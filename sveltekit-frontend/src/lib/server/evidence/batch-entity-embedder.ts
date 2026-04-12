@@ -9,7 +9,7 @@
  * Performance: ~100-500 entities/sec vs ~10-20 with individual INSERTs
  */
 
-import { db } from '$lib/server/db/client.js';
+import db from '$lib/server/db/client.js';
 import { embedTexts } from '$lib/server/batch-embedder.js';
 import type { Entity } from '$lib/server/analysis/entity-extraction.js';
 import { Writable } from 'stream';

@@ -7,7 +7,8 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
 
 const recentQuerySchema = z.object({

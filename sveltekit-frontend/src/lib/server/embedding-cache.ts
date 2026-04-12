@@ -3,7 +3,8 @@
  * Stores Float32Array embeddings in binary format (4x smaller than JSON)
  */
 
-import { redis } from './redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from './redis.js';
 import { createHash } from 'crypto';
 
 const EMBEDDING_TTL = 3600; // 1 hour
@@ -29,6 +30,7 @@ export async function cacheEmbedding(
 	// Convert Float32Array to Buffer (binary)
 	const buffer = Buffer.from(embedding.buffer, embedding.byteOffset, embedding.byteLength);
 
+	const redis: Redis = getRedis();
 	await redis.setex(key, EMBEDDING_TTL, buffer);
 }
 
@@ -39,6 +41,7 @@ export async function cacheEmbedding(
  */
 export async function getCachedEmbedding(text: string): Promise<Float32Array | null> {
 	const key = `embed:${hashText(text)}`;
+	const redis: Redis = getRedis();
 	const buffer = await redis.getBuffer(key);
 
 	if (!buffer) return null;
@@ -56,6 +59,7 @@ export async function batchCacheEmbeddings(
 ): Promise<void> {
 	if (entries.length === 0) return;
 
+	const redis: Redis = getRedis();
 	const pipeline = redis.pipeline();
 
 	for (const { text, embedding } of entries) {
@@ -78,6 +82,7 @@ export async function batchGetCachedEmbeddings(
 	if (texts.length === 0) return [];
 
 	const keys = texts.map((text) => `embed:${hashText(text)}`);
+	const redis: Redis = getRedis();
 	const pipeline = redis.pipeline();
 
 	for (const key of keys) {
@@ -97,6 +102,7 @@ export async function batchGetCachedEmbeddings(
  * Clear embedding cache (use sparingly)
  */
 export async function clearEmbeddingCache(): Promise<void> {
+	const redis: Redis = getRedis();
 	const keys = await redis.keys('embed:*');
 	if (keys.length > 0) {
 		await redis.del(...keys);

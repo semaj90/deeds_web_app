@@ -8,7 +8,8 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';

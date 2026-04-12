@@ -16,7 +16,8 @@ import {
 	fictionalCaseEvents,
 } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 

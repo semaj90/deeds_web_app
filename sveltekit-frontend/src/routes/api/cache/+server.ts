@@ -12,7 +12,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 
 const memoryCache = new Map<string, { value: unknown; expires: number; priority?: string; tags?: string[] }>();
 
@@ -37,6 +38,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     let redisKeys = 0;
     let redisMemory = '0';
     try {
+      const redis: Redis = getRedis();
       redisKeys = await redis.dbsize();
       const info = await redis.info('memory');
       const match = info.match(/used_memory_human:(\S+)/);
@@ -58,6 +60,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   if (action === 'health') {
     let redisHealthy = false;
     try {
+      const redis: Redis = getRedis();
       const pong = await redis.ping();
       redisHealthy = pong === 'PONG';
     } catch {
@@ -82,6 +85,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     }
     // Try Redis
     try {
+      const redis: Redis = getRedis();
       const result = await redis.get(key);
       if (result) {
         try {
@@ -127,6 +131,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	// Also store in Redis
 	try {
+		const redis: Redis = getRedis();
 		const ttlSeconds = Math.ceil(ttl / 1000);
 		await redis.set(key, JSON.stringify(value), 'EX', ttlSeconds);
 	} catch { /* Redis unavailable, memory-only */ }
@@ -141,13 +146,19 @@ export const DELETE: RequestHandler = async ({ url, locals }) => {
 
 	if (action === 'clear') {
 		memoryCache.clear();
-		try { await redis.flushdb(); } catch { /* Redis unavailable */ }
+		try {
+			const redis: Redis = getRedis();
+			await redis.flushdb();
+		} catch { /* Redis unavailable */ }
 		return json({ success: true, message: 'Cache cleared' });
 	}
 
 	if (key) {
 		memoryCache.delete(key);
-		try { await redis.del(key); } catch { /* Redis unavailable */ }
+		try {
+			const redis: Redis = getRedis();
+			await redis.del(key);
+		} catch { /* Redis unavailable */ }
 		return json({ success: true, key });
 	}
 

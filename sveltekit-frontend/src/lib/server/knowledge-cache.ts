@@ -1,9 +1,10 @@
 /**
  * Redis caching layer for knowledge base queries
  */
+import type { Redis } from 'ioredis';
 import type { ScoredPoint } from '$lib/types/qdrant';
 import crypto from 'crypto';
-import { redis } from '$lib/server/redis.js';
+import { getRedis } from '$lib/server/redis.js';
 
 const TTL = {
     embeddings: 3600, // 1 hour
@@ -30,6 +31,7 @@ async function recordCacheMetric(type: 'hit' | 'miss', cacheType: string): Promi
     const key = `metrics:cache:${cacheType}`;
     const field = type === 'hit' ? 'hits' : 'misses';
     try {
+        const redis: Redis = getRedis();
         const pipeline = redis.pipeline();
         pipeline.hincrby(key, field, 1);
         pipeline.expire(key, 3600);
@@ -42,6 +44,7 @@ async function recordCacheMetric(type: 'hit' | 'miss', cacheType: string): Promi
 export async function getCacheStats(cacheType: string) {
     try {
         const key = `metrics:cache:${cacheType}`;
+        const redis: Redis = getRedis();
         const stats = await redis.hgetall(key);
         const hits = parseInt(stats?.hits ?? '0');
         const misses = parseInt(stats?.misses ?? '0');
@@ -59,6 +62,7 @@ export async function getCacheStats(cacheType: string) {
 
 export async function getAllCacheStats() {
     try {
+        const redis: Redis = getRedis();
         const pipeline = redis.pipeline();
         pipeline.hgetall('metrics:cache:embeddings');
         pipeline.hgetall('metrics:cache:search');
@@ -81,6 +85,7 @@ export async function getAllCacheStats() {
 export async function getCachedEmbedding(text: string, model: string): Promise<number[] | null> {
     const cacheKey = getEmbeddingCacheKey(text, model);
     try {
+        const redis: Redis = getRedis();
         const cached = await redis.get(cacheKey);
         if (cached) {
             await recordCacheMetric('hit', 'embeddings');
@@ -97,6 +102,7 @@ export async function getCachedEmbedding(text: string, model: string): Promise<n
 export async function setCachedEmbedding(text: string, model: string, embedding: number[]): Promise<void> {
     const cacheKey = getEmbeddingCacheKey(text, model);
     try {
+        const redis: Redis = getRedis();
         await redis.setex(cacheKey, TTL.embeddings, JSON.stringify(embedding));
     } catch (error) {
         console.error('Failed to cache embedding', error);
@@ -113,6 +119,7 @@ export async function getCachedSearchResults(
   const cacheKey = getSearchCacheKey(collection, queryHash, filters);
 
   try {
+    const redis = getRedis();
     const cached = await redis.get(cacheKey);
     if (cached) {
       await recordCacheMetric('hit', 'search');
@@ -135,6 +142,7 @@ export async function setCachedSearchResults(
   const queryHash = crypto.createHash('md5').update(query).digest('hex').substring(0, 12);
   const cacheKey = getSearchCacheKey(collection, queryHash, filters);
   try {
+    const redis = getRedis();
     await redis.setex(cacheKey, TTL.search, JSON.stringify(results));
   } catch (error) {
     console.error('Failed to cache search results', error);
@@ -144,6 +152,7 @@ export async function setCachedSearchResults(
 // Invalidation
 export async function invalidatePattern(pattern: string): Promise<number> {
     try {
+        const redis: Redis = getRedis();
         const keys = await redis.keys(pattern);
         if (keys.length === 0) return 0;
         return await redis.del(...keys);
@@ -169,6 +178,7 @@ export async function onDocumentIndexed(docId: string): Promise<void> {
     console.log(`📝 Document indexed: ${docId}`);
     try {
       await invalidateAllSearchCaches();
+      const redis = getRedis();
       await redis.del('stats:knowledge_base');
       await redis.publish(
         'kb:invalidate',
@@ -186,6 +196,7 @@ export async function onModelUpdated(model: string): Promise<void> {
 // Health config
 export async function getCacheHealth() {
     try {
+        const redis: Redis = getRedis();
         const ping = await redis.ping();
         const info = await redis.info('memory');
         const usedMemoryMatch = info.match(/used_memory_human:(\S+)/);
@@ -211,7 +222,6 @@ export async function getCacheHealth() {
 }
 
 export async function closeCache(): Promise<void> {
+    const redis = getRedis();
     await redis.quit();
 }
-
-export { redis };

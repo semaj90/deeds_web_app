@@ -7,7 +7,8 @@
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { RequestHandler } from '@sveltejs/kit';
 import { ollamaFetch } from '$lib/server/ollama.js';

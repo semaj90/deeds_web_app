@@ -25,6 +25,7 @@ import {
   serializeEvidenceMetadataBase64,
   type EvidenceMetadataProto,
 } from '$lib/server/evidence/proto-serializer.js';
+import { batchStoreEntities } from '$lib/server/evidence/batch-entity-storer.js';
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -1133,30 +1134,16 @@ async function processAndEmbed(
     /* non-fatal */
   }
 
-  // 6a-ii. Persist entities + forensic flags to normalized tables (no cap)
+  // 6a-ii. Persist entities to normalized table using batch storer (Drizzle multi-row INSERT)
   if (entities.length > 0) {
     try {
-      const entityRows = entities.map((e) => ({
-        evidenceId,
-        caseId: caseId ?? null,
-        entityText: e.text.slice(0, 5000),
-        entityLabel: e.label.slice(0, 50),
-        confidence: e.score ?? null,
-        startOffset: e.start ?? null,
-        endOffset: e.end ?? null,
-        source: 'llm' as const,
-      }));
-      // Batch insert in chunks of 500 (Drizzle has no cap, but PG has param limit)
-      for (let i = 0; i < entityRows.length; i += 500) {
-        await db.execute(sql`
-					INSERT INTO evidence_entities (evidence_id, case_id, entity_text, entity_label, confidence, start_offset, end_offset, source)
-					SELECT * FROM jsonb_to_recordset(${JSON.stringify(entityRows.slice(i, i + 500))}::jsonb)
-					AS t(evidence_id uuid, case_id uuid, entity_text text, entity_label varchar, confidence real, start_offset int, end_offset int, source varchar)
-				`);
-      }
+      const batchResult = await batchStoreEntities(entities, evidenceId, caseId);
       console.log(
-        `[Upload] Persisted ${entities.length} entities to evidence_entities for ${fileName}`
+        `[Upload] Batch stored ${batchResult.inserted} entities in ${batchResult.durationMs}ms for ${fileName}`
       );
+      if (batchResult.failed > 0) {
+        console.warn(`[Upload] ${batchResult.failed} entities failed to store`);
+      }
     } catch (err) {
       console.warn('[Upload] Entity normalization failed (non-fatal, JSONB fallback intact):', err);
       markStage(

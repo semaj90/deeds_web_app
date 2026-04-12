@@ -9,7 +9,7 @@
  * Performance: 100-500 entities/sec vs ~10-20 with individual INSERTs
  */
 
-import { db } from '$lib/server/db/client.js';
+import db from '$lib/server/db/client.js';
 import { evidenceEntities, type NewEvidenceEntity } from '$lib/server/db/schema-postgres.js';
 import type { Entity } from '$lib/server/analysis/entity-extraction.js';
 

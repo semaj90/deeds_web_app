@@ -7,7 +7,8 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
 import { memoryCache } from '$lib/server/cache.js';
 import { ollamaBreaker, qdrantBreaker, redisBreaker, breakerEventLog } from '$lib/server/circuit-breaker.js';

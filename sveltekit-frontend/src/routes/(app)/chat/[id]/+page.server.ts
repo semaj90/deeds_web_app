@@ -4,7 +4,8 @@
  */
 
 import { fail } from '@sveltejs/kit';
-import { redis } from '$lib/server/redis';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
 import { ollamaFetch } from '$lib/server/ollama.js';

@@ -13,7 +13,8 @@
  *   - /api/gpu/lease — full CRUD lease management ✅
  *   - /api/gpu-wasm-integration — pipeline telemetry ✅
  */
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 
 export type InferenceBackend = 'ollama' | 'tensorrt';
@@ -38,6 +39,7 @@ export async function acquireGpuLease(
 	ttlSeconds = DEFAULT_TTL_SEC
 ): Promise<GpuLease | null> {
 	try {
+		const redis: Redis = getRedis();
 		const existing = await redis.get(LEASE_KEY);
 		if (existing) {
 			const lease: GpuLease = JSON.parse(existing);
@@ -83,6 +85,7 @@ export async function acquireGpuLease(
  */
 export async function releaseGpuLease(backend: InferenceBackend): Promise<boolean> {
 	try {
+		const redis: Redis = getRedis();
 		const existing = await redis.get(LEASE_KEY);
 		if (!existing) return true;
 
@@ -102,6 +105,7 @@ export async function releaseGpuLease(backend: InferenceBackend): Promise<boolea
  */
 export async function getGpuLeaseStatus(): Promise<GpuLease | null> {
 	try {
+		const redis: Redis = getRedis();
 		const existing = await redis.get(LEASE_KEY);
 		if (!existing) return null;
 		const lease: GpuLease = JSON.parse(existing);
@@ -122,6 +126,7 @@ export async function getGpuLeaseStatus(): Promise<GpuLease | null> {
  */
 export async function acquireGpuSemaphore(timeoutSec = 30): Promise<string | null> {
 	try {
+		const redis: Redis = getRedis();
 		const ticket = `gpu-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 		const count = await redis.scard(SEMAPHORE_KEY);
 		if (count >= MAX_CONCURRENT_GPU_OPS) {
@@ -149,6 +154,7 @@ export async function acquireGpuSemaphore(timeoutSec = 30): Promise<string | nul
  */
 export async function releaseGpuSemaphore(ticket: string): Promise<void> {
 	try {
+		const redis: Redis = getRedis();
 		await redis.srem(SEMAPHORE_KEY, ticket);
 	} catch {
 		// Non-critical
@@ -160,6 +166,7 @@ export async function releaseGpuSemaphore(ticket: string): Promise<void> {
  */
 export async function getGpuSemaphoreStatus(): Promise<{ active: number; max: number }> {
 	try {
+		const redis: Redis = getRedis();
 		const count = await redis.scard(SEMAPHORE_KEY);
 		return { active: count, max: MAX_CONCURRENT_GPU_OPS };
 	} catch {

@@ -6,7 +6,8 @@
 	seq: <number>, chunk: <string>, meta: <json> }
  * Consumers read with XRANGE/XREAD to replay tokens for resume semantics.
  */
-import { redis } from '$lib/server/redis';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis';
 
 export type TokenEntry = {
     id: string; // The stream ID (e.g. "169616...-0")
@@ -29,7 +30,7 @@ export async function produceTokenChunk(
     chunk: string,
     meta: Record<string, unknown> = {}
 ): Promise<string> {
-    if (!redis) throw new Error('Redis client not initialized');
+    const redis: Redis = getRedis();
     const key = streamKey(requestId);
 
     // XADD key * seq <seq> chunk <chunk> meta <json>
@@ -56,7 +57,7 @@ export async function readTokenStream(
     fromId = '-',
     count = 100
 ): Promise<TokenEntry[]> {
-    if (!redis) throw new Error('Redis client not initialized');
+    const redis: Redis = getRedis();
     const key = streamKey(requestId);
 
     // XRANGE key start end COUNT count
@@ -75,7 +76,7 @@ export async function trimTokenStream(
     requestId: string,
     maxLen = 1000
 ): Promise<void> {
-    if (!redis) throw new Error('Redis client not initialized');
+    const redis: Redis = getRedis();
     const key = streamKey(requestId);
     await (redis as any).xtrim(key, 'MAXLEN', '~', maxLen);
 }
@@ -90,7 +91,7 @@ export async function consumeTokenStream(
     callback: (entry: TokenEntry) => Promise<void>,
     stopAfterMs = 30000
 ): Promise<void> {
-    if (!redis) throw new Error('Redis client not initialized');
+    const redis: Redis = getRedis();
     const key = streamKey(requestId);
     let lastId = fromId;
     const start = Date.now();
