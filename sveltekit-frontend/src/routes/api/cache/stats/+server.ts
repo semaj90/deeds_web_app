@@ -11,13 +11,14 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { redisPool } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
 // redis-metrics module removed — inline fallback below
 
 /** Count keys matching a pattern using SCAN (non-blocking, unlike KEYS) */
-async function scanCount(redis: ReturnType<typeof redisPool.getConnection>, pattern: string): Promise<number> {
+async function scanCount(redis: Redis, pattern: string): Promise<number> {
 	let count = 0;
 	let cursor = '0';
 	do {
@@ -31,7 +32,7 @@ async function scanCount(redis: ReturnType<typeof redisPool.getConnection>, patt
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const redis = redisPool.getConnection();
+		const redis: Redis = getRedis();
 
 		// Redis stats
 		const [

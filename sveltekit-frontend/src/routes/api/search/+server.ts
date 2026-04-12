@@ -23,6 +23,7 @@ import {
 import { ilike, or, desc, sql, eq } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.js';
+import { getSemanticCacheHit, setSemanticCache } from '$lib/server/search/semantic-cache.js';
 
 /**
  * Unified Platform Search — Three-layer architecture:
@@ -525,6 +526,29 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	}
 	const { q, type, limit, jurisdiction, authority } = parsed.data;
 
+	// Check semantic cache first (28x speedup on similar queries)
+	const cachedResult = await getSemanticCacheHit(q);
+	if (cachedResult) {
+		// Reconstruct full response from cached data
+		const groups: Record<string, number> = {};
+		for (const hit of cachedResult.results) {
+			groups[hit.entityType] = (groups[hit.entityType] ?? 0) + 1;
+		}
+
+		return json({
+			query: q,
+			type,
+			totalResults: cachedResult.results.length,
+			groups,
+			hits: cachedResult.results,
+			timing: {
+				totalMs: (cachedResult.timings.cacheAge as number) ?? 0,
+				adapters: cachedResult.timings as AdapterTimings,
+				semanticCacheHit: true,
+			},
+		});
+	}
+
 	const startTime = performance.now();
 	const adapterTimings: AdapterTimings = {};
 
@@ -586,6 +610,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			totalMs: Math.round(performance.now() - startTime),
 			adapters: adapterTimings,
 		};
+
+		// Store in semantic cache for future similar queries (non-blocking)
+		setSemanticCache(q, hits, adapterTimings).catch((err) =>
+			console.warn('[search] Cache write failed (non-fatal):', err)
+		);
 
 		return json({
 			query: q,

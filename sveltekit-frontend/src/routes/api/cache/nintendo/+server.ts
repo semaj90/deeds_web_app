@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const maxMemory = 8192; // 8KB banks metaphor
 
 	try {
+		const redis: Redis = getRedis();
 		const memInfo = await redis.info('memory');
 		const statsInfo = await redis.info('stats');
 

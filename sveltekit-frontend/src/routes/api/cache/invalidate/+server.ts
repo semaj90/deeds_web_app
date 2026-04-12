@@ -12,7 +12,8 @@
  */
 
 import { json, error, type RequestHandler } from '@sveltejs/kit';
-import { redisPool } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
 
 const ALLOWED_PREFIXES = [
@@ -42,7 +43,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 		const { pattern } = parsed.data;
 
-		const redis = redisPool.getConnection();
+		const redis: Redis = getRedis();
 		const keys = await redis.keys(pattern);
 
 		if (keys.length === 0) {

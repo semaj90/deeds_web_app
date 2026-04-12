@@ -2,20 +2,29 @@
  *  GET  /api/pgai/summarize — Health check */
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { summarizeWithQueue } from '$lib/server/pgai/summarize.js';
+
+const summarizeSchema = z.object({
+	text: z.string().min(1, 'text is required').max(50000),
+	documentId: z.string().optional()
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		const body = await request.json().catch(() => ({}));
-		const text = body.text;
-		const documentId = body.documentId || `temp-${Date.now()}`;
+		const body = await request.json();
+		const parsed = summarizeSchema.safeParse(body);
 
-		if (!text || typeof text !== 'string') {
-			return json({ success: false, error: 'text is required' }, { status: 400 });
+		if (!parsed.success) {
+			return json(
+				{ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+				{ status: 400 }
+			);
 		}
 
+		const { text, documentId = `temp-${Date.now()}` } = parsed.data;
 		const result = await summarizeWithQueue(text.slice(0, 6000), documentId);
 		return json(result);
 	} catch (err) {

@@ -1,22 +1,32 @@
 /** POST /api/chrrom/events — Record user action, predict next, push CHR patterns */
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { predictor, mapActionToCHRContext } from '$lib/server/chrrom/predictor.js';
 import { generateCHRPatterns } from '$lib/server/chrrom/patterns.js';
 import { broadcastPatterns } from '$lib/server/chrrom/bus.js';
+
+const chrromEventSchema = z.object({
+	action: z.string().min(1, 'action is required').max(200),
+	userId: z.string().optional(),
+	topK: z.number().int().min(1).max(5).optional().default(2)
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
 		const body = await request.json();
-		const userId = body.userId || locals.user.id || 'anonymous';
-		const action = body.action;
-		const topK = Math.min(Math.max(body.topK ?? 2, 1), 5);
+		const parsed = chrromEventSchema.safeParse(body);
 
-		if (!action || typeof action !== 'string') {
-			return json({ error: 'action is required' }, { status: 400 });
+		if (!parsed.success) {
+			return json(
+				{ error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+				{ status: 400 }
+			);
 		}
+
+		const { action, userId = locals.user.id || 'anonymous', topK = 2 } = parsed.data;
 
 		// Record action in Markov predictor
 		await predictor.recordAction(userId, action);

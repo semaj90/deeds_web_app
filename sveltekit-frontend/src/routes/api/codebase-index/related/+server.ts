@@ -15,25 +15,31 @@ import { resolve, relative } from 'path';
 import { readFileSync } from 'fs';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { z } from 'zod';
 
 const PROJECT_ROOT = resolve(process.cwd());
+
+const relatedSchema = z.object({
+	filePath: z.string().min(1, 'filePath is required').max(500, 'filePath too long'),
+	limit: z.number().int().min(1).max(20).optional().default(8),
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	let body: { filePath?: string; limit?: number };
+	let body: unknown;
 	try {
 		body = await request.json();
 	} catch {
 		return json({ error: 'Invalid JSON body' }, { status: 400 });
 	}
 
-	const filePath = body.filePath;
-	const limit = Math.min(body.limit ?? 8, 20);
-
-	if (!filePath || typeof filePath !== 'string') {
-		return json({ error: 'filePath is required' }, { status: 400 });
+	const parsed = relatedSchema.safeParse(body);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+
+	const { filePath, limit } = parsed.data;
 
 	// Resolve path
 	const normalizedPath = filePath.startsWith('src/')

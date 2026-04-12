@@ -13,8 +13,19 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { createCodebaseEmbeddingJob, processEmbeddingJob, getJobStatus } from '$lib/server/gpu/mapreduce-cuda-analyzer';
 import crypto from 'crypto';
+
+const indexRequestSchema = z.object({
+	scope: z.enum(['lib', 'routes', 'all']).optional().default('all'),
+	incremental: z.boolean().optional().default(false),
+	patterns: z.array(z.string()).optional(),
+	config: z.object({
+		batchSize: z.number().int().min(1).max(1000).optional(),
+		concurrency: z.number().int().min(1).max(16).optional()
+	}).optional()
+});
 
 // Scope → glob pattern mapping for mapreduce fallback
 const SCOPE_TO_PATTERNS: Record<string, string[]> = {
@@ -115,11 +126,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	try {
-		const body = await request.json().catch(() => ({}));
-		const scope: string = body.scope ?? 'all';
-		const incremental: boolean = body.incremental ?? false;
-		const patterns: string[] = body.patterns ?? SCOPE_TO_PATTERNS[scope] ?? SCOPE_TO_PATTERNS.all;
-		const config = body.config ?? {};
+		const body = await request.json();
+		const parsed = indexRequestSchema.safeParse(body);
+
+		if (!parsed.success) {
+			return json(
+				{ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+				{ status: 400 }
+			);
+		}
+
+		const { scope, incremental, patterns: customPatterns, config } = parsed.data;
+		const patterns = customPatterns ?? SCOPE_TO_PATTERNS[scope] ?? SCOPE_TO_PATTERNS.all;
 
 		// Try RabbitMQ first (production path)
 		const rmqJobId = await tryRabbitMQPath(scope, incremental, locals.user.id);
@@ -135,7 +153,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		// Fallback to mapreduce worker_threads
-		const mrJobId = await fallbackMapReducePath(patterns, config);
+		const mrJobId = await fallbackMapReducePath(patterns, config ?? {});
 
 		// Wait briefly for file scan
 		await new Promise((r) => setTimeout(r, 1000));

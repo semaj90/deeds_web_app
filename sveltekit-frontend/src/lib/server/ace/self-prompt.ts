@@ -11,7 +11,8 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import type { ACEContext, SelfEvaluation } from './types.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -85,6 +86,7 @@ export async function evaluateResponse(opts: {
     evaluation.evalMs = Date.now() - start;
 
     // Cache evaluation
+    const redis: Redis = getRedis();
     const cacheKey = `ace:eval:${hashString(opts.query + opts.response)}`;
     await redis.set(cacheKey, JSON.stringify(evaluation), 'EX', EVAL_CACHE_TTL).catch(() => {});
 

@@ -1,4 +1,5 @@
-import { redis } from '$lib/server/redis';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis';
 // @ts-ignore — rabbitmq.ts excluded from tsconfig
 const publishToQueue = async (queue: string, msg: any) => { /* stub */ };
 import type { RagShardJob, DocStatus, DocStatusInfo } from './types.js';
@@ -29,6 +30,7 @@ export async function enqueueDocumentForRag(params: {
     }
 
     // Set initial status
+    const redis: Redis = getRedis();
     await redis.set(`rag:doc:${params.docId}:status`, 'sharding');
     await redis.set(`rag:doc:${params.docId}:shard_count`, String(shardCount));
 
@@ -42,6 +44,7 @@ export async function enqueueDocumentForRag(params: {
 }
 
 export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
+    const redis: Redis = getRedis();
     const [statusRaw, shardCountRaw] = await redis.mget([
         `rag:doc:${docId}:status`,
         `rag:doc:${docId}:shard_count`
@@ -76,6 +79,7 @@ export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
 }
 
 export async function getShardChunks(docId: string, shardId: number): Promise<any[]> {
+    const redis: Redis = getRedis();
     const chunksKey = `rag:doc:${docId}:shard:${shardId}:chunks`;
     const chunksJson = await redis.get(chunksKey);
     return chunksJson ? JSON.parse(chunksJson) : [];
@@ -87,6 +91,7 @@ export async function updateShardStatus(
     status: string,
     metadata?: any
 ): Promise<void> {
+    const redis: Redis = getRedis();
     const statusKey = `rag:doc:${docId}:shard:${shardId}:status`;
     await redis.set(statusKey, status);
 
@@ -97,6 +102,7 @@ export async function updateShardStatus(
 }
 
 export async function getAllDocIds(): Promise<string[]> {
+    const redis: Redis = getRedis();
     const keys = await redis.keys('rag:doc:*:status');
     return keys.map((key) => key.replace('rag:doc:', '').replace(':status', ''));
 }

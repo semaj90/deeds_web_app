@@ -15,6 +15,7 @@ import { ollamaBreaker, qdrantBreaker, redisBreaker, breakerEventLog } from '$li
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	const redis: Redis = getRedis();
 	let redisInfo = { keyspace_hits: 0, keyspace_misses: 0, used_memory: 0, total_connections_received: 0 };
 
 	try {

@@ -5,9 +5,16 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { tryEmbedOllama } from '$lib/server/embeddings/ollama.js';
+
+const wikiSearchSchema = z.object({
+	query: z.string().min(1, 'query is required').max(500),
+	limit: z.number().int().min(1).max(100).optional().default(10),
+	domain: z.string().optional()
+});
 
 // GET /api/codebase/wiki - List wiki pages
 export const GET: RequestHandler = async ({ url, locals }) => {
@@ -42,11 +49,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	try {
-		const { query, limit = 10, domain } = await request.json();
+		const body = await request.json();
+		const parsed = wikiSearchSchema.safeParse(body);
 
-		if (!query || typeof query !== 'string') {
-			return json({ results: [], error: 'Invalid query' }, { status: 400 });
+		if (!parsed.success) {
+			return json(
+				{ results: [], error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+				{ status: 400 }
+			);
 		}
+
+		const { query, limit, domain } = parsed.data;
 
 		// Generate embedding for the search query
 		const embeddingResult = await tryEmbedOllama(query, { timeoutMs: 5000 });

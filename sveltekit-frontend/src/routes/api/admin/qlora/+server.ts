@@ -59,6 +59,7 @@ const JOBS_KEY = 'qlora:jobs';
 
 async function getJobs(): Promise<TrainingJob[]> {
 	try {
+		const redis: Redis = getRedis();
 		const raw = await redis.get(JOBS_KEY);
 		return raw ? JSON.parse(raw) : [];
 	} catch {
@@ -68,6 +69,7 @@ async function getJobs(): Promise<TrainingJob[]> {
 
 async function saveJobs(jobs: TrainingJob[]): Promise<void> {
 	try {
+		const redis: Redis = getRedis();
 		await redis.set(JOBS_KEY, JSON.stringify(jobs));
 	} catch { /* non-critical */ }
 }

@@ -19,24 +19,31 @@ import { createHash } from 'crypto';
 import { callOllamaChat } from '$lib/server/ollama.js';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
 import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
+import { z } from 'zod';
 
 const SRC_ROOT = resolve(process.cwd(), 'src');
+
+const analyzeSchema = z.object({
+	filePath: z.string().min(1, 'filePath is required').max(500, 'filePath too long'),
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const requestStart = performance.now();
 
-	let body: { filePath?: string };
+	let body: unknown;
 	try {
 		body = await request.json();
 	} catch {
 		return json({ error: 'Invalid JSON body' }, { status: 400 });
 	}
 
-	const filePath = body.filePath;
-	if (!filePath || typeof filePath !== 'string') {
-		return json({ error: 'filePath is required' }, { status: 400 });
+	const parsed = analyzeSchema.safeParse(body);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+
+	const { filePath } = parsed.data;
 
 	// Resolve relative to project root: "src/routes/..." → absolute path
 	const normalizedPath = filePath.startsWith('src/')

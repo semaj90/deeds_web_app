@@ -41,6 +41,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { caseId, collections } = parsed.data;
 
 	// Check Redis cache
+	const redis: Redis = getRedis();
 	const cacheKey = `cartridge:${caseId}`;
 	try {
 		const cached = await redis.getBuffer(cacheKey);

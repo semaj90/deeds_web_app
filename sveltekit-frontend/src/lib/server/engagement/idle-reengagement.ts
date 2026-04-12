@@ -14,7 +14,8 @@
  *   - 24hr:  Summary digest ("Here's what happened while you were away...")
  *   - 7day:  Re-engagement ("We miss you! Check out new features...")
  */
-import { redis } from '$lib/server/redis.js';
+import type { Redis } from 'ioredis';
+import { getRedis } from '$lib/server/redis.js';
 import { sendNotification } from '$lib/server/notifications/push-service.js';
 import type { NotificationPayload } from '$lib/server/notifications/push-service.js';
 import { db } from '$lib/server/db/client';
@@ -80,6 +81,7 @@ const FEATURE_HIGHLIGHTS: NotificationPayload[] = [
  */
 export async function recordHeartbeat(userId: string): Promise<void> {
 	try {
+		const redis: Redis = getRedis();
 		const key = `${REDIS_KEY_PREFIX}${userId}`;
 		const now = Date.now();
 		await redis.set(key, String(now), 'EX', 30 * 24 * 60 * 60); // 30-day TTL
@@ -93,6 +95,7 @@ export async function recordHeartbeat(userId: string): Promise<void> {
  */
 export async function getLastActive(userId: string): Promise<number | null> {
 	try {
+		const redis: Redis = getRedis();
 		const key = `${REDIS_KEY_PREFIX}${userId}`;
 		const val = await redis.get(key);
 		return val ? parseInt(val, 10) : null;
@@ -117,6 +120,7 @@ export async function getIdleDuration(userId: string): Promise<number> {
  */
 async function hasNotifiedToday(userId: string, tier: IdleTier): Promise<boolean> {
 	try {
+		const redis: Redis = getRedis();
 		const key = `${REDIS_NOTIFY_PREFIX}${userId}:${tier}`;
 		const count = await redis.get(key);
 		const tierConfig = IDLE_TIERS.find(t => t.name === tier);
@@ -131,6 +135,7 @@ async function hasNotifiedToday(userId: string, tier: IdleTier): Promise<boolean
  */
 async function markNotified(userId: string, tier: IdleTier): Promise<void> {
 	try {
+		const redis: Redis = getRedis();
 		const key = `${REDIS_NOTIFY_PREFIX}${userId}:${tier}`;
 		await redis.incr(key);
 		// Expire at midnight UTC
@@ -219,6 +224,7 @@ export async function scanIdleUsers(): Promise<{
 	const result = { scanned: 0, notified: 0, errors: 0 };
 
 	try {
+		const redis: Redis = getRedis();
 		// Get all user activity keys from Redis
 		const keys: string[] = [];
 		let cursor = '0';

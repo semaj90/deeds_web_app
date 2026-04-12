@@ -219,6 +219,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 
 		// Store in Redis
+		const redis: Redis = getRedis();
 		await redis.set(
 			SESSION_PREFIX + sessionId,
 			JSON.stringify(session),
@@ -258,6 +259,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	}
 
 	try {
+		const redis: Redis = getRedis();
 		const sessionIds = await redis.smembers(USER_SESSIONS_PREFIX + locals.user.id);
 		const sessions: Array<{
 			id: string;

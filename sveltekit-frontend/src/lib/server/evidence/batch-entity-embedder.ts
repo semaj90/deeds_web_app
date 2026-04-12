@@ -60,7 +60,7 @@ export async function batchEmbedAndStoreEntities(
 
 	// 2. Build Qdrant points with deterministic IDs for idempotent upserts
 	const points = entities.map((entity, i) => ({
-		id: deterministicPointId(`entity:${evidenceId}:${i}`),,
+		id: deterministicPointId(`entity:${evidenceId}:${i}`),
 		vector: Array.from(embeddings[i]),
 		payload: {
 			type: 'entity',
@@ -79,7 +79,7 @@ export async function batchEmbedAndStoreEntities(
 	// 3. Upsert to Qdrant evidence_items collection
 	try {
 		const result = await qdrant.batchUpsert({
-			collectionName: 'evidence_items',
+			collection: 'evidence_items',
 			points,
 			batchSize: 50,
 		});

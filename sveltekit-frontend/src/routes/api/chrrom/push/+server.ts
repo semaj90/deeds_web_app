@@ -2,9 +2,18 @@
  *  POST /api/chrrom/push — Generate patterns and broadcast to all connected clients */
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { generateCHRPatterns } from '$lib/server/chrrom/patterns.js';
 import type { PrecomputeContext } from '$lib/server/chrrom/patterns.js';
 import { addClient, removeClient, broadcastPatterns } from '$lib/server/chrrom/bus.js';
+
+const precomputeContextSchema = z.object({
+	userId: z.string().optional(),
+	sessionId: z.string().optional(),
+	caseId: z.string().optional(),
+	docId: z.string().optional(),
+	query: z.string().max(1000).optional()
+});
 
 export const GET: RequestHandler = async () => {
 	const encoder = new TextEncoder();
@@ -42,7 +51,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		const ctx = (await request.json()) as PrecomputeContext;
+		const body = await request.json();
+		const parsed = precomputeContextSchema.safeParse(body);
+
+		if (!parsed.success) {
+			return json(
+				{ error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+				{ status: 400 }
+			);
+		}
+
+		const ctx: PrecomputeContext = parsed.data;
 		const patterns = await generateCHRPatterns(ctx);
 		broadcastPatterns(patterns);
 		return json({ ok: true, count: patterns.length });
