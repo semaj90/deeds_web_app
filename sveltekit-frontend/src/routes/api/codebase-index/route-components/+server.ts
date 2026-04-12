@@ -18,6 +18,11 @@ import { resolve, relative, dirname, basename } from 'path';
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { createHash } from 'crypto';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
+import { z } from 'zod';
+
+const routeComponentsSchema = z.object({
+	route: z.string().min(1, 'route query parameter is required').max(200),
+});
 
 const SRC_ROOT = resolve(process.cwd(), 'src');
 const ROUTES_ROOT = resolve(SRC_ROOT, 'routes');
@@ -224,11 +229,15 @@ function resolveComponentTree(
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const route = url.searchParams.get('route');
-	if (!route || typeof route !== 'string') {
-		return json({ error: 'route query parameter is required' }, { status: 400 });
+	const parsed = routeComponentsSchema.safeParse({
+		route: url.searchParams.get('route'),
+	});
+
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid params' }, { status: 400 });
 	}
 
+	const { route } = parsed.data;
 	const startMs = Date.now();
 
 	// Check cache

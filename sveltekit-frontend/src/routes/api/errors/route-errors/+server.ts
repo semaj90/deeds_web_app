@@ -10,17 +10,28 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { errorEvents, errorClusters } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, sql, gte, and } from 'drizzle-orm';
+import { z } from 'zod';
+
+const routeErrorsSchema = z.object({
+	route: z.string().min(1, 'route query parameter is required').max(200),
+	limit: z.coerce.number().int().min(1).max(100).default(20),
+	hours: z.coerce.number().int().min(1).max(168).default(24),
+});
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const route = url.searchParams.get('route');
-	if (!route || typeof route !== 'string') {
-		return json({ error: 'route query parameter is required' }, { status: 400 });
+	const parsed = routeErrorsSchema.safeParse({
+		route: url.searchParams.get('route'),
+		limit: url.searchParams.get('limit'),
+		hours: url.searchParams.get('hours'),
+	});
+
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid params' }, { status: 400 });
 	}
 
-	const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10) || 20, 100);
-	const hours = Math.min(parseInt(url.searchParams.get('hours') || '24', 10) || 24, 168);
+	const { route, limit, hours } = parsed.data;
 	const since = new Date(Date.now() - hours * 60 * 60 * 1000);
 
 	try {
