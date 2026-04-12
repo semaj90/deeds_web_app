@@ -513,20 +513,20 @@ export class ChatContextWorker extends QueueWorker<{
 
 		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 		await qdrant.batchUpsert({
-			collection: 'chat_messages' as Parameters<typeof qdrant.batchUpsert>[0]['collection'],
-			points: [
-				{
-					id: `chat-${data.sessionId}-${Date.now()}`,
-					vector: embedding,
-					payload: {
-						sessionId: data.sessionId,
-						role: data.role ?? 'user',
-						content: data.message.slice(0, 500),
-						timestamp: Date.now()
-					}
-				}
-			]
-		});
+      collection: 'chat_history' as Parameters<typeof qdrant.batchUpsert>[0]['collection'],
+      points: [
+        {
+          id: crypto.randomUUID(),
+          vector: embedding,
+          payload: {
+            sessionId: data.sessionId,
+            role: data.role ?? 'user',
+            content: data.message.slice(0, 500),
+            timestamp: Date.now(),
+          },
+        },
+      ],
+    });
 	}
 }
 
