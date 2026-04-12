@@ -1,8 +1,9 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 /** GET /api/yorha/cluster-health — Cluster health metrics for YoRHa dashboard */
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user?.id) {
     return json(
       {
@@ -27,7 +28,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		const totalMem = require('os').totalmem();
 		const freeMem = require('os').freemem();
 
-		return json({
+		const responseData = {
 			timestamp: new Date().toISOString(),
 			metrics: {
 				cpu_usage: Math.round(Math.random() * 30 + 10), // Placeholder — real CPU requires sampling
@@ -45,6 +46,13 @@ export const GET: RequestHandler = async ({ locals }) => {
 				gpu_warning: 80,
 				gpu_critical: 95
 			}
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[/api/yorha/cluster-health] error:', err);
@@ -59,6 +67,8 @@ export const GET: RequestHandler = async ({ locals }) => {
         gpu_warning: 80,
         gpu_critical: 95,
       },
-    });
+    }, {
+			headers: cacheControl.short
+		});
 	}
 };

@@ -121,9 +121,24 @@
     onMount(() => {
         mounted = true;
         analytics.init(data?.user?.id);
+
+        // Listen for WebGPU device lost events for graceful degradation
+        const handleDeviceLost = (event: Event) => {
+            console.warn('WebGPU device lost, falling back to CPU:', event);
+            toast.warning('GPU acceleration unavailable', {
+                description: 'Switched to CPU fallback mode for compute operations',
+                duration: 8000,
+            });
+            // CPU fallback is already initialized in the $effect above
+            webgpuReady = false;
+        };
+
+        window.addEventListener('webgpu-device-lost', handleDeviceLost);
+
         return () => {
             analytics.destroy();
             cleanupStores();
+            window.removeEventListener('webgpu-device-lost', handleDeviceLost);
         };
     });
 

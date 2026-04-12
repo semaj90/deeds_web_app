@@ -4,6 +4,9 @@
 	import { legalCompressor } from '$lib/gpu/webgpu-palace-compression.js';
 	import type { ComputeBackend } from '$lib/gpu/webgpu-palace-core.js';
 
+	// Disable SSR - WebGPU visualization requires browser environment
+	export const ssr = false;
+
 	let canvas: HTMLCanvasElement | undefined = $state();
 	let palace: WebGPUPalaceCore | null = $state(null);
 	let backend: ComputeBackend = $state('cpu');

@@ -81,13 +81,30 @@ let loadAttempted = false;
 /** Add LibTorch + cuDNN DLL directories to PATH so the addon can find its dependencies */
 function ensureLibtorchInPath(): void {
 	const libDirs = [
+		// Windows paths (native)
 		resolve(process.cwd(), '../libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib'),
 		'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
+		// WSL2 paths (Windows C: drive mounted at /mnt/c/)
+		'/mnt/c/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
+		'/mnt/c/libtorch/lib',
+		// Linux paths (native LibTorch installation)
+		'/usr/local/libtorch/lib',
+		'/opt/libtorch/lib',
+		'/usr/local/lib',
 	];
 	// cuDNN DLLs (v9.16 for CUDA 13.0) — enables torch::cuda::cudnn_is_available()
 	const cudnnDirs = [
+		// Windows paths (native)
 		'C:/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
 		'C:/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
+		// WSL2 paths (Windows C: drive mounted at /mnt/c/)
+		'/mnt/c/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
+		'/mnt/c/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
+		// Linux paths (standard CUDA toolkit locations)
+		'/usr/local/cuda-13.0/lib64',
+		'/usr/local/cuda-12.8/lib64',
+		'/usr/local/cuda/lib64',
+		'/usr/lib/x86_64-linux-gnu',
 	];
 	const sep = process.platform === 'win32' ? ';' : ':';
 	let currentPath = process.env.PATH ?? '';
