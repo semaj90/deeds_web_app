@@ -4,6 +4,7 @@ import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, or, isNull, arrayContains, type SQL } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const THREAT_LEVELS = ['low', 'medium', 'high', 'critical'] as const;
 const POI_STATUSES = ['surveillance', 'wanted', 'active', 'cleared'] as const;
@@ -29,7 +30,7 @@ const personListSchema = z.object({
  * GET /api/persons
  * Fetch persons of interest with optional filtering
  */
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals, url, request }) => {
   if (!locals.user) {
     return json({ success: false, data: [], pagination: { limit: 20, offset: 0, count: 0 } });
   }
@@ -68,10 +69,18 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       .limit(limit)
       .offset(offset);
 
-    return json({
+    const responseData = {
       success: true,
       data: results,
       pagination: { limit, offset, count: results.length },
+    };
+
+    // ETag check for 304 response
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
     });
   } catch (err) {
     console.error('Error fetching persons of interest:', err);
