@@ -35,7 +35,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 			return json({ error: 'Document not found' }, { status: 404 });
 		}
 
-		return json({
+		const responseData = {
 			id: doc.id,
 			title: doc.title,
 			content: doc.content ?? '',
@@ -46,6 +46,14 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 			citations: (doc.metadata as Record<string, unknown>)?.citations ?? [],
 			createdAt: doc.createdAt,
 			updatedAt: doc.updatedAt,
+		};
+
+		// ETag check for 304 response
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[documents] GET error:', err);
