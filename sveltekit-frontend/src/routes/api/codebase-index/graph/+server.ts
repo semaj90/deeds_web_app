@@ -19,6 +19,13 @@ import { readdirSync, statSync } from 'fs';
 import { createHash } from 'crypto';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
+import { z } from 'zod';
+
+const codebaseGraphSchema = z.object({
+	maxFiles: z.coerce.number().int().min(1).max(500).default(200),
+	dir: z.string().max(200).optional().default(''),
+	worker: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
+});
 
 interface GraphNode {
 	id: string;
@@ -280,10 +287,17 @@ async function buildGraphInline(scanDir: string, maxFiles: number) {
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const maxFiles = Math.min(parseInt(url.searchParams.get('maxFiles') || '200'), 500);
-	const subdir = url.searchParams.get('dir') || '';
-	const useWorker = url.searchParams.get('worker') !== 'false';
+	const parsed = codebaseGraphSchema.safeParse({
+		maxFiles: url.searchParams.get('maxFiles'),
+		dir: url.searchParams.get('dir'),
+		worker: url.searchParams.get('worker'),
+	});
 
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid params' }, { status: 400 });
+	}
+
+	const { maxFiles, dir: subdir, worker: useWorker } = parsed.data;
 	const scanDir = subdir ? resolve(SRC_ROOT, subdir) : SRC_ROOT;
 	if (!scanDir.startsWith(SRC_ROOT)) {
 		return json({ error: 'Invalid directory' }, { status: 400 });

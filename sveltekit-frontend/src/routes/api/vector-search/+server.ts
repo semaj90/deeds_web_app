@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { rateLimitOrRespond, RateLimitPresets } from '$lib/server/middleware/rate-limit.js';
 
 const vectorSearchSchema = z.object({
 	query: z.string().min(1).max(10000),
@@ -9,9 +10,15 @@ const vectorSearchSchema = z.object({
 });
 
 /** POST /api/vector-search — Qdrant vector similarity search across evidence/documents */
-export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	// Rate limiting: 50 requests per minute (search preset)
+	const rateLimited = await rateLimitOrRespond(event, RateLimitPresets.search);
+	if (rateLimited) return rateLimited;
+
 	try {
+		const { request, locals } = event;
 		const raw = await request.json();
 		const parsed = vectorSearchSchema.safeParse(raw);
 		if (!parsed.success) {

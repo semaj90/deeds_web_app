@@ -10,6 +10,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { ENV } from '$lib/server/env.server.js';
+import { rateLimitOrRespond, RateLimitPresets } from '$lib/server/middleware/rate-limit.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 
@@ -483,6 +484,11 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 export const POST: RequestHandler = async (event) => {
   if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const auth = await requireAuth(event);
+
+  // Rate limiting: 20 requests per 5 minutes (AI endpoint preset)
+  const rateLimited = await rateLimitOrRespond(event, RateLimitPresets.aiEndpoint);
+  if (rateLimited) return rateLimited;
+
   const timer = createEventTimer('synthesis');
 
   const raw = await event.request.json();

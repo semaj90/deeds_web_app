@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { rateLimitOrRespond, RateLimitPresets } from '$lib/server/middleware/rate-limit.js';
 
 const analyzeSchema = z.object({
 	node: z.object({
@@ -14,9 +15,15 @@ const analyzeSchema = z.object({
 });
 
 /** POST /api/evidence/ai/analyze — AI analysis of an evidence node */
-export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	// Rate limiting: 20 requests per 5 minutes (AI endpoint preset)
+	const rateLimited = await rateLimitOrRespond(event, RateLimitPresets.aiEndpoint);
+	if (rateLimited) return rateLimited;
+
 	try {
+		const { request, locals } = event;
 		const raw = await request.json();
 		const parsed = analyzeSchema.safeParse(raw);
 		if (!parsed.success) {

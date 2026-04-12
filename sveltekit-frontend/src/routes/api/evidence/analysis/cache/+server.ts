@@ -12,23 +12,37 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { getRedis } from '$lib/server/redis.js';
+import { z } from 'zod';
+
+const analysisCacheSchema = z.object({
+	evidenceId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i).optional(),
+	caseId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i).optional(),
+	type: z.enum(['yolo', 'vlm', 'llm_synthesis', 'combined']).optional(),
+	limit: z.coerce.number().int().min(1).max(100).default(20),
+}).refine((data) => data.evidenceId || data.caseId, {
+	message: 'Provide evidenceId or caseId',
+});
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user) {
     return json({ error: 'Unauthorized', data: [], cacheHit: false, count: 0 }, { status: 401 });
   }
 
-  const evidenceId = url.searchParams.get('evidenceId');
-  const caseId = url.searchParams.get('caseId');
-  const analysisType = url.searchParams.get('type'); // 'yolo' | 'vlm' | 'llm_synthesis' | 'combined'
-  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100);
+  const parsed = analysisCacheSchema.safeParse({
+    evidenceId: url.searchParams.get('evidenceId'),
+    caseId: url.searchParams.get('caseId'),
+    type: url.searchParams.get('type'),
+    limit: url.searchParams.get('limit'),
+  });
 
-  if (!evidenceId && !caseId) {
+  if (!parsed.success) {
     return json(
-      { error: 'Provide evidenceId or caseId', data: [], cacheHit: false, count: 0 },
+      { error: parsed.error.issues[0]?.message ?? 'Invalid params', data: [], cacheHit: false, count: 0 },
       { status: 400 }
     );
   }
+
+  const { evidenceId, caseId, type: analysisType, limit } = parsed.data;
 
   // L0: Memory cache check
   const cacheKey = `analysis_cache:${evidenceId ?? ''}:${caseId ?? ''}:${analysisType ?? 'all'}`;
