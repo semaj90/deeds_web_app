@@ -6,13 +6,14 @@
 import { test, expect, type Page } from '@playwright/test';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { PORTS } from './helpers/env-ports.js';
 
 // ES module compatibility
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Test configuration
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 const TEST_PDF_PATH = path.join(__dirname, 'complaint.pdf');
 
 // Routes to test from navigation

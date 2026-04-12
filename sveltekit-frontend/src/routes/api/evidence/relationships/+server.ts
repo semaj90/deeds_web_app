@@ -5,6 +5,7 @@ import { db } from '$lib/server/db/client';
 import { evidenceRelationships } from '$lib/server/db/schema-postgres.js';
 import { eq, and, or } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const createRelationshipSchema = z.object({
 	caseId: z.string().uuid(),
@@ -16,7 +17,7 @@ const createRelationshipSchema = z.object({
 });
 
 /** GET /api/evidence/relationships — List relationships for a case/evidence item */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const caseId = url.searchParams.get('caseId');
 	const evidenceId = url.searchParams.get('evidenceId');
@@ -50,10 +51,19 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		}
 
 		const rows = await query;
-		return json({ relationships: rows });
+		const responseData = { relationships: rows };
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[/api/evidence/relationships] GET error:', err);
-		return json({ relationships: [] });
+		return json({ relationships: [] }, {
+			headers: cacheControl.private
+		});
 	}
 };
 

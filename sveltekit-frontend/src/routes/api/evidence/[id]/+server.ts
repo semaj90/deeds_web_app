@@ -5,6 +5,7 @@ import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 function parseMetadata(value: unknown): unknown {
   if (typeof value !== 'string') return value;
@@ -30,7 +31,7 @@ const updateEvidenceSchema = z.object({
  * GET /api/evidence/[id]
  * Retrieve a single evidence item by ID
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
@@ -45,9 +46,16 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       return json({ error: 'Evidence not found' }, { status: 404 });
     }
 
-    return json({
+    const responseData = {
       ...item,
       metadata: parseMetadata(item.metadata),
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
     });
   } catch (err) {
     console.error('[evidence] GET error:', err);
@@ -73,6 +81,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       aiTags: [],
       status: 'pending',
       _degraded: true,
+    }, {
+      headers: cacheControl.private
     });
   }
 };

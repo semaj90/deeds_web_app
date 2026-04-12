@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Phase 89: All Routes Screenshot & Verification Test
@@ -10,7 +11,7 @@ import { expect, test } from '@playwright/test';
  * 4. Checks for route wiring (200 status, not 404)
  */
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 // All routes discovered via ripgrep
 const routes = [

@@ -5,6 +5,7 @@ import { and, eq, sql, desc, count } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { validateUuidParams } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const updateNoteSchema = z.object({
 	title: z.string().max(1000).optional(),
@@ -16,7 +17,7 @@ const updateNoteSchema = z.object({
  * GET /api/cases/[id]/notes/[noteId]
  * Fetch a single note
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const invalid = validateUuidParams(params, 'id', 'noteId');
 	if (invalid) return invalid;
@@ -41,10 +42,18 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			return json({ error: 'Note not found' }, { status: 404 });
 		}
 
-		return json({ success: true, note });
+		const responseData = { success: true, note };
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[notes] GET single error:', err);
-		return json({ success: false, note: null });
+		return json({ success: false, note: null }, {
+			headers: cacheControl.private
+		});
 	}
 };
 

@@ -17,9 +17,12 @@
 
 import { test, expect } from '@playwright/test';
 import pg from 'pg';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
-const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const BASE = PORTS.APP_BASE;
+const DB_URL =
+  process.env.DATABASE_URL ||
+  `postgresql://legal_admin:123456@127.0.0.1:${PORTS.PG_PORT}/legal_ai_db`;
 const SCREENSHOT_DIR = 'test-results/auth-ui-screenshots';
 
 const TEST_USER = {

@@ -2,10 +2,12 @@ import path from 'path';
 import pg from 'pg';
 import { expect, test } from '@playwright/test';
 import { TEST_CASE_PREFIX } from './fixtures/test-cases.js';
+import { PORTS } from './helpers/env-ports.js';
 
 const SCREENSHOT_DIR = path.join(process.cwd(), 'test-results', 'screenshots');
 const DB_URL =
-  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+  process.env.DATABASE_URL ||
+  `postgresql://legal_admin:123456@127.0.0.1:${PORTS.PG_PORT}/legal_ai_db`;
 
 async function cleanupCasesPageArtifacts(email: string, caseId: string | null) {
   const pool = new pg.Pool({ connectionString: DB_URL });

@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const querySchema = z.object({
   q: z.string().min(2, 'Search query must be at least 2 characters').max(500),
@@ -15,7 +16,7 @@ const querySchema = z.object({
  * Full-text search across case notes (title + content)
  * Uses PostgreSQL to_tsvector/plainto_tsquery with ILIKE fallback
  */
-export const GET: RequestHandler = async ({ params, url, locals }) => {
+export const GET: RequestHandler = async ({ params, url, locals, request }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const caseId = params.id;
   if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
@@ -34,7 +35,9 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
       .limit(1);
 
     if (!targetCase) {
-      return json({ success: true, notes: [], query, total: 0 });
+      return json({ success: true, notes: [], query, total: 0 }, {
+        headers: cacheControl.private
+      });
     }
 
     // FTS ranked search
@@ -74,9 +77,17 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
     const like = (likeRows.rows ?? likeRows) as Record<string, unknown>[];
     const notes = [...fts, ...like];
 
-    return json({ success: true, notes, query, total: notes.length });
+    const responseData = { success: true, notes, query, total: notes.length };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
+    });
   } catch (err) {
     console.error('[notes-search] error:', err);
-    return json({ success: false, notes: [], query, total: 0 });
+    return json({ success: false, notes: [], query, total: 0 }, {
+      headers: cacheControl.private
+    });
   }
 };

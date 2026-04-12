@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Phase 99: Production Deployment Testing
@@ -11,7 +12,7 @@ import { expect, test } from '@playwright/test';
  */
 
 // Configure base URL for all tests
-test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173' });
+test.use({ baseURL: PORTS.APP_BASE });
 
 test.describe('Phase 99: Cases Route Production Tests', () => {
   test.beforeEach(async ({ page }) => {
