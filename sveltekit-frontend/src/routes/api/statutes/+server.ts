@@ -8,6 +8,7 @@ import { db } from '$lib/server/db/client';
 import { statutes } from '$lib/server/db/schema-postgres';
 import { desc, ilike, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const listSchema = z.object({
 	page: z.coerce.number().int().min(1).default(1),
@@ -29,7 +30,7 @@ const createSchema = z.object({
 
 const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const parsed = listSchema.safeParse(Object.fromEntries(url.searchParams));
@@ -83,7 +84,15 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       ),
     ]);
 
-    return json({ items, total: countResult, page, limit });
+    const responseData = { items, total: countResult, page, limit };
+
+    // ETag check for 304 response (reference data changes infrequently)
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.long, ETag: etag }
+    });
   } catch {
     return json({ items: [], total: 0, page, limit });
   }

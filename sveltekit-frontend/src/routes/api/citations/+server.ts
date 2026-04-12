@@ -5,6 +5,7 @@ import type { RequestHandler } from './$types';
 import { getFromMemoryCache, setCache } from '$lib/server/cache.js';
 import { z } from 'zod';
 import { findStateBySlug } from '$lib/server/law-mapping.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const citationCreateSchema = z.object({
   statute_code: z.string().min(1).max(500),
@@ -44,7 +45,7 @@ const citationListSchema = z.object({
  * Fetch citations with optional case filter.
  * Uses Memory+Redis dual-tier cache (5min TTL) to avoid repeated DB queries.
  */
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals, url, request }) => {
   if (!locals.user) {
     return json({ success: false, citations: [] }, { status: 401 });
   }
@@ -60,7 +61,13 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   const cacheKey = `citations:${caseId ?? 'all'}:${limit}`;
   const cached = getFromMemoryCache(cacheKey);
   if (Array.isArray(cached)) {
-    return json({ success: true, citations: cached, cache: true });
+    // ETag check for 304 response
+    const { etag, isMatch } = checkETag(cached, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json({ success: true, citations: cached, cache: true }, {
+      headers: { ...cacheControl.private, ETag: etag }
+    });
   }
 
   try {
@@ -71,7 +78,13 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     // Cache results (5min TTL)
     setCache(cacheKey, results, 300_000);
 
-    return json({ success: true, citations: results });
+    // ETag check for 304 response
+    const { etag, isMatch } = checkETag(results, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json({ success: true, citations: results }, {
+      headers: { ...cacheControl.private, ETag: etag }
+    });
   } catch (err) {
     console.error('Error fetching citations:', err);
     return json({ success: false, citations: [], error: 'Database unavailable' });

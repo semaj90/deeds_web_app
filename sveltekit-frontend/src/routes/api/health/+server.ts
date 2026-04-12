@@ -18,6 +18,7 @@ import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getTrtLlmUrl, getTritonUrl } from '$lib/config/env.server.js';
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import type { RequestHandler } from './$types';
 
 const querySchema = z.object({
@@ -251,7 +252,7 @@ export const GET: RequestHandler = async ({ url }) => {
       tier3_http_batch: { enabled: true, url: `${ENV.OLLAMA_BASE_URL}/api/embed` },
       tier4_http_seq: { enabled: true, url: `${ENV.OLLAMA_BASE_URL}/api/embeddings` },
     },
-  });
+  }, { headers: cacheControl.short });
 };
 
 /** Handle per-service health sub-endpoint */
@@ -259,15 +260,15 @@ async function handleServiceHealth(service: string) {
   switch (service) {
     case 'ollama': {
       const result = await probe(`${ENV.OLLAMA_BASE_URL}/api/tags`, 5000);
-      return json({ service: 'ollama', ...result });
+      return json({ service: 'ollama', ...result }, { headers: cacheControl.short });
     }
     case 'redis': {
       const state = redisBreaker.getStatus();
-      return json({ service: 'redis', ok: state.state === 'CLOSED', state });
+      return json({ service: 'redis', ok: state.state === 'CLOSED', state }, { headers: cacheControl.short });
     }
     case 'qdrant': {
       const result = await probe(`${ENV.QDRANT_URL}`, 3000);
-      return json({ service: 'qdrant', ...result });
+      return json({ service: 'qdrant', ...result }, { headers: cacheControl.short });
     }
     case 'database': {
       try {
@@ -278,13 +279,13 @@ async function handleServiceHealth(service: string) {
           service: 'database',
           ok: true,
           latencyMs: Math.round(performance.now() - start),
-        });
+        }, { headers: cacheControl.short });
       } catch (err) {
         return json({
           service: 'database',
           ok: false,
           error: 'Service unreachable',
-        });
+        }, { headers: cacheControl.short });
       }
     }
     case 'quic': {
