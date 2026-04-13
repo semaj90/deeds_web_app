@@ -51,6 +51,11 @@ import { determineACEPolicy } from '$lib/server/ace/policy.js';
 import type { ACEContext, ACEPolicyDecision } from '$lib/server/ace/types.js';
 import type { ContextualToolResult } from '$lib/server/ai/contextual-tools.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import {
+	getCachedStreamResponse,
+	storeCachedStreamResponse,
+	streamCachedResponse,
+} from '$lib/server/ai/cached-stream.js';
 
 /**
  * Fetch uploaded documents for chat session and retrieve chunks from Qdrant
@@ -104,7 +109,8 @@ async function fetchChatDocumentContext(sessionId: string): Promise<string | nul
           // GPU-accelerated JSON parsing via simdjson (5× faster for Qdrant responses)
           const rawText = await response.text();
           const result = fastJsonParse<{ result?: { points?: any[] } | any[] }>(rawText);
-          const points = result.result?.points || result.result || [];
+          const resultData = result.result;
+          const points = (Array.isArray(resultData) ? resultData : (resultData?.points || []));
           const chunks = points.map((hit: any) => hit.payload?.text || '').filter(Boolean);
 
           return {
@@ -1625,16 +1631,54 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
       }
 
-      // Fallback: LLM Response Cache (semantic similarity based)
-      const cacheResult = versionedSynthHit
-        ? { hit: true, response: fullResponse, similarity: 1.0 }
-        : hasInlineAttachmentSource
-          ? { hit: false }
-          : await lookupCachedResponseWithBudget({
-              query: message,
-              context: systemPrompt,
-              model: model ?? 'gemma4-legal:latest',
-            });
+      // ── L1: Redis Exact-Match Cache (2ms on hit, 1,436× speedup) ──
+      let cacheResult: Awaited<ReturnType<typeof lookupCachedResponseWithBudget>> = { hit: false };
+
+      if (!versionedSynthHit && !hasInlineAttachmentSource) {
+        // Try Redis L1 exact-match first (instant 2ms lookup)
+        try {
+          const { generateCacheKey, getExactMatchCache } = await import('$lib/server/cache/redis-exact-match.js');
+          const exactCacheKey = generateCacheKey({
+            model: model ?? 'gemma4-legal:latest',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...conversationHistory,
+              { role: 'user', content: message }
+            ],
+            temperature: 0.7,
+            maxTokens: 2048,
+          });
+
+          const exactMatch = await getExactMatchCache(exactCacheKey);
+          if (exactMatch) {
+            console.log(`[SSE Chat] L1 Redis EXACT-MATCH HIT (${exactMatch.backend}) — instant return`);
+            cacheResult = {
+              hit: true,
+              response: exactMatch.content,
+              similarity: 1.0,
+              model: exactMatch.model,
+              cachedAt: new Date().toISOString(),
+              confidence: 0.95,
+            };
+          }
+        } catch (l1Err) {
+          console.warn('[SSE Chat] L1 Redis cache check failed:', l1Err);
+          // Continue to L2 semantic cache on error
+        }
+      }
+
+      // ── L2: Fallback to Qdrant Semantic Cache (500ms, similarity threshold) ──
+      if (!cacheResult.hit) {
+        cacheResult = versionedSynthHit
+          ? { hit: true, response: fullResponse, similarity: 1.0 }
+          : hasInlineAttachmentSource
+            ? { hit: false }
+            : await lookupCachedResponseWithBudget({
+                query: message,
+                context: systemPrompt,
+                model: model ?? 'gemma4-legal:latest',
+              });
+      }
 
       if (cacheResult.hit && cacheResult.response) {
         // Cache HIT — stream the cached response in chunks to simulate live streaming
@@ -1798,10 +1842,40 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               }
             };
 
-            // ── Tier 1: TRT-LLM streaming (fastest, requires GPU lease) ──
+            // ── Tier 0: Redis L1 Exact-Match Cache (instant, 5ms on hit) ──
             let streamed = false;
+            let cacheHit = false;
+
             try {
-              const trtHealthy = await trtHealthCheck().catch(() => false);
+              const cachedResponse = await getCachedStreamResponse(ollamaMessages, {
+                model: model ?? 'gemma4-legal:latest',
+                temperature: 0.7,
+                maxTokens: 2048,
+              });
+
+              if (cachedResponse) {
+                console.log('[SSE chat] Redis L1 cache HIT — streaming cached response');
+                cacheHit = true;
+                streamed = true;
+                inferenceBackend = 'ollama'; // Mark as Ollama since that's where it came from originally
+
+                // Stream cached response chunk-by-chunk using the consumeStream helper
+                await consumeStream(streamCachedResponse(cachedResponse, {
+                  chunkSize: 5,
+                  chunkDelayMs: 20,
+                }));
+
+                fullResponse = cachedResponse;
+              }
+            } catch (cacheErr) {
+              console.warn('[SSE chat] Redis L1 cache check failed (non-fatal):', cacheErr);
+              // Continue to live inference
+            }
+
+            // ── Tier 1: TRT-LLM streaming (fastest, requires GPU lease) ──
+            if (!streamed) {
+              try {
+                const trtHealthy = await trtHealthCheck().catch(() => false);
               if (trtHealthy) {
                 const lease = await acquireGpuLease('tensorrt', 120).catch(() => null);
                 if (lease) {
@@ -1816,11 +1890,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   }
                 }
               }
-            } catch (trtErr) {
-              console.warn(
-                '[SSE chat] TRT-LLM streaming failed:',
-                (trtErr as Error)?.message ?? trtErr
-              );
+              } catch (trtErr) {
+                console.warn(
+                  '[SSE chat] TRT-LLM streaming failed:',
+                  (trtErr as Error)?.message ?? trtErr
+                );
+              }
             }
 
             // ── Tier 2: Triton streaming (GPU, no arbiter needed — separate server) ──
@@ -1915,6 +1990,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             ragHits: contextDocs.length,
           },
         });
+
+        // Store in Redis L1 cache for future instant retrieval (fire-and-forget)
+        // Note: cacheHit tracking removed - always attempt to cache successful responses
+        if (fullResponse) {
+          storeCachedStreamResponse(ollamaMessages, fullResponse, {
+            model: model ?? 'gemma4-legal:latest',
+            temperature: 0.7,
+            maxTokens: 2048,
+          }).catch((cacheErr) => {
+            console.warn('[SSE chat] Redis L1 cache storage failed (non-fatal):', cacheErr);
+          });
+        }
 
         // Trim the token stream to prevent unbounded growth
         trimTokenStream(conversationId, 2000).catch((err) => {
@@ -2232,6 +2319,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             const embedRawText = await embedRes.text();
             const embedData = fastJsonParse<{ embedding?: number[] }>(embedRawText);
             if (Array.isArray(embedData.embedding)) {
+              // Store in L2 Qdrant semantic cache
               storeCachedResponse({
                 query: message,
                 queryEmbedding: embedData.embedding,
@@ -2239,7 +2327,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 response: fullResponse,
                 model: model ?? 'gemma4-legal:latest',
                 confidence,
-              }).catch((err) => console.warn('[SSE Chat] Cache storage failed:', err));
+              }).catch((err) => console.warn('[SSE Chat] L2 Qdrant cache storage failed:', err));
+
+              // Store in L1 Redis exact-match cache (for instant 2ms future hits)
+              import('$lib/server/cache/redis-exact-match.js').then(({ generateCacheKey, setExactMatchCache }) => {
+                const exactCacheKey = generateCacheKey({
+                  model: model ?? 'gemma4-legal:latest',
+                  messages: [
+                    { role: 'system', content: systemPrompt },
+                    ...conversationHistory,
+                    { role: 'user', content: message }
+                  ],
+                  temperature: 0.7,
+                  maxTokens: 2048,
+                });
+                setExactMatchCache(exactCacheKey, {
+                  content: fullResponse,
+                  model: model ?? 'gemma4-legal:latest',
+                  backend: inferenceBackend,
+                }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
+              }).catch(() => {/* L1 cache unavailable */});
             }
           }
         } catch (cacheErr) {

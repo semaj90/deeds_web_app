@@ -5,10 +5,10 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getQdrantUrl, getOllamaBaseUrl } from '$lib/config/env.server.js';
+import { getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 
 const QDRANT_URL = getQdrantUrl();
-const OLLAMA_URL = getOllamaBaseUrl();
+const OLLAMA_URL = getOllamaUrl();
 const COLLECTION = 'codebase_chunks_768';
 
 interface SearchResult {

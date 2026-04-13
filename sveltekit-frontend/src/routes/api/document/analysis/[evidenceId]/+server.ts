@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 		// Extract document-specific analysis from metadata
 		const extractedText = metadata.extractedText || null;
-		const textLength = extractedText?.length || 0;
+		const textLength = (typeof extractedText === 'string' ? extractedText.length : 0);
 		const pageCount = metadata.pageCount || 0;
 		const chunks = metadata.chunks || [];
 		const entities = metadata.entities || [];

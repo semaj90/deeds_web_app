@@ -172,7 +172,7 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 			}
 			fileMap.get(file_path).chunks++;
 
-			const parts = file_path.split('/');
+			const parts = String(file_path).split('/');
 			for (let i = 1; i < parts.length; i++) {
 				const dirPath = parts.slice(0, i).join('/');
 				if (!dirMap.has(dirPath)) {
@@ -183,8 +183,10 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 				}
 			}
 
-			extensionCount[extension] = (extensionCount[extension] || 0) + 1;
-			if (domain) domainCount[domain] = (domainCount[domain] || 0) + 1;
+			const ext = String(extension);
+			const dom = String(domain);
+			extensionCount[ext] = (extensionCount[ext] || 0) + 1;
+			if (domain) domainCount[dom] = (domainCount[dom] || 0) + 1;
 		}
 
 		const nodes: GraphNode[] = [];

@@ -47,6 +47,14 @@ async function main() {
     console.log("recommendations started:", rr.jobId ?? rr.message ?? rr.error);
     if (rr.jobId) await poll("/api/codebase-index/recommendations", rr.jobId, "recommendations", 180000);
   }
+
+  // 3. Evidence Analysis (cache warm-up with GPU inference)
+  console.log("\n=== Firing evidence-analyze (domain=evidence-analysis, batchSize=5) ===");
+  const ea = await post("/api/codebase-index/evidence-analyze", { domain: "evidence-analysis", batchSize: 5 });
+  if (ea) {
+    console.log("evidence-analyze started:", ea.jobId ?? ea.message ?? ea.error);
+    if (ea.jobId) await poll("/api/codebase-index/evidence-analyze", ea.jobId, "evidence-analyze", 180000);
+  }
 }
 
 main().catch(e => { console.error("FATAL:", e.message); process.exit(1); });

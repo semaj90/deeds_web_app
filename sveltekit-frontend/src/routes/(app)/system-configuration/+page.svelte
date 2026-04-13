@@ -12,6 +12,7 @@
  import SystemStatusPanel from '$lib/components/dashboard/SystemStatusPanel.svelte';
  import SystemOverview from '$lib/components/yorha/dashboard/SystemOverview.svelte';
  import YoRHaSystemStatus from '$lib/components/yorha/_simulations/YoRHaSystemStatus.svelte';
+ import CacheMonitoringWidget from '$lib/components/monitoring/CacheMonitoringWidget.svelte';
 
   const ONBOARDING_OPEN_EVENT = 'deeds:onboarding:open';
 
@@ -339,6 +340,11 @@
        <label for="endpoint">Ollama Endpoint</label>
        <input type="text" id="endpoint" bind:value={config.ai.ollamaEndpoint}>
       </div>
+     </div>
+
+     <!-- LLM Cache Monitoring -->
+     <div class="mt-6">
+      <CacheMonitoringWidget />
      </div>
     </section>
    {/if}

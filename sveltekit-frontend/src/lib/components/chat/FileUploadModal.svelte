@@ -158,11 +158,7 @@
 
           <!-- Drop Zone -->
           <div
-            class="border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer"
-            class:border-info={isDragOver}
-            class:bg-info/5={isDragOver}
-            class:border-sand/20={!isDragOver}
-            class:hover:border-sand/40={!isDragOver}
+            class="border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer {isDragOver ? 'border-info bg-info/5' : 'border-sand/20 hover:border-sand/40'}"
             ondragover={handleDragOver}
             ondragleave={handleDragLeave}
             ondrop={handleDrop}

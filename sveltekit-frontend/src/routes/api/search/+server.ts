@@ -26,7 +26,8 @@ import { ENV } from '$lib/server/env.server.js';
 import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.js';
 import { getSemanticCacheHit, setSemanticCache } from '$lib/server/search/semantic-cache.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
-import { gpuRerankQdrantResults } from '$lib/server/ml/gpu-reranker.js';
+// GPU reranker temporarily disabled - import error
+// import { gpuRerankQdrantResults } from '$lib/server/ml/gpu-reranker.js';
 
 /**
  * Unified Platform Search — Three-layer architecture:

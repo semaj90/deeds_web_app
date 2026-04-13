@@ -174,10 +174,9 @@
         <div
           class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all"
           class:bg-info={isCurrentStage}
-          class:text-white={isCurrentStage}
           class:bg-green-500={isPastStage}
-          class:text-white={isPastStage}
           class:bg-sand/10={isFutureStage}
+          class:text-white={isCurrentStage || isPastStage}
           class:text-sand/40={isFutureStage}
         >
           {#if isCurrentStage}

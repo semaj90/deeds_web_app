@@ -91,7 +91,7 @@ async function detectWebGPU(): Promise<WebGPUInfo | null> {
 	}
 
 	try {
-		const adapter = await navigator.gpu.requestAdapter();
+		const adapter = await (navigator.gpu as GPU).requestAdapter();
 		if (!adapter) {
 			return { available: false };
 		}

@@ -210,7 +210,7 @@ export async function bifrostChat(
   model: string,
   options?: { temperature?: number; maxTokens?: number; timeoutMs?: number; cacheKey?: string }
 ): Promise<string> {
-  const bifrostModel = model.includes('/') ? model : `ollama-local/${model}`;
+  const bifrostModel = model.includes('/') ? model : `ollama/${model}`;  // Fixed: ollama-local → ollama
   // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
   // Without it, every request bypasses the cache entirely (Bifrost docs).
   // 'legal-ai-global' creates a shared namespace: semantically similar questions

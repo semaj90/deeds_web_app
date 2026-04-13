@@ -233,7 +233,7 @@ export class VideoVLMProcessor {
 			const base64Image = imageBuffer.toString('base64');
 
 			// Call Ollama VLM endpoint
-			const response = await fetch(`${ENV.OLLAMA_URL}/api/generate`, {
+			const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -390,7 +390,7 @@ export class VideoVLMProcessor {
 		const summaryPrompt = `Based on video analysis with ${frameAnalysis.length} frames across ${sceneDetection.length} scenes, generate a concise summary. Key objects: ${[...allObjects].join(', ')}. Key tags: ${[...allTags].join(', ')}. Provide: overall summary (2-3 sentences), key objects list, activities observed, and setting description.`;
 
 		try {
-			const response = await fetch(`${ENV.OLLAMA_URL}/api/generate`, {
+			const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

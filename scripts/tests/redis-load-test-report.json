@@ -1,38 +1,38 @@
 {
   "testConfig": {
-    "duration": 10,
-    "concurrency": 20,
+    "duration": 30,
+    "concurrency": 5,
     "targetQPM": 12000,
     "baseUrl": "http://localhost:5173",
     "redisStatsUrl": "http://localhost:5173/api/cache/exact-match/stats",
     "bifrostUrl": "http://localhost:3040",
     "sampleInterval": 5000
   },
-  "duration": 10.069651899999998,
+  "duration": 30.0487307,
   "requests": {
-    "total": 40,
-    "successful": 40,
+    "total": 17,
+    "successful": 17,
     "failed": 0,
     "l1Hits": 0,
-    "l2Hits": 16,
-    "l3Hits": 24
+    "l2Hits": 2,
+    "l3Hits": 15
   },
   "hitRates": {
     "l1": 0,
-    "l2": 40,
-    "combined": 40
+    "l2": 11.76,
+    "combined": 11.76
   },
   "latency": {
-    "avg": 6654.8,
-    "p50": 7515,
-    "p95": 9620.8,
-    "p99": 9853.7
+    "avg": 10154.7,
+    "p50": 9966.8,
+    "p95": 14188,
+    "p99": 14188
   },
-  "qpm": 238,
+  "qpm": 34,
   "memoryGrowth": null,
   "memorySnapshots": [
     {
-      "timestamp": "2026-04-13T04:40:37.449Z",
+      "timestamp": "2026-04-13T04:50:06.163Z",
       "success": true,
       "stats": {
         "totalKeys": 0,
@@ -43,7 +43,51 @@
       }
     },
     {
-      "timestamp": "2026-04-13T04:40:43.379Z",
+      "timestamp": "2026-04-13T04:50:12.333Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:50:18.226Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:50:24.169Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:50:29.922Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:50:35.951Z",
       "success": true,
       "stats": {
         "totalKeys": 0,
@@ -55,5 +99,5 @@
     }
   ],
   "errors": [],
-  "timestamp": "2026-04-13T04:40:54.202Z"
+  "timestamp": "2026-04-13T04:50:43.513Z"
 }

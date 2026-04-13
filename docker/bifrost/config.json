@@ -13,10 +13,11 @@
       "enabled": true,
       "name": "semantic_cache",
       "config": {
-        "provider": "ollama-local",
+        "default_cache_key": "global",
+        "provider": "ollama",
         "embedding_model": "embeddinggemma:latest",
         "dimension": 768,
-        "cleanup_on_shutdown": true,
+        "cleanup_on_shutdown": false,
         "ttl": "2h",
         "threshold": 0.82,
         "conversation_history_threshold": 3,
@@ -32,13 +33,14 @@
     "log_retention_days": 7
   },
   "providers": {
-    "ollama-local": {
+    "ollama": {
       "keys": [
         {
           "name": "ollama-key",
-          "value": "dummy",
+          "value": "http://host.docker.internal:11434",
           "models": [
             "gemma4-legal:latest",
+            "gemma4-legal-fast",
             "embeddinggemma:latest",
             "gemma3:latest",
             "nomic-embed-text:latest",
@@ -48,18 +50,8 @@
         }
       ],
       "network_config": {
-        "base_url": "http://host.docker.internal:11434",
         "default_request_timeout_in_seconds": 120
-      },
-      "custom_provider_config": {
-        "base_provider_type": "openai",
-        "allowed_requests": {
-          "chat_completion": true,
-          "chat_completion_stream": true,
-          "embedding": true
-        }
       }
-
     }
   }
 }

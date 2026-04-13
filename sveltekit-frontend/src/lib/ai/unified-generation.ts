@@ -143,7 +143,7 @@ export async function isE2bReady(): Promise<boolean> {
 			return false;
 		}
 
-		const adapter = await navigator.gpu.requestAdapter();
+		const adapter = await (navigator.gpu as GPU).requestAdapter();
 		if (!adapter) {
 			_e2bReady = false;
 			_e2bCheckExpiry = Date.now() + E2B_CHECK_TTL;

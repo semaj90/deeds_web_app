@@ -119,12 +119,7 @@
       type="button"
       onclick={handleSubmit}
       disabled={!canSubmit}
-      class="flex-shrink-0 p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      class:bg-accent={canSubmit}
-      class:text-white={canSubmit}
-      class:hover:bg-accent/90={canSubmit}
-      class:bg-sand/10={!canSubmit}
-      class:text-sand/40={!canSubmit}
+      class="flex-shrink-0 p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed {canSubmit ? 'bg-accent text-white hover:bg-accent/90' : 'bg-sand/10 text-sand/40'}"
       aria-label="Send message"
     >
       <Icon name="send" class="w-5 h-5" />
