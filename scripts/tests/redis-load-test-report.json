@@ -1,38 +1,38 @@
 {
   "testConfig": {
-    "duration": 30,
-    "concurrency": 10,
+    "duration": 10,
+    "concurrency": 20,
     "targetQPM": 12000,
     "baseUrl": "http://localhost:5173",
     "redisStatsUrl": "http://localhost:5173/api/cache/exact-match/stats",
     "bifrostUrl": "http://localhost:3040",
     "sampleInterval": 5000
   },
-  "duration": 30.0669124,
+  "duration": 10.069651899999998,
   "requests": {
-    "total": 72,
-    "successful": 72,
+    "total": 40,
+    "successful": 40,
     "failed": 0,
     "l1Hits": 0,
-    "l2Hits": 71,
-    "l3Hits": 1
+    "l2Hits": 16,
+    "l3Hits": 24
   },
   "hitRates": {
     "l1": 0,
-    "l2": 98.61,
-    "combined": 98.61
+    "l2": 40,
+    "combined": 40
   },
   "latency": {
-    "avg": 4553,
-    "p50": 4396.5,
-    "p95": 6854.3,
-    "p99": 7480.5
+    "avg": 6654.8,
+    "p50": 7515,
+    "p95": 9620.8,
+    "p99": 9853.7
   },
-  "qpm": 144,
+  "qpm": 238,
   "memoryGrowth": null,
   "memorySnapshots": [
     {
-      "timestamp": "2026-04-13T04:29:20.943Z",
+      "timestamp": "2026-04-13T04:40:37.449Z",
       "success": true,
       "stats": {
         "totalKeys": 0,
@@ -43,40 +43,7 @@
       }
     },
     {
-      "timestamp": "2026-04-13T04:29:27.274Z",
-      "success": true,
-      "stats": {
-        "totalKeys": 0,
-        "memoryUsedMB": 0,
-        "avgTtlMinutes": 0,
-        "rawBytes": 0,
-        "rawTtlSeconds": 0
-      }
-    },
-    {
-      "timestamp": "2026-04-13T04:29:33.407Z",
-      "success": true,
-      "stats": {
-        "totalKeys": 0,
-        "memoryUsedMB": 0,
-        "avgTtlMinutes": 0,
-        "rawBytes": 0,
-        "rawTtlSeconds": 0
-      }
-    },
-    {
-      "timestamp": "2026-04-13T04:29:39.458Z",
-      "success": true,
-      "stats": {
-        "totalKeys": 0,
-        "memoryUsedMB": 0,
-        "avgTtlMinutes": 0,
-        "rawBytes": 0,
-        "rawTtlSeconds": 0
-      }
-    },
-    {
-      "timestamp": "2026-04-13T04:29:45.344Z",
+      "timestamp": "2026-04-13T04:40:43.379Z",
       "success": true,
       "stats": {
         "totalKeys": 0,
@@ -88,5 +55,5 @@
     }
   ],
   "errors": [],
-  "timestamp": "2026-04-13T04:29:55.310Z"
+  "timestamp": "2026-04-13T04:40:54.202Z"
 }

@@ -44,10 +44,22 @@ async function testCache() {
   console.log(`✓ ${elapsed3}ms`);
   
   console.log('\n=== Results ===');
+
+  // Check for errors
+  if (run1.error || run2.error || run3.error) {
+    console.error('❌ Test failed - one or more requests returned errors:');
+    if (run1.error) console.error(`  Run 1: ${run1.error}`);
+    if (run2.error) console.error(`  Run 2: ${run2.error}`);
+    if (run3.error) console.error(`  Run 3: ${run3.error}`);
+    console.error('\n💡 Likely cause: Dev server needs restart to pick up cache-demo endpoint changes');
+    console.error('   Fix: Ctrl+C then run `npm run dev` in sveltekit-frontend/');
+    return;
+  }
+
   console.log(`Run 1: ${run1.results[0].latencyMs}ms (${run1.results[0].expectedTier})`);
   console.log(`Run 2: ${run2.results[0].latencyMs}ms (${run2.results[0].expectedTier})`);
   console.log(`Run 3: ${run3.results[0].latencyMs}ms (${run3.results[0].expectedTier})`);
-  
+
   const speedup = Math.round(run1.results[0].latencyMs / run3.results[0].latencyMs);
   console.log(`\n🚀 Speedup: ${speedup}× (cold → hot)`);
   console.log(`\nCache Stats: ${run3.cacheStats.after.totalKeys} keys, ${run3.cacheStats.after.memoryMB}MB`);
