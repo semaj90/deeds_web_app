@@ -99,10 +99,16 @@ services:
     restart: unless-stopped
     command: >
       redis-server
-      --maxmemory 512mb
+      --maxmemory 2gb
       --maxmemory-policy allkeys-lru
       --appendonly yes
-      --save 60 1
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --lazyfree-lazy-eviction yes
+      --lazyfree-lazy-expire yes
+      --slowlog-log-slower-than 10000
+      --slowlog-max-len 128
     volumes:
       - redis-data:/data
     networks:
@@ -115,7 +121,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 3G  # Increased to accommodate 2GB maxmemory + overhead
 
   # Qdrant Vector Database
   qdrant:

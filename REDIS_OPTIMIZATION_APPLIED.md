@@ -125,10 +125,12 @@ slowlog-max-len: 128 ✅
 
 ## Configuration Persistence
 
-### Current Status: ✅ PERMANENT (Updated in docker-compose.yml)
+### Current Status: ✅ PERMANENT (Updated in All Docker Compose Files)
 
 **Date Updated**: April 12, 2026
-**File Modified**: `docker-compose.yml` (root)
+**Files Modified**:
+- `docker-compose.yml` (main, container: `legal-ai-redis`)
+- `docker-compose.test.yml` (test/prod, container: `deeds-redis-prod`)
 
 **Changes Applied**:
 ```yaml
