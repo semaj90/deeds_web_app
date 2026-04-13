@@ -52,90 +52,94 @@ export interface RecommendationResult {
 // ── Qdrant scroll — collect vectors per file ──────────────────────────────────
 
 interface QdrantPoint {
-	id: number | string;
-	payload?: {
-		relativePath?: string;
-		path?: string;
-		filePath?: string;
-		cluster?: string;
-	};
-	vector?: {
-		content?: number[];
-		signature?: number[];
-	} | number[];
+  id: number | string;
+  payload?: {
+    relativePath?: string;
+    path?: string;
+    filePath?: string;
+    file_path?: string;
+    cluster?: string;
+  };
+  vector?:
+    | {
+        content?: number[];
+        signature?: number[];
+      }
+    | number[];
 }
 
 interface FileEmbeddingEntry {
-	fileId: string;
-	filePath: string;
-	cluster: string;
-	vectors: number[][];
+  fileId: string;
+  filePath: string;
+  cluster: string;
+  vectors: number[][];
 }
 
 async function scrollFileEmbeddings(limit = 10000): Promise<Map<string, FileEmbeddingEntry>> {
-	const fileMap = new Map<string, FileEmbeddingEntry>();
-	let offset: string | number | null = null;
+  const fileMap = new Map<string, FileEmbeddingEntry>();
+  let offset: string | number | null = null;
 
-	do {
-		const body: Record<string, unknown> = {
-			limit: 250,
-			with_vector: ['content'],
-			with_payload: true,
-		};
-		if (offset !== null) body.offset = offset;
+  do {
+    const body: Record<string, unknown> = {
+      limit: 250,
+      with_vector: ['content'],
+      with_payload: true,
+    };
+    if (offset !== null) body.offset = offset;
 
-		const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(body),
-			signal: AbortSignal.timeout(30000),
-		});
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000),
+    });
 
-		if (!res.ok) {
-			const text = await res.text().catch(() => '');
-			throw new Error(`Qdrant scroll failed: ${res.status} ${text}`);
-		}
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Qdrant scroll failed: ${res.status} ${text}`);
+    }
 
-		const data = (await res.json()) as {
-			result?: {
-				points?: QdrantPoint[];
-				next_page_offset?: string | number | null;
-			};
-		};
+    const data = (await res.json()) as {
+      result?: {
+        points?: QdrantPoint[];
+        next_page_offset?: string | number | null;
+      };
+    };
 
-		const points = data.result?.points ?? [];
-		offset = data.result?.next_page_offset ?? null;
+    const points = data.result?.points ?? [];
+    offset = data.result?.next_page_offset ?? null;
 
-		for (const pt of points) {
-			// Extract file path from payload
-			const payload = pt.payload ?? {};
-			const rawPath = payload.relativePath ?? payload.filePath ?? payload.path ?? '';
-			if (!rawPath) continue;
+    for (const pt of points) {
+      // Extract file path from payload
+      const payload = pt.payload ?? {};
+      const rawPath =
+        payload.relativePath ?? payload.filePath ?? payload.file_path ?? payload.path ?? '';
+      if (!rawPath) continue;
 
-			// Normalise to a stable file ID (strip leading src/)
-			const filePath = rawPath.startsWith('src/') ? rawPath : `src/${rawPath}`;
-			const fileId = filePath.replace(/[^a-zA-Z0-9/_.-]/g, '_');
+      // Normalise to a stable file ID (strip leading src/)
+      const filePath = rawPath.startsWith('src/') ? rawPath : `src/${rawPath}`;
+      const fileId = filePath.replace(/[^a-zA-Z0-9/_.-]/g, '_');
 
-			// Extract content vector
-			const vectorObj = pt.vector as Record<string, number[]> | undefined;
-			const vec = vectorObj?.content;
-			if (!Array.isArray(vec) || vec.length === 0) continue;
+      // Extract content vector
+      const vectorObj = pt.vector as Record<string, number[]> | undefined;
+      const vec = vectorObj?.content;
+      if (!Array.isArray(vec) || vec.length === 0) continue;
 
-			if (!fileMap.has(fileId)) {
-				fileMap.set(fileId, {
-					fileId,
-					filePath,
-					cluster: payload.cluster ?? 'unknown',
-					vectors: [],
-				});
-			}
-			fileMap.get(fileId)!.vectors.push(vec);
-		}
+      if (!fileMap.has(fileId)) {
+        fileMap.set(fileId, {
+          fileId,
+          filePath,
+          cluster: payload.cluster ?? 'unknown',
+          vectors: [],
+        });
+      }
+      fileMap.get(fileId)!.vectors.push(vec);
+    }
 
-		if (fileMap.size >= limit || offset === null) break;
-	} while (offset !== null && fileMap.size < limit);
+    if (fileMap.size >= limit || offset === null) break;
+  } while (offset !== null && fileMap.size < limit);
 
-	return fileMap;
+  return fileMap;
 }
 
 // ── Mean-pool vectors for each file ──────────────────────────────────────────

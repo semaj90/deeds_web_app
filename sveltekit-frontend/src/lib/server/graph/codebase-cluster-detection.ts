@@ -79,32 +79,45 @@ async function scrollFiles(limit: number): Promise<FileEntry[]> {
 		if (!res.ok) throw new Error(`Qdrant scroll ${res.status}: ${await res.text().catch(() => '')}`);
 
 		const data = (await res.json()) as {
-			result?: {
-				points?: Array<{
-					id: number | string;
-					payload?: { relativePath?: string; filePath?: string; path?: string; cluster?: string };
-					vector?: Record<string, number[]>;
-				}>;
-				next_page_offset?: string | number | null;
-			};
-		};
+      result?: {
+        points?: Array<{
+          id: number | string;
+          payload?: {
+            relativePath?: string;
+            filePath?: string;
+            file_path?: string;
+            path?: string;
+            cluster?: string;
+          };
+          vector?: Record<string, number[]>;
+        }>;
+        next_page_offset?: string | number | null;
+      };
+    };
 
-		const points = data.result?.points ?? [];
-		offset = data.result?.next_page_offset ?? null;
+    const points = data.result?.points ?? [];
+    offset = data.result?.next_page_offset ?? null;
 
-		for (const pt of points) {
-			const pay = pt.payload ?? {};
-			const rawPath = pay.relativePath ?? pay.filePath ?? pay.path ?? '';
-			if (!rawPath) continue;
-			const filePath = rawPath.startsWith('src/') ? rawPath : `src/${rawPath}`;
-			const fileId = filePath.replace(/[^a-zA-Z0-9/_.-]/g, '_');
-			const vec = pt.vector?.content;
-			if (!Array.isArray(vec) || vec.length === 0) continue;
-			if (!fileMap.has(fileId)) {
-				fileMap.set(fileId, { fileId, filePath, astCluster: pay.cluster ?? 'unknown', vectors: [] });
-			}
-			fileMap.get(fileId)!.vectors.push(vec);
-		}
+    for (const pt of points) {
+      const pay = pt.payload ?? {};
+      const rawPath = pay.relativePath ?? pay.filePath ?? pay.file_path ?? pay.path ?? '';
+      if (!rawPath) continue;
+      const filePath = rawPath.startsWith('src/') ? rawPath : `src/${rawPath}`;
+      // Match the scanner's nodeId format: strip 'src/' prefix + strip .ts/.js/.mts extensions
+      const scannerPath = filePath.startsWith('src/') ? filePath.slice(4) : filePath;
+      const fileId = scannerPath.replace(/\.(ts|js|mts)$/, '').replace(/[^a-zA-Z0-9/_.-]/g, '_');
+      const vec = pt.vector?.content;
+      if (!Array.isArray(vec) || vec.length === 0) continue;
+      if (!fileMap.has(fileId)) {
+        fileMap.set(fileId, {
+          fileId,
+          filePath,
+          astCluster: pay.cluster ?? 'unknown',
+          vectors: [],
+        });
+      }
+      fileMap.get(fileId)!.vectors.push(vec);
+    }
 
 		if (fileMap.size >= limit || offset === null) break;
 	} while (offset !== null && fileMap.size < limit);
