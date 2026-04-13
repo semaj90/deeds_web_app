@@ -106,9 +106,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 3G  # Increased to accommodate 2GB maxmemory + overhead
         reservations:
-          memory: 512M
+          memory: 1G
     logging:
       driver: json-file
       options:
@@ -126,10 +126,15 @@ services:
       --loadmodule /opt/redis-stack/lib/redistimeseries.so
       --loadmodule /opt/redis-stack/lib/rejson.so
       --loadmodule /opt/redis-stack/lib/redisbloom.so
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lfu
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
       --save 900 1
       --save 300 10
+      --save 60 10000
+      --lazyfree-lazy-eviction yes
+      --lazyfree-lazy-expire yes
+      --slowlog-log-slower-than 10000
+      --slowlog-max-len 128
     volumes:
       - redis_data:/data
     networks:
