@@ -1,8 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import KeyboardShortcutsHelp from '$lib/components/analysis/KeyboardShortcutsHelp.svelte';
-	import AnalysisToast from '$lib/components/analysis/AnalysisToast.svelte';
 	import { goto } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
@@ -47,8 +45,6 @@
 	let analysis = $state<VideoAnalysisData | null>(null);
 	let activeTab = $state<'overview' | 'frames' | 'scenes' | 'transcription' | 'analysis'>('overview');
 	let currentFrame = $state(0);
-	let showHelp = $state(false);
-	let toastComponent: { toast: any } | null = $state(null);
 
 	// Load analysis data
 	$effect(() => {
@@ -109,45 +105,23 @@
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		const filename = `video-analysis-${data.evidenceId}-${new Date().toISOString().split('T')[0]}.json`;
-		a.download = filename;
+		a.download = `video-analysis-${data.evidenceId}-${new Date().toISOString().split('T')[0]}.json`;
 		a.click();
 		URL.revokeObjectURL(url);
-
-		// Show success toast
-		toastComponent?.toast.success(`Exported ${filename}`);
 	}
 
 	function selectFrame(idx: number) {
 		currentFrame = idx;
 	}
 
-	function copyToClipboard(text: string) {
-		navigator.clipboard.writeText(text).then(() => {
-			toastComponent?.toast.success('Copied to clipboard');
-		}).catch(() => {
-			toastComponent?.toast.error('Failed to copy');
-		});
-	}
-
 	function handleKeydown(e: KeyboardEvent) {
 		const tag = (e.target as HTMLElement)?.tagName;
 		const isInput = tag === 'INPUT' || tag === 'TEXTAREA';
 
-		// ESC to close (or close help if open)
+		// ESC to close
 		if (e.key === 'Escape' && !isInput) {
 			e.preventDefault();
-			if (showHelp) {
-				showHelp = false;
-			} else {
-				handleClose();
-			}
-		}
-
-		// ? to toggle help
-		if (e.key === '?' && !isInput) {
-			e.preventDefault();
-			showHelp = !showHelp;
+			handleClose();
 		}
 
 		// Number keys 1-5 to switch tabs
@@ -574,22 +548,6 @@
 		color: var(--t-text-secondary);
 	}
 
-	.keyboard-hint {
-		font-size: 0.65rem;
-		font-family: monospace;
-		color: var(--t-text-secondary);
-		opacity: 0.6;
-		padding: 0.125rem 0.375rem;
-		background: var(--t-bg);
-		border-radius: 0.25rem;
-		border: 1px solid var(--t-border);
-	}
-
-	.tool-btn:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
 	/* ═══ Content Area ═══ */
 	.content-area {
 		display: flex;
@@ -982,9 +940,3 @@
 		color: var(--t-text);
 	}
 </style>
-
-<!-- Help Panel -->
-<KeyboardShortcutsHelp bind:open={showHelp} type="video" />
-
-<!-- Toast Notifications -->
-<AnalysisToast bind:this={toastComponent} />

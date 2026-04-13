@@ -1,8 +1,6 @@
 <script lang="ts">
-	import type { PageData} from './$types';
+	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import KeyboardShortcutsHelp from '$lib/components/analysis/KeyboardShortcutsHelp.svelte';
-	import AnalysisToast from '$lib/components/analysis/AnalysisToast.svelte';
 	import { goto } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
@@ -30,8 +28,6 @@
 	let activeTab = $state<'transcription' | 'timeline' | 'analysis' | 'entities'>('transcription');
 	let currentTime = $state(0);
 	let isPlaying = $state(false);
-	let showHelp = $state(false);
-	let toastComponent: { toast: any } | null = $state(null);
 
 	// Load analysis data
 	$effect(() => {
@@ -86,21 +82,9 @@
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		const filename = `audio-analysis-${data.evidenceId}-${new Date().toISOString().split('T')[0]}.json`;
-		a.download = filename;
+		a.download = `audio-analysis-${data.evidenceId}-${new Date().toISOString().split('T')[0]}.json`;
 		a.click();
 		URL.revokeObjectURL(url);
-
-		// Show success toast
-		toastComponent?.toast.success(`Exported ${filename}`);
-	}
-
-	function copySegmentToClipboard(text: string) {
-		navigator.clipboard.writeText(text).then(() => {
-			toastComponent?.toast.success('Copied to clipboard');
-		}).catch(() => {
-			toastComponent?.toast.error('Failed to copy');
-		});
 	}
 
 	function jumpToSegment(timestamp: number) {
@@ -112,20 +96,10 @@
 		const tag = (e.target as HTMLElement)?.tagName;
 		const isInput = tag === 'INPUT' || tag === 'TEXTAREA';
 
-		// ESC to close (or close help if open)
+		// ESC to close
 		if (e.key === 'Escape' && !isInput) {
 			e.preventDefault();
-			if (showHelp) {
-				showHelp = false;
-			} else {
-				handleClose();
-			}
-		}
-
-		// ? to toggle help
-		if (e.key === '?' && !isInput) {
-			e.preventDefault();
-			showHelp = !showHelp;
+			handleClose();
 		}
 
 		// Number keys 1-4 to switch tabs
@@ -300,33 +274,18 @@
 								</div>
 								<div class="timeline-list">
 									{#each analysis.transcription.segments as segment}
-										<div
+										<button
+											type="button"
 											class="timeline-segment"
+											onclick={() => jumpToSegment(segment.start)}
 											class:active={currentTime >= segment.start && currentTime < segment.end}
 										>
-											<button
-												type="button"
-												class="segment-clickable"
-												onclick={() => jumpToSegment(segment.start)}
-											>
-												<div class="segment-time">
-													<Icon name="play-circle" class="segment-play-icon" />
-													{formatTimestamp(segment.start)} - {formatTimestamp(segment.end)}
-												</div>
-												<div class="segment-text">{segment.text}</div>
-											</button>
-											<button
-												type="button"
-												class="segment-copy-btn"
-												onclick={(e) => {
-													e.stopPropagation();
-													copySegmentToClipboard(segment.text);
-												}}
-												title="Copy text"
-											>
-												<Icon name="copy" />
-											</button>
-										</div>
+											<div class="segment-time">
+												<Icon name="play-circle" class="segment-play-icon" />
+												{formatTimestamp(segment.start)} - {formatTimestamp(segment.end)}
+											</div>
+											<div class="segment-text">{segment.text}</div>
+										</button>
 									{/each}
 								</div>
 							</div>
@@ -401,12 +360,6 @@
 		</div>
 	{/if}
 </div>
-
-<!-- Help Panel -->
-<KeyboardShortcutsHelp bind:open={showHelp} type="audio" />
-
-<!-- Toast Notifications -->
-<AnalysisToast bind:this={toastComponent} />
 
 <style>
 	.audio-editor {
@@ -667,14 +620,17 @@
 	}
 
 	.timeline-segment {
-		position: relative;
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
+		gap: 1rem;
+		padding: 1rem;
 		background: var(--t-panel);
 		border-radius: 0.5rem;
 		border: 1px solid var(--t-border);
 		transition: all 0.2s;
-		overflow: hidden;
+		cursor: pointer;
+		text-align: left;
+		width: 100%;
 	}
 
 	.timeline-segment:hover {
@@ -683,70 +639,23 @@
 		transform: translateX(4px);
 	}
 
-	.timeline-segment:hover .segment-copy-btn {
-		opacity: 1;
-		pointer-events: auto;
-	}
-
 	.timeline-segment.active {
 		border-color: var(--t-accent);
 		background: var(--t-accent-soft);
 		box-shadow: 0 0 0 3px rgba(var(--t-accent-rgb), 0.1);
 	}
 
-	.segment-clickable {
-		flex: 1;
-		display: flex;
-		align-items: flex-start;
-		gap: 1rem;
-		padding: 1rem;
-		background: transparent;
-		border: none;
-		cursor: pointer;
-		text-align: left;
-		color: inherit;
-	}
-
 	.segment-time {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
 		font-family: monospace;
 		font-size: 0.875rem;
 		color: var(--t-accent);
 		font-weight: 600;
-		min-width: 140px;
+		min-width: 100px;
 	}
 
 	.segment-text {
 		flex: 1;
 		line-height: 1.6;
-	}
-
-	.segment-copy-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 40px;
-		height: 100%;
-		background: var(--t-accent);
-		border: none;
-		color: white;
-		cursor: pointer;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.2s;
-		flex-shrink: 0;
-	}
-
-	.segment-copy-btn:hover {
-		background: var(--t-accent);
-		opacity: 1 !important;
-		filter: brightness(1.1);
-	}
-
-	.segment-copy-btn:active {
-		transform: scale(0.95);
 	}
 
 	/* ═══ Analysis View ═══ */

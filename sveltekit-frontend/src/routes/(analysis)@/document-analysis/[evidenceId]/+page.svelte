@@ -1,8 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import KeyboardShortcutsHelp from '$lib/components/analysis/KeyboardShortcutsHelp.svelte';
-	import AnalysisToast from '$lib/components/analysis/AnalysisToast.svelte';
 	import { goto } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
@@ -28,8 +26,6 @@
 	let searchQuery = $state('');
 	let fontSize = $state(16);
 	let showSidebar = $state(true);
-	let showHelp = $state(false);
-	let toastComponent: { toast: any } | null = $state(null);
 
 	// Load analysis data
 	$effect(() => {
@@ -66,109 +62,7 @@
 		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
 		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	}
-
-	function handleExport() {
-		if (!analysis) return;
-
-		const exportData = {
-			title: data.title,
-			evidenceId: data.evidenceId,
-			exportDate: new Date().toISOString(),
-			extractedText: analysis.extractedText,
-			textLength: analysis.textLength,
-			pageCount: analysis.pageCount,
-			entities: analysis.entities,
-			citations: analysis.citations,
-			keyTerms: analysis.keyTerms,
-			aceAnalysis: analysis.aceAnalysis
-		};
-
-		const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-			type: 'application/json'
-		});
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		const filename = `document-analysis-${data.evidenceId}-${new Date().toISOString().split('T')[0]}.json`;
-		a.download = filename;
-		a.click();
-		URL.revokeObjectURL(url);
-
-		// Show success toast
-		toastComponent?.toast.success(`Exported ${filename}`);
-	}
-
-	function copyToClipboard(text: string) {
-		navigator.clipboard.writeText(text).then(() => {
-			toastComponent?.toast.success('Copied to clipboard');
-		}).catch(() => {
-			toastComponent?.toast.error('Failed to copy');
-		});
-	}
-
-	let searchInputRef = $state<HTMLInputElement | null>(null);
-
-	function handleKeydown(e: KeyboardEvent) {
-		const tag = (e.target as HTMLElement)?.tagName;
-		const isInput = tag === 'INPUT' || tag === 'TEXTAREA';
-
-		// ESC to close (or close help/search if open)
-		if (e.key === 'Escape' && !isInput) {
-			e.preventDefault();
-			if (showHelp) {
-				showHelp = false;
-			} else if (searchQuery) {
-				searchQuery = '';
-			} else {
-				handleClose();
-			}
-		}
-
-		// ? to toggle help
-		if (e.key === '?' && !isInput) {
-			e.preventDefault();
-			showHelp = !showHelp;
-		}
-
-		// Ctrl+F to focus search
-		if (e.ctrlKey && e.key === 'f') {
-			e.preventDefault();
-			searchInputRef?.focus();
-		}
-
-		// Ctrl+E to export
-		if (e.ctrlKey && e.key === 'e') {
-			e.preventDefault();
-			handleExport();
-		}
-
-		// Ctrl+B to toggle sidebar
-		if (e.ctrlKey && e.key === 'b') {
-			e.preventDefault();
-			showSidebar = !showSidebar;
-		}
-
-		// Ctrl + Plus/Minus to adjust font size
-		if (e.ctrlKey && (e.key === '+' || e.key === '=')) {
-			e.preventDefault();
-			fontSize = Math.min(24, fontSize + 2);
-		}
-		if (e.ctrlKey && e.key === '-') {
-			e.preventDefault();
-			fontSize = Math.max(12, fontSize - 2);
-		}
-
-		// Number keys 1-4 to switch sidebar panels
-		if (!e.ctrlKey && !e.altKey && !e.shiftKey && !isInput) {
-			if (e.key === '1') activePanel = 'text';
-			if (e.key === '2') activePanel = 'analysis';
-			if (e.key === '3') activePanel = 'citations';
-			if (e.key === '4') activePanel = 'entities';
-		}
-	}
 </script>
-
-<svelte:window onkeydown={handleKeydown} />
 
 <svelte:head>
 	<title>{data.title || 'Document Analysis'} | Legal AI</title>
@@ -236,16 +130,13 @@
 				class="tool-btn"
 				class:active={showSidebar}
 				onclick={() => (showSidebar = !showSidebar)}
-				title="Toggle sidebar (Ctrl+B)"
+				title="Toggle sidebar"
 			>
 				<Icon name="panel-right" />
 			</button>
-			<div class="keyboard-hint">Ctrl+B</div>
-			<div class="toolbar-divider"></div>
-			<button type="button" class="tool-btn" onclick={handleExport} disabled={!analysis} title="Export (Ctrl+E)">
+			<button type="button" class="tool-btn" title="Export">
 				<Icon name="download" />
 			</button>
-			<div class="keyboard-hint">Ctrl+E</div>
 		</div>
 	</div>
 
@@ -272,17 +163,14 @@
 					<Icon name="search" />
 					<input
 						type="text"
-						placeholder="Search document... (Ctrl+F)"
+						placeholder="Search document..."
 						bind:value={searchQuery}
-						bind:this={searchInputRef}
 						class="search-input"
 					/>
 					{#if searchQuery}
 						<button type="button" class="clear-search" onclick={() => (searchQuery = '')}>
 							<Icon name="x" />
 						</button>
-					{:else}
-						<div class="keyboard-hint">Ctrl+F</div>
 					{/if}
 				</div>
 
@@ -563,22 +451,6 @@
 		color: var(--t-text-secondary);
 		min-width: 40px;
 		text-align: center;
-	}
-
-	.keyboard-hint {
-		font-size: 0.65rem;
-		font-family: monospace;
-		color: var(--t-text-secondary);
-		opacity: 0.6;
-		padding: 0.125rem 0.375rem;
-		background: var(--t-bg);
-		border-radius: 0.25rem;
-		border: 1px solid var(--t-border);
-	}
-
-	.tool-btn:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
 	}
 
 	/* ═══ Content Area ═══ */
@@ -871,9 +743,3 @@
 		font-weight: 700;
 	}
 </style>
-
-<!-- Help Panel -->
-<KeyboardShortcutsHelp bind:open={showHelp} type="document" />
-
-<!-- Toast Notifications -->
-<AnalysisToast bind:this={toastComponent} />
