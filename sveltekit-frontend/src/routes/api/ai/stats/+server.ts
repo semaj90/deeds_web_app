@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * GET /api/ai/stats
  *
@@ -66,10 +67,10 @@ export const GET: RequestHandler = async ({ locals }) => {
 		const { db } = await import('$lib/server/db/client');
 
 		const [chats, docs, cites, cases] = await Promise.all([
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM chat_metadata`).then((r) => (r as any).rows[0] as { c: number } | undefined).catch(() => ({ c: 0 })),
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM evidence`).then((r) => (r as any).rows[0] as { c: number } | undefined).catch(() => ({ c: 0 })),
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM saved_citations`).then((r) => (r as any).rows[0] as { c: number } | undefined).catch(() => ({ c: 0 })),
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM cases`).then((r) => (r as any).rows[0] as { c: number } | undefined).catch(() => ({ c: 0 }))
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM chat_metadata`).then((r) => pgRows(r)[0] as { c: number } | undefined).catch(() => ({ c: 0 })),
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM evidence`).then((r) => pgRows(r)[0] as { c: number } | undefined).catch(() => ({ c: 0 })),
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM saved_citations`).then((r) => pgRows(r)[0] as { c: number } | undefined).catch(() => ({ c: 0 })),
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM cases`).then((r) => pgRows(r)[0] as { c: number } | undefined).catch(() => ({ c: 0 }))
 		]);
 		activeChats = Number(chats?.c ?? 0);
 		documentsAnalyzed = Number(docs?.c ?? 0);

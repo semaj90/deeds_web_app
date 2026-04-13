@@ -65,6 +65,11 @@ let workerInterval: ReturnType<typeof setInterval> | null = null;
 let polling = false;
 const POLL_MS = 3_000;
 
+// Error tracking for exponential backoff
+let consecutiveDbErrors = 0;
+let lastDbErrorLog = 0;
+const DB_ERROR_LOG_INTERVAL = 60_000; // Log once per minute max
+
 async function pollOnce(): Promise<void> {
 	if (polling) return;
 	polling = true;
@@ -80,6 +85,9 @@ async function pollOnce(): Promise<void> {
 			const job = await claimNextJob(jobType);
 			if (!job) continue;
 
+			// Reset backoff on successful claim
+			consecutiveDbErrors = 0;
+
 			// Run inside concurrency gate (non-blocking)
 			gated(cfg.gate, async () => {
 				const t0 = Date.now();
@@ -94,8 +102,27 @@ async function pollOnce(): Promise<void> {
 				}
 			}).catch(() => {});
 		}
-	} catch (err) {
-		console.error('[Worker] Poll error:', err);
+	} catch (err: any) {
+		consecutiveDbErrors++;
+
+		// Exponential backoff: 2s, 4s, 8s, 16s, 32s (max)
+		const backoffMs = Math.min(2000 * Math.pow(2, consecutiveDbErrors - 1), 32000);
+
+		// Only log once per minute to avoid spam
+		const now = Date.now();
+		if (now - lastDbErrorLog > DB_ERROR_LOG_INTERVAL) {
+			if (err.code === 'ECONNREFUSED') {
+				console.warn(`[Worker] DB unavailable (ECONNREFUSED), backing off ${backoffMs}ms`);
+			} else if (err.message?.includes('57P03') || err.message?.includes('starting up')) {
+				console.warn(`[Worker] DB still starting up, backing off ${backoffMs}ms`);
+			} else {
+				console.error(`[Worker] Poll error:`, err.message);
+			}
+			lastDbErrorLog = now;
+		}
+
+		// Apply backoff delay
+		await new Promise(resolve => setTimeout(resolve, backoffMs));
 	} finally {
 		polling = false;
 	}

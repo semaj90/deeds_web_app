@@ -9,7 +9,7 @@ import os from 'os';
 
 export interface OcrResult {
     text: string;
-    method: 'native' | 'tesseractjs' | 'fallback';
+    method: 'native' | 'tesseractjs' | 'fallback' | 'native-from-pdf' | 'tesseractjs-from-pdf' | 'pdf-conversion-failed';
     confidence: number;
     error?: string;
 }
@@ -53,19 +53,77 @@ function sanitizeFilename(filename: string): string {
 }
 
 /**
+ * Render a single PDF page to a PNG buffer using pdfjs-dist + @napi-rs/canvas.
+ * This enables OCR on scanned PDFs by converting the first page to an image.
+ *
+ * @param pdfBuffer - PDF file buffer
+ * @param pageNumber - Page number to render (1-indexed)
+ * @returns PNG image buffer suitable for Tesseract OCR
+ */
+async function renderPdfPageToImage(pdfBuffer: Buffer, pageNumber: number): Promise<Buffer> {
+    // Runtime-constructed paths prevent Rollup from statically resolving native .node binaries
+    const pdfjsPath = ['pdfjs-dist', 'legacy', 'build', 'pdf.mjs'].join('/');
+    const canvasPath = ['@napi-rs', 'canvas'].join('/');
+    const { getDocument } = await import(/* @vite-ignore */ pdfjsPath);
+    const { createCanvas } = await import(/* @vite-ignore */ canvasPath);
+
+    const pdfDoc = await getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
+    if (pageNumber > pdfDoc.numPages) {
+        throw new Error(`Page ${pageNumber} exceeds PDF page count (${pdfDoc.numPages})`);
+    }
+
+    const page = await pdfDoc.getPage(pageNumber);
+    const viewport = page.getViewport({ scale: 2.0 }); // 2x scale for better OCR accuracy
+    const canvas = createCanvas(Math.floor(viewport.width), Math.floor(viewport.height));
+    const ctx = canvas.getContext('2d');
+
+    // White background (scanned docs may have transparent BG)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    await page.render({ canvasContext: ctx as any, viewport }).promise;
+    const pngBuffer = canvas.toBuffer('image/png');
+
+    // Cleanup
+    page.cleanup();
+    pdfDoc.destroy();
+
+    return Buffer.from(pngBuffer);
+}
+
+/**
  * Hybrid OCR service that tries native Tesseract first, then falls back to tesseract.js
  */
 export async function extractTextHybrid(imageBuffer: Buffer, filename: string): Promise<OcrResult> {
     const safeFilename = sanitizeFilename(filename);
 
+    // Check if this is a PDF file — convert to image first
+    const isPdf = /\.pdf$/i.test(filename);
+    let processBuffer = imageBuffer;
+
+    if (isPdf) {
+        try {
+            console.log('[OCR Hybrid] PDF detected, converting first page to image for OCR');
+            // Convert first page of PDF to PNG using pdfjs-dist + @napi-rs/canvas
+            processBuffer = await renderPdfPageToImage(imageBuffer, 1);
+        } catch (pdfErr) {
+            return {
+                text: '',
+                method: 'pdf-conversion-failed',
+                confidence: 0,
+                error: pdfErr instanceof Error ? pdfErr.message : 'Failed to convert PDF to image',
+            };
+        }
+    }
+
     // Try native Tesseract first
     try {
         const nativeAvailable = await isTesseractAvailable();
         if (nativeAvailable) {
-            const result = await extractTextFromImageNative(imageBuffer, safeFilename);
+            const result = await extractTextFromImageNative(processBuffer, safeFilename);
             return {
                 text: result.text,
-                method: 'native',
+                method: isPdf ? 'native-from-pdf' : 'native',
                 confidence: calculateOcrConfidence(result.text),
                 error: result.error,
             };
@@ -79,8 +137,8 @@ export async function extractTextHybrid(imageBuffer: Buffer, filename: string): 
         const tempDir = os.tmpdir();
         const tempFile = path.join(tempDir, `ocr-js-${Date.now()}-${safeFilename}`);
 
-        // Write buffer to temp file for tesseract.js
-        await fs.writeFile(tempFile, imageBuffer);
+        // Write buffer to temp file for tesseract.js (use processBuffer which may be PDF→image converted)
+        await fs.writeFile(tempFile, processBuffer);
 
         const worker = await createWorker('eng');
         const {
@@ -94,7 +152,7 @@ export async function extractTextHybrid(imageBuffer: Buffer, filename: string): 
         const trimmedText = text.trim();
         return {
             text: trimmedText,
-            method: 'tesseractjs',
+            method: isPdf ? 'tesseractjs-from-pdf' : 'tesseractjs',
             confidence: calculateOcrConfidence(trimmedText),
         };
     } catch (error) {

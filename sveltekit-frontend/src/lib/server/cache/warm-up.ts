@@ -12,7 +12,7 @@
  *   node scripts/cache-warmup.mjs
  */
 
-import { bifrostChat } from '$lib/server/ollama.js';
+import { bifrostChat, getOllamaEndpoint } from '$lib/server/ollama.js';
 
 /**
  * Common Legal Queries — 120 queries across 6 domains
@@ -233,14 +233,24 @@ export async function warmUpCache(options: {
 				try {
 					console.log(`  [${queryNum}/${COMMON_QUERIES.length}] "${query.slice(0, 50)}..."`);
 
-					const response = await bifrostChat(
-						[{ role: 'user', content: query }],
-						model,
-						{
-							temperature: 0.3, // Low temperature for consistent caching
-							maxTokens: 200, // Short responses for common queries
-						}
-					);
+					let response: string | null = null;
+
+					// Try Bifrost first (L1 Redis + L2 semantic cache)
+					try {
+						response = await bifrostChat(
+							[{ role: 'user', content: query }],
+							model,
+							{
+								temperature: 0.3, // Low temperature for consistent caching
+								maxTokens: 200, // Short responses for common queries
+								timeoutMs: 10000, // 10s timeout for Bifrost
+							}
+						);
+					} catch (bifrostErr) {
+						// Bifrost failed — fall back to direct Ollama
+						console.warn(`  ⚠ [${queryNum}] Bifrost failed, using direct Ollama`);
+						response = await directOllamaChat(query, model);
+					}
 
 					if (response) {
 						report.successful++;
@@ -351,4 +361,30 @@ export interface WarmUpReport {
 	errors: Array<{ query: string; error: string }>;
 	durationMs: number;
 	model: string;
+}
+
+/**
+ * Direct Ollama call (bypasses Bifrost when it's down)
+ * INTERNAL USE ONLY — for warm-up fallback
+ */
+async function directOllamaChat(prompt: string, model: string): Promise<string> {
+	const OLLAMA_URL = getOllamaEndpoint();
+	const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			model,
+			messages: [{ role: 'user', content: prompt }],
+			stream: false,
+			options: { temperature: 0.3, num_predict: 200 },
+		}),
+		signal: AbortSignal.timeout(30000), // 30s timeout
+	});
+
+	if (!res.ok) {
+		throw new Error(`Ollama error: ${res.status}`);
+	}
+
+	const data = await res.json();
+	return data.message?.content || '';
 }

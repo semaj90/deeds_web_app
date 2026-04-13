@@ -1,3 +1,4 @@
+import { pgRows } from './client.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
@@ -24,7 +25,7 @@ export async function verifyCanvasStatesTable(): Promise<boolean> {
 
         const firstRow = Array.isArray(result)
           ? result[0]
-          : ((result as any).rows?.[0] ?? (result as any)[0]);
+          : (pgRows(result)?.[0] ?? (result as any)[0]);
         const existsValue = (firstRow as { exists?: unknown } | undefined)?.exists;
 
         canvasStatesExists =

@@ -26,8 +26,7 @@ import { ENV } from '$lib/server/env.server.js';
 import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.js';
 import { getSemanticCacheHit, setSemanticCache } from '$lib/server/search/semantic-cache.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
-// GPU reranker temporarily disabled - import error
-// import { gpuRerankQdrantResults } from '$lib/server/ml/gpu-reranker.js';
+import { gpuRerankQdrantResults } from '$lib/server/retrieval/gpu-reranker.js';
 
 /**
  * Unified Platform Search — Three-layer architecture:
@@ -496,7 +495,16 @@ async function searchCanon(q: string, limit: number, jurisdiction?: string, auth
 		}
 
 		// GPU-accelerated post-retrieval reranking via LibTorch (100× faster batch similarity)
-		points = await gpuRerankQdrantResults(queryVec, points, { topK: limit, vectorName: 'content' });
+		const { results: rerankPoints } = await gpuRerankQdrantResults(
+      queryVec,
+      points as Array<{
+        id: string | number;
+        score: number;
+        payload?: Record<string, unknown>;
+        vector?: number[];
+      }>
+    );
+    points = rerankPoints as QdrantPoint[];
 
 		return points.map((r) => ({
 			id: (r.payload?.chunk_id ?? r.id) as string,

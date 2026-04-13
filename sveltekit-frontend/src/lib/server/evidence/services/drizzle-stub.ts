@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { evidenceVectors } from '$lib/server/db/schema-postgres.js';
 import { eq, and, sql } from 'drizzle-orm';
+import { pgRows } from '$lib/server/db/client';
 
 /**
  * Upsert an embedding vector for a given evidence item into the evidence_vectors table.
@@ -11,39 +12,38 @@ import { eq, and, sql } from 'drizzle-orm';
  * @param meta - Additional metadata (must include `model` string)
  */
 export async function upsertEmbedding(
-	evidenceId: string,
-	vector: number[],
-	meta: Record<string, any>
+  evidenceId: string,
+  vector: number[],
+  meta: Record<string, any>
 ): Promise<void> {
-	const model = (meta.model as string) || 'embeddinggemma';
+  const model = (meta.model as string) || 'embeddinggemma';
 
-	try {
-		// Check if a vector for this evidence+model already exists
-		const existing = await db
-			.select({ id: evidenceVectors.id })
-			.from(evidenceVectors)
-			.where(and(eq(evidenceVectors.evidenceId, evidenceId), eq(evidenceVectors.model, model)))
-			.limit(1);
+  try {
+    // Check if a vector for this evidence+model already exists
+    const existing = await db
+      .select({ id: evidenceVectors.id })
+      .from(evidenceVectors)
+      .where(and(eq(evidenceVectors.evidenceId, evidenceId), eq(evidenceVectors.model, model)))
+      .limit(1);
 
-		if ((existing as any).rows?.length > 0 || (Array.isArray(existing) && existing.length > 0)) {
-			const rows = (existing as any).rows ?? existing;
-			// Update existing vector
-			await db
-				.update(evidenceVectors)
-				.set({ vector })
-				.where(eq(evidenceVectors.id, rows[0].id));
-		} else {
-			// Insert new vector
-			await db.insert(evidenceVectors).values({
-				evidenceId,
-				vector,
-				model,
-			});
-		}
-	} catch (err) {
-		console.error('[drizzle-stub] Failed to upsert embedding for', evidenceId, err);
-		throw err;
-	}
+    if (existing.length > 0) {
+      // Update existing vector
+      await db
+        .update(evidenceVectors)
+        .set({ vector })
+        .where(eq(evidenceVectors.id, existing[0].id));
+    } else {
+      // Insert new vector
+      await db.insert(evidenceVectors).values({
+        evidenceId,
+        vector,
+        model,
+      });
+    }
+  } catch (err) {
+    console.error('[drizzle-stub] Failed to upsert embedding for', evidenceId, err);
+    throw err;
+  }
 }
 
 /**
@@ -54,22 +54,21 @@ export async function upsertEmbedding(
  * @returns The vector as number[] or null if not found
  */
 export async function getEmbedding(
-	evidenceId: string,
-	model = 'embeddinggemma'
+  evidenceId: string,
+  model = 'embeddinggemma'
 ): Promise<number[] | null> {
-	try {
-		const result = await db
-			.select({ vector: evidenceVectors.vector })
-			.from(evidenceVectors)
-			.where(and(eq(evidenceVectors.evidenceId, evidenceId), eq(evidenceVectors.model, model)))
-			.limit(1);
+  try {
+    const result = await db
+      .select({ vector: evidenceVectors.vector })
+      .from(evidenceVectors)
+      .where(and(eq(evidenceVectors.evidenceId, evidenceId), eq(evidenceVectors.model, model)))
+      .limit(1);
 
-		const rows = (result as any).rows ?? result;
-		return rows.length > 0 ? rows[0].vector : null;
-	} catch (err) {
-		console.error('[drizzle-stub] Failed to get embedding for', evidenceId, err);
-		return null;
-	}
+    return result.length > 0 ? result[0].vector : null;
+  } catch (err) {
+    console.error('[drizzle-stub] Failed to get embedding for', evidenceId, err);
+    return null;
+  }
 }
 
 /**
@@ -81,29 +80,28 @@ export async function getEmbedding(
  * @returns Array of { evidenceId, distance } sorted by similarity
  */
 export async function findSimilar(
-	queryVector: number[],
-	limit = 10,
-	model = 'embeddinggemma'
+  queryVector: number[],
+  limit = 10,
+  model = 'embeddinggemma'
 ): Promise<Array<{ evidenceId: string; distance: number }>> {
-	try {
-		const vectorStr = `[${queryVector.join(',')}]`;
-		const result = await db.execute(
-			sql`SELECT evidence_id, vector <=> ${vectorStr}::vector AS distance
+  try {
+    const vectorStr = `[${queryVector.join(',')}]`;
+    const result = await db.execute(
+      sql`SELECT evidence_id, vector <=> ${vectorStr}::vector AS distance
 				FROM evidence_vectors
 				WHERE model = ${model}
 				ORDER BY vector <=> ${vectorStr}::vector
 				LIMIT ${limit}`
-		);
+    );
 
-		const rows = (result as any).rows ?? result;
-		return rows.map((r: any) => ({
-			evidenceId: r.evidence_id,
-			distance: parseFloat(r.distance),
-		}));
-	} catch (err) {
-		console.error('[drizzle-stub] Similarity search failed:', err);
-		return [];
-	}
+    return pgRows(result).map((r: any) => ({
+      evidenceId: r.evidence_id,
+      distance: parseFloat(r.distance),
+    }));
+  } catch (err) {
+    console.error('[drizzle-stub] Similarity search failed:', err);
+    return [];
+  }
 }
 
 /**

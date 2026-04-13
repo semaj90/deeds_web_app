@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * Shared KAG (Knowledge-Augmented Generation) module.
  *
@@ -60,10 +61,10 @@ export async function getCaseGraphNeighborIds(caseId: string): Promise<GraphNeig
 				WHERE n.status = 'active' AND n.case_id = ${caseId}
 				LIMIT 50
 			`);
-      const nodeRows = (nodeResult as any).rows ?? nodeResult;
+      const nodeRows = pgRows(nodeResult);
       if (!nodeRows?.length) return [];
 
-      const nodeIds = nodeRows.map((r: any) => r.node_id);
+      const nodeIds = nodeRows.map((r: any) => r.node_id as string);
       const nodeIdStr = nodeIds.map((id: string) => `'${id.replace(/'/g, "''")}'`).join(',');
 
       const connResult = await db.execute(sql`
@@ -97,7 +98,7 @@ export async function getCaseGraphNeighborIds(caseId: string): Promise<GraphNeig
 				LIMIT 15
 			`);
 
-      const connRows = (connResult as any).rows ?? connResult;
+      const connRows = pgRows(connResult);
       if (!connRows?.length) return [];
 
       return connRows.map((r: any) => ({
@@ -226,10 +227,10 @@ export async function getGraphContext(
 			AND ${evidenceLookupClause}
 		`);
 
-      const nodeRows = (nodeResult as any).rows ?? nodeResult;
+      const nodeRows = pgRows(nodeResult);
       if (!nodeRows || nodeRows.length === 0) return null;
 
-      const nodeIds = nodeRows.map((r: any) => r.node_id);
+      const nodeIds = nodeRows.map((r: any) => r.node_id as string);
       const nodeIdTuple = sql`(${sql.join(
         nodeIds.map((id: string) => sql`${id}`),
         sql`, `
@@ -260,23 +261,23 @@ export async function getGraphContext(
 			LIMIT 10
 		`);
 
-      const connRows = (connResult as any).rows ?? connResult;
+      const connRows = pgRows(connResult);
       if (!connRows || connRows.length === 0) return null;
 
       // Deduplicate neighbors
       const seen = new Set<string>();
       const neighbors: GraphNeighbor[] = [];
       for (const row of connRows) {
-        if (seen.has(row.neighbor_id)) continue;
-        seen.add(row.neighbor_id);
+        if (seen.has(row.neighbor_id as string)) continue;
+        seen.add(row.neighbor_id as string);
         neighbors.push({
-          nodeId: row.neighbor_id,
-          title: row.neighbor_title ?? '',
-          evidenceType: row.neighbor_type ?? '',
-          connectionType: row.connection_type ?? '',
-          strength: row.strength ?? 50,
-          confidence: row.confidence_score ?? 0,
-          evidenceIds: extractEvidenceIdsFromPath(row.neighbor_file_path),
+          nodeId: row.neighbor_id as string,
+          title: (row.neighbor_title as string) ?? '',
+          evidenceType: (row.neighbor_type as string) ?? '',
+          connectionType: (row.connection_type as string) ?? '',
+          strength: (row.strength as number) ?? 50,
+          confidence: (row.confidence_score as number) ?? 0,
+          evidenceIds: extractEvidenceIdsFromPath(row.neighbor_file_path as string | null),
         });
       }
 

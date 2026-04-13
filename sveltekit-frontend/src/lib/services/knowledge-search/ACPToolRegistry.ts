@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * Phase 76: ACP (Agent Communication Protocol) Tool Registry
  *
@@ -179,7 +180,7 @@ const handlers: Record<string, HandlerFn> = {
 
     try {
       const result = await db.execute(sql.raw(finalQuery));
-      const rows = Array.isArray(result) ? result : (result as any).rows ?? [];
+      const rows = Array.isArray(result) ? result : pgRows(result) ?? [];
       return {
         success: true,
         kind: 'result',

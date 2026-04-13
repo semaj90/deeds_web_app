@@ -28,40 +28,36 @@ export interface OnnxInferenceResult {
  * Returns null if ONNX session is not available.
  */
 export async function runOnnxInference(
-	prompt: string,
-	options: OnnxInferenceOptions = {}
+  prompt: string,
+  options: OnnxInferenceOptions = {}
 ): Promise<string | null> {
-	const {
-		maxTokens = 200,
-		temperature = 0.7,
-		topP = 0.9,
-		topK = 40,
-	} = options;
+  const { maxTokens = 200, temperature = 0.7, topP = 0.9, topK = 40 } = options;
 
-	const startTime = performance.now();
+  const startTime = performance.now();
 
-	try {
-		const session = await getOnnxSession();
-		if (!session) {
-			console.warn('[onnx-inference] ONNX session not available');
-			return null;
-		}
+  try {
+    const session = await getOnnxSession('/gemma3_270m_onnx/gemma3_270m_w8a16.onnx');
+    if (!session) {
+      console.warn('[onnx-inference] ONNX session not available');
+      return null;
+    }
 
-		// Simple text generation (this is a stub - actual implementation would need tokenizer)
-		// For now, return null to indicate not implemented
-		console.warn('[onnx-inference] ONNX inference not fully implemented - use E2B or LiteRT instead');
-		return null;
+    // Simple text generation (this is a stub - actual implementation would need tokenizer)
+    // For now, return null to indicate not implemented
+    console.warn(
+      '[onnx-inference] ONNX inference not fully implemented - use E2B or LiteRT instead'
+    );
+    return null;
 
-		// TODO: Implement actual ONNX inference with tokenizer
-		// const inputIds = await tokenize(prompt);
-		// const outputs = await session.run({ input_ids: inputIds });
-		// const generatedText = await detokenize(outputs.logits);
-		// return generatedText;
-
-	} catch (error) {
-		console.error('[onnx-inference] Error during inference:', error);
-		return null;
-	}
+    // TODO: Implement actual ONNX inference with tokenizer
+    // const inputIds = await tokenize(prompt);
+    // const outputs = await session.run({ input_ids: inputIds });
+    // const generatedText = await detokenize(outputs.logits);
+    // return generatedText;
+  } catch (error) {
+    console.error('[onnx-inference] Error during inference:', error);
+    return null;
+  }
 }
 
 /**
@@ -69,10 +65,10 @@ export async function runOnnxInference(
  * This is a lightweight check that doesn't load the full session.
  */
 export async function isOnnxAvailable(): Promise<boolean> {
-	try {
-		const session = await getOnnxSession();
-		return session !== null;
-	} catch {
-		return false;
-	}
+  try {
+    const session = await getOnnxSession('/gemma3_270m_onnx/gemma3_270m_w8a16.onnx');
+    return session !== null;
+  } catch {
+    return false;
+  }
 }

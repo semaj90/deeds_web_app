@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * POST /api/ai/yorha/context-chat
  *
@@ -36,7 +37,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			const rows = await db.execute(
 				sql`SELECT title, description, jurisdiction, court, status FROM cases WHERE id = ${caseId} LIMIT 1`
 			);
-			const c = (rows as any).rows[0] as Record<string, unknown> | undefined;
+			const c = pgRows(rows)[0] as Record<string, unknown> | undefined;
 			if (c) {
 				systemPrompt += `\n\nActive Case: ${c.title ?? 'Unknown'}`;
 				if (c.jurisdiction) systemPrompt += ` | Jurisdiction: ${c.jurisdiction}`;

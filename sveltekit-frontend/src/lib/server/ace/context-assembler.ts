@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * ACE Context Assembler — Central Orchestration Module
  *
@@ -746,7 +747,7 @@ async function fetchCaseContext(caseId: string): Promise<string | null> {
       sql`SELECT title, description, jurisdiction, court, status, practice_area
 				FROM cases WHERE id = ${caseId} LIMIT 1`
     );
-    const c = (rows as any).rows[0] as Record<string, unknown> | undefined;
+    const c = pgRows(rows)[0] as Record<string, unknown> | undefined;
     if (!c) return null;
 
     const parts: string[] = [];
@@ -763,7 +764,7 @@ async function fetchCaseContext(caseId: string): Promise<string | null> {
 				ORDER BY created_at DESC
 				LIMIT 5`
     );
-    const glossaryLines = (glossaryRows as any).rows
+    const glossaryLines = pgRows(glossaryRows)
       .map((row: any) => {
         const term = String(row.citation_text ?? '').trim();
         const definition = String(row.notes ?? '').trim();
@@ -1257,7 +1258,7 @@ async function fetchKAGNeighbors(
         ORDER BY c.strength DESC, c.confidence_score DESC
         LIMIT 10`
         );
-        return (rows as any).rows.map((r: any) => ({
+        return pgRows(rows).map((r: any) => ({
           nodeId: String(r.node_id ?? ''),
           title: String(r.title ?? ''),
           relationship: String(r.relationship ?? ''),
@@ -1285,7 +1286,7 @@ async function fetchChatHistory(
 				ORDER BY created_at DESC
 				LIMIT 20`
     );
-    return (rows as any).rows.reverse().map((r: any) => ({
+    return pgRows(rows).reverse().map((r: any) => ({
       role: r.role as 'user' | 'assistant' | 'system',
       content: String(r.content ?? ''),
     }));
@@ -1305,7 +1306,7 @@ async function fetchEvidenceMetadataForCase(
 				FROM evidence WHERE case_id = ${caseId}
 				ORDER BY created_at DESC LIMIT 15`
     );
-    return (rows as any).rows.map((r: any) => {
+    return pgRows(rows).map((r: any) => {
       const meta = (typeof r.metadata === 'string' ? JSON.parse(r.metadata) : r.metadata) || {};
       return {
         id: String(r.id ?? ''),
@@ -1339,7 +1340,7 @@ async function fetchEvidenceConnections(
 			ORDER BY ebc.strength DESC
 			LIMIT 25`
     );
-    return (rows as any).rows.map((r: any) => ({
+    return pgRows(rows).map((r: any) => ({
       fromTitle: String(r.from_title ?? 'Unknown'),
       toTitle: String(r.to_title ?? 'Unknown'),
       connectionType: String(r.connection_type ?? 'related'),

@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * POST /api/precedents/search
  *
@@ -204,7 +205,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				}
 
 				timing.pg_search_ms = Math.round(performance.now() - pgStart);
-				const rows = (results as any).rows as Record<string, unknown>[];
+				const rows = pgRows(results) as Record<string, unknown>[];
 				return rows.map(mapPgRow);
 			} catch (err) {
 				console.error('[Precedents] PostgreSQL search failed:', err);

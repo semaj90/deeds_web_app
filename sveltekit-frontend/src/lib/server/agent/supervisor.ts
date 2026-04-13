@@ -220,25 +220,30 @@ export class SupervisorAgent {
 				];
 				let answer = '';
 
-				for (const msg of result.messages ?? []) {
-					const role = (msg as any)._getType?.() ?? (msg as any).role ?? '';
-					if (role === 'tool' || (msg as any).tool_call_id) {
-						toolCalls.push({
-							tool: (msg as any).name ?? 'unknown',
-							input: {},
-							output:
-								typeof (msg as any).content === 'string'
-									? (msg as any).content
-									: JSON.stringify((msg as any).content),
-						});
-					} else if (role === 'ai' || role === 'assistant') {
-						const content = (msg as any).content;
-						if (typeof content === 'string' && content.trim()) {
-							answer = content;
-							reasoning.push(`[${name}] ${content.slice(0, 200)}`);
-						}
-					}
-				}
+				type LangMsg = {
+          _getType?: () => string;
+          role?: string;
+          tool_call_id?: string;
+          name?: string;
+          content?: string | unknown[];
+        };
+        for (const msg of result.messages ?? []) {
+          const m = msg as LangMsg;
+          const role = m._getType?.() ?? m.role ?? '';
+          if (role === 'tool' || m.tool_call_id) {
+            toolCalls.push({
+              tool: m.name ?? 'unknown',
+              input: {},
+              output: typeof m.content === 'string' ? m.content : JSON.stringify(m.content),
+            });
+          } else if (role === 'ai' || role === 'assistant') {
+            const content = m.content;
+            if (typeof content === 'string' && content.trim()) {
+              answer = content;
+              reasoning.push(`[${name}] ${content.slice(0, 200)}`);
+            }
+          }
+        }
 
 				return {
 					answer: answer || 'Investigation complete.',

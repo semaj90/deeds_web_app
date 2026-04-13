@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * Codebase Wiki API
  * GPU-accelerated semantic search with cosine retrieval
@@ -33,8 +34,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		);
 
 		return json({
-			pages: (result as any).rows,
-			total: (result as any).rows.length
+			pages: pgRows(result),
+			total: pgRows(result).length
 		});
 	} catch (error) {
 		console.error('Wiki list error:', error);
@@ -93,7 +94,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		);
 
 		// Map similarity_score → similarity for consistent API response
-		const results = ((searchResult as any).rows || []).map((r: any) => ({
+		const results = (pgRows(searchResult) || []).map((r: any) => ({
 			...r,
 			similarity: r.similarity_score
 		}));

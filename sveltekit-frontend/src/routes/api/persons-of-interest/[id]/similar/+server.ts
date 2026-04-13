@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
 import { and, eq, isNull, ne, or, desc, sql } from 'drizzle-orm';
-import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
+import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
 

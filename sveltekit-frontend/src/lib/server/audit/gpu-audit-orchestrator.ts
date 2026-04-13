@@ -28,7 +28,7 @@ import {
 	type ClusterResult,
 } from '$lib/server/gpu/libtorch-bridge.js';
 import { ENV } from '$lib/server/env.server.js';
-import db from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { codebaseAuditReports } from '$lib/server/db/schema-postgres.js';
 import { eq, desc } from 'drizzle-orm';
 

@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * Knowledge Base Learning System for Error-Brain
  *
@@ -261,7 +262,7 @@ export class KnowledgeBase {
 				LIMIT ${limit}
 			`);
 
-			const rows = (results as any).rows as Record<string, any>[];
+			const rows = pgRows(results) as Record<string, any>[];
 			return rows.map((row) => ({
 				pattern: {
 					id: row.id,

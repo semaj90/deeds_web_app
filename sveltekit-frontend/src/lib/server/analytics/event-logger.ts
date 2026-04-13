@@ -12,7 +12,7 @@
  * - Predictive next actions ("after upload → suggest RAG extract")
  * - Query pattern analysis for cache warming
  */
-import dbClient from '$lib/server/db/client.js';
+import dbClient from '$lib/server/db/client';
 const db = dbClient.db;
 import { sql } from 'drizzle-orm';
 import { createHash } from 'crypto';

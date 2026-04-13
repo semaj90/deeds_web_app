@@ -82,15 +82,17 @@ const uploadAudio = fromPromise(async ({ input }: { input: AudioUploadContext })
 
   const response = await fetch('/api/audio/upload', {
     method: 'POST',
-    body: formData
+    body: formData,
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error((errorData as any).error || `HTTP ${response.status}`);
+    throw new Error(
+      String((errorData as Record<string, unknown>).error ?? '') || `HTTP ${response.status}`
+    );
   }
 
-  const result = await response.json() as { evidenceId: string };
+  const result = (await response.json()) as { evidenceId: string };
   return result;
 }) as any;
 
@@ -133,12 +135,12 @@ const streamProgress = fromPromise(async ({ input }: { input: AudioUploadContext
 export const audioUploadMachine = setup({
   types: {
     context: {} as AudioUploadContext,
-    events: {} as AudioUploadEvent
+    events: {} as AudioUploadEvent,
   },
   actors: {
     uploadAudio,
-    streamProgress
-  }
+    streamProgress,
+  },
 }).createMachine({
   id: 'audioUpload',
   initial: 'idle',
@@ -151,7 +153,7 @@ export const audioUploadMachine = setup({
     stageMessage: '',
     overallProgress: 0,
     result: null,
-    error: null
+    error: null,
   },
   states: {
     idle: {
@@ -159,21 +161,21 @@ export const audioUploadMachine = setup({
         SELECT_FILE: {
           target: 'uploading',
           actions: assign({
-            file: ({ event }) => isSelectFileEvent(event) ? event.file : null,
+            file: ({ event }) => (isSelectFileEvent(event) ? event.file : null),
             caseId: ({ event }) => {
               const e = asRecord(event);
               return typeof e.caseId === 'string' ? e.caseId : null;
             },
-            error: () => null
-          })
-        }
-      }
+            error: () => null,
+          }),
+        },
+      },
     },
     uploading: {
       entry: assign({
         uploadProgress: 0,
         processingStage: () => 'upload' as const,
-        stageMessage: () => 'Uploading audio file...'
+        stageMessage: () => 'Uploading audio file...',
       }),
       invoke: {
         id: 'uploadAudio',
@@ -184,21 +186,21 @@ export const audioUploadMachine = setup({
           actions: assign({
             evidenceId: ({ event }) => extractEvidenceIdFromInvoke(event),
             uploadProgress: 100,
-            error: null
-          })
+            error: null,
+          }),
         },
         onError: {
           target: 'error',
           actions: assign({
-            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed'
-          })
-        }
-      }
+            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed',
+          }),
+        },
+      },
     },
     streaming: {
       entry: assign({
         processingStage: () => 'transcription' as const,
-        stageMessage: () => 'Transcribing audio...'
+        stageMessage: () => 'Transcribing audio...',
       }),
       invoke: {
         id: 'streamProgress',
@@ -209,27 +211,37 @@ export const audioUploadMachine = setup({
           actions: assign({
             result: ({ event }) => {
               const e = asRecord(event);
-              const data = (e.data ?? e.output) as any;
+              const data = (e.data ?? e.output) as Record<string, unknown>;
               return data?.details || null;
             },
             overallProgress: 100,
             processingStage: () => 'complete' as const,
-            stageMessage: () => 'Processing complete'
-          })
+            stageMessage: () => 'Processing complete',
+          }),
         },
         onError: {
           target: 'error',
           actions: assign({
-            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed'
-          })
-        }
+            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed',
+          }),
+        },
       },
       on: {
         PROGRESS: {
           actions: assign({
             processingStage: ({ event }) => {
               const e = asRecord(event);
-              return typeof e.stage === 'string' ? e.stage as any : 'upload';
+              const valid = [
+                'upload',
+                'transcription',
+                'analysis',
+                'indexing',
+                'complete',
+                'error',
+              ];
+              return (
+                typeof e.stage === 'string' && valid.includes(e.stage) ? e.stage : 'upload'
+              ) as AudioUploadContext['processingStage'];
             },
             overallProgress: ({ event }) => {
               const e = asRecord(event);
@@ -238,10 +250,10 @@ export const audioUploadMachine = setup({
             stageMessage: ({ event }) => {
               const e = asRecord(event);
               return typeof e.message === 'string' ? e.message : '';
-            }
-          })
-        }
-      }
+            },
+          }),
+        },
+      },
     },
     complete: {
       type: 'final',
@@ -257,18 +269,18 @@ export const audioUploadMachine = setup({
             stageMessage: '',
             overallProgress: 0,
             result: null,
-            error: null
-          })
-        }
-      }
+            error: null,
+          }),
+        },
+      },
     },
     error: {
       on: {
         RETRY: {
           target: 'uploading',
           actions: assign({
-            error: null
-          })
+            error: null,
+          }),
         },
         RESET: {
           target: 'idle',
@@ -281,12 +293,12 @@ export const audioUploadMachine = setup({
             stageMessage: '',
             overallProgress: 0,
             result: null,
-            error: null
-          })
-        }
-      }
-    }
-  }
+            error: null,
+          }),
+        },
+      },
+    },
+  },
 });
 
 export default audioUploadMachine;

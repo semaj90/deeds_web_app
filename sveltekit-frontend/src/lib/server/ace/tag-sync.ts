@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * Mirrored Tag Sync — CouchDB + Qdrant + pgvector
  *
@@ -66,7 +67,7 @@ export async function getDocumentTags(
 			ORDER BY confidence DESC
 			LIMIT 30
 		`);
-		const tags = (rows as any).rows as Array<{
+		const tags = pgRows(rows) as Array<{
 			tag_label: string;
 			tag_category: string;
 			confidence: number;

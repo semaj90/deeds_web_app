@@ -10,8 +10,10 @@ import lazyDb from './client.js';
 import * as schema from './schema.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
-const _CFG: Record<string, any> =
-  typeof globalThis !== 'undefined' && (globalThis as any)._CFG ? (globalThis as any)._CFG : {};
+const _CFG: Record<string, unknown> =
+  typeof globalThis !== 'undefined' && '_CFG' in globalThis
+    ? (globalThis as unknown as Record<string, Record<string, unknown>>)._CFG
+    : {};
 
 // Lazy-load project's cache/redis helper at runtime
 let _cacheInitialized = false;
@@ -23,7 +25,7 @@ async function getCache(): Promise<any | undefined> {
   try {
     const cachePath = '$lib/server/cache/redis';
     const mod = await import(/* @vite-ignore */ cachePath);
-    _cache = (mod as any).default ?? mod;
+    _cache = (mod as Record<string, unknown>).default ?? mod;
   } catch (err) {
     _cache = undefined;
   }
@@ -75,7 +77,9 @@ export async function hybridVectorSearch<T = unknown>(
 ): Promise<unknown[]> {
   try {
     if (qdrantClient) {
-      const qResults = await (qdrantClient as any).search({
+      const qResults = await (
+        qdrantClient as unknown as { search: (opts: Record<string, unknown>) => Promise<unknown[]> }
+      ).search({
         collectionName: _CFG.QDRANT_COLLECTION ?? 'legal_embeddings',
         vector: embedding,
         limit,
@@ -89,10 +93,11 @@ export async function hybridVectorSearch<T = unknown>(
   // Fallback to pgvector
   try {
     const vectorStr = `[${embedding.join(',')}]`;
-    const rows = await (db as any)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = await (db as unknown as any)
       .select()
-      .from(table as any)
-      .orderBy(sql`${column as any} <#> ${vectorStr}::vector`)
+      .from(table)
+      .orderBy(sql`${column} <#> ${vectorStr}::vector`)
       .limit(limit)
       .execute();
     return Array.isArray(rows) ? rows : [];
@@ -111,22 +116,32 @@ export async function storeEmbedding(
 	metadata: Record<string, unknown> = {}
 ): Promise<void> {
 	try {
-		await (db as any)
-			.update(table as any)
-			.set({ [(vectorColumn as any)?.name ?? 'embedding']: embedding })
-			.where(eq((table as any).id, recordId))
-			.execute();
-	} catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (db as unknown as any)
+      .update(table)
+      .set({
+        [((vectorColumn as Record<string, unknown>)?.name as string) ?? 'embedding']: embedding,
+      })
+      .where(eq((table as Record<string, unknown>).id as Parameters<typeof eq>[0], recordId))
+      .execute();
+  } catch (err) {
 		console.warn('⚠️ Failed to update embedding in Postgres:', err);
 	}
 
 	try {
 		if (qdrantClient) {
-			await (qdrantClient as any).upsert({
-				collectionName: _CFG.QDRANT_COLLECTION ?? 'legal_embeddings',
-				points: [{
-	id: recordId, vector: embedding, payload: metadata }]
-			});
+			await (
+        qdrantClient as unknown as { upsert: (opts: Record<string, unknown>) => Promise<void> }
+      ).upsert({
+        collectionName: _CFG.QDRANT_COLLECTION ?? 'legal_embeddings',
+        points: [
+          {
+            id: recordId,
+            vector: embedding,
+            payload: metadata,
+          },
+        ],
+      });
 		}
 	} catch (err) {
 		console.warn('⚠️ Failed to upsert to Qdrant:', err);

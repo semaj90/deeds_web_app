@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * Evidence Analysis Pipeline
  *
@@ -313,7 +314,7 @@ async function createGraphConnections(
 			LIMIT 20`
 	);
 
-	const siblingRows = (siblings as any).rows ?? [];
+	const siblingRows = pgRows(siblings) ?? [];
 
 	for (const sibling of siblingRows) {
 		const siblingTags: string[] = Array.isArray(sibling.ai_tags)

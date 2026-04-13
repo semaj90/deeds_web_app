@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * GET /api/evidence/analysis/cache?evidenceId=...&caseId=...&type=...
  *
@@ -103,7 +104,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       );
     }
 
-    const data = (rows as any).rows ?? [];
+    const data = pgRows(rows) ?? [];
 
     // Cache for 5 minutes (memory + Redis)
     await setCache(cacheKey, data, 5 * 60 * 1000).catch(() => {});

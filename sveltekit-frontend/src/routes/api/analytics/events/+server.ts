@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * POST /api/analytics/events — Log analytics event(s)
  *   Accepts single event or batch array: { batch: [...] }
@@ -103,7 +104,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 				LIMIT ${limit}`
 		);
 
-		const responseData = { events: (rows as any).rows };
+		const responseData = { events: pgRows(rows) };
 		const { etag, isMatch } = checkETag(responseData, request.headers);
 		if (isMatch) return notModified(etag);
 

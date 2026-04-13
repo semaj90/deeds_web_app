@@ -55,43 +55,43 @@ export interface ProcessingMetrics {
  * Detects headings, sections, and legal document patterns
  */
 export class GPUMarkdownScanner {
-    private device: GPUDevice | null = null;
-    private pipelines: Map<string, any> = new Map();
+  private device: GPUDevice | null = null;
+  private pipelines: Map<string, any> = new Map();
 
-    async initialize(): Promise<void> {
-        if (!(navigator as any).gpu) {
-            throw new Error('WebGPU not supported');
-        }
-
-        const adapter = await (navigator as any).gpu.requestAdapter();
-        if (!adapter) {
-            throw new Error('No WebGPU adapter found');
-        }
-
-        this.device = await adapter.requestDevice();
-
-        // Create compute pipelines for different scanning operations
-        await this.createScanPipelines();
+  async initialize(): Promise<void> {
+    if (!navigator.gpu) {
+      throw new Error('WebGPU not supported');
     }
 
-    private async createScanPipelines(): Promise<void> {
-        if (!this.device) return;
-
-        // Pipeline for heading detection (# ## ###)
-        const headingShader = this.createHeadingDetectionShader();
-        this.pipelines.set('headings', await this.createComputePipeline(headingShader));
-
-        // Pipeline for section marker detection (FACTS: REASONING, etc.)
-        const sectionShader = this.createSectionDetectionShader();
-        this.pipelines.set('sections', await this.createComputePipeline(sectionShader));
-
-        // Pipeline for token boundary detection
-        const tokenShader = this.createTokenBoundaryShader();
-        this.pipelines.set('tokens', await this.createComputePipeline(tokenShader));
+    const adapter = await (navigator.gpu as GPU).requestAdapter();
+    if (!adapter) {
+      throw new Error('No WebGPU adapter found');
     }
 
-    private createHeadingDetectionShader(): string {
-        return `
+    this.device = await adapter.requestDevice();
+
+    // Create compute pipelines for different scanning operations
+    await this.createScanPipelines();
+  }
+
+  private async createScanPipelines(): Promise<void> {
+    if (!this.device) return;
+
+    // Pipeline for heading detection (# ## ###)
+    const headingShader = this.createHeadingDetectionShader();
+    this.pipelines.set('headings', await this.createComputePipeline(headingShader));
+
+    // Pipeline for section marker detection (FACTS: REASONING, etc.)
+    const sectionShader = this.createSectionDetectionShader();
+    this.pipelines.set('sections', await this.createComputePipeline(sectionShader));
+
+    // Pipeline for token boundary detection
+    const tokenShader = this.createTokenBoundaryShader();
+    this.pipelines.set('tokens', await this.createComputePipeline(tokenShader));
+  }
+
+  private createHeadingDetectionShader(): string {
+    return `
             @group(0) @binding(0) var<storage, read> inputText: array<u32>;
             @group(0) @binding(1) var<storage, read_write> headingPositions: array<u32>;
             @group(0) @binding(2) var<storage, read_write> headingLevels: array<u32>;
@@ -123,10 +123,10 @@ export class GPUMarkdownScanner {
                 }
             }
         `;
-    }
+  }
 
-    private createSectionDetectionShader(): string {
-        return `
+  private createSectionDetectionShader(): string {
+    return `
             @group(0) @binding(0) var<storage, read> inputText: array<u32>;
             @group(0) @binding(1) var<storage, read_write> sectionMarkers: array<u32>;
 
@@ -162,10 +162,10 @@ export class GPUMarkdownScanner {
                 }
             }
         `;
-    }
+  }
 
-    private createTokenBoundaryShader(): string {
-        return `
+  private createTokenBoundaryShader(): string {
+    return `
             @group(0) @binding(0) var<storage, read> inputText: array<u32>;
             @group(0) @binding(1) var<storage, read_write> tokenBoundaries: array<u32>;
 
@@ -200,174 +200,199 @@ export class GPUMarkdownScanner {
                 tokenBoundaries[idx] = select(0u, 1u, isBoundary);
             }
         `;
+  }
+
+  private async createComputePipeline(shaderCode: string): Promise<any> {
+    if (!this.device) throw new Error('Device not initialized');
+
+    const shaderModule = this.device!.createShaderModule({
+      code: shaderCode,
+    });
+
+    return this.device!.createComputePipeline({
+      layout: 'auto',
+      compute: {
+        module: shaderModule,
+        entryPoint: 'main',
+      },
+    });
+  }
+
+  /**
+   * Scan markdown text for headings and sections using GPU
+   */
+  async scanMarkdown(text: string): Promise<{
+    headings: Array<{ position: number; level: number }>;
+    sections: Array<{
+      position: number;
+      type: string;
+    }>;
+  }> {
+    if (!this.device) await this.initialize();
+
+    const encoder = new TextEncoder();
+    const textArray = encoder.encode(text);
+
+    // Pad array to multiple of 4 for alignment if needed, or handle in buffer creation
+
+    const textBuffer = this.device!.createBuffer({
+      size: Math.max(textArray.length * 4, 16), // Use u32 array size mapping roughly
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+      mappedAtCreation: true,
+    });
+
+    const u32Array = new Uint32Array(textBuffer.getMappedRange());
+    for (let i = 0; i < textArray.length; i++) {
+      u32Array[i] = textArray[i];
     }
+    textBuffer.unmap();
 
-    private async createComputePipeline(shaderCode: string): Promise<any> {
-        if (!this.device) throw new Error('Device not initialized');
+    // Create output buffers
+    const bufferSize = Math.max(textArray.length * 4, 16);
+    const headingPositionsBuffer = this.device!.createBuffer({
+      size: bufferSize,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
 
-        const shaderModule = (this.device as any).createShaderModule({
-            code: shaderCode,
-        });
+    const headingLevelsBuffer = this.device!.createBuffer({
+      size: bufferSize,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
 
-        return (this.device as any).createComputePipeline({
-            layout: 'auto',
-            compute: {
-	module: shaderModule,
-                entryPoint: 'main',
+    const sectionMarkersBuffer = this.device!.createBuffer({
+      size: bufferSize,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
+
+    // 1. Headings Pass
+    const headingCommandEncoder = this.device!.createCommandEncoder();
+    const headingPass = headingCommandEncoder.beginComputePass();
+    headingPass.setPipeline(this.pipelines.get('headings')!);
+    headingPass.setBindGroup(
+      0,
+      this.device!.createBindGroup({
+        layout: this.pipelines.get('headings')!.getBindGroupLayout(0),
+        entries: [
+          {
+            binding: 0,
+            resource: {
+              buffer: textBuffer,
             },
-	});
+          },
+          {
+            binding: 1,
+            resource: {
+              buffer: headingPositionsBuffer,
+            },
+          },
+          {
+            binding: 2,
+            resource: {
+              buffer: headingLevelsBuffer,
+            },
+          },
+        ],
+      })
+    );
+    headingPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
+    headingPass.end();
+    this.device!.queue.submit([headingCommandEncoder.finish()]);
+
+    // 2. Sections Pass
+    const sectionCommandEncoder = this.device!.createCommandEncoder();
+    const sectionPass = sectionCommandEncoder.beginComputePass();
+    sectionPass.setPipeline(this.pipelines.get('sections')!);
+    sectionPass.setBindGroup(
+      0,
+      this.device!.createBindGroup({
+        layout: this.pipelines.get('sections')!.getBindGroupLayout(0),
+        entries: [
+          {
+            binding: 0,
+            resource: {
+              buffer: textBuffer,
+            },
+          },
+          {
+            binding: 1,
+            resource: {
+              buffer: sectionMarkersBuffer,
+            },
+          },
+        ],
+      })
+    );
+    sectionPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
+    sectionPass.end();
+    this.device!.queue.submit([sectionCommandEncoder.finish()]);
+
+    // Read results
+    const headingPositions = await this.readBuffer(headingPositionsBuffer, textArray.length);
+    const headingLevels = await this.readBuffer(headingLevelsBuffer, textArray.length);
+    const sectionMarkers = await this.readBuffer(sectionMarkersBuffer, textArray.length);
+
+    // Process results
+    const headings: Array<{
+      position: number;
+      level: number;
+    }> = [];
+    const sections: Array<{
+      position: number;
+      type: string;
+    }> = [];
+
+    const sectionTypes = ['', 'facts', 'reasoning', 'holding', 'conclusion'];
+
+    for (let i = 0; i < textArray.length; i++) {
+      if (headingPositions[i] > 0) {
+        headings.push({ position: i, level: headingLevels[i] });
+      }
+      if (sectionMarkers[i] > 0 && sectionMarkers[i] < sectionTypes.length) {
+        sections.push({
+          position: i,
+          type: sectionTypes[sectionMarkers[i]],
+        });
+      }
     }
 
-    /**
-     * Scan markdown text for headings and sections using GPU
-     */
-    async scanMarkdown(text: string): Promise<{
-	headings: Array<{ position: number;
-	level: number }>;
-        sections: Array<{
-	position: number, type: string }>;
-    }> {
-        if (!this.device) await this.initialize();
+    // Cleanup
+    textBuffer.destroy();
+    headingPositionsBuffer.destroy();
+    headingLevelsBuffer.destroy();
+    sectionMarkersBuffer.destroy();
 
-        const encoder = new TextEncoder();
-        const textArray = encoder.encode(text);
+    return { headings, sections };
+  }
 
-        // Pad array to multiple of 4 for alignment if needed, or handle in buffer creation
+  private async readBuffer(buffer: GPUBuffer, length: number): Promise<Uint32Array> {
+    const size = Math.max(length * 4, 16);
+    const readBuffer = this.device!.createBuffer({
+      size: size,
+      usage: 8 /* COPY_DST */ | 1 /* MAP_READ */,
+    });
 
-        const textBuffer = (this.device! as any).createBuffer({
-            size: Math.max(textArray.length * 4, 16), // Use u32 array size mapping roughly
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-            mappedAtCreation: true,
-        });
+    const commandEncoder = this.device!.createCommandEncoder();
+    commandEncoder.copyBufferToBuffer(buffer, 0, readBuffer, 0, size);
+    this.device!.queue.submit([commandEncoder.finish()]);
 
-        const u32Array = new Uint32Array((textBuffer as any).getMappedRange());
-        for (let i = 0; i < textArray.length; i++) {
-            u32Array[i] = textArray[i];
-        }
-        (textBuffer as any).unmap();
+    await readBuffer.mapAsync(1 /* READ */);
+    // Create a copy because unmap invalidates the array
+    const result = new Uint32Array(readBuffer.getMappedRange());
+    const copy = new Uint32Array(result);
 
-        // Create output buffers
-        const bufferSize = Math.max(textArray.length * 4, 16);
-        const headingPositionsBuffer = (this.device! as any).createBuffer({
-            size: bufferSize,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-        });
+    readBuffer.unmap();
+    readBuffer.destroy();
 
-        const headingLevelsBuffer = (this.device! as any).createBuffer({
-            size: bufferSize,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-        });
+    return copy;
+  }
 
-        const sectionMarkersBuffer = (this.device! as any).createBuffer({
-            size: bufferSize,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-        });
-
-        // 1. Headings Pass
-        const headingCommandEncoder = (this.device! as any).createCommandEncoder();
-        const headingPass = headingCommandEncoder.beginComputePass();
-        headingPass.setPipeline(this.pipelines.get('headings')!);
-        headingPass.setBindGroup(
-            0,
-            (this.device! as any).createBindGroup({
-                layout: this.pipelines.get('headings')!.getBindGroupLayout(0),
-                entries: [
-                    { binding: 0, resource: {
-	buffer: textBuffer } },
-	{ binding: 1, resource: {
-	buffer: headingPositionsBuffer } },
-	{ binding: 2, resource: {
-	buffer: headingLevelsBuffer } }
-                ],
-            })
-        );
-        headingPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
-        headingPass.end();
-        (this.device! as any).queue.submit([headingCommandEncoder.finish()]);
-
-        // 2. Sections Pass
-        const sectionCommandEncoder = (this.device! as any).createCommandEncoder();
-        const sectionPass = sectionCommandEncoder.beginComputePass();
-        sectionPass.setPipeline(this.pipelines.get('sections')!);
-        sectionPass.setBindGroup(
-            0,
-            this.device!.createBindGroup({
-                layout: this.pipelines.get('sections')!.getBindGroupLayout(0),
-                entries: [
-                    { binding: 0, resource: {
-	buffer: textBuffer } },
-	{ binding: 1, resource: {
-	buffer: sectionMarkersBuffer } }
-                ],
-            })
-        );
-        sectionPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
-        sectionPass.end();
-        (this.device! as any).queue.submit([sectionCommandEncoder.finish()]);
-
-        // Read results
-        const headingPositions = await this.readBuffer(headingPositionsBuffer, textArray.length);
-        const headingLevels = await this.readBuffer(headingLevelsBuffer, textArray.length);
-        const sectionMarkers = await this.readBuffer(sectionMarkersBuffer, textArray.length);
-
-        // Process results
-        const headings: Array<{
-	position: number, level: number }> = [];
-        const sections: Array<{
-	position: number, type: string }> = [];
-
-        const sectionTypes = ['', 'facts', 'reasoning', 'holding', 'conclusion'];
-
-        for (let i = 0; i < textArray.length; i++) {
-            if (headingPositions[i] > 0) {
-                headings.push({ position: i, level: headingLevels[i] });
-            }
-            if (sectionMarkers[i] > 0 && sectionMarkers[i] < sectionTypes.length) {
-                sections.push({
-                    position: i,
-                    type: sectionTypes[sectionMarkers[i]],
-                });
-            }
-        }
-
-        // Cleanup
-        textBuffer.destroy();
-        headingPositionsBuffer.destroy();
-        headingLevelsBuffer.destroy();
-        sectionMarkersBuffer.destroy();
-
-        return { headings, sections };
+  destroy(): void {
+    this.pipelines.clear();
+    if (this.device) {
+      this.device!.destroy();
+      this.device = null;
     }
-
-    private async readBuffer(buffer: GPUBuffer, length: number): Promise<Uint32Array> {
-        const size = Math.max(length * 4, 16);
-        const readBuffer = (this.device! as any).createBuffer({
-            size: size,
-            usage: (8 /* COPY_DST */) | (1 /* MAP_READ */),
-        });
-
-        const commandEncoder = (this.device! as any).createCommandEncoder();
-        commandEncoder.copyBufferToBuffer(buffer, 0, readBuffer, 0, size);
-        (this.device! as any).queue.submit([commandEncoder.finish()]);
-
-        await (readBuffer as any).mapAsync(1 /* READ */);
-        // Create a copy because unmap invalidates the array
-        const result = new Uint32Array((readBuffer as any).getMappedRange());
-        const copy = new Uint32Array(result);
-
-        (readBuffer as any).unmap();
-        (readBuffer as any).destroy();
-
-        return copy;
-    }
-
-    destroy(): void {
-        this.pipelines.clear();
-        if (this.device) {
-            (this.device as any).destroy();
-            this.device = null;
-        }
-    }
+  }
 }
 
 /**
@@ -375,311 +400,324 @@ export class GPUMarkdownScanner {
  * Combines scanning, tokenization, chunking, and embedding
  */
 export class GPUMarkdownProcessor {
-    private scanner: GPUMarkdownScanner;
-    private tokenizer: GPUTokenizer;
-    private embedder: GPUEmbedder;
-    private gpuAvailable: boolean = false;
+  private scanner: GPUMarkdownScanner;
+  private tokenizer: GPUTokenizer;
+  private embedder: GPUEmbedder;
+  private gpuAvailable: boolean = false;
 
-    constructor() {
-        this.scanner = new GPUMarkdownScanner();
-        this.tokenizer = new GPUTokenizer();
-        this.embedder = new GPUEmbedder();
+  constructor() {
+    this.scanner = new GPUMarkdownScanner();
+    this.tokenizer = new GPUTokenizer();
+    this.embedder = new GPUEmbedder();
+  }
+
+  async initialize(): Promise<void> {
+    try {
+      // Try to initialize GPU components
+      await Promise.all([
+        this.scanner.initialize(),
+        this.tokenizer.initialize(),
+        this.embedder.initialize(),
+      ]);
+      this.gpuAvailable = true;
+      console.log('✅ GPU Markdown Processor initialized with WebGPU');
+    } catch (error) {
+      console.warn('⚠️ WebGPU initialization failed, using CPU fallback:', error);
+      this.gpuAvailable = false;
     }
+  }
 
-    async initialize(): Promise<void> {
-        try {
-            // Try to initialize GPU components
-            await Promise.all([
-                this.scanner.initialize(),
-                this.tokenizer.initialize(),
-                this.embedder.initialize()
-            ]);
-            this.gpuAvailable = true;
-            console.log('✅ GPU Markdown Processor initialized with WebGPU');
-        } catch (error) {
-            console.warn('⚠️ WebGPU initialization failed, using CPU fallback:', error);
-            this.gpuAvailable = false;
-        }
+  async processMarkdown(text: string): Promise<MarkdownProcessingResult> {
+    const startTime = performance.now();
+
+    if (this.gpuAvailable) {
+      // GPU-accelerated processing
+      return this.processWithGPU(text, startTime);
+    } else {
+      // CPU fallback processing
+      return this.processWithCPU(text, startTime);
     }
+  }
 
-    async processMarkdown(text: string): Promise<MarkdownProcessingResult> {
-        const startTime = performance.now();
+  private async processWithGPU(text: string, startTime: number): Promise<MarkdownProcessingResult> {
+    // Step 1: GPU scanning for structure
+    const scanStart = performance.now();
+    const { headings, sections } = await this.scanner.scanMarkdown(text);
+    // const scanTime = performance.now() - scanStart; // unused
 
-        if (this.gpuAvailable) {
-            // GPU-accelerated processing
-            return this.processWithGPU(text, startTime);
-        } else {
-            // CPU fallback processing
-            return this.processWithCPU(text, startTime);
-        }
-    }
+    // Step 2: Tokenization
+    const tokenStart = performance.now();
+    const tokens = await this.tokenizer.tokenize(text);
+    const tokenTime = performance.now() - tokenStart;
 
-    private async processWithGPU(text: string, startTime: number): Promise<MarkdownProcessingResult> {
-        // Step 1: GPU scanning for structure
-        const scanStart = performance.now();
-        const { headings, sections } = await this.scanner.scanMarkdown(text);
-        // const scanTime = performance.now() - scanStart; // unused
+    // Step 3: Semantic chunking
+    const chunkStart = performance.now();
+    const markdownSections = await this.createSections(text, headings, sections);
+    const chunkTime = performance.now() - chunkStart;
 
-        // Step 2: Tokenization
-        const tokenStart = performance.now();
-        const tokens = await this.tokenizer.tokenize(text);
-        const tokenTime = performance.now() - tokenStart;
+    // Step 4: Embeddings
+    const embedStart = performance.now();
+    const embeddings = await this.embedder.embedSections(markdownSections);
+    const embedTime = performance.now() - embedStart;
 
-        // Step 3: Semantic chunking
-        const chunkStart = performance.now();
-        const markdownSections = await this.createSections(text, headings, sections);
-        const chunkTime = performance.now() - chunkStart;
+    const totalTime = performance.now() - startTime;
+    const memoryUsed = await this.getGPUMemoryUsage();
 
-        // Step 4: Embeddings
-        const embedStart = performance.now();
-        const embeddings = await this.embedder.embedSections(markdownSections);
-        const embedTime = performance.now() - embedStart;
+    return {
+      sections: markdownSections,
+      tokens,
+      embeddings,
+      performance: {
+        tokenizationTime: tokenTime,
+        chunkingTime: chunkTime,
+        embeddingTime: embedTime,
+        gpuMemoryUsed: memoryUsed,
+        totalTime,
+      },
+    };
+  }
 
-        const totalTime = performance.now() - startTime;
-        const memoryUsed = await this.getGPUMemoryUsage();
+  private async processWithCPU(text: string, startTime: number): Promise<MarkdownProcessingResult> {
+    // CPU-based processing as fallback
+    const scanStart = performance.now();
 
-        return {
-            sections: markdownSections,
-            tokens,
-            embeddings,
-            performance: {
-	tokenizationTime: tokenTime,
-                chunkingTime: chunkTime,
-                embeddingTime: embedTime,
-                gpuMemoryUsed: memoryUsed,
-                totalTime,
-            },
-	};
-    }
+    // Simple CPU-based section detection
+    const { headings, sections } = this.scanMarkdownCPU(text);
+    // const scanTime = performance.now() - scanStart; // unused
 
-    private async processWithCPU(text: string, startTime: number): Promise<MarkdownProcessingResult> {
-        // CPU-based processing as fallback
-        const scanStart = performance.now();
+    // Simple tokenization
+    const tokenStart = performance.now();
+    const tokens = this.tokenizeCPU(text);
+    const tokenTime = performance.now() - tokenStart;
 
-        // Simple CPU-based section detection
-        const { headings, sections } = this.scanMarkdownCPU(text);
-        // const scanTime = performance.now() - scanStart; // unused
+    // Basic chunking
+    const chunkStart = performance.now();
+    const markdownSections = this.createSectionsCPU(text, headings, sections);
+    const chunkTime = performance.now() - chunkStart;
 
-        // Simple tokenization
-        const tokenStart = performance.now();
-        const tokens = this.tokenizeCPU(text);
-        const tokenTime = performance.now() - tokenStart;
+    // No embeddings in CPU mode
+    const embedTime = 0;
+    const embeddings: Float32Array[] = [];
 
-        // Basic chunking
-        const chunkStart = performance.now();
-        const markdownSections = this.createSectionsCPU(text, headings, sections);
-        const chunkTime = performance.now() - chunkStart;
+    const totalTime = performance.now() - startTime;
 
-        // No embeddings in CPU mode
-        const embedTime = 0;
-        const embeddings: Float32Array[] = [];
+    return {
+      sections: markdownSections,
+      tokens,
+      embeddings,
+      performance: {
+        tokenizationTime: tokenTime,
+        chunkingTime: chunkTime,
+        embeddingTime: embedTime,
+        gpuMemoryUsed: 0,
+        totalTime,
+      },
+    };
+  }
 
-        const totalTime = performance.now() - startTime;
+  private async createSections(
+    text: string,
+    headings: Array<{
+      position: number;
+      level: number;
+    }>,
+    sections: Array<{
+      position: number;
+      type: string;
+    }>
+  ): Promise<MarkdownSection[]> {
+    const result: MarkdownSection[] = [];
+    const lines = text.split('\n');
 
-        return {
-            sections: markdownSections,
-            tokens,
-            embeddings,
-            performance: {
-	tokenizationTime: tokenTime,
-                chunkingTime: chunkTime,
-                embeddingTime: embedTime,
-                gpuMemoryUsed: 0,
-                totalTime,
-            },
-	};
-    }
+    let currentSection: Partial<MarkdownSection> | null = null;
+    let lineStart = 0;
 
-    private async createSections(
-        text: string,
-        headings: Array<{
-	position: number, level: number }>,
-        sections: Array<{
-	position: number, type: string }>
-    ): Promise<MarkdownSection[]> {
-        const result: MarkdownSection[] = [];
-        const lines = text.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const lineOffset = text.indexOf(line, lineStart);
 
-        let currentSection: Partial<MarkdownSection> | null = null;
-        let lineStart = 0;
-
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            const lineOffset = text.indexOf(line, lineStart);
-
-            // Check for headings
-            const heading = headings.find((h) => Math.abs(h.position - lineOffset) < 10);
-            if (heading) {
-                // Save previous section
-                if (currentSection) {
-                    currentSection.endOffset = lineOffset;
-                    currentSection.content = text.slice(
-                        currentSection.startOffset!,
-                        currentSection.endOffset
-                    );
-                    result.push(currentSection as MarkdownSection);
-                }
-
-                // Start new heading section
-                currentSection = {
-                    type: 'heading',
-                    level: heading.level,
-                    startOffset: lineOffset,
-                    content: '',
-                };
-                lineStart = lineOffset + line.length + 1; // update lineStart
-                continue;
-            }
-
-            // Check for legal sections
-            const section = sections.find((s) => Math.abs(s.position - lineOffset) < 20);
-            if (section) {
-                // Save previous section
-                if (currentSection) {
-                    currentSection.endOffset = lineOffset;
-                    currentSection.content = text.slice(
-                        currentSection.startOffset!,
-                        currentSection.endOffset
-                    );
-                    result.push(currentSection as MarkdownSection);
-                }
-
-                // Start new legal section
-                currentSection = {
-                    type: section.type as any,
-                    startOffset: lineOffset,
-                    content: '',
-                };
-                lineStart = lineOffset + line.length + 1;
-                continue;
-            }
-
-            // Continue building current section
-            if (currentSection && !currentSection.type) {
-                if (line.trim().startsWith('- ') || line.trim().match(/^\d+\./)) {
-                    currentSection.type = 'list';
-                } else if (line.trim().startsWith('```')) {
-                    currentSection.type = 'code';
-                } else {
-                    currentSection.type = 'paragraph';
-                }
-            }
-
-            lineStart = lineOffset + line.length + 1;
-        }
-
-        // Save final section
+      // Check for headings
+      const heading = headings.find((h) => Math.abs(h.position - lineOffset) < 10);
+      if (heading) {
+        // Save previous section
         if (currentSection) {
-            currentSection.endOffset = text.length;
-            currentSection.content = text.slice(currentSection.startOffset!, currentSection.endOffset);
-            result.push(currentSection as MarkdownSection);
+          currentSection.endOffset = lineOffset;
+          currentSection.content = text.slice(
+            currentSection.startOffset!,
+            currentSection.endOffset
+          );
+          result.push(currentSection as MarkdownSection);
         }
 
-        return result;
-    }
+        // Start new heading section
+        currentSection = {
+          type: 'heading',
+          level: heading.level,
+          startOffset: lineOffset,
+          content: '',
+        };
+        lineStart = lineOffset + line.length + 1; // update lineStart
+        continue;
+      }
 
-    private scanMarkdownCPU(text: string): {
-	headings: Array<{ position: number;
-	level: number }>;
-        sections: Array<{
-	position: number, type: string }>;
-    } {
-        const headings: Array<{
-	position: number, level: number }> = [];
-        const sections: Array<{
-	position: number, type: string }> = [];
-
-        const lines = text.split('\n');
-        let currentPos = 0;
-
-        for (const line of lines) {
-            // Find headings
-            const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
-            if (headingMatch) {
-                const level = headingMatch[1].length;
-                const title = headingMatch[2].toLowerCase();
-
-                headings.push({ position: currentPos, level });
-
-                if (title.includes('fact')) sections.push({ position: currentPos, type: 'facts' });
-                else if (title.includes('reasoning') || title.includes('analysis'))
-                    sections.push({ position: currentPos, type: 'reasoning' });
-                else if (title.includes('holding') || title.includes('decision'))
-                    sections.push({ position: currentPos, type: 'holding' });
-                else if (title.includes('conclusion') || title.includes('result'))
-                    sections.push({ position: currentPos, type: 'conclusion' });
-            }
-
-            currentPos += line.length + 1; // +1 for newline
+      // Check for legal sections
+      const section = sections.find((s) => Math.abs(s.position - lineOffset) < 20);
+      if (section) {
+        // Save previous section
+        if (currentSection) {
+          currentSection.endOffset = lineOffset;
+          currentSection.content = text.slice(
+            currentSection.startOffset!,
+            currentSection.endOffset
+          );
+          result.push(currentSection as MarkdownSection);
         }
 
-        return { headings, sections };
-    }
+        // Start new legal section
+        currentSection = {
+          type: section.type as MarkdownSection['type'],
+          startOffset: lineOffset,
+          content: '',
+        };
+        lineStart = lineOffset + line.length + 1;
+        continue;
+      }
 
-    private tokenizeCPU(text: string): Token[] {
-        // Simple word-based tokenization
-        // Using a simplistic regex split for demo
-        const words = text.split(/\s+/).filter((word) => word.length > 0);
-        let currentPos = 0;
-
-        return words.map((word) => {
-             const pos = text.indexOf(word, currentPos);
-             currentPos = pos + word.length;
-             return {
-                text: word,
-                type: 'word' as const,
-                position: pos,
-                confidence: 1.0,
-            };
-        });
-    }
-
-    private createSectionsCPU(
-        text: string,
-        headings: Array<{
-	position: number, level: number }>,
-        sections: Array<{
-	position: number, type: string }>
-    ): MarkdownSection[] {
-        const result: MarkdownSection[] = [];
-
-        // Combine markers
-        const allMarkers = [
-            ...headings.map((h) => ({ ...h, type: 'heading' as const, level: h.level })),
-            ...sections.map((s) => ({ ...s, type: s.type as any, level: 1 })) // sections don't have level property
-        ];
-
-        allMarkers.sort((a, b) => a.position - b.position);
-
-        for (let i = 0; i < allMarkers.length; i++) {
-            const marker = allMarkers[i];
-            const nextMarker = allMarkers[i + 1];
-            const endOffset = nextMarker ? nextMarker.position : text.length;
-
-            result.push({
-                type: marker.type,
-                level: (marker as any).level,
-                startOffset: marker.position,
-                endOffset: endOffset,
-                content: text.slice(marker.position, endOffset).trim(),
-                metadata: {},
-	});
+      // Continue building current section
+      if (currentSection && !currentSection.type) {
+        if (line.trim().startsWith('- ') || line.trim().match(/^\d+\./)) {
+          currentSection.type = 'list';
+        } else if (line.trim().startsWith('```')) {
+          currentSection.type = 'code';
+        } else {
+          currentSection.type = 'paragraph';
         }
+      }
 
-        return result;
+      lineStart = lineOffset + line.length + 1;
     }
 
-    private async getGPUMemoryUsage(): Promise<number> {
-        // This would integrate with WebGPU memory reporting
-        // For now return dummy 0
-        return 0;
+    // Save final section
+    if (currentSection) {
+      currentSection.endOffset = text.length;
+      currentSection.content = text.slice(currentSection.startOffset!, currentSection.endOffset);
+      result.push(currentSection as MarkdownSection);
     }
 
-    destroy(): void {
-        this.scanner.destroy();
-        this.tokenizer.destroy();
-        this.embedder.destroy();
+    return result;
+  }
+
+  private scanMarkdownCPU(text: string): {
+    headings: Array<{ position: number; level: number }>;
+    sections: Array<{
+      position: number;
+      type: string;
+    }>;
+  } {
+    const headings: Array<{
+      position: number;
+      level: number;
+    }> = [];
+    const sections: Array<{
+      position: number;
+      type: string;
+    }> = [];
+
+    const lines = text.split('\n');
+    let currentPos = 0;
+
+    for (const line of lines) {
+      // Find headings
+      const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+      if (headingMatch) {
+        const level = headingMatch[1].length;
+        const title = headingMatch[2].toLowerCase();
+
+        headings.push({ position: currentPos, level });
+
+        if (title.includes('fact')) sections.push({ position: currentPos, type: 'facts' });
+        else if (title.includes('reasoning') || title.includes('analysis'))
+          sections.push({ position: currentPos, type: 'reasoning' });
+        else if (title.includes('holding') || title.includes('decision'))
+          sections.push({ position: currentPos, type: 'holding' });
+        else if (title.includes('conclusion') || title.includes('result'))
+          sections.push({ position: currentPos, type: 'conclusion' });
+      }
+
+      currentPos += line.length + 1; // +1 for newline
     }
+
+    return { headings, sections };
+  }
+
+  private tokenizeCPU(text: string): Token[] {
+    // Simple word-based tokenization
+    // Using a simplistic regex split for demo
+    const words = text.split(/\s+/).filter((word) => word.length > 0);
+    let currentPos = 0;
+
+    return words.map((word) => {
+      const pos = text.indexOf(word, currentPos);
+      currentPos = pos + word.length;
+      return {
+        text: word,
+        type: 'word' as const,
+        position: pos,
+        confidence: 1.0,
+      };
+    });
+  }
+
+  private createSectionsCPU(
+    text: string,
+    headings: Array<{
+      position: number;
+      level: number;
+    }>,
+    sections: Array<{
+      position: number;
+      type: string;
+    }>
+  ): MarkdownSection[] {
+    const result: MarkdownSection[] = [];
+
+    // Combine markers
+    const allMarkers = [
+      ...headings.map((h) => ({ ...h, type: 'heading' as const, level: h.level })),
+      ...sections.map((s) => ({ ...s, type: s.type as MarkdownSection['type'], level: 1 })), // sections don't have level property
+    ];
+
+    allMarkers.sort((a, b) => a.position - b.position);
+
+    for (let i = 0; i < allMarkers.length; i++) {
+      const marker = allMarkers[i];
+      const nextMarker = allMarkers[i + 1];
+      const endOffset = nextMarker ? nextMarker.position : text.length;
+
+      result.push({
+        type: marker.type,
+        level: marker.level,
+        startOffset: marker.position,
+        endOffset: endOffset,
+        content: text.slice(marker.position, endOffset).trim(),
+        metadata: {},
+      });
+    }
+
+    return result;
+  }
+
+  private async getGPUMemoryUsage(): Promise<number> {
+    // This would integrate with WebGPU memory reporting
+    // For now return dummy 0
+    return 0;
+  }
+
+  destroy(): void {
+    this.scanner.destroy();
+    this.tokenizer.destroy();
+    this.embedder.destroy();
+  }
 }
 
 /**

@@ -9,7 +9,9 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
-const MODEL = 'gemma4-legal:latest';
+// Use gemma3:270m (fast, 4.5s avg) instead of gemma4-legal (slow, 25s avg)
+// Entity extraction benefits from speed over complexity
+const MODEL = 'gemma3:270m';
 
 /** Zod schema for structured entity extraction response — drives GBNF grammar */
 const entityResponseSchema = z.object({

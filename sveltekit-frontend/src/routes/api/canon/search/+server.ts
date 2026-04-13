@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * POST /api/canon/search — Hybrid search across canonical legal chunks
  *
@@ -155,7 +156,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					LIMIT ${topK}
 				`);
 
-				const rows = (pgResults as any).rows as Record<string, unknown>[];
+				const rows = pgRows(pgResults) as Record<string, unknown>[];
 				results = rows
 					.filter((r) => Number(r.score) >= 0.3)
 					.map((r) => ({

@@ -210,6 +210,20 @@ function generateWeeklyReengagement(): NotificationPayload {
 	};
 }
 
+// ── Helper Functions ──────────────────────────────────────────────
+
+/**
+ * Check if Redis is ready for operations.
+ */
+function isRedisReady(): boolean {
+	try {
+		const redis = getRedis();
+		return redis.status === 'ready';
+	} catch {
+		return false;
+	}
+}
+
 // ── Scanner ───────────────────────────────────────────────────────
 
 /**
@@ -222,6 +236,11 @@ export async function scanIdleUsers(): Promise<{
 	errors: number;
 }> {
 	const result = { scanned: 0, notified: 0, errors: 0 };
+
+	if (!isRedisReady()) {
+		console.log('[Idle] Redis unavailable, skipping scan');
+		return result;
+	}
 
 	try {
 		const redis: Redis = getRedis();
@@ -293,8 +312,12 @@ export async function scanIdleUsers(): Promise<{
 				console.warn(`[Idle] Error processing user ${userId.slice(0, 8)}:`, err);
 			}
 		}
-	} catch (err) {
-		console.warn('[Idle] Scanner error:', err);
+	} catch (err: any) {
+		if (err.message?.includes('Connection is closed')) {
+			console.warn('[Idle] Redis connection closed, skipping scan');
+		} else {
+			console.warn('[Idle] Scanner error:', err.message);
+		}
 		result.errors++;
 	}
 

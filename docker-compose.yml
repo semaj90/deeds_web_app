@@ -46,7 +46,7 @@ services:
     environment:
       - POSTGRES_DB=legal_ai_db
       - POSTGRES_USER=legal_admin
-      - POSTGRES_PASSWORD=123456
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-123456}
       - POSTGRES_HOST_AUTH_METHOD=md5
     ports:
       - "5432:5432"
@@ -196,7 +196,7 @@ services:
     command: server /data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio123
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minio123}
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -275,7 +275,7 @@ services:
       - "5984:5984"
     environment:
       COUCHDB_USER: admin
-      COUCHDB_PASSWORD: legal_ai_pass
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-legal_ai_pass}
     volumes:
       - couchdb_data:/opt/couchdb/data
       - couchdb_config:/opt/couchdb/etc/local.d
@@ -473,7 +473,7 @@ services:
     environment:
       CLICKHOUSE_DB: default
       CLICKHOUSE_USER: clickhouse
-      CLICKHOUSE_PASSWORD: clickhouse_langfuse
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}
       # Cap ClickHouse memory to prevent OOM crashes (was 1G, kept segfaulting)
       CLICKHOUSE_MAX_SERVER_MEMORY_USAGE_RATIO: "0.8"
     volumes:
@@ -512,23 +512,23 @@ services:
         max-size: "20m"
         max-file: "3"
     environment: &langfuse-env
-      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/langfuse?connect_timeout=10&pool_timeout=10
+      DATABASE_URL: postgresql://legal_admin:${POSTGRES_PASSWORD:-123456}@postgres:5432/langfuse?connect_timeout=10&pool_timeout=10
       CLICKHOUSE_URL: http://langfuse-clickhouse:8123
-      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:clickhouse_langfuse@langfuse-clickhouse:9000
+      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}@langfuse-clickhouse:9000
       CLICKHOUSE_USER: clickhouse
-      CLICKHOUSE_PASSWORD: clickhouse_langfuse
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}
       CLICKHOUSE_CLUSTER_ENABLED: "false"
       LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
       LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
       LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
-      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: minio123
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
       LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
       LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
       LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
       LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
       LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
       LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
-      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: minio123
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
       LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://minio:9000
       LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
       LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
@@ -577,7 +577,7 @@ services:
       LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-3941aba7500ce9fabbe0c513ad6c3a58
       LANGFUSE_INIT_USER_EMAIL: admin@deeds-legal.ai
       LANGFUSE_INIT_USER_NAME: Admin
-      LANGFUSE_INIT_USER_PASSWORD: admin123
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_ADMIN_PASSWORD:-admin123}
     networks:
       - legal-ai-network
     healthcheck:

@@ -75,10 +75,10 @@ export const userTypingStateMachine = setup({
 
           const result = await response.json();
           return {
-            contextualHints: (result as any).hints || [],
-            suggestions: (result as any).suggestions || [],
-            userIntent: (result as any).intent || 'unknown',
-            confidence: (result as any).confidence || 0,
+            contextualHints: (result as Record<string, unknown>).hints || [],
+            suggestions: (result as Record<string, unknown>).suggestions || [],
+            userIntent: (result as Record<string, unknown>).intent || 'unknown',
+            confidence: (result as Record<string, unknown>).confidence || 0,
           };
         } catch (error) {
           console.error('Contextual processing error: ', error);
@@ -200,8 +200,7 @@ export const userTypingStateMachine = setup({
                   start: context.typingStartTime,
                   end: Date.now(),
                   text: context.currentText,
-                  speed:
-                    context.charactersTyped / ((Date.now() - context.typingStartTime) / 60000),
+                  speed: context.charactersTyped / ((Date.now() - context.typingStartTime) / 60000),
                 },
               ].slice(-10),
             }),
@@ -343,7 +342,8 @@ export const userTypingStateMachine = setup({
           actions: assign({
             userBehavior: ({ context, event }) => ({
               ...context.userBehavior,
-              contextualHints: (event.output as any).contextualHints,
+              contextualHints: (event.output as Record<string, unknown>)
+                .contextualHints as string[],
             }),
             lastProcessedText: ({ context }) => context.currentText,
             mcpWorkerStatus: 'idle',
@@ -379,10 +379,11 @@ export const userTypingStateMachine = setup({
           actions: assign({
             userBehavior: ({ context, event }) => ({
               ...context.userBehavior,
-              contextualHints: (event.output as any).contextualHints,
+              contextualHints: (event.output as Record<string, unknown>)
+                .contextualHints as string[],
               patternRecognition: [
                 ...context.userBehavior.patternRecognition,
-                (event.output as any).userIntent,
+                (event.output as Record<string, unknown>).userIntent as string,
               ].slice(-5),
             }),
             lastProcessedText: ({ context }) => context.currentText,

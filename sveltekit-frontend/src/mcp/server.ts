@@ -748,7 +748,7 @@ function setupToolHandlers() {
   async function handleToolCall(name: string, args: Record<string, any>): Promise<any> {
     switch (name) {
       case 'cases:load': {
-        const result = await mcpTools.cases.loadCases(args as any);
+        const result = await mcpTools.cases.loadCases(args);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
@@ -880,7 +880,7 @@ function setupToolHandlers() {
       }
 
       case 'playwright:browser_action': {
-        const { action, url: targetUrl, selector, value } = args as any;
+        const { action, url: targetUrl, selector, value } = args;
 
         // Call the Playwright test infrastructure via the app's test API
         const testUrl = process.env.PLAYWRIGHT_SERVICE_URL || 'http://localhost:5173';
@@ -1017,8 +1017,8 @@ function setupToolHandlers() {
                 entities: entities.length,
                 forensicFlags: forensics.length,
                 highSeverityFlags: forensics.filter((f: any) => f.severity === 'high').length,
-                tags: (tags as any).tags?.length ?? 0,
-                tagsMirrored: (tags as any).mirrored ?? 0,
+                tags: tags.tags?.length ?? 0,
+                tagsMirrored: tags.mirrored ?? 0,
               }),
             },
           ],
@@ -1033,7 +1033,7 @@ function setupToolHandlers() {
           analyzeVision,
           analyzeAudio,
           extractEmbeddings,
-        } = args as any;
+        } = args;
         const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
 
         // Fetch file from MinIO
@@ -1053,9 +1053,9 @@ function setupToolHandlers() {
 
         const response = await fetch(url.toString(), {
           method: 'POST',
-          body: formData as any,
+          body: formData as unknown as BodyInit,
           headers: formData.getHeaders(),
-        });
+        } as RequestInit);
 
         if (!response.ok) {
           throw new Error(
@@ -1068,7 +1068,7 @@ function setupToolHandlers() {
       }
 
       case 'evidence:detect_objects': {
-        const { evidenceId, imageUrl, confidenceThreshold } = args as any;
+        const { evidenceId, imageUrl, confidenceThreshold } = args;
         const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
 
         // Fetch image from MinIO
@@ -1085,9 +1085,9 @@ function setupToolHandlers() {
 
         const response = await fetch(url.toString(), {
           method: 'POST',
-          body: formData as any,
+          body: formData as unknown as BodyInit,
           headers: formData.getHeaders(),
-        });
+        } as RequestInit);
 
         if (!response.ok) {
           throw new Error(`Object detection failed: ${response.status} ${await response.text()}`);
@@ -1098,7 +1098,7 @@ function setupToolHandlers() {
       }
 
       case 'evidence:transcribe_gpu': {
-        const { evidenceId, audioUrl, language, wordTimestamps } = args as any;
+        const { evidenceId, audioUrl, language, wordTimestamps } = args;
         const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
 
         // Fetch audio from MinIO
@@ -1116,9 +1116,9 @@ function setupToolHandlers() {
 
         const response = await fetch(url.toString(), {
           method: 'POST',
-          body: formData as any,
+          body: formData as unknown as BodyInit,
           headers: formData.getHeaders(),
-        });
+        } as RequestInit);
 
         if (!response.ok) {
           throw new Error(`GPU transcription failed: ${response.status} ${await response.text()}`);
@@ -1129,7 +1129,7 @@ function setupToolHandlers() {
       }
 
       case 'evidence:search_similar': {
-        const { query, modalities, topK } = args as any;
+        const { query, modalities, topK } = args;
         const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
 
         const url = new URL(`${FASTAPI_URL}/multimodal/search`);
@@ -1152,22 +1152,28 @@ function setupToolHandlers() {
       }
 
       case 'reports:list': {
-        const result = await mcpTools.reports.listReports(args as any);
+        const result = await mcpTools.reports.listReports(args);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
       case 'reports:create': {
-        const result = await mcpTools.reports.createReport(args as any);
+        const result = await mcpTools.reports.createReport(
+          args as Parameters<typeof mcpTools.reports.createReport>[0]
+        );
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
       case 'reports:generate_from_template': {
-        const result = await mcpTools.reports.generateFromTemplate(args as any);
+        const result = await mcpTools.reports.generateFromTemplate(
+          args as Parameters<typeof mcpTools.reports.generateFromTemplate>[0]
+        );
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
       case 'reports:update': {
-        const result = await mcpTools.reports.updateReport(args as any);
+        const result = await mcpTools.reports.updateReport(
+          args as Parameters<typeof mcpTools.reports.updateReport>[0]
+        );
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
@@ -1178,12 +1184,14 @@ function setupToolHandlers() {
       }
 
       case 'reports:export': {
-        const result = await mcpTools.reports.exportReport(args as any);
+        const result = await mcpTools.reports.exportReport(
+          args as Parameters<typeof mcpTools.reports.exportReport>[0]
+        );
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
       case 'cases:create': {
-        const result = await mcpTools.cases.createCase(args as any);
+        const result = await mcpTools.cases.createCase(args);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
@@ -1200,7 +1208,7 @@ function setupToolHandlers() {
       }
 
       case 'citations:search': {
-        const result = await mcpTools.citations.searchCitations(args as any);
+        const result = await mcpTools.citations.searchCitations(args);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
@@ -1211,7 +1219,9 @@ function setupToolHandlers() {
       }
 
       case 'citations:add_to_case': {
-        const result = await mcpTools.citations.addToCase(args as any);
+        const result = await mcpTools.citations.addToCase(
+          args as Parameters<typeof mcpTools.citations.addToCase>[0]
+        );
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
@@ -1399,7 +1409,9 @@ function setupToolHandlers() {
           enableCodebaseContext: enableCodebaseContext ?? true,
           enableWebSearch: false,
           enableWikipedia: true,
-          persona: acePersona as any,
+          persona: acePersona as
+            | import('../lib/server/ace/style-adapter.js').LegalPersona
+            | undefined,
         });
         const acePrompt = await buildACEPromptCached(context, aceQuery);
 

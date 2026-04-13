@@ -373,10 +373,27 @@ export async function getTemplateCacheStats(): Promise<{
 }
 
 /**
+ * Check if Redis is ready for operations.
+ */
+function isRedisReady(): boolean {
+	try {
+		const redis = redisPool.getConnection();
+		return redis.status === 'ready';
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Warm up template cache by pre-loading all templates
  * Call on server startup for better first-request performance
  */
 export async function warmupTemplateCache(): Promise<void> {
+	if (!isRedisReady()) {
+		console.log('[TemplateCache] Redis unavailable, skipping warmup');
+		return;
+	}
+
 	console.log('[TemplateCache] Warming up cache...');
 	const start = Date.now();
 
@@ -390,8 +407,12 @@ export async function warmupTemplateCache(): Promise<void> {
 
 		const elapsed = Date.now() - start;
 		console.log(`[TemplateCache] Warmup complete (${elapsed}ms) - cached ${templateTypes.length} templates`);
-	} catch (err) {
-		console.error('[TemplateCache] Warmup failed:', err);
+	} catch (err: any) {
+		if (err.message?.includes('Connection is closed')) {
+			console.warn('[TemplateCache] Redis unavailable during warmup');
+		} else {
+			console.error('[TemplateCache] Warmup failed:', err.message);
+		}
 		// Non-fatal - server can continue without warmup
 	}
 }

@@ -9,6 +9,7 @@ import { existsSync } from 'fs';
 import { join, dirname, basename } from 'path';
 import { randomUUID } from 'crypto';
 import { db } from '$lib/server/db/client';
+import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server';
 
 interface VideoVLMJob {
@@ -435,14 +436,12 @@ export class VideoVLMProcessor {
 	 * Update evidence metadata in database
 	 */
 	private async updateEvidenceMetadata(evidenceId: string, updates: any): Promise<void> {
-		const query = `
+		await db.execute(sql`
       UPDATE evidence
-      SET metadata = metadata || $1::jsonb,
+      SET metadata = metadata || ${JSON.stringify(updates)}::jsonb,
           updated_at = NOW()
-      WHERE id = $2
-    `;
-
-		await db.execute(query, [JSON.stringify(updates), evidenceId]);
+      WHERE id = ${evidenceId}
+    `);
 	}
 
 	/**

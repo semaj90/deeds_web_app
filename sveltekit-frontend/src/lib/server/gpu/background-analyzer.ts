@@ -1,3 +1,4 @@
+import { pgRows } from '$lib/server/db/client';
 /**
  * GPU Background Evidence Analyzer
  *
@@ -493,7 +494,7 @@ export async function warmupGpuCache(maxCases = 5): Promise<{ warmed: number; sk
 			LIMIT ${maxCases}
 		`);
 
-		const rows = (result as any).rows ?? [];
+		const rows = pgRows(result) ?? [];
 		if (rows.length === 0) return { warmed: 0, skipped: 0, errors: 0 };
 
 		for (const row of rows) {

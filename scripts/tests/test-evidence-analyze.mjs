@@ -104,7 +104,7 @@ async function main() {
 	const response = await post('/api/codebase-index/evidence-analyze', {
 		domain,
 		batchSize: 5,
-		model: 'gemma4-legal:latest',
+		model: 'gemma3:270m', // Fast model (4.5s avg) — use gemma4-legal:latest for complex analysis
 	});
 
 	if (!response) {

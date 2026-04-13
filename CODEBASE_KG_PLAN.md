@@ -346,23 +346,23 @@ curl http://localhost:7474/db/neo4j/tx/commit -d '{
 
 ### Phase 2: API Endpoints (1 hour)
 
-- [ ] `GET /api/codebase-index/graph` - Full graph JSON
-- [ ] `POST /api/codebase-index/graph-search` - Neo4j traversal
-- [ ] `POST /api/codebase-index/hybrid-search` - Vector + graph fusion
+- [x] `GET /api/codebase-index/graph` - Full graph JSON — **DONE** (endpoint exists)
+- [ ] `POST /api/codebase-index/graph-search` - Neo4j traversal — **VERIFY** (may exist, needs confirmation)
+- [x] `POST /api/codebase-index/hybrid-search` - Vector + graph fusion — **DONE** (graph-informed retrieval operational)
 
 ### Phase 3: Visualization (2-3 hours)
 
-- [ ] Create `/demos/codebase-graph` route
-- [ ] Implement D3 force-directed layout
-- [ ] Add filters (by directory, by type, by language)
-- [ ] Add search integration
+- [x] Create `/demos/codebase-graph` route — **DONE** (route exists at (app)/demos/codebase-graph)
+- [ ] Implement D3 force-directed layout — **VERIFY** (route exists, check if visualization complete)
+- [ ] Add filters (by directory, by type, by language) — **VERIFY**
+- [x] Add search integration — **DONE** (ACE KAG pipeline: Query → RAG → Graph Neighbors)
 
 ### Phase 4: Obsidian Export (Optional, 30 min)
 
-- [ ] Generate markdown files
-- [ ] Create `obsidian-vault/` directory
-- [ ] Add front-matter metadata
-- [ ] Generate graph view JSON
+- [ ] Generate markdown files — **DEFERRED** (graph APIs operational, Obsidian export not priority)
+- [ ] Create `obsidian-vault/` directory — **DEFERRED**
+- [ ] Add front-matter metadata — **DEFERRED**
+- [x] Generate graph view JSON — **DONE** (Neo4j 3,140 nodes, CouchDB 8 recommendations)
 
 ---
 

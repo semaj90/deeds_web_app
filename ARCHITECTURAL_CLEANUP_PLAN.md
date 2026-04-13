@@ -489,16 +489,16 @@ func (s *server) Generate(ctx context.Context, req *pb.GenerateRequest) (*pb.Gen
 - [ ] Add Zod schemas for JSONB
 
 ### Phase 2: Queue Refactor (Week 1-2)
-- [ ] Consolidate queue names to `QUEUE_NAMES` const
-- [ ] Type all RabbitMQ message payloads
-- [ ] Update all consumers to use contracts
-- [ ] Add queue message validation (Zod)
+- [x] Consolidate queue names to `QUEUE_NAMES` const — **DONE** (8 queues centralized)
+- [x] Type all RabbitMQ message payloads — **DONE** (7 queues typed)
+- [x] Update all consumers to use contracts — **DONE** (all 8 queues have consumers)
+- [ ] Add queue message validation (Zod) — **PARTIAL** (API validation 74.1%, queue validation deferred)
 
 ### Phase 3: GPU Isolation (Week 2)
-- [ ] Extract 5 LibTorch primitives
-- [ ] Create clean N-API wrapper
-- [ ] Build WebGPU client bridge
-- [ ] Remove GPU code from server SSR paths
+- [x] Extract 5 LibTorch primitives — **DONE** (libtorch-bridge.ts: cosine similarity, clustering)
+- [x] Create clean N-API wrapper — **DONE** (tensorrt_bridge.node: simdjson + LibTorch)
+- [x] Build WebGPU client bridge — **DONE** (WebGPU Orphan Revival: SOM cache, texture streaming, N64 LOD)
+- [x] Remove GPU code from server SSR paths — **DONE** (SSR safety: onMount guards, ssr=false routes)
 
 ### Phase 4: Storage Mirroring (Week 2-3)
 - [ ] Implement dual-write pattern

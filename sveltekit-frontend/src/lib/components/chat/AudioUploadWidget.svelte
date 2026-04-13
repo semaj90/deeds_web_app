@@ -39,7 +39,8 @@
   let currentStage = $state<ProgressEvent['stage']>('upload');
   let overallProgress = $state(0);
   let stageMessage = $state('Initializing upload...');
-  let stageDetails = $state<ProgressEvent['details']>({});
+  type StageDetails = ProgressEvent['details'];
+  let stageDetails: StageDetails = $state({});
   let isComplete = $state(false);
   let hasError = $state(false);
   let errorMessage = $state('');
@@ -175,9 +176,8 @@
           class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all"
           class:bg-info={isCurrentStage}
           class:bg-green-500={isPastStage}
-          class:bg-sand/10={isFutureStage}
           class:text-white={isCurrentStage || isPastStage}
-          class:text-sand/40={isFutureStage}
+          style={isFutureStage ? 'background:rgba(var(--color-sand),0.1);color:rgba(var(--color-sand),0.4)' : ''}
         >
           {#if isCurrentStage}
             <Icon name="loader-2" class="w-4 h-4 animate-spin" />
@@ -194,7 +194,7 @@
             class="text-sm font-medium transition-colors"
             class:text-info={isCurrentStage}
             class:text-sand={isPastStage}
-            class:text-sand/60={isFutureStage}
+            style={isFutureStage ? 'color:rgba(var(--color-sand,210 180 140),0.6)' : ''}
           >
             {stageLabels[stage as ProgressEvent['stage']]}
           </p>

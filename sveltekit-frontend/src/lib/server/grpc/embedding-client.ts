@@ -716,6 +716,20 @@ export async function generateSingleEmbedding(text: string): Promise<number[]> {
 }
 
 /**
+ * Single-text nullable embedding — drop-in replacement for embeddings-simple.generateEmbedding().
+ * Returns null on empty input or failure, compatible with null-check call sites.
+ */
+export async function generateEmbedding(text: string): Promise<number[] | null> {
+  if (!text?.trim()) return null;
+  try {
+    const result = await generateEmbeddings([text]);
+    return result.vectors[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Check gRPC service health.
  */
 export async function checkGrpcHealth(): Promise<{

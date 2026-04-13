@@ -83,6 +83,21 @@ export async function closeConnections(): Promise<void> {
  await adminPool.end();
 }
 
+/**
+ * Extract rows from a db.execute() result without `as any`.
+ * Drizzle with node-postgres returns { rows: T[] }; this helper handles that
+ * shape plus the fallback where the result is already an array.
+ *
+ * Usage: `const rows = pgRows<{ id: string }>(await db.execute(sql`...`));`
+ */
+export function pgRows<T extends Record<string, unknown> = Record<string, unknown>>(
+	result: unknown
+): T[] {
+	if (Array.isArray(result)) return result as T[];
+	const r = result as { rows?: T[] };
+	return r.rows ?? [];
+}
+
 export { canvasAutosaves } from './schema-canvas-autosaves.js';
 export * from './schema.js'; // Changed from schema-postgres
 

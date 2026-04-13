@@ -327,11 +327,12 @@ export async function POST({ request, locals }: RequestEvent) {
       uploadedVia: 'api',
     });
     const insertResult = await db.execute(sql`
-			INSERT INTO evidence (case_id, evidence_number, title, type, summary, description,
+			INSERT INTO evidence (case_id, user_id, evidence_number, title, type, summary, description,
         evidence_type, file_type, mime_type, file_url, file_name, file_size, hash, uploaded_at,
         ai_analysis, uploaded_by)
 			VALUES (
         ${caseId},
+				${locals.user.id},
 				${evidenceNumber},
 				${title || file.name},
 				'document',
@@ -434,7 +435,6 @@ export async function POST({ request, locals }: RequestEvent) {
       {
         success: true,
         data: responseData,
-        ...responseData,
       },
       { status: 201 }
     );

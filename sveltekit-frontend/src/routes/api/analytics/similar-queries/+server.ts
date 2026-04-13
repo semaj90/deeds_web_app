@@ -8,7 +8,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
-import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
+import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { similaritySearchSchema, validateSearchParams } from '$lib/server/validation/query-params.js';
 
 export const GET: RequestHandler = async ({ url, locals, request }) => {

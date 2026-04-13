@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { statutes, legalGlossary } from '$lib/server/db/schema-postgres';
 import { desc, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
+import { pgRows } from '$lib/server/db/client';
 
 export const load: PageServerLoad = async () => {
 	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
@@ -48,7 +49,7 @@ export const load: PageServerLoad = async () => {
 						(SELECT count(DISTINCT jurisdiction) FROM statutes WHERE jurisdiction IS NOT NULL) AS jurisdiction_count
 				`)
 				.then((r) => {
-					const rows = (r as any).rows as Record<string, unknown>[];
+					const rows = pgRows(r) as Record<string, unknown>[];
 					const row = rows?.[0];
 					return {
 						statutes: Number(row?.statute_count ?? 0),

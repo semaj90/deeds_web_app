@@ -100,131 +100,140 @@ export function getDispatchStats(): Readonly<typeof stats> {
 // ─── Publisher Router ────────────────────────────────────────────────────────
 
 async function callPublisher(
-	rabbitmq: RabbitMQManager,
-	queue: QueueName,
-	data: Record<string, unknown>
+  rabbitmq: RabbitMQManager,
+  queue: QueueName,
+  data: unknown
 ): Promise<void> {
-	switch (queue) {
-		case 'cache.invalidate':
-			await rabbitmq.publishCacheInvalidation(data);
-			break;
-		case 'document.embed':
-			await rabbitmq.publishDocumentEmbed(data as any);
-			break;
-		case 'evidence.process':
-			await rabbitmq.publishEvidenceProcess(data as any);
-			break;
-		case 'vector.index':
-			await rabbitmq.publishVectorIndex(data as any);
-			break;
-		case 'chat.context':
-			await rabbitmq.publishChatContext(data as any);
-			break;
-		case 'analytics.track':
-			await rabbitmq.publishAnalyticsEvent(data as any);
-			break;
-		case 'codebase.index':
-			await rabbitmq.publishCodebaseIndex(data as any);
-			break;
-		case 'ace.evaluate':
-			await rabbitmq.publishACEEvaluation(data as any);
-			break;
-		case 'error.embed':
-			await rabbitmq.publishErrorEmbed(data as any);
-			break;
-		case 'synthesis.generate':
-			await rabbitmq.publishSynthesisGenerate(data as any);
-			break;
-		case 'knowledge.backfill':
-			await rabbitmq.publishKnowledgeBackfill(data as any);
-			break;
-	}
+  const d = data as Record<string, unknown>;
+  switch (queue) {
+    case 'cache.invalidate':
+      await rabbitmq.publishCacheInvalidation(d);
+      break;
+    case 'document.embed':
+      await rabbitmq.publishDocumentEmbed(d as Parameters<typeof rabbitmq.publishDocumentEmbed>[0]);
+      break;
+    case 'evidence.process':
+      await rabbitmq.publishEvidenceProcess(
+        d as Parameters<typeof rabbitmq.publishEvidenceProcess>[0]
+      );
+      break;
+    case 'vector.index':
+      await rabbitmq.publishVectorIndex(d as Parameters<typeof rabbitmq.publishVectorIndex>[0]);
+      break;
+    case 'chat.context':
+      await rabbitmq.publishChatContext(d as Parameters<typeof rabbitmq.publishChatContext>[0]);
+      break;
+    case 'analytics.track':
+      await rabbitmq.publishAnalyticsEvent(
+        d as Parameters<typeof rabbitmq.publishAnalyticsEvent>[0]
+      );
+      break;
+    case 'codebase.index':
+      await rabbitmq.publishCodebaseIndex(d as Parameters<typeof rabbitmq.publishCodebaseIndex>[0]);
+      break;
+    case 'ace.evaluate':
+      await rabbitmq.publishACEEvaluation(d as Parameters<typeof rabbitmq.publishACEEvaluation>[0]);
+      break;
+    case 'error.embed':
+      await rabbitmq.publishErrorEmbed(d as Parameters<typeof rabbitmq.publishErrorEmbed>[0]);
+      break;
+    case 'synthesis.generate':
+      await rabbitmq.publishSynthesisGenerate(
+        d as Parameters<typeof rabbitmq.publishSynthesisGenerate>[0]
+      );
+      break;
+    case 'knowledge.backfill':
+      await rabbitmq.publishKnowledgeBackfill(
+        d as Parameters<typeof rabbitmq.publishKnowledgeBackfill>[0]
+      );
+      break;
+  }
 }
 
 // ─── Inline Handler Router ───────────────────────────────────────────────────
 
 async function executeInline(queue: QueueName, data: unknown): Promise<void> {
-	switch (queue) {
-		case 'cache.invalidate':
-			return inlineCacheInvalidate(data as any);
-		case 'document.embed':
-			return inlineDocumentEmbed(data as any);
-		case 'evidence.process':
-			return inlineEvidenceProcess(data as any);
-		case 'vector.index':
-			return inlineVectorIndex(data as any);
-		case 'chat.context':
-			return inlineChatContext(data as any);
-		case 'analytics.track':
-			return inlineAnalyticsTrack(data as any);
-		case 'ace.evaluate':
-			return inlineACEEvaluate(data as any);
-		case 'error.embed':
-			return inlineErrorEmbed(data as any);
-		default:
-			throw new Error(`No inline handler for queue: ${queue}`);
-	}
+  switch (queue) {
+    case 'cache.invalidate':
+      return inlineCacheInvalidate(data as Parameters<typeof inlineCacheInvalidate>[0]);
+    case 'document.embed':
+      return inlineDocumentEmbed(data as Parameters<typeof inlineDocumentEmbed>[0]);
+    case 'evidence.process':
+      return inlineEvidenceProcess(data as Parameters<typeof inlineEvidenceProcess>[0]);
+    case 'vector.index':
+      return inlineVectorIndex(data as Parameters<typeof inlineVectorIndex>[0]);
+    case 'chat.context':
+      return inlineChatContext(data as Parameters<typeof inlineChatContext>[0]);
+    case 'analytics.track':
+      return inlineAnalyticsTrack(data as Parameters<typeof inlineAnalyticsTrack>[0]);
+    case 'ace.evaluate':
+      return inlineACEEvaluate(data as Parameters<typeof inlineACEEvaluate>[0]);
+    case 'error.embed':
+      return inlineErrorEmbed(data as Parameters<typeof inlineErrorEmbed>[0]);
+    default:
+      throw new Error(`No inline handler for queue: ${queue}`);
+  }
 }
 
 // ─── Inline Handlers (reuse queue-worker.ts process() logic) ─────────────────
 
 async function inlineCacheInvalidate(data: { key?: string; pattern?: string }): Promise<void> {
-	const { CacheInvalidateWorker } = await import('./queue-worker.js');
-	const worker = new CacheInvalidateWorker();
-	await worker.process(data);
+  const { CacheInvalidateWorker } = await import('./queue-worker.js');
+  const worker = new CacheInvalidateWorker();
+  await worker.process(data);
 }
 
 async function inlineDocumentEmbed(data: {
-	documentId: string;
-	text: string;
-	collection?: string;
-	metadata?: Record<string, unknown>;
+  documentId: string;
+  text: string;
+  collection?: string;
+  metadata?: Record<string, unknown>;
 }): Promise<void> {
-	const { DocumentEmbedWorker } = await import('./queue-worker.js');
-	const worker = new DocumentEmbedWorker();
-	await worker.process(data);
+  const { DocumentEmbedWorker } = await import('./queue-worker.js');
+  const worker = new DocumentEmbedWorker();
+  await worker.process(data);
 }
 
 async function inlineEvidenceProcess(data: {
-	evidenceId: string;
-	text: string;
-	contentType?: string;
+  evidenceId: string;
+  text: string;
+  contentType?: string;
 }): Promise<void> {
-	const { EvidenceProcessWorker } = await import('./queue-worker.js');
-	const worker = new EvidenceProcessWorker();
-	await worker.process(data);
+  const { EvidenceProcessWorker } = await import('./queue-worker.js');
+  const worker = new EvidenceProcessWorker();
+  await worker.process(data);
 }
 
 async function inlineVectorIndex(data: {
-	documentId: string;
-	embedding: number[];
-	collection?: string;
-	metadata?: Record<string, unknown>;
+  documentId: string;
+  embedding: number[];
+  collection?: string;
+  metadata?: Record<string, unknown>;
 }): Promise<void> {
-	const { VectorIndexWorker } = await import('./queue-worker.js');
-	const worker = new VectorIndexWorker();
-	await worker.process(data);
+  const { VectorIndexWorker } = await import('./queue-worker.js');
+  const worker = new VectorIndexWorker();
+  await worker.process(data);
 }
 
 async function inlineChatContext(data: {
-	sessionId: string;
-	message?: string;
-	embedding?: number[];
-	role?: string;
-	metadata?: Record<string, unknown>;
+  sessionId: string;
+  message?: string;
+  embedding?: number[];
+  role?: string;
+  metadata?: Record<string, unknown>;
 }): Promise<void> {
-	const { ChatContextWorker } = await import('./queue-worker.js');
-	const worker = new ChatContextWorker();
-	await worker.process(data);
+  const { ChatContextWorker } = await import('./queue-worker.js');
+  const worker = new ChatContextWorker();
+  await worker.process(data);
 }
 
 async function inlineAnalyticsTrack(data: {
-	eventType: string;
-	payload: Record<string, unknown>;
+  eventType: string;
+  payload: Record<string, unknown>;
 }): Promise<void> {
-	const { AnalyticsTrackWorker } = await import('./queue-worker.js');
-	const worker = new AnalyticsTrackWorker();
-	await worker.process(data);
+  const { AnalyticsTrackWorker } = await import('./queue-worker.js');
+  const worker = new AnalyticsTrackWorker();
+  await worker.process(data);
 }
 
 /**
@@ -232,45 +241,54 @@ async function inlineAnalyticsTrack(data: {
  * Core logic: evaluateResponse() + Redis cache (without ack/nack).
  */
 async function inlineACEEvaluate(data: {
-	responseId: string;
-	query: string;
-	response: string;
-	context?: { ragChunks: unknown[]; kagNeighbors: unknown[]; persona: string };
+  responseId: string;
+  query: string;
+  response: string;
+  context?: { ragChunks: unknown[]; kagNeighbors: unknown[]; persona: string };
 }): Promise<void> {
-	if (!data.responseId || !data.query || !data.response) return;
+  if (!data.responseId || !data.query || !data.response) return;
 
-	const { evaluateResponse } = await import('../ace/self-prompt.js');
-	const evaluation = await evaluateResponse({
-		query: data.query,
-		response: data.response,
-		context: (data.context ?? { ragChunks: [], kagNeighbors: [], persona: 'neutral' }) as any,
-		backend: 'ollama',
-	});
+  const { evaluateResponse } = await import('../ace/self-prompt.js');
+  const evaluation = await evaluateResponse({
+    query: data.query,
+    response: data.response,
+    context: (data.context ?? {
+      ragChunks: [],
+      kagNeighbors: [],
+      persona: 'neutral',
+      userProfile: null,
+      caseContext: null,
+      glossaryMatches: null,
+      kbChunks: [],
+      caseChunks: [],
+    }) as import('../ace/types.js').ACEContext,
+    backend: 'ollama',
+  });
 
-	// Store result in Redis for async retrieval (1hr TTL)
-	try {
-		const { getRedis } = await import('../redis.js');
-		const redis = getRedis();
-		if (redis) {
-			const key = `ace:result:${data.responseId}`;
-			await redis.set(
-				key,
-				JSON.stringify({
-					responseId: data.responseId,
-					...evaluation,
-					evaluatedAt: new Date().toISOString(),
-				}),
-				'EX',
-				3600
-			);
-		}
-	} catch {
-		// Redis unavailable — evaluation ran but result not cached
-	}
+  // Store result in Redis for async retrieval (1hr TTL)
+  try {
+    const { getRedis } = await import('../redis.js');
+    const redis = getRedis();
+    if (redis) {
+      const key = `ace:result:${data.responseId}`;
+      await redis.set(
+        key,
+        JSON.stringify({
+          responseId: data.responseId,
+          ...evaluation,
+          evaluatedAt: new Date().toISOString(),
+        }),
+        'EX',
+        3600
+      );
+    }
+  } catch {
+    // Redis unavailable — evaluation ran but result not cached
+  }
 
-	console.log(
-		`[dispatch] ACE eval inline complete: ${data.responseId} (quality: ${evaluation.quality.toFixed(2)})`
-	);
+  console.log(
+    `[dispatch] ACE eval inline complete: ${data.responseId} (quality: ${evaluation.quality.toFixed(2)})`
+  );
 }
 
 /**

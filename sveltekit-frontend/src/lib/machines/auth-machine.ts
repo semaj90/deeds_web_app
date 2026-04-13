@@ -98,286 +98,299 @@ const registerActor = fromPromise(async (ctx: any) => {
 });
 
 const logoutActor = fromPromise(async () => {
-	const res = await fetch('/api/auth/logout', {
-		method: 'POST',
-		credentials: 'include'
-	});
-	if (!res.ok) {
-		const data = await res.json().catch(() => ({}));
-		throw new Error((data as any).error?.message || 'Logout failed');
-	}
-	return { success: true };
+  const res = await fetch('/api/auth/logout', {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(
+      String((data as Record<string, unknown>).error ?? 'Logout failed') || 'Logout failed'
+    );
+  }
+  return { success: true };
 });
 
 const checkSessionActor = fromPromise(async () => {
-	const res = await fetch('/api/auth/me', { credentials: 'include' });
-	const data = await res.json();
-	if (!res.ok || !data.user) throw new Error('No active session');
-	return { user: data.user as User };
+  const res = await fetch('/api/auth/me', { credentials: 'include' });
+  const data = await res.json();
+  if (!res.ok || !data.user) throw new Error('No active session');
+  return { user: data.user as User };
 });
 
 const updateProfileActor = fromPromise(async (ctx: any) => {
-	const input = ctx.input as { updates: Partial<User> };
-	const res = await fetch('/api/auth/me', {
-		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(input.updates),
-		credentials: 'include'
-	});
-	if (!res.ok) throw new Error('Profile update failed');
-	return await res.json();
+  const input = ctx.input as { updates: Partial<User> };
+  const res = await fetch('/api/auth/me', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input.updates),
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Profile update failed');
+  return await res.json();
 });
 
 const resetPasswordActor = fromPromise(async (ctx: any) => {
-	const input = ctx.input as { email: string };
-	const res = await fetch('/api/auth/reset-password', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ email: input.email }),
-		credentials: 'include'
-	});
-	if (!res.ok) {
-		const data = await res.json().catch(() => ({}));
-		throw new Error((data as any).error || 'Password reset failed');
-	}
-	return { success: true };
+  const input = ctx.input as { email: string };
+  const res = await fetch('/api/auth/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: input.email }),
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(
+      String((data as Record<string, unknown>).error ?? 'Password reset failed') ||
+        'Password reset failed'
+    );
+  }
+  return { success: true };
 });
 
 // --- Machine Definition ---
 
 export const authMachine = createMachine({
-	id: 'auth',
-	initial: 'idle',
-	context: initialContext as AuthContext,
+  id: 'auth',
+  initial: 'idle',
+  context: initialContext as AuthContext,
 
-	states: {
-		idle: {
-			on: {
-				START_LOGIN: {
-					target: 'authenticating',
-					guard: ({ context }: { context: AuthContext }) =>
-						!context.lockoutUntil || new Date() > context.lockoutUntil
-				},
-				START_REGISTRATION: 'registering',
-				RESET_PASSWORD: 'resettingPassword',
-				CHECK_SESSION: 'checkingSession'
-			}
-		},
+  states: {
+    idle: {
+      on: {
+        START_LOGIN: {
+          target: 'authenticating',
+          guard: ({ context }: { context: AuthContext }) =>
+            !context.lockoutUntil || new Date() > context.lockoutUntil,
+        },
+        START_REGISTRATION: 'registering',
+        RESET_PASSWORD: 'resettingPassword',
+        CHECK_SESSION: 'checkingSession',
+      },
+    },
 
-		checkingSession: {
-			invoke: {
-				src: checkSessionActor,
-				onDone: {
-					target: 'authenticated',
-					actions: assign(({ event }) => ({
-						user: event.output.user,
-						isLoading: false,
-						error: null
-					}))
-				},
-				onError: { target: 'idle' }
-			}
-		},
+    checkingSession: {
+      invoke: {
+        src: checkSessionActor,
+        onDone: {
+          target: 'authenticated',
+          actions: assign(({ event }) => ({
+            user: event.output.user,
+            isLoading: false,
+            error: null,
+          })),
+        },
+        onError: { target: 'idle' },
+      },
+    },
 
-		authenticating: {
-			entry: assign({ isLoading: true, error: null }),
-			invoke: {
-				src: authenticateActor,
-				input: ({ event }) => {
-					const e = event as Extract<AuthEvent, { type: 'START_LOGIN' }>;
-					return { email: e.data.email, password: e.data.password };
-				},
-				onDone: [
-					{
-						guard: ({ event }) => !!(event.output as any).requiresTwoFactor,
-						target: 'requiresTwoFactor',
-						actions: assign({ twoFactorRequired: true, isLoading: false })
-					},
-					{
-						target: 'authenticated',
-						actions: assign(({ event }) => ({
-							user: event.output.user,
-							session: event.output.session,
-							isLoading: false,
-							error: null,
-							loginAttempts: 0
-						}))
-					}
-				],
-				onError: [
-					{
-						guard: ({ context }) => (context as AuthContext).loginAttempts >= (context as AuthContext).maxLoginAttempts,
-						target: 'locked',
-						actions: assign(({ context }) => ({
-							lockoutUntil: new Date(Date.now() + 15 * 60 * 1000),
-							loginAttempts: 0,
-							error: (context as any).error || 'Account locked due to too many failed attempts',
-							isLoading: false
-						}))
-					},
-					{
-						target: 'idle',
-						actions: assign(({ context, event }) => ({
-							loginAttempts: (context as AuthContext).loginAttempts + 1,
-							error: (event as any).error?.message || 'Login failed',
-							isLoading: false
-						}))
-					}
-				]
-			}
-		},
+    authenticating: {
+      entry: assign({ isLoading: true, error: null }),
+      invoke: {
+        src: authenticateActor,
+        input: ({ event }) => {
+          const e = event as Extract<AuthEvent, { type: 'START_LOGIN' }>;
+          return { email: e.data.email, password: e.data.password };
+        },
+        onDone: [
+          {
+            guard: ({ event }) => !!(event.output as Record<string, unknown>).requiresTwoFactor,
+            target: 'requiresTwoFactor',
+            actions: assign({ twoFactorRequired: true, isLoading: false }),
+          },
+          {
+            target: 'authenticated',
+            actions: assign(({ event }) => ({
+              user: event.output.user,
+              session: event.output.session,
+              isLoading: false,
+              error: null,
+              loginAttempts: 0,
+            })),
+          },
+        ],
+        onError: [
+          {
+            guard: ({ context }) =>
+              (context as AuthContext).loginAttempts >= (context as AuthContext).maxLoginAttempts,
+            target: 'locked',
+            actions: assign(({ context }) => ({
+              lockoutUntil: new Date(Date.now() + 15 * 60 * 1000),
+              loginAttempts: 0,
+              error:
+                (context as AuthContext).error || 'Account locked due to too many failed attempts',
+              isLoading: false,
+            })),
+          },
+          {
+            target: 'idle',
+            actions: assign(({ context, event }) => ({
+              loginAttempts: (context as AuthContext).loginAttempts + 1,
+              error: (event as { error?: { message?: string } }).error?.message || 'Login failed',
+              isLoading: false,
+            })),
+          },
+        ],
+      },
+    },
 
-		requiresTwoFactor: {
-			on: {
-				TWO_FACTOR_SUCCESS: {
-					target: 'authenticated',
-					actions: assign(({ event }) => {
-						const e = event as Extract<AuthEvent, { type: 'TWO_FACTOR_SUCCESS' }>;
-						return {
-							session: e.data.session,
-							twoFactorRequired: false,
-							loginAttempts: 0,
-							error: null
-						};
-					})
-				},
-				TWO_FACTOR_FAILURE: {
-					target: 'idle',
-					actions: assign(({ event }) => ({
-						error: (event as Extract<AuthEvent, { type: 'TWO_FACTOR_FAILURE' }>).data.error,
-						twoFactorRequired: false,
-						isLoading: false
-					}))
-				}
-			}
-		},
+    requiresTwoFactor: {
+      on: {
+        TWO_FACTOR_SUCCESS: {
+          target: 'authenticated',
+          actions: assign(({ event }) => {
+            const e = event as Extract<AuthEvent, { type: 'TWO_FACTOR_SUCCESS' }>;
+            return {
+              session: e.data.session,
+              twoFactorRequired: false,
+              loginAttempts: 0,
+              error: null,
+            };
+          }),
+        },
+        TWO_FACTOR_FAILURE: {
+          target: 'idle',
+          actions: assign(({ event }) => ({
+            error: (event as Extract<AuthEvent, { type: 'TWO_FACTOR_FAILURE' }>).data.error,
+            twoFactorRequired: false,
+            isLoading: false,
+          })),
+        },
+      },
+    },
 
-		authenticated: {
-			entry: assign({ isLoading: false }),
-			on: {
-				LOGOUT: 'loggingOut',
-				SESSION_EXPIRED: {
-					target: 'idle',
-					actions: assign({ user: null, session: null })
-				},
-				UPDATE_PROFILE: 'updatingProfile'
-			}
-		},
+    authenticated: {
+      entry: assign({ isLoading: false }),
+      on: {
+        LOGOUT: 'loggingOut',
+        SESSION_EXPIRED: {
+          target: 'idle',
+          actions: assign({ user: null, session: null }),
+        },
+        UPDATE_PROFILE: 'updatingProfile',
+      },
+    },
 
-		loggingOut: {
-			entry: assign({ isLoading: true }),
-			invoke: {
-				src: logoutActor,
-				onDone: {
-					target: 'idle',
-					actions: assign({ user: null, session: null, error: null, isLoading: false })
-				},
-				onError: {
-					target: 'idle',
-					actions: assign({ user: null, session: null, isLoading: false })
-				}
-			}
-		},
+    loggingOut: {
+      entry: assign({ isLoading: true }),
+      invoke: {
+        src: logoutActor,
+        onDone: {
+          target: 'idle',
+          actions: assign({ user: null, session: null, error: null, isLoading: false }),
+        },
+        onError: {
+          target: 'idle',
+          actions: assign({ user: null, session: null, isLoading: false }),
+        },
+      },
+    },
 
-		registering: {
-			entry: assign(({ event }) => ({
-				isLoading: true,
-				error: null,
-				registrationData: (event as any).data ?? null
-			})),
-			invoke: {
-				src: registerActor,
-				input: ({ event }) => {
-					const e = event as Extract<AuthEvent, { type: 'START_REGISTRATION' }>;
-					return e.data;
-				},
-				onDone: {
-					target: 'authenticated',
-					actions: assign(({ event }) => ({
-						user: event.output.user,
-						session: event.output.session,
-						registrationData: null,
-						isLoading: false,
-						error: null
-					}))
-				},
-				onError: {
-					target: 'idle',
-					actions: assign(({ event }) => ({
-						error: (event as any).error?.message || 'Registration failed',
-						registrationData: null,
-						isLoading: false
-					}))
-				}
-			}
-		},
+    registering: {
+      entry: assign(({ event }) => ({
+        isLoading: true,
+        error: null,
+        registrationData:
+          ((event as Record<string, unknown>).data as Record<string, unknown>) ?? null,
+      })),
+      invoke: {
+        src: registerActor,
+        input: ({ event }) => {
+          const e = event as Extract<AuthEvent, { type: 'START_REGISTRATION' }>;
+          return e.data;
+        },
+        onDone: {
+          target: 'authenticated',
+          actions: assign(({ event }) => ({
+            user: event.output.user,
+            session: event.output.session,
+            registrationData: null,
+            isLoading: false,
+            error: null,
+          })),
+        },
+        onError: {
+          target: 'idle',
+          actions: assign(({ event }) => ({
+            error:
+              (event as { error?: { message?: string } }).error?.message || 'Registration failed',
+            registrationData: null,
+            isLoading: false,
+          })),
+        },
+      },
+    },
 
-		resettingPassword: {
-			entry: assign({ isLoading: true, error: null }),
-			invoke: {
-				src: resetPasswordActor,
-				input: ({ event }) => {
-					const e = event as Extract<AuthEvent, { type: 'RESET_PASSWORD' }>;
-					return { email: e.data.email };
-				},
-				onDone: {
-					target: 'passwordResetSent',
-					actions: assign({ isLoading: false })
-				},
-				onError: {
-					target: 'idle',
-					actions: assign(({ event }) => ({
-						error: (event as any).error?.message || 'Password reset failed',
-						isLoading: false
-					}))
-				}
-			}
-		},
+    resettingPassword: {
+      entry: assign({ isLoading: true, error: null }),
+      invoke: {
+        src: resetPasswordActor,
+        input: ({ event }) => {
+          const e = event as Extract<AuthEvent, { type: 'RESET_PASSWORD' }>;
+          return { email: e.data.email };
+        },
+        onDone: {
+          target: 'passwordResetSent',
+          actions: assign({ isLoading: false }),
+        },
+        onError: {
+          target: 'idle',
+          actions: assign(({ event }) => ({
+            error:
+              (event as { error?: { message?: string } }).error?.message || 'Password reset failed',
+            isLoading: false,
+          })),
+        },
+      },
+    },
 
-		passwordResetSent: {
-			after: {
-				3000: 'idle'
-			}
-		},
+    passwordResetSent: {
+      after: {
+        3000: 'idle',
+      },
+    },
 
-		locked: {
-			on: {
-				UNLOCK_ACCOUNT: {
-					target: 'idle',
-					actions: assign({ lockoutUntil: null, loginAttempts: 0 })
-				}
-			},
-			after: {
-				900000: {
-					target: 'idle',
-					actions: assign({ lockoutUntil: null, loginAttempts: 0 })
-				}
-			}
-		},
+    locked: {
+      on: {
+        UNLOCK_ACCOUNT: {
+          target: 'idle',
+          actions: assign({ lockoutUntil: null, loginAttempts: 0 }),
+        },
+      },
+      after: {
+        900000: {
+          target: 'idle',
+          actions: assign({ lockoutUntil: null, loginAttempts: 0 }),
+        },
+      },
+    },
 
-		updatingProfile: {
-			entry: assign({ isLoading: true }),
-			invoke: {
-				src: updateProfileActor,
-				input: ({ event }) => ({
-					updates: (event as any).data ?? {}
-				}),
-				onDone: {
-					target: 'authenticated',
-					actions: assign(({ context, event }) => ({
-						user: (context as AuthContext).user
-							? { ...(context as AuthContext).user!, ...(event.output as any).user }
-							: (context as AuthContext).user,
-						isLoading: false
-					}))
-				},
-				onError: {
-					target: 'authenticated',
-					actions: assign({ isLoading: false })
-				}
-			}
-		}
-	}
+    updatingProfile: {
+      entry: assign({ isLoading: true }),
+      invoke: {
+        src: updateProfileActor,
+        input: ({ event }) => ({
+          updates: (event as Record<string, unknown>).data ?? {},
+        }),
+        onDone: {
+          target: 'authenticated',
+          actions: assign(({ context, event }) => ({
+            user: (context as AuthContext).user
+              ? {
+                  ...(context as AuthContext).user!,
+                  ...(((event.output as Record<string, unknown>).user as Partial<User>) ?? {}),
+                }
+              : (context as AuthContext).user,
+            isLoading: false,
+          })),
+        },
+        onError: {
+          target: 'authenticated',
+          actions: assign({ isLoading: false }),
+        },
+      },
+    },
+  },
 });
 
 export type AuthMachine = typeof authMachine;

@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { pgRows } from '$lib/server/db/client';
 
 const querySchema = z.object({
 	route: z.string().min(1, 'Missing "route" query parameter').max(500)
@@ -28,7 +29,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				WHERE route_path = ${route}
 				LIMIT 1`
 		);
-		const rows = (result as any).rows ?? [];
+		const rows = pgRows(result) ?? [];
 		const row = rows[0] as Record<string, unknown> | undefined;
 		if (row) {
 			return json({

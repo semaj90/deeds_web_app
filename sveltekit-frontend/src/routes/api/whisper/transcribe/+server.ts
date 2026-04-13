@@ -8,7 +8,7 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
 import { extractDocument } from '$lib/server/langextract-client.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
-import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
+import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { z } from 'zod';
 
 interface TranscriptionEnrichment {

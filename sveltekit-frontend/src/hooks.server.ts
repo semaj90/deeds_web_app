@@ -28,6 +28,8 @@ import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { createDefaultRegistry } from '$lib/server/queue/queue-worker.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
+import { getRedis } from '$lib/server/redis.js';
+import { sql } from 'drizzle-orm';
 
 // ── Request Timeout Constants ────────────────────────────────────────────
 const DEFAULT_REQUEST_TIMEOUT = 30_000; // 30s for normal routes
@@ -38,6 +40,9 @@ const MAX_BODY_SIZE = 50 * 1024 * 1024; // 50MB default
 const MAX_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB for file uploads
 const UPLOAD_PATHS = ['/api/evidence/upload', '/api/vision/analyze', '/api/persons-of-interest'];
 const shouldRunBootTasks = !building && process.env.NODE_ENV !== 'test';
+
+// Environment variable to skip warmups for faster dev server startup
+const SKIP_BOOT_WARMUP = process.env.SKIP_BOOT_WARMUP === 'true';
 
 // In cluster mode, only worker 1 runs singleton boot tasks (RabbitMQ, Qdrant, warmup)
 // Audit buffer + rate limiting run on ALL workers independently
@@ -105,17 +110,110 @@ if (shouldRunBootTasks && !dev) {
   }
 }
 
+// ── Service Readiness Checks ──────────────────────────────────────
+
+/**
+ * Check if Redis is ready for operations.
+ */
+async function checkRedis(): Promise<boolean> {
+  try {
+    const redis = getRedis();
+    return redis.status === 'ready';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check if database is ready for operations.
+ */
+async function checkDb(): Promise<boolean> {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query('SELECT 1');
+      return true;
+    } finally {
+      client.release();
+    }
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check all required services for readiness.
+ */
+async function checkServicesReady() {
+  const [redis, db] = await Promise.all([
+    checkRedis(),
+    checkDb()
+  ]);
+
+  return { redis, db };
+}
+
 if (shouldRunBootTasks) {
   // ── Per-worker tasks (run on ALL workers in cluster mode) ──
-  // Start the analysis worker on server boot (idempotent)
-  startWorker();
-
   // Start API audit buffer (batched writes to api_audit_log every 5s)
   auditBuffer.start();
 }
 
 if (shouldRunSingletonTasks) {
   // ── Singleton tasks (only worker 1 in cluster mode) ──
+
+  // Check service readiness before starting dependent tasks
+  checkServicesReady().then((services) => {
+    if (SKIP_BOOT_WARMUP) {
+      console.log('[Boot] SKIP_BOOT_WARMUP=true, skipping warmups for fast dev start');
+    }
+
+    // Start DB-dependent tasks only if DB is ready
+    if (services.db) {
+      // Start the analysis worker on server boot (idempotent)
+      startWorker();
+
+      if (!SKIP_BOOT_WARMUP) {
+        // Warm up export cache (pre-generate top 5 recent report exports)
+        warmupExportCache()
+          .then((s) =>
+            console.log(
+              `[Boot] Export cache: ${s.status}${s.cached ? ` (${s.cached} exports)` : ''}${s.reason ? ` — ${s.reason}` : ''}`
+            )
+          )
+          .catch((err) => console.warn('[Boot] Export cache: failed:', (err as Error).message));
+      }
+    } else {
+      console.log('[Boot] DB unavailable, deferring analysis worker');
+    }
+
+    // Start Redis-dependent tasks only if Redis is ready
+    if (services.redis) {
+      if (!SKIP_BOOT_WARMUP) {
+        // Warm up template cache (Priority #10: pre-load all 10 templates on startup)
+        warmupTemplateCache()
+          .then(() => console.log('[Boot] Template cache: warmed'))
+          .catch((err) => console.warn('[Boot] Template cache: failed:', (err as Error).message));
+
+        // Warm up LLM cache (pre-cache 5 common legal queries)
+        warmupLLMCache()
+          .then((s) =>
+            console.log(
+              `[Boot] LLM cache: ${s.status}${s.cached ? ` (${s.cached}/${s.total})` : ''}${s.reason ? ` — ${s.reason}` : ''}`
+            )
+          )
+          .catch((err) => console.warn('[Boot] LLM cache: failed:', (err as Error).message));
+      }
+
+      // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
+      startIdleScanner();
+    } else {
+      console.log('[Boot] Redis unavailable, skipping cache warmups and idle scanner');
+    }
+  }).catch((err) => {
+    console.warn('[Boot] Service readiness check failed:', (err as Error).message);
+  });
+
   // Start RabbitMQ 7-queue pipeline (XState v5 with auto-reconnect, non-blocking)
   startRabbitMQPipeline()
     .then(() => {
@@ -145,14 +243,6 @@ if (shouldRunSingletonTasks) {
       console.warn('[Boot] Qdrant initialization failed (non-fatal):', (err as Error).message);
     });
 
-  // Warm up template cache (Priority #10: pre-load all 10 templates on startup)
-  warmupTemplateCache()
-    .then(() => console.log('[Boot] Template cache: warmed'))
-    .catch((err) => console.warn('[Boot] Template cache: failed:', (err as Error).message));
-
-  // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
-  startIdleScanner();
-
   // Start typed queue-worker consumers (entity extraction, embedding, analytics, etc.)
   createDefaultRegistry()
     .startAll()
@@ -166,30 +256,14 @@ if (shouldRunSingletonTasks) {
       console.warn('[Boot] Queue workers failed (non-fatal):', (err as Error).message);
     });
 
-  // Option #6: Warm up export cache (pre-generate top 5 recent report exports)
-  warmupExportCache()
-    .then((s) =>
-      console.log(
-        `[Boot] Export cache: ${s.status}${s.cached ? ` (${s.cached} exports)` : ''}${s.reason ? ` — ${s.reason}` : ''}`
-      )
-    )
-    .catch((err) => console.warn('[Boot] Export cache: failed:', (err as Error).message));
-
-  // Option #6: Warm up LLM cache (pre-cache 5 common legal queries)
-  warmupLLMCache()
-    .then((s) =>
-      console.log(
-        `[Boot] LLM cache: ${s.status}${s.cached ? ` (${s.cached}/${s.total})` : ''}${s.reason ? ` — ${s.reason}` : ''}`
-      )
-    )
-    .catch((err) => console.warn('[Boot] LLM cache: failed:', (err as Error).message));
-
   // Warm the primary chat model so the first contextual request avoids cold-load penalty.
-  warmupChatModel()
-    .then((s) =>
-      console.log(`[Boot] Chat model warmup: ${s.status}${s.reason ? ` — ${s.reason}` : ''}`)
-    )
-    .catch((err) => console.warn('[Boot] Chat model warmup: failed:', (err as Error).message));
+  if (!SKIP_BOOT_WARMUP) {
+    warmupChatModel()
+      .then((s) =>
+        console.log(`[Boot] Chat model warmup: ${s.status}${s.reason ? ` — ${s.reason}` : ''}`)
+      )
+      .catch((err) => console.warn('[Boot] Chat model warmup: failed:', (err as Error).message));
+  }
 
   // Pre-populate codebase Fuse.js index (avoids cold-start on first search)
   import('$lib/server/retrieval/codebase-context.js')
