@@ -15,6 +15,7 @@ import { getExactMatchStats } from '$lib/server/cache/redis-exact-match.js';
 interface CacheDemoRequest {
 	query: string;
 	runs?: number; // How many times to run the same query (default: 3)
+	model?: string; // Model to use (default: gemma3:270m for fast testing)
 }
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -24,6 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const body = await request.json() as CacheDemoRequest;
 		const query = body.query || 'What is hearsay evidence in criminal law?';
 		const runs = body.runs || 3;
+		const model = body.model || 'gemma3:270m'; // Default to fast model for testing
 
 		// Get cache stats before
 		const statsBefore = await getExactMatchStats();
@@ -36,7 +38,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			const response = await bifrostChat(
 				[{ role: 'user', content: query }],
-				'gemma4-legal',
+				model,
 				{
 					temperature: 0.3,
 					maxTokens: 200,

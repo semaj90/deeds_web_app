@@ -90,10 +90,10 @@ async function sendRequest() {
 			},
 			body: JSON.stringify({
 				message: query,
-				model: 'gemma4-legal',
+				model: 'gemma3:270m',  // Fast 270M model (13× faster than gemma4-legal)
 				temperature: 0.3,
 			}),
-			signal: AbortSignal.timeout(30000),  // 30s timeout (first requests may be cold)
+			signal: AbortSignal.timeout(15000),  // 15s timeout (faster model)
 		});
 
 		const latency = performance.now() - start;
