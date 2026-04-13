@@ -4,6 +4,7 @@
  * DELETE /api/gpu/lease — Release GPU lease
  */
 import { json, type RequestEvent } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import {
 	acquireGpuLease,
 	releaseGpuLease,
@@ -20,19 +21,29 @@ const gpuReleaseSchema = z.object({
 	backend: z.enum(['ollama', 'tensorrt'])
 });
 
-export async function GET({ locals }: RequestEvent) {
+export async function GET({ locals, request }: RequestEvent) {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const lease = await getGpuLeaseStatus();
-    return json({
+    const responseData = {
       lease,
       free: !lease,
       remainingMs: lease ? Math.max(0, lease.expiresAt - Date.now()) : null,
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.short, ETag: etag }
     });
   } catch (err) {
     console.error('GPU lease status error:', err);
-    return json({ lease: null, free: true, remainingMs: null });
+    const fallbackData = { lease: null, free: true, remainingMs: null };
+    return json(fallbackData, {
+      headers: cacheControl.short
+    });
   }
 }
 

@@ -1,0 +1,146 @@
+syntax = "proto3";
+package generation;
+
+// ============================================================================
+// Generation Service (Gemma 4 VLM + Tool Calling)
+// ============================================================================
+
+service GenerationService {
+  rpc Generate(GenerateRequest) returns (GenerateResponse);
+  rpc GenerateStream(GenerateRequest) returns (stream GenerateChunk);
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// ============================================================================
+// Generation Request/Response
+// ============================================================================
+
+message GenerateRequest {
+  repeated Message messages = 1;
+  string model = 2;                    // "gemma4:e4b-it-q4_K_M", "gemma3-legal:latest"
+  GenerateOptions options = 3;
+  repeated Tool tools = 4;             // Tool calling support (Gemma 4)
+  repeated Image images = 5;           // VLM support (Gemma 4 + mmproj)
+  string format = 6;                   // "json" for structured output
+}
+
+message Message {
+  string role = 1;                     // "system", "user", "assistant", "tool"
+  string content = 2;
+  repeated Image images = 3;           // Per-message images (VLM)
+  ToolCall tool_call = 4;              // Tool call result
+}
+
+message GenerateOptions {
+  float temperature = 1;               // 0.0-2.0 (default: 0.7)
+  int32 max_tokens = 2;                // Max completion tokens
+  float top_p = 3;                     // Nucleus sampling
+  float top_k = 4;                     // Top-K sampling
+  repeated string stop = 5;            // Stop sequences
+  int32 num_ctx = 6;                   // Context window (default: 32768)
+  bool stream = 7;                     // Enable streaming
+  int32 num_predict = 8;               // Alias for max_tokens
+  float repeat_penalty = 9;            // Repetition penalty
+  int64 seed = 10;                     // Random seed
+}
+
+message GenerateResponse {
+  string id = 1;
+  string model = 2;
+  int64 created_at = 3;
+  Message message = 4;
+  bool done = 5;
+  int32 prompt_eval_count = 6;
+  int32 eval_count = 7;
+  int64 total_duration_ns = 8;
+  int64 load_duration_ns = 9;
+  int64 prompt_eval_duration_ns = 10;
+  int64 eval_duration_ns = 11;
+}
+
+message GenerateChunk {
+  string id = 1;
+  string model = 2;
+  int64 created_at = 3;
+  string delta = 4;                    // Content delta for streaming
+  bool done = 5;
+  ToolCall tool_call = 6;              // Tool call in progress
+}
+
+// ============================================================================
+// Tool Calling (Gemma 4)
+// ============================================================================
+
+message Tool {
+  string type = 1;                     // "function"
+  FunctionTool function = 2;
+}
+
+message FunctionTool {
+  string name = 1;
+  string description = 2;
+  bytes parameters_schema = 3;         // JSON schema (application/json)
+}
+
+message ToolCall {
+  string id = 1;
+  string type = 2;                     // "function"
+  FunctionCall function = 3;
+}
+
+message FunctionCall {
+  string name = 1;
+  bytes arguments = 2;                 // JSON arguments
+  bytes result = 3;                    // JSON result (from user)
+}
+
+// ============================================================================
+// VLM Support (Gemma 4 + mmproj)
+// ============================================================================
+
+message Image {
+  oneof source {
+    bytes data = 1;                    // Raw image bytes
+    string url = 2;                    // Image URL
+    string base64 = 3;                 // Base64-encoded image
+  }
+  string format = 4;                   // "png", "jpg", "jpeg", "webp", "gif"
+  ImageMetadata metadata = 5;
+}
+
+message ImageMetadata {
+  int32 width = 1;
+  int32 height = 2;
+  int32 size_bytes = 3;
+  string mime_type = 4;
+}
+
+// ============================================================================
+// Health Check
+// ============================================================================
+
+message HealthRequest {}
+
+message HealthResponse {
+  bool healthy = 1;
+  repeated string models_loaded = 2;
+  bool gpu_available = 3;
+  int64 vram_used_mb = 4;
+  int64 vram_total_mb = 5;
+  bool mmproj_loaded = 6;               // VLM projector loaded
+  int32 active_requests = 7;
+}
+
+// ============================================================================
+// Batch Generation (Optional)
+// ============================================================================
+
+message BatchGenerateRequest {
+  repeated GenerateRequest requests = 1;
+  bool parallel = 2;                   // Process in parallel (GPU batch)
+}
+
+message BatchGenerateResponse {
+  repeated GenerateResponse responses = 1;
+  int64 total_duration_ns = 2;
+}

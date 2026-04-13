@@ -5,17 +5,21 @@
 
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 /**
  * GET /api/auth/session
  * Check if user has a valid session
  */
-export const GET: RequestHandler = async ({ cookies }) => {
+export const GET: RequestHandler = async ({ cookies, request }) => {
 	try {
 		const sessionId = cookies.get('auth_session');
 
 		if (!sessionId) {
-			return json({ authenticated: false, session: null, user: null }, { status: 401 });
+			return json({ authenticated: false, session: null, user: null }, {
+				status: 401,
+				headers: cacheControl.private
+			});
 		}
 
 		// Validate session with Lucia v3
@@ -24,13 +28,16 @@ export const GET: RequestHandler = async ({ cookies }) => {
 		if (!session || !user) {
 			// Session invalid, clear cookie
 			deleteSessionCookie(cookies);
-			return json({ authenticated: false, session: null, user: null }, { status: 401 });
+			return json({ authenticated: false, session: null, user: null }, {
+				status: 401,
+				headers: cacheControl.private
+			});
 		}
 
 		// Refresh session cookie if needed (Lucia automatically handles session refresh)
 		setSessionCookie(cookies, session.id);
 
-		return json({
+		const responseData = {
 			authenticated: true,
 			session: { id: session.id,
 				userId: session.userId,
@@ -45,10 +52,19 @@ export const GET: RequestHandler = async ({ cookies }) => {
 				isActive: user.isActive,
 				avatarUrl: user.avatarUrl
 			}
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
 		});
 	} catch (error) {
 		console.error('[Auth] Session validation error:', error);
-		return json({ authenticated: false, session: null, user: null });
+		return json({ authenticated: false, session: null, user: null }, {
+			headers: cacheControl.private
+		});
 	}
 };
 

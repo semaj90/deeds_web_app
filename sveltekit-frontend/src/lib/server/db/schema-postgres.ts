@@ -2245,6 +2245,37 @@ export const yorhaChatSessions = pgTable('yorha_chat_sessions',
 );
 
 /**
+ * Chat Document Attachments - files uploaded to chat context
+ * Links documents to chat sessions with embedding status tracking
+ */
+export const chatDocumentAttachments = pgTable(
+	'chat_document_attachments',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		chat_session_id: uuid('chat_session_id')
+			.notNull()
+			.references(() => yorhaChatSessions.id, { onDelete: 'cascade' }),
+		document_id: uuid('document_id').references(() => documents.id, { onDelete: 'set null' }),
+		file_name: varchar('file_name', { length: 255 }).notNull(),
+		file_size: integer('file_size').notNull(),
+		file_type: varchar('file_type', { length: 100 }),
+		minio_path: varchar('minio_path', { length: 500 }),
+		upload_timestamp: timestamp('upload_timestamp', { withTimezone: true }).defaultNow(),
+		embedding_status: varchar('embedding_status', { length: 50 }).default('pending'), // 'pending' | 'processing' | 'completed' | 'failed'
+		qdrant_id: uuid('qdrant_id'), // ID in Qdrant chat_documents collection
+		metadata: jsonb('metadata').default({})
+	},
+	(table) => ({
+		session_idx: index('chat_attachments_session_idx').on(table.chat_session_id),
+		status_idx: index('chat_attachments_status_idx').on(table.embedding_status),
+		document_idx: index('chat_attachments_document_idx').on(table.document_id)
+	})
+);
+
+export type ChatDocumentAttachment = typeof chatDocumentAttachments.$inferSelect;
+export type NewChatDocumentAttachment = typeof chatDocumentAttachments.$inferInsert;
+
+/**
  * YoRHa Chat Messages table - stores individual messages in chat sessions
  */
 export const yorhaChatMessages = pgTable('yorha_chat_messages',

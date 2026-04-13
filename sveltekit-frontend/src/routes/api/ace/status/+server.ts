@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { getAceIngestJob } from '$lib/server/ace-ingest-progress.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const querySchema = z.object({
 	jobId: z.string().min(1, 'Missing jobId parameter').max(200)
@@ -22,7 +23,7 @@ const emptyStatus = {
   updatedAt: null,
 };
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
   if (!locals.user?.id) {
     return json({ ...emptyStatus, error: 'Unauthorized' }, { status: 401 });
   }
@@ -44,7 +45,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     );
   }
 
-  return json({
+  const responseData = {
     jobId: job.jobId,
     sourceType: job.sourceType,
     caseId: job.caseId ?? null,
@@ -67,5 +68,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     result: job.result ?? null,
     createdAt: job.createdAt,
     updatedAt: job.updatedAt,
+  };
+
+  const { etag, isMatch } = checkETag(responseData, request.headers);
+  if (isMatch) return notModified(etag);
+
+  return json(responseData, {
+    headers: { ...cacheControl.short, ETag: etag }
   });
 };

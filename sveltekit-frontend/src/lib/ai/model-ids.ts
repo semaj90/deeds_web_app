@@ -131,6 +131,14 @@ export const TURBOQUANT_CONTEXT_LIMITS = {
 	turbo4: { vram4gb: 16384, vram8gb: 32768, cpu_l3_12mb: 384 },
 } as const;
 
+// ── Client-Side Service URLs (for browser fetch calls) ──────────────────
+
+/** Bifrost semantic cache — client-side endpoint (routes through SvelteKit API) */
+export const BIFROST_BASE_URL_CLIENT = '/api/cache/bifrost';
+
+/** TurboQuant — client-side endpoint (for future direct browser calls if needed) */
+export const TURBOQUANT_BASE_URL_CLIENT = 'http://127.0.0.1:8090';
+
 // ── Qdrant collection names ──────────────────────────────────────────────
 // These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts
 // (server-only file cannot be imported here — keep in sync manually)

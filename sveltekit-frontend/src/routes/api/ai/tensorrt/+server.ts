@@ -11,6 +11,7 @@ import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbi
 import { inferLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 const tensorrtSchema = z.object({
 	prompt: z.string().min(1, 'prompt is required').max(10000),
@@ -49,7 +50,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					signal: AbortSignal.timeout(120000)
 				});
 				if (ollamaRes.ok) {
-					const ollamaData = await ollamaRes.json();
+					const rawText = await ollamaRes.text();
+					const ollamaData = fastJsonParse<{ response?: string }>(rawText);
 					return json({
 						text: ollamaData.response ?? '',
 						model: 'ollama',

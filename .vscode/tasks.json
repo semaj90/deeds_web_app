@@ -2268,3 +2268,62 @@
     }
   ]
 }
+    ,
+    {
+      "label": "Test: WebGPU Modules (API)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/test/webgpu-modules | jq .",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Test: WebGPU Full Validation",
+      "type": "shell",
+      "command": "bash test-webgpu-modules.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "routePath",
+      "type": "promptString",
+      "description": "Route path (e.g., /evidence or /cases)",
+      "default": "/evidence"
+    },
+    {
+      "id": "auditPlannerQuery",
+      "type": "promptString",
+      "description": "Ask Gemma 4 about your codebase (triggers GPU audit tools automatically)",
+      "default": "What are the most critical files and are there any near-duplicate code sections?"
+    },
+    {
+      "id": "obsidianSearchQuery",
+      "type": "promptString",
+      "description": "Search query for Obsidian vault notes",
+      "default": "legal research"
+    },
+    {
+      "id": "obsidianCaseTitle",
+      "type": "promptString",
+      "description": "Case title for Obsidian export (creates Legal AI/Cases/<title>.md)",
+      "default": "Smith v Johnson"
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E2B WebGPU Test</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+    h1 { color: #4CAF50; }
+    .status { padding: 1rem; margin: 1rem 0; border-radius: 4px; }
+    .success { background: #1b5e20; }
+    .error { background: #b71c1c; }
+    .info { background: #01579b; }
+    .warning { background: #e65100; }
+    pre { background: #2a2a2a; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+    }
+    button:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+    #output {
+      background: #2a2a2a;
+      padding: 1rem;
+      border-radius: 4px;
+      min-height: 100px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Gemma 4 E2B WebGPU Test</h1>
+
+  <div id="webgpu-status" class="status info">
+    <strong>Checking WebGPU availability...</strong>
+  </div>
+
+  <div id="controls">
+    <button id="loadBtn" disabled>1. Load E2B Model</button>
+    <button id="testBtn" disabled>2. Run Test Inference</button>
+    <button id="disposeBtn" disabled>3. Dispose Session</button>
+  </div>
+
+  <h2>Output</h2>
+  <div id="output">Waiting for actions...</div>
+
+  <h2>System Info</h2>
+  <pre id="sysinfo">Loading...</pre>
+
+  <script type="module">
+    // Import E2B modules (assumes dev server running on :5173)
+    const { getE2bSession, getWebGPUInfo, getE2bLoadError, disposeE2bSession, isE2bSessionReady } =
+      await import('/src/lib/ai/e2b/session.ts');
+    const { runE2bInferenceDetailed } = await import('/src/lib/ai/e2b/inference.ts');
+
+    const webgpuStatusEl = document.getElementById('webgpu-status');
+    const loadBtn = document.getElementById('loadBtn');
+    const testBtn = document.getElementById('testBtn');
+    const disposeBtn = document.getElementById('disposeBtn');
+    const outputEl = document.getElementById('output');
+    const sysinfoEl = document.getElementById('sysinfo');
+
+    function log(msg) {
+      outputEl.textContent += msg + '\n';
+      console.log(msg);
+    }
+
+    function logError(msg) {
+      outputEl.textContent += '❌ ' + msg + '\n';
+      console.error(msg);
+    }
+
+    function logSuccess(msg) {
+      outputEl.textContent += '✅ ' + msg + '\n';
+      console.log(msg);
+    }
+
+    // Check WebGPU on load
+    async function checkWebGPU() {
+      const info = await getWebGPUInfo();
+
+      if (!info || !info.available) {
+        webgpuStatusEl.className = 'status error';
+        webgpuStatusEl.innerHTML = '<strong>❌ WebGPU not available</strong><br>E2B requires WebGPU support (Chrome 113+, Edge 113+, Safari 18+)';
+        return;
+      }
+
+      webgpuStatusEl.className = 'status success';
+      webgpuStatusEl.innerHTML = `
+        <strong>✅ WebGPU Available</strong><br>
+        GPU: ${info.adapterInfo?.description || 'Unknown'}<br>
+        Vendor: ${info.adapterInfo?.vendor || 'Unknown'}<br>
+        Est. VRAM: ${info.estimatedVRAM || 'Unknown'}MB
+      `;
+
+      loadBtn.disabled = false;
+
+      // System info
+      sysinfoEl.textContent = JSON.stringify({
+        userAgent: navigator.userAgent,
+        hardwareConcurrency: navigator.hardwareConcurrency,
+        deviceMemory: navigator.deviceMemory || 'Unknown',
+        webgpu: info,
+      }, null, 2);
+    }
+
+    // Load E2B model
+    loadBtn.addEventListener('click', async () => {
+      loadBtn.disabled = true;
+      log('Loading Gemma 4 E2B model...');
+      log('This may take 5-10s on first load (downloading + compiling model)');
+
+      const start = performance.now();
+      const session = await getE2bSession();
+      const latency = Math.round(performance.now() - start);
+
+      if (!session) {
+        const error = getE2bLoadError();
+        logError(`Failed to load E2B: ${error}`);
+        loadBtn.disabled = false;
+        return;
+      }
+
+      logSuccess(`E2B loaded in ${latency}ms`);
+      testBtn.disabled = false;
+      disposeBtn.disabled = false;
+    });
+
+    // Test inference
+    testBtn.addEventListener('click', async () => {
+      testBtn.disabled = true;
+      const testPrompt = 'What is hearsay evidence? Answer in one sentence.';
+
+      log('\n--- Running Test Inference ---');
+      log(`Prompt: "${testPrompt}"`);
+      log('Generating...');
+
+      const result = await runE2bInferenceDetailed(testPrompt, {
+        maxTokens: 100,
+        temperature: 0.3,
+      });
+
+      if (result.error) {
+        logError(`Inference failed: ${result.error}`);
+      } else {
+        logSuccess(`Generated in ${result.latencyMs}ms (~${result.tokensGenerated} tokens)`);
+        log(`\nResponse:\n"${result.text}"\n`);
+      }
+
+      testBtn.disabled = false;
+    });
+
+    // Dispose session
+    disposeBtn.addEventListener('click', async () => {
+      disposeBtn.disabled = true;
+      log('\nDisposing E2B session...');
+
+      await disposeE2bSession();
+      logSuccess('Session disposed, memory freed');
+
+      loadBtn.disabled = false;
+      testBtn.disabled = true;
+      disposeBtn.disabled = true;
+    });
+
+    // Initialize
+    checkWebGPU();
+  </script>
+</body>
+</html>

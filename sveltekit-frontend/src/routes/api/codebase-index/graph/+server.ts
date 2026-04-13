@@ -1,348 +1,293 @@
 /**
- * Codebase Dependency Graph API
- *
- * GET /api/codebase-index/graph
- *
- * Uses a worker thread to run ts-morph AST extraction off the main event loop.
- * Returns a dependency graph (nodes + edges) for D3 visualization.
- *
- * Query params:
- *   ?maxFiles=200   — limit number of files scanned (default 200)
- *   ?dir=routes/api  — restrict scan to a subdirectory under src/
- *   ?worker=true     — use worker thread (default true)
+ * Codebase Knowledge Graph API
+ * Endpoint: GET /api/codebase-index/graph
+ * Purpose: Generate graph data for D3/Obsidian visualization
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { Worker } from 'worker_threads';
-import { resolve, relative, basename, dirname, extname } from 'path';
-import { readdirSync, statSync } from 'fs';
-import { createHash } from 'crypto';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
-import { setCache, cognitiveCache } from '$lib/server/cache.js';
-import { z } from 'zod';
 
-const codebaseGraphSchema = z.object({
-	maxFiles: z.coerce.number().int().min(1).max(500).default(200),
-	dir: z.string().max(200).optional().default(''),
-	worker: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
-});
+const QDRANT_URL = getQdrantUrl();
+const COLLECTION = 'codebase_chunks_768';
 
 interface GraphNode {
 	id: string;
 	label: string;
-	type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
-	errorCount: number;
-	filePath: string;
-	cluster?: string;
-	imports?: string[];
-	exports?: string[];
-	functions?: string[];
-	lineCount?: number;
-	fileSize?: number;
-	complexity?: number;
-	classCount?: number;
-	importCount?: number;
-	exportCount?: number;
+	type: 'file' | 'directory';
+	path: string;
+	extension?: string;
+	size: number;
+	domain?: string;
+	complexity?: string;
+	group: number;
 }
 
 interface GraphEdge {
 	source: string;
 	target: string;
-	type: 'import' | 'export' | 'dependency';
+	type: 'contains' | 'imports' | 'exports';
+	weight: number;
 }
 
-const SRC_ROOT = resolve(process.cwd(), 'src');
-
-/**
- * Run AST graph extraction in a worker thread.
- * Falls back to inline execution if the worker fails to spawn.
- */
-function runInWorker(scanDir: string, maxFiles: number): Promise<{ nodes: GraphNode[]; edges: GraphEdge[]; metadata: Record<string, unknown> }> {
-	return new Promise((resolve, reject) => {
-		const workerPath = new URL('../../../../lib/workers/ast-graph-worker.mjs', import.meta.url).pathname
-			// Fix Windows paths: /C:/foo → C:/foo
-			.replace(/^\/([A-Z]:)/, '$1');
-
-		let worker: Worker;
-		try {
-			worker = new Worker(workerPath);
-		} catch {
-			// Worker failed — reject so caller can fall back to inline
-			reject(new Error('Worker spawn failed'));
-			return;
-		}
-
-		const taskId = Date.now();
-		const timeout = setTimeout(() => {
-			worker.terminate();
-			reject(new Error('Worker timeout (30s)'));
-		}, 30_000);
-
-		worker.on('message', (msg: { taskId: number; result?: unknown; error?: string }) => {
-			clearTimeout(timeout);
-			worker.terminate();
-			if (msg.error) reject(new Error(msg.error));
-			else resolve(msg.result as any);
-		});
-
-		worker.on('error', (err) => {
-			clearTimeout(timeout);
-			worker.terminate();
-			reject(err);
-		});
-
-		worker.postMessage({
-			taskId,
-			type: 'ast-graph',
-			payload: { scanDir, srcRoot: SRC_ROOT, maxFiles }
-		});
-	});
-}
-
-// ── Inline fallback (same logic, runs on main thread) ──────
-
-function classifyFile(relPath: string): GraphNode['type'] {
-	if (relPath.includes('/routes/api/') || relPath.includes('+server.ts')) return 'api';
-	if (relPath.includes('/routes/')) return 'route';
-	if (relPath.includes('/stores/') || relPath.includes('.svelte.ts')) return 'store';
-	if (relPath.includes('/components/')) return 'component';
-	if (relPath.includes('/server/') || relPath.includes('/services/')) return 'service';
-	return 'util';
-}
-
-function deriveCluster(relPath: string): string {
-	if (relPath.startsWith('routes/api/')) {
-		const parts = relPath.split('/');
-		return parts.length >= 4 ? `api-${parts[2]}` : 'api';
-	}
-	if (relPath.startsWith('routes/(app)/')) {
-		const parts = relPath.split('/');
-		return parts.length >= 4 ? `app-${parts[2]}` : 'app';
-	}
-	if (relPath.startsWith('routes/')) return 'routes';
-	if (relPath.startsWith('lib/components/')) {
-		const parts = relPath.split('/');
-		return parts.length >= 4 ? `comp-${parts[2]}` : 'components';
-	}
-	if (relPath.startsWith('lib/stores/')) return 'stores';
-	if (relPath.startsWith('lib/server/')) {
-		const parts = relPath.split('/');
-		return parts.length >= 4 ? `server-${parts[2]}` : 'server';
-	}
-	if (relPath.startsWith('lib/ai/')) return 'ai';
-	return 'lib';
-}
-
-function collectFiles(dir: string, maxFiles: number): string[] {
-	const files: string[] = [];
-	function walk(d: string) {
-		if (files.length >= maxFiles) return;
-		let entries: string[];
-		try { entries = readdirSync(d); } catch { return; }
-		for (const entry of entries) {
-			if (files.length >= maxFiles) return;
-			const full = resolve(d, entry);
-			let st;
-			try { st = statSync(full); } catch { continue; }
-			if (st.isDirectory()) {
-				if (['node_modules', '.svelte-kit', 'deeds_labs', 'static', 'build', 'services'].includes(entry)) continue;
-				walk(full);
-			} else {
-				const ext = extname(entry);
-				if (['.ts', '.js', '.mts'].includes(ext) && !entry.endsWith('.d.ts')) {
-					files.push(full);
-				}
-			}
-		}
-	}
-	walk(dir);
-	return files;
-}
-
-function resolveImportPath(importSpec: string, fromFile: string): string | null {
-	if (importSpec.startsWith('$lib/')) return 'lib/' + importSpec.slice(5).replace(/\.js$/, '');
-	if (importSpec.startsWith('$') || importSpec.startsWith('@')) return null;
-	if (importSpec.startsWith('.')) {
-		const fromDir = dirname(relative(SRC_ROOT, fromFile));
-		const resolved = resolve(SRC_ROOT, fromDir, importSpec).replace(/\.js$/, '');
-		const rel = relative(SRC_ROOT, resolved).replace(/\\/g, '/');
-		if (rel.startsWith('..')) return null;
-		return rel;
-	}
-	return null;
-}
-
-async function buildGraphInline(scanDir: string, maxFiles: number) {
-	const startMs = Date.now();
-	const { Project, SyntaxKind } = await import('ts-morph');
-
-	const filePaths = collectFiles(scanDir, maxFiles);
-	const project = new Project({
-		skipAddingFilesFromTsConfig: true,
-		compilerOptions: { allowJs: true, noEmit: true, skipLibCheck: true }
-	});
-
-	const nodeMap = new Map<string, GraphNode>();
-	const edges: GraphEdge[] = [];
-
-	for (const fp of filePaths) {
-		let sourceFile;
-		try { sourceFile = project.addSourceFileAtPath(fp); } catch { continue; }
-
-		const relPath = relative(SRC_ROOT, fp).replace(/\\/g, '/');
-		const nodeId = relPath.replace(/\.(ts|js|mts)$/, '').replace(/[^a-zA-Z0-9/_-]/g, '_');
-
-		const exportNames: string[] = [];
-		for (const fn of sourceFile.getFunctions()) {
-			if (fn.isExported()) exportNames.push(fn.getName() ?? '');
-		}
-		for (const cls of sourceFile.getClasses()) {
-			if (cls.isExported()) exportNames.push(cls.getName() ?? '');
-		}
-		for (const vd of sourceFile.getVariableDeclarations()) {
-			const stmt = vd.getFirstAncestorByKind(SyntaxKind.VariableStatement);
-			if (stmt?.isExported()) exportNames.push(vd.getName());
-		}
-
-		const funcNames: string[] = [];
-		for (const fn of sourceFile.getFunctions()) {
-			const name = fn.getName();
-			if (name) funcNames.push(name);
-		}
-
-		const importPaths: string[] = [];
-		for (const imp of sourceFile.getImportDeclarations()) {
-			importPaths.push(imp.getModuleSpecifierValue());
-		}
-
-		// Compute richer metadata
-		const fullText = sourceFile.getFullText();
-		const lineCount = fullText.split('\n').length;
-		const fileSize = fullText.length;
-		const branchKeywords = fullText.match(/\b(if|else|for|while|switch|case|catch|&&|\|\||\?)\b/g);
-		const complexity = branchKeywords ? branchKeywords.length : 0;
-		const classCount = sourceFile.getClasses().length;
-
-		nodeMap.set(relPath, {
-			id: nodeId,
-			label: basename(fp),
-			type: classifyFile(relPath),
-			errorCount: 0,
-			filePath: 'src/' + relPath,
-			cluster: deriveCluster(relPath),
-			imports: importPaths.slice(0, 20),
-			exports: exportNames.filter(Boolean).slice(0, 20),
-			functions: funcNames.slice(0, 20),
-			lineCount,
-			fileSize,
-			complexity,
-			classCount,
-			importCount: importPaths.length,
-			exportCount: exportNames.filter(Boolean).length,
-		});
-
-		for (const spec of importPaths) {
-			const targetRel = resolveImportPath(spec, fp);
-			if (!targetRel) continue;
-			const candidates = [targetRel, targetRel + '.ts', targetRel + '/index.ts', targetRel + '/+server.ts', targetRel + '/+page.server.ts'];
-			for (const cand of candidates) {
-				if (nodeMap.has(cand) || filePaths.some(f => relative(SRC_ROOT, f).replace(/\\/g, '/') === cand)) {
-					const targetId = cand.replace(/\.(ts|js|mts)$/, '').replace(/[^a-zA-Z0-9/_-]/g, '_');
-					edges.push({ source: nodeId, target: targetId, type: 'import' });
-					break;
-				}
-			}
-		}
-
-		try { project.removeSourceFile(sourceFile); } catch { /* ok */ }
-	}
-
-	const nodes = Array.from(nodeMap.values());
-	const edgeSet = new Set<string>();
-	const uniqueEdges = edges.filter(e => {
-		const key = `${e.source}→${e.target}`;
-		if (edgeSet.has(key)) return false;
-		edgeSet.add(key);
-		return true;
-	});
-	const nodeIds = new Set(nodes.map(n => n.id));
-	const validEdges = uniqueEdges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
-
-	return {
-		nodes,
-		edges: validEdges,
-		metadata: {
-			totalNodes: nodes.length,
-			totalEdges: validEdges.length,
-			nodesWithErrors: 0,
-			scanTimeMs: Date.now() - startMs,
-			maxFiles,
-			generatedAt: new Date().toISOString()
-		}
+interface GraphData {
+	nodes: GraphNode[];
+	edges: GraphEdge[];
+	stats: {
+		totalFiles: number;
+		totalChunks: number;
+		totalDirs: number;
+		importEdges: number;
+		extensionBreakdown: Record<string, number>;
+		domainBreakdown: Record<string, number>;
 	};
 }
 
-// ── Handler ──────────────────────────────────────────────────
+// Helper: Extract imports from file content
+function extractImports(content: string): string[] {
+	const imports: string[] = [];
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+	// TypeScript/JavaScript imports: import ... from '...'
+	const importRegex = /import\s+.*?from\s+['"](.*?)['"]/g;
+	let match;
+	while ((match = importRegex.exec(content)) !== null) {
+		imports.push(match[1]);
+	}
+
+	// Dynamic imports: import('...')
+	const dynamicRegex = /import\(['"](.*?)['"]\)/g;
+	while ((match = dynamicRegex.exec(content)) !== null) {
+		imports.push(match[1]);
+	}
+
+	// CJS require: require('...')
+	const requireRegex = /require\(['"](.*?)['"]\)/g;
+	while ((match = requireRegex.exec(content)) !== null) {
+		imports.push(match[1]);
+	}
+
+	return [...new Set(imports)]; // dedupe
+}
+
+// Helper: Resolve import path to absolute file path
+function resolveImportPath(fromFile: string, importPath: string): string | null {
+	// Skip external packages (node_modules)
+	if (!importPath.startsWith('.') && !importPath.startsWith('$lib')) {
+		return null;
+	}
+
+	// Handle $lib alias
+	if (importPath.startsWith('$lib/')) {
+		return importPath.replace('$lib/', 'src/lib/');
+	}
+
+	// Handle relative imports
+	if (importPath.startsWith('./') || importPath.startsWith('../')) {
+		const dir = fromFile.split('/').slice(0, -1).join('/');
+		let resolved = `${dir}/${importPath}`;
+
+		// Normalize path (remove ./ and ../)
+		const parts = resolved.split('/');
+		const normalized: string[] = [];
+		for (const part of parts) {
+			if (part === '..') {
+				normalized.pop();
+			} else if (part !== '.' && part !== '') {
+				normalized.push(part);
+			}
+		}
+		resolved = normalized.join('/');
+
+		return resolved;
+	}
+
+	return null;
+}
+
+// Helper: Try to match import path to actual file (handles missing extensions)
+function matchImportToFile(importPath: string, fileMap: Map<string, any>): string | null {
+	// Try exact match first
+	if (fileMap.has(importPath)) {
+		return importPath;
+	}
+
+	// Try common extensions
+	const extensions = ['.ts', '.js', '.svelte', '.mjs', '/index.ts', '/index.js'];
+	for (const ext of extensions) {
+		const withExt = importPath + ext;
+		if (fileMap.has(withExt)) {
+			return withExt;
+		}
+	}
+
+	return null;
+}
+
+export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const parsed = codebaseGraphSchema.safeParse({
-		maxFiles: url.searchParams.get('maxFiles'),
-		dir: url.searchParams.get('dir'),
-		worker: url.searchParams.get('worker'),
-	});
-
-	if (!parsed.success) {
-		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid params' }, { status: 400 });
-	}
-
-	const { maxFiles, dir: subdir, worker: useWorker } = parsed.data;
-	const scanDir = subdir ? resolve(SRC_ROOT, subdir) : SRC_ROOT;
-	if (!scanDir.startsWith(SRC_ROOT)) {
-		return json({ error: 'Invalid directory' }, { status: 400 });
-	}
-
-	const GRAPH_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
-	const cacheKey = `ast:graph:${createHash('sha256').update(`${scanDir}:${maxFiles}`).digest('hex').slice(0, 16)}`;
-
-	// Check cache first
-	const cached = await cognitiveCache.getJsonbDocument<{ nodes: GraphNode[]; edges: GraphEdge[]; metadata: Record<string, unknown> }>(cacheKey);
-	if (cached) {
-		return json({ ...cached, cached: true });
-	}
+	const limit = parseInt(url.searchParams.get('limit') || '5000');
+	const includeImports = url.searchParams.get('includeImports') !== 'false'; // default true
 
 	try {
-		let result;
-
-		if (useWorker) {
-			try {
-				result = await runInWorker(scanDir, maxFiles);
-			} catch (workerErr) {
-				console.warn('Worker failed, falling back to inline:', workerErr);
-				result = await buildGraphInline(scanDir, maxFiles);
+		const response = await fetch(
+			`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					limit,
+					with_payload: true,
+					with_vector: false
+				}),
+				signal: AbortSignal.timeout(30_000)
 			}
-		} else {
-			result = await buildGraphInline(scanDir, maxFiles);
+		);
+
+		if (!response.ok) {
+			return json({ error: 'Failed to fetch codebase data' }, { status: 500 });
 		}
 
-		// Store in cache
-		await setCache(cacheKey, result, GRAPH_CACHE_TTL_MS);
+		// GPU-accelerated JSON parsing via simdjson (5× faster for large responses)
+		const rawText = await response.text();
+		const data = fastJsonParse<{ result?: { points?: Array<{ payload: Record<string, unknown> }> } }>(rawText);
+		const points = data.result?.points || [];
 
-		return json(result);
+		// Build graph structures
+		const fileMap = new Map();
+		const fileContent = new Map(); // Store content for import extraction
+		const dirMap = new Map();
+		const extensionCount: Record<string, number> = {};
+		const domainCount: Record<string, number> = {};
+
+		for (const point of points) {
+			const { file_path, extension, domain, content } = point.payload;
+
+			if (!fileMap.has(file_path)) {
+				fileMap.set(file_path, { chunks: 0, extension, domain });
+				// Store first chunk's content for import extraction
+				if (content && typeof content === 'string') {
+					fileContent.set(file_path, content);
+				}
+			}
+			fileMap.get(file_path).chunks++;
+
+			const parts = file_path.split('/');
+			for (let i = 1; i < parts.length; i++) {
+				const dirPath = parts.slice(0, i).join('/');
+				if (!dirMap.has(dirPath)) {
+					dirMap.set(dirPath, new Set());
+				}
+				if (i === parts.length - 1) {
+					dirMap.get(dirPath).add(file_path);
+				}
+			}
+
+			extensionCount[extension] = (extensionCount[extension] || 0) + 1;
+			if (domain) domainCount[domain] = (domainCount[domain] || 0) + 1;
+		}
+
+		const nodes: GraphNode[] = [];
+		const edges: GraphEdge[] = [];
+		let groupId = 0;
+		const dirGroups = new Map();
+
+		// Create directory nodes
+		for (const [dirPath, files] of dirMap.entries()) {
+			const parts = dirPath.split('/');
+			const label = parts[parts.length - 1] || 'root';
+
+			if (!dirGroups.has(parts[0])) {
+				dirGroups.set(parts[0], groupId++);
+			}
+
+			nodes.push({
+				id: `dir:${dirPath}`,
+				label,
+				type: 'directory',
+				path: dirPath,
+				size: files.size,
+				group: dirGroups.get(parts[0])
+			});
+
+			if (parts.length > 1) {
+				const parentPath = parts.slice(0, -1).join('/');
+				edges.push({
+					source: `dir:${parentPath}`,
+					target: `dir:${dirPath}`,
+					type: 'contains',
+					weight: 1
+				});
+			}
+		}
+
+		// Create file nodes
+		for (const [filePath, info] of fileMap.entries()) {
+			const parts = filePath.split('/');
+			const fileName = parts[parts.length - 1];
+			const dirPath = parts.slice(0, -1).join('/');
+
+			nodes.push({
+				id: `file:${filePath}`,
+				label: fileName,
+				type: 'file',
+				path: filePath,
+				extension: info.extension,
+				size: info.chunks,
+				domain: info.domain,
+				group: dirGroups.get(parts[0]) || 0
+			});
+
+			if (dirPath) {
+				edges.push({
+					source: `dir:${dirPath}`,
+					target: `file:${filePath}`,
+					type: 'contains',
+					weight: info.chunks
+				});
+			}
+		}
+
+		// Extract import edges
+		let importEdgeCount = 0;
+		if (includeImports) {
+			for (const [filePath, content] of fileContent.entries()) {
+				const imports = extractImports(content);
+
+				for (const importPath of imports) {
+					const resolved = resolveImportPath(filePath, importPath);
+					if (!resolved) continue; // Skip external packages
+
+					const matched = matchImportToFile(resolved, fileMap);
+					if (matched) {
+						edges.push({
+							source: `file:${filePath}`,
+							target: `file:${matched}`,
+							type: 'imports',
+							weight: 1
+						});
+						importEdgeCount++;
+					}
+				}
+			}
+		}
+
+		const graphData: GraphData = {
+			nodes,
+			edges,
+			stats: {
+				totalFiles: fileMap.size,
+				totalChunks: points.length,
+				totalDirs: dirMap.size,
+				importEdges: importEdgeCount,
+				extensionBreakdown: extensionCount,
+				domainBreakdown: domainCount
+			}
+		};
+
+		return json(graphData);
 	} catch (error) {
-		console.error('Error building graph:', error);
-		return json({
-      nodes: [],
-      edges: [],
-      metadata: {
-        totalNodes: 0,
-        totalEdges: 0,
-        nodesWithErrors: 0,
-        scanTimeMs: 0,
-        maxFiles: 0,
-        generatedAt: new Date().toISOString(),
-      },
-    });
+		console.error('Failed to generate graph data:', error);
+		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runtime Matrix Verification Checklist</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #4CAF50;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      color: #2196F3;
+      margin-top: 2rem;
+    }
+    .step {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .step-number {
+      background: #2196F3;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .step-content {
+      margin-left: 52px;
+    }
+    .code {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+    }
+    .button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+      transition: background 0.2s;
+    }
+    .button:hover {
+      background: #45a049;
+    }
+    .button:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+    .button-secondary {
+      background: #2196F3;
+    }
+    .button-secondary:hover {
+      background: #1976D2;
+    }
+    .status {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      font-weight: 500;
+    }
+    .status-pending {
+      background: #e65100;
+      color: white;
+    }
+    .status-pass {
+      background: #1b5e20;
+      color: white;
+    }
+    .status-fail {
+      background: #b71c1c;
+      color: white;
+    }
+    .status-skip {
+      background: #424242;
+      color: white;
+    }
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+    .checklist li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .checklist li::before {
+      content: '○';
+      color: #666;
+      font-size: 1.5rem;
+    }
+    .checklist li.checked::before {
+      content: '✓';
+      color: #4CAF50;
+    }
+    .summary {
+      background: #1a1a1a;
+      border: 2px solid #4CAF50;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .summary h3 {
+      margin-top: 0;
+      color: #4CAF50;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #333;
+    }
+    .metric:last-child {
+      border-bottom: none;
+    }
+    .metric-value {
+      font-weight: 600;
+      color: #4CAF50;
+    }
+    a {
+      color: #2196F3;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .warning {
+      background: #e65100;
+      color: white;
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+    .info {
+      background: #01579b;
+      color: white;
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+    #progress {
+      width: 100%;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #2196F3);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .auto-test-result {
+      background: #2a2a2a;
+      border-left: 4px solid #4CAF50;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Runtime Matrix Verification Checklist</h1>
+
+  <div class="info">
+    <strong>Purpose:</strong> Verify all lanes, cache tiers, and services from RUNTIME_MATRIX.md are functional.
+    <br><br>
+    <strong>Duration:</strong> ~10-15 minutes
+    <br>
+    <strong>Status:</strong> <span id="overall-status">Not Started</span>
+  </div>
+
+  <div id="progress">
+    <div id="progress-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- STEP 1: Server Infrastructure -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div class="step-title">Verify Server Infrastructure</div>
+    </div>
+    <div class="step-content">
+      <p>Check that all core services are running:</p>
+
+      <button class="button" onclick="checkInfrastructure()">Run Auto-Check</button>
+
+      <div id="infra-results" style="display: none;">
+        <h4>Results:</h4>
+        <div class="auto-test-result" id="infra-output"></div>
+      </div>
+
+      <div class="status status-pending" id="step1-status">⏳ Pending</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- STEP 2: E2B WebGPU Test -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div class="step-title">E2B WebGPU Test</div>
+    </div>
+    <div class="step-content">
+      <p>Test client-side WebGPU inference with Gemma 4 E2B 2.3B:</p>
+
+      <button class="button" onclick="openE2BTest()">Open E2B Test Page</button>
+
+      <h4>Expected Results:</h4>
+      <ul class="checklist" id="e2b-checklist">
+        <li>✅ WebGPU Available (green status)</li>
+        <li>GPU adapter info displayed</li>
+        <li>Model loads in 5-10s (first time)</li>
+        <li>Test inference completes in 1-2s</li>
+        <li>Response text appears in output</li>
+      </ul>
+
+      <div class="warning">
+        <strong>⚠️ If WebGPU NOT available:</strong><br>
+        • Browser: Chrome 113+, Edge 113+, Safari 18+<br>
+        • System will auto-fallback to LiteRT/ONNX (still works, just slower)
+      </div>
+
+      <button class="button button-secondary" onclick="markE2BPass()">✓ E2B PASS</button>
+      <button class="button button-secondary" onclick="markE2BFail()">✗ E2B FAIL (auto-fallback)</button>
+
+      <div class="status status-pending" id="step2-status">⏳ Pending</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- STEP 3: Unified Generation API Test -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div class="step-title">Unified Generation API Test</div>
+    </div>
+    <div class="step-content">
+      <p>Test the complete client-side generation cascade:</p>
+
+      <button class="button" onclick="testUnifiedAPI()">Run API Test</button>
+
+      <div id="api-results" style="display: none;">
+        <h4>Results:</h4>
+        <div class="auto-test-result" id="api-output"></div>
+      </div>
+
+      <h4>Manual Test (Browser Console):</h4>
+      <div class="code">
+import { chat } from '/src/lib/ai/unified-generation.ts';
+const answer = await chat('What is hearsay evidence?');
+console.log(answer);
+      </div>
+
+      <h4>Expected Results:</h4>
+      <ul class="checklist">
+        <li>Response in 1-5s (depending on tier)</li>
+        <li>Check Network tab for tier used</li>
+        <li>Legal-quality answer returned</li>
+      </ul>
+
+      <div class="status status-pending" id="step3-status">⏳ Pending</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- STEP 4: Cache Performance Check -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div class="step-title">Cache Performance Check</div>
+    </div>
+    <div class="step-content">
+      <p>Verify L1/L2 cache is working:</p>
+
+      <button class="button" onclick="checkCacheStats()">Check Cache Stats</button>
+
+      <div id="cache-results" style="display: none;">
+        <h4>Results:</h4>
+        <div class="auto-test-result" id="cache-output"></div>
+      </div>
+
+      <h4>Expected Metrics:</h4>
+      <div class="metric">
+        <span>Redis L1 Hit Rate:</span>
+        <span class="metric-value">20-30%</span>
+      </div>
+      <div class="metric">
+        <span>Redis L1 Latency:</span>
+        <span class="metric-value">&lt;5ms</span>
+      </div>
+      <div class="metric">
+        <span>Bifrost L2 Hit Rate:</span>
+        <span class="metric-value">70-90%</span>
+      </div>
+      <div class="metric">
+        <span>Combined Hit Rate:</span>
+        <span class="metric-value">90-95%</span>
+      </div>
+
+      <div class="status status-pending" id="step4-status">⏳ Pending</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- STEP 5: LiteRT Sidecar (Optional) -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">5</div>
+      <div class="step-title">LiteRT Sidecar (Optional)</div>
+    </div>
+    <div class="step-content">
+      <p><strong>⚠️ Optional:</strong> Only needed if E2B WebGPU fails</p>
+
+      <button class="button" onclick="checkLiteRT()">Check LiteRT Status</button>
+
+      <div id="litert-results" style="display: none;">
+        <h4>Results:</h4>
+        <div class="auto-test-result" id="litert-output"></div>
+      </div>
+
+      <h4>Start LiteRT Sidecar (if needed):</h4>
+      <div class="code">
+# In terminal:
+litert-lm serve \
+  --model /models/gemma4_e2b_litert_int4.tflite \
+  --port 8070 \
+  --threads 8
+      </div>
+
+      <button class="button button-secondary" onclick="markLiteRTPass()">✓ LiteRT RUNNING</button>
+      <button class="button button-secondary" onclick="markLiteRTSkip()">⊘ SKIP (not needed)</button>
+
+      <div class="status status-pending" id="step5-status">⏳ Pending</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Summary -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="summary" id="summary" style="display: none;">
+    <h3>🎉 Verification Complete!</h3>
+
+    <div class="metric">
+      <span>Steps Completed:</span>
+      <span class="metric-value" id="steps-completed">0/5</span>
+    </div>
+    <div class="metric">
+      <span>Steps Passed:</span>
+      <span class="metric-value" id="steps-passed">0/5</span>
+    </div>
+    <div class="metric">
+      <span>Steps Failed:</span>
+      <span class="metric-value" id="steps-failed">0/5</span>
+    </div>
+    <div class="metric">
+      <span>Steps Skipped:</span>
+      <span class="metric-value" id="steps-skipped">0/5</span>
+    </div>
+
+    <h4>Next Steps:</h4>
+    <ol>
+      <li>Update Neo4j graph with verification results</li>
+      <li>Run: <code>bash scripts/neo4j/update-verification-status.sh</code></li>
+      <li>View updated graph at: <a href="http://localhost:7474" target="_blank">http://localhost:7474</a></li>
+    </ol>
+
+    <button class="button" onclick="downloadResults()">Download Results (JSON)</button>
+  </div>
+
+  <script type="module">
+    // ═══════════════════════════════════════════════════════════════
+    // Verification State
+    // ═══════════════════════════════════════════════════════════════
+
+    window.verificationState = {
+      step1: { status: 'pending', results: null },
+      step2: { status: 'pending', results: null },
+      step3: { status: 'pending', results: null },
+      step4: { status: 'pending', results: null },
+      step5: { status: 'pending', results: null },
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // Helper Functions
+    // ═══════════════════════════════════════════════════════════════
+
+    function updateProgress() {
+      const total = 5;
+      const completed = Object.values(window.verificationState).filter(s => s.status !== 'pending').length;
+      const percent = (completed / total) * 100;
+
+      document.getElementById('progress-bar').style.width = percent + '%';
+      document.getElementById('overall-status').textContent = `${completed}/${total} steps completed`;
+
+      // Show summary if all complete
+      if (completed === total) {
+        showSummary();
+      }
+    }
+
+    function updateStepStatus(step, status, results = null) {
+      window.verificationState[step] = { status, results };
+
+      const statusEl = document.getElementById(`step${step.slice(-1)}-status`);
+      statusEl.className = 'status status-' + status;
+
+      const icons = { pass: '✅', fail: '❌', skip: '⊘', pending: '⏳' };
+      const labels = { pass: 'PASS', fail: 'FAIL', skip: 'SKIPPED', pending: 'Pending' };
+
+      statusEl.textContent = `${icons[status]} ${labels[status]}`;
+
+      updateProgress();
+    }
+
+    function showSummary() {
+      const states = Object.values(window.verificationState);
+      const completed = states.length;
+      const passed = states.filter(s => s.status === 'pass').length;
+      const failed = states.filter(s => s.status === 'fail').length;
+      const skipped = states.filter(s => s.status === 'skip').length;
+
+      document.getElementById('steps-completed').textContent = `${completed}/5`;
+      document.getElementById('steps-passed').textContent = `${passed}/5`;
+      document.getElementById('steps-failed').textContent = `${failed}/5`;
+      document.getElementById('steps-skipped').textContent = `${skipped}/5`;
+
+      document.getElementById('summary').style.display = 'block';
+      document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Step 1: Infrastructure Check
+    // ═══════════════════════════════════════════════════════════════
+
+    window.checkInfrastructure = async function() {
+      const outputEl = document.getElementById('infra-output');
+      const resultsEl = document.getElementById('infra-results');
+      resultsEl.style.display = 'block';
+      outputEl.textContent = 'Checking services...\n';
+
+      const services = [
+        { name: 'Redis L1', url: '/api/health', check: (data) => data.redis },
+        { name: 'Qdrant L3', url: '/api/health', check: (data) => data.qdrant },
+        { name: 'Ollama', url: '/api/health', check: (data) => data.ollama },
+        { name: 'RabbitMQ', url: '/api/health', check: (data) => data.rabbitmq },
+      ];
+
+      let allPass = true;
+      for (const service of services) {
+        try {
+          const res = await fetch(service.url);
+          const data = await res.json();
+          const pass = service.check(data);
+
+          outputEl.textContent += `${pass ? '✅' : '❌'} ${service.name}: ${pass ? 'PASS' : 'FAIL'}\n`;
+
+          if (!pass) allPass = false;
+        } catch (err) {
+          outputEl.textContent += `❌ ${service.name}: ERROR (${err.message})\n`;
+          allPass = false;
+        }
+      }
+
+      updateStepStatus('step1', allPass ? 'pass' : 'fail', { allPass });
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // Step 2: E2B WebGPU Test
+    // ═══════════════════════════════════════════════════════════════
+
+    window.openE2BTest = function() {
+      window.open('/scripts/tests/test-e2b-loading.html', '_blank');
+    };
+
+    window.markE2BPass = function() {
+      updateStepStatus('step2', 'pass', { webgpu: true });
+    };
+
+    window.markE2BFail = function() {
+      updateStepStatus('step2', 'fail', { webgpu: false });
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // Step 3: Unified API Test
+    // ═══════════════════════════════════════════════════════════════
+
+    window.testUnifiedAPI = async function() {
+      const outputEl = document.getElementById('api-output');
+      const resultsEl = document.getElementById('api-results');
+      resultsEl.style.display = 'block';
+      outputEl.textContent = 'Testing unified generation API...\n\n';
+
+      try {
+        const { chat } = await import('/src/lib/ai/unified-generation.ts');
+
+        const start = performance.now();
+        const answer = await chat('What is hearsay evidence?');
+        const latency = Math.round(performance.now() - start);
+
+        outputEl.textContent += `✅ API Test PASS\n\n`;
+        outputEl.textContent += `Latency: ${latency}ms\n`;
+        outputEl.textContent += `Answer: ${answer.substring(0, 200)}...\n`;
+
+        updateStepStatus('step3', 'pass', { latency, answer });
+      } catch (err) {
+        outputEl.textContent += `❌ API Test FAIL\n\n`;
+        outputEl.textContent += `Error: ${err.message}\n`;
+        updateStepStatus('step3', 'fail', { error: err.message });
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // Step 4: Cache Stats
+    // ═══════════════════════════════════════════════════════════════
+
+    window.checkCacheStats = async function() {
+      const outputEl = document.getElementById('cache-output');
+      const resultsEl = document.getElementById('cache-results');
+      resultsEl.style.display = 'block';
+      outputEl.textContent = 'Checking cache statistics...\n\n';
+
+      try {
+        const res = await fetch('/api/cache/exact-match/stats');
+        const data = await res.json();
+
+        outputEl.textContent += `✅ Cache Stats Retrieved\n\n`;
+        outputEl.textContent += `Redis L1 Hit Rate: ${(data.hit_rate * 100).toFixed(1)}%\n`;
+        outputEl.textContent += `Redis L1 Avg Latency: ${data.avg_latency_ms?.toFixed(2) ?? 'N/A'}ms\n`;
+        outputEl.textContent += `Total Requests: ${data.total_requests ?? 0}\n`;
+
+        updateStepStatus('step4', 'pass', data);
+      } catch (err) {
+        outputEl.textContent += `❌ Cache Stats FAIL\n\n`;
+        outputEl.textContent += `Error: ${err.message}\n`;
+        updateStepStatus('step4', 'fail', { error: err.message });
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // Step 5: LiteRT Check
+    // ═══════════════════════════════════════════════════════════════
+
+    window.checkLiteRT = async function() {
+      const outputEl = document.getElementById('litert-output');
+      const resultsEl = document.getElementById('litert-results');
+      resultsEl.style.display = 'block';
+      outputEl.textContent = 'Checking LiteRT sidecar...\n\n';
+
+      try {
+        const res = await fetch('http://localhost:8070/health', {
+          signal: AbortSignal.timeout(2000)
+        });
+        const data = await res.json();
+
+        outputEl.textContent += `✅ LiteRT Running\n\n`;
+        outputEl.textContent += `Status: ${data.status}\n`;
+        outputEl.textContent += `Model: ${data.model}\n`;
+
+        updateStepStatus('step5', 'pass', data);
+      } catch (err) {
+        outputEl.textContent += `⚠️  LiteRT Not Running\n\n`;
+        outputEl.textContent += `(This is optional — only needed if E2B fails)\n`;
+        updateStepStatus('step5', 'skip', { error: err.message });
+      }
+    };
+
+    window.markLiteRTPass = function() {
+      updateStepStatus('step5', 'pass', { running: true });
+    };
+
+    window.markLiteRTSkip = function() {
+      updateStepStatus('step5', 'skip', { running: false });
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // Download Results
+    // ═══════════════════════════════════════════════════════════════
+
+    window.downloadResults = function() {
+      const results = {
+        timestamp: new Date().toISOString(),
+        verification_state: window.verificationState,
+        summary: {
+          total: 5,
+          completed: Object.values(window.verificationState).filter(s => s.status !== 'pending').length,
+          passed: Object.values(window.verificationState).filter(s => s.status === 'pass').length,
+          failed: Object.values(window.verificationState).filter(s => s.status === 'fail').length,
+          skipped: Object.values(window.verificationState).filter(s => s.status === 'skip').length,
+        }
+      };
+
+      const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `runtime-verification-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+  </script>
+</body>
+</html>

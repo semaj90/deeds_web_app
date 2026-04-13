@@ -9,9 +9,10 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     // Fetch statistics
@@ -19,7 +20,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     const stats = await searcher.getStats();
 
     // Return stats
-    return json({
+    const responseData = {
       success: true,
       stats: { totalDocuments: stats.totalDocuments,
         indexedVectors: stats.indexedVectors,
@@ -34,10 +35,17 @@ export const GET: RequestHandler = async ({ locals }) => {
         },
         lastIndexed: stats.lastIndexed
       }
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.short, ETag: etag }
     });
   } catch (error) {
     console.error('Stats API error:', error);
-    return json({
+    const fallbackData = {
       success: false,
       stats: {
         totalDocuments: 0,
@@ -49,6 +57,9 @@ export const GET: RequestHandler = async ({ locals }) => {
         },
         lastIndexed: null,
       },
+    };
+    return json(fallbackData, {
+      headers: cacheControl.short
     });
   }
 };

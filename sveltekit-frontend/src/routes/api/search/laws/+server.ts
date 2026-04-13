@@ -7,6 +7,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { statutes } from '$lib/server/db/schema-postgres.js';
@@ -32,7 +33,7 @@ type LawSearchRow = {
 	score: number;
 };
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const startTime = performance.now();
 
@@ -112,15 +113,25 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 		const executionTimeMs = Math.round(performance.now() - startTime);
 
-		return json({
+		const responseData = {
 			results,
 			total: results.length,
 			query,
 			executionTimeMs
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[search/laws] error:', err);
 		const executionTimeMs = Math.round(performance.now() - startTime);
-		return json({ results: [], total: 0, query, executionTimeMs });
+		const fallbackData = { results: [], total: 0, query, executionTimeMs };
+		return json(fallbackData, {
+			headers: cacheControl.short
+		});
 	}
 };

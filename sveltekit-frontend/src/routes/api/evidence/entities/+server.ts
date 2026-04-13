@@ -12,6 +12,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -26,7 +27,7 @@ const entitiesQuerySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(500).default(50),
 });
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -131,5 +132,10 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		results.counts = null;
 	}
 
-	return json(results);
+	const { etag, isMatch } = checkETag(results, request.headers);
+	if (isMatch) return notModified(etag);
+
+	return json(results, {
+		headers: { ...cacheControl.short, ETag: etag }
+	});
 };

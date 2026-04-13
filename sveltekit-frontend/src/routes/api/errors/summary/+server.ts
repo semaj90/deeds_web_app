@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from '@sveltejs/kit';
 
@@ -7,7 +8,7 @@ import type { RequestHandler } from '@sveltejs/kit';
  * GET /api/errors/summary
  * Error counts aggregated by route — used by /cases/[id]/overview diagnostics
  */
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const result = await db.execute(sql`
@@ -29,9 +30,19 @@ export const GET: RequestHandler = async ({ locals }) => {
 			total += count;
 		}
 
-		return json({ total, byRoute });
+		const responseData = { total, byRoute };
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
+		});
 	} catch {
 		// Table may not exist yet — return empty
-		return json({ total: 0, byRoute: {} });
+		const fallbackData = { total: 0, byRoute: {} };
+		return json(fallbackData, {
+			headers: cacheControl.short
+		});
 	}
 };

@@ -11,6 +11,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
@@ -28,7 +29,7 @@ function getMemoryStats() {
 	return { totalSize, expired, active: totalSize - expired };
 }
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const action = url.searchParams.get('action');
   const key = url.searchParams.get('key');
@@ -47,13 +48,20 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       /* Redis unavailable */
     }
 
-    return json({
+    const responseData = {
       success: true,
       stats: {
         memory: { items: mem.active, expired: mem.expired, total: mem.totalSize },
         redis: { keys: redisKeys, memoryUsed: redisMemory },
         combined: { totalItems: mem.active + redisKeys },
       },
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.short, ETag: etag }
     });
   }
 
@@ -67,13 +75,20 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       /* Redis down */
     }
 
-    return json({
+    const responseData = {
       success: true,
       health: {
         memory: { status: 'healthy', items: getMemoryStats().active },
         redis: { status: redisHealthy ? 'healthy' : 'unavailable' },
         overall: redisHealthy ? 'healthy' : 'degraded',
       },
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.short, ETag: etag }
     });
   }
 
@@ -81,23 +96,39 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     // Try memory first
     const memEntry = memoryCache.get(key);
     if (memEntry && memEntry.expires > Date.now()) {
-      return json({ success: true, cached: true, value: memEntry.value, source: 'memory' });
+      const responseData = { success: true, cached: true, value: memEntry.value, source: 'memory' };
+      const { etag, isMatch } = checkETag(responseData, request.headers);
+      if (isMatch) return notModified(etag);
+      return json(responseData, {
+        headers: { ...cacheControl.short, ETag: etag }
+      });
     }
     // Try Redis
     try {
       const redis: Redis = getRedis();
       const result = await redis.get(key);
       if (result) {
+        let responseData;
         try {
-          return json({ success: true, cached: true, value: JSON.parse(result), source: 'redis' });
+          responseData = { success: true, cached: true, value: JSON.parse(result), source: 'redis' };
         } catch {
-          return json({ success: true, cached: true, value: result, source: 'redis' });
+          responseData = { success: true, cached: true, value: result, source: 'redis' };
         }
+        const { etag, isMatch } = checkETag(responseData, request.headers);
+        if (isMatch) return notModified(etag);
+        return json(responseData, {
+          headers: { ...cacheControl.short, ETag: etag }
+        });
       }
     } catch {
       /* Redis unavailable */
     }
-    return json({ success: true, cached: false });
+    const responseData = { success: true, cached: false };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, {
+      headers: { ...cacheControl.short, ETag: etag }
+    });
   }
 
   return json({ success: false, error: 'Missing action or key parameter' }, { status: 400 });

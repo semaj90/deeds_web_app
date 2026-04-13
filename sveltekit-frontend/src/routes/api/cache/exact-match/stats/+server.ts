@@ -7,8 +7,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getExactMatchStats } from '$lib/server/cache/redis-exact-match.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	// Optional: require auth for cache stats
 	// if (!locals.user?.id) {
 	// 	return json({ error: 'Unauthorized' }, { status: 401 });
@@ -20,7 +21,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		const memoryMB = (stats.memoryUsedBytes / (1024 * 1024)).toFixed(2);
 		const avgTtlMinutes = Math.round(stats.avgTtlSeconds / 60);
 
-		return json({
+		const responseData = {
 			success: true,
 			stats: {
 				totalKeys: stats.totalKeys,
@@ -30,10 +31,17 @@ export const GET: RequestHandler = async ({ locals }) => {
 				rawTtlSeconds: stats.avgTtlSeconds,
 			},
 			timestamp: new Date().toISOString(),
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[/api/cache/exact-match/stats] Error:', err);
-		return json({
+		const fallbackData = {
 			success: false,
 			error: 'Failed to retrieve cache stats',
 			stats: {
@@ -43,6 +51,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 				rawBytes: 0,
 				rawTtlSeconds: 0,
 			},
+		};
+		return json(fallbackData, {
+			headers: cacheControl.short
 		});
 	}
 };

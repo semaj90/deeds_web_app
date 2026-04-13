@@ -11,6 +11,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
@@ -29,7 +30,7 @@ async function scanCount(redis: Redis, pattern: string): Promise<number> {
 	return count;
 }
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const redis: Redis = getRedis();
@@ -88,7 +89,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			recommendations: []
 		};
 
-		return json({
+		const responseData = {
 			success: true,
 			data: {
 				redis: {
@@ -116,10 +117,17 @@ export const GET: RequestHandler = async ({ locals }) => {
 				},
 				metrics: metricsInsights
 			}
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[CacheStats] Error:', err);
-		return json({
+		const fallbackData = {
       success: false,
       message: 'Cache backends unavailable; showing fallback stats',
       error: 'Failed to fetch cache statistics',
@@ -172,6 +180,9 @@ export const GET: RequestHandler = async ({ locals }) => {
           recommendations: [],
         },
       },
-    });
+    };
+		return json(fallbackData, {
+			headers: cacheControl.short
+		});
 	}
 };

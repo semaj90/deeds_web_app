@@ -1,156 +1,91 @@
 /**
- * Codebase Semantic Search API
- * Endpoint: GET /api/codebase-index/search
- * Purpose: Semantic search across codebase index
+ * Semantic Codebase Search API
+ * Endpoint: POST /api/codebase-index/search
+ * Purpose: Vector search across codebase with KAG context
  */
-import { getCodebaseIndexUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
-import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { getQdrantUrl, getOllamaBaseUrl } from '$lib/config/env.server.js';
 
-const querySchema = z.object({
-  q: z.string().max(500).default(''),
-  limit: z.coerce.number().int().min(1).max(50).default(10),
-  types: z.string().max(200).optional()
-});
+const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = getOllamaBaseUrl();
+const COLLECTION = 'codebase_chunks_768';
 
 interface SearchResult {
-  id: string;
-  filePath: string;
-  label: string;
-  type: string;
-  score: number;
-  errorCount: number;
-  snippet?: string;
+	id: string;
+	score: number;
+	payload: {
+		file_path: string;
+		file_name: string;
+		extension: string;
+		content: string;
+		chunk_index: number;
+		total_chunks: number;
+		domain?: string;
+		complexity?: string;
+		tags?: string[];
+	};
 }
 
-export const GET: RequestHandler = async ({ url, fetch, locals }) => {
-  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-  const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
-  if (!parsed.success) {
-    return json({ results: [], query: '', error: parsed.error.issues[0]?.message }, { status: 400 });
-  }
-  const { q: query, limit, types: typesStr } = parsed.data;
-  const types = typesStr?.split(',').filter(Boolean) ?? [];
+export const POST: RequestHandler = async ({ request, fetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!query.trim()) {
-    return json({ results: [], query: '' });
-  }
+	try {
+		const { query, limit = 10, vector = 'content' } = await request.json();
 
-  try {
-    // Try to fetch from FastAPI backend
-    const backendUrl = getCodebaseIndexUrl();
+		if (!query) {
+			return json({ error: 'Query is required' }, { status: 400 });
+		}
 
-    try {
-      const searchParams = new URLSearchParams({
-        q: query,
-        limit: limit.toString()
-      });
-      if (types.length > 0) {
-        searchParams.set('types', types.join(','));
-      }
+		// Generate embedding
+		const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'embeddinggemma:latest',
+				input: query
+			}),
+			signal: AbortSignal.timeout(10_000)
+		});
 
-      const response = await fetch(`${backendUrl}/api/codebase/search?${searchParams}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        signal: AbortSignal.timeout(5000)
-      });
+		if (!embedRes.ok) {
+			return json({ error: 'Failed to generate embedding' }, { status: 500 });
+		}
 
-      if (response.ok) {
-        const data = await response.json();
-        return json(data);
-      }
-    } catch (backendError) {
-      console.warn('FastAPI search service not available, using mock data:', backendError);
-    }
+		const embedData = await embedRes.json();
+		const embedding = embedData.embeddings[0];
 
-    // Mock search results for development
-    const mockResults: SearchResult[] = [
-      {
-        id: 'route-home',
-        filePath: 'src/routes/+page.svelte',
-        label: '+page.svelte',
-        type: 'route',
-        score: 0.95,
-        errorCount: 2,
-        snippet: 'Main landing page component'
-      },
-      {
-        id: 'comp-evidence-board',
-        filePath: 'src/lib/components/evidence/EvidenceBoard.svelte',
-        label: 'EvidenceBoard.svelte',
-        type: 'component',
-        score: 0.88,
-        errorCount: 5,
-        snippet: 'Canvas-based evidence visualization'
-      },
-      {
-        id: 'store-user',
-        filePath: 'src/lib/stores/user.ts',
-        label: 'user.ts',
-        type: 'store',
-        score: 0.82,
-        errorCount: 1,
-        snippet: 'User authentication state management'
-      },
-      {
-        id: 'service-api',
-        filePath: 'src/lib/services/api.ts',
-        label: 'api.ts',
-        type: 'service',
-        score: 0.78,
-        errorCount: 2,
-        snippet: 'API client with fetch wrapper'
-      },
-      {
-        id: 'api-evidence',
-        filePath: 'src/routes/api/evidence/+server.ts',
-        label: 'evidence/+server.ts',
-        type: 'api',
-        score: 0.75,
-        errorCount: 3,
-        snippet: 'Evidence CRUD endpoints'
-      },
-      {
-        id: 'error-ts2307',
-        filePath: 'src/lib/components/Card.svelte',
-        label: 'TS2307: Cannot find module',
-        type: 'error',
-        score: 0.92,
-        errorCount: 1,
-        snippet: "Cannot find module './missing'"
-      }
-    ];
+		// Search Qdrant
+		const searchRes = await fetch(
+			`${QDRANT_URL}/collections/${COLLECTION}/points/query`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query: embedding,
+					using: vector,
+					limit,
+					with_payload: true
+				}),
+				signal: AbortSignal.timeout(10_000)
+			}
+		);
 
-    // Simple fuzzy search
-    const queryLower = query.toLowerCase();
-    const results = mockResults
-      .filter(item => {
-        const matchesQuery =
-          item.label.toLowerCase().includes(queryLower) ||
-          item.filePath.toLowerCase().includes(queryLower) ||
-          (item.snippet?.toLowerCase().includes(queryLower) ?? false);
+		if (!searchRes.ok) {
+			return json({ error: 'Search failed' }, { status: 500 });
+		}
 
-        const matchesType = types.length === 0 || types.includes(item.type);
+		const searchData = await searchRes.json();
+		const results: SearchResult[] = searchData.result.points || [];
 
-        return matchesQuery && matchesType;
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
-
-    return json({
-      results,
-      query,
-      total: results.length
-    });
-  } catch (error) {
-    console.error('Search error:', error);
-    return json({
-      results: [],
-      query,
-      total: 0,
-    });
-  }
+		return json({
+			query,
+			results,
+			total: results.length,
+			vector_used: vector
+		});
+	} catch (error) {
+		console.error('Codebase search error:', error);
+		return json({ error: 'Internal server error' }, { status: 500 });
+	}
 };

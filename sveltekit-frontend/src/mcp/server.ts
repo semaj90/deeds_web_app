@@ -703,6 +703,44 @@ function setupToolHandlers() {
           required: ['steps'],
         },
       },
+      // ─────────────────────────────────────────────────────────────────────
+      // Codebase File Intelligence — Neo4j + CouchDB aggregated view
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'codebase:file_intel',
+        description:
+          'Unified file intelligence: Neo4j AST metadata, IMPORTS graph edges (in+out), GPU cluster assignment, and missing-import recommendations from CouchDB. Use when you need deep context about a specific source file.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path: {
+              type: 'string',
+              description: 'Relative path to the file (e.g. src/lib/server/rag-pipeline.ts)',
+            },
+          },
+          required: ['path'],
+        },
+      },
+      {
+        name: 'codebase:graph_neighbors',
+        description:
+          'Return immediate graph neighbors for a file: files it imports and files that import it. Useful for impact analysis and understanding module coupling.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path: {
+              type: 'string',
+              description: 'Relative file path (e.g. src/lib/server/cache.ts)',
+            },
+            direction: {
+              type: 'string',
+              enum: ['both', 'imports', 'importedBy'],
+              description: 'Edge direction to return (default: both)',
+            },
+          },
+          required: ['path'],
+        },
+      },
     ],
   }));
 
@@ -753,9 +791,17 @@ function setupToolHandlers() {
 
         if (text.length < 50) {
           return {
-            content: [{ type: 'text', text: JSON.stringify({
-              indexed: false, error: 'Page content too short', url, textLength: text.length,
-            }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  indexed: false,
+                  error: 'Page content too short',
+                  url,
+                  textLength: text.length,
+                }),
+              },
+            ],
           };
         }
 
@@ -791,18 +837,20 @@ function setupToolHandlers() {
         // 5. Store in Qdrant knowledge_base collection
         const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
         const collection = 'knowledge_base';
-        const points = chunks.map((chunk, i) => ({
-          id: crypto.randomUUID(),
-          vector: embeddings[i] ?? [],
-          payload: {
-            content: chunk,
-            source: url,
-            chunk_index: i,
-            doc_name: new URL(url).pathname.split('/').pop() || 'web-page',
-            indexed_at: new Date().toISOString(),
-            source_type: 'web',
-          },
-        })).filter(p => p.vector.length > 0);
+        const points = chunks
+          .map((chunk, i) => ({
+            id: crypto.randomUUID(),
+            vector: embeddings[i] ?? [],
+            payload: {
+              content: chunk,
+              source: url,
+              chunk_index: i,
+              doc_name: new URL(url).pathname.split('/').pop() || 'web-page',
+              indexed_at: new Date().toISOString(),
+              source_type: 'web',
+            },
+          }))
+          .filter((p) => p.vector.length > 0);
 
         if (points.length > 0) {
           await fetch(`${QDRANT_URL}/collections/${collection}/points`, {
@@ -814,15 +862,20 @@ function setupToolHandlers() {
 
         const elapsed = Date.now() - startMs;
         return {
-          content: [{ type: 'text', text: JSON.stringify({
-            indexed: true,
-            url,
-            textLength: text.length,
-            chunks: chunks.length,
-            embedded: points.length,
-            collection,
-            processingTimeMs: elapsed,
-          }) }],
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                indexed: true,
+                url,
+                textLength: text.length,
+                chunks: chunks.length,
+                embedded: points.length,
+                collection,
+                processingTimeMs: elapsed,
+              }),
+            },
+          ],
         };
       }
 
@@ -849,15 +902,20 @@ function setupToolHandlers() {
             const htmlContent = await page.content();
             await browser.close();
             return {
-              content: [{ type: 'text', text: JSON.stringify({
-                success: true,
-                action,
-                url: targetUrl,
-                title,
-                contentLength: htmlContent.length,
-                screenshotSize: screenshot.length,
-                timestamp: new Date().toISOString(),
-              }) }],
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    success: true,
+                    action,
+                    url: targetUrl,
+                    title,
+                    contentLength: htmlContent.length,
+                    screenshotSize: screenshot.length,
+                    timestamp: new Date().toISOString(),
+                  }),
+                },
+              ],
             };
           } catch (err: any) {
             await browser.close();
@@ -865,673 +923,847 @@ function setupToolHandlers() {
           }
         }
         return {
-          content: [{ type: 'text', text: JSON.stringify({
-            success: false,
-            error: `Action '${action}' requires a url parameter`,
-          }) }],
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                error: `Action '${action}' requires a url parameter`,
+              }),
+            },
+          ],
           isError: true,
         };
       }
 
-        case 'transcribe_audio': {
-          const { evidenceId, audioUrl } = args as { evidenceId: string; audioUrl: string };
-          const { transcribeAudio, isDoclingAvailable } = await import('../lib/server/docling.js');
+      case 'transcribe_audio': {
+        const { evidenceId, audioUrl } = args as { evidenceId: string; audioUrl: string };
+        const { transcribeAudio, isDoclingAvailable } = await import('../lib/server/docling.js');
 
-          if (!(await isDoclingAvailable())) {
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify({
-                    error: 'Docling ASR unavailable — python/docling_analyze.py not found',
-                    evidenceId,
-                  }),
-                },
-              ],
-              isError: true,
-            };
-          }
-
-          // Fetch audio from MinIO
-          const audioBuffer = await mcpGetFile(audioUrl);
-
-          // Detect MIME from extension
-          const ext = audioUrl.split('.').pop()?.toLowerCase() || '';
-          const mimeMap: Record<string, string> = {
-            mp3: 'audio/mpeg',
-            wav: 'audio/wav',
-            m4a: 'audio/mp4',
-            ogg: 'audio/ogg',
-            flac: 'audio/flac',
-          };
-          const mimeType = mimeMap[ext] || 'audio/wav';
-
-          const result = await transcribeAudio(audioBuffer, mimeType);
-          const wordCount = result.fullText.split(/\s+/).filter(Boolean).length;
-
+        if (!(await isDoclingAvailable())) {
           return {
             content: [
               {
                 type: 'text',
                 text: JSON.stringify({
+                  error: 'Docling ASR unavailable — python/docling_analyze.py not found',
                   evidenceId,
-                  transcript: result.fullText,
-                  wordCount,
-                  blocks: result.blocks,
-                  processingTimeMs: result.processingTimeMs,
                 }),
               },
             ],
+            isError: true,
           };
         }
 
-        case 'evidence:analyze': {
-          const { evidenceId, text, evidenceType } = args as {
-            evidenceId: string;
-            text: string;
-            evidenceType?: string;
-          };
-          const { extractEntities } = await import('../lib/server/analysis/entity-extraction.js');
-          const { detectForensicPatterns } = await import('../lib/server/analysis/forensics.js');
-          const { autoTagDocument } = await import('../lib/server/ace/auto-tagger.js');
+        // Fetch audio from MinIO
+        const audioBuffer = await mcpGetFile(audioUrl);
 
-          const [entities, forensics, tags] = await Promise.all([
-            extractEntities(text.slice(0, 50_000)).catch(() => []),
-            Promise.resolve(detectForensicPatterns(text.slice(0, 50_000))),
-            autoTagDocument({
-              documentId: evidenceId,
-              text: text.slice(0, 15_000),
-              maxTags: 20,
-            }).catch(() => ({ tags: [], mirrored: 0 })),
-          ]);
+        // Detect MIME from extension
+        const ext = audioUrl.split('.').pop()?.toLowerCase() || '';
+        const mimeMap: Record<string, string> = {
+          mp3: 'audio/mpeg',
+          wav: 'audio/wav',
+          m4a: 'audio/mp4',
+          ogg: 'audio/ogg',
+          flac: 'audio/flac',
+        };
+        const mimeType = mimeMap[ext] || 'audio/wav';
 
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify({
-                  evidenceId,
-                  entities: entities.length,
-                  forensicFlags: forensics.length,
-                  highSeverityFlags: forensics.filter((f: any) => f.severity === 'high').length,
-                  tags: (tags as any).tags?.length ?? 0,
-                  tagsMirrored: (tags as any).mirrored ?? 0,
-                }),
-              },
-            ],
-          };
-        }
+        const result = await transcribeAudio(audioBuffer, mimeType);
+        const wordCount = result.fullText.split(/\s+/).filter(Boolean).length;
 
-        case 'evidence:analyze_multimodal': {
-          const {
-            evidenceId,
-            fileUrl,
-            evidenceType,
-            analyzeVision,
-            analyzeAudio,
-            extractEmbeddings,
-          } = args as any;
-          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
-
-          // Fetch file from MinIO
-          const fileBuffer = await mcpGetFile(fileUrl);
-
-          // Call FastAPI multimodal endpoint
-          const FormData = (await import('form-data')).default;
-          const formData = new FormData();
-          formData.append('file', fileBuffer, { filename: fileUrl.split('/').pop() || 'evidence' });
-
-          const url = new URL(`${FASTAPI_URL}/multimodal/analyze`);
-          url.searchParams.set('evidence_id', evidenceId);
-          url.searchParams.set('evidence_type', evidenceType);
-          url.searchParams.set('analyze_vision', String(analyzeVision ?? true));
-          url.searchParams.set('analyze_audio', String(analyzeAudio ?? true));
-          url.searchParams.set('extract_embeddings', String(extractEmbeddings ?? true));
-
-          const response = await fetch(url.toString(), {
-            method: 'POST',
-            body: formData as any,
-            headers: formData.getHeaders(),
-          });
-
-          if (!response.ok) {
-            throw new Error(
-              `Multimodal analysis failed: ${response.status} ${await response.text()}`
-            );
-          }
-
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'evidence:detect_objects': {
-          const { evidenceId, imageUrl, confidenceThreshold } = args as any;
-          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
-
-          // Fetch image from MinIO
-          const imageBuffer = await mcpGetFile(imageUrl);
-
-          // Call FastAPI vision endpoint
-          const FormData = (await import('form-data')).default;
-          const formData = new FormData();
-          formData.append('file', imageBuffer, { filename: imageUrl.split('/').pop() || 'image' });
-
-          const url = new URL(`${FASTAPI_URL}/vision/analyze`);
-          url.searchParams.set('evidence_id', evidenceId);
-          url.searchParams.set('confidence_threshold', String(confidenceThreshold ?? 0.5));
-
-          const response = await fetch(url.toString(), {
-            method: 'POST',
-            body: formData as any,
-            headers: formData.getHeaders(),
-          });
-
-          if (!response.ok) {
-            throw new Error(`Object detection failed: ${response.status} ${await response.text()}`);
-          }
-
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'evidence:transcribe_gpu': {
-          const { evidenceId, audioUrl, language, wordTimestamps } = args as any;
-          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
-
-          // Fetch audio from MinIO
-          const audioBuffer = await mcpGetFile(audioUrl);
-
-          // Call FastAPI audio endpoint
-          const FormData = (await import('form-data')).default;
-          const formData = new FormData();
-          formData.append('file', audioBuffer, { filename: audioUrl.split('/').pop() || 'audio' });
-
-          const url = new URL(`${FASTAPI_URL}/audio/transcribe`);
-          url.searchParams.set('evidence_id', evidenceId);
-          if (language) url.searchParams.set('language', language);
-          url.searchParams.set('word_timestamps', String(wordTimestamps ?? false));
-
-          const response = await fetch(url.toString(), {
-            method: 'POST',
-            body: formData as any,
-            headers: formData.getHeaders(),
-          });
-
-          if (!response.ok) {
-            throw new Error(
-              `GPU transcription failed: ${response.status} ${await response.text()}`
-            );
-          }
-
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'evidence:search_similar': {
-          const { query, modalities, topK } = args as any;
-          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
-
-          const url = new URL(`${FASTAPI_URL}/multimodal/search`);
-          url.searchParams.set('query', query);
-          url.searchParams.set('top_k', String(topK ?? 10));
-          if (modalities) {
-            for (const modality of modalities) {
-              url.searchParams.append('modalities', modality);
-            }
-          }
-
-          const response = await fetch(url.toString(), { method: 'POST' });
-
-          if (!response.ok) {
-            throw new Error(
-              `Cross-modal search failed: ${response.status} ${await response.text()}`
-            );
-          }
-
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'reports:list': {
-          const result = await mcpTools.reports.listReports(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'reports:create': {
-          const result = await mcpTools.reports.createReport(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'reports:generate_from_template': {
-          const result = await mcpTools.reports.generateFromTemplate(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'reports:update': {
-          const result = await mcpTools.reports.updateReport(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'reports:delete': {
-          const { reportId } = args as { reportId: string };
-          const result = await mcpTools.reports.deleteReport(reportId);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'reports:export': {
-          const result = await mcpTools.reports.exportReport(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'cases:create': {
-          const result = await mcpTools.cases.createCase(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'cases:update': {
-          const { caseId, ...updates } = args as { caseId: string; [k: string]: any };
-          const result = await mcpTools.cases.updateCase(caseId, updates);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'cases:delete': {
-          const { caseId } = args as { caseId: string };
-          const result = await mcpTools.cases.deleteCase(caseId);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'citations:search': {
-          const result = await mcpTools.citations.searchCitations(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'citations:list_by_case': {
-          const { caseId } = args as { caseId: string };
-          const result = await mcpTools.citations.listByCaseId(caseId);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        case 'citations:add_to_case': {
-          const result = await mcpTools.citations.addToCase(args as any);
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-        }
-
-        // ─────────────────────────────────────────────────────────────────────
-        // GPU Direct — bypass HTTP for hot-path operations
-        // ─────────────────────────────────────────────────────────────────────
-        case 'embedding:generate': {
-          const { texts } = args as { texts: string[] };
-          if (!Array.isArray(texts) || texts.length === 0) {
-            throw new Error('texts must be a non-empty array');
-          }
-          const capped = texts.slice(0, 32).map((t) => t.slice(0, 2048));
-          const { generateEmbeddings } = await import('../lib/server/grpc/embedding-client.js');
-          const embeddings = await generateEmbeddings(capped);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify({
-                  count: embeddings.vectors.length,
-                  dimensions: embeddings.vectors[0]?.length ?? 0,
-                  embeddings: embeddings.vectors,
-                }),
-              },
-            ],
-          };
-        }
-
-        case 'gpu:similarity': {
-          const { embeddings } = args as { embeddings: number[][] };
-          if (!Array.isArray(embeddings) || embeddings.length < 2) {
-            throw new Error('embeddings must contain at least 2 vectors');
-          }
-          try {
-            const { graphSimilarity } = await import('../lib/server/gpu/libtorch-bridge.js');
-            const matrix = await graphSimilarity(embeddings);
-            return {
-              content: [{ type: 'text', text: JSON.stringify({
-                size: embeddings.length,
-                backend: 'libtorch-cuda',
-                matrix,
-              }) }],
-            };
-          } catch {
-            // CPU fallback: manual cosine similarity
-            const dot = (a: number[], b: number[]) => a.reduce((s, v, i) => s + v * b[i], 0);
-            const norm = (a: number[]) => Math.sqrt(dot(a, a));
-            const matrix = embeddings.map((a) =>
-              embeddings.map((b) => {
-                const d = norm(a) * norm(b);
-                return d > 0 ? Math.round((dot(a, b) / d) * 1000) / 1000 : 0;
-              })
-            );
-            return {
-              content: [{ type: 'text', text: JSON.stringify({
-                size: embeddings.length,
-                backend: 'cpu-fallback',
-                matrix,
-              }) }],
-            };
-          }
-        }
-
-        case 'inference:route': {
-          const { prompt, model, maxTokens, temperature, stream } = args as {
-            prompt: string; model?: string; maxTokens?: number; temperature?: number; stream?: boolean;
-          };
-          try {
-            const { routeInference } = await import('../lib/server/inference/inference-router.js');
-            const result = await routeInference({
-              prompt,
-              model: model ?? 'gemma4-legal:latest',
-              maxTokens: maxTokens ?? 2048,
-              temperature: temperature ?? 0.3,
-              stream: stream ?? false,
-            });
-            return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-          } catch {
-            // Direct Ollama fallback
-            const { ollamaFetch } = await import('../lib/server/ollama.js');
-            const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
-            const res = await ollamaFetch(`${ollamaUrl}/api/generate`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                model: model ?? 'gemma4-legal:latest',
-                prompt,
-                stream: false,
-                options: { num_predict: maxTokens ?? 2048, temperature: temperature ?? 0.3 },
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                evidenceId,
+                transcript: result.fullText,
+                wordCount,
+                blocks: result.blocks,
+                processingTimeMs: result.processingTimeMs,
               }),
-            });
-            const data = await res.json();
-            return {
-              content: [{ type: 'text', text: JSON.stringify({
-                response: data.response ?? '',
-                model: data.model,
-                backend: 'ollama-direct-fallback',
-                evalCount: data.eval_count,
-              }) }],
-            };
+            },
+          ],
+        };
+      }
+
+      case 'evidence:analyze': {
+        const { evidenceId, text, evidenceType } = args as {
+          evidenceId: string;
+          text: string;
+          evidenceType?: string;
+        };
+        const { extractEntities } = await import('../lib/server/analysis/entity-extraction.js');
+        const { detectForensicPatterns } = await import('../lib/server/analysis/forensics.js');
+        const { autoTagDocument } = await import('../lib/server/ace/auto-tagger.js');
+
+        const [entities, forensics, tags] = await Promise.all([
+          extractEntities(text.slice(0, 50_000)).catch(() => []),
+          Promise.resolve(detectForensicPatterns(text.slice(0, 50_000))),
+          autoTagDocument({
+            documentId: evidenceId,
+            text: text.slice(0, 15_000),
+            maxTags: 20,
+          }).catch(() => ({ tags: [], mirrored: 0 })),
+        ]);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                evidenceId,
+                entities: entities.length,
+                forensicFlags: forensics.length,
+                highSeverityFlags: forensics.filter((f: any) => f.severity === 'high').length,
+                tags: (tags as any).tags?.length ?? 0,
+                tagsMirrored: (tags as any).mirrored ?? 0,
+              }),
+            },
+          ],
+        };
+      }
+
+      case 'evidence:analyze_multimodal': {
+        const {
+          evidenceId,
+          fileUrl,
+          evidenceType,
+          analyzeVision,
+          analyzeAudio,
+          extractEmbeddings,
+        } = args as any;
+        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+        // Fetch file from MinIO
+        const fileBuffer = await mcpGetFile(fileUrl);
+
+        // Call FastAPI multimodal endpoint
+        const FormData = (await import('form-data')).default;
+        const formData = new FormData();
+        formData.append('file', fileBuffer, { filename: fileUrl.split('/').pop() || 'evidence' });
+
+        const url = new URL(`${FASTAPI_URL}/multimodal/analyze`);
+        url.searchParams.set('evidence_id', evidenceId);
+        url.searchParams.set('evidence_type', evidenceType);
+        url.searchParams.set('analyze_vision', String(analyzeVision ?? true));
+        url.searchParams.set('analyze_audio', String(analyzeAudio ?? true));
+        url.searchParams.set('extract_embeddings', String(extractEmbeddings ?? true));
+
+        const response = await fetch(url.toString(), {
+          method: 'POST',
+          body: formData as any,
+          headers: formData.getHeaders(),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Multimodal analysis failed: ${response.status} ${await response.text()}`
+          );
+        }
+
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'evidence:detect_objects': {
+        const { evidenceId, imageUrl, confidenceThreshold } = args as any;
+        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+        // Fetch image from MinIO
+        const imageBuffer = await mcpGetFile(imageUrl);
+
+        // Call FastAPI vision endpoint
+        const FormData = (await import('form-data')).default;
+        const formData = new FormData();
+        formData.append('file', imageBuffer, { filename: imageUrl.split('/').pop() || 'image' });
+
+        const url = new URL(`${FASTAPI_URL}/vision/analyze`);
+        url.searchParams.set('evidence_id', evidenceId);
+        url.searchParams.set('confidence_threshold', String(confidenceThreshold ?? 0.5));
+
+        const response = await fetch(url.toString(), {
+          method: 'POST',
+          body: formData as any,
+          headers: formData.getHeaders(),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Object detection failed: ${response.status} ${await response.text()}`);
+        }
+
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'evidence:transcribe_gpu': {
+        const { evidenceId, audioUrl, language, wordTimestamps } = args as any;
+        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+        // Fetch audio from MinIO
+        const audioBuffer = await mcpGetFile(audioUrl);
+
+        // Call FastAPI audio endpoint
+        const FormData = (await import('form-data')).default;
+        const formData = new FormData();
+        formData.append('file', audioBuffer, { filename: audioUrl.split('/').pop() || 'audio' });
+
+        const url = new URL(`${FASTAPI_URL}/audio/transcribe`);
+        url.searchParams.set('evidence_id', evidenceId);
+        if (language) url.searchParams.set('language', language);
+        url.searchParams.set('word_timestamps', String(wordTimestamps ?? false));
+
+        const response = await fetch(url.toString(), {
+          method: 'POST',
+          body: formData as any,
+          headers: formData.getHeaders(),
+        });
+
+        if (!response.ok) {
+          throw new Error(`GPU transcription failed: ${response.status} ${await response.text()}`);
+        }
+
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'evidence:search_similar': {
+        const { query, modalities, topK } = args as any;
+        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+        const url = new URL(`${FASTAPI_URL}/multimodal/search`);
+        url.searchParams.set('query', query);
+        url.searchParams.set('top_k', String(topK ?? 10));
+        if (modalities) {
+          for (const modality of modalities) {
+            url.searchParams.append('modalities', modality);
           }
         }
 
-        // ─────────────────────────────────────────────────────────────────────
-        // Codebase Search — Dual-vector semantic search via Qdrant
-        // ─────────────────────────────────────────────────────────────────────
-        case 'codebase:search': {
-          const { query, limit, contentWeight, signatureWeight } = args as {
-            query: string;
-            limit?: number;
-            contentWeight?: number;
-            signatureWeight?: number;
-          };
-          const { searchCodebase } = await import('../lib/server/indexer/dual-embedder.js');
-          const results = await searchCodebase(query, {
-            limit: Math.min(Math.max(limit ?? 10, 1), 50),
-            contentWeight: contentWeight ?? 0.6,
-            signatureWeight: signatureWeight ?? 0.4,
-          });
+        const response = await fetch(url.toString(), { method: 'POST' });
+
+        if (!response.ok) {
+          throw new Error(`Cross-modal search failed: ${response.status} ${await response.text()}`);
+        }
+
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'reports:list': {
+        const result = await mcpTools.reports.listReports(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'reports:create': {
+        const result = await mcpTools.reports.createReport(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'reports:generate_from_template': {
+        const result = await mcpTools.reports.generateFromTemplate(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'reports:update': {
+        const result = await mcpTools.reports.updateReport(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'reports:delete': {
+        const { reportId } = args as { reportId: string };
+        const result = await mcpTools.reports.deleteReport(reportId);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'reports:export': {
+        const result = await mcpTools.reports.exportReport(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'cases:create': {
+        const result = await mcpTools.cases.createCase(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'cases:update': {
+        const { caseId, ...updates } = args as { caseId: string; [k: string]: any };
+        const result = await mcpTools.cases.updateCase(caseId, updates);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'cases:delete': {
+        const { caseId } = args as { caseId: string };
+        const result = await mcpTools.cases.deleteCase(caseId);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'citations:search': {
+        const result = await mcpTools.citations.searchCitations(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'citations:list_by_case': {
+        const { caseId } = args as { caseId: string };
+        const result = await mcpTools.citations.listByCaseId(caseId);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'citations:add_to_case': {
+        const result = await mcpTools.citations.addToCase(args as any);
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // GPU Direct — bypass HTTP for hot-path operations
+      // ─────────────────────────────────────────────────────────────────────
+      case 'embedding:generate': {
+        const { texts } = args as { texts: string[] };
+        if (!Array.isArray(texts) || texts.length === 0) {
+          throw new Error('texts must be a non-empty array');
+        }
+        const capped = texts.slice(0, 32).map((t) => t.slice(0, 2048));
+        const { generateEmbeddings } = await import('../lib/server/grpc/embedding-client.js');
+        const embeddings = await generateEmbeddings(capped);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                count: embeddings.vectors.length,
+                dimensions: embeddings.vectors[0]?.length ?? 0,
+                embeddings: embeddings.vectors,
+              }),
+            },
+          ],
+        };
+      }
+
+      case 'gpu:similarity': {
+        const { embeddings } = args as { embeddings: number[][] };
+        if (!Array.isArray(embeddings) || embeddings.length < 2) {
+          throw new Error('embeddings must contain at least 2 vectors');
+        }
+        try {
+          const { graphSimilarity } = await import('../lib/server/gpu/libtorch-bridge.js');
+          const matrix = await graphSimilarity(embeddings);
           return {
             content: [
               {
                 type: 'text',
                 text: JSON.stringify({
-                  query,
-                  total: results.length,
-                  results: results.map((r) => ({
-                    path: r.chunk.path,
-                    lineStart: r.chunk.lineStart,
-                    lineEnd: r.chunk.lineEnd,
-                    kind: r.chunk.kind,
-                    score: Math.round(r.score * 1000) / 1000,
-                    content: r.chunk.content?.slice(0, 500),
-                    httpMethod: r.chunk.httpMethod,
-                    routeId: r.chunk.routeId,
-                    tags: r.chunk.tags,
-                  })),
+                  size: embeddings.length,
+                  backend: 'libtorch-cuda',
+                  matrix,
+                }),
+              },
+            ],
+          };
+        } catch {
+          // CPU fallback: manual cosine similarity
+          const dot = (a: number[], b: number[]) => a.reduce((s, v, i) => s + v * b[i], 0);
+          const norm = (a: number[]) => Math.sqrt(dot(a, a));
+          const matrix = embeddings.map((a) =>
+            embeddings.map((b) => {
+              const d = norm(a) * norm(b);
+              return d > 0 ? Math.round((dot(a, b) / d) * 1000) / 1000 : 0;
+            })
+          );
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  size: embeddings.length,
+                  backend: 'cpu-fallback',
+                  matrix,
                 }),
               },
             ],
           };
         }
+      }
 
-        case 'codebase:ace_context': {
-          const { query: aceQuery, caseId: aceCaseId, enableCodebaseContext, persona: acePersona, maxTokens: aceMaxTokens } = args as {
-            query: string;
-            caseId?: string;
-            enableCodebaseContext?: boolean;
-            persona?: string;
-            maxTokens?: number;
-          };
-          const { assembleACEContext, buildACEPromptCached } = await import('../lib/server/ace/context-assembler.js');
+      case 'inference:route': {
+        const { prompt, model, maxTokens, temperature, stream } = args as {
+          prompt: string;
+          model?: string;
+          maxTokens?: number;
+          temperature?: number;
+          stream?: boolean;
+        };
+        try {
+          const { routeInference } = await import('../lib/server/inference/inference-router.js');
+          const result = await routeInference({
+            prompt,
+            model: model ?? 'gemma4-legal:latest',
+            maxTokens: maxTokens ?? 2048,
+            temperature: temperature ?? 0.3,
+            stream: stream ?? false,
+          });
+          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+        } catch {
+          // Direct Ollama fallback
           const { ollamaFetch } = await import('../lib/server/ollama.js');
-
-          const context = await assembleACEContext({
-            query: aceQuery,
-            caseId: aceCaseId,
-            enableCodebaseContext: enableCodebaseContext ?? true,
-            enableWebSearch: false,
-            enableWikipedia: true,
-            persona: acePersona as any,
-          });
-          const acePrompt = await buildACEPromptCached(context, aceQuery);
-
-          const ollamaUrl = process.env.OLLAMA_HOST || 'http://127.0.0.1:11434';
-          const llmRes = await ollamaFetch(`${ollamaUrl}/api/generate`, {
+          const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
+          const res = await ollamaFetch(`${ollamaUrl}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: process.env.LLM_MODEL || 'gemma4-legal:latest',
-              prompt: aceQuery,
-              system: acePrompt.systemPrompt,
+              model: model ?? 'gemma4-legal:latest',
+              prompt,
               stream: false,
-              options: { num_predict: aceMaxTokens ?? 2048, temperature: 0.4 },
+              options: { num_predict: maxTokens ?? 2048, temperature: temperature ?? 0.3 },
             }),
           });
-          const llmData = await llmRes.json();
-
+          const data = await res.json();
           return {
             content: [
               {
                 type: 'text',
                 text: JSON.stringify({
-                  query: aceQuery,
-                  answer: llmData.response ?? '',
-                  confidenceFactors: acePrompt.confidenceFactors,
-                  contextSources: {
-                    ragChunks: context.ragChunks.length,
-                    kagNeighbors: context.kagNeighbors.length,
-                    codebaseChunks: context.codebaseContext?.length ?? 0,
-                    hasEvidence: !!context.evidenceMetadata?.length,
-                    hasGlossary: !!context.glossaryMatches?.length,
-                    hasUserProfile: !!context.userProfile,
-                    hasCaseContext: !!context.caseContext,
-                  },
-                  model: llmData.model,
-                  tokensUsed: llmData.prompt_eval_count + (llmData.eval_count ?? 0),
+                  response: data.response ?? '',
+                  model: data.model,
+                  backend: 'ollama-direct-fallback',
+                  evalCount: data.eval_count,
                 }),
               },
             ],
           };
         }
+      }
 
-        // ─────────────────────────────────────────────────────────────────────
-        // LangExtract Handlers — Call Python service on port 8095
-        // ─────────────────────────────────────────────────────────────────────
-        case 'langextract:legal': {
-          const { text, extraction_passes, temperature } = args as {
-            text: string;
-            extraction_passes?: number;
-            temperature?: number;
-          };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+      // ─────────────────────────────────────────────────────────────────────
+      // Codebase Search — Dual-vector semantic search via Qdrant
+      // ─────────────────────────────────────────────────────────────────────
+      case 'codebase:search': {
+        const { query, limit, contentWeight, signatureWeight } = args as {
+          query: string;
+          limit?: number;
+          contentWeight?: number;
+          signatureWeight?: number;
+        };
+        const { searchCodebase } = await import('../lib/server/indexer/dual-embedder.js');
+        const results = await searchCodebase(query, {
+          limit: Math.min(Math.max(limit ?? 10, 1), 50),
+          contentWeight: contentWeight ?? 0.6,
+          signatureWeight: signatureWeight ?? 0.4,
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                query,
+                total: results.length,
+                results: results.map((r) => ({
+                  path: r.chunk.path,
+                  lineStart: r.chunk.lineStart,
+                  lineEnd: r.chunk.lineEnd,
+                  kind: r.chunk.kind,
+                  score: Math.round(r.score * 1000) / 1000,
+                  content: r.chunk.content?.slice(0, 500),
+                  httpMethod: r.chunk.httpMethod,
+                  routeId: r.chunk.routeId,
+                  tags: r.chunk.tags,
+                })),
+              }),
+            },
+          ],
+        };
+      }
 
-          const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: text.slice(0, 50000),
-              extraction_type: 'legal',
-              extraction_passes: extraction_passes ?? 1,
-              temperature: temperature ?? 0.3,
-            }),
-          });
+      case 'codebase:ace_context': {
+        const {
+          query: aceQuery,
+          caseId: aceCaseId,
+          enableCodebaseContext,
+          persona: acePersona,
+          maxTokens: aceMaxTokens,
+        } = args as {
+          query: string;
+          caseId?: string;
+          enableCodebaseContext?: boolean;
+          persona?: string;
+          maxTokens?: number;
+        };
+        const { assembleACEContext, buildACEPromptCached } = await import(
+          '../lib/server/ace/context-assembler.js'
+        );
+        const { ollamaFetch } = await import('../lib/server/ollama.js');
 
-          if (!response.ok) {
-            throw new Error(`LangExtract failed: ${response.status} ${await response.text()}`);
-          }
+        const context = await assembleACEContext({
+          query: aceQuery,
+          caseId: aceCaseId,
+          enableCodebaseContext: enableCodebaseContext ?? true,
+          enableWebSearch: false,
+          enableWikipedia: true,
+          persona: acePersona as any,
+        });
+        const acePrompt = await buildACEPromptCached(context, aceQuery);
 
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+        const ollamaUrl = process.env.OLLAMA_HOST || 'http://127.0.0.1:11434';
+        const llmRes = await ollamaFetch(`${ollamaUrl}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: process.env.LLM_MODEL || 'gemma4-legal:latest',
+            prompt: aceQuery,
+            system: acePrompt.systemPrompt,
+            stream: false,
+            options: { num_predict: aceMaxTokens ?? 2048, temperature: 0.4 },
+          }),
+        });
+        const llmData = await llmRes.json();
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                query: aceQuery,
+                answer: llmData.response ?? '',
+                confidenceFactors: acePrompt.confidenceFactors,
+                contextSources: {
+                  ragChunks: context.ragChunks.length,
+                  kagNeighbors: context.kagNeighbors.length,
+                  codebaseChunks: context.codebaseContext?.length ?? 0,
+                  hasEvidence: !!context.evidenceMetadata?.length,
+                  hasGlossary: !!context.glossaryMatches?.length,
+                  hasUserProfile: !!context.userProfile,
+                  hasCaseContext: !!context.caseContext,
+                },
+                model: llmData.model,
+                tokensUsed: llmData.prompt_eval_count + (llmData.eval_count ?? 0),
+              }),
+            },
+          ],
+        };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // LangExtract Handlers — Call Python service on port 8095
+      // ─────────────────────────────────────────────────────────────────────
+      case 'langextract:legal': {
+        const { text, extraction_passes, temperature } = args as {
+          text: string;
+          extraction_passes?: number;
+          temperature?: number;
+        };
+        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+
+        const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: text.slice(0, 50000),
+            extraction_type: 'legal',
+            extraction_passes: extraction_passes ?? 1,
+            temperature: temperature ?? 0.3,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`LangExtract failed: ${response.status} ${await response.text()}`);
         }
 
-        case 'langextract:evidence': {
-          const { text, extraction_passes, temperature } = args as {
-            text: string;
-            extraction_passes?: number;
-            temperature?: number;
-          };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
 
-          const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: text.slice(0, 50000),
-              extraction_type: 'evidence',
-              extraction_passes: extraction_passes ?? 1,
-              temperature: temperature ?? 0.3,
-            }),
-          });
+      case 'langextract:evidence': {
+        const { text, extraction_passes, temperature } = args as {
+          text: string;
+          extraction_passes?: number;
+          temperature?: number;
+        };
+        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 
-          if (!response.ok) {
-            throw new Error(`LangExtract failed: ${response.status} ${await response.text()}`);
-          }
+        const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: text.slice(0, 50000),
+            extraction_type: 'evidence',
+            extraction_passes: extraction_passes ?? 1,
+            temperature: temperature ?? 0.3,
+          }),
+        });
 
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+        if (!response.ok) {
+          throw new Error(`LangExtract failed: ${response.status} ${await response.text()}`);
         }
 
-        case 'langextract:file': {
-          const { file_path, extraction_type, extraction_passes } = args as {
-            file_path: string;
-            extraction_type?: string;
-            extraction_passes?: number;
-          };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
 
-          const response = await fetch(`${LANGEXTRACT_URL}/extract/file`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              file_path,
-              extraction_type: extraction_type ?? 'legal',
-              extraction_passes: extraction_passes ?? 2,
-            }),
-          });
+      case 'langextract:file': {
+        const { file_path, extraction_type, extraction_passes } = args as {
+          file_path: string;
+          extraction_type?: string;
+          extraction_passes?: number;
+        };
+        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 
-          if (!response.ok) {
-            throw new Error(`LangExtract file failed: ${response.status} ${await response.text()}`);
-          }
+        const response = await fetch(`${LANGEXTRACT_URL}/extract/file`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            file_path,
+            extraction_type: extraction_type ?? 'legal',
+            extraction_passes: extraction_passes ?? 2,
+          }),
+        });
 
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+        if (!response.ok) {
+          throw new Error(`LangExtract file failed: ${response.status} ${await response.text()}`);
         }
 
-        case 'langextract:custom': {
-          const { text, prompt, examples, extraction_passes } = args as {
-            text: string;
-            prompt: string;
-            examples?: any[];
-            extraction_passes?: number;
-          };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
 
-          const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: text.slice(0, 50000),
-              extraction_type: 'custom',
-              custom_prompt: prompt,
-              custom_examples: examples ?? [],
-              extraction_passes: extraction_passes ?? 1,
-            }),
-          });
+      case 'langextract:custom': {
+        const { text, prompt, examples, extraction_passes } = args as {
+          text: string;
+          prompt: string;
+          examples?: any[];
+          extraction_passes?: number;
+        };
+        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 
-          if (!response.ok) {
-            throw new Error(
-              `LangExtract custom failed: ${response.status} ${await response.text()}`
+        const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: text.slice(0, 50000),
+            extraction_type: 'custom',
+            custom_prompt: prompt,
+            custom_examples: examples ?? [],
+            extraction_passes: extraction_passes ?? 1,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`LangExtract custom failed: ${response.status} ${await response.text()}`);
+        }
+
+        const result = await response.json();
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // Compose Pipeline — Chain multiple tools sequentially
+      // ─────────────────────────────────────────────────────────────────────
+      case 'compose:pipeline': {
+        const { steps, stopOnError } = args as {
+          steps: Array<{ tool: string; args: Record<string, any> }>;
+          stopOnError?: boolean;
+        };
+
+        if (!Array.isArray(steps) || steps.length === 0) {
+          throw new Error('Pipeline requires at least one step');
+        }
+        if (steps.length > 10) {
+          throw new Error('Pipeline limited to 10 steps');
+        }
+
+        const results: any[] = [];
+        const pipelineStart = Date.now();
+
+        for (let i = 0; i < steps.length; i++) {
+          const step = steps[i];
+          // Template substitution: replace {{stepN.field}} with actual values
+          let resolvedArgs = JSON.stringify(step.args);
+          for (let j = 0; j < results.length; j++) {
+            const pattern = new RegExp(`\\{\\{step${j}\\.([^}]+)\\}\\}`, 'g');
+            resolvedArgs = resolvedArgs.replace(pattern, (_match, field) => {
+              try {
+                const parsed = typeof results[j] === 'string' ? JSON.parse(results[j]) : results[j];
+                const keys = field.split('.');
+                let val = parsed;
+                for (const k of keys) val = val?.[k];
+                return typeof val === 'string' ? val : JSON.stringify(val ?? null);
+              } catch {
+                return 'null';
+              }
+            });
+          }
+
+          try {
+            const stepResult = await handleToolCall(step.tool, JSON.parse(resolvedArgs));
+            const text = stepResult?.content?.[0]?.text ?? JSON.stringify(stepResult);
+            results.push(text);
+          } catch (err: any) {
+            results.push(JSON.stringify({ error: err.message, step: i, tool: step.tool }));
+            if (stopOnError !== false) break;
+          }
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                pipeline: true,
+                stepsCompleted: results.length,
+                totalSteps: steps.length,
+                processingTimeMs: Date.now() - pipelineStart,
+                results,
+              }),
+            },
+          ],
+        };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // Codebase File Intelligence
+      // ─────────────────────────────────────────────────────────────────────
+      case 'codebase:file_intel': {
+        const { path: filePath } = args as { path: string };
+        if (!filePath) throw new Error('path is required');
+
+        const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
+        const { couchdb: couch } = await import('../lib/services/couchdb-client.js');
+
+        const fileId = (filePath.startsWith('src/') ? filePath : `src/${filePath}`).replace(
+          /[^a-zA-Z0-9/_.-]/g,
+          '_'
+        );
+
+        const driver = getNeo4jDriver();
+        const session = driver.session({ database: 'neo4j' });
+
+        let node: Record<string, unknown> | null = null;
+        let imports: unknown[] = [];
+        let importedBy: unknown[] = [];
+
+        try {
+          const [nr, outr, inr] = await Promise.all([
+            session.run(
+              `MATCH (f:CodebaseFile {id: $id})
+                 RETURN f.id AS id, f.filePath AS filePath, f.type AS type,
+                        f.cluster AS cluster, f.gpuCluster AS gpuCluster,
+                        f.lineCount AS lineCount, f.complexity AS complexity,
+                        f.importCount AS importCount, f.exportCount AS exportCount`,
+              { id: fileId }
+            ),
+            session.run(
+              `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS]->(b:CodebaseFile)
+                 RETURN b.filePath AS filePath, b.type AS type LIMIT 30`,
+              { id: fileId }
+            ),
+            session.run(
+              `MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile {id: $id})
+                 RETURN a.filePath AS filePath, a.type AS type LIMIT 30`,
+              { id: fileId }
+            ),
+          ]);
+          if (nr.records[0]) {
+            node = Object.fromEntries(
+              [
+                'id',
+                'filePath',
+                'type',
+                'cluster',
+                'gpuCluster',
+                'lineCount',
+                'complexity',
+                'importCount',
+                'exportCount',
+              ].map((k) => [k, nr.records[0].get(k)])
             );
           }
-
-          const result = await response.json();
-          return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+          imports = outr.records.map((r) => ({ filePath: r.get('filePath'), type: r.get('type') }));
+          importedBy = inr.records.map((r) => ({
+            filePath: r.get('filePath'),
+            type: r.get('type'),
+          }));
+        } finally {
+          await session.close();
         }
 
-        // ─────────────────────────────────────────────────────────────────────
-        // Compose Pipeline — Chain multiple tools sequentially
-        // ─────────────────────────────────────────────────────────────────────
-        case 'compose:pipeline': {
-          const { steps, stopOnError } = args as {
-            steps: Array<{ tool: string; args: Record<string, any> }>;
-            stopOnError?: boolean;
-          };
+        const recoDoc = await couch
+          .get('graph_recommendations', `graph-reco:file:${fileId}`)
+          .catch(() => null);
 
-          if (!Array.isArray(steps) || steps.length === 0) {
-            throw new Error('Pipeline requires at least one step');
-          }
-          if (steps.length > 10) {
-            throw new Error('Pipeline limited to 10 steps');
-          }
-
-          const results: any[] = [];
-          const pipelineStart = Date.now();
-
-          for (let i = 0; i < steps.length; i++) {
-            const step = steps[i];
-            // Template substitution: replace {{stepN.field}} with actual values
-            let resolvedArgs = JSON.stringify(step.args);
-            for (let j = 0; j < results.length; j++) {
-              const pattern = new RegExp(`\\{\\{step${j}\\.([^}]+)\\}\\}`, 'g');
-              resolvedArgs = resolvedArgs.replace(pattern, (_match, field) => {
-                try {
-                  const parsed = typeof results[j] === 'string' ? JSON.parse(results[j]) : results[j];
-                  const keys = field.split('.');
-                  let val = parsed;
-                  for (const k of keys) val = val?.[k];
-                  return typeof val === 'string' ? val : JSON.stringify(val ?? null);
-                } catch {
-                  return 'null';
-                }
-              });
-            }
-
-            try {
-              const stepResult = await handleToolCall(step.tool, JSON.parse(resolvedArgs));
-              const text = stepResult?.content?.[0]?.text ?? JSON.stringify(stepResult);
-              results.push(text);
-            } catch (err: any) {
-              results.push(JSON.stringify({ error: err.message, step: i, tool: step.tool }));
-              if (stopOnError !== false) break;
-            }
-          }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({
-              pipeline: true,
-              stepsCompleted: results.length,
-              totalSteps: steps.length,
-              processingTimeMs: Date.now() - pipelineStart,
-              results,
-            }) }],
-          };
-        }
-
-        default:
-          throw new Error(`Unknown tool: ${name}`);
+        const result = {
+          fileId,
+          filePath,
+          node,
+          graph: { imports, importedBy },
+          recommendations: recoDoc,
+        };
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
+
+      case 'codebase:graph_neighbors': {
+        const { path: filePath, direction = 'both' } = args as { path: string; direction?: string };
+        if (!filePath) throw new Error('path is required');
+
+        const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
+        const fileId = (filePath.startsWith('src/') ? filePath : `src/${filePath}`).replace(
+          /[^a-zA-Z0-9/_.-]/g,
+          '_'
+        );
+
+        const driver = getNeo4jDriver();
+        const session = driver.session({ database: 'neo4j' });
+
+        let imports: unknown[] = [];
+        let importedBy: unknown[] = [];
+
+        try {
+          if (direction === 'both' || direction === 'imports') {
+            const r = await session.run(
+              `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS]->(b:CodebaseFile)
+                 RETURN b.filePath AS filePath, b.type AS type, b.cluster AS cluster LIMIT 50`,
+              { id: fileId }
+            );
+            imports = r.records.map((rec) => ({
+              filePath: rec.get('filePath'),
+              type: rec.get('type'),
+              cluster: rec.get('cluster'),
+            }));
+          }
+          if (direction === 'both' || direction === 'importedBy') {
+            const r = await session.run(
+              `MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile {id: $id})
+                 RETURN a.filePath AS filePath, a.type AS type, a.cluster AS cluster LIMIT 50`,
+              { id: fileId }
+            );
+            importedBy = r.records.map((rec) => ({
+              filePath: rec.get('filePath'),
+              type: rec.get('type'),
+              cluster: rec.get('cluster'),
+            }));
+          }
+        } finally {
+          await session.close();
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                fileId,
+                filePath,
+                direction,
+                imports,
+                importedBy,
+                summary: { importCount: imports.length, importedByCount: importedBy.length },
+              }),
+            },
+          ],
+        };
+      }
+
+      default:
+        throw new Error(`Unknown tool: ${name}`);
+    }
   }
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {

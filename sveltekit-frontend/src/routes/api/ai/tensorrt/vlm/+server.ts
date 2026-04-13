@@ -16,6 +16,7 @@ import { getOllamaUrl } from '$lib/config/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 const vlmJsonSchema = z.object({
   prompt: z.string().max(50000).optional().default(''),
@@ -161,7 +162,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         signal: AbortSignal.timeout(120000),
       });
       if (ollamaRes.ok) {
-        const ollamaData = await ollamaRes.json();
+        const rawText = await ollamaRes.text();
+        const ollamaData = fastJsonParse<{ message?: { content?: string } }>(rawText);
         return json({
           text: ollamaData.message?.content ?? '',
           model: `${vlmModel} (ollama fallback)`,
@@ -250,7 +252,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       );
     }
 
-    const result = await res.json();
+    const rawText = await res.text();
+    const result = fastJsonParse<{
+      outputs?: Array<{ name?: string; datatype?: string; data?: unknown }>;
+    }>(rawText);
 
     // Extract generated text from Triton v2 inference response
     // TRT-LLM backends return text in an output named 'text_output' (BYTES datatype)

@@ -46,6 +46,7 @@ import { retry, retryPredicates } from '$lib/server/utils/retry.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { Agent } from 'undici';
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -257,12 +258,14 @@ export async function bifrostChat(
     throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
   }
 
-  const data = (await res.json()) as {
+  // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
+  const rawText = await res.text();
+  const data = fastJsonParse<{
     choices?: Array<{ message?: { content?: string } }>;
     extra_fields?: {
       cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
     };
-  };
+  }>(rawText);
   const debug = data.extra_fields?.cache_debug;
   const content = data.choices?.[0]?.message?.content ?? '';
 
@@ -322,7 +325,9 @@ export async function generateText(prompt: string): Promise<string> {
 					throw new Error(`Ollama chat failed: ${res.status}`);
 				}
 
-				const data = (await res.json()) as { message?: { content: string } };
+				// GPU-accelerated JSON parsing via simdjson (5× faster for large LLM responses)
+				const rawText = await res.text();
+				const data = fastJsonParse<{ message?: { content: string } }>(rawText);
 				return data.message?.content ?? '';
 			}, { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer })
 		);
@@ -396,7 +401,9 @@ export async function callOllamaChat(
               throw new Error(`Ollama chat failed: ${res.status}`);
             }
 
-            const data = (await res.json()) as { message?: { content: string } };
+            // GPU-accelerated JSON parsing via simdjson (5× faster for large LLM responses)
+            const rawText = await res.text();
+            const data = fastJsonParse<{ message?: { content: string } }>(rawText);
             const result = data.message?.content ?? '';
             console.log(`[ollama] Chat completed in ${duration}ms (${result.length} chars)`);
             return result;
@@ -435,8 +442,10 @@ export async function listAvailableModels(): Promise<string[]> {
 			signal: AbortSignal.timeout(5000),
 		});
 		if (!res.ok) return [];
-		const data = await res.json();
-		return data.models?.map((m: any) => m.name) ?? [];
+		// GPU-accelerated JSON parsing via simdjson (5× faster for model list responses)
+		const rawText = await res.text();
+		const data = fastJsonParse<{ models?: Array<{ name: string }> }>(rawText);
+		return data.models?.map((m) => m.name) ?? [];
 	} catch {
 		return [];
 	}

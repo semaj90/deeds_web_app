@@ -7,13 +7,14 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
 import { memoryCache } from '$lib/server/cache.js';
 import { ollamaBreaker, qdrantBreaker, redisBreaker, breakerEventLog } from '$lib/server/circuit-breaker.js';
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const redis: Redis = getRedis();
 	let redisInfo = { keyspace_hits: 0, keyspace_misses: 0, used_memory: 0, total_connections_received: 0 };
@@ -40,7 +41,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	// Application-level metrics from CacheMetrics singleton
 	const appMetrics = cacheMetrics.snapshot();
 
-	return json({
+	const responseData = {
 		retrieval: {
 			hits: redisInfo.keyspace_hits,
 			misses: redisInfo.keyspace_misses,
@@ -79,5 +80,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 			redis: redisBreaker.getStatus(),
 			recentEvents: breakerEventLog.slice(-10),
 		},
+	};
+
+	const { etag, isMatch } = checkETag(responseData, request.headers);
+	if (isMatch) return notModified(etag);
+
+	return json(responseData, {
+		headers: { ...cacheControl.short, ETag: etag }
 	});
 };

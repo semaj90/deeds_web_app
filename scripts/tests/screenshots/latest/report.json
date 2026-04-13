@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-11T23-15-43",
+  "timestamp": "2026-04-12T23-47-35",
   "base": "http://127.0.0.1:5173",
-  "totalTimeMs": 5558,
+  "totalTimeMs": 1556,
   "results": [
     {
-      "name": "chat",
-      "path": "/chat",
-      "url": "http://127.0.0.1:5173/chat",
+      "name": "document-analysis-455b7ca4-6d57-411e-b591-7ac6c539e3dc",
+      "path": "/document-analysis/455b7ca4-6d57-411e-b591-7ac6c539e3dc",
+      "url": "http://127.0.0.1:5173/document-analysis/455b7ca4-6d57-411e-b591-7ac6c539e3dc",
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "chat.png",
+      "file": "document-analysis-455b7ca4-6d57-411e-b591-7ac6c539e3dc.png",
       "consoleErrors": [],
       "consoleWarnings": [
         "No available adapters.",
@@ -21,19 +21,19 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3574,
-      "domElements": 304,
-      "resourceCount": 215,
-      "resourceSizeKB": 8130
+      "loadTimeMs": 1173,
+      "domElements": 207,
+      "resourceCount": 186,
+      "resourceSizeKB": 7720
     }
   ],
   "summary": {
     "passed": 1,
     "failed": 0,
     "total": 1,
-    "avgLoadMs": 3574,
-    "slowestRoute": "chat",
-    "slowestLoadMs": 3574,
+    "avgLoadMs": 1173,
+    "slowestRoute": "document-analysis-455b7ca4-6d57-411e-b591-7ac6c539e3dc",
+    "slowestLoadMs": 1173,
     "totalConsoleErrors": 0,
     "totalNetworkFailures": 0
   }

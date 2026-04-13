@@ -8,6 +8,7 @@
 
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
 import { eq, and } from 'drizzle-orm';
@@ -110,14 +111,21 @@ async function generatePreview({ locals, params, format, request }: {
 	};
 }
 
-export const GET: RequestHandler = async ({ locals, params, url }) => {
+export const GET: RequestHandler = async ({ locals, params, url, request }) => {
 	const format = url.searchParams.get('format') || 'html';
 	try {
 		const result = await generatePreview({ locals, params, format });
-		return json({
+		const responseData = {
 			success: true,
 			...result,
 			message: `Preview generated successfully as ${format.toUpperCase()}`
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('Preview error:', err);

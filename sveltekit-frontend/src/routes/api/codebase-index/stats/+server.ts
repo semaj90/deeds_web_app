@@ -106,9 +106,27 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 			errorClusters = clusterData.result?.count ?? 0;
 		}
 
+		// Get codebase indexing stats from codebase_chunks_768 collection
+		let indexedFiles = 0;
+		try {
+			const codebaseResponse = await fetch(
+				`${QDRANT_URL}/collections/codebase_chunks_768`,
+				{
+					headers: { 'Content-Type': 'application/json' },
+					signal: AbortSignal.timeout(5_000)
+				}
+			);
+			if (codebaseResponse.ok) {
+				const codebaseData = await codebaseResponse.json();
+				indexedFiles = codebaseData.result?.points_count ?? 0;
+			}
+		} catch (err) {
+			console.warn('Failed to get codebase collection stats:', err);
+		}
+
 		return json({
-			totalFiles: 0,
-			indexedFiles: 0,
+			totalFiles: indexedFiles, // Total chunks in Qdrant
+			indexedFiles,
 			totalErrors,
 			errorClusters,
 			topErrorCodes,

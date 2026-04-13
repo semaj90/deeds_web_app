@@ -6,6 +6,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { cases, statutes } from '$lib/server/db/schema-postgres.js';
@@ -22,7 +23,7 @@ function distinctValues(rows: Array<{ value: string | null | undefined }>): stri
 	).sort((left, right) => left.localeCompare(right));
 }
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
@@ -43,7 +44,13 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			const categories = distinctValues([...practiceAreaRows, ...crimeCategoryRows]);
 			const types = distinctValues(crimeClassificationRows);
 
-			return json({ jurisdictions, categories, types });
+			const responseData = { jurisdictions, categories, types };
+			const { etag, isMatch } = checkETag(responseData, request.headers);
+			if (isMatch) return notModified(etag);
+
+			return json(responseData, {
+				headers: { ...cacheControl.medium, ETag: etag }
+			});
 		}
 
 		const [jurisdictionRows, categoryRows] = await Promise.all([
@@ -54,9 +61,18 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		const categories = distinctValues(categoryRows);
 		const types = [...categories];
 
-		return json({ jurisdictions, categories, types });
+		const responseData = { jurisdictions, categories, types };
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.medium, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[search/filters] error:', err);
-		return json({ jurisdictions: [], categories: [], types: [] });
+		const fallbackData = { jurisdictions: [], categories: [], types: [] };
+		return json(fallbackData, {
+			headers: cacheControl.medium
+		});
 	}
 };

@@ -7,6 +7,7 @@
  * used by the Analysis Panel to show runtime issues on the current page.
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { db } from '$lib/server/db/client';
 import { errorEvents, errorClusters } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, sql, gte, and } from 'drizzle-orm';
@@ -18,7 +19,7 @@ const routeErrorsSchema = z.object({
 	hours: z.coerce.number().int().min(1).max(168).default(24),
 });
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const parsed = routeErrorsSchema.safeParse({
@@ -98,16 +99,26 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			// routePaths array query may fail if column doesn't exist yet
 		}
 
-		return json({
+		const responseData = {
 			route,
 			errors,
 			counts,
 			clusters,
 			total: errors.length,
 			since: since.toISOString(),
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[route-errors] Query error:', err);
-		return json({ route, errors: [], counts: {}, clusters: [], total: 0, since: since.toISOString() });
+		const fallbackData = { route, errors: [], counts: {}, clusters: [], total: 0, since: since.toISOString() };
+		return json(fallbackData, {
+			headers: cacheControl.short
+		});
 	}
 };

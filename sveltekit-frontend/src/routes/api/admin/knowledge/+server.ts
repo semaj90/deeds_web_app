@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const QDRANT_URL = getQdrantUrl();
 
@@ -16,7 +17,7 @@ interface KBEntry { id: string, score: number;
 	timestamp: string;
 }
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
@@ -95,19 +96,29 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			}
 		}
 
-		return json({
+		const responseData = {
 			file_path: filePath,
 			entries,
 			total: entries.length,
 			collections: ['phase76_knowledge_base', 'phase89_error_chunks']
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (error) {
 		console.error('Knowledge query error:', error);
-		return json({
+		const fallbackData = {
 			file_path: filePath,
 			entries: [],
 			total: 0,
 			collections: ['phase76_knowledge_base', 'phase89_error_chunks']
+		};
+		return json(fallbackData, {
+			headers: cacheControl.short
 		});
 	}
 };
