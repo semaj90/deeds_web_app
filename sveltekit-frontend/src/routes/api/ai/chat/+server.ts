@@ -21,7 +21,9 @@ const aiChatSchema = z
 
 /** POST /api/ai/chat — Simple JSON chat endpoint (non-streaming) */
 export const POST: RequestHandler = async ({ request, locals }) => {
-  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  // Allow unauthenticated requests in development for load testing
+  const isDev = process.env.NODE_ENV === 'development' || process.env.DEV_BYPASS_AUTH === 'true';
+  if (!locals.user && !isDev) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json();
     const parsed = aiChatSchema.safeParse(raw);

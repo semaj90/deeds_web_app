@@ -82,18 +82,18 @@ async function sendRequest() {
 	const start = performance.now();
 
 	try {
-		const response = await fetch(`${CONFIG.baseUrl}/api/ai/chat`, {
+		// Direct Ollama endpoint (bypasses inference router for load testing)
+		const response = await fetch(`${CONFIG.baseUrl}/api/ai/chat-direct`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				messages: [{ role: 'user', content: query }],
+				message: query,
 				model: 'gemma4-legal',
 				temperature: 0.3,
-				maxTokens: 200,
 			}),
-			signal: AbortSignal.timeout(30000),
+			signal: AbortSignal.timeout(30000),  // 30s timeout (first requests may be cold)
 		});
 
 		const latency = performance.now() - start;

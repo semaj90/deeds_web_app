@@ -1,0 +1,144 @@
+{
+  "testConfig": {
+    "duration": 30,
+    "concurrency": 10,
+    "targetQPM": 12000,
+    "baseUrl": "http://localhost:5173",
+    "redisStatsUrl": "http://localhost:5173/api/cache/exact-match/stats",
+    "bifrostUrl": "http://localhost:3040",
+    "sampleInterval": 5000
+  },
+  "duration": 30.1569127,
+  "requests": {
+    "total": 10,
+    "successful": 0,
+    "failed": 10,
+    "l1Hits": 0,
+    "l2Hits": 0,
+    "l3Hits": 0
+  },
+  "hitRates": {
+    "l1": 0,
+    "l2": 0,
+    "combined": 0
+  },
+  "latency": {
+    "avg": null,
+    "p50": 0,
+    "p95": 0,
+    "p99": 0
+  },
+  "qpm": 20,
+  "memoryGrowth": null,
+  "memorySnapshots": [
+    {
+      "timestamp": "2026-04-13T04:09:14.340Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:09:20.271Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:09:25.924Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:09:31.691Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:09:37.320Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    },
+    {
+      "timestamp": "2026-04-13T04:09:43.165Z",
+      "success": true,
+      "stats": {
+        "totalKeys": 0,
+        "memoryUsedMB": 0,
+        "avgTtlMinutes": 0,
+        "rawBytes": 0,
+        "rawTtlSeconds": 0
+      }
+    }
+  ],
+  "errors": [
+    {
+      "query": "What is hearsay evidence in California?",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "Define attorney-client privilege",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "What are the elements of breach of contract?",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "What is hearsay evidence in California?",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "Explain hearsay rules in CA courts",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "What is hearsay evidence in California?",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "What are the elements of breach of contract?",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "What is the statute of limitations for 1776053353447?",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "What are the elements of breach of contract?",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "query": "What is hearsay evidence in California?",
+      "error": "The operation was aborted due to timeout"
+    }
+  ],
+  "timestamp": "2026-04-13T04:09:48.178Z"
+}
