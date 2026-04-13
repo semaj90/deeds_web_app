@@ -1,5 +1,4 @@
 {
-  "$schema": "https://www.getbifrost.ai/schema",
   "vector_store": {
     "enabled": true,
     "type": "qdrant",
