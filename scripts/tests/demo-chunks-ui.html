@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Evidence Upload Results - Chunks Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #0a0a0a;
+      color: #e0e0e0;
+    }
+    h1 { color: #ffd700; margin-bottom: 30px; }
+    .section {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #333;
+    }
+    .section-title { font-size: 18px; font-weight: 600; margin: 0; }
+    .section-stat {
+      background: rgba(126, 231, 255, 0.1);
+      color: #7ee7ff;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .chunks-grid { display: flex; flex-direction: column; gap: 12px; }
+    .chunk-card {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.03) 0%, rgba(255, 215, 0, 0.01) 100%);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .chunk-card:hover { border-color: rgba(255, 215, 0, 0.3); }
+    .chunk-card.article { border-color: rgba(126, 231, 255, 0.3); background: rgba(126, 231, 255, 0.03); }
+    .chunk-card.section { border-color: rgba(255, 159, 64, 0.3); background: rgba(255, 159, 64, 0.03); }
+    .chunk-card.subsection { border-color: rgba(187, 134, 252, 0.3); background: rgba(187, 134, 252, 0.03); }
+    .chunk-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .chunk-type-badge {
+      background: rgba(255, 215, 0, 0.15);
+      color: #ffd700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .chunk-card.article .chunk-type-badge { background: rgba(126, 231, 255, 0.15); color: #7ee7ff; }
+    .chunk-card.section .chunk-type-badge { background: rgba(255, 159, 64, 0.15); color: #ff9f40; }
+    .chunk-card.subsection .chunk-type-badge { background: rgba(187, 134, 252, 0.15); color: #bb86fc; }
+    .chunk-expand-btn {
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .chunk-expand-btn:hover { color: #ffd700; }
+    .chunk-expand-btn.expanded { transform: rotate(180deg); }
+    .chunk-preview {
+      color: #999;
+      font-size: 14px;
+      line-height: 1.6;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chunk-expanded {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 215, 0, 0.1);
+      animation: slideDown 0.3s ease;
+    }
+    .chunk-full-text {
+      color: #e0e0e0;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+    }
+    .chunk-meta {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      font-size: 12px;
+      color: #777;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .success-banner {
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.05) 100%);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .success-icon { font-size: 24px; }
+    .demo-note {
+      background: rgba(255, 159, 64, 0.1);
+      border: 1px solid rgba(255, 159, 64, 0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      color: #ff9f40;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📄 Evidence Upload Results - Expandable Chunks Demo</h1>
+
+  <div class="demo-note">
+    <strong>🎯 Demo Mode:</strong> This page demonstrates the expandable chunks UI from <code>EvidenceUploadResults.svelte</code> with mock legal document data.
+  </div>
+
+  <div class="success-banner">
+    <span class="success-icon">✅</span>
+    <div>
+      <strong>Upload Complete!</strong> Document processed successfully with 9 chunks extracted.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h3 class="section-title">📑 Document Chunks</h3>
+      <span class="section-stat">9 chunks</span>
+    </div>
+
+    <div class="chunks-grid">
+      <!-- Chunk 1: ARTICLE I -->
+      <div class="chunk-card article" onclick="toggleChunk(this)">
+        <div class="chunk-header">
+          <div class="chunk-type-badge">ARTICLE</div>
+          <button class="chunk-expand-btn">▼</button>
+        </div>
+        <div class="chunk-preview">
+          ARTICLE I - JURISDICTION AND PARTIES
+This Court has jurisdiction pursuant to 28 U.S.C. § 1331...
+        </div>
+        <div class="chunk-expanded" style="display: none;">
+          <div class="chunk-full-text">ARTICLE I - JURISDICTION AND PARTIES
+
+SECTION 1.1 - Jurisdiction
+This Court has jurisdiction pursuant to 28 U.S.C. § 1331 (federal question jurisdiction).
+
+SECTION 1.2 - Plaintiff
+Jane Doe, a citizen of California, hereinafter referred to as "Plaintiff".
+
+SECTION 1.3 - Defendant
+XYZ Corporation, a Delaware corporation, hereinafter referred to as "Defendant".</div>
+          <div class="chunk-meta">📍 Characters 0–385</div>
+        </div>
+      </div>
+
+      <!-- Chunk 2: SECTION 1.1 -->
+      <div class="chunk-card section" onclick="toggleChunk(this)">
+        <div class="chunk-header">
+          <div class="chunk-type-badge">SECTION</div>
+          <button class="chunk-expand-btn">▼</button>
+        </div>
+        <div class="chunk-preview">
+          SECTION 1.1 - Jurisdiction
+This Court has jurisdiction pursuant to 28 U.S.C. § 1331...
+        </div>
+        <div class="chunk-expanded" style="display: none;">
+          <div class="chunk-full-text">SECTION 1.1 - Jurisdiction
+This Court has jurisdiction pursuant to 28 U.S.C. § 1331 (federal question jurisdiction).</div>
+          <div class="chunk-meta">📍 Characters 39–147</div>
+        </div>
+      </div>
+
+      <!-- Chunk 3: SECTION 1.2 -->
+      <div class="chunk-card section" onclick="toggleChunk(this)">
+        <div class="chunk-header">
+          <div class="chunk-type-badge">SECTION</div>
+          <button class="chunk-expand-btn">▼</button>
+        </div>
+        <div class="chunk-preview">
+          SECTION 1.2 - Plaintiff
+Jane Doe, a citizen of California, hereinafter referred to as "Plaintiff"...
+        </div>
+        <div class="chunk-expanded" style="display: none;">
+          <div class="chunk-full-text">SECTION 1.2 - Plaintiff
+Jane Doe, a citizen of California, hereinafter referred to as "Plaintiff".</div>
+          <div class="chunk-meta">📍 Characters 149–237</div>
+        </div>
+      </div>
+
+      <!-- Chunk 4: ARTICLE II -->
+      <div class="chunk-card article" onclick="toggleChunk(this)">
+        <div class="chunk-header">
+          <div class="chunk-type-badge">ARTICLE</div>
+          <button class="chunk-expand-btn">▼</button>
+        </div>
+        <div class="chunk-preview">
+          ARTICLE II - STATEMENT OF FACTS
+The Plaintiff alleges that Defendant failed to deliver goods...
+        </div>
+        <div class="chunk-expanded" style="display: none;">
+          <div class="chunk-full-text">ARTICLE II - STATEMENT OF FACTS
+
+SECTION 2.1 - Background
+On January 15, 2024, Plaintiff entered into an employment agreement with Defendant.
+
+SECTION 2.2 - Breach of Contract
+Defendant failed to pay the agreed-upon salary of $120,000 per annum as specified in Section 3.2 of the employment contract dated January 15, 2024.</div>
+          <div class="chunk-meta">📍 Characters 385–678</div>
+        </div>
+      </div>
+
+      <!-- Chunk 5: ARTICLE III -->
+      <div class="chunk-card article" onclick="toggleChunk(this)">
+        <div class="chunk-header">
+          <div class="chunk-type-badge">ARTICLE</div>
+          <button class="chunk-expand-btn">▼</button>
+        </div>
+        <div class="chunk-preview">
+          ARTICLE III - CAUSES OF ACTION
+First Cause: Breach of Contract - violation of California Labor Code § 201...
+        </div>
+        <div class="chunk-expanded" style="display: none;">
+          <div class="chunk-full-text">ARTICLE III - CAUSES OF ACTION
+
+SECTION 3.1 - First Cause of Action: Breach of Contract
+Plaintiff alleges that Defendant breached the employment contract by failing to pay salary as promised, in violation of California Labor Code § 201.
+
+SECTION 3.2 - Second Cause of Action: Unjust Enrichment
+Defendant has been unjustly enriched by receiving the benefit of Plaintiff's labor without providing the agreed-upon compensation.</div>
+          <div class="chunk-meta">📍 Characters 679–1048</div>
+        </div>
+      </div>
+
+      <!-- Chunk 6: SUBSECTION -->
+      <div class="chunk-card subsection" onclick="toggleChunk(this)">
+        <div class="chunk-header">
+          <div class="chunk-type-badge">SUBSECTION</div>
+          <button class="chunk-expand-btn">▼</button>
+        </div>
+        <div class="chunk-preview">
+          SECTION 3.3 - Third Cause of Action: Violation of Wage and Hour Laws...
+        </div>
+        <div class="chunk-expanded" style="display: none;">
+          <div class="chunk-full-text">SECTION 3.3 - Third Cause of Action: Violation of Wage and Hour Laws
+Defendant's actions constitute willful violations of the Fair Labor Standards Act, 29 U.S.C. § 201 et seq.</div>
+          <div class="chunk-meta">📍 Characters 1049–1225</div>
+        </div>
+      </div>
+
+      <!-- More chunks... -->
+      <div class="chunk-card article" onclick="toggleChunk(this)">
+        <div class="chunk-header">
+          <div class="chunk-type-badge">ARTICLE</div>
+          <button class="chunk-expand-btn">▼</button>
+        </div>
+        <div class="chunk-preview">
+          ARTICLE IV - RELIEF REQUESTED
+Plaintiff seeks compensatory damages ($30,000), punitive damages ($90,000)...
+        </div>
+        <div class="chunk-expanded" style="display: none;">
+          <div class="chunk-full-text">ARTICLE IV - RELIEF REQUESTED
+
+SECTION 4.1 - Monetary Damages
+Plaintiff seeks compensatory damages in the amount of $30,000 for unpaid wages.
+
+SECTION 4.2 - Punitive Damages
+Plaintiff requests punitive damages in the amount of $90,000 to punish Defendant's willful conduct.
+
+SECTION 4.3 - Attorney's Fees
+Pursuant to California Labor Code § 218.5, Plaintiff requests an award of reasonable attorney's fees and costs.</div>
+          <div class="chunk-meta">📍 Characters 1226–1602</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleChunk(card) {
+      const expanded = card.querySelector('.chunk-expanded');
+      const btn = card.querySelector('.chunk-expand-btn');
+
+      if (expanded.style.display === 'none') {
+        expanded.style.display = 'block';
+        btn.classList.add('expanded');
+      } else {
+        expanded.style.display = 'none';
+        btn.classList.remove('expanded');
+      }
+    }
+  </script>
+</body>
+</html>
