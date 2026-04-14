@@ -11,7 +11,9 @@
 import path from 'path';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { initializeNeo4jSchema } from './neo4j-schema.js';
+import { buildCodebaseGraphV2 } from './codebase-scanner-v2.js';
 import { buildCodebaseGraph } from './codebase-scanner.js';
+import type { ScanNodeV2 as WorkerNodeV2 } from './codebase-scanner-v2.js';
 import type { ScanNode as WorkerNode, ScanEdge as WorkerEdge } from './codebase-scanner.js';
 
 export interface CodebaseSyncResult {
@@ -26,7 +28,7 @@ const BATCH_SIZE = 500;
 
 // ── Batch MERGE nodes ─────────────────────────────────────────────────────────
 
-async function mergeNodes(session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>, nodes: WorkerNode[]): Promise<number> {
+async function mergeNodes(session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>, nodes: (WorkerNode | WorkerNodeV2)[]): Promise<number> {
 	let synced = 0;
 
 	console.log(`[Neo4j Sync] mergeNodes start: ${nodes.length} nodes, batchSize=${BATCH_SIZE}`);
@@ -34,16 +36,32 @@ async function mergeNodes(session: ReturnType<ReturnType<typeof getNeo4jDriver>[
 	// Pass 1: MERGE all nodes as CodebaseFile with full property set
 	for (let i = 0; i < nodes.length; i += BATCH_SIZE) {
 		const batchT = Date.now();
-		const batch = nodes.slice(i, i + BATCH_SIZE).map(n => ({
-			id: n.id, filePath: n.filePath, label: n.label,
-			nodeLabel: n.nodeLabel ?? 'File', type: n.type, cluster: n.cluster,
-			lineCount: n.lineCount, fileSize: n.fileSize, complexity: n.complexity,
-			classCount: n.classCount, importCount: n.importCount, exportCount: n.exportCount,
-			exports: n.exports, functions: n.functions,
-			usedTables: n.usedTables ?? [], publishedQueues: n.publishedQueues ?? [],
-			consumedQueues: n.consumedQueues ?? [], fetchedRoutes: n.fetchedRoutes ?? [],
-			usesNative: n.usesNative ?? false, hasDynamicImports: n.hasDynamicImports ?? false,
-		}));
+		const batch = nodes.slice(i, i + BATCH_SIZE).map(n => {
+			const isV2 = 'dynamicImportTargets' in n;
+			return {
+				id: n.id, filePath: n.filePath, label: n.label,
+				nodeLabel: n.nodeLabel ?? 'File', type: n.type, cluster: n.cluster,
+				lineCount: n.lineCount, fileSize: n.fileSize, complexity: n.complexity,
+				classCount: n.classCount, importCount: n.importCount, exportCount: n.exportCount,
+				exports: n.exports, functions: n.functions,
+				usedTables: n.usedTables ?? [], publishedQueues: n.publishedQueues ?? [],
+				consumedQueues: n.consumedQueues ?? [], fetchedRoutes: n.fetchedRoutes ?? [],
+				usesNative: n.usesNative ?? false, hasDynamicImports: n.hasDynamicImports ?? false,
+				// V2-only properties
+				dynamicImportTargets: isV2 ? (n as WorkerNodeV2).dynamicImportTargets : [],
+				callees: isV2 ? (n as WorkerNodeV2).callees : [],
+				hasErrorHandling: isV2 ? (n as WorkerNodeV2).hasErrorHandling : false,
+				hasAuthGuard: isV2 ? (n as WorkerNodeV2).hasAuthGuard : false,
+				hasZodValidation: isV2 ? (n as WorkerNodeV2).hasZodValidation : false,
+				hasCachePattern: isV2 ? (n as WorkerNodeV2).hasCachePattern : false,
+				isSseEndpoint: isV2 ? (n as WorkerNodeV2).isSseEndpoint : false,
+				isWorkerBoundary: isV2 ? (n as WorkerNodeV2).isWorkerBoundary : false,
+				isRouteFile: isV2 ? (n as WorkerNodeV2).isRouteFile : false,
+				routeType: isV2 ? (n as WorkerNodeV2).routeType : 'util',
+				symbolCount: isV2 ? (n as WorkerNodeV2).symbolCount : 0,
+				maxCallDepth: isV2 ? (n as WorkerNodeV2).maxCallDepth : 0,
+			};
+		});
 
 		await session.run(
 			`UNWIND $batch AS node
@@ -67,6 +85,18 @@ async function mergeNodes(session: ReturnType<ReturnType<typeof getNeo4jDriver>[
 			     f.fetchedRoutes    = node.fetchedRoutes,
 			     f.usesNative       = node.usesNative,
 			     f.hasDynamicImports = node.hasDynamicImports,
+			     f.dynamicImportTargets = node.dynamicImportTargets,
+			     f.callees          = node.callees,
+			     f.hasErrorHandling = node.hasErrorHandling,
+			     f.hasAuthGuard     = node.hasAuthGuard,
+			     f.hasZodValidation = node.hasZodValidation,
+			     f.hasCachePattern  = node.hasCachePattern,
+			     f.isSseEndpoint    = node.isSseEndpoint,
+			     f.isWorkerBoundary = node.isWorkerBoundary,
+			     f.isRouteFile      = node.isRouteFile,
+			     f.routeType        = node.routeType,
+			     f.symbolCount      = node.symbolCount,
+			     f.maxCallDepth     = node.maxCallDepth,
 			     f.updatedAt        = datetime()`,
 			{ batch }
 		);
@@ -107,7 +137,7 @@ async function mergeNodes(session: ReturnType<ReturnType<typeof getNeo4jDriver>[
 
 // ── Batch MERGE edges ─────────────────────────────────────────────────────────
 
-async function mergeEdges(session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>, edges: WorkerEdge[], nodes: WorkerNode[]): Promise<number> {
+async function mergeEdges(session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>, edges: WorkerEdge[], nodes: (WorkerNode | WorkerNodeV2)[]): Promise<number> {
 	let synced = 0;
 	console.log(`[Neo4j Sync] mergeEdges start: ${edges.length} edges, batchSize=${BATCH_SIZE}`);
 
@@ -199,10 +229,22 @@ export async function syncCodebaseToNeo4j(options: SyncOptions = {}): Promise<Co
 		emit('schema-init');
 		await initializeNeo4jSchema();
 
-		// 2. Extract graph directly (inline — no Worker thread needed, ~800ms for 2000 files)
+		// 2. Extract graph — try ts-morph v2 (20 metrics), fall back to regex v1
 		emit('worker-scan');
-		const { nodes, edges } = buildCodebaseGraph({ scanDir, srcRoot, maxFiles });
-		console.log(`[Neo4j Sync] Scan done: ${nodes.length} nodes, ${edges.length} edges`);
+		let nodes: (WorkerNode | WorkerNodeV2)[];
+		let edges: WorkerEdge[];
+		try {
+			const scanResultV2 = buildCodebaseGraphV2({ scanDir, srcRoot, maxFiles });
+			console.log(`[Neo4j Sync] Scan done (ts-morph v2, method=${scanResultV2.metadata.scanMethod}): ${scanResultV2.nodes.length} nodes, ${scanResultV2.edges.length} edges`);
+			nodes = scanResultV2.nodes;
+			edges = scanResultV2.edges;
+		} catch (v2Err) {
+			console.warn('[Neo4j Sync] ts-morph v2 scan failed, falling back to regex v1:', (v2Err as Error)?.message);
+			const scanResultV1 = buildCodebaseGraph({ scanDir, srcRoot, maxFiles });
+			console.log(`[Neo4j Sync] Scan done (regex v1 fallback): ${scanResultV1.nodes.length} nodes, ${scanResultV1.edges.length} edges`);
+			nodes = scanResultV1.nodes;
+			edges = scanResultV1.edges;
+		}
 		emit('worker-done', { files: nodes.length, edges: edges.length });
 
 		if (!nodes.length) {

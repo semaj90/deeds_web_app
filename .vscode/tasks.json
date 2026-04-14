@@ -2147,6 +2147,45 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    // ============================================
+    // GPU: Codebase Intelligence (Phase 108)
+    // ============================================
+    {
+      "label": "GPU: Codebase Index — Full Pipeline",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '[GPU Codebase Index] Starting full pipeline (ts-morph scan → Neo4j sync → GPU cluster → audit)' -ForegroundColor Cyan; $stages = @('graph-sync', 'cluster-detect', 'gpu'); foreach ($stage in $stages) { Write-Host \\\"  → POST /api/codebase-index/$stage\\\" -ForegroundColor Gray; }; Write-Host ''; $url = 'http://localhost:5173'; $headers = @{'Content-Type'='application/json'}; Write-Host 'Stage 1: Neo4j graph sync (ts-morph)...' -ForegroundColor Yellow; $r1 = Invoke-RestMethod \\\"$url/api/codebase-index/graph-sync\\\" -Method Post -Headers $headers -TimeoutSec 300 -ErrorAction Stop; $jobId1 = $r1.jobId; Write-Host \\\"  jobId: $jobId1\\\" -ForegroundColor Green; $done = $false; $maxWait = 0; while (-not $done -and $maxWait -lt 120) { Start-Sleep -Seconds 2; $status = Invoke-RestMethod \\\"$url/api/codebase-index/graph-sync?jobId=$jobId1\\\" -ErrorAction SilentlyContinue; if ($status.status -eq 'done' -or $status.status -eq 'error') { $done = $true; Write-Host \\\"  Status: $($status.status)\\\" -ForegroundColor Green; } $maxWait++; }; Write-Host 'Stage 2: GPU cluster detection...' -ForegroundColor Yellow; $r2 = Invoke-RestMethod \\\"$url/api/codebase-index/cluster-detect\\\" -Method Post -Headers $headers -Body (@{k=12;maxFiles=500} | ConvertTo-Json) -TimeoutSec 300 -ErrorAction Stop; $jobId2 = $r2.jobId; Write-Host \\\"  jobId: $jobId2\\\" -ForegroundColor Green; $done = $false; $maxWait = 0; while (-not $done -and $maxWait -lt 120) { Start-Sleep -Seconds 2; $status = Invoke-RestMethod \\\"$url/api/codebase-index/cluster-detect?jobId=$jobId2\\\" -ErrorAction SilentlyContinue; if ($status.status -eq 'done' -or $status.status -eq 'error') { $done = $true; Write-Host \\\"  Status: $($status.status)\\\" -ForegroundColor Green; } $maxWait++; }; Write-Host 'Stage 3: GPU audit (PageRank + similarity)...' -ForegroundColor Yellow; $r3 = Invoke-RestMethod \\\"$url/api/audit/gpu\\\" -Method Post -Headers $headers -Body (@{skipGraph=$false;skipCodebase=$false;persist=$true} | ConvertTo-Json) -TimeoutSec 300 -ErrorAction Stop; if ($r3.success) { Write-Host 'Pipeline complete!' -ForegroundColor Green; if ($r3.report.metadata.timing) { Write-Host 'Timing:' -ForegroundColor Yellow; $r3.report.metadata.timing | ConvertTo-Json | Write-Host; } } else { Write-Host 'Pipeline failed!' -ForegroundColor Red; Write-Host $r3 | ConvertTo-Json; }\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "GPU: Codebase Scan (ts-morph only)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '[GPU Codebase Scan] Starting ts-morph scanner + Neo4j sync...' -ForegroundColor Cyan; $url = 'http://localhost:5173'; $headers = @{'Content-Type'='application/json'}; Invoke-RestMethod \\\"$url/api/codebase-index/graph-sync\\\" -Method Post -Headers $headers -TimeoutSec 300 | ConvertTo-Json | Write-Host; Write-Host 'Scan started. Check Neo4j for graph updates.' -ForegroundColor Green\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "GPU: Codebase Audit Report",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '[GPU Codebase Audit] Generating audit report...' -ForegroundColor Cyan; $url = 'http://localhost:5173'; $headers = @{'Content-Type'='application/json'}; $result = Invoke-RestMethod \\\"$url/api/audit/gpu\\\" -Method Post -Headers $headers -TimeoutSec 300 -Body (@{persist=$true} | ConvertTo-Json); if ($result.success) { Write-Host 'Audit complete!' -ForegroundColor Green; Write-Host 'Report:' -ForegroundColor Yellow; $result.report | Select-Object @{N='Files';E={'`n' + ($_.metadata.nodes | Measure-Object).Count}}, @{N='Edges';E={$_.metadata.edges}}, @{N='Timing';E={$_.metadata.timing | ConvertTo-Json -Depth 3}} | Format-List; } else { Write-Host 'Audit failed!' -ForegroundColor Red; }\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
     }
   ],
   "inputs": [
