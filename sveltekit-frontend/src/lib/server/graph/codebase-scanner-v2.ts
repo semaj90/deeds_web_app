@@ -106,7 +106,7 @@ const RE_TBL_INS    = /\.insert\s*\(\s*([a-z][a-zA-Z0-9]{2,})\s*\)/gm;
 const RE_TBL_UPD    = /\.update\s*\(\s*([a-z][a-zA-Z0-9]{2,})\s*\)/gm;
 const RE_TBL_DEL    = /\.delete\s*\(\s*([a-z][a-zA-Z0-9]{2,})\s*\)/gm;
 const RE_NATIVE     = /(?:fastJsonParse|computeGpuSimilarity|isCudaAvailable|isSimdJsonAvailable|tensorrt_bridge|libtorchCosineSimilarity)/;
-const RE_TRY_CATCH  = /\b(try|catch|finally|throw)\b/g;
+const RE_TRY_CATCH  = /\b(try|catch|finally|throw)\b/;
 const RE_AUTH_GUARD = /locals\.user|requireAuth|getSession|checkAuth/;
 const RE_ZOD        = /\bz\.|safeParse|parseAsync|schema\(|ZodSchema/;
 const RE_CACHE      = /redis|loki|IndexedDB|localStorage|sessionStorage|cacheMap|Cache/i;
@@ -211,14 +211,10 @@ function filterKnown(names: string[], set: Set<string>): string[] {
 // ── ts-morph analysis ─────────────────────────────────────────────────────────
 // Called ONCE before the file loop — pre-builds the AST map for all files.
 // Returns a Map<absolutePath, analysisResult> so per-file lookup is O(1).
-function buildTsMorphMap(filePaths: string[], srcRoot: string): Map<string, {
-	dynamicImportTargets: string[];
-	callees: string[];
-	symbolCount: number;
-	maxCallDepth: number;
-}> {
-	const empty = { dynamicImportTargets: [], callees: [], symbolCount: 0, maxCallDepth: 0 };
-	const result = new Map<string, typeof empty>();
+type TsMorphEntry = { dynamicImportTargets: string[]; callees: string[]; symbolCount: number; maxCallDepth: number };
+
+function buildTsMorphMap(filePaths: string[], srcRoot: string): Map<string, TsMorphEntry> {
+	const result = new Map<string, TsMorphEntry>();
 
 	let project: Project;
 	try {
