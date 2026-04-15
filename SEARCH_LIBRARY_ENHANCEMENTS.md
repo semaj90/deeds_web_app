@@ -1,6 +1,6 @@
 # Search + Legal Library — Enhancement Log
 
-> Session: 2026-04-14  
+> Session: 2026-04-14 → 2026-04-15 (continued)  
 > Status: **PRODUCTION READY** — svelte-check 0 errors, 0 warnings
 
 ---
@@ -222,19 +222,47 @@ Positioned between SYSTEM CONFIG and AST TOPOLOGY in the SYSTEM section.
 
 ## 6. Known Limitations
 
-| Issue | Impact | Workaround |
-|-------|--------|-----------|
-| Go search service not auto-started | Library search falls back to inline SQL | Start manually or add to dev startup script |
-| Qdrant indexing not in ingestion worker | Legal corpus Qdrant collection not populated | Needs `graphing` stage extended to upsert to Qdrant |
-| `export const ssr = false` inline in `.svelte` | Non-standard placement | Accepted pattern in this project (30+ pages use it) |
-| Library ingestion is single-threaded | Large PDFs (400+ pages) block for 60-120s | Worker thread queue via RabbitMQ `codebase.index` queue for future |
+| Issue | Impact | Status |
+|-------|--------|--------|
+| Go search service not auto-started | Library search falls back to inline SQL | Open — start manually |
+| ~~Qdrant indexing not in ingestion worker~~ | ~~Legal corpus Qdrant collection not populated~~ | **✅ FIXED 2026-04-15** — Stage F2b upserts to `legal_documents` (named `content` vector, non-fatal) |
+| `export const ssr = false` inline in `.svelte` | Non-standard placement | Accepted pattern (30+ pages) |
+| Library ingestion is single-threaded | Large PDFs (400+ pages) block 60-120s | Open — RabbitMQ queue future work |
+| ~~Admin page used snake_case field names~~ | ~~Table rendered empty (corpus type, status, chunks)~~ | **✅ FIXED 2026-04-15** — All 12 references updated to camelCase matching API |
+| ~~`GET /api/library/ingest/[jobId]` was SSE stream~~ | ~~Polling client received stream, not JSON~~ | **✅ FIXED 2026-04-15** — Endpoint now returns plain JSON; client polls at 2.5s |
+| ~~`GET /api/library/search` received POST~~ | ~~searchLibrary() sent JSON body to GET endpoint~~ | **✅ FIXED 2026-04-14** — Corrected to GET with URLSearchParams |
 
 ---
 
 ## 7. Future Enhancements
 
-- **Qdrant upsert in graphing stage** — currently only writes to PostgreSQL; extend `runIngestionPipeline` to upsert chunks into `legal_documents` Qdrant collection after embedding
-- **Batch re-embed** — endpoint to backfill chunks where `embedding IS NULL` (non-fatal path)
+- **Batch re-embed** — endpoint to backfill `legal_chunks` where `embedding IS NULL` (non-fatal path creates gaps for large docs)
 - **Version management** — UI to upload updated versions of existing documents (uses `library_document_versions` table)
 - **Citation graph visualization** — Neo4j sync of `legal_citations` → graph view of statute cross-references
 - **Go service auto-start** — add to VS Code task "GPU: Codebase Index — Full Pipeline" or dev server startup script
+- ~~**Qdrant upsert in graphing stage**~~ — **✅ DONE** (ingestion-worker.ts Stage F2b)
+
+---
+
+## 8. Route Wiring Audit (2026-04-15)
+
+| Route | Method | File | Auth | Zod | Status |
+|-------|--------|------|------|-----|--------|
+| `/api/library/upload` | POST | `upload/+server.ts` | ✅ | ✅ | **WIRED** |
+| `/api/library/ingest/[jobId]` | GET | `ingest/[jobId]/+server.ts` | ✅ | — | **WIRED** (JSON polling) |
+| `/api/library/documents` | GET | `documents/+server.ts` | ✅ | ✅ | **WIRED** |
+| `/api/library/documents/[documentId]` | GET/PUT/DELETE | `documents/[documentId]/+server.ts` | ✅ | ✅ | **WIRED** |
+| `/api/library/search` | GET | `search/+server.ts` | ✅ | ✅ | **WIRED** (match_type field added) |
+| `/api/library/ingest-codebase-docs` | POST | `ingest-codebase-docs/+server.ts` | ✅ | — | **WIRED** |
+| `/admin/library` (page) | — | `(app)/admin/library/+page.svelte` | SSR off | — | **WIRED** |
+| `/library` (page) | — | `(app)/library/+page.svelte` | — | — | **WIRED** |
+| `/library/[documentId]` (page) | — | `(app)/library/[documentId]/+page.svelte` | — | — | **WIRED** |
+
+**Ingestion worker:** `$lib/server/legal/ingestion-worker.ts`
+- `uploadLibraryDocument()` → called by `POST /api/library/upload`
+- `runIngestionPipeline()` → called by upload worker (fire-and-forget)
+- Stage F2b: Qdrant `batchUpsert()` → `legal_documents` collection (`documents` alias, `content` 768-dim vector)
+
+**Sidebar:** `LIBRARY INGEST` → `/admin/library` ✅ (YorhaSidebar.svelte adminItems)
+
+**Tests:** `tests/library-upload-ingest.spec.ts` — 9 tests covering all 5 routes ✅
