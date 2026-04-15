@@ -22,13 +22,15 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status?jobId=job-1'),
-      request: new Request('http://localhost'), locals: {},
+      request: new Request('http://localhost'),
+      locals: {},
     } as never);
 
     const body = await response.json();
 
     expect(response.status).toBe(401);
-    expect(body).toEqual({ error: 'Unauthorized' });
+    expect(body.error).toBe('Unauthorized');
+    expect(body.jobId).toBeNull();
     expect(mockGetAceIngestJob).not.toHaveBeenCalled();
   });
 
@@ -37,7 +39,8 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status'),
-      request: new Request('http://localhost'), locals: {
+      request: new Request('http://localhost'),
+      locals: {
         user: { id: 'user-1' },
       },
     } as never);
@@ -56,7 +59,8 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status?jobId=missing-job'),
-      request: new Request('http://localhost'), locals: {
+      request: new Request('http://localhost'),
+      locals: {
         user: { id: 'user-1' },
       },
     } as never);
@@ -64,7 +68,9 @@ describe('/api/ace/status route', () => {
     const body = await response.json();
 
     expect(response.status).toBe(404);
-    expect(body).toEqual({ error: 'Job not found' });
+    expect(body.error).toBe('Job not found');
+    expect(body.jobId).toBe('missing-job');
+    expect(body.status).toBe('error');
     expect(mockGetAceIngestJob).toHaveBeenCalledWith('missing-job');
   });
 
@@ -87,7 +93,8 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status?jobId=job-1'),
-      request: new Request('http://localhost'), locals: {
+      request: new Request('http://localhost'),
+      locals: {
         user: { id: 'user-1' },
       },
     } as never);
@@ -95,7 +102,9 @@ describe('/api/ace/status route', () => {
     const body = await response.json();
 
     expect(response.status).toBe(404);
-    expect(body).toEqual({ error: 'Job not found' });
+    expect(body.error).toBe('Job not found');
+    expect(body.jobId).toBe('job-1');
+    expect(body.status).toBe('error');
     expect(mockGetAceIngestJob).toHaveBeenCalledWith('job-1');
   });
 

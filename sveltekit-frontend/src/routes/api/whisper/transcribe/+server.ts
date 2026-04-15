@@ -225,24 +225,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     const formData = await request.formData();
 
-    // Validate FormData with Zod
+    // Validate FormData with Zod (convert null → undefined so Zod .default() triggers)
     const parsed = whisperTranscribeSchema.safeParse({
       file: formData.get('file'),
-      language: formData.get('language'),
-      translate: formData.get('translate'),
-      timestamps: formData.get('timestamps'),
-      enrich: formData.get('enrich'),
-      caseId: formData.get('caseId'),
+      language: formData.get('language') ?? undefined,
+      translate: formData.get('translate') ?? undefined,
+      timestamps: formData.get('timestamps') ?? undefined,
+      enrich: formData.get('enrich') ?? undefined,
+      caseId: formData.get('caseId') ?? undefined,
     });
 
     if (!parsed.success) {
-      return json(
-        { error: parsed.error.issues[0]?.message ?? 'Invalid request' },
-        { status: 400 }
-      );
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
     }
 
-    const { file: audioFile, language: languageParam, translate, timestamps, enrich, caseId } = parsed.data;
+    const {
+      file: audioFile,
+      language: languageParam,
+      translate,
+      timestamps,
+      enrich,
+      caseId,
+    } = parsed.data;
 
     const ext = '.' + (audioFile.name.split('.').pop()?.toLowerCase() ?? '');
     const buffer = Buffer.from(await audioFile.arrayBuffer());
@@ -275,7 +279,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         if (serverResult) {
           const enrichment = enrich
-            ? await enrichTranscription(serverResult.text, serverResult.language, caseId).catch(() => ({}))
+            ? await enrichTranscription(serverResult.text, serverResult.language, caseId).catch(
+                () => ({})
+              )
             : {};
           return json({
             ok: true,

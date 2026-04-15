@@ -44,6 +44,8 @@ vi.mock('$lib/server/env.server.js', () => ({
     OLLAMA_BASE_URL: 'http://localhost:11434',
     QDRANT_URL: 'http://localhost:6333',
     MINIO_EVIDENCE_BUCKET: 'evidence',
+    WHISPER_USE_SERVER: true,
+    WHISPER_SERVER_URL: 'http://localhost:8095',
   },
 }));
 vi.mock('$lib/config/env.server.js', () => ({
@@ -66,10 +68,10 @@ const mockOllamaFetch = vi.fn(async () => {
   );
 });
 vi.mock('$lib/server/ollama.js', () => ({
-	getChatModelKeepAlive: () => '2m',
-	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-legal:latest',
-	getEmbedModel: () => 'embeddinggemma:latest',
+  getChatModelKeepAlive: () => '2m',
+  getEmbeddingModelKeepAlive: () => '24h',
+  getChatModel: () => 'gemma4-legal:latest',
+  getEmbedModel: () => 'embeddinggemma:latest',
   ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
@@ -231,6 +233,23 @@ vi.mock('$lib/server/grpc/embedding-client.js', () => ({
     vectors: [new Array(768).fill(0.01)],
   })),
   generateEmbedding: vi.fn(async () => new Array(768).fill(0.01)),
+}));
+
+// ── Langfuse observability mock ──
+vi.mock('$lib/server/observability/langfuse.js', () => ({
+  traceLLM: vi.fn(async (_name: string, _meta: any, fn: any) => {
+    return fn({ end: vi.fn() });
+  }),
+}));
+
+// ── LangExtract mock ──
+vi.mock('$lib/server/langextract-client.js', () => ({
+  extractDocument: vi.fn(async () => ({ entities: [] })),
+}));
+
+// ── Entity extraction mock ──
+vi.mock('$lib/server/analysis/entity-extraction.js', () => ({
+  extractEntities: vi.fn(async () => []),
 }));
 
 vi.mock('$lib/server/middleware/rate-limit.js', () => ({
@@ -680,116 +699,137 @@ describe('/api/topology (GET)', () => {
 // /api/glyph/generate (POST)
 // ─────────────────────────────────────────────────────────
 describe('/api/glyph/generate (POST)', () => {
-	it('generates a glyph successfully', async () => {
-		const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
-			body: { evidence_id: 'ev-1', prompt: 'Contract document analysis', style: 'legal' },
-		});
-		const res = await POST(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.glyph).toBeDefined();
-	});
+  it('generates a glyph successfully', async () => {
+    const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
+      body: { evidence_id: 'ev-1', prompt: 'Contract document analysis', style: 'legal' },
+    });
+    const res = await POST(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.glyph).toBeDefined();
+  });
 
-	it('returns 400 for missing evidence_id', async () => {
-		const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
-			body: { evidence_id: '', prompt: 'test' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing evidence_id', async () => {
+    const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
+      body: { evidence_id: '', prompt: 'test' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 400 for missing prompt', async () => {
-		const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
-			body: { evidence_id: 'ev-1', prompt: '' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing prompt', async () => {
+    const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
+      body: { evidence_id: 'ev-1', prompt: '' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 401 for unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
-			body: { evidence_id: 'ev-1', prompt: 'test' },
-			locals: { user: null },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 for unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
+      body: { evidence_id: 'ev-1', prompt: 'test' },
+      locals: { user: null },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 503 when LLM fails', async () => {
-		mockOllamaFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
-		const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
-			body: { evidence_id: 'ev-1', prompt: 'test prompt' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(503);
-	});
+  it('returns 503 when LLM fails', async () => {
+    mockOllamaFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
+    const { POST } = await import('../src/routes/api/glyph/generate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/glyph/generate', {
+      body: { evidence_id: 'ev-1', prompt: 'test prompt' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(503);
+  });
 });
 
 // ─────────────────────────────────────────────────────────
 // /api/whisper/transcribe (POST)
 // ─────────────────────────────────────────────────────────
 describe('/api/whisper/transcribe (POST)', () => {
-	it('transcribes audio successfully', async () => {
-		mockOllamaFetch.mockResolvedValueOnce(new Response(JSON.stringify({
-			response: 'The witness testified that...',
-		}), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+  it('transcribes audio successfully', async () => {
+    // Mock global fetch for whisper server health check + inference
+    const originalFetch = global.fetch;
+    const mockFetch = vi.fn(async (url: any, _opts?: any) => {
+      const urlStr = String(url);
+      if (urlStr.includes('/health')) {
+        return new Response('OK', { status: 200 });
+      }
+      if (urlStr.includes('/inference')) {
+        return new Response(
+          JSON.stringify({
+            text: 'The witness testified that...',
+            language: 'en',
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      return originalFetch(url, _opts);
+    }) as any;
+    global.fetch = mockFetch;
 
-		const { POST } = await import('../src/routes/api/whisper/transcribe/+server.js');
-		const mockFile = {
-			name: 'testimony.wav',
-			type: 'audio/wav',
-			size: 1024,
-			arrayBuffer: async () => new ArrayBuffer(1024),
-		};
-		const mockFormData = new Map([['file', mockFile]]);
-		const req: any = new Request('http://localhost/api/whisper/transcribe', { method: 'POST' });
-		req.formData = async () => ({
-			get: (key: string) => mockFormData.get(key) ?? null,
-		});
-		const event = {
-			request: req,
-			url: new URL('http://localhost/api/whisper/transcribe'),
-			params: {},
-			locals: { user: { id: TEST_USER_ID, role: 'admin' } },
-		};
-		const res = await POST(event as any);
-		const data = await jsonBody(res);
-		expect(data.ok).toBe(true);
-		expect(data.text).toBeTruthy();
-	});
+    const { POST } = await import('../src/routes/api/whisper/transcribe/+server.js');
+    const audioBuffer = new ArrayBuffer(1024);
+    const audioFile = new File([audioBuffer], 'testimony.wav', { type: 'audio/wav' });
+    // jsdom File may not implement arrayBuffer() — polyfill if missing
+    if (!audioFile.arrayBuffer) {
+      (audioFile as any).arrayBuffer = async () => audioBuffer;
+    }
+    const formFields: Record<string, any> = {
+      file: audioFile,
+      enrich: 'false',
+    };
+    const mockFormData = {
+      get: (key: string) => formFields[key] ?? null,
+    };
+    const req: any = new Request('http://localhost/api/whisper/transcribe', { method: 'POST' });
+    req.formData = async () => mockFormData;
+    const event = {
+      request: req,
+      url: new URL('http://localhost/api/whisper/transcribe'),
+      params: {},
+      locals: { user: { id: TEST_USER_ID, role: 'admin' } },
+    };
+    const res = await POST(event as any);
+    const data = await jsonBody(res);
+    expect(data.ok).toBe(true);
+    expect(data.text).toBeTruthy();
+    global.fetch = originalFetch;
+  });
 
-	it('returns 400 for missing audio file', async () => {
-		const { POST } = await import('../src/routes/api/whisper/transcribe/+server.js');
-		const req: any = new Request('http://localhost/api/whisper/transcribe', { method: 'POST' });
-		req.formData = async () => ({ get: () => null });
-		const event = {
-			request: req,
-			url: new URL('http://localhost/api/whisper/transcribe'),
-			params: {},
-			locals: { user: { id: TEST_USER_ID, role: 'admin' } },
-		};
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing audio file', async () => {
+    const { POST } = await import('../src/routes/api/whisper/transcribe/+server.js');
+    const req: any = new Request('http://localhost/api/whisper/transcribe', { method: 'POST' });
+    req.formData = async () => ({ get: () => null });
+    const event = {
+      request: req,
+      url: new URL('http://localhost/api/whisper/transcribe'),
+      params: {},
+      locals: { user: { id: TEST_USER_ID, role: 'admin' } },
+    };
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 401 for unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/whisper/transcribe/+server.js');
-		const req: any = new Request('http://localhost/api/whisper/transcribe', { method: 'POST' });
-		req.formData = async () => ({ get: () => null });
-		const event = {
-			request: req,
-			url: new URL('http://localhost/api/whisper/transcribe'),
-			params: {},
-			locals: { user: null },
-		};
-		const res = await POST(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 for unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/whisper/transcribe/+server.js');
+    const req: any = new Request('http://localhost/api/whisper/transcribe', { method: 'POST' });
+    req.formData = async () => ({ get: () => null });
+    const event = {
+      request: req,
+      url: new URL('http://localhost/api/whisper/transcribe'),
+      params: {},
+      locals: { user: null },
+    };
+    const res = await POST(event as any);
+    expect(res.status).toBe(401);
+  });
 });
 
 // ─────────────────────────────────────────────────────────

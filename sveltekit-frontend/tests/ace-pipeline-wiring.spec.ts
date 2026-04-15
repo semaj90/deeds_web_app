@@ -52,10 +52,11 @@ vi.mock('$lib/server/db/client', () => ({
 
 // ── Mock auth ───────────────────────────────────────────────────────────
 vi.mock('$lib/server/auth-helpers.js', () => ({
-	requireAuth: vi.fn((locals: any) => {
-		if (!locals?.user) throw new Error('Unauthorized');
-		return { user: locals.user };
-	}),
+  requireAuth: vi.fn((event: any) => {
+    const locals = event?.locals ?? event;
+    if (!locals?.user) throw new Error('Unauthorized');
+    return { user: locals.user };
+  }),
 }));
 
 // ── Mock Qdrant ─────────────────────────────────────────────────────────
@@ -118,8 +119,8 @@ describe('ACE pipeline wiring', () => {
 			const { TOKEN_BUDGET } = await import('$lib/server/ace/types.js');
 
 			expect(TOKEN_BUDGET).toHaveProperty('codebaseContext');
-			expect(TOKEN_BUDGET.codebaseContext).toBe(200);
-			expect(TOKEN_BUDGET.total).toBe(2250);
+			expect(TOKEN_BUDGET.codebaseContext).toBe(400);
+      expect(TOKEN_BUDGET.total).toBe(5100);
 		});
 	});
 
@@ -172,25 +173,36 @@ describe('ACE pipeline wiring', () => {
 		it('includes codebase context section when codebaseContext is populated', async () => {
 			const { buildACEPrompt } = await import('$lib/server/ace/context-assembler.js');
 			const context = {
-				userProfile: null,
-				caseContext: null,
-				glossaryMatches: null,
-				ragChunks: [],
-				kagNeighbors: [],
-				chatHistory: [],
-				entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
-				practiceTemplate: null,
-				queryTags: [],
-				webSearchContext: null,
-				persona: 'neutral',
-				evidenceMetadata: null,
-				evidenceConnections: null,
-				userAnalyticsContext: null,
-				codebaseContext: [
-					{ filePath: 'src/lib/server/ace/context-assembler.ts', content: 'export function assembleACEContext() {}', score: 0.92, lineStart: 31 },
-					{ filePath: 'src/lib/server/ace/types.ts', content: 'export interface ACEContext {}', score: 0.88 },
-				],
-			};
+        userProfile: null,
+        caseContext: null,
+        glossaryMatches: null,
+        ragChunks: [],
+        kagNeighbors: [],
+        kbChunks: [],
+        caseChunks: [],
+        chatHistory: [],
+        entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
+        practiceTemplate: null,
+        queryTags: [],
+        webSearchContext: null,
+        persona: 'neutral',
+        evidenceMetadata: null,
+        evidenceConnections: null,
+        userAnalyticsContext: null,
+        codebaseContext: [
+          {
+            filePath: 'src/lib/server/ace/context-assembler.ts',
+            content: 'export function assembleACEContext() {}',
+            score: 0.92,
+            lineStart: 31,
+          },
+          {
+            filePath: 'src/lib/server/ace/types.ts',
+            content: 'export interface ACEContext {}',
+            score: 0.88,
+          },
+        ],
+      };
 
 			const prompt = buildACEPrompt(context as any, 'How does ACE context assembly work?');
 
@@ -204,22 +216,24 @@ describe('ACE pipeline wiring', () => {
 		it('omits codebase section when codebaseContext is null', async () => {
 			const { buildACEPrompt } = await import('$lib/server/ace/context-assembler.js');
 			const context = {
-				userProfile: null,
-				caseContext: null,
-				glossaryMatches: null,
-				ragChunks: [],
-				kagNeighbors: [],
-				chatHistory: [],
-				entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
-				practiceTemplate: null,
-				queryTags: [],
-				webSearchContext: null,
-				persona: 'neutral',
-				evidenceMetadata: null,
-				evidenceConnections: null,
-				userAnalyticsContext: null,
-				codebaseContext: null,
-			};
+        userProfile: null,
+        caseContext: null,
+        glossaryMatches: null,
+        ragChunks: [],
+        kagNeighbors: [],
+        kbChunks: [],
+        caseChunks: [],
+        chatHistory: [],
+        entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
+        practiceTemplate: null,
+        queryTags: [],
+        webSearchContext: null,
+        persona: 'neutral',
+        evidenceMetadata: null,
+        evidenceConnections: null,
+        userAnalyticsContext: null,
+        codebaseContext: null,
+      };
 
 			const prompt = buildACEPrompt(context as any, 'test');
 
@@ -247,29 +261,33 @@ describe('ACE pipeline wiring', () => {
 		});
 
 		it('returns complete with parsed evaluation', async () => {
-			const evalData = {
-				responseId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-				quality: 0.85,
-				completeness: 0.9,
-				accuracy: 0.8,
-				suggestions: ['Add more citations'],
-				shouldRetry: false,
-				evaluatedAt: '2026-04-02T00:00:00.000Z',
-			};
-			mockRedisGet.mockResolvedValueOnce(JSON.stringify(evalData));
+      const evalData = {
+        responseId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        quality: 0.85,
+        completeness: 0.9,
+        accuracy: 0.8,
+        suggestions: ['Add more citations'],
+        shouldRetry: false,
+        evaluatedAt: '2026-04-02T00:00:00.000Z',
+      };
+      mockRedisGet
+        .mockResolvedValueOnce(null) // synthesis:result → no synthesis
+        .mockResolvedValueOnce(null) // synthesis:status → no status
+        .mockResolvedValueOnce(JSON.stringify(evalData)); // ace:result → evaluation
 
-			const { GET } = await import('../src/routes/api/synthesis/evaluation/[id]/+server.js');
+      const { GET } = await import('../src/routes/api/synthesis/evaluation/[id]/+server.js');
 
-			const response = await GET({
-				params: { id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
-				request: new Request('http://localhost'), locals: { user: { id: 'u1', email: 'test@test.com' } },
-			} as any);
+      const response = await GET({
+        params: { id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+        request: new Request('http://localhost'),
+        locals: { user: { id: 'u1', email: 'test@test.com' } },
+      } as any);
 
-			const body = await response.json();
-			expect(body.status).toBe('complete');
-			expect(body.evaluation.quality).toBe(0.85);
-			expect(body.evaluation.suggestions).toEqual(['Add more citations']);
-		});
+      const body = await response.json();
+      expect(body.status).toBe('complete');
+      expect(body.evaluation.quality).toBe(0.85);
+      expect(body.evaluation.suggestions).toEqual(['Add more citations']);
+    });
 
 		it('returns invalid_id for non-UUID', async () => {
 			const { GET } = await import('../src/routes/api/synthesis/evaluation/[id]/+server.js');

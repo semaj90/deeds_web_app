@@ -146,7 +146,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			         coalesce(l.snippet, s.snippet) AS snippet,
 			         coalesce(l.jcode, s.jcode) AS jcode,
 			         coalesce(l.jname, s.jname) AS jname,
-			         coalesce(l.lex_score, 0) * 0.4 + coalesce(s.sem_score, 0) * 0.6 AS score
+			         coalesce(l.lex_score, 0) * 0.4 + coalesce(s.sem_score, 0) * 0.6 AS score,
+			         CASE
+			           WHEN l.chunk_id IS NOT NULL AND s.chunk_id IS NOT NULL THEN 'fused'
+			           WHEN s.chunk_id IS NOT NULL THEN 'vector'
+			           ELSE 'fts'
+			         END AS match_type
 			  FROM lexical l
 			  FULL OUTER JOIN semantic s USING (chunk_id)
 			)
@@ -166,7 +171,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			       lc.page_start, lc.page_end,
 			       ts_rank(ln.tsv, plainto_tsquery('english', $1)) AS score,
 			       lc.chunk_text AS snippet,
-			       j.code AS jcode, j.name AS jname
+			       j.code AS jcode, j.name AS jname,
+			       'fts' AS match_type
 			FROM legal_chunks lc
 			JOIN legal_nodes ln ON ln.id = lc.legal_node_id
 			JOIN library_documents ld ON ld.id = ln.document_id
@@ -207,6 +213,7 @@ function formatGoHit(hit: Record<string, unknown>) {
 
 /** Format a row from the inline SQL fallback */
 function formatHit(row: Record<string, unknown>) {
+	const snippet = (row.snippet as string) ?? '';
 	return {
 		chunkId:      row.chunk_id,
 		documentId:   row.document_id,
@@ -216,7 +223,7 @@ function formatHit(row: Record<string, unknown>) {
 		heading:      row.heading,
 		nodePath:     row.node_path,
 		nodeType:     row.node_type,
-		snippet:      (row.snippet as string)?.slice(0, 400) + ((row.snippet as string)?.length > 400 ? '…' : ''),
+		snippet:      snippet.length > 400 ? snippet.slice(0, 400) + '…' : snippet,
 		score:        Number(row.score ?? 0),
 		sourceType:   row.source_type,
 		isOfficial:   row.is_official,
@@ -225,5 +232,6 @@ function formatHit(row: Record<string, unknown>) {
 		pageEnd:      row.page_end,
 		jurisdiction: { code: row.jcode, name: row.jname },
 		corpusType:   row.corpus_type,
+		matchType:    (row.match_type as string) ?? 'fts',
 	};
 }

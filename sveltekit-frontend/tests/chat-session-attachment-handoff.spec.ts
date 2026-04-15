@@ -35,6 +35,22 @@ vi.mock('$lib/ai/emotion-context.js', () => ({
   getEmotionState: vi.fn(() => ({ composite: { mood: 'focused' } })),
 }));
 
+vi.mock('@huggingface/transformers', () => ({
+  AutoTokenizer: {
+    from_pretrained: vi.fn(async () => ({ encode: vi.fn(() => ({ length: 10 })) })),
+  },
+}));
+
+vi.mock('onnxruntime-web', () => ({
+  Tensor: vi.fn(),
+  InferenceSession: { create: vi.fn() },
+}));
+
+vi.mock('$lib/ai/onnx/session.js', () => ({
+  getOnnxSession: vi.fn(async () => ({ run: vi.fn() })),
+  getProviderLabel: vi.fn(() => 'cpu'),
+}));
+
 import { ChatSession } from '../src/lib/models/ChatSession.svelte.ts';
 
 function makeAttachmentFile(name: string, text = 'Attachment source text for testing.') {

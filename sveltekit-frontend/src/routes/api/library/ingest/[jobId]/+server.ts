@@ -1,9 +1,11 @@
 /**
  * GET /api/library/ingest/[jobId]
- * SSE stream of ingestion progress. Clients poll every ~2s.
- * Emits: { stage, progress, status, metrics }
- * Closes when status = 'complete' or 'failed'.
+ * Returns current ingestion job status as plain JSON.
+ * Clients poll this endpoint every ~2.5s; no SSE needed since polling is client-driven.
+ *
+ * Response: { stage, stageLabel, status, progress, errorText, metrics, document, stageIndex, totalStages }
  */
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { isUuid } from '$lib/server/validation.js';
@@ -26,83 +28,46 @@ function stageLabel(stage: string): string {
 }
 
 export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user?.id) return new Response('Unauthorized', { status: 401 });
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { jobId } = params;
-	if (!isUuid(jobId)) return new Response(JSON.stringify({ error: 'Invalid ID format' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+	if (!isUuid(jobId)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
 
-	const encoder = new TextEncoder();
-	let closed = false;
+	try {
+		const res = await pool.query(
+			`SELECT ij.stage, ij.status, ij.progress, ij.error_text, ij.metrics_json,
+			        ld.title, ld.corpus_type, ld.page_count, ld.id AS document_id
+			 FROM ingestion_jobs ij
+			 JOIN library_documents ld ON ld.id = ij.document_id
+			 WHERE ij.id = $1`,
+			[jobId]
+		);
 
-	const stream = new ReadableStream({
-		async start(controller) {
-			const send = (data: object) => {
-				if (closed) return;
-				controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-			};
+		const row = res.rows[0];
+		if (!row) {
+			return json({ error: 'Job not found' }, { status: 404 });
+		}
 
-			const poll = async () => {
-				try {
-					const res = await pool.query(
-						`SELECT ij.stage, ij.status, ij.progress, ij.error_text, ij.metrics_json,
-						        ld.title, ld.corpus_type, ld.page_count, ld.id AS document_id
-						 FROM ingestion_jobs ij
-						 JOIN library_documents ld ON ld.id = ij.document_id
-						 WHERE ij.id = $1`,
-						[jobId]
-					);
-					const row = res.rows[0];
-					if (!row) {
-						send({ error: 'Job not found' });
-						controller.close();
-						closed = true;
-						return;
-					}
-
-					send({
-						stage:      row.stage,
-						stageLabel: stageLabel(row.stage),
-						status:     row.status,
-						progress:   Number(row.progress),
-						errorText:  row.error_text ?? null,
-						metrics:    row.metrics_json ?? {},
-						document: {
-							id:        row.document_id,
-							title:     row.title,
-							corpusType: row.corpus_type,
-							pageCount: row.page_count,
-						},
-						stageIndex:  STAGES.indexOf(row.stage),
-						totalStages: STAGES.length,
-					});
-
-					if (row.status === 'complete' || row.status === 'failed') {
-						controller.close();
-						closed = true;
-						return;
-					}
-
-					// Poll again after 1.5s
-					if (!closed) setTimeout(poll, 1500);
-				} catch {
-					send({ error: 'Poll error' });
-					controller.close();
-					closed = true;
-				}
-			};
-
-			await poll();
-		},
-		cancel() {
-			closed = true;
-		},
-	});
-
-	return new Response(stream, {
-		headers: {
-			'Content-Type':  'text/event-stream',
-			'Cache-Control': 'no-cache',
-			Connection:      'keep-alive',
-		},
-	});
+		return json({
+			stage:      row.stage,
+			stageLabel: stageLabel(row.stage),
+			status:     row.status,
+			progress:   Number(row.progress),
+			errorText:  row.error_text ?? null,
+			metrics:    row.metrics_json ?? {},
+			document: {
+				id:         row.document_id,
+				title:      row.title,
+				corpusType: row.corpus_type,
+				pageCount:  row.page_count,
+			},
+			stageIndex:  STAGES.indexOf(row.stage),
+			totalStages: STAGES.length,
+		});
+	} catch (err) {
+		console.error('[ingest/status] query failed:', err);
+		return json({ error: 'Status query failed' }, { status: 500 });
+	}
 };

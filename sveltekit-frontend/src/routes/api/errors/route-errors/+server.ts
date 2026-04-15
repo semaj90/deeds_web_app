@@ -23,10 +23,10 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const parsed = routeErrorsSchema.safeParse({
-		route: url.searchParams.get('route'),
-		limit: url.searchParams.get('limit'),
-		hours: url.searchParams.get('hours'),
-	});
+    route: url.searchParams.get('route'),
+    limit: url.searchParams.get('limit') ?? undefined,
+    hours: url.searchParams.get('hours') ?? undefined,
+  });
 
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid params' }, { status: 400 });

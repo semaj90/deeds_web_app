@@ -114,7 +114,15 @@ const mockSchema = {
 vi.mock('$lib/server/db/schema', () => mockSchema);
 vi.mock('$lib/server/db/schema.js', () => mockSchema);
 
-vi.mock('$lib/server/db/schema-postgres.js', () => ({}));
+vi.mock('$lib/server/db/schema-postgres.js', () => ({
+  personsOfInterest: { id: 'id', name: 'name', createdBy: 'created_by' },
+  poiRelationships: {
+    poiId1: 'poi_id_1',
+    poiId2: 'poi_id_2',
+    relationshipType: 'relationship_type',
+    strength: 'strength',
+  },
+}));
 
 vi.mock('drizzle-orm', () => ({
 	eq: vi.fn((...args: unknown[]) => ({ type: 'eq', args })),
@@ -221,12 +229,12 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 	// ── GET ──
 	describe('GET', () => {
 		it('returns 401 when unauthenticated', async () => {
-			try {
-				await GET({ url: mkUrl('/api/reports'), request: new Request('http://localhost'), locals: anonLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(401);
-			}
+			const res = await GET({
+        url: mkUrl('/api/reports'),
+        request: new Request('http://localhost'),
+        locals: anonLocals,
+      });
+      expect(res.status).toBe(401);
 		});
 
 		it('returns all user reports with defaults', async () => {
@@ -296,43 +304,31 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 				})),
 			});
 
-			try {
-				await GET({ url: mkUrl('/api/reports'), request: new Request('http://localhost'), locals: authedLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(500);
-			}
+			const res = await GET({
+        url: mkUrl('/api/reports'),
+        request: new Request('http://localhost'),
+        locals: authedLocals,
+      });
+      // Degraded response contract: returns 200 with empty data
+      expect(res.status).toBe(200);
 		});
 	});
 
 	// ── POST ──
 	describe('POST', () => {
 		it('returns 401 when unauthenticated', async () => {
-			try {
-				await POST({ request: mkRequest({}), locals: anonLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(401);
-			}
+			const res = await POST({ request: mkRequest({}), locals: anonLocals });
+      expect(res.status).toBe(401);
 		});
 
 		it('returns error for missing caseId', async () => {
-			try {
-				await POST({ request: mkRequest({ title: 'Test' }), locals: authedLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				// HttpError(400) thrown inside try/catch becomes 500 (HttpError !instanceof Error)
-				expect(err.status).toBe(500);
-			}
+			const res = await POST({ request: mkRequest({ title: 'Test' }), locals: authedLocals });
+      expect(res.status).toBe(400);
 		});
 
 		it('returns error for invalid caseId UUID', async () => {
-			try {
-				await POST({ request: mkRequest({ caseId: 'not-uuid' }), locals: authedLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(500);
-			}
+			const res = await POST({ request: mkRequest({ caseId: 'not-uuid' }), locals: authedLocals });
+      expect(res.status).toBe(400);
 		});
 
 		it('creates report with valid data', async () => {
@@ -406,43 +402,26 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 				})),
 			});
 
-			try {
-				await POST({ request: mkRequest({ caseId: UUID1 }), locals: authedLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(500);
-			}
+			const res = await POST({ request: mkRequest({ caseId: UUID1 }), locals: authedLocals });
+      expect(res.status).toBe(500);
 		});
 	});
 
 	// ── PATCH ──
 	describe('PATCH', () => {
 		it('returns 401 when unauthenticated', async () => {
-			try {
-				await PATCH({ request: mkRequest({}), locals: anonLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(401);
-			}
+			const res = await PATCH({ request: mkRequest({}), locals: anonLocals });
+      expect(res.status).toBe(401);
 		});
 
 		it('returns error for empty ids array', async () => {
-			try {
-				await PATCH({ request: mkRequest({ ids: [] }), locals: authedLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				// HttpError(400) caught inside try/catch becomes 500
-				expect(err.status).toBe(500);
-			}
+			const res = await PATCH({ request: mkRequest({ ids: [] }), locals: authedLocals });
+      expect(res.status).toBe(400);
 		});
 
 		it('returns error for invalid UUID in ids', async () => {
-			try {
-				await PATCH({ request: mkRequest({ ids: ['not-uuid'] }), locals: authedLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(500);
-			}
+			const res = await PATCH({ request: mkRequest({ ids: ['not-uuid'] }), locals: authedLocals });
+      expect(res.status).toBe(400);
 		});
 
 		it('bulk updates reports with status', async () => {
@@ -501,37 +480,27 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 				})),
 			});
 
-			try {
-				await PATCH({
-					request: mkRequest({ ids: [UUID1], status: 'completed' }),
-					locals: authedLocals,
-				});
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(500);
-			}
+			const res = await PATCH({
+        request: mkRequest({ ids: [UUID1], status: 'completed' }),
+        locals: authedLocals,
+      });
+			expect(res.status).toBe(500);
 		});
 	});
 
 	// ── DELETE ──
 	describe('DELETE', () => {
 		it('returns 401 when unauthenticated', async () => {
-			try {
-				await DELETE({ request: mkRequest({ ids: [UUID1] }, 'DELETE'), locals: anonLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(401);
-			}
+			const res = await DELETE({
+        request: mkRequest({ ids: [UUID1] }, 'DELETE'),
+        locals: anonLocals,
+      });
+      expect(res.status).toBe(401);
 		});
 
 		it('returns error for empty ids', async () => {
-			try {
-				await DELETE({ request: mkRequest({ ids: [] }, 'DELETE'), locals: authedLocals });
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				// HttpError(400) caught inside try/catch becomes 500
-				expect(err.status).toBe(500);
-			}
+			const res = await DELETE({ request: mkRequest({ ids: [] }, 'DELETE'), locals: authedLocals });
+      expect(res.status).toBe(400);
 		});
 
 		it('bulk deletes reports', async () => {
@@ -572,15 +541,11 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 				})),
 			});
 
-			try {
-				await DELETE({
-					request: mkRequest({ ids: [UUID1] }, 'DELETE'),
-					locals: authedLocals,
-				});
-				expect.unreachable('should have thrown');
-			} catch (err: any) {
-				expect(err.status).toBe(500);
-			}
+			const res = await DELETE({
+        request: mkRequest({ ids: [UUID1] }, 'DELETE'),
+        locals: authedLocals,
+      });
+			expect(res.status).toBe(500);
 		});
 	});
 });
@@ -608,7 +573,7 @@ describe('/api/reports/save (POST)', () => {
 
 	it('saves report successfully', async () => {
 		const { db } = await import('$lib/server/db/client');
-		const updated = { id: 'r1', title: 'Saved Report', content: '<p>Updated</p>' };
+		const updated = { id: UUID1, title: 'Saved Report', content: '<p>Updated</p>' };
 		(db.update as any).mockReturnValueOnce({
 			set: vi.fn(() => ({
 				where: vi.fn(() => ({
@@ -618,9 +583,9 @@ describe('/api/reports/save (POST)', () => {
 		});
 
 		const res = await POST({
-			request: mkRequest({ reportId: 'r1', title: 'Saved Report', contentHtml: '<p>Updated</p>' }),
-			locals: authedLocals,
-		});
+      request: mkRequest({ reportId: UUID1, title: 'Saved Report', contentHtml: '<p>Updated</p>' }),
+      locals: authedLocals,
+    });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(true);
@@ -638,9 +603,9 @@ describe('/api/reports/save (POST)', () => {
 		});
 
 		const res = await POST({
-			request: mkRequest({ reportId: 'nonexistent' }),
-			locals: authedLocals,
-		});
+      request: mkRequest({ reportId: UUID2 }),
+      locals: authedLocals,
+    });
 		expect(res.status).toBe(404);
 	});
 
@@ -655,9 +620,9 @@ describe('/api/reports/save (POST)', () => {
 		});
 
 		const res = await POST({
-			request: mkRequest({ reportId: 'r1' }),
-			locals: authedLocals,
-		});
+      request: mkRequest({ reportId: UUID1 }),
+      locals: authedLocals,
+    });
 		expect(res.status).toBe(500);
 	});
 });
@@ -998,45 +963,77 @@ describe('/api/persons-of-interest/relationships (POST)', () => {
 	});
 
 	it('creates relationship with valid data', async () => {
-		const { db } = await import('$lib/server/db/client');
-		const newRel = { id: 'rel-1', poiId1: UUID1, poiId2: UUID2, relationshipType: 'business', strength: '0.8' };
-		(db.insert as any).mockReturnValueOnce(buildInsertChain([newRel]));
+    const { db } = await import('$lib/server/db/client');
+    const newRel = {
+      id: 'rel-1',
+      poiId1: UUID1,
+      poiId2: UUID2,
+      relationshipType: 'business',
+      strength: '0.8',
+    };
+    // Mock db.select for ownership check (returns 2 matching POIs)
+    (db.select as any).mockReturnValueOnce({
+      from: vi.fn(() => ({
+        where: vi.fn(async () => [{ id: UUID1 }, { id: UUID2 }]),
+      })),
+    });
+    (db.insert as any).mockReturnValueOnce(buildInsertChain([newRel]));
 
-		const res = await POST({
-			request: mkRequest({ poiId1: UUID1, poiId2: UUID2, type: 'business', strength: 0.8 }),
-			locals: authedLocals,
-		});
-		const data = await res.json();
-		expect(res.status).toBe(200);
-		expect(data.relationship.relationshipType).toBe('business');
-	});
+    const res = await POST({
+      request: mkRequest({ poiId1: UUID1, poiId2: UUID2, type: 'business', strength: 0.8 }),
+      locals: authedLocals,
+    });
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.relationship.relationshipType).toBe('business');
+  });
 
 	it('defaults to unknown type and 0.7 strength', async () => {
-		const { db } = await import('$lib/server/db/client');
-		const newRel = { id: 'rel-2', poiId1: UUID1, poiId2: UUID2, relationshipType: 'unknown', strength: '0.7' };
-		(db.insert as any).mockReturnValueOnce(buildInsertChain([newRel]));
+    const { db } = await import('$lib/server/db/client');
+    const newRel = {
+      id: 'rel-2',
+      poiId1: UUID1,
+      poiId2: UUID2,
+      relationshipType: 'unknown',
+      strength: '0.7',
+    };
+    // Mock db.select for ownership check (returns 2 matching POIs)
+    (db.select as any).mockReturnValueOnce({
+      from: vi.fn(() => ({
+        where: vi.fn(async () => [{ id: UUID1 }, { id: UUID2 }]),
+      })),
+    });
+    (db.insert as any).mockReturnValueOnce(buildInsertChain([newRel]));
 
-		const res = await POST({
-			request: mkRequest({ poiId1: UUID1, poiId2: UUID2 }),
-			locals: authedLocals,
-		});
-		const data = await res.json();
-		expect(res.status).toBe(200);
-		expect(data.relationship.relationshipType).toBe('unknown');
-	});
+    const res = await POST({
+      request: mkRequest({ poiId1: UUID1, poiId2: UUID2 }),
+      locals: authedLocals,
+    });
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.relationship.relationshipType).toBe('unknown');
+  });
 
 	it('returns 500 on DB error', async () => {
-		const { db } = await import('$lib/server/db/client');
-		(db.insert as any).mockReturnValueOnce({
-			values: vi.fn(() => ({
-				returning: vi.fn(async () => { throw new Error('DB error'); }),
-			})),
-		});
+    const { db } = await import('$lib/server/db/client');
+    // Mock db.select for ownership check (returns 2 matching POIs)
+    (db.select as any).mockReturnValueOnce({
+      from: vi.fn(() => ({
+        where: vi.fn(async () => [{ id: UUID1 }, { id: UUID2 }]),
+      })),
+    });
+    (db.insert as any).mockReturnValueOnce({
+      values: vi.fn(() => ({
+        returning: vi.fn(async () => {
+          throw new Error('DB error');
+        }),
+      })),
+    });
 
-		const res = await POST({
-			request: mkRequest({ poiId1: UUID1, poiId2: UUID2, type: 'conflict' }),
-			locals: authedLocals,
-		});
-		expect(res.status).toBe(500);
-	});
+    const res = await POST({
+      request: mkRequest({ poiId1: UUID1, poiId2: UUID2, type: 'conflict' }),
+      locals: authedLocals,
+    });
+    expect(res.status).toBe(500);
+  });
 });

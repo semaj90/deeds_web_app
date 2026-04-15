@@ -376,400 +376,422 @@ describe('/api/cases/[id]/connections (GET)', () => {
 });
 
 describe('/api/cases/[id]/connections (POST)', () => {
-	it('rejects unauthenticated requests', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/connections/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/connections', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-			body: { fromEvidenceId: TEST_EVIDENCE_ID, toEvidenceId: TEST_PERSON_ID },
-		});
-		await expect(POST(event as any)).rejects.toThrow();
-	});
+  it('rejects unauthenticated requests', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/connections/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/connections', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+      body: { fromEvidenceId: TEST_EVIDENCE_ID, toEvidenceId: TEST_PERSON_ID },
+    });
+    await expect(POST(event as any)).rejects.toThrow();
+  });
 
-	it('rejects invalid input (bad UUID)', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/connections/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/connections', {
-			params: { id: TEST_CASE_ID },
-			body: { fromEvidenceId: 'not-uuid', toEvidenceId: 'also-bad' },
-		});
-		await expect(POST(event as any)).rejects.toThrow();
-	});
+  it('rejects invalid input (bad UUID)', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/connections/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/connections', {
+      params: { id: TEST_CASE_ID },
+      body: { fromEvidenceId: 'not-uuid', toEvidenceId: 'also-bad' },
+    });
+    await expect(POST(event as any)).rejects.toThrow();
+  });
 
-	it('creates connection on success', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/connections/+server.js');
-		mockInsertReturning.push({ id: 'new-conn-id', caseId: TEST_CASE_ID, fromEvidenceId: TEST_EVIDENCE_ID, toEvidenceId: TEST_PERSON_ID });
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/connections', {
-			params: { id: TEST_CASE_ID },
-			body: {
-				fromEvidenceId: TEST_EVIDENCE_ID,
-				toEvidenceId: TEST_PERSON_ID,
-				connectionType: 'supports',
-				label: 'Key link',
-			},
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(201);
-		const body = await jsonBody(res);
-		expect(body.connection).toBeDefined();
-	});
+  it('creates connection on success', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/connections/+server.js');
+    mockInsertReturning.push({
+      id: 'new-conn-id',
+      caseId: TEST_CASE_ID,
+      fromEvidenceId: TEST_EVIDENCE_ID,
+      toEvidenceId: TEST_PERSON_ID,
+    });
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/connections', {
+      params: { id: TEST_CASE_ID },
+      body: {
+        fromEvidenceId: TEST_EVIDENCE_ID,
+        toEvidenceId: TEST_PERSON_ID,
+        connectionType: 'supports',
+        label: 'Key link',
+      },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(201);
+    const body = await jsonBody(res);
+    expect(body.connection).toBeDefined();
+  });
 });
 
 // ═════════════════════════════════════════════════════════
 //  /api/cases/[id]/persons (GET, POST, DELETE)
 // ═════════════════════════════════════════════════════════
 describe('/api/cases/[id]/persons (GET)', () => {
-	it('returns 401 when unauthenticated', async () => {
-		const { GET } = await import('../src/routes/api/cases/[id]/persons/+server.js');
-		const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/persons', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-		});
-		const res = await GET(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { GET } = await import('../src/routes/api/cases/[id]/persons/+server.js');
+    const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/persons', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+    });
+    const res = await GET(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns persons list', async () => {
-		const { GET } = await import('../src/routes/api/cases/[id]/persons/+server.js');
-		mockDbRows.push({
-			linkId: 'link1',
-			personId: TEST_PERSON_ID,
-			fullName: 'Jane Doe',
-			role: 'suspect',
-			riskLevel: 'high',
-			dob: '1990-01-01',
-			lastKnownLocation: 'NYC',
-			notes: 'Primary suspect',
-			relationshipType: 'suspect',
-			isPrimary: 'true',
-			linkedAt: '2026-01-01',
-		});
-		const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/persons', {
-			params: { id: TEST_CASE_ID },
-		});
-		const res = await GET(event as any);
-		expect(res.status).toBe(200);
-		const body = await jsonBody(res);
-		expect(body.persons).toHaveLength(1);
-		expect(body.persons[0].fullName).toBe('Jane Doe');
-	});
+  it('returns persons list', async () => {
+    const { GET } = await import('../src/routes/api/cases/[id]/persons/+server.js');
+    mockDbRows.push({
+      linkId: 'link1',
+      personId: TEST_PERSON_ID,
+      fullName: 'Jane Doe',
+      role: 'suspect',
+      riskLevel: 'high',
+      dob: '1990-01-01',
+      lastKnownLocation: 'NYC',
+      notes: 'Primary suspect',
+      relationshipType: 'suspect',
+      isPrimary: 'true',
+      linkedAt: '2026-01-01',
+    });
+    const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/persons', {
+      params: { id: TEST_CASE_ID },
+    });
+    const res = await GET(event as any);
+    expect(res.status).toBe(200);
+    const body = await jsonBody(res);
+    expect(body.persons).toHaveLength(1);
+    expect(body.persons[0].fullName).toBe('Jane Doe');
+  });
 });
 
 describe('/api/cases/[id]/persons (POST)', () => {
-	it('returns 401 when unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/persons/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/persons', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-			body: { personId: TEST_PERSON_ID },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/persons/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/persons', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+      body: { personId: TEST_PERSON_ID },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 400 for invalid personId', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/persons/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/persons', {
-			params: { id: TEST_CASE_ID },
-			body: { personId: 'not-valid' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid personId', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/persons/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/persons', {
+      params: { id: TEST_CASE_ID },
+      body: { personId: 'not-valid' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('links person to case on success', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/persons/+server.js');
-		mockInsertReturning.push({ id: 'new-link-id' });
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/persons', {
-			params: { id: TEST_CASE_ID },
-			body: { personId: TEST_PERSON_ID, relationshipType: 'witness' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(201);
-		const body = await jsonBody(res);
-		expect(body.success).toBe(true);
-	});
+  it('links person to case on success', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/persons/+server.js');
+    mockInsertReturning.push({ id: 'new-link-id' });
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/persons', {
+      params: { id: TEST_CASE_ID },
+      body: { personId: TEST_PERSON_ID, relationshipType: 'witness' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(201);
+    const body = await jsonBody(res);
+    expect(body.success).toBe(true);
+  });
 });
 
 describe('/api/cases/[id]/persons (DELETE)', () => {
-	it('returns 401 when unauthenticated', async () => {
-		const { DELETE } = await import('../src/routes/api/cases/[id]/persons/+server.js');
-		const event = makeEvent('DELETE', '/api/cases/' + TEST_CASE_ID + '/persons', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-			body: { personId: TEST_PERSON_ID },
-		});
-		const res = await DELETE(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { DELETE } = await import('../src/routes/api/cases/[id]/persons/+server.js');
+    const event = makeEvent('DELETE', '/api/cases/' + TEST_CASE_ID + '/persons', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+      body: { personId: TEST_PERSON_ID },
+    });
+    const res = await DELETE(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('unlinks person from case', async () => {
-		const { DELETE } = await import('../src/routes/api/cases/[id]/persons/+server.js');
-		const event = makeEvent('DELETE', '/api/cases/' + TEST_CASE_ID + '/persons', {
-			params: { id: TEST_CASE_ID },
-			body: { personId: TEST_PERSON_ID },
-		});
-		const res = await DELETE(event as any);
-		expect(res.status).toBe(200);
-		const body = await jsonBody(res);
-		expect(body.success).toBe(true);
-	});
+  it('unlinks person from case', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { DELETE } = await import('../src/routes/api/cases/[id]/persons/+server.js');
+    const event = makeEvent('DELETE', '/api/cases/' + TEST_CASE_ID + '/persons', {
+      params: { id: TEST_CASE_ID },
+      body: { personId: TEST_PERSON_ID },
+    });
+    const res = await DELETE(event as any);
+    expect(res.status).toBe(200);
+    const body = await jsonBody(res);
+    expect(body.success).toBe(true);
+  });
 });
 
 // ═════════════════════════════════════════════════════════
 //  /api/cases/[id]/key-points (POST)
 // ═════════════════════════════════════════════════════════
 describe('/api/cases/[id]/key-points (POST)', () => {
-	it('returns 401 when unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/key-points/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/key-points', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/key-points/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/key-points', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 400 for invalid case ID', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/key-points/+server.js');
-		const event = makeEvent('POST', '/api/cases/bad/key-points', {
-			params: { id: 'bad' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid case ID', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/key-points/+server.js');
+    const event = makeEvent('POST', '/api/cases/bad/key-points', {
+      params: { id: 'bad' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns no-op when no evidence found', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/key-points/+server.js');
-		mockDbRows.length = 0;
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/key-points', {
-			params: { id: TEST_CASE_ID },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(200);
-		const body = await jsonBody(res);
-		expect(body.total).toBe(0);
-	});
+  it('returns no-op when no evidence found', async () => {
+    // First query (ownership) returns case, second query (evidence) returns empty
+    let callCount = 0;
+    mockChain.then.mockImplementation((resolve: any, reject?: any) => {
+      callCount++;
+      const data = callCount === 1 ? [{ id: TEST_CASE_ID }] : [];
+      return Promise.resolve(data).then(resolve, reject);
+    });
+    const { POST } = await import('../src/routes/api/cases/[id]/key-points/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/key-points', {
+      params: { id: TEST_CASE_ID },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(200);
+    const body = await jsonBody(res);
+    expect(body.total).toBe(0);
+  });
 });
 
 // ═════════════════════════════════════════════════════════
 //  /api/cases/[id]/reasoning-chain (POST)
 // ═════════════════════════════════════════════════════════
 describe('/api/cases/[id]/reasoning-chain (POST)', () => {
-	it('returns 401 when unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-			body: { summary: 'A long case summary about property dispute in federal court' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+      body: { summary: 'A long case summary about property dispute in federal court' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 400 for invalid case ID', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
-		const event = makeEvent('POST', '/api/cases/bad/reasoning-chain', {
-			params: { id: 'bad' },
-			body: { summary: 'Some summary text here' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid case ID', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
+    const event = makeEvent('POST', '/api/cases/bad/reasoning-chain', {
+      params: { id: 'bad' },
+      body: { summary: 'Some summary text here' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 400 for missing summary', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
-			params: { id: TEST_CASE_ID },
-			body: {},
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing summary', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
+      params: { id: TEST_CASE_ID },
+      body: {},
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns reasoning chain on success', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
-			params: { id: TEST_CASE_ID },
-			body: {
-				summary: 'Property dispute involving two parties over deed ownership in federal court',
-				keyFacts: ['Title chain unclear', 'Survey discrepancy'],
-				jurisdiction: 'Federal',
-			},
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(200);
-		const body = await jsonBody(res);
-		expect(body.success).toBe(true);
-		expect(body.chain.steps).toHaveLength(4);
-		expect(body.chain.overallConfidence).toBeGreaterThan(0);
-	});
+  it('returns reasoning chain on success', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
+      params: { id: TEST_CASE_ID },
+      body: {
+        summary: 'Property dispute involving two parties over deed ownership in federal court',
+        keyFacts: ['Title chain unclear', 'Survey discrepancy'],
+        jurisdiction: 'Federal',
+      },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(200);
+    const body = await jsonBody(res);
+    expect(body.success).toBe(true);
+    expect(body.chain.steps).toHaveLength(4);
+    expect(body.chain.overallConfidence).toBeGreaterThan(0);
+  });
 
-	it('returns 500 on chain generation failure', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
-		mockGenerateReasoningChain.mockRejectedValueOnce(new Error('LLM timeout'));
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
-			params: { id: TEST_CASE_ID },
-			body: { summary: 'A case about deed forgery in real property transfers' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(500);
-	});
+  it('returns 500 on chain generation failure', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/reasoning-chain/+server.js');
+    mockGenerateReasoningChain.mockRejectedValueOnce(new Error('LLM timeout'));
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/reasoning-chain', {
+      params: { id: TEST_CASE_ID },
+      body: { summary: 'A case about deed forgery in real property transfers' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(500);
+  });
 });
 
 // ═════════════════════════════════════════════════════════
 //  /api/cases/[id]/citations (GET, POST)
 // ═════════════════════════════════════════════════════════
 describe('/api/cases/[id]/citations (GET)', () => {
-	it('rejects unauthenticated requests', async () => {
-		const { GET } = await import('../src/routes/api/cases/[id]/citations/+server.js');
-		const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/citations', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-		});
-		await expect(GET(event as any)).rejects.toThrow();
-	});
+  it('rejects unauthenticated requests', async () => {
+    const { GET } = await import('../src/routes/api/cases/[id]/citations/+server.js');
+    const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/citations', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+    });
+    await expect(GET(event as any)).rejects.toThrow();
+  });
 
-	it('returns 400 for invalid case ID', async () => {
-		const { GET } = await import('../src/routes/api/cases/[id]/citations/+server.js');
-		const event = makeEvent('GET', '/api/cases/bad/citations', {
-			params: { id: 'bad' },
-		});
-		const res = await GET(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid case ID', async () => {
+    const { GET } = await import('../src/routes/api/cases/[id]/citations/+server.js');
+    const event = makeEvent('GET', '/api/cases/bad/citations', {
+      params: { id: 'bad' },
+    });
+    const res = await GET(event as any);
+    expect(res.status).toBe(400);
+  });
 });
 
 describe('/api/cases/[id]/citations (POST)', () => {
-	it('rejects unauthenticated requests', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/citations/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/citations', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-			body: { citation_id: TEST_CITATION_ID },
-		});
-		await expect(POST(event as any)).rejects.toThrow();
-	});
+  it('rejects unauthenticated requests', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/citations/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/citations', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+      body: { citation_id: TEST_CITATION_ID },
+    });
+    await expect(POST(event as any)).rejects.toThrow();
+  });
 
-	it('rejects invalid case ID', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/citations/+server.js');
-		const event = makeEvent('POST', '/api/cases/bad/citations', {
-			params: { id: 'bad' },
-			body: { citation_id: TEST_CITATION_ID },
-		});
-		await expect(POST(event as any)).rejects.toThrow();
-	});
+  it('rejects invalid case ID', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/citations/+server.js');
+    const event = makeEvent('POST', '/api/cases/bad/citations', {
+      params: { id: 'bad' },
+      body: { citation_id: TEST_CITATION_ID },
+    });
+    await expect(POST(event as any)).rejects.toThrow();
+  });
 });
 
 // ═════════════════════════════════════════════════════════
 //  /api/cases/[id]/chat (POST)
 // ═════════════════════════════════════════════════════════
 describe('/api/cases/[id]/chat (POST)', () => {
-	it('returns 401 when unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/chat', {
-			locals: { user: null },
-			params: { id: TEST_CASE_ID },
-			body: { chatId: 'chat1', messages: [{ role: 'user', content: 'Hello' }] },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/chat', {
+      locals: { user: null },
+      params: { id: TEST_CASE_ID },
+      body: { chatId: 'chat1', messages: [{ role: 'user', content: 'Hello' }] },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 400 for invalid case ID', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
-		const event = makeEvent('POST', '/api/cases/bad/chat', {
-			params: { id: 'bad' },
-			body: { chatId: 'chat1', messages: [{ role: 'user', content: 'Hello' }] },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid case ID', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
+    const event = makeEvent('POST', '/api/cases/bad/chat', {
+      params: { id: 'bad' },
+      body: { chatId: 'chat1', messages: [{ role: 'user', content: 'Hello' }] },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 400 for empty messages', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/chat', {
-			params: { id: TEST_CASE_ID },
-			body: { chatId: 'chat1', messages: [] },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for empty messages', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/chat', {
+      params: { id: TEST_CASE_ID },
+      body: { chatId: 'chat1', messages: [] },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('saves chat messages on success', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
-		mockInsertReturning.push({ id: 'msg1', role: 'user', content: 'Hello' });
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/chat', {
-			params: { id: TEST_CASE_ID },
-			body: {
-				chatId: 'chat-session-1',
-				messages: [
-					{ role: 'user', content: 'What are the key facts?' },
-					{ role: 'assistant', content: 'The key facts are...' },
-				],
-			},
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(200);
-		const body = await jsonBody(res);
-		expect(body.success).toBe(true);
-	});
+  it('saves chat messages on success', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/chat/+server.js');
+    mockInsertReturning.push({ id: 'msg1', role: 'user', content: 'Hello' });
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/chat', {
+      params: { id: TEST_CASE_ID },
+      body: {
+        chatId: 'chat-session-1',
+        messages: [
+          { role: 'user', content: 'What are the key facts?' },
+          { role: 'assistant', content: 'The key facts are...' },
+        ],
+      },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(200);
+    const body = await jsonBody(res);
+    expect(body.success).toBe(true);
+  });
 });
 
 // ═════════════════════════════════════════════════════════
 //  /api/cases/[id]/canvas (GET, POST)
 // ═════════════════════════════════════════════════════════
 describe('/api/cases/[id]/canvas (POST)', () => {
-	it('returns 400 for missing case id', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
-		const event = makeEvent('POST', '/api/cases//canvas', {
-			params: { id: '' },
-			body: { nodes: [] },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing case id', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
+    const event = makeEvent('POST', '/api/cases//canvas', {
+      params: { id: '' },
+      body: { nodes: [] },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 400 for invalid case ID format', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
-		const event = makeEvent('POST', '/api/cases/bad/canvas', {
-			params: { id: 'not-uuid' },
-			body: { nodes: [] },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid case ID format', async () => {
+    const { POST } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
+    const event = makeEvent('POST', '/api/cases/bad/canvas', {
+      params: { id: 'not-uuid' },
+      body: { nodes: [] },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('saves canvas state on success', async () => {
-		const { POST } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
-		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/canvas', {
-			params: { id: TEST_CASE_ID },
-			body: { nodes: [{ id: 'n1', x: 100, y: 200 }], edges: [] },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(200);
-		const body = await jsonBody(res);
-		expect(body.success).toBe(true);
-	});
+  it('saves canvas state on success', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { POST } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
+    const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/canvas', {
+      params: { id: TEST_CASE_ID },
+      body: { nodes: [{ id: 'n1', x: 100, y: 200 }], edges: [] },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(200);
+    const body = await jsonBody(res);
+    expect(body.success).toBe(true);
+  });
 });
 
 describe('/api/cases/[id]/canvas (GET)', () => {
-	it('returns 400 for invalid case ID', async () => {
-		const { GET } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
-		const event = makeEvent('GET', '/api/cases/bad/canvas', {
-			params: { id: 'bad' },
-		});
-		const res = await GET(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid case ID', async () => {
+    const { GET } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
+    const event = makeEvent('GET', '/api/cases/bad/canvas', {
+      params: { id: 'bad' },
+    });
+    const res = await GET(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns null when no canvas state exists', async () => {
-		const { GET } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
-		const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/canvas', {
-			params: { id: TEST_CASE_ID },
-		});
-		const res = await GET(event as any);
-		expect(res.status).toBe(200);
-	});
+  it('returns null when no canvas state exists', async () => {
+    mockDbRows.push({ id: TEST_CASE_ID });
+    const { GET } = await import('../src/routes/api/cases/[id]/canvas/+server.js');
+    const event = makeEvent('GET', '/api/cases/' + TEST_CASE_ID + '/canvas', {
+      params: { id: TEST_CASE_ID },
+    });
+    const res = await GET(event as any);
+    expect(res.status).toBe(200);
+  });
 });
 
 // ═════════════════════════════════════════════════════════

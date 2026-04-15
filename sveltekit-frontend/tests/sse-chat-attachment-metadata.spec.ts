@@ -6,7 +6,7 @@ const mockInsertValues = vi.fn();
 const mockInsert = vi.fn(() => ({ values: mockInsertValues }));
 const mockHistoryLimit = vi.fn();
 const mockHistoryOrderBy = vi.fn(() => ({ limit: mockHistoryLimit }));
-const mockHistoryWhere = vi.fn(() => ({ orderBy: mockHistoryOrderBy }));
+const mockHistoryWhere = vi.fn(() => ({ orderBy: mockHistoryOrderBy, limit: mockHistoryLimit }));
 const mockHistoryFrom = vi.fn(() => ({ where: mockHistoryWhere }));
 const mockSelect = vi.fn(() => ({ from: mockHistoryFrom }));
 
@@ -69,6 +69,8 @@ vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
 vi.mock('$lib/server/retrieval/graph-context.js', () => ({
   getGraphContext: mockGetGraphContext,
   getCaseGraphNeighborIds: vi.fn(async () => []),
+  getNeo4jMultiHopNeighbors: vi.fn(async () => []),
+  formatNeo4jContext: vi.fn(() => ''),
   buildGraphShouldFilter: vi.fn(() => null),
   applyGraphAuthorityScoring: vi.fn((docs: unknown[]) => docs),
 }));
@@ -121,6 +123,8 @@ vi.mock('$lib/server/ace/self-prompt.js', () => ({
 
 vi.mock('$lib/server/ace/context-assembler.js', () => ({
   fetchGlossaryMatches: mockFetchGlossaryMatches,
+  fetchCachedACEChunks: vi.fn(async () => []),
+  persistACEChunks: vi.fn(async () => undefined),
 }));
 
 vi.mock('$lib/server/retrieval/document-dag.js', () => ({
@@ -135,9 +139,11 @@ vi.mock('$lib/server/queue/rabbitmq-manager-fixed.js', () => ({
 }));
 
 function makeJsonResponse(body: unknown, ok = true) {
+  const bodyStr = JSON.stringify(body);
   return {
     ok,
     json: async () => body,
+    text: async () => bodyStr,
   };
 }
 

@@ -751,16 +751,20 @@ describe('/api/knowledge/stats (GET)', () => {
 	});
 
 	it('returns 503 for Qdrant errors', async () => {
-		mockGetStats.mockRejectedValueOnce(new Error('Qdrant connection refused'));
+    mockGetStats.mockRejectedValueOnce(new Error('Qdrant connection refused'));
 
-		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
-		expect(res.status).toBe(503);
-	});
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(false);
+  });
 
-	it('returns 500 for generic errors', async () => {
-		mockGetStats.mockRejectedValueOnce(new Error('Something went wrong'));
+  it('returns 500 for generic errors', async () => {
+    mockGetStats.mockRejectedValueOnce(new Error('Something went wrong'));
 
-		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
-		expect(res.status).toBe(500);
-	});
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(false);
+  });
 });

@@ -76,6 +76,13 @@ export default defineConfig({
     // Mock module resolution
     alias: {
       $lib: path.resolve(__dirname, './src/lib'),
+      // @huggingface/transformers has broken package.json exports (main-only, no ESM)
+      // Mock it so dynamic imports in ChatSession.svelte.ts resolve in test env
+      '@huggingface/transformers': path.resolve(
+        __dirname,
+        './tests/__mocks__/huggingface-transformers.ts'
+      ),
+      'onnxruntime-web': path.resolve(__dirname, './tests/__mocks__/onnxruntime-web.ts'),
     },
     // Coverage settings
     coverage: {
