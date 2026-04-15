@@ -2,7 +2,6 @@
 	import * as d3Import from 'd3';
 	// Migrated to $effect
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const d3 = d3Import as any;
 
 	interface Props {
@@ -70,7 +69,7 @@
 			.attr('height', height);
 
 		// Create force simulation
-		const simulation = d3.forceSimulation(nodes as any)
+		const simulation = d3.forceSimulation(nodes)
 			.force('link', d3.forceLink(links).id((d: any) => d.id).distance(100))
 			.force('charge', d3.forceManyBody().strength(-300))
 			.force('center', d3.forceCenter(width / 2, height / 2))
@@ -105,7 +104,7 @@
 			.data(nodes)
 			.enter()
 			.append('g')
-			.call((d3 as any).drag()
+			.call(d3.drag()
 				.on('start', dragstarted)
 				.on('drag', dragged)
 				.on('end', dragended)
@@ -114,7 +113,7 @@
 		// Node circles
 		const colorScale = d3.scaleSequential()
 			.domain([0, d3.max(nodes, (d: any) => d.error_count) || 0])
-			.interpolator(d3.interpolateRdYlGn).range([1, 0] as any);
+			.interpolator(d3.interpolateRdYlGn).range([1, 0] as [number, number]);
 
 		node.append('circle')
 			.attr('r', (d: any) => 10 + Math.sqrt(d.error_count) * 3)
@@ -179,7 +178,7 @@
 	$effect(() => {
 
 		loadErrorPropagation();
-	
+
 });
 
 	$effect(() => {

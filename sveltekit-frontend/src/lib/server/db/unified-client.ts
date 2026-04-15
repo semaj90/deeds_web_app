@@ -84,19 +84,24 @@ type QdrantHit = { id: string | number; score?: number; payload?: Record<string,
 const isDev = process.env.NODE_ENV === 'development';
 
 const config: DatabaseConfig = {
-    runtime: {
-	url: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
-        poolSize: isDev ? 5 : 20
-    },
-	admin: {
-	url: process.env.DATABASE_URL_ADMIN ?? process.env.ADMIN_DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
-        poolSize: 2
-    },
-	qdrant: process.env.QDRANT_URL ? {
+  runtime: {
+    url: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
+    poolSize: isDev ? 5 : 20,
+  },
+  admin: {
+    url:
+      process.env.DATABASE_URL_ADMIN ??
+      process.env.ADMIN_DATABASE_URL ??
+      'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
+    poolSize: 2,
+  },
+  qdrant: process.env.QDRANT_URL
+    ? {
         url: process.env.QDRANT_URL,
-        apiKey: process.env.QDRANT_API_KEY
-    } : undefined,
-    environment: (process.env.NODE_ENV as any) ?? 'development'
+        apiKey: process.env.QDRANT_API_KEY,
+      }
+    : undefined,
+  environment: (process.env.NODE_ENV ?? 'development') as 'development' | 'production' | 'test',
 };
 
 // ============================================================================
@@ -125,20 +130,23 @@ class DatabaseManager {
     private createRuntimeConnection(): postgres.Sql {
         if (!this.runtimeConnection) {
             this.runtimeConnection = postgres(config.runtime.url, {
-                max: config.runtime.poolSize,
-                idle_timeout: 30,
-                max_lifetime: 60 * 30,
-                prepare: !isDev,
-                ssl: false,
-                types: {
-                    // Custom pgvector support
-                    vector: {
-	to: 1184,
-                        from: [1184],
-                        serialize: (x: number[]) => (Array.isArray(x) ? `[${x.join(',')}]` : x),
-                        parse: (x: string) => (typeof x === 'string' && x.startsWith('[') && x.endsWith(']') ? x.slice(1, -1).split(',').map(Number) : [])
-                    }
-                } as any
+              max: config.runtime.poolSize,
+              idle_timeout: 30,
+              max_lifetime: 60 * 30,
+              prepare: !isDev,
+              ssl: false,
+              types: {
+                // Custom pgvector support
+                vector: {
+                  to: 1184,
+                  from: [1184],
+                  serialize: (x: number[]) => (Array.isArray(x) ? `[${x.join(',')}]` : x),
+                  parse: (x: string) =>
+                    typeof x === 'string' && x.startsWith('[') && x.endsWith(']')
+                      ? x.slice(1, -1).split(',').map(Number)
+                      : [],
+                },
+              } as Parameters<typeof postgres>[1]['types'],
             });
         }
         return this.runtimeConnection;
@@ -209,7 +217,7 @@ class DatabaseManager {
                 const migrationsFolder = process.env.MIGRATIONS_FOLDER || path.resolve(process.cwd(), 'drizzle');
                 console.log(`🔄 Running database migrations with admin privileges (folder=${migrationsFolder})...`);
                 try {
-                    await migrate(adminDb as any, { migrationsFolder });
+                    await migrate(adminDb as Parameters<typeof migrate>[0], { migrationsFolder });
                     console.log('✅ Database migrations completed');
                 } catch (err) {
                     console.warn('⚠️ Migration failed (may already be applied):', err);
@@ -351,10 +359,10 @@ class DatabaseManager {
                             */
                             for (const r of qRes) {
                                 results.push({
-                                    id: String(r.id),
-                                    score: r.score,
-                                    document: r.payload as any,
-                                    source: 'qdrant'
+                                  id: String(r.id),
+                                  score: r.score,
+                                  document: r.payload as unknown as DocumentMetadata,
+                                  source: 'qdrant',
                                 });
                             }
                         } catch (err) {

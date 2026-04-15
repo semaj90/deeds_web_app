@@ -512,7 +512,22 @@
 	tag={tagToRename}
 	isOpen={showTagRename}
 	onClose={() => { showTagRename = false; tagToRename = null; }}
-	onRename={async (oldName, newName) => { console.log(`Rename: ${oldName} → ${newName}`); showTagRename = false; tagToRename = null; return true; }}
+	onRename={async (oldName, newName) => {
+		try {
+			const res = await fetch('/api/codebase/tags/rename', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ oldName, newName })
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error ?? 'Rename failed');
+			showTagRename = false; tagToRename = null;
+			return true;
+		} catch (e) {
+			console.error('Tag rename failed:', e);
+			return false;
+		}
+	}}
 />
 
 <style>

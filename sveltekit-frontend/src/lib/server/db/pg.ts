@@ -20,15 +20,15 @@ export function getPostgreSQLDatabase(): PostgresJsDatabase<typeof schema> | nul
 	console.log('[PostgreSQL] Connecting via postgres-js client:', databaseUrl);
 
 	// Create drizzle instance using postgres-js client (pgClient)
-	_db = drizzle(pgClient as any, { schema });
+	_db = drizzle(pgClient as Parameters<typeof drizzle>[0], { schema });
 	return _db;
 }
 
 // Cleanup function: attempt to close postgres-js client if supported
 export async function closeDatabase(): Promise<void> {
 	try {
-		if (typeof (pgClient as any).end === 'function') {
-			await (pgClient as any).end();
+		if (typeof (pgClient as unknown as { end?: () => Promise<void> }).end === 'function') {
+			await (pgClient as unknown as { end?: () => Promise<void> }).end?.();
 		}
 	} catch (e) {
 		console.warn('[PostgreSQL] Error closing postgres-js client:', e);

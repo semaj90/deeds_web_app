@@ -3,17 +3,15 @@
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLButtonAttributes {
-		asChild?: boolean;
 		children?: Snippet;
+		child?: Snippet<[{ props: Record<string, unknown> }]>;
 	}
 
-	let { asChild = false, children, ...restProps }: Props = $props();
+	let { children, child, ...restProps }: Props = $props();
 </script>
 
-{#if asChild}
-	{#if children}
-		{@render children()}
-	{/if}
+{#if child}
+	{@render child({ props: restProps })}
 {:else}
 	<button type="button" {...restProps}>
 		{#if children}

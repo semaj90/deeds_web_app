@@ -113,12 +113,12 @@ export class ComponentLoader {
 
     // Start loading
     const loadingPromise = loader()
-      .then(component => {
+      .then((component) => {
         this.loadedComponents.set(key, component);
         this.loadingPromises.delete(key);
         return component;
       })
-      .catch(error => {
+      .catch((error) => {
         this.loadingPromises.delete(key);
         console.error(`Failed to load component ${key}:`, error);
         throw error;
@@ -149,6 +149,19 @@ export class ComponentLoader {
     this.loadedComponents.clear();
     this.loadingPromises.clear();
   }
+
+  get loadedCount(): number {
+    return this.loadedComponents.size;
+  }
+  get loadingCount(): number {
+    return this.loadingPromises.size;
+  }
+  get loadedKeys(): string[] {
+    return Array.from(this.loadedComponents.keys());
+  }
+  get loadingKeys(): string[] {
+    return Array.from(this.loadingPromises.keys());
+  }
 }
 
 // Global component loader instance
@@ -159,7 +172,7 @@ export const preloadStrategies = {
   // Preload components likely to be used soon
   async onIdle() {
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      return new Promise<void>(resolve => {
+      return new Promise<void>((resolve) => {
         window.requestIdleCallback(() => {
           // Preload commonly used AI components
           componentLoader.preload('detectives', loadAIComponents.detectives);
@@ -175,13 +188,13 @@ export const preloadStrategies = {
     const commonComponents = [
       { key: 'qloraMonitoring', loader: loadAIComponents.qloraMonitoring },
       { key: 'fabricCanvas', loader: loadAIComponents.fabricCanvas },
-      { key: 'legalAnalysis', loader: loadAIComponents.legalAnalysis }
+      { key: 'legalAnalysis', loader: loadAIComponents.legalAnalysis },
     ];
 
     // Preload after first user interaction
-    return Promise.all(commonComponents.map(({ key, loader }) =>
-      componentLoader.preload(key, loader)
-    ));
+    return Promise.all(
+      commonComponents.map(({ key, loader }) => componentLoader.preload(key, loader))
+    );
   },
 
   // Preload based on route
@@ -208,19 +221,17 @@ export const preloadStrategies = {
     const componentsToLoad = routeComponentMap[routeId] || [];
 
     return Promise.all(
-      componentsToLoad.map(({ key, loader }) =>
-        componentLoader.preload(key, loader)
-      )
+      componentsToLoad.map(({ key, loader }) => componentLoader.preload(key, loader))
     );
-  }
+  },
 };
 
 // Bundle analysis helper
 export function getBundleStats() {
   return {
-    loadedComponents: (componentLoader as any).loadedComponents.size,
-    loadingComponents: (componentLoader as any).loadingPromises.size,
-    componentsInMemory: Array.from((componentLoader as any).loadedComponents.keys()),
-    currentlyLoading: Array.from((componentLoader as any).loadingPromises.keys())
+    loadedComponents: componentLoader.loadedCount,
+    loadingComponents: componentLoader.loadingCount,
+    componentsInMemory: componentLoader.loadedKeys,
+    currentlyLoading: componentLoader.loadingKeys,
   };
 }

@@ -59,6 +59,7 @@
   const isUploading = $derived(progress !== undefined && progress < 100);
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
   class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-sand/20 bg-panel/50 hover:bg-panel transition-colors max-w-64"
   class:cursor-pointer={isClickable}

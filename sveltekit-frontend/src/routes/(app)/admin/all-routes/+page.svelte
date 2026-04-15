@@ -57,10 +57,10 @@
 	let metadataSource = $state<'cache' | 'network' | ''>('');
 
 	const EMPTY_METADATA = {
-		allEndpoints: [] as any[],
-		activeAPI: [] as any[],
-		archived: [] as any[],
-		categories: [] as any[],
+		allEndpoints: [] as RouteEndpoint[],
+		activeAPI: [] as RouteEndpoint[],
+		archived: [] as RouteEndpoint[],
+		categories: [] as string[],
 		stats: {
 			totalRoutes: 0, activeRoutes: 0, archivedRoutes: 0,
 			apiEndpoints: 0, pageServers: 0, pages: 0, categories: 0,
@@ -68,8 +68,8 @@
 			groupCounts: { app: 0, dev: 0, admin: 0, api: 0, system: 0, other: 0, archived: 0 },
 			authRequired: 0, sse: 0
 		},
-		crossRefs: [] as any[],
-		deadRoutes: [] as any[]
+		crossRefs: [] as RouteEndpoint[],
+		deadRoutes: [] as RouteEndpoint[]
 	};
 
 	const IDB_NAME = 'deeds-route-cache';
@@ -122,6 +122,23 @@
 	let categoryCount = $derived(apiMetadata.categories.length);
 	let systemEndpoints = $derived(apiMetadata.allEndpoints.filter((e: RouteEndpoint) => e.group === 'system'));
 	let showSystem = $state(false);
+
+	let allExpanded = $state(false);
+
+	function toggleExpandAll() {
+		allExpanded = !allExpanded;
+		showAPIExplorer = allExpanded;
+		showRouteTree = allExpanded;
+		showArchivedRoutes = allExpanded;
+		showDemos = allExpanded;
+		showDevReview = allExpanded;
+		showSystem = allExpanded;
+		showOpsLog = allExpanded;
+		showSimpleRoutes = allExpanded;
+		showRouteGraph = allExpanded;
+		showErrorBrainHistory = allExpanded;
+		if (allExpanded && errorBrainRuns.length === 0) loadErrorBrainHistory();
+	}
 
 	// Group standalone/system routes by functional subcategory
 	const standaloneSubgroupMap: Record<string, { label: string; icon: string }> = {
@@ -273,8 +290,8 @@
 		endpoints: routes.filter((r: any) => r.kind === 'endpoint' || r.kind === 'server').length
 	});
 
-	let errorClusters = $derived(Array.isArray((data as any).errorClusters) ? (data as any).errorClusters : []);
-	let serverStats = $derived((data as any).stats as { totalRoutes: number; totalClusters: number; errorCount: number; warningCount: number } ?? { totalRoutes: 0, totalClusters: 0, errorCount: 0, warningCount: 0 });
+	let errorClusters = $derived(Array.isArray(data.errorClusters) ? data.errorClusters : []);
+	let serverStats = $derived(data.stats as { totalRoutes: number; totalClusters: number; errorCount: number; warningCount: number } ?? { totalRoutes: 0, totalClusters: 0, errorCount: 0, warningCount: 0 });
 	let showClusters = $state(false);
 
 	// SSE Real-Time Updates
@@ -548,6 +565,9 @@
 		<button class="cap-item cap-eb" onclick={() => { showErrorBrainHistory = !showErrorBrainHistory; if (showErrorBrainHistory && errorBrainRuns.length === 0) loadErrorBrainHistory(); }}>
 			{showErrorBrainHistory ? '[-] HIDE ERROR BRAIN' : '[+] ERROR BRAIN'}
 		</button>
+		<button class="cap-item cap-expand" onclick={toggleExpandAll}>
+			{allExpanded ? '[-] COLLAPSE ALL' : '[+] EXPAND ALL'}
+		</button>
 		<button class="cap-item cap-ops" onclick={() => {
 			if (selectedRoute) {
 				decisionRoute = { path: selectedRoute.path ?? selectedRoute.id, reason: selectedRoute.errorState === 'broken' ? 'Route is broken' : selectedRoute.errorState === 'flaky' ? 'Route is flaky' : 'Routine review', decision: null };
@@ -562,7 +582,7 @@
 	{#if showAPIExplorer}
 		<div class="explorer-panel">
 			<RouteAPIExplorer
-				categories={apiMetadata.categories}
+				categories={apiMetadata.categories as any}
 				allEndpoints={apiMetadata.allEndpoints}
 				onTestEndpoint={handleTestEndpoint}
 			/>
@@ -626,8 +646,8 @@
 			<DevReviewPanel
 				endpoints={apiMetadata.allEndpoints}
 				stats={apiMetadata.stats}
-				crossRefs={apiMetadata.crossRefs ?? []}
-				deadRoutes={apiMetadata.deadRoutes ?? []}
+				crossRefs={(apiMetadata.crossRefs ?? []) as any}
+				deadRoutes={(apiMetadata.deadRoutes ?? []) as any}
 			/>
 		</div>
 	{/if}
@@ -1330,6 +1350,22 @@
 
 	.cap-item.cap-review:hover {
 		background: rgba(255, 102, 51, 0.1);
+	}
+
+	.cap-item.cap-expand {
+		color: #ffffff;
+		background: none;
+		border: 1px solid #ffffff;
+		padding: 0.15rem 0.6rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+		font-weight: bold;
+	}
+
+	.cap-item.cap-expand:hover {
+		background: rgba(255, 255, 255, 0.12);
 	}
 
 	.cap-item.cap-system {

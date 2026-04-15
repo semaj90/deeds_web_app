@@ -12,6 +12,8 @@
 		last_modified: string;
 	}
 
+	import { notificationStore } from '$lib/stores/notifications.svelte';
+
 	interface KBEntry { file_path: string, content: string;
 		embedding: number[];
 		tags: string[];
@@ -99,7 +101,7 @@
 
 			const data = await response.json();
 			if (data.success) {
-				alert(`Agent started fixing ${route.path}`);
+				notificationStore.add({ type: 'info', title: 'Agent started', message: `Fixing ${route.path}` });
 			}
 		} catch (error) {
 			console.error('Failed to start agent:', error);

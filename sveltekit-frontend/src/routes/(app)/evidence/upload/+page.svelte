@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import EvidenceUploadProgress from '$lib/components/evidence/EvidenceUploadProgress.svelte';
 	import { analytics } from '$lib/stores/analytics.svelte';
+	import { goto } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
 	let user = $derived(data.user);
@@ -78,7 +79,6 @@
 	}
 
 	function handleUploadComplete(evidenceId: string) {
-		console.log('[Upload] Complete:', evidenceId);
 		uploadComplete = true;
 		completedEvidenceId = evidenceId;
 	}
@@ -106,7 +106,6 @@
 
 			// Offline mode: mark upload as complete
 			uploadComplete = true;
-			console.log('[Upload] Saved locally (Offline Mode). Will upload when online.');
 		} catch (e) {
 			// Offline mode: show error
 			console.error('[Upload] Local save failed:', e instanceof Error ? e.message : 'Unknown error');

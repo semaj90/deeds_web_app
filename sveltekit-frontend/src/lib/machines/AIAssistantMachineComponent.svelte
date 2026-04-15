@@ -31,6 +31,13 @@ interface AssistantContext {
 	history: Array<{ query: string; resultCount: number }>;
 }
 
+type AssistantEvent =
+	| { type: 'UPDATE_QUERY'; query: string }
+	| { type: 'SEARCH' }
+	| { type: 'CLEAR' };
+
+type ErrorEvent = { error: { message?: string } };
+
 const assistantMachine = createMachine({
 	id: 'aiAssistant',
 	initial: 'idle',
@@ -48,7 +55,7 @@ const assistantMachine = createMachine({
 			on: {
 				UPDATE_QUERY: {
 					actions: assign({
-						query: ({ event }) => (event as any).query
+						query: ({ event }) => (event as AssistantEvent & { query?: string }).query
 					})
 				},
 				SEARCH: {
@@ -96,7 +103,7 @@ const assistantMachine = createMachine({
 					target: 'error',
 					actions: assign({
 						error: ({ event }) =>
-							(event as any).error?.message || 'Search failed',
+							(event as unknown as ErrorEvent).error?.message || 'Search failed',
 						chunks: [],
 						totalFound: 0
 					})
@@ -107,7 +114,7 @@ const assistantMachine = createMachine({
 			on: {
 				UPDATE_QUERY: {
 					actions: assign({
-						query: ({ event }) => (event as any).query
+						query: ({ event }) => (event as AssistantEvent & { query?: string }).query
 					})
 				},
 				SEARCH: {
@@ -129,7 +136,7 @@ const assistantMachine = createMachine({
 			on: {
 				UPDATE_QUERY: {
 					actions: assign({
-						query: ({ event }) => (event as any).query
+						query: ({ event }) => (event as AssistantEvent & { query?: string }).query
 					})
 				},
 				SEARCH: {

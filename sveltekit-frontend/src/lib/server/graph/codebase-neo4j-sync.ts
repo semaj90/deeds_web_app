@@ -60,6 +60,12 @@ async function mergeNodes(session: ReturnType<ReturnType<typeof getNeo4jDriver>[
 				routeType: isV2 ? (n as WorkerNodeV2).routeType : 'util',
 				symbolCount: isV2 ? (n as WorkerNodeV2).symbolCount : 0,
 				maxCallDepth: isV2 ? (n as WorkerNodeV2).maxCallDepth : 0,
+				// G21-G25: Svelte 5 rune compliance
+				isSvelteComponent: isV2 ? (n as WorkerNodeV2).isSvelteComponent : false,
+				hasSvelte4Props:    isV2 ? (n as WorkerNodeV2).hasSvelte4Props : false,
+				hasSvelte4Reactive: isV2 ? (n as WorkerNodeV2).hasSvelte4Reactive : false,
+				hasSvelte4Events:   isV2 ? (n as WorkerNodeV2).hasSvelte4Events : false,
+				hasRunesInPlainTs:  isV2 ? (n as WorkerNodeV2).hasRunesInPlainTs : false,
 			};
 		});
 
@@ -95,9 +101,14 @@ async function mergeNodes(session: ReturnType<ReturnType<typeof getNeo4jDriver>[
 			     f.isWorkerBoundary = node.isWorkerBoundary,
 			     f.isRouteFile      = node.isRouteFile,
 			     f.routeType        = node.routeType,
-			     f.symbolCount      = node.symbolCount,
-			     f.maxCallDepth     = node.maxCallDepth,
-			     f.updatedAt        = datetime()`,
+			     f.symbolCount        = node.symbolCount,
+			     f.maxCallDepth      = node.maxCallDepth,
+			     f.isSvelteComponent = node.isSvelteComponent,
+			     f.hasSvelte4Props   = node.hasSvelte4Props,
+			     f.hasSvelte4Reactive = node.hasSvelte4Reactive,
+			     f.hasSvelte4Events  = node.hasSvelte4Events,
+			     f.hasRunesInPlainTs = node.hasRunesInPlainTs,
+			     f.updatedAt         = datetime()`,
 			{ batch }
 		);
 		const batchMs = Date.now() - batchT;

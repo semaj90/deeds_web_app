@@ -16,6 +16,7 @@
  */
 
 import { page } from '$app/state';
+import { goto } from '$app/navigation';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
 import { generateAnswer, searchKnowledgeBase, validateSources } from '$lib/services/rag-source-validation';
@@ -160,9 +161,10 @@ function handleCancel() {
 }
 
 function handlePinToCanvas(citation: Citation) {
-  // TODO: Integrate with case canvas
-  console.log('Pin to canvas:', citation);
-  alert(`Would pin "${citation.source_title}" to canvas for case ${caseId || 'current'}`);
+  const caseTarget = caseId || '';
+  if (caseTarget) {
+    goto(`/cases/${caseTarget}/board?pin=${encodeURIComponent(citation.source_title ?? '')}`);
+  }
 }
 
 function startNewSearch() {

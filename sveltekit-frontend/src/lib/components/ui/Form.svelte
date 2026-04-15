@@ -1,8 +1,7 @@
 <script lang="ts">
 // Svelte 5 runes are auto-imported
 import Button from '$lib/components/ui/Button.svelte';
-// TODO: Fix form store exports
-// import { createFormStore, type FormOptions } from '$lib/stores/form.svelte';
+import { notificationStore } from '$lib/stores/notifications.svelte';
 
 interface Props {
 	// TODO: Fix FormOptions type
@@ -103,11 +102,11 @@ async function handleSubmit(_event: SubmitEvent): Promise<any> {
 	_event.preventDefault();
 	const isValid = await form.submit();
 	if (!isValid) {
-		// TODO: Fix notifications.error method
-		console.error(
-			"Form validation failed",
-        "Please correct the errors and try again."
-      );
+		notificationStore.add({
+			type: 'error',
+			title: 'Form validation failed',
+			message: 'Please correct the errors and try again.',
+		});
 	}
 }
 

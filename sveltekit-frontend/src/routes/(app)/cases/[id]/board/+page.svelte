@@ -10,13 +10,14 @@
 	import Fuse from 'fuse.js';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
+	import { notificationStore } from '$lib/stores/notifications.svelte';
 
 	// Props
 	let { data }: { data: PageData } = $props();
 	let caseId = $derived(data.caseId);
 	let initialState = $derived(data.initialState);
-	let evidenceItems = $derived((data as any).evidence || []);
-	let dbConnections = $derived((data as any).connections || []);
+	let evidenceItems = $derived(data.evidence || []);
+	let dbConnections = $derived(data.connections || []);
 
 	// State
 	let board: HybridBoard = $state() as HybridBoard;
@@ -144,10 +145,9 @@
 				const result = await res.json();
 				if (result.keyPoints?.length) {
 					// Update the evidence item in the local array
-					const items = evidenceItems as any[];
-					const idx = items.findIndex((e: any) => e.id === evidenceId);
+					const idx = evidenceItems.findIndex((e: { id: string }) => e.id === evidenceId);
 					if (idx >= 0) {
-						(items[idx] as any).keyPoints = result.keyPoints;
+						(evidenceItems[idx] as Record<string, unknown>).keyPoints = result.keyPoints;
 						// Force reactivity by reassigning selectedEvidence
 						if (selectedEvidence?.id === evidenceId) {
 							selectedEvidence = { ...selectedEvidence, keyPoints: result.keyPoints };
@@ -645,7 +645,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			isRecording = true;
 		} catch (e) {
 			console.error('Error accessing microphone:', e);
-			alert('Unable to access microphone. Please check permissions.');
+			notificationStore.add({ type: 'error', title: 'Microphone error', message: 'Unable to access microphone. Please check permissions.' });
 		}
 	}
 
@@ -670,13 +670,13 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			});
 			if (!res.ok) {
 				console.error('Failed to save', await res.json());
-				alert('Failed to save board state');
+				notificationStore.add({ type: 'error', title: 'Save failed', message: 'Failed to save board state.' });
 			} else {
 				isDirty = false;
 			}
 		} catch (e) {
 			console.error('Save error', e);
-			alert('Error saving board state');
+			notificationStore.add({ type: 'error', title: 'Save error', message: 'Error saving board state.' });
 		} finally {
 			isSaving = false;
 		}

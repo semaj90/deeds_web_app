@@ -40,6 +40,10 @@
 	let inputElement: HTMLInputElement;
 	let debounceTimer: ReturnType<typeof setTimeout>;
 
+	$effect(() => {
+		return () => clearTimeout(debounceTimer);
+	});
+
 	// Type colors
 	const typeColors: Record<string, string> = {
 		route: 'text-info/80',
@@ -136,8 +140,6 @@
 			isOpen = true;
 		}
 	}
-
-	// TODO: Add as cleanup in $effect: return () => clearTimeout(debounceTimer);
 </script>
 
 <div class="semantic-search">

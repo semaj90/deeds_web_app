@@ -108,169 +108,179 @@ export const GET: RequestHandler = async ({ params, url, locals, request }) => {
 	const userId = locals.user.id;
 
 	try {
-		// Step 1: Load source case from database
-		const [sourceCase] = await db
+    // Step 1: Load source case from database
+    const [sourceCase] = await db
       .select()
       .from(cases)
       .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
       .limit(1);
 
-		if (!sourceCase) {
-			return json({ error: 'Case not found' }, { status: 404 });
-		}
+    if (!sourceCase) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
 
-		// Step 2: Generate case embedding (description + evidence summaries)
-		const embedStart = performance.now();
-		const caseEmbedding = await generateCaseEmbedding(caseId, sourceCase);
-		if (!caseEmbedding || caseEmbedding.length !== 768) {
-			// Embedding unavailable — return empty results gracefully instead of 500
-			return json({
-				query: { caseId, title: sourceCase.title },
-				results: [],
-				timing: {
-					embedMs: Math.round(performance.now() - embedStart),
-					searchMs: 0, rerankMs: 0, aceMs: 0,
-					totalMs: Math.round(performance.now() - startTime)
-				}
-			});
-		}
-		const embedMs = performance.now() - embedStart;
+    // Step 2: Generate case embedding (description + evidence summaries)
+    const embedStart = performance.now();
+    const caseEmbedding = await generateCaseEmbedding(caseId, sourceCase);
+    if (!caseEmbedding || caseEmbedding.length !== 768) {
+      // Embedding unavailable — return empty results gracefully instead of 500
+      return json({
+        query: { caseId, title: sourceCase.title },
+        results: [],
+        timing: {
+          embedMs: Math.round(performance.now() - embedStart),
+          searchMs: 0,
+          rerankMs: 0,
+          aceMs: 0,
+          totalMs: Math.round(performance.now() - startTime),
+        },
+      });
+    }
+    const embedMs = performance.now() - embedStart;
 
-		// Step 3: Dual search (Qdrant + pgvector)
-		const searchStart = performance.now();
-		const candidates = await dualCaseSearch(caseEmbedding, caseId, limit * 3);
-		const searchMs = performance.now() - searchStart;
+    // Step 3: Dual search (Qdrant + pgvector)
+    const searchStart = performance.now();
+    const candidates = await dualCaseSearch(caseEmbedding, caseId, limit * 3);
+    const searchMs = performance.now() - searchStart;
 
-		if (candidates.length === 0) {
-			return json({
-				query: { caseId, title: sourceCase.title },
-				results: [],
-				timing: {
-					embedMs: Math.round(embedMs),
-					searchMs: Math.round(searchMs),
-					rerankMs: 0,
-					aceMs: 0,
-					totalMs: Math.round(performance.now() - startTime)
-				}
-			});
-		}
+    if (candidates.length === 0) {
+      return json({
+        query: { caseId, title: sourceCase.title },
+        results: [],
+        timing: {
+          embedMs: Math.round(embedMs),
+          searchMs: Math.round(searchMs),
+          rerankMs: 0,
+          aceMs: 0,
+          totalMs: Math.round(performance.now() - startTime),
+        },
+      });
+    }
 
-		// Step 4: Multi-modal reranking (5 signals)
-		const rerankStart = performance.now();
+    // Step 4: Multi-modal reranking (5 signals)
+    const rerankStart = performance.now();
 
-		// Enrich candidates with real Neo4j centrality scores
-		const candidateIds = candidates.map((c) => c.caseId);
-		const centralityMap = await computeCentralityForNodes(candidateIds).catch(() => new Map<string, number>());
-		if (centralityMap.size > 0) {
-			console.log(`[Case Similarity] Enriched ${centralityMap.size}/${candidates.length} candidates with Neo4j centrality`);
-		}
+    // Enrich candidates with real Neo4j centrality scores
+    const candidateIds = candidates.map((c) => c.caseId);
+    const centralityMap = await computeCentralityForNodes(candidateIds).catch(
+      () => new Map<string, number>()
+    );
+    if (centralityMap.size > 0) {
+      console.log(
+        `[Case Similarity] Enriched ${centralityMap.size}/${candidates.length} candidates with Neo4j centrality`
+      );
+    }
 
-		// Convert SimilarCase[] to DocumentCandidate[] for ranker
-		const docCandidates = candidates.map(c => ({
-			id: c.caseId,
-			title: c.title,
-			embedding: [], // Embedding already used in search
-			tags: c.sharedTags,
-			topicMemberships: c.topicCluster !== undefined
-				? [{ topicId: c.topicCluster, probability: 0.8 }]
-				: [],
-			centrality: centralityMap.get(c.caseId) ?? (c.graphConnections ? c.graphConnections / 100 : 0),
-			caseIds: [c.caseId]
-		}));
+    // Convert SimilarCase[] to DocumentCandidate[] for ranker
+    const docCandidates = candidates.map((c) => ({
+      id: c.caseId,
+      title: c.title,
+      embedding: [], // Embedding already used in search
+      tags: c.sharedTags,
+      topicMemberships:
+        c.topicCluster !== undefined ? [{ topicId: c.topicCluster, probability: 0.8 }] : [],
+      centrality:
+        centralityMap.get(c.caseId) ?? (c.graphConnections ? c.graphConnections / 100 : 0),
+      caseIds: [c.caseId],
+    }));
 
-		// Multi-modal ranking with 5 signals
-		let topResults = candidates;
-		if (userId) {
-			const ranker = new MultiModalRanker(userId);
-			const ranked = await ranker.rankDocuments(
-				caseEmbedding,
-				[], // No query tags for case similarity
-				docCandidates,
-				limit
-			);
+    // Multi-modal ranking with 5 signals
+    let topResults = candidates;
+    if (userId) {
+      const ranker = new MultiModalRanker(userId);
+      const ranked = await ranker.rankDocuments(
+        caseEmbedding,
+        [], // No query tags for case similarity
+        docCandidates,
+        limit
+      );
 
-			// Map ranked documents back to SimilarCase with signal breakdown
-			topResults = ranked.map(r => {
-				const original = candidates.find(c => c.caseId === r.documentId)!;
-				return {
-					...original,
-					similarity: r.score,
-					breakdown: {
-						vector: r.signals.vectorSimilarity,
-						tags: r.signals.tagOverlap,
-						topic: r.signals.topicAffinity,
-						centrality: r.signals.graphCentrality,
-						userHistory: r.signals.profileMatch
-					}
-				};
-			});
-		} else {
-			// No user context — sort by raw vector similarity
-			topResults = candidates.slice(0, limit);
-		}
+      // Map ranked documents back to SimilarCase with signal breakdown
+      topResults = ranked.map((r) => {
+        const original = candidates.find((c) => c.caseId === r.documentId)!;
+        return {
+          ...original,
+          similarity: r.score,
+          breakdown: {
+            vector: r.signals.vectorSimilarity,
+            tags: r.signals.tagOverlap,
+            topic: r.signals.topicAffinity,
+            centrality: r.signals.graphCentrality,
+            userHistory: r.signals.profileMatch,
+          },
+        };
+      });
+    } else {
+      // No user context — sort by raw vector similarity
+      topResults = candidates.slice(0, limit);
+    }
 
-		const rerankMs = performance.now() - rerankStart;
+    const rerankMs = performance.now() - rerankStart;
 
-		// Step 5: ACE context enrichment (for top result)
-		let aceContext = null;
-		let aceMs = 0;
-		if (topResults.length > 0) {
-			const aceStart = performance.now();
-			try {
-				aceContext = await assembleACEContext({
-					query: `Find cases similar to: ${sourceCase.title}`,
-					userId: userId ?? undefined,
-					caseId,
-					maxTokens: 1500
-				});
-			} catch (err) {
-				console.warn('[Case Similarity] ACE context failed (non-fatal):', err);
-			}
-			aceMs = performance.now() - aceStart;
-		}
+    // Step 5: ACE context enrichment (for top result)
+    let aceContext = null;
+    let aceMs = 0;
+    if (topResults.length > 0) {
+      const aceStart = performance.now();
+      try {
+        aceContext = await assembleACEContext({
+          query: `Find cases similar to: ${sourceCase.title}`,
+          userId: userId ?? undefined,
+          caseId,
+          maxTokens: 1500,
+        });
+      } catch (err) {
+        console.warn('[Case Similarity] ACE context failed (non-fatal):', err);
+      }
+      aceMs = performance.now() - aceStart;
+    }
 
-		// Step 6: Background Neo4j graph analysis (fire-and-forget)
-		let graphJobId: string | undefined;
-		if (triggerGraph && topResults.length > 0) {
-			graphJobId = await triggerGraphAnalysis(caseId, topResults.map(r => r.caseId));
-		}
+    // Step 6: Background Neo4j graph analysis (fire-and-forget)
+    let graphJobId: string | undefined;
+    if (triggerGraph && topResults.length > 0) {
+      graphJobId = await triggerGraphAnalysis(
+        caseId,
+        topResults.map((r) => r.caseId)
+      );
+    }
 
-		// Step 7: Store synthesis in CouchDB (fire-and-forget)
-		storeSynthesisInCouchDB(caseId, topResults, aceContext).catch(() => {
-			// Non-critical
-		});
+    // Step 7: Store synthesis in CouchDB (fire-and-forget)
+    storeSynthesisInCouchDB(caseId, topResults, aceContext).catch(() => {
+      // Non-critical
+    });
 
-		// Step 8: Record user interaction (TODO: implement view tracking)
-		// if (userId) {
-		// 	const historyTracker = new UserHistoryTracker(userId);
-		// 	await historyTracker.recordView(caseId, caseId, 0, `similar-cases-${caseId}`);
-		// }
+    // Step 8: Record user interaction (fire-and-forget)
+    if (userId) {
+      new UserHistoryTracker(userId)
+        .recordView(caseId, caseId, 0, `similar-cases-${caseId}`)
+        .catch(() => {});
+    }
 
-		const response: SimilarityResponse = {
-			query: {
-				caseId,
-				title: sourceCase.title,
-				...(includeEmbedding && { embedding: caseEmbedding })
-			},
-			results: topResults,
-			...(aceContext && { aceContext }),
-			timing: {
-				embedMs: Math.round(embedMs),
-				searchMs: Math.round(searchMs),
-				rerankMs: Math.round(rerankMs),
-				aceMs: Math.round(aceMs),
-				totalMs: Math.round(performance.now() - startTime)
-			},
-			...(graphJobId && { graphJobId })
-		};
+    const response: SimilarityResponse = {
+      query: {
+        caseId,
+        title: sourceCase.title,
+        ...(includeEmbedding && { embedding: caseEmbedding }),
+      },
+      results: topResults,
+      ...(aceContext && { aceContext }),
+      timing: {
+        embedMs: Math.round(embedMs),
+        searchMs: Math.round(searchMs),
+        rerankMs: Math.round(rerankMs),
+        aceMs: Math.round(aceMs),
+        totalMs: Math.round(performance.now() - startTime),
+      },
+      ...(graphJobId && { graphJobId }),
+    };
 
-		const { etag, isMatch } = checkETag(response, request.headers);
-		if (isMatch) return notModified(etag);
+    const { etag, isMatch } = checkETag(response, request.headers);
+    if (isMatch) return notModified(etag);
 
-		return json(response, {
-			headers: { ...cacheControl.private, ETag: etag }
-		});
-	} catch (err) {
+    return json(response, {
+      headers: { ...cacheControl.private, ETag: etag },
+    });
+  } catch (err) {
 		console.error('[Case Similarity] Error:', err instanceof Error ? err.message : err);
 		return json(
       {

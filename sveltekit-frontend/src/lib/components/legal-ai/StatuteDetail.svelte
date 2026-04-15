@@ -47,13 +47,15 @@
     contextLoading = true;
 
     try {
-      const response = await fetch(`/api/laws/${statute.code}`);
+      const response = await fetch('/api/statutes/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: statute.title || statute.code, limit: 5 })
+      });
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
-          context = data.context || [];
-          relatedCases = data.relatedCases || [];
-        }
+        context = (data.results ?? []).map((r: { snippet: string }) => r.snippet).filter(Boolean);
+        relatedCases = [];
       }
     } catch (error) {
       console.error('Error loading statute context:', error);

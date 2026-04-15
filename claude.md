@@ -638,6 +638,36 @@ rg "import.*zod\|from.*zod\|z\.\|zodSchema" src/routes/api/$MODULE/ --type ts
 rg "window\.\|document\.\|localStorage\|IndexedDB" src/lib/$MODULE --type svelte
 # If hits: verify guarded by onMount() or typeof window !== 'undefined'
 # Or route has export const ssr = false
+
+# ══════════════════════════════════════════════════════════════
+# TIER E: SVELTE 5 RUNE COMPLIANCE (G21-G25 — added 2026-04-14)
+# All gates MUST return 0 hits. Current baseline: all 0 ✅
+# ══════════════════════════════════════════════════════════════
+
+# G21: No Svelte 4 props (export let → $props())
+rg "export\s+let\s+\w+" src/ --glob "*.svelte"
+
+# G22: No Svelte 4 reactive declarations ($: → $derived/$effect)
+rg "^\s*\$:[^:]" src/ --glob "*.svelte"
+
+# G23: No Svelte 4 event directives (on:click → onclick)
+rg "\bon:[a-z][a-z]+=" src/ --glob "*.svelte"
+
+# G24: No createEventDispatcher in live code (callback props replace it)
+rg "createEventDispatcher\(\)" src/ --glob "*.svelte"
+
+# G25: No rune calls in plain .ts files (reactivity inert — use .svelte.ts)
+rg "\$(?:state|derived|effect|props)\s*[(<]" src/lib/ --type ts --glob "!*.svelte.ts" --glob "!*.d.ts"
+```
+
+**Rune compliance Neo4j queries** (http://localhost:7474):
+```cypher
+MATCH (n:CodebaseFile) WHERE n.isSvelteComponent = true
+RETURN count(n) AS svelteFiles,
+  sum(CASE WHEN n.hasSvelte4Props    THEN 1 ELSE 0 END) AS legacyExportLet,
+  sum(CASE WHEN n.hasSvelte4Reactive THEN 1 ELSE 0 END) AS legacyReactive,
+  sum(CASE WHEN n.hasSvelte4Events   THEN 1 ELSE 0 END) AS legacyOnEvent,
+  sum(CASE WHEN n.hasRunesInPlainTs  THEN 1 ELSE 0 END) AS runesInPlainTs
 ```
 
 Also check: config refs (`unocss.config.ts`, `svelte.config.js`, `vite.config.ts`), SvelteKit route files are NEVER orphans.

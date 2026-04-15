@@ -95,11 +95,52 @@
 	}): Promise<AISuggestion[]> {
 		const suggestions: AISuggestion[] = [];
 
-		// TODO: Implement actual AI suggestions via API
-		// For now, return empty array to avoid errors
-		console.log('AI suggestions context:', context);
+		try {
+			const prompt = [
+				'You are a legal writing assistant. Given the text before the cursor, suggest up to 3 short completions.',
+				'Reply ONLY with a JSON array of objects: [{"text":"...","type":"completion","reasoning":"...","confidence":0.8}].',
+				'Types: completion, grammar, semantic, legal_term. Keep each suggestion under 80 chars.',
+				`\nText before cursor:\n${context.contextBefore}`,
+				context.contextAfter ? `\nText after cursor:\n${context.contextAfter}` : '',
+			].join('\n');
 
-		return suggestions;
+			const res = await fetch('/api/chat', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: `${aiModel}:latest`,
+					prompt,
+					stream: false,
+					options: { temperature: 0.4, num_predict: 256 },
+				}),
+				signal: AbortSignal.timeout(10000),
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				const raw: string = data.response?.trim() ?? '';
+				// Extract JSON array from response (model may wrap in markdown)
+				const match = raw.match(/\[[\s\S]*\]/);
+				if (match) {
+					const parsed = JSON.parse(match[0]) as Array<{ text: string; type: AISuggestion['type']; reasoning: string; confidence: number }>;
+					for (const item of parsed) {
+						if (item.text) {
+							suggestions.push({
+								id: crypto.randomUUID(),
+								type: item.type ?? 'completion',
+								text: item.text,
+								confidence: item.confidence ?? 0.7,
+								reasoning: item.reasoning ?? '',
+							});
+						}
+					}
+				}
+			}
+		} catch {
+			// Silently degrade — suggestions are non-critical
+		}
+
+		return suggestions.slice(0, maxSuggestions);
 	}
 
 	// Update suggestion popup position

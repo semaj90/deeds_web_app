@@ -83,7 +83,7 @@
 
 	// Sync tags when doc loads
 	$effect(() => {
-		if (doc) tags = (doc.tags ?? (metadata as any)?.suggestedTags ?? []) as string[];
+		if (doc) tags = (doc.tags ?? (metadata as Record<string, unknown>)?.suggestedTags ?? []) as string[];
 	});
 
 	async function saveTags(newTags: string[]) {
@@ -103,9 +103,11 @@
 		}
 	}
 	let status = $derived(doc?.status ?? doc?.processingStatus ?? doc?.documentStatus ?? '');
-	let processingDiagnostics = $derived((metadata as any)?.processingDiagnostics ?? null);
-	let diagnosticStages = $derived.by(() => Object.entries((processingDiagnostics as any)?.stages ?? {}));
-	let diagnosticWarnings = $derived<Array<{ stage: string; detail: string; at: string }>>((processingDiagnostics as any)?.warnings ?? []);
+	let processingDiagnostics = $derived(
+		((metadata as Record<string, unknown>)?.processingDiagnostics as { stages?: Record<string, { status: string; detail?: string }>; warnings?: Array<{ stage: string; detail: string; at: string }>; startedAt?: string; completedAt?: string } | undefined) ?? null
+	);
+	let diagnosticStages = $derived.by(() => Object.entries(processingDiagnostics?.stages ?? {}) as [string, { status: string; detail?: string }][]);
+	let diagnosticWarnings = $derived<Array<{ stage: string; detail: string; at: string }>>(processingDiagnostics?.warnings ?? []);
 
 	function statusTone(status: string): 'success' | 'warning' | 'failed' | 'pending' | 'skipped' {
 		if (status === 'success') return 'success';
@@ -405,9 +407,9 @@
 								Processing Diagnostics
 							</h3>
 							<div class="diagnostics-meta">
-								<span>Started {formatDate((processingDiagnostics as any).startedAt)}</span>
-								{#if (processingDiagnostics as any).completedAt}
-									<span>Completed {formatDate((processingDiagnostics as any).completedAt)}</span>
+								<span>Started {formatDate(processingDiagnostics?.startedAt ?? "")}</span>
+								{#if processingDiagnostics?.completedAt}
+									<span>Completed {formatDate(processingDiagnostics?.completedAt)}</span>
 								{/if}
 								<span>{diagnosticWarnings.length} warning{diagnosticWarnings.length !== 1 ? 's' : ''}</span>
 							</div>
@@ -416,10 +418,10 @@
 									<div class="diagnostic-card">
 										<div class="diagnostic-card-head">
 											<span class="diagnostic-stage">{stage.replace(/_/g, ' ')}</span>
-											<span class={`diagnostic-badge ${statusTone((record as any).status)}`}>{(record as any).status}</span>
+											<span class={`diagnostic-badge ${statusTone(record.status)}`}>{record.status}</span>
 										</div>
-										{#if (record as any).detail}
-											<p class="diagnostic-detail">{(record as any).detail}</p>
+										{#if record.detail}
+											<p class="diagnostic-detail">{record.detail}</p>
 										{/if}
 									</div>
 								{/each}

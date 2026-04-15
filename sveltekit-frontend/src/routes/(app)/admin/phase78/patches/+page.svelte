@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Migrated to $effect
+	import { notificationStore } from '$lib/stores/notifications.svelte';
 
 	interface Suggestion { id: string, routePath: string;
 		summary: string;
@@ -57,12 +57,12 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 				throw new Error(result.message || 'Failed to apply patch');
 			}
 
-			alert(`✅ Patch applied successfully!\n\nFile: ${result.filePath}\nBackup: ${result.backupPath}`);
+			notificationStore.add({ type: 'success', title: 'Patch applied', message: `File: ${result.filePath}` });
 
 			// Reload data
 			await loadData();
 		} catch (e) {
-			alert(`❌ Error: ${e instanceof Error ? e.message : 'Unknown error'}`);
+			notificationStore.add({ type: 'error', title: 'Patch failed', message: e instanceof Error ? e.message : 'Unknown error' });
 		} finally {
 			applyingPatch = null;
 		}
@@ -93,7 +93,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 	$effect(() => {
 
 		loadData();
-	
+
 });
 </script>
 

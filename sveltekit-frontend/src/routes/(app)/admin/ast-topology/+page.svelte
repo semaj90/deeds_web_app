@@ -119,7 +119,6 @@
 
       eventSource.onopen = () => {
         isConnected = true;
-        console.log('✅ Connected to agentic event stream');
       };
 
       // Fix proposed

@@ -9,9 +9,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { documents, chatDocumentAttachments } from '$lib/server/db/schema-postgres';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { minio } from '$lib/server/minio/client';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
@@ -40,11 +38,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'text/plain',
       'text/markdown',
-      'application/json'
+      'application/json',
     ];
 
     if (!allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|doc|docx|txt|md|json)$/i)) {
-      return json({ error: 'Invalid file type. Allowed: PDF, DOC, DOCX, TXT, MD, JSON' }, { status: 400 });
+      return json(
+        { error: 'Invalid file type. Allowed: PDF, DOC, DOCX, TXT, MD, JSON' },
+        { status: 400 }
+      );
     }
 
     // Validate file size (max 50MB for documents)
@@ -56,53 +57,85 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const documentId = crypto.randomUUID();
     const fileName = file.name;
     const fileSize = file.size;
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Save file to temp directory
-    const tempDir = join(process.cwd(), 'uploads', 'documents');
-    if (!existsSync(tempDir)) {
-      await mkdir(tempDir, { recursive: true });
+    // Upload to MinIO (primary) or fall back to local filesystem
+    const BUCKET = 'documents';
+    const objectName = `${documentId}/${fileName}`;
+    let filePath = objectName; // MinIO object path as default
+
+    try {
+      await minio.bucketExists(BUCKET).catch(async () => {
+        await minio.makeBucket(BUCKET, 'us-east-1');
+      });
+      await minio.putObject(BUCKET, objectName, buffer, buffer.length, {
+        'content-type': file.type,
+        'x-amz-meta-document-id': documentId,
+        'x-amz-meta-case-id': caseId ?? '',
+        'x-amz-meta-uploaded-by': locals.user.id,
+      });
+    } catch (minioErr) {
+      // MinIO unavailable — fall back to local filesystem
+      console.warn(
+        '[documents/upload] MinIO unavailable, saving locally:',
+        (minioErr as Error).message
+      );
+      const { writeFile, mkdir } = await import('fs/promises');
+      const { join } = await import('path');
+      const { existsSync } = await import('fs');
+      const tempDir = join(process.cwd(), 'uploads', 'documents');
+      if (!existsSync(tempDir)) {
+        await mkdir(tempDir, { recursive: true });
+      }
+      filePath = join(tempDir, `${documentId}_${fileName}`);
+      await writeFile(filePath, buffer);
     }
 
-    const filePath = join(tempDir, `${documentId}_${fileName}`);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filePath, buffer);
-
     // Insert document record
-    const [documentRecord] = await db.insert(documents).values({
-      id: documentId,
-      title: fileName.replace(/\.[^.]+$/, ''), // Remove extension
-      filePath: filePath,
-      fileSize: fileSize,
-      mimeType: file.type,
-      originalName: fileName,
-      status: 'pending',
-      metadata: {
-        uploadedBy: locals.user.id,
-        uploadedAt: new Date().toISOString(),
-        sessionId
-      }
-    }).returning();
+    const [documentRecord] = await db
+      .insert(documents)
+      .values({
+        id: documentId,
+        title: fileName.replace(/\.[^.]+$/, ''), // Remove extension
+        filePath: filePath,
+        fileSize: fileSize,
+        mimeType: file.type,
+        originalName: fileName,
+        status: 'pending',
+        metadata: {
+          uploadedBy: locals.user.id,
+          uploadedAt: new Date().toISOString(),
+          sessionId,
+        },
+      })
+      .returning();
 
     // Insert chat attachment record (optional — skip if session doesn't exist)
     let attachmentId: string | null = null;
     try {
-      const [attachmentRecord] = await db.insert(chatDocumentAttachments).values({
-        chat_session_id: sessionId,
-        document_id: documentId,
-        file_name: fileName,
-        file_size: fileSize,
-        file_type: file.type,
-        minio_path: filePath, // TODO: Upload to MinIO in production
-        embedding_status: 'pending',
-        metadata: {
-          caseId,
-          uploadedBy: locals.user.id
-        }
-      }).returning();
+      const [attachmentRecord] = await db
+        .insert(chatDocumentAttachments)
+        .values({
+          chat_session_id: sessionId,
+          document_id: documentId,
+          file_name: fileName,
+          file_size: fileSize,
+          file_type: file.type,
+          minio_path: filePath,
+          embedding_status: 'pending',
+          metadata: {
+            caseId,
+            uploadedBy: locals.user.id,
+          },
+        })
+        .returning();
       attachmentId = attachmentRecord.id;
     } catch (attachErr) {
       // Non-fatal: attachment record links to a chat session; if session doesn't exist yet, skip
-      console.warn('Document attachment insert skipped (session may not exist yet):', (attachErr as Error).message);
+      console.warn(
+        'Document attachment insert skipped (session may not exist yet):',
+        (attachErr as Error).message
+      );
     }
 
     // Publish to RabbitMQ — wait for channel to be ready if still initializing
@@ -113,20 +146,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       sessionId,
       caseId,
       userId: locals.user.id,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     return json({
       success: true,
       documentId,
       attachmentId,
-      message: 'Document uploaded and queued for embedding'
+      message: 'Document uploaded and queued for embedding',
     });
   } catch (err) {
     console.error('Document upload error:', err);
-    return json(
-      { error: 'Failed to upload document' },
-      { status: 500 }
-    );
+    return json({ error: 'Failed to upload document' }, { status: 500 });
   }
 };

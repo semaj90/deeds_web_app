@@ -59,6 +59,35 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
  let autoPatchRunning = $state(false);
  let autoPatchResult = $state<any>(null);
 
+ // KAG (Knowledge-Augmented Generation) state
+ let kagErrorId = $state('');
+ let kagAction = $state<'root-cause' | 'similar' | 'traverse'>('root-cause');
+ let kagRunning = $state(false);
+ let kagResult = $state<any>(null);
+ let kagAvailable = $state<boolean | null>(null);
+
+ $effect(() => {
+   fetch('/api/phase109/kag').then(r => r.json()).then(d => { kagAvailable = d.ready ?? false; }).catch(() => { kagAvailable = false; });
+ });
+
+ async function runKag() {
+   if (!kagErrorId.trim()) return;
+   kagRunning = true;
+   kagResult = null;
+   try {
+     const res = await fetch('/api/phase109/kag', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ errorId: kagErrorId, action: kagAction }),
+     });
+     kagResult = await res.json();
+   } catch (err) {
+     kagResult = { error: (err as Error).message };
+   } finally {
+     kagRunning = false;
+   }
+ }
+
  async function runAutoPatch() {
 	if (!autoPatchTarget || !autoPatchError) return;
 	autoPatchRunning = true;
@@ -420,6 +449,94 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
 	</CardContent>
  </Card>
 
+ <!-- KAG Analysis (Phase 109) -->
+ <Card>
+	<CardHeader>
+		<CardTitle>KAG Analysis <span class="text-xs font-normal text-gray-400 ml-2">(Knowledge-Augmented Generation)</span>
+			{#if kagAvailable === true}
+				<span class="ml-2 inline-block px-1.5 py-0.5 text-xs rounded bg-green-100 text-green-700">Neo4j ✓</span>
+			{:else if kagAvailable === false}
+				<span class="ml-2 inline-block px-1.5 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">Neo4j offline (degraded)</span>
+			{/if}
+		</CardTitle>
+		<CardDescription>Traverse the error knowledge graph to identify root causes, related fixes, and cascading paths</CardDescription>
+	</CardHeader>
+	<CardContent>
+		<div class="flex flex-col gap-3">
+			<div class="flex gap-3 items-center">
+				<label for="kag-error-id" class="text-sm font-semibold min-w-20">Error ID:</label>
+				<input id="kag-error-id" type="text" placeholder="e.g. error-uuid or synthetic-error-id" bind:value={kagErrorId} class="flex-1 px-2 py-1.5 border border-gray-300 rounded font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+			</div>
+			<div class="flex gap-3 items-center">
+				<label class="text-sm font-semibold min-w-20">Action:</label>
+				<div class="flex gap-2">
+					{#each (['root-cause', 'similar', 'traverse'] as const) as act}
+						<button
+							onclick={() => { kagAction = act; }}
+							class="px-2 py-1 text-xs rounded border font-mono transition-colors {kagAction === act ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 hover:border-blue-400'}"
+						>{act}</button>
+					{/each}
+				</div>
+				<Button onclick={runKag} disabled={kagRunning || !kagErrorId.trim()}>
+					{kagRunning ? 'Traversing...' : 'Run KAG'}
+				</Button>
+			</div>
+			{#if kagResult}
+				<div class="kag-result">
+					{#if kagResult.degraded}
+						<div class="text-yellow-700 text-sm mb-2">⚠ {kagResult.message}</div>
+					{:else if kagResult.error}
+						<div class="text-red-600 text-sm">{kagResult.error}: {kagResult.message ?? ''}</div>
+					{:else}
+						<div class="text-sm font-semibold mb-2">
+							{kagAction === 'root-cause' ? '🎯 Root Cause Analysis' : kagAction === 'similar' ? '🔎 Similar Errors' : '🗺 Graph Traversal'}
+						</div>
+						{#if kagResult.result?.rootCause}
+							<div class="mb-2 p-2 rounded bg-red-50 border border-red-200">
+								<strong class="text-xs text-red-700">Root Cause:</strong>
+								<p class="text-sm mt-1">{kagResult.result.rootCause}</p>
+							</div>
+						{/if}
+						{#if kagResult.result?.cascadingErrors?.length > 0}
+							<div class="mb-2">
+								<strong class="text-xs text-gray-600">Cascading Errors ({kagResult.result.cascadingErrors.length}):</strong>
+								<div class="mt-1 space-y-0.5">
+									{#each kagResult.result.cascadingErrors as ce}
+										<div class="text-xs font-mono text-gray-500 pl-2 border-l-2 border-red-200">{ce}</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
+						{#if kagResult.result?.relatedFixes?.length > 0}
+							<div class="mb-2">
+								<strong class="text-xs text-gray-600">Related Fixes:</strong>
+								<div class="mt-1 space-y-1">
+									{#each kagResult.result.relatedFixes as fix}
+										<div class="text-xs p-1.5 rounded bg-green-50 border border-green-200">
+											<span class="font-semibold">{fix.fixId}</span>
+											<span class="ml-2 text-gray-500">{fix.description}</span>
+											<span class="ml-2 text-green-700 font-mono">{(fix.successRate * 100).toFixed(0)}% success</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
+						{#if Array.isArray(kagResult.result) && kagResult.result.length > 0}
+							<div class="space-y-1">
+								{#each kagResult.result as item}
+									<div class="text-xs p-1.5 rounded bg-gray-50 border border-gray-200 font-mono">
+										{JSON.stringify(item).slice(0, 200)}
+									</div>
+								{/each}
+							</div>
+						{/if}
+					{/if}
+				</div>
+			{/if}
+		</div>
+	</CardContent>
+ </Card>
+
  <!-- Runs List -->
  <Card>
  <CardHeader>
@@ -491,6 +608,13 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
     border-radius: 0.375rem;
     border: 1px solid var(--t-border, #e5e7eb);
     background: var(--t-surface, #fafafa);
+  }
+  .kag-result {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    font-size: 0.75rem;
   }
 </style>
 

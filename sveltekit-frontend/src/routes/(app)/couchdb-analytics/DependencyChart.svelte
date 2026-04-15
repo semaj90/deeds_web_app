@@ -130,7 +130,7 @@
 	$effect(() => {
 
 		loadDependencies();
-	
+
 });
 
 	$effect(() => {

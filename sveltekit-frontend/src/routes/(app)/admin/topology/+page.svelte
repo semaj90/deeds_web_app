@@ -31,6 +31,29 @@
 	let panX = 0;
 	let panY = 0;
 
+	let fixAIResult = $state('');
+	let fixAILoading = $state(false);
+
+	async function fixWithAI(node: TopologyNode) {
+		fixAILoading = true;
+		fixAIResult = 'Analyzing...';
+		try {
+			const res = await fetch('/api/chat', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					message: `Analyze this codebase node and suggest fixes: "${node.name}" (type: ${node.type}, errors: ${node.errors}, complexity: ${node.complexity}, recommended action: ${node.recommended_action}). List 3 specific, actionable fixes.`,
+					model: 'gemma4-legal'
+				})
+			});
+			const data = await res.json();
+			fixAIResult = data.response ?? data.message ?? 'No suggestion generated.';
+		} catch {
+			fixAIResult = 'AI analysis unavailable.';
+		} finally {
+			fixAILoading = false;
+		}
+	}
 	// Color scheme
 	const colors = {
 		urgent_refactor: '#ef4444',
@@ -408,9 +431,12 @@
 				</div>
 			{/if}
 
-			<button class="fix-button" onclick={() => alert('Fix with AI: ' + selectedNode?.name)}>
-				Fix with AI
+			<button class="fix-button" onclick={() => selectedNode && fixWithAI(selectedNode)}>
+				{fixAILoading ? 'Analyzing...' : 'Fix with AI'}
 			</button>
+			{#if fixAIResult}
+				<div style="margin-top:0.5rem;padding:0.75rem;background:#1e293b;border-radius:6px;font-size:0.8rem;color:#cbd5e1;white-space:pre-wrap;">{fixAIResult}</div>
+			{/if}
 		</div>
 	{/if}
 </div>

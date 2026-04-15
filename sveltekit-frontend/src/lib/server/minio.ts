@@ -54,9 +54,14 @@ export class MinIOService {
     }
   }
 
-  async uploadFile(file: File, userId: string): Promise<{
-	bucket: string, key: string;
-	url: string }> {
+  async uploadFile(
+    file: File,
+    userId: string
+  ): Promise<{
+    bucket: string;
+    key: string;
+    url: string;
+  }> {
     try {
       await this.ensureBucketExists();
 
@@ -91,12 +96,14 @@ export class MinIOService {
   }
 
   async getTextContent(key: string): Promise<{
-	content: string, metadata: Record<string, unknown> }> {
+    content: string;
+    metadata: Record<string, unknown>;
+  }> {
     const buffer = await this.getObjectBuffer(key);
     return {
       content: buffer.toString('utf-8'),
       metadata: {},
-	};
+    };
   }
 
   static extractKeyFromUrl(url: string, bucket: string): string {
@@ -116,7 +123,9 @@ export class MinIOService {
 
   // Static helpers for direct usage
   static async getTextContentFromUrl(url: string): Promise<{
-	content: string; metadata: Record<string, unknown> } | null> {
+    content: string;
+    metadata: Record<string, unknown>;
+  } | null> {
     try {
       const service = new MinIOService();
       const key = MinIOService.extractKeyFromUrl(url, service.bucket);
@@ -131,5 +140,37 @@ export class MinIOService {
     const service = new MinIOService();
     const key = MinIOService.extractKeyFromUrl(url, service.bucket);
     return await service.getObjectBuffer(key);
+  }
+
+  async getFileBuffer(bucket: string, filename: string): Promise<Buffer> {
+    const stream = await this.client.getObject(bucket, filename);
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+      stream.on('end', () => resolve(Buffer.concat(chunks)));
+      stream.on('error', (err: Error) => reject(err));
+    });
+  }
+
+  async uploadBuffer(
+    buffer: Buffer,
+    filename: string,
+    opts: { bucket: string; contentType: string }
+  ): Promise<void> {
+    const exists = await this.client.bucketExists(opts.bucket);
+    if (!exists) {
+      await this.client.makeBucket(opts.bucket, 'us-east-1');
+    }
+    await this.client.putObject(opts.bucket, filename, buffer, buffer.length, {
+      'Content-Type': opts.contentType,
+    });
+  }
+
+  async deleteFile(bucket: string, filename: string): Promise<void> {
+    await this.client.removeObject(bucket, filename);
+  }
+
+  async getFileUrl(bucket: string, filename: string, expires = 86400): Promise<string> {
+    return await this.client.presignedGetObject(bucket, filename, expires);
   }
 }

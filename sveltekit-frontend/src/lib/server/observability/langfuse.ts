@@ -196,7 +196,7 @@ export async function traceVectorSearch<T>(
 	try {
 		const result = await callback();
 		const ms = Date.now() - start;
-		const count = Array.isArray(result) ? result.length : (result as any)?.length ?? 1;
+		const count = Array.isArray(result) ? result.length : (result as { length?: number })?.length ?? 1;
 		span.end({ output: `${count} results (${ms}ms)` });
 		return result;
 	} catch (err) {
@@ -231,7 +231,7 @@ export async function traceDB<T>(
 	try {
 		const result = await callback();
 		const ms = Date.now() - start;
-		const rowCount = (result as any)?.rows?.length ?? (result as any)?.rowCount ?? '?';
+		const rowCount = (result as { rows?: unknown[] })?.rows?.length ?? (result as { rowCount?: number })?.rowCount ?? '?';
 		span.end({ output: `${rowCount} rows (${ms}ms)` });
 		return result;
 	} catch (err) {
@@ -395,7 +395,7 @@ export async function traceGraph<T>(
 	try {
 		const result = await callback();
 		const ms = Date.now() - start;
-		const count = Array.isArray(result) ? result.length : (result as any)?.length ?? 1;
+		const count = Array.isArray(result) ? result.length : (result as { length?: number })?.length ?? 1;
 		span.end({ output: `${count} results (${ms}ms)` });
 		return result;
 	} catch (err) {

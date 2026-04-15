@@ -35,6 +35,7 @@
 	let chunkViewerResult = $state<any>(null);
 	let contextConfirmData = $state<{ context_id: string; source: string; score: number; snippet: string; range?: { from_msg_id: number; to_msg_id: number }; timestamp?: string } | null>(null);
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
+	import { goto } from '$app/navigation';
 	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
 
 	interface SearchResult {
@@ -1081,7 +1082,7 @@
 						category: r.metadata?.category,
 						relevance_score: r.score
 					}))}
-					onselect={(statute) => { console.log('Selected statute:', statute.code, statute.id); }}
+					onselect={(statute) => { goto(`/citations?statute=${encodeURIComponent(statute.code ?? statute.id)}`); }}
 				/>
 			{:else if searchMode === 'precedents' && precedentResults.length > 0}
 				{#each precedentResults as result, i}
@@ -1432,8 +1433,18 @@
 	<ContextConfirmModal
 		context={contextConfirmData}
 		hint="Is this the search context you were looking for?"
-		onaccept={({ comment }) => { console.log('Context accepted:', contextConfirmData?.context_id, comment); showContextConfirm = false; }}
-		onreject={({ comment }) => { console.log('Context rejected:', contextConfirmData?.context_id, comment); showContextConfirm = false; }}
+		onaccept={({ comment }) => {
+			if (contextConfirmData?.context_id) {
+				fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: contextConfirmData.context_id, rating: 1 }) }).catch(() => {});
+			}
+			showContextConfirm = false;
+		}}
+		onreject={({ comment }) => {
+			if (contextConfirmData?.context_id) {
+				fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: contextConfirmData.context_id, rating: 0 }) }).catch(() => {});
+			}
+			showContextConfirm = false;
+		}}
 	/>
 {/if}
 

@@ -38,6 +38,33 @@
 	let searchResults = $state<any[]>([]);
 	let searchLoading = $state(false);
 	let searchError = $state<string | null>(null);
+	let aiReportOpen = $state(false);
+	let aiReportContent = $state('');
+	let aiReportLoading = $state(false);
+
+	async function generateAIReport(person: FugitiveDexPerson) {
+		aiReportOpen = true;
+		aiReportLoading = true;
+		aiReportContent = '';
+		try {
+			const prompt = `Generate a concise law enforcement intelligence report for a person of interest named ${person.name}. Threat level: ${person.dangerLevel}/10. Modus operandi: ${person.modusOperandi || 'unknown'}. Last known location: ${person.lastSeen || 'unknown'}. Include: risk assessment, recommended surveillance actions, and key investigative leads. Keep it under 300 words.`;
+			const res = await fetch('/api/chat', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ message: prompt, model: 'gemma4-legal' })
+			});
+			if (res.ok) {
+				const data = await res.json();
+				aiReportContent = data.response ?? data.message ?? 'No report generated.';
+			} else {
+				aiReportContent = 'Failed to generate report. Please try again.';
+			}
+		} catch {
+			aiReportContent = 'Report generation unavailable.';
+		} finally {
+			aiReportLoading = false;
+		}
+	}
 	let riskData = $state<any>(null);
 	let riskLoading = $state(false);
 	let riskError = $state<string | null>(null);
@@ -754,13 +781,29 @@
 					attributes: { stealth: 50, intelligence: 50, strength: 50, speed: 50, dangerousness: 50 }
 				} satisfies FugitiveDexPerson}
 				<div class="dex-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-					<PersonProfile selectedPerson={dexPerson} onOpenAIModal={() => { console.log('AI report for', poi.name); }} />
+					<PersonProfile selectedPerson={dexPerson} onOpenAIModal={(p) => generateAIReport(p)} />
 					<PersonStatsPanel selectedPerson={dexPerson} />
 				</div>
 			{/if}
 		</div>
 	{/if}
 </div>
+
+{#if aiReportOpen}
+	<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;" onclick={() => (aiReportOpen = false)}>
+		<div style="background:#1a1a2e;border:1px solid #333;border-radius:8px;padding:2rem;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;" onclick={(e) => e.stopPropagation()}>
+			<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+				<h3 style="color:#fff;margin:0;">AI Intelligence Report</h3>
+				<button style="background:none;border:none;color:#888;font-size:1.5rem;cursor:pointer;" onclick={() => (aiReportOpen = false)}>×</button>
+			</div>
+			{#if aiReportLoading}
+				<p style="color:#888;">Generating report...</p>
+			{:else}
+				<p style="color:#ccc;line-height:1.6;white-space:pre-wrap;">{aiReportContent}</p>
+			{/if}
+		</div>
+	</div>
+{/if}
 
 <style>
 	.poi-detail-page { padding: 2rem 2.5rem; margin: -2.5rem; background: #0f0f23; min-height: 100vh; }

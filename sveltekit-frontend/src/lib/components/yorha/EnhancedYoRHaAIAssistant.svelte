@@ -118,7 +118,7 @@
         model: 'gemma4-legal',
         intent: getIntentForRole(userRole),
         endpoint: '/api/rag/stream',
-        contextIds: evidenceItems.map((item) => (item as any).id),
+        contextIds: evidenceItems.map((item) => item.id),
         onToken: (token) => {
           responseContent += token;
           updateLastAssistantMessage(responseContent);
@@ -197,7 +197,7 @@
   }
 
   function removeEvidence(id: string) {
-    evidenceItems = evidenceItems.filter((item) => (item as any).id !== id);
+    evidenceItems = evidenceItems.filter((item) => item.id !== id);
   }
 
   function exportEvidence() {
@@ -298,8 +298,8 @@
           <div class="context-items">
             {#each (evidenceItems.slice(0, 3)) as item}
               <div class="context-item">
-                <span class="context-name">{(item as any).name}</span>
-                <span class="context-type">{(item as any).type}</span>
+                <span class="context-name">{item.name}</span>
+                <span class="context-type">{item.type}</span>
               </div>
             {/each}
             {#if evidenceItems.length > 3}
@@ -408,7 +408,7 @@
                 <div class="analysis-content">
                   {#each (evidenceItems.slice(0, 3)) as item}
                     <div class="evidence-analysis">
-                      <strong>{(item as any).name}</strong>: Relevance score 94%, supports primary argument
+                      <strong>{item.name}</strong>: Relevance score 94%, supports primary argument
                     </div>
                   {/each}
                 </div>

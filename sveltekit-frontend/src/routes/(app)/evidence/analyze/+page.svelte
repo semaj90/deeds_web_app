@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
+	import { goto } from '$app/navigation';
 
 	interface HighlightedCitation {
 		text: string;
@@ -347,7 +348,7 @@
 				{/if}
 			</div>
 			<div class="ea-card-footer">
-				<button class="ea-btn primary" onclick={() => console.log('View details:', results)}>
+			<button class="ea-btn primary" onclick={() => goto(`/evidence?caseId=${encodeURIComponent(caseId)}`)}>
 					<Icon name="external-link" size={14} />
 					View Details
 				</button>

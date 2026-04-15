@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 	import EvidenceAnalysisDashboard from '$lib/components/dashboard/EvidenceAnalysisDashboard.svelte';
 	import PoliceReportGenerator from '$lib/components/yorha/PoliceReportGenerator.svelte';
@@ -167,8 +168,8 @@
 				<div class="grid-item">
 					<EvidenceCard
 						evidence={item}
-						onAskAI={(ev) => { console.log('Ask AI about:', ev.file_name); }}
-						onDelete={(id) => { console.log('Delete evidence:', id); }}
+						onAskAI={(ev) => { goto('/global-search?q=' + encodeURIComponent(ev.file_name ?? '')); }}
+						onDelete={async (id) => { await fetch('/api/evidence/' + id, { method: 'DELETE' }).catch(() => {}); }}
 					/>
 				</div>
 			{/each}

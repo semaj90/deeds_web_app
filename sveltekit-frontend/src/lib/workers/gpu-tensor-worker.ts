@@ -270,7 +270,10 @@ self.onmessage = async (ev: MessageEvent<WorkerMessage>) => {
 			case 'PROCESS_TENSOR': {
 				const out = await worker.processGPUTensor(msg.data as MultiDimArray);
 				const transferables = out.data instanceof Float32Array ? [out.data.buffer] : [];
-				self.postMessage({ type: 'SUCCESS', id: msg.id, data: out }, transferables as any);
+				(self as any).postMessage(
+          { type: 'SUCCESS', id: msg.id, data: out },
+          transferables as Transferable[]
+        );
 				break;
 			}
 			case 'PROCESS_BATCH': {

@@ -4,9 +4,14 @@
  interface Props {
  caseId: string;
  onClose?: () => void;
+ initialMessage?: string;
  }
 
- let { caseId, onClose }: Props = $props();
+ let { caseId, onClose, initialMessage }: Props = $props();
+
+ $effect(() => {
+ if (initialMessage) { inputValue = initialMessage; }
+ });
 
  interface Message {
  role: 'user' | 'assistant';
@@ -28,7 +33,7 @@
  if (messagesContainer) {
  messagesContainer.scrollTop = messagesContainer.scrollHeight;
  }
- 
+
 });
 
  $effect(() => {

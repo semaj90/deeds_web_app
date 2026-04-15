@@ -13,6 +13,7 @@
 	import SmartSearchInterface from '$lib/components/ai/SmartSearchInterface.svelte';
 	import LLMSelector from '$lib/components/ai/LLMSelector.svelte';
 	import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
+	import { goto } from '$app/navigation';
 
 	interface AIStats {
 		activeChats: number;
@@ -306,7 +307,7 @@
 				{showCaseWorkflow ? 'Hide Case Workflow' : 'RAG Case Intake Workflow (WHO/WHAT/WHEN/WHERE/WHY/HOW)'}
 			</button>
 			{#if showCaseWorkflow}
-				<div class="panel-body"><RAGAssistantChat onCaseCreated={(id) => console.log('[Case Created]', id)} /></div>
+				<div class="panel-body"><RAGAssistantChat onCaseCreated={(id) => goto('/cases/' + id)} /></div>
 			{/if}
 		</div>
 

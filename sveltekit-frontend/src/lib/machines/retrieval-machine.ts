@@ -91,7 +91,7 @@ const DEFAULT_CONFIG: RetrievalConfig = {
 
 // ── Actor logic (fromPromise) ────────────────────────────────────────────
 
-const recallActor = (fromPromise as any)(
+const recallActor = fromPromise(
 	async ({ input }: any) => {
 		const start = performance.now();
 
@@ -112,7 +112,7 @@ const recallActor = (fromPromise as any)(
 	}
 );
 
-const rerankActor = (fromPromise as any)(async ({ input }: any) => {
+const rerankActor = fromPromise(async ({ input }: any) => {
 	const start = performance.now();
 
 	const res = await fetch('/api/codebase/rerank', {
@@ -135,7 +135,7 @@ const rerankActor = (fromPromise as any)(async ({ input }: any) => {
 	return { results: data.results ?? [], ms };
 });
 
-const assembleActor = (fromPromise as any)(
+const assembleActor = fromPromise(
 	async ({ input }: any) => {
 		const start = performance.now();
 		const chunks = input.reranked;

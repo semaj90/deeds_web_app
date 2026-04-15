@@ -61,12 +61,23 @@ export async function readTokenStream(
     const key = streamKey(requestId);
 
     // XRANGE key start end COUNT count
-    const rawRes = await (redis as any).xrange(key, fromId, '+', 'COUNT', count);
+    const rawRes = await (
+      redis as unknown as {
+        xrange(
+          key: string,
+          start: string,
+          end: string,
+          ...args: unknown[]
+        ): Promise<[string, string[]][]>;
+        xtrim(key: string, ...args: unknown[]): Promise<unknown>;
+        duplicate(): unknown;
+      }
+    ).xrange(key, fromId, '+', 'COUNT', count);
 
     if (!rawRes) return [];
 
     // Parse [id, [field, value, ...]]
-    return rawRes.map(([id, fields]: [string, string[]]) => parseStreamEntry(id, fields));
+    return rawRes.map(([id, fields]) => parseStreamEntry(id, fields));
 }
 
 /**
@@ -78,7 +89,13 @@ export async function trimTokenStream(
 ): Promise<void> {
     const redis: Redis = getRedis();
     const key = streamKey(requestId);
-    await (redis as any).xtrim(key, 'MAXLEN', '~', maxLen);
+    await (
+      redis as unknown as {
+        xrange(key: string, start: string, end: string, ...args: unknown[]): Promise<unknown>;
+        xtrim(key: string, ...args: unknown[]): Promise<unknown>;
+        duplicate(): unknown;
+      }
+    ).xtrim(key, 'MAXLEN', '~', maxLen);
 }
 
 /**
@@ -97,7 +114,16 @@ export async function consumeTokenStream(
     const start = Date.now();
 
     // We need a duplicate connection for blocking operations to avoid stalling the main client
-    const reader = (redis as any).duplicate();
+    const reader = (
+      redis as unknown as {
+        xrange(key: string, start: string, end: string, ...args: unknown[]): Promise<unknown>;
+        xtrim(key: string, ...args: unknown[]): Promise<unknown>;
+        duplicate(): {
+          xread(...args: unknown[]): Promise<[string, [string, string[]][]][] | null>;
+          disconnect(): void;
+        };
+      }
+    ).duplicate();
 
     try {
         while (Date.now() - start < stopAfterMs) {

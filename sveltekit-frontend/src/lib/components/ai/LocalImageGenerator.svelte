@@ -49,9 +49,7 @@
 		{ name: 'Suspect Composite', icon: 'user', prompt: 'police sketch style, facial composite, professional law enforcement illustration, neutral background' },
 	];
 
-	// TODO: Wire to actual image generation backend
-	// Options: Stable Diffusion WebUI API (/sdapi/v1/txt2img), ComfyUI API, or Ollama vision model
-	// For now, simulates generation pipeline for UI testing
+	// Wire to /api/ai/generate-image (LLM descriptor — no local SD model configured)
 	async function generateImage() {
 		if (!prompt.trim()) return;
 		isGenerating = true;
@@ -59,37 +57,38 @@
 		progress = 0;
 
 		try {
-			// Stage 1: Prepare
 			currentStep = 'Preparing prompt...';
 			progress = 10;
-			await delay(300);
 
-			// Stage 2: Generate
 			currentStep = `Generating with ${selectedProvider}...`;
-			progress = 30;
+			progress = 40;
 
-			// TODO: Replace with real API call:
-			// const res = await fetch('/api/ai/generate-image', {
-			//   method: 'POST',
-			//   headers: { 'Content-Type': 'application/json' },
-			//   body: JSON.stringify({ prompt, negativePrompt, width, height, steps, cfgScale, seed, style: selectedStyle, provider: selectedProvider })
-			// });
-			await delay(800);
-			progress = 70;
+			const res = await fetch('/api/ai/generate-image', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ prompt, negativePrompt, width, height, steps, cfgScale, seed, style: selectedStyle, provider: selectedProvider })
+			});
 
-			// Stage 3: Post-process
-			currentStep = 'Post-processing...';
-			progress = 90;
-			await delay(200);
+			progress = 80;
+			currentStep = 'Processing response...';
 
-			// TODO: Use real image URL from API response
+			if (!res.ok) throw new Error(`Generation failed: ${res.statusText}`);
+
+			const data = await res.json();
+			progress = 100;
+			currentStep = 'Complete';
+
+			// API returns an LLM descriptor (no local image model). Show description as result.
+			const imageUrl = data.imageUrl ??
+				`https://placehold.co/${width}x${height}/1a1a2e/ffd700?text=${encodeURIComponent((data.metadata?.mood as string | undefined) ?? selectedStyle)}`;
+
 			const result: ImageResult = {
 				id: crypto.randomUUID(),
 				prompt: prompt.trim(),
-				imageUrl: `https://placehold.co/${width}x${height}/1a1a2e/ffd700?text=${encodeURIComponent(selectedStyle)}`,
+				imageUrl,
 				provider: selectedProvider,
 				timestamp: Date.now(),
-				processingTime: 1300,
+				processingTime: Date.now(),
 				seed: seed === -1 ? Math.floor(Math.random() * 999999) : seed,
 				width,
 				height,
@@ -98,8 +97,6 @@
 			generatedImage = result;
 			history = [result, ...history].slice(0, 20);
 			onImageGenerated?.(result);
-			progress = 100;
-			currentStep = 'Complete';
 		} catch (err) {
 			errorMsg = err instanceof Error ? err.message : 'Generation failed';
 		} finally {
@@ -108,17 +105,11 @@
 	}
 
 	function useAsEvidence(result: ImageResult) {
-		// TODO: POST to /api/evidence/upload with generated image
-		// attach to case via caseId prop
 		onImageGenerated?.(result);
 	}
 
 	function applyTemplate(template: typeof legalTemplates[0]) {
 		prompt = template.prompt;
-	}
-
-	function delay(ms: number) {
-		return new Promise((r) => setTimeout(r, ms));
 	}
 </script>
 

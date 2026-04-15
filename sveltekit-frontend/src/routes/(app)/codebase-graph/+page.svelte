@@ -1,5 +1,6 @@
 <script lang="ts">
 import { onMount } from 'svelte';
+import { goto } from '$app/navigation';
 import Icon from '$lib/components/ui/Icon.svelte';
 import CodebaseGraphCanvas from './CodebaseGraphCanvas.svelte';
 import CodebaseGraphSidebar from './CodebaseGraphSidebar.svelte';
@@ -61,26 +62,26 @@ async function loadGraph() {
 const filteredNodes = $derived.by(() => {
 	if (!graphData) return [];
 	let nodes = graphData.nodes;
-	
+
 	if (searchQuery) {
 		const query = searchQuery.toLowerCase();
-		nodes = nodes.filter(n => 
+		nodes = nodes.filter(n =>
 			n.label.toLowerCase().includes(query) ||
 			n.path.toLowerCase().includes(query)
 		);
 	}
-	
+
 	if (filterExtension) {
 		nodes = nodes.filter(n => n.extension === filterExtension);
 	}
-	
+
 	return nodes;
 });
 
 const filteredEdges = $derived.by(() => {
 	if (!graphData) return [];
 	const nodeIds = new Set(filteredNodes.map(n => n.id));
-	return graphData.edges.filter(e => 
+	return graphData.edges.filter(e =>
 		nodeIds.has(e.source) && nodeIds.has(e.target)
 	);
 });
@@ -91,7 +92,6 @@ onMount(() => {
 
 function handleNodeClick(node: GraphNode) {
 	selectedNode = node;
-	console.log('Selected node:', node);
 }
 
 function clearFilters() {

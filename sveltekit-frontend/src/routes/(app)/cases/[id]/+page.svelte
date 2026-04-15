@@ -73,6 +73,7 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  let editorMode = $state<'wysiwyg' | 'tiptap' | 'ai-tiptap' | 'nier' | 'inline'>('wysiwyg');
  let showDocumentWriter = $state(false);
  let showYoRHaDetails = $state(false);
+ let chatInitialMessage = $state('');
  let typingPrompts = $state<string[]>([]);
  let showIdleRecommendations = $state(false);
  let idleRecommendationQuery = $state('');
@@ -291,7 +292,6 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  if (cached) {
  caseData = cached;
  caseDescription = cached.description ?? '';
- console.log('✅ Cache hit: case-' + caseId);
  return;
  }
 
@@ -316,7 +316,6 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
 
  // Cache with 5 minute TTL
  await cache.set(cacheKey, normalizedCase, CacheStrategies.TWO_LAYER);
- console.log('💾 Cached: case-' + caseId);
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to load case';
  }
@@ -350,7 +349,6 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  const cached = await cache.get<Evidence[]>(cacheKey);
  if (cached) {
  evidence = Array.isArray(cached) ? cached : [];
- console.log('✅ Cache hit: evidence-list-' + caseId);
  isLoading = false;
  return;
  }
@@ -369,7 +367,6 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  persistent: true,
  ttl: 600000 // 10 minutes
  });
- console.log('💾 Cached: evidence-list-' + caseId);
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to load evidence';
  } finally {
@@ -478,7 +475,6 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  // Invalidate evidence cache before reloading
  await cache.delete(`evidence-list-${caseId}`);
  await cache.delete(`evidence-${caseId}`);
- console.log('🗑️ Cache invalidated: evidence after upload');
 
  // Reload evidence (will fetch fresh data)
  await loadEvidence();
@@ -697,7 +693,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
        {#each typingPrompts as prompt}
          <button
            class="text-xs px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full hover:bg-blue-100 transition"
-           onclick={() => { console.log('AI prompt:', prompt); typingPrompts = []; }}
+           onclick={() => { chatInitialMessage = prompt; typingPrompts = []; showChatModal = true; }}
          >
            {prompt}
          </button>
@@ -743,7 +739,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  onClose={() => showChatModal = false}
  widthClass="w-[900px]"
  >
- <ContextualChatModal {caseId} onClose={() => showChatModal = false} />
+ <ContextualChatModal {caseId} onClose={() => { showChatModal = false; chatInitialMessage = ''; }} initialMessage={chatInitialMessage} />
  </NesModal>
 
  <!-- Citation Save Modal -->
@@ -1040,8 +1036,15 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  {:else if activeTab === 'contract'}
  <!-- Contract Analysis Tab -->
  <ContractAnalyzer
-   onAnalyze={async (id) => { console.log('Analyzing contract:', id); }}
-   onExport={(format) => { console.log('Exporting contract as', format); }}
+   onAnalyze={async (id) => {
+    await fetch('/api/agent/investigate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: `Analyze contract ${id} for case ${caseId}: clauses, risks, obligations.`, caseId }) });
+   }}
+   onExport={(format) => {
+    const link = document.createElement('a');
+    link.href = `/api/cases/${caseId}/export?format=${encodeURIComponent(format)}`;
+    link.download = `contract-${caseId}.${format}`;
+    link.click();
+   }}
  />
  {:else if activeTab === 'document'}
  <!-- Legal Document Editor Tab -->
@@ -1082,7 +1085,9 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
    <CollaborationPanel
      userId={caseData?.id ?? 'anonymous'}
      evidenceId={selectedEvidence?.id ?? ''}
-     onAddAnnotation={(content, position) => { console.log('Annotation:', content, position); }}
+     onAddAnnotation={async (content, position) => {
+    await fetch('/api/cases/' + caseId + '/annotations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, position, evidenceId: selectedEvidence?.id }) }).catch(() => {});
+   }}
    />
  </div>
  {/if}

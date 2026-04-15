@@ -133,8 +133,7 @@
 	}
 
 	function viewFile(filePath: string) {
-		// Could open in editor or show file details
-		console.log('View file:', filePath);
+		goto(`/admin/codebase-viewer?file=${encodeURIComponent(filePath)}`);
 	}
 
 	function toggleTypeFilter(type: string) {

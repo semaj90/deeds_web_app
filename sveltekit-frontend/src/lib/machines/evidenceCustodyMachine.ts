@@ -113,7 +113,9 @@ export const evidenceCustodyMachine = setup({
             workflowStage: 'evidence-intake',
             error: '',
             warnings: [],
-            custodyEvents: [createCustodyEvent('intake', event.userId, { originalHash: event.originalHash })],
+            custodyEvents: [
+              createCustodyEvent('intake', event.userId, { originalHash: event.originalHash }),
+            ],
           })),
         },
       },
@@ -126,7 +128,13 @@ export const evidenceCustodyMachine = setup({
           actions: assign(({ context }) => ({
             progress: 15,
             workflowStage: 'integrity-verification',
-            custodyEvents: [...context.custodyEvents, createCustodyEvent('intake', context.userId, { hashMatch: true, originalHash: context.originalHash })],
+            custodyEvents: [
+              ...context.custodyEvents,
+              createCustodyEvent('intake', context.userId, {
+                hashMatch: true,
+                originalHash: context.originalHash,
+              }),
+            ],
           })),
         },
       },
@@ -152,7 +160,13 @@ export const evidenceCustodyMachine = setup({
               integrityStatus: 'verified',
               verificationResults: results,
               currentHash: context.originalHash,
-              custodyEvents: [...context.custodyEvents, createCustodyEvent('verification', context.userId, { integrityStatus: 'verified', verificationResults: results })],
+              custodyEvents: [
+                ...context.custodyEvents,
+                createCustodyEvent('verification', context.userId, {
+                  integrityStatus: 'verified',
+                  verificationResults: results,
+                }),
+              ],
             };
           }),
         },
@@ -166,7 +180,12 @@ export const evidenceCustodyMachine = setup({
             integrityStatus: event.results.hashMatch ? 'verified' : 'compromised',
             verificationResults: event.results,
             currentHash: event.currentHash,
-            custodyEvents: [...context.custodyEvents, createCustodyEvent('verification', context.userId, { integrityStatus: event.results.hashMatch ? 'verified' : 'compromised' })],
+            custodyEvents: [
+              ...context.custodyEvents,
+              createCustodyEvent('verification', context.userId, {
+                integrityStatus: event.results.hashMatch ? 'verified' : 'compromised',
+              }),
+            ],
           })),
         },
         VERIFICATION_FAILED: {
@@ -189,12 +208,24 @@ export const evidenceCustodyMachine = setup({
               aiAnalysis: analysis,
               collaborationSession: {
                 sessionId: crypto.randomUUID(),
-                participants: [{ userId: context.userId, role: 'investigator', joinedAt: new Date().toISOString() }],
+                participants: [
+                  {
+                    userId: context.userId,
+                    role: 'investigator',
+                    joinedAt: new Date().toISOString(),
+                  },
+                ],
                 chatHistory: [],
                 annotations: [],
               },
               activeCollaborators: [context.userId],
-              custodyEvents: [...context.custodyEvents, createCustodyEvent('analysis', context.userId, { aiAnalysis: analysis, models: ['gemma4-legal'] })],
+              custodyEvents: [
+                ...context.custodyEvents,
+                createCustodyEvent('analysis', context.userId, {
+                  aiAnalysis: analysis,
+                  models: ['gemma4-legal'],
+                }),
+              ],
             };
           }),
         },
@@ -206,10 +237,14 @@ export const evidenceCustodyMachine = setup({
             progress: 50,
             workflowStage: 'collaboration',
             aiAnalysis: event.analysis,
-            custodyEvents: [...context.custodyEvents, createCustodyEvent('analysis', context.userId, { aiAnalysis: event.analysis })],
+            custodyEvents: [
+              ...context.custodyEvents,
+              createCustodyEvent('analysis', context.userId, { aiAnalysis: event.analysis }),
+            ],
           })),
         },
         AI_ANALYSIS_FAILED: {
+          target: 'failed',
           actions: assign(({ context, event }) => ({
             warnings: [...context.warnings, `AI analysis failed: ${event.error}`],
           })),
@@ -248,7 +283,12 @@ export const evidenceCustodyMachine = setup({
                   ...context.collaborationSession,
                   annotations: [
                     ...context.collaborationSession.annotations,
-                    { userId: event.userId, content: event.content, position: event.position, timestamp: new Date().toISOString() },
+                    {
+                      userId: event.userId,
+                      content: event.content,
+                      position: event.position,
+                      timestamp: new Date().toISOString(),
+                    },
                   ],
                 }
               : context.collaborationSession,
@@ -259,7 +299,14 @@ export const evidenceCustodyMachine = setup({
           actions: assign(({ context, event }) => ({
             progress: 65,
             workflowStage: 'custody-transfer',
-            custodyEvents: [...context.custodyEvents, createCustodyEvent('transfer', context.userId, { fromCustodian: context.userId, toCustodian: event.newCustodian, transferReason: event.reason })],
+            custodyEvents: [
+              ...context.custodyEvents,
+              createCustodyEvent('transfer', context.userId, {
+                fromCustodian: context.userId,
+                toCustodian: event.newCustodian,
+                transferReason: event.reason,
+              }),
+            ],
           })),
         },
         CANCEL_WORKFLOW: { target: 'cancelled' },
@@ -298,14 +345,26 @@ export const evidenceCustodyMachine = setup({
             progress: 90,
             workflowStage: 'finalization',
             requiresApproval: false,
-            custodyEvents: [...context.custodyEvents, createCustodyEvent('approval', context.userId, { approvalStatus: 'approved', finalIntegrityStatus: context.integrityStatus })],
+            custodyEvents: [
+              ...context.custodyEvents,
+              createCustodyEvent('approval', context.userId, {
+                approvalStatus: 'approved',
+                finalIntegrityStatus: context.integrityStatus,
+              }),
+            ],
           })),
         },
         REJECT_CUSTODY: {
           target: 'rejected',
           actions: assign(({ context, event }) => ({
             error: `Custody rejected: ${event.reason}`,
-            custodyEvents: [...context.custodyEvents, createCustodyEvent('approval', context.userId, { approvalStatus: 'rejected', reason: event.reason })],
+            custodyEvents: [
+              ...context.custodyEvents,
+              createCustodyEvent('approval', context.userId, {
+                approvalStatus: 'rejected',
+                reason: event.reason,
+              }),
+            ],
           })),
         },
         CANCEL_WORKFLOW: { target: 'cancelled' },
@@ -319,13 +378,16 @@ export const evidenceCustodyMachine = setup({
           actions: assign(({ context }) => ({
             progress: 100,
             workflowStage: 'completed',
-            custodyEvents: [...context.custodyEvents, createCustodyEvent('finalization', context.userId, {
-              custodyReport: {
-                totalEvents: context.custodyEvents.length + 1,
-                totalProcessingTime: Date.now(),
-                finalStatus: context.integrityStatus,
-              },
-            })],
+            custodyEvents: [
+              ...context.custodyEvents,
+              createCustodyEvent('finalization', context.userId, {
+                custodyReport: {
+                  totalEvents: context.custodyEvents.length + 1,
+                  totalProcessingTime: Date.now(),
+                  finalStatus: context.integrityStatus,
+                },
+              }),
+            ],
           })),
         },
       },

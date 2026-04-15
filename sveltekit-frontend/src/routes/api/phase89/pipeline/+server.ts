@@ -59,11 +59,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 export const GET: RequestHandler = async () => {
 	// Return pipeline status
 	try {
-		// Check if there's a running pipeline by looking at Redis
-		// Note: Redis does not serve HTTP. This is a naive TCP connectivity probe that always fails.
-		// TODO: Replace with a proper Redis client ping if pipeline status checking is needed.
-		const { getRedisHost, getRedisPort } = await import('$lib/config/env.server.js');
-		const redisCheck = await fetch(`http://${getRedisHost()}:${getRedisPort()}`, { method: 'HEAD', signal: AbortSignal.timeout(3_000) }).catch(() => null);
+		const { redis } = await import('$lib/server/redis.js');
+    await redis.ping();
 
 		return json({
 			status: 'idle',

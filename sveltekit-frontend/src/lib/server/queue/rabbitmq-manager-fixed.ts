@@ -138,7 +138,7 @@ export class RabbitMQManager extends EventEmitter {
   private async connect(): Promise<void> {
     try {
       const amqp = await import('amqplib');
-      const connect = (amqp as any).default?.connect ?? (amqp as any).connect;
+      const connect = (amqp as { default?: { connect(...a: unknown[]): Promise<unknown> }; connect?(...a: unknown[]): Promise<unknown> }).default?.connect ?? (amqp as { connect?(...a: unknown[]): Promise<unknown> }).connect;
       this.connection = (await connect(this.url)) as AmqpConnection;
       this.channel = await this.connection.createChannel();
 
@@ -196,7 +196,7 @@ export class RabbitMQManager extends EventEmitter {
     ];
     for (const queue of queuesToMigrate) {
       try {
-        await (this.channel as any).deleteQueue(queue);
+        await (this.channel as unknown as { deleteQueue(q: string): Promise<unknown> }).deleteQueue(queue);
       } catch {
         // Queue doesn't exist yet — it will be created below
       }
@@ -486,7 +486,7 @@ export class RabbitMQManager extends EventEmitter {
           const { qdrant } = await import('../vector/qdrant-manager.js');
 
           await qdrant.batchUpsert({
-            collection: collection as any,
+            collection: collection as keyof typeof qdrant.collections,
             points: [
               {
                 id: data.documentId,
@@ -1362,7 +1362,7 @@ export class RabbitMQManager extends EventEmitter {
    */
   private retryOrDLQ(msg: AmqpMessageObj, error: unknown): void {
     if (!this.channel) return;
-    const deaths = (msg.properties?.headers as any)?.['x-death'] as
+    const deaths = (msg.properties?.headers as Record<string, unknown>)?.['x-death'] as
       | Array<{ count?: number }>
       | undefined;
     const retryCount = deaths?.[0]?.count ?? 0;
@@ -1424,7 +1424,7 @@ export class RabbitMQManager extends EventEmitter {
           if (!msg || !this.channel) return;
           try {
             const payload = JSON.parse(msg.content.toString());
-            const deaths = (msg.properties as any)?.headers?.['x-death'] as
+            const deaths = (msg.properties as { headers?: Record<string, unknown> })?.headers?.['x-death'] as
               | Array<{
                   queue?: string;
                   reason?: string;

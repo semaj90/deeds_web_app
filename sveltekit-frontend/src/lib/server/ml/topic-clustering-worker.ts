@@ -18,6 +18,17 @@
 
 import { setup, assign, fromPromise } from 'xstate';
 import { KMeansClusterer } from './topic-cluster.js';
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return 'Unknown error';
+  }
+}
+
 import { db } from '$lib/server/db/client';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { documentTopics } from '$lib/server/db/schema-postgres.js';
@@ -207,7 +218,19 @@ async function invalidateCache(jobId: string): Promise<{ invalidated: boolean }>
 		const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
 
 		// Dynamic import to avoid server-side dependency issues
-		const amqp = await import('amqplib') as any;
+		const amqpMod = (await import('amqplib')) as unknown as {
+      connect(
+        url: string
+      ): Promise<{
+        createChannel(): Promise<{
+          assertExchange(n: string, t: string, o: object): Promise<unknown>;
+          publish(e: string, r: string, b: Buffer, o?: object): boolean;
+          close(): Promise<void>;
+        }>;
+        close(): Promise<void>;
+      }>;
+    };
+    const amqp = amqpMod;
 		const connection = await amqp.connect(rabbitmqUrl);
 		const channel = await connection.createChannel();
 
@@ -244,172 +267,154 @@ async function invalidateCache(jobId: string): Promise<{ invalidated: boolean }>
  * XState v5 machine for clustering workflow
  */
 export const clusteringMachine = setup({
-	actors: {
-		fetchEmbeddings: fromPromise(async () => fetchDocumentEmbeddings()),
-		runClustering: fromPromise(
-			async ({ input }: { input: number[][] }) => runClustering(input)
-		),
-		persistAssignments: fromPromise(
-			async ({
-				input
-			}: {
-				input: {
-					documentIds: string[];
-					clusterAssignments: number[];
-					embeddings: number[][];
-				};
-			}) =>
-				persistClusterAssignments(
-					input.documentIds,
-					input.clusterAssignments,
-					input.embeddings
-				)
-		),
-		invalidateCache: fromPromise(
-			async ({ input }: { input: string }) => invalidateCache(input)
-		)
-	},
-	guards: {
-		silhouetteQualityOk: ({ context }: { context: ClusteringContext }) =>
-			(context.silhouetteScore ?? 0) >= 0.6,
-		timeoutNotExceeded: ({ context }: { context: ClusteringContext }) =>
-			Date.now() - context.startTime < 5 * 60 * 1000 // 5 minute timeout
-	}
+  actors: {
+    fetchEmbeddings: fromPromise(async () => fetchDocumentEmbeddings()),
+    runClustering: fromPromise(async ({ input }: { input: number[][] }) => runClustering(input)),
+    persistAssignments: fromPromise(
+      async ({
+        input,
+      }: {
+        input: {
+          documentIds: string[];
+          clusterAssignments: number[];
+          embeddings: number[][];
+        };
+      }) => persistClusterAssignments(input.documentIds, input.clusterAssignments, input.embeddings)
+    ),
+    invalidateCache: fromPromise(async ({ input }: { input: string }) => invalidateCache(input)),
+  },
+  guards: {
+    silhouetteQualityOk: ({ context }: { context: ClusteringContext }) =>
+      (context.silhouetteScore ?? 0) >= 0.6,
+    timeoutNotExceeded: ({ context }: { context: ClusteringContext }) =>
+      Date.now() - context.startTime < 5 * 60 * 1000, // 5 minute timeout
+  },
 }).createMachine({
-	id: 'clustering-worker',
-	initial: 'idle',
-	context: {
-		jobId: '',
-		startTime: Date.now(),
-		status: 'idle',
-		centroidCount: 15,
-		documentsProcessed: 0,
-		cacheInvalidated: false
-	},
-	states: {
-		idle: {
-			on: {
-				START: {
-					target: 'fetching_embeddings',
-					actions: assign({
-						jobId: () => `clustering-${Date.now()}`,
-						startTime: () => Date.now(),
-						status: () => 'fetching'
-					})
-				}
-			}
-		},
+  id: 'clustering-worker',
+  initial: 'idle',
+  context: {
+    jobId: '',
+    startTime: Date.now(),
+    status: 'idle',
+    centroidCount: 15,
+    documentsProcessed: 0,
+    cacheInvalidated: false,
+  },
+  states: {
+    idle: {
+      on: {
+        START: {
+          target: 'fetching_embeddings',
+          actions: assign({
+            jobId: () => `clustering-${Date.now()}`,
+            startTime: () => Date.now(),
+            status: () => 'fetching',
+          }),
+        },
+      },
+    },
 
-		fetching_embeddings: {
-			invoke: {
-				src: 'fetchEmbeddings',
-				onDone: {
-					target: 'clustering',
-					actions: assign({
-						embeddings: ({ event }) => event.output.embeddings,
-						documentIds: ({ event }) => event.output.documentIds,
-						documentsProcessed: ({ event }) => event.output.embeddings.length,
-						status: () => 'clustering'
-					})
-				},
-				onError: {
-					target: 'failed',
-					actions: assign({
-						error: ({ event }) => {
-							const err = event.error as any;
-							return typeof err === 'string' ? err : err?.message || 'Unknown error';
-						},
-						status: () => 'failed'
-					})
-				}
-			}
-		},
+    fetching_embeddings: {
+      invoke: {
+        src: 'fetchEmbeddings',
+        onDone: {
+          target: 'clustering',
+          actions: assign({
+            embeddings: ({ event }) => event.output.embeddings,
+            documentIds: ({ event }) => event.output.documentIds,
+            documentsProcessed: ({ event }) => event.output.embeddings.length,
+            status: () => 'clustering',
+          }),
+        },
+        onError: {
+          target: 'failed',
+          actions: assign({
+            error: ({ event }) => getErrorMessage(event.error),
+            status: () => 'failed',
+          }),
+        },
+      },
+    },
 
-		clustering: {
-			invoke: {
-				src: 'runClustering',
-				input: ({ context }) => context.embeddings!,
-				onDone: {
-					target: 'persisting',
-					actions: assign({
-						clusterAssignments: ({ event }) => event.output.clusterAssignments,
-						silhouetteScore: ({ event }) => event.output.silhouetteScore,
-						status: () => 'persisting'
-					})
-				},
-				onError: {
-					target: 'failed',
-					actions: assign({
-						error: ({ event }) => {
-							const err = event.error as any;
-							return typeof err === 'string' ? err : err?.message || 'Clustering failed';
-						},
-						status: () => 'failed'
-					})
-				}
-			}
-		},
+    clustering: {
+      invoke: {
+        src: 'runClustering',
+        input: ({ context }) => context.embeddings!,
+        onDone: {
+          target: 'persisting',
+          actions: assign({
+            clusterAssignments: ({ event }) => event.output.clusterAssignments,
+            silhouetteScore: ({ event }) => event.output.silhouetteScore,
+            status: () => 'persisting',
+          }),
+        },
+        onError: {
+          target: 'failed',
+          actions: assign({
+            error: ({ event }) => getErrorMessage(event.error),
+            status: () => 'failed',
+          }),
+        },
+      },
+    },
 
-		persisting: {
-			invoke: {
-				src: 'persistAssignments',
-				input: ({ context }) => ({
-					documentIds: context.documentIds!,
-					clusterAssignments: context.clusterAssignments!,
-					embeddings: context.embeddings!
-				}),
-				onDone: {
-					target: 'invalidating_cache',
-					actions: assign({
-						status: () => 'invalidating'
-					})
-				},
-				onError: {
-					target: 'failed',
-					actions: assign({
-						error: ({ event }) => {
-							const err = event.error as any;
-							return typeof err === 'string' ? err : err?.message || 'Persistence failed';
-						},
-						status: () => 'failed'
-					})
-				}
-			}
-		},
+    persisting: {
+      invoke: {
+        src: 'persistAssignments',
+        input: ({ context }) => ({
+          documentIds: context.documentIds!,
+          clusterAssignments: context.clusterAssignments!,
+          embeddings: context.embeddings!,
+        }),
+        onDone: {
+          target: 'invalidating_cache',
+          actions: assign({
+            status: () => 'invalidating',
+          }),
+        },
+        onError: {
+          target: 'failed',
+          actions: assign({
+            error: ({ event }) => getErrorMessage(event.error),
+            status: () => 'failed',
+          }),
+        },
+      },
+    },
 
-		invalidating_cache: {
-			invoke: {
-				src: 'invalidateCache',
-				input: ({ context }) => context.jobId,
-				onDone: {
-					target: 'done',
-					actions: assign({
-						cacheInvalidated: ({ event }) => event.output.invalidated,
-						status: () => 'done',
-						endTime: () => Date.now()
-					})
-				},
-				onError: {
-					// Cache invalidation failure is non-fatal
-					target: 'done',
-					actions: assign({
-						status: () => 'done',
-						endTime: () => Date.now()
-					})
-				}
-			}
-		},
+    invalidating_cache: {
+      invoke: {
+        src: 'invalidateCache',
+        input: ({ context }) => context.jobId,
+        onDone: {
+          target: 'done',
+          actions: assign({
+            cacheInvalidated: ({ event }) => event.output.invalidated,
+            status: () => 'done',
+            endTime: () => Date.now(),
+          }),
+        },
+        onError: {
+          // Cache invalidation failure is non-fatal
+          target: 'done',
+          actions: assign({
+            status: () => 'done',
+            endTime: () => Date.now(),
+          }),
+        },
+      },
+    },
 
-		done: {
-			type: 'final'
-		},
+    done: {
+      type: 'final',
+    },
 
-		failed: {
-			on: {
-				RESET: 'idle'
-			}
-		}
-	}
+    failed: {
+      on: {
+        RESET: 'idle',
+      },
+    },
+  },
 });
 
 /**

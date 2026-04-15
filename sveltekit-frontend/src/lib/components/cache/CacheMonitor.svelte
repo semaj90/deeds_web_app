@@ -18,7 +18,7 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 		lastCheck: Date.now()
 	});
 
-	let stats = $derived(cache.getStats() as any);
+	let stats = $derived(cache.getStats());
 	let autoRefresh = $state(true);
 	let refreshInterval: ReturnType<typeof setInterval> | undefined;
 
@@ -39,9 +39,9 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 	async function updateHealth() {
 		const raw = await CacheMonitoring.getHealth();
 		health = {
-			isHealthy: (raw as any).totalRequests >= 0,
-			memoryReady: ((raw as any).memoryStats?.collections ?? 0) >= 0,
-			persistentReady: ((raw as any).persistentHits ?? 0) >= 0,
+			isHealthy: raw.status !== 'unavailable',
+			memoryReady: raw.layers.some((l) => l.name === 'memory' && l.healthy),
+			persistentReady: raw.layers.some((l) => l.name === 'persistent' && l.healthy),
 			lastCheck: Date.now()
 		};
 	}

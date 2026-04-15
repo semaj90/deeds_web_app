@@ -16,9 +16,17 @@
 
 	async function loadData() {
 		isLoading = true;
+		error = null;
 		try {
-			// Placeholder for data loading
-			console.log('Loading data for', routePath);
+			const res = await fetch('/api/phase78/monitor');
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const data = await res.json();
+			const match = (data.routes ?? []).find((r: any) => r.routePath === routePath);
+			if (match) {
+				health = { state: match.state, recentErrorCount: match.recentErrorCount, updatedAt: match.updatedAt };
+			}
+		} catch (e) {
+			error = (e as Error).message;
 		} finally {
 			isLoading = false;
 		}
@@ -49,7 +57,7 @@
 	$effect(() => {
 
 		loadData();
-	
+
 });
 </script>
 

@@ -74,7 +74,7 @@ declare module '*.css';
 declare global {
   // WebGPU support (avoid conflict with @webgpu/types)
   interface Navigator {
-    gpu?: unknown;
+    gpu?: GPU;
   }
 
   // Global WebGPU types (simplified)

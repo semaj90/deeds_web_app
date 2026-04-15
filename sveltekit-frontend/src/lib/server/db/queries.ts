@@ -16,7 +16,7 @@ export async function getUserById(id: string): Promise<User | null> {
 export async function getUserByEmail(email: string): Promise<User | null> {
     try {
         // Casting users to any to access email if it's not strictly typed in schema yet
-        const result = await db.select().from(users).where(eq((users as any).email, email)).limit(1);
+        const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
         return (result[0] as unknown as User) ?? null;
     } catch (error: unknown) {
         console.error('Error fetching user by email: ', error);

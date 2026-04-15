@@ -2337,6 +2337,234 @@
         "kind": "test",
         "isDefault": false
       }
+    },
+    // ============================================
+    // Phase 89 + 109: GPU Pipeline + KAG + Auto-Tag
+    // ============================================
+    {
+      "label": "🚀 Phase 89: Run GPU Clustering Pipeline",
+      "type": "shell",
+      "command": ".venv/Scripts/python.exe sveltekit-frontend/scripts/phase89-enhanced-cuda-pipeline.py --chunk-size 500",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run GPU-accelerated DBSCAN error clustering, embed via Ollama, store clusters to Qdrant (phase89_error_chunks)"
+    },
+    {
+      "label": "🚀 Phase 89: Run Pipeline (small batch)",
+      "type": "shell",
+      "command": ".venv/Scripts/python.exe sveltekit-frontend/scripts/phase89-enhanced-cuda-pipeline.py --chunk-size 100 --max 200",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Quick test run — 200 errors max at batch 100"
+    },
+    {
+      "label": "🧠 Phase 109: KAG Stats (Neo4j health)",
+      "type": "shell",
+      "command": "curl -s http://localhost:5173/api/phase109/kag | jq .",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Check KAGTraverser Neo4j connectivity and service stats"
+    },
+    {
+      "label": "🧠 Phase 109: KAG Root Cause (prompt Error ID)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/phase109/kag -H 'Content-Type: application/json' -d '{\"errorId\":\"${input:kagErrorId}\",\"action\":\"root-cause\"}' | jq .",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Traverse Neo4j error graph to find root cause of a specific error"
+    },
+    {
+      "label": "🏷️ Phase 109: Auto-Tag Qdrant (dry run)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/phase109/tag-chunks -H 'Content-Type: application/json' -d '{\"dryRun\":true,\"limit\":50}' | jq .",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Preview which codebase_chunks_768 points would be auto-tagged (no writes)"
+    },
+    {
+      "label": "🏷️ Phase 109: Auto-Tag Qdrant (100 chunks)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/phase109/tag-chunks -H 'Content-Type: application/json' -d '{\"dryRun\":false,\"limit\":100}' | jq .",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Auto-tag up to 100 untagged codebase_chunks_768 via LLM classification"
+    },
+    {
+      "label": "🔧 Phase 66: Run Error Fixer (LLM)",
+      "type": "shell",
+      "command": ".venv/Scripts/python.exe scripts/phase66_automated_error_fixer.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run the Phase 66 LangGraph multi-agent TypeScript error fixer pipeline"
+    },
+    // ─────────────────────────────────────────────────────────────────────────
+    // Phase 108: Batch Syntax Fixer (regex-based, fast, no LLM required)
+    // ─────────────────────────────────────────────────────────────────────────
+    {
+      "label": "🔍 Phase 108: Batch Fixer (dry-run)",
+      "type": "shell",
+      "command": "node scripts/phase108-batch-fixer.cjs --dry-run --verbose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Identify CSS/TS/Svelte syntax corruption patterns without modifying files"
+    },
+    {
+      "label": "✅ Phase 108: Batch Fixer (apply)",
+      "type": "shell",
+      "command": "node scripts/phase108-batch-fixer.cjs --apply",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Apply CSS/TS/Svelte syntax fixes across all src files"
+    },
+    // ─────────────────────────────────────────────────────────────────────────
+    // Go Search Service (HTTP :8096, gRPC :50055)
+    // ─────────────────────────────────────────────────────────────────────────
+    {
+      "label": "🔨 Go Search: Build",
+      "type": "shell",
+      "command": "go build -o go-search-service.exe .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/go-search-service",
+        "env": {
+          "CGO_ENABLED": "0",
+          "GOOS": "windows",
+          "GOARCH": "amd64"
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [
+        "$go"
+      ],
+      "detail": "Compile Go legal library search service binary"
+    },
+    {
+      "label": "🚀 Go Search: Run (HTTP :8096)",
+      "type": "shell",
+      "command": ".\\go-search-service.exe",
+      "options": {
+        "cwd": "${workspaceFolder}/services/go-search-service",
+        "env": {
+          "HTTP_PORT": "8096",
+          "GRPC_PORT": "50055",
+          "QDRANT_URL": "http://localhost:6333",
+          "REDIS_URL": "redis://localhost:6379",
+          "OLLAMA_URL": "http://localhost:11434"
+        }
+      },
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Start Go legal library search service (enables fast fan-out search at /api/library/search)"
+    },
+    {
+      "label": "🏥 Go Search: Health Check",
+      "type": "shell",
+      "command": "curl -s http://localhost:8096/health | python -m json.tool",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Check Go search service deep health (pg + redis + qdrant + ollama)"
     }
   ],
   "inputs": [
@@ -2363,6 +2591,12 @@
       "type": "promptString",
       "description": "Case title for Obsidian export (creates Legal AI/Cases/<title>.md)",
       "default": "Smith v Johnson"
+    },
+    {
+      "id": "kagErrorId",
+      "type": "promptString",
+      "description": "Error ID to traverse in KAG Neo4j graph",
+      "default": "demo-0"
     }
   ]
 }

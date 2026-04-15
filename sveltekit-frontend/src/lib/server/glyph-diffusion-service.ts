@@ -18,6 +18,14 @@ import crypto from 'node:crypto';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
+/** Methods used by glyph-diffusion-service that are not on the public MinIOService API */
+interface MinIOExtended {
+	getFileBuffer(bucket: string, key: string): Promise<Buffer>;
+	uploadBuffer(data: Buffer, key: string, opts?: { bucket?: string; contentType?: string }): Promise<void>;
+	getFileUrl(bucket: string, key: string, ttl?: number): Promise<string>;
+	deleteFile(bucket: string, key: string): Promise<void>;
+}
+
 export interface TensorManifest {
 	id: string;
 	model: string;
@@ -93,8 +101,8 @@ class GPUTensorCache {
 		try {
 			const { minioService } = await import('$lib/server/storage/minio-service.js');
 			const [manifestData, tensorData] = await Promise.all([
-				(minioService as any).getFileBuffer('tensor-cache', `${tensorId}.meta.json`),
-				(minioService as any).getFileBuffer('tensor-cache', `${tensorId}.tensor`),
+				minioService.getFileBuffer('tensor-cache', `${tensorId}.meta.json`),
+				minioService.getFileBuffer('tensor-cache', `${tensorId}.tensor`),
 			]);
 
 			const manifest = JSON.parse(manifestData.toString()) as TensorManifest;
@@ -133,12 +141,12 @@ class GPUTensorCache {
 		try {
 			const { minioService } = await import('$lib/server/storage/minio-service.js');
 			await Promise.all([
-				(minioService as any).uploadBuffer(
+				minioService.uploadBuffer(
 					Buffer.from(JSON.stringify(manifest, null, 2)),
 					`${tensorId}.meta.json`,
 					{ bucket: 'tensor-cache', contentType: 'application/json' }
 				),
-				(minioService as any).uploadBuffer(data, `${tensorId}.tensor`, {
+				minioService.uploadBuffer(data, `${tensorId}.tensor`, {
 					bucket: 'tensor-cache',
 					contentType: 'application/octet-stream',
 				}),
@@ -334,11 +342,11 @@ export class GlyphDiffusionService {
 		let glyphUrl = `/generated-glyphs/glyph_${requestHash}.png`;
 		try {
 			const { minioService } = await import('$lib/server/storage/minio-service.js');
-			await (minioService as any).uploadBuffer(glyphData, `glyph_${requestHash}.png`, {
-				bucket: 'generated-glyphs',
+				await minioService.uploadBuffer(glyphData, `glyph_${requestHash}.png`, {
+					bucket: 'generated-glyphs',
 				contentType: 'image/png',
 			});
-			glyphUrl = await (minioService as any).getFileUrl(
+				glyphUrl = await minioService.getFileUrl(
 				'generated-glyphs',
 				`glyph_${requestHash}.png`,
 				3600
@@ -377,11 +385,11 @@ export class GlyphDiffusionService {
 
 			const { minioService } = await import('$lib/server/storage/minio-service.js');
 			const embeddedFilename = `glyph_${requestHash}_embedded.png`;
-			await (minioService as any).uploadBuffer(embeddedPNG, embeddedFilename, {
+				await minioService.uploadBuffer(embeddedPNG, embeddedFilename, {
 				bucket: 'generated-glyphs',
 				contentType: 'image/png',
 			});
-			previewWithTensors = await (minioService as any).getFileUrl(
+				previewWithTensors = await minioService.getFileUrl(
 				'generated-glyphs',
 				embeddedFilename,
 				3600
@@ -443,8 +451,8 @@ export class GlyphDiffusionService {
 			const { minioService } = await import('$lib/server/storage/minio-service.js');
 			for (const row of results.rows as Array<{ id: string }>) {
 				try {
-					await (minioService as any).deleteFile('tensor-cache', `${row.id}.tensor`);
-					await (minioService as any).deleteFile('tensor-cache', `${row.id}.meta.json`);
+					await minioService.deleteFile('tensor-cache', `${row.id}.tensor`);
+					await minioService.deleteFile('tensor-cache', `${row.id}.meta.json`);
 					freedBytes += 1024; // Estimate
 				} catch {
 					// Continue cleanup

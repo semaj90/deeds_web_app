@@ -870,7 +870,10 @@
         <StatuteDetail
           statute={{ id: selectedCitation.id, code: selectedCitation.statute_code ?? '', title: selectedCitation.statute_title ?? '', full_text: selectedCitation.highlighted_text ?? '', jurisdiction: selectedCitation.jurisdiction ?? '' }}
           onattachtocase={() => { attachStatuteCode = selectedCitation?.statute_code ?? null; attachCitationId = selectedCitation?.id ?? null; showAttachModal = true; }}
-          onsavecitation={() => { console.log('Save citation:', selectedCitation.id); }}
+          onsavecitation={async (statute) => {
+            if (!statute) return;
+            await fetch('/api/citations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ statute_code: statute.code ?? statute.id, statute_title: statute.title, jurisdiction: statute.jurisdiction ?? '', highlighted_text: statute.full_text ?? '' }) }).catch(() => {});
+          }}
         />
         <RelatedCasesPanel
           statuteCode={selectedCitation.statute_code ?? null}
@@ -920,7 +923,7 @@
   isOpen={showAttachModal}
   statuteCode={attachStatuteCode}
   citationId={attachCitationId}
-  onattached={(data) => { console.log('Attached to case:', data); showAttachModal = false; loadCitations(); }}
+  onattached={() => { showAttachModal = false; loadCitations(); }}
 />
 
 <!-- Collection Detail Panel -->

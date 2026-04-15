@@ -48,6 +48,13 @@ export interface ScanNodeV2 {
 	routeType: 'api' | 'page' | 'layout' | 'server' | 'component' | 'util'; // 18
 	symbolCount: number; // 19
 	maxCallDepth: number; // 20
+
+	// Svelte 5 rune compliance (gates G21-G25)
+	isSvelteComponent: boolean; // 21
+	hasSvelte4Props: boolean;   // 22 — export let (should be $props())
+	hasSvelte4Reactive: boolean;// 23 — $: (should be $derived/$effect)
+	hasSvelte4Events: boolean;  // 24 — on:event (should be onclick)
+	hasRunesInPlainTs: boolean; // 25 — $state/$derived in .ts (not .svelte.ts)
 }
 
 export interface ScanEdge {
@@ -112,6 +119,12 @@ const RE_ZOD        = /\bz\.|safeParse|parseAsync|schema\(|ZodSchema/;
 const RE_CACHE      = /redis|loki|IndexedDB|localStorage|sessionStorage|cacheMap|Cache/i;
 const RE_SSE        = /text\/event-stream|EventSource|ReadableStream/;
 const RE_WORKER     = /worker_threads|new Worker\(|Worker\('/;
+
+// ── Svelte 5 rune compliance patterns ────────────────────────────────────────
+const RE_SVELTE4_PROPS    = /\bexport\s+let\s+\w+/;
+const RE_SVELTE4_REACTIVE = /^\s*\$:[^:]/m;
+const RE_SVELTE4_EVENTS   = /\bon:[a-z][a-z]+=["'{]/;
+const RE_RUNE_IN_PLAIN_TS = /(?:^|[^a-zA-Z0-9_])\$(?:state|derived|effect|props)\s*[(<]/m;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getNodeLabel(relPath: string): string {
@@ -179,12 +192,18 @@ function collectFiles(dir: string, maxFiles: number): string[] {
 				walk(full);
 			} else {
 				const ext = extname(entry);
-				if (['.ts', '.js', '.mts'].includes(ext) && !entry.endsWith('.d.ts')) files.push(full);
+				if (['.ts', '.js', '.mts', '.svelte'].includes(ext) && !entry.endsWith('.d.ts')) files.push(full);
 			}
 		}
 	}
 	walk(dir);
 	return files;
+}
+
+/** Extract script content from a .svelte file for pattern analysis. */
+function extractSvelteScript(src: string): string {
+	const matches = src.match(/<script[^>]*>([\s\S]*?)<\/script>/g) ?? [];
+	return matches.map((m: string) => m.replace(/<script[^>]*>|<\/script>/g, '')).join('\n');
 }
 
 function resolveImport(spec: string, fromFile: string, srcRoot: string): string | null {
@@ -225,7 +244,8 @@ function buildTsMorphMap(filePaths: string[], srcRoot: string): Map<string, TsMo
 			useInMemoryFileSystem: false,
 		});
 		// Pre-add ALL files at once — ts-morph batches the parse, not per-file
-		project.addSourceFilesAtPaths(filePaths);
+		// Skip .svelte files — ts-morph cannot parse Svelte syntax; rune detection uses regex instead
+		project.addSourceFilesAtPaths(filePaths.filter(f => !f.endsWith('.svelte')));
 		console.log(`[scanner-v2] ts-morph loaded ${project.getSourceFiles().length} source files`);
 	} catch (err) {
 		console.warn('[scanner-v2] ts-morph Project init failed:', (err as Error)?.message);
@@ -350,6 +370,16 @@ export function buildCodebaseGraphV2(options: { scanDir: string; srcRoot: string
 			const { dynamicImportTargets, callees, symbolCount, maxCallDepth } =
 				tsMorphMap.get(fp) ?? { dynamicImportTargets: [], callees: [], symbolCount: 0, maxCallDepth: 0 };
 
+			// G21-G25: Svelte 5 rune compliance
+			const isSvelteFile = fp.endsWith('.svelte');
+			const isSvelteTsFile = fp.endsWith('.svelte.ts');
+			const scriptSrc = isSvelteFile ? extractSvelteScript(src) : src;
+			const hasSvelte4Props    = RE_SVELTE4_PROPS.test(scriptSrc);
+			const hasSvelte4Reactive = RE_SVELTE4_REACTIVE.test(scriptSrc);
+			const hasSvelte4Events   = RE_SVELTE4_EVENTS.test(scriptSrc);
+			// hasRunesInPlainTs: rune calls in .ts files that aren't .svelte.ts (reactivity is inert there)
+			const hasRunesInPlainTs  = !isSvelteFile && !isSvelteTsFile && RE_RUNE_IN_PLAIN_TS.test(src);
+
 			nodeMap.set(relPath, {
 				id: nodeId,
 				label: basename(fp),
@@ -384,7 +414,14 @@ export function buildCodebaseGraphV2(options: { scanDir: string; srcRoot: string
 				isRouteFile: /\+(?:page|layout|server)\.(?:ts|js|svelte)$/.test(fp),
 				routeType: getRouteType(relPath),
 				symbolCount,
-				maxCallDepth
+				maxCallDepth,
+
+				// G21-G25: Svelte 5 rune compliance
+				isSvelteComponent: isSvelteFile,
+				hasSvelte4Props,
+				hasSvelte4Reactive,
+				hasSvelte4Events,
+				hasRunesInPlainTs,
 			});
 
 			// Static IMPORTS edges

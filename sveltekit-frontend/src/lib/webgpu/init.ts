@@ -38,21 +38,21 @@ export interface WebGPUInitOptions {
  * });
  * ```
  */
-export async function initWebGPU(
-  options: WebGPUInitOptions = {}
-): Promise<WebGPUContext | null> {
+export async function initWebGPU(options: WebGPUInitOptions = {}): Promise<WebGPUContext | null> {
   // SSR Guard: Must run in browser with WebGPU support
   // NOTE: 'gpu' in navigator can be true even when navigator.gpu is null (WSL2).
   // Always check navigator.gpu directly to avoid null-dereference crashes.
   if (!browser || typeof navigator === 'undefined' || !navigator.gpu) {
-    console.warn('[WebGPU] Not available (SSR, unsupported browser, or WSL2 without GPU passthrough)');
+    console.warn(
+      '[WebGPU] Not available (SSR, unsupported browser, or WSL2 without GPU passthrough)'
+    );
     return null;
   }
 
   try {
     // Request adapter with power preference
-    const adapter = await (navigator as any).gpu.requestAdapter({
-      powerPreference: options.powerPreference || 'high-performance'
+    const adapter = await navigator.gpu.requestAdapter({
+      powerPreference: options.powerPreference || 'high-performance',
     });
 
     if (!adapter) {
@@ -67,7 +67,7 @@ export async function initWebGPU(
         vendor: info.vendor,
         architecture: info.architecture,
         device: info.device,
-        description: info.description
+        description: info.description,
       });
     }
 
@@ -75,31 +75,32 @@ export async function initWebGPU(
     const device = await adapter.requestDevice({
       requiredFeatures: options.requiredFeatures || [],
       requiredLimits: {
-	maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+        maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
         maxComputeWorkgroupsPerDimension: 65535,
-        ...options.requiredLimits
-      }
+        ...options.requiredLimits,
+      },
     });
 
     // Handle device loss
     device.lost.then((info) => {
       console.error('[WebGPU] Device lost:', {
         reason: info.reason,
-        message: info.message
+        message: info.message,
       });
       // Optionally dispatch event for app-level handling
       if (browser && window.dispatchEvent) {
-        window.dispatchEvent(new CustomEvent('webgpu-device-lost', {
-          detail: info
-        }));
+        window.dispatchEvent(
+          new CustomEvent('webgpu-device-lost', {
+            detail: info,
+          })
+        );
       }
     });
 
     // Get preferred canvas format
-    const format = (navigator as any).gpu.getPreferredCanvasFormat();
+    const format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
 
     return { adapter, device, format };
-
   } catch (error) {
     console.error('[WebGPU] Initialization failed:', error);
     return null;
@@ -127,7 +128,7 @@ export function configureCanvas(
     ctx.configure({
       device: context.device,
       format: context.format,
-      alphaMode: 'premultiplied'
+      alphaMode: 'premultiplied',
     });
 
     return ctx;
@@ -154,7 +155,7 @@ export function createBuffer(
     const buffer = device.createBuffer({
       label,
       size: data.byteLength,
-      usage: usage | GPUBufferUsage.COPY_DST
+      usage: usage | GPUBufferUsage.COPY_DST,
     });
 
     device.queue.writeBuffer(buffer, 0, data);
@@ -173,7 +174,7 @@ export function cpuCompute<T extends Float32Array | Uint8Array>(
   data: T,
   operation: (value: number, index: number) => number
 ): T {
-  const result = new (data.constructor as any)(data.length);
+  const result = new (data.constructor as new (n: number) => typeof data)(data.length);
   for (let i = 0; i < data.length; i++) {
     result[i] = operation(data[i], i);
   }
@@ -192,28 +193,28 @@ export function isWebGPUAvailable(): boolean {
  * Get WebGPU capabilities (SSR-safe)
  */
 export async function getWebGPUCapabilities(): Promise<{
-	available: boolean;
+  available: boolean;
   adapter: GPUAdapter | null;
   features: string[];
-	limits: Record<string, number>;
+  limits: Record<string, number>;
 } | null> {
   if (!isWebGPUAvailable()) {
     return {
       available: false,
       adapter: null,
       features: [],
-      limits: {}
+      limits: {},
     };
   }
 
   try {
-    const adapter = await (navigator as any).gpu.requestAdapter();
+    const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) {
       return {
         available: false,
         adapter: null,
         features: [],
-        limits: {}
+        limits: {},
       };
     }
 
@@ -222,11 +223,11 @@ export async function getWebGPUCapabilities(): Promise<{
       adapter,
       features: Array.from(adapter.features),
       limits: {
-	maxBufferSize: adapter.limits.maxBufferSize,
+        maxBufferSize: adapter.limits.maxBufferSize,
         maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
         maxComputeWorkgroupsPerDimension: adapter.limits.maxComputeWorkgroupsPerDimension,
-        maxComputeInvocationsPerWorkgroup: adapter.limits.maxComputeInvocationsPerWorkgroup
-      }
+        maxComputeInvocationsPerWorkgroup: adapter.limits.maxComputeInvocationsPerWorkgroup,
+      },
     };
   } catch (error) {
     console.error('[WebGPU] Capabilities check failed:', error);

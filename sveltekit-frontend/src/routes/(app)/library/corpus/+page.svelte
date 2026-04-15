@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import IngestionProgress from '$lib/components/legal/IngestionProgress.svelte';
+	import { notificationStore } from '$lib/stores/notifications.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -113,7 +114,7 @@
 			});
 			if (!res.ok) {
 				const d = await res.json();
-				alert(`Failed to start ${src.stateName}: ${d.error}`);
+				notificationStore.add({ type: 'error', title: `Failed to start ${src.stateName}`, message: d.error ?? res.statusText });
 			}
 		} finally {
 			perStateRunning = new Set([...perStateRunning].filter((c) => c !== src.stateCode));

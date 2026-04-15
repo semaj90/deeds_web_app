@@ -373,7 +373,11 @@
     <section class="config-section">
      <h2>ACCESSIBILITY_SETTINGS</h2>
      <AccessibilitySettings
-      onSettingsChange={(settings) => { console.log('A11y settings:', settings); }}
+      onSettingsChange={(settings) => {
+       if (typeof window !== 'undefined') {
+        localStorage.setItem('a11y-settings', JSON.stringify(settings));
+       }
+      }}
      />
     </section>
    {/if}

@@ -98,70 +98,70 @@ function extractAIResultsFromInvoke(evt: unknown): { processedFiles: AIProcessin
     return null;
 }
 
-const validateFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
-    const errors: Record<string, string[]> = {};
-    if (input.files.length === 0) {
-        errors.files = ['Please select at least one file'];
+const validateFiles = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+  const errors: Record<string, string[]> = {};
+  if (input.files.length === 0) {
+    errors.files = ['Please select at least one file'];
+  }
+  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
+  const maxSize = 10 * 1024 * 1024;
+  for (const file of input.files) {
+    if (!allowedTypes.includes(file.type)) {
+      errors.files = errors.files || [];
+      errors.files.push(`${file.name}: File type not allowed`);
     }
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
-    const maxSize = 10 * 1024 * 1024;
-    for (const file of input.files) {
-        if (!allowedTypes.includes(file.type)) {
-            errors.files = errors.files || [];
-            errors.files.push(`${file.name}: File type not allowed`);
-        }
-        if (file.size > maxSize) {
-            errors.files = errors.files || [];
-            errors.files.push(`${file.name}: File too large (max 10MB)`);
-        }
+    if (file.size > maxSize) {
+      errors.files = errors.files || [];
+      errors.files.push(`${file.name}: File too large (max 10MB)`);
     }
+  }
 
-    if (Object.keys(errors).length > 0) {
-        // eslint-disable-next-line no-throw-literal
-        throw { validationErrors: errors };
+  if (Object.keys(errors).length > 0) {
+    // eslint-disable-next-line no-throw-literal
+    throw { validationErrors: errors };
+  }
+  return input.files;
+});
+
+const uploadFiles = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+  const uploadedFiles: UploadedFile[] = [];
+
+  for (const file of input.files) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/evidence/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error((errorData as { error?: string }).error || `HTTP ${response.status}`);
     }
-    return input.files;
-}) as any);
+    const result = (await response.json()) as { id: string; jobId: string; fileName: string };
+    uploadedFiles.push({ id: result.id, name: result.fileName, jobId: result.jobId });
+  }
 
-const uploadFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
-    const uploadedFiles: UploadedFile[] = [];
-
-    for (const file of input.files) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/evidence/upload', {
-            method: 'POST',
-            body: formData
-        });
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error((errorData as any).error || `HTTP ${response.status}`);
-        }
-        const result = await response.json() as { id: string; jobId: string; fileName: string };
-        uploadedFiles.push({ id: result.id, name: result.fileName, jobId: result.jobId });
-    }
-
-    return { files: uploadedFiles };
-}) as any);
+  return { files: uploadedFiles };
+});
 
 // AI processing (entity extraction, summarization, embedding) runs automatically
 // in the background via the evidence upload pipeline — no separate call needed
-const processFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
-    // The /api/evidence/upload pipeline handles all AI processing automatically:
-    // text extraction → chunking → embedding → entity extraction → forensics → summarization
-    return {
-        processedFiles: input.uploadedFiles.map(f => ({
-            extractedText: '',
-            metadata: { fileId: f.id, status: 'processing-in-background' }
-        })),
-        summary: {
-            totalFiles: input.uploadedFiles.length,
-            successfulProcessing: input.uploadedFiles.length,
-            extractedTextLength: 0
-        }
-    };
-}) as any);
+const processFiles = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+  // The /api/evidence/upload pipeline handles all AI processing automatically:
+  // text extraction → chunking → embedding → entity extraction → forensics → summarization
+  return {
+    processedFiles: input.uploadedFiles.map((f) => ({
+      extractedText: '',
+      metadata: { fileId: f.id, status: 'processing-in-background' },
+    })),
+    summary: {
+      totalFiles: input.uploadedFiles.length,
+      successfulProcessing: input.uploadedFiles.length,
+      extractedTextLength: 0,
+    },
+  };
+});
 
 export const documentUploadMachine = setup({
     types: {

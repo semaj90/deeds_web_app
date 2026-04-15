@@ -26,13 +26,12 @@ export interface ExtendedUser extends UserType {
 
 // Helper function to convert User to ExtendedUser
 export function extendUser(user: UserType): ExtendedUser {
- return {
- ...user,
- username:
- user?.name||
- (user as any).email ||
- `${(user as any).firstName} ${(user as any).lastName}`.trim(),
- };
+  return {
+    ...user,
+    username: (user?.name ||
+      ((user as Record<string, unknown>).email as string) ||
+      `${(user as Record<string, unknown>).firstName} ${(user as Record<string, unknown>).lastName}`.trim()) as string,
+  };
 }
 
 // Evidence type
@@ -41,15 +40,16 @@ export type NewEvidence = InferInsertModel<typeof evidence>;
 
 // Extended Evidence type with computed UI properties
 export interface ExtendedEvidence extends Evidence {
-	displayStatus?: string; // computed from isAdmissible and other fields
-}// Helper function to convert Evidence to ExtendedEvidence
+  displayStatus?: string; // computed from isAdmissible and other fields
+} // Helper function to convert Evidence to ExtendedEvidence
 export function extendEvidence(evidenceItem: Evidence): ExtendedEvidence {
- return {
- ...evidenceItem,
- status: (evidenceItem as any).isAdmissible ? 'approved' : 'pending',
- type: (evidenceItem as any).evidenceType,
- createdAt: (evidenceItem as any).collectedAt || (evidenceItem as any).uploadedAt,
- };
+  return {
+    ...evidenceItem,
+    status: (evidenceItem as Record<string, unknown>).isAdmissible ? 'approved' : 'pending',
+    type: (evidenceItem as Record<string, unknown>).evidenceType as string,
+    createdAt: ((evidenceItem as Record<string, unknown>).collectedAt ||
+      (evidenceItem as Record<string, unknown>).uploadedAt) as Date | null,
+  };
 }
 
 // Enhanced Report Builder types

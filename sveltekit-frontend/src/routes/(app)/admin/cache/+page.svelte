@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { notificationStore } from '$lib/stores/notifications.svelte';
 	import type { BufferPoolStats } from '$lib/gpu/gpu-compute-pipeline';
 
 	let { data }: { data: PageData } = $props();
@@ -85,13 +86,13 @@
 
 			if (res.ok) {
 				await refreshStats();
-				alert('Cache invalidated successfully');
+				notificationStore.add({ type: 'success', title: 'Cache invalidated', message: `Keys matching "${pattern}" cleared.` });
 			} else {
 				const err = await res.json();
-				alert(`Failed: ${err.error || res.statusText}`);
+				notificationStore.add({ type: 'error', title: 'Invalidation failed', message: err.error || res.statusText });
 			}
 		} catch (err) {
-			alert(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+			notificationStore.add({ type: 'error', title: 'Error', message: err instanceof Error ? err.message : 'Unknown error' });
 		}
 	}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { notificationStore } from '$lib/stores/notifications.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import EvidenceDrawer from '$lib/components/admin/EvidenceDrawer.svelte';
 	import EvidenceDataGrid from '$lib/components/admin/EvidenceDataGrid.svelte';
@@ -712,7 +713,9 @@
 						{ id: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Additional notes...' },
 						{ id: 'urgent', label: 'Mark as Urgent', type: 'checkbox' }
 					]}
-					onsubmit={(data) => { console.log('YoRHa form submitted:', data); }}
+					onsubmit={async (data) => {
+					await fetch('/api/cases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: data.name || 'Demo Case', priority: data.priority || 'medium', description: data.notes || '', status: 'open' }) }).catch(() => {});
+				}}
 				/>
 			</div>
 		</div>

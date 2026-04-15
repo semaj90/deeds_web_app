@@ -418,8 +418,8 @@ export async function persistAuditReport(report: AuditReport): Promise<string> {
 	const mem = getCudaMemoryInfo();
 
 	const [row] = await db.insert(codebaseAuditReports).values({
-		caseId: report.caseId as any,
-		createdBy: report.createdBy as any,
+		caseId: report.caseId ?? null,
+		createdBy: report.createdBy || null,
 		reportType: 'codebase',
 		cudaAvailable: cuda,
 		gpuMemoryMb: mem.totalMB,
@@ -448,7 +448,7 @@ export async function persistAuditReport(report: AuditReport): Promise<string> {
 export async function getLatestAuditReport(caseId?: string): Promise<AuditReport | null> {
 	const query = caseId
 		? db.select().from(codebaseAuditReports)
-			.where(eq(codebaseAuditReports.caseId, caseId as any))
+			.where(eq(codebaseAuditReports.caseId, caseId!))
 			.orderBy(desc(codebaseAuditReports.createdAt))
 			.limit(1)
 		: db.select().from(codebaseAuditReports)
@@ -459,7 +459,7 @@ export async function getLatestAuditReport(caseId?: string): Promise<AuditReport
 	if (!rows[0]?.codebaseAnalysis) return null;
 
 	try {
-		const analysis = rows[0].codebaseAnalysis as any;
+		const analysis = rows[0].codebaseAnalysis as Record<string, unknown>;
 		return {
 			reportType: 'gpu_codebase_audit',
 			caseId: rows[0].caseId ?? undefined,

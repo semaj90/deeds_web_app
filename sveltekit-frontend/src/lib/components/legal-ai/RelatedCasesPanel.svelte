@@ -32,14 +32,15 @@
     error = null;
 
     try {
-      const response = await fetch(`/api/laws/${statuteCode}/related-cases?limit=10`);
+      const response = await fetch(`/api/cases?search=${encodeURIComponent(statuteCode)}&limit=10`);
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
-          cases = data.cases ?? [];
-        } else {
-          error = data.error || 'Failed to load related cases';
-        }
+        const raw = data.data?.cases ?? data.cases ?? [];
+        cases = raw.map((c: { id: string; caseNumber?: string; title: string; status?: string }) => ({
+          id: c.id,
+          caseNumber: c.caseNumber ?? c.id.slice(0, 8).toUpperCase(),
+          title: c.title,
+        }));
       } else {
         error = 'Failed to load related cases';
       }

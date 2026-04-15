@@ -51,12 +51,20 @@ export async function getConnection(): Promise<AmqpConnection> {
     const connectFn = amqpModule.default?.connect ?? amqpModule.connect;
     if (!connectFn) throw new Error('amqplib connect function not found');
     connection = await connectFn(rabbitmqUrl);
-    (connection as any).on('error', (err: Error) => {
+    (
+      connection as Record<string, unknown> & {
+        on: (evt: string, cb: (...a: unknown[]) => void) => void;
+      }
+    ).on('error', (err: Error) => {
       console.error('❌ RabbitMQ connection error:', err);
       connection = null;
       channel = null;
     });
-    (connection as any).on('close', () => {
+    (
+      connection as Record<string, unknown> & {
+        on: (evt: string, cb: (...a: unknown[]) => void) => void;
+      }
+    ).on('close', () => {
       console.log('🔌 RabbitMQ connection closed');
       connection = null;
       channel = null;
@@ -72,13 +80,28 @@ export async function getChannel(): Promise<AmqpChannel> {
   if (channel) return channel;
   const conn = await getConnection();
   try {
-    channel = await (conn as any).createChannel();
-    await (channel as any).prefetch(1);
-    (channel as any).on('error', (err: Error) => {
+    channel = await conn.createChannel();
+    await (
+      channel as Record<string, unknown> & {
+        prefetch: (n: number) => Promise<void>;
+        on: (evt: string, cb: (...a: unknown[]) => void) => void;
+      }
+    ).prefetch(1);
+    (
+      channel as Record<string, unknown> & {
+        prefetch: (n: number) => Promise<void>;
+        on: (evt: string, cb: (...a: unknown[]) => void) => void;
+      }
+    ).on('error', (err: Error) => {
       console.error('❌ RabbitMQ channel error:', err);
       channel = null;
     });
-    (channel as any).on('close', () => {
+    (
+      channel as Record<string, unknown> & {
+        prefetch: (n: number) => Promise<void>;
+        on: (evt: string, cb: (...a: unknown[]) => void) => void;
+      }
+    ).on('close', () => {
       console.log('📺 RabbitMQ channel closed');
       channel = null;
     });

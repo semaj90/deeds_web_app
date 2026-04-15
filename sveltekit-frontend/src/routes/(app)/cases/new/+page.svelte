@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms/client';
+	import { goto } from '$app/navigation';
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 	import { intakeCaseSchema } from './schema.js';
 	import type { PageData } from './$types';
@@ -149,8 +150,26 @@
 	{#if formMode === 'autofill'}
 		<div class="multi-step-container">
 			<AutoPopulatedCaseForm
-				onSubmit={(formData) => { console.log('Auto-filled case submitted:', formData); }}
-				onFieldChange={(field, value) => { console.log('Field changed:', field, value); }}
+				onSubmit={async (formData) => {
+					try {
+						const res = await fetch('/api/cases', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								title: [formData.plaintiff, formData.defendant].filter(Boolean).join(' v. ') || 'Untitled Case',
+								description: formData.summary ?? '',
+								status: 'open',
+								priority: 'medium',
+							})
+						});
+						const data = await res.json();
+						if (res.ok && data.case?.id) goto('/cases/' + data.case.id);
+						else toast.error(data.error ?? 'Failed to create case');
+					} catch {
+						toast.error('Failed to create case');
+					}
+				}}
+				onFieldChange={() => {}}
 				editable={true}
 			/>
 		</div>
