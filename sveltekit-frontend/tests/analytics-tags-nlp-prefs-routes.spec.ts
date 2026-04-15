@@ -193,6 +193,10 @@ vi.mock('$lib/server/ace/tag-sync.js', () => ({
 
 // ── Ollama fetch mock ──────────────────────────────────────────
 vi.mock('$lib/server/ollama.js', () => ({
+	getChatModelKeepAlive: () => '2m',
+	getEmbeddingModelKeepAlive: () => '24h',
+	getChatModel: () => 'gemma4-legal:latest',
+	getEmbedModel: () => 'embeddinggemma:latest',
   ollamaFetch: vi.fn(async () => ({
     ok: true,
     json: async () => ({ embeddings: [[0.1, 0.2, 0.3]] }),

@@ -46,6 +46,10 @@ vi.mock('$lib/config/env.server.js', () => ({
 
 const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
+	getChatModelKeepAlive: () => '2m',
+	getEmbeddingModelKeepAlive: () => '24h',
+	getChatModel: () => 'gemma4-legal:latest',
+	getEmbedModel: () => 'embeddinggemma:latest',
   ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
 }));
 

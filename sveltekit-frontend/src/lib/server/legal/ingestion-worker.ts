@@ -8,9 +8,10 @@
  */
 
 import { pool } from '$lib/server/db/client';
-import { getFile, ensureBucket, putObject } from '$lib/server/minio-client.js';
+import { getFile, putObject } from '$lib/server/minio-client.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { chunkLegalDocument } from '$lib/server/indexer/legal-chunker.js';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { randomUUID } from 'crypto';
 
 const BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
@@ -363,6 +364,7 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 	// ── Stage F: Embeddings ─────────────────────────────────────────────────
 	const EMBED_BATCH = 32;
 	const embedTexts = chunkRows.map((c) => c.text.slice(0, 1024));
+	const qdrantPoints: Array<{ id: string; vector: number[]; chunkIdx: number }> = [];
 
 	for (let i = 0; i < chunkRows.length; i += EMBED_BATCH) {
 		const batch = chunkRows.slice(i, i + EMBED_BATCH);
@@ -384,11 +386,44 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 					`UPDATE legal_chunks SET embedding = $1 WHERE id = $2`,
 					[`[${embedding.join(',')}]`, batch[j].id]
 				);
+				qdrantPoints.push({ id: batch[j].id, vector: embedding, chunkIdx: i + j });
 			}
 		}
 
 		const progress = 70 + Math.floor((i / chunkRows.length) * 20);
 		await setStage(jobId, 'embedding', progress);
+	}
+
+	// ── Stage F2b: Qdrant upsert ─────────────────────────────────────────────
+	if (qdrantPoints.length > 0) {
+		try {
+			const jurisdictionRowEarly = await pool.query(
+				`SELECT code FROM jurisdictions WHERE id = $1`,
+				[doc.jurisdiction_id]
+			);
+			const jCode = jurisdictionRowEarly.rows[0]?.code ?? 'federal';
+
+			await qdrant.batchUpsert({
+				collection: 'documents',
+				points: qdrantPoints.map((p) => ({
+					id: p.id,
+					vector: { content: p.vector },
+					payload: {
+						document_id: documentId,
+						title: doc.title,
+						chunk_text: chunkRows[p.chunkIdx]?.text ?? '',
+						node_id: chunkRows[p.chunkIdx]?.nodeId ?? '',
+						chunk_index: chunkRows[p.chunkIdx]?.index ?? p.chunkIdx,
+						jurisdiction_code: jCode,
+						corpus_type: doc.corpus_type ?? 'statute',
+					},
+				})),
+				batchSize: 100,
+			});
+		} catch (e) {
+			// Non-fatal: Qdrant may be unavailable, pgvector is primary store
+			console.warn('[ingestion] Qdrant upsert failed (non-fatal):', e);
+		}
 	}
 
 	// ── Stage F2: Extract Legal Definitions ──────────────────────────────────

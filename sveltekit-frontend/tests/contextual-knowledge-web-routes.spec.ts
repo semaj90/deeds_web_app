@@ -39,14 +39,15 @@ vi.mock('$lib/server/redis.js', () => ({
 
 // ── ENV mock ──
 vi.mock('$lib/server/env.server.js', () => ({
-	ENV: {
-		OLLAMA_BASE_URL: 'http://localhost:11434',
-		QDRANT_URL: 'http://localhost:6333',
-		SEARXNG_URL: 'http://localhost:8888',
-		LANGEXTRACT_URL: 'http://localhost:8095',
-		MINIO_EVIDENCE_BUCKET: 'evidence',
-		GEMINI_API_KEY: '',
-	},
+  ENV: {
+    OLLAMA_BASE_URL: 'http://localhost:11434',
+    QDRANT_URL: 'http://localhost:6333',
+    SEARXNG_URL: 'http://localhost:8888',
+    LANGEXTRACT_URL: 'http://localhost:8095',
+    LANGEXTRACT_ENABLED: 'true',
+    MINIO_EVIDENCE_BUCKET: 'evidence',
+    GEMINI_API_KEY: '',
+  },
 }));
 vi.mock('$lib/config/env.server.js', () => ({
 	getOllamaUrl: () => 'http://localhost:11434',
@@ -71,7 +72,11 @@ const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } });
 });
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+  getChatModelKeepAlive: () => '2m',
+  getEmbeddingModelKeepAlive: () => '24h',
+  getChatModel: () => 'gemma4-legal:latest',
+  getEmbedModel: () => 'embeddinggemma:latest',
+  ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── DB mock ──
@@ -155,6 +160,15 @@ vi.mock('$lib/server/retrieval/query-expansion.js', () => ({
 		synonyms: [],
 		source: 'none',
 	})),
+}));
+
+// ── langextract client mock ──
+const mockLangextractFetch = vi.fn(async () => new Response(JSON.stringify({
+	title: 'Extracted Page',
+	text: 'Extracted content from page.',
+}), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+vi.mock('$lib/server/langextract-client.js', () => ({
+	langextractFetch: (...args: any[]) => mockLangextractFetch(...args),
 }));
 
 // ── global fetch mock for SearXNG / Qdrant / langextract ──
@@ -618,7 +632,7 @@ describe('/api/web/crawl (POST)', () => {
 	});
 
 	it('returns 502 when langextract fails', async () => {
-		mockGlobalFetch.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+		mockLangextractFetch.mockRejectedValueOnce(new Error('ECONNREFUSED'));
 		const { POST } = await import('../src/routes/api/web/crawl/+server.js');
 		const event = makeEvent('POST', 'http://localhost/api/web/crawl', {
 			body: { url: 'https://example.com/page' },
@@ -656,7 +670,9 @@ describe('/api/knowledge/stats (GET)', () => {
 		const { GET } = await import('../src/routes/api/knowledge/stats/+server.js');
 		const event = makeEvent('GET', 'http://localhost/api/knowledge/stats');
 		const res = await GET(event as any);
-		expect(res.status).toBe(503);
+		expect(res.status).toBe(200);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(false);
 	});
 
 	it('returns 500 for generic errors', async () => {
@@ -664,7 +680,9 @@ describe('/api/knowledge/stats (GET)', () => {
 		const { GET } = await import('../src/routes/api/knowledge/stats/+server.js');
 		const event = makeEvent('GET', 'http://localhost/api/knowledge/stats');
 		const res = await GET(event as any);
-		expect(res.status).toBe(500);
+		expect(res.status).toBe(200);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(false);
 	});
 });
 

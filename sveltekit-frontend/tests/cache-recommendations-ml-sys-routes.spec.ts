@@ -28,46 +28,53 @@ const mockRedisStore: Record<string, string> = {};
 const mockSortedSet: Array<{ member: string; score: number }> = [];
 
 const redisMock = {
-	get: vi.fn(async (k: string) => mockRedisStore[k] ?? null),
-	set: vi.fn(async (k: string, v: string, ...args: any[]) => {
-		mockRedisStore[k] = v;
-		return 'OK';
-	}),
-	setex: vi.fn(async (k: string, _ttl: number, v: string) => {
-		mockRedisStore[k] = v;
-		return 'OK';
-	}),
-	del: vi.fn(async (...keys: string[]) => {
-		let count = 0;
-		for (const k of keys) {
-			if (mockRedisStore[k] !== undefined) {
-				delete mockRedisStore[k];
-				count++;
-			}
-		}
-		return count;
-	}),
-	keys: vi.fn(async (_p: string) => Object.keys(mockRedisStore)),
-	dbsize: vi.fn(async () => Object.keys(mockRedisStore).length),
-	ping: vi.fn(async () => 'PONG'),
-	flushdb: vi.fn(async () => 'OK'),
-	info: vi.fn(async (_section: string) => {
-		if (_section === 'memory') return 'used_memory:1048576\nused_memory_human:1M\n';
-		return 'keyspace_hits:100\nkeyspace_misses:20\ntotal_connections_received:50\n';
-	}),
-	zadd: vi.fn(async (_key: string, score: number, member: string) => {
-		mockSortedSet.push({ member, score });
-		return 1;
-	}),
-	zrevrange: vi.fn(async (_key: string, _start: number, _stop: number, _ws?: string) => {
-		const sorted = [...mockSortedSet].sort((a, b) => b.score - a.score);
-		const result: string[] = [];
-		for (const entry of sorted) {
-			result.push(entry.member, String(entry.score));
-		}
-		return result;
-	}),
-	zremrangebyrank: vi.fn(async () => 0),
+  get: vi.fn(async (k: string) => mockRedisStore[k] ?? null),
+  set: vi.fn(async (k: string, v: string, ...args: any[]) => {
+    mockRedisStore[k] = v;
+    return 'OK';
+  }),
+  setex: vi.fn(async (k: string, _ttl: number, v: string) => {
+    mockRedisStore[k] = v;
+    return 'OK';
+  }),
+  del: vi.fn(async (...keys: string[]) => {
+    let count = 0;
+    for (const k of keys) {
+      if (mockRedisStore[k] !== undefined) {
+        delete mockRedisStore[k];
+        count++;
+      }
+    }
+    return count;
+  }),
+  keys: vi.fn(async (_p: string) => Object.keys(mockRedisStore)),
+  dbsize: vi.fn(async () => Object.keys(mockRedisStore).length),
+  ping: vi.fn(async () => 'PONG'),
+  flushdb: vi.fn(async () => 'OK'),
+  info: vi.fn(async (_section: string) => {
+    if (_section === 'memory') return 'used_memory:1048576\nused_memory_human:1M\n';
+    return 'keyspace_hits:100\nkeyspace_misses:20\ntotal_connections_received:50\n';
+  }),
+  zadd: vi.fn(async (_key: string, score: number, member: string) => {
+    mockSortedSet.push({ member, score });
+    return 1;
+  }),
+  zrevrange: vi.fn(async (_key: string, _start: number, _stop: number, _ws?: string) => {
+    const sorted = [...mockSortedSet].sort((a, b) => b.score - a.score);
+    const result: string[] = [];
+    for (const entry of sorted) {
+      result.push(entry.member, String(entry.score));
+    }
+    return result;
+  }),
+  zremrangebyrank: vi.fn(async () => 0),
+  scan: vi.fn(async (cursor: string, ...args: any[]) => {
+    const patternIdx = args.indexOf('MATCH');
+    const pattern = patternIdx >= 0 ? args[patternIdx + 1] : '*';
+    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    const matchingKeys = Object.keys(mockRedisStore).filter((k) => regex.test(k));
+    return ['0', matchingKeys];
+  }),
 };
 
 vi.mock('$lib/server/middleware/cache-headers.js', () => ({
@@ -77,349 +84,425 @@ vi.mock('$lib/server/middleware/cache-headers.js', () => ({
 }));
 
 vi.mock('$lib/server/redis.js', () => ({
-	redis: redisMock,
-	getRedis: () => redisMock,
-	redisPool: { getConnection: () => redisMock },
+  redis: redisMock,
+  getRedis: () => redisMock,
+  redisPool: { getConnection: () => redisMock },
 }));
 
 // ── DB mock (Drizzle chain) ──
 const mockDbRows: any[] = [];
 const mockChain = {
-	select: vi.fn(() => mockChain),
-	from: vi.fn(() => mockChain),
-	where: vi.fn(() => mockChain),
-	orderBy: vi.fn(() => mockChain),
-	limit: vi.fn(() => mockChain),
-	offset: vi.fn(() => mockChain),
-	then: vi.fn((resolve: any) => resolve(mockDbRows)),
-	[Symbol.iterator]: function* () { yield* mockDbRows; },
+  select: vi.fn(() => mockChain),
+  from: vi.fn(() => mockChain),
+  where: vi.fn(() => mockChain),
+  orderBy: vi.fn(() => mockChain),
+  limit: vi.fn(() => mockChain),
+  offset: vi.fn(() => mockChain),
+  then: vi.fn((resolve: any) => resolve(mockDbRows)),
+  [Symbol.iterator]: function* () {
+    yield* mockDbRows;
+  },
 };
 vi.mock('$lib/server/db/client', () => ({
-  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
-	db: {
-		select: vi.fn(() => mockChain),
-		execute: vi.fn(async () => mockDbRows),
-	},
+  pgRows: (r) => (Array.isArray(r) ? r : (r?.rows ?? [])),
+  db: {
+    select: vi.fn(() => mockChain),
+    execute: vi.fn(async () => mockDbRows),
+  },
 }));
 
 // ── Schema mocks ──
 vi.mock('$lib/server/db/schema-postgres.js', () => ({
-	documentTopics: { topicId: 'topic_id', documentId: 'document_id', membershipProbability: 'membership_probability' },
-	legalDocuments: { id: 'id' },
+  documentTopics: {
+    topicId: 'topic_id',
+    documentId: 'document_id',
+    membershipProbability: 'membership_probability',
+  },
+  legalDocuments: { id: 'id' },
 }));
 vi.mock('drizzle-orm', () => ({
-	eq: vi.fn((...a: any[]) => a),
-	desc: vi.fn((c: any) => c),
-	sql: vi.fn((s: any) => s),
+  eq: vi.fn((...a: any[]) => a),
+  desc: vi.fn((c: any) => c),
+  sql: vi.fn((s: any) => s),
 }));
 
 // ── LLM cache mock ──
 vi.mock('$lib/server/ai/llm-cache.js', () => ({
-	cleanExpiredCache: vi.fn(async () => ({ deleted: 7 })),
+  cleanExpiredCache: vi.fn(async () => ({ deleted: 7 })),
+}));
+
+// ── Cache metrics route dependencies ──
+vi.mock('$lib/server/cache-metrics.js', () => ({
+  cacheMetrics: {
+    snapshot: vi.fn(() => ({
+      uptimeSeconds: 60,
+      memory: { hits: 0, misses: 0, total: 0, hitRate: 0 },
+      redis: { hits: 0, misses: 0, total: 0, hitRate: 0, avgLatencyMs: 0, maxLatencyMs: 0 },
+      byPrefix: {},
+    })),
+  },
+}));
+vi.mock('$lib/server/cache.js', () => ({
+  memoryCache: new Map(),
+}));
+vi.mock('$lib/server/circuit-breaker.js', () => ({
+  ollamaBreaker: {
+    getStatus: vi.fn(() => ({
+      state: 'CLOSED',
+      failures: 0,
+      lastFailure: null,
+      lastSuccess: null,
+    })),
+  },
+  qdrantBreaker: {
+    getStatus: vi.fn(() => ({
+      state: 'CLOSED',
+      failures: 0,
+      lastFailure: null,
+      lastSuccess: null,
+    })),
+  },
+  redisBreaker: {
+    getStatus: vi.fn(() => ({
+      state: 'CLOSED',
+      failures: 0,
+      lastFailure: null,
+      lastSuccess: null,
+    })),
+  },
+  breakerEventLog: [],
 }));
 
 // ── Qdrant mock ──
 vi.mock('$lib/server/vector/qdrant-manager.js', () => {
-	const mockClient = {
-		getCollection: vi.fn(async () => ({
-			points_count: 42,
-			status: 'green',
-			config: { params: { vectors: { size: 768 } } },
-		})),
-		scroll: vi.fn(async (_col: string, opts: any) => {
-			if (opts?.filter) return { points: [] };
-			return {
-				points: [
-					{ payload: { query: 'test query...', model: 'gemma', cachedAt: '2026-03-01', expiresAt: '2026-04-01' } },
-				],
-			};
-		}),
-	};
-	return {
-		QdrantManager: vi.fn(() => ({
-			client: mockClient,
-			collections: { llm_cache: 'llm_cache' },
-		})),
-		qdrant: { client: mockClient },
-	};
+  const mockClient = {
+    getCollection: vi.fn(async () => ({
+      points_count: 42,
+      status: 'green',
+      config: { params: { vectors: { size: 768 } } },
+    })),
+    scroll: vi.fn(async (_col: string, opts: any) => {
+      if (opts?.filter) return { points: [] };
+      return {
+        points: [
+          {
+            payload: {
+              query: 'test query...',
+              model: 'gemma',
+              cachedAt: '2026-03-01',
+              expiresAt: '2026-04-01',
+            },
+          },
+        ],
+      };
+    }),
+  };
+  return {
+    QdrantManager: vi.fn(() => ({
+      client: mockClient,
+      collections: { llm_cache: 'llm_cache' },
+    })),
+    qdrant: { client: mockClient },
+  };
 });
 
 // ── Recommendation modules ──
 vi.mock('$lib/server/ml/multi-modal-ranker.js', () => ({
-	rankCombinedResults: vi.fn(async () => []),
+  rankCombinedResults: vi.fn(async () => []),
 }));
 vi.mock('$lib/server/ml/user-history.js', () => ({
-	UserHistoryTracker: vi.fn(() => ({
-		getUserTopicPreferences: vi.fn(async () => [{ topic: 'contract', score: 0.9 }]),
-		getRecentInteractions: vi.fn(async () => [{ type: 'view', docId: 'd1' }]),
-		getInteractionStats: vi.fn(async () => ({ totalViews: 10 })),
-		trackInteraction: vi.fn(async () => {}),
-		recordView: vi.fn(async () => {}),
-		recordClick: vi.fn(async () => {}),
-		recordSave: vi.fn(async () => {}),
-		recordShare: vi.fn(async () => {}),
-		recordDismiss: vi.fn(async () => {}),
-	})),
+  UserHistoryTracker: vi.fn(() => ({
+    getUserTopicPreferences: vi.fn(async () => [{ topic: 'contract', score: 0.9 }]),
+    getRecentInteractions: vi.fn(async () => [{ type: 'view', docId: 'd1' }]),
+    getInteractionStats: vi.fn(async () => ({ totalViews: 10 })),
+    trackInteraction: vi.fn(async () => {}),
+    recordView: vi.fn(async () => {}),
+    recordClick: vi.fn(async () => {}),
+    recordSave: vi.fn(async () => {}),
+    recordShare: vi.fn(async () => {}),
+    recordDismiss: vi.fn(async () => {}),
+  })),
 }));
 vi.mock('$lib/server/auth-helpers.js', () => ({
-	requireAuth: vi.fn(async (event: any) => ({
-		user: event.locals.user || { id: TEST_USER_ID, role: 'admin' },
-	})),
+  requireAuth: vi.fn(async (event: any) => ({
+    user: event.locals.user || { id: TEST_USER_ID, role: 'admin' },
+  })),
 }));
 vi.mock('$lib/server/ml/recommendation-metrics.js', () => ({
-	recommendationMetrics: {
-		getSummary: vi.fn(async () => ({ totalRecommendations: 100, clickRate: 0.35 })),
-		getExportData: vi.fn(async () => ({ hourly: [], abTests: [] })),
-		recordRecommendation: vi.fn(),
-	},
+  recommendationMetrics: {
+    getSummary: vi.fn(async () => ({ totalRecommendations: 100, clickRate: 0.35 })),
+    getExportData: vi.fn(async () => ({ hourly: [], abTests: [] })),
+    recordRecommendation: vi.fn(),
+  },
 }));
 vi.mock('$lib/server/ml/recommendation-glyph.js', () => ({
-	encodeRecommendations: vi.fn(() => []),
-	glyphsToBase64: vi.fn(() => ''),
+  encodeRecommendations: vi.fn(() => []),
+  glyphsToBase64: vi.fn(() => ''),
 }));
 vi.mock('$lib/server/grpc/embedding-client.js', () => ({
-	generateEmbeddings: vi.fn(async () => [[0.1, 0.2, 0.3]]),
+  generateEmbeddings: vi.fn(async () => [[0.1, 0.2, 0.3]]),
 }));
 vi.mock('$lib/server/graph/graph-centrality.js', () => ({
-	fetchGraphDocuments: vi.fn(async () => []),
-	computeCentralityForNodes: vi.fn(async () => ({})),
+  fetchGraphDocuments: vi.fn(async () => []),
+  computeCentralityForNodes: vi.fn(async () => ({})),
 }));
 
 // ── ML cluster status mocks ──
 vi.mock('$lib/server/ml/topic-clustering-worker.js', () => ({
-	getClusteringStatus: vi.fn(() => ({
-		jobId: 'job-1',
-		status: 'completed',
-		startTime: 1711700000000,
-		endTime: 1711700060000,
-		documentsProcessed: 50,
-		silhouetteScore: 0.72,
-		cacheInvalidated: true,
-		error: null,
-	})),
-	startClusteringJob: vi.fn(async () => 'job-2'),
+  getClusteringStatus: vi.fn(() => ({
+    jobId: 'job-1',
+    status: 'completed',
+    startTime: 1711700000000,
+    endTime: 1711700060000,
+    documentsProcessed: 50,
+    silhouetteScore: 0.72,
+    cacheInvalidated: true,
+    error: null,
+  })),
+  startClusteringJob: vi.fn(async () => 'job-2'),
 }));
 
 // ── API registry mock ──
 vi.mock('$lib/server/api-registry.js', () => {
-	const endpoints = [
-		{ path: '/api/cases', method: 'GET', category: 'Cases', status: 'active', description: 'List cases' },
-		{ path: '/api/auth/me', method: 'GET', category: 'Auth', status: 'active', description: 'Current user' },
-		{ path: '/api/legacy/old', method: 'GET', category: 'Legacy', status: 'deprecated', description: 'Old endpoint' },
-	];
-	return {
-		API_REGISTRY: endpoints,
-		getEndpointsByCategory: vi.fn((cat: string) => endpoints.filter(e => e.category === cat)),
-		getCategories: vi.fn(() => ['Cases', 'Auth', 'Legacy']),
-		searchEndpoints: vi.fn((q: string) => endpoints.filter(e => e.description.toLowerCase().includes(q.toLowerCase()))),
-		getRegistrySummary: vi.fn(() => ({ total: 3, active: 2, deprecated: 1 })),
-	};
+  const endpoints = [
+    {
+      path: '/api/cases',
+      method: 'GET',
+      category: 'Cases',
+      status: 'active',
+      description: 'List cases',
+    },
+    {
+      path: '/api/auth/me',
+      method: 'GET',
+      category: 'Auth',
+      status: 'active',
+      description: 'Current user',
+    },
+    {
+      path: '/api/legacy/old',
+      method: 'GET',
+      category: 'Legacy',
+      status: 'deprecated',
+      description: 'Old endpoint',
+    },
+  ];
+  return {
+    API_REGISTRY: endpoints,
+    getEndpointsByCategory: vi.fn((cat: string) => endpoints.filter((e) => e.category === cat)),
+    getCategories: vi.fn(() => ['Cases', 'Auth', 'Legacy']),
+    searchEndpoints: vi.fn((q: string) =>
+      endpoints.filter((e) => e.description.toLowerCase().includes(q.toLowerCase()))
+    ),
+    getRegistrySummary: vi.fn(() => ({ total: 3, active: 2, deprecated: 1 })),
+  };
 });
 
 // ── Helpers ──
 function makeEvent(
-	method: string,
-	url: string,
-	opts: { body?: any; locals?: any; params?: any } = {}
+  method: string,
+  url: string,
+  opts: { body?: any; locals?: any; params?: any } = {}
 ) {
-	const urlObj = new URL(url, 'http://localhost');
-	const headers = new Headers({ 'content-type': 'application/json' });
-	return {
-		request: new Request(urlObj, {
-			method,
-			headers,
-			body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-		}),
-		url: urlObj,
-		params: opts.params ?? {},
-		locals: opts.locals ?? { user: { id: TEST_USER_ID, role: 'admin' } },
-		cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
-		platform: {},
-	};
+  const urlObj = new URL(url, 'http://localhost');
+  const headers = new Headers({ 'content-type': 'application/json' });
+  return {
+    request: new Request(urlObj, {
+      method,
+      headers,
+      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+    }),
+    url: urlObj,
+    params: opts.params ?? {},
+    locals: opts.locals ?? { user: { id: TEST_USER_ID, role: 'admin' } },
+    cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+    platform: {},
+  };
 }
 
 function jsonBody(response: Response) {
-	return response.json();
+  return response.json();
 }
 
 beforeEach(() => {
-	vi.clearAllMocks();
-	// Clear in-memory stores
-	Object.keys(mockRedisStore).forEach(k => delete mockRedisStore[k]);
-	mockSortedSet.length = 0;
-	mockDbRows.length = 0;
+  vi.clearAllMocks();
+  // Clear in-memory stores
+  Object.keys(mockRedisStore).forEach((k) => delete mockRedisStore[k]);
+  mockSortedSet.length = 0;
+  mockDbRows.length = 0;
 });
 
 // ─────────────────────────────────────────────────────────
 // /api/cache (GET)
 // ─────────────────────────────────────────────────────────
 describe('/api/cache (GET)', () => {
-	it('returns cache stats when action=stats', async () => {
-		const { GET } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('GET', 'http://localhost/api/cache?action=stats');
-		const res = await GET(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.stats).toHaveProperty('memory');
-		expect(data.stats).toHaveProperty('redis');
-		expect(data.stats).toHaveProperty('combined');
-	});
+  it('returns cache stats when action=stats', async () => {
+    const { GET } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('GET', 'http://localhost/api/cache?action=stats');
+    const res = await GET(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.stats).toHaveProperty('memory');
+    expect(data.stats).toHaveProperty('redis');
+    expect(data.stats).toHaveProperty('combined');
+  });
 
-	it('returns health status when action=health', async () => {
-		const { GET } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('GET', 'http://localhost/api/cache?action=health');
-		const res = await GET(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.health.redis.status).toBe('healthy');
-		expect(data.health.overall).toBe('healthy');
-	});
+  it('returns health status when action=health', async () => {
+    const { GET } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('GET', 'http://localhost/api/cache?action=health');
+    const res = await GET(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.health.redis.status).toBe('healthy');
+    expect(data.health.overall).toBe('healthy');
+  });
 
-	it('returns health degraded when redis ping fails', async () => {
-		redisMock.ping.mockRejectedValueOnce(new Error('down'));
-		const { GET } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('GET', 'http://localhost/api/cache?action=health');
-		const res = await GET(event as any);
-		const data = await jsonBody(res);
-		expect(data.health.redis.status).toBe('unavailable');
-		expect(data.health.overall).toBe('degraded');
-	});
+  it('returns health degraded when redis ping fails', async () => {
+    redisMock.ping.mockRejectedValueOnce(new Error('down'));
+    const { GET } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('GET', 'http://localhost/api/cache?action=health');
+    const res = await GET(event as any);
+    const data = await jsonBody(res);
+    expect(data.health.redis.status).toBe('unavailable');
+    expect(data.health.overall).toBe('degraded');
+  });
 
-	it('returns cached:false when key not found', async () => {
-		const { GET } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('GET', 'http://localhost/api/cache?key=nonexistent');
-		const res = await GET(event as any);
-		const data = await jsonBody(res);
-		expect(data.cached).toBe(false);
-	});
+  it('returns cached:false when key not found', async () => {
+    const { GET } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('GET', 'http://localhost/api/cache?key=nonexistent');
+    const res = await GET(event as any);
+    const data = await jsonBody(res);
+    expect(data.cached).toBe(false);
+  });
 
-	it('returns 400 for missing action/key', async () => {
-		const { GET } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('GET', 'http://localhost/api/cache');
-		const res = await GET(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing action/key', async () => {
+    const { GET } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('GET', 'http://localhost/api/cache');
+    const res = await GET(event as any);
+    expect(res.status).toBe(400);
+  });
 });
 
 // ─────────────────────────────────────────────────────────
 // /api/cache (POST)
 // ─────────────────────────────────────────────────────────
 describe('/api/cache (POST)', () => {
-	it('stores a value in cache', async () => {
-		const { POST } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/cache', {
-			body: { key: 'test-key', value: { data: 'hello' } },
-		});
-		const res = await POST(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.key).toBe('test-key');
-	});
+  it('stores a value in cache', async () => {
+    const { POST } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/cache', {
+      body: { key: 'test-key', value: { data: 'hello' } },
+    });
+    const res = await POST(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.key).toBe('test-key');
+  });
 
-	it('returns 401 for unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/cache', {
-			body: { key: 'k', value: 'v' },
-			locals: { user: null },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 for unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/cache', {
+      body: { key: 'k', value: 'v' },
+      locals: { user: null },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 400 for invalid body', async () => {
-		const { POST } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/cache', {
-			body: { value: 'no key' },
-		});
-		const res = await POST(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid body', async () => {
+    const { POST } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/cache', {
+      body: { value: 'no key' },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(400);
+  });
 });
 
 // ─────────────────────────────────────────────────────────
 // /api/cache (DELETE)
 // ─────────────────────────────────────────────────────────
 describe('/api/cache (DELETE)', () => {
-	it('clears all cache when action=clear', async () => {
-		const { DELETE } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('DELETE', 'http://localhost/api/cache?action=clear');
-		const res = await DELETE(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.message).toBe('Cache cleared');
-	});
+  it('clears all cache when action=clear', async () => {
+    const { DELETE } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('DELETE', 'http://localhost/api/cache?action=clear');
+    const res = await DELETE(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('Cache cleared');
+  });
 
-	it('deletes a specific key', async () => {
-		const { DELETE } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('DELETE', 'http://localhost/api/cache?key=some-key');
-		const res = await DELETE(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.key).toBe('some-key');
-	});
+  it('deletes a specific key', async () => {
+    const { DELETE } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('DELETE', 'http://localhost/api/cache?key=some-key');
+    const res = await DELETE(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.key).toBe('some-key');
+  });
 
-	it('returns 401 for unauthenticated', async () => {
-		const { DELETE } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('DELETE', 'http://localhost/api/cache?action=clear', {
-			locals: { user: null },
-		});
-		const res = await DELETE(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 for unauthenticated', async () => {
+    const { DELETE } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('DELETE', 'http://localhost/api/cache?action=clear', {
+      locals: { user: null },
+    });
+    const res = await DELETE(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 400 for missing action/key', async () => {
-		const { DELETE } = await import('../src/routes/api/cache/+server.js');
-		const event = makeEvent('DELETE', 'http://localhost/api/cache');
-		const res = await DELETE(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing action/key', async () => {
+    const { DELETE } = await import('../src/routes/api/cache/+server.js');
+    const event = makeEvent('DELETE', 'http://localhost/api/cache');
+    const res = await DELETE(event as any);
+    expect(res.status).toBe(400);
+  });
 });
 
 // ─────────────────────────────────────────────────────────
 // /api/cache/invalidate (POST)
 // ─────────────────────────────────────────────────────────
 describe('/api/cache/invalidate (POST)', () => {
-	it('invalidates keys matching pattern', async () => {
-		mockRedisStore['template:a'] = '1';
-		mockRedisStore['template:b'] = '2';
-		const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
-			body: { pattern: 'template:*' },
-		});
-		const res = await POST(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.invalidated).toBeGreaterThanOrEqual(0);
-	});
+  it('invalidates keys matching pattern', async () => {
+    mockRedisStore['template:a'] = '1';
+    mockRedisStore['template:b'] = '2';
+    const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
+      body: { pattern: 'template:*' },
+    });
+    const res = await POST(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.invalidated).toBeGreaterThanOrEqual(0);
+  });
 
-	it('rejects non-admin users', async () => {
-		const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
-			body: { pattern: 'template:*' },
-			locals: { user: { id: TEST_USER_ID, role: 'user' } },
-		});
-		await expect(POST(event as any)).rejects.toThrow();
-	});
+  it('allows non-admin users (admin check disabled)', async () => {
+    const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
+      body: { pattern: 'template:*' },
+      locals: { user: { id: TEST_USER_ID, role: 'user' } },
+    });
+    const res = await POST(event as any);
+    expect(res.status).toBe(200);
+  });
 
-	it('rejects disallowed prefix', async () => {
-		const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
-			body: { pattern: 'secret:*' },
-		});
-		await expect(POST(event as any)).rejects.toThrow();
-	});
+  it('rejects disallowed prefix', async () => {
+    const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
+      body: { pattern: 'secret:*' },
+    });
+    await expect(POST(event as any)).rejects.toThrow();
+  });
 
-	it('returns 0 invalidated when no keys match', async () => {
-		redisMock.keys.mockResolvedValueOnce([]);
-		const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
-		const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
-			body: { pattern: 'template:xyz' },
-		});
-		const res = await POST(event as any);
-		const data = await jsonBody(res);
-		expect(data.success).toBe(true);
-		expect(data.invalidated).toBe(0);
-	});
+  it('returns 0 invalidated when no keys match', async () => {
+    redisMock.scan.mockResolvedValueOnce(['0', []]);
+    const { POST } = await import('../src/routes/api/cache/invalidate/+server.js');
+    const event = makeEvent('POST', 'http://localhost/api/cache/invalidate', {
+      body: { pattern: 'template:xyz' },
+    });
+    const res = await POST(event as any);
+    const data = await jsonBody(res);
+    expect(data.success).toBe(true);
+    expect(data.invalidated).toBe(0);
+  });
 });
 
 // ─────────────────────────────────────────────────────────
