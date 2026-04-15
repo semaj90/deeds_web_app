@@ -35,7 +35,7 @@ import sys
 import time
 import urllib.request
 import urllib.error
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 try:
@@ -64,6 +64,17 @@ QDRANT_COLLECTION = "phase89_error_chunks"
 EMBED_DIM = 768
 DEFAULT_PHASE78_FILE = FRONTEND_DIR / ".phase78-collection.json"
 
+AUTO_DIAGNOSTIC_GLOBS = [
+    ".phase78-collection.json",
+    "svelte-check*.txt",
+    "check_out*.txt",
+    "check*.txt",
+    "errors*.txt",
+    "errors*.jsonl",
+    "errors*.ndjson",
+    "errors*.json",
+]
+
 # Maps dominant error keywords → KNOWN_FIXERS key + fix_hint
 ERROR_TYPE_FIXERS: dict[str, tuple[str, str]] = {
     "export let":           ("fix-svelte5-events",    "Replace export let with $props() rune"),
@@ -75,7 +86,8 @@ ERROR_TYPE_FIXERS: dict[str, tuple[str, str]] = {
     "import:":              ("fix-import-corruption", "Fix corrupted import: {x} from: 'y' syntax"),
     "from:":                ("fix-import-corruption", "Fix corrupted from: 'y' in import statement"),
     "import { x: x }":     ("phase74-import-fixer",  "Fix import { x: x } shorthand corruption"),
-    ": {":                  ("fix-colon-corruption",  "Fix colon-as-separator corruption in TS files"),
+    "Declaration or statement expected": ("fix-colon-corruption", "Fix colon-as-separator corruption in TS files"),
+    "Unexpected token":     ("fix-colon-corruption",  "Fix colon-as-separator corruption in TS files"),
     "Type '":               ("phase108-batch-fixer",  "Fix TypeScript type mismatch errors"),
     "Cannot find module":   ("phase108-batch-fixer",  "Fix missing module imports"),
     "Property '":           ("phase108-batch-fixer",  "Fix missing property / type narrowing"),
@@ -83,6 +95,99 @@ ERROR_TYPE_FIXERS: dict[str, tuple[str, str]] = {
     "Object is possibly":   ("phase108-batch-fixer",  "Add null checks for possibly null/undefined"),
     "Expected":             ("phase108-batch-fixer",  "Fix argument count / signature mismatches"),
 }
+
+ERROR_SIGNATURE_RULES: list[dict[str, object]] = [
+    {
+        "label": "svelte props migration",
+        "patterns": [r"\bexport let\b"],
+        "fixer_key": "fix-svelte5-events",
+        "fix_hint": "Replace export let with $props() rune",
+    },
+    {
+        "label": "svelte event migration",
+        "patterns": [r"\bon:(?:click|submit|change|input)\b"],
+        "fixer_key": "fix-svelte5-events",
+        "fix_hint": "Replace Svelte 4 event directives with DOM event props",
+    },
+    {
+        "label": "legacy dispatcher migration",
+        "patterns": [r"createEventDispatcher"],
+        "fixer_key": "fix-svelte5-all",
+        "fix_hint": "Remove createEventDispatcher and use callback props",
+    },
+    {
+        "label": "legacy reactive statement",
+        "patterns": [r"(^|\s)\$:(?=\s|$)", r"\$derived", r"\$effect"],
+        "fixer_key": "fix-svelte5-all",
+        "fix_hint": "Replace legacy reactive statements with $derived or $effect",
+    },
+    {
+        "label": "corrupted import syntax",
+        "patterns": [r"import:\s*\{", r"\bfrom:\s*['\"]"],
+        "fixer_key": "fix-import-corruption",
+        "fix_hint": "Repair corrupted import and from syntax",
+    },
+    {
+        "label": "import shorthand corruption",
+        "patterns": [r"import\s*\{\s*[^}]+:\s*[^}]+\s*\}"],
+        "fixer_key": "phase74-import-fixer",
+        "fix_hint": "Repair duplicated import shorthand aliases",
+    },
+    {
+        "label": "statement syntax corruption",
+        "patterns": [r"Declaration or statement expected"],
+        "fixer_key": "fix-colon-corruption",
+        "fix_hint": "Repair syntax corruption around declarations and separators",
+    },
+    {
+        "label": "token syntax corruption",
+        "patterns": [r"Unexpected token", r"',' expected", r"';' expected", r"'\)' expected", r"'}' expected", r"']' expected"],
+        "fixer_key": "fix-colon-corruption",
+        "fix_hint": "Repair syntax corruption around separators and punctuation",
+    },
+    {
+        "label": "argument count mismatch",
+        "patterns": [r"Expected \d+ arguments?, but got \d+", r"No overload matches this call"],
+        "fixer_key": "phase108-batch-fixer",
+        "fix_hint": "Fix argument count and call signature mismatches",
+    },
+    {
+        "label": "module export mismatch",
+        "patterns": [r"has no exported member", r"Cannot find module", r"Cannot find name"],
+        "fixer_key": "phase108-batch-fixer",
+        "fix_hint": "Fix module paths, exports, and imported symbol names",
+    },
+    {
+        "label": "unknown object property",
+        "patterns": [r"Object literal may only specify known properties"],
+        "fixer_key": "phase108-batch-fixer",
+        "fix_hint": "Fix object literals that include properties absent from the target type",
+    },
+    {
+        "label": "missing property on type",
+        "patterns": [r"Property '.+?' does not exist on type"],
+        "fixer_key": "phase108-batch-fixer",
+        "fix_hint": "Fix property access or update the target type definition",
+    },
+    {
+        "label": "type assignability mismatch",
+        "patterns": [r"is not assignable to type", r"incorrectly extends interface"],
+        "fixer_key": "phase108-batch-fixer",
+        "fix_hint": "Fix incompatible TypeScript assignments and interface shapes",
+    },
+    {
+        "label": "nullability guard needed",
+        "patterns": [r"Object is possibly", r"possibly 'null'", r"possibly 'undefined'"],
+        "fixer_key": "phase108-batch-fixer",
+        "fix_hint": "Add null or undefined guards before access",
+    },
+    {
+        "label": "duplicate declaration",
+        "patterns": [r"Cannot redeclare block-scoped variable", r"has already been declared"],
+        "fixer_key": "phase108-batch-fixer",
+        "fix_hint": "Remove duplicate declarations or rename conflicting symbols",
+    },
+]
 
 # ── Args ──────────────────────────────────────────────────────────────────────
 
@@ -159,6 +264,21 @@ def parse_inline_error_lines(output: str, tool: str) -> list[dict]:
     return entries
 
 
+def looks_like_code_line(text: str) -> bool:
+    stripped = text.strip()
+    if not stripped:
+        return False
+    if stripped.startswith(("//", "import ", "export ", "const ", "let ", "var ", "function ", "class ", "interface ", "type ", "<", "{#", "{:", "{/", "}", ")", "]")):
+        return True
+    if "$lib/" in stripped or "=>" in stripped:
+        return True
+    if re.search(r"\bfrom\s+['\"]", stripped):
+        return True
+    if stripped.endswith(("{", "}", ";")) and not stripped.endswith("."):
+        return True
+    return False
+
+
 def parse_svelte_check_human_output(output: str, tool: str = "svelte-check") -> list[dict]:
     entries: list[dict] = []
     lines = [strip_ansi(line) for line in output.splitlines()]
@@ -190,6 +310,9 @@ def parse_svelte_check_human_output(output: str, tool: str = "svelte-check") -> 
             if current.startswith("http") or current.startswith("If you") or current.startswith("Did you") or current.startswith("See http"):
                 index += 1
                 continue
+            if looks_like_code_line(current):
+                index += 1
+                continue
             if current:
                 current = re.sub(r"\s*\((ts|svelte|css|js)\)\s*$", "", current, flags=re.IGNORECASE).strip()
                 if current:
@@ -212,6 +335,24 @@ def normalize_diagnostic_record(record: dict, tool: str) -> dict | None:
     severity = record.get("severity") or record.get("level") or "error"
     record_tool = record.get("tool") or record.get("kind") or tool
     return make_error_entry(str(file_path), int(line) if str(line).isdigit() else 0, str(message), str(severity), str(record_tool))
+
+
+def find_latest_saved_diagnostics() -> Path | None:
+    candidates: list[Path] = []
+    for pattern in AUTO_DIAGNOSTIC_GLOBS:
+        candidates.extend(path for path in FRONTEND_DIR.glob(pattern) if path.is_file())
+
+    unique_candidates = sorted({path.resolve() for path in candidates}, key=lambda path: path.stat().st_mtime, reverse=True)
+    for candidate in unique_candidates:
+        try:
+            if candidate.stat().st_size == 0:
+                continue
+            entries, _ = load_errors_from_diagnostics_file(candidate)
+            if entries:
+                return candidate
+        except Exception:
+            continue
+    return None
 
 
 def load_errors_from_diagnostics_file(file_path: Path) -> tuple[list[dict], str]:
@@ -289,6 +430,14 @@ if not error_lines and not diagnostics_path and DEFAULT_PHASE78_FILE.exists():
     error_lines, raw_output = load_errors_from_diagnostics_file(DEFAULT_PHASE78_FILE)
     reported_count = len(error_lines)
     print(f"   Loaded {len(error_lines)} errors from saved Phase 78 diagnostics")
+
+if not error_lines and not diagnostics_path:
+    latest_saved = find_latest_saved_diagnostics()
+    if latest_saved:
+        print(f"   ℹ️  No live errors found — loading newest saved diagnostics from {latest_saved}")
+        error_lines, raw_output = load_errors_from_diagnostics_file(latest_saved)
+        reported_count = len(error_lines)
+        print(f"   Loaded {len(error_lines)} errors from saved diagnostics artifact")
 
 if not error_lines:
     # Minimal synthetic seed so collection isn't empty
@@ -506,9 +655,47 @@ for err, label in zip(valid_errors, cluster_labels):
 
 print(f"\n━━━ Stage 5: Summarise {len(clusters)} clusters ━━━")
 
+
+def extract_signal_terms(text: str) -> list[str]:
+    clean = strip_ansi(text)
+    counter: Counter[str] = Counter()
+
+    def add(term: str) -> None:
+        candidate = term.strip().strip(".,:;()[]{}")
+        if len(candidate) < 3 or len(candidate) > 80:
+            return
+        if candidate.lower() in {"type", "error", "warning", "module", "property", "object", "string", "number", "boolean", "unknown", "never"}:
+            return
+        counter[candidate] += 1
+
+    for match in re.finditer(r"'([^'\n]{2,80})'|`([^`\n]{2,80})`", clean):
+        add(match.group(1) or match.group(2) or "")
+    for match in re.finditer(r"\bTS\d{4,5}\b", clean):
+        add(match.group(0))
+    for match in re.finditer(r"\$lib/[A-Za-z0-9_./-]+", clean):
+        add(match.group(0))
+    for match in re.finditer(r"\bon:[a-z]+\b", clean):
+        add(match.group(0))
+    for match in re.finditer(r"\b(?:[A-Z][A-Za-z0-9]+(?:\.[A-Z][A-Za-z0-9]+)*|[a-z][A-Za-z0-9]+(?:Service|Store|Panel|Editor|Response|Event|State|Embedding|Evidence|Summary|Dialog|Canvas|Case))\b", clean):
+        add(match.group(0))
+    return [term for term, _count in counter.most_common(12)]
+
 def detect_error_type(messages: list[str]) -> tuple[str, str, str]:
-    """Return (error_type, fixer_key, fix_hint) by scanning messages."""
+    """Return (error_type, fixer_key, fix_hint) by scoring cluster messages against signature rules."""
     combined = " ".join(messages)
+    best_rule: dict[str, object] | None = None
+    best_score = 0
+
+    for rule in ERROR_SIGNATURE_RULES:
+        patterns = rule["patterns"]
+        score = sum(1 for pattern in patterns if re.search(str(pattern), combined, re.IGNORECASE))
+        if score > best_score:
+            best_rule = rule
+            best_score = score
+
+    if best_rule and best_score > 0:
+        return str(best_rule["label"]), str(best_rule["fixer_key"]), str(best_rule["fix_hint"])
+
     for keyword, (fk, fh) in ERROR_TYPE_FIXERS.items():
         if keyword.lower() in combined.lower():
             return keyword, fk, fh
@@ -553,22 +740,24 @@ def llm_summarize(messages: list[str], error_type: str, graph_ctx: str) -> str:
 
 print(f"\n━━━ Stage 6: Qdrant upsert ━━━")
 
-def ensure_collection():
-    """Create/recreate phase89_error_chunks with default vector (not named)."""
+def recreate_collection():
+    """Recreate phase89_error_chunks with the expected default vector schema."""
     try:
         info = http_get(f"{QDRANT_URL}/collections/{QDRANT_COLLECTION}")
         pts = info.get("result", {}).get("points_count", 0)
-        print(f"   Collection exists ({pts} points) — will append/overwrite")
+        _req("DELETE", f"{QDRANT_URL}/collections/{QDRANT_COLLECTION}")
+        print(f"   Dropped existing collection ({pts} points)")
     except Exception:
-        # Create fresh
-        http_put(
-            f"{QDRANT_URL}/collections/{QDRANT_COLLECTION}",
-            {"vectors": {"size": EMBED_DIM, "distance": "Cosine"}},
-        )
-        print(f"   ✅ Created: {QDRANT_COLLECTION} (768-dim Cosine, default vector)")
+        pass
+
+    http_put(
+        f"{QDRANT_URL}/collections/{QDRANT_COLLECTION}",
+        {"vectors": {"size": EMBED_DIM, "distance": "Cosine"}},
+    )
+    print(f"   ✅ Created: {QDRANT_COLLECTION} (768-dim Cosine, default vector)")
 
 if not args.dry_run:
-    ensure_collection()
+    recreate_collection()
 
 qdrant_points: list[dict] = []
 
@@ -582,6 +771,13 @@ for cluster_id, members in clusters.items():
 
     messages = [m["message"] for m in members]
     files = list({m["file"] for m in members})
+    match_terms = []
+    term_counter: Counter[str] = Counter()
+    for message in messages:
+        term_counter.update(extract_signal_terms(message))
+    for file_path in files:
+        term_counter.update(extract_signal_terms(Path(file_path).name))
+    match_terms = [term for term, _count in term_counter.most_common(12)]
 
     error_type, fixer_key, fix_hint = detect_error_type(messages)
 
@@ -615,6 +811,7 @@ for cluster_id, members in clusters.items():
             "fixer_key":     fixer_key,
             "files":         files[:10],
             "sample_errors": messages[:3],
+            "match_terms":   match_terms,
             "neo4j_g21":     g21,
             "neo4j_g22":     g22,
             "neo4j_g23":     g23,

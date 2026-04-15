@@ -151,44 +151,6 @@ export class ChatSSEClient {
 	}
 }
 
-/**
- * Svelte 5 reactive SSE hook
- */
-export function createChatStream(sessionId: string) {
-	let messages = $state<ChatMessage[]>([]);
-	let error = $state<Error | null>(null);
-	let connected = false;
-
-	const client = new ChatSSEClient(sessionId);
-
-	client.onMessage((msg: any) => {
-		messages = [...messages, msg];
-	});
-
-	client.onError((err: any) => {
-		error = err;
-	});
-
-	// Auto-connect
-	client.connect().then(() => {
-		connected = true;
-	});
-
-	// Auto-cleanup on unmount
-	if (typeof window !== 'undefined') {
-		window.addEventListener('beforeunload', () => {
-			client.disconnect();
-		});
-	}
-
-	return {
-		get messages() { return messages; },
-	get error() { return error; },
-	get connected() { return connected; },
-	sendMessage: (content: string) => client.sendMessage(content),
-		disconnect: () => client.disconnect()
-	};
-}
 
 
 

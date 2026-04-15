@@ -227,7 +227,8 @@
 
 		try {
 			if (searchMode === 'all') {
-				await searchPlatform();
+				// Fire platform + library in parallel for 'all' mode
+				await Promise.allSettled([searchPlatform(), searchLibrary()]);
 			} else if (searchMode === 'law') {
 				await searchLibrary();
 			} else if (searchMode === 'cases') {
@@ -266,15 +267,16 @@
 	}
 
 	async function searchLibrary() {
-		const res = await fetch('/api/library/search', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: searchQuery, limit: 20 }),
-		});
+		const params = new URLSearchParams({ q: searchQuery, limit: '20' });
+		if (statuteSearchFilters.jurisdiction) params.set('jurisdiction', statuteSearchFilters.jurisdiction);
+		const res = await fetch(`/api/library/search?${params}`);
 		if (!res.ok) throw new Error(`Library search failed: ${res.status}`);
 		const data = await res.json();
-		libraryResults = data.results ?? [];
-		totalFound = libraryResults.length;
+		libraryResults = data.hits ?? data.results ?? [];
+		// Only override totalFound when library is the primary search (law mode)
+		if (searchMode === 'law') {
+			totalFound = data.total ?? libraryResults.length;
+		}
 	}
 
 	async function searchCaseRecords() {
@@ -433,10 +435,11 @@
 		if (e.key === 'Enter') performSearch();
 	}
 
+	let autoSearchTimeout: ReturnType<typeof setTimeout> | null = null;
+
 	function handleSearchInput() {
-		if (searchSuggestionTimeout) {
-			clearTimeout(searchSuggestionTimeout);
-		}
+		if (searchSuggestionTimeout) clearTimeout(searchSuggestionTimeout);
+		if (autoSearchTimeout) clearTimeout(autoSearchTimeout);
 
 		if (searchQuery.trim().length < 2) {
 			searchSuggestions = [];
@@ -446,6 +449,11 @@
 		searchSuggestionTimeout = setTimeout(() => {
 			void refreshSearchSuggestions();
 		}, 150);
+
+		// Auto-search after 400ms debounce
+		autoSearchTimeout = setTimeout(() => {
+			void performSearch();
+		}, 400);
 	}
 
 	async function refreshSearchSuggestions() {
@@ -810,8 +818,12 @@
 							<div class="bundle-rank">#{i + 1}</div>
 							<span class="entity-type-badge">{hit.entityType}</span>
 							<div class="bundle-title">{hit.title}</div>
-							<div class="confidence-badge" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;">
-								{hit.matchType} · {Math.round(hit.score * 100)}%
+							<div class="hit-score-wrap">
+								<span class="match-type-badge match-{hit.matchType ?? 'fts'}">{hit.matchType ?? 'fts'}</span>
+								<div class="score-bar-mini" title="Cosine similarity: {Math.round(hit.score * 100)}%">
+									<div class="score-bar-mini-fill" style="width:{Math.min(100, Math.round(hit.score * 100))}%"></div>
+								</div>
+								<span class="score-pct">{Math.round(hit.score * 100)}</span>
 							</div>
 						</div>
 						<p class="bundle-preview">{hit.snippet}</p>
@@ -828,31 +840,75 @@
 					</a>
 				{/each}
 
+				<!-- Library results appended in 'all' mode -->
+				{#if libraryResults.length > 0}
+					<div class="library-section-header">
+						<span class="library-section-label">⚖ LEGAL CORPUS · {libraryResults.length} chunks</span>
+					</div>
+					{#each libraryResults.slice(0, 5) as hit, i}
+						{@const libScore = (hit.score ?? hit.rrf_score ?? 0) as number}
+						{@const libMatchType = (hit.matchType ?? hit.match_type ?? 'fused') as string}
+						<a href="/library/{hit.documentId ?? hit.document_id ?? ''}/node/{hit.nodeId ?? hit.node_id ?? ''}" class="result-card library-hit">
+							<div class="bundle-header">
+								<div class="bundle-rank">§</div>
+								<div class="bundle-title">{hit.title ?? hit.document_title ?? 'Legal Document'}</div>
+								<div class="hit-score-wrap">
+									<span class="match-type-badge match-{libMatchType}">{libMatchType}</span>
+									<div class="score-bar-mini" title="Score: {Math.round(libScore * 100)}%">
+										<div class="score-bar-mini-fill" style="width:{Math.min(100, Math.round(libScore * 100))}%; background: #4ade80"></div>
+									</div>
+									<span class="score-pct" style="color:#4ade80">{Math.round(libScore * 100)}</span>
+								</div>
+							</div>
+							<p class="bundle-preview">{hit.snippet ?? (hit.chunk_text ?? '').slice(0, 250)}</p>
+							{#if (hit.jurisdictionCode ?? hit.jurisdiction_code) || (hit.corpusType ?? hit.corpus_type)}
+								<div class="bundle-meta">
+									{#if hit.jurisdictionCode ?? hit.jurisdiction_code}
+										<span class="meta-tag source">{hit.jurisdictionCode ?? hit.jurisdiction_code}</span>
+									{/if}
+									{#if hit.corpusType ?? hit.corpus_type}
+										<span class="meta-tag section">{hit.corpusType ?? hit.corpus_type}</span>
+									{/if}
+									{#if hit.citation ?? hit.citation_label}
+										<span class="meta-tag citation">{hit.citation ?? hit.citation_label}</span>
+									{/if}
+								</div>
+							{/if}
+						</a>
+					{/each}
+				{/if}
+
 			{:else if searchMode === 'law' && libraryResults.length > 0}
 				<!-- Legal Library Search Results -->
 				{#each libraryResults as hit, i}
-					<a href="/library/{hit.document_id ?? ''}/node/{hit.node_id ?? ''}" class="result-card library-hit">
+					{@const libScore = (hit.score ?? hit.rrf_score ?? 0) as number}
+					{@const libMatchType = (hit.matchType ?? hit.match_type ?? 'fused') as string}
+					<a href="/library/{hit.documentId ?? hit.document_id ?? ''}/node/{hit.nodeId ?? hit.node_id ?? ''}" class="result-card library-hit">
 						<div class="bundle-header">
 							<div class="bundle-rank">#{i + 1}</div>
-							<div class="bundle-title">{hit.document_title ?? 'Legal Document'}</div>
-							<div class="confidence-badge" style="background: rgba(74, 222, 128, 0.15); color: #4ade80;">
-								{Math.round(((hit.score ?? hit.rrf_score ?? 0) as number) * 100)}%
+							<div class="bundle-title">{hit.title ?? hit.document_title ?? 'Legal Document'}</div>
+							<div class="hit-score-wrap">
+								<span class="match-type-badge match-{libMatchType}">{libMatchType}</span>
+								<div class="score-bar-mini" title="Score: {Math.round(libScore * 100)}%">
+									<div class="score-bar-mini-fill" style="width:{Math.min(100, Math.round(libScore * 100))}%; background: #4ade80"></div>
+								</div>
+								<span class="score-pct" style="color:#4ade80">{Math.round(libScore * 100)}</span>
 							</div>
 						</div>
 						{#if hit.node_heading}
 							<p class="hit-heading-label">{hit.node_heading}</p>
 						{/if}
 						<p class="bundle-preview">{hit.snippet ?? (hit.chunk_text ?? '').slice(0, 250)}</p>
-						{#if hit.jurisdiction_code || hit.corpus_type}
+						{#if hit.jurisdictionCode ?? hit.jurisdiction_code ?? hit.corpusType ?? hit.corpus_type}
 							<div class="bundle-meta">
-								{#if hit.jurisdiction_code}
-									<span class="meta-tag source">{hit.jurisdiction_code}</span>
+								{#if hit.jurisdictionCode ?? hit.jurisdiction_code}
+									<span class="meta-tag source">{hit.jurisdictionCode ?? hit.jurisdiction_code}</span>
 								{/if}
-								{#if hit.corpus_type}
-									<span class="meta-tag section">{hit.corpus_type}</span>
+								{#if hit.corpusType ?? hit.corpus_type}
+									<span class="meta-tag section">{hit.corpusType ?? hit.corpus_type}</span>
 								{/if}
-								{#if hit.citation_label}
-									<span class="meta-tag citation">{hit.citation_label}</span>
+								{#if hit.citation ?? hit.citation_label}
+									<span class="meta-tag citation">{hit.citation ?? hit.citation_label}</span>
 								{/if}
 							</div>
 						{/if}
@@ -876,8 +932,12 @@
 							<div class="bundle-rank">#{i + 1}</div>
 							<span class="entity-type-badge">{hit.entityType}</span>
 							<div class="bundle-title">{hit.title}</div>
-							<div class="confidence-badge" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;">
-								{hit.matchType} · {Math.round(hit.score * 100)}%
+							<div class="hit-score-wrap">
+								<span class="match-type-badge match-{hit.matchType ?? 'fts'}">{hit.matchType ?? 'fts'}</span>
+								<div class="score-bar-mini" title="Score: {Math.round(hit.score * 100)}%">
+									<div class="score-bar-mini-fill" style="width:{Math.min(100, Math.round(hit.score * 100))}%"></div>
+								</div>
+								<span class="score-pct">{Math.round(hit.score * 100)}</span>
 							</div>
 						</div>
 						<p class="bundle-preview">{hit.snippet}</p>
@@ -2271,4 +2331,62 @@
 	.score-vec { color: #6ba3a0; }
 	.score-tfidf { color: #c9a96e; }
 	.score-combined { color: #d4c9a9; margin-left: auto; font-weight: 600; }
+
+	.library-section-header {
+		margin: 0.75rem 0 0.4rem;
+		padding: 0.3rem 0;
+		border-top: 1px solid #3a3520;
+	}
+	.library-section-label {
+		font-size: 0.65rem;
+		color: #4ade80;
+		letter-spacing: 0.08em;
+		font-weight: 600;
+	}
+
+	/* ── Score bar + match badge (platform & library hits) ──────────────── */
+
+	.hit-score-wrap {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		margin-left: auto;
+		flex-shrink: 0;
+	}
+
+	.match-type-badge {
+		font-size: 0.6rem;
+		padding: 1px 5px;
+		border-radius: 3px;
+		font-weight: 600;
+		letter-spacing: 0.03em;
+		border: 1px solid transparent;
+	}
+	.match-fts    { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border-color: rgba(96,165,250,0.2); }
+	.match-vector { background: rgba(167, 139, 250, 0.15); color: #a78bfa; border-color: rgba(167,139,250,0.2); }
+	.match-fused  { background: rgba(99, 102, 241, 0.15); color: #818cf8; border-color: rgba(99,102,241,0.2); }
+	.match-qdrant { background: rgba(192, 132, 252, 0.15); color: #c084fc; border-color: rgba(192,132,252,0.2); }
+	.match-ilike  { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border-color: rgba(156,163,175,0.2); }
+
+	.score-bar-mini {
+		width: 48px;
+		height: 4px;
+		background: rgba(255,255,255,0.08);
+		border-radius: 2px;
+		overflow: hidden;
+	}
+
+	.score-bar-mini-fill {
+		height: 100%;
+		background: #60a5fa;
+		border-radius: 2px;
+		transition: width 0.3s ease;
+	}
+
+	.score-pct {
+		font-size: 0.6rem;
+		color: #8a7a5a;
+		width: 2ch;
+		text-align: right;
+	}
 </style>

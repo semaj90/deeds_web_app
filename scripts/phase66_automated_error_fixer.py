@@ -225,6 +225,36 @@ def _ollama_embed(text: str) -> list[float] | None:
         return None
 
 
+GENERIC_CLUSTER_TYPES = {
+    "general-ts-error",
+    "Type '",
+    "Expected",
+    "Property '",
+}
+
+
+def _extract_signal_terms(text: str) -> set[str]:
+    terms: set[str] = set()
+
+    def add(candidate: str) -> None:
+        cleaned = candidate.strip().strip(".,:;()[]{}")
+        if len(cleaned) < 3 or len(cleaned) > 80:
+            return
+        if cleaned.lower() in {"type", "error", "warning", "module", "property", "object", "string", "number", "boolean", "unknown", "never"}:
+            return
+        terms.add(cleaned)
+
+    for match in re.finditer(r"'([^'\n]{2,80})'|`([^`\n]{2,80})`", text):
+        add(match.group(1) or match.group(2) or "")
+    for match in re.finditer(r"\bTS\d{4,5}\b", text):
+        add(match.group(0))
+    for match in re.finditer(r"\$lib/[A-Za-z0-9_./-]+", text):
+        add(match.group(0))
+    for match in re.finditer(r"\b(?:[A-Z][A-Za-z0-9]+(?:\.[A-Z][A-Za-z0-9]+)*|[a-z][A-Za-z0-9]+(?:Service|Store|Panel|Editor|Response|Event|State|Embedding|Evidence|Summary|Dialog|Canvas|Case))\b", text):
+        add(match.group(0))
+    return terms
+
+
 def retriever_node(state: AgentState) -> AgentState:
     """Embed current errors and query Qdrant phase89_error_chunks for similar past fixes."""
     print("\n━━━ [retriever] ━━━")
@@ -236,6 +266,7 @@ def retriever_node(state: AgentState) -> AgentState:
 
     # Build a compact error summary to embed
     error_snippet = state["raw_output"][:1500]
+    query_terms = _extract_signal_terms(error_snippet)
 
     vec = _ollama_embed(error_snippet)
     if vec is None:
@@ -250,25 +281,40 @@ def retriever_node(state: AgentState) -> AgentState:
         hits = client.query_points(
             collection_name=QDRANT_COLLECTION,
             query=vec,
-            limit=5,
+            limit=8,
             with_payload=True,
         ).points
 
-        context = []
+        ranked_context = []
         for hit in hits:
             payload = hit.payload or {}
+            error_type = payload.get("error_type", payload.get("tag", "unknown"))
+            payload_terms = {str(term) for term in payload.get("match_terms", []) if term}
+            overlapping_terms = sorted(query_terms & payload_terms)
+            lexical_bonus = min(len(overlapping_terms), 4) * 0.03
+            specificity_bonus = 0.04 if error_type not in GENERIC_CLUSTER_TYPES else 0.0
+            adjusted_score = round(float(hit.score) + lexical_bonus + specificity_bonus, 3)
             entry = {
-                "score": round(hit.score, 3),
+                "score": adjusted_score,
+                "vector_score": round(float(hit.score), 3),
                 "cluster_id": payload.get("cluster_id", "?"),
-                "error_type": payload.get("error_type", payload.get("tag", "unknown")),
+                "error_type": error_type,
                 "summary": payload.get("summary", payload.get("content", ""))[:300],
                 "fix_hint": payload.get("fix_hint", payload.get("fix_action", "")),
+                "match_terms": overlapping_terms[:6],
             }
-            context.append(entry)
+            ranked_context.append(entry)
+
+        context = sorted(
+            ranked_context,
+            key=lambda entry: (entry["score"], entry.get("vector_score", 0.0)),
+            reverse=True,
+        )[:5]
 
         print(f"  Found {len(context)} similar past error clusters from Qdrant")
         for c in context:
-            print(f"    [{c['score']}] {c['error_type']}: {c['summary'][:80]}...")
+            overlap = f" terms={','.join(c['match_terms'])}" if c.get("match_terms") else ""
+            print(f"    [{c['score']}] {c['error_type']}: {c['summary'][:80]}...{overlap}")
 
         return {**state, "qdrant_context": context}
 

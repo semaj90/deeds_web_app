@@ -69,6 +69,7 @@
 	const adminItems = [
 		{ label: 'ADMIN', icon: 'shield', href: '/admin' },
 		{ label: 'SYSTEM CONFIG', icon: 'settings', href: '/system-configuration' },
+		{ label: 'LIBRARY INGEST', icon: 'book-plus', href: '/admin/library' },
 		{ label: 'AST TOPOLOGY', icon: 'network', href: '/ast-topology' },
 		{ label: 'GPU GRAPH', icon: 'share-2', href: '/admin/gpu-evidence-graph' },
 		{ label: 'ERROR BRAIN', icon: 'bug', href: '/admin/error-brain' },
