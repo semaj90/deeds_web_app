@@ -54,12 +54,18 @@ const mockOllamaFetch = vi.fn(async (url: string, opts?: any) => {
 	return new Response(
 		JSON.stringify({
 			message: { content: 'AI response: The legal analysis indicates...' },
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			response: 'AI response: The legal analysis indicates...',
 		}),
 		{ status: 200, headers: { 'Content-Type': 'application/json' } }
 	);
 });
+
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
 
 vi.mock('$lib/server/ollama.js', () => ({
 	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
@@ -79,7 +85,7 @@ const mockGlobalFetch = vi.fn(async (url: string) => {
 		return new Response(
 			JSON.stringify({
 				models: [
-					{ name: 'gemma3-legal:latest', size: 4000000000, modified_at: '2026-03-01', digest: 'abc123def456' },
+					{ name: 'gemma4-legal:latest', size: 4000000000, modified_at: '2026-03-01', digest: 'abc123def456' },
 					{ name: 'embeddinggemma:latest', size: 1000000000, modified_at: '2026-03-01', digest: 'def456abc123' },
 				],
 			}),
@@ -107,6 +113,7 @@ const mockChain: any = {
 	[Symbol.iterator]: function* () { yield* mockDbRows; },
 };
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => mockChain),
 		insert: vi.fn(() => mockChain),
@@ -211,7 +218,7 @@ describe('/api/ai/models (GET)', () => {
 		const res = await GET(event as any);
 		const data = await jsonBody(res);
 		expect(data.models).toHaveLength(2);
-		expect(data.models[0].name).toBe('gemma3-legal:latest');
+		expect(data.models[0].name).toBe('gemma4-legal:latest');
 	});
 
 	it('returns 401 for unauthenticated', async () => {
@@ -371,7 +378,7 @@ describe('/api/ai/ask (POST)', () => {
 		const res = await POST(event as any);
 		const data = await jsonBody(res);
 		expect(data.answer).toBeTruthy();
-		expect(data.model).toBe('gemma3-legal:latest');
+		expect(data.model).toBe('gemma4-legal:latest');
 	});
 
 	it('accepts query or prompt field as alias', async () => {
@@ -503,7 +510,7 @@ describe('/api/ai/case-prediction (POST)', () => {
 		const data = await jsonBody(res);
 		expect(data.prediction).toBeTruthy();
 		expect(data.caseId).toBe(TEST_CASE_ID);
-		expect(data.model).toBe('gemma3-legal:latest');
+		expect(data.model).toBe('gemma4-legal:latest');
 	});
 
 	it('returns 404 for nonexistent case', async () => {

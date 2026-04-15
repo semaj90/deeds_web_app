@@ -92,7 +92,7 @@ describe('Phase 76 ACP tool registry', () => {
   it('db:query dry-run applies a bounded LIMIT to valid SELECT statements', async () => {
     await fc.assert(
       fc.asyncProperty(
-        fc.constantFrom('users', 'sessions', 'cases', 'evidence'),
+        fc.constantFrom('cases', 'evidence', 'citations', 'documents'),
         fc.integer({ min: 1, max: 500 }),
         async (tableName, limit) => {
           const result = await executeACPTool(
@@ -166,7 +166,7 @@ describe('Phase 76 ACP tool registry', () => {
     await fc.assert(
       fc.asyncProperty(
         fc.string({ minLength: 1, maxLength: 300 }),
-        fc.constantFrom('gemma3-legal:latest', 'custom-model:latest'),
+        fc.constantFrom('gemma4-legal:latest', 'custom-model:latest'),
         async (prompt, model) => {
           const result = await executeACPTool('llm:generate', { prompt, model }, { dryRun: true });
 

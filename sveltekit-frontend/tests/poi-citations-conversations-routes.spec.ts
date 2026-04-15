@@ -84,6 +84,12 @@ const deleteChain = {
 };
 
 // ── Mocks ──────────────────────────────────────────────────────
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -92,6 +98,7 @@ vi.mock('$lib/server/env.server.js', () => ({
 }));
 
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => buildSelectChain()),
 		insert: vi.fn(() => insertChain),
@@ -433,7 +440,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 		it('returns 401 when unauthenticated', async () => {
 			const res = await GET({
 				params: { id: VALID_UUID },
-				locals: anonLocals,
+				request: new Request('http://localhost'), locals: anonLocals,
 			});
 			expect(res.status).toBe(401);
 		});
@@ -441,7 +448,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 		it('returns 400 for invalid UUID', async () => {
 			const res = await GET({
 				params: { id: 'not-a-uuid' },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(400);
 		});
@@ -458,7 +465,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 
 			const res = await GET({
 				params: { id: VALID_UUID },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(404);
 		});
@@ -484,7 +491,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 
 			const res = await GET({
 				params: { id: VALID_UUID },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(res.status).toBe(200);
@@ -558,7 +565,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 		it('returns 401 when unauthenticated', async () => {
 			const res = await DELETE({
 				params: { id: VALID_UUID },
-				locals: anonLocals,
+				request: new Request('http://localhost'), locals: anonLocals,
 			});
 			expect(res.status).toBe(401);
 		});
@@ -566,7 +573,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 		it('returns 400 for invalid UUID', async () => {
 			const res = await DELETE({
 				params: { id: 'bad' },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(400);
 		});
@@ -574,7 +581,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 		it('deletes POI when found', async () => {
 			const res = await DELETE({
 				params: { id: VALID_UUID },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(res.status).toBe(200);
@@ -596,7 +603,7 @@ describe('/api/persons-of-interest/[id] (GET/PATCH/DELETE)', () => {
 
 			const res = await DELETE({
 				params: { id: VALID_UUID },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(404);
 		});
@@ -620,7 +627,7 @@ describe('/api/citations (GET/POST/DELETE)', () => {
 	describe('GET', () => {
 		it('returns 401 when unauthenticated', async () => {
 			try {
-				await GET({ url: mkUrl('/api/citations'), locals: anonLocals });
+				await GET({ url: mkUrl('/api/citations'), request: new Request('http://localhost'), locals: anonLocals });
 				expect.unreachable('should have thrown');
 			} catch (err: any) {
 				expect(err.status).toBe(401);
@@ -640,7 +647,7 @@ describe('/api/citations (GET/POST/DELETE)', () => {
 
 			const res = await GET({
 				url: mkUrl('/api/citations'),
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(res.status).toBe(200);
@@ -654,7 +661,7 @@ describe('/api/citations (GET/POST/DELETE)', () => {
 
 			const res = await GET({
 				url: mkUrl('/api/citations'),
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(data.cache).toBe(true);
@@ -673,7 +680,7 @@ describe('/api/citations (GET/POST/DELETE)', () => {
 
 			const res = await GET({
 				url: mkUrl('/api/citations', { case_id: VALID_UUID }),
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(200);
 		});
@@ -690,7 +697,7 @@ describe('/api/citations (GET/POST/DELETE)', () => {
 
 			const res = await GET({
 				url: mkUrl('/api/citations'),
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(res.status).toBe(200);
@@ -930,7 +937,7 @@ describe('/api/conversations/[id] (PUT/DELETE)', () => {
 		it('returns 401 when unauthenticated', async () => {
 			const res = await DELETE({
 				params: { id: VALID_UUID },
-				locals: anonLocals,
+				request: new Request('http://localhost'), locals: anonLocals,
 			});
 			expect(res.status).toBe(401);
 		});
@@ -938,7 +945,7 @@ describe('/api/conversations/[id] (PUT/DELETE)', () => {
 		it('returns 400 for invalid UUID', async () => {
 			const res = await DELETE({
 				params: { id: 'bad-id' },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(400);
 		});
@@ -951,7 +958,7 @@ describe('/api/conversations/[id] (PUT/DELETE)', () => {
 
 			const res = await DELETE({
 				params: { id: VALID_UUID },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(data.success).toBe(true);
@@ -965,7 +972,7 @@ describe('/api/conversations/[id] (PUT/DELETE)', () => {
 
 			const res = await DELETE({
 				params: { id: VALID_UUID },
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(500);
 		});

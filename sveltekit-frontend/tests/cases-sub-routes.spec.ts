@@ -27,9 +27,15 @@ const mockOllamaFetch = vi.fn(async () =>
 	new Response(JSON.stringify({
 		message: { content: 'Mock LLM response' },
 		response: '{"keyPoints":["Point 1","Point 2","Point 3"],"confidence":0.85}',
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } })
 );
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$lib/server/ollama.js', () => ({
 	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
@@ -63,6 +69,7 @@ const mockPool = {
 	query: vi.fn(async () => ({ rows: [], rowCount: 0 })),
 };
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => mockChain),
 		execute: vi.fn(async () => ({ rows: [{ exists: true }] })),

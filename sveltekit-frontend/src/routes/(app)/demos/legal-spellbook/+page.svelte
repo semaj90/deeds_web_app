@@ -1,6 +1,5 @@
 <script lang="ts">
 	import LegalResearchSpellbook from '$lib/components/legal/LegalResearchSpellbook.svelte';
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-4xl mx-auto">

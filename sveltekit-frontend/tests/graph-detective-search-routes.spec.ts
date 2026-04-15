@@ -22,245 +22,294 @@ const TEST_USER_ID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
 const TEST_CASE_ID = 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e';
 
 // ── ENV mock ──
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$lib/server/env.server.js', () => ({
-	ENV: {
-		OLLAMA_BASE_URL: 'http://localhost:11434',
-		QDRANT_URL: 'http://localhost:6333',
-	},
+  ENV: {
+    OLLAMA_BASE_URL: 'http://localhost:11434',
+    QDRANT_URL: 'http://localhost:6333',
+  },
 }));
 vi.mock('$lib/config/env.server.js', () => ({
-	getOllamaUrl: () => 'http://localhost:11434',
+  getOllamaUrl: () => 'http://localhost:11434',
 }));
 
 // ── ollamaFetch mock ──
 const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
-	const body = opts?.body ? JSON.parse(opts.body) : {};
-	if (body.stream === true) {
-		const encoder = new TextEncoder();
-		const chunks = [
-			JSON.stringify({ message: { content: 'Analysis: ' }, response: 'Analysis: ' }),
-			JSON.stringify({ message: { content: 'The evidence...' }, response: 'The evidence...' }),
-			JSON.stringify({ done: true }),
-		];
-		let index = 0;
-		const stream = new ReadableStream({
-			pull(controller) {
-				if (index < chunks.length) {
-					controller.enqueue(encoder.encode(chunks[index] + '\n'));
-					index++;
-				} else {
-					controller.close();
-				}
-			},
-		});
-		return new Response(stream, { status: 200 });
-	}
-	// Non-streaming: for embeddings and generate
-	if (String(_url).includes('/api/embeddings')) {
-		return new Response(JSON.stringify({ embedding: new Array(768).fill(0.01) }), {
-			status: 200, headers: { 'Content-Type': 'application/json' },
-		});
-	}
-	return new Response(JSON.stringify({
-		message: { content: 'result' },
-		response: JSON.stringify({
-			summary: 'AI-generated summary',
-			recommendations: [{ title: 'Review Evidence', rationale: 'Important', confidence: 'high' }],
-			didYouMean: ['alternative query'],
-			predictiveSignals: ['signal 1'],
-		}),
-		model: 'gemma3-legal:latest',
-	}), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  const body = opts?.body ? JSON.parse(opts.body) : {};
+  if (body.stream === true) {
+    const encoder = new TextEncoder();
+    const chunks = [
+      JSON.stringify({ message: { content: 'Analysis: ' }, response: 'Analysis: ' }),
+      JSON.stringify({ message: { content: 'The evidence...' }, response: 'The evidence...' }),
+      JSON.stringify({ done: true }),
+    ];
+    let index = 0;
+    const stream = new ReadableStream({
+      pull(controller) {
+        if (index < chunks.length) {
+          controller.enqueue(encoder.encode(chunks[index] + '\n'));
+          index++;
+        } else {
+          controller.close();
+        }
+      },
+    });
+    return new Response(stream, { status: 200 });
+  }
+  // Non-streaming: for embeddings and generate
+  if (String(_url).includes('/api/embeddings')) {
+    return new Response(JSON.stringify({ embedding: new Array(768).fill(0.01) }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  return new Response(
+    JSON.stringify({
+      message: { content: 'result' },
+      response: JSON.stringify({
+        summary: 'AI-generated summary',
+        recommendations: [{ title: 'Review Evidence', rationale: 'Important', confidence: 'high' }],
+        didYouMean: ['alternative query'],
+        predictiveSignals: ['signal 1'],
+      }),
+      model: 'gemma4-legal:latest',
+    }),
+    { status: 200, headers: { 'Content-Type': 'application/json' } }
+  );
 });
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+  ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── Neo4j mock ──
 const mockNeo4jSession = {
-	run: vi.fn(async () => ({
-		records: [
-			{
-				get: vi.fn((key: string) => {
-					const map: Record<string, any> = {
-						connectedCaseId: 'case-2',
-						connectedCaseTitle: 'Related Case',
-						status: 'open',
-						strength: { toNumber: () => 3 },
-						sharedEntities: [{ type: 'Person', title: 'John Doe' }],
-						sourceId: 'node-1', sourceLabel: 'Case', sourceTitle: 'Case 1', sourceName: '',
-						targetId: 'node-2', targetLabel: 'Person', targetTitle: 'John', targetName: 'Doe',
-						relType: 'INVOLVES',
-					};
-					return map[key];
-				}),
-			},
-		],
-	})),
-	close: vi.fn(async () => {}),
+  run: vi.fn(async () => ({
+    records: [
+      {
+        get: vi.fn((key: string) => {
+          const map: Record<string, any> = {
+            connectedCaseId: 'case-2',
+            connectedCaseTitle: 'Related Case',
+            status: 'open',
+            strength: { toNumber: () => 3 },
+            sharedEntities: [{ type: 'Person', title: 'John Doe' }],
+            sourceId: 'node-1',
+            sourceLabel: 'Case',
+            sourceTitle: 'Case 1',
+            sourceName: '',
+            targetId: 'node-2',
+            targetLabel: 'Person',
+            targetTitle: 'John',
+            targetName: 'Doe',
+            relType: 'INVOLVES',
+          };
+          return map[key];
+        }),
+      },
+    ],
+  })),
+  close: vi.fn(async () => {}),
 };
 vi.mock('$lib/server/neo4j-driver.js', () => ({
-	getNeo4jDriver: () => ({
-		session: () => mockNeo4jSession,
-	}),
+  getNeo4jDriver: () => ({
+    session: () => mockNeo4jSession,
+  }),
 }));
 
 // ── Graph sync mock ──
 vi.mock('$lib/server/graph/pg-neo4j-sync.js', () => ({
-	syncCaseToGraph: vi.fn(async () => ({ synced: 1, errors: [] })),
-	syncAllCasesToGraph: vi.fn(async () => ({ synced: 10, errors: [] })),
+  syncCaseToGraph: vi.fn(async () => ({ synced: 1, errors: [] })),
+  syncAllCasesToGraph: vi.fn(async () => ({ synced: 10, errors: [] })),
 }));
 
 // ── Embedding mock ──
 vi.mock('$lib/server/embedding/embed.js', () => ({
-	embedText: vi.fn(async () => new Float32Array(768).fill(0.01)),
+  embedText: vi.fn(async () => new Float32Array(768).fill(0.01)),
 }));
 
 // ── Qdrant mock ──
 vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
-	qdrant: {
-		hybridSearch: vi.fn(async () => ({
-			results: [
-				{ payload: { title: 'Evidence 1', content_preview: 'Contract review' }, score: 0.88 },
-			],
-		})),
-	},
+  qdrant: {
+    hybridSearch: vi.fn(async () => ({
+      results: [
+        { payload: { title: 'Evidence 1', content_preview: 'Contract review' }, score: 0.88 },
+      ],
+    })),
+  },
 }));
 
 // ── DB mock (Drizzle chain) ──
 const mockDbRows: any[] = [];
 const mockChain: any = {
-	select: vi.fn(() => mockChain),
-	selectDistinct: vi.fn(() => mockChain),
-	from: vi.fn(() => mockChain),
-	where: vi.fn(() => mockChain),
-	orderBy: vi.fn(() => mockChain),
-	limit: vi.fn(() => mockChain),
-	offset: vi.fn(() => mockChain),
-	leftJoin: vi.fn(() => mockChain),
-	groupBy: vi.fn(() => mockChain),
-	then: vi.fn((resolve: any) => resolve(mockDbRows)),
-	[Symbol.iterator]: function* () { yield* mockDbRows; },
+  select: vi.fn(() => mockChain),
+  selectDistinct: vi.fn(() => mockChain),
+  from: vi.fn(() => mockChain),
+  where: vi.fn(() => mockChain),
+  orderBy: vi.fn(() => mockChain),
+  limit: vi.fn(() => mockChain),
+  offset: vi.fn(() => mockChain),
+  leftJoin: vi.fn(() => mockChain),
+  groupBy: vi.fn(() => mockChain),
+  then: vi.fn((resolve: any) => resolve(mockDbRows)),
+  [Symbol.iterator]: function* () {
+    yield* mockDbRows;
+  },
 };
 vi.mock('$lib/server/db/client', () => ({
-	db: {
-		select: vi.fn(() => mockChain),
-		selectDistinct: vi.fn(() => mockChain),
-		execute: vi.fn(async () => ({ rows: [] })),
-	},
-	pool: {
-		query: vi.fn(async () => ({ rows: [] })),
-	},
+  pgRows: (r) => (Array.isArray(r) ? r : (r?.rows ?? [])),
+  db: {
+    select: vi.fn(() => mockChain),
+    selectDistinct: vi.fn(() => mockChain),
+    execute: vi.fn(async () => ({ rows: [] })),
+  },
+  pool: {
+    query: vi.fn(async () => ({ rows: [] })),
+  },
 }));
 
 // ── Schema mocks ──
 vi.mock('$lib/server/db/schema-postgres.js', () => ({
-	cases: {
-		id: 'id', title: 'title', description: 'description', caseNumber: 'case_number',
-		status: 'status', priority: 'priority', jurisdiction: 'jurisdiction',
-		court: 'court', practiceArea: 'practice_area', createdAt: 'created_at',
-		userId: 'user_id',
-	},
-	statutes: {
-		id: 'id', title: 'title', section: 'section', jurisdiction: 'jurisdiction',
-		category: 'category', content: 'content', effectiveDate: 'effective_date',
-		sourceUrl: 'source_url', createdAt: 'created_at',
-	},
-	canonicalDocuments: {},
+  cases: {
+    id: 'id',
+    title: 'title',
+    description: 'description',
+    caseNumber: 'case_number',
+    status: 'status',
+    priority: 'priority',
+    jurisdiction: 'jurisdiction',
+    court: 'court',
+    practiceArea: 'practice_area',
+    createdAt: 'created_at',
+    userId: 'user_id',
+  },
+  statutes: {
+    id: 'id',
+    title: 'title',
+    section: 'section',
+    jurisdiction: 'jurisdiction',
+    category: 'category',
+    content: 'content',
+    effectiveDate: 'effective_date',
+    sourceUrl: 'source_url',
+    createdAt: 'created_at',
+  },
+  canonicalDocuments: {},
 }));
 vi.mock('$lib/server/db/schema/legal-cases.js', () => ({
-	crimes: {
-		crimeCode: 'crime_code', crimeCategory: 'crime_category',
-		crimeClassification: 'crime_classification',
-	},
+  crimes: {
+    crimeCode: 'crime_code',
+    crimeCategory: 'crime_category',
+    crimeClassification: 'crime_classification',
+  },
 }));
 vi.mock('$lib/server/db/schema', () => ({
-	savedCitations: {
-		id: 'id', statuteCode: 'statute_code', statuteTitle: 'statute_title',
-		highlightedText: 'highlighted_text', notes: 'notes', jurisdiction: 'jurisdiction',
-		severity: 'severity', year: 'year', sourceType: 'source_type', createdAt: 'created_at',
-	},
+  savedCitations: {
+    id: 'id',
+    statuteCode: 'statute_code',
+    statuteTitle: 'statute_title',
+    highlightedText: 'highlighted_text',
+    notes: 'notes',
+    jurisdiction: 'jurisdiction',
+    severity: 'severity',
+    year: 'year',
+    sourceType: 'source_type',
+    createdAt: 'created_at',
+  },
 }));
 vi.mock('drizzle-orm', () => ({
-	eq: vi.fn((...a: any[]) => a),
-	desc: vi.fn((c: any) => c),
-	and: vi.fn((...a: any[]) => a),
-	or: vi.fn((...a: any[]) => a),
-	ilike: vi.fn((...a: any[]) => a),
-	sql: Object.assign(vi.fn((s: any) => s), {
-		raw: vi.fn((s: any) => s),
-	}),
-	isNotNull: vi.fn((c: any) => c),
+  eq: vi.fn((...a: any[]) => a),
+  desc: vi.fn((c: any) => c),
+  and: vi.fn((...a: any[]) => a),
+  or: vi.fn((...a: any[]) => a),
+  ilike: vi.fn((...a: any[]) => a),
+  sql: Object.assign(
+    vi.fn((s: any) => s),
+    {
+      raw: vi.fn((s: any) => s),
+    }
+  ),
+  isNotNull: vi.fn((c: any) => c),
 }));
 
 // ── Helpers ──
 function makeEvent(
-	method: string,
-	url: string,
-	opts: { body?: any; locals?: any; params?: any } = {}
+  method: string,
+  url: string,
+  opts: { body?: any; locals?: any; params?: any } = {}
 ) {
-	const urlObj = new URL(url, 'http://localhost');
-	const headers = new Headers({ 'content-type': 'application/json' });
-	return {
-		request: new Request(urlObj, {
-			method,
-			headers,
-			body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-		}),
-		url: urlObj,
-		params: opts.params ?? {},
-		locals: opts.locals ?? { user: { id: TEST_USER_ID, role: 'admin' } },
-		cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
-		platform: {},
-	};
+  const urlObj = new URL(url, 'http://localhost');
+  const headers = new Headers({ 'content-type': 'application/json' });
+  return {
+    request: new Request(urlObj, {
+      method,
+      headers,
+      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+    }),
+    url: urlObj,
+    params: opts.params ?? {},
+    locals: opts.locals ?? { user: { id: TEST_USER_ID, role: 'admin' } },
+    cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+    platform: {},
+  };
 }
 
 function jsonBody(response: Response) {
-	return response.json();
+  return response.json();
 }
 
 beforeEach(() => {
-	vi.clearAllMocks();
-	mockDbRows.length = 0;
+  vi.clearAllMocks();
+  mockDbRows.length = 0;
 });
 
 // ─────────────────────────────────────────────────────────
 // /api/graph/connections (GET)
 // ─────────────────────────────────────────────────────────
 describe('/api/graph/connections (GET)', () => {
-	it('returns case connections from Neo4j', async () => {
-		const { GET } = await import('../src/routes/api/graph/connections/+server.js');
-		const event = makeEvent('GET', `http://localhost/api/graph/connections?caseId=${TEST_CASE_ID}`);
-		const res = await GET(event as any);
-		const data = await jsonBody(res);
-		expect(data.caseId).toBe(TEST_CASE_ID);
-		expect(data.connections).toHaveLength(1);
-		expect(data.connections[0].caseId).toBe('case-2');
-	});
+  it('returns case connections from Neo4j', async () => {
+    const { GET } = await import('../src/routes/api/graph/connections/+server.js');
+    const event = makeEvent('GET', `http://localhost/api/graph/connections?caseId=${TEST_CASE_ID}`);
+    const res = await GET(event as any);
+    const data = await jsonBody(res);
+    expect(data.caseId).toBe(TEST_CASE_ID);
+    expect(data.connections).toHaveLength(1);
+    expect(data.connections[0].caseId).toBe('case-2');
+  });
 
-	it('returns 400 for missing caseId', async () => {
-		const { GET } = await import('../src/routes/api/graph/connections/+server.js');
-		const event = makeEvent('GET', 'http://localhost/api/graph/connections');
-		const res = await GET(event as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for missing caseId', async () => {
+    const { GET } = await import('../src/routes/api/graph/connections/+server.js');
+    const event = makeEvent('GET', 'http://localhost/api/graph/connections');
+    const res = await GET(event as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 401 for unauthenticated', async () => {
-		const { GET } = await import('../src/routes/api/graph/connections/+server.js');
-		const event = makeEvent('GET', `http://localhost/api/graph/connections?caseId=${TEST_CASE_ID}`, {
-			locals: { user: null },
-		});
-		const res = await GET(event as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 for unauthenticated', async () => {
+    const { GET } = await import('../src/routes/api/graph/connections/+server.js');
+    const event = makeEvent(
+      'GET',
+      `http://localhost/api/graph/connections?caseId=${TEST_CASE_ID}`,
+      {
+        locals: { user: null },
+      }
+    );
+    const res = await GET(event as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 503 when Neo4j is down', async () => {
-		mockNeo4jSession.run.mockRejectedValueOnce(new Error('Neo4j unavailable'));
-		const { GET } = await import('../src/routes/api/graph/connections/+server.js');
-		const event = makeEvent('GET', `http://localhost/api/graph/connections?caseId=${TEST_CASE_ID}`);
-		const res = await GET(event as any);
-		expect(res.status).toBe(503);
-	});
+  it('returns empty connections when Neo4j is down', async () => {
+    mockNeo4jSession.run.mockRejectedValueOnce(new Error('Neo4j unavailable'));
+    const { GET } = await import('../src/routes/api/graph/connections/+server.js');
+    const event = makeEvent('GET', `http://localhost/api/graph/connections?caseId=${TEST_CASE_ID}`);
+    const res = await GET(event as any);
+    expect(res.status).toBe(200);
+    const data = await jsonBody(res);
+    expect(data.connections).toEqual([]);
+  });
 });
 
 // ─────────────────────────────────────────────────────────

@@ -12,14 +12,19 @@
  */
 import { Cache, type MutationOption } from 'drizzle-orm/cache/core';
 import type { CacheConfig } from 'drizzle-orm/cache/core/types';
-import { Table, getTableName } from 'drizzle-orm';
+import { type Table, getTableName } from 'drizzle-orm';
 import { getRedis } from '../redis.js';
 
 const PREFIX = 'drizzle';
 const DEFAULT_TTL = 300; // 5 minutes
 
-function is(val: unknown, klass: any): val is typeof Table {
-	return val != null && typeof val === 'object' && (val as any).constructor?.[Symbol.for('drizzle:entityKind')] === klass[Symbol.for('drizzle:entityKind')];
+function is(val: unknown, klass: any): val is Table {
+  return (
+    val != null &&
+    typeof val === 'object' &&
+    (val as any).constructor?.[Symbol.for('drizzle:entityKind')] ===
+      klass[Symbol.for('drizzle:entityKind')]
+  );
 }
 
 export class IoRedisDrizzleCache extends Cache {

@@ -53,6 +53,12 @@ function buildDeleteChain(data: unknown[] = []) {
 }
 
 // ── Mocks ──────────────────────────────────────────────────────
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -70,6 +76,7 @@ vi.mock('$lib/server/ollama.js', () => ({
 }));
 
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => buildSelectChain()),
 		insert: vi.fn(() => buildInsertChain()),
@@ -211,7 +218,7 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 	describe('GET', () => {
 		it('returns 401 when unauthenticated', async () => {
 			try {
-				await GET({ url: mkUrl('/api/reports'), locals: anonLocals });
+				await GET({ url: mkUrl('/api/reports'), request: new Request('http://localhost'), locals: anonLocals });
 				expect.unreachable('should have thrown');
 			} catch (err: any) {
 				expect(err.status).toBe(401);
@@ -223,7 +230,7 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 			const reports = [{ id: 'r-1', title: 'Report 1', status: 'draft' }];
 			(db.select as any).mockReturnValueOnce(buildSelectChain(reports));
 
-			const res = await GET({ url: mkUrl('/api/reports'), locals: authedLocals });
+			const res = await GET({ url: mkUrl('/api/reports'), request: new Request('http://localhost'), locals: authedLocals });
 			const data = await res.json();
 			expect(res.status).toBe(200);
 			expect(data.success).toBe(true);
@@ -237,7 +244,7 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 
 			const res = await GET({
 				url: mkUrl('/api/reports', { caseId: UUID1 }),
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(res.status).toBe(200);
@@ -254,7 +261,7 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 
 			const res = await GET({
 				url: mkUrl('/api/reports', { ids: `${UUID1},${UUID2}` }),
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			const data = await res.json();
 			expect(res.status).toBe(200);
@@ -264,7 +271,7 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 		it('returns 400 for invalid limit', async () => {
 			const res = await GET({
 				url: mkUrl('/api/reports', { limit: '999' }),
-				locals: authedLocals,
+				request: new Request('http://localhost'), locals: authedLocals,
 			});
 			expect(res.status).toBe(400);
 		});
@@ -286,7 +293,7 @@ describe('/api/reports (GET/POST/PATCH/DELETE)', () => {
 			});
 
 			try {
-				await GET({ url: mkUrl('/api/reports'), locals: authedLocals });
+				await GET({ url: mkUrl('/api/reports'), request: new Request('http://localhost'), locals: authedLocals });
 				expect.unreachable('should have thrown');
 			} catch (err: any) {
 				expect(err.status).toBe(500);

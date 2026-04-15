@@ -24,6 +24,12 @@ const mockDbUpdate = vi.fn();
 const mockDbDelete = vi.fn();
 const mockDbExecute = vi.fn();
 
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -89,6 +95,7 @@ const fromFn = vi.fn(() => ({ where: whereFn, orderBy: vi.fn(() => ({ limit: vi.
 const valuesFn = vi.fn(() => ({ returning: vi.fn(async () => [{ id: 'diag-1' }]), onConflictDoNothing: vi.fn() }));
 
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => ({ from: fromFn })),
 		insert: vi.fn(() => ({ values: valuesFn })),
@@ -248,7 +255,7 @@ describe('POST /api/error-brain/generate-fix', () => {
 		expect(body.fix).toBeDefined();
 		expect(body.fix.fixedCode).toBeTruthy();
 		expect(body.metadata).toBeDefined();
-		expect(body.metadata.model).toBe('gemma3-legal:latest');
+		expect(body.metadata.model).toBe('gemma4-legal:latest');
 	});
 
 	it('handles Ollama failure gracefully', async () => {

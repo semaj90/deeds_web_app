@@ -15,6 +15,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ── Mocks ──────────────────────────────────────────────────────
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -60,6 +66,7 @@ function buildSelectChain(data: unknown[] = []) {
 }
 
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => buildSelectChain()),
 		insert: (...args: unknown[]) => mockInsert(...args),
@@ -282,19 +289,19 @@ describe('/api/errors/route-errors (GET)', () => {
 	});
 
 	it('returns 401 when unauthenticated', async () => {
-		const res = await GET({ url: mkUrl('/api/errors/route-errors', { route: '/cases' }), locals: anonLocals });
+		const res = await GET({ url: mkUrl('/api/errors/route-errors', { route: '/cases' }), request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('returns 400 when route param is missing', async () => {
-		const res = await GET({ url: mkUrl('/api/errors/route-errors'), locals: authedLocals });
+		const res = await GET({ url: mkUrl('/api/errors/route-errors'), request: new Request('http://localhost'), locals: authedLocals });
 		expect(res.status).toBe(400);
 	});
 
 	it('returns error data for a route', async () => {
 		const res = await GET({
 			url: mkUrl('/api/errors/route-errors', { route: '/cases/[id]' }),
-			locals: authedLocals,
+			request: new Request('http://localhost'), locals: authedLocals,
 		});
 		const data = await res.json();
 		expect(res.status).toBe(200);
@@ -308,7 +315,7 @@ describe('/api/errors/route-errors (GET)', () => {
 	it('respects limit parameter', async () => {
 		const res = await GET({
 			url: mkUrl('/api/errors/route-errors', { route: '/cases', limit: '5' }),
-			locals: authedLocals,
+			request: new Request('http://localhost'), locals: authedLocals,
 		});
 		expect(res.status).toBe(200);
 	});
@@ -324,7 +331,7 @@ describe('/api/errors/route-errors (GET)', () => {
 
 		const res = await GET({
 			url: mkUrl('/api/errors/route-errors', { route: '/cases' }),
-			locals: authedLocals,
+			request: new Request('http://localhost'), locals: authedLocals,
 		});
 		const data = await res.json();
 		expect(res.status).toBe(200);
@@ -344,7 +351,7 @@ describe('/api/errors/summary (GET)', () => {
 	});
 
 	it('returns 401 when unauthenticated', async () => {
-		const res = await GET({ locals: anonLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
@@ -354,7 +361,7 @@ describe('/api/errors/summary (GET)', () => {
 			{ file_path: '/evidence', code: 'TS2345', count: '3' },
 		]);
 
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.total).toBe(8);
@@ -365,7 +372,7 @@ describe('/api/errors/summary (GET)', () => {
 	it('returns empty on table missing', async () => {
 		mockExecute.mockRejectedValueOnce(new Error('relation does not exist'));
 
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.total).toBe(0);
@@ -465,12 +472,12 @@ describe('/api/fictional-cases (GET)', () => {
 	});
 
 	it('returns 401 when unauthenticated', async () => {
-		const res = await GET({ url: mkUrl('/api/fictional-cases'), locals: anonLocals });
+		const res = await GET({ url: mkUrl('/api/fictional-cases'), request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('returns fictional cases list', async () => {
-		const res = await GET({ url: mkUrl('/api/fictional-cases'), locals: authedLocals });
+		const res = await GET({ url: mkUrl('/api/fictional-cases'), request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(Array.isArray(data.cases)).toBe(true);
@@ -483,7 +490,7 @@ describe('/api/fictional-cases (GET)', () => {
 	it('accepts filter parameters', async () => {
 		const res = await GET({
 			url: mkUrl('/api/fictional-cases', { category: 'fraud', q: 'embezzlement', limit: '5' }),
-			locals: authedLocals,
+			request: new Request('http://localhost'), locals: authedLocals,
 		});
 		expect(res.status).toBe(200);
 	});
@@ -491,7 +498,7 @@ describe('/api/fictional-cases (GET)', () => {
 	it('returns 400 for invalid limit', async () => {
 		const res = await GET({
 			url: mkUrl('/api/fictional-cases', { limit: '999' }),
-			locals: authedLocals,
+			request: new Request('http://localhost'), locals: authedLocals,
 		});
 		expect(res.status).toBe(400);
 	});
@@ -523,17 +530,17 @@ describe('/api/fictional-cases/[id] (GET/PATCH/DELETE)', () => {
 
 	// GET
 	it('GET returns 401 when unauthenticated', async () => {
-		const res = await GET({ params: { id: VALID_UUID }, locals: anonLocals });
+		const res = await GET({ params: { id: VALID_UUID }, request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('GET returns 400 for invalid UUID', async () => {
-		const res = await GET({ params: { id: 'not-a-uuid' }, locals: authedLocals });
+		const res = await GET({ params: { id: 'not-a-uuid' }, request: new Request('http://localhost'), locals: authedLocals });
 		expect(res.status).toBe(400);
 	});
 
 	it('GET returns fictional case with related data', async () => {
-		const res = await GET({ params: { id: VALID_UUID }, locals: authedLocals });
+		const res = await GET({ params: { id: VALID_UUID }, request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.id).toBe(VALID_UUID);
@@ -552,7 +559,7 @@ describe('/api/fictional-cases/[id] (GET/PATCH/DELETE)', () => {
 			return chain;
 		});
 
-		const res = await GET({ params: { id: VALID_UUID }, locals: authedLocals });
+		const res = await GET({ params: { id: VALID_UUID }, request: new Request('http://localhost'), locals: authedLocals });
 		expect(res.status).toBe(404);
 	});
 
@@ -610,17 +617,17 @@ describe('/api/fictional-cases/[id] (GET/PATCH/DELETE)', () => {
 
 	// DELETE
 	it('DELETE returns 401 when unauthenticated', async () => {
-		const res = await DELETE({ params: { id: VALID_UUID }, locals: anonLocals });
+		const res = await DELETE({ params: { id: VALID_UUID }, request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('DELETE returns 400 for invalid UUID', async () => {
-		const res = await DELETE({ params: { id: 'bad' }, locals: authedLocals });
+		const res = await DELETE({ params: { id: 'bad' }, request: new Request('http://localhost'), locals: authedLocals });
 		expect(res.status).toBe(400);
 	});
 
 	it('DELETE removes case successfully', async () => {
-		const res = await DELETE({ params: { id: VALID_UUID }, locals: authedLocals });
+		const res = await DELETE({ params: { id: VALID_UUID }, request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(true);
@@ -633,7 +640,7 @@ describe('/api/fictional-cases/[id] (GET/PATCH/DELETE)', () => {
 			})),
 		}));
 
-		const res = await DELETE({ params: { id: VALID_UUID }, locals: authedLocals });
+		const res = await DELETE({ params: { id: VALID_UUID }, request: new Request('http://localhost'), locals: authedLocals });
 		expect(res.status).toBe(404);
 	});
 });
@@ -666,11 +673,11 @@ describe('/api/engagement/heartbeat (GET/POST)', () => {
 
 	// GET
 	it('GET returns 401 when unauthenticated', async () => {
-		await expect(GET({ locals: anonLocals })).rejects.toThrow();
+		await expect(GET({ request: new Request('http://localhost'), locals: anonLocals })).rejects.toThrow();
 	});
 
 	it('GET returns idle duration', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.userId).toBe('user-1');
@@ -682,7 +689,7 @@ describe('/api/engagement/heartbeat (GET/POST)', () => {
 	it('GET reports idle when over threshold', async () => {
 		mockGetIdleDuration.mockResolvedValueOnce(60 * 60 * 1000); // 1 hour
 
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(data.isIdle).toBe(true);
 		expect(data.idleMinutes).toBe(60);
@@ -727,12 +734,12 @@ describe('/api/knowledge/stats (GET)', () => {
 	});
 
 	it('returns 401 when unauthenticated', async () => {
-		const res = await GET({ locals: anonLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('returns knowledge statistics', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(true);
@@ -746,14 +753,14 @@ describe('/api/knowledge/stats (GET)', () => {
 	it('returns 503 for Qdrant errors', async () => {
 		mockGetStats.mockRejectedValueOnce(new Error('Qdrant connection refused'));
 
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		expect(res.status).toBe(503);
 	});
 
 	it('returns 500 for generic errors', async () => {
 		mockGetStats.mockRejectedValueOnce(new Error('Something went wrong'));
 
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		expect(res.status).toBe(500);
 	});
 });

@@ -16,7 +16,6 @@
 		'Cal. Civ. Code §1714 - Everyone is responsible for the result of willful acts...',
 	];
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-3xl mx-auto">

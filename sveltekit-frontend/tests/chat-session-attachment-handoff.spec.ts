@@ -9,6 +9,12 @@ const mocks = vi.hoisted(() => ({
   mockUpdateTextEmotion: vi.fn(),
 }));
 
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$lib/ai/client-router.js', () => ({
   shouldEscalateToServer: mocks.mockShouldEscalateToServer,
   fetchCapabilities: mocks.mockFetchCapabilities,

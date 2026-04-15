@@ -10,58 +10,71 @@ const mockOllamaFetch = vi.fn();
 const mockDbExecute = vi.fn();
 const mockPoolQuery = vi.fn();
 
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
 vi.mock('$lib/server/env.server.js', () => ({
-	ENV: {
-		OLLAMA_BASE_URL: 'http://ollama.test',
-		QDRANT_URL: 'http://qdrant.test',
-		REDIS_URL: 'redis://localhost:6379',
-		QUIC_EMBED_PORT: '4433',
-		GO_SEARCH_GRPC_URL: 'localhost:50051',
-	},
-}));
-
-vi.mock('$lib/config/env.server.js', () => ({
-	getTrtLlmUrl: vi.fn(() => 'http://localhost:8001'),
-	getTritonUrl: vi.fn(() => 'http://localhost:8002'),
-}));
-
-vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: mockOllamaFetch,
+  ENV: {
+    OLLAMA_BASE_URL: 'http://ollama.test',
+    QDRANT_URL: 'http://qdrant.test',
+    REDIS_URL: 'redis://localhost:6379',
+    QUIC_EMBED_PORT: '4433',
+    GO_SEARCH_GRPC_URL: 'localhost:50051',
+    RABBITMQ_URL: 'amqp://localhost:5672',
+    DATABASE_URL: 'postgresql://localhost:5432/test',
+    COUCHDB_URL: 'http://admin:pass@localhost:5984',
+    NEO4J_URI: 'bolt://localhost:7687',
+    MINIO_ENDPOINT: 'localhost',
+    MINIO_PORT: '9000',
+    LANGEXTRACT_URL: 'http://localhost:8095',
+    QUIC_HEALTH_URL: 'http://localhost:5178',
+    GO_SEARCH_URL: 'http://localhost:8096',
+    NATS_URL: 'nats://localhost:4222',
+    EMBEDDING_QUIC_ENABLED: 'false',
+    EMBEDDING_GRPC_ENABLED: 'false',
+    EMBEDDING_GRPC_URL: 'localhost:50051',
+  },
+  ollamaFetch: mockOllamaFetch,
 }));
 
 vi.mock('$lib/server/db/client', () => ({
-	db: {
-		execute: mockDbExecute,
-	},
-	pool: {
-		query: mockPoolQuery,
-	},
+  pgRows: (r) => (Array.isArray(r) ? r : (r?.rows ?? [])),
+  db: {
+    execute: mockDbExecute,
+  },
+  pool: {
+    query: mockPoolQuery,
+  },
 }));
 
 vi.mock('drizzle-orm', () => ({
-	sql: Object.assign(vi.fn(), { raw: vi.fn((s: string) => s) }),
-	eq: vi.fn(),
+  sql: Object.assign(vi.fn(), { raw: vi.fn((s: string) => s) }),
+  eq: vi.fn(),
 }));
 
 vi.mock('$lib/server/circuit-breaker.js', () => ({
-	ollamaBreaker: {
-		fire: vi.fn(async (fn: Function) => fn()),
-		getState: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
-		getStatus: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
-	},
-	qdrantBreaker: {
-		fire: vi.fn(async (fn: Function) => fn()),
-		getState: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
-		getStatus: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
-	},
-	redisBreaker: {
-		fire: vi.fn(async (fn: Function) => fn()),
-		getState: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
-		getStatus: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
-	},
+  ollamaBreaker: {
+    fire: vi.fn(async (fn: Function) => fn()),
+    getState: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
+    getStatus: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
+  },
+  qdrantBreaker: {
+    fire: vi.fn(async (fn: Function) => fn()),
+    getState: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
+    getStatus: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
+  },
+  redisBreaker: {
+    fire: vi.fn(async (fn: Function) => fn()),
+    getState: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
+    getStatus: vi.fn(() => ({ state: 'CLOSED', failureCount: 0, lastFailure: null })),
+  },
+  breakerEventLog: [],
 }));
 
 vi.mock('$lib/server/embedding/embed.js', () => ({

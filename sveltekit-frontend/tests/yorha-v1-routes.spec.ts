@@ -30,7 +30,7 @@ const mockOllamaFetch = vi.fn(async () =>
 	new Response(JSON.stringify({
 		message: { content: 'Mock LLM response' },
 		response: 'Mock LLM response',
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } })
 );
 vi.mock('$lib/server/ollama.js', () => ({
@@ -452,7 +452,7 @@ describe('/api/v1/evidence/analyze (POST)', () => {
 		}) as any);
 		const data = await jsonBody(res);
 		expect(data.analysis).toBeTruthy();
-		expect(data.model).toBe('gemma3-legal:latest');
+		expect(data.model).toBe('gemma4-legal:latest');
 	});
 
 	it('returns 400 for no content or evidenceId', async () => {

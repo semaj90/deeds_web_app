@@ -3,7 +3,6 @@
 
 	let open = $state(true);
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-4xl mx-auto">

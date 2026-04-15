@@ -1,6 +1,5 @@
 <script lang="ts">
 	import AgentChat from '$lib/components/agentic/AgentChat.svelte';
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-3xl mx-auto">

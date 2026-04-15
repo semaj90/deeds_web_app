@@ -5,7 +5,6 @@
 
 	let activeTab = $state<'ollama' | 'onnx'>('ollama');
 
-	export const ssr = false;
 </script>
 
 <div class="inference-demo">

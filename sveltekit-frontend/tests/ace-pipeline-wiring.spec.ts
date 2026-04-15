@@ -11,6 +11,12 @@
 import { describe, expect, it, vi, beforeAll } from 'vitest';
 
 // ── Mock SvelteKit env modules ──────────────────────────────────────────
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 vi.mock('$lib/server/env.server.js', () => ({
@@ -39,6 +45,7 @@ vi.mock('$lib/server/redis.js', () => ({
 
 // ── Mock DB ─────────────────────────────────────────────────────────────
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: { execute: vi.fn(async () => ({ rows: [] })) },
 	pool: { query: vi.fn(async () => ({ rows: [] })) },
 }));
@@ -65,7 +72,7 @@ vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	ollamaFetch: vi.fn(async () => ({
 		ok: true,
-		json: async () => ({ response: 'test response', model: 'gemma3-legal', eval_count: 100, prompt_eval_count: 50 }),
+		json: async () => ({ response: 'test response', model: 'gemma4-legal', eval_count: 100, prompt_eval_count: 50 }),
 	})),
 	bifrostChat: vi.fn(async () => 'test response'),
 	getChatModelKeepAlive: vi.fn(() => '24h'),
@@ -231,7 +238,7 @@ describe('ACE pipeline wiring', () => {
 
 			const response = await GET({
 				params: { id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
-				locals: { user: { id: 'u1', email: 'test@test.com' } },
+				request: new Request('http://localhost'), locals: { user: { id: 'u1', email: 'test@test.com' } },
 			} as any);
 
 			const body = await response.json();
@@ -255,7 +262,7 @@ describe('ACE pipeline wiring', () => {
 
 			const response = await GET({
 				params: { id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
-				locals: { user: { id: 'u1', email: 'test@test.com' } },
+				request: new Request('http://localhost'), locals: { user: { id: 'u1', email: 'test@test.com' } },
 			} as any);
 
 			const body = await response.json();
@@ -269,7 +276,7 @@ describe('ACE pipeline wiring', () => {
 
 			const response = await GET({
 				params: { id: 'not-a-uuid' },
-				locals: { user: { id: 'u1', email: 'test@test.com' } },
+				request: new Request('http://localhost'), locals: { user: { id: 'u1', email: 'test@test.com' } },
 			} as any);
 
 			const body = await response.json();
@@ -284,7 +291,7 @@ describe('ACE pipeline wiring', () => {
 
 			const response = await GET({
 				params: { id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
-				locals: { user: { id: 'u1', email: 'test@test.com' } },
+				request: new Request('http://localhost'), locals: { user: { id: 'u1', email: 'test@test.com' } },
 			} as any);
 
 			const body = await response.json();
@@ -306,7 +313,7 @@ describe('ACE pipeline wiring', () => {
 				mock();
 				const response = await GET({
 					params: { id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
-					locals: { user: { id: 'u1', email: 'test@test.com' } },
+					request: new Request('http://localhost'), locals: { user: { id: 'u1', email: 'test@test.com' } },
 				} as any);
 				const body = await response.json();
 				expect(body).toHaveProperty('evaluation');

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import AIChatAssistant from '$lib/components/AIChatAssistant.svelte';
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

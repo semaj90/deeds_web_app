@@ -3,7 +3,6 @@
 	import { toastStore } from '$lib/stores/unified/toast-store.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

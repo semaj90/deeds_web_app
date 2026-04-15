@@ -6,7 +6,6 @@
 	let modal2Open = $state(false);
 	let modal3Open = $state(false);
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

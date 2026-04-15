@@ -40,9 +40,6 @@
 	let errorMessage = $state<string | null>(null);
 	let streamer: WebGPUTextureStreamer | null = null;
 
-	// SSR safety - don't run on server
-	export const ssr = false;
-
 	onMount(() => {
 		if (!browser) return;
 

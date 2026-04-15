@@ -13,28 +13,42 @@ vi.mock('$lib/server/db/client', () => ({
 }));
 
 vi.mock('$lib/server/db/schema-postgres.js', () => ({
-	evidence: {
-		id: 'id',
-	},
+  evidence: {
+    id: 'id',
+    userId: 'userId',
+  },
+  cases: {},
 }));
 
 vi.mock('drizzle-orm', () => ({
-	eq: mockEq,
-	sql: vi.fn(() => 'sql-fragment'),
+  eq: mockEq,
+  and: vi.fn((...args: unknown[]) => args),
+  sql: vi.fn(() => 'sql-fragment'),
+}));
+
+vi.mock('$lib/server/validation.js', () => ({
+  isUuid: vi.fn((v: string) =>
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
+  ),
+}));
+
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {} },
+  checkETag: vi.fn(() => ({ etag: '"test-etag"', isMatch: false })),
 }));
 
 describe('/api/evidence/[id] GET route', () => {
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-	it('returns 404 when the evidence row does not exist', async () => {
+  it('returns 404 when the evidence row does not exist', async () => {
     mockLimit.mockResolvedValueOnce([]);
 
     const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
 
     const response = await GET({
-      params: { id: 'missing-evidence' },
+      params: { id: '00000000-0000-4000-a000-000000000001' },
       locals: { user: { id: 'test-user' } },
     } as never);
 
@@ -67,8 +81,10 @@ describe('/api/evidence/[id] GET route', () => {
     const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
 
     const response = await GET({
-      params: { id: 'evidence-1' },
+      params: { id: '00000000-0000-4000-a000-000000000002' },
       locals: { user: { id: 'test-user' } },
+      request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000002'),
+      request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000002'),
     } as never);
 
     const body = await response.json();
@@ -101,8 +117,10 @@ describe('/api/evidence/[id] GET route', () => {
     const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
 
     const response = await GET({
-      params: { id: 'evidence-2' },
+      params: { id: '00000000-0000-4000-a000-000000000003' },
+      request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000003'),
       locals: { user: { id: 'test-user' } },
+      request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000003'),
     } as never);
 
     const body = await response.json();

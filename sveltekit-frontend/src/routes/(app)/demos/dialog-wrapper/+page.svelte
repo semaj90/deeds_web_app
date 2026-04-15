@@ -6,7 +6,6 @@
 	let dialogOpen = $state(false);
 	let aiDialogOpen = $state(false);
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

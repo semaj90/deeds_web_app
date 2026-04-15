@@ -1,6 +1,5 @@
 <script lang="ts">
 	import EvidenceTheoryBoard from '$lib/components/detective/EvidenceTheoryBoard.svelte';
-	export const ssr = false;
 </script>
 
 <div class="p-4" style="height: calc(100vh - 4rem);">

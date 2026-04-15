@@ -16,7 +16,6 @@
 		{ id: 'ch3', heading: 'Chapter 3: Analysis', nodeType: 'section', children: [] },
 	];
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

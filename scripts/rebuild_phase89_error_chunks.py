@@ -197,6 +197,7 @@ parser.add_argument("--no-neo4j", action="store_true", help="Skip Neo4j graph en
 parser.add_argument("--max",      type=int, default=None, help="Max errors to embed")
 parser.add_argument("--diagnostics-file", type=str, default=None,
                     help="Path to saved diagnostics (.phase78-collection.json, JSONL, or svelte-check text)")
+parser.add_argument("--no-llm",   action="store_true", help="Skip LLM summaries (use deterministic fallback, much faster)")
 args = parser.parse_args()
 
 print("=" * 70)
@@ -756,9 +757,6 @@ def recreate_collection():
     )
     print(f"   ✅ Created: {QDRANT_COLLECTION} (768-dim Cosine, default vector)")
 
-if not args.dry_run:
-    recreate_collection()
-
 qdrant_points: list[dict] = []
 
 for cluster_id, members in clusters.items():
@@ -794,7 +792,14 @@ for cluster_id, members in clusters.items():
     graph_ctx = f"G21={g21} G22={g22} G23={g23} G25={g25}" if any([g21,g22,g23,g25]) else ""
 
     print(f"   Cluster {cluster_id:2d}: {len(members):3d} errors  type={error_type:<25}  {graph_ctx}")
-    summary = llm_summarize(messages, error_type, graph_ctx)
+    if args.no_llm:
+        fallback_example = messages[0][:120] if messages else error_type
+        if graph_ctx:
+            summary = f"Cluster centers on {error_type} and should use the mapped fixer. Graph context: {graph_ctx}. Example: {fallback_example}"
+        else:
+            summary = f"Cluster centers on {error_type} and should use the mapped fixer. Example: {fallback_example}"
+    else:
+        summary = llm_summarize(messages, error_type, graph_ctx)
     if fixer_key not in summary and fix_hint not in summary:
         summary = f"{summary} Recommended fixer: {fixer_key}. {fix_hint}."
 
@@ -824,6 +829,10 @@ for cluster_id, members in clusters.items():
 if args.dry_run:
     print(f"\n🔍 DRY RUN — would upsert {len(qdrant_points)} cluster points")
 else:
+    if not qdrant_points:
+        print("   ⚠️  No cluster points generated — preserving existing collection")
+    else:
+        recreate_collection()
     batch_size = 50
     total_upserted = 0
     for i in range(0, len(qdrant_points), batch_size):

@@ -10,7 +10,6 @@
 		{ chunkId: 'chunk-3', documentTitle: 'Evidence Analysis Report', heading: 'Financial Records', content: 'Bank statements from January through March 2024 show a pattern of irregular transfers totaling $847,000, inconsistent with normal business operations for the entity in question.', pageStart: 15, documentId: 'doc-003' },
 	];
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

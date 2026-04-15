@@ -10,6 +10,12 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 // ── Mock SvelteKit env modules ──────────────────────────────────────────
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 vi.mock('$lib/server/env.server.js', () => ({
@@ -38,8 +44,9 @@ vi.mock('$lib/server/redis.js', () => ({
 // ── Mock DB ─────────────────────────────────────────────────────────────
 const mockDbExecute = vi.fn(async () => ({ rows: [] }));
 vi.mock('$lib/server/db/client', () => ({
-	db: { execute: (...args: any[]) => mockDbExecute(...args) },
-	pool: { query: vi.fn(async () => ({ rows: [] })) },
+  pgRows: (r) => (Array.isArray(r) ? r : (r?.rows ?? [])),
+  db: { execute: (...args: any[]) => mockDbExecute(...args) },
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
 }));
 
 // ── Mock Qdrant ─────────────────────────────────────────────────────────
@@ -120,14 +127,14 @@ vi.mock('$lib/services/couchdb-client.js', () => ({
 	},
 }));
 vi.mock('$lib/server/observability/langfuse.js', () => ({
-	traceLLM: vi.fn(async (_name: string, _meta: any, fn: any) => fn({ end: vi.fn() })),
-	traceEmbedding: vi.fn(async (_name: string, _meta: any, fn: any) => fn({ end: vi.fn() })),
-	traceCouchDB: vi.fn(async (_name: string, _db: string, fn: any) => fn()),
+  traceLLM: vi.fn(async (_name: string, _meta: any, fn: any) => fn({ end: vi.fn() })),
+  traceEmbedding: vi.fn(async (_name: string, _meta: any, fn: any) => fn({ end: vi.fn() })),
+  traceCouchDB: vi.fn(async (_name: string, _db: string, fn: any) => fn()),
+  traceGraph: vi.fn(async (_name: string, _meta: any, fn: any) => fn()),
+  traceCache: vi.fn(async (_name: string, _meta: any, fn: any) => fn()),
+  tracePolicy: vi.fn(async (_name: string, _meta: any, fn: any) => fn()),
+  traceVectorSearch: vi.fn(async (_name: string, _meta: any, fn: any) => fn({ end: vi.fn() })),
 }));
-
-// ─────────────────────────────────────────────────────────────────────────
-// Tests
-// ─────────────────────────────────────────────────────────────────────────
 
 describe('Graph-informed retrieval path wiring', () => {
 	beforeEach(() => {

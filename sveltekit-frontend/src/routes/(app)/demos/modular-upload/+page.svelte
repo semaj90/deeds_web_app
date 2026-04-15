@@ -9,7 +9,6 @@
 		log = [`[${new Date().toLocaleTimeString()}] ${msg}`, ...log].slice(0, 20);
 	}
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

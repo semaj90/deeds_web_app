@@ -7,7 +7,6 @@
 	let checked1 = $state(false);
 	let checked2 = $state(true);
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

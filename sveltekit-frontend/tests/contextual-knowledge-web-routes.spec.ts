@@ -26,6 +26,12 @@ const mockRedis = {
 	del: vi.fn(async (key: string) => { delete mockRedisStore[key]; }),
 	setex: vi.fn(async (k: string, _ttl: number, v: string) => { mockRedisStore[k] = v; }),
 };
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$lib/server/redis.js', () => ({
 	getRedis: () => mockRedis,
 	redis: mockRedis,
@@ -82,6 +88,7 @@ const mockChain: any = {
 	[Symbol.iterator]: function* () { yield* mockDbRows; },
 };
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => mockChain),
 		execute: vi.fn(async () => ({ rows: [] })),

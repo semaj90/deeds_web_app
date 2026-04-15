@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PhoenixProsecutorDashboard from '$lib/components/yorha/PhoenixProsecutorDashboard.svelte';
-	export const ssr = false;
 </script>
 
 <div class="p-4">

@@ -15,7 +15,6 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import WebGPUTextureStreamingDemo from '$lib/components/evidence/WebGPUTextureStreamingDemo.svelte';
 
-	export const ssr = false;
 
 	let activeModule = $state<'som' | 'texture' | 'lod' | 'all'>('all');
 	let somInitialized = $state(false);

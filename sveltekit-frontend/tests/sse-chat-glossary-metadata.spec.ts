@@ -22,6 +22,12 @@ const mockGenerateCorrectionPrompt = vi.fn();
 const mockLoadCodebaseContext = vi.fn();
 const mockGetGraphContext = vi.fn();
 
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -33,6 +39,7 @@ vi.mock('$lib/server/env.server.js', () => ({
 }));
 
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
   db: {
     insert: mockInsert,
     select: mockSelect,

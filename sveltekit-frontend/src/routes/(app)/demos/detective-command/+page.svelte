@@ -1,6 +1,5 @@
 <script lang="ts">
 	import YoRHaDetectiveCommandCenter from '$lib/components/yorha/YoRHaDetectiveCommandCenter.svelte';
-	export const ssr = false;
 </script>
 
 <div class="p-4">

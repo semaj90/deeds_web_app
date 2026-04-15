@@ -11,7 +11,6 @@
 		byStatus: { active: 142, inactive: 68, archived: 37 }
 	};
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-3xl mx-auto">

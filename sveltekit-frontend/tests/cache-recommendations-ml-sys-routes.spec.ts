@@ -70,6 +70,12 @@ const redisMock = {
 	zremrangebyrank: vi.fn(async () => 0),
 };
 
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$lib/server/redis.js', () => ({
 	redis: redisMock,
 	getRedis: () => redisMock,
@@ -89,6 +95,7 @@ const mockChain = {
 	[Symbol.iterator]: function* () { yield* mockDbRows; },
 };
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
 	db: {
 		select: vi.fn(() => mockChain),
 		execute: vi.fn(async () => mockDbRows),

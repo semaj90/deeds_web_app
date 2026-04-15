@@ -4,7 +4,6 @@
 
 	let activeTab = $state<'ui' | 'superforms'>('ui');
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-3xl mx-auto">

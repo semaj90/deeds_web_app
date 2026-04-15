@@ -14,6 +14,7 @@ vi.mock('$lib/server/db', () => ({
 }));
 
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
   db: {
     execute: mockDbExecute,
   },

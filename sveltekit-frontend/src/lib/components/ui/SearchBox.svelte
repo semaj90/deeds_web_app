@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as env from '$env/static/public';
+	import * as publicEnv from '$env/static/public';
 
 	interface Props {
 		placeholder?: string;
@@ -21,7 +21,7 @@
 	let isExpanded = $state(false);
 	let searchInput: HTMLInputElement | null = null;
 
-	const API_BASE = (env.PUBLIC_API_BASE ?? '').replace(/\/$/, '');
+	const API_BASE = ((publicEnv as Record<string, string>)['PUBLIC_API_URL'] ?? '').replace(/\/$/, '');
 
 	async function performSearch() {
 		if (!query?.trim() || query.length < 2) {

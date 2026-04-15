@@ -1,7 +1,6 @@
 <script lang="ts">
 	import LegalAILayout from '$lib/components/legal-ai/LegalAILayout.svelte';
 
-	export const ssr = false;
 </script>
 
 <LegalAILayout title="Legal AI Workspace" subtitle="3-column layout with nav rail, main content, and system status panel">

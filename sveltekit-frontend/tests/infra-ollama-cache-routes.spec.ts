@@ -16,6 +16,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ── Mocks ──────────────────────────────────────────────────────
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -52,6 +58,7 @@ const mockSelectChain = (data: unknown[] = []) => {
 };
 
 vi.mock('$lib/server/db/client', () => ({
+  pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
   db: {
     select: vi.fn(() => mockSelectChain()),
     execute: (...args: unknown[]) => mockExecute(...args),
@@ -273,7 +280,7 @@ describe('/api/infrastructure/status (GET)', () => {
   });
 
   it('returns infrastructure status overview', async () => {
-    const res = await GET({ locals: authedLocals });
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.tiers).toBeDefined();
@@ -292,7 +299,7 @@ describe('/api/infrastructure/status (GET)', () => {
   });
 
   it('includes GPU information', async () => {
-    const res = await GET({ locals: authedLocals });
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
     const data = await res.json();
     expect(data.gpu.cudaAddon).toBe(false);
     expect(data.gpu.leaseFree).toBe(true);
@@ -300,21 +307,21 @@ describe('/api/infrastructure/status (GET)', () => {
   });
 
   it('includes runtime config', async () => {
-    const res = await GET({ locals: authedLocals });
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
     const data = await res.json();
     expect(data.runtimeConfig.maxOldSpaceSize).toBe(4096);
     expect(data.runtimeConfig.wasmSimd).toBe(true);
   });
 
   it('includes service statuses', async () => {
-    const res = await GET({ locals: authedLocals });
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
     const data = await res.json();
     expect(data.services.redis).toBe(true);
     expect(data.services.postgres).toBe(true);
   });
 
   it('includes cache and queue stats', async () => {
-    const res = await GET({ locals: authedLocals });
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
     const data = await res.json();
     expect(data.cache.redis).toBeDefined();
     expect(data.queues).toBeDefined();
@@ -322,7 +329,7 @@ describe('/api/infrastructure/status (GET)', () => {
   });
 
   it('sets Cache-Control header', async () => {
-    const res = await GET({ locals: authedLocals });
+    const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
     expect(res.headers.get('Cache-Control')).toContain('max-age=15');
   });
 });
@@ -351,12 +358,12 @@ describe('/api/dashboard/stats (GET)', () => {
 	});
 
 	it('returns 401 when unauthenticated', async () => {
-		const res = await GET({ locals: anonLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('returns dashboard statistics', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.activeCases).toBeDefined();
@@ -368,7 +375,7 @@ describe('/api/dashboard/stats (GET)', () => {
 	});
 
 	it('returns numeric values', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(typeof data.activeCases).toBe('number');
 		expect(typeof data.totalEvidence).toBe('number');
@@ -436,22 +443,22 @@ describe('/api/ollama/pull (GET/POST)', () => {
 
 	// GET
 	it('GET returns 401 when unauthenticated', async () => {
-		const res = await GET({ locals: anonLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('GET returns service info', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.service).toBe('ollama');
-		expect(data.model).toBe('gemma3-legal');
+		expect(data.model).toBe('gemma4-legal');
 		expect(data.url).toBe('http://ollama.test');
 	});
 
 	// POST
 	it('POST returns 401 when unauthenticated', async () => {
-		const res = await POST({ request: mkRequest({ model: 'gemma3-legal' }), locals: anonLocals });
+		const res = await POST({ request: mkRequest({ model: 'gemma4-legal' }), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
@@ -466,7 +473,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
 	});
 
 	it('POST pulls model successfully', async () => {
-		const res = await POST({ request: mkRequest({ model: 'gemma3-legal' }), locals: authedLocals });
+		const res = await POST({ request: mkRequest({ model: 'gemma4-legal' }), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.ok).toBe(true);
@@ -490,7 +497,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
 	it('POST returns 500 on fetch error', async () => {
 		vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('Connection refused'); }));
 
-		const res = await POST({ request: mkRequest({ model: 'gemma3-legal' }), locals: authedLocals });
+		const res = await POST({ request: mkRequest({ model: 'gemma4-legal' }), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(500);
 		expect(data.ok).toBe(false);
@@ -527,7 +534,7 @@ describe('/api/ollama/generate (POST)', () => {
 		mockOllamaFetch.mockResolvedValueOnce({
 			ok: true,
 			body: null,
-			json: async () => ({ response: 'Legal analysis complete.', model: 'gemma3-legal:latest', done: true }),
+			json: async () => ({ response: 'Legal analysis complete.', model: 'gemma4-legal:latest', done: true }),
 		});
 
 		const res = await POST({
@@ -560,17 +567,17 @@ describe('/api/ollama/generate (POST)', () => {
 		mockOllamaFetch.mockResolvedValueOnce({
 			ok: true,
 			body: null,
-			json: async () => ({ response: 'done', model: 'gemma3-legal:latest' }),
+			json: async () => ({ response: 'done', model: 'gemma4-legal:latest' }),
 		});
 
 		await POST({
-			request: mkRequest({ prompt: 'test', model: 'gemma3-legal', stream: false }),
+			request: mkRequest({ prompt: 'test', model: 'gemma4-legal', stream: false }),
 			locals: authedLocals,
 		});
 
 		expect(mockOllamaFetch).toHaveBeenCalledOnce();
 		const callBody = JSON.parse((mockOllamaFetch.mock.calls[0] as any[])[1].body);
-		expect(callBody.model).toBe('gemma3-legal:latest');
+		expect(callBody.model).toBe('gemma4-legal:latest');
 	});
 
 	it('returns 503 when Ollama fails', async () => {
@@ -614,12 +621,12 @@ describe('/api/cache/stats (GET)', () => {
 	});
 
 	it('returns 401 when unauthenticated', async () => {
-		const res = await GET({ locals: anonLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('returns cache statistics', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(true);
@@ -633,7 +640,7 @@ describe('/api/cache/stats (GET)', () => {
 	});
 
 	it('returns LLM hit rate', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(data.data.llm.hits).toBe(1000);
 		expect(data.data.llm.misses).toBe(200);
@@ -649,7 +656,7 @@ describe('/api/cache/stats (GET)', () => {
 			info: vi.fn(async () => { throw new Error('Redis down'); }),
 		});
 
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		// Route returns fallback data with success: false
 		expect(data.data.redis.connected).toBe(false);
@@ -789,7 +796,7 @@ describe('/api/case-theory (POST)', () => {
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(true);
 		expect(data.plan.masterTheory).toBeTruthy();
-		expect(data.metadata.model).toBe('gemma3-legal:latest');
+		expect(data.metadata.model).toBe('gemma4-legal:latest');
 	});
 
 	it('returns 422 when LLM returns non-JSON', async () => {
@@ -855,12 +862,12 @@ describe('/api/consolidation/status (GET)', () => {
 	});
 
 	it('returns 401 when unauthenticated', async () => {
-		const res = await GET({ locals: anonLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: anonLocals });
 		expect(res.status).toBe(401);
 	});
 
 	it('returns consolidation status', async () => {
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.status).toBe('complete');
@@ -877,7 +884,7 @@ describe('/api/consolidation/status (GET)', () => {
 			})),
 		}));
 
-		const res = await GET({ locals: authedLocals });
+		const res = await GET({ request: new Request('http://localhost'), locals: authedLocals });
 		const data = await res.json();
 		expect(res.status).toBe(200); // graceful degradation
 		expect(data.status).toBe('complete');

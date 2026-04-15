@@ -1,6 +1,5 @@
 <script lang="ts">
 	import EnhancedFileUpload from '$lib/components/ai/EnhancedFileUpload.svelte';
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-3xl mx-auto">

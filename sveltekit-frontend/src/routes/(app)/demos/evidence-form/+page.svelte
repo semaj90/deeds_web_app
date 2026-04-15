@@ -1,7 +1,6 @@
 <script lang="ts">
 	import EvidenceForm from '$lib/components/forms/EvidenceForm.svelte';
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-2xl mx-auto">

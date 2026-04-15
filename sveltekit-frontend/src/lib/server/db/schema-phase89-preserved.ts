@@ -7,7 +7,17 @@
  * DO NOT DELETE - Contains ~1.2 million records of error analysis data
  */
 
-import { pgTable, text, integer, timestamp, jsonb, boolean, doublePrecision, uuid, serial, varchar } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  integer,
+  timestamp,
+  jsonb,
+  boolean,
+  uuid,
+  serial,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 // ============================================================

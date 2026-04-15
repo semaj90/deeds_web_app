@@ -2,6 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGetAceIngestJob = vi.fn();
 
+vi.mock('$lib/server/middleware/cache-headers.js', () => ({
+  cacheControl: { private: {}, public: {} },
+  checkETag: () => ({ etag: '"test"', isMatch: false }),
+  notModified: () => new Response(null, { status: 304 }),
+}));
+
 vi.mock('$lib/server/ace-ingest-progress.js', () => ({
   getAceIngestJob: mockGetAceIngestJob,
 }));
@@ -16,7 +22,7 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status?jobId=job-1'),
-      locals: {},
+      request: new Request('http://localhost'), locals: {},
     } as never);
 
     const body = await response.json();
@@ -31,7 +37,7 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status'),
-      locals: {
+      request: new Request('http://localhost'), locals: {
         user: { id: 'user-1' },
       },
     } as never);
@@ -50,7 +56,7 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status?jobId=missing-job'),
-      locals: {
+      request: new Request('http://localhost'), locals: {
         user: { id: 'user-1' },
       },
     } as never);
@@ -81,7 +87,7 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status?jobId=job-1'),
-      locals: {
+      request: new Request('http://localhost'), locals: {
         user: { id: 'user-1' },
       },
     } as never);
@@ -127,7 +133,7 @@ describe('/api/ace/status route', () => {
 
     const response = await GET({
       url: new URL('http://localhost/api/ace/status?jobId=job-1'),
-      locals: {
+      request: new Request('http://localhost'), locals: {
         user: { id: 'user-1' },
       },
     } as never);

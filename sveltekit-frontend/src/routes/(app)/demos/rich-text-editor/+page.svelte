@@ -7,7 +7,6 @@
 	let fullContent = $state('<h2>Full TipTap Editor</h2><p>This editor has a <em>full toolbar</em>, markdown export, and content/JSON modes.</p>');
 	let activeTab = $state<'compact' | 'full'>('compact');
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-4xl mx-auto">

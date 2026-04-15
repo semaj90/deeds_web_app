@@ -16,7 +16,7 @@ const mockOllamaFetch = vi.fn(async () =>
 	new Response(JSON.stringify({
 		message: { content: 'Mock LLM response' },
 		response: 'Mock LLM response',
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		embedding: new Array(768).fill(0.01),
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } })
 );
@@ -183,7 +183,7 @@ describe('/api/ai/ask (POST)', () => {
 	it('returns answer for question', async () => {
 		mockOllamaFetch.mockResolvedValueOnce(new Response(JSON.stringify({
 			message: { content: 'Contract law requires consideration.' },
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 		}), { status: 200, headers: { 'Content-Type': 'application/json' } }));
 		const { POST } = await import('../src/routes/api/ai/ask/+server.js');
 		const res = await POST(makeEvent('POST', 'http://localhost/api/ai/ask', {
@@ -191,7 +191,7 @@ describe('/api/ai/ask (POST)', () => {
 		}) as any);
 		const data = await jsonBody(res);
 		expect(data.answer).toBe('Contract law requires consideration.');
-		expect(data.model).toBe('gemma3-legal:latest');
+		expect(data.model).toBe('gemma4-legal:latest');
 	});
 
 	it('accepts query or prompt fields', async () => {
@@ -237,7 +237,7 @@ describe('/api/ai/summarize (POST)', () => {
 	it('summarizes text', async () => {
 		mockOllamaFetch.mockResolvedValueOnce(new Response(JSON.stringify({
 			message: { content: 'The contract establishes obligations between parties.' },
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 		}), { status: 200, headers: { 'Content-Type': 'application/json' } }));
 		const { POST } = await import('../src/routes/api/ai/summarize/+server.js');
 		const res = await POST(makeEvent('POST', 'http://localhost/api/ai/summarize', {
@@ -302,7 +302,7 @@ describe('/api/ai/stats (GET)', () => {
 		const { GET } = await import('../src/routes/api/ai/stats/+server.js');
 		// Mock global fetch for Ollama /api/tags
 		const mockFetch = vi.fn(async () => new Response(JSON.stringify({
-			models: [{ name: 'gemma3-legal:latest' }, { name: 'embeddinggemma:latest' }],
+			models: [{ name: 'gemma4-legal:latest' }, { name: 'embeddinggemma:latest' }],
 		}), { status: 200, headers: { 'Content-Type': 'application/json' } }));
 		const origFetch = globalThis.fetch;
 		globalThis.fetch = mockFetch;
@@ -368,7 +368,7 @@ describe('/api/ai/legal-research (POST)', () => {
 	it('returns research results', async () => {
 		mockOllamaFetch.mockResolvedValueOnce(new Response(JSON.stringify({
 			message: { content: 'Summary of contract law research...' },
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 		}), { status: 200, headers: { 'Content-Type': 'application/json' } }));
 		const { POST } = await import('../src/routes/api/ai/legal-research/+server.js');
 		const res = await POST(makeEvent('POST', 'http://localhost/api/ai/legal-research', {

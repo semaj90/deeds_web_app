@@ -10,7 +10,6 @@
 		{ id: '4', role: 'assistant' as const, content: 'Key cases include Meinhard v. Salmon (1928) establishing the "punctilio of an honor" standard, and In re Walt Disney Co. Derivative Litigation (2006) clarifying the business judgment rule in the context of fiduciary duties.', timestamp: new Date(), confidence: 0.87 },
 	];
 
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-3xl mx-auto">

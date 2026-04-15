@@ -1,7 +1,6 @@
 <script lang="ts">
 	import ChatPanel from '$lib/components/ChatPanel.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
-	export const ssr = false;
 </script>
 
 <div class="p-6 max-w-3xl mx-auto">
