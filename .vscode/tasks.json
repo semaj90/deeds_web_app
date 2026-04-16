@@ -1568,6 +1568,178 @@
       "problemMatcher": []
     },
     // ============================================
+    // TurboQuant — llama-server with turbo3 KV quantization
+    // 2× faster than Ollama, legal fine-tune preserved, port 8090
+    // ============================================
+    {
+      "label": "⚡ TurboQuant: Start (text-only, :8090)",
+      "type": "shell",
+      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096 --log-disable",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Start gemma4-legal with TurboQuant turbo3 KV cache (3-4 bit, 2× speedup, 3.4 GB VRAM) on :8090"
+    },
+    {
+      "label": "⚡ TurboQuant: Start (vision + text, :8090)",
+      "type": "shell",
+      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Start gemma4-legal + mmproj VLM with TurboQuant turbo3 KV cache (5.8 GB VRAM, text + vision) on :8090"
+    },
+    {
+      "label": "⚡ TurboQuant: Health Check",
+      "type": "shell",
+      "command": "curl -s http://localhost:8090/health | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Verify TurboQuant server is ready on :8090"
+    },
+    {
+      "label": "⚡ TurboQuant: Test Inference (hearsay query)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:8090/v1/chat/completions -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-legal\\\",\\\"messages\\\":[{\\\"role\\\":\\\"user\\\",\\\"content\\\":\\\"What is hearsay evidence? Answer in 2 sentences.\\\"}],\\\"max_tokens\\\":120,\\\"temperature\\\":0.3}\" | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Send a test legal query to TurboQuant — expect ~15-20s cold, <100ms on Redis L1 cache hit"
+    },
+    {
+      "label": "⚡ TurboQuant: Cache Validation (3-run cold→warm→hot)",
+      "type": "shell",
+      "command": "node scripts/tests/test-cache-simple.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run 3-tier cache validation: TurboQuant cold (~17s) → Bifrost L2 (~3-5s) → Redis L1 (<100ms). Expects 170-340× speedup."
+    },
+    // ============================================
+    // LangGraph Synthesis Service (Docker GPU)
+    // RAG → KAG → LangGraph DAG → Gemma4-legal
+    // Port 8091 | docker compose --profile gpu
+    // ============================================
+    {
+      "label": "🧠 LangGraph: Build + Start (Docker GPU)",
+      "type": "shell",
+      "command": "docker compose --profile gpu up -d --build langgraph-synthesis",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Build and start LangGraph synthesis service with CUDA GPU access on :8091"
+    },
+    {
+      "label": "🧠 LangGraph: Start (no rebuild)",
+      "type": "shell",
+      "command": "docker compose --profile gpu up -d langgraph-synthesis",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Start LangGraph synthesis service (existing image) on :8091"
+    },
+    {
+      "label": "🧠 LangGraph: Stop",
+      "type": "shell",
+      "command": "docker compose stop langgraph-synthesis",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Stop LangGraph synthesis container (data preserved)"
+    },
+    {
+      "label": "🧠 LangGraph: Health Check",
+      "type": "shell",
+      "command": "curl -s http://localhost:8091/health | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Check LangGraph service health (GPU status, Qdrant, Ollama connectivity)"
+    },
+    {
+      "label": "🧠 LangGraph: Test Synthesis Query",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:8091/synthesize -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"What are the elements of a breach of contract claim under California law?\\\"}\" | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run a full RAG+KAG+LLM synthesis pipeline test against the LangGraph service"
+    },
+    {
+      "label": "🧠 LangGraph: Logs (follow)",
+      "type": "shell",
+      "command": "docker compose logs -f langgraph-synthesis",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Follow LangGraph synthesis service logs (GPU usage, pipeline stages, errors)"
+    },
+    // ============================================
     // Qdrant Codebase Indexing + Semantic Search
     // ============================================
     {
