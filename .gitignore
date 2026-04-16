@@ -516,7 +516,10 @@ test.db
 ########################################
 # LLM models & weight directories
 ########################################
-models/
+# Root-scoped: only ignore /models/ at repo root (NOT src/routes/api/ai/models/ or src/lib/models/)
+/models/
+# Explicit sub-paths that must stay ignored
+sveltekit-frontend/models/
 local-llms/
 llm-models/
 local-models/
