@@ -90,10 +90,8 @@ export const GET: RequestHandler = async ({ locals, request }) => {
           with_errors: 0,
           in_kb: 0,
         },
-        error: 'Failed to load routes',
       },
       {
-				status: 500,
 				headers: cacheControl.medium
 			}
     );

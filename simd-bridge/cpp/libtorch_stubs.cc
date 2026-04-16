@@ -39,4 +39,13 @@ extern "C" int bridge_relu(const float*, float*, int) {
     return -99;
 }
 
+// pytorch_graph.cc stubs
+extern "C" int pageRankGPU(const float*, int, float, int, float*, int) { return -99; }
+extern "C" int attentionScoreGPU(const float*, int, const float*, int, float*, int) { return -99; }
+extern "C" int rewardScoreGPU(const float*, const float*, int, int, float*, int) { return -99; }
+extern "C" int softmaxGPU(const float*, int, float*, int) { return -99; }
+extern "C" int topKIndicesGPU(const float*, int, int, int*, int) { return -99; }
+extern "C" int kmeansWithCentroids(const float*, int, int, int, int, int*, int, float*, int) { return -99; }
+extern "C" int trainSOM(const float*, int, int, int, int, int, float, float, float, float, float*, int, int*, int) { return -99; }
+
 #endif

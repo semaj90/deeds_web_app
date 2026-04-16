@@ -24,6 +24,11 @@ import {
 	isCudaAvailable,
 	getCudaMemoryInfo,
 } from '$lib/server/gpu/libtorch-bridge.js';
+import {
+	pageRankGPU,
+	kmeansWithCentroids as kmeansGPU,
+	attentionScoreGPU,
+} from '$lib/server/gpu/pytorch-graph.js';
 import { couchdb } from '$lib/services/couchdb-client.js';
 import { createHash } from 'crypto';
 
@@ -38,6 +43,7 @@ export interface GraphAnalysisRequest {
 	clusterCount?: number;
 	halfPrecision?: boolean;
 	maxNodes?: number;
+	attentionQuery?: number[];
 }
 
 export interface PageRankResult {
@@ -63,6 +69,8 @@ export interface GraphAnalysisResult {
 		k: number;
 		source: 'gpu' | 'cpu';
 		assignments: Array<{ nodeId: string; label: string; cluster: number }>;
+		centroids?: Array<{ cluster: number; vector: number[] }>;
+		attentionWeights?: number[];
 	};
 	similarityMatrix?: {
 		source: 'gpu' | 'cpu';
@@ -384,9 +392,54 @@ export async function analyzeGraph(req: GraphAnalysisRequest): Promise<GraphAnal
 		durationMs: 0,
 	};
 
-	// 3. PageRank
+	// 3. PageRank — GPU-first, CPU fallback when GPU fails or graph too large
 	if (req.includePageRank !== false) {
-		result.pageRank = computePageRank(nodes, edges);
+		const n = nodes.length;
+		let pageRankSource: 'gpu' | 'cpu' = 'cpu';
+		let pageRankScores: number[] | null = null;
+
+		if (n > 0 && n <= 2000) {
+			try {
+				// Build adjacency matrix as Float32Array (row-major, n×n)
+				const nodeIndex = new Map<string, number>();
+				nodes.forEach((node, i) => nodeIndex.set(node.nodeId, i));
+
+				const adjMatrix = new Float32Array(n * n);
+				for (const edge of edges) {
+					const fromIdx = nodeIndex.get(edge.from);
+					const toIdx = nodeIndex.get(edge.to);
+					if (fromIdx !== undefined && toIdx !== undefined) {
+						adjMatrix[fromIdx * n + toIdx] = 1;
+					}
+				}
+
+				const gpuResult = pageRankGPU(adjMatrix, n, 0.85, 50);
+				if (gpuResult.scores.length === n) {
+					pageRankScores = Array.from(gpuResult.scores);
+					pageRankSource = gpuResult.source;
+				}
+			} catch (err) {
+				console.warn('[gpu-graph-analysis] GPU PageRank failed, falling back to CPU:', (err as Error)?.message);
+			}
+		}
+
+		if (pageRankScores) {
+			// Normalise to [0, 1] and attach source label
+			const maxScore = Math.max(...pageRankScores);
+			const normalised = maxScore > 0 ? pageRankScores.map((s) => s / maxScore) : pageRankScores;
+			result.pageRank = nodes
+				.map((node, i) => ({
+					nodeId: node.nodeId,
+					label: node.label,
+					title: node.title,
+					score: Math.round(normalised[i] * 10000) / 10000,
+					source: pageRankSource,
+				}))
+				.sort((a, b) => b.score - a.score) as PageRankResult[];
+		} else {
+			// CPU fallback
+			result.pageRank = computePageRank(nodes, edges);
+		}
 	}
 
 	// 4. Community detection
@@ -406,21 +459,51 @@ export async function analyzeGraph(req: GraphAnalysisRequest): Promise<GraphAnal
 			if (evidenceNodeIds.length >= 2) {
 				const embeddings = await fetchNodeEmbeddings(ENV.QDRANT_URL, evidenceNodeIds);
 				if (embeddings.length >= 2) {
-					const k = req.clusterCount ?? Math.min(8, Math.ceil(embeddings.length / 3));
-					const clusterResult = await clusterEmbeddings(
-						embeddings.map((e) => e.vector),
-						k
-					);
+					const n_emb = embeddings.length;
+					const dim = embeddings[0].vector.length;
+					const k = req.clusterCount ?? Math.min(8, Math.ceil(n_emb / 3));
+
+					// Flatten to Float32Array (n × dim, row-major) for kmeansGPU
+					const flatVectors = new Float32Array(n_emb * dim);
+					for (let i = 0; i < n_emb; i++) {
+						const v = embeddings[i].vector;
+						for (let d = 0; d < dim; d++) flatVectors[i * dim + d] = v[d] ?? 0;
+					}
+
+					// kmeansGPU(embeddings, n, dim, k, maxIters?) → { assignments: Int32Array, centroids: Float32Array, source }
+					const kmeansResult = kmeansGPU(flatVectors, n_emb, dim, k);
+
+					// Unpack centroids: Float32Array[k×dim] → Array<{ cluster, vector }>
+					const centroids: Array<{ cluster: number; vector: number[] }> = [];
+					for (let ci = 0; ci < k; ci++) {
+						centroids.push({
+							cluster: ci,
+							vector: Array.from(kmeansResult.centroids.subarray(ci * dim, (ci + 1) * dim)),
+						});
+					}
 
 					result.gpuClusters = {
-						k: clusterResult.k,
-						source: clusterResult.source,
-						assignments: clusterResult.assignments.map((cluster, i) => ({
+						k,
+						source: kmeansResult.source,
+						assignments: Array.from(kmeansResult.assignments).map((cluster, i) => ({
 							nodeId: embeddings[i]?.nodeId ?? '',
 							label: embeddings[i]?.label ?? '',
 							cluster,
 						})),
+						centroids,
 					};
+
+					// Attention re-ranking of clusters if a query vector is provided
+					if (req.attentionQuery && req.attentionQuery.length === dim && centroids.length > 0) {
+						try {
+							const queryVec = new Float32Array(req.attentionQuery);
+							const centroidMatrix = kmeansResult.centroids; // already k×dim Float32Array
+							const attnResult = attentionScoreGPU(queryVec, dim, centroidMatrix, k);
+							result.gpuClusters.attentionWeights = Array.from(attnResult.weights);
+						} catch (attnErr) {
+							console.warn('[gpu-graph-analysis] attentionScoreGPU failed:', (attnErr as Error)?.message);
+						}
+					}
 				}
 			}
 		} catch (err) {

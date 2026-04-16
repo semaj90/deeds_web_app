@@ -97,9 +97,9 @@ if(EXISTS "${SIMDJSON_SRC}")
   list(APPEND ADDON_SOURCES vendor/simdjson.cpp)
 endif()
 
-# Add libtorch_graph.cc if LibTorch available, otherwise stubs
+# Add libtorch_graph.cc + pytorch_graph.cc if LibTorch available, otherwise stubs
 if(Torch_FOUND)
-  list(APPEND ADDON_SOURCES libtorch_graph.cc)
+  list(APPEND ADDON_SOURCES libtorch_graph.cc pytorch_graph.cc)
 else()
   list(APPEND ADDON_SOURCES libtorch_stubs.cc)
 endif()

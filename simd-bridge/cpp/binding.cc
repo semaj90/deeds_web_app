@@ -44,6 +44,7 @@ napi_status napi_set_named_property(napi_env, napi_value, const char*, napi_valu
 napi_status napi_get_typedarray_info(napi_env, napi_value, napi_typedarray_type*, size_t*, void**, napi_value*, size_t*);
 napi_status napi_create_typedarray(napi_env, napi_typedarray_type, size_t, napi_value, size_t, napi_value*);
 napi_status napi_create_arraybuffer(napi_env, size_t, void**, napi_value*);
+napi_status napi_create_object(napi_env, napi_value*);
 }
 
 #ifndef NAPI_MODULE
@@ -56,6 +57,20 @@ napi_status napi_create_arraybuffer(napi_env, size_t, void**, napi_value*);
 
 // External C functions from other compilation units
 extern "C" int bridgeSIMDToTensorRT(const char* json);
+
+// pytorch_graph.cc (pageRank, attention, reward, softmax, topK, kMeans, SOM)
+extern "C" int pageRankGPU(const float* adj, int n, float damping, int iters, float* out, int out_len);
+extern "C" int attentionScoreGPU(const float* query, int dim, const float* keys, int n, float* out, int out_len);
+extern "C" int rewardScoreGPU(const float* gen, const float* ref, int n, int dim, float* out, int out_len);
+extern "C" int softmaxGPU(const float* logits, int n, float* out, int out_len);
+extern "C" int topKIndicesGPU(const float* scores, int n, int k, int* out, int out_len);
+extern "C" int kmeansWithCentroids(const float* embeddings, int n, int dim, int k, int max_iters,
+                                    int* assignments_out, int assignments_len,
+                                    float* centroids_out, int centroids_len);
+extern "C" int trainSOM(const float* data, int n, int dim, int grid_w, int grid_h,
+                         int iters, float lr_init, float lr_final,
+                         float radius_init, float radius_final,
+                         float* weights_out, int weights_len, int* bmu_out, int bmu_len);
 
 // LibTorch graph analysis (libtorch_graph.cc)
 extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* output, int output_len);
@@ -501,6 +516,197 @@ static napi_value GraphSimilarityHalfWrapper(napi_env env, napi_callback_info in
   return result;
 }
 
+// ── PageRankGPU(Float32Array adj, n, damping, iters) → Float32Array[n] ──────
+
+static napi_value PageRankGPUWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4; napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 4) return throw_type_error(env, "pageRankGPU(Float32Array adj, n, damping, iters)");
+  void* adj_data; size_t adj_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &adj_len, &adj_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[1], &n);
+  double damping_d; napi_get_value_double(env, argv[2], &damping_d); float damping = (float)damping_d;
+  int32_t iters; napi_get_value_int32(env, argv[3], &iters);
+  if (n <= 0 || (size_t)(n * n) > adj_len) return throw_type_error(env, "adj must have n*n elements");
+  void* out_data; napi_value ab;
+  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (pageRankGPU((const float*)adj_data, n, damping, iters, (float*)out_data, n) != 0)
+    return throw_error(env, "pageRankGPU failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, ab, 0, &result);
+  return result;
+}
+
+// ── AttentionScoreGPU(Float32Array query, dim, Float32Array keys, n) → Float32Array[n] ─
+
+static napi_value AttentionScoreGPUWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4; napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 4) return throw_type_error(env, "attentionScoreGPU(query, dim, keys, n)");
+  void* q_data; napi_get_typedarray_info(env, argv[0], nullptr, nullptr, &q_data, nullptr, nullptr);
+  int32_t dim; napi_get_value_int32(env, argv[1], &dim);
+  void* k_data; napi_get_typedarray_info(env, argv[2], nullptr, nullptr, &k_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[3], &n);
+  if (dim <= 0 || n <= 0) return throw_type_error(env, "dim and n must be positive");
+  void* out_data; napi_value ab;
+  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (attentionScoreGPU((const float*)q_data, dim, (const float*)k_data, n, (float*)out_data, n) != 0)
+    return throw_error(env, "attentionScoreGPU failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, ab, 0, &result);
+  return result;
+}
+
+// ── RewardScoreGPU(Float32Array gen, Float32Array ref, n, dim) → Float32Array[n] ─
+
+static napi_value RewardScoreGPUWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4; napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 4) return throw_type_error(env, "rewardScoreGPU(gen, ref, n, dim)");
+  void* g_data; napi_get_typedarray_info(env, argv[0], nullptr, nullptr, &g_data, nullptr, nullptr);
+  void* r_data; napi_get_typedarray_info(env, argv[1], nullptr, nullptr, &r_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[2], &n);
+  int32_t dim; napi_get_value_int32(env, argv[3], &dim);
+  if (n <= 0 || dim <= 0) return throw_type_error(env, "n and dim must be positive");
+  void* out_data; napi_value ab;
+  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (rewardScoreGPU((const float*)g_data, (const float*)r_data, n, dim, (float*)out_data, n) != 0)
+    return throw_error(env, "rewardScoreGPU failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, ab, 0, &result);
+  return result;
+}
+
+// ── SoftmaxGPU(Float32Array logits, n) → Float32Array[n] ────────────────────
+
+static napi_value SoftmaxGPUWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 2; napi_value argv[2];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 2) return throw_type_error(env, "softmaxGPU(Float32Array logits, n)");
+  void* in_data; size_t in_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &in_len, &in_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[1], &n);
+  if (n <= 0 || (size_t)n > in_len) return throw_type_error(env, "n exceeds array length");
+  void* out_data; napi_value ab;
+  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (softmaxGPU((const float*)in_data, n, (float*)out_data, n) != 0)
+    return throw_error(env, "softmaxGPU failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, ab, 0, &result);
+  return result;
+}
+
+// ── TopKIndicesGPU(Float32Array scores, n, k) → Int32Array[k] ───────────────
+
+static napi_value TopKIndicesGPUWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 3; napi_value argv[3];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 3) return throw_type_error(env, "topKIndicesGPU(Float32Array scores, n, k)");
+  void* s_data; size_t s_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &s_len, &s_data, nullptr, nullptr);
+  int32_t n; napi_get_value_int32(env, argv[1], &n);
+  int32_t k; napi_get_value_int32(env, argv[2], &k);
+  if (n <= 0 || k <= 0 || k > n || (size_t)n > s_len) return throw_type_error(env, "invalid n/k");
+  void* out_data; napi_value ab;
+  napi_create_arraybuffer(env, k * sizeof(int32_t), &out_data, &ab);
+  if (topKIndicesGPU((const float*)s_data, n, k, (int*)out_data, k) != 0)
+    return throw_error(env, "topKIndicesGPU failed");
+  napi_value result;
+  napi_create_typedarray(env, napi_int32_array, k, ab, 0, &result);
+  return result;
+}
+
+// ── KmeansWithCentroids(Float32Array embeddings, n, dim, k, maxIters) → { assignments: Int32Array[n], centroids: Float32Array[k*dim] } ─
+// Returns a Float32Array where the first n*sizeof(int32)/sizeof(float) elements encode
+// the Int32 assignments (reinterpreted), followed by k*dim centroid floats.
+// Simpler: we pack both into a single Float32Array output:
+//   [0 .. n-1]       = assignments cast to float (integer values)
+//   [n .. n+k*dim-1] = centroid float values
+// TypeScript unpacks with Int32Array.from() and Float32Array.subarray().
+
+static napi_value KmeansWithCentroidsWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 5; napi_value argv[5];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 5) return throw_type_error(env, "kmeansWithCentroids(Float32Array, n, dim, k, maxIters)");
+
+  void* emb_data; size_t emb_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &emb_len, &emb_data, nullptr, nullptr);
+  int32_t n, dim, k, max_iters;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &dim);
+  napi_get_value_int32(env, argv[3], &k);
+  napi_get_value_int32(env, argv[4], &max_iters);
+  if (n <= 0 || dim <= 0 || k <= 0 || (size_t)(n * dim) > emb_len)
+    return throw_type_error(env, "kmeansWithCentroids: invalid dimensions");
+
+  // Allocate assignments (int32) and centroids (float32) separately
+  void* a_data; napi_value a_ab;
+  napi_create_arraybuffer(env, (size_t)n * sizeof(int32_t), &a_data, &a_ab);
+  void* c_data; napi_value c_ab;
+  napi_create_arraybuffer(env, (size_t)k * dim * sizeof(float), &c_data, &c_ab);
+
+  int rc = kmeansWithCentroids((const float*)emb_data, n, dim, k, max_iters,
+                                (int*)a_data, n, (float*)c_data, k * dim);
+  if (rc < 0) return throw_error(env, "kmeansWithCentroids failed");
+
+  // Return [assignments: Int32Array, centroids: Float32Array] as a 2-element JS Array
+  napi_value assignments, centroids, result_arr;
+  napi_create_typedarray(env, napi_int32_array, (size_t)n, a_ab, 0, &assignments);
+  napi_create_typedarray(env, napi_float32_array, (size_t)(k * dim), c_ab, 0, &centroids);
+
+  // Build result object { assignments, centroids }
+  napi_value obj;
+  napi_env e = env;
+  napi_create_object(e, &obj);
+  napi_set_named_property(e, obj, "assignments", assignments);
+  napi_set_named_property(e, obj, "centroids", centroids);
+  return obj;
+}
+
+// ── TrainSOM(Float32Array data, n, dim, gridW, gridH, iters, lrInit, lrFinal, radInit, radFinal) ─
+// Returns { weights: Float32Array[gridW*gridH*dim], bmu: Int32Array[n] }
+
+static napi_value TrainSOMWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 10; napi_value argv[10];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 10) return throw_type_error(env, "trainSOM(data, n, dim, gridW, gridH, iters, lrInit, lrFinal, radInit, radFinal)");
+
+  void* data_ptr; size_t data_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &data_len, &data_ptr, nullptr, nullptr);
+  int32_t n, dim, grid_w, grid_h, iters;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &dim);
+  napi_get_value_int32(env, argv[3], &grid_w);
+  napi_get_value_int32(env, argv[4], &grid_h);
+  napi_get_value_int32(env, argv[5], &iters);
+  double lr_i_d, lr_f_d, r_i_d, r_f_d;
+  napi_get_value_double(env, argv[6], &lr_i_d);
+  napi_get_value_double(env, argv[7], &lr_f_d);
+  napi_get_value_double(env, argv[8], &r_i_d);
+  napi_get_value_double(env, argv[9], &r_f_d);
+  if (n <= 0 || dim <= 0 || grid_w <= 0 || grid_h <= 0 || iters <= 0)
+    return throw_type_error(env, "trainSOM: invalid dimensions");
+
+  const int neurons = grid_w * grid_h;
+  void* w_data; napi_value w_ab;
+  napi_create_arraybuffer(env, (size_t)neurons * dim * sizeof(float), &w_data, &w_ab);
+  void* b_data; napi_value b_ab;
+  napi_create_arraybuffer(env, (size_t)n * sizeof(int32_t), &b_data, &b_ab);
+
+  int rc = trainSOM((const float*)data_ptr, n, dim, grid_w, grid_h, iters,
+                     (float)lr_i_d, (float)lr_f_d, (float)r_i_d, (float)r_f_d,
+                     (float*)w_data, neurons * dim, (int*)b_data, n);
+  if (rc < 0) return throw_error(env, "trainSOM failed");
+
+  napi_value weights, bmu, obj;
+  napi_create_typedarray(env, napi_float32_array, (size_t)neurons * dim, w_ab, 0, &weights);
+  napi_create_typedarray(env, napi_int32_array,   (size_t)n,             b_ab, 0, &bmu);
+  napi_create_object(env, &obj);
+  napi_set_named_property(env, obj, "weights", weights);
+  napi_set_named_property(env, obj, "bmu",     bmu);
+  return obj;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -518,6 +724,14 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "getCudaMemory", GetCudaMemoryWrapper);
   registerFn(env, exports, "batchCosineSimilarity", BatchCosineSimilarityWrapper);
   registerFn(env, exports, "graphSimilarityHalf", GraphSimilarityHalfWrapper);
+  // pytorch_graph: graph analysis + ML ops
+  registerFn(env, exports, "pageRankGPU", PageRankGPUWrapper);
+  registerFn(env, exports, "attentionScoreGPU", AttentionScoreGPUWrapper);
+  registerFn(env, exports, "rewardScoreGPU", RewardScoreGPUWrapper);
+  registerFn(env, exports, "softmaxGPU", SoftmaxGPUWrapper);
+  registerFn(env, exports, "topKIndicesGPU", TopKIndicesGPUWrapper);
+  registerFn(env, exports, "kmeansWithCentroids", KmeansWithCentroidsWrapper);
+  registerFn(env, exports, "trainSOM", TrainSOMWrapper);
   // simdjson functions
   registerFn(env, exports, "simdJsonParse", RegisterSimdJsonParse);
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);

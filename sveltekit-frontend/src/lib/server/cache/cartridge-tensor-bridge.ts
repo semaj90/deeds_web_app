@@ -434,3 +434,97 @@ export async function invalidateGpuAnalysis(caseId: string): Promise<void> {
 		await redis.del(`${GPU_RESULT_PREFIX}${caseId}`);
 	} catch {}
 }
+
+// ── Staged 3-Pass Tensor Search ──────────────────────────────────────────────
+//
+// Operates on a ParsedCartridge (Redis-cached or freshly built).
+// Complements GlyphBridge.searchCartridge (which operates on raw GlyphRecord[]).
+//
+// Stage 1 — 4d manifold L2 prefilter     (CPU, ~4 ops/rune, eliminates 75%)
+// Stage 2 — attentionScoreGPU softmax    (GPU/CPU, cluster-local candidate set)
+// Stage 3 — rewardScoreGPU cosine rerank (GPU/CPU, GRPO-compatible final scores)
+
+export interface StagedSearchResult extends TensorSearchResult {
+  attnWeight: number;    // Stage 2 softmax attention weight
+  rewardScore: number;   // Stage 3 cosine reward score (final rank key)
+  stage1Rank: number;    // Original 4d-distance rank (for diagnostics)
+}
+
+/**
+ * 3-stage staged tensor search on a parsed CHR97 cartridge.
+ *
+ * @param queryVec   - 768-dim pre-embedded query (Float32Array)
+ * @param cartridge  - ParsedCartridge from getCachedCartridge / parseCartridge
+ * @param topK       - final result count (default 10)
+ * @param minReward  - minimum rewardScoreGPU threshold (default 0.25)
+ */
+export async function searchCartridgeStaged(
+  queryVec: Float32Array,
+  cartridge: { runes: Array<{ id: number; clusterId: number; manifold: [number,number,number,number] }>; tensors: Float32Array[] },
+  topK = 10,
+  minReward = 0.25
+): Promise<StagedSearchResult[]> {
+  const { runes, tensors } = cartridge;
+  if (tensors.length === 0 || runes.length !== tensors.length) return [];
+
+  const dim = queryVec.length;
+
+  // ── Stage 1: 4d manifold L2 prefilter ────────────────────────────────────
+  // Derive query topo from first 4 dims (matches chr97-builder manifold convention)
+  const q0 = queryVec[0], q1 = queryVec[1], q2 = queryVec[2], q3 = queryVec[3];
+  const preK = Math.min(runes.length, topK * 4);
+
+  const distanced = runes.map((rune, i) => {
+    const m = rune.manifold;
+    const d = (m[0]-q0)**2 + (m[1]-q1)**2 + (m[2]-q2)**2 + (m[3]-q3)**2;
+    return { idx: i, rune, tensor: tensors[i], dist4d: d };
+  });
+  distanced.sort((a, b) => a.dist4d - b.dist4d);
+  const stage1 = distanced.slice(0, preK);
+
+  // ── Stage 2: attentionScoreGPU on cluster-local tensors ──────────────────
+  const { attentionScoreGPU } = await import('$lib/server/gpu/pytorch-graph.js');
+  const keyMatrix = new Float32Array(stage1.length * dim);
+  for (let i = 0; i < stage1.length; i++) {
+    const t = stage1[i].tensor;
+    for (let d = 0; d < dim; d++) keyMatrix[i * dim + d] = t[d];
+  }
+
+  const { weights: attnWeights } = attentionScoreGPU(queryVec, dim, keyMatrix, stage1.length);
+
+  // Re-rank by attention weight → top 2×topK for final pass
+  const attended = stage1
+    .map((item, i) => ({ ...item, attnWeight: attnWeights[i] }))
+    .sort((a, b) => b.attnWeight - a.attnWeight)
+    .slice(0, topK * 2);
+
+  // ── Stage 3: rewardScoreGPU cosine final rerank ───────────────────────────
+  const { rewardScoreGPU } = await import('$lib/server/gpu/pytorch-graph.js');
+  const n = attended.length;
+
+  const genVecs = new Float32Array(n * dim); // candidate tensors
+  const refVecs = new Float32Array(n * dim); // query repeated n times
+  for (let i = 0; i < n; i++) {
+    const t = attended[i].tensor;
+    for (let d = 0; d < dim; d++) {
+      genVecs[i * dim + d] = t[d];
+      refVecs[i * dim + d] = queryVec[d];
+    }
+  }
+
+  const { scores: rewardScores } = rewardScoreGPU(genVecs, refVecs, n, dim);
+
+  return attended
+    .map((item, i) => ({
+      runeId: item.rune.id,
+      clusterId: item.rune.clusterId,
+      manifold: item.rune.manifold,
+      score: rewardScores[i],       // primary sort key
+      attnWeight: item.attnWeight,
+      rewardScore: rewardScores[i],
+      stage1Rank: stage1.indexOf(item),
+    }))
+    .filter(r => r.rewardScore >= minReward)
+    .sort((a, b) => b.rewardScore - a.rewardScore)
+    .slice(0, topK);
+}

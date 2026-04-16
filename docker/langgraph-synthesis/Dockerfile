@@ -1,19 +1,26 @@
-FROM nvidia/cuda:12.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
 
-# ── System deps ───────────────────────────────────────────────────────────────
+# ── System deps + Python 3.13 (deadsnakes PPA) ────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11 python3.11-dev python3-pip curl git \
-    libpq-dev libgomp1 && \
+    software-properties-common curl git libpq-dev libgomp1 && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    python3.13 python3.13-dev python3.13-venv && \
     rm -rf /var/lib/apt/lists/*
 
-RUN ln -sf /usr/bin/python3.11 /usr/bin/python3 && \
-    ln -sf /usr/bin/python3.11 /usr/bin/python
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.13
+
+RUN ln -sf /usr/bin/python3.13 /usr/bin/python3 && \
+    ln -sf /usr/bin/python3.13 /usr/bin/python
 
 WORKDIR /app
 
 # ── Python deps (cached layer) ────────────────────────────────────────────────
 COPY requirements.txt .
-RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cu121 -r requirements.txt
+RUN pip install --no-cache-dir \
+    --extra-index-url https://download.pytorch.org/whl/cu128 \
+    --extra-index-url https://pypi.nvidia.com \
+    -r requirements.txt
 
 # ── App ───────────────────────────────────────────────────────────────────────
 COPY app.py .

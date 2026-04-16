@@ -150,6 +150,7 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
       surfaceBreakdown: {},
       techBreakdown: {},
       lastIndexed: null,
+      _perf: { totalMs: 0, simdAvailable: false, parser: 'v8' },
     });
 	}
 };

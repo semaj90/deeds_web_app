@@ -1,30 +1,45 @@
 # LangGraph Synthesis Service
 # GPU-accelerated RAG → KAG → LangGraph DAG pipeline
 # Connects to: Ollama (:11434), Qdrant (:6333), Neo4j (:7687), PostgreSQL (:5432), RabbitMQ (:5672)
+#
+# Install (local Windows .venv, CUDA 12.8 — skip tensorrt-llm):
+#   pip install --extra-index-url https://download.pytorch.org/whl/cu128 \
+#     $(grep -v tensorrt-llm requirements.txt | grep -v '^#')
+#
+# Install (Docker, Linux):
+#   pip install --no-cache-dir \
+#     --extra-index-url https://download.pytorch.org/whl/cu128 \
+#     --extra-index-url https://pypi.nvidia.com \
+#     -r requirements.txt
 
 # ── LangChain + LangGraph ─────────────────────────────────────────────────────
-langchain==0.3.25
-langchain-community==0.3.24
-langchain-ollama==0.3.3
-langgraph==0.4.1
-langgraph-checkpoint==2.0.25
+langchain==1.2.3
+langchain-community==0.4.1
+langchain-ollama==1.0.1
+langgraph==1.0.5
+langgraph-checkpoint==3.0.1
 
 # ── Vector + DB clients ───────────────────────────────────────────────────────
-qdrant-client==1.14.3
-neo4j==5.29.0
+qdrant-client==1.15.1
+neo4j==5.28.3
 psycopg2-binary==2.9.10
+asyncpg==0.30.0              # async PostgreSQL — HMM evidence summary seeding at startup
 redis==5.3.0
 aio-pika==9.5.5          # RabbitMQ async
 
 # ── Embeddings / Inference ────────────────────────────────────────────────────
-ollama==0.4.8
+ollama>=0.6.0,<1.0.0
+numpy>=1.26.0             # HMM Viterbi tagger (LegalHMM) — also required by torch
 sentence-transformers==3.4.1
-torch==2.6.0+cu121       # LibTorch CUDA 12.1 (RTX 3060 Ti)
-torchvision==0.21.0+cu121
-torchaudio==0.21.0+cu121
+torch==2.7.0+cu128        # CUDA 12.8 — Python 3.13 compatible
+torchvision==0.22.0+cu128
+torchaudio==2.7.0+cu128
+
+# ── TensorRT-LLM (Linux/Docker only — Windows .venv: skip this line) ─────────
+tensorrt-llm>=0.18.0      # requires nvidia/cuda:12.8-devel + TensorRT 10.x
 
 # ── FastAPI server ────────────────────────────────────────────────────────────
-fastapi==0.115.12
+fastapi==0.115.14
 uvicorn[standard]==0.34.2
 pydantic==2.11.4
 httpx==0.28.1
@@ -36,4 +51,4 @@ tiktoken==0.9.0
 python-multipart==0.0.20
 
 # ── Observability ─────────────────────────────────────────────────────────────
-langfuse==2.61.0
+langfuse==3.14.6

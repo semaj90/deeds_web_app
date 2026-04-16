@@ -438,9 +438,22 @@ services:
       - "8085:8085"
     environment:
       OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      # VLM OCR — Gemma4 via Ollama (gemma4:e4b or gemma4:e4b-it-q4_K_M)
+      VLM_MODEL: ${VLM_MODEL:-gemma4:e4b}
+      # YOLO GPU model — drop yolov8x.pt in docker/docling-vlm/models/ and set YOLO_MODELS_DIR
+      YOLO_MODEL_PATH: ${YOLO_MODEL_PATH:-yolov8x.pt}
+      # YOLO CPU fallback — nano stays as TurboQuant / ONNX export target
+      YOLO_CPU_FALLBACK_PATH: ${YOLO_CPU_FALLBACK_PATH:-yolov8n.pt}
+      MAX_IMAGE_LONG_EDGE: ${MAX_IMAGE_LONG_EDGE:-1536}
+      PRELOAD_MODELS: ${PRELOAD_MODELS:-false}
+    volumes:
+      # Mount directory containing large YOLO .pt model files
+      # Set YOLO_MODEL_PATH=/models/<filename>.pt in .env to use
+      - ${YOLO_MODELS_DIR:-./docker/docling-vlm/models}:/models:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -451,6 +464,57 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
+  # Image Synthesis + 3D Crime Scene Reconstruction (port 8092)
+  # Pipeline: FLUX.1-schnell (keyframe) → Wan2.1-1.3B (video) → DepthAnything v2 (depth)
+  # Multi-image: POST /reconstruct/gaussian-splat (needs ENABLE_GAUSSIAN_SPLATTING=true)
+  image-synthesis:
+    build:
+      context: ./docker/image-synthesis
+    container_name: legal-ai-image-synthesis
+    restart: unless-stopped
+    profiles: ["full", "gpu"]
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 2G
+    ports:
+      - "8092:8092"
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+      LLM_MODEL: ${LLM_MODEL:-gemma4-legal:latest}
+      # Wan2.1-1.3B: text-to-video, Apache 2.0, ~6GB VRAM bfloat16 + TorchAO INT8
+      WAN_MODEL_ID: ${WAN_MODEL_ID:-Wan-AI/Wan2.1-T2V-1.3B}
+      # FLUX.1-schnell: keyframe image, Apache 2.0, ~4GB VRAM NF4/INT8
+      FLUX_MODEL_ID: ${FLUX_MODEL_ID:-black-forest-labs/FLUX.1-schnell}
+      # DepthAnything v2 Large: monocular depth from single image, ~1.3GB VRAM
+      DEPTH_MODEL_ID: ${DEPTH_MODEL_ID:-depth-anything/Depth-Anything-V2-Large-hf}
+      IMAGE_WIDTH: ${IMAGE_WIDTH:-512}
+      IMAGE_HEIGHT: ${IMAGE_HEIGHT:-512}
+      VIDEO_FRAMES: ${VIDEO_FRAMES:-25}
+      VIDEO_FPS: ${VIDEO_FPS:-24}
+      WAN_STEPS: ${WAN_STEPS:-30}
+      FLUX_STEPS: ${FLUX_STEPS:-4}
+      # TorchAO TurboQuant: "int8" | "int4" | "nf4" | "none"
+      QUANT_MODE: ${QUANT_MODE:-int8}
+      # FlashAttention 2 via xformers (Ampere RTX 3060 Ti)
+      USE_FLASH_ATTN: ${USE_FLASH_ATTN:-true}
+      GENERATION_MODE: ${GENERATION_MODE:-i2v}
+      PRELOAD_MODELS: ${PRELOAD_MODELS:-false}
+      # Set true + install gsplat for multi-image Gaussian Splatting
+      ENABLE_GAUSSIAN_SPLATTING: ${ENABLE_GAUSSIAN_SPLATTING:-false}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8092/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
 
   # Langfuse ClickHouse — OLAP store for traces/observations/scores (required by Langfuse v3)
   langfuse-clickhouse:

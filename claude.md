@@ -546,7 +546,7 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 ---
 
-## Unified Audit Gate System (20 Gates)
+## Unified Audit Gate System (47 Gates)
 
 **Use cases:** (a) pre-archive safety, (b) post-wire verification, (c) infrastructure health audit.
 **Automated:** `bash sveltekit-frontend/scripts/audit/orphan-detector.sh [dir]` covers Tier A (~10s).
@@ -675,6 +675,71 @@ rg "^// @vitest-environment node" tests/routes/ --glob "*.test.ts" --glob "*.spe
 # Automated: tests/routes/sveltekit-form-actions.test.ts covers fail/message/redirect
 ```
 
+```
+
+```bash
+# ══════════════════════════════════════════════════════════════
+# TIER F: CONTEXTUAL GRAPH ANALYSIS (G27-G35 — added 2026-04-16)
+# pytorch-graph N-API ops wired end-to-end through all pipelines
+# ══════════════════════════════════════════════════════════════
+
+# G27: pytorch-graph consumers — kmeansWithCentroids AND trainSOM must be imported
+rg "kmeansWithCentroids|trainSOM" src/lib/server/ --type ts -l
+# MUST return ≥2 files (som-topology-pipeline.ts + gpu-graph-analysis.ts)
+
+# G28: SOM topology endpoint exists
+ls src/routes/api/graph/som-topology/+server.ts
+# MUST exist — draws Neo4j SIMILAR_TOPOLOGY edges from SOM BMU adjacency
+
+# G29: Colab export endpoint exists
+ls src/routes/api/graph/colab-export/+server.ts
+# MUST exist — returns .ipynb JSON for Google Colab GPU processing
+
+# G30: Compound parallel tasks — tasks.json has dependsOrder: "parallel"
+rg '"dependsOrder".*"parallel"' ../.vscode/tasks.json
+# MUST return ≥2 hits (Full Dataset Index + Graph Analysis Suite tasks)
+
+# G31: Qdrant tag enrichment — som_cluster payload field written after SOM
+rg "som_cluster" src/lib/server/ --type ts
+# MUST return ≥1 hit — SOM BMU index written to codebase_chunks_768 payload
+
+# G32: Neo4j topology edges — SIMILAR_TOPOLOGY relationship created
+rg "SIMILAR_TOPOLOGY" src/lib/server/ --type ts
+# MUST return ≥1 hit — SOM grid adjacency relationships in Neo4j
+
+# G33: pageRankGPU wired in graph module — replaces JS loop for n≤2000
+rg "pageRankGPU" src/lib/server/graph/ --type ts
+# MUST return ≥1 hit (gpu-graph-analysis.ts imports + calls pytorch pageRankGPU)
+
+# G34: attentionScoreGPU wired for ACE context weighting
+rg "attentionScoreGPU" src/lib/server/ --type ts -l
+# MUST return ≥1 file — used for query-weighted centroid scoring in graph analysis
+# OR in context-assembler.ts for ACE chunk ranking
+
+# G35: rewardScoreGPU available for GRPO pipeline
+rg "rewardScoreGPU" src/lib/server/ --type ts -l
+# Should return ≥1 file when GRPO reward scoring is wired to LangGraph service
+
+# ── Neo4j query: verify SOM topology edges exist ──────────────────────
+# Run at http://localhost:7474/browser
+```cypher
+MATCH ()-[r:SIMILAR_TOPOLOGY]->()
+RETURN count(r) AS topologyEdges,
+       count(DISTINCT startNode(r)) AS sourceNodes,
+       count(DISTINCT endNode(r)) AS targetNodes
+```
+
+# ── VS Code: run all graph analysis gates ──────────────────────────────
+# Task label: "🔍 Graph: Audit G27-G35 (pytorch-graph wiring gates)"
+# Or run in terminal from workspace root:
+node -e "
+const addon = require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+const fns = ['kmeansWithCentroids','trainSOM','pageRankGPU','attentionScoreGPU','rewardScoreGPU'];
+fns.forEach(f => console.log(f + ':', typeof addon[f] === 'function' ? 'EXPORTED' : 'MISSING'));
+"
+# All 5 MUST print 'EXPORTED'
+```
+
 **Rune compliance Neo4j queries** (http://localhost:7474):
 ```cypher
 MATCH (n:CodebaseFile) WHERE n.isSvelteComponent = true
@@ -686,6 +751,75 @@ RETURN count(n) AS svelteFiles,
 ```
 
 Also check: config refs (`unocss.config.ts`, `svelte.config.js`, `vite.config.ts`), SvelteKit route files are NEVER orphans.
+
+```bash
+# ══════════════════════════════════════════════════════════════
+# TIER G: GLYPH / CARTRIDGE / ACE AUDIT (G36-G47 — added 2026-04-16)
+# Verifies shared schema, staged search, cache alignment, and
+# Drizzle persistence for the Glyph/CHR97/ACE integration layer.
+# ══════════════════════════════════════════════════════════════
+
+# G36: Shared GlyphRecord schema exists
+# Canonical type must include semantic, vector, topology, and render layers
+rg "export interface GlyphRecord|type GlyphSection|type GlyphKind" src/lib/server/ --type ts
+# MUST return ≥1 hit — the core unifying type across cartridge/tile/ACE
+
+# G37: RuneData → GlyphRecord compatibility mapper exists
+# Backward-compat bridge so existing CHR97 cartridge code keeps working
+rg "runeToGlyphRecord|GlyphRecord.*RuneData|RuneData.*GlyphRecord" src/lib/server/ --type ts
+# MUST return ≥1 hit — mapper from CHR97 RuneData into GlyphRecord
+
+# G38: Staged cartridge search path exists
+# Search must do: 4D/topology prefilter → attention rerank → 768d rerank/reward
+rg "topology prefilter|scoreAttention|rewardScoreGPU|searchCartridge.*Float32Array" src/lib/server/ --type ts
+# MUST return ≥1 hit — the staged search bridge
+
+# G39: Section-aware tiling exists
+# Glyphs must carry legal section labels for tile grouping
+rg "FACTS|LEGAL_AUTHORITY|CLAIMS|PRAYER_HOLDING" src/lib/server/ --type ts
+# MUST return ≥1 hit — section enum/const used in glyph tile grouping
+
+# G40: Glyph prompt cache aligns to page boundaries
+# Cache keys must tie to glyphId, pageIndex, or cartridge page identity
+rg "glyphId|pageIndex|tileIndex|promptCacheKey|setFragment|getFragment" src/lib/server/ --type ts
+# MUST return ≥1 hit — page-aligned cache contract
+
+# G41: Tile atlas builder is wired (not dormant)
+# buildGlyphTileAtlas must be reachable from a live route or rebuild path
+rg "buildGlyphTileAtlas|searchGlyphTiles|invalidateGlyphAtlas|publishGlyphRebuild" src/ --type ts
+# MUST return ≥2 hits — builder + at least one consumer/trigger
+
+# G42: Redis slim/full atlas contract is explicit
+# Cached atlases omit centroids (fine for UI); search paths must rehydrate
+rg "centroid omitted from Redis|source: 'redis'|searchGlyphTiles" src/lib/server/ --type ts
+# MUST return ≥1 hit — explicit contract comment or rehydration logic
+
+# G43: CouchDB topology persistence exists
+# Glyph atlas writes topology docs to CouchDB with stable doc shape
+rg "glyph_topology|COUCHDB_DB|_couchSave" src/lib/server/ --type ts
+# MUST return ≥1 hit — topology persistence path
+
+# G44: RabbitMQ glyph rebuild trigger exists
+# glyph.tile.rebuild publish path must be live after SOM rebuild or indexing
+rg "glyph.tile.rebuild" src/lib/server/ --type ts
+# MUST return ≥1 hit — queue-triggered rebuild
+
+# G45: Drizzle schema stores glyph metadata
+# Postgres must have columns/JSONB for section, tags, summary, somCluster,
+# centroidId, grpoRewardScore, render/cache hints
+rg "glyph_records|grpoRewardScore|somCluster|centroidId|recordJson" src/lib/server/db/ --type ts
+# MUST return ≥1 hit — durable schema-backed glyph records
+
+# G46: Barrel exports are narrow and stable
+# Only approved glyph/cartridge types exported from server barrels
+rg "from './glyph|from './cartridge|export type .*Glyph|export .*Glyph" src/lib/server/ --type ts
+# Should return controlled set — no accidental internal exposure
+
+# G47: Frontend route coverage exists
+# At least one frontend consumer for cartridge and glyph features
+rg "/api/cartridge/|/api/glyph/|glyph|cartridge" src/routes/ src/lib/ --type svelte
+# MUST return ≥1 hit per feature area (cartridge export/search/stats, glyph atlas/tiles)
+```
 
 ### Decision Tree (post-gate)
 

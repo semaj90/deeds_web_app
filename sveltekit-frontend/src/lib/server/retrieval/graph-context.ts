@@ -10,6 +10,7 @@ import { sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import { traceGraph } from '$lib/server/observability/langfuse.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
+import { topKIndices } from '$lib/server/gpu/pytorch-graph.js';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const UUID_IN_PATH = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
@@ -179,6 +180,12 @@ export function applyGraphAuthorityScoring(
     return { ...d, similarity: Math.min(d.similarity * boost, 1.0) };
   });
 
+  // GPU top-k sort for large sets; CPU sort fallback for small sets
+  if (scored.length > 8) {
+    const simScores = new Float32Array(scored.map((d) => d.similarity));
+    const { indices } = topKIndices(simScores, scored.length);
+    return Array.from(indices).map((i) => scored[i]);
+  }
   scored.sort((a, b) => b.similarity - a.similarity);
   return scored;
 }

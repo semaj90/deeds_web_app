@@ -1,0 +1,4 @@
+# Place large YOLO .pt model files here (e.g. yolov8x.pt, yolov8l.pt)
+# Then set YOLO_MODEL_PATH=/models/<filename>.pt in docker/.env
+# and YOLO_MODELS_DIR=./docker/docling-vlm/models in root .env
+

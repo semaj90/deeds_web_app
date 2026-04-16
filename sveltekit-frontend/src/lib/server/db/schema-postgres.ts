@@ -3520,3 +3520,110 @@ export const whisperSegments = pgTable('whisper_segments', {
 export type WhisperSegment = typeof whisperSegments.$inferSelect;
 export type NewWhisperSegment = typeof whisperSegments.$inferInsert;
 
+// === ACE CONTEXT CACHE ===
+export const aceContextCache = pgTable('ace_context_cache', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  queryHash: text('query_hash').notNull(),
+  userId: uuid('user_id'),
+  policyTier: varchar('policy_tier', { length: 30 }).notNull(),
+  contextJson: jsonb('context_json').notNull(),
+  chunkCount: integer('chunk_count').default(0).notNull(),
+  totalTokens: integer('total_tokens').default(0).notNull(),
+  cacheSource: varchar('cache_source', { length: 20 }).default('miss').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+  queryHashIdx: index('ace_context_cache_query_hash_idx').on(table.queryHash),
+  userIdx: index('ace_context_cache_user_idx').on(table.userId),
+}));
+export type AceContextCache = typeof aceContextCache.$inferSelect;
+export type NewAceContextCache = typeof aceContextCache.$inferInsert;
+
+// === KNOWLEDGE ARTIFACTS ===
+export const knowledgeArtifacts = pgTable('knowledge_artifacts', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  sourceType: varchar('source_type', { length: 30 }).notNull(), // codebase|evidence|case|doc
+  sourceId: text('source_id').notNull(),
+  summary: text('summary'),
+  tags: jsonb('tags').default(sql`'[]'::jsonb`).notNull(),
+  metadata: jsonb('metadata').default(sql`'{}'::jsonb`).notNull(),
+  embedText: text('embed_text'),
+  somCluster: integer('som_cluster'),
+  schemaVersion: integer('schema_version').default(1).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+  sourceIdx: index('knowledge_artifacts_source_idx').on(table.sourceType, table.sourceId),
+  clusterIdx: index('knowledge_artifacts_cluster_idx').on(table.somCluster),
+}));
+export type KnowledgeArtifact = typeof knowledgeArtifacts.$inferSelect;
+export type NewKnowledgeArtifact = typeof knowledgeArtifacts.$inferInsert;
+
+// === SYNTHESIS RUNS ===
+export const synthesisRuns = pgTable('synthesis_runs', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  userId: uuid('user_id'),
+  query: text('query').notNull(),
+  model: varchar('model', { length: 100 }).notNull(),
+  cacheHit: varchar('cache_hit', { length: 10 }),
+  latencyMs: integer('latency_ms'),
+  confidence: real('confidence'),
+  grpoRewardScore: real('grpo_reward_score'),
+  policyTier: varchar('policy_tier', { length: 30 }),
+  citations: jsonb('citations').default(sql`'[]'::jsonb`).notNull(),
+  answer: text('answer').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+  userIdx: index('synthesis_runs_user_idx').on(table.userId),
+  createdIdx: index('synthesis_runs_created_idx').on(table.createdAt),
+}));
+export type SynthesisRun = typeof synthesisRuns.$inferSelect;
+export type NewSynthesisRun = typeof synthesisRuns.$inferInsert;
+
+// === GLYPH RECORDS ===
+// Durable JSONB-backed store for canonical GlyphRecord schema.
+// Scalar columns for common filters/sorts; JSONB for evolving fields.
+// record_json preserves the full canonical GlyphRecord for round-trip fidelity.
+export const glyphRecords = pgTable('glyph_records', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  glyphId: text('glyph_id').notNull(),
+  sourceId: text('source_id').notNull(),
+  caseId: uuid('case_id'),
+  kind: varchar('kind', { length: 30 }).notNull(),
+  section: varchar('section', { length: 30 }).notNull().default('UNKNOWN'),
+  schemaVersion: integer('schema_version').notNull().default(1),
+
+  // Scalar columns for indexed queries
+  somCluster: integer('som_cluster'),
+  centroidId: integer('centroid_id'),
+  grpoRewardScore: real('grpo_reward_score'),
+
+  // Semantic layer (denormalised for fast text search)
+  summary: text('summary').notNull(),
+  tags: jsonb('tags').notNull().default(sql`'[]'::jsonb`),
+  entities: jsonb('entities').notNull().default(sql`'[]'::jsonb`),
+  kagNeighbors: jsonb('kag_neighbors').notNull().default(sql`'[]'::jsonb`),
+  dagPrev: jsonb('dag_prev').notNull().default(sql`'[]'::jsonb`),
+  dagNext: jsonb('dag_next').notNull().default(sql`'[]'::jsonb`),
+
+  // Full nested layers as JSONB (forward-compat for schema evolution)
+  topology: jsonb('topology').notNull().default(sql`'{}'::jsonb`),
+  render: jsonb('render').notNull().default(sql`'{}'::jsonb`),
+
+  // Full canonical GlyphRecord for round-trip fidelity (embedding omitted — stays in Qdrant)
+  recordJson: jsonb('record_json').notNull().default(sql`'{}'::jsonb`),
+
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+  glyphIdIdx:   index('glyph_records_glyph_id_idx').on(table.glyphId),
+  sourceIdx:    index('glyph_records_source_idx').on(table.sourceId),
+  caseIdx:      index('glyph_records_case_idx').on(table.caseId),
+  clusterIdx:   index('glyph_records_cluster_idx').on(table.somCluster),
+  centroidIdx:  index('glyph_records_centroid_idx').on(table.centroidId),
+  sectionIdx:   index('glyph_records_section_idx').on(table.section),
+  rewardIdx:    index('glyph_records_reward_idx').on(table.grpoRewardScore),
+}));
+
+export type GlyphRecordRow = typeof glyphRecords.$inferSelect;
+export type NewGlyphRecordRow = typeof glyphRecords.$inferInsert;
+

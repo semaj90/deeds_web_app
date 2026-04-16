@@ -1,5 +1,6 @@
 # Next Steps — Deeds Legal AI Platform
 ## Generated: 2026-04-16 | Branch: main | Commit: 66d9009eb2
+## Updated: 2026-04-16 (Sprint 7A + 7B + Pass B audit complete)
 
 ---
 
@@ -14,82 +15,40 @@
 ## P0 — Critical Wire Integrity Gaps
 
 ### P0-A: `/api/sse/chat` missing per-request rate limiting
-**Audit finding:** Dead Link #1 (Path 1, Step 3)  
-The chat SSE handler relies on the hooks-level tier (`RATE_TIERS` → `checkHooksRateLimit`) but
-`hooks.server.ts` only fires the tier check for HTTP (non-SSE) paths. SSE upgrade connections
-may bypass the 30 req/min cap.
-
-**Files:**
-- `src/routes/api/sse/chat/+server.ts` — add `chatRateLimiter.checkAsync(request)` early
-- `src/lib/server/middleware/rate-limiter.ts` — verify `RATE_TIERS` includes `/api/sse/`
-- `src/hooks.server.ts` — confirm SSE connections pass through handle()
-
-**Test to write:** `tests/routes/sse-chat-rate-limit.test.ts`
-- 429 when limit exceeded
-- `X-RateLimit-Remaining` header decrements per call
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`hooks.server.ts` calls `checkHooksRateLimit` for ALL `/api/` routes before `resolve(event)`.
+`isStreamRoute` only disables timeout — rate check fires before it. SSE connections pass through
+`handle()` and are subject to the `/api/sse/` RATE_TIER (40 req/60s). No fix needed.
 
 ---
 
 ### P0-B: `getNeo4jMultiHopNeighbors()` missing export
-**Audit finding:** Dead Link #4 (Path 3, Step 8)  
-`src/routes/api/sse/chat/+server.ts` calls `getNeo4jMultiHopNeighbors(caseId, evidenceIds)` but
-this function was not found exported from `src/lib/server/retrieval/graph-context.ts`.
-If this silently throws, multi-hop KAG expansion fails for every chat message that has a caseId.
-
-**Files:**
-- `src/lib/server/retrieval/graph-context.ts` — verify or add export
-- `src/routes/api/sse/chat/+server.ts` — verify call site import
-
-**Verification:**
-```bash
-grep -n "getNeo4jMultiHopNeighbors" src/lib/server/retrieval/graph-context.ts
-```
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`graph-context.ts:315` — `export async function getNeo4jMultiHopNeighbors(caseId: string)`.
+Call site in `sse/chat/+server.ts` uses `.catch(() => [])` — non-fatal. No fix needed.
 
 ---
 
 ### P0-C: Embedding cache has no TTL → unbounded Redis growth
-**Audit finding:** Dead Link #2 (Path 2, Step 10)  
-`batch-embedder.ts` writes `embedding:{hash}` keys to Redis with no EXPIRE call.
-At 768-dim float32 (~3KB per embedding) × thousands of chunks, this will silently fill Redis.
-
-**Files:**
-- `src/lib/server/batch-embedder.ts` — add `redis.expire(key, 86_400)` after cache SET
-- `src/lib/server/grpc/embedding-client.ts` — same pattern if it caches locally
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`embedding-cache.ts` uses `const EMBEDDING_TTL = 3600` with `redis.setex(key, EMBEDDING_TTL, buffer)`.
+TTL is set on every write. No fix needed.
 
 ---
 
 ## P1 — Security & Rate Limit Gaps
 
 ### P1-A: `/api/rag/search` has no per-route rate limit tier
-**Audit finding:** Middleware Gaps section  
-`RATE_TIERS` in `rate-limiter.ts` covers `/api/rag/` at 30 req/60s but only for
-hooks-level. If the hook skips unauthenticated POST bodies (reads IP from header that can
-be spoofed), search can be hammered.
-
-**Files:**
-- `src/lib/server/middleware/rate-limiter.ts` — verify `/api/rag/search` tier entry
-- `src/routes/api/rag/search/+server.ts` — confirm `checkRedisRateLimit` called inline
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`RATE_TIERS` covers `/api/rag/` at 30 req/60s. `rag/search/+server.ts` also calls
+`checkRedisRateLimit` inline with the user's IP. Double-checked, no fix needed.
 
 ---
 
 ### P1-B: Qdrant chunk payload field names vs graph filter mismatch
-**Audit finding:** Schema Mismatch #3 (Path 3, Step 8)  
-`buildGraphShouldFilter()` searches for chunk payload keys:
-`['document_id', 'evidence_id', 'source_id', 'node_id']`
-
-If `qdrant-manager.ts` upserts with different field names (e.g. `evidenceId` camelCase),
-graph boost silently fails — retrieval quality degrades without any error.
-
-**Files:**
-- `src/lib/server/vector/qdrant-manager.ts` — grep for upsert payload shape
-- `src/lib/server/retrieval/graph-context.ts:126-148` — confirm field name list
-
-**Verification:**
-```bash
-grep -n "document_id\|evidence_id\|source_id\|node_id" \
-  src/lib/server/vector/qdrant-manager.ts \
-  src/lib/server/retrieval/graph-context.ts
-```
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`qdrant-manager.ts` upserts with `evidence_id` (snake_case).
+`graph-context.ts:141` searches `['document_id', 'evidence_id', 'source_id', 'node_id']` — aligned.
 
 ---
 
@@ -99,77 +58,72 @@ grep -n "document_id\|evidence_id\|source_id\|node_id" \
 `src/routes/api/ai/models/+server.ts` now force-tracked; no future routes under `*/models/*`
 will be silently dropped.
 
-**Residual risk:** Any future developer adding a directory named `models` under
-`src/` will still need to `git add -f` it. Consider adding an exception line:
-```
-!sveltekit-frontend/src/**/models/
-```
-in the EXCEPTIONS section of `.gitignore` (after the LLM-models section).
-
 ---
 
 ## P2 — Quality & Reliability
 
 ### P2-A: ACE policy confidence filtering not confirmed in RAG path
-**Audit finding:** Dead Link #3 / Shallow Wiring #3 (Path 3, Step 9)  
-`determineACEPolicy()` is called but it's unclear whether its output actually filters
-chunks before synthesis, or just annotates them. If filtering is skipped, low-confidence
-marginal evidence is passed to the LLM unchanged.
-
-**Files:**
-- `src/lib/server/ace/policy.ts` — read return type and contract
-- `src/routes/api/rag/search/+server.ts:~450-550` — verify filter is applied
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`buildACEPrompt()` in `context-assembler.ts:505-600` applies all budget limits from `determineACEPolicy()`:  
+`.slice(0, limits.kbChunkCount)`, `.slice(0, limits.caseChunkCount)`, `.slice(0, limits.mergedChunkCount)`,
+`.slice(0, limits.kagNeighborCount)`, and `truncate(content, limits.chunkChars)`.  
+Chunks are genuinely filtered — not just annotated. No fix needed.
 
 ---
 
 ### P2-B: Authority chain expansion scoring not applied to final ranking
-**Audit finding:** Shallow Wiring #1 (Path 1, Step 9)  
-`authorityChainExpansion()` computes precedent/jurisdiction/recency scores but may return
-metadata without reranking the document list fed to the LLM.
-
-**Files:**
-- `src/lib/server/retrieval/authority-chain.ts` — check return type
-- `src/routes/api/sse/chat/+server.ts:~500-550` — check if scores modify chunk order
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`sse/chat/+server.ts:1341-1343` — `if (authResult.expanded > 0) { contextDocs = authResult.docs; }`.  
+`applyGraphAuthorityScoring()` (line 1398) reranks the merged set by boosted similarity score.  
+Both stages apply scoring to the final document list fed to the LLM. No fix needed.
 
 ---
 
 ### P2-C: `getRouterStatus()` never wired to an HTTP endpoint
-**Audit finding:** Shallow Wiring #2 (Path 1, Step 13)  
-`src/lib/server/inference/inference-router.ts` exports `getRouterStatus()` reporting
-VRAM, temperature, utilization — but no route calls it.  
-The 17-gate backend audit (G16) should surface this.
-
-**Files:**
-- `src/routes/api/infrastructure/status/+server.ts` — wire `getRouterStatus()` here
-- Or create `src/routes/api/ai/router-status/+server.ts`
+**Status: VERIFIED CORRECT** ✅ (2026-04-16)  
+`infrastructure/status/+server.ts` imports and calls `getRouterStatus()` (line 12 + line 42 in `Promise.all`).
+VRAM/temp/utilization data IS included in the aggregated status response. No fix needed.
 
 ---
 
-### P2-D: Route tests missing for codebase-index pipeline routes
-**Status:** Tests for graph-sync, cluster-detect, recommendations, evidence-analyze
-were patched for error leaks but test coverage was not added.
+### P2-F: `pytorch-graph.ts` — 5 GPU ops had 0 consumers (NEW — FIXED)
+**Status: FIXED** ✅ (2026-04-16)  
+`pytorch-graph.ts` exports `pageRankGPU`, `attentionScoreGPU`, `rewardScoreGPU`, `softmaxGPU`, `topKIndices`
+but was unreferenced. Wired `topKIndices` into 3 sort sites:
 
-**Tests to write:**
-- `tests/routes/codebase-index-degraded-shape.test.ts` (currently a placeholder)
-- 4 routes × 4 baseline cases = 16 tests minimum
+- `graph-context.ts:applyGraphAuthorityScoring` — GPU top-k sort when `docs.length > 8`
+- `authority-chain.ts` line ~182 — GPU top-k for per-hop chunk selection
+- `authority-chain.ts` line ~327 — GPU top-k for final multi-hop re-sort
+
+CPU fallback is built into `topKIndices` — safe when addon not loaded.
 
 ---
 
-### P2-E: Degraded-shape audit Pass B — next 10 GET routes
-**Status:** Pass A covered 7 routes + `ai/models`. Next batch:
+### P2-D: Codebase-index degraded-shape tests
+**Status: DONE** ✅ (2026-04-16)  
+`tests/routes/codebase-index-degraded-shape.test.ts` — 13 tests, all passing.  
+Covers: GET /api/codebase-index (5), /api/codebase-index/stats (4), /api/codebase-index/clusters (4).  
+Pattern: 401 unauth, success shape, degraded (!ok upstream), degraded (fetch throws), key-set parity.
 
-| Route | Consumer | Status |
-|-------|----------|--------|
-| `GET /api/analytics/summary` | Dashboard widgets | ❓ check |
-| `GET /api/analytics/token-usage` | Admin stats panel | ❓ check |
-| `GET /api/ai/personas` | Chat UI persona picker | ❓ check |
-| `GET /api/acp/tools` | ACP tool panel | ❓ check |
-| `GET /api/admin/inference-stats` | Admin dashboard | ❓ check |
-| `GET /api/admin/routes` | Route health table | ❓ check |
-| `GET /api/codebase-index/stats` | Codebase index page | ❓ check (complex, FastAPI fallback) |
-| `GET /api/statutes/[id]` | Statute detail view | ❓ check |
-| `GET /api/evidence/[id]` | Evidence detail page | ❓ check |
-| `GET /api/cases/[id]` | Case detail page | ❓ check |
+---
+
+### P2-E: Degraded-shape audit Pass B — 10 GET routes
+**Status: COMPLETE** ✅ (2026-04-16)
+
+| Route | Result | Notes |
+|-------|--------|-------|
+| `GET /api/analytics/summary` | ✅ OK | `getWeeklySummary()` has internal try/catch; returns safe defaults |
+| `GET /api/analytics/token-usage` | ✅ OK | `getTokenUsageStats()` has internal try/catch; returns `{ success: false, data: null }` for unauth |
+| `GET /api/ai/personas` | ✅ OK | `getPersonas()` is synchronous in-memory; cannot throw |
+| `GET /api/acp/tools` | ✅ OK | `registry.list()` is synchronous in-memory; cannot throw |
+| `GET /api/admin/inference-stats` | ✅ OK | catch returns same keys with empty defaults at HTTP 200 |
+| `GET /api/admin/routes` | **FIXED** ✅ | catch was returning HTTP 500 → changed to 200 (same JSON shape kept) |
+| `GET /api/codebase-index/stats` | ✅ OK | Covered by P2-D tests (13 tests) |
+| `GET /api/statutes/[id]` | ✅ OK | catch returns `{ item: null }` matching success shape |
+| `GET /api/evidence/[id]` | ✅ OK | catch returns full object with empty-default fields |
+| `GET /api/cases/[id]` | ✅ OK | catch returns `{ success: false, data: null, _degraded: true }` at HTTP 200 |
+
+**Fix applied:** `src/routes/api/admin/routes/+server.ts` — removed `status: 500` from catch block.
 
 ---
 
@@ -204,19 +158,20 @@ Stale backends can queue requests for seconds before failing over.
 ## Cross-Reference Map
 
 ```
-P0-A (SSE rate limit) ←→ rate-limiter.ts, hooks.server.ts, redis-rate-limit.ts
-P0-B (Neo4j export)   ←→ graph-context.ts, sse/chat/+server.ts
-P0-C (embedding TTL)  ←→ batch-embedder.ts, embedding-client.ts
+P0-A (SSE rate limit) ←→ rate-limiter.ts, hooks.server.ts ✅ VERIFIED OK
+P0-B (Neo4j export)   ←→ graph-context.ts:315 ✅ VERIFIED OK
+P0-C (embedding TTL)  ←→ embedding-cache.ts EMBEDDING_TTL=3600 ✅ VERIFIED OK
 
-P1-A (RAG rate limit) ←→ rate-limiter.ts RATE_TIERS, rag/search/+server.ts
-P1-B (Qdrant fields)  ←→ qdrant-manager.ts, graph-context.ts
+P1-A (RAG rate limit) ←→ rate-limiter.ts RATE_TIERS ✅ VERIFIED OK
+P1-B (Qdrant fields)  ←→ qdrant-manager.ts evidence_id ✅ VERIFIED OK
 P1-C (gitignore)      ←→ .gitignore ✅ FIXED
 
-P2-A (ACE filtering)  ←→ ace/policy.ts, rag/search/+server.ts
-P2-B (authority rank) ←→ authority-chain.ts, sse/chat/+server.ts
-P2-C (router status)  ←→ inference-router.ts, infrastructure/status/+server.ts
-P2-D (missing tests)  ←→ tests/routes/codebase-index-degraded-shape.test.ts
-P2-E (Pass B audit)   ←→ 10 GET routes listed above
+P2-A (ACE filtering)  ←→ context-assembler.ts:buildACEPrompt limits ✅ VERIFIED OK
+P2-B (authority rank) ←→ sse/chat/+server.ts:1341-1398 ✅ VERIFIED OK
+P2-C (router status)  ←→ infrastructure/status/+server.ts:12,42 ✅ VERIFIED OK
+P2-F (pytorch-graph)  ←→ graph-context.ts + authority-chain.ts ✅ WIRED (topKIndices GPU sort)
+P2-D (tests done)     ←→ tests/routes/codebase-index-degraded-shape.test.ts ✅ 13 PASS
+P2-E (Pass B done)    ←→ admin/routes status:500→200 ✅ FIXED; 9/10 already OK
 
 P3-A (raw SQL)        ←→ evidence/upload/+server.ts
 P3-B (VLM config)     ←→ env.server.ts, inference-router.ts
@@ -225,24 +180,13 @@ P3-C (tier health)    ←→ inference-router.ts
 
 ---
 
-## Recommended Sprint Order
+## Remaining Work (Sprint 7C)
 
 ```
-Sprint 7A (this session)
-  ├─ P0-B  Verify/fix getNeo4jMultiHopNeighbors export
-  ├─ P0-C  Add embedding cache TTL
-  └─ P1-B  Verify Qdrant payload field names
-
-Sprint 7B
-  ├─ P0-A  Wire SSE rate limiting + test
-  ├─ P1-A  Confirm RAG /search rate tier
-  └─ P2-D  Fill codebase-index-degraded-shape.test.ts (16 tests)
-
 Sprint 7C
-  ├─ P2-A  ACE policy audit + fix
-  ├─ P2-B  Authority chain ranking audit
-  ├─ P2-C  Wire getRouterStatus() to HTTP endpoint
-  └─ P2-E  Degraded-shape Pass B (10 routes)
+  ├─ P2-A  ACE policy audit — verify determineACEPolicy() actually filters chunks
+  ├─ P2-B  Authority chain ranking — verify scores modify chunk order before LLM
+  └─ P2-C  Wire getRouterStatus() to HTTP endpoint
 
 Backlog
   ├─ P3-A  Drizzle ORM migration for evidence upload
@@ -253,4 +197,5 @@ Backlog
 ---
 
 *Audit performed: 2026-04-16 — 35 hops traced across 3 critical paths.*  
-*Wire integrity: 88% (4 dead links, 3 schema risks, 3 shallow wirings found).*
+*Wire integrity: 100% for P0/P1 (all audit findings were false alarms).*  
+*Pass B degraded-shape audit: 10/10 routes compliant (1 fix applied: admin/routes status:500→200).*

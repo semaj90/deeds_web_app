@@ -201,5 +201,131 @@ export async function detectObjectsInImage(
   }
 }
 
+// ── VLM OCR Types ─────────────────────────────────────────────────────────────
+
+export type VLMDocType = 'auto' | 'general' | 'table' | 'handwriting' | 'scan' | 'legal';
+
+export type VLMOCRResult = {
+	text: string;
+	docType: VLMDocType;
+	model: string;
+	tokens: number;
+	processingTimeMs: number;
+};
+
+export type YoloVLMResult = VLMOCRResult & {
+	regions: number;
+	pipeline: 'yolo-vlm' | 'vlm-only';
+};
+
+/**
+ * VLM-powered OCR using Gemma4 via the docling-vlm Docker service.
+ *
+ * Best for: handwritten deeds, scanned court filings, tables, mixed layouts.
+ * Falls back gracefully when the service is unavailable.
+ *
+ * @param imageBuffer - Raw image bytes (PNG, JPG, TIFF, WebP)
+ * @param docType     - Document category hint; 'auto' = VLM self-classifies
+ * @param model       - Override VLM model (default: VLM_MODEL env = gemma4:e4b)
+ */
+export async function ocrWithVLM(
+	imageBuffer: Buffer,
+	docType: VLMDocType = 'auto',
+	model = ''
+): Promise<VLMOCRResult> {
+	const startTime = Date.now();
+
+	const formData = new FormData();
+	formData.append('file', new Blob([new Uint8Array(imageBuffer)]), 'image.png');
+	formData.append('doc_type', docType);
+	if (model) formData.append('model', model);
+
+	const response = await fetch(`${DOCLING_SERVICE_URL}/ocr/vlm`, {
+		method: 'POST',
+		body: formData,
+		signal: AbortSignal.timeout(180_000), // Gemma4 can be slow on first load
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		throw new Error(`VLM OCR error (${response.status}): ${errorText}`);
+	}
+
+	const result = (await response.json()) as {
+		text: string;
+		doc_type: string;
+		model: string;
+		tokens: number;
+		processing_time_ms: number;
+	};
+
+	return {
+		text: result.text,
+		docType: result.doc_type as VLMDocType,
+		model: result.model,
+		tokens: result.tokens,
+		processingTimeMs: result.processing_time_ms || Date.now() - startTime,
+	};
+}
+
+/**
+ * Two-stage YOLO + Gemma4 VLM OCR pipeline via docling-vlm Docker service.
+ *
+ * Stage 1: YOLO detects text regions (uses YOLO_MODEL_PATH model)
+ * Stage 2: Gemma4 VLM OCRs each region in spatial (reading) order
+ *
+ * Falls back to VLM-only when YOLO model is unavailable.
+ *
+ * @param imageBuffer - Raw image bytes (PNG, JPG, TIFF, WebP)
+ * @param docType     - Document category hint; 'auto' = VLM self-classifies per region
+ * @param confidence  - YOLO detection confidence threshold (default 0.25)
+ * @param model       - Override VLM model (default: VLM_MODEL env = gemma4:e4b)
+ */
+export async function ocrWithYoloVLM(
+	imageBuffer: Buffer,
+	docType: VLMDocType = 'auto',
+	confidence = 0.25,
+	model = ''
+): Promise<YoloVLMResult> {
+	const startTime = Date.now();
+
+	const formData = new FormData();
+	formData.append('file', new Blob([new Uint8Array(imageBuffer)]), 'image.png');
+	formData.append('doc_type', docType);
+	formData.append('confidence', String(confidence));
+	if (model) formData.append('model', model);
+
+	const response = await fetch(`${DOCLING_SERVICE_URL}/ocr/yolo-vlm`, {
+		method: 'POST',
+		body: formData,
+		signal: AbortSignal.timeout(300_000), // Multi-region: allow more time
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		throw new Error(`YOLO+VLM OCR error (${response.status}): ${errorText}`);
+	}
+
+	const result = (await response.json()) as {
+		text: string;
+		doc_type: string;
+		model: string;
+		regions: number;
+		pipeline: 'yolo-vlm' | 'vlm-only';
+		tokens?: number;
+		processing_time_ms: number;
+	};
+
+	return {
+		text: result.text,
+		docType: result.doc_type as VLMDocType,
+		model: result.model,
+		tokens: result.tokens ?? 0,
+		regions: result.regions,
+		pipeline: result.pipeline,
+		processingTimeMs: result.processing_time_ms || Date.now() - startTime,
+	};
+}
+
 // Legacy export for backward compatibility
 export const processWithDocling = analyzeDocumentWithDocling;

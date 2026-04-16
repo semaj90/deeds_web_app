@@ -75,6 +75,7 @@ export class RabbitMQManager extends EventEmitter {
     synthesis_generate: 'synthesis.generate',
     knowledge_backfill: 'knowledge.backfill',
     audio_process: 'audio.process',
+    glyph_tile_rebuild: 'glyph.tile.rebuild',
   };
 
   constructor() {
@@ -193,6 +194,7 @@ export class RabbitMQManager extends EventEmitter {
       'synthesis.generate',
       'knowledge.backfill',
       'audio.process',
+      'glyph.tile.rebuild',
     ];
     for (const queue of queuesToMigrate) {
       try {
@@ -268,6 +270,11 @@ export class RabbitMQManager extends EventEmitter {
       this.exchanges.audio_processing,
       'audio.process'
     );
+    await this.bindQueue(
+      this.queues.glyph_tile_rebuild,
+      this.exchanges.document_processing,
+      'glyph.tile.rebuild'
+    );
 
     console.log('✅ Queue bindings configured (with DLQ)');
   }
@@ -296,8 +303,9 @@ export class RabbitMQManager extends EventEmitter {
     await this.consume(this.queues.error_embed, this.handleErrorEmbed.bind(this)); // medium (embedding)
     await this.consume(this.queues.synthesis_generate, this.handleSynthesisGenerate.bind(this)); // slow (LLM call)
     await this.consume(this.queues.knowledge_backfill, this.handleKnowledgeBackfill.bind(this)); // medium (web search + embed)
+    await this.consume(this.queues.glyph_tile_rebuild, this.handleGlyphTileRebuild.bind(this)); // slow (GPU kMeans)
 
-    console.log('👂 All 11 RabbitMQ consumers started (prefetch: 10)');
+    console.log('👂 All 12 RabbitMQ consumers started (prefetch: 10)');
 
     // Start DLQ consumers — drain dead-lettered messages for logging/monitoring
     await this.startDLQConsumers();
@@ -1323,6 +1331,69 @@ export class RabbitMQManager extends EventEmitter {
       enqueuedAt: new Date().toISOString(),
     });
     return true;
+  }
+
+  // --- Glyph Tile Rebuild Consumer ---
+
+  private async handleGlyphTileRebuild(msg: AmqpMessage): Promise<void> {
+    if (!msg || !this.channel) return;
+    try {
+      const data = this.parseMessage(msg);
+      if (!data?.caseId) {
+        this.channel.nack(msg, false, false);
+        return;
+      }
+      console.log(`[glyph.tile.rebuild] caseId=${data.caseId} reason=${data.reason ?? 'n/a'}`);
+      // Dynamically import to avoid circular dependency at startup
+      const { buildGlyphTileAtlas } = await import('../cartridge/glyph-tile-engine.js');
+      // Fetch current KAG neighbors as seed points when available
+      let points: { embedding: number[]; entities?: string[] }[] = [];
+      try {
+        const { assembleACEContext } = await import('../ace/context-assembler.js');
+        const ctx = await assembleACEContext({
+          query: data.reason ?? `glyph rebuild for case ${data.caseId}`,
+          caseId: data.caseId,
+          userId: 'system',
+          enableWebSearch: false,
+        });
+        points = ctx.ragChunks
+          .filter((c: { embedding?: number[] }) => c.embedding && c.embedding.length > 0)
+          .map((c: { embedding: number[]; entities?: string[] }) => ({
+            embedding: c.embedding,
+            entities: c.entities,
+          }));
+      } catch {
+        // No context available — rebuild from cache with skipCache=false just refreshes Redis TTL
+      }
+      await buildGlyphTileAtlas(data.caseId, points, 16, 16, /* skipCache */ true);
+      this.channel.ack(msg);
+    } catch (error) {
+      console.error('[glyph.tile.rebuild] handler error:', this.formatError(error));
+      this.retryOrDLQ(msg as AmqpMessageObj, error);
+    }
+  }
+
+  // --- Glyph Tile Rebuild Publisher ---
+
+  async publishGlyphTileRebuild(caseId: string, reason: string): Promise<boolean> {
+    if (!this.isReady()) return false;
+    await this.publish(this.exchanges.document_processing, 'glyph.tile.rebuild', {
+      caseId,
+      reason,
+      ts: Date.now(),
+    });
+    return true;
+  }
+
+  // --- Generic queue publish (used by glyph-tile-engine and other callers) ---
+
+  async publishToQueue(queue: string, data: unknown): Promise<void> {
+    if (!this.channel) {
+      console.warn(`[RabbitMQ] publishToQueue skipped — no channel (${queue})`);
+      return;
+    }
+    const message = Buffer.from(JSON.stringify(data));
+    this.channel.publish('', queue, message, { persistent: true });
   }
 
   private async publish(exchange: string, routingKey: string, data: any): Promise<void> {

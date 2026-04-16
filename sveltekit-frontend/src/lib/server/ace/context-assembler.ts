@@ -1221,8 +1221,13 @@ async function fetchKAGNeighbors(
       try {
         const result = await session.run(
           `MATCH (c:Case {id: $caseId})-[r]-(n)
-				 RETURN n.id AS nodeId, n.title AS title, type(r) AS relationship
-				 LIMIT 10`,
+           RETURN n.id AS nodeId, n.title AS title, type(r) AS relationship
+           LIMIT 10
+           UNION ALL
+           MATCH (c2:Case {id: $caseId})-[]-(m)-[:SIMILAR_TOPOLOGY]-(n2)
+           WHERE n2.id IS NOT NULL
+           RETURN n2.id AS nodeId, n2.title AS title, 'SIMILAR_TOPOLOGY' AS relationship
+           LIMIT 5`,
           { caseId }
         );
         return result.records.map((rec) => ({

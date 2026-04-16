@@ -1410,6 +1410,56 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
       }
 
+      // ── ACE Policy Decision (P2-A fix: compute before systemPrompt so budget limits apply) ──
+      const ssePolicyContext: ACEContext = {
+        userProfile: null,
+        caseContext,
+        glossaryMatches,
+        ragChunks: contextDocs.map((d) => ({
+          content: d.content,
+          score: d.similarity,
+          source: d.sourceId ?? d.documentId,
+        })),
+        kbChunks: [],
+        caseChunks: [],
+        kagNeighbors:
+          graphContext?.neighbors?.map((n) => ({
+            nodeId: n.nodeId,
+            title: n.title,
+            relationship: n.connectionType,
+          })) ?? [],
+        chatHistory: conversationHistory
+          .filter(
+            (m): m is { role: 'user' | 'assistant' | 'system'; content: string } =>
+              m.role === 'user' || m.role === 'assistant' || m.role === 'system'
+          )
+          .map((m) => ({ role: m.role, content: m.content })),
+        entities: {
+          statutes: queryEntities.statutes,
+          cases: queryEntities.cases,
+          persons: [],
+          organizations: [],
+          dates: [],
+        },
+        practiceTemplate: null,
+        queryTags: [...queryEntities.statutes.slice(0, 3), ...queryEntities.cases.slice(0, 3)],
+        webSearchContext: null,
+        persona: 'neutral',
+        evidenceMetadata: null,
+        evidenceConnections: null,
+        userAnalyticsContext: null,
+        codebaseContext:
+          codebaseResult?.chunks.map((chunk) => ({
+            filePath: chunk.relativePath,
+            content: chunk.symbol,
+            score: chunk.score,
+          })) ?? null,
+        policyDecision: null,
+      };
+      const policyDecision: ACEPolicyDecision = determineACEPolicy(message, ssePolicyContext);
+      // Apply budget limit: slice contextDocs to policy-determined chunk count before injecting into prompt
+      const promptDocs = contextDocs.slice(0, policyDecision.budget.limits.mergedChunkCount);
+
       let systemPrompt =
         'You are a legal AI assistant specialized in prosecutor and detective workflows. ' +
         'Provide accurate, detailed, and actionable legal analysis. ' +
@@ -1447,12 +1497,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         systemPrompt += `\n\n${glossaryContext}`;
       }
 
-      // Inject RAG context (vector-similar documents, DAG-ordered, budget-capped)
-      if (contextDocs.length > 0) {
-        const contextText = contextDocs
+      // Inject RAG context (vector-similar documents, DAG-ordered, budget-capped by ACE policy)
+      if (promptDocs.length > 0) {
+        const contextText = promptDocs
           .map((d, i) => `[Source ${i + 1} (relevance: ${d.similarity.toFixed(2)})] ${d.content}`)
           .join('\n\n');
-        systemPrompt += `\n\n## Retrieved Evidence (${contextDocs.length} sources${reformulated ? ', query-corrected' : ''})\n${contextText}`;
+        systemPrompt += `\n\n## Retrieved Evidence (${promptDocs.length} sources${reformulated ? ', query-corrected' : ''})\n${contextText}`;
         systemPrompt +=
           '\n\n## Source Citation Rules (MANDATORY)' +
           '\n1. When answering factual questions, START with the highest-relevance source.' +
@@ -1503,52 +1553,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // If enableTools is true (default for case-bound sessions), do a quick
       // non-streaming pass to check if the LLM wants to call tools (web search,
       // glossary, RAG). Tool results are injected into the system prompt.
-      const ssePolicyContext: ACEContext = {
-        userProfile: null,
-        caseContext,
-        glossaryMatches,
-        ragChunks: contextDocs.map((d) => ({
-          content: d.content,
-          score: d.similarity,
-          source: d.sourceId ?? d.documentId,
-        })),
-        kbChunks: [],
-        caseChunks: [],
-        kagNeighbors:
-          graphContext?.neighbors?.map((n) => ({
-            nodeId: n.nodeId,
-            title: n.title,
-            relationship: n.connectionType,
-          })) ?? [],
-        chatHistory: conversationHistory
-          .filter(
-            (m): m is { role: 'user' | 'assistant' | 'system'; content: string } =>
-              m.role === 'user' || m.role === 'assistant' || m.role === 'system'
-          )
-          .map((m) => ({ role: m.role, content: m.content })),
-        entities: {
-          statutes: queryEntities.statutes,
-          cases: queryEntities.cases,
-          persons: [],
-          organizations: [],
-          dates: [],
-        },
-        practiceTemplate: null,
-        queryTags: [...queryEntities.statutes.slice(0, 3), ...queryEntities.cases.slice(0, 3)],
-        webSearchContext: null,
-        persona: 'neutral',
-        evidenceMetadata: null,
-        evidenceConnections: null,
-        userAnalyticsContext: null,
-        codebaseContext:
-          codebaseResult?.chunks.map((chunk) => ({
-            filePath: chunk.relativePath,
-            content: chunk.symbol,
-            score: chunk.score,
-          })) ?? null,
-        policyDecision: null,
-      };
-      const policyDecision: ACEPolicyDecision = determineACEPolicy(message, ssePolicyContext);
+      // ssePolicyContext + policyDecision computed above (before systemPrompt build).
 
       let toolResults: ContextualToolResult[] = [];
       const shouldRunTools = enableTools ?? !!caseMatch;

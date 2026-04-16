@@ -33,9 +33,11 @@ import uuid
 from typing import Any, AsyncGenerator, TypedDict
 
 import httpx
+import numpy as np
 import redis.asyncio as aioredis
 import torch
 from fastapi import FastAPI, HTTPException, Query
+from collections import Counter
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
@@ -62,6 +64,8 @@ REPO_ROOT          = os.environ.get("REPO_ROOT",        "/workspace/repo")
 CONFIDENCE_THRESHOLD = float(os.environ.get("CONFIDENCE_THRESHOLD", "0.65"))
 REDIS_L1_PREFIX    = "llm:exact:"
 REDIS_L1_TTL       = 3600  # 1 hour — matches TS redis-exact-match.ts
+REDIS_KAG_PREFIX   = "langgraph:kag:neighbors:"  # pre-warm cache written by Colab Cell 11
+REDIS_KAG_TTL      = 86_400  # 24 h — refreshed by nightly Colab run
 BIFROST_THRESHOLD  = float(os.environ.get("BIFROST_THRESHOLD", "0.80"))
 
 # ── FastAPI ───────────────────────────────────────────────────────────────────
@@ -253,6 +257,206 @@ def rg_search(query: str, path: str = REPO_ROOT, limit: int = 8) -> list[dict]:
         return []
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# HMM Legal Section Tagger  (salvaged from deeds_labs/services/hmm-topic-service)
+# Pure numpy — no GPU needed. Viterbi over 7 legal states: PARTIES → JURISDICTION
+# → FACTS → LEGAL_AUTHORITY → CLAIMS → PRAYER → HOLDING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class LegalHMM:
+    STATES = ['PARTIES', 'JURISDICTION', 'FACTS', 'LEGAL_AUTHORITY', 'CLAIMS', 'PRAYER', 'HOLDING']
+    TRANSITIONS = {
+        'PARTIES':        {'JURISDICTION': 0.9, 'FACTS': 0.1},
+        'JURISDICTION':   {'FACTS': 0.8, 'LEGAL_AUTHORITY': 0.2},
+        'FACTS':          {'LEGAL_AUTHORITY': 0.7, 'CLAIMS': 0.3},
+        'LEGAL_AUTHORITY':{'CLAIMS': 0.8, 'FACTS': 0.2},
+        'CLAIMS':         {'PRAYER': 0.6, 'HOLDING': 0.4},
+        'PRAYER':         {'HOLDING': 0.9, 'PARTIES': 0.1},
+        'HOLDING':        {'PARTIES': 0.1, 'HOLDING': 0.9},
+    }
+    EMISSIONS = {
+        'PARTIES':        {'plaintiff': 0.15, 'defendant': 0.15, 'appellant': 0.1, 'respondent': 0.1, 'petitioner': 0.1, 'v.': 0.2, 'versus': 0.15, 'party': 0.05},
+        'JURISDICTION':   {'jurisdiction': 0.2, 'venue': 0.15, 'court': 0.15, 'district': 0.1, 'federal': 0.1, 'state': 0.1, 'competent': 0.05, 'proper': 0.05},
+        'FACTS':          {'occurred': 0.1, 'happened': 0.1, 'alleged': 0.15, 'facts': 0.1, 'incident': 0.1, 'event': 0.1, 'date': 0.1, 'time': 0.05, 'place': 0.05},
+        'LEGAL_AUTHORITY':{'statute': 0.15, 'regulation': 0.15, 'constitution': 0.1, 'law': 0.15, 'code': 0.1, 'section': 0.1, 'u.s.c.': 0.1, 'precedent': 0.05},
+        'CLAIMS':         {'claim': 0.2, 'cause': 0.15, 'action': 0.15, 'violation': 0.15, 'breach': 0.1, 'negligence': 0.1, 'damages': 0.05},
+        'PRAYER':         {'prayer': 0.2, 'relief': 0.2, 'damages': 0.15, 'injunction': 0.15, 'declaratory': 0.1, 'request': 0.05},
+        'HOLDING':        {'held': 0.2, 'holding': 0.2, 'ruled': 0.15, 'affirmed': 0.1, 'reversed': 0.1, 'remanded': 0.1, 'therefore': 0.05},
+    }
+
+    def __init__(self) -> None:
+        self._re_tok = re.compile(r'\b\w+\b')
+
+    def _tokens(self, text: str) -> list[str]:
+        return self._re_tok.findall(text.lower())
+
+    def _emit(self, state: str, word: str) -> float:
+        return self.EMISSIONS.get(state, {}).get(word, 0.01)
+
+    def _trans(self, from_s: str, to_s: str) -> float:
+        return self.TRANSITIONS.get(from_s, {}).get(to_s, 1.0 / len(self.STATES))
+
+    def viterbi(self, tokens: list[str]) -> tuple[list[str], float]:
+        n, k = len(tokens), len(self.STATES)
+        V = np.full((k, n), -np.inf)
+        B = np.zeros((k, n), dtype=int)
+        for i, s in enumerate(self.STATES):
+            V[i, 0] = np.log(self._emit(s, tokens[0]) + 1e-10)
+        for t in range(1, n):
+            for j, to_s in enumerate(self.STATES):
+                ep = np.log(self._emit(to_s, tokens[t]) + 1e-10)
+                scores = V[:, t - 1] + np.array([np.log(self._trans(f, to_s) + 1e-10) for f in self.STATES])
+                best = int(np.argmax(scores))
+                V[j, t] = scores[best] + ep
+                B[j, t] = best
+        path, s = [], int(np.argmax(V[:, -1]))
+        path.append(s)
+        for t in range(n - 1, 0, -1):
+            s = B[s, t]; path.append(s)
+        path.reverse()
+        return [self.STATES[i] for i in path], float(np.exp(np.max(V[:, -1])))
+
+    # ── Tag → state supervision map  (Qdrant payload tags / statute glossary) ───
+    _TAG_STATE: dict[str, str] = {
+        "plaintiff": "PARTIES", "defendant": "PARTIES", "appellant": "PARTIES",
+        "respondent": "PARTIES", "petitioner": "PARTIES", "party": "PARTIES",
+        "jurisdiction": "JURISDICTION", "venue": "JURISDICTION", "court": "JURISDICTION",
+        "district": "JURISDICTION", "federal": "JURISDICTION",
+        "facts": "FACTS", "incident": "FACTS", "allegation": "FACTS",
+        "narrative": "FACTS", "background": "FACTS", "timeline": "FACTS",
+        "statute": "LEGAL_AUTHORITY", "regulation": "LEGAL_AUTHORITY", "code": "LEGAL_AUTHORITY",
+        "section": "LEGAL_AUTHORITY", "u.s.c.": "LEGAL_AUTHORITY", "precedent": "LEGAL_AUTHORITY",
+        "authority": "LEGAL_AUTHORITY", "constitution": "LEGAL_AUTHORITY",
+        "claim": "CLAIMS", "cause_of_action": "CLAIMS", "violation": "CLAIMS",
+        "breach": "CLAIMS", "negligence": "CLAIMS", "liability": "CLAIMS",
+        "damages": "CLAIMS",
+        "prayer": "PRAYER", "relief": "PRAYER", "injunction": "PRAYER",
+        "declaratory": "PRAYER", "remedy": "PRAYER",
+        "holding": "HOLDING", "ruling": "HOLDING", "affirmed": "HOLDING",
+        "reversed": "HOLDING", "remanded": "HOLDING", "judgment": "HOLDING",
+        "verdict": "HOLDING", "order": "HOLDING",
+    }
+
+    def _forward_backward(self, tokens: list[str]) -> np.ndarray:
+        """Baum-Welch E-step → γ[state, t] = P(state at t | full sequence)."""
+        n, k = len(tokens), len(self.STATES)
+        log_a = np.full((k, n), -np.inf)
+        for i, s in enumerate(self.STATES):
+            log_a[i, 0] = np.log(self._emit(s, tokens[0]) + 1e-10)
+        for t in range(1, n):
+            for j, to_s in enumerate(self.STATES):
+                ep = np.log(self._emit(to_s, tokens[t]) + 1e-10)
+                log_a[j, t] = np.logaddexp.reduce(
+                    log_a[:, t - 1] + np.array([np.log(self._trans(f, to_s) + 1e-10) for f in self.STATES])
+                ) + ep
+        log_b = np.zeros((k, n))
+        for t in range(n - 2, -1, -1):
+            for i, from_s in enumerate(self.STATES):
+                log_b[i, t] = np.logaddexp.reduce([
+                    np.log(self._trans(from_s, to_s) + 1e-10)
+                    + np.log(self._emit(to_s, tokens[t + 1]) + 1e-10)
+                    + log_b[j, t + 1]
+                    for j, to_s in enumerate(self.STATES)
+                ])
+        log_gamma = log_a + log_b
+        log_gamma -= np.logaddexp.reduce(log_gamma, axis=0, keepdims=True)
+        return np.exp(log_gamma)  # (k, n)
+
+    def _blend_counts(self, soft_counts: dict[str, dict[str, float]], lr: float) -> None:
+        """Merge soft word→state counts into emission probs (Laplace + linear blend)."""
+        for state in self.STATES:
+            counts = soft_counts[state]
+            if not counts:
+                continue
+            total = sum(counts.values()) + len(counts)  # add-1 smoothing
+            for word, cnt in counts.items():
+                prior = self.EMISSIONS[state].get(word, 0.005)
+                learned = (cnt + 1) / total
+                self.EMISSIONS[state][word] = round((1 - lr) * prior + lr * learned, 5)
+
+    def adapt_from_texts(self, texts: list[str], lr: float = 0.15) -> int:
+        """
+        Baum-Welch soft EM on unlabeled legal texts.
+        Sources: evidence summaries (PostgreSQL), JSONL corpus, chat RAG chunks.
+        Only updates emissions — transition matrix stays fixed.
+        Returns total tokens processed.
+        """
+        soft_counts: dict[str, dict[str, float]] = {s: {} for s in self.STATES}
+        total_tokens = 0
+        for text in texts:
+            tokens = self._tokens(text)[:300]
+            if len(tokens) < 5:
+                continue
+            gamma = self._forward_backward(tokens)
+            for t, word in enumerate(tokens):
+                for i, state in enumerate(self.STATES):
+                    soft_counts[state][word] = soft_counts[state].get(word, 0.0) + gamma[i, t]
+            total_tokens += len(tokens)
+        if total_tokens > 0:
+            self._blend_counts(soft_counts, lr)
+            log.info(f"[HMM] adapt_from_texts: {len(texts)} texts, {total_tokens} tokens")
+        return total_tokens
+
+    def adapt_from_qdrant_hits(self, hits: list[dict], lr: float = 0.20) -> int:
+        """
+        Supervised adaptation from Qdrant hits with 'tags' payloads.
+        Sources: legal_documents, evidence_items, statute_chunks — any collection
+        whose chunks carry tags that map to known legal section states.
+        """
+        supervised: dict[str, dict[str, float]] = {s: {} for s in self.STATES}
+        n_adapted = 0
+        for hit in hits:
+            tags: list[str] = hit.get("tags", []) or []
+            mapped: set[str] = set()
+            for tag in tags:
+                state = self._TAG_STATE.get(tag.lower().replace(" ", "_")) \
+                     or self._TAG_STATE.get(tag.lower())
+                if state:
+                    mapped.add(state)
+            if not mapped:
+                continue
+            tokens = self._tokens(hit.get("text", ""))[:200]
+            w = 1.0 / len(mapped)
+            for state in mapped:
+                for word in tokens:
+                    supervised[state][word] = supervised[state].get(word, 0.0) + w
+            n_adapted += 1
+        if n_adapted:
+            self._blend_counts(supervised, lr)
+            log.info(f"[HMM] adapt_from_qdrant_hits: {n_adapted}/{len(hits)} hits tagged")
+        return n_adapted
+
+    def to_redis_payload(self) -> str:
+        return json.dumps({"v": 1, "emissions": self.EMISSIONS})
+
+    def load_redis_payload(self, raw: str) -> bool:
+        try:
+            data = json.loads(raw)
+            if data.get("v") == 1 and "emissions" in data:
+                self.EMISSIONS = data["emissions"]
+                log.info("[HMM] Loaded adapted emissions from Redis")
+                return True
+        except Exception as exc:
+            log.debug(f"[HMM] Redis load error: {exc}")
+        return False
+
+    def tag_chunk(self, text: str) -> dict:
+        """Return primary_state + state_probabilities for a single text chunk."""
+        tokens = self._tokens(text)
+        if not tokens:
+            return {"primary_state": "FACTS", "state_probabilities": {}, "hmm_confidence": 0.0}
+        seq, prob = self.viterbi(tokens[:200])
+        dist = Counter(seq)
+        total = sum(dist.values())
+        probs = {s: round(dist[s] / total, 3) for s in dist}
+        primary = max(probs, key=probs.get)
+        return {"primary_state": primary, "state_probabilities": probs, "hmm_confidence": round(prob, 4)}
+
+
+_hmm = LegalHMM()  # module-level singleton — numpy, no GPU, safe to share
+_HMM_REDIS_KEY = "hmm:emissions:v1"
+_HMM_REDIS_TTL = 7 * 86_400  # 7 days
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # ACE entity extraction  (regex — mirrors tag-extractor.ts)
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -265,13 +469,63 @@ def extract_legal_entities(text: str) -> dict:
         "cases":    list({m.group() for m in _CASE_RE.finditer(text)})[:6],
     }
 
+def build_citations(rag_hits: list[dict]) -> list[dict]:
+    """
+    Build structured citation list from tagged RAG hits.
+    Saved with synthesis_runs for QLoRA context and provenance tracking.
+    """
+    return [
+        {
+            "index": i + 1,
+            "id":      h.get("id", ""),
+            "title":   h.get("title", ""),
+            "source":  h.get("source", ""),
+            "score":   round(float(h.get("score", 0)), 4),
+            "section": h.get("primary_state", ""),   # HMM label, e.g. "FACTS"
+            "text":    h.get("text", "")[:300],       # snippet for QLoRA input context
+        }
+        for i, h in enumerate(rag_hits[:8])
+    ]
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # Neo4j KAG expansion
 # ═══════════════════════════════════════════════════════════════════════════════
 
-async def kag_neighbors(doc_ids: list[str], limit: int = 8) -> list[dict]:
+async def kag_neighbors(doc_ids: list[str], limit: int = 8) -> tuple[list[dict], str]:
+    """
+    Returns (neighbors, kag_source) where kag_source is one of:
+      'redis_prewarm'  — served from Colab-prewarmed Redis key (24h TTL)
+      'neo4j_live'     — live Neo4j traversal, result written back to Redis
+      'none'           — no neighbors found (Neo4j unavailable or empty result)
+    """
     if not doc_ids:
-        return []
+        return [], "none"
+
+    # Normalise IDs: deduplicate + sort so key is stable regardless of call order
+    norm = "|".join(sorted(set(doc_ids)))
+    _kag_cache_key = f"{REDIS_KAG_PREFIX}{hashlib.md5(norm.encode()).hexdigest()[:12]}"
+
+    # ── L0: Redis pre-warm cache (written by Colab Cell 11 or previous live query) ─
+    try:
+        _redis = await get_redis()
+        _raw = await _redis.get(_kag_cache_key)
+        if _raw:
+            cached_data = json.loads(_raw)
+            # Support versioned payload { "v": 1, "neighbors": [...], "source": "..." }
+            # and legacy plain list written by older versions of this code
+            if isinstance(cached_data, dict) and cached_data.get("v") == 1:
+                neighbors = cached_data.get("neighbors", [])
+                cache_source = cached_data.get("source", "redis_prewarm")
+            else:
+                neighbors = cached_data  # legacy list format
+                cache_source = "redis_prewarm"
+            log.info(f"[kag] Redis hit  source={cache_source}  key=...{_kag_cache_key[-8:]}  ids={len(doc_ids)}")
+            return neighbors, cache_source
+    except Exception as _exc:
+        log.debug(f"[kag] Redis lookup error (non-fatal): {_exc}")
+
+    # ── L1: Live Neo4j query ──────────────────────────────────────────────────
+    neighbors = []
     try:
         from neo4j import AsyncGraphDatabase
         driver = AsyncGraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
@@ -283,10 +537,22 @@ async def kag_neighbors(doc_ids: list[str], limit: int = 8) -> list[dict]:
             )
             records = await result.values()
         await driver.close()
-        return [{"id": r[0], "path": r[1], "summary": r[2] or ""} for r in records]
+        neighbors = [{"id": r[0], "path": r[1], "summary": r[2] or ""} for r in records]
     except Exception as exc:
         log.debug(f"[kag] Neo4j unavailable: {exc}")
-        return []
+
+    # Write back to Redis with versioned payload
+    if neighbors:
+        try:
+            _redis = await get_redis()
+            payload = {"v": 1, "neighbors": neighbors, "source": "neo4j_live"}
+            await _redis.set(_kag_cache_key, json.dumps(payload), ex=REDIS_KAG_TTL)
+            log.debug(f"[kag] Redis write  key=...{_kag_cache_key[-8:]}  neighbors={len(neighbors)}")
+        except Exception:
+            pass
+
+    source = "neo4j_live" if neighbors else "none"
+    return neighbors, source
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # LangGraph state
@@ -298,8 +564,9 @@ class SynthesisState(TypedDict):
     entities: dict
     web_results: list[dict]
     rg_results: list[dict]
-    rag_hits: list[dict]
+    rag_hits: list[dict]          # each hit gains 'primary_state' after tag_chunks node
     kag_neighbors: list[dict]
+    kag_source: str               # "redis_prewarm" | "neo4j_live" | "none"
     ace_context: str
     merged_context: str
     llm_response: str
@@ -343,8 +610,20 @@ async def node_retrieve_rag(state: SynthesisState) -> dict:
     return {"rag_hits": hits[:10]}
 
 async def node_retrieve_kag(state: SynthesisState) -> dict:
-    neighbors = await kag_neighbors([h["id"] for h in state["rag_hits"][:5]])
-    return {"kag_neighbors": neighbors}
+    neighbors, kag_source = await kag_neighbors([h["id"] for h in state["rag_hits"][:5]])
+    return {"kag_neighbors": neighbors, "kag_source": kag_source}
+
+async def node_tag_chunks(state: SynthesisState) -> dict:
+    """
+    Annotate each RAG hit with its legal section type via HMM Viterbi.
+    Adds 'primary_state' and 'hmm_confidence' to each hit dict.
+    Pure numpy — runs in <1ms per chunk, no GPU needed.
+    """
+    tagged = []
+    for hit in state["rag_hits"]:
+        tag = _hmm.tag_chunk(hit.get("text", ""))
+        tagged.append({**hit, **tag})
+    return {"rag_hits": tagged}
 
 async def node_assemble_ace(state: SynthesisState) -> dict:
     """
@@ -360,11 +639,13 @@ async def node_assemble_ace(state: SynthesisState) -> dict:
             "\n".join(f"- {s}" for s in entities.get("statutes", [])) +
             "\n".join(f"- {c}" for c in entities.get("cases", [])))
 
-    # RAG chunks  (highest priority)
+    # RAG chunks  (highest priority — section type from HMM tagger)
     if state["rag_hits"]:
         parts.append("## Retrieved Legal Context (RAG)")
         for i, h in enumerate(state["rag_hits"][:6], 1):
-            parts.append(f"[{i}] {h['title']} ({h['source']}, score={h['score']:.2f})\n{h['text']}")
+            section = h.get("primary_state", "")
+            section_tag = f" [{section}]" if section else ""
+            parts.append(f"[{i}] {h['title']} ({h['source']}, score={h['score']:.2f}{section_tag})\n{h['text']}")
 
     # KAG neighbors
     if state["kag_neighbors"]:
@@ -428,33 +709,175 @@ def _should_retry(state: SynthesisState) -> str:
 # Build graph
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def _build_graph() -> Any:
+def _build_graph(lg_cache: Any | None = None) -> Any:
+    """
+    Build and compile the LangGraph synthesis DAG.
+
+    lg_cache: optional langgraph.cache.redis.RedisCache instance.
+      - Passed to g.compile(cache=lg_cache) so LangGraph caches node outputs
+        by their input-state hash (5-min TTL on retrieve_kag).
+      - Falls back to no-cache if None (Redis unavailable at startup).
+    """
+    # Per-node cache policy for the Neo4j KAG expansion (most expensive non-LLM step)
+    _kag_policy: Any = None
+    try:
+        from langgraph.cache.base import CachePolicy  # langgraph ≥ 1.0
+        _kag_policy = CachePolicy(ttl=300)  # 5-min node-output cache
+    except ImportError:
+        pass  # older langgraph — skip per-node policy
+
     g = StateGraph(SynthesisState)
     g.add_node("web_search",    node_web_search)
     g.add_node("rg_search",     node_rg_search)
     g.add_node("retrieve_rag",  node_retrieve_rag)
-    g.add_node("retrieve_kag",  node_retrieve_kag)
+    g.add_node(
+        "retrieve_kag", node_retrieve_kag,
+        **({"cache_policy": _kag_policy} if _kag_policy is not None else {}),
+    )
+    g.add_node("tag_chunks",    node_tag_chunks)  # HMM legal section tagger
     g.add_node("assemble_ace",  node_assemble_ace)
     g.add_node("merge",         node_merge)
     g.add_node("synthesize",    node_synthesize)
     g.add_node("self_eval",     node_self_eval)
 
     # Parallel retrieval fan-out from entry
+    # retrieve_rag → (retrieve_kag, web_search, rg_search) in parallel
+    # retrieve_kag → tag_chunks → assemble_ace  (sequential: need RAG hits tagged first)
+    # web_search, rg_search → assemble_ace directly
     g.set_entry_point("retrieve_rag")
-    # web + rg run in parallel before rag completes — triggered from rag fan-out
     g.add_edge("retrieve_rag",  "retrieve_kag")
     g.add_edge("retrieve_rag",  "web_search")
     g.add_edge("retrieve_rag",  "rg_search")
-    g.add_edge("retrieve_kag",  "assemble_ace")
+    g.add_edge("retrieve_kag",  "tag_chunks")
+    g.add_edge("tag_chunks",    "assemble_ace")
     g.add_edge("web_search",    "assemble_ace")
     g.add_edge("rg_search",     "assemble_ace")
     g.add_edge("assemble_ace",  "merge")
     g.add_edge("merge",         "synthesize")
     g.add_edge("synthesize",    "self_eval")
     g.add_conditional_edges("self_eval", _should_retry, {"retry": "synthesize", "done": END})
-    return g.compile()
 
-_graph = _build_graph()
+    compile_kwargs: dict = {}
+    if lg_cache is not None:
+        compile_kwargs["cache"] = lg_cache
+    return g.compile(**compile_kwargs)
+
+
+# ── Lazy graph singleton — wired with RedisCache in startup handler ───────────
+
+_graph: Any | None = None
+
+
+async def _hmm_adapt_startup() -> None:
+    """
+    Seed HMM emission probabilities at startup from three sources (priority order):
+
+    1. Redis cache (hmm:emissions:v1) — fastest path, persisted from last run
+    2. Qdrant legal_documents / statute_chunks — tagged chunks → supervised adapt
+    3. PostgreSQL evidence summaries — unlabeled text → Baum-Welch soft EM
+
+    Writes learned emissions back to Redis (7-day TTL) so the next restart is instant.
+    Non-fatal: any failure falls back to hardcoded prior without breaking startup.
+    """
+    try:
+        # ── 1. Try Redis cache ────────────────────────────────────────────────
+        redis = await get_redis()
+        cached_raw = await redis.get(_HMM_REDIS_KEY)
+        if cached_raw and _hmm.load_redis_payload(cached_raw):
+            return  # fast path — already adapted
+
+        # ── 2. Qdrant tagged chunks (statute_chunks + legal_documents) ────────
+        qdrant_hits: list[dict] = []
+        try:
+            qdrant = await get_qdrant()
+            for collection in ("legal_documents", "statute_chunks", "evidence_items"):
+                try:
+                    # Scroll up to 200 points per collection
+                    results, _ = await qdrant.scroll(
+                        collection_name=collection,
+                        limit=200,
+                        with_payload=True,
+                    )
+                    for pt in results:
+                        p = pt.payload or {}
+                        text = p.get("chunk_text") or p.get("text") or p.get("summary") or ""
+                        tags = p.get("tags") or []
+                        if text and tags:
+                            qdrant_hits.append({"text": text, "tags": tags})
+                except Exception:
+                    pass
+            adapted = _hmm.adapt_from_qdrant_hits(qdrant_hits, lr=0.20)
+            log.info(f"[HMM startup] Qdrant adapt: {adapted} hits from {len(qdrant_hits)} chunks")
+        except Exception as exc:
+            log.debug(f"[HMM startup] Qdrant adapt skipped: {exc}")
+
+        # ── 3. PostgreSQL evidence summaries (unlabeled Baum-Welch) ───────────
+        try:
+            import asyncpg
+            pg_url = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/deeds")
+            conn = await asyncpg.connect(pg_url)
+            rows = await conn.fetch(
+                "SELECT summary FROM evidence WHERE summary IS NOT NULL AND length(summary) > 80 LIMIT 300"
+            )
+            await conn.close()
+            summaries = [r["summary"] for r in rows if r["summary"]]
+            if summaries:
+                tokens_seen = _hmm.adapt_from_texts(summaries, lr=0.15)
+                log.info(f"[HMM startup] Evidence summaries adapt: {len(summaries)} docs, {tokens_seen} tokens")
+        except Exception as exc:
+            log.debug(f"[HMM startup] PostgreSQL adapt skipped: {exc}")
+
+        # ── Persist adapted emissions to Redis ────────────────────────────────
+        try:
+            await redis.set(_HMM_REDIS_KEY, _hmm.to_redis_payload(), ex=_HMM_REDIS_TTL)
+            log.info(f"[HMM startup] Adapted emissions persisted to Redis (TTL={_HMM_REDIS_TTL}s)")
+        except Exception as exc:
+            log.debug(f"[HMM startup] Redis persist skipped: {exc}")
+
+    except Exception as exc:
+        log.warning(f"[HMM startup] Adaptation failed (non-fatal, using prior): {exc}")
+
+
+async def _hmm_adapt_from_hits(hits: list[dict]) -> None:
+    """
+    Background task: supervised-adapt HMM from one synthesis query's RAG hits,
+    then persist updated emissions to Redis. Called after every L3 synthesis.
+    Non-fatal — errors are logged at DEBUG level only.
+    """
+    try:
+        n = _hmm.adapt_from_qdrant_hits(hits, lr=0.05)  # small lr for incremental updates
+        if n > 0:
+            redis = await get_redis()
+            await redis.set(_HMM_REDIS_KEY, _hmm.to_redis_payload(), ex=_HMM_REDIS_TTL)
+            log.debug(f"[HMM bg] adapted {n} hits, emissions persisted")
+    except Exception as exc:
+        log.debug(f"[HMM bg] non-fatal: {exc}")
+
+
+@app.on_event("startup")
+async def _startup_graph() -> None:
+    """
+    Build the LangGraph DAG once on startup.
+    Wires langgraph.cache.redis.RedisCache if available so node outputs
+    (especially retrieve_kag's Neo4j expansion) are cached in Redis.
+    Falls back to an uncached graph if LangGraph's Redis cache module is absent.
+    Also seeds HMM emission probabilities from Qdrant tags + evidence summaries.
+    """
+    global _graph
+    # Run HMM adaptation in parallel with graph compilation (independent)
+    lg_cache: Any | None = None
+    try:
+        import redis as _sync_redis
+        from langgraph.cache.redis import RedisCache
+        r_sync = _sync_redis.from_url(REDIS_URL)
+        lg_cache = RedisCache(r_sync, prefix="langgraph:cache:")
+        log.info("[startup] LangGraph compiled with RedisCache (prefix=langgraph:cache:)")
+    except Exception as exc:
+        log.warning(f"[startup] LangGraph RedisCache unavailable — compiling without KV cache: {exc}")
+    _graph, _ = await asyncio.gather(
+        asyncio.to_thread(_build_graph, lg_cache),
+        _hmm_adapt_startup(),
+    )
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Request/Response models
@@ -501,16 +924,21 @@ async def synthesize(req: SynthesizeRequest) -> dict:
             }
 
     # L3: LangGraph DAG
+    graph = _graph
+    if graph is None:
+        raise HTTPException(status_code=503, detail="Graph initializing — retry in a moment")
+
     initial: SynthesisState = {
         "query": req.query, "case_id": req.case_id,
         "entities": extract_legal_entities(req.query),
         "web_results": [], "rg_results": [], "rag_hits": [],
-        "kag_neighbors": [], "ace_context": "", "merged_context": "",
+        "kag_neighbors": [], "kag_source": "none",
+        "ace_context": "", "merged_context": "",
         "llm_response": "", "confidence": 0.0, "retried": False, "trace_id": trace_id,
     }
 
     try:
-        result = await _graph.ainvoke(initial)
+        result = await graph.ainvoke(initial)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -519,16 +947,37 @@ async def synthesize(req: SynthesizeRequest) -> dict:
     # Write back to L1
     await l1_set(cache_key, answer, LLM_MODEL, "langgraph")
 
+    citations = build_citations(result["rag_hits"])
+
+    # GRPO reward: PyTorch cosine similarity between query and answer embeddings.
+    # Provides a scalar reward ∈ [-1, 1] for GRPO fine-tuning of the synthesis model.
+    grpo_reward_score: float | None = None
+    try:
+        import torch.nn.functional as F
+        q_emb = await embed_query(req.query)
+        a_emb = await embed_query(answer[:512])
+        q_t = torch.tensor(q_emb, dtype=torch.float32).unsqueeze(0)
+        a_t = torch.tensor(a_emb, dtype=torch.float32).unsqueeze(0)
+        grpo_reward_score = float(F.cosine_similarity(q_t, a_t).item())
+    except Exception as exc:
+        log.debug(f"[grpo] reward compute skipped: {exc}")
+
+    # Background HMM adaptation — fire-and-forget, non-blocking
+    asyncio.create_task(_hmm_adapt_from_hits(result["rag_hits"]))
+
     return {
         "answer": answer,
         "confidence": result["confidence"],
+        "grpo_reward_score": grpo_reward_score,
         "cache": "L3-langgraph",
         "rag_hits": len(result["rag_hits"]),
         "kag_neighbors": len(result["kag_neighbors"]),
+        "kag_source": result.get("kag_source", "none"),
         "web_results": len(result["web_results"]),
         "rg_results": len(result["rg_results"]),
         "retried": result["retried"],
         "entities": result["entities"],
+        "citations": citations,
         "latency_ms": round((time.perf_counter() - t0) * 1000),
         "trace_id": trace_id,
         "gpu": torch.cuda.is_available(),
@@ -578,22 +1027,24 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
             except Exception:
                 pass
         rag_hits.sort(key=lambda h: h["score"], reverse=True)
+        # Tag chunks inline (pure numpy, <1ms per chunk — safe in streaming path)
+        rag_hits = [{**h, **_hmm.tag_chunk(h.get("text", ""))} for h in rag_hits]
         yield f"data: {json.dumps({'stage':'rag','status':'done','hits':len(rag_hits)})}\n\n"
 
         yield f"data: {json.dumps({'stage':'kag','status':'running'})}\n\n"
-        neighbors = await kag_neighbors([h["id"] for h in rag_hits[:5]])
+        neighbors, kag_source = await kag_neighbors([h["id"] for h in rag_hits[:5]])
         web_results, rg_results = await asyncio.gather(
             web_search(req.query, limit=3),
             asyncio.to_thread(rg_search, req.query, REPO_ROOT, 4),
         )
-        yield f"data: {json.dumps({'stage':'kag','status':'done','neighbors':len(neighbors),'web':len(web_results),'rg':len(rg_results)})}\n\n"
+        yield f"data: {json.dumps({'stage':'kag','status':'done','neighbors':len(neighbors),'kag_source':kag_source,'web':len(web_results),'rg':len(rg_results)})}\n\n"
 
         # Build ACE context
         ctx_state: SynthesisState = {
             "query": req.query, "case_id": None,
             "entities": extract_legal_entities(req.query),
             "web_results": web_results, "rg_results": rg_results,
-            "rag_hits": rag_hits, "kag_neighbors": neighbors,
+            "rag_hits": rag_hits, "kag_neighbors": neighbors, "kag_source": kag_source,
             "ace_context": "", "merged_context": "", "llm_response": "",
             "confidence": 0.0, "retried": False, "trace_id": trace_id,
         }
@@ -616,7 +1067,18 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
 
         await l1_set(cache_key, full_text, LLM_MODEL, "langgraph-stream")
         confidence = min(0.95, 0.5 + len(rag_hits) * 0.05 + (0.1 if "[" in full_text else 0))
-        yield f"data: {json.dumps({'stage':'done','confidence':confidence,'trace_id':trace_id,'cache':'L3-langgraph'})}\n\n"
+        citations = build_citations(rag_hits)
+        grpo_reward_score: float | None = None
+        try:
+            import torch.nn.functional as F
+            q_emb = await embed_query(req.query)
+            a_emb = await embed_query(full_text[:512])
+            q_t = torch.tensor(q_emb, dtype=torch.float32).unsqueeze(0)
+            a_t = torch.tensor(a_emb, dtype=torch.float32).unsqueeze(0)
+            grpo_reward_score = float(F.cosine_similarity(q_t, a_t).item())
+        except Exception:
+            pass
+        yield f"data: {json.dumps({'stage':'done','confidence':confidence,'trace_id':trace_id,'cache':'L3-langgraph','kag_source':kag_source,'citations':citations,'grpo_reward_score':grpo_reward_score})}\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
 
@@ -700,3 +1162,42 @@ async def health() -> dict:
         if k in ("qdrant", "redis", "ollama", "gpu")
     ) else "degraded"
     return checks
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# HMM management endpoints
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@app.get("/hmm/stats")
+async def hmm_stats() -> dict:
+    """
+    Return current HMM emission state for debugging and QLoRA context audit.
+    Shows which words have been up-weighted by corpus adaptation vs. the hard prior.
+    """
+    top_words: dict[str, list[str]] = {}
+    for state in LegalHMM.STATES:
+        emissions = _hmm.EMISSIONS.get(state, {})
+        # Sort by prob descending, return top-8 words
+        ranked = sorted(emissions.items(), key=lambda x: x[1], reverse=True)[:8]
+        top_words[state] = [f"{w}={p:.3f}" for w, p in ranked]
+    try:
+        redis = await get_redis()
+        has_redis = bool(await redis.exists(_HMM_REDIS_KEY))
+    except Exception:
+        has_redis = False
+    return {
+        "states": LegalHMM.STATES,
+        "top_emission_words": top_words,
+        "redis_persisted": has_redis,
+        "redis_key": _HMM_REDIS_KEY,
+    }
+
+
+@app.post("/hmm/adapt")
+async def hmm_adapt_endpoint() -> dict:
+    """
+    Manual trigger: run full 2-source adaptation (Qdrant + PostgreSQL) and persist.
+    Equivalent to a fresh startup adaptation — use after ingesting new documents.
+    """
+    asyncio.create_task(_hmm_adapt_startup())
+    return {"status": "adaptation started in background", "key": _HMM_REDIS_KEY}

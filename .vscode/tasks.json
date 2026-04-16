@@ -3304,6 +3304,116 @@
       "group": "build",
       "presentation": { "reveal": "silent", "panel": "shared" },
       "problemMatcher": []
+    },
+
+    // ============================================
+    // Contextual Graph Analysis — pytorch-graph GPU ops
+    // ============================================
+    {
+      "label": "🧮 Graph: PageRank + K-Means Analysis (GPU)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$body = @{includePageRank=$true;includeGpuClusters=$true;includeSimilarityMatrix=$false;clusterCount=20;maxNodes=2000} | ConvertTo-Json; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:5173/api/graph/analyze' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 120; $sw.Stop(); Write-Host \\\"Graph analysis: $($sw.ElapsedMilliseconds)ms | nodes=$($r.nodeCount) | edges=$($r.edgeCount) | cuda=$($r.gpu.cuda) | clusters=$($r.gpuClusters.k)\\\" -ForegroundColor Cyan; $r.pageRank | Select-Object -First 10 | Format-Table nodeId,label,score -AutoSize\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗺️ Graph: Train SOM Topology + Draw Neo4j Connections",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '── Training Kohonen SOM on codebase_chunks_768 ──' -ForegroundColor Cyan; $body = @{maxFiles=2000;iters=1000} | ConvertTo-Json; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:5173/api/graph/som-topology' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 300; $sw.Stop(); Write-Host \\\"SOM: $($sw.ElapsedMilliseconds)ms | files=$($r.filesProcessed) | grid=$($r.gridSize) | neurons=$($r.neuronsUsed) | neo4j-edges=$($r.edgesCreated) | source=$($r.source)\\\" -ForegroundColor Green; if ($r.error) { Write-Host \\\"Warning: $($r.error)\\\" -ForegroundColor Yellow }\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📓 Graph: Export Colab GPU Notebook (.ipynb)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$outPath = \\\"$env:USERPROFILE\\\\Downloads\\\\deeds-graph-analysis.ipynb\\\"; Invoke-WebRequest 'http://localhost:5173/api/graph/colab-export' -OutFile $outPath; Write-Host \\\"Notebook saved to: $outPath\\\" -ForegroundColor Green; Write-Host 'Upload to: https://colab.research.google.com → File → Upload notebook' -ForegroundColor Cyan\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 Graph: Audit G27-G35 (pytorch-graph wiring gates)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '── G27: pytorch-graph consumers ──' -ForegroundColor Cyan; $g27 = (rg 'kmeansWithCentroids|trainSOM' 'sveltekit-frontend/src' --glob '*.ts' -l 2>$null | Measure-Object -Line).Lines; Write-Host \\\"G27 consumers: $g27 files\\\" -ForegroundColor $(if ($g27 -ge 2) { 'Green' } else { 'Red' }); Write-Host '── G28: som-topology endpoint ──' -ForegroundColor Cyan; $g28 = Test-Path 'sveltekit-frontend/src/routes/api/graph/som-topology/+server.ts'; Write-Host \\\"G28 som-topology: $g28\\\" -ForegroundColor $(if ($g28) { 'Green' } else { 'Red' }); Write-Host '── G29: colab-export endpoint ──' -ForegroundColor Cyan; $g29 = Test-Path 'sveltekit-frontend/src/routes/api/graph/colab-export/+server.ts'; Write-Host \\\"G29 colab-export: $g29\\\" -ForegroundColor $(if ($g29) { 'Green' } else { 'Red' }); Write-Host '── G30: compound tasks ──' -ForegroundColor Cyan; $g30 = (Select-String 'dependsOrder.*parallel' '.vscode/tasks.json' -Quiet); Write-Host \\\"G30 compound parallel tasks: $g30\\\" -ForegroundColor $(if ($g30) { 'Green' } else { 'Red' }); Write-Host '── G31: Qdrant tag enrichment (som_cluster) ──' -ForegroundColor Cyan; $g31 = (rg 'som_cluster' 'sveltekit-frontend/src' --glob '*.ts' -l 2>$null | Measure-Object -Line).Lines; Write-Host \\\"G31 som_cluster writes: $g31 files\\\" -ForegroundColor $(if ($g31 -ge 1) { 'Green' } else { 'Red' }); Write-Host '── G33: pageRankGPU imported in graph module ──' -ForegroundColor Cyan; $g33 = (rg 'pageRankGPU' 'sveltekit-frontend/src/lib/server/graph' --glob '*.ts' -l 2>$null | Measure-Object -Line).Lines; Write-Host \\\"G33 pageRankGPU in graph: $g33 files\\\" -ForegroundColor $(if ($g33 -ge 1) { 'Green' } else { 'Red' })\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    // ============================================
+    // Concurrent Indexing — Parallel Dataset Pipelines
+    // ============================================
+    {
+      "label": "⚡ PARALLEL: Ingest Dev Docs (background)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$r = Invoke-RestMethod 'http://localhost:5173/api/library/ingest-dev-docs' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{}' -TimeoutSec 120; Write-Host \\\"Dev Docs: created=$($r.created) skipped=$($r.skipped) failed=$($r.failed)\\\" -ForegroundColor Green\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ PARALLEL: KAG Error Ingest (background)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$r = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/ingest-errors' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"mode\\\":\\\"migrate\\\",\\\"force\\\":false}' -TimeoutSec 60; Write-Host \\\"KAG Errors: clusters=$($r.ingested.clusters) cards=$($r.ingested.cards)\\\" -ForegroundColor Green\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ PARALLEL: GPU Cluster Detection (background)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$r = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/cluster-detect' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"k\\\":20,\\\"maxFiles\\\":2000}' -TimeoutSec 60; Write-Host \\\"Cluster detect: jobId=$($r.jobId) k=$($r.k) files=$($r.fileCount)\\\" -ForegroundColor Green\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ PARALLEL: SOM Topology Train (background)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$r = Invoke-RestMethod 'http://localhost:5173/api/graph/som-topology' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"maxFiles\\\":2000,\\\"iters\\\":1000}' -TimeoutSec 300; Write-Host \\\"SOM: files=$($r.filesProcessed) grid=$($r.gridSize) edges=$($r.edgesCreated) source=$($r.source)\\\" -ForegroundColor Green\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 CONCURRENT: Full Dataset Index + Graph Analysis (all 4 in parallel)",
+      "dependsOn": [
+        "⚡ PARALLEL: Ingest Dev Docs (background)",
+        "⚡ PARALLEL: KAG Error Ingest (background)",
+        "⚡ PARALLEL: GPU Cluster Detection (background)",
+        "⚡ PARALLEL: SOM Topology Train (background)"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 CONCURRENT: Graph Analysis Suite (PageRank + SOM + Colab export)",
+      "dependsOn": [
+        "🧮 Graph: PageRank + K-Means Analysis (GPU)",
+        "🗺️ Graph: Train SOM Topology + Draw Neo4j Connections",
+        "📓 Graph: Export Colab GPU Notebook (.ipynb)"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 CONCURRENT: Full Ingest + Svelte Check (index while type-checking)",
+      "dependsOn": [
+        "⚡ PARALLEL: Ingest Dev Docs (background)",
+        "⚡ PARALLEL: KAG Error Ingest (background)",
+        "Svelte Check"
+      ],
+      "dependsOrder": "parallel",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
     }
   ],
   "inputs": [

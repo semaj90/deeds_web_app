@@ -21,6 +21,7 @@ import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { traceEmbedding, traceVectorSearch } from '$lib/server/observability/langfuse.js';
 import { createHash } from 'crypto';
+import { topKIndices } from '$lib/server/gpu/pytorch-graph.js';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -178,6 +179,11 @@ async function searchAuthorityCollections(
 			for (const r of results) {
 				if (r.status === 'fulfilled') chunks.push(...r.value);
 			}
+			if (chunks.length > 8) {
+				const simScores = new Float32Array(chunks.map((c) => c.similarity));
+				const { indices } = topKIndices(simScores, Math.min(limit, chunks.length));
+				return Array.from(indices).map((i) => chunks[i]);
+			}
 			chunks.sort((a, b) => b.similarity - a.similarity);
 			return chunks.slice(0, limit);
 		}
@@ -246,7 +252,7 @@ export async function authorityChainExpansion(
 	}
 
 	// ── Multi-hop expansion ──────────────────────────────────────────────
-	const allDocs = [...contextDocs];
+	let allDocs = [...contextDocs];
 	const seenIds = new Set(allDocs.map((d) => d.documentId));
 	const knownStatutes = new Set<string>();
 	const knownCases = new Set<string>();
@@ -323,8 +329,14 @@ export async function authorityChainExpansion(
 		totalExpanded += hopChunks.length;
 	}
 
-	// Re-sort by similarity
-	allDocs.sort((a, b) => b.similarity - a.similarity);
+	// Re-sort by similarity (GPU-accelerated for large result sets)
+	if (allDocs.length > 8) {
+		const simScores = new Float32Array(allDocs.map((d) => d.similarity));
+		const { indices } = topKIndices(simScores, allDocs.length);
+		allDocs = Array.from(indices).map((i) => allDocs[i]);
+	} else {
+		allDocs.sort((a, b) => b.similarity - a.similarity);
+	}
 
 	const result: AuthorityChainResult = {
 		docs: allDocs,

@@ -91,12 +91,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		});
 
 		if (!response.ok) {
-			const errorText = await response.text();
-			console.error('Qdrant error:', errorText);
+			console.error('Qdrant error:', response.status);
 			return json({
 				files: [],
 				stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
-				error: `Qdrant request failed: ${response.status}`
+				error: 'Qdrant unavailable'
 			}, { status: 200 });
 		}
 
