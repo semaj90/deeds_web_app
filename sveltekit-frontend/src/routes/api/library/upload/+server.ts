@@ -21,7 +21,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     const formData = await request.formData();
     const file = formData.get('file');
-    if (!(file instanceof File))
+    // Cross-realm instanceof check (jsdom File !== undici File in test env) — use duck-typing
+    if (!file || typeof file === 'string')
       return json({ success: false, error: 'Missing file' }, { status: 400 });
     if (file.size > 200 * 1024 * 1024)
       return json({ success: false, error: 'File too large (200 MB max)' }, { status: 413 });

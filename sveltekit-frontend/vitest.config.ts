@@ -50,6 +50,7 @@ export default defineConfig({
       'tests/cases-sub-routes.spec.ts',
       'tests/retrieval-path-wiring.spec.ts',
       'tests/ace-pipeline-wiring.spec.ts',
+      'tests/library-upload-ingest.spec.ts',
       'tests/routes/all-routes-page-server.test.ts',
       'tests/routes/all-routes-page.test.ts',
     ],
