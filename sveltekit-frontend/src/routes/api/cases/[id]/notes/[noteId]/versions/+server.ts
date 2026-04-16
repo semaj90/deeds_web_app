@@ -4,6 +4,7 @@ import { json } from '@sveltejs/kit';
 import { and, eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { validateUuidParams } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 /**
  * GET /api/cases/[id]/notes/[noteId]/versions
@@ -32,9 +33,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			.orderBy(desc(caseNoteVersions.versionNumber))
 			.limit(50);
 
-		return json({ success: true, versions });
+		return json({ success: true, versions }, { headers: cacheControl.short });
 	} catch (err) {
 		console.error('[note-versions] GET error:', err);
-		return json({ success: true, versions: [] });
+		return json({ success: true, versions: [] }, { headers: cacheControl.short });
 	}
 };

@@ -11,6 +11,7 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { STATE_CONSTITUTION_SOURCES, getSource } from '$lib/server/legal/constitution-registry';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 const constitutionIngestSchema = z
   .object({
@@ -115,10 +116,10 @@ export const GET: RequestHandler = async ({ locals }) => {
       notStarted: merged.filter((s) => s.processingStatus === 'not_started').length,
     };
 
-    return json({ sources: merged, stats });
+    return json({ sources: merged, stats }, { headers: cacheControl.long });
   } catch (err) {
     console.warn('[api/corpus/constitutions] GET fallback:', err);
-    return json(buildFallbackSources());
+    return json(buildFallbackSources(), { headers: cacheControl.long });
   }
 };
 

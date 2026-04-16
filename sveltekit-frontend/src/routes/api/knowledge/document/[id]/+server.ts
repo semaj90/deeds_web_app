@@ -12,6 +12,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -49,21 +50,25 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     }
 
     // Return document with metadata
-    return json({
-      success: true,
-      document: {id: document.id,
-        title: document.title,
-        url: document.url,
-        content: document.content,
-        summary: document.summary,
-        entities: document.entities,
-        tags: document.tags,
-        scrapedAt: document.scrapedAt.toISOString(),
-        minioKey: document.minioKey
-      }
-    });
+    return json(
+      {
+        success: true,
+        document: {
+          id: document.id,
+          title: document.title,
+          url: document.url,
+          content: document.content,
+          summary: document.summary,
+          entities: document.entities,
+          tags: document.tags,
+          scrapedAt: document.scrapedAt.toISOString(),
+          minioKey: document.minioKey,
+        },
+      },
+      { headers: cacheControl.medium }
+    );
   } catch (error) {
     console.error('Document API error:', error);
-    return json({ success: false, document: emptyDocument });
+    return json({ success: false, document: emptyDocument }, { headers: cacheControl.medium });
   }
 };

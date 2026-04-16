@@ -5,6 +5,7 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq } from 'drizzle-orm';
 import { getChatModelKeepAlive } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 /**
  * GET /api/evidence/[id]/report
@@ -52,50 +53,56 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       }
     }
 
-    return json({
-      id: evidenceId,
-      title: item.title,
-      type: 'document_analysis',
-      status: meta.reviewStatus ?? 'pending',
-      priority: 'medium',
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-      evidence: {
-        id: item.id,
+    return json(
+      {
+        id: evidenceId,
         title: item.title,
-        description: item.description,
-        type: item.type,
-        evidenceType: item.evidenceType,
-        fileName: item.fileName,
-        fileType: item.fileType,
-        fileSize: item.fileSize,
-        source: item.source,
-        collectedAt: item.collectedAt,
-        collectedBy: item.collectedBy,
-        tags: item.tags,
-        aiTags: item.aiTags,
+        type: 'document_analysis',
+        status: meta.reviewStatus ?? 'pending',
+        priority: 'medium',
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        evidence: {
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          type: item.type,
+          evidenceType: item.evidenceType,
+          fileName: item.fileName,
+          fileType: item.fileType,
+          fileSize: item.fileSize,
+          source: item.source,
+          collectedAt: item.collectedAt,
+          collectedBy: item.collectedBy,
+          tags: item.tags,
+          aiTags: item.aiTags,
+        },
+        analysis: {
+          summary: aiSummary,
+          confidence: aiAnalysis.confidence ?? 0.75,
+          entities: aiAnalysis.entities ?? [],
+          patterns: aiAnalysis.patterns ?? [],
+        },
+        metadata: meta,
       },
-      analysis: {
-        summary: aiSummary,
-        confidence: aiAnalysis.confidence ?? 0.75,
-        entities: aiAnalysis.entities ?? [],
-        patterns: aiAnalysis.patterns ?? [],
-      },
-      metadata: meta,
-    });
+      { headers: cacheControl.medium }
+    );
   } catch (err) {
     console.error(`[evidence/${evidenceId}/report] error:`, err);
-    return json({
-      id: evidenceId,
-      title: '',
-      type: 'document_analysis',
-      status: 'pending',
-      priority: 'medium',
-      createdAt: null,
-      updatedAt: null,
-      evidence: null,
-      analysis: { summary: '', confidence: 0, entities: [], patterns: [] },
-      metadata: {},
-    });
+    return json(
+      {
+        id: evidenceId,
+        title: '',
+        type: 'document_analysis',
+        status: 'pending',
+        priority: 'medium',
+        createdAt: null,
+        updatedAt: null,
+        evidence: null,
+        analysis: { summary: '', confidence: 0, entities: [], patterns: [] },
+        metadata: {},
+      },
+      { headers: cacheControl.medium }
+    );
   }
 };

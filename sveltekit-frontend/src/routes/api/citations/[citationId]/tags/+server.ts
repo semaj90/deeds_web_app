@@ -6,6 +6,7 @@ import { invalidateCitationCache } from '$lib/server/cache/invalidation.js';
 import { citations } from '$lib/server/db/schema-postgres.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 async function userOwnsCitation(citationId: string, userId: string): Promise<boolean> {
   const result = await db.execute(
@@ -40,10 +41,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       sql`SELECT id, tag, color, created_at FROM citation_tag_links WHERE citation_id = ${params.citationId} ORDER BY created_at`
     );
     const rows = (result as unknown as { rows?: Record<string, unknown>[] }).rows ?? [];
-    return json({ success: true, tags: rows });
+    return json({ success: true, tags: rows }, { headers: cacheControl.medium });
   } catch (err) {
     console.error('[citation-tags] GET error:', err);
-    return json({ success: true, tags: [] });
+    return json({ success: true, tags: [] }, { headers: cacheControl.medium });
   }
 };
 

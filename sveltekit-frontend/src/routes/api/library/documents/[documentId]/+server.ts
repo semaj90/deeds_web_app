@@ -5,6 +5,7 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { pool } from '$lib/server/db/client';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -47,37 +48,40 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		ORDER BY created_at DESC
 	`, [documentId]);
 
-	return json({
-		document: {
-			id: doc.id,
-			title: doc.title,
-			shortTitle: doc.short_title,
-			citation: doc.citation,
-			jurisdiction: doc.jurisdiction_name,
-			jurisdictionCode: doc.jurisdiction_code,
-			corpusType: doc.corpus_type,
-			sourceType: doc.source_type,
-			processingStatus: doc.processing_status,
-			effectiveDate: doc.effective_date,
-			sourceConfidence: doc.source_confidence,
-			pageCount: doc.page_count,
-			isOfficial: doc.is_official,
-			officialUrl: doc.official_url,
-			sourceHash: doc.source_hash,
-			mimeType: doc.mime_type,
-			minioKey: doc.minio_key,
-			nodeCount: doc.node_count,
-			chunkCount: doc.chunk_count,
-			createdAt: doc.created_at,
-		},
-		versions: versionsRes.rows.map((v: Record<string, unknown>) => ({
-			id: v.id,
-			versionLabel: v.version_label,
-			sourceDate: v.source_date,
-			isCurrent: v.is_current,
-			amendmentNote: v.amendment_note,
-		})),
-	});
+	return json(
+    {
+      document: {
+        id: doc.id,
+        title: doc.title,
+        shortTitle: doc.short_title,
+        citation: doc.citation,
+        jurisdiction: doc.jurisdiction_name,
+        jurisdictionCode: doc.jurisdiction_code,
+        corpusType: doc.corpus_type,
+        sourceType: doc.source_type,
+        processingStatus: doc.processing_status,
+        effectiveDate: doc.effective_date,
+        sourceConfidence: doc.source_confidence,
+        pageCount: doc.page_count,
+        isOfficial: doc.is_official,
+        officialUrl: doc.official_url,
+        sourceHash: doc.source_hash,
+        mimeType: doc.mime_type,
+        minioKey: doc.minio_key,
+        nodeCount: doc.node_count,
+        chunkCount: doc.chunk_count,
+        createdAt: doc.created_at,
+      },
+      versions: versionsRes.rows.map((v: Record<string, unknown>) => ({
+        id: v.id,
+        versionLabel: v.version_label,
+        sourceDate: v.source_date,
+        isCurrent: v.is_current,
+        amendmentNote: v.amendment_note,
+      })),
+    },
+    { headers: cacheControl.long }
+  );
 };
 
 export const PUT: RequestHandler = async ({ params, request, locals }) => {

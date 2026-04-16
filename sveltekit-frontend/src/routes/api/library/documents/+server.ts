@@ -6,6 +6,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { pool } from '$lib/server/db/client';
 
 const querySchema = z.object({
@@ -82,10 +83,13 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		createdAt: r.created_at,
 	}));
 
-	return json({
-		documents,
-		total: countRes.rows[0]?.total ?? 0,
-		limit,
-		offset,
-	});
+	return json(
+    {
+      documents,
+      total: countRes.rows[0]?.total ?? 0,
+      limit,
+      offset,
+    },
+    { headers: cacheControl.medium }
+  );
 };

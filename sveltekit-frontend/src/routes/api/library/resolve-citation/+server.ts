@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 const querySchema = z.object({
 	q: z.string().min(1, 'Missing query').max(500)
@@ -30,7 +31,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		);
 
 		if (exactMatch.rows.length > 0) {
-			return json({ success: true, result: exactMatch.rows[0] });
+			return json({ success: true, result: exactMatch.rows[0] }, { headers: cacheControl.long });
 		}
 
 		// 2. Try fuzzy match (trigram or ILIKE) on citation_label and heading
@@ -46,7 +47,10 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		);
 
 		if (fuzzyMatch.rows.length > 0) {
-			return json({ success: true, result: fuzzyMatch.rows[0], fuzzy: true });
+			return json(
+        { success: true, result: fuzzyMatch.rows[0], fuzzy: true },
+        { headers: cacheControl.long }
+      );
 		}
 
 		return json({ success: false, error: 'Citation not found' }, { status: 404 });

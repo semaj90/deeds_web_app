@@ -6,29 +6,30 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { pool } from '$lib/server/db/client';
 import { isUuid } from '$lib/server/validation.js';
 
 const querySchema = z.object({
-	nodeId: z.string().uuid().optional(),
-	page: z.coerce.number().int().min(1).default(1),
-	limit: z.coerce.number().int().min(1).max(50).default(20)
+  nodeId: z.string().uuid().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const { documentId } = params;
-	if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
+  const { documentId } = params;
+  if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
-	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
-	if (!parsed.success) {
-		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-	}
-	const { nodeId, page, limit } = parsed.data;
-	const offset = (page - 1) * limit;
+  const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  }
+  const { nodeId, page, limit } = parsed.data;
+  const offset = (page - 1) * limit;
 
-	const accessRes = await pool.query(
+  const accessRes = await pool.query(
     `SELECT id FROM library_documents WHERE id = $1 AND (uploaded_by IS NULL OR uploaded_by = $2)`,
     [documentId, locals.user.id]
   );
@@ -109,14 +110,17 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
         ),
   ]);
 
-	const total = Number(countRes.rows[0]?.count ?? 0);
+  const total = Number(countRes.rows[0]?.count ?? 0);
 
-	return json({
-		chunks:  res.rows,
-		page,
-		limit,
-		total,
-		pages:   Math.ceil(total / limit),
-		hasMore: page * limit < total,
-	});
+  return json(
+    {
+      chunks: res.rows,
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    },
+    { headers: cacheControl.long }
+  );
 };

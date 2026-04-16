@@ -10,6 +10,7 @@ import { and, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { validateUuidParams } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 // Zod schema validates evidenceId for POST and DELETE
 const noteEvidenceSchema = z.object({
@@ -48,10 +49,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       .innerJoin(evidence, eq(caseNoteEvidenceRefs.evidenceId, evidence.id))
       .where(eq(caseNoteEvidenceRefs.noteId, params.noteId));
 
-    return json({ success: true, refs });
+    return json({ success: true, refs }, { headers: cacheControl.medium });
   } catch (err) {
     console.error('[note-evidence] GET error:', err);
-    return json({ success: true, refs: [] });
+    return json({ success: true, refs: [] }, { headers: cacheControl.medium });
   }
 };
 

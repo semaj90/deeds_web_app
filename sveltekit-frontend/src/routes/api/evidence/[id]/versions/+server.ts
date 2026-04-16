@@ -6,6 +6,7 @@ import { and, eq, desc, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { createEvidenceVersion } from '$lib/server/audit/evidence-audit.js';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 const createVersionSchema = z.object({
   changeReason: z.string().max(1000).optional(),
@@ -52,14 +53,17 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
       .orderBy(desc(evidenceVersions.version))
       .limit(limit);
 
-    return json({
-      evidenceId: id,
-      versions,
-      count: versions.length,
-    });
+    return json(
+      {
+        evidenceId: id,
+        versions,
+        count: versions.length,
+      },
+      { headers: cacheControl.short }
+    );
   } catch (err) {
     console.error('[evidence/versions] GET error:', err);
-    return json({ evidenceId: id, versions: [], count: 0 });
+    return json({ evidenceId: id, versions: [], count: 0 }, { headers: cacheControl.short });
   }
 };
 

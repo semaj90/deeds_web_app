@@ -12,90 +12,94 @@ import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { ENV } from '$lib/server/env.server.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 
 const librarySearchSchema = z.object({
-	q: z.string().min(2).max(1000),
-	jurisdiction: z.string().max(50).nullish(),
-	corpusType: z.string().max(50).nullish(),
-	limit: z.coerce.number().int().min(1).max(50).default(20),
+  q: z.string().min(2).max(1000),
+  jurisdiction: z.string().max(50).nullish(),
+  corpusType: z.string().max(50).nullish(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
 const GO_SEARCH_URL = (ENV as unknown as Record<string, string>).GO_SEARCH_URL || '';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const parsed = librarySearchSchema.safeParse({
-		q: url.searchParams.get('q')?.trim() ?? '',
-		jurisdiction: url.searchParams.get('jurisdiction'),
-		corpusType: url.searchParams.get('corpusType'),
-		limit: url.searchParams.get('limit') ?? undefined,
-	});
-	if (!parsed.success) return json({ hits: [], total: 0 });
+  const parsed = librarySearchSchema.safeParse({
+    q: url.searchParams.get('q')?.trim() ?? '',
+    jurisdiction: url.searchParams.get('jurisdiction'),
+    corpusType: url.searchParams.get('corpusType'),
+    limit: url.searchParams.get('limit') ?? undefined,
+  });
+  if (!parsed.success) return json({ hits: [], total: 0 });
 
-	const { q, jurisdiction, corpusType, limit } = parsed.data;
+  const { q, jurisdiction, corpusType, limit } = parsed.data;
 
-	// Fast-path: Go search service (parallel fan-out: citation + FTS + pgvector + Qdrant)
-	if (GO_SEARCH_URL) {
-		try {
-			const goResp = await fetch(`${GO_SEARCH_URL}/search`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query: q,
-					jurisdiction: jurisdiction ?? '',
-					corpusType: corpusType ?? '',
-					limit,
-					userId: locals.user.id,
-				}),
-				signal: AbortSignal.timeout(8000),
-			});
-			if (goResp.ok) {
-				const data = await goResp.json();
-				return json({
-					hits: (data.hits ?? []).map(formatGoHit),
-					total: data.total ?? 0,
-					meta: { ...data.meta, source: 'go-search-service' },
-				});
-			}
-			// Non-200 → fall through to inline SQL
-		} catch {
-			// Go service unavailable → fall through
-		}
-	}
+  // Fast-path: Go search service (parallel fan-out: citation + FTS + pgvector + Qdrant)
+  if (GO_SEARCH_URL) {
+    try {
+      const goResp = await fetch(`${GO_SEARCH_URL}/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: q,
+          jurisdiction: jurisdiction ?? '',
+          corpusType: corpusType ?? '',
+          limit,
+          userId: locals.user.id,
+        }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (goResp.ok) {
+        const data = await goResp.json();
+        return json(
+          {
+            hits: (data.hits ?? []).map(formatGoHit),
+            total: data.total ?? 0,
+            meta: { ...data.meta, source: 'go-search-service' },
+          },
+          { headers: cacheControl.short }
+        );
+      }
+      // Non-200 → fall through to inline SQL
+    } catch {
+      // Go service unavailable → fall through
+    }
+  }
 
-	// Fallback: inline SQL (existing logic)
-	let queryEmbedding: number[] | null = null;
-	try {
-		queryEmbedding = await generateSingleEmbedding(q.slice(0, 512));
-	} catch {
-		// Lexical-only fallback
-	}
+  // Fallback: inline SQL (existing logic)
+  let queryEmbedding: number[] | null = null;
+  try {
+    queryEmbedding = await generateSingleEmbedding(q.slice(0, 512));
+  } catch {
+    // Lexical-only fallback
+  }
 
-	const filters: string[] = [];
-	const params: unknown[] = [q];
-	let paramIdx = 2;
+  const filters: string[] = [];
+  const params: unknown[] = [q];
+  let paramIdx = 2;
 
-	if (jurisdiction) {
-		params.push(jurisdiction);
-		filters.push(`j.code = $${paramIdx++}`);
-	}
-	if (corpusType) {
-		params.push(corpusType);
-		filters.push(`ld.corpus_type = $${paramIdx++}::corpus_type`);
-	}
+  if (jurisdiction) {
+    params.push(jurisdiction);
+    filters.push(`j.code = $${paramIdx++}`);
+  }
+  if (corpusType) {
+    params.push(corpusType);
+    filters.push(`ld.corpus_type = $${paramIdx++}::corpus_type`);
+  }
 
-	const whereClause = filters.length ? `AND ${filters.join(' AND ')}` : '';
+  const whereClause = filters.length ? `AND ${filters.join(' AND ')}` : '';
 
-	if (queryEmbedding) {
-		// Hybrid: lexical rank + cosine, fused with RRF
-		params.push(`[${queryEmbedding.join(',')}]`);
-		const embeddingParam = paramIdx++;
-		params.push(limit * 2); // Fetch more for reranking
-		const fetchParam = paramIdx++;
+  if (queryEmbedding) {
+    // Hybrid: lexical rank + cosine, fused with RRF
+    params.push(`[${queryEmbedding.join(',')}]`);
+    const embeddingParam = paramIdx++;
+    params.push(limit * 2); // Fetch more for reranking
+    const fetchParam = paramIdx++;
 
-		const hybridQuery = `
+    const hybridQuery = `
 			WITH lexical AS (
 			  SELECT lc.id AS chunk_id, ln.id AS node_id, ln.document_id,
 			         ld.title, ld.corpus_type, ld.source_type, ld.is_official, ld.official_url,
@@ -157,14 +161,17 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			)
 			SELECT * FROM combined ORDER BY score DESC LIMIT $${paramIdx}`;
 
-		params.push(limit);
+    params.push(limit);
 
-		const res = await pool.query(hybridQuery, params);
-		return json({ hits: res.rows.map(formatHit), total: res.rowCount });
-	} else {
-		// Lexical only
-		params.push(limit);
-		const lexQuery = `
+    const res = await pool.query(hybridQuery, params);
+    return json(
+      { hits: res.rows.map(formatHit), total: res.rowCount },
+      { headers: cacheControl.short }
+    );
+  } else {
+    // Lexical only
+    params.push(limit);
+    const lexQuery = `
 			SELECT lc.id AS chunk_id, ln.id AS node_id, ln.document_id,
 			       ld.title, ld.corpus_type, ld.source_type, ld.is_official, ld.official_url,
 			       ln.heading, ln.citation_label, ln.node_path, ln.node_type,
@@ -182,9 +189,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			ORDER BY score DESC
 			LIMIT $${paramIdx}`;
 
-		const res = await pool.query(lexQuery, params);
-		return json({ hits: res.rows.map(formatHit), total: res.rowCount, meta: { source: 'inline-sql' } });
-	}
+    const res = await pool.query(lexQuery, params);
+    return json(
+      { hits: res.rows.map(formatHit), total: res.rowCount, meta: { source: 'inline-sql' } },
+      { headers: cacheControl.short }
+    );
+  }
 };
 
 /** Format a row from the Go search service response */

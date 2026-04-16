@@ -9,6 +9,7 @@ import {
 import { eq, and, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 const updateCollectionSchema = z.object({
   name: z.string().trim().max(500).optional(),
@@ -79,16 +80,22 @@ export const GET: RequestHandler = async ({ locals, params }) => {
       .where(eq(collectionCitations.collectionId, collectionId))
       .orderBy(collectionCitations.addedAt);
 
-    return json({
-      ...collection,
-      citations: collectionCitationsList,
-    });
+    return json(
+      {
+        ...collection,
+        citations: collectionCitationsList,
+      },
+      { headers: cacheControl.medium }
+    );
   } catch (err) {
     console.error('[citations/collections/[id]] GET error:', err);
-    return json({
-      ...collection,
-      citations: [],
-    });
+    return json(
+      {
+        ...collection,
+        citations: [],
+      },
+      { headers: cacheControl.medium }
+    );
   }
 };
 

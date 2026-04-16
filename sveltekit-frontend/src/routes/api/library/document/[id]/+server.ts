@@ -2,13 +2,14 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	const { id } = params;
-	if (!isUuid(id)) return json({ error: 'Invalid ID format' }, { status: 400 });
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  const { id } = params;
+  if (!isUuid(id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
-	const [documentResult, versionsResult] = await Promise.all([
+  const [documentResult, versionsResult] = await Promise.all([
     pool.query(
       `SELECT ld.*, j.name AS jurisdiction_name, j.code AS jurisdiction_code,
 			        COALESCE(nc.c, 0)::int AS node_count,
@@ -34,44 +35,47 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     ),
   ]).catch(() => [{ rows: [] }, { rows: [] }]);
 
-	if (!documentResult.rows[0]) {
-		return json({ error: 'Document not found' }, { status: 404 });
-	}
+  if (!documentResult.rows[0]) {
+    return json({ error: 'Document not found' }, { status: 404 });
+  }
 
-	const row = documentResult.rows[0];
+  const row = documentResult.rows[0];
 
-	return json({
-		document: {
-			id: row.id,
-			title: row.title,
-			shortTitle: row.short_title,
-			citation: row.citation,
-			corpusType: row.corpus_type,
-			sourceType: row.source_type,
-			processingStatus: row.processing_status,
-			pageCount: row.page_count,
-			wordCount: row.word_count ?? null,
-			effectiveDate: row.effective_date,
-			isOfficial: row.is_official,
-			officialUrl: row.official_url,
-			sourceConfidence: row.source_confidence,
-			sourceHash: row.source_hash,
-			mimeType: row.mime_type,
-			minioKey: row.minio_key,
-			nodeCount: row.node_count,
-			chunkCount: row.chunk_count,
-			createdAt: row.created_at,
-			jurisdiction: row.jurisdiction_code
-				? { code: row.jurisdiction_code, name: row.jurisdiction_name }
-				: null,
-		},
-		versions: versionsResult.rows.map((version: Record<string, unknown>) => ({
-			id: version.id,
-			versionLabel: version.version_label,
-			sourceDate: version.source_date,
-			isCurrent: version.is_current,
-			amendmentNote: version.amendment_note,
-			createdAt: version.created_at,
-		})),
-	});
+  return json(
+    {
+      document: {
+        id: row.id,
+        title: row.title,
+        shortTitle: row.short_title,
+        citation: row.citation,
+        corpusType: row.corpus_type,
+        sourceType: row.source_type,
+        processingStatus: row.processing_status,
+        pageCount: row.page_count,
+        wordCount: row.word_count ?? null,
+        effectiveDate: row.effective_date,
+        isOfficial: row.is_official,
+        officialUrl: row.official_url,
+        sourceConfidence: row.source_confidence,
+        sourceHash: row.source_hash,
+        mimeType: row.mime_type,
+        minioKey: row.minio_key,
+        nodeCount: row.node_count,
+        chunkCount: row.chunk_count,
+        createdAt: row.created_at,
+        jurisdiction: row.jurisdiction_code
+          ? { code: row.jurisdiction_code, name: row.jurisdiction_name }
+          : null,
+      },
+      versions: versionsResult.rows.map((version: Record<string, unknown>) => ({
+        id: version.id,
+        versionLabel: version.version_label,
+        sourceDate: version.source_date,
+        isCurrent: version.is_current,
+        amendmentNote: version.amendment_note,
+        createdAt: version.created_at,
+      })),
+    },
+    { headers: cacheControl.long }
+  );
 };

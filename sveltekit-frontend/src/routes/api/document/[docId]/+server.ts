@@ -4,6 +4,7 @@ import { and, eq } from 'drizzle-orm';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -24,8 +25,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			return json({ error: 'Document not found' }, { status: 404 });
 		}
 
-		return json({ document: doc });
+		return json({ document: doc }, { headers: cacheControl.long });
 	} catch {
-		return json({ document: null });
+		return json({ document: null }, { headers: cacheControl.long });
 	}
 };

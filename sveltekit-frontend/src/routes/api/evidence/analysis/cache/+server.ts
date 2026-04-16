@@ -14,18 +14,27 @@ import { sql } from 'drizzle-orm';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
-const analysisCacheSchema = z.object({
-	evidenceId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i).optional(),
-	caseId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i).optional(),
-	type: z.enum(['yolo', 'vlm', 'llm_synthesis', 'combined']).optional(),
-	limit: z.coerce.number().int().min(1).max(100).default(20),
-}).refine((data) => data.evidenceId || data.caseId, {
-	message: 'Provide evidenceId or caseId',
-});
+const analysisCacheSchema = z
+  .object({
+    evidenceId: z
+      .string()
+      .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+      .optional(),
+    caseId: z
+      .string()
+      .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+      .optional(),
+    type: z.enum(['yolo', 'vlm', 'llm_synthesis', 'combined']).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+  })
+  .refine((data) => data.evidenceId || data.caseId, {
+    message: 'Provide evidenceId or caseId',
+  });
 
 export const GET: RequestHandler = async ({ url, locals }) => {
-	if (!locals.user) {
+  if (!locals.user) {
     return json({ error: 'Unauthorized', data: [], cacheHit: false, count: 0 }, { status: 401 });
   }
 
@@ -38,7 +47,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
   if (!parsed.success) {
     return json(
-      { error: parsed.error.issues[0]?.message ?? 'Invalid params', data: [], cacheHit: false, count: 0 },
+      {
+        error: parsed.error.issues[0]?.message ?? 'Invalid params',
+        data: [],
+        cacheHit: false,
+        count: 0,
+      },
       { status: 400 }
     );
   }
@@ -50,7 +64,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   const mem = getFromMemoryCache(cacheKey);
   if (mem.found) {
     const data = Array.isArray(mem.value) ? mem.value : [];
-    return json({ data, cacheHit: 'memory', count: data.length });
+    return json({ data, cacheHit: 'memory', count: data.length }, { headers: cacheControl.short });
   }
 
   // L1: Redis cache check
@@ -60,7 +74,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     if (cached) {
       const parsed = JSON.parse(cached);
       const data = Array.isArray(parsed) ? parsed : [];
-      return json({ data, cacheHit: 'redis', count: data.length });
+      return json({ data, cacheHit: 'redis', count: data.length }, { headers: cacheControl.short });
     }
   } catch {
     /* miss */
@@ -109,9 +123,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     // Cache for 5 minutes (memory + Redis)
     await setCache(cacheKey, data, 5 * 60 * 1000).catch(() => {});
 
-    return json({ data, cacheHit: false, count: data.length });
+    return json({ data, cacheHit: false, count: data.length }, { headers: cacheControl.short });
   } catch (err) {
     console.error('[analysis/cache] Query failed:', err);
-    return json({ data: [], cacheHit: false, count: 0 });
+    return json({ data: [], cacheHit: false, count: 0 }, { headers: cacheControl.short });
   }
 };
