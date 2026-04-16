@@ -1740,6 +1740,45 @@
       "detail": "Follow LangGraph synthesis service logs (GPU usage, pipeline stages, errors)"
     },
     // ============================================
+    // Library: Web Crawl + Dev Docs Ingestion
+    // ============================================
+    {
+      "label": "📚 Library: Ingest Dev Docs (local md + CLAUDE.md)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/library/ingest-dev-docs -H \"Content-Type: application/json\" -H \"Cookie: session=dev\" -d '{\"rescan\":false}' | python -m json.tool",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+      "problemMatcher": [],
+      "detail": "Ingest data/knowledge/*.md + memory/*.md + CLAUDE.md into library corpus (treatise/docs, deduped by hash)"
+    },
+    {
+      "label": "📚 Library: Ingest Dev Docs (with Drizzle + SvelteKit + Qdrant web docs)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/library/ingest-dev-docs -H \"Content-Type: application/json\" -H \"Cookie: session=dev\" -d '{\"preset\":[\"drizzle\",\"sveltekit\",\"qdrant\"],\"rescan\":false}' | python -m json.tool",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": [],
+      "detail": "Ingest local docs + crawl Drizzle ORM, SvelteKit, and Qdrant documentation sites"
+    },
+    {
+      "label": "📚 Library: Ingest Dev Docs (force rescan all)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/library/ingest-dev-docs -H \"Content-Type: application/json\" -H \"Cookie: session=dev\" -d '{\"preset\":[\"drizzle\",\"sveltekit\",\"qdrant\",\"langchain\"],\"rescan\":true}' | python -m json.tool",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": [],
+      "detail": "Force re-ingest all dev docs (ignores existing hashes)"
+    },
+    {
+      "label": "📚 Library: Crawl Web URL(s) → Library Corpus",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/library/crawl -H \"Content-Type: application/json\" -H \"Cookie: session=dev\" -d '{\"urls\":[\"https://orm.drizzle.team/docs/overview\"],\"corpusType\":\"docs\"}' | python -m json.tool",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+      "problemMatcher": [],
+      "detail": "Crawl a web URL and ingest into library corpus (chunk + embed + Qdrant upsert)"
+    },
+    // ============================================
     // Qdrant Codebase Indexing + Semantic Search
     // ============================================
     {
