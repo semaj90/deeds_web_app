@@ -92,10 +92,15 @@ export const GET: RequestHandler = async (event) => {
 		);
 	} catch (err) {
 		console.error('Error fetching cases:', err);
-		return apiResponses.ok({
-			cases: [],
-			pagination: { limit, offset, hasMore: false }
-		});
+		return json(
+      {
+        success: false,
+        data: { cases: [], pagination: { limit, offset, hasMore: false } },
+        timestamp: Date.now(),
+        degraded: true,
+      },
+      { headers: cacheControl.private }
+    );
 	}
 };
 

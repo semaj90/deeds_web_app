@@ -25,9 +25,9 @@ const vlmJsonSchema = z.object({
   temperature: z.number().min(0).max(2).optional(),
 });
 
-const getTritonUrl = () => (ENV.TRITON_URL ?? 'http://localhost:8000').replace(/\/$/, '');
-const getVlmModel = () => ENV.TRITON_VLM_MODEL ?? 'gemma_vlm_ensemble';
-const getVisionModel = () => ENV.TRITON_VISION_MODEL ?? 'siglip_vision';
+const getTritonUrl = () => ENV.TRITON_URL.replace(/\/$/, '');
+const getVlmModel = () => ENV.TRITON_VLM_MODEL;
+const getVisionModel = () => ENV.TRITON_VISION_MODEL;
 
 interface VlmRequest {
   prompt: string;

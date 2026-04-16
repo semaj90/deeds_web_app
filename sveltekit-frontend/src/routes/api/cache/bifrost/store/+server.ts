@@ -54,12 +54,13 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({ stored: true });
 	} catch (err) {
+		console.error('[Bifrost] Store error:', err);
 		return json(
-			{
-				stored: false,
-				error: err instanceof Error ? err.message : 'Bifrost cache store failed',
-			},
-			{ status: 500 }
-		);
+      {
+        stored: false,
+        error: 'Cache store operation failed',
+      },
+      { status: 500 }
+    );
 	}
 };

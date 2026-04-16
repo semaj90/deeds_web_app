@@ -20,6 +20,29 @@ export interface AudioProcessJob {
   timestamp: number;
 }
 
+export interface AudioProcessResult {
+  evidenceId: string;
+  status: 'complete' | 'error';
+  transcript?: {
+    transcriptId: string;
+    text: string;
+    language: string;
+    duration: number;
+    segmentCount: number;
+  };
+  segments?: {
+    indexed: number;
+    embedded: number;
+    qdrantUpserted: number;
+  };
+  analysis?: {
+    summary: string;
+    entityCount: number;
+    tags: string[];
+  };
+  error?: string;
+}
+
 export interface DocumentEmbedJob {
   documentId: string;
   filePath: string;

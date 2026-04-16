@@ -1,5 +1,37 @@
 {
   // ========================================
+  // FILE & SEARCH EXCLUSIONS (reduce noise in Explorer + search)
+  // ========================================
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/.svelte-kit": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/.venv": true,
+    "**/static/models": true,
+    "**/static/gemma3_270m_onnx": true,
+    "**/static/embeddinggemma_300m_onnx": true,
+    "**/static/ort/*.wasm": true
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/.svelte-kit": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/.venv": true,
+    "**/static/models": true,
+    "**/static/gemma3_270m_onnx": true,
+    "**/static/embeddinggemma_300m_onnx": true,
+    "**/static/ort/*.wasm": true,
+    "**/deeds_labs": true,
+    "**/logs": true,
+    "**/minio-data": true
+  },
+  // ========================================
   // GPU-ACCELERATED VS CODE CONFIGURATION
   // ========================================
   // GPU Rendering & Hardware Acceleration
@@ -50,11 +82,12 @@
   "cmake.showOptionsMovedNotification": false,
 
   // ========================================
-  // PYTHON ENVIRONMENT SETTINGS (DISABLED — not needed for SvelteKit)
+  // PYTHON ENVIRONMENT SETTINGS
   // ========================================
+  "python.defaultInterpreterPath": "${workspaceFolder}/../.venv/Scripts/python.exe",
   "python.terminal.useEnvFile": false,
   "python.envFile": "${workspaceFolder}/../.env",
-  "python.terminal.activateEnvironment": false,
+  "python.terminal.activateEnvironment": true,
   "python.terminal.executeInFileDir": false,
   // ========================================
   // CUDA ACCELERATION SETTINGS

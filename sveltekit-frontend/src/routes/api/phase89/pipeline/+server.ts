@@ -70,7 +70,7 @@ export const GET: RequestHandler = async () => {
 			message: 'Ready to run pipeline'
 		});
 	} catch {
-		return json({ status: 'error', message: 'Could not check status' });
+		return json({ status: 'error', progress: 0, complete: false, processed: 0, message: 'Could not check status' });
 	}
 };
 

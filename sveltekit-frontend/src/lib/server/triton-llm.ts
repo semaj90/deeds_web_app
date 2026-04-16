@@ -1,7 +1,7 @@
 import { ENV } from '$lib/server/env.server.js';
 
-const getEndpoint = () => ENV.TRITON_URL ?? 'http://localhost:8000';
-const getModel = () => ENV.TRITON_LLM_MODEL ?? 'legal-llm';
+const getEndpoint = () => ENV.TRITON_URL;
+const getModel = () => ENV.TRITON_LLM_MODEL;
 const withBasePath = (path: string) => `${getEndpoint().replace(/\/$/, '')}${path}`;
 
 export interface TritonLlmRequest {

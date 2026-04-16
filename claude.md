@@ -640,7 +640,7 @@ rg "window\.\|document\.\|localStorage\|IndexedDB" src/lib/$MODULE --type svelte
 # Or route has export const ssr = false
 
 # ══════════════════════════════════════════════════════════════
-# TIER E: SVELTE 5 RUNE COMPLIANCE (G21-G25 — added 2026-04-14)
+# TIER E: SVELTE 5 RUNE COMPLIANCE (G21-G26 — added 2026-04-14/15)
 # All gates MUST return 0 hits. Current baseline: all 0 ✅
 # ══════════════════════════════════════════════════════════════
 
@@ -658,6 +658,21 @@ rg "createEventDispatcher\(\)" src/ --glob "*.svelte"
 
 # G25: No rune calls in plain .ts files (reactivity inert — use .svelte.ts)
 rg "\$(?:state|derived|effect|props)\s*[(<]" src/lib/ --type ts --glob "!*.svelte.ts" --glob "!*.d.ts"
+
+# G26: Route handler unit tests use the lazy-import pattern (added 2026-04-15)
+# Every +server.ts and +page.server.ts test file MUST:
+#   1. Declare // @vitest-environment node (top of file, before any imports)
+#   2. Use vi.hoisted() for all mock variables referenced inside vi.mock() factories
+#   3. Lazy-import the route handler inside beforeEach (not at module scope)
+#   4. Cover 4 baseline cases: 401 unauth, 400 bad input, 200 success, degraded upstream
+#
+# Verify: all test files in tests/routes/ have the node env directive
+rg "^// @vitest-environment node" tests/routes/ --glob "*.test.ts" --glob "*.spec.ts" -l
+# Count should equal total test files in that dir (no file missing the directive)
+#
+# Automated: tests/runes/svelte5-rune-compliance.test.ts covers G21-G25 statically
+# Automated: tests/routes/sveltekit-load-patterns.test.ts covers load() redirect + DB fallback
+# Automated: tests/routes/sveltekit-form-actions.test.ts covers fail/message/redirect
 ```
 
 **Rune compliance Neo4j queries** (http://localhost:7474):

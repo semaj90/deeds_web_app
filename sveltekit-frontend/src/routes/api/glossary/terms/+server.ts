@@ -107,6 +107,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			timing: { total_ms: Math.round(performance.now() - start) },
 		});
 	} catch {
-		return json({ error: 'No glossary tables found' }, { status: 503 });
+		console.error('[glossary/terms] No glossary tables found');
+    return json({
+      terms: [],
+      count: 0,
+      total: 0,
+      timing: { total_ms: Math.round(performance.now() - start) },
+    });
 	}
 };

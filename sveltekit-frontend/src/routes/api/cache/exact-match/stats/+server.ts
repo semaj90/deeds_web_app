@@ -42,16 +42,17 @@ export const GET: RequestHandler = async ({ locals, request }) => {
 	} catch (err) {
 		console.error('[/api/cache/exact-match/stats] Error:', err);
 		const fallbackData = {
-			success: false,
-			error: 'Failed to retrieve cache stats',
-			stats: {
-				totalKeys: 0,
-				memoryUsedMB: 0,
-				avgTtlMinutes: 0,
-				rawBytes: 0,
-				rawTtlSeconds: 0,
-			},
-		};
+      success: false,
+      degraded: true,
+      stats: {
+        totalKeys: 0,
+        memoryUsedMB: 0,
+        avgTtlMinutes: 0,
+        rawBytes: 0,
+        rawTtlSeconds: 0,
+      },
+      timestamp: new Date().toISOString(),
+    };
 		return json(fallbackData, {
 			headers: cacheControl.short
 		});

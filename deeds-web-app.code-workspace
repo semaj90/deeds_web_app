@@ -11,6 +11,42 @@
         "github.copilot.chat.anthropic.toolSearchTool.mode": "client",
         "github.copilot.chat.backgroundCompaction": true,
         "github.copilot.chat.copilotMemory.enabled": true,
-        "github.copilot.chat.anthropic.tools.websearch.enabled": true
+        "github.copilot.chat.anthropic.tools.websearch.enabled": true,
+        "claudeCode.respectGitIgnore": false,
+        "files.exclude": {
+            "**/.git": true,
+            "**/node_modules": true,
+            "**/.svelte-kit": true,
+            "**/.vite": true,
+            "**/dist": true,
+            "**/build": true,
+            "**/coverage": true,
+            "**/.venv": true,
+            "**/__pycache__": true,
+            "minio-data": true,
+            "logs": true
+        },
+        "search.exclude": {
+            "**/.git": true,
+            "**/node_modules": true,
+            "**/.svelte-kit": true,
+            "**/.vite": true,
+            "**/dist": true,
+            "**/build": true,
+            "**/coverage": true,
+            "**/.venv": true,
+            "**/__pycache__": true,
+            "**/go-microservice/vendor": true,
+            "minio-data": true,
+            "logs": true,
+            "deeds_labs": true,
+            "**/static/models": true,
+            "**/static/gemma3_270m_onnx": true,
+            "**/static/embeddinggemma_300m_onnx": true,
+            "**/static/ort/*.wasm": true
+        },
+        "typescript.tsdk": "sveltekit-frontend/node_modules/typescript/lib",
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+        "python.terminal.activateEnvironment": true
     }
 }

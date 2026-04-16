@@ -33,10 +33,12 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   } catch (err) {
     console.error('[UploadTest] Error:', err);
-    return json({
-      success: false,
-      error: err instanceof Error ? err.message : 'Unknown error',
-      stack: err instanceof Error ? err.stack : undefined,
-    }, { status: 500 });
+    return json(
+      {
+        success: false,
+        error: 'Upload test failed',
+      },
+      { status: 500 }
+    );
   }
 };

@@ -10,14 +10,13 @@
  */
 import { getRedis } from '$lib/server/redis';
 import { db } from '$lib/server/db/client';
-import { evidence } from '$lib/server/db/schema-postgres';
+import { evidence, audioTranscripts, whisperSegments } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 import { spawn } from 'child_process';
 import { readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import type { Redis } from 'ioredis';
 import { ENV } from '$lib/server/env.server';
-
 
 export interface AudioJob {
   evidenceId: string;
@@ -74,13 +73,18 @@ export class AudioProcessor {
 
     try {
       // Stage 1: Whisper transcription (CUDA)
-      await this.updateStatus(evidenceId, 'transcription', 25, 'Transcribing audio with Whisper...');
+      await this.updateStatus(
+        evidenceId,
+        'transcription',
+        25,
+        'Transcribing audio with Whisper...'
+      );
       const transcription = await this.transcribeAudio(filePath);
 
       // Stage 2: Entity extraction (LangExtract)
       await this.updateStatus(evidenceId, 'analysis', 50, 'Extracting entities...', {
         duration: transcription.duration,
-        language: transcription.language
+        language: transcription.language,
       });
       const entities = await this.extractEntities(transcription.text);
 
@@ -88,12 +92,16 @@ export class AudioProcessor {
       await this.updateStatus(evidenceId, 'analysis', 65, 'Analyzing content with ACE...');
       const aceAnalysis = await this.analyzeWithACE(transcription.text, caseId);
 
-      // Stage 4: Qdrant indexing
-      await this.updateStatus(evidenceId, 'indexing', 80, 'Indexing for search...', {
+      // Stage 4: Qdrant indexing (full transcript + per-segment)
+      await this.updateStatus(evidenceId, 'indexing', 75, 'Indexing for search...', {
         entities: entities.entities.length,
-        tags: aceAnalysis.tags
+        tags: aceAnalysis.tags,
       });
       await this.indexInQdrant(evidenceId, transcription.text, aceAnalysis.tags, caseId);
+
+      // Stage 4b: Segment-level indexing (Qdrant audio_segments + Drizzle tables)
+      await this.updateStatus(evidenceId, 'indexing', 85, 'Indexing audio segments...');
+      await this.indexSegments(evidenceId, caseId, transcription, aceAnalysis.tags);
 
       // Stage 5: Update evidence record
       await this.updateStatus(evidenceId, 'indexing', 95, 'Updating evidence record...');
@@ -104,7 +112,7 @@ export class AudioProcessor {
         duration: transcription.duration,
         language: transcription.language,
         entities: entities.entities.length,
-        tags: aceAnalysis.tags
+        tags: aceAnalysis.tags,
       });
 
       // Cleanup: delete temp file
@@ -155,7 +163,7 @@ export class AudioProcessor {
     const response = await fetch(`${serverUrl}/inference`, {
       method: 'POST',
       body: form,
-      signal: AbortSignal.timeout(300_000)
+      signal: AbortSignal.timeout(300_000),
     });
 
     if (!response.ok) {
@@ -167,7 +175,7 @@ export class AudioProcessor {
       text: result.text || '',
       language: result.language || 'unknown',
       duration: result.duration || 0,
-      segments: result.segments || []
+      segments: result.segments || [],
     };
   }
 
@@ -186,18 +194,24 @@ export class AudioProcessor {
 
     const args = [
       filePath,
-      '--model', model,
-      '--device', device,
-      '--output_format', 'json',
-      '--output_dir', outputDir,
-      '--fp16', 'False'  // required for CPU; harmless on GPU
+      '--model',
+      model,
+      '--device',
+      device,
+      '--output_format',
+      'json',
+      '--output_dir',
+      outputDir,
+      '--fp16',
+      'False', // required for CPU; harmless on GPU
     ];
 
     // Inject ffmpeg directory into PATH so Whisper can find it
     const spawnEnv: NodeJS.ProcessEnv = { ...process.env };
     if (ffmpegPath) {
       const ffmpegDir = ffmpegPath.replace(/[\\/][^\\/]+$/, '');
-      spawnEnv.PATH = ffmpegDir + (process.platform === 'win32' ? ';' : ':') + (spawnEnv.PATH || '');
+      spawnEnv.PATH =
+        ffmpegDir + (process.platform === 'win32' ? ';' : ':') + (spawnEnv.PATH || '');
     }
 
     return new Promise((resolve, reject) => {
@@ -220,7 +234,13 @@ export class AudioProcessor {
           if (device !== 'cpu') {
             console.warn('Whisper CUDA failed, retrying with CPU:', stderrText.slice(0, 200));
             try {
-              const result = await this.transcribeViaCLI(filePath, whisperPath, model, 'cpu', ffmpegPath);
+              const result = await this.transcribeViaCLI(
+                filePath,
+                whisperPath,
+                model,
+                'cpu',
+                ffmpegPath
+              );
               resolve(result);
             } catch (retryErr) {
               reject(retryErr);
@@ -241,7 +261,7 @@ export class AudioProcessor {
             text: result.text || '',
             language: result.language || 'unknown',
             duration: result.duration || 0,
-            segments: result.segments || []
+            segments: result.segments || [],
           });
         } catch (parseErr) {
           reject(parseErr);
@@ -250,7 +270,11 @@ export class AudioProcessor {
 
       proc.on('error', (err) => {
         clearTimeout(timer);
-        reject(new Error(`Failed to spawn Whisper: ${(err as Error).message}. Check WHISPER_PATH env var.`));
+        reject(
+          new Error(
+            `Failed to spawn Whisper: ${(err as Error).message}. Check WHISPER_PATH env var.`
+          )
+        );
       });
     });
   }
@@ -263,7 +287,7 @@ export class AudioProcessor {
       const response = await fetch('http://localhost:8095/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text }),
       });
 
       if (!response.ok) {
@@ -308,9 +332,9 @@ Respond in JSON format:
           stream: false,
           options: {
             temperature: 0.3,
-            num_predict: 512
-          }
-        })
+            num_predict: 512,
+          },
+        }),
       });
 
       if (!response.ok) {
@@ -325,7 +349,7 @@ Respond in JSON format:
         claims: analysis.claims || [],
         contradictions: analysis.contradictions || [],
         confidence: 0.85,
-        tags: analysis.tags || []
+        tags: analysis.tags || [],
       };
     } catch (error) {
       console.warn('ACE analysis failed, using fallback:', error);
@@ -334,7 +358,7 @@ Respond in JSON format:
         claims: [],
         contradictions: [],
         confidence: 0.5,
-        tags: ['audio', 'transcription']
+        tags: ['audio', 'transcription'],
       };
     }
   }
@@ -355,8 +379,8 @@ Respond in JSON format:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'embeddinggemma:latest',
-          prompt: text
-        })
+          prompt: text,
+        }),
       });
 
       if (!embedResponse.ok) {
@@ -366,32 +390,167 @@ Respond in JSON format:
       const { embedding } = await embedResponse.json();
 
       // Upsert to Qdrant evidence_items collection
-      const qdrantResponse = await fetch('http://localhost:6333/collections/evidence_items/points', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          points: [
-            {
-              id: evidenceId,
-              vector: embedding,
-              payload: {
-                evidenceId,
-                caseId,
-                text,
-                tags,
-                type: 'audio_transcription',
-                timestamp: new Date().toISOString()
-              }
-            }
-          ]
-        })
-      });
+      const qdrantResponse = await fetch(
+        'http://localhost:6333/collections/evidence_items/points',
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            points: [
+              {
+                id: evidenceId,
+                vector: embedding,
+                payload: {
+                  evidenceId,
+                  caseId,
+                  text,
+                  tags,
+                  type: 'audio_transcription',
+                  timestamp: new Date().toISOString(),
+                },
+              },
+            ],
+          }),
+        }
+      );
 
       if (!qdrantResponse.ok) {
         throw new Error(`Qdrant indexing failed: ${qdrantResponse.status}`);
       }
     } catch (error) {
       console.warn('Qdrant indexing failed, continuing without search index:', error);
+    }
+  }
+
+  /**
+   * Index individual segments in Qdrant audio_segments + Drizzle whisper_segments table
+   */
+  private async indexSegments(
+    evidenceId: string,
+    caseId: string | null,
+    transcription: TranscriptionResult,
+    tags: string[]
+  ): Promise<void> {
+    if (!transcription.segments.length) return;
+
+    try {
+      // 1. Create transcript record in Drizzle
+      const [transcript] = await db
+        .insert(audioTranscripts)
+        .values({
+          evidenceId,
+          caseId,
+          language: transcription.language,
+          duration: transcription.duration,
+          fullText: transcription.text,
+          segmentCount: transcription.segments.length,
+          whisperModel: ENV.WHISPER_MODEL,
+        })
+        .returning({ id: audioTranscripts.id });
+
+      if (!transcript) return;
+
+      // 2. Batch-embed all segment texts (max 20 per batch to avoid timeout)
+      const BATCH_SIZE = 20;
+      const qdrantPoints: Array<{
+        id: string;
+        vector: Record<string, number[]>;
+        payload: Record<string, unknown>;
+      }> = [];
+      const dbRows: Array<{
+        transcriptId: string;
+        evidenceId: string;
+        segmentIndex: number;
+        startMs: number;
+        endMs: number;
+        text: string;
+        language: string;
+        embedding: number[];
+        embeddingModel: string;
+        qdrantPointId: string;
+      }> = [];
+
+      for (
+        let batchStart = 0;
+        batchStart < transcription.segments.length;
+        batchStart += BATCH_SIZE
+      ) {
+        const batch = transcription.segments.slice(batchStart, batchStart + BATCH_SIZE);
+        const embeddings = await Promise.all(batch.map((seg) => this.getEmbedding(seg.text)));
+
+        for (let i = 0; i < batch.length; i++) {
+          const seg = batch[i];
+          const embedding = embeddings[i];
+          if (!embedding) continue;
+
+          const segIdx = batchStart + i;
+          const segId = `${evidenceId}-seg-${segIdx}`;
+
+          qdrantPoints.push({
+            id: segId,
+            vector: { content: embedding },
+            payload: {
+              evidenceId,
+              caseId,
+              transcriptId: transcript.id,
+              segmentIndex: segIdx,
+              startMs: Math.round(seg.start * 1000),
+              endMs: Math.round(seg.end * 1000),
+              text: seg.text,
+              language: transcription.language,
+              tags,
+              evidenceType: 'audio_segment',
+            },
+          });
+
+          dbRows.push({
+            transcriptId: transcript.id,
+            evidenceId,
+            segmentIndex: segIdx,
+            startMs: Math.round(seg.start * 1000),
+            endMs: Math.round(seg.end * 1000),
+            text: seg.text,
+            language: transcription.language,
+            embedding,
+            embeddingModel: 'embeddinggemma:latest',
+            qdrantPointId: segId,
+          });
+        }
+      }
+
+      // 3. Upsert to Qdrant audio_segments collection
+      if (qdrantPoints.length > 0) {
+        await fetch('http://localhost:6333/collections/audio_segments/points', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ points: qdrantPoints }),
+        }).catch((err) => console.warn('Qdrant audio_segments upsert failed:', err));
+      }
+
+      // 4. Batch insert into Drizzle whisper_segments table
+      if (dbRows.length > 0) {
+        await db.insert(whisperSegments).values(dbRows);
+      }
+    } catch (error) {
+      console.warn('Segment indexing failed, continuing:', error);
+    }
+  }
+
+  /**
+   * Get embedding vector for text via embeddinggemma
+   */
+  private async getEmbedding(text: string): Promise<number[] | null> {
+    try {
+      const response = await fetch('http://localhost:11434/api/embeddings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),
+      });
+      if (!response.ok) return null;
+      const { embedding } = await response.json();
+      return embedding;
+    } catch {
+      return null;
     }
   }
 
@@ -412,7 +571,7 @@ Respond in JSON format:
             text: transcription.text,
             language: transcription.language,
             segments: transcription.segments,
-            duration: transcription.duration
+            duration: transcription.duration,
           },
           entities: entities.entities,
           aceAnalysis: {
@@ -420,11 +579,11 @@ Respond in JSON format:
             claims: aceAnalysis.claims,
             contradictions: aceAnalysis.contradictions,
             confidence: aceAnalysis.confidence,
-            tags: aceAnalysis.tags
+            tags: aceAnalysis.tags,
           },
           processingStatus: 'complete',
-          processedAt: new Date().toISOString()
-        }
+          processedAt: new Date().toISOString(),
+        },
       })
       .where(eq(evidence.id, evidenceId));
   }
@@ -446,7 +605,7 @@ Respond in JSON format:
         progress,
         message,
         details,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }),
       'EX',
       3600 // 1 hour TTL

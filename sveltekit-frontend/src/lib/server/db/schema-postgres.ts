@@ -3473,3 +3473,50 @@ export const serviceCapabilities = pgTable('service_capabilities', {
 export type ServiceCapability = typeof serviceCapabilities.$inferSelect;
 export type NewServiceCapability = typeof serviceCapabilities.$inferInsert;
 
+// === AUDIO TRANSCRIPTION TABLES ===
+// Structured storage for Whisper transcriptions and per-segment vectors
+
+export const audioTranscripts = pgTable('audio_transcripts', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	evidenceId: uuid('evidence_id').references(() => evidence.id, { onDelete: 'cascade' }).notNull(),
+	caseId: uuid('case_id'),
+	language: varchar('language', { length: 10 }).default('en').notNull(),
+	duration: real('duration').notNull(),
+	fullText: text('full_text').notNull(),
+	segmentCount: integer('segment_count').default(0).notNull(),
+	whisperModel: varchar('whisper_model', { length: 50 }),
+	metadata: jsonb('metadata'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	evidenceIdx: index('audio_transcripts_evidence_idx').on(table.evidenceId),
+	caseIdx: index('audio_transcripts_case_idx').on(table.caseId),
+}));
+
+export type AudioTranscript = typeof audioTranscripts.$inferSelect;
+export type NewAudioTranscript = typeof audioTranscripts.$inferInsert;
+
+export const whisperSegments = pgTable('whisper_segments', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	transcriptId: uuid('transcript_id').references(() => audioTranscripts.id, { onDelete: 'cascade' }).notNull(),
+	evidenceId: uuid('evidence_id').references(() => evidence.id, { onDelete: 'cascade' }).notNull(),
+	segmentIndex: integer('segment_index').notNull(),
+	startMs: integer('start_ms').notNull(),
+	endMs: integer('end_ms').notNull(),
+	text: text('text').notNull(),
+	language: varchar('language', { length: 10 }),
+	embedding: vector('embedding', { dimensions: 768 }),
+	embeddingModel: varchar('embedding_model', { length: 50 }),
+	qdrantPointId: varchar('qdrant_point_id', { length: 200 }),
+	speaker: varchar('speaker', { length: 100 }),
+	confidence: real('confidence'),
+	metadata: jsonb('metadata'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	evidenceSegmentIdx: index('whisper_segments_evidence_segment_idx').on(table.evidenceId, table.segmentIndex),
+	caseIdx: index('whisper_segments_case_idx').on(table.transcriptId),
+	evidenceTimeIdx: index('whisper_segments_evidence_time_idx').on(table.evidenceId, table.startMs),
+}));
+
+export type WhisperSegment = typeof whisperSegments.$inferSelect;
+export type NewWhisperSegment = typeof whisperSegments.$inferInsert;
+

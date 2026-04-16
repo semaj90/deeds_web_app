@@ -199,7 +199,7 @@ export const aiStore = (() => {
 
 	// Derived values
 	let messageCount = $derived(messages.length);
-	let averageConfidence = $derived(() => {
+	let averageConfidence = $derived.by(() => {
 		const confidences = messages
 			.filter((m) => m.confidence !== undefined)
 			.map((m) => m.confidence!);
@@ -225,7 +225,7 @@ export const aiStore = (() => {
 			return messageCount;
 		},
 	get averageConfidence() {
-			return averageConfidence();
+			return averageConfidence;
 		},
 	// Actions
 		startMessage(role: 'user' | 'assistant', content: string) {

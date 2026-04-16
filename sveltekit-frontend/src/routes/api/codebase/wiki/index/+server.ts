@@ -121,102 +121,96 @@ async function fallbackMapReducePath(
 
 // ─── POST /api/codebase/wiki/index ─── Start indexing job
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-	try {
-		const body = await request.json();
-		const parsed = indexRequestSchema.safeParse(body);
+  try {
+    const body = await request.json();
+    const parsed = indexRequestSchema.safeParse(body);
 
-		if (!parsed.success) {
-			return json(
-				{ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
-				{ status: 400 }
-			);
-		}
+    if (!parsed.success) {
+      return json(
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+        { status: 400 }
+      );
+    }
 
-		const { scope, incremental, patterns: customPatterns, config } = parsed.data;
-		const patterns = customPatterns ?? SCOPE_TO_PATTERNS[scope] ?? SCOPE_TO_PATTERNS.all;
+    const { scope, incremental, patterns: customPatterns, config } = parsed.data;
+    const patterns = customPatterns ?? SCOPE_TO_PATTERNS[scope] ?? SCOPE_TO_PATTERNS.all;
 
-		// Try RabbitMQ first (production path)
-		const rmqJobId = await tryRabbitMQPath(scope, incremental, locals.user.id);
+    // Try RabbitMQ first (production path)
+    const rmqJobId = await tryRabbitMQPath(scope, incremental, locals.user.id);
 
-		if (rmqJobId) {
-			return json({
-				success: true,
-				jobId: rmqJobId,
-				backend: 'rabbitmq',
-				message: 'Indexing queued via RabbitMQ',
-				scope,
-			});
-		}
+    if (rmqJobId) {
+      return json({
+        success: true,
+        jobId: rmqJobId,
+        backend: 'rabbitmq',
+        message: 'Indexing queued via RabbitMQ',
+        scope,
+      });
+    }
 
-		// Fallback to mapreduce worker_threads
-		const mrJobId = await fallbackMapReducePath(patterns, config ?? {});
+    // Fallback to mapreduce worker_threads
+    const mrJobId = await fallbackMapReducePath(patterns, config ?? {});
 
-		// Wait briefly for file scan
-		await new Promise((r) => setTimeout(r, 1000));
-		const status = await getJobStatus(mrJobId);
+    // Wait briefly for file scan
+    await new Promise((r) => setTimeout(r, 1000));
+    const status = await getJobStatus(mrJobId);
 
-		return json({
-			success: true,
-			jobId: mrJobId,
-			backend: 'mapreduce',
-			message: 'Indexing started via mapreduce fallback',
-			scope,
-			totalFiles: status?.totalFiles || 0,
-		});
-	} catch (error: any) {
-		console.error('[codebase/wiki/index] POST error:', error);
-		return json(
-			{ success: false, error: error.message },
-			{ status: 500 }
-		);
-	}
+    return json({
+      success: true,
+      jobId: mrJobId,
+      backend: 'mapreduce',
+      message: 'Indexing started via mapreduce fallback',
+      scope,
+      totalFiles: status?.totalFiles || 0,
+    });
+  } catch (error: any) {
+    console.error('[codebase/wiki/index] POST error:', error);
+    return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
+  }
 };
 
 // ─── GET /api/codebase/wiki/index?jobId=xxx ─── Check job status
 export const GET: RequestHandler = async ({ url, locals }) => {
-	if (!locals.user) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-	try {
-		const jobId = url.searchParams.get('jobId');
+  try {
+    const jobId = url.searchParams.get('jobId');
 
-		if (!jobId) {
-			return json({ error: 'Missing jobId' }, { status: 400 });
-		}
+    if (!jobId) {
+      return json({ error: 'Missing jobId' }, { status: 400 });
+    }
 
-		// 1. Check Redis first (RabbitMQ-tracked jobs)
-		try {
-			const { getRedis } = await import('$lib/server/redis.js');
-			const redis = getRedis();
-			const redisData = await redis.get(`codebase:index:${jobId}`);
-			if (redisData) {
-				const job = JSON.parse(redisData);
-				return json({ success: true, job });
-			}
-		} catch {
-			// Redis unavailable — fall through to DB check
-		}
+    // 1. Check Redis first (RabbitMQ-tracked jobs)
+    try {
+      const { getRedis } = await import('$lib/server/redis.js');
+      const redis = getRedis();
+      const redisData = await redis.get(`codebase:index:${jobId}`);
+      if (redisData) {
+        const job = JSON.parse(redisData);
+        return json({ success: true, job });
+      }
+    } catch {
+      // Redis unavailable — fall through to DB check
+    }
 
-		// 2. Fallback to DB (mapreduce-tracked jobs)
-		const status = await getJobStatus(jobId);
-		if (!status) {
-			return json({ error: 'Job not found' }, { status: 404 });
-		}
+    // 2. Fallback to DB (mapreduce-tracked jobs)
+    const status = await getJobStatus(jobId);
+    if (!status) {
+      return json({ error: 'Job not found' }, { status: 404 });
+    }
 
-		return json({
-			success: true,
-			job: { ...status, backend: 'mapreduce' },
-		});
-	} catch (error: any) {
-		console.error('[codebase/wiki/index] GET error:', error);
-		return json(
-			{ success: false, error: error.message },
-			{ status: 500 }
-		);
-	}
+    return json({
+      success: true,
+      job: { ...status, backend: 'mapreduce' },
+    });
+  } catch (error: any) {
+    console.error('[codebase/wiki/index] GET error:', error);
+    return json({ success: false, error: 'Job lookup failed' }, { status: 500 });
+  }
 };

@@ -108,9 +108,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} catch (error: any) {
 		console.error('Semantic search error:', error);
 		return json({
-			results: [],
-			error: error.message,
-			query: ''
-		});
+      results: [],
+      error: 'Semantic search failed',
+      query: '',
+    });
 	}
 };

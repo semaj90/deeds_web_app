@@ -72,7 +72,7 @@ let statusSizeClasses = $derived({
 }[size]);
 
 // Generate initials from alt text if not provided
-let displayInitials = $derived(() => {
+let displayInitials = $derived.by(() => {
 	if (initials) return initials.slice(0, 2).toUpperCase();
 	if (alt) {
 		const parts = alt.trim().split(' ');
@@ -84,13 +84,13 @@ let displayInitials = $derived(() => {
 	return '?? ';
 });
 
-let bgColor = $derived(() => {
+let bgColor = $derived.by(() => {
 	const colors = [
 		'bg-info', 'bg-accent', 'bg-info/60',
 		'bg-pink-600', 'bg-info', 'bg-info',
 		'bg-orange-600', 'bg-info'
 	];
-	const hash = displayInitials().charCodeAt(0) + (displayInitials().charCodeAt(1) ?? 0);
+	const hash = displayInitials.charCodeAt(0) + (displayInitials.charCodeAt(1) ?? 0);
 	return colors[hash % colors.length];
 });
 
@@ -115,7 +115,7 @@ function handleError() {
 		class="w-full h-full flex items-center justify-center overflow-hidden
 			   {shapeClasses}
 			   {bordered ? 'ring-2 ring-white' : ''}
-			   {(!src || hasError) ? bgColor() : 'bg-panelSoft'}"
+			   {(!src || hasError) ? bgColor : 'bg-panelSoft'}"
 	>
 		{#if src && !hasError}
 			<img
@@ -132,7 +132,7 @@ function handleError() {
 				{@render fallback()}
 			{:else}
 				<span class="font-medium text-white select-none">
-					{displayInitials()}
+					{displayInitials}
 				</span>
 			{/if}
 		{/if}

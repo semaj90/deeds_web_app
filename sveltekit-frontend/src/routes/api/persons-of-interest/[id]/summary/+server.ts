@@ -24,35 +24,46 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
-  const poi = await db
-    .select({
-      aiProfile: personsOfInterest.aiProfile,
-      name: personsOfInterest.name,
-      threatLevel: personsOfInterest.threatLevel,
-    })
-    .from(personsOfInterest)
-    .where(
-      and(
-        eq(personsOfInterest.id, params.id),
-        or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+  try {
+    const poi = await db
+      .select({
+        aiProfile: personsOfInterest.aiProfile,
+        name: personsOfInterest.name,
+        threatLevel: personsOfInterest.threatLevel,
+      })
+      .from(personsOfInterest)
+      .where(
+        and(
+          eq(personsOfInterest.id, params.id),
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+        )
       )
-    )
-    .limit(1)
-    .then((r) => r[0]);
+      .limit(1)
+      .then((r) => r[0]);
 
-  if (!poi) return json({ error: 'Person of interest not found' }, { status: 404 });
+    if (!poi) return json({ error: 'Person of interest not found' }, { status: 404 });
 
-  const profile = poi.aiProfile as Record<string, unknown> | null;
-  const responseData = {
-    poiId: params.id,
-    name: poi.name,
-    summary: (profile?.summary as string) ?? null,
-    riskLevel: poi.threatLevel,
-    generatedAt: (profile?.summaryGeneratedAt as string) ?? null,
-  };
-  const { etag, isMatch } = checkETag(responseData, request.headers);
-  if (isMatch) return notModified(etag);
-  return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
+    const profile = poi.aiProfile as Record<string, unknown> | null;
+    const responseData = {
+      poiId: params.id,
+      name: poi.name,
+      summary: (profile?.summary as string) ?? null,
+      riskLevel: poi.threatLevel,
+      generatedAt: (profile?.summaryGeneratedAt as string) ?? null,
+    };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
+  } catch (err) {
+    console.error('[poi/[id]/summary] GET error:', err);
+    return json({
+      poiId: params.id,
+      name: null,
+      summary: null,
+      riskLevel: null,
+      generatedAt: null,
+    });
+  }
 };
 
 /**

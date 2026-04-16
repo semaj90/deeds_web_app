@@ -95,18 +95,6 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
     return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (e: unknown) {
     console.error('Error loading canvas:', e);
-
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
-      return json(
-        {
-          error: 'canvas_states table missing; run db, push:dev to apply migrations',
-          code: 'TABLE_MISSING',
-        },
-        { status: 503 }
-      );
-    }
-
-    return json({ error: 'Internal Server Error' }, { status: 500 });
+    return json(null);
   }
 };

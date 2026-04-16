@@ -129,8 +129,7 @@ export const GET: RequestHandler = async ({ locals, request }) => {
 		console.error('[CacheStats] Error:', err);
 		const fallbackData = {
       success: false,
-      message: 'Cache backends unavailable; showing fallback stats',
-      error: 'Failed to fetch cache statistics',
+      degraded: true,
       data: {
         redis: {
           connected: false,

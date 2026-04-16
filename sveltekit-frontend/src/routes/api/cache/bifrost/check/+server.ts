@@ -90,12 +90,13 @@ export const POST: RequestHandler = async ({ request }) => {
 			latencyMs,
 		});
 	} catch (err) {
+		console.error('[Bifrost] Check error:', err);
 		return json(
-			{
-				hit: false,
-				error: err instanceof Error ? err.message : 'Bifrost cache check failed',
-			},
-			{ status: 500 }
-		);
+      {
+        hit: false,
+        error: 'Cache check failed',
+      },
+      { status: 500 }
+    );
 	}
 };

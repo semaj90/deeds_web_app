@@ -52,8 +52,8 @@ export interface VLMAnalysisInput {
 const TRITON_TIMEOUT = 120_000;
 const OLLAMA_TIMEOUT = 120_000;
 
-const getTritonUrl = () => (ENV.TRITON_URL ?? 'http://localhost:8000').replace(/\/$/, '');
-const getVlmModel = () => ENV.TRITON_VLM_MODEL ?? 'gemma_vlm_ensemble';
+const getTritonUrl = () => ENV.TRITON_URL.replace(/\/$/, '');
+const getVlmModel = () => ENV.TRITON_VLM_MODEL;
 
 const DEFAULT_EVIDENCE_PROMPT = `Analyze this document/evidence image for a legal case investigation.
 

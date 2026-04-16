@@ -33,8 +33,9 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
     const { etag, isMatch } = checkETag(responseData, request.headers);
     if (isMatch) return notModified(etag);
     return json(responseData, { headers: { ...cacheControl.long, ETag: etag } });
-  } catch {
-    return json({ item: null }, { status: 500 });
+  } catch (err) {
+    console.error('[statutes/[id]] GET error:', err);
+    return json({ item: null });
   }
 };
 

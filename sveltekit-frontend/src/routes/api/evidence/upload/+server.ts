@@ -247,11 +247,13 @@ export async function POST({ request, locals }: RequestEvent) {
       formData = await request.formData();
     } catch (parseErr) {
       console.error('[Upload] FormData parsing failed:', parseErr);
-      return json({
-        success: false,
-        error: 'Failed to parse multipart form data. Ensure Content-Type is multipart/form-data.',
-        details: parseErr instanceof Error ? parseErr.message : undefined
-      }, { status: 400 });
+      return json(
+        {
+          success: false,
+          error: 'Failed to parse multipart form data. Ensure Content-Type is multipart/form-data.',
+        },
+        { status: 400 }
+      );
     }
 
     const file = formData.get('file') as File | null;
@@ -453,14 +455,16 @@ export async function POST({ request, locals }: RequestEvent) {
     if (uploadedObjectKey) {
       await deleteFile(BUCKET, uploadedObjectKey).catch(() => false);
     }
-    updateJob(jobId, { step: 'error', progress: 0, message: errorMessage });
-    return json({
-      success: false,
-      error: errorMessage,
-      jobId,
-      data: null,
-      debug: process.env.NODE_ENV === 'development' ? errorStack : undefined
-    }, { status: 500 });
+    updateJob(jobId, { step: 'error', progress: 0, message: 'Upload processing failed' });
+    return json(
+      {
+        success: false,
+        error: 'Evidence upload processing failed',
+        jobId,
+        data: null,
+      },
+      { status: 500 }
+    );
   }
 }
 

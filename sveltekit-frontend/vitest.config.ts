@@ -57,6 +57,9 @@ export default defineConfig({
       'tests/routes/cache-stats.test.ts',
       'tests/routes/codebase-tags-rename.test.ts',
       'tests/routes/phase109-tag-chunks.test.ts',
+      'tests/routes/get-degraded-shape.test.ts',
+      'tests/routes/get-degraded-shape-pass-a.test.ts',
+      'tests/routes/kag-ingest-notebook-contract.test.ts',
       // SvelteKit 2 + Svelte 5 audit tests (added 2026-04-15)
       'tests/runes/svelte5-rune-compliance.test.ts',
       'tests/routes/sveltekit-load-patterns.test.ts',

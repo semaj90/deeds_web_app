@@ -54,34 +54,42 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     return json({ error: 'Collection not found' }, { status: 404 });
   }
 
-  // Fetch citations in this collection
-  // NOTE: citations Drizzle schema has column name mismatches vs actual DB
-  // (citationText→quoted_text, sourceUrl→N/A, confidence→relevance_score)
-  // Use Drizzle for type-safe joins + sql`` for actual DB column names
-  const collectionCitationsList = await db
-    .select({
-      id: citations.id,
-      caseId: citations.caseId,
-      documentId: citations.documentId,
-      pageNumber: citations.pageNumber,
-      createdAt: citations.createdAt,
-      addedAt: collectionCitations.addedAt,
-      // Map to actual DB column names (not Drizzle schema names)
-      quotedText: sql<string>`"citations"."quoted_text"`,
-      citationType: sql<string>`"citations"."citation_type"`,
-      relevanceScore: sql<number>`"citations"."relevance_score"`,
-      formattedCitation: sql<string>`"citations"."formatted_citation"`,
-      isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
-    })
-    .from(collectionCitations)
-    .innerJoin(citations, eq(collectionCitations.citationId, citations.id))
-    .where(eq(collectionCitations.collectionId, collectionId))
-    .orderBy(collectionCitations.addedAt);
+  try {
+    // Fetch citations in this collection
+    // NOTE: citations Drizzle schema has column name mismatches vs actual DB
+    // (citationText→quoted_text, sourceUrl→N/A, confidence→relevance_score)
+    // Use Drizzle for type-safe joins + sql`` for actual DB column names
+    const collectionCitationsList = await db
+      .select({
+        id: citations.id,
+        caseId: citations.caseId,
+        documentId: citations.documentId,
+        pageNumber: citations.pageNumber,
+        createdAt: citations.createdAt,
+        addedAt: collectionCitations.addedAt,
+        // Map to actual DB column names (not Drizzle schema names)
+        quotedText: sql<string>`"citations"."quoted_text"`,
+        citationType: sql<string>`"citations"."citation_type"`,
+        relevanceScore: sql<number>`"citations"."relevance_score"`,
+        formattedCitation: sql<string>`"citations"."formatted_citation"`,
+        isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
+      })
+      .from(collectionCitations)
+      .innerJoin(citations, eq(collectionCitations.citationId, citations.id))
+      .where(eq(collectionCitations.collectionId, collectionId))
+      .orderBy(collectionCitations.addedAt);
 
-  return json({
-    ...collection,
-    citations: collectionCitationsList,
-  });
+    return json({
+      ...collection,
+      citations: collectionCitationsList,
+    });
+  } catch (err) {
+    console.error('[citations/collections/[id]] GET error:', err);
+    return json({
+      ...collection,
+      citations: [],
+    });
+  }
 };
 
 /**

@@ -47,7 +47,7 @@
   let currentPage = $state(1);
   let searchQuery = $state('');
 
-  const filteredData = $derived(() => {
+  const filteredData = $derived.by(() => {
     let filtered = [...data];
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -70,14 +70,14 @@
     return filtered;
   });
 
-  const paginatedData = $derived(() => {
-    const list = filteredData();
+  const paginatedData = $derived.by(() => {
+    const list = filteredData;
     if (!pagination) return list;
     const start = (currentPage - 1) * pageSize;
     return list.slice(start, start + pageSize);
   });
 
-  const totalPages = $derived(() => Math.ceil(filteredData().length / pageSize));
+  const totalPages = $derived(Math.ceil(filteredData.length / pageSize));
 
   function handleSort(column: TableColumn) {
     if (!column.sortable || !sortable) return;
@@ -155,7 +155,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-sand/50">
-        {#each paginatedData() as row, i}
+        {#each paginatedData as row, i}
           <tr class="hover:bg-info/5 transition-colors group">
             {#if selectable}
               <td class="p-3">
@@ -196,10 +196,10 @@
   </div>
 
   <!-- Pagination -->
-  {#if pagination && totalPages() > 1}
+  {#if pagination && totalPages > 1}
     <div class="p-3 border-t border-sand/20 flex justify-between items-center bg-panel/50">
       <span class="text-[10px] font-mono text-sand/60 uppercase">
-        Page {currentPage} of {totalPages()}
+        Page {currentPage} of {totalPages}
       </span>
       <div class="flex gap-1">
         <button
@@ -210,7 +210,7 @@
           PREV
         </button>
         <button
-          disabled={currentPage === totalPages()}
+          disabled={currentPage === totalPages}
           onclick={() => currentPage++}
           class="px-2 py-1 bg-panelSoft border border-sand/20 text-[10px] font-bold enabled:hover bg-panelSoft disabled:opacity-30 transition-all font-mono"
         >

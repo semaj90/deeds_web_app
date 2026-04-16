@@ -221,10 +221,9 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			result.created++;
 			result.items.push({ url, status: 'created', documentId, chunks: chunkRows.length });
 		} catch (err) {
-			const errMsg = err instanceof Error ? err.message : String(err);
-			console.error(`[library/crawl] failed for ${url}:`, errMsg);
+			console.error(`[library/crawl] failed for ${url}:`, err);
 			result.failed++;
-			result.items.push({ url, status: 'failed', error: errMsg });
+			result.items.push({ url, status: 'failed', error: 'Crawl failed' });
 		}
 	}
 

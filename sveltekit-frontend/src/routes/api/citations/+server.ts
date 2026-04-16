@@ -87,7 +87,7 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
     });
   } catch (err) {
     console.error('Error fetching citations:', err);
-    return json({ success: false, citations: [], error: 'Database unavailable' });
+    return json({ success: false, citations: [], cache: false, degraded: true });
   }
 };
 

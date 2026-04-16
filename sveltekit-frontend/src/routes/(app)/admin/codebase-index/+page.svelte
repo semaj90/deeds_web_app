@@ -25,7 +25,7 @@
 	}
 
 	// Computed filtered files
-	let filteredFiles = $derived(() => {
+	let filteredFiles = $derived.by(() => {
 		let result = Array.isArray(files) ? [...files] : [];
 
 		if (searchQuery) {
@@ -175,7 +175,7 @@
 				</select>
 			</div>
 			<div class="ml-auto text-sm text-slate-400">
-				Showing {filteredFiles().length} of {files.length} files
+				Showing {filteredFiles.length} of {files.length} files
 			</div>
 		</div>
 
@@ -194,7 +194,7 @@
 
 		<!-- File Cards Grid -->
 		<div class="grid gap-4">
-			{#each filteredFiles() as file (file.id)}
+			{#each filteredFiles as file (file.id)}
 				<div class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-5 backdrop-blur transition-all hover:border-cyan-500/50 hover:bg-slate-800/50">
 					<div class="flex items-start gap-4">
 						<!-- Icon -->
@@ -256,7 +256,7 @@
 			{/each}
 		</div>
 
-		{#if !loading && filteredFiles().length === 0}
+		{#if !loading && filteredFiles.length === 0}
 			<div class="rounded-xl border border-slate-700/50 bg-slate-800/30 p-12 text-center">
 				<div class="text-4xl">🔍</div>
 				<h3 class="mt-4 font-semibold text-slate-300">No files found</h3>

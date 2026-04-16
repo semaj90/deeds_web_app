@@ -108,13 +108,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} catch (error) {
 		console.error('[SOM Cache] Analysis error:', error);
 		return json(
-			{
-				success: false,
-				error: 'Failed to analyze NPM errors',
-				details: error instanceof Error ? error.message : 'Unknown error',
-			},
-			{ status: 500 }
-		);
+      {
+        success: false,
+        error: 'Failed to analyze NPM errors',
+      },
+      { status: 500 }
+    );
 	}
 };
 

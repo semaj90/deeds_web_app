@@ -30,41 +30,46 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 
   const caseId = params.id;
 
-  const [targetCase] = await db
-    .select({ id: cases.id })
-    .from(cases)
-    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
-    .limit(1);
+  try {
+    const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+      .limit(1);
 
-  if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
+    if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
 
-  const rows = await db
-    .select({
-      linkId: casePersons.id,
-      personId: personsOfInterest.id,
-      fullName: personsOfInterest.fullName,
-      role: personsOfInterest.role,
-      riskLevel: personsOfInterest.riskLevel,
-      dob: personsOfInterest.dob,
-      lastKnownLocation: personsOfInterest.lastKnownLocation,
-      notes: personsOfInterest.notes,
-      relationshipType: casePersons.relationshipType,
-      isPrimary: casePersons.isPrimary,
-      linkedAt: casePersons.createdAt,
-    })
-    .from(casePersons)
-    .innerJoin(personsOfInterest, eq(casePersons.personId, personsOfInterest.id))
-    .where(eq(casePersons.caseId, caseId));
+    const rows = await db
+      .select({
+        linkId: casePersons.id,
+        personId: personsOfInterest.id,
+        fullName: personsOfInterest.fullName,
+        role: personsOfInterest.role,
+        riskLevel: personsOfInterest.riskLevel,
+        dob: personsOfInterest.dob,
+        lastKnownLocation: personsOfInterest.lastKnownLocation,
+        notes: personsOfInterest.notes,
+        relationshipType: casePersons.relationshipType,
+        isPrimary: casePersons.isPrimary,
+        linkedAt: casePersons.createdAt,
+      })
+      .from(casePersons)
+      .innerJoin(personsOfInterest, eq(casePersons.personId, personsOfInterest.id))
+      .where(eq(casePersons.caseId, caseId));
 
-  const persons = rows.map((r) => ({
-    ...r,
-    isPrimary: r.isPrimary === 'true',
-  }));
+    const persons = rows.map((r) => ({
+      ...r,
+      isPrimary: r.isPrimary === 'true',
+    }));
 
-  const responseData = { persons, total: persons.length };
-  const { etag, isMatch } = checkETag(responseData, request.headers);
-  if (isMatch) return notModified(etag);
-  return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
+    const responseData = { persons, total: persons.length };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
+  } catch (err) {
+    console.error('[cases/[id]/persons] GET error:', err);
+    return json({ persons: [], total: 0 });
+  }
 };
 
 /** POST — link a person to a case */

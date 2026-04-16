@@ -101,6 +101,7 @@ export const GET: RequestHandler = async ({ locals }) => {
         success: true,
         error: 'Cluster analysis failed',
         clusters: [],
+        total: 0,
       },
       { status: 200 }
     );

@@ -2,11 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const originalAceChatSelfEvalEnabled = process.env.ACE_CHAT_SELF_EVAL_ENABLED;
 
+/** 768-dim embedding vector required by the route's dimension check */
+const MOCK_EMBEDDING_768 = Array.from({ length: 768 }, (_, i) => 0.001 * (i + 1));
+
 const mockInsertValues = vi.fn();
 const mockInsert = vi.fn(() => ({ values: mockInsertValues }));
 const mockHistoryLimit = vi.fn();
 const mockHistoryOrderBy = vi.fn(() => ({ limit: mockHistoryLimit }));
-const mockHistoryWhere = vi.fn(() => ({ orderBy: mockHistoryOrderBy }));
+const mockHistoryWhere = vi.fn(() => ({ orderBy: mockHistoryOrderBy, limit: mockHistoryLimit }));
 const mockHistoryFrom = vi.fn(() => ({ where: mockHistoryWhere }));
 const mockSelect = vi.fn(() => ({ from: mockHistoryFrom }));
 
@@ -69,6 +72,8 @@ vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
 vi.mock('$lib/server/retrieval/graph-context.js', () => ({
   getGraphContext: mockGetGraphContext,
   getCaseGraphNeighborIds: vi.fn(async () => []),
+  getNeo4jMultiHopNeighbors: vi.fn(async () => []),
+  formatNeo4jContext: vi.fn(() => ''),
   buildGraphShouldFilter: vi.fn(() => null),
   applyGraphAuthorityScoring: vi.fn((docs: unknown[]) => docs),
 }));
@@ -121,6 +126,8 @@ vi.mock('$lib/server/ace/self-prompt.js', () => ({
 
 vi.mock('$lib/server/ace/context-assembler.js', () => ({
   fetchGlossaryMatches: mockFetchGlossaryMatches,
+  fetchCachedACEChunks: vi.fn(async () => []),
+  persistACEChunks: vi.fn(async () => undefined),
 }));
 
 vi.mock('$lib/server/retrieval/document-dag.js', () => ({
@@ -131,13 +138,123 @@ vi.mock('$lib/server/retrieval/document-dag.js', () => ({
 vi.mock('$lib/server/queue/rabbitmq-manager-fixed.js', () => ({
   rabbitmq: {
     publishChatContext: mockPublishChatContext,
+    isReady: vi.fn(() => true),
   },
 }));
 
+// Prevent in-memory synthesis cache from leaking between tests.
+vi.mock('$lib/server/cache.js', () => ({
+  setCache: vi.fn(async () => undefined),
+  getFromMemoryCache: vi.fn(() => ({ found: false, value: null })),
+  getFromRedisCache: vi.fn(async () => null),
+}));
+
+// Block the L1 Redis exact-match cache from hitting the live Docker Redis instance.
+// The real Redis IS running (Docker), so without this mock the dynamic import would
+// find stale entries from dev-server usage and force tests onto the cached path.
+vi.mock('$lib/server/cache/redis-exact-match.js', () => ({
+  generateCacheKey: vi.fn((_opts: unknown) => 'test-cache-key'),
+  getExactMatchCache: vi.fn(async () => null),
+  setExactMatchCache: vi.fn(async () => undefined),
+}));
+
+// Prevent Bifrost streaming cache from intercepting live-path tests.
+vi.mock('$lib/server/ai/cached-stream.js', () => ({
+  getCachedStreamResponse: vi.fn(async () => null),
+  storeCachedStreamResponse: vi.fn(async () => undefined),
+  streamCachedResponse: vi.fn(function* () {}),
+}));
+
+vi.mock('$lib/server/rag/tag-extractor.js', () => ({
+  extractLegalTags: vi.fn(() => ({ statutes: [], cases: [], citations: [], dates: [] })),
+}));
+
+vi.mock('$lib/server/knowledge-cache.js', () => ({
+  getCachedEmbedding: vi.fn(async () => null),
+  setCachedEmbedding: vi.fn(async () => undefined),
+}));
+
+vi.mock('$lib/server/cache/dag-cache.js', () => ({
+  getCachedDAG: vi.fn(() => null),
+  setCachedDAG: vi.fn(() => undefined),
+}));
+
+vi.mock('$lib/server/observability/inference-log.js', () => ({
+  logInference: vi.fn(),
+}));
+
+vi.mock('$lib/server/db/schema-postgres.js', () => ({
+  chatDocumentAttachments: { chatId: 'chatId', documentId: 'documentId', attachedAt: 'attachedAt' },
+}));
+
+vi.mock('$lib/server/trt-llm.js', () => ({
+  streamLLM: vi.fn(async function* () {}),
+  healthCheck: vi.fn(async () => false),
+}));
+
+vi.mock('$lib/server/triton-llm.js', () => ({
+  streamLLM: vi.fn(async function* () {}),
+  healthCheck: vi.fn(async () => false),
+}));
+
+vi.mock('$lib/server/inference/gpu-arbiter.js', () => ({
+  acquireGpuLease: vi.fn(async () => ({ acquired: false, reason: 'test' })),
+  releaseGpuLease: vi.fn(async () => undefined),
+  getGpuLeaseStatus: vi.fn(async () => ({ available: false })),
+}));
+
+vi.mock('$lib/server/redis-streams.js', () => ({
+  produceTokenChunk: vi.fn(async () => undefined),
+  trimTokenStream: vi.fn(async () => undefined),
+}));
+
+vi.mock('$lib/server/retrieval/auto-backfill.js', () => ({
+  shouldBackfill: vi.fn(() => false),
+  triggerBackfillAsync: vi.fn(async () => undefined),
+}));
+
+vi.mock('$lib/server/cache-keys.js', () => ({
+  synthesisKey: {
+    forQuery: vi.fn((...args: string[]) => `synthesis:${args.join(':')}`),
+    global: vi.fn((...args: string[]) => `synthesis:global:${args.join(':')}`),
+  },
+  getCaseVersion: vi.fn(async () => 1),
+  TTL: { SYNTHESIS: 3600, CASE_VERSION: 1800, EMBEDDING: 7200 },
+  caseVersionKey: { forCase: vi.fn((id: string) => `case:${id}:version`) },
+  retrievalKey: {
+    forQuery: vi.fn((...args: string[]) => `retrieval:${args.join(':')}`),
+    global: vi.fn((...args: string[]) => `retrieval:global:${args.join(':')}`),
+  },
+  embeddingKey: { forText: vi.fn((text: string) => `emb:${text.slice(0, 10)}`) },
+}));
+
+vi.mock('$lib/server/config/vector-config.js', () => ({
+  buildVectorPayload: vi.fn((collection: string, vector: number[]) => vector),
+  VECTOR_CONFIG: {
+    COLLECTIONS: {
+      LEGAL_DOCUMENTS: 'legal_documents',
+      CHAT_MESSAGES: 'chat_messages',
+      EVIDENCE: 'evidence_items',
+      CODEBASE: 'codebase_chunks_768',
+    },
+    EMBEDDING_DIM: 768,
+    DISTANCE_METRIC: { COSINE: 'Cosine' },
+    SEARCH_DEFAULTS: { limit: 5, scoreThreshold: 0.5 },
+    NAMED_VECTORS: {},
+  },
+  NAMED_VECTOR_MAP: {},
+  getVectorSearchConfig: vi.fn(() => undefined),
+  getNamedVectorName: vi.fn(() => undefined),
+  validateVectorDimensions: vi.fn(() => true),
+  checkVectorEnvironment: vi.fn(() => ({ ok: true, issues: [] })),
+}));
+
 function makeJsonResponse(body: unknown, ok = true) {
+  const bodyStr = JSON.stringify(body);
   return {
     ok,
     json: async () => body,
+    text: async () => bodyStr,
   };
 }
 
@@ -183,6 +300,7 @@ describe('/api/sse/chat glossary metadata', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    vi.unstubAllGlobals();
     process.env.ACE_CHAT_SELF_EVAL_ENABLED = 'true';
 
     mockInsertValues.mockResolvedValue(undefined);
@@ -195,7 +313,16 @@ describe('/api/sse/chat glossary metadata', () => {
       cachedAt: '2026-03-21T00:00:00.000Z',
     });
     mockStoreCachedResponse.mockResolvedValue(undefined);
-    mockOllamaFetch.mockResolvedValue(makeJsonResponse({}, false));
+    mockOllamaFetch.mockImplementation(async (url: string) => {
+      if (url.endsWith('/api/embeddings')) {
+        return makeJsonResponse({
+          embedding: MOCK_EMBEDDING_768,
+          model: 'embeddinggemma:latest',
+        });
+      }
+
+      return makeJsonResponse({}, false);
+    });
     mockFetchGlossaryMatches.mockResolvedValue([glossaryMatch]);
     mockGetFragment.mockReturnValue(null);
     mockEvaluateResponse.mockResolvedValue(null);
@@ -279,7 +406,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -344,7 +471,7 @@ describe('/api/sse/chat glossary metadata', () => {
           response: 'Probable cause applies.',
           model: 'gemma4-legal:latest',
           context: expect.any(String),
-          queryEmbedding: [0.2, 0.3, 0.4],
+          queryEmbedding: MOCK_EMBEDDING_768,
           confidence: doneEvent?.confidence,
         })
       );
@@ -375,7 +502,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -486,7 +613,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -568,7 +695,7 @@ describe('/api/sse/chat glossary metadata', () => {
           context: expect.stringContaining(
             'Retrieved non-attachment legal grounding text that should back the retried answer.'
           ),
-          queryEmbedding: [0.2, 0.3, 0.4],
+          queryEmbedding: MOCK_EMBEDDING_768,
           confidence: 0.5,
         })
       );
@@ -640,7 +767,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -713,7 +840,7 @@ describe('/api/sse/chat glossary metadata', () => {
           context: expect.stringContaining(
             'Retrieved legal grounding text for a high-quality response with explicit support.'
           ),
-          queryEmbedding: [0.2, 0.3, 0.4],
+          queryEmbedding: MOCK_EMBEDDING_768,
           confidence: 0.7,
         })
       );
@@ -803,7 +930,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -882,7 +1009,7 @@ describe('/api/sse/chat glossary metadata', () => {
           context: expect.stringMatching(
             /Retrieved legal grounding text for a code-aware high-quality response\.[\s\S]*## Knowledge Graph Context[\s\S]*## Codebase Context/
           ),
-          queryEmbedding: [0.2, 0.3, 0.4],
+          queryEmbedding: MOCK_EMBEDDING_768,
           confidence: expect.any(Number),
         })
       );
@@ -962,7 +1089,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -1039,7 +1166,7 @@ describe('/api/sse/chat glossary metadata', () => {
           context: expect.stringMatching(
             /Retrieved legal grounding text for a KAG-only high-quality response\.[\s\S]*## Knowledge Graph Context/
           ),
-          queryEmbedding: [0.2, 0.3, 0.4],
+          queryEmbedding: MOCK_EMBEDDING_768,
           confidence: expect.any(Number),
         })
       );
@@ -1085,7 +1212,7 @@ describe('/api/sse/chat glossary metadata', () => {
     mockOllamaFetch.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -1224,7 +1351,7 @@ describe('/api/sse/chat glossary metadata', () => {
     mockOllamaFetch.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -1378,7 +1505,7 @@ describe('/api/sse/chat glossary metadata', () => {
     mockOllamaFetch.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -1563,7 +1690,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -1651,7 +1778,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -1683,17 +1810,17 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(assistantInsertCall.role).toBe('assistant');
     expect(assistantInsertCall.content).toBe(longResponse);
 
-    const queueCall = mockPublishChatContext.mock.calls.at(-1)?.[0] as {
-      sessionId?: string;
-      message?: string;
-      role?: string;
-      metadata?: { model?: string; confidence?: number };
-    };
-    expect(queueCall.sessionId).toBe('conversation-queue-truncate-live');
-    expect(queueCall.role).toBe('assistant');
-    expect(queueCall.message).toBe(longResponse.slice(0, 5000));
-    expect(queueCall.message?.length).toBe(5000);
-    expect(queueCall.metadata?.confidence).toBe(doneEvent?.confidence);
+    await vi.waitFor(() => {
+      const assistantCall = mockPublishChatContext.mock.calls
+        .map((c: unknown[]) => c[0] as { role?: string; sessionId?: string; message?: string; metadata?: { model?: string; confidence?: number } })
+        .find((c) => c.role === 'assistant');
+      expect(assistantCall).toBeDefined();
+      expect(assistantCall!.sessionId).toBe('conversation-queue-truncate-live');
+      expect(assistantCall!.role).toBe('assistant');
+      expect(assistantCall!.message).toBe(longResponse.slice(0, 5000));
+      expect(assistantCall!.message?.length).toBe(5000);
+      expect(assistantCall!.metadata?.confidence).toBe(doneEvent?.confidence);
+    });
 
     const cacheStoreCall = mockStoreCachedResponse.mock.calls.at(-1)?.[0] as {
       response?: string;
@@ -1774,7 +1901,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
-          embedding: [0.2, 0.3, 0.4],
+          embedding: MOCK_EMBEDDING_768,
           model: 'embeddinggemma:latest',
         });
       }
@@ -1853,7 +1980,7 @@ describe('/api/sse/chat glossary metadata', () => {
           context: expect.stringMatching(
             /Retrieved legal grounding text for a codebase-only high-quality response\.[\s\S]*## Codebase Context/
           ),
-          queryEmbedding: [0.2, 0.3, 0.4],
+          queryEmbedding: MOCK_EMBEDDING_768,
           confidence: expect.any(Number),
         })
       );

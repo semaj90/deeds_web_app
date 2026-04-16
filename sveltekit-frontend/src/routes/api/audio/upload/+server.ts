@@ -104,9 +104,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
   } catch (err) {
     console.error('Audio upload error:', err);
-    return json(
-      { error: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
-    );
+    return json({ error: 'Audio upload failed' }, { status: 500 });
   }
 };

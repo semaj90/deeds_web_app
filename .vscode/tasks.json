@@ -113,7 +113,7 @@
     {
       "label": "Vite Build",
       "type": "shell",
-      "command": "npx vite build",
+      "command": "npm run check:vite",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -2776,9 +2776,543 @@
       },
       "problemMatcher": [],
       "detail": "Check Go search service deep health (pg + redis + qdrant + ollama)"
+    },
+    // ============================================
+    // GPU Error Analysis: Complete Pipeline
+    // Phase 78 individual stages + compound tasks
+    // ============================================
+    {
+      "label": "🔬 Phase 78: AST-Ranked Error Scan",
+      "type": "shell",
+      "command": "npm run phase78:ast-rank",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "svelte-check → machine output → AST-aware priority ranking of all errors"
+    },
+    {
+      "label": "🔬 Phase 78: Insert Errors to DB",
+      "type": "shell",
+      "command": "npm run phase78:insert",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Persist ranked errors to PostgreSQL for cluster analysis"
+    },
+    {
+      "label": "🔬 Phase 78: Cluster Errors",
+      "type": "shell",
+      "command": "npm run phase78:cluster",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Group errors into semantic clusters for batch fixing"
+    },
+    {
+      "label": "🔬 Phase 78: Generate Fix Suggestions",
+      "type": "shell",
+      "command": "npm run phase78:suggest",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Generate LLM-powered fix suggestions per error cluster"
+    },
+    {
+      "label": "⚡ Phase 78: Embed Clusters (Force Re-embed)",
+      "type": "shell",
+      "command": "npm run phase78:embed-clusters:force",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Re-embed all error clusters (ignores existing embeddings)"
+    },
+    // ============================================
+    // Compound: Fast Path (Type Check + Vite Build)
+    // ============================================
+    {
+      "label": "✅ Fast Path: Type Check + Vite Build",
+      "type": "shell",
+      "command": "npm run check:all && npm run check:vite",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [
+        "$tsc"
+      ],
+      "detail": "Fast error-fix verification: TS + Svelte type check → Vite production build"
+    },
+    // ============================================
+    // Compound: Deep Path (GPU Cluster Analysis + ANN Retrieval)
+    // Collect → Embed → Cluster → Qdrant ANN → Suggest
+    // ============================================
+    {
+      "label": "🧠 Deep Path: GPU Error Analysis (Full)",
+      "type": "shell",
+      "command": "npm run phase78:full && npm run phase78:embed-clusters:qdrant",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Deep path: AST-rank → insert → cluster → suggest → embed to Qdrant for ANN cosine retrieval"
+    },
+    // ============================================
+    // Compound: Full Verify + Deep Analysis
+    // Fast path then deep path in sequence
+    // ============================================
+    {
+      "label": "🚀 Full: Verify + GPU Error Analysis",
+      "type": "shell",
+      "command": "npm run check:all && npm run check:vite && npm run phase78:full && npm run phase78:embed-clusters:qdrant",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Combined: TS check + Vite build + Phase 78 full pipeline + Qdrant embed (fast path → deep path)"
+    },
+    // ============================================
+    // KV Cache: Redis L1 + Bifrost L2 Warm/Stats
+    // ============================================
+    {
+      "label": "📊 Cache: Exact-Match Stats (L1 Redis)",
+      "type": "shell",
+      "command": "curl -s http://localhost:5173/api/cache/exact-match/stats | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "L1 Redis exact-match cache: hit rate, key count, memory usage"
+    },
+    {
+      "label": "📊 Cache: Bifrost Semantic Health (L2 Qdrant)",
+      "type": "shell",
+      "command": "curl -s http://localhost:3040/health | python -m json.tool && echo '---' && curl -s http://localhost:6333/collections | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "L2 Bifrost semantic cache health + Qdrant collection stats"
+    },
+    {
+      "label": "📊 Cache: Full Stack Stats (L1 + L2 + Qdrant Collections)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '=== L1: Redis Exact-Match ===' -ForegroundColor Cyan; try { $l1 = Invoke-RestMethod http://localhost:5173/api/cache/exact-match/stats -TimeoutSec 5; Write-Host \\\"  Hits: $($l1.hits)  Misses: $($l1.misses)  Keys: $($l1.size)\\\" -ForegroundColor Green } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== L2: Bifrost Semantic ===' -ForegroundColor Cyan; try { $l2 = Invoke-RestMethod http://localhost:3040/health -TimeoutSec 5; Write-Host \\\"  Status: $($l2.status)\\\" -ForegroundColor Green } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== Qdrant Collections ===' -ForegroundColor Cyan; try { $q = Invoke-RestMethod http://localhost:6333/collections -TimeoutSec 5; $q.result.collections | ForEach-Object { Write-Host \\\"  $($_.name)\\\" -ForegroundColor Yellow } } catch { Write-Host '  Unavailable' -ForegroundColor Red }; Write-Host '=== Redis Memory ===' -ForegroundColor Cyan; try { redis-cli INFO memory 2>$null | Select-String 'used_memory_human' | ForEach-Object { Write-Host \\\"  $($_.Line)\\\" -ForegroundColor Green } } catch { Write-Host '  Unavailable' -ForegroundColor Red }\"",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Complete KV cache stack: Redis L1 stats + Bifrost L2 health + Qdrant collections + Redis memory"
+    },
+    // ============================================
+    // GPU: Codebase Index → Error Analysis (Combined)
+    // Index fresh code → analyze errors against indexed codebase
+    // ============================================
+    {
+      "label": "🧠 GPU: Index + Error Analysis Pipeline",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '=== Stage 1: Codebase Semantic Index ===' -ForegroundColor Cyan; Push-Location ${workspaceFolder}/sveltekit-frontend; npm run codebase:index -- --concurrency 4; Write-Host '=== Stage 2: Phase 78 Error Analysis ===' -ForegroundColor Cyan; npm run phase78:full; Write-Host '=== Stage 3: Embed Error Clusters to Qdrant ===' -ForegroundColor Cyan; npm run phase78:embed-clusters:qdrant; Pop-Location; Write-Host '=== Pipeline Complete ===' -ForegroundColor Green\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Full GPU pipeline: semantic index codebase → collect/rank/cluster errors → embed clusters to Qdrant for ANN retrieval"
+    },
+
+    // ============================================
+    // Workspace Audit + Error Fix Pipeline
+    // ============================================
+    {
+      "label": "🔍 Audit: TypeScript Check",
+      "type": "shell",
+      "command": "npm run check:typescript",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "🔍 Audit: Vite Build Check",
+      "type": "shell",
+      "command": "npm run check:vite",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "🔍 Audit: Full Check (types + svelte + vite build)",
+      "type": "shell",
+      "command": "npm run check:all:build",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": ["$tsc"],
+      "detail": "TypeScript noEmit + svelte-check (concurrent) → Vite production build. Catches alias resolution, dead imports, chunking issues."
+    },
+    {
+      "label": "🔁 Audit: Full Pipeline (tsc → vite → vitest)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "🔍 Audit: TypeScript Check",
+        "🔍 Audit: Vite Build Check",
+        "🧪 Audit: Run vitest (unit tests)"
+      ],
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Audit: Run vitest (unit tests)",
+      "type": "shell",
+      "command": "npm run test:unit",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Test: Codebase Indexer routes",
+      "type": "shell",
+      "command": "npx vitest run tests/codebase-indexer.spec.ts --reporter=verbose",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Test: Single spec file (prompt)",
+      "type": "shell",
+      "command": "npx vitest run tests/${input:specFile} --reporter=verbose",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Test: Watch mode (prompt)",
+      "type": "shell",
+      "command": "npx vitest tests/${input:specFile} --reporter=verbose",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "isBackground": true,
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    // ============================================
+    // KV Token Cache (Redis L1 + Bifrost L2 + LangGraph)
+    // ============================================
+    {
+      "label": "⚡ Cache: Run 3-tier cache test",
+      "type": "shell",
+      "command": "node scripts/tests/test-cache-simple.mjs",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ Cache: LangGraph Service Health",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"try { $r = Invoke-RestMethod 'http://localhost:8091/health' -TimeoutSec 5; Write-Host 'LangGraph :8091 OK' -ForegroundColor Green; $r | ConvertTo-Json | Write-Host } catch { Write-Host 'LangGraph :8091 DOWN (start with GPU docker profile)' -ForegroundColor Yellow }\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+
+    // ============================================
+    // TurboQuant (llama-server -ctk turbo3)
+    // ============================================
+    {
+      "label": "⚡ TurboQuant: Start (text-only, port 8090)",
+      "type": "shell",
+      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096 --log-disable",
+      "isBackground": true,
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ TurboQuant: Start (vision mode, port 8090)",
+      "type": "shell",
+      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096",
+      "isBackground": true,
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ TurboQuant: Health Check",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"try { Invoke-RestMethod 'http://localhost:8090/health' -TimeoutSec 5 | Out-Null; Write-Host 'TurboQuant :8090 OK' -ForegroundColor Green } catch { Write-Host 'TurboQuant :8090 DOWN' -ForegroundColor Red }\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ TurboQuant: Test Inference",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-legal';messages=@(@{role='user';content='What is hearsay evidence? (2 sentences)'});max_tokens=150;temperature=0.3} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8090/v1/chat/completions' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 60; $sw.Stop(); Write-Host \\\"TurboQuant: $($sw.ElapsedMilliseconds)ms\\\" -ForegroundColor Cyan; $r.choices[0].message.content | Write-Host\"",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ TurboQuant: Cache Validation (3 runs cold→warm→hot)",
+      "type": "shell",
+      "command": "node scripts/tests/test-cache-simple.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": { "LLM_ENDPOINT": "http://localhost:8090" }
+      },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    // ============================================
+    // LangGraph Synthesis Service (Docker GPU)
+    // ============================================
+    {
+      "label": "🧠 LangGraph: Build + Start (GPU profile)",
+      "type": "shell",
+      "command": "docker compose --profile gpu up --build langgraph-synthesis",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 LangGraph: Start (no rebuild)",
+      "type": "shell",
+      "command": "docker compose --profile gpu up langgraph-synthesis",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 LangGraph: Stop",
+      "type": "shell",
+      "command": "docker compose --profile gpu stop langgraph-synthesis",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 LangGraph: Logs (follow)",
+      "type": "shell",
+      "command": "docker compose --profile gpu logs -f langgraph-synthesis",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 LangGraph: Test Synthesis Query",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-legal';messages=@(@{role='user';content='Summarize hearsay exceptions under FRE 803.'});temperature=0.3;max_tokens=400;use_ace=$true;use_web_search=$false;use_rg_search=$false} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8091/synthesize' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 120; $sw.Stop(); Write-Host \\\"LangGraph: $($sw.ElapsedMilliseconds)ms | cache=$($r.cache_tier) | conf=$($r.confidence)\\\" -ForegroundColor Cyan; $r.response | Write-Host\"",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    // ============================================
+    // Library Ingestion Tasks
+    // ============================================
+    {
+      "label": "📚 Ingest Dev Docs (local files only)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$r = Invoke-RestMethod 'http://localhost:5173/api/library/ingest-dev-docs' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{}' -TimeoutSec 120; Write-Host \\\"Created: $($r.created), Skipped: $($r.skipped), Failed: $($r.failed), Scanned: $($r.totalScanned)\\\" -ForegroundColor $(if($r.success){'Green'}else{'Red'})\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Ingest Dev Docs (+ presets: drizzle/sveltekit/qdrant/langchain)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$body = @{preset=@('drizzle','sveltekit','qdrant','langchain')} | ConvertTo-Json; $r = Invoke-RestMethod 'http://localhost:5173/api/library/ingest-dev-docs' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 300; Write-Host \\\"Created: $($r.created), Skipped: $($r.skipped), Failed: $($r.failed)\\\" -ForegroundColor $(if($r.success){'Green'}else{'Red'}); $r.files | Where-Object {$_.status -ne 'skipped'} | Format-Table -AutoSize\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Ingest Dev Docs (force rescan all)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$body = @{rescan=$true;preset=@('drizzle','sveltekit','qdrant','langchain')} | ConvertTo-Json; $r = Invoke-RestMethod 'http://localhost:5173/api/library/ingest-dev-docs' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 600; Write-Host \\\"Created: $($r.created), Skipped: $($r.skipped), Failed: $($r.failed)\\\" -ForegroundColor $(if($r.success){'Green'}else{'Red'})\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Library: Crawl Web URL",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$url = '${input:crawlUrl}'; $body = @{urls=@($url);corpusType='treatise';skipDuplicates=$true} | ConvertTo-Json; $r = Invoke-RestMethod 'http://localhost:5173/api/library/crawl' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 120; Write-Host \\\"Created: $($r.created), Skipped: $($r.skipped)\\\" -ForegroundColor Green; $r.items | Format-Table -AutoSize\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    // ============================================
+    // KAG Notebook — GPU Index × Neo4j × ACE
+    // ============================================
+    {
+      "label": "🔄 KAG: Ingest Errors → Qdrant (migrate from phase89)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '── Migrating phase89 clusters → phase90_error_clusters ──' -ForegroundColor Cyan; $r = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/ingest-errors' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"mode\\\":\\\"migrate\\\",\\\"force\\\":false}' -TimeoutSec 60; if ($r.skipped) { Write-Host \\\"Already ingested ($($r.existingClusters) clusters) — pass force=true to re-ingest\\\" -ForegroundColor Yellow } else { Write-Host \\\"Ingested: $($r.ingested.clusters) clusters, $($r.ingested.cards) cards → phase90_error_clusters\\\" -ForegroundColor Green }\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔄 KAG: Ingest Errors → Qdrant (live tsc scan)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '── Running tsc --noEmit --skipLibCheck (may take ~3 min) ──' -ForegroundColor Cyan; $r = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/ingest-errors' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"mode\\\":\\\"live\\\",\\\"force\\\":true}' -TimeoutSec 240; Write-Host \\\"Live scan: $($r.ingested.clusters) new clusters, $($r.ingested.cards) cards\\\" -ForegroundColor Green\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 KAG: Full Ingest Pipeline (Index → Errors → Clusters → CouchDB → Notebook)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '── Step 1: Ingest errors → phase90 ──' -ForegroundColor Cyan; $ie = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/ingest-errors' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"mode\\\":\\\"migrate\\\",\\\"force\\\":false}' -TimeoutSec 60; if ($ie.skipped) { Write-Host \\\"phase90 already has $($ie.existingClusters) clusters\\\" -ForegroundColor Yellow } else { Write-Host \\\"Ingested $($ie.ingested.clusters) clusters\\\" -ForegroundColor Green }; Write-Host '── Step 2: GPU cluster detection → CouchDB ──' -ForegroundColor Cyan; $cl = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/cluster-detect' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"k\\\":20,\\\"maxFiles\\\":500}' -TimeoutSec 30; Write-Host \\\"Cluster job: $($cl.jobId)\\\" -ForegroundColor Green; Start-Sleep 3; Write-Host '── Step 3: Build KAG Notebook ──' -ForegroundColor Cyan; $nb = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/kag-notebook?limit=25' -TimeoutSec 30; Write-Host \\\"Notebook: $($nb.stats.totalCells) cells | $($nb.stats.errorClusters) clusters | $($nb.stats.aceReadyCells) ACE-ready | $($nb.stats.gpuClusters) GPU clusters | $($nb.stats.importRecos) import recos\\\" -ForegroundColor Green; Write-Host 'Open: http://localhost:5173/admin/kag-notebook' -ForegroundColor Magenta\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 KAG: Build Notebook (GPU Index → Neo4j → Notebook)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$r = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/kag-notebook?limit=25' -TimeoutSec 30; Write-Host \\\"Cells: $($r.stats.totalCells)  |  Clusters: $($r.stats.errorClusters)  |  Files: $($r.stats.totalFiles)  |  ACE-Ready: $($r.stats.aceReadyCells)\\\" -ForegroundColor Cyan; $r.cells | ForEach-Object { $icon = if ($_.aceReady) { '[ACE]' } else { '     ' }; Write-Host \\\"$icon [$($_.type)] $($_.title) — $($_.errorCount) errors\\\" }\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📓 KAG: Export Notebook to Obsidian",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$body = @{action='export-obsidian'} | ConvertTo-Json; $r = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/kag-notebook' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 30; Write-Host \\\"Exported $($r.cells) cells → $($r.path)\\\" -ForegroundColor Green\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔧 KAG: ACE Fix — Error ID (prompt)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$body = @{action='ace-fix';errorId='${input:kagErrorId}'} | ConvertTo-Json; $r = Invoke-RestMethod 'http://localhost:5173/api/codebase-index/kag-notebook' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 60; if ($r.degraded) { Write-Host 'Neo4j unavailable — KAG degraded mode' -ForegroundColor Yellow } else { Write-Host \\\"ACE context for $($r.errorId):\\\" -ForegroundColor Cyan; $r.aceContext | ConvertTo-Json -Depth 5 | Write-Host }\"",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "👁️ KAG: Open Notebook View in Browser",
+      "type": "shell",
+      "command": "start http://localhost:5173/admin/kag-notebook",
+      "group": "build",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
     }
   ],
   "inputs": [
+    {
+      "id": "specFile",
+      "type": "promptString",
+      "description": "Spec filename inside tests/ (e.g. codebase-indexer.spec.ts)",
+      "default": "codebase-indexer.spec.ts"
+    },
     {
       "id": "routePath",
       "type": "promptString",
@@ -2808,6 +3342,18 @@
       "type": "promptString",
       "description": "Error ID to traverse in KAG Neo4j graph",
       "default": "demo-0"
+    },
+    {
+      "id": "crawlUrl",
+      "type": "promptString",
+      "description": "URL to crawl and ingest into library corpus (e.g. https://kit.svelte.dev/docs/introduction)",
+      "default": "https://kit.svelte.dev/docs/introduction"
+    },
+    {
+      "id": "annSearchQuery",
+      "type": "promptString",
+      "description": "Semantic ANN search query for Qdrant codebase_chunks_768",
+      "default": "authentication middleware session handling"
     }
   ]
 }

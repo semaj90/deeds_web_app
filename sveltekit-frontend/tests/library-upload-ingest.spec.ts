@@ -7,6 +7,7 @@
  *  - GET  /api/library/documents        → 401, 200
  *  - GET  /api/library/search           → 401, 200
  *  - POST /api/library/ingest-codebase-docs → 401, 200
+ *  - POST /api/library/ingest-dev-docs      → 401, 400, 200, SSRF-blocked, web-crawl, preset
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -506,5 +507,174 @@ describe('POST /api/library/ingest-codebase-docs', () => {
 		const body = await res.json();
 		expect(body.success).toBe(true);
 		expect(body.skipped).toBeGreaterThanOrEqual(1);
+	});
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/library/ingest-dev-docs
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('POST /api/library/ingest-dev-docs', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+
+		// fs.existsSync returns true for data/knowledge dir, fs.readdirSync returns one file
+		mockFsReaddir.mockReturnValue([
+			Object.assign({ name: 'architecture-reference.md', isDirectory: () => false, isFile: () => true }, {}),
+		]);
+		mockFsReadFile.mockReturnValue('# Architecture\n\nThis system uses SvelteKit and Qdrant.');
+
+		// Default: no existing doc with this hash
+		mockPoolQuery.mockResolvedValue({ rows: [], rowCount: 0 });
+
+		mockGenerateEmbeddings.mockResolvedValue({
+			vectors: [[0.1, 0.2, 0.3]],
+			model: 'embeddinggemma:latest',
+		});
+	});
+
+	it('returns 401 when unauthenticated', async () => {
+		const { POST } = await import('../src/routes/api/library/ingest-dev-docs/+server.js');
+		const req = new Request('http://localhost/api/library/ingest-dev-docs', { method: 'POST' });
+		const res = await POST({ request: req, locals: {} } as any);
+		expect(res.status).toBe(401);
+	});
+
+	it('returns 400 on invalid body (bad URL)', async () => {
+		const { POST } = await import('../src/routes/api/library/ingest-dev-docs/+server.js');
+		const req = new Request('http://localhost/api/library/ingest-dev-docs', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ urls: ['not-a-valid-url'] }),
+		});
+		const res = await POST({ request: req, locals: { user: { id: 'user-1' } } } as any);
+		expect(res.status).toBe(400);
+	});
+
+	it('returns 200 with scan summary scanning local files', async () => {
+		const { POST } = await import('../src/routes/api/library/ingest-dev-docs/+server.js');
+		const req = new Request('http://localhost/api/library/ingest-dev-docs', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({}),
+		});
+		const res = await POST({
+			request: req,
+			locals: { user: { id: 'user-1' } },
+			fetch: vi.fn(async () => new Response('{}', { status: 200 })),
+		} as any);
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+		expect(typeof body.created).toBe('number');
+		expect(typeof body.skipped).toBe('number');
+		expect(typeof body.failed).toBe('number');
+		expect(body.files).toBeInstanceOf(Array);
+	});
+
+	it('skips local files already ingested by hash', async () => {
+		// Pool always returns a row → jurisdiction + hash check both hit → skipped
+		mockPoolQuery.mockResolvedValue({
+			rows: [{ id: 'existing-dev-doc', processing_status: 'complete' }],
+			rowCount: 1,
+		});
+
+		const { POST } = await import('../src/routes/api/library/ingest-dev-docs/+server.js');
+		const req = new Request('http://localhost/api/library/ingest-dev-docs', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({}),
+		});
+		const res = await POST({
+			request: req,
+			locals: { user: { id: 'user-1' } },
+			fetch: vi.fn(async () => new Response('{}', { status: 200 })),
+		} as any);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+		expect(body.skipped).toBeGreaterThanOrEqual(1);
+		expect(body.created).toBe(0);
+	});
+
+	it('blocks SSRF-unsafe URLs (localhost, private IP)', async () => {
+		const { POST } = await import('../src/routes/api/library/ingest-dev-docs/+server.js');
+		const req = new Request('http://localhost/api/library/ingest-dev-docs', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ urls: ['http://localhost/secret', 'http://169.254.169.254/meta'] }),
+		});
+		const mockFetch = vi.fn();
+		const res = await POST({
+			request: req,
+			locals: { user: { id: 'user-1' } },
+			fetch: mockFetch,
+		} as any);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+		// Both URLs should be ssrf-blocked — fetch should never be called
+		expect(mockFetch).not.toHaveBeenCalled();
+		const blocked = body.files.filter((f: { status: string }) => f.status === 'ssrf-blocked');
+		expect(blocked).toHaveLength(2);
+	});
+
+	it('crawls and ingests a valid external URL', async () => {
+		const { POST } = await import('../src/routes/api/library/ingest-dev-docs/+server.js');
+		const mockFetch = vi.fn(async (url: string) => {
+			if (url === '/api/web/crawl') {
+				return new Response(
+					JSON.stringify({
+						title: 'Drizzle ORM Docs',
+						text: 'Drizzle is a TypeScript ORM for Node.js. It provides a type-safe query builder and schema migration tooling for PostgreSQL, MySQL, and SQLite.',
+					}),
+					{ status: 200, headers: { 'Content-Type': 'application/json' } }
+				);
+			}
+			return new Response('{}', { status: 404 });
+		});
+
+		const req = new Request('http://localhost/api/library/ingest-dev-docs', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ urls: ['https://orm.drizzle.team/docs/overview'] }),
+		});
+		const res = await POST({
+			request: req,
+			locals: { user: { id: 'user-1' } },
+			fetch: mockFetch,
+		} as any);
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+		// The external URL should either be created or skipped (not errored/blocked)
+		const urlEntry = body.files.find(
+			(f: { path: string }) => f.path === 'https://orm.drizzle.team/docs/overview'
+		);
+		expect(urlEntry?.status).toBe('created');
+	});
+
+	it('accepts preset doc collections (e.g. drizzle)', async () => {
+		const mockFetch = vi.fn(async () =>
+			new Response(
+				JSON.stringify({ title: 'Drizzle Docs', text: 'Drizzle ORM documentation content.' }),
+				{ status: 200, headers: { 'Content-Type': 'application/json' } }
+			)
+		);
+
+		const { POST } = await import('../src/routes/api/library/ingest-dev-docs/+server.js');
+		const req = new Request('http://localhost/api/library/ingest-dev-docs', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ preset: ['drizzle'] }),
+		});
+		const res = await POST({
+			request: req,
+			locals: { user: { id: 'user-1' } },
+			fetch: mockFetch,
+		} as any);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+		// drizzle preset has 3 URLs → fetch should have been called 3 times for web/crawl
+		const crawlCalls = mockFetch.mock.calls.filter(([url]: [string]) => url === '/api/web/crawl');
+		expect(crawlCalls.length).toBe(3);
 	});
 });

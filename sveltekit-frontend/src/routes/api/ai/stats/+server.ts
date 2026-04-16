@@ -29,7 +29,6 @@ export const GET: RequestHandler = async ({ locals }) => {
         embeddingModel: 'embeddinggemma:latest',
         llmModel: 'gemma4-legal:latest',
         ollamaStatus: 'unauthorized',
-        error: 'Unauthorized',
       },
       { status: 401 }
     );

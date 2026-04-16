@@ -338,9 +338,9 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			result.created++;
 			result.files.push({ path: url, status: 'created', documentId, chunks });
 		} catch (err) {
-			const msg = err instanceof Error ? err.message : String(err);
+			console.error(`[ingest-dev-docs] Failed to process ${url}:`, err);
 			result.failed++;
-			result.files.push({ path: url, status: 'error', documentId: msg });
+			result.files.push({ path: url, status: 'error', documentId: null });
 		}
 	}
 

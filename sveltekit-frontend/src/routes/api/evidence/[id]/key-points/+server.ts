@@ -27,21 +27,31 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	if (!isUuid(params.id)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
-	const rows = await db
-    .select({ aiAnalysis: evidence.aiAnalysis })
-    .from(evidence)
-    .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
-    .limit(1);
+	try {
+    const rows = await db
+      .select({ aiAnalysis: evidence.aiAnalysis })
+      .from(evidence)
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .limit(1);
 
-	if (!rows[0]) return json({ error: 'Evidence not found' }, { status: 404 });
+    if (!rows[0]) return json({ error: 'Evidence not found' }, { status: 404 });
 
-	const analysis = rows[0].aiAnalysis as Record<string, unknown> | null;
-	return json({
-		evidenceId: params.id,
-		keyPoints: (analysis?.keyPoints as string[]) ?? [],
-		confidence: (analysis?.keyPointsConfidence as number) ?? 0,
-		generatedAt: (analysis?.keyPointsGeneratedAt as string) ?? null
-	});
+    const analysis = rows[0].aiAnalysis as Record<string, unknown> | null;
+    return json({
+      evidenceId: params.id,
+      keyPoints: (analysis?.keyPoints as string[]) ?? [],
+      confidence: (analysis?.keyPointsConfidence as number) ?? 0,
+      generatedAt: (analysis?.keyPointsGeneratedAt as string) ?? null,
+    });
+  } catch (err) {
+    console.error('[evidence/[id]/key-points] GET error:', err);
+    return json({
+      evidenceId: params.id,
+      keyPoints: [],
+      confidence: 0,
+      generatedAt: null,
+    });
+  }
 };
 
 /**
