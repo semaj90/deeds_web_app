@@ -51,8 +51,16 @@ export default defineConfig({
       'tests/retrieval-path-wiring.spec.ts',
       'tests/ace-pipeline-wiring.spec.ts',
       'tests/library-upload-ingest.spec.ts',
+      'tests/codebase-indexer.spec.ts',
       'tests/routes/all-routes-page-server.test.ts',
       'tests/routes/all-routes-page.test.ts',
+      'tests/routes/cache-stats.test.ts',
+      'tests/routes/codebase-tags-rename.test.ts',
+      'tests/routes/phase109-tag-chunks.test.ts',
+      // SvelteKit 2 + Svelte 5 audit tests (added 2026-04-15)
+      'tests/runes/svelte5-rune-compliance.test.ts',
+      'tests/routes/sveltekit-load-patterns.test.ts',
+      'tests/routes/sveltekit-form-actions.test.ts',
     ],
     exclude: [
       'node_modules/**',

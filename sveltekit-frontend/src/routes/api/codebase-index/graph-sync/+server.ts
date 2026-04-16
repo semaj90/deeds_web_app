@@ -60,11 +60,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		job.finishedAt = new Date().toISOString();
 		job.result = result;
 		job.phase = job.status === 'done' ? 'complete' : 'failed';
-		if (job.status === 'error') job.error = result.errors[0];
+		if (job.status === 'error') {
+			console.error('[codebase-index/graph-sync] Pipeline errors:', result.errors);
+			job.error = 'Graph sync failed';
+		}
 	}).catch((err) => {
+		console.error('[codebase-index/graph-sync] Pipeline error:', err);
 		job.status = 'error';
 		job.finishedAt = new Date().toISOString();
-		job.error = err instanceof Error ? err.message : String(err);
+		job.error = 'Graph sync failed';
 		job.phase = 'failed';
 	});
 

@@ -9,6 +9,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getExactMatchStats } from '$lib/server/cache/redis-exact-match.js';
 import { getRedis } from '$lib/server/redis.js';
+import { degradedJson } from '$lib/server/api-response.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	// Auth check
@@ -78,13 +79,27 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (err) {
 		console.error('[cache-stats] Error:', err);
-		return json(
-			{
-				success: false,
-				error: (err as Error).message,
+		return degradedJson({
+			success: false,
+			timestamp: new Date().toISOString(),
+			l1_redis: {
+				totalKeys: 0,
+				llmCacheKeys: 0,
+				memoryMB: '0.00',
+				usedMemoryMB: '0.00',
+				hitRate: '0%',
+				keyspaceHits: 0,
+				keyspaceMisses: 0,
 			},
-			{ status: 500 }
-		);
+			samples: [] as unknown[],
+			performance: {
+				expectedHitRate: 'N/A',
+				avgCacheLatency: 'N/A',
+				avgColdLatency: 'N/A',
+				speedup: 'N/A',
+			},
+			recommendations: ['Cache stats unavailable — Redis may be offline'],
+		});
 	}
 };
 

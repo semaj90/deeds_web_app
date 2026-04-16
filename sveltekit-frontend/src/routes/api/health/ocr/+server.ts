@@ -258,12 +258,12 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
  } catch (err: unknown) {
+ console.error('[health/ocr] Processing test error:', getErrorMessage(err));
  return json(
  {
  action: 'test-processing',
  status: 'error',
  message: 'OCR processing test error',
- error: getErrorMessage(err),
  responseTime: Date.now() - startTime,
  timestamp: new Date().toISOString(),
  },
@@ -302,10 +302,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json(response, { status: httpStatus });
  } catch (err: unknown) {
+ console.error('[health/ocr] POST handler error:', getErrorMessage(err));
  return json(
  {
  error: 'Invalid request',
- message: getErrorMessage(err),
  availableActions: ['test-processing', 'detailed-status'],
  },
  { status: 400 }

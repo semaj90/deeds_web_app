@@ -56,11 +56,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		job.status = result.errors.length && !result.filesProcessed ? 'error' : 'done';
 		job.finishedAt = new Date().toISOString();
 		job.result = result;
-		if (job.status === 'error') job.error = result.errors[0];
+		if (job.status === 'error') {
+			console.error('[codebase-index/recommendations] Pipeline errors:', result.errors);
+			job.error = 'Recommendation pipeline failed';
+		}
 	}).catch((err) => {
+		console.error('[codebase-index/recommendations] Pipeline error:', err);
 		job.status = 'error';
 		job.finishedAt = new Date().toISOString();
-		job.error = err instanceof Error ? err.message : String(err);
+		job.error = 'Recommendation pipeline failed';
 	});
 
 	return json({

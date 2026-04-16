@@ -7,6 +7,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { errorJson } from '$lib/server/api-response.js';
 
 const schema = z.object({
 	oldName: z.string().min(1).max(200),
@@ -84,6 +85,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 	} catch (err) {
 		console.error('[codebase/tags/rename] Error:', err);
-		return json({ error: 'Tag rename failed', detail: (err as Error).message }, { status: 500 });
+		return errorJson(500, 'Tag rename failed');
 	}
 };

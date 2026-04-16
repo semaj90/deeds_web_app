@@ -29,6 +29,7 @@ import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { createDefaultRegistry } from '$lib/server/queue/queue-worker.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 import { getRedis } from '$lib/server/redis.js';
+import { checkHooksRateLimit, startCleanup } from '$lib/server/middleware/rate-limiter.js';
 import { sql } from 'drizzle-orm';
 
 // ── Request Timeout Constants ────────────────────────────────────────────
@@ -49,52 +50,10 @@ const SKIP_BOOT_WARMUP = process.env.SKIP_BOOT_WARMUP === 'true';
 const isClusterWorker1 = !process.env.CLUSTER_WORKER_ID || process.env.CLUSTER_WORKER_ID === '1';
 const shouldRunSingletonTasks = shouldRunBootTasks && isClusterWorker1;
 
-// ── Per-Route Rate Limiting (Sprint 4 → upgraded Sprint 5) ───────────────
-// In-memory sliding window — per route tier + IP
-// Entries: Map<"tier:ip", { count, resetTime }>
-const RATE_LIMIT_MAX_ENTRIES = 50_000;
-const rateLimits = new Map<string, { count: number; resetTime: number }>();
-
-/** Route-specific rate limit tiers — matched in order, first match wins */
-const RATE_TIERS: Array<{ prefix: string; window: number; max: number; methods?: string[] }> = [
-  // Auth brute-force protection
-  { prefix: '/api/auth/login', window: 300_000, max: 10 },
-  { prefix: '/api/auth/register', window: 300_000, max: 5 },
-  { prefix: '/api/auth/reset-password', window: 300_000, max: 5 },
-  // GPU-bound inference (limited VRAM)
-  { prefix: '/api/ai/tensorrt', window: 60_000, max: 10 },
-  { prefix: '/api/gpu/', window: 60_000, max: 15 },
-  // AI/LLM routes (Ollama inference, moderate)
-  { prefix: '/api/ai/', window: 60_000, max: 30 },
-  { prefix: '/api/rag/', window: 60_000, max: 30 },
-  { prefix: '/api/synthesis/', window: 60_000, max: 20 },
-  { prefix: '/api/agents/', window: 60_000, max: 20 },
-  { prefix: '/api/contextual/', window: 60_000, max: 30 },
-  // Chat routes
-  { prefix: '/api/chat/', window: 60_000, max: 40 },
-  { prefix: '/api/sse/', window: 60_000, max: 40 },
-  // Write-heavy mutation routes (default write limiter)
-  { prefix: '/api/', window: 60_000, max: 60, methods: ['POST', 'PUT', 'PATCH', 'DELETE'] },
-  // Global GET read limiter (DoS protection)
-  { prefix: '/api/', window: 60_000, max: 200, methods: ['GET'] },
-];
-
-function getRateTier(path: string, method: string) {
-  for (const tier of RATE_TIERS) {
-    if (path.startsWith(tier.prefix)) {
-      if (!tier.methods || tier.methods.includes(method)) return tier;
-    }
-  }
-  return null;
-}
-
+// ── Per-Route Rate Limiting (Sprint 4 → Sprint 6: Redis-backed) ──────────
+// Tiers + Redis counters live in middleware/rate-limiter.ts
 if (shouldRunBootTasks) {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of rateLimits) {
-      if (now > entry.resetTime) rateLimits.delete(key);
-    }
-  }, 60_000);
+  startCleanup();
 }
 
 // ── Production Secret Guard ─────────────────────────────────────────────
@@ -569,46 +528,32 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
-  // === PER-ROUTE RATE LIMITING (Sprint 4 → Sprint 5) ===
-  // Skip rate limiting in dev mode to avoid false 429s during rapid testing
+  // === PER-ROUTE RATE LIMITING (Sprint 4 → Sprint 6: Redis-backed) ===
   const skipRateLimit = dev && process.env.DEV_BYPASS_AUTH === 'true';
   if (
     !skipRateLimit &&
     event.url.pathname.startsWith('/api/') &&
     !event.url.pathname.startsWith('/api/health')
   ) {
-    const tier = getRateTier(event.url.pathname, event.request.method);
-    if (tier) {
-      const forwarded = event.request.headers.get('x-forwarded-for');
-      const ip = forwarded
-        ? forwarded.split(',')[0].trim()
-        : (event.getClientAddress?.() ?? 'unknown');
-      const now = Date.now();
-      const key = `${tier.prefix}:${ip}`;
-      const entry = rateLimits.get(key);
-
-      if (!entry || now > entry.resetTime) {
-        // Evict oldest if at capacity (prevent unbounded growth from unique IPs)
-        if (!rateLimits.has(key) && rateLimits.size >= RATE_LIMIT_MAX_ENTRIES) {
-          const oldest = rateLimits.keys().next().value;
-          if (oldest) rateLimits.delete(oldest);
-        }
-        rateLimits.set(key, { count: 1, resetTime: now + tier.window });
-      } else if (entry.count >= tier.max) {
-        const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded', retryAfter }), {
+    const forwarded = event.request.headers.get('x-forwarded-for');
+    const ip = forwarded
+      ? forwarded.split(',')[0].trim()
+      : (event.getClientAddress?.() ?? 'unknown');
+    const rlResult = await checkHooksRateLimit(event.url.pathname, event.request.method, ip);
+    if (rlResult && !rlResult.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded', retryAfter: rlResult.retryAfter }),
+        {
           status: 429,
           headers: {
             'Content-Type': 'application/json',
-            'Retry-After': String(retryAfter),
-            'X-RateLimit-Limit': String(tier.max),
+            'Retry-After': String(rlResult.retryAfter),
+            'X-RateLimit-Limit': String(rlResult.limit),
             'X-RateLimit-Remaining': '0',
             'X-Request-ID': requestId,
           },
-        });
-      } else {
-        entry.count++;
-      }
+        }
+      );
     }
   }
 

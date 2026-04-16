@@ -139,9 +139,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			}
 		})
 		.catch((err) => {
+			console.error('[codebase-index/evidence-analyze] Pipeline error:', err);
 			job.status = 'error';
 			job.finishedAt = new Date().toISOString();
-			job.error = err instanceof Error ? err.message : String(err);
+			job.error = 'Evidence analysis pipeline failed';
 		});
 
 	return json({

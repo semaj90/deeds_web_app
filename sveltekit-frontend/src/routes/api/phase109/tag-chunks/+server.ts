@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { degradedJson } from '$lib/server/api-response.js';
 
 /**
  * Phase 109: Auto-tag Qdrant codebase chunks via LLM
@@ -70,7 +71,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 			message: 'Use POST to start auto-tagging',
 		});
 	} catch (err) {
-		return json({ collection: COLLECTION, exists: false, error: String(err) });
+		console.error('[phase109/tag-chunks] GET error:', err);
+		return degradedJson({ collection: COLLECTION, exists: false, tagged: 0, untagged: 0 });
 	}
 };
 
@@ -164,9 +166,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 	} catch (err) {
 		console.error('[phase109/tag-chunks] Error:', err);
-		return json(
-			{ error: 'Auto-tagging failed', message: err instanceof Error ? err.message : String(err) },
-			{ status: 500 }
-		);
+		return json({ error: 'Auto-tagging failed' }, { status: 500 });
 	}
 };
