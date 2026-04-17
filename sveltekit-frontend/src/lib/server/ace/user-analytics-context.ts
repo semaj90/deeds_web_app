@@ -11,6 +11,10 @@
 
 import { getTopQueryPatterns } from '$lib/server/analytics/event-logger.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { getRedis } from '$lib/server/redis.js';
+
+const HOT_QUERY_KEY = 'analytics:hot_queries';
+const QUERY_VEC_KEY = 'analytics:query_vecs';
 
 /**
  * Fetch user analytics context for ACE prompt enrichment.
@@ -69,6 +73,35 @@ async function fetchConnectedCasesSafe(
 	try {
 		const { findConnectedCases } = await import('$lib/server/graph/graph-centrality.js');
 		return await findConnectedCases(caseId, 5);
+	} catch {
+		return [];
+	}
+}
+
+/**
+ * Fetch the top-N query strings from the global Redis hot-query leaderboard.
+ * Uses the `analytics:hot_queries` ZINCRBY sorted set (written by recordSearchQuery).
+ * Returns raw query strings ranked by hit count — inject into ACE queryTags.
+ */
+export async function fetchTopQueryTags(limit = 5): Promise<string[]> {
+	try {
+		const redis = getRedis();
+		// ZREVRANGE returns members sorted high→low by score
+		const hashes: string[] = await redis.zrevrange(HOT_QUERY_KEY, 0, limit - 1);
+		if (!hashes.length) return [];
+
+		const metas = await redis.hmget(QUERY_VEC_KEY, ...hashes);
+		const queries: string[] = [];
+		for (const raw of metas) {
+			if (!raw) continue;
+			try {
+				const meta = JSON.parse(raw) as { query?: string };
+				if (meta.query) queries.push(meta.query.slice(0, 80));
+			} catch {
+				// ignore malformed entries
+			}
+		}
+		return queries;
 	} catch {
 		return [];
 	}

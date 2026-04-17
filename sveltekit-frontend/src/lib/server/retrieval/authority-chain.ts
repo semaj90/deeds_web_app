@@ -22,6 +22,7 @@ import { logInference } from '$lib/server/observability/inference-log.js';
 import { traceEmbedding, traceVectorSearch } from '$lib/server/observability/langfuse.js';
 import { createHash } from 'crypto';
 import { topKIndices } from '$lib/server/gpu/pytorch-graph.js';
+import { fromContextDoc, type UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +52,7 @@ export interface AuthorityChainConfig {
 }
 
 export interface AuthorityChainResult {
-	docs: ContextDoc[];
+	docs: UnifiedRetrievalResult[];
 	hops: number;
 	expanded: number;
 	authorities: { statutes: string[]; cases: string[] };
@@ -220,7 +221,7 @@ export async function authorityChainExpansion(
 	const startTime = performance.now();
 
 	const empty: AuthorityChainResult = {
-		docs: contextDocs,
+		docs: contextDocs.map((d) => fromContextDoc(d, { kind: 'legal_doc' })),
 		hops: 0,
 		expanded: 0,
 		authorities: { statutes: [], cases: [] },
@@ -339,7 +340,7 @@ export async function authorityChainExpansion(
 	}
 
 	const result: AuthorityChainResult = {
-		docs: allDocs,
+		docs: allDocs.map((d) => fromContextDoc(d, { kind: 'legal_doc' })),
 		hops: hop,
 		expanded: totalExpanded,
 		authorities: {

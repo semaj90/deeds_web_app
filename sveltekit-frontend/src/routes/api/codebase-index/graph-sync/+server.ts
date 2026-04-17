@@ -64,6 +64,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			console.error('[codebase-index/graph-sync] Pipeline errors:', result.errors);
 			job.error = 'Graph sync failed';
 		}
+		// Step 10: auto-trigger enrich-qdrant so Qdrant payloads stay in sync with Neo4j
+		if (job.status === 'done') {
+			onPhase('enrich-qdrant');
+			fetch('/api/codebase-index/enrich-qdrant', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ dryRun: false, batchSize: 50 }),
+			}).then((r) => {
+				if (r.ok) {
+					console.log('[codebase-index/graph-sync] enrich-qdrant triggered automatically');
+				} else {
+					console.warn('[codebase-index/graph-sync] enrich-qdrant trigger returned', r.status);
+				}
+			}).catch((e) => {
+				console.warn('[codebase-index/graph-sync] enrich-qdrant auto-trigger failed:', e?.message ?? e);
+			});
+		}
 	}).catch((err) => {
 		console.error('[codebase-index/graph-sync] Pipeline error:', err);
 		job.status = 'error';

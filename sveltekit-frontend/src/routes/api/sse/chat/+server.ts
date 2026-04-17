@@ -1339,7 +1339,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           }));
 
           if (authResult.expanded > 0) {
-            contextDocs = authResult.docs;
+            contextDocs = authResult.docs.map((r) => ({
+              content: r.content,
+              similarity: r.score,
+              documentId: r.sourceId ?? r.id,
+              sourceId: r.sourceId,
+              model: r.metadata?.['model'] as string | undefined,
+            }));
           }
         }
       }
@@ -1376,9 +1382,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       if (graphContext?.neighbors?.length) {
         const queryVector = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(() => null);
         if (queryVector) {
-          contextDocs = await graphExpandRetrieval(
+          const expandInput = contextDocs.map((d) => ({
+            id: d.documentId,
+            kind: 'legal_doc' as const,
+            source: 'qdrant' as const,
+            content: d.content,
+            score: d.similarity,
+            tags: [],
+            sourceId: d.sourceId ?? d.documentId,
+          }));
+          const expandResult = await graphExpandRetrieval(
             queryVector,
-            contextDocs,
+            expandInput,
             graphContext.neighbors,
             { qdrantUrl: QDRANT_URL, collections: RAG_COLLECTIONS }
           ).catch((err) => {
@@ -1386,8 +1401,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               '[KAG Expand] Graph expansion failed (non-fatal):',
               (err as Error)?.message ?? err
             );
-            return contextDocs;
+            return expandInput;
           });
+          contextDocs = expandResult.map((r) => ({
+            content: r.content,
+            similarity: r.score,
+            documentId: r.sourceId ?? r.id,
+            sourceId: r.sourceId,
+            model: r.metadata?.['model'] as string | undefined,
+          }));
         }
       }
 
@@ -1416,9 +1438,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         caseContext,
         glossaryMatches,
         ragChunks: contextDocs.map((d) => ({
+          id: d.documentId,
+          kind: 'legal_doc' as const,
+          source: 'qdrant' as const,
           content: d.content,
           score: d.similarity,
-          source: d.sourceId ?? d.documentId,
+          tags: [],
+          sourceId: d.sourceId ?? d.documentId,
         })),
         kbChunks: [],
         caseChunks: [],
@@ -2072,9 +2098,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   caseContext,
                   glossaryMatches,
                   ragChunks: contextDocs.map((d) => ({
+                    id: d.documentId,
+                    kind: 'legal_doc' as const,
+                    source: 'qdrant' as const,
                     content: d.content,
                     score: d.similarity,
-                    source: d.documentId,
+                    tags: [],
+                    sourceId: d.sourceId ?? d.documentId,
                   })),
                   kagNeighbors:
                     graphContext?.neighbors.map((n) => ({

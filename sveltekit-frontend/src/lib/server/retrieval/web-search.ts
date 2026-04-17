@@ -9,9 +9,10 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { fromWebResult } from '$lib/server/types/retrieval.js';
 
 // Re-export Wikipedia search for unified retrieval access
-export { searchWikipedia, formatWikipediaAsContext } from './wikipedia-search.js';
+export { searchWikipedia, formatWikipediaAsContext, wikipediaToUnified } from './wikipedia-search.js';
 export type { WikipediaResult, WikipediaSearchResponse } from './wikipedia-search.js';
 
 export interface WebSearchResult {
@@ -207,6 +208,15 @@ async function searxngSearch(query: string, maxResults: number): Promise<WebSear
     snippet: String(r.content ?? ''),
     source: 'searxng' as const,
   }));
+}
+
+/** Convert web search results to UnifiedRetrievalResult[] for cross-source reranking. */
+export function webSearchToUnified(
+	response: WebSearchResponse
+): import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[] {
+	return response.results.map((r, i) =>
+		fromWebResult(r, { score: 1 / (i + 1), originalRank: i })
+	);
 }
 
 /** Format web search results as context string for LLM prompt injection. */

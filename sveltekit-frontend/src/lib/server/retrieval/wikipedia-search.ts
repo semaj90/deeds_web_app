@@ -1,3 +1,5 @@
+import { fromWebResult } from '$lib/server/types/retrieval.js';
+
 /**
  * Wikipedia Search Integration
  *
@@ -134,6 +136,15 @@ export function formatWikipediaAsContext(response: WikipediaSearchResponse): str
 		lines.push(`  ${r.snippet.slice(0, 300)}`);
 	}
 	return lines.join('\n');
+}
+
+/** Convert Wikipedia results to UnifiedRetrievalResult[] for cross-source reranking. */
+export function wikipediaToUnified(
+	response: WikipediaSearchResponse
+): import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[] {
+	return response.results.map((r, i) =>
+		fromWebResult({ ...r, source: 'wikipedia' }, { score: 1 / (i + 1), originalRank: i })
+	);
 }
 
 /** Strip HTML tags from Wikipedia API snippets. */

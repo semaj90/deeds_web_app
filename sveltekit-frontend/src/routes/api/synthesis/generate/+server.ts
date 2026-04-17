@@ -221,13 +221,13 @@ async function prefetchContextForPredictions(
  * DAG-order RAG chunks by citation dependency so cited sources appear first.
  */
 function dagOrderRAGChunks(
-  chunks: Array<{ content: string; score: number; source: string }>
+  chunks: import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]
 ): typeof chunks {
   if (chunks.length <= 1) return chunks;
   const knownIds = new Set(chunks.map((_, i) => `chunk-${i}`));
   const dagDocs: DAGDocument[] = chunks.map((c, i) => ({
     id: `chunk-${i}`,
-    title: c.source,
+    title: c.sourceId ?? c.id,
     score: c.score,
     citations: extractCitationRefs(c.content, knownIds),
     content: c.content,
@@ -246,7 +246,7 @@ function buildCacheKey(userId: string, query: string, caseId?: string, persona?:
 
 function extractCitations(
   answerText: string,
-  ragChunks: Array<{ content: string; score: number; source: string }>
+  ragChunks: import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]
 ): SynthesisCitation[] {
   const citations: SynthesisCitation[] = [];
   const refs = answerText.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
@@ -260,7 +260,7 @@ function extractCitations(
       const chunk = ragChunks[idx];
       citations.push({
         id: crypto.randomUUID(),
-        sourceTitle: chunk?.source ?? `Source ${match[1]}`,
+        sourceTitle: chunk?.sourceId ?? chunk?.id ?? `Source ${match[1]}`,
         quote: ref,
       });
     }
@@ -541,9 +541,9 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
         const synthesisId = crypto.randomUUID();
 
         // Section drift guard for stream path (same 50% threshold as sync path)
-        const streamSectionCounts = (context.ragChunks as Array<Record<string, unknown>>)
+        const streamSectionCounts = context.ragChunks
           .slice(0, 3)
-          .map((c) => (c['primary_state'] as string) ?? null)
+          .map((c) => (c.metadata?.['primary_state'] as string | undefined) ?? null)
           .filter((s): s is string => s !== null)
           .reduce<Record<string, number>>((acc, s) => { acc[s] = (acc[s] ?? 0) + 1; return acc; }, {});
         const streamTotalVotes = Object.values(streamSectionCounts).reduce((a, b) => a + b, 0);
@@ -556,8 +556,8 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 
         const streamAnalyticsUsed = !!(
           context.kagNeighbors.length > 0 ||
-          (context as Record<string, unknown>)['analyticsPatterns'] ||
-          (context as Record<string, unknown>)['userAnalytics']
+          (context as unknown as Record<string, unknown>)['analyticsPatterns'] ||
+          (context as unknown as Record<string, unknown>)['userAnalytics']
         );
 
         sendEvent('complete', {
@@ -640,6 +640,13 @@ export const POST: RequestHandler = async (event) => {
     includeCitations = true,
   } = body;
 
+  // Step 9: auto-enable codebase context when the query looks code-related
+  const enableCodebaseContext =
+    body.enableCodebaseContext ??
+    /\b(function|class|route|component|schema|hook|store|import|api|endpoint|interface|type|const|export)\b/i.test(
+      query
+    );
+
   // SSE stream mode
   if (body.stream) {
     return handleStream(body, auth.user.id);
@@ -660,7 +667,7 @@ export const POST: RequestHandler = async (event) => {
     let prefetchEntry: { acePrompt: unknown; contextSources: unknown } | null = null;
 
     if (cached) {
-      const c = cached as Record<string, unknown>;
+      const c = cached as unknown as Record<string, unknown>;
       if (c['synthesisId']) {
         // Full synthesis response — return immediately
         timer.mark('cache-hit');
@@ -675,7 +682,7 @@ export const POST: RequestHandler = async (event) => {
       if (c['_prefetched']) {
         // Predicted prefetch hit — ACE context pre-built, skip expensive assembly
         aceSource = 'predicted-prefetch';
-        prefetchEntry = cached as { acePrompt: unknown; contextSources: unknown };
+        prefetchEntry = cached as unknown as { acePrompt: unknown; contextSources: unknown };
         timer.mark('prefetch-hit');
       }
     }
@@ -694,7 +701,7 @@ export const POST: RequestHandler = async (event) => {
       maxTokens,
       temperature,
       enableACE,
-      enableCodebaseContext: body.enableCodebaseContext,
+      enableCodebaseContext,
       sectionTypes: body.sectionTypes,
     });
 
@@ -722,7 +729,7 @@ export const POST: RequestHandler = async (event) => {
       conversationId: body.conversationId,
       persona: body.persona,
       sectionTypes: body.sectionTypes,
-      enableCodebaseContext: body.enableCodebaseContext,
+      enableCodebaseContext,
       enableWebSearch: true,
     });
     context.ragChunks = dagOrderRAGChunks(context.ragChunks);
@@ -807,9 +814,9 @@ export const POST: RequestHandler = async (event) => {
     // Infer dominant legal section from RAG chunk tags (set by LangGraph tag_chunks node).
     // Drift guard: require ≥50% of sampled votes to avoid noisy retrievals pushing the
     // wrong follow-up track. Tied or split votes fall through to null → FACTS default.
-    const sectionCounts = (context.ragChunks as Array<Record<string, unknown>>)
+    const sectionCounts = context.ragChunks
       .slice(0, 3)
-      .map((c) => (c['primary_state'] as string) ?? null)
+      .map((c) => (c.metadata?.['primary_state'] as string | undefined) ?? null)
       .filter((s): s is string => s !== null)
       .reduce<Record<string, number>>((acc, s) => { acc[s] = (acc[s] ?? 0) + 1; return acc; }, {});
     const totalVotes  = Object.values(sectionCounts).reduce((a, b) => a + b, 0);
@@ -832,8 +839,8 @@ export const POST: RequestHandler = async (event) => {
     // Detect analytics enrichment: proxy — context has user-specific neighbors or case data
     const analyticsContextUsed = !!(
       context.kagNeighbors.length > 0 ||
-      (context as Record<string, unknown>)['analyticsPatterns'] ||
-      (context as Record<string, unknown>)['userAnalytics']
+      (context as unknown as Record<string, unknown>)['analyticsPatterns'] ||
+      (context as unknown as Record<string, unknown>)['userAnalytics']
     );
 
     const response: SynthesisResponse = {

@@ -4,6 +4,7 @@
  * Defines the data structures for adaptive prompt assembly,
  * self-evaluation, and tag generation.
  */
+import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 
 export interface ACEUserProfile {
 	userId: string;
@@ -92,11 +93,11 @@ export interface ACEContext {
     sourceNodeId: string | null;
   }> | null;
   /** RAG chunks from Qdrant vector search (merged KB + Case for backward compat) */
-  ragChunks: Array<{ content: string; score: number; source: string }>;
+  ragChunks: UnifiedRetrievalResult[];
   /** Knowledge base chunks — statutes, glossary, templates, doctrine (stable, heavily cached) */
-  kbChunks: Array<{ content: string; score: number; source: string }>;
+  kbChunks: UnifiedRetrievalResult[];
   /** Case/evidence chunks — uploaded PDFs, notes, POI data (case-scoped, invalidates often) */
-  caseChunks: Array<{ content: string; score: number; source: string }>;
+  caseChunks: UnifiedRetrievalResult[];
   /** KAG graph neighbors from Neo4j or PostgreSQL */
   kagNeighbors: Array<{ nodeId: string; title: string; relationship: string; score?: number }>;
   /** Chat history (recent turns) */
@@ -145,6 +146,18 @@ export interface ACEContext {
     score: number;
     lineStart?: number;
     lineEnd?: number;
+    tags?: string[];
+    gpuCluster?: number | null;
+    pageRankScore?: number | null;
+    routeType?: string | null;
+    hasAuthGuard?: boolean | null;
+  }> | null;
+  /** GPU cluster narratives (compiled knowledge from k-means clustering) */
+  clusterNarratives?: Array<{
+    clusterId: number;
+    purpose: string;
+    patterns: string[];
+    keyFiles: string[];
   }> | null;
   /** Deterministic policy decision used to size context and route tools */
   policyDecision: ACEPolicyDecision | null;

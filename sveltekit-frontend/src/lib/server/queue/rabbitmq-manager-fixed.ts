@@ -76,6 +76,7 @@ export class RabbitMQManager extends EventEmitter {
     knowledge_backfill: 'knowledge.backfill',
     audio_process: 'audio.process',
     glyph_tile_rebuild: 'glyph.tile.rebuild',
+    qlora_distill: 'qlora.distill',
   };
 
   constructor() {
@@ -304,8 +305,9 @@ export class RabbitMQManager extends EventEmitter {
     await this.consume(this.queues.synthesis_generate, this.handleSynthesisGenerate.bind(this)); // slow (LLM call)
     await this.consume(this.queues.knowledge_backfill, this.handleKnowledgeBackfill.bind(this)); // medium (web search + embed)
     await this.consume(this.queues.glyph_tile_rebuild, this.handleGlyphTileRebuild.bind(this)); // slow (GPU kMeans)
+    await this.consume(this.queues.qlora_distill, this.handleQLoRADistill.bind(this)); // slow (DB + CouchDB)
 
-    console.log('👂 All 12 RabbitMQ consumers started (prefetch: 10)');
+    console.log('👂 All 13 RabbitMQ consumers started (prefetch: 10)');
 
     // Start DLQ consumers — drain dead-lettered messages for logging/monitoring
     await this.startDLQConsumers();
@@ -1033,24 +1035,24 @@ export class RabbitMQManager extends EventEmitter {
 
           // DAG-order RAG chunks
           if (context.ragChunks.length > 1) {
-            type RAGChunk = { content: string; score: number; source: string };
+            type URR = import('$lib/server/types/retrieval.js').UnifiedRetrievalResult;
             const knownIds = new Set(
-              context.ragChunks.map((_: RAGChunk, i: number) => `chunk-${i}`)
+              context.ragChunks.map((_: URR, i: number) => `chunk-${i}`)
             );
-            const dagDocs = context.ragChunks.map((c: RAGChunk, i: number) => ({
+            const dagDocs = context.ragChunks.map((c: URR, i: number) => ({
               id: `chunk-${i}`,
-              title: c.source,
+              title: c.sourceId ?? c.id,
               score: c.score,
               citations: extractCitationRefs(c.content, knownIds),
               content: c.content,
             }));
             const { ordered } = orderByDependency(dagDocs);
-            const chunkMap = new Map<string, RAGChunk>(
-              context.ragChunks.map((c: RAGChunk, i: number) => [`chunk-${i}`, c])
+            const chunkMap = new Map<string, URR>(
+              context.ragChunks.map((c: URR, i: number) => [`chunk-${i}`, c])
             );
             context.ragChunks = ordered
               .map((d: { id: string }) => chunkMap.get(d.id))
-              .filter((c): c is RAGChunk => c !== undefined);
+              .filter((c): c is URR => c !== undefined);
           }
 
           const acePrompt = await buildACEPromptCached(context, data.query);
@@ -1357,10 +1359,10 @@ export class RabbitMQManager extends EventEmitter {
           enableWebSearch: false,
         });
         points = ctx.ragChunks
-          .filter((c: { embedding?: number[] }) => c.embedding && c.embedding.length > 0)
-          .map((c: { embedding: number[]; entities?: string[] }) => ({
-            embedding: c.embedding,
-            entities: c.entities,
+          .filter((c) => Array.isArray(c.metadata?.['embedding']) && (c.metadata!['embedding'] as number[]).length > 0)
+          .map((c) => ({
+            embedding: c.metadata!['embedding'] as number[],
+            entities: c.metadata?.['entities'] as string[] | undefined,
           }));
       } catch {
         // No context available — rebuild from cache with skipCache=false just refreshes Redis TTL
@@ -1477,6 +1479,149 @@ export class RabbitMQManager extends EventEmitter {
       `🔄 RabbitMQ: reconnect attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${Math.round(delay / 1000)}s`
     );
     setTimeout(() => this.initialize(), delay);
+  }
+
+  /**
+   * QLoRA Distillation Consumer (P1-B)
+   *
+   * Triggered by messages on `qlora.distill`. Selects qualifying rows from
+   * rag_query_log (rerank_score >= threshold), pulls chunk_hit_log hits,
+   * fetches LLM responses from CouchDB inference_log, and inserts into
+   * qlora_examples for downstream fine-tuning.
+   *
+   * Message payload: { minRerankScore?: number, minResponseScore?: number, limit?: number }
+   */
+  private async handleQLoRADistill(msg: AmqpMessage): Promise<void> {
+    if (!msg || !this.channel) return;
+    try {
+      const data = this.parseMessage(msg) ?? {};
+      const minRerankScore   = Number(data.minRerankScore   ?? 0.80);
+      const minResponseScore = Number(data.minResponseScore ?? 0.80);
+      const limit            = Math.min(Number(data.limit   ?? 50), 200);
+
+      console.log(`[qlora.distill] Starting distillation: minRerank=${minRerankScore} limit=${limit}`);
+
+      if (!this.db) {
+        console.warn('[qlora.distill] No DB available — skipping');
+        this.channel.ack(msg);
+        return;
+      }
+
+      // 1. Find qualifying query_log rows not yet in qlora_examples
+      const { pgRows } = await import('../db/client.js');
+      const { sql: drizzleSql } = await import('drizzle-orm');
+      type CandidateRow = { query: string; query_hash: string; top_rerank_score: number | null; entity_statutes: unknown; entity_cases: unknown };
+      const candidates: CandidateRow[] = await this.db.execute(drizzleSql`
+        SELECT ql.query, ql.query_hash, ql.top_rerank_score,
+               ql.entity_statutes, ql.entity_cases
+        FROM   rag_query_log ql
+        WHERE  ql.top_rerank_score >= ${minRerankScore}
+          AND  NOT EXISTS (
+            SELECT 1 FROM qlora_examples qe WHERE qe.query_hash = ql.query_hash
+          )
+        ORDER  BY ql.top_rerank_score DESC
+        LIMIT  ${limit}
+      `).then((r: unknown) => pgRows<CandidateRow>(r)).catch(() => []);
+
+      let inserted = 0;
+      const couchUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+
+      for (const row of candidates) {
+        try {
+          // 2. Pull top chunk hits
+          type HitRow = { chunk_id: string; relative_path: string; gpu_cluster: number | null; pipeline: string; score: number; rerank_score: number | null };
+          const hits: HitRow[] = await this.db.execute(drizzleSql`
+            SELECT chunk_id, relative_path, gpu_cluster, pipeline, score, rerank_score
+            FROM   chunk_hit_log
+            WHERE  query_hash = ${row.query_hash}
+            ORDER  BY COALESCE(rerank_score, score) DESC
+            LIMIT  10
+          `).then((r: unknown) => pgRows<HitRow>(r)).catch(() => []);
+
+          if (!hits.length) continue;
+
+          // 3. Cluster narrative from Redis
+          const topCluster = hits.find((h) => h.gpu_cluster != null)?.gpu_cluster;
+          let graphSummary: string | null = null;
+          if (topCluster != null && this.redisService) {
+            const cached = await this.redisService.get(`cluster-summary:${topCluster}`).catch(() => null);
+            if (cached) {
+              try {
+                const p = JSON.parse(cached) as { summary?: string; purpose?: string };
+                graphSummary = p.summary ?? p.purpose ?? null;
+              } catch { /* ignore */ }
+            }
+          }
+
+          // 4. Fetch LLM response from CouchDB inference_log
+          let llmResponse = '';
+          try {
+            const res = await fetch(`${couchUrl}/inference_log/_find`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                selector: { query_hash: row.query_hash },
+                sort:     [{ created_at: 'desc' }],
+                limit:    1,
+                fields:   ['response', 'self_eval_score'],
+              }),
+              signal: AbortSignal.timeout(5_000),
+            });
+            if (res.ok) {
+              const d = await res.json() as { docs?: Array<{ response?: string; self_eval_score?: number }> };
+              const doc = d.docs?.[0];
+              if (doc?.response && (doc.self_eval_score ?? 0) >= minResponseScore) {
+                llmResponse = doc.response;
+              }
+            }
+          } catch { /* CouchDB unavailable — skip */ }
+
+          if (!llmResponse) continue;
+
+          // 5. Quality tier + metadata
+          const avgRerank = hits.reduce((s, h) => s + (h.rerank_score ?? h.score), 0) / hits.length;
+          const tier = avgRerank >= 0.90 ? 'gold' : avgRerank >= 0.80 ? 'silver' : 'bronze';
+          const clusterIds = [...new Set(hits.map((h) => h.gpu_cluster).filter((c): c is number => c != null))];
+          const pipelineHits = hits.reduce<Record<string, number>>((acc, h) => {
+            acc[h.pipeline] = (acc[h.pipeline] ?? 0) + 1;
+            return acc;
+          }, {});
+          const contextChunks = hits.map((h) => ({
+            id: h.chunk_id, filePath: h.relative_path,
+            pipeline: h.pipeline, score: h.score, rerankScore: h.rerank_score,
+          }));
+
+          // 6. Insert
+          const entityTags = JSON.stringify([
+            ...((row.entity_statutes as string[]) ?? []),
+            ...((row.entity_cases   as string[]) ?? []),
+          ]);
+          const modelVersion = process.env.OLLAMA_MODEL ?? 'gemma4-legal';
+          await this.db.execute(drizzleSql`
+            INSERT INTO qlora_examples
+              (query, query_hash, instruction, context_chunks, graph_summary,
+               response, response_score, pipeline_hits, gpu_clusters, avg_rerank_score,
+               entity_tags, quality_tier, model_version)
+            VALUES (
+              ${row.query}, ${row.query_hash}, ${row.query.trim()},
+              ${JSON.stringify(contextChunks)}::jsonb, ${graphSummary},
+              ${llmResponse}, ${avgRerank},
+              ${JSON.stringify(pipelineHits)}::jsonb,
+              ${JSON.stringify(clusterIds)}::jsonb,
+              ${avgRerank}, ${entityTags}::jsonb, ${tier}, ${modelVersion}
+            )
+            ON CONFLICT DO NOTHING
+          `);
+          inserted++;
+        } catch { /* non-fatal per-row error */ }
+      }
+
+      console.log(`[qlora.distill] Distillation complete: ${inserted}/${candidates.length} examples inserted`);
+      this.channel.ack(msg);
+    } catch (error) {
+      console.error('❌ QLoRA distill error:', this.formatError(error));
+      this.retryOrDLQ(msg, error);
+    }
   }
 
   /**

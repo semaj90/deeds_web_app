@@ -2397,6 +2397,42 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "📊 Analytics: CouchDB PageRank (dry-run)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/codebase-index/couchdb-pagerank -H \"Content-Type: application/json\" -H \"Cookie: session=dev\" -d \"{\\\"dryRun\\\":true}\" | python -m json.tool",
+      "detail": "Verify CouchDB link_matrix view is reachable and shows edge count",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Analytics: CouchDB PageRank (run + sync Qdrant)",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/codebase-index/couchdb-pagerank -H \"Content-Type: application/json\" -H \"Cookie: session=dev\" -d \"{\\\"syncQdrant\\\":true,\\\"syncNeo4j\\\":false}\" | python -m json.tool",
+      "detail": "Power-iteration PageRank from CouchDB edges → write pagerank_score_couchdb to Qdrant payload",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Analytics: CouchDB PageRank Top Files",
+      "type": "shell",
+      "command": "curl -s http://localhost:5173/api/codebase-index/couchdb-pagerank -H \"Cookie: session=dev\" | python -m json.tool",
+      "detail": "Read cached PageRank scores from Redis — shows top 20 central files",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ SEQUENCE: Graph-Sync then CouchDB PageRank",
+      "dependsOn": ["GPU: Codebase Scan (ts-morph only)", "📊 Analytics: CouchDB PageRank (run + sync Qdrant)"],
+      "dependsOrder": "sequence",
+      "detail": "ts-morph scan → Neo4j + CouchDB mirror, then power-iteration PageRank → Qdrant payload",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [

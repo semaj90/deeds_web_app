@@ -13,6 +13,7 @@ import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { initializeNeo4jSchema } from './neo4j-schema.js';
 import { buildCodebaseGraphV2 } from './codebase-scanner-v2.js';
 import { buildCodebaseGraph } from './codebase-scanner.js';
+import { syncNodesToCouchDb, ensureCouchDbDesignDoc } from './couchdb-pagerank.js';
 import type { ScanNodeV2 as WorkerNodeV2 } from './codebase-scanner-v2.js';
 import type { ScanNode as WorkerNode, ScanEdge as WorkerEdge } from './codebase-scanner.js';
 
@@ -22,6 +23,8 @@ export interface CodebaseSyncResult {
 	skipped: number;
 	errors: string[];
 	durationMs: number;
+	couchdbWritten?: number;
+	couchdbFailed?: number;
 }
 
 const BATCH_SIZE = 500;
@@ -286,6 +289,52 @@ export async function syncCodebaseToNeo4j(options: SyncOptions = {}): Promise<Co
 			result.errors.push(`Neo4j write failed: ${err instanceof Error ? err.message : String(err)}`);
 		} finally {
 			await session.close();
+		}
+
+		// 4. CouchDB mirror — write link graph for MapReduce PageRank (Step 21)
+		//    Fire-and-forget: non-fatal, doesn't block Neo4j path
+		emit('couchdb-mirror');
+		try {
+			await ensureCouchDbDesignDoc();
+			const couchNodes = nodes.map((n) => {
+				const isV2    = 'dynamicImportTargets' in n;
+				const fp      = n.filePath ?? n.id ?? '';
+				const norm    = fp.replace(/\\/g, '/');
+				const srcIdx  = norm.indexOf('sveltekit-frontend/src/');
+				const relPath = srcIdx >= 0
+					? norm.slice(srcIdx + 'sveltekit-frontend/src/'.length)
+					: norm.includes('src/')
+						? norm.slice(norm.indexOf('src/') + 'src/'.length)
+						: norm;
+
+				return {
+					id:          relPath || n.id,
+					filePath:    fp,
+					imports:     edges
+						.filter((e) => e.source === n.id && e.type === 'IMPORTS')
+						.map((e) => {
+							const tfp  = (nodes.find((nn) => nn.id === e.target)?.filePath ?? e.target).replace(/\\/g, '/');
+							const tidx = tfp.indexOf('sveltekit-frontend/src/');
+							return tidx >= 0
+								? tfp.slice(tidx + 'sveltekit-frontend/src/'.length)
+								: tfp.includes('src/')
+									? tfp.slice(tfp.indexOf('src/') + 'src/'.length)
+									: tfp;
+						}),
+					lineCount:   n.lineCount,
+					complexity:  n.complexity,
+					routeType:   isV2 ? (n as WorkerNodeV2).routeType : null,
+					hasAuthGuard: isV2 ? (n as WorkerNodeV2).hasAuthGuard : false,
+					isRouteFile: isV2 ? (n as WorkerNodeV2).isRouteFile : false,
+				};
+			});
+
+			const couchResult = await syncNodesToCouchDb(couchNodes);
+			result.couchdbWritten = couchResult.written;
+			result.couchdbFailed  = couchResult.failed;
+			console.log(`[Neo4j Sync] CouchDB mirror: ${couchResult.written} written, ${couchResult.failed} failed`);
+		} catch (couchErr) {
+			console.warn('[Neo4j Sync] CouchDB mirror failed (non-fatal):', (couchErr as Error)?.message);
 		}
 	} catch (err) {
 		result.errors.push(err instanceof Error ? err.message : String(err));

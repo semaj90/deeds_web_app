@@ -18,19 +18,15 @@ import type { GraphNeighbor } from './graph-context.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { traceGraph } from '$lib/server/observability/langfuse.js';
 import { gpuRerank, type RerankableDoc } from './gpu-reranker.js';
+import { fromQdrantPoint, type UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 
+// ── Legacy ContextDoc shim (kept for call-sites that haven't migrated yet) ──
 export interface ContextDoc {
 	content: string;
 	similarity: number;
 	documentId: string;
 	sourceId?: string;
 	model?: string;
-}
-
-function resolveSourceId(payload: Record<string, unknown> | undefined, fallbackId: string): string {
-	const candidate =
-		payload?.document_id ?? payload?.evidence_id ?? payload?.source_id ?? payload?.file_path;
-	return typeof candidate === 'string' && candidate.length > 0 ? candidate : fallbackId;
 }
 
 interface GraphExpansionConfig {
@@ -73,10 +69,10 @@ const DEFAULT_CONFIG: GraphExpansionConfig = {
  */
 export async function graphExpandRetrieval(
 	queryVector: number[],
-	initialDocs: ContextDoc[],
+	initialDocs: UnifiedRetrievalResult[],
 	neighbors: GraphNeighbor[],
 	config: Partial<GraphExpansionConfig> & { qdrantUrl: string }
-): Promise<ContextDoc[]> {
+): Promise<UnifiedRetrievalResult[]> {
 	const cfg = { ...DEFAULT_CONFIG, ...config };
 
 	if (!neighbors.length || !queryVector.length) return initialDocs;
@@ -84,7 +80,7 @@ export async function graphExpandRetrieval(
 	return traceGraph('graph-expand-retrieval', { neighborCount: neighbors.length, initialDocCount: initialDocs.length }, async () => {
 		// 1. Find neighbor IDs not already in the initial result set
 		const existingIds = new Set(
-			initialDocs.map((d) => d.sourceId ?? d.documentId.split(':').pop() ?? d.documentId)
+			initialDocs.map((d) => d.sourceId ?? d.id)
 		);
 		const newNeighbors = neighbors.filter((n) => !existingIds.has(n.nodeId));
 
@@ -112,52 +108,66 @@ export async function graphExpandRetrieval(
 
 		// 3. Apply authority weight: score = cosine * (1 + authorityWeight * normalizedStrength)
 		const weightedHits = expansionHits.map((hit) => {
-			const neighbor = newNeighbors.find((n) => (hit.sourceId ?? hit.documentId).includes(n.nodeId));
+			const neighbor = newNeighbors.find((n) => (hit.sourceId ?? hit.id).includes(n.nodeId));
 			const normalizedStrength = neighbor ? neighbor.strength / 100 : 0.5;
 			const authorityBoost = 1 + cfg.authorityWeight * normalizedStrength;
 			return {
 				...hit,
-				similarity: Math.min(hit.similarity * authorityBoost, 1.0),
-			};
+				score: Math.min(hit.score * authorityBoost, 1.0),
+				graphDistance: 1,
+			} satisfies UnifiedRetrievalResult;
 		});
 
 		// 4. Merge + deduplicate (initial docs take priority)
 		const merged = [...initialDocs];
-		const seenIds = new Set(initialDocs.map((d) => d.documentId));
+		const seenIds = new Set(initialDocs.map((d) => d.id));
 
 		for (const hit of weightedHits) {
-			if (seenIds.has(hit.documentId)) continue;
-			seenIds.add(hit.documentId);
+			if (seenIds.has(hit.id)) continue;
+			seenIds.add(hit.id);
 			merged.push(hit);
 		}
 
 		// 5. GPU-accelerated reranking if enough docs, else JS sort
+		// gpuRerank operates on the legacy ContextDoc shape — bridge via shim
+		const legacyMerged: (ContextDoc & RerankableDoc)[] = merged.map((d) => ({
+			content: d.content,
+			similarity: d.score,
+			documentId: d.sourceId ?? d.id,
+			sourceId: d.sourceId,
+		}));
 		const reranked = await gpuRerank<ContextDoc & RerankableDoc>(
 			queryVector,
-			merged as (ContextDoc & RerankableDoc)[],
+			legacyMerged,
 			{ minDocsForGpu: 20, gpuWeight: 0.6 }
 		);
+
+		// Map reranked ContextDoc[] back to UnifiedRetrievalResult[] preserving metadata
+		const idToUnified = new Map(merged.map((d) => [d.sourceId ?? d.id, d]));
+		const result = reranked.docs.map((d) => {
+			const original = idToUnified.get(d.sourceId ?? d.documentId) ?? merged[0];
+			return { ...original, score: d.similarity } satisfies UnifiedRetrievalResult;
+		});
 
 		console.log(
 			`[KAG Expand] Merged ${expansionHits.length} expansion chunks → ` +
 				`${merged.length} total (was ${initialDocs.length}), rerank: ${reranked.source} (${reranked.rerankMs}ms)`
 		);
 
-		return reranked.docs;
+		return result;
 	}); // end traceGraph
 }
 
 /**
  * Fetch Qdrant chunks from neighbor documents using the original query vector.
- *
- * For each collection, searches with a filter constraining results to chunks
- * whose source document ID matches one of the graph neighbor node IDs.
+ * Returns UnifiedRetrievalResult[] via fromQdrantPoint() so callers get
+ * graphDistance, somCluster, and authorityScore from enriched Qdrant payloads.
  */
 async function fetchNeighborChunks(
 	queryVector: number[],
 	neighbors: GraphNeighbor[],
 	cfg: GraphExpansionConfig
-): Promise<ContextDoc[]> {
+): Promise<UnifiedRetrievalResult[]> {
 	// Collect both node IDs and resolved evidence IDs for Qdrant matching
 	const allMatchIds = new Set<string>();
 	for (const n of neighbors) {
@@ -167,12 +177,10 @@ async function fetchNeighborChunks(
 	const matchIds = [...allMatchIds];
 
 	// Build Qdrant filter: match chunks whose document/evidence ID is in the neighbor set
-	// Different collections use different payload keys for the source document ID
 	const idFilterKeys = ['document_id', 'evidence_id', 'source_id', 'file_path'];
 
 	const searchPromises = cfg.collections.map(async (collection) => {
 		try {
-			// Use should (OR) across all possible ID field names
 			const shouldClauses = idFilterKeys.map((key) => ({
 				key,
 				match: { any: matchIds },
@@ -196,44 +204,42 @@ async function fetchNeighborChunks(
 				}
 			);
 
-			if (!res.ok) return [];
+			if (!res.ok) return [] as UnifiedRetrievalResult[];
 			const data = await res.json();
-			return ((data.result ?? []) as Array<Record<string, unknown>>).map(
-				(r) => {
+
+			return ((data.result ?? []) as Array<Record<string, unknown>>)
+				.map((r) => {
 					const payload = r.payload as Record<string, unknown> | undefined;
+					// Truncate content to budget
 					const rawContent = String(
-						payload?.text ??
-							payload?.content_preview ??
-							payload?.full_text ??
-							payload?.content ??
-							payload?.title ??
+						payload?.['text'] ??
+							payload?.['content_preview'] ??
+							payload?.['full_text'] ??
+							payload?.['content'] ??
+							payload?.['title'] ??
 							''
 					);
-					const content =
-						rawContent.length > cfg.chunkMaxChars
-							? rawContent.slice(0, cfg.chunkMaxChars) + '...'
-							: rawContent;
+					const truncatedPayload = rawContent.length > cfg.chunkMaxChars
+						? { ...payload, content: rawContent.slice(0, cfg.chunkMaxChars) + '...' }
+						: payload;
 
-					return {
-						content,
-						similarity: Number(r.score ?? 0),
-						documentId: `${collection}:${r.id}`,
-						sourceId: resolveSourceId(payload, `${collection}:${String(r.id ?? '')}`),
-						model: payload?.embedding_model as string | undefined,
-					};
-				}
-			);
+					return fromQdrantPoint(
+						{ id: String(r['id'] ?? ''), score: Number(r['score'] ?? 0), payload: truncatedPayload },
+						{ kind: 'legal_doc', collection }
+					);
+				})
+				.filter((c) => c.content.length > 0);
 		} catch (err) {
 			console.warn(
 				`[KAG Expand] Qdrant search failed for ${collection}:`,
 				(err as Error)?.message ?? err
 			);
-			return [];
+			return [] as UnifiedRetrievalResult[];
 		}
 	});
 
 	const results = await Promise.allSettled(searchPromises);
-	const allChunks: ContextDoc[] = [];
+	const allChunks: UnifiedRetrievalResult[] = [];
 
 	for (const result of results) {
 		if (result.status === 'fulfilled') {
@@ -242,6 +248,6 @@ async function fetchNeighborChunks(
 	}
 
 	// Sort by score, take top N
-	allChunks.sort((a, b) => b.similarity - a.similarity);
-	return allChunks.slice(0, cfg.maxExpansionChunks).filter((c) => c.content.length > 0);
+	allChunks.sort((a, b) => b.score - a.score);
+	return allChunks.slice(0, cfg.maxExpansionChunks);
 }

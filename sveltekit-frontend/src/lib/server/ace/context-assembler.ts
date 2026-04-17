@@ -23,7 +23,7 @@ import { getTopQueryPatterns, getWeeklySummary } from '$lib/server/analytics/eve
 import { applyStyle, type LegalPersona } from './style-adapter.js';
 import { webSearch, formatWebResultsAsContext } from '$lib/server/retrieval/web-search.js';
 import { searchWikipedia, formatWikipediaAsContext } from '$lib/server/retrieval/wikipedia-search.js';
-import { fetchUserAnalyticsContext } from './user-analytics-context.js';
+import { fetchUserAnalyticsContext, fetchTopQueryTags } from './user-analytics-context.js';
 import {
   getCaseGraphNeighborIds,
   buildGraphShouldFilter,
@@ -31,6 +31,7 @@ import {
   type GraphNeighbor,
 } from '$lib/server/retrieval/graph-context.js';
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
+import { sortByBestScore, assignRanks } from '$lib/server/types/retrieval.js';
 import {
   traceGraph,
   traceCache,
@@ -40,6 +41,7 @@ import {
 } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from './policy.js';
+import { recordChunkHits, type ChunkHit } from '$lib/server/analytics/search-analytics.js';
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -87,6 +89,7 @@ export async function assembleACEContext(opts: {
         wikiResults,
         userAnalyticsContext,
         codebaseContext,
+        topQueryTags,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -102,8 +105,9 @@ export async function assembleACEContext(opts: {
           ? fetchUserAnalyticsContext(userId, query, caseId).catch(() => null)
           : Promise.resolve(null),
         opts.enableCodebaseContext
-          ? fetchCodebaseContext(query).catch(() => null)
+          ? fetchCodebaseContext(query, userId ?? undefined).catch(() => null)
           : Promise.resolve(null),
+        fetchTopQueryTags(5).catch(() => [] as string[]),
       ]);
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
@@ -118,20 +122,30 @@ export async function assembleACEContext(opts: {
       const practiceArea = extractPracticeArea(caseContext, userProfile);
       const practiceTemplate = selectPracticeTemplate(practiceArea);
 
-      // Generate query tags from entities + practice area
+      // Generate query tags from entities + practice area + Redis hot-query leaderboard
       const queryTags: string[] = [
         ...legalTags.statutes.slice(0, 3),
         ...legalTags.cases.slice(0, 3),
         ...(practiceArea ? [practiceArea] : []),
+        ...(topQueryTags ?? []).slice(0, 3),
       ];
 
+      const toUnified = (c: RAGChunk): import('$lib/server/types/retrieval.js').UnifiedRetrievalResult => ({
+        id: c.source,
+        kind: 'legal_doc' as const,
+        source: 'qdrant' as const,
+        content: c.content,
+        score: c.score,
+        tags: [],
+        sourceId: c.source,
+      });
       const baseContext: ACEContext = {
         userProfile,
         caseContext,
         glossaryMatches,
-        ragChunks,
-        kbChunks,
-        caseChunks,
+        ragChunks: assignRanks(sortByBestScore(ragChunks.map(toUnified))),
+        kbChunks: assignRanks(sortByBestScore(kbChunks.map(toUnified))),
+        caseChunks: assignRanks(sortByBestScore(caseChunks.map(toUnified))),
         kagNeighbors,
         chatHistory,
         entities,
@@ -183,6 +197,31 @@ export async function assembleACEContext(opts: {
       if (caseId) {
         persistACEChunks(caseId, finalContext.ragChunks, finalContext.kbChunks, finalContext.caseChunks)
           .catch((err) => console.warn('[ACE persist] failed:', (err as Error)?.message ?? err));
+      }
+
+      // Fire-and-forget: record chunk hits for analytics (Step 17)
+      const hitOpts = { userId: userId ?? undefined, caseId: caseId ?? undefined };
+      const aceHits: ChunkHit[] = [
+        ...finalContext.kbChunks.map((c) => ({ id: c.id, score: c.score })),
+        ...finalContext.caseChunks.map((c) => ({ id: c.id, score: c.score })),
+      ];
+      if (aceHits.length) recordChunkHits(aceHits, query, 'ace', hitOpts);
+      else if (finalContext.ragChunks.length) {
+        recordChunkHits(
+          finalContext.ragChunks.map((c) => ({ id: c.id, score: c.score })),
+          query, 'rag', hitOpts
+        );
+      }
+      if (codebaseContext?.length) {
+        recordChunkHits(
+          codebaseContext.map((c) => ({
+            id:         c.filePath,
+            relativePath: c.filePath,
+            gpuCluster: c.gpuCluster ?? null,
+            score:      c.score,
+          })),
+          query, 'codebase', hitOpts
+        );
       }
 
       return finalContext;
@@ -1184,8 +1223,8 @@ async function fetchRAGChunks(
       if (authResult.expanded > 0) {
         ragChunks = authResult.docs.map((d) => ({
           content: d.content,
-          score: d.similarity,
-          source: d.documentId,
+          score: d.score,
+          source: d.sourceId ?? d.id,
         }));
       }
     } catch {
@@ -1429,28 +1468,81 @@ function extractGlossaryCandidateTerms(query: string): { exact: string[]; prefix
 }
 
 async function fetchCodebaseContext(
-  query: string
+  query: string,
+  userId?: string
 ): Promise<ACEContext['codebaseContext']> {
   try {
-    // Use dual-vector search (content 0.6 + signature 0.4) for higher precision
+    // Fetch broader initial set so the reranker has candidates to work with
     const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
     const results = await searchCodebase(query, {
-      limit: 5,
+      limit: 20,
       contentWeight: 0.6,
       signatureWeight: 0.4,
     });
 
     if (!results.length) return null;
 
+    // Helper to map a result (with optional rerank score override) to the context shape
+    const toCtx = (
+      r: (typeof results)[number],
+      scoreOverride?: number
+    ): NonNullable<ACEContext['codebaseContext']>[number] => ({
+      filePath: String(r.chunk.path ?? r.chunk.relativePath ?? 'unknown'),
+      content: String(r.chunk.content ?? ''),
+      score: scoreOverride ?? r.score,
+      lineStart: typeof r.chunk.lineStart === 'number' ? r.chunk.lineStart : undefined,
+      lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
+      tags: Array.isArray(r.chunk.tags) ? (r.chunk.tags as string[]) : undefined,
+      gpuCluster:
+        r.chunk.neo4j_gpuCluster != null ? Number(r.chunk.neo4j_gpuCluster) : null,
+      pageRankScore:
+        r.chunk.neo4j_pageRankScore != null ? Number(r.chunk.neo4j_pageRankScore) : null,
+      routeType:
+        r.chunk.neo4j_routeType != null ? String(r.chunk.neo4j_routeType) : null,
+      hasAuthGuard:
+        r.chunk.neo4j_hasAuthGuard != null ? Boolean(r.chunk.neo4j_hasAuthGuard) : null,
+    });
+
+    // Step 3 — cross-encoder reranker pass (noFallback prevents web search on code queries)
+    if (results.length > 1) {
+      try {
+        const { rerankWithGemma4 } = await import(
+          '$lib/server/retrieval/cross-encoder-reranker.js'
+        );
+        const candidates = results.map((r, i) => ({
+          documentId: String(r.chunk.path ?? r.chunk.relativePath ?? `code-${i}`),
+          content: String(r.chunk.content ?? ''),
+          retrievalScore: r.score,
+          // spread neo4j payload so reranker can use metadata
+          ...(r.chunk as Record<string, unknown>),
+        }));
+        const { results: reranked } = await rerankWithGemma4(query, candidates, {
+          topN: 20,
+          returnTopK: 5,
+          noFallback: true,
+          userId,
+        });
+        if (reranked.length > 0) {
+          const scoreMap = new Map(reranked.map((r) => [r.doc.documentId, r.rerankScore]));
+          return results
+            .map((r) => {
+              const docId = String(r.chunk.path ?? r.chunk.relativePath ?? '');
+              return toCtx(r, scoreMap.get(docId) ?? r.score);
+            })
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5)
+            .filter((r) => r.score >= 0.45);
+        }
+      } catch {
+        // Reranker unavailable — fall through to cosine-only results below
+      }
+    }
+
+    // Fallback: cosine-score filtering only
     return results
       .filter((r) => r.score >= 0.5)
-      .map((r) => ({
-        filePath: String(r.chunk.path ?? r.chunk.relativePath ?? 'unknown'),
-        content: String(r.chunk.content ?? ''),
-        score: r.score,
-        lineStart: typeof r.chunk.lineStart === 'number' ? r.chunk.lineStart : undefined,
-        lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
-      }));
+      .slice(0, 5)
+      .map((r) => toCtx(r));
   } catch (err) {
     console.warn('[ACE context] codebase context fetch failed:', (err as Error)?.message ?? err);
     return null;
