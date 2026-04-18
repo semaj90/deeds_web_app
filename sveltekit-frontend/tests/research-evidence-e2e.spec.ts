@@ -264,9 +264,7 @@ test.describe('Research task panel UI', () => {
 	test('Task panel toggle button exists on all pages', async ({ page }) => {
 		await page.goto(BASE);
 		await page.waitForLoadState('networkidle');
-		// ResearchTaskPanel is mounted in (app)/+layout.svelte
-		const toggle = page.locator('.rtp-toggle, [aria-label*="Research"], [title*="Research"]').first();
-		// May not be visible if layout doesn't mount it — just check no crash
+		// ResearchTaskPanel is mounted in (app)/+layout.svelte — just check no crash
 		await page.waitForTimeout(300);
 		await screenshot(page, 'research-task-panel.png');
 	});

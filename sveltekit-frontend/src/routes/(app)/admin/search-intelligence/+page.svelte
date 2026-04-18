@@ -25,7 +25,7 @@
 	let loading     = $state(false);
 	let error       = $state<string | null>(null);
 	let autoRefresh = $state(false);
-	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research' | 'summaries'>('queries');
+	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research' | 'summaries' | 'graph'>('queries');
 
 	// Distillation runner state
 	let distillRunning  = $state(false);
@@ -101,6 +101,58 @@
 	let corpusLoading      = $state(false);
 	let corpusError        = $state<string | null>(null);
 	let corpusResults      = $state<CorpusResult[]>([]);
+
+	// ── Research Graph RL state ───────────────────────────────────────────────
+	type GraphCluster = { id: number; memberIds: string[]; pageRank: number; size: number };
+	type RlPolicy = { ace: number; kag: number; dag: number; rag: number; codebase: number; updatedAt: string };
+	type GraphStats = { clusters: GraphCluster[]; totalSummaries: number; builtAt: string | null };
+	let graphLoading   = $state(false);
+	let graphError     = $state<string | null>(null);
+	let graphStats     = $state<GraphStats | null>(null);
+	let rlPolicy       = $state<RlPolicy | null>(null);
+	let graphBuilding  = $state(false);
+	let graphBuildMsg  = $state<string | null>(null);
+
+	async function fetch_graph() {
+		graphLoading = true;
+		graphError   = null;
+		try {
+			const res = await fetch('/api/analytics/research-graph');
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const d = await res.json();
+			graphStats = d.graph  ?? null;
+			rlPolicy   = d.policy ?? null;
+		} catch (e) {
+			graphError = e instanceof Error ? e.message : String(e);
+		} finally {
+			graphLoading = false;
+		}
+	}
+
+	async function rebuild_graph(action: 'build' | 'policy') {
+		graphBuilding = true;
+		graphBuildMsg = null;
+		try {
+			const res = await fetch('/api/analytics/research-graph', {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body:    JSON.stringify({ action }),
+			});
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const d = await res.json();
+			if (action === 'build') {
+				graphBuildMsg = `Built — ${d.clusters?.length ?? 0} clusters, ${d.totalSummaries ?? 0} summaries (${d.durationMs ?? 0}ms, ${d.source ?? '?'})`;
+				await fetch_graph();
+			} else {
+				graphBuildMsg = `Policy updated — ace:${d.weights?.ace?.toFixed(3) ?? '?'} rag:${d.weights?.rag?.toFixed(3) ?? '?'} kag:${d.weights?.kag?.toFixed(3) ?? '?'}`;
+				rlPolicy = d.weights ?? null;
+			}
+		} catch (e) {
+			graphBuildMsg = 'Error: ' + (e instanceof Error ? e.message : String(e));
+		} finally {
+			graphBuilding = false;
+		}
+	}
 
 	// ── Ingest state ─────────────────────────────────────────────────────────
 	let ingestStateCode    = $state('ca');
@@ -315,6 +367,13 @@
 		if (activeSection === 'research' && !researchData && !researchLoading) {
 			fetch_research_topics();
 			load_corpus_stats();
+		}
+	});
+
+	// Load graph stats when Graph tab is opened
+	$effect(() => {
+		if (activeSection === 'graph' && !graphStats && !graphLoading) {
+			fetch_graph();
 		}
 	});
 
@@ -563,6 +622,9 @@
 	</button>
 	<button class="s-tab" class:active={activeSection === 'summaries'} onclick={() => activeSection = 'summaries'}>
 		<Icon name="library" class="w-3.5 h-3.5" /> Summaries
+	</button>
+	<button class="s-tab" class:active={activeSection === 'graph'} onclick={() => activeSection = 'graph'}>
+		<Icon name="network" class="w-3.5 h-3.5" /> Graph RL
 	</button>
 </div>
 
@@ -1002,6 +1064,10 @@
 			<a href="/api/analytics/qlora-dataset?export=jsonl" download="qlora-training.jsonl"
 				class="btn-distill export">
 				<Icon name="download" class="w-3.5 h-3.5" /> Export JSONL
+			</a>
+			<a href="/api/analytics/qlora-dataset?export=summaries&minScore=0.7" download="research-summaries-ft.jsonl"
+				class="btn-distill export" title="Export curated research summaries as Alpaca-format JSONL for topological summary fine-tuning">
+				<Icon name="book-open" class="w-3.5 h-3.5" /> Export Summaries FT
 			</a>
 		</div>
 
@@ -1470,6 +1536,139 @@
 			<ResearchSummariesBrowser />
 		</div>
 	</section>
+</div>
+{/if}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     RESEARCH GRAPH RL — cluster bar chart + RL policy weights + rebuild
+══════════════════════════════════════════════════════════════════════ -->
+{#if activeSection === 'graph'}
+<div class="si-grid">
+
+	<!-- Controls -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="network" class="w-4 h-4" /> Research Graph RL</span>
+			<span class="panel-sub">
+				GPU k-means clusters over <code>research_summaries</code> · PageRank authority scores ·
+				RL policy weights from GRPO feedback · Auto-rebuilds every 100 new embedded rows.
+			</span>
+		</div>
+		<div class="graph-controls">
+			<button
+				class="btn-sm"
+				disabled={graphBuilding}
+				onclick={() => rebuild_graph('build')}
+				title="Re-cluster all research_summaries with GPU k-means + PageRank"
+			>
+				{graphBuilding ? 'Building…' : 'Rebuild Graph'}
+			</button>
+			<button
+				class="btn-sm"
+				disabled={graphBuilding}
+				onclick={() => rebuild_graph('policy')}
+				title="Recompute RL policy weights from feedback + QLoRA rewards"
+			>
+				{graphBuilding ? 'Computing…' : 'Recompute Policy'}
+			</button>
+			<button class="btn-sm btn-ghost" disabled={graphLoading} onclick={fetch_graph}>
+				<Icon name="refresh-cw" class="w-3 h-3" /> Refresh
+			</button>
+			{#if graphBuildMsg}
+				<span class="build-msg">{graphBuildMsg}</span>
+			{/if}
+		</div>
+		{#if graphError}
+			<p class="err-inline"><Icon name="alert-triangle" class="w-3.5 h-3.5" /> {graphError}</p>
+		{/if}
+	</section>
+
+	<!-- Graph stats summary -->
+	{#if graphStats}
+	<section class="panel">
+		<div class="panel-hdr"><span class="panel-title">Graph Summary</span></div>
+		<dl class="stat-dl">
+			<div class="stat-row">
+				<dt>Total summaries</dt>
+				<dd>{graphStats.totalSummaries ?? 0}</dd>
+			</div>
+			<div class="stat-row">
+				<dt>Clusters (k)</dt>
+				<dd>{graphStats.clusters?.length ?? 0}</dd>
+			</div>
+			<div class="stat-row">
+				<dt>Built at</dt>
+				<dd>{graphStats.builtAt ? new Date(graphStats.builtAt).toLocaleTimeString() : '—'}</dd>
+			</div>
+		</dl>
+		{#if graphStats.totalSummaries < 40}
+			<p class="warn-note">
+				<Icon name="info" class="w-3.5 h-3.5" />
+				Needs ≥40 embedded rows for k=20 clusters. Current: {graphStats.totalSummaries}.
+				Run a web-research crawl to seed data.
+			</p>
+		{/if}
+	</section>
+	{/if}
+
+	<!-- RL Policy weights -->
+	{#if rlPolicy}
+	<section class="panel">
+		<div class="panel-hdr"><span class="panel-title">RL Policy Weights</span></div>
+		<div class="policy-bars">
+			{#each Object.entries(rlPolicy).filter(([k]) => k !== 'updatedAt') as [pipeline, weight]}
+				{@const cfg = PIPELINE_CFG[pipeline]}
+				{@const pct_val = Math.round(Number(weight) * 100)}
+				<div class="policy-row">
+					<span class="policy-label" style="color:{cfg?.color ?? '#9ca3af'}">{cfg?.label ?? pipeline}</span>
+					<div class="policy-bar-track">
+						<div
+							class="policy-bar-fill"
+							style="width:{Math.min(pct_val, 100)}%; background:{cfg?.color ?? '#9ca3af'}22; border-color:{cfg?.color ?? '#9ca3af'}"
+						></div>
+					</div>
+					<span class="policy-val">{Number(weight).toFixed(3)}</span>
+				</div>
+			{/each}
+			<p class="policy-updated">Updated {rlPolicy.updatedAt ? new Date(rlPolicy.updatedAt).toLocaleTimeString() : '—'}</p>
+		</div>
+	</section>
+	{/if}
+
+	<!-- Cluster bar chart -->
+	{#if graphStats?.clusters?.length}
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title">Cluster PageRank Scores</span>
+			<span class="panel-sub">Sorted by authority score descending. Each bar = one k-means cluster.</span>
+		</div>
+		<div class="cluster-chart">
+			{#each graphStats.clusters.slice(0, 20) as cluster}
+				{@const maxPR = graphStats.clusters[0]?.pageRank ?? 1}
+				{@const barPct = maxPR > 0 ? Math.round((cluster.pageRank / maxPR) * 100) : 0}
+				<div class="cluster-bar-row">
+					<span class="cluster-id">C{cluster.id}</span>
+					<div class="cluster-bar-track">
+						<div class="cluster-bar-fill" style="width:{barPct}%"></div>
+					</div>
+					<span class="cluster-meta">{cluster.size} docs · PR {cluster.pageRank.toFixed(4)}</span>
+				</div>
+			{/each}
+		</div>
+	</section>
+	{:else if graphLoading}
+	<section class="panel span2">
+		<p class="loading-note"><Icon name="loader" class="w-4 h-4 spin" /> Loading graph data…</p>
+	</section>
+	{:else if !graphError}
+	<section class="panel span2">
+		<p class="empty-note">
+			<Icon name="info" class="w-4 h-4" />
+			No graph built yet. Crawl some research summaries first, then click <strong>Rebuild Graph</strong>.
+		</p>
+	</section>
+	{/if}
+
 </div>
 {/if}
 
@@ -2041,4 +2240,29 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 	margin-top: 0.25rem;
 	line-height: 1.5;
 }
+
+/* ── Graph RL section ───────────────────────────────────────────────────── */
+.graph-controls   { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-top: 0.75rem; }
+.build-msg        { font-size: 0.72rem; color: #a0c080; margin-left: 0.5rem; }
+.err-inline       { font-size: 0.72rem; color: #f87171; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.35rem; }
+.warn-note        { font-size: 0.72rem; color: #f59e0b; margin-top: 0.75rem; display: flex; align-items: center; gap: 0.35rem; line-height: 1.5; }
+.loading-note     { font-size: 0.8rem; color: #6b7280; padding: 1.5rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.empty-note       { font-size: 0.8rem; color: #6b7280; padding: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.stat-dl          { display: grid; grid-template-columns: 1fr; gap: 0.4rem; margin-top: 0.5rem; }
+.stat-row         { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid #2a2618; }
+.stat-row dt      { font-size: 0.74rem; color: #8b7860; }
+.stat-row dd      { font-size: 0.8rem; color: #d4c7a3; font-weight: 600; }
+.policy-bars      { margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.policy-row       { display: flex; align-items: center; gap: 0.5rem; }
+.policy-label     { width: 70px; font-size: 0.72rem; font-weight: 600; flex-shrink: 0; }
+.policy-bar-track { flex: 1; height: 8px; background: #1e1c14; border-radius: 4px; overflow: hidden; }
+.policy-bar-fill  { height: 100%; border-radius: 4px; border: 1px solid; transition: width 0.4s ease; }
+.policy-val       { width: 50px; text-align: right; font-size: 0.72rem; color: #a09070; }
+.policy-updated   { font-size: 0.66rem; color: #6b7280; margin-top: 0.5rem; }
+.cluster-chart    { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.cluster-bar-row  { display: flex; align-items: center; gap: 0.5rem; }
+.cluster-id       { width: 28px; font-size: 0.66rem; color: #6b7280; flex-shrink: 0; text-align: right; }
+.cluster-bar-track{ flex: 1; height: 10px; background: #1e1c14; border-radius: 3px; overflow: hidden; }
+.cluster-bar-fill { height: 100%; background: linear-gradient(90deg, #4b5563, #7c6ff7); border-radius: 3px; transition: width 0.4s ease; }
+.cluster-meta     { width: 160px; font-size: 0.68rem; color: #8b7860; text-align: right; flex-shrink: 0; }
 </style>

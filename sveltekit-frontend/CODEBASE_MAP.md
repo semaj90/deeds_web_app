@@ -160,7 +160,7 @@ Status note: `ACTIVE` in this table means the route group is present in `src/rou
 | `admin/` | 6 | Admin operations, agent fix, knowledge seed |
 | `system/` | 6 | System env, health, phase13/78 patches |
 | `knowledge/` | 5 | Knowledge base queries, search, stats, stream |
-| `analytics/` | 4 | Events, patterns, summary |
+| `analytics/` | 6 | Events, patterns, summary, research-summaries (browse+persist), research-graph (stats+build+rl) |
 | `rag/` | 4 | Search, validate, answer, enhanced |
 | `graph/` | 5 | Neo4j connections, relationships, sync, timeline |
 | `chat/` | 3 | Chat POST, stream, migrate |

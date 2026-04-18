@@ -92,6 +92,13 @@
       "when": 1745000001000,
       "tag": "0012_qlora_column_addendum",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1745086800000,
+      "tag": "0013_research_summaries",
+      "breakpoints": true
     }
   ]
 }

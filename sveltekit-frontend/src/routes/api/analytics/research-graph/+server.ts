@@ -22,8 +22,11 @@ import {
 } from '$lib/server/analytics/research-graph-rl.js';
 import type { RequestHandler } from './$types';
 
-const REDIS_GRAPH_KEY  = 'rsgraph:clusters';
-const REDIS_POLICY_KEY = 'rlpolicy:pipeline_weights';
+const REDIS_GRAPH_KEY   = 'rsgraph:clusters';
+const REDIS_POLICY_KEY  = 'rlpolicy:pipeline_weights';
+// Rate-limit: max 10 rl-step calls per user per minute (GPU-bound operation)
+const RL_RATE_LIMIT     = 10;
+const RL_RATE_WINDOW_S  = 60;
 
 // ── GET ───────────────────────────────────────────────────────────────────────
 
@@ -124,6 +127,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	if (data.action === 'rl-step') {
+		// Token-bucket rate-limit: 10 requests/user/minute (GPU-bound)
+		const bucketKey = `ratelimit:rl-step:${locals.user.id}`;
+		try {
+			const redis = getRedis();
+			const count = await redis.incr(bucketKey);
+			if (count === 1) await redis.expire(bucketKey, RL_RATE_WINDOW_S);
+			if (count > RL_RATE_LIMIT) {
+				return json({ error: 'Rate limit exceeded — max 10 rl-step requests per minute' }, { status: 429 });
+			}
+		} catch { /* Redis down — allow through rather than block */ }
+
 		const result = await runResearchRlLoop({
 			query:          data.query,
 			queryEmbedding: data.embedding,

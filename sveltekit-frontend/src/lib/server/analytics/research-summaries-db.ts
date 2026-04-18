@@ -56,16 +56,24 @@ export interface BrowseFilters {
 	cursor:    string | null;
 }
 
+/** Per-pipeline RL reward weights (1.0 = neutral, >1 = favoured by feedback) */
+export interface RlPolicySnapshot {
+	ace: number; kag: number; dag: number; rag: number; codebase: number;
+	updatedAt: string | null;
+}
+
 export interface BrowsePage {
-	summaries:   ResearchSummary[];
-	nextCursor:  string | null;
-	prevCursor:  string | null;  // stored in Redis per user
-	total:       number;         // estimated via count(*) with filters
-	page:        number;         // 1-based, stored in Redis per user
-	totalPages:  number;
-	didYouMean:  string[];       // top-10 trgm suggestions for current query
+	summaries:     ResearchSummary[];
+	nextCursor:    string | null;
+	prevCursor:    string | null;  // stored in Redis per user
+	total:         number;         // estimated via count(*) with filters
+	page:          number;         // 1-based, stored in Redis per user
+	totalPages:    number;
+	didYouMean:    string[];       // top-10 trgm suggestions for current query
 	/** Compact Fuse.js-ready index: title + query + entityTags for client-side top-5 */
-	fuseIndex:   { id: string; title: string; query: string; tags: string }[];
+	fuseIndex:     { id: string; title: string; query: string; tags: string }[];
+	/** RL policy weights snapshot — client shows per-pipeline quality badges */
+	policyWeights: RlPolicySnapshot;
 }
 
 export interface PageState {
@@ -293,8 +301,26 @@ export async function browseResearchSummaries(
 		tags:  r.entityTags.join(' '),
 	}));
 
+	// RL policy weights — fetch from Redis (non-blocking, neutral fallback)
+	const neutralPolicy: RlPolicySnapshot = { ace: 1, kag: 1, dag: 1, rag: 1, codebase: 1, updatedAt: null };
+	let policyWeights: RlPolicySnapshot = neutralPolicy;
+	try {
+		const raw = await getRedis().get('rlpolicy:pipeline_weights');
+		if (raw) {
+			const parsed = JSON.parse(raw) as Partial<RlPolicySnapshot>;
+			policyWeights = {
+				ace:       parsed.ace       ?? 1,
+				kag:       parsed.kag       ?? 1,
+				dag:       parsed.dag       ?? 1,
+				rag:       parsed.rag       ?? 1,
+				codebase:  parsed.codebase  ?? 1,
+				updatedAt: parsed.updatedAt ?? null,
+			};
+		}
+	} catch { /* Redis unavailable — use neutral weights */ }
+
 	return {
-		summaries:  pageRows,
+		summaries:     pageRows,
 		nextCursor,
 		prevCursor,
 		total,
@@ -302,6 +328,7 @@ export async function browseResearchSummaries(
 		totalPages,
 		didYouMean,
 		fuseIndex,
+		policyWeights,
 	};
 }
 

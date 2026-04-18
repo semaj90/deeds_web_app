@@ -77,7 +77,7 @@ Use this file as the route inventory and explorer reference, not as the canonica
 | knowledge | 5 |
 | cartridge | 4 |
 | codebase | 4 |
-| analytics | 4 |
+| analytics | 6 | +2: research-graph (GET stats, POST build/policy/search/rl-step), research-summaries (GET browse, POST persist) |
 | recommendations | 4 |
 | rag | 4 |
 
@@ -150,6 +150,9 @@ All Phase 1 components from the enhancement plan already exist:
 - [ ] Layer SSR/render verification status onto the route inventory instead of treating presence as proof
 - [ ] Add validation/auth/degraded-shape status columns for high-risk API groups
 - [ ] Mark route groups as inventory-only vs runtime-verified vs production-hardened
+- [ ] **P6-A (blocking)**: Run `drizzle/0013_research_summaries.sql` migration before any research-graph endpoint is usable
+- [ ] **P6-F**: `research-graph` auto-categorised under "analytics" — verify in all-routes page category map
+- [ ] **P6-H**: Rate-limit `POST /api/analytics/research-graph { action: 'rl-step' }` (10 req/user/min) before public exposure
 
 ### Phase 2: Directory Consolidation UI
 - [x] Add dedicated "Demos" section/tab to the all-routes page (26 demos need showcase) — DONE (Demos panel with grid cards)
