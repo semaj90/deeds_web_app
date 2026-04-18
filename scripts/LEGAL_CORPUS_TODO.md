@@ -1,6 +1,6 @@
 # Legal Corpus Expansion — TODO / Research Backlog
 
-> **As of March 24, 2026** — Current corpus: 789 glossary terms (100% embedded) + 7,825 SCOTUS court opinions (100% embedded, Qdrant indexed).
+> **As of March 24, 2026** — Current corpus: 867 glossary terms (100% embedded, Qdrant indexed) + 7,825 SCOTUS court opinions (100% embedded, Qdrant indexed).
 > All inserts target: PostgreSQL `legal_ai_db` on `127.0.0.1:5434`, user `legal_admin`
 > Ingest script: `scripts/ingest_court_opinions.py`
 > Fetch script: `scripts/fetch_court_datasets.py`
@@ -202,17 +202,17 @@ CREATE INDEX ON legal_statutes USING gin(to_tsvector('english', full_text));
 
 ## SECTION 8 — GLOSSARY ENHANCEMENTS
 
-Current: **789 terms**, 100% embedded (PostgreSQL pgvector + Qdrant `legal_glossary` TODO)
+Current: **867 terms**, 100% embedded (PostgreSQL pgvector + Qdrant `legal_glossary` ✅)
 
 | Task | Terms to Add | Priority |
 |------|-------------|----------|
-| `[ ]` Add Model Penal Code §2.02 culpability levels verbatim | purposely, knowingly, recklessly, negligently + definitions | 🔴 HIGH |
-| `[ ]` Add USSG aggravating/mitigating factor terms | §3A1.1–§3A1.3, §5K1.1-§5K2 departures | 🔴 HIGH |
-| `[ ]` Add causation doctrine terms batch | but-for, NESS test, loss of chance, market share liability | 🟡 MED |
-| `[ ]` Add contract formation terms batch | mailbox rule, mirror image rule, battle of forms (UCC 2-207) | 🟡 MED |
-| `[ ]` Add international law terms | VCLT, jus cogens, erga omnes, universality principle | 🟢 LOW |
-| `[ ]` Add Native American law terms | plenary power, trust responsibility, ICWA, sovereign immunity | 🟢 LOW |
-| `[ ]` Index glossary into Qdrant collection `legal_glossary` | Run: create `scripts/index_glossary_qdrant.py` | 🟡 MED |
+| `[x]` ~~Add Model Penal Code §2.02 culpability levels verbatim~~ | batch_10.cjs — 23 terms | ✅ DONE |
+| `[x]` ~~Add USSG aggravating/mitigating factor terms~~ | batch_11.cjs — 24 terms | ✅ DONE |
+| `[x]` ~~Add causation doctrine terms batch~~ | batch_12.cjs — 14 terms | ✅ DONE |
+| `[x]` ~~Add contract formation terms batch~~ | batch_13.cjs — 16 terms | ✅ DONE |
+| `[x]` ~~Add international law terms~~ | batch_14.cjs — 16 terms | ✅ DONE |
+| `[x]` ~~Add Native American law terms~~ | Already in batches 1-9 | ✅ DONE |
+| `[x]` ~~Index glossary into Qdrant collection `legal_glossary`~~ | 867 pts indexed | ✅ DONE |
 
 ---
 
@@ -222,7 +222,7 @@ Current: **789 terms**, 100% embedded (PostgreSQL pgvector + Qdrant `legal_gloss
 |--------|---------|----------|
 | `[ ]` `scripts/fetch_state_constitutions.py` | Scrape 50 state constitution pages → JSONL | 🔴 HIGH |
 | `[ ]` `scripts/ingest_legal_statutes.py` | Ingest constitutions/statutes into `legal_statutes` table | 🔴 HIGH |
-| `[ ]` `scripts/index_glossary_qdrant.py` | Push glossary terms + embeddings into Qdrant `legal_glossary` | 🟡 MED |
+| `[x]` ~~`scripts/index_glossary_qdrant.py`~~ | Push glossary terms + embeddings into Qdrant `legal_glossary` | ✅ DONE |
 | `[ ]` `scripts/similarity_cluster.py` | Cluster 7825 opinions by embedding (k-means or HDBSCAN) | 🟡 MED |
 | `[ ]` `scripts/extract_citations.py` | Parse US Reporter citations (e.g. "347 U.S. 67") from opinion text | 🟢 LOW |
 | `[ ]` `scripts/build_citation_graph.py` | Build case citation network (A cited B) → Neo4j or pgvector | 🟢 LOW |
@@ -264,12 +264,12 @@ $env:CL_API_TOKEN = "your_token"
 ## SECTION 11 — PRIORITY ORDER (RECOMMENDED SEQUENCE)
 
 1. `[x]` ~~7,825 SCOTUS opinions ingested with embeddings~~ ✅ **DONE**
-2. `[x]` ~~789 glossary terms at 100% embedding coverage~~ ✅ **DONE**
+2. `[x]` ~~867 glossary terms at 100% embedding coverage~~ ✅ **DONE**
 3. `[ ]` **Run Qdrant indexer** → `python scripts/index_court_opinions_qdrant.py`
 4. `[ ]` **Run concept analyzer** → `python scripts/analyze_legal_concepts.py --similarities --export`
 5. `[ ]` **Create `legal_statutes` table** → apply `drizzle/manual/0008_legal_statutes.sql`
 6. `[ ]` **Build `fetch_state_constitutions.py`** → auto-scrape 50+DC constitutions
 7. `[ ]` **Get CourtListener token** → https://www.courtlistener.com/sign-in/ (free) → ca9, ca5, cal
 8. `[ ]` **Ingest USSG Sentencing Guidelines** → aggravating factors §3A chapter
-9. `[ ]` **Add MPC §2.02 mens rea levels** to glossary (batch_10.cjs)
-10. `[ ]` **Index glossary into Qdrant** → `scripts/index_glossary_qdrant.py`
+9. `[x]` ~~**Add MPC §2.02 mens rea levels** to glossary (batch_10.cjs)~~ ✅ **DONE** (+4 more batches)
+10. `[x]` ~~**Index glossary into Qdrant** → `scripts/index_glossary_qdrant.py`~~ ✅ **DONE** (867 pts)

@@ -13,7 +13,7 @@ const pool = new Pool({
 async function main() {
   // Load all batch files
   const batchFiles = [];
-  for (let i = 1; i <= 9; i++) {
+  for (let i = 1; i <= 14; i++) {
     const fp = path.join(__dirname, `glossary_batch_${i}.cjs`);
     if (fs.existsSync(fp)) {
       batchFiles.push(fp);
