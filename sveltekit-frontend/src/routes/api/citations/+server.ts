@@ -150,6 +150,16 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     setCache(`citations:${body.case_id ?? 'all'}:50`, null, 0);
     setCache('citations:all:50', null, 0);
 
+    // ── RL signal: citation_saved (+0.05) ────────────────────────────────────
+    const _userId = locals.user?.id;
+    if (_userId) {
+      import('$lib/server/graph/hypergraph-4d.js')
+        .then(({ adaptFromAnalytics }) =>
+          adaptFromAnalytics({ signal: 'citation_saved', pipeline: 'ace', userId: _userId, sessionId: _userId })
+        )
+        .catch(() => {});
+    }
+
     return json(
       {
         success: true,

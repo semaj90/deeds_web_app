@@ -451,6 +451,7 @@ const CORPUS_COLLECTIONS = [
 	{ alias: 'legal_canon_chunks', label: 'Legal Canon' },
 	{ alias: 'court_opinions',     label: 'Court Opinions' },
 	{ alias: 'documents',          label: 'Legal Documents' },
+	{ alias: 'legal_glossary',     label: 'Legal Glossary' },
 ] as const;
 
 export interface CorpusChunkSummary {
@@ -578,11 +579,11 @@ export async function crawlLegalCorpus(
 	const summaries: CorpusChunkSummary[] = await Promise.all(
 		allHits.map(async (hit, idx): Promise<CorpusChunkSummary> => {
 			const payload       = hit.payload ?? {};
-			const chunkText     = String(payload.chunk_text ?? payload.text ?? payload.content ?? '').trim();
-			const citationLabel = String(payload.citation_label ?? payload.citation ?? '').trim() || null;
+			const chunkText     = String(payload.chunk_text ?? payload.text ?? payload.content ?? payload.definition ?? '').trim();
+			const citationLabel = String(payload.citation_label ?? payload.citation ?? payload.term ?? '').trim() || null;
 			const sectionPath   = String(payload.section_path ?? payload.section ?? '').trim() || null;
 			const jurisdiction  = String(payload.jurisdiction ?? payload.state_code ?? '').trim() || null;
-			const corpusType    = String(payload.corpus_type ?? payload.doc_type ?? '').trim() || null;
+			const corpusType    = String(payload.corpus_type ?? payload.doc_type ?? payload.category ?? '').trim() || null;
 			const pointId       = String(hit.id);
 
 			const doSummarize  = idx < MAX_SUMMARIZE && chunkText.length > 80;
