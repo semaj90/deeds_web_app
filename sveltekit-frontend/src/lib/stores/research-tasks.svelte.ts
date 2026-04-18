@@ -18,6 +18,8 @@ export interface ResearchTask {
 	sourceText?: string;
 	summary?: string;
 	result?: { answer: string; pipeline: string; durationMs: number };
+	/** ID of the research_summaries row persisted for this task's result */
+	summaryId?: string;
 	notified: boolean;
 	createdAt: string;
 	completedAt?: string | null;
@@ -82,6 +84,7 @@ class ResearchTaskStore {
 			sourceText:   t.sourceText != null ? String(t.sourceText) : (t.source_text != null ? String(t.source_text) : undefined),
 			summary:      t.summary != null ? String(t.summary) : undefined,
 			result:       t.result as ResearchTask['result'] ?? undefined,
+			summaryId:    t.summaryId != null ? String(t.summaryId) : (t.summary_id != null ? String(t.summary_id) : undefined),
 			notified:     Boolean(t.notified),
 			createdAt:    String(t.createdAt ?? t.created_at ?? new Date().toISOString()),
 			completedAt:  t.completedAt != null ? String(t.completedAt) : (t.completed_at != null ? String(t.completed_at) : null),

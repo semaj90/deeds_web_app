@@ -25,6 +25,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { eq } from 'drizzle-orm';
+import { db } from '$lib/server/db/client';
+import { researchSummaries, citations } from '$lib/server/db/schema-postgres.js';
 import {
 	browseResearchSummaries,
 	persistResearchSummary,
@@ -33,12 +36,21 @@ import {
 	type BrowseFilters,
 } from '$lib/server/analytics/research-summaries-db.js';
 
-const SOURCES   = ['web', 'corpus', 'document', 'image', 'video', 'report', 'note', 'case', 'all'] as const;
-const PIPELINES = ['ace', 'rag', 'kag', 'dag', 'codebase', 'all'] as const;
+// Persist enum types — must be a concrete source/pipeline (not 'all')
+const PERSIST_SOURCES   = ['web', 'corpus', 'document', 'image', 'video', 'report', 'note', 'case'] as const;
+const PERSIST_PIPELINES = ['ace', 'rag', 'kag', 'dag', 'codebase'] as const;
+
+// Save-citation action schema — promote a research summary to a saved citation
+const saveCitationSchema = z.object({
+	action:    z.literal('save_citation'),
+	summaryId: z.string().uuid(),
+	caseId:    z.string().uuid().optional(),
+	annotation: z.string().max(2000).optional(),
+});
 
 const postSchema = z.object({
-	source:         z.enum(SOURCES).exclude(['all']),
-	pipeline:       z.enum(PIPELINES).exclude(['all']).default('ace'),
+	source:         z.enum(PERSIST_SOURCES),
+	pipeline:       z.enum(PERSIST_PIPELINES).default('ace'),
 	entityType:     z.string().max(30).optional(),
 	query:          z.string().min(3).max(400),
 	queryHash:      z.string().length(8).optional(),
@@ -104,12 +116,63 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	}
 };
 
-// ── POST — persist ────────────────────────────────────────────────────────────
+// ── POST — persist summary OR save as citation ────────────────────────────────
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const raw    = await request.json().catch(() => ({}));
+	const raw = await request.json().catch(() => ({}));
+
+	// ── save_citation action: promote existing summary → citations table ──────
+	if ((raw as Record<string, unknown>).action === 'save_citation') {
+		const parsed = saveCitationSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const { summaryId, caseId, annotation } = parsed.data;
+
+		// Fetch the summary
+		const rows = await db
+			.select()
+			.from(researchSummaries)
+			.where(eq(researchSummaries.id, summaryId))
+			.limit(1)
+			.catch(() => []);
+
+		const summary = rows[0];
+		if (!summary) return json({ error: 'Summary not found' }, { status: 404 });
+
+		// Already saved?
+		if (summary.savedCitationId) {
+			return json({ citationId: summary.savedCitationId, alreadySaved: true });
+		}
+
+		// Create citation row
+		const [newCitation] = await db
+			.insert(citations)
+			.values({
+				citationText:   summary.citationLabel ?? summary.title ?? summary.query.slice(0, 200),
+				citationType:   summary.source,
+				title:          summary.title ?? null,
+				annotation:     annotation ?? summary.summary.slice(0, 1000),
+				isKeyAuthority: false,
+				tags:           summary.entityTags,
+				sourceUrl:      summary.url ?? null,
+				caseId:         caseId ?? null,
+				createdBy:      locals.user.id,
+			})
+			.returning();
+
+		// Link back to research_summaries
+		await db
+			.update(researchSummaries)
+			.set({ savedCitationId: newCitation.id })
+			.where(eq(researchSummaries.id, summaryId));
+
+		return json({ citationId: newCitation.id, citation: newCitation });
+	}
+
+	// ── Standard persist ──────────────────────────────────────────────────────
 	const parsed = postSchema.safeParse(raw);
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
@@ -117,7 +180,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const d = parsed.data;
 
-	// Compute queryHash FNV-1a if not supplied
 	function fnv1a(text: string): string {
 		let h = 2166136261;
 		for (let i = 0; i < Math.min(text.length, 512); i++) {
