@@ -64,6 +64,28 @@ export interface EmbeddingTransportHealth {
   lastSuccessAt?: string;
 }
 
+/**
+ * JSONB-compatible embedding cache entry.
+ * Stored in Redis as JSON string; shape mirrors what would be indexed in a
+ * PostgreSQL JSONB column if the cache were ever promoted to durable storage.
+ *
+ * Key: `embed:{model}:{sha256_16hex}` (24h TTL — embeddings are deterministic)
+ * Qdrant tag enrichment (qdrantTags) is populated fire-and-forget after generation
+ * and is used by bifrostChat() to sharpen the semantic cache key.
+ */
+export interface EmbeddingCacheEntry {
+  vector:      number[];
+  source:      EmbeddingSource;
+  model:       string;
+  dimension:   number;
+  /** Top entity tags from nearest-neighbor Qdrant payload — used in Bifrost cache key */
+  qdrantTags:  string[];
+  queryHash:   string;   // FNV-1a of original text (8 hex chars)
+  createdAt:   string;   // ISO timestamp
+  hitCount:    number;   // incremented on cache hits (approximate)
+}
+
+/** Legacy narrow shape for backwards-compat reads. */
 interface CachedEmbeddingEntry {
   vector: number[];
   source?: EmbeddingSource;
@@ -546,18 +568,115 @@ async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEnt
 async function setCachedEmbedding(
   text: string,
   vector: number[],
-  source: EmbeddingSource
+  source: EmbeddingSource,
+  qdrantTags: string[] = [],
 ): Promise<void> {
   try {
     const { getRedis } = await import('../redis.js');
     const redis = getRedis();
     if (!redis) return;
     const { createHash } = await import('crypto');
-    const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
-    await redis.set(key, JSON.stringify({ vector, source }), 'EX', EMBED_CACHE_TTL);
+    const sha = createHash('sha256').update(text).digest('hex').slice(0, 16);
+    const key = `embed:${SERVER_EMBEDDING_MODEL}:${sha}`;
+    const entry: EmbeddingCacheEntry = {
+      vector,
+      source,
+      model:      SERVER_EMBEDDING_MODEL,
+      dimension:  vector.length,
+      qdrantTags,
+      queryHash:  fnv1aHash(text),
+      createdAt:  new Date().toISOString(),
+      hitCount:   0,
+    };
+    await redis.set(key, JSON.stringify(entry), 'EX', EMBED_CACHE_TTL);
   } catch {
     // Cache write failure is non-fatal
   }
+}
+
+/** FNV-1a 32-bit (same algorithm used across the codebase for queryHash). */
+function fnv1aHash(text: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < Math.min(text.length, 512); i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+/**
+ * Enrich an embedding vector with entity tags from the nearest-neighbor
+ * Qdrant payload. Fire-and-forget — never throws. Returns top-8 tags.
+ *
+ * Uses the `research_summaries` conceptual space; searches whichever
+ * collections are available (legal_documents, legal_canon_chunks).
+ */
+export async function enrichEmbeddingWithQdrantTags(
+  vector: number[],
+  pipeline: string = 'ace',
+): Promise<string[]> {
+  try {
+    const { qdrant } = await import('../vector/qdrant-manager.js');
+    // Search two authoritative collections for entity_tags in payload
+    const collections = ['legal_documents', 'legal_canon_chunks'];
+    const tagSets = await Promise.all(
+      collections.map(col =>
+        qdrant.hybridSearch({
+          query:          '',
+          queryEmbedding: vector,
+          collection:     col,
+          limit:          3,
+          scoreThreshold: 0.65,
+        }).then((res: { results: { payload?: Record<string, unknown> }[] }) =>
+          res.results.flatMap(r => (r.payload?.entity_tags as string[] | undefined) ?? [])
+        ).catch(() => [] as string[]),
+      ),
+    );
+    const allTags = [...new Set(tagSets.flat())];
+    // Also pull from web:research:idx for the pipeline — these have fresh tags
+    if (allTags.length < 4) {
+      const { getRedis } = await import('../redis.js');
+      const redis = getRedis();
+      const hashes = await redis
+        .zrevrange(`web:research:idx:${pipeline}`, 0, 2)
+        .catch(() => [] as string[]);
+      for (const h of hashes) {
+        const raw = await redis.get(`web:research:sum:${h}`).catch(() => null);
+        if (!raw) continue;
+        try {
+          const s = JSON.parse(raw) as { entityTags?: string[] };
+          allTags.push(...(s.entityTags ?? []));
+        } catch { /* */ }
+      }
+    }
+    return [...new Set(allTags)].slice(0, 8);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Generate embeddings and immediately persist a rich JSONB cache entry.
+ * Returned EmbeddingCacheEntry.qdrantTags can be passed to bifrostChat()
+ * as `entityTags` to sharpen the Bifrost semantic cache key.
+ */
+export async function generateEmbeddingsWithTags(
+  texts: string[],
+  pipeline: string = 'ace',
+  options: EmbeddingOptions = {},
+): Promise<{ result: EmbeddingResult; qdrantTags: string[] }> {
+  const result = await generateEmbeddings(texts, options);
+  // Enrich the first text's embedding with Qdrant tags (fire-and-forget for rest)
+  const qdrantTags = result.vectors[0]?.length
+    ? await enrichEmbeddingWithQdrantTags(result.vectors[0], pipeline)
+    : [];
+  // Back-fill tags into cache entries for all texts (non-blocking)
+  if (qdrantTags.length && !options.skipCacheWrite) {
+    for (let i = 0; i < texts.length; i++) {
+      setCachedEmbedding(texts[i], result.vectors[i], result.source, qdrantTags).catch(() => {});
+    }
+  }
+  return { result, qdrantTags };
 }
 
 /**

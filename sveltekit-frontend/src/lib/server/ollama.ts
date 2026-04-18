@@ -226,14 +226,32 @@ function normalizeBifrostMessage(content: string): string {
 export async function bifrostChat(
   messages: Array<{ role: string; content: string }>,
   model: string,
-  options?: { temperature?: number; maxTokens?: number; timeoutMs?: number; cacheKey?: string }
+  options?: {
+    temperature?: number;
+    maxTokens?: number;
+    timeoutMs?: number;
+    cacheKey?: string;
+    /**
+     * Entity tags from Qdrant payload enrichment (e.g. from generateEmbeddingsWithTags).
+     * Top-4 sorted tags are appended to the Bifrost x-bf-cache-key so that semantically
+     * similar queries about different legal domains get distinct cache entries.
+     * Example: 'hearsay evidence' vs 'hearsay objection' both embed similarly but
+     * tag differently (evidence-rules vs courtroom-procedure) → separate cache slots.
+     */
+    entityTags?: string[];
+  }
 ): Promise<string> {
   const bifrostModel = model.includes('/') ? model : `ollama/${model}`; // Fixed: ollama-local → ollama
   // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
   // Without it, every request bypasses the cache entirely (Bifrost docs).
   // 'legal-ai-global' creates a shared namespace: semantically similar questions
   // from any user hit the same cache entry (ideal for repeatable legal queries).
-  const cacheKey = options?.cacheKey ?? 'legal-ai-global';
+  // If entityTags are provided, append top-4 sorted tags to differentiate legal domains.
+  const baseKey = options?.cacheKey ?? 'legal-ai-global';
+  const tagSuffix = options?.entityTags?.length
+    ? ':' + [...options.entityTags].sort().slice(0, 4).join(',')
+    : '';
+  const cacheKey = `${baseKey}${tagSuffix}`;
   // Normalize user messages to improve semantic cache hit rate (filler stripping, citation normalization)
   const normalizedMessages = messages.map((m) =>
     m.role === 'user' ? { ...m, content: normalizeBifrostMessage(m.content) } : m
