@@ -110,26 +110,35 @@ async function extractTagsWithLLM(
 
 // ── Cosine similarity ranking via LibTorch GPU ──────────────────────────────
 
+/**
+ * Rank snippets by cosine similarity to the query embedding.
+ * Uses generateEmbeddingsWithTags so the Redis cache entry is enriched with
+ * Qdrant entity tags — these are returned and threaded into bifrostChat()
+ * to differentiate Bifrost cache slots by legal domain.
+ */
 async function rankByEmbedding(
 	query: string,
 	snippets: string[],
-): Promise<number[]> {
+	pipeline: string = 'ace',
+): Promise<{ scores: number[]; qdrantTags: string[] }> {
 	try {
-		const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
+		const { generateEmbeddingsWithTags } = await import('$lib/server/grpc/embedding-client.js');
 		const texts = [query, ...snippets];
-		const embResult = await generateEmbeddings(texts);
-    if (embResult.vectors.length < 2) return snippets.map((_, i) => 1 / (i + 1));
+		const { result: embResult, qdrantTags } = await generateEmbeddingsWithTags(texts, pipeline);
+		if (embResult.vectors.length < 2) {
+			return { scores: snippets.map((_, i) => 1 / (i + 1)), qdrantTags };
+		}
 
-		const queryVec = embResult.vectors[0];
-    const resultVecs = embResult.vectors.slice(1);
+		const queryVec   = embResult.vectors[0];
+		const resultVecs = embResult.vectors.slice(1);
 
 		// Try GPU cosine similarity (LibTorch N-API)
 		const { batchCosineSimilarity } = await import('$lib/server/gpu/libtorch-bridge.js');
-		const result = await batchCosineSimilarity(queryVec, resultVecs);
-		return result.scores;
+		const gpuResult = await batchCosineSimilarity(queryVec, resultVecs);
+		return { scores: gpuResult.scores, qdrantTags };
 	} catch {
-		// CPU fallback: simple dot product (embeddings are L2-normalised)
-		return snippets.map((_, i) => 1 / (i + 1));
+		// CPU fallback: positional scoring + empty tags
+		return { scores: snippets.map((_, i) => 1 / (i + 1)), qdrantTags: [] };
 	}
 }
 
@@ -140,6 +149,7 @@ async function summarizeResult(
 	snippet: string,
 	url: string,
 	query: string,
+	qdrantTags: string[] = [],
 ): Promise<string> {
 	try {
 		const raw = await bifrostChat(
@@ -159,7 +169,12 @@ async function summarizeResult(
 				},
 			],
 			MODEL,
-			{ temperature: 0.2, maxTokens: 256, cacheKey: `web-sum-${fnv1a(url + query)}` },
+			{
+				temperature: 0.2,
+				maxTokens:   256,
+				cacheKey:    `web-sum-${fnv1a(url + query)}`,
+				entityTags:  qdrantTags,
+			},
 		);
 		return raw.trim().slice(0, 800);
 	} catch {
@@ -190,9 +205,9 @@ export async function crawlWebResearch(
 		return { query, queryHash: qHash, summaries: [], provider: 'none', searchMs: searchRes.searchMs, indexedAt: new Date().toISOString() };
 	}
 
-	// 2. Rank by embedding cosine similarity
-	const snippets   = searchRes.results.map(r => `${r.title}. ${r.snippet}`);
-	const scores     = await rankByEmbedding(query, snippets);
+	// 2. Rank by embedding cosine similarity + enrich with Qdrant entity tags
+	const snippets = searchRes.results.map(r => `${r.title}. ${r.snippet}`);
+	const { scores, qdrantTags } = await rankByEmbedding(query, snippets, pipeline);
 
 	// Attach scores and sort descending
 	const ranked = searchRes.results
@@ -200,12 +215,13 @@ export async function crawlWebResearch(
 		.sort((a, b) => b.score - a.score);
 
 	// 3. Summarize top-N with Ollama; rest use snippet only
+	// qdrantTags flow into bifrostChat() to sharpen the Bifrost semantic cache key
 	const summaries: WebResearchSummary[] = await Promise.all(
 		ranked.map(async (r, idx): Promise<WebResearchSummary> => {
 			const urlHash     = fnv1a(r.url);
 			const summarize   = idx < MAX_SUMMARIZE;
 			const summaryText = summarize
-				? await summarizeResult(r.title, r.snippet, r.url, query)
+				? await summarizeResult(r.title, r.snippet, r.url, query, qdrantTags)
 				: r.snippet.slice(0, 400);
 
 			// 4. Extract entity tags
@@ -363,6 +379,7 @@ async function summarizeCorpusChunk(
 	chunkText: string,
 	citationLabel: string | null,
 	query: string,
+	qdrantTags: string[] = [],
 ): Promise<string> {
 	try {
 		const raw = await bifrostChat(
@@ -383,7 +400,12 @@ async function summarizeCorpusChunk(
 				},
 			],
 			MODEL,
-			{ temperature: 0.15, maxTokens: 200, cacheKey: `corpus-sum-${fnv1a(chunkText.slice(0, 200) + query)}` },
+			{
+				temperature: 0.15,
+				maxTokens:   200,
+				cacheKey:    `corpus-sum-${fnv1a(chunkText.slice(0, 200) + query)}`,
+				entityTags:  qdrantTags,
+			},
 		);
 		return raw.trim().slice(0, 600);
 	} catch {
@@ -409,10 +431,12 @@ export async function crawlLegalCorpus(
 
 	// 1. Embed query
 	let queryEmbedding: number[] = [];
+	let corpusQdrantTags: string[] = [];
 	try {
-		const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
-		const vecs = await generateEmbeddings([query]);
-		queryEmbedding = vecs[0] ?? [];
+		const { generateEmbeddingsWithTags } = await import('$lib/server/grpc/embedding-client.js');
+		const { result: embResult, qdrantTags } = await generateEmbeddingsWithTags([query], pipeline);
+		queryEmbedding = embResult.vectors[0] ?? [];
+		corpusQdrantTags = qdrantTags;
 	} catch { /* fallback to empty — hybridSearch handles it */ }
 
 	// 2. Search each corpus collection in parallel
@@ -458,7 +482,7 @@ export async function crawlLegalCorpus(
 
 			const doSummarize  = idx < MAX_SUMMARIZE && chunkText.length > 80;
 			const summaryText  = doSummarize
-				? await summarizeCorpusChunk(chunkText, citationLabel, query)
+				? await summarizeCorpusChunk(chunkText, citationLabel, query, corpusQdrantTags)
 				: chunkText.slice(0, 400);
 
 			const regexTags  = extractLegalTags(`${citationLabel ?? ''} ${summaryText}`);

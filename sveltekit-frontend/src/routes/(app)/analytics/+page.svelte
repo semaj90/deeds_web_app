@@ -1003,8 +1003,8 @@
 						<div class="pg-histogram">
 							<div class="pg-hist-title">Score Histogram (0.1 buckets)</div>
 							<div class="pg-hist-bars">
-								{@const maxCount = Math.max(...playgroundAggOnly.scoreBuckets.map(b => b.count), 1)}
-								{#each playgroundAggOnly.scoreBuckets as bucket}
+								{#each playgroundAggOnly.scoreBuckets as bucket, _i}
+									{@const maxCount = Math.max(...playgroundAggOnly.scoreBuckets.map(b => b.count), 1)}
 									<div class="pg-hist-bar" title="{bucket.pipeline} {bucket.bucketStart.toFixed(1)}: {bucket.count}">
 										<div class="pg-hist-fill" style="height:{Math.round((bucket.count/maxCount)*64)}px"></div>
 										<span class="pg-hist-label">{bucket.bucketStart.toFixed(1)}</span>
