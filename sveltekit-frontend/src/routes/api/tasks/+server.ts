@@ -11,7 +11,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
-import { userResearchTasks } from '$lib/server/db/schema-postgres.js';
+import { userResearchTasks, researchSummaries } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, and, or, isNull } from 'drizzle-orm';
 
 const ANON_SESSION_COOKIE = 'urt_session';
@@ -111,6 +111,13 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 
 async function runDeepResearch(taskId: string, selfPrompt: string, pipelineHint: string) {
 	try {
+		// Fetch the task for userId (needed to associate the research summary)
+		const [task] = await db
+			.select()
+			.from(userResearchTasks)
+			.where(eq(userResearchTasks.id, taskId))
+			.limit(1);
+
 		const { bifrostChat } = await import('$lib/server/ollama.js');
 		const systemPrompts: Record<string, string> = {
 			rag: 'You are a legal research AI. Provide thorough analysis with citations to relevant statutes and case law.',
@@ -125,7 +132,38 @@ async function runDeepResearch(taskId: string, selfPrompt: string, pipelineHint:
 			'gemma4-legal:latest',
 			{ temperature: 0.3, maxTokens: 1536, timeoutMs: 120_000 },
 		);
-		const result = { answer, pipeline: pipelineHint, durationMs: Date.now() - start };
+		const durationMs = Date.now() - start;
+
+		// Persist to research_summaries so result appears in the browser
+		let summaryId: string | undefined;
+		try {
+			function fnv1a(text: string): string {
+				let h = 2166136261;
+				for (let i = 0; i < Math.min(text.length, 512); i++) {
+					h ^= text.charCodeAt(i);
+					h = Math.imul(h, 16777619) >>> 0;
+				}
+				return h.toString(16).padStart(8, '0');
+			}
+			const [summary] = await db
+				.insert(researchSummaries)
+				.values({
+					source:         'report',
+					pipeline:       pipelineHint as 'ace' | 'rag' | 'kag' | 'dag' | 'codebase',
+					entityType:     'task_result',
+					query:          selfPrompt,
+					queryHash:      fnv1a(selfPrompt),
+					title:          task?.title ?? selfPrompt.slice(0, 120),
+					summary:        answer.slice(0, 4000),
+					entityTags:     [],
+					relevanceScore: 0.8,
+					userId:         task?.userId ?? null,
+				})
+				.returning({ id: researchSummaries.id });
+			summaryId = summary?.id;
+		} catch { /* non-fatal — result still saved in task */ }
+
+		const result = { answer, pipeline: pipelineHint, durationMs, summaryId };
 
 		await db
 			.update(userResearchTasks)

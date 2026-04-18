@@ -84,7 +84,7 @@ class ResearchTaskStore {
 			sourceText:   t.sourceText != null ? String(t.sourceText) : (t.source_text != null ? String(t.source_text) : undefined),
 			summary:      t.summary != null ? String(t.summary) : undefined,
 			result:       t.result as ResearchTask['result'] ?? undefined,
-			summaryId:    t.summaryId != null ? String(t.summaryId) : (t.summary_id != null ? String(t.summary_id) : undefined),
+			summaryId:    t.summaryId != null ? String(t.summaryId) : (t.summary_id != null ? String(t.summary_id) : ((t.result as Record<string, unknown>)?.summaryId != null ? String((t.result as Record<string, unknown>).summaryId) : undefined)),
 			notified:     Boolean(t.notified),
 			createdAt:    String(t.createdAt ?? t.created_at ?? new Date().toISOString()),
 			completedAt:  t.completedAt != null ? String(t.completedAt) : (t.completed_at != null ? String(t.completed_at) : null),
