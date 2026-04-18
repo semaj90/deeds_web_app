@@ -5,6 +5,7 @@ import { ENV } from '$lib/server/env.server.js';
 import type { OllamaResponse } from '$lib/server/ollama.js';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { z } from 'zod';
 import {
   CONTEXTUAL_TOOLS,
@@ -150,6 +151,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       enableFunctions = false,
       aceContext,
     } = parsed.data;
+
+    // Record search query for Search Intelligence analytics (fire-and-forget)
+    recordSearchQuery({
+      query:    message,
+      pipeline: 'contextual',
+      cacheHit: false,
+      userId:   locals.user.id,
+    });
 
     // Get conversation history from Redis for context
     let conversationHistory: Array<{ role: string; content: string }> = [];

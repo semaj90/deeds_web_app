@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { contextualChat } from '$lib/server/llm/contextual-chat.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { z } from 'zod';
 
 const contextualChatSchema = z.object({
@@ -36,6 +37,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const message = parsed.data.message || parsed.data.query || '';
 		const { caseId, sessionId, tags, jurisdiction, sectionTypes } = parsed.data;
+
+		// Fire-and-forget analytics — does not affect response latency
+		recordSearchQuery({ query: message, pipeline: 'ace', cacheHit: false, userId: locals.user.id });
 
 		const result = await contextualChat({
       message,
