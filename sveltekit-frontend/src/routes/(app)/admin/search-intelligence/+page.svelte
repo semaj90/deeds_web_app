@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import FeedbackButtons from '$lib/components/ui/FeedbackButtons.svelte';
+	import ResearchSummariesBrowser from '$lib/components/analytics/ResearchSummariesBrowser.svelte';
 
 	// ── Types ─────────────────────────────────────────────────────────────────
 
@@ -24,7 +25,7 @@
 	let loading     = $state(false);
 	let error       = $state<string | null>(null);
 	let autoRefresh = $state(false);
-	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research'>('queries');
+	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research' | 'summaries'>('queries');
 
 	// Distillation runner state
 	let distillRunning  = $state(false);
@@ -559,6 +560,9 @@
 	</button>
 	<button class="s-tab" class:active={activeSection === 'research'} onclick={() => activeSection = 'research'}>
 		<Icon name="telescope" class="w-3.5 h-3.5" /> Research
+	</button>
+	<button class="s-tab" class:active={activeSection === 'summaries'} onclick={() => activeSection = 'summaries'}>
+		<Icon name="library" class="w-3.5 h-3.5" /> Summaries
 	</button>
 </div>
 
@@ -1448,6 +1452,27 @@
 </div>
 {/if}
 
+<!-- ══════════════════════════════════════════════════════════════════════
+     SUMMARIES BROWSER — paginated research_summaries (web + corpus + docs)
+══════════════════════════════════════════════════════════════════════ -->
+{#if activeSection === 'summaries'}
+<div class="si-grid wide">
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title">Research Summaries Browser</span>
+			<span class="panel-sub">
+				Paginated browse of all persisted web + corpus + document summaries.
+				Filter by source, pipeline, and entity tags. Fuse.js instant search on current page.
+				"Did you mean?" via pg_trgm. Cursor-based pagination — no OFFSET scans.
+			</span>
+		</div>
+		<div class="summaries-browser-wrap">
+			<ResearchSummariesBrowser />
+		</div>
+	</section>
+</div>
+{/if}
+
 </div>
 
 <style>
@@ -2004,4 +2029,16 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 .ingest-result.success { background: #0e1e10; border: 1px solid #1e4a20; color: #6bdd6b; }
 .ingest-result.skip    { background: #1a1a0e; border: 1px solid #3a3a20; color: #a0a060; }
 .ingest-result.fail    { background: #1e0e0e; border: 1px solid #4a1a1a; color: #dd6b6b; }
+
+/* ── Summaries browser wrapper ─────────────────────────────────────────── */
+.summaries-browser-wrap {
+	padding: 0.75rem 0;
+	min-height: 400px;
+}
+.panel-sub {
+	font-size: 0.72rem;
+	color: #6b7280;
+	margin-top: 0.25rem;
+	line-height: 1.5;
+}
 </style>

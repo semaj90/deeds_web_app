@@ -12,10 +12,26 @@
  *   - Async non-blocking persist from crawler pipeline
  */
 
-import { sql, and, eq, lt, desc, or, type SQL } from 'drizzle-orm';
+import { sql, and, eq, desc, or, type SQL } from 'drizzle-orm';
+// (lt was removed — keyset cursor uses raw sql<> expressions instead of lt())
 import { db } from '$lib/server/db/client';
 import { researchSummaries, type NewResearchSummary, type ResearchSummary } from '$lib/server/db/schema-postgres.js';
 import { getRedis } from '$lib/server/redis.js';
+
+// ── Embedding helpers (lazy import to avoid circular deps) ────────────────────
+
+async function embedSummaryText(
+	text:     string,
+	pipeline: string,
+): Promise<{ vector: number[]; qdrantTags: string[] }> {
+	try {
+		const { generateEmbeddingsWithTags } = await import('$lib/server/grpc/embedding-client.js');
+		const { result, qdrantTags } = await generateEmbeddingsWithTags([text], pipeline);
+		return { vector: result.vectors[0] ?? [], qdrantTags };
+	} catch {
+		return { vector: [], qdrantTags: [] };
+	}
+}
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -262,28 +278,65 @@ export async function browseResearchSummaries(
 	};
 }
 
-// ── Persist a single summary (non-blocking — fire-and-forget wrapper) ─────────
+// ── Persist a single summary (with embedding + qdrantTag enrichment) ──────────
 
 export async function persistResearchSummary(
 	entry: NewResearchSummary,
 ): Promise<void> {
 	try {
+		// Embed the summary text so the HNSW index and Bifrost cache key are useful.
+		// qdrantTags from nearest-neighbor lookup are merged into entity_tags.
+		const { vector, qdrantTags } = await embedSummaryText(
+			entry.summary,
+			entry.pipeline ?? 'ace',
+		);
+
+		const enriched: NewResearchSummary = {
+			...entry,
+			embedding:  vector.length ? vector : undefined,
+			entityTags: [...new Set([...(entry.entityTags ?? []), ...qdrantTags])],
+		};
+
 		await db
 			.insert(researchSummaries)
-			.values(entry)
+			.values(enriched)
 			.onConflictDoNothing();   // idempotent — duplicates silently ignored
 	} catch { /* non-fatal */ }
 }
 
-/** Batch upsert — used by crawlers after a full batch run. */
+/**
+ * Batch upsert — used by crawlers after a full batch run.
+ * Embeds each entry's summary text in a single batched call to minimise
+ * round-trips, then merges qdrantTags into entity_tags before insert.
+ */
 export async function persistResearchSummaryBatch(
 	entries: NewResearchSummary[],
 ): Promise<number> {
 	if (!entries.length) return 0;
 	try {
+		// Batch-embed all summaries in one gRPC/HTTP call
+		let vectors: number[][] = [];
+		let qdrantTags: string[] = [];
+		try {
+			const { generateEmbeddingsWithTags } = await import('$lib/server/grpc/embedding-client.js');
+			const texts = entries.map(e => e.summary);
+			const { result, qdrantTags: tags } = await generateEmbeddingsWithTags(
+				texts,
+				entries[0]?.pipeline ?? 'ace',
+			);
+			vectors    = result.vectors;
+			qdrantTags = tags;
+		} catch { /* fall through — insert without vectors */ }
+
+		const enriched: NewResearchSummary[] = entries.map((e, i) => ({
+			...e,
+			embedding:  vectors[i]?.length ? vectors[i] : undefined,
+			entityTags: [...new Set([...(e.entityTags ?? []), ...qdrantTags])],
+		}));
+
 		const result = await db
 			.insert(researchSummaries)
-			.values(entries)
+			.values(enriched)
 			.onConflictDoNothing()
 			.returning({ id: researchSummaries.id });
 		return result.length;

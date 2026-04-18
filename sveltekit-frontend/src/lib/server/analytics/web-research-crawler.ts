@@ -11,7 +11,8 @@
  *   7. Add to Redis ZSET web:research:idx:{pipeline} (relevanceScore)
  *   8. Add to research-cache ZSET so research-topics picks them up
  *
- * Data never touches Postgres — web results are ephemeral (Redis only).
+ * Summaries are also persisted to Postgres research_summaries (non-blocking batch
+ * insert at end of each crawl) for durable DYM, HNSW vector search, and filter browse.
  * Summaries surface in: research-topics, deep-research, MCP analytics:web_research.
  *
  * Redis schema:
@@ -259,6 +260,27 @@ export async function crawlWebResearch(
 	);
 
 	redis.set(BUILT_AT_KEY, new Date().toISOString(), 'EX', WEB_TTL_S).catch(() => {});
+
+	// Persist to Postgres research_summaries (non-blocking — embeddings added by batch fn)
+	import('$lib/server/analytics/research-summaries-db.js').then(({ persistResearchSummaryBatch }) => {
+		persistResearchSummaryBatch(summaries.map(s => ({
+			source:         'web',
+			pipeline:       s.pipeline,
+			entityType:     'web',
+			query:          s.query,
+			queryHash:      s.queryHash,
+			title:          s.title ?? null,
+			url:            s.url,
+			collection:     null,
+			citationLabel:  null,
+			sectionPath:    null,
+			jurisdiction:   null,
+			summary:        s.summary,
+			entityTags:     s.entityTags,
+			relevanceScore: s.relevanceScore,
+			userId:         null,
+		}))).catch(() => {});
+	}).catch(() => {});
 
 	return {
 		query,
@@ -520,6 +542,27 @@ export async function crawlLegalCorpus(
 	);
 
 	redis.set(CORPUS_BUILT_AT, new Date().toISOString(), 'EX', CORPUS_TTL_S).catch(() => {});
+
+	// Persist corpus summaries to Postgres (non-blocking)
+	import('$lib/server/analytics/research-summaries-db.js').then(({ persistResearchSummaryBatch }) => {
+		persistResearchSummaryBatch(summaries.map(s => ({
+			source:         'corpus',
+			pipeline:       s.pipeline,
+			entityType:     s.corpusType ?? 'corpus',
+			query:          s.query,
+			queryHash:      s.queryHash,
+			title:          s.citationLabel ?? s.collectionLabel ?? null,
+			url:            null,
+			collection:     s.collection,
+			citationLabel:  s.citationLabel,
+			sectionPath:    s.sectionPath,
+			jurisdiction:   s.jurisdiction,
+			summary:        s.summary,
+			entityTags:     s.entityTags,
+			relevanceScore: s.relevanceScore,
+			userId:         null,
+		}))).catch(() => {});
+	}).catch(() => {});
 
 	return {
 		query,

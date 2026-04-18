@@ -3697,6 +3697,8 @@ export const researchSummaries = pgTable('research_summaries', {
   embedding:      vector('embedding', { dimensions: 768 }),
   /** NULL = anonymous / system-generated summary */
   userId:         uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  /** Set when the user promotes this summary to a saved citation */
+  savedCitationId: uuid('saved_citation_id').references(() => citations.id, { onDelete: 'set null' }),
   createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => [
   index('rs_pipeline_score_id').on(t.pipeline, t.relevanceScore, t.id),
