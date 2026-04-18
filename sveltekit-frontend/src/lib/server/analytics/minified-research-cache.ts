@@ -544,6 +544,46 @@ export async function warmResearchCache(
   } catch { /* non-fatal */ }
 }
 
+// ── Backfill L1 from web/corpus crawl output ──────────────────────────────────
+
+/**
+ * Warm the Redis L1 glyph cache from freshly crawled summaries.
+ * Called fire-and-forget from crawlWebResearch / crawlLegalCorpus after persist.
+ * Items without embeddings are stored with a zero Int8Array — they still get
+ * tag-bitmask and metadata benefits and will gain vectors on next HNSW index pass.
+ */
+export async function backfillWebGlyphs(
+  items: Array<{
+    id:             string;   // urlHash or pointId used as glyphId
+    summary:        string;
+    entityTags:     string[];
+    pipeline:       string;
+    relevanceScore: number;
+    embedding?:     number[];
+  }>,
+): Promise<void> {
+  await Promise.allSettled(items.map(item => {
+    const embInt8: Int8Array = item.embedding && item.embedding.length === DIM
+      ? quantizeInt8(item.embedding)
+      : new Int8Array(DIM);
+    const glyph: MinifiedGlyph = {
+      glyphId:     item.id,
+      sourceId:    item.id,
+      sectionCode: sectionFromTags(item.entityTags),
+      tagMask:     tagsToBitmask(item.entityTags),
+      embInt8,
+      topo4d:      [0, 0, 0, 0],
+      somCluster:  0,
+      pageRank:    0,
+      rewardScore: item.relevanceScore,
+      summary:     item.summary.slice(0, SUMMARY_TRUNC),
+      pipeline:    item.pipeline,
+      relevance:   item.relevanceScore,
+    };
+    return l1Set(glyph);
+  }));
+}
+
 // ── Glyph-formatted search result (for agentic tools) ─────────────────────────
 
 export interface GlyphSearchResult {

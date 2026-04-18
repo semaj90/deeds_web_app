@@ -120,6 +120,44 @@ export const CONTEXTUAL_TOOLS = [
 	{
 		type: 'function' as const,
 		function: {
+			name: 'crawl_web_research',
+			description:
+				'Trigger a live web search crawl on a research query, summarise top results with gemma4-legal, ' +
+				'and index them in the glyph cache. Use when the user wants fresh web research on a legal topic, ' +
+				'case law updates, or news relevant to their case. Results are also persisted for future searches.',
+			parameters: {
+				type: 'object',
+				required: ['query'],
+				properties: {
+					query:      { type: 'string',  description: 'Research query to crawl' },
+					pipeline:   { type: 'string',  description: 'Pipeline label: ace|rag|kag|dag|codebase (default: ace)' },
+					maxResults: { type: 'number',  description: 'Max web results to fetch (default: 5, max: 10)' },
+				},
+			},
+		},
+	},
+	{
+		type: 'function' as const,
+		function: {
+			name: 'crawl_legal_corpus',
+			description:
+				'Search the local legal corpus (Legal Canon, Court Opinions, Legal Documents) using vector similarity, ' +
+				'then summarise top chunks with gemma4-legal. Use for authoritative legal research — statutes, ' +
+				'case holdings, canon law — from the locally indexed Qdrant collections.',
+			parameters: {
+				type: 'object',
+				required: ['query'],
+				properties: {
+					query:      { type: 'string', description: 'Legal research query' },
+					pipeline:   { type: 'string', description: 'Pipeline label: ace|rag|kag|dag|codebase (default: ace)' },
+					maxResults: { type: 'number', description: 'Max chunks per collection (default: 4, max: 8)' },
+				},
+			},
+		},
+	},
+	{
+		type: 'function' as const,
+		function: {
 			name: 'research_glyph_search',
 			description:
 				'Fast parallel cache search over minified research summaries using GPU cosine reranking. ' +
@@ -147,6 +185,8 @@ const TOOL_TIMEOUT_MS: Record<string, number> = {
 	graph_expand:           6_000,
 	authority_drill:        8_000,
 	case_search:            6_000,
+	crawl_web_research:    25_000,   // web search + LLM summarization
+	crawl_legal_corpus:    20_000,   // Qdrant hybrid + LLM summarization
 	research_glyph_search:  4_000,   // parallel L1-L3 + GPU rerank
 };
 
@@ -176,6 +216,16 @@ const TOOL_ARG_SCHEMAS: Record<string, z.ZodType> = {
 	case_search: z.object({
 		query: z.string().min(1),
 		limit: z.number().int().min(1).max(20).optional(),
+	}),
+	crawl_web_research: z.object({
+		query:      z.string().min(1).max(400),
+		pipeline:   z.string().max(20).optional(),
+		maxResults: z.number().int().min(1).max(10).optional(),
+	}),
+	crawl_legal_corpus: z.object({
+		query:      z.string().min(1).max(400),
+		pipeline:   z.string().max(20).optional(),
+		maxResults: z.number().int().min(1).max(8).optional(),
 	}),
 	research_glyph_search: z.object({
 		query:    z.string().min(1).max(400),
@@ -479,6 +529,55 @@ export async function executeContextualTool(
 					result: `## Research Glyph Search (${result.total} indexed · ${result.hitMs}ms · ${result.cacheLevel})\n${lines}${tagCtx}`,
 					durationMs: Date.now() - start,
 					metadata: { cacheLevel: result.cacheLevel, hitMs: result.hitMs, total: result.total },
+				};
+			}
+
+			case 'crawl_web_research': {
+				const { crawlWebResearch } = await import('$lib/server/analytics/web-research-crawler.js');
+				const cwQuery      = String(args.query || '');
+				const cwPipeline   = String(args.pipeline ?? 'ace');
+				const cwMaxResults = Math.min(10, Math.max(1, Number(args.maxResults ?? 5)));
+				if (!cwQuery)
+					return { ok: false, tool: name, result: 'Missing query', durationMs: Date.now() - start, metadata };
+				const batch = await crawlWebResearch(cwQuery, cwPipeline, cwMaxResults);
+				if (!batch.summaries.length)
+					return { ok: true, tool: name, result: 'No web results found for this query.', durationMs: Date.now() - start, metadata };
+				const lines = batch.summaries.slice(0, 5).map((s, i) => {
+					const pct = (s.relevanceScore * 100).toFixed(0);
+					const tag = s.entityTags.slice(0, 3).join(', ') || '—';
+					return `${i + 1}. [${pct}%${s.snippetOnly ? ' · snippet' : ' · summarized'}] **${s.title.slice(0, 100)}**\n   ${s.summary.slice(0, 200)}\n   Tags: ${tag} · Source: ${s.provider}`;
+				}).join('\n\n');
+				return {
+					ok: true,
+					tool: name,
+					result: `## Web Research: "${cwQuery}" (${batch.summaries.length} results · ${batch.searchMs}ms)\n${lines}`,
+					durationMs: Date.now() - start,
+					metadata: { provider: batch.provider, searchMs: batch.searchMs, indexed: batch.summaries.length },
+				};
+			}
+
+			case 'crawl_legal_corpus': {
+				const { crawlLegalCorpus } = await import('$lib/server/analytics/web-research-crawler.js');
+				const clQuery      = String(args.query || '');
+				const clPipeline   = String(args.pipeline ?? 'ace');
+				const clMaxResults = Math.min(8, Math.max(1, Number(args.maxResults ?? 4)));
+				if (!clQuery)
+					return { ok: false, tool: name, result: 'Missing query', durationMs: Date.now() - start, metadata };
+				const batch = await crawlLegalCorpus(clQuery, clPipeline, clMaxResults);
+				if (!batch.summaries.length)
+					return { ok: true, tool: name, result: 'No corpus results found for this query.', durationMs: Date.now() - start, metadata };
+				const lines = batch.summaries.slice(0, 6).map((s, i) => {
+					const pct  = (s.relevanceScore * 100).toFixed(0);
+					const cite = s.citationLabel ? ` · ${s.citationLabel.slice(0, 60)}` : '';
+					const jur  = s.jurisdiction ? ` (${s.jurisdiction})` : '';
+					return `${i + 1}. [${pct}%] **${s.collectionLabel}${jur}**${cite}\n   ${s.summary.slice(0, 250)}`;
+				}).join('\n\n');
+				return {
+					ok: true,
+					tool: name,
+					result: `## Legal Corpus: "${clQuery}" (${batch.summaries.length} chunks · ${batch.searchMs}ms)\nCollections: ${batch.collections.join(', ')}\n\n${lines}`,
+					durationMs: Date.now() - start,
+					metadata: { collections: batch.collections, searchMs: batch.searchMs, indexed: batch.summaries.length },
 				};
 			}
 

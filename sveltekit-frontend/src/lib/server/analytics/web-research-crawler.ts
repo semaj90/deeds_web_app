@@ -27,13 +27,14 @@ import { getRedis } from '$lib/server/redis.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const WEB_TTL_S      = 2 * 60 * 60;          // 2h
-const MAX_SUMMARIZE  = 3;                      // top-N results to fully summarize
-const MAX_TAGS       = 8;
-const WEB_SUM_KEY    = (h: string) => `web:research:sum:${h}`;
-const WEB_IDX_KEY    = (pl: string) => `web:research:idx:${pl}`;
-const BUILT_AT_KEY   = 'web:research:built_at';
-const MODEL          = 'gemma4-legal:latest';
+const WEB_TTL_S           = 2 * 60 * 60;     // 2h
+const MAX_SUMMARIZE       = 3;               // top-N results to fully summarize
+const MAX_TAGS            = 8;
+const GRAPH_REBUILD_EVERY = 100;             // trigger rebuild every N new embedded rows
+const WEB_SUM_KEY         = (h: string) => `web:research:sum:${h}`;
+const WEB_IDX_KEY         = (pl: string) => `web:research:idx:${pl}`;
+const BUILT_AT_KEY        = 'web:research:built_at';
+const MODEL               = 'gemma4-legal:latest';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -183,6 +184,40 @@ async function summarizeResult(
 	}
 }
 
+// ── Graph rebuild trigger ───────────────────────────────────────────────────
+
+/**
+ * After a batch persist, check if total embedded rows just crossed a multiple
+ * of GRAPH_REBUILD_EVERY (default 100). If so, fire-and-forget a full graph
+ * rebuild + RL policy recompute. Non-fatal; errors are silently swallowed.
+ */
+async function maybeTriggerGraphRebuild(newlyInserted: number): Promise<void> {
+	if (newlyInserted <= 0) return;
+	try {
+		const { db } = await import('$lib/server/db/client');
+		const { sql } = await import('drizzle-orm');
+		const result = await db.execute(sql`
+			SELECT COUNT(*)::int AS total
+			FROM   research_summaries
+			WHERE  embedding IS NOT NULL
+		`);
+		const rows  = (result as unknown as { rows: { total: number }[] }).rows;
+		const total = rows[0]?.total ?? 0;
+		if (total < 40) return;   // k-means needs ≥ 40 points for k=20
+
+		const prev = total - newlyInserted;
+		const prevBucket = Math.floor(prev / GRAPH_REBUILD_EVERY);
+		const curBucket  = Math.floor(total / GRAPH_REBUILD_EVERY);
+		if (curBucket <= prevBucket) return; // no bucket boundary crossed
+
+		const { buildResearchGraph, computeRlPolicy } = await import(
+			'$lib/server/analytics/research-graph-rl.js'
+		);
+		await buildResearchGraph();
+		await computeRlPolicy();
+	} catch { /* non-fatal */ }
+}
+
 // ── Main crawl function ─────────────────────────────────────────────────────
 
 /**
@@ -279,6 +314,19 @@ export async function crawlWebResearch(
 			entityTags:     s.entityTags,
 			relevanceScore: s.relevanceScore,
 			userId:         null,
+		})))
+			.then(inserted => maybeTriggerGraphRebuild(inserted).catch(() => {}))
+			.catch(() => {});
+	}).catch(() => {});
+
+	// Warm Redis L1 glyph cache immediately (non-blocking)
+	import('$lib/server/analytics/minified-research-cache.js').then(({ backfillWebGlyphs }) => {
+		backfillWebGlyphs(summaries.map(s => ({
+			id:             s.urlHash,
+			summary:        s.summary,
+			entityTags:     s.entityTags,
+			pipeline:       s.pipeline,
+			relevanceScore: s.relevanceScore,
 		}))).catch(() => {});
 	}).catch(() => {});
 
@@ -561,6 +609,17 @@ export async function crawlLegalCorpus(
 			entityTags:     s.entityTags,
 			relevanceScore: s.relevanceScore,
 			userId:         null,
+		}))).catch(() => {});
+	}).catch(() => {});
+
+	// Warm Redis L1 glyph cache from corpus hits (non-blocking)
+	import('$lib/server/analytics/minified-research-cache.js').then(({ backfillWebGlyphs }) => {
+		backfillWebGlyphs(summaries.map(s => ({
+			id:             s.pointId,
+			summary:        s.summary,
+			entityTags:     s.entityTags,
+			pipeline:       s.pipeline,
+			relevanceScore: s.relevanceScore,
 		}))).catch(() => {});
 	}).catch(() => {});
 
