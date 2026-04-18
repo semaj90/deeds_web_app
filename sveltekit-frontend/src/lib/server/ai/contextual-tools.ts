@@ -117,15 +117,37 @@ export const CONTEXTUAL_TOOLS = [
 			},
 		},
 	},
+	{
+		type: 'function' as const,
+		function: {
+			name: 'research_glyph_search',
+			description:
+				'Fast parallel cache search over minified research summaries using GPU cosine reranking. ' +
+				'Searches L1 Redis → L2 in-process LRU → L3 Qdrant ANN in parallel. ' +
+				'Use when the user asks about prior research, past summaries, web crawl results, or corpus analysis. ' +
+				'Returns top matching glyphs with attention scores and shared tag context.',
+			parameters: {
+				type: 'object',
+				required: ['query'],
+				properties: {
+					query:    { type: 'string', description: 'Research query or topic to search' },
+					pipeline: { type: 'string', description: 'Filter by pipeline: ace|rag|kag|dag|codebase|all (default: all)' },
+					tags:     { type: 'array',  items: { type: 'string' }, description: 'Entity tags to filter by (AND semantics)' },
+					topK:     { type: 'number', description: 'Max results (default: 8)' },
+				},
+			},
+		},
+	},
 ] as const;
 
 const TOOL_TIMEOUT_MS: Record<string, number> = {
-	glossary_search: 3_000,
-	rag_search: 6_000,
-	web_search: 8_000,
-	graph_expand: 6_000,
-	authority_drill: 8_000,
-	case_search: 6_000,
+	glossary_search:        3_000,
+	rag_search:             6_000,
+	web_search:             8_000,
+	graph_expand:           6_000,
+	authority_drill:        8_000,
+	case_search:            6_000,
+	research_glyph_search:  4_000,   // parallel L1-L3 + GPU rerank
 };
 
 // ── Zod schemas for tool call argument validation ─────────────────────
@@ -154,6 +176,12 @@ const TOOL_ARG_SCHEMAS: Record<string, z.ZodType> = {
 	case_search: z.object({
 		query: z.string().min(1),
 		limit: z.number().int().min(1).max(20).optional(),
+	}),
+	research_glyph_search: z.object({
+		query:    z.string().min(1).max(400),
+		pipeline: z.string().max(20).optional(),
+		tags:     z.array(z.string().max(60)).max(12).optional(),
+		topK:     z.number().int().min(1).max(12).optional(),
 	}),
 };
 
@@ -390,6 +418,70 @@ export async function executeContextualTool(
 					.join('\n\n');
 				return { ok: true, tool: name, result: `## Similar Cases (${csResults.length} found)\n${csLines}`, durationMs: Date.now() - start, metadata };
 			}
+
+			case 'research_glyph_search': {
+				// Parallel L1-L3 cache + GPU attention rerank over minified research glyphs
+				const { glyphSearch }          = await import('$lib/server/analytics/minified-research-cache.js');
+				const { generateEmbeddings: genGE } = await import('$lib/server/grpc/embedding-client.js');
+
+				const glQuery    = String(args.query || '');
+				const glPipeline = String(args.pipeline ?? 'all');
+				const glTags     = Array.isArray(args.tags) ? args.tags.map(String) : [];
+				const glTopK     = Math.min(12, Math.max(1, Number(args.topK ?? 8)));
+
+				if (!glQuery)
+					return { ok: false, tool: name, result: 'Missing query', durationMs: Date.now() - start, metadata };
+
+				// FNV-1a query hash (same algorithm as research-summaries-db)
+				let glHash = 2166136261;
+				for (let i = 0; i < Math.min(glQuery.length, 512); i++) {
+					glHash ^= glQuery.charCodeAt(i);
+					glHash = (Math.imul(glHash, 16777619)) >>> 0;
+				}
+				const queryHash = glHash.toString(16).padStart(8, '0');
+
+				// Embed query (non-blocking race with timeout)
+				let queryEmbedding: Float32Array | null = null;
+				try {
+					const embResult = await Promise.race([
+						genGE([glQuery]),
+						new Promise<never>((_, rej) => setTimeout(() => rej(new Error('timeout')), 2_500)),
+					]) as Awaited<ReturnType<typeof genGE>>;
+					if (embResult.vectors[0]?.length === 768)
+						queryEmbedding = new Float32Array(embResult.vectors[0]);
+				} catch { /* fallback to DB-only search */ }
+
+				const result = await glyphSearch({
+					queryText:      glQuery,
+					queryHash,
+					queryEmbedding,
+					tags:           glTags.length ? glTags : undefined,
+					pipeline:       glPipeline !== 'all' ? glPipeline : undefined,
+					topK:           glTopK,
+				});
+
+				if (!result.glyphs.length)
+					return { ok: true, tool: name, result: 'No research summaries found for this query.', durationMs: Date.now() - start, metadata };
+
+				const lines = result.glyphs.map((g, i) => {
+					const pct   = (g.score * 100).toFixed(0);
+					const cache = result.cacheLevel.replace('l3-', 'L3/');
+					return `${i + 1}. [${pct}% · ${cache}] **${g.summary.slice(0, 120)}**\n   Pipeline: ${g.pipeline} · Tags: ${[...g.tagMask.toString(2)].filter(c=>c==='1').length} matched`;
+				}).join('\n\n');
+
+				const tagCtx = result.tagMatches.length
+					? `\nShared tags: ${result.tagMatches.slice(0, 6).join(', ')}`
+					: '';
+
+				return {
+					ok: true,
+					tool: name,
+					result: `## Research Glyph Search (${result.total} indexed · ${result.hitMs}ms · ${result.cacheLevel})\n${lines}${tagCtx}`,
+					durationMs: Date.now() - start,
+					metadata: { cacheLevel: result.cacheLevel, hitMs: result.hitMs, total: result.total },
+				};
+			}
+
 			default:
 				return {
 					ok: false,
