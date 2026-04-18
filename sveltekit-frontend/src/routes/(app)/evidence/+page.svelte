@@ -85,7 +85,7 @@
 	let showViewModal = $state(false);
 
 	// Pagination
-	let allEvidence = $state<any[]>(data.evidence ?? []);
+	let allEvidence = $state<any[]>([]);
 	let hasMore = $state(true);
 	let isLoadingMore = $state(false);
 	let currentPage = $state(1);
