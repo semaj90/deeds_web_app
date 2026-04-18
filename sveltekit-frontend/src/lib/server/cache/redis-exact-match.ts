@@ -16,9 +16,11 @@
  */
 
 import { getRedis } from '../redis.js';
-import { createHash } from 'crypto';
+import { LLM_EXACT_CACHE_PREFIX, generateCacheKey } from '../cache-keys.js';
 
-const CACHE_PREFIX = 'llm:exact:';
+export { generateCacheKey };
+
+const CACHE_PREFIX = LLM_EXACT_CACHE_PREFIX;
 const DEFAULT_TTL_SECONDS = 3600; // 1 hour
 
 export interface CachedLLMResponse {
@@ -28,34 +30,6 @@ export interface CachedLLMResponse {
 	cachedAt: string;
 	promptTokens?: number;
 	completionTokens?: number;
-}
-
-/**
- * Generate deterministic cache key from request parameters.
- * Uses SHA-256 hash of JSON-serialized request for consistent keys.
- */
-export function generateCacheKey(params: {
-	model: string;
-	messages: Array<{ role: string; content: string }>;
-	temperature?: number;
-	maxTokens?: number;
-	systemPrompt?: string;
-}): string {
-	// Normalize to ensure consistent hashing
-	const normalized = {
-		model: params.model,
-		messages: params.messages,
-		temperature: params.temperature ?? 0.7,
-		maxTokens: params.maxTokens ?? 2048,
-		systemPrompt: params.systemPrompt ?? '',
-	};
-
-	const hash = createHash('sha256')
-		.update(JSON.stringify(normalized))
-		.digest('hex')
-		.slice(0, 16); // 16-char hex = 64-bit hash (collision-resistant for cache)
-
-	return `${CACHE_PREFIX}${hash}`;
 }
 
 /**

@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import type { OllamaResponse } from '$lib/server/ollama.js';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
@@ -361,12 +362,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Non-blocking
     }
 
+    const queryHash = createHash('sha256').update(message).digest('hex').slice(0, 16);
+
     return json({
       success: true,
       data: {
         response: responseText,
         model: 'gemma4-legal:latest',
         sessionId,
+        queryHash,
         ...(caseId ? { caseId } : {}),
         ...(toolResultsCtx.length > 0 && {
           toolResults: toolResultsCtx,

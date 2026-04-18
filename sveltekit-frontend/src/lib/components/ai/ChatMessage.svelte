@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
+  import FeedbackButtons from '$lib/components/ui/FeedbackButtons.svelte';
   interface MessageData {
     id?: string;
     role?: string;
@@ -13,6 +14,8 @@
       model?: string;
       latency?: number;
       tokenCount?: number;
+      queryHash?: string;
+      pipeline?: string;
     };
   }
 
@@ -137,7 +140,16 @@
       <span class="text-sand/40">{formattedTime}</span>
 
       {#if showActions}
-        <div class="actions flex gap-0.5">
+        <div class="actions flex gap-0.5 items-center">
+          {#if isAssistant && message.metadata?.queryHash}
+            <FeedbackButtons
+              queryHash={message.metadata.queryHash}
+              pipeline={message.metadata.pipeline}
+              compact
+              showCounts
+            />
+          {/if}
+
           <Button
             variant="ghost"
             size="sm"

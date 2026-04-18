@@ -1,6 +1,6 @@
 <script lang="ts">
  import type { AttachmentMetadata } from '$lib/types/sharedTypes';
-
+ import FeedbackButtons from '$lib/components/ui/FeedbackButtons.svelte';
 
  type QuickAction = 'chat' | 'report' | 'case' | 'evidence';
 
@@ -9,7 +9,9 @@
 	ts: number;
  status?: 'pending' | 'sent' | 'error';
  attachments?: AttachmentPreview[];
- error?: string };
+ error?: string;
+ queryHash?: string;
+ pipeline?: string; };
 
  type AttachmentPreview = { id: string, name: string;
 	size: number;
@@ -188,7 +190,9 @@ const sessionSeed =
  role: 'assistant',
  content: replyText,
  ts: Date.now(),
- status: 'sent'
+ status: 'sent',
+ queryHash: payload?.data?.queryHash as string | undefined,
+ pipeline: 'ace',
  };
  chatMessages = chatMessages
  .map((msg): ChatMessage => (msg.id === userMessage.id ? { ...msg, status: 'sent' as const } : msg))
@@ -396,6 +400,9 @@ const sessionSeed =
  <header>
  <strong>{message.role === 'user' ? 'Detective' : '9S Assistant'}</strong>
  <small>{new Date(message.ts).toLocaleTimeString()}</small>
+ {#if message.role === 'assistant' && message.queryHash}
+ <FeedbackButtons queryHash={message.queryHash} pipeline={message.pipeline} compact showCounts />
+ {/if}
  </header>
  <p>{message.content}</p>
  {#if message.attachments?.length}

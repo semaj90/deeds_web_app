@@ -83,20 +83,23 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (error) {
 		console.error('Error fetching video analysis:', error);
-		return json(
-			{
-				error: 'Failed to load video analysis',
-				evidenceId,
-				processingStatus: 'error',
-				transcription: null,
-				vlmAnalysis: null,
-				frameAnalysis: [],
-				sceneDetection: [],
-				entities: [],
-				aceAnalysis: null,
-				videoMetadata: {}
-			},
-			{ status: 200 }
-		);
+		return json({
+      evidenceId,
+      title: '',
+      fileName: '',
+      filePath: '',
+      fileSize: 0,
+      mimeType: '',
+      processingStatus: 'error',
+      transcription: null,
+      vlmAnalysis: null,
+      frameAnalysis: [],
+      sceneDetection: [],
+      entities: [],
+      aceAnalysis: null,
+      videoMetadata: {},
+      createdAt: null,
+      updatedAt: null,
+    });
 	}
 };

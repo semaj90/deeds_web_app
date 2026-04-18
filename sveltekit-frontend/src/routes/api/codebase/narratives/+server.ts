@@ -72,12 +72,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Get current cluster map from CouchDB
 		const existing = await getAllClusterNarratives(k);
-		if (existing.size === 0) {
-			return json({ synthesized: 0, message: 'No clusters found. Run cluster detection first.' });
-		}
+		if (existing.length === 0) {
+      return json({ synthesized: 0, message: 'No clusters found. Run cluster detection first.' });
+    }
 
-		// Re-synthesize triggers the full pipeline including PG + Qdrant mirror
-		const result = await detectCodebaseClusters(k);
+    // Re-synthesize triggers the full pipeline including PG + Qdrant mirror
+    const result = await detectCodebaseClusters(k != null ? { k } : {});
 		return json({
 			synthesized: result.narrativesSynthesized,
 			clusters: result.k,

@@ -57,14 +57,13 @@ export const GET: RequestHandler = async () => {
  }
 
  return json(
- {
- status: 'unavailable',
- service: 'redis',
- message: 'Redis not configured or unreachable',
- error: msg,
- timestamp,
- },
- { status: 503 }
+   {
+     status: 'unavailable',
+     service: 'redis',
+     message: 'Redis not configured or unreachable',
+     timestamp,
+   },
+   { status: 503 }
  );
  } finally {
  // Quit the short-lived client if possible to avoid leaking connections

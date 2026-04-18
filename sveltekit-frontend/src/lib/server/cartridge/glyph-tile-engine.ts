@@ -58,11 +58,11 @@ export interface GlyphTileAtlas {
   tileCount: number;
   tiles: GlyphTile[];
   buildMs: number;
-  source: 'gpu' | 'cpu' | 'redis';
+  source: 'gpu' | 'cpu' | 'redis' | 'grpc';
 }
 
 export interface EmbeddingPoint {
-  embedding: number[];   // 768-dim
+  embedding: number[]; // 768-dim
   entities?: string[];
   sourceId?: string;
 }
@@ -183,8 +183,8 @@ function _projectToGrid(
   const positions: Array<{ gx: number; gy: number; normX: number; normY: number }> = [];
 
   for (let i = 0; i < k; i++) {
-    const c0 = centroids[i * DIM]     ?? 0;  // manifold[0]
-    const c1 = centroids[i * DIM + 1] ?? 0;  // manifold[1]
+    const c0 = centroids[i * DIM] ?? 0; // manifold[0]
+    const c1 = centroids[i * DIM + 1] ?? 0; // manifold[1]
 
     // Map [-1,1] → [0, gridW/H - 1]
     let gx = Math.round(((c0 + 1) / 2) * (gridW - 1));
@@ -216,7 +216,7 @@ function _projectToGrid(
 
 function _manifold4(centroid: Float32Array, offset: number): [number, number, number, number] {
   return [
-    centroid[offset]     ?? 0,
+    centroid[offset] ?? 0,
     centroid[offset + 1] ?? 0,
     centroid[offset + 2] ?? 0,
     centroid[offset + 3] ?? 0,
@@ -366,9 +366,8 @@ export function searchGlyphTiles(
 ): GlyphTile[] {
   if (atlas.tiles.length === 0) return [];
 
-  const query = queryEmbedding instanceof Float32Array
-    ? queryEmbedding
-    : new Float32Array(queryEmbedding);
+  const query =
+    queryEmbedding instanceof Float32Array ? queryEmbedding : new Float32Array(queryEmbedding);
 
   // Build flat centroid matrix [k × DIM]
   const k = atlas.tiles.length;
@@ -400,6 +399,11 @@ export async function invalidateGlyphAtlas(caseId: string): Promise<void> {
   } catch {
     // non-fatal
   }
+}
+
+/** Retrieve a cached GlyphTileAtlas from Redis (returns null if not cached). */
+export async function getGlyphTileAtlas(caseId: string): Promise<GlyphTileAtlas | null> {
+  return _redisLoad(caseId);
 }
 
 // ── RabbitMQ rebuild trigger ──────────────────────────────────────────────────

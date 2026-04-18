@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   try {
     const { db } = await import('$lib/server/db/client');
     const { sql: drizzleSql, gte, and, eq } = await import('drizzle-orm');
-    const { ragQueryLog } = await import('$lib/server/db/schema-postgres.js');
+    const { ragQueryLog } = await import('$lib/server/db/schema.js');
 
     const since = new Date(Date.now() - days * 86_400_000);
     const rows = await db

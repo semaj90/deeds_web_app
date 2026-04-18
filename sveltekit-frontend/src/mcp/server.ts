@@ -566,6 +566,44 @@ function setupToolHandlers() {
         },
       },
       // ─────────────────────────────────────────────────────────────────────
+      // Codebase Cluster Explain — VLM narrative for a GPU k-means cluster
+      // Step 8: Claude / Copilot MCP bridge
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'codebase:explain_cluster',
+        description:
+          'Return a VLM-synthesised narrative for a GPU k-means cluster in the codebase index. ' +
+          'Accepts a clusterId (integer) OR a free-text query (searches the most relevant cluster). ' +
+          'Returns: purpose, summary, patterns, keyFiles, warnings. ' +
+          'Use this when Claude / Copilot needs to explain what a group of related files does ' +
+          '(e.g. "how does auth work?", "what is the evidence pipeline?").',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            clusterId: {
+              type: 'number',
+              description: 'GPU cluster index (0-based). If omitted, query must be provided.',
+            },
+            query: {
+              type: 'string',
+              description:
+                'Natural language query — the tool searches codebase_chunks_768 and picks the top cluster. ' +
+                'Used when clusterId is unknown.',
+            },
+            maxFiles: {
+              type: 'number',
+              description: 'Max file chunks to include when query-based lookup is used (default: 5)',
+              default: 5,
+            },
+            force: {
+              type: 'boolean',
+              description: 'Bypass Redis cache and regenerate narrative (default: false)',
+              default: false,
+            },
+          },
+        },
+      },
+      // ─────────────────────────────────────────────────────────────────────
       // LangExtract Tools — Google's official structured extraction library
       // Uses local Ollama (gemma4-legal) instead of Gemini API
       // ─────────────────────────────────────────────────────────────────────
@@ -1448,6 +1486,85 @@ function setupToolHandlers() {
                 },
                 model: llmData.model,
                 tokensUsed: llmData.prompt_eval_count + (llmData.eval_count ?? 0),
+              }),
+            },
+          ],
+        };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // Codebase Cluster Explain (Step 8 MCP bridge)
+      // ─────────────────────────────────────────────────────────────────────
+      case 'codebase:explain_cluster': {
+        const {
+          clusterId: inputClusterId,
+          query: clusterQuery,
+          maxFiles = 5,
+          force = false,
+        } = args as {
+          clusterId?: number;
+          query?: string;
+          maxFiles?: number;
+          force?: boolean;
+        };
+
+        // Resolve clusterId — either from input or via Qdrant semantic search
+        let resolvedClusterId: number | null = inputClusterId ?? null;
+
+        if (resolvedClusterId == null && clusterQuery) {
+          const { searchCodebase } = await import('../lib/server/indexer/dual-embedder.js');
+          const hits = await searchCodebase(clusterQuery, { limit: maxFiles, contentWeight: 0.6, signatureWeight: 0.4 });
+          const topCluster = hits[0]?.chunk?.neo4j_gpuCluster ?? hits[0]?.chunk?.som_cluster;
+          if (typeof topCluster === 'number') resolvedClusterId = topCluster;
+        }
+
+        if (resolvedClusterId == null) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ error: 'Provide clusterId or query to resolve one' }) }],
+          };
+        }
+
+        const { generateClusterSummary } = await import('../lib/server/indexer/cluster-summary.js');
+        const summary = await generateClusterSummary(resolvedClusterId, force);
+
+        if (!summary) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ error: `No data for cluster ${resolvedClusterId}` }) }],
+          };
+        }
+
+        // If a free-text query was provided, return the top-scoring search hits
+        // from that cluster so the caller has grounding evidence
+        let clusterChunks: Array<{ path: string; score: number; content: string }> = [];
+        if (clusterQuery) {
+          const { searchCodebase } = await import('../lib/server/indexer/dual-embedder.js');
+          const hits = await searchCodebase(clusterQuery, { limit: maxFiles * 2 });
+          clusterChunks = hits
+            .filter((h) => {
+              const hCluster = h.chunk?.neo4j_gpuCluster ?? h.chunk?.som_cluster;
+              return hCluster === resolvedClusterId;
+            })
+            .slice(0, maxFiles)
+            .map((h) => ({
+              path:    String(h.chunk.path ?? h.chunk.relativePath ?? ''),
+              score:   Math.round(h.score * 1000) / 1000,
+              content: String(h.chunk.content ?? '').slice(0, 500),
+            }));
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                clusterId: resolvedClusterId,
+                purpose:     summary.purpose,
+                summary:     summary.summary,
+                patterns:    summary.patterns,
+                keyFiles:    summary.keyFiles,
+                warnings:    summary.warnings,
+                generatedAt: summary.generatedAt,
+                chunks:      clusterChunks,
               }),
             },
           ],

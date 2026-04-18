@@ -40,6 +40,15 @@ export { savedCitations } from './schema/citations';
 // Analytics events (used by event-logger.ts)
 export { userAnalyticsEvents, type UserAnalyticsEvent, type NewUserAnalyticsEvent } from './schema/analytics';
 
+// Search analytics pipeline tables (search-intelligence dashboard + QLoRA training)
+export {
+	chunkHitLog,       type ChunkHitLog,       type NewChunkHitLog,
+	queryVariancePairs,type QueryVariancePair,  type NewQueryVariancePair,
+	ragQueryLog,       type RagQueryLog,        type NewRagQueryLog,
+	qloraExamples,     type QloraExample,       type NewQloraExample,
+	responseFeedback,  type ResponseFeedback,   type NewResponseFeedback,
+} from './schema/search-analytics';
+
 // === UNIVERSAL LEGAL CORPUS SCHEMA ===
 // Layer 1: Canonical legal structure
 export {

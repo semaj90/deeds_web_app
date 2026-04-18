@@ -47,11 +47,12 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { Agent } from 'undici';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { logInference } from '$lib/server/observability/inference-log.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
 export function getOllamaEndpoint(): string {
-	return ENV.OLLAMA_BASE_URL;
+  return ENV.OLLAMA_BASE_URL;
 }
 
 const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
@@ -63,10 +64,10 @@ const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '300000');
 // keepAliveTimeout: 30s (Ollama inference can be slow, keep conn alive between calls)
 // maxSockets: 10 (conservative for 8GB VRAM with NUM_PARALLEL=2)
 const ollamaDispatcher = new Agent({
-	keepAliveTimeout: 30_000,
-	keepAliveMaxTimeout: 600_000,
-	connections: 10,
-	pipelining: 1,
+  keepAliveTimeout: 30_000,
+  keepAliveMaxTimeout: 600_000,
+  connections: 10,
+  pipelining: 1,
 });
 
 /**
@@ -75,88 +76,93 @@ const ollamaDispatcher = new Agent({
  */
 const CHAT_MODEL_KEEP_ALIVE = process.env?.OLLAMA_CHAT_KEEP_ALIVE ?? '10m';
 const EMBEDDING_MODEL_KEEP_ALIVE =
-	process.env?.OLLAMA_EMBED_KEEP_ALIVE ?? process.env?.OLLAMA_KEEP_ALIVE ?? '24h';
+  process.env?.OLLAMA_EMBED_KEEP_ALIVE ?? process.env?.OLLAMA_KEEP_ALIVE ?? '24h';
 const OLLAMA_DIAGNOSTICS_ENABLED =
-	(process.env?.OLLAMA_DIAGNOSTICS_ENABLED ?? (ENV.NODE_ENV === 'development' ? 'true' : 'false')) ===
-	'true';
+  (process.env?.OLLAMA_DIAGNOSTICS_ENABLED ??
+    (ENV.NODE_ENV === 'development' ? 'true' : 'false')) === 'true';
 
 export function getChatModelKeepAlive(): string {
-	return CHAT_MODEL_KEEP_ALIVE;
+  return CHAT_MODEL_KEEP_ALIVE;
 }
 
 export function getEmbeddingModelKeepAlive(): string {
-	return EMBEDDING_MODEL_KEEP_ALIVE;
+  return EMBEDDING_MODEL_KEEP_ALIVE;
 }
 
 function parseKeepAliveMs(value: unknown): number | null {
-	if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
-		return value;
-	}
+  if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+    return value;
+  }
 
-	if (typeof value !== 'string') return null;
-	const trimmed = value.trim().toLowerCase();
-	const match = trimmed.match(/^(\d+)(ms|s|m|h)$/);
-	if (!match) return null;
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().toLowerCase();
+  const match = trimmed.match(/^(\d+)(ms|s|m|h)$/);
+  if (!match) return null;
 
-	const amount = Number(match[1]);
-	const unit = match[2];
-	if (unit === 'ms') return amount;
-	if (unit === 's') return amount * 1000;
-	if (unit === 'm') return amount * 60_000;
-	return amount * 3_600_000;
+  const amount = Number(match[1]);
+  const unit = match[2];
+  if (unit === 'ms') return amount;
+  if (unit === 's') return amount * 1000;
+  if (unit === 'm') return amount * 60_000;
+  return amount * 3_600_000;
 }
 
-function extractOllamaRequestMeta(url: string, init?: RequestInit): {
-	endpoint: string;
-	model?: string;
-	keepAlive?: string | number;
+function extractOllamaRequestMeta(
+  url: string,
+  init?: RequestInit
+): {
+  endpoint: string;
+  model?: string;
+  keepAlive?: string | number;
 } {
-	const endpoint = new URL(url, OLLAMA_BASE_URL).pathname;
-	if (typeof init?.body !== 'string') return { endpoint };
+  const endpoint = new URL(url, OLLAMA_BASE_URL).pathname;
+  if (typeof init?.body !== 'string') return { endpoint };
 
-	try {
-		const parsed = JSON.parse(init.body) as { model?: string; keep_alive?: string | number };
-		return {
-			endpoint,
-			model: parsed.model,
-			keepAlive: parsed.keep_alive,
-		};
-	} catch {
-		return { endpoint };
-	}
+  try {
+    const parsed = JSON.parse(init.body) as { model?: string; keep_alive?: string | number };
+    return {
+      endpoint,
+      model: parsed.model,
+      keepAlive: parsed.keep_alive,
+    };
+  } catch {
+    return { endpoint };
+  }
 }
 
 function logOllamaDiagnostics(
-	phase: 'success' | 'error',
-	meta: ReturnType<typeof extractOllamaRequestMeta>,
-	durationMs: number,
-	status?: number,
-	error?: unknown
+  phase: 'success' | 'error',
+  meta: ReturnType<typeof extractOllamaRequestMeta>,
+  durationMs: number,
+  status?: number,
+  error?: unknown
 ): void {
-	if (!OLLAMA_DIAGNOSTICS_ENABLED) return;
+  if (!OLLAMA_DIAGNOSTICS_ENABLED) return;
 
-	const keepAliveMs = parseKeepAliveMs(meta.keepAlive);
-	const residentUntil =
-		keepAliveMs !== null && keepAliveMs > 0 ? new Date(Date.now() + keepAliveMs).toISOString() : null;
-	const details = [
-		`endpoint=${meta.endpoint}`,
-		`model=${meta.model ?? 'unknown'}`,
-		`keep_alive=${String(meta.keepAlive ?? 'unset')}`,
-		`duration_ms=${durationMs}`,
-	];
+  const keepAliveMs = parseKeepAliveMs(meta.keepAlive);
+  const residentUntil =
+    keepAliveMs !== null && keepAliveMs > 0
+      ? new Date(Date.now() + keepAliveMs).toISOString()
+      : null;
+  const details = [
+    `endpoint=${meta.endpoint}`,
+    `model=${meta.model ?? 'unknown'}`,
+    `keep_alive=${String(meta.keepAlive ?? 'unset')}`,
+    `duration_ms=${durationMs}`,
+  ];
 
-	if (typeof status === 'number') details.push(`status=${status}`);
-	if (residentUntil && (meta.endpoint === '/api/chat' || meta.endpoint === '/api/generate')) {
-		details.push(`resident_until~=${residentUntil}`);
-	}
+  if (typeof status === 'number') details.push(`status=${status}`);
+  if (residentUntil && (meta.endpoint === '/api/chat' || meta.endpoint === '/api/generate')) {
+    details.push(`resident_until~=${residentUntil}`);
+  }
 
-	if (phase === 'success') {
-		console.log(`[ollama-diag] ${details.join(' ')}`);
-		return;
-	}
+  if (phase === 'success') {
+    console.log(`[ollama-diag] ${details.join(' ')}`);
+    return;
+  }
 
-	const errorMessage = error instanceof Error ? error.message : String(error ?? 'unknown error');
-	console.warn(`[ollama-diag] ${details.join(' ')} error=${errorMessage}`);
+  const errorMessage = error instanceof Error ? error.message : String(error ?? 'unknown error');
+  console.warn(`[ollama-diag] ${details.join(' ')} error=${errorMessage}`);
 }
 
 /**
@@ -164,20 +170,20 @@ function logOllamaDiagnostics(
  * All Ollama HTTP calls should use this instead of raw fetch().
  */
 export async function ollamaFetch(url: string, init?: RequestInit): Promise<Response> {
-	const meta = extractOllamaRequestMeta(url, init);
-	const startedAt = Date.now();
+  const meta = extractOllamaRequestMeta(url, init);
+  const startedAt = Date.now();
 
-	try {
-		const response = await fetch(url, {
-			...init,
-			dispatcher: ollamaDispatcher,
-		} as RequestInit);
-		logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status);
-		return response;
-	} catch (error) {
-		logOllamaDiagnostics('error', meta, Date.now() - startedAt, undefined, error);
-		throw error;
-	}
+  try {
+    const response = await fetch(url, {
+      ...init,
+      dispatcher: ollamaDispatcher,
+    } as RequestInit);
+    logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status);
+    return response;
+  } catch (error) {
+    logOllamaDiagnostics('error', meta, Date.now() - startedAt, undefined, error);
+    throw error;
+  }
 }
 
 // ── Bifrost Gateway (OpenAI-compatible gateway with semantic caching) ─────
@@ -196,7 +202,10 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
  */
 function normalizeBifrostMessage(content: string): string {
   return content
-    .replace(/^(can you (please )?|could you (please )?|i (want|need|would like) (you )?to |please )/i, '')
+    .replace(
+      /^(can you (please )?|could you (please )?|i (want|need|would like) (you )?to |please )/i,
+      ''
+    )
     .replace(/^(help me (understand|with|explain)|tell me (about|how|what|why) )/i, '')
     .replace(/\bsec(?:tion|\.)?\s*(\d+)/gi, '§$1')
     .replace(/§\s+(\d)/g, '§$1')
@@ -210,7 +219,7 @@ export async function bifrostChat(
   model: string,
   options?: { temperature?: number; maxTokens?: number; timeoutMs?: number; cacheKey?: string }
 ): Promise<string> {
-  const bifrostModel = model.includes('/') ? model : `ollama/${model}`;  // Fixed: ollama-local → ollama
+  const bifrostModel = model.includes('/') ? model : `ollama/${model}`; // Fixed: ollama-local → ollama
   // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
   // Without it, every request bypasses the cache entirely (Bifrost docs).
   // 'legal-ai-global' creates a shared namespace: semantically similar questions
@@ -222,7 +231,9 @@ export async function bifrostChat(
   );
 
   // ── L1 Cache: Redis Exact-Match (sub-ms lookup, 17,500× speedup) ──
-  const { generateCacheKey, getExactMatchCache, setExactMatchCache } = await import('$lib/server/cache/redis-exact-match.js');
+  const { generateCacheKey, getExactMatchCache, setExactMatchCache } = await import(
+    '$lib/server/cache/redis-exact-match.js'
+  );
   const exactCacheKey = generateCacheKey({
     model: bifrostModel,
     messages: normalizedMessages,
@@ -237,6 +248,7 @@ export async function bifrostChat(
   }
 
   // ── L2 Cache: Bifrost Semantic Search (5s lookup via Qdrant) ──
+  const bifrostStart = performance.now();
   const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -277,6 +289,22 @@ export async function bifrostChat(
 
   // Store in Redis exact-match cache for instant future retrieval
   if (content) {
+    // Log L3 cold inference to CouchDB for QLoRA distillation
+    if (!debug?.cache_hit) {
+      logInference({
+        type: 'llm',
+        model: bifrostModel,
+        backend: 'ollama',
+        latencyMs: Math.round(performance.now() - bifrostStart),
+        tokenCount: content.split(/\s+/).length,
+        cacheHit: false,
+        metadata: {
+          response: content.slice(0, 20_000),
+          temperature: options?.temperature ?? 0.7,
+          source: 'bifrostChat',
+        },
+      });
+    }
     await setExactMatchCache(exactCacheKey, {
       content,
       model: bifrostModel,

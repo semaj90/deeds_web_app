@@ -33,6 +33,9 @@ export * from './ace-web-crawl.js';
 // Analytics (user_analytics_events — used via raw SQL in event-logger.ts)
 export * from './analytics.js';
 
+// Search Intelligence pipeline tables (chunk_hit_log, rag_query_log, qlora_examples, response_feedback, query_variance_pairs)
+export * from './search-analytics.js';
+
 // === UNIVERSAL LEGAL CORPUS SCHEMA ===
 // Canonical legal structure (Layer 1)
 export * from './jurisdictions.js';

@@ -277,3 +277,46 @@ export function getGraphMLStatus(): { napi: boolean; grpc: boolean; cuda: boolea
     cuda,
   };
 }
+
+/**
+ * Condition a GlyphTileAtlas through the graph-ML pipeline.
+ * Applies attention scoring and PageRank-based weighting to atlas tiles.
+ * Returns attention weights and a conditioning vector for FLUX/Wan spatial hints.
+ */
+export async function conditionGlyphAtlas(
+  atlas: import('$lib/server/cartridge/glyph-tile-engine.js').GlyphTileAtlas,
+  queryVec: Float32Array,
+): Promise<{
+  attentionWeights: Float32Array;
+  conditioningVector: Float32Array;
+  source: string;
+}> {
+  const status = getGraphMLStatus();
+  const centroids = atlas.tiles
+    .filter((t) => t.centroid.length > 0)
+    .map((t) => new Float32Array(t.centroid));
+  if (centroids.length === 0 || (!status.napi && !status.grpc)) {
+    return {
+      attentionWeights: new Float32Array(atlas.tiles.length),
+      conditioningVector: queryVec,
+      source: 'passthrough',
+    };
+  }
+  // Build flat key matrix [n × dim]
+  const dim = queryVec.length;
+  const keys = new Float32Array(centroids.length * dim);
+  centroids.forEach((c, i) => {
+    const slice = c.length >= dim ? c.subarray(0, dim) : c;
+    keys.set(slice, i * dim);
+  });
+  const { scores, source } = scoreAttention(queryVec, dim, keys, centroids.length);
+  // Weighted sum of centroids as conditioning vector
+  const condVec = new Float32Array(dim);
+  for (let i = 0; i < centroids.length; i++) {
+    const w = scores[i] ?? 0;
+    for (let d = 0; d < dim && d < centroids[i].length; d++) {
+      condVec[d] += w * centroids[i][d];
+    }
+  }
+  return { attentionWeights: scores, conditioningVector: condVec, source };
+}

@@ -93,12 +93,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					if (evt.eventType === 'done' || evt.eventType === 'error') break;
 				}
 			} catch (err) {
+				console.error('[tools/stream] Error:', err instanceof Error ? err.message : err);
 				send('error', {
-					requestId: req.requestId,
-					toolName:  req.toolName,
-					data:      err instanceof Error ? err.message : 'Stream error',
-					elapsedMs: 0,
-				});
+          requestId: req.requestId,
+          toolName: req.toolName,
+          data: 'Tool execution failed',
+          elapsedMs: 0,
+        });
 			} finally {
 				controller.close();
 			}

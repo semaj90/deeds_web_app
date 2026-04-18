@@ -261,6 +261,88 @@ export async function findConnectedCases(
 }
 
 /**
+ * Get personalized case recommendations for a user based on interaction graph.
+ * Uses degree centrality on the user's interaction subgraph as a lightweight
+ * PageRank proxy (Neo4j Community Edition lacks GDS PageRank).
+ *
+ * Walks: User -[:VIEWED|SEARCHED|ANALYZED|CREATED]-> Case/SearchQuery
+ *        then Case -[:HAS_EVIDENCE|CITES|INVOLVES]-> shared entities -> other Cases
+ *
+ * Returns cases ranked by (interaction strength × connection centrality).
+ */
+export async function getPersonalizedCaseRecommendations(
+	userId: string,
+	limit: number = 10
+): Promise<
+	Array<{
+		caseId: string;
+		title: string;
+		score: number;
+		reason: string;
+		interactionTypes: string[];
+	}>
+> {
+	try {
+		const driver = getNeo4jDriver();
+		const session = driver.session({ database: 'neo4j' });
+
+		try {
+			const result = await session.run(
+				`// Find cases the user interacted with
+				 MATCH (u:User {id: $userId})-[r:VIEWED|SEARCHED|ANALYZED|CREATED]->(target)
+				 WITH u, target,
+				      CASE WHEN target:Case THEN target
+				           ELSE NULL END AS directCase,
+				      type(r) AS interactionType,
+				      coalesce(r.viewCount, r.searchCount, r.analyzeCount, 1) AS weight
+
+				 // Walk from direct cases to connected cases via shared entities
+				 WITH u, collect(DISTINCT directCase) AS userCases,
+				      collect({type: interactionType, weight: weight}) AS interactions
+
+				 UNWIND userCases AS uc
+				 MATCH (uc)-[r1]-(shared)-[r2]-(candidate:Case)
+				 WHERE candidate.id IS NOT NULL
+				   AND NOT candidate IN userCases
+				   AND NOT (u)-[:VIEWED]->(candidate)
+
+				 WITH candidate,
+				      count(DISTINCT shared) AS sharedEntities,
+				      collect(DISTINCT type(r1) + ' → ' + labels(shared)[0]) AS reasons,
+				      collect(DISTINCT type(r2)) AS connectionTypes
+
+				 // Compute degree centrality for the candidate
+				 OPTIONAL MATCH (candidate)-[allRels]-()
+				 WITH candidate, sharedEntities, reasons, connectionTypes,
+				      count(DISTINCT allRels) AS degree
+
+				 RETURN candidate.id AS caseId,
+				        coalesce(candidate.title, '') AS title,
+				        toFloat(sharedEntities * (1 + log(degree + 1))) AS score,
+				        reasons,
+				        connectionTypes
+				 ORDER BY score DESC
+				 LIMIT $limit`,
+				{ userId, limit: Number(limit) }
+			);
+
+			return result.records.map((rec) => ({
+				caseId: rec.get('caseId'),
+				title: rec.get('title') || '',
+				score: toNumber(rec.get('score')),
+				reason: ((rec.get('reasons') as string[]) || []).slice(0, 3).join('; '),
+				interactionTypes: (rec.get('connectionTypes') as string[]) || [],
+			}));
+		} finally {
+			await session.close();
+		}
+	} catch (err) {
+		console.warn('[graph-centrality] Personalized recommendations failed:', err);
+		return [];
+	}
+}
+
+/**
  * Convert Neo4j integer (which may be a neo4j.Integer object) to JS number.
  */
 function toNumber(val: unknown): number {

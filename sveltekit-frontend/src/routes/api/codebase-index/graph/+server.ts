@@ -145,7 +145,18 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 		);
 
 		if (!response.ok) {
-			return json({ error: 'Failed to fetch codebase data' }, { status: 500 });
+			return json({
+        nodes: [],
+        edges: [],
+        stats: {
+          totalFiles: 0,
+          totalChunks: 0,
+          totalDirs: 0,
+          importEdges: 0,
+          extensionBreakdown: {},
+          domainBreakdown: {},
+        },
+      });
 		}
 
 		// GPU-accelerated JSON parsing via simdjson (5× faster for large responses)
@@ -290,6 +301,17 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 		return json(graphData);
 	} catch (error) {
 		console.error('Failed to generate graph data:', error);
-		return json({ error: 'Internal server error' }, { status: 500 });
+		return json({
+      nodes: [],
+      edges: [],
+      stats: {
+        totalFiles: 0,
+        totalChunks: 0,
+        totalDirs: 0,
+        importEdges: 0,
+        extensionBreakdown: {},
+        domainBreakdown: {},
+      },
+    });
 	}
 };

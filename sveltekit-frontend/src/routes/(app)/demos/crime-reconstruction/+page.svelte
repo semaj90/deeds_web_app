@@ -79,7 +79,7 @@
     });
 
     gpuContext = canvas.getContext('webgpu') as GPUCanvasContext;
-    const format = navigator.gpu.getPreferredCanvasFormat();
+    const format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
     gpuContext.configure({ device: gpuDevice, format, alphaMode: 'premultiplied' });
 
     // Camera uniform buffer (mat4+mat4+vec4+4f = 160 bytes, align to 256)
@@ -185,7 +185,7 @@
     // Draw point cloud if loaded
     if (pointBuffer && pointCount3D > 0) {
       const bindGroup = gpuDevice.createBindGroup({
-        layout: pointCloudPipeline.getBindGroupLayout(0),
+        layout: pointCloudPipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
         entries: [
           { binding: 0, resource: { buffer: cameraBuffer } },
           { binding: 1, resource: { buffer: pointBuffer } },
@@ -581,7 +581,7 @@
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
         class="border-2 border-dashed border-[#2a2a2a] rounded p-3 text-center text-[11px] text-[#555] hover:border-[#c4a35a] cursor-pointer"
-        ondragover|preventDefault={() => {}}
+        ondragover={(e) => e.preventDefault()}
         ondrop={onOBJDrop}
       >
         Drop .obj files here
@@ -612,7 +612,7 @@
   <main class="flex-1 flex flex-col">
     <!-- Viewport -->
     <div class="flex-1 relative"
-      ondragover|preventDefault={() => {}}
+      ondragover={(e) => e.preventDefault()}
       ondrop={onOBJDrop}
     >
       <canvas

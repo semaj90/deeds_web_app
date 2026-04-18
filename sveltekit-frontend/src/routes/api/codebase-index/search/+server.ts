@@ -5,11 +5,18 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
 const COLLECTION = 'codebase_chunks_768';
+
+const bodySchema = z.object({
+  query: z.string().min(1).max(500),
+  limit: z.number().int().min(1).max(50).default(10),
+  vector: z.string().max(30).default('content'),
+});
 
 interface SearchResult {
 	id: string;
@@ -31,11 +38,12 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		const { query, limit = 10, vector = 'content' } = await request.json();
-
-		if (!query) {
-			return json({ error: 'Query is required' }, { status: 400 });
-		}
+		const raw = await request.json().catch(() => ({}));
+    const parsed = bodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+    }
+		const { query, limit, vector } = parsed.data;
 
 		// Generate embedding
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {

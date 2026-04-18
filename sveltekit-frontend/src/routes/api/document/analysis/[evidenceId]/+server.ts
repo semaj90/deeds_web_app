@@ -89,23 +89,26 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (error) {
 		console.error('Error fetching document analysis:', error);
-		return json(
-			{
-				error: 'Failed to load document analysis',
-				evidenceId,
-				processingStatus: 'error',
-				extractedText: null,
-				textLength: 0,
-				pageCount: 0,
-				chunks: [],
-				entities: [],
-				aceAnalysis: null,
-				citations: [],
-				statutes: [],
-				keyTerms: [],
-				documentMetadata: {}
-			},
-			{ status: 200 }
-		);
+		return json({
+      evidenceId,
+      title: '',
+      fileName: '',
+      filePath: '',
+      fileSize: 0,
+      mimeType: '',
+      processingStatus: 'error',
+      extractedText: null,
+      textLength: 0,
+      pageCount: 0,
+      chunks: [],
+      entities: [],
+      aceAnalysis: null,
+      citations: [],
+      statutes: [],
+      keyTerms: [],
+      documentMetadata: {},
+      createdAt: null,
+      updatedAt: null,
+    });
 	}
 };

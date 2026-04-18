@@ -78,6 +78,20 @@
       "when": 1772589320495,
       "tag": "0010_nifty_sumo",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1745000000000,
+      "tag": "0011_search_analytics",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1745000001000,
+      "tag": "0012_qlora_column_addendum",
+      "breakpoints": true
     }
   ]
 }

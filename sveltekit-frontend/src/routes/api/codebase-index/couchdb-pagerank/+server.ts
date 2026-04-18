@@ -96,9 +96,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			syncNeo4j:  opts.syncNeo4j,
 		});
 	} catch (err) {
-		const msg = err instanceof Error ? err.message : String(err);
-		console.error('[couchdb-pagerank] Pipeline failed:', msg);
-		return json({ error: msg }, { status: 500 });
+		console.error('[couchdb-pagerank] Pipeline failed:', err instanceof Error ? err.message : err);
+    return json({ error: 'PageRank pipeline failed' }, { status: 500 });
 	}
 };
 

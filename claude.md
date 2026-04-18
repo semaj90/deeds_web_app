@@ -821,6 +821,52 @@ rg "/api/cartridge/|/api/glyph/|glyph|cartridge" src/routes/ src/lib/ --type sve
 # MUST return ≥1 hit per feature area (cartridge export/search/stats, glyph atlas/tiles)
 ```
 
+```bash
+# ══════════════════════════════════════════════════════════════
+# TIER H: SEARCH INTELLIGENCE + ANALYTICS (G48-G55 — added 2026-04-17)
+# Verifies the analytics collection pipeline, Search Patterns API,
+# ACE feedback loop (P1-A prompt leaderboard, P3-A cross-source rerank),
+# and cache key consolidation (P2-A).
+# ══════════════════════════════════════════════════════════════
+
+# G48: Search Patterns API exports all 9 required top-level fields
+# Response must include hotQueries, clusterHeat, variancePairs, chunkQuality,
+# pipelineMemory, crossPipelineChamps, trending, didYouMean, meta
+rg "pipelineMemory|crossPipelineChamps|trending|didYouMean" src/routes/api/analytics/search-patterns/+server.ts
+# MUST return ≥4 hits (all four new fields returned in json())
+
+# G49: search-analytics.ts exports all 6 required read-side functions
+rg "export async function get" src/lib/server/analytics/search-analytics.ts
+# MUST return ≥6 hits:
+#   getHotQueries, getClusterHeatMap, getChunkQualitySignals,
+#   getVariancePairs, getDidYouMeanSuggestions, getAllQuerySketches
+
+# G50: Chunk hit logging wired in ACE assembly (context-assembler.ts)
+rg "recordChunkHits" src/lib/server/ace/context-assembler.ts
+# MUST return ≥1 hit — analytics must fire on every ACE retrieval pass
+
+# G51: P1-A prompt leaderboard → ACE queryTags (feedback loop closed)
+rg "fetchTopQueryTags|getTopPrompts|topQueryTags" src/lib/server/ace/context-assembler.ts
+# MUST return ≥1 hit — top prompts injected into ACEContext.queryTags
+
+# G52: P3-A cross-source reranking active in context assembler
+rg "webSearchToUnified|webUnified|P3-A" src/lib/server/ace/context-assembler.ts
+# MUST return ≥2 hits — import + usage of webSearchToUnified in ragChunks merge
+
+# G53: ACE_PIPELINE_VERSION reflects post-P3-A state
+rg "ACE_PIPELINE_VERSION = '2\." src/lib/server/ace/context-assembler.ts
+# MUST return 1 hit — version ≥ 2.x invalidates stale ace_chunks cache rows
+
+# G54: P2-A cache key consolidation — generateCacheKey lives in cache-keys.ts
+rg "export function generateCacheKey|export function generateContextHash" src/lib/server/cache-keys.ts
+# MUST return 2 hits — single source of truth for LLM cache key generation
+
+# G55: redis-exact-match.ts and llm-cache.ts import from cache-keys (not local)
+rg "from.*cache-keys" src/lib/server/cache/redis-exact-match.ts src/lib/server/ai/llm-cache.ts
+# MUST return 2 hits — both files import from canonical cache-keys.ts
+# If either file still has a local generateCacheKey/hashContext → DRY violation remains
+```
+
 ### Decision Tree (post-gate)
 
 1. **G1-G9 all zero?** → Orphan candidate

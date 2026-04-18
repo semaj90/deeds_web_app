@@ -77,16 +77,19 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (error) {
 		console.error('Error fetching audio analysis:', error);
-		return json(
-			{
-				error: 'Failed to load audio analysis',
-				evidenceId,
-				processingStatus: 'error',
-				transcription: null,
-				entities: [],
-				aceAnalysis: null
-			},
-			{ status: 200 }
-		);
+		return json({
+      evidenceId,
+      title: '',
+      fileName: '',
+      filePath: '',
+      fileSize: 0,
+      mimeType: '',
+      processingStatus: 'error',
+      transcription: null,
+      entities: [],
+      aceAnalysis: null,
+      createdAt: null,
+      updatedAt: null,
+    });
 	}
 };

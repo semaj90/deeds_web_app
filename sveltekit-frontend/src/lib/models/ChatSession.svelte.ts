@@ -53,7 +53,20 @@ export interface ChatMessage {
     graph_context?: string[];
     warnings?: string[];
     routerDecision?: RouterDecision;
+    queryHash?: string;
+    pipeline?: string;
   };
+}
+
+/** FNV-1a 32-bit hash → 8 hex chars. Browser-safe, no crypto import needed. */
+function shortHash(text: string): string {
+  let h = 2166136261;
+  const len = Math.min(text.length, 256);
+  for (let i = 0; i < len; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
 }
 
 export interface ConfidenceFactors {
@@ -1048,12 +1061,13 @@ export class ChatSession {
 
       // Placeholder assistant message — updated as chunks arrive
       const assistantIdx = this.messages.length;
+      const _qHash = shortHash(message);
       this.messages.push({
         role: 'assistant',
         content: '',
         timestamp: new Date().toISOString(),
         source: decision.source,
-        metadata: { routerDecision: decision },
+        metadata: { routerDecision: decision, queryHash: _qHash, pipeline: decision.source },
       });
 
       const reader = res.body.getReader();
@@ -1188,9 +1202,8 @@ export class ChatSession {
 
     const source = msg.source ?? this.lastSource;
     const queryMsg = this.messages.slice(0, messageIndex).reverse().find((m) => m.role === 'user');
-    const queryHash = queryMsg?.content
-      ? `feedback_${queryMsg.content.slice(0, 60)}`
-      : `feedback_${messageIndex}`;
+    const queryHash = msg.metadata?.queryHash
+      ?? (queryMsg?.content ? shortHash(queryMsg.content) : shortHash(String(messageIndex)));
 
     await recordFeedback({
       queryHash,

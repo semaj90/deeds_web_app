@@ -72,6 +72,8 @@ export interface RankExplain {
   legalWeight?: number;
   /** Whether this came from DAG-ordered batch */
   dagOrdered?: boolean;
+  /** QLoRA quality boost applied */
+  qloraBoost?: boolean;
 }
 
 // ── The canonical shape ────────────────────────────────────────────────────

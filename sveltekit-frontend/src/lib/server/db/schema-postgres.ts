@@ -3627,3 +3627,44 @@ export const glyphRecords = pgTable('glyph_records', {
 export type GlyphRecordRow = typeof glyphRecords.$inferSelect;
 export type NewGlyphRecordRow = typeof glyphRecords.$inferInsert;
 
+// QLoRA training examples live in schema/search-analytics.ts (drizzle-kit managed).
+// Import from there: import { qloraExamples } from '$lib/server/db/schema';
+
+// ── Ingestion Buffers ────────────────────────────────────────────────────────
+
+export const ingestionBuffers = pgTable('ingestion_buffers', {
+  id:               uuid('id').defaultRandom().primaryKey(),
+  scope:            text('scope').notNull(),
+  clusterId:        integer('cluster_id'),
+  k:                integer('k').notNull().default(20),
+  bufferJsonb:      jsonb('buffer_jsonb').notNull().default(sql`'{}'::jsonb`),
+  tokenEstimate:    integer('token_estimate').notNull().default(0),
+  compressionRatio: real('compression_ratio').notNull().default(1),
+  generatedAt:      timestamp('generated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+  updatedAt:        timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+  scopeClusterK: unique('ingestion_buffers_scope_cluster_k').on(table.scope, table.clusterId, table.k),
+}));
+
+// ── Cluster Narratives ───────────────────────────────────────────────────────
+
+export const clusterNarratives = pgTable('cluster_narratives', {
+  id:                 uuid('id').defaultRandom().primaryKey(),
+  clusterId:          integer('cluster_id').notNull(),
+  k:                  integer('k').notNull().default(20),
+  summary:            text('summary').notNull(),
+  purpose:            text('purpose').notNull(),
+  patterns:           jsonb('patterns').notNull().default(sql`'[]'::jsonb`),
+  keyFiles:           jsonb('key_files').notNull().default(sql`'[]'::jsonb`),
+  warnings:           jsonb('warnings').notNull().default(sql`'[]'::jsonb`),
+  crossReferences:    jsonb('cross_references').notNull().default(sql`'[]'::jsonb`),
+  memberCount:        integer('member_count').notNull().default(0),
+  dominantAstCluster: text('dominant_ast_cluster'),
+  tags:               jsonb('tags').notNull().default(sql`'[]'::jsonb`),
+  narrativeEmbedding: vector('narrative_embedding', { dimensions: 768 }),
+  generatedAt:        timestamp('generated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+  updatedAt:          timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+  clusterIdx: index('cluster_narratives_cluster_idx').on(table.clusterId),
+}));
+

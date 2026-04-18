@@ -101,6 +101,16 @@ export interface GlyphBridge {
   assembleACEFromGlyphs(
     glyphs: GlyphRecord[]
   ): Promise<{ context: string; source: 'cache' | 'fresh' }>;
+
+  /** Alias for searchCartridge (matches GlyphBridge contract in types/glyph.ts). */
+  search(
+    queryEmbedding: Float32Array,
+    glyphs: GlyphRecord[],
+    opts?: { topK?: number; sectionBias?: GlyphSection; minReward?: number }
+  ): Promise<Array<{ glyphId: string; score: number; stage: string }>>;
+
+  /** Alias for assembleACEFromGlyphs (matches GlyphBridge contract in types/glyph.ts). */
+  assembleACE(glyphs: GlyphRecord[]): Promise<{ context: string; source: 'cache' | 'fresh' }>;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -118,17 +128,11 @@ export function glyphRecordToRuneData(g: GlyphRecord, index: number): RuneData {
   return {
     id: index,
     clusterId: g.centroidId ?? g.somCluster ?? 0,
-    embedding: Array.isArray(g.embedding768)
-      ? g.embedding768
-      : Array.from(g.embedding768),
+    embedding: Array.isArray(g.embedding768) ? g.embedding768 : Array.from(g.embedding768),
     text: g.summary,
     sourceId: g.sourceId,
     sourceName: g.sourceName,
-    entities: [
-      ...(g.tags),
-      ...(g.entities ?? []),
-      ...(g.section ? [g.section] : []),
-    ],
+    entities: [...g.tags, ...(g.entities ?? []), ...(g.section ? [g.section] : [])],
   };
 }
 
@@ -187,10 +191,8 @@ class GlyphCartridgeBridge implements GlyphBridge {
       createdAt: new Date().toISOString(),
       runeCount: runes.length,
       embeddingDim: runes[0]?.embedding.length ?? 768,
-      collections: [...new Set(glyphs.map(g => g.type))],
-      sources: [...new Set(
-        glyphs.map(g => g.sourceName).filter(Boolean) as string[]
-      )],
+      collections: [...new Set(glyphs.map((g) => g.type))],
+      sources: [...new Set(glyphs.map((g) => g.sourceName).filter(Boolean) as string[])],
     };
     const buf = buildCartridge(runes, meta);
     return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
@@ -206,9 +208,7 @@ class GlyphCartridgeBridge implements GlyphBridge {
     const dim = queryEmbedding.length;
 
     // Optional section tile-axis pre-filter
-    const pool = opts.section
-      ? glyphs.filter(g => g.section === opts.section)
-      : glyphs;
+    const pool = opts.section ? glyphs.filter((g) => g.section === opts.section) : glyphs;
 
     if (pool.length === 0) return [];
 
@@ -217,7 +217,7 @@ class GlyphCartridgeBridge implements GlyphBridge {
     const qt = queryEmbedding as Float32Array;
     const queryTopo: [number, number, number, number] = [qt[0], qt[1], qt[2], qt[3]];
 
-    const withDist = pool.map(g => {
+    const withDist = pool.map((g) => {
       const t = g.topo4d;
       const d =
         (t[0] - queryTopo[0]) ** 2 +
@@ -227,7 +227,7 @@ class GlyphCartridgeBridge implements GlyphBridge {
       return { g, dist4d: d };
     });
     withDist.sort((a, b) => a.dist4d - b.dist4d);
-    const stage1 = withDist.slice(0, topK * 4).map(x => x.g);
+    const stage1 = withDist.slice(0, topK * 4).map((x) => x.g);
 
     // ── Stage 2: attentionScoreGPU on cluster-local tensors ────────────
     // Build flat key matrix [stage1.length × dim] from stage1 embeddings
@@ -248,7 +248,7 @@ class GlyphCartridgeBridge implements GlyphBridge {
       .map((g, i) => ({ g, w: weights[i] }))
       .sort((a, b) => b.w - a.w)
       .slice(0, topK * 2);
-    const stage2 = attended.map(x => x.g);
+    const stage2 = attended.map((x) => x.g);
 
     // ── Stage 3: rewardScoreGPU cosine final rerank ────────────────────
     const { rewardScoreGPU } = await import('$lib/server/gpu/pytorch-graph.js');
@@ -269,10 +269,10 @@ class GlyphCartridgeBridge implements GlyphBridge {
     const { scores } = rewardScoreGPU(genVecs, refVecs, n, dim);
     return stage2
       .map((g, i) => ({ g, score: scores[i] }))
-      .filter(x => x.score >= minScore)
+      .filter((x) => x.score >= minScore)
       .sort((a, b) => b.score - a.score)
       .slice(0, topK)
-      .map(x => x.g.glyphId);
+      .map((x) => x.g.glyphId);
   }
 
   async assembleACEFromGlyphs(
@@ -299,6 +299,25 @@ class GlyphCartridgeBridge implements GlyphBridge {
       context: parts.join('\n\n---\n\n'),
       source: allCached ? 'cache' : 'fresh',
     };
+  }
+
+  async search(
+    queryEmbedding: Float32Array,
+    glyphs: GlyphRecord[],
+    opts?: { topK?: number; sectionBias?: GlyphSection; minReward?: number }
+  ): Promise<Array<{ glyphId: string; score: number; stage: string }>> {
+    const ids = await this.searchCartridge(queryEmbedding, glyphs, {
+      topK: opts?.topK,
+      section: opts?.sectionBias,
+      minScore: opts?.minReward,
+    });
+    return ids.map((id, i) => ({ glyphId: id, score: 1 - i * 0.01, stage: 'reward' }));
+  }
+
+  async assembleACE(
+    glyphs: GlyphRecord[]
+  ): Promise<{ context: string; source: 'cache' | 'fresh' }> {
+    return this.assembleACEFromGlyphs(glyphs);
   }
 }
 

@@ -255,19 +255,19 @@ async function _renderGPU(
   width: number,
   height: number,
   palette: readonly (readonly number[])[],
-  highlightCluster: number,
+  highlightCluster: number
 ): Promise<Uint8ClampedArray> {
   const pipeline = await _getPipeline(device);
 
-  const tileBuf  = _buildTileBuffer(tiles);
-  const palBuf   = _buildPaletteBuffer(palette);
+  const tileBuf = _buildTileBuffer(tiles);
+  const palBuf = _buildPaletteBuffer(palette);
 
   const tileGPU = device.createBuffer({
     label: 'tiles',
     size: tileBuf.byteLength,
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
   });
-  device.queue.writeBuffer(tileGPU, 0, tileBuf);
+  device.queue.writeBuffer(tileGPU, 0, tileBuf as unknown as ArrayBuffer);
 
   const uniformData = new Uint32Array(4);
   uniformData[0] = tiles.length;
@@ -281,19 +281,19 @@ async function _renderGPU(
     size: 16,
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   });
-  device.queue.writeBuffer(uniformGPU, 0, uniformData);
+  device.queue.writeBuffer(uniformGPU, 0, uniformData as unknown as ArrayBuffer);
 
   const paletteGPU = device.createBuffer({
     label: 'palette',
     size: palBuf.byteLength,
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
   });
-  device.queue.writeBuffer(paletteGPU, 0, palBuf);
+  device.queue.writeBuffer(paletteGPU, 0, palBuf as unknown as ArrayBuffer);
 
   const outSize = width * height * 4; // RGBA8 u32 × pixels but stored as bytes
   const outGPU = device.createBuffer({
     label: 'out_rgba',
-    size: width * height * 4,          // u32 per pixel
+    size: width * height * 4, // u32 per pixel
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
   });
   const readbackGPU = device.createBuffer({
@@ -303,7 +303,7 @@ async function _renderGPU(
   });
 
   const bindGroup = device.createBindGroup({
-    layout: pipeline.getBindGroupLayout(0),
+    layout: pipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
     entries: [
       { binding: 0, resource: { buffer: tileGPU } },
       { binding: 1, resource: { buffer: uniformGPU } },
@@ -336,8 +336,8 @@ async function _renderGPU(
   const rgba = new Uint8ClampedArray(outSize);
   for (let i = 0; i < u32.length; i++) {
     const p = u32[i]!;
-    rgba[i * 4]     = p & 0xff;         // R
-    rgba[i * 4 + 1] = (p >> 8)  & 0xff; // G
+    rgba[i * 4] = p & 0xff; // R
+    rgba[i * 4 + 1] = (p >> 8) & 0xff; // G
     rgba[i * 4 + 2] = (p >> 16) & 0xff; // B
     rgba[i * 4 + 3] = (p >> 24) & 0xff; // A
   }
@@ -351,7 +351,7 @@ function _renderCPU(
   width: number,
   height: number,
   palette: readonly (readonly number[])[],
-  highlightCluster: number,
+  highlightCluster: number
 ): Uint8ClampedArray {
   const rgba = new Uint8ClampedArray(width * height * 4);
 
@@ -379,12 +379,12 @@ function _renderCPU(
       const palIdx = bestIdx % 8;
       const c = palette[palIdx] ?? [0, 0, 0, 255];
       const dim = 0.5 + 0.5 * Math.max(0, Math.min(1, bestConf));
-      const highlight = (highlightCluster >= 0 && bestIdx === highlightCluster) ? 1.5 : 1.0;
+      const highlight = highlightCluster >= 0 && bestIdx === highlightCluster ? 1.5 : 1.0;
 
       const off = (py * width + px) * 4;
-      rgba[off]     = Math.min(255, ((c[0] ?? 0) * dim * highlight));
-      rgba[off + 1] = Math.min(255, ((c[1] ?? 0) * dim * highlight));
-      rgba[off + 2] = Math.min(255, ((c[2] ?? 0) * dim * highlight));
+      rgba[off] = Math.min(255, (c[0] ?? 0) * dim * highlight);
+      rgba[off + 1] = Math.min(255, (c[1] ?? 0) * dim * highlight);
+      rgba[off + 2] = Math.min(255, (c[2] ?? 0) * dim * highlight);
       rgba[off + 3] = c[3] ?? 255;
     }
   }
@@ -399,7 +399,7 @@ function _drawGrid(
   gridW: number,
   gridH: number,
   canvasW: number,
-  canvasH: number,
+  canvasH: number
 ): void {
   ctx.strokeStyle = 'rgba(255,255,255,0.12)';
   ctx.lineWidth = 0.5;
@@ -440,12 +440,12 @@ export async function renderGlyphAtlas(
     gridH?: number;
     tileCount?: number;
   },
-  opts: RenderOptions = {},
+  opts: RenderOptions = {}
 ): Promise<RenderResult> {
   if (!browser) throw new Error('renderGlyphAtlas is client-only');
 
   const {
-    width  = 256,
+    width = 256,
     height = 256,
     paletteId = 'nes-yorha',
     showGrid = true,
@@ -455,7 +455,9 @@ export async function renderGlyphAtlas(
   const tiles = atlasData.tiles;
   if (!tiles || tiles.length === 0) {
     const ctx2 = canvas.getContext('2d');
-    if (ctx2) { ctx2.clearRect(0, 0, canvas.width, canvas.height); }
+    if (ctx2) {
+      ctx2.clearRect(0, 0, canvas.width, canvas.height);
+    }
     return { backend: 'cpu', durationMs: 0, tileCount: 0 };
   }
 
@@ -463,7 +465,9 @@ export async function renderGlyphAtlas(
 
   // Acquire serial render lock
   let release!: () => void;
-  const myTurn = new Promise<void>((res) => { release = res; });
+  const myTurn = new Promise<void>((res) => {
+    release = res;
+  });
   const prev = _renderLock;
   _renderLock = myTurn;
   await prev;
@@ -487,11 +491,15 @@ export async function renderGlyphAtlas(
     }
 
     // Draw to canvas
-    canvas.width  = width;
+    canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      const imageData = new ImageData(rgbaPixels, width, height);
+      const imageData = new ImageData(
+        new Uint8ClampedArray(rgbaPixels.buffer as ArrayBuffer),
+        width,
+        height
+      );
       ctx.putImageData(imageData, 0, 0);
 
       if (showGrid && atlasData.gridW && atlasData.gridH) {

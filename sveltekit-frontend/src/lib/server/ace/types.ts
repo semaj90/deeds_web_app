@@ -159,6 +159,18 @@ export interface ACEContext {
     patterns: string[];
     keyFiles: string[];
   }> | null;
+  /**
+   * VLM-synthesised narrative for the top cluster hit in the current query (Step 6).
+   * Prepended to the codebase context block in the LLM system prompt.
+   */
+  activeClusterSummary?: {
+    clusterId: number;
+    summary: string;
+    purpose: string;
+    patterns: string[];
+    keyFiles: string[];
+    warnings: string[];
+  } | null;
   /** Deterministic policy decision used to size context and route tools */
   policyDecision: ACEPolicyDecision | null;
 }

@@ -40,29 +40,34 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	for (const err of errors) {
 		try {
-			// Map client error type to error_kind enum
-			const kind = err.type === 'fetch-failure' ? 'api' : 'runtime';
-			const severity = err.type === 'handleError' ? 'error' : 'warn';
+      // Map client error type to error_kind enum
+      const kind = err.type === 'fetch-failure' ? 'api' : 'runtime';
+      const severity = err.type === 'handleError' ? 'error' : 'warn';
 
-			await db.insert(errorEvents).values({
-				routePath: err.url || '/',
-				kind,
-				severity,
-				message: err.message,
-				stack: err.stack || null,
-				collectedAt: err.timestamp ? new Date(err.timestamp) : new Date(),
-			});
-			stored++;
+      // Sanitize client-provided strings before storing
+      const safeMessage = String(err.message ?? '').slice(0, 2000);
+      const safeStack = err.stack ? String(err.stack).slice(0, 5000) : null;
+      const safeUrl = String(err.url ?? '/').slice(0, 500);
 
-			// Dispatch error embedding (queue or inline fallback, fire-and-forget)
-			dispatchOrExecuteInline('error.embed', {
-				errorMessage: err.message,
-				routePath: err.url || '/',
-				stackTrace: err.stack || undefined,
-				severity,
-			}).catch(() => {});
-			published++;
-		} catch {
+      await db.insert(errorEvents).values({
+        routePath: safeUrl,
+        kind,
+        severity,
+        message: safeMessage,
+        stack: safeStack,
+        collectedAt: err.timestamp ? new Date(err.timestamp) : new Date(),
+      });
+      stored++;
+
+      // Dispatch error embedding (queue or inline fallback, fire-and-forget)
+      dispatchOrExecuteInline('error.embed', {
+        errorMessage: safeMessage,
+        routePath: safeUrl,
+        stackTrace: safeStack || undefined,
+        severity,
+      }).catch(() => {});
+      published++;
+    } catch {
 			// Continue processing remaining errors
 		}
 	}

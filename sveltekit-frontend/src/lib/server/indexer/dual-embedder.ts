@@ -17,7 +17,7 @@ import { SERVER_EMBEDDING_MODEL, SERVER_EMBEDDING_DIMS } from '$lib/ai/model-ids
 import type { CodeChunk } from './ast-chunker.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
-const QDRANT_COLLECTION = 'codebase_chunks';
+const QDRANT_COLLECTION = 'codebase_chunks_768';
 const BATCH_SIZE = 16;
 
 interface EmbeddingResult {

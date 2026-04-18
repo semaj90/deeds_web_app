@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+import { recordSearchQuery, recordQueryLog, queryHash as computeQueryHash } from '$lib/server/analytics/search-analytics.js';
 import type { RequestHandler } from './$types';
 import type {
 	RetrieveCandidatesRequest,
@@ -898,6 +899,25 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       diagnostics,
       timestamp: new Date().toISOString(),
     };
+
+    // Fire-and-forget: record into search-analytics pipeline (hot-query ring + rag_query_log)
+    recordSearchQuery({
+      query,
+      embedding,
+      pipeline:  'rag',
+      cacheHit:  diagnostics.cache.hit,
+      userId:    userId || undefined,
+    });
+    recordQueryLog({
+      query,
+      queryHash:    computeQueryHash(query),
+      userId:       userId || undefined,
+      caseId:       effectiveCaseId || undefined,
+      totalFound:   allChunks.length,
+      searchTimeMs: Math.round(performance.now() - startTime),
+      hybridSearch: hybridSearchUsed,
+      dagEnabled:   enableDAG,
+    });
 
     // Fire-and-forget: persist search query to DB for analytics/audit
     import('$lib/server/db/client')

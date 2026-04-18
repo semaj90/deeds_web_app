@@ -31,11 +31,12 @@
 		'yorha-panel-open': IconPanelOpen
 	};
 
-	let { name, size, class: className = '', label }: {
+	let { name, size, class: className = '', label, style: extraStyle = '' }: {
 		name: string;
 		size?: string | number;
 		class?: string;
 		label?: string;
+		style?: string;
 	} = $props();
 
 	let isYorha = $derived(name.startsWith('yorha-'));
@@ -59,7 +60,7 @@
 {:else}
 	<span
 		class="i-lucide-{name} inline-block {className}"
-		style={sizeStyle}
+		style={[sizeStyle, extraStyle].filter(Boolean).join(';')}
 		aria-hidden={label ? undefined : 'true'}
 		aria-label={label}
 		role={label ? 'img' : undefined}

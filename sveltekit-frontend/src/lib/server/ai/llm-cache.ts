@@ -9,10 +9,10 @@
  * - Similarity threshold 0.88 for cache hits (high precision for legal domain safety)
  */
 
-import { createHash } from 'crypto';
 import { QdrantManager, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { generateContextHash } from '$lib/server/cache-keys.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -46,17 +46,6 @@ function classifyQueryTier(query: string): CacheTier {
 	return 'default';
 }
 
-interface CacheEntry {
-	query: string;
-	queryEmbedding: number[];
-	contextHash: string;
-	response: string;
-	model: string;
-	confidence?: number;
-	cachedAt: string;
-	expiresAt: string;
-}
-
 interface CacheLookupResult {
 	hit: boolean;
 	response?: string;
@@ -64,13 +53,6 @@ interface CacheLookupResult {
 	similarity?: number;
 	cachedAt?: string;
 	model?: string;
-}
-
-/**
- * Generate a deterministic hash of the context to ensure cache hits only for identical context
- */
-function hashContext(context: string): string {
-	return createHash('md5').update(context).digest('hex');
 }
 
 /**
@@ -113,7 +95,7 @@ export async function lookupCachedResponse(params: {
 			return { hit: false };
 		}
 
-		const contextHash = hashContext(context);
+		const contextHash = generateContextHash(context);
 		const qdrant = new QdrantManager();
 
 		// Search for semantically similar cached queries
@@ -180,7 +162,7 @@ export async function storeCachedResponse(params: {
 	const { query, queryEmbedding, context, response, model, confidence } = params;
 
 	try {
-		const contextHash = hashContext(context);
+		const contextHash = generateContextHash(context);
 		const tier = classifyQueryTier(query);
 		const ttlSeconds = CACHE_TTL[tier];
 		const now = new Date();

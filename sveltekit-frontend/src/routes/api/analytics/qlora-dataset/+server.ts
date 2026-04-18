@@ -320,6 +320,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     import('$lib/server/retrieval/qlora-boost.js')
       .then(({ invalidateQloraBoostSet }) => invalidateQloraBoostSet())
       .catch(() => {});
+    // Invalidate research cache so /api/analytics/research-topics rebuilds with new examples
+    import('$lib/server/analytics/research-cache.js')
+      .then(({ invalidateResearchIndex }) => invalidateResearchIndex())
+      .catch(() => {});
   }
 
 	return json({

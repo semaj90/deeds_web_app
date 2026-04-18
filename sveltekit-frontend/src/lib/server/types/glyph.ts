@@ -18,11 +18,34 @@
 // ─── Section + Kind ───────────────────────────────────────────────────────────
 
 export type GlyphSection =
+  | 'PARTIES'
+  | 'JURISDICTION'
   | 'FACTS'
   | 'LEGAL_AUTHORITY'
   | 'CLAIMS'
   | 'PRAYER_HOLDING'
   | 'UNKNOWN';
+
+/** Map HMM raw state labels to canonical GlyphSection values. */
+export function hmmStateToGlyphSection(state: string): GlyphSection {
+  switch (state) {
+    case 'PARTIES':
+      return 'PARTIES';
+    case 'JURISDICTION':
+      return 'JURISDICTION';
+    case 'FACTS':
+      return 'FACTS';
+    case 'LEGAL_AUTHORITY':
+      return 'LEGAL_AUTHORITY';
+    case 'CLAIMS':
+      return 'CLAIMS';
+    case 'PRAYER':
+    case 'HOLDING':
+      return 'PRAYER_HOLDING';
+    default:
+      return 'UNKNOWN';
+  }
+}
 
 export type GlyphKind =
   | 'chunk'

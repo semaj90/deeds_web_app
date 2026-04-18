@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const parsed = saveSchema.safeParse(body);
 
 		if (!parsed.success) {
-			return json({ id: null, error: parsed.error.message }, { status: 400 });
+			return json({ id: null, error: 'Invalid synthesis data' }, { status: 400 });
 		}
 
 		const {

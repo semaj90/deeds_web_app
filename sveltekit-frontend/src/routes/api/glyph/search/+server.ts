@@ -165,9 +165,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const t3 = performance.now();
   let hits;
   try {
-    hits = await glyphBridge.search(queryEmb, glyphs, {
+    hits = await glyphBridge.search(queryEmb, glyphs as any, {
       topK,
-      sectionBias,
+      sectionBias: sectionBias as any,
       minReward,
     });
   } catch {

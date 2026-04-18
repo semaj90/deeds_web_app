@@ -6,7 +6,7 @@
 	let summary = $derived(data.summary);
 	let patterns = $derived(data.patterns);
 
-	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel'>('overview');
+	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research'>('overview');
 
 	interface PersonalizedCase {
 		caseId: string;
@@ -56,6 +56,99 @@
 		searchIntelLoading = false;
 	}
 
+	// ── Deep Research — self-prompting via RAG/KAG/DAG/ACE + feedback index ──
+	interface ResearchTopic {
+		id:          string;
+		title:       string;
+		description: string;
+		reasoning:   string;
+		priority:    'high' | 'medium' | 'low';
+		sources:     string[];
+		selfPrompt:  string;
+		tags:        string[];
+		pipelineHint: string;
+	}
+
+	interface FeedbackSignal {
+		queryHash:  string;
+		query:      string;
+		thumbsUp:   number;
+		thumbsDown: number;
+		pipeline:   string;
+	}
+
+	interface PipelineHitSummary {
+		pipeline:      string;
+		totalHits:     number;
+		uniqueChunks:  number;
+		uniqueQueries: number;
+		avgRerank:     number | null;
+		topChunkPath:  string | null;
+	}
+
+	interface DeepResearchData {
+		topics:            ResearchTopic[];
+		feedbackSignals:   FeedbackSignal[];
+		pipelineSummary:   PipelineHitSummary[];
+		graphInsights:     Array<{ caseId: string; title: string; centrality: number; sharedTypes: string[] }>;
+		hotQueryTags:      string[];
+		topPrompts:        string[];
+		generatedAt:       string | null;
+		modelUsed:         string | null;
+		cachedUntil:       string | null;
+	}
+
+	let deepResearch = $state<DeepResearchData | null>(null);
+	let deepResearchLoading = $state(false);
+	let deepResearchError = $state<string | null>(null);
+
+	// Self-prompt execution state
+	let executingPromptId = $state<string | null>(null);
+	let promptResult = $state<{ answer: string; pipeline: string; durationMs: number } | null>(null);
+
+	async function loadDeepResearch(refresh = false) {
+		if (deepResearch && !refresh) return;
+		deepResearchLoading = true;
+		deepResearchError = null;
+		try {
+			const url = refresh ? '/api/analytics/deep-research?refresh=true' : '/api/analytics/deep-research';
+			const res = await fetch(url);
+			if (res.ok) {
+				deepResearch = await res.json();
+			} else {
+				deepResearchError = 'Failed to load research topics';
+			}
+		} catch {
+			deepResearchError = 'Network error loading research topics';
+		}
+		deepResearchLoading = false;
+	}
+
+	async function executeSelfPrompt(topic: ResearchTopic) {
+		executingPromptId = topic.id;
+		promptResult = null;
+		try {
+			const res = await fetch('/api/analytics/deep-research', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					selfPrompt: topic.selfPrompt,
+					pipelineHint: topic.pipelineHint,
+				}),
+			});
+			if (res.ok) {
+				promptResult = await res.json();
+			}
+		} catch { /* non-fatal */ }
+		executingPromptId = null;
+	}
+
+	function priorityColor(p: string): string {
+		if (p === 'high') return 'rgba(248, 113, 113, 0.8)';
+		if (p === 'medium') return 'rgba(251, 191, 36, 0.7)';
+		return 'rgba(52, 211, 153, 0.7)';
+	}
+
 	function formatRate(rate: number): string {
 		return `${(rate * 100).toFixed(1)}%`;
 	}
@@ -95,12 +188,13 @@
 			{ id: 'patterns', label: 'Query Patterns', icon: 'activity' },
 			{ id: 'cache', label: 'Cache Performance', icon: 'database' },
 			{ id: 'search-intel', label: 'Search Intelligence', icon: 'search' },
+			{ id: 'deep-research', label: 'Deep Research', icon: 'brain' },
 			{ id: 'for-you', label: 'For You', icon: 'sparkles' }
 		] as tab}
 			<button
 				class="ana-tab"
 				class:active={activeTab === tab.id}
-				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); }}
+				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); if (tab.id === 'deep-research') loadDeepResearch(); }}
 			>
 				<Icon name={tab.icon} />
 				{tab.label}
@@ -433,6 +527,187 @@
 			<div class="ana-empty-center">
 				Failed to load search intelligence data.
 			</div>
+		{/if}
+	{/if}
+
+	{#if activeTab === 'deep-research'}
+		<div class="ana-card">
+			<div class="ana-card-head" style="display:flex;align-items:center;justify-content:space-between">
+				<div>
+					<h3 class="ana-card-title">Deep Research Topics</h3>
+					<p class="ana-card-desc">Self-prompting research topics generated from RAG/KAG/DAG/ACE hits, feedback signals, and graph analysis via Ollama</p>
+				</div>
+				<button class="dr-refresh-btn" onclick={() => loadDeepResearch(true)} disabled={deepResearchLoading}>
+					<Icon name="refresh-cw" />
+					{deepResearchLoading ? 'Generating…' : 'Regenerate'}
+				</button>
+			</div>
+
+			{#if deepResearchLoading}
+				<div class="ana-empty-center">Generating research topics via Ollama deep analysis…</div>
+			{:else if deepResearchError}
+				<div class="ana-empty-center">{deepResearchError}</div>
+			{:else if deepResearch?.topics?.length}
+				<div class="dr-topics-grid">
+					{#each deepResearch.topics as topic}
+						<div class="dr-topic-card" class:dr-priority-high={topic.priority === 'high'}>
+							<div class="dr-topic-header">
+								<span class="dr-priority-badge" style="color: {priorityColor(topic.priority)}">{topic.priority}</span>
+								<span class="dr-pipeline-badge">{topic.pipelineHint.toUpperCase()}</span>
+							</div>
+							<h4 class="dr-topic-title">{topic.title}</h4>
+							<p class="dr-topic-desc">{topic.description}</p>
+							<p class="dr-topic-reasoning">{topic.reasoning}</p>
+							<div class="dr-topic-tags">
+								{#each topic.tags as tag}
+									<span class="ana-rec-tag">{tag}</span>
+								{/each}
+							</div>
+							<div class="dr-topic-sources">
+								Sources: {topic.sources.join(', ')}
+							</div>
+							<div class="dr-topic-prompt">
+								<code class="dr-self-prompt">{topic.selfPrompt}</code>
+								<button
+									class="dr-execute-btn"
+									disabled={executingPromptId !== null}
+									onclick={() => executeSelfPrompt(topic)}
+								>
+									{executingPromptId === topic.id ? 'Running…' : 'Execute'}
+								</button>
+							</div>
+						</div>
+					{/each}
+				</div>
+
+				{#if promptResult}
+					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(96, 165, 250, 0.2)">
+						<div class="ana-card-head">
+							<h3 class="ana-card-title">Deep Research Result</h3>
+							<p class="ana-card-desc">Pipeline: {promptResult.pipeline} — {promptResult.durationMs}ms</p>
+						</div>
+						<div class="dr-result-text">{promptResult.answer}</div>
+					</div>
+				{/if}
+			{:else}
+				<div class="ana-empty-center">
+					No research topics generated yet. Click "Regenerate" to analyze your feedback signals and generate recommendations.
+				</div>
+			{/if}
+		</div>
+
+		<!-- Feedback Signals + Pipeline Summary side-by-side -->
+		{#if deepResearch && !deepResearchLoading}
+			<div class="ana-two-col">
+				<div class="ana-card">
+					<h3 class="ana-card-title">Feedback Index</h3>
+					<p class="ana-card-desc">Thumbs up/down signals driving research priority</p>
+					{#if deepResearch.feedbackSignals?.length}
+						<div class="ana-pattern-list">
+							{#each deepResearch.feedbackSignals.slice(0, 8) as sig}
+								<div class="ana-pattern-row">
+									<div class="ana-pattern-left">
+										<span class="ana-si-query">{sig.query}</span>
+										<span class="ana-rec-tag">{sig.pipeline}</span>
+									</div>
+									<div class="ana-pattern-right">
+										<span class="dr-thumb-up">+{sig.thumbsUp}</span>
+										<span class="dr-thumb-down">-{sig.thumbsDown}</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No feedback signals yet — vote on search results to build the index</p>
+					{/if}
+				</div>
+
+				<div class="ana-card">
+					<h3 class="ana-card-title">Pipeline Hit Summary</h3>
+					<p class="ana-card-desc">RAG/KAG/DAG/ACE retrieval distribution (7 days)</p>
+					{#if deepResearch.pipelineSummary?.length}
+						<div class="ana-cache-layers">
+							{#each deepResearch.pipelineSummary as pm}
+								<div class="ana-cache-row">
+									<span class="ana-cache-name">{pm.pipeline.toUpperCase()}</span>
+									<div class="ana-cache-meta">
+										<span>{pm.totalHits} hits</span>
+										<span>{pm.uniqueChunks} chunks</span>
+										<span>{pm.avgRerank != null ? (pm.avgRerank * 100).toFixed(0) + '%' : '—'}</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No pipeline data yet</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Graph Insights + Hot Tags + Top Prompts -->
+			<div class="ana-two-col">
+				<div class="ana-card">
+					<h3 class="ana-card-title">Graph Insights</h3>
+					<p class="ana-card-desc">Connected cases from knowledge graph analysis</p>
+					{#if deepResearch.graphInsights?.length}
+						<div class="ana-pattern-list">
+							{#each deepResearch.graphInsights.slice(0, 5) as gi}
+								<div class="ana-pattern-row">
+									<div class="ana-pattern-left">
+										<span class="ana-si-query">{gi.title || gi.caseId.slice(0, 12)}</span>
+										<div class="ana-si-tags">
+											{#each gi.sharedTypes.slice(0, 3) as st}
+												<span class="ana-rec-tag">{st}</span>
+											{/each}
+										</div>
+									</div>
+									<div class="ana-pattern-right">
+										<span class="ana-rec-score">{gi.centrality.toFixed(2)}</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No graph connections found</p>
+					{/if}
+				</div>
+
+				<div class="ana-card">
+					<h3 class="ana-card-title">Research Context</h3>
+					<p class="ana-card-desc">Hot query tags and top-clicked prompts feeding the research engine</p>
+					{#if deepResearch.hotQueryTags?.length || deepResearch.topPrompts?.length}
+						<div class="ana-cache-layers">
+							{#if deepResearch.hotQueryTags?.length}
+								<div class="ana-cache-row">
+									<span class="ana-cache-name">Hot Tags</span>
+									<div class="ana-si-tags" style="justify-content:flex-end">
+										{#each deepResearch.hotQueryTags.slice(0, 4) as tag}
+											<span class="ana-rec-tag">{tag.slice(0, 30)}</span>
+										{/each}
+									</div>
+								</div>
+							{/if}
+							{#each deepResearch.topPrompts?.slice(0, 4) ?? [] as prompt, i}
+								<div class="ana-cache-row">
+									<span class="ana-cache-name">Prompt #{i + 1}</span>
+									<span class="ana-si-query" style="text-align:right;max-width:16rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{prompt}</span>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No research context yet</p>
+					{/if}
+				</div>
+			</div>
+
+			{#if deepResearch.generatedAt}
+				<div class="dr-meta">
+					Generated {relativeTime(deepResearch.generatedAt)} via {deepResearch.modelUsed ?? 'unknown'}
+					{#if deepResearch.cachedUntil}
+						 — cached until {new Date(deepResearch.cachedUntil).toLocaleTimeString()}
+					{/if}
+				</div>
+			{/if}
 		{/if}
 	{/if}
 
@@ -783,5 +1058,155 @@
 		display: flex;
 		gap: 0.25rem;
 		flex-wrap: wrap;
+	}
+
+	/* ── Deep Research ── */
+	.dr-refresh-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.75rem !important;
+		font-size: 0.7rem;
+		font-weight: 600;
+		color: rgba(96, 165, 250, 0.85);
+		background: rgba(96, 165, 250, 0.08) !important;
+		border: 1px solid rgba(96, 165, 250, 0.2) !important;
+		border-radius: 0.375rem;
+		cursor: pointer;
+		transition: all 0.15s;
+		flex-shrink: 0;
+	}
+	.dr-refresh-btn:hover { background: rgba(96, 165, 250, 0.15) !important; }
+	.dr-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+	.dr-topics-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.75rem;
+		margin-top: 0.75rem;
+	}
+	@media (max-width: 768px) { .dr-topics-grid { grid-template-columns: 1fr; } }
+
+	.dr-topic-card {
+		background: rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(212, 199, 163, 0.06);
+		border-radius: 0.5rem;
+		padding: 0.875rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+		transition: border-color 0.15s;
+	}
+	.dr-topic-card:hover { border-color: rgba(212, 199, 163, 0.15); }
+	.dr-topic-card.dr-priority-high { border-left: 2px solid rgba(248, 113, 113, 0.4); }
+
+	.dr-topic-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.dr-priority-badge {
+		font-size: 0.6rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
+	.dr-pipeline-badge {
+		font-size: 0.55rem;
+		font-weight: 600;
+		padding: 0.1rem 0.35rem;
+		border-radius: 0.2rem;
+		background: rgba(96, 165, 250, 0.1);
+		color: rgba(96, 165, 250, 0.7);
+		letter-spacing: 0.04em;
+	}
+
+	.dr-topic-title {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.9);
+		margin: 0;
+		line-height: 1.3;
+	}
+	.dr-topic-desc {
+		font-size: 0.72rem;
+		color: rgba(212, 199, 163, 0.55);
+		line-height: 1.5;
+		margin: 0;
+	}
+	.dr-topic-reasoning {
+		font-size: 0.66rem;
+		color: rgba(212, 199, 163, 0.3);
+		font-style: italic;
+		margin: 0;
+	}
+	.dr-topic-tags {
+		display: flex;
+		gap: 0.25rem;
+		flex-wrap: wrap;
+	}
+	.dr-topic-sources {
+		font-size: 0.6rem;
+		color: rgba(212, 199, 163, 0.25);
+	}
+	.dr-topic-prompt {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		margin-top: 0.25rem;
+		padding-top: 0.375rem;
+		border-top: 1px solid rgba(212, 199, 163, 0.05);
+	}
+	.dr-self-prompt {
+		flex: 1;
+		font-size: 0.68rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		color: rgba(212, 199, 163, 0.45);
+		line-height: 1.4;
+		word-break: break-word;
+	}
+	.dr-execute-btn {
+		padding: 0.25rem 0.625rem !important;
+		font-size: 0.65rem;
+		font-weight: 600;
+		color: rgba(52, 211, 153, 0.85);
+		background: rgba(52, 211, 153, 0.08) !important;
+		border: 1px solid rgba(52, 211, 153, 0.2) !important;
+		border-radius: 0.25rem;
+		cursor: pointer;
+		transition: all 0.15s;
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+	.dr-execute-btn:hover { background: rgba(52, 211, 153, 0.15) !important; }
+	.dr-execute-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+	.dr-result-text {
+		font-size: 0.78rem;
+		color: rgba(212, 199, 163, 0.7);
+		line-height: 1.65;
+		white-space: pre-wrap;
+		max-height: 24rem;
+		overflow-y: auto;
+	}
+
+	.dr-thumb-up {
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: rgba(52, 211, 153, 0.8);
+		font-variant-numeric: tabular-nums;
+	}
+	.dr-thumb-down {
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: rgba(248, 113, 113, 0.7);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.dr-meta {
+		font-size: 0.62rem;
+		color: rgba(212, 199, 163, 0.2);
+		text-align: right;
+		padding: 0.25rem 0;
 	}
 </style>

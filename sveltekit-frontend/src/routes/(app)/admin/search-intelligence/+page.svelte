@@ -24,7 +24,7 @@
 	let loading     = $state(false);
 	let error       = $state<string | null>(null);
 	let autoRefresh = $state(false);
-	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training'>('queries');
+	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research'>('queries');
 
 	// Distillation runner state
 	let distillRunning  = $state(false);
@@ -61,6 +61,60 @@
 	let clusterNarrative    = $state<ClusterNarrative | null>(null);
 	let clusterNarrLoading  = $state(false);
 	let clusterNarrError    = $state<string | null>(null);
+
+	// ── Research topics state ─────────────────────────────────────────────────
+	type ResearchTopic = {
+		queryHash:       string;
+		query:           string;
+		pipeline:        string;
+		pipelines:       string[];
+		qualityTier:     string | null;
+		confidence:      number;
+		feedbackRatio:   number;
+		feedbackUp:      number;
+		feedbackDown:    number;
+		entityTags:      string[];
+		graphSummary:    string | null;
+		selfPromptChain: string[];
+	};
+	type ResearchData = {
+		topics:          ResearchTopic[];
+		seedTopics:      string[];
+		hotQueryTags:    string[];
+		graphExpansions: string[];
+		meta: {
+			pipeline:        string;
+			cacheBuiltAt:    string | null;
+			totalByPipeline: Record<string, number>;
+		};
+	};
+	let researchPipeline   = $state<'all' | 'ace' | 'rag' | 'kag' | 'dag' | 'codebase'>('all');
+	let researchDomains    = $state('typescript,sveltekit,ripgrep,ollama');
+	let researchLoading    = $state(false);
+	let researchData       = $state<ResearchData | null>(null);
+	let researchError      = $state<string | null>(null);
+	let expandedTopic      = $state<string | null>(null);
+
+	async function fetch_research_topics(rebuild = false) {
+		researchLoading = true;
+		researchError   = null;
+		try {
+			const params = new URLSearchParams({
+				pipeline: researchPipeline,
+				domains:  researchDomains,
+				limit:    '15',
+				depth:    '3',
+			});
+			if (rebuild) params.set('rebuild', '1');
+			const res = await fetch(`/api/analytics/research-topics?${params}`);
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			researchData = await res.json();
+		} catch (e) {
+			researchError = e instanceof Error ? e.message : String(e);
+		} finally {
+			researchLoading = false;
+		}
+	}
 
 	let data = $state<{
 		hotQueries:          HotQuery[];
@@ -175,6 +229,13 @@
 	$effect(() => {
 		void days; void temperature;
 		schedule_refresh();
+	});
+
+	// Load research topics when Research tab is opened
+	$effect(() => {
+		if (activeSection === 'research' && !researchData && !researchLoading) {
+			fetch_research_topics();
+		}
 	});
 
 	// Load leaderboard when Training tab is opened or section filter changes
@@ -416,6 +477,9 @@
 	</button>
 	<button class="s-tab" class:active={activeSection === 'training'} onclick={() => activeSection = 'training'}>
 		<Icon name="brain" class="w-3.5 h-3.5" /> Training
+	</button>
+	<button class="s-tab" class:active={activeSection === 'research'} onclick={() => activeSection = 'research'}>
+		<Icon name="telescope" class="w-3.5 h-3.5" /> Research
 	</button>
 </div>
 
@@ -1028,6 +1092,176 @@
 	</div>
 {/if}
 
+<!-- ══════════════════════════════════════════════════════════════════════
+     RESEARCH TOPICS — independent of search-patterns data
+══════════════════════════════════════════════════════════════════════ -->
+{#if activeSection === 'research'}
+<div class="si-grid">
+
+	<!-- Controls -->
+	<section class="panel span2">
+		<div class="research-controls">
+			<div class="ctrl-group">
+				<label class="ctrl-label">Pipeline</label>
+				<select bind:value={researchPipeline} class="ctrl-select" onchange={() => fetch_research_topics()}>
+					<option value="all">All pipelines</option>
+					<option value="ace">ACE</option>
+					<option value="rag">RAG</option>
+					<option value="kag">KAG</option>
+					<option value="dag">DAG</option>
+					<option value="codebase">Codebase</option>
+				</select>
+			</div>
+			<div class="ctrl-group" style="flex:1">
+				<label class="ctrl-label">Domains (comma-separated)</label>
+				<input
+					type="text"
+					bind:value={researchDomains}
+					class="ctrl-input"
+					placeholder="typescript,sveltekit,ripgrep,ollama,awk"
+				/>
+			</div>
+			<button class="btn-sm" onclick={() => fetch_research_topics(false)} disabled={researchLoading}>
+				<Icon name="refresh-cw" class="w-3 h-3" />
+				{researchLoading ? 'Loading…' : 'Refresh'}
+			</button>
+			<button class="btn-sm" onclick={() => fetch_research_topics(true)} disabled={researchLoading} title="Force-rebuild Redis index">
+				<Icon name="database" class="w-3 h-3" /> Rebuild
+			</button>
+		</div>
+		{#if researchData?.meta}
+			<p class="cache-hint">
+				Cache built: {researchData.meta.cacheBuiltAt
+					? new Date(researchData.meta.cacheBuiltAt).toLocaleTimeString()
+					: 'never'} &nbsp;·&nbsp;
+				{Object.entries(researchData.meta.totalByPipeline)
+					.filter(([, n]) => n > 0)
+					.map(([k, n]) => `${k}:${n}`)
+					.join(' · ')}
+			</p>
+		{/if}
+	</section>
+
+	<!-- Hot query tags + Graph expansions -->
+	{#if researchData && (researchData.hotQueryTags.length || researchData.graphExpansions.length || researchData.seedTopics.length)}
+	<section class="panel span2">
+		<h2><Icon name="zap" class="w-4 h-4 text-yellow-400" /> Live Signals</h2>
+		<div class="signal-row">
+			{#if researchData.hotQueryTags.length}
+			<div class="signal-group">
+				<span class="signal-label">Hot queries</span>
+				<div class="tag-cloud">
+					{#each researchData.hotQueryTags.slice(0,8) as q}
+						<span class="tag hot-tag" title={q}>{q.slice(0,50)}</span>
+					{/each}
+				</div>
+			</div>
+			{/if}
+			{#if researchData.graphExpansions.length}
+			<div class="signal-group">
+				<span class="signal-label">Graph-connected questions</span>
+				<ul class="signal-list">
+					{#each researchData.graphExpansions as exp}
+						<li>{exp}</li>
+					{/each}
+				</ul>
+			</div>
+			{/if}
+			{#if researchData.seedTopics.length}
+			<div class="signal-group">
+				<span class="signal-label">Domain seed topics</span>
+				<ul class="signal-list">
+					{#each researchData.seedTopics as st}
+						<li>{st}</li>
+					{/each}
+				</ul>
+			</div>
+			{/if}
+		</div>
+	</section>
+	{/if}
+
+	<!-- Research topic cards -->
+	{#if researchLoading && !researchData}
+		<section class="panel span2"><div class="empty">Building research index…</div></section>
+	{:else if researchError}
+		<section class="panel span2"><div class="empty error-text">{researchError}</div></section>
+	{:else if !researchData?.topics?.length}
+		<section class="panel span2">
+			<div class="empty">
+				No research topics yet. Run distillation first to populate the QLoRA examples, then rebuild the index.
+			</div>
+		</section>
+	{:else}
+		{#each researchData.topics as topic}
+		<section class="panel research-card" class:expanded={expandedTopic === topic.queryHash}>
+
+			<!-- Card header -->
+			<div class="rc-header" role="button" tabindex="0"
+				onclick={() => expandedTopic = expandedTopic === topic.queryHash ? null : topic.queryHash}
+				onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') expandedTopic = expandedTopic === topic.queryHash ? null : topic.queryHash; }}>
+				<div class="rc-meta">
+					<span class="pipeline-badge {topic.pipeline}">{topic.pipeline.toUpperCase()}</span>
+					{#if topic.qualityTier}
+						<span class="tier-badge {topic.qualityTier}">{topic.qualityTier}</span>
+					{/if}
+					<span class="rc-conf" title="Composite score">
+						{Math.round(topic.confidence * 100)}%
+					</span>
+					<span class="feedback-inline">
+						<Icon name="thumbs-up" class="w-3 h-3" />{topic.feedbackUp}
+						<Icon name="thumbs-down" class="w-3 h-3" />{topic.feedbackDown}
+					</span>
+				</div>
+				<p class="rc-query">{topic.query || '(no query text)'}</p>
+				{#if topic.entityTags.length}
+					<div class="rc-tags">
+						{#each topic.entityTags.slice(0,5) as tag}
+							<span class="tag">{tag}</span>
+						{/each}
+					</div>
+				{/if}
+			</div>
+
+			<!-- Expanded detail -->
+			{#if expandedTopic === topic.queryHash}
+			<div class="rc-detail">
+				{#if topic.graphSummary}
+					<p class="rc-graph-summary"><strong>Graph context:</strong> {topic.graphSummary}</p>
+				{/if}
+
+				{#if topic.selfPromptChain.length}
+				<div class="rc-chain">
+					<h4><Icon name="link" class="w-3.5 h-3.5" /> Self-prompt chain</h4>
+					<ol class="chain-list">
+						{#each topic.selfPromptChain as step, i}
+							<li class="chain-step">
+								<span class="step-num">{i + 1}</span>
+								<span class="step-text">{step}</span>
+							</li>
+						{/each}
+					</ol>
+				</div>
+				{:else}
+					<p class="muted chain-hint">No chain generated — run rebuild or use gold/platinum tier topics to trigger Ollama synthesis.</p>
+				{/if}
+
+				<div class="rc-pipelines">
+					<span class="muted">Pipelines: </span>
+					{#each topic.pipelines as pl}
+						<span class="pipeline-badge {pl}">{pl}</span>
+					{/each}
+				</div>
+			</div>
+			{/if}
+
+		</section>
+		{/each}
+	{/if}
+
+</div>
+{/if}
+
 </div>
 
 <style>
@@ -1438,4 +1672,65 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 /* ── Animations ─────────────────────────────────────────────────────────── */
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin 0.7s linear infinite; display: inline-block; }
+
+/* ── Research panel ────────────────────────────────────────────────────── */
+.research-controls {
+	display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap;
+}
+.ctrl-group { display: flex; flex-direction: column; gap: 0.25rem; }
+.ctrl-label { font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 0.04em; }
+.ctrl-select, .ctrl-input {
+	background: #181818; border: 1px solid #333; color: #ccc;
+	padding: 0.3rem 0.5rem; border-radius: 4px; font-size: 0.75rem;
+}
+.ctrl-input { min-width: 240px; }
+.cache-hint { font-size: 0.65rem; color: #555; margin-top: 0.5rem; }
+
+.signal-row { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.signal-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 180px; }
+.signal-label { font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 0.04em; }
+.signal-list { margin: 0; padding-left: 1rem; list-style: disc; }
+.signal-list li { font-size: 0.75rem; color: #aaa; margin-bottom: 0.2rem; }
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.hot-tag { background: #f59e0b18; border-color: #f59e0b40; color: #f59e0b; }
+
+.research-card { cursor: pointer; transition: border-color 0.15s; }
+.research-card:hover { border-color: #7c6ff740; }
+.research-card.expanded { border-color: #7c6ff7; }
+
+.rc-header { padding: 0; }
+.rc-meta { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+.rc-conf { font-size: 0.7rem; color: #a89cf5; font-weight: 600; }
+.feedback-inline { display: flex; align-items: center; gap: 0.2rem; font-size: 0.65rem; color: #666; margin-left: auto; }
+.rc-query { font-size: 0.8rem; color: #e0e0e0; line-height: 1.4; margin: 0 0 0.35rem; }
+.rc-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+.rc-detail { border-top: 1px solid #2a2a2a; padding-top: 0.75rem; margin-top: 0.75rem; }
+.rc-graph-summary { font-size: 0.72rem; color: #aaa; margin-bottom: 0.6rem; }
+.rc-chain h4 { font-size: 0.7rem; color: #7c6ff7; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.3rem; }
+.chain-list { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+.chain-step { display: flex; gap: 0.5rem; align-items: flex-start; }
+.step-num {
+	flex-shrink: 0; width: 1.2rem; height: 1.2rem; border-radius: 50%;
+	background: #7c6ff720; border: 1px solid #7c6ff750;
+	font-size: 0.6rem; color: #7c6ff7; display: flex; align-items: center; justify-content: center;
+	font-weight: 700; margin-top: 0.1rem;
+}
+.step-text { font-size: 0.75rem; color: #ccc; line-height: 1.4; }
+.chain-hint { font-size: 0.7rem; font-style: italic; margin: 0.3rem 0; }
+.rc-pipelines { margin-top: 0.6rem; display: flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
+
+.pipeline-badge { font-size: 0.58rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 600; }
+.pipeline-badge.ace      { background: #7c6ff718; border: 1px solid #7c6ff740; color: #a89cf5; }
+.pipeline-badge.rag      { background: #3b82f618; border: 1px solid #3b82f640; color: #93c5fd; }
+.pipeline-badge.kag      { background: #10b98118; border: 1px solid #10b98140; color: #6ee7b7; }
+.pipeline-badge.dag      { background: #f59e0b18; border: 1px solid #f59e0b40; color: #fcd34d; }
+.pipeline-badge.codebase { background: #ec489918; border: 1px solid #ec489940; color: #f9a8d4; }
+.pipeline-badge.reranker { background: #f9731618; border: 1px solid #f9731640; color: #fdba74; }
+
+.tier-badge { font-size: 0.58rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 600; }
+.tier-badge.platinum { background: #e2e8f018; border: 1px solid #e2e8f040; color: #e2e8f0; }
+.tier-badge.gold     { background: #f59e0b18; border: 1px solid #f59e0b40; color: #fcd34d; }
+.tier-badge.silver   { background: #9ca3af18; border: 1px solid #9ca3af40; color: #d1d5db; }
+.tier-badge.bronze   { background: #b4530918; border: 1px solid #b4530930; color: #fbbf24; }
 </style>

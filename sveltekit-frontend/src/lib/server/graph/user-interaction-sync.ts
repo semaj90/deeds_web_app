@@ -93,6 +93,21 @@ export async function syncUserInteractionToGraph(event: AnalyticsEvent): Promise
 
 			// Also embed the query into Qdrant (fire-and-forget)
 			embedSearchQuery(userId, query, eventType, ts).catch(() => {});
+		} else if (
+			['evidence_analyze', 'ai_summarize', 'vlm_analyze'].includes(eventType) &&
+			caseId
+		) {
+			// Track analysis actions — creates ANALYZED relationship
+			const evidenceId = payload?.evidenceId as string | undefined;
+			await session.run(
+				`MERGE (u:User {id: $userId})
+				 MERGE (c:Case {id: $caseId})
+				 MERGE (u)-[r:ANALYZED]->(c)
+				 SET r.lastAnalyzed = datetime({epochMillis: $ts}),
+				     r.analyzeCount = coalesce(r.analyzeCount, 0) + 1,
+				     r.evidenceId = CASE WHEN $evidenceId IS NOT NULL THEN $evidenceId ELSE r.evidenceId END`,
+				{ userId, caseId, ts, evidenceId: evidenceId ?? null }
+			);
 		}
 	} catch {
 		// Neo4j unavailable — silent failure (this is fire-and-forget)

@@ -21,8 +21,15 @@ import { selectPracticeTemplate } from './practice-templates.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { getTopQueryPatterns, getWeeklySummary } from '$lib/server/analytics/event-logger.js';
 import { applyStyle, type LegalPersona } from './style-adapter.js';
-import { webSearch, formatWebResultsAsContext } from '$lib/server/retrieval/web-search.js';
-import { searchWikipedia, formatWikipediaAsContext } from '$lib/server/retrieval/wikipedia-search.js';
+import {
+  webSearch,
+  formatWebResultsAsContext,
+  webSearchToUnified,
+} from '$lib/server/retrieval/web-search.js';
+import {
+  searchWikipedia,
+  formatWikipediaAsContext,
+} from '$lib/server/retrieval/wikipedia-search.js';
 import { fetchUserAnalyticsContext, fetchTopQueryTags } from './user-analytics-context.js';
 import {
   getCaseGraphNeighborIds,
@@ -41,7 +48,8 @@ import {
 } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from './policy.js';
-import { recordChunkHits, type ChunkHit } from '$lib/server/analytics/search-analytics.js';
+import { recordChunkHits, recordQueryLog, queryHash, type ChunkHit } from '$lib/server/analytics/search-analytics.js';
+import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -130,7 +138,9 @@ export async function assembleACEContext(opts: {
         ...(topQueryTags ?? []).slice(0, 3),
       ];
 
-      const toUnified = (c: RAGChunk): import('$lib/server/types/retrieval.js').UnifiedRetrievalResult => ({
+      const toUnified = (
+        c: RAGChunk
+      ): import('$lib/server/types/retrieval.js').UnifiedRetrievalResult => ({
         id: c.source,
         kind: 'legal_doc' as const,
         source: 'qdrant' as const,
@@ -139,11 +149,15 @@ export async function assembleACEContext(opts: {
         tags: [],
         sourceId: c.source,
       });
+      // P5-B: Apply QLoRA quality boost to RAG chunks (proven high-quality chunks get +0.05)
+      const allRag = ragChunks.map(toUnified);
+      await applyQloraBoost(allRag).catch(() => {});
+
       const baseContext: ACEContext = {
         userProfile,
         caseContext,
         glossaryMatches,
-        ragChunks: assignRanks(sortByBestScore(ragChunks.map(toUnified))),
+        ragChunks: assignRanks(sortByBestScore(allRag)),
         kbChunks: assignRanks(sortByBestScore(kbChunks.map(toUnified))),
         caseChunks: assignRanks(sortByBestScore(caseChunks.map(toUnified))),
         kagNeighbors,
@@ -165,6 +179,33 @@ export async function assembleACEContext(opts: {
         codebaseContext,
         policyDecision: null,
       };
+
+      // P3-A: cross-source reranking — web results compete with KB/case chunks in unified pool
+      const webUnified = webResults ? webSearchToUnified(webResults) : [];
+      if (webUnified.length) {
+        baseContext.ragChunks = assignRanks(
+          sortByBestScore([...baseContext.kbChunks, ...baseContext.caseChunks, ...webUnified])
+        );
+      }
+
+      // Step 6: fetch VLM cluster narrative for the top matched cluster
+      let activeClusterSummary: ACEContext['activeClusterSummary'] = null;
+      if (opts.enableCodebaseContext && codebaseContext?.length) {
+        const topCluster = codebaseContext[0]?.gpuCluster;
+        if (topCluster != null) {
+          try {
+            const { generateClusterSummary } = await import(
+              '$lib/server/indexer/cluster-summary.js'
+            );
+            activeClusterSummary = await generateClusterSummary(topCluster, false);
+          } catch {
+            /* non-fatal */
+          }
+        }
+      }
+      if (activeClusterSummary) {
+        (baseContext as ACEContext).activeClusterSummary = activeClusterSummary;
+      }
 
       const policyDecision = await tracePolicy(
         'ace-context',
@@ -195,8 +236,12 @@ export async function assembleACEContext(opts: {
 
       // Fire-and-forget: persist top chunks to ace_chunks for future cache hits
       if (caseId) {
-        persistACEChunks(caseId, finalContext.ragChunks, finalContext.kbChunks, finalContext.caseChunks)
-          .catch((err) => console.warn('[ACE persist] failed:', (err as Error)?.message ?? err));
+        persistACEChunks(
+          caseId,
+          finalContext.ragChunks,
+          finalContext.kbChunks,
+          finalContext.caseChunks
+        ).catch((err) => console.warn('[ACE persist] failed:', (err as Error)?.message ?? err));
       }
 
       // Fire-and-forget: record chunk hits for analytics (Step 17)
@@ -209,20 +254,36 @@ export async function assembleACEContext(opts: {
       else if (finalContext.ragChunks.length) {
         recordChunkHits(
           finalContext.ragChunks.map((c) => ({ id: c.id, score: c.score })),
-          query, 'rag', hitOpts
+          query,
+          'rag',
+          hitOpts
         );
       }
       if (codebaseContext?.length) {
         recordChunkHits(
           codebaseContext.map((c) => ({
-            id:         c.filePath,
+            id: c.filePath,
             relativePath: c.filePath,
             gpuCluster: c.gpuCluster ?? null,
-            score:      c.score,
+            score: c.score,
           })),
-          query, 'codebase', hitOpts
+          query,
+          'codebase',
+          hitOpts
         );
       }
+
+      // Fire-and-forget: persist per-query stats to rag_query_log (feeds search-patterns API)
+      recordQueryLog({
+        query,
+        queryHash: queryHash(query),
+        userId:     userId ?? undefined,
+        caseId:     caseId ?? undefined,
+        totalFound: aceHits.length + (codebaseContext?.length ?? 0),
+        searchTimeMs: Date.now() - policyStartedAt,
+        dagEnabled:   true,
+        hybridSearch: false,
+      });
 
       return finalContext;
     }
@@ -232,7 +293,7 @@ export async function assembleACEContext(opts: {
 // ── ACE Chunks Configuration ────────────────────────────────────────────
 
 /** Bump this when retrieval logic changes to invalidate stale cached chunks. */
-const ACE_PIPELINE_VERSION = '1.0.0';
+const ACE_PIPELINE_VERSION = '2.0.0';
 const ACE_EMBEDDING_MODEL = 'embeddinggemma:latest';
 const ACE_CHUNK_TTL_HOURS = 1;
 const ACE_MIN_QUALITY_SCORE = 0.5;
@@ -263,15 +324,18 @@ export async function persistACEChunks(
   const rows: Array<{ content: string; chunkType: string; source: string; score: number }> = [];
 
   for (const c of kbChunks.slice(0, 5)) {
-    if (c.score >= 0.4) rows.push({ content: c.content, chunkType: 'legal', source: c.source, score: c.score });
+    if (c.score >= 0.4)
+      rows.push({ content: c.content, chunkType: 'legal', source: c.source, score: c.score });
   }
   for (const c of caseChunks.slice(0, 5)) {
-    if (c.score >= 0.4) rows.push({ content: c.content, chunkType: 'evidence', source: c.source, score: c.score });
+    if (c.score >= 0.4)
+      rows.push({ content: c.content, chunkType: 'evidence', source: c.source, score: c.score });
   }
   // Only store merged ragChunks if tiered chunks are empty (backward compat)
   if (!kbChunks.length && !caseChunks.length) {
     for (const c of ragChunks.slice(0, 5)) {
-      if (c.score >= 0.4) rows.push({ content: c.content, chunkType: 'analysis', source: c.source, score: c.score });
+      if (c.score >= 0.4)
+        rows.push({ content: c.content, chunkType: 'analysis', source: c.source, score: c.score });
     }
   }
 
@@ -280,7 +344,9 @@ export async function persistACEChunks(
   // Generate embeddings in parallel (fail-tolerant: NULL on failure)
   const embeddings = await Promise.all(
     rows.map((r) =>
-      traceEmbedding(r.content, ACE_EMBEDDING_MODEL, () => getQueryEmbedding(r.content)).catch(() => null)
+      traceEmbedding(r.content, ACE_EMBEDDING_MODEL, () => getQueryEmbedding(r.content)).catch(
+        () => null
+      )
     )
   );
   const embeddedCount = embeddings.filter(Boolean).length;
@@ -349,10 +415,7 @@ export async function persistACEChunks(
  * Invalidate stale ace_chunks when pipeline version changes.
  * Called lazily on read — deletes chunks with outdated pipeline_version column.
  */
-async function invalidateStaleACEChunks(
-  pool: import('pg').Pool,
-  caseId: string
-): Promise<number> {
+async function invalidateStaleACEChunks(pool: import('pg').Pool, caseId: string): Promise<number> {
   const startMs = Date.now();
   try {
     const result = await pool.query(
@@ -363,7 +426,9 @@ async function invalidateStaleACEChunks(
     );
     const deleted = result.rowCount ?? 0;
     if (deleted > 0) {
-      console.log(`[ACE invalidate] purged ${deleted} stale chunks for case ${caseId.slice(0, 8)} (pipeline != ${ACE_PIPELINE_VERSION})`);
+      console.log(
+        `[ACE invalidate] purged ${deleted} stale chunks for case ${caseId.slice(0, 8)} (pipeline != ${ACE_PIPELINE_VERSION})`
+      );
       logInference({
         type: 'vector_search',
         backend: 'pgvector',
@@ -719,10 +784,34 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
       .slice(0, limits.codebaseContextCount)
       .map((c) => {
         const loc = c.lineStart ? `:${c.lineStart}${c.lineEnd ? `-${c.lineEnd}` : ''}` : '';
-        return `[${c.filePath}${loc}] (score: ${c.score.toFixed(2)})\n${truncate(c.content, limits.chunkChars)}`;
+        const meta = [
+          c.routeType ? `type:${c.routeType}` : '',
+          c.gpuCluster != null ? `cluster:${c.gpuCluster}` : '',
+          c.pageRankScore != null ? `rank:${c.pageRankScore.toFixed(2)}` : '',
+          c.hasAuthGuard ? 'auth-guarded' : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
+        const header = `[${c.filePath}${loc}]${meta ? ` (${meta})` : ''} score:${c.score.toFixed(2)}`;
+        return `${header}\n${truncate(c.content, limits.chunkChars)}`;
       })
       .join('\n\n');
-    lines.push(`\n## Codebase Context\n${codeLines}`);
+
+    // Step 6: prepend VLM cluster narrative when available
+    let clusterPrefix = '';
+    const acs = (
+      context as ACEContext & { activeClusterSummary?: ACEContext['activeClusterSummary'] }
+    ).activeClusterSummary;
+    if (acs?.summary) {
+      clusterPrefix =
+        `// CLUSTER ${acs.clusterId}: ${acs.purpose}\n` +
+        `// ${acs.summary}\n` +
+        (acs.patterns.length ? `// Patterns: ${acs.patterns.join(', ')}\n` : '') +
+        (acs.warnings.length ? `// Warnings: ${acs.warnings.join('; ')}\n` : '') +
+        '\n';
+    }
+
+    lines.push(`\n## Codebase Context\n${clusterPrefix}${codeLines}`);
     confidenceFactors.codebaseContext = Math.max(...context.codebaseContext.map((c) => c.score));
   }
 
@@ -1070,9 +1159,19 @@ async function fetchKBChunks(
       ...(graphFilter ? { filter: graphFilter } : {}),
     });
 
-    const [docResults, canonResults] = await Promise.all([
+    const [docResults, canonResults, kbResults] = await Promise.all([
       qdrantMgr.client.search('legal_documents', searchOpts(6, 0.45)).catch(() => []),
       qdrantMgr.client.search('legal_canon_chunks', searchOpts(4, 0.4)).catch(() => []),
+      // knowledge_base uses unnamed vectors (raw array, not named)
+      qdrantMgr.client
+        .search('knowledge_base', {
+          vector: embedding,
+          limit: 4,
+          score_threshold: 0.4,
+          with_payload: true,
+          ...(graphFilter ? { filter: graphFilter } : {}),
+        })
+        .catch(() => []),
     ]);
 
     const chunks: RAGChunk[] = [
@@ -1085,6 +1184,11 @@ async function fetchKBChunks(
         content: String(r.payload?.content ?? r.payload?.text ?? ''),
         score: r.score,
         source: String(r.payload?.source ?? 'kb:canon'),
+      })),
+      ...kbResults.map((r: any) => ({
+        content: String(r.payload?.content ?? r.payload?.text ?? ''),
+        score: r.score,
+        source: String(r.payload?.source ?? r.payload?.url ?? 'kb:knowledge'),
       })),
     ]
       .sort((a, b) => b.score - a.score)

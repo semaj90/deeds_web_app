@@ -79,7 +79,7 @@ export class GaussianSplatRenderer {
   private async _init(device: GPUDevice, config: SplatRenderConfig) {
     this.device  = device;
     this.context = config.canvas.getContext('webgpu') as GPUCanvasContext;
-    this.format  = navigator.gpu.getPreferredCanvasFormat();
+    this.format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
 
     this.context.configure({ device, format: this.format, alphaMode: 'premultiplied' });
 
@@ -91,34 +91,49 @@ export class GaussianSplatRenderer {
 
     // ── GPU Buffers ───────────────────────────────────────────────────────
     this.splatBuffer = device.createBuffer({
-      size:  config.splatData.byteLength,
+      size: config.splatData.byteLength,
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       mappedAtCreation: true,
     });
     new Uint8Array(this.splatBuffer.getMappedRange()).set(new Uint8Array(config.splatData));
     this.splatBuffer.unmap();
 
-    const splat2dBytes  = this.gaussianCount * 48;  // sizeof(Splat2D)
-    const sortKeyBytes  = this.gaussianCount * 16;  // sizeof(SortKey)
-    const tileCount     = this.tileW * this.tileH;
+    const splat2dBytes = this.gaussianCount * 48; // sizeof(Splat2D)
+    const sortKeyBytes = this.gaussianCount * 16; // sizeof(SortKey)
+    const tileCount = this.tileW * this.tileH;
 
-    this.splat2dBuffer  = device.createBuffer({ size: splat2dBytes,  usage: GPUBufferUsage.STORAGE });
-    this.sortKeyBuffer  = device.createBuffer({ size: sortKeyBytes,  usage: GPUBufferUsage.STORAGE });
-    this.tileRangeBuffer= device.createBuffer({ size: tileCount * 8, usage: GPUBufferUsage.STORAGE });
-    this.visibleCountBuf= device.createBuffer({ size: 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC });
-    this.cameraUBO      = device.createBuffer({ size: 144, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-    this.renderConfigUBO= device.createBuffer({ size: 16,  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+    this.splat2dBuffer = device.createBuffer({ size: splat2dBytes, usage: GPUBufferUsage.STORAGE });
+    this.sortKeyBuffer = device.createBuffer({ size: sortKeyBytes, usage: GPUBufferUsage.STORAGE });
+    this.tileRangeBuffer = device.createBuffer({
+      size: tileCount * 8,
+      usage: GPUBufferUsage.STORAGE,
+    });
+    this.visibleCountBuf = device.createBuffer({
+      size: 4,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
+    this.cameraUBO = device.createBuffer({
+      size: 144,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+    this.renderConfigUBO = device.createBuffer({
+      size: 16,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
 
     // Output texture (storageTexture binding for rasterize, sampled by blit)
     this.outputTexture = device.createTexture({
-      size:   [W, H],
+      size: [W, H],
       format: 'rgba8unorm',
-      usage:  GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
+      usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
     });
 
     // Write static config
-    device.queue.writeBuffer(this.renderConfigUBO, 0,
-      new Uint32Array([W, H, this.tileW, this.tileH]));
+    device.queue.writeBuffer(
+      this.renderConfigUBO,
+      0,
+      new Uint32Array([W, H, this.tileW, this.tileH])
+    );
 
     // ── Shaders ───────────────────────────────────────────────────────────
     const [prepSrc, rastSrc, sortSrc] = await Promise.all([
@@ -127,26 +142,26 @@ export class GaussianSplatRenderer {
       this._bitonicSortWGSL(),
     ]);
 
-    const prepModule  = device.createShaderModule({ label: 'gauss-preprocess', code: prepSrc });
-    const sortModule  = device.createShaderModule({ label: 'gauss-sort',       code: sortSrc });
-    const rastModule  = device.createShaderModule({ label: 'gauss-rasterize',  code: rastSrc });
+    const prepModule = device.createShaderModule({ label: 'gauss-preprocess', code: prepSrc });
+    const sortModule = device.createShaderModule({ label: 'gauss-sort', code: sortSrc });
+    const rastModule = device.createShaderModule({ label: 'gauss-rasterize', code: rastSrc });
 
     // ── Pipelines ─────────────────────────────────────────────────────────
     this.preprocessPipeline = device.createComputePipeline({
-      label:   'gauss-preprocess',
-      layout:  'auto',
+      label: 'gauss-preprocess',
+      layout: 'auto',
       compute: { module: prepModule, entryPoint: 'main' },
     });
 
     this.sortPipeline = device.createComputePipeline({
-      label:   'gauss-sort',
-      layout:  'auto',
+      label: 'gauss-sort',
+      layout: 'auto',
       compute: { module: sortModule, entryPoint: 'main' },
     });
 
     this.rasterPipeline = device.createComputePipeline({
-      label:   'gauss-rasterize',
-      layout:  'auto',
+      label: 'gauss-rasterize',
+      layout: 'auto',
       compute: { module: rastModule, entryPoint: 'main' },
     });
 
@@ -155,7 +170,7 @@ export class GaussianSplatRenderer {
 
     // ── Bind Groups ───────────────────────────────────────────────────────
     this.preprocessBG = device.createBindGroup({
-      layout: this.preprocessPipeline.getBindGroupLayout(0),
+      layout: this.preprocessPipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
       entries: [
         { binding: 0, resource: { buffer: this.splatBuffer } },
         { binding: 1, resource: { buffer: this.splat2dBuffer } },
@@ -166,7 +181,7 @@ export class GaussianSplatRenderer {
     });
 
     this.rasterBG = device.createBindGroup({
-      layout: this.rasterPipeline.getBindGroupLayout(0),
+      layout: this.rasterPipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
       entries: [
         { binding: 0, resource: { buffer: this.splat2dBuffer } },
         { binding: 1, resource: { buffer: this.tileRangeBuffer } },
@@ -176,9 +191,12 @@ export class GaussianSplatRenderer {
     });
 
     this.blitBG = device.createBindGroup({
-      layout: this.blitPipeline.getBindGroupLayout(0),
+      layout: this.blitPipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
       entries: [
-        { binding: 0, resource: device.createSampler({ magFilter: 'linear', minFilter: 'linear' }) },
+        {
+          binding: 0,
+          resource: device.createSampler({ magFilter: 'linear', minFilter: 'linear' }),
+        },
         { binding: 1, resource: this.outputTexture.createView() },
       ],
     });
