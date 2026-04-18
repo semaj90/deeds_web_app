@@ -353,6 +353,18 @@ export async function crawlWebResearch(
 		}))).catch(() => {});
 	}).catch(() => {});
 
+	// ── RL audit trail: research event per crawl run ─────────────────────────
+	import('$lib/server/db/client').then(({ db }) =>
+		import('$lib/server/db/schema-postgres.js').then(({ contextTimeline }) =>
+			db.insert(contextTimeline).values({
+				sessionId: '',
+				eventType: 'research',
+				pipeline:  pipeline as 'ace' | 'rag' | 'kag' | 'dag' | 'codebase',
+				payload:   { query, queryHash: qHash, results: summaries.length, provider: searchRes.provider, searchMs: searchRes.searchMs } as Record<string, unknown>,
+			}).catch(() => {})
+		)
+	).catch(() => {});
+
 	return {
 		query,
 		queryHash:  qHash,
@@ -632,7 +644,9 @@ export async function crawlLegalCorpus(
 			entityTags:     s.entityTags,
 			relevanceScore: s.relevanceScore,
 			userId:         null,
-		}))).catch(() => {});
+		})))
+			.then(inserted => maybeTriggerGraphRebuild(inserted).catch(() => {}))
+			.catch(() => {});
 	}).catch(() => {});
 
 	// Proactively warm the TurboQuant KV prefix for this corpus query.

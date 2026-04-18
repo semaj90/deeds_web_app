@@ -201,17 +201,17 @@ async function toggleRelated(id: string) {
 	relatedItems   = [];
 	relatedLoading = true;
 
-	// Opening "Related" is a dwell_long intent signal — fire RL signal
+	// Opening "Related" is a dwell_long intent signal — route through rl-signal to update pipeline weights
 	const row = data?.summaries.find(s => s.id === id);
 	if (row) {
-		fetch('/api/analytics/context-timeline', {
+		fetch('/api/analytics/rl-signal', {
 			method:  'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				eventType: 'feedback',
 				signal:    'dwell_long',
-				pipeline:  row.pipeline ?? 'ace',
-				payload:   { summaryId: id, trigger: 'related_panel_open' },
+				pipeline:  (row.pipeline ?? 'ace') as 'ace' | 'rag' | 'kag' | 'dag' | 'codebase',
+				summaryId: id,
+				payload:   { trigger: 'related_panel_open' },
 			}),
 		}).catch(() => {});
 	}

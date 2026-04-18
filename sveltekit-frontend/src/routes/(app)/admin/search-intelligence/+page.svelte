@@ -113,6 +113,49 @@
 	let graphBuilding  = $state(false);
 	let graphBuildMsg  = $state<string | null>(null);
 
+	// ── RL Audit Trail (context_timeline) ────────────────────────────────────
+	type TimelineEvent = {
+		id: string; eventType: string; pipeline: string; sessionId: string;
+		signal: string | null; grpoReward: number | null; pipelineWeightAfter: number | null;
+		triggeredRebuild: boolean; hyperedgeHash: string | null;
+		payload: Record<string, unknown>; createdAt: string;
+	};
+	let tlEvents      = $state<TimelineEvent[]>([]);
+	let tlLoading     = $state(false);
+	let tlError       = $state<string | null>(null);
+	let tlNextCursor  = $state<string | null>(null);
+	let tlEventType   = $state('');
+	let tlPipeline    = $state('');
+
+	async function fetch_timeline(cursor?: string) {
+		tlLoading = true;
+		tlError   = null;
+		try {
+			const params = new URLSearchParams({ limit: '20' });
+			if (cursor)       params.set('cursor',    cursor);
+			if (tlEventType)  params.set('eventType', tlEventType);
+			if (tlPipeline)   params.set('pipeline',  tlPipeline);
+			const res = await fetch(`/api/analytics/context-timeline?${params}`);
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const d = await res.json() as { events: TimelineEvent[]; nextCursor: string | null };
+			if (cursor) {
+				tlEvents = [...tlEvents, ...(d.events ?? [])];
+			} else {
+				tlEvents = d.events ?? [];
+			}
+			tlNextCursor = d.nextCursor ?? null;
+		} catch (e) {
+			tlError = e instanceof Error ? e.message : String(e);
+		} finally {
+			tlLoading = false;
+		}
+	}
+
+	$effect(() => {
+		void tlEventType; void tlPipeline;
+		if (activeSection === 'graph') void fetch_timeline();
+	});
+
 	async function fetch_graph() {
 		graphLoading = true;
 		graphError   = null;
@@ -1770,6 +1813,87 @@
 		{/if}
 	</section>
 
+	<!-- ── RL Audit Trail ──────────────────────────────────────────────────── -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="activity" class="w-4 h-4" /> RL Audit Trail</span>
+			<span class="panel-sub">Live <code>context_timeline</code> events — feedback, citations, summaries, adapts, tool calls</span>
+			<div style="display:flex;gap:0.4rem;margin-left:auto;align-items:center">
+				<select
+					class="ctrl-select"
+					bind:value={tlEventType}
+					title="Filter by event type"
+				>
+					<option value="">All events</option>
+					<option value="feedback">feedback</option>
+					<option value="citation">citation</option>
+					<option value="summary">summary</option>
+					<option value="rl_adapt">rl_adapt</option>
+					<option value="tool_call">tool_call</option>
+					<option value="research">research</option>
+				</select>
+				<select
+					class="ctrl-select"
+					bind:value={tlPipeline}
+					title="Filter by pipeline"
+				>
+					<option value="">All pipelines</option>
+					<option value="ace">ace</option>
+					<option value="rag">rag</option>
+					<option value="kag">kag</option>
+					<option value="dag">dag</option>
+					<option value="codebase">codebase</option>
+				</select>
+				<button class="btn-sm btn-ghost" disabled={tlLoading} onclick={() => fetch_timeline()}>
+					<Icon name="refresh-cw" class="w-3 h-3" />
+				</button>
+			</div>
+		</div>
+		{#if tlError}
+			<p class="err-inline"><Icon name="alert-triangle" class="w-3.5 h-3.5" /> {tlError}</p>
+		{:else if tlLoading && tlEvents.length === 0}
+			<p class="loading-note"><Icon name="loader" class="w-4 h-4 spin" /> Loading audit trail…</p>
+		{:else if tlEvents.length === 0}
+			<p class="empty-note"><Icon name="info" class="w-4 h-4" /> No events yet — interact with the system to generate RL signals.</p>
+		{:else}
+			<table class="data-table tl-table">
+				<thead><tr>
+					<th>Time</th><th>Event</th><th>Pipeline</th><th>Signal</th>
+					<th class="r-cell">Reward</th><th class="r-cell">Weight after</th><th>Rebuild</th><th>Payload</th>
+				</tr></thead>
+				<tbody>
+					{#each tlEvents as ev}
+						{@const cfg = PIPELINE_CFG[ev.pipeline]}
+						{@const reward = ev.grpoReward}
+						<tr>
+							<td class="tl-time">{new Date(ev.createdAt).toLocaleTimeString()}</td>
+							<td><span class="tl-event-badge {ev.eventType}">{ev.eventType}</span></td>
+							<td><span class="pipeline-badge {ev.pipeline}" style="color:{cfg?.color ?? '#9ca3af'}">{ev.pipeline}</span></td>
+							<td class="muted">{ev.signal ?? '—'}</td>
+							<td class="r-cell" style="color:{reward != null ? (reward >= 0 ? '#4ade80' : '#f87171') : '#6b7280'}">
+								{reward != null ? (reward >= 0 ? '+' : '') + reward.toFixed(3) : '—'}
+							</td>
+							<td class="r-cell muted">{ev.pipelineWeightAfter != null ? ev.pipelineWeightAfter.toFixed(3) : '—'}</td>
+							<td class="r-cell">{ev.triggeredRebuild ? '✓' : ''}</td>
+							<td class="tl-payload muted">
+								{#if ev.payload && Object.keys(ev.payload).length}
+									{Object.entries(ev.payload).slice(0, 3).map(([k,v]) => `${k}:${typeof v === 'number' ? (v as number).toFixed(2) : String(v).slice(0,20)}`).join(' · ')}
+								{:else}—{/if}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+			{#if tlNextCursor}
+				<div style="text-align:center;margin-top:0.75rem">
+					<button class="btn-sm btn-ghost" disabled={tlLoading} onclick={() => fetch_timeline(tlNextCursor ?? undefined)}>
+						{tlLoading ? 'Loading…' : 'Load more'}
+					</button>
+				</div>
+			{/if}
+		{/if}
+	</section>
+
 	<!-- ── Agent Test ───────────────────────────────────────────────────────── -->
 	<section class="panel span2">
 		<div class="panel-hdr">
@@ -2417,4 +2541,25 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 	font-size: 0.75rem; color: #d4c7a3; line-height: 1.6;
 	white-space: pre-wrap; word-break: break-word; margin: 0;
 }
+
+/* ── RL Audit Trail ─────────────────────────────────────────────────────── */
+.tl-table { font-size: 0.68rem; }
+.tl-time  { color: #6b7280; white-space: nowrap; font-size: 0.65rem; }
+.tl-payload { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.65rem; }
+.tl-event-badge {
+	display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px;
+	font-size: 0.65rem; font-weight: 600; letter-spacing: 0.04em;
+	border: 1px solid;
+}
+.tl-event-badge.feedback   { color: #60a5fa; border-color: #60a5fa44; background: #60a5fa0d; }
+.tl-event-badge.citation   { color: #f59e0b; border-color: #f59e0b44; background: #f59e0b0d; }
+.tl-event-badge.summary    { color: #4ade80; border-color: #4ade8044; background: #4ade800d; }
+.tl-event-badge.rl_adapt   { color: #a78bfa; border-color: #a78bfa44; background: #a78bfa0d; }
+.tl-event-badge.tool_call  { color: #f87171; border-color: #f8717144; background: #f871710d; }
+.tl-event-badge.research   { color: #38bdf8; border-color: #38bdf844; background: #38bdf80d; }
+.ctrl-select {
+	height: 1.75rem; padding: 0 0.5rem; font-size: 0.7rem; font-family: inherit;
+	background: #13120f; border: 1px solid #2d2b24; border-radius: 4px; color: #9ca3af; cursor: pointer;
+}
+.ctrl-select:focus { outline: none; border-color: #7c6ff7; }
 </style>

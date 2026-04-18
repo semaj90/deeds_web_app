@@ -90,9 +90,58 @@
       onsave?.(message.id);
     }
   }
+
+  // ── Dwell tracking (assistant messages only) ─────────────────────────────
+  // Sends dwell_short after 2s in viewport, dwell_long after 8s.
+  // Fires at most once per signal per message to avoid spam.
+
+  let messageEl = $state<HTMLDivElement | null>(null);
+
+  $effect(() => {
+    if (!isAssistant || !message?.metadata?.queryHash || typeof IntersectionObserver === 'undefined') return;
+
+    const pipeline = (message.metadata?.pipeline ?? 'ace') as 'ace' | 'rag' | 'kag' | 'dag' | 'codebase';
+    const hyperedgeHash = message.metadata?.hyperedgeHash;
+    let shortFired = false;
+    let longFired  = false;
+    let shortTimer: ReturnType<typeof setTimeout> | null = null;
+    let longTimer:  ReturnType<typeof setTimeout> | null = null;
+
+    function fireSignal(signal: 'dwell_short' | 'dwell_long') {
+      fetch('/api/analytics/rl-signal', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signal, pipeline, hyperedgeHash, payload: { queryHash: message.metadata?.queryHash } }),
+      }).catch(() => {});
+    }
+
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (!shortFired) {
+          shortTimer = setTimeout(() => { shortFired = true; fireSignal('dwell_short'); }, 2_000);
+        }
+        if (!longFired) {
+          longTimer  = setTimeout(() => { longFired  = true; fireSignal('dwell_long');  }, 8_000);
+        }
+      } else {
+        if (shortTimer) { clearTimeout(shortTimer); shortTimer = null; }
+        if (longTimer)  { clearTimeout(longTimer);  longTimer  = null; }
+      }
+    }, { threshold: 0.5 });
+
+    const el = messageEl;
+    if (el) obs.observe(el);
+
+    return () => {
+      obs.disconnect();
+      if (shortTimer) clearTimeout(shortTimer);
+      if (longTimer)  clearTimeout(longTimer);
+    };
+  });
 </script>
 
 <div
+  bind:this={messageEl}
   class="chat-message-container flex gap-3 py-2"
   class:justify-end={isUser}
   onmouseenter={() => showActions = true}
