@@ -3709,3 +3709,30 @@ export const researchSummaries = pgTable('research_summaries', {
 export type ResearchSummary    = typeof researchSummaries.$inferSelect;
 export type NewResearchSummary = typeof researchSummaries.$inferInsert;
 
+// ── User Research Tasks ───────────────────────────────────────────────────────
+// Persistent task list created from text highlights, deep-research topics, or
+// manual entry. Anonymous tasks use sessionId only; logged-in tasks sync to user.
+export const userResearchTasks = pgTable('user_research_tasks', {
+  id:           uuid('id').defaultRandom().primaryKey(),
+  userId:       uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  sessionId:    text('session_id'),
+  title:        text('title').notNull(),
+  selfPrompt:   text('self_prompt').notNull(),
+  pipelineHint: text('pipeline_hint').notNull().default('ace'),
+  priority:     text('priority').notNull().default('medium'),
+  status:       text('status').notNull().default('pending'),
+  sourceText:   text('source_text'),
+  summary:      text('summary'),
+  result:       jsonb('result'),
+  notified:     boolean('notified').notNull().default(false),
+  createdAt:    timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  completedAt:  timestamp('completed_at', { withTimezone: true }),
+}, (t) => [
+  index('urt_user_status').on(t.userId, t.status),
+  index('urt_user_created').on(t.userId, t.createdAt),
+  index('urt_session').on(t.sessionId),
+]);
+
+export type UserResearchTask    = typeof userResearchTasks.$inferSelect;
+export type NewUserResearchTask = typeof userResearchTasks.$inferInsert;
+
