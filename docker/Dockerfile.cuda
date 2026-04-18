@@ -1,72 +1,176 @@
-# Legal AI Evidence Processing System - CUDA GPU Runtime
-# RTX 3060 Ti (SM 86) Optimized
-# Build: docker build -f docker/Dockerfile.cuda -t legal-ai-gpu .
+# Legal AI Evidence Processing System — PyTorch CUDA Runtime
+# RTX 3060 Ti (Ampere sm_86) Optimized — CUDA 12.6 / cuDNN 9
+#
+# Build:
+#   docker build -f docker/Dockerfile.cuda -t legal-ai-gpu .
+#
+# Key capabilities added over base pytorch image:
+#   • FlashAttention-2    — fused O(n) attention, 2-4× faster transformer decode
+#   • xformers            — memory-efficient attention + sparse ops
+#   • Triton              — GPU JIT compiler powering torch.compile() kernels
+#   • bitsandbytes        — INT8/INT4 quantization for legal LLMs (runs on sm_86)
+#   • DeepSpeed           — ZeRO optimizer stages for large model inference
+#   • CUTLASS 3.7         — custom GEMM/convolution kernels
+#   • torchvision/audio   — vision pipeline + Whisper-based audio transcription
+#   • accelerate          — HuggingFace model parallel + device-map auto
+#   • torch.compile()     — inductor backend + Triton sm_86 kernel cache (persistent)
+#   • cuGraph / PyG       — GPU community detection + HypergraphConv (optional profile)
+#
+# torch.compile() — how it works in Docker
+# ─────────────────────────────────────────
+# PyTorch ≥ 2.0 added torch.compile(model, backend='inductor').
+# The C compiler analogy: TorchInductor is the ML-aware JIT compiler that lowers
+# PyTorch ops → Triton kernels → PTX → sm_86 SASS.
+# Without persistent cache dirs every container restart recompiles all kernels
+# (~10-30 min first call). The three env vars below point TorchInductor and Triton
+# at volume-backed dirs so compiled .cubin/.ttgir artefacts survive restarts.
+#
+# docker-compose.yml should mount:
+#   torchinductor_cache:/app/.cache/torchinductor
+#   triton_cache:/app/.cache/triton
+#   torch_extensions:/app/.torch_extensions
 
-FROM nvidia/cuda:12.0-devel-ubuntu22.04
+# ── Base: PyTorch 2.11.0 + CUDA 12.6 + cuDNN 9 ────────────────────────────────
+# Official PyTorch devel image ships NVCC, cuBLAS, cuSPARSE, cuDNN, NCCL.
+# Pulls ~11.9 GB; pin a digest in CI for reproducibility.
+FROM pytorch/pytorch:2.11.0-cuda12.6-cudnn9-devel
 
-# Set environment variables
+# ── Target architecture: RTX 3060 Ti (Ampere sm_86) ───────────────────────────
+# TORCH_CUDA_ARCH_LIST restricts kernel compilation to sm_86 only — avoids
+# generating unused sm_70/sm_75/sm_80/sm_89 PTX and cuts build time ~60%.
+# PYTORCH_CUDA_ALLOC_CONF: expandable_segments avoids fragmentation on 8 GB VRAM.
+#
+# torch.compile() cache dirs (CRITICAL — without these, every restart recompiles):
+#   TORCHINDUCTOR_CACHE_DIR — TorchInductor lowered-kernel artefacts (.ttgir, .cubin)
+#   TRITON_CACHE_DIR        — Triton PTX → SASS compiled kernels
+#   TORCH_EXTENSIONS_DIR    — C++/CUDA extension .so files (libtorch_graph, simdJson)
+#
+# TORCHINDUCTOR_COMPILE_THREADS=4 — parallel Triton kernel compilation threads.
+#   Set to nproc/2 to avoid OOM; 4 is safe on 8-core hosts.
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     CUDA_HOME=/usr/local/cuda \
     PATH=/usr/local/cuda/bin:${PATH} \
-    LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH} \
+    TORCH_CUDA_ARCH_LIST="8.6" \
+    TORCH_EXTENSIONS_DIR="/app/.torch_extensions" \
+    PYTORCH_CUDA_ALLOC_CONF="max_split_size_mb:256,expandable_segments:True" \
+    CUDA_LAUNCH_BLOCKING=0 \
+    NCCL_DEBUG=WARN \
+    TORCHINDUCTOR_CACHE_DIR="/app/.cache/torchinductor" \
+    TRITON_CACHE_DIR="/app/.cache/triton" \
+    TORCHINDUCTOR_COMPILE_THREADS="4" \
+    TORCH_COMPILE_DEBUG="0"
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# ── System packages ────────────────────────────────────────────────────────────
+RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     build-essential \
+    ninja-build \
     git \
     wget \
     curl \
-    python3.11 \
-    python3.11-dev \
-    python3-pip \
     libpython3.11-dev \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Python 3.11 as default
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+# ── CUTLASS v3.7 — custom GEMM kernels, sm_86 targeted ────────────────────────
+# Used by FlashAttention and the libtorch_graph.cc N-API bridge.
+RUN git clone --depth 1 --branch v3.7.0 \
+    https://github.com/NVIDIA/cutlass.git /opt/cutlass
 
-# Install CUTLASS (optional, for advanced optimization)
-RUN git clone https://github.com/NVIDIA/cutlass.git /opt/cutlass && \
-    cd /opt/cutlass && \
-    git checkout v3.4.0
+# ── Python ML dependencies ─────────────────────────────────────────────────────
+RUN pip install --upgrade pip setuptools wheel
 
-# Install Python build tools
-RUN pip3 install --upgrade pip setuptools wheel && \
-    pip3 install pybind11 numpy
+# torchvision + torchaudio: pinned to PyTorch 2.11.0 + CUDA 12.6
+RUN pip install \
+    "torchvision==0.26.0" \
+    "torchaudio==2.11.0" \
+    --extra-index-url https://download.pytorch.org/whl/cu126
 
-# Copy source code
+# Triton: JIT compiler that powers torch.compile() — sm_86 kernels.
+# PyTorch 2.11.0 bundles a compatible version; install standalone to get
+# the latest sm_86 optimizations and ensure TRITON_CACHE_DIR is honoured.
+RUN pip install triton
+
+# xformers: memory-efficient attention (transformers, diffusion models)
+RUN pip install xformers --extra-index-url https://download.pytorch.org/whl/cu126
+
+# FlashAttention-2: fused O(n) attention — 2-4× faster on Ampere.
+# --no-build-isolation uses already-installed torch/triton; requires nvcc ≥ 12.3.
+RUN pip install flash-attn --no-build-isolation
+
+# bitsandbytes: INT8/INT4 quantization runtime for quantized legal LLMs
+RUN pip install bitsandbytes
+
+# DeepSpeed: ZeRO inference + kernel fusion for large model serving.
+# DS_BUILD_OPS=1 compiles sm_86 CUDA ops (fused Adam, sparse attention, etc.)
+RUN DS_BUILD_OPS=1 \
+    TORCH_CUDA_ARCH_LIST="8.6" \
+    pip install deepspeed
+
+# accelerate + transformers: HuggingFace device-map auto + mixed precision
+RUN pip install accelerate transformers
+
+# cuGraph + PyG: GPU community detection (Louvain) + HypergraphConv CUDA kernel.
+# cuGraph-ops is the lightweight GPU-only backend; full cuGraph requires ~2GB extra.
+# Optional — comment out if not using community detection / GNN training.
+RUN pip install \
+    torch-geometric \
+    --extra-index-url https://data.pyg.org/whl/torch-2.11.0+cu126.html || \
+    echo "PyG install failed — HypergraphConv CUDA kernel unavailable, CPU fallback active"
+
+# Vector search + embedding + gRPC deps
+RUN pip install \
+    pybind11 \
+    numpy \
+    scipy \
+    sentence-transformers \
+    qdrant-client \
+    grpcio \
+    grpcio-tools
+
+# ── Application source ─────────────────────────────────────────────────────────
 COPY . /app
 WORKDIR /app
 
-# Create build directory
-RUN mkdir -p build
+RUN mkdir -p build .torch_extensions \
+                .cache/torchinductor \
+                .cache/triton
 
-# Build CUDA components
+# ── Build custom C++/CUDA extensions (legal-chunker, libtorch bridge) ──────────
+# cmake finds NVCC, cuBLAS, and CUTLASS automatically from the devel image.
+# Ninja builds in parallel; -arch=sm_86 + --use_fast_math for maximum throughput.
 RUN cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release \
+    cmake -GNinja \
+          -DCMAKE_BUILD_TYPE=Release \
           -DCUDA_ARCHITECTURES=86 \
           -DCUTLASS_DIR=/opt/cutlass \
           -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
+          -DCMAKE_CUDA_FLAGS="-arch=sm_86 -O3 --use_fast_math" \
           .. && \
-    make -j$(nproc) && \
-    make install
+    ninja -j$(nproc) && \
+    ninja install
 
-# Install Python dependencies
-RUN pip3 install -r requirements.txt
+# ── Application Python dependencies ───────────────────────────────────────────
+RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-# Expose API port
+# ── Declare cache volumes — mount these in docker-compose.yml ──────────────────
+# These dirs MUST be mounted as named volumes (not anonymous) so compiled Triton
+# kernels and TorchInductor artefacts survive container restarts.
+# Without volume mounts the cache dirs exist but are wiped on every restart,
+# causing 10-30 min recompilation on each cold start.
+VOLUME ["/app/.cache/torchinductor", "/app/.cache/triton", "/app/.torch_extensions"]
+
+# ── Runtime ────────────────────────────────────────────────────────────────────
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:8000/api/health || exit 1
 
-# Run FastAPI server with GPU support
+# Single worker: PyTorch CUDA context is not fork-safe; use --workers 1
+# and rely on async I/O for concurrency. Set SKIP_TORCH_COMPILE_WARMUP=1 in CI.
 CMD ["python3", "-m", "uvicorn", "backend.main:app", \
      "--host", "0.0.0.0", \
      "--port", "8000", \
-     "--workers", "4"]
+     "--workers", "1"]

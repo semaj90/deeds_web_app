@@ -18,6 +18,11 @@ services:
       - CUDA_VISIBLE_DEVICES=0
       - PYTHONUNBUFFERED=1
       - LOG_LEVEL=INFO
+      # RTX 3060 Ti (sm_86) CUDA tuning
+      - TORCH_CUDA_ARCH_LIST=8.6
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:256,expandable_segments:True
+      - CUDA_LAUNCH_BLOCKING=0
+      # Application services
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/legal_ai
       - REDIS_URL=redis://redis:6379
       - QDRANT_URL=http://qdrant:6333
@@ -168,7 +173,7 @@ services:
   # GPU Monitoring (Optional)
   # ========================================================================
   gpu-monitor:
-    image: nvidia/cuda:12.0-runtime-ubuntu22.04
+    image: nvidia/cuda:12.6.3-runtime-ubuntu22.04
     container_name: legal-ai-gpu-monitor
     environment:
       - NVIDIA_VISIBLE_DEVICES=all

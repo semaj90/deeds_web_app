@@ -2739,6 +2739,85 @@
       "detail": "Apply CSS/TS/Svelte syntax fixes across all src files"
     },
     // ─────────────────────────────────────────────────────────────────────────
+    // Go Retrieval Service (HTTP :8098, gRPC :50053)
+    // ─────────────────────────────────────────────────────────────────────────
+    {
+      "label": "🔨 Go Retrieval: Build",
+      "type": "shell",
+      "command": "go build -o go-retrieval-service.exe .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/go-retrieval-service",
+        "env": {
+          "CGO_ENABLED": "0",
+          "GOOS": "windows",
+          "GOARCH": "amd64"
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": ["$go"],
+      "detail": "Compile Go RAG+KAG+DAG retrieval service binary"
+    },
+    {
+      "label": "🚀 Local: Start Go Retrieval gRPC",
+      "type": "shell",
+      "command": ".\\go-retrieval-service.exe",
+      "options": {
+        "cwd": "${workspaceFolder}/services/go-retrieval-service",
+        "env": {
+          "HTTP_PORT": "8100",
+          "GRPC_PORT": "50053",
+          "QDRANT_URL": "http://localhost:6333",
+          "QDRANT_GRPC_HOST": "localhost",
+          "QDRANT_GRPC_PORT": "6334",
+          "REDIS_URL": "redis://localhost:6379",
+          "OLLAMA_URL": "http://localhost:11434",
+          "EMBED_SERVICE_URL": "localhost:50051",
+          "GPU_EMBED_ENABLED": "true",
+          "EMBED_MODEL": "embeddinggemma:latest"
+        }
+      },
+      "group": "build",
+      "isBackground": true,
+      "dependsOn": "🔨 Go Retrieval: Build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Start Go RAG+KAG+DAG retrieval service (gRPC :50053, HTTP :8098) — GPU embed, JSONB filters, gob cache"
+    },
+    {
+      "label": "🏥 Go Retrieval: Health Check",
+      "type": "shell",
+      "command": "curl -s http://localhost:8100/health | python -m json.tool",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Check Go retrieval service health (pg + redis + qdrant + ollama)"
+    },
+    // ─────────────────────────────────────────────────────────────────────────
     // Go Search Service (HTTP :8096, gRPC :50055)
     // ─────────────────────────────────────────────────────────────────────────
     {

@@ -263,9 +263,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
         reservations:
-          memory: 256M
+          memory: 512M
     logging:
       driver: json-file
       options:
@@ -276,6 +276,12 @@ services:
     environment:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-legal_ai_pass}
+      # Discard Erlang crash dumps instead of writing multi-GB files to disk
+      ERL_CRASH_DUMP: /dev/null
+      ERL_CRASH_DUMP_SECONDS: 0
+      # Cap Erlang process/port table — default +P 1M and +Q 65K over-allocate
+      # memory for a single-node dev instance; 128K processes + 4K ports is plenty
+      ERL_FLAGS: "+P 131072 +Q 4096"
     volumes:
       - couchdb_data:/opt/couchdb/data
       - couchdb_config:/opt/couchdb/etc/local.d
@@ -402,6 +408,11 @@ services:
     ports:
       - "3040:8080"
     volumes:
+      # Named volume: gives Bifrost a writable /app/data/ for its SQLite
+      # semantic-cache DB, request logs, and stats. The bind-mount below
+      # overlays config.json on top (Docker applies bind mounts after named-
+      # volume initialisation, so the file-level override works correctly).
+      - bifrost_data:/app/data
       - ./docker/bifrost/config.json:/app/data/config.json:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -730,6 +741,54 @@ services:
       timeout: 5s
       retries: 3
 
+  # Go gRPC Retrieval Service (RAG+KAG+DAG, GPU embed, port 50053)
+  go-retrieval-service:
+    build:
+      context: ./services/go-retrieval-service
+      dockerfile: Dockerfile
+    container_name: legal-ai-go-retrieval
+    restart: unless-stopped
+    profiles: ["full", "gpu"]
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    ports:
+      - "50053:50053"
+      - "8100:8100"
+    environment:
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_GRPC_HOST: qdrant
+      QDRANT_GRPC_PORT: "6334"
+      REDIS_URL: redis://redis:6379
+      OLLAMA_URL: http://host.docker.internal:11434
+      EMBED_SERVICE_URL: go-embedding-service:50051
+      EMBED_MODEL: "embeddinggemma:latest"
+      GPU_EMBED_ENABLED: "true"
+      GRPC_PORT: "50053"
+      HTTP_PORT: "8100"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      go-embedding-service:
+        condition: service_started
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8100/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   # ═══════════════════════════════════════════════════════════════════
   # GPU PROFILE — TensorRT-LLM (stop Ollama first!)
   # Usage: docker compose --profile gpu up -d
@@ -739,6 +798,8 @@ services:
   tensorrt-llm:
     image: nvcr.io/nvidia/tensorrt-llm/release:latest
     container_name: legal-ai-tensorrt-llm
+    # runtime: nvidia is needed alongside deploy.resources for NVIDIA_DRIVER_CAPABILITIES
+    # to be honoured by the container toolkit (legacy flag, still required for driver caps).
     runtime: nvidia
     profiles: ["gpu"]
     deploy:
@@ -758,6 +819,10 @@ services:
       - HF_HUB_CACHE=/workspace/cache
       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
       - REDIS_URL=redis://redis:6379/0
+      # torch.compile() persistent kernel cache — avoids 10-30 min recompile on restart
+      - TORCHINDUCTOR_CACHE_DIR=/workspace/.cache/torchinductor
+      - TRITON_CACHE_DIR=/workspace/.cache/triton
+      - TORCHINDUCTOR_COMPILE_THREADS=4
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -767,6 +832,8 @@ services:
       - ${TENSORRT_MODEL_DIR:-./docker/tensorrt-llm/models}:/workspace/models
       - ${TENSORRT_ENGINE_DIR:-./docker/tensorrt-llm/engines}:/workspace/engines
       - ${TENSORRT_CACHE_DIR:-./.cache/tensorrt-llm}:/workspace/cache
+      - torchinductor_cache:/workspace/.cache/torchinductor
+      - triton_cache:/workspace/.cache/triton
     command:
       - bash
       - -lc
@@ -831,10 +898,17 @@ services:
       - EMBED_MODEL=${EMBED_MODEL:-embeddinggemma:latest}
       - LANGFUSE_HOST=http://langfuse-web:3000
       - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.65}
+      # torch.compile() persistent kernel cache — avoids 10-30 min recompile on restart
+      - TORCHINDUCTOR_CACHE_DIR=/app/.cache/torchinductor
+      - TRITON_CACHE_DIR=/app/.cache/triton
+      - TORCHINDUCTOR_COMPILE_THREADS=4
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
       - "${LANGGRAPH_PORT:-8091}:8091"
+    volumes:
+      - torchinductor_cache:/app/.cache/torchinductor
+      - triton_cache:/app/.cache/triton
     depends_on:
       - redis
       - qdrant
@@ -851,6 +925,8 @@ services:
 # VOLUMES — names preserved for existing data compatibility
 # ═══════════════════════════════════════════════════════════════════
 volumes:
+  bifrost_data:
+    driver: local
   redis_data:
     driver: local
   qdrant_data:
@@ -891,6 +967,14 @@ volumes:
   chroma_db:
     driver: local
   training_data:
+    driver: local
+
+  # torch.compile() / Triton kernel caches — shared between GPU containers.
+  # Persists compiled sm_86 .cubin/.ttgir artefacts so containers don't recompile
+  # TorchInductor/Triton kernels on every restart (saves 10-30 min cold-start penalty).
+  torchinductor_cache:
+    driver: local
+  triton_cache:
     driver: local
 
 networks:

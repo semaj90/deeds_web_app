@@ -105,7 +105,7 @@ const PostSchema = z.object({
   grpoReward:          z.number().optional(),
   pipelineWeightAfter: z.number().optional(),
   triggeredRebuild:    z.boolean().default(false),
-  payload:             z.record(z.unknown()).default({}),
+  payload:             z.record(z.string(), z.unknown()).default({}),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
