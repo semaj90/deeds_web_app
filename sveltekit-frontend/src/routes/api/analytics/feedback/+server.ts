@@ -27,10 +27,12 @@ import { getRedis } from '$lib/server/redis.js';
 // ── Schema ─────────────────────────────────────────────────────────────────
 
 const postSchema = z.object({
-	queryHash: z.string().min(1).max(64),
-	rating:    z.enum(['up', 'down']).nullable(),
-	pipeline:  z.string().max(32).optional(),
-	chunkIds:  z.array(z.string()).max(20).optional(),
+	queryHash:     z.string().min(1).max(64),
+	rating:        z.enum(['up', 'down']).nullable(),
+	pipeline:      z.string().max(32).optional(),
+	chunkIds:      z.array(z.string()).max(20).optional(),
+	/** 8-char FNV-1a hash of the active hyperedge at signal time (from selectAdaptiveMemory) */
+	hyperedgeHash: z.string().max(8).optional(),
 });
 
 // ── Redis keys ─────────────────────────────────────────────────────────────
@@ -72,7 +74,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const parsed = postSchema.safeParse(body);
 	if (!parsed.success) return json({ error: 'Invalid request' }, { status: 400 });
 
-	const { queryHash, rating, pipeline, chunkIds = [] } = parsed.data;
+	const { queryHash, rating, pipeline, chunkIds = [], hyperedgeHash } = parsed.data;
 	const userId = locals.user.id as string;
 	const redis  = getRedis();
 
@@ -173,6 +175,24 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			import('$lib/server/retrieval/qlora-boost.js').then(({ invalidateQloraBoostSet }) => invalidateQloraBoostSet()).catch(() => {});
 			import('$lib/server/analytics/research-cache.js').then(({ invalidateResearchIndex }) => invalidateResearchIndex()).catch(() => {});
 		}).catch(() => {});
+	}
+
+	// ── 5. RL self-modification signal ───────────────────────────────────
+	// Maps thumbs-up/down → rlpolicy:pipeline_weights delta + context_timeline row.
+	// Fire-and-forget: never delays the HTTP response.
+	if (rating !== null) {
+		const rlSignal = rating === 'up' ? 'thumbs_up' as const : 'thumbs_down' as const;
+		import('$lib/server/graph/hypergraph-4d.js')
+			.then(({ adaptFromAnalytics }) =>
+				adaptFromAnalytics({
+					signal:        rlSignal,
+					pipeline:      pipeline ?? 'ace',
+					hyperedgeHash: hyperedgeHash ?? undefined,
+					userId,
+					sessionId:     userId,
+				})
+			)
+			.catch(() => {});
 	}
 
 	return json({ ok: true, counts, rating });
