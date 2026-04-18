@@ -134,7 +134,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			 WHERE query_hash = $1
 			   AND quality_tier != 'gold'`,
 			[queryHash]
-		).catch(() => {});
+		).then(() => {
+			// Invalidate caches so next retrieval and research-topics use updated scores
+			import('$lib/server/retrieval/qlora-boost.js').then(({ invalidateQloraBoostSet }) => invalidateQloraBoostSet()).catch(() => {});
+			import('$lib/server/analytics/research-cache.js').then(({ invalidateResearchIndex }) => invalidateResearchIndex()).catch(() => {});
+		}).catch(() => {});
 
 		// Boost chunk quality signals for this query's top chunks
 		if (chunkIds.length > 0) {
@@ -165,7 +169,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			     response_score = GREATEST(response_score - 0.05, 0.0)
 			 WHERE query_hash = $1`,
 			[queryHash]
-		).catch(() => {});
+		).then(() => {
+			import('$lib/server/retrieval/qlora-boost.js').then(({ invalidateQloraBoostSet }) => invalidateQloraBoostSet()).catch(() => {});
+			import('$lib/server/analytics/research-cache.js').then(({ invalidateResearchIndex }) => invalidateResearchIndex()).catch(() => {});
+		}).catch(() => {});
 	}
 
 	return json({ ok: true, counts, rating });

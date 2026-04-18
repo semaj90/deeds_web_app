@@ -29,17 +29,18 @@ import { legalDocuments } from '$lib/server/db/schema-postgres.js';
 import { sql } from 'drizzle-orm';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import {
-	fetchGraphDocuments,
-	computeCentralityForNodes
+  fetchGraphDocuments,
+  computeCentralityForNodes,
+  getPersonalizedCaseRecommendations,
 } from '$lib/server/graph/graph-centrality.js';
 import { getRedis } from '$lib/server/redis.js';
 
 const recommendationRequestSchema = z.object({
-	query: z.string().min(1, 'Query required').max(2000),
-	caseId: z.string().uuid('Invalid case ID').optional(),
-	topK: z.number().int().min(1).max(100).optional(),
-	includeExplanations: z.boolean().optional(),
-	tags: z.array(z.string().max(200)).max(50).optional()
+  query: z.string().min(1, 'Query required').max(2000),
+  caseId: z.string().uuid('Invalid case ID').optional(),
+  topK: z.number().int().min(1).max(100).optional(),
+  includeExplanations: z.boolean().optional(),
+  tags: z.array(z.string().max(200)).max(50).optional(),
 });
 
 const JOB_TTL = 300; // 5 minutes
@@ -49,55 +50,63 @@ const JOB_TTL = 300; // 5 minutes
  * Get user's interaction history and topic preferences
  */
 export const GET: RequestHandler = async (event) => {
-	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	let auth: Awaited<ReturnType<typeof requireAuth>>;
-	try {
-		auth = await requireAuth(event);
-	} catch {
-		return json({ success: true, data: { topicPreferences: [], recentInteractions: [], stats: null } });
-	}
-	const startTime = Date.now();
+  if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  let auth: Awaited<ReturnType<typeof requireAuth>>;
+  try {
+    auth = await requireAuth(event);
+  } catch {
+    return json({
+      success: true,
+      data: { topicPreferences: [], recentInteractions: [], stats: null },
+    });
+  }
+  const startTime = Date.now();
 
-	try {
-		const tracker = new UserHistoryTracker(auth.user.id);
+  try {
+    const tracker = new UserHistoryTracker(auth.user.id);
 
-		const [topicPreferences, recentInteractions, interactionStats] = await Promise.all([
-			tracker.getUserTopicPreferences().catch(() => []),
-			tracker.getRecentInteractions(20).catch(() => []),
-			tracker.getInteractionStats().catch(() => null)
-		]);
+    const [topicPreferences, recentInteractions, interactionStats] = await Promise.all([
+      tracker.getUserTopicPreferences().catch(() => []),
+      tracker.getRecentInteractions(20).catch(() => []),
+      tracker.getInteractionStats().catch(() => null),
+    ]);
 
-		const processingTime = Date.now() - startTime;
+    const personalizedCases = await getPersonalizedCaseRecommendations(auth.user.id, 10).catch(
+      () => []
+    );
 
-		return json(
-			{
-				success: true,
-				data: {
-					topicPreferences: (topicPreferences ?? []).slice(0, 10),
-					recentInteractions: recentInteractions ?? [],
-					stats: interactionStats ?? null
-				},
-				metadata: {
-					timestamp: new Date().toISOString(),
-					version: '1.0',
-					processing_time: processingTime
-				}
-			},
-			{ status: 200 }
-		);
-	} catch (err) {
-		console.error('[recommendations] GET request error:', err);
+    const processingTime = Date.now() - startTime;
 
-		return json({
-			success: true,
-			data: { topicPreferences: [], recentInteractions: [], stats: null },
-			metadata: {
-				timestamp: new Date().toISOString(),
-				version: '1.0',
-				processing_time: Date.now() - startTime
-			}
-		});
-	}
+    return json(
+      {
+        success: true,
+        data: {
+          topicPreferences: (topicPreferences ?? []).slice(0, 10),
+          recentInteractions: recentInteractions ?? [],
+          stats: interactionStats ?? null,
+          personalizedCases,
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          version: '1.0',
+          processing_time: processingTime,
+        },
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error('[recommendations] GET request error:', err);
+
+    return json({
+      success: true,
+      data: { topicPreferences: [], recentInteractions: [], stats: null, personalizedCases: [] },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        version: '1.0',
+        processing_time: Date.now() - startTime,
+      },
+    });
+  }
 };
 
 /**

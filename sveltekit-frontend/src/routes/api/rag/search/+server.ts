@@ -839,6 +839,15 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       };
     }
 
+    // P5-B: Apply QLoRA quality boost (+0.05) to chunks that appear in high-quality training examples
+    // Runs for both ACE and non-ACE paths. Fire-and-forget — non-fatal on Redis unavailability.
+    await import('$lib/server/retrieval/qlora-boost.js').then(async ({ applyQloraBoost }) => {
+      await applyQloraBoost(allChunks.map(c => ({ id: c.chunk_id, score: c.score })))
+        .then(boosted => {
+          if (boosted > 0) allChunks.sort((a, b) => b.score - a.score); // re-sort after boost
+        });
+    }).catch(() => {});
+
     let topChunks = allChunks.slice(0, top_k);
 
     // DAG reordering: cited documents appear before citing documents (default: on)

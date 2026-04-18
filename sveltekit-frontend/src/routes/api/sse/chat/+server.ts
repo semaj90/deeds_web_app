@@ -32,6 +32,7 @@ import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 import { getCachedDAG, setCachedDAG } from '$lib/server/cache/dag-cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import { queryHash as computeQueryHash, recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
 import { chatDocumentAttachments } from '$lib/server/db/schema-postgres.js';
 import { streamLLM as streamTrtLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
@@ -52,9 +53,9 @@ import type { ACEContext, ACEPolicyDecision } from '$lib/server/ace/types.js';
 import type { ContextualToolResult } from '$lib/server/ai/contextual-tools.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import {
-	getCachedStreamResponse,
-	storeCachedStreamResponse,
-	streamCachedResponse,
+  getCachedStreamResponse,
+  storeCachedStreamResponse,
+  streamCachedResponse,
 } from '$lib/server/ai/cached-stream.js';
 
 /**
@@ -81,25 +82,31 @@ async function fetchChatDocumentContext(sessionId: string): Promise<string | nul
           return {
             fileName: attachment.file_name,
             chunks: [],
-            status: attachment.embedding_status
+            status: attachment.embedding_status,
           };
         }
 
         try {
           // Search Qdrant for chunks with this document's metadata
-          const response = await fetch(`${ENV.QDRANT_URL}/collections/chat_documents/points/scroll`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              filter: {
-                must: [
-                  { key: 'documentId', match: { value: attachment.document_id || attachment.qdrant_id } }
-                ]
-              },
-              limit: 10,
-              with_payload: true
-            })
-          });
+          const response = await fetch(
+            `${ENV.QDRANT_URL}/collections/chat_documents/points/scroll`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                filter: {
+                  must: [
+                    {
+                      key: 'documentId',
+                      match: { value: attachment.document_id || attachment.qdrant_id },
+                    },
+                  ],
+                },
+                limit: 10,
+                with_payload: true,
+              }),
+            }
+          );
 
           if (!response.ok) {
             console.warn(`Failed to fetch chunks for ${attachment.file_name} from Qdrant`);
@@ -110,14 +117,14 @@ async function fetchChatDocumentContext(sessionId: string): Promise<string | nul
           const rawText = await response.text();
           const result = fastJsonParse<{ result?: { points?: any[] } | any[] }>(rawText);
           const resultData = result.result;
-          const points = (Array.isArray(resultData) ? resultData : (resultData?.points || []));
+          const points = Array.isArray(resultData) ? resultData : resultData?.points || [];
           const chunks = points.map((hit: any) => hit.payload?.text || '').filter(Boolean);
 
           return {
             fileName: attachment.file_name,
             fileSize: attachment.file_size,
             chunks,
-            status: 'success'
+            status: 'success',
           };
         } catch (error) {
           console.warn(`Error fetching chunks for ${attachment.file_name}:`, error);
@@ -983,6 +990,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const caseIdMatch = conversationId.match(CASE_ID_PATTERN);
   const caseUuidForDb = caseIdMatch ? caseIdMatch[1] : undefined;
 
+  // Fire-and-forget: record into hot-query analytics ring buffer (feeds search-patterns API)
+  recordSearchQuery({ query: message, pipeline: 'ace', cacheHit: false, userId: locals.user.id });
+
   // Save user message to chatMessages table
   try {
     await db.insert(chatMessages).values({
@@ -1227,7 +1237,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           : Promise.resolve(null),
         // ACE chunks: fast PostgreSQL cache read (parallel with Qdrant)
         caseUuid
-          ? fetchCachedACEChunks(caseUuid).catch(() => [] as Array<{ content: string; score: number; source: string }>)
+          ? fetchCachedACEChunks(caseUuid).catch(
+              () => [] as Array<{ content: string; score: number; source: string }>
+            )
           : Promise.resolve([] as Array<{ content: string; score: number; source: string }>),
       ]);
 
@@ -1255,14 +1267,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         for (const ac of aceChunks) {
           if (!existingPrefixes.has(ac.content.slice(0, 100))) {
             rawContextDocs.push({
-              content: ac.content.length > RAG_CHUNK_MAX_CHARS ? ac.content.slice(0, RAG_CHUNK_MAX_CHARS) + '...' : ac.content,
+              content:
+                ac.content.length > RAG_CHUNK_MAX_CHARS
+                  ? ac.content.slice(0, RAG_CHUNK_MAX_CHARS) + '...'
+                  : ac.content,
               similarity: ac.score,
               documentId: `ace_chunks:${ac.source}`,
             });
             existingPrefixes.add(ac.content.slice(0, 100));
           }
         }
-        console.log(`[ACE→SSE] Merged ${aceChunks.length} ace_chunks (${rawContextDocs.length} total context docs)`);
+        console.log(
+          `[ACE→SSE] Merged ${aceChunks.length} ace_chunks (${rawContextDocs.length} total context docs)`
+        );
       }
 
       // ── Corrective RAG: auto-reformulate query on low retrieval scores ──
@@ -1427,7 +1444,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           .map((d) => ({ content: d.content, score: d.similarity, source: d.documentId }));
         if (aceRows.length > 0) {
           persistACEChunks(caseUuid, aceRows, [], []).catch((err) =>
-            console.warn('[ACE persist] SSE chat fire-and-forget failed:', (err as Error)?.message ?? err)
+            console.warn(
+              '[ACE persist] SSE chat fire-and-forget failed:',
+              (err as Error)?.message ?? err
+            )
           );
         }
       }
@@ -1668,13 +1688,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       if (!versionedSynthHit && !hasInlineAttachmentSource) {
         // Try Redis L1 exact-match first (instant 2ms lookup)
         try {
-          const { generateCacheKey, getExactMatchCache } = await import('$lib/server/cache/redis-exact-match.js');
+          const { generateCacheKey, getExactMatchCache } = await import(
+            '$lib/server/cache/redis-exact-match.js'
+          );
           const exactCacheKey = generateCacheKey({
             model: model ?? 'gemma4-legal:latest',
             messages: [
               { role: 'system', content: systemPrompt },
               ...conversationHistory,
-              { role: 'user', content: message }
+              { role: 'user', content: message },
             ],
             temperature: 0.7,
             maxTokens: 2048,
@@ -1682,7 +1704,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
           const exactMatch = await getExactMatchCache(exactCacheKey);
           if (exactMatch) {
-            console.log(`[SSE Chat] L1 Redis EXACT-MATCH HIT (${exactMatch.backend}) — instant return`);
+            console.log(
+              `[SSE Chat] L1 Redis EXACT-MATCH HIT (${exactMatch.backend}) — instant return`
+            );
             cacheResult = {
               hit: true,
               response: exactMatch.content,
@@ -1891,10 +1915,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 inferenceBackend = 'ollama'; // Mark as Ollama since that's where it came from originally
 
                 // Stream cached response chunk-by-chunk using the consumeStream helper
-                await consumeStream(streamCachedResponse(cachedResponse, {
-                  chunkSize: 5,
-                  chunkDelayMs: 20,
-                }));
+                await consumeStream(
+                  streamCachedResponse(cachedResponse, {
+                    chunkSize: 5,
+                    chunkDelayMs: 20,
+                  })
+                );
 
                 fullResponse = cachedResponse;
               }
@@ -1907,20 +1933,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             if (!streamed) {
               try {
                 const trtHealthy = await trtHealthCheck().catch(() => false);
-              if (trtHealthy) {
-                const lease = await acquireGpuLease('tensorrt', 120).catch(() => null);
-                if (lease) {
-                  try {
-                    await consumeStream(streamTrtLLM({ prompt: flatPrompt, temperature: 0.7 }));
-                    inferenceBackend = 'tensorrt';
-                    streamed = true;
-                  } finally {
-                    releaseGpuLease('tensorrt').catch((e) =>
-                      console.warn('[sse/chat] GPU lease release failed:', e)
-                    );
+                if (trtHealthy) {
+                  const lease = await acquireGpuLease('tensorrt', 120).catch(() => null);
+                  if (lease) {
+                    try {
+                      await consumeStream(streamTrtLLM({ prompt: flatPrompt, temperature: 0.7 }));
+                      inferenceBackend = 'tensorrt';
+                      streamed = true;
+                    } finally {
+                      releaseGpuLease('tensorrt').catch((e) =>
+                        console.warn('[sse/chat] GPU lease release failed:', e)
+                      );
+                    }
                   }
                 }
-              }
               } catch (trtErr) {
                 console.warn(
                   '[SSE chat] TRT-LLM streaming failed:',
@@ -2003,24 +2029,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             });
           }
         );
-
-        // Log LLM inference to CouchDB (fire-and-forget)
-        logInference({
-          type: 'llm',
-          model:
-            inferenceBackend === 'ollama' ? (model ?? 'gemma4-legal:latest') : inferenceBackend,
-          backend: inferenceBackend,
-          latencyMs: Math.round(performance.now() - llmStreamStart),
-          tokenCount: tokenSeq,
-          cacheHit: false,
-          metadata: {
-            policyDecision,
-            toolResults,
-            codebaseHits: codebaseResult?.chunks.length ?? 0,
-            kagNeighbors: graphContext?.neighbors.length ?? 0,
-            ragHits: contextDocs.length,
-          },
-        });
 
         // Store in Redis L1 cache for future instant retrieval (fire-and-forget)
         // Note: cacheHit tracking removed - always attempt to cache successful responses
@@ -2319,6 +2327,31 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           );
         }
 
+        // Log to CouchDB inference_log with response + self-eval for QLoRA distillation
+        if (fullResponse) {
+          logInference({
+            type: 'llm',
+            model:
+              inferenceBackend === 'ollama' ? (model ?? 'gemma4-legal:latest') : inferenceBackend,
+            backend: inferenceBackend,
+            latencyMs: Math.round(performance.now() - llmStreamStart),
+            tokenCount: tokenSeq,
+            cacheHit: false,
+            queryHash: computeQueryHash(message),
+            metadata: {
+              query: message,
+              response: fullResponse.slice(0, 20_000),
+              self_eval_score: aceEvaluation?.quality ?? null,
+              ace_completeness: aceEvaluation?.completeness ?? null,
+              ace_accuracy: aceEvaluation?.accuracy ?? null,
+              policyDecision,
+              ragHits: contextDocs.length,
+              codebaseHits: codebaseResult?.chunks.length ?? 0,
+              kagNeighbors: graphContext?.neighbors.length ?? 0,
+            },
+          });
+        }
+
         // Publish assistant response to chat.context queue (non-blocking)
         import('$lib/server/queue/dispatch-inline.js')
           .then(({ dispatchOrExecuteInline }) => {
@@ -2365,23 +2398,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               }).catch((err) => console.warn('[SSE Chat] L2 Qdrant cache storage failed:', err));
 
               // Store in L1 Redis exact-match cache (for instant 2ms future hits)
-              import('$lib/server/cache/redis-exact-match.js').then(({ generateCacheKey, setExactMatchCache }) => {
-                const exactCacheKey = generateCacheKey({
-                  model: model ?? 'gemma4-legal:latest',
-                  messages: [
-                    { role: 'system', content: systemPrompt },
-                    ...conversationHistory,
-                    { role: 'user', content: message }
-                  ],
-                  temperature: 0.7,
-                  maxTokens: 2048,
+              import('$lib/server/cache/redis-exact-match.js')
+                .then(({ generateCacheKey, setExactMatchCache }) => {
+                  const exactCacheKey = generateCacheKey({
+                    model: model ?? 'gemma4-legal:latest',
+                    messages: [
+                      { role: 'system', content: systemPrompt },
+                      ...conversationHistory,
+                      { role: 'user', content: message },
+                    ],
+                    temperature: 0.7,
+                    maxTokens: 2048,
+                  });
+                  setExactMatchCache(exactCacheKey, {
+                    content: fullResponse,
+                    model: model ?? 'gemma4-legal:latest',
+                    backend: inferenceBackend,
+                  }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
+                })
+                .catch(() => {
+                  /* L1 cache unavailable */
                 });
-                setExactMatchCache(exactCacheKey, {
-                  content: fullResponse,
-                  model: model ?? 'gemma4-legal:latest',
-                  backend: inferenceBackend,
-                }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
-              }).catch(() => {/* L1 cache unavailable */});
             }
           }
         } catch (cacheErr) {
