@@ -28,7 +28,8 @@ export type HitPipeline =
   | 'rag'
   | 'reranker'
   | 'reranker+qlora'
-  | 'codebase';
+  | 'codebase'
+  | 'contextual';
 
 export interface ChunkHit {
 	id:           string;
