@@ -25,7 +25,10 @@ const saveCitationSchema = z
     highlighted_text: z.string().max(50000).nullable().optional(),
     highlightedText: z.string().max(50000).nullable().optional(),
     contextText: z.string().max(50000).nullable().optional(),
-    notes: z.string().max(50000).nullable().optional(),
+    notes:         z.string().max(50000).nullable().optional(),
+    /** RL signal routing — optional, passed from research panel */
+    hyperedgeHash: z.string().max(8).optional(),
+    pipeline:      z.string().max(32).optional(),
   })
   .refine((d) => d.statute_code?.trim() || d.citationText?.trim(), {
     message: 'Missing required field: statute_code',
@@ -145,6 +148,20 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         notes: body.notes ?? null,
       })
       .returning();
+
+    // ── RL signal: citation_saved is the strongest positive reward (+0.05) ──
+    // Fire-and-forget: never delays the HTTP response.
+    import('$lib/server/graph/hypergraph-4d.js')
+      .then(({ adaptFromAnalytics }) =>
+        adaptFromAnalytics({
+          signal:        'citation_saved',
+          pipeline:      body.pipeline      ?? 'ace',
+          hyperedgeHash: body.hyperedgeHash ?? undefined,
+          userId,
+          sessionId:     userId,
+        })
+      )
+      .catch(() => {});
 
     return json(
       { success: true, citation: newCitation, message: 'Citation saved' },
