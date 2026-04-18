@@ -35,16 +35,19 @@ interface Summary {
 
 interface FuseEntry { id: string; title: string; query: string; tags: string }
 
+interface PolicyWeights { ace: number; kag: number; dag: number; rag: number; codebase: number; updatedAt: string | null }
+
 interface BrowsePage {
-	summaries:   Summary[];
-	nextCursor:  string | null;
-	prevCursor:  string | null;
-	total:       number;
-	page:        number;
-	totalPages:  number;
-	didYouMean:  string[];
-	fuseIndex:   FuseEntry[];
-	topTags:     string[];
+	summaries:     Summary[];
+	nextCursor:    string | null;
+	prevCursor:    string | null;
+	total:         number;
+	page:          number;
+	totalPages:    number;
+	didYouMean:    string[];
+	fuseIndex:     FuseEntry[];
+	topTags:       string[];
+	policyWeights: PolicyWeights;
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -398,6 +401,14 @@ function scoreBar(score: number) {
 								{row.source}
 							</span>
 							<span class="text-xs text-sand-9 capitalize">{row.pipeline}</span>
+							{#if data?.policyWeights}
+								{@const plw = (data.policyWeights as unknown as Record<string, number>)[row.pipeline] ?? 1}
+								{#if Math.abs(plw - 1) > 0.04}
+									<span class="text-xs px-1 rounded {plw > 1.05 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+										RL×{plw.toFixed(2)}
+									</span>
+								{/if}
+							{/if}
 							{#if row.citationLabel}
 								<span class="text-xs text-sand-9 truncate">{row.citationLabel}</span>
 							{/if}

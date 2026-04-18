@@ -73,6 +73,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			summaries: [], nextCursor: null, prevCursor: null,
 			total: 0, page: 1, totalPages: 1, didYouMean: [], fuseIndex: [],
 			topTags: [],
+			policyWeights: { ace: 1, kag: 1, dag: 1, rag: 1, codebase: 1, updatedAt: null },
 		});
 	}
 
@@ -112,6 +113,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			summaries: [], nextCursor: null, prevCursor: null,
 			total: 0, page: 1, totalPages: 1, didYouMean: [], fuseIndex: [],
 			topTags: [],
+			policyWeights: { ace: 1, kag: 1, dag: 1, rag: 1, codebase: 1, updatedAt: null },
 		});
 	}
 };
