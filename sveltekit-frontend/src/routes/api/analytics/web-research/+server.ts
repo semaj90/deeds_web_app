@@ -19,33 +19,40 @@ import {
 	queryWebResearchIndex,
 	getWebResearchStats,
 	invalidateWebResearchCache,
+	crawlLegalCorpus,
+	queryCorpusIndex,
+	getCorpusSearchStats,
+	invalidateCorpusCache,
 } from '$lib/server/analytics/web-research-crawler.js';
 
 const postSchema = z.object({
 	selfPrompts: z.array(z.string().min(3).max(400)).min(1).max(10),
 	pipeline:   z.enum(['ace', 'rag', 'kag', 'dag', 'codebase', 'all']).default('ace'),
 	maxResults: z.number().int().min(1).max(10).default(5),
-	action:     z.enum(['crawl', 'invalidate']).default('crawl'),
+	action:     z.enum(['crawl', 'corpus-search', 'invalidate']).default('crawl'),
 });
 
-// ── GET — cached summaries ────────────────────────────────────────────────────
+// ── GET — cached summaries (web + corpus) ────────────────────────────────────
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) {
-		return json({ summaries: [], stats: { builtAt: null, totalByPipeline: {} } });
+		return json({ summaries: [], corpusSummaries: [], stats: { builtAt: null, totalByPipeline: {} }, corpusStats: { builtAt: null, totalByPipeline: {} } });
 	}
 
 	const pipeline = (url.searchParams.get('pipeline') ?? 'all') as string;
 	const limit    = Math.min(Number(url.searchParams.get('limit') ?? '20'), 50);
+	const source   = url.searchParams.get('source') ?? 'web'; // 'web' | 'corpus' | 'all'
 
 	try {
-		const [summaries, stats] = await Promise.all([
-			queryWebResearchIndex(pipeline, limit),
-			getWebResearchStats(),
+		const results = await Promise.all([
+			source !== 'corpus' ? queryWebResearchIndex(pipeline, limit) : Promise.resolve([]),
+			source !== 'corpus' ? getWebResearchStats() : Promise.resolve({ builtAt: null, totalByPipeline: {} }),
+			source !== 'web'    ? queryCorpusIndex(pipeline, limit)    : Promise.resolve([]),
+			source !== 'web'    ? getCorpusSearchStats()               : Promise.resolve({ builtAt: null, totalByPipeline: {} }),
 		]);
-		return json({ summaries, stats });
+		return json({ summaries: results[0], stats: results[1], corpusSummaries: results[2], corpusStats: results[3] });
 	} catch {
-		return json({ summaries: [], stats: { builtAt: null, totalByPipeline: {} } });
+		return json({ summaries: [], corpusSummaries: [], stats: { builtAt: null, totalByPipeline: {} }, corpusStats: { builtAt: null, totalByPipeline: {} } });
 	}
 };
 
@@ -64,11 +71,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	// ── Invalidate ──────────────────────────────────────────────────────────────
 	if (action === 'invalidate') {
-		await invalidateWebResearchCache().catch(() => {});
+		await Promise.all([
+			invalidateWebResearchCache().catch(() => {}),
+			invalidateCorpusCache().catch(() => {}),
+		]);
 		return json({ cleared: true });
 	}
 
-	// ── Crawl — run sequentially to avoid hammering search providers ────────────
+	// ── Corpus search — query local Qdrant legal collections ────────────────────
+	if (action === 'corpus-search') {
+		const batches = [];
+		let totalSummaries = 0;
+		for (const query of selfPrompts) {
+			try {
+				const batch = await crawlLegalCorpus(query, pipeline, maxResults);
+				batches.push(batch);
+				totalSummaries += batch.summaries.length;
+			} catch { /* non-fatal */ }
+		}
+		return json({ batches, totalSummaries, source: 'corpus', indexedAt: new Date().toISOString() });
+	}
+
+	// ── Crawl web — run sequentially to avoid hammering search providers ────────
 	const batches = [];
 	let totalSummaries = 0;
 
@@ -85,6 +109,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	return json({
 		batches,
 		totalSummaries,
+		source: 'web',
 		indexedAt: new Date().toISOString(),
 	});
 };

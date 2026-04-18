@@ -970,8 +970,8 @@ function setupToolHandlers() {
             },
             action: {
               type: 'string',
-              enum: ['crawl', 'query', 'stats', 'invalidate'],
-              description: 'crawl=run search, query=read cache, stats=counts, invalidate=clear',
+              enum: ['crawl', 'corpus-search', 'query', 'corpus-query', 'stats', 'invalidate'],
+              description: 'crawl=web search, corpus-search=local Qdrant, query/corpus-query=read cache, stats=counts, invalidate=clear both',
               default: 'crawl',
             },
           },
@@ -2270,6 +2270,10 @@ function setupToolHandlers() {
           queryWebResearchIndex,
           getWebResearchStats,
           invalidateWebResearchCache,
+          crawlLegalCorpus,
+          queryCorpusIndex,
+          getCorpusSearchStats,
+          invalidateCorpusCache,
         } = await import('$lib/server/analytics/web-research-crawler.js');
 
         const action     = String(args.action ?? 'crawl');
@@ -2277,25 +2281,49 @@ function setupToolHandlers() {
         const maxResults = Math.min(10, Math.max(1, Number(args.maxResults ?? 5)));
 
         if (action === 'invalidate') {
-          await invalidateWebResearchCache();
+          await Promise.all([invalidateWebResearchCache(), invalidateCorpusCache()]);
           return { content: [{ type: 'text', text: JSON.stringify({ cleared: true }) }] };
         }
         if (action === 'stats') {
-          const stats = await getWebResearchStats();
-          return { content: [{ type: 'text', text: JSON.stringify(stats) }] };
+          const [webStats, corpusStats] = await Promise.all([getWebResearchStats(), getCorpusSearchStats()]);
+          return { content: [{ type: 'text', text: JSON.stringify({ web: webStats, corpus: corpusStats }) }] };
         }
         if (action === 'query') {
           const limit     = Math.min(50, Math.max(1, Number(args.maxResults ?? 20)));
           const summaries = await queryWebResearchIndex(pipeline, limit);
-          return { content: [{ type: 'text', text: JSON.stringify({ summaries }) }] };
+          return { content: [{ type: 'text', text: JSON.stringify({ summaries, source: 'web' }) }] };
+        }
+        if (action === 'corpus-query') {
+          const limit     = Math.min(50, Math.max(1, Number(args.maxResults ?? 20)));
+          const summaries = await queryCorpusIndex(pipeline, limit);
+          return { content: [{ type: 'text', text: JSON.stringify({ summaries, source: 'corpus' }) }] };
         }
 
-        // action === 'crawl'
         const selfPrompts: string[] = Array.isArray(args.selfPrompts)
           ? (args.selfPrompts as string[]).slice(0, 10)
           : [];
         if (!selfPrompts.length) throw new Error('selfPrompts must be a non-empty array');
 
+        // action === 'corpus-search' — query local Qdrant legal collections
+        if (action === 'corpus-search') {
+          const batches = [];
+          let totalSummaries = 0;
+          for (const q of selfPrompts) {
+            try {
+              const batch = await crawlLegalCorpus(q, pipeline, maxResults);
+              batches.push(batch);
+              totalSummaries += batch.summaries.length;
+            } catch { /* non-fatal */ }
+          }
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({ batches, totalSummaries, source: 'corpus', indexedAt: new Date().toISOString() }),
+            }],
+          };
+        }
+
+        // action === 'crawl' — live web search
         const batches = [];
         let totalSummaries = 0;
         for (const q of selfPrompts) {
@@ -2308,7 +2336,7 @@ function setupToolHandlers() {
         return {
           content: [{
             type: 'text',
-            text: JSON.stringify({ batches, totalSummaries, indexedAt: new Date().toISOString() }),
+            text: JSON.stringify({ batches, totalSummaries, source: 'web', indexedAt: new Date().toISOString() }),
           }],
         };
       }
