@@ -1,8 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
-import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
+import { orchestrateRetrieval } from '$lib/server/retrieval/orchestrator.js';
 
 const searchSchema = z.object({
   query: z.string().min(1).max(1000),
@@ -18,73 +17,57 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const raw = await request.json();
     const parsed = searchSchema.safeParse(raw);
     if (!parsed.success) {
-      return json(
-        { results: [], total: 0, source: 'error' },
-        { status: 400 }
-      );
+      return json({ results: [], total: 0, source: 'error' }, { status: 400 });
     }
     const { query, tags, limit, somCluster } = parsed.data;
 
-    // 1. Embed the query
-    const embResult = await generateEmbeddings([query]);
-    const vector = embResult.vectors[0];
-
-    // 2. Build Qdrant filter
-    const mustClauses: object[] = [];
-    if (tags && tags.length > 0) {
-      mustClauses.push({
-        key: 'tags',
-        match: { any: tags },
-      });
-    }
-    if (somCluster !== undefined) {
-      mustClauses.push({
-        key: 'som_cluster',
-        match: { value: somCluster },
-      });
-    }
-    const filter = mustClauses.length > 0 ? { must: mustClauses } : undefined;
-
-    // 3. Search Qdrant codebase_chunks_768
-    const searchBody: Record<string, unknown> = {
-      vector: { name: 'content', vector },
-      limit,
-      with_payload: true,
-    };
-    if (filter) searchBody.filter = filter;
-
-    const resp = await fetch(
-      `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(searchBody),
-        signal: AbortSignal.timeout(8000),
-      }
-    );
-
-    if (!resp.ok) {
-      console.error('[kb/search] Qdrant error:', resp.status, await resp.text());
-      return json({ results: [], total: 0, source: 'error' });
-    }
-
-    const data = await resp.json();
-    const results = (data?.result ?? []).map((r: Record<string, unknown>) => {
-      const payload = (r.payload as Record<string, unknown>) ?? {};
-      return {
-        id: r.id,
-        score: r.score,
-        file_path: payload.file_path ?? null,
-        content: payload.content ?? payload.text ?? '',
-        summary: payload.summary ?? null,
-        tags: payload.tags ?? [],
-        som_cluster: payload.som_cluster ?? null,
-        language: payload.language ?? null,
-        chunk_index: payload.chunk_index ?? null,
-      };
+    const result = await orchestrateRetrieval({
+      query,
+      pipeline: 'codebase',
+      topK: limit,
+      skipGraph: true,
+      skipDag: true,
+      skipAuthority: true,
     });
 
-    return json({ results, total: results.length, source: 'qdrant' });
+    // Prefer codebaseChunks (ranked by cross-encoder); fall back to chunks
+    const raw_results = result.codebaseChunks.length
+      ? result.codebaseChunks
+      : result.chunks.map(c => ({
+          file_path: c.sourceId ?? '',
+          file_name: '',
+          extension: '',
+          content: c.content,
+          similarity: c.similarity,
+          score: c.similarity,
+          tags: [] as string[],
+          som_cluster: null as number | null,
+        }));
+
+    // Post-filter by tags/somCluster (orchestrator doesn't support these natively)
+    const filtered = raw_results.filter(r => {
+      const rTags: string[] = (r as { tags?: string[] }).tags ?? [];
+      if (tags && tags.length > 0 && !tags.some(t => rTags.includes(t))) return false;
+      if (somCluster !== undefined) {
+        const rc = (r as { som_cluster?: number | null }).som_cluster;
+        if (rc !== somCluster) return false;
+      }
+      return true;
+    });
+
+    const results = filtered.slice(0, limit).map(r => ({
+      id:          (r as { id?: string }).id ?? (r as { file_path?: string }).file_path ?? '',
+      score:       (r as { similarity?: number; score?: number }).similarity ?? (r as { score?: number }).score ?? 0,
+      file_path:   (r as { file_path?: string }).file_path ?? null,
+      content:     (r as { content?: string }).content ?? '',
+      summary:     (r as { summary?: string }).summary ?? null,
+      tags:        (r as { tags?: string[] }).tags ?? [],
+      som_cluster: (r as { som_cluster?: number | null }).som_cluster ?? null,
+      language:    (r as { language?: string }).language ?? null,
+      chunk_index: (r as { chunk_index?: number }).chunk_index ?? null,
+    }));
+
+    return json({ results, total: results.length, source: 'orchestrator', latencyMs: result.latencyMs });
   } catch (err) {
     console.error('[kb/search] Error:', err);
     return json({ results: [], total: 0, source: 'error' });

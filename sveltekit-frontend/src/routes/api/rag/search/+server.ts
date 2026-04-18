@@ -881,11 +881,57 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
     diagnostics.retrieval.status = allChunks.length > 0 ? 'success' : 'warning';
     diagnostics.retrieval.totalCandidates = allChunks.length;
 
+    // Graph enrichment: run concurrently with final response assembly (non-blocking if fails)
+    let graph_context: string | null = null;
+    let authorities: { statutes: string[]; cases: string[] } | null = null;
+    if (effectiveCaseId && topChunks.length > 0) {
+      const evidenceIds = topChunks.map(c => (c as { source_id?: string }).source_id).filter((id): id is string => !!id);
+      const { getGraphContext } = await import('$lib/server/retrieval/graph-context.js').catch(() => ({ getGraphContext: null }));
+      if (getGraphContext && evidenceIds.length) {
+        const gc = await getGraphContext(evidenceIds, effectiveCaseId).catch(() => null);
+        if (gc) {
+          graph_context = gc.context;
+          // Re-rank top chunks by graph authority strength
+          if (gc.neighbors.length) {
+            const { applyGraphAuthorityScoring } = await import('$lib/server/retrieval/graph-context.js').catch(() => ({ applyGraphAuthorityScoring: null }));
+            if (applyGraphAuthorityScoring) {
+              const reranked = applyGraphAuthorityScoring(
+                topChunks.map(c => ({
+                  content: (c as { text?: string }).text ?? '',
+                  similarity: (c as { score?: number }).score ?? 0,
+                  documentId: (c as { source_id?: string }).source_id ?? '',
+                  sourceId: (c as { source_id?: string }).source_id ?? '',
+                })),
+                gc.neighbors,
+              );
+              // Apply boosted scores back
+              for (let i = 0; i < reranked.length && i < topChunks.length; i++) {
+                (topChunks[i] as { score: number }).score = reranked[i].similarity;
+              }
+              topChunks.sort((a, b) => ((b as { score?: number }).score ?? 0) - ((a as { score?: number }).score ?? 0));
+            }
+          }
+          // Extract top-level authority references from graph neighbors
+          const statuteSet = new Set<string>();
+          const caseSet = new Set<string>();
+          for (const n of gc.neighbors.slice(0, 8)) {
+            if (n.documentType === 'statute') statuteSet.add(n.label ?? n.id);
+            else caseSet.add(n.label ?? n.id);
+          }
+          if (statuteSet.size || caseSet.size) {
+            authorities = { statutes: [...statuteSet].slice(0, 6), cases: [...caseSet].slice(0, 6) };
+          }
+        }
+      }
+    }
+
     const response: RetrieveCandidatesResponse & {
       corrective_rag?: unknown;
       hybrid_search?: string;
       embedding_transport?: string;
       diagnostics?: SearchPhaseDiagnostics;
+      graph_context?: string | null;
+      authorities?: { statutes: string[]; cases: string[] } | null;
     } = {
       query_id: crypto.randomUUID(),
       query,
@@ -907,6 +953,8 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       embedding_transport: embeddingTransport,
       diagnostics,
       timestamp: new Date().toISOString(),
+      graph_context,
+      authorities,
     };
 
     // Fire-and-forget: record into search-analytics pipeline (hot-query ring + rag_query_log)

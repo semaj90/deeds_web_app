@@ -1,99 +1,62 @@
 /**
  * Semantic Codebase Search API
  * Endpoint: POST /api/codebase-index/search
- * Purpose: Vector search across codebase with KAG context
+ * Delegates to the canonical retrieval orchestrator (pipeline: codebase).
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
-
-const QDRANT_URL = getQdrantUrl();
-const OLLAMA_URL = getOllamaUrl();
-const COLLECTION = 'codebase_chunks_768';
+import { orchestrateRetrieval } from '$lib/server/retrieval/orchestrator.js';
 
 const bodySchema = z.object({
-  query: z.string().min(1).max(500),
-  limit: z.number().int().min(1).max(50).default(10),
+  query:  z.string().min(1).max(500),
+  limit:  z.number().int().min(1).max(50).default(10),
   vector: z.string().max(30).default('content'),
 });
 
-interface SearchResult {
-	id: string;
-	score: number;
-	payload: {
-		file_path: string;
-		file_name: string;
-		extension: string;
-		content: string;
-		chunk_index: number;
-		total_chunks: number;
-		domain?: string;
-		complexity?: string;
-		tags?: string[];
-	};
-}
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-export const POST: RequestHandler = async ({ request, fetch, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-
-	try {
-		const raw = await request.json().catch(() => ({}));
+  try {
+    const raw = await request.json().catch(() => ({}));
     const parsed = bodySchema.safeParse(raw);
     if (!parsed.success) {
       return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
-		const { query, limit, vector } = parsed.data;
+    const { query, limit } = parsed.data;
 
-		// Generate embedding
-		const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
-				input: query
-			}),
-			signal: AbortSignal.timeout(10_000)
-		});
+    const result = await orchestrateRetrieval({
+      query,
+      pipeline:       'codebase',
+      topK:           limit,
+      skipGraph:      true,
+      skipDag:        true,
+      skipAuthority:  true,
+    });
 
-		if (!embedRes.ok) {
-			return json({ error: 'Failed to generate embedding' }, { status: 500 });
-		}
+    // Map to the original SearchResult shape expected by callers
+    const results = result.chunks.slice(0, limit).map(c => ({
+      id:    c.documentId,
+      score: c.similarity,
+      payload: {
+        file_path:    c.sourceId ?? '',
+        file_name:    c.sourceId?.split('/').pop() ?? '',
+        extension:    c.sourceId?.split('.').pop() ?? '',
+        content:      c.content,
+        chunk_index:  0,
+        total_chunks: 0,
+      },
+    }));
 
-		const embedData = await embedRes.json();
-		const embedding = embedData.embeddings[0];
-
-		// Search Qdrant
-		const searchRes = await fetch(
-			`${QDRANT_URL}/collections/${COLLECTION}/points/query`,
-			{
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query: embedding,
-					using: vector,
-					limit,
-					with_payload: true
-				}),
-				signal: AbortSignal.timeout(10_000)
-			}
-		);
-
-		if (!searchRes.ok) {
-			return json({ error: 'Search failed' }, { status: 500 });
-		}
-
-		const searchData = await searchRes.json();
-		const results: SearchResult[] = searchData.result.points || [];
-
-		return json({
-			query,
-			results,
-			total: results.length,
-			vector_used: vector
-		});
-	} catch (error) {
-		console.error('Codebase search error:', error);
-		return json({ error: 'Internal server error' }, { status: 500 });
-	}
+    return json({
+      query,
+      results,
+      total:       results.length,
+      vector_used: 'content',
+      latencyMs:   result.latencyMs,
+    });
+  } catch (error) {
+    console.error('Codebase search error:', error);
+    return json({ error: 'Internal server error' }, { status: 500 });
+  }
 };

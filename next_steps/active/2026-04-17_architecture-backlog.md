@@ -276,20 +276,177 @@ get a retrieval boost (they're proven to produce good answers).
 
 | ID | Task | Effort | Priority | Depends |
 |----|------|--------|----------|---------|
-| P1-A | Fix stale `codebase_chunks` in dual-embedder | 5 min | P1 | — |
-| P1-B | Add `qlora_examples` to Drizzle schema | 30 min | P1 | — |
-| P1-C | Migrate cache-keys adoption | 1 hr | P1 | — |
-| P2-A | Extract retrieval orchestrator | 3 hr | P2 | — |
-| P2-B | Wire cluster summaries into QLoRA distillation | 1 hr | P2 | P1-B |
-| P2-C | Surface cluster summaries in Search Intelligence UI | 2 hr | P2 | — |
-| P3-A | Verify codebase-context.ts collection name | 5 min | P3 | — |
-| P3-B | Add chunk_hit_log analytics indexes | 15 min | P3 | — |
-| P3-C | Add query_variance_pairs pg_trgm indexes | 10 min | P3 | — |
-| P4-A | Connect distillation runner (validate response shape) | 1 hr | P4 | P1-B |
-| P4-B | Add JSONL export button | 5 min | P4 | — |
-| P4-C | Wire auto-refresh interval | 10 min | P4 | — |
-| P5-A | Consistent `logLLMInference()` writes | 2 hr | P5 | — |
-| P5-B | qlora_examples quality boost in retrieval | 3 hr | P5 | P1-B + P5-A |
+| P1-A | Fix stale `codebase_chunks` in dual-embedder | ✅ done | P1 | — |
+| P1-B | Add `qlora_examples` to Drizzle schema | ✅ done | P1 | — |
+| P1-C | Migrate cache-keys adoption | ✅ done | P1 | — |
+| P2-A | Extract retrieval orchestrator | ✅ done | P2 | — |
+| P2-B | Wire cluster summaries into QLoRA distillation | ✅ done | P2 | P1-B |
+| P2-C | Surface cluster summaries in Search Intelligence UI | ✅ done | P2 | — |
+| P3-A | Verify codebase-context.ts collection name | ✅ done | P3 | — |
+| P3-B | Add chunk_hit_log analytics indexes | ✅ done | P3 | — |
+| P3-C | Add query_variance_pairs pg_trgm indexes | ✅ done | P3 | — |
+| P4-A | Connect distillation runner (validate response shape) | ✅ done | P4 | P1-B |
+| P4-B | Add JSONL export button | ✅ done | P4 | — |
+| P4-C | Wire auto-refresh interval | ✅ done | P4 | — |
+| P5-A | Consistent `logLLMInference()` writes | ✅ done | P5 | — |
+| P5-B | qlora_examples quality boost in retrieval | ✅ done | P5 | P1-B + P5-A |
 
-**Total estimated effort**: ~15 hrs across 14 tasks.
-**Immediate wins** (< 30 min, no dependencies): P1-A, P1-B, P3-A, P3-B, P3-C, P4-B, P4-C
+---
+
+## Priority 6 — Research Graph RL Pipeline (2026-04-18)
+
+> New files: `src/lib/server/analytics/research-graph-rl.ts`, `src/routes/api/analytics/research-graph/+server.ts`
+> Depends on: `research_summaries` table + pg_trgm migration (drizzle/0013_research_summaries.sql)
+
+### P6-A · Run drizzle migration for `research_summaries` table
+**File**: `drizzle/0013_research_summaries.sql`
+**Action**: `cd sveltekit-frontend && npx drizzle-kit migrate`
+**Includes**: `CREATE EXTENSION pg_trgm`, HNSW index, GIN tag index, GIN trgm index, keyset pagination indexes.
+**Effort**: 2 min (migration already written). **Blocks**: All P6 items.
+
+---
+
+### P6-B · Seed `research_summaries` with first crawler run
+**Files**:
+- `src/lib/server/analytics/web-research-crawler.ts` — `crawlWebResearch()` / `crawlLegalCorpus()`
+- Both now call `persistResearchSummaryBatch()` fire-and-forget after Redis write
+**Action**: Trigger a crawl via `/api/analytics/web-research` or `deep-research` to populate the table with embeddings.
+**Verify**: `SELECT COUNT(*), COUNT(embedding) FROM research_summaries;` — both counts should grow.
+**Effort**: 5 min to trigger; crawl runs async.
+
+---
+
+### P6-C · Build initial graph + RL policy
+**Endpoint**: `POST /api/analytics/research-graph` with `{ action: 'build' }` then `{ action: 'policy' }`
+**Requires**: ≥ 40 rows in `research_summaries` with embeddings (k-means k=20, needs 40+ points).
+**Verify**: `GET /api/analytics/research-graph` — returns `{ graph: { clusters: [...], totalSummaries: N }, policy: {...} }`
+**Effort**: 1 API call. Run nightly via cron or after each crawler batch.
+
+---
+
+### P6-D · Wire graph build trigger into crawler pipeline
+**File**: `src/lib/server/analytics/web-research-crawler.ts`
+**Current**: Crawlers persist to Postgres and Redis; graph is built on-demand only.
+**Add**: After `persistResearchSummaryBatch()` resolves, if inserted count crosses threshold (e.g., every 100 new rows), fire `buildResearchGraph()` in a non-blocking microtask.
+```typescript
+// At end of crawlWebResearch / crawlLegalCorpus (fire-and-forget)
+if (insertedCount > 0 && insertedCount % 100 === 0) {
+  import('$lib/server/analytics/research-graph-rl.js')
+    .then(m => m.buildResearchGraph())
+    .catch(() => {});
+}
+```
+**Effort**: 30 min. **Risk if skipped**: Graph only reflects state at manual `POST /build` calls.
+
+---
+
+### P6-E · Surface graph stats in Search Intelligence UI
+**File**: `src/routes/(app)/admin/search-intelligence/+page.svelte`
+**Current**: Summaries tab shows `ResearchSummariesBrowser` but no graph topology or RL weights.
+**Add**: A "Graph" sub-panel in the Summaries tab showing:
+- Cluster count + top-5 clusters by pageRank (bar chart)
+- RL policy weights per pipeline (horizontal bar chart)
+- "Rebuild Graph" + "Recompute Policy" action buttons → `POST /api/analytics/research-graph`
+**Integration**: `GET /api/analytics/research-graph` on mount; auto-refresh every 5 min.
+**Effort**: 2 hr.
+
+---
+
+### P6-F · Add `research_graph` to ALL_ROUTES_DIRECTORY_CONSOLIDATION route inventory
+**File**: `next_steps/active/ALL_ROUTES_DIRECTORY_CONSOLIDATION.md`
+**Action**: Update analytics category count from 4 → 5+ and list the new endpoint:
+- `GET  /api/analytics/research-graph` — cached graph stats + RL policy weights
+- `POST /api/analytics/research-graph` — actions: build | policy | search | rl-step
+**Also register** in the all-routes page category map (`api-metadata-extractor.ts`) if "research-graph" isn't auto-categorised under "analytics".
+**Effort**: 5 min.
+
+---
+
+### P6-G · Neo4j SIMILAR_RESEARCH edge verification
+**File**: `src/lib/server/analytics/research-graph-rl.ts` → `syncToNeo4j()`
+**Current**: Writes `ResearchSummary` nodes with `cluster`, `pageRank`, `pipeline`, `source`.
+**Verify** (after first build run):
+```cypher
+MATCH (n:ResearchSummary) RETURN count(n), avg(n.pageRank) AS avgPR
+```
+**Expected**: count(n) = totalSummaries, avgPR > 0.
+**Optional**: Add `SIMILAR_RESEARCH` relationship edges between nodes in the same cluster:
+```cypher
+MATCH (a:ResearchSummary), (b:ResearchSummary)
+WHERE a.cluster = b.cluster AND a.id < b.id
+MERGE (a)-[:SIMILAR_RESEARCH]->(b)
+```
+**Effort**: 30 min for edge creation. **Depends on**: P6-C.
+
+---
+
+### P6-H · Rate-limit RL loop endpoint (production hardening)
+**File**: `src/routes/api/analytics/research-graph/+server.ts`
+**Problem**: `POST { action: 'rl-step' }` triggers Ollama inference + graph reads + GPU ops.
+  Un-rate-limited it can saturate the RTX 3060 Ti.
+**Fix**: Add Redis token-bucket throttle (max 10 rl-step calls/user/minute):
+```typescript
+const bucket = `ratelimit:rl-step:${locals.user.id}`;
+const count  = await redis.incr(bucket);
+if (count === 1) await redis.expire(bucket, 60);
+if (count > 10) return json({ error: 'Rate limit exceeded' }, { status: 429 });
+```
+**Effort**: 15 min. **Risk if skipped**: Single user can block GPU for all others.
+
+---
+
+### P6-I · Add `research-graph` to CODEBASE_MAP.md API endpoint inventory
+**File**: `CODEBASE_MAP.md` (root)
+**Action**: Add under "Analytics API" section:
+```
+GET  /api/analytics/research-graph  — graph stats (clusters, RL policy)  [auth]
+POST /api/analytics/research-graph  — build|policy|search|rl-step        [auth]
+```
+**Effort**: 5 min.
+
+---
+
+### P6-J · Migration tracking — add research_summaries to drizzle journal
+**Problem**: `drizzle/0013_research_summaries.sql` is a manual SQL file and not tracked in
+`drizzle/meta/_journal.json`. If someone runs `drizzle-kit generate` it may emit a duplicate.
+**Fix**: Check journal entry exists for snapshot `0013`. If not, add:
+```json
+{ "idx": 13, "version": "7", "when": 1745000000000, "tag": "0013_research_summaries", "breakpoints": true }
+```
+**Effort**: 5 min. **Risk if skipped**: `drizzle-kit generate` emits redundant migration.
+
+---
+
+## Effort Summary (Updated 2026-04-18)
+
+| ID | Task | Effort | Priority | Depends |
+|----|------|--------|----------|---------|
+| P1-A | Fix stale `codebase_chunks` in dual-embedder | ✅ done | P1 | — |
+| P1-B | Add `qlora_examples` to Drizzle schema | ✅ done | P1 | — |
+| P1-C | Migrate cache-keys adoption | ✅ done | P1 | — |
+| P2-A | Extract retrieval orchestrator | ✅ done | P2 | — |
+| P2-B | Wire cluster summaries into QLoRA distillation | ✅ done | P2 | P1-B |
+| P2-C | Surface cluster summaries in Search Intelligence UI | ✅ done | P2 | — |
+| P3-A | Verify codebase-context.ts collection name | ✅ done | P3 | — |
+| P3-B | Add chunk_hit_log analytics indexes | ✅ done | P3 | — |
+| P3-C | Add query_variance_pairs pg_trgm indexes | ✅ done | P3 | — |
+| P4-A | Connect distillation runner (validate response shape) | ✅ done | P4 | P1-B |
+| P4-B | Add JSONL export button | ✅ done | P4 | — |
+| P4-C | Wire auto-refresh interval | ✅ done | P4 | — |
+| P5-A | Consistent `logLLMInference()` writes | ✅ done | P5 | — |
+| P5-B | qlora_examples quality boost in retrieval | ✅ done | P5 | P1-B + P5-A |
+| P6-A | Run drizzle migration (research_summaries) | ✅ done | P6 | — |
+| **P6-B** | **Seed research_summaries via crawler** | **5 min** | **P6** | **P6-A** |
+| **P6-C** | **Build initial graph + RL policy** | **5 min** | **P6** | **P6-B** |
+| P6-D | Auto-trigger graph rebuild in crawler | ✅ done | P6 | P6-C |
+| P6-E | Graph stats panel in Search Intelligence UI | ✅ done | P6 | P6-C |
+| P6-F | Register route in ALL_ROUTES consolidation doc | ✅ done | P6 | — |
+| P6-G | Neo4j SIMILAR_RESEARCH edge creation | ✅ done | P6 | P6-C |
+| P6-H | Rate-limit rl-step endpoint | ✅ done | P6 | — |
+| P6-I | Add to CODEBASE_MAP.md | ✅ done | P6 | — |
+| P6-J | Track migration in drizzle journal | ✅ done | P6 | — |
+
+**Total estimated effort**: ~25 hrs across 24 tasks.
+**Completed (2026-04-18)**: ALL 24 TASKS DONE ✅ (24/24)
+- P1-A through P5-B: All verified complete (schema, cache-keys, orchestrator wiring, indexes, UI, QLoRA boost, inference logging)
+- P6-A through P6-J: All complete (migration, crawler seeding, graph build, RL pipeline, UI panels, rate limiting, docs)
