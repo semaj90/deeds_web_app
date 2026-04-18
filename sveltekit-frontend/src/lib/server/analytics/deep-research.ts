@@ -433,6 +433,20 @@ export async function generateDeepResearch(
 	// Cache in Redis (non-blocking)
 	redis.set(cacheKey, JSON.stringify(result), 'EX', RESEARCH_CACHE_TTL).catch(() => {});
 
+	// Kick off web research for high-priority topics (fire-and-forget)
+	const highPriority = topics.filter(t => t.priority === 'high').slice(0, 3);
+	if (highPriority.length) {
+		import('$lib/server/analytics/web-research-crawler.js')
+			.then(({ crawlWebResearch }) =>
+				Promise.all(
+					highPriority.map(t =>
+						crawlWebResearch(t.selfPrompt, t.pipelineHint ?? 'ace', 5).catch(() => null),
+					),
+				),
+			)
+			.catch(() => {}); // fully non-fatal
+	}
+
 	return result;
 }
 

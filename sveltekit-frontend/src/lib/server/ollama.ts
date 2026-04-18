@@ -11,17 +11,20 @@
  *   - VLM_MODELS — model name constants
  */
 
-// VLM model configurations
-export const VLM_MODELS = {
-	/** Gemma 4 E4B Q4_K_M — native multimodal (vision + audio), 131K context */
+// VLM model configurations — resolved from ENV so .env overrides work without code changes.
+// Keys are populated after ENV is imported below (see ── Config ──).
+// Callers use VLM_MODELS.legal / .vision / .embedding / .gemma4 as before.
+export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4', string> = {
+	/** Vision-language model — Gemma 4 E4B (native multimodal, 131K context) */
 	vision: 'gemma4:e4b-it-q4_K_M',
 	embedding: 'embeddinggemma:latest',
+	/** Legal text reasoning / chat model (fine-tuned) */
 	legal: 'gemma4-legal:latest',
-	/** Gemma 4 E4B Q4_K_M — 8B params, 131K context, native tool calling + thinking */
+	/** Gemma 4 E4B — tool calling + thinking */
 	gemma4: 'gemma4:e4b-it-q4_K_M',
-} as const;
+};
 
-export type VLMModel = (typeof VLM_MODELS)[keyof typeof VLM_MODELS];
+export type VLMModel = string;
 
 export interface OllamaMessage {
 	role: 'user' | 'assistant' | 'system';

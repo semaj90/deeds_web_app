@@ -940,6 +940,44 @@ function setupToolHandlers() {
           required: ['userId'],
         },
       },
+      // ─────────────────────────────────────────────────────────────────────
+      // Analytics — Web Research Crawler (SearXNG → cosine → ACE summarize)
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'analytics:web_research',
+        description:
+          'Run web research for selfPrompt queries: SearXNG/Google/DDG search → 768-dim embedding → ' +
+          'GPU cosine similarity ranking → Ollama ACE summarization → entity tag extraction → ' +
+          'Redis ZSET index. Summaries surface in research-topics and deep-research pipelines.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            selfPrompts: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Research queries to search (1-10)',
+            },
+            pipeline: {
+              type: 'string',
+              enum: ['ace', 'rag', 'kag', 'dag', 'codebase', 'all'],
+              description: 'Pipeline label for ZSET routing (default: ace)',
+              default: 'ace',
+            },
+            maxResults: {
+              type: 'number',
+              description: 'Web results per query (1-10, default: 5)',
+              default: 5,
+            },
+            action: {
+              type: 'string',
+              enum: ['crawl', 'query', 'stats', 'invalidate'],
+              description: 'crawl=run search, query=read cache, stats=counts, invalidate=clear',
+              default: 'crawl',
+            },
+          },
+          required: ['selfPrompts'],
+        },
+      },
     ],
   }));
 
@@ -2223,6 +2261,56 @@ function setupToolHandlers() {
         const synthesize = args.synthesize !== false;
         const result = await executeCodebaseResearch(userId, { days, query, synthesize });
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      // ── Analytics: Web Research Crawler ────────────────────────────────────
+      case 'analytics:web_research': {
+        const {
+          crawlWebResearch,
+          queryWebResearchIndex,
+          getWebResearchStats,
+          invalidateWebResearchCache,
+        } = await import('$lib/server/analytics/web-research-crawler.js');
+
+        const action     = String(args.action ?? 'crawl');
+        const pipeline   = String(args.pipeline ?? 'ace');
+        const maxResults = Math.min(10, Math.max(1, Number(args.maxResults ?? 5)));
+
+        if (action === 'invalidate') {
+          await invalidateWebResearchCache();
+          return { content: [{ type: 'text', text: JSON.stringify({ cleared: true }) }] };
+        }
+        if (action === 'stats') {
+          const stats = await getWebResearchStats();
+          return { content: [{ type: 'text', text: JSON.stringify(stats) }] };
+        }
+        if (action === 'query') {
+          const limit     = Math.min(50, Math.max(1, Number(args.maxResults ?? 20)));
+          const summaries = await queryWebResearchIndex(pipeline, limit);
+          return { content: [{ type: 'text', text: JSON.stringify({ summaries }) }] };
+        }
+
+        // action === 'crawl'
+        const selfPrompts: string[] = Array.isArray(args.selfPrompts)
+          ? (args.selfPrompts as string[]).slice(0, 10)
+          : [];
+        if (!selfPrompts.length) throw new Error('selfPrompts must be a non-empty array');
+
+        const batches = [];
+        let totalSummaries = 0;
+        for (const q of selfPrompts) {
+          try {
+            const batch = await crawlWebResearch(q, pipeline, maxResults);
+            batches.push(batch);
+            totalSummaries += batch.summaries.length;
+          } catch { /* non-fatal */ }
+        }
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({ batches, totalSummaries, indexedAt: new Date().toISOString() }),
+          }],
+        };
       }
 
       default:

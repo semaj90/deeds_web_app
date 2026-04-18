@@ -36,6 +36,12 @@ export const ENV = {
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
   RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? DEV.RABBITMQ_URL,
   OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
+  /** Legal reasoning / chat model (fine-tuned Gemma 4 for legal text) */
+  OLLAMA_CHAT_MODEL: privateEnv.OLLAMA_CHAT_MODEL ?? privateEnv.OLLAMA_MODEL ?? 'gemma4-legal:latest',
+  /** Vision-language model for image/document understanding (base Gemma 4 with vision) */
+  OLLAMA_VLM_MODEL: privateEnv.OLLAMA_VLM_MODEL ?? privateEnv.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
+  /** Embedding model (768-dim, primary) */
+  OLLAMA_EMBED_MODEL: privateEnv.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
   /** Gemma 4 E4B model tag for tool-calling / complex reasoning (131K ctx, native thinking) */
   GEMMA4_MODEL: privateEnv.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
   /** Granite-Docling-258M for layout-aware document extraction (Ollama multimodal) */
