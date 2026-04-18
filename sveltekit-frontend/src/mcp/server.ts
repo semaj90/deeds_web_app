@@ -779,6 +779,99 @@ function setupToolHandlers() {
           required: ['path'],
         },
       },
+      // ─────────────────────────────────────────────────────────────────────
+      // Analytics — Deep Research + JSONL Research Index (feedback-weighted)
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'analytics:deep_research',
+        description:
+          'Generate personalized deep research topics from RAG/KAG/DAG/ACE hit analytics, ' +
+          'thumbs-up/down feedback signals, Neo4j graph centrality, and Ollama self-prompting. ' +
+          'Returns up to 8 research topics with selfPrompt fields ready to execute, plus ' +
+          'pipeline hit summary, feedback index, and graph insights. Cached 30 min per user.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User UUID for personalisation' },
+            refresh: {
+              type: 'boolean',
+              description: 'Bypass 30-min Redis cache and regenerate (default: false)',
+              default: false,
+            },
+          },
+          required: ['userId'],
+        },
+      },
+      {
+        name: 'analytics:research_topics',
+        description:
+          'Query the Redis-cached JSONL research index: qlora_examples joined with response_feedback, ' +
+          'scored by quality tier × feedback ratio × response score. Returns sketches for a specific ' +
+          'pipeline (ace/rag/kag/dag/codebase/all) with self-prompt chains. Optionally force-rebuilds the index.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            pipeline: {
+              type: 'string',
+              enum: ['ace', 'rag', 'kag', 'dag', 'codebase', 'reranker', 'all'],
+              description: 'Retrieval pipeline to filter by (default: all)',
+              default: 'all',
+            },
+            limit: {
+              type: 'number',
+              description: 'Max sketches to return (1-50, default: 12)',
+              default: 12,
+            },
+            domains: {
+              type: 'string',
+              description: 'Comma-separated codebase domain seeds: typescript,sveltekit,ripgrep,awk,ollama',
+              default: '',
+            },
+            rebuild: {
+              type: 'boolean',
+              description: 'Force-rebuild Redis index from Postgres (default: false)',
+              default: false,
+            },
+          },
+          required: [],
+        },
+      },
+      // ─────────────────────────────────────────────────────────────────────
+      // Codebase Ripgrep — fast literal+regex search over source files
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'codebase:rg_search',
+        description:
+          'Fast ripgrep search over the SvelteKit codebase. Supports regex patterns and file-type ' +
+          'filtering. Returns matching lines with file paths and line numbers. Use for finding ' +
+          'imports, API route wiring, auth guards (G18), Zod validation (G19), rune compliance, ' +
+          'or any code pattern. More precise than semantic codebase:search for known symbol names.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            pattern: {
+              type: 'string',
+              description: 'Regex or literal pattern to search for',
+            },
+            fileGlob: {
+              type: 'string',
+              description: 'Glob pattern to filter files (e.g. "*.ts", "*.svelte", "**/*.server.ts")',
+              default: '*.{ts,svelte}',
+            },
+            maxResults: {
+              type: 'number',
+              description: 'Max matching lines to return (default: 40, max: 200)',
+              default: 40,
+            },
+            caseInsensitive: {
+              type: 'boolean',
+              description: 'Case-insensitive search (default: false)',
+              default: false,
+            },
+          },
+          required: ['pattern'],
+        },
+      },
     ],
   }));
 
@@ -1887,6 +1980,97 @@ function setupToolHandlers() {
               }),
             },
           ],
+        };
+      }
+
+      // ── Analytics: Deep Research ──────────────────────────────────────────
+      case 'analytics:deep_research': {
+        const { generateDeepResearch } = await import('$lib/server/analytics/deep-research.js');
+        const userId  = String(args.userId ?? 'anonymous');
+        const refresh = Boolean(args.refresh ?? false);
+        const result  = await generateDeepResearch(userId, { skipCache: refresh });
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      // ── Analytics: Research Topics (JSONL index) ──────────────────────────
+      case 'analytics:research_topics': {
+        const {
+          queryResearchIndex,
+          buildResearchIndex,
+          invalidateResearchIndex,
+          getResearchIndexStats,
+        } = await import('$lib/server/analytics/research-cache.js');
+
+        const pipeline = (args.pipeline ?? 'all') as Parameters<typeof queryResearchIndex>[0];
+        const limit    = Math.min(50, Math.max(1, Number(args.limit ?? 12)));
+        const rebuild  = Boolean(args.rebuild ?? false);
+        const domains  = String(args.domains ?? '').split(',').map((d: string) => d.trim()).filter(Boolean);
+
+        if (rebuild) {
+          await invalidateResearchIndex();
+        }
+
+        const [sketches, stats] = await Promise.all([
+          queryResearchIndex(pipeline, limit),
+          getResearchIndexStats(),
+        ]);
+
+        // Seed domain topics for codebase pipeline when index is sparse
+        const DOMAIN_SEEDS: Record<string, string[]> = {
+          typescript: ['How do TypeScript generics constrain Drizzle ORM query builders?', 'What unsafe casts remain in the server layer?'],
+          sveltekit:  ['How does SvelteKit 2 layout hierarchy affect SSR caching?', 'Which routes misuse throw error() inside try/catch?'],
+          ripgrep:    ['What files import from db/index instead of db/client?', 'Which API routes are missing Zod validation?'],
+          awk:        ['Aggregate chunk score distribution from chunk_hit_log.', 'Compute avg search_time_ms per pipeline grouped by day.'],
+          ollama:     ['Optimal KV cache quantisation for gemma4-legal at 8K context?', 'Flash Attention trade-offs on RTX 3060 Ti.'],
+        };
+        const seedTopics = domains.flatMap((d: string) => DOMAIN_SEEDS[d.toLowerCase()] ?? []).slice(0, 6);
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({ sketches, seedTopics, meta: { pipeline, limit, ...stats } }),
+          }],
+        };
+      }
+
+      // ── Codebase: Ripgrep Search ──────────────────────────────────────────
+      case 'codebase:rg_search': {
+        const { execFile } = await import('child_process');
+        const { promisify } = await import('util');
+        const execFileAsync = promisify(execFile);
+
+        const pattern   = String(args.pattern ?? '');
+        const fileGlob  = String(args.fileGlob ?? '*.{ts,svelte}');
+        const maxRes    = Math.min(200, Math.max(1, Number(args.maxResults ?? 40)));
+        const noCase    = Boolean(args.caseInsensitive ?? false);
+
+        if (!pattern) throw new Error('pattern is required');
+
+        const rgArgs = [
+          '--no-heading', '--line-number', '--color=never',
+          '--glob', fileGlob,
+          ...(noCase ? ['-i'] : []),
+          '--max-count', String(maxRes),
+          pattern,
+          'src',
+        ];
+
+        let output = '';
+        try {
+          const cwd = new URL('../../..', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
+          const result = await execFileAsync('rg', rgArgs, { cwd, maxBuffer: 1_048_576 });
+          output = result.stdout;
+        } catch (err: any) {
+          // rg exits 1 when no matches — that's OK
+          output = err.stdout ?? '';
+        }
+
+        const lines = output.split('\n').filter(Boolean).slice(0, maxRes);
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({ pattern, fileGlob, matchCount: lines.length, matches: lines }),
+          }],
         };
       }
 
