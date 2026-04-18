@@ -227,7 +227,7 @@ export async function buildResearchGraph(): Promise<GraphBuildResult> {
 	};
 }
 
-/** Fire-and-forget: write cluster assignments to Neo4j if driver available. */
+/** Fire-and-forget: write cluster assignments + SIMILAR_RESEARCH edges to Neo4j. */
 async function syncToNeo4j(
 	summaries: ResearchSummary[],
 	assignments: Int32Array,
@@ -239,6 +239,7 @@ async function syncToNeo4j(
 		if (!driver) return;
 		const session = driver.session();
 		try {
+			// 1. Upsert ResearchSummary nodes with cluster metadata
 			const batch = summaries.map((s, i) => ({
 				id:       s.id,
 				query:    s.query,
@@ -256,6 +257,32 @@ async function syncToNeo4j(
 				      n.pipeline = row.pipeline,
 				      n.source   = row.source
 			`, { batch });
+
+			// 2. Build SIMILAR_RESEARCH edges: connect adjacent members within each
+			//    cluster (chain topology — O(n) edges, not O(n²)).
+			//    Cap at 6 members per cluster to keep edge count bounded.
+			const clusterMembers: Map<number, string[]> = new Map();
+			for (let i = 0; i < summaries.length; i++) {
+				const cid = assignments[i];
+				if (!clusterMembers.has(cid)) clusterMembers.set(cid, []);
+				const members = clusterMembers.get(cid)!;
+				if (members.length < 6) members.push(summaries[i].id);
+			}
+			const edges: { fromId: string; toId: string; cluster: number }[] = [];
+			for (const [cid, members] of clusterMembers) {
+				for (let j = 0; j < members.length - 1; j++) {
+					edges.push({ fromId: members[j], toId: members[j + 1], cluster: cid });
+				}
+			}
+			if (edges.length > 0) {
+				await session.run(`
+					UNWIND $edges AS e
+					MATCH (a:ResearchSummary { id: e.fromId })
+					MATCH (b:ResearchSummary { id: e.toId   })
+					MERGE (a)-[r:SIMILAR_RESEARCH]->(b)
+					SET   r.cluster = e.cluster
+				`, { edges });
+			}
 		} finally {
 			await session.close();
 		}

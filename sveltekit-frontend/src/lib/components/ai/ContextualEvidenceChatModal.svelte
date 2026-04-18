@@ -51,6 +51,15 @@ const sessionSeed =
  let attachments = $state<AttachmentPreview[]>([]);
  let dropActive = $state(false);
 
+ // ACE context selector — evidence + notes checkboxes for KV-cached context
+ let aceContextCaseId = $state('');
+ $effect(() => { aceContextCaseId = defaultCaseId ?? ''; });
+ let aceEvidence = $state<Array<{ id: string; title: string; description: string; evidenceType?: string }>>([]);
+ let aceNotes = $state<Array<{ id: string; title: string; content: string }>>([]);
+ let aceLoading = $state(false);
+ let aceOpen = $state(false);
+ let aceSelected = $state(new Set<string>());
+
  let caseOptions = $state<CaseOption[]>([]);
  let casesLoading = $state(false);
  let casesError = $state<string | null>(null);
@@ -165,6 +174,10 @@ const sessionSeed =
  formData.set('sessionId', sessionId);
  if (userId) formData.set('userId', userId);
  formData.set('enableFunctions', 'true');
+
+ if (aceContextCaseId) formData.set('caseId', aceContextCaseId);
+ const aceCtx = buildAceContext();
+ if (aceCtx) formData.set('aceContext', aceCtx);
 
  if (queuedAttachment?.file) {
  formData.set('file', queuedAttachment.file, queuedAttachment.name);
@@ -314,6 +327,56 @@ const sessionSeed =
  } catch (error) {
  evidenceStatus = { state: 'error', message: error instanceof Error ? error.message : 'Unexpected failure' };
  }
+ }
+
+ async function loadAceContext() {
+  const cid = aceContextCaseId;
+  if (!cid || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cid)) return;
+  aceLoading = true;
+  try {
+   const [evRes, notesRes] = await Promise.allSettled([
+    fetch(`/api/evidence?caseId=${cid}&limit=20`, { credentials: 'include' }),
+    fetch(`/api/cases/${cid}/notes`, { credentials: 'include' }),
+   ]);
+   if (evRes.status === 'fulfilled' && evRes.value.ok) {
+    const d = await evRes.value.json();
+    aceEvidence = (d.evidence ?? []).map((e: { id: string; jsonData?: { title?: string; description?: string; type?: string }; title?: string; description?: string; evidenceType?: string }) => ({
+     id: e.id,
+     title: e.jsonData?.title ?? e.title ?? 'Untitled',
+     description: (e.jsonData?.description ?? e.description ?? '').slice(0, 200),
+     evidenceType: e.jsonData?.type ?? e.evidenceType ?? '',
+    })).slice(0, 20);
+   }
+   if (notesRes.status === 'fulfilled' && notesRes.value.ok) {
+    const d = await notesRes.value.json();
+    aceNotes = (d.notes ?? []).map((n: { id: string; title?: string; content?: string }) => ({
+     id: n.id,
+     title: n.title ?? 'Note',
+     content: (n.content ?? '').slice(0, 300),
+    })).slice(0, 10);
+   }
+  } finally {
+   aceLoading = false;
+  }
+ }
+
+ function toggleAceItem(id: string) {
+  const next = new Set(aceSelected);
+  if (next.has(id)) next.delete(id); else next.add(id);
+  aceSelected = next;
+ }
+
+ function buildAceContext(): string {
+  const parts: string[] = [];
+  for (const ev of aceEvidence) {
+   if (!aceSelected.has(ev.id)) continue;
+   parts.push(`[Evidence] ${ev.title}${ev.evidenceType ? ` (${ev.evidenceType})` : ''}: ${ev.description || '(no description)'}`);
+  }
+  for (const note of aceNotes) {
+   if (!aceSelected.has(note.id)) continue;
+   parts.push(`[Note] ${note.title}: ${note.content}`);
+  }
+  return parts.join('\n\n');
  }
 
  function closeModal() {
@@ -608,6 +671,60 @@ const sessionSeed =
  {/each}
  </ul>
  {/if}
+
+ <!-- ACE Context Selector -->
+ <div class="ace-context-section">
+  <button type="button" class="ace-toggle" onclick={() => { aceOpen = !aceOpen; if (aceOpen && aceContextCaseId) void loadAceContext(); }}>
+   <span>ACE Context</span>
+   <span class="ace-chevron">{aceOpen ? '▲' : '▼'}</span>
+   {#if aceSelected.size > 0}
+    <span class="ace-badge">{aceSelected.size} selected</span>
+   {/if}
+  </button>
+  {#if aceOpen}
+   <div class="ace-panel">
+    {#if !aceContextCaseId}
+     <p class="ace-hint">Open from a case page to auto-load evidence &amp; notes.</p>
+    {:else if aceLoading}
+     <p class="ace-hint">Loading context items…</p>
+    {:else if aceEvidence.length === 0 && aceNotes.length === 0}
+     <p class="ace-hint">No evidence or notes found for this case.</p>
+    {:else}
+     {#if aceEvidence.length > 0}
+      <p class="ace-group-label">Evidence ({aceEvidence.length})</p>
+      {#each aceEvidence as ev (ev.id)}
+       <label class="ace-item">
+        <input type="checkbox" checked={aceSelected.has(ev.id)} onchange={() => toggleAceItem(ev.id)} />
+        <span class="ace-item-title">{ev.title}</span>
+        {#if ev.evidenceType}<span class="ace-item-type">{ev.evidenceType}</span>{/if}
+       </label>
+      {/each}
+     {/if}
+     {#if aceNotes.length > 0}
+      <p class="ace-group-label">Notes ({aceNotes.length})</p>
+      {#each aceNotes as note (note.id)}
+       <label class="ace-item">
+        <input type="checkbox" checked={aceSelected.has(note.id)} onchange={() => toggleAceItem(note.id)} />
+        <span class="ace-item-title">{note.title}</span>
+       </label>
+      {/each}
+     {/if}
+     <div class="ace-footer">
+      <button type="button" class="ace-select-all" onclick={() => {
+       const allIds = [...aceEvidence.map(e => e.id), ...aceNotes.map(n => n.id)];
+       aceSelected = aceSelected.size < allIds.length ? new Set(allIds) : new Set();
+      }}>
+       {aceSelected.size < aceEvidence.length + aceNotes.length ? 'Select all' : 'Clear all'}
+      </button>
+      {#if aceSelected.size > 0}
+       <span class="ace-count">{aceSelected.size} item{aceSelected.size > 1 ? 's' : ''} in context</span>
+      {/if}
+     </div>
+    {/if}
+   </div>
+  {/if}
+ </div>
+
  </div>
  {/if}
  </section>
@@ -848,6 +965,93 @@ const sessionSeed =
 	height: 100%;
  }
  }
+ /* ACE Context Selector */
+ .ace-context-section {
+  margin-top: 0.75rem;
+  border: 1px solid rgba(94, 243, 180, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+ }
+ .ace-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(94, 243, 180, 0.06);
+  border: none;
+  color: #b8f5db;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+ }
+ .ace-toggle:hover { background: rgba(94, 243, 180, 0.12); }
+ .ace-chevron { margin-left: auto; font-size: 0.7rem; }
+ .ace-badge {
+  background: rgba(94, 243, 180, 0.25);
+  color: #5ef3b4;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.72rem;
+ }
+ .ace-panel {
+  padding: 0.6rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 220px;
+  overflow-y: auto;
+ }
+ .ace-hint {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.8rem;
+  margin: 0;
+ }
+ .ace-group-label {
+  margin: 0.4rem 0 0.1rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+ }
+ .ace-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0.15rem 0;
+ }
+ .ace-item input[type='checkbox'] { flex-shrink: 0; accent-color: #5ef3b4; }
+ .ace-item-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ .ace-item-type {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+ }
+ .ace-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+ }
+ .ace-select-all {
+  font-size: 0.75rem;
+  color: #5ef3b4;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+ }
+ .ace-count { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
 </style>
 
 

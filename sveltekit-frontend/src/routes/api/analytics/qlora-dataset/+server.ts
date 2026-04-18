@@ -456,6 +456,57 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     });
   }
 
+  // ── research_summaries export for topological summary fine-tuning ──────────
+  if (exportFormat === 'summaries') {
+    const minScore = parseFloat(url.searchParams.get('minScore') ?? '0.7');
+    const curatedOnly = url.searchParams.get('curated') === 'true';
+    const limit = Math.min(5000, parseInt(url.searchParams.get('limit') ?? '1000', 10));
+
+    const conditions = [`summary IS NOT NULL`, `relevance_score >= $1`];
+    const params: unknown[] = [minScore];
+    if (curatedOnly) { conditions.push(`saved_citation_id IS NOT NULL`); }
+
+    type SummaryRow = {
+      id: string; query: string; title: string | null; url: string | null;
+      summary: string; entity_tags: string[]; pipeline: string; source: string;
+      relevance_score: number; saved_citation_id: string | null; created_at: string;
+    };
+
+    const rsResult = await pool
+      .query<SummaryRow>(
+        `SELECT id, query, title, url, summary, entity_tags, pipeline, source,
+                relevance_score::real, saved_citation_id, created_at::text
+         FROM   research_summaries
+         WHERE  ${conditions.join(' AND ')}
+         ORDER  BY saved_citation_id IS NOT NULL DESC, relevance_score DESC
+         LIMIT  $${params.length + 1}`,
+        [...params, limit]
+      )
+      .catch(() => ({ rows: [] as SummaryRow[] }));
+
+    const lines = rsResult.rows.map((r) => {
+      const qualityTier = r.saved_citation_id ? 'curated' : r.relevance_score >= 0.85 ? 'high' : 'medium';
+      return JSON.stringify({
+        instruction: 'Summarize the legal significance of this research result for the given query.',
+        input: `Query: ${r.query}\n\nSource: ${r.title ?? 'Unknown'}\nURL: ${r.url ?? ''}`,
+        output: r.summary,
+        metadata: {
+          id: r.id, source: r.source, pipeline: r.pipeline,
+          relevance_score: r.relevance_score, entity_tags: r.entity_tags,
+          quality_tier: qualityTier, curated: !!r.saved_citation_id, created_at: r.created_at,
+        },
+      });
+    });
+
+    return new Response(lines.join('\n'), {
+      headers: {
+        'Content-Type': 'application/x-ndjson',
+        'Content-Disposition': `attachment; filename="research_summaries_${Date.now()}.jsonl"`,
+        'X-Record-Count': String(lines.length),
+      },
+    });
+  }
+
   // Stats + preview
   const [statsResult, recentResult] = await Promise.all([
     pool

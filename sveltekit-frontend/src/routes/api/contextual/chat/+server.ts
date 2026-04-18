@@ -98,6 +98,8 @@ const contextualChatSchema = z.object({
   userId: z.string().max(200).optional(),
   caseId: z.string().max(200).optional(),
   enableFunctions: z.boolean().optional(),
+  /** Pre-assembled ACE context text from selected evidence/notes (checkbox panel) */
+  aceContext: z.string().max(15000).optional(),
 });
 
 /**
@@ -115,6 +117,7 @@ async function parseRequest(request: Request): Promise<z.infer<typeof contextual
       userId: formData.get('userId') ? String(formData.get('userId')) : undefined,
       caseId: formData.get('caseId') ? String(formData.get('caseId')) : undefined,
       enableFunctions: formData.get('enableFunctions') === 'true' ? true : undefined,
+      aceContext: formData.get('aceContext') ? String(formData.get('aceContext')) : undefined,
     };
   }
 
@@ -145,6 +148,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       userId = 'anonymous',
       caseId,
       enableFunctions = false,
+      aceContext,
     } = parsed.data;
 
     // Get conversation history from Redis for context
@@ -184,6 +188,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     if (caseContext) {
       systemMessages.push({ role: 'system', content: `## Case Context\n${caseContext}` });
+    }
+
+    if (aceContext) {
+      systemMessages.push({ role: 'system', content: `## Selected Evidence & Notes\n${aceContext}` });
     }
 
     const messages: Array<{ role: string; content: string }> = [
