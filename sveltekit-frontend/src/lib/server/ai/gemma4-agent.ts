@@ -25,9 +25,8 @@ import { ollamaFetch, VLM_MODELS, getOllamaEndpoint } from '$lib/server/ollama.j
 import { generateEmbedding }                           from '$lib/server/grpc/embedding-client.js';
 import { qdrant }                                      from '$lib/server/vector/qdrant-manager.js';
 import { selectAdaptiveMemory, queryTopHyperedges }    from '$lib/server/graph/hypergraph-4d.js';
-import { db }                                          from '$lib/server/db/client';
+import { db, pool }                                    from '$lib/server/db/client';
 import { contextTimeline }                             from '$lib/server/db/schema-postgres.js';
-import { pool }                                        from '$lib/server/db/client';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -163,21 +162,21 @@ async function dispatchTool(
         : 'research_summaries';
 
       const hits = await qdrant.hybridSearch({
-        collection: col,
+        collection:     col,
         query,
-        embedding:  emb,
-        limit:      topK,
+        queryEmbedding: emb,
+        limit:          topK,
       });
 
       return {
         tool: name,
-        result: hits.map((h) => ({
+        result: hits.results.map((h) => ({
           id:       h.id,
           score:    h.score,
-          summary:  h.payload?.summary   ?? h.payload?.content ?? '',
-          title:    h.payload?.title     ?? '',
-          source:   h.payload?.source    ?? col,
-          pipeline: h.payload?.pipeline  ?? '',
+          summary:  (h.payload?.['summary']  ?? h.payload?.['content'] ?? '') as string,
+          title:    (h.payload?.['title']    ?? '') as string,
+          source:   (h.payload?.['source']   ?? col) as string,
+          pipeline: (h.payload?.['pipeline'] ?? '') as string,
         })),
       };
     }
@@ -237,7 +236,7 @@ async function dispatchTool(
           grade:     e.gradeLabel,
           score:     e.gradeScore,
           pipeline:  e.pipeline,
-          members:   e.members.length,
+          members:   e.memberIds.length,
           summary:   e.summary?.slice(0, 300) ?? '',
         })),
       };
@@ -375,7 +374,7 @@ export async function runGemma4Agent(
     payload: {
       query,
       toolsUsed,
-      rounds,
+      rounds: round,
       durationMs,
     } as Record<string, unknown>,
   }).catch(() => { /* non-fatal */ });
