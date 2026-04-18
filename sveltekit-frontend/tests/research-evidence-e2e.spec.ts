@@ -28,14 +28,21 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
+import { mkdir } from 'fs/promises';
 
 const BASE = 'http://127.0.0.1:5173';
+const SCREENSHOT_DIR = 'tests/screenshots/latest';
+
+// Ensure screenshot dir exists before any test runs
+test.beforeAll(async () => {
+	await mkdir(SCREENSHOT_DIR, { recursive: true }).catch(() => {});
+});
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function screenshot(page: Page, name: string) {
 	await page.screenshot({
-		path:     `tests/screenshots/latest/${name}`,
+		path:     `${SCREENSHOT_DIR}/${name}`,
 		fullPage: false,
 	});
 }
@@ -214,10 +221,13 @@ test.describe('Evidence page + modal viewer', () => {
 	test('EvidenceAiAssistantDrawer tabs are present in page', async ({ page }) => {
 		await page.goto(`${BASE}/evidence`);
 		await page.waitForLoadState('networkidle');
-		// AI drawer might be hidden — just verify page doesn't crash and has tab labels
-		const hasTabLabels = await page.locator('text=AI Assistant, text=Evidence Chat, text=Image Analysis').count();
+		// AI drawer may be closed by default — check for any of its known tab labels
+		// using separate locators (comma in Playwright locators is not a CSS multi-selector)
+		const aiTabCount = await page.getByText('AI Assistant', { exact: true }).count()
+			+ await page.getByText('Evidence Chat', { exact: true }).count()
+			+ await page.getByText('Image Analysis', { exact: true }).count();
 		// May be 0 if drawer is closed — that's OK, just no 500
-		expect(hasTabLabels).toBeGreaterThanOrEqual(0);
+		expect(aiTabCount).toBeGreaterThanOrEqual(0);
 		await screenshot(page, 'evidence-ai-drawer.png');
 	});
 });
