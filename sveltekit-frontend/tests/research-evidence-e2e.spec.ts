@@ -142,9 +142,12 @@ test.describe('API parity — citations', () => {
 		expect([200, 401]).toContain(res.status());
 	});
 
-	test('POST /api/citations save_citation → 401 without auth', async ({ request }) => {
+	test('POST /api/citations save_citation → 401 or 404 (no such summary)', async ({ request }) => {
+		// Use nil UUID (passes Zod v4 uuid() validation) to get 404 from DB lookup
+		// rather than 400 from schema rejection. Non-existent summary → 404 with auth,
+		// or 401 if auth guard fires (when DEV_BYPASS_AUTH is not set).
 		const res = await request.post(`${BASE}/api/analytics/research-summaries`, {
-			data: { action: 'save_citation', summaryId: '00000000-0000-0000-0000-000000000001' },
+			data: { action: 'save_citation', summaryId: '00000000-0000-0000-0000-000000000000' },
 		});
 		expect([401, 404]).toContain(res.status());
 	});

@@ -3699,6 +3699,19 @@ export const researchSummaries = pgTable('research_summaries', {
   userId:         uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   /** Set when the user promotes this summary to a saved citation */
   savedCitationId: uuid('saved_citation_id').references(() => citations.id, { onDelete: 'set null' }),
+  /**
+   * 4D hypergraph manifold coordinates — set by buildHypergraph4D() after SOM+k-means.
+   * [som_x, som_y, semantic_z, grpo_w]
+   *   som_x:      SOM BMU x-coordinate on the 12×12 research grid (0–11)
+   *   som_y:      SOM BMU y-coordinate on the 12×12 research grid (0–11)
+   *   semantic_z: cosine distance to assigned cluster centroid [0,1] (0=at centroid)
+   *   grpo_w:     GRPO reward score [0,1] (quality grade: A≥0.75, B≥0.55, C≥0.35)
+   *
+   * NULL until the first hypergraph build runs. Enables direct SQL queries over 4D
+   * bounding regions without hitting Redis (offline analytics, batch reranking, cursor
+   * pagination by manifold region).
+   */
+  manifold4:      real('manifold4').array(),
   createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => [
   index('rs_pipeline_score_id').on(t.pipeline, t.relevanceScore, t.id),
@@ -3710,6 +3723,15 @@ export const researchSummaries = pgTable('research_summaries', {
 
 export type ResearchSummary    = typeof researchSummaries.$inferSelect;
 export type NewResearchSummary = typeof researchSummaries.$inferInsert;
+
+/**
+ * A research summary that has been incorporated into the 4D hypergraph.
+ * manifold4 is guaranteed non-null: [som_x, som_y, semantic_z, grpo_w].
+ * Use this type when querying summaries after a hypergraph build has run.
+ */
+export type ResearchArtifact = Omit<ResearchSummary, 'manifold4'> & {
+  manifold4: [number, number, number, number];
+};
 
 // ── User Research Tasks ───────────────────────────────────────────────────────
 // Persistent task list created from text highlights, deep-research topics, or
@@ -3737,4 +3759,52 @@ export const userResearchTasks = pgTable('user_research_tasks', {
 
 export type UserResearchTask    = typeof userResearchTasks.$inferSelect;
 export type NewUserResearchTask = typeof userResearchTasks.$inferInsert;
+
+// ── Context Timeline ──────────────────────────────────────────────────────────
+// Durable write-path for the RL self-modification loop.
+// Every user interaction that influences rlpolicy:pipeline_weights or triggers
+// a hypergraph rebuild is recorded here, closing the loop:
+//
+//   user signal → adaptFromAnalytics
+//     → Redis policy update + context_timeline row
+//     → threshold (8 signals) → hypergraph rebuild → X_prime centroids reset
+//     → selectAdaptiveMemory returns updated knowledge anchors
+//     → LLM system prompt shaped by accumulated feedback
+//
+// event_type: 'research' | 'feedback' | 'citation' | 'graph_edge' | 'rl_adapt' | 'tool_call' | 'summary'
+// signal:     'thumbs_up' | 'thumbs_down' | 'dwell_long' | 'dwell_short' | 'citation_saved' | null
+export const contextTimeline = pgTable('context_timeline', {
+  id:                  uuid('id').defaultRandom().primaryKey(),
+  /** null = anonymous / system-generated event */
+  userId:              uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  sessionId:           text('session_id').notNull().default(''),
+  /** Broad event class — drives downstream QLoRA distillation selector */
+  eventType:           text('event_type').notNull(),
+  /** Which pipeline produced the context for this event */
+  pipeline:            text('pipeline').notNull().default('ace'),
+  /** research_summaries row that triggered or was affected by this event */
+  summaryId:           uuid('summary_id').references(() => researchSummaries.id, { onDelete: 'set null' }),
+  /** 8-char FNV-1a key of the active hyperedge at signal time */
+  hyperedgeHash:       varchar('hyperedge_hash', { length: 8 }),
+  /** User feedback signal; null for non-feedback event types */
+  signal:              text('signal'),
+  /** GRPO reward delta applied by this signal (positive = good) */
+  grpoReward:          real('grpo_reward'),
+  /** New pipeline weight after RL delta was applied */
+  pipelineWeightAfter: real('pipeline_weight_after'),
+  /** True when this event was the one that crossed the rebuild threshold */
+  triggeredRebuild:    boolean('triggered_rebuild').notNull().default(false),
+  /** Catch-all for evolving fields (previousWeight, loraHint, etc.) */
+  payload:             jsonb('payload').notNull().default(sql`'{}'::jsonb`),
+  createdAt:           timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  index('ctx_user_created').on(t.userId, t.createdAt),
+  index('ctx_session_created').on(t.sessionId, t.createdAt),
+  index('ctx_event_type').on(t.eventType, t.createdAt),
+  index('ctx_pipeline_reward').on(t.pipeline, t.grpoReward),
+  index('ctx_hyperedge').on(t.hyperedgeHash),
+]);
+
+export type ContextTimelineRow    = typeof contextTimeline.$inferSelect;
+export type NewContextTimelineRow = typeof contextTimeline.$inferInsert;
 

@@ -82,6 +82,43 @@ message PageRankResponse {
   string source = 2;
 }
 
+// -- Memory Checkpoint (QLoRA / LoRA adapter selection) --
+// Published after every hypergraph build for each Grade A/B hyperedge.
+// The gRPC server stores X_prime centroids and maps them to the nearest
+// fine-tuned LoRA adapter — enabling per-query adapter loading at inference time.
+
+message MemoryCheckpointRequest {
+  string hyperedge_hash = 1;  // 8-char FNV-1a key
+  repeated float x_prime = 2; // 768-dim HGNN-enriched centroid (reward-weighted mean)
+  float grade_score = 3;       // [0,1] GRPO reward signal
+  string grade_label = 4;      // "A" | "B" | "C" | "D"
+  string pipeline = 5;         // dominant pipeline: ace|rag|kag|dag|codebase
+  int32 member_count = 6;      // number of research summaries in this cluster
+  string lora_hint = 7;        // suggested LoRA adapter: legal_rag|legal_kag|etc.
+}
+
+message MemoryCheckpointResponse {
+  bool accepted = 1;      // false = rejected (grade too low, duplicate, etc.)
+  string adapter_id = 2;  // nearest LoRA adapter UUID found by the server (optional)
+}
+
+// -- RL Analytics Signal (self-modification feedback) --
+// Emitted on user interaction (thumbs up/down, citation saved, dwell time).
+// Server adjusts pipeline weight deltas and can trigger re-clustering.
+
+message AnalyticsSignalRequest {
+  string signal = 1;          // thumbs_up|thumbs_down|dwell_long|dwell_short|citation_saved
+  string pipeline = 2;        // which pipeline produced the response
+  string hyperedge_hash = 3;  // active memory module hash at signal time (optional)
+  string user_id = 4;
+  string session_id = 5;
+}
+
+message AnalyticsSignalResponse {
+  float updated_weight = 1;   // new pipeline weight after delta applied
+  bool rebuild_triggered = 2; // true if pending count reached rebuild threshold
+}
+
 // -- Service --
 
 service GraphMLService {
@@ -89,4 +126,8 @@ service GraphMLService {
   rpc RunSOM(SOMRequest) returns (SOMResponse);
   rpc ScoreAttention(AttentionRequest) returns (AttentionResponse);
   rpc RunPageRank(PageRankRequest) returns (PageRankResponse);
+
+  // Memory module / self-modification RPCs
+  rpc PublishMemoryCheckpoint(MemoryCheckpointRequest) returns (MemoryCheckpointResponse);
+  rpc RecordAnalyticsSignal(AnalyticsSignalRequest) returns (AnalyticsSignalResponse);
 }

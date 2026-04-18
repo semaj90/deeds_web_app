@@ -215,6 +215,23 @@ async function maybeTriggerGraphRebuild(newlyInserted: number): Promise<void> {
 		);
 		await buildResearchGraph();
 		await computeRlPolicy();
+
+		// After RL weights are refreshed, re-warm top-5 prefix KV slots so the
+		// next inference requests immediately benefit from the new policy ranking.
+		import('$lib/server/inference/turbo-prefix-cache.js').then(async ({ buildAndWarmPrefix }) => {
+			const { pool: pg } = await import('$lib/server/db/client');
+			type Row = { query: string };
+			const { rows } = await pg.query<Row>(
+				`SELECT DISTINCT ON (query) query
+				 FROM   research_summaries
+				 WHERE  embedding IS NOT NULL
+				 ORDER  BY query, relevance_score DESC
+				 LIMIT  5`,
+			).catch(() => ({ rows: [] as Row[] }));
+			for (const { query } of rows) {
+				buildAndWarmPrefix(query).catch(() => {});
+			}
+		}).catch(() => {});
 	} catch { /* non-fatal */ }
 }
 
@@ -317,6 +334,12 @@ export async function crawlWebResearch(
 		})))
 			.then(inserted => maybeTriggerGraphRebuild(inserted).catch(() => {}))
 			.catch(() => {});
+	}).catch(() => {});
+
+	// Proactively warm the TurboQuant KV prefix for this query now that fresh
+	// summaries are in Redis — next inference request for this query gets a cache hit.
+	import('$lib/server/inference/turbo-prefix-cache.js').then(({ buildAndWarmPrefix }) => {
+		buildAndWarmPrefix(query).catch(() => {});
 	}).catch(() => {});
 
 	// Warm Redis L1 glyph cache immediately (non-blocking)
@@ -610,6 +633,11 @@ export async function crawlLegalCorpus(
 			relevanceScore: s.relevanceScore,
 			userId:         null,
 		}))).catch(() => {});
+	}).catch(() => {});
+
+	// Proactively warm the TurboQuant KV prefix for this corpus query.
+	import('$lib/server/inference/turbo-prefix-cache.js').then(({ buildAndWarmPrefix }) => {
+		buildAndWarmPrefix(query).catch(() => {});
 	}).catch(() => {});
 
 	// Warm Redis L1 glyph cache from corpus hits (non-blocking)

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://www.getbifrost.ai/schema",
   "vector_store": {
     "enabled": true,
     "type": "qdrant",
@@ -45,11 +46,13 @@
             "nomic-embed-text:latest",
             "gemma3:270m"
           ],
-          "weight": 1.0
+          "weight": 1.0,
+          "ollama_key_config": {
+            "url": "http://host.docker.internal:11434"
+          }
         }
       ],
       "network_config": {
-        "base_url": "http://host.docker.internal:11434",
         "default_request_timeout_in_seconds": 120
       }
     }

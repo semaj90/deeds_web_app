@@ -251,6 +251,94 @@ export function scoreGRPOReward(
 
 export { rewardScoreGPU };
 
+// ── Memory Checkpoint — gRPC serialization for QLoRA adapter selection ────────
+
+/**
+ * A memory checkpoint is the HGNN-enriched X_prime centroid for one hyperedge,
+ * serialized for consumption by the QLoRA adapter selector:
+ *
+ *   X_prime[j] (768-dim, reward-weighted cluster mean)
+ *     → cosine distance to each LoRA adapter's parameter-space embedding
+ *     → nearest adapter loaded for this query's inference request
+ *
+ * This closes the self-modification loop:
+ *   user query → selectAdaptiveMemory → X_prime centroid
+ *     → publishMemoryCheckpoints → gRPC server → LoRA adapter selection
+ *     → inference with domain-specific adapter weights
+ *     → user feedback → adaptFromAnalytics → RL policy update → rebuild
+ */
+export interface MemoryCheckpoint {
+  hyperedgeHash:  string;       // 8-char FNV-1a key
+  xPrimeCentroid: Float32Array; // 768-dim HGNN-enriched centroid
+  gradeScore:     number;       // [0,1] GRPO reward signal
+  gradeLabel:     string;       // 'A'|'B'|'C'|'D'
+  pipeline:       string;       // dominant pipeline label
+  memberCount:    number;
+  loraHint:       string;       // 'legal_rag' | 'legal_kag' | 'legal_dag' | 'legal_ace'
+}
+
+/**
+ * Publish X_prime memory checkpoints to the gRPC graph-ML service.
+ * The gRPC server maps each 768-dim centroid to the nearest LoRA adapter,
+ * enabling per-query adapter loading at inference time.
+ *
+ * Falls back to Redis ZSET `rl:memory:checkpoints` when gRPC is unavailable.
+ * Always fire-and-forget — never throws.
+ */
+export async function publishMemoryCheckpoints(
+  checkpoints: MemoryCheckpoint[],
+): Promise<void> {
+  const grpcEnabled = !!(ENV as any).GRAPH_ML_GRPC_ENABLED;
+
+  // ── gRPC path ─────────────────────────────────────────────────────────────
+  if (grpcEnabled) {
+    const client = await getGrpcClient().catch(() => null);
+    if (client) {
+      try {
+        await Promise.all(
+          checkpoints.map(cp =>
+            new Promise<void>((resolve, reject) => {
+              client.PublishMemoryCheckpoint(
+                {
+                  hyperedge_hash: cp.hyperedgeHash,
+                  x_prime:        Array.from(cp.xPrimeCentroid),
+                  grade_score:    cp.gradeScore,
+                  grade_label:    cp.gradeLabel,
+                  pipeline:       cp.pipeline,
+                  member_count:   cp.memberCount,
+                  lora_hint:      cp.loraHint,
+                },
+                (err: Error | null) => (err ? reject(err) : resolve()),
+              );
+            })
+          ),
+        );
+        return; // gRPC succeeded — skip Redis fallback
+      } catch { /* fall through */ }
+    }
+  }
+
+  // ── Redis fallback: ZSET keyed by gradeScore, blob at rl:memory:cp:{hash} ──
+  // turbo-prefix-cache.ts and ACE assembler can ZREVRANGEBYSCORE to get top-N
+  // checkpoints without a gRPC round-trip.
+  try {
+    const { getRedis } = await import('$lib/server/redis.js');
+    const redis = getRedis();
+    const pipe = redis.pipeline();
+    const CP_TTL = 4 * 60 * 60; // 4h — matches HG_EDGE_TTL in hypergraph-4d.ts
+    for (const cp of checkpoints) {
+      pipe.set(
+        `rl:memory:cp:${cp.hyperedgeHash}`,
+        JSON.stringify({ ...cp, xPrimeCentroid: Array.from(cp.xPrimeCentroid) }),
+        'EX', CP_TTL,
+      );
+      pipe.zadd('rl:memory:checkpoints', cp.gradeScore, cp.hyperedgeHash);
+    }
+    pipe.expire('rl:memory:checkpoints', CP_TTL);
+    await pipe.exec();
+  } catch { /* non-fatal */ }
+}
+
 // ── Status ────────────────────────────────────────────────────────────────────
 
 /**

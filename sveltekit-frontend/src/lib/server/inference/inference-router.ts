@@ -41,6 +41,7 @@ import { bifrostChat } from '$lib/server/ollama.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 import { TURBOQUANT_BASE_URL, LITERT_BASE_URL, VLM_BASE_URL } from '$lib/ai/model-ids.js';
+import { isPrefixWarm } from '$lib/server/inference/turbo-prefix-cache.js';
 import { execSync, spawn } from 'node:child_process';
 
 /** Minimum free VRAM (MB) required before routing to TensorRT-LLM */
@@ -452,9 +453,20 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
   }
 
   try {
+    // Check if the system prompt is already warm in the GPU KV slot.
+    // Logged for observability — warm hits skip ~2K token re-processing.
+    const prefixAlreadyWarm = request.systemPrompt
+      ? await isPrefixWarm(request.systemPrompt).catch(() => false)
+      : false;
+    if (prefixAlreadyWarm) {
+      console.debug('[turbo] KV prefix cache HIT — reusing GPU slot');
+    }
+
     // OpenAI-compatible /v1/chat/completions — llama-server b8757+
     // When model uses thinking mode, content may be empty and reasoning in reasoning_content
     // With --mmproj, also handles vision via image_url content parts
+    // cache_prompt=true: tells llama-server to keep this prompt's KV state in its slot
+    // for reuse on subsequent requests with the same system prompt prefix.
     const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -463,6 +475,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
         max_tokens: request.maxTokens ?? 2048,
         temperature: request.temperature ?? 0.7,
         stream: false,
+        cache_prompt: true,
       }),
       signal: AbortSignal.timeout(120_000),
     });

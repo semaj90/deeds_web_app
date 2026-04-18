@@ -99,6 +99,20 @@
       "when": 1745086800000,
       "tag": "0013_research_summaries",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1745173200000,
+      "tag": "0014_user_research_tasks",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1745259600000,
+      "tag": "0015_context_timeline",
+      "breakpoints": true
     }
   ]
 }

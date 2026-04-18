@@ -1506,7 +1506,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Apply budget limit: slice contextDocs to policy-determined chunk count before injecting into prompt
       const promptDocs = contextDocs.slice(0, policyDecision.budget.limits.mergedChunkCount);
 
-      let systemPrompt =
+      // ── Graph-aware KV prefix (≤150ms timeout, never blocks inference) ──────
+      // buildGraphAwarePrefix pulls RL policy (L0), recent research summaries
+      // (L1 Redis ZSET → L2 Postgres pgvector), DYM suggestions, and fires a
+      // background crawl if the index is empty (L3). The returned prefix is
+      // deterministic for a given RL policy + research index snapshot, so
+      // llama-server's KV cache reuses it across many queries sharing the same
+      // knowledge anchors. Fire-and-forget warm happens inside buildAndWarmPrefix.
+      let graphAwarePrefix = '';
+      try {
+        const { buildAndWarmPrefix } = await import(
+          '$lib/server/inference/turbo-prefix-cache.js'
+        );
+        graphAwarePrefix = await Promise.race([
+          buildAndWarmPrefix(message, { caseContext: caseContext ?? undefined }),
+          new Promise<string>((_, reject) => setTimeout(reject, 150)),
+        ]);
+      } catch { /* non-fatal — proceed without graph context */ }
+
+      // Base role instructions. If we got a graph-aware prefix (which already
+      // includes the base role instructions), use it directly; otherwise fall
+      // back to the hardcoded base so the prompt is never empty.
+      let systemPrompt = graphAwarePrefix ||
         'You are a legal AI assistant specialized in prosecutor and detective workflows. ' +
         'Provide accurate, detailed, and actionable legal analysis. ' +
         'Always cite relevant statutes and case law when possible. ' +
@@ -1529,7 +1550,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
 
       // Inject case context (case details, evidence, citations)
-      if (caseContext) {
+      // Skip if the graph-aware prefix already included it via buildAndWarmPrefix
+      if (caseContext && !graphAwarePrefix) {
         systemPrompt += `\n\n${caseContext}`;
       }
 
@@ -1645,6 +1667,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             toolErr instanceof Error ? toolErr.message : toolErr
           );
         }
+      }
+
+      // ── TurboQuant KV prefix warm (fallback) ─────────────────────────────
+      // buildAndWarmPrefix (called above) already fires the KV warm for the
+      // stable graph-aware prefix. Only fall back here if the prefix build
+      // timed out so the GPU slot still gets warmed with the ACE system prompt.
+      if (!graphAwarePrefix) {
+        import('$lib/server/inference/turbo-prefix-cache.js').then(({ warmTurboQuantKvCache }) => {
+          warmTurboQuantKvCache(systemPrompt).catch(() => {});
+        }).catch(() => {});
       }
 
       let fullResponse = '';
