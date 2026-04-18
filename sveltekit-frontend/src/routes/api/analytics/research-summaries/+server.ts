@@ -171,6 +171,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.set({ savedCitationId: newCitation.id })
 			.where(eq(researchSummaries.id, summaryId));
 
+		// RL signal: citation_saved is the strongest positive reward (+0.05)
+		import('$lib/server/graph/hypergraph-4d.js')
+			.then(({ adaptFromAnalytics }) =>
+				adaptFromAnalytics({
+					signal:    'citation_saved',
+					pipeline:  summary.pipeline ?? 'ace',
+					userId:    locals.user.id,
+					sessionId: locals.user.id,
+				})
+			)
+			.catch(() => {});
+
 		return json({ citationId: newCitation.id, citation: newCitation });
 	}
 

@@ -200,6 +200,22 @@ async function toggleRelated(id: string) {
 	relatedOpenId  = id;
 	relatedItems   = [];
 	relatedLoading = true;
+
+	// Opening "Related" is a dwell_long intent signal — fire RL signal
+	const row = data?.summaries.find(s => s.id === id);
+	if (row) {
+		fetch('/api/analytics/context-timeline', {
+			method:  'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				eventType: 'feedback',
+				signal:    'dwell_long',
+				pipeline:  row.pipeline ?? 'ace',
+				payload:   { summaryId: id, trigger: 'related_panel_open' },
+			}),
+		}).catch(() => {});
+	}
+
 	try {
 		const res = await fetch(`/api/analytics/research-summaries/${id}?mode=similar&limit=5`);
 		if (!res.ok) throw new Error(await res.text());
