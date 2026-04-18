@@ -3,17 +3,19 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface Props {
-		queryHash:   string;
-		pipeline?:   string;
-		chunkIds?:   string[];
-		compact?:    boolean;
-		showCounts?: boolean;
+		queryHash:      string;
+		pipeline?:      string;
+		chunkIds?:      string[];
+		hyperedgeHash?: string;
+		compact?:       boolean;
+		showCounts?:    boolean;
 	}
 
 	let {
 		queryHash,
 		pipeline,
 		chunkIds = [],
+		hyperedgeHash,
 		compact    = false,
 		showCounts = false,
 	}: Props = $props();
@@ -64,7 +66,7 @@
 			const res = await fetch('/api/analytics/feedback', {
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body:    JSON.stringify({ queryHash, rating: newRating, pipeline, chunkIds }),
+				body:    JSON.stringify({ queryHash, rating: newRating, pipeline, chunkIds, hyperedgeHash }),
 			});
 			if (!res.ok) throw new Error('Failed');
 			const d = await res.json() as { counts: { up: number; down: number }; rating: 'up' | 'down' | null };
