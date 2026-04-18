@@ -86,10 +86,10 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const parsed = querySchema.safeParse({
-		days:        url.searchParams.get('days'),
-		temperature: url.searchParams.get('temperature'),
-		q:           url.searchParams.get('q'),
-		suggest:     url.searchParams.get('suggest'),
+		days:        url.searchParams.get('days')        ?? undefined,
+		temperature: url.searchParams.get('temperature') ?? undefined,
+		q:           url.searchParams.get('q')           ?? undefined,
+		suggest:     url.searchParams.get('suggest')     ?? undefined,
 	});
 	if (!parsed.success) return json({ error: 'Invalid query params', issues: parsed.error.issues }, { status: 400 });
 

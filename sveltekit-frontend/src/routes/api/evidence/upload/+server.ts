@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { deleteFile, uploadFile } from '$lib/server/minio-client';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { evidence } from '$lib/server/db/schema-postgres.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
@@ -318,43 +319,49 @@ export async function POST({ request, locals }: RequestEvent) {
 
     const minioUrl = `minio://${BUCKET}/${objectKey}`;
 
-    // 4. Insert into PostgreSQL (raw SQL — Drizzle schema out of sync with actual DB columns)
+    // 4. Insert into PostgreSQL via Drizzle ORM
     updateJob(jobId, { step: 'db-insert', progress: 50, message: 'Saving to database...' });
 
     const evidenceNumber = `EV-${Date.now().toString(36).toUpperCase()}`;
-    const initialAnalysis = JSON.stringify({
-      textLength: null,
-      extractionMethod: null,
-      extractionStatus: 'pending',
-      uploadedVia: 'api',
-    });
-    const insertResult = await db.execute(sql`
-			INSERT INTO evidence (case_id, user_id, evidence_number, title, type, summary, description,
-        evidence_type, file_type, mime_type, file_url, file_name, file_size, hash, uploaded_at,
-        ai_analysis, uploaded_by)
-			VALUES (
-        ${caseId},
-				${locals.user.id},
-				${evidenceNumber},
-				${title || file.name},
-				'document',
-				${description || `Uploaded file: ${file.name}`},
-				${description},
-				${evidenceType},
-				${file.type},
-        ${file.type || null},
-				${minioUrl},
-				${file.name},
-				${file.size},
-				${'sha256:' + fileHash},
-				NOW(),
-        ${initialAnalysis}::jsonb,
-				${locals.user.id}
-			)
-			RETURNING id
-		`);
-    const resultRows = getResultRows(insertResult);
-    const inserted = { id: (resultRows[0] as Record<string, any>)?.id };
+    const VALID_EVIDENCE_TYPES = [
+      'document', 'photo', 'video', 'audio', 'physical', 'digital',
+      'witness_statement', 'forensic', 'documentary', 'testimonial',
+      'demonstrative', 'real', 'circumstantial', 'hearsay', 'expert', 'scientific',
+    ] as const;
+    type EvidenceTypeVal = (typeof VALID_EVIDENCE_TYPES)[number];
+    const safeEvidenceType: EvidenceTypeVal | null = VALID_EVIDENCE_TYPES.includes(
+      evidenceType as EvidenceTypeVal,
+    )
+      ? (evidenceType as EvidenceTypeVal)
+      : null;
+
+    const [inserted] = await db
+      .insert(evidence)
+      .values({
+        caseId,
+        userId: locals.user.id,
+        evidenceNumber,
+        title: title || file.name,
+        type: 'document',
+        summary: description || `Uploaded file: ${file.name}`,
+        description,
+        evidenceType: safeEvidenceType,
+        fileType: file.type,
+        mimeType: file.type || null,
+        fileUrl: minioUrl,
+        fileName: file.name,
+        fileSize: file.size,
+        hash: 'sha256:' + fileHash,
+        uploadedAt: new Date().toISOString(),
+        aiAnalysis: {
+          textLength: null,
+          extractionMethod: null,
+          extractionStatus: 'pending',
+          uploadedVia: 'api',
+        },
+        uploadedBy: locals.user.id,
+      })
+      .returning({ id: evidence.id });
 
     const evidenceId = inserted.id;
     updateJob(jobId, {

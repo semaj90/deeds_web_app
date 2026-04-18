@@ -6,7 +6,7 @@
 	let summary = $derived(data.summary);
 	let patterns = $derived(data.patterns);
 
-	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research'>('overview');
+	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research' | 'matrix'>('overview');
 
 	interface PersonalizedCase {
 		caseId: string;
@@ -143,6 +143,43 @@
 		executingPromptId = null;
 	}
 
+	// ── MapReduce Matrix state ──────────────────────────────────────────
+	interface MatrixRow {
+		chunkId: string;
+		filePath: string;
+		scores: number[];
+		composite: number;
+	}
+	interface MatrixData {
+		matrix: MatrixRow[];
+		topChunks: Array<{ chunkId: string; filePath: string; composite: number; pipeline: string }>;
+		pipelineCoverage: Record<string, number>;
+		glyphContext: { totalGlyphs: number; topSections: Array<{ section: string; count: number }> };
+		synthesis: { topics: Array<{ title: string; rationale: string; selfPrompt: string; pipeline: string }> } | null;
+		meta: { userId: string; days: number; rowCount: number; computeMs: number };
+	}
+	let matrixData = $state<MatrixData | null>(null);
+	let matrixLoading = $state(false);
+	let matrixError = $state<string | null>(null);
+
+	async function loadMatrix(refresh = false) {
+		if (matrixData && !refresh) return;
+		matrixLoading = true;
+		matrixError = null;
+		try {
+			const url = refresh ? '/api/analytics/mapreduce-matrix?refresh=true' : '/api/analytics/mapreduce-matrix';
+			const res = await fetch(url);
+			if (res.ok) {
+				matrixData = await res.json();
+			} else {
+				matrixError = 'Failed to load matrix analysis';
+			}
+		} catch {
+			matrixError = 'Network error loading matrix';
+		}
+		matrixLoading = false;
+	}
+
 	function priorityColor(p: string): string {
 		if (p === 'high') return 'rgba(248, 113, 113, 0.8)';
 		if (p === 'medium') return 'rgba(251, 191, 36, 0.7)';
@@ -189,12 +226,13 @@
 			{ id: 'cache', label: 'Cache Performance', icon: 'database' },
 			{ id: 'search-intel', label: 'Search Intelligence', icon: 'search' },
 			{ id: 'deep-research', label: 'Deep Research', icon: 'brain' },
+			{ id: 'matrix', label: 'MapReduce Matrix', icon: 'grid-3x3' },
 			{ id: 'for-you', label: 'For You', icon: 'sparkles' }
 		] as tab}
 			<button
 				class="ana-tab"
 				class:active={activeTab === tab.id}
-				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); if (tab.id === 'deep-research') loadDeepResearch(); }}
+				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); if (tab.id === 'deep-research') loadDeepResearch(); if (tab.id === 'matrix') loadMatrix(); }}
 			>
 				<Icon name={tab.icon} />
 				{tab.label}
@@ -711,6 +749,109 @@
 		{/if}
 	{/if}
 
+	{#if activeTab === 'matrix'}
+		<div class="ana-card">
+			<div class="ana-card-head">
+				<h3 class="ana-card-title">MapReduce Matrix Analysis</h3>
+				<p class="ana-card-desc">8-dimensional similarity matrix across RAG/KAG/DAG/ACE pipelines with cosine-scored chunk ranking</p>
+				<button class="ana-refresh-btn" onclick={() => loadMatrix(true)} disabled={matrixLoading}>
+					<Icon name="refresh-cw" /> Refresh
+				</button>
+			</div>
+
+			{#if matrixLoading}
+				<div class="ana-loading">Executing MapReduce pipeline…</div>
+			{:else if matrixError}
+				<div class="ana-error">{matrixError}</div>
+			{:else if matrixData}
+				<!-- Pipeline Coverage -->
+				<div class="matrix-section">
+					<h4>Pipeline Coverage</h4>
+					<div class="matrix-coverage">
+						{#each Object.entries(matrixData.pipelineCoverage) as [pipeline, count]}
+							<div class="matrix-coverage-item">
+								<span class="matrix-pipe-label">{pipeline.toUpperCase()}</span>
+								<span class="matrix-pipe-count">{count}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Top Ranked Chunks -->
+				<div class="matrix-section">
+					<h4>Top Ranked Chunks</h4>
+					<div class="matrix-table-wrap">
+						<table class="matrix-table">
+							<thead>
+								<tr>
+									<th>File</th>
+									<th>Pipeline</th>
+									<th>Composite</th>
+									<th>RAG</th>
+									<th>KAG</th>
+									<th>DAG</th>
+									<th>ACE</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each matrixData.topChunks.slice(0, 15) as chunk}
+									{@const row = matrixData.matrix.find(r => r.chunkId === chunk.chunkId)}
+									<tr>
+										<td class="matrix-filepath">{chunk.filePath?.split('/').slice(-2).join('/') ?? chunk.chunkId.slice(0, 12)}</td>
+										<td><span class="matrix-pipe-badge">{chunk.pipeline}</span></td>
+										<td class="matrix-score">{chunk.composite.toFixed(3)}</td>
+										<td class="matrix-score">{row?.scores[0]?.toFixed(2) ?? '–'}</td>
+										<td class="matrix-score">{row?.scores[1]?.toFixed(2) ?? '–'}</td>
+										<td class="matrix-score">{row?.scores[2]?.toFixed(2) ?? '–'}</td>
+										<td class="matrix-score">{row?.scores[3]?.toFixed(2) ?? '–'}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- Glyph Topology Context -->
+				{#if matrixData.glyphContext.totalGlyphs > 0}
+					<div class="matrix-section">
+						<h4>Glyph Topology ({matrixData.glyphContext.totalGlyphs} glyphs)</h4>
+						<div class="matrix-coverage">
+							{#each matrixData.glyphContext.topSections as sec}
+								<div class="matrix-coverage-item">
+									<span class="matrix-pipe-label">{sec.section}</span>
+									<span class="matrix-pipe-count">{sec.count}</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Synthesis Topics -->
+				{#if matrixData.synthesis?.topics?.length}
+					<div class="matrix-section">
+						<h4>Self-Prompting Research Topics</h4>
+						{#each matrixData.synthesis.topics as topic, i}
+							<div class="dr-topic-card">
+								<div class="dr-topic-num">{i + 1}</div>
+								<div class="dr-topic-body">
+									<div class="dr-topic-title">{topic.title}</div>
+									<div class="dr-topic-rationale">{topic.rationale}</div>
+									<div class="dr-topic-tags">
+										<span class="dr-tag">{topic.pipeline}</span>
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+
+				<div class="dr-meta">
+					{matrixData.meta.rowCount} chunks in {matrixData.meta.computeMs}ms — {matrixData.meta.days}-day window
+				</div>
+			{/if}
+		</div>
+	{/if}
+
 	{#if activeTab === 'for-you'}
 		<div class="ana-card">
 			<div class="ana-card-head">
@@ -1209,4 +1350,19 @@
 		text-align: right;
 		padding: 0.25rem 0;
 	}
+
+	/* MapReduce Matrix tab */
+	.matrix-section { margin-bottom: 1rem; }
+	.matrix-section h4 { font-size: 0.75rem; color: rgba(212, 199, 163, 0.6); margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+	.matrix-coverage { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+	.matrix-coverage-item { display: flex; align-items: center; gap: 0.35rem; background: rgba(212, 199, 163, 0.06); border: 1px solid rgba(212, 199, 163, 0.08); border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.7rem; }
+	.matrix-pipe-label { color: rgba(212, 199, 163, 0.5); text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.04em; }
+	.matrix-pipe-count { color: rgba(96, 165, 250, 0.9); font-weight: 600; }
+	.matrix-table-wrap { overflow-x: auto; }
+	.matrix-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+	.matrix-table th { text-align: left; padding: 0.3rem 0.5rem; color: rgba(212, 199, 163, 0.4); border-bottom: 1px solid rgba(212, 199, 163, 0.08); font-weight: 500; }
+	.matrix-table td { padding: 0.3rem 0.5rem; border-bottom: 1px solid rgba(212, 199, 163, 0.04); }
+	.matrix-filepath { color: rgba(212, 199, 163, 0.7); max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.matrix-score { color: rgba(96, 165, 250, 0.8); font-family: monospace; text-align: right; }
+	.matrix-pipe-badge { background: rgba(96, 165, 250, 0.12); color: rgba(96, 165, 250, 0.9); padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.6rem; text-transform: uppercase; }
 </style>

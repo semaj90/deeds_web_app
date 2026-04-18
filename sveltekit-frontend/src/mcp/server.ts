@@ -592,7 +592,8 @@ function setupToolHandlers() {
             },
             maxFiles: {
               type: 'number',
-              description: 'Max file chunks to include when query-based lookup is used (default: 5)',
+              description:
+                'Max file chunks to include when query-based lookup is used (default: 5)',
               default: 5,
             },
             force: {
@@ -824,7 +825,8 @@ function setupToolHandlers() {
             },
             domains: {
               type: 'string',
-              description: 'Comma-separated codebase domain seeds: typescript,sveltekit,ripgrep,awk,ollama',
+              description:
+                'Comma-separated codebase domain seeds: typescript,sveltekit,ripgrep,awk,ollama',
               default: '',
             },
             rebuild: {
@@ -855,7 +857,8 @@ function setupToolHandlers() {
             },
             fileGlob: {
               type: 'string',
-              description: 'Glob pattern to filter files (e.g. "*.ts", "*.svelte", "**/*.server.ts")',
+              description:
+                'Glob pattern to filter files (e.g. "*.ts", "*.svelte", "**/*.server.ts")',
               default: '*.{ts,svelte}',
             },
             maxResults: {
@@ -870,6 +873,71 @@ function setupToolHandlers() {
             },
           },
           required: ['pattern'],
+        },
+      },
+      // ─────────────────────────────────────────────────────────────────────
+      // Analytics — MapReduce Matrix Analysis (RAG/KAG/DAG/ACE similarity)
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'analytics:mapreduce_matrix',
+        description:
+          'Execute MapReduce matrix analysis across RAG/KAG/DAG/ACE pipelines. ' +
+          'MAP: extracts 5 data sources (chunk_hit_log, response_feedback, CouchDB glyph topology, ' +
+          'Redis rerank cache, qlora_examples). REDUCE: builds 8-dimensional similarity matrix. ' +
+          'SYNTHESIZE: generates LangGraph-compatible research topics via Ollama. ' +
+          'Returns ranked chunks, pipeline coverage, glyph context, and self-prompting topics.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User UUID for personalisation' },
+            days: {
+              type: 'number',
+              description: 'Lookback window in days (1-30, default: 7)',
+              default: 7,
+            },
+            topK: {
+              type: 'number',
+              description: 'Top chunks to return (1-100, default: 20)',
+              default: 20,
+            },
+            synthesize: {
+              type: 'boolean',
+              description: 'Run Ollama synthesis (default: true)',
+              default: true,
+            },
+          },
+          required: ['userId'],
+        },
+      },
+      // ─────────────────────────────────────────────────────────────────────
+      // Analytics — Codebase Deep Research (rg + pipeline + Ollama)
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'analytics:codebase_research',
+        description:
+          'Deep research codebase scanner using ripgrep pattern analysis, pipeline hit distribution, ' +
+          'feedback-weighted query insights, and Ollama synthesis. Generates TypeScript/SvelteKit-specific ' +
+          'research topics with code patterns and self-prompts. Cached 30 min per user.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User UUID for personalisation' },
+            days: {
+              type: 'number',
+              description: 'Lookback window in days (1-30, default: 7)',
+              default: 7,
+            },
+            query: {
+              type: 'string',
+              description: 'Optional rg search query to include in analysis',
+            },
+            synthesize: {
+              type: 'boolean',
+              description: 'Run Ollama synthesis (default: true)',
+              default: true,
+            },
+          },
+          required: ['userId'],
         },
       },
     ],
@@ -1606,14 +1674,23 @@ function setupToolHandlers() {
 
         if (resolvedClusterId == null && clusterQuery) {
           const { searchCodebase } = await import('../lib/server/indexer/dual-embedder.js');
-          const hits = await searchCodebase(clusterQuery, { limit: maxFiles, contentWeight: 0.6, signatureWeight: 0.4 });
+          const hits = await searchCodebase(clusterQuery, {
+            limit: maxFiles,
+            contentWeight: 0.6,
+            signatureWeight: 0.4,
+          });
           const topCluster = hits[0]?.chunk?.neo4j_gpuCluster ?? hits[0]?.chunk?.som_cluster;
           if (typeof topCluster === 'number') resolvedClusterId = topCluster;
         }
 
         if (resolvedClusterId == null) {
           return {
-            content: [{ type: 'text', text: JSON.stringify({ error: 'Provide clusterId or query to resolve one' }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({ error: 'Provide clusterId or query to resolve one' }),
+              },
+            ],
           };
         }
 
@@ -1622,7 +1699,12 @@ function setupToolHandlers() {
 
         if (!summary) {
           return {
-            content: [{ type: 'text', text: JSON.stringify({ error: `No data for cluster ${resolvedClusterId}` }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({ error: `No data for cluster ${resolvedClusterId}` }),
+              },
+            ],
           };
         }
 
@@ -1639,8 +1721,8 @@ function setupToolHandlers() {
             })
             .slice(0, maxFiles)
             .map((h) => ({
-              path:    String(h.chunk.path ?? h.chunk.relativePath ?? ''),
-              score:   Math.round(h.score * 1000) / 1000,
+              path: String(h.chunk.path ?? h.chunk.relativePath ?? ''),
+              score: Math.round(h.score * 1000) / 1000,
               content: String(h.chunk.content ?? '').slice(0, 500),
             }));
         }
@@ -1651,13 +1733,13 @@ function setupToolHandlers() {
               type: 'text',
               text: JSON.stringify({
                 clusterId: resolvedClusterId,
-                purpose:     summary.purpose,
-                summary:     summary.summary,
-                patterns:    summary.patterns,
-                keyFiles:    summary.keyFiles,
-                warnings:    summary.warnings,
+                purpose: summary.purpose,
+                summary: summary.summary,
+                patterns: summary.patterns,
+                keyFiles: summary.keyFiles,
+                warnings: summary.warnings,
                 generatedAt: summary.generatedAt,
-                chunks:      clusterChunks,
+                chunks: clusterChunks,
               }),
             },
           ],
@@ -1986,9 +2068,9 @@ function setupToolHandlers() {
       // ── Analytics: Deep Research ──────────────────────────────────────────
       case 'analytics:deep_research': {
         const { generateDeepResearch } = await import('$lib/server/analytics/deep-research.js');
-        const userId  = String(args.userId ?? 'anonymous');
+        const userId = String(args.userId ?? 'anonymous');
         const refresh = Boolean(args.refresh ?? false);
-        const result  = await generateDeepResearch(userId, { skipCache: refresh });
+        const result = await generateDeepResearch(userId, { skipCache: refresh });
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
@@ -2002,9 +2084,12 @@ function setupToolHandlers() {
         } = await import('$lib/server/analytics/research-cache.js');
 
         const pipeline = (args.pipeline ?? 'all') as Parameters<typeof queryResearchIndex>[0];
-        const limit    = Math.min(50, Math.max(1, Number(args.limit ?? 12)));
-        const rebuild  = Boolean(args.rebuild ?? false);
-        const domains  = String(args.domains ?? '').split(',').map((d: string) => d.trim()).filter(Boolean);
+        const limit = Math.min(50, Math.max(1, Number(args.limit ?? 12)));
+        const rebuild = Boolean(args.rebuild ?? false);
+        const domains = String(args.domains ?? '')
+          .split(',')
+          .map((d: string) => d.trim())
+          .filter(Boolean);
 
         if (rebuild) {
           await invalidateResearchIndex();
@@ -2017,19 +2102,38 @@ function setupToolHandlers() {
 
         // Seed domain topics for codebase pipeline when index is sparse
         const DOMAIN_SEEDS: Record<string, string[]> = {
-          typescript: ['How do TypeScript generics constrain Drizzle ORM query builders?', 'What unsafe casts remain in the server layer?'],
-          sveltekit:  ['How does SvelteKit 2 layout hierarchy affect SSR caching?', 'Which routes misuse throw error() inside try/catch?'],
-          ripgrep:    ['What files import from db/index instead of db/client?', 'Which API routes are missing Zod validation?'],
-          awk:        ['Aggregate chunk score distribution from chunk_hit_log.', 'Compute avg search_time_ms per pipeline grouped by day.'],
-          ollama:     ['Optimal KV cache quantisation for gemma4-legal at 8K context?', 'Flash Attention trade-offs on RTX 3060 Ti.'],
+          typescript: [
+            'How do TypeScript generics constrain Drizzle ORM query builders?',
+            'What unsafe casts remain in the server layer?',
+          ],
+          sveltekit: [
+            'How does SvelteKit 2 layout hierarchy affect SSR caching?',
+            'Which routes misuse throw error() inside try/catch?',
+          ],
+          ripgrep: [
+            'What files import from db/index instead of db/client?',
+            'Which API routes are missing Zod validation?',
+          ],
+          awk: [
+            'Aggregate chunk score distribution from chunk_hit_log.',
+            'Compute avg search_time_ms per pipeline grouped by day.',
+          ],
+          ollama: [
+            'Optimal KV cache quantisation for gemma4-legal at 8K context?',
+            'Flash Attention trade-offs on RTX 3060 Ti.',
+          ],
         };
-        const seedTopics = domains.flatMap((d: string) => DOMAIN_SEEDS[d.toLowerCase()] ?? []).slice(0, 6);
+        const seedTopics = domains
+          .flatMap((d: string) => DOMAIN_SEEDS[d.toLowerCase()] ?? [])
+          .slice(0, 6);
 
         return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({ sketches, seedTopics, meta: { pipeline, limit, ...stats } }),
-          }],
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({ sketches, seedTopics, meta: { pipeline, limit, ...stats } }),
+            },
+          ],
         };
       }
 
@@ -2039,18 +2143,22 @@ function setupToolHandlers() {
         const { promisify } = await import('util');
         const execFileAsync = promisify(execFile);
 
-        const pattern   = String(args.pattern ?? '');
-        const fileGlob  = String(args.fileGlob ?? '*.{ts,svelte}');
-        const maxRes    = Math.min(200, Math.max(1, Number(args.maxResults ?? 40)));
-        const noCase    = Boolean(args.caseInsensitive ?? false);
+        const pattern = String(args.pattern ?? '');
+        const fileGlob = String(args.fileGlob ?? '*.{ts,svelte}');
+        const maxRes = Math.min(200, Math.max(1, Number(args.maxResults ?? 40)));
+        const noCase = Boolean(args.caseInsensitive ?? false);
 
         if (!pattern) throw new Error('pattern is required');
 
         const rgArgs = [
-          '--no-heading', '--line-number', '--color=never',
-          '--glob', fileGlob,
+          '--no-heading',
+          '--line-number',
+          '--color=never',
+          '--glob',
+          fileGlob,
           ...(noCase ? ['-i'] : []),
-          '--max-count', String(maxRes),
+          '--max-count',
+          String(maxRes),
           pattern,
           'src',
         ];
@@ -2067,11 +2175,54 @@ function setupToolHandlers() {
 
         const lines = output.split('\n').filter(Boolean).slice(0, maxRes);
         return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({ pattern, fileGlob, matchCount: lines.length, matches: lines }),
-          }],
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({ pattern, fileGlob, matchCount: lines.length, matches: lines }),
+            },
+          ],
         };
+      }
+
+      // ── Analytics: MapReduce Matrix Analysis ─────────────────────────────
+      case 'analytics:mapreduce_matrix': {
+        const { executeMapReduceAnalysis } = await import(
+          '$lib/server/analytics/mapreduce-matrix-analysis.js'
+        );
+        const userId = String(args.userId ?? 'anonymous');
+        const days = Math.min(30, Math.max(1, Number(args.days ?? 7)));
+        const topK = Math.min(100, Math.max(1, Number(args.topK ?? 20)));
+        const synthesize = args.synthesize !== false;
+        const result = await executeMapReduceAnalysis(userId, { days, topK, synthesize });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                ...result,
+                matrix: result.matrix.map((r) => ({
+                  chunkId: r.chunkId,
+                  filePath: r.filePath,
+                  scores: Array.from(r.scores),
+                  composite: r.composite,
+                })),
+              }),
+            },
+          ],
+        };
+      }
+
+      // ── Analytics: Codebase Deep Research ─────────────────────────────────
+      case 'analytics:codebase_research': {
+        const { executeCodebaseResearch } = await import(
+          '$lib/server/analytics/codebase-research.js'
+        );
+        const userId = String(args.userId ?? 'anonymous');
+        const days = Math.min(30, Math.max(1, Number(args.days ?? 7)));
+        const query = args.query ? String(args.query) : undefined;
+        const synthesize = args.synthesize !== false;
+        const result = await executeCodebaseResearch(userId, { days, query, synthesize });
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
       default:
