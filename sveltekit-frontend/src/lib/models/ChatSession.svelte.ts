@@ -99,6 +99,7 @@ export interface SSEChunk {
   glossaryMatches?: GlossaryMatch[];
   aceEval?: AceEvalSummary;
   conversationTurns?: number;
+  hyperedgeHash?: string;
 }
 
 type OnnxGenerationOutput = {
@@ -1122,6 +1123,9 @@ export class ChatSession {
                   }),
                   ...(chunk.aceEval && {
                     aceEval: chunk.aceEval,
+                  }),
+                  ...(chunk.hyperedgeHash && {
+                    hyperedgeHash: chunk.hyperedgeHash,
                   }),
                 },
               };

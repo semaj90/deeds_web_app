@@ -2481,6 +2481,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           });
         }
 
+        // Resolve active hyperedge hash for RL feedback attribution.
+        // Reuses the embedding already cached from the RAG retrieval step — no extra Ollama call.
+        let topHyperedgeHash: string | undefined;
+        try {
+          const cachedEmb = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(() => null);
+          if (cachedEmb && cachedEmb.length === 768) {
+            const { selectAdaptiveMemory } = await import('$lib/server/graph/hypergraph-4d.js');
+            const modules = await selectAdaptiveMemory(cachedEmb, 1).catch(() => []);
+            topHyperedgeHash = modules[0]?.hyperedgeHash;
+          }
+        } catch { /* non-fatal — feedback still fires without hash */ }
+
         send({
           id,
           role: 'assistant',
@@ -2493,6 +2505,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           conversationTurns: conversationHistory.length,
           policyDecision,
+          ...(topHyperedgeHash ? { hyperedgeHash: topHyperedgeHash } : {}),
           ...(aceEvaluation
             ? {
                 aceEval: {

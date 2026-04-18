@@ -145,6 +145,7 @@
             <FeedbackButtons
               queryHash={message.metadata.queryHash}
               pipeline={message.metadata.pipeline}
+              hyperedgeHash={message.metadata.hyperedgeHash}
               compact
               showCounts
             />

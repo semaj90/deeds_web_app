@@ -355,6 +355,18 @@ export async function persistResearchSummary(
 			.insert(researchSummaries)
 			.values(enriched)
 			.onConflictDoNothing();   // idempotent — duplicates silently ignored
+
+		// ── RL audit trail: record summary ingestion event ────────────────────
+		import('$lib/server/db/schema-postgres.js')
+			.then(({ contextTimeline }) =>
+				db.insert(contextTimeline).values({
+					sessionId:  '',
+					eventType:  'summary',
+					pipeline:   entry.pipeline ?? 'ace',
+					payload:    { source: entry.source, queryHash: entry.queryHash } as Record<string, unknown>,
+				})
+			)
+			.catch(() => {});
 	} catch { /* non-fatal */ }
 }
 
@@ -393,6 +405,21 @@ export async function persistResearchSummaryBatch(
 			.values(enriched)
 			.onConflictDoNothing()
 			.returning({ id: researchSummaries.id });
+
+		// ── RL audit trail: one aggregated summary event per batch ────────────
+		if (result.length > 0) {
+			import('$lib/server/db/schema-postgres.js')
+				.then(({ contextTimeline }) =>
+					db.insert(contextTimeline).values({
+						sessionId:  '',
+						eventType:  'summary',
+						pipeline:   entries[0]?.pipeline ?? 'ace',
+						payload:    { count: result.length, pipeline: entries[0]?.pipeline ?? 'ace' } as Record<string, unknown>,
+					})
+				)
+				.catch(() => {});
+		}
+
 		return result.length;
 	} catch { return 0; }
 }
