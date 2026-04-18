@@ -3450,6 +3450,82 @@
       "group": "test",
       "presentation": { "reveal": "always", "panel": "shared", "clear": false },
       "problemMatcher": []
+    },
+    // ============================================
+    // Research Graph RL — Runes + Cache + Workers
+    // ============================================
+    {
+      "label": "🧪 Test: Research Graph RL (runes reactivity + cache + web workers)",
+      "type": "shell",
+      "command": "npx playwright test tests/research-graph-rl.spec.ts --reporter=line",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "PLAYWRIGHT_BASE_URL": "http://127.0.0.1:5173"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Test: Research Graph RL — API routes only (no browser)",
+      "type": "shell",
+      "command": "npx playwright test tests/research-graph-rl.spec.ts --grep \"API routes\" --reporter=line",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "PLAYWRIGHT_BASE_URL": "http://127.0.0.1:5173"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Test: Research Graph RL — runes reactivity only",
+      "type": "shell",
+      "command": "npx playwright test tests/research-graph-rl.spec.ts --grep \"Runes reactivity\" --reporter=line",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "PLAYWRIGHT_BASE_URL": "http://127.0.0.1:5173"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 CONCURRENT: Research Graph RL (build graph + run tests in parallel)",
+      "dependsOn": [
+        "🧪 Test: Research Graph RL (runes reactivity + cache + web workers)"
+      ],
+      "dependsOrder": "parallel",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
     }
   ],
   "inputs": [
