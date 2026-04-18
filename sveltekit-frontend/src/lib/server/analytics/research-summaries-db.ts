@@ -213,9 +213,36 @@ export async function browseResearchSummaries(
 	const conditions = buildWhere(filters, cursor);
 	const whereClause = conditions.length ? and(...conditions) : undefined;
 
+	// Optionally embed query for cosine ranking (first-page only — cursor disables it)
+	let queryVec: number[] | null = null;
+	if (filters.query && filters.sortBy === 'relevance' && !cursor) {
+		const { vector } = await embedSummaryText(
+			filters.query,
+			filters.pipeline !== 'all' ? filters.pipeline : 'ace',
+		).catch(() => ({ vector: [] as number[] }));
+		if (vector.length === 768) queryVec = vector;
+	}
+
 	// Sorted fetch
 	let rows: ResearchSummary[];
-	if (filters.sortBy === 'date') {
+	if (queryVec) {
+		// Cosine distance ranking via pgvector (rows without embeddings sorted last)
+		const vecLiteral = `[${queryVec.join(',')}]`;
+		const rawResult = await db.execute(sql`
+			SELECT *
+			FROM   research_summaries
+			${conditions.length ? sql`WHERE ${and(...conditions)}` : sql``}
+			ORDER BY
+				CASE WHEN embedding IS NOT NULL
+					THEN (embedding <=> ${vecLiteral}::vector)
+					ELSE 2.0
+				END ASC,
+				relevance_score DESC,
+				id DESC
+			LIMIT ${limit + 1}
+		`);
+		rows = (rawResult as unknown as { rows: ResearchSummary[] }).rows;
+	} else if (filters.sortBy === 'date') {
 		rows = await db
 			.select()
 			.from(researchSummaries)

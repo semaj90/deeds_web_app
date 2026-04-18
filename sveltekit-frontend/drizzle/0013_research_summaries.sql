@@ -65,3 +65,12 @@ CREATE INDEX IF NOT EXISTS rs_fts
   ON research_summaries USING GIN (
     to_tsvector('english', coalesce(query, '') || ' ' || coalesce(summary, ''))
   );
+
+-- ── saved_citation_id: link research summary → saved citation (nullable FK) ──
+ALTER TABLE research_summaries
+  ADD COLUMN IF NOT EXISTS saved_citation_id UUID
+  REFERENCES citations(id) ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS rs_saved_citation
+  ON research_summaries (saved_citation_id)
+  WHERE saved_citation_id IS NOT NULL;

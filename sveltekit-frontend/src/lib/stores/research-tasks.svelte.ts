@@ -198,8 +198,32 @@ class ResearchTaskStore {
 			});
 			if (res.ok) {
 				const result = await res.json() as { answer: string; pipeline: string; durationMs: number };
+				// Non-blocking: persist result as a research_summary so it appears in the browser
+				let summaryId: string | undefined;
+				try {
+					const sr = await fetch('/api/analytics/research-summaries', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							source:         'report',
+							pipeline:       task.pipelineHint ?? 'ace',
+							query:          task.selfPrompt,
+							title:          task.title,
+							summary:        result.answer.slice(0, 4000),
+							entityTags:     [],
+							relevanceScore: 0.8,
+						}),
+					});
+					if (sr.ok) {
+						const srj = await sr.json() as { id?: string };
+						summaryId = srj.id;
+					}
+				} catch { /* non-fatal */ }
+
 				this.tasks = this.tasks.map(t =>
-					t.id === task.id ? { ...t, status: 'done', result, completedAt: new Date().toISOString() } : t
+					t.id === task.id
+						? { ...t, status: 'done', result, summaryId, completedAt: new Date().toISOString() }
+						: t
 				);
 			} else {
 				this.tasks = this.tasks.map(t => t.id === task.id ? { ...t, status: 'failed' } : t);

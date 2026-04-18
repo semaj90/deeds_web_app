@@ -189,7 +189,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return h.toString(16).padStart(8, '0');
 	}
 
-	await persistResearchSummary({
+	const entry = {
 		source:        d.source,
 		pipeline:      d.pipeline,
 		entityType:    d.entityType ?? d.source,
@@ -205,7 +205,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		entityTags:    d.entityTags,
 		relevanceScore: d.relevanceScore,
 		userId:        locals.user.id,
-	});
+	};
 
-	return json({ saved: true });
+	// Insert and return the generated ID so callers (e.g. ResearchTaskStore) can
+	// link directly to the summary row without a follow-up lookup.
+	const [inserted] = await db
+		.insert(researchSummaries)
+		.values(entry)
+		.onConflictDoNothing()
+		.returning({ id: researchSummaries.id })
+		.catch(() => [] as { id: string }[]);
+
+	// Non-blocking: embed + enrich in background (won't stall the response)
+	if (inserted?.id) {
+		persistResearchSummary(entry).catch(() => {});
+	}
+
+	return json({ saved: true, id: inserted?.id ?? null });
 };

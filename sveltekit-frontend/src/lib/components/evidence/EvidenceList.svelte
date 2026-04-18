@@ -6,6 +6,8 @@
 		evidence = [],
 		viewMode = 'grid',
 		hasActiveFilters = false,
+		hasMore = false,
+		isLoadingMore = false,
 		onOpenDetail,
 		onAnalyze,
 		onReport,
@@ -13,11 +15,14 @@
 		onEdit,
 		onDelete,
 		onClearFilters,
-		onLinkCase
+		onLinkCase,
+		onLoadMore
 	}: {
 		evidence?: any[];
 		viewMode?: 'grid' | 'list';
 		hasActiveFilters?: boolean;
+		hasMore?: boolean;
+		isLoadingMore?: boolean;
 		onOpenDetail?: (e: MouseEvent, id: string) => void;
 		onAnalyze?: (doc: any) => void;
 		onReport?: (id: string) => void;
@@ -26,6 +31,7 @@
 		onDelete?: (id: string, name: string) => void;
 		onClearFilters?: () => void;
 		onLinkCase?: (id: string) => void;
+		onLoadMore?: () => void;
 	} = $props();
 
 	function getAccentColor(doc: any): string {
@@ -170,6 +176,26 @@
 				{/each}
 			</tbody>
 		</table>
+	</div>
+{/if}
+
+{#if hasMore}
+	<div class="ev-load-more">
+		<button
+			type="button"
+			class="ev-load-more-btn"
+			disabled={isLoadingMore}
+			onclick={() => onLoadMore?.()}
+		>
+			{#if isLoadingMore}
+				<Icon name="loader-2" class="w-4 h-4 animate-spin" />
+				Loading…
+			{:else}
+				<Icon name="chevrons-down" class="w-4 h-4" />
+				Load more evidence
+			{/if}
+		</button>
+		<span class="ev-load-more-count">{evidence.length} items loaded</span>
 	</div>
 {/if}
 
@@ -440,5 +466,40 @@
 	.ev-row-actions button.action-danger:hover {
 		color: #f87171;
 		background: rgba(239, 68, 68, 0.08);
+	}
+
+	/* Load More */
+	.ev-load-more {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 1.5rem 1rem;
+	}
+	.ev-load-more-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem 1.5rem;
+		border-radius: 8px;
+		background: rgba(96, 165, 250, 0.08);
+		border: 1px solid rgba(96, 165, 250, 0.18);
+		color: #93c5fd;
+		font-size: 0.8rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.ev-load-more-btn:hover:not(:disabled) {
+		background: rgba(96, 165, 250, 0.15);
+		border-color: rgba(96, 165, 250, 0.3);
+	}
+	.ev-load-more-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+	.ev-load-more-count {
+		font-size: 0.7rem;
+		color: rgba(212, 199, 163, 0.35);
 	}
 </style>

@@ -81,6 +81,10 @@
 	let tags = $state<string[]>([]);
 	let tagsSaving = $state(false);
 
+	// Direct AI analysis trigger
+	let analyzeLoading = $state(false);
+	let analyzeQueued  = $state(false);
+
 	// Sync tags when doc loads
 	$effect(() => {
 		if (doc) tags = (doc.tags ?? (metadata as Record<string, unknown>)?.suggestedTags ?? []) as string[];
@@ -148,6 +152,28 @@
 		} finally {
 			doclingLoading = false;
 		}
+	}
+
+	async function runAnalysis() {
+		if (!evidenceId || analyzeLoading || analyzeQueued) return;
+		analyzeLoading = true;
+		try {
+			const res = await fetch('/api/evidence/analysis', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					evidenceId,
+					stages: ['entity_extraction', 'forensics', 'summarization'],
+				}),
+			});
+			if (res.ok) {
+				analyzeQueued = true;
+				onAnalyze?.(doc);
+				// Reload after a short delay to reflect any immediate enrichment
+				setTimeout(() => { if (evidenceId) loadDoc(evidenceId); }, 3000);
+			}
+		} catch { /* non-fatal */ }
+		analyzeLoading = false;
 	}
 
 	// Image lightbox
@@ -507,12 +533,17 @@
 								{doclingLoading ? 'Loading…' : 'Docling Extract'}
 							</button>
 						{/if}
-						{#if onAnalyze}
-							<button type="button" class="footer-btn secondary" onclick={() => { onAnalyze?.(doc); close(); }}>
-								<Icon name="sparkles" class="w-3.5 h-3.5" />
-								Analyze
-							</button>
-						{/if}
+						<button
+							type="button"
+							class="footer-btn secondary"
+							class:analysis-queued={analyzeQueued}
+							onclick={runAnalysis}
+							disabled={analyzeLoading || analyzeQueued}
+							title={analyzeQueued ? 'Analysis jobs enqueued — results will appear shortly' : 'Run AI analysis (entity extraction, forensics, summarization)'}
+						>
+							<Icon name={analyzeQueued ? 'check' : 'sparkles'} class="w-3.5 h-3.5" />
+							{analyzeLoading ? 'Queuing…' : analyzeQueued ? 'Analysis Queued' : 'Run Analysis'}
+						</button>
 						{#if onEdit}
 							<button type="button" class="footer-btn primary" onclick={() => { onEdit?.(doc.id); close(); }}>
 								<Icon name="pencil" class="w-3.5 h-3.5" />
@@ -1278,6 +1309,12 @@
 	.footer-btn.secondary.download:hover {
 		background: rgba(34, 197, 94, 0.2);
 		border-color: rgba(34, 197, 94, 0.3);
+	}
+	.footer-btn.secondary.analysis-queued {
+		background: rgba(34, 197, 94, 0.1);
+		border-color: rgba(34, 197, 94, 0.2);
+		color: #4ade80;
+		opacity: 0.85;
 	}
 	.footer-btn.primary {
 		background: rgba(96, 165, 250, 0.15);

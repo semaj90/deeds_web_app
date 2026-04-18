@@ -4,6 +4,7 @@
   import RecommendationWidget from '$lib/components/recommendations/RecommendationWidget.svelte';
   import { createViewTracker } from '$lib/utils/tracking';
   import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
+  import { researchTasks } from '$lib/stores/research-tasks.svelte.js';
 
   interface EvidenceItem {
     id?: string;
@@ -21,9 +22,11 @@
     open?: boolean;
     caseId?: string;
     onSave?: (data: EvidenceItem) => void;
+    /** Whether the user is authenticated (needed by researchTasks.addTask) */
+    isAuthenticated?: boolean;
   }
 
-  let { item, open = $bindable(false), caseId = undefined, onSave }: Props = $props();
+  let { item, open = $bindable(false), caseId = undefined, onSave, isAuthenticated = false }: Props = $props();
 
   let dialogEl: HTMLDialogElement | undefined = $state(undefined);
   let isEditing = $state(false);
@@ -108,6 +111,20 @@
   function handleSummarize(result: { text: string; summary: string; confidence: number }) {
     console.log('Citation summarized:', result);
   }
+
+  /** Citation "→ Research" button: create a research task from selected text */
+  async function handleResearch(data: { text: string; summary?: string; pipelineHint?: string }) {
+    await researchTasks.addTask(
+      {
+        title:        `Research: ${data.text.slice(0, 60)}${data.text.length > 60 ? '…' : ''}`,
+        selfPrompt:   data.text,
+        pipelineHint: data.pipelineHint ?? 'ace',
+        sourceText:   data.text,
+        summary:      data.summary,
+      },
+      isAuthenticated,
+    );
+  }
 </script>
 
 {#if open}
@@ -146,6 +163,7 @@
               onsave={handleSaveCitation}
               onremove={handleRemoveCitation}
               onsummarize={handleSummarize}
+              onresearch={handleResearch}
             />
           </div>
           <div>

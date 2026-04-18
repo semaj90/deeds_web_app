@@ -4,7 +4,7 @@ import { uploadFile, getMinioClient } from '$lib/server/minio-client';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, desc } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import type { Actions, PageServerLoad } from './$types';
@@ -16,6 +16,8 @@ import {
   MAX_FILE_SIZE,
   ALLOWED_MIME_TYPES,
 } from './schema.js';
+
+const PAGE_SIZE = 50;
 
 export const load: PageServerLoad = async ({ url, locals }) => {
   const caseId = url.searchParams.get('caseId');
@@ -40,21 +42,18 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   let evidenceData;
   let loadError: string | null = null;
 
-  if (caseId) {
-    evidenceData = await safe(
-      db
-        .select()
-        .from(evidence)
-        .where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
-        .limit(100),
-      []
-    );
-  } else {
-    evidenceData = await safe(
-      db.select().from(evidence).where(eq(evidence.userId, locals.user.id)).limit(50),
-      []
-    );
-  }
+  const conditions = [eq(evidence.userId, locals.user.id)];
+  if (caseId) conditions.push(eq(evidence.caseId, caseId));
+
+  evidenceData = await safe(
+    db
+      .select()
+      .from(evidence)
+      .where(and(...conditions))
+      .orderBy(desc(evidence.createdAt))
+      .limit(PAGE_SIZE),
+    []
+  );
 
   if (evidenceData.length === 0) {
     loadError = 'No evidence found or database unavailable';
@@ -65,6 +64,21 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     caseId,
     user: locals.user,
     loadError,
+    form: await superValidate(zod(evidenceUploadSchema)),
+  };
+};
+
+  if (evidenceData.length === 0 && !cursor) {
+    loadError = 'No evidence found or database unavailable';
+  }
+
+  return {
+    evidence: evidenceData,
+    caseId,
+    user: locals.user,
+    loadError,
+    hasMore,
+    nextCursor,
     form: await superValidate(zod(evidenceUploadSchema)),
   };
 };

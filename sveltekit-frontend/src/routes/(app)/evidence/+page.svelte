@@ -84,6 +84,41 @@
 	let viewEvidenceId = $state<string | null>(null);
 	let showViewModal = $state(false);
 
+	// Pagination
+	let allEvidence = $state<any[]>(data.evidence ?? []);
+	let hasMore = $state(true);
+	let isLoadingMore = $state(false);
+	let currentPage = $state(1);
+
+	// Sync when data changes (navigation / invalidation)
+	$effect(() => {
+		allEvidence = data.evidence ?? [];
+		hasMore = (data.evidence?.length ?? 0) >= 50;
+		currentPage = 1;
+	});
+
+	async function loadMore() {
+		if (isLoadingMore) return;
+		isLoadingMore = true;
+		try {
+			currentPage++;
+			const params = new URLSearchParams({ page: String(currentPage), limit: '50' });
+			if (data.caseId) params.set('caseId', data.caseId);
+			const res = await fetch(`/api/evidence?${params}`);
+			if (!res.ok) { currentPage--; return; }
+			const result = await res.json();
+			const newItems = result.evidence ?? [];
+			if (newItems.length > 0) {
+				allEvidence = [...allEvidence, ...newItems];
+			}
+			hasMore = currentPage < (result.totalPages ?? 1);
+		} catch {
+			currentPage--;
+		} finally {
+			isLoadingMore = false;
+		}
+	}
+
 	// React to pushState / popstate (back button closes modal)
 	$effect(() => {
 		const state = page.state as { showDocumentModal?: boolean; documentId?: string } | undefined;
@@ -108,7 +143,7 @@
 	);
 
 	let filteredEvidence = $derived(
-		(data.evidence ?? []).filter((doc: any) => matchesSearchQuery(doc) && matchesAdvancedFilters(doc))
+		allEvidence.filter((doc: any) => matchesSearchQuery(doc) && matchesAdvancedFilters(doc))
 	);
 
 	let displayEvidence = $derived.by(() => {
@@ -251,7 +286,7 @@
 
 <div class="evidence-page">
 	<EvidencePageHeader
-		evidenceCount={data.evidence?.length ?? 0}
+		evidenceCount={allEvidence.length}
 		caseId={data.caseId ?? null}
 		onCreateWithAI={() => { crudMode = 'create'; crudEvidenceId = undefined; showCrudModal = true; }}
 		onBulkUpload={() => (showBulkUpload = true)}
@@ -260,7 +295,7 @@
 	/>
 
 	<EvidenceStatsRow
-		totalCount={data.evidence?.length ?? 0}
+		totalCount={allEvidence.length}
 		filteredCount={displayEvidence.length}
 		caseId={data.caseId ?? null}
 		{searchMode}
@@ -298,6 +333,9 @@
 			evidence={displayEvidence}
 			{viewMode}
 			hasActiveFilters={hasActiveEvidenceFilters}
+			{hasMore}
+			{isLoadingMore}
+			onLoadMore={loadMore}
 			onOpenDetail={(e, id) => { setCaseLinkTargetById(id); openDocumentModal(e, id); }}
 			onAnalyze={(doc) => aiDrawer?.analyzeEvidence(doc)}
 			onReport={(id) => aiDrawer?.loadReport(id)}

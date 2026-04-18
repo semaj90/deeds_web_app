@@ -8,14 +8,67 @@
 	let summary = $derived(data.summary);
 	let patterns = $derived(data.patterns);
 
-	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research' | 'matrix' | 'playground'>('overview');
+	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research' | 'matrix' | 'playground' | 'graph'>('overview');
+
+	// ── Research Graph state (declared before onMount for TS hoisting) ──────────
+	interface GraphCluster { id: number; memberIds: string[]; pageRank: number; size: number }
+	interface GraphData { clusters: GraphCluster[]; totalSummaries: number; builtAt: string | null }
+	interface RlPolicyWeights { ace: number; kag: number; dag: number; rag: number; codebase: number; updatedAt: string }
+
+	let graphData    = $state<GraphData | null>(null);
+	let graphPolicy  = $state<RlPolicyWeights | null>(null);
+	let graphLoading = $state(false);
+	let graphBuilding= $state(false);
+	let graphError   = $state<string | null>(null);
+
+	async function loadGraph() {
+		if (graphData) return;
+		graphLoading = true;
+		graphError   = null;
+		try {
+			const res = await fetch('/api/analytics/research-graph');
+			if (res.ok) {
+				const json = await res.json();
+				graphData   = (json.graph?.totalSummaries != null ? json.graph : null) as GraphData | null;
+				graphPolicy = json.policy ?? null;
+			}
+		} catch { graphError = 'Network error loading graph'; }
+		graphLoading = false;
+	}
+
+	async function rebuildGraph(action: 'build' | 'policy') {
+		graphBuilding = true;
+		graphError    = null;
+		try {
+			const res = await fetch('/api/analytics/research-graph', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action }),
+			});
+			if (res.ok) {
+				const json = await res.json();
+				if (action === 'build') graphData = json.graph ?? graphData;
+				graphPolicy = json.policy ?? graphPolicy;
+			} else {
+				graphError = `Failed: ${res.status}`;
+			}
+		} catch (e) { graphError = String(e); }
+		graphBuilding = false;
+	}
+
+	function pipelineColor(p: string): string {
+		const map: Record<string, string> = {
+			ace: '#60a5fa', kag: '#a78bfa', dag: '#34d399', rag: '#fbbf24', codebase: '#f472b6',
+		};
+		return map[p] ?? 'rgba(212,199,163,0.5)';
+	}
 
 	// Listen for Alt+D / Alt+R keyboard navigation from layout
 	onMount(() => {
 		if (!browser) return;
 		// Check URL hash for initial tab
 		const hash = window.location.hash.replace('#', '') as typeof activeTab;
-		const validTabs = ['overview','patterns','cache','for-you','search-intel','deep-research','matrix','playground'];
+		const validTabs = ['overview','patterns','cache','for-you','search-intel','deep-research','matrix','playground','graph'];
 		if (validTabs.includes(hash)) { activeTab = hash; }
 
 		function handleNavAnalytics(e: Event) {
@@ -27,6 +80,7 @@
 				if (tab === 'deep-research') loadDeepResearch();
 				if (tab === 'matrix') loadMatrix();
 				if (tab === 'playground') loadPlayground();
+				if (tab === 'graph') loadGraph();
 				window.history.replaceState(null, '', `/analytics#${tab}`);
 			}
 		}

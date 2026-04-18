@@ -172,9 +172,21 @@
 										<div class="rtp-result">
 											<div class="rtp-result-meta">{task.result.pipeline.toUpperCase()} · {task.result.durationMs}ms</div>
 											<div class="rtp-result-text">{task.result.answer}</div>
-											<a href="/analytics" class="rtp-open-link" onclick={toggle}>
-												Open Deep Research tab →
-											</a>
+											<div class="rtp-result-links">
+												<a href="/analytics#deep-research" class="rtp-open-link" onclick={toggle}>
+													Open Deep Research →
+												</a>
+												{#if task.summaryId}
+													<a
+														href="/admin/search-intelligence#rs-{task.summaryId}"
+														class="rtp-open-link rtp-summary-link"
+														onclick={toggle}
+														title="View persisted research summary"
+													>
+														View Summary →
+													</a>
+												{/if}
+											</div>
 										</div>
 									{/if}
 								{/if}

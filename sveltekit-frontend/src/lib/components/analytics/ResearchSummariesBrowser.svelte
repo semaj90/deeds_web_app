@@ -9,25 +9,28 @@
  *  - Fuse.js instant top-3-5 hits from current page (no extra fetch)
  *  - Page state cached server-side in Redis (30 min per user+filter fingerprint)
  *  - Reset to page 1 when any filter changes
+ *  - "Save as Citation" — promotes a summary to the citations table
+ *  - "Related" panel — HNSW nearest-neighbor from pgvector embedding
  */
 import Fuse from 'fuse.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Summary {
-	id:             string;
-	source:         string;
-	pipeline:       string;
-	entityType:     string;
-	query:          string;
-	title:          string | null;
-	url:            string | null;
-	collection:     string | null;
-	citationLabel:  string | null;
-	summary:        string;
-	entityTags:     string[];
-	relevanceScore: number;
-	createdAt:      string;
+	id:              string;
+	source:          string;
+	pipeline:        string;
+	entityType:      string;
+	query:           string;
+	title:           string | null;
+	url:             string | null;
+	collection:      string | null;
+	citationLabel:   string | null;
+	summary:         string;
+	entityTags:      string[];
+	relevanceScore:  number;
+	savedCitationId: string | null;
+	createdAt:       string;
 }
 
 interface FuseEntry { id: string; title: string; query: string; tags: string }
@@ -56,7 +59,6 @@ let sortBy    = $state<'relevance' | 'date'>('relevance');
 let limit     = $state(25);
 let query     = $state('');
 let activeTags = $state<string[]>([]);
-let cursor    = $state<string | null>(null);
 
 // Response state
 let data      = $state<BrowsePage | null>(null);
@@ -72,9 +74,21 @@ let fuseQuery = $state('');
 let dymQuery  = $state('');
 let dymOpen   = $state(false);
 
+// Pagination cursor
+let cursor    = $state<string | null>(null);
+
 // Tag autocomplete
 let tagInput  = $state('');
 let allTags   = $state<string[]>([]);
+
+// Save-as-citation per-card state
+let savingId   = $state<string | null>(null);  // ID currently being saved
+let savedIds   = $state<Record<string, string>>({}); // summaryId → citationId
+
+// Related-panel per-card state
+let relatedOpenId   = $state<string | null>(null);
+let relatedLoading  = $state(false);
+let relatedItems    = $state<Summary[]>([]);
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 
@@ -94,7 +108,6 @@ async function fetchPage(newCursor: string | null = null) {
 		const res = await fetch(`/api/analytics/research-summaries?${params}`);
 		if (!res.ok) throw new Error(await res.text());
 		data   = await res.json() as BrowsePage;
-		cursor = newCursor;
 		// Rebuild Fuse.js index from current page
 		if (data.fuseIndex.length) {
 			fuse = new Fuse(data.fuseIndex, {
@@ -143,6 +156,57 @@ function toggleTag(tag: string) {
 		? activeTags.filter(t => t !== tag)
 		: [...activeTags, tag];
 	resetAndFetch();
+}
+
+// ── Save as Citation ──────────────────────────────────────────────────────────
+
+async function saveAsCitation(row: Summary) {
+	if (savingId === row.id) return;
+	savingId = row.id;
+	try {
+		const res = await fetch('/api/analytics/research-summaries', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ action: 'save_citation', summaryId: row.id }),
+		});
+		if (!res.ok) throw new Error(await res.text());
+		const json = await res.json() as { citationId: string };
+		savedIds = { ...savedIds, [row.id]: json.citationId };
+		// Patch local page data so button updates immediately
+		if (data) {
+			data = {
+				...data,
+				summaries: data.summaries.map(s =>
+					s.id === row.id ? { ...s, savedCitationId: json.citationId } : s
+				),
+			};
+		}
+	} catch { /* non-fatal */ } finally {
+		savingId = null;
+	}
+}
+
+// ── Related panel (HNSW nearest-neighbor) ────────────────────────────────────
+
+async function toggleRelated(id: string) {
+	if (relatedOpenId === id) {
+		relatedOpenId = null;
+		relatedItems  = [];
+		return;
+	}
+	relatedOpenId  = id;
+	relatedItems   = [];
+	relatedLoading = true;
+	try {
+		const res = await fetch(`/api/analytics/research-summaries/${id}?mode=similar&limit=5`);
+		if (!res.ok) throw new Error(await res.text());
+		const json = await res.json() as { similar: Summary[] };
+		relatedItems = json.similar ?? [];
+	} catch {
+		relatedItems = [];
+	} finally {
+		relatedLoading = false;
+	}
 }
 
 const SOURCE_COLORS: Record<string, string> = {
@@ -349,6 +413,42 @@ function scoreBar(score: number) {
 								</div>
 								<span class="text-xs text-sand-9">{Math.round(row.relevanceScore * 100)}%</span>
 							</div>
+
+							<!-- Save as Citation -->
+							{#if row.savedCitationId || savedIds[row.id]}
+								<a
+									href="/citations/{row.savedCitationId ?? savedIds[row.id]}"
+									class="flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-green-100 text-green-700 border border-green-200 hover:bg-green-200 transition-colors"
+								>
+									<span class="i-lucide-bookmark-check text-xs"></span>
+									Saved
+								</a>
+							{:else}
+								<button
+									class="flex items-center gap-1 px-2 py-0.5 rounded text-xs border border-panel-soft text-sand-10 hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
+									disabled={savingId === row.id}
+									onclick={() => saveAsCitation(row)}
+								>
+									{#if savingId === row.id}
+										<span class="animate-spin i-lucide-loader-2 text-xs"></span>
+									{:else}
+										<span class="i-lucide-bookmark text-xs"></span>
+									{/if}
+									Save citation
+								</button>
+							{/if}
+
+							<!-- Related toggle -->
+							<button
+								class="flex items-center gap-1 px-2 py-0.5 rounded text-xs border transition-colors
+									{relatedOpenId === row.id
+										? 'border-accent text-accent bg-accent/5'
+										: 'border-panel-soft text-sand-10 hover:border-accent hover:text-accent'}"
+								onclick={() => toggleRelated(row.id)}
+							>
+								<span class="i-lucide-git-branch text-xs"></span>
+								Related
+							</button>
 						</div>
 					</div>
 
@@ -381,6 +481,37 @@ function scoreBar(score: number) {
 							{new Date(row.createdAt).toLocaleDateString()}
 						</span>
 					</div>
+
+					<!-- ── Related panel ────────────────────────────────────────────── -->
+					{#if relatedOpenId === row.id}
+						<div class="mt-1 border-t border-panel-soft pt-3 flex flex-col gap-2">
+							<p class="text-xs font-medium text-sand-10 uppercase tracking-wide">Similar summaries (vector)</p>
+							{#if relatedLoading}
+								<div class="flex items-center gap-2 text-xs text-sand-9">
+									<span class="animate-spin i-lucide-loader-2"></span>
+									Searching HNSW index…
+								</div>
+							{:else if relatedItems.length === 0}
+								<p class="text-xs text-sand-9">No similar summaries found (embedding may be missing).</p>
+							{:else}
+								{#each relatedItems as rel}
+									<div class="flex items-start gap-2 p-2 rounded bg-panel-soft/50 border border-panel-soft">
+										<span class="px-1 py-0.5 rounded text-xs font-medium shrink-0 {SOURCE_COLORS[rel.source] ?? 'bg-sand-3 text-sand-11'}">
+											{rel.source}
+										</span>
+										<div class="flex flex-col gap-0.5 min-w-0 flex-1">
+											<p class="text-xs font-medium text-sand-12 truncate">{rel.title ?? rel.query.slice(0, 60)}</p>
+											<p class="text-xs text-sand-10 line-clamp-2">{rel.summary}</p>
+										</div>
+										<button
+											class="shrink-0 text-xs text-sand-9 hover:text-accent transition-colors"
+											onclick={() => scrollToHit(rel.id)}
+										>↑ jump</button>
+									</div>
+								{/each}
+							{/if}
+						</div>
+					{/if}
 				</div>
 			{/each}
 		</div>
