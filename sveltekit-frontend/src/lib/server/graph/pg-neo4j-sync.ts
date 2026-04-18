@@ -37,7 +37,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
         sql`SELECT id, title, case_number, jurisdiction, court, status, practice_area, description
 					FROM cases WHERE id = ${caseId} LIMIT 1`
       );
-      const caseData = (pgRows(caseRows))[0] as Record<string, unknown> | undefined;
+      const caseData = pgRows(caseRows)[0] as Record<string, unknown> | undefined;
       if (!caseData) {
         result.errors.push(`Case ${caseId} not found`);
         return result;
@@ -61,11 +61,12 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
       );
       result.cases++;
 
-      // 2. Load persons linked to this case
+      // 2. Load persons linked to this case (check both case_id UUID and case_ids text[])
       const personRows = await db.execute(
-        sql`SELECT id, name, role, description
+        sql`SELECT id, name, relationship, description
 					FROM persons_of_interest
-					WHERE ${caseId} = ANY(case_ids)
+					WHERE case_id = ${caseId}
+					   OR ${caseId}::text = ANY(case_ids)
 					LIMIT 50`
       );
       for (const p of pgRows(personRows) as Record<string, unknown>[]) {
@@ -78,7 +79,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
           {
             id: p.id,
             name: p.name ?? '',
-            role: p.role ?? 'unknown',
+            role: p.relationship ?? 'unknown',
             caseId,
           }
         );
@@ -113,12 +114,14 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 
       // 4. Load citations linked to this case
       const citationRows = await db.execute(
-        sql`SELECT id, statute_code, statute_title
-					FROM saved_citations
+        sql`SELECT id, citation_text, title
+					FROM citations
 					WHERE case_id = ${caseId}
 					LIMIT 30`
       );
       for (const cit of pgRows(citationRows) as Record<string, unknown>[]) {
+        const code = String(cit.citation_text ?? '').trim();
+        if (!code) continue;
         await session.run(
           `MERGE (s:Statute {code: $code})
 					 SET s.title = $title
@@ -126,8 +129,8 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 					 MATCH (c:Case {id: $caseId})
 					 MERGE (c)-[:REFERENCES]->(s)`,
           {
-            code: cit.statute_code ?? '',
-            title: cit.statute_title ?? '',
+            code,
+            title: cit.title ?? code,
             caseId,
           }
         );

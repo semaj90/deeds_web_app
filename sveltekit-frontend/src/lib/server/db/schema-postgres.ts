@@ -3668,3 +3668,44 @@ export const clusterNarratives = pgTable('cluster_narratives', {
   clusterIdx: index('cluster_narratives_cluster_idx').on(table.clusterId),
 }));
 
+// ── Research Summaries ────────────────────────────────────────────────────────
+// Unified durable store for all summarised content: web crawl, legal corpus,
+// uploaded documents/images/videos, reports, case notes, etc.
+// GIN trigram + HNSW vector + tag GIN indexes are in the manual SQL migration
+// (Drizzle cannot express USING gin(..._ops) or USING hnsw natively).
+export const researchSummaries = pgTable('research_summaries', {
+  id:             uuid('id').defaultRandom().primaryKey(),
+  /** Broad content type: web | corpus | document | image | video | report | note | case */
+  source:         text('source').notNull(),
+  pipeline:       text('pipeline').notNull().default('ace'),
+  /** Same as source — kept separate for future sub-typing without a join */
+  entityType:     text('entity_type').notNull(),
+  query:          text('query').notNull(),
+  queryHash:      varchar('query_hash', { length: 8 }).notNull(),
+  title:          text('title'),
+  /** Web URL or MinIO object path */
+  url:            text('url'),
+  /** Qdrant collection name (corpus only) */
+  collection:     text('collection'),
+  citationLabel:  text('citation_label'),
+  sectionPath:    text('section_path'),
+  jurisdiction:   text('jurisdiction'),
+  summary:        text('summary').notNull(),
+  entityTags:     text('entity_tags').array().notNull().default(sql`'{}'::text[]`),
+  relevanceScore: real('relevance_score').notNull().default(0),
+  /** 768-dim embeddinggemma vector — NULL if embedding unavailable at ingest time */
+  embedding:      vector('embedding', { dimensions: 768 }),
+  /** NULL = anonymous / system-generated summary */
+  userId:         uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  index('rs_pipeline_score_id').on(t.pipeline, t.relevanceScore, t.id),
+  index('rs_entity_type_score').on(t.entityType, t.relevanceScore, t.id),
+  index('rs_source_score').on(t.source, t.relevanceScore, t.id),
+  index('rs_user_created').on(t.userId, t.createdAt),
+  index('rs_query_hash').on(t.queryHash),
+]);
+
+export type ResearchSummary    = typeof researchSummaries.$inferSelect;
+export type NewResearchSummary = typeof researchSummaries.$inferInsert;
+

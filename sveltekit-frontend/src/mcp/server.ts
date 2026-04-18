@@ -910,6 +910,32 @@ function setupToolHandlers() {
         },
       },
       // ─────────────────────────────────────────────────────────────────────
+      // Analytics — Unified Research Playground
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'analytics:unified_research',
+        description:
+          'Unified research query orchestrating: research-cache (qlora × feedback), ' +
+          'mapreduce-matrix (cosine similarity × CouchDB glyph), codebase rg/awk, ' +
+          'web search (Firecrawl), deep-research Ollama self-prompting, AWK-style SQL ' +
+          'score aggregations, and LangGraph supervisor state. Cached 20 min per user.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            userId:          { type: 'string', description: 'User UUID' },
+            query:           { type: 'string', description: 'Text query or URL (Firecrawl fetches URL content)' },
+            pipeline:        { type: 'string', enum: ['all', 'ace', 'rag', 'kag', 'dag', 'codebase'], default: 'all' },
+            domains:         { type: 'array', items: { type: 'string' }, description: 'Codebase domain hints (typescript, sveltekit, ripgrep)' },
+            depth:           { type: 'number', description: 'Self-prompt chain depth 1-5', default: 3 },
+            days:            { type: 'number', description: 'Lookback window 1-30 days', default: 7 },
+            includeWeb:      { type: 'boolean', default: false },
+            includeCodebase: { type: 'boolean', default: true },
+            includeMatrix:   { type: 'boolean', default: true },
+            rebuild:         { type: 'boolean', default: false },
+          },
+        },
+      },
+      // ─────────────────────────────────────────────────────────────────────
       // Analytics — Codebase Deep Research (rg + pipeline + Ollama)
       // ─────────────────────────────────────────────────────────────────────
       {
@@ -2248,6 +2274,28 @@ function setupToolHandlers() {
             },
           ],
         };
+      }
+
+      // ── Analytics: Unified Research Playground ────────────────────────────
+      case 'analytics:unified_research': {
+        const { executeUnifiedResearch } = await import(
+          '$lib/server/analytics/unified-research-query.js'
+        );
+        const userId  = String(args.userId ?? 'anonymous');
+        const result  = await executeUnifiedResearch(userId, {
+          query:           args.query   ? String(args.query)   : undefined,
+          pipeline:        args.pipeline ? String(args.pipeline) : 'all',
+          domains:         Array.isArray(args.domains) ? args.domains.map(String) : [],
+          depth:           Math.min(5, Math.max(1, Number(args.depth  ?? 3))),
+          days:            Math.min(30, Math.max(1, Number(args.days   ?? 7))),
+          includeWeb:      args.includeWeb      !== false,
+          includeCodebase: args.includeCodebase !== false,
+          includeMatrix:   args.includeMatrix   !== false,
+          rebuild:         args.rebuild         === true,
+        });
+        // Serialize Float64Arrays before JSON
+        const safe = JSON.stringify(result, (_k, v) => v instanceof Float64Array ? Array.from(v) : v);
+        return { content: [{ type: 'text', text: safe }] };
       }
 
       // ── Analytics: Codebase Deep Research ─────────────────────────────────

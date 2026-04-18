@@ -95,6 +95,84 @@
 	let researchError      = $state<string | null>(null);
 	let expandedTopic      = $state<string | null>(null);
 
+	// ── Corpus search state ───────────────────────────────────────────────────
+	let corpusQuery        = $state('');
+	let corpusLoading      = $state(false);
+	let corpusError        = $state<string | null>(null);
+	let corpusResults      = $state<CorpusResult[]>([]);
+
+	// ── Ingest state ─────────────────────────────────────────────────────────
+	let ingestStateCode    = $state('ca');
+	let ingestLoading      = $state(false);
+	let ingestResult       = $state<IngestResult | null>(null);
+	let corpusStats        = $state<CorpusStats | null>(null);
+
+	type CorpusResult = {
+		pointId: string; collection: string; collectionLabel: string;
+		query: string; summary: string; entityTags: string[];
+		jurisdiction: string | null; corpusType: string | null;
+		citationLabel: string | null; sectionPath: string | null;
+		relevanceScore: number;
+	};
+	type IngestResult   = { queued?: boolean; skipped?: boolean; error?: string; stateName?: string; message?: string };
+	type CorpusStats    = { byType: Record<string, { complete: number; total: number }>; constitutionCoverage: number; totalDocuments: number; totalComplete: number };
+
+	async function run_corpus_search() {
+		if (!corpusQuery.trim()) return;
+		corpusLoading = true;
+		corpusError   = null;
+		try {
+			const res = await fetch('/api/analytics/web-research', {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action: 'corpus-search', selfPrompts: [corpusQuery.trim()], pipeline: researchPipeline, maxResults: 6 }),
+			});
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const d = await res.json();
+			corpusResults = d.batches?.[0]?.summaries ?? [];
+		} catch (e) {
+			corpusError = e instanceof Error ? e.message : String(e);
+		} finally {
+			corpusLoading = false;
+		}
+	}
+
+	async function ingest_constitution(stateCode: string) {
+		ingestLoading = true;
+		ingestResult  = null;
+		try {
+			const res = await fetch('/api/ingest/legal', {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action: 'constitution', stateCode }),
+			});
+			ingestResult = await res.json();
+		} catch (e) {
+			ingestResult = { error: e instanceof Error ? e.message : String(e) };
+		} finally {
+			ingestLoading = false;
+		}
+	}
+
+	async function load_corpus_stats() {
+		try {
+			const res = await fetch('/api/ingest/legal?type=corpus');
+			if (!res.ok) return;
+			const d = await res.json();
+			corpusStats = { byType: d.byCorpusType ? buildByTypeMap(d.byCorpusType) : {}, constitutionCoverage: d.constitutionCoverage?.pct ?? 0, totalDocuments: Object.values<{ total: number }>(d.byCorpusType ? buildByTypeMap(d.byCorpusType) : {}).reduce((s, v) => s + v.total, 0), totalComplete: d.constitutionCoverage?.complete ?? 0 };
+		} catch { /* non-fatal */ }
+	}
+
+	function buildByTypeMap(rows: { corpus_type: string; processing_status: string; cnt: number }[]): Record<string, { complete: number; total: number }> {
+		const m: Record<string, { complete: number; total: number }> = {};
+		for (const r of rows) {
+			if (!m[r.corpus_type]) m[r.corpus_type] = { complete: 0, total: 0 };
+			m[r.corpus_type].total += r.cnt;
+			if (r.processing_status === 'complete') m[r.corpus_type].complete += r.cnt;
+		}
+		return m;
+	}
+
 	async function fetch_research_topics(rebuild = false) {
 		researchLoading = true;
 		researchError   = null;
@@ -231,10 +309,11 @@
 		schedule_refresh();
 	});
 
-	// Load research topics when Research tab is opened
+	// Load research topics + corpus stats when Research tab is opened
 	$effect(() => {
 		if (activeSection === 'research' && !researchData && !researchLoading) {
 			fetch_research_topics();
+			load_corpus_stats();
 		}
 	});
 
@@ -1259,6 +1338,113 @@
 		{/each}
 	{/if}
 
+	<!-- ── Corpus Search ─────────────────────────────────────────────────── -->
+	<section class="panel corpus-panel">
+		<h3 class="section-title">Local Legal Corpus Search</h3>
+		<p class="corpus-desc">Search <code>legal_canon_chunks</code>, <code>court_opinions</code>, and <code>legal_documents</code> via gemma4-legal — authoritative, offline, no external calls.</p>
+		<div class="corpus-controls">
+			<input
+				class="corpus-input"
+				placeholder="e.g. hearsay exceptions under FRE 803 …"
+				bind:value={corpusQuery}
+				onkeydown={(e) => { if (e.key === 'Enter') run_corpus_search(); }}
+			/>
+			<button class="btn-sm primary" onclick={run_corpus_search} disabled={corpusLoading || !corpusQuery.trim()}>
+				{corpusLoading ? 'Searching…' : 'Search Corpus'}
+			</button>
+		</div>
+		{#if corpusError}
+			<p class="err-msg">{corpusError}</p>
+		{/if}
+		{#if corpusResults.length}
+			<div class="corpus-results">
+				{#each corpusResults as r}
+					<div class="corpus-result">
+						<div class="corpus-result-header">
+							<span class="corpus-badge {r.collection}">{r.collectionLabel}</span>
+							{#if r.jurisdiction}<span class="juris-badge">{r.jurisdiction.toUpperCase()}</span>{/if}
+							{#if r.citationLabel}<span class="citation-badge">{r.citationLabel}</span>{/if}
+							<span class="score-badge">{(r.relevanceScore * 100).toFixed(0)}%</span>
+						</div>
+						{#if r.sectionPath}<p class="section-path">{r.sectionPath}</p>{/if}
+						<p class="corpus-summary">{r.summary}</p>
+						{#if r.entityTags.length}
+							<div class="tag-row">
+								{#each r.entityTags.slice(0, 6) as tag}
+									<span class="tag">{tag}</span>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/each}
+			</div>
+		{:else if !corpusLoading}
+			<p class="empty-msg">Enter a legal question to search the local corpus.</p>
+		{/if}
+	</section>
+
+	<!-- ── Legal Corpus Ingestion ────────────────────────────────────────── -->
+	<section class="panel ingest-panel">
+		<h3 class="section-title">Legal Corpus Ingestion</h3>
+
+		{#if corpusStats}
+			<div class="corpus-coverage">
+				<div class="coverage-stat">
+					<span class="cov-label">Constitutions</span>
+					<div class="cov-bar-wrap">
+						<div class="cov-bar" style="width: {corpusStats.constitutionCoverage}%"></div>
+					</div>
+					<span class="cov-pct">{corpusStats.constitutionCoverage}%</span>
+					<span class="cov-detail">({corpusStats.byType['constitution']?.complete ?? 0}/53 ingested)</span>
+				</div>
+				{#each Object.entries(corpusStats.byType).filter(([k]) => k !== 'constitution') as [type, counts]}
+					<div class="coverage-stat">
+						<span class="cov-label">{type}</span>
+						<span class="cov-detail">{counts.complete}/{counts.total} complete</span>
+					</div>
+				{/each}
+			</div>
+		{/if}
+
+		<div class="ingest-controls">
+			<label class="ctrl-label" for="ingest-state">State / Federal Code</label>
+			<select id="ingest-state" class="ctrl-select" bind:value={ingestStateCode}>
+				<option value="us">United States (Federal)</option>
+				<option value="ca">California</option>
+				<option value="ny">New York</option>
+				<option value="tx">Texas</option>
+				<option value="fl">Florida</option>
+				<option value="wa">Washington</option>
+				<option value="or">Oregon</option>
+				<option value="co">Colorado</option>
+				<option value="il">Illinois</option>
+				<option value="pa">Pennsylvania</option>
+				<option value="oh">Ohio</option>
+				<option value="ga">Georgia</option>
+				<option value="nc">North Carolina</option>
+				<option value="all">All 53 constitutions (background)</option>
+			</select>
+			<button class="btn-sm primary" onclick={() => ingest_constitution(ingestStateCode)} disabled={ingestLoading}>
+				{ingestLoading ? 'Queuing…' : 'Ingest Constitution'}
+			</button>
+			<button class="btn-sm" onclick={load_corpus_stats} title="Refresh coverage stats">
+				Refresh Stats
+			</button>
+		</div>
+
+		{#if ingestResult}
+			<div class="ingest-result" class:success={ingestResult.queued} class:skip={ingestResult.skipped} class:fail={!!ingestResult.error}>
+				{#if ingestResult.queued}
+					Queued: <strong>{ingestResult.stateName ?? ingestResult.message}</strong> — pipeline running in background.
+				{:else if ingestResult.skipped}
+					Already complete. Pass <code>force: true</code> to re-ingest.
+				{:else if ingestResult.error}
+					Error: {ingestResult.error}
+				{/if}
+			</div>
+		{/if}
+	</section>
+
 </div>
 {/if}
 
@@ -1733,4 +1919,89 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 .tier-badge.gold     { background: #f59e0b18; border: 1px solid #f59e0b40; color: #fcd34d; }
 .tier-badge.silver   { background: #9ca3af18; border: 1px solid #9ca3af40; color: #d1d5db; }
 .tier-badge.bronze   { background: #b4530918; border: 1px solid #b4530930; color: #fbbf24; }
+
+/* ── Corpus Search Panel ───────────────────────────────────────────────── */
+.corpus-panel, .ingest-panel {
+	margin-top: 1.5rem;
+	padding: 1.25rem 1.5rem;
+	background: rgba(30, 28, 22, 0.7);
+	border: 1px solid #3a3520;
+	border-radius: 6px;
+}
+.corpus-desc {
+	font-size: 0.72rem;
+	color: #a09070;
+	margin: 0.25rem 0 1rem;
+}
+.corpus-desc code {
+	background: #2a2618;
+	padding: 0.1em 0.35em;
+	border-radius: 3px;
+	color: #c8b560;
+}
+.corpus-controls {
+	display: flex;
+	gap: 0.6rem;
+	margin-bottom: 1rem;
+}
+.corpus-input {
+	flex: 1;
+	background: #1a1810;
+	border: 1px solid #3a3520;
+	border-radius: 4px;
+	padding: 0.45rem 0.75rem;
+	color: #d4c7a3;
+	font-family: inherit;
+	font-size: 0.8rem;
+}
+.corpus-input:focus { outline: none; border-color: #786030; }
+.corpus-results { display: flex; flex-direction: column; gap: 0.75rem; }
+.corpus-result {
+	padding: 0.9rem 1rem;
+	background: #16140e;
+	border: 1px solid #2a2818;
+	border-radius: 5px;
+}
+.corpus-result-header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	align-items: center;
+	margin-bottom: 0.4rem;
+}
+.corpus-badge {
+	font-size: 0.6rem;
+	padding: 0.15rem 0.45rem;
+	border-radius: 3px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+.corpus-badge.legal_canon_chunks { background: #1a3a1a; border: 1px solid #2a5a2a; color: #6bdd6b; }
+.corpus-badge.court_opinions     { background: #1a1a3a; border: 1px solid #2a2a5a; color: #6b8bdd; }
+.corpus-badge.documents          { background: #2a1a1a; border: 1px solid #4a2a2a; color: #dd8b6b; }
+.juris-badge   { font-size: 0.6rem; padding: 0.1rem 0.35rem; border-radius: 2px; background: #2a2010; border: 1px solid #4a3818; color: #c8a040; font-weight: 700; }
+.citation-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 2px; background: #201e14; border: 1px solid #3a3620; color: #b0a080; font-style: italic; }
+.score-badge   { font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 2px; background: #0e1a1e; border: 1px solid #1a3040; color: #60b0d0; margin-left: auto; }
+.section-path  { font-size: 0.65rem; color: #786840; margin: 0 0 0.3rem; font-style: italic; }
+.corpus-summary { font-size: 0.76rem; color: #c0b090; line-height: 1.55; margin: 0 0 0.5rem; }
+
+/* ── Corpus Ingestion Panel ────────────────────────────────────────────── */
+.corpus-coverage { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.coverage-stat   { display: flex; align-items: center; gap: 0.75rem; font-size: 0.72rem; }
+.cov-label   { width: 110px; color: #a09070; flex-shrink: 0; }
+.cov-bar-wrap { flex: 1; max-width: 200px; height: 6px; background: #2a2618; border-radius: 3px; overflow: hidden; }
+.cov-bar     { height: 100%; background: linear-gradient(90deg, #786030, #c8a040); border-radius: 3px; transition: width 0.4s ease; }
+.cov-pct     { width: 36px; text-align: right; color: #c8a040; font-weight: 600; }
+.cov-detail  { color: #786840; font-size: 0.68rem; }
+.ingest-controls { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-top: 0.75rem; }
+.ingest-result {
+	margin-top: 0.75rem;
+	padding: 0.6rem 0.9rem;
+	border-radius: 4px;
+	font-size: 0.74rem;
+}
+.ingest-result.success { background: #0e1e10; border: 1px solid #1e4a20; color: #6bdd6b; }
+.ingest-result.skip    { background: #1a1a0e; border: 1px solid #3a3a20; color: #a0a060; }
+.ingest-result.fail    { background: #1e0e0e; border: 1px solid #4a1a1a; color: #dd6b6b; }
 </style>

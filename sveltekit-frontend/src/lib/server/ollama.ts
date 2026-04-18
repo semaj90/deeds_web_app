@@ -59,8 +59,14 @@ export function getOllamaEndpoint(): string {
 }
 
 const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
-const CHAT_MODEL = process.env?.OLLAMA_MODEL ?? VLM_MODELS.legal;
+const CHAT_MODEL = ENV.OLLAMA_CHAT_MODEL;
 const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '300000');
+
+// Populate VLM_MODELS from ENV now that ENV is initialized
+VLM_MODELS.vision    = ENV.OLLAMA_VLM_MODEL;
+VLM_MODELS.gemma4    = ENV.OLLAMA_VLM_MODEL;
+VLM_MODELS.legal     = ENV.OLLAMA_CHAT_MODEL;
+VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL;
 
 // ── HTTP Keep-Alive Agent ───────────────────────────────────────────────────
 // Reuses TCP connections to Ollama instead of creating new ones per request.

@@ -80,6 +80,12 @@ type TrendingQueryRow = {
 	growth_rate:   number;
 };
 
+type CorpusStatRow = {
+	corpus_type:       string;
+	processing_status: string;
+	cnt:               number;
+};
+
 // ── Handler ────────────────────────────────────────────────────────────────
 
 export const GET: RequestHandler = async ({ locals, url }) => {
@@ -106,6 +112,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		crossPipelineChamps,
 		trendingQueries,
 		didYouMean,
+		corpusStatRows,
 	] = await Promise.all([
 
 		// ── Hot queries (top 50 before filter) ──────────────────────────────
@@ -194,6 +201,14 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		suggestFor
 			? getDidYouMeanSuggestions(suggestFor, temperature, 5).catch(() => [])
 			: Promise.resolve([]),
+
+		// ── Legal corpus coverage ─────────────────────────────────────────
+		pool.query<CorpusStatRow>(
+			`SELECT corpus_type, processing_status, COUNT(*)::int AS cnt
+			 FROM   library_documents
+			 GROUP  BY corpus_type, processing_status
+			 ORDER  BY corpus_type, processing_status`
+		).then((r) => r.rows).catch((): CorpusStatRow[] => []),
 	]);
 
 	// ── Apply regex/substring filter to hot queries ────────────────────────
@@ -218,6 +233,20 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		query: hotHashMap.get(t.query_hash) ?? null,
 	}));
 
+	// ── Build legal corpus coverage summary ───────────────────────────────
+	const corpusByType: Record<string, { complete: number; total: number }> = {};
+	for (const row of corpusStatRows) {
+		if (!corpusByType[row.corpus_type]) corpusByType[row.corpus_type] = { complete: 0, total: 0 };
+		corpusByType[row.corpus_type].total += row.cnt;
+		if (row.processing_status === 'complete') corpusByType[row.corpus_type].complete += row.cnt;
+	}
+	const legalCorpusStats = {
+		byType:                 corpusByType,
+		constitutionCoverage:   Math.round((corpusByType['constitution']?.complete ?? 0) / 53 * 100),
+		totalDocuments:         corpusStatRows.reduce((s, r) => s + r.cnt, 0),
+		totalComplete:          corpusStatRows.filter(r => r.processing_status === 'complete').reduce((s, r) => s + r.cnt, 0),
+	};
+
 	return json({
 		hotQueries,
 		clusterHeat,
@@ -228,6 +257,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		crossPipelineChamps,
 		trending,
 		didYouMean,
+		legalCorpusStats,
 		meta: {
 			windowDays:    days,
 			temperature,

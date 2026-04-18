@@ -6,7 +6,7 @@
 	let summary = $derived(data.summary);
 	let patterns = $derived(data.patterns);
 
-	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research' | 'matrix'>('overview');
+	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research' | 'matrix' | 'playground'>('overview');
 
 	interface PersonalizedCase {
 		caseId: string;
@@ -180,6 +180,87 @@
 		matrixLoading = false;
 	}
 
+	// ── Research Playground — unified query across all analytics sources ──
+	interface UnifiedTopic {
+		id: string; title: string; selfPrompt: string; pipeline: string;
+		priority: 'high' | 'medium' | 'low'; score: number;
+		sources: string[]; tags: string[]; mcpHints: string[];
+	}
+	interface AwkAgg { pipeline: string; hitCount: number; avgScore: number; p50Score: number; highQuality: number; mediumQuality: number; lowQuality: number }
+	interface ScoreBucket { bucketStart: number; count: number; pipeline: string }
+	interface PlaygroundResult {
+		unifiedTopics: UnifiedTopic[];
+		selfPromptChain: string[];
+		aggregations: { pipelineStats: AwkAgg[]; scoreBuckets: ScoreBucket[] };
+		deepResearch: { topics: unknown[]; hotQueryTags: string[]; topPrompts: string[] } | null;
+		codebaseInsights: { topics: unknown[]; filesScanned: number } | null;
+		webInsights: { batches: unknown[]; totalSummaries: number } | null;
+		fetchedPage: { url: string; title: string; markdown: string; source: string } | null;
+		langGraphState: { messages: { role: string; name?: string; content: string | unknown }[]; next: string; step?: number; accumulated: { topics: string[]; selfPrompts: string[] } } | null;
+		meta: { computeMs: number; sources: string[]; cachedUntil: string };
+	}
+	let playgroundQuery        = $state('');
+	let playgroundPipeline     = $state('all');
+	let playgroundDepth        = $state(3);
+	let playgroundDays         = $state(7);
+	let playgroundIncludeWeb   = $state(false);
+	let playgroundIncludeMx    = $state(true);
+	let playgroundIncludeCb    = $state(true);
+	let playgroundResult       = $state<PlaygroundResult | null>(null);
+	let playgroundLoading      = $state(false);
+	let playgroundError        = $state<string | null>(null);
+	let playgroundAggOnly      = $state<{ pipelineStats: AwkAgg[]; scoreBuckets: ScoreBucket[] } | null>(null);
+
+	async function loadPlayground() {
+		if (playgroundAggOnly) return;
+		try {
+			const res = await fetch('/api/analytics/unified-research?days=7');
+			if (res.ok) {
+				const json = await res.json();
+				playgroundAggOnly = json.aggregations;
+			}
+		} catch { /* non-fatal */ }
+	}
+
+	async function runPlayground() {
+		playgroundLoading = true;
+		playgroundError = null;
+		try {
+			const res = await fetch('/api/analytics/unified-research', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query:           playgroundQuery || undefined,
+					pipeline:        playgroundPipeline,
+					depth:           playgroundDepth,
+					days:            playgroundDays,
+					includeWeb:      playgroundIncludeWeb,
+					includeMatrix:   playgroundIncludeMx,
+					includeCodebase: playgroundIncludeCb,
+				}),
+			});
+			if (res.ok) {
+				const json = await res.json();
+				playgroundResult = json;
+				playgroundAggOnly = json.aggregations;
+			} else {
+				playgroundError = 'Query failed — check console';
+			}
+		} catch (e: unknown) {
+			playgroundError = e instanceof Error ? e.message : 'Network error';
+		}
+		playgroundLoading = false;
+	}
+
+	async function runSelfPrompt(prompt: string) {
+		if (executingPromptId) return;
+		executingPromptId = prompt;
+		playgroundQuery = prompt;
+		await runPlayground();
+		executingPromptId = null;
+	}
+
+
 	function priorityColor(p: string): string {
 		if (p === 'high') return 'rgba(248, 113, 113, 0.8)';
 		if (p === 'medium') return 'rgba(251, 191, 36, 0.7)';
@@ -227,12 +308,13 @@
 			{ id: 'search-intel', label: 'Search Intelligence', icon: 'search' },
 			{ id: 'deep-research', label: 'Deep Research', icon: 'brain' },
 			{ id: 'matrix', label: 'MapReduce Matrix', icon: 'grid-3x3' },
+			{ id: 'playground', label: 'Research Playground', icon: 'flask-conical' },
 			{ id: 'for-you', label: 'For You', icon: 'sparkles' }
 		] as tab}
 			<button
 				class="ana-tab"
 				class:active={activeTab === tab.id}
-				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); if (tab.id === 'deep-research') loadDeepResearch(); if (tab.id === 'matrix') loadMatrix(); }}
+				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); if (tab.id === 'deep-research') loadDeepResearch(); if (tab.id === 'matrix') loadMatrix(); if (tab.id === 'playground') loadPlayground(); }}
 			>
 				<Icon name={tab.icon} />
 				{tab.label}
@@ -852,6 +934,162 @@
 		</div>
 	{/if}
 
+	{#if activeTab === 'playground'}
+		<div class="ana-card">
+			<div class="ana-card-head">
+				<h3 class="ana-card-title">Research Playground</h3>
+				<p class="ana-card-desc">Unified query: research-cache · mapreduce-matrix · codebase rg/awk · web Firecrawl · deep-research · LangGraph supervisor</p>
+			</div>
+
+			<div class="pg-form">
+				<div class="pg-query-row">
+					<input class="pg-input" type="text" placeholder="Query or paste a URL for Firecrawl…" bind:value={playgroundQuery} />
+					<button class="pg-run-btn" onclick={runPlayground} disabled={playgroundLoading}>
+						{#if playgroundLoading}Running…{:else}Run Query{/if}
+					</button>
+				</div>
+				<div class="pg-options-row">
+					<label class="pg-option-group">
+						<span>Pipeline</span>
+						<select bind:value={playgroundPipeline}>
+							{#each ['all','ace','rag','kag','dag','codebase'] as p}
+								<option value={p}>{p.toUpperCase()}</option>
+							{/each}
+						</select>
+					</label>
+					<label class="pg-option-group">
+						<span>Depth {playgroundDepth}</span>
+						<input type="range" min="1" max="5" bind:value={playgroundDepth} />
+					</label>
+					<label class="pg-option-group">
+						<span>Days {playgroundDays}</span>
+						<input type="range" min="1" max="30" bind:value={playgroundDays} />
+					</label>
+					<label class="pg-toggle"><input type="checkbox" bind:checked={playgroundIncludeMx} /> Matrix</label>
+					<label class="pg-toggle"><input type="checkbox" bind:checked={playgroundIncludeCb} /> Codebase rg</label>
+					<label class="pg-toggle"><input type="checkbox" bind:checked={playgroundIncludeWeb} /> Web (Firecrawl)</label>
+				</div>
+			</div>
+
+			{#if playgroundError}
+				<div class="ana-error">{playgroundError}</div>
+			{/if}
+
+			{#if playgroundAggOnly?.pipelineStats?.length}
+				<div class="pg-section">
+					<h4 class="pg-section-title">AWK Pipeline Aggregations</h4>
+					<div class="pg-agg-table-wrap">
+						<table class="pg-agg-table">
+							<thead><tr>
+								<th>Pipeline</th><th>Hits</th><th>Avg Score</th><th>P50</th>
+								<th class="pg-high">High</th><th class="pg-med">Med</th><th class="pg-low">Low</th>
+							</tr></thead>
+							<tbody>
+								{#each playgroundAggOnly.pipelineStats as agg}
+								<tr>
+									<td><span class="matrix-pipe-badge">{agg.pipeline}</span></td>
+									<td class="pg-num">{agg.hitCount.toLocaleString()}</td>
+									<td class="pg-num">{agg.avgScore.toFixed(3)}</td>
+									<td class="pg-num">{agg.p50Score.toFixed(3)}</td>
+									<td class="pg-num pg-high">{agg.highQuality}</td>
+									<td class="pg-num pg-med">{agg.mediumQuality}</td>
+									<td class="pg-num pg-low">{agg.lowQuality}</td>
+								</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+					{#if playgroundAggOnly.scoreBuckets?.length}
+						<div class="pg-histogram">
+							<div class="pg-hist-title">Score Histogram (0.1 buckets)</div>
+							<div class="pg-hist-bars">
+								{@const maxCount = Math.max(...playgroundAggOnly.scoreBuckets.map(b => b.count), 1)}
+								{#each playgroundAggOnly.scoreBuckets as bucket}
+									<div class="pg-hist-bar" title="{bucket.pipeline} {bucket.bucketStart.toFixed(1)}: {bucket.count}">
+										<div class="pg-hist-fill" style="height:{Math.round((bucket.count/maxCount)*64)}px"></div>
+										<span class="pg-hist-label">{bucket.bucketStart.toFixed(1)}</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			{#if playgroundResult}
+				{#if playgroundResult.unifiedTopics?.length}
+					<div class="pg-section">
+						<h4 class="pg-section-title">Unified Research Topics ({playgroundResult.unifiedTopics.length})</h4>
+						{#each playgroundResult.unifiedTopics as topic, i}
+							<div class="pg-topic-card" style="border-left-color:{priorityColor(topic.priority)}">
+								<div class="pg-topic-num">{i+1}</div>
+								<div class="pg-topic-body">
+									<div class="pg-topic-title">{topic.title}</div>
+									<div class="pg-topic-prompt">{topic.selfPrompt}</div>
+									<div class="pg-topic-meta">
+										<span class="matrix-pipe-badge">{topic.pipeline}</span>
+										<span class="pg-score">{(topic.score*100).toFixed(0)}%</span>
+										{#each topic.sources as src}<span class="pg-source-badge">{src}</span>{/each}
+										{#each topic.mcpHints as hint}<span class="pg-mcp-hint" title={hint}>{hint.split(':')[1]}</span>{/each}
+									</div>
+								</div>
+								<button class="pg-exec-btn" onclick={() => runSelfPrompt(topic.selfPrompt)} disabled={!!executingPromptId} title="Use as next query">
+									{executingPromptId === topic.selfPrompt ? '…' : '→'}
+								</button>
+							</div>
+						{/each}
+					</div>
+				{/if}
+
+				{#if playgroundResult.selfPromptChain?.length}
+					<div class="pg-section">
+						<h4 class="pg-section-title">Self-Prompt Chain (depth {playgroundDepth})</h4>
+						<div class="pg-chain">
+							{#each playgroundResult.selfPromptChain as prompt, i}
+								<div class="pg-chain-step">
+									<div class="pg-chain-num">{i+1}</div>
+									<div class="pg-chain-text">{prompt}</div>
+									<button class="pg-exec-btn" onclick={() => runSelfPrompt(prompt)} disabled={!!executingPromptId}>→</button>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if playgroundResult.fetchedPage}
+					<div class="pg-section">
+						<h4 class="pg-section-title">Fetched Page — {playgroundResult.fetchedPage.source}</h4>
+						<div class="pg-fetched-meta">
+							<a href={playgroundResult.fetchedPage.url} target="_blank" rel="noreferrer">{playgroundResult.fetchedPage.title}</a>
+						</div>
+						<pre class="pg-fetched-text">{playgroundResult.fetchedPage.markdown.slice(0, 1200)}{playgroundResult.fetchedPage.markdown.length > 1200 ? '…' : ''}</pre>
+					</div>
+				{/if}
+
+				{#if playgroundResult.langGraphState?.messages?.length}
+					<div class="pg-section">
+						<h4 class="pg-section-title">LangGraph Supervisor State</h4>
+						<div class="pg-lg-meta">
+							next: <code>{playgroundResult.langGraphState.next}</code>
+							· step {playgroundResult.langGraphState.step}/5
+							· sources: {playgroundResult.meta.sources.join(', ')}
+						</div>
+						<div class="pg-lg-messages">
+							{#each playgroundResult.langGraphState.messages as msg}
+								<div class="pg-lg-msg pg-lg-{msg.role}">
+									<span class="pg-lg-role">{msg.name ?? msg.role}</span>
+									<span class="pg-lg-content">{typeof msg.content === 'string' ? msg.content.slice(0, 180) : JSON.stringify(msg.content).slice(0, 180)}</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				<div class="dr-meta">{playgroundResult.meta.computeMs}ms · {playgroundResult.meta.sources.length} sources · cached {new Date(playgroundResult.meta.cachedUntil).toLocaleTimeString()}</div>
+			{/if}
+		</div>
+	{/if}
+
 	{#if activeTab === 'for-you'}
 		<div class="ana-card">
 			<div class="ana-card-head">
@@ -1365,4 +1603,77 @@
 	.matrix-filepath { color: rgba(212, 199, 163, 0.7); max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.matrix-score { color: rgba(96, 165, 250, 0.8); font-family: monospace; text-align: right; }
 	.matrix-pipe-badge { background: rgba(96, 165, 250, 0.12); color: rgba(96, 165, 250, 0.9); padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.6rem; text-transform: uppercase; }
+
+	/* ── Research Playground ── */
+	.pg-form { display: flex; flex-direction: column; gap: 0.625rem; margin-bottom: 1.25rem; }
+	.pg-query-row { display: flex; gap: 0.5rem; }
+	.pg-input {
+		flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(212,199,163,0.12);
+		border-radius: 0.375rem; padding: 0.5rem 0.75rem;
+		color: rgba(212,199,163,0.9); font-size: 0.8rem; outline: none;
+	}
+	.pg-input:focus { border-color: rgba(96,165,250,0.4); }
+	.pg-run-btn {
+		padding: 0.5rem 1.25rem; background: rgba(96,165,250,0.15);
+		border: 1px solid rgba(96,165,250,0.3); border-radius: 0.375rem;
+		color: rgba(96,165,250,0.9); font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+		transition: background 0.15s;
+	}
+	.pg-run-btn:hover:not(:disabled) { background: rgba(96,165,250,0.25); }
+	.pg-run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+	.pg-options-row { display: flex; flex-wrap: wrap; gap: 0.875rem; align-items: center; font-size: 0.72rem; color: rgba(212,199,163,0.6); }
+	.pg-option-group { display: flex; align-items: center; gap: 0.375rem; }
+	.pg-option-group span { white-space: nowrap; }
+	.pg-option-group select, .pg-option-group input[type=range] { accent-color: rgba(96,165,250,0.8); }
+	.pg-toggle { display: flex; align-items: center; gap: 0.25rem; cursor: pointer; }
+	.pg-section { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(212,199,163,0.06); }
+	.pg-section-title { font-size: 0.75rem; font-weight: 600; color: rgba(212,199,163,0.5); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.625rem; }
+	.pg-agg-table-wrap { overflow-x: auto; }
+	.pg-agg-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+	.pg-agg-table th { color: rgba(212,199,163,0.4); font-weight: 500; text-align: left; padding: 0.3rem 0.5rem; border-bottom: 1px solid rgba(212,199,163,0.08); }
+	.pg-agg-table td { padding: 0.3rem 0.5rem; border-bottom: 1px solid rgba(212,199,163,0.04); }
+	.pg-num { font-family: monospace; color: rgba(212,199,163,0.8); }
+	.pg-high { color: rgba(52,211,153,0.9) !important; }
+	.pg-med  { color: rgba(251,191,36,0.9) !important; }
+	.pg-low  { color: rgba(248,113,113,0.8) !important; }
+	.pg-histogram { margin-top: 0.75rem; }
+	.pg-hist-title { font-size: 0.68rem; color: rgba(212,199,163,0.4); margin-bottom: 0.375rem; }
+	.pg-hist-bars { display: flex; align-items: flex-end; gap: 2px; height: 72px; }
+	.pg-hist-bar { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: default; }
+	.pg-hist-fill { width: 10px; background: rgba(96,165,250,0.4); border-radius: 2px 2px 0 0; min-height: 1px; transition: height 0.2s; }
+	.pg-hist-bar:hover .pg-hist-fill { background: rgba(96,165,250,0.7); }
+	.pg-hist-label { font-size: 0.45rem; color: rgba(212,199,163,0.3); transform: rotate(-45deg); white-space: nowrap; }
+	.pg-topic-card {
+		display: flex; align-items: flex-start; gap: 0.625rem;
+		background: rgba(0,0,0,0.2); border-left: 3px solid rgba(212,199,163,0.2);
+		border-radius: 0 0.375rem 0.375rem 0; padding: 0.625rem 0.75rem;
+		margin-bottom: 0.375rem;
+	}
+	.pg-topic-num { font-size: 0.65rem; font-family: monospace; color: rgba(212,199,163,0.3); width: 1.25rem; flex-shrink: 0; padding-top: 0.125rem; }
+	.pg-topic-body { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
+	.pg-topic-title { font-size: 0.8rem; font-weight: 600; color: rgba(212,199,163,0.9); }
+	.pg-topic-prompt { font-size: 0.7rem; color: rgba(212,199,163,0.55); font-style: italic; }
+	.pg-topic-meta { display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; margin-top: 0.125rem; }
+	.pg-score { font-size: 0.65rem; font-family: monospace; color: rgba(52,211,153,0.8); }
+	.pg-source-badge { font-size: 0.58rem; background: rgba(139,92,246,0.12); color: rgba(139,92,246,0.8); padding: 0.05rem 0.3rem; border-radius: 3px; }
+	.pg-mcp-hint { font-size: 0.58rem; background: rgba(251,191,36,0.08); color: rgba(251,191,36,0.7); padding: 0.05rem 0.3rem; border-radius: 3px; }
+	.pg-exec-btn { padding: 0.25rem 0.5rem; background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.2); border-radius: 0.25rem; color: rgba(96,165,250,0.8); font-size: 0.7rem; cursor: pointer; flex-shrink: 0; }
+	.pg-exec-btn:hover:not(:disabled) { background: rgba(96,165,250,0.2); }
+	.pg-exec-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	.pg-chain { display: flex; flex-direction: column; gap: 0.375rem; }
+	.pg-chain-step { display: flex; align-items: flex-start; gap: 0.5rem; background: rgba(0,0,0,0.15); border-radius: 0.375rem; padding: 0.5rem 0.75rem; }
+	.pg-chain-num { font-size: 0.65rem; font-family: monospace; color: rgba(96,165,250,0.5); width: 1rem; flex-shrink: 0; padding-top: 0.1rem; }
+	.pg-chain-text { flex: 1; font-size: 0.75rem; color: rgba(212,199,163,0.8); }
+	.pg-fetched-meta { margin-bottom: 0.375rem; font-size: 0.72rem; }
+	.pg-fetched-meta a { color: rgba(96,165,250,0.8); text-decoration: none; }
+	.pg-fetched-meta a:hover { text-decoration: underline; }
+	.pg-fetched-text { font-size: 0.68rem; color: rgba(212,199,163,0.6); background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 0.375rem; white-space: pre-wrap; overflow-x: auto; max-height: 300px; overflow-y: auto; }
+	.pg-lg-meta { font-size: 0.7rem; color: rgba(212,199,163,0.5); margin-bottom: 0.5rem; }
+	.pg-lg-meta code { background: rgba(0,0,0,0.2); padding: 0.1rem 0.3rem; border-radius: 3px; color: rgba(96,165,250,0.8); }
+	.pg-lg-messages { display: flex; flex-direction: column; gap: 0.25rem; }
+	.pg-lg-msg { display: flex; gap: 0.5rem; font-size: 0.7rem; padding: 0.25rem 0; border-bottom: 1px solid rgba(212,199,163,0.04); }
+	.pg-lg-role { font-weight: 600; width: 6rem; flex-shrink: 0; color: rgba(212,199,163,0.4); font-size: 0.65rem; padding-top: 0.1rem; }
+	.pg-lg-content { color: rgba(212,199,163,0.7); }
+	.pg-lg-user .pg-lg-role { color: rgba(96,165,250,0.6); }
+	.pg-lg-tool .pg-lg-role { color: rgba(251,191,36,0.6); }
 </style>
