@@ -59,6 +59,9 @@ export const ENV = {
   EMBEDDING_GRPC_ENABLED: (privateEnv.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true',
   RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL ?? '127.0.0.1:50053',
   RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
+  /** Go retrieval service HTTP REST API (port 8100) — lighter weight alternative to gRPC */
+  RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? 'http://localhost:8100',
+  RETRIEVAL_HTTP_ENABLED: (privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
   CHR97_GRPC_URL: privateEnv.CHR97_GRPC_URL ?? '127.0.0.1:50055',
   CHR97_GRPC_ENABLED: (privateEnv.CHR97_GRPC_ENABLED ?? 'false') === 'true',
   TOOL_GRPC_URL: privateEnv.TOOL_GRPC_URL ?? '127.0.0.1:50057',

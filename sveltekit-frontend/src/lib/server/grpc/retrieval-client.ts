@@ -97,6 +97,8 @@ export interface EvidenceSearchResponse {
 
 const RETRIEVAL_GRPC_URL = ENV.RETRIEVAL_GRPC_URL;
 const RETRIEVAL_GRPC_ENABLED = ENV.RETRIEVAL_GRPC_ENABLED;
+const RETRIEVAL_HTTP_URL = ENV.RETRIEVAL_HTTP_URL;
+const RETRIEVAL_HTTP_ENABLED = ENV.RETRIEVAL_HTTP_ENABLED;
 const GO_SEARCH_GRPC_URL = ENV.GO_SEARCH_GRPC_URL;
 
 let grpcClient: any = null;
@@ -342,6 +344,55 @@ function mapProtoResponse(response: any): EvidenceSearchResponse {
   };
 }
 
+// ── HTTP REST fast-path (go-retrieval-service :8100) ────────────────────
+//
+// Lower-latency alternative to gRPC that uses the service's /search/evidence
+// REST endpoint — no proto codegen required.
+// Controlled by RETRIEVAL_HTTP_ENABLED (default: false).
+
+/**
+ * Search evidence via Go retrieval service HTTP REST API.
+ * Returns null if disabled/unavailable (caller falls through to inline TS pipeline).
+ */
+export async function searchEvidenceViaHttp(
+  params: EvidenceSearchParams,
+  timeoutMs = 10_000
+): Promise<EvidenceSearchResponse | null> {
+  if (!RETRIEVAL_HTTP_ENABLED) return null;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    const res = await fetch(`${RETRIEVAL_HTTP_URL}/search/evidence`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        query:        params.query,
+        case_id:      params.caseId ?? '',
+        limit:        params.limit ?? 10,
+        jurisdiction: params.jurisdiction ?? '',
+      }),
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      console.warn(`[retrieval-client] HTTP /search/evidence returned ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json() as Record<string, unknown>;
+    // The Go service returns proto-shaped JSON — reuse the proto mapper
+    return mapProtoResponse(data);
+  } catch (err) {
+    if ((err as Error).name !== 'AbortError') {
+      console.warn('[retrieval-client] HTTP search failed:', (err as Error).message);
+    }
+    return null;
+  }
+}
+
 // ── Health check ────────────────────────────────────────────────────────
 
 /**
@@ -381,6 +432,26 @@ export async function checkRetrievalHealth(): Promise<{
         });
       });
     });
+  }
+
+  // Try HTTP health endpoint for Go retrieval service (port 8100)
+  if (RETRIEVAL_HTTP_ENABLED) {
+    try {
+      const res = await fetch(`${RETRIEVAL_HTTP_URL}/health`, { signal: AbortSignal.timeout(3000) });
+      if (res.ok) {
+        const data = await res.json() as Record<string, unknown>;
+        return {
+          enabled: true,
+          url: RETRIEVAL_HTTP_URL,
+          available: data.status === 'healthy',
+          status: data.status as string | undefined,
+          pgvectorConnected: data.pgvectorConnected as boolean | undefined,
+          qdrantConnected: data.qdrantConnected as boolean | undefined,
+          service: 'go-retrieval-http',
+        };
+      }
+    } catch { /* unavailable */ }
+    return { enabled: true, url: RETRIEVAL_HTTP_URL, available: false, service: 'go-retrieval-http' };
   }
 
   const goBase = { enabled: false, url: GO_SEARCH_GRPC_URL };

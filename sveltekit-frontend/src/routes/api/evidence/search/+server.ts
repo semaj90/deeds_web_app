@@ -29,7 +29,7 @@ import { embedText } from '$lib/server/embedding/embed.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
-import { searchEvidenceViaGrpc } from '$lib/server/grpc/retrieval-client.js';
+import { searchEvidenceViaGrpc, searchEvidenceViaHttp } from '$lib/server/grpc/retrieval-client.js';
 import type { VectorSearchResult, VectorSearchOptions } from '$lib/server/db/pgvector-utils.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { legalPageRank } from '$lib/server/retrieval/legal-pagerank.js';
@@ -178,7 +178,15 @@ export async function POST({ request, locals }: RequestEvent) {
       );
       return json(grpcResult);
     }
-    // gRPC unavailable or disabled — fall through to inline pipeline
+    // gRPC unavailable or disabled — try HTTP REST fast-path
+    const httpResult = await searchEvidenceViaHttp({ query, caseId, limit, jurisdiction });
+    if (httpResult) {
+      console.log(
+        `[Evidence Search] HTTP hit for "${query.slice(0, 40)}..." (${httpResult.timing.totalMs}ms)`
+      );
+      return json(httpResult);
+    }
+    // HTTP unavailable or disabled — fall through to inline pipeline
 
     // ── Cache check: session-scoped key (user + filters + query) ─────
     const cacheKey = buildEvidenceSearchCacheKey({
