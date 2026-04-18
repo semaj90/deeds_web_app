@@ -29,7 +29,8 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
-import { pool } from '$lib/server/db/client';
+import { db, pool } from '$lib/server/db/client';
+import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { fetchTopQueryTags } from '$lib/server/ace/user-analytics-context.js';
 import type { HitPipeline } from './search-analytics.js';
@@ -432,6 +433,23 @@ export async function generateDeepResearch(
 
 	// Cache in Redis (non-blocking)
 	redis.set(cacheKey, JSON.stringify(result), 'EX', RESEARCH_CACHE_TTL).catch(() => {});
+
+	// RL audit: record generation event to context_timeline (non-blocking)
+	const dominantPipeline = [...pipelineSummary]
+		.sort((a, b) => b.totalHits - a.totalHits)[0]?.pipeline ?? 'ace';
+	db.insert(contextTimeline).values({
+		userId,
+		sessionId:  '',
+		eventType:  'research',
+		pipeline:   dominantPipeline,
+		payload:    {
+			source:              'deep-research',
+			topicCount:          topics.length,
+			highPriorityCount:   topics.filter(t => t.priority === 'high').length,
+			modelUsed:           topics.length > 0 ? RESEARCH_MODEL : 'fallback',
+			feedbackSignalCount: feedbackSignals.length,
+		} as Record<string, unknown>,
+	}).catch(() => {});
 
 	// Kick off web research for high-priority topics (fire-and-forget)
 	const highPriority = topics.filter(t => t.priority === 'high').slice(0, 3);
