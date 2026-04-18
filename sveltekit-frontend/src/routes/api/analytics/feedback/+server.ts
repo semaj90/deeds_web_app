@@ -182,11 +182,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	// Fire-and-forget: never delays the HTTP response.
 	if (rating !== null) {
 		const rlSignal = rating === 'up' ? 'thumbs_up' as const : 'thumbs_down' as const;
+		const rlPipeline = (pipeline ?? 'ace') as 'ace' | 'rag' | 'kag' | 'dag' | 'codebase';
 		import('$lib/server/graph/hypergraph-4d.js')
 			.then(({ adaptFromAnalytics }) =>
 				adaptFromAnalytics({
 					signal:        rlSignal,
-					pipeline:      pipeline ?? 'ace',
+					pipeline:      rlPipeline,
 					hyperedgeHash: hyperedgeHash ?? undefined,
 					userId,
 					sessionId:     userId,

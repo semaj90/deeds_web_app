@@ -151,11 +151,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
     // ── RL signal: citation_saved is the strongest positive reward (+0.05) ──
     // Fire-and-forget: never delays the HTTP response.
+    const citPipeline = (body.pipeline ?? 'ace') as 'ace' | 'rag' | 'kag' | 'dag' | 'codebase';
     import('$lib/server/graph/hypergraph-4d.js')
       .then(({ adaptFromAnalytics }) =>
         adaptFromAnalytics({
           signal:        'citation_saved',
-          pipeline:      body.pipeline      ?? 'ace',
+          pipeline:      citPipeline,
           hyperedgeHash: body.hyperedgeHash ?? undefined,
           userId,
           sessionId:     userId,

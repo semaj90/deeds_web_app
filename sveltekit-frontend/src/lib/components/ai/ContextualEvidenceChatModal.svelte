@@ -11,7 +11,8 @@
  attachments?: AttachmentPreview[];
  error?: string;
  queryHash?: string;
- pipeline?: string; };
+ pipeline?: string;
+ hyperedgeHash?: string; };
 
  type AttachmentPreview = { id: string, name: string;
 	size: number;
@@ -464,7 +465,7 @@ const sessionSeed =
  <strong>{message.role === 'user' ? 'Detective' : '9S Assistant'}</strong>
  <small>{new Date(message.ts).toLocaleTimeString()}</small>
  {#if message.role === 'assistant' && message.queryHash}
- <FeedbackButtons queryHash={message.queryHash} pipeline={message.pipeline} compact showCounts />
+ <FeedbackButtons queryHash={message.queryHash} pipeline={message.pipeline} hyperedgeHash={message.hyperedgeHash} compact showCounts />
  {/if}
  </header>
  <p>{message.content}</p>

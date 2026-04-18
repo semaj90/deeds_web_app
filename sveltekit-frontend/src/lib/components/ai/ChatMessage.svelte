@@ -16,6 +16,7 @@
       tokenCount?: number;
       queryHash?: string;
       pipeline?: string;
+      hyperedgeHash?: string;
     };
   }
 
