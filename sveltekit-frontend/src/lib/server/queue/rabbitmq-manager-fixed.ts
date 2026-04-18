@@ -1375,6 +1375,23 @@ export class RabbitMQManager extends EventEmitter {
     }
   }
 
+  // --- QLoRA Distillation Publisher (P1-B) ---
+
+  async publishQLoRADistill(opts: {
+    minRerankScore?: number;
+    minResponseScore?: number;
+    limit?: number;
+  } = {}): Promise<boolean> {
+    if (!this.isReady()) return false;
+    await this.publish(this.exchanges.document_processing, 'qlora.distill', {
+      minRerankScore:   opts.minRerankScore   ?? 0.80,
+      minResponseScore: opts.minResponseScore ?? 0.80,
+      limit:            opts.limit            ?? 50,
+      ts:               Date.now(),
+    });
+    return true;
+  }
+
   // --- Glyph Tile Rebuild Publisher ---
 
   async publishGlyphTileRebuild(caseId: string, reason: string): Promise<boolean> {

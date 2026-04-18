@@ -6,7 +6,55 @@
 	let summary = $derived(data.summary);
 	let patterns = $derived(data.patterns);
 
-	let activeTab = $state<'overview' | 'patterns' | 'cache'>('overview');
+	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel'>('overview');
+
+	interface PersonalizedCase {
+		caseId: string;
+		title: string;
+		score: number;
+		reason: string;
+		interactionTypes: string[];
+	}
+
+	let personalizedCases = $state<PersonalizedCase[]>([]);
+	let forYouLoading = $state(false);
+
+	async function loadForYou() {
+		if (personalizedCases.length > 0) return; // already loaded
+		forYouLoading = true;
+		try {
+			const res = await fetch('/api/recommendations');
+			if (res.ok) {
+				const json = await res.json();
+				personalizedCases = json.data?.personalizedCases ?? [];
+			}
+		} catch { /* non-fatal */ }
+		forYouLoading = false;
+	}
+
+	// ── Search Intelligence — matches /api/analytics/search-patterns response ──
+	interface SearchIntelData {
+		hotQueries:          Array<{ query: string; hits: number; hash: string }>;
+		trending:            Array<{ query_hash: string; query: string | null; recent_hits: number; prior_hits: number; growth_rate: number }>;
+		crossPipelineChamps: Array<{ chunk_id: string; relative_path: string | null; pipeline_count: number; pipelines: string; total_hits: number; avg_rerank: number | null; quality_score: number }>;
+		pipelineMemory:      Array<{ pipeline: string; total_hits: number; unique_chunks: number; unique_queries: number; avg_rerank: number | null; top_chunk_path: string | null }>;
+		didYouMean:          Array<{ suggestion: string; similarity: number; hitCount: number; source: string; qualityTier?: string }>;
+		chunkQuality:        Array<{ chunk_id: string; relative_path: string | null; hit_count: number; avg_rerank: number | null; unique_queries: number; pipelines: string[]; quality_score: number }>;
+		clusterHeat:         Array<{ gpu_cluster: number; total_hits: number; unique_queries: number; avg_rerank: number | null }>;
+	}
+
+	let searchIntel = $state<SearchIntelData | null>(null);
+	let searchIntelLoading = $state(false);
+
+	async function loadSearchIntel() {
+		if (searchIntel) return;
+		searchIntelLoading = true;
+		try {
+			const res = await fetch('/api/analytics/search-patterns');
+			if (res.ok) searchIntel = await res.json();
+		} catch { /* non-fatal */ }
+		searchIntelLoading = false;
+	}
 
 	function formatRate(rate: number): string {
 		return `${(rate * 100).toFixed(1)}%`;
@@ -45,12 +93,14 @@
 		{#each [
 			{ id: 'overview', label: 'Overview', icon: 'layout-dashboard' },
 			{ id: 'patterns', label: 'Query Patterns', icon: 'activity' },
-			{ id: 'cache', label: 'Cache Performance', icon: 'database' }
+			{ id: 'cache', label: 'Cache Performance', icon: 'database' },
+			{ id: 'search-intel', label: 'Search Intelligence', icon: 'search' },
+			{ id: 'for-you', label: 'For You', icon: 'sparkles' }
 		] as tab}
 			<button
 				class="ana-tab"
 				class:active={activeTab === tab.id}
-				onclick={() => (activeTab = tab.id as typeof activeTab)}
+				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); }}
 			>
 				<Icon name={tab.icon} />
 				{tab.label}
@@ -210,6 +260,216 @@
 				</div>
 			</div>
 		{/if}
+	{/if}
+
+	{#if activeTab === 'search-intel'}
+		{#if searchIntelLoading}
+			<div class="ana-empty-center">Loading search intelligence...</div>
+		{:else if searchIntel}
+			<!-- Hot Queries + Trending -->
+			<div class="ana-two-col">
+				<div class="ana-card">
+					<h3 class="ana-card-title">Hot Queries</h3>
+					<p class="ana-card-desc">Most frequent queries across all pipelines</p>
+					{#if searchIntel.hotQueries?.length}
+						<div class="ana-pattern-list">
+							{#each searchIntel.hotQueries.slice(0, 8) as hq, i}
+								<div class="ana-pattern-row">
+									<div class="ana-pattern-left">
+										<span class="ana-pattern-rank">{i + 1}</span>
+										<span class="ana-si-query">{hq.query}</span>
+									</div>
+									<div class="ana-pattern-right">
+										<span>{hq.hits}x</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No hot queries recorded yet</p>
+					{/if}
+				</div>
+
+				<div class="ana-card">
+					<h3 class="ana-card-title">Trending</h3>
+					<p class="ana-card-desc">Queries with rising frequency</p>
+					{#if searchIntel.trending?.length}
+						<div class="ana-pattern-list">
+							{#each searchIntel.trending.slice(0, 8) as t, i}
+								<div class="ana-pattern-row">
+									<div class="ana-pattern-left">
+										<span class="ana-pattern-rank">{i + 1}</span>
+										<span class="ana-si-query">{t.query ?? t.query_hash.slice(0, 12)}</span>
+									</div>
+									<div class="ana-pattern-right">
+										<span class="ana-si-growth">+{(t.growth_rate * 100).toFixed(0)}%</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No trending data yet</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Pipeline Memory + Cluster Heat -->
+			<div class="ana-two-col">
+				<div class="ana-card">
+					<h3 class="ana-card-title">Pipeline Memory</h3>
+					<p class="ana-card-desc">RAG/KAG/DAG/ACE retrieval breakdown</p>
+					{#if searchIntel.pipelineMemory?.length}
+						<div class="ana-cache-layers">
+							{#each searchIntel.pipelineMemory as pm}
+								<div class="ana-cache-row">
+									<span class="ana-cache-name">{pm.pipeline}</span>
+									<div class="ana-cache-meta">
+										<span>{pm.total_hits} hits</span>
+										<span>avg {pm.avg_rerank != null ? (pm.avg_rerank * 100).toFixed(0) + '%' : '—'}</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No pipeline data yet</p>
+					{/if}
+				</div>
+
+				<div class="ana-card">
+					<h3 class="ana-card-title">Cluster Heat Map</h3>
+					<p class="ana-card-desc">Vector cluster activity density</p>
+					{#if searchIntel.clusterHeat?.length}
+						<div class="ana-pattern-list">
+							{#each searchIntel.clusterHeat.slice(0, 6) as cluster}
+								<div class="ana-pattern-row">
+									<div class="ana-pattern-left">
+										<code class="ana-pattern-hash">#{cluster.gpu_cluster}</code>
+									</div>
+									<div class="ana-pattern-right">
+										<span>{cluster.total_hits} hits</span>
+										<span>avg {cluster.avg_rerank != null ? (cluster.avg_rerank * 100).toFixed(0) + '%' : '—'}</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No cluster data yet</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Cross-Pipeline Champions + Chunk Quality -->
+			<div class="ana-two-col">
+				<div class="ana-card">
+					<h3 class="ana-card-title">Cross-Pipeline Champions</h3>
+					<p class="ana-card-desc">Chunks surfaced by multiple retrieval pipelines</p>
+					{#if searchIntel.crossPipelineChamps?.length}
+						<div class="ana-pattern-list">
+							{#each searchIntel.crossPipelineChamps.slice(0, 5) as champ}
+								<div class="ana-pattern-row">
+									<div class="ana-pattern-left">
+										<code class="ana-pattern-hash">{champ.chunk_id.slice(0, 12)}</code>
+										<div class="ana-si-tags">
+											{#each champ.pipelines.split(', ') as p}
+												<span class="ana-rec-tag">{p}</span>
+											{/each}
+										</div>
+									</div>
+									<div class="ana-pattern-right">
+										<span class="ana-rec-score">{champ.quality_score.toFixed(2)}</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="ana-empty">No cross-pipeline data yet</p>
+					{/if}
+				</div>
+
+				<div class="ana-card">
+					<h3 class="ana-card-title">Chunk Quality</h3>
+					<p class="ana-card-desc">Retrieval quality signals across the corpus</p>
+					{#if searchIntel.chunkQuality?.length}
+						<div class="ana-cache-layers">
+							<div class="ana-cache-row">
+								<span class="ana-cache-name">Tracked chunks</span>
+								<span class="ana-stat-value" style="font-size:1rem">{searchIntel.chunkQuality.length}</span>
+							</div>
+							<div class="ana-cache-row">
+								<span class="ana-cache-name">Avg rerank</span>
+								<span class="ana-stat-value" style="font-size:1rem">
+									{(searchIntel.chunkQuality.reduce((s, c) => s + (c.avg_rerank ?? 0), 0) / searchIntel.chunkQuality.length * 100).toFixed(0)}%
+								</span>
+							</div>
+						</div>
+					{:else}
+						<p class="ana-empty">No chunk quality data</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Did You Mean -->
+			{#if searchIntel.didYouMean?.length}
+				<div class="ana-card">
+					<h3 class="ana-card-title">Did You Mean?</h3>
+					<p class="ana-card-desc">Semantically similar query variants detected in the corpus</p>
+					<div class="ana-pattern-list">
+						{#each searchIntel.didYouMean.slice(0, 5) as dym}
+							<div class="ana-pattern-row">
+								<div class="ana-pattern-left">
+									<span class="ana-si-query">{dym.suggestion}</span>
+									<span class="ana-rec-tag">{dym.source}</span>
+								</div>
+								<div class="ana-pattern-right">
+									<span>{(dym.similarity * 100).toFixed(0)}% match</span>
+									<span>{dym.hitCount} hits</span>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		{:else}
+			<div class="ana-empty-center">
+				Failed to load search intelligence data.
+			</div>
+		{/if}
+	{/if}
+
+	{#if activeTab === 'for-you'}
+		<div class="ana-card">
+			<div class="ana-card-head">
+				<h3 class="ana-card-title">Recommended Cases</h3>
+				<p class="ana-card-desc">Cases connected to your activity via shared entities in the knowledge graph</p>
+			</div>
+			{#if forYouLoading}
+				<div class="ana-empty-center">Loading recommendations...</div>
+			{:else if personalizedCases.length > 0}
+				<div class="ana-pattern-list">
+					{#each personalizedCases as rec, i}
+						<div class="ana-pattern-row">
+							<div class="ana-pattern-left">
+								<span class="ana-pattern-rank">{i + 1}</span>
+								<div class="ana-rec-info">
+									<a href="/cases/{rec.caseId}" class="ana-rec-title">{rec.title || rec.caseId.slice(0, 8)}</a>
+									<span class="ana-rec-reason">{rec.reason}</span>
+								</div>
+							</div>
+							<div class="ana-pattern-right">
+								<span class="ana-rec-score">{rec.score.toFixed(1)}</span>
+								{#each rec.interactionTypes.slice(0, 2) as type}
+									<span class="ana-rec-tag">{type}</span>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<div class="ana-empty-center">
+					No recommendations yet. View, search, or analyze more cases to build your interaction graph.
+				</div>
+			{/if}
+		</div>
 	{/if}
 </div>
 
@@ -468,5 +728,60 @@
 		font-size: 0.8rem;
 		font-family: 'JetBrains Mono', ui-monospace, monospace;
 		color: #f87171;
+	}
+
+	/* ── For You recommendations ── */
+	.ana-rec-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.125rem;
+	}
+	.ana-rec-title {
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: rgba(96, 165, 250, 0.85);
+		text-decoration: none;
+	}
+	.ana-rec-title:hover { color: rgba(96, 165, 250, 1); text-decoration: underline; }
+	.ana-rec-reason {
+		font-size: 0.68rem;
+		color: rgba(212, 199, 163, 0.35);
+		max-width: 28rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.ana-rec-score {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: rgba(52, 211, 153, 0.8);
+		font-variant-numeric: tabular-nums;
+	}
+	.ana-rec-tag {
+		font-size: 0.6rem;
+		padding: 0.125rem 0.375rem;
+		border-radius: 0.25rem;
+		background: rgba(212, 199, 163, 0.06);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		color: rgba(212, 199, 163, 0.45);
+	}
+
+	/* ── Search Intelligence ── */
+	.ana-si-query {
+		font-size: 0.8rem;
+		color: rgba(212, 199, 163, 0.65);
+	}
+	.ana-si-strike { text-decoration: line-through; color: rgba(212, 199, 163, 0.3); }
+	.ana-si-arrow { font-size: 0.75rem; color: rgba(96, 165, 250, 0.6); margin: 0 0.25rem; }
+	.ana-si-growth {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: rgba(52, 211, 153, 0.8);
+		font-variant-numeric: tabular-nums;
+	}
+	.ana-si-tags {
+		display: flex;
+		gap: 0.25rem;
+		flex-wrap: wrap;
 	}
 </style>
