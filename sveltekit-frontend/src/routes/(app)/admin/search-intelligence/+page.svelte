@@ -154,6 +154,62 @@
 		}
 	}
 
+	// ── Hyperedges (Grade A/B from /api/graph/hypergraph) ────────────────────
+	type HyperEdge = {
+		hash: string; gradeLabel: string; gradeScore: number; pipeline: string;
+		memberCount: number; summary: string | null; loraHint: string | null;
+	};
+	let hyperedgeGrade   = $state<'A' | 'B' | 'C'>('A');
+	let hyperedges       = $state<HyperEdge[]>([]);
+	let hyperedgeLoading = $state(false);
+	let hyperedgeError   = $state<string | null>(null);
+
+	async function fetch_hyperedges() {
+		hyperedgeLoading = true;
+		hyperedgeError   = null;
+		try {
+			const res = await fetch(`/api/graph/hypergraph?grade=${hyperedgeGrade}&limit=10`);
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const d = await res.json() as { edges: HyperEdge[] };
+			hyperedges = d.edges ?? [];
+		} catch (e) {
+			hyperedgeError = e instanceof Error ? e.message : String(e);
+		} finally {
+			hyperedgeLoading = false;
+		}
+	}
+
+	$effect(() => {
+		void hyperedgeGrade;
+		if (activeSection === 'graph') void fetch_hyperedges();
+	});
+
+	// ── Agent test ────────────────────────────────────────────────────────────
+	let agentQuery   = $state('');
+	let agentRunning = $state(false);
+	let agentResult  = $state<{ answer: string; toolsUsed: string[]; rounds: number; durationMs: number } | null>(null);
+	let agentError   = $state<string | null>(null);
+
+	async function run_agent() {
+		if (!agentQuery.trim() || agentRunning) return;
+		agentRunning = true;
+		agentError   = null;
+		agentResult  = null;
+		try {
+			const res = await fetch('/api/ai/agent', {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body:    JSON.stringify({ query: agentQuery, pipeline: 'ace' }),
+			});
+			if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+			agentResult = await res.json();
+		} catch (e) {
+			agentError = e instanceof Error ? e.message : String(e);
+		} finally {
+			agentRunning = false;
+		}
+	}
+
 	// ── Ingest state ─────────────────────────────────────────────────────────
 	let ingestStateCode    = $state('ca');
 	let ingestLoading      = $state(false);
@@ -1669,6 +1725,85 @@
 	</section>
 	{/if}
 
+	<!-- ── Top Hyperedges ───────────────────────────────────────────────────── -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="layers" class="w-4 h-4" /> Top Hyperedges</span>
+			<span class="panel-sub">HGNN-enriched knowledge clusters · Grades A–C by GRPO reward score</span>
+			<div style="display:flex;gap:0.3rem;margin-left:auto">
+				{#each (['A','B','C'] as const) as g}
+					<button
+						class="btn-sm {hyperedgeGrade === g ? 'primary' : ''}"
+						onclick={() => { hyperedgeGrade = g; }}
+					>{g}</button>
+				{/each}
+				<button class="btn-sm btn-ghost" disabled={hyperedgeLoading} onclick={fetch_hyperedges}>
+					<Icon name="refresh-cw" class="w-3 h-3" />
+				</button>
+			</div>
+		</div>
+		{#if hyperedgeError}
+			<p class="err-inline"><Icon name="alert-triangle" class="w-3.5 h-3.5" /> {hyperedgeError}</p>
+		{:else if hyperedgeLoading}
+			<p class="loading-note"><Icon name="loader" class="w-4 h-4 spin" /> Loading hyperedges…</p>
+		{:else if hyperedges.length === 0}
+			<p class="empty-note">No Grade {hyperedgeGrade} hyperedges yet — rebuild graph after seeding ≥40 summaries.</p>
+		{:else}
+			<table class="data-table">
+				<thead><tr>
+					<th>Hash</th><th>Grade</th><th>Score</th><th>Pipeline</th><th>Members</th><th>LoRA hint</th><th>Summary</th>
+				</tr></thead>
+				<tbody>
+					{#each hyperedges as e}
+						<tr>
+							<td><code class="mono">{e.hash}</code></td>
+							<td><span class="tier-badge {e.gradeLabel}">{e.gradeLabel}</span></td>
+							<td class="r-cell">{(e.gradeScore * 100).toFixed(0)}%</td>
+							<td><span class="pipeline-badge {e.pipeline}">{e.pipeline.toUpperCase()}</span></td>
+							<td class="r-cell">{e.memberCount}</td>
+							<td class="q-cell muted">{e.loraHint ?? '—'}</td>
+							<td class="q-cell">{e.summary?.slice(0, 80) ?? '—'}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</section>
+
+	<!-- ── Agent Test ───────────────────────────────────────────────────────── -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="bot" class="w-4 h-4" /> Gemma4 Agent Test</span>
+			<span class="panel-sub">rag_search · case_search · memory_recall · hyperedge_stats — max 5 tool rounds</span>
+		</div>
+		<div class="input-row" style="margin-bottom:0.6rem">
+			<input
+				class="text-input"
+				style="flex:1;width:auto"
+				placeholder="Ask the agent a legal research question…"
+				bind:value={agentQuery}
+				disabled={agentRunning}
+				onkeydown={(e) => { if (e.key === 'Enter') void run_agent(); }}
+			/>
+			<button class="btn-sm primary" onclick={run_agent} disabled={agentRunning || !agentQuery.trim()}>
+				{agentRunning ? 'Running…' : 'Run Agent'}
+			</button>
+		</div>
+		{#if agentError}
+			<p class="err-inline"><Icon name="alert-triangle" class="w-3.5 h-3.5" /> {agentError}</p>
+		{/if}
+		{#if agentResult}
+			<div class="agent-result">
+				<div class="agent-meta">
+					<span class="agent-badge">Tools: {agentResult.toolsUsed.join(', ') || 'none'}</span>
+					<span class="agent-badge">Rounds: {agentResult.rounds}</span>
+					<span class="agent-badge">{agentResult.durationMs}ms</span>
+				</div>
+				<p class="agent-answer">{agentResult.answer}</p>
+			</div>
+		{/if}
+	</section>
+
 </div>
 {/if}
 
@@ -2265,4 +2400,21 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 .cluster-bar-track{ flex: 1; height: 10px; background: #1e1c14; border-radius: 3px; overflow: hidden; }
 .cluster-bar-fill { height: 100%; background: linear-gradient(90deg, #4b5563, #7c6ff7); border-radius: 3px; transition: width 0.4s ease; }
 .cluster-meta     { width: 160px; font-size: 0.68rem; color: #8b7860; text-align: right; flex-shrink: 0; }
+
+/* ── Agent result ───────────────────────────────────────────────────────── */
+.agent-result {
+	border: 1px solid #2d2b24; border-radius: 6px;
+	padding: 0.75rem; background: #0f0e0c;
+}
+.agent-meta {
+	display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem;
+}
+.agent-badge {
+	font-size: 0.62rem; padding: 0.1rem 0.45rem; border-radius: 3px;
+	background: #2d2b24; color: #9ca3af; font-family: inherit;
+}
+.agent-answer {
+	font-size: 0.75rem; color: #d4c7a3; line-height: 1.6;
+	white-space: pre-wrap; word-break: break-word; margin: 0;
+}
 </style>
