@@ -68,21 +68,6 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   };
 };
 
-  if (evidenceData.length === 0 && !cursor) {
-    loadError = 'No evidence found or database unavailable';
-  }
-
-  return {
-    evidence: evidenceData,
-    caseId,
-    user: locals.user,
-    loadError,
-    hasMore,
-    nextCursor,
-    form: await superValidate(zod(evidenceUploadSchema)),
-  };
-};
-
 // Phase 96: Form Actions for mutations (replaces API endpoints)
 export const actions: Actions = {
   // Upload new evidence

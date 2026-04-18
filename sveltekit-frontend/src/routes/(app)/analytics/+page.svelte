@@ -389,12 +389,13 @@
 			{ id: 'deep-research', label: 'Deep Research', icon: 'brain' },
 			{ id: 'matrix', label: 'MapReduce Matrix', icon: 'grid-3x3' },
 			{ id: 'playground', label: 'Research Playground', icon: 'flask-conical' },
-			{ id: 'for-you', label: 'For You', icon: 'sparkles' }
+			{ id: 'graph',      label: 'Knowledge Graph',    icon: 'git-graph' },
+			{ id: 'for-you',    label: 'For You',            icon: 'sparkles' }
 		] as tab}
 			<button
 				class="ana-tab"
 				class:active={activeTab === tab.id}
-				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); if (tab.id === 'deep-research') loadDeepResearch(); if (tab.id === 'matrix') loadMatrix(); if (tab.id === 'playground') loadPlayground(); }}
+				onclick={() => { activeTab = tab.id as typeof activeTab; if (tab.id === 'for-you') loadForYou(); if (tab.id === 'search-intel') loadSearchIntel(); if (tab.id === 'deep-research') loadDeepResearch(); if (tab.id === 'matrix') loadMatrix(); if (tab.id === 'playground') loadPlayground(); if (tab.id === 'graph') loadGraph(); }}
 			>
 				<Icon name={tab.icon} />
 				{tab.label}
@@ -1205,6 +1206,128 @@
 			{/if}
 		</div>
 	{/if}
+
+	{#if activeTab === 'graph'}
+		<div class="graph-panel">
+			<!-- Header row -->
+			<div class="graph-header">
+				<div class="graph-header-left">
+					<Icon name="git-graph" class="w-5 h-5" />
+					<div>
+						<h2 class="graph-title">Knowledge Graph</h2>
+						<p class="graph-subtitle">GPU k-means clusters · PageRank authority · RL policy weights per pipeline</p>
+					</div>
+				</div>
+				<div class="graph-actions">
+					<button
+						class="graph-btn"
+						onclick={() => rebuildGraph('policy')}
+						disabled={graphBuilding}
+					>
+						<Icon name="refresh-cw" class="w-3.5 h-3.5" />
+						Refresh Policy
+					</button>
+					<button
+						class="graph-btn graph-btn-primary"
+						onclick={() => { graphData = null; rebuildGraph('build'); }}
+						disabled={graphBuilding}
+					>
+						<Icon name={graphBuilding ? 'loader' : 'cpu'} class="w-3.5 h-3.5" />
+						{graphBuilding ? 'Building…' : 'Rebuild Graph'}
+					</button>
+				</div>
+			</div>
+
+			{#if graphError}
+				<div class="graph-error">
+					<Icon name="circle-alert" class="w-4 h-4" />
+					{graphError}
+				</div>
+			{/if}
+
+			{#if graphLoading}
+				<div class="graph-loading">
+					<Icon name="loader" class="w-5 h-5 spin" />
+					Loading graph…
+				</div>
+			{:else if !graphData || graphData.totalSummaries === 0}
+				<div class="graph-empty">
+					<Icon name="git-graph" class="w-8 h-8 mb-2" />
+					<p>No graph data yet.</p>
+					<p class="graph-empty-sub">Click <strong>Rebuild Graph</strong> to cluster your research summaries.</p>
+				</div>
+			{:else}
+				<!-- Stats row -->
+				<div class="graph-stats-row">
+					<div class="graph-stat">
+						<span class="graph-stat-val">{graphData.totalSummaries.toLocaleString()}</span>
+						<span class="graph-stat-label">Summaries</span>
+					</div>
+					<div class="graph-stat">
+						<span class="graph-stat-val">{graphData.clusters.length}</span>
+						<span class="graph-stat-label">Clusters</span>
+					</div>
+					<div class="graph-stat">
+						<span class="graph-stat-val">{graphData.clusters.reduce((s, c) => s + c.size, 0).toLocaleString()}</span>
+						<span class="graph-stat-label">Embedded rows</span>
+					</div>
+					{#if graphData.builtAt}
+						<div class="graph-stat">
+							<span class="graph-stat-val">{relativeTime(graphData.builtAt)}</span>
+							<span class="graph-stat-label">Last built</span>
+						</div>
+					{/if}
+				</div>
+
+				<!-- RL Policy weights -->
+				{#if graphPolicy}
+					<div class="graph-section">
+						<h3 class="graph-section-title">
+							<Icon name="zap" class="w-3.5 h-3.5" />
+							RL Policy Weights
+							<span class="graph-section-meta">updated {relativeTime(graphPolicy.updatedAt)}</span>
+						</h3>
+						<div class="policy-grid">
+							{#each (['ace','kag','dag','rag','codebase'] as const) as pipe}
+								{@const weight = graphPolicy[pipe]}
+								{@const pct    = Math.min(100, Math.round((weight / 2) * 100))}
+								<div class="policy-row">
+									<span class="policy-name" style="color:{pipelineColor(pipe)}">{pipe.toUpperCase()}</span>
+									<div class="policy-bar-track">
+										<div class="policy-bar-fill" style="width:{pct}%; background:{pipelineColor(pipe)}55; border-right:2px solid {pipelineColor(pipe)}"></div>
+									</div>
+									<span class="policy-val">{weight.toFixed(3)}</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Cluster list -->
+				<div class="graph-section">
+					<h3 class="graph-section-title">
+						<Icon name="layers" class="w-3.5 h-3.5" />
+						Top Clusters by PageRank
+					</h3>
+					<div class="cluster-list">
+						{#each graphData.clusters.slice(0, 20) as cluster}
+							<div class="cluster-row">
+								<div class="cluster-id">#{cluster.id}</div>
+								<div class="cluster-bar-wrap">
+									<div
+										class="cluster-bar"
+										style="width:{Math.round((cluster.size / Math.max(...graphData.clusters.map(c => c.size))) * 100)}%"
+									></div>
+								</div>
+								<span class="cluster-size">{cluster.size} rows</span>
+								<span class="cluster-pr">PR {cluster.pageRank.toFixed(4)}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -1756,4 +1879,227 @@
 	.pg-lg-content { color: rgba(212,199,163,0.7); }
 	.pg-lg-user .pg-lg-role { color: rgba(96,165,250,0.6); }
 	.pg-lg-tool .pg-lg-role { color: rgba(251,191,36,0.6); }
+
+	/* ── Knowledge Graph tab ── */
+	.graph-panel {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		padding: 1.5rem 2rem;
+	}
+	.graph-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+	.graph-header-left {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		color: rgba(212,199,163,0.5);
+	}
+	.graph-title {
+		font-size: 1rem;
+		font-weight: 600;
+		color: rgba(212,199,163,0.9);
+		margin: 0;
+	}
+	.graph-subtitle {
+		font-size: 0.72rem;
+		color: rgba(212,199,163,0.4);
+		margin: 0.25rem 0 0;
+	}
+	.graph-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+	.graph-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.45rem 0.85rem;
+		border-radius: 8px;
+		font-size: 0.78rem;
+		font-weight: 500;
+		cursor: pointer;
+		border: 1px solid rgba(212,199,163,0.12);
+		background: rgba(212,199,163,0.05);
+		color: rgba(212,199,163,0.65);
+		transition: all 0.15s;
+	}
+	.graph-btn:hover:not(:disabled) {
+		background: rgba(212,199,163,0.1);
+		color: rgba(212,199,163,0.9);
+	}
+	.graph-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+	.graph-btn-primary {
+		background: rgba(96,165,250,0.1);
+		border-color: rgba(96,165,250,0.22);
+		color: #93c5fd;
+	}
+	.graph-btn-primary:hover:not(:disabled) {
+		background: rgba(96,165,250,0.18);
+		color: #bfdbfe;
+	}
+	.graph-error {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		background: rgba(239,68,68,0.08);
+		border: 1px solid rgba(239,68,68,0.18);
+		color: #f87171;
+		font-size: 0.8rem;
+	}
+	.graph-loading {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 3rem;
+		justify-content: center;
+		color: rgba(212,199,163,0.4);
+		font-size: 0.85rem;
+	}
+	.graph-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 4rem 2rem;
+		color: rgba(212,199,163,0.35);
+		font-size: 0.85rem;
+		text-align: center;
+		gap: 0.25rem;
+	}
+	.graph-empty-sub { font-size: 0.75rem; color: rgba(212,199,163,0.25); margin-top: 0.25rem; }
+	.graph-empty strong { color: rgba(212,199,163,0.5); }
+	.graph-stats-row {
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+	.graph-stat {
+		flex: 1;
+		min-width: 7rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		background: rgba(255,255,255,0.02);
+		border: 1px solid rgba(212,199,163,0.07);
+		border-radius: 10px;
+		padding: 0.875rem 1rem;
+	}
+	.graph-stat-val {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: rgba(212,199,163,0.9);
+		font-variant-numeric: tabular-nums;
+	}
+	.graph-stat-label {
+		font-size: 0.68rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: rgba(212,199,163,0.35);
+	}
+	.graph-section {
+		background: rgba(255,255,255,0.02);
+		border: 1px solid rgba(212,199,163,0.07);
+		border-radius: 10px;
+		padding: 1rem;
+	}
+	.graph-section-title {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: rgba(212,199,163,0.4);
+		margin: 0 0 0.875rem;
+	}
+	.graph-section-meta {
+		margin-left: auto;
+		font-weight: 400;
+		text-transform: none;
+		letter-spacing: 0;
+		color: rgba(212,199,163,0.25);
+		font-size: 0.68rem;
+	}
+	/* ── Policy bars ── */
+	.policy-grid { display: flex; flex-direction: column; gap: 0.55rem; }
+	.policy-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.policy-name {
+		font-size: 0.72rem;
+		font-weight: 700;
+		font-family: 'JetBrains Mono', monospace;
+		width: 4.5rem;
+		flex-shrink: 0;
+	}
+	.policy-bar-track {
+		flex: 1;
+		height: 0.5rem;
+		background: rgba(212,199,163,0.06);
+		border-radius: 999px;
+		overflow: hidden;
+	}
+	.policy-bar-fill {
+		height: 100%;
+		border-radius: 999px;
+		transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+	}
+	.policy-val {
+		font-size: 0.72rem;
+		font-family: 'JetBrains Mono', monospace;
+		color: rgba(212,199,163,0.55);
+		width: 3.5rem;
+		text-align: right;
+	}
+	/* ── Cluster list ── */
+	.cluster-list { display: flex; flex-direction: column; gap: 0.4rem; }
+	.cluster-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.35rem 0;
+		border-bottom: 1px solid rgba(212,199,163,0.04);
+	}
+	.cluster-id {
+		font-size: 0.68rem;
+		font-family: 'JetBrains Mono', monospace;
+		color: rgba(212,199,163,0.35);
+		width: 2.5rem;
+		flex-shrink: 0;
+	}
+	.cluster-bar-wrap {
+		flex: 1;
+		height: 6px;
+		background: rgba(212,199,163,0.05);
+		border-radius: 999px;
+		overflow: hidden;
+	}
+	.cluster-bar {
+		height: 100%;
+		background: linear-gradient(90deg, rgba(96,165,250,0.5), rgba(168,85,247,0.5));
+		border-radius: 999px;
+	}
+	.cluster-size {
+		font-size: 0.7rem;
+		color: rgba(212,199,163,0.5);
+		width: 4.5rem;
+		text-align: right;
+	}
+	.cluster-pr {
+		font-size: 0.65rem;
+		font-family: 'JetBrains Mono', monospace;
+		color: rgba(52,211,153,0.6);
+		width: 5.5rem;
+		text-align: right;
+	}
+	@keyframes spin { to { transform: rotate(360deg); } }
+	:global(.spin) { animation: spin 1s linear infinite; }
 </style>
