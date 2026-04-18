@@ -36,6 +36,11 @@
 			{ keys: ['Ctrl', '/'], action: 'Focus Terminal Input' },
 			{ keys: ['/'], action: 'Quick Search Focus' },
 		]},
+		{ category: 'Research', icon: 'flask-conical', items: [
+			{ keys: ['Alt', 'D'], action: 'Open Deep Research tab' },
+			{ keys: ['Alt', 'T'], action: 'Toggle Task Panel' },
+			{ keys: ['Alt', 'R'], action: 'Open Research Playground' },
+		]},
 		{ category: 'System', icon: 'settings', items: [
 			{ keys: ['?'], action: 'Show This Panel' },
 			{ keys: ['Ctrl', 'Shift', 'D'], action: 'Toggle Document Writer' },

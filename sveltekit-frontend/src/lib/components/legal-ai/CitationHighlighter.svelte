@@ -11,11 +11,13 @@
 		onsave?: (...args: any[]) => void;
 		onremove?: (...args: any[]) => void;
 		onsummarize?: (result: { text: string; summary: string; confidence: number }) => void;
+		/** Called when user clicks "→ Research" — triggers deep-research task creation */
+		onresearch?: (data: { text: string; summary?: string; pipelineHint?: string }) => void;
 		content?: string;
 		citations?: HighlightedCitation[];
 	}
 
-	let { content = '', citations = [], onsave, onremove, onsummarize }: Props = $props();
+	let { content = '', citations = [], onsave, onremove, onsummarize, onresearch }: Props = $props();
 
 	let selectedText = $state('');
 	let selectionStart = $state(0);
@@ -25,6 +27,7 @@
 	let tooltipY = $state(0);
 	let tooltipBelow = $state(false);
 	let isSummarizing = $state(false);
+	let isResearching = $state(false);
 	let summaryResult = $state<{ summary: string; confidence: number } | null>(null);
 	let contentRef: HTMLDivElement | undefined = $state();
 
@@ -51,6 +54,7 @@
 			showTooltip = true;
 			summaryResult = null;
 			isSummarizing = false;
+			isResearching = false;
 		} else {
 			closeTooltip();
 		}
@@ -92,11 +96,31 @@
 		}
 	}
 
+	async function createResearchTask() {
+		if (!selectedText || isResearching) return;
+		isResearching = true;
+
+		// Auto-summarize if we don't have a summary yet
+		if (!summaryResult && selectedText.length >= 10) {
+			await summarizeSelection();
+		}
+
+		onresearch?.({
+			text: selectedText,
+			summary: summaryResult?.summary,
+			pipelineHint: 'ace',
+		});
+
+		closeTooltip();
+		isResearching = false;
+	}
+
 	function closeTooltip() {
 		showTooltip = false;
 		selectedText = '';
 		summaryResult = null;
 		isSummarizing = false;
+		isResearching = false;
 	}
 
 	function isCitationHighlighted(index: number): boolean {
@@ -167,7 +191,12 @@
 						</span>
 					</div>
 					<div class="tooltip-actions">
-						<button class="tooltip-btn save" onclick={saveCitation}>Save as Citation</button>
+						<button class="tooltip-btn save" onclick={saveCitation}>Save Citation</button>
+						{#if onresearch}
+							<button class="tooltip-btn research" onclick={createResearchTask} disabled={isResearching}>
+								{isResearching ? 'Adding…' : '→ Research'}
+							</button>
+						{/if}
 						<button class="tooltip-btn close" onclick={closeTooltip}>Close</button>
 					</div>
 				</div>
@@ -177,6 +206,11 @@
 						{isSummarizing ? 'Summarizing...' : 'Summarize'}
 					</button>
 					<button class="tooltip-btn save" onclick={saveCitation}>Save Citation</button>
+					{#if onresearch}
+						<button class="tooltip-btn research" onclick={createResearchTask} disabled={isResearching}>
+							{isResearching ? 'Adding…' : '→ Research'}
+						</button>
+					{/if}
 					<button class="tooltip-btn close" onclick={closeTooltip}>&#x2715;</button>
 				</div>
 			{/if}
@@ -237,14 +271,15 @@
 		border-radius: 8px;
 		padding: 0.5rem;
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-		max-width: 360px;
-		min-width: 180px;
+		max-width: 400px;
+		min-width: 200px;
 	}
 
 	.tooltip-actions {
 		display: flex;
 		gap: 0.35rem;
 		align-items: center;
+		flex-wrap: wrap;
 	}
 
 	.tooltip-btn {
@@ -279,6 +314,20 @@
 
 	.tooltip-btn.save:hover {
 		background-color: #3a9a4a;
+	}
+
+	.tooltip-btn.research {
+		background-color: #1d4ed8;
+		color: #e0f2fe;
+	}
+
+	.tooltip-btn.research:hover:not(:disabled) {
+		background-color: #2563eb;
+	}
+
+	.tooltip-btn.research:disabled {
+		opacity: 0.7;
+		cursor: wait;
 	}
 
 	.tooltip-btn.close {

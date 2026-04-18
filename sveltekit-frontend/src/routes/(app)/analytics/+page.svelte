@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	let { data } = $props();
 
@@ -7,6 +9,30 @@
 	let patterns = $derived(data.patterns);
 
 	let activeTab = $state<'overview' | 'patterns' | 'cache' | 'for-you' | 'search-intel' | 'deep-research' | 'matrix' | 'playground'>('overview');
+
+	// Listen for Alt+D / Alt+R keyboard navigation from layout
+	onMount(() => {
+		if (!browser) return;
+		// Check URL hash for initial tab
+		const hash = window.location.hash.replace('#', '') as typeof activeTab;
+		const validTabs = ['overview','patterns','cache','for-you','search-intel','deep-research','matrix','playground'];
+		if (validTabs.includes(hash)) { activeTab = hash; }
+
+		function handleNavAnalytics(e: Event) {
+			const tab = (e as CustomEvent<{ tab: string }>).detail?.tab as typeof activeTab;
+			if (tab && validTabs.includes(tab)) {
+				activeTab = tab;
+				if (tab === 'for-you') loadForYou();
+				if (tab === 'search-intel') loadSearchIntel();
+				if (tab === 'deep-research') loadDeepResearch();
+				if (tab === 'matrix') loadMatrix();
+				if (tab === 'playground') loadPlayground();
+				window.history.replaceState(null, '', `/analytics#${tab}`);
+			}
+		}
+		window.addEventListener('yorha:nav-analytics', handleNavAnalytics);
+		return () => window.removeEventListener('yorha:nav-analytics', handleNavAnalytics);
+	});
 
 	interface PersonalizedCase {
 		caseId: string;

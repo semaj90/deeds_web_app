@@ -14,6 +14,7 @@
 	import { initTypingDetector } from '$lib/utils/telemetry.js';
 	import { analytics } from '$lib/stores/analytics.svelte.js';
 	import { analysisPanel } from '$lib/stores/analysis-panel.svelte.js';
+	import { researchTasks } from '$lib/stores/research-tasks.svelte.js';
 	import { Tooltip } from 'bits-ui';
 
 	interface Props {
@@ -25,6 +26,7 @@
 	let showDocumentWriter = $state(false);
 	let showShortcuts = $state(false);
 	let showAnalysisPanel = $state(false);
+	let showAuthModal = $state(false);
 	let currentPathname = $derived(page.url.pathname);
 
 	// Dynamic imports to avoid SSR TDZ crashes (browser-only components)
@@ -33,6 +35,8 @@
 	let SetupWizard = $state<typeof import('$lib/components/onboarding/SetupWizard.svelte').default | null>(null);
 	let KeyboardShortcutsPanel = $state<typeof import('$lib/components/KeyboardShortcutsPanel.svelte').default | null>(null);
 	let AnalysisPanelComp = $state<typeof import('$lib/components/analysis/AnalysisPanel.svelte').default | null>(null);
+	let ResearchTaskPanel = $state<typeof import('$lib/components/research/ResearchTaskPanel.svelte').default | null>(null);
+	let AuthModal = $state<typeof import('$lib/components/ui/AuthModal.svelte').default | null>(null);
 	onMount(() => {
 		// Dynamic imports (async, no cleanup return)
 		Promise.all([
@@ -41,13 +45,20 @@
 			import('$lib/components/onboarding/SetupWizard.svelte').catch(() => null),
 			import('$lib/components/KeyboardShortcutsPanel.svelte').catch(() => null),
 			import('$lib/components/analysis/AnalysisPanel.svelte').catch(() => null),
-		]).then(([accMod, chatMod, wizardMod, shortcutsMod, analysisMod]) => {
+			import('$lib/components/research/ResearchTaskPanel.svelte').catch(() => null),
+			import('$lib/components/ui/AuthModal.svelte').catch(() => null),
+		]).then(([accMod, chatMod, wizardMod, shortcutsMod, analysisMod, tasksMod, authMod]) => {
 			if (accMod) AccessibilityPanel = accMod.default;
 			if (chatMod) AIChatWidget = chatMod.default;
 			if (wizardMod) SetupWizard = wizardMod.default;
 			if (shortcutsMod) KeyboardShortcutsPanel = shortcutsMod.default;
 			if (analysisMod) AnalysisPanelComp = analysisMod.default;
+			if (tasksMod) ResearchTaskPanel = tasksMod.default;
+			if (authMod) AuthModal = authMod.default;
 		}).catch(() => { /* non-fatal: optional UI components */ });
+
+		// Load research tasks from server (auth) or localStorage (anon)
+		researchTasks.load(!!data.user);
 
 		const handleOpenAnalysis = () => { showAnalysisPanel = true; };
 		window.addEventListener('yorha:open-analysis', handleOpenAnalysis);
@@ -93,6 +104,27 @@
 		if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'g') {
 			e.preventDefault();
 			showAnalysisPanel = !showAnalysisPanel;
+		}
+		// Alt+D — navigate to Analytics deep-research tab
+		if (e.altKey && e.key.toLowerCase() === 'd' && !e.ctrlKey) {
+			e.preventDefault();
+			window.dispatchEvent(new CustomEvent('yorha:nav-analytics', { detail: { tab: 'deep-research' } }));
+			if (!currentPathname.startsWith('/analytics')) {
+				window.location.href = '/analytics';
+			}
+		}
+		// Alt+R — navigate to Research Playground tab
+		if (e.altKey && e.key.toLowerCase() === 'r' && !e.ctrlKey) {
+			e.preventDefault();
+			window.dispatchEvent(new CustomEvent('yorha:nav-analytics', { detail: { tab: 'playground' } }));
+			if (!currentPathname.startsWith('/analytics')) {
+				window.location.href = '/analytics';
+			}
+		}
+		// Alt+T — toggle research task panel
+		if (e.altKey && e.key.toLowerCase() === 't' && !e.ctrlKey) {
+			e.preventDefault();
+			researchTasks.panelOpen = !researchTasks.panelOpen;
 		}
 		// ? key toggles keyboard shortcuts panel (only when not typing in an input)
 		if (e.key === '?' && !e.ctrlKey && !e.altKey) {
@@ -152,6 +184,20 @@
 {/if}
 {#if AnalysisPanelComp}
 	<AnalysisPanelComp bind:open={showAnalysisPanel} />
+{/if}
+{#if ResearchTaskPanel}
+	<ResearchTaskPanel
+		isAuthenticated={!!data.user}
+		onNeedsAuth={() => { showAuthModal = true; }}
+	/>
+{/if}
+{#if AuthModal}
+	<AuthModal
+		bind:open={showAuthModal}
+		prompt="Sign in to sync your research tasks across devices and sessions."
+		returnUrl={currentPathname}
+		onclose={() => { researchTasks.dismissNeedsAuth(); }}
+	/>
 {/if}
 
 <!-- Toast Notifications Overlay -->
