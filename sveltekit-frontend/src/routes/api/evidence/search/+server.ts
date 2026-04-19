@@ -34,6 +34,7 @@ import type { VectorSearchResult, VectorSearchOptions } from '$lib/server/db/pgv
 import { productionLogger } from '$lib/server/production-logger.js';
 import { legalPageRank } from '$lib/server/retrieval/legal-pagerank.js';
 import { CitationGraph } from '$lib/server/retrieval/citation-graph.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { z } from 'zod';
 
 const evidenceSearchSchema = z.object({
@@ -163,6 +164,9 @@ export async function POST({ request, locals }: RequestEvent) {
 
     const start = performance.now();
     const userId = locals.user?.id ?? null;
+
+    // Record in Search Intelligence hot-query ring (fire-and-forget)
+    recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: userId ?? undefined });
 
     // ── gRPC fast-path: delegate to RetrievalService if available ────
     const grpcResult = await searchEvidenceViaGrpc({
