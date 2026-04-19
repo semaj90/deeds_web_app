@@ -27,6 +27,7 @@ import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.
 import { getSemanticCacheHit, setSemanticCache } from '$lib/server/search/semantic-cache.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { gpuRerankQdrantResults } from '$lib/server/retrieval/gpu-reranker.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 /**
  * Unified Platform Search — Three-layer architecture:
@@ -543,8 +544,11 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 	}
 	const { q, type, limit, jurisdiction, authority } = parsed.data;
 
-	// Check semantic cache first (28x speedup on similar queries)
+	// Record search query analytics (fire-and-forget)
 	const cachedResult = await getSemanticCacheHit(q);
+	recordSearchQuery({ query: q, pipeline: 'rag', cacheHit: !!cachedResult, userId: locals.user.id });
+
+	// Check semantic cache first (28x speedup on similar queries)
 	if (cachedResult) {
 		// Reconstruct full response from cached data
 		const groups: Record<string, number> = {};

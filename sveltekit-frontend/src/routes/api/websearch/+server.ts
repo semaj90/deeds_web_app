@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const websearchSchema = z.object({
 	query: z.string().min(1).max(5000),
@@ -22,6 +23,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { query, maxResults } = parsed.data;
+		recordSearchQuery({ query, pipeline: 'contextual', cacheHit: false, userId: locals.user.id });
 
 		const { ENV } = await import('$lib/server/env.server.js');
 		const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8888';

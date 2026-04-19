@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { rateLimitOrRespond, RateLimitPresets } from '$lib/server/middleware/rate-limit.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const vectorSearchSchema = z.object({
 	query: z.string().min(1).max(10000),
@@ -18,8 +19,7 @@ export const POST: RequestHandler = async (event) => {
 	if (rateLimited) return rateLimited;
 
 	try {
-		const { request, locals } = event;
-		const raw = await request.json();
+		const raw = await event.request.json();
 		const parsed = vectorSearchSchema.safeParse(raw);
 		if (!parsed.success) {
 			return json(
@@ -29,6 +29,7 @@ export const POST: RequestHandler = async (event) => {
 		}
 
 		const { query, limit, threshold } = parsed.data;
+		recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: event.locals.user.id });
 
 		// Generate embedding for the query
 		const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
