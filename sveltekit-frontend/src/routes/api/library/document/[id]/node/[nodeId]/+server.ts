@@ -15,7 +15,7 @@ export async function GET({ params, locals }) {
 	if (invalid) return invalid;
 
 	// Go fast-path: only works with integer IDs (Go service uses int32)
-	const goUrl = (ENV as unknown as Record<string, string>).GO_SEARCH_URL;
+	const goUrl = ENV.GO_SEARCH_URL;
 	if (goUrl && /^\d+$/.test(nodeId)) {
 		try {
 			const res = await fetch(`${goUrl}/node/${nodeId}`, {

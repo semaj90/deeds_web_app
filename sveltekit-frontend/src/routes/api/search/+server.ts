@@ -166,7 +166,7 @@ async function tryGoGrpcSearch(q: string, limit: number): Promise<PlatformSearch
 
 /** Search the legal library via Go service gRPC (fastest) → HTTP (fast) → SQL fallback */
 async function searchLegalLibrary(q: string, limit: number): Promise<PlatformSearchHit[]> {
-	const goUrl = (ENV as unknown as Record<string, string>).GO_SEARCH_URL;
+	const goUrl = ENV.GO_SEARCH_URL;
 
 	// Tier 1: gRPC fast path (binary protocol, lowest latency)
 	const grpcResult = await tryGoGrpcSearch(q, limit);

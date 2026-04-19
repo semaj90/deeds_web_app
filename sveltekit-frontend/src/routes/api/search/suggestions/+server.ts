@@ -97,7 +97,7 @@ async function getLawSuggestions(query: string, limit: number): Promise<Platform
 
 /** Go legal service suggestions (headings, citations, document titles) */
 async function getGoSuggestions(query: string, limit: number): Promise<PlatformSuggestion[]> {
-  const goUrl = (ENV as unknown as Record<string, string>).GO_SEARCH_URL;
+  const goUrl = ENV.GO_SEARCH_URL;
   if (!goUrl) return [];
   try {
     const res = await fetch(`${goUrl}/suggest?q=${encodeURIComponent(query)}&limit=${limit}`, {
