@@ -65,6 +65,7 @@ export const VECTOR_CONFIG = {
     diagnosis_embeddings: 'diagnosis_embeddings',
     knowledge: 'knowledge_base',
     audio_segments: 'audio_segments',
+    legal_glossary: 'legal_glossary',
   },
 
   /** Per-collection vector schema (vector name → used by health checks + init) */
@@ -88,6 +89,7 @@ export const VECTOR_CONFIG = {
     diagnosis_embeddings: { vectors: ['diagnosis'], on_disk_payload: true },
     knowledge_base: { vectors: ['default'] },
     audio_segments: { vectors: ['content'], on_disk_payload: true },
+    legal_glossary: { vectors: ['content'], on_disk_payload: true },
   },
 
   /** Qdrant HNSW config applied to all collections */

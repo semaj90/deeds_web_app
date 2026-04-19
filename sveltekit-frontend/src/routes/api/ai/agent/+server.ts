@@ -20,7 +20,7 @@ import { json }             from '@sveltejs/kit';
 import { z }                from 'zod';
 import { runGemma4Agent }   from '$lib/server/ai/gemma4-agent.js';
 import { getRedis }         from '$lib/server/redis.js';
-import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { recordSearchQuery, type HitPipeline } from '$lib/server/analytics/search-analytics.js';
 import type { RequestHandler } from './$types';
 
 const RATE_LIMIT      = 20;
@@ -66,7 +66,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const { query, systemPrompt, pipeline } = parsed.data;
 
   // Record agent query in Search Intelligence analytics (fire-and-forget)
-  recordSearchQuery({ query, pipeline, cacheHit: false, userId: locals.user.id });
+  recordSearchQuery({ query, pipeline: pipeline as HitPipeline, cacheHit: false, userId: locals.user.id });
 
   try {
     const result = await runGemma4Agent(query, {
