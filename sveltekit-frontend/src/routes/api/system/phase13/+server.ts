@@ -1,6 +1,7 @@
 import { redisPool } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { sql } from 'drizzle-orm';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -10,7 +11,7 @@ import { ENV } from '$lib/server/env.server.js';
  * Health check - verifies core services are reachable
  * No side effects
  */
-export async function GET() {
+export const GET: RequestHandler = async () => {
 	const health: { timestamp: string; services: Record<string, Record<string, unknown>> } = {
 		timestamp: new Date().toISOString(),
 		services: {},

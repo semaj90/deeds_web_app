@@ -1,9 +1,10 @@
 import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { uploadLibraryDocument, runIngestionPipeline } from '$lib/server/legal/ingestion-worker.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-export async function GET({ locals }) {
+export const GET: RequestHandler = async ({ locals }) => {
     if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
     console.log("=================================================");
     console.log("  California Constitution Ingestion Pipeline    ");

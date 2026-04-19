@@ -4,11 +4,12 @@
  * Fast-path: Go search service for numeric IDs, SQL fallback for UUIDs.
  */
 import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 
-export async function GET({ params, locals }) {
+export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 	if (!isUuid(id)) return json({ error: 'Invalid ID format' }, { status: 400 });

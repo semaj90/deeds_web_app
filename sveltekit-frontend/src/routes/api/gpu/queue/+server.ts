@@ -27,7 +27,7 @@ const taskQueue: GpuTask[] = [];
 const completedTasks: GpuTask[] = [];
 let stats = { totalSubmitted: 0, totalProcessed: 0, totalErrors: 0 };
 
-export async function GET() {
+export const GET: RequestHandler = async () => {
 	return json({
 		queue: taskQueue.map(t => ({
 			id: t.id,

@@ -14,7 +14,7 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestEvent } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import {
@@ -48,7 +48,7 @@ const _postSchema = z.object({
 
 // ── GET ───────────────────────────────────────────────────────────────────
 
-export async function GET(event: RequestEvent) {
+export const GET: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth?.user) {
     return json({ atlas: null, error: 'Unauthorized' }, { status: 401 });
@@ -90,7 +90,7 @@ export async function GET(event: RequestEvent) {
 
 // ── POST ──────────────────────────────────────────────────────────────────
 
-export async function POST(event: RequestEvent) {
+export const POST: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth?.user) {
     return json({ atlas: null, queued: false, error: 'Unauthorized' }, { status: 401 });
@@ -150,7 +150,7 @@ export async function POST(event: RequestEvent) {
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 
-export async function DELETE(event: RequestEvent) {
+export const DELETE: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth?.user) {
     return json({ invalidated: false, error: 'Unauthorized' }, { status: 401 });

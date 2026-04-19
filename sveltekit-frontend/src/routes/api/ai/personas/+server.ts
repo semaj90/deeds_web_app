@@ -4,10 +4,11 @@
  * Returns available LLM personas for the style adaptation system.
  */
 import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { getPersonas } from '$lib/server/ace/style-adapter.js';
 
-export async function GET({ locals, request }) {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const responseData = { personas: getPersonas() };

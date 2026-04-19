@@ -1,11 +1,12 @@
 import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 /**
  * GET /api/system/env
  * Sanitized environment check (presence flags only, no secrets)
  * No side effects
  */
-export async function GET() {
+export const GET: RequestHandler = async () => {
 	const env = {
 		timestamp: new Date().toISOString(),
 		has: { REDIS_URL: !!process.env.REDIS_URL,

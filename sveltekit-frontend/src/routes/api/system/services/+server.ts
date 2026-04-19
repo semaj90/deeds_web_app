@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { getOllamaUrl, getQdrantUrl, getRedisUrl, getDatabaseUrl, getMinioConfig } from '$lib/config/env.server.js';
 import { ENV } from '$lib/server/env.server.js';
 import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { sql } from 'drizzle-orm';
 
 interface ServiceStatus {
@@ -21,7 +22,7 @@ interface ServiceStatus {
  * Detailed service probe results + readiness
  * No side effects
  */
-export async function GET({ locals }: { locals: App.Locals }) {
+export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const services: Record<string, ServiceStatus> = {};
 
