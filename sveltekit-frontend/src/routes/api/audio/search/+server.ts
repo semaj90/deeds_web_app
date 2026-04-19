@@ -11,6 +11,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { whisperSegments, audioTranscripts, evidence } from '$lib/server/db/schema-postgres';
 import { eq, and, sql, desc } from 'drizzle-orm';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -24,6 +25,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!q) {
 		return json({ segments: [], total: 0, query: '', mode });
 	}
+
+	recordSearchQuery({ query: q, pipeline: 'rag', cacheHit: false, userId: locals.user?.id ?? '' });
 
 	// Validate UUIDs if provided
 	if (evidenceId && !UUID_RE.test(evidenceId)) {

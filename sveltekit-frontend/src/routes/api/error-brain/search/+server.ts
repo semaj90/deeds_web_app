@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const errorSearchSchema = z.object({
 	errorMessage: z.string().max(50000).optional().default(''),
@@ -29,6 +30,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const errorMessage = parsed.data.errorMessage;
 	const filePath = parsed.data.filePath;
 	const limit = parsed.data.limit;
+	const searchQuery = errorMessage.trim() || filePath.trim();
+	recordSearchQuery({ query: searchQuery, pipeline: 'codebase', cacheHit: false, userId: locals.user.id });
 
 	const sources: Array<{ type: string; id: string; content: string; relevance: number; metadata: Record<string, unknown> }> = [];
 

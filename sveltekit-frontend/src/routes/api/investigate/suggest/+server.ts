@@ -13,6 +13,7 @@ import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 /** GBNF-constrained response schema for investigation suggestions */
@@ -41,6 +42,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 	}
 	const { query, answer, caseId } = parsed.data;
+	recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: user.id });
 
 	try {
 		// 1. Self-evaluate the investigation result

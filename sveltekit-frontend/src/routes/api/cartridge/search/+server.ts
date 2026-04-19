@@ -15,6 +15,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { searchCartridgeTensors, type TensorSearchResponse } from '$lib/server/cache/cartridge-tensor-bridge.js';
 import type { RuneData } from '$lib/server/cartridge/chr97-builder.js';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const searchSchema = z.object({
 	query: z.string().min(1).max(2000),
@@ -39,6 +40,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const { query, caseId, topK, minScore, collection } = parsed.data;
+	recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 	const collectionName = collection ?? 'evidence_items';
 
 	// Build fetchRunes function that scrolls Qdrant
