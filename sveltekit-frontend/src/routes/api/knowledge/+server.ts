@@ -10,8 +10,7 @@ import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
-const sql = postgres(getDatabaseUrl());
-const qdrant = new QdrantClient({ url: getQdrantUrl() });
+const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
 let knowledgeBaseTableAvailable: boolean | null = null;
 let knowledgeBaseSupportsSparse: boolean | null = null;
 
@@ -32,7 +31,7 @@ const qd = qdrant as QdrantClient & {
   upsert(collection: string, params: Record<string, unknown>): Promise<void>;
 };
 
-const OLLAMA_URL_VAR = getOllamaUrl();
+const OLLAMA_URL_VAR = ENV.OLLAMA_BASE_URL;
 const GEMINI_API_KEY = ENV.GEMINI_API_KEY;
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -229,11 +228,12 @@ async function persistKnowledgeChunkMetadata(
   }
 
   try {
-    await sql`
-      INSERT INTO knowledge_base (doc_name, chunk_idx, content, source, embedding_id)
-      VALUES (${fileName}, ${chunkIndex}, ${chunk}, ${source}, ${pointId})
-      ON CONFLICT (embedding_id) DO UPDATE SET content = ${chunk}
-    `;
+    await pool.query(
+      `INSERT INTO knowledge_base (doc_name, chunk_idx, content, source, embedding_id)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (embedding_id) DO UPDATE SET content = $3`,
+      [fileName, chunkIndex, chunk, source, pointId]
+    );
     knowledgeBaseTableAvailable = true;
     return true;
   } catch (error) {
