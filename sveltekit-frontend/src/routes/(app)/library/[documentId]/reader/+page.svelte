@@ -244,9 +244,9 @@
 										<div class="lr-result-card">
 											<div class="lr-result-header">
 												<div>
-													<p class="lr-result-title">{hit.document_title as string}</p>
-													{#if hit.node_heading}
-														<p class="lr-result-heading">{hit.node_heading as string}</p>
+													<p class="lr-result-title">{(hit.title ?? hit.document_title) as string}</p>
+													{#if hit.heading ?? hit.node_heading}
+														<p class="lr-result-heading">{(hit.heading ?? hit.node_heading) as string}</p>
 													{/if}
 												</div>
 												<span class="lr-result-score">

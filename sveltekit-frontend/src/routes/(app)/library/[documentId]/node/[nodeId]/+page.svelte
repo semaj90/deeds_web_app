@@ -317,9 +317,9 @@
 						<div class="search-results-list">
 							{#each searchResults as hit}
 								<div class="search-hit">
-									<p class="hit-title">{hit.document_title}</p>
-									{#if hit.node_heading}
-										<p class="hit-heading">{hit.node_heading}</p>
+									<p class="hit-title">{hit.title ?? hit.document_title}</p>
+									{#if hit.heading ?? hit.node_heading}
+										<p class="hit-heading">{hit.heading ?? hit.node_heading}</p>
 									{/if}
 									<p class="hit-snippet">{hit.snippet}</p>
 									<span class="hit-score">{Math.round(((hit.score as number) ?? 0) * 100)}%</span>
