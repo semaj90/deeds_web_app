@@ -13,6 +13,7 @@ import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -56,6 +57,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			jurisdiction,
 			legal_area
 		} = parsed.data;
+		recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 
 		// Fetch approved context from Redis (stored by /api/rag/validate)
 		let combinedContext = '';

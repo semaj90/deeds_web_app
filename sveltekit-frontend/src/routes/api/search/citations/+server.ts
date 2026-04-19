@@ -9,6 +9,7 @@ import { db } from '$lib/server/db/client';
 import { savedCitations } from '$lib/server/db/schema';
 import { desc, ilike, or } from 'drizzle-orm';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const searchSchema = z.object({
 	query: z.string().min(1).max(500),
@@ -26,6 +27,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	const { query, limit } = parsed.data;
+	recordSearchQuery({ query, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
 	try {
 		const results = await db

@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { getRagServiceUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const RAG_SERVICE_URL = getRagServiceUrl();
 
@@ -19,6 +20,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
 		const { query, mode } = parsed.data;
+		recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 
 		// Determine endpoint based on mode
 		const endpoint = mode === 'process'
