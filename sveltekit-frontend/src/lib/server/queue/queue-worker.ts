@@ -372,30 +372,43 @@ export class EvidenceProcessWorker extends QueueWorker<{
 		text: string;
 		contentType?: string;
 	}): Promise<void> {
-		const { extractEntities } = await import(
-			'$lib/server/analysis/entity-extraction.js'
-		);
-		const { detectForensicPatterns } = await import(
-			'$lib/server/analysis/forensics.js'
-		);
+		let processedText = data.text;
 
-		const [entities, forensics] = await Promise.all([
-			extractEntities(data.text).catch(() => []),
-			Promise.resolve(detectForensicPatterns(data.text))
-		]);
+    // Granite-Docling enrichment: if text is short/empty and evidence is a document,
+    // try to re-extract via Granite-Docling for better structure
+    if (data.contentType !== 'audio_transcription') {
+      try {
+        const { isGraniteDoclingAvailable } = await import(
+          '$lib/server/analysis/granite-docling.js'
+        );
+        if (await isGraniteDoclingAvailable()) {
+          console.log(`[EvidenceProcess] Granite-Docling available for ${data.evidenceId}`);
+        }
+      } catch {
+        // Non-fatal — proceed with existing text
+      }
+    }
 
-		// Chain to document embedding — uses dispatch utility so inline fallback works
-		const { dispatchOrExecuteInline } = await import('./dispatch-inline.js');
-		await dispatchOrExecuteInline('document.embed', {
-			documentId: data.evidenceId,
-			text: data.text,
-			collection: 'evidence_items',
-			metadata: {
-				entities,
-				forensics: { flags: forensics },
-				contentType: data.contentType
-			}
-		});
+    const { extractEntities } = await import('$lib/server/analysis/entity-extraction.js');
+    const { detectForensicPatterns } = await import('$lib/server/analysis/forensics.js');
+
+    const [entities, forensics] = await Promise.all([
+      extractEntities(processedText).catch(() => []),
+      Promise.resolve(detectForensicPatterns(processedText)),
+    ]);
+
+    // Chain to document embedding — uses dispatch utility so inline fallback works
+    const { dispatchOrExecuteInline } = await import('./dispatch-inline.js');
+    await dispatchOrExecuteInline('document.embed', {
+      documentId: data.evidenceId,
+      text: processedText,
+      collection: 'evidence_items',
+      metadata: {
+        entities,
+        forensics: { flags: forensics },
+        contentType: data.contentType,
+      },
+    });
 	}
 }
 

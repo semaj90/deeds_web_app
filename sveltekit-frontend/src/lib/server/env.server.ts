@@ -148,6 +148,10 @@ export const ENV = {
   FFMPEG_PATH: privateEnv.FFMPEG_PATH || null,
   // Timeouts
   ACE_EMBED_BATCH_TIMEOUT_MS: Number(privateEnv.ACE_EMBED_BATCH_TIMEOUT_MS ?? '20000'),
+  // Python executable for CUDA clustering scripts (phase89-cuda-clustering.py etc.)
+  // Needs PyTorch + cupy — use project .venv (torch 2.7.0+cu128).
+  // Dev: set PYTHON_PATH=C:\Users\james\Videos\deeds-web-app\.venv\Scripts\python.exe in .env
+  PYTHON_PATH: privateEnv.PYTHON_PATH ?? 'python',
   // Node environment
   NODE_ENV: process.env.NODE_ENV ?? 'development',
 };

@@ -12,7 +12,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { somWebGPUCache } from '$lib/webgpu/som-webgpu-cache';
+import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
+
+const SOM_CACHE_TTL = 3600; // 1 hour
+const SOM_KEY = (k: string) => `som_cache:${k}`;
 
 // ── Validation Schemas ────────────────────────────────────────────────
 
@@ -43,25 +47,14 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	}
 
 	try {
-		// TODO: Implement get operation when somWebGPUCache exports it
-		// For now, return not implemented
-		return json(
-			{
-				success: false,
-				error: 'Cache retrieval not yet implemented',
-				key,
-			},
-			{ status: 501 }
-		);
+		const raw = await getRedis().get(SOM_KEY(key));
+		if (!raw) {
+			return json({ success: false, error: 'Cache miss', key }, { status: 404 });
+		}
+		return json({ success: true, key, data: JSON.parse(raw) });
 	} catch (error) {
 		console.error('[SOM Cache] GET error:', error);
-		return json(
-			{
-				success: false,
-				error: 'Failed to retrieve from SOM cache',
-			},
-			{ status: 500 }
-		);
+		return json({ success: false, error: 'Failed to retrieve from SOM cache' }, { status: 500 });
 	}
 };
 
@@ -144,24 +137,12 @@ export const PUT: RequestHandler = async ({ request, locals }) => {
 		);
 	}
 
+	const { key, data } = validation.data;
 	try {
-		// TODO: Implement store operation when somWebGPUCache exports it
-		// For now, return not implemented
-		return json(
-			{
-				success: false,
-				error: 'Cache storage not yet implemented',
-			},
-			{ status: 501 }
-		);
+		await getRedis().set(SOM_KEY(key), JSON.stringify(data), 'EX', SOM_CACHE_TTL);
+		return json({ success: true, key, ttl: SOM_CACHE_TTL });
 	} catch (error) {
 		console.error('[SOM Cache] PUT error:', error);
-		return json(
-			{
-				success: false,
-				error: 'Failed to store in SOM cache',
-			},
-			{ status: 500 }
-		);
+		return json({ success: false, error: 'Failed to store in SOM cache' }, { status: 500 });
 	}
 };

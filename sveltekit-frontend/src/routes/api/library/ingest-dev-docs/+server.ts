@@ -67,13 +67,22 @@ const PRESET_DOC_URLS: Record<string, string[]> = {
 		'https://python.langchain.com/docs/introduction/',
 		'https://langchain-ai.github.io/langgraph/concepts/',
 	],
+	karpathy: [
+		'https://raw.githubusercontent.com/karpathy/nanoGPT/master/README.md',
+		'https://raw.githubusercontent.com/karpathy/minGPT/master/README.md',
+		'https://raw.githubusercontent.com/karpathy/makemore/master/README.md',
+		'https://raw.githubusercontent.com/karpathy/llm.c/master/README.md',
+		'https://raw.githubusercontent.com/karpathy/nn-zero-to-hero/master/README.md',
+		'https://karpathy.github.io/2015/05/21/rnn-effectiveness/',
+		'https://karpathy.github.io/2019/04/25/recipe/',
+	],
 };
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
 const schema = z.object({
 	urls:   z.array(z.string().url()).max(30).optional().default([]),
-	preset: z.array(z.enum(['drizzle', 'sveltekit', 'qdrant', 'langchain'])).optional().default([]),
+	preset: z.array(z.enum(['drizzle', 'sveltekit', 'qdrant', 'langchain', 'karpathy'])).optional().default([]),
 	rescan: z.boolean().optional().default(false),
 });
 

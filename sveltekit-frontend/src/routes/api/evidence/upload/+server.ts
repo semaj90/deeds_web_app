@@ -863,15 +863,25 @@ async function processAndEmbed(
     console.warn('[Upload] Failed to persist extracted text:', err);
   }
 
-  // Structure-aware chunking: detects ARTICLE/SECTION/§ headings, preserves section paths
-  const legalChunks = chunkLegalDocument(fullText, { maxTokens: 512, overlap: 128 });
+  // Structure-aware chunking: uses DocTags blocks if available (Granite-Docling),
+  // otherwise detects ARTICLE/SECTION/§ headings and preserves section paths
+  const typedDoclingBlocks = doclingBlocks as
+    | Array<{ type: string; text: string; page: number; bbox?: [number, number, number, number] }>
+    | undefined;
+  const legalChunks = chunkLegalDocument(fullText, {
+    maxTokens: 512,
+    overlap: 128,
+    doclingBlocks: typedDoclingBlocks,
+  });
   const hasStructure = legalChunks.some((c) => c.sectionPath.length > 0);
+  const hasDocTags = legalChunks.some((c) => c.doctagTypes && c.doctagTypes.length > 0);
   console.log(
-    `[Upload] ${legalChunks.length} chunks, structure=${hasStructure ? 'legal' : 'flat'}`
+    `[Upload] ${legalChunks.length} chunks, structure=${hasStructure ? 'legal' : 'flat'}, docTags=${hasDocTags}`
   );
   markStage(diagnostics, 'chunking', 'success', `Generated ${legalChunks.length} legal chunk(s)`, {
     chunkCount: legalChunks.length,
     hasStructure,
+    hasDocTags,
   });
 
   // Extract legal sections via LangExtract (facts, issues, holdings, etc.) for chunk tagging
@@ -989,8 +999,17 @@ async function processAndEmbed(
           citations: chunk.citations,
           token_count: chunk.tokenCount,
           section_type: sectionType,
-          content_type: extractionMethod.startsWith('whisper-') || extractionMethod === 'docling-asr' ? 'audio_transcription' : 'document',
+          content_type:
+            extractionMethod.startsWith('whisper-') || extractionMethod === 'docling-asr'
+              ? 'audio_transcription'
+              : 'document',
           created_at: new Date().toISOString(),
+          ...(chunk.doctagTypes && chunk.doctagTypes.length > 0
+            ? { doctag_types: chunk.doctagTypes }
+            : {}),
+          ...(chunk.isTable ? { is_table: true } : {}),
+          ...(chunk.pageStart != null ? { page_start: chunk.pageStart } : {}),
+          ...(chunk.pageEnd != null ? { page_end: chunk.pageEnd } : {}),
         },
       });
 
@@ -1549,15 +1568,21 @@ async function processAndEmbed(
       await qdrant.client.setPayload('evidence', {
         payload: {
           ...(allSuggestedTags.length > 0 && { suggested_tags: allSuggestedTags }),
-          ...(visionAnalysis?.keyFindings?.length && { vlm_key_findings: visionAnalysis.keyFindings }),
+          ...(visionAnalysis?.keyFindings?.length && {
+            vlm_key_findings: visionAnalysis.keyFindings,
+          }),
           ...(visionAnalysis?.model && { vlm_model: visionAnalysis.model }),
-          ...(yoloDetections?.objects?.length && { yolo_objects: yoloDetections.objects.map((o: { class: string }) => o.class) }),
+          ...(yoloDetections?.objects?.length && {
+            yolo_objects: yoloDetections.objects.map((o: { class: string }) => o.class),
+          }),
         },
         filter: {
           must: [{ key: 'evidence_id', match: { value: evidenceId } }],
         },
       });
-      console.log(`[Upload] Enriched Qdrant points with ${allSuggestedTags.length} tags + VLM metadata for ${evidenceId}`);
+      console.log(
+        `[Upload] Enriched Qdrant points with ${allSuggestedTags.length} tags + VLM metadata for ${evidenceId}`
+      );
     } catch (err) {
       console.warn('[Upload] Qdrant payload enrichment failed (non-fatal):', err);
     }
@@ -1583,7 +1608,7 @@ async function processAndEmbed(
         textLength: fullText.length,
         language: extractionMethod.match(/whisper-\w+-(\w+)/)?.[1] ?? undefined,
         ocrFallbackUsed: extractionMethod.includes('vlm-ocr-fallback'),
-        resize: visionAnalysis?.resizeMeta
+        resize: visionAnalysis?.resizeMeta,
       },
       entities: entities.slice(0, 200).map((e) => ({
         type: e.label,

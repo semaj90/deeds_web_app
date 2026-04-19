@@ -164,167 +164,177 @@ const processFiles = fromPromise(async ({ input }: { input: DocumentUploadContex
 });
 
 export const documentUploadMachine = setup({
-    types: {
-        context: {} as DocumentUploadContext,
-        events: {} as DocUploadEvent
-    },
-    actors: {
-        validateFiles,
-        uploadFiles,
-        processFiles
-    }
+  types: {
+    context: {} as DocumentUploadContext,
+    events: {} as DocUploadEvent,
+  },
+  actors: {
+    validateFiles,
+    uploadFiles,
+    processFiles,
+  },
 }).createMachine({
-    id: 'documentUpload',
-    initial: 'idle',
-    context: {
-        files: [],
-        uploadProgress: 0,
-        processingProgress: 0,
-        validationErrors: {} as Record<string, string[]>,
-        uploadedFiles: [] as UploadedFile[],
-        aiResults: null,
-        error: null,
-        retryCount: 0
+  id: 'documentUpload',
+  initial: 'idle',
+  context: {
+    files: [],
+    uploadProgress: 0,
+    processingProgress: 0,
+    validationErrors: {} as Record<string, string[]>,
+    uploadedFiles: [] as UploadedFile[],
+    aiResults: null,
+    error: null,
+    retryCount: 0,
+  },
+  states: {
+    idle: {
+      on: {
+        SELECT_FILES: {
+          target: 'validating',
+          actions: assign({
+            files: ({ event, context }) =>
+              isSelectFilesEvent(event) ? event.files : context.files,
+            error: () => null,
+          }),
+        },
+      },
     },
-    states: {
-        idle: {
-            on: {
-                SELECT_FILES: {
-                    target: 'validating',
-                    actions: assign({
-                        files: ({ event, context }) => (isSelectFilesEvent(event) ? event.files : context.files),
-                        error: () => null
-                    })
-                }
-            }
+    validating: {
+      invoke: {
+        id: 'validateFiles',
+        src: 'validateFiles',
+        input: ({ context }) => context,
+        onDone: {
+          target: 'validated',
+          actions: assign({
+            validationErrors: {} as Record<string, string[]>,
+            error: null,
+          }),
         },
-        validating: {
-            invoke: {
-                id: 'validateFiles',
-                src: 'validateFiles',
-                input: ({ context }) => context,
-                onDone: {
-                    target: 'validated',
-                    actions: assign({
-                        validationErrors: {} as Record<string, string[]>,
-                        error: null
-                    })
-                },
-                onError: {
-                    target: 'idle',
-                    actions: assign({
-                        validationErrors: ({ event }) => extractValidationErrorsFromInvoke(event) ?? {},
-                        error: () => 'File validation failed'
-                    })
-                }
-            }
+        onError: {
+          target: 'idle',
+          actions: assign({
+            validationErrors: ({ event }) => extractValidationErrorsFromInvoke(event) ?? {},
+            error: () => 'File validation failed',
+          }),
         },
-        validated: {
-            on: {
-                SUBMIT: 'uploading',
-                SELECT_FILES: {
-                    target: 'validating',
-                    actions: assign({
-                        files: ({ event, context }) => (isSelectFilesEvent(event) ? event.files : context.files)
-                    })
-                }
-            }
+      },
+    },
+    validated: {
+      on: {
+        SUBMIT: 'uploading',
+        SELECT_FILES: {
+          target: 'validating',
+          actions: assign({
+            files: ({ event, context }) =>
+              isSelectFilesEvent(event) ? event.files : context.files,
+          }),
         },
-        uploading: {
-            entry: assign({
-                uploadProgress: 0,
-                retryCount: ({ context }) => context.retryCount + 1
+      },
+    },
+    uploading: {
+      entry: assign({
+        uploadProgress: 0,
+        retryCount: ({ context }) => context.retryCount + 1,
+      }),
+      invoke: {
+        id: 'uploadFiles',
+        src: 'uploadFiles',
+        input: ({ context }) => context,
+        onDone: {
+          target: 'extracting',
+          actions: assign({
+            uploadedFiles: ({ event }) => extractUploadedFilesFromInvoke(event),
+            uploadProgress: 100,
+            error: null,
+          }),
+        },
+        onError: [
+          {
+            guard: ({ context }) => context.retryCount < 3,
+            target: 'retrying',
+            actions: assign({
+              error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed',
             }),
-            invoke: {
-                id: 'uploadFiles',
-                src: 'uploadFiles',
-                input: ({ context }) => context,
-                onDone: {
-                    target: 'processing',
-                    actions: assign({
-                        uploadedFiles: ({ event }) => extractUploadedFilesFromInvoke(event),
-                        uploadProgress: 100,
-                        error: null
-                    })
-                },
-                onError: [
-                    {
-                        guard: ({ context }) => context.retryCount < 3,
-                        target: 'retrying',
-                        actions: assign({
-                            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed'
-                        })
-                    },
-                    {
-                        target: 'failed',
-                        actions: assign({
-                            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed after retries'
-                        })
-                    }
-                ]
-            }
+          },
+          {
+            target: 'failed',
+            actions: assign({
+              error: ({ event }) =>
+                extractErrorMessageFromInvoke(event) ?? 'Upload failed after retries',
+            }),
+          },
+        ],
+      },
+    },
+    extracting: {
+      // Server-side extraction (Granite-Docling / pdf-parse / OCR) runs automatically
+      // in the upload pipeline. This state tracks the stage for UI progress display.
+      after: {
+        500: 'processing',
+      },
+    },
+    processing: {
+      entry: assign({ processingProgress: 0 }),
+      invoke: {
+        id: 'processFiles',
+        src: 'processFiles',
+        input: ({ context }) => context,
+        onDone: {
+          target: 'completed',
+          actions: assign({
+            aiResults: ({ event }) => extractAIResultsFromInvoke(event),
+            processingProgress: 100,
+            error: null,
+          }),
         },
-        processing: {
-            entry: assign({ processingProgress: 0 }),
-            invoke: {
-                id: 'processFiles',
-                src: 'processFiles',
-                input: ({ context }) => context,
-                onDone: {
-                    target: 'completed',
-                    actions: assign({
-                        aiResults: ({ event }) => extractAIResultsFromInvoke(event),
-                        processingProgress: 100,
-                        error: null
-                    })
-                },
-                onError: {
-                    target: 'failed',
-                    actions: assign({
-                        error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed'
-                    })
-                }
-            }
+        onError: {
+          target: 'failed',
+          actions: assign({
+            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed',
+          }),
         },
-        retrying: {
-            after: {
-                2000: 'uploading'
-            },
-            on: {
-                RETRY: 'uploading'
-            }
+      },
+    },
+    retrying: {
+      after: {
+        2000: 'uploading',
+      },
+      on: {
+        RETRY: 'uploading',
+      },
+    },
+    completed: {
+      type: 'final',
+      on: {
+        RESET: {
+          target: 'idle',
+          actions: assign({
+            files: [],
+            uploadProgress: 0,
+            processingProgress: 0,
+            validationErrors: {} as Record<string, string[]>,
+            uploadedFiles: [],
+            aiResults: null,
+            error: null,
+            retryCount: 0,
+          }),
         },
-        completed: {
-            type: 'final',
-            on: {
-                RESET: {
-                    target: 'idle',
-                    actions: assign({
-                        files: [],
-                        uploadProgress: 0,
-                        processingProgress: 0,
-                        validationErrors: {} as Record<string, string[]>,
-                        uploadedFiles: [],
-                        aiResults: null,
-                        error: null,
-                        retryCount: 0
-                    })
-                }
-            }
+      },
+    },
+    failed: {
+      on: {
+        RETRY: 'uploading',
+        RESET: {
+          target: 'idle',
+          actions: assign({
+            error: null,
+            retryCount: 0,
+          }),
         },
-        failed: {
-            on: {
-                RETRY: 'uploading',
-                RESET: {
-                    target: 'idle',
-                    actions: assign({
-                        error: null,
-                        retryCount: 0
-                    })
-                }
-            }
-        }
-    }
+      },
+    },
+  },
 });
 
 export default documentUploadMachine;

@@ -1,7 +1,7 @@
 # Granite-Docling-258M — Document Understanding Integration Plan
 
 **Created:** 2026-04-05
-**Status:** Active — Phase 1 COMPLETE (Ollama API wired, evidence upload + ACE ingest + MCP + dedicated API endpoint)
+**Status:** Active — Phase 1 + Phase 2 COMPLETE (Ollama API wired, DocTags-aware chunking, Qdrant payload enrichment)
 **Priority:** High — fills the document-to-structured-text gap in our evidence pipeline
 
 ---
@@ -164,16 +164,16 @@ Drizzle ORM 0.44 (PostgreSQL storage):
 | 8 | MCP tool integration (`transcribeAudio` via docling) | [mcp/server.ts](sveltekit-frontend/src/mcp/server.ts) | ✅ |
 | 9 | Dev UI toggle (Odin dashboard) | [odin/+page.svelte](sveltekit-frontend/src/routes/(dev)/odin/+page.svelte) | ✅ |
 
-### Phase 2: Enhanced Chunking + Tags (1 Session)
+### Phase 2: Enhanced Chunking + Tags (1 Session) ✅ COMPLETE (2026-04-18)
 
-| Step | Action | Files |
-|------|--------|-------|
-| 1 | Update legal-chunker to use DocTags section boundaries | [legal-chunker.ts](sveltekit-frontend/src/lib/server/indexer/legal-chunker.ts) |
-| 2 | Add DocTags element types as Qdrant payload tags | Qdrant upsert calls |
-| 3 | Table chunks: preserve as whole units with OTSL metadata | legal-chunker.ts |
-| 4 | Add `granite_docling` stage to RabbitMQ evidence.process consumer | [queue-worker.ts](sveltekit-frontend/src/lib/server/queue/) |
-| 5 | Update XState document-processing machine with new state | [document-processing machine](sveltekit-frontend/src/lib/machines/) |
-| 6 | Update dashboard GrpcStatusAdapter (needs stage label added) | [GrpcStatusAdapter.ts](sveltekit-frontend/src/lib/stores/dashboard/GrpcStatusAdapter.ts) |
+| Step | Action | Files | Status |
+|------|--------|-------|--------|
+| 1 | Update legal-chunker to use DocTags section boundaries | [legal-chunker.ts](sveltekit-frontend/src/lib/server/indexer/legal-chunker.ts) | ✅ |
+| 2 | Add DocTags element types as Qdrant payload tags | Qdrant upsert calls in upload/+server.ts | ✅ |
+| 3 | Table chunks: preserve as whole units with OTSL metadata | legal-chunker.ts | ✅ |
+| 4 | Add `granite_docling` stage to RabbitMQ evidence.process consumer | [queue-worker.ts](sveltekit-frontend/src/lib/server/queue/queue-worker.ts) | ✅ |
+| 5 | Update XState document-processing machine with new state | [document-upload-machine.ts](sveltekit-frontend/src/lib/machines/document-upload-machine.ts) | ✅ |
+| 6 | Update dashboard GrpcStatusAdapter (needs stage label added) | [GrpcStatusAdapter.ts](sveltekit-frontend/src/lib/stores/dashboard/GrpcStatusAdapter.ts) | ✅ (already existed) |
 
 ### Phase 3: Replace Docling Service (Optional)
 

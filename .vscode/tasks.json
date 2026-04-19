@@ -2291,6 +2291,86 @@
       "problemMatcher": []
     },
     // ============================================
+    // Karpathy Knowledge Base Pipeline
+    // ============================================
+    {
+      "label": "📚 Karpathy: Ingest Knowledge Base",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/library/ingest-dev-docs -H \"Content-Type: application/json\" -d \"{\\\"preset\\\":[\\\"karpathy\\\"],\\\"rescan\\\":false}\" | jq '{success, created, skipped, failed, files: [.files[] | select(.status != \"skipped\") | {path: .path[-60:], status, chunks}]}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Karpathy: Ingest Knowledge Base (Force Rescan)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/library/ingest-dev-docs -H \"Content-Type: application/json\" -d \"{\\\"preset\\\":[\\\"karpathy\\\"],\\\"rescan\\\":true}\" | jq '{success, created, skipped, failed, files: [.files[] | {path: .path[-60:], status, chunks}]}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Karpathy: Gap-Fill Auto-Research (nanoGPT)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/codebase/auto-research -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"nanoGPT transformer architecture training loop\\\",\\\"threshold\\\":0.45,\\\"maxFiles\\\":5,\\\"generateWiki\\\":true}\" | jq '{backfilled, topScore, wikiEntries: [(.wikiEntries // [])[] | {path: .path[:50], summary: .summary[:80]}]}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Karpathy: Gap-Fill Auto-Research (Backprop & Micrograd)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/codebase/auto-research -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"backpropagation autograd micrograd neural network from scratch\\\",\\\"threshold\\\":0.45,\\\"maxFiles\\\":5,\\\"generateWiki\\\":true}\" | jq '{backfilled, topScore, wikiEntries: [(.wikiEntries // [])[] | {path: .path[:50], summary: .summary[:80]}]}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Karpathy: Gap-Fill Auto-Research (LLM internals)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/codebase/auto-research -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"large language model tokenization attention mechanism CUDA kernel\\\",\\\"threshold\\\":0.45,\\\"maxFiles\\\":5,\\\"generateWiki\\\":true}\" | jq '{backfilled, topScore, wikiEntries: [(.wikiEntries // [])[] | {path: .path[:50], summary: .summary[:80]}]}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 Karpathy: Full Pipeline (Ingest + Gap-Fill)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "📚 Karpathy: Ingest Knowledge Base",
+        "📚 Karpathy: Gap-Fill Auto-Research (nanoGPT)",
+        "📚 Karpathy: Gap-Fill Auto-Research (Backprop & Micrograd)",
+        "📚 Karpathy: Gap-Fill Auto-Research (LLM internals)"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
     // Go Search Service (5-Way Fan-Out)
     // ============================================
     {

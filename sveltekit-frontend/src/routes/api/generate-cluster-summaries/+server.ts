@@ -8,7 +8,7 @@
  */
 
 import { db } from '$lib/server/db/client';
-import { getOllamaUrl, getRedisUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 import { scrollPoints, upsertPoints } from '$lib/server/qdrant-http';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -19,8 +19,8 @@ import { promisify } from 'util';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 const execAsync = promisify(exec);
-const OLLAMA_URL = getOllamaUrl();
-const PYTHON_PATH = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const PYTHON_PATH = ENV.PYTHON_PATH;
 
 interface ClusterSummary {
   id: number;
@@ -132,7 +132,7 @@ async function generateClusterSummaries(clusters: Record<string, (string | numbe
     const summary = await analyzeClusterWithLLM(parseInt(clusterId), errors.rows);
 
     // Get enhanced tags from Qdrant
-    const tags = await getClusterTags(errorIds);
+    const tags = await getClusterTags();
 
     summaries.push({
       id: parseInt(clusterId),
@@ -203,7 +203,7 @@ Be concise and actionable.`;
   };
 }
 
-async function getClusterTags(errorIds: (string | number)[]): Promise<string[]> {
+async function getClusterTags(): Promise<string[]> {
   const tags = new Set<string>();
 
   // Sample Qdrant collections for tags
@@ -280,8 +280,50 @@ async function cacheClusterCoordinates(coordinates: ClusterCoordinate[]) {
 }
 
 async function updateNeo4jGraph(summaries: ClusterSummary[]) {
-	// TODO: Implement Neo4j Cypher queries
-	console.log('Neo4j graph update:', summaries.length, 'clusters');
+	if (!summaries.length) return;
+	try {
+		const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
+		const driver = getNeo4jDriver();
+		const session = driver.session();
+		try {
+			// Upsert ErrorCluster nodes
+			for (const s of summaries) {
+				await session.run(
+					`MERGE (c:ErrorCluster {clusterId: $clusterId})
+					 SET c.summary    = $summary,
+					     c.tags       = $tags,
+					     c.errorCount = $errorCount,
+					     c.cudaAnalysis = $cudaAnalysis,
+					     c.updatedAt  = $updatedAt`,
+					{
+						clusterId:   s.id,
+						summary:     s.summary,
+						tags:        s.tags,
+						errorCount:  s.errorCount,
+						cudaAnalysis: s.cudaAnalysis,
+						updatedAt:   s.timestamp,
+					}
+				);
+			}
+			// Create SIMILAR_CLUSTER edges between clusters sharing tags
+			for (let i = 0; i < summaries.length; i++) {
+				for (let j = i + 1; j < summaries.length; j++) {
+					const sharedTags = summaries[i].tags.filter(t => summaries[j].tags.includes(t));
+					if (sharedTags.length > 0) {
+						await session.run(
+							`MATCH (a:ErrorCluster {clusterId: $aId}), (b:ErrorCluster {clusterId: $bId})
+							 MERGE (a)-[:SIMILAR_CLUSTER {sharedTags: $sharedTags}]->(b)`,
+							{ aId: summaries[i].id, bId: summaries[j].id, sharedTags }
+						);
+					}
+				}
+			}
+		} finally {
+			await session.close();
+		}
+	} catch (err) {
+		console.warn('[generate-cluster-summaries] Neo4j update failed (non-fatal):', (err as Error).message);
+	}
 }
 
 async function syncToPostgreSQL(summaries: ClusterSummary[]) {
@@ -313,6 +355,24 @@ async function syncToPostgreSQL(summaries: ClusterSummary[]) {
 }
 
 async function syncToCouchDB(summaries: ClusterSummary[]) {
-	// TODO: Implement CouchDB sync
-	console.log('CouchDB sync:', summaries.length, 'documents');
+	if (!summaries.length) return;
+	try {
+		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const DB = 'phase89_clusters';
+		await couchdb.createDb(DB).catch(() => {});  // no-op if already exists
+		for (const s of summaries) {
+			await couchdb.put(DB, `cluster_${s.id}`, {
+				clusterId:       s.id,
+				summary:         s.summary,
+				tags:            s.tags,
+				errorCount:      s.errorCount,
+				recommendations: s.recommendations,
+				cudaAnalysis:    s.cudaAnalysis,
+				timestamp:       s.timestamp,
+				type:            'phase89_cluster',
+			}).catch(() => {});  // conflict on _rev mismatch is non-fatal
+		}
+	} catch (err) {
+		console.warn('[generate-cluster-summaries] CouchDB sync failed (non-fatal):', (err as Error).message);
+	}
 }

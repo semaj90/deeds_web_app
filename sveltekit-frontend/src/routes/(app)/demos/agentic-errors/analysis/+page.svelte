@@ -5,6 +5,7 @@
 	const { data } = $props<{ data: PageData }>();
 
 	let generating = $state(false);
+	let reindexing = $state(false);
 	let selectedCluster = $state<any>(null);
 	let showAgenticController = $state(false);
 
@@ -19,6 +20,33 @@
 			generating = false;
 		}
 	}
+
+	async function triggerReindex() {
+		reindexing = true;
+		try {
+			const res = await fetch('/api/phase89/reindex', { method: 'POST' });
+			const result = await res.json();
+			if (result.success) {
+				// Refresh analysis after a short delay to let indexing start
+				setTimeout(() => location.reload(), 2000);
+			}
+		} finally {
+			reindexing = false;
+		}
+	}
+
+	const priorityColors: Record<string, string> = {
+		HIGH: 'bg-danger/20 border-danger text-danger',
+		MED: 'bg-warning/20 border-warning text-warning',
+		LOW: 'bg-info/20 border-info text-info',
+	};
+
+	const categoryIcons: Record<string, string> = {
+		indexing: '📦',
+		retrieval: '🔍',
+		health: '🏥',
+		pipeline: '⚙️',
+	};
 </script>
 
 <svelte:head>
@@ -37,7 +65,7 @@
 
 		<button
 			onclick={generateAnalysis}
-			disabled={generating || !data.hasGeminiKey}
+			disabled={generating}
 			class="px-4 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
 		>
 			{#if generating}
@@ -45,6 +73,13 @@
 			{:else}
 				🔄 Regenerate Analysis
 			{/if}
+		</button>
+		<button
+			onclick={triggerReindex}
+			disabled={reindexing}
+			class="px-4 py-2 bg-panel hover:bg-sand/20 text-black border-2 border-black/20 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+		>
+			{reindexing ? '⏳ Re-indexing...' : '📦 Re-index Codebase'}
 		</button>
 	</div>
 
@@ -64,9 +99,9 @@
 	{/if}
 
 	{#if !data.hasGeminiKey}
-		<div class="p-4 bg-warning/20 border-2 border-warning rounded-lg">
+		<div class="p-4 bg-info/20 border-2 border-info rounded-lg">
 			<p class="text-black">
-				⚠️ <strong>GEMINI_API_KEY</strong> not set in .env. Add your API key to enable AI analysis.
+				ℹ️ <strong>GEMINI_API_KEY</strong> not set — using Ollama (gemma4-legal) for AI analysis.
 			</p>
 		</div>
 	{/if}
@@ -107,115 +142,136 @@
 		<div class="bg-panel border-2 border-black/20 rounded-lg p-6">
 			<h2 class="text-xl font-bold text-black mb-4 uppercase tracking-wide">📦 Collections Overview</h2>
 
-			<div class="space-y-4">
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
 				{#each data.analysis.knowledge.collections as collection}
 					<div class="p-4 bg-sand/10 border-2 border-black/20 rounded-lg">
-						<div class="flex items-start justify-between">
-							<div class="flex-1">
-								<h3 class="text-lg font-semibold text-accent">{collection.name}</h3>
-								<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 text-sm">
-									<div>
-										<span class="text-black/60">Points:</span>
-										<span class="text-black ml-2 font-medium">{collection.points.toLocaleString()}</span>
-									</div>
-									<div>
-										<span class="text-black/60">Vector Size:</span>
-										<span class="text-black ml-2 font-medium">{collection.vectorSize}</span>
-									</div>
-									<div>
-										<span class="text-black/60">Tags:</span>
-										<span class="text-black ml-2 font-medium">{collection.tags.length}</span>
-									</div>
-									<div>
-										<span class="text-black/60">File Types:</span>
-										<span class="text-black ml-2 font-medium">{collection.fileTypes.join(', ')}</span>
-									</div>
-								</div>
-
-								{#if collection.tags.length > 0}
-									<div class="mt-3">
-										<div class="text-xs text-black/60 mb-2 uppercase tracking-wide">Top Tags:</div>
-										<div class="flex flex-wrap gap-2">
-											{#each collection.tags.slice(0, 10) as tag}
-												<span class="px-2 py-1 bg-accent/20 border border-accent text-accent text-xs rounded">
-													{tag}
-												</span>
-											{/each}
-										</div>
-									</div>
-								{/if}
-
-								{#if collection.errorTypes.length > 0}
-									<div class="mt-3">
-										<div class="text-xs text-black/60 mb-2 uppercase tracking-wide">Error Types:</div>
-										<div class="flex flex-wrap gap-2">
-											{#each collection.errorTypes as errorType}
-												<span class="px-2 py-1 bg-danger/20 border border-danger text-danger text-xs rounded">
-													{errorType}
-												</span>
-											{/each}
-										</div>
-									</div>
-								{/if}
+						<h3 class="text-sm font-semibold text-accent truncate" title={collection.name}>{collection.name}</h3>
+						<div class="grid grid-cols-2 gap-2 mt-2 text-sm">
+							<div>
+								<span class="text-black/60">Points:</span>
+								<span class="text-black ml-1 font-medium">{(collection.points ?? 0).toLocaleString()}</span>
 							</div>
+							<div>
+								<span class="text-black/60">Segments:</span>
+								<span class="text-black ml-1 font-medium">{collection.segments ?? '—'}</span>
+							</div>
+						</div>
+						<div class="mt-2">
+							<span class="px-2 py-0.5 text-xs rounded border {
+								collection.status === 'green' ? 'bg-accent/20 border-accent text-accent' :
+								collection.status === 'yellow' ? 'bg-warning/20 border-warning text-warning' :
+								'bg-danger/20 border-danger text-danger'
+							}">
+								{collection.status ?? 'unknown'}
+							</span>
 						</div>
 					</div>
 				{/each}
 			</div>
 		</div>
 
+		<!-- Cluster Health -->
+		{#if data.analysis.clusterHealth}
+			{@const ch = data.analysis.clusterHealth}
+			<div class="bg-panel border-2 border-black/20 rounded-lg p-6">
+				<h2 class="text-xl font-bold text-black mb-4 uppercase tracking-wide">🏥 Cluster Health</h2>
+				<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+					<div class="text-center">
+						<div class="text-2xl font-bold text-black">{ch.totalClusters}</div>
+						<div class="text-xs text-black/60 uppercase">Error Clusters</div>
+					</div>
+					<div class="text-center">
+						<div class="text-2xl font-bold text-black">{ch.errorEvents}</div>
+						<div class="text-xs text-black/60 uppercase">Error Events</div>
+					</div>
+					<div class="text-center">
+						<div class="text-2xl font-bold" class:text-accent={ch.codebaseChunksInQdrant > 0} class:text-danger={ch.codebaseChunksInQdrant === 0}>
+							{ch.codebaseChunksInQdrant.toLocaleString()}
+						</div>
+						<div class="text-xs text-black/60 uppercase">Codebase Chunks</div>
+					</div>
+					<div class="text-center">
+						<div class="text-2xl font-bold text-black">{ch.phase89ChunksInQdrant.toLocaleString()}</div>
+						<div class="text-xs text-black/60 uppercase">P89 Error Chunks</div>
+					</div>
+					<div class="text-center">
+						<div class="text-2xl font-bold text-black">{ch.phase90CardsInQdrant.toLocaleString()}</div>
+						<div class="text-xs text-black/60 uppercase">P90 Error Cards</div>
+					</div>
+				</div>
+
+				{#if ch.codebaseChunksInQdrant === 0}
+					<div class="mt-4 p-3 bg-danger/10 border-2 border-danger/30 rounded-lg flex items-center justify-between">
+						<span class="text-danger text-sm font-medium">Codebase index empty — semantic search disabled</span>
+						<button
+							onclick={triggerReindex}
+							disabled={reindexing}
+							class="px-3 py-1 bg-danger hover:bg-danger/80 text-white text-sm rounded disabled:opacity-50 transition-colors"
+						>
+							{reindexing ? '⏳ Indexing...' : '🔄 Re-index Now'}
+						</button>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
 		<!-- Recommendations -->
 		{#if data.analysis.recommendations}
 			<div class="bg-panel border-2 border-black/20 rounded-lg p-6">
 				<h2 class="text-xl font-bold text-black mb-4 uppercase tracking-wide">💡 Recommendations</h2>
 
-				<div class="space-y-6">
-					{#each data.analysis.recommendations as category}
-						<div>
-							<h3 class="text-lg font-semibold text-accent mb-3">{category.category}</h3>
-							<div class="space-y-2">
-								{#each category.items as item}
-									<div class="p-3 bg-sand/10 border-2 border-black/20 rounded">
-										<div class="flex items-start justify-between">
-											<div class="flex-1">
-												<div class="text-black font-medium">
-													{item.action || item.tool}
-												</div>
-												{#if item.reason}
-													<div class="text-sm text-black/60 mt-1">{item.reason}</div>
-												{/if}
-												{#if item.command}
-													<pre class="mt-2 p-2 bg-black/30 border-2 border-black/20 rounded text-xs text-accent overflow-x-auto">{item.command}</pre>
-												{/if}
-												{#if item.args}
-													<div class="mt-2 text-xs text-black/40">
-														Args: {JSON.stringify(item.args)}
-													</div>
-												{/if}
-											</div>
-											<span class="ml-4 px-2 py-1 text-xs rounded border-2 {
-												item.priority === 'high' ? 'bg-danger/20 border-danger text-danger' :
-												item.priority === 'medium' ? 'bg-warning/20 border-warning text-warning' :
-												'bg-info/20 border-info text-info'
-											}">
-												{item.priority}
+				<div class="space-y-3">
+					{#each data.analysis.recommendations as rec}
+						{@const isStructured = typeof rec === 'object' && rec.priority}
+						{#if isStructured}
+							<div class="p-4 bg-sand/10 border-2 border-black/20 rounded-lg">
+								<div class="flex items-start gap-3">
+									<span class="text-xl">{categoryIcons[rec.category] ?? '📋'}</span>
+									<div class="flex-1 min-w-0">
+										<div class="flex items-center gap-2 mb-1">
+											<span class="font-semibold text-black">{rec.title}</span>
+											<span class="px-2 py-0.5 text-xs rounded border-2 {priorityColors[rec.priority] ?? 'bg-info/20 border-info text-info'}">
+												{rec.priority}
 											</span>
 										</div>
+										<p class="text-sm text-black/60 mb-2">{rec.detail}</p>
+										<div class="flex items-center gap-3">
+											<pre class="flex-1 p-2 bg-black/5 border border-black/10 rounded text-xs text-accent overflow-x-auto">{rec.action}</pre>
+											{#if rec.action.startsWith('POST /api/phase89/reindex') || rec.action.includes('codebase-index')}
+												<button
+													onclick={triggerReindex}
+													disabled={reindexing}
+													class="px-3 py-1 bg-accent hover:bg-accent/80 text-white text-xs rounded disabled:opacity-50 transition-colors whitespace-nowrap"
+												>
+													{reindexing ? '⏳...' : '▶ Run'}
+												</button>
+											{/if}
+										</div>
+										{#if rec.estimatedImpact}
+											<div class="text-xs text-black/40 mt-2">Impact: {rec.estimatedImpact}</div>
+										{/if}
 									</div>
-								{/each}
+								</div>
 							</div>
-						</div>
+						{:else}
+							<!-- Legacy string recommendation -->
+							<div class="p-3 bg-sand/10 border-2 border-black/20 rounded text-sm text-black">
+								{rec}
+							</div>
+						{/if}
 					{/each}
 				</div>
 			</div>
 		{/if}
 
-		<!-- Gemini Analysis -->
+		<!-- AI Analysis Summary -->
 		{#if data.analysis.analysis}
 			<div class="bg-panel border-2 border-black/20 rounded-lg p-6">
-				<h2 class="text-xl font-bold text-black mb-4 uppercase tracking-wide">🧠 Gemini AI Analysis</h2>
+				<h2 class="text-xl font-bold text-black mb-4 uppercase tracking-wide">🧠 AI Analysis</h2>
 
-				{#if data.analysis.analysis.rawAnalysis}
+				{#if typeof data.analysis.analysis === 'string'}
+					<p class="text-black leading-relaxed">{data.analysis.analysis}</p>
+				{:else if data.analysis.analysis.rawAnalysis}
 					<pre class="p-4 bg-black/30 border-2 border-black/20 rounded text-sm text-black whitespace-pre-wrap overflow-x-auto">{data.analysis.analysis.rawAnalysis}</pre>
 				{:else}
 					<pre class="p-4 bg-black/30 border-2 border-black/20 rounded text-sm text-black overflow-x-auto">{JSON.stringify(data.analysis.analysis, null, 2)}</pre>

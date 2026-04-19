@@ -110,9 +110,13 @@ function buildEmbeddingMatrix(rows: ResearchSummary[]): Float32Array {
 	const n = rows.length;
 	const mat = new Float32Array(n * DIM);
 	for (let i = 0; i < n; i++) {
-		const emb = rows[i].embedding as unknown as number[] | null;
-		if (emb && emb.length === DIM) {
-			const vec = l2Norm(new Float32Array(emb));
+		// node-postgres returns pgvector as a string "[v1,v2,...]" — parse it
+		let raw = rows[i].embedding as unknown as number[] | string | null;
+		if (typeof raw === 'string') {
+			try { raw = JSON.parse(raw) as number[]; } catch { raw = null; }
+		}
+		if (Array.isArray(raw) && raw.length === DIM) {
+			const vec = l2Norm(new Float32Array(raw));
 			mat.set(vec, i * DIM);
 		}
 		// rows with no embedding leave zeros → they cluster around origin
