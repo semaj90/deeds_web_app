@@ -1,3 +1,4 @@
+import type { PageServerLoad } from './$types';
 /**
  * Analytics Dashboard — Server Load
  * Fetches weekly summary + query patterns for the current user.
@@ -9,7 +10,7 @@ const safe = <T>(p: Promise<T>, fallback: T): Promise<T> =>
 		() => fallback
 	);
 
-export async function load({ locals }) {
+export const load: PageServerLoad = async ({ locals }) => {
 	const userId = (locals as Record<string, unknown>).userId as string | undefined;
 	const uid = userId ?? 'anonymous';
 
