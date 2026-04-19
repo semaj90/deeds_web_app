@@ -99,6 +99,7 @@ const RETRIEVAL_GRPC_URL = ENV.RETRIEVAL_GRPC_URL;
 const RETRIEVAL_GRPC_ENABLED = ENV.RETRIEVAL_GRPC_ENABLED;
 const RETRIEVAL_HTTP_URL = ENV.RETRIEVAL_HTTP_URL;
 const RETRIEVAL_HTTP_ENABLED = ENV.RETRIEVAL_HTTP_ENABLED;
+const GO_SEARCH_URL = ENV.GO_SEARCH_URL;
 const GO_SEARCH_GRPC_URL = ENV.GO_SEARCH_GRPC_URL;
 
 let grpcClient: any = null;
@@ -396,7 +397,12 @@ export async function searchEvidenceViaHttp(
 // ── Health check ────────────────────────────────────────────────────────
 
 /**
- * Check gRPC RetrievalService health.
+ * Check retrieval service health.
+ * Probe order:
+ *   1. gRPC RetrievalService      (if RETRIEVAL_GRPC_ENABLED)
+ *   2. HTTP go-retrieval service   (if RETRIEVAL_HTTP_ENABLED, port 8100)
+ *   3. HTTP go-search-service      (if GO_SEARCH_URL, port 8096)
+ *   4. gRPC go-search-library      (port 50055, last resort)
  */
 export async function checkRetrievalHealth(): Promise<{
   available: boolean;
@@ -452,6 +458,23 @@ export async function checkRetrievalHealth(): Promise<{
       }
     } catch { /* unavailable */ }
     return { enabled: true, url: RETRIEVAL_HTTP_URL, available: false, service: 'go-retrieval-http' };
+  }
+
+  // Try go-search-service HTTP health first (no gRPC deps)
+  if (GO_SEARCH_URL) {
+    try {
+      const res = await fetch(`${GO_SEARCH_URL}/health`, { signal: AbortSignal.timeout(3000) });
+      if (res.ok) {
+        const data = await res.json() as Record<string, unknown>;
+        return {
+          enabled: true,
+          url: GO_SEARCH_URL,
+          available: data.status === 'healthy' || data.status === 'ok',
+          status: data.status as string | undefined,
+          service: 'go-search-http',
+        };
+      }
+    } catch { /* fall through to gRPC probe */ }
   }
 
   const goBase = { enabled: false, url: GO_SEARCH_GRPC_URL };
