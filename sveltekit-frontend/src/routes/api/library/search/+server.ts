@@ -22,7 +22,7 @@ const librarySearchSchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
-const GO_SEARCH_URL = (ENV as unknown as Record<string, string>).GO_SEARCH_URL || '';
+const GO_SEARCH_URL = ENV.GO_SEARCH_URL || '';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
