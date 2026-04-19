@@ -9,7 +9,8 @@
  * Wired from: som-webgpu-cache.ts (728 lines, previously orphaned)
  */
 
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { somWebGPUCache } from '$lib/webgpu/som-webgpu-cache';
 import { z } from 'zod';
 

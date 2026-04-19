@@ -5,7 +5,8 @@
  * Body: { query: string, caseId?: string }
  * Returns: { success, summary, recommendations, didYouMean, predictiveSignals }
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import { embedText } from '$lib/server/embedding/embed.js';

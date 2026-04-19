@@ -2,7 +2,8 @@
  * GET /api/graph/relationships — Get entity relationships from Neo4j
  * Query: ?entityId=xxx&depth=2
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 

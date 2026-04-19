@@ -11,7 +11,8 @@
  * - { pattern: "case:*" } - Invalidate all case caches
  */
 
-import { json, error, type RequestHandler } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';

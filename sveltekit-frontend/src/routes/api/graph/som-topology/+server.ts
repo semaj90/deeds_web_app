@@ -8,7 +8,8 @@
  * Returns endpoint description and parameter reference (no auth required).
  */
 
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { runSOMTopologyPipeline } from '$lib/server/graph/som-topology-pipeline.js';
 import { getRedis } from '$lib/server/redis.js';

@@ -2,7 +2,8 @@
  * GET /api/graph/connections — Find cases connected via shared entities
  * Query: ?caseId=xxx
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 

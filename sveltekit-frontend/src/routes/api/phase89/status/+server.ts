@@ -1,4 +1,5 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { getRedis } from '$lib/server/redis.js';
 import { getQdrantUrl } from '$lib/config/env.server.js';
 import { pool as pgPool } from '$lib/server/db/client';

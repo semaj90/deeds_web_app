@@ -14,7 +14,8 @@
  *
  * Cached in Redis for 5 minutes.
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 import { readFileSync } from 'fs';

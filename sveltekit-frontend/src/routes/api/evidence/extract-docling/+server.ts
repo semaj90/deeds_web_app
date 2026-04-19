@@ -6,7 +6,8 @@
  * Returns: DoclingResult with structured blocks, page numbers, bounding boxes.
  */
 
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 
 const bodySchema = z.object({

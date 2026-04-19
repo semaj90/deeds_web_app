@@ -2,7 +2,8 @@
  * GET /api/tags/search — Semantic tag search via Qdrant
  * Query: ?q=contract+law&limit=10
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { searchTagsBySemantic } from '$lib/server/ace/tag-sync.js';
 import { ENV } from '$lib/server/env.server.js';

@@ -8,7 +8,8 @@ import { pgRows } from '$lib/server/db/client';
  * Request: { sessionId, userId, caseId?, message }
  * Response: { response, context: { keywords, keyPhrases, suggestions } }
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';

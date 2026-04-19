@@ -6,7 +6,8 @@
  * Returns recent error_events for a specific route path,
  * used by the Analysis Panel to show runtime issues on the current page.
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { db } from '$lib/server/db/client';
 import { errorEvents, errorClusters } from '$lib/server/db/schema-postgres.js';

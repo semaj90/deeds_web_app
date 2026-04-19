@@ -3,7 +3,8 @@
  * Returns categorized catalog of all API endpoints.
  * Query: ?category=Auth&q=search&status=active
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import {

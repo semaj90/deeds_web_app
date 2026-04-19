@@ -3,7 +3,8 @@
  * Returns file-error topology for visualization
  */
 
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { pool } from '$lib/server/db/client';
 
 export const GET: RequestHandler = async ({ locals }) => {

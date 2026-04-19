@@ -5,7 +5,8 @@
  *   → Generates embeddings for rows missing queryEmbedding + upserts to Qdrant
  *   → Also re-infers probableRootCauseType for rows stuck on 'unknown'
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { db } from '$lib/server/db/client';
 import { diagnosisEvents } from '$lib/server/db/schema-postgres.js';
 import { eq, isNull, sql } from 'drizzle-orm';

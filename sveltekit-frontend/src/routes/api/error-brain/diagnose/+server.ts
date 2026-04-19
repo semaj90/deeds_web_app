@@ -11,7 +11,8 @@
  *   4. LLM Diagnosis — structured fix plan via Ollama + GBNF
  *   5. Cache + Store — Redis cache + Qdrant embedding + DB record
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';

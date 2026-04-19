@@ -1,4 +1,5 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { getAceIngestJob } from '$lib/server/ace-ingest-progress.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';

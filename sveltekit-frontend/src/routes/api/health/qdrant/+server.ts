@@ -9,7 +9,8 @@
  * - Optionally auto-creates missing collections
  */
 
-import { json, error, type RequestHandler } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';

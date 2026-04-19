@@ -10,7 +10,8 @@
  * - Memory Cache (size, TTL, hit rate)
  */
 
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';

@@ -13,7 +13,8 @@
  * DELETE /api/error-brain/diagnosis-history
  *   → Delete a diagnosis event by ID
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 import { db } from '$lib/server/db/client';

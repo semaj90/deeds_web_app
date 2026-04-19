@@ -8,7 +8,8 @@
  * stores them in the error_events table, and publishes to
  * the error.embed RabbitMQ queue for async embedding.
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { errorEvents } from '$lib/server/db/schema-postgres.js';

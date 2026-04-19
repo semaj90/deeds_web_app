@@ -7,7 +7,8 @@
  * POST /api/indexing/search - Search indexed codebase
  * POST /api/indexing/search-errors - Search indexed error patterns
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import { glob } from 'glob';

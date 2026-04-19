@@ -29,7 +29,8 @@
  *   }
  */
 
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { warmUpCache, warmUpDomain } from '$lib/server/cache/warm-up.js';
 

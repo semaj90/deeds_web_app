@@ -4,7 +4,8 @@ import { pgRows } from '$lib/server/db/client';
  *   Accepts single event or batch array: { batch: [...] }
  * GET  /api/analytics/events — Get recent events for a user
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { logEvent, logEventBatch, type AnalyticsEvent } from '$lib/server/analytics/event-logger.js';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';

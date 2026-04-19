@@ -9,7 +9,8 @@
  *   "health"  — Lightweight health check
  *   "shaders" — Full WGSL shader source + binding layouts
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { z } from 'zod';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { ENV } from '$lib/server/env.server.js';

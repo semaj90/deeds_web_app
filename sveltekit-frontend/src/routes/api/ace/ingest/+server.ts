@@ -1,4 +1,5 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';

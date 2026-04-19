@@ -8,7 +8,8 @@
  * Request body: { query: string, jurisdiction?: string, category?: string, limit?: number }
  * Response: { results: StatuteSearchResult[], timing: Timing }
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';

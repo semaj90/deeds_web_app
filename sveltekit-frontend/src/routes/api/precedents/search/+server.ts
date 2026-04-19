@@ -9,7 +9,8 @@ import { pgRows } from '$lib/server/db/client';
  * Request body: { query: string, court?: string, caseId?: string, limit?: number }
  * Response: { results: PrecedentSearchResult[], timing: Timing }
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';

@@ -5,7 +5,8 @@ import { pgRows } from '$lib/server/db/client';
  * Returns AI dashboard statistics — active chat sessions, model info,
  * document counts, and Ollama connection status.
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';

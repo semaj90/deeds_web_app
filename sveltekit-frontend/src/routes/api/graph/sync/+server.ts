@@ -2,7 +2,8 @@
  * POST /api/graph/sync — Trigger PostgreSQL → Neo4j sync
  * Body: { caseId?: string } — sync specific case or all
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { syncCaseToGraph, syncAllCasesToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 import { z } from 'zod';
 

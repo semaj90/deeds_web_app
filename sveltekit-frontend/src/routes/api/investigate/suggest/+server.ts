@@ -8,7 +8,8 @@
  * Body: { query: string, answer: string, caseId?: string }
  * Returns: { evaluation, suggestedQueries[], correctionPrompt? }
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';

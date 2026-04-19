@@ -4,7 +4,8 @@
  * Lists available Ollama models. Proxies Ollama's /api/tags endpoint
  * and normalizes the response for the AI dashboard.
  */
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
