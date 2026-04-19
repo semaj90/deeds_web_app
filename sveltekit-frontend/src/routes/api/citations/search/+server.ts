@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { savedCitations } from '$lib/server/db/schema';
 import { desc, ilike, or } from 'drizzle-orm';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const querySchema = z.object({
 	q: z.string().max(500).default(''),
@@ -26,6 +27,8 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
   }
   const { q: query, limit } = parsed.data;
+
+  recordSearchQuery({ query, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
   if (!query.trim() || query.trim().length < 2) {
     return json({ success: true, citations: [] });

@@ -15,6 +15,7 @@ import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -126,6 +127,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { query, limit } = parsed.data;
 	const court = parsed.data.court ?? null;
 	const caseId = parsed.data.caseId;
+
+	recordSearchQuery({ query, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
 	const timing: Record<string, number> = {};
 	const courtPattern = court ? `%${court}%` : null;

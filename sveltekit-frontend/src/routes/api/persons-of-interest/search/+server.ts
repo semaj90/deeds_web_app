@@ -4,6 +4,7 @@ import { json, error } from '@sveltejs/kit';
 import { and, eq, isNull, or, sql, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const poiSearchSchema = z.object({
 	query: z.string().min(1, 'Query is required').max(200),
@@ -28,6 +29,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const query = body.query.trim();
 	const limit = body.limit;
 	const excludeId = body.excludeId ?? null;
+
+	recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 
 	try {
 		// Text-based similarity search across name, description, aliases

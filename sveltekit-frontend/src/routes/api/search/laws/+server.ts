@@ -9,6 +9,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { db } from '$lib/server/db/client';
 import { statutes } from '$lib/server/db/schema-postgres.js';
 import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
@@ -42,6 +43,8 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 		return json({ results: [], total: 0, query: '', executionTimeMs: 0, error: parsed.error.issues[0]?.message }, { status: 400 });
 	}
 	const { query, limit, jurisdiction, sectionType } = parsed.data;
+
+	recordSearchQuery({ query, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
 	if (!query.trim() || query.trim().length < 2) {
 		return json({ results: [], total: 0, query, executionTimeMs: 0 });

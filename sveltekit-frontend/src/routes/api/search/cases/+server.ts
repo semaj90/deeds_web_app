@@ -13,6 +13,7 @@ import { cases } from '$lib/server/db/schema-postgres.js';
 import { crimes } from '$lib/server/db/schema/legal-cases.js';
 import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const querySchema = z.object({
   query: z.string().max(500).default(''),
@@ -56,6 +57,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     );
   }
   const { query, limit, jurisdiction, crimeCategory, crimeClassification } = parsed.data;
+
+  recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 
   if (!query.trim() || query.trim().length < 2) {
     return json({ results: [], total: 0, query, executionTimeMs: 0 });
