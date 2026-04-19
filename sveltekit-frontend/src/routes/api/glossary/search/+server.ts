@@ -16,6 +16,7 @@ import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -78,6 +79,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 	const { query, limit } = parsed.data;
 	const category = parsed.data.category ?? null;
+
+	recordSearchQuery({ query, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
 	const timing: Record<string, number> = {};
 	const categoryPattern = category ? `%${category}%` : null;
