@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const agentChatSchema = z.object({
 	prompt: z.string().max(10000).optional(),
@@ -185,6 +186,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
 		const prompt = parsed.data.prompt || parsed.data.message || '';
+
+		recordSearchQuery({ query: prompt, pipeline: 'ace', cacheHit: false, userId: locals.user.id });
 
 		const messages: Array<{ role: string; content: string }> = [
 			{
