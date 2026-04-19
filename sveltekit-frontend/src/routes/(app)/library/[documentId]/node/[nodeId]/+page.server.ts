@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { pool } from '$lib/server/db/client';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 /** Extract citation-like references from text using common legal patterns */
 function extractCitationRefs(text: string | null): Array<{ label: string; type: string }> {
@@ -62,7 +62,8 @@ function generateImplications(corpusType: string, heading: string, jurisdictionN
 	return templates[corpusType] ?? templates.statute;
 }
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
+	if (!locals.user?.id) throw redirect(303, '/login');
 	const { documentId, nodeId } = params;
 
 	try {

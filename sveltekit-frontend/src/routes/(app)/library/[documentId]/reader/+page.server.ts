@@ -1,7 +1,10 @@
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { pool } from '$lib/server/db/client';
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
+	if (!locals.user?.id) throw redirect(303, '/login');
+
 	const { documentId } = params;
 	const selectedNodeId = url.searchParams.get('node') ?? null;
 
