@@ -31,6 +31,24 @@
 	let searchResults = $state<Array<Record<string, unknown>>>([]);
 	let searching = $state(false);
 	let searchError = $state<string | null>(null);
+	let suggestions = $state<string[]>([]);
+	let suggestTimer: ReturnType<typeof setTimeout> | null = null;
+
+	async function fetchSuggestions(q: string) {
+		if (q.trim().length < 2) { suggestions = []; return; }
+		try {
+			const res = await fetch(`/api/library/suggestions?q=${encodeURIComponent(q.trim())}`);
+			if (res.ok) {
+				const d = await res.json() as { suggestions: Array<{ suggestion: string }> };
+				suggestions = (d.suggestions ?? []).map((s) => s.suggestion).slice(0, 8);
+			}
+		} catch { /* non-fatal */ }
+	}
+
+	function onSearchInput() {
+		if (suggestTimer) clearTimeout(suggestTimer);
+		suggestTimer = setTimeout(() => fetchSuggestions(searchQ), 250);
+	}
 
 	// Build flat toc into nested tree
 	interface TocNode {
@@ -222,9 +240,16 @@
 									bind:value={searchQ}
 									type="search"
 									placeholder="Search within this library..."
+									list="lr-suggestions"
+									oninput={onSearchInput}
 									onkeydown={(e) => e.key === 'Enter' && runSearch()}
 									class="lr-search-input"
 								/>
+								<datalist id="lr-suggestions">
+									{#each suggestions as s}
+										<option value={s}></option>
+									{/each}
+								</datalist>
 								<button
 									onclick={runSearch}
 									disabled={searching}

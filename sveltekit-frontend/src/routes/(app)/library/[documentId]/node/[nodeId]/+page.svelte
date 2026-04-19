@@ -16,6 +16,24 @@
 	let searchQ = $state('');
 	let searchResults = $state<Array<Record<string, unknown>>>([]);
 	let searching = $state(false);
+	let suggestions = $state<string[]>([]);
+	let suggestTimer: ReturnType<typeof setTimeout> | null = null;
+
+	async function fetchSuggestions(q: string) {
+		if (q.trim().length < 2) { suggestions = []; return; }
+		try {
+			const res = await fetch(`/api/library/suggestions?q=${encodeURIComponent(q.trim())}`);
+			if (res.ok) {
+				const d = await res.json() as { suggestions: Array<{ suggestion: string }> };
+				suggestions = (d.suggestions ?? []).map((s) => s.suggestion).slice(0, 8);
+			}
+		} catch { /* non-fatal */ }
+	}
+
+	function onSearchInput() {
+		if (suggestTimer) clearTimeout(suggestTimer);
+		suggestTimer = setTimeout(() => fetchSuggestions(searchQ), 250);
+	}
 
 	const CORPUS_LABELS: Record<string, string> = {
 		constitution: 'Constitution',
@@ -177,9 +195,16 @@
 						<input
 							type="text"
 							placeholder="Search this section..."
+							list="node-suggestions"
 							bind:value={searchQ}
+							oninput={onSearchInput}
 							onkeydown={(e) => e.key === 'Enter' && runSearch()}
 						/>
+						<datalist id="node-suggestions">
+							{#each suggestions as s}
+								<option value={s}></option>
+							{/each}
+						</datalist>
 					</div>
 				</div>
 			</div>
