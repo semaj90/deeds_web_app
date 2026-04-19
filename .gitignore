@@ -415,6 +415,7 @@ src/proto/**
 /services/*
 !/services/go-search-service/
 !/services/go-retrieval-service/
+!/services/go-embedding-service/
 Ollama/ollama.exe
 Ollama/ollama\ app.exe
 Ollama/unins000.exe
