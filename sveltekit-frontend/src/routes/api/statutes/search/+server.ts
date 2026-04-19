@@ -13,6 +13,7 @@ import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -55,6 +56,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 	}
 	const { query, limit } = parsed.data;
+
+	recordSearchQuery({ query, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
 	const timing: Record<string, number> = {};
 
