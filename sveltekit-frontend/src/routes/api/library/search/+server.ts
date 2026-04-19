@@ -1,11 +1,14 @@
 /**
- * GET /api/library/search
+ * GET  /api/library/search?q=...    — query-param form (used by admin + global search)
+ * POST /api/library/search          — JSON body form: { query, limit?, jurisdiction?, corpusType? }
+ *                                     (used by reader and node-detail pages)
  *
  * Hybrid search over legal library tables.
  * Fast-path: Go search service at GO_SEARCH_URL (4-way parallel fan-out).
  * Fallback:  Inline SQL (lexical + semantic, same as before).
  *
- * Query params: q, jurisdiction?, corpusType?, limit?
+ * Both methods return { hits, results, total } — `results` is an alias of `hits`
+ * for backward-compat with pages that destructure `d.results`.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -14,6 +17,7 @@ import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const librarySearchSchema = z.object({
   q: z.string().min(2).max(1000),
@@ -22,20 +26,28 @@ const librarySearchSchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
+// POST body accepts `query` instead of `q`
+const postBodySchema = z.object({
+  query: z.string().min(2).max(1000),
+  jurisdiction: z.string().max(50).nullish(),
+  corpusType: z.string().max(50).nullish(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
 const GO_SEARCH_URL = ENV.GO_SEARCH_URL || '';
 
-export const GET: RequestHandler = async ({ url, locals }) => {
-  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+interface SearchParams {
+  q: string;
+  jurisdiction?: string | null;
+  corpusType?: string | null;
+  limit: number;
+  userId: string;
+}
 
-  const parsed = librarySearchSchema.safeParse({
-    q: url.searchParams.get('q')?.trim() ?? '',
-    jurisdiction: url.searchParams.get('jurisdiction'),
-    corpusType: url.searchParams.get('corpusType'),
-    limit: url.searchParams.get('limit') ?? undefined,
-  });
-  if (!parsed.success) return json({ hits: [], total: 0 });
+async function doSearch(p: SearchParams) {
+  const { q, jurisdiction, corpusType, limit, userId } = p;
 
-  const { q, jurisdiction, corpusType, limit } = parsed.data;
+  recordSearchQuery({ query: q, pipeline: 'kag', cacheHit: false, userId });
 
   // Fast-path: Go search service (parallel fan-out: citation + FTS + pgvector + Qdrant)
   if (GO_SEARCH_URL) {
@@ -48,20 +60,14 @@ export const GET: RequestHandler = async ({ url, locals }) => {
           jurisdiction: jurisdiction ?? '',
           corpusType: corpusType ?? '',
           limit,
-          userId: locals.user.id,
+          userId,
         }),
         signal: AbortSignal.timeout(8000),
       });
       if (goResp.ok) {
         const data = await goResp.json();
-        return json(
-          {
-            hits: (data.hits ?? []).map(formatGoHit),
-            total: data.total ?? 0,
-            meta: { ...data.meta, source: 'go-search-service' },
-          },
-          { headers: cacheControl.short }
-        );
+        const hits = (data.hits ?? []).map(formatGoHit);
+        return { hits, results: hits, total: data.total ?? 0, meta: { ...data.meta, source: 'go-search-service' } };
       }
       // Non-200 → fall through to inline SQL
     } catch {
@@ -164,10 +170,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     params.push(limit);
 
     const res = await pool.query(hybridQuery, params);
-    return json(
-      { hits: res.rows.map(formatHit), total: res.rowCount },
-      { headers: cacheControl.short }
-    );
+    const hits = res.rows.map(formatHit);
+    return { hits, results: hits, total: res.rowCount ?? 0 };
   } else {
     // Lexical only
     params.push(limit);
@@ -190,11 +194,39 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			LIMIT $${paramIdx}`;
 
     const res = await pool.query(lexQuery, params);
-    return json(
-      { hits: res.rows.map(formatHit), total: res.rowCount, meta: { source: 'inline-sql' } },
-      { headers: cacheControl.short }
-    );
+    const hits = res.rows.map(formatHit);
+    return { hits, results: hits, total: res.rowCount ?? 0, meta: { source: 'inline-sql' } };
   }
+}
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user?.id) return json({ hits: [], results: [], total: 0 }, { status: 401 });
+
+  const parsed = librarySearchSchema.safeParse({
+    q: url.searchParams.get('q')?.trim() ?? '',
+    jurisdiction: url.searchParams.get('jurisdiction'),
+    corpusType: url.searchParams.get('corpusType'),
+    limit: url.searchParams.get('limit') ?? undefined,
+  });
+  if (!parsed.success) return json({ hits: [], results: [], total: 0 });
+
+  const { q, jurisdiction, corpusType, limit } = parsed.data;
+  const result = await doSearch({ q, jurisdiction, corpusType, limit, userId: locals.user.id });
+  return json(result, { headers: cacheControl.short });
+};
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ hits: [], results: [], total: 0 }, { status: 401 });
+
+  let body: unknown;
+  try { body = await request.json(); } catch { return json({ hits: [], results: [], total: 0 }); }
+
+  const parsed = postBodySchema.safeParse(body);
+  if (!parsed.success) return json({ hits: [], results: [], total: 0 });
+
+  const { query: q, jurisdiction, corpusType, limit } = parsed.data;
+  const result = await doSearch({ q, jurisdiction, corpusType, limit, userId: locals.user.id });
+  return json(result, { headers: cacheControl.short });
 };
 
 /** Format a row from the Go search service response */
