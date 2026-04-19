@@ -2,13 +2,13 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
-import postgres from 'postgres';
-import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
+import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const sql = postgres(getDatabaseUrl());
 const qdrant = new QdrantClient({ url: getQdrantUrl() });
@@ -351,6 +351,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
   }
   const { q: query, limit } = parsed.data;
+  recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 
   try {
     await ensureQdrantCollection();

@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { orchestrateRetrieval } from '$lib/server/retrieval/orchestrator.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const searchSchema = z.object({
   query: z.string().min(1).max(1000),
@@ -20,6 +21,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ results: [], total: 0, source: 'error' }, { status: 400 });
     }
     const { query, tags, limit, somCluster } = parsed.data;
+
+    recordSearchQuery({ query, pipeline: 'codebase', cacheHit: false, userId: locals.user.id });
 
     const result = await orchestrateRetrieval({
       query,

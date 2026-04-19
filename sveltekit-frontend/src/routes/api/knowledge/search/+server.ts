@@ -14,6 +14,7 @@ import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 // Zod schema validates query (trimmed, 1-500), topK (1-100), llmProvider enum
 const knowledgeSearchSchema = z.object({
@@ -57,6 +58,8 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
       return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
     }
     const body = parsed.data as SearchRequest & Record<string, unknown>;
+
+    recordSearchQuery({ query: body.query.trim(), pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 
     // Execute search — parallel across KnowledgeSearcher (Qdrant) + 3 legal sources
     const searcher = getKnowledgeSearcher();

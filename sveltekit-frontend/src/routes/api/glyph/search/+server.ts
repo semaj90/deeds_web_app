@@ -19,6 +19,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { db } from '$lib/server/db/client';
 import { glyphRecords } from '$lib/server/db/schema-postgres.js';
 import { eq, and, inArray } from 'drizzle-orm';
@@ -56,6 +57,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const { query, caseId, topK = 10, sectionBias, minReward = 0.25, skipAtlas = false } = parsed.data;
+  recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
   const t0 = performance.now();
   const metrics: Record<string, number> = {};
 
