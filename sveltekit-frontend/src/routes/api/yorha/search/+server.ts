@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { evidence, cases, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { or, ilike, desc, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const yorhaSearchSchema = z.object({
 	query: z.string().min(2, 'Query must be at least 2 characters').max(2000),
@@ -28,6 +29,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const { query, limit, sources, vectorSearch: useVector } = parsed.data;
 	const pattern = `%${query}%`;
+
+	recordSearchQuery({ query, pipeline: 'rag', cacheHit: false, userId: locals.user.id });
 
 	const results: Array<{ type: string; id: string; title: string; snippet: string; score: number; metadata: Record<string, unknown> }> = [];
 
