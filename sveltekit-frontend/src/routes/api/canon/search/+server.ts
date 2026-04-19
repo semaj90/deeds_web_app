@@ -17,6 +17,7 @@ import { z } from 'zod';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const QDRANT_COLLECTION = 'legal_canon_chunks';
 
@@ -55,6 +56,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { query, jurisdiction, authorityLevel, docType, limit: topK = 10 } = parsed.data;
+
+		recordSearchQuery({ query, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
 		// 1. Embed query
 		const embedStart = Date.now();
