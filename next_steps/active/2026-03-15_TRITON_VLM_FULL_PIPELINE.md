@@ -1,7 +1,7 @@
 # Triton Inference + VLM + Full Pipeline Roadmap
 
 ## Date: March 15, 2026
-## Status: NOT RUNNING — re-audit Apr 7: Docker image deleted, compose archived, engines never built
+## Status: SUPERSEDED — Docker image deleted, compose archived, engines never built (Apr 7 re-audit). Archive candidate.
 ## Hardware: RTX 3060 Ti (8GB VRAM, SM 86, Ampere)
 
 ---

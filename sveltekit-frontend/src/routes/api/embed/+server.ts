@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+
 import type { RequestHandler } from './$types.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { embedRateLimiter } from '$lib/server/middleware/rate-limiter.js';
@@ -8,8 +8,9 @@ import { embedText } from '$lib/server/embedding/embed.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const OLLAMA_URL = getOllamaUrl();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 const embedRequestSchema = z.object({
 	text: z.string().min(1, 'Text is required').max(50000),

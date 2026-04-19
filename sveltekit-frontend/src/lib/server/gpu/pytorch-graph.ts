@@ -17,6 +17,68 @@ import { createRequire } from 'module';
 
 const esmRequire = createRequire(import.meta.url);
 
+// ── Float32Array pool (matches libtorch-bridge.ts) ────────────────────────
+// Reuses typed arrays across calls to eliminate GC churn.
+
+const float32Pool = new Map<number, Float32Array[]>();
+const POOL_MAX_PER_BUCKET = 6;
+
+function nextPow2(n: number): number {
+	let p = 1;
+	while (p < n) p <<= 1;
+	return p;
+}
+
+function acquireFloat32(n: number): Float32Array {
+	const cap = nextPow2(n);
+	const bucket = float32Pool.get(cap);
+	if (bucket && bucket.length > 0) {
+		const arr = bucket.pop()!;
+		arr.fill(0, 0, n);
+		return arr.subarray(0, n) as Float32Array;
+	}
+	return new Float32Array(cap).subarray(0, n) as Float32Array;
+}
+
+function releaseFloat32(arr: Float32Array): void {
+	const cap = arr.buffer.byteLength / 4;
+	const bucket = float32Pool.get(cap) ?? [];
+	if (bucket.length < POOL_MAX_PER_BUCKET) {
+		bucket.push(new Float32Array(arr.buffer));
+		float32Pool.set(cap, bucket);
+	}
+}
+
+/** Drain the pool — call after large batch jobs to reclaim heap. */
+export function drainFloat32Pool(): void {
+	float32Pool.clear();
+}
+
+// ── CUDA OOM + heap guards ────────────────────────────────────────────────
+
+const CUDA_OOM_MIN_MB = 256;
+
+function heapHasRoom(requiredBytes: number): boolean {
+	const m = process.memoryUsage();
+	return (m.heapTotal - m.heapUsed) >= requiredBytes;
+}
+
+/** Check free VRAM via the addon's getCudaMemory. */
+function gpuHasRoom(requiredMB: number): boolean {
+	const a = getAddon() as Record<string, unknown> | null;
+	const fn = a?.getCudaMemory as ((f: BigInt64Array, t: BigInt64Array) => number) | undefined;
+	if (!fn) return false;
+	try {
+		const f = new BigInt64Array(1), t = new BigInt64Array(1);
+		if (fn(f, t) !== 0) return false;
+		return Number(f[0]) / (1024 * 1024) >= requiredMB;
+	} catch { return false; }
+}
+
+function vramNeededMB(elements: number): number {
+	return (elements * 4) / (1024 * 1024);
+}
+
 // ── Addon interface (shared with libtorch-bridge) ─────────────────────────
 
 interface KmeansResult {
@@ -123,12 +185,27 @@ export function pageRankGPU(
 ): { scores: Float32Array; source: 'gpu' | 'cpu' } {
 	const a = getAddon();
 	if (a?.pageRankGPU) {
-		try {
-			return { scores: a.pageRankGPU(adj, n, damping, iters), source: 'gpu' };
-		} catch (e) {
-			console.warn('[pytorch-graph] pageRankGPU GPU failed, falling back:', e);
-		}
-	}
+    const mb = vramNeededMB(n * n); // adj is n×n
+    if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
+      try {
+        return { scores: a.pageRankGPU(adj, n, damping, iters), source: 'gpu' };
+      } catch (e) {
+        console.warn('[pytorch-graph] pageRankGPU GPU failed, falling back:', e);
+      }
+    } else {
+      console.warn(
+        `[pytorch-graph] pageRankGPU: insufficient VRAM (need ${mb.toFixed(0)} MB), using CPU`
+      );
+    }
+  }
+
+  // CPU heap guard
+  const cpuBytes = n * n * 4 + n * 4; // P matrix + rank vector
+  if (!heapHasRoom(cpuBytes)) {
+    throw new RangeError(
+      `[pytorch-graph] pageRankGPU: insufficient heap for ${n}×${n} matrix (need ~${(cpuBytes / 1e6).toFixed(0)} MB)`
+    );
+  }
 	return { scores: cpuPageRank(adj, n, damping, iters), source: 'cpu' };
 }
 
@@ -144,22 +221,30 @@ export function attentionScoreGPU(
 ): { weights: Float32Array; source: 'gpu' | 'cpu' } {
 	const a = getAddon();
 	if (a?.attentionScoreGPU) {
-		try {
-			return { weights: a.attentionScoreGPU(query, dim, keys, n), source: 'gpu' };
-		} catch (e) {
-			console.warn('[pytorch-graph] attentionScoreGPU GPU failed, falling back:', e);
-		}
-	}
+    const mb = vramNeededMB(dim + n * dim); // query + keys
+    if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
+      try {
+        return { weights: a.attentionScoreGPU(query, dim, keys, n), source: 'gpu' };
+      } catch (e) {
+        console.warn('[pytorch-graph] attentionScoreGPU GPU failed, falling back:', e);
+      }
+    }
+  }
 
-	// CPU fallback: Q @ K^T / sqrt(dim) → softmax
-	const scale = 1 / Math.sqrt(dim);
-	const rawScores = new Float32Array(n);
-	for (let i = 0; i < n; i++) {
-		let dot = 0;
-		for (let d = 0; d < dim; d++) dot += query[d] * keys[i * dim + d];
-		rawScores[i] = dot * scale;
-	}
-	return { weights: cpuSoftmax(rawScores), source: 'cpu' };
+  // CPU fallback: Q @ K^T / sqrt(dim) → softmax — pooled output
+  const scale = 1 / Math.sqrt(dim);
+  const rawScores = acquireFloat32(n);
+  try {
+    for (let i = 0; i < n; i++) {
+      let dot = 0;
+      for (let d = 0; d < dim; d++) dot += query[d] * keys[i * dim + d];
+      rawScores[i] = dot * scale;
+    }
+    // cpuSoftmax returns a new array, so release the pooled scratch
+    return { weights: cpuSoftmax(rawScores), source: 'cpu' };
+  } finally {
+    releaseFloat32(rawScores);
+  }
 }
 
 /**
@@ -172,25 +257,37 @@ export function rewardScoreGPU(
 	n: number,
 	dim: number
 ): { scores: Float32Array; source: 'gpu' | 'cpu' } {
-	const a = getAddon();
-	if (a?.rewardScoreGPU) {
-		try {
-			return { scores: a.rewardScoreGPU(gen, ref, n, dim), source: 'gpu' };
-		} catch (e) {
-			console.warn('[pytorch-graph] rewardScoreGPU GPU failed, falling back:', e);
-		}
-	}
+  const a = getAddon();
+  if (a?.rewardScoreGPU) {
+    const mb = vramNeededMB(2 * n * dim); // gen + ref
+    if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
+      try {
+        return { scores: a.rewardScoreGPU(gen, ref, n, dim), source: 'gpu' };
+      } catch (e) {
+        console.warn('[pytorch-graph] rewardScoreGPU GPU failed, falling back:', e);
+      }
+    }
+  }
 
-	// CPU fallback: element-wise cosine similarity
-	const scores = new Float32Array(n);
-	for (let i = 0; i < n; i++) {
-		const gSlice = l2norm(gen.slice(i * dim, (i + 1) * dim) as Float32Array);
-		const rSlice = l2norm(ref.slice(i * dim, (i + 1) * dim) as Float32Array);
-		let dot = 0;
-		for (let d = 0; d < dim; d++) dot += gSlice[d] * rSlice[d];
-		scores[i] = dot;
-	}
-	return { scores, source: 'cpu' };
+  // CPU heap guard: 2 temp norm vectors + output
+  const cpuBytes = (2 * dim + n) * 4;
+  if (!heapHasRoom(cpuBytes)) {
+    throw new RangeError(
+      `[pytorch-graph] rewardScoreGPU: insufficient heap (need ~${(cpuBytes / 1e6).toFixed(0)} MB)`
+    );
+  }
+
+  // CPU fallback: element-wise cosine similarity — pooled output
+  const scores = acquireFloat32(n);
+  for (let i = 0; i < n; i++) {
+    const gSlice = l2norm(gen.slice(i * dim, (i + 1) * dim) as Float32Array);
+    const rSlice = l2norm(ref.slice(i * dim, (i + 1) * dim) as Float32Array);
+    let dot = 0;
+    for (let d = 0; d < dim; d++) dot += gSlice[d] * rSlice[d];
+    scores[i] = dot;
+  }
+  // Caller owns the array — do NOT release pooled scores here
+  return { scores, source: 'cpu' };
 }
 
 /**
@@ -200,11 +297,13 @@ export function softmaxGPU(logits: Float32Array): { probs: Float32Array; source:
 	const n = logits.length;
 	const a = getAddon();
 	if (a?.softmaxGPU) {
-		try {
-			return { probs: a.softmaxGPU(logits, n), source: 'gpu' };
-		} catch (e) {
-			console.warn('[pytorch-graph] softmaxGPU GPU failed, falling back:', e);
-		}
+		if (gpuHasRoom(vramNeededMB(n) + CUDA_OOM_MIN_MB)) {
+      try {
+        return { probs: a.softmaxGPU(logits, n), source: 'gpu' };
+      } catch (e) {
+        console.warn('[pytorch-graph] softmaxGPU GPU failed, falling back:', e);
+      }
+    }
 	}
 	return { probs: cpuSoftmax(logits), source: 'cpu' };
 }
@@ -220,11 +319,13 @@ export function topKIndices(
 	const n = scores.length;
 	const a = getAddon();
 	if (a?.topKIndicesGPU && k <= n) {
-		try {
-			return { indices: a.topKIndicesGPU(scores, n, k), source: 'gpu' };
-		} catch (e) {
-			console.warn('[pytorch-graph] topKIndicesGPU GPU failed, falling back:', e);
-		}
+		if (gpuHasRoom(vramNeededMB(n) + CUDA_OOM_MIN_MB)) {
+      try {
+        return { indices: a.topKIndicesGPU(scores, n, k), source: 'gpu' };
+      } catch (e) {
+        console.warn('[pytorch-graph] topKIndicesGPU GPU failed, falling back:', e);
+      }
+    }
 	}
 
 	// CPU fallback: sort indices by score descending
@@ -252,13 +353,28 @@ export function kmeansWithCentroids(
 ): { assignments: Int32Array; centroids: Float32Array; source: 'gpu' | 'cpu' } {
 	const a = getAddon();
 	if (a?.kmeansWithCentroids) {
-		try {
-			const result = a.kmeansWithCentroids(embeddings, n, dim, k, maxIters);
-			return { ...result, source: 'gpu' };
-		} catch (e) {
-			console.warn('[pytorch-graph] kmeansWithCentroids GPU failed, falling back:', e);
-		}
-	}
+    const mb = vramNeededMB(n * dim + k * dim); // embeddings + centroids
+    if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
+      try {
+        const result = a.kmeansWithCentroids(embeddings, n, dim, k, maxIters);
+        return { ...result, source: 'gpu' };
+      } catch (e) {
+        console.warn('[pytorch-graph] kmeansWithCentroids GPU failed, falling back:', e);
+      }
+    } else {
+      console.warn(
+        `[pytorch-graph] kmeansWithCentroids: insufficient VRAM (need ${mb.toFixed(0)} MB), using CPU`
+      );
+    }
+  }
+
+  // CPU heap guard: centroids + assignments + temp counts
+  const cpuBytes = k * dim * 4 + n * 4 + k * 4;
+  if (!heapHasRoom(cpuBytes)) {
+    throw new RangeError(
+      `[pytorch-graph] kmeansWithCentroids: insufficient heap (need ~${(cpuBytes / 1e6).toFixed(0)} MB)`
+    );
+  }
 
 	// CPU fallback: Lloyd's algorithm
 	const kClamped = Math.min(k, n);
@@ -329,18 +445,45 @@ export function trainSOM(
 	radInit = Math.max(gridW, gridH) / 2,
 	radFinal = 1.0
 ): { weights: Float32Array; bmu: Int32Array; source: 'gpu' | 'cpu' } {
+	const neurons = gridW * gridH;
 	const a = getAddon();
 	if (a?.trainSOM) {
-		try {
-			const result = a.trainSOM(data, n, dim, gridW, gridH, iters, lrInit, lrFinal, radInit, radFinal);
-			return { ...result, source: 'gpu' };
-		} catch (e) {
-			console.warn('[pytorch-graph] trainSOM GPU failed, falling back:', e);
-		}
-	}
+    const mb = vramNeededMB(n * dim + neurons * dim); // data + weights
+    if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
+      try {
+        const result = a.trainSOM(
+          data,
+          n,
+          dim,
+          gridW,
+          gridH,
+          iters,
+          lrInit,
+          lrFinal,
+          radInit,
+          radFinal
+        );
+        return { ...result, source: 'gpu' };
+      } catch (e) {
+        console.warn('[pytorch-graph] trainSOM GPU failed, falling back:', e);
+      }
+    } else {
+      console.warn(
+        `[pytorch-graph] trainSOM: insufficient VRAM (need ${mb.toFixed(0)} MB), using CPU`
+      );
+    }
+  }
+
+  // CPU heap guard: weights + bmu + gridPos
+  const cpuBytes = neurons * dim * 4 + n * 4 + neurons * 2 * 4;
+  if (!heapHasRoom(cpuBytes)) {
+    throw new RangeError(
+      `[pytorch-graph] trainSOM: insufficient heap for ${neurons} neurons × ${dim} dim (need ~${(cpuBytes / 1e6).toFixed(0)} MB)`
+    );
+  }
 
 	// CPU fallback: Kohonen competitive learning
-	const neurons = gridW * gridH;
+	// (neurons already declared above: const neurons = gridW * gridH)
 	// Init weights: first neurons rows of data (deterministic)
 	const weights = new Float32Array(neurons * dim);
 	const step = Math.max(1, Math.floor(n / neurons));

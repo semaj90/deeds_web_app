@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { tryEmbedOllama } from '$lib/server/embeddings/ollama.js';
+import { tryEmbedOllama } from '$lib/server/embedding/ollama-embed.js';
 
 const wikiSearchSchema = z.object({
 	query: z.string().min(1, 'query is required').max(500),
@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		});
 	} catch (error) {
 		console.error('Wiki list error:', error);
-		return json({ pages: [], total: 0 }, { status: 500 });
+		return json({ pages: [], total: 0 });
 	}
 };
 

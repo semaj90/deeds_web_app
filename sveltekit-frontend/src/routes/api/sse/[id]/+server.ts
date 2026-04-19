@@ -7,13 +7,14 @@ import { json } from '@sveltejs/kit';
  */
 
 import IORedis from 'ioredis';
-import { getRedisUrl } from '$lib/config/env.server.js';
+
 import { produceTokenChunk, readTokenStream } from '$lib/server/redis-streams.js';
 import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const REDIS_URL = getRedisUrl();
+const REDIS_URL = ENV.REDIS_URL;
 
 // Shared Redis pub/sub connection — ONE connection for ALL SSE clients
 // Each client registers a callback; the shared subscriber fans out messages

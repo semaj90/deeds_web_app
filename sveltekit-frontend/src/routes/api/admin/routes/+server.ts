@@ -5,10 +5,11 @@ import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cac
 import fs from 'fs/promises';
 import path from 'path';
 import type { RequestHandler } from './$types';
-import { getQdrantUrl } from '$lib/config/env.server.js';
-import { pool as pgPool } from '$lib/server/db/client';
 
-const QDRANT_URL = getQdrantUrl();
+import { pool as pgPool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
+
+const QDRANT_URL = ENV.QDRANT_URL;
 
 interface RouteInfo {
 	id: string;

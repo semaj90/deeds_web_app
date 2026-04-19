@@ -9,10 +9,15 @@ import { pgRows } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import { traceGraph } from '$lib/server/observability/langfuse.js';
-import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
+import { setCache, getFromMemoryCache, getFromRedisCache } from '$lib/server/cache.js';
 import { topKIndices } from '$lib/server/gpu/pytorch-graph.js';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Cache TTLs for graph walk results.
+// Short for PG 1-hop (case connections change during active investigation).
+// Longer for Neo4j multi-hop (cross-case topology is stable).
+const CASE_NEIGHBOR_CACHE_TTL_MS = 2 * 60_000;  // 2 min
 const UUID_IN_PATH = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
 
 /** Extract UUID-shaped evidence IDs from a node's file_path (e.g. "evidence/cb4b0a08-2b34-...") */
@@ -53,6 +58,20 @@ export interface GraphNeighbor {
  */
 export async function getCaseGraphNeighborIds(caseId: string): Promise<GraphNeighbor[]> {
   if (!caseId || !UUID_PATTERN.test(caseId)) return [];
+
+  const cacheKey = `graph:case:${caseId}:neighbors`;
+
+  // L0: in-process memory cache (zero latency, per-server-instance)
+  const mem = getFromMemoryCache(cacheKey);
+  if (mem.found) return mem.value as GraphNeighbor[];
+
+  // L1: Redis (5ms, cross-request, survives server restart under HMR)
+  const redisCached = await getFromRedisCache<GraphNeighbor[]>(cacheKey);
+  if (redisCached !== null) {
+    // Warm L0 so subsequent calls in this instance skip Redis
+    setCache(cacheKey, redisCached, CASE_NEIGHBOR_CACHE_TTL_MS).catch(() => {});
+    return redisCached;
+  }
 
   return traceGraph('case-graph-neighbors', { caseId }, async () => {
     try {
@@ -102,7 +121,7 @@ export async function getCaseGraphNeighborIds(caseId: string): Promise<GraphNeig
       const connRows = pgRows(connResult);
       if (!connRows?.length) return [];
 
-      return connRows.map((r: any) => ({
+      const neighbors: GraphNeighbor[] = connRows.map((r: any) => ({
         nodeId: r.neighbor_id,
         title: r.neighbor_title ?? '',
         evidenceType: r.neighbor_type ?? '',
@@ -111,6 +130,11 @@ export async function getCaseGraphNeighborIds(caseId: string): Promise<GraphNeig
         confidence: r.confidence_score ?? 0,
         evidenceIds: extractEvidenceIdsFromPath(r.neighbor_file_path),
       }));
+
+      // Write-through: populate L0 + L1 for subsequent requests
+      setCache(cacheKey, neighbors, CASE_NEIGHBOR_CACHE_TTL_MS).catch(() => {});
+
+      return neighbors;
     } catch (err) {
       console.warn('[KAG Pre-Retrieval] Case graph neighbor fetch failed (non-fatal):', err);
       return [];
@@ -323,12 +347,19 @@ export async function getNeo4jMultiHopNeighbors(caseId: string): Promise<GraphNe
   if (!caseId || !UUID_PATTERN.test(caseId)) return [];
 
   return traceGraph('neo4j-multihop', { caseId }, async () => {
-    // Check memory cache first
     const cacheKey = `neo4j:multihop:${caseId}`;
-    try {
-      const cached = getFromMemoryCache(cacheKey);
-      if (cached.found) return cached.value as GraphNeighbor[];
-    } catch {}
+
+    // L0: in-process memory cache
+    const mem = getFromMemoryCache(cacheKey);
+    if (mem.found) return mem.value as GraphNeighbor[];
+
+    // L1: Redis — written by setCache() below; read here so warm cache
+    //     survives server restart / HMR without paying Neo4j round-trip.
+    const redisCached = await getFromRedisCache<GraphNeighbor[]>(cacheKey).catch(() => null);
+    if (redisCached !== null) {
+      setCache(cacheKey, redisCached, NEO4J_CACHE_TTL_MS).catch(() => {}); // warm L0
+      return redisCached;
+    }
 
     try {
       const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');

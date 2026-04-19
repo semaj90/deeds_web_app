@@ -1,10 +1,11 @@
 import { json } from '@sveltejs/kit';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const OLLAMA_URL = getOllamaUrl();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 /**
  * POST /api/summarize

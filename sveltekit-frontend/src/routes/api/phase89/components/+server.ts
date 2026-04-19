@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
-import { getQdrantUrl, getCudaServiceUrl } from '$lib/config/env.server.js';
+
 import type { RequestHandler } from './$types';
+import { ENV } from '$lib/server/env.server.js';
 
 // Phase 89: Components API Endpoint
 // Returns component analysis data with CrewAI agentic metadata
@@ -18,7 +19,7 @@ interface ComponentUnit { unit_id: string, file_path: string;
 export const GET: RequestHandler = async ({ fetch, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const qdrantBaseUrl = getQdrantUrl();
+		const qdrantBaseUrl = ENV.QDRANT_URL;
 
 		// Fetch from Qdrant phase89_code_units collection
 		const qdrantResponse = await fetch(`${qdrantBaseUrl}/collections/phase89_code_units/points/scroll`, {
@@ -65,7 +66,7 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 
 		// Get CUDA status
 		let cudaEnabled = false;
-		const CUDA_SERVICE_URL = getCudaServiceUrl();
+		const CUDA_SERVICE_URL = ENV.CUDA_SERVICE_URL;
 		try {
 			const gpuCheck = await fetch(`${CUDA_SERVICE_URL}/health`, { signal: AbortSignal.timeout(3_000) }).catch(() => null);
 			if (gpuCheck?.ok) {
@@ -116,7 +117,4 @@ function determineDiffStatus(payload: Record<string, unknown>): 'clean' | 'modif
 
 	return 'clean';
 }
-
-
-
 

@@ -1,5 +1,6 @@
 # Consolidated TODO — All Active Roadmaps
 **Date**: April 6, 2026
+**Status**: SUPERSEDED — session-scoped TODO from Apr 6; items completed or rolled into `2026-04-17_architecture-backlog.md`. Archive candidate.
 **Source**: Deep-review pipeline gaps, VLM audit, Whisper GPU, Gemma4 community integration
 
 ---

@@ -12,7 +12,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { routeInference } from '$lib/server/inference/inference-router.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
@@ -147,7 +147,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   if (!tritonReady) {
     // Fast path: try direct Ollama VLM first (works when VRAM is free)
     try {
-      const ollamaUrl = getOllamaUrl();
+      const ollamaUrl = ENV.OLLAMA_BASE_URL;
       const vlmModel = ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M';
       const ollamaRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
         method: 'POST',

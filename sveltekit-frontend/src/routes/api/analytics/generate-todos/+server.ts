@@ -358,3 +358,23 @@ Generate 5-10 todos ordered by estimated impact descending.`;
   job.status = 'done';
   job.finishedAt = new Date().toISOString();
 }
+
+// ── PATCH — update todo status (dismiss / mark done) ─────────────────────
+
+export const PATCH: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+
+  const raw = await request.json().catch(() => ({})) as { id?: string; status?: string };
+  const { id, status } = raw;
+  if (!id || !status) return json({ error: 'id and status required' }, { status: 400 });
+
+  const allowed = ['pending', 'in_progress', 'done', 'dismissed'];
+  if (!allowed.includes(status)) return json({ error: 'invalid status' }, { status: 400 });
+
+  await pool.query(
+    `UPDATE predictive_todos SET status = $1, resolved_at = CASE WHEN $1 IN ('done','dismissed') THEN now() ELSE resolved_at END WHERE id = $2`,
+    [status, id]
+  ).catch(() => null);
+
+  return json({ ok: true });
+};

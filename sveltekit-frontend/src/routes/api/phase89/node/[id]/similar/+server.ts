@@ -7,10 +7,11 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
-import { getDatabaseUrl } from '$lib/config/env.server.js';
-import { isUuid } from '$lib/server/validation.js';
 
-const sql = postgres(getDatabaseUrl());
+import { isUuid } from '$lib/server/validation.js';
+import { ENV } from '$lib/server/env.server.js';
+
+const sql = postgres(ENV.DATABASE_URL);
 
 const querySchema = z.object({
   topK: z.coerce.number().int().min(1).max(50).default(5)

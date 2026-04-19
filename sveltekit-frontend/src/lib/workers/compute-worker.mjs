@@ -368,14 +368,83 @@ function runForensics({ text }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// BATCH COSINE SIMILARITY — cache-blocked CPU fallback
+//
+// TILE = 128 floats (512 bytes) — fits comfortably in L2 D-cache.
+// Inner loop unrolled 8× for SIMD auto-vectorization.
+//
+// SharedArrayBuffer protocol (zero-copy IPC):
+//   payload.sharedQuery   → SharedArrayBuffer (dim floats, query vector)
+//   payload.sharedCorpus  → SharedArrayBuffer (n * dim floats, candidate pool)
+//   payload.sharedScores  → SharedArrayBuffer (n floats, output — written by worker)
+//   payload.n             → number of candidates
+//   payload.dim           → vector dimension (typically 768)
+//
+// If sharedQuery/sharedCorpus are absent, falls back to plain arrays.
+// ═══════════════════════════════════════════════════════════════
+
+const TILE = 128;
+
+function runSimilarity({ sharedQuery, sharedCorpus, sharedScores, query, corpus, n, dim }) {
+	// Zero-copy path: caller passed SharedArrayBuffers (no serialization overhead)
+	const q = sharedQuery
+		? new Float32Array(sharedQuery)
+		: new Float32Array(query);
+	const C = sharedCorpus
+		? new Float32Array(sharedCorpus)
+		: new Float32Array(corpus);
+	const scores = sharedScores
+		? new Float32Array(sharedScores) // write in-place, zero-copy return
+		: new Float32Array(n);
+
+	// Pre-compute query L2 norm (single pass, cache-warm)
+	let qNormSq = 0;
+	for (let d = 0; d < dim; d++) qNormSq += q[d] * q[d];
+	const qNorm = Math.sqrt(qNormSq) || 1e-12;
+
+	// Score each candidate
+	for (let i = 0; i < n; i++) {
+		const off = i * dim;
+
+		// Candidate L2 norm + dot product in blocked passes (L2-cache-friendly)
+		let dot = 0;
+		let cNormSq = 0;
+
+		for (let b = 0; b < dim; b += TILE) {
+			const end = Math.min(b + TILE, dim);
+
+			// Unrolled 8× within the tile
+			let k = b;
+			for (; k + 8 <= end; k += 8) {
+				const c0 = C[off + k],     c1 = C[off + k + 1], c2 = C[off + k + 2], c3 = C[off + k + 3];
+				const c4 = C[off + k + 4], c5 = C[off + k + 5], c6 = C[off + k + 6], c7 = C[off + k + 7];
+				dot     += q[k]*c0     + q[k+1]*c1 + q[k+2]*c2 + q[k+3]*c3
+				         + q[k+4]*c4  + q[k+5]*c5 + q[k+6]*c6 + q[k+7]*c7;
+				cNormSq += c0*c0 + c1*c1 + c2*c2 + c3*c3 + c4*c4 + c5*c5 + c6*c6 + c7*c7;
+			}
+			for (; k < end; k++) {
+				dot     += q[k] * C[off + k];
+				cNormSq += C[off + k] * C[off + k];
+			}
+		}
+
+		scores[i] = dot / (qNorm * (Math.sqrt(cNormSq) || 1e-12));
+	}
+
+	// If using SharedArrayBuffer, scores are already written — return n + dim for ack
+	return sharedScores ? { n, dim, shared: true } : { scores: Array.from(scores), n, dim };
+}
+
+// ═══════════════════════════════════════════════════════════════
 // MESSAGE HANDLER
 // ═══════════════════════════════════════════════════════════════
 
 const HANDLERS = {
-	kmeans: runKMeans,
-	som: runSOM,
-	forensics: runForensics,
+	kmeans:     runKMeans,
+	som:        runSOM,
+	forensics:  runForensics,
 	silhouette: ({ embeddings, assignments, k }) => computeSilhouette(embeddings, assignments, k),
+	similarity: runSimilarity,
 };
 
 parentPort?.on('message', (msg) => {

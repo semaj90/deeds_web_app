@@ -5,8 +5,12 @@
  */
 
 export type WorkflowEventType =
+	// Infrastructure
 	| 'SSE_CONNECTED'
 	| 'SSE_ERROR'
+	| 'WORKFLOW_COMPLETE'
+	| 'WORKFLOW_ERROR'
+	// Evidence pipeline
 	| 'OCR_COMPLETE'
 	| 'OCR_ERROR'
 	| 'EMBEDDING_COMPLETE'
@@ -15,13 +19,28 @@ export type WorkflowEventType =
 	| 'ENTITY_ERROR'
 	| 'SUMMARY_COMPLETE'
 	| 'SUMMARY_ERROR'
-	| 'WORKFLOW_COMPLETE'
-	| 'WORKFLOW_ERROR';
+	// Claude Assist pipeline
+	| 'SCHEMA_LOOKUP_COMPLETE'
+	| 'RERANK_COMPLETE'
+	| 'KAG_COMPLETE'
+	| 'SCAFFOLD_WARMED'
+	| 'ASSIST_COMPLETE'
+	| 'ASSIST_ERROR'
+	// Generic pipeline stage
+	| 'PIPELINE_STAGE_START'
+	| 'PIPELINE_STAGE_DONE'
+	| 'PIPELINE_STAGE_ERROR';
 
 export interface WorkflowEvent {
 	type: WorkflowEventType;
 	sessionId?: string;
 	timestamp?: string;
+	/** Human-readable stage label for UI progress. */
+	label?: string;
+	/** Stage duration in ms. */
+	durationMs?: number;
+	/** Compact result summary (counts, keys, etc.). */
+	data?: Record<string, unknown>;
 	result?: unknown;
 	error?: string;
 }

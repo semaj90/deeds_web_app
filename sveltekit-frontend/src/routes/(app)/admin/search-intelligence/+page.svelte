@@ -2,6 +2,7 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import FeedbackButtons from '$lib/components/ui/FeedbackButtons.svelte';
 	import ResearchSummariesBrowser from '$lib/components/analytics/ResearchSummariesBrowser.svelte';
+	import LiveResearchPanel from '$lib/components/analytics/LiveResearchPanel.svelte';
 
 	// ── Types ─────────────────────────────────────────────────────────────────
 
@@ -25,7 +26,7 @@
 	let loading     = $state(false);
 	let error       = $state<string | null>(null);
 	let autoRefresh = $state(false);
-	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research' | 'summaries' | 'graph'>('queries');
+	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research' | 'summaries' | 'live' | 'assist' | 'tags' | 'graph'>('queries');
 
 	// Distillation runner state
 	let distillRunning  = $state(false);
@@ -37,6 +38,336 @@
 		queued?:    boolean;
 		background?: boolean;
 	} | null>(null);
+
+	// ── Predictive Todos (generate-todos post-graph pipeline) ────────────────
+	type PredictiveTodo = {
+		id: string;
+		todo_type: string;
+		gpu_cluster: number | null;
+		reason: string;
+		suggested_action: string;
+		estimated_impact: string;
+		status: string;
+		generated_at: string;
+	};
+	let todosLoading  = $state(false);
+	let todosRunning  = $state(false);
+	let todosError    = $state<string | null>(null);
+	let todosDays     = $state(7);
+	let todosResult   = $state<PredictiveTodo[]>([]);
+	let todosJobId    = $state<string | null>(null);
+
+	async function loadTodos() {
+		todosLoading = true;
+		try {
+			const r = await fetch('/api/analytics/generate-todos');
+			if (r.ok) { const d = await r.json() as { todos: PredictiveTodo[] }; todosResult = d.todos ?? []; }
+		} catch { /* ignore */ }
+		finally { todosLoading = false; }
+	}
+
+	async function runGenerateTodos(dryRun: boolean) {
+		todosRunning = true;
+		todosError   = null;
+		try {
+			const r = await fetch('/api/analytics/generate-todos', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ days: todosDays, dryRun }),
+			});
+			const d = await r.json() as { jobId?: string; error?: string };
+			if (!r.ok) { todosError = d.error ?? 'Failed'; return; }
+			todosJobId = d.jobId ?? null;
+			// Poll for completion
+			if (todosJobId) {
+				let attempts = 0;
+				const poll = setInterval(async () => {
+					attempts++;
+					const pr = await fetch(`/api/analytics/generate-todos?jobId=${todosJobId}`);
+					const pd = await pr.json() as { status: string; inserted?: number; error?: string };
+					if (pd.status === 'done' || pd.status === 'error' || attempts > 30) {
+						clearInterval(poll);
+						todosRunning = false;
+						if (pd.status === 'error') todosError = pd.error ?? 'Analysis failed';
+						else loadTodos();
+					}
+				}, 2000);
+			} else {
+				todosRunning = false;
+			}
+		} catch (e) {
+			todosError = String((e as { message?: string })?.message ?? e);
+			todosRunning = false;
+		}
+	}
+
+	async function dismissTodo(id: string) {
+		await fetch(`/api/analytics/generate-todos`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ id, status: 'dismissed' }),
+		}).catch(() => {});
+		todosResult = todosResult.filter(t => t.id !== id);
+	}
+
+	// ── Karpathy tag backfill state ──────────────────────────────────────────
+	let tagBackfillRunning  = $state(false);
+	let tagBackfillDryRun   = $state(false);
+	let tagBackfillBatch    = $state(0);
+	let tagBackfillTotal    = $state(0);
+	let tagBackfillTagged   = $state(0);
+	let tagBackfillSkipped  = $state(0);
+	let tagBackfillElapsed  = $state(0);
+	let tagBackfillDist     = $state<Record<string, number>>({});
+	let tagBackfillDone     = $state(false);
+	let tagBackfillError    = $state<string | null>(null);
+	let tagBackfillAbort    = $state<AbortController | null>(null);
+
+	// Tag status (loaded on tab switch)
+	let tagStatusLoading = $state(false);
+	let tagStatus = $state<{ tagged: number; total: number; pct: number; semanticTagDist: Record<string, number> } | null>(null);
+
+	async function loadTagStatus() {
+		tagStatusLoading = true;
+		try {
+			const res = await fetch('/api/codebase-index/karpathy-tag');
+			if (res.ok) tagStatus = await res.json();
+		} catch { /* ignore */ }
+		finally { tagStatusLoading = false; }
+	}
+
+	async function startTagBackfill() {
+		if (tagBackfillRunning) return;
+		tagBackfillRunning = true;
+		tagBackfillBatch   = 0;
+		tagBackfillTotal   = 0;
+		tagBackfillTagged  = 0;
+		tagBackfillSkipped = 0;
+		tagBackfillElapsed = 0;
+		tagBackfillDist    = {};
+		tagBackfillDone    = false;
+		tagBackfillError   = null;
+
+		const ctrl = new AbortController();
+		tagBackfillAbort = ctrl;
+
+		try {
+			const params = new URLSearchParams({ batchSize: '20' });
+			if (tagBackfillDryRun) params.set('dryRun', 'true');
+
+			const res = await fetch(`/api/codebase-index/karpathy-tag/backfill?${params}`, {
+				signal: ctrl.signal,
+			});
+			if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+			const reader = res.body.getReader();
+			const dec    = new TextDecoder();
+			let buf = '';
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				buf += dec.decode(value, { stream: true });
+
+				let idx;
+				while ((idx = buf.indexOf('\n\n')) !== -1) {
+					const block = buf.slice(0, idx).trim();
+					buf = buf.slice(idx + 2);
+					if (!block) continue;
+
+					const eventMatch = block.match(/^event:\s*(.+)$/m);
+					const dataMatch  = block.match(/^data:\s*(.+)$/m);
+					if (!eventMatch || !dataMatch) continue;
+
+					const evt = eventMatch[1];
+					let d: Record<string, unknown>;
+					try { d = JSON.parse(dataMatch[1]); } catch { continue; }
+
+					if (evt === 'batch') {
+						tagBackfillBatch   = (d.batch as number) ?? 0;
+						tagBackfillTotal   = (d.totalProcessed as number) ?? 0;
+						tagBackfillTagged  = (d.totalTagged as number) ?? 0;
+						tagBackfillSkipped = (d.totalSkipped as number) ?? 0;
+						tagBackfillElapsed = (d.elapsed as number) ?? 0;
+						tagBackfillDist    = (d.tagDist as Record<string, number>) ?? {};
+					} else if (evt === 'done') {
+						tagBackfillDone    = true;
+						tagBackfillTotal   = (d.totalProcessed as number) ?? tagBackfillTotal;
+						tagBackfillTagged  = (d.totalTagged as number) ?? tagBackfillTagged;
+						tagBackfillElapsed = (d.elapsed as number) ?? tagBackfillElapsed;
+						tagBackfillDist    = (d.tagDist as Record<string, number>) ?? tagBackfillDist;
+					} else if (evt === 'error') {
+						tagBackfillError = (d.message as string) ?? 'Unknown error';
+					}
+				}
+			}
+		} catch (err) {
+			if ((err as Error).name !== 'AbortError') {
+				tagBackfillError = (err as Error).message;
+			}
+		} finally {
+			tagBackfillRunning = false;
+			tagBackfillAbort   = null;
+			void loadTagStatus();
+		}
+	}
+
+	function cancelTagBackfill() {
+		tagBackfillAbort?.abort();
+		tagBackfillRunning = false;
+	}
+
+	// ── Claude-Assist debug panel state ────────────────────────────────────
+	let assistDebugQuery    = $state('');
+	let assistDebugLoading  = $state(false);
+	let assistDebugResult   = $state<Record<string, unknown> | null>(null);
+	let assistDebugError    = $state<string | null>(null);
+
+	async function runAssistDebug() {
+		if (!assistDebugQuery.trim() || assistDebugLoading) return;
+		assistDebugLoading = true;
+		assistDebugResult  = null;
+		assistDebugError   = null;
+		feedbackSent       = false;
+		try {
+			const res = await fetch('/api/codebase-index/claude-assist', {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query: assistDebugQuery.trim(),
+					compact: true,
+					compactContext: true,
+					preferCachedResearch: true,
+					debug: true,
+				}),
+			});
+			if (res.ok) {
+				assistDebugResult = await res.json();
+			} else {
+				assistDebugError = `HTTP ${res.status}: ${await res.text().catch(() => 'failed')}`;
+			}
+		} catch (err) {
+			assistDebugError = (err as Error).message;
+		} finally {
+			assistDebugLoading = false;
+		}
+	}
+
+	// ── Feedback state ────────────────────────────────────────────────────
+	let feedbackSent     = $state(false);
+	let feedbackLoading  = $state(false);
+	let feedbackStats    = $state<{ total: number; useful: number; notUseful: number; usefulPct: number; recent: any[] } | null>(null);
+
+	async function sendFeedback(useful: boolean) {
+		if (!assistDebugResult || feedbackLoading) return;
+		const r = assistDebugResult as Record<string, any>;
+		feedbackLoading = true;
+		try {
+			await fetch('/api/codebase-index/claude-assist/feedback', {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					queryHash: r.cache?.key?.split(':').pop() ?? 'unknown',
+					cacheSlot: r.cache?.key ?? '',
+					useful,
+				}),
+			});
+			feedbackSent = true;
+		} catch { /* non-fatal */ }
+		feedbackLoading = false;
+	}
+
+	async function loadFeedbackStats() {
+		try {
+			const res = await fetch('/api/codebase-index/claude-assist/feedback?limit=20');
+			if (res.ok) feedbackStats = await res.json();
+		} catch { /* non-fatal */ }
+	}
+
+	// ── Feedback analysis state ───────────────────────────────────────────
+	let analysisData    = $state<Record<string, any> | null>(null);
+	let analysisLoading = $state(false);
+	let analysisWindow  = $state<string>('all');
+
+	async function loadAnalysis() {
+		analysisLoading = true;
+		try {
+			const params = new URLSearchParams({ limit: '200' });
+			if (analysisWindow !== 'all') params.set('window', analysisWindow);
+			const res = await fetch(`/api/codebase-index/claude-assist/feedback/analysis?${params}`);
+			if (res.ok) {
+				analysisData = await res.json();
+				loadAppliedDefaults();
+			}
+		} catch { /* non-fatal */ }
+		analysisLoading = false;
+	}
+
+	// ── Applied defaults state ────────────────────────────────────────────
+	let appliedDefaults = $state<{ codeDefaults: Record<string, any>; applied: Record<string, any> | null; appliedAt: string | null } | null>(null);
+	let defaultsLoading = $state(false);
+	let applyingDefaults = $state(false);
+	let applyMessage = $state<string | null>(null);
+
+	async function loadAppliedDefaults() {
+		defaultsLoading = true;
+		try {
+			const res = await fetch('/api/codebase-index/claude-assist/defaults');
+			if (res.ok) appliedDefaults = await res.json();
+		} catch { /* non-fatal */ }
+		defaultsLoading = false;
+	}
+
+	async function applyDefaults(defaults: Record<string, any>) {
+		applyingDefaults = true;
+		applyMessage = null;
+		try {
+			const res = await fetch('/api/codebase-index/claude-assist/defaults', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(defaults),
+			});
+			if (res.ok) {
+				applyMessage = 'Defaults applied successfully';
+				await loadAppliedDefaults();
+				await loadAnalysis();
+			} else {
+				const data = await res.json().catch(() => ({}));
+				applyMessage = data.error ?? 'Failed to apply';
+			}
+		} catch {
+			applyMessage = 'Network error';
+		}
+		applyingDefaults = false;
+	}
+
+	let revertingDefaults = $state(false);
+	let revertMessage = $state<string | null>(null);
+
+	async function revertDefaults() {
+		if (!analysisData?.defaultsImpact?.previous) return;
+		revertingDefaults = true;
+		revertMessage = null;
+		try {
+			const res = await fetch('/api/codebase-index/claude-assist/defaults', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(analysisData.defaultsImpact.previous),
+			});
+			if (res.ok) {
+				revertMessage = 'Reverted to previous defaults';
+				await loadAppliedDefaults();
+				await loadAnalysis();
+			} else {
+				const data = await res.json().catch(() => ({}));
+				revertMessage = data.error ?? 'Failed to revert';
+			}
+		} catch {
+			revertMessage = 'Network error';
+		}
+		revertingDefaults = false;
+	}
+
 	let distillError    = $state<string | null>(null);
 	let minRerankScore  = $state(0.8);
 	let distillLimit    = $state(100);
@@ -481,6 +812,7 @@
 		if (activeSection === 'training') {
 			void leaderSection;
 			fetch_leaderboard();
+			if (!todosResult.length && !todosLoading) loadTodos();
 		}
 	});
 
@@ -721,6 +1053,15 @@
 	</button>
 	<button class="s-tab" class:active={activeSection === 'summaries'} onclick={() => activeSection = 'summaries'}>
 		<Icon name="library" class="w-3.5 h-3.5" /> Summaries
+	</button>
+	<button class="s-tab" class:active={activeSection === 'live'} onclick={() => activeSection = 'live'}>
+		<Icon name="radio" class="w-3.5 h-3.5" /> Live Research
+	</button>
+	<button class="s-tab" class:active={activeSection === 'assist'} onclick={() => activeSection = 'assist'}>
+		<Icon name="sparkles" class="w-3.5 h-3.5" /> Assist
+	</button>
+	<button class="s-tab" class:active={activeSection === 'tags'} onclick={() => { activeSection = 'tags'; if (!tagStatus && !tagStatusLoading) void loadTagStatus(); }}>
+		<Icon name="tag" class="w-3.5 h-3.5" /> Tags
 	</button>
 	<button class="s-tab" class:active={activeSection === 'graph'} onclick={() => activeSection = 'graph'}>
 		<Icon name="network" class="w-3.5 h-3.5" /> Graph RL
@@ -1330,6 +1671,67 @@
 		{/if}
 	</section>
 
+	<!-- Predictive Todos — post-graph pipeline: LLM gap analysis → actionable tasks -->
+	<section class="panel span2">
+		<h2>
+			<Icon name="list-checks" class="w-4 h-4" style="color:#38bdf8" /> Predictive To-Do List
+			<span class="h2-sub">Gap analysis from cluster heat + low-rerank queries → actionable dev tasks</span>
+			{#if todosResult.length}
+				<span class="h2-badge">{todosResult.filter(t => t.status === 'pending').length} pending</span>
+			{/if}
+		</h2>
+
+		<div class="distill-controls" style="margin-bottom:0.75rem">
+			<label class="field" style="flex-direction:row;align-items:center;gap:0.5rem">
+				<span class="muted" style="font-size:0.75rem">Lookback</span>
+				<select class="ctrl-select" style="width:90px" bind:value={todosDays}>
+					{#each [1,3,7,14,30] as d}<option value={d}>{d}d</option>{/each}
+				</select>
+			</label>
+			<button class="btn-distill dry"
+				disabled={todosRunning}
+				onclick={() => runGenerateTodos(true)}>
+				<Icon name="eye" class="w-3.5 h-3.5" /> Preview
+			</button>
+			<button class="btn-distill run"
+				disabled={todosRunning}
+				onclick={() => runGenerateTodos(false)}>
+				<Icon name="cpu" class="w-3.5 h-3.5" />
+				{todosRunning ? 'Analysing…' : 'Generate todos'}
+			</button>
+			<button class="btn-distill export" onclick={loadTodos} disabled={todosLoading}>
+				<Icon name="refresh-cw" class="w-3.5 h-3.5" />
+				{todosLoading ? 'Loading…' : 'Refresh'}
+			</button>
+		</div>
+
+		{#if todosError}
+			<div class="distill-err">{todosError}</div>
+		{/if}
+
+		{#if todosResult.length === 0 && !todosLoading && !todosRunning}
+			<p class="muted" style="font-size:0.8rem">No todos yet — click Generate to run LLM gap analysis.</p>
+		{:else}
+			<div class="todo-list">
+				{#each todosResult.filter(t => t.status !== 'dismissed') as todo (todo.id)}
+					{@const impactColor = todo.estimated_impact === 'high' ? '#f87171' : todo.estimated_impact === 'medium' ? '#f59e0b' : '#94a3b8'}
+					<div class="todo-row" class:done={todo.status === 'done'}>
+						<span class="todo-impact" style="color:{impactColor};border-color:{impactColor}40">{todo.estimated_impact}</span>
+						<span class="todo-type mono">{todo.todo_type.replace(/_/g, ' ')}</span>
+						{#if todo.gpu_cluster != null}
+							<span class="todo-cluster muted">cluster {todo.gpu_cluster}</span>
+						{/if}
+						<span class="todo-reason" title={todo.suggested_action}>{todo.reason}</span>
+						<code class="todo-action">{todo.suggested_action.slice(0, 80)}{todo.suggested_action.length > 80 ? '…' : ''}</code>
+						<button class="todo-dismiss" onclick={() => dismissTodo(todo.id)} title="Dismiss">
+							<Icon name="x" class="w-3 h-3" />
+						</button>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</section>
+
 	{/if}
 
 </div>
@@ -1634,6 +2036,565 @@
 		<div class="summaries-browser-wrap">
 			<ResearchSummariesBrowser />
 		</div>
+	</section>
+</div>
+{/if}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     LIVE RESEARCH — SSE streaming concurrent research panel
+══════════════════════════════════════════════════════════════════════ -->
+{#if activeSection === 'live'}
+<div class="si-grid wide">
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="radio" class="w-4 h-4" style="color:#4ade80" /> Live Concurrent Research</span>
+			<span class="panel-sub">
+				Stream a LangGraph supervisor → parallel domain workers → Ollama synthesis pipeline.
+				Worker results appear as they arrive. Persisted summaries link back to the Summaries tab.
+			</span>
+		</div>
+		<LiveResearchPanel />
+	</section>
+</div>
+{/if}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     CLAUDE ASSIST DEBUG — compact pipeline diagnostics
+══════════════════════════════════════════════════════════════════════ -->
+{#if activeSection === 'assist'}
+<div class="si-grid wide">
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="sparkles" class="w-4 h-4" style="color:#a78bfa" /> Claude Assist Debug</span>
+			<span class="panel-sub">
+				Run a compact claude-assist query with debug=true to inspect latency, cache, budgets, and retrieval counts.
+			</span>
+		</div>
+
+		<div class="ad-input-row">
+			<input
+				type="text"
+				class="ad-query"
+				placeholder="Claude-assist query — e.g. 'How does the evidence pipeline handle OCR fallback?'"
+				bind:value={assistDebugQuery}
+				onkeydown={(e) => { if (e.key === 'Enter') runAssistDebug(); }}
+				disabled={assistDebugLoading}
+			/>
+			<button class="ad-btn" onclick={runAssistDebug} disabled={!assistDebugQuery.trim() || assistDebugLoading}>
+				{assistDebugLoading ? 'Running…' : 'Run'}
+			</button>
+		</div>
+
+		{#if assistDebugError}
+			<div class="ad-error">❌ {assistDebugError}</div>
+		{/if}
+
+		{#if assistDebugResult}
+			{@const r = assistDebugResult as Record<string, any>}
+			<div class="ad-cards">
+				<div class="ad-card">
+					<span class="ad-label">Latency</span>
+					<span class="ad-value">{r.timing?.totalMs ?? '–'}ms</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Cache</span>
+					<span class="ad-value" class:hit={r.cache?.hit} class:miss={!r.cache?.hit}>
+						{r.cache?.hit ? 'HIT' : 'MISS'}
+					</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Content Hits</span>
+					<span class="ad-value">{r.retrieval?.content_hits ?? 0}</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Error Hits</span>
+					<span class="ad-value">{r.retrieval?.error_hits ?? 0}</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">ACE Chunks</span>
+					<span class="ad-value">{r.ace_context?.top_chunks?.length ?? 0}</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Research Workers</span>
+					<span class="ad-value">{r.research?.workers ?? 0}</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Schema IDs</span>
+					<span class="ad-value">{r.retrieval?.schema_ids ?? 0}</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Compact</span>
+					<span class="ad-value">{r.compact ? 'ON' : 'OFF'}</span>
+				</div>
+			</div>
+
+			<!-- Timing breakdown -->
+			<div class="ad-timing">
+				<h4>Timing</h4>
+				{#each Object.entries(r.timing ?? {}) as [k, v]}
+					<span class="ad-timing-item"><strong>{k}</strong>: {v}ms</span>
+				{/each}
+			</div>
+
+			<!-- Debug diagnostics (only when debug=true returned them) -->
+			{#if r.diagnostics}
+				<details class="ad-details">
+					<summary>Diagnostics (budgets + raw counts)</summary>
+					<pre class="ad-pre">{JSON.stringify(r.diagnostics, null, 2)}</pre>
+				</details>
+			{/if}
+
+			<!-- Research summary preview -->
+			{#if r.research?.markdown}
+				<details class="ad-details">
+					<summary>Research Summary ({r.research.markdown.length} chars)</summary>
+					<pre class="ad-pre">{r.research.markdown}</pre>
+				</details>
+			{/if}
+
+			<div class="ad-cache-key">
+				<Icon name="key" class="w-3 h-3" /> {r.cache?.key ?? '–'}
+			</div>
+
+			<!-- Feedback row -->
+			<div class="fb-row">
+				{#if feedbackSent}
+					<span class="fb-thanks">Thanks for feedback</span>
+				{:else}
+					<span class="fb-label">Was this useful?</span>
+					<button class="fb-btn fb-up" onclick={() => sendFeedback(true)} disabled={feedbackLoading}>
+						<Icon name="thumbs-up" class="w-4 h-4" /> Yes
+					</button>
+					<button class="fb-btn fb-down" onclick={() => sendFeedback(false)} disabled={feedbackLoading}>
+						<Icon name="thumbs-down" class="w-4 h-4" /> No
+					</button>
+				{/if}
+				<button class="fb-stats-btn" onclick={loadFeedbackStats} style="margin-left:auto">
+					<Icon name="bar-chart-2" class="w-3 h-3" /> Stats
+				</button>
+			</div>
+
+			<!-- Feedback stats (if loaded) -->
+			{#if feedbackStats}
+				<div class="fb-stats">
+					<span class="fb-stat">Total: <strong>{feedbackStats.total}</strong></span>
+					<span class="fb-stat">Useful: <strong>{feedbackStats.useful}</strong></span>
+					<span class="fb-stat">Not useful: <strong>{feedbackStats.notUseful}</strong></span>
+					<span class="fb-stat fb-pct" class:fb-good={feedbackStats.usefulPct >= 70} class:fb-warn={feedbackStats.usefulPct >= 40 && feedbackStats.usefulPct < 70} class:fb-low={feedbackStats.usefulPct < 40}>
+						{feedbackStats.usefulPct}% useful
+					</span>
+				</div>
+			{/if}
+		{/if}
+	</section>
+
+	<!-- ── Feedback Analysis Panel ──────────────────────────────────────── -->
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="bar-chart-2" class="w-4 h-4" style="color:#60a5fa" /> Retrieval Quality Analysis</span>
+			<span class="panel-sub">
+				Correlates human feedback with assist run telemetry. The key metric: do retrieved files match what the operator actually edits?
+			</span>
+		</div>
+
+		<div class="fa-toolbar">
+			<button class="ad-btn" onclick={loadAnalysis} disabled={analysisLoading}>
+				{analysisLoading ? 'Loading…' : 'Load Analysis'}
+			</button>
+			<select class="fa-window-select" bind:value={analysisWindow} onchange={loadAnalysis}>
+				<option value="all">All time</option>
+				<option value="7d">Last 7 days</option>
+				<option value="25">Last 25 runs</option>
+				<option value="50">Last 50 runs</option>
+			</select>
+		</div>
+
+		{#if analysisData}
+			{@const a = analysisData}
+
+			<!-- Top-line KPIs -->
+			<div class="ad-cards">
+				<div class="ad-card">
+					<span class="ad-label">Useful Rate</span>
+					<span class="ad-value" class:fb-good={a.overallStats.usefulPct >= 70} class:fb-warn={a.overallStats.usefulPct >= 40 && a.overallStats.usefulPct < 70} class:fb-low={a.overallStats.usefulPct < 40}>
+						{a.overallStats.usefulPct}%
+					</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Overlap Rate</span>
+					<span class="ad-value" class:fb-good={a.overlapRate.mean >= 50} class:fb-warn={a.overlapRate.mean >= 20 && a.overlapRate.mean < 50} class:fb-low={a.overlapRate.mean < 20}>
+						{a.overlapRate.mean}%
+					</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">Feedback Samples</span>
+					<span class="ad-value">{a.overallStats.total}</span>
+				</div>
+				<div class="ad-card">
+					<span class="ad-label">With Edits</span>
+					<span class="ad-value">{a.overlapRate.withEdits}</span>
+				</div>
+			</div>
+
+			<!-- Auto-suggested recommendations -->
+			{#if a.recommendations?.length > 0}
+				<div class="fa-recs">
+					<h4 class="fa-heading">Suggested Tuning</h4>
+					{#each a.recommendations as rec}
+						<div class="fa-rec" class:fa-rec-high={rec.confidence === 'high'} class:fa-rec-medium={rec.confidence === 'medium'} class:fa-rec-low={rec.confidence === 'low'}>
+							<Icon name={rec.icon} class="w-3.5 h-3.5 shrink-0" />
+							<span class="fa-rec-text">{rec.text}</span>
+							<span class="fa-rec-conf">{rec.confidence}</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+
+			<!-- Apply Suggested Defaults panel -->
+			{#if a.suggestedDefaults}
+				<div class="fa-apply-panel">
+					<h4 class="fa-heading">Apply Suggested Defaults</h4>
+					<div class="fa-apply-grid">
+						{#if a.suggestedDefaults.maxGraphNeighbors != null}
+							<div class="fa-apply-row">
+								<span class="fa-apply-label">Max Graph Neighbors</span>
+								<span class="fa-apply-current">current: {appliedDefaults?.applied?.maxGraphNeighbors ?? 10}</span>
+								<span class="fa-apply-arrow">→</span>
+								<span class="fa-apply-suggested">{a.suggestedDefaults.maxGraphNeighbors}</span>
+							</div>
+						{/if}
+						{#if a.suggestedDefaults.maxAceChunks != null}
+							<div class="fa-apply-row">
+								<span class="fa-apply-label">Max ACE Chunks</span>
+								<span class="fa-apply-current">current: {appliedDefaults?.applied?.maxAceChunks ?? 6}</span>
+								<span class="fa-apply-arrow">→</span>
+								<span class="fa-apply-suggested">{a.suggestedDefaults.maxAceChunks}</span>
+							</div>
+						{/if}
+						{#if a.suggestedDefaults.compact != null}
+							<div class="fa-apply-row">
+								<span class="fa-apply-label">Default Mode</span>
+								<span class="fa-apply-current">current: {appliedDefaults?.applied?.compact !== false ? 'compact' : 'debug'}</span>
+								<span class="fa-apply-arrow">→</span>
+								<span class="fa-apply-suggested">{a.suggestedDefaults.compact ? 'compact' : 'debug'}</span>
+							</div>
+						{/if}
+						{#if a.suggestedDefaults.cacheTtlHint}
+							<div class="fa-apply-row">
+								<span class="fa-apply-label">Cache TTL</span>
+								<span class="fa-apply-current">current: {appliedDefaults?.applied?.cacheTtlHint ?? 'keep'}</span>
+								<span class="fa-apply-arrow">→</span>
+								<span class="fa-apply-suggested">{a.suggestedDefaults.cacheTtlHint}</span>
+							</div>
+						{/if}
+					</div>
+					<div class="fa-apply-actions">
+						<button class="ad-btn" onclick={() => applyDefaults(a.suggestedDefaults)} disabled={applyingDefaults}>
+							{applyingDefaults ? 'Applying…' : 'Apply Suggested Defaults'}
+						</button>
+						<button class="ad-btn" onclick={loadAppliedDefaults} disabled={defaultsLoading}>
+							{defaultsLoading ? 'Loading…' : 'Refresh Current'}
+						</button>
+						{#if applyMessage}
+							<span class="fa-apply-msg">{applyMessage}</span>
+						{/if}
+					</div>
+					{#if appliedDefaults?.appliedAt}
+						<div class="fa-apply-meta">Last applied: {new Date(appliedDefaults.appliedAt).toLocaleString()}</div>
+					{/if}
+				</div>
+			{/if}
+
+			<!-- Defaults impact: before/after comparison -->
+			{#if a.defaultsImpact}
+				{@const d = a.defaultsImpact}
+				<div class="fa-impact-panel">
+					<h4 class="fa-heading">Defaults Impact</h4>
+					<div class="fa-impact-meta">
+						Applied: {new Date(d.appliedAt).toLocaleString()}
+						· Before: {d.before.total} samples · After: {d.after.total} samples
+					</div>
+					<div class="fa-impact-grid">
+						<div class="fa-impact-col">
+							<span class="fa-impact-label">Before</span>
+							<span class="fa-impact-val">{d.before.usefulPct}% useful</span>
+							<span class="fa-impact-val">{d.before.overlapMean}% overlap</span>
+						</div>
+						<div class="fa-impact-col fa-impact-arrow-col">
+							<span class="fa-impact-arrow">→</span>
+						</div>
+						<div class="fa-impact-col">
+							<span class="fa-impact-label">After</span>
+							<span class="fa-impact-val">{d.after.usefulPct}% useful</span>
+							<span class="fa-impact-val">{d.after.overlapMean}% overlap</span>
+						</div>
+						<div class="fa-impact-col">
+							<span class="fa-impact-label">Delta</span>
+							<span class="fa-impact-delta" class:fa-delta-pos={d.delta.usefulPct > 0} class:fa-delta-neg={d.delta.usefulPct < 0}>
+								{d.delta.usefulPct > 0 ? '+' : ''}{d.delta.usefulPct}% useful
+							</span>
+							<span class="fa-impact-delta" class:fa-delta-pos={d.delta.overlapMean > 0} class:fa-delta-neg={d.delta.overlapMean < 0}>
+								{d.delta.overlapMean > 0 ? '+' : ''}{d.delta.overlapMean}% overlap
+							</span>
+						</div>
+					</div>
+					{#if d.current}
+						<div class="fa-impact-defaults">
+							<span class="fa-impact-def-label">Current defaults:</span>
+							{#each Object.entries(d.current) as [k, v]}
+								<span class="fa-pill">{k}: {v}</span>
+							{/each}
+						</div>
+					{/if}
+					{#if d.previous}
+						<div class="fa-impact-defaults">
+							<span class="fa-impact-def-label">Previous defaults:</span>
+							{#each Object.entries(d.previous) as [k, v]}
+								<span class="fa-pill">{k}: {v}</span>
+							{/each}
+						</div>
+					{/if}
+					{#if d.previous}
+						<div class="fa-impact-actions">
+							<button class="ad-btn fa-revert-btn" onclick={revertDefaults} disabled={revertingDefaults}>
+								{revertingDefaults ? 'Reverting…' : 'Revert to Previous Defaults'}
+							</button>
+							{#if revertMessage}
+								<span class="fa-apply-msg">{revertMessage}</span>
+							{/if}
+						</div>
+					{/if}
+					{#if d.domainImpact && d.domainImpact.length > 0}
+						<div class="fa-impact-domain-section">
+							<span class="fa-impact-def-label">Per-domain deltas:</span>
+							<div class="fa-impact-domain-grid">
+								{#each d.domainImpact as di}
+									<div class="fa-impact-domain-row">
+										<span class="fa-domain-name">{di.domain}</span>
+										<span class="fa-impact-delta" class:fa-delta-pos={di.delta.usefulPct > 0} class:fa-delta-neg={di.delta.usefulPct < 0}>
+											{di.delta.usefulPct > 0 ? '+' : ''}{di.delta.usefulPct}% useful
+										</span>
+										<span class="fa-impact-delta" class:fa-delta-pos={di.delta.overlapMean > 0} class:fa-delta-neg={di.delta.overlapMean < 0}>
+											{di.delta.overlapMean > 0 ? '+' : ''}{di.delta.overlapMean}% overlap
+										</span>
+										<span class="fa-impact-counts">{di.before.total}→{di.after.total}</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			<!-- Cache hit vs miss usefulness -->
+			<div class="fa-section">
+				<h4 class="fa-heading">Cache Hit vs Miss</h4>
+				<div class="fa-row">
+					<span class="fa-pill">HIT: {a.byCacheHit.hit.pct}% useful ({a.byCacheHit.hit.total})</span>
+					<span class="fa-pill">MISS: {a.byCacheHit.miss.pct}% useful ({a.byCacheHit.miss.total})</span>
+				</div>
+			</div>
+
+			<!-- Compact vs debug usefulness -->
+			<div class="fa-section">
+				<h4 class="fa-heading">Compact vs Debug</h4>
+				<div class="fa-row">
+					<span class="fa-pill">Compact: {a.byCompactMode.compact.pct}% useful ({a.byCompactMode.compact.total})</span>
+					<span class="fa-pill">Debug: {a.byCompactMode.debug.pct}% useful ({a.byCompactMode.debug.total})</span>
+				</div>
+			</div>
+
+			<!-- Domain breakdown -->
+			{#if a.byDomain.length > 0}
+				<div class="fa-section">
+					<h4 class="fa-heading">By Research Domain</h4>
+					<div class="fa-domain-grid">
+						{#each a.byDomain as d}
+							<div class="fa-domain-row">
+								<span class="fa-domain-name">{d.domain}</span>
+								<div class="fa-bar-track">
+									<div class="fa-bar-fill" class:fb-good={d.pct >= 70} class:fb-warn={d.pct >= 40 && d.pct < 70} class:fb-low={d.pct < 40}
+										style="width:{d.pct}%"></div>
+								</div>
+								<span class="fa-domain-pct">{d.pct}% ({d.total})</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			<!-- Graph neighbor buckets -->
+			{#if a.byGraphBucket.length > 0}
+				<div class="fa-section">
+					<h4 class="fa-heading">By Graph Neighbors</h4>
+					<div class="fa-row">
+						{#each a.byGraphBucket as g}
+							<span class="fa-pill">{g.bucket}: {g.pct}% ({g.total})</span>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			<!-- Latency buckets -->
+			{#if a.latencyBuckets.length > 0}
+				<div class="fa-section">
+					<h4 class="fa-heading">By Latency</h4>
+					<div class="fa-row">
+						{#each a.latencyBuckets as l}
+							<span class="fa-pill">{l.bucket}: {l.pct}% useful ({l.total})</span>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			<!-- Recent correlated feedback -->
+			{#if a.recentCorrelated.length > 0}
+				<details class="ad-details">
+					<summary>Recent Correlated Feedback ({a.recentCorrelated.length})</summary>
+					<div class="fa-table-wrap">
+						<table class="fa-table">
+							<thead>
+								<tr>
+									<th>Useful</th>
+									<th>Domains</th>
+									<th>Top Paths</th>
+									<th>Edited</th>
+									<th>Cache</th>
+									<th>Graph</th>
+									<th>ms</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each a.recentCorrelated as c}
+									<tr>
+										<td>{c.useful ? 'Yes' : 'No'}</td>
+										<td class="fa-cell-sm">{(c.domains ?? []).join(', ') || '–'}</td>
+										<td class="fa-cell-sm">{(c.topPaths ?? []).map((p: string) => p.split('/').pop()).join(', ') || '–'}</td>
+										<td class="fa-cell-sm">{(c.editedFiles ?? []).map((p: string) => p.split('/').pop()).join(', ') || '–'}</td>
+										<td>{c.cacheHit ? 'HIT' : c.cacheHit === false ? 'MISS' : '–'}</td>
+										<td>{c.graphNeighbors ?? '–'}</td>
+										<td>{c.totalMs ?? '–'}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				</details>
+			{/if}
+		{/if}
+	</section>
+</div>
+{/if}
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     KARPATHY TAG BACKFILL — semantic tag enrichment + status
+══════════════════════════════════════════════════════════════════════ -->
+{#if activeSection === 'tags'}
+<div class="si-grid wide">
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="tag" class="w-4 h-4" style="color:#4ade80" /> Karpathy Semantic Tags</span>
+			<span class="panel-sub">
+				Classifies codebase chunks into 20 semantic categories via Ollama. Tags enable precise domain filtering in concurrent research.
+			</span>
+		</div>
+
+		<!-- Status bar -->
+		{#if tagStatusLoading}
+			<div class="ad-timing"><span class="ad-timing-item">Loading tag status…</span></div>
+		{:else if tagStatus}
+			<div class="tb-status-bar">
+				<div class="tb-stat">
+					<span class="tb-stat-label">Tagged</span>
+					<span class="tb-stat-value">{tagStatus.tagged}</span>
+				</div>
+				<div class="tb-stat">
+					<span class="tb-stat-label">Total</span>
+					<span class="tb-stat-value">{tagStatus.total}</span>
+				</div>
+				<div class="tb-stat">
+					<span class="tb-stat-label">Coverage</span>
+					<span class="tb-stat-value" class:tb-good={tagStatus.pct >= 80} class:tb-warn={tagStatus.pct >= 30 && tagStatus.pct < 80} class:tb-low={tagStatus.pct < 30}>
+						{tagStatus.pct}%
+					</span>
+				</div>
+				<button class="ad-btn" onclick={loadTagStatus} style="margin-left:auto">
+					<Icon name="refresh-cw" class="w-3 h-3" /> Refresh
+				</button>
+			</div>
+
+			<!-- Tag distribution -->
+			{#if Object.keys(tagStatus.semanticTagDist).length > 0}
+				<div class="tb-dist">
+					{#each Object.entries(tagStatus.semanticTagDist).sort((a, b) => b[1] - a[1]) as [tag, count]}
+						<span class="tb-tag">{tag} <strong>{count}</strong></span>
+					{/each}
+				</div>
+			{/if}
+		{/if}
+
+		<!-- Backfill controls -->
+		<div class="tb-controls">
+			<label class="lr-opt">
+				<input type="checkbox" bind:checked={tagBackfillDryRun} disabled={tagBackfillRunning} />
+				<span class="lr-opt-label">Dry Run</span>
+			</label>
+			{#if tagBackfillRunning}
+				<button class="lr-btn lr-btn-cancel" onclick={cancelTagBackfill}>
+					<Icon name="x" class="w-3.5 h-3.5" /> Cancel
+				</button>
+			{:else}
+				<button class="ad-btn" onclick={startTagBackfill}>
+					<Icon name="play" class="w-3.5 h-3.5" /> Run Backfill
+				</button>
+			{/if}
+		</div>
+
+		<!-- Backfill progress -->
+		{#if tagBackfillRunning || tagBackfillDone || tagBackfillError}
+			<div class="tb-progress">
+				<div class="ad-cards">
+					<div class="ad-card">
+						<span class="ad-label">Batch</span>
+						<span class="ad-value">{tagBackfillBatch}</span>
+					</div>
+					<div class="ad-card">
+						<span class="ad-label">Processed</span>
+						<span class="ad-value">{tagBackfillTotal}</span>
+					</div>
+					<div class="ad-card">
+						<span class="ad-label">Tagged</span>
+						<span class="ad-value" style="color:#4ade80">{tagBackfillTagged}</span>
+					</div>
+					<div class="ad-card">
+						<span class="ad-label">Skipped</span>
+						<span class="ad-value">{tagBackfillSkipped}</span>
+					</div>
+					<div class="ad-card">
+						<span class="ad-label">Elapsed</span>
+						<span class="ad-value">{tagBackfillElapsed < 1000 ? `${tagBackfillElapsed}ms` : `${(tagBackfillElapsed / 1000).toFixed(1)}s`}</span>
+					</div>
+					<div class="ad-card">
+						<span class="ad-label">Status</span>
+						<span class="ad-value" style="color:{tagBackfillDone ? '#4ade80' : tagBackfillError ? '#f87171' : '#a78bfa'}">
+							{tagBackfillDone ? 'Done' : tagBackfillError ? 'Error' : 'Running…'}
+						</span>
+					</div>
+				</div>
+
+				{#if tagBackfillError}
+					<div class="ad-error">❌ {tagBackfillError}</div>
+				{/if}
+
+				{#if Object.keys(tagBackfillDist).length > 0}
+					<div class="tb-dist">
+						{#each Object.entries(tagBackfillDist).sort((a, b) => b[1] - a[1]) as [tag, count]}
+							<span class="tb-tag">{tag} <strong>{count}</strong></span>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
 	</section>
 </div>
 {/if}
@@ -2386,6 +3347,219 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 	font-weight: 700; margin-top: 0.1rem;
 }
 .step-text { font-size: 0.75rem; color: #ccc; line-height: 1.4; }
+
+/* ── Assist Debug Panel ──────────────────────────────────────────────── */
+.ad-input-row {
+	display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;
+}
+.ad-query {
+	flex: 1; min-width: 240px; height: 2rem; padding: 0 0.75rem;
+	font-size: 0.78rem; font-family: inherit;
+	background: #0f0e0c; border: 1px solid #2d2b24; border-radius: 5px;
+	color: #d4c7a3; outline: none;
+}
+.ad-query:focus { border-color: #a78bfa; }
+.ad-query::placeholder { color: #6b7280; }
+.ad-btn {
+	height: 2rem; padding: 0 1rem; font-size: 0.75rem; font-weight: 600;
+	background: #a78bfa18; border: 1px solid #a78bfa44; color: #a78bfa;
+	border-radius: 5px; cursor: pointer; transition: background 0.15s;
+}
+.ad-btn:hover:not(:disabled) { background: #a78bfa28; }
+.ad-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ad-error {
+	font-size: 0.72rem; color: #f87171; padding: 0.4rem 0.6rem;
+	background: #f871710d; border: 1px solid #f8717122; border-radius: 5px;
+	margin-bottom: 0.6rem;
+}
+.ad-cards {
+	display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem;
+	margin-bottom: 0.75rem;
+}
+.ad-card {
+	padding: 0.5rem 0.6rem; background: #13120f;
+	border: 1px solid #2d2b24; border-radius: 5px;
+	display: flex; flex-direction: column; gap: 0.15rem;
+}
+.ad-label { font-size: 0.62rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+.ad-value { font-size: 0.85rem; font-weight: 700; color: #d4c7a3; }
+.ad-value.hit  { color: #4ade80; }
+.ad-value.miss { color: #f59e0b; }
+.ad-timing {
+	display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+	font-size: 0.7rem; color: #9ca3af; margin-bottom: 0.6rem;
+}
+.ad-timing h4 { margin: 0; font-size: 0.7rem; color: #d4c7a3; }
+.ad-timing-item { padding: 0.15rem 0.5rem; background: #1a1914; border-radius: 4px; }
+.ad-details {
+	margin-bottom: 0.5rem;
+}
+.ad-details summary {
+	font-size: 0.72rem; color: #a78bfa; cursor: pointer; user-select: none;
+}
+.ad-pre {
+	font-size: 0.68rem; color: #d4c7a3; background: #0f0e0c;
+	padding: 0.5rem; border-radius: 5px; border: 1px solid #2d2b24;
+	overflow-x: auto; max-height: 300px; white-space: pre-wrap; word-break: break-all;
+}
+.ad-cache-key {
+	display: flex; align-items: center; gap: 0.3rem;
+	font-size: 0.62rem; color: #6b7280; font-family: 'JetBrains Mono', monospace;
+	margin-top: 0.3rem;
+}
+
+/* ── Feedback Widget ─────────────────────────────────────────────────── */
+.fb-row {
+	display: flex; align-items: center; gap: 0.5rem;
+	margin-top: 0.6rem; padding: 0.4rem 0.5rem;
+	background: #13120f; border: 1px solid #2d2b24; border-radius: 5px;
+}
+.fb-label { font-size: 0.72rem; color: #9ca3af; }
+.fb-btn {
+	display: inline-flex; align-items: center; gap: 0.25rem;
+	padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid #3f3e36;
+	background: transparent; color: #d4c7a3; font-size: 0.72rem; cursor: pointer;
+	transition: background 0.15s, border-color 0.15s;
+}
+.fb-btn:hover:not(:disabled) { background: #1e1d18; border-color: #a78bfa; }
+.fb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.fb-up:hover:not(:disabled) { border-color: #4ade80; color: #4ade80; }
+.fb-down:hover:not(:disabled) { border-color: #f87171; color: #f87171; }
+.fb-thanks { font-size: 0.72rem; color: #4ade80; }
+.fb-stats-btn {
+	display: inline-flex; align-items: center; gap: 0.2rem;
+	padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid #2d2b24;
+	background: transparent; color: #6b7280; font-size: 0.65rem; cursor: pointer;
+}
+.fb-stats-btn:hover { color: #a78bfa; border-color: #a78bfa; }
+.fb-stats {
+	display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+	margin-top: 0.4rem; padding: 0.35rem 0.5rem;
+	background: #0d0c0a; border: 1px solid #2d2b24; border-radius: 5px;
+	font-size: 0.68rem; color: #9ca3af;
+}
+.fb-stat strong { color: #d4c7a3; }
+.fb-pct { font-weight: 700; }
+.fb-pct.fb-good { color: #4ade80; }
+.fb-pct.fb-warn { color: #f59e0b; }
+.fb-pct.fb-low  { color: #f87171; }
+
+/* ── Feedback Analysis Panel ─────────────────────────────────────────── */
+.fa-toolbar { margin-bottom: 0.6rem; }
+.fa-section { margin-top: 0.75rem; }
+.fa-heading {
+	font-size: 0.68rem; font-weight: 700; color: #9ca3af;
+	text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem;
+}
+.fa-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.fa-pill {
+	padding: 0.2rem 0.55rem; border-radius: 4px;
+	background: #13120f; border: 1px solid #2d2b24;
+	font-size: 0.68rem; color: #d4c7a3;
+}
+.fa-domain-grid { display: flex; flex-direction: column; gap: 0.3rem; }
+.fa-domain-row { display: flex; align-items: center; gap: 0.5rem; }
+.fa-domain-name {
+	width: 8rem; font-size: 0.68rem; color: #9ca3af;
+	overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fa-bar-track {
+	flex: 1; height: 6px; background: #1e1d18; border-radius: 3px; overflow: hidden;
+}
+.fa-bar-fill {
+	height: 100%; border-radius: 3px; transition: width 0.3s;
+}
+.fa-bar-fill.fb-good { background: #4ade80; }
+.fa-bar-fill.fb-warn { background: #f59e0b; }
+.fa-bar-fill.fb-low  { background: #f87171; }
+.fa-domain-pct { font-size: 0.62rem; color: #6b7280; min-width: 5rem; }
+.fa-table-wrap { overflow-x: auto; margin-top: 0.4rem; }
+.fa-table {
+	width: 100%; border-collapse: collapse; font-size: 0.65rem;
+}
+.fa-table th {
+	text-align: left; padding: 0.3rem 0.5rem; color: #6b7280;
+	border-bottom: 1px solid #2d2b24; font-weight: 600;
+}
+.fa-table td { padding: 0.3rem 0.5rem; border-bottom: 1px solid #1e1d18; color: #d4c7a3; }
+.fa-cell-sm { max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fa-recs { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.fa-rec {
+	display: flex; align-items: flex-start; gap: 0.5rem;
+	padding: 0.4rem 0.6rem; border-radius: 5px;
+	border-left: 3px solid #4d4a3d; background: #1a1914; color: #d4c7a3; font-size: 0.82rem;
+}
+.fa-rec-high { border-left-color: #22c55e; }
+.fa-rec-medium { border-left-color: #f59e0b; }
+.fa-rec-low { border-left-color: #6b7280; }
+.fa-rec-text { flex: 1; line-height: 1.35; }
+.fa-rec-conf {
+	font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+	padding: 0.1rem 0.35rem; border-radius: 3px; background: #2d2b24; color: #9ca3af; white-space: nowrap;
+}
+.fa-apply-panel {
+	margin-top: 0.75rem; padding: 0.6rem; border: 1px solid #2d2b24;
+	border-radius: 6px; background: #13120f;
+}
+.fa-apply-grid { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.4rem 0; }
+.fa-apply-row {
+	display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem;
+	padding: 0.25rem 0.4rem; border-radius: 4px; background: #1a1914;
+}
+.fa-apply-label { flex: 1; color: #d4c7a3; font-weight: 600; }
+.fa-apply-current { color: #6b7280; font-size: 0.75rem; }
+.fa-apply-arrow { color: #4ade80; font-weight: bold; }
+.fa-apply-suggested { color: #f59e0b; font-weight: 600; }
+.fa-apply-actions { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.4rem; }
+.fa-apply-msg { font-size: 0.75rem; color: #4ade80; }
+.fa-apply-meta { font-size: 0.7rem; color: #6b7280; margin-top: 0.3rem; }
+
+/* ── Defaults Impact Panel ──────────────────────────────────────────── */
+.fa-impact-panel { background: #13120f; border: 1px solid #2d2b24; border-radius: 6px; padding: 0.6rem 0.7rem; margin-top: 0.5rem; }
+.fa-impact-meta { font-size: 0.7rem; color: #9ca3af; margin-bottom: 0.4rem; }
+.fa-impact-grid { display: flex; gap: 0.6rem; align-items: center; }
+.fa-impact-col { display: flex; flex-direction: column; gap: 0.15rem; }
+.fa-impact-arrow-col { font-size: 1.1rem; color: #6b7280; padding: 0 0.2rem; }
+.fa-impact-label { font-size: 0.65rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+.fa-impact-val { font-size: 0.8rem; color: #d4d0c8; }
+.fa-impact-delta { font-size: 0.8rem; font-weight: 600; }
+.fa-delta-pos { color: #4ade80; }
+.fa-delta-neg { color: #f87171; }
+.fa-impact-defaults { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin-top: 0.35rem; }
+.fa-impact-def-label { font-size: 0.7rem; color: #6b7280; }
+.fa-impact-actions { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid #1f1e1a; }
+.fa-revert-btn { border-color: #f87171 !important; color: #f87171 !important; }
+.fa-revert-btn:hover:not(:disabled) { background: rgba(248, 113, 113, 0.1) !important; }
+.fa-window-select { background: #1a1914; border: 1px solid #2d2b24; border-radius: 4px; color: #d4d0c8; font-size: 0.75rem; padding: 0.25rem 0.4rem; }
+.fa-impact-domain-section { margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid #1f1e1a; }
+.fa-impact-domain-grid { display: flex; flex-direction: column; gap: 0.2rem; margin-top: 0.25rem; }
+.fa-impact-domain-row { display: flex; gap: 0.5rem; align-items: center; font-size: 0.75rem; }
+.fa-impact-counts { color: #6b7280; font-size: 0.65rem; }
+
+/* ── Tag Backfill Panel ──────────────────────────────────────────────── */
+.tb-status-bar {
+	display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+	margin-bottom: 0.75rem; padding: 0.5rem 0.6rem;
+	background: #13120f; border: 1px solid #2d2b24; border-radius: 5px;
+}
+.tb-stat { display: flex; flex-direction: column; gap: 0.1rem; }
+.tb-stat-label { font-size: 0.6rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+.tb-stat-value { font-size: 0.85rem; font-weight: 700; color: #d4c7a3; }
+.tb-stat-value.tb-good { color: #4ade80; }
+.tb-stat-value.tb-warn { color: #f59e0b; }
+.tb-stat-value.tb-low  { color: #f87171; }
+.tb-dist {
+	display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;
+}
+.tb-tag {
+	font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 4px;
+	background: #1a1914; border: 1px solid #2d2b24; color: #9ca3af;
+}
+.tb-tag strong { color: #4ade80; margin-left: 0.2rem; }
+.tb-controls {
+	display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;
+}
+.tb-progress { margin-top: 0.5rem; }
 .chain-hint { font-size: 0.7rem; font-style: italic; margin: 0.3rem 0; }
 .rc-pipelines { margin-top: 0.6rem; display: flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
 
@@ -2563,4 +3737,32 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 	background: #13120f; border: 1px solid #2d2b24; border-radius: 4px; color: #9ca3af; cursor: pointer;
 }
 .ctrl-select:focus { outline: none; border-color: #7c6ff7; }
+
+/* ── Predictive Todos ───────────────────────────────────────────────────── */
+.todo-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.todo-row {
+	display: grid;
+	grid-template-columns: 3.5rem 8rem auto 1fr 1fr 1.5rem;
+	gap: 0.5rem;
+	align-items: center;
+	padding: 0.45rem 0.6rem;
+	background: #1a1916;
+	border: 1px solid #2a2825;
+	border-radius: 5px;
+	font-size: 0.75rem;
+}
+.todo-row.done { opacity: 0.45; }
+.todo-impact {
+	font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+	border: 1px solid; border-radius: 3px; padding: 1px 5px; text-align: center;
+}
+.todo-type { color: #e2e8f0; font-size: 0.7rem; }
+.todo-cluster { font-size: 0.68rem; }
+.todo-reason { color: #94a3b8; }
+.todo-action { font-size: 0.68rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.todo-dismiss {
+	background: transparent; border: none; color: #475569; cursor: pointer; padding: 2px;
+	border-radius: 3px; display: flex; align-items: center; justify-content: center;
+}
+.todo-dismiss:hover { color: #f87171; background: #f8717115; }
 </style>

@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 // Phase 89: Pipeline API Endpoint
 // Triggers CUDA clustering pipeline with real-time progress
@@ -23,7 +24,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		if (action === 'cluster') {
 			// Spawn Python pipeline process
-			const pythonPath = process.env?.PHASE72_PYTHON ?? 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
+			const pythonPath = ENV.PYTHON_PATH;
 			const scriptPath = 'scripts/phase89-enhanced-cuda-pipeline.py';
 
 			const args = ['--chunk-size', String(chunkSize)];

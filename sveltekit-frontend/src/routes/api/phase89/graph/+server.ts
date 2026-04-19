@@ -7,10 +7,11 @@ import { json } from '@sveltejs/kit';
 import fs from 'fs/promises';
 import path from 'path';
 import postgres from 'postgres';
-import { getDatabaseUrl } from '$lib/config/env.server.js';
-import type { RequestHandler } from './$types';
 
-const sql = postgres(getDatabaseUrl());
+import type { RequestHandler } from './$types';
+import { ENV } from '$lib/server/env.server.js';
+
+const sql = postgres(ENV.DATABASE_URL);
 
 export const GET: RequestHandler = async ({ url, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -50,5 +51,4 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     return json({ nodes: [], edges: [] });
   }
 };
-
 

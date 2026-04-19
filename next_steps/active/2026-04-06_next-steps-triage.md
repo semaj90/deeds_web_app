@@ -1,4 +1,5 @@
 # Next Steps File Triage — April 6, 2026
+**Status**: SUPERSEDED — replaced by April 18, 2026 re-triage. Archive candidate.
 
 **Scope**: 39 files in `next_steps/active/` + 2 root-level files
 **Also**: 9 in `archive/`, 26 in `completed/`, 9 in `canonical/`

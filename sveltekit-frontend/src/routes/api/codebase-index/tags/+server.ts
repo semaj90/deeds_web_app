@@ -33,11 +33,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { getQdrantUrl } from '$lib/config/env.server.js';
+
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const COLLECTION = 'codebase_chunks_768';
-const QDRANT_URL  = getQdrantUrl();
+const QDRANT_URL  = ENV.QDRANT_URL;
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(100).max(50_000).optional().default(20_000),

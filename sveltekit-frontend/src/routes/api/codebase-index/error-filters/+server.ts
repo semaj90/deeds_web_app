@@ -8,8 +8,9 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getQdrantUrl } from '$lib/config/env.server.js';
-const QDRANT_URL = getQdrantUrl();
+import { ENV } from '$lib/server/env.server.js';
+
+const QDRANT_URL = ENV.QDRANT_URL;
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 export const GET: RequestHandler = async ({ locals }) => {

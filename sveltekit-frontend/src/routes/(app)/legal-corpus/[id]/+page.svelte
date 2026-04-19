@@ -12,7 +12,7 @@
 	import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
 	import LegalCorpusClassicView from '$lib/components/legal-corpus/LegalCorpusClassicView.svelte';
 	import LegalCorpusDemoView from '$lib/components/legal-corpus/LegalCorpusDemoView.svelte';
-	import { type LegalCorpusView, type DemoModel, legalCorpusViews, parseView, toDemoModel } from '$lib/adapters/legal-corpus';
+	import { type LegalCorpusView, type DemoModel, legalCorpusViews, parseView, toDemoModel } from '$lib/types/legal-corpus-views';
 
 	let { data } = $props();
 	let statute = $derived(data.statute);

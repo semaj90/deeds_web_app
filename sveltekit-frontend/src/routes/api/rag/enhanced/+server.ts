@@ -1,10 +1,11 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { getRagServiceUrl } from '$lib/config/env.server.js';
+
 import { z } from 'zod';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const RAG_SERVICE_URL = getRagServiceUrl();
+const RAG_SERVICE_URL = ENV.RAG_SERVICE_URL;
 
 const ragEnhancedSchema = z.object({
 	query: z.string().min(1).max(10000),

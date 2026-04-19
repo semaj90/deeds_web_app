@@ -10,7 +10,7 @@
  * - RabbitMQ server with fallback (Docker -> Native Windows -> Remote)
  */
 
-import { checkHealth, getChannel, getCurrentConfig } from '$lib/server/rabbitmq/connection';
+import { checkHealth, getChannel, getCurrentConfig } from '$lib/server/queue/rabbitmq-connection';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 

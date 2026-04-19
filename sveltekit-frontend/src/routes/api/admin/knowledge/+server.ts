@@ -1,10 +1,11 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { getQdrantUrl } from '$lib/config/env.server.js';
+
 import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const QDRANT_URL = getQdrantUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
 
 const querySchema = z.object({
 	file_path: z.string().min(1, 'file_path parameter required').max(500),
@@ -122,7 +123,4 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 		});
 	}
 };
-
-
-
 

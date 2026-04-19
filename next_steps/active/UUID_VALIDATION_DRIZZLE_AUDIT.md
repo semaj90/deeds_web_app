@@ -1,6 +1,6 @@
 # UUID Validation Audit — Drizzle API Routes
 
-## Status: COMPLETE (78 UUID + 11 non-UUID routes validated)
+## Status: ✅ COMPLETE (78 UUID + 11 non-UUID routes validated) — Archive candidate.
 
 **Problem**: Dynamic API routes passed `params.id` directly to Drizzle `eq()` / raw SQL without validation. PostgreSQL rejects non-UUID values for uuid columns, causing unhandled 500 errors.
 

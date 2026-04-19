@@ -22,10 +22,10 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
-import { getQdrantUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const COLLECTION = 'codebase_chunks_768';
-const QDRANT_URL  = getQdrantUrl();
+const QDRANT_URL  = ENV.QDRANT_URL;
 
 const bodySchema = z.object({
   dryRun:    z.boolean().optional().default(false),
@@ -242,6 +242,22 @@ async function _runEnrichment(job: EnrichJob, batchSize: number): Promise<void> 
       );
 
       console.log(`[enrich-qdrant] Progress: ${Math.min(i + batchSize, nodes.length)}/${nodes.length} nodes processed`);
+    }
+
+    // Ensure payload indexes for the fields we just wrote — enables O(1) prefiltering.
+    // Qdrant PUT /index is idempotent; fire-and-forget after the main update loop.
+    const indexDefs = [
+      { field_name: 'neo4j_gpuCluster',  field_schema: { type: 'integer', lookup: true, range: false } },
+      { field_name: 'som_cluster',        field_schema: { type: 'integer', lookup: true, range: false } },
+      { field_name: 'neo4j_routeType',    field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'neo4j_communityId',  field_schema: { type: 'integer', lookup: true, range: false } },
+    ];
+    for (const def of indexDefs) {
+      fetch(`${QDRANT_URL}/collections/${COLLECTION}/index`, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(def),
+      }).catch(() => {});
     }
 
     job.status     = 'done';

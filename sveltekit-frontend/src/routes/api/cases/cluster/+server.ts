@@ -33,6 +33,129 @@ interface ClusterRequest {
 }
 
 /**
+ * Average-linkage agglomerative hierarchical clustering.
+ * Caps at 500 points for performance (samples randomly if larger).
+ * Returns a ClusterResult compatible with k-means output.
+ */
+function hierarchicalCluster(
+	embeddings: number[][],
+	k: number,
+	documentIds: string[],
+	includeEmbeddings: boolean
+): ClusterResult {
+	const MAX_POINTS = 500;
+	let useEmb = embeddings;
+	let useIds = documentIds;
+
+	// Random subsample if n > MAX_POINTS
+	if (embeddings.length > MAX_POINTS) {
+		const indices = Array.from({ length: embeddings.length }, (_, i) => i);
+		for (let i = 0; i < MAX_POINTS; i++) {
+			const j = i + Math.floor(Math.random() * (embeddings.length - i));
+			[indices[i], indices[j]] = [indices[j], indices[i]];
+		}
+		const sample = indices.slice(0, MAX_POINTS);
+		useEmb = sample.map((i) => embeddings[i]);
+		useIds = sample.map((i) => documentIds[i]);
+	}
+
+	const m = useEmb.length;
+	const dim = useEmb[0]?.length ?? 768;
+	const kSafe = Math.min(k, m);
+
+	// Pre-compute cosine distance matrix (stored as flat Float32Array)
+	const dist = new Float32Array(m * m);
+	for (let i = 0; i < m; i++) {
+		for (let j = i + 1; j < m; j++) {
+			let dot = 0, na = 0, nb = 0;
+			for (let d = 0; d < dim; d++) {
+				dot += useEmb[i][d] * useEmb[j][d];
+				na += useEmb[i][d] * useEmb[i][d];
+				nb += useEmb[j][d] * useEmb[j][d];
+			}
+			const cosine = na > 0 && nb > 0 ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
+			const cosDist = 1 - cosine;
+			dist[i * m + j] = cosDist;
+			dist[j * m + i] = cosDist;
+		}
+	}
+
+	// Average-linkage inter-cluster distances (updated after each merge)
+	const clusterDist = dist.slice();
+
+	// Cluster membership: members[i] = point indices belonging to cluster i
+	const members: number[][] = Array.from({ length: m }, (_, i) => [i]);
+	const active = new Set<number>(Array.from({ length: m }, (_, i) => i));
+
+	let merges = 0;
+	while (active.size > kSafe) {
+		const activeArr = Array.from(active);
+		let minD = Infinity;
+		let bestA = -1, bestB = -1;
+
+		// Find closest pair
+		for (let i = 0; i < activeArr.length; i++) {
+			for (let j = i + 1; j < activeArr.length; j++) {
+				const d = clusterDist[activeArr[i] * m + activeArr[j]];
+				if (d < minD) { minD = d; bestA = activeArr[i]; bestB = activeArr[j]; }
+			}
+		}
+
+		// Merge bestB into bestA using average linkage update formula
+		const sizeA = members[bestA].length;
+		const sizeB = members[bestB].length;
+		members[bestA] = [...members[bestA], ...members[bestB]];
+		members[bestB] = [];
+
+		for (const c of active) {
+			if (c === bestA || c === bestB) continue;
+			const updated =
+				(sizeA * clusterDist[bestA * m + c] + sizeB * clusterDist[bestB * m + c]) /
+				(sizeA + sizeB);
+			clusterDist[bestA * m + c] = updated;
+			clusterDist[c * m + bestA] = updated;
+		}
+
+		active.delete(bestB);
+		merges++;
+	}
+
+	// Build final cluster objects
+	const clusters: DocumentCluster[] = [];
+	let idx = 0;
+	for (const cId of active) {
+		const memberIndices = members[cId];
+		const docs = memberIndices.map((i) => useIds[i]);
+
+		let centroid: number[] = [];
+		if (includeEmbeddings && dim > 0) {
+			centroid = new Array(dim).fill(0);
+			for (const i of memberIndices) {
+				for (let d = 0; d < dim; d++) centroid[d] += useEmb[i][d];
+			}
+			centroid = centroid.map((v) => v / memberIndices.length);
+		}
+
+		clusters.push({
+			id: `cluster-${idx}`,
+			centroid,
+			documents: docs,
+			size: docs.length,
+			label: `Cluster ${idx + 1}`
+		});
+		idx++;
+	}
+
+	return {
+		clusters,
+		clusterId: `hierarchical-${Date.now()}`,
+		silhouetteScore: 0,
+		iterations: merges,
+		converged: true
+	};
+}
+
+/**
  * POST /api/cases/cluster
  * Cluster similar legal cases based on embeddings
  */
@@ -202,13 +325,11 @@ export const POST: RequestHandler = async (event) => {
 				`[cases-cluster] SOM complete: quantizationError=${somResult.quantizationError.toFixed(4)}, topographicError=${(somResult.topographicError * 100).toFixed(2)}%`
 			);
 		} else {
-			// hierarchical
-			return json(
-				{
-					success: false,
-					error: 'Hierarchical clustering not yet implemented. Use algorithm=kmeans for now.'
-				},
-				{ status: 501 }
+			// hierarchical — average-linkage agglomerative clustering
+			console.log(`[cases-cluster] Running hierarchical clustering with k=${k}...`);
+			clusterResult = hierarchicalCluster(embeddings, k, documentIds, includeEmbeddings);
+			console.log(
+				`[cases-cluster] Hierarchical complete: ${clusterResult.clusters.length} clusters, ${clusterResult.iterations} merges`
 			);
 		}
 

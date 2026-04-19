@@ -5,6 +5,7 @@
 
 import { spawn } from 'child_process';
 import path from 'path';
+import { ENV } from '$lib/server/env.server.js';
 
 export const phase89Tools = {
 	/**
@@ -51,8 +52,7 @@ export const phase89Tools = {
 			const { eps = 0.3, minSamples = 2, batchSize = 1000 } = args;
 
 			return new Promise((resolve, reject) => {
-                // Use environment variable or fallback to default path
-				const pythonPath = process.env.PHASE72_PYTHON || 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
+				const pythonPath = ENV.PYTHON_PATH;
 				const scriptPath = path.join(process.cwd(), 'scripts', 'phase89-cuda-multicore.py');
 
 				const proc = spawn(pythonPath, [scriptPath], {

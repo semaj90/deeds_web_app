@@ -53,8 +53,9 @@ const TTL = {
  * Cached export file structure
  */
 export interface CachedExport {
-	content: string; // File content (HTML, Markdown, JSON string, or base64 PDF)
-	format: string; // 'html' | 'markdown' | 'json' | 'pdf'
+	content: string; // File content (HTML, Markdown, JSON string, or base64-encoded binary)
+	isBase64: boolean; // true for binary formats (docx, pdf) — decode with Buffer.from(content, 'base64')
+	format: string; // 'html' | 'markdown' | 'json' | 'pdf' | 'docx'
 	reportId: string;
 	exportedAt: string; // ISO timestamp
 	contentType: string; // MIME type
@@ -138,6 +139,7 @@ export async function cacheExport(
 
 		const cached: CachedExport = {
 			content,
+			isBase64: false,
 			format,
 			reportId,
 			exportedAt: new Date().toISOString(),
@@ -155,6 +157,46 @@ export async function cacheExport(
 	} catch (err) {
 		// Non-fatal - log warning and continue
 		console.warn('[ExportCache] cacheExport error:', (err as Error).message);
+	}
+}
+
+/**
+ * Cache a binary export (docx, pdf) as base64.
+ * On retrieval, check cached.isBase64 and decode with Buffer.from(content, 'base64').
+ */
+export async function cacheExportBinary(
+	reportId: string,
+	format: string,
+	content: Buffer,
+	contentType: string,
+	filename: string,
+	reportUpdatedAt: Date
+): Promise<void> {
+	if (content.length > MAX_EXPORT_SIZE_BYTES) {
+		console.warn(`[ExportCache] SKIP: binary too large (${content.length} bytes)`);
+		return;
+	}
+	const redis = redisPool.getConnection();
+	try {
+		const cacheKey = EXPORT_CACHE_KEYS.export(reportId, format);
+		const b64 = content.toString('base64');
+
+		const cached: CachedExport = {
+			content: b64,
+			isBase64: true,
+			format,
+			reportId,
+			exportedAt: new Date().toISOString(),
+			contentType,
+			filename,
+			reportUpdatedAt: reportUpdatedAt.toISOString(),
+			sizeBytes: content.length
+		};
+
+		await redis.setex(cacheKey, TTL.EXPORT, JSON.stringify(cached));
+		console.log(`[ExportCache] CACHED (binary): ${cacheKey} (${content.length} bytes, TTL ${TTL.EXPORT}s)`);
+	} catch (err) {
+		console.warn('[ExportCache] cacheExportBinary error:', (err as Error).message);
 	}
 }
 

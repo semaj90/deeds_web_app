@@ -16,9 +16,10 @@ import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL, SERVER_EMBEDDING_DIMS } from '$lib/ai/model-ids.js';
 import type { CodeChunk } from './ast-chunker.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { runWithAdaptiveBatch } from '$lib/server/gpu/libtorch-bridge.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
-const BATCH_SIZE = 16;
+const INITIAL_BATCH = 24; // starting batch size; runWithAdaptiveBatch halves on OOM
 
 interface EmbeddingResult {
 	embedding: number[];
@@ -68,8 +69,9 @@ async function ensureCollection(): Promise<void> {
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			vectors: {
-				content: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
-				signature: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' }
+				content:   { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
+				signature: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
+				error:     { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
 			}
 		})
 	});
@@ -90,6 +92,103 @@ async function ensureCollection(): Promise<void> {
 			})
 		}).catch(() => {}); // ignore if already exists
 	}
+}
+
+/**
+ * Non-destructively add the `error` named vector to an existing collection.
+ *
+ * Qdrant v1.12+ supports PATCH /collections/{name} to add new named vectors
+ * without touching existing `content` + `signature` vectors or their points.
+ * Safe to call repeatedly — idempotent via Qdrant's update semantics.
+ *
+ * Call once during indexing setup or from /api/codebase-index/enrich-qdrant
+ * to upgrade legacy collections created before the error vector was added.
+ */
+export async function patchErrorVectorSchema(): Promise<boolean> {
+	const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}`, {
+		method:  'PATCH',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			vectors: {
+				error: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
+			},
+		}),
+		signal: AbortSignal.timeout(10_000),
+	}).catch(() => null);
+	return res?.ok ?? false;
+}
+
+/**
+ * Generate a 768-dim embedding for an error description and upsert it as the
+ * `error` named vector on an existing `codebase_chunks_768` point.
+ *
+ * The error text is: "[ErrorCode] message (filePath)" — compact enough to embed
+ * cleanly with embeddinggemma while capturing all three search dimensions.
+ *
+ * Fire-and-forget safe: caller can `.catch(() => {})` without consequence.
+ * The `content` and `signature` vectors on the point are NOT touched.
+ *
+ * @param chunkId   - Qdrant point ID (number or UUID string)
+ * @param errorCode - Error code (e.g. "TS2345", "SVELTE-401")
+ * @param message   - Human-readable error message
+ * @param filePath  - File path where the error was detected
+ */
+export async function upsertErrorVector(
+	chunkId: string | number,
+	errorCode: string,
+	message: string,
+	filePath: string,
+): Promise<boolean> {
+	const errorText = `[${errorCode}] ${message} (${filePath})`.slice(0, 1_000);
+
+	let errorEmbedding: number[];
+	try {
+		errorEmbedding = await embed(errorText);
+	} catch {
+		return false;
+	}
+
+	// Qdrant PUT /points with named vector — only updates the `error` vector slot;
+	// existing `content` and `signature` vectors on the point are preserved.
+	const pointId = typeof chunkId === 'string' ? hashToUint(chunkId) : chunkId;
+	const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {
+		method:  'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			points: [{
+				id:     pointId,
+				vector: { error: errorEmbedding },
+			}],
+		}),
+		signal: AbortSignal.timeout(15_000),
+	}).catch(() => null);
+
+	return res?.ok ?? false;
+}
+
+/**
+ * Search `codebase_chunks_768` using the `error` named vector.
+ * Returns chunks ordered by semantic similarity to the error description.
+ *
+ * Use this to find code that is likely associated with a specific error pattern
+ * (complementary to content-search, which finds code by what it does).
+ *
+ * @param errorText  - Error message or description to embed + search
+ * @param limit      - Max results (default 10)
+ * @param filter     - Optional Qdrant payload filter
+ */
+export async function searchByError(
+	errorText: string,
+	limit = 10,
+	filter?: Record<string, unknown>,
+): Promise<Array<{ id: number | string; score: number; payload: Record<string, unknown> }>> {
+	let vector: number[];
+	try {
+		vector = await embed(errorText.slice(0, 1_000));
+	} catch {
+		return [];
+	}
+	return searchVector('error', vector, limit, filter);
 }
 
 /**
@@ -217,53 +316,58 @@ export async function indexChunks(chunks: CodeChunk[]): Promise<IndexResult> {
 
 	await ensureCollection();
 
-	// Process in batches
-	for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
-		const batch = chunks.slice(i, i + BATCH_SIZE);
-		const points: Array<{
-			id: string;
-			vectors: { content: number[]; signature: number[] };
-			payload: Record<string, unknown>;
-		}> = [];
+	// runWithAdaptiveBatch handles CUDA OOM by halving batch size and retrying.
+	// On success it doubles back toward INITIAL_BATCH (adaptive oscillation).
+	// Embedding is the GPU bottleneck — batch size of 24 fills ~350 MB VRAM on RTX 3060 Ti.
+	await runWithAdaptiveBatch<CodeChunk>(
+		chunks,
+		async (batch) => {
+			const points: Array<{
+				id: string;
+				vectors: { content: number[]; signature: number[] };
+				payload: Record<string, unknown>;
+			}> = [];
 
-		for (const chunk of batch) {
-			try {
-				const [contentEmb, signatureEmb] = await Promise.all([
-					embed(chunk.content.slice(0, 2000)), // cap content to avoid token limits
-					embed(chunk.signature)
-				]);
-				embeddingsGenerated += 2;
+			for (const chunk of batch) {
+				try {
+					const [contentEmb, signatureEmb] = await Promise.all([
+						embed(chunk.content.slice(0, 2_000)), // cap content to avoid token limits
+						embed(chunk.signature),
+					]);
+					embeddingsGenerated += 2;
 
-				points.push({
-					id: chunk.id,
-					vectors: { content: contentEmb, signature: signatureEmb },
-					payload: {
-						content: chunk.content.slice(0, 4000), // store truncated for retrieval
-						signature: chunk.signature,
-						...chunk.metadata
-					}
-				});
-			} catch {
-				failed++;
+					points.push({
+						id:      chunk.id,
+						vectors: { content: contentEmb, signature: signatureEmb },
+						payload: {
+							content:   chunk.content.slice(0, 4_000), // store truncated for retrieval
+							signature: chunk.signature,
+							...chunk.metadata,
+						},
+					});
+				} catch {
+					failed++;
+				}
 			}
-		}
 
-		if (points.length > 0) {
-			try {
-				await upsertPoints(points);
-				storedInQdrant += points.length;
-			} catch {
-				failed += points.length;
+			if (points.length > 0) {
+				try {
+					await upsertPoints(points);
+					storedInQdrant += points.length;
+				} catch {
+					failed += points.length;
+				}
 			}
-		}
-	}
+		},
+		{ initialBatch: INITIAL_BATCH, minBatch: 4 }
+	);
 
 	return {
-		chunksProcessed: chunks.length,
+		chunksProcessed:      chunks.length,
 		embeddingsGenerated,
 		storedInQdrant,
 		failed,
-		durationMs: Math.round(performance.now() - start)
+		durationMs: Math.round(performance.now() - start),
 	};
 }
 

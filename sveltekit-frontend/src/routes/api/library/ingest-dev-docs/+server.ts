@@ -28,6 +28,7 @@ import { pool } from '$lib/server/db/client';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
+import { kmeansWithCentroids, isPytorchGpuAvailable } from '$lib/server/gpu/pytorch-graph.js';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -81,7 +82,7 @@ const PRESET_DOC_URLS: Record<string, string[]> = {
 // ── Schema ────────────────────────────────────────────────────────────────────
 
 const schema = z.object({
-	urls:   z.array(z.string().url()).max(30).optional().default([]),
+	urls:   z.array(z.url()).max(30).optional().default([]),
 	preset: z.array(z.enum(['drizzle', 'sveltekit', 'qdrant', 'langchain', 'karpathy'])).optional().default([]),
 	rescan: z.boolean().optional().default(false),
 });
@@ -145,7 +146,7 @@ async function upsertDoc(opts: {
 	hash: string;
 	jurisdictionId: number | null;
 	sourceType: 'markdown' | 'web';
-}): Promise<{ documentId: string; chunks: number }> {
+}): Promise<{ documentId: string; chunks: number; clustered: boolean }> {
 	const { title, content, sourceUrl, hash, jurisdictionId, sourceType } = opts;
 	const documentId = randomUUID();
 	const versionId  = randomUUID();
@@ -192,40 +193,69 @@ async function upsertDoc(opts: {
 		);
 	}
 
-	// Embed + Qdrant
+	// Embed + GPU cluster + Qdrant
+	const allVectors: Array<{ c: { id: string; text: string; index: number }; v: number[] }> = [];
 	for (let i = 0; i < chunkRows.length; i += EMBED_BATCH) {
 		const batch = chunkRows.slice(i, i + EMBED_BATCH);
 		try {
 			const { vectors } = await generateEmbeddings(batch.map((c) => c.text.slice(0, 1024)));
-			const points = batch.map((c, j) => ({ c, v: vectors[j] })).filter(({ v }) => v?.length);
-			if (points.length > 0) {
-				await qdrant.batchUpsert({
-					collection: 'documents',
-					points: points.map(({ c, v }) => ({
-						id: c.id,
-						vector: { content: v },
-						payload: {
-							document_id: documentId,
-							title,
-							chunk_text: c.text,
-							node_id: rootNodeId,
-							chunk_index: c.index,
-							jurisdiction_code: 'docs',
-							corpus_type: 'treatise',
-							source_url: sourceUrl,
-							source_type: 'dev-docs',
-						},
-					})),
-					batchSize: 100,
-				});
-				for (const { c, v } of points) {
-					await pool.query(`UPDATE legal_chunks SET embedding = $1 WHERE id = $2`, [
-						`[${v.join(',')}]`, c.id,
-					]);
-				}
+			for (let j = 0; j < batch.length; j++) {
+				if (vectors[j]?.length) allVectors.push({ c: batch[j], v: vectors[j] });
 			}
 		} catch (e) {
 			console.warn('[ingest-dev-docs] embed batch non-fatal:', e);
+		}
+	}
+
+	// GPU K-Means cluster assignment across all chunks in this document
+	const clusterMap = new Map<string, number>();
+	if (allVectors.length >= 4) {
+		try {
+			const dim = allVectors[0].v.length;
+			const flat = new Float32Array(allVectors.length * dim);
+			for (let i = 0; i < allVectors.length; i++) {
+				flat.set(allVectors[i].v, i * dim);
+			}
+			const k = Math.max(2, Math.min(Math.ceil(Math.sqrt(allVectors.length)), 12));
+			const result = kmeansWithCentroids(flat, allVectors.length, dim, k, 30);
+			for (let i = 0; i < allVectors.length; i++) {
+				clusterMap.set(allVectors[i].c.id, result.assignments[i]);
+			}
+		} catch (e) {
+			console.warn('[ingest-dev-docs] GPU kmeans non-fatal:', e);
+		}
+	}
+
+	if (allVectors.length > 0) {
+		try {
+			await qdrant.batchUpsert({
+				collection: 'documents',
+				points: allVectors.map(({ c, v }) => ({
+					id: c.id,
+					vector: { content: v },
+					payload: {
+						document_id: documentId,
+						title,
+						chunk_text: c.text,
+						node_id: rootNodeId,
+						chunk_index: c.index,
+						jurisdiction_code: 'docs',
+						corpus_type: 'treatise',
+						source_url: sourceUrl,
+						source_type: 'dev-docs',
+						gpu_cluster: clusterMap.get(c.id) ?? null,
+						cuda_indexed: isPytorchGpuAvailable(),
+					},
+				})),
+				batchSize: 100,
+			});
+			for (const { c, v } of allVectors) {
+				await pool.query(`UPDATE legal_chunks SET embedding = $1 WHERE id = $2`, [
+					`[${v.join(',')}]`, c.id,
+				]);
+			}
+		} catch (e) {
+			console.warn('[ingest-dev-docs] Qdrant upsert non-fatal:', e);
 		}
 	}
 
@@ -234,7 +264,7 @@ async function upsertDoc(opts: {
 		[documentId]
 	);
 
-	return { documentId, chunks: chunkRows.length };
+	return { documentId, chunks: allVectors.length, clustered: clusterMap.size > 0 };
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
@@ -253,7 +283,8 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		created: 0,
 		skipped: 0,
 		failed:  0,
-		files: [] as Array<{ path: string; status: string; chunks?: number; documentId?: string }>,
+		gpuClustered: 0,
+		files: [] as Array<{ path: string; status: string; chunks?: number; documentId?: string; clustered?: boolean }>,
 	};
 
 	// ── 1. Local files ─────────────────────────────────────────────────────────
@@ -289,13 +320,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		}
 
 		try {
-			const { documentId, chunks } = await upsertDoc({
+			const { documentId, chunks, clustered } = await upsertDoc({
 				title, content, hash, jurisdictionId,
 				sourceUrl: `file://${filePath.replace(/\\/g, '/')}`,
 				sourceType: 'markdown',
 			});
 			result.created++;
-			result.files.push({ path: relPath, status: 'created', documentId, chunks });
+			if (clustered) result.gpuClustered++;
+			result.files.push({ path: relPath, status: 'created', documentId, chunks, clustered });
 		} catch (err) {
 			result.failed++;
 			result.files.push({ path: relPath, status: 'error' });
@@ -341,11 +373,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 				}
 			}
 
-			const { documentId, chunks } = await upsertDoc({
+			const { documentId, chunks, clustered } = await upsertDoc({
 				title, content: text, hash, jurisdictionId, sourceUrl: url, sourceType: 'web',
 			});
 			result.created++;
-			result.files.push({ path: url, status: 'created', documentId, chunks });
+			if (clustered) result.gpuClustered++;
+			result.files.push({ path: url, status: 'created', documentId, chunks, clustered });
 		} catch (err) {
 			console.error(`[ingest-dev-docs] Failed to process ${url}:`, err);
 			result.failed++;
@@ -357,5 +390,6 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		success: true,
 		...result,
 		totalScanned: localFiles.length + webUrls.length,
+		gpu: { clustered: result.gpuClustered, cudaAvailable: isPytorchGpuAvailable() },
 	});
 };

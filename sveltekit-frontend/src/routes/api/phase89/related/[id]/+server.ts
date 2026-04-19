@@ -1,12 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-import { getQdrantUrl } from '$lib/config/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
+import { ENV } from '$lib/server/env.server.js';
 // Phase 89: Related Files API
 // Uses cosine similarity from Qdrant to find related components
 
-const QDRANT_URL = getQdrantUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
 
 export const GET: RequestHandler = async ({ params, fetch, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });

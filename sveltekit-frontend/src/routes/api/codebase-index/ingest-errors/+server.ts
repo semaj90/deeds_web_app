@@ -12,11 +12,12 @@ import type { RequestHandler } from './$types';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { createHash } from 'crypto';
-import { getQdrantUrl } from '$lib/config/env.server.js';
+
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const execAsync = promisify(exec);
-const QDRANT_URL = getQdrantUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
 const SRC_COLLECTION = 'phase89_error_chunks';
 const DST_CLUSTERS = 'phase90_error_clusters';
 const DST_CARDS = 'phase90_error_cards';

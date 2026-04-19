@@ -1,4 +1,5 @@
 # Session TODO — 2026-04-03
+**Status**: SUPERSEDED — session-scoped TODO, all items completed. Archive candidate.
 
 ## Completed Today
 

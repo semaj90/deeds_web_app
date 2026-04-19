@@ -1,9 +1,10 @@
 import { json } from '@sveltejs/kit';
 import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 
 const analyzeSchema = z.object({
 	cluster_id: z.number().int().min(1, 'Missing cluster_id'),
@@ -78,7 +79,7 @@ Provide your analysis in this JSON structure:
 }`;
 
 		// Call Ollama for analysis
-		const ollamaBaseUrl = getOllamaUrl();
+		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL;
 		const ollamaRes = await ollamaFetch(`${ollamaBaseUrl}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },

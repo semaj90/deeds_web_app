@@ -5,10 +5,11 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getQdrantUrl } from '$lib/config/env.server.js';
-import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
-const QDRANT_URL = getQdrantUrl();
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { ENV } from '$lib/server/env.server.js';
+
+const QDRANT_URL = ENV.QDRANT_URL;
 const COLLECTION = 'codebase_chunks_768';
 
 interface GraphNode {

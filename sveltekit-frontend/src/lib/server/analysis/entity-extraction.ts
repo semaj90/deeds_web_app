@@ -2,16 +2,26 @@
  * Entity extraction: LLM structured extraction (primary) + regex fallback.
  * Primary: Gemma4-legal structured JSON via Ollama GBNF-constrained output
  * Fallback: regex for emails, phones, dates, citations, statutes, money.
+ *
+ * Redis cache:
+ *   Key  = `entity:<sha256(slice)>`
+ *   TTL  = 1800s (30 min)
+ *   LLM entities are deterministic for the same text slice — safe to cache.
+ *   Regex entities are re-run and merged on every call (zero latency, no cache needed).
  */
 
+import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
 
 // Use gemma3:270m (fast, 4.5s avg) instead of gemma4-legal (slow, 25s avg)
 // Entity extraction benefits from speed over complexity
 const MODEL = 'gemma3:270m';
+const CACHE_TTL = 1800; // 30 minutes
+const CACHE_KEY_PREFIX = 'entity:';
 
 /** Zod schema for structured entity extraction response — drives GBNF grammar */
 const entityResponseSchema = z.object({
@@ -32,9 +42,41 @@ export interface Entity {
 	source?: 'llm' | 'regex';
 }
 
+// ── Redis helpers ─────────────────────────────────────────────────────────────
+
+/** FNV-1a inspired — but for deterministic entity cache we need full SHA-256 */
+function sliceKey(text: string): string {
+	return CACHE_KEY_PREFIX + createHash('sha256').update(text).digest('hex');
+}
+
+async function getCachedEntities(key: string): Promise<Entity[] | null> {
+	try {
+		const raw = await getRedis().get(key);
+		if (!raw) return null;
+		return JSON.parse(raw) as Entity[];
+	} catch {
+		return null;
+	}
+}
+
+async function setCachedEntities(key: string, entities: Entity[]): Promise<void> {
+	try {
+		// Fire-and-forget — don't block the caller on a cache write
+		getRedis()
+			.set(key, JSON.stringify(entities), 'EX', CACHE_TTL)
+			.catch(() => {});
+	} catch {
+		// Non-fatal
+	}
+}
+
+// ── Public API ────────────────────────────────────────────────────────────────
+
 /**
  * Extract entities using LLM structured extraction, falling back to regex.
- * @param text - Document text (truncated to maxChars internally)
+ * LLM results are cached in Redis for 30 min keyed by SHA-256 of the text slice.
+ *
+ * @param text    - Document text (truncated to maxChars internally)
  * @param maxChars - Maximum characters to send to LLM (default 35000)
  */
 export async function extractEntities(text: string, maxChars: number = 35_000): Promise<Entity[]> {
@@ -42,12 +84,23 @@ export async function extractEntities(text: string, maxChars: number = 35_000): 
 
 	const slice = text.length > maxChars ? text.slice(0, maxChars) : text;
 
+	// Regex entities run on every call (zero latency — no need to cache)
+	const regexEntities = extractViaRegex(slice);
+
+	// Check Redis cache for LLM entities BEFORE calling the model
+	const cacheKey = sliceKey(slice);
+	const cached = await getCachedEntities(cacheKey);
+	if (cached !== null) {
+		console.log(`[entity-extraction] Redis HIT key=${cacheKey.slice(-8)}`);
+		return dedupeEntities([...cached, ...regexEntities]);
+	}
+
 	// 1) LLM structured extraction (best quality — PERSON, ORG, COURT, LAW, etc.)
 	try {
 		const llmEntities = await extractViaLLM(slice);
 		if (llmEntities.length > 0) {
-			// Merge LLM results with regex results for completeness
-			const regexEntities = extractViaRegex(slice);
+			// Cache LLM results; fire-and-forget
+			setCachedEntities(cacheKey, llmEntities);
 			return dedupeEntities([...llmEntities, ...regexEntities]);
 		}
 	} catch {
@@ -55,8 +108,10 @@ export async function extractEntities(text: string, maxChars: number = 35_000): 
 	}
 
 	// 2) Regex fallback (minimum guarantee — always works, zero latency)
-	return dedupeEntities(extractViaRegex(slice));
+	return dedupeEntities(regexEntities);
 }
+
+// ── LLM extraction ────────────────────────────────────────────────────────────
 
 /**
  * LLM-based extraction via Ollama with GBNF-constrained structured output.
@@ -111,6 +166,8 @@ ${text}`;
 		}
 	});
 }
+
+// ── Regex extraction ──────────────────────────────────────────────────────────
 
 /**
  * Regex-based extraction — zero latency, always available.
@@ -182,6 +239,8 @@ function extractViaRegex(text: string): Entity[] {
 
 	return entities;
 }
+
+// ── Dedup ─────────────────────────────────────────────────────────────────────
 
 /**
  * Deduplicate entities by label+text (case-insensitive).

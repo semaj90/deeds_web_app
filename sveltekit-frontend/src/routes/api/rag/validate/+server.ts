@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getQdrantUrl } from '$lib/config/env.server.js';
+
 import type { RequestHandler } from './$types';
 import type {
 	ValidateSourcesRequest,
@@ -8,6 +8,7 @@ import type {
 } from '$lib/types/rag-source-validation';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const ragValidateSchema = z.object({
 	query_id: z.string().min(1, 'query_id is required').max(200),
@@ -21,7 +22,7 @@ const ragValidateSchema = z.object({
 	notes: z.string().max(5000).optional()
 });
 
-const QDRANT_URL = getQdrantUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
 
 /**
  * POST /api/rag/validate

@@ -1,5 +1,5 @@
 # Architecture Backlog — 2026-04-17
-**Status**: Working engineering doc. Each item is concrete, file-referenced, and independently executable.
+**Status**: ACTIVE — P1-P5 ALL COMPLETE (14/14). P6 research-graph RL pipeline: 22/24 done, 2 runtime steps remain (seed + build).
 **Baseline**: svelte-check 0 errors | Playwright 698 passed | Search Intelligence admin page complete.
 
 ---

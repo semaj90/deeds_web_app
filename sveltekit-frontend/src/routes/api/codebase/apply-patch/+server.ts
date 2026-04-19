@@ -1,9 +1,10 @@
-import { getQdrantUrl } from '$lib/config/env.server.js';
+
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
-const QDRANT_URL = getQdrantUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
 
 const applyPatchSchema = z.object({
     clusterId: z.string().min(1).max(500),
@@ -137,7 +138,4 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
         }, { status: 500 });
     }
 };
-
-
-
 

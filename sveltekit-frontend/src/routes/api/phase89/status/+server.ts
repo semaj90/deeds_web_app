@@ -1,10 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
-import { getQdrantUrl } from '$lib/config/env.server.js';
-import { pool as pgPool } from '$lib/server/db/client';
 
-const QDRANT_URL = getQdrantUrl();
+import { pool as pgPool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
+
+const QDRANT_URL = ENV.QDRANT_URL;
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });

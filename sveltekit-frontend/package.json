@@ -380,7 +380,7 @@
     "@mapbox/node-pre-gyp": "2.0.3",
     "@playwright/test": "^1.55.1",
     "@qdrant/js-client-rest": "1.15.1",
-    "@sveltejs/adapter-node": "5.4.0",
+    "@sveltejs/adapter-node": "5.5.4",
     "@sveltejs/kit": "2.49.2",
     "@sveltejs/vite-plugin-svelte": "6.2.1",
     "@testing-library/jest-dom": "^6.8.0",

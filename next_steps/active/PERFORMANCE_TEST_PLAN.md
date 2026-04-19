@@ -1,4 +1,5 @@
 # Performance Testing Plan - Session 93r28c+++++
+**Status**: SUPERSEDED — cache system redesigned (Bifrost L1/L2/L3). Test metrics obsolete. Archive candidate.
 
 **Objective**: Verify cache performance + evidence pipeline scaling
 **Duration**: 1 hour

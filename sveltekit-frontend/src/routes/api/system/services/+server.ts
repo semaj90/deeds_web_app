@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/client';
-import { getOllamaUrl, getQdrantUrl, getRedisUrl, getDatabaseUrl, getMinioConfig } from '$lib/config/env.server.js';
+
 import { ENV } from '$lib/server/env.server.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       let port = '6379';
 
       try {
-        const url = new URL(getRedisUrl().startsWith('redis://') ? getRedisUrl() : `redis://${getRedisUrl()}`);
+        const url = new URL(ENV.REDIS_URL.startsWith('redis://') ? ENV.REDIS_URL : `redis://${ENV.REDIS_URL}`);
         hostname = url.hostname;
         port = url?.port ?? '6379';
       } catch (e) {
@@ -54,13 +54,13 @@ export const GET: RequestHandler = async ({ locals }) => {
       clearTimeout(timeoutId);
 
       services.redis = {
-        url: getRedisUrl().substring(0, 30) + '...',
+        url: ENV.REDIS_URL.substring(0, 30) + '...',
         reachable: resp?.ok ?? false,
         purpose: 'Error cache, session storage, fix memory',
       };
     } catch (e) {
       services.redis = {
-        url: getRedisUrl().substring(0, 30) + '...',
+        url: ENV.REDIS_URL.substring(0, 30) + '...',
         reachable: false,
         error: 'Service unreachable',
       };
@@ -70,15 +70,15 @@ export const GET: RequestHandler = async ({ locals }) => {
   // Qdrant vector DB
   {
     try {
-      const resp = await fetch(`${getQdrantUrl()}/health`, { signal: AbortSignal.timeout(5000) });
+      const resp = await fetch(`${ENV.QDRANT_URL}/health`, { signal: AbortSignal.timeout(5000) });
       services.qdrant = {
-        url: getQdrantUrl(),
+        url: ENV.QDRANT_URL,
         reachable: resp.ok,
         purpose: 'Vector embeddings for semantic search',
       };
     } catch (e) {
       services.qdrant = {
-        url: getQdrantUrl(),
+        url: ENV.QDRANT_URL,
         reachable: false,
         error: 'Service unreachable',
       };
@@ -88,17 +88,17 @@ export const GET: RequestHandler = async ({ locals }) => {
   // Ollama LLM
   {
     try {
-      const resp = await fetch(`${getOllamaUrl()}/api/tags`, { signal: AbortSignal.timeout(5000) });
+      const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(5000) });
       const data = await resp.json();
       services.ollama = {
-        url: getOllamaUrl(),
+        url: ENV.OLLAMA_BASE_URL,
         reachable: resp.ok,
         models: data.models?.map((m: { name: string }) => m.name) || [],
         purpose: 'Local LLM inference (Gemma4-legal, embeddings)',
       };
     } catch (e) {
       services.ollama = {
-        url: getOllamaUrl(),
+        url: ENV.OLLAMA_BASE_URL,
         reachable: false,
         error: 'Service unreachable',
       };
@@ -110,7 +110,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     try {
       const result = await db.execute(sql`SELECT 1`);
       services.postgres = {
-        url: getDatabaseUrl().substring(0, 40) + '...',
+        url: ENV.DATABASE_URL.substring(0, 40) + '...',
         reachable: result.rows.length > 0,
         database: 'legal_ai_db',
         extensions: ['pgvector', 'pg_trgm'],
@@ -118,7 +118,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       };
     } catch (e) {
       services.postgres = {
-        url: getDatabaseUrl().substring(0, 40) + '...',
+        url: ENV.DATABASE_URL.substring(0, 40) + '...',
         reachable: false,
         error: 'Service unreachable',
       };
@@ -128,7 +128,7 @@ export const GET: RequestHandler = async ({ locals }) => {
   // MinIO
   {
     services.minio = {
-      endpoint: getMinioConfig().endpoint,
+      endpoint: ENV.MINIO_ENDPOINT,
       bucket: ENV.MINIO_EVIDENCE_BUCKET,
       purpose: 'Evidence staging, raw artifacts',
     };
@@ -140,5 +140,4 @@ export const GET: RequestHandler = async ({ locals }) => {
     services,
   });
 }
-
 

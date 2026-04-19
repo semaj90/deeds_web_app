@@ -1,18 +1,19 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getDatabaseUrl, getRedisUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
+
 import { env } from '$env/dynamic/private';
+import { ENV } from '$lib/server/env.server.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const config = {
 		// PostgreSQL Configuration
-		postgres: { connectionString: getDatabaseUrl(),
+		postgres: { connectionString: ENV.DATABASE_URL,
 			ssl: env.PGSSL === 'true'
 		},
 
 		// Redis Configuration
-		redis: { url: getRedisUrl(),
+		redis: { url: ENV.REDIS_URL,
 			db: parseInt(env?.REDIS_DB ?? '0'),
 			prefixes: { phase89: 'phase89:',
 				embeddings: 'emb:',
@@ -22,7 +23,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		},
 
 		// Qdrant Configuration
-		qdrant: { url: getQdrantUrl(),
+		qdrant: { url: ENV.QDRANT_URL,
 			collections: { error_chunks: 'phase89_error_chunks',
 				ast_chunks: 'phase89_ast_chunks',
 				kb_cards: 'phase89_kb_cards',
@@ -36,7 +37,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		},
 
 		// Ollama Configuration
-		ollama: { url: getOllamaUrl(),
+		ollama: { url: ENV.OLLAMA_BASE_URL,
 			models: { embedding: 'embeddinggemma:latest',
 				legal: 'gemma4-legal:latest'
 			}
@@ -74,6 +75,4 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	return json(config);
 };
-
-
 

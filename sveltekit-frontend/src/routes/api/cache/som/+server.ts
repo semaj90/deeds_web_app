@@ -54,7 +54,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json({ success: true, key, data: JSON.parse(raw) });
 	} catch (error) {
 		console.error('[SOM Cache] GET error:', error);
-		return json({ success: false, error: 'Failed to retrieve from SOM cache' }, { status: 500 });
+		return json({ success: false, key: key ?? '', data: null });
 	}
 };
 

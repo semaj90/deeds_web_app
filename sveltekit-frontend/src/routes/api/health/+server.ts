@@ -16,7 +16,7 @@ import {
 import { getInFlightCount } from '$lib/server/embedding/embed.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getTrtLlmUrl, getTritonUrl } from '$lib/config/env.server.js';
+
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import type { RequestHandler } from './$types';
@@ -72,8 +72,8 @@ export const GET: RequestHandler = async ({ url }) => {
     return handleServiceHealth(service);
   }
 
-  const trtllmUrl = getTrtLlmUrl();
-  const tritonUrl = getTritonUrl();
+  const trtllmUrl = ENV.TENSORRT_URL;
+  const tritonUrl = ENV.TRITON_URL;
   const langextractUrl = ENV.LANGEXTRACT_URL;
   const minioUrl = `http://${ENV.MINIO_ENDPOINT}:${ENV.MINIO_PORT}`;
 

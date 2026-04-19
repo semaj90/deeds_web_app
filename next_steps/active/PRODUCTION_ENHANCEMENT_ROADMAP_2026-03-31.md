@@ -1,4 +1,5 @@
 # PRODUCTION ENHANCEMENT ROADMAP — March 31, 2026
+**Status**: SUPERSEDED — core stabilization done, replaced by PRODUCTION_READINESS (Mar 25) + architecture-backlog (Apr 17). Archive candidate.
 ## From Current Healthy Core To Full Accelerated Platform
 
 ---

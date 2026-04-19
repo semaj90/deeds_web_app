@@ -84,7 +84,7 @@ export const VECTOR_CONFIG = {
     poi_profiles: { vectors: ['embedding'] },
     legal_canon_chunks: { vectors: ['content'], on_disk_payload: true },
     fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
-    codebase_chunks_768: { vectors: ['content', 'signature'], on_disk_payload: true },
+    codebase_chunks_768: { vectors: ['content', 'signature', 'error'], on_disk_payload: true },
     error_embeddings: { vectors: ['error'], on_disk_payload: true },
     diagnosis_embeddings: { vectors: ['diagnosis'], on_disk_payload: true },
     knowledge_base: { vectors: ['default'] },

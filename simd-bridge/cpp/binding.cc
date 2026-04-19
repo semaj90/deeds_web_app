@@ -7,6 +7,16 @@
  *   - graphSimilarity(Float32Array, n, dim) → Float32Array[n*n]
  *   - clusterEmbeddings(Float32Array, n, dim, k, maxIters) → Int32Array[n]
  *   - computeCaseEmbedding(Float32Array weights, Float32Array embeddings, n, dim) → Float32Array[dim]
+ *
+ * ArrayBuffer Pool:
+ *   All typed-array outputs are backed by a thread_local free-list pool
+ *   (g_ab_pool) keyed by power-of-2 byte capacity.  When V8 GCs the JS
+ *   ArrayBuffer, pool_finalizer() either returns the raw allocation to the
+ *   bucket (if not full) or free()s it.  This eliminates the per-call
+ *   malloc/free churn that dominated profiling on RTX 3060 Ti (sm_86).
+ *
+ *   Sizing: min bucket = 64 bytes (one cache line); max 8 buffers per bucket;
+ *   no global cap — pool naturally self-sizes to the hot working set.
  */
 
 #include <cassert>
@@ -17,16 +27,17 @@
 #include <cstdint>
 #include <cstdlib>
 
-typedef void *napi_env;
-typedef void *napi_value;
-typedef void *napi_callback_info;
-typedef int32_t napi_status;
-typedef int32_t napi_valuetype;
-typedef int32_t napi_typedarray_type;
+using napi_env             = void*;
+using napi_value           = void*;
+using napi_callback_info   = void*;
+using napi_status          = int32_t;
+using napi_valuetype       = int32_t;
+using napi_typedarray_type = int32_t;
+using napi_finalize        = void(*)(napi_env env, void* finalize_data, void* finalize_hint);
 
-enum { napi_ok = 0 };
-enum { napi_string = 1 };
-enum { napi_float32_array = 0, napi_int32_array = 4 };
+enum : uint8_t { napi_ok = 0, napi_generic_failure = 1 };
+enum : uint8_t { napi_string = 1 };
+enum : uint8_t { napi_float32_array = 0, napi_int32_array = 4 };
 
 #define NAPI_AUTO_LENGTH ((size_t)-1)
 
@@ -39,11 +50,13 @@ napi_status napi_get_value_string_utf8(napi_env, napi_value, char*, size_t, size
 napi_status napi_get_value_int32(napi_env, napi_value, int32_t*);
 napi_status napi_get_value_double(napi_env, napi_value, double*);
 napi_status napi_create_int32(napi_env, int32_t, napi_value*);
+napi_status napi_create_double(napi_env, double, napi_value*);
 napi_status napi_create_function(napi_env, const char*, size_t, napi_value(*)(napi_env, napi_callback_info), void*, napi_value*);
 napi_status napi_set_named_property(napi_env, napi_value, const char*, napi_value);
 napi_status napi_get_typedarray_info(napi_env, napi_value, napi_typedarray_type*, size_t*, void**, napi_value*, size_t*);
 napi_status napi_create_typedarray(napi_env, napi_typedarray_type, size_t, napi_value, size_t, napi_value*);
 napi_status napi_create_arraybuffer(napi_env, size_t, void**, napi_value*);
+napi_status napi_create_external_arraybuffer(napi_env, void*, size_t, napi_finalize, void*, napi_value*);
 napi_status napi_create_object(napi_env, napi_value*);
 }
 
@@ -52,6 +65,7 @@ napi_status napi_create_object(napi_env, napi_value*);
 #endif
 #endif
 
+#include <unordered_map>
 #include <vector>
 #include <cstring>
 
@@ -95,6 +109,102 @@ extern "C" napi_value RegisterSimdJsonParse(napi_env env, napi_callback_info inf
 extern "C" napi_value RegisterSimdJsonValidate(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonExtractNumbers(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonBackend(napi_env env, napi_callback_info info);
+
+// ── ArrayBuffer pool ─────────────────────────────────────────────────────────
+//
+// Strategy: napi_create_external_arraybuffer transfers ownership of a raw
+// malloc'd region to V8.  When V8 GCs the backing store, pool_finalizer fires
+// and either recycles the region into g_ab_pool or free()s it.
+//
+// thread_local is correct here: all N-API callbacks for a given V8 isolate
+// execute on the same OS thread, so there is no concurrent access to the pool.
+// Worker threads (worker_threads module) each get their own thread_local
+// instance automatically — no mutex needed anywhere.
+//
+// Bucket key = power-of-2 byte capacity (min 64 bytes = one cache line).
+// Minimum 64 bytes ensures natural alignment for AVX2 loads (32-byte aligned
+// addresses within 64-byte regions), which matters for sm_86 GPU data prep.
+
+static constexpr size_t AB_POOL_MAX_PER_BUCKET = 8;
+
+static thread_local std::unordered_map<size_t, std::vector<void*>> g_ab_pool;
+
+// Portable branch-prediction hints.
+// MSVC takes the first branch (no __builtin_expect).
+// GCC/Clang (Linux/WSL2 target, CUDA host compiler) take the second.
+// The _MSC_VER guard avoids C4067 "unexpected tokens after #if" that MSVC
+// emits when it encounters __has_builtin(__builtin_expect) in the condition.
+#if defined(_MSC_VER)
+#  define AB_LIKELY(x)   (x)
+#  define AB_UNLIKELY(x) (x)
+#elif defined(__has_builtin) && __has_builtin(__builtin_expect)
+#  define AB_LIKELY(x)   __builtin_expect(!!(x), 1)
+#  define AB_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#  define AB_LIKELY(x)   (x)
+#  define AB_UNLIKELY(x) (x)
+#endif
+
+// Round up n to the next power of 2, minimum 64 (one L1 cache line).
+static inline size_t ab_next_pow2(size_t n) {
+    if (n <= 64u) return 64u;
+    size_t p = 64u;
+    while (p < n) p <<= 1u;
+    return p;
+}
+
+// V8 GC finalizer — called when the JS ArrayBuffer becomes unreachable.
+// hint encodes the power-of-2 capacity so we return to the correct bucket.
+static void pool_finalizer(napi_env /*env*/, void* data, void* hint) {
+    const size_t cap = reinterpret_cast<size_t>(hint);
+    auto& bucket = g_ab_pool[cap];
+    if (bucket.size() < AB_POOL_MAX_PER_BUCKET) {
+        bucket.push_back(data);  // recycle — no free()
+    } else {
+        free(data);              // bucket full — release to OS
+    }
+}
+
+// Acquire a buffer of at least `bytes` from the pool (or malloc a new one).
+// Zeros only the *used* portion so callers get clean output without paying
+// to zero the entire power-of-2 allocation.
+static void* pool_acquire(size_t bytes, size_t* cap_out) {
+    const size_t cap = ab_next_pow2(bytes);
+    *cap_out = cap;
+    auto& bucket = g_ab_pool[cap];
+    // Hot path: pool hit — AB_LIKELY keeps the branch predictor on the fast lane.
+    if (AB_LIKELY(!bucket.empty())) {
+        void* ptr = bucket.back();
+        bucket.pop_back();
+        memset(ptr, 0, bytes);  // zero used region only
+        return ptr;
+    }
+    // Cold path (first call per bucket size) — allocate a fresh block.
+    // malloc on x86-64 returns 16-byte-aligned memory; sufficient for AVX2
+    // unaligned loads used inside the GPU kernels.
+    void* ptr = malloc(cap);
+    if (AB_LIKELY(ptr != nullptr)) { memset(ptr, 0, bytes); }
+    return ptr;
+}
+
+// Create an external ArrayBuffer backed by a pooled allocation.
+// Replaces every napi_create_arraybuffer call in this file.
+// AB_UNLIKELY on null: malloc rarely fails in a healthy Node.js process —
+// keeps the happy-path instructions in the L1 I-cache.
+static napi_status create_pooled_ab(napi_env env, size_t bytes,
+                                     void** out_data, napi_value* out_ab) {
+    size_t cap = 0;
+    void* ptr = pool_acquire(bytes, &cap);
+    if (AB_UNLIKELY(ptr == nullptr)) { return napi_generic_failure; }
+    *out_data = ptr;
+    // hint = capacity as void* — recovered in pool_finalizer to pick bucket.
+    return napi_create_external_arraybuffer(
+        env, ptr, bytes,
+        pool_finalizer,
+        reinterpret_cast<void*>(cap),
+        out_ab
+    );
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -173,11 +283,12 @@ static napi_value GraphSimilarityWrapper(napi_env env, napi_callback_info info) 
   if (n <= 0 || dim <= 0 || (size_t)(n * dim) > arr_len)
     return throw_type_error(env, "Invalid dimensions for embeddings array");
 
-  // Allocate output: n*n float32 values
+  // Allocate output: n*n float32 values — pooled
   int output_len = n * n;
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, output_len * sizeof(float), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, (size_t)output_len * sizeof(float), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "graphSimilarity: output allocation failed");
 
   int rc = graphSimilarity((const float*)arr_data, n, dim, (float*)out_data, output_len);
   if (rc != 0) return throw_error(env, "graphSimilarity failed (GPU/CPU error)");
@@ -210,10 +321,11 @@ static napi_value ClusterEmbeddingsWrapper(napi_env env, napi_callback_info info
   if (n <= 0 || dim <= 0 || k <= 0 || (size_t)(n * dim) > arr_len)
     return throw_type_error(env, "Invalid dimensions for cluster input");
 
-  // Allocate output: n int32 assignments
+  // Allocate output: n int32 assignments — pooled
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, n * sizeof(int32_t), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "clusterEmbeddings: output allocation failed");
 
   int rc = clusterEmbeddings((const float*)arr_data, n, dim, k, max_iters, (int*)out_data, n);
   if (rc != 0) return throw_error(env, "clusterEmbeddings failed (GPU/CPU error)");
@@ -249,10 +361,11 @@ static napi_value ComputeCaseEmbeddingWrapper(napi_env env, napi_callback_info i
   if (n <= 0 || dim <= 0 || (size_t)n > w_len || (size_t)(n * dim) > e_len)
     return throw_type_error(env, "Invalid dimensions for weighted embedding input");
 
-  // Allocate output: dim float32 values
+  // Allocate output: dim float32 values — pooled
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, dim * sizeof(float), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, (size_t)dim * sizeof(float), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "computeCaseEmbedding: output allocation failed");
 
   int rc = computeCaseEmbedding((const float*)w_data, n, (const float*)e_data, dim, (float*)out_data, dim);
   if (rc != 0) return throw_error(env, "computeCaseEmbedding failed (GPU/CPU error)");
@@ -285,9 +398,11 @@ static napi_value LSTMAddWrapper(napi_env env, napi_callback_info info) {
   if (n <= 0 || (size_t)n > a_len || (size_t)n > b_len)
     return throw_type_error(env, "Invalid length for LSTM add input");
 
+  // Pooled output
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "lstmAdd: output allocation failed");
 
   int rc = bridge_run_lstm((const float*)a_data, (const float*)b_data, (float*)out_data, n);
   if (rc != 0) return throw_error(env, "LSTM add failed (GPU/CPU error)");
@@ -316,9 +431,11 @@ static napi_value SOMCacheWrapper(napi_env env, napi_callback_info info) {
   if (n <= 0 || (size_t)n > in_len)
     return throw_type_error(env, "Invalid length for SOM cache input");
 
+  // Pooled output
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "somCache: output allocation failed");
 
   runSOMCache((const float*)in_data, (float*)out_data, n);
 
@@ -350,9 +467,11 @@ static napi_value DotProductWrapper(napi_env env, napi_callback_info info) {
   if (n <= 0 || (size_t)n > a_len || (size_t)n > b_len)
     return throw_type_error(env, "Invalid length for dot product input");
 
+  // Pooled output — min bucket is 64 bytes, 1 float fits with margin
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, sizeof(float), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, sizeof(float), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "dotProduct: output allocation failed");
 
   int rc = bridge_dot_product((const float*)a_data, (const float*)b_data, (float*)out_data, n);
   if (rc != 0) return throw_error(env, "dotProduct failed (GPU/CPU error)");
@@ -386,9 +505,11 @@ static napi_value ScaleWrapper(napi_env env, napi_callback_info info) {
   if (n <= 0 || (size_t)n > in_len)
     return throw_type_error(env, "Invalid length for scale input");
 
+  // Pooled output
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "scale: output allocation failed");
 
   int rc = bridge_scale((const float*)in_data, (float*)out_data, scalar, n);
   if (rc != 0) return throw_error(env, "scale failed (GPU/CPU error)");
@@ -417,9 +538,11 @@ static napi_value ReLUWrapper(napi_env env, napi_callback_info info) {
   if (n <= 0 || (size_t)n > in_len)
     return throw_type_error(env, "Invalid length for ReLU input");
 
+  // Pooled output
   void* out_data;
   napi_value arraybuffer;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &arraybuffer);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)
+    return throw_error(env, "relu: output allocation failed");
 
   int rc = bridge_relu((const float*)in_data, (float*)out_data, n);
   if (rc != 0) return throw_error(env, "relu failed (GPU/CPU error)");
@@ -528,8 +651,10 @@ static napi_value PageRankGPUWrapper(napi_env env, napi_callback_info info) {
   double damping_d; napi_get_value_double(env, argv[2], &damping_d); float damping = (float)damping_d;
   int32_t iters; napi_get_value_int32(env, argv[3], &iters);
   if (n <= 0 || (size_t)(n * n) > adj_len) return throw_type_error(env, "adj must have n*n elements");
+  // Pooled output
   void* out_data; napi_value ab;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "pageRankGPU: output allocation failed");
   if (pageRankGPU((const float*)adj_data, n, damping, iters, (float*)out_data, n) != 0)
     return throw_error(env, "pageRankGPU failed");
   napi_value result;
@@ -548,8 +673,10 @@ static napi_value AttentionScoreGPUWrapper(napi_env env, napi_callback_info info
   void* k_data; napi_get_typedarray_info(env, argv[2], nullptr, nullptr, &k_data, nullptr, nullptr);
   int32_t n; napi_get_value_int32(env, argv[3], &n);
   if (dim <= 0 || n <= 0) return throw_type_error(env, "dim and n must be positive");
+  // Pooled output
   void* out_data; napi_value ab;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "attentionScoreGPU: output allocation failed");
   if (attentionScoreGPU((const float*)q_data, dim, (const float*)k_data, n, (float*)out_data, n) != 0)
     return throw_error(env, "attentionScoreGPU failed");
   napi_value result;
@@ -568,8 +695,10 @@ static napi_value RewardScoreGPUWrapper(napi_env env, napi_callback_info info) {
   int32_t n; napi_get_value_int32(env, argv[2], &n);
   int32_t dim; napi_get_value_int32(env, argv[3], &dim);
   if (n <= 0 || dim <= 0) return throw_type_error(env, "n and dim must be positive");
+  // Pooled output
   void* out_data; napi_value ab;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "rewardScoreGPU: output allocation failed");
   if (rewardScoreGPU((const float*)g_data, (const float*)r_data, n, dim, (float*)out_data, n) != 0)
     return throw_error(env, "rewardScoreGPU failed");
   napi_value result;
@@ -587,8 +716,10 @@ static napi_value SoftmaxGPUWrapper(napi_env env, napi_callback_info info) {
   napi_get_typedarray_info(env, argv[0], nullptr, &in_len, &in_data, nullptr, nullptr);
   int32_t n; napi_get_value_int32(env, argv[1], &n);
   if (n <= 0 || (size_t)n > in_len) return throw_type_error(env, "n exceeds array length");
+  // Pooled output
   void* out_data; napi_value ab;
-  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &ab);
+  if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "softmaxGPU: output allocation failed");
   if (softmaxGPU((const float*)in_data, n, (float*)out_data, n) != 0)
     return throw_error(env, "softmaxGPU failed");
   napi_value result;
@@ -607,8 +738,10 @@ static napi_value TopKIndicesGPUWrapper(napi_env env, napi_callback_info info) {
   int32_t n; napi_get_value_int32(env, argv[1], &n);
   int32_t k; napi_get_value_int32(env, argv[2], &k);
   if (n <= 0 || k <= 0 || k > n || (size_t)n > s_len) return throw_type_error(env, "invalid n/k");
+  // Pooled output
   void* out_data; napi_value ab;
-  napi_create_arraybuffer(env, k * sizeof(int32_t), &out_data, &ab);
+  if (create_pooled_ab(env, (size_t)k * sizeof(int32_t), &out_data, &ab) != napi_ok)
+    return throw_error(env, "topKIndicesGPU: output allocation failed");
   if (topKIndicesGPU((const float*)s_data, n, k, (int*)out_data, k) != 0)
     return throw_error(env, "topKIndicesGPU failed");
   napi_value result;
@@ -617,11 +750,6 @@ static napi_value TopKIndicesGPUWrapper(napi_env env, napi_callback_info info) {
 }
 
 // ── KmeansWithCentroids(Float32Array embeddings, n, dim, k, maxIters) → { assignments: Int32Array[n], centroids: Float32Array[k*dim] } ─
-// Returns a Float32Array where the first n*sizeof(int32)/sizeof(float) elements encode
-// the Int32 assignments (reinterpreted), followed by k*dim centroid floats.
-// Simpler: we pack both into a single Float32Array output:
-//   [0 .. n-1]       = assignments cast to float (integer values)
-//   [n .. n+k*dim-1] = centroid float values
 // TypeScript unpacks with Int32Array.from() and Float32Array.subarray().
 
 static napi_value KmeansWithCentroidsWrapper(napi_env env, napi_callback_info info) {
@@ -639,27 +767,28 @@ static napi_value KmeansWithCentroidsWrapper(napi_env env, napi_callback_info in
   if (n <= 0 || dim <= 0 || k <= 0 || (size_t)(n * dim) > emb_len)
     return throw_type_error(env, "kmeansWithCentroids: invalid dimensions");
 
-  // Allocate assignments (int32) and centroids (float32) separately
+  // Allocate assignments (int32) and centroids (float32) — both pooled
   void* a_data; napi_value a_ab;
-  napi_create_arraybuffer(env, (size_t)n * sizeof(int32_t), &a_data, &a_ab);
+  if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &a_data, &a_ab) != napi_ok)
+    return throw_error(env, "kmeansWithCentroids: assignments allocation failed");
   void* c_data; napi_value c_ab;
-  napi_create_arraybuffer(env, (size_t)k * dim * sizeof(float), &c_data, &c_ab);
+  if (create_pooled_ab(env, (size_t)k * dim * sizeof(float), &c_data, &c_ab) != napi_ok)
+    return throw_error(env, "kmeansWithCentroids: centroids allocation failed");
 
   int rc = kmeansWithCentroids((const float*)emb_data, n, dim, k, max_iters,
                                 (int*)a_data, n, (float*)c_data, k * dim);
   if (rc < 0) return throw_error(env, "kmeansWithCentroids failed");
 
   // Return [assignments: Int32Array, centroids: Float32Array] as a 2-element JS Array
-  napi_value assignments, centroids, result_arr;
-  napi_create_typedarray(env, napi_int32_array, (size_t)n, a_ab, 0, &assignments);
+  napi_value assignments, centroids;
+  napi_create_typedarray(env, napi_int32_array,   (size_t)n,         a_ab, 0, &assignments);
   napi_create_typedarray(env, napi_float32_array, (size_t)(k * dim), c_ab, 0, &centroids);
 
   // Build result object { assignments, centroids }
   napi_value obj;
-  napi_env e = env;
-  napi_create_object(e, &obj);
-  napi_set_named_property(e, obj, "assignments", assignments);
-  napi_set_named_property(e, obj, "centroids", centroids);
+  napi_create_object(env, &obj);
+  napi_set_named_property(env, obj, "assignments", assignments);
+  napi_set_named_property(env, obj, "centroids", centroids);
   return obj;
 }
 
@@ -688,10 +817,13 @@ static napi_value TrainSOMWrapper(napi_env env, napi_callback_info info) {
     return throw_type_error(env, "trainSOM: invalid dimensions");
 
   const int neurons = grid_w * grid_h;
+  // Pooled outputs
   void* w_data; napi_value w_ab;
-  napi_create_arraybuffer(env, (size_t)neurons * dim * sizeof(float), &w_data, &w_ab);
+  if (create_pooled_ab(env, (size_t)neurons * dim * sizeof(float), &w_data, &w_ab) != napi_ok)
+    return throw_error(env, "trainSOM: weights allocation failed");
   void* b_data; napi_value b_ab;
-  napi_create_arraybuffer(env, (size_t)n * sizeof(int32_t), &b_data, &b_ab);
+  if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &b_data, &b_ab) != napi_ok)
+    return throw_error(env, "trainSOM: bmu allocation failed");
 
   int rc = trainSOM((const float*)data_ptr, n, dim, grid_w, grid_h, iters,
                      (float)lr_i_d, (float)lr_f_d, (float)r_i_d, (float)r_f_d,
@@ -704,6 +836,46 @@ static napi_value TrainSOMWrapper(napi_env env, napi_callback_info info) {
   napi_create_object(env, &obj);
   napi_set_named_property(env, obj, "weights", weights);
   napi_set_named_property(env, obj, "bmu",     bmu);
+  return obj;
+}
+
+// ── PoolStats() → { totalBuckets, totalPooled, totalCapacityBytes } ──────────
+//
+// Exposes the ArrayBuffer pool's runtime state for Langfuse / admin dashboards.
+// Call from TypeScript: addon.poolStats() → { totalBuckets, totalPooled, totalCapacityBytes }
+//
+//   totalBuckets       — number of distinct power-of-2 capacity buckets with >= 1 entry
+//   totalPooled        — total buffers currently sitting in the pool (not in use by V8)
+//   totalCapacityBytes — sum of (capacity × count) across all buckets (upper bound on
+//                        reclaimed bytes; actual used bytes = sum of sizes at acquire time)
+//
+// This is deliberately read-only and lock-free: it reads thread_local g_ab_pool
+// from the N-API callback thread (same thread that writes the pool).
+
+static napi_value PoolStatsWrapper(napi_env env, napi_callback_info info) {
+  (void)info;
+
+  size_t totalBuckets = 0;
+  size_t totalPooled  = 0;
+  size_t totalCapacityBytes = 0;
+
+  for (const auto& kv : g_ab_pool) {
+    if (!kv.second.empty()) {
+      totalBuckets++;
+      totalPooled       += kv.second.size();
+      totalCapacityBytes += kv.first * kv.second.size(); // capacity × count
+    }
+  }
+
+  napi_value obj, vBuckets, vPooled, vBytes;
+  napi_create_object(env, &obj);
+  napi_create_int32(env, static_cast<int32_t>(totalBuckets), &vBuckets);
+  napi_create_int32(env, static_cast<int32_t>(totalPooled),  &vPooled);
+  // Use double for byte counts — may exceed 2^31 on memory-heavy workloads
+  napi_create_double(env, static_cast<double>(totalCapacityBytes), &vBytes);
+  napi_set_named_property(env, obj, "totalBuckets",       vBuckets);
+  napi_set_named_property(env, obj, "totalPooled",        vPooled);
+  napi_set_named_property(env, obj, "totalCapacityBytes", vBytes);
   return obj;
 }
 
@@ -732,6 +904,8 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "topKIndicesGPU", TopKIndicesGPUWrapper);
   registerFn(env, exports, "kmeansWithCentroids", KmeansWithCentroidsWrapper);
   registerFn(env, exports, "trainSOM", TrainSOMWrapper);
+  // ArrayBuffer pool telemetry
+  registerFn(env, exports, "poolStats", PoolStatsWrapper);
   // simdjson functions
   registerFn(env, exports, "simdJsonParse", RegisterSimdJsonParse);
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);

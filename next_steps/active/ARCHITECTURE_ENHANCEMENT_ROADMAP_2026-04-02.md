@@ -1,4 +1,5 @@
 # Architecture Enhancement Roadmap — 2026-04-02
+**Status**: SUPERSEDED — predates Bifrost cache, Search Intelligence, and architecture-backlog (Apr 17). Archive candidate.
 
 ## Current Architecture (What's Actually Wired)
 

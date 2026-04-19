@@ -1,13 +1,12 @@
 import { json } from '@sveltejs/kit';
-import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
-// Stream endpoint not yet implemented
-function broadcastAgentProgress(_data: unknown) { /* no-op */ }
+import { ENV } from '$lib/server/env.server.js';
+function broadcastAgentProgress(_data: unknown) { /* no-op: progress tracked via returned fixes array */ }
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
-const OLLAMA_URL = getOllamaUrl();
-const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const QDRANT_URL = ENV.QDRANT_URL;
 
 const agentFixSchema = z.object({
 	file_path: z.string().min(1, 'file_path is required').max(1000),

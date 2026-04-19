@@ -8,7 +8,7 @@ import { json } from '@sveltejs/kit';
  */
 
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';

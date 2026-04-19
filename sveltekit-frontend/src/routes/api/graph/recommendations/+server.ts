@@ -8,10 +8,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+
 import { embedText } from '$lib/server/embedding/embed.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 
 /** GBNF-constrained response schema for recommendations */
 const recommendationsResponseSchema = z.object({
@@ -63,7 +64,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.join('\n');
 
 		// 2. Generate recommendations via Ollama
-		const OLLAMA_URL = getOllamaUrl();
+		const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 		const MODEL = 'gemma4-legal:latest';
 
 		const prompt = `You are a legal case analyst. Based on the query and evidence context below, provide investigation recommendations.

@@ -6,9 +6,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
-import { getQdrantUrl } from '$lib/config/env.server.js';
-const QDRANT_URL = getQdrantUrl();
+
+const QDRANT_URL = ENV.QDRANT_URL;
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 const querySchema = z.object({

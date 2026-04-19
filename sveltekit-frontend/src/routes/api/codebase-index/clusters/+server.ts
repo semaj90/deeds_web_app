@@ -6,10 +6,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { getQdrantUrl, getCodebaseIndexUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const QDRANT_URL = getQdrantUrl();
-const FASTAPI_URL = getCodebaseIndexUrl();
+
+const QDRANT_URL = ENV.QDRANT_URL;
+const FASTAPI_URL = ENV.CODEBASE_INDEX_URL;
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
 const querySchema = z.object({

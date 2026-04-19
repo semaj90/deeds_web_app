@@ -1,10 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getQdrantUrl } from '$lib/config/env.server.js';
+
 import { couchdb } from '$lib/services/couchdb-client.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
-const QDRANT_URL = getQdrantUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
 
 interface NotebookCell {
 	id: string;
@@ -24,7 +26,8 @@ interface NotebookCell {
 
 const postSchema = z.discriminatedUnion('action', [
 	z.object({ action: z.literal('export-obsidian') }),
-	z.object({ action: z.literal('ace-fix'), errorId: z.string().min(1) })
+	z.object({ action: z.literal('ace-fix'),     errorId: z.string().min(1) }),
+	z.object({ action: z.literal('llm-ace-fix'), errorId: z.string().min(1), clusterId: z.string().optional() }),
 ]);
 
 /** GET /api/codebase-index/kag-notebook
@@ -241,6 +244,102 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		});
 		const kagData = await kagRes.json();
 		return json({ aceContext: kagData.result, errorId: body.errorId, degraded: kagData.degraded ?? false });
+	}
+
+	// ── LLM-powered ACE fix using Bifrost L1→L2→L3 cache (zero API cost) ─────
+	if (body.action === 'llm-ace-fix') {
+		const errorId   = body.errorId;
+		const clusterId = body.clusterId ?? null;
+
+		// 1. Fetch error cards for this error from Qdrant
+		const cardFilter = clusterId
+			? { must: [{ key: 'cluster_id', match: { value: clusterId } }] }
+			: { must: [{ key: 'error_id',   match: { value: errorId   } }] };
+
+		const cardRes = await fetch(`${QDRANT_URL}/collections/phase90_error_cards/points/scroll`, {
+			method:  'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body:    JSON.stringify({ limit: 5, with_payload: true, with_vector: false, filter: cardFilter }),
+			signal:  AbortSignal.timeout(10_000),
+		}).catch(() => null);
+
+		const cardData  = cardRes?.ok ? await cardRes.json() : { result: { points: [] } };
+		const errorCards: any[] = cardData?.result?.points ?? [];
+
+		// 2. Fetch related codebase chunks for context
+		const affectedFiles: string[] = errorCards.map((c: any) => c.payload?.file_path ?? '').filter(Boolean);
+		let chunkContext = '';
+		if (affectedFiles.length > 0) {
+			const chunkRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body:    JSON.stringify({
+					limit:        10,
+					with_payload: true,
+					with_vector:  false,
+					filter: { must: [{ key: 'file_path', match: { any: affectedFiles.slice(0, 3) } }] },
+				}),
+				signal: AbortSignal.timeout(10_000),
+			}).catch(() => null);
+
+			const chunkData = chunkRes?.ok ? await chunkRes.json() : { result: { points: [] } };
+			const chunks: any[] = chunkData?.result?.points ?? [];
+			chunkContext = chunks
+				.map((c: any) => `// ${c.payload?.file_path ?? 'unknown'} (lines ${c.payload?.lineStart ?? '?'}-${c.payload?.lineEnd ?? '?'})\n${(c.payload?.content ?? '').slice(0, 400)}`)
+				.join('\n\n---\n\n');
+		}
+
+		// 3. Build LLM prompt — context is cached by Bifrost L1/L2 on repeated error patterns
+		const errorSummary = errorCards.map((c: any) => {
+			const p = c.payload ?? {};
+			return `- [${p.error_code ?? 'TS????'}] ${p.normalized_message ?? p.raw_message ?? ''}\n  File: ${p.file_path ?? 'unknown'}`;
+		}).join('\n');
+
+		const systemPrompt = [
+			'You are an expert TypeScript / SvelteKit code fixer.',
+			'Given error information and related code context, produce a concise fix plan.',
+			'Format: 1) Root cause 2) Fix steps (numbered) 3) Code patch (if applicable).',
+			'Keep responses under 600 words.',
+		].join(' ');
+
+		const userPrompt = [
+			`## Error ID: ${errorId}`,
+			'',
+			'### Errors',
+			errorSummary || '(no error cards found — using cluster context)',
+			'',
+			chunkContext ? '### Related Code\n\n```typescript\n' + chunkContext + '\n```' : '',
+			'',
+			'### Task',
+			'Provide root cause analysis and a step-by-step fix for the errors above.',
+		].filter(Boolean).join('\n');
+
+		// bifrostChat → L1 Redis exact-match → L2 Bifrost semantic → L3 Ollama
+		// Repeated calls with the same error pattern will hit L1/L2 cache instantly
+		const fixText = await bifrostChat(
+			[
+				{ role: 'system', content: systemPrompt },
+				{ role: 'user',   content: userPrompt },
+			],
+			ENV.OLLAMA_CHAT_MODEL,
+			{
+				temperature: 0.2,
+				maxTokens:   800,
+				cacheKey:    `kag-ace-fix:${errorId}`,    // L2 Bifrost key for semantic dedup
+				entityTags:  ['code-fix', 'typescript', 'sveltekit'],
+			}
+		).catch(() => 'LLM unavailable — check Ollama and Bifrost services.');
+
+		return json({
+			errorId,
+			clusterId,
+			fixText,
+			errorCount:  errorCards.length,
+			filesContext: affectedFiles,
+			model:       ENV.OLLAMA_CHAT_MODEL,
+			cached:      false,  // bifrostChat sets L1 on write; next identical call returns instantly
+			degraded:    errorCards.length === 0,
+		});
 	}
 
 	return json({ error: 'Unknown action' }, { status: 400 });

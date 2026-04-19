@@ -152,6 +152,24 @@ export const ENV = {
   // Needs PyTorch + cupy — use project .venv (torch 2.7.0+cu128).
   // Dev: set PYTHON_PATH=C:\Users\james\Videos\deeds-web-app\.venv\Scripts\python.exe in .env
   PYTHON_PATH: privateEnv.PYTHON_PATH ?? 'python',
+  // FastAPI codebase-index microservice (port 8090)
+  CODEBASE_INDEX_URL: privateEnv.CODEBASE_INDEX_URL ?? 'http://localhost:8090',
+  // Orchestrator service (port 8102)
+  ORCHESTRATOR_URL: privateEnv.ORCHESTRATOR_URL ?? 'http://localhost:8102',
+  // CUDA/GPU compute service (port 8765)
+  CUDA_SERVICE_URL: privateEnv.CUDA_SERVICE_URL ?? 'http://localhost:8765',
+  // RAG microservice (port 8103)
+  RAG_SERVICE_URL: privateEnv.RAG_SERVICE_URL ?? 'http://localhost:8103',
+  // Redis host + port (for ioredis explicit config)
+  REDIS_HOST: privateEnv.REDIS_HOST ?? 'localhost',
+  REDIS_PORT: Number(privateEnv.REDIS_PORT ?? '6379'),
+  // RabbitMQ management API
+  RABBITMQ_MGMT_URL: privateEnv.RABBITMQ_MGMT_URL ?? 'http://localhost:15672',
+  RABBITMQ_MGMT_AUTH: (() => {
+    const user = privateEnv.RABBITMQ_MGMT_USER ?? privateEnv.RABBITMQ_USER ?? 'guest';
+    const pass = privateEnv.RABBITMQ_MGMT_PASS ?? privateEnv.RABBITMQ_PASS ?? 'guest';
+    return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
+  })(),
   // Node environment
   NODE_ENV: process.env.NODE_ENV ?? 'development',
 };

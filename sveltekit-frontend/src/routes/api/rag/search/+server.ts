@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+
 import { recordSearchQuery, recordQueryLog, queryHash as computeQueryHash } from '$lib/server/analytics/search-analytics.js';
 import type { RequestHandler } from './$types';
 import type {
@@ -92,8 +92,8 @@ const ragSearchSchema = z.object({
     .optional(),
 });
 
-const QDRANT_URL = getQdrantUrl();
-const OLLAMA_URL = getOllamaUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 type PhaseStatus = 'success' | 'warning' | 'skipped';
 

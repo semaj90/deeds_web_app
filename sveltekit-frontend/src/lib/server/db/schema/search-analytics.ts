@@ -162,3 +162,25 @@ export const responseFeedback = pgTable('response_feedback', {
 
 export type ResponseFeedback    = typeof responseFeedback.$inferSelect;
 export type NewResponseFeedback = typeof responseFeedback.$inferInsert;
+
+// ── predictive_todos ────────────────────────────────────────────────────────
+// LLM + rule-based gap analysis output from POST /api/analytics/generate-todos.
+// Drives the post-graph pipeline: research → gap analysis → actionable todos.
+
+export const predictiveTodos = pgTable('predictive_todos', {
+	id:              uuid('id').defaultRandom().primaryKey(),
+	todoType:        text('todo_type').notNull(),          // 'add_cluster_summary'|'reindex_cluster'|'add_kb_article'|'fix_collection'|'qlora_retrain'|'add_qlora_training'
+	gpuCluster:      integer('gpu_cluster'),
+	reason:          text('reason').notNull(),
+	suggestedAction: text('suggested_action').notNull(),
+	estimatedImpact: text('estimated_impact').notNull(),  // 'high'|'medium'|'low'
+	status:          text('status').notNull().default('pending'),  // 'pending'|'in_progress'|'done'|'dismissed'
+	generatedAt:     timestamp('generated_at', { withTimezone: true }).notNull().default(sql`now()`),
+	resolvedAt:      timestamp('resolved_at', { withTimezone: true }),
+	metadata:        jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+}, (t) => ({
+	statusImpactIdx: index('predictive_todos_status_impact_idx').on(t.status, t.estimatedImpact, t.generatedAt),
+}));
+
+export type PredictiveTodo    = typeof predictiveTodos.$inferSelect;
+export type NewPredictiveTodo = typeof predictiveTodos.$inferInsert;

@@ -1,14 +1,15 @@
 import { json } from '@sveltejs/kit';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 // Zod schema validates model name (trimmed, 1-200)
 const ollamaPullSchema = z.object({
 	model: z.string().trim().min(1, 'Missing model').max(200),
 });
 
-const OLLAMA_BASE = getOllamaUrl();
+const OLLAMA_BASE = ENV.OLLAMA_BASE_URL;
 
 export const GET: RequestHandler = async ({ locals }) => {
  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -82,6 +83,4 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  return json({ ok: false, error: 'Model pull failed' }, { status: 500 });
  }
 };
-
-
 

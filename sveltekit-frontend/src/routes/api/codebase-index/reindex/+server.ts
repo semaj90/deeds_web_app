@@ -6,12 +6,13 @@
  * Endpoint: POST /api/codebase-index/reindex
  * Purpose: Trigger codebase reindexing and clustering
  */
-import { getCodebaseIndexUrl } from '$lib/config/env.server.js';
+
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
-const FASTAPI_URL = getCodebaseIndexUrl();
+const FASTAPI_URL = ENV.CODEBASE_INDEX_URL;
 
 const reindexSchema = z.object({
 	force: z.boolean().optional().default(false),

@@ -15,12 +15,13 @@ import { glob } from 'glob';
 import { ensureBucket, putObject } from '$lib/server/minio-client.js';
 import path from 'path';
 import postgres from 'postgres';
-import { getQdrantUrl, getOllamaUrl, getDatabaseUrl } from '$lib/config/env.server.js';
+
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 // Configuration
 const CONFIG = {
   qdrant: {
-    url: getQdrantUrl(),
+    url: ENV.QDRANT_URL,
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
@@ -29,11 +30,11 @@ const CONFIG = {
     bucketErrors: 'error-analysis'
   },
   ollama: {
-    url: getOllamaUrl(),
+    url: ENV.OLLAMA_BASE_URL,
     embeddingModel: 'embeddinggemma:latest'
   },
   postgres: {
-    url: getDatabaseUrl()
+    url: ENV.DATABASE_URL
   }
 };
 

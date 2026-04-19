@@ -62,6 +62,12 @@ export default defineConfig({
       'tests/routes/codebase-index-degraded-shape.test.ts',
       'tests/routes/kag-ingest-notebook-contract.test.ts',
       'tests/routes/ai-models.test.ts',
+      'tests/research-pipeline-smoke.spec.ts',
+      'tests/retrieval-quality-regression.spec.ts',
+      'tests/performance-snapshot.spec.ts',
+      'tests/assist-feedback.spec.ts',
+      'tests/assist-feedback-analysis.spec.ts',
+      'tests/assist-defaults.spec.ts',
       // SvelteKit 2 + Svelte 5 audit tests (added 2026-04-15)
       'tests/runes/svelte5-rune-compliance.test.ts',
       'tests/routes/sveltekit-load-patterns.test.ts',

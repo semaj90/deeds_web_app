@@ -2,12 +2,17 @@
  * simdjson N-API Bridge — server-only.
  *
  * Loads the compiled tensorrt_bridge.node addon and exposes simdjson functions:
- *   - fastJsonParse<T>(json) → T (simdjson + LRU cache, fallback to JSON.parse)
- *   - fastJsonValidate(json) → boolean (fast structural check)
+ *   - fastJsonParse<T>(json) → T  (simdjson + byte-budget LRU, fallback to JSON.parse)
+ *   - fastJsonValidate(json) → boolean
  *   - fastJsonExtractNumbers(json, pointer) → Float64Array | null
+ *   - fastJsonExtractField(json, key) → string | null  (single-field fast path)
  *
- * Auto-fallback: if the native addon is unavailable, all functions degrade to
- * V8 built-ins. Payloads < 1KB skip the addon (V8 is faster for small strings).
+ * Memory optimizations:
+ *   - Byte-budget LRU (8 MB cap) instead of count-only — prevents unbounded heap growth
+ *   - Input size guard (64 MB max) — prevents OOM from malicious/huge payloads
+ *   - SIMD-friendly FNV-1a: samples 64-byte prefix + stride tail — stays in L1 cache
+ *   - Payloads < 1 KB bypass native (V8 JIT faster for small strings)
+ *   - TTL eviction: stale entries cleared on each insert
  */
 
 import { resolve } from 'path';
@@ -16,7 +21,7 @@ import { createRequire } from 'module';
 
 const esmRequire = createRequire(import.meta.url);
 
-// ── Addon interface ────────────────────────────────────────────────────
+// ── Addon interface ────────────────────────────────────────────────────────────
 
 interface SimdJsonAddon {
 	simdJsonParse: (json: string) => string;
@@ -55,67 +60,135 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 	return null;
 }
 
-// ── LRU Cache ──────────────────────────────────────────────────────────
+// ── Byte-budget LRU cache ──────────────────────────────────────────────────────
+// Tracks approximate heap usage of cached values to prevent unbounded growth.
+// Evicts by TTL first, then by oldest-insertion order.
 
-const LRU_MAX = 200;
-const LRU_TTL_MS = 30_000;
+const LRU_BUDGET_BYTES = 8 * 1024 * 1024; // 8 MB
+const LRU_TTL_MS       = 30_000;           // 30 s
+const MAX_ENTRY_BYTES  = 512 * 1024;       // skip caching single entries > 512 KB
 
 interface CacheEntry {
 	value: unknown;
 	expiresAt: number;
+	sizeBytes: number;  // approximate serialized size
 }
 
-const lruCache = new Map<string, CacheEntry>();
+const lruCache   = new Map<string, CacheEntry>();
+let   cacheBytes = 0;
 
-/** FNV-1a hash of (first 128 bytes + length) for cache key */
+/**
+ * FNV-1a 32-bit hash — L1-cache-friendly: reads first 64 bytes + stride-sampled tail.
+ * Keeps hot path (< 64 chars) entirely within a single L1 cache line.
+ */
 function fnv1aKey(input: string): string {
 	const len = input.length;
-	const prefix = input.length > 128 ? input.slice(0, 128) : input;
-	let hash = 0x811c9dc5;
-	for (let i = 0; i < prefix.length; i++) {
-		hash ^= prefix.charCodeAt(i);
-		hash = (hash * 0x01000193) >>> 0;
+	let hash = 0x811c9dc5 >>> 0;
+
+	// First 64 chars (≤ 256 bytes in UTF-16, fits in L1 D-cache)
+	const head = Math.min(len, 64);
+	for (let i = 0; i < head; i++) {
+		hash ^= input.charCodeAt(i);
+		hash = Math.imul(hash, 0x01000193) >>> 0;
 	}
-	// Mix in length to differentiate strings with same 128-byte prefix
-	hash ^= len;
-	hash = (hash * 0x01000193) >>> 0;
+
+	// Stride-sample the tail (every 32 chars) to catch length + content variation
+	if (len > 64) {
+		const stride = Math.max(32, Math.floor((len - 64) / 8));
+		for (let i = 64; i < len; i += stride) {
+			hash ^= input.charCodeAt(i);
+			hash = Math.imul(hash, 0x01000193) >>> 0;
+		}
+		// Always include the last char (catches trailing-diff strings)
+		hash ^= input.charCodeAt(len - 1);
+		hash = Math.imul(hash, 0x01000193) >>> 0;
+	}
+
+	// Mix in length to differentiate same-prefix strings
+	hash ^= (len & 0xffff);
+	hash = Math.imul(hash, 0x01000193) >>> 0;
+
 	return hash.toString(36);
+}
+
+function approximateSize(value: unknown): number {
+	try {
+		return JSON.stringify(value).length * 2; // rough UTF-16 estimate
+	} catch {
+		return 1024; // unknown — assume 1 KB
+	}
+}
+
+function lruEvictExpired(): void {
+	const now = Date.now();
+	for (const [k, entry] of lruCache) {
+		if (now > entry.expiresAt) {
+			cacheBytes -= entry.sizeBytes;
+			lruCache.delete(k);
+		}
+	}
 }
 
 function lruGet(key: string): unknown | undefined {
 	const entry = lruCache.get(key);
 	if (!entry) return undefined;
 	if (Date.now() > entry.expiresAt) {
+		cacheBytes -= entry.sizeBytes;
 		lruCache.delete(key);
 		return undefined;
 	}
-	// Move to end (most recently used)
+	// Refresh to MRU position
 	lruCache.delete(key);
 	lruCache.set(key, entry);
 	return entry.value;
 }
 
 function lruSet(key: string, value: unknown): void {
-	// Evict oldest if at capacity
-	if (lruCache.size >= LRU_MAX) {
+	const sizeBytes = approximateSize(value);
+
+	// Skip caching huge entries — they'd blow the budget on a single item
+	if (sizeBytes > MAX_ENTRY_BYTES) return;
+
+	// Evict expired entries first (free pass)
+	lruEvictExpired();
+
+	// Evict LRU entries until budget allows insertion
+	while (cacheBytes + sizeBytes > LRU_BUDGET_BYTES && lruCache.size > 0) {
 		const oldest = lruCache.keys().next().value;
-		if (oldest) lruCache.delete(oldest);
+		if (!oldest) break;
+		const old = lruCache.get(oldest)!;
+		cacheBytes -= old.sizeBytes;
+		lruCache.delete(oldest);
 	}
-	lruCache.set(key, { value, expiresAt: Date.now() + LRU_TTL_MS });
+
+	lruCache.set(key, { value, expiresAt: Date.now() + LRU_TTL_MS, sizeBytes });
+	cacheBytes += sizeBytes;
 }
 
-// ── Minimum payload size for native path ──────────────────────────────
+// ── OOM guard ──────────────────────────────────────────────────────────────────
 
+const MAX_INPUT_BYTES = 64 * 1024 * 1024; // 64 MB — beyond this, bail early
+
+/** Minimum payload size for native simdjson path (V8 is faster for small strings) */
 const MIN_NATIVE_BYTES = 1024;
 
-// ── Public API ─────────────────────────────────────────────────────────
+// ── Public API ─────────────────────────────────────────────────────────────────
 
 /**
  * Parse JSON with simdjson (large payloads) or V8 JSON.parse (small/fallback).
- * Results are LRU-cached for 30s.
+ * Results cached with 8 MB byte-budget LRU for 30 s.
+ * Inputs > 64 MB throw RangeError to prevent OOM.
  */
 export function fastJsonParse<T = unknown>(input: string): T {
-	// Check LRU cache
+	// OOM guard — bail before any allocation
+	if (input.length > MAX_INPUT_BYTES) {
+		throw new RangeError(
+			`[simdjson-bridge] Input too large (${(input.length / 1e6).toFixed(1)} MB). ` +
+			`Max is ${MAX_INPUT_BYTES / 1e6} MB.`
+		);
+	}
+
+	// Check LRU cache (hash computed over L1-friendly prefix)
 	const cacheKey = fnv1aKey(input);
 	const cached = lruGet(cacheKey);
 	if (cached !== undefined) return cached as T;
@@ -125,11 +198,10 @@ export function fastJsonParse<T = unknown>(input: string): T {
 	const native = input.length >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
 	if (native) {
 		try {
-			// simdjson validates + minifies, then V8 parses the validated string
+			// simdjson validates + minifies; V8 parses the tightly-packed output
 			const validated = native.simdJsonParse(input);
 			result = JSON.parse(validated) as T;
 		} catch {
-			// Fallback on any native error
 			result = JSON.parse(input) as T;
 		}
 	} else {
@@ -145,15 +217,16 @@ export function fastJsonParse<T = unknown>(input: string): T {
  * Falls back to try/catch JSON.parse if addon unavailable.
  */
 export function fastJsonValidate(input: string): boolean {
+	if (input.length > MAX_INPUT_BYTES) return false;
+
 	const native = getSimdJsonAddon();
 	if (native) {
 		try {
 			return native.simdJsonValidate(input);
 		} catch {
-			// fallback
+			// fall through
 		}
 	}
-
 	try {
 		JSON.parse(input);
 		return true;
@@ -164,18 +237,151 @@ export function fastJsonValidate(input: string): boolean {
 
 /**
  * Extract a numeric array at a JSON Pointer path directly into a Float64Array.
- * Skips JS object allocation entirely — ideal for embedding vectors.
- * Returns null if addon is unavailable.
+ * Zero-copy for embedding vectors — avoids full JS object allocation.
+ * Returns null if addon unavailable or path not found.
  */
 export function fastJsonExtractNumbers(input: string, pointer: string): Float64Array | null {
+	if (input.length > MAX_INPUT_BYTES) return null;
 	const native = getSimdJsonAddon();
 	if (!native) return null;
-
 	try {
 		return native.simdJsonExtractNumbers(input, pointer);
 	} catch {
 		return null;
 	}
+}
+
+/**
+ * Extract a single string/number field by key from a flat JSON object.
+ * Uses a lightweight regex fast-path — avoids full parse for single-field reads.
+ * Example: fastJsonExtractField('{"model":"gemma4","status":"ok"}', "status") → "ok"
+ */
+export function fastJsonExtractField(input: string, key: string): string | null {
+	if (input.length > MAX_INPUT_BYTES) return null;
+
+	// Fast regex — captures first occurrence of `"key": <value>`
+	const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const m = new RegExp(`"${escapedKey}"\\s*:\\s*("(?:[^"\\\\]|\\\\.)*"|[^,}\\]]+)`).exec(input);
+	if (!m) return null;
+
+	const raw = m[1].trim();
+	// Strip outer quotes for string values
+	if (raw.startsWith('"') && raw.endsWith('"')) {
+		return raw.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+	}
+	return raw;
+}
+
+// ── Reusable BufferPool ────────────────────────────────────────────────────────
+// Pools pre-allocated Buffers for raw JSON input staging.
+// Avoids repeated Buffer.allocUnsafe() in hot ingestion loops.
+// simdjson docs recommend reusing parser + input storage for best performance.
+
+const BUFFER_POOL_CHUNK = 1 << 20; // 1 MB minimum chunk
+const BUFFER_POOL_MAX   = 12;      // max 12 buffers cached (~12 MB pool cap)
+const _bufferPool: Buffer[] = [];
+
+/**
+ * Acquire a Buffer of at least `minBytes` from the pool (allocates if none available).
+ * Must be released via `releaseBuffer()` when done — do NOT hold across await boundaries.
+ */
+export function acquireBuffer(minBytes: number): Buffer {
+	const need = Math.max(minBytes, BUFFER_POOL_CHUNK);
+	for (let i = 0; i < _bufferPool.length; i++) {
+		if (_bufferPool[i].byteLength >= need) {
+			return _bufferPool.splice(i, 1)[0];
+		}
+	}
+	return Buffer.allocUnsafe(need);
+}
+
+/**
+ * Return a Buffer to the pool for reuse.
+ * Do not use the buffer after releasing it.
+ */
+export function releaseBuffer(buf: Buffer): void {
+	if (_bufferPool.length < BUFFER_POOL_MAX) {
+		_bufferPool.push(buf);
+	}
+	// If pool is full, let GC reclaim it
+}
+
+/**
+ * Run `fn` with a pooled Buffer large enough for `size` bytes.
+ * Automatically acquires and releases — safe for sync code.
+ */
+export function withBuffer<T>(size: number, fn: (buf: Buffer) => T): T {
+	const buf = acquireBuffer(size);
+	try {
+		return fn(buf);
+	} finally {
+		releaseBuffer(buf);
+	}
+}
+
+/**
+ * Parse a large JSON array in chunks to stay within L2 cache per pass.
+ * Yields parsed elements — caller controls memory pressure via iteration speed.
+ * Falls back to full JSON.parse for non-array inputs.
+ */
+export function* fastJsonParseStream<T = unknown>(input: string, chunkHint = 64): Generator<T> {
+	// Only chunk arrays; other values fall through to full parse
+	const trimmed = input.trimStart();
+	if (!trimmed.startsWith('[')) {
+		yield fastJsonParse<T>(input);
+		return;
+	}
+
+	// Trim outer brackets and split on top-level commas
+	// This is a simplified splitter — does not handle nested commas inside objects.
+	// For production use with deeply-nested arrays, prefer the native streaming API.
+	const inner = trimmed.slice(1, trimmed.lastIndexOf(']'));
+	let depth = 0, start = 0;
+	const items: string[] = [];
+	for (let i = 0; i < inner.length; i++) {
+		const ch = inner[i];
+		if (ch === '{' || ch === '[') depth++;
+		else if (ch === '}' || ch === ']') depth--;
+		else if (ch === ',' && depth === 0) {
+			items.push(inner.slice(start, i).trim());
+			start = i + 1;
+		}
+	}
+	if (start < inner.length) items.push(inner.slice(start).trim());
+
+	for (let i = 0; i < items.length; i += chunkHint) {
+		const chunk = items.slice(i, i + chunkHint);
+		for (const item of chunk) {
+			if (item) yield fastJsonParse<T>(item);
+		}
+		// Allow GC + I/O between chunks (microtask boundary)
+		// In sync generator context this is a no-op but signals intent to caller
+	}
+}
+
+/**
+ * Return LRU cache stats for monitoring (Langfuse / admin panel).
+ */
+export function getSimdjsonCacheStats(): {
+	entries: number;
+	budgetUsedBytes: number;
+	budgetLimitBytes: number;
+	hitRatePct: number;
+} {
+	return {
+		entries: lruCache.size,
+		budgetUsedBytes: cacheBytes,
+		budgetLimitBytes: LRU_BUDGET_BYTES,
+		hitRatePct: 0, // counter tracking not added here to avoid overhead
+	};
+}
+
+/**
+ * Flush the LRU cache (useful after large bulk ingestion jobs to reclaim heap).
+ */
+export function clearSimdjsonCache(): void {
+	lruCache.clear();
+	cacheBytes = 0;
 }
 
 /**

@@ -10,8 +10,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { ApiResponse } from '$lib/types/api.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
-import { getRabbitMQUrl } from '$lib/config/env.server.js';
+
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const workerTriggerSchema = z.object({
 	type: z.enum(['case_created', 'evidence_uploaded', 'document_added']),
@@ -71,7 +72,7 @@ export const POST: RequestHandler = async (event) => {
 			// Dynamic import to avoid server-side dependency issues
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const amqp = (await import('amqplib')) as any;
-			const rabbitmqUrl = getRabbitMQUrl();
+			const rabbitmqUrl = ENV.RABBITMQ_URL;
 
 			const connection = await amqp.connect(rabbitmqUrl);
 			const channel = await connection.createChannel();

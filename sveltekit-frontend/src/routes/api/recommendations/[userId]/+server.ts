@@ -24,10 +24,11 @@ import { documentTopics, userInteractionHistory } from '$lib/server/db/schema-po
 import { eq, desc } from 'drizzle-orm';
 import { MultiModalRanker, type DocumentCandidate, type RankedDocument } from '$lib/server/ml/multi-modal-ranker.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
-import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // Zod schema validates POST body: interactionType enum, documentId, topicPreferences array
 const userInteractionSchema = z.object({
@@ -43,8 +44,8 @@ const userInteractionSchema = z.object({
 	})).max(50).optional(),
 });
 
-const QDRANT_URL = getQdrantUrl();
-const OLLAMA_URL = getOllamaUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 /**
  * Generate embedding for query via Ollama

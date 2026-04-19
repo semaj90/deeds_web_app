@@ -5,11 +5,12 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getQdrantUrl, getCodebaseIndexUrl } from '$lib/config/env.server.js';
-import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
 
-const QDRANT_URL = getQdrantUrl();
-const FASTAPI_URL = getCodebaseIndexUrl();
+import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
+import { ENV } from '$lib/server/env.server.js';
+
+const QDRANT_URL = ENV.QDRANT_URL;
+const FASTAPI_URL = ENV.CODEBASE_INDEX_URL;
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 

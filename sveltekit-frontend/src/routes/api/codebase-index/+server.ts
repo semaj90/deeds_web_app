@@ -2,10 +2,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
-import { getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
-const QDRANT_URL = getQdrantUrl();
-const OLLAMA_URL = getOllamaUrl();
+import { ENV } from '$lib/server/env.server.js';
+const QDRANT_URL = ENV.QDRANT_URL;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
 interface FileProfile {

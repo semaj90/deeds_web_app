@@ -2,10 +2,10 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
-import { getQdrantUrl } from '$lib/config/env.server.js';
 const qdrant = new QdrantClient({
-	url: getQdrantUrl()
+	url: ENV.QDRANT_URL
 });
 
 const similarClustersSchema = z.object({
@@ -61,5 +61,4 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		);
 	}
 };
-
 

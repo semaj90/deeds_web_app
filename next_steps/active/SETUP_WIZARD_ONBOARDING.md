@@ -1,6 +1,6 @@
 # Setup Wizard — Interactive Onboarding Tutorial
 
-## Status: COMPLETE
+## Status: ✅ COMPLETE — All items done. Archive candidate.
 ## Priority: High
 ## Created: 2026-03-16
 

@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
-import { getTrtLlmUrl, getQdrantUrl } from '$lib/config/env.server.js';
+
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { getLangExtractStatus } from '$lib/server/langextract-client.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
@@ -43,8 +43,8 @@ export const GET: RequestHandler = async () => {
 	};
 
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
-	const qdrantUrl = getQdrantUrl();
-	const trtllmUrl = getTrtLlmUrl();
+	const qdrantUrl = ENV.QDRANT_URL;
+	const trtllmUrl = ENV.TENSORRT_URL;
 
 	// Parallel checks — all with 2s timeout
 	const [

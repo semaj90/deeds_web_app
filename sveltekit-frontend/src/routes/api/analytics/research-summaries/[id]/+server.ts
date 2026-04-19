@@ -89,10 +89,10 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 			.where(eq(researchSummaries.id, id))
 			.limit(1);
 
-		if (!rows[0]) return json({ error: 'Not found' }, { status: 404 });
+		if (!rows[0]) return json({ summary: null });
 		return json({ summary: rows[0] });
 	} catch {
-		return json({ error: 'DB error' }, { status: 500 });
+		return json({ summary: null });
 	}
 };
 

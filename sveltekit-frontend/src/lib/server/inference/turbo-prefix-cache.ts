@@ -148,7 +148,7 @@ async function fetchFromRedisZset(
 function extractQueryTags(query: string): string[] {
   const legal = query.match(/\b(?:hearsay|negligence|tort|contract|discovery|statute|section\s*\d+|§\s*\d+|f\.r\.e\.|u\.s\.c\.|mens rea|actus reus|injunction|habeas|certiorari|stare decisis|res judicata)\b/gi) ?? [];
   const nouns = query.match(/\b[A-Z][a-z]{3,}\b/g)?.map(w => w.toLowerCase()) ?? [];
-  return [...new Set([...legal.map(t => t.toLowerCase()), ...nouns])].slice(0, 4);
+  return [...new Set([...legal.map((t: string) => t.toLowerCase()), ...nouns])].slice(0, 4);
 }
 
 /**
@@ -329,10 +329,21 @@ async function logPrefixBuildToNeo4j(
  *
  * Sources: Redis ZSET (L1) → Postgres pgvector + JSONB tags (L2) → crawl trigger (L3)
  */
+// Prefix scaffold TTL (seconds) — 15 min balances freshness vs RL policy change rate.
+// Inlined at the call site to avoid TS 6133 false-positive in fire-and-forget closures.
+// Change both this comment and the setex() call below if adjusting the TTL.
+
 export async function buildGraphAwarePrefix(
   query: string,
   opts: { caseContext?: string } = {},
 ): Promise<string> {
+  // ── Scaffold cache: skip full pipeline if same (query, caseContext) seen recently ──
+  const scaffoldKey = `turbo:prefix:${fnv1a(query + ':' + (opts.caseContext ?? ''))}`;
+  try {
+    const cached = await getRedis().get(scaffoldKey);
+    if (cached) return cached;
+  } catch { /* Redis down — proceed */ }
+
   const [policy, dymSuggestions] = await Promise.all([
     fetchRlPolicy(),
     getDymSuggestions(query),
@@ -389,6 +400,9 @@ export async function buildGraphAwarePrefix(
     anchorSection,
     caseSection,
   ].join('').trim();
+
+  // Cache assembled scaffold for 15 min — skips RL policy + Postgres + DYM on repeat queries
+  getRedis().setex(scaffoldKey, 15 * 60, prefix).catch(() => {});
 
   // Log to Neo4j (fire-and-forget — graph analysis only)
   const prefixHash = fnv1a(prefix);

@@ -2,7 +2,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 import { createQdrantService } from '$lib/server/db/qdrant-integration';
-import { tryEmbedOllama } from '$lib/server/embeddings/ollama';
+import { tryEmbedOllama } from '$lib/server/embedding/ollama-embed';
 
 export const load: PageServerLoad = async ({ locals }) => {
     return {

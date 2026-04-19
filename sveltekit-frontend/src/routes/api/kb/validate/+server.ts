@@ -5,14 +5,15 @@
  * POST /api/kb/validate
  */
 
-import { getQdrantUrl } from '$lib/config/env.server.js';
+
 import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const QDRANT_URL = getQdrantUrl();
+const QDRANT_URL = ENV.QDRANT_URL;
 
 const validateSourcesSchema = z.object({
   query_id: z.string().min(1).max(500),

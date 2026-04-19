@@ -13,9 +13,9 @@ import type { RequestHandler } from './$types';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 
-import { getOllamaUrl } from '$lib/config/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
-const OLLAMA_URL = getOllamaUrl();
+import { ENV } from '$lib/server/env.server.js';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 const analyzeTagSchema = z.object({
 	tag: z.string().min(1, 'tag is required').max(200),

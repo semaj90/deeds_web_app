@@ -1,5 +1,5 @@
 /**
- * Shared codebase retrieval module: recall (Fuse.js) -> rerank (Qdrant dual-vector).
+ * Shared codebase retrieval module: recall (Fuse.js) -> rerank (Qdrant tri-vector).
  *
  * Provides a single-call `loadCodebaseContext(query)` that returns a formatted
  * context string suitable for injection into LLM system prompts.
@@ -13,12 +13,16 @@
  * Step 2 fix: RankedChunk carries neo4j graph enrichment fields (gpuCluster,
  *             pageRankScore, routeType, hasAuthGuard) with Colab-preferred fallback.
  *             PageRank priority: Colab bare key > CouchDB power-iteration > local LibTorch.
+ * Step 3 opt: Optional third lane — `error` named vector searched via searchByError().
+ *             Activated when RerankOptions.errorQuery is set; additive boost (weight 0.15).
+ *             Chunks that appear in error-vector results are promoted in the final ranking.
  */
 import Fuse from 'fuse.js';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
+import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 
 // -- Collection name -----------------------------------------------------------
 
@@ -216,14 +220,28 @@ export interface RerankOptions {
 	limit?: number;
 	contentWeight?: number;
 	signatureWeight?: number;
+	/** Additive error-vector boost weight (default 0.15). Only active when errorQuery set. */
+	errorWeight?: number;
 	pathBoosts?: Record<string, number>;
+	/**
+	 * When provided, also searches the `error` named vector via searchByError().
+	 * Results are additively merged into the main score map with errorWeight.
+	 * Chunks semantically close to the error description are promoted.
+	 */
+	errorQuery?: string;
 }
 
 export interface RerankResult {
 	results: RankedChunk[];
 	queryVector: number[];
 	timing: { embedMs: number; searchMs: number; totalMs: number };
-	meta: { contentResults: number; signatureResults: number; merged: number; returned: number };
+	meta: {
+		contentResults: number;
+		signatureResults: number;
+		errorResults: number;
+		merged: number;
+		returned: number;
+	};
 }
 
 export async function rerankChunks(
@@ -233,6 +251,7 @@ export async function rerankChunks(
 	const limit = Math.min(options.limit ?? 10, 50);
 	const contentWeight = options.contentWeight ?? 0.6;
 	const signatureWeight = options.signatureWeight ?? 0.4;
+	const errorWeight = options.errorWeight ?? 0.15;
 	const pathBoosts = options.pathBoosts ?? DEFAULT_PATH_BOOSTS;
 
 	const start = performance.now();
@@ -251,9 +270,17 @@ export async function rerankChunks(
 	const embedMs = performance.now() - start;
 
 	const searchStart = performance.now();
-	const [contentResults, signatureResults] = await Promise.all([
+
+	// Three-way parallel search: content + signature (always) + error (when errorQuery provided).
+	// Error search uses its own embedding (the error text, not the code query) — this is
+	// intentional: error-vector space represents "what errors does this chunk relate to",
+	// so searching with error text finds semantically related error-prone code.
+	const [contentResults, signatureResults, errorResults] = await Promise.all([
 		searchQdrant('content', queryVector, limit * 3, filter),
-		searchQdrant('signature', queryVector, limit * 3, filter)
+		searchQdrant('signature', queryVector, limit * 3, filter),
+		options.errorQuery
+			? searchByError(options.errorQuery, limit * 2, filter)
+			: Promise.resolve([] as Array<{ id: number | string; score: number; payload: Record<string, unknown> }>)
 	]);
 	const searchMs = performance.now() - searchStart;
 
@@ -271,6 +298,19 @@ export async function rerankChunks(
 			existing.score += r.score * signatureWeight;
 		} else {
 			scoreMap.set(key, { payload: r.payload, score: r.score * signatureWeight });
+		}
+	}
+
+	// Additive error boost — promotes chunks already in the score map that also match
+	// the error description. Chunks only in errorResults (not in content/signature) are
+	// added with errorWeight score so they can still surface if highly relevant.
+	for (const r of errorResults) {
+		const key = String(r.id);
+		const existing = scoreMap.get(key);
+		if (existing) {
+			existing.score += r.score * errorWeight;
+		} else {
+			scoreMap.set(key, { payload: r.payload, score: r.score * errorWeight });
 		}
 	}
 
@@ -332,6 +372,7 @@ export async function rerankChunks(
 		meta: {
 			contentResults: contentResults.length,
 			signatureResults: signatureResults.length,
+			errorResults: errorResults.length,
 			merged: scoreMap.size,
 			returned: results.length
 		}

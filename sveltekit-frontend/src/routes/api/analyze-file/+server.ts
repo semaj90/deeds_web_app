@@ -15,11 +15,11 @@ import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import { promisify } from 'util';
 
-import { getOllamaUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 const execFileAsync = promisify(execFile);
-const OLLAMA_URL = getOllamaUrl();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 const analyzeFileSchema = z.object({
   filePath: z
@@ -291,6 +291,4 @@ async function generateEnhancedTag(filePath: string, analysis: { summary: string
 		};
 	}
 }
-
-
 

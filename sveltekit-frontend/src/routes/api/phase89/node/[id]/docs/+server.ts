@@ -7,12 +7,12 @@ import { json } from '@sveltejs/kit';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
 
-import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
-const sql = postgres(getDatabaseUrl());
-const QDRANT_URL = getQdrantUrl();
-const OLLAMA_URL = getOllamaUrl();
+import { ENV } from '$lib/server/env.server.js';
+const sql = postgres(ENV.DATABASE_URL);
+const QDRANT_URL = ENV.QDRANT_URL;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const KNOWLEDGE_COLLECTION = 'phase76_knowledge_base';
 
 async function generateEmbedding(text: string): Promise<number[]> {

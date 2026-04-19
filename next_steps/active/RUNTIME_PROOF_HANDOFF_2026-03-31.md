@@ -1,4 +1,5 @@
 # Runtime Proof Handoff — March 31, 2026
+**Status**: SUPERSEDED — runtime proofs completed in later sessions (evidence upload, SSE chat, infrastructure all verified). Archive candidate.
 
 ## Current Position
 

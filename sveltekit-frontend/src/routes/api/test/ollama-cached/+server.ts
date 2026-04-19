@@ -6,31 +6,34 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 import { ollamaCachedChat } from '$lib/server/ollama-cached.js';
+import { z } from 'zod';
 
-interface TestRequest {
-  query: string;
-  model?: string;
-  temperature?: number;
-  maxTokens?: number;
-}
+const ollamaCachedSchema = z.object({
+  query: z.string().max(1000).default('Test query'),
+  model: z.string().max(100).default('gemma4-legal-fast'),
+  temperature: z.number().min(0).max(2).default(0.3),
+  maxTokens: z.number().int().min(1).max(4096).default(200),
+});
 
 export const POST: RequestHandler = async ({ request }) => {
+  if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
   const startTime = performance.now();
 
   try {
-    const body = await request.json() as TestRequest;
-    const query = body.query || 'Test query';
-    const model = body.model || 'gemma4-legal-fast';
-    const temperature = body.temperature ?? 0.3;
-    const maxTokens = body.maxTokens ?? 200;
+    const raw = await request.json().catch(() => ({}));
+    const parsed = ollamaCachedSchema.safeParse(raw);
+    if (!parsed.success)
+      return json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+    const { query, model, temperature, maxTokens } = parsed.data;
 
-    const content = await ollamaCachedChat(
-      [{ role: 'user', content: query }],
-      model,
-      { temperature, maxTokens, timeoutMs: 60_000 }
-    );
+    const content = await ollamaCachedChat([{ role: 'user', content: query }], model, {
+      temperature,
+      maxTokens,
+      timeoutMs: 60_000,
+    });
 
     const totalMs = Math.round(performance.now() - startTime);
 

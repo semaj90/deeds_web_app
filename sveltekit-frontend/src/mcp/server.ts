@@ -967,6 +967,46 @@ function setupToolHandlers() {
         },
       },
       // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'codebase:concurrent_research',
+        description:
+          'LangGraph-style concurrent deep research over codebase_chunks_768. ' +
+          'Runs a supervisor → parallel domain workers → Ollama synthesizer DAG. ' +
+          'Domains: api-routes, state-machines, database, error-patterns, ml-inference, ' +
+          'auth, cache, rag-pipeline, ui-components, graph-db, general. ' +
+          'Returns supervisorSummary, keyFindings, actionItems, per-domain chunks + insights. ' +
+          'format=markdown returns Claude-Code-ready context block with file paths. ' +
+          'All LLM calls via L1 Redis → L2 Bifrost → L3 Ollama (zero API cost).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Natural language research question about the codebase',
+            },
+            domains: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['api-routes','state-machines','database','error-patterns','ml-inference','auth','cache','rag-pipeline','ui-components','graph-db','general'],
+              },
+              description: 'Explicit research domains (auto-detected from query if omitted)',
+            },
+            limitPerWorker: {
+              type: 'number',
+              description: 'Max Qdrant chunks per domain worker (default 12, max 30)',
+              default: 12,
+            },
+            format: {
+              type: 'string',
+              enum: ['json', 'markdown'],
+              description: 'Response format: json (structured) or markdown (Claude Code context block)',
+              default: 'json',
+            },
+          },
+          required: ['query'],
+        },
+      },
       // Analytics — Web Research Crawler (SearXNG → cosine → ACE summarize)
       // ─────────────────────────────────────────────────────────────────────
       {
@@ -2312,6 +2352,50 @@ function setupToolHandlers() {
       }
 
       // ── Analytics: Web Research Crawler ────────────────────────────────────
+      // ── Codebase: Concurrent LangGraph Research ──────────────────────────────────
+      case 'codebase:concurrent_research': {
+        const { runConcurrentResearch, formatGraphForClaudeCode } = await import(
+          '$lib/server/ai/langgraph-research.js'
+        );
+        const query          = String(args.query ?? '');
+        const domains        = Array.isArray(args.domains) ? args.domains : undefined;
+        const limitPerWorker = Math.min(30, Math.max(3, Number(args.limitPerWorker ?? 12)));
+        const format         = args.format === 'markdown' ? 'markdown' : 'json';
+
+        if (!query.trim()) throw new Error('query is required');
+
+        const graph = await runConcurrentResearch(query, { domains, limitPerWorker });
+
+        if (format === 'markdown') {
+          const md = formatGraphForClaudeCode(graph);
+          return { content: [{ type: 'text', text: md }] };
+        }
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              query:             graph.query,
+              domains:           graph.domains,
+              supervisorSummary: graph.supervisorSummary,
+              keyFindings:       graph.keyFindings,
+              actionItems:       graph.actionItems,
+              totalChunks:       graph.totalChunks,
+              totalDurationMs:   graph.totalDurationMs,
+              workers: graph.workerFindings.map(w => ({
+                domain:        w.domain,
+                chunkCount:    w.chunks.length,
+                summary:       w.summary,
+                keyInsights:   w.keyInsights,
+                relevantPaths: w.relevantPaths,
+                source:        w.source,
+                cached:        w.cached,
+              })),
+            }),
+          }],
+        };
+      }
+
       case 'analytics:web_research': {
         const {
           crawlWebResearch,

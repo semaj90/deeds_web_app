@@ -1,8 +1,9 @@
 
-import { getRedisHost, getRedisPort } from '$lib/config/env.server.js';
+
 import { createRedisConnection } from '$lib/server/redis';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // Helper: safely extract a message from unknown error values
 function extractMessage(e: unknown): string {
@@ -41,8 +42,8 @@ export const GET: RequestHandler = async () => {
  return json({
  status: 'healthy',
  service: 'redis',
- port: getRedisPort(),
- host: getRedisHost(),
+ port: ENV.REDIS_PORT,
+ host: ENV.REDIS_HOST,
  timestamp,
  });
  } catch (error: unknown) {
@@ -76,5 +77,4 @@ export const GET: RequestHandler = async () => {
  }
  }
 };
-
 

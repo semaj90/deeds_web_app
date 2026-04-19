@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import type { DemoModel } from '$lib/adapters/legal-corpus';
+	import type { DemoModel } from '$lib/types/legal-corpus-views';
 
 	let { model, onCitationClick }: { model: DemoModel; onCitationClick?: (cite: DemoModel['topCitations'][number]) => void } = $props();
 </script>

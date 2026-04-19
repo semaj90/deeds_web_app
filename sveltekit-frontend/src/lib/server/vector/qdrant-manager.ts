@@ -134,6 +134,25 @@ export class QdrantManager {
         field: 'jurisdiction',
         schema: 'keyword',
       },
+      // ── codebase_chunks_768 — KAG/ACE/error-fix critical filters ──────────────
+      // These fields are used in every codebase search: by language, by kind (route/
+      // component/schema/migration), by K-means cluster, by SOM neuron, by file path,
+      // by extracted symbol, and by repo for future multi-repo support.
+      // Without these indexes Qdrant does a full O(n) payload scan on every query.
+      { collection: this.collections.codebase_chunks, field: 'kind',        schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'language',    schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'cluster_id',  schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'som_cluster', schema: 'integer' },
+      { collection: this.collections.codebase_chunks, field: 'path',        schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'symbol_name', schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'tags',        schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'repo',        schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'error_id',    schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'updated_at',  schema: 'integer' },
+      // evidence_items: add cluster + tag indexes for cross-case similarity
+      { collection: this.collections.evidence, field: 'cluster_id',   schema: 'keyword' },
+      { collection: this.collections.evidence, field: 'tags',         schema: 'keyword' },
+      { collection: this.collections.evidence, field: 'entity_labels', schema: 'keyword' },
     ];
 
     for (const { collection, field, schema } of indexConfigs) {

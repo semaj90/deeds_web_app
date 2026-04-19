@@ -1265,6 +1265,71 @@ async function fetchCaseChunks(
   }
 }
 
+/**
+ * Research Summaries Tier — SOM-prefiltered retrieval from research_summaries.
+ * When a SOM cluster is detected via probe, filters to that cluster before ANN,
+ * shrinking the candidate space from 60K+ → ~5-10K. Falls back to full sweep
+ * when the prefiltered result count is too low.
+ */
+async function fetchResearchSummaryChunks(
+  embedding: number[],
+  queryHashStr: string,
+  somCluster: number | null
+): Promise<RAGChunk[]> {
+  const clusterSuffix = somCluster != null ? `:c${somCluster}` : ':all';
+  const cacheKey = `research_bundle:${queryHashStr}${clusterSuffix}`;
+  const cached = await getCachedBundle(cacheKey);
+  if (cached) {
+    console.log(`[ACE Research] bundle HIT cluster=${somCluster ?? 'all'} (${cached.length} chunks)`);
+    return cached;
+  }
+
+  try {
+    const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
+    const baseOpts = {
+      vector: embedding, // research_summaries uses unnamed single vector
+      limit: 6,
+      score_threshold: 0.38,
+      with_payload: true,
+    };
+
+    // Prefiltered ANN: narrow to detected SOM cluster first
+    let results: any[] = somCluster != null
+      ? await qdrantMgr.client
+          .search('research_summaries', {
+            ...baseOpts,
+            filter: { must: [{ key: 'som_cluster', match: { value: somCluster } }] },
+          })
+          .catch(() => [])
+      : [];
+
+    // Fallback: full sweep when cluster filter is empty or cluster unknown
+    if (results.length < 2) {
+      results = await qdrantMgr.client
+        .search('research_summaries', baseOpts)
+        .catch(() => []);
+      if (results.length && somCluster != null) {
+        console.log(`[ACE Research] cluster=${somCluster} prefilter sparse, fell back to full sweep`);
+      }
+    }
+
+    const chunks: RAGChunk[] = results
+      .map((r: any) => ({
+        content: String(r.payload?.summary ?? r.payload?.content ?? r.payload?.text ?? ''),
+        score: r.score,
+        source: String(r.payload?.url ?? r.payload?.source ?? r.payload?.topic ?? 'research:summary'),
+      }))
+      .filter((c: RAGChunk) => c.content.length > 30);
+
+    // 5-min TTL — research summaries are less volatile than live evidence
+    setCachedBundle(cacheKey, chunks, 300).catch(() => {});
+    return chunks;
+  } catch (err) {
+    console.warn('[ACE Research] retrieval failed:', (err as Error)?.message ?? err);
+    return [];
+  }
+}
+
 /** Merged RAG retrieval (backward compat) — calls both tiers in parallel.
  *  When a caseId is provided, fetches graph neighbors BEFORE retrieval
  *  and passes them as Qdrant `should` filters + post-retrieval authority scoring.
@@ -1290,11 +1355,41 @@ async function fetchRAGChunks(
     }
   }
 
-  // Fetch ace_chunks cache + Qdrant tiers in parallel
-  const [kbChunks, caseChunks, aceChunks] = await Promise.all([
+  // SOM topology probe: quick 5-point scan to detect query's probable cluster.
+  // Reduces research_summaries candidate space from 60K+ → ~5-10K before full ANN.
+  let somCluster: number | null = null;
+  try {
+    const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
+    const probe = await qdrantMgr.client
+      .search('research_summaries', {
+        vector: embedding,
+        limit: 5,
+        with_payload: true,
+        score_threshold: 0.3,
+      })
+      .catch(() => [] as any[]);
+    if (probe.length >= 2) {
+      const counts = new Map<number, number>();
+      for (const pt of probe) {
+        const c = pt.payload?.som_cluster;
+        if (c != null && typeof c === 'number') counts.set(c, (counts.get(c) ?? 0) + 1);
+      }
+      let best = 0;
+      for (const [cluster, count] of counts) {
+        if (count > best) { best = count; somCluster = cluster; }
+      }
+      if (somCluster != null) {
+        console.log(`[ACE RAG] SOM probe → cluster=${somCluster} (${best}/${probe.length} pts agree)`);
+      }
+    }
+  } catch { /* non-fatal — continue without prefilter */ }
+
+  // Fetch ace_chunks cache + Qdrant tiers + research summaries in parallel
+  const [kbChunks, caseChunks, aceChunks, researchChunks] = await Promise.all([
     fetchKBChunks(embedding, queryHash, graphFilter),
     fetchCaseChunks(embedding, queryHash, caseId, sectionTypes, graphFilter),
     caseId ? fetchCachedACEChunks(caseId) : Promise.resolve([]),
+    fetchResearchSummaryChunks(embedding, queryHash, somCluster),
   ]);
 
   // Merge all sources: Qdrant tiers + ace_chunks cache, deduplicate by content prefix
@@ -1307,7 +1402,7 @@ async function fetchRAGChunks(
       return true;
     });
 
-  let ragChunks = dedup([...kbChunks, ...caseChunks, ...aceChunks])
+  let ragChunks = dedup([...kbChunks, ...caseChunks, ...aceChunks, ...researchChunks])
     .sort((a, b) => b.score - a.score)
     .slice(0, 15);
 

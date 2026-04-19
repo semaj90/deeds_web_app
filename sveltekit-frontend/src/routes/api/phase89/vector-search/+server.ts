@@ -3,13 +3,14 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
-import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 const qdrant = new QdrantClient({
-	url: getQdrantUrl()
+	url: ENV.QDRANT_URL
 });
 
-const OLLAMA_URL = getOllamaUrl();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 async function generateEmbedding(text: string): Promise<number[]> {
 	try {
