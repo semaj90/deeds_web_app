@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const legalResearchSchema = z.object({
 	topic: z.string().max(10000).optional().default(''),
@@ -22,6 +23,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const topic = parsed.data.topic || parsed.data.query || '';
 		const jurisdiction = parsed.data.jurisdiction;
 		const depth = parsed.data.depth;
+		recordSearchQuery({ query: topic, pipeline: 'kag', cacheHit: false, userId: locals.user.id });
 
 		const systemPrompt = `You are a legal research assistant. Provide thorough legal research on the given topic.
 Include: relevant statutes, case law references, legal principles, and practical implications.
