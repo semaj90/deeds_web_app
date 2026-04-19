@@ -7,7 +7,8 @@
  */
 
 import { db } from '$lib/server/db/client';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { execFile } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { readFile } from 'fs/promises';
@@ -33,7 +34,7 @@ const analyzeFileSchema = z.object({
 const PROJECT_ROOT = resolve(process.cwd());
 const ALLOWED_SRC = resolve(PROJECT_ROOT, 'src');
 
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
 	try {

@@ -16,7 +16,7 @@
 import { db } from '$lib/server/db/client';
 import { users, passwordResetTokens } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import crypto from 'node:crypto';

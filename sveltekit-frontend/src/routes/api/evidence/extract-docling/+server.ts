@@ -7,7 +7,7 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
 const bodySchema = z.object({

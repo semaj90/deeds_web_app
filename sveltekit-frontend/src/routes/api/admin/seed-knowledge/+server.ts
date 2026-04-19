@@ -7,7 +7,7 @@
  *   Index lawpdfs/ directory through the evidence upload pipeline
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { legalGlossary, statutes, statuteChunks, legalPrecedents } from '$lib/server/db/schema-postgres.js';

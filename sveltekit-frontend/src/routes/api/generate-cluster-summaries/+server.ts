@@ -10,7 +10,8 @@
 import { db } from '$lib/server/db/client';
 import { getOllamaUrl, getRedisUrl } from '$lib/config/env.server.js';
 import { scrollPoints, upsertPoints } from '$lib/server/qdrant-http';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
@@ -38,7 +39,7 @@ interface ClusterCoordinate {
   [key: string]: unknown;
 }
 
-export async function POST({ locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ locals }) => {
   if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
   try {

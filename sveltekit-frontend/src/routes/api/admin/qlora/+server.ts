@@ -5,7 +5,8 @@
  * Training infrastructure lives in deeds_labs/ (Python trainers, CUDA kernels).
  * This endpoint manages job metadata and delegates to the training backend.
  */
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import type { Redis } from 'ioredis';
@@ -74,7 +75,7 @@ async function saveJobs(jobs: TrainingJob[]): Promise<void> {
 	} catch { /* non-critical */ }
 }
 
-export async function GET({ locals }: RequestEvent) {
+export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const jobs = await getJobs();
 
@@ -122,7 +123,7 @@ export async function GET({ locals }: RequestEvent) {
 	});
 }
 
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const raw = await request.json();

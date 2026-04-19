@@ -2,7 +2,7 @@
  * GET /api/analytics/summary — Weekly analytics summary for a user
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { getWeeklySummary } from '$lib/server/analytics/event-logger.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';

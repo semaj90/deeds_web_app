@@ -3,7 +3,8 @@
  * POST /api/gpu/lease — Acquire GPU lease for a backend
  * DELETE /api/gpu/lease — Release GPU lease
  */
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import {
 	acquireGpuLease,
@@ -21,7 +22,7 @@ const gpuReleaseSchema = z.object({
 	backend: z.enum(['ollama', 'tensorrt'])
 });
 
-export async function GET({ locals, request }: RequestEvent) {
+export const GET: RequestHandler = async ({ locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
@@ -47,7 +48,7 @@ export async function GET({ locals, request }: RequestEvent) {
   }
 }
 
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const raw = await request.json();
@@ -74,7 +75,7 @@ export async function POST({ request, locals }: RequestEvent) {
 	}
 }
 
-export async function DELETE({ request, locals }: RequestEvent) {
+export const DELETE: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const raw = await request.json();

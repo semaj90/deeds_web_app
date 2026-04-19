@@ -14,7 +14,7 @@
  *   → Delete a diagnosis event by ID
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 import { db } from '$lib/server/db/client';

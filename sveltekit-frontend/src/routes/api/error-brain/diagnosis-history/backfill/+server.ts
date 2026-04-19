@@ -6,7 +6,7 @@
  *   → Also re-infers probableRootCauseType for rows stuck on 'unknown'
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { diagnosisEvents } from '$lib/server/db/schema-postgres.js';
 import { eq, isNull, sql } from 'drizzle-orm';

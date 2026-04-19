@@ -2,7 +2,7 @@
  * GET /api/analytics/patterns — Top query patterns for a user
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { getTopQueryPatterns } from '$lib/server/analytics/event-logger.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';

@@ -7,7 +7,7 @@
  * used by the Analysis Panel to show runtime issues on the current page.
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { db } from '$lib/server/db/client';
 import { errorEvents, errorClusters } from '$lib/server/db/schema-postgres.js';

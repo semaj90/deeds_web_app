@@ -1,6 +1,6 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 import { pool } from '$lib/server/db/client';

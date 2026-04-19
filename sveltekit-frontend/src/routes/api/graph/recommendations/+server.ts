@@ -6,7 +6,7 @@
  * Returns: { success, summary, recommendations, didYouMean, predictiveSignals }
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import { embedText } from '$lib/server/embedding/embed.js';

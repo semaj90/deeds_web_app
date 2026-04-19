@@ -21,7 +21,8 @@
  *   Return coherent context bundles (not isolated snippets)
  */
 import { createHash } from 'node:crypto';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -145,7 +146,7 @@ interface ContextBundle {
   documentContext?: DocumentContext;
 }
 
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     const raw = await request.json();
     const parsed = evidenceSearchSchema.safeParse(raw);

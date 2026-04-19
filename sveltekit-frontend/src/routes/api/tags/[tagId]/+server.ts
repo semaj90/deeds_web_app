@@ -2,7 +2,7 @@
  * GET /api/tags/:tagId — Tag detail from CouchDB catalog
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { isValidSafeId } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {

@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { getDatabaseUrl, getRedisUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { env } from '$env/dynamic/private';
 

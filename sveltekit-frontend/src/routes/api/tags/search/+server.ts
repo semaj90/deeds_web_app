@@ -3,7 +3,7 @@
  * Query: ?q=contract+law&limit=10
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { searchTagsBySemantic } from '$lib/server/ace/tag-sync.js';
 import { ENV } from '$lib/server/env.server.js';

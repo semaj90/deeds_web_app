@@ -3,7 +3,8 @@
  * Query the api_audit_log table with pagination + filters.
  * Immutable log — POST/PUT/PATCH/DELETE return 405.
  */
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { pool } from '$lib/server/db/client';
 import { z } from 'zod';
@@ -20,7 +21,7 @@ const querySchema = z.object({
 	until: z.string().datetime().optional(),
 });
 
-export async function GET({ url, locals, request }: RequestEvent) {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const raw = Object.fromEntries(url.searchParams);

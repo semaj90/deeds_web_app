@@ -3,7 +3,7 @@
  * Body: { caseId?: string } — sync specific case or all
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { syncCaseToGraph, syncAllCasesToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 import { z } from 'zod';
 

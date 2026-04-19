@@ -1,5 +1,5 @@
 import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { auditLog, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { and, eq, or, isNull } from 'drizzle-orm';

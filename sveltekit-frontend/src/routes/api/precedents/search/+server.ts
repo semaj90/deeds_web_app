@@ -10,7 +10,7 @@ import { pgRows } from '$lib/server/db/client';
  * Response: { results: PrecedentSearchResult[], timing: Timing }
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';

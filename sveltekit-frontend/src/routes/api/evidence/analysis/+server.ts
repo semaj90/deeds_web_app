@@ -1,4 +1,5 @@
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { getWorkerStats } from '$lib/server/analysis/worker.js';
 import { getJobCounts, getJobsForEvidence, enqueueJob, type JobType } from '$lib/server/analysis/analysis-jobs.js';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ const evidenceAnalysisSchema = z.object({
  * GET /api/evidence/analysis?evidenceId=xxx
  * All analysis jobs for a specific evidence item.
  */
-export async function GET({ url, locals }: RequestEvent) {
+export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -51,7 +52,7 @@ export async function GET({ url, locals }: RequestEvent) {
  *
  * If stages is omitted, enqueues all three.
  */
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}

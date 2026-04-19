@@ -9,7 +9,7 @@
  * Response: { results: StatuteSearchResult[], timing: Timing }
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';

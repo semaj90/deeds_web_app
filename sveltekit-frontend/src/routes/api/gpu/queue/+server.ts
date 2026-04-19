@@ -2,7 +2,8 @@
  * GET /api/gpu/queue — Get current GPU process queue status
  * POST /api/gpu/queue — Submit a new GPU task
  */
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import {
 	createGpuTask,
 	classifyTaskPriority,
@@ -57,7 +58,7 @@ export async function GET() {
 	});
 }
 
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const raw = await request.json();

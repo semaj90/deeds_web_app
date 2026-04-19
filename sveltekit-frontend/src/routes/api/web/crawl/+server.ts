@@ -4,7 +4,8 @@
  * Web crawl proxy — delegates to the langextract Docker service (port 8095)
  * for URL content extraction, then optionally embeds + stores the result.
  */
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -27,7 +28,7 @@ interface CrawlResult {
   source: 'langextract' | 'fallback';
 }
 
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   const raw = await request.json();

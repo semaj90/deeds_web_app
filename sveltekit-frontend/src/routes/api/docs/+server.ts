@@ -4,7 +4,7 @@
  * Query: ?category=Auth&q=search&status=active
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import {

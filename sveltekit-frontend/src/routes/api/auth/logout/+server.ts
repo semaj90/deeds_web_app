@@ -4,7 +4,7 @@
 
 import { lucia } from '$lib/server/lucia';
 import { json, redirect } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async (event) => {
  try {

@@ -1,4 +1,5 @@
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import crypto from 'crypto';
 import { deleteFile, uploadFile } from '$lib/server/minio-client';
 import { db } from '$lib/server/db/client';
@@ -221,7 +222,7 @@ async function setCachedExtraction(
  * POST /api/evidence/upload
  * Pipeline: MinIO → PostgreSQL → text extraction (pdf-parse + OCR fallback) → chunk → embed → pgvector + Qdrant
  */
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
   // Auth guard: reject unauthenticated uploads
   if (!locals.user?.id) {
     return json({ success: false, error: 'Unauthorized' }, { status: 401 });

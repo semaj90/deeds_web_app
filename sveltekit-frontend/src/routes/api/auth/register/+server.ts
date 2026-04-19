@@ -8,7 +8,7 @@ import { users } from '$lib/server/db/schema';
 import { formatErrorResponse, ERROR_CODES } from '$lib/server/errors.js';
 import { createUserSession, hashPassword, setSessionCookie } from '$lib/server/lucia';
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 

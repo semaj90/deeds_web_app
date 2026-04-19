@@ -14,7 +14,7 @@
  * Cached in Redis for 15 minutes.
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { resolve, relative, dirname, basename } from 'path';
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { createHash } from 'crypto';

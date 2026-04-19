@@ -9,7 +9,7 @@
  * the error.embed RabbitMQ queue for async embedding.
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { errorEvents } from '$lib/server/db/schema-postgres.js';

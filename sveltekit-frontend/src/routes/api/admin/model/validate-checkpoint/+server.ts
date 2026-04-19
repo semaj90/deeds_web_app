@@ -22,7 +22,7 @@
  * Auth: requires locals.user
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { bifrostChat, listAvailableModels } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';

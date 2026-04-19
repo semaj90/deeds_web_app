@@ -10,7 +10,7 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { somWebGPUCache } from '$lib/webgpu/som-webgpu-cache';
 import { z } from 'zod';
 

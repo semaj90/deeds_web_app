@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';

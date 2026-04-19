@@ -9,7 +9,7 @@ import { pgRows } from '$lib/server/db/client';
  * Response: { response, context: { keywords, keyPhrases, suggestions } }
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';

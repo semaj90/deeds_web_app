@@ -8,7 +8,8 @@
 
 import { db } from '$lib/server/db/client';
 import { getCollections, scrollPoints } from '$lib/server/qdrant-http';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -21,7 +22,7 @@ const analyzeTagSchema = z.object({
 	collection: z.string().min(1, 'collection is required').max(200)
 });
 
-export async function POST({ request, locals }: RequestEvent) {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
 	let raw: unknown;

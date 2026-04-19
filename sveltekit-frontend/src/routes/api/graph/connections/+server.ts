@@ -3,7 +3,7 @@
  * Query: ?caseId=xxx
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 

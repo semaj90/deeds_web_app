@@ -12,7 +12,7 @@
  *   5. Cache + Store — Redis cache + Qdrant embedding + DB record
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';

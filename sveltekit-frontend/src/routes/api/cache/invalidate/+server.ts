@@ -12,7 +12,7 @@
  */
 
 import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';

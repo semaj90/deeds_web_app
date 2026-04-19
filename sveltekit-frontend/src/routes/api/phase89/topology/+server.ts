@@ -4,7 +4,7 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 
 export const GET: RequestHandler = async ({ locals }) => {

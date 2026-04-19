@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { sql, count } from 'drizzle-orm';
 import { legalGlossary, statutes, legalPrecedents } from '$lib/server/db/schema-postgres.js';

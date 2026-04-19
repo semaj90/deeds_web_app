@@ -8,7 +8,7 @@
  * POST /api/indexing/search-errors - Search indexed error patterns
  */
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './';
+import type { RequestHandler } from './$types';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import { glob } from 'glob';
