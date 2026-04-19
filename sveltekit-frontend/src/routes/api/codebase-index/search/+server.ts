@@ -7,6 +7,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { orchestrateRetrieval } from '$lib/server/retrieval/orchestrator.js';
+import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const bodySchema = z.object({
   query:  z.string().min(1).max(500),
@@ -24,6 +25,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
     const { query, limit } = parsed.data;
+
+    recordSearchQuery({ query, pipeline: 'codebase', cacheHit: false, userId: locals.user.id });
 
     const result = await orchestrateRetrieval({
       query,
