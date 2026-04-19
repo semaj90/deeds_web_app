@@ -2557,6 +2557,7 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 .tl-event-badge.rl_adapt   { color: #a78bfa; border-color: #a78bfa44; background: #a78bfa0d; }
 .tl-event-badge.tool_call  { color: #f87171; border-color: #f8717144; background: #f871710d; }
 .tl-event-badge.research   { color: #38bdf8; border-color: #38bdf844; background: #38bdf80d; }
+.tl-event-badge.graph_edge { color: #34d399; border-color: #34d39944; background: #34d3990d; }
 .ctrl-select {
 	height: 1.75rem; padding: 0 0.5rem; font-size: 0.7rem; font-family: inherit;
 	background: #13120f; border: 1px solid #2d2b24; border-radius: 4px; color: #9ca3af; cursor: pointer;

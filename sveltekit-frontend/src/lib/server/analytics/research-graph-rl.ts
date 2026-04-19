@@ -32,6 +32,7 @@ import {
 	rewardScoreGPU,
 } from '$lib/server/grpc/graph-ml-client.js';
 import type { ResearchSummary } from '$lib/server/db/schema-postgres.js';
+import { contextTimeline }     from '$lib/server/db/schema-postgres.js';
 
 // ── Constants ───────────────────────────────────────────────────────────────
 
@@ -282,6 +283,19 @@ async function syncToNeo4j(
 					MERGE (a)-[r:SIMILAR_RESEARCH]->(b)
 					SET   r.cluster = e.cluster
 				`, { edges });
+
+				// RL audit trail — one graph_edge event per sync batch
+				db.insert(contextTimeline).values({
+					sessionId:  '',
+					eventType:  'graph_edge',
+					pipeline:   'ace',
+					payload:    {
+						edgesCreated:  edges.length,
+						clusters:      clusterMembers.size,
+						summariesSync: summaries.length,
+						relationship:  'SIMILAR_RESEARCH',
+					} as Record<string, unknown>,
+				}).catch(() => { /* non-fatal */ });
 			}
 		} finally {
 			await session.close();
