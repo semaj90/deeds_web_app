@@ -73,11 +73,13 @@ export interface LangGraphHealthResponse {
 	ollama: string;
 	qdrant: string;
 	redis: string;
-	neo4j: string;
+	neo4j?: string;
 	bifrost: string;
-	hmm_adapted: boolean;
-	graph_compiled: boolean;
-	status: 'healthy' | 'degraded' | 'unhealthy';
+	rg_available?: boolean;
+	ollama_models?: string[];
+	hmm_adapted?: boolean;
+	graph_compiled?: boolean;
+	status: 'ok' | 'healthy' | 'degraded' | 'unhealthy';
 }
 
 export interface LangGraphHMMStats {

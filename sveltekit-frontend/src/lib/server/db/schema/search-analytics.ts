@@ -20,15 +20,17 @@ import {
 	integer,
 	jsonb,
 	pgTable,
+	primaryKey,
 	real,
 	text,
 	timestamp,
 	uniqueIndex,
 	uuid,
 	varchar,
+	vector,
 } from 'drizzle-orm/pg-core';
-import { vector } from 'pgvector/drizzle-orm';
 import { sql } from 'drizzle-orm';
+import { users } from '$lib/server/db/schema-postgres.js';
 
 // ── chunk_hit_log ──────────────────────────────────────────────────────────────
 // Per-chunk retrieval event log. One row per chunk × query × pipeline pass.
@@ -192,33 +194,112 @@ export type NewPredictiveTodo = typeof predictiveTodos.$inferInsert;
 // and summary-based vector search without Qdrant dependency.
 
 export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
-	id:                uuid('id').defaultRandom().primaryKey(),
-	qdrantId:          varchar('qdrant_id', { length: 64 }).unique(),
-	relativePath:      text('relative_path').notNull(),
-	symbol:            varchar('symbol', { length: 255 }),
-	kind:              varchar('kind', { length: 50 }),
-	lineStart:         integer('line_start'),
-	lineEnd:           integer('line_end'),
-	content:           text('content'),                                           // full chunk source text
-	contentEmbedding:  vector('content_embedding', { dimensions: 768 }),          // halfvec(768) in DB
-	signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),       // AST metadata embedding
-	summaryEmbedding:  vector('summary_embedding', { dimensions: 768 }),          // autoencoded cluster summary
-	gpuCluster:        integer('gpu_cluster'),
-	somCluster:        integer('som_cluster'),
-	pageRankScore:     real('page_rank_score'),
-	communityId:       integer('community_id'),
-	tags:              jsonb('tags').notNull().default(sql`'[]'::jsonb`),
-	clusterSummary:    jsonb('cluster_summary').notNull().default(sql`'{}'::jsonb`), // { summary, purpose, patterns, keyFiles, warnings }
-	neoMeta:           jsonb('neo4j_meta').notNull().default(sql`'{}'::jsonb`),
-	indexedAt:         timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
-	enrichedAt:        timestamp('enriched_at', { withTimezone: true }),
-	updatedAt:         timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+	id:                 uuid('id').defaultRandom().primaryKey(),
+	qdrantId:           varchar('qdrant_id', { length: 64 }).unique(),
+	relativePath:       text('relative_path').notNull(),
+	symbol:             varchar('symbol', { length: 255 }),
+	kind:               varchar('kind', { length: 50 }),
+	domain:             varchar('domain', { length: 50 }),
+	language:           varchar('language', { length: 20 }),
+	extension:          varchar('extension', { length: 20 }),
+	lineStart:          integer('line_start'),
+	lineEnd:            integer('line_end'),
+	content:            text('content'),
+	summary:            text('summary'),
+	contentEmbedding:   vector('content_embedding', { dimensions: 768 }),
+	signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
+	summaryEmbedding:   vector('summary_embedding', { dimensions: 768 }),
+	gpuCluster:         integer('gpu_cluster'),
+	somCluster:         integer('som_cluster'),
+	pageRankScore:      real('page_rank_score'),
+	communityId:        integer('community_id'),
+	tags:               jsonb('tags').notNull().default(sql`'[]'::jsonb`),              // legacy jsonb tags
+	semanticTags:       text('semantic_tags').array().notNull().default(sql`'{}'`),     // typed Karpathy atoms
+	clusterSummary:     jsonb('cluster_summary').notNull().default(sql`'{}'::jsonb`),
+	neoMeta:            jsonb('neo4j_meta').notNull().default(sql`'{}'::jsonb`),
+	embeddingModel:     varchar('embedding_model', { length: 100 }),
+	summaryModel:       varchar('summary_model', { length: 100 }),
+	metadata:           jsonb('metadata').notNull().default(sql`'{}'::jsonb`),          // flexible enrichment
+	indexedAt:           timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
+	enrichedAt:          timestamp('enriched_at', { withTimezone: true }),
+	updatedAt:           timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => ({
-	pathIdx:      index('codebase_chunk_index_path_idx').on(t.relativePath),
-	gpuClusterIdx: index('codebase_chunk_index_gpu_cluster_idx').on(t.gpuCluster),
-	somClusterIdx: index('codebase_chunk_index_som_cluster_idx').on(t.somCluster),
-	// qdrant_id unique index created by .unique() on column definition
+	pathIdx:         index('codebase_chunk_index_path_idx').on(t.relativePath),
+	gpuClusterIdx:   index('codebase_chunk_index_gpu_cluster_idx').on(t.gpuCluster),
+	somClusterIdx:   index('codebase_chunk_index_som_cluster_idx').on(t.somCluster),
+	domainIdx:       index('codebase_chunk_index_domain_idx').on(t.domain),
+	languageIdx:     index('codebase_chunk_index_language_idx').on(t.language),
+	extensionIdx:    index('codebase_chunk_index_extension_idx').on(t.extension),
 }));
 
 export type CodebaseChunkIndex    = typeof codebaseChunkIndex.$inferSelect;
 export type NewCodebaseChunkIndex = typeof codebaseChunkIndex.$inferInsert;
+
+// ── cluster_summaries ─────────────────────────────────────────────────────────
+// One row per (repo, gpu_cluster) — GPU-derived narrative + representative chunks.
+
+export const clusterSummaries = pgTable('cluster_summaries', {
+	id:                     uuid('id').defaultRandom().primaryKey(),
+	repoId:                 text('repo_id').notNull().default('default'),
+	gpuCluster:             integer('gpu_cluster').notNull(),
+	summary:                text('summary').notNull(),
+	purpose:                text('purpose'),
+	patterns:               text('patterns').array(),
+	warnings:               text('warnings').array(),
+	representativeChunkIds: uuid('representative_chunk_ids').array().notNull().default(sql`'{}'`),
+	memberCount:            integer('member_count').notNull().default(0),
+	tags:                   text('tags').array().notNull().default(sql`'{}'`),
+	centroidDistanceMean:   real('centroid_distance_mean'),
+	summaryModel:           varchar('summary_model', { length: 100 }),
+	summaryEmbedding:       vector('summary_embedding', { dimensions: 768 }),
+	metadata:               jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	createdAt:              timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt:              timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => ({
+	repoClusterUniq: index('cluster_summaries_repo_cluster').on(t.repoId, t.gpuCluster),
+}));
+
+export type ClusterSummary    = typeof clusterSummaries.$inferSelect;
+export type NewClusterSummary = typeof clusterSummaries.$inferInsert;
+
+// ── llm_outputs ───────────────────────────────────────────────────────────────
+// Each LLM generation tracked with provenance for ACE context assembly.
+
+export const llmOutputs = pgTable('llm_outputs', {
+	outputId:    uuid('output_id').defaultRandom().primaryKey(),
+	caseId:      uuid('case_id'),
+	userId:      integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+	pipeline:    varchar('pipeline', { length: 50 }).notNull().default('ace'),
+	prompt:      text('prompt').notNull(),
+	response:    text('response').notNull(),
+	model:       varchar('model', { length: 100 }),
+	temperature: real('temperature'),
+	tokensIn:    integer('tokens_in'),
+	tokensOut:   integer('tokens_out'),
+	latencyMs:   integer('latency_ms'),
+	selfEval:    real('self_eval'),
+	metadata:    jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	createdAt:   timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => ({
+	caseIdx:         index('llm_outputs_case_idx').on(t.caseId),
+	userCreatedIdx:  index('llm_outputs_user_created').on(t.userId, t.createdAt),
+	pipelineIdx:     index('llm_outputs_pipeline_created').on(t.pipeline, t.createdAt),
+}));
+
+export type LlmOutput    = typeof llmOutputs.$inferSelect;
+export type NewLlmOutput = typeof llmOutputs.$inferInsert;
+
+// ── llm_output_chunks ─────────────────────────────────────────────────────────
+// 1:N join between LLM outputs and source chunks (evidence, context, citation).
+
+export const llmOutputChunks = pgTable('llm_output_chunks', {
+	outputId: uuid('output_id').notNull().references(() => llmOutputs.outputId, { onDelete: 'cascade' }),
+	chunkId:  uuid('chunk_id').notNull().references(() => codebaseChunkIndex.id, { onDelete: 'cascade' }),
+	rank:     integer('rank').notNull(),
+	score:    real('score'),
+	role:     varchar('role', { length: 30 }),
+	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+}, (t) => ({
+	pk:       primaryKey({ columns: [t.outputId, t.chunkId] }),
+	chunkIdx: index('llm_output_chunks_chunk_idx').on(t.chunkId),
+}));

@@ -255,6 +255,7 @@
 		{ href: '/admin/phase89', label: 'Phase 89', icon: 'flask-conical', desc: 'Cluster analysis' },
 		{ href: '/admin/kag-notebook', label: 'KAG Notebook', icon: 'notebook-pen', desc: 'Knowledge notebook' },
 		{ href: '/admin/all-routes', label: 'All Routes', icon: 'route', desc: 'Route health ops' },
+		{ href: '/admin/face-gallery', label: 'Face Gallery', icon: 'scan-face', desc: 'POI face matching + GRPO reranker + QLoRA synths' },
 	];
 </script>
 

@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+// legal.agent.v1 — MCP JSON-RPC ↔ internal gRPC ToolRouter bridge.
+//
+// Edge side:   MCP 2025-03-26  JSON-RPC 2.0  POST /mcp  { method: "tools/call", params: {...} }
+// Bridge side: this proto — receives a CallToolRequest with request_id, tool_name, arguments_json
+// Internal:    each tool (face_identify, llm_synths, etc.) is dispatched here
+//
+// Google's guidance (Jan 2026): current remote MCP is JSON-RPC over HTTP/SSE;
+// gRPC is a pluggable/custom transport path.  This adapter bridges both layers.
+
+package legal.agent.v1;
+
+option go_package = "github.com/deeds/legalagent/v1";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ToolRouter — maps incoming MCP tools/call requests to typed gRPC dispatches
+// ─────────────────────────────────────────────────────────────────────────────
+service ToolRouter {
+  // Dispatch a single tool call (mirrors MCP tools/call params exactly)
+  rpc CallTool(CallToolRequest) returns (CallToolResponse);
+
+  // Batch dispatch — same semantics, amortises connection overhead
+  rpc CallToolBatch(CallToolBatchRequest) returns (CallToolBatchResponse);
+
+  // Stream incremental updates for long-running tools (VLM passes, etc.)
+  rpc CallToolStream(CallToolRequest) returns (stream CallToolEvent);
+
+  // List all registered tools (mirrors MCP tools/list)
+  rpc ListTools(ListToolsRequest) returns (ListToolsResponse);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Core request/response — maps 1:1 to MCP tools/call JSON-RPC shape
+// ─────────────────────────────────────────────────────────────────────────────
+
+message CallToolRequest {
+  string request_id   = 1;  // MCP id field (e.g. "call-001")
+  string tool_name    = 2;  // MCP params.name
+  string arguments_json = 3; // JSON-serialised MCP params.arguments (string avoids any)
+  map<string, string> meta = 4; // MCP params._meta (traceparent, authToken, etc.)
+  string actor_id     = 5;  // resolved user/session from auth middleware
+  string session_id   = 6;  // SSE/chat session for streaming correlation
+  int32  timeout_ms   = 7;  // 0 = use server default per tool
+}
+
+message CallToolResponse {
+  string request_id    = 1;
+  string content_json  = 2;  // MCP result.content[] serialised as JSON
+  bool   is_error      = 3;  // MCP result.isError
+  string error_code    = 4;  // e.g. TOOL_NOT_FOUND, TIMEOUT, UPSTREAM_ERROR
+  string error_message = 5;
+  int64  duration_ms   = 6;
+  map<string, string> span = 7; // otel span context for tracing
+}
+
+message CallToolBatchRequest {
+  repeated CallToolRequest calls = 1;
+  bool parallel = 2; // run calls concurrently when true
+}
+
+message CallToolBatchResponse {
+  repeated CallToolResponse results = 1;
+  int64 total_duration_ms = 2;
+}
+
+// Streaming event — emitted during multi-pass tools (e.g. VLM face passes)
+message CallToolEvent {
+  string request_id  = 1;
+  string tool_name   = 2;
+  EventType type     = 3;
+  string data        = 4; // partial result JSON or status string
+  int64  elapsed_ms  = 5;
+  int32  pass        = 6; // pass number for GRPO multi-pass tools (1/2/3)
+}
+
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  START    = 1;
+  PROGRESS = 2;
+  PASS_RESULT = 3;  // per-pass score emitted during GRPO reranking
+  RESULT   = 4;
+  ERROR    = 5;
+  DONE     = 6;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tool listing (mirrors MCP tools/list response)
+// ─────────────────────────────────────────────────────────────────────────────
+
+message ListToolsRequest {
+  string cursor = 1; // MCP pagination cursor
+}
+
+message ListToolsResponse {
+  repeated ToolDefinition tools = 1;
+  string next_cursor = 2;
+}
+
+message ToolDefinition {
+  string name         = 1;
+  string description  = 2;
+  string input_schema_json = 3; // JSON Schema string (reuses existing CONTEXTUAL_TOOLS shape)
+  ToolCategory category = 4;
+  int32  timeout_ms   = 5;
+  repeated string tags = 6; // e.g. ["vision", "grpo", "vlm"]
+}
+
+enum ToolCategory {
+  TOOL_CATEGORY_UNSPECIFIED = 0;
+  RETRIEVAL   = 1;
+  SEARCH      = 2;
+  GRAPH       = 3;
+  AUTHORITY   = 4;
+  ANALYSIS    = 5;
+  VISION      = 6;  // face_identify, VLM-based tools
+  TRAINING    = 7;  // llm_synths, qlora adapter generation
+  CACHE       = 8;
+}

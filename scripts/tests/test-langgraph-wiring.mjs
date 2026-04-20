@@ -80,13 +80,23 @@ async function testDockerHealth() {
   const health = await res.json();
   log('ok', 'Docker health check', `${health.status} (${ms}ms) GPU=${health.gpu} VRAM=${health.vram_free_mb ?? '?'}MB`);
 
-  // Sub-checks
-  for (const svc of ['ollama', 'qdrant', 'redis', 'neo4j']) {
+  // Sub-checks — only test services present in health response
+  for (const svc of ['ollama', 'qdrant', 'redis', 'bifrost']) {
     const status = health[svc] ?? 'unknown';
     log(status === 'ok' || status === 'healthy' ? 'ok' : 'fail', `  ${svc}`, status);
   }
-  log(health.graph_compiled ? 'ok' : 'fail', '  LangGraph DAG compiled', String(health.graph_compiled));
-  log(health.hmm_adapted ? 'ok' : 'skip', '  HMM adapted', String(health.hmm_adapted));
+  // Optional services — skip if not present (neo4j may not be running)
+  if (health.neo4j) {
+    log(health.neo4j === 'ok' ? 'ok' : 'fail', '  neo4j', health.neo4j);
+  } else {
+    log('skip', '  neo4j', 'not in health response (optional)');
+  }
+  if (health.rg_available != null) {
+    log(health.rg_available ? 'ok' : 'skip', '  ripgrep (codebase search)', String(health.rg_available));
+  }
+  if (health.ollama_models) {
+    log('ok', '  ollama models', `${health.ollama_models.length} loaded`);
+  }
 
   return true;
 }

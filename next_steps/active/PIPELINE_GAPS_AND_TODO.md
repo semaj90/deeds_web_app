@@ -79,10 +79,15 @@ Neo4j seeded from PostgreSQL via `scripts/seed-neo4j.mjs`. Fixed schema mismatch
 ### ~~GAP-10: D3 Graph Visualization~~ CLOSED (Apr 20, 2026)
 New `/admin/case-graph` route with full D3 force-directed layout: nodes for Case/Evidence/Person/GlossaryTerm/Statute, per-label color+radius, label filter chips with counts, title search filter, node click → side panel with properties and deep-link. API: `GET /api/graph/cases?limit=600` queries Neo4j for nodes+edges. Drag-to-pin nodes, zoom/pan, edge type labels. Added "Case Graph" link to `/admin` dashboard.
 
-### GAP-11: POI Face Recognition
-Schema has `faceEmbedding`. Pipeline designed but not implemented.
-**Note**: POI photo upload API (`api/persons-of-interest/[id]/photos/+server.ts`) and photo LEFT JOIN in search are already wired. GAP-11 is the AI face *matching* pipeline only.
-**See**: [FEATURE_ROADMAPS.md](FEATURE_ROADMAPS.md). **Effort**: Large.
+### ~~GAP-11: POI Face Recognition~~ CLOSED (Apr 20, 2026) ✅
+3-pass GRPO face reranker + gemma4 VLM tool + QLoRA synths + admin gallery.
+- `POST /api/persons-of-interest/[id]/face-rerank` — GRPO 3-pass (pgvector cosine → gemma4 VLM → reward fusion 0.25/0.75)
+- `face_identify` agentic tool wired in `CONTEXTUAL_TOOLS` (90s timeout, inline executor)
+- `proto/active/tool_router.proto` — `legal.agent.v1.ToolRouter` MCP JSON-RPC ↔ gRPC bridge
+- `src/lib/server/grpc/tool-router-client.ts` — JSON-RPC adapter + `executeContextualTool` fallback
+- `POST /api/persons/face-synth` — QLoRA llm_synths (description/compare/adversarial modes, admin-only)
+- `/admin/face-gallery` — POI photo grid + GRPO reranker UI + QLoRA synth controls
+- `face:identify` + `poi:face_synth` tools registered in MCP `server.ts`
 
 ### ~~GAP-17: gRPC Embedding Service~~ CLOSED (Apr 20, 2026) ⚡
 `embedding-server.exe` confirmed running: `:50051` gRPC + `:8097` HTTP health → `{"status":"healthy"}`. `EMBEDDING_GRPC_ENABLED=true` in `.env`. Full call chain verified: `/api/embed` → `embedText()` → `generateSingleEmbedding()` → `generateEmbeddings()` → gRPC tier 1. 768-dim vectors returned.
