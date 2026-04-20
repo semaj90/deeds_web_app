@@ -20,12 +20,12 @@
 - Graph recommendations API — 145 lines, LLM-based
 
 ### Pending (Runtime Steps)
-- [ ] Activate Neo4j container + seed from PostgreSQL (`scripts/seed-neo4j.mjs`)
-- [ ] End-to-end validation: recommendations API, graph recs, SSE chat Neo4j context
-- [ ] User-specific graph recommendations (VIEWED/SEARCHED/ANALYZED edges + PageRank)
-- [ ] Similar-queries wiring (Qdrant `user_searches` collection)
-- [ ] Dashboard enhancements (real-time graph visualization)
-- [ ] `.env.example` — add Neo4j connection vars
+- [ ] Activate Neo4j container + seed from PostgreSQL (`scripts/seed-neo4j.mjs`) (RUNTIME)
+- [ ] End-to-end validation: recommendations API, graph recs, SSE chat Neo4j context (RUNTIME)
+- [x] User-specific graph recommendations (VIEWED/SEARCHED/ANALYZED edges + PageRank) — code exists: `user-interaction-sync.ts`, `graph-centrality.ts:getUserRecommendations()`, "For You" tab
+- [x] Similar-queries wiring (Qdrant `user_searches` collection) — `fetchUserAnalyticsContext()` wired in ACE context-assembler
+- [ ] Dashboard enhancements (real-time graph visualization) (DEFERRED — see GAP-10)
+- [x] `.env.example` — Neo4j vars added (GAP-14 reconciliation, Apr 19)
 
 ---
 

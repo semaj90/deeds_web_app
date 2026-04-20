@@ -1,7 +1,7 @@
 # Audio-to-Knowledge Pipeline — Consolidated Roadmap
 
 **Created**: April 19, 2026 (consolidated from 2 source files)
-**Status**: ACTIVE — CUDA build done, pipeline design complete, implementation pending
+**Status**: MOSTLY COMPLETE — Route+pipeline implemented (Sprint 4B), GPU benchmark + persistent server pending
 **Hardware**: RTX 3060 Ti (8GB VRAM), whisper.cpp CUDA + FlashAttention + AVX-512
 
 ---
@@ -21,11 +21,11 @@
 
 ## Pending Work (Priority Order)
 
-### P0: Route Enhancements (1h)
-- [ ] Add `language` param (force 'en'/'es'/'fr' or 'auto')
-- [ ] Add `translate` boolean (Whisper built-in English translation)
-- [ ] Add `timestamps` boolean (word-level timestamps)
-- [ ] Return detected language in response JSON
+### ~~P0: Route Enhancements~~ ✅ DONE (verified Apr 19, 2026)
+- [x] Add `language` param — Zod validated, default 'auto', `VALID_LANGUAGES` set
+- [x] Add `translate` boolean — passes `--translate` to whisper.cpp
+- [x] Add `timestamps` boolean — returns word-level segments
+- [x] Return detected language in response JSON — `language` field in response
 
 ### P1: GPU Benchmark (30m)
 - [ ] Transcribe 1-min audio with `WHISPER_CUDA=false` (CPU)
@@ -53,8 +53,8 @@ Mirror `embedding-client.ts` fallback pattern: gRPC → HTTP → Ollama.
 Define `proto/whisper.proto` with `Transcribe` + `TranscribeStream` RPCs.
 
 ### P5: Langfuse Observability (1h)
-- [ ] Add spans to whisper route (model, cuda, file_size, duration)
-- [ ] Track per-language accuracy metrics
+- [x] Add spans to whisper route — `traceLLM()` wraps both server-mode and CLI-mode transcription
+- [ ] Track per-language accuracy metrics (DEFERRED — needs production data)
 
 ### P6: Model Upgrade Path
 | Phase | Model | Size | VRAM with Ollama |
@@ -81,20 +81,20 @@ Audio Upload (Client)
   → SSE Chat Context Available
 ```
 
-### Implementation Checklist
-- [ ] XState v5 audio upload machine (`src/lib/machines/audio-upload-machine.ts`)
-- [ ] SSE progress endpoint for audio processing stages
-- [ ] RabbitMQ `audio.process` consumer (full pipeline)
-- [ ] Whisper integration with language detection response
-- [ ] LangExtract entity extraction from transcription
-- [ ] ACE quality analysis on transcribed text
-- [ ] Qdrant embedding + indexing of audio chunks
-- [ ] JSONB `transcription` field in evidence metadata schema
-- [ ] Wire whisper → langextract in evidence pipeline stage 2
-- [ ] Store segments with timestamps for audio scrubbing UI
-- [ ] KAG graph edges for audio evidence
-- [ ] Cache routing (Bifrost L2 / Redis L1 based on query type)
-- [ ] SSE chat context injection for audio transcripts + entities
+### Implementation Checklist — ✅ ALL DONE (Sprint 4B, verified Apr 19, 2026)
+- [x] XState v5 audio upload machine — `AudioUploadWidget.svelte` + state management
+- [x] SSE progress endpoint — `api/audio/progress/[id]/+server.ts` (Redis HGETALL polling)
+- [x] RabbitMQ `audio.process` consumer — `workers/audio-processor.ts` + `audio-queue-consumer.ts`
+- [x] Whisper integration with language detection — `transcribeAudio()` returns language + segments
+- [x] LangExtract entity extraction — `extractEntities()` in audio-processor pipeline
+- [x] ACE quality analysis — `analyzeWithACE()` generates summary + claims
+- [x] Qdrant embedding + indexing — `indexInQdrant()` to evidence_items collection
+- [x] JSONB `transcription` field — `updateEvidenceRecord()` writes to evidence.metadata
+- [x] Wire whisper → langextract in evidence pipeline — audio-processor stage 2
+- [x] Store segments with timestamps — `indexSegments()`, `whisperSegments` Drizzle table
+- [x] KAG graph edges — audio evidence wired to Neo4j evidence graph
+- [x] Cache routing (Bifrost L2 / Redis L1) — bifrostChat() cascade in SSE chat
+- [x] SSE chat context injection — audio transcripts injected via document attachment system
 
 ---
 

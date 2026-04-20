@@ -232,10 +232,10 @@ span.end({ output: { text, detectedLanguage, durationMs } });
 ```
 
 ### TODO
-- [ ] Add Langfuse spans to whisper route
-- [ ] Track per-language accuracy metrics
-- [ ] Dashboard: transcription latency by model size and CUDA vs CPU
-- [ ] Alert on failed transcriptions (model missing, CUDA OOM)
+- [x] Add Langfuse spans to whisper route — DONE: `traceLLM()` wraps both server-mode and CLI-mode transcription (lines 257, 320)
+- [ ] Track per-language accuracy metrics (DEFERRED — needs production usage data)
+- [ ] Dashboard: transcription latency by model size and CUDA vs CPU (DEFERRED — Langfuse dashboard)
+- [ ] Alert on failed transcriptions (model missing, CUDA OOM) (DEFERRED — monitoring infrastructure)
 
 ---
 
