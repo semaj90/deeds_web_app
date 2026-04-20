@@ -55,12 +55,47 @@
 		};
 	});
 
+	// CHR97 cartridge cache stats
+	interface CartridgeStats {
+		cachedCases: number;
+		totalSizeBytes: number;
+		totalSizeMB: number;
+		redisConnected: boolean;
+		nesMemory: {
+			totalDocuments: number;
+			allocatedBanks: number;
+			bankSizeBytes: number;
+			totalMemoryBytes: number;
+			utilizationPercent: number;
+		};
+		error?: string;
+	}
+	let cartridgeStats = $state<CartridgeStats | null>(null);
+	let cartridgeLoading = $state(false);
+
+	async function refreshCartridgeStats() {
+		cartridgeLoading = true;
+		try {
+			const res = await fetch('/api/cartridge/stats');
+			if (res.ok) cartridgeStats = await res.json();
+		} catch {
+			// non-fatal
+		} finally {
+			cartridgeLoading = false;
+		}
+	}
+
+	$effect(() => {
+		refreshCartridgeStats();
+	});
+
 	async function refreshStats() {
 		loading = true;
 		try {
 			const [res] = await Promise.all([
 				fetch('/api/cache/stats'),
-				refreshGPUStats()
+				refreshGPUStats(),
+				refreshCartridgeStats(),
 			]);
 			if (res.ok) {
 				const json = await res.json();
@@ -563,6 +598,83 @@
 				Buffers cleared on GPU device loss (automatic CPU fallback).
 			</p>
 		</section>
+		<!-- CHR97 Cartridge Cache -->
+		<section class="cache-section">
+			<h2><Icon name="package" class="inline-block" /> CHR97 Cartridge Cache</h2>
+
+			{#if cartridgeLoading && !cartridgeStats}
+				<p class="info-note"><Icon name="loader-circle" class="inline-block spin" /> Loading cartridge stats…</p>
+			{:else if cartridgeStats}
+				{#if cartridgeStats.error && !cartridgeStats.redisConnected}
+					<p class="info-note warn">
+						<Icon name="alert-triangle" class="inline-block" />
+						Redis not connected — cartridge cache unavailable.
+					</p>
+				{:else}
+					<div class="section-grid">
+						<div class="metric-card">
+							<div class="metric-label">Cached Cases</div>
+							<div class="metric-value">{cartridgeStats.cachedCases}</div>
+							<div class="metric-meta">Active cartridge keys in Redis</div>
+						</div>
+
+						<div class="metric-card">
+							<div class="metric-label">Total Cache Size</div>
+							<div class="metric-value">{cartridgeStats.totalSizeMB.toFixed(2)} MB</div>
+							<div class="metric-meta">{formatBytes(cartridgeStats.totalSizeBytes)}</div>
+						</div>
+
+						<div class="metric-card">
+							<div class="metric-label">NES Documents</div>
+							<div class="metric-value">{cartridgeStats.nesMemory.totalDocuments}</div>
+							<div class="metric-meta">{cartridgeStats.nesMemory.allocatedBanks} banks allocated</div>
+						</div>
+
+						<div class="metric-card">
+							<div class="metric-label">NES Memory</div>
+							<div class="metric-value">{formatBytes(cartridgeStats.nesMemory.totalMemoryBytes)}</div>
+							<div class="metric-meta">
+								{cartridgeStats.nesMemory.utilizationPercent.toFixed(1)}% utilization
+								({formatBytes(cartridgeStats.nesMemory.bankSizeBytes)} / bank)
+							</div>
+						</div>
+
+						<div class="metric-card">
+							<div class="metric-label">Redis Connected</div>
+							<div class="metric-value" class:text-green-600={cartridgeStats.redisConnected} class:text-red-600={!cartridgeStats.redisConnected}>
+								{cartridgeStats.redisConnected ? 'Yes' : 'No'}
+							</div>
+						</div>
+					</div>
+
+					<div class="cartridge-actions">
+						<button
+							class="action-btn danger"
+							onclick={() => invalidateCache('cartridge:*')}
+						>
+							<Icon name="trash-2" />
+							Invalidate All Cartridges
+						</button>
+						<button
+							class="action-btn"
+							onclick={refreshCartridgeStats}
+							disabled={cartridgeLoading}
+						>
+							<Icon name={cartridgeLoading ? 'loader-circle' : 'refresh-cw'} class={cartridgeLoading ? 'spin' : ''} />
+							Refresh
+						</button>
+					</div>
+				{/if}
+			{:else}
+				<p class="info-note"><Icon name="info" class="inline-block" /> Cartridge stats unavailable.</p>
+			{/if}
+
+			<p class="info-note">
+				<Icon name="info" class="inline-block" />
+				CHR97 binary cartridges are built on-demand from Qdrant evidence chunks and cached in Redis (30 min TTL).
+				Langfuse traces tagged <code>chr97</code> track each build, cache hit, and tensor search.
+			</p>
+		</section>
 	</div>
 </div>
 
@@ -883,6 +995,19 @@
 		border-radius: 4px;
 		color: #1e40af;
 		font-size: 0.85rem;
+		margin-top: 1rem;
+	}
+
+	.info-note.warn {
+		background: #fffbeb;
+		border-color: #fde68a;
+		color: #92400e;
+	}
+
+	.cartridge-actions {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
 		margin-top: 1rem;
 	}
 

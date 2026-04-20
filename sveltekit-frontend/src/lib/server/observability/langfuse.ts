@@ -438,6 +438,42 @@ export async function tracePolicy<T>(
 }
 
 /**
+ * Trace a CHR97 cartridge operation (export, search, cache lookup).
+ * Tags: 'chr97', operation name, optionally 'cache-hit' or 'cache-miss'.
+ */
+export async function traceCartridge<T>(
+	operation: 'export' | 'search' | 'cache-hit' | 'cache-miss',
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = await getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `cartridge:${operation}`,
+		metadata: { operation, ...metadata },
+		tags: ['chr97', operation],
+	});
+
+	const span = trace.span({
+		name: `cartridge-${operation}`,
+		input: JSON.stringify(metadata).slice(0, 400),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		const ms = Date.now() - start;
+		const count = Array.isArray(result) ? result.length : null;
+		span.end({ output: count !== null ? `${count} results (${ms}ms)` : `ok (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
  * Flush pending events (call during graceful shutdown).
  */
 export async function flushLangfuse(): Promise<void> {

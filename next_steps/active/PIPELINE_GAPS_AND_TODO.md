@@ -97,7 +97,7 @@ Built `services/go-retrieval-service/retrieval-server.exe` (33MB). Health check:
 | GAP-13 | Redis Rate Limiting (generalized middleware) | Medium |
 | GAP-14 | ~~.env.example reconciliation~~ CLOSED (Apr 20, 2026) — added `FFMPEG_PATH`, `PYTHON_PATH`, `GEMINI_API_KEY`, `GRAPH_ML_GRPC_*`, `ACE_EMBED_BATCH_TIMEOUT_MS`; added `GRAPH_ML_GRPC_*` to `env.server.ts` + removed `(ENV as any)` casts in `graph-ml-client.ts` | Small |
 | GAP-15 | ~~Obsidian Export UI~~ CLOSED (Apr 20, 2026) — button already live in `/admin/kag-notebook`, calls `/api/codebase-index/kag-notebook` `export-obsidian` action | Small |
-| GAP-16 | CHR97 operator stats + route-level observability before UI exposure | Small |
+| GAP-16 | ~~CHR97 operator stats + route-level observability~~ CLOSED (Apr 20, 2026) — added `traceCartridge()` to `langfuse.ts`; wired into `/api/cartridge/export` (cache-hit + build traces) and `/api/cartridge/search` (tensor search trace); added CHR97 Cartridge section to `/admin/cache` dashboard (live stats + invalidate button) | Small |
 
 ---
 
