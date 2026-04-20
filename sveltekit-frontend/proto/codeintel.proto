@@ -1,0 +1,168 @@
+// codeintel.proto — Batch enrichment contract for GPU codebase intelligence.
+//
+// Wire format between:
+//   - TypeScript orchestrator (SvelteKit, producer)
+//   - GPU enrichment workers (LibTorch/CUDA, consumer)
+//   - Postgres/Qdrant upsert workers (consumer)
+//
+// Design:
+//   protobuf first, JSON only at API edges.
+//   Compact typed results, no arbitrary tensors.
+//   Stable wire contract for Node/Rust/C++ interop.
+
+syntax = "proto3";
+
+package codeintel.v1;
+
+option go_package = "deeds/codeintel/v1;codeintelv1";
+
+// ── Core identifiers ───────────────────────────────────────────────────────
+
+message ChunkRef {
+  string chunk_id = 1;    // UUID from codebase_chunk_index.id
+  string qdrant_id = 2;   // Qdrant point ID (string or numeric)
+  string repo_id = 3;     // Repo identifier (default: "default")
+}
+
+// ── GPU-produced features per chunk ────────────────────────────────────────
+
+message ChunkFeatures {
+  ChunkRef ref = 1;
+
+  // Vectors (768-dim, L2-normalized). Inline for small batches;
+  // for >1000 chunks, stream via BatchEnrichStream instead.
+  repeated float content_embedding = 2   [packed = true];
+  repeated float signature_embedding = 3 [packed = true];
+  repeated float summary_embedding = 4   [packed = true];
+
+  // Karpathy semantic tags (from SEMANTIC_TAGS vocabulary)
+  repeated string tags = 5;
+
+  // GPU cluster assignments
+  int32 gpu_cluster = 6;
+  int32 som_cluster = 7;
+  float centroid_distance = 8;
+
+  // LLM-generated summary
+  string summary = 9;
+  float summary_confidence = 10;
+  string summary_model = 11;
+
+  // File metadata (typed, not freeform)
+  string file_path = 12;
+  string kind = 13;        // api-route, server-module, ui-component, etc.
+  string domain = 14;      // legal, utility, config, etc.
+  string language = 15;    // typescript, javascript, svelte, etc.
+  string extension = 16;   // .ts, .js, .svelte, etc.
+  string symbol = 17;      // function/class/export name
+  int32 line_start = 18;
+  int32 line_end = 19;
+
+  // Graph metrics
+  float page_rank_score = 20;
+  int32 community_id = 21;
+
+  // Flexible enrichment metadata (small, typed key/value only)
+  map<string, string> attrs = 22;
+}
+
+// ── Batch enrichment request/response ──────────────────────────────────────
+
+message BatchEnrichRequest {
+  repeated ChunkRef refs = 1;
+
+  // Which GPU operations to run
+  bool compute_embeddings = 2;
+  bool compute_clusters = 3;
+  bool compute_summaries = 4;
+  bool compute_tags = 5;
+  bool compute_pagerank = 6;
+
+  // Cluster parameters
+  int32 cluster_count = 7;   // k for K-means (default: 20)
+
+  // Summary parameters
+  string summary_model = 8;  // e.g. "gemma4-legal-vlm:latest"
+  int32 summary_max_tokens = 9;
+
+  // Repo scope
+  string repo_id = 10;
+}
+
+message BatchEnrichResponse {
+  repeated ChunkFeatures items = 1;
+
+  // Cluster-level outputs
+  repeated ClusterSummary cluster_summaries = 2;
+
+  // Job metadata
+  string job_id = 3;
+  int32 total_chunks = 4;
+  int32 processed_chunks = 5;
+  int32 failed_chunks = 6;
+  int64 duration_ms = 7;
+  string source = 8;          // "gpu", "cpu", "cached"
+}
+
+// ── Cluster-level summary ──────────────────────────────────────────────────
+
+message ClusterSummary {
+  string repo_id = 1;
+  int32 gpu_cluster = 2;
+  string summary = 3;
+  string purpose = 4;
+  repeated string patterns = 5;
+  repeated string warnings = 6;
+  repeated string representative_chunk_ids = 7;
+  int32 member_count = 8;
+  repeated string tags = 9;
+  float centroid_distance_mean = 10;
+  string summary_model = 11;
+  repeated float summary_embedding = 12 [packed = true];
+}
+
+// ── Upsert request (Postgres + Qdrant in one pass) ─────────────────────────
+
+message UpsertChunksRequest {
+  repeated ChunkFeatures chunks = 1;
+  bool upsert_postgres = 2;
+  bool upsert_qdrant = 3;
+  bool upsert_neo4j = 4;
+  string repo_id = 5;
+}
+
+message UpsertChunksResponse {
+  int32 postgres_upserted = 1;
+  int32 qdrant_upserted = 2;
+  int32 neo4j_merged = 3;
+  int32 failed = 4;
+  repeated string errors = 5;
+  int64 duration_ms = 6;
+}
+
+// ── Service definition ─────────────────────────────────────────────────────
+
+service CodeIntelService {
+  // Batch enrichment — GPU compute
+  rpc BatchEnrich(BatchEnrichRequest) returns (BatchEnrichResponse);
+
+  // Streaming enrichment — for large repos (>1000 chunks)
+  rpc BatchEnrichStream(BatchEnrichRequest) returns (stream ChunkFeatures);
+
+  // Unified upsert — write enriched chunks to all stores
+  rpc UpsertChunks(UpsertChunksRequest) returns (UpsertChunksResponse);
+
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;            // "healthy", "degraded", "unhealthy"
+  bool cuda_available = 2;
+  int64 free_vram_mb = 3;
+  int32 indexed_chunks = 4;
+  int32 qdrant_points = 5;
+  string embedding_model = 6;
+}

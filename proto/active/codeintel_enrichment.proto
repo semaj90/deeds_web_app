@@ -1,0 +1,100 @@
+// proto/active/codeintel_enrichment.proto
+// Codebase intelligence enrichment service contract.
+// Package: codeintel.v1
+// Implements: BatchEnrich, SummarizeCluster
+
+syntax = "proto3";
+
+package codeintel.v1;
+
+option go_package = "github.com/deeds/codeintel/v1;codeintelv1";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared primitives
+// ─────────────────────────────────────────────────────────────────────────────
+
+message ChunkRef {
+  string chunk_id        = 1;  // sha1(repoId:qdrantPointId)[0:32] or uuid
+  string repo_id         = 2;  // code_repos.repo_id
+  string qdrant_point_id = 3;  // raw Qdrant point id (string or uuid-shaped)
+}
+
+message EmbeddingVector {
+  repeated float values = 1;
+  bool   l2_normalized  = 2;
+  string metric         = 3;  // cosine | dot | euclidean
+}
+
+message ChunkFeatures {
+  ChunkRef        ref                = 1;
+  string          file_path          = 2;
+  string          language           = 3;
+  string          extension          = 4;
+  string          kind               = 5;
+  string          domain             = 6;
+  string          symbol             = 7;
+  repeated string tags               = 8;
+  int32           gpu_cluster        = 9;
+  int32           som_cluster        = 10;
+  int32           neo4j_gpu_cluster  = 11;
+  string          summary            = 12;
+  float           summary_confidence = 13;
+  EmbeddingVector summary_embedding  = 14;
+  map<string, string> attrs          = 15;
+  string          embedding_model    = 16;
+  string          summary_model      = 17;
+  string          metadata_json      = 18;  // arbitrary extras as JSON
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BatchEnrich — enrich a list of chunk refs with embeddings / clusters / sums
+// ─────────────────────────────────────────────────────────────────────────────
+
+message BatchEnrichRequest {
+  repeated ChunkRef refs             = 1;
+  bool              compute_embeddings = 2;
+  bool              compute_clusters  = 3;
+  bool              compute_summaries = 4;
+  string            preferred_model   = 5;
+  int32             batch_size        = 6;
+}
+
+message BatchEnrichResponse {
+  repeated ChunkFeatures items         = 1;
+  int32                  processed_count = 2;
+  int32                  failed_count    = 3;
+  repeated string        warnings        = 4;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SummarizeCluster — produce a cluster-level summary for one gpu_cluster
+// ─────────────────────────────────────────────────────────────────────────────
+
+message ClusterSummaryRequest {
+  string          repo_id         = 1;
+  int32           gpu_cluster     = 2;
+  repeated string chunk_ids       = 3;
+  int32           max_chunks      = 4;
+  string          preferred_model = 5;
+}
+
+message ClusterSummaryResponse {
+  string          repo_id                    = 1;
+  int32           gpu_cluster                = 2;
+  string          summary                    = 3;
+  repeated string representative_chunk_ids   = 4;
+  repeated string tags                       = 5;
+  string          metadata_json              = 6;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EnrichmentService
+// ─────────────────────────────────────────────────────────────────────────────
+
+service EnrichmentService {
+  // Enrich a batch of chunk refs: embed + cluster-assign + summarise.
+  rpc BatchEnrich(BatchEnrichRequest) returns (BatchEnrichResponse);
+
+  // Generate a summary for a single gpu_cluster and write to cluster_summaries.
+  rpc SummarizeCluster(ClusterSummaryRequest) returns (ClusterSummaryResponse);
+}

@@ -31,6 +31,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema-postgres.js';
+import { codeRepos } from './codebase-intelligence.js';
 
 // ── chunk_hit_log ──────────────────────────────────────────────────────────────
 // Per-chunk retrieval event log. One row per chunk × query × pipeline pass.
@@ -193,44 +194,69 @@ export type NewPredictiveTodo = typeof predictiveTodos.$inferInsert;
 // pgvector mirror of Qdrant codebase_chunks_768 — enables SQL joins, QLoRA hydration,
 // and summary-based vector search without Qdrant dependency.
 
-export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
-	id:                 uuid('id').defaultRandom().primaryKey(),
-	qdrantId:           varchar('qdrant_id', { length: 64 }).unique(),
-	relativePath:       text('relative_path').notNull(),
-	symbol:             varchar('symbol', { length: 255 }),
-	kind:               varchar('kind', { length: 50 }),
-	domain:             varchar('domain', { length: 50 }),
-	language:           varchar('language', { length: 20 }),
-	extension:          varchar('extension', { length: 20 }),
-	lineStart:          integer('line_start'),
-	lineEnd:            integer('line_end'),
-	content:            text('content'),
-	summary:            text('summary'),
-	contentEmbedding:   vector('content_embedding', { dimensions: 768 }),
-	signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
-	summaryEmbedding:   vector('summary_embedding', { dimensions: 768 }),
-	gpuCluster:         integer('gpu_cluster'),
-	somCluster:         integer('som_cluster'),
-	pageRankScore:      real('page_rank_score'),
-	communityId:        integer('community_id'),
-	tags:               jsonb('tags').notNull().default(sql`'[]'::jsonb`),              // legacy jsonb tags
-	semanticTags:       text('semantic_tags').array().notNull().default(sql`'{}'`),     // typed Karpathy atoms
-	clusterSummary:     jsonb('cluster_summary').notNull().default(sql`'{}'::jsonb`),
-	neoMeta:            jsonb('neo4j_meta').notNull().default(sql`'{}'::jsonb`),
-	embeddingModel:     varchar('embedding_model', { length: 100 }),
-	summaryModel:       varchar('summary_model', { length: 100 }),
-	metadata:           jsonb('metadata').notNull().default(sql`'{}'::jsonb`),          // flexible enrichment
-	indexedAt:           timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
-	enrichedAt:          timestamp('enriched_at', { withTimezone: true }),
-	updatedAt:           timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
-}, (t) => ({
-	pathIdx:         index('codebase_chunk_index_path_idx').on(t.relativePath),
-	gpuClusterIdx:   index('codebase_chunk_index_gpu_cluster_idx').on(t.gpuCluster),
-	somClusterIdx:   index('codebase_chunk_index_som_cluster_idx').on(t.somCluster),
-	domainIdx:       index('codebase_chunk_index_domain_idx').on(t.domain),
-	languageIdx:     index('codebase_chunk_index_language_idx').on(t.language),
-	extensionIdx:    index('codebase_chunk_index_extension_idx').on(t.extension),
-}));
+export const codebaseChunkIndex = pgTable(
+  'codebase_chunk_index',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    qdrantId: varchar('qdrant_id', { length: 64 }).unique(),
+    repoId: uuid('repo_id').references(() => codeRepos.repoId, { onDelete: 'set null' }),
+    relativePath: text('relative_path').notNull(),
+    symbol: varchar('symbol', { length: 255 }),
+    kind: varchar('kind', { length: 50 }),
+    domain: varchar('domain', { length: 50 }),
+    language: varchar('language', { length: 20 }),
+    extension: varchar('extension', { length: 20 }),
+    lineStart: integer('line_start'),
+    lineEnd: integer('line_end'),
+    contentHash: text('content_hash'),
+    tokenCount: integer('token_count'),
+    content: text('content'),
+    summary: text('summary'),
+    contentEmbedding: vector('content_embedding', { dimensions: 768 }),
+    signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
+    summaryEmbedding: vector('summary_embedding', { dimensions: 768 }),
+    gpuCluster: integer('gpu_cluster'),
+    somCluster: integer('som_cluster'),
+    neo4jGpuCluster: integer('neo4j_gpu_cluster'),
+    pageRankScore: real('page_rank_score'),
+    communityId: integer('community_id'),
+    tags: jsonb('tags')
+      .notNull()
+      .default(sql`'[]'::jsonb`), // legacy jsonb tags
+    semanticTags: text('semantic_tags')
+      .array()
+      .notNull()
+      .default(sql`'{}'`), // typed Karpathy atoms
+    clusterSummary: jsonb('cluster_summary')
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    neoMeta: jsonb('neo4j_meta')
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    embeddingModel: varchar('embedding_model', { length: 100 }),
+    summaryModel: varchar('summary_model', { length: 100 }),
+    metadata: jsonb('metadata')
+      .notNull()
+      .default(sql`'{}'::jsonb`), // flexible enrichment
+    indexedAt: timestamp('indexed_at', { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    enrichedAt: timestamp('enriched_at', { withTimezone: true }),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (t) => ({
+    pathIdx: index('codebase_chunk_index_path_idx').on(t.relativePath),
+    gpuClusterIdx: index('codebase_chunk_index_gpu_cluster_idx').on(t.gpuCluster),
+    somClusterIdx: index('codebase_chunk_index_som_cluster_idx').on(t.somCluster),
+    domainIdx: index('codebase_chunk_index_domain_idx').on(t.domain),
+    languageIdx: index('codebase_chunk_index_language_idx').on(t.language),
+    extensionIdx: index('codebase_chunk_index_extension_idx').on(t.extension),
+    repoIdx: index('idx_codebase_chunk_index_repo_id').on(t.repoId),
+    neo4jClusterIdx: index('idx_codebase_chunk_index_neo4j_gpu_cluster').on(t.neo4jGpuCluster),
+  })
+);
 
 export type CodebaseChunkIndex    = typeof codebaseChunkIndex.$inferSelect;
 export type NewCodebaseChunkIndex = typeof codebaseChunkIndex.$inferInsert;

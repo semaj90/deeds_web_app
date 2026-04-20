@@ -58,3 +58,6 @@ export * from './case-library-links.js';
 
 // Drizzle relations for legal corpus tables
 export * from './legal-relations.js';
+
+// Codebase intelligence persistence layer (code_repos, enrichment_jobs)
+export * from './codebase-intelligence.js';
