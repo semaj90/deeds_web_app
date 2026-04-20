@@ -29,6 +29,7 @@ import {
 } from '$lib/server/evidence/proto-serializer.js';
 import { batchStoreEntities } from '$lib/server/evidence/batch-entity-storer.js';
 import { batchEmbedAndStoreEntities } from '$lib/server/evidence/batch-entity-embedder.js';
+import { summarizeDoclingStructure } from '$lib/server/evidence/docling-structure.js';
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -38,10 +39,13 @@ import { createYOLOService } from '$lib/server/yolo.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 const evidenceUploadSchema = z.object({
-	title: z.string().max(256).optional(),
-	description: z.string().max(10000).optional(),
-	caseId: z.string().uuid('Invalid caseId format. Expected UUID, use crypto.randomUUID() or a valid case ID.').optional(),
-	evidenceType: z.string().max(100).optional()
+  title: z.string().max(256).optional(),
+  description: z.string().max(10000).optional(),
+  caseId: z
+    .string()
+    .uuid('Invalid caseId format. Expected UUID, use crypto.randomUUID() or a valid case ID.')
+    .optional(),
+  evidenceType: z.string().max(100).optional(),
 });
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -325,13 +329,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     const evidenceNumber = `EV-${Date.now().toString(36).toUpperCase()}`;
     const VALID_EVIDENCE_TYPES = [
-      'document', 'photo', 'video', 'audio', 'physical', 'digital',
-      'witness_statement', 'forensic', 'documentary', 'testimonial',
-      'demonstrative', 'real', 'circumstantial', 'hearsay', 'expert', 'scientific',
+      'document',
+      'photo',
+      'video',
+      'audio',
+      'physical',
+      'digital',
+      'witness_statement',
+      'forensic',
+      'documentary',
+      'testimonial',
+      'demonstrative',
+      'real',
+      'circumstantial',
+      'hearsay',
+      'expert',
+      'scientific',
     ] as const;
     type EvidenceTypeVal = (typeof VALID_EVIDENCE_TYPES)[number];
     const safeEvidenceType: EvidenceTypeVal | null = VALID_EVIDENCE_TYPES.includes(
-      evidenceType as EvidenceTypeVal,
+      evidenceType as EvidenceTypeVal
     )
       ? (evidenceType as EvidenceTypeVal)
       : null;
@@ -474,7 +491,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       { status: 500 }
     );
   }
-}
+};
 
 /**
  * Extract text from a file buffer based on extension.
@@ -505,11 +522,18 @@ async function extractText(
         }
       }
     } catch (err) {
-      console.warn('[Upload] Docling ASR failed, trying whisper:', err instanceof Error ? err.message : err);
+      console.warn(
+        '[Upload] Docling ASR failed, trying whisper:',
+        err instanceof Error ? err.message : err
+      );
     }
     // Tier 2: Whisper (nodejs-whisper) — multilingual base model
     try {
-      const { writeFile: writeTmp, unlink: unlinkTmp, readFile: readTmp } = await import('fs/promises');
+      const {
+        writeFile: writeTmp,
+        unlink: unlinkTmp,
+        readFile: readTmp,
+      } = await import('fs/promises');
       const { tmpdir } = await import('os');
       const { join } = await import('path');
       const { randomUUID } = await import('crypto');
@@ -526,7 +550,10 @@ async function extractText(
           whisperOptions: { outputInText: true, outputInJsonFull: true },
         });
         const text = Array.isArray(transcript)
-          ? transcript.map((t: any) => t.speech ?? t.text ?? '').join(' ').trim()
+          ? transcript
+              .map((t: any) => t.speech ?? t.text ?? '')
+              .join(' ')
+              .trim()
           : String(transcript ?? '').trim();
         // Try reading JSON output for language + segments
         const wavBase = tmpPath.replace(/\.[^.]+$/, '.wav');
@@ -537,20 +564,28 @@ async function extractText(
           const parsed = JSON.parse(jsonData);
           detectedLang = parsed?.result?.language ?? parsed?.params?.language ?? null;
           await unlinkTmp(jsonPath).catch(() => {});
-        } catch { /* no JSON output */ }
+        } catch {
+          /* no JSON output */
+        }
         await unlinkTmp(tmpPath).catch(() => {});
         const txtPath = wavBase + '.txt';
         await unlinkTmp(txtPath).catch(() => {});
         if (wavBase !== tmpPath) await unlinkTmp(wavBase).catch(() => {});
         if (text.length > 0) {
-          return { text, method: `whisper-${whisperModel}${detectedLang ? `-${detectedLang}` : ''}` };
+          return {
+            text,
+            method: `whisper-${whisperModel}${detectedLang ? `-${detectedLang}` : ''}`,
+          };
         }
       } finally {
         await writeTmp(tmpPath, '').catch(() => {}); // ensure cleanup
         await (await import('fs/promises')).unlink(tmpPath).catch(() => {});
       }
     } catch (err) {
-      console.warn('[Upload] Whisper transcription failed:', err instanceof Error ? err.message : err);
+      console.warn(
+        '[Upload] Whisper transcription failed:',
+        err instanceof Error ? err.message : err
+      );
     }
     return { text: `Audio evidence file: ${fileName}`, method: 'audio-placeholder' };
   }
@@ -596,14 +631,21 @@ async function extractText(
         `[Upload] PDF text too short (${text.trim().length} chars), trying Granite-Docling for ${fileName}`
       );
       try {
-        const { isGraniteDoclingAvailable, analyzePdfWithGraniteDocling } =
-          await import('$lib/server/analysis/granite-docling.js');
+        const { isGraniteDoclingAvailable, analyzePdfWithGraniteDocling } = await import(
+          '$lib/server/analysis/granite-docling.js'
+        );
         if (await isGraniteDoclingAvailable()) {
           const gdResult = await analyzePdfWithGraniteDocling(buffer);
           if (gdResult.fullText.trim().length >= MIN_PDF_TEXT_LENGTH) {
-            return { text: gdResult.fullText, method: 'granite-docling-pdf', doclingBlocks: gdResult.blocks };
+            return {
+              text: gdResult.fullText,
+              method: 'granite-docling-pdf',
+              doclingBlocks: gdResult.blocks,
+            };
           }
-          console.log(`[Upload] Granite-Docling PDF text too short (${gdResult.fullText.trim().length} chars), falling back to OCR`);
+          console.log(
+            `[Upload] Granite-Docling PDF text too short (${gdResult.fullText.trim().length} chars), falling back to OCR`
+          );
         }
       } catch (gdErr) {
         console.warn('[Upload] Granite-Docling PDF failed, falling back to OCR:', gdErr);
@@ -630,14 +672,21 @@ async function extractText(
   if (isImage) {
     // Try Granite-Docling first for layout-aware document understanding (tables, equations, structure)
     try {
-      const { isGraniteDoclingAvailable, analyzeImageWithGraniteDocling } =
-        await import('$lib/server/analysis/granite-docling.js');
+      const { isGraniteDoclingAvailable, analyzeImageWithGraniteDocling } = await import(
+        '$lib/server/analysis/granite-docling.js'
+      );
       if (await isGraniteDoclingAvailable()) {
         const gdResult = await analyzeImageWithGraniteDocling(buffer);
         if (gdResult.fullText.trim().length >= MIN_PDF_TEXT_LENGTH) {
-          return { text: gdResult.fullText, method: 'granite-docling', doclingBlocks: gdResult.blocks };
+          return {
+            text: gdResult.fullText,
+            method: 'granite-docling',
+            doclingBlocks: gdResult.blocks,
+          };
         }
-        console.log(`[Upload] Granite-Docling text too short (${gdResult.fullText.trim().length} chars), falling back to OCR`);
+        console.log(
+          `[Upload] Granite-Docling text too short (${gdResult.fullText.trim().length} chars), falling back to OCR`
+        );
       }
     } catch (err) {
       console.warn('[Upload] Granite-Docling failed, falling back to OCR:', err);
@@ -760,6 +809,13 @@ async function processAndEmbed(
   markStage(diagnostics, 'metadata_persist', 'pending', 'Awaiting metadata persistence');
   markStage(diagnostics, 'gpu_analysis', 'pending', 'Awaiting background GPU analysis');
   markStage(diagnostics, 'pipeline_job', 'pending', 'Awaiting pipeline job creation');
+  markStage(
+    diagnostics,
+    'docling_enrichment',
+    'pending',
+    'Awaiting Granite-Docling structural analysis'
+  );
+  markStage(diagnostics, 'docling_vlm_rerank', 'pending', 'Awaiting VLM section reranking');
 
   updateJob(jobId, { step: 'embedding', progress: 65, message: 'Extracting text...' });
 
@@ -796,7 +852,8 @@ async function processAndEmbed(
     );
   }
 
-  const { text: fullText, method: extractionMethod, doclingBlocks } = extractionResult;
+  const { text: fullText, method: extractionMethod } = extractionResult;
+  let { doclingBlocks } = extractionResult;
   if (!fullText.trim()) {
     markStage(diagnostics, 'chunking', 'skipped', 'No text extracted');
     markStage(diagnostics, 'embedding', 'skipped', 'No text extracted');
@@ -863,11 +920,201 @@ async function processAndEmbed(
     console.warn('[Upload] Failed to persist extracted text:', err);
   }
 
+  // ── Granite-Docling structural enrichment (PRIMARY — runs on ALL PDFs + images) ───
+  // When initial extraction came from pdf-parse/OCR/etc., Granite-Docling adds structural
+  // DocTags (headings, tables, lists, equations, sections) that feed into legal-chunker
+  // for richer metadata, Qdrant tagged vector indexing, and ACE contextual chat.
+  const isPdfOrImage = /\.(pdf|png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
+  let doclingQualityScore: number | null = null;
+  let doclingVlmSections: string[] = [];
+
+  if (!doclingBlocks && isPdfOrImage) {
+    updateJob(jobId, {
+      step: 'embedding',
+      progress: 67,
+      message: 'Running structural document analysis (Granite-Docling)...',
+    });
+    try {
+      const {
+        isGraniteDoclingAvailable,
+        analyzeImageWithGraniteDocling,
+        analyzePdfWithGraniteDocling,
+      } = await import('$lib/server/analysis/granite-docling.js');
+      if (await isGraniteDoclingAvailable()) {
+        const isPDF = /\.pdf$/i.test(fileName);
+        const gdResult = isPDF
+          ? await analyzePdfWithGraniteDocling(buffer, 10)
+          : await analyzeImageWithGraniteDocling(buffer);
+        if (gdResult.blocks.length > 0) {
+          doclingBlocks = gdResult.blocks;
+          console.log(
+            `[Upload] Granite-Docling enrichment: ${gdResult.blocks.length} structural blocks for ${fileName} (${gdResult.processingTimeMs}ms)`
+          );
+          markStage(
+            diagnostics,
+            'docling_enrichment',
+            'success',
+            `Granite-Docling extracted ${gdResult.blocks.length} structural block(s)`,
+            {
+              blockCount: gdResult.blocks.length,
+              processingTimeMs: gdResult.processingTimeMs,
+              blockTypes: [...new Set(gdResult.blocks.map((b: any) => b.type))],
+            }
+          );
+        } else {
+          markStage(
+            diagnostics,
+            'docling_enrichment',
+            'warning',
+            'Granite-Docling returned no blocks'
+          );
+        }
+      } else {
+        markStage(
+          diagnostics,
+          'docling_enrichment',
+          'skipped',
+          'Granite-Docling model not available in Ollama'
+        );
+      }
+    } catch (err) {
+      console.warn('[Upload] Granite-Docling enrichment failed (non-fatal):', err);
+      markStage(
+        diagnostics,
+        'docling_enrichment',
+        'warning',
+        'Granite-Docling enrichment failed; proceeding without structural metadata'
+      );
+    }
+  } else if (doclingBlocks) {
+    markStage(
+      diagnostics,
+      'docling_enrichment',
+      'skipped',
+      `DocTags already present from primary extraction (${extractionMethod})`
+    );
+  } else {
+    markStage(
+      diagnostics,
+      'docling_enrichment',
+      'skipped',
+      'File type not suitable for Granite-Docling structural analysis'
+    );
+  }
+
+  // ── VLM section reranking via Gemma4 ──────────────────────────────────────
+  // Validates Granite-Docling structural sections with Gemma4 VLM for legal
+  // relevance scoring. Acts as a safety net when LangExtract misses sections.
+  // Produces quality score + section type labels for Qdrant payload enrichment.
+  if (doclingBlocks && (doclingBlocks as any[]).length > 0) {
+    try {
+      const blocks = doclingBlocks as Array<{ type: string; text: string; page?: number }>;
+      const sectionSummary = blocks
+        .slice(0, 25)
+        .map((b, i) => `${i + 1}. [${b.type}] ${b.text.slice(0, 150)}`)
+        .join('\n');
+
+      const vlmRerankRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: ENV.OLLAMA_CHAT_MODEL,
+          prompt: `You are a legal document analyst. Below are sections extracted from an evidence document via structural analysis.\n\nFor each section, assess its legal relevance. Output a JSON object with:\n- "quality": overall document structural quality score 0.0 to 1.0\n- "sections": array of detected legal section types from this list: FACTS, LEGAL_AUTHORITY, CLAIMS, PROCEDURAL_HISTORY, EVIDENCE, PRAYER_HOLDING, TESTIMONY, FINANCIAL, CONTRACT, CORRESPONDENCE, OTHER\n\nSections:\n${sectionSummary}\n\nRespond with ONLY the JSON object, no explanation.`,
+          stream: false,
+          options: { temperature: 0, num_predict: 512 },
+        }),
+        signal: AbortSignal.timeout(45_000),
+      });
+
+      if (vlmRerankRes.ok) {
+        const vlmData = await vlmRerankRes.json();
+        const rawResponse: string = vlmData.response ?? '';
+        const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (typeof parsed.quality === 'number') {
+              doclingQualityScore = Math.min(1, Math.max(0, parsed.quality));
+            }
+            if (Array.isArray(parsed.sections)) {
+              doclingVlmSections = parsed.sections
+                .filter((s: unknown) => typeof s === 'string')
+                .slice(0, 20);
+            }
+          } catch {
+            /* JSON parse failed */
+          }
+        }
+
+        if (doclingQualityScore !== null || doclingVlmSections.length > 0) {
+          console.log(
+            `[Upload] VLM rerank: quality=${doclingQualityScore}, sections=[${doclingVlmSections.join(', ')}] for ${fileName}`
+          );
+          markStage(
+            diagnostics,
+            'docling_vlm_rerank',
+            'success',
+            `VLM scored quality=${doclingQualityScore?.toFixed(2)}, ${doclingVlmSections.length} section types`,
+            {
+              qualityScore: doclingQualityScore,
+              sectionTypes: doclingVlmSections,
+            }
+          );
+        } else {
+          markStage(
+            diagnostics,
+            'docling_vlm_rerank',
+            'warning',
+            'VLM response did not contain parseable scores'
+          );
+        }
+      } else {
+        markStage(
+          diagnostics,
+          'docling_vlm_rerank',
+          'warning',
+          `VLM returned status ${vlmRerankRes.status}`
+        );
+      }
+    } catch (err) {
+      console.warn('[Upload] VLM section reranking failed (non-fatal):', err);
+      markStage(
+        diagnostics,
+        'docling_vlm_rerank',
+        'warning',
+        'VLM reranking failed; LangExtract results will be used as primary'
+      );
+    }
+  } else {
+    markStage(
+      diagnostics,
+      'docling_vlm_rerank',
+      'skipped',
+      'No DocTags blocks available for VLM reranking'
+    );
+  }
+
   // Structure-aware chunking: uses DocTags blocks if available (Granite-Docling),
   // otherwise detects ARTICLE/SECTION/§ headings and preserves section paths
   const typedDoclingBlocks = doclingBlocks as
     | Array<{ type: string; text: string; page: number; bbox?: [number, number, number, number] }>
     | undefined;
+  const doclingStructure = summarizeDoclingStructure(
+    (typedDoclingBlocks ?? []) as Array<{
+      type:
+        | 'paragraph'
+        | 'heading'
+        | 'table'
+        | 'list'
+        | 'equation'
+        | 'image'
+        | 'transcription'
+        | 'other';
+      text: string;
+      page: number;
+      bbox?: [number, number, number, number];
+    }>
+  );
   const legalChunks = chunkLegalDocument(fullText, {
     maxTokens: 512,
     overlap: 128,
@@ -882,24 +1129,48 @@ async function processAndEmbed(
     chunkCount: legalChunks.length,
     hasStructure,
     hasDocTags,
+    doclingSectionCount: doclingStructure.sections.length,
   });
 
   // Extract legal sections via LangExtract (facts, issues, holdings, etc.) for chunk tagging
-  let sectionMap: LangExtractSection[] = [];
+  let semanticSectionMap: LangExtractSection[] = [];
+  let chunkSectionMap: LangExtractSection[] = doclingStructure.sections;
+  let sectionMapSource: 'none' | 'docling' | 'langextract' | 'langextract+docling' | 'heuristic' =
+    chunkSectionMap.length > 0 ? 'docling' : 'none';
   try {
     const result = await extractSectionsFromText(fullText.slice(0, 50_000), evidenceId, 'case');
-    sectionMap = result.sections;
-    console.log(`[Upload] LangExtract: ${sectionMap.length} sections extracted for ${fileName}`);
+    semanticSectionMap = result.sections;
+    console.log(
+      `[Upload] LangExtract: ${semanticSectionMap.length} sections extracted for ${fileName}`
+    );
+    if (chunkSectionMap.length === 0) {
+      chunkSectionMap = semanticSectionMap;
+      sectionMapSource = 'langextract';
+    } else {
+      sectionMapSource = 'langextract+docling';
+    }
   } catch {
-    try {
-      sectionMap = detectSectionsHeuristic(fullText.slice(0, 50_000), evidenceId).sections;
+    if (chunkSectionMap.length > 0) {
       console.log(
-        `[Upload] LangExtract unavailable, heuristic: ${sectionMap.length} sections for ${fileName}`
+        `[Upload] LangExtract unavailable, Docling structure fallback: ${chunkSectionMap.length} sections for ${fileName}`
       );
-    } catch {
-      /* proceed without sections */
+    } else {
+      try {
+        semanticSectionMap = detectSectionsHeuristic(
+          fullText.slice(0, 50_000),
+          evidenceId
+        ).sections;
+        chunkSectionMap = semanticSectionMap;
+        sectionMapSource = 'heuristic';
+        console.log(
+          `[Upload] LangExtract unavailable, heuristic: ${chunkSectionMap.length} sections for ${fileName}`
+        );
+      } catch {
+        /* proceed without sections */
+      }
     }
   }
+  const persistedSectionMap = semanticSectionMap.length > 0 ? semanticSectionMap : chunkSectionMap;
 
   updateJob(jobId, {
     step: 'embedding',
@@ -964,7 +1235,7 @@ async function processAndEmbed(
       if (!embedding || embedding.length === 0) continue;
 
       const chunkUUID = crypto.randomUUID();
-      const sectionType = findChunkSectionType(chunk.startOffset, chunk.endOffset, sectionMap);
+      const sectionType = findChunkSectionType(chunk.startOffset, chunk.endOffset, chunkSectionMap);
 
       try {
         await storeChunkVector(evidenceId, chunk.chunkIndex, chunk.text.slice(0, 4000), embedding, {
@@ -1010,6 +1281,9 @@ async function processAndEmbed(
           ...(chunk.isTable ? { is_table: true } : {}),
           ...(chunk.pageStart != null ? { page_start: chunk.pageStart } : {}),
           ...(chunk.pageEnd != null ? { page_end: chunk.pageEnd } : {}),
+          docling_enriched: Boolean(doclingBlocks),
+          ...(doclingQualityScore != null ? { docling_quality_score: doclingQualityScore } : {}),
+          ...(doclingVlmSections.length > 0 ? { docling_vlm_sections: doclingVlmSections } : {}),
         },
       });
 
@@ -1561,6 +1835,7 @@ async function processAndEmbed(
     ...(visionAnalysis?.suggestedTags ?? []),
     ...(yoloDetections?.objects?.map((o: { class: string }) => `detected:${o.class}`) ?? []),
     ...(analysisPipelineResult?.tags ?? []),
+    ...doclingVlmSections.map((s) => `section:${s.toLowerCase()}`),
   ].filter(Boolean);
 
   if (allSuggestedTags.length > 0 || visionAnalysis?.keyFindings?.length) {
@@ -1644,7 +1919,7 @@ async function processAndEmbed(
                     : 0.2,
             }
           : undefined,
-      sections: sectionMap.slice(0, 100).map((s) => ({
+      sections: chunkSectionMap.slice(0, 100).map((s) => ({
         sectionType: s.section_type,
         confidence: s.confidence ?? 0,
         startOffset: s.start_offset,
@@ -1713,21 +1988,40 @@ async function processAndEmbed(
       extractionMethod,
       refinedEvidenceType: finalType,
       doclingBlocks: doclingBlocks?.slice(0, 50) ?? null,
+      doclingEnriched: Boolean(doclingBlocks),
+      doclingStructure:
+        doclingBlocks && doclingBlocks.length > 0
+          ? {
+              headings: doclingStructure.headings,
+              blockTypes: doclingStructure.blockTypes,
+            }
+          : null,
+      doclingSections:
+        doclingStructure.sections.length > 0
+          ? doclingStructure.sections.map((s) => ({
+              type: s.section_type,
+              subtype: s.section_subtype ?? null,
+              confidence: s.confidence ?? null,
+            }))
+          : null,
+      doclingQualityScore,
+      doclingVlmSections: doclingVlmSections.length > 0 ? doclingVlmSections : null,
       visionAnalysis: visionAnalysis ?? null,
       yoloDetections: yoloDetections ?? null,
       nlpClassification: nlpClassification ?? null,
       evidenceProfile: evidenceProfile ?? null,
       admissibilityIndicators: evidenceProfile?.admissibility_indicators ?? null,
+      sectionMapSource,
       langextractSections:
-        sectionMap.length > 0
-          ? sectionMap.map((s) => ({ type: s.section_type, confidence: s.confidence }))
+        semanticSectionMap.length > 0
+          ? semanticSectionMap.map((s) => ({ type: s.section_type, confidence: s.confidence }))
           : null,
       sectionTypeDistribution:
-        sectionMap.length > 0
+        chunkSectionMap.length > 0
           ? Object.fromEntries(
-              [...new Set(sectionMap.map((s) => s.section_type))].map((t) => [
+              [...new Set(chunkSectionMap.map((s) => s.section_type))].map((t) => [
                 t,
-                sectionMap.filter((s) => s.section_type === t).length,
+                chunkSectionMap.filter((s) => s.section_type === t).length,
               ])
             )
           : null,
@@ -1736,6 +2030,7 @@ async function processAndEmbed(
         ...(visionAnalysis?.suggestedTags ?? []),
         ...(yoloDetections?.objects?.map((o) => `detected:${o.class}`) ?? []),
         ...(analysisPipelineResult?.tags ?? []),
+        ...doclingVlmSections.map((s) => `section:${s.toLowerCase()}`),
       ].filter(Boolean),
       analysisTimestamp: diagnostics.completedAt,
       // Audio transcription metadata (when evidence was audio)

@@ -91,7 +91,7 @@ async function getGrpcClient(): Promise<any> {
 
     if (!GraphMLService) throw new Error('GraphMLService not found in proto descriptor');
 
-    const url = (ENV as any).GRAPH_ML_GRPC_URL ?? '127.0.0.1:50056';
+    const url = ENV.GRAPH_ML_GRPC_URL;
     _grpcClient = new GraphMLService(url, grpc.credentials.createInsecure(), {
       'grpc.keepalive_time_ms': 10_000,
       'grpc.keepalive_timeout_ms': 5_000,
@@ -173,7 +173,18 @@ export function runSOM(
   radFinal = 1.0
 ): GraphMLSOMResult {
   const t0 = performance.now();
-  const result = trainSOM(embeddings, n, dim, gridW, gridH, iters, lrInit, lrFinal, radInit, radFinal);
+  const result = trainSOM(
+    embeddings,
+    n,
+    dim,
+    gridW,
+    gridH,
+    iters,
+    lrInit,
+    lrFinal,
+    radInit,
+    radFinal
+  );
   return {
     weights: result.weights,
     bmu: result.bmu,
@@ -268,13 +279,13 @@ export { rewardScoreGPU };
  *     → user feedback → adaptFromAnalytics → RL policy update → rebuild
  */
 export interface MemoryCheckpoint {
-  hyperedgeHash:  string;       // 8-char FNV-1a key
+  hyperedgeHash: string; // 8-char FNV-1a key
   xPrimeCentroid: Float32Array; // 768-dim HGNN-enriched centroid
-  gradeScore:     number;       // [0,1] GRPO reward signal
-  gradeLabel:     string;       // 'A'|'B'|'C'|'D'
-  pipeline:       string;       // dominant pipeline label
-  memberCount:    number;
-  loraHint:       string;       // 'legal_rag' | 'legal_kag' | 'legal_dag' | 'legal_ace'
+  gradeScore: number; // [0,1] GRPO reward signal
+  gradeLabel: string; // 'A'|'B'|'C'|'D'
+  pipeline: string; // dominant pipeline label
+  memberCount: number;
+  loraHint: string; // 'legal_rag' | 'legal_kag' | 'legal_dag' | 'legal_ace'
 }
 
 /**
@@ -285,10 +296,8 @@ export interface MemoryCheckpoint {
  * Falls back to Redis ZSET `rl:memory:checkpoints` when gRPC is unavailable.
  * Always fire-and-forget — never throws.
  */
-export async function publishMemoryCheckpoints(
-  checkpoints: MemoryCheckpoint[],
-): Promise<void> {
-  const grpcEnabled = !!(ENV as any).GRAPH_ML_GRPC_ENABLED;
+export async function publishMemoryCheckpoints(checkpoints: MemoryCheckpoint[]): Promise<void> {
+  const grpcEnabled = ENV.GRAPH_ML_GRPC_ENABLED;
 
   // ── gRPC path ─────────────────────────────────────────────────────────────
   if (grpcEnabled) {
@@ -296,25 +305,28 @@ export async function publishMemoryCheckpoints(
     if (client) {
       try {
         await Promise.all(
-          checkpoints.map(cp =>
-            new Promise<void>((resolve, reject) => {
-              client.PublishMemoryCheckpoint(
-                {
-                  hyperedge_hash: cp.hyperedgeHash,
-                  x_prime:        Array.from(cp.xPrimeCentroid),
-                  grade_score:    cp.gradeScore,
-                  grade_label:    cp.gradeLabel,
-                  pipeline:       cp.pipeline,
-                  member_count:   cp.memberCount,
-                  lora_hint:      cp.loraHint,
-                },
-                (err: Error | null) => (err ? reject(err) : resolve()),
-              );
-            })
-          ),
+          checkpoints.map(
+            (cp) =>
+              new Promise<void>((resolve, reject) => {
+                client.PublishMemoryCheckpoint(
+                  {
+                    hyperedge_hash: cp.hyperedgeHash,
+                    x_prime: Array.from(cp.xPrimeCentroid),
+                    grade_score: cp.gradeScore,
+                    grade_label: cp.gradeLabel,
+                    pipeline: cp.pipeline,
+                    member_count: cp.memberCount,
+                    lora_hint: cp.loraHint,
+                  },
+                  (err: Error | null) => (err ? reject(err) : resolve())
+                );
+              })
+          )
         );
         return; // gRPC succeeded — skip Redis fallback
-      } catch { /* fall through */ }
+      } catch {
+        /* fall through */
+      }
     }
   }
 
@@ -330,13 +342,16 @@ export async function publishMemoryCheckpoints(
       pipe.set(
         `rl:memory:cp:${cp.hyperedgeHash}`,
         JSON.stringify({ ...cp, xPrimeCentroid: Array.from(cp.xPrimeCentroid) }),
-        'EX', CP_TTL,
+        'EX',
+        CP_TTL
       );
       pipe.zadd('rl:memory:checkpoints', cp.gradeScore, cp.hyperedgeHash);
     }
     pipe.expire('rl:memory:checkpoints', CP_TTL);
     await pipe.exec();
-  } catch { /* non-fatal */ }
+  } catch {
+    /* non-fatal */
+  }
 }
 
 // ── Status ────────────────────────────────────────────────────────────────────
@@ -349,18 +364,20 @@ export async function publishMemoryCheckpoints(
  * - cuda:  true when the addon confirmed CUDA is available on this machine
  */
 export function getGraphMLStatus(): { napi: boolean; grpc: boolean; cuda: boolean } {
-  const grpcEnabled = !!(ENV as any).GRAPH_ML_GRPC_ENABLED;
+  const grpcEnabled = ENV.GRAPH_ML_GRPC_ENABLED;
   const cuda = isPytorchGpuAvailable();
   return {
-    napi: cuda || (() => {
-      // addon may be loaded even when CUDA is absent (CPU fallback inside addon)
-      try {
-        kmeansWithCentroids(new Float32Array([1, 0, 0, 1]), 2, 2, 2, 1);
-        return true;
-      } catch {
-        return false;
-      }
-    })(),
+    napi:
+      cuda ||
+      (() => {
+        // addon may be loaded even when CUDA is absent (CPU fallback inside addon)
+        try {
+          kmeansWithCentroids(new Float32Array([1, 0, 0, 1]), 2, 2, 2, 1);
+          return true;
+        } catch {
+          return false;
+        }
+      })(),
     grpc: grpcEnabled,
     cuda,
   };

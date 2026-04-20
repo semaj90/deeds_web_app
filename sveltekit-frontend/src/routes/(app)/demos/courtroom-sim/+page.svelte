@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { CourtroomScene } from '$lib/courtroom/courtroom-scene.svelte.js';
+	import type { ModelDef } from '$lib/courtroom/courtroom-scene.svelte.js';
+	import { TimelineEngine } from '$lib/courtroom/timeline-engine.svelte.js';
+	import type { TimelineKeyframe } from '$lib/courtroom/timeline-engine.svelte.js';
 	import { ROLE_COLORS } from '$lib/courtroom/courtroom-types.js';
 	import StrategyWizard from '$lib/components/courtroom/StrategyWizard.svelte';
 
@@ -65,6 +68,17 @@
 	let scene = new CourtroomScene();
 	let dialogueBoxEl = $state<HTMLDivElement | null>(null);
 
+	// ── Timeline Engine ──
+	let timeline = new TimelineEngine();
+	let showTimeline = $state(false);
+	let timelineLoading = $state(false);
+
+	// ── Derived timeline state ──
+	let timelineProgress = $derived(timeline.progress);
+	let timelineState = $derived(timeline.state);
+	let timelineDuration = $derived(timeline.totalDurationMs);
+	let timelineCurrentTime = $derived(timeline.currentTimeMs);
+
 	// ── Derived ──
 	let filteredCases = $derived.by(() => {
 		let cases = data.fictionalCases;
@@ -97,6 +111,24 @@
 	// ── Lifecycle ──
 	onMount(() => {
 		loadActiveSessions();
+		loadModels();
+
+		// Wire timeline engine → courtroom scene
+		timeline.onKeyframeReached((kf) => {
+			if (scene.isReady) {
+				scene.executeKeyframe(kf);
+				// Sync dialogue display to timeline
+				if (kf.dialogueTurn != null && kf.animType === 'speaking') {
+					const entry = dialogue.find((d) => d.turn === kf.dialogueTurn);
+					if (entry) {
+						currentSpeaker = entry.speaker;
+						currentRole = entry.role;
+						typewriterText(entry.content);
+					}
+				}
+			}
+		});
+
 		const handler = (e: KeyboardEvent) => {
 			if (view !== 'courtroom' || userInputMode) return;
 			if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advanceTurn('next_turn'); }
@@ -107,17 +139,24 @@
 			if (e.key === 'e' || e.key === 'E') showEvidence = !showEvidence;
 			if (e.key === 'l' || e.key === 'L') showLog = !showLog;
 			if (e.key === 'n' || e.key === 'N') advanceTurn('next_phase');
+			if (e.key === 'p' || e.key === 'P') { showTimeline = !showTimeline; }
 			if (e.key === 'Escape') { insight = null; showStrategy = false; showLog = false; }
 			if (e.key === 'r' || e.key === 'R') { userInputMode = true; }
 		};
 		window.addEventListener('keydown', handler);
-		return () => window.removeEventListener('keydown', handler);
+		return () => {
+			window.removeEventListener('keydown', handler);
+			timeline.dispose();
+		};
 	});
 
-	// Init Babylon when canvas appears
+	// Init Babylon when canvas appears, then load models + timeline
 	$effect(() => {
 		if (canvasEl && view === 'courtroom' && !scene.isReady) {
-			scene.init(canvasEl);
+			scene.init(canvasEl).then(() => {
+				loadModels();
+				if (sessionId) loadTimeline();
+			});
 		}
 	});
 
@@ -306,8 +345,64 @@
 		backToLobby();
 	}
 
+	/** Load 3D models from the database (if any registered) */
+	async function loadModels() {
+		try {
+			const res = await fetch('/api/courtroom/models');
+			if (!res.ok) return;
+			const data = await res.json();
+			if (data.models?.length > 0 && scene.isReady) {
+				const modelDefs: ModelDef[] = data.models.map((m: any) => ({
+					role: m.role,
+					modelUrl: m.modelUrl,
+					scale: m.scale,
+					animations: m.animations?.map((a: any) => ({
+						name: a.name,
+						url: a.animationUrl,
+						animType: a.animType,
+					})),
+				}));
+				await scene.loadModels(modelDefs);
+			}
+		} catch { /* models are optional — procedural fallback works */ }
+	}
+
+	/** Load or generate timeline keyframes for the current session */
+	async function loadTimeline() {
+		if (!sessionId) return;
+		timelineLoading = true;
+		try {
+			// Try to fetch existing keyframes
+			let res = await fetch(`/api/simulation/${sessionId}/keyframes`);
+			let data = await res.json();
+
+			// If no keyframes exist and we have dialogue, auto-generate
+			if ((!data.keyframes || data.keyframes.length === 0) && dialogue.length > 0) {
+				res = await fetch(`/api/simulation/${sessionId}/keyframes`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ action: 'generate', msPerTurn: 3000 }),
+				});
+				data = await res.json();
+			}
+
+			if (data.keyframes?.length > 0) {
+				timeline.loadKeyframes(data.keyframes);
+			}
+		} catch { /* timeline is optional */ }
+		finally { timelineLoading = false; }
+	}
+
+	function formatTime(ms: number): string {
+		const s = Math.floor(ms / 1000);
+		const m = Math.floor(s / 60);
+		const sec = s % 60;
+		return `${m}:${sec.toString().padStart(2, '0')}`;
+	}
+
 	function backToLobby() {
 		scene.dispose();
+		timeline.reset();
 		sessionId = null;
 		sessionData = null;
 		dialogue = [];
@@ -316,6 +411,7 @@
 		currentRole = '';
 		insight = null;
 		userInputMode = false;
+		showTimeline = false;
 		view = 'lobby';
 		loadActiveSessions();
 	}
@@ -429,6 +525,12 @@
 				<button class="btn-icon" class:active={showLog} onclick={() => (showLog = !showLog)} title="Dialogue log [L]">
 					<Icon name="scroll-text" size={16} />
 				</button>
+				<button class="btn-icon" class:active={showTimeline} onclick={() => (showTimeline = !showTimeline)} title="Timeline playback [P]">
+					<Icon name="clock" size={16} />
+				</button>
+				{#if scene.modelsLoaded}
+					<span class="badge-3d">3D</span>
+				{/if}
 				{#if sessionData?.status === 'completed'}
 					<span class="badge-done">COMPLETED</span>
 				{/if}
@@ -579,6 +681,71 @@
 			</div>
 		{/if}
 
+		<!-- ── Timeline Controls ── -->
+		{#if showTimeline}
+			<div class="timeline-panel">
+				<div class="timeline-header">
+					<Icon name="clock" size={14} />
+					<span class="timeline-title">3D TIMELINE</span>
+					<span class="timeline-time">{formatTime(timelineCurrentTime)} / {formatTime(timelineDuration)}</span>
+					{#if timelineLoading}
+						<span class="timeline-loading">Loading...</span>
+					{/if}
+				</div>
+				<div class="timeline-controls">
+					<button class="tl-btn" onclick={() => timeline.stepBackward()} title="Previous keyframe">
+						<Icon name="skip-back" size={14} />
+					</button>
+					<button class="tl-btn tl-play" onclick={() => timeline.toggle()}>
+						{#if timelineState === 'playing'}
+							<Icon name="pause" size={16} />
+						{:else}
+							<Icon name="play" size={16} />
+						{/if}
+					</button>
+					<button class="tl-btn" onclick={() => timeline.stepForward()} title="Next keyframe">
+						<Icon name="skip-forward" size={14} />
+					</button>
+					<div class="tl-scrubber">
+						<input
+							type="range"
+							min="0"
+							max={timelineDuration}
+							value={timelineCurrentTime}
+							oninput={(e) => timeline.seekTo(Number((e.target as HTMLInputElement).value))}
+						/>
+						<div class="tl-progress" style="width: {timelineProgress}%"></div>
+					</div>
+					<div class="tl-speed">
+						<button class="tl-speed-btn" class:active={timeline.playbackSpeed === 0.5} onclick={() => timeline.setSpeed(0.5)}>0.5x</button>
+						<button class="tl-speed-btn" class:active={timeline.playbackSpeed === 1} onclick={() => timeline.setSpeed(1)}>1x</button>
+						<button class="tl-speed-btn" class:active={timeline.playbackSpeed === 2} onclick={() => timeline.setSpeed(2)}>2x</button>
+					</div>
+					<button class="tl-btn" onclick={() => timeline.reset()} title="Reset">
+						<Icon name="rotate-ccw" size={14} />
+					</button>
+					<button class="tl-btn" onclick={loadTimeline} title="Regenerate timeline" disabled={timelineLoading}>
+						<Icon name="refresh-cw" size={14} />
+					</button>
+				</div>
+				<!-- Keyframe markers -->
+				{#if timelineDuration > 0}
+					<div class="tl-markers">
+						{#each timeline.keyframes ?? [] as kf, i}
+							{@const left = (kf.timeMs / timelineDuration) * 100}
+							<button
+								class="tl-marker"
+								class:active={timeline.currentKeyframeIndex === i}
+								style="left: {left}%"
+								onclick={() => timeline.seekTo(kf.timeMs)}
+								title="{kf.characterRole}: {kf.animType} @ {formatTime(kf.timeMs)}"
+							></button>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
+
 		<!-- ── Action Bar (bottom horizontal) ── -->
 		<div class="action-bar">
 			{#if sessionData?.status === 'completed'}
@@ -637,6 +804,13 @@
 		{#if scene.isReady}
 			<div class="overlay-fps">
 				{scene.engineType.toUpperCase()} | {scene.fps} FPS
+				{#if scene.modelsLoaded}| 3D{/if}
+			</div>
+		{/if}
+
+		{#if scene.loadingProgress > 0 && scene.loadingProgress < 100}
+			<div class="overlay-model-loading">
+				Loading 3D models... {scene.loadingProgress}%
 			</div>
 		{/if}
 
@@ -779,4 +953,31 @@
 	.overlay-disclaimer { position: absolute; top: 52px; left: 50%; transform: translateX(-50%); font-size: 0.55rem; color: rgba(255,204,102,0.4); letter-spacing: 0.1em; text-transform: uppercase; z-index: 10; pointer-events: none; }
 	.overlay-fps { position: absolute; bottom: 52px; left: 4px; font-size: 0.6rem; color: rgba(255,255,255,0.3); font-family: monospace; z-index: 10; pointer-events: none; }
 	.overlay-error { position: absolute; top: 55px; left: 50%; transform: translateX(-50%); padding: 0.4rem 1rem; background: rgba(248,56,0,0.85); color: #fff; font-size: 0.75rem; border-radius: 4px; z-index: 30; }
+	.overlay-model-loading { position: absolute; top: 55px; right: 8px; font-size: 0.65rem; color: var(--t-accent); padding: 0.3rem 0.75rem; background: rgba(0,0,0,0.8); border: 1px solid var(--t-accent); border-radius: 4px; z-index: 10; }
+	.badge-3d { font-size: 0.6rem; padding: 0.15rem 0.4rem; background: #7c4dff; color: #fff; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; }
+
+	/* ── Timeline Panel ── */
+	.timeline-panel { position: absolute; bottom: 48px; left: 0; right: 0; background: rgba(0,0,0,0.94); border-top: 2px solid rgba(124,77,255,0.6); padding: 0.5rem 1rem; z-index: 22; }
+	.timeline-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; color: #b388ff; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+	.timeline-title { font-weight: 700; }
+	.timeline-time { margin-left: auto; font-family: monospace; color: #999; font-size: 0.7rem; }
+	.timeline-loading { color: var(--t-accent); animation: pulse-text 1s infinite; font-size: 0.65rem; }
+	.timeline-controls { display: flex; align-items: center; gap: 0.4rem; }
+	.tl-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #ccc; cursor: pointer; font-family: inherit; }
+	.tl-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+	.tl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+	.tl-play { width: 36px; height: 36px; background: rgba(124,77,255,0.2); border-color: #7c4dff; color: #b388ff; }
+	.tl-play:hover { background: rgba(124,77,255,0.4); color: #fff; }
+	.tl-scrubber { flex: 1; position: relative; height: 28px; display: flex; align-items: center; }
+	.tl-scrubber input[type="range"] { width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer; position: relative; z-index: 2; }
+	.tl-scrubber input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #b388ff; border-radius: 50%; cursor: pointer; }
+	.tl-progress { position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 4px; background: #7c4dff; border-radius: 2px; pointer-events: none; z-index: 1; }
+	.tl-speed { display: flex; gap: 0.15rem; }
+	.tl-speed-btn { padding: 0.2rem 0.35rem; font-size: 0.55rem; background: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 3px; color: #888; cursor: pointer; font-family: inherit; }
+	.tl-speed-btn:hover { color: #ccc; }
+	.tl-speed-btn.active { color: #b388ff; border-color: #7c4dff; background: rgba(124,77,255,0.15); }
+	.tl-markers { position: relative; height: 8px; margin-top: 0.3rem; }
+	.tl-marker { position: absolute; width: 4px; height: 8px; background: rgba(255,255,255,0.2); border: none; cursor: pointer; padding: 0; transform: translateX(-50%); }
+	.tl-marker:hover { background: rgba(255,255,255,0.5); }
+	.tl-marker.active { background: #b388ff; box-shadow: 0 0 6px rgba(124,77,255,0.6); }
 </style>

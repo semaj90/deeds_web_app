@@ -244,7 +244,7 @@ Server-Sent Events (SSE) endpoint for real-time progress updates.
 - [x] Create UI components (DocumentChip, FileUploadModal, ChatPromptBar, AudioUploadWidget)
 - [x] Create XState v5 audio upload machine
 - [x] Create API routes (/api/audio/upload, /api/audio/progress/[id])
-- [ ] Wire RabbitMQ `audio.process` queue consumer (Whisper transcription)
+- [x] Wire RabbitMQ `audio.process` queue consumer (Whisper transcription)
 - [ ] Add Drizzle schema for `chat_document_attachments` table
 - [ ] Update SSE chat to include document context from Qdrant
 - [ ] Add MinIO integration for document uploads

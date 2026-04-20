@@ -70,10 +70,11 @@ gh repo create semaj90/deeds-labs --private --source=. --push
 
 ## 4. Granite-Docling Integration (Phase 3+ Deferred)
 
-**Phases 1-2 COMPLETE**: Ollama API wired, DocTags-aware chunking, Qdrant payload enrichment.
+**Phases 1-3 COMPLETE**: Ollama API wired, DocTags-aware chunking, Qdrant payload enrichment, PRIMARY enrichment pipeline.
 
 ### Remaining
 - [x] Wire Granite-Docling as evidence pipeline Stage 2 fallback (before Tesseract OCR) — DONE: `api/evidence/upload/+server.ts` lines 598-640 (scanned PDFs + images), verified Apr 19, 2026
+- [x] Promote Granite-Docling to PRIMARY structural enrichment on ALL PDF+image uploads — DONE Apr 20, 2026: always-run enrichment pass + Gemma4 VLM reranking + Qdrant tagged indexing (`docling_enriched`, `docling_quality_score`, `docling_vlm_sections`)
 - [ ] Evaluate retirement of standalone Docling Python service (port 8085) in favor of Ollama-native (DEFERRED — Docling service still first-choice when available)
 
 ---

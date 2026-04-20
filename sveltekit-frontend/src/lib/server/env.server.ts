@@ -68,6 +68,9 @@ export const ENV = {
   CHR97_GRPC_ENABLED: (privateEnv.CHR97_GRPC_ENABLED ?? 'false') === 'true',
   TOOL_GRPC_URL: privateEnv.TOOL_GRPC_URL ?? '127.0.0.1:50057',
   TOOL_GRPC_ENABLED: (privateEnv.TOOL_GRPC_ENABLED ?? 'false') === 'true',
+  /** GraphML gRPC service (GPU graph analytics — PyTorch/CUDA, port 50056) */
+  GRAPH_ML_GRPC_URL: privateEnv.GRAPH_ML_GRPC_URL ?? '127.0.0.1:50056',
+  GRAPH_ML_GRPC_ENABLED: (privateEnv.GRAPH_ML_GRPC_ENABLED ?? 'false') === 'true',
   // LangExtract service (Python FastAPI + spaCy + NER, container: phase66-langextract)
   LANGEXTRACT_ENABLED:
     (privateEnv.LANGEXTRACT_ENABLED ?? privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',

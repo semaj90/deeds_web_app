@@ -1,4 +1,5 @@
 	{
+	"$schema": "vscode://schemas/tasks",
 	"version": "2.0.0",
 	"tasks": [
 		{
@@ -193,6 +194,27 @@
 				"cwd": "${workspaceFolder}"
 			},
 			"group": "build"
+		},
+		{
+			"label": "🔎 Audit: Transport / Tool Contracts",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$body = @{ skipGraph = $true; skipCodebase = $true; includeContracts = $true; persist = $false } | ConvertTo-Json; $r = Invoke-RestMethod 'http://localhost:5173/api/audit/gpu' -Method Post -Headers @{ 'Content-Type' = 'application/json'; 'x-dev-bypass' = 'true' } -Body $body -TimeoutSec 120; Write-Host ('Type safety files: ' + (($r.report.contracts.typeSafety.files | Measure-Object).Count)) -ForegroundColor Green; Write-Host ('Tool schemas: ' + (($r.report.contracts.toolContracts.files | Measure-Object).Count)) -ForegroundColor Green; Write-Host ('gRPC/proto files: ' + (($r.report.contracts.protobuf.files | Measure-Object).Count)) -ForegroundColor Green; Write-Host ('Model routing refs: ' + (($r.report.contracts.routing.files | Measure-Object).Count)) -ForegroundColor Green"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/sveltekit-frontend"
+			},
+			"group": "test",
+			"detail": "Quick contract audit for Zod, MCP schemas, gRPC/protobuf, and model-routing surfaces.",
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"clear": true
+			},
+			"problemMatcher": []
 		}
 	],
 	"inputs": [
@@ -205,22 +227,6 @@
 		{
 			"id": "filePath",
 			"type": "promptString",
-		{
-			"label": "🔎 Audit: Transport / Tool Contracts",
-			"type": "shell",
-			"command": "pwsh -NoProfile -Command \"$body = @{skipGraph=$true; skipCodebase=$true; includeContracts=$true; persist=$false} | ConvertTo-Json; $r = Invoke-RestMethod 'http://localhost:5173/api/audit/gpu' -Method Post -Headers @{'Content-Type'='application/json'; 'x-dev-bypass'='true'} -Body $body -TimeoutSec 120; Write-Host ('Type safety files: ' + (($r.report.contracts.typeSafety.files | Measure-Object).Count)) -ForegroundColor Green; Write-Host ('Tool schemas: ' + (($r.report.contracts.toolContracts.files | Measure-Object).Count)) -ForegroundColor Green; Write-Host ('gRPC/proto files: ' + (($r.report.contracts.protobuf.files | Measure-Object).Count)) -ForegroundColor Green; Write-Host ('Model routing refs: ' + (($r.report.contracts.routing.files | Measure-Object).Count)) -ForegroundColor Green\"",
-			"options": {
-				"cwd": "${workspaceFolder}/sveltekit-frontend"
-			},
-			"group": "test",
-			"detail": "Quick contract audit for Zod, MCP schemas, gRPC/protobuf, and model-routing surfaces.",
-			"presentation": {
-				"reveal": "always",
-				"panel": "dedicated",
-				"clear": true
-			},
-			"problemMatcher": []
-		},
 			"description": "Enter file path (relative to workspace)",
 			"default": "src/lib/components/MyComponent.svelte"
 		}

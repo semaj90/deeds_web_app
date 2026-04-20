@@ -3808,3 +3808,81 @@ export const contextTimeline = pgTable('context_timeline', {
 export type ContextTimelineRow    = typeof contextTimeline.$inferSelect;
 export type NewContextTimelineRow = typeof contextTimeline.$inferInsert;
 
+// === COURTROOM 3D ANIMATION SYSTEM ===
+// Timeline-driven 3D reconstruction: Mixamo-rigged models with keyframe animation
+
+export const courtroomAnimTypeEnum = pgEnum('courtroom_anim_type', [
+	'idle', 'speaking', 'objection', 'walk', 'gesture', 'point', 'sit', 'stand',
+	'present_evidence', 'react_surprised', 'react_angry', 'react_sad', 'nod', 'shake_head',
+]);
+
+/** Available 3D character models (Mixamo-rigged .glb files) */
+export const courtroomModels = pgTable('courtroom_models', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	name: varchar('name', { length: 100 }).notNull(),
+	role: varchar('role', { length: 50 }).notNull(),     // prosecutor, defense, judge, witness, etc.
+	modelUrl: varchar('model_url', { length: 500 }).notNull(), // path to .glb file (static/ or CDN)
+	thumbnailUrl: varchar('thumbnail_url', { length: 500 }),
+	skeletonType: varchar('skeleton_type', { length: 50 }).notNull().default('mixamo'), // mixamo, custom
+	scaleX: real('scale_x').notNull().default(1),
+	scaleY: real('scale_y').notNull().default(1),
+	scaleZ: real('scale_z').notNull().default(1),
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	roleIdx: index('courtroom_models_role_idx').on(table.role),
+}));
+
+/** Animation clips that can be applied to models */
+export const courtroomAnimations = pgTable('courtroom_animations', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	name: varchar('name', { length: 100 }).notNull(),
+	animType: courtroomAnimTypeEnum('anim_type').notNull(),
+	animationUrl: varchar('animation_url', { length: 500 }).notNull(), // path to .glb animation file
+	durationMs: integer('duration_ms').notNull(),
+	loop: boolean('loop').notNull().default(false),
+	blendWeight: real('blend_weight').notNull().default(1),
+	skeletonType: varchar('skeleton_type', { length: 50 }).notNull().default('mixamo'),
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	typeIdx: index('courtroom_anims_type_idx').on(table.animType),
+}));
+
+/** Keyframe entries for timeline-driven 3D scene reconstruction */
+export const courtroomKeyframes = pgTable('courtroom_keyframes', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	sessionId: varchar('session_id', { length: 64 }).notNull(),      // simulation session UUID
+	timeMs: integer('time_ms').notNull(),                             // millisecond offset from session start
+	characterRole: varchar('character_role', { length: 50 }).notNull(),
+	animType: courtroomAnimTypeEnum('anim_type').notNull(),
+	animationId: uuid('animation_id').references(() => courtroomAnimations.id),
+	// Position overrides (null = keep current position)
+	posX: real('pos_x'),
+	posY: real('pos_y'),
+	posZ: real('pos_z'),
+	rotY: real('rot_y'),                                              // Y-axis rotation (facing direction)
+	// Camera
+	cameraView: varchar('camera_view', { length: 50 }),               // prosecution, defense, judge, witness, wide
+	// Dialogue link
+	dialogueTurn: integer('dialogue_turn'),                           // links to dialogueHistory turn index
+	// Visual effects
+	effect: varchar('effect', { length: 50 }),                        // screen_flash, shake, spotlight, dim
+	// Evidence display
+	evidenceUrl: varchar('evidence_url', { length: 500 }),            // PDF/image to show on evidence stand
+	// Phase metadata
+	phase: varchar('phase', { length: 50 }),
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	sessionTimeIdx: index('courtroom_kf_session_time_idx').on(table.sessionId, table.timeMs),
+	sessionRoleIdx: index('courtroom_kf_session_role_idx').on(table.sessionId, table.characterRole),
+}));
+
+export type CourtroomModel = typeof courtroomModels.$inferSelect;
+export type NewCourtroomModel = typeof courtroomModels.$inferInsert;
+export type CourtroomAnimation = typeof courtroomAnimations.$inferSelect;
+export type NewCourtroomAnimation = typeof courtroomAnimations.$inferInsert;
+export type CourtroomKeyframe = typeof courtroomKeyframes.$inferSelect;
+export type NewCourtroomKeyframe = typeof courtroomKeyframes.$inferInsert;
+

@@ -135,7 +135,12 @@ describe('/api/rag/search ACE route integration', () => {
     mockGetCaseVersion.mockResolvedValue(0);
     mockGetFromMemoryCache.mockReturnValue({ found: false });
     mockSetCache.mockResolvedValue(undefined);
-    mockGetRedis.mockReturnValue({ get: vi.fn().mockResolvedValue(null) });
+    mockGetRedis.mockReturnValue({
+      get: vi.fn().mockResolvedValue(null),
+      zincrby: vi.fn().mockResolvedValue(1),
+      hsetnx: vi.fn().mockResolvedValue(1),
+      expire: vi.fn().mockResolvedValue(1),
+    });
     mockSectionFilteredSearch.mockResolvedValue({ results: [] });
     mockSparseHybridSearch.mockResolvedValue({
       results: [

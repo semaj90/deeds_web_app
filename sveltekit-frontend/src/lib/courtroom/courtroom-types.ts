@@ -58,3 +58,18 @@ export const ROLE_COLORS: Record<string, string> = {
 	witness: '#3cbcfc',
 	narrator: '#7c7c7c',
 };
+
+/** Animation types supported by the courtroom system */
+export const ANIMATION_TYPES = [
+	'idle', 'speaking', 'objection', 'walk', 'gesture', 'point', 'sit', 'stand',
+	'present_evidence', 'react_surprised', 'react_angry', 'react_sad', 'nod', 'shake_head',
+] as const;
+
+export type CourtroomAnimType = typeof ANIMATION_TYPES[number];
+
+/** Visual effects that can be triggered during playback */
+export const TIMELINE_EFFECTS = [
+	'screen_flash', 'shake', 'spotlight', 'dim',
+] as const;
+
+export type TimelineEffect = typeof TIMELINE_EFFECTS[number];

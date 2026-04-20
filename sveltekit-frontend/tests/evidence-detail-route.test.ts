@@ -84,7 +84,6 @@ describe('/api/evidence/[id] GET route', () => {
       params: { id: '00000000-0000-4000-a000-000000000002' },
       locals: { user: { id: 'test-user' } },
       request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000002'),
-      request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000002'),
     } as never);
 
     const body = await response.json();
@@ -118,7 +117,6 @@ describe('/api/evidence/[id] GET route', () => {
 
     const response = await GET({
       params: { id: '00000000-0000-4000-a000-000000000003' },
-      request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000003'),
       locals: { user: { id: 'test-user' } },
       request: new Request('http://localhost/api/evidence/00000000-0000-4000-a000-000000000003'),
     } as never);
