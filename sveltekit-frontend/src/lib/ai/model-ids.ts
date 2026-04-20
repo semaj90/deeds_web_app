@@ -168,6 +168,7 @@ export type InferenceSource =
 	| 'server-vlm'       // VLM server (HF Transformers + NF4, vision + text, :8085)
 	| 'server-turboquant' // TurboQuant llama-server (turbo3 KV cache, :8090)
 	| 'server-ollama'    // Ollama gemma4-legal (default server)
+	| 'server-agentic'   // Gemma4 multi-round tool-calling agent (/api/ai/agent)
 	| 'server-gemini'    // Gemini API (external)
 	| 'retrieval-hybrid'; // Client embed + server RAG search
 

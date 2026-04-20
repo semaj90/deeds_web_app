@@ -25,6 +25,7 @@
  *   limit?: number           — max chunks to process (default 50, cap 200)
  *   exportToObsidian?: bool  — write results to Obsidian vault
  *   folder?: string          — Obsidian vault folder (default 'Codebase Intelligence')
+ *   recompute?: bool         — trigger GPU recomputation: ts-morph → embed → k-means → SOM → PageRank
  * }
  */
 import { json } from '@sveltejs/kit';
@@ -87,6 +88,8 @@ const pipelineSchema = z.object({
 	limit: z.number().int().min(1).max(200).default(50),
 	exportToObsidian: z.boolean().default(false),
 	folder: z.string().max(100).default('Codebase Intelligence'),
+	/** Trigger full GPU recomputation: ts-morph scan → embed → k-means → SOM → PageRank → wiki */
+	recompute: z.boolean().default(false),
 });
 
 // ── Qdrant helpers ────────────────────────────────────────────────────────────
@@ -782,9 +785,100 @@ export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFe
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 	}
 
-	const { action, query, clusterId, errorIds, caseId, limit, exportToObsidian, folder } = parsed.data;
+	const { action, query, clusterId, errorIds, caseId, limit, exportToObsidian, folder, recompute } = parsed.data;
 	const pipelineStart = performance.now();
 	const stages: PipelineResult[] = [];
+
+	// ── Stage 0 (optional): GPU recomputation ─────────────────────────────────
+	// When recompute=true, re-run: ts-morph AST scan → dual-embed → Qdrant upsert
+	// → Neo4j graph sync → GPU k-means + PageRank → SOM topology
+	// before the read-only analysis stages below.
+	if (recompute) {
+		const recomputeT0 = performance.now();
+		const recomputeResults: Record<string, unknown> = {};
+
+		try {
+			// 0a. ts-morph AST scan → CodeChunk[] → dual-embed → Qdrant upsert
+			// Dynamic imports avoid loading ts-morph on every pipeline call
+			const { chunkFiles } = await import('$lib/server/indexer/ast-chunker.js');
+			const { indexChunks } = await import('$lib/server/indexer/dual-embedder.js');
+			const { readdir } = await import('fs/promises');
+			const { resolve } = await import('path');
+
+			const srcRoot = resolve(process.cwd(), 'src');
+			const EXTS = new Set(['.ts', '.js', '.mts', '.svelte']);
+			const SKIP = new Set(['node_modules', '.svelte-kit', 'archives', 'backups']);
+
+			// Recursive file list (same pattern as orchestrate endpoint)
+			async function walk(dir: string): Promise<string[]> {
+				const out: string[] = [];
+				for (const ent of await readdir(dir, { withFileTypes: true })) {
+					if (SKIP.has(ent.name)) continue;
+					const p = resolve(dir, ent.name);
+					if (ent.isDirectory()) out.push(...(await walk(p)));
+					else if (EXTS.has(ent.name.slice(ent.name.lastIndexOf('.')))) out.push(p);
+				}
+				return out;
+			}
+
+			const files = await walk(srcRoot);
+			recomputeResults.filesScanned = files.length;
+
+			// ts-morph AST → CodeChunk[] (handles .ts/.js, skips .svelte gracefully)
+			const tsFiles = files.filter(f => f.endsWith('.ts') || f.endsWith('.js') || f.endsWith('.mts'));
+			const chunks = chunkFiles(tsFiles.slice(0, 2000), srcRoot);
+			recomputeResults.chunksGenerated = chunks.length;
+
+			// Dual-embed → Qdrant upsert (batched, adaptive GPU VRAM)
+			if (chunks.length > 0) {
+				const indexResult = await indexChunks(chunks);
+				recomputeResults.embed = { stored: indexResult.storedInQdrant, failed: indexResult.failed, durationMs: indexResult.durationMs };
+			}
+
+			// 0b. GPU k-means + PageRank via analyzeGraph
+			const { analyzeGraph } = await import('$lib/server/graph/gpu-graph-analysis.js');
+			const graphResult = await analyzeGraph({
+				caseId: caseId ?? 'codebase',
+				includeGpuClusters: true,
+				includePageRank: true,
+				includeSimilarityMatrix: false,
+				maxNodes: 2000,
+			});
+			recomputeResults.graph = {
+				nodes: graphResult.nodeCount,
+				edges: graphResult.edgeCount,
+				clusters: graphResult.gpuClusters?.k ?? 0,
+				gpuSource: graphResult.gpuClusters?.source ?? 'none',
+				gpu: graphResult.gpu,
+			};
+
+			// 0c. SOM topology → Neo4j SIMILAR_TOPOLOGY edges + Qdrant som_cluster tags
+			const { runSOMTopologyPipeline } = await import('$lib/server/graph/som-topology-pipeline.js');
+			const somResult = await runSOMTopologyPipeline({ maxFiles: 2000 });
+			recomputeResults.som = {
+				files: somResult.filesProcessed,
+				grid: somResult.gridSize,
+				edges: somResult.edgesCreated,
+				source: somResult.source,
+			};
+		} catch (err: any) {
+			recomputeResults.error = err.message ?? 'Recompute failed';
+		}
+
+		stages.push({
+			stage: 'gpu-recompute',
+			data: recomputeResults,
+			durationMs: performance.now() - recomputeT0,
+			source: 'gpu',
+		});
+
+		// Invalidate chunk cache so Stage 1 reads fresh data
+		try {
+			const redis = getRedis();
+			const keys = await redis.keys('gp:chunks:*');
+			if (keys.length > 0) await redis.del(...keys);
+		} catch { /* Redis unavailable — chunks may be stale */ }
+	}
 
 	// ── Stage 1: Codebase chunks ──────────────────────────────────────────────
 	const codebaseResult = await stageCodebaseChunks(limit, clusterId);
@@ -878,6 +972,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFe
 		action,
 		stages: stages.map(s => ({ stage: s.stage, durationMs: Math.round(s.durationMs), source: s.source })),
 		summary: {
+			recomputed: recompute,
 			codebaseChunks: codebaseChunks.length,
 			errorClusters: errorData.clusters?.length ?? 0,
 			errorCards: errorData.cards?.length ?? 0,

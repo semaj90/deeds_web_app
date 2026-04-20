@@ -490,7 +490,7 @@ export async function warmupGpuCache(maxCases = 5): Promise<{ warmed: number; sk
 			WHERE case_id IS NOT NULL
 			GROUP BY case_id
 			HAVING COUNT(*) >= 2
-			ORDER BY MAX(created_at) DESC
+			ORDER BY MAX(COALESCE(updated_at, uploaded_at)) DESC
 			LIMIT ${maxCases}
 		`);
 

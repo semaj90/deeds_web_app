@@ -57,11 +57,14 @@ async function tryRabbitMQPath(
 		const { rabbitmq } = await import('$lib/server/queue/rabbitmq-manager-fixed.js');
 		const jobId = crypto.randomUUID();
 
-		const published = await rabbitmq.publishCodebaseIndex({
-			scope,
-			incremental,
-			requestedBy,
-		});
+    const published = await Promise.race([
+      rabbitmq.publishCodebaseIndex({
+        scope,
+        incremental,
+        requestedBy,
+      }),
+      new Promise<false>((resolve) => setTimeout(() => resolve(false), 5000)),
+    ]);
 
 		if (!published) {
 			console.warn('[codebase/wiki/index] RabbitMQ not ready, falling back to mapreduce');

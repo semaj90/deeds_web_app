@@ -180,7 +180,7 @@ async function inferOllamaVLM(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
+        model: ENV.OLLAMA_VLM_MODEL ?? 'gemma4:e4b-it-q4_K_M',
         prompt,
         images: [base64Image],
         stream: false,
@@ -233,6 +233,8 @@ async function inferTurboQuantVLM(
 		if (!res.ok) return null;
 		const data = await res.json();
 		const msg = data.choices?.[0]?.message;
+		// Prefer content (final answer); only fall back to reasoning_content
+		// (chain-of-thought) when content is empty — hide thinking from consumers
 		return msg?.content || msg?.reasoning_content || null;
 	} catch {
 		return null;
@@ -320,7 +322,7 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 	if (!responseText) {
 		responseText = await inferOllamaVLM(base64Image, prompt, maxTokens);
 		if (responseText) {
-			model = `${ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M'} (ollama)`;
+			model = `${ENV.OLLAMA_VLM_MODEL ?? 'gemma4:e4b-it-q4_K_M'} (ollama)`;
 			console.log(`[VLM] Ollama inference complete for ${input.fileName}`);
 		}
 	}

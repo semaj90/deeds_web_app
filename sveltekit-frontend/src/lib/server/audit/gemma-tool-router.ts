@@ -156,200 +156,277 @@ export interface AuditToolResult {
 // ── Tool Executor ─────────────────────────────────────────────────────
 
 export async function executeAuditTool(
-	name: string,
-	args: Record<string, unknown>
+  name: string,
+  args: Record<string, unknown>
 ): Promise<AuditToolResult> {
-	const start = Date.now();
-	const timeout = TOOL_TIMEOUT_MS[name] ?? 15_000;
+  const start = Date.now();
+  const timeout = TOOL_TIMEOUT_MS[name] ?? 15_000;
 
-	try {
-		switch (name) {
-			case 'run_gpu_audit': {
-				const { runGpuAudit, persistAuditReport } = await import(
-					'$lib/server/audit/gpu-audit-orchestrator.js'
-				);
-				const report = await Promise.race([
-					runGpuAudit({
-						userId: 'gemma-tool-router',
-						caseId: args.caseId as string | undefined,
-						maxNodes: (args.maxNodes as number) ?? 500,
-						clusterCount: args.clusterCount as number | undefined,
-						maxVectors: (args.maxVectors as number) ?? 500,
-						dupThreshold: (args.dupThreshold as number) ?? 0.92,
-						halfPrecision: (args.halfPrecision as boolean) ?? false,
-					}),
-					new Promise<never>((_, reject) =>
-						setTimeout(() => reject(new Error('timeout')), timeout)
-					),
-				]);
+  try {
+    switch (name) {
+      case 'run_gpu_audit': {
+        const { runGpuAudit, persistAuditReport } = await import(
+          '$lib/server/audit/gpu-audit-orchestrator.js'
+        );
+        const report = await Promise.race([
+          runGpuAudit({
+            userId: 'gemma-tool-router',
+            caseId: args.caseId as string | undefined,
+            maxNodes: (args.maxNodes as number) ?? 500,
+            clusterCount: args.clusterCount as number | undefined,
+            maxVectors: (args.maxVectors as number) ?? 500,
+            dupThreshold: (args.dupThreshold as number) ?? 0.92,
+            halfPrecision: (args.halfPrecision as boolean) ?? false,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), timeout)
+          ),
+        ]);
 
-				let reportId: string | undefined;
-				try {
-					reportId = await persistAuditReport(report);
-				} catch { /* non-fatal */ }
+        let reportId: string | undefined;
+        try {
+          reportId = await persistAuditReport(report);
+        } catch {
+          /* non-fatal */
+        }
 
-				const summary = [
-					`## GPU Codebase Audit Complete`,
-					`- **Graph**: ${report.stats.graphNodeCount} nodes, ${report.stats.graphEdgeCount} edges`,
-					`- **Vectors**: ${report.stats.vectorCount} (${report.stats.vectorDimension}d)`,
-					`- **Central files**: ${report.centralFiles.length} (top: ${report.centralFiles[0]?.title || 'none'})`,
-					`- **Communities**: ${report.communities.length}`,
-					`- **Near-duplicates**: ${report.stats.duplicatePairCount} pairs (≥${args.dupThreshold ?? 0.92})`,
-					`- **Code clusters**: ${report.stats.clusterCount}`,
-					`- **GPU**: CUDA=${report.gpu.cuda}, ${report.gpu.freeMB}MB free / ${report.gpu.totalMB}MB total`,
-					`- **Timing**: graph=${report.timing.graphMs}ms, vectors=${report.timing.vectorFetchMs}ms, similarity=${report.timing.similarityMs}ms, clustering=${report.timing.clusteringMs}ms, total=${report.timing.totalMs}ms`,
-					reportId ? `- **Report ID**: ${reportId}` : '',
-				].filter(Boolean).join('\n');
+        const summary = [
+          `## GPU Codebase Audit Complete`,
+          `- **Graph**: ${report.stats.graphNodeCount} nodes, ${report.stats.graphEdgeCount} edges`,
+          `- **Vectors**: ${report.stats.vectorCount} (${report.stats.vectorDimension}d)`,
+          `- **Central files**: ${report.centralFiles.length} (top: ${report.centralFiles[0]?.title || 'none'})`,
+          report.contracts
+            ? `- **Type safety**: ${report.contracts.typeSafety.files.length} Zod/tool schema surfaces`
+            : '',
+          report.contracts
+            ? `- **Protobuf**: ${report.contracts.protobuf.files.length} gRPC/proto surfaces`
+            : '',
+          `- **Communities**: ${report.communities.length}`,
+          `- **Near-duplicates**: ${report.stats.duplicatePairCount} pairs (≥${args.dupThreshold ?? 0.92})`,
+          `- **Code clusters**: ${report.stats.clusterCount}`,
+          `- **GPU**: CUDA=${report.gpu.cuda}, ${report.gpu.freeMB}MB free / ${report.gpu.totalMB}MB total`,
+          `- **Timing**: graph=${report.timing.graphMs}ms, vectors=${report.timing.vectorFetchMs}ms, similarity=${report.timing.similarityMs}ms, clustering=${report.timing.clusteringMs}ms, total=${report.timing.totalMs}ms`,
+          reportId ? `- **Report ID**: ${reportId}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n');
 
-				return { ok: true, tool: name, result: summary, durationMs: Date.now() - start, data: { reportId, stats: report.stats, timing: report.timing } };
-			}
+        return {
+          ok: true,
+          tool: name,
+          result: summary,
+          durationMs: Date.now() - start,
+          data: { reportId, stats: report.stats, timing: report.timing },
+        };
+      }
 
-			case 'analyze_graph': {
-				const { analyzeGraph } = await import('$lib/server/graph/gpu-graph-analysis.js');
-				const graphResult = await Promise.race([
-					analyzeGraph({
-						caseId: args.caseId as string | undefined,
-						includePageRank: true,
-						includeCommunities: (args.includeCommunities as boolean) ?? true,
-						maxNodes: (args.maxNodes as number) ?? 500,
-					}),
-					new Promise<never>((_, reject) =>
-						setTimeout(() => reject(new Error('timeout')), timeout)
-					),
-				]);
+      case 'analyze_graph': {
+        const { analyzeGraph } = await import('$lib/server/graph/gpu-graph-analysis.js');
+        const graphResult = await Promise.race([
+          analyzeGraph({
+            caseId: args.caseId as string | undefined,
+            includePageRank: true,
+            includeCommunities: (args.includeCommunities as boolean) ?? true,
+            maxNodes: (args.maxNodes as number) ?? 500,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), timeout)
+          ),
+        ]);
 
-				const topFiles = (graphResult.pageRank ?? []).slice(0, 10)
-					.map((pr, i) => `${i + 1}. **${pr.title || pr.nodeId}** (${pr.label}) — PageRank: ${pr.score}`)
-					.join('\n');
+        const topFiles = (graphResult.pageRank ?? [])
+          .slice(0, 10)
+          .map(
+            (pr, i) =>
+              `${i + 1}. **${pr.title || pr.nodeId}** (${pr.label}) — PageRank: ${pr.score}`
+          )
+          .join('\n');
 
-				const communities = (graphResult.communities ?? []).slice(0, 8)
-					.map((c, i) => `${i + 1}. Community ${c.communityId}: ${c.size} members — ${c.members.slice(0, 3).map(m => m.title || m.label).join(', ')}`)
-					.join('\n');
+        const communities = (graphResult.communities ?? [])
+          .slice(0, 8)
+          .map(
+            (c, i) =>
+              `${i + 1}. Community ${c.communityId}: ${c.size} members — ${c.members
+                .slice(0, 3)
+                .map((m) => m.title || m.label)
+                .join(', ')}`
+          )
+          .join('\n');
 
-				const summary = [
-					`## Graph Analysis: ${graphResult.nodeCount} nodes, ${graphResult.edgeCount} edges`,
-					`### Top Central Files (PageRank)`,
-					topFiles || 'No nodes found',
-					graphResult.communities ? `### Communities` : '',
-					communities,
-					`Duration: ${graphResult.durationMs}ms${graphResult.cached ? ' (cached)' : ''}`,
-				].filter(Boolean).join('\n');
+        const summary = [
+          `## Graph Analysis: ${graphResult.nodeCount} nodes, ${graphResult.edgeCount} edges`,
+          `### Top Central Files (PageRank)`,
+          topFiles || 'No nodes found',
+          graphResult.communities ? `### Communities` : '',
+          communities,
+          `Duration: ${graphResult.durationMs}ms${graphResult.cached ? ' (cached)' : ''}`,
+        ]
+          .filter(Boolean)
+          .join('\n');
 
-				return { ok: true, tool: name, result: summary, durationMs: Date.now() - start };
-			}
+        return { ok: true, tool: name, result: summary, durationMs: Date.now() - start };
+      }
 
-			case 'search_codebase': {
-				const query = String(args.query || '');
-				const limit = Number(args.limit ?? 10);
+      case 'search_codebase': {
+        const query = String(args.query || '');
+        const limit = Number(args.limit ?? 10);
 
-				// embed the query
-				const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model: VLM_MODELS.embedding, input: query }),
-					signal: AbortSignal.timeout(10_000),
-				});
+        // embed the query
+        const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: VLM_MODELS.embedding, input: query }),
+          signal: AbortSignal.timeout(10_000),
+        });
 
-				if (!embedRes.ok) {
-					return { ok: false, tool: name, result: 'Failed to embed query', durationMs: Date.now() - start };
-				}
+        if (!embedRes.ok) {
+          return {
+            ok: false,
+            tool: name,
+            result: 'Failed to embed query',
+            durationMs: Date.now() - start,
+          };
+        }
 
-				const embedData = await embedRes.json();
-				const queryVec: number[] = embedData.embeddings?.[0] ?? [];
-				if (queryVec.length === 0) {
-					return { ok: false, tool: name, result: 'Empty embedding returned', durationMs: Date.now() - start };
-				}
+        const embedData = await embedRes.json();
+        const queryVec: number[] = embedData.embeddings?.[0] ?? [];
+        if (queryVec.length === 0) {
+          return {
+            ok: false,
+            tool: name,
+            result: 'Empty embedding returned',
+            durationMs: Date.now() - start,
+          };
+        }
 
-				// search Qdrant
-				const searchRes = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						vector: queryVec,
-						limit,
-						with_payload: true,
-						score_threshold: 0.3,
-					}),
-					signal: AbortSignal.timeout(10_000),
-				});
+        // search Qdrant
+        const searchRes = await fetch(
+          `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              vector: queryVec,
+              limit,
+              with_payload: true,
+              score_threshold: 0.3,
+            }),
+            signal: AbortSignal.timeout(10_000),
+          }
+        );
 
-				if (!searchRes.ok) {
-					return { ok: false, tool: name, result: 'Qdrant search failed', durationMs: Date.now() - start };
-				}
+        if (!searchRes.ok) {
+          return {
+            ok: false,
+            tool: name,
+            result: 'Qdrant search failed',
+            durationMs: Date.now() - start,
+          };
+        }
 
-				const searchData = await searchRes.json();
-				const hits = searchData.result ?? [];
-				if (hits.length === 0) {
-					return { ok: true, tool: name, result: 'No matching codebase chunks found.', durationMs: Date.now() - start };
-				}
+        const searchData = await searchRes.json();
+        const hits = searchData.result ?? [];
+        if (hits.length === 0) {
+          return {
+            ok: true,
+            tool: name,
+            result: 'No matching codebase chunks found.',
+            durationMs: Date.now() - start,
+          };
+        }
 
-				const formatted = hits.map((h: any, i: number) => {
-					const path = h.payload?.relativePath ?? h.payload?.path ?? 'unknown';
-					const symbol = h.payload?.symbol ?? '';
-					const score = ((h.score ?? 0) * 100).toFixed(0);
-					return `${i + 1}. [${score}%] **${path}**${symbol ? ` — ${symbol}` : ''}`;
-				}).join('\n');
+        const formatted = hits
+          .map((h: any, i: number) => {
+            const path = h.payload?.relativePath ?? h.payload?.path ?? 'unknown';
+            const symbol = h.payload?.symbol ?? '';
+            const score = ((h.score ?? 0) * 100).toFixed(0);
+            return `${i + 1}. [${score}%] **${path}**${symbol ? ` — ${symbol}` : ''}`;
+          })
+          .join('\n');
 
-				return { ok: true, tool: name, result: `## Codebase Search: "${query}"\n${formatted}`, durationMs: Date.now() - start };
-			}
+        return {
+          ok: true,
+          tool: name,
+          result: `## Codebase Search: "${query}"\n${formatted}`,
+          durationMs: Date.now() - start,
+        };
+      }
 
-			case 'get_audit_report': {
-				const { getLatestAuditReport } = await import('$lib/server/audit/gpu-audit-orchestrator.js');
-				const report = await Promise.race([
-					getLatestAuditReport(args.caseId as string | undefined),
-					new Promise<never>((_, reject) =>
-						setTimeout(() => reject(new Error('timeout')), timeout)
-					),
-				]);
+      case 'get_audit_report': {
+        const { getLatestAuditReport } = await import(
+          '$lib/server/audit/gpu-audit-orchestrator.js'
+        );
+        const report = await Promise.race([
+          getLatestAuditReport(args.caseId as string | undefined),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), timeout)
+          ),
+        ]);
 
-				if (!report) {
-					return { ok: true, tool: name, result: 'No GPU audit reports found. Run `run_gpu_audit` first.', durationMs: Date.now() - start };
-				}
+        if (!report) {
+          return {
+            ok: true,
+            tool: name,
+            result: 'No GPU audit reports found. Run `run_gpu_audit` first.',
+            durationMs: Date.now() - start,
+          };
+        }
 
-				const summary = [
-					`## Latest GPU Audit Report`,
-					`- Graph: ${report.stats.graphNodeCount} nodes, ${report.stats.graphEdgeCount} edges`,
-					`- Vectors: ${report.stats.vectorCount}`,
-					`- Central files: ${report.centralFiles.length}`,
-					`- Communities: ${report.communities.length}`,
-					`- Near-duplicates: ${report.stats.duplicatePairCount}`,
-					`- Clusters: ${report.stats.clusterCount}`,
-					`- Total time: ${report.timing.totalMs}ms`,
-					'',
-					`### Top 5 Central Files`,
-					...report.centralFiles.slice(0, 5).map((cf, i) =>
-						`${i + 1}. **${cf.title || cf.nodeId}** (${cf.label}) — PR: ${cf.pageRankScore}`),
-				].join('\n');
+        const summary = [
+          `## Latest GPU Audit Report`,
+          `- Graph: ${report.stats.graphNodeCount} nodes, ${report.stats.graphEdgeCount} edges`,
+          `- Vectors: ${report.stats.vectorCount}`,
+          `- Central files: ${report.centralFiles.length}`,
+          `- Communities: ${report.communities.length}`,
+          `- Near-duplicates: ${report.stats.duplicatePairCount}`,
+          `- Clusters: ${report.stats.clusterCount}`,
+          `- Total time: ${report.timing.totalMs}ms`,
+          '',
+          `### Top 5 Central Files`,
+          ...report.centralFiles
+            .slice(0, 5)
+            .map(
+              (cf, i) =>
+                `${i + 1}. **${cf.title || cf.nodeId}** (${cf.label}) — PR: ${cf.pageRankScore}`
+            ),
+        ].join('\n');
 
-				return { ok: true, tool: name, result: summary, durationMs: Date.now() - start };
-			}
+        return { ok: true, tool: name, result: summary, durationMs: Date.now() - start };
+      }
 
-			case 'gpu_status': {
-				const { isCudaAvailable, getCudaMemoryInfo } = await import(
-					'$lib/server/gpu/libtorch-bridge.js'
-				);
-				const cuda = isCudaAvailable();
-				const mem = getCudaMemoryInfo();
-				const result = [
-					`## GPU Status`,
-					`- CUDA available: ${cuda}`,
-					`- VRAM: ${mem.freeMB}MB free / ${mem.totalMB}MB total (${mem.usedMB}MB used)`,
-					cuda ? '- Recommendation: Full FP32 audit supported' : '- Recommendation: CPU fallback mode, consider halfPrecision=true',
-				].join('\n');
-				return { ok: true, tool: name, result, durationMs: Date.now() - start };
-			}
+      case 'gpu_status': {
+        const { isCudaAvailable, getCudaMemoryInfo } = await import(
+          '$lib/server/gpu/libtorch-bridge.js'
+        );
+        const cuda = isCudaAvailable();
+        const mem = getCudaMemoryInfo();
+        const result = [
+          `## GPU Status`,
+          `- CUDA available: ${cuda}`,
+          `- VRAM: ${mem.freeMB}MB free / ${mem.totalMB}MB total (${mem.usedMB}MB used)`,
+          cuda
+            ? '- Recommendation: Full FP32 audit supported'
+            : '- Recommendation: CPU fallback mode, consider halfPrecision=true',
+        ].join('\n');
+        return { ok: true, tool: name, result, durationMs: Date.now() - start };
+      }
 
-			default:
-				return { ok: false, tool: name, result: `Unknown audit tool: ${name}`, durationMs: Date.now() - start };
-		}
-	} catch (err) {
-		return {
-			ok: false,
-			tool: name,
-			result: `Tool ${name} failed: ${(err as Error)?.message ?? 'unknown error'}`,
-			durationMs: Date.now() - start,
-		};
-	}
+      default:
+        return {
+          ok: false,
+          tool: name,
+          result: `Unknown audit tool: ${name}`,
+          durationMs: Date.now() - start,
+        };
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      tool: name,
+      result: `Tool ${name} failed: ${(err as Error)?.message ?? 'unknown error'}`,
+      durationMs: Date.now() - start,
+    };
+  }
 }
 
 // ── Gemma 4 Agentic Loop ─────────────────────────────────────────────
@@ -373,15 +450,15 @@ After running tools, synthesize the results into a clear, actionable summary. Hi
 5. Orphan components with no graph connections`;
 
 export interface AuditPlannerRequest {
-	query: string;
-	caseId?: string;
-	conversationHistory?: Array<{ role: string; content: string }>;
+  query: string;
+  caseId?: string;
+  conversationHistory?: Array<{ role: string; content: string }>;
 }
 
 export interface AuditPlannerResult {
-	response: string;
-	toolResults: AuditToolResult[];
-	totalDurationMs: number;
+  response: string;
+  toolResults: AuditToolResult[];
+  totalDurationMs: number;
 }
 
 /**
@@ -391,132 +468,135 @@ export interface AuditPlannerResult {
  * tools to call, executes them, and synthesizes a readable report.
  */
 export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPlannerResult> {
-	const totalStart = Date.now();
-	const MAX_TOOL_ROUNDS = 3;
-	const MAX_TOTAL_TOOL_CALLS = 5;
-	let toolRounds = 0;
-	let totalToolCalls = 0;
-	const allResults: AuditToolResult[] = [];
+  const totalStart = Date.now();
+  const MAX_TOOL_ROUNDS = 3;
+  const MAX_TOTAL_TOOL_CALLS = 5;
+  let toolRounds = 0;
+  let totalToolCalls = 0;
+  const allResults: AuditToolResult[] = [];
 
-	const messages: Array<{ role: string; content: string }> = [
-		{ role: 'system', content: AUDIT_SYSTEM_PROMPT },
-		...(req.conversationHistory ?? []).slice(-6),
-		{ role: 'user', content: req.query },
-	];
+  const messages: Array<{ role: string; content: string }> = [
+    { role: 'system', content: AUDIT_SYSTEM_PROMPT },
+    ...(req.conversationHistory ?? []).slice(-6),
+    { role: 'user', content: req.query },
+  ];
 
-	const ollamaUrl = ENV.OLLAMA_BASE_URL;
-	const keepAlive = '2m';
+  const ollamaUrl = ENV.OLLAMA_BASE_URL;
+  const keepAlive = '2m';
 
-	// Multi-round tool-calling loop
-	while (toolRounds < MAX_TOOL_ROUNDS) {
-		let res: Response;
-		try {
-			res = await ollamaFetch(`${ollamaUrl}/api/chat`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: VLM_MODELS.gemma4,
-					messages,
-					stream: false,
-					tools: AUDIT_TOOLS,
-					keep_alive: keepAlive,
-					options: {
-						temperature: 0.1,
-						top_k: 20,
-						top_p: 0.8,
-						num_ctx: 8192,
-						num_predict: 512,
-					},
-				}),
-				signal: AbortSignal.timeout(30_000),
-			});
-		} catch {
-			break;
-		}
+  // Multi-round tool-calling loop
+  while (toolRounds < MAX_TOOL_ROUNDS) {
+    let res: Response;
+    try {
+      res = await ollamaFetch(`${ollamaUrl}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: VLM_MODELS.legal,
+          messages,
+          stream: false,
+          tools: AUDIT_TOOLS,
+          keep_alive: keepAlive,
+          options: {
+            temperature: 0.1,
+            top_k: 20,
+            top_p: 0.8,
+            num_ctx: 8192,
+            num_predict: 512,
+          },
+        }),
+        signal: AbortSignal.timeout(30_000),
+      });
+    } catch {
+      break;
+    }
 
-		if (!res.ok) break;
+    if (!res.ok) break;
 
-		let data: any;
-		try {
-			data = await res.json();
-		} catch {
-			break;
-		}
+    let data: any;
+    try {
+      data = await res.json();
+    } catch {
+      break;
+    }
 
-		const toolCalls = data.message?.tool_calls;
-		const assistantContent = data.message?.content || '';
+    const toolCalls = data.message?.tool_calls;
+    const assistantContent = data.message?.content || '';
 
-		// No tool calls — model is done, return its response
-		if (!toolCalls || !Array.isArray(toolCalls) || toolCalls.length === 0) {
-			return {
-				response: assistantContent,
-				toolResults: allResults,
-				totalDurationMs: Date.now() - totalStart,
-			};
-		}
+    // No tool calls — model is done, return its response
+    if (!toolCalls || !Array.isArray(toolCalls) || toolCalls.length === 0) {
+      return {
+        response: assistantContent,
+        toolResults: allResults,
+        totalDurationMs: Date.now() - totalStart,
+      };
+    }
 
-		// Append assistant message (may contain thinking)
-		messages.push({ role: 'assistant', content: assistantContent });
+    // Append assistant message (may contain thinking)
+    messages.push({ role: 'assistant', content: assistantContent });
 
-		// Execute each tool call
-		for (const tc of toolCalls) {
-			if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) break;
-			const toolName = tc.function?.name;
-			const rawArgs = tc.function?.arguments || {};
-			if (!toolName) continue;
+    // Execute each tool call
+    for (const tc of toolCalls) {
+      if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) break;
+      const toolName = tc.function?.name;
+      const rawArgs = tc.function?.arguments || {};
+      if (!toolName) continue;
 
-			const toolArgs = validateToolArgs(toolName, rawArgs);
-			if (!toolArgs) {
-				allResults.push({
-					ok: false,
-					tool: toolName,
-					result: `Invalid arguments for ${toolName}`,
-					durationMs: 0,
-				});
-				totalToolCalls++;
-				messages.push({ role: 'tool', content: `Invalid arguments for ${toolName}` });
-				continue;
-			}
+      const toolArgs = validateToolArgs(toolName, rawArgs);
+      if (!toolArgs) {
+        allResults.push({
+          ok: false,
+          tool: toolName,
+          result: `Invalid arguments for ${toolName}`,
+          durationMs: 0,
+        });
+        totalToolCalls++;
+        messages.push({ role: 'tool', content: `Invalid arguments for ${toolName}` });
+        continue;
+      }
 
-			const tr = await executeAuditTool(toolName, toolArgs);
-			allResults.push(tr);
-			totalToolCalls++;
-			messages.push({ role: 'tool', content: tr.result });
-		}
+      const tr = await executeAuditTool(toolName, toolArgs);
+      allResults.push(tr);
+      totalToolCalls++;
+      messages.push({ role: 'tool', content: tr.result });
+    }
 
-		toolRounds++;
-	}
+    toolRounds++;
+  }
 
-	// If we exhausted rounds without a final response, make one last call without tools
-	try {
-		const finalRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: VLM_MODELS.gemma4,
-				messages,
-				stream: false,
-				keep_alive: keepAlive,
-				options: { temperature: 0.3, num_ctx: 8192, num_predict: 1024 },
-			}),
-			signal: AbortSignal.timeout(30_000),
-		});
+  // If we exhausted rounds without a final response, make one last call without tools
+  try {
+    const finalRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: VLM_MODELS.legal,
+        messages,
+        stream: false,
+        keep_alive: keepAlive,
+        options: { temperature: 0.3, num_ctx: 8192, num_predict: 1024 },
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
 
-		if (finalRes.ok) {
-			const finalData = await finalRes.json();
-			return {
-				response: finalData.message?.content || 'Audit tools executed but no summary generated.',
-				toolResults: allResults,
-				totalDurationMs: Date.now() - totalStart,
-			};
-		}
-	} catch { /* fall through */ }
+    if (finalRes.ok) {
+      const finalData = await finalRes.json();
+      return {
+        response: finalData.message?.content || 'Audit tools executed but no summary generated.',
+        toolResults: allResults,
+        totalDurationMs: Date.now() - totalStart,
+      };
+    }
+  } catch {
+    /* fall through */
+  }
 
-	return {
-		response: allResults.length > 0
-			? `Executed ${allResults.length} tool(s) but could not generate summary. Raw results attached.`
-			: 'No audit tools were executed.',
-		toolResults: allResults,
-		totalDurationMs: Date.now() - totalStart,
-	};
+  return {
+    response:
+      allResults.length > 0
+        ? `Executed ${allResults.length} tool(s) but could not generate summary. Raw results attached.`
+        : 'No audit tools were executed.',
+    toolResults: allResults,
+    totalDurationMs: Date.now() - totalStart,
+  };
 }

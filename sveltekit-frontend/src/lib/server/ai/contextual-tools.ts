@@ -22,160 +22,182 @@ export interface ContextualToolResult {
 
 /** Ollama native function-calling tool definitions */
 export const CONTEXTUAL_TOOLS = [
-	{
-		type: 'function' as const,
-		function: {
-			name: 'glossary_search',
-			description:
-				'Search the legal glossary for term definitions and legal concepts. Use when the user asks "what is [term]?", "define [term]", or needs clarification on legal terminology.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Legal term or concept to look up' },
-					limit: { type: 'number', description: 'Max results (default: 5)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'rag_search',
-			description:
-				'Semantic search through legal documents using vector similarity. Use to find relevant evidence, case documents, or legal precedents.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Semantic search query' },
-					limit: { type: 'number', description: 'Max results (default: 5)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'web_search',
-			description: 'Search the web for legal research, case law, or documentation.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Search query' },
-					maxResults: { type: 'number', description: 'Max results (default: 5)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'graph_expand',
-			description:
-				'Expand retrieval using the knowledge graph. Given an evidence or case ID, find related documents through graph connections (KAG neighbors). Use when the user asks about related evidence, connections between documents, or wants to explore relationships.',
-			parameters: {
-				type: 'object',
-				required: ['caseId'],
-				properties: {
-					caseId: { type: 'string', description: 'Case UUID to expand graph from' },
-					limit: { type: 'number', description: 'Max neighbors (default: 8)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'authority_drill',
-			description:
-				'Drill down into cited statutes and case precedents. Given a legal citation or statute reference, find the full text and related authorities. Use when the user asks about specific statutes, precedents, or wants deeper analysis of cited law.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Statute code, case citation, or legal concept to drill into' },
-					maxHops: { type: 'number', description: 'Max citation hops (default: 2)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'case_search',
-			description:
-				'Search for similar cases by description or legal issue. Returns matching cases with similarity scores. Use when the user asks to find related cases, similar precedents, or case patterns.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Case description or legal issue to search for' },
-					limit: { type: 'number', description: 'Max results (default: 5)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'crawl_web_research',
-			description:
-				'Trigger a live web search crawl on a research query, summarise top results with gemma4-legal, ' +
-				'and index them in the glyph cache. Use when the user wants fresh web research on a legal topic, ' +
-				'case law updates, or news relevant to their case. Results are also persisted for future searches.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query:      { type: 'string',  description: 'Research query to crawl' },
-					pipeline:   { type: 'string',  description: 'Pipeline label: ace|rag|kag|dag|codebase (default: ace)' },
-					maxResults: { type: 'number',  description: 'Max web results to fetch (default: 5, max: 10)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'crawl_legal_corpus',
-			description:
-				'Search the local legal corpus (Legal Canon, Court Opinions, Legal Documents) using vector similarity, ' +
-				'then summarise top chunks with gemma4-legal. Use for authoritative legal research — statutes, ' +
-				'case holdings, canon law — from the locally indexed Qdrant collections.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query:      { type: 'string', description: 'Legal research query' },
-					pipeline:   { type: 'string', description: 'Pipeline label: ace|rag|kag|dag|codebase (default: ace)' },
-					maxResults: { type: 'number', description: 'Max chunks per collection (default: 4, max: 8)' },
-				},
-			},
-		},
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'research_glyph_search',
-			description:
-				'Fast parallel cache search over minified research summaries using GPU cosine reranking. ' +
-				'Searches L1 Redis → L2 in-process LRU → L3 Qdrant ANN in parallel. ' +
-				'Use when the user asks about prior research, past summaries, web crawl results, or corpus analysis. ' +
-				'Returns top matching glyphs with attention scores and shared tag context.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query:    { type: 'string', description: 'Research query or topic to search' },
-					pipeline: { type: 'string', description: 'Filter by pipeline: ace|rag|kag|dag|codebase|all (default: all)' },
-					tags:     { type: 'array',  items: { type: 'string' }, description: 'Entity tags to filter by (AND semantics)' },
-					topK:     { type: 'number', description: 'Max results (default: 8)' },
-				},
-			},
-		},
-	},
+  {
+    type: 'function' as const,
+    function: {
+      name: 'glossary_search',
+      description:
+        'Search the legal glossary for term definitions and legal concepts. Use when the user asks "what is [term]?", "define [term]", or needs clarification on legal terminology.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'Legal term or concept to look up' },
+          limit: { type: 'number', description: 'Max results (default: 5)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'rag_search',
+      description:
+        'Semantic search through legal documents using vector similarity. Use to find relevant evidence, case documents, or legal precedents.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'Semantic search query' },
+          limit: { type: 'number', description: 'Max results (default: 5)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'web_search',
+      description: 'Search the web for legal research, case law, or documentation.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'Search query' },
+          maxResults: { type: 'number', description: 'Max results (default: 5)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'graph_expand',
+      description:
+        'Expand retrieval using the knowledge graph. Given an evidence or case ID, find related documents through graph connections (KAG neighbors). Use when the user asks about related evidence, connections between documents, or wants to explore relationships.',
+      parameters: {
+        type: 'object',
+        required: ['caseId'],
+        properties: {
+          caseId: { type: 'string', description: 'Case UUID to expand graph from' },
+          limit: { type: 'number', description: 'Max neighbors (default: 8)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'authority_drill',
+      description:
+        'Drill down into cited statutes and case precedents. Given a legal citation or statute reference, find the full text and related authorities. Use when the user asks about specific statutes, precedents, or wants deeper analysis of cited law.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: {
+            type: 'string',
+            description: 'Statute code, case citation, or legal concept to drill into',
+          },
+          maxHops: { type: 'number', description: 'Max citation hops (default: 2)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'case_search',
+      description:
+        'Search for similar cases by description or legal issue. Returns matching cases with similarity scores. Use when the user asks to find related cases, similar precedents, or case patterns.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'Case description or legal issue to search for' },
+          limit: { type: 'number', description: 'Max results (default: 5)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'crawl_web_research',
+      description:
+        'Trigger a live web search crawl on a research query, summarise top results with gemma4-legal, ' +
+        'and index them in the glyph cache. Use when the user wants fresh web research on a legal topic, ' +
+        'case law updates, or news relevant to their case. Results are also persisted for future searches.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'Research query to crawl' },
+          pipeline: {
+            type: 'string',
+            description: 'Pipeline label: ace|rag|kag|dag|codebase (default: ace)',
+          },
+          maxResults: {
+            type: 'number',
+            description: 'Max web results to fetch (default: 5, max: 10)',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'crawl_legal_corpus',
+      description:
+        'Search the local legal corpus (Legal Canon, Court Opinions, Context Documents) using vector similarity, ' +
+        'then summarise top chunks with gemma4-legal. Use for offline legal research across authoritative ' +
+        'primary sources plus nearby contextual local documents from the indexed Qdrant collections.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'Legal research query' },
+          pipeline: {
+            type: 'string',
+            description: 'Pipeline label: ace|rag|kag|dag|codebase (default: ace)',
+          },
+          maxResults: {
+            type: 'number',
+            description: 'Max chunks per collection (default: 4, max: 8)',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'research_glyph_search',
+      description:
+        'Fast parallel cache search over minified research summaries using GPU cosine reranking. ' +
+        'Searches L1 Redis → L2 in-process LRU → L3 Qdrant ANN in parallel. ' +
+        'Use when the user asks about prior research, past summaries, web crawl results, or corpus analysis. ' +
+        'Returns top matching glyphs with attention scores and shared tag context.',
+      parameters: {
+        type: 'object',
+        required: ['query'],
+        properties: {
+          query: { type: 'string', description: 'Research query or topic to search' },
+          pipeline: {
+            type: 'string',
+            description: 'Filter by pipeline: ace|rag|kag|dag|codebase|all (default: all)',
+          },
+          tags: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Entity tags to filter by (AND semantics)',
+          },
+          topK: { type: 'number', description: 'Max results (default: 8)' },
+        },
+      },
+    },
+  },
 ] as const;
 
 const TOOL_TIMEOUT_MS: Record<string, number> = {

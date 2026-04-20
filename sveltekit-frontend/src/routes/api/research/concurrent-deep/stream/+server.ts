@@ -251,6 +251,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					? await persistGraph(query, supervisorSummary, domains, totalChunks, userId)
 					: null;
 
+				// 4b. Fire-and-forget: Karpathy wiki research note
+				import('$lib/server/indexer/karpathy-wiki.js')
+					.then(({ recordResearchNote }) => recordResearchNote({
+						query,
+						outsideSources: [],
+						internalAreas: workerFindings.flatMap(w => w.relevantPaths.slice(0, 5)),
+						confidence: Math.min(1, totalChunks / 50),
+						pipeline: 'langgraph',
+						unresolvedQuestions: actionItems.slice(0, 5),
+					}))
+					.catch(() => { /* non-fatal */ });
+
 				// ── context_timeline: persisted (if summary was stored) ───────
 				if (persistedId) {
 					emitTimeline(userId, 'research.concurrent.persisted', {

@@ -12,7 +12,7 @@ import { ENV } from '$lib/server/env.server.js';
  * SearXNG Setup:
  * - Docker: docker run -d -p 8080:8080 searxng/searxng
  * - Or use public instance: https://searx.space/
- * - Set SEARXNG_URL in .env (e.g., http://localhost:8080)
+ * - Set SEARXNG_URL in .env (e.g., http://localhost:8888)
  */
 
 export const webSearchSchema = z.object({
@@ -113,7 +113,7 @@ export async function webSearch(input: WebSearchInput): Promise<WebSearchResult>
  * Search via SearXNG API
  */
 async function searchViaSearXNG(query: string, maxResults: number): Promise<SearchResult[]> {
-	const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8080';
+	const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8888';
 
 	const response = await fetch(`${searxngUrl}/search`, {
 		method: 'POST',

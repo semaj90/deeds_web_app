@@ -13,6 +13,7 @@
  *   halfPrecision?: boolean (default false),
  *   skipGraph?: boolean (default false),
  *   skipCodebase?: boolean (default false),
+ *   includeContracts?: boolean (default true),
  *   persist?: boolean (default true)
  * }
  *
@@ -37,6 +38,7 @@ const auditSchema = z.object({
 	halfPrecision: z.boolean().optional().default(false),
 	skipGraph: z.boolean().optional().default(false),
 	skipCodebase: z.boolean().optional().default(false),
+	includeContracts: z.boolean().optional().default(true),
 	persist: z.boolean().optional().default(true),
 });
 

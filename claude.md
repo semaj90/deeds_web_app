@@ -1,6 +1,6 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: March 15, 2026 (GPU Audit Session)
+## Last Updated: April 19, 2026 (Unified model + gRPC audit + Docker VHDX audit)
 ## Status: svelte-check 0 errors, 0 warnings | vite build PASSES | Playwright 20/20
 
 ---
@@ -27,7 +27,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Server Cache**: Redis (SSR pages + sessions)
 - **Database**: PostgreSQL 16 + Drizzle ORM 0.44 + pgvector
 - **Vector DB**: Qdrant (GPU-accelerated)
-- **AI Models**: Ollama (`embeddinggemma:latest` + `gemma4-legal:latest`)
+- **AI Models**: Ollama (`embeddinggemma:latest` + `gemma4-legal-vlm:latest` — unified text+vision, GRPO legal LoRA merged)
 - **Client AI**: ONNX Runtime (WebGPU → WASM SIMD → CPU) + gemma 270M quantized
 - **Real-Time**: Server-Sent Events (SSE)
 - **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
@@ -50,7 +50,7 @@ Client Router (src/lib/ai/client-router.ts)
   │   └─ Auto-escalate on failure → SERVER
   │
   └─ Legal/complex query → SERVER Ollama
-      ├─ LLM: gemma4-legal:latest
+      ├─ LLM: gemma4-legal-vlm:latest
       ├─ Embeddings: embeddinggemma:latest (768-dim)
       └─ SSE stream via /api/sse/chat
 ```
@@ -961,6 +961,51 @@ bash scripts/audit/backend-infrastructure-audit.sh
 
 ---
 
+## gRPC Service Port Map (Audited April 19, 2026)
+
+| Port  | Service                  | Client                   | Status        |
+|-------|--------------------------|--------------------------|---------------|
+| 50051 | EmbeddingService (Go)    | `grpc/embedding-client.ts` | FULLY WIRED |
+| 50052 | GenerationService        | `grpc/generation-client.ts` | ORPHANED   |
+| 50053 | RetrievalService (Go)    | `grpc/retrieval-client.ts` | FULLY WIRED |
+| 50055 | CHR97 / LibSearch (Go)   | `grpc/chr97-agent-client.ts` | PORT COLLISION |
+| 50056 | GraphML (PyTorch GPU)    | `grpc/graph-ml-client.ts` | MISSING ENV |
+| 50057 | ToolCalling              | `grpc/tool-calling-client.ts` | FULLY WIRED |
+| 8096  | go-search-service HTTP   | direct fetch             | OPERATIONAL   |
+| 8097  | go-embedding-service HTTP| direct fetch             | COMPILED      |
+| 8100  | go-retrieval-service HTTP| `grpc/retrieval-client.ts` | OPERATIONAL |
+
+**Known issues:** Port 50055 collision (CHR97 + go-search-service), `GRAPH_ML_GRPC_URL` missing from `env.server.ts`, `generation-client.ts` has zero consumers.
+
+**All gRPC services default to disabled** (`*_GRPC_ENABLED=false`). Each client has graceful fallback chains (gRPC → HTTP → inline TypeScript).
+
+---
+
+## Docker WSL2 VHDX Management
+
+**Windows 10 limitation:** Docker's VHDX never auto-shrinks. Must compact manually after cleanup.
+
+**Compaction steps** (after any `docker rmi` / prune):
+```powershell
+# 1. Prune inside Docker
+docker system prune -a --volumes && docker builder prune -a
+# 2. Quit Docker Desktop from system tray
+# 3. Shut down WSL
+wsl --shutdown
+# 4. Compact via diskpart
+diskpart
+select vdisk file="C:\Users\james\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
+compact vdisk
+detach vdisk
+exit
+```
+
+**Set disk cap:** Docker Desktop Settings > Resources > Advanced > Disk image size (e.g., 64 GB)
+
+**Move to another drive:** Docker Desktop Settings > Resources > Advanced > Disk image location
+
+---
+
 ## GPU Acceleration Stack (N-API + LibTorch + simdjson)
 
 **Overview**: Native C++ addons bridge TypeScript ↔ CUDA/LibTorch/simdjson for 2-6,500× performance gains.
@@ -1149,6 +1194,32 @@ await db.update(cases).set({ status: 'closed' }).where(eq(cases.id, caseId));
 
 **Core table groups**: Auth (users, sessions), Cases (cases, caseNotes, caseStatuteLinks), Evidence (evidence, evidenceRelationships), Documents (documents, legalDocuments, documentChunks), Legal (citations, statutes, statuteChunks, legalPrecedents), RAG (ragSessions, ragMessages), Embeddings (6 vector tables, 768 dims), Workspaces, Route Health, Error Tracking
 
+### pgvector Column Types (Drizzle-native)
+
+```typescript
+// PREFERRED — Drizzle-native (built into drizzle-orm/pg-core since ~v0.30)
+import { vector, halfvec, sparsevec, bit } from 'drizzle-orm/pg-core';
+
+// LEGACY — pgvector npm package (experimental, DO NOT use for new code)
+// import { vector } from 'pgvector/drizzle-orm';
+
+// Distance functions — use typed API, not raw SQL operators
+import { cosineDistance, l2Distance, innerProduct } from 'drizzle-orm';
+
+// Similarity search
+const results = await db.select({
+  id: items.id,
+  distance: cosineDistance(items.embedding, queryVec)
+}).from(items)
+  .orderBy(asc(cosineDistance(items.embedding, queryVec)))
+  .limit(10);
+
+// HNSW index (Drizzle 0.44 native — but keep manual SQL convention for production)
+index('embedding_hnsw_idx')
+  .using('hnsw', table.embedding.op('vector_cosine_ops'))
+  .with({ m: 16, ef_construction: 64 }),
+```
+
 See `memory/drizzle-schema-reference.md` for full table reference.
 
 ---
@@ -1311,6 +1382,12 @@ safelist: [
 - **MANDATORY: Wiring audit before moving files**: NEVER move/archive files without checking ALL import consumers first. Use `grep -r 'from.*module-name'` across entire `src/`. Root layout (`+layout.svelte`) imports from `$lib/webgpu/` — would have broken every page if moved. The cartridge system (`ChatSession.svelte.ts` → `/api/cartridge/export` → `chr97-builder.ts` → `cartridge-tensor-bridge.ts`) was 70% wired but appeared phantom. Always check: (1) grep for `from.*$lib/module`, (2) check root layout, (3) check `+page.svelte` dynamic imports, (4) check barrel `index.ts` re-exports, (5) check API routes. Files in `deeds_labs/` are gitignored — permanent deletion if lost
 - **Phantom vs wired detection**: A file re-exported by `index.ts` but never imported downstream IS dead. A file with phantom CHR-ROM97 comments but real LokiJS/IndexedDB/Fuse.js code is NOT dead. Check call sites, not just file names
 - **Cartridge API endpoints**: `/api/cartridge/export` (POST, build+cache), `/api/cartridge/search` (POST, tensor similarity), `/api/cartridge/stats` (GET, Redis cache stats), `/api/cartridge/invalidate` (POST, evict cached cartridge)
+- **Unified model (April 2026)**: `gemma4-legal-vlm:latest` serves BOTH text and vision — eliminates VRAM swap on 8GB GPU. Stock `gemma4:e4b-it-q4_K_M` has NO legal fine-tuning
+- **pgvector imports**: Use `import { vector } from 'drizzle-orm/pg-core'` (native), NOT `'pgvector/drizzle-orm'` (legacy experimental)
+- **Docker VHDX**: Never auto-shrinks on Windows 10. After `docker rmi` / prune, must `wsl --shutdown` then `diskpart` → `compact vdisk`
+- **ES2025 usable now**: `Promise.withResolvers()` (SSE streams), Iterator Helpers (`.map()/.filter()` on iterators), Set methods (`.union()/.intersection()`), `Object.groupBy()`
+- **UnoCSS**: `presetUno()` soft-deprecated since v66.0.0 — `preset-wind3` (stable) or `preset-wind4` (Tailwind 4-aligned) recommended. No urgency to migrate
+- **gRPC port collision**: Port 50055 claimed by both `chr97-agent-client` and `go-search-service` — one must be moved
 
 ---
 

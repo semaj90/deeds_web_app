@@ -23,7 +23,7 @@ export interface FusedResult {
 	};
 }
 
-const EMBEDDING_MODEL = 'embeddinggemma:latest';
+const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 
 // Signal weights for fusion
 const WEIGHTS = {

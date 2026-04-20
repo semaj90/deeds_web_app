@@ -35,8 +35,8 @@ torch==2.7.0+cu128        # CUDA 12.8 — Python 3.13 compatible
 torchvision==0.22.0+cu128
 torchaudio==2.7.0+cu128
 
-# ── TensorRT-LLM (Linux/Docker only — Windows .venv: skip this line) ─────────
-tensorrt-llm>=0.18.0      # requires nvidia/cuda:12.8-devel + TensorRT 10.x
+# ── TensorRT-LLM (DISABLED — nvidia-smi unavailable at Docker build time) ─────
+# tensorrt-llm>=0.18.0    # requires TensorRT 10.x; LLM inference via Ollama/TurboQuant instead
 
 # ── FastAPI server ────────────────────────────────────────────────────────────
 fastapi==0.115.14

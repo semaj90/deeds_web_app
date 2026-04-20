@@ -10,12 +10,14 @@
  * and in Claude / Copilot context enrichment.
  */
 import { ENV } from '$lib/server/env.server.js';
-import { bifrostChat } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
+import { pool } from '$lib/server/db/client';
 import { TTL, clusterSummaryKey } from '$lib/server/cache-keys.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const TOP_CHUNKS         = 10;
-const MODEL              = 'gemma4-legal:latest';
+const MODEL = ENV.OLLAMA_CHAT_MODEL;
 
 export interface ClusterSummary {
 	clusterId: number;
@@ -58,45 +60,164 @@ interface QdrantPoint {
 	payload: Record<string, unknown>;
 }
 
+async function fetchClusterChunksFromPostgres(clusterId: number): Promise<QdrantPoint[]> {
+  try {
+    const result = await pool.query<{
+      qdrant_id: string | null;
+      relative_path: string;
+      symbol: string | null;
+      kind: string | null;
+      content: string | null;
+      tags: unknown;
+      page_rank_score: number | null;
+      gpu_cluster: number | null;
+      som_cluster: number | null;
+      cluster_summary: unknown;
+    }>(
+      `SELECT qdrant_id,
+			        relative_path,
+			        symbol,
+			        kind,
+			        content,
+			        tags,
+			        page_rank_score,
+			        gpu_cluster,
+			        som_cluster,
+			        cluster_summary
+		   FROM codebase_chunk_index
+		  WHERE gpu_cluster = $1 OR som_cluster = $1
+		  ORDER BY COALESCE(page_rank_score, 0) DESC,
+		           indexed_at DESC
+		  LIMIT 50`,
+      [clusterId]
+    );
+
+    return result.rows.map((row) => ({
+      id: row.qdrant_id ?? row.relative_path,
+      payload: {
+        relativePath: row.relative_path,
+        path: row.relative_path,
+        symbol: row.symbol ?? '',
+        kind: row.kind ?? '',
+        content: row.content ?? '',
+        tags: Array.isArray(row.tags) ? row.tags : [],
+        pagerank_score: row.page_rank_score ?? 0,
+        neo4j_gpuCluster: row.gpu_cluster ?? null,
+        som_cluster: row.som_cluster ?? null,
+        cluster_summary: row.cluster_summary ?? {},
+      },
+    }));
+  } catch {
+    return [];
+  }
+}
+
 async function fetchClusterChunks(clusterId: number): Promise<QdrantPoint[]> {
-	const filter = {
-		should: [
-			{ key: 'neo4j_gpuCluster', match: { value: clusterId } },
-			{ key: 'som_cluster',      match: { value: clusterId } },
-		],
-	};
+  // Qdrant-first: has full content + relativePath; Postgres mirror is sparse
+  const filter = {
+    should: [
+      { key: 'neo4j_gpuCluster', match: { value: clusterId } },
+      { key: 'som_cluster', match: { value: clusterId } },
+    ],
+  };
 
-	const res = await fetch(
-		`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`,
-		{
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				limit: 50,
-				with_payload: true,
-				with_vector: false,
-				filter,
-			}),
-			signal: AbortSignal.timeout(10_000),
-		},
-	);
+  let points: QdrantPoint[] = [];
+  try {
+    const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        limit: 50,
+        with_payload: true,
+        with_vector: false,
+        filter,
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
 
-	if (!res.ok) return [];
+    if (res.ok) {
+      const data = await res.json();
+      points = data.result?.points ?? [];
+    } else {
+      console.log(`[cluster-summary] Qdrant scroll failed: ${res.status}`);
+    }
+  } catch (err) {
+    console.log(`[cluster-summary] Qdrant unreachable: ${(err as Error)?.message}`);
+  }
 
-	const data = await res.json();
-	const points: QdrantPoint[] = data.result?.points ?? [];
+  const withContent = points.filter((p) => String(p.payload['content'] ?? '').length > 10);
+  console.log(`[cluster-summary] Qdrant: ${points.length} raw, ${withContent.length} with content`);
 
-	// Sort by pageRankScore DESC (prefer Colab bare key, then CouchDB, then local)
-	points.sort((a, b) => {
-		const scoreOf = (p: QdrantPoint) =>
-			(p.payload['pagerank_score']        as number | undefined) ??
-			(p.payload['pagerank_score_couchdb'] as number | undefined) ??
-			(p.payload['neo4j_pageRankScore']    as number | undefined) ??
-			0;
-		return scoreOf(b) - scoreOf(a);
-	});
+  if (withContent.length > 0) {
+    // Sort by pageRankScore DESC (prefer Colab bare key, then CouchDB, then local)
+    withContent.sort((a, b) => {
+      const scoreOf = (p: QdrantPoint) =>
+        (p.payload['pagerank_score'] as number | undefined) ??
+        (p.payload['pagerank_score_couchdb'] as number | undefined) ??
+        (p.payload['neo4j_pageRankScore'] as number | undefined) ??
+        0;
+      return scoreOf(b) - scoreOf(a);
+    });
+    return withContent.slice(0, TOP_CHUNKS);
+  }
 
-	return points.slice(0, TOP_CHUNKS);
+  // Fallback: Postgres mirror (only if Qdrant returned nothing useful)
+  console.log(`[cluster-summary] Qdrant empty, falling back to Postgres`);
+  const postgresChunks = await fetchClusterChunksFromPostgres(clusterId);
+  const pgWithContent = postgresChunks.filter(
+    (p) => String(p.payload['content'] ?? '').length > 10
+  );
+  console.log(
+    `[cluster-summary] Postgres fallback: ${postgresChunks.length} rows, ${pgWithContent.length} with content`
+  );
+  return pgWithContent.slice(0, TOP_CHUNKS);
+}
+
+async function embedSummary(summary: string): Promise<number[] | null> {
+  try {
+    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: summary }),
+      signal: AbortSignal.timeout(30_000),
+    });
+
+    if (!res.ok) return null;
+    const data = (await res.json()) as { embedding?: number[]; embeddings?: number[][] };
+    return data.embedding ?? data.embeddings?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function persistClusterSummary(summary: ClusterSummary): Promise<void> {
+  try {
+    await pool.query(
+      `UPDATE codebase_chunk_index
+			    SET cluster_summary = $1::jsonb,
+			        enriched_at = NOW(),
+			        updated_at = NOW()
+			  WHERE gpu_cluster = $2 OR som_cluster = $2`,
+      [JSON.stringify(summary), summary.clusterId]
+    );
+
+    const summaryEmbedding = await embedSummary(summary.summary);
+    if (summaryEmbedding) {
+      await pool.query(
+        `UPDATE codebase_chunk_index
+				    SET summary_embedding = $1::vector,
+				        enriched_at = NOW(),
+				        updated_at = NOW()
+				  WHERE gpu_cluster = $2 OR som_cluster = $2`,
+        [JSON.stringify(summaryEmbedding), summary.clusterId]
+      );
+    }
+  } catch (err) {
+    console.warn(
+      `[cluster-summary] PostgreSQL mirror failed for cluster ${summary.clusterId}:`,
+      (err as Error)?.message
+    );
+  }
 }
 
 // ── JSON extraction (handles markdown code fences) ───────────────────────────
@@ -118,76 +239,136 @@ function extractJson(text: string): string {
  * @param clusterId  GPU k-means / SOM cluster index
  * @param force      Bypass Redis cache and regenerate (default: false)
  */
+export type ClusterSummaryResult =
+  | { ok: true; summary: ClusterSummary }
+  | { ok: false; reason: string };
+
 export async function generateClusterSummary(
-	clusterId: number,
-	force = false,
-): Promise<ClusterSummary | null> {
-	if (!force) {
-		const cached = await getCache(clusterId);
-		if (cached) return cached;
-	}
+  clusterId: number,
+  force = false
+): Promise<ClusterSummaryResult> {
+  if (!force) {
+    const cached = await getCache(clusterId);
+    if (cached) return { ok: true, summary: cached };
+  }
 
-	const chunks = await fetchClusterChunks(clusterId);
-	if (chunks.length === 0) return null;
+  const chunks = await fetchClusterChunks(clusterId);
+  if (chunks.length === 0)
+    return { ok: false, reason: `No chunks found in Postgres or Qdrant for cluster ${clusterId}` };
 
-	// Build the code context for the LLM
-	const chunkText = chunks
-		.map((pt) => {
-			const p  = pt.payload;
-			const path = String(p['relativePath'] ?? p['path'] ?? 'unknown');
-			const kind = String(p['kind'] ?? '');
-			const sym  = String(p['symbol'] ?? '');
-			const content = String(p['content'] ?? '').slice(0, 600);
-			return `// ${path} [${kind}${sym ? ': ' + sym : ''}]\n${content}`;
-		})
-		.join('\n\n---\n\n');
+  // Build the code context for the LLM
+  const chunkText = chunks
+    .map((pt) => {
+      const p = pt.payload;
+      const path = String(p['relativePath'] ?? p['path'] ?? 'unknown');
+      const kind = String(p['kind'] ?? '');
+      const sym = String(p['symbol'] ?? '');
+      const content = String(p['content'] ?? '').slice(0, 600);
+      return `// ${path} [${kind}${sym ? ': ' + sym : ''}]\n${content}`;
+    })
+    .join('\n\n---\n\n');
 
-	const systemPrompt =
-		'You are a senior code architect. Analyse the following source files and output ONLY valid JSON ' +
-		'(no markdown fences, no prose). The JSON must match this schema exactly:\n' +
-		'{ "summary": string, "purpose": string, "patterns": string[], "keyFiles": string[], "warnings": string[] }\n' +
-		'summary: 1-2 sentence plain-English description of what this cluster does.\n' +
-		'purpose: one-line label (e.g. "Database access layer", "Authentication middleware").\n' +
-		'patterns: 3-5 key design/architectural patterns observed (e.g. "Singleton", "Repository pattern").\n' +
-		'keyFiles: relative paths of the 3-5 most important files in the cluster.\n' +
-		'warnings: any security, performance, or correctness concerns (may be empty array).';
+  const systemPrompt =
+    'You are a senior code architect. Analyse the following source files and output ONLY valid JSON ' +
+    '(no markdown fences, no prose). The JSON must match this schema exactly:\n' +
+    '{ "summary": string, "purpose": string, "patterns": string[], "keyFiles": string[], "warnings": string[] }\n' +
+    'summary: 1-2 sentence plain-English description of what this cluster does.\n' +
+    'purpose: one-line label (e.g. "Database access layer", "Authentication middleware").\n' +
+    'patterns: 3-5 key design/architectural patterns observed (e.g. "Singleton", "Repository pattern").\n' +
+    'keyFiles: relative paths of the 3-5 most important files in the cluster.\n' +
+    'warnings: any security, performance, or correctness concerns (may be empty array).';
 
-	const userMessage =
-		`Analyse cluster ${clusterId} (${chunks.length} files):\n\n${chunkText}`;
+  const userMessage = `Analyse cluster ${clusterId} (${chunks.length} files):\n\n${chunkText}`;
 
-	let raw: string;
-	try {
-		raw = await bifrostChat(
-			[
-				{ role: 'system', content: systemPrompt },
-				{ role: 'user',   content: userMessage },
-			],
-			MODEL,
-			{ temperature: 0.2, maxTokens: 512, cacheKey: `cluster-summary-${clusterId}` },
-		);
-	} catch (err) {
-		console.warn(`[cluster-summary] LLM call failed for cluster ${clusterId}:`, (err as Error)?.message);
-		return null;
-	}
+  let raw: string;
+  try {
+    raw = await traceLLM(
+      'codebase-cluster-summary',
+      { model: MODEL, clusterId, chunkCount: chunks.length, prompt: userMessage.slice(0, 500) },
+      async (gen) => {
+        // Direct Ollama call (bypasses Bifrost — Bifrost provider is unreliable)
+        const ollamaUrl = `${ENV.OLLAMA_BASE_URL}/api/chat`;
+        console.log(`[cluster-summary] Calling Ollama directly: ${ollamaUrl} model=${MODEL}`);
+        const res = await ollamaFetch(ollamaUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: MODEL,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userMessage },
+            ],
+            stream: false,
+            options: { temperature: 0.2, num_predict: 512 },
+          }),
+          signal: AbortSignal.timeout(120_000),
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => '');
+          const message = `Ollama ${res.status}: ${errText.slice(0, 200)}`;
+          gen.end({ output: message, level: 'ERROR' });
+          throw new Error(message);
+        }
 
-	let parsed: { summary: string; purpose: string; patterns: string[]; keyFiles: string[]; warnings: string[] };
-	try {
-		parsed = JSON.parse(extractJson(raw));
-	} catch {
-		console.warn(`[cluster-summary] JSON parse failed for cluster ${clusterId}. Raw:`, raw.slice(0, 200));
-		return null;
-	}
+        const data = (await res.json()) as { message?: { content?: string } };
+        const content = data.message?.content ?? '';
+        gen.end({ output: content.slice(0, 1000), level: content ? 'DEFAULT' : 'WARNING' });
+        console.log(
+          `[cluster-summary] Ollama OK (${content.length} chars) for cluster ${clusterId}`
+        );
+        return content;
+      }
+    );
+  } catch (err) {
+    const msg = (err as Error)?.message ?? 'unknown';
+    console.warn(`[cluster-summary] LLM call failed for cluster ${clusterId}:`, msg);
+    return { ok: false, reason: `Ollama call failed: ${msg}` };
+  }
 
-	const summary: ClusterSummary = {
-		clusterId,
-		summary:     String(parsed.summary  ?? ''),
-		purpose:     String(parsed.purpose  ?? ''),
-		patterns:    Array.isArray(parsed.patterns)  ? parsed.patterns.map(String)  : [],
-		keyFiles:    Array.isArray(parsed.keyFiles)   ? parsed.keyFiles.map(String)   : [],
-		warnings:    Array.isArray(parsed.warnings)   ? parsed.warnings.map(String)   : [],
-		generatedAt: new Date().toISOString(),
-	};
+  if (!raw) {
+    console.warn(`[cluster-summary] Empty LLM response for cluster ${clusterId}`);
+    return { ok: false, reason: `Ollama returned empty response for cluster ${clusterId}` };
+  }
 
-	await setCache(summary);
-	return summary;
+  let parsed: {
+    summary: string;
+    purpose: string;
+    patterns: string[];
+    keyFiles: string[];
+    warnings: string[];
+  };
+  try {
+    parsed = JSON.parse(extractJson(raw));
+  } catch {
+    console.warn(
+      `[cluster-summary] JSON parse failed for cluster ${clusterId}. Raw:`,
+      raw.slice(0, 200)
+    );
+    return {
+      ok: false,
+      reason: `JSON parse failed (${raw.length} chars). Preview: ${raw.slice(0, 120)}`,
+    };
+  }
+
+  const summary: ClusterSummary = {
+    clusterId,
+    summary: String(parsed.summary ?? ''),
+    purpose: String(parsed.purpose ?? ''),
+    patterns: Array.isArray(parsed.patterns) ? parsed.patterns.map(String) : [],
+    keyFiles: Array.isArray(parsed.keyFiles) ? parsed.keyFiles.map(String) : [],
+    warnings: Array.isArray(parsed.warnings) ? parsed.warnings.map(String) : [],
+    generatedAt: new Date().toISOString(),
+  };
+
+  await setCache(summary);
+  await persistClusterSummary(summary);
+
+  // Fire-and-forget: generate durable wiki note for this cluster
+  import('$lib/server/indexer/karpathy-wiki.js')
+    .then(({ generateClusterNote }) => generateClusterNote(clusterId, 'gpu'))
+    .catch(() => {
+      /* non-fatal */
+    });
+
+  return { ok: true, summary };
 }

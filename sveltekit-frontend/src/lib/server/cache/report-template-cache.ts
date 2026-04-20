@@ -8,7 +8,7 @@
  * - Template rendering results (15 minutes TTL)
  */
 
-import { redisPool } from '$lib/server/redis.js';
+import { ensureRedis, redisPool } from '$lib/server/redis.js';
 import { REPORT_TEMPLATES, getTemplate, type ReportTemplate } from '$lib/data/report-templates.js';
 import type { Redis } from 'ioredis';
 
@@ -143,7 +143,7 @@ export async function getCachedAllTemplates(): Promise<ReportTemplate[]> {
 		console.error('[TemplateCache] Error getting all templates:', err);
 		// Fallback to source on cache error
 		return Object.values(REPORT_TEMPLATES);
-		
+
 	}
 }
 
@@ -174,7 +174,7 @@ export async function cacheAIContent(
 	} catch (err) {
 		console.error('[TemplateCache] Error caching AI content:', err);
 		// Non-fatal - continue without caching
-		
+
 	}
 }
 
@@ -200,7 +200,7 @@ export async function getCachedAIContent(
 	} catch (err) {
 		console.error('[TemplateCache] Error getting AI content:', err);
 		return null;
-		
+
 	}
 }
 
@@ -231,7 +231,7 @@ export async function cacheRenderedTemplate(
 	} catch (err) {
 		console.error('[TemplateCache] Error caching rendered template:', err);
 		// Non-fatal - continue without caching
-		
+
 	}
 }
 
@@ -258,7 +258,7 @@ export async function getCachedRenderedTemplate(
 	} catch (err) {
 		console.error('[TemplateCache] Error getting rendered template:', err);
 		return null;
-		
+
 	}
 }
 
@@ -279,7 +279,7 @@ export async function invalidateTemplateCache(templateType: string): Promise<voi
 	} catch (err) {
 		console.error('[TemplateCache] Error invalidating template cache:', err);
 		// Non-fatal
-		
+
 	}
 }
 
@@ -300,7 +300,7 @@ export async function invalidateCaseAIContent(caseId: string): Promise<void> {
 	} catch (err) {
 		console.error('[TemplateCache] Error invalidating case AI content:', err);
 		// Non-fatal
-		
+
 	}
 }
 
@@ -321,7 +321,7 @@ export async function invalidateCaseRenderedTemplates(caseId: string): Promise<v
 	} catch (err) {
 		console.error('[TemplateCache] Error invalidating case rendered templates:', err);
 		// Non-fatal
-		
+
 	}
 }
 
@@ -363,24 +363,12 @@ export async function getTemplateCacheStats(): Promise<{
 	} catch (err) {
 		console.error('[TemplateCache] Error getting stats:', err);
 		return {
-			totalKeys: 0,
-			metadataKeys: 0,
-			aiContentKeys: 0,
-			renderedKeys: 0
-		};
-		
-	}
-}
+      totalKeys: 0,
+      metadataKeys: 0,
+      aiContentKeys: 0,
+      renderedKeys: 0,
+    };
 
-/**
- * Check if Redis is ready for operations.
- */
-function isRedisReady(): boolean {
-	try {
-		const redis = redisPool.getConnection();
-		return redis.status === 'ready';
-	} catch {
-		return false;
 	}
 }
 
@@ -389,10 +377,12 @@ function isRedisReady(): boolean {
  * Call on server startup for better first-request performance
  */
 export async function warmupTemplateCache(): Promise<void> {
-	if (!isRedisReady()) {
-		console.log('[TemplateCache] Redis unavailable, skipping warmup');
-		return;
-	}
+	try {
+    await ensureRedis();
+  } catch {
+    console.log('[TemplateCache] Redis unavailable, skipping warmup');
+    return;
+  }
 
 	console.log('[TemplateCache] Warming up cache...');
 	const start = Date.now();

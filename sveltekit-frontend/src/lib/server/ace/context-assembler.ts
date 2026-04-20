@@ -197,7 +197,8 @@ export async function assembleACEContext(opts: {
             const { generateClusterSummary } = await import(
               '$lib/server/indexer/cluster-summary.js'
             );
-            activeClusterSummary = await generateClusterSummary(topCluster, false);
+            const csResult = await generateClusterSummary(topCluster, false);
+            if (csResult.ok) activeClusterSummary = csResult.summary;
           } catch {
             /* non-fatal */
           }
@@ -277,11 +278,11 @@ export async function assembleACEContext(opts: {
       recordQueryLog({
         query,
         queryHash: queryHash(query),
-        userId:     userId ?? undefined,
-        caseId:     caseId ?? undefined,
+        userId: userId ?? undefined,
+        caseId: caseId ?? undefined,
         totalFound: aceHits.length + (codebaseContext?.length ?? 0),
         searchTimeMs: Date.now() - policyStartedAt,
-        dagEnabled:   true,
+        dagEnabled: true,
         hybridSearch: false,
       });
 
@@ -294,7 +295,7 @@ export async function assembleACEContext(opts: {
 
 /** Bump this when retrieval logic changes to invalidate stale cached chunks. */
 const ACE_PIPELINE_VERSION = '2.0.0';
-const ACE_EMBEDDING_MODEL = 'embeddinggemma:latest';
+const ACE_EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const ACE_CHUNK_TTL_HOURS = 1;
 const ACE_MIN_QUALITY_SCORE = 0.5;
 const ACE_MAX_CACHED_CHUNKS = 8;
@@ -1086,6 +1087,16 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
 
 type RAGChunk = { content: string; score: number; source: string };
 
+const KB_SOURCE_SCORE_WEIGHTS = {
+  contextualDocument: 0.9,
+  canon: 1.05,
+  knowledge: 1.0,
+} as const;
+
+function weightKbScore(score: number, sourceType: keyof typeof KB_SOURCE_SCORE_WEIGHTS): number {
+  return Number((score * KB_SOURCE_SCORE_WEIGHTS[sourceType]).toFixed(6));
+}
+
 /** Generate query embedding (shared by both tiers). */
 async function getQueryEmbedding(query: string): Promise<number[] | null> {
   try {
@@ -1132,7 +1143,7 @@ async function setCachedBundle(key: string, chunks: RAGChunk[], ttlSeconds: numb
 
 /**
  * KB Tier — Knowledge Base / Legal Corpus retrieval.
- * Searches: legal_documents, legal_canon_chunks
+ * Searches: legal_canon_chunks (primary authority), legal_documents (contextual), knowledge_base
  * Stable, heavily cached (10min TTL).
  */
 async function fetchKBChunks(
@@ -1160,8 +1171,8 @@ async function fetchKBChunks(
     });
 
     const [docResults, canonResults, kbResults] = await Promise.all([
-      qdrantMgr.client.search('legal_documents', searchOpts(6, 0.45)).catch(() => []),
-      qdrantMgr.client.search('legal_canon_chunks', searchOpts(4, 0.4)).catch(() => []),
+      qdrantMgr.client.search('legal_documents', searchOpts(4, 0.45)).catch(() => []),
+      qdrantMgr.client.search('legal_canon_chunks', searchOpts(6, 0.4)).catch(() => []),
       // knowledge_base uses unnamed vectors (raw array, not named)
       qdrantMgr.client
         .search('knowledge_base', {
@@ -1177,17 +1188,17 @@ async function fetchKBChunks(
     const chunks: RAGChunk[] = [
       ...docResults.map((r: any) => ({
         content: String(r.payload?.content_preview ?? r.payload?.full_text ?? ''),
-        score: r.score,
+        score: weightKbScore(Number(r.score ?? 0), 'contextualDocument'),
         source: String(r.payload?.source_url ?? r.payload?.document_type ?? 'kb:document'),
       })),
       ...canonResults.map((r: any) => ({
         content: String(r.payload?.content ?? r.payload?.text ?? ''),
-        score: r.score,
+        score: weightKbScore(Number(r.score ?? 0), 'canon'),
         source: String(r.payload?.source ?? 'kb:canon'),
       })),
       ...kbResults.map((r: any) => ({
         content: String(r.payload?.content ?? r.payload?.text ?? ''),
-        score: r.score,
+        score: weightKbScore(Number(r.score ?? 0), 'knowledge'),
         source: String(r.payload?.source ?? r.payload?.url ?? 'kb:knowledge'),
       })),
     ]
@@ -1280,7 +1291,9 @@ async function fetchResearchSummaryChunks(
   const cacheKey = `research_bundle:${queryHashStr}${clusterSuffix}`;
   const cached = await getCachedBundle(cacheKey);
   if (cached) {
-    console.log(`[ACE Research] bundle HIT cluster=${somCluster ?? 'all'} (${cached.length} chunks)`);
+    console.log(
+      `[ACE Research] bundle HIT cluster=${somCluster ?? 'all'} (${cached.length} chunks)`
+    );
     return cached;
   }
 
@@ -1294,22 +1307,23 @@ async function fetchResearchSummaryChunks(
     };
 
     // Prefiltered ANN: narrow to detected SOM cluster first
-    let results: any[] = somCluster != null
-      ? await qdrantMgr.client
-          .search('research_summaries', {
-            ...baseOpts,
-            filter: { must: [{ key: 'som_cluster', match: { value: somCluster } }] },
-          })
-          .catch(() => [])
-      : [];
+    let results: any[] =
+      somCluster != null
+        ? await qdrantMgr.client
+            .search('research_summaries', {
+              ...baseOpts,
+              filter: { must: [{ key: 'som_cluster', match: { value: somCluster } }] },
+            })
+            .catch(() => [])
+        : [];
 
     // Fallback: full sweep when cluster filter is empty or cluster unknown
     if (results.length < 2) {
-      results = await qdrantMgr.client
-        .search('research_summaries', baseOpts)
-        .catch(() => []);
+      results = await qdrantMgr.client.search('research_summaries', baseOpts).catch(() => []);
       if (results.length && somCluster != null) {
-        console.log(`[ACE Research] cluster=${somCluster} prefilter sparse, fell back to full sweep`);
+        console.log(
+          `[ACE Research] cluster=${somCluster} prefilter sparse, fell back to full sweep`
+        );
       }
     }
 
@@ -1317,7 +1331,9 @@ async function fetchResearchSummaryChunks(
       .map((r: any) => ({
         content: String(r.payload?.summary ?? r.payload?.content ?? r.payload?.text ?? ''),
         score: r.score,
-        source: String(r.payload?.url ?? r.payload?.source ?? r.payload?.topic ?? 'research:summary'),
+        source: String(
+          r.payload?.url ?? r.payload?.source ?? r.payload?.topic ?? 'research:summary'
+        ),
       }))
       .filter((c: RAGChunk) => c.content.length > 30);
 
@@ -1339,7 +1355,9 @@ async function fetchRAGChunks(
   sectionTypes?: string[],
   caseId?: string
 ): Promise<{ ragChunks: RAGChunk[]; kbChunks: RAGChunk[]; caseChunks: RAGChunk[] }> {
-  const embedding = await traceEmbedding(query, 'embeddinggemma:latest', () => getQueryEmbedding(query));
+  const embedding = await traceEmbedding(query, 'embeddinggemma:latest', () =>
+    getQueryEmbedding(query)
+  );
   if (!embedding) return { ragChunks: [], kbChunks: [], caseChunks: [] };
 
   const { createHash } = await import('crypto');
@@ -1376,13 +1394,20 @@ async function fetchRAGChunks(
       }
       let best = 0;
       for (const [cluster, count] of counts) {
-        if (count > best) { best = count; somCluster = cluster; }
+        if (count > best) {
+          best = count;
+          somCluster = cluster;
+        }
       }
       if (somCluster != null) {
-        console.log(`[ACE RAG] SOM probe → cluster=${somCluster} (${best}/${probe.length} pts agree)`);
+        console.log(
+          `[ACE RAG] SOM probe → cluster=${somCluster} (${best}/${probe.length} pts agree)`
+        );
       }
     }
-  } catch { /* non-fatal — continue without prefilter */ }
+  } catch {
+    /* non-fatal — continue without prefilter */
+  }
 
   // Fetch ace_chunks cache + Qdrant tiers + research summaries in parallel
   const [kbChunks, caseChunks, aceChunks, researchChunks] = await Promise.all([
@@ -1529,10 +1554,12 @@ async function fetchChatHistory(
 				ORDER BY created_at DESC
 				LIMIT 20`
     );
-    return pgRows(rows).reverse().map((r: any) => ({
-      role: r.role as 'user' | 'assistant' | 'system',
-      content: String(r.content ?? ''),
-    }));
+    return pgRows(rows)
+      .reverse()
+      .map((r: any) => ({
+        role: r.role as 'user' | 'assistant' | 'system',
+        content: String(r.content ?? ''),
+      }));
   } catch (err) {
     console.warn('[ACE context] chat history fetch failed:', (err as Error)?.message ?? err);
     return [];
@@ -1692,14 +1719,11 @@ async function fetchCodebaseContext(
       lineStart: typeof r.chunk.lineStart === 'number' ? r.chunk.lineStart : undefined,
       lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
       tags: Array.isArray(r.chunk.tags) ? (r.chunk.tags as string[]) : undefined,
-      gpuCluster:
-        r.chunk.neo4j_gpuCluster != null ? Number(r.chunk.neo4j_gpuCluster) : null,
+      gpuCluster: r.chunk.neo4j_gpuCluster != null ? Number(r.chunk.neo4j_gpuCluster) : null,
       pageRankScore:
         r.chunk.neo4j_pageRankScore != null ? Number(r.chunk.neo4j_pageRankScore) : null,
-      routeType:
-        r.chunk.neo4j_routeType != null ? String(r.chunk.neo4j_routeType) : null,
-      hasAuthGuard:
-        r.chunk.neo4j_hasAuthGuard != null ? Boolean(r.chunk.neo4j_hasAuthGuard) : null,
+      routeType: r.chunk.neo4j_routeType != null ? String(r.chunk.neo4j_routeType) : null,
+      hasAuthGuard: r.chunk.neo4j_hasAuthGuard != null ? Boolean(r.chunk.neo4j_hasAuthGuard) : null,
     });
 
     // Step 3 — cross-encoder reranker pass (noFallback prevents web search on code queries)
@@ -1723,29 +1747,129 @@ async function fetchCodebaseContext(
         });
         if (reranked.length > 0) {
           const scoreMap = new Map(reranked.map((r) => [r.doc.documentId, r.rerankScore]));
-          return results
-            .map((r) => {
-              const docId = String(r.chunk.path ?? r.chunk.relativePath ?? '');
-              return toCtx(r, scoreMap.get(docId) ?? r.score);
-            })
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 5)
-            .filter((r) => r.score >= 0.45);
+          return applyKarpathyBoost(
+            results
+              .map((r) => {
+                const docId = String(r.chunk.path ?? r.chunk.relativePath ?? '');
+                return toCtx(r, scoreMap.get(docId) ?? r.score);
+              })
+              .sort((a, b) => b.score - a.score)
+              .slice(0, 10),
+            query
+          );
         }
       } catch {
         // Reranker unavailable — fall through to cosine-only results below
       }
     }
 
-    // Fallback: cosine-score filtering only
-    return results
-      .filter((r) => r.score >= 0.5)
-      .slice(0, 5)
-      .map((r) => toCtx(r));
+    // Fallback: cosine-score filtering only + Karpathy boost
+    return applyKarpathyBoost(
+      results
+        .filter((r) => r.score >= 0.5)
+        .slice(0, 10)
+        .map((r) => toCtx(r)),
+      query
+    );
   } catch (err) {
     console.warn('[ACE context] codebase context fetch failed:', (err as Error)?.message ?? err);
     return null;
   }
+}
+
+// ── Karpathy tag-aware boost for codebase context ─────────────────────────
+
+/** Maps query keywords to Karpathy semantic tags for relevance boosting */
+const QUERY_TAG_MAP: Record<string, string[]> = {
+  api: ['api-route', 'sse'],
+  route: ['api-route', 'page-component'],
+  endpoint: ['api-route'],
+  page: ['page-component', 'ui-component'],
+  component: ['ui-component', 'page-component'],
+  database: ['database'],
+  schema: ['database', 'types'],
+  drizzle: ['database'],
+  query: ['database', 'vector-search'],
+  qdrant: ['vector-search', 'embedding'],
+  vector: ['vector-search', 'embedding'],
+  search: ['vector-search', 'rag-pipeline'],
+  rag: ['rag-pipeline', 'vector-search'],
+  cache: ['cache'],
+  redis: ['cache'],
+  auth: ['auth'],
+  login: ['auth'],
+  state: ['state-machine'],
+  xstate: ['state-machine'],
+  machine: ['state-machine'],
+  worker: ['worker'],
+  queue: ['worker'],
+  rabbitmq: ['worker'],
+  stream: ['sse'],
+  sse: ['sse'],
+  embed: ['embedding'],
+  test: ['test'],
+  config: ['config'],
+  neo4j: ['graph-db'],
+  graph: ['graph-db'],
+  gpu: ['ml-inference'],
+  cuda: ['ml-inference'],
+  inference: ['ml-inference'],
+  onnx: ['ml-inference'],
+  analytics: ['analytics'],
+  metric: ['analytics'],
+};
+
+/**
+ * Apply Karpathy semantic tag boost + GPU cluster coherence scoring.
+ *
+ * 1. Infer query's probable semantic tags from keywords
+ * 2. Boost chunks whose Karpathy tags overlap with inferred tags (+0.08 per match)
+ * 3. Boost chunks from same GPU cluster as top-ranked result (+0.04)
+ * 4. Re-sort, return top 5 above 0.45
+ */
+function applyKarpathyBoost(
+  candidates: NonNullable<ACEContext['codebaseContext']>,
+  query: string
+): NonNullable<ACEContext['codebaseContext']> {
+  if (!candidates || candidates.length === 0) return candidates;
+
+  // Step 1: infer query semantic tags from keywords
+  const queryLower = query.toLowerCase();
+  const inferredTags = new Set<string>();
+  for (const [keyword, tags] of Object.entries(QUERY_TAG_MAP)) {
+    if (queryLower.includes(keyword)) {
+      for (const t of tags) inferredTags.add(t);
+    }
+  }
+
+  // Step 2: identify top result's GPU cluster for coherence boost
+  const topCluster = candidates[0]?.gpuCluster ?? null;
+
+  // Step 3: apply boosts
+  const boosted = candidates.map((c) => {
+    let boost = 0;
+
+    // Tag overlap boost: +0.08 per matching Karpathy tag (max +0.24)
+    if (inferredTags.size > 0 && c.tags?.length) {
+      let tagMatches = 0;
+      for (const tag of c.tags) {
+        if (inferredTags.has(tag)) tagMatches++;
+      }
+      boost += Math.min(tagMatches * 0.08, 0.24);
+    }
+
+    // GPU cluster coherence: +0.04 if same cluster as top result
+    if (topCluster != null && c.gpuCluster === topCluster && c !== candidates[0]) {
+      boost += 0.04;
+    }
+
+    return { ...c, score: c.score + boost };
+  });
+
+  return boosted
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5)
+    .filter((r) => r.score >= 0.45);
 }
 
 function extractPracticeArea(

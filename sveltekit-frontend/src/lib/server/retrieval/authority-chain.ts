@@ -8,7 +8,7 @@
  * Flow per hop:
  *   1. Extract statute/case citations from current docs
  *   2. Build a combined citation text and embed it
- *   3. Search statute collections (legal_canon_chunks, legal_documents)
+ *   3. Search authoritative statute collection (legal_canon_chunks)
  *   4. Search case collections (court_opinions, case_chunks)
  *   5. Merge + deduplicate + re-rank
  *
@@ -63,8 +63,8 @@ export type EmbedFn = (text: string) => Promise<number[] | null>;
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-/** Collections for statute/regulation full text */
-const STATUTE_COLLECTIONS = ['legal_canon_chunks', 'legal_documents'] as const;
+/** Authoritative collection for statute/regulation full text */
+const STATUTE_COLLECTIONS = ['legal_canon_chunks'] as const;
 /** Collections for case precedent */
 const CASE_PRECEDENT_COLLECTIONS = ['court_opinions', 'case_chunks'] as const;
 

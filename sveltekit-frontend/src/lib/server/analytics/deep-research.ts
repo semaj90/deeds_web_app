@@ -32,13 +32,14 @@ import { getRedis } from '$lib/server/redis.js';
 import { db, pool } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 import { fetchTopQueryTags } from '$lib/server/ace/user-analytics-context.js';
 import type { HitPipeline } from './search-analytics.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
 const RESEARCH_CACHE_TTL = 1800; // 30 min
-const RESEARCH_MODEL = 'gemma4-legal:latest';
+const RESEARCH_MODEL = ENV.OLLAMA_CHAT_MODEL;
 const MAX_TOPICS = 8;
 const HOT_QUERY_KEY = 'analytics:hot_queries';
 const QUERY_VEC_KEY = 'analytics:query_vecs';

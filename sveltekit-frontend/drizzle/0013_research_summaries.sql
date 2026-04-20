@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS research_summaries (
   entity_tags     TEXT[] NOT NULL DEFAULT '{}',
   relevance_score REAL NOT NULL DEFAULT 0,
   embedding       vector(768),                             -- 768-dim embeddinggemma
-  user_id         UUID REFERENCES users(id) ON DELETE SET NULL,
+  user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

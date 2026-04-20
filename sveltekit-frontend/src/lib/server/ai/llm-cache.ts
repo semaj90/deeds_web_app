@@ -15,7 +15,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { generateContextHash } from '$lib/server/cache-keys.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const EMBEDDING_MODEL = 'embeddinggemma:latest';
+const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 
 // Cache hit threshold — only return cached response if similarity >= 0.88
 // Bumped from 0.85 to 0.88 for legal domain safety (incorrect cached answers are worse than cache misses)

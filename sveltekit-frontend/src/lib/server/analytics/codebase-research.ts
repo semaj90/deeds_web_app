@@ -21,10 +21,11 @@ import { promisify } from 'util';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 
 const execAsync = promisify(exec);
 
-const MODEL = 'gemma4-legal:latest';
+const MODEL = ENV.OLLAMA_CHAT_MODEL;
 const CACHE_PREFIX = 'codebase:deep-research:';
 const CACHE_TTL = 1800; // 30 min
 const MAX_RG_RESULTS = 50;

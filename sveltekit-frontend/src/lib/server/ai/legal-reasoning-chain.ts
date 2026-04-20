@@ -23,6 +23,7 @@
  */
 
 import { generateCompletion } from '$lib/server/ai/ollama-client.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface ReasoningStepInput {
 	summary: string;
@@ -46,7 +47,7 @@ export interface ReasoningChainResult {
 	totalDurationMs: number;
 }
 
-const MODEL = 'gemma4-legal:latest';
+const MODEL = ENV.OLLAMA_CHAT_MODEL;
 const TIMEOUT_MS = 60_000;
 
 function buildStepPrompt(stepName: string, context: string): string {

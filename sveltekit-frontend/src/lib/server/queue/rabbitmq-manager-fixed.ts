@@ -2,30 +2,57 @@
 // Use local interfaces + dynamic import pattern per CLAUDE.md
 import { EventEmitter } from 'events';
 import { traceQueue, traceLLM } from '$lib/server/observability/langfuse.js';
+import { ENV } from '$lib/server/env.server.js';
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 interface AmqpConnection {
-    createChannel(): Promise<AmqpChannel>;
-    close(): Promise<void>;
-    on(event: string, listener: (...args: unknown[]) => void): this;
+  createChannel(): Promise<AmqpChannel>;
+  close(): Promise<void>;
+  on(event: string, listener: (...args: unknown[]) => void): this;
 }
 
 interface AmqpChannel {
-    assertExchange(exchange: string, type: string, options?: Record<string, unknown>): Promise<unknown>;
-    assertQueue(queue: string, options?: Record<string, unknown>): Promise<unknown>;
-    bindQueue(queue: string, exchange: string, routingKey: string): Promise<unknown>;
-    consume(queue: string, handler: (msg: AmqpMessage) => void, options?: Record<string, unknown>): Promise<unknown>;
-    publish(exchange: string, routingKey: string, content: Buffer, options?: Record<string, unknown>): boolean;
-    ack(message: { content: Buffer; fields: Record<string, unknown>; properties: Record<string, unknown> }): void;
-    nack(message: { content: Buffer; fields: Record<string, unknown>; properties: Record<string, unknown> }, allUpTo?: boolean, requeue?: boolean): void;
-    prefetch(count: number): Promise<void>;
-    close(): Promise<void>;
-    on(event: string, listener: (...args: unknown[]) => void): this;
-}
-
-interface AmqpMessageObj {
+  assertExchange(
+    exchange: string,
+    type: string,
+    options?: Record<string, unknown>
+  ): Promise<unknown>;
+  assertQueue(queue: string, options?: Record<string, unknown>): Promise<unknown>;
+  bindQueue(queue: string, exchange: string, routingKey: string): Promise<unknown>;
+  consume(
+    queue: string,
+    handler: (msg: AmqpMessage) => void,
+    options?: Record<string, unknown>
+  ): Promise<unknown>;
+  publish(
+    exchange: string,
+    routingKey: string,
+    content: Buffer,
+    options?: Record<string, unknown>
+  ): boolean;
+  ack(message: {
     content: Buffer;
     fields: Record<string, unknown>;
     properties: Record<string, unknown>;
+  }): void;
+  nack(
+    message: {
+      content: Buffer;
+      fields: Record<string, unknown>;
+      properties: Record<string, unknown>;
+    },
+    allUpTo?: boolean,
+    requeue?: boolean
+  ): void;
+  prefetch(count: number): Promise<void>;
+  close(): Promise<void>;
+  on(event: string, listener: (...args: unknown[]) => void): this;
+}
+
+interface AmqpMessageObj {
+  content: Buffer;
+  fields: Record<string, unknown>;
+  properties: Record<string, unknown>;
 }
 
 type AmqpMessage = AmqpMessageObj | null;
@@ -81,7 +108,7 @@ export class RabbitMQManager extends EventEmitter {
 
   constructor() {
     super();
-    this.url = process.env?.RABBITMQ_URL ?? 'amqp://localhost:5672';
+    this.url = ENV.RABBITMQ_URL;
     this.setupEventHandlers();
   }
 
@@ -137,12 +164,68 @@ export class RabbitMQManager extends EventEmitter {
     }
   }
 
+  private attachChannelListeners(channel: AmqpChannel): void {
+    channel.on('error', (err: unknown) => {
+      console.error('❌ RabbitMQ channel error:', (err as Error)?.message ?? err);
+      if (this.channel === channel) {
+        this.channel = null;
+      }
+    });
+  }
+
+  private async recreateChannel(): Promise<AmqpChannel> {
+    if (!this.connection) {
+      throw new Error('RabbitMQ connection not available');
+    }
+
+    const channel = await this.connection.createChannel();
+    this.attachChannelListeners(channel);
+    this.channel = channel;
+    return channel;
+  }
+
+  private async assertMainQueue(queue: string): Promise<void> {
+    const options = {
+      durable: true,
+      arguments: {
+        'x-message-ttl': 300000,
+        'x-dead-letter-exchange': this.exchanges.dlx,
+        'x-dead-letter-routing-key': queue,
+      },
+    };
+
+    if (!this.channel) {
+      throw new Error('Channel not available');
+    }
+
+    try {
+      await this.channel.assertQueue(queue, options);
+    } catch (error) {
+      const message = this.formatError(error);
+      if (!/PRECONDITION_FAILED/i.test(message)) {
+        throw error;
+      }
+
+      console.warn(`⚠️ Recreating RabbitMQ queue with updated DLQ args: ${queue}`);
+      const channel = await this.recreateChannel();
+      await (channel as unknown as { deleteQueue(q: string): Promise<unknown> }).deleteQueue(queue);
+      await channel.assertQueue(queue, options);
+    }
+  }
+
   private async connect(): Promise<void> {
     try {
       const amqp = await import('amqplib');
-      const connect = (amqp as { default?: { connect(...a: unknown[]): Promise<unknown> }; connect?(...a: unknown[]): Promise<unknown> }).default?.connect ?? (amqp as { connect?(...a: unknown[]): Promise<unknown> }).connect;
+      const connect =
+        (
+          amqp as {
+            default?: { connect(...a: unknown[]): Promise<unknown> };
+            connect?(...a: unknown[]): Promise<unknown>;
+          }
+        ).default?.connect ?? (amqp as { connect?(...a: unknown[]): Promise<unknown> }).connect;
       this.connection = (await connect(this.url)) as AmqpConnection;
       this.channel = await this.connection.createChannel();
+      this.attachChannelListeners(this.channel);
 
       this.connection.on('error', (err: unknown) => {
         console.error('❌ RabbitMQ connection error:', (err as Error)?.message ?? err);
@@ -150,10 +233,6 @@ export class RabbitMQManager extends EventEmitter {
       });
       this.connection.on('close', () => {
         this.emit('connection_lost');
-      });
-      this.channel.on('error', (err: unknown) => {
-        console.error('❌ RabbitMQ channel error:', (err as Error)?.message ?? err);
-        this.channel = null;
       });
 
       console.log('✅ RabbitMQ connected');
@@ -177,44 +256,9 @@ export class RabbitMQManager extends EventEmitter {
       await this.channel.bindQueue(dlqName, this.exchanges.dlx, queue);
     }
 
-    // Migrate queues created without DLX (pre-existing mismatch fix).
-    // AMQP assertQueue fails with PRECONDITION_FAILED if queue exists with
-    // different arguments, and that closes the channel. Force delete before
-    // re-creating so stale queue args from earlier boot paths do not survive.
-    const queuesToMigrate = [
-      'cache.invalidate',
-      'document.embed',
-      'chat.document.embed',
-      'evidence.process',
-      'vector.index',
-      'chat.context',
-      'analytics.track',
-      'codebase.index',
-      'ace.evaluate',
-      'error.embed',
-      'synthesis.generate',
-      'knowledge.backfill',
-      'audio.process',
-      'glyph.tile.rebuild',
-    ];
-    for (const queue of queuesToMigrate) {
-      try {
-        await (this.channel as unknown as { deleteQueue(q: string): Promise<unknown> }).deleteQueue(queue);
-      } catch {
-        // Queue doesn't exist yet — it will be created below
-      }
-    }
-
     // Declare main queues with dead-letter routing
     for (const [, queue] of Object.entries(this.queues)) {
-      await this.channel.assertQueue(queue, {
-        durable: true,
-        arguments: {
-          'x-message-ttl': 300000, // 5 minutes
-          'x-dead-letter-exchange': this.exchanges.dlx,
-          'x-dead-letter-routing-key': queue,
-        },
-      });
+      await this.assertMainQueue(queue);
     }
 
     // Bindings
@@ -324,11 +368,12 @@ export class RabbitMQManager extends EventEmitter {
   // --- Handlers ---
 
   private async handleCacheInvalidation(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
 
@@ -352,19 +397,22 @@ export class RabbitMQManager extends EventEmitter {
         }
       );
 
-      this.channel.ack(msg);
+      if (this.channel !== channel) return;
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Cache invalidation error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) return;
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
   private async handleDocumentEmbedding(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.text) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
 
@@ -392,19 +440,22 @@ export class RabbitMQManager extends EventEmitter {
         }
       );
 
-      this.channel.ack(msg);
+      if (this.channel !== channel) return;
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Document embedding error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) return;
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
   private async handleEvidenceProcess(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.evidenceId) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
       console.log('🔬 Processing evidence:', data.evidenceId);
@@ -470,19 +521,28 @@ export class RabbitMQManager extends EventEmitter {
           .catch(() => {}); // Non-fatal — PG data is sufficient
       }
 
-      this.channel.ack(msg);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Evidence process: channel recycled during processing, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Evidence process error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Evidence process: channel recycled, cannot nack/requeue');
+        return;
+      }
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
   private async handleVectorIndex(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.embedding || !data?.documentId) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
       const collection = data.collection ?? 'documents';
@@ -513,19 +573,22 @@ export class RabbitMQManager extends EventEmitter {
         }
       );
 
-      this.channel.ack(msg);
+      if (this.channel !== channel) return;
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Vector index error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) return;
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
   private async handleChatContext(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.sessionId) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
       console.log('💬 Chat context update:', data.sessionId);
@@ -563,19 +626,22 @@ export class RabbitMQManager extends EventEmitter {
           ],
         });
       }
-      this.channel.ack(msg);
+      if (this.channel !== channel) return;
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Chat context error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) return;
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
   private async handleAnalyticsTrack(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.eventType) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
       console.log('📊 Analytics:', data.eventType);
@@ -610,19 +676,22 @@ export class RabbitMQManager extends EventEmitter {
       import('../graph/user-interaction-sync.js')
         .then(({ syncUserInteractionToGraph }) => syncUserInteractionToGraph(data))
         .catch(() => {});
-      this.channel.ack(msg);
+      if (this.channel !== channel) return;
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Analytics track error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) return;
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
   private async handleCodebaseIndex(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
       console.log(`📦 Codebase index job received: scope=${data.scope}`);
@@ -648,7 +717,7 @@ export class RabbitMQManager extends EventEmitter {
       await updateRedisProgress({ status: 'scanning', progress: 5 });
 
       const { chunkFiles } = await import('../indexer/ast-chunker.js');
-      const { indexChunks } = await import('../indexer/dual-embedder.js');
+      const { indexChunksIncremental } = await import('../indexer/dual-embedder.js');
       const { resolve } = await import('path');
       const { readdir } = await import('fs/promises');
 
@@ -712,19 +781,27 @@ export class RabbitMQManager extends EventEmitter {
         chunksTotal: chunks.length,
       });
 
-      const result = await indexChunks(chunks);
+      const result = await indexChunksIncremental(chunks);
 
       await updateRedisProgress({
         status: 'completed',
         progress: 100,
         chunksProcessed: chunks.length,
+        skippedExisting: result.skippedExisting,
+        embeddingsGenerated: result.embeddingsGenerated,
         completedAt: new Date().toISOString(),
       });
 
       console.log(
-        `✅ Codebase index complete: ${allFiles.length} files, ${chunks.length} chunks indexed`
+        `✅ Codebase index complete: ${allFiles.length} files, ${chunks.length} chunks` +
+          ` (${result.skippedExisting} cached, ${result.embeddingsGenerated} new embeddings)`
       );
-      this.channel.ack(msg);
+      // Guard: channel may have recycled during long embedding operation
+      if (this.channel !== channel) {
+        console.warn('⚠️ Codebase index: channel recycled during processing, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Codebase index error:', this.formatError(error));
 
@@ -751,16 +828,22 @@ export class RabbitMQManager extends EventEmitter {
         /* non-fatal */
       }
 
-      this.retryOrDLQ(msg, error);
+      // Only retry/DLQ if the original channel is still valid
+      if (this.channel === channel) {
+        this.retryOrDLQ(msg, error, channel);
+      } else {
+        console.warn('⚠️ Codebase index: channel recycled, cannot nack/requeue');
+      }
     }
   }
 
   private async handleACEEvaluate(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.responseId || !data?.query || !data?.response) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
 
@@ -801,10 +884,18 @@ export class RabbitMQManager extends EventEmitter {
         }
       );
 
-      this.channel.ack(msg);
+      if (this.channel !== channel) {
+        console.warn('⚠️ ACE evaluate: channel recycled during evaluation, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ ACE evaluate error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) {
+        console.warn('⚠️ ACE evaluate: channel recycled, cannot nack/requeue');
+        return;
+      }
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
@@ -857,7 +948,10 @@ export class RabbitMQManager extends EventEmitter {
     incremental?: boolean;
     requestedBy?: string;
   }): Promise<boolean> {
-    if (!this.isReady()) return false;
+    if (!this.isReady()) {
+      const initialized = await this.initialize();
+      if (!initialized || !this.isReady()) return false;
+    }
     await this.publish(this.exchanges.codebase_indexing, `codebase.index.${data.scope}`, {
       ...data,
       enqueuedAt: new Date().toISOString(),
@@ -933,11 +1027,12 @@ export class RabbitMQManager extends EventEmitter {
   // --- Error Embedding Handler ---
 
   private async handleErrorEmbed(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.errorMessage) {
-        this.channel.ack(msg);
+        channel.ack(msg);
         return;
       }
 
@@ -956,10 +1051,18 @@ export class RabbitMQManager extends EventEmitter {
         `[error.embed] Embedded error → point ${result.pointId}, cluster: ${result.matchedCluster ?? 'new'}, ${result.totalMs}ms`
       );
 
-      this.channel.ack(msg);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Error embed: channel recycled during embedding, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('[error.embed] Handler error:', this.formatError(error));
-      this.retryOrDLQ(msg as AmqpMessageObj, error);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Error embed: channel recycled, cannot nack/requeue');
+        return;
+      }
+      this.retryOrDLQ(msg as AmqpMessageObj, error, channel);
     }
   }
 
@@ -984,11 +1087,12 @@ export class RabbitMQManager extends EventEmitter {
   // --- Synthesis Generate Handler ---
 
   private async handleSynthesisGenerate(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.synthesisId || !data?.query) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
 
@@ -1036,9 +1140,7 @@ export class RabbitMQManager extends EventEmitter {
           // DAG-order RAG chunks
           if (context.ragChunks.length > 1) {
             type URR = import('$lib/server/types/retrieval.js').UnifiedRetrievalResult;
-            const knownIds = new Set(
-              context.ragChunks.map((_: URR, i: number) => `chunk-${i}`)
-            );
+            const knownIds = new Set(context.ragChunks.map((_: URR, i: number) => `chunk-${i}`));
             const dagDocs = context.ragChunks.map((c: URR, i: number) => ({
               id: `chunk-${i}`,
               title: c.sourceId ?? c.id,
@@ -1061,7 +1163,7 @@ export class RabbitMQManager extends EventEmitter {
           // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)
           const { ollamaFetch } = await import('../ollama.js');
           const { ENV } = await import('../env.server.js');
-          const MODEL = 'gemma4-legal:latest';
+          const MODEL = ENV.OLLAMA_CHAT_MODEL;
           const maxTokens = data.maxTokens ?? 2048;
           const temperature = data.temperature ?? 0.3;
 
@@ -1222,7 +1324,12 @@ export class RabbitMQManager extends EventEmitter {
         }
       ); // End traceQueue
 
-      this.channel.ack(msg);
+      // Guard: channel may have recycled during the long LLM inference
+      if (this.channel !== channel) {
+        console.warn('⚠️ Synthesis generate: channel recycled during processing, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Synthesis generate error:', this.formatError(error));
 
@@ -1245,7 +1352,11 @@ export class RabbitMQManager extends EventEmitter {
         }
       }
 
-      this.retryOrDLQ(msg as AmqpMessageObj, error);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Synthesis generate: channel recycled, cannot nack/requeue');
+        return;
+      }
+      this.retryOrDLQ(msg as AmqpMessageObj, error, channel);
     }
   }
 
@@ -1284,11 +1395,12 @@ export class RabbitMQManager extends EventEmitter {
   // --- Knowledge Backfill Handler ---
 
   private async handleKnowledgeBackfill(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.query) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
 
@@ -1311,10 +1423,18 @@ export class RabbitMQManager extends EventEmitter {
         );
       }
 
-      this.channel.ack(msg);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Knowledge backfill: channel recycled during backfill, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ Knowledge backfill error:', this.formatError(error));
-      this.retryOrDLQ(msg as AmqpMessageObj, error);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Knowledge backfill: channel recycled, cannot nack/requeue');
+        return;
+      }
+      this.retryOrDLQ(msg as AmqpMessageObj, error, channel);
     }
   }
 
@@ -1338,11 +1458,12 @@ export class RabbitMQManager extends EventEmitter {
   // --- Glyph Tile Rebuild Consumer ---
 
   private async handleGlyphTileRebuild(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
       if (!data?.caseId) {
-        this.channel.nack(msg, false, false);
+        channel.nack(msg, false, false);
         return;
       }
       console.log(`[glyph.tile.rebuild] caseId=${data.caseId} reason=${data.reason ?? 'n/a'}`);
@@ -1359,7 +1480,11 @@ export class RabbitMQManager extends EventEmitter {
           enableWebSearch: false,
         });
         points = ctx.ragChunks
-          .filter((c) => Array.isArray(c.metadata?.['embedding']) && (c.metadata!['embedding'] as number[]).length > 0)
+          .filter(
+            (c) =>
+              Array.isArray(c.metadata?.['embedding']) &&
+              (c.metadata!['embedding'] as number[]).length > 0
+          )
           .map((c) => ({
             embedding: c.metadata!['embedding'] as number[],
             entities: c.metadata?.['entities'] as string[] | undefined,
@@ -1368,26 +1493,36 @@ export class RabbitMQManager extends EventEmitter {
         // No context available — rebuild from cache with skipCache=false just refreshes Redis TTL
       }
       await buildGlyphTileAtlas(data.caseId, points, 16, 16, /* skipCache */ true);
-      this.channel.ack(msg);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Glyph tile rebuild: channel recycled during rebuild, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('[glyph.tile.rebuild] handler error:', this.formatError(error));
-      this.retryOrDLQ(msg as AmqpMessageObj, error);
+      if (this.channel !== channel) {
+        console.warn('⚠️ Glyph tile rebuild: channel recycled, cannot nack/requeue');
+        return;
+      }
+      this.retryOrDLQ(msg as AmqpMessageObj, error, channel);
     }
   }
 
   // --- QLoRA Distillation Publisher (P1-B) ---
 
-  async publishQLoRADistill(opts: {
-    minRerankScore?: number;
-    minResponseScore?: number;
-    limit?: number;
-  } = {}): Promise<boolean> {
+  async publishQLoRADistill(
+    opts: {
+      minRerankScore?: number;
+      minResponseScore?: number;
+      limit?: number;
+    } = {}
+  ): Promise<boolean> {
     if (!this.isReady()) return false;
     await this.publish(this.exchanges.document_processing, 'qlora.distill', {
-      minRerankScore:   opts.minRerankScore   ?? 0.80,
-      minResponseScore: opts.minResponseScore ?? 0.80,
-      limit:            opts.limit            ?? 50,
-      ts:               Date.now(),
+      minRerankScore: opts.minRerankScore ?? 0.8,
+      minResponseScore: opts.minResponseScore ?? 0.8,
+      limit: opts.limit ?? 50,
+      ts: Date.now(),
     });
     return true;
   }
@@ -1439,7 +1574,7 @@ export class RabbitMQManager extends EventEmitter {
   private parseMessage(msg: AmqpMessage): any {
     if (!msg) return null;
     try {
-      return JSON.parse(msg.content.toString());
+      return fastJsonParse(msg.content.toString());
     } catch {
       return null;
     }
@@ -1450,8 +1585,12 @@ export class RabbitMQManager extends EventEmitter {
    * If retries exhausted, sends to DLQ (nack without requeue).
    * Otherwise, requeues for retry.
    */
-  private retryOrDLQ(msg: AmqpMessageObj, error: unknown): void {
-    if (!this.channel) return;
+  private retryOrDLQ(
+    msg: AmqpMessageObj,
+    error: unknown,
+    channel: AmqpChannel | null = this.channel
+  ): void {
+    if (!channel) return;
     const deaths = (msg.properties?.headers as Record<string, unknown>)?.['x-death'] as
       | Array<{ count?: number }>
       | undefined;
@@ -1460,12 +1599,12 @@ export class RabbitMQManager extends EventEmitter {
       console.warn(
         `☠️ DLQ: message exhausted ${RabbitMQManager.MAX_RETRIES} retries — routing to dead letter`
       );
-      this.channel.nack(msg, false, false); // goes to DLQ via x-dead-letter-exchange
+      channel.nack(msg, false, false); // goes to DLQ via x-dead-letter-exchange
     } else {
       console.warn(
         `🔄 Retry ${retryCount + 1}/${RabbitMQManager.MAX_RETRIES}: ${this.formatError(error)}`
       );
-      this.channel.nack(msg, false, true); // requeue
+      channel.nack(msg, false, true); // requeue
     }
   }
 
@@ -1509,26 +1648,37 @@ export class RabbitMQManager extends EventEmitter {
    * Message payload: { minRerankScore?: number, minResponseScore?: number, limit?: number }
    */
   private async handleQLoRADistill(msg: AmqpMessage): Promise<void> {
-    if (!msg || !this.channel) return;
+    const channel = this.channel;
+    if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg) ?? {};
-      const minRerankScore   = Number(data.minRerankScore   ?? 0.80);
-      const minResponseScore = Number(data.minResponseScore ?? 0.80);
-      const limit            = Math.min(Number(data.limit   ?? 50), 200);
+      const minRerankScore = Number(data.minRerankScore ?? 0.8);
+      const minResponseScore = Number(data.minResponseScore ?? 0.8);
+      const limit = Math.min(Number(data.limit ?? 50), 200);
 
-      console.log(`[qlora.distill] Starting distillation: minRerank=${minRerankScore} limit=${limit}`);
+      console.log(
+        `[qlora.distill] Starting distillation: minRerank=${minRerankScore} limit=${limit}`
+      );
 
       if (!this.db) {
         console.warn('[qlora.distill] No DB available — skipping');
-        this.channel.ack(msg);
+        channel.ack(msg);
         return;
       }
 
       // 1. Find qualifying query_log rows not yet in qlora_examples
       const { pgRows } = await import('../db/client.js');
       const { sql: drizzleSql } = await import('drizzle-orm');
-      type CandidateRow = { query: string; query_hash: string; top_rerank_score: number | null; entity_statutes: unknown; entity_cases: unknown };
-      const candidates: CandidateRow[] = await this.db.execute(drizzleSql`
+      type CandidateRow = {
+        query: string;
+        query_hash: string;
+        top_rerank_score: number | null;
+        entity_statutes: unknown;
+        entity_cases: unknown;
+      };
+      const candidates: CandidateRow[] = await this.db
+        .execute(
+          drizzleSql`
         SELECT ql.query, ql.query_hash, ql.top_rerank_score,
                ql.entity_statutes, ql.entity_cases
         FROM   rag_query_log ql
@@ -1538,7 +1688,10 @@ export class RabbitMQManager extends EventEmitter {
           )
         ORDER  BY ql.top_rerank_score DESC
         LIMIT  ${limit}
-      `).then((r: unknown) => pgRows<CandidateRow>(r)).catch(() => []);
+      `
+        )
+        .then((r: unknown) => pgRows<CandidateRow>(r))
+        .catch(() => []);
 
       let inserted = 0;
       const couchUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
@@ -1546,14 +1699,26 @@ export class RabbitMQManager extends EventEmitter {
       for (const row of candidates) {
         try {
           // 2. Pull top chunk hits
-          type HitRow = { chunk_id: string; relative_path: string; gpu_cluster: number | null; pipeline: string; score: number; rerank_score: number | null };
-          const hits: HitRow[] = await this.db.execute(drizzleSql`
+          type HitRow = {
+            chunk_id: string;
+            relative_path: string;
+            gpu_cluster: number | null;
+            pipeline: string;
+            score: number;
+            rerank_score: number | null;
+          };
+          const hits: HitRow[] = await this.db
+            .execute(
+              drizzleSql`
             SELECT chunk_id, relative_path, gpu_cluster, pipeline, score, rerank_score
             FROM   chunk_hit_log
             WHERE  query_hash = ${row.query_hash}
             ORDER  BY COALESCE(rerank_score, score) DESC
             LIMIT  10
-          `).then((r: unknown) => pgRows<HitRow>(r)).catch(() => []);
+          `
+            )
+            .then((r: unknown) => pgRows<HitRow>(r))
+            .catch(() => []);
 
           if (!hits.length) continue;
 
@@ -1561,12 +1726,16 @@ export class RabbitMQManager extends EventEmitter {
           const topCluster = hits.find((h) => h.gpu_cluster != null)?.gpu_cluster;
           let graphSummary: string | null = null;
           if (topCluster != null && this.redisService) {
-            const cached = await this.redisService.get(`cluster-summary:${topCluster}`).catch(() => null);
+            const cached = await this.redisService
+              .get(`cluster-summary:${topCluster}`)
+              .catch(() => null);
             if (cached) {
               try {
                 const p = JSON.parse(cached) as { summary?: string; purpose?: string };
                 graphSummary = p.summary ?? p.purpose ?? null;
-              } catch { /* ignore */ }
+              } catch {
+                /* ignore */
+              }
             }
           }
 
@@ -1578,40 +1747,49 @@ export class RabbitMQManager extends EventEmitter {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 selector: { query_hash: row.query_hash },
-                sort:     [{ created_at: 'desc' }],
-                limit:    1,
-                fields:   ['response', 'self_eval_score'],
+                sort: [{ created_at: 'desc' }],
+                limit: 1,
+                fields: ['response', 'self_eval_score'],
               }),
               signal: AbortSignal.timeout(5_000),
             });
             if (res.ok) {
-              const d = await res.json() as { docs?: Array<{ response?: string; self_eval_score?: number }> };
+              const d = (await res.json()) as {
+                docs?: Array<{ response?: string; self_eval_score?: number }>;
+              };
               const doc = d.docs?.[0];
               if (doc?.response && (doc.self_eval_score ?? 0) >= minResponseScore) {
                 llmResponse = doc.response;
               }
             }
-          } catch { /* CouchDB unavailable — skip */ }
+          } catch {
+            /* CouchDB unavailable — skip */
+          }
 
           if (!llmResponse) continue;
 
           // 5. Quality tier + metadata
           const avgRerank = hits.reduce((s, h) => s + (h.rerank_score ?? h.score), 0) / hits.length;
-          const tier = avgRerank >= 0.90 ? 'gold' : avgRerank >= 0.80 ? 'silver' : 'bronze';
-          const clusterIds = [...new Set(hits.map((h) => h.gpu_cluster).filter((c): c is number => c != null))];
+          const tier = avgRerank >= 0.9 ? 'gold' : avgRerank >= 0.8 ? 'silver' : 'bronze';
+          const clusterIds = [
+            ...new Set(hits.map((h) => h.gpu_cluster).filter((c): c is number => c != null)),
+          ];
           const pipelineHits = hits.reduce<Record<string, number>>((acc, h) => {
             acc[h.pipeline] = (acc[h.pipeline] ?? 0) + 1;
             return acc;
           }, {});
           const contextChunks = hits.map((h) => ({
-            id: h.chunk_id, filePath: h.relative_path,
-            pipeline: h.pipeline, score: h.score, rerankScore: h.rerank_score,
+            id: h.chunk_id,
+            filePath: h.relative_path,
+            pipeline: h.pipeline,
+            score: h.score,
+            rerankScore: h.rerank_score,
           }));
 
           // 6. Insert
           const entityTags = JSON.stringify([
             ...((row.entity_statutes as string[]) ?? []),
-            ...((row.entity_cases   as string[]) ?? []),
+            ...((row.entity_cases as string[]) ?? []),
           ]);
           const modelVersion = process.env.OLLAMA_MODEL ?? 'gemma4-legal';
           await this.db.execute(drizzleSql`
@@ -1630,14 +1808,26 @@ export class RabbitMQManager extends EventEmitter {
             ON CONFLICT DO NOTHING
           `);
           inserted++;
-        } catch { /* non-fatal per-row error */ }
+        } catch {
+          /* non-fatal per-row error */
+        }
       }
 
-      console.log(`[qlora.distill] Distillation complete: ${inserted}/${candidates.length} examples inserted`);
-      this.channel.ack(msg);
+      console.log(
+        `[qlora.distill] Distillation complete: ${inserted}/${candidates.length} examples inserted`
+      );
+      if (this.channel !== channel) {
+        console.warn('⚠️ QLoRA distill: channel recycled during distillation, skipping ack');
+        return;
+      }
+      channel.ack(msg);
     } catch (error) {
       console.error('❌ QLoRA distill error:', this.formatError(error));
-      this.retryOrDLQ(msg, error);
+      if (this.channel !== channel) {
+        console.warn('⚠️ QLoRA distill: channel recycled, cannot nack/requeue');
+        return;
+      }
+      this.retryOrDLQ(msg, error, channel);
     }
   }
 
@@ -1647,17 +1837,22 @@ export class RabbitMQManager extends EventEmitter {
    * and stores bounded history in Redis.
    */
   private async startDLQConsumers(): Promise<void> {
-    if (!this.channel) return;
+    const channel = this.channel;
+    if (!channel) return;
 
     for (const [, queue] of Object.entries(this.queues)) {
       const dlqName = `${queue}.dlq`;
-      await this.channel.consume(
+      await channel.consume(
         dlqName,
         async (msg) => {
-          if (!msg || !this.channel) return;
+          if (!msg) return;
+          // If channel has been recycled, skip — the new channel will get its own consumers
+          if (this.channel !== channel) return;
           try {
-            const payload = JSON.parse(msg.content.toString());
-            const deaths = (msg.properties as { headers?: Record<string, unknown> })?.headers?.['x-death'] as
+            const payload = fastJsonParse(msg.content.toString());
+            const deaths = (msg.properties as { headers?: Record<string, unknown> })?.headers?.[
+              'x-death'
+            ] as
               | Array<{
                   queue?: string;
                   reason?: string;
@@ -1706,11 +1901,13 @@ export class RabbitMQManager extends EventEmitter {
               await this.redisService.ltrim(key, 0, 499);
             }
 
-            this.channel.ack(msg);
+            if (this.channel !== channel) return;
+            channel.ack(msg);
           } catch (err) {
             console.error(`❌ DLQ consumer error [${dlqName}]:`, this.formatError(err));
             // Ack anyway — don't let DLQ messages re-dead-letter infinitely
-            this.channel.ack(msg);
+            if (this.channel !== channel) return;
+            channel.ack(msg);
           }
         },
         { noAck: false }

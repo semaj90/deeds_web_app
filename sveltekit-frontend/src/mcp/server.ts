@@ -1799,18 +1799,19 @@ function setupToolHandlers() {
         }
 
         const { generateClusterSummary } = await import('../lib/server/indexer/cluster-summary.js');
-        const summary = await generateClusterSummary(resolvedClusterId, force);
+        const result = await generateClusterSummary(resolvedClusterId, force);
 
-        if (!summary) {
+        if (result.ok === false) {
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify({ error: `No data for cluster ${resolvedClusterId}` }),
+                text: JSON.stringify({ error: result.reason }),
               },
             ],
           };
         }
+        const summary = result.summary;
 
         // If a free-text query was provided, return the top-scoring search hits
         // from that cluster so the caller has grounding evidence

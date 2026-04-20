@@ -32,7 +32,7 @@ export type { ContextDoc };
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const EMBEDDING_MODEL = 'embeddinggemma:latest';
+const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const RAG_MAX_CHUNKS = 12;
 const CORRECTIVE_RAG_THRESHOLD = 0.5;

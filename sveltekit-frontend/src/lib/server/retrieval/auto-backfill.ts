@@ -18,7 +18,7 @@ import { createHash } from 'crypto';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
-const EMBEDDING_MODEL = 'embeddinggemma:latest';
+const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const BACKFILL_COLLECTION = 'knowledge_base';
 const CHUNK_SIZE = 900;
 const CHUNK_OVERLAP = 150;

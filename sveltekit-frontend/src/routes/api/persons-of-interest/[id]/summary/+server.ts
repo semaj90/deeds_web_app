@@ -122,7 +122,7 @@ Respond with ONLY a JSON object:
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal:latest',
+        model: ENV.OLLAMA_CHAT_MODEL,
         prompt,
         format: poiSummaryResponseJsonSchema,
         stream: false,

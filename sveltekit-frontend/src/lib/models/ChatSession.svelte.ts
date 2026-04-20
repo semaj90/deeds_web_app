@@ -616,6 +616,8 @@ export class ChatSession {
       await this._handleLocalInference(routedMessage, decision);
     } else if (decision.source === 'retrieval-hybrid') {
       await this._handleRetrievalInference(routedMessage, decision);
+    } else if (decision.source === 'server-agentic') {
+      await this._handleAgenticInference(routedMessage, decision, effectiveOptions);
     } else {
       await this._handleServerInference(routedMessage, decision, effectiveOptions);
     }
@@ -1002,6 +1004,122 @@ export class ChatSession {
         source: 'server-ollama',
         reason: `retrieval-fallback(${err.message})`,
       });
+    }
+  }
+
+  /**
+   * Agentic inference via /api/ai/agent (Gemma4 multi-round tool calling).
+   * Routes complex/multi-hop queries through the 4-tool agent loop instead
+   * of single-pass SSE. Falls back to SSE on failure.
+   */
+  private async _handleAgenticInference(
+    message: string,
+    decision: RouterDecision,
+    options?: SendMessageOptions
+  ) {
+    const t0 = performance.now();
+    this.status = 'thinking';
+    this.error = null;
+
+    this.abortController?.abort();
+    this.abortController = new AbortController();
+
+    const _qHash = shortHash(message);
+
+    // Placeholder — shows "thinking" while agent runs multi-round loop
+    const assistantIdx = this.messages.length;
+    this.messages.push({
+      role: 'assistant',
+      content: '',
+      timestamp: new Date().toISOString(),
+      source: 'server-agentic',
+      metadata: { routerDecision: decision, queryHash: _qHash, pipeline: 'agentic' },
+    });
+
+    try {
+      const res = await fetch('/api/ai/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: message,
+          pipeline: this._hasCaseContext ? 'case' : 'ace',
+          sessionId: this._chatId,
+        }),
+        signal: this.abortController.signal,
+      });
+
+      if (!res.ok) {
+        // Agent failed (rate limit, server error) → fall back to SSE
+        console.warn(`[ChatRouter] Agent returned ${res.status}, falling back to SSE`);
+        // Remove placeholder
+        this.messages.splice(assistantIdx, 1);
+        await this._handleServerInference(message, {
+          ...decision,
+          source: 'server-ollama',
+          reason: decision.reason + '+agent-fallback',
+        }, options);
+        return;
+      }
+
+      const result: {
+        answer: string;
+        toolsUsed: string[];
+        rounds: number;
+        sources: unknown[];
+        durationMs: number;
+      } = await res.json();
+
+      // Build tool attribution suffix
+      const toolInfo = result.toolsUsed.length > 0
+        ? `\n\n---\n*Agent used ${result.toolsUsed.join(', ')} over ${result.rounds} round${result.rounds !== 1 ? 's' : ''} (${(result.durationMs / 1000).toFixed(1)}s)*`
+        : '';
+
+      this.messages[assistantIdx] = {
+        ...this.messages[assistantIdx],
+        content: result.answer + toolInfo,
+        source: 'server-agentic',
+        metadata: {
+          ...this.messages[assistantIdx].metadata,
+          pipeline: 'agentic',
+        },
+      };
+
+      this.status = 'idle';
+      this.lastSource = 'server-agentic';
+      this.debugInfo = {
+        ...this.debugInfo,
+        cacheHit: 'none',
+        latencyMs: Math.round(performance.now() - t0),
+        provider: `agent(${result.rounds}r,${result.toolsUsed.length}t)`,
+      };
+
+      // Persist to IndexedDB
+      const finalMsg = this.messages[assistantIdx];
+      if (finalMsg?.content) {
+        clientCache.saveChatMessage(
+          this._chatId,
+          'assistant',
+          finalMsg.content,
+          buildPersistedMetadata(finalMsg, decision)
+        );
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.warn('[ChatRouter] Agent error, falling back to SSE:', err.message);
+      // Remove placeholder and fall back
+      if (this.messages[assistantIdx]?.content === '') {
+        this.messages.splice(assistantIdx, 1);
+      }
+      await this._handleServerInference(message, {
+        ...decision,
+        source: 'server-ollama',
+        reason: decision.reason + '+agent-error',
+      }, options);
+    } finally {
+      this.abortController = null;
+      if (this.status === 'thinking') {
+        this.status = 'idle';
+      }
     }
   }
 

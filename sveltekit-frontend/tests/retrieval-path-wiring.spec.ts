@@ -91,7 +91,8 @@ vi.mock('$lib/server/analytics/event-logger.js', () => ({
 	getWeeklySummary: vi.fn(async () => ({ topIntents: [], avgLatencyMs: 0, cacheHitRate: 0 })),
 }));
 vi.mock('$lib/server/ace/user-analytics-context.js', () => ({
-	fetchUserAnalyticsContext: vi.fn(async () => null),
+  fetchUserAnalyticsContext: vi.fn(async () => null),
+  fetchTopQueryTags: vi.fn(async () => []),
 }));
 vi.mock('$lib/server/retrieval/web-search.js', () => ({
 	webSearch: vi.fn(async () => null),
@@ -172,6 +173,52 @@ describe('Graph-informed retrieval path wiring', () => {
 			expect(context).toHaveProperty('kagNeighbors');
 			expect(Array.isArray(context.kagNeighbors)).toBe(true);
 		});
+
+		it('prefers canon kb chunks over contextual legal_documents when scores are close', async () => {
+      mockQdrantSearch.mockImplementation(async (collection: string) => {
+        if (collection === 'legal_documents') {
+          return [
+            {
+              score: 0.92,
+              payload: {
+                content_preview: 'Contextual case summary discussing hearsay objections.',
+                document_type: 'evidence-summary',
+              },
+            },
+          ];
+        }
+
+        if (collection === 'legal_canon_chunks') {
+          return [
+            {
+              score: 0.88,
+              payload: {
+                content: 'FRE 803 lists hearsay exceptions regardless of witness availability.',
+              },
+            },
+          ];
+        }
+
+        return [];
+      });
+
+      const { assembleACEContext } = await import('$lib/server/ace/context-assembler.js');
+
+      const context = await assembleACEContext({
+        query: 'hearsay exceptions close-score preference regression',
+        enableWikipedia: false,
+        enableWebSearch: false,
+      });
+
+      expect(context.kbChunks.length).toBeGreaterThanOrEqual(2);
+      expect(context.kbChunks[0]?.content).toContain('FRE 803');
+
+      const contextualDoc = context.kbChunks.find((chunk) =>
+        chunk.content.includes('Contextual case summary')
+      );
+      expect(contextualDoc).toBeDefined();
+      expect(context.kbChunks[0]!.score).toBeGreaterThan(contextualDoc!.score ?? 0);
+    });
 
 		it('buildGraphShouldFilter produces valid Qdrant filter shape', async () => {
 			const { buildGraphShouldFilter } = await import('$lib/server/retrieval/graph-context.js');

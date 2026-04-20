@@ -8,7 +8,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
-const MODEL = 'gemma4-legal:latest';
+const MODEL = ENV.OLLAMA_CHAT_MODEL;
 
 export async function summarizeDocument(text: string, maxWords: number = 150): Promise<string> {
 	if (!text || text.trim().length < 100) return '';

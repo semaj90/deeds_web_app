@@ -198,7 +198,77 @@ async function redisSet(key: string, value: unknown, ttl: number): Promise<void>
 
 const QDRANT_URL  = ENV.QDRANT_URL;
 const COLLECTION  = 'codebase_chunks_768';
-const CHAT_MODEL  = ENV.OLLAMA_CHAT_MODEL;   // used for Ollama synthesis (extractStructured)
+const CHAT_MODEL  = ENV.OLLAMA_CHAT_MODEL;   // gemma4-legal-vlm (unified)
+
+// ── Neo4j topology expansion ─────────────────────────────────────────────────
+
+/**
+ * Expand chunks via SIMILAR_TOPOLOGY edges in Neo4j.
+ * Given top-scoring chunks' clusters, finds neighboring files in the SOM grid
+ * and returns additional Qdrant chunks from those neighbors.
+ */
+async function expandViaTopology(
+	topChunks: WorkerChunk[],
+	queryVector: number[],
+	limit: number,
+): Promise<WorkerChunk[]> {
+	// Extract unique clusters from top chunks
+	const clusters = [...new Set(
+		topChunks.map(c => c.gpuCluster).filter((c): c is number => c != null)
+	)].slice(0, 3);
+	if (!clusters.length) return [];
+
+	try {
+		// Find topology neighbors via pgvector (faster than Neo4j for this use case)
+		const { pool: pgPool } = await import('$lib/server/db/client');
+		const neighborResult = await pgPool.query<{ relative_path: string; gpu_cluster: number }>(
+			`SELECT DISTINCT relative_path, gpu_cluster
+			 FROM codebase_chunk_index
+			 WHERE gpu_cluster = ANY($1)
+			   AND relative_path NOT IN (SELECT UNNEST($2::text[]))
+			 ORDER BY COALESCE(page_rank_score, 0) DESC
+			 LIMIT $3`,
+			[clusters, topChunks.map(c => c.path), limit]
+		);
+
+		if (!neighborResult.rows.length) return [];
+
+		// Search Qdrant for chunks from neighbor paths using same query vector
+		const neighborPaths = neighborResult.rows.map(r => r.relative_path);
+		const body = {
+			vector: { name: 'content', vector: queryVector },
+			limit: limit * 2,
+			with_payload: true,
+			filter: {
+				must: [{ key: 'file_path', match: { any: neighborPaths } }],
+			},
+		};
+
+		const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+			signal: AbortSignal.timeout(10_000),
+		}).catch(() => null);
+
+		if (!res?.ok) return [];
+		const data = await res.json() as { result?: Array<{
+			score: number;
+			payload?: Record<string, unknown>;
+		}> };
+
+		return (data.result ?? []).slice(0, limit).map(h => ({
+			path:       (h.payload?.file_path ?? h.payload?.relativePath ?? '') as string,
+			content:    ((h.payload?.content ?? '') as string).slice(0, 400),
+			score:      h.score * 0.9, // slight penalty for topology-expanded results
+			tags:       Array.isArray(h.payload?.tags) ? h.payload.tags as string[] : [],
+			gpuCluster: (h.payload?.neo4j_gpuCluster ?? h.payload?.som_cluster) as number | null,
+			pageRank:   (h.payload?.pagerank_score ?? h.payload?.neo4j_pageRankScore) as number | null,
+		}));
+	} catch {
+		return []; // Non-fatal — degrade silently
+	}
+}
 
 /** Check if a named vector exists on the collection (cached after first call). */
 let _namedVecCache: Set<string> | null = null;
@@ -365,6 +435,16 @@ async function runWorker(domain: ResearchDomain, query: string, limit: number): 
 	// retry without tags — query augmentation + path-hint rerank still provide steering.
 	if (!chunks.length) {
 		chunks = await searchQdrant(vector, vecName, limit, undefined, pathFilter);
+	}
+
+	// 2b. Expand via topology neighbors (SIMILAR_TOPOLOGY graph adjacency)
+	if (chunks.length > 0 && vector) {
+		const topoChunks = await expandViaTopology(chunks, vector, Math.max(3, Math.floor(limit / 2)));
+		if (topoChunks.length) {
+			const existingPaths = new Set(chunks.map(c => c.path));
+			const novel = topoChunks.filter(c => !existingPaths.has(c.path));
+			chunks = [...chunks, ...novel].sort((a, b) => b.score - a.score).slice(0, limit);
+		}
 	}
 
 	if (!chunks.length) {

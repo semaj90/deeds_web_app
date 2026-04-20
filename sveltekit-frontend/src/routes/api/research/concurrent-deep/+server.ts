@@ -146,6 +146,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		);
 	}
 
+	// Fire-and-forget: Karpathy wiki research note
+	import('$lib/server/indexer/karpathy-wiki.js')
+		.then(({ recordResearchNote }) => recordResearchNote({
+			query,
+			outsideSources: [],
+			internalAreas: graph.workerFindings.flatMap(w => w.relevantPaths.slice(0, 5)),
+			confidence: Math.min(1, graph.totalChunks / 50),
+			pipeline: 'langgraph',
+			unresolvedQuestions: graph.actionItems.slice(0, 5),
+		}))
+		.catch(() => { /* non-fatal */ });
+
 	// ── Build response (apply compact limits) ────────────────────────────────
 	const workerPayloads = graph.workerFindings.map(w => {
 		const base: Record<string, unknown> = {

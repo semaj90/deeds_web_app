@@ -40,6 +40,7 @@
 import { pool } from '$lib/server/db/client';
 import { getRedis } from '$lib/server/redis.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 import { queryHash } from './search-analytics.js';
 import type { HitPipeline } from './search-analytics.js';
 
@@ -49,7 +50,7 @@ const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
 const GLYPH_DB = 'glyph_topology';
 const MATRIX_CACHE_KEY = 'mapreduce:matrix:';
 const MATRIX_CACHE_TTL = 900; // 15 min
-const MODEL = 'gemma4-legal:latest';
+const MODEL = ENV.OLLAMA_CHAT_MODEL;
 
 // Pipeline weight vector for cosine similarity aggregation
 const PIPELINE_WEIGHTS: Record<string, number> = {

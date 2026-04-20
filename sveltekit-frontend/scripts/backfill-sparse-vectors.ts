@@ -32,8 +32,11 @@ const QDRANT_URL  = (process.env.QDRANT_URL ?? 'http://localhost:6333').replace(
 const TARGET      = process.env.COLLECTION ?? '';
 const BATCH_SIZE  = parseInt(process.env.BATCH_SIZE ?? '100', 10);
 const DRY_RUN     = process.env.DRY_RUN === '1';
+const DEFAULT_LEGAL_COLLECTION = process.env.QDRANT_COLLECTION ?? 'legal_documents';
 
-const SUPPORTED_COLLECTIONS = ['legal_documents', 'evidence_items', 'legal_library_chunks'];
+const SUPPORTED_COLLECTIONS = [
+  ...new Set(['legal_documents', 'evidence_items', DEFAULT_LEGAL_COLLECTION]),
+];
 
 /** Text field names to look for in Qdrant point payloads. */
 const TEXT_FIELDS = ['text', 'chunk_text', 'content', 'snippet'];

@@ -3,14 +3,22 @@
  *
  * The existing collection uses unnamed vectors which can't coexist with sparse.
  * Since there are only 59 points, we save → recreate → re-upsert.
+ * If the Qdrant collection is empty or missing, bootstrap from canonical_chunks.
  *
  * Usage: node scripts/backfill-canon-sparse.mjs
  */
 
+import { createHash } from 'node:crypto';
+import pg from 'pg';
+
+const { Pool } = pg;
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const DATABASE_URL =
+  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
 const COLLECTION = 'legal_canon_chunks';
 const BATCH_SIZE = 30;
 const VOCAB_SIZE = 2_000_000;
+const pool = new Pool({ connectionString: DATABASE_URL });
 
 // ── FNV-1a hash (must match bm42-sparse.ts) ──
 function fnv1a(token) {
@@ -73,6 +81,66 @@ function generateSparseVector(text) {
 	return { indices, values };
 }
 
+function makePointId(chunkId) {
+  return createHash('md5').update(chunkId).digest('hex').replace(/-/g, '').slice(0, 32);
+}
+
+function parsePgVector(raw) {
+  if (typeof raw !== 'string' || raw.length < 2) return null;
+  const body = raw.startsWith('[') && raw.endsWith(']') ? raw.slice(1, -1) : raw;
+  if (!body.trim()) return [];
+
+  const values = body.split(',').map((part) => Number(part.trim()));
+  return values.every((value) => Number.isFinite(value)) ? values : null;
+}
+
+async function loadCanonicalChunksFromPostgres() {
+  const { rows } = await pool.query(`
+		SELECT
+			cc.chunk_id,
+			cc.document_id::text AS doc_id,
+			cc.content,
+			cc.token_count,
+			cc.embedding::text AS embedding_text,
+			COALESCE(cc.domains, '[]'::jsonb) AS domains,
+			COALESCE(cc.key_terms, '[]'::jsonb) AS key_terms,
+			cd.title AS doc_title,
+			cd.doc_type,
+			cd.citation,
+			cd.jurisdiction::text AS jurisdiction,
+			cd.authority_level::text AS authority_level
+		FROM canonical_chunks cc
+		JOIN canonical_documents cd ON cd.id = cc.document_id
+		WHERE cc.embedding IS NOT NULL
+		ORDER BY cd.title ASC, cc.chunk_index ASC
+	`);
+
+  return rows
+    .map((row) => {
+      const denseVec = parsePgVector(row.embedding_text);
+      if (!denseVec || denseVec.length !== 768) return null;
+
+      return {
+        id: makePointId(row.chunk_id),
+        denseVec,
+        payload: {
+          chunk_id: row.chunk_id,
+          doc_id: row.doc_id,
+          doc_title: row.doc_title,
+          doc_type: row.doc_type,
+          citation: row.citation,
+          jurisdiction: row.jurisdiction,
+          authority_level: row.authority_level,
+          content: typeof row.content === 'string' ? row.content.slice(0, 500) : '',
+          token_count: row.token_count,
+          domains: Array.isArray(row.domains) ? row.domains : [],
+          key_terms: Array.isArray(row.key_terms) ? row.key_terms : [],
+        },
+      };
+    })
+    .filter((point) => point !== null);
+}
+
 async function qdrantFetch(path, opts = {}) {
 	const url = `${QDRANT_URL}${path}`;
 	const res = await fetch(url, {
@@ -93,43 +161,63 @@ async function main() {
 	console.log('Step 1: Saving existing points...');
 	const savedPoints = [];
 	let offset = null;
+	let collectionExists = true;
 
-	while (true) {
-		const scrollBody = { limit: BATCH_SIZE, with_payload: true, with_vector: true };
-		if (offset !== null) scrollBody.offset = offset;
+	try {
+    while (true) {
+      const scrollBody = { limit: BATCH_SIZE, with_payload: true, with_vector: true };
+      if (offset !== null) scrollBody.offset = offset;
 
-		const data = await qdrantFetch(`/collections/${COLLECTION}/points/scroll`, {
-			method: 'POST',
-			body: JSON.stringify(scrollBody),
-		});
+      const data = await qdrantFetch(`/collections/${COLLECTION}/points/scroll`, {
+        method: 'POST',
+        body: JSON.stringify(scrollBody),
+      });
 
-		const points = data.result?.points ?? [];
-		if (points.length === 0) break;
+      const points = data.result?.points ?? [];
+      if (points.length === 0) break;
 
-		for (const p of points) {
-			const denseVec = Array.isArray(p.vector) ? p.vector : p.vector?.[''] ?? null;
-			savedPoints.push({
-				id: p.id,
-				denseVec,
-				payload: p.payload,
-			});
-		}
+      for (const p of points) {
+        const denseVec = Array.isArray(p.vector) ? p.vector : (p.vector?.[''] ?? null);
+        savedPoints.push({
+          id: p.id,
+          denseVec,
+          payload: p.payload,
+        });
+      }
 
-		offset = data.result?.next_page_offset;
-		if (offset === null || offset === undefined) break;
-	}
+      offset = data.result?.next_page_offset;
+      if (offset === null || offset === undefined) break;
+    }
+  } catch (err) {
+    if (String(err?.message ?? err).includes('Qdrant 404')) {
+      collectionExists = false;
+      console.log('  Collection missing; will bootstrap from PostgreSQL instead.');
+    } else {
+      throw err;
+    }
+  }
 
 	console.log(`  Saved ${savedPoints.length} points`);
 
 	if (savedPoints.length === 0) {
-		console.log('  No points to migrate. Exiting.');
-		return;
-	}
+    const bootstrappedPoints = await loadCanonicalChunksFromPostgres();
+    savedPoints.push(...bootstrappedPoints);
+    console.log(`  Bootstrapped ${bootstrappedPoints.length} points from canonical_chunks`);
+  }
+
+  if (savedPoints.length === 0) {
+    console.log('  No points to migrate or bootstrap. Exiting.');
+    return;
+  }
 
 	// Step 2: Delete old collection
 	console.log('\nStep 2: Deleting old collection...');
-	await qdrantFetch(`/collections/${COLLECTION}`, { method: 'DELETE' });
-	console.log('  Deleted');
+	if (collectionExists) {
+    await qdrantFetch(`/collections/${COLLECTION}`, { method: 'DELETE' });
+    console.log('  Deleted');
+  } else {
+    console.log('  Collection absent; skipping delete');
+  }
 
 	// Step 3: Recreate with named dense + sparse config
 	console.log('\nStep 3: Recreating with named vectors + sparse...');
@@ -221,7 +309,11 @@ async function main() {
 	}
 }
 
-main().catch((err) => {
-	console.error('Fatal:', err);
-	process.exit(1);
-});
+main()
+  .catch((err) => {
+    console.error('Fatal:', err);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await pool.end().catch(() => {});
+  });

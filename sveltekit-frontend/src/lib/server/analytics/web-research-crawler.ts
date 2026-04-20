@@ -430,7 +430,7 @@ export async function invalidateWebResearchCache(): Promise<void> {
 // ═══════════════════════════════════════════════════════════════════════════
 // LEGAL CORPUS SEARCH — search local Qdrant collections with gemma4-legal
 //
-// Searches `legal_canon_chunks`, `court_opinions`, and `legal_documents`
+// Searches authoritative canon/opinion collections plus contextual legal documents
 // (768-dim embeddinggemma vectors) and summarises top chunks via the same
 // gemma4-legal bifrostChat pipeline used for web results.  Data stored in
 // Redis alongside web results so research-topics surfaces both sources.
@@ -448,11 +448,25 @@ const CORPUS_BUILT_AT = 'corpus:built_at';
 
 // Collections to search in priority order (alias names from qdrant-manager)
 const CORPUS_COLLECTIONS = [
-	{ alias: 'legal_canon_chunks', label: 'Legal Canon' },
-	{ alias: 'court_opinions',     label: 'Court Opinions' },
-	{ alias: 'documents',          label: 'Legal Documents' },
-	{ alias: 'legal_glossary',     label: 'Legal Glossary' },
+  { alias: 'legal_canon_chunks', label: 'Legal Canon' },
+  { alias: 'court_opinions', label: 'Court Opinions' },
+  { alias: 'documents', label: 'Context Documents' },
+  { alias: 'legal_glossary', label: 'Legal Glossary' },
 ] as const;
+
+const CORPUS_COLLECTION_SCORE_WEIGHTS: Record<(typeof CORPUS_COLLECTIONS)[number]['alias'], number> = {
+	legal_canon_chunks: 1.05,
+	court_opinions: 1.03,
+	documents: 0.9,
+	legal_glossary: 0.95,
+};
+
+function weightCorpusCollectionScore(
+	score: number,
+	collection: (typeof CORPUS_COLLECTIONS)[number]['alias']
+): number {
+	return Number((score * CORPUS_COLLECTION_SCORE_WEIGHTS[collection]).toFixed(6));
+}
 
 export interface CorpusChunkSummary {
 	pointId:        string;
@@ -560,6 +574,7 @@ export async function crawlLegalCorpus(
 				});
 				return res.results.map((r: { id: string; score: number; payload: Record<string, unknown> }) => ({
 					...r,
+					score: weightCorpusCollectionScore(Number(r.score ?? 0), alias),
 					_collection: alias,
 					_label:      label,
 				}));
@@ -569,7 +584,7 @@ export async function crawlLegalCorpus(
 		})
 	);
 
-	// 3. Merge + sort by score descending, keep top maxResults*2 overall
+	// 3. Merge + sort by weighted score descending, keep top maxResults*2 overall
 	const allHits = collectionResults
 		.flat()
 		.sort((a, b) => b.score - a.score)

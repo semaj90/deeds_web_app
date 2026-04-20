@@ -2,7 +2,7 @@
  * Gemma4 Tool-Calling Agent
  *
  * Runs an agentic loop against Ollama's native tool-calling API
- * (gemma4:e4b-it-q4_K_M supports structured tool_calls).
+ * (gemma4-legal-vlm:latest — unified legal+VLM for tool-calling + agentic tasks).
  *
  * Loop:
  *   1. Send messages + tool definitions to /api/chat
@@ -31,7 +31,7 @@ import { contextTimeline }                             from '$lib/server/db/sche
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const MAX_ROUNDS  = 5;   // max tool-call rounds before forcing a final answer
-const TOOL_MODEL  = VLM_MODELS.gemma4;   // gemma4:e4b-it-q4_K_M
+const TOOL_MODEL  = VLM_MODELS.legal;   // gemma4-legal-vlm:latest (unified)
 const TIMEOUT_MS  = 90_000;
 
 // ── Ollama wire types ──────────────────────────────────────────────────────────

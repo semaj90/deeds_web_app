@@ -26,11 +26,11 @@
 
 CREATE TABLE IF NOT EXISTS context_timeline (
   id                    UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id               UUID         REFERENCES users(id)                ON DELETE SET NULL,
+  user_id               INTEGER      REFERENCES users(id)                ON DELETE SET NULL,
   session_id            TEXT         NOT NULL DEFAULT '',
   event_type            TEXT         NOT NULL,
   pipeline              TEXT         NOT NULL DEFAULT 'ace',
-  summary_id            UUID         REFERENCES research_summaries(id)   ON DELETE SET NULL,
+  summary_id            UUID,
   hyperedge_hash        VARCHAR(8),
   signal                TEXT,
   grpo_reward           REAL,

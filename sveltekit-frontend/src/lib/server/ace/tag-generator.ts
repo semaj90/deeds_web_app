@@ -12,7 +12,7 @@ import type { GeneratedTag } from './types.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const MODEL = 'gemma4-legal:latest';
+const MODEL = ENV.OLLAMA_CHAT_MODEL;
 
 interface TagResult {
 	legal: { statutes: string[]; cases: string[]; codes: string[] };

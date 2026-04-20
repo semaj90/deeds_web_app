@@ -15,33 +15,33 @@
 // Keys are populated after ENV is imported below (see ── Config ──).
 // Callers use VLM_MODELS.legal / .vision / .embedding / .gemma4 as before.
 export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4', string> = {
-	/** Vision-language model — Gemma 4 E4B (native multimodal, 131K context) */
-	vision: 'gemma4:e4b-it-q4_K_M',
-	embedding: 'embeddinggemma:latest',
-	/** Legal text reasoning / chat model (fine-tuned) */
-	legal: 'gemma4-legal:latest',
-	/** Gemma 4 E4B — tool calling + thinking */
-	gemma4: 'gemma4:e4b-it-q4_K_M',
+  /** Unified legal+VLM model (GRPO legal LoRA merged, mmproj vision, 5.3GB) */
+  vision: 'gemma4-legal-vlm:latest',
+  embedding: 'embeddinggemma:latest',
+  /** Legal text reasoning / chat / agentic tool-calling (same unified model) */
+  legal: 'gemma4-legal-vlm:latest',
+  /** Gemma 4 unified — tool calling + thinking + vision */
+  gemma4: 'gemma4-legal-vlm:latest',
 };
 
 export type VLMModel = string;
 
 export interface OllamaMessage {
-	role: 'user' | 'assistant' | 'system';
-	content: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
 }
 
 export interface OllamaResponse {
-	model: string;
-	created_at: string;
-	message: OllamaMessage;
-	done: boolean;
-	total_duration: number;
-	load_duration: number;
-	prompt_eval_count: number;
-	prompt_eval_duration: number;
-	eval_count: number;
-	eval_duration: number;
+  model: string;
+  created_at: string;
+  message: OllamaMessage;
+  done: boolean;
+  total_duration: number;
+  load_duration: number;
+  prompt_eval_count: number;
+  prompt_eval_duration: number;
+  eval_count: number;
+  eval_duration: number;
 }
 
 import { ollamaBreaker } from '$lib/server/circuit-breaker.js';
@@ -63,8 +63,8 @@ const CHAT_MODEL = ENV.OLLAMA_CHAT_MODEL;
 const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '300000');
 
 // Populate VLM_MODELS from ENV now that ENV is initialized
-VLM_MODELS.vision    = ENV.OLLAMA_VLM_MODEL;
-VLM_MODELS.gemma4    = ENV.OLLAMA_VLM_MODEL;
+VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL;
+VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL;
 VLM_MODELS.legal     = ENV.OLLAMA_CHAT_MODEL;
 VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL;
 
@@ -275,49 +275,86 @@ export async function bifrostChat(
   }
 
   // ── L2 Cache: Bifrost Semantic Search (5s lookup via Qdrant) ──
+  // Bifrost timeout: 30s (short) — falls through to L3 direct Ollama on failure
+  const BIFROST_TIMEOUT_MS = Math.min(options?.timeoutMs ?? 30_000, 30_000);
   const bifrostStart = performance.now();
-  const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-bf-cache-key': cacheKey,
-    },
-    body: JSON.stringify({
-      model: bifrostModel,
-      messages: normalizedMessages,
-      temperature: options?.temperature ?? 0.7,
-      max_tokens: options?.maxTokens ?? 2048,
-      stream: false,
-    }),
-    signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
-  });
+  let content = '';
+  let cacheHit = false;
+  let hitType: string | undefined;
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
-  }
+  try {
+    const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-bf-cache-key': cacheKey,
+      },
+      body: JSON.stringify({
+        model: bifrostModel,
+        messages: normalizedMessages,
+        temperature: options?.temperature ?? 0.7,
+        max_tokens: options?.maxTokens ?? 2048,
+        stream: false,
+      }),
+      signal: AbortSignal.timeout(BIFROST_TIMEOUT_MS),
+    });
 
-  // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
-  const rawText = await res.text();
-  const data = fastJsonParse<{
-    choices?: Array<{ message?: { content?: string } }>;
-    extra_fields?: {
-      cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
-    };
-  }>(rawText);
-  const debug = data.extra_fields?.cache_debug;
-  const content = data.choices?.[0]?.message?.content ?? '';
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
+    }
 
-  if (debug?.cache_hit) {
-    console.debug(
-      `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
+    // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
+    const rawText = await res.text();
+    const data = fastJsonParse<{
+      choices?: Array<{ message?: { content?: string } }>;
+      extra_fields?: {
+        cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
+      };
+    }>(rawText);
+    const debug = data.extra_fields?.cache_debug;
+    content = data.choices?.[0]?.message?.content ?? '';
+    cacheHit = !!debug?.cache_hit;
+    hitType = debug?.hit_type;
+
+    if (debug?.cache_hit) {
+      console.debug(
+        `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
+      );
+    }
+  } catch (bifrostErr) {
+    // ── L3 Fallback: Direct Ollama (bypasses broken Bifrost) ──
+    console.warn(
+      `[bifrost] L2 failed (${(bifrostErr as Error)?.message?.slice(0, 80)}), falling back to L3 direct Ollama`
     );
+    const ollamaRes = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model, // use original model name (not bifrost prefixed)
+        messages: normalizedMessages,
+        stream: false,
+        options: {
+          temperature: options?.temperature ?? 0.7,
+          num_predict: options?.maxTokens ?? 2048,
+        },
+      }),
+      signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
+    });
+
+    if (!ollamaRes.ok) {
+      throw new Error(`Ollama L3 error: ${ollamaRes.status}`);
+    }
+
+    const ollamaData = (await ollamaRes.json()) as OllamaResponse;
+    content = ollamaData.message?.content ?? '';
+    console.log(`[bifrost] L3 DIRECT OLLAMA OK (${Math.round(performance.now() - bifrostStart)}ms)`);
   }
 
   // Store in Redis exact-match cache for instant future retrieval
   if (content) {
     // Log L3 cold inference to CouchDB for QLoRA distillation
-    if (!debug?.cache_hit) {
+    if (!cacheHit) {
       logInference({
         type: 'llm',
         model: bifrostModel,
@@ -335,7 +372,7 @@ export async function bifrostChat(
     await setExactMatchCache(exactCacheKey, {
       content,
       model: bifrostModel,
-      backend: debug?.cache_hit ? 'bifrost-semantic' : 'ollama',
+      backend: cacheHit ? `bifrost-semantic${hitType ? '-' + hitType : ''}` : 'ollama-direct',
     });
   }
 

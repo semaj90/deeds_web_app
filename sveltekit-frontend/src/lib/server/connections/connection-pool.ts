@@ -221,7 +221,7 @@ export async function ensureRabbitConnection(): Promise<AmqpConnection> {
 
 	try {
 		rabbitConnectionAttempts++;
-		const url = process.env?.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
+		const url = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:secret123@localhost:5672';
 		const amqplib = await import('amqplib');
 		rabbitConnectionInstance = await (amqplib as any).default.connect(url, {
 			heartbeat: 60,

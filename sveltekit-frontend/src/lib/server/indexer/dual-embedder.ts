@@ -17,20 +17,25 @@ import { SERVER_EMBEDDING_MODEL, SERVER_EMBEDDING_DIMS } from '$lib/ai/model-ids
 import type { CodeChunk } from './ast-chunker.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { runWithAdaptiveBatch } from '$lib/server/gpu/libtorch-bridge.js';
+import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const INITIAL_BATCH = 24; // starting batch size; runWithAdaptiveBatch halves on OOM
 
 interface EmbeddingResult {
-	embedding: number[];
+  embedding: number[];
 }
 
 interface IndexResult {
-	chunksProcessed: number;
-	embeddingsGenerated: number;
-	storedInQdrant: number;
-	failed: number;
-	durationMs: number;
+  chunksProcessed: number;
+  embeddingsGenerated: number;
+  storedInQdrant: number;
+  failed: number;
+  durationMs: number;
+}
+
+function isValidEmbedding(value: unknown): value is number[] {
+  return Array.isArray(value) && value.length === SERVER_EMBEDDING_DIMS;
 }
 
 /**
@@ -38,60 +43,70 @@ interface IndexResult {
  * Redis-cached by content hash to avoid re-embedding identical text.
  */
 async function embed(text: string): Promise<number[]> {
-	const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),
-		signal: AbortSignal.timeout(30_000)
-	});
+  const prompt = text.trim() || text;
+  const cached = await getCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL).catch(() => null);
+  if (isValidEmbedding(cached)) {
+    return cached;
+  }
 
-	if (!res.ok) {
-		throw new Error(`Embedding failed (${res.status}): ${await res.text()}`);
-	}
+  const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt, keep_alive: '24h' }),
+    signal: AbortSignal.timeout(30_000),
+  });
 
-	const data = (await res.json()) as EmbeddingResult;
-	return data.embedding;
+  if (!res.ok) {
+    throw new Error(`Embedding failed (${res.status}): ${await res.text()}`);
+  }
+
+  const data = (await res.json()) as EmbeddingResult;
+  if (!isValidEmbedding(data.embedding)) {
+    throw new Error('Embedding response returned an invalid vector');
+  }
+  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, data.embedding).catch(() => {});
+  return data.embedding;
 }
 
 /**
  * Ensure a Qdrant collection exists with dual named vectors.
  */
 async function ensureCollection(): Promise<void> {
-	const qdrantUrl = ENV.QDRANT_URL;
+  const qdrantUrl = ENV.QDRANT_URL;
 
-	// Check if collection exists
-	const check = await fetch(`${qdrantUrl}/collections/${QDRANT_COLLECTION}`);
-	if (check.ok) return;
+  // Check if collection exists
+  const check = await fetch(`${qdrantUrl}/collections/${QDRANT_COLLECTION}`);
+  if (check.ok) return;
 
-	// Create with named vectors for dual embedding
-	const res = await fetch(`${qdrantUrl}/collections/${QDRANT_COLLECTION}`, {
-		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			vectors: {
-				content:   { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
-				signature: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
-				error:     { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
-			}
-		})
-	});
+  // Create with named vectors for dual embedding
+  const res = await fetch(`${qdrantUrl}/collections/${QDRANT_COLLECTION}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      vectors: {
+        content: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
+        signature: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
+        error: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
+      },
+    }),
+  });
 
-	if (!res.ok) {
-		throw new Error(`Failed to create collection: ${await res.text()}`);
-	}
+  if (!res.ok) {
+    throw new Error(`Failed to create collection: ${await res.text()}`);
+  }
 
-	// Create payload indexes for filtered search
-	const indexes = ['kind', 'httpMethod', 'routeId', 'tags'];
-	for (const field of indexes) {
-		await fetch(`${qdrantUrl}/collections/${QDRANT_COLLECTION}/index`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				field_name: field,
-				field_schema: field === 'tags' ? 'keyword[]' : 'keyword'
-			})
-		}).catch(() => {}); // ignore if already exists
-	}
+  // Create payload indexes for filtered search
+  const indexes = ['kind', 'httpMethod', 'routeId', 'tags'];
+  for (const field of indexes) {
+    await fetch(`${qdrantUrl}/collections/${QDRANT_COLLECTION}/index`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        field_name: field,
+        field_schema: { type: 'keyword', lookup: true },
+      }),
+    }).catch(() => {}); // ignore if already exists
+  }
 }
 
 /**
@@ -105,17 +120,17 @@ async function ensureCollection(): Promise<void> {
  * to upgrade legacy collections created before the error vector was added.
  */
 export async function patchErrorVectorSchema(): Promise<boolean> {
-	const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}`, {
-		method:  'PATCH',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			vectors: {
-				error: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
-			},
-		}),
-		signal: AbortSignal.timeout(10_000),
-	}).catch(() => null);
-	return res?.ok ?? false;
+  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      vectors: {
+        error: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
+      },
+    }),
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => null);
+  return res?.ok ?? false;
 }
 
 /**
@@ -134,36 +149,38 @@ export async function patchErrorVectorSchema(): Promise<boolean> {
  * @param filePath  - File path where the error was detected
  */
 export async function upsertErrorVector(
-	chunkId: string | number,
-	errorCode: string,
-	message: string,
-	filePath: string,
+  chunkId: string | number,
+  errorCode: string,
+  message: string,
+  filePath: string
 ): Promise<boolean> {
-	const errorText = `[${errorCode}] ${message} (${filePath})`.slice(0, 1_000);
+  const errorText = `[${errorCode}] ${message} (${filePath})`.slice(0, 1_000);
 
-	let errorEmbedding: number[];
-	try {
-		errorEmbedding = await embed(errorText);
-	} catch {
-		return false;
-	}
+  let errorEmbedding: number[];
+  try {
+    errorEmbedding = await embed(errorText);
+  } catch {
+    return false;
+  }
 
-	// Qdrant PUT /points with named vector — only updates the `error` vector slot;
-	// existing `content` and `signature` vectors on the point are preserved.
-	const pointId = typeof chunkId === 'string' ? hashToUint(chunkId) : chunkId;
-	const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {
-		method:  'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			points: [{
-				id:     pointId,
-				vector: { error: errorEmbedding },
-			}],
-		}),
-		signal: AbortSignal.timeout(15_000),
-	}).catch(() => null);
+  // Qdrant PUT /points with named vector — only updates the `error` vector slot;
+  // existing `content` and `signature` vectors on the point are preserved.
+  const pointId = typeof chunkId === 'string' ? hashToUint(chunkId) : chunkId;
+  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      points: [
+        {
+          id: pointId,
+          vector: { error: errorEmbedding },
+        },
+      ],
+    }),
+    signal: AbortSignal.timeout(15_000),
+  }).catch(() => null);
 
-	return res?.ok ?? false;
+  return res?.ok ?? false;
 }
 
 /**
@@ -178,207 +195,262 @@ export async function upsertErrorVector(
  * @param filter     - Optional Qdrant payload filter
  */
 export async function searchByError(
-	errorText: string,
-	limit = 10,
-	filter?: Record<string, unknown>,
+  errorText: string,
+  limit = 10,
+  filter?: Record<string, unknown>
 ): Promise<Array<{ id: number | string; score: number; payload: Record<string, unknown> }>> {
-	let vector: number[];
-	try {
-		vector = await embed(errorText.slice(0, 1_000));
-	} catch {
-		return [];
-	}
-	return searchVector('error', vector, limit, filter);
+  let vector: number[];
+  try {
+    vector = await embed(errorText.slice(0, 1_000));
+  } catch {
+    return [];
+  }
+  return searchVector('error', vector, limit, filter);
 }
 
 /**
  * Upsert points with dual named vectors to Qdrant.
  */
 async function upsertPoints(
-	points: Array<{
-		id: string;
-		vectors: { content: number[]; signature: number[] };
-		payload: Record<string, unknown>;
-	}>
+  points: Array<{
+    id: string;
+    vectors: { content: number[]; signature: number[] };
+    payload: Record<string, unknown>;
+  }>
 ): Promise<void> {
-	const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {
-		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			points: points.map((p) => ({
-				id: hashToUint(p.id),
-				vector: { content: p.vectors.content, signature: p.vectors.signature },
-				payload: p.payload
-			}))
-		})
-	});
+  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      points: points.map((p) => ({
+        id: hashToUint(p.id),
+        vector: { content: p.vectors.content, signature: p.vectors.signature },
+        payload: p.payload,
+      })),
+    }),
+  });
 
-	if (!res.ok) {
-		throw new Error(`Qdrant upsert failed (${res.status}): ${await res.text()}`);
-	}
+  if (!res.ok) {
+    throw new Error(`Qdrant upsert failed (${res.status}): ${await res.text()}`);
+  }
 }
 
 /**
  * Search with dual vectors. Combines content + signature scores.
  */
 export async function searchCodebase(
-	query: string,
-	opts: {
-		limit?: number;
-		filter?: Record<string, unknown>;
-		contentWeight?: number;
-		signatureWeight?: number;
-	} = {}
+  query: string,
+  opts: {
+    limit?: number;
+    filter?: Record<string, unknown>;
+    contentWeight?: number;
+    signatureWeight?: number;
+  } = {}
 ): Promise<Array<{ chunk: { content: string } & Record<string, unknown>; score: number }>> {
-	const limit = opts.limit ?? 10;
-	const contentWeight = opts.contentWeight ?? 0.6;
-	const signatureWeight = opts.signatureWeight ?? 0.4;
+  const limit = opts.limit ?? 10;
+  const contentWeight = opts.contentWeight ?? 0.6;
+  const signatureWeight = opts.signatureWeight ?? 0.4;
 
-	const queryEmbedding = await embed(query);
+  const queryEmbedding = await embed(query);
 
-	// Search both vector spaces
-	const [contentResults, signatureResults] = await Promise.all([
-		searchVector('content', queryEmbedding, limit * 2, opts.filter),
-		searchVector('signature', queryEmbedding, limit * 2, opts.filter)
-	]);
+  // Search both vector spaces
+  const [contentResults, signatureResults] = await Promise.all([
+    searchVector('content', queryEmbedding, limit * 2, opts.filter),
+    searchVector('signature', queryEmbedding, limit * 2, opts.filter),
+  ]);
 
-	// Merge and re-rank by weighted score
-	const scoreMap = new Map<string, { payload: Record<string, unknown>; score: number }>();
+  // Merge and re-rank by weighted score
+  const scoreMap = new Map<string, { payload: Record<string, unknown>; score: number }>();
 
-	for (const r of contentResults) {
-		const key = r.id.toString();
-		const existing = scoreMap.get(key);
-		const score = (existing?.score ?? 0) + r.score * contentWeight;
-		scoreMap.set(key, { payload: r.payload, score });
-	}
+  for (const r of contentResults) {
+    const key = r.id.toString();
+    const existing = scoreMap.get(key);
+    const score = (existing?.score ?? 0) + r.score * contentWeight;
+    scoreMap.set(key, { payload: r.payload, score });
+  }
 
-	for (const r of signatureResults) {
-		const key = r.id.toString();
-		const existing = scoreMap.get(key);
-		const score = (existing?.score ?? 0) + r.score * signatureWeight;
-		scoreMap.set(key, { payload: existing?.payload ?? r.payload, score });
-	}
+  for (const r of signatureResults) {
+    const key = r.id.toString();
+    const existing = scoreMap.get(key);
+    const score = (existing?.score ?? 0) + r.score * signatureWeight;
+    scoreMap.set(key, { payload: existing?.payload ?? r.payload, score });
+  }
 
-	// Sort by combined score, take top N
-	return [...scoreMap.values()]
-		.sort((a, b) => b.score - a.score)
-		.slice(0, limit)
-		.map((r) => ({
-			chunk: {
-				content: r.payload.content as string,
-				path: r.payload.path as string,
-				relativePath: r.payload.relativePath as string,
-				kind: r.payload.kind as string,
-				symbol: r.payload.symbol as string,
-				httpMethod: r.payload.httpMethod as string | undefined,
-				routeId: r.payload.routeId as string | undefined,
-				exports: r.payload.exports as string[],
-				tags: r.payload.tags as string[],
-				lineStart: r.payload.lineStart as number,
-				lineEnd: r.payload.lineEnd as number
-			},
-			score: r.score
-		}));
+  // Sort by combined score, take top N
+  return [...scoreMap.values()]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((r) => ({
+      chunk: {
+        content: r.payload.content as string,
+        path: r.payload.path as string,
+        relativePath: r.payload.relativePath as string,
+        kind: r.payload.kind as string,
+        symbol: r.payload.symbol as string,
+        httpMethod: r.payload.httpMethod as string | undefined,
+        routeId: r.payload.routeId as string | undefined,
+        exports: r.payload.exports as string[],
+        tags: r.payload.tags as string[],
+        lineStart: r.payload.lineStart as number,
+        lineEnd: r.payload.lineEnd as number,
+      },
+      score: r.score,
+    }));
 }
 
 async function searchVector(
-	vectorName: string,
-	vector: number[],
-	limit: number,
-	filter?: Record<string, unknown>
+  vectorName: string,
+  vector: number[],
+  limit: number,
+  filter?: Record<string, unknown>
 ): Promise<Array<{ id: number | string; score: number; payload: Record<string, unknown> }>> {
-	const body: Record<string, unknown> = {
-		vector: { name: vectorName, vector },
-		limit,
-		with_payload: true
-	};
-	if (filter) body.filter = filter;
+  const body: Record<string, unknown> = {
+    vector: { name: vectorName, vector },
+    limit,
+    with_payload: true,
+  };
+  if (filter) body.filter = filter;
 
-	const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body)
-	});
+  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
 
-	if (!res.ok) return [];
-	const data = await res.json();
-	return data.result ?? [];
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.result ?? [];
 }
 
 /**
  * Index an array of AST code chunks into Qdrant with dual embeddings.
  */
 export async function indexChunks(chunks: CodeChunk[]): Promise<IndexResult> {
-	const start = performance.now();
-	let embeddingsGenerated = 0;
-	let storedInQdrant = 0;
-	let failed = 0;
+  const start = performance.now();
+  let embeddingsGenerated = 0;
+  let storedInQdrant = 0;
+  let failed = 0;
 
-	await ensureCollection();
+  await ensureCollection();
 
-	// runWithAdaptiveBatch handles CUDA OOM by halving batch size and retrying.
-	// On success it doubles back toward INITIAL_BATCH (adaptive oscillation).
-	// Embedding is the GPU bottleneck — batch size of 24 fills ~350 MB VRAM on RTX 3060 Ti.
-	await runWithAdaptiveBatch<CodeChunk>(
-		chunks,
-		async (batch) => {
-			const points: Array<{
-				id: string;
-				vectors: { content: number[]; signature: number[] };
-				payload: Record<string, unknown>;
-			}> = [];
+  // runWithAdaptiveBatch handles CUDA OOM by halving batch size and retrying.
+  // On success it doubles back toward INITIAL_BATCH (adaptive oscillation).
+  // Embedding is the GPU bottleneck — batch size of 24 fills ~350 MB VRAM on RTX 3060 Ti.
+  await runWithAdaptiveBatch<CodeChunk>(
+    chunks,
+    async (batch) => {
+      const points: Array<{
+        id: string;
+        vectors: { content: number[]; signature: number[] };
+        payload: Record<string, unknown>;
+      }> = [];
 
-			for (const chunk of batch) {
-				try {
-					const [contentEmb, signatureEmb] = await Promise.all([
-						embed(chunk.content.slice(0, 2_000)), // cap content to avoid token limits
-						embed(chunk.signature),
-					]);
-					embeddingsGenerated += 2;
+      for (const chunk of batch) {
+        try {
+          const [contentEmb, signatureEmb] = await Promise.all([
+            embed(chunk.content.slice(0, 2_000)), // cap content to avoid token limits
+            embed(chunk.signature),
+          ]);
+          embeddingsGenerated += 2;
 
-					points.push({
-						id:      chunk.id,
-						vectors: { content: contentEmb, signature: signatureEmb },
-						payload: {
-							content:   chunk.content.slice(0, 4_000), // store truncated for retrieval
-							signature: chunk.signature,
-							...chunk.metadata,
-						},
-					});
-				} catch {
-					failed++;
-				}
-			}
+          points.push({
+            id: chunk.id,
+            vectors: { content: contentEmb, signature: signatureEmb },
+            payload: {
+              content: chunk.content.slice(0, 4_000), // store truncated for retrieval
+              signature: chunk.signature,
+              ...chunk.metadata,
+            },
+          });
+        } catch {
+          failed++;
+        }
+      }
 
-			if (points.length > 0) {
-				try {
-					await upsertPoints(points);
-					storedInQdrant += points.length;
-				} catch {
-					failed += points.length;
-				}
-			}
-		},
-		{ initialBatch: INITIAL_BATCH, minBatch: 4 }
-	);
+      if (points.length > 0) {
+        try {
+          await upsertPoints(points);
+          storedInQdrant += points.length;
+        } catch {
+          failed += points.length;
+        }
+      }
+    },
+    { initialBatch: INITIAL_BATCH, minBatch: 4 }
+  );
 
-	return {
-		chunksProcessed:      chunks.length,
-		embeddingsGenerated,
-		storedInQdrant,
-		failed,
-		durationMs: Math.round(performance.now() - start),
-	};
+  return {
+    chunksProcessed: chunks.length,
+    embeddingsGenerated,
+    storedInQdrant,
+    failed,
+    durationMs: Math.round(performance.now() - start),
+  };
 }
 
 /**
  * Deterministic hash of a string to a uint64 (for Qdrant point ID).
  */
 function hashToUint(str: string): number {
-	let hash = 0;
-	for (let i = 0; i < str.length; i++) {
-		const char = str.charCodeAt(i);
-		hash = ((hash << 5) - hash + char) | 0;
-	}
-	return Math.abs(hash);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash + char) | 0;
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Batch-check which Qdrant point IDs already exist in the collection.
+ * Uses POST /points with id filter — returns the set of IDs that are present.
+ */
+async function getExistingPointIds(ids: number[]): Promise<Set<number>> {
+  const existing = new Set<number>();
+  const BATCH = 500;
+  for (let i = 0; i < ids.length; i += BATCH) {
+    const batch = ids.slice(i, i + BATCH);
+    const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: batch, with_payload: false, with_vector: false }),
+      signal: AbortSignal.timeout(15_000),
+    }).catch(() => null);
+    if (!res?.ok) continue;
+    const data = (await res.json()) as { result?: Array<{ id: number }> };
+    for (const pt of data.result ?? []) existing.add(pt.id);
+  }
+  return existing;
+}
+
+interface IncrementalIndexResult extends IndexResult {
+  skippedExisting: number;
+}
+
+/**
+ * Index chunks incrementally — skip chunks whose point ID already exists in Qdrant.
+ * On re-run, only new/changed chunks get embedded and upserted.
+ */
+export async function indexChunksIncremental(chunks: CodeChunk[]): Promise<IncrementalIndexResult> {
+  await ensureCollection();
+
+  // Check which chunks are already in Qdrant
+  const chunkIds = chunks.map((c) => hashToUint(c.id));
+  const existing = await getExistingPointIds(chunkIds);
+
+  const newChunks = chunks.filter((c) => !existing.has(hashToUint(c.id)));
+  const skippedExisting = chunks.length - newChunks.length;
+
+  if (newChunks.length === 0) {
+    return {
+      chunksProcessed: chunks.length,
+      embeddingsGenerated: 0,
+      storedInQdrant: 0,
+      failed: 0,
+      skippedExisting,
+      durationMs: 0,
+    };
+  }
+
+  const result = await indexChunks(newChunks);
+  return { ...result, chunksProcessed: chunks.length, skippedExisting };
 }

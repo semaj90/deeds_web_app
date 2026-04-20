@@ -12,6 +12,48 @@ import { eq, sql } from 'drizzle-orm';
 export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization';
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
 
+let analysisJobsTableMissing = false;
+let loggedMissingAnalysisJobsTable = false;
+
+function isMissingAnalysisJobsTableError(err: unknown): boolean {
+  let current: unknown = err;
+
+  for (let depth = 0; depth < 5 && current; depth++) {
+    if (typeof current === 'object' && current !== null) {
+      const code = 'code' in current ? String((current as { code?: unknown }).code ?? '') : '';
+      const message =
+        'message' in current ? String((current as { message?: unknown }).message ?? '') : '';
+
+      if (code === '42P01' || message.includes('relation "analysis_jobs" does not exist')) {
+        return true;
+      }
+
+      current = 'cause' in current ? (current as { cause?: unknown }).cause : null;
+      continue;
+    }
+
+    const message = String(current ?? '');
+    if (message.includes('relation "analysis_jobs" does not exist')) {
+      return true;
+    }
+    break;
+  }
+
+  return false;
+}
+
+function markAnalysisJobsUnavailable(): void {
+  analysisJobsTableMissing = true;
+  if (loggedMissingAnalysisJobsTable) {
+    return;
+  }
+
+  loggedMissingAnalysisJobsTable = true;
+  console.warn(
+    '[AnalysisJobs] analysis_jobs table is missing; DB-backed analysis polling is disabled'
+  );
+}
+
 /**
  * Enqueue a new job with status='queued' (not running).
  * The worker loop will claim it via claimNextJob().
@@ -74,6 +116,10 @@ export async function claimNextJob(jobType?: JobType): Promise<{
   jobType: string;
   result: Record<string, unknown>;
 } | null> {
+  if (analysisJobsTableMissing) {
+    return null;
+  }
+
   try {
     const typeFilter = jobType ? sql`AND job_type = ${jobType}` : sql``;
 
@@ -117,6 +163,11 @@ export async function claimNextJob(jobType?: JobType): Promise<{
       throw err; // Let caller handle backoff
     }
 
+    if (isMissingAnalysisJobsTableError(err)) {
+      markAnalysisJobsUnavailable();
+      return null;
+    }
+
     // Other errors: log once and return empty
     console.error('[AnalysisJobs] Unexpected DB error:', err.message);
     return null;
@@ -127,15 +178,39 @@ export async function claimNextJob(jobType?: JobType): Promise<{
  * Get job by ID (for SSE progress polling from DB).
  */
 export async function getAnalysisJob(id: string) {
-  const [row] = await db.select().from(analysisJobs).where(eq(analysisJobs.id, id)).limit(1);
-  return row ?? null;
+  if (analysisJobsTableMissing) {
+    return null;
+  }
+
+  try {
+    const [row] = await db.select().from(analysisJobs).where(eq(analysisJobs.id, id)).limit(1);
+    return row ?? null;
+  } catch (err) {
+    if (isMissingAnalysisJobsTableError(err)) {
+      markAnalysisJobsUnavailable();
+      return null;
+    }
+    throw err;
+  }
 }
 
 /**
  * Get all jobs for an evidence item (for status page).
  */
 export async function getJobsForEvidence(evidenceId: string) {
-  return db.select().from(analysisJobs).where(eq(analysisJobs.evidenceId, evidenceId));
+  if (analysisJobsTableMissing) {
+    return [];
+  }
+
+  try {
+    return await db.select().from(analysisJobs).where(eq(analysisJobs.evidenceId, evidenceId));
+  } catch (err) {
+    if (isMissingAnalysisJobsTableError(err)) {
+      markAnalysisJobsUnavailable();
+      return [];
+    }
+    throw err;
+  }
 }
 
 /**
@@ -143,13 +218,25 @@ export async function getJobsForEvidence(evidenceId: string) {
  * Jobs stuck in 'running' for more than `staleMinutes` are re-queued.
  */
 export async function resetStaleJobs(staleMinutes: number = 10): Promise<number> {
-  const result = await db.execute(sql`
+  if (analysisJobsTableMissing) {
+    return 0;
+  }
+
+  try {
+    const result = await db.execute(sql`
 		UPDATE analysis_jobs
 		SET status = 'queued', started_at = NULL, updated_at = NOW()
 		WHERE status = 'running'
 		  AND started_at < NOW() - make_interval(mins => ${staleMinutes})
 	`);
-  return (result as any).rowCount ?? 0;
+    return (result as any).rowCount ?? 0;
+  } catch (err) {
+    if (isMissingAnalysisJobsTableError(err)) {
+      markAnalysisJobsUnavailable();
+      return 0;
+    }
+    throw err;
+  }
 }
 
 export async function updateAnalysisJob(
@@ -195,14 +282,28 @@ export async function failAnalysisJob(id: string, error: string): Promise<void> 
  * Monitoring: count jobs by status (for admin dashboards / health checks).
  */
 export async function getJobCounts(): Promise<Record<string, number>> {
-  const rows = await db.execute(sql`
+  const result: Record<string, number> = { queued: 0, running: 0, completed: 0, failed: 0 };
+
+  if (analysisJobsTableMissing) {
+    return result;
+  }
+
+  try {
+    const rows = await db.execute(sql`
 		SELECT status, COUNT(*)::int AS count
 		FROM analysis_jobs
 		GROUP BY status
 	`);
-  const result: Record<string, number> = { queued: 0, running: 0, completed: 0, failed: 0 };
-  for (const row of pgRows(rows)) {
-    result[(row as any).status] = (row as any).count;
+    for (const row of pgRows(rows)) {
+      result[(row as any).status] = (row as any).count;
+    }
+  } catch (err) {
+    if (isMissingAnalysisJobsTableError(err)) {
+      markAnalysisJobsUnavailable();
+      return result;
+    }
+    throw err;
   }
+
   return result;
 }

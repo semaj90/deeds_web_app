@@ -27,6 +27,7 @@ import {
 	uuid,
 	varchar,
 } from 'drizzle-orm/pg-core';
+import { vector } from 'pgvector/drizzle-orm';
 import { sql } from 'drizzle-orm';
 
 // ── chunk_hit_log ──────────────────────────────────────────────────────────────
@@ -128,6 +129,7 @@ export const qloraExamples = pgTable('qlora_examples', {
 	responseScore:  real('response_score'),
 	avgRerankScore: real('avg_rerank_score'),
 	gpuClusters:    jsonb('gpu_clusters').notNull().default(sql`'[]'::jsonb`),
+	somClusters:    jsonb('som_clusters').notNull().default(sql`'[]'::jsonb`),
 	pipelineHits:   jsonb('pipeline_hits').notNull().default(sql`'{}'::jsonb`),
 	entityTags:     jsonb('entity_tags').notNull().default(sql`'[]'::jsonb`),  // extracted statute + case entity tags
 	modelVersion:   varchar('model_version', { length: 50 }),  // e.g. 'gemma4-legal'
@@ -184,3 +186,39 @@ export const predictiveTodos = pgTable('predictive_todos', {
 
 export type PredictiveTodo    = typeof predictiveTodos.$inferSelect;
 export type NewPredictiveTodo = typeof predictiveTodos.$inferInsert;
+
+// ── codebase_chunk_index ──────────────────────────────────────────────────────
+// pgvector mirror of Qdrant codebase_chunks_768 — enables SQL joins, QLoRA hydration,
+// and summary-based vector search without Qdrant dependency.
+
+export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
+	id:                uuid('id').defaultRandom().primaryKey(),
+	qdrantId:          varchar('qdrant_id', { length: 64 }).unique(),
+	relativePath:      text('relative_path').notNull(),
+	symbol:            varchar('symbol', { length: 255 }),
+	kind:              varchar('kind', { length: 50 }),
+	lineStart:         integer('line_start'),
+	lineEnd:           integer('line_end'),
+	content:           text('content'),                                           // full chunk source text
+	contentEmbedding:  vector('content_embedding', { dimensions: 768 }),          // halfvec(768) in DB
+	signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),       // AST metadata embedding
+	summaryEmbedding:  vector('summary_embedding', { dimensions: 768 }),          // autoencoded cluster summary
+	gpuCluster:        integer('gpu_cluster'),
+	somCluster:        integer('som_cluster'),
+	pageRankScore:     real('page_rank_score'),
+	communityId:       integer('community_id'),
+	tags:              jsonb('tags').notNull().default(sql`'[]'::jsonb`),
+	clusterSummary:    jsonb('cluster_summary').notNull().default(sql`'{}'::jsonb`), // { summary, purpose, patterns, keyFiles, warnings }
+	neoMeta:           jsonb('neo4j_meta').notNull().default(sql`'{}'::jsonb`),
+	indexedAt:         timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
+	enrichedAt:        timestamp('enriched_at', { withTimezone: true }),
+	updatedAt:         timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => ({
+	pathIdx:      index('codebase_chunk_index_path_idx').on(t.relativePath),
+	gpuClusterIdx: index('codebase_chunk_index_gpu_cluster_idx').on(t.gpuCluster),
+	somClusterIdx: index('codebase_chunk_index_som_cluster_idx').on(t.somCluster),
+	// qdrant_id unique index created by .unique() on column definition
+}));
+
+export type CodebaseChunkIndex    = typeof codebaseChunkIndex.$inferSelect;
+export type NewCodebaseChunkIndex = typeof codebaseChunkIndex.$inferInsert;

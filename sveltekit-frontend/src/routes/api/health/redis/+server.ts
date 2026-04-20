@@ -25,27 +25,28 @@ export const GET: RequestHandler = async () => {
  let client: ReturnType<typeof createRedisConnection> | null = null;
 
  try {
- // Use a short-lived connection for health checks to avoid errors when the
- // global/shared client has been closed or is in a bad state.
- client = createRedisConnection();
+   // Use a short-lived connection for health checks to avoid errors when the
+   // global/shared client has been closed or is in a bad state.
+   client = createRedisConnection();
 
- // If the client exposes connect, ensure it's open before ping
- if (client && typeof client.connect === 'function' && (client as { status?: string }).status !== 'ready') {
- await client.connect();
- }
+   // Ping using the short-lived client
+   if (client && typeof client.ping === 'function') {
+     if (
+       typeof client.connect === 'function' &&
+       (client as { status?: string }).status === 'wait'
+     ) {
+       await client.connect();
+     }
+     await client.ping();
+   }
 
- // Ping using the short-lived client
- if (client && typeof client.ping === 'function') {
- await client.ping();
- }
-
- return json({
- status: 'healthy',
- service: 'redis',
- port: ENV.REDIS_PORT,
- host: ENV.REDIS_HOST,
- timestamp,
- });
+   return json({
+     status: 'healthy',
+     service: 'redis',
+     port: ENV.REDIS_PORT,
+     host: ENV.REDIS_HOST,
+     timestamp,
+   });
  } catch (error: unknown) {
  const msg = extractMessage(error);
  console.warn('[Redis Health] Redis unavailable: ', msg);

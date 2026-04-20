@@ -8,13 +8,14 @@ const { Pool } = pkg;
 const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'legal_documents';
 
 const p = new Pool({ connectionString: DB_URL });
 
 // 1. Quick Qdrant collection check
-console.log('\n=== Checking Qdrant legal_library_chunks collection ===');
+console.log(`\n=== Checking Qdrant ${QDRANT_COLLECTION} collection ===`);
 try {
-  const r = await fetch(`${QDRANT_URL}/collections/legal_library_chunks`);
+  const r = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}`);
   if (r.ok) {
     const data: any = await r.json();
     console.log(`  Points count: ${data.result?.points_count ?? 'unknown'}`);

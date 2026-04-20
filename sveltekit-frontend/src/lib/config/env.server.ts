@@ -88,7 +88,7 @@ export function getRedisPassword(): string {
 
 export function getRabbitMQUrl(): string {
  return (
- env?.RABBITMQ_URL|| `amqp://legal_admin:123456@${isDocker ? 'rabbitmq' : 'localhost'}:5672`
+   env?.RABBITMQ_URL || `amqp://legal_admin:secret123@${isDocker ? 'rabbitmq' : 'localhost'}:5672`
  );
 }
 

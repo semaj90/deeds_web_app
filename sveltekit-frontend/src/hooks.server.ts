@@ -12,23 +12,15 @@
 
 import { building, dev } from '$app/environment';
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
-import { startWorker } from '$lib/server/analysis/worker.js';
 import { productionLogger } from '$lib/server/production-logger.js';
-import { startRabbitMQPipeline } from '$lib/server/queue/rabbitmq-xstate-integration.js';
-import { startAudioQueueConsumer } from '$lib/server/workers/audio-queue-consumer.js';
-import { startDocumentEmbedConsumer } from '$lib/server/workers/document-embed-consumer.js';
-import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
-import { warmupTemplateCache } from '$lib/server/cache/report-template-cache.js';
-import { startIdleScanner } from '$lib/server/engagement/idle-reengagement.js';
 import { pool } from '$lib/server/db/client';
 import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
-import { createDefaultRegistry } from '$lib/server/queue/queue-worker.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
-import { getRedis } from '$lib/server/redis.js';
+import { ensureRedis, getRedis } from '$lib/server/redis.js';
 import { checkHooksRateLimit, startCleanup } from '$lib/server/middleware/rate-limiter.js';
 import { sql } from 'drizzle-orm';
 
@@ -76,8 +68,8 @@ if (shouldRunBootTasks && !dev) {
  */
 async function checkRedis(): Promise<boolean> {
   try {
-    const redis = getRedis();
-    return redis.status === 'ready';
+    await ensureRedis();
+    return true;
   } catch {
     return false;
   }
@@ -100,6 +92,57 @@ async function checkDb(): Promise<boolean> {
   }
 }
 
+type CodebaseChunkIndexMirrorStatus = {
+  exists: boolean;
+  missingColumns: string[];
+};
+
+const REQUIRED_CODEBASE_CHUNK_INDEX_COLUMNS = [
+  'qdrant_id',
+  'content',
+  'cluster_summary',
+  'summary_embedding',
+  'signature_embedding',
+] as const;
+
+async function checkCodebaseChunkIndexMirror(): Promise<CodebaseChunkIndexMirrorStatus> {
+  const client = await pool.connect();
+
+  try {
+    const tableResult = await client.query<{ exists: boolean }>(
+      "SELECT to_regclass('public.codebase_chunk_index') IS NOT NULL AS exists"
+    );
+
+    const exists = tableResult.rows[0]?.exists === true;
+    if (!exists) {
+      return {
+        exists: false,
+        missingColumns: [...REQUIRED_CODEBASE_CHUNK_INDEX_COLUMNS],
+      };
+    }
+
+    const columnResult = await client.query<{ column_name: string }>(
+      `SELECT column_name
+         FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'codebase_chunk_index'
+          AND column_name = ANY($1::text[])`,
+      [[...REQUIRED_CODEBASE_CHUNK_INDEX_COLUMNS]]
+    );
+
+    const presentColumns = new Set(columnResult.rows.map((row) => row.column_name));
+
+    return {
+      exists: true,
+      missingColumns: REQUIRED_CODEBASE_CHUNK_INDEX_COLUMNS.filter(
+        (column) => !presentColumns.has(column)
+      ),
+    };
+  } finally {
+    client.release();
+  }
+}
+
 /**
  * Check all required services for readiness.
  */
@@ -118,65 +161,126 @@ if (shouldRunBootTasks) {
   auditBuffer.start();
 }
 
-if (shouldRunSingletonTasks) {
-  // ── Singleton tasks (only worker 1 in cluster mode) ──
+let singletonBootScheduled = false;
 
+function runSingletonBootTasks(): void {
   // Check service readiness before starting dependent tasks
-  checkServicesReady().then((services) => {
-    if (SKIP_BOOT_WARMUP) {
-      console.log('[Boot] SKIP_BOOT_WARMUP=true, skipping warmups for fast dev start');
-    }
-
-    // Start DB-dependent tasks only if DB is ready
-    if (services.db) {
-      // Start the analysis worker on server boot (idempotent)
-      startWorker();
-
-      if (!SKIP_BOOT_WARMUP) {
-        // Warm up export cache (pre-generate top 5 recent report exports)
-        warmupExportCache()
-          .then((s) =>
-            console.log(
-              `[Boot] Export cache: ${s.status}${s.cached ? ` (${s.cached} exports)` : ''}${s.reason ? ` — ${s.reason}` : ''}`
-            )
-          )
-          .catch((err) => console.warn('[Boot] Export cache: failed:', (err as Error).message));
-      }
-    } else {
-      console.log('[Boot] DB unavailable, deferring analysis worker');
-    }
-
-    // Start Redis-dependent tasks only if Redis is ready
-    if (services.redis) {
-      if (!SKIP_BOOT_WARMUP) {
-        // Warm up template cache (Priority #10: pre-load all 10 templates on startup)
-        warmupTemplateCache()
-          .then(() => console.log('[Boot] Template cache: warmed'))
-          .catch((err) => console.warn('[Boot] Template cache: failed:', (err as Error).message));
-
-        // Warm up LLM cache (pre-cache 5 common legal queries)
-        warmupLLMCache()
-          .then((s) =>
-            console.log(
-              `[Boot] LLM cache: ${s.status}${s.cached ? ` (${s.cached}/${s.total})` : ''}${s.reason ? ` — ${s.reason}` : ''}`
-            )
-          )
-          .catch((err) => console.warn('[Boot] LLM cache: failed:', (err as Error).message));
+  checkServicesReady()
+    .then(async (services) => {
+      if (SKIP_BOOT_WARMUP) {
+        console.log('[Boot] SKIP_BOOT_WARMUP=true, skipping warmups for fast dev start');
       }
 
-      // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
-      startIdleScanner();
-    } else {
-      console.log('[Boot] Redis unavailable, skipping cache warmups and idle scanner');
-    }
-  }).catch((err) => {
-    console.warn('[Boot] Service readiness check failed:', (err as Error).message);
-  });
+      // Start DB-dependent tasks only if DB is ready
+      if (services.db) {
+        const { startWorker } = await import('$lib/server/analysis/worker.js');
+
+        checkCodebaseChunkIndexMirror()
+          .then((status) => {
+            if (!status.exists) {
+              console.warn(
+                '[Boot] codebase_chunk_index mirror missing — run drizzle/manual/rag_query_analytics.sql and drizzle/manual/20260419_chunk_index_summary_mirror.sql'
+              );
+              return;
+            }
+
+            if (status.missingColumns.length > 0) {
+              console.warn(
+                `[Boot] codebase_chunk_index mirror incomplete — missing ${status.missingColumns.join(', ')} — run drizzle/manual/20260419_chunk_index_summary_mirror.sql`
+              );
+              return;
+            }
+
+            console.log('[Boot] codebase_chunk_index mirror: verified');
+          })
+          .catch((err) => {
+            console.warn(
+              '[Boot] codebase_chunk_index mirror check failed:',
+              (err as Error).message
+            );
+          });
+
+        // Start the analysis worker on server boot (idempotent)
+        startWorker();
+
+        if (!SKIP_BOOT_WARMUP) {
+          // Warm up export cache (pre-generate top 5 recent report exports)
+          warmupExportCache()
+            .then((s) =>
+              console.log(
+                `[Boot] Export cache: ${s.status}${s.cached ? ` (${s.cached} exports)` : ''}${s.reason ? ` — ${s.reason}` : ''}`
+              )
+            )
+            .catch((err) => console.warn('[Boot] Export cache: failed:', (err as Error).message));
+        }
+      } else {
+        console.log('[Boot] DB unavailable, deferring analysis worker');
+      }
+
+      // Start Redis-dependent tasks only if Redis is ready
+      if (services.redis) {
+        if (!SKIP_BOOT_WARMUP) {
+          // Warm up template cache (Priority #10: pre-load all 10 templates on startup)
+          import('$lib/server/cache/report-template-cache.js')
+            .then(({ warmupTemplateCache }) => warmupTemplateCache())
+            .then(() => console.log('[Boot] Template cache: warmed'))
+            .catch((err) => console.warn('[Boot] Template cache: failed:', (err as Error).message));
+
+          // Warm up LLM cache (pre-cache 5 common legal queries)
+          warmupLLMCache()
+            .then((s) =>
+              console.log(
+                `[Boot] LLM cache: ${s.status}${s.cached ? ` (${s.cached}/${s.total})` : ''}${s.reason ? ` — ${s.reason}` : ''}`
+              )
+            )
+            .catch((err) => console.warn('[Boot] LLM cache: failed:', (err as Error).message));
+        }
+
+        // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
+        import('$lib/server/engagement/idle-reengagement.js')
+          .then(({ startIdleScanner }) => startIdleScanner())
+          .catch((err) =>
+            console.warn('[Boot] Idle scanner failed (non-fatal):', (err as Error).message)
+          );
+      } else {
+        console.log('[Boot] Redis unavailable, skipping cache warmups and idle scanner');
+      }
+    })
+    .catch((err) => {
+      console.warn('[Boot] Service readiness check failed:', (err as Error).message);
+    });
 
   // Start RabbitMQ 7-queue pipeline (XState v5 with auto-reconnect, non-blocking)
-  startRabbitMQPipeline()
-    .then(() => {
+  import('$lib/server/queue/rabbitmq-xstate-integration.js')
+    .then(({ startRabbitMQPipeline }) => startRabbitMQPipeline())
+    .then(async () => {
       console.log('[Boot] RabbitMQ consumers active');
+
+      const [
+        { createDefaultRegistry },
+        { startDocumentEmbedConsumer },
+        { startAudioQueueConsumer },
+      ] = await Promise.all([
+        import('$lib/server/queue/queue-worker.js'),
+        import('$lib/server/workers/document-embed-consumer.js'),
+        import('$lib/server/workers/audio-queue-consumer.js'),
+      ]);
+
+      const queueWorkerRegistry = createDefaultRegistry();
+      queueWorkerRegistry
+        .startAll()
+        .then((stats) => {
+          console.log(
+            `[Boot] Queue workers: ${stats.started}/${stats.started + stats.failed} started`
+          );
+          if (stats.errors.length > 0) {
+            console.warn('[Boot] Queue worker errors:', stats.errors.join(', '));
+          }
+        })
+        .catch((err) => {
+          console.warn('[Boot] Queue workers failed (non-fatal):', (err as Error).message);
+        });
+
       // Start additional consumers after RabbitMQ is fully initialized
       startDocumentEmbedConsumer()
         .then(() => console.log('[Boot] Document embed consumer active'))
@@ -194,25 +298,13 @@ if (shouldRunSingletonTasks) {
     });
 
   // Initialize Qdrant collections (Priority #2: auto-create missing collections)
-  initializeQdrant()
+  import('$lib/server/startup/qdrant-init.js')
+    .then(({ initializeQdrant }) => initializeQdrant())
     .then(() => {
       console.log('[Boot] Qdrant collections verified');
     })
     .catch((err) => {
       console.warn('[Boot] Qdrant initialization failed (non-fatal):', (err as Error).message);
-    });
-
-  // Start typed queue-worker consumers (entity extraction, embedding, analytics, etc.)
-  createDefaultRegistry()
-    .startAll()
-    .then((stats) => {
-      console.log(`[Boot] Queue workers: ${stats.started}/${stats.started + stats.failed} started`);
-      if (stats.errors.length > 0) {
-        console.warn('[Boot] Queue worker errors:', stats.errors.join(', '));
-      }
-    })
-    .catch((err) => {
-      console.warn('[Boot] Queue workers failed (non-fatal):', (err as Error).message);
     });
 
   // Warm the primary chat model so the first contextual request avoids cold-load penalty.
@@ -234,7 +326,9 @@ if (shouldRunSingletonTasks) {
   import('$lib/server/gpu/background-analyzer.js')
     .then(({ warmupGpuCache }) => warmupGpuCache(5))
     .then((s) =>
-      console.log(`[Boot] GPU cache warmup: ${s.warmed} warmed, ${s.skipped} cached, ${s.errors} errors`)
+      console.log(
+        `[Boot] GPU cache warmup: ${s.warmed} warmed, ${s.skipped} cached, ${s.errors} errors`
+      )
     )
     .catch((err) => console.warn('[Boot] GPU cache warmup: failed:', (err as Error).message));
 
@@ -242,7 +336,9 @@ if (shouldRunSingletonTasks) {
   import('$lib/server/observability/inference-log.js')
     .then(({ startInferenceLogCleanup }) => {
       startInferenceLogCleanup();
-      console.log('[Boot] CouchDB inference_log cleanup: scheduled (7-day retention, 6hr interval)');
+      console.log(
+        '[Boot] CouchDB inference_log cleanup: scheduled (7-day retention, 6hr interval)'
+      );
     })
     .catch((err) => console.warn('[Boot] Inference log cleanup: failed:', (err as Error).message));
 
@@ -263,17 +359,38 @@ if (shouldRunSingletonTasks) {
   // ── Infrastructure Diagnostic ─────────────────────────────────────────
   const dbUrl = ENV.DATABASE_URL || process.env.DATABASE_URL || '(not set)';
   const dbHost = dbUrl.match(/@([^:/]+):?(\d+)?/);
-  console.log(`[Boot] DB: ${dbHost ? dbHost[1] + ':' + (dbHost[2] || '5432') : dbUrl.slice(0, 40)}`);
-  console.log(`[Boot] Bifrost: ${ENV.BIFROST_ENABLED ? 'ENABLED → ' + ENV.BIFROST_URL : 'disabled'}`);
+  console.log(
+    `[Boot] DB: ${dbHost ? dbHost[1] + ':' + (dbHost[2] || '5432') : dbUrl.slice(0, 40)}`
+  );
+  console.log(
+    `[Boot] Bifrost: ${ENV.BIFROST_ENABLED ? 'ENABLED → ' + ENV.BIFROST_URL : 'disabled'}`
+  );
   console.log(`[Boot] OpenAI-compat: ${ENV.OPENAI_BASE_URL}`);
-  console.log(`[Boot] Langfuse: ${ENV.LANGFUSE_ENABLED ? 'ENABLED → ' + ENV.LANGFUSE_HOST : 'disabled'}`);
+  console.log(
+    `[Boot] Langfuse: ${ENV.LANGFUSE_ENABLED ? 'ENABLED → ' + ENV.LANGFUSE_HOST : 'disabled'}`
+  );
   // Quick Bifrost reachability check (non-blocking)
   if (ENV.BIFROST_ENABLED) {
     fetch(`${ENV.BIFROST_URL}/health`, { signal: AbortSignal.timeout(3000) })
-      .then(r => r.json())
-      .then(d => console.log(`[Boot] Bifrost health: ${(d as { status?: string }).status || 'unknown'}`))
+      .then((r) => r.json())
+      .then((d) =>
+        console.log(`[Boot] Bifrost health: ${(d as { status?: string }).status || 'unknown'}`)
+      )
       .catch(() => console.warn('[Boot] Bifrost: unreachable'));
   }
+}
+
+function scheduleSingletonBootTasks(): void {
+  if (singletonBootScheduled) return;
+  singletonBootScheduled = true;
+
+  setTimeout(() => {
+    runSingletonBootTasks();
+  }, 0);
+}
+
+if (shouldRunSingletonTasks) {
+  scheduleSingletonBootTasks();
 }
 
 type WarmupStatus = {
@@ -678,7 +795,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api/contextual/') ||
     event.url.pathname.startsWith('/api/synthesis/') ||
     event.url.pathname.startsWith('/api/error-brain/diagnose') ||
-    event.url.pathname.startsWith('/api/evidence/upload');
+    event.url.pathname.startsWith('/api/evidence/upload') ||
+    event.url.pathname.startsWith('/api/codebase-index/');
 
   if (isStreamRoute) {
     // No timeout for SSE / streaming routes

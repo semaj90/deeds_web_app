@@ -148,7 +148,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // Fast path: try direct Ollama VLM first (works when VRAM is free)
     try {
       const ollamaUrl = ENV.OLLAMA_BASE_URL;
-      const vlmModel = ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M';
+      const vlmModel = ENV.OLLAMA_VLM_MODEL ?? 'gemma4:e4b-it-q4_K_M';
       const ollamaRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

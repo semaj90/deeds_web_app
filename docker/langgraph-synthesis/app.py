@@ -58,7 +58,7 @@ NEO4J_URI          = os.environ.get("NEO4J_URI",        "bolt://neo4j:7687")
 NEO4J_USER         = os.environ.get("NEO4J_USER",       "neo4j")
 NEO4J_PASSWORD     = os.environ.get("NEO4J_PASSWORD",   "password")
 SEARXNG_URL        = os.environ.get("SEARXNG_URL",      "http://searxng:8080")
-LLM_MODEL          = os.environ.get("LLM_MODEL",        "gemma4-legal:latest")
+LLM_MODEL          = os.environ.get("LLM_MODEL",        "gemma4-legal-vlm:latest")
 EMBED_MODEL        = os.environ.get("EMBED_MODEL",      "embeddinggemma:latest")
 REPO_ROOT          = os.environ.get("REPO_ROOT",        "/workspace/repo")
 CONFIDENCE_THRESHOLD = float(os.environ.get("CONFIDENCE_THRESHOLD", "0.65"))
@@ -1132,14 +1132,17 @@ async def health() -> dict:
         except Exception as exc:
             checks[name] = f"error: {exc}"
 
-    qdrant = await get_qdrant()
-    redis  = await get_redis()
+    try:
+        qdrant = await get_qdrant()
+        await ping("qdrant", qdrant.get_collections())
+    except Exception as exc:
+        checks["qdrant"] = f"error: {exc}"
 
-    await asyncio.gather(
-        ping("qdrant",  qdrant.get_collections()),
-        ping("redis",   redis.ping()),
-        return_exceptions=True,
-    )
+    try:
+        redis = await get_redis()
+        await ping("redis", redis.ping())
+    except Exception as exc:
+        checks["redis"] = f"error: {exc}"
 
     try:
         async with httpx.AsyncClient(timeout=4) as c:
@@ -1156,7 +1159,10 @@ async def health() -> dict:
     except Exception:
         checks["bifrost"] = "unavailable"
 
-    checks["rg_available"] = subprocess.run(["rg", "--version"], capture_output=True).returncode == 0
+    try:
+        checks["rg_available"] = subprocess.run(["rg", "--version"], capture_output=True).returncode == 0
+    except FileNotFoundError:
+        checks["rg_available"] = False
     checks["status"] = "ok" if all(
         v in ("ok", True) for k, v in checks.items()
         if k in ("qdrant", "redis", "ollama", "gpu")

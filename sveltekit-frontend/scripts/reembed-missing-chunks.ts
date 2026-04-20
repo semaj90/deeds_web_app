@@ -27,7 +27,7 @@ const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:12345
 const OLLAMA_BASE_URL = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434').replace(/\/$/, '');
 const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://localhost:6333').replace(/\/$/, '');
 const EMBED_MODEL = process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest';
-const QDRANT_COLLECTION = 'legal_library_chunks';
+const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'legal_documents';
 const DRY_RUN = process.env.DRY_RUN === '1';
 const BATCH_SIZE = 20;
 

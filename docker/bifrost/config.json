@@ -39,12 +39,14 @@
           "name": "ollama-key",
           "value": "dummy",
           "models": [
+            "gemma4-legal-vlm:latest",
+            "gemma4-legal-fast:latest",
             "gemma4-legal:latest",
-            "gemma4-legal-fast",
+            "gemma4:e4b-it-q4_K_M",
             "embeddinggemma:latest",
-            "gemma3:latest",
             "nomic-embed-text:latest",
-            "gemma3:270m"
+            "gemma3:270m",
+            "ibm/granite-docling:258m"
           ],
           "weight": 1.0,
           "ollama_key_config": {

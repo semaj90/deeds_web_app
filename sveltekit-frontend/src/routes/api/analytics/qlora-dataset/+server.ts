@@ -50,6 +50,7 @@ interface AlpacaExample {
     quality_tier: string;
     avg_rerank_score: number | null;
     gpu_clusters: number[];
+    som_clusters: number[];
     pipeline_hits: Record<string, number>;
     created_at: string;
   };
@@ -63,6 +64,7 @@ function toAlpacaFormat(row: {
   quality_tier: string;
   avg_rerank_score: number | null;
   gpu_clusters: unknown;
+  som_clusters: unknown;
   pipeline_hits: unknown;
   created_at: string;
 }): AlpacaExample {
@@ -87,6 +89,7 @@ function toAlpacaFormat(row: {
     .join('\n');
 
   const clusters = Array.isArray(row.gpu_clusters) ? (row.gpu_clusters as number[]) : [];
+  const somClusters = Array.isArray(row.som_clusters) ? (row.som_clusters as number[]) : [];
 
   const hits =
     typeof row.pipeline_hits === 'object' && row.pipeline_hits !== null
@@ -101,6 +104,7 @@ function toAlpacaFormat(row: {
       quality_tier: row.quality_tier,
       avg_rerank_score: row.avg_rerank_score,
       gpu_clusters: clusters,
+      som_clusters: somClusters,
       pipeline_hits: hits,
       created_at: row.created_at,
     },
@@ -175,11 +179,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           chunk_id: string;
           relative_path: string;
           gpu_cluster: number | null;
+          som_cluster: number | null;
           pipeline: string;
           score: number;
           rerank_score: number | null;
         }>(
-          `SELECT chunk_id, relative_path, gpu_cluster, pipeline,
+          `SELECT chunk_id, relative_path, gpu_cluster, som_cluster, pipeline,
 				        score, rerank_score
 				 FROM   chunk_hit_log
 				 WHERE  query_hash = $1
@@ -192,6 +197,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             chunk_id: string;
             relative_path: string;
             gpu_cluster: number | null;
+            som_cluster: number | null;
             pipeline: string;
             score: number;
             rerank_score: number | null;
@@ -209,8 +215,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const topCluster = hits.find((h) => h.gpu_cluster != null)?.gpu_cluster;
       let graphSummary: string | null = null;
       if (topCluster != null) {
-        const clusterDoc = await generateClusterSummary(topCluster).catch(() => null);
-        graphSummary = clusterDoc?.summary ?? clusterDoc?.purpose ?? null;
+        const csResult = await generateClusterSummary(topCluster).catch(() => ({ ok: false as const, reason: 'exception' }));
+        if (csResult.ok) graphSummary = csResult.summary.summary ?? csResult.summary.purpose ?? null;
       }
 
       // 4. Fetch LLM response from inference_log (CouchDB) — best-effort
@@ -258,6 +264,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const clusterIds = [
         ...new Set(hits.map((h) => h.gpu_cluster).filter((c): c is number => c != null)),
       ];
+      const somClusterIds = [
+        ...new Set(hits.map((h) => h.som_cluster).filter((c): c is number => c != null)),
+      ];
       const pipelineHits = hits.reduce<Record<string, number>>((acc, h) => {
         acc[h.pipeline] = (acc[h.pipeline] ?? 0) + 1;
         return acc;
@@ -281,11 +290,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       await pool.query(
         `INSERT INTO qlora_examples
 				   (query, query_hash, instruction, context_chunks, graph_summary,
-				    response, response_score, pipeline_hits, gpu_clusters, avg_rerank_score,
+				    response, response_score, pipeline_hits, gpu_clusters, som_clusters, avg_rerank_score,
 				    entity_tags, quality_tier, model_version, dataset_split)
 				 VALUES
-				   ($1, $2, $3, $4::jsonb, $5, $6, $7, $8::jsonb, $9::jsonb, $10,
-				    $11::jsonb, $12, $13, $14)
+				   ($1, $2, $3, $4::jsonb, $5, $6, $7, $8::jsonb, $9::jsonb, $10::jsonb, $11,
+				    $12::jsonb, $13, $14, $15)
 				 ON CONFLICT DO NOTHING`,
         [
           row.query,
@@ -297,6 +306,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           avgRerank, // response_score
           JSON.stringify(pipelineHits), // pipeline_hits
           JSON.stringify(clusterIds), // gpu_clusters
+          JSON.stringify(somClusterIds), // som_clusters
           avgRerank, // avg_rerank_score
           JSON.stringify([
             ...((row.entity_statutes as string[]) ?? []),
@@ -355,11 +365,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         quality_tier: string;
         avg_rerank_score: number | null;
         gpu_clusters: unknown;
+        som_clusters: unknown;
         pipeline_hits: unknown;
         created_at: string;
       }>(
         `SELECT instruction, context_chunks, graph_summary, response,
-			        quality_tier, avg_rerank_score, gpu_clusters, pipeline_hits,
+			        quality_tier, avg_rerank_score, gpu_clusters, som_clusters, pipeline_hits,
 			        created_at::text
 			 FROM   qlora_examples
 			 WHERE  dataset_split = $1
@@ -375,6 +386,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
           quality_tier: string;
           avg_rerank_score: number | null;
           gpu_clusters: unknown;
+          som_clusters: unknown;
           pipeline_hits: unknown;
           created_at: string;
         }>,

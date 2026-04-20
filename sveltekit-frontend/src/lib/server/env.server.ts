@@ -6,7 +6,7 @@ const DEV = {
   DATABASE_URL: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
   REDIS_URL: 'redis://localhost:6379',
   QDRANT_URL: 'http://localhost:6333',
-  RABBITMQ_URL: 'amqp://guest:guest@localhost:5672',
+  RABBITMQ_URL: 'amqp://legal_admin:secret123@localhost:5672',
   OLLAMA_URL: 'http://localhost:11434',
   TRITON_URL: 'http://localhost:8000',
   TRITON_VLM_MODEL: 'gemma_vlm_ensemble',
@@ -36,14 +36,16 @@ export const ENV = {
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
   RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? DEV.RABBITMQ_URL,
   OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
-  /** Legal reasoning / chat model (fine-tuned Gemma 4 for legal text) */
-  OLLAMA_CHAT_MODEL: privateEnv.OLLAMA_CHAT_MODEL ?? privateEnv.OLLAMA_MODEL ?? 'gemma4-legal:latest',
-  /** Vision-language model for image/document understanding (base Gemma 4 with vision) */
-  OLLAMA_VLM_MODEL: privateEnv.OLLAMA_VLM_MODEL ?? privateEnv.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
+  /** Legal reasoning / chat / tool-calling model (unified GRPO legal + VLM, 5.3GB) */
+  OLLAMA_CHAT_MODEL:
+    privateEnv.OLLAMA_CHAT_MODEL ?? privateEnv.OLLAMA_MODEL ?? 'gemma4-legal-vlm:latest',
+  /** Vision-language model for image/document understanding (same unified model) */
+  OLLAMA_VLM_MODEL:
+    privateEnv.OLLAMA_VLM_MODEL ?? privateEnv.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest',
   /** Embedding model (768-dim, primary) */
   OLLAMA_EMBED_MODEL: privateEnv.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
-  /** Gemma 4 E4B model tag for tool-calling / complex reasoning (131K ctx, native thinking) */
-  GEMMA4_MODEL: privateEnv.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
+  /** Gemma 4 unified legal+VLM — tool calling + thinking + vision (5.3GB) */
+  GEMMA4_MODEL: privateEnv.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest',
   /** Granite-Docling-258M for layout-aware document extraction (Ollama multimodal) */
   GRANITE_DOCLING_MODEL: privateEnv.GRANITE_DOCLING_MODEL ?? 'ibm/granite-docling:258m',
   GRANITE_DOCLING_ENABLED: (privateEnv.GRANITE_DOCLING_ENABLED ?? 'true') === 'true',
@@ -92,7 +94,7 @@ export const ENV = {
   // CouchDB document store
   COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:password@localhost:5984',
   // Web Search APIs (optional — falls back to curated results)
-  SEARXNG_URL: privateEnv.SEARXNG_URL ?? '', // Free self-hosted: http://localhost:8080 or public instance
+  SEARXNG_URL: privateEnv.SEARXNG_URL ?? 'http://localhost:8888', // Docker: 8888→8080 internal
   GOOGLE_SEARCH_API_KEY: privateEnv.GOOGLE_SEARCH_API_KEY ?? '',
   GOOGLE_SEARCH_CX: privateEnv.GOOGLE_SEARCH_CX ?? '',
   // Obsidian Local REST API (optional — vault sync via obsidian-local-rest-api plugin)
@@ -158,6 +160,9 @@ export const ENV = {
   ORCHESTRATOR_URL: privateEnv.ORCHESTRATOR_URL ?? 'http://localhost:8102',
   // CUDA/GPU compute service (port 8765)
   CUDA_SERVICE_URL: privateEnv.CUDA_SERVICE_URL ?? 'http://localhost:8765',
+  // LangGraph synthesis service (Docker GPU profile, port 8091)
+  LANGGRAPH_URL: privateEnv.LANGGRAPH_URL ?? 'http://localhost:8091',
+  LANGGRAPH_ENABLED: (privateEnv.LANGGRAPH_ENABLED ?? 'false') === 'true',
   // RAG microservice (port 8103)
   RAG_SERVICE_URL: privateEnv.RAG_SERVICE_URL ?? 'http://localhost:8103',
   // Redis host + port (for ioredis explicit config)
@@ -166,8 +171,8 @@ export const ENV = {
   // RabbitMQ management API
   RABBITMQ_MGMT_URL: privateEnv.RABBITMQ_MGMT_URL ?? 'http://localhost:15672',
   RABBITMQ_MGMT_AUTH: (() => {
-    const user = privateEnv.RABBITMQ_MGMT_USER ?? privateEnv.RABBITMQ_USER ?? 'guest';
-    const pass = privateEnv.RABBITMQ_MGMT_PASS ?? privateEnv.RABBITMQ_PASS ?? 'guest';
+    const user = privateEnv.RABBITMQ_MGMT_USER ?? privateEnv.RABBITMQ_USER ?? 'legal_admin';
+    const pass = privateEnv.RABBITMQ_MGMT_PASS ?? privateEnv.RABBITMQ_PASS ?? 'secret123';
     return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
   })(),
   // Node environment

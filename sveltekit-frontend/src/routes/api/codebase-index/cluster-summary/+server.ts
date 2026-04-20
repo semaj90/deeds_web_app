@@ -30,12 +30,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const { clusterId, force } = parsed.data;
 
-	const summary = await generateClusterSummary(clusterId, force);
-	if (!summary) {
-		return json({ error: `No chunks found for cluster ${clusterId}` }, { status: 404 });
+	const result = await generateClusterSummary(clusterId, force);
+	if (result.ok === false) {
+		return json({ error: result.reason }, { status: 404 });
 	}
 
-	return json(summary);
+	return json(result.summary);
 };
 
 /**
@@ -52,10 +52,10 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json({ error: 'clusterId query param required' }, { status: 400 });
 	}
 
-	const summary = await generateClusterSummary(clusterId, false);
-	if (!summary) {
-		return json({ error: `No summary for cluster ${clusterId}` }, { status: 404 });
+	const result = await generateClusterSummary(clusterId, false);
+	if (result.ok === false) {
+		return json({ error: result.reason }, { status: 404 });
 	}
 
-	return json(summary);
+	return json(result.summary);
 };

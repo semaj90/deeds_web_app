@@ -617,20 +617,23 @@ export async function enrichEmbeddingWithQdrantTags(
 ): Promise<string[]> {
   try {
     const { qdrant } = await import('../vector/qdrant-manager.js');
-    // Search two authoritative collections for entity_tags in payload
+    // Search the canon plus contextual legal documents for entity_tags in payload
     const collections = ['legal_documents', 'legal_canon_chunks'];
     const tagSets = await Promise.all(
-      collections.map(col =>
-        qdrant.hybridSearch({
-          query:          '',
-          queryEmbedding: vector,
-          collection:     col,
-          limit:          3,
-          scoreThreshold: 0.65,
-        }).then((res: { results: { payload?: Record<string, unknown> }[] }) =>
-          res.results.flatMap(r => (r.payload?.entity_tags as string[] | undefined) ?? [])
-        ).catch(() => [] as string[]),
-      ),
+      collections.map((col) =>
+        qdrant
+          .hybridSearch({
+            query: '',
+            queryEmbedding: vector,
+            collection: col,
+            limit: 3,
+            scoreThreshold: 0.65,
+          })
+          .then((res: { results: { payload?: Record<string, unknown> }[] }) =>
+            res.results.flatMap((r) => (r.payload?.entity_tags as string[] | undefined) ?? [])
+          )
+          .catch(() => [] as string[])
+      )
     );
     const allTags = [...new Set(tagSets.flat())];
     // Also pull from web:research:idx for the pipeline — these have fresh tags
@@ -646,7 +649,9 @@ export async function enrichEmbeddingWithQdrantTags(
         try {
           const s = JSON.parse(raw) as { entityTags?: string[] };
           allTags.push(...(s.entityTags ?? []));
-        } catch { /* */ }
+        } catch {
+          /* */
+        }
       }
     }
     return [...new Set(allTags)].slice(0, 8);

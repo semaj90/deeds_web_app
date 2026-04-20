@@ -894,7 +894,7 @@ services:
       - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
       - REDIS_URL=redis://redis:6379/1
-      - LLM_MODEL=${LLM_MODEL:-gemma4-legal:latest}
+      - LLM_MODEL=${LLM_MODEL:-gemma4-legal-vlm:latest}
       - EMBED_MODEL=${EMBED_MODEL:-embeddinggemma:latest}
       - LANGFUSE_HOST=http://langfuse-web:3000
       - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.65}

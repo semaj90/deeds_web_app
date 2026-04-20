@@ -68,7 +68,7 @@ const OLLAMA_BASE_URL  = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434
 const QDRANT_URL       = (process.env.QDRANT_URL      ?? 'http://localhost:6333').replace(/\/$/, '');
 const EMBED_MODEL      = process.env.EMBEDDING_MODEL  ?? 'embeddinggemma:latest';
 const MINIO_BUCKET     = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
-const QDRANT_COLLECTION = 'legal_library_chunks';
+const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'legal_documents';
 
 const GOVINFO_BASE     = 'https://api.govinfo.gov';
 const GOVINFO_API_KEY  = process.env.GOVINFO_API_KEY  ?? 'DEMO_KEY';

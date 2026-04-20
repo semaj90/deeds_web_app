@@ -40,7 +40,7 @@ export const QUEUES = {
 
 export async function getConnection(): Promise<AmqpConnection> {
   if (connection) return connection;
-  const rabbitmqUrl = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:123456@localhost:5672';
+  const rabbitmqUrl = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:secret123@localhost:5672';
   console.log('🐰 Connecting to RabbitMQ:', rabbitmqUrl);
   try {
     const amqp = await import('amqplib');

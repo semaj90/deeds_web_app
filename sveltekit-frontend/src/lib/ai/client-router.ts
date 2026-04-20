@@ -239,6 +239,68 @@ export function classifyIntent(message: string): { intent: IntentCategory; score
 	return { intent: best, score: Math.min(bestScore, 1.0) };
 }
 
+// ── Agentic Detection ───────────────────────────────────────────────────
+
+/** Multi-hop / compound patterns that benefit from multi-round tool calling */
+const AGENTIC_PATTERNS = [
+	// Compound requests (do X then Y)
+	'and then ', 'after that ', 'first ', 'then ', 'also ',
+	'additionally ', 'furthermore ', 'next ',
+	// Explicit multi-source
+	'compare .* with', 'cross-reference', 'correlate',
+	'find .* and .* compare', 'search .* and .* analyze',
+	// Deep analysis
+	'investigate', 'deep dive', 'thorough analysis',
+	'comprehensive review', 'full analysis', 'detailed breakdown',
+	// Multi-hop reasoning
+	'what evidence supports', 'trace the', 'follow the chain',
+	'how does .* relate to', 'connection between',
+	// Explicit agentic signals
+	'use tools', 'search and analyze', 'look up and',
+	'gather information', 'research and summarize',
+];
+
+/** Simple regex patterns compiled once */
+const AGENTIC_REGEXES = AGENTIC_PATTERNS.map(p =>
+	p.includes('.*') ? new RegExp(p, 'i') : null
+);
+
+/**
+ * Detect whether a query benefits from multi-round agentic tool calling
+ * rather than single-pass SSE chat. Returns a 0-1 score.
+ */
+export function agenticScore(message: string, conversationDepth: number): number {
+	const lower = message.toLowerCase();
+	let score = 0;
+
+	// Pattern matching
+	for (let i = 0; i < AGENTIC_PATTERNS.length; i++) {
+		const regex = AGENTIC_REGEXES[i];
+		if (regex) {
+			if (regex.test(lower)) score += 0.25;
+		} else if (lower.includes(AGENTIC_PATTERNS[i])) {
+			score += 0.2;
+		}
+	}
+
+	// Question complexity: multiple question marks suggest multi-part
+	const questionMarks = (message.match(/\?/g) || []).length;
+	if (questionMarks >= 2) score += 0.3;
+
+	// Long + legal = likely needs tool orchestration
+	if (message.length > 300 && LEGAL_TERMS.some(t => lower.includes(t))) {
+		score += 0.15;
+	}
+
+	// Deep conversation benefits from memory recall tools
+	if (conversationDepth > 8) score += 0.1;
+
+	return Math.min(score, 1.0);
+}
+
+/** Threshold above which queries route to the agentic endpoint */
+const AGENTIC_THRESHOLD = 0.45;
+
 // ── Router Decision ──────────────────────────────────────────────────────
 
 export interface RouterDecision {
@@ -384,6 +446,18 @@ export function shouldEscalateToServer(
 				intent,
 			};
 		}
+
+		// Agentic detection: multi-hop / compound queries → multi-round tool agent
+		const aScore = agenticScore(message, conversationHistory.length);
+		if (aScore >= AGENTIC_THRESHOLD) {
+			return {
+				source: 'server-agentic',
+				reason: reasonStr + `+agentic(${aScore.toFixed(2)})`,
+				confidence: Math.min(serverScore, 1.0),
+				intent,
+			};
+		}
+
 		return {
 			source: 'server-ollama',
 			reason: reasonStr,
