@@ -54,11 +54,22 @@ CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_neo4j_gpu_cluster
   ON codebase_chunk_index (neo4j_gpu_cluster);
 
 -- ivfflat cosine index for summary_embedding ANN search
--- Note: requires pgvector 0.5+. vector type was already created by
--- 0016_codeintel_schema.sql. We use lists=100 (tune down to 50 if < 50k rows).
-CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_summary_ivfflat
-  ON codebase_chunk_index USING ivfflat (summary_embedding vector_cosine_ops)
-  WITH (lists = 100);
+-- Note: requires pgvector 0.5+. summary_embedding vector(768) is added by
+-- 0016_codeintel_schema.sql. Skipped gracefully if column not yet present.
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'codebase_chunk_index' AND column_name = 'summary_embedding'
+  ) THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_indexes WHERE indexname = 'idx_codebase_chunk_index_summary_ivfflat'
+    ) THEN
+      EXECUTE 'CREATE INDEX idx_codebase_chunk_index_summary_ivfflat
+        ON codebase_chunk_index USING ivfflat (summary_embedding vector_cosine_ops)
+        WITH (lists = 100)';
+    END IF;
+  END IF;
+END $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. enrichment_jobs — durable progress tracking for batch workers
