@@ -71,8 +71,8 @@ Full pipeline: Granite-Docling DocTags → LangExtract sections → Gemma4 VLM r
 ### ~~GAP-9: User Interaction Graph~~ CLOSED (Apr 20, 2026)
 Neo4j seeded from PostgreSQL via `scripts/seed-neo4j.mjs`. Fixed schema mismatch (`citation_text` → `quoted_text` in citations query). Full seed run: **343 cases, 61 evidence, 21 glossary, 0 errors** (10.6s). Final graph: 568 Case nodes, 296 Evidence nodes, 21 GlossaryTerm nodes, BELONGS_TO/RELATED_TO/CHUNK_OF relationships. Script is idempotent (MERGE) — safe to re-run on any machine restart.
 
-### GAP-10: D3 Graph Visualization
-Route exists but may be incomplete. Need D3 force-directed layout with filters. **Effort**: Medium.
+### ~~GAP-10: D3 Graph Visualization~~ CLOSED (Apr 20, 2026)
+New `/admin/case-graph` route with full D3 force-directed layout: nodes for Case/Evidence/Person/GlossaryTerm/Statute, per-label color+radius, label filter chips with counts, title search filter, node click → side panel with properties and deep-link. API: `GET /api/graph/cases?limit=600` queries Neo4j for nodes+edges. Drag-to-pin nodes, zoom/pan, edge type labels. Added "Case Graph" link to `/admin` dashboard.
 
 ### GAP-11: POI Face Recognition
 Schema has `faceEmbedding`. Pipeline designed but not implemented.

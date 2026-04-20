@@ -245,6 +245,7 @@
 		{ href: '/admin/ai-dashboard', label: 'AI Dashboard', icon: 'brain', desc: 'Operator + Lab consoles' },
 		{ href: '/admin/codebase-index', label: 'Codebase Index', icon: 'database', desc: 'Qdrant/Postgres browser' },
 		{ href: '/admin/codebase-graph', label: 'Codebase Graph', icon: 'git-branch', desc: 'Import dependency graph' },
+		{ href: '/admin/case-graph', label: 'Case Graph', icon: 'git-fork', desc: 'D3 case/evidence/person relationships' },
 		{ href: '/admin/error-brain', label: 'Error Brain', icon: 'bug', desc: 'AI error diagnosis' },
 		{ href: '/admin/cache', label: 'Cache Monitor', icon: 'hard-drive', desc: 'Redis + GPU buffers' },
 		{ href: '/admin/topology', label: 'Topology', icon: 'network', desc: 'Interactive dependency view' },

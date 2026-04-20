@@ -115,8 +115,11 @@ export function getEvidenceProcessorEndpoint(): string {
 }
 
 /**
- * Returns the endpoint for the Ingestion Service (Go microservice, port 8091).
- * Prioritizes Docker service name: 'ingestion-service' from environment variables.
+ * Returns the endpoint for the Ingestion Service (Go microservice).
+ * NOTE: Port 8091 is now claimed by LangGraph Synthesis (docker-compose GPU profile).
+ * This function has zero consumers — the Go ingestion service was never built.
+ * Kept for reference; use ENV.LANGGRAPH_URL for port 8091.
+ * @deprecated Zero consumers — port 8091 belongs to LangGraph synthesis service.
  */
 export function getIngestionServiceEndpoint(): string {
     if (typeof process !== 'undefined' && process.env?.INGESTION_SERVICE_URL) {

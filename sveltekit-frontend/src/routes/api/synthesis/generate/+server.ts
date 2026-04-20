@@ -62,6 +62,12 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { db } from '$lib/server/db/client';
 import { synthesisRuns } from '$lib/server/db/schema-postgres.js';
 import { logQuery, logEvent } from '$lib/server/analytics/event-logger.js';
+import {
+  langGraphSynthesize,
+  langGraphSynthesizeStream,
+  parseLangGraphSSE,
+  type LangGraphSynthesizeResponse,
+} from '$lib/server/ai/langgraph-client.js';
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -396,6 +402,121 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
     retryOnLowQuality = true,
   } = body;
 
+  // ── LangGraph streaming fast-path ────────────────────────────────────
+  // Translates LangGraph SSE events → SvelteKit synthesis event format.
+  const lgStream = await langGraphSynthesizeStream({
+    query,
+    case_id: body.caseId ?? null,
+    temperature,
+    max_tokens: maxTokens,
+    skip_cache: false,
+  });
+
+  if (lgStream) {
+    // Pipe LangGraph SSE → SvelteKit SSE with event name translation
+    const transformedStream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        const sendEvent = (event: string, data: unknown) => {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        };
+        controller.enqueue(encoder.encode('retry: 3000\n\n'));
+
+        const reader = lgStream.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullResponse = '';
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
+
+            for (const line of lines) {
+              const evt = parseLangGraphSSE(line);
+              if (!evt) continue;
+
+              switch (evt.stage) {
+                case 'rag':
+                  if (evt.status === 'done') {
+                    sendEvent('context_assembled', {
+                      ragChunks: evt.hits ?? 0, kagNeighbors: 0, persona: null, contextMs: 0,
+                    });
+                  }
+                  break;
+                case 'kag':
+                  if (evt.status === 'done') {
+                    sendEvent('context_assembled', {
+                      ragChunks: evt.hits ?? 0,
+                      kagNeighbors: evt.neighbors ?? 0,
+                      kagSource: evt.kag_source,
+                      webResults: evt.web ?? 0,
+                      contextMs: 0,
+                    });
+                  }
+                  break;
+                case 'llm':
+                  if (evt.token) {
+                    fullResponse += evt.token;
+                    sendEvent('synthesis_chunk', { text: evt.token });
+                  } else if (evt.status === 'running') {
+                    sendEvent('synthesis_started', { model: 'gemma4-legal:latest', maxTokens });
+                  }
+                  break;
+                case 'cache':
+                  sendEvent('context_assembled', {
+                    ragChunks: 0, kagNeighbors: 0, persona: null, contextMs: 0, cache: evt.source,
+                  });
+                  break;
+                case 'done':
+                  sendEvent('synthesis_complete', { fullResponse, tokensUsed: Math.ceil(fullResponse.length / 4) });
+                  sendEvent('complete', {
+                    synthesisId: crypto.randomUUID(),
+                    query,
+                    answer: fullResponse,
+                    citations: evt.citations ?? [],
+                    evaluation: null,
+                    confidence: evt.confidence ?? 0.5,
+                    model: 'gemma4-legal:latest',
+                    tokensUsed: Math.ceil(fullResponse.length / 4),
+                    timing: { contextMs: 0, generateMs: 0, evalMs: 0, totalMs: 0 },
+                    cached: evt.cache !== 'L3-langgraph',
+                    timestamp: new Date().toISOString(),
+                    evaluationUrl: null,
+                    predictedFollowUps: [],
+                    dominantSection: null,
+                    analyticsContextUsed: false,
+                    prefetched: false,
+                    aceSource: evt.cache === 'L1-redis' ? 'cache' : 'fresh',
+                    contextSources: null,
+                  });
+                  break;
+              }
+            }
+          }
+        } catch (err) {
+          sendEvent('error', { message: 'LangGraph stream failed' });
+        } finally {
+          reader.releaseLock();
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(transformedStream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
+    });
+  }
+
+  // ── In-process fallback (LangGraph unavailable) ────────────────────
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
@@ -687,8 +808,66 @@ export const POST: RequestHandler = async (event) => {
       }
     }
 
-    // Stage 2: Publish to RabbitMQ worker — returns immediately with synthesisId
+    // Stage 2: LangGraph Docker service (if enabled + healthy)
+    // Full DAG: web_search + rg_search → retrieve_rag → retrieve_kag → tag_chunks (HMM)
+    //   → assemble_ace → merge → synthesize → self_eval
+    // Falls through to RabbitMQ / in-process if unavailable.
     const synthesisId = crypto.randomUUID();
+    timer.mark('langgraph-check');
+
+    const lgResult = await langGraphSynthesize({
+      query,
+      case_id: body.caseId ?? null,
+      temperature,
+      max_tokens: maxTokens,
+      skip_cache: false,
+    });
+
+    if (lgResult) {
+      timer.mark('langgraph-done');
+      const lgCitations: SynthesisCitation[] = (lgResult.citations ?? []).map((c) => ({
+        id: crypto.randomUUID(),
+        sourceTitle: c.title,
+        quote: c.text,
+      }));
+      const lgConfidence = lgResult.confidence;
+      const lgResponse: SynthesisResponse = {
+        synthesisId,
+        query,
+        answer: lgResult.answer,
+        citations: lgCitations,
+        evaluation: null,
+        confidence: lgConfidence,
+        model: MODEL,
+        tokensUsed: Math.ceil(lgResult.answer.length / 4),
+        timing: {
+          contextMs: 0,
+          generateMs: lgResult.latency_ms,
+          evalMs: 0,
+          totalMs: timer.elapsed(),
+        },
+        cached: lgResult.cache !== 'L3-langgraph',
+        timestamp: new Date().toISOString(),
+        evaluationUrl: null,
+        predictedFollowUps: [],
+        dominantSection: null,
+        analyticsContextUsed: lgResult.kag_neighbors > 0,
+        prefetched: false,
+        aceSource: lgResult.cache === 'L1-redis' ? 'cache' : 'fresh',
+        contextSources: {
+          ragChunks: lgResult.rag_hits,
+          kagNeighbors: lgResult.kag_neighbors,
+          codebaseChunks: lgResult.rg_results,
+          hasEvidence: lgResult.rag_hits > 0,
+          hasGlossary: false,
+          hasCaseContext: !!body.caseId,
+          hasWebSearch: lgResult.web_results > 0,
+        },
+      };
+      console.log(`[synthesis] LangGraph path: ${timer.summary()}`);
+      return json(lgResponse);
+    }
+
     timer.mark('queue-publish');
 
     const published = await rabbitmq.publishSynthesisGenerate({
