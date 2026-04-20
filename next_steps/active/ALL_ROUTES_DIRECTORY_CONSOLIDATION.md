@@ -1,7 +1,8 @@
 # All-Routes Directory Consolidation
 
 ## Date: March 18, 2026
-## Status: ROUTE DIRECTORY COMPLETE — production-readiness audit still partial
+## Status: ROUTE DIRECTORY COMPLETE + DIRECTORY CONSOLIDATION TIER 1-3 DONE (Apr 19, 2026)
+## Apr 19 Update: 14 dead server/lib dirs eliminated, 4 overlapping pairs merged, svelte-check 0 errors. Tiers 4-5 (1-file server/component dirs) remain as medium-priority.
 
 ---
 
@@ -150,9 +151,9 @@ All Phase 1 components from the enhancement plan already exist:
 - [ ] Layer SSR/render verification status onto the route inventory instead of treating presence as proof
 - [ ] Add validation/auth/degraded-shape status columns for high-risk API groups
 - [ ] Mark route groups as inventory-only vs runtime-verified vs production-hardened
-- [ ] **P6-A (blocking)**: Run `drizzle/0013_research_summaries.sql` migration before any research-graph endpoint is usable
-- [ ] **P6-F**: `research-graph` auto-categorised under "analytics" — verify in all-routes page category map
-- [ ] **P6-H**: Rate-limit `POST /api/analytics/research-graph { action: 'rl-step' }` (10 req/user/min) before public exposure
+- [ ] **P6-A (blocking)**: Run `drizzle/0013_research_summaries.sql` migration before any research-graph endpoint is usable (RUNTIME — needs Docker)
+- [x] **P6-F**: `research-graph` auto-categorised under "analytics" — verified: `api-metadata-extractor.ts` line 326 maps "analytics" category, research-graph is sub-route
+- [x] **P6-H**: Rate-limit `POST /api/analytics/research-graph { action: 'rl-step' }` (10 req/user/min) — DONE: Redis token bucket at line 131 of `research-graph/+server.ts`
 
 ### Phase 2: Directory Consolidation UI
 - [x] Add dedicated "Demos" section/tab to the all-routes page (26 demos need showcase) — DONE (Demos panel with grid cards)

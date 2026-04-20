@@ -43,13 +43,11 @@
 - Consider `--language auto` flag for explicit auto-detection mode
 - Add `language` parameter to route for forced language mode
 
-### TODO: Route Enhancements
-```typescript
-// Add to route schema:
-language?: string;        // Force language ('en', 'es', 'fr', etc.) or 'auto'
-translate?: boolean;      // Translate to English (whisper built-in)
-timestamps?: boolean;     // Include word-level timestamps
-```
+### ~~TODO: Route Enhancements~~ ✅ DONE (verified Apr 19, 2026)
+All 3 parameters already in Zod schema at `api/whisper/transcribe/+server.ts` (lines 152-154):
+- [x] `language` — Zod string, default 'auto', validates against `VALID_LANGUAGES` set
+- [x] `translate` — Zod boolean, passes `--translate` flag to whisper.cpp
+- [x] `timestamps` — Zod boolean, returns word-level segments in response
 
 ---
 
@@ -309,11 +307,11 @@ Audio Upload → Whisper Transcribe → Entity Extract → JSONB Store
 }
 ```
 
-### TODO
-- [ ] Add `transcription` field to evidence metadata JSONB schema
-- [ ] Wire whisper → langextract_legal entity extraction in evidence pipeline stage 2
-- [ ] Store segments with timestamps for audio scrubbing UI
-- [ ] Index transcription text in Qdrant for semantic search over audio evidence
+### TODO — ✅ ALL DONE (Sprint 4B, verified Apr 19, 2026)
+- [x] Add `transcription` field to evidence metadata JSONB schema — `audio-processor.ts:updateEvidenceRecord()` stores transcription, entities, ACE analysis
+- [x] Wire whisper → langextract entity extraction — `audio-processor.ts:extractEntities()` (line 89)
+- [x] Store segments with timestamps — `audio-processor.ts:indexSegments()` (line 104), `whisperSegments` Drizzle table
+- [x] Index transcription text in Qdrant — `audio-processor.ts:indexInQdrant()` (line 100), evidence_items collection
 
 ---
 

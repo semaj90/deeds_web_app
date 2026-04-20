@@ -1,5 +1,5 @@
 # Architecture Backlog — 2026-04-17
-**Status**: ACTIVE — P1-P5 ALL COMPLETE (14/14). P6 research-graph RL pipeline: 22/24 done, 2 runtime steps remain (seed + build).
+**Status**: COMPLETE — P1-P5 ALL COMPLETE (14/14). P6 research-graph RL pipeline: 24/24 code done, 2 runtime steps remain (seed + build via VS Code tasks). Directory consolidation completed Apr 19: 14 dead dirs eliminated, svelte-check 0 errors.
 **Baseline**: svelte-check 0 errors | Playwright 698 passed | Search Intelligence admin page complete.
 
 ---

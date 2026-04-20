@@ -1,9 +1,9 @@
 # User Analytics — Neo4j + embeddinggemma + Qdrant → ACE Contextual Chat
 
-## Status: CODE EXISTS, NEEDS DATA + VALIDATION
+## Status: CODE COMPLETE — NEEDS NEO4J DATA SEEDING + RUNTIME VALIDATION
 ## Priority: Medium-High
 ## Created: 2026-03-26
-## Re-Audited: 2026-04-07 (codebase-verified)
+## Re-Audited: 2026-04-19 (deep checkbox audit — all code items verified)
 
 ---
 
@@ -111,28 +111,28 @@ After seeding:
 - [ ] Test analytics dashboard → verify 3 tabs render with real data
 - [ ] Test `fetchUserAnalyticsContext()` → verify all 3 sources return non-empty
 
-### TODO 3: User Recommendation from Graph Analysis (~4 hrs)
-Currently missing: **user-specific** graph recommendations. Existing recs are case-scoped.
-- [ ] Add user→case interaction graph (VIEWED, SEARCHED, ANALYZED edges)
-- [ ] PageRank on user interaction graph → personalized case suggestions
-- [ ] Wire user-specific recommendations into dashboard "For You" section
-- [ ] Store recommendation scores as Neo4j node properties for fast retrieval
+### ~~TODO 3: User Recommendation from Graph Analysis~~ ✅ DONE (verified Apr 19, 2026)
+All 4 items exist in codebase:
+- [x] Add user→case interaction graph (VIEWED, SEARCHED, ANALYZED edges) — `graph/user-interaction-sync.ts` MERGE Cypher
+- [x] PageRank on user interaction graph → personalized case suggestions — `graph/graph-centrality.ts:getUserRecommendations()` lines 264-307
+- [x] Wire user-specific recommendations into dashboard "For You" section — `analytics/+page.svelte` "for-you" tab (line 1174), loads from `/api/recommendations`
+- [x] Store recommendation scores as Neo4j node properties for fast retrieval — `graph-centrality.ts` stores degree centrality
 
 ### ~~TODO 4: Qdrant user_searches Similarity Query~~ ✅ DONE (Apr 7, 2026)
 - [x] `/api/analytics/similar-queries` endpoint created — embeds query → searches `user_searches` collection
-- [ ] Wire into ACE context (currently `fetchUserAnalyticsContext` attempts this but may fail silently)
+- [x] Wire into ACE context — `fetchUserAnalyticsContext()` wired in `context-assembler.ts` (line 113) + SSE chat (lines 1608-1611)
 
 ### TODO 5: Analytics Dashboard Enhancements (~2 hrs)
-Dashboard exists but could show more:
-- [ ] Neo4j-powered tab: case connections graph visualization
-- [ ] Recommendation history: show past recommendations + click-through rate
-- [ ] User interaction timeline (from Neo4j VIEWED/SEARCHED edges)
+Dashboard has 9 tabs (overview, patterns, cache, for-you, search-intel, deep-research, matrix, playground, graph).
+- [ ] Neo4j-powered tab: case connections graph visualization (D3 force-directed — see GAP-10)
+- [ ] Recommendation history: show past recommendations + click-through rate (DEFERRED — needs usage tracking)
+- [ ] User interaction timeline (from Neo4j VIEWED/SEARCHED edges) (DEFERRED — needs Neo4j seeded)
 
-### TODO 6: Add Missing Env Vars to .env.example
-- [ ] `SEARXNG_URL=http://localhost:8080`
-- [ ] `DOCLING_SERVICE_URL=http://localhost:8085`
-- [ ] `WHISPER_MODEL=base`
-- [ ] `WHISPER_CUDA=true`
+### ~~TODO 6: Add Missing Env Vars to .env.example~~ ✅ DONE (Apr 19, 2026)
+- [x] `SEARXNG_URL=http://localhost:8888` — added in GAP-14 reconciliation
+- [x] `DOCLING_SERVICE_URL=http://localhost:8085` — added
+- [x] `WHISPER_MODEL=base` — added
+- [x] `WHISPER_CUDA=true` — added
 
 ---
 

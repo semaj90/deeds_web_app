@@ -1,8 +1,17 @@
 # Gemma 4 E4B Legal — VLM Re-Attachment + TRT-LLM Deployment Plan
 
 **Created**: 2026-04-07
+**Updated**: 2026-04-19
 **GPU**: RTX 3060 Ti (Ampere, SM 8.6, 8GB VRAM)
-**Status**: Planning
+**Status**: UNBLOCKED — upstream PEFT ClippableLinear fix merged (unsloth PR #4807, 2026-04-05)
+
+### Upstream Fix (April 2026)
+- **PR #4807** (rolandtannous): Patches PEFT checkpoint loader for `Gemma4ClippableLinear` submodules
+- **Merged**: ~Apr 5, 2026 — branch deleted, fix in main
+- **Impact**: `merge_and_unload()` now correctly traverses `.linear` submodule of ClippableLinear wrappers
+- **Target modules regex**: `r".*\.audio_tower.*\.(q_proj|v_proj)\.linear"` (per BenjaminBossan)
+- **What this means**: Can now do a clean PEFT merge with vision+audio towers intact — no surgical tensor stripping needed
+- **Action**: Update `unsloth` in Colab notebook (`pip install --upgrade unsloth`) before running VLM re-merge
 
 ---
 
