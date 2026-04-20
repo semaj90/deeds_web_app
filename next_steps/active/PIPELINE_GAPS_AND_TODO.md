@@ -24,15 +24,21 @@ CLIENT (Browser)                    SERVER (SvelteKit + Docker)
 
 ## LangGraph Status
 
-LangGraph is now a live runtime dependency, not just an installed package:
+LangGraph is now a live runtime dependency with **both** in-process TypeScript and Docker service paths:
 
+**In-process (TypeScript `@langchain/langgraph`):**
 - `src/lib/server/agent/supervisor.ts` builds a `StateGraph` supervisor over 5 routed subagents.
 - `src/routes/api/agent/investigate/+server.ts` defaults to supervisor mode and can stream supervisor-node updates over SSE.
 - `src/routes/api/research/concurrent-deep/+server.ts` runs the concurrent research DAG (supervisor → parallel workers → synthesis).
 - `src/lib/server/analytics/research-graph-rl.ts` uses a `StateGraph` loop for Retrieve → Rerank → Generate → Evaluate → Update.
-- `ENV.LANGGRAPH_URL` and `ENV.LANGGRAPH_ENABLED` exist for the external LangGraph service path when that Docker profile is used.
 
-Remaining LangGraph work is operational: env enablement, trace visibility, and runtime validation, not package installation.
+**Docker service (`docker/langgraph-synthesis/app.py` — port 8091):** WIRED (Apr 20, 2026)
+- `LANGGRAPH_ENABLED=true` + `LANGGRAPH_URL=http://localhost:8091` in `.env`
+- Client: `src/lib/server/ai/langgraph-client.ts` — health check, JSON synthesis, SSE streaming, HMM stats/adapt
+- Wired into `/api/synthesis/generate` (JSON + SSE) with automatic fallback to in-process pipeline
+- Unique features: HMM Baum-Welch adaptation, Redis KAG neighbor cache, PyTorch GRPO reward scoring
+- Start: `docker compose --profile gpu up -d langgraph-synthesis`
+- Test: `node scripts/tests/test-langgraph-wiring.mjs`
 
 ---
 
@@ -64,9 +70,8 @@ Full pipeline: Granite-Docling DocTags → LangExtract sections → Gemma4 VLM r
 
 ## P2 — Valuable Gaps (professional features)
 
-### GAP-8: Canonical Legal Document Corpus
-3D Prosecutor roadmap describes `canonical_documents` + `canonical_chunks` + `terms` tables. None exist in Drizzle schema.
-**Fix**: Drizzle schema + ingestion pipeline for FRE rules/federal statutes/SCOTUS chunks. **Effort**: Large.
+### ~~GAP-8: Canonical Legal Document Corpus~~ CLOSED (Apr 20, 2026)
+Tables exist in Drizzle schema (`schema-postgres.ts` lines 3211+) and in DB: 54 docs (24 statute, 18 opinion, 12 rule), 59 chunks, 10 legal_terms. Full ingest pipeline at `GET /api/canon/ingest` (chunk → embed → pgvector + Qdrant `legal_canon_chunks`). Hybrid search at `POST /api/canon/search` (Qdrant dense+BM42 RRF → pgvector fallback). Gap was written before implementation existed.
 
 ### ~~GAP-9: User Interaction Graph~~ CLOSED (Apr 20, 2026)
 Neo4j seeded from PostgreSQL via `scripts/seed-neo4j.mjs`. Fixed schema mismatch (`citation_text` → `quoted_text` in citations query). Full seed run: **343 cases, 61 evidence, 21 glossary, 0 errors** (10.6s). Final graph: 568 Case nodes, 296 Evidence nodes, 21 GlossaryTerm nodes, BELONGS_TO/RELATED_TO/CHUNK_OF relationships. Script is idempotent (MERGE) — safe to re-run on any machine restart.
@@ -91,8 +96,8 @@ Built `services/go-retrieval-service/retrieval-server.exe` (33MB). Health check:
 
 | Gap | Description | Effort |
 |-----|-------------|--------|
-| GAP-12 | HMM Legal Section Tagger (port from Python Viterbi) | Medium |
-| GAP-13 | Redis Rate Limiting (generalized middleware) | Medium |
+| ~~GAP-12~~ CLOSED (Apr 20, 2026) | HMM Legal Section Tagger — Docker LangGraph service (`app.py`) has full HMM Viterbi + Baum-Welch adaptation. Client `langgraph-client.ts` wired into `/api/synthesis/generate` (JSON + SSE) with fallback. `LANGGRAPH_ENABLED=true` in `.env`. | Medium |
+| ~~GAP-13~~ CLOSED (Apr 20, 2026) | Redis Rate Limiting — already fully implemented: `rate-limiter.ts` (tiered hooks middleware: auth 5–10/5min, gpu 15/min, ai 30/min, chat 40/min, generic GET 200/min), `rate-limit.ts` (sliding window ZADD helper + `rateLimitOrRespond()` + presets), `redis-rate-limit.ts` (atomic Lua INCR, in-memory fallback). Wired in hooks.server.ts for all `/api/` routes. | Medium |
 | GAP-14 | ~~.env.example reconciliation~~ CLOSED (Apr 20, 2026) — added `FFMPEG_PATH`, `PYTHON_PATH`, `GEMINI_API_KEY`, `GRAPH_ML_GRPC_*`, `ACE_EMBED_BATCH_TIMEOUT_MS`; added `GRAPH_ML_GRPC_*` to `env.server.ts` + removed `(ENV as any)` casts in `graph-ml-client.ts` | Small |
 | GAP-15 | ~~Obsidian Export UI~~ CLOSED (Apr 20, 2026) — button already live in `/admin/kag-notebook`, calls `/api/codebase-index/kag-notebook` `export-obsidian` action | Small |
 | GAP-16 | ~~CHR97 operator stats + route-level observability~~ CLOSED (Apr 20, 2026) — added `traceCartridge()` to `langfuse.ts`; wired into `/api/cartridge/export` (cache-hit + build traces) and `/api/cartridge/search` (tensor search trace); added CHR97 Cartridge section to `/admin/cache` dashboard (live stats + invalidate button) | Small |
