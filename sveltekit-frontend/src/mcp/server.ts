@@ -1138,6 +1138,216 @@ function setupToolHandlers() {
           required: [],
         },
       },
+      // ─────────────────────────────────────────────────────────────────────
+      // CodeIntel — cluster summaries, chunk lookup, job status
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'codeintel.health',
+        description:
+          'Check CodeIntel pipeline health (cluster_summaries + chunk index + gRPC reachability).',
+        inputSchema: { type: 'object', properties: {} },
+      },
+      {
+        name: 'cluster.summary.get',
+        description:
+          'Fetch the LLM-generated summary for a GPU cluster (purpose, patterns, warnings, tags).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            gpuCluster: { type: 'number', description: 'GPU cluster index (0-19)' },
+            repoId: {
+              type: 'string',
+              description: 'Repository ID (default: "default")',
+              default: 'default',
+            },
+          },
+          required: ['gpuCluster'],
+        },
+      },
+      {
+        name: 'cluster.summary.refresh',
+        description:
+          'Re-run LLM summarization for a cluster and store the new embedding. Use force=true to bypass cache.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            gpuCluster: { type: 'number', description: 'GPU cluster index (0-19)' },
+            repoId: { type: 'string', description: 'Repository ID', default: 'default' },
+            force: { type: 'boolean', description: 'Bypass Redis cache', default: true },
+          },
+          required: ['gpuCluster'],
+        },
+      },
+      {
+        name: 'chunk.lookup',
+        description:
+          'Look up a single codebase chunk by its Qdrant ID. Returns path, kind, domain, cluster, semantic tags.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            chunkId: { type: 'string', description: 'Qdrant chunk ID (UUID)' },
+            repoId: { type: 'string', description: 'Repository ID', default: 'default' },
+          },
+          required: ['chunkId'],
+        },
+      },
+      {
+        name: 'codeintel.fix_recommend',
+        description:
+          'Given a TypeScript/SvelteKit compiler error or runtime exception, retrieves semantically similar codebase chunks from the 16,626-row enriched index, fetches the GPU cluster narrative, and calls Gemma4 to return 1-6 concrete fix recommendations with reference files. Use this for any error-fixing workflow targeting this codebase.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            error: {
+              type: 'string',
+              description:
+                'The full error message or compiler diagnostic (TS code, message, stack)',
+            },
+            filePath: {
+              type: 'string',
+              description: 'File path where the error occurred (optional but improves accuracy)',
+            },
+            line: {
+              type: 'number',
+              description: 'Line number of the error (optional)',
+            },
+            codeSnippet: {
+              type: 'string',
+              description: 'Up to 800 chars of surrounding code for context (optional)',
+            },
+            framework: {
+              type: 'string',
+              description:
+                'Framework hint: "svelte5", "sveltekit", "drizzle", "bits-ui", etc. (optional)',
+            },
+            topK: {
+              type: 'number',
+              description: 'Number of fix recommendations to return (1-6, default 3)',
+              default: 3,
+            },
+            includeClusterSummary: {
+              type: 'boolean',
+              description:
+                'Include the GPU cluster narrative (purpose, patterns, warnings) in context (default true)',
+              default: true,
+            },
+          },
+          required: ['error'],
+        },
+      },
+      {
+        name: 'codeintel.ace.context',
+        description:
+          'Assemble a normalized ACE CodeIntel context bundle from cluster summaries, chunk metadata, and health stats. Returns structured JSON ready for Gemma4 prompting or Claude Code fix recommendations. Specify clusterIds and/or chunkIds to focus context, or omit for a broad overview.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'What you are trying to understand or fix — drives context selection',
+            },
+            repoId: {
+              type: 'string',
+              description: 'Repository ID (default: "default")',
+              default: 'default',
+            },
+            clusterIds: {
+              type: 'array',
+              items: { type: 'number' },
+              description: 'Optional list of GPU cluster IDs to include (0-19)',
+            },
+            chunkIds: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Optional list of Qdrant chunk IDs or relative file paths',
+            },
+            limit: {
+              type: 'number',
+              description: 'Max cluster summaries to include (default 20)',
+              default: 20,
+            },
+          },
+          required: ['query'],
+        },
+      },
+
+      // ── Graph Indexing ────────────────────────────────────────────────────
+      {
+        name: 'graph.index',
+        description:
+          'Trigger graph indexing pipeline: Neo4j sync → SOM topology training → GPU graph analysis. ' +
+          'Chains up to 3 stages in order. Run after codebase indexing to update all graph representations.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            steps: {
+              type: 'array',
+              items: { type: 'string', enum: ['sync', 'som', 'analyze'] },
+              description: 'Which steps to run (default: all three in order)',
+              default: ['sync', 'som', 'analyze'],
+            },
+            caseId: {
+              type: 'string',
+              description: 'Optional case UUID to scope Neo4j sync (omit for full sync)',
+            },
+            somMaxFiles: {
+              type: 'number',
+              description: 'Max files for SOM topology training (default 2000)',
+              default: 2000,
+            },
+          },
+        },
+      },
+      {
+        name: 'graph.status',
+        description:
+          'Report current graph indexing health: cluster count, chunk count, embedding coverage, Neo4j reachability.',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+
+      // ── ACE Wiki ──────────────────────────────────────────────────────────
+      {
+        name: 'ace.wiki',
+        description:
+          'Generate a structured wiki-style article about a query from ACE codebase context. ' +
+          'Returns title, summary, 3-5 sections, related files, and related clusters. ' +
+          'Falls back to heuristic content from cluster summaries when LLM is unavailable.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description:
+                'What to generate a wiki article about (e.g. "authentication flow", "evidence pipeline")',
+            },
+            repoId: {
+              type: 'string',
+              description: 'Repository ID (default: "default")',
+              default: 'default',
+            },
+            clusterIds: {
+              type: 'array',
+              items: { type: 'number' },
+              description: 'Focus on specific GPU cluster IDs (omit for broad search)',
+            },
+            maxWords: {
+              type: 'number',
+              description: 'Approximate max article body word count (default 600)',
+              default: 600,
+            },
+            task: {
+              type: 'string',
+              enum: ['explain', 'troubleshoot', 'overview', 'deep-dive'],
+              description: 'Article style (default: explain)',
+              default: 'explain',
+            },
+          },
+          required: ['query'],
+        },
+      },
     ],
   }));
 
@@ -2599,6 +2809,357 @@ function setupToolHandlers() {
             },
           ],
         };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // CodeIntel — cluster summaries, chunk lookup, job status
+      // ─────────────────────────────────────────────────────────────────────
+      case 'codeintel.health': {
+        const { getClusterSummary } = await import('../lib/server/grpc/codeintel-client.js');
+        // Quick probe: fetch cluster 0
+        const c = await getClusterSummary('default', 0);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({ ok: c !== null, clusterZeroFound: c !== null }),
+            },
+          ],
+        };
+      }
+
+      case 'cluster.summary.get': {
+        const { gpuCluster, repoId } = args as { gpuCluster: number; repoId?: string };
+        const { getClusterSummary } = await import('../lib/server/grpc/codeintel-client.js');
+        const cluster = await getClusterSummary(repoId ?? 'default', gpuCluster);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({ cluster, error: cluster ? null : 'not found' }),
+            },
+          ],
+        };
+      }
+
+      case 'cluster.summary.refresh': {
+        const { gpuCluster, repoId, force } = args as {
+          gpuCluster: number;
+          repoId?: string;
+          force?: boolean;
+        };
+        const { refreshClusterSummary } = await import('../lib/server/grpc/codeintel-client.js');
+        const result = await refreshClusterSummary(repoId ?? 'default', gpuCluster, force ?? true);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+        };
+      }
+
+      case 'chunk.lookup': {
+        const { chunkId, repoId } = args as { chunkId: string; repoId?: string };
+        const { lookupChunk } = await import('../lib/server/grpc/codeintel-client.js');
+        const chunk = await lookupChunk(repoId ?? 'default', chunkId);
+        return {
+          content: [
+            { type: 'text', text: JSON.stringify({ chunk, error: chunk ? null : 'not found' }) },
+          ],
+        };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // CodeIntel Fix Recommender — ACE + enriched codebase index + Gemma4
+      // ─────────────────────────────────────────────────────────────────────
+      case 'codeintel.fix_recommend': {
+        const {
+          error: errMsg,
+          filePath,
+          line,
+          codeSnippet,
+          framework,
+          topK,
+          includeClusterSummary,
+        } = args as {
+          error: string;
+          filePath?: string;
+          line?: number;
+          codeSnippet?: string;
+          framework?: string;
+          topK?: number;
+          includeClusterSummary?: boolean;
+        };
+
+        if (!errMsg || typeof errMsg !== 'string') {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  ok: false,
+                  error: 'error field is required',
+                  recommendations: [],
+                }),
+              },
+            ],
+          };
+        }
+
+        const { getFixRecommendations } = await import(
+          '../lib/server/codeintel/fix-recommender.js'
+        );
+        const result = await getFixRecommendations({
+          error: errMsg,
+          filePath,
+          line,
+          codeSnippet,
+          framework,
+          topK: topK ?? 3,
+          includeClusterSummary: includeClusterSummary !== false,
+        });
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+        };
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // ACE CodeIntel context assembly — cluster + chunk + health bundle
+      // ─────────────────────────────────────────────────────────────────────
+      case 'codeintel.ace.context': {
+        const { query, repoId, clusterIds, chunkIds, limit } = args as {
+          query: string;
+          repoId?: string;
+          clusterIds?: number[];
+          chunkIds?: string[];
+          limit?: number;
+        };
+
+        if (!query || typeof query !== 'string') {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  query: '',
+                  repoId: 'default',
+                  clusterContext: [],
+                  chunkContext: [],
+                  health: { ok: false, chunkCount: 0, clusterCount: 0, embeddingCoverage: null },
+                  degraded: true,
+                  errors: ['query field is required'],
+                }),
+              },
+            ],
+          };
+        }
+
+        const { assembleAceContext } = await import('../lib/server/ace/codeintel-datastore.js');
+        const context = await assembleAceContext(query, {
+          repoId: repoId ?? 'default',
+          clusterIds: Array.isArray(clusterIds) && clusterIds.length ? clusterIds : undefined,
+          chunkIds: Array.isArray(chunkIds) && chunkIds.length ? chunkIds : undefined,
+          limit: limit ?? 20,
+        });
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify(context) }],
+        };
+      }
+
+      // ── Graph Indexing ────────────────────────────────────────────────────
+      case 'graph.index': {
+        // graph.index is a JOB TRIGGER — it fires the pipeline and returns immediately.
+        // Use graph.status to poll progress. Never blocks on the full chain.
+        const VALID_STAGES = ['sync', 'som', 'analyze'] as const;
+        const requestedStages: string[] = Array.isArray(args.steps)
+          ? (args.steps as string[]).filter((s) =>
+              VALID_STAGES.includes(s as (typeof VALID_STAGES)[number])
+            )
+          : ['sync', 'som', 'analyze'];
+        const caseId = args.caseId ? String(args.caseId) : undefined;
+
+        const { withMcpLog } = await import('../lib/server/mcp/mcp-logger.js');
+
+        const indexResult = await withMcpLog('graph.index', args, async () => {
+          // Validate UUID if provided
+          const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          if (caseId && !UUID_RE.test(caseId)) {
+            return {
+              ok: false,
+              jobId: null,
+              accepted: false,
+              requestedStages,
+              degraded: false,
+              error: 'caseId must be a valid UUID',
+            };
+          }
+
+          // Generate a job ID and start the pipeline fire-and-forget
+          const jobId = crypto.randomUUID();
+          const somMaxFiles = Math.min(5000, Math.max(1, Number(args.somMaxFiles ?? 2000)));
+
+          // Fire-and-forget — errors are logged but do not fail the trigger response
+          (async () => {
+            try {
+              if (requestedStages.includes('sync')) {
+                const { syncCaseToGraph, syncAllCasesToGraph } = await import(
+                  '../lib/server/graph/pg-neo4j-sync.js'
+                );
+                if (caseId) await syncCaseToGraph(caseId);
+                else await syncAllCasesToGraph();
+              }
+              if (requestedStages.includes('som')) {
+                const { runSOMTopologyPipeline } = await import(
+                  '../lib/server/graph/som-topology-pipeline.js'
+                );
+                await runSOMTopologyPipeline({ maxFiles: somMaxFiles });
+              }
+              if (requestedStages.includes('analyze')) {
+                const { analyzeGraph } = await import('../lib/server/graph/gpu-graph-analysis.js');
+                await analyzeGraph({
+                  includePageRank: true,
+                  includeCommunities: true,
+                  maxNodes: 500,
+                });
+              }
+              console.log(
+                JSON.stringify({ mcp: true, tool: 'graph.index', jobId, status: 'done' })
+              );
+            } catch (e: unknown) {
+              console.error(
+                JSON.stringify({
+                  mcp: true,
+                  tool: 'graph.index',
+                  jobId,
+                  status: 'failed',
+                  error: e instanceof Error ? e.message : String(e),
+                })
+              );
+            }
+          })();
+
+          return {
+            ok: true,
+            jobId,
+            accepted: true,
+            requestedStages,
+            degraded: false,
+            error: null,
+          };
+        });
+
+        return { content: [{ type: 'text', text: JSON.stringify(indexResult) }] };
+      }
+
+      case 'graph.status': {
+        const { withMcpLog } = await import('../lib/server/mcp/mcp-logger.js');
+
+        const statusResult = await withMcpLog('graph.status', args, async () => {
+          const EMPTY_GRAPH = { chunkCount: 0, clusterCount: 0, nodeCount: 0, edgeCount: 0 };
+
+          // ── Postgres chunk/cluster counts ────────────────────────────────
+          let graph = { ...EMPTY_GRAPH };
+          let pgOk = false;
+          try {
+            const { getCodeIntelHealthForAce } = await import(
+              '../lib/server/ace/codeintel-datastore.js'
+            );
+            const health = await getCodeIntelHealthForAce();
+            graph.chunkCount = health.chunkCount;
+            graph.clusterCount = health.clusterCount;
+            pgOk = health.ok;
+          } catch {
+            /* non-fatal */
+          }
+
+          // ── Neo4j node/edge counts ───────────────────────────────────────
+          try {
+            const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
+            const driver = getNeo4jDriver();
+            const session = driver.session({ database: 'neo4j' });
+            try {
+              const [nodeRes, edgeRes] = await Promise.all([
+                session.run('MATCH (n) RETURN count(n) AS c'),
+                session.run('MATCH ()-[r]->() RETURN count(r) AS c'),
+              ]);
+              graph.nodeCount = (nodeRes.records[0]?.get('c') as { low: number })?.low ?? 0;
+              graph.edgeCount = (edgeRes.records[0]?.get('c') as { low: number })?.low ?? 0;
+            } finally {
+              await session.close();
+            }
+          } catch {
+            /* non-fatal — keep counts as 0 */
+          }
+
+          const degraded = !pgOk;
+          return {
+            ok: !degraded,
+            graph,
+            jobs: [] as Array<{
+              jobId: string;
+              status: string;
+              stage: string | null;
+              updatedAt: string | null;
+            }>,
+            degraded,
+            error: degraded ? 'Codebase index not fully populated.' : null,
+          };
+        });
+
+        return { content: [{ type: 'text', text: JSON.stringify(statusResult) }] };
+      }
+
+      // ── ACE Wiki ──────────────────────────────────────────────────────────
+      case 'ace.wiki': {
+        const {
+          query: wikiQuery,
+          repoId,
+          clusterIds,
+          maxWords,
+          task,
+        } = args as {
+          query: string;
+          repoId?: string;
+          clusterIds?: number[];
+          maxWords?: number;
+          task?: 'explain' | 'troubleshoot' | 'overview' | 'deep-dive';
+        };
+
+        if (!wikiQuery || typeof wikiQuery !== 'string') {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  ok: false,
+                  query: '',
+                  title: null,
+                  summary: null,
+                  sections: [],
+                  relatedFiles: [],
+                  relatedClusters: [],
+                  degraded: true,
+                  errors: ['query field is required'],
+                  latencyMs: 0,
+                }),
+              },
+            ],
+          };
+        }
+
+        const { withMcpLog } = await import('../lib/server/mcp/mcp-logger.js');
+        const { generateAceWiki } = await import('../lib/server/ace/ace-wiki.js');
+
+        const wikiResult = await withMcpLog('ace.wiki', args, () =>
+          generateAceWiki({
+            query: wikiQuery,
+            repoId: repoId ?? 'default',
+            clusterIds: Array.isArray(clusterIds) ? clusterIds : undefined,
+            maxWords: maxWords ?? 600,
+            task: task ?? 'explain',
+          })
+        );
+
+        return { content: [{ type: 'text', text: JSON.stringify(wikiResult) }] };
       }
 
       default:

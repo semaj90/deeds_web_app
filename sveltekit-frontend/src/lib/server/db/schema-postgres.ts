@@ -3886,3 +3886,125 @@ export type NewCourtroomAnimation = typeof courtroomAnimations.$inferInsert;
 export type CourtroomKeyframe = typeof courtroomKeyframes.$inferSelect;
 export type NewCourtroomKeyframe = typeof courtroomKeyframes.$inferInsert;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Code-intel tables (codebase_chunk_index, cluster_summaries, enrichment_jobs)
+// These mirror the GPU-enriched codebase index built by the indexer pipeline.
+// NOTE: content_embedding uses halfvec(768) in the DB — modelled as text here
+//       so Drizzle can read/write rows; do NOT use Drizzle for HNSW queries on
+//       that column (use raw SQL or Qdrant instead).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** GPU-enriched codebase chunk index — mirrors codebase_chunk_index in Postgres */
+export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	qdrantId: varchar('qdrant_id', { length: 64 }),
+
+	repoId: uuid('repo_id'),
+	relativePath: text('relative_path').notNull(),
+	symbol: varchar('symbol', { length: 255 }),
+	kind: varchar('kind', { length: 50 }),
+	domain: varchar('domain', { length: 50 }),
+	language: varchar('language', { length: 20 }),
+	extension: varchar('extension', { length: 20 }),
+
+	lineStart: integer('line_start'),
+	lineEnd: integer('line_end'),
+	tokenCount: integer('token_count'),
+
+	content: text('content'),
+	contentHash: text('content_hash'),
+	signature: text('summary'), // summary field doubles as chunk signature
+
+	gpuCluster: integer('gpu_cluster'),
+	somCluster: integer('som_cluster'),
+	neo4jGpuCluster: integer('neo4j_gpu_cluster'),
+	communityId: integer('community_id'),
+	pageRankScore: real('page_rank_score'),
+
+	// text[] semantic tags from karpathy-tag enrichment
+	semanticTags: text('semantic_tags').array().notNull().default(sql`'{}'::text[]`),
+	// jsonb tags from heuristic enrichment (older field, array inside JSONB)
+	tags: jsonb('tags').default(sql`'[]'::jsonb`),
+	neo4jMeta: jsonb('neo4j_meta').default(sql`'{}'::jsonb`),
+	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+
+	embeddingModel: varchar('embedding_model', { length: 100 }),
+	summaryModel: varchar('summary_model', { length: 100 }),
+
+	// vector(768) summary embedding — use for cluster/semantic queries
+	summaryEmbedding: vector('summary_embedding', { dimensions: 768 }),
+	signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
+	// NOTE: content_embedding is halfvec(768) — not modelled here, use raw SQL
+
+	indexedAt: timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
+	enrichedAt: timestamp('enriched_at', { withTimezone: true }),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (table) => ({
+	qdrantIdUq: unique('codebase_chunk_index_qdrant_id_key').on(table.qdrantId),
+	repoIdIdx: index('codebase_chunk_index_repo_id_idx').on(table.repoId),
+	gpuClusterIdx: index('codebase_chunk_index_gpu_cluster_idx').on(table.gpuCluster),
+	domainIdx: index('codebase_chunk_index_domain_idx').on(table.domain),
+	extensionIdx: index('codebase_chunk_index_extension_idx').on(table.extension),
+}));
+
+/** Cluster-level LLM summaries — one row per (repo_id, gpu_cluster) pair */
+export const clusterSummaries = pgTable('cluster_summaries', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	// repo_id is TEXT 'default' — not a FK to avoid coupling to non-existent code_repos
+	repoId: text('repo_id').notNull().default('default'),
+	gpuCluster: integer('gpu_cluster').notNull(),
+
+	summary: text('summary').notNull(),
+	purpose: text('purpose'),
+	patterns: text('patterns').array(),
+	warnings: text('warnings').array(),
+	tags: text('tags').array().notNull().default(sql`'{}'::text[]`),
+
+	representativeChunkIds: uuid('representative_chunk_ids').array().notNull().default(sql`'{}'::uuid[]`),
+	memberCount: integer('member_count').notNull().default(0),
+	centroidDistanceMean: real('centroid_distance_mean'),
+
+	summaryModel: varchar('summary_model', { length: 100 }),
+	summaryEmbedding: vector('summary_embedding', { dimensions: 768 }),
+
+	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (table) => ({
+	repoClusterUq: unique('cluster_summaries_repo_cluster_uq').on(table.repoId, table.gpuCluster),
+	repoClusterIdx: index('cluster_summaries_repo_cluster_idx').on(table.repoId, table.gpuCluster),
+}));
+
+/** Enrichment job tracking — one row per background enrichment run */
+export const enrichmentJobs = pgTable('enrichment_jobs', {
+	jobId: uuid('job_id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	repoId: text('repo_id'),
+
+	jobType: varchar('job_type', { length: 64 }).notNull(),
+	status: varchar('status', { length: 32 }).notNull().default('pending'),
+
+	cursor: text('cursor'),
+	totalProcessed: integer('total_processed').notNull().default(0),
+	totalUpserted: integer('total_upserted').notNull().default(0),
+	totalFailed: integer('total_failed').notNull().default(0),
+
+	startedAt: timestamp('started_at', { withTimezone: true }),
+	finishedAt: timestamp('finished_at', { withTimezone: true }),
+
+	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	error: jsonb('error'),
+
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (table) => ({
+	statusIdx: index('enrichment_jobs_status_idx').on(table.status),
+	jobTypeIdx: index('enrichment_jobs_job_type_idx').on(table.jobType),
+}));
+
+export type CodebaseChunkIndex = typeof codebaseChunkIndex.$inferSelect;
+export type NewCodebaseChunkIndex = typeof codebaseChunkIndex.$inferInsert;
+export type ClusterSummary = typeof clusterSummaries.$inferSelect;
+export type NewClusterSummary = typeof clusterSummaries.$inferInsert;
+export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
+export type NewEnrichmentJob = typeof enrichmentJobs.$inferInsert;
+

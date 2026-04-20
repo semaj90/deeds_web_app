@@ -147,6 +147,45 @@ function kindToTags(kind) {
   return kind ? [kind] : [];
 }
 
+/** Derive programming language from file extension. */
+const EXT_LANG = {
+  '.ts':    'TypeScript',
+  '.tsx':   'TypeScript',
+  '.svelte':'Svelte',
+  '.js':    'JavaScript',
+  '.mjs':   'JavaScript',
+  '.cjs':   'JavaScript',
+  '.py':    'Python',
+  '.go':    'Go',
+  '.rs':    'Rust',
+  '.proto': 'Protobuf',
+  '.sql':   'SQL',
+  '.json':  'JSON',
+  '.yaml':  'YAML',
+  '.yml':   'YAML',
+  '.css':   'CSS',
+  '.scss':  'SCSS',
+  '.html':  'HTML',
+  '.md':    'Markdown',
+  '.toml':  'TOML',
+  '.sh':    'Shell',
+  '.bash':  'Shell',
+  '.cpp':   'C++',
+  '.cc':    'C++',
+  '.c':     'C',
+  '.h':     'C/C++',
+  '.wgsl':  'WGSL',
+  '.glsl':  'GLSL',
+  '.vue':   'Vue',
+};
+
+function detectLanguage(filePath) {
+  if (!filePath) return null;
+  const dot = filePath.lastIndexOf('.');
+  if (dot < 0) return null;
+  return EXT_LANG[filePath.slice(dot).toLowerCase()] ?? null;
+}
+
 // ── Qdrant scroll ──────────────────────────────────────────────────────────────
 
 async function scrollQdrant(offset, limit) {
@@ -186,10 +225,10 @@ async function main() {
     if (!points.length) break;
 
     for (const pt of points) {
-      const filePath = pt.payload?.file_path ?? pt.payload?.relative_path ?? '';
+      const filePath = pt.payload?.relativePath ?? pt.payload?.path ?? pt.payload?.file_path ?? '';
       const result   = classify(filePath);
 
-      if (!result) {
+      if (!result || !filePath) {
         unchanged++;
         total++;
         continue;
@@ -197,20 +236,10 @@ async function main() {
 
       const { domain, kind } = result;
       const tags = kindToTags(kind);
+      const language = detectLanguage(filePath);
 
-      // Only enrich if domain was missing/wrong or kind was missing
-      const oldDomain = pt.payload?.domain;
-      const oldKind   = pt.payload?.kind;
-      const needsUpdate = !oldDomain || oldDomain === 'utility' || !oldKind;
-
-      if (!needsUpdate) {
-        unchanged++;
-        total++;
-        continue;
-      }
-
-      qdrantUpdates.push({ id: pt.id, domain, kind, tags });
-      pgUpdates.push({ qdrantId: String(pt.id), domain, kind, tags });
+      qdrantUpdates.push({ id: pt.id, domain, kind, tags, language });
+      pgUpdates.push({ qdrantId: String(pt.id), domain, kind, tags, language });
 
       domainDist[domain] = (domainDist[domain] ?? 0) + 1;
       kindDist[kind]     = (kindDist[kind] ?? 0) + 1;
@@ -244,11 +273,11 @@ async function main() {
       try {
         const existingTags = [];  // We merge, not replace
         const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-          method:  'PUT',
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({
-            payload: { domain: upd.domain, kind: upd.kind, tags: upd.tags },
-            points:  [upd.id],
+          body: JSON.stringify({
+            payload: { domain: upd.domain, kind: upd.kind, tags: upd.tags, language: upd.language },
+            points: [upd.id],
           }),
           signal: AbortSignal.timeout(10_000),
         });
@@ -268,9 +297,9 @@ async function main() {
       try {
         await client.query(
           `UPDATE codebase_chunk_index
-           SET domain = $1, kind = $2, semantic_tags = $3, updated_at = now()
-           WHERE qdrant_id = $4`,
-          [upd.domain, upd.kind, upd.tags, upd.qdrantId]
+           SET domain = $1, kind = $2, semantic_tags = $3, language = $4, updated_at = now()
+           WHERE qdrant_id = $5`,
+          [upd.domain, upd.kind, upd.tags, upd.language, upd.qdrantId]
         );
       } catch (err) {
         errors++;

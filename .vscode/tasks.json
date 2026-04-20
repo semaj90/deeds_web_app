@@ -185,6 +185,57 @@
       }
     },
     {
+      "label": "shell: 🚀 Start All Services",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File scripts/start-all.ps1",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "shell: 📊 Summarize Clusters",
+      "type": "shell",
+      "command": "npm run summarize:clusters",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "shell: 🏥 Health Aggregator (Go run)",
+      "type": "shell",
+      "command": "go run .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/go-health-aggregator"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
       "label": "Docker Services Up",
       "type": "shell",
       "command": "$ErrorActionPreference = 'Stop'; if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Error 'Docker CLI is not installed or not on PATH.'; exit 1 }; try { docker version | Out-Null } catch { Write-Error 'Docker Desktop Linux engine is unavailable. Start Docker Desktop or switch to the Linux containers backend, then retry.'; exit 1 }; $serviceAliases = @(@('deeds-postgres-prod'), @('deeds-postgres-prod-proxy'), @('deeds-redis-prod','phase66-redis','legal-ai-redis'), @('deeds-qdrant-prod','phase66-qdrant','legal-ai-qdrant'), @('phase66-minio','legal-ai-minio'), @('phase66-rabbitmq','legal-ai-rabbitmq'), @('phase66-couchdb','legal-ai-couchdb')); $toStart = @(); foreach ($aliases in $serviceAliases) { $matches = @(); foreach ($name in $aliases) { $status = docker inspect --format '{{.State.Status}}' $name 2>$null; if ($LASTEXITCODE -eq 0) { $matches += @{ Name = $name; Status = $status.Trim() } } } if ($matches.Count -eq 0) { Write-Host ('Skipping missing service aliases: ' + ($aliases -join ', ')) -ForegroundColor Yellow; continue } $running = $matches | Where-Object { $_.Status -eq 'running' } | Select-Object -First 1; if ($running) { Write-Host ('Already running: ' + $running.Name) -ForegroundColor DarkGray; continue } $toStart += ($matches | Select-Object -First 1).Name }; if ($toStart.Count -eq 0) { Write-Host 'All requested services are already running.' -ForegroundColor Green; exit 0 }; docker start @toStart",
@@ -2761,6 +2812,73 @@
       },
       "problemMatcher": [],
       "detail": "Start Go RAG+KAG+DAG retrieval service (gRPC :50053, HTTP :8098) — GPU embed, JSONB filters, gob cache"
+    },
+    {
+      "label": "🧠 CodeIntel: Build",
+      "type": "shell",
+      "command": "go build -o codeintel-service.exe .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/go-codeintel-service"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Compile CodeIntel gRPC service binary (port 50058 — cluster summaries, chunk lookup, job status)"
+    },
+    {
+      "label": "🧠 CodeIntel: Start (port 50058)",
+      "type": "shell",
+      "command": ".\\codeintel-service.exe",
+      "options": {
+        "cwd": "${workspaceFolder}/services/go-codeintel-service",
+        "env": {
+          "CODEINTEL_GRPC_PORT": "50058",
+          "DATABASE_URL": "postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db",
+          "REDIS_URL": "redis://localhost:6379",
+          "OLLAMA_URL": "http://localhost:11434",
+          "CODEINTEL_DEFAULT_MODEL": "gemma4-legal-fast:latest",
+          "OLLAMA_EMBED_MODEL": "embeddinggemma:latest"
+        }
+      },
+      "group": "build",
+      "isBackground": true,
+      "dependsOn": "🧠 CodeIntel: Build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Start CodeIntel gRPC service (port 50058) — cluster summaries, chunk lookup, job status, enrichment job polling"
+    },
+    {
+      "label": "🧠 CodeIntel: Health Check",
+      "type": "shell",
+      "command": "Invoke-WebRequest -Uri 'http://localhost:5173/api/codeintel/health' -UseBasicParsing | Select-Object -ExpandProperty Content | ConvertFrom-Json | ConvertTo-Json -Depth 3",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Query GET /api/codeintel/health — shows cluster_summaries row count, embedding coverage, chunk index stats"
     },
     {
       "label": "🏥 Go Retrieval: Health Check",

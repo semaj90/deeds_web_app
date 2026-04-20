@@ -77,6 +77,9 @@ export default defineConfig({
       'tests/runes/svelte5-rune-compliance.test.ts',
       'tests/routes/sveltekit-load-patterns.test.ts',
       'tests/routes/sveltekit-form-actions.test.ts',
+      'tests/routes/codeintel-fix-recommender.test.ts',
+      'tests/routes/codeintel-clusters-post.test.ts',
+      'tests/routes/ace-wiki-graph-index.test.ts',
     ],
     exclude: [
       'node_modules/**',
