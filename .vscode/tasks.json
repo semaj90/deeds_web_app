@@ -200,7 +200,7 @@
     {
       "label": "DB Proxy Up",
       "type": "shell",
-      "command": "$ErrorActionPreference = 'Stop'; if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Error 'Docker CLI is not installed or not on PATH.'; exit 1 }; $dbContainer = 'deeds-postgres-prod'; $proxyContainer = 'deeds-postgres-prod-proxy'; $targetPort = 5434; $dbStatus = docker inspect --format '{{.State.Status}}' $dbContainer 2>$null; if ($LASTEXITCODE -ne 0) { Write-Error ('Required database container not found: ' + $dbContainer); exit 1 }; if ($dbStatus.Trim() -ne 'running') { docker start $dbContainer | Out-Null }; $proxyStatus = docker inspect --format '{{.State.Status}}' $proxyContainer 2>$null; if ($LASTEXITCODE -eq 0 -and $proxyStatus.Trim() -eq 'running') { Write-Host ('Already running: ' + $proxyContainer) -ForegroundColor Green; exit 0 }; if ($LASTEXITCODE -eq 0) { docker rm -f $proxyContainer | Out-Null }; $networksJson = docker inspect $dbContainer --format '{{json .NetworkSettings.Networks}}'; $networks = $networksJson | ConvertFrom-Json; $networkName = ($networks.PSObject.Properties | Select-Object -First 1).Name; if (-not $networkName) { Write-Error ('No Docker network found for ' + $dbContainer); exit 1 }; docker run -d --name $proxyContainer --restart unless-stopped --network $networkName -p ${targetPort}:${targetPort} alpine/socat TCP-LISTEN:${targetPort},fork,reuseaddr TCP:${dbContainer}:5432 | Out-Null; Write-Host ('Started ' + $proxyContainer + ' on localhost:' + $targetPort) -ForegroundColor Green",
+      "command": "$ErrorActionPreference = 'Stop'; if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Error 'Docker CLI is not installed or not on PATH.'; exit 1 }; $dbCandidates = @('deeds-postgres-prod', 'legal-ai-postgres'); $dbContainer = $null; $dbStatus = $null; foreach ($candidate in $dbCandidates) { $status = docker inspect --format '{{.State.Status}}' $candidate 2>$null; if ($LASTEXITCODE -eq 0) { $dbContainer = $candidate; $dbStatus = $status.Trim(); break } }; if (-not $dbContainer) { Write-Error ('Required database container not found. Tried: ' + ($dbCandidates -join ', ')); exit 1 }; $proxyContainer = 'deeds-postgres-prod-proxy'; $targetPort = 5434; if ($dbStatus -ne 'running') { docker start $dbContainer | Out-Null }; $proxyStatus = docker inspect --format '{{.State.Status}}' $proxyContainer 2>$null; if ($LASTEXITCODE -eq 0 -and $proxyStatus.Trim() -eq 'running') { Write-Host ('Already running: ' + $proxyContainer) -ForegroundColor Green; exit 0 }; if ($LASTEXITCODE -eq 0) { docker rm -f $proxyContainer | Out-Null }; $networksJson = docker inspect $dbContainer --format '{{json .NetworkSettings.Networks}}'; $networks = $networksJson | ConvertFrom-Json; $networkName = ($networks.PSObject.Properties | Select-Object -First 1).Name; if (-not $networkName) { Write-Error ('No Docker network found for ' + $dbContainer); exit 1 }; $publishPort = [string]$targetPort + ':' + [string]$targetPort; $listenTarget = 'TCP-LISTEN:' + $targetPort + ',fork,reuseaddr'; $upstreamTarget = 'TCP:' + $dbContainer + ':5432'; docker run -d --name $proxyContainer --restart unless-stopped --network $networkName -p $publishPort alpine/socat $listenTarget $upstreamTarget | Out-Null; Write-Host ('Started ' + $proxyContainer + ' on localhost:' + $targetPort + ' via ' + $dbContainer) -ForegroundColor Green",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -243,7 +243,7 @@
       }
     },
     {
-      "label": "Truth Check: All",
+      "label": "Truth Check: All (Core)",
       "type": "shell",
       "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/truth-check-legal-corpus.ps1 -Mode all",
       "options": {
@@ -258,6 +258,25 @@
         "showReuseMessage": false,
         "clear": true
       }
+    },
+    {
+      "label": "Truth Check: All",
+      "dependsOn": [
+        "Truth Check: All (Core)",
+        "🗺️ Codebase: Full Orchestrator Guardrail"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "detail": "Run the full truth-check script, then the orchestrator Postgres mirror, route-contract, and SSE guardrail sequence",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
     },
     {
       "label": "Truth Check: Repo",
@@ -328,7 +347,7 @@
       }
     },
     {
-      "label": "Truth Check: Runtime",
+      "label": "Truth Check: Runtime (Core)",
       "type": "shell",
       "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/truth-check-legal-corpus.ps1 -Mode runtime",
       "options": {
@@ -343,6 +362,25 @@
         "showReuseMessage": false,
         "clear": true
       }
+    },
+    {
+      "label": "Truth Check: Runtime",
+      "dependsOn": [
+        "Truth Check: Runtime (Core)",
+        "🗺️ Codebase: Full Orchestrator Guardrail"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "detail": "Run the runtime truth-check script, then the orchestrator Postgres mirror, route-contract, and SSE guardrail sequence",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
     },
     {
       "label": "CMake: Configure (CUDA Release)",
@@ -3121,6 +3159,21 @@
       "problemMatcher": []
     },
     {
+      "label": "🧪 Test: Codebase mirror fallback",
+      "type": "shell",
+      "command": "npx vitest run tests/codebase-index-postgres-fallback.spec.ts --reporter=verbose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "🧪 Test: Single spec file (prompt)",
       "type": "shell",
       "command": "npx vitest run tests/${input:specFile} --reporter=verbose",
@@ -3950,7 +4003,7 @@
     {
       "label": "⚡ ACE: Rebuild Hypergraph 4D (SOM + manifold4 + Qdrant mirror)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"Write-Host '[Hypergraph] Rebuilding 4D manifold + SOM mirror...' -ForegroundColor Cyan; $r = Invoke-RestMethod 'http://localhost:5173/api/analytics/research-graph' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"force\\\":true}' -TimeoutSec 300; Write-Host \\\"✅ status=$($r.status) nodes=$($r.nodes) edges=$($r.edges)\\\" -ForegroundColor Green\"",
+      "command": "pwsh -NoProfile -Command \"Write-Host '[Hypergraph] Rebuilding 4D manifold + SOM mirror...' -ForegroundColor Cyan; $r = Invoke-RestMethod 'http://localhost:5173/api/analytics/research-graph' -Method Post -Headers @{'Content-Type'='application/json'} -Body '{\\\"action\\\":\\\"build\\\"}' -TimeoutSec 300; Write-Host \\\"✅ status=$($r.status) nodes=$($r.nodes) edges=$($r.edges)\\\" -ForegroundColor Green\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -4778,6 +4831,736 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Mirror cluster to pgvector (SSE)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$cluster = Read-Host 'GPU cluster ID'; $r = Invoke-WebRequest -Uri \"http://localhost:5173/api/codebase-index/index-stream?cluster=$cluster&limit=50\" -Method POST -Headers @{'Content-Type'='application/json'; 'x-dev-bypass'='true'} -TimeoutSec 120; $r.Content\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Status (GET)",
+      "type": "shell",
+      "command": "curl -s http://localhost:5173/api/codebase-index/index-stream -H 'x-dev-bypass: true' | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.stringify(JSON.parse(d),null,2)))\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗄️ DB: Run pending manual migrations",
+      "type": "shell",
+      "command": "for f in drizzle/manual/20260419_*.sql; do echo \"--- $f ---\"; psql $DATABASE_URL -f \"$f\" 2>&1 || echo 'SKIPPED (DB not reachable)'; done",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ GPU Karpathy Tag (progress bar)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs gpu-tag",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "GPU batch cosine tagging with ANSI progress bars. 100x faster than Ollama LLM.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ GPU Karpathy Tag (dry run)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs gpu-tag --dry-run --limit 500",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Dry run: GPU classify chunks but do NOT write tags to Qdrant.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Codebase Intelligence Status (progress bars)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs status",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Dashboard: pgvector mirror stats, GPU tag coverage with bar charts, predictive todos summary.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster pipeline (progress bars)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs index-stream",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "7-stage SSE pipeline with per-stage progress: scroll → summarize → autoencode → qdrant_upsert → mirror → GPU tag → complete.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster pipeline (dry run)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs index-stream --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Dry run: scroll + summarize + classify, skip all Qdrant/PostgreSQL writes.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 Predictive Todos: Generate (progress bar)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs generate-todos",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Gemma4 gap analysis over 7 days of search analytics → actionable todos with progress polling.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Pipeline: Full GPU Intelligence (progress bars)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-5",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Full 4-phase pipeline with progress bars: (1) Index clusters 0-5, (2) GPU Karpathy backfill, (3) Gemma4 gap analysis, (4) Status report. Feeds 4D topological graph into Claude Code.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧬 Codebase Spine: Full indexing graph",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs codebase-index-spine --clusters 0-5",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Explicit top-level indexing spine: assign → index → backfill → todos → status.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Pipeline: Full GPU Intelligence — Extended (clusters 0-11)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-11",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Extended pipeline: all 12 clusters with summaries, pgvector mirror, GPU tagging, gap analysis.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Pipeline: Full GPU Intelligence (dry run)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-5 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Dry run: full pipeline preview — no Qdrant/PostgreSQL writes.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "❓ Pipeline Runner: Help",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs --help",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Show all pipeline runner commands, options, and examples.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Start TurboQuant",
+      "type": "shell",
+      "command": "Start-Process -FilePath 'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe' -ArgumentList '--host 0.0.0.0 --port 8090 --ctx-size 8192 --n-gpu-layers 99 -m C:\\Users\\james\\.ollama\\models\\blobs\\sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7' -PassThru | ForEach-Object { Write-Host ('TurboQuant started — PID ' + $_.Id + ' — http://localhost:8090') -ForegroundColor Green }",
+      "group": "build",
+      "detail": "Launch llama-server.exe (TurboQuant) on port 8090 with full GPU offload for fast primary inference",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🧠 Start LangGraph",
+      "type": "shell",
+      "command": "docker compose --profile gpu up -d langgraph-synthesis 2>&1; if ($LASTEXITCODE -eq 0) { Write-Host 'LangGraph synthesis started on port 8091' -ForegroundColor Green } else { Write-Host 'LangGraph start failed — GPU Docker runtime may not be available' -ForegroundColor Yellow }",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "detail": "Start the LangGraph synthesis container (GPU profile, port 8091). Requires NVIDIA Docker runtime.",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🔨 Rebuild Go Search",
+      "type": "shell",
+      "command": "docker compose --profile full build go-search-service 2>&1; if ($LASTEXITCODE -eq 0) { Write-Host 'go-search-service image rebuilt successfully' -ForegroundColor Green } else { Write-Host 'Build failed' -ForegroundColor Red }",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "detail": "Rebuild the go-search-service Docker image from services/go-search-service/Dockerfile",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🔍 Start Go Search",
+      "type": "shell",
+      "command": "docker compose --profile full up -d go-search-service 2>&1; Start-Sleep -Seconds 3; $health = try { (Invoke-WebRequest -Uri 'http://localhost:8096/health' -TimeoutSec 5 -UseBasicParsing).StatusCode } catch { 0 }; if ($health -eq 200) { Write-Host 'go-search-service healthy on :8096 + :50055' -ForegroundColor Green } else { Write-Host 'go-search-service started but health check pending — check docker logs legal-ai-go-search' -ForegroundColor Yellow }",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "detail": "Start the go-search-service container (HTTP 8096, gRPC 50055). Depends on postgres, redis, qdrant.",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "⚡ Verify SIMD Bridge",
+      "type": "shell",
+      "command": "node -e \"const b=require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node'); console.log('CUDA:',b.checkCudaAvailable()===1?'GPU':'CPU'); console.log('ReLU:',Array.from(b.relu(new Float32Array([1,2,3,-1,-2,0]),6))); console.log('Dot:',Array.from(b.dotProduct(new Float32Array([1,2,3]),new Float32Array([4,5,6]),3))); console.log('Sim:',Array.from(b.graphSimilarity(new Float32Array([1,0,0,0,1,0]),2,3))); console.log('KMeans:',Array.from(b.clusterEmbeddings(new Float32Array([0,0,1,1,10,10,11,11]),4,2,2,50))); console.log('All 5 SIMD bridge ops passed');\"",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "PATH": "C:\\libtorch-win-shared-with-deps-2.9.0+cu130\\libtorch\\lib;${env:PATH}",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "group": "test",
+      "detail": "Smoke-test all 5 tensorrt_bridge.node native ops: CUDA check, ReLU, dotProduct, graphSimilarity, clusterEmbeddings",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "📦 Start Retrieval Stack",
+      "type": "shell",
+      "command": "$services = @('legal-ai-qdrant','deeds-redis-prod','legal-ai-go-embedding','legal-ai-go-search'); $toStart = @(); foreach ($s in $services) { $st = docker inspect --format '{{.State.Status}}' $s 2>$null; if ($LASTEXITCODE -ne 0) { Write-Host ('Missing: ' + $s) -ForegroundColor Yellow; continue }; if ($st.Trim() -eq 'running') { Write-Host ('Running: ' + $s) -ForegroundColor DarkGray } else { $toStart += $s } }; if ($toStart.Count -gt 0) { docker start @toStart; Write-Host ('Started: ' + ($toStart -join ', ')) -ForegroundColor Green } else { Write-Host 'All retrieval services already running' -ForegroundColor Green }",
+      "group": "build",
+      "detail": "Start the full retrieval stack: Qdrant, Redis, Go Embedding, Go Search",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🔬 Investigate + Assist",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/codebase-index/claude-assist -H 'Content-Type: application/json' -d ('{\"query\": \"' + ${input:assistQuery} + '\"}') 2>&1 | ConvertFrom-Json | ConvertTo-Json -Depth 5",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Run a claude-assist investigation query against the live dev server (requires Dev Server running)",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🏁 Production Gate",
+      "type": "shell",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/production-gate.ps1",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "detail": "Run the full production readiness gate: service health, app integration, build checks. Add -SkipLangGraph to skip GPU container.",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🚀 Inference: Start Full Stack",
+      "dependsOn": [
+        "📦 Start Retrieval Stack",
+        "🚀 Start TurboQuant",
+        "🧠 Start LangGraph"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "detail": "Start entire inference cascade in parallel: Retrieval (Qdrant+Redis+Go) + TurboQuant (:8090) + LangGraph (:8091). Ollama assumed already running.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🏥 Inference: Health Check All",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$svc = @{ 'Ollama :11434' = 'http://localhost:11434/api/tags'; 'TurboQuant :8090' = 'http://localhost:8090/health'; 'LangGraph :8091' = 'http://localhost:8091/health'; 'Bifrost :3040' = 'http://localhost:3040/health'; 'Go Search :8096' = 'http://localhost:8096/health'; 'Go Embed :8097' = 'http://localhost:8097/health'; 'Qdrant :6333' = 'http://localhost:6333/'; 'Redis :6379' = $null }; foreach ($k in $svc.Keys) { if ($k -eq 'Redis :6379') { $r = docker exec deeds-redis-prod redis-cli ping 2>$null; if ($r -eq 'PONG') { Write-Host ('OK  ' + $k) -ForegroundColor Green } else { Write-Host ('DOWN ' + $k) -ForegroundColor Red }; continue }; try { Invoke-RestMethod $svc[$k] -TimeoutSec 3 | Out-Null; Write-Host ('OK  ' + $k) -ForegroundColor Green } catch { Write-Host ('DOWN ' + $k) -ForegroundColor Red } }\"",
+      "group": "test",
+      "detail": "Check health of all 8 inference services: Ollama, TurboQuant, LangGraph, Bifrost, Go Search, Go Embed, Qdrant, Redis",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🚀 Inference: Dev Server + TurboQuant",
+      "dependsOn": [
+        "📦 Start Retrieval Stack",
+        "🚀 Start TurboQuant"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "detail": "Start retrieval stack + TurboQuant in parallel (lighter than full stack — no LangGraph GPU container)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📸 Playwright: Screenshot Codebase Visualization",
+      "type": "shell",
+      "command": "node scripts/tests/test-screenshots.mjs --route /admin/codebase-index --route /admin/codebase-graph --route /admin/codebase-viewer --route /admin/gpu-evidence-graph --route /command-center/codebase --route /codebase-wiki",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Capture screenshots of all codebase map/indexing/graph visualization pages",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "📸 Playwright: Screenshot Single Route",
+      "type": "shell",
+      "command": "node scripts/tests/test-screenshots.mjs --route ${input:screenshotRoute}",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Take a Playwright screenshot of a single route",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "📸 Playwright: Screenshot All Routes",
+      "type": "shell",
+      "command": "node scripts/tests/test-screenshots.mjs --all",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Take Playwright screenshots of all 23 app routes",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "⚡ TurboQuant: Start VLM (text + vision, :8090)",
+      "type": "shell",
+      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 8192 --threads 6",
+      "isBackground": true,
+      "group": "build",
+      "detail": "Launch TurboQuant llama-server with mmproj for unified text+vision inference (gemma4-legal-vlm Q4_K_M + SigLIP projector, ~6GB VRAM)",
+      "problemMatcher": {
+        "owner": "llama-server",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "loading model",
+          "endsPattern": "all slots are idle"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🏷️ Qdrant: Search by Tag",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:6333/collections/codebase_chunks_768/points/scroll -H 'Content-Type: application/json' -d '{\"limit\":20,\"with_payload\":true,\"with_vector\":false,\"filter\":{\"must\":[{\"key\":\"tags\",\"match\":{\"any\":[\"${input:tagSearchQuery}\"]}}]}}' | python -m json.tool",
+      "group": "test",
+      "detail": "Search Qdrant codebase_chunks_768 by Karpathy semantic tag (api-route, database, rag-pipeline, etc.)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🏷️ Qdrant: Tag Distribution Stats",
+      "type": "shell",
+      "command": "node -e \"const tags=['api-route','page-component','server-module','ui-component','state-machine','database','vector-search','graph-db','cache','rag-pipeline','auth','types','config','test','utility','worker','sse','embedding','analytics','ml-inference'];(async()=>{for(const t of tags){const r=await fetch('http://localhost:6333/collections/codebase_chunks_768/points/count',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:{must:[{key:'tags',match:{any:[t]}}]}})});const d=await r.json();console.log(t.padEnd(20),d.result?.count??0)}})()\"",
+      "group": "test",
+      "detail": "Show count of chunks per Karpathy semantic tag across all 20 tags",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Run Codebase Orchestrator (sync core)",
+      "type": "shell",
+      "command": "curl -s -N -X POST 'http://localhost:5173/api/codebase-index/orchestrate' -H 'Content-Type: application/json' -d '{\"scope\":\"all\",\"clusterCount\":20,\"gpuTag\":true,\"summarize\":true,\"somTopology\":false,\"neo4jSync\":false,\"pageRank\":false,\"exportWiki\":false,\"hypergraph\":false}'",
+      "group": "build",
+      "detail": "Default write-enabled path: ast_embed → cluster_assign → summarize → tag (no SOM/Neo4j/PageRank)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Run Codebase Orchestrator (async wiki)",
+      "type": "shell",
+      "command": "curl -s -X POST 'http://localhost:5173/api/codebase-index/orchestrate' -H 'Content-Type: application/json' -d '{\"mode\":\"async\",\"scope\":\"all\",\"incremental\":true}' | node -e \"process.stdin.on('data',d=>console.log(JSON.stringify(JSON.parse(d),null,2)))\"",
+      "group": "build",
+      "detail": "Async queue handoff via /api/codebase/wiki/index — returns jobId and status path for polling",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Run Codebase Orchestrator (full graph)",
+      "type": "shell",
+      "command": "curl -s -N -X POST 'http://localhost:5173/api/codebase-index/orchestrate' -H 'Content-Type: application/json' -d '{\"scope\":\"all\",\"clusterCount\":20,\"gpuTag\":true,\"summarize\":true,\"somTopology\":true,\"neo4jSync\":true,\"pageRank\":true,\"exportWiki\":true,\"hypergraph\":true}'",
+      "group": "build",
+      "detail": "Full graph-enabled pipeline: AST → embed → cluster → SOM → Neo4j → PageRank → summaries → tags → wiki → hypergraph",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🗺️ Codebase: Quick Index (lib, no graph)",
+      "type": "shell",
+      "command": "curl -s -N -X POST 'http://localhost:5173/api/codebase-index/orchestrate' -H 'Content-Type: application/json' -d '{\"scope\":\"lib\",\"clusterCount\":12,\"gpuTag\":true,\"summarize\":false,\"somTopology\":false,\"neo4jSync\":false,\"pageRank\":false}'",
+      "group": "build",
+      "detail": "Fast lib-only: AST → embed → cluster → GPU tag (skip summaries + graph stages)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🗺️ Codebase: Recompute Topology (SOM + Neo4j + PageRank)",
+      "type": "shell",
+      "command": "curl -s -N -X POST 'http://localhost:5173/api/codebase-index/orchestrate' -H 'Content-Type: application/json' -d '{\"recompute\":true,\"scope\":\"all\",\"clusterCount\":20,\"gpuTag\":false,\"summarize\":false,\"somTopology\":true,\"neo4jSync\":true,\"pageRank\":true,\"runId\":\"topo\"}'",
+      "group": "build",
+      "detail": "Force re-index + rebuild topology graph (SOM + Neo4j + CouchDB PageRank). Cached under runId=topo for 2h resume.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🗺️ Codebase: Resume Topology (skip cached stages)",
+      "type": "shell",
+      "command": "curl -s -N -X POST 'http://localhost:5173/api/codebase-index/orchestrate' -H 'Content-Type: application/json' -d '{\"recompute\":true,\"scope\":\"all\",\"clusterCount\":20,\"gpuTag\":false,\"summarize\":false,\"somTopology\":true,\"neo4jSync\":true,\"pageRank\":true,\"runId\":\"topo\",\"resume\":true}'",
+      "group": "build",
+      "detail": "Resume a disconnected topology run — skips stages already cached in Redis (2h TTL)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🗺️ Codebase: Dry Run (preview stages)",
+      "type": "shell",
+      "command": "curl -s -N -X POST 'http://localhost:5173/api/codebase-index/orchestrate' -H 'Content-Type: application/json' -d '{\"scope\":\"all\",\"dryRun\":true}'",
+      "group": "test",
+      "detail": "Dry-run: collect + chunk + preview stages without writing to Qdrant/Neo4j/CouchDB",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🗺️ Codebase: Pipeline Status",
+      "type": "shell",
+      "command": "curl -s 'http://localhost:5173/api/codebase-index/orchestrate' | node -e \"process.stdin.on('data',d=>console.log(JSON.stringify(JSON.parse(d),null,2)))\"",
+      "group": "test",
+      "detail": "Check orchestrator status: collection points, tag coverage %, CUDA, all 12 stages listed",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗺️ Codebase: Verify PG Mirror",
+      "type": "shell",
+      "command": "$required = @('cluster_summary','content','qdrant_id','signature_embedding','summary_embedding'); $table = (psql -h 127.0.0.1 -p 5434 -U legal_admin -d legal_ai_db -tAc 'SELECT to_regclass(''public.codebase_chunk_index'') IS NOT NULL').Trim(); if ($table -ne 't') { Write-Host 'codebase_chunk_index mirror missing' -ForegroundColor Red; Write-Host 'Apply: drizzle/manual/rag_query_analytics.sql then drizzle/manual/20260419_chunk_index_summary_mirror.sql' -ForegroundColor Yellow; exit 1 }; $present = @(psql -h 127.0.0.1 -p 5434 -U legal_admin -d legal_ai_db -tAc 'SELECT column_name FROM information_schema.columns WHERE table_schema = ''public'' AND table_name = ''codebase_chunk_index'' AND column_name IN (''qdrant_id'',''content'',''cluster_summary'',''summary_embedding'',''signature_embedding'') ORDER BY column_name') | ForEach-Object { $_.Trim() } | Where-Object { $_ }; $missing = @($required | Where-Object { $_ -notin $present }); if ($missing.Count -gt 0) { Write-Host \"codebase_chunk_index mirror incomplete. Missing: $($missing -join ', ')\" -ForegroundColor Yellow; exit 1 }; Write-Host 'codebase_chunk_index mirror verified' -ForegroundColor Green; $present | ForEach-Object { Write-Host \"  $_\" }",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "PGPASSWORD": "123456"
+        }
+      },
+      "group": "test",
+      "detail": "Verify the Postgres codebase_chunk_index mirror table and required columns before running codebase index summary/wiki flows",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗺️ Codebase: Test Orchestrator Route Contract",
+      "type": "shell",
+      "command": "npx vitest run tests/routes/codebase-index-orchestrate.test.ts --config vitest.config.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Focused route-level regression slice for GET pgMirror status and POST orchestrator sync/dry-run contract",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗺️ Codebase: Full Orchestrator Guardrail",
+      "dependsOn": [
+        "🗺️ Codebase: Verify PG Mirror",
+        "🗺️ Codebase: Test Orchestrator Route Contract",
+        "🗺️ Codebase: Smoke Test (with Dev Server)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "detail": "Run the full orchestrator preflight in order: Postgres mirror check, focused route regression, then smoke after the Dev Server background task is ready",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Smoke Test Orchestrator SSE",
+      "type": "shell",
+      "command": "node scripts/tests/test-orchestrator-smoke.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Smoke test: GET status + POST SSE dry-run. Add --live for write-enabled sync core, --full for all graph stages",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗺️ Codebase: Ensure Dev Server Ready",
+      "type": "shell",
+      "command": "try { $response = Invoke-WebRequest -Uri 'http://localhost:5173' -UseBasicParsing -TimeoutSec 3; if ($null -ne $response) { Write-Host 'Dev server already ready'; exit 0 } } catch {}; npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "test",
+      "detail": "Reuse the existing localhost:5173 dev server when it is already responding; otherwise start Vite and wait for readiness",
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^([^\\s].*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Dev server already ready|ready in"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🗺️ Codebase: Smoke Test (with Dev Server)",
+      "dependsOn": [
+        "🗺️ Codebase: Ensure Dev Server Ready",
+        "Smoke Test Orchestrator SSE"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "detail": "Ensure localhost:5173 is ready, then run the orchestrator smoke test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📸 VLM: Test Evidence Image Analysis",
+      "type": "shell",
+      "command": "python -c \"import base64,json,urllib.request,socket;f=open(r'${workspaceFolder}/sveltekit-frontend/scripts/tests/screenshots/latest/evidence.png','rb');b64=base64.b64encode(f.read()).decode();f.close();p=json.dumps({'messages':[{'role':'user','content':[{'type':'image_url','image_url':{'url':f'data:image/png;base64,{b64}'}},{'type':'text','text':'Analyze this screenshot. Describe the interface and key elements in 3 sentences.'}]}],'max_tokens':512,'temperature':0.2}).encode();socket.setdefaulttimeout(120);r=urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8090/v1/chat/completions',data=p,headers={'Content-Type':'application/json'}),timeout=120);d=json.loads(r.read());m=d['choices'][0]['message'];print('CONTENT:',m.get('content',''));print();print('REASONING:',m.get('reasoning_content','')[:500])\"",
+      "group": "test",
+      "detail": "Send evidence screenshot to TurboQuant VLM and verify image analysis works",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
     }
   ],
   "inputs": [
@@ -4986,6 +5769,12 @@
       "type": "promptString",
       "description": "LangGraph concurrent research question",
       "default": "How does authentication work and where are the auth guards in the API routes?"
+    },
+    {
+      "id": "tagSearchQuery",
+      "type": "promptString",
+      "description": "Tag name to search in Qdrant (e.g., api-route, database, rag-pipeline)",
+      "default": "rag-pipeline"
     }
   ]
 }

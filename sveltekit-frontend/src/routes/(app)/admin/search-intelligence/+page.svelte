@@ -16,6 +16,23 @@
 	type DYM         = { suggestion: string; similarity: number; hitCount: number; source: 'redis' | 'pg' | 'qlora'; qualityTier?: string };
 	type QloraStat   = { quality_tier: string; cnt: number; avg_score: number };
 	type PromptLeaderEntry = { prompt: string; promptSource: string; section: string; clicks: number; rank: number };
+	type IdxEvent = { event: string; data: Record<string, unknown> };
+	type IdxFinalCounts = {
+		files: number | null;
+		chunks: number | null;
+		embeddings: number | null;
+		stored: number | null;
+		summaryClusters: number | null;
+		tagged: number | null;
+		processed: number | null;
+	};
+	type IdxPgMirror = {
+		table: string;
+		healthy: boolean;
+		exists: boolean | null;
+		missingColumns: string[];
+		error: string | null;
+	};
 
 	// ── State ─────────────────────────────────────────────────────────────────
 
@@ -26,7 +43,166 @@
 	let loading     = $state(false);
 	let error       = $state<string | null>(null);
 	let autoRefresh = $state(false);
-	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research' | 'summaries' | 'live' | 'assist' | 'tags' | 'graph'>('queries');
+	let activeSection = $state<'queries' | 'pipeline' | 'chunks' | 'training' | 'research' | 'summaries' | 'live' | 'assist' | 'tags' | 'graph' | 'index'>('queries');
+
+	// ── Codebase Index Orchestrator state ─────────────────────────────────────
+	let idxRunning   = $state(false);
+	let idxEvents    = $state<IdxEvent[]>([]);
+	let idxError     = $state<string | null>(null);
+	let idxStatus    = $state<Record<string, unknown> | null>(null);
+	let idxStatusLoading = $state(false);
+	let idxRunId     = $state<string | null>(null);
+	let idxResume    = $state(false);
+
+	type IdxPreset = 'sync' | 'quick' | 'full' | 'topology' | 'custom';
+	type IdxPresetConfig = {
+		scope: 'lib' | 'all';
+		clusterCount: number;
+		gpuTag: boolean;
+		summarize: boolean;
+		somTopology: boolean;
+		neo4jSync: boolean;
+		pageRank: boolean;
+		exportWiki: boolean;
+		hypergraph: boolean;
+		indexFileLimit?: number;
+		recompute?: boolean;
+	};
+	let idxPreset    = $state<IdxPreset>('sync');
+
+	const IDX_PRESETS: Record<IdxPreset, IdxPresetConfig> = {
+		sync: { scope: 'all', clusterCount: 20, gpuTag: true, summarize: true, somTopology: false, neo4jSync: false, pageRank: false, exportWiki: false, hypergraph: false },
+		quick: { scope: 'lib', clusterCount: 12, gpuTag: true, summarize: false, somTopology: false, neo4jSync: false, pageRank: false, exportWiki: false, hypergraph: false, indexFileLimit: 50 },
+		full: { scope: 'all', clusterCount: 20, gpuTag: true, summarize: true, somTopology: true, neo4jSync: true, pageRank: true, exportWiki: true, hypergraph: true },
+		topology: { scope: 'all', clusterCount: 20, gpuTag: false, summarize: false, recompute: true, somTopology: true, neo4jSync: true, pageRank: true, exportWiki: false, hypergraph: false },
+		custom: { scope: 'all', clusterCount: 20, gpuTag: false, summarize: false, somTopology: false, neo4jSync: false, pageRank: false, exportWiki: false, hypergraph: false },
+	};
+	const IDX_PRESET_LABELS: Record<IdxPreset, string> = {
+		sync: 'sync core',
+		quick: 'quick (lib)',
+		full: 'full graph',
+		topology: 'topology',
+		custom: 'custom',
+	};
+	let idxPresetConfig = $derived(IDX_PRESETS[idxPreset]);
+
+	function idxNumber(value: unknown): number | null {
+		return typeof value === 'number' ? value : null;
+	}
+
+	function idxRecord(value: unknown): Record<string, unknown> | null {
+		return value && typeof value === 'object' ? (value as Record<string, unknown>) : null;
+	}
+
+	let idxFinalCounts = $derived.by<IdxFinalCounts>(() => {
+		const scanDone = idxEvents.find((event) => event.event === 'scan_done');
+		const chunkDone = idxEvents.find((event) => event.event === 'chunk_done');
+		const embedDone = idxEvents.find((event) => event.event === 'embed_done');
+		const summaryDone = idxEvents.find((event) => event.event === 'summary_done');
+		const tagDone = idxEvents.find((event) => event.event === 'tag_done');
+		const tagDetails = idxRecord(tagDone?.data?.details);
+
+		return {
+			files: idxNumber(scanDone?.data?.filesProcessed),
+			chunks: idxNumber(chunkDone?.data?.chunksProcessed),
+			embeddings: idxNumber(embedDone?.data?.embeddingsGenerated),
+			stored: idxNumber(embedDone?.data?.storedInQdrant),
+			summaryClusters: idxNumber(summaryDone?.data?.count),
+			tagged: idxNumber(tagDetails?.totalTagged),
+			processed: idxNumber(tagDetails?.totalProcessed),
+		};
+	});
+	let idxPgMirror = $derived.by<IdxPgMirror>(() => {
+		const status = idxRecord(idxStatus);
+		const mirror = idxRecord(status?.pgMirror);
+
+		return {
+			table: typeof mirror?.table === 'string' ? mirror.table : 'codebase_chunk_index',
+			healthy: mirror?.healthy === true,
+			exists: typeof mirror?.exists === 'boolean' ? mirror.exists : null,
+			missingColumns: Array.isArray(mirror?.missingColumns)
+				? mirror.missingColumns.filter((value): value is string => typeof value === 'string')
+				: [],
+			error: typeof mirror?.error === 'string' ? mirror.error : null,
+		};
+	});
+	let idxStartTime = $state<number | null>(null);
+	let idxElapsed = $state<string>('');
+
+	$effect(() => {
+		if (!idxRunning) { idxStartTime = null; return; }
+		if (!idxStartTime) idxStartTime = Date.now();
+		const interval = setInterval(() => {
+			const s = Math.round((Date.now() - (idxStartTime ?? Date.now())) / 1000);
+			idxElapsed = s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`;
+		}, 500);
+		return () => clearInterval(interval);
+	});
+
+	async function loadIdxStatus() {
+		idxStatusLoading = true;
+		try {
+			const res = await fetch('/api/codebase-index/orchestrate');
+			if (res.ok) idxStatus = await res.json();
+		} catch { /* ignore */ }
+		idxStatusLoading = false;
+	}
+
+	async function runIdxPipeline() {
+		idxRunning = true;
+		idxEvents = [];
+		idxError = null;
+		const body = {
+			...IDX_PRESETS[idxPreset],
+			...(idxRunId && idxResume ? { runId: idxRunId, resume: true } : {}),
+		};
+
+		try {
+			const res = await fetch('/api/codebase-index/orchestrate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body),
+			});
+			if (!res.ok) {
+				idxError = `HTTP ${res.status}: ${await res.text().catch(() => '')}`;
+				idxRunning = false;
+				return;
+			}
+			const reader = res.body?.getReader();
+			if (!reader) { idxError = 'No response body'; idxRunning = false; return; }
+
+			const decoder = new TextDecoder();
+			let buffer = '';
+			while (true) {
+				const { done, value } = await reader.read();
+				buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+				let boundary = buffer.indexOf('\n\n');
+				while (boundary !== -1) {
+					const chunk = buffer.slice(0, boundary).trim();
+					buffer = buffer.slice(boundary + 2);
+					if (chunk) {
+						let event = 'message';
+						const dataLines: string[] = [];
+						for (const line of chunk.split(/\r?\n/)) {
+							if (line.startsWith('event:')) event = line.slice(6).trim();
+							if (line.startsWith('data:')) dataLines.push(line.slice(5).trim());
+						}
+						let data: Record<string, unknown> = {};
+						try { data = JSON.parse(dataLines.join('\n')); } catch { data = { raw: dataLines.join('\n') }; }
+						idxEvents = [...idxEvents, { event, data }];
+						if (event === 'started' && data.runId) { idxRunId = String(data.runId); idxResume = false; }
+						if (event === 'failed') idxError = String(data.message ?? 'Pipeline failed');
+					}
+					boundary = buffer.indexOf('\n\n');
+				}
+				if (done) break;
+			}
+		} catch (e) {
+			idxError = (e as Error).message;
+		}
+		idxRunning = false;
+		void loadIdxStatus();
+	}
 
 	// Distillation runner state
 	let distillRunning  = $state(false);
@@ -428,10 +604,21 @@
 	let expandedTopic      = $state<string | null>(null);
 
 	// ── Corpus search state ───────────────────────────────────────────────────
+	type CorpusJob = {
+		jobId: string;
+		status: 'queued' | 'running' | 'completed' | 'failed' | 'timed_out' | 'cancelled';
+		action: 'crawl' | 'corpus-search' | 'invalidate';
+		totalSummaries?: number;
+		source?: string;
+		indexedAt?: string;
+		error?: string;
+		batches?: Array<{ summaries: CorpusResult[] }>;
+	};
 	let corpusQuery        = $state('');
 	let corpusLoading      = $state(false);
 	let corpusError        = $state<string | null>(null);
 	let corpusResults      = $state<CorpusResult[]>([]);
+	let corpusJob          = $state<CorpusJob | null>(null);
 
 	// ── Research Graph RL state ───────────────────────────────────────────────
 	type GraphCluster = { id: number; memberIds: string[]; pageRank: number; size: number };
@@ -600,19 +787,50 @@
 	type IngestResult   = { queued?: boolean; skipped?: boolean; error?: string; stateName?: string; message?: string };
 	type CorpusStats    = { byType: Record<string, { complete: number; total: number }>; constitutionCoverage: number; totalDocuments: number; totalComplete: number };
 
+	function sleep(ms: number) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	async function poll_corpus_job(jobId: string) {
+		for (let attempt = 0; attempt < 30; attempt += 1) {
+			const res = await fetch(`/api/analytics/web-research?jobId=${encodeURIComponent(jobId)}`);
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const d = await res.json() as { job: CorpusJob };
+			if (!d.job) throw new Error('Research job not found');
+			corpusJob = d.job;
+			if (d.job.status === 'completed' || d.job.status === 'failed' || d.job.status === 'timed_out' || d.job.status === 'cancelled') {
+				if (d.job.status !== 'completed') {
+					corpusError = d.job.error ?? 'Research job did not complete';
+				}
+				return d.job;
+			}
+			await sleep(Math.min(1000 + attempt * 250, 2500));
+		}
+		throw new Error('Timed out waiting for corpus search');
+	}
+
 	async function run_corpus_search() {
 		if (!corpusQuery.trim()) return;
 		corpusLoading = true;
 		corpusError   = null;
+		corpusResults = [];
+		corpusJob     = null;
 		try {
 			const res = await fetch('/api/analytics/web-research', {
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ action: 'corpus-search', selfPrompts: [corpusQuery.trim()], pipeline: researchPipeline, maxResults: 6 }),
+				body: JSON.stringify({ action: 'corpus-search', selfPrompts: [corpusQuery.trim()], pipeline: researchPipeline, maxResults: 6, defer: true }),
 			});
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-			const d = await res.json();
-			corpusResults = d.batches?.[0]?.summaries ?? [];
+			const d = await res.json() as { jobId?: string; status?: string; batches?: Array<{ summaries: CorpusResult[] }> };
+			if (d.jobId) {
+				corpusJob = { jobId: d.jobId, status: (d.status as CorpusJob['status']) ?? 'queued', action: 'corpus-search' };
+				const job = await poll_corpus_job(d.jobId);
+				corpusJob = job;
+				corpusResults = job.batches?.[0]?.summaries ?? [];
+			} else {
+				corpusResults = d.batches?.[0]?.summaries ?? [];
+			}
 		} catch (e) {
 			corpusError = e instanceof Error ? e.message : String(e);
 		} finally {
@@ -1065,6 +1283,9 @@
 	</button>
 	<button class="s-tab" class:active={activeSection === 'graph'} onclick={() => activeSection = 'graph'}>
 		<Icon name="network" class="w-3.5 h-3.5" /> Graph RL
+	</button>
+	<button class="s-tab" class:active={activeSection === 'index'} onclick={() => { activeSection = 'index'; if (!idxStatus && !idxStatusLoading) void loadIdxStatus(); }}>
+		<Icon name="database" class="w-3.5 h-3.5" /> Index
 	</button>
 </div>
 
@@ -1911,8 +2132,8 @@
 
 	<!-- ── Corpus Search ─────────────────────────────────────────────────── -->
 	<section class="panel corpus-panel">
-		<h3 class="section-title">Local Legal Corpus Search</h3>
-		<p class="corpus-desc">Search <code>legal_canon_chunks</code>, <code>court_opinions</code>, and <code>legal_documents</code> via gemma4-legal — authoritative, offline, no external calls.</p>
+		<h3 class="section-title">Local Legal Search</h3>
+		<p class="corpus-desc">Search authoritative sources in <code>legal_canon_chunks</code> and <code>court_opinions</code>, plus contextual records in <code>legal_documents</code>, via gemma4-legal — offline, no external calls.</p>
 		<div class="corpus-controls">
 			<input
 				class="corpus-input"
@@ -1921,9 +2142,12 @@
 				onkeydown={(e) => { if (e.key === 'Enter') run_corpus_search(); }}
 			/>
 			<button class="btn-sm primary" onclick={run_corpus_search} disabled={corpusLoading || !corpusQuery.trim()}>
-				{corpusLoading ? 'Searching…' : 'Search Corpus'}
+				{corpusLoading ? 'Searching…' : corpusJob?.status === 'completed' ? 'Search Again' : 'Search Corpus'}
 			</button>
 		</div>
+		{#if corpusJob}
+			<p class="corpus-status">Job {corpusJob.status}{corpusJob.totalSummaries ? ` · ${corpusJob.totalSummaries} summaries` : ''}{corpusJob.error ? ` · ${corpusJob.error}` : ''}</p>
+		{/if}
 		{#if corpusError}
 			<p class="err-msg">{corpusError}</p>
 		{/if}
@@ -2892,6 +3116,151 @@
 </div>
 {/if}
 
+<!-- ═══════════════════════════ INDEX ORCHESTRATOR ═══════════════════════ -->
+{#if activeSection === 'index'}
+<div class="si-grid">
+
+	<!-- Status + Controls -->
+	<section class="panel span2">
+		<h3>Codebase Index Orchestrator</h3>
+		<p class="sub">Unified pipeline: AST scan, embed, cluster, SOM, Neo4j, PageRank, summaries, tags, wiki, 4D hypergraph</p>
+
+		<div class="idx-controls">
+			<div class="idx-presets">
+				<button class="btn-sm" class:active={idxPreset === 'sync'} onclick={() => idxPreset = 'sync'}>Sync Core</button>
+				<button class="btn-sm" class:active={idxPreset === 'quick'} onclick={() => idxPreset = 'quick'}>Quick (lib)</button>
+				<button class="btn-sm" class:active={idxPreset === 'topology'} onclick={() => idxPreset = 'topology'}>Topology</button>
+				<button class="btn-sm" class:active={idxPreset === 'full'} onclick={() => idxPreset = 'full'}>Full Graph</button>
+				<button class="btn-sm" class:active={idxPreset === 'custom'} onclick={() => idxPreset = 'custom'}>Custom</button>
+			</div>
+
+			<div class="idx-actions">
+				<button class="btn-sm primary" disabled={idxRunning} onclick={() => { idxResume = false; void runIdxPipeline(); }}>
+					{idxRunning ? `Running… ${idxElapsed}` : `Run ${IDX_PRESET_LABELS[idxPreset]}`}
+				</button>
+				{#if idxRunId && !idxRunning}
+				<button class="btn-sm btn-resume" onclick={() => { idxResume = true; void runIdxPipeline(); }}
+					title="Resume run {idxRunId} — skip cached stages">
+					Resume {idxRunId}
+				</button>
+				{/if}
+				<button class="btn-sm btn-ghost" disabled={idxStatusLoading} onclick={loadIdxStatus}>
+					<Icon name="refresh-cw" class="w-3 h-3" /> Status
+				</button>
+			</div>
+		</div>
+
+		{#if idxError}
+			<div class="idx-error">{idxError}</div>
+		{/if}
+
+		<!-- Preset details -->
+		<div class="idx-preset-info">
+			<span>action: <b>{IDX_PRESET_LABELS[idxPreset]}</b></span>
+			{#if idxRunning}<span>elapsed: <b>{idxElapsed}</b></span>{/if}
+			{#if idxRunId}<span>run: <b>{idxRunId}</b></span>{/if}
+			<span>scope: <b>{idxPresetConfig.scope}</b></span>
+			<span>k: <b>{idxPresetConfig.clusterCount}</b></span>
+			{#if idxPresetConfig.gpuTag}<span class="idx-flag on">tags</span>{/if}
+			{#if idxPresetConfig.summarize}<span class="idx-flag on">summaries</span>{/if}
+			{#if idxPresetConfig.somTopology}<span class="idx-flag on">SOM</span>{/if}
+			{#if idxPresetConfig.neo4jSync}<span class="idx-flag on">Neo4j</span>{/if}
+			{#if idxPresetConfig.pageRank}<span class="idx-flag on">PageRank</span>{/if}
+			{#if idxPresetConfig.exportWiki}<span class="idx-flag on">wiki</span>{/if}
+			{#if idxPresetConfig.hypergraph}<span class="idx-flag on">4D</span>{/if}
+			{#if idxPresetConfig.recompute}<span class="idx-flag warn">recompute</span>{/if}
+		</div>
+	</section>
+
+	<!-- Collection Status -->
+	{#if idxStatus}
+	<section class="panel">
+		<h4>Collection</h4>
+		<div class="idx-stats">
+			<div class="stat-row"><span>Points</span><span>{(idxStatus as Record<string, any>).collection?.points?.toLocaleString() ?? '–'}</span></div>
+			<div class="stat-row"><span>Vectors</span><span>{(idxStatus as Record<string, any>).collection?.vectors?.toLocaleString() ?? '–'}</span></div>
+			<div class="stat-row"><span>Status</span><span>{(idxStatus as Record<string, any>).collection?.status ?? '–'}</span></div>
+			<div class="stat-row"><span>PG Mirror</span><span class:cuda-on={idxPgMirror.healthy}>{idxPgMirror.healthy ? 'Healthy' : idxPgMirror.exists === false ? 'Missing' : idxPgMirror.error ? 'Error' : 'Unknown'}</span></div>
+			{#if idxPgMirror.missingColumns.length > 0}
+				<div class="stat-row"><span>Missing Columns</span><span>{idxPgMirror.missingColumns.join(', ')}</span></div>
+			{/if}
+			{#if idxPgMirror.error}
+				<div class="stat-row"><span>Mirror Error</span><span>{idxPgMirror.error}</span></div>
+			{/if}
+			<div class="stat-row"><span>Tag Coverage</span><span>{(idxStatus as Record<string, any>).tagCoverage?.pct ?? 0}%</span></div>
+			<div class="stat-row"><span>CUDA</span><span class:cuda-on={(idxStatus as Record<string, any>).cuda}>{(idxStatus as Record<string, any>).cuda ? 'Available' : 'Unavailable'}</span></div>
+		</div>
+	</section>
+	{/if}
+
+	<!-- SSE Event Log -->
+	{#if idxEvents.length > 0}
+	{@const completeEv = idxEvents.find(e => e.event === 'complete')}
+	{@const failedEv = idxEvents.find(e => e.event === 'failed')}
+	{@const stagesDone = (completeEv?.data?.completedStages as string[] | undefined) ?? []}
+	{@const stagesResumed = new Set((completeEv?.data?.resumedStages as string[] | undefined) ?? [])}
+	{@const totalMs = completeEv?.data?.totalMs as number | undefined}
+	<section class="panel span2">
+		<h4>Pipeline Events ({idxEvents.length}){totalMs ? ` — ${(totalMs / 1000).toFixed(1)}s total` : ''}</h4>
+
+		<!-- Completed stages summary -->
+		{#if stagesDone.length > 0}
+		<div class="idx-stages-bar">
+			{#each stagesDone as stage}
+				<span class="idx-stage-chip" class:done={!stagesResumed.has(stage)} class:cached={stagesResumed.has(stage)}>
+					{stage}{stagesResumed.has(stage) ? ' (cached)' : ''}
+				</span>
+			{/each}
+		</div>
+		{/if}
+		{#if failedEv}
+		<div class="idx-error">{failedEv.data?.message ?? 'Pipeline failed'}</div>
+		{/if}
+
+		<!-- Final counts -->
+		{#if completeEv?.data}
+		<div class="idx-final-counts">
+			{#if completeEv.data.cuda != null}<span>CUDA: <b>{completeEv.data.cuda ? 'Yes' : 'No'}</b></span>{/if}
+			{#if idxFinalCounts.files != null}<span>Files: <b>{idxFinalCounts.files}</b></span>{/if}
+			{#if idxFinalCounts.chunks != null}<span>Chunks: <b>{idxFinalCounts.chunks}</b></span>{/if}
+			{#if idxFinalCounts.embeddings != null}<span>Embeddings: <b>{idxFinalCounts.embeddings}</b></span>{/if}
+			{#if idxFinalCounts.stored != null}<span>Stored: <b>{idxFinalCounts.stored}</b></span>{/if}
+			{#if idxFinalCounts.summaryClusters != null}<span>Summary Clusters: <b>{idxFinalCounts.summaryClusters}</b></span>{/if}
+			{#if idxFinalCounts.tagged != null}<span>Tagged: <b>{idxFinalCounts.tagged}</b></span>{/if}
+			{#if idxFinalCounts.processed != null}<span>Processed: <b>{idxFinalCounts.processed}</b></span>{/if}
+		</div>
+		{/if}
+
+		<div class="idx-events">
+			{#each idxEvents as ev}
+				<div class="idx-ev" class:ev-done={ev.event.endsWith('_done') || ev.event === 'complete'}
+					class:ev-fail={ev.event === 'failed' || ev.data?.step === 'failed'}
+					class:ev-skip={ev.data?.step === 'skipped'}
+					class:ev-cached={ev.data?.step === 'cached'}
+					class:ev-start={ev.event.endsWith('_started') || ev.event === 'started'}>
+					<span class="ev-name">{ev.event}</span>
+					{#if ev.data?.stage}<span class="ev-stage">{ev.data.stage}</span>{/if}
+					{#if ev.data?.totalMs}<span class="ev-ms">{ev.data.totalMs}ms</span>{/if}
+					{#if ev.data?.durationMs}<span class="ev-ms">{ev.data.durationMs}ms</span>{/if}
+					{#if ev.data?.filesProcessed}<span class="ev-detail">{ev.data.filesProcessed} files</span>{/if}
+					{#if ev.data?.chunksProcessed}<span class="ev-detail">{ev.data.chunksProcessed} chunks</span>{/if}
+					{#if ev.data?.embeddingsGenerated != null}<span class="ev-detail">{ev.data.embeddingsGenerated} embeds</span>{/if}
+					{#if ev.data?.storedInQdrant != null}<span class="ev-detail">{ev.data.storedInQdrant} stored</span>{/if}
+					{#if ev.data?.skippedExisting}<span class="ev-detail">{ev.data.skippedExisting} skipped</span>{/if}
+					{#if ev.data?.k}<span class="ev-detail">k={ev.data.k}</span>{/if}
+					{#if ev.data?.completedStages}<span class="ev-detail">{(ev.data.completedStages as string[]).join(', ')}</span>{/if}
+					{#if ev.data?.cachedAt}<span class="ev-cached-at">cached</span>{/if}
+					{#if ev.data?.reason}<span class="ev-reason">{ev.data.reason}</span>{/if}
+					{#if ev.data?.error}<span class="ev-error">{ev.data.error}</span>{/if}
+				</div>
+			{/each}
+		</div>
+	</section>
+	{/if}
+
+</div>
+{/if}
+
 </div>
 
 <style>
@@ -3765,4 +4134,41 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 	border-radius: 3px; display: flex; align-items: center; justify-content: center;
 }
 .todo-dismiss:hover { color: #f87171; background: #f8717115; }
+
+/* ── Index Orchestrator ────────────────────────────────────────────────── */
+.idx-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; gap: 0.75rem; flex-wrap: wrap; }
+.idx-presets  { display: flex; gap: 0.35rem; }
+.idx-presets .btn-sm { background: #1e1c14; color: #8b7860; border: 1px solid #2a2618; }
+.idx-presets .btn-sm.active { background: #2a2618; color: #d4c7a3; border-color: #7c6ff7; }
+.idx-actions  { display: flex; gap: 0.35rem; }
+.idx-error    { font-size: 0.75rem; color: #f87171; margin-top: 0.5rem; padding: 0.4rem 0.6rem; background: #f8717110; border: 1px solid #f8717130; border-radius: 4px; }
+.idx-preset-info { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; font-size: 0.72rem; color: #6b7280; align-items: center; }
+.idx-flag     { padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.04em; }
+.idx-flag.on  { color: #4ade80; border: 1px solid #4ade8044; background: #4ade800d; }
+.idx-flag.warn{ color: #f59e0b; border: 1px solid #f59e0b44; background: #f59e0b0d; }
+.idx-stats    { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.5rem; }
+.idx-stats .stat-row span:first-child { font-size: 0.74rem; color: #8b7860; }
+.idx-stats .stat-row span:last-child  { font-size: 0.8rem; color: #d4c7a3; font-weight: 600; }
+.cuda-on      { color: #4ade80 !important; }
+.idx-events   { display: flex; flex-direction: column; gap: 0.25rem; max-height: 400px; overflow-y: auto; }
+.idx-ev       { display: flex; gap: 0.5rem; align-items: center; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.72rem; background: #1a1916; border: 1px solid #2a2618; flex-wrap: wrap; }
+.idx-ev.ev-done  { border-color: #4ade8044; background: #4ade800a; }
+.idx-ev.ev-fail  { border-color: #f8717144; background: #f871710a; }
+.idx-ev.ev-skip  { opacity: 0.5; }
+.idx-ev.ev-cached { border-color: #a78bfa44; background: #a78bfa0a; }
+.idx-ev.ev-start { border-color: #60a5fa33; }
+.btn-resume { background: #2d2150; color: #a78bfa; border: 1px solid #a78bfa44; }
+.ev-name      { font-weight: 600; color: #d4c7a3; min-width: 120px; }
+.ev-stage     { color: #7c6ff7; font-size: 0.68rem; }
+.ev-ms        { color: #4ade80; font-size: 0.68rem; }
+.ev-detail    { color: #9ca3af; font-size: 0.68rem; }
+.ev-reason    { color: #f59e0b; font-size: 0.68rem; }
+.ev-error     { color: #f87171; font-size: 0.68rem; }
+.ev-cached-at { color: #a78bfa; font-size: 0.68rem; font-weight: 600; }
+.idx-stages-bar { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.idx-stage-chip { padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; }
+.idx-stage-chip.done { color: #4ade80; background: #4ade800d; border: 1px solid #4ade8044; }
+.idx-stage-chip.cached { color: #a78bfa; background: #a78bfa0d; border: 1px solid #a78bfa44; }
+.idx-final-counts { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; font-size: 0.72rem; color: #9ca3af; }
+.idx-final-counts b { color: #d4c7a3; }
 </style>
