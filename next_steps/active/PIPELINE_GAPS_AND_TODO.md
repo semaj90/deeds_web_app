@@ -81,21 +81,11 @@ Schema has `faceEmbedding`. Pipeline designed but not implemented.
 **Note**: POI photo upload API (`api/persons-of-interest/[id]/photos/+server.ts`) and photo LEFT JOIN in search are already wired. GAP-11 is the AI face *matching* pipeline only.
 **See**: [FEATURE_ROADMAPS.md](FEATURE_ROADMAPS.md). **Effort**: Large.
 
-### GAP-17: gRPC Embedding Service (go-embedding-service) ⚡
-**go-embedding-service is compiled and ready** at `services/go-embedding-service/embedding-server.exe`. NOT in deeds_labs — that note in Infrastructure Decisions is wrong.
-- Listens on port 50051 (gRPC) + 8097 (HTTP health). Redis-caches embeddings (24h TTL), batches to Ollama.
-- **Env flag already set**: `EMBEDDING_GRPC_ENABLED=true` is live in `.env`. The TypeScript client will attempt gRPC on 50051 and fall back to Ollama if the server isn't running.
-- **Remaining work**: start `./embedding-server.exe` and verify gRPC path is being hit (check `[EmbeddingClient] gRPC` logs vs `[EmbeddingClient] Ollama fallback`).
-- TypeScript client `src/lib/server/grpc/embedding-client.ts` already wired with gRPC→HTTP→Ollama fallback chain.
-- **Effort**: ~10 min (start exe + check logs).
+### ~~GAP-17: gRPC Embedding Service~~ CLOSED (Apr 20, 2026) ⚡
+`embedding-server.exe` confirmed running: `:50051` gRPC + `:8097` HTTP health → `{"status":"healthy"}`. `EMBEDDING_GRPC_ENABLED=true` in `.env`. Full call chain verified: `/api/embed` → `embedText()` → `generateSingleEmbedding()` → `generateEmbeddings()` → gRPC tier 1. 768-dim vectors returned.
 
-### GAP-18: gRPC Retrieval Service (go-retrieval-service)
-`services/go-retrieval-service/` has `.go` source (no compiled exe yet).
-- Listens on port 50053, proxies Qdrant hybrid search with Redis caching.
-- **Enable**: `cd services/go-retrieval-service && go build -o retrieval-server.exe .`, then `RETRIEVAL_GRPC_ENABLED=true`.
-- TypeScript client `src/lib/server/grpc/retrieval-client.ts` already wired with gRPC→HTTP→inline fallback.
-- **Known issue**: port 50055 collision between `chr97-agent-client.ts` and `go-search-service` (go-search actually runs HTTP on 8096, not gRPC — the collision is a CLAUDE.md doc error, not a real conflict).
-- **Effort**: Small (~30 min — build + test).
+### ~~GAP-18: gRPC Retrieval Service~~ CLOSED (Apr 20, 2026)
+Built `services/go-retrieval-service/retrieval-server.exe` (33MB). Health check: `{"status":"healthy","qdrantConnected":true,"pgvectorConnected":true,"redisConnected":true,"embeddingServiceUp":true}`. Port `:50053` gRPC + `:8100` HTTP. Set `RETRIEVAL_GRPC_ENABLED=true` in `.env`. TypeScript client `retrieval-client.ts` auto-routes through gRPC → HTTP → inline fallback.
 
 ---
 
@@ -106,7 +96,7 @@ Schema has `faceEmbedding`. Pipeline designed but not implemented.
 | GAP-12 | HMM Legal Section Tagger (port from Python Viterbi) | Medium |
 | GAP-13 | Redis Rate Limiting (generalized middleware) | Medium |
 | GAP-14 | ~~.env.example reconciliation~~ CLOSED (Apr 20, 2026) — added `FFMPEG_PATH`, `PYTHON_PATH`, `GEMINI_API_KEY`, `GRAPH_ML_GRPC_*`, `ACE_EMBED_BATCH_TIMEOUT_MS`; added `GRAPH_ML_GRPC_*` to `env.server.ts` + removed `(ENV as any)` casts in `graph-ml-client.ts` | Small |
-| GAP-15 | Obsidian Export UI (Karpathy wiki `exportToObsidian()`) | Small |
+| GAP-15 | ~~Obsidian Export UI~~ CLOSED (Apr 20, 2026) — button already live in `/admin/kag-notebook`, calls `/api/codebase-index/kag-notebook` `export-obsidian` action | Small |
 | GAP-16 | CHR97 operator stats + route-level observability before UI exposure | Small |
 
 ---
