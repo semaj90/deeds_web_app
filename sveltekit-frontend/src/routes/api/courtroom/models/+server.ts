@@ -44,14 +44,16 @@ export const GET: RequestHandler = async ({ locals }) => {
 				thumbnailUrl: m.thumbnailUrl,
 				skeletonType: m.skeletonType,
 				scale: { x: m.scaleX, y: m.scaleY, z: m.scaleZ },
-				animations: (animsByType.get(m.skeletonType) ?? []).map((a) => ({
-					id: a.id,
-					name: a.name,
-					animType: a.animType,
-					animationUrl: a.animationUrl,
-					durationMs: a.durationMs,
-					loop: a.loop,
-				})),
+				animations: (animsByType.get(m.skeletonType) ?? [])
+					.filter((a) => a.animationUrl) // skip procedural placeholders (empty URL)
+					.map((a) => ({
+						id: a.id,
+						name: a.name,
+						animType: a.animType,
+						animationUrl: a.animationUrl,
+						durationMs: a.durationMs,
+						loop: a.loop,
+					})),
 			})),
 			animations: animations.map((a) => ({
 				id: a.id,

@@ -68,10 +68,8 @@ Full pipeline: Granite-Docling DocTags → LangExtract sections → Gemma4 VLM r
 3D Prosecutor roadmap describes `canonical_documents` + `canonical_chunks` + `terms` tables. None exist in Drizzle schema.
 **Fix**: Drizzle schema + ingestion pipeline for FRE rules/federal statutes/SCOTUS chunks. **Effort**: Large.
 
-### GAP-9: User Interaction Graph
-Neo4j schema exists but not populated. Need: record VIEWED/SEARCHED/ANALYZED edges, PageRank for suggestions.
-**Seed script**: `scripts/seed-neo4j.mjs` (362 lines, PG→Neo4j MERGE) exists and is ready to run.
-**See**: [FEATURE_ROADMAPS.md](FEATURE_ROADMAPS.md) — Neo4j activation details. **Effort**: Medium (seed + runtime validation).
+### ~~GAP-9: User Interaction Graph~~ CLOSED (Apr 20, 2026)
+Neo4j seeded from PostgreSQL via `scripts/seed-neo4j.mjs`. Fixed schema mismatch (`citation_text` → `quoted_text` in citations query). Full seed run: **343 cases, 61 evidence, 21 glossary, 0 errors** (10.6s). Final graph: 568 Case nodes, 296 Evidence nodes, 21 GlossaryTerm nodes, BELONGS_TO/RELATED_TO/CHUNK_OF relationships. Script is idempotent (MERGE) — safe to re-run on any machine restart.
 
 ### GAP-10: D3 Graph Visualization
 Route exists but may be incomplete. Need D3 force-directed layout with filters. **Effort**: Medium.

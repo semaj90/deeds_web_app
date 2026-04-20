@@ -95,7 +95,6 @@ def convert_fbx_to_glb(fbx_path, output_path):
             export_apply=False,
             export_texcoords=True,
             export_normals=True,
-            export_colors=True,
             export_cameras=False,
             export_lights=False,
             export_yup=True,

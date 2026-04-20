@@ -128,23 +128,23 @@ async function syncEvidence(session, caseId) {
 
 async function syncCitations(session, caseId) {
 	const { rows } = await pool.query(
-		`SELECT id, citation_text, title FROM citations WHERE case_id = $1 LIMIT 30`,
-		[caseId]
-	);
-	for (const cit of rows) {
-		const code = (cit.citation_text || cit.title || '').slice(0, 120);
-		if (!code) continue;
-		await session.run(
-			`MERGE (s:Statute {code: $code})
+    `SELECT id, quoted_text, title FROM citations WHERE case_id = $1 LIMIT 30`,
+    [caseId]
+  );
+  for (const cit of rows) {
+    const code = (cit.quoted_text || cit.title || '').slice(0, 120);
+    if (!code) continue;
+    await session.run(
+      `MERGE (s:Statute {code: $code})
 			 SET s.title = $title
 			 WITH s
 			 MATCH (c:Case {id: $caseId})
 			 MERGE (c)-[:REFERENCES]->(s)`,
-			{ code, title: cit.title || code, caseId }
-		);
-		stats.citations++;
-		stats.relationships++;
-	}
+      { code, title: cit.title || code, caseId }
+    );
+    stats.citations++;
+    stats.relationships++;
+  }
 	return rows.length;
 }
 
