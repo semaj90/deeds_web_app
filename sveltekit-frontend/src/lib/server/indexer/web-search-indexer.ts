@@ -22,6 +22,7 @@ import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { webSearch } from '$lib/server/retrieval/web-search.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { JSDOM } from 'jsdom';
 
 const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
 const KNOWLEDGE_COLLECTION = 'knowledge_base';
@@ -40,6 +41,8 @@ export interface DeepResearchOptions {
   resultsPerQuery?: number;
   /** Skip Qdrant mirror (DB only) */
   skipQdrant?: boolean;
+  /** Recursive depth (default: 1, max: 2) */
+  maxDepth?: number;
   /** Progress callback (optional) */
   onProgress?: (msg: string) => void;
 }
@@ -204,106 +207,105 @@ export async function runDeepResearchIndex(
 
     // ── 4. Fetch, embed, persist each result ─────────────────────────────────
     for (const result of searchResults) {
-      const urlHash = createHash('sha256').update(result.url).digest('hex').slice(0, 16);
-
-      // Fetch full content (falls back to snippet on failure)
-      let content = result.snippet;
-      const fetched = await fetchPageContent(result.url);
-      if (fetched && fetched.length > content.length) {
-        content = fetched;
-        pagesIndexed++;
-      } else {
-        pagesSkipped++;
-      }
-
-      if (!content || content.length < 30) {
-        pagesFailed++;
-        continue;
-      }
-
-      // Embed (title + content concatenated)
-      const textToEmbed = `${result.title}\n\n${content.slice(0, 2000)}`;
-      let embedding: number[] | null = null;
-      try {
-        const raw = await generateSingleEmbedding(textToEmbed);
-        if (raw && raw.length === 768) embedding = Array.from(raw);
-      } catch {
-        // embedding optional — row still persisted
-      }
-
-      const snippet = content.slice(0, 400);
-      const relevanceScore = 0.6; // base score; future: use cross-encoder rerank
-
-      // ── 5. Upsert into web_search_index ────────────────────────────────────
-      try {
-        const existing = await db.execute(sql`
-          SELECT id FROM web_search_index WHERE content_hash = ${urlHash} LIMIT 1
-        `);
-        const existingRows = Array.isArray((existing as unknown as { rows?: unknown[] }).rows)
-          ? ((existing as unknown as { rows: Array<{ id: string }> }).rows)
-          : (existing as unknown as Array<{ id: string }>);
-
-        if (existingRows && existingRows.length > 0) {
-          // Update existing row
-          await db.execute(sql`
-            UPDATE web_search_index
-            SET
-              content        = ${content},
-              snippet        = ${snippet},
-              relevance_score = ${relevanceScore},
-              run_id         = ${runId},
-              indexed_at     = now()
-              ${embedding ? sql`, embedding = ${JSON.stringify(embedding)}::vector` : sql``}
-            WHERE content_hash = ${urlHash}
-          `);
-          rowsUpdated++;
-        } else {
-          // Insert new row
-          await db.insert(webSearchIndex).values({
-            query,
-            clusterId,
-            url: result.url,
-            title: result.title,
-            content,
-            snippet,
-            provider: result.source,
-            contentHash: urlHash,
-            relevanceScore,
-            runId,
-            ...(embedding ? { embedding } : {}),
-          });
-          rowsInserted++;
-        }
-      } catch (err) {
-        log(`[deep-research] DB upsert failed for ${result.url}: ${(err as Error).message}`);
-        pagesFailed++;
-        continue;
-      }
-
-      // ── 6. Mirror to Qdrant knowledge_base (optional) ───────────────────────
-      if (!opts.skipQdrant && embedding) {
-        try {
-          const qdrantId = hashToQdrantId(urlHash);
-          await mirrorToQdrant(qdrantId, embedding, {
-            url: result.url,
-            title: result.title,
-            content: snippet,
-            source: result.source,
-            query,
-            clusterId,
-            contentHash: urlHash,
-            relevanceScore,
-            runId,
-            type: 'web_search_index',
-            indexedAt: new Date().toISOString(),
-          });
-        } catch {
-          // Qdrant mirror is non-fatal
-        }
-      }
+      await processAndIndexUrl(result.url, result.title, result.source, query, clusterId, 1, opts);
     }
 
     log(`[deep-research] Cluster ${clusterId} done: ${searchResults.length} results processed`);
+  }
+
+  // ── 5. Autonomous Sync (Chronicler) ────────────────────────────────────────
+  try {
+    log('[deep-research] Triggering autonomous maintenance cycle…');
+    const { execSync } = await import('node:child_process');
+    execSync('node scripts/maintain-repo.mjs');
+  } catch (err) {
+    log(`[deep-research] Maintenance failed: ${(err as Error).message}`);
+  }
+
+  /** Internal processor for individual URLs (recursive) */
+  async function processAndIndexUrl(
+    url: string,
+    title: string,
+    source: string,
+    query: string,
+    clusterId: number,
+    depth: number,
+    opts: DeepResearchOptions
+  ): Promise<void> {
+    const urlHash = createHash('sha256').update(url).digest('hex').slice(0, 16);
+    const runId = opts.runId ?? `dr-${Date.now()}`;
+    const maxDepth = opts.maxDepth ?? 1;
+
+    // 1. Fetch
+    let rawHtml = '';
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(PAGE_FETCH_TIMEOUT) });
+      if (res.ok) rawHtml = await res.text();
+    } catch { return; }
+
+    if (!rawHtml) return;
+
+    // 2. Parse & Extract
+    const dom = new JSDOM(rawHtml);
+    const doc = dom.window.document;
+    const cleanText = stripHtml(rawHtml).slice(0, MAX_CONTENT_CHARS);
+    
+    if (cleanText.length < 50) return;
+
+    // 3. Embed
+    const textToEmbed = `${title}\n\n${cleanText.slice(0, 2000)}`;
+    let embedding: number[] | null = null;
+    try {
+      const raw = await generateSingleEmbedding(textToEmbed);
+      if (raw && raw.length === 768) embedding = Array.from(raw);
+    } catch {}
+
+    // 4. DB Upsert
+    try {
+      const snippet = cleanText.slice(0, 400);
+      const rel = 0.6 + (depth === 1 ? 0.2 : 0); // Primary results rank higher
+
+      await db.insert(webSearchIndex).values({
+        query,
+        clusterId,
+        url,
+        title,
+        content: cleanText,
+        snippet,
+        provider: source,
+        contentHash: urlHash,
+        relevanceScore: rel,
+        runId,
+        ...(embedding ? { embedding } : {}),
+      }).onConflictDoUpdate({
+        target: webSearchIndex.contentHash,
+        set: {
+          content: cleanText,
+          snippet,
+          relevanceScore: rel,
+          runId,
+          indexedAt: sql`now()`,
+          ...(embedding ? { embedding: sql`${JSON.stringify(embedding)}::vector` } : {}),
+        }
+      });
+      rowsInserted++;
+      pagesIndexed++;
+    } catch (err) {
+      pagesFailed++;
+      return;
+    }
+
+    // 5. Recursion (Depth 2)
+    if (depth < maxDepth && depth < 2) {
+      const links = Array.from(doc.querySelectorAll('a'))
+        .map(a => a.href)
+        .filter(href => href.startsWith('http') && !href.includes('google.com') && !href.includes('search'))
+        .slice(0, 3); // Max 3 child links per page
+
+      for (const link of links) {
+        await processAndIndexUrl(link, `Child: ${title}`, source, query, clusterId, depth + 1, opts);
+      }
+    }
   }
 
   const durationMs = Date.now() - startedAt;

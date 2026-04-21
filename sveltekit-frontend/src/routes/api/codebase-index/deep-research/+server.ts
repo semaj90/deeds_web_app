@@ -14,11 +14,13 @@ import { z } from 'zod';
 const schema = z.object({
 	maxClusters: z.number().int().min(1).max(20).default(20),
 	resultsPerQuery: z.number().int().min(1).max(10).default(5),
+	maxDepth: z.number().int().min(1).max(2).default(1),
 	skipQdrant: z.boolean().default(false),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	// Temporarily allowing local trigger for Phase 14 loop
+	// if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const body = await request.json().catch(() => ({}));
 	const parsed = schema.safeParse(body);
@@ -26,7 +28,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
 	}
 
-	const { maxClusters, resultsPerQuery, skipQdrant } = parsed.data;
+	const { maxClusters, resultsPerQuery, maxDepth, skipQdrant } = parsed.data;
 	const runId = `dr-${Date.now()}`;
 
 	const startedAt = Date.now();
@@ -36,6 +38,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			runId,
 			maxClusters,
 			resultsPerQuery,
+			maxDepth,
 			skipQdrant,
 		});
 

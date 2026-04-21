@@ -25,18 +25,17 @@ async function maintain() {
 	// 2. Generate TODO Update
 	const timestamp = new Date().toISOString();
 	const todoEntry = `
-## [${timestamp}] - ACE Phase 13 Sync
-### Accomplished (Summarized from Phase 12/13)
-- Successfully integrated TRT-LLM batch reranker (Phase 11).
-- Implemented Autonomous Refinement Cycles (4+2 model) (Phase 12).
-- Deployed Sentinel: Proactive Architectural Guarding (Phase 13).
-- Deployed Scouter: Agentic Web Indexing & Deep Research (Phase 13).
+## [${timestamp}] - ACE Phase 14 Deep Research Sync
+### Accomplished (Summarized from Phase 13/14)
+- Sentinel: Live architectural health monitoring & risk assessment.
+- **Scouter (Phase 14)**: Depth 2 recursive web research indexing into "web_search_index".
+- Corrective RAG: Integrated "web_search_index" retrieval into context-assembler.ts.
+- Chronicler: Autonomous Orchestration (Indexing -> Research -> Sync).
 
-### Missing Features / Tomorrow's Focus
-- Implement UI "Risk Badge" for At-Risk files.
-- Enable automatic deep-scroll for web pages with relevance > 0.8.
-- Finalize legal glossary graph extraction from web-search hits.
-- Hardening focus-trigger rate limiting.
+### Missing Features / Tomorrow's Focus (Timestamp: ${timestamp})
+- Implement "Cognitive Sort" for web search results (Semantic-Temporal Boost).
+- Enable UI "Guard Badge" for files currently undergoing proactive research.
+- Hardening JSDOM link extraction for SPA documentation sites.
 
 ---
 `.trim();
@@ -55,8 +54,8 @@ async function maintain() {
 		console.log('[Chronicler] Running git commands...');
 		execSync('git add .');
 		
-		// Use a concise commit message based on the last phase
-		const commitMsg = `ACE Phase 13: Sentinel & Curator Deployment - ${timestamp.slice(0, 10)}`;
+		// Use a specific "Deep Research" commit message for the user
+		const commitMsg = `Deep Research ACE Commit: Phase 14 Loop Completion - ${timestamp.slice(0, 16)}`;
 		execSync(`git commit -m "${commitMsg}"`);
 		
 		console.log('[Chronicler] Pushing to main...');
