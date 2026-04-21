@@ -60,9 +60,9 @@ export interface DeepResearchResult {
 interface ClusterSummaryRow {
   gpu_cluster: number;
   purpose: string;
-  patterns: string[];
-  warnings: string[];
-  tags: string[];
+  patterns: string[] | string | null;
+  warnings: string[] | string | null;
+  tags: string[] | string | null;
 }
 
 // ── HTML stripping ───────────────────────────────────────────────────────────
@@ -90,7 +90,7 @@ async function fetchPageContent(url: string): Promise<string | null> {
       signal: AbortSignal.timeout(PAGE_FETCH_TIMEOUT),
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; LegalAI-Research-Bot/1.0)',
-        'Accept': 'text/html,application/xhtml+xml',
+        Accept: 'text/html,application/xhtml+xml',
       },
     });
     if (!res.ok) return null;
@@ -110,7 +110,7 @@ async function fetchPageContent(url: string): Promise<string | null> {
 async function mirrorToQdrant(
   pointId: number,
   embedding: number[],
-  payload: Record<string, unknown>,
+  payload: Record<string, unknown>
 ): Promise<void> {
   const res = await fetch(`${QDRANT_URL}/collections/${KNOWLEDGE_COLLECTION}/points`, {
     method: 'PUT',
@@ -123,6 +123,35 @@ async function mirrorToQdrant(
   if (!res.ok) throw new Error(`Qdrant PUT ${res.status}`);
 }
 
+// Safely parse a value that may be a JS array, a JSON string, or a raw PG
+// array literal like {"a","b"} into a JS string[].
+function toStringArray(v: unknown): string[] {
+  if (!v) return [];
+  if (Array.isArray(v)) return v as string[];
+  const s = String(v).trim();
+  // PostgreSQL array literal: {"a","b"} or {a,b}
+  if (s.startsWith('{') && s.endsWith('}')) {
+    const inner = s.slice(1, -1);
+    if (!inner) return [];
+    // Split on commas not inside quotes
+    return (
+      inner
+        .match(/"[^"]*"|[^,]+/g)
+        ?.map((t) => t.replace(/^"|"$/g, '').trim())
+        .filter(Boolean) ?? []
+    );
+  }
+  // JSON array string
+  if (s.startsWith('[')) {
+    try {
+      return JSON.parse(s) as string[];
+    } catch {
+      return [];
+    }
+  }
+  return [s];
+}
+
 // ── Stable integer ID from content hash ──────────────────────────────────────
 
 function hashToQdrantId(contentHash: string): number {
@@ -133,7 +162,7 @@ function hashToQdrantId(contentHash: string): number {
 // ── Main pipeline ─────────────────────────────────────────────────────────────
 
 export async function runDeepResearchIndex(
-  opts: DeepResearchOptions = {},
+  opts: DeepResearchOptions = {}
 ): Promise<DeepResearchResult> {
   const startedAt = Date.now();
   const log = opts.onProgress ?? (() => {});
@@ -156,37 +185,50 @@ export async function runDeepResearchIndex(
       SELECT gpu_cluster, purpose, patterns, warnings, tags
       FROM cluster_summaries
       ORDER BY gpu_cluster
-      LIMIT ${maxClusters}
+      LIMIT ${sql.raw(String(maxClusters))}
     `);
     const rowData = Array.isArray((rows as unknown as { rows?: unknown[] }).rows)
-      ? ((rows as unknown as { rows: ClusterSummaryRow[] }).rows)
+      ? (rows as unknown as { rows: ClusterSummaryRow[] }).rows
       : (rows as unknown as ClusterSummaryRow[]);
     clusters = rowData ?? [];
   } catch (err) {
     log(`[deep-research] Failed to load cluster summaries: ${(err as Error).message}`);
-    return { queriesRun, pagesIndexed, pagesSkipped, pagesFailed, rowsInserted, rowsUpdated, durationMs: Date.now() - startedAt };
+    return {
+      queriesRun,
+      pagesIndexed,
+      pagesSkipped,
+      pagesFailed,
+      rowsInserted,
+      rowsUpdated,
+      durationMs: Date.now() - startedAt,
+    };
   }
 
   if (clusters.length === 0) {
     log('[deep-research] No cluster summaries found — run cluster summarization first');
-    return { queriesRun, pagesIndexed, pagesSkipped, pagesFailed, rowsInserted, rowsUpdated, durationMs: Date.now() - startedAt };
+    return {
+      queriesRun,
+      pagesIndexed,
+      pagesSkipped,
+      pagesFailed,
+      rowsInserted,
+      rowsUpdated,
+      durationMs: Date.now() - startedAt,
+    };
   }
 
   log(`[deep-research] Processing ${clusters.length} clusters…`);
 
   // ── 2. Process each cluster ────────────────────────────────────────────────
   for (const cluster of clusters) {
-    const clusterId = cluster.gpu_cluster;
+    // Build focused query from cluster knowledge (patterns only — tags are file paths)
+    const purposeStr = (cluster.purpose ?? '').trim();
+    const patterns = toStringArray(cluster.patterns).slice(0, 2);
+    // Build a clean, readable query: purpose + top 2 patterns + language context
+    const queryParts = [purposeStr, ...patterns].filter(Boolean);
+    const query = `${queryParts.join(' ')} TypeScript SvelteKit`;
 
-    // Build focused query from cluster knowledge
-    const queryParts = [cluster.purpose];
-    const topPatterns = (cluster.patterns ?? []).slice(0, 2);
-    if (topPatterns.length) queryParts.push(topPatterns.join(' '));
-    const topTags = (cluster.tags ?? []).slice(0, 2);
-    if (topTags.length) queryParts.push(topTags.join(' '));
-    const query = `${queryParts.join(' ')} TypeScript SvelteKit site:github.com OR site:docs.rs OR site:dev.to`;
-
-    log(`[deep-research] Cluster ${clusterId}: "${query.slice(0, 80)}…"`);
+    log(`[deep-research] Cluster ${cluster.gpu_cluster}: "${query.slice(0, 80)}"`);
 
     // ── 3. Web search ────────────────────────────────────────────────────────
     let searchResults: Awaited<ReturnType<typeof webSearch>>['results'] = [];
@@ -195,22 +237,34 @@ export async function runDeepResearchIndex(
       searchResults = searchResp.results;
       queriesRun++;
     } catch (err) {
-      log(`[deep-research] Search failed for cluster ${clusterId}: ${(err as Error).message}`);
+      log(
+        `[deep-research] Search failed for cluster ${cluster.gpu_cluster}: ${(err as Error).message}`
+      );
       queriesRun++;
       continue;
     }
 
     if (searchResults.length === 0) {
-      log(`[deep-research] Cluster ${clusterId}: no results`);
+      log(`[deep-research] Cluster ${cluster.gpu_cluster}: no results`);
       continue;
     }
 
     // ── 4. Fetch, embed, persist each result ─────────────────────────────────
     for (const result of searchResults) {
-      await processAndIndexUrl(result.url, result.title, result.source, query, clusterId, 1, opts);
+      await processAndIndexUrl(
+        result.url,
+        result.title,
+        result.source,
+        query,
+        cluster.gpu_cluster,
+        1,
+        opts
+      );
     }
 
-    log(`[deep-research] Cluster ${clusterId} done: ${searchResults.length} results processed`);
+    log(
+      `[deep-research] Cluster ${cluster.gpu_cluster} done: ${searchResults.length} results processed`
+    );
   }
 
   // ── 5. Autonomous Sync (Chronicler) ────────────────────────────────────────
@@ -241,7 +295,9 @@ export async function runDeepResearchIndex(
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(PAGE_FETCH_TIMEOUT) });
       if (res.ok) rawHtml = await res.text();
-    } catch { return; }
+    } catch {
+      return;
+    }
 
     if (!rawHtml) return;
 
@@ -249,7 +305,7 @@ export async function runDeepResearchIndex(
     const dom = new JSDOM(rawHtml);
     const doc = dom.window.document;
     const cleanText = stripHtml(rawHtml).slice(0, MAX_CONTENT_CHARS);
-    
+
     if (cleanText.length < 50) return;
 
     // 3. Embed
@@ -265,29 +321,32 @@ export async function runDeepResearchIndex(
       const snippet = cleanText.slice(0, 400);
       const rel = 0.6 + (depth === 1 ? 0.2 : 0); // Primary results rank higher
 
-      await db.insert(webSearchIndex).values({
-        query,
-        clusterId,
-        url,
-        title,
-        content: cleanText,
-        snippet,
-        provider: source,
-        contentHash: urlHash,
-        relevanceScore: rel,
-        runId,
-        ...(embedding ? { embedding } : {}),
-      }).onConflictDoUpdate({
-        target: webSearchIndex.contentHash,
-        set: {
+      await db
+        .insert(webSearchIndex)
+        .values({
+          query,
+          clusterId,
+          url,
+          title,
           content: cleanText,
           snippet,
+          provider: source,
+          contentHash: urlHash,
           relevanceScore: rel,
           runId,
-          indexedAt: sql`now()`,
-          ...(embedding ? { embedding: sql`${JSON.stringify(embedding)}::vector` } : {}),
-        }
-      });
+          ...(embedding ? { embedding } : {}),
+        })
+        .onConflictDoUpdate({
+          target: webSearchIndex.contentHash,
+          set: {
+            content: cleanText,
+            snippet,
+            relevanceScore: rel,
+            runId,
+            indexedAt: sql`now()`,
+            ...(embedding ? { embedding: sql`${JSON.stringify(embedding)}::vector` } : {}),
+          },
+        });
       rowsInserted++;
       pagesIndexed++;
     } catch (err) {
@@ -298,18 +357,39 @@ export async function runDeepResearchIndex(
     // 5. Recursion (Depth 2)
     if (depth < maxDepth && depth < 2) {
       const links = Array.from(doc.querySelectorAll('a'))
-        .map(a => a.href)
-        .filter(href => href.startsWith('http') && !href.includes('google.com') && !href.includes('search'))
+        .map((a) => a.href)
+        .filter(
+          (href) =>
+            href.startsWith('http') && !href.includes('google.com') && !href.includes('search')
+        )
         .slice(0, 3); // Max 3 child links per page
 
       for (const link of links) {
-        await processAndIndexUrl(link, `Child: ${title}`, source, query, clusterId, depth + 1, opts);
+        await processAndIndexUrl(
+          link,
+          `Child: ${title}`,
+          source,
+          query,
+          clusterId,
+          depth + 1,
+          opts
+        );
       }
     }
   }
 
   const durationMs = Date.now() - startedAt;
-  log(`[deep-research] Complete — queries:${queriesRun} indexed:${pagesIndexed} inserted:${rowsInserted} updated:${rowsUpdated} failed:${pagesFailed} (${durationMs}ms)`);
+  log(
+    `[deep-research] Complete — queries:${queriesRun} indexed:${pagesIndexed} inserted:${rowsInserted} updated:${rowsUpdated} failed:${pagesFailed} (${durationMs}ms)`
+  );
 
-  return { queriesRun, pagesIndexed, pagesSkipped, pagesFailed, rowsInserted, rowsUpdated, durationMs };
+  return {
+    queriesRun,
+    pagesIndexed,
+    pagesSkipped,
+    pagesFailed,
+    rowsInserted,
+    rowsUpdated,
+    durationMs,
+  };
 }

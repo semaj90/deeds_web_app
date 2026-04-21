@@ -19,8 +19,7 @@ const schema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	// Temporarily allowing local trigger for Phase 14 loop
-	// if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const body = await request.json().catch(() => ({}));
 	const parsed = schema.safeParse(body);
