@@ -20,9 +20,8 @@ CREATE TABLE IF NOT EXISTS web_search_index (
   indexed_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Deduplication constraint
-ALTER TABLE web_search_index
-  ADD CONSTRAINT IF NOT EXISTS wsi_content_hash_unique UNIQUE (content_hash);
+-- Deduplication index (unique)
+CREATE UNIQUE INDEX IF NOT EXISTS wsi_content_hash_unique ON web_search_index (content_hash);
 
 -- Query performance indexes
 CREATE INDEX IF NOT EXISTS wsi_cluster_score ON web_search_index (cluster_id, relevance_score);
@@ -35,6 +34,10 @@ CREATE INDEX IF NOT EXISTS wsi_embedding_hnsw
   USING hnsw (embedding vector_cosine_ops)
   WITH (m = 16, ef_construction = 64);
 
--- pipeline index on research_summaries for deep_research queries
-CREATE INDEX IF NOT EXISTS rs_pipeline_created
-  ON research_summaries (pipeline, created_at DESC);
+-- pipeline index on research_summaries (only if the table exists)
+DO $$
+BEGIN
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'research_summaries') THEN
+    CREATE INDEX IF NOT EXISTS rs_pipeline_created ON research_summaries (pipeline, created_at DESC);
+  END IF;
+END$$;

@@ -1,4 +1,4 @@
-import { pgRows } from '$lib/server/db/client';
+import { pgRows, db } from '$lib/server/db/client';
 /**
  * ACE Context Assembler — Central Orchestration Module
  *
@@ -58,6 +58,53 @@ import {
   type ChunkHit,
 } from '$lib/server/analytics/search-analytics.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+
+/** Vector-search web_search_index for semantically relevant pre-indexed pages. */
+async function fetchWebResearchRows(
+  query: string,
+  limit = 4
+): Promise<import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]> {
+  try {
+    const vec = await generateSingleEmbedding(query);
+    if (!vec || vec.length !== 768) return [];
+    const rows = await db.execute(sql`
+      SELECT url, title, snippet, relevance_score,
+             1 - (embedding <=> ${JSON.stringify(Array.from(vec))}::vector) AS score
+      FROM web_search_index
+      ORDER BY embedding <=> ${JSON.stringify(Array.from(vec))}::vector
+      LIMIT ${limit}
+    `);
+    const data = Array.isArray((rows as unknown as { rows?: unknown[] }).rows)
+      ? (
+          rows as unknown as {
+            rows: Array<{
+              url: string;
+              title: string | null;
+              snippet: string | null;
+              score: number;
+            }>;
+          }
+        ).rows
+      : (rows as unknown as Array<{
+          url: string;
+          title: string | null;
+          snippet: string | null;
+          score: number;
+        }>);
+    return (data ?? []).map((r) => ({
+      id: r.url,
+      kind: 'web_result' as const,
+      source: 'pgvector' as const,
+      content: r.snippet ?? r.title ?? '',
+      score: Math.max(0, Math.min(1, Number(r.score) || 0)),
+      tags: ['web_research'],
+      sourceId: r.url,
+    }));
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -106,6 +153,7 @@ export async function assembleACEContext(opts: {
         userAnalyticsContext,
         codebaseContext,
         topQueryTags,
+        webResearchRows,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -124,6 +172,9 @@ export async function assembleACEContext(opts: {
           ? fetchCodebaseContext(query, userId ?? undefined).catch(() => null)
           : Promise.resolve(null),
         fetchTopQueryTags(5).catch(() => [] as string[]),
+        fetchWebResearchRows(query).catch(
+          () => [] as import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]
+        ),
       ]);
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
@@ -225,11 +276,12 @@ export async function assembleACEContext(opts: {
           .catch(() => {});
       }
 
-      // P3-A: cross-source reranking — web results compete with KB/case chunks in unified pool
+      // P3-A: cross-source reranking — web results + pre-indexed research compete with KB/case chunks
       const webUnified = webResults ? webSearchToUnified(webResults) : [];
-      if (webUnified.length) {
+      const allExternal = [...webUnified, ...(webResearchRows ?? [])];
+      if (allExternal.length) {
         baseContext.ragChunks = assignRanks(
-          sortByBestScore([...baseContext.kbChunks, ...baseContext.caseChunks, ...webUnified])
+          sortByBestScore([...baseContext.kbChunks, ...baseContext.caseChunks, ...allExternal])
         );
       }
 
@@ -1921,17 +1973,17 @@ function applyKarpathyBoost(
 }
 
 function extractPracticeArea(
-	caseContext: string | null,
-	userProfile: ACEUserProfile | null
+  caseContext: string | null,
+  userProfile: ACEUserProfile | null
 ): string | null {
-	// Try case context first (look for practice_area field)
-	if (caseContext) {
-		const match = caseContext.match(/practice_area[:\s]+(\w[\w-]*)/i);
-		if (match) return match[1].toLowerCase();
-	}
-	// Fall back to user profile
-	if (userProfile?.practiceAreas.length) {
-		return userProfile.practiceAreas[0];
-	}
-	return null;
+  // Try case context first (look for practice_area field)
+  if (caseContext) {
+    const match = caseContext.match(/practice_area[:\s]+(\w[\w-]*)/i);
+    if (match) return match[1].toLowerCase();
+  }
+  // Fall back to user profile
+  if (userProfile?.practiceAreas.length) {
+    return userProfile.practiceAreas[0];
+  }
+  return null;
 }
