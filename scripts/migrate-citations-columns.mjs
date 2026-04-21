@@ -1,6 +1,6 @@
 import pg from 'pg';
 const { Pool } = pg;
-const p = new Pool({ connectionString: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db' });
+const p = new Pool({ connectionString: 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db' });
 
 await p.query(`
   ALTER TABLE citations

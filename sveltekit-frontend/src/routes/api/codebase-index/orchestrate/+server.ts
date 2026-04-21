@@ -53,30 +53,31 @@ const ALL_STAGES = [
 // ── Request schema ──────────────────────────────────────────────────────────
 
 const orchestrateSchema = z.object({
-	mode: z.enum(['sync', 'async']).default('sync'),
-	scope: z.enum(['routes', 'lib', 'all']).default('all'),
-	incremental: z.boolean().default(false),
-	runIndexing: z.boolean().optional(),
-	indexFileLimit: z.number().int().min(1).max(10000).optional(),
-	clusterCount: z.number().int().min(2).max(100).default(20),
-	clusterRange: z.string().max(200).optional(),
-	limit: z.number().int().min(1).max(200).default(50),
-	backfillLimit: z.number().int().min(10).max(10000).default(2000),
-	dryRun: z.boolean().default(false),
-	force: z.boolean().default(false),
-	gpuTag: z.boolean().default(true),
-	summarize: z.boolean().default(true),
-	forceRetag: z.boolean().default(false),
-	// Extended backbone flags
-	recompute: z.boolean().default(false),
-	somTopology: z.boolean().default(false),
-	neo4jSync: z.boolean().default(false),
-	pageRank: z.boolean().default(false),
-	exportWiki: z.boolean().default(false),
-	hypergraph: z.boolean().default(false),
-	// Checkpoint / resume
-	runId: z.string().max(64).optional(),
-	resume: z.boolean().default(false),
+  mode: z.enum(['sync', 'async']).default('sync'),
+  scope: z.enum(['routes', 'lib', 'all']).default('all'),
+  incremental: z.boolean().default(false),
+  runIndexing: z.boolean().optional(),
+  indexFileLimit: z.number().int().min(1).max(10000).optional(),
+  clusterCount: z.number().int().min(2).max(100).default(20),
+  clusterRange: z.string().max(200).optional(),
+  limit: z.number().int().min(1).max(200).default(50),
+  backfillLimit: z.number().int().min(10).max(10000).default(2000),
+  dryRun: z.boolean().default(false),
+  force: z.boolean().default(false),
+  gpuTag: z.boolean().default(true),
+  summarize: z.boolean().default(true),
+  forceRetag: z.boolean().default(false),
+  // Extended backbone flags
+  recompute: z.boolean().default(false),
+  somTopology: z.boolean().default(false),
+  neo4jSync: z.boolean().default(false),
+  pageRank: z.boolean().default(false),
+  exportWiki: z.boolean().default(false),
+  hypergraph: z.boolean().default(false),
+  deepResearch: z.boolean().default(false),
+  // Checkpoint / resume
+  runId: z.string().max(64).optional(),
+  resume: z.boolean().default(false),
 });
 
 // ── Checkpoint cache (Redis) ────────────────────────────────────────────────
@@ -427,6 +428,11 @@ async function importHypergraph4D() {
 	return mod.buildHypergraph4D;
 }
 
+async function importDeepResearch() {
+  const mod = await import('$lib/server/indexer/web-search-indexer.js');
+  return mod.runDeepResearchIndex;
+}
+
 // ── POST handler (SSE pipeline) ─────────────────────────────────────────────
 
 export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch }) => {
@@ -492,6 +498,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
 		hypergraph,
 		resume,
 	} = parsed.data;
+	const deepResearch = parsed.data.deepResearch ?? false;
 	const runId = parsed.data.runId ?? randomUUID().slice(0, 8);
 	const runIndexing = parsed.data.runIndexing ?? mode === 'sync';
 	if (mode === 'async' && dryRun) {
@@ -543,497 +550,620 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
 			// ── Check cached stages if resuming ──────────────────────────
 			const cachedStages = new Map<string, StageCheckpoint>();
 			if (resume) {
-				for (const stageName of ['ast_embed', 'cluster_assign', 'som_topology', 'neo4j_sync', 'pagerank', 'summarize', 'tag', 'wiki_export', 'hypergraph_4d']) {
-					const cached = await getCachedStage(runId, stageName);
-					if (cached) cachedStages.set(stageName, cached);
-				}
+				for (const stageName of [
+          'ast_embed',
+          'cluster_assign',
+          'som_topology',
+          'neo4j_sync',
+          'pagerank',
+          'summarize',
+          'tag',
+          'wiki_export',
+          'hypergraph_4d',
+          'deep_research',
+        ]) {
+          const cached = await getCachedStage(runId, stageName);
+          if (cached) cachedStages.set(stageName, cached);
+        }
 			}
 
 			emit('started', {
-				runId,
-				resume,
-				cachedStages: resume ? [...cachedStages.keys()] : [],
-				mode,
-				scope,
-				runIndexing,
-				indexFileLimit: indexFileLimit ?? null,
-				clusterCount,
-				clusterIds,
-				limit,
-				backfillLimit,
-				dryRun,
-				gpuTag,
-				summarize,
-				forceRetag,
-				recompute,
-				somTopology,
-				neo4jSync,
-				pageRank,
-				exportWiki,
-				hypergraph,
-			});
+        runId,
+        resume,
+        cachedStages: resume ? [...cachedStages.keys()] : [],
+        mode,
+        scope,
+        runIndexing,
+        indexFileLimit: indexFileLimit ?? null,
+        clusterCount,
+        clusterIds,
+        limit,
+        backfillLimit,
+        dryRun,
+        gpuTag,
+        summarize,
+        forceRetag,
+        recompute,
+        somTopology,
+        neo4jSync,
+        pageRank,
+        exportWiki,
+        hypergraph,
+        deepResearch,
+      });
 
 			// Save run metadata for polling
 			void setRunMeta(runId, { scope, clusterCount, startedAt: new Date().toISOString(), resume, cachedStages: [...cachedStages.keys()] });
 
 			try {
-				const completedStages: string[] = [];
+        const completedStages: string[] = [];
 
-				// ── Stage 1: AST scan + chunk + embed ─────────────────────────
-				if (runIndexing || recompute) {
-					const cached = cachedStages.get('ast_embed');
-					if (cached) {
-						emit('stage', { stage: 'ast_embed', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						stageTimings.ast_embed = cached.durationMs;
-						completedStages.push('ast_embed');
-					} else {
-						const stageStart = Date.now();
-						emit('scan_started', {
-							stage: 'scan',
-							scope,
-							indexFileLimit: indexFileLimit ?? null,
-							incremental,
-							recompute,
-							mode: 'sync-inline',
-						});
+        // ── Stage 1: AST scan + chunk + embed ─────────────────────────
+        if (runIndexing || recompute) {
+          const cached = cachedStages.get('ast_embed');
+          if (cached) {
+            emit('stage', {
+              stage: 'ast_embed',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            stageTimings.ast_embed = cached.durationMs;
+            completedStages.push('ast_embed');
+          } else {
+            const stageStart = Date.now();
+            emit('scan_started', {
+              stage: 'scan',
+              scope,
+              indexFileLimit: indexFileLimit ?? null,
+              incremental,
+              recompute,
+              mode: 'sync-inline',
+            });
 
-						const allFiles: string[] = [];
-						const targetLimit = indexFileLimit ?? Number.MAX_SAFE_INTEGER;
-						for (const dir of scopeDirs) {
-							const remaining = targetLimit - allFiles.length;
-							if (remaining <= 0) break;
-							const scopedFiles = await collectFiles(resolve(ROOT, dir), remaining);
-							allFiles.push(...scopedFiles);
-						}
+            const allFiles: string[] = [];
+            const targetLimit = indexFileLimit ?? Number.MAX_SAFE_INTEGER;
+            for (const dir of scopeDirs) {
+              const remaining = targetLimit - allFiles.length;
+              if (remaining <= 0) break;
+              const scopedFiles = await collectFiles(resolve(ROOT, dir), remaining);
+              allFiles.push(...scopedFiles);
+            }
 
-						emit('scan_done', {
-							stage: 'scan',
-							scope,
-							dirs: scopeDirs,
-							filesProcessed: allFiles.length,
-							indexFileLimit: indexFileLimit ?? null,
-						});
+            emit('scan_done', {
+              stage: 'scan',
+              scope,
+              dirs: scopeDirs,
+              filesProcessed: allFiles.length,
+              indexFileLimit: indexFileLimit ?? null,
+            });
 
-						if (allFiles.length === 0) {
-							throw new Error(`No indexable files found for scope ${scope}`);
-						}
+            if (allFiles.length === 0) {
+              throw new Error(`No indexable files found for scope ${scope}`);
+            }
 
-						const chunks = chunkFiles(allFiles, ROOT);
-						emit('chunk_done', {
-							stage: 'chunk',
-							filesProcessed: allFiles.length,
-							chunksProcessed: chunks.length,
-						});
+            const chunks = chunkFiles(allFiles, ROOT);
+            emit('chunk_done', {
+              stage: 'chunk',
+              filesProcessed: allFiles.length,
+              chunksProcessed: chunks.length,
+            });
 
-						if (chunks.length === 0) {
-							throw new Error(`Chunk extraction produced 0 chunks for scope ${scope}`);
-						}
+            if (chunks.length === 0) {
+              throw new Error(`Chunk extraction produced 0 chunks for scope ${scope}`);
+            }
 
-						let embedResult: Record<string, unknown> = {};
-						if (dryRun) {
-							embedResult = {
-								dryRun: true,
-								simulated: true,
-								executed: false,
-								skippedWrites: true,
-								filesProcessed: allFiles.length,
-								chunksProcessed: chunks.length,
-								embeddingsGenerated: 0,
-								storedInQdrant: 0,
-							};
-						} else if (incremental && !recompute) {
-							const indexResult = await indexChunksIncremental(chunks);
-							embedResult = { incremental: true, filesProcessed: allFiles.length, ...indexResult };
-						} else {
-							const indexResult = await indexChunks(chunks);
-							embedResult = { filesProcessed: allFiles.length, ...indexResult };
-						}
-						emit('embed_done', { stage: 'embed', ...embedResult });
+            let embedResult: Record<string, unknown> = {};
+            if (dryRun) {
+              embedResult = {
+                dryRun: true,
+                simulated: true,
+                executed: false,
+                skippedWrites: true,
+                filesProcessed: allFiles.length,
+                chunksProcessed: chunks.length,
+                embeddingsGenerated: 0,
+                storedInQdrant: 0,
+              };
+            } else if (incremental && !recompute) {
+              const indexResult = await indexChunksIncremental(chunks);
+              embedResult = { incremental: true, filesProcessed: allFiles.length, ...indexResult };
+            } else {
+              const indexResult = await indexChunks(chunks);
+              embedResult = { filesProcessed: allFiles.length, ...indexResult };
+            }
+            emit('embed_done', { stage: 'embed', ...embedResult });
 
-						stageTimings.ast_embed = Date.now() - stageStart;
-						completedStages.push('ast_embed');
-						void cacheStage(runId, 'ast_embed', embedResult, stageTimings.ast_embed);
-					}
-				} else {
-					emit('stage', {
-						stage: 'ast_embed',
-						step: 'skipped',
-						reason: 'runIndexing disabled',
-					});
-				}
+            stageTimings.ast_embed = Date.now() - stageStart;
+            completedStages.push('ast_embed');
+            void cacheStage(runId, 'ast_embed', embedResult, stageTimings.ast_embed);
+          }
+        } else {
+          emit('stage', {
+            stage: 'ast_embed',
+            step: 'skipped',
+            reason: 'runIndexing disabled',
+          });
+        }
 
-				// ── Stage 2: Cluster assignment (k-means via Qdrant scroll) ──
-				{
-					const cached = cachedStages.get('cluster_assign');
-					if (cached) {
-						emit('stage', { stage: 'cluster_assign', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('cluster_done', { stage: 'cluster', details: cached.result });
-						stageTimings.cluster_assign = cached.durationMs;
-						completedStages.push('cluster_assign');
-					} else {
-						const stageStart = Date.now();
-						const clusterComplete = await forwardSSEStage(
-							forwardFetch,
-							`/api/codebase-index/cluster-assign?dryRun=${String(dryRun)}&k=${clusterCount}`,
-							{ method: 'POST' },
-							(event, data) => {
-								emit('stage', {
-									stage: 'cluster_assign',
-									step: event,
-									details: data,
-								});
-							},
-							'Cluster assignment',
-						);
-						emit('cluster_done', {
-							stage: 'cluster',
-							details: clusterComplete,
-						});
-						stageTimings.cluster_assign = Date.now() - stageStart;
-						completedStages.push('cluster_assign');
-						void cacheStage(runId, 'cluster_assign', (clusterComplete as Record<string, unknown>) ?? {}, stageTimings.cluster_assign);
-					}
-				}
+        // ── Stage 2: Cluster assignment (k-means via Qdrant scroll) ──
+        {
+          const cached = cachedStages.get('cluster_assign');
+          if (cached) {
+            emit('stage', {
+              stage: 'cluster_assign',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('cluster_done', { stage: 'cluster', details: cached.result });
+            stageTimings.cluster_assign = cached.durationMs;
+            completedStages.push('cluster_assign');
+          } else {
+            const stageStart = Date.now();
+            const clusterComplete = await forwardSSEStage(
+              forwardFetch,
+              `/api/codebase-index/cluster-assign?dryRun=${String(dryRun)}&k=${clusterCount}`,
+              { method: 'POST' },
+              (event, data) => {
+                emit('stage', {
+                  stage: 'cluster_assign',
+                  step: event,
+                  details: data,
+                });
+              },
+              'Cluster assignment'
+            );
+            emit('cluster_done', {
+              stage: 'cluster',
+              details: clusterComplete,
+            });
+            stageTimings.cluster_assign = Date.now() - stageStart;
+            completedStages.push('cluster_assign');
+            void cacheStage(
+              runId,
+              'cluster_assign',
+              (clusterComplete as Record<string, unknown>) ?? {},
+              stageTimings.cluster_assign
+            );
+          }
+        }
 
-				// ── Stage 3: SOM topology (GPU Kohonen + Neo4j edges) ────────
-				if (somTopology && !dryRun) {
-					const cached = cachedStages.get('som_topology');
-					if (cached) {
-						emit('stage', { stage: 'som_topology', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('som_done', { stage: 'som_topology', ...cached.result });
-						stageTimings.som_topology = cached.durationMs;
-						completedStages.push('som_topology');
-					} else {
-						const stageStart = Date.now();
-						emit('som_started', { stage: 'som_topology' });
+        // ── Stage 3: SOM topology (GPU Kohonen + Neo4j edges) ────────
+        if (somTopology && !dryRun) {
+          const cached = cachedStages.get('som_topology');
+          if (cached) {
+            emit('stage', {
+              stage: 'som_topology',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('som_done', { stage: 'som_topology', ...cached.result });
+            stageTimings.som_topology = cached.durationMs;
+            completedStages.push('som_topology');
+          } else {
+            const stageStart = Date.now();
+            emit('som_started', { stage: 'som_topology' });
 
-						try {
-							const runSOM = await importSOMTopology();
-							const somResult = await runSOM({ maxFiles: backfillLimit });
+            try {
+              const runSOM = await importSOMTopology();
+              const somResult = await runSOM({ maxFiles: backfillLimit });
 
-							const resultData = {
-								filesProcessed: somResult.filesProcessed,
-								gridSize: somResult.gridSize,
-								neuronsUsed: somResult.neuronsUsed,
-								edgesCreated: somResult.edgesCreated,
-								source: somResult.source,
-								durationMs: somResult.durationMs,
-							};
-							emit('som_done', { stage: 'som_topology', ...resultData });
-							stageTimings.som_topology = Date.now() - stageStart;
-							completedStages.push('som_topology');
-							void cacheStage(runId, 'som_topology', resultData, stageTimings.som_topology);
-						} catch (err) {
-							emit('stage', {
-								stage: 'som_topology',
-								step: 'failed',
-								error: (err as Error).message,
-							});
-						}
-					}
-				} else {
-					emit('stage', {
-						stage: 'som_topology',
-						step: 'skipped',
-						reason: dryRun ? 'dryRun' : 'somTopology disabled',
-					});
-				}
+              const resultData = {
+                filesProcessed: somResult.filesProcessed,
+                gridSize: somResult.gridSize,
+                neuronsUsed: somResult.neuronsUsed,
+                edgesCreated: somResult.edgesCreated,
+                source: somResult.source,
+                durationMs: somResult.durationMs,
+              };
+              emit('som_done', { stage: 'som_topology', ...resultData });
+              stageTimings.som_topology = Date.now() - stageStart;
+              completedStages.push('som_topology');
+              void cacheStage(runId, 'som_topology', resultData, stageTimings.som_topology);
+            } catch (err) {
+              emit('stage', {
+                stage: 'som_topology',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'som_topology',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'somTopology disabled',
+          });
+        }
 
-				// ── Stage 4: Neo4j sync (CodebaseFile nodes + IMPORTS edges) ─
-				if (neo4jSync && !dryRun) {
-					const cached = cachedStages.get('neo4j_sync');
-					if (cached) {
-						emit('stage', { stage: 'neo4j_sync', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('mirror_done', { stage: 'neo4j_sync', ...cached.result });
-						stageTimings.neo4j_sync = cached.durationMs;
-						completedStages.push('neo4j_sync');
-					} else {
-						const stageStart = Date.now();
-						emit('mirror_started', { stage: 'neo4j_sync' });
+        // ── Stage 4: Neo4j sync (CodebaseFile nodes + IMPORTS edges) ─
+        if (neo4jSync && !dryRun) {
+          const cached = cachedStages.get('neo4j_sync');
+          if (cached) {
+            emit('stage', {
+              stage: 'neo4j_sync',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('mirror_done', { stage: 'neo4j_sync', ...cached.result });
+            stageTimings.neo4j_sync = cached.durationMs;
+            completedStages.push('neo4j_sync');
+          } else {
+            const stageStart = Date.now();
+            emit('mirror_started', { stage: 'neo4j_sync' });
 
-						try {
-							const { syncCodebaseToNeo4j } = await importNeo4jSync();
-							const syncResult = await syncCodebaseToNeo4j({
-								onPhase: (phase, extra) => {
-									emit('stage', {
-										stage: 'neo4j_sync',
-										step: phase,
-										details: extra,
-									});
-								},
-							});
+            try {
+              const { syncCodebaseToNeo4j } = await importNeo4jSync();
+              const syncResult = await syncCodebaseToNeo4j({
+                onPhase: (phase, extra) => {
+                  emit('stage', {
+                    stage: 'neo4j_sync',
+                    step: phase,
+                    details: extra,
+                  });
+                },
+              });
 
-							const resultData = {
-								files: syncResult.files,
-								edges: syncResult.edges,
-								skipped: syncResult.skipped,
-								errors: syncResult.errors.length,
-								couchdbWritten: syncResult.couchdbWritten ?? 0,
-								durationMs: syncResult.durationMs,
-							};
-							emit('mirror_done', { stage: 'neo4j_sync', ...resultData });
-							stageTimings.neo4j_sync = Date.now() - stageStart;
-							completedStages.push('neo4j_sync');
-							void cacheStage(runId, 'neo4j_sync', resultData, stageTimings.neo4j_sync);
-						} catch (err) {
-							emit('stage', {
-								stage: 'neo4j_sync',
-								step: 'failed',
-								error: (err as Error).message,
-							});
-						}
-					}
-				} else {
-					emit('stage', {
-						stage: 'neo4j_sync',
-						step: 'skipped',
-						reason: dryRun ? 'dryRun' : 'neo4jSync disabled',
-					});
-				}
+              const resultData = {
+                files: syncResult.files,
+                edges: syncResult.edges,
+                skipped: syncResult.skipped,
+                errors: syncResult.errors.length,
+                couchdbWritten: syncResult.couchdbWritten ?? 0,
+                durationMs: syncResult.durationMs,
+              };
+              emit('mirror_done', { stage: 'neo4j_sync', ...resultData });
+              stageTimings.neo4j_sync = Date.now() - stageStart;
+              completedStages.push('neo4j_sync');
+              void cacheStage(runId, 'neo4j_sync', resultData, stageTimings.neo4j_sync);
+            } catch (err) {
+              emit('stage', {
+                stage: 'neo4j_sync',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'neo4j_sync',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'neo4jSync disabled',
+          });
+        }
 
-				// ── Stage 5: CouchDB PageRank (power iteration) ─────────────
-				if (pageRank && !dryRun) {
-					const cached = cachedStages.get('pagerank');
-					if (cached) {
-						emit('stage', { stage: 'pagerank', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('pagerank_done', { stage: 'pagerank', ...cached.result });
-						stageTimings.pagerank = cached.durationMs;
-						completedStages.push('pagerank');
-					} else {
-						const stageStart = Date.now();
-						emit('pagerank_started', { stage: 'pagerank' });
+        // ── Stage 5: CouchDB PageRank (power iteration) ─────────────
+        if (pageRank && !dryRun) {
+          const cached = cachedStages.get('pagerank');
+          if (cached) {
+            emit('stage', {
+              stage: 'pagerank',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('pagerank_done', { stage: 'pagerank', ...cached.result });
+            stageTimings.pagerank = cached.durationMs;
+            completedStages.push('pagerank');
+          } else {
+            const stageStart = Date.now();
+            emit('pagerank_started', { stage: 'pagerank' });
 
-						try {
-							const { runCouchDbPageRank } = await importCouchDbPageRank();
-							const prResult = await runCouchDbPageRank();
+            try {
+              const { runCouchDbPageRank } = await importCouchDbPageRank();
+              const prResult = await runCouchDbPageRank();
 
-							const resultData = {
-								nodesScored: prResult.nodesScored,
-								edgesUsed: prResult.edgesUsed,
-								writtenCouch: prResult.writtenCouch,
-								topFiles: prResult.topFiles.slice(0, 5),
-								durationMs: prResult.durationMs,
-							};
-							emit('pagerank_done', { stage: 'pagerank', ...resultData });
-							stageTimings.pagerank = Date.now() - stageStart;
-							completedStages.push('pagerank');
-							void cacheStage(runId, 'pagerank', resultData, stageTimings.pagerank);
-						} catch (err) {
-							emit('stage', {
-								stage: 'pagerank',
-								step: 'failed',
-								error: (err as Error).message,
-							});
-						}
-					}
-				} else {
-					emit('stage', {
-						stage: 'pagerank',
-						step: 'skipped',
-						reason: dryRun ? 'dryRun' : 'pageRank disabled',
-					});
-				}
+              const resultData = {
+                nodesScored: prResult.nodesScored,
+                edgesUsed: prResult.edgesUsed,
+                writtenCouch: prResult.writtenCouch,
+                topFiles: prResult.topFiles.slice(0, 5),
+                durationMs: prResult.durationMs,
+              };
+              emit('pagerank_done', { stage: 'pagerank', ...resultData });
+              stageTimings.pagerank = Date.now() - stageStart;
+              completedStages.push('pagerank');
+              void cacheStage(runId, 'pagerank', resultData, stageTimings.pagerank);
+            } catch (err) {
+              emit('stage', {
+                stage: 'pagerank',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'pagerank',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'pageRank disabled',
+          });
+        }
 
-				// ── Stage 6: Cluster summaries (LLM per cluster) ────────────
-				if (summarize) {
-					const cached = cachedStages.get('summarize');
-					if (cached) {
-						emit('stage', { stage: 'summarize', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('summary_done', { stage: 'summarize', ...cached.result });
-						stageTimings.summarize = cached.durationMs;
-						completedStages.push('summarize');
-					} else {
-						const stageStart = Date.now();
-						for (const clusterId of clusterIds) {
-							await forwardSSEStage(
-								forwardFetch,
-								`/api/codebase-index/index-stream?cluster=${clusterId}&limit=${limit}&force=${String(force)}&dryRun=${String(dryRun)}&gpuTag=false`,
-								{ method: 'POST' },
-								(event, data) => {
-									emit('stage', {
-										stage: 'summarize',
-										step: event,
-										clusterId,
-										details: data,
-									});
-								},
-								`Cluster summarize ${clusterId}`,
-							);
-						}
-						const resultData = { clusters: clusterIds, count: clusterIds.length };
-						emit('summary_done', { stage: 'summarize', dryRun, simulated: dryRun, ...resultData });
-						stageTimings.summarize = Date.now() - stageStart;
-						completedStages.push('summarize');
-						void cacheStage(runId, 'summarize', resultData, stageTimings.summarize);
-					}
-				} else {
-					emit('stage', {
-						stage: 'summarize',
-						step: 'skipped',
-						reason: 'summarize disabled',
-					});
-				}
+        // ── Stage 6: Cluster summaries (LLM per cluster) ────────────
+        if (summarize) {
+          const cached = cachedStages.get('summarize');
+          if (cached) {
+            emit('stage', {
+              stage: 'summarize',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('summary_done', { stage: 'summarize', ...cached.result });
+            stageTimings.summarize = cached.durationMs;
+            completedStages.push('summarize');
+          } else {
+            const stageStart = Date.now();
+            for (const clusterId of clusterIds) {
+              await forwardSSEStage(
+                forwardFetch,
+                `/api/codebase-index/index-stream?cluster=${clusterId}&limit=${limit}&force=${String(force)}&dryRun=${String(dryRun)}&gpuTag=false`,
+                { method: 'POST' },
+                (event, data) => {
+                  emit('stage', {
+                    stage: 'summarize',
+                    step: event,
+                    clusterId,
+                    details: data,
+                  });
+                },
+                `Cluster summarize ${clusterId}`
+              );
+            }
+            const resultData = { clusters: clusterIds, count: clusterIds.length };
+            emit('summary_done', { stage: 'summarize', dryRun, simulated: dryRun, ...resultData });
+            stageTimings.summarize = Date.now() - stageStart;
+            completedStages.push('summarize');
+            void cacheStage(runId, 'summarize', resultData, stageTimings.summarize);
+          }
+        } else {
+          emit('stage', {
+            stage: 'summarize',
+            step: 'skipped',
+            reason: 'summarize disabled',
+          });
+        }
 
-				// ── Stage 7: GPU Karpathy tagging ───────────────────────────
-				if (gpuTag) {
-					const cached = cachedStages.get('tag');
-					if (cached) {
-						emit('stage', { stage: 'tag', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('tag_done', { stage: 'tag', ...cached.result });
-						stageTimings.tag = cached.durationMs;
-						completedStages.push('tag');
-					} else {
-						const stageStart = Date.now();
-						const tagComplete = await forwardSSEStage(
-							forwardFetch,
-							'/api/codebase-index/karpathy-tag/gpu',
-							{
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({
-									batchSize: 200,
-									threshold: 0.35,
-									maxTags: 4,
-									dryRun,
-									forceRetag,
-									limit: backfillLimit,
-								}),
-							},
-							(event, data) => {
-								emit('stage', {
-									stage: 'tag',
-									step: event,
-									details: data,
-								});
-							},
-							'GPU tag backfill',
-						);
-						const resultData = { limit: backfillLimit, dryRun, simulated: dryRun, details: tagComplete };
-						emit('tag_done', { stage: 'tag', ...resultData });
-						stageTimings.tag = Date.now() - stageStart;
-						completedStages.push('tag');
-						void cacheStage(runId, 'tag', resultData as Record<string, unknown>, stageTimings.tag);
-					}
-				} else {
-					emit('stage', {
-						stage: 'tag',
-						step: 'skipped',
-						reason: 'gpuTag disabled',
-					});
-				}
+        // ── Stage 7: GPU Karpathy tagging ───────────────────────────
+        if (gpuTag) {
+          const cached = cachedStages.get('tag');
+          if (cached) {
+            emit('stage', {
+              stage: 'tag',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('tag_done', { stage: 'tag', ...cached.result });
+            stageTimings.tag = cached.durationMs;
+            completedStages.push('tag');
+          } else {
+            const stageStart = Date.now();
+            const tagComplete = await forwardSSEStage(
+              forwardFetch,
+              '/api/codebase-index/karpathy-tag/gpu',
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  batchSize: 200,
+                  threshold: 0.35,
+                  maxTags: 4,
+                  dryRun,
+                  forceRetag,
+                  limit: backfillLimit,
+                }),
+              },
+              (event, data) => {
+                emit('stage', {
+                  stage: 'tag',
+                  step: event,
+                  details: data,
+                });
+              },
+              'GPU tag backfill'
+            );
+            const resultData = {
+              limit: backfillLimit,
+              dryRun,
+              simulated: dryRun,
+              details: tagComplete,
+            };
+            emit('tag_done', { stage: 'tag', ...resultData });
+            stageTimings.tag = Date.now() - stageStart;
+            completedStages.push('tag');
+            void cacheStage(runId, 'tag', resultData as Record<string, unknown>, stageTimings.tag);
+          }
+        } else {
+          emit('stage', {
+            stage: 'tag',
+            step: 'skipped',
+            reason: 'gpuTag disabled',
+          });
+        }
 
-				// ── Stage 8: Wiki export (Karpathy notes → CouchDB) ────────
-				if (exportWiki && !dryRun) {
-					const cached = cachedStages.get('wiki_export');
-					if (cached) {
-						emit('stage', { stage: 'wiki_export', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('wiki_done', { stage: 'wiki_export', ...cached.result });
-						stageTimings.wiki_export = cached.durationMs;
-						completedStages.push('wiki_export');
-					} else {
-						const stageStart = Date.now();
-						emit('wiki_started', { stage: 'wiki_export' });
+        // ── Stage 8: Wiki export (Karpathy notes → CouchDB) ────────
+        if (exportWiki && !dryRun) {
+          const cached = cachedStages.get('wiki_export');
+          if (cached) {
+            emit('stage', {
+              stage: 'wiki_export',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('wiki_done', { stage: 'wiki_export', ...cached.result });
+            stageTimings.wiki_export = cached.durationMs;
+            completedStages.push('wiki_export');
+          } else {
+            const stageStart = Date.now();
+            emit('wiki_started', { stage: 'wiki_export' });
 
-						try {
-							const { generateAllClusterNotes } = await importKarpathyWiki();
-							const wikiResult = await generateAllClusterNotes('gpu');
+            try {
+              const { generateAllClusterNotes } = await importKarpathyWiki();
+              const wikiResult = await generateAllClusterNotes('gpu');
 
-							const resultData = {
-								generated: wikiResult.generated,
-								failed: wikiResult.failed,
-								clusters: wikiResult.clusters,
-							};
-							emit('wiki_done', { stage: 'wiki_export', ...resultData });
-							stageTimings.wiki_export = Date.now() - stageStart;
-							completedStages.push('wiki_export');
-							void cacheStage(runId, 'wiki_export', resultData, stageTimings.wiki_export);
-						} catch (err) {
-							emit('stage', {
-								stage: 'wiki_export',
-								step: 'failed',
-								error: (err as Error).message,
-							});
-						}
-					}
-				} else {
-					emit('stage', {
-						stage: 'wiki_export',
-						step: 'skipped',
-						reason: dryRun ? 'dryRun' : 'exportWiki disabled',
-					});
-				}
+              const resultData = {
+                generated: wikiResult.generated,
+                failed: wikiResult.failed,
+                clusters: wikiResult.clusters,
+              };
+              emit('wiki_done', { stage: 'wiki_export', ...resultData });
+              stageTimings.wiki_export = Date.now() - stageStart;
+              completedStages.push('wiki_export');
+              void cacheStage(runId, 'wiki_export', resultData, stageTimings.wiki_export);
+            } catch (err) {
+              emit('stage', {
+                stage: 'wiki_export',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'wiki_export',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'exportWiki disabled',
+          });
+        }
 
-				// ── Stage 9: 4D hypergraph (SOM×cosine×GRPO manifold) ───────
-				if (hypergraph && !dryRun) {
-					const cached = cachedStages.get('hypergraph_4d');
-					if (cached) {
-						emit('stage', { stage: 'hypergraph_4d', step: 'cached', cachedAt: cached.completedAt, durationMs: cached.durationMs });
-						emit('hypergraph_done', { stage: 'hypergraph_4d', ...cached.result });
-						stageTimings.hypergraph_4d = cached.durationMs;
-						completedStages.push('hypergraph_4d');
-					} else {
-						const stageStart = Date.now();
-						emit('hypergraph_started', { stage: 'hypergraph_4d' });
+        // ── Stage 9: 4D hypergraph (SOM×cosine×GRPO manifold) ───────
+        if (hypergraph && !dryRun) {
+          const cached = cachedStages.get('hypergraph_4d');
+          if (cached) {
+            emit('stage', {
+              stage: 'hypergraph_4d',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('hypergraph_done', { stage: 'hypergraph_4d', ...cached.result });
+            stageTimings.hypergraph_4d = cached.durationMs;
+            completedStages.push('hypergraph_4d');
+          } else {
+            const stageStart = Date.now();
+            emit('hypergraph_started', { stage: 'hypergraph_4d' });
 
-						try {
-							const buildHypergraph4D = await importHypergraph4D();
-							const hgResult = await buildHypergraph4D();
+            try {
+              const buildHypergraph4D = await importHypergraph4D();
+              const hgResult = await buildHypergraph4D();
 
-							const resultData = {
-								nodesTagged: hgResult.nodesTagged,
-								hyperedges: hgResult.hyperedges,
-								gradeA: hgResult.gradeA,
-								gradeB: hgResult.gradeB,
-								gradeC: hgResult.gradeC,
-								gradeD: hgResult.gradeD,
-								source: hgResult.source,
-								durationMs: hgResult.durationMs,
-							};
-							emit('hypergraph_done', { stage: 'hypergraph_4d', ...resultData });
-							stageTimings.hypergraph_4d = Date.now() - stageStart;
-							completedStages.push('hypergraph_4d');
-							void cacheStage(runId, 'hypergraph_4d', resultData, stageTimings.hypergraph_4d);
-						} catch (err) {
-							emit('stage', {
-								stage: 'hypergraph_4d',
-								step: 'failed',
-								error: (err as Error).message,
-							});
-						}
-					}
-				} else {
-					emit('stage', {
-						stage: 'hypergraph_4d',
-						step: 'skipped',
-						reason: dryRun ? 'dryRun' : 'hypergraph disabled',
-					});
-				}
+              const resultData = {
+                nodesTagged: hgResult.nodesTagged,
+                hyperedges: hgResult.hyperedges,
+                gradeA: hgResult.gradeA,
+                gradeB: hgResult.gradeB,
+                gradeC: hgResult.gradeC,
+                gradeD: hgResult.gradeD,
+                source: hgResult.source,
+                durationMs: hgResult.durationMs,
+              };
+              emit('hypergraph_done', { stage: 'hypergraph_4d', ...resultData });
+              stageTimings.hypergraph_4d = Date.now() - stageStart;
+              completedStages.push('hypergraph_4d');
+              void cacheStage(runId, 'hypergraph_4d', resultData, stageTimings.hypergraph_4d);
+            } catch (err) {
+              emit('stage', {
+                stage: 'hypergraph_4d',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'hypergraph_4d',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'hypergraph disabled',
+          });
+        }
 
-				// ── Complete ─────────────────────────────────────────────────
-				const resumedStages = [...cachedStages.keys()];
-				emit('complete', {
-					runId,
-					dryRun,
-					completedStages,
-					simulatedStages: dryRun ? completedStages : [],
-					resumedStages,
-					clusterCount,
-					clusterIds,
-					cuda: isCudaAvailable(),
-					stageTimings,
-					totalMs: Date.now() - startedAt,
-				});
+        // ── Stage 10: Deep-research web search indexing ───────────────
+        if (deepResearch && !dryRun) {
+          const cached = cachedStages.get('deep_research');
+          if (cached) {
+            emit('stage', {
+              stage: 'deep_research',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('deep_research_done', { stage: 'deep_research', ...cached.result });
+            stageTimings.deep_research = cached.durationMs;
+            completedStages.push('deep_research');
+          } else {
+            const stageStart = Date.now();
+            emit('deep_research_started', { stage: 'deep_research' });
 
-				// Update run metadata with final state
-				void setRunMeta(runId, {
-					scope, clusterCount,
-					startedAt: new Date(startedAt).toISOString(),
-					completedAt: new Date().toISOString(),
-					completedStages,
-					resumedStages,
-					totalMs: Date.now() - startedAt,
-				});
-			} catch (error) {
+            try {
+              const runDeepResearch = await importDeepResearch();
+              const drResult = await runDeepResearch({
+                runId,
+                onProgress: (msg) => {
+                  emit('stage', { stage: 'deep_research', step: 'progress', message: msg });
+                },
+              });
+
+              const resultData = {
+                queriesRun: drResult.queriesRun,
+                pagesIndexed: drResult.pagesIndexed,
+                pagesSkipped: drResult.pagesSkipped,
+                pagesFailed: drResult.pagesFailed,
+                rowsInserted: drResult.rowsInserted,
+                rowsUpdated: drResult.rowsUpdated,
+                durationMs: drResult.durationMs,
+              };
+              emit('deep_research_done', { stage: 'deep_research', ...resultData });
+              stageTimings.deep_research = Date.now() - stageStart;
+              completedStages.push('deep_research');
+              void cacheStage(runId, 'deep_research', resultData, stageTimings.deep_research);
+            } catch (err) {
+              emit('stage', {
+                stage: 'deep_research',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'deep_research',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'deepResearch disabled',
+          });
+        }
+
+        // ── Complete ─────────────────────────────────────────────────
+        const resumedStages = [...cachedStages.keys()];
+        emit('complete', {
+          runId,
+          dryRun,
+          completedStages,
+          simulatedStages: dryRun ? completedStages : [],
+          resumedStages,
+          clusterCount,
+          clusterIds,
+          cuda: isCudaAvailable(),
+          stageTimings,
+          totalMs: Date.now() - startedAt,
+        });
+
+        // Update run metadata with final state
+        void setRunMeta(runId, {
+          scope,
+          clusterCount,
+          startedAt: new Date(startedAt).toISOString(),
+          completedAt: new Date().toISOString(),
+          completedStages,
+          resumedStages,
+          totalMs: Date.now() - startedAt,
+        });
+      } catch (error) {
 				emit('failed', {
 					message: (error as Error).message ?? String(error),
 					totalMs: Date.now() - startedAt,

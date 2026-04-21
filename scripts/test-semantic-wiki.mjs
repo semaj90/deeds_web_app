@@ -15,7 +15,7 @@
 import pg from 'pg';
 const { Pool } = pg;
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
 const API_BASE = process.env.PUBLIC_API_URL || 'http://localhost:5173';
 
 const pool = new Pool({ connectionString: DATABASE_URL });

@@ -20,7 +20,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // ── Config ─────────────────────────────────────────────────────────────────
 const OLLAMA_URL = 'http://localhost:11434';
 const QDRANT_URL = 'http://localhost:6333';
-const PG_URL = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const PG_URL = 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
 const MINIO_CONFIG = { endPoint: 'localhost', port: 9000, useSSL: false, accessKey: 'admin', secretKey: 'password' };
 const REDIS_CONFIG = { host: 'localhost', port: 6379, password: 'redis' };
 

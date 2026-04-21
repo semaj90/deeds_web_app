@@ -17,7 +17,7 @@ import path from 'node:path';
 
 const { Pool } = pg;
 const pool = new Pool({
-	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
+	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db',
 });
 
 const outputDir = process.argv.includes('--output-dir')

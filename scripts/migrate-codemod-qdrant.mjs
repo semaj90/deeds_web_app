@@ -2,7 +2,7 @@
 /**
  * Migrate codemod_memories into active Qdrant instance.
  * 1. Creates the collection (768-dim, cosine)
- * 2. Reads 12 rows from prod PG (5434)
+ * 2. Reads 12 rows from prod PG (5432)
  * 3. Embeds content via Ollama embeddinggemma
  * 4. Upserts points into Qdrant
  * 5. Updates PG embedding column
@@ -10,7 +10,7 @@
 import pg from 'pg';
 
 const { Pool } = pg;
-const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
+const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db' });
 const QDRANT = 'http://localhost:6333';
 const OLLAMA = 'http://localhost:11434';
 

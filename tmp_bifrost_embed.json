@@ -1,1 +1,0 @@
-{"is_bifrost_error":false,"error":{"code":"unsupported_operation","message":"embedding is not supported by ollama-local provider"},"extra_fields":{"provider":"ollama-local","model_requested":"embeddinggemma:latest","request_type":"embedding"}}

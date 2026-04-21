@@ -3760,6 +3760,46 @@ export const userResearchTasks = pgTable('user_research_tasks', {
 export type UserResearchTask    = typeof userResearchTasks.$inferSelect;
 export type NewUserResearchTask = typeof userResearchTasks.$inferInsert;
 
+// ── Web Search Index ──────────────────────────────────────────────────────────
+// Durable store for agentic deep-research web search results.
+// Populated by the orchestrator's Stage 10 (deep_research) which uses codebase
+// cluster summaries as query seeds, fetches + parses web pages, embeds them,
+// and upserts here + into Qdrant knowledge_base for RAG retrieval.
+export const webSearchIndex = pgTable('web_search_index', {
+  id:             uuid('id').defaultRandom().primaryKey(),
+  /** The search query used to find this page (derived from cluster purpose/patterns) */
+  query:          text('query').notNull(),
+  /** Which codebase GPU cluster triggered this search (0-19, or null for manual) */
+  clusterId:      integer('cluster_id'),
+  /** Source page URL */
+  url:            text('url').notNull(),
+  /** Page title */
+  title:          text('title'),
+  /** Extracted full text content (stripped HTML) */
+  content:        text('content').notNull(),
+  /** Short excerpt for display / context snippets */
+  snippet:        text('snippet'),
+  /** Web search provider used: searxng | google | duckduckgo */
+  provider:       text('provider').notNull().default('searxng'),
+  /** SHA-256 prefix of URL for deduplication */
+  contentHash:    varchar('content_hash', { length: 16 }).notNull(),
+  /** 768-dim embeddinggemma vector for RAG retrieval */
+  embedding:      vector('embedding', { dimensions: 768 }),
+  /** Cross-encoder rerank score vs cluster query [0,1] */
+  relevanceScore: real('relevance_score').notNull().default(0),
+  /** Orchestrator run_id that produced this row */
+  runId:          text('run_id'),
+  indexedAt:      timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  unique('wsi_content_hash_unique').on(t.contentHash),
+  index('wsi_cluster_score').on(t.clusterId, t.relevanceScore),
+  index('wsi_indexed_at').on(t.indexedAt),
+  index('wsi_run_id').on(t.runId),
+]);
+
+export type WebSearchIndexRow    = typeof webSearchIndex.$inferSelect;
+export type NewWebSearchIndexRow = typeof webSearchIndex.$inferInsert;
+
 // ── Context Timeline ──────────────────────────────────────────────────────────
 // Durable write-path for the RL self-modification loop.
 // Every user interaction that influences rlpolicy:pipeline_weights or triggers

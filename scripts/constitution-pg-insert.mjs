@@ -11,7 +11,7 @@ import crypto from 'crypto';
 
 const DOC_ID = 'a683d98d-f853-412c-a51f-8f4d74eb2447';
 const BUCKET = 'legal-library';
-const PG_URL = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const PG_URL = 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
 
 async function main() {
 	// Fetch extraction JSON from MinIO

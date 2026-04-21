@@ -2972,6 +2972,49 @@
       "detail": "Check Go search service deep health (pg + redis + qdrant + ollama)"
     },
     {
+      // ── Legal corpus vector truth checklist ───────────────────────────────
+      // A) Canon corpus: Postgres canonical_chunks ↔ Qdrant legal_canon_chunks
+      // B) Main corpus:  Postgres legal_chunks      ↔ Qdrant legal_documents
+      // Returns parity ratio, actionNeeded string, and current search path.
+      "label": "📚 Legal: Vector Parity Check",
+      "type": "shell",
+      "command": "curl -sf http://localhost:5173/api/library/health | python -m json.tool",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Vector truth checklist: Postgres legal_chunks ↔ Qdrant legal_documents parity + canon corpus status + search path"
+    },
+    {
+      // Backfill Qdrant legal_documents from Postgres legal_chunks (embedded rows only).
+      // Safe to re-run: uses deterministic point IDs — won't create duplicates.
+      // Typical run time: 5-15 min for 6000+ chunks.
+      "label": "📚 Legal: Backfill Qdrant (legal_documents)",
+      "type": "shell",
+      "command": "node scripts/backfill-qdrant-legal.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "DATABASE_URL": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+          "QDRANT_URL": "http://127.0.0.1:6333"
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Backfill Qdrant legal_documents collection from Postgres legal_chunks WHERE embedding IS NOT NULL. Idempotent — safe to re-run."
+    },
+    {
       "label": "🔬 Phase 78: AST-Ranked Error Scan",
       "type": "shell",
       "command": "npm run phase78:ast-rank",
@@ -5680,6 +5723,578 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    // ══════════════════════════════════════════════════════════════════════
+    // 🧩 ACE Pipeline — Agentic Codebase Error Fixing
+    // Run these in sequence for the full dev-tool pipeline:
+    //   1. ACE: Health Check      → verify all services ready
+    //   2. ACE: Index Codebase    → embed + push to Qdrant
+    //   3. ACE: Svelte-Check → KAG → run type checks, push errors to KAG
+    //   4. ACE: Agent Query       → multi-step Gemma 4 fix recommendation
+    //   5. ACE: Full Pipeline     → runs 1→2→3→4 in sequence
+    // ══════════════════════════════════════════════════════════════════════
+    {
+      "label": "🩺 ACE: Health Check (Semantic Search + All Services)",
+      "type": "shell",
+      "command": "curl -sf http://localhost:5173/api/ace/health -H \"x-dev-bypass-auth: true\" | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Live health check: Ollama embed+chat, Qdrant codebase_chunks_768, semantic search round-trip, Postgres research_summaries, Redis RL policy, LangGraph"
+    },
+    {
+      "label": "🔍 ACE: Semantic Search Test (single query)",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:11434/api/embed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'embeddinggemma:latest',input:'${input:aceSearchQuery}'})}).then(r=>r.json()).then(async d=>{const v=d.embeddings[0];const s=await fetch('http://localhost:6333/collections/codebase_chunks_768/points/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vector:v,limit:5,with_payload:true})}).then(r=>r.json());s.result.forEach(h=>console.log('['+Math.round(h.score*100)+'%]',h.payload.relative_path,'—',String(h.payload.summary||'').slice(0,100)));})\"",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Embed a query with embeddinggemma and search codebase_chunks_768. Confirms the semantic search path works."
+    },
+    {
+      "label": "🔧 ACE: Svelte-Check → Error KAG (capture + summarize errors)",
+      "type": "shell",
+      "command": "npx svelte-kit sync && npx svelte-check --threshold error --tsconfig ./tsconfig.json 2>&1 | tee /tmp/svelte-check-out.txt; $ec=$LASTEXITCODE; if ($ec -ne 0) { $errors=Get-Content /tmp/svelte-check-out.txt -Raw; node -e \"fetch('http://localhost:5173/api/ace/error-kag',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({errorText:process.argv[1],source:'svelte-check'})}).then(r=>r.json()).then(d=>console.log('KAG stored:',d.summaryId,'severity:',d.summary?.severity))\" -- \"$errors\" } else { Write-Host '✅ No errors — nothing to push to KAG' }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [
+        "$tsc"
+      ],
+      "detail": "Run svelte-check. On error: pipe output to /api/ace/error-kag → Gemma 4 summarizes → stored in Postgres + Qdrant KAG"
+    },
+    {
+      "label": "🤖 ACE: Agent Query (multi-step Gemma 4 tool loop)",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/ace/agent',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({query:'${input:aceAgentQuery}',maxTokens:2048})}).then(r=>r.json()).then(d=>{console.log('\\n=== ACE Agent Answer ===');console.log(d.answer);console.log('\\nTool rounds:',d.toolCallsExecuted,'Latency:',d.latencyMs+'ms');})\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run a multi-step Gemma 4 agent query: define tools → model emits calls → execute locally → feed back → final answer"
+    },
+    {
+      "label": "🔥 ACE: Push Error to KAG (manual)",
+      "type": "shell",
+      "command": "node -e \"const e=process.argv[1];fetch('http://localhost:5173/api/ace/error-kag',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({errorText:e,source:'runtime',affectedFiles:[]})}).then(r=>r.json()).then(d=>console.log(JSON.stringify(d,null,2)))\" -- \"${input:aceErrorText}\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Manually push raw error text through Gemma 4 summarization → Postgres research_summaries + Qdrant KAG tags"
+    },
+    {
+      "label": "📊 ACE: Research Graph Rebuild (KAG clusters)",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/analytics/research-graph',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({action:'build'})}).then(r=>r.json()).then(d=>console.log('Graph:',d.clusterCount,'clusters,',d.edgeCount,'edges,',d.totalSummaries,'summaries'))\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Rebuild the KAG research graph from research_summaries (GPU k-means → PageRank → Redis clusters)"
+    },
+    {
+      "label": "📊 ACE: RL Policy Update",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/analytics/research-graph',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({action:'policy'})}).then(r=>r.json()).then(d=>console.log('RL weights:',JSON.stringify(d.weights,null,2)))\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Recompute RL pipeline weights from feedback data → store in Redis rlpolicy:pipeline_weights"
+    },
+    {
+      "label": "⚡ TurboQuant: Test Tool Calling (/api/chat)",
+      "type": "shell",
+      "command": "node -e \"const body={model:'gemma4-legal-fast:latest',stream:false,options:{temperature:0.1,num_predict:300},messages:[{role:'user',content:'Which file handles RabbitMQ? Call search_codebase.'}],tools:[{type:'function',function:{name:'search_codebase',description:'Search codebase',parameters:{type:'object',properties:{query:{type:'string'}},required:['query']}}}]};fetch('http://localhost:11434/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(90000)}).then(r=>r.json()).then(d=>console.log('tool_calls:',JSON.stringify(d.message.tool_calls,null,2)))\"",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Verify Gemma 4 emits tool_calls via Ollama /api/chat (the first round of the tool-calling loop)"
+    },
+    {
+      "label": "🚀 ACE: Full Pipeline (Health → Index → Check → KAG → Graph)",
+      "dependsOn": [
+        "🩺 ACE: Health Check (Semantic Search + All Services)",
+        "📊 Qdrant: Index Codebase (Full)",
+        "🔧 ACE: Svelte-Check → Error KAG (capture + summarize errors)",
+        "📊 ACE: Research Graph Rebuild (KAG clusters)",
+        "📊 ACE: RL Policy Update"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Full ACE pipeline: verify services → index codebase → run type checks + push errors to KAG → rebuild research graph → update RL policy"
+    },
+    {
+      "label": "🩺 ACE: Health",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/system/health',{headers:{'x-dev-bypass':'true'}}).then(r=>r.json()).then(d=>{const s=d.services;const lines=Object.entries(s).map(([k,v])=>{const st=v.status==='ok'?'✔':v.detail==='optional-offline'?'○':'✗';const detail=v.detail?' ('+v.detail+')':'';return st+' '+k+detail});console.log('\\nStatus:',d.status.toUpperCase(),'\\n');lines.forEach(l=>console.log(' ',l));console.log('\\nOllama:',d.inference?.ollamaUrl);console.log('TurboQuant:',d.inference?.turboQuantUrl,'(optional)');console.log('Memory:',Math.round(d.system.memory.free/1e9)+'GB free /'+Math.round(d.system.memory.total/1e9)+'GB total\\n')}).catch(e=>console.error('Health check failed:',e.message))\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Fast system health: Postgres, Redis, Ollama, Qdrant (core). TurboQuant is optional — never degrades overall status.",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 ACE: Semantic Search Smoke",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/codeintel/semantic-health',{headers:{'x-dev-bypass-auth':'true'}}).then(r=>r.json()).then(d=>{console.log('\\n=== Semantic Search Health ===');console.log('OK:',d.ok,'Degraded:',d.degraded);console.log('Qdrant:',d.search?.qdrantReachable?'✔':'✗','Collection:',d.search?.collectionExists?'✔':'✗');console.log('Chunks:',d.search?.chunkCount,'Clusters:',d.search?.clusterSummaryCount);console.log('Coverage:',d.search?.embeddingCoverage!==null?Math.round(d.search.embeddingCoverage*100)+'%':'?');console.log('Sample query:',d.search?.sampleQueryOk?'✔':'✗');console.log('Redis:',d.cache?.redisReachable?'✔':'✗');console.log('Ollama:',d.model?.ollamaReachable?'✔':'✗','Chat:',d.model?.chatModelReady?'✔':'✗','Embed:',d.model?.embedModelReady?'✔':'✗');console.log('Latency:',d.latencyMs,'ms\\n')}).catch(e=>console.error('Semantic health failed:',e.message))\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Deep semantic search health: Qdrant collection + chunk/cluster counts + embedding coverage + live sample query + Redis + Ollama model readiness",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🏗️ ACE: Full Pipeline",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs codebase-index-spine --clusters 0-20 --limit 50",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Full codebase index spine: K-Means assign → cluster index → GPU tag backfill → predictive todos → status",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 ACE: Tool Loop Query",
+      "type": "shell",
+      "command": "node -e \"const q=process.argv[1]||'How does authentication work?';fetch('http://localhost:5173/api/v1/agentic/tool-loop',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass':'true'},body:JSON.stringify({query:q,tools:['codebase_search','knowledge_search','read_file','web_search'],maxIterations:3})}).then(r=>r.json()).then(d=>{console.log('\\n🤖 Answer:\\n');console.log(d.answer);console.log('\\n📊 '+d.iterations+' iterations | '+d.totalDurationMs+'ms | '+d.model);d.toolCallLog?.forEach(t=>console.log('  → '+t.toolName+': '+t.durationMs+'ms'))}).catch(e=>console.error('Query failed:',e.message))\" -- \"${input:aceAgentQuery}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Agentic query via tool loop: codebase search → KB search → file read → web search fallback (gated)",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔨 ACE: Error Fix Agent",
+      "type": "shell",
+      "command": "node -e \"const q=process.argv[1]||'fix the latest TypeScript error';fetch('http://localhost:5173/api/v1/agentic/tool-loop',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass':'true'},body:JSON.stringify({query:q,tools:['codebase_search','read_file','fix_recommend','error_summarize','web_search'],maxIterations:5})}).then(r=>r.json()).then(d=>{console.log('\\n🤖 Answer:\\n');console.log(d.answer);console.log('\\n📊 Stats: '+d.iterations+' iterations, '+d.totalDurationMs+'ms');console.log('🔧 Tool calls:');d.toolCallLog?.forEach(t=>console.log('  → '+t.toolName+' ('+t.durationMs+'ms)'))}).catch(e=>console.error('Agent failed:',e.message))\" -- \"${input:aceErrorMessage}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Agentic error fixing: codebase search → read file → fix recommend → error summarize (KAG gated) → web search fallback",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧹 ACE: Cleanup Dry Run",
+      "type": "shell",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/cleanup-stale-files.ps1",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "detail": "Dry run: categorize stale .log + .json dump files (strict keep-list: config/schema/fixtures/migrations preserved)",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧹 ACE: Cleanup Force",
+      "type": "shell",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/cleanup-stale-files.ps1 -Force",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "detail": "⚠️ DESTRUCTIVE: Delete stale .log + .json dump files (only known dump dirs, strict keep-list enforced)",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "✅ ACE: svelte-check",
+      "type": "shell",
+      "command": "npx svelte-kit sync; npx svelte-check --threshold error --tsconfig ./tsconfig.json",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Type-check gate: sync SvelteKit types → svelte-check at error threshold",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [
+        "$tsc"
+      ]
+    },
+    // ══════════════════════════════════════════════════════════════════════
+    // 🧠 CodeIntel — Canonical Operator Flow
+    // Run in this order for end-to-end agentic dev pipeline:
+    //   1. CodeIntel: Preflight    → verify all services alive
+    //   2. CodeIntel: Health       → fast (no embed round-trip)
+    //   3. CodeIntel: Semantic Health → deep (embed + sample query)
+    //   4. CodeIntel: Start MCP    → launch MCP tool server
+    //   5. CodeIntel: Semantic Search Smoke
+    //   6. CodeIntel: Wiki Smoke
+    //   7. CodeIntel: Fix Recommend Smoke
+    //   8. CodeIntel: svelte-check
+    //   (optional) CodeIntel: Graph Index / Graph Status
+    // ══════════════════════════════════════════════════════════════════════
+    {
+      "label": "🧠 CodeIntel: Preflight (all services)",
+      "type": "shell",
+      "command": "echo '=== Ollama ===' && curl -sf http://localhost:11434/api/tags | python -m json.tool && echo '=== Qdrant ===' && curl -sf http://localhost:6333/collections | python -m json.tool && echo '=== Redis ===' && docker exec deeds-redis-prod redis-cli ping && echo '=== LangGraph ===' && curl -sf http://localhost:8091/health",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Quick preflight: Ollama tags, Qdrant collections, Redis PING, LangGraph health"
+    },
+    {
+      "label": "🧠 CodeIntel: Health (fast — no embed)",
+      "type": "shell",
+      "command": "curl -sf http://localhost:5173/api/codeintel/health -H \"x-dev-bypass-auth: true\" | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Fast CodeIntel health: cluster_summaries count, codebase_chunk_index count, gRPC status. No embedding round-trip."
+    },
+    {
+      "label": "🧠 CodeIntel: Semantic Health (deep — embed + sample query)",
+      "type": "shell",
+      "command": "curl -sf 'http://localhost:5173/api/codeintel/semantic-health?mode=deep' -H \"x-dev-bypass-auth: true\" | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Deep semantic health: Qdrant reachable + collection exists + chunk/summary counts + embedding coverage + live embed→search round-trip + Redis + Ollama model readiness"
+    },
+    {
+      "label": "🧠 CodeIntel: Start",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/start-all.ps1"
+      ],
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Lightweight operator entrypoint: SvelteKit dev server + MCP server"
+    },
+    {
+      "label": "🧠 CodeIntel: Start MCP",
+      "type": "shell",
+      "command": "npx tsx src/mcp/server.ts",
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [
+        {
+          "owner": "mcp",
+          "pattern": {
+            "regexp": ".",
+            "message": 0
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".",
+            "endsPattern": "MCP server ready|Listening"
+          }
+        }
+      ],
+      "detail": "Start the CodeIntel MCP server (stdio transport, 9 tools). Required for agentic tool calling via VS Code."
+    },
+    {
+      "label": "🧠 CodeIntel: Semantic Search Smoke",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/codeintel/ace',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({query:'${input:codeIntelSmokeQuery}',mode:'search',topK:3})}).then(r=>r.json()).then(d=>{console.log('\\nHits:',d.chunks?.length??d.results?.length??0);(d.chunks??d.results??[]).slice(0,3).forEach(h=>console.log('['+Math.round((h.score??h.similarity??0)*100)+'%]',h.filePath??h.file_path??h.relative_path??'?','\\n  ',String(h.summary??h.content??'').slice(0,100)));})\" 2>&1",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Smoke test: POST /api/codeintel/ace with a search query, print top-3 chunk hits with scores and file paths"
+    },
+    {
+      "label": "🧠 CodeIntel: Wiki Smoke",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/codeintel/wiki',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({topic:'${input:codeIntelWikiTopic}'})}).then(r=>r.json()).then(d=>{console.log('\\n=== Wiki: '+d.topic+' ===');console.log(String(d.article??d.content??d.text??JSON.stringify(d)).slice(0,600));console.log('\\nLatency:',d.latencyMs??'?','ms');})\" 2>&1",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Smoke test: POST /api/codeintel/wiki to generate a wiki article via the Gemma4 tool loop"
+    },
+    {
+      "label": "🧠 CodeIntel: Fix Recommend Smoke",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/codeintel/fix',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({errorText:'${input:codeIntelFixError}',filePath:'src/routes/api/codeintel/ace/+server.ts'})}).then(r=>r.json()).then(d=>{console.log('\\n=== Fix Recommendation ===');console.log(d.recommendation??d.fix??d.answer??JSON.stringify(d,null,2).slice(0,800));console.log('\\nConfidence:',d.confidence,'Latency:',d.latencyMs,'ms');})\" 2>&1",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Smoke test: POST /api/codeintel/fix with an error message, verify the fix recommender returns a structured suggestion"
+    },
+    {
+      "label": "🧠 CodeIntel: Tool Loop Query (multi-step Gemma4)",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:5173/api/ai/agent',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({query:'${input:codeIntelAgentQuery}',pipeline:'ace'})}).then(r=>r.json()).then(d=>{console.log('\\n=== Tool Loop Answer ===');console.log(d.answer);console.log('\\nTools used:',d.toolsUsed?.join(', ')??'none','Rounds:',d.rounds,'Latency:',d.durationMs,'ms');})\" 2>&1",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run a query through the full Gemma4 multi-step tool loop (/api/ai/agent): define tools → model emits calls → execute locally → feed back → final answer"
+    },
+    {
+      "label": "🧠 CodeIntel: svelte-check",
+      "type": "shell",
+      "command": "npx svelte-kit sync && npx svelte-check --threshold error --tsconfig ./tsconfig.json 2>&1",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [
+        "$tsc"
+      ],
+      "detail": "Run svelte-check at error threshold — the gating step before any CI or deploy"
+    },
+    {
+      "label": "🧠 CodeIntel: Graph Index (Qdrant + tags)",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --tags --concurrency 2",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "(Optional) Re-index codebase into Qdrant codebase_chunks_768 with Gemma4 tags. Run after large refactors."
+    },
+    {
+      "label": "🧠 CodeIntel: Graph Status",
+      "type": "shell",
+      "command": "curl -sf http://localhost:6333/collections/codebase_chunks_768 | python -m json.tool && echo '---' && curl -sf -X POST http://localhost:5173/api/codeintel/clusters -H 'Content-Type: application/json' -H 'x-dev-bypass-auth: true' -d '{}' | python -m json.tool",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "(Optional) Show Qdrant codebase_chunks_768 point count + current cluster summaries"
+    },
+    {
+      "label": "🧠 CodeIntel: Full Operator Flow",
+      "dependsOn": [
+        "🧠 CodeIntel: Start",
+        "🧠 CodeIntel: Preflight (all services)",
+        "🧠 CodeIntel: Health (fast — no embed)",
+        "🧠 CodeIntel: Semantic Search Smoke",
+        "🧠 CodeIntel: Wiki Smoke",
+        "🧠 CodeIntel: Fix Recommend Smoke",
+        "🧠 CodeIntel: Tool Loop Query (multi-step Gemma4)",
+        "🧠 CodeIntel: svelte-check"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Canonical end-to-end operator flow: start → preflight → fast health → smoke tests → tool loop query → svelte-check"
+    },
+    {
+      "label": "🧠 CodeIntel: Deep Legal Backfill",
+      "type": "shell",
+      "command": "$env:DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db\"; node scripts/backfill-qdrant-legal.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Sync legal corpus from Postgres (port 5432) to Qdrant legal_documents collection"
+    },
+    {
+      "label": "🧠 CodeIntel: Index Status Check",
+      "type": "shell",
+      "command": "node scripts/tests/test-orchestrator-smoke.mjs --status",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "BASE_URL": "http://127.0.0.1:5173"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Diagnostic status check of the codebase index and retrieval parity via test-orchestrator-smoke.mjs"
+    },
+    {
+      "label": "🧠 CodeIntel: Wiki Export Build",
+      "type": "shell",
+      "command": "npm run codebase:index -- --exportWiki",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Forces a full codebase index and exports the Markdown wiki (use after large refactors)"
     }
   ],
   "inputs": [
@@ -5688,6 +6303,18 @@
       "type": "promptString",
       "description": "Route path to screenshot (e.g., /evidence, /legal-corpus, /cases)",
       "default": "/dashboard"
+    },
+    {
+      "id": "aceAgentQuery",
+      "type": "promptString",
+      "description": "ACE Tool Loop: semantic query for agentic codebase research",
+      "default": "How does the authentication middleware work and where are the session guards?"
+    },
+    {
+      "id": "aceErrorMessage",
+      "type": "promptString",
+      "description": "ACE Error Fix: paste error message or stack trace for agentic diagnosis",
+      "default": "Cannot find module '$lib/server/ollama' — TS2307"
     },
     {
       "id": "agentQuery",
@@ -5894,6 +6521,36 @@
       "type": "promptString",
       "description": "Tag name to search in Qdrant (e.g., api-route, database, rag-pipeline)",
       "default": "rag-pipeline"
+    },
+    {
+      "id": "codeIntelSmokeQuery",
+      "type": "promptString",
+      "description": "CodeIntel semantic search smoke query",
+      "default": "authentication session middleware guard"
+    },
+    {
+      "id": "codeIntelWikiTopic",
+      "type": "promptString",
+      "description": "Topic for CodeIntel wiki generation",
+      "default": "evidence upload pipeline and OCR fallback"
+    },
+    {
+      "id": "codeIntelFixError",
+      "type": "promptString",
+      "description": "Error message or stack trace for fix recommender smoke test",
+      "default": "Type 'string | undefined' is not assignable to type 'string'"
+    },
+    {
+      "id": "codeIntelAgentQuery",
+      "type": "promptString",
+      "description": "Query for the Gemma4 multi-step tool loop agent",
+      "default": "Which file handles RabbitMQ queue initialization and what queues does it declare?"
+    },
+    {
+      "id": "devAuthCookie",
+      "type": "promptString",
+      "description": "Session cookie for dev server auth (paste from browser DevTools → Application → Cookies). Leave empty if DEV_BYPASS_AUTH=true is set.",
+      "default": ""
     }
   ]
 }

@@ -64,13 +64,13 @@ export interface WebResearchBatch {
 
 // ── Hash helpers ────────────────────────────────────────────────────────────
 
-function fnv1a(text: string): string {
-	let h = 2166136261;
-	for (let i = 0; i < Math.min(text.length, 512); i++) {
-		h ^= text.charCodeAt(i);
-		h = Math.imul(h, 16777619) >>> 0;
-	}
-	return h.toString(16).padStart(8, '0');
+export function fnv1a(text: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < Math.min(text.length, 512); i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
 }
 
 // ── Legal entity tag extraction ─────────────────────────────────────────────

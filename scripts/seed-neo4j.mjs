@@ -7,7 +7,7 @@
  * Usage: node scripts/seed-neo4j.mjs [--case <caseId>] [--dry-run] [--verify]
  *
  * Requires:
- *   PostgreSQL on 127.0.0.1:5434 (deeds-postgres-prod via proxy)
+ *   PostgreSQL on 127.0.0.1:5432 (deeds-postgres-prod via proxy)
  *   Neo4j on bolt://localhost:7687 (docker compose --profile full up -d neo4j)
  *
  * Neo4j credentials: neo4j/neo4j123 (matches docker-compose.yml NEO4J_AUTH)
@@ -20,7 +20,7 @@ const { Pool } = pg;
 
 // ── Config ──────────────────────────────────────────────────────────────
 
-const PG_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const PG_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
 const NEO4J_URI = process.env.NEO4J_URI || 'bolt://localhost:7687';
 const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD || 'neo4j123';
