@@ -30,8 +30,8 @@ import {
 	vector,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { users } from '$lib/server/db/schema-postgres.js';
-import { codeRepos } from './codebase-intelligence.js';
+import { users } from '../schema-postgres';
+import { codeRepos } from './codebase-intelligence';
 
 // ── chunk_hit_log ──────────────────────────────────────────────────────────────
 // Per-chunk retrieval event log. One row per chunk × query × pipeline pass.

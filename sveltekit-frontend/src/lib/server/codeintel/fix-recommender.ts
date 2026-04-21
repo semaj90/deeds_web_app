@@ -12,6 +12,8 @@
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
+import { loadCodebaseContext, rerankChunks } from '$lib/server/retrieval/codebase-context.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
@@ -45,6 +47,10 @@ export interface FixRecommendation {
   confidence: number;
   /** Reference files from the codebase that informed this recommendation */
   referenceFiles: string[];
+  /** True if the fix was verified via LinterService */
+  verified?: boolean;
+  /** Combined output from svelte-check/tsc during verification */
+  verificationLogs?: string;
 }
 
 export interface FixRecommendResult {
@@ -76,9 +82,7 @@ export interface FixRecommendResult {
 // Entry point
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function getFixRecommendations(
-  req: FixRecommendRequest
-): Promise<FixRecommendResult> {
+export async function getFixRecommendations(req: FixRecommendRequest): Promise<FixRecommendResult> {
   const startMs = Date.now();
   const model = 'gemma4-legal-fast:latest';
   const topK = Math.min(req.topK ?? 3, 6);
@@ -86,25 +90,25 @@ export async function getFixRecommendations(
   // ── Step 1: Build search query from error + context ───────────────────────
   const searchQuery = buildSearchQuery(req);
 
-  // ── Step 2: Semantic search via Qdrant (reuses existing dual-embedder) ────
+  // ── Step 2: Semantic search via Stage C (Pointwise Cross-Encoder) ──────────
   let searchResults: SearchHit[] = [];
   try {
-    const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
-    const raw = await searchCodebase(searchQuery, {
-      limit: 20,
-      contentWeight: 0.65,
-      signatureWeight: 0.35,
+    const reranked = await rerankChunks(searchQuery, {
+      limit: 15,
+      contentWeight: 0.6,
+      signatureWeight: 0.4,
     });
-    searchResults = raw.map((r) => ({
-      filePath: String(r.chunk.path ?? r.chunk.relativePath ?? 'unknown'),
-      content: String(r.chunk.content ?? ''),
+    
+    searchResults = reranked.results.map((r) => ({
+      filePath: r.relativePath,
+      content: r.content,
       score: r.score,
-      kind: String(r.chunk.kind ?? ''),
-      gpuCluster:
-        r.chunk.neo4j_gpuCluster != null ? Number(r.chunk.neo4j_gpuCluster) : null,
+      kind: r.kind,
+      gpuCluster: r.gpuCluster ?? null,
+      semanticTags: r.tags || [],
     }));
-  } catch {
-    // Qdrant unavailable — fall through to Postgres-only path
+  } catch (e: any) {
+    console.error('[fix-recommender] Stage C retrieval failed:', e.message);
   }
 
   // ── Step 3: Enrich with Postgres metadata for top hits ───────────────────
@@ -113,7 +117,8 @@ export async function getFixRecommendations(
     try {
       const pgRows = await db.execute(sql`
         SELECT relative_path, domain, kind, semantic_tags, gpu_cluster, som_cluster,
-               COALESCE(summary, '') AS summary
+               COALESCE(summary, '') AS summary,
+               cluster_summary
         FROM codebase_chunk_index
         WHERE relative_path = ANY(${topHitPaths})
         LIMIT 20
@@ -125,11 +130,18 @@ export async function getFixRecommendations(
           hit.domain = meta.domain;
           hit.semanticTags = Array.isArray(meta.semantic_tags) ? meta.semantic_tags : [];
           hit.summary = meta.summary;
+          if (meta.cluster_summary && typeof meta.cluster_summary === 'object') {
+            hit.clusterSummaryJson = meta.cluster_summary as Record<string, unknown>;
+          }
           if (hit.gpuCluster == null && meta.gpu_cluster != null) {
             hit.gpuCluster = Number(meta.gpu_cluster);
           }
         }
       }
+
+      // Apply Karpathy tag boost — improves cluster targeting accuracy
+      applyKarpathyTagBoost(searchResults, req.error);
+      searchResults.sort((a, b) => b.score - a.score);
     } catch {
       // non-fatal
     }
@@ -139,8 +151,9 @@ export async function getFixRecommendations(
   const topCluster = searchResults.find((r) => r.gpuCluster != null)?.gpuCluster ?? null;
   let clusterContext: FixRecommendResult['clusterContext'] = undefined;
 
-  if (topCluster != null && (req.includeClusterSummary !== false)) {
+  if (topCluster != null && req.includeClusterSummary !== false) {
     try {
+      // Primary: cluster_summaries table (may be sparsely populated)
       const csRows = await db.execute(sql`
         SELECT gpu_cluster, COALESCE(purpose,'') AS purpose,
                COALESCE(summary,'') AS summary,
@@ -165,6 +178,25 @@ export async function getFixRecommendations(
     } catch {
       // non-fatal
     }
+
+    // Fallback: read cluster_summary JSONB persisted by cluster-summary.ts
+    // into codebase_chunk_index — populated by the GPU/SOM pipeline loop.
+    if (!clusterContext) {
+      const topHitWithJson = searchResults.find(
+        (r) => r.gpuCluster === topCluster && r.clusterSummaryJson != null
+      );
+      if (topHitWithJson?.clusterSummaryJson) {
+        const cs = topHitWithJson.clusterSummaryJson as any;
+        clusterContext = {
+          clusterId: topCluster,
+          purpose: String(cs.purpose ?? ''),
+          summary: String(cs.summary ?? ''),
+          patterns: Array.isArray(cs.patterns) ? (cs.patterns as string[]) : [],
+          warnings: Array.isArray(cs.warnings) ? (cs.warnings as string[]) : [],
+          tags: Array.isArray(cs.keyFiles) ? (cs.keyFiles as string[]) : [],
+        };
+      }
+    }
   }
 
   // ── Step 5: Build structured prompt ──────────────────────────────────────
@@ -176,29 +208,21 @@ export async function getFixRecommendations(
   let llmError: string | undefined;
 
   try {
-    const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        prompt: buildUserPrompt(req),
-        system: systemPrompt,
-        stream: false,
-        format: 'json',
-        options: { temperature: 0.2, num_predict: 1024 },
-      }),
-      signal: AbortSignal.timeout(90_000),
+    // Stage 6: Agentic Loop (supports web_search, rag_search, etc.)
+    const agentResult = await runGemma4Agent(buildUserPrompt(req), {
+      systemPrompt,
+      pipeline: 'ace-fix',
     });
 
-    if (!resp.ok) throw new Error(`Ollama HTTP ${resp.status}`);
-    const data = await resp.json();
-    const raw = (data.response as string).trim();
-
-    recommendations = parseRecommendations(raw, chunksUsed);
+    if (agentResult.answer) {
+      recommendations = parseRecommendations(agentResult.answer.trim(), chunksUsed);
+    } else {
+      throw new Error('Agent returned empty answer');
+    }
   } catch (e: any) {
     // Log raw error server-side only — never expose to callers
-    console.error('[fix-recommender] LLM call failed:', e?.message ?? e);
-    llmError = 'LLM unavailable — using heuristic recommendations';
+    console.error('[fix-recommender] Agentic loop failed:', e?.message ?? e);
+    llmError = 'Agentic loop failed — using heuristic recommendations';
     recommendations = heuristicRecommendations(req, chunksUsed, topK);
   }
 
@@ -232,6 +256,57 @@ interface SearchHit {
   domain?: string;
   semanticTags?: string[];
   summary?: string;
+  /** Cluster narrative from codebase_chunk_index.cluster_summary JSONB */
+  clusterSummaryJson?: Record<string, unknown>;
+}
+
+// ── Karpathy vocabulary (mirrors context-assembler.ts tag map) ────────────────
+// These are the semantic tags assigned during codebase indexing.
+// Each matching tag in a chunk's semantic_tags array earns +0.08 on score (max +0.24).
+const KARPATHY_VOCAB = new Set([
+  'state-management',
+  'api-route',
+  'database-access',
+  'authentication',
+  'form-handling',
+  'error-handling',
+  'caching',
+  'streaming',
+  'vector-search',
+  'llm-inference',
+  'file-upload',
+  'ml-inference',
+  'graph-analysis',
+  'embedding',
+  'queue',
+  'svelte-component',
+  'server-action',
+  'drizzle-orm',
+  'qdrant',
+  'redis',
+]);
+
+/**
+ * Apply a small Karpathy-tag score boost to chunks whose semantic_tags
+ * overlap with vocabulary words extracted from the error message.
+ * Mirrors the boost in context-assembler.ts::applyKarpathyBoost().
+ */
+function applyKarpathyTagBoost(hits: SearchHit[], errorText: string): void {
+  const words = errorText
+    .toLowerCase()
+    .split(/\W+/)
+    .filter((w) => w.length > 3);
+  const matchingTags = new Set<string>();
+  for (const word of words) {
+    for (const tag of KARPATHY_VOCAB) {
+      if (tag.includes(word) || word.includes(tag.split('-')[0])) matchingTags.add(tag);
+    }
+  }
+  if (matchingTags.size === 0) return;
+  for (const hit of hits) {
+    const overlap = (hit.semanticTags ?? []).filter((t) => matchingTags.has(t)).length;
+    if (overlap > 0) hit.score += Math.min(overlap * 0.08, 0.24);
+  }
 }
 
 function buildSearchQuery(req: FixRecommendRequest): string {
@@ -252,13 +327,23 @@ function buildSystemPrompt(
   topK: number
 ): string {
   const lines: string[] = [
-    'You are an expert TypeScript/SvelteKit code assistant. Your task is to diagnose and fix compilation errors.',
-    `Return ONLY a JSON object with a "recommendations" array of exactly ${topK} objects, each with:`,
+    'You are an expert TypeScript/SvelteKit code assistant. Your mission is to diagnose and fix errors using production-grade verification.',
+    '',
+    '### AUTONOMOUS REPAIR PROTOCOL:',
+    '1. READ: Use `read_file` to understand the target file and any related dependencies.',
+    '2. PATCH: Use `apply_shadow_patch` to apply your proposed fix to the target file.',
+    '3. VERIFY: Use `verify_fix` to run compiler/linter checks on your patch.',
+    '4. ANALYZE: If there are errors, read the file again and iterate (max 2 retries).',
+    '5. CLEANUP: Mandatory! Call `revert_fix` on every file you patched before finishing.',
+    '',
+    'Return ONLY a JSON object with a "recommendations" array of exactly ${topK} objects, each with:',
     '  "title": short label (≤10 words)',
     '  "explanation": why this fix applies (1-2 sentences)',
-    '  "fix": the concrete code change or command (≤20 lines)',
+    '  "fix": the concrete code change (the final version that passed verification)',
     '  "confidence": float 0.0-1.0',
     '  "referenceFiles": array of file paths from the codebase that informed this fix',
+    '  "verified": boolean (true if verify_fix returned success:true)',
+    '  "verificationLogs": string (summary of the linter output)',
     '',
     'Do NOT include any text outside the JSON object.',
   ];
@@ -310,6 +395,8 @@ function parseRecommendations(raw: string, chunks: SearchHit[]): FixRecommendati
       referenceFiles: Array.isArray(r.referenceFiles)
         ? r.referenceFiles.map(String)
         : chunks.slice(0, 2).map((c) => c.filePath),
+      verified: Boolean(r.verified ?? false),
+      verificationLogs: String(r.verificationLogs ?? ''),
     }));
   } catch {
     return heuristicRecommendations({ error: raw } as FixRecommendRequest, chunks, 3);

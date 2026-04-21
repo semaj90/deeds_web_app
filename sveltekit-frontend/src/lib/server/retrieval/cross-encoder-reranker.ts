@@ -39,6 +39,7 @@ import { webSearch, type WebSearchResult } from '$lib/server/retrieval/web-searc
 import { traceCache, traceGraph } from '$lib/server/observability/langfuse.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { fromRerankResult, type UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
+import { scoreBatchTriton, isRerankerReady } from './triton-reranker.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -399,6 +400,50 @@ async function scoreWithBackendFallback(query: string, doc: RerankCandidate): Pr
   return 0.5; // all backends failed
 }
 
+/**
+ * Score a batch of candidates using the best available backend.
+ * Favors Triton batching if selected.
+ */
+async function scoreBatchWithBackendFallback(
+  query: string, 
+  candidates: RerankCandidate[]
+): Promise<Map<string, number>> {
+  const scores = new Map<string, number>();
+  if (candidates.length === 0) return scores;
+
+  // 1. Try Triton Batching first if it's the primary or secondary backend
+  const tritonHealth = _backendHealth['triton'];
+  const useTritonBatch = (RERANK_BACKEND === 'triton' || RERANK_BACKEND === 'tensorrt') && 
+                         (tritonHealth.ok || Date.now() - tritonHealth.checkedAt > HEALTH_RECHECK_MS);
+
+  if (useTritonBatch) {
+    try {
+        const docTexts = candidates.map(c => c.content.slice(0, SCORE_MAX_CHARS));
+        const batchScores = await scoreBatchTriton(query, docTexts);
+        
+        if (batchScores.length === candidates.length) {
+            tritonHealth.ok = true;
+            tritonHealth.checkedAt = Date.now();
+            for (let i = 0; i < candidates.length; i++) {
+                scores.set(candidates[i].documentId, batchScores[i]);
+            }
+            return scores;
+        }
+    } catch {
+        tritonHealth.ok = false;
+        tritonHealth.checkedAt = Date.now();
+    }
+  }
+
+  // 2. Fall back to sequential scoring (exploits Ollama prefix cache)
+  for (const doc of candidates) {
+    const score = await scoreWithBackendFallback(query, doc);
+    scores.set(doc.documentId, score);
+  }
+
+  return scores;
+}
+
 // ── Web search fallback ───────────────────────────────────────────────────────
 
 /**
@@ -517,11 +562,11 @@ export async function rerankWithGemma4<T extends RerankCandidate>(
       // ── Gemma4 scoring for uncached pairs (sequential — prefix KV cache) ──
       // Sequential (not parallel) so Ollama keeps the model hot and the
       // query-prefix KV states are warm across all doc calls.
-      const freshScores = new Map<string, number>();
-      for (const doc of uncached) {
-        const score = await scoreWithBackendFallback(query, doc);
-        freshScores.set(doc.documentId, score);
-        toWrite.push({ doc, score });
+      // ── Scorer for uncached pairs (Batch preferred) ─────────────────────────
+      const freshScores = await scoreBatchWithBackendFallback(query, uncached);
+      for (const [docId, score] of freshScores.entries()) {
+        const doc = uncached.find(d => d.documentId === docId);
+        if (doc) toWrite.push({ doc, score });
       }
 
       // ── Write fresh scores to L1 Redis ──────────────────────────────
@@ -550,10 +595,13 @@ export async function rerankWithGemma4<T extends RerankCandidate>(
           const webUncached = webCandidates.filter(d => !webCached.has(d.documentId));
           const webToWrite: Array<{ doc: T; score: number }> = [];
 
-          for (const doc of webUncached) {
-            const score = await scoreWithBackendFallback(query, doc);
-            freshScores.set(doc.documentId, score);
-            webToWrite.push({ doc, score });
+          const webScores = await scoreBatchWithBackendFallback(query, webUncached);
+          for (const [docId, score] of webScores.entries()) {
+            const doc = webUncached.find(d => d.documentId === docId);
+            if (doc) {
+                freshScores.set(docId, score);
+                webToWrite.push({ doc, score });
+            }
           }
           await _batchSetCached(qHash, webToWrite);
 

@@ -44,6 +44,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const parsed = bodySchema.safeParse(raw);
 	const { maxFiles } = parsed.success ? parsed.data : { maxFiles: 2000 };
 
+	// Phase 7: Clear stale context buffers for the initial sync phase
+	try {
+		const { invalidateBuffers } = await import('$lib/server/retrieval/context-buffer.js');
+		await invalidateBuffers();
+	} catch (e) {
+		console.warn('[graph-sync] Failed to invalidate buffers:', e);
+	}
+
 	const jobId = randomUUID();
 	const job: SyncJob = { jobId, status: 'running', startedAt: new Date().toISOString() };
 	jobs.set(jobId, job);
@@ -80,6 +88,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			}).catch((e) => {
 				console.warn('[codebase-index/graph-sync] enrich-qdrant auto-trigger failed:', e?.message ?? e);
 			});
+
+			// Step 6: auto-trigger cluster-summary synthesis (Phase 6)
+			// Trigger the batch pre-warm (PUT) to ensure narratives match latest graph clusters.
+			fetch('/api/codebase-index/cluster-summary', {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ force: false }),
+			})
+				.then((r) => {
+					if (r.ok) {
+						console.log('[codebase-index/graph-sync] cluster-summary synthesis triggered');
+					}
+				})
+				.catch((e) => {
+					console.warn(
+						'[codebase-index/graph-sync] cluster-summary auto-trigger failed:',
+						e?.message ?? e
+					);
+				});
 		}
 	}).catch((err) => {
 		console.error('[codebase-index/graph-sync] Pipeline error:', err);

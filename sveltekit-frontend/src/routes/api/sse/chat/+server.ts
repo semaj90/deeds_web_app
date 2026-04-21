@@ -58,6 +58,14 @@ import {
   streamCachedResponse,
 } from '$lib/server/ai/cached-stream.js';
 
+/** Returns true when a Postgres error is 42P01 (undefined_table). */
+function isMissingRelationError(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const cause = (err as any).cause;
+  const code = cause?.code ?? (err as any).code;
+  return code === '42P01';
+}
+
 /**
  * Fetch uploaded documents for chat session and retrieve chunks from Qdrant
  */
@@ -159,7 +167,11 @@ async function fetchChatDocumentContext(sessionId: string): Promise<string | nul
 
     return null;
   } catch (error) {
-    console.error('Failed to fetch chat document context:', error);
+    if (isMissingRelationError(error)) {
+      console.warn('[fetchChatDocumentContext] chat_document_attachments not found — skipping document context');
+    } else {
+      console.error('Failed to fetch chat document context:', error);
+    }
     return null;
   }
 }

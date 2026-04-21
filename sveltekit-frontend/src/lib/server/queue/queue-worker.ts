@@ -24,6 +24,7 @@ type QueueName =
 	| 'vector.index'
 	| 'chat.context'
 	| 'analytics.track'
+	| 'kb.ingest'
 	| 'codebase.index';
 
 export interface WorkerStats {
@@ -616,6 +617,16 @@ export class CodebaseIndexWorker extends QueueWorker<{
 	}
 }
 
+/** Web search ingestion worker — embeddings + Qdrant push for external research */
+export class WebIngestWorker extends QueueWorker<import('../retrieval/web-ingest.js').WebIngestMessage> {
+	readonly queue = 'kb.ingest' as const;
+
+	async process(data: import('../retrieval/web-ingest.js').WebIngestMessage): Promise<void> {
+		const { processWebIngestMessage } = await import('../retrieval/web-ingest.js');
+		await processWebIngestMessage(data);
+	}
+}
+
 // ─── Default Registry ────────────────────────────────────────────────────────
 
 /**
@@ -630,6 +641,7 @@ export function createDefaultRegistry(): WorkerRegistry {
 	registry.register(new AnalyticsTrackWorker() as QueueWorker<unknown>);
 	registry.register(new VectorIndexWorker() as QueueWorker<unknown>);
 	registry.register(new ChatContextWorker() as QueueWorker<unknown>);
+	registry.register(new WebIngestWorker() as QueueWorker<unknown>);
 	registry.register(new CodebaseIndexWorker() as QueueWorker<unknown>);
 	return registry;
 }

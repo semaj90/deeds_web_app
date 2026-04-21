@@ -3917,8 +3917,11 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 
 	gpuCluster: integer('gpu_cluster'),
 	somCluster: integer('som_cluster'),
+	somBmuRow: integer('som_bmu_row'),
+	somBmuCol: integer('som_bmu_col'),
 	neo4jGpuCluster: integer('neo4j_gpu_cluster'),
 	communityId: integer('community_id'),
+	clusterSummary: jsonb('cluster_summary').default(sql`'{}'::jsonb`),
 	pageRankScore: real('page_rank_score'),
 
 	// text[] semantic tags from karpathy-tag enrichment
@@ -4001,10 +4004,26 @@ export const enrichmentJobs = pgTable('enrichment_jobs', {
 	jobTypeIdx: index('enrichment_jobs_job_type_idx').on(table.jobType),
 }));
 
+/** Context Buffers — Pre-assembled, high-token context blocks for IDE retrieval.
+ *  Saves LLM synthesis costs by caching 20-cluster architecture summaries.
+ */
+export const contextBuffers = pgTable('context_buffers', {
+	bufferKey: text('buffer_key').primaryKey().notNull(), // e.g. 'architecture-overview', 'pipeline:evidence'
+	repoId: text('repo_id').notNull().default('default'),
+	content: text('content').notNull(),
+	tokenCount: integer('token_count'),
+	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	expiresAt: timestamp('expires_at', { withTimezone: true }),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+});
+
 export type CodebaseChunkIndex = typeof codebaseChunkIndex.$inferSelect;
 export type NewCodebaseChunkIndex = typeof codebaseChunkIndex.$inferInsert;
 export type ClusterSummary = typeof clusterSummaries.$inferSelect;
 export type NewClusterSummary = typeof clusterSummaries.$inferInsert;
 export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
 export type NewEnrichmentJob = typeof enrichmentJobs.$inferInsert;
+export type ContextBuffer = typeof contextBuffers.$inferSelect;
+export type NewContextBuffer = typeof contextBuffers.$inferInsert;
 

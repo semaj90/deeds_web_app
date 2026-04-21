@@ -293,6 +293,11 @@ export async function searchCodebase(
         tags: r.payload.tags as string[],
         lineStart: r.payload.lineStart as number,
         lineEnd: r.payload.lineEnd as number,
+        neo4j_gpuCluster: r.payload.neo4j_gpuCluster as number | undefined,
+        gpu_cluster: r.payload.gpu_cluster as number | undefined,
+        som_cluster: r.payload.som_cluster as number | undefined,
+        som_bmu_row: r.payload.som_bmu_row as number | undefined,
+        som_bmu_col: r.payload.som_bmu_col as number | undefined,
       },
       score: r.score,
     }));

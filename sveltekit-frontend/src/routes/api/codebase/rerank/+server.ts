@@ -39,31 +39,66 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 	const body = parsed.data;
 
-	const rerank = await rerankChunks(body.query, {
-		candidatePaths: body.candidatePaths,
-		limit: body.limit,
-		contentWeight: body.contentWeight,
-		signatureWeight: body.signatureWeight,
-		errorWeight: body.errorWeight,
-		pathBoosts: body.pathBoosts,
-		errorQuery: body.errorQuery,
-	});
+	try {
+		const rerank = await rerankChunks(body.query, {
+			candidatePaths: body.candidatePaths,
+			limit: body.limit,
+			contentWeight: body.contentWeight,
+			signatureWeight: body.signatureWeight,
+			errorWeight: body.errorWeight,
+			pathBoosts: body.pathBoosts,
+			errorQuery: body.errorQuery,
+		});
 
-	// Fire-and-forget analytics
-	logCodebaseSearch({
-		userId: locals.user?.id,
-		query: body.query,
-		recallCount: body.candidatePaths?.length ?? 0,
-		rerankCount: rerank.results.length,
-		recallMs: 0, // recall was in Stage A
-		rerankMs: rerank.timing.searchMs,
-		totalMs: rerank.timing.totalMs,
-		topHits: rerank.results.map((r) => r.relativePath),
-	});
+		// -- Stage C: Gemma4 Pointwise Rerank (Optional/Default) ---------------
+		let finalResults = rerank.results;
+		let stageCStats = null;
 
-	return json({
-		results: rerank.results,
-		timing: rerank.timing,
-		meta: rerank.meta,
-	});
+		const useGemma = request.headers.get('x-rerank-stage') === 'C' || true;
+		if (useGemma && rerank.results.length > 0) {
+			const { rerankWithGemma4 } = await import('$lib/server/retrieval/cross-encoder-reranker.js');
+			const pool = rerank.results.map(c => ({
+				documentId: `${c.relativePath}:${c.lineStart}`,
+				content: c.content,
+				retrievalScore: c.score,
+				chunk: c
+			}));
+
+			const gemmas = await rerankWithGemma4(body.query, pool, {
+				returnTopK: body.limit,
+				noFallback: false
+			});
+
+			finalResults = gemmas.results.map(r => r.doc.chunk);
+			stageCStats = gemmas.stats;
+		}
+
+		// Fire-and-forget analytics
+		logCodebaseSearch({
+			userId: locals.user?.id,
+			query: body.query,
+			recallCount: body.candidatePaths?.length ?? 0,
+			rerankCount: finalResults.length,
+			recallMs: 0,
+			rerankMs: rerank.timing.searchMs,
+			totalMs: rerank.timing.totalMs,
+			topHits: finalResults.map((r) => r.relativePath),
+		});
+
+		return json({
+			results: finalResults,
+			timing: rerank.timing,
+			meta: {
+				...rerank.meta,
+				stageC: stageCStats
+			},
+		});
+	} catch (err) {
+		console.error('[rerank-endpoint] Rerank failed:', err);
+		return json({
+			results: [],
+			error: (err as Error).message,
+			meta: { error: true }
+		}, { status: 207 });
+	}
 };

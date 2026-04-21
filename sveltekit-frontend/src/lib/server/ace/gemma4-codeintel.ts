@@ -63,10 +63,7 @@ export function buildGemma4AcePrompt(
 ): string {
   const sections: string[] = [];
 
-  // ── QUERY ────────────────────────────────────────────────────────────────
-  sections.push(`## QUERY\n${context.query}`);
-
-  // ── CLUSTER SUMMARIES ────────────────────────────────────────────────────
+  // 1. CLUSTER SUMMARIES (Highly Stable Prefix) ─────────────────────────────
   if (context.clusterContext.length > 0) {
     const clusterLines = context.clusterContext.map(c => {
       const parts = [`  Cluster ${c.gpuCluster} — ${c.purpose ?? 'unknown purpose'}`];
@@ -76,10 +73,10 @@ export function buildGemma4AcePrompt(
       if (c.tags.length)     parts.push(`  Tags: ${c.tags.join(', ')}`);
       return parts.join('\n');
     });
-    sections.push(`## CLUSTER SUMMARIES (${context.clusterContext.length})\n${clusterLines.join('\n\n')}`);
+    sections.push(`## CLUSTER REVIEWS (${context.clusterContext.length})\n${clusterLines.join('\n\n')}`);
   }
 
-  // ── RELEVANT CHUNKS ──────────────────────────────────────────────────────
+  // 2. RELEVANT CHUNKS ──────────────────────────────────────────────────────
   if (context.chunkContext.length > 0) {
     const chunkLines = context.chunkContext.map(c => {
       const meta = [c.kind, c.domain, c.language].filter(Boolean).join(' | ');
@@ -89,23 +86,25 @@ export function buildGemma4AcePrompt(
       if (c.summary) parts.push(`  Summary: ${c.summary.slice(0, 300)}`);
       return parts.join('\n');
     });
-    sections.push(`## RELEVANT CHUNKS (${context.chunkContext.length})\n${chunkLines.join('\n\n')}`);
+    sections.push(`## SOURCE CONTEXT (${context.chunkContext.length})\n${chunkLines.join('\n\n')}`);
   }
 
-  // ── SYSTEM HEALTH ────────────────────────────────────────────────────────
+  // 3. SYSTEM HEALTH ────────────────────────────────────────────────────────
   const h = context.health;
   const healthLines = [
     `  Status: ${h.ok ? 'ok' : 'degraded'}`,
-    `  Chunk index: ${h.chunkCount.toLocaleString()} chunks across ${h.clusterCount} clusters`,
+    `  Index: ${h.chunkCount.toLocaleString()} chunks`,
   ];
   if (h.embeddingCoverage != null) {
-    healthLines.push(`  Embedding coverage: ${Math.round(h.embeddingCoverage * 100)}%`);
+    healthLines.push(`  Coverage: ${Math.round(h.embeddingCoverage * 100)}%`);
   }
-  if (context.degraded) healthLines.push('  ⚠ Some data sources unavailable — response may be partial');
-  sections.push(`## SYSTEM HEALTH\n${healthLines.join('\n')}`);
+  sections.push(`## SYSTEM STATUS\n${healthLines.join('\n')}`);
 
-  // ── TASK ─────────────────────────────────────────────────────────────────
-  if (task) sections.push(`## TASK\n${task}`);
+  // 4. QUERY (Volatile) ─────────────────────────────────────────────────────
+  sections.push(`## USER QUERY\n${context.query}`);
+
+  // 5. TASK ─────────────────────────────────────────────────────────────────
+  if (task) sections.push(`## TASK INSTRUCTIONS\n${task}`);
 
   return sections.join('\n\n');
 }
@@ -156,7 +155,12 @@ export async function callGemma4WithAceContext(
         system:  systemPrompt,
         stream:  false,
         ...(formatField !== undefined ? { format: formatField } : {}),
-        options: { temperature, num_predict: maxTokens },
+        options: { 
+          temperature, 
+          num_predict: maxTokens,
+          num_ctx: 16384, // ACE architectural contexts are large
+        },
+        keep_alive: '1h', // Maximize KV cache reuse for agentic loops
       }),
       signal: AbortSignal.timeout(90_000),
     });
@@ -184,6 +188,153 @@ export async function callGemma4WithAceContext(
       error: `LLM call failed: ${e instanceof Error ? e.message : String(e)}`,
       latencyMs: Date.now() - startMs,
       model,
+    };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Multi-step tool-calling loop  (uses /api/chat, NOT /api/generate)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A tool definition for Gemma 4 function calling.
+ * `execute` is local-only — it is never sent to Ollama.
+ */
+export interface Gemma4Tool {
+  name: string;
+  description: string;
+  parameters: {
+    type: 'object';
+    properties: Record<string, { type: string; description?: string; enum?: string[] }>;
+    required?: string[];
+  };
+  execute: (args: Record<string, unknown>) => Promise<string>;
+}
+
+export interface Gemma4ToolCallResult {
+  ok: boolean;
+  text: string;
+  toolCallsExecuted: number;
+  degraded: boolean;
+  error?: string;
+  latencyMs: number;
+  model: string;
+}
+
+const MAX_TOOL_ROUNDS = 5;
+
+type OllamaMessage = {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string;
+  tool_calls?: Array<{ function: { name: string; arguments: Record<string, unknown> } }>;
+};
+
+/**
+ * Multi-step Gemma 4 tool-calling loop via Ollama /api/chat.
+ *
+ * Loop:
+ *   1. Send messages + tool definitions to Ollama.
+ *   2. If response has tool_calls → execute each tool locally.
+ *   3. Append tool results as { role: 'tool' } messages.
+ *   4. Repeat until no tool_calls or MAX_TOOL_ROUNDS reached.
+ *   5. Return the final assistant text.
+ *
+ * Usage:
+ *   const result = await callGemma4WithTools(systemPrompt, userMessage, [
+ *     { name: 'get_cluster', description: '...', parameters: {...}, execute: async (args) => '...' },
+ *   ]);
+ */
+export async function callGemma4WithTools(
+  systemPrompt: string,
+  userMessage: string,
+  tools: Gemma4Tool[],
+  opts: Pick<Gemma4AceOpts, 'model' | 'temperature' | 'maxTokens'> = {},
+): Promise<Gemma4ToolCallResult> {
+  const model       = opts.model       ?? DEFAULT_MODEL;
+  const temperature = opts.temperature ?? 0.2;
+  const maxTokens   = opts.maxTokens   ?? 1024;
+  const startMs     = Date.now();
+
+  // Ollama tool definitions — executor stripped (local-only)
+  const ollamaTools = tools.map(t => ({
+    type: 'function' as const,
+    function: { name: t.name, description: t.description, parameters: t.parameters },
+  }));
+
+  const executorMap = new Map(tools.map(t => [t.name, t.execute]));
+
+  const messages: OllamaMessage[] = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user',   content: userMessage  },
+  ];
+
+  let toolCallsExecuted = 0;
+
+  try {
+    for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages,
+          tools:   ollamaTools,
+          stream:  false,
+          options: { temperature, num_predict: maxTokens },
+        }),
+        signal: AbortSignal.timeout(90_000),
+      });
+
+      if (!resp.ok) throw new Error(`Ollama HTTP ${resp.status}`);
+
+      const data = await resp.json() as { message: OllamaMessage; done: boolean };
+      const msg  = data.message;
+      messages.push(msg); // append assistant turn
+
+      // No tool calls → final answer ready
+      if (!msg.tool_calls || msg.tool_calls.length === 0) {
+        return {
+          ok: true,
+          text: msg.content.trim(),
+          toolCallsExecuted,
+          degraded: false,
+          latencyMs: Date.now() - startMs,
+          model,
+        };
+      }
+
+      // Execute each tool call and feed results back
+      for (const tc of msg.tool_calls) {
+        const { name, arguments: args } = tc.function;
+        const executor = executorMap.get(name);
+        let result: string;
+        if (executor) {
+          try   { result = await executor(args); }
+          catch (err) { result = `Error: ${err instanceof Error ? err.message : String(err)}`; }
+        } else {
+          result = `Error: unknown tool "${name}"`;
+        }
+        messages.push({ role: 'tool', content: result });
+        toolCallsExecuted++;
+      }
+    }
+
+    // Exceeded MAX_TOOL_ROUNDS — return last assistant content
+    const last = [...messages].reverse().find(m => m.role === 'assistant');
+    return {
+      ok: false,
+      text: last?.content ?? '',
+      toolCallsExecuted,
+      degraded: true,
+      error: `Exceeded max tool rounds (${MAX_TOOL_ROUNDS})`,
+      latencyMs: Date.now() - startMs,
+      model,
+    };
+  } catch (e: unknown) {
+    return {
+      ok: false, text: '', toolCallsExecuted, degraded: true,
+      error: `Tool loop failed: ${e instanceof Error ? e.message : String(e)}`,
+      latencyMs: Date.now() - startMs, model,
     };
   }
 }

@@ -11,6 +11,7 @@ const DEV = {
   TRITON_URL: 'http://localhost:8000',
   TRITON_VLM_MODEL: 'gemma_vlm_ensemble',
   TRITON_VISION_MODEL: 'siglip_vision',
+  TRITON_RERANKER_MODEL: 'bge-reranker',
   PUBLIC_API_URL: 'http://localhost:5173',
   MINIO_ENDPOINT: 'localhost',
   MINIO_PORT: '9000',
@@ -93,6 +94,7 @@ export const ENV = {
   TRITON_LLM_MODEL: privateEnv.TRITON_LLM_MODEL ?? 'legal-llm',
   TRITON_VLM_MODEL: privateEnv.TRITON_VLM_MODEL ?? DEV.TRITON_VLM_MODEL,
   TRITON_VISION_MODEL: privateEnv.TRITON_VISION_MODEL ?? DEV.TRITON_VISION_MODEL,
+  TRITON_RERANKER_MODEL: privateEnv.TRITON_RERANKER_MODEL ?? DEV.TRITON_RERANKER_MODEL,
   // Neo4j graph database
   NEO4J_URI: privateEnv.NEO4J_URI ?? privateEnv.NEO4J_URL ?? 'bolt://localhost:7687',
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',

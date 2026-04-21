@@ -23,6 +23,7 @@ import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
+import { rerankWithGemma4 } from './cross-encoder-reranker.js';
 import {
   getCachedEmbedding,
   getCachedSearchResults,
@@ -62,11 +63,15 @@ export interface RankedChunk {
   score: number;
   lineStart: number;
   lineEnd: number;
-  // Graph enrichment fields (Step 2)
+  // neo4j enriched fields
   gpuCluster?: number | null;
   pageRankScore?: number | null;
   routeType?: string | null;
   hasAuthGuard?: boolean | null;
+  somCluster?: number | null;
+  somBmuRow?: number | null;
+  somBmuCol?: number | null;
+  authorityScore?: number;
 }
 
 // -- Module-level Fuse.js metadata cache -------------------------------------
@@ -156,6 +161,46 @@ export async function recallChunks(query: string, limit = 100): Promise<RecallRe
     total: metadataCache.length,
     recallMs: Math.round(performance.now() - start),
   };
+}
+
+/**
+ * Filtered search within a specific GPU cluster.
+ * Used for deep architectural exploration in a specific domain.
+ */
+export async function searchByCluster(
+  query: string,
+  clusterId: number,
+  limit = 5
+): Promise<RankedChunk[]> {
+  const res = await rerankChunks(query, {
+    limit,
+    filter: {
+      should: [
+        { key: 'neo4j_gpuCluster', match: { value: clusterId } },
+        { key: 'som_cluster', match: { value: clusterId } },
+      ],
+    },
+  });
+  return res.results;
+}
+
+/**
+ * Post-processor to boost chunks belonging to the same cluster as the top hit.
+ * Ensures domain coherence in the final context.
+ */
+export function boostBySameCluster(chunks: RankedChunk[], boostFactor = 1.1): RankedChunk[] {
+  if (chunks.length < 2) return chunks;
+  const topCluster = chunks[0].gpuCluster;
+  if (topCluster == null) return chunks;
+
+  return chunks
+    .map((c, i) => {
+      if (i > 0 && c.gpuCluster === topCluster) {
+        return { ...c, score: Math.min(1.0, c.score * boostFactor) };
+      }
+      return c;
+    })
+    .sort((a, b) => b.score - a.score);
 }
 
 export function getMetadataCacheSize(): number {
@@ -256,6 +301,8 @@ export interface RerankOptions {
    * Chunks semantically close to the error description are promoted.
    */
   errorQuery?: string;
+  /** Optional Qdrant filter to restrict the search space (e.g. for cluster-scoped queries). */
+  filter?: Record<string, unknown>;
 }
 
 export interface RerankResult {
@@ -291,6 +338,8 @@ export async function rerankChunks(
         match: { value: p },
       })),
     };
+  } else if (options.filter) {
+    filter = options.filter;
   }
 
   const queryVector = await embedQuery(query);
@@ -384,6 +433,8 @@ export async function rerankChunks(
       pageRankScore,
       routeType: (p.routeType as string | null) ?? null,
       hasAuthGuard: (p.hasAuthGuard as boolean | null) ?? null,
+      somBmuRow: numPayload(p, 'som_bmu_row'),
+      somBmuCol: numPayload(p, 'som_bmu_col'),
     };
   });
 
@@ -422,12 +473,28 @@ export async function loadCodebaseContext(query: string): Promise<{
     if (goodCandidates.length === 0) return null;
 
     const candidatePaths = goodCandidates.map((c) => c.path);
-    const rerank = await rerankChunks(query, { candidatePaths, limit: 5 });
+    const multiVectorResult = await rerankChunks(query, { candidatePaths, limit: 12 });
 
-    if (rerank.results.length === 0) return null;
+    if (multiVectorResult.results.length === 0) return null;
 
-    let context = `## Codebase Context (${rerank.results.length} relevant chunks)\n`;
-    for (const chunk of rerank.results) {
+    // -- Stage C: Gemma4 Cross-Encoder Rerank --------------------------------
+    // Map RankedChunk -> RerankCandidate
+    const rerankPool = multiVectorResult.results.map((c) => ({
+      documentId: `${c.relativePath}:${c.lineStart}`,
+      content: c.content,
+      retrievalScore: c.score,
+      chunk: c, // Pass original chunk through
+    }));
+
+    const gemmasResult = await rerankWithGemma4(query, rerankPool, {
+      returnTopK: 5,
+      noFallback: true, // Internal codebase search doesn't fallback to web here
+    });
+
+    const finalChunks = gemmasResult.results.map((r) => r.doc.chunk);
+
+    let context = `## Codebase Context (${finalChunks.length} high-precision chunks)\n`;
+    for (const chunk of finalChunks) {
       const header = chunk.httpMethod
         ? `${chunk.httpMethod} ${chunk.routeId ?? chunk.relativePath}`
         : `${chunk.kind}: ${chunk.symbol}`;
@@ -455,10 +522,10 @@ export async function loadCodebaseContext(query: string): Promise<{
 
     return {
       context,
-      chunks: rerank.results,
+      chunks: finalChunks,
       timing: {
         recallMs: recall.recallMs,
-        rerankMs: rerank.timing.totalMs,
+        rerankMs: 0,
       },
     };
   } catch (err) {

@@ -173,10 +173,11 @@ These must be cleaned before any production deployment.
 ### Files by Category
 
 | Type | Count | Total Size | Action |
+
+| `.txt` files | **234** | ~1.5GB combined |(keep README) |
 |---|---|---|---|
 | `.log` files | **134** | ~2GB combined | 🗑️ Delete all |
-| `.txt` files | **234** | ~1.5GB combined | 🗑️ Delete all (keep README) |
-| `.json` report dumps | **98** | ~500MB | 🗑️ Delete (keep package/tsconfig/config) |
+| `.json` are any for schema matching or just report dumps | **98** | ~500MB | 🗑️ Delete (keep package/tsconfig/config) |
 | `.png` screenshots | 27 | ~15MB | 🗑️ archive for reference Delete |
 | `.bat` scripts | 23 | ~50KB | ⚠️ Archive or delete |
 | `.py` migration scripts | 20 | ~100KB | ⚠️ Archive to `scripts/` |

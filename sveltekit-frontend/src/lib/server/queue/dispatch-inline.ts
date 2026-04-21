@@ -14,17 +14,18 @@
 import type { RabbitMQManager } from './rabbitmq-manager-fixed.js';
 
 export type QueueName =
-	| 'cache.invalidate'
-	| 'document.embed'
-	| 'evidence.process'
-	| 'vector.index'
-	| 'chat.context'
-	| 'analytics.track'
-	| 'codebase.index'
-	| 'ace.evaluate'
-	| 'error.embed'
-	| 'synthesis.generate'
-	| 'knowledge.backfill';
+  | 'cache.invalidate'
+  | 'document.embed'
+  | 'evidence.process'
+  | 'vector.index'
+  | 'chat.context'
+  | 'analytics.track'
+  | 'codebase.index'
+  | 'ace.evaluate'
+  | 'error.embed'
+  | 'synthesis.generate'
+  | 'knowledge.backfill'
+  | 'kb.ingest';
 
 export interface DispatchResult {
 	mode: 'queued' | 'inline' | 'skipped';

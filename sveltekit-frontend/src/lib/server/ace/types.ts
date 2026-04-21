@@ -151,6 +151,9 @@ export interface ACEContext {
     pageRankScore?: number | null;
     routeType?: string | null;
     hasAuthGuard?: boolean | null;
+    somCluster?: number | null;
+    somBmuRow?: number | null;
+    somBmuCol?: number | null;
   }> | null;
   /** GPU cluster narratives (compiled knowledge from k-means clustering) */
   clusterNarratives?: Array<{

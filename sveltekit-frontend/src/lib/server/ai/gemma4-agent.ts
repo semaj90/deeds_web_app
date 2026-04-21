@@ -27,6 +27,10 @@ import { qdrant }                                      from '$lib/server/vector/
 import { selectAdaptiveMemory, queryTopHyperedges }    from '$lib/server/graph/hypergraph-4d.js';
 import { db, pool }                                    from '$lib/server/db/client';
 import { contextTimeline }                             from '$lib/server/db/schema-postgres.js';
+import { ENV } from '$lib/server/env.server.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { LinterService } from './linter-service.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -86,8 +90,8 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query:  { type: 'string', description: 'Search term or case description' },
-          limit:  { type: 'number', description: 'Max results (default 5, max 20)' },
+          query: { type: 'string', description: 'Search term or case description' },
+          limit: { type: 'number', description: 'Max results (default 5, max 20)' },
         },
         required: ['query'],
       },
@@ -105,8 +109,8 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {
-          query:  { type: 'string', description: 'Topic or question to recall memories for' },
-          topK:   { type: 'number', description: 'Number of memory modules to return (default 3)' },
+          query: { type: 'string', description: 'Topic or question to recall memories for' },
+          topK: { type: 'number', description: 'Number of memory modules to return (default 3)' },
         },
         required: ['query'],
       },
@@ -133,7 +137,75 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'read_file',
+      description: 'Read the contents of a source file to understand the current code or structure.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Path to the file relative to workspace root (e.g., src/routes/+page.svelte)' },
+        },
+        required: ['filePath'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'verify_fix',
+      description: 'Run svelte-check or tsc on a specific file to verify it is free of syntax/type errors. Use this AFTER applying a shadow patch.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Path to the file to verify (e.g., src/routes/+page.svelte)' },
+          checkFull: { type: 'boolean', description: 'Whether to check the entire project for regressions (default: false)' },
+        },
+        required: ['filePath'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'apply_shadow_patch',
+      description: 'Apply a temporary patch to a file for verification. This creates a .bak file automatically.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Path to the target file' },
+          patch: { type: 'string', description: 'The code content to write' },
+        },
+        required: ['filePath', 'patch'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'revert_fix',
+      description: 'Revert a shadow patch by restoring the .bak file. Use this to cleanup after verification.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Path to the file to revert' },
+        },
+        required: ['filePath'],
+      },
+    },
+  },
 ] as const;
+
+// ── FNV-1a 32-bit hash (for Redis cache keys) ─────────────────────────────────
+function fnv1a32(s: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = (Math.imul(h, 0x01000193) >>> 0);
+  }
+  return h.toString(16);
+}
 
 // ── In-process tool dispatch ───────────────────────────────────────────────────
 
@@ -240,6 +312,143 @@ async function dispatchTool(
           summary:   e.summary?.slice(0, 300) ?? '',
         })),
       };
+    }
+
+    if (name === 'web_search') {
+      const query = String(args.query ?? '').trim();
+      const maxResults = Math.min(Math.max(Number(args.maxResults ?? 3), 1), 5);
+      if (!query) return { tool: name, result: [] };
+
+      const cacheKey = `websearch:${fnv1a32(query)}`;
+
+      // 1. Redis cache hit
+      try {
+        const { getRedis } = await import('$lib/server/redis.js');
+        const redis = getRedis();
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+          return { tool: name, result: JSON.parse(cached) };
+        }
+      } catch {
+        /* Redis unavailable — continue */
+      }
+
+      // 2. SearXNG
+      try {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 6000);
+        const params = new URLSearchParams({
+          q: query,
+          format: 'json',
+          engines: 'google,duckduckgo,bing',
+          language: 'en',
+          safesearch: '1',
+        });
+        const res = await fetch(`${ENV.SEARXNG_URL}/search?${params}`, {
+          signal: ctrl.signal,
+          headers: { Accept: 'application/json' },
+        }).finally(() => clearTimeout(tid));
+
+        if (res.ok) {
+          const body = (await res.json()) as {
+            results?: Array<{ title?: string; url?: string; content?: string }>;
+          };
+          const hits = (body.results ?? []).slice(0, maxResults).map((r) => ({
+            title: String(r.title ?? '').slice(0, 120),
+            url: String(r.url ?? ''),
+            snippet: String(r.content ?? '').slice(0, 400),
+            source: 'searxng' as const,
+          }));
+
+          if (hits.length > 0) {
+            try {
+              const { getRedis } = await import('$lib/server/redis.js');
+              const redis = getRedis();
+              await redis.set(cacheKey, JSON.stringify(hits), 'EX', 3600);
+            } catch {
+              /* non-fatal */
+            }
+            return { tool: name, result: hits };
+          }
+        }
+      } catch {
+        /* SearXNG unreachable — fall through to Qdrant */
+      }
+
+      // 3. Qdrant research_summaries semantic fallback
+      try {
+        const emb = await generateEmbedding(query);
+        if (emb) {
+          const hits = await qdrant.hybridSearch({
+            collection: 'research_summaries',
+            query,
+            queryEmbedding: emb,
+            limit: maxResults,
+          });
+          const results = hits.results
+            .filter((h) => h.score > 0.5)
+            .map((h) => ({
+              title: String(h.payload?.['title'] ?? 'Research Note'),
+              url: String(h.payload?.['source'] ?? ''),
+              snippet: String(h.payload?.['summary'] ?? '').slice(0, 400),
+              source: 'qdrant_fallback' as const,
+            }));
+          if (results.length > 0) return { tool: name, result: results };
+        }
+      } catch {
+        /* non-fatal */
+      }
+
+      return { tool: name, result: [] };
+    }
+
+    if (name === 'read_file') {
+      const fp = String(args.filePath ?? '');
+      if (!fp.startsWith('src/')) return { tool: name, result: null, errorMsg: 'Access denied: outside src/' };
+      const abs = path.join(process.cwd(), fp);
+      try {
+        const content = await fs.readFile(abs, 'utf-8');
+        return { tool: name, result: { content, lines: content.split('\n').length } };
+      } catch (e: any) {
+        return { tool: name, result: null, errorMsg: e.message };
+      }
+    }
+
+    if (name === 'verify_fix') {
+      const fp = String(args.filePath ?? '');
+      const full = Boolean(args.checkFull ?? false);
+      const res = await LinterService.verifySvelteFile(fp, { checkFull: full });
+      return { tool: name, result: res };
+    }
+
+    if (name === 'apply_shadow_patch') {
+      const fp = String(args.filePath ?? '');
+      const patch = String(args.patch ?? '');
+      if (!fp.startsWith('src/')) return { tool: name, result: null, errorMsg: 'Access denied: outside src/' };
+      const abs = path.join(process.cwd(), fp);
+      const bak = `${abs}.bak`;
+
+      try {
+        if (!process.env.DEV_BYPASS_AUTH) return { tool: name, result: null, errorMsg: 'Write access disabled' };
+        await fs.copyFile(abs, bak);
+        await fs.writeFile(abs, patch, 'utf-8');
+        return { tool: name, result: { success: true, backup: bak } };
+      } catch (e: any) {
+        return { tool: name, result: null, errorMsg: e.message };
+      }
+    }
+
+    if (name === 'revert_fix') {
+      const fp = String(args.filePath ?? '');
+      const abs = path.join(process.cwd(), fp);
+      const bak = `${abs}.bak`;
+      try {
+        await fs.copyFile(bak, abs);
+        await fs.unlink(bak);
+        return { tool: name, result: { success: true } };
+      } catch (e: any) {
+        return { tool: name, result: null, errorMsg: e.message };
+      }
     }
 
     return { tool: name, result: null, errorMsg: `Unknown tool: ${name}` };

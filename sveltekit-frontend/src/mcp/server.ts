@@ -5,14 +5,13 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { mcpTools } from '../mcp/index.js';
 
-const server = new Server(
+export const server = new Server(
   {
-    name: "deeds-legal-server",
-    version: "1.0.0",
+    name: 'deeds-legal-server',
+    version: '1.0.0',
   },
   {
-    capabilities: { tools: {},
-    },
+    capabilities: { tools: {} },
   }
 );
 
@@ -23,8 +22,7 @@ const MCP_AUTH_TOKEN = process.env.MCP_AUTH_TOKEN;
 
 function checkAuth(request: any): void {
   if (!MCP_AUTH_TOKEN) return; // no token configured → open access
-  const token = request?.params?._meta?.authToken
-    ?? request?.params?.arguments?._authToken;
+  const token = request?.params?._meta?.authToken ?? request?.params?.arguments?._authToken;
   if (token !== MCP_AUTH_TOKEN) {
     throw new Error('Unauthorized: invalid or missing MCP auth token');
   }
@@ -74,7 +72,7 @@ async function executeTool(
 /**
  * Setup tool handlers for MCP server
  */
-function setupToolHandlers() {
+export function setupToolHandlers() {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
       {
@@ -600,6 +598,33 @@ function setupToolHandlers() {
               type: 'boolean',
               description: 'Bypass Redis cache and regenerate narrative (default: false)',
               default: false,
+            },
+          },
+        },
+      },
+      {
+        name: 'codebase:get_buffer',
+        description:
+          'Retrieve a pre-assembled context buffer containing high-token codebase insights (e.g. architecture overview). ' +
+          'More efficient than explain_cluster for large-scale repo understanding.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bufferKey: {
+              type: 'string',
+              description: 'The key of the buffer to retrieve (e.g. "architecture-overview")',
+              default: 'architecture-overview',
+            },
+            bakeIfMissing: {
+              type: 'boolean',
+              description:
+                'If true, re-synthesises the buffer if it is expired or missing (default: true)',
+              default: true,
+            },
+            lastHash: {
+              type: 'string',
+              description:
+                'Optional. Result of a previous call. If hashes match, content is omitted.',
             },
           },
         },
@@ -2155,6 +2180,78 @@ function setupToolHandlers() {
         };
       }
 
+      case 'codebase:get_buffer': {
+        const {
+          bufferKey = 'architecture-overview',
+          bakeIfMissing = true,
+          lastHash,
+        } = args as {
+          bufferKey?: string;
+          bakeIfMissing?: boolean;
+          lastHash?: string;
+        };
+        const { getBuffer, bakeArchitectureBuffer } = await import(
+          '../lib/server/retrieval/context-buffer.js'
+        );
+
+        let buffer = await getBuffer(bufferKey);
+
+        if (!buffer && bakeIfMissing && bufferKey === 'architecture-overview') {
+          const content = await bakeArchitectureBuffer();
+          buffer = {
+            content,
+            tokenCount: Math.ceil(content.length / 4),
+            updatedAt: new Date().toISOString(),
+            hash: (await import('node:crypto'))
+              .createHash('sha256')
+              .update(content)
+              .digest('hex')
+              .slice(0, 16),
+          };
+        }
+
+        if (!buffer) {
+          return {
+            content: [
+              { type: 'text', text: JSON.stringify({ error: `Buffer '${bufferKey}' not found.` }) },
+            ],
+            isError: true,
+          };
+        }
+
+        if (lastHash && buffer.hash === lastHash) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  bufferKey,
+                  status: 'no_change',
+                  hash: buffer.hash,
+                  updatedAt: buffer.updatedAt,
+                }),
+              },
+            ],
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                bufferKey,
+                status: 'ok',
+                content: buffer.content,
+                tokenCount: buffer.tokenCount,
+                updatedAt: buffer.updatedAt,
+                hash: buffer.hash,
+              }),
+            },
+          ],
+        };
+      }
+
       // ─────────────────────────────────────────────────────────────────────
       // LangExtract Handlers — Call Python service on port 8095
       // ─────────────────────────────────────────────────────────────────────
@@ -3219,13 +3316,18 @@ async function main() {
   setupToolHandlers();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Deeds Legal MCP Server running on stdio");
+  console.error('Deeds Legal MCP Server running on stdio');
 }
 
-main().catch((error) => {
-  console.error("Server error:", error);
-  process.exit(1);
-});
+if (
+  process.argv[1] &&
+  (process.argv[1].endsWith('server.ts') || process.argv[1].endsWith('server.js'))
+) {
+  main().catch((error) => {
+    console.error('Server error:', error);
+    process.exit(1);
+  });
+}
 
 
 

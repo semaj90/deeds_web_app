@@ -46,9 +46,17 @@ import {
   traceVectorSearch,
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
+import { searchByError } from '$lib/server/indexer/dual-embedder.js';
+import { rerankWithGemma4 } from '../retrieval/cross-encoder-reranker.js';
+import { applyTopologicalBoost } from '../retrieval/topological-search.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from './policy.js';
-import { recordChunkHits, recordQueryLog, queryHash, type ChunkHit } from '$lib/server/analytics/search-analytics.js';
+import {
+  recordChunkHits,
+  recordQueryLog,
+  queryHash,
+  type ChunkHit,
+} from '$lib/server/analytics/search-analytics.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 
 /**
@@ -175,10 +183,47 @@ export async function assembleACEContext(opts: {
         persona: opts.persona ?? 'neutral',
         evidenceMetadata,
         evidenceConnections,
-        userAnalyticsContext,
-        codebaseContext,
+        userAnalyticsContext: userAnalyticsContext ?? null,
+        codebaseContext: codebaseContext ?? null,
         policyDecision: null,
       };
+
+      // ── Autonomous Research Ingestion (Phase 6) ─────────────────────
+      // Persist all external research (Web + Wikipedia) to knowledge_base
+      const researchToIngest = [
+        ...(webResults?.results ?? []).map((r) => ({
+          url: r.url,
+          title: r.title,
+          content: r.snippet,
+          source: r.source,
+        })),
+        ...(wikiResults
+          ? [
+              {
+                url: wikiResults.url,
+                title: wikiResults.title,
+                content: wikiResults.summary,
+                source: 'wikipedia',
+              },
+            ]
+          : []),
+      ];
+
+      if (researchToIngest.length > 0) {
+        Promise.all([
+          import('$lib/server/queue/rabbitmq-manager-fixed.js'),
+          import('$lib/server/queue/dispatch-inline.js'),
+        ])
+          .then(([{ rabbitmq }, { dispatchOrExecuteInline }]) => {
+            if (rabbitmq) {
+              dispatchOrExecuteInline('kb.ingest', {
+                docs: researchToIngest,
+                collection: 'knowledge_base',
+              }).catch(() => {});
+            }
+          })
+          .catch(() => {});
+      }
 
       // P3-A: cross-source reranking — web results compete with KB/case chunks in unified pool
       const webUnified = webResults ? webSearchToUnified(webResults) : [];
@@ -1724,6 +1769,9 @@ async function fetchCodebaseContext(
         r.chunk.neo4j_pageRankScore != null ? Number(r.chunk.neo4j_pageRankScore) : null,
       routeType: r.chunk.neo4j_routeType != null ? String(r.chunk.neo4j_routeType) : null,
       hasAuthGuard: r.chunk.neo4j_hasAuthGuard != null ? Boolean(r.chunk.neo4j_hasAuthGuard) : null,
+      somCluster: r.chunk.som_cluster != null ? Number(r.chunk.som_cluster) : null,
+      somBmuRow: r.chunk.som_bmu_row != null ? Number(r.chunk.som_bmu_row) : null,
+      somBmuCol: r.chunk.som_bmu_col != null ? Number(r.chunk.som_bmu_col) : null,
     });
 
     // Step 3 — cross-encoder reranker pass (noFallback prevents web search on code queries)
@@ -1747,16 +1795,16 @@ async function fetchCodebaseContext(
         });
         if (reranked.length > 0) {
           const scoreMap = new Map(reranked.map((r) => [r.doc.documentId, r.rerankScore]));
-          return applyKarpathyBoost(
-            results
-              .map((r) => {
-                const docId = String(r.chunk.path ?? r.chunk.relativePath ?? '');
-                return toCtx(r, scoreMap.get(docId) ?? r.score);
-              })
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 10),
-            query
-          );
+          const unsorted = results.map((r) => {
+            const docId = String(r.chunk.path ?? r.chunk.relativePath ?? '');
+            return toCtx(r, scoreMap.get(docId) ?? r.score);
+          });
+
+          // Phase 8: Apply 4D topological boost (PageRank + SOM grid distance)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const boosted = applyTopologicalBoost(unsorted as any);
+
+          return applyKarpathyBoost(boosted.slice(0, 10) as any, query);
         }
       } catch {
         // Reranker unavailable — fall through to cosine-only results below

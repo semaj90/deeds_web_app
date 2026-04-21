@@ -117,7 +117,8 @@ export async function isLangGraphAvailable(): Promise<boolean> {
 			return false;
 		}
 		const data = (await res.json()) as LangGraphHealthResponse;
-		_cachedHealthy = data.status === 'healthy' || data.status === 'degraded';
+		_cachedHealthy =
+      data.status === 'ok' || data.status === 'healthy' || data.status === 'degraded';
 		_healthCacheTs = now;
 		return _cachedHealthy;
 	} catch {

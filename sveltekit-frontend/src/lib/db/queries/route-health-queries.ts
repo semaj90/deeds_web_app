@@ -10,6 +10,14 @@
 
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { getDb } from '../pool.js';
+
+/** Returns true when a Postgres error is 42P01 (undefined_table — optional feature table missing). */
+function isMissingRelationError(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const cause = (err as any).cause;
+  const code = cause?.code ?? (err as any).code;
+  return code === '42P01';
+}
 import {
   errorBrainAnalysis,
   errorBrainPatch,
@@ -52,11 +60,19 @@ export async function getRouteMetadata(routeId: string) {
  */
 export async function getAllRouteMetadata() {
   const db = getDb();
-  return await db
-    .select()
-    .from(routeMetadata)
-    .where(sql`${routeMetadata.archivedAt} IS NULL`)
-    .orderBy(routeMetadata.path);
+  try {
+    return await db
+      .select()
+      .from(routeMetadata)
+      .where(sql`${routeMetadata.archivedAt} IS NULL`)
+      .orderBy(routeMetadata.path);
+  } catch (e) {
+    if (isMissingRelationError(e)) {
+      console.warn('[getAllRouteMetadata] route_metadata table not found — returning empty list');
+      return [];
+    }
+    throw e;
+  }
 }
 
 /**

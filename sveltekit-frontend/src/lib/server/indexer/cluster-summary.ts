@@ -192,6 +192,7 @@ async function embedSummary(summary: string): Promise<number[] | null> {
 
 async function persistClusterSummary(summary: ClusterSummary): Promise<void> {
   try {
+    // 1. Update codebase_chunk_index.cluster_summary JSONB for all chunks in this cluster
     await pool.query(
       `UPDATE codebase_chunk_index
 			    SET cluster_summary = $1::jsonb,
@@ -212,10 +213,97 @@ async function persistClusterSummary(summary: ClusterSummary): Promise<void> {
         [JSON.stringify(summaryEmbedding), summary.clusterId]
       );
     }
+
+    // 2. Upsert into cluster_summaries table (primary read path for fix-recommender)
+    await pool.query(
+      `INSERT INTO cluster_summaries
+              (repo_id, gpu_cluster, summary, purpose, patterns, warnings, tags, updated_at)
+       VALUES ('default', $1, $2, $3, $4, $5, $6, NOW())
+       ON CONFLICT (repo_id, gpu_cluster) DO UPDATE
+          SET summary    = EXCLUDED.summary,
+              purpose    = EXCLUDED.purpose,
+              patterns   = EXCLUDED.patterns,
+              warnings   = EXCLUDED.warnings,
+              tags       = EXCLUDED.tags,
+              updated_at = NOW()`,
+      [
+        summary.clusterId,
+        summary.summary,
+        summary.purpose,
+        summary.patterns,
+        summary.warnings,
+        summary.keyFiles,
+      ]
+    );
+
+    // 3. Push summary payload to Qdrant so dual-vector search results carry it
+    await pushSummaryToQdrant(summary).catch((err) => {
+      console.warn(
+        `[cluster-summary] Qdrant payload push failed for cluster ${summary.clusterId} (non-fatal):`,
+        (err as Error)?.message
+      );
+    });
   } catch (err) {
     console.warn(
       `[cluster-summary] PostgreSQL mirror failed for cluster ${summary.clusterId}:`,
       (err as Error)?.message
+    );
+  }
+}
+
+/**
+ * Fetch all Qdrant point IDs that belong to this cluster and batch-update
+ * their payload with cluster_purpose + cluster_summary_text so downstream
+ * dual-vector search results carry the cluster narrative without an extra DB hop.
+ */
+async function pushSummaryToQdrant(summary: ClusterSummary): Promise<void> {
+  const filter = {
+    should: [
+      { key: 'neo4j_gpuCluster', match: { value: summary.clusterId } },
+      { key: 'som_cluster',      match: { value: summary.clusterId } },
+    ],
+  };
+
+  // Scroll for point IDs only (no vectors needed)
+  const scrollRes = await fetch(
+    `${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ limit: 500, with_vector: false, with_payload: false, filter }),
+      signal: AbortSignal.timeout(15_000),
+    }
+  );
+  if (!scrollRes.ok) return;
+
+  const scrollData = await scrollRes.json();
+  const pointIds: Array<string | number> = (scrollData.result?.points ?? []).map(
+    (p: { id: string | number }) => p.id
+  );
+  if (pointIds.length === 0) return;
+
+  // Batch-update payload (all points in cluster get same summary fields)
+  const BATCH = 100;
+  for (let i = 0; i < pointIds.length; i += BATCH) {
+    const batch = pointIds.slice(i, i + BATCH);
+    await fetch(
+      `${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payload: {
+            cluster_id:           summary.clusterId,
+            cluster_purpose:      summary.purpose,
+            cluster_summary_text: summary.summary,
+            cluster_patterns:     summary.patterns,
+            cluster_warnings:     summary.warnings,
+            cluster_tags:         summary.keyFiles,
+          },
+          points: batch,
+        }),
+        signal: AbortSignal.timeout(20_000),
+      }
     );
   }
 }
@@ -299,7 +387,7 @@ export async function generateClusterSummary(
               { role: 'user', content: userMessage },
             ],
             stream: false,
-            options: { temperature: 0.2, num_predict: 512 },
+            options: { temperature: 0.2, num_predict: 2048 },
           }),
           signal: AbortSignal.timeout(120_000),
         });

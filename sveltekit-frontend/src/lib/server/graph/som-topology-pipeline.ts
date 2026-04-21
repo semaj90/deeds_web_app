@@ -14,6 +14,7 @@
 import { trainSOM } from '$lib/server/gpu/pytorch-graph.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { ENV } from '$lib/server/env.server.js';
+import { pool } from '$lib/server/db/client';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -120,17 +121,26 @@ async function scrollEmbeddings(maxFiles: number): Promise<FileEmbedding[]> {
 
 async function updateQdrantSomClusters(
 	files: FileEmbedding[],
-	bmuAssignments: Int32Array
+	bmuAssignments: Int32Array,
+	opts: { gridW: number }
 ): Promise<void> {
 	const qdrantUrl = ENV.QDRANT_URL;
 	const BATCH = 100;
 
 	for (let i = 0; i < files.length; i += BATCH) {
 		const batch = files.slice(i, i + BATCH);
-		const points = batch.map((f, j) => ({
-			id: f.pointId,
-			payload: { som_cluster: bmuAssignments[i + j] },
-		}));
+		const points = batch.map((f, j) => {
+			const bmuIdx = bmuAssignments[i + j];
+			const gridW = opts?.gridW ?? 10; // Fallback to 10 if not provided
+			return {
+				id: f.pointId,
+				payload: {
+					som_cluster: bmuIdx,
+					som_bmu_row: Math.floor(bmuIdx / gridW),
+					som_bmu_col: bmuIdx % gridW,
+				},
+			};
+		});
 
 		try {
 			const res = await fetch(
@@ -250,6 +260,48 @@ async function createNeo4jTopologyEdges(
 	return edgesCreated;
 }
 
+// ── Postgres mirror: write som_cluster assignments to codebase_chunk_index ──────
+
+/**
+ * Batch-updates codebase_chunk_index.som_cluster using the qdrant_id → BMU mapping.
+ * This keeps the Postgres mirror in sync with the Qdrant payload so that
+ * cluster-summary.ts and fix-recommender.ts read accurate cluster IDs.
+ */
+async function updatePostgresSomClusters(
+	files: FileEmbedding[],
+	bmuAssignments: Int32Array,
+	opts: { gridW: number }
+): Promise<void> {
+	const BATCH = 200;
+	for (let i = 0; i < files.length; i += BATCH) {
+		const batch = files.slice(i, i + BATCH);
+		const valuesSql = batch
+			.map((_, idx) => `($${idx * 4 + 1}::text, $${idx * 4 + 2}::int, $${idx * 4 + 3}::int, $${idx * 4 + 4}::int)`)
+			.join(', ');
+		const params = batch.flatMap((f, j) => {
+			const bmuIdx = bmuAssignments[i + j];
+			const gridW = opts?.gridW ?? 10;
+			return [
+				String(f.pointId),
+				bmuIdx,
+				Math.floor(bmuIdx / gridW),
+				bmuIdx % gridW
+			];
+		});
+
+		await pool.query(
+			`UPDATE codebase_chunk_index c
+			    SET som_cluster = v.som_cluster,
+			        som_bmu_row = v.som_bmu_row,
+			        som_bmu_col = v.som_bmu_col,
+			        updated_at = NOW()
+			   FROM (VALUES ${valuesSql}) AS v(qdrant_id, som_cluster, som_bmu_row, som_bmu_col)
+			  WHERE c.qdrant_id = v.qdrant_id`,
+			params
+		).catch(err => console.warn('[som-topology] Postgres mirror batch failed:', err));
+	}
+}
+
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 export async function runSOMTopologyPipeline(opts?: {
@@ -258,71 +310,88 @@ export async function runSOMTopologyPipeline(opts?: {
 	gridH?: number;
 	iters?: number;
 }): Promise<SOMTopologyResult> {
-	const t0 = Date.now();
-	const maxFiles = Math.min(opts?.maxFiles ?? 2000, 5000);
-	const iters = opts?.iters ?? 1000;
+  const t0 = Date.now();
+  const maxFiles = Math.min(opts?.maxFiles ?? 2000, 5000);
+  const iters = opts?.iters ?? 1000;
 
-	// 1. Fetch embeddings from Qdrant, deduplicated by file_path
-	const files = await scrollEmbeddings(maxFiles);
-	const n = files.length;
+  // 1. Fetch embeddings from Qdrant, deduplicated by file_path
+  const files = await scrollEmbeddings(maxFiles);
+  const n = files.length;
 
-	if (n === 0) {
-		return {
-			filesProcessed: 0,
-			gridSize: '0x0',
-			neuronsUsed: 0,
-			edgesCreated: 0,
-			durationMs: Date.now() - t0,
-			source: 'cpu',
-		};
-	}
+  if (n === 0) {
+    return {
+      filesProcessed: 0,
+      gridSize: '0x0',
+      neuronsUsed: 0,
+      edgesCreated: 0,
+      durationMs: Date.now() - t0,
+      source: 'cpu',
+    };
+  }
 
-	// 2. Compute grid dimensions using standard SOM sizing rule
-	const gridW = opts?.gridW ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
-	const gridH = opts?.gridH ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
-	const radInit = Math.max(gridW, gridH) / 2;
+  // 2. Compute grid dimensions using standard SOM sizing rule
+  const gridW = opts?.gridW ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
+  const gridH = opts?.gridH ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
+  const radInit = Math.max(gridW, gridH) / 2;
 
-	// 3. Build flat Float32Array [n × 768]
-	const flatVectors = new Float32Array(n * DIM);
-	for (let i = 0; i < n; i++) {
-		const vec = files[i].vector;
-		for (let d = 0; d < DIM; d++) flatVectors[i * DIM + d] = vec[d];
-	}
+  // 3. Build flat Float32Array [n × 768]
+  const flatVectors = new Float32Array(n * DIM);
+  for (let i = 0; i < n; i++) {
+    const vec = files[i].vector;
+    for (let d = 0; d < DIM; d++) flatVectors[i * DIM + d] = vec[d];
+  }
 
-	// 4. Train SOM
-	const { bmu, source } = trainSOM(
-		flatVectors,
-		n,
-		DIM,
-		gridW,
-		gridH,
-		iters,
-		0.1,   // lrInit
-		0.01,  // lrFinal
-		radInit,
-		1.0    // radFinal
-	);
+  // 4. Train SOM
+  const { bmu, source } = trainSOM(
+    flatVectors,
+    n,
+    DIM,
+    gridW,
+    gridH,
+    iters,
+    0.1, // lrInit
+    0.01, // lrFinal
+    radInit,
+    1.0 // radFinal
+  );
 
-	// 5. Bulk-update Qdrant payloads with som_cluster
-	await updateQdrantSomClusters(files, bmu).catch((err) => {
-		console.warn('[som-topology] Qdrant payload update failed (non-fatal):', err);
-	});
+  // 5. Bulk-update Qdrant payloads with som_cluster + coordinates
+  await updateQdrantSomClusters(files, bmu, { gridW }).catch((err) => {
+    console.warn('[som-topology] Qdrant payload update failed (non-fatal):', err);
+  });
+  
+  // 5b. Mirror som_cluster + coordinates back to Postgres codebase_chunk_index
+  await updatePostgresSomClusters(files, bmu, { gridW }).catch((err) => {
+    console.warn('[som-topology] Postgres som_cluster mirror failed (non-fatal):', err);
+  });
 
-	// 6. Create SIMILAR_TOPOLOGY edges in Neo4j
-	const edgesCreated = await createNeo4jTopologyEdges(files, bmu, gridW, gridH).catch((err) => {
-		console.warn('[som-topology] Neo4j edge creation failed (non-fatal):', err);
-		return 0;
-	});
+  // 6. Create SIMILAR_TOPOLOGY edges in Neo4j
+  const edgesCreated = await createNeo4jTopologyEdges(files, bmu, gridW, gridH).catch((err) => {
+    console.warn('[som-topology] Neo4j edge creation failed (non-fatal):', err);
+    return 0;
+  });
 
-	// 7. Compute stats
-	const neuronsUsed = new Set(Array.from(bmu)).size;
+  // 7. Compute stats
+  const neuronsUsed = new Set(Array.from(bmu)).size;
 
-	return {
-		filesProcessed: n,
-		gridSize: `${gridW}x${gridH}`,
-		neuronsUsed,
-		edgesCreated,
-		durationMs: Date.now() - t0,
-		source,
-	};
+  // 7b. Fire-and-forget: generate cluster summaries for each distinct SOM cluster
+  const distinctClusters = Array.from(new Set(Array.from(bmu)));
+  if (distinctClusters.length > 0) {
+    import('$lib/server/indexer/cluster-summary.js')
+      .then(({ generateClusterSummary }) => {
+        for (const clusterId of distinctClusters) {
+          generateClusterSummary(clusterId, false).catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }
+
+  return {
+    filesProcessed: n,
+    gridSize: `${gridW}x${gridH}`,
+    neuronsUsed,
+    edgesCreated,
+    durationMs: Date.now() - t0,
+    source,
+  };
 }

@@ -82,6 +82,8 @@ export interface ResearchTopic {
 	selfPrompt:  string;
 	tags:        string[];
 	pipelineHint: string;
+	validated?:  boolean;
+	evidenceScore?: number;
 }
 
 export interface DeepResearchResult {
@@ -385,7 +387,9 @@ export async function generateDeepResearch(
 			fetchTopPrompts(10),
 		]);
 
-	// Generate research topics via Ollama
+	// 5. Ollama Deep Research Generation
+	// Request 10 candidates initially to allow for pruning down to 6 after validation
+	const CANDIDATE_LIMIT = 10;
 	let topics: ResearchTopic[] = [];
 	try {
 		const prompt = buildResearchPrompt(
@@ -408,8 +412,34 @@ export async function generateDeepResearch(
 		);
 
 		topics = parseResearchTopics(response);
+		if (topics.length > CANDIDATE_LIMIT) topics = topics.slice(0, CANDIDATE_LIMIT);
 	} catch (err) {
 		console.warn('[deep-research] Ollama generation failed:', (err as Error).message);
+	}
+
+	// 6. Autonomous Refinement Cycle (PHASE 12)
+	try {
+		const { validateTopicsWithTriton, refineTopicPrompts } = await import('$lib/server/analytics/research-refiner.js');
+		
+		const validations = await validateTopicsWithTriton(topics);
+		const refinedTopics = await refineTopicPrompts(topics, validations);
+
+		// Distribute topics: 4 Grounded + 2 Speculative (Nice to have)
+		const grounded = refinedTopics
+			.filter(t => t.validated && (t.evidenceScore ?? 0) >= 0.3)
+			.sort((a, b) => (b.evidenceScore ?? 0) - (a.evidenceScore ?? 0))
+			.slice(0, 4);
+
+		const speculative = refinedTopics
+			.filter(t => !grounded.some(g => g.id === t.id))
+			.sort((a, b) => (b.evidenceScore ?? 0) - (a.evidenceScore ?? 0))
+			.slice(0, 2);
+
+		topics = [...grounded, ...speculative];
+	} catch (err) {
+		console.warn('[deep-research] Refinement cycle failed:', err);
+		// Fallback to original top 6 if refinement failed
+		if (topics.length > 6) topics = topics.slice(0, 6);
 	}
 
 	// If Ollama failed or returned nothing, generate fallback topics from data

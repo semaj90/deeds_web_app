@@ -3,7 +3,8 @@
 **As of 2026-04-16 — updated with Steps 1–2 DONE + Phase 2 analytics pipeline DONE + Step 21 CouchDB MapReduce PageRank**
 **Goal**: GPU-indexed, cluster-aware, VLM-synthesised codebase context driving ACE LLM prompting,
 Claude/Copilot wiring, Ollama web-search ingestion, and production-ready consolidation.
-
+continue with alignment is there health check for our semantic search, llama-server running with turboquant kv caching redis cache for api/chat then create source of truth with vs code tasks wired up in pipeline end to end this will be ace codebase indexing dev tool for agentic error fixing with deep reserach web_search fallback if gets lost after generating an error summarization for context added to our kag of qdrant tags pg vector postgresql stored summaries of qdrant tags and grpc fastmcp protobuff serializations for api/chat ace call loops then review  `.log` files | **134** | ~2GB combined | 🗑️ Delete all |
+| `.json` are any for schema matching or just report dumps | **98** | ~500MB | 🗑️ Delete (keep package/tsconfig/config) |
 ---
 
 ## Architecture Overview (Karpathy-style knowledge source wiring)
@@ -77,21 +78,13 @@ retrieval funnel. The codebase intelligence pipeline extends that funnel with a 
 │  VLM synthesis of cluster summaries  ← NOT YET BUILT                      │
 │  Cluster-to-narrative ACE prompt     ← NOT YET BUILT                      │
 └─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
 ## Gap Audit — RED / AMBER / GREEN
-
 ### RED — Broken paths (silent failures today)
-
 | Gap | File(s) | Impact |
 |-----|---------|--------|
 | **No reranker on codebase results** | `ace/context-assembler.ts:fetchCodebaseContext` | Codebase context injected into ACE with only cosine score filtering (≥0.5), no Gemma4 cross-encoder precision pass |
 | **Web fallback not ingested** | `synthesis/generate`, `sse/chat` | Reranker triggers web search on low-score queries but nobody dispatches `document.embed` to RabbitMQ — web results used once then discarded |
-
 ### AMBER — Partially wired (works, but missing a stage)
-
 | Gap | Status | What's Missing |
 |-----|--------|----------------|
 | **Cluster-aware retrieval** | Clusters exist in Qdrant payload | No retrieval path filters or scores by `neo4j_gpuCluster` — same cluster members aren't boosted together |
@@ -100,9 +93,7 @@ retrieval funnel. The codebase intelligence pipeline extends that funnel with a 
 | **Synthesis route + codebase** | synthesis/generate calls ACE | `enableCodebaseContext` is NOT passed in the default synthesis body schema — codebase context off by default |
 | **SOM cluster → SIMILAR_TOPOLOGY** | som-topology-pipeline writes edges | But nothing reads SIMILAR_TOPOLOGY for retrieval expansion — graph neighbor lookup uses only IMPORTS |
 | **VLM for code** | Gemma4 VLM wired for evidence/images | No code-specific synthesis path ("summarise cluster 7 — what is this group of files responsible for?") |
-
 ### GREEN — Fully wired and passing
-
 | Component | Status |
 |-----------|--------|
 | ts-morph scanner v2 (20 metrics) | PRODUCTION — 1335 nodes, 28s, 0 errors |
