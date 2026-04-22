@@ -101,10 +101,8 @@ export const ENV = {
   NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'password',
   // CouchDB document store
   COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:password@localhost:5984',
-  // Web Search APIs (optional — falls back to curated results)
+  // Web search (optional — SearXNG first, DuckDuckGo fallback)
   SEARXNG_URL: privateEnv.SEARXNG_URL ?? 'http://localhost:8888', // Docker: 8888→8080 internal
-  GOOGLE_SEARCH_API_KEY: privateEnv.GOOGLE_SEARCH_API_KEY ?? '',
-  GOOGLE_SEARCH_CX: privateEnv.GOOGLE_SEARCH_CX ?? '',
   // Obsidian Local REST API (optional — vault sync via obsidian-local-rest-api plugin)
   OBSIDIAN_URL: privateEnv.OBSIDIAN_URL ?? 'https://127.0.0.1:27124',
   OBSIDIAN_API_KEY: privateEnv.OBSIDIAN_API_KEY ?? '',
@@ -150,8 +148,6 @@ export const ENV = {
   // Auth secrets
   JWT_SECRET: privateEnv.JWT_SECRET ?? DEV.JWT_SECRET,
   SERVICE_AUTH_TOKEN: privateEnv.SERVICE_AUTH_TOKEN ?? DEV.SERVICE_AUTH_TOKEN,
-  // Google Gemini (optional — fallback to local Ollama)
-  GEMINI_API_KEY: privateEnv.GEMINI_API_KEY ?? privateEnv.GOOGLE_GEMINI_API_KEY ?? '',
   // MinIO library bucket
   MINIO_LIBRARY_BUCKET: privateEnv.MINIO_LIBRARY_BUCKET ?? 'legal-library',
   // Whisper persistent server (whisper-server.exe HTTP mode — eliminates cold start)

@@ -21,7 +21,7 @@ export const load: PageServerLoad = async () => {
 	return {
     analysis,
     timestamp,
-    hasGeminiKey: !!(process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GEMINI_API_KEY),
+    hasGeminiKey: false,
     loadError,
   };
 };

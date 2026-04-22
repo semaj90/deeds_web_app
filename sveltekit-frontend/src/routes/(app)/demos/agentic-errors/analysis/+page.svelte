@@ -101,7 +101,7 @@
 	{#if !data.hasGeminiKey}
 		<div class="p-4 bg-info/20 border-2 border-info rounded-lg">
 			<p class="text-black">
-				ℹ️ <strong>GEMINI_API_KEY</strong> not set — using Ollama (gemma4-legal) for AI analysis.
+				ℹ️ Using the local Ollama stack for AI analysis.
 			</p>
 		</div>
 	{/if}
@@ -287,16 +287,12 @@
 				Click "Regenerate Analysis" to start comprehensive error analysis with RAG+KAG integration.
 			</p>
 
-			{#if data.hasGeminiKey}
-				<button
-					onclick={generateAnalysis}
-					class="px-6 py-3 bg-accent hover:bg-accent/80 text-white rounded-lg transition-colors"
-				>
-					🚀 Generate First Analysis
-				</button>
-			{:else}
-				<p class="text-warning">Set GEMINI_API_KEY in .env first</p>
-			{/if}
+			<button
+				onclick={generateAnalysis}
+				class="px-6 py-3 bg-accent hover:bg-accent/80 text-white rounded-lg transition-colors"
+			>
+				🚀 Generate First Analysis
+			</button>
 		</div>
 	{/if}
 </div>

@@ -65,7 +65,7 @@
 	}
 
 	function providerLabel(provider: string): string {
-		return provider === 'google' ? 'GOOGLE' : 'OLLAMA';
+		return provider === 'ollama' ? 'OLLAMA' : 'OLLAMA';
 	}
 
 	async function handleRun(id: string) {
@@ -199,7 +199,7 @@
 								{#if task.status === 'running'}
 									<div class="rtp-running">
 										<span class="rtp-spinner"></span>
-										Researching via {task.provider === 'google' ? 'Google Deep Research' : 'Ollama'}…
+										Researching via Ollama…
 									</div>
 								{/if}
 							</div>

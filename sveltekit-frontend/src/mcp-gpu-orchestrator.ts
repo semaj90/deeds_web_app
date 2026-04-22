@@ -4,12 +4,20 @@
  * Integrates existing 37 Go services and Ollama cluster
  */
 
+import {
+  createPersistedPayloadEnvelope,
+  jsonValueFromUnknown,
+  type JsonValue,
+  type PersistedEnvelope,
+  type ProtocolBoundary,
+} from '$lib/shared/schemas/protocol.js';
+
 /** Local type — original module `$lib/api/production-service-client` does not exist */
 interface ServiceResponse {
-	success: boolean;
-	data?: unknown;
-	protocol?: string;
-	latency?: number;
+  success: boolean;
+  data?: JsonValue;
+  protocol?: ProtocolBoundary;
+  latency?: number;
 }
 
 interface ProductionServiceClient {
@@ -18,14 +26,28 @@ interface ProductionServiceClient {
 
 const productionServiceClient: ProductionServiceClient = {
 	async callService(path, body, opts) {
+		const requestedProtocol =
+      typeof opts?.preferredProtocol === 'string' ? opts.preferredProtocol : undefined;
+    const protocol: ProtocolBoundary =
+      requestedProtocol === 'json-rpc' ||
+      requestedProtocol === 'grpc' ||
+      requestedProtocol === 'http' ||
+      requestedProtocol === 'sse' ||
+      requestedProtocol === 'internal' ||
+      requestedProtocol === 'unknown'
+        ? requestedProtocol
+        : requestedProtocol === 'quic'
+          ? 'grpc'
+          : 'http';
+
 		const res = await fetch(path, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body),
 			signal: opts?.timeout ? AbortSignal.timeout(opts.timeout as number) : undefined,
 		});
-		const data = await res.json();
-		return { success: res.ok, data, protocol: 'http', latency: 0 };
+		const data = jsonValueFromUnknown(await res.json());
+    return { success: res.ok, data, protocol, latency: 0 };
 	}
 };
 
@@ -71,22 +93,21 @@ export interface GPUTaskConfig {
 }
 
 export interface GPUTaskResult {
-	taskId: string; success: boolean;
-	result: unknown; metrics: {
-		processingTime: number;
-		gpuUtilization?: number;
-		memoryUsage?: number;
-		protocol?: string;
-		model?: string;
-	};
-	error?: string;
-	recommendations?: string[];
-	riskScore?: number;
-	securityScore?: number;
-	legalVerification?: { verified: boolean;
-		confidence: number;
-		details?: unknown;
-	};
+  taskId: string;
+  success: boolean;
+  result: PersistedEnvelope | null;
+  metrics: {
+    processingTime: number;
+    gpuUtilization?: number;
+    memoryUsage?: number;
+    protocol?: string;
+    model?: string;
+  };
+  error?: string;
+  recommendations?: string[];
+  riskScore?: number;
+  securityScore?: number;
+  legalVerification?: { verified: boolean; confidence: number; details?: JsonValue };
 }
 
 export interface ClusterMetrics {
@@ -167,49 +188,89 @@ class MCPGPUOrchestrator {
 			this.taskQueue.delete(task.id);
 			this.activeGPUTasks.delete(task.id);
 
-			// Extract common values from the ServiceResponse
-			const payload = this.getNested<unknown>(result, ['data'], () => true) ?? result;
-			const protocol = this.getNested<string>(result, ['protocol'], this.isString) ??
-				this.getNested<string>(result, ['data', 'protocol'], this.isString) ??
+			const processingTime = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
+			const payload = result.data ?? null;
+			const protocol = result.protocol ??
+				this.getNested<ProtocolBoundary>(result, ['data', 'protocol'], this.isProtocolBoundary) ??
 				'http';
 
 			const riskScore = this.getNested<number>(result, ['data', 'riskScore'], this.isNumber);
 			const securityScore = this.getNested<number>(result, ['data', 'securityScore'], this.isNumber);
 			const legalVerification = this.getNested(result, ['data', 'legalVerification'], () => true);
+			const resultEnvelope = createPersistedPayloadEnvelope({
+        source: 'mcp-gpu-orchestrator',
+        lane: task.type ?? 'gpu_task',
+        protocol,
+        ok: result.success,
+        payload,
+        fields: {
+          taskId: task.id,
+          model: task.config?.model ?? 'unknown',
+          processingTimeMs: processingTime,
+          ...(typeof riskScore === 'number' ? { riskScore } : {}),
+          ...(typeof securityScore === 'number' ? { securityScore } : {}),
+          ...(legalVerification
+            ? { legalVerification: jsonValueFromUnknown(legalVerification) }
+            : {}),
+        },
+        metadata: {
+          priority: task.priority,
+          useGPU: task.config?.useGPU ?? true,
+        },
+      });
 
 			return {
-				taskId: task.id,
-				success: true,
-				result: payload,
-				metrics: { processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
-					gpuUtilization: await this.getGPUUtilization(),
-					memoryUsage: await this.getMemoryUsage(),
-					protocol,
-					model: task.config?.model ?? 'unknown'
-				},
-				recommendations: await this.generateRecommendations(task, result),
-				riskScore,
-				securityScore,
-				legalVerification: legalVerification as GPUTaskResult['legalVerification']
-			};
+        taskId: task.id,
+        success: result.success,
+        result: resultEnvelope,
+        metrics: {
+          processingTime,
+          gpuUtilization: await this.getGPUUtilization(),
+          memoryUsage: await this.getMemoryUsage(),
+          protocol,
+          model: task.config?.model ?? 'unknown',
+        },
+        recommendations: result.success ? await this.generateRecommendations(task, result) : [],
+        riskScore,
+        securityScore,
+        legalVerification: legalVerification as GPUTaskResult['legalVerification'],
+      };
 		} catch (error) {
 			this.taskQueue.delete(task.id);
 			this.activeGPUTasks.delete(task.id);
 
 			const message = error instanceof Error ? error.message : String(error);
+			const processingTime =
+        (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
 
 			return {
-				taskId: task.id,
-				success: false,
-				result: null,
-				metrics: { processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
-					gpuUtilization: 0,
-					memoryUsage: 0,
-					protocol: 'failed',
-					model: 'failed'
-				},
-				error: message
-			};
+        taskId: task.id,
+        success: false,
+        result: createPersistedPayloadEnvelope({
+          source: 'mcp-gpu-orchestrator',
+          lane: task.type ?? 'gpu_task',
+          protocol: 'internal',
+          ok: false,
+          error: message,
+          fields: {
+            taskId: task.id,
+            model: task.config?.model ?? 'unknown',
+            processingTimeMs: processingTime,
+          },
+          metadata: {
+            priority: task.priority,
+            useGPU: task.config?.useGPU ?? true,
+          },
+        }),
+        metrics: {
+          processingTime,
+          gpuUtilization: 0,
+          memoryUsage: 0,
+          protocol: 'failed',
+          model: 'failed',
+        },
+        error: message,
+      };
 		}
 	}
 
@@ -394,27 +455,32 @@ class MCPGPUOrchestrator {
 			const compositeRiskScore = Math.min(1.0, baseRiskScore);
 
 			return {
-				success: true,
-				data: { riskScore: compositeRiskScore,
-					securityScore: Math.round((1 - compositeRiskScore) * 100),
-					analysis: this.getNested<unknown>(response, ['data', 'analysis'], () => true) ?? undefined,
-					recommendations: [],
-					flags: this.getNested<unknown[]>(response, ['data', 'flags'], this.isArray) ?? []
-				},
-				protocol: this.getNested<string>(response, ['protocol'], this.isString) ?? 'http',
-				latency: this.getNested<number>(response, ['latency'], this.isNumber) ?? 0
-			} as unknown as ServiceResponse;
+        success: true,
+        data: jsonValueFromUnknown({
+          riskScore: compositeRiskScore,
+          securityScore: Math.round((1 - compositeRiskScore) * 100),
+          analysis:
+            this.getNested<unknown>(response, ['data', 'analysis'], () => true) ?? undefined,
+          recommendations: [],
+          flags: this.getNested<unknown[]>(response, ['data', 'flags'], this.isArray) ?? [],
+        }),
+        protocol:
+          this.getNested<ProtocolBoundary>(response, ['protocol'], this.isProtocolBoundary) ??
+          'http',
+        latency: this.getNested<number>(response, ['latency'], this.isNumber) ?? 0,
+      };
 		} catch (error) {
 			return {
-				success: false,
-				data: { riskScore: 0.5,
-					securityScore: 50,
-					analysis: 'Fallback security analysis',
-					error: error instanceof Error ? error.message : String(error)
-				},
-				protocol: 'fallback',
-				latency: 0
-			} as unknown as ServiceResponse;
+        success: false,
+        data: jsonValueFromUnknown({
+          riskScore: 0.5,
+          securityScore: 50,
+          analysis: 'Fallback security analysis',
+          error: error instanceof Error ? error.message : String(error),
+        }),
+        protocol: 'unknown',
+        latency: 0,
+      };
 		}
 	}
 
@@ -470,6 +536,10 @@ class MCPGPUOrchestrator {
 
 	private isArray(val: unknown): boolean {
 		return Array.isArray(val);
+	}
+
+	private isProtocolBoundary(val: unknown): val is ProtocolBoundary {
+		return val === 'json-rpc' || val === 'grpc' || val === 'http' || val === 'sse' || val === 'internal' || val === 'unknown';
 	}
 
 	private async getGPUUtilization(): Promise<number> {

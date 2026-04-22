@@ -17,11 +17,17 @@ import { z } from 'zod';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 // Zod schema validates query (trimmed, 1-500), topK (1-100), llmProvider enum
-const knowledgeSearchSchema = z.object({
-  query: z.string().trim().min(1, 'Query cannot be empty').max(500, 'Query too long (max 500 characters)'),
-  topK: z.number().int().min(1).max(100).optional(),
-  llmProvider: z.enum(['ollama', 'gemini', 'claude']).optional(),
-}).passthrough();
+const knowledgeSearchSchema = z
+  .object({
+    query: z
+      .string()
+      .trim()
+      .min(1, 'Query cannot be empty')
+      .max(500, 'Query too long (max 500 characters)'),
+    topK: z.number().int().min(1).max(100).optional(),
+    llmProvider: z.enum(['ollama']).optional().default('ollama'),
+  })
+  .passthrough();
 
 interface SourceResult {
   id: string;

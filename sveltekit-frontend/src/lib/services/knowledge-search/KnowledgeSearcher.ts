@@ -56,7 +56,9 @@ export class KnowledgeSearcher {
 
     for (const result of semanticResults) {
       // Get TF-IDF vector from payload
-      const tfIdfVector = (result as any).payload?.tfIdfVector as Record<string, number> | undefined;
+      const tfIdfVector = (result as any).payload?.tfIdfVector as
+        | Record<string, number>
+        | undefined;
 
       if (!tfIdfVector) {
         hybridResults.push({
@@ -91,7 +93,7 @@ export class KnowledgeSearcher {
         scores: {
           semantic: semanticScore,
           tfidf: tfidfScore,
-          combined: combinedScore
+          combined: combinedScore,
         },
       });
     }
@@ -166,7 +168,7 @@ export class KnowledgeSearcher {
         entities: (point.payload?.entities as string[]) ?? [],
         tags: (point.payload?.tags as string[]) ?? [],
         scrapedAt: new Date(point.payload?.scrapedAt as string),
-        minioKey
+        minioKey,
       };
     } catch (error) {
       console.error(`Error fetching document ${id}:`, error);
@@ -187,17 +189,17 @@ export class KnowledgeSearcher {
         collections: {
           qdrant: {
             points: qdrantStats.points,
-            status: qdrantStats.status
+            status: qdrantStats.status,
           },
           postgres: {
-            rows: 0
+            rows: 0,
           },
           minio: {
             objects: 0,
-            size: '0 MB'
-          }
+            size: '0 MB',
+          },
         },
-        lastIndexed: new Date().toISOString()
+        lastIndexed: new Date().toISOString(),
       };
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -219,7 +221,7 @@ export class KnowledgeSearcher {
   private async synthesizeAnswer(
     query: string,
     results: SearchResult[],
-    provider: 'ollama' | 'gemini' | 'claude' = 'ollama'
+    _provider: 'ollama' = 'ollama'
   ): Promise<string> {
     const context = results
       .slice(0, 5)
@@ -238,16 +240,7 @@ Question: ${query}
 
 Answer:`;
 
-    switch (provider) {
-      case 'ollama':
-        return await this.callOllama(prompt);
-      case 'gemini':
-        return await this.callGemini(prompt);
-      case 'claude':
-        return await this.callClaude(prompt);
-      default:
-        throw new Error(`Unsupported LLM provider: ${provider}`);
-    }
+    return await this.callOllama(prompt);
   }
 
   /**
@@ -265,9 +258,9 @@ Answer:`;
           options: {
             temperature: 0.7,
             top_p: 0.9,
-            num_predict: 500
-          }
-        })
+            num_predict: 500,
+          },
+        }),
       });
 
       if (!response.ok) {
@@ -280,20 +273,6 @@ Answer:`;
       console.error('Ollama API error:', error);
       throw error;
     }
-  }
-
-  /**
-   * Call Google Gemini API
-   */
-  private async callGemini(prompt: string): Promise<string> {
-    throw new Error('Gemini provider not yet implemented');
-  }
-
-  /**
-   * Call Anthropic Claude API
-   */
-  private async callClaude(prompt: string): Promise<string> {
-    throw new Error('Claude provider not yet implemented');
   }
 }
 

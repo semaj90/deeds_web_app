@@ -56,11 +56,11 @@
 	$effect(() => {
 
 		loadSummaries();
-	
+
 });
 
 	function getProviderBadgeClass(provider: string) {
-		if (provider.includes('gemini')) return 'is-success';
+		if (provider.includes('ollama')) return 'is-success';
 		if (provider.includes('gpt')) return 'is-primary';
 		if (provider.includes('claude')) return 'is-warning';
 		return 'is-dark';
@@ -79,7 +79,7 @@
 		<div class="nes-select">
 			<select bind:value={filterProvider} onchange={loadSummaries}>
 				<option value="all">All Providers</option>
-				<option value="gemini">Gemini</option>
+				<option value="ollama">Ollama</option>
 				<option value="gpt">GPT-4</option>
 				<option value="claude">Claude</option>
 			</select>

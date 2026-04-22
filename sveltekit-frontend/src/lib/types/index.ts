@@ -40,6 +40,37 @@ export interface Message {
   metadata?: Record<string, unknown>;
 }
 
+export type {
+  AceContextEnvelope,
+  CacheHitMetadata,
+  JsonRecord,
+  JsonValue,
+  OllamaMessage,
+  PersistedEnvelope,
+  PersistedPayloadEnvelope,
+  ProtocolBoundary,
+  ResearchChunk,
+  SessionEdgePayload,
+  ToolCallResponse,
+} from '../shared/schemas/protocol.js';
+
+export {
+  AceContextEnvelopeSchema,
+  CacheHitMetadataSchema,
+  JsonValueSchema,
+  OllamaMessageSchema,
+  PersistedEnvelopeSchema,
+  PersistedPayloadEnvelopeSchema,
+  PROTOCOL_SCHEMA_VERSION,
+  ProtocolBoundarySchema,
+  ResearchChunkSchema,
+  SessionEdgePayloadSchema,
+  ToolCallResponseSchema,
+  coercePersistedPayloadEnvelope,
+  createPersistedPayloadEnvelope,
+  jsonValueFromUnknown,
+} from '../shared/schemas/protocol.js';
+
 /**
  * Central type export hub for all API response types
  *

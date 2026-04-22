@@ -7,6 +7,10 @@ import { pgRows } from '$lib/server/db/client';
 
 import { db } from '$lib/server/db/client';
 import { analysisJobs } from '$lib/server/db/schema-postgres.js';
+import {
+  coercePersistedPayloadEnvelope,
+  type PersistedEnvelope,
+} from '$lib/shared/schemas/protocol.js';
 import { eq, sql } from 'drizzle-orm';
 
 export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization';
@@ -14,6 +18,22 @@ export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
 
 let analysisJobsTableMissing = false;
 let loggedMissingAnalysisJobsTable = false;
+
+type AnalysisJobPayload = PersistedEnvelope | Record<string, unknown>;
+
+function normalizeAnalysisJobPayload(
+  value: AnalysisJobPayload | undefined,
+  lane: string,
+  ok: boolean = true
+): PersistedEnvelope {
+  return coercePersistedPayloadEnvelope(value, {
+    source: 'analysis_jobs',
+    lane,
+    protocol: 'internal',
+    ok,
+    validatorTag: 'protocol/PersistedPayloadEnvelope@v1',
+  });
+}
 
 function isMissingAnalysisJobsTableError(err: unknown): boolean {
   let current: unknown = err;
@@ -62,7 +82,7 @@ export async function enqueueJob(params: {
   evidenceId: string;
   caseId?: string | null;
   jobType: JobType;
-  result?: Record<string, unknown>;
+  result?: AnalysisJobPayload;
 }): Promise<string> {
   const [row] = await db
     .insert(analysisJobs)
@@ -72,7 +92,7 @@ export async function enqueueJob(params: {
       jobType: params.jobType,
       status: 'queued',
       progress: '0',
-      result: params.result ?? {},
+      result: normalizeAnalysisJobPayload(params.result, params.jobType),
     })
     .returning({ id: analysisJobs.id });
   return row.id;
@@ -96,7 +116,7 @@ export async function createAnalysisJob(params: {
       status: 'running',
       startedAt: new Date(),
       progress: '0',
-      result: {},
+      result: normalizeAnalysisJobPayload({}, params.jobType),
     })
     .returning({ id: analysisJobs.id });
   return row.id;
@@ -114,7 +134,7 @@ export async function claimNextJob(jobType?: JobType): Promise<{
   evidenceId: string;
   caseId: string | null;
   jobType: string;
-  result: Record<string, unknown>;
+  result: PersistedEnvelope;
 } | null> {
   if (analysisJobsTableMissing) {
     return null;
@@ -151,7 +171,7 @@ export async function claimNextJob(jobType?: JobType): Promise<{
       evidenceId: row.evidence_id,
       caseId: row.case_id,
       jobType: row.job_type,
-      result: row.result ?? {},
+      result: normalizeAnalysisJobPayload(row.result ?? {}, row.job_type),
     };
   } catch (err: any) {
     // Throw specific errors for backoff logic in worker.ts
@@ -244,28 +264,31 @@ export async function updateAnalysisJob(
   patch: {
     status?: JobStatus;
     progress?: string;
-    result?: Record<string, unknown>;
+    result?: AnalysisJobPayload;
     error?: string | null;
     completedAt?: Date | null;
   }
 ): Promise<void> {
+  const normalizedResult =
+    typeof patch.result === 'undefined'
+      ? undefined
+      : normalizeAnalysisJobPayload(patch.result, 'analysis', patch.status !== 'failed');
+
   await db
     .update(analysisJobs)
     .set({
       ...patch,
+      ...(normalizedResult ? { result: normalizedResult } : {}),
       updatedAt: new Date(),
     })
     .where(eq(analysisJobs.id, id));
 }
 
-export async function completeAnalysisJob(
-  id: string,
-  result: Record<string, unknown>
-): Promise<void> {
+export async function completeAnalysisJob(id: string, result: AnalysisJobPayload): Promise<void> {
   await updateAnalysisJob(id, {
     status: 'completed',
     progress: '100',
-    result,
+    result: normalizeAnalysisJobPayload(result, 'analysis', true),
     completedAt: new Date(),
   });
 }

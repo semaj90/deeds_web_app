@@ -183,27 +183,14 @@
 	let deepResearch = $state<DeepResearchData | null>(null);
 	let deepResearchLoading = $state(false);
 	let deepResearchError = $state<string | null>(null);
-	let deepResearchExecutionProvider = $state<'ollama' | 'google'>('ollama');
-
-	interface GoogleVisualOutput {
-		src: string | null;
-		uri: string | null;
-		mimeType: string | null;
-		resolution: string | null;
-	}
 
 	interface PromptResultState {
 		answer: string;
 		pipeline: string;
 		durationMs: number | null;
-		provider: 'ollama' | 'google';
-		mode: 'report' | 'plan';
+		provider: 'ollama';
 		topicId?: string;
 		topicTitle?: string;
-		interactionId?: string;
-		imageCount?: number;
-		images?: GoogleVisualOutput[];
-		thoughtSummaries?: string[];
 	}
 
 	// Self-prompt execution state
@@ -211,93 +198,7 @@
 	let promptExecutionError = $state<string | null>(null);
 	let promptExecutionStatus = $state<string | null>(null);
 	let promptResult = $state<PromptResultState | null>(null);
-	let promptPlanFollowUp = $state('');
 	let queuedTaskMessage = $state<string | null>(null);
-
-	const GOOGLE_DEEP_RESEARCH_POLL_INTERVAL_MS = 5000;
-	const GOOGLE_DEEP_RESEARCH_MAX_POLLS = 120;
-
-	function sleep(ms: number): Promise<void> {
-		return new Promise((resolve) => window.setTimeout(resolve, ms));
-	}
-
-	async function pollGoogleDeepResearch(interactionId: string) {
-		for (let attempt = 0; attempt < GOOGLE_DEEP_RESEARCH_MAX_POLLS; attempt++) {
-			const res = await fetch(`/api/analytics/deep-research/google?interactionId=${encodeURIComponent(interactionId)}`);
-			const payload = await res.json().catch(() => ({}));
-
-			if (!res.ok) {
-				throw new Error(String(payload?.error ?? 'Failed to poll Google Deep Research'));
-			}
-
-			promptExecutionStatus = `Google Deep Research: ${String(payload.status ?? 'in_progress').replaceAll('_', ' ')}`;
-
-			if (payload.status === 'completed' || payload.status === 'failed' || payload.status === 'cancelled') {
-				return payload as {
-					interactionId: string;
-					status: string;
-					textOutput: string;
-					durationMs: number | null;
-					imageCount: number;
-					images: GoogleVisualOutput[];
-					thoughtSummaries: string[];
-					error?: { message?: string } | null;
-				};
-			}
-
-			await sleep(GOOGLE_DEEP_RESEARCH_POLL_INTERVAL_MS);
-		}
-
-		throw new Error('Google Deep Research timed out before completion');
-	}
-
-	function activePromptTopic(): ResearchTopic | null {
-		if (!promptResult?.topicId || !deepResearch?.topics?.length) return null;
-		return deepResearch.topics.find((topic) => topic.id === promptResult?.topicId) ?? null;
-	}
-
-	async function submitGoogleDeepResearchRequest(body: Record<string, unknown>, pendingLabel: string) {
-		const res = await fetch('/api/analytics/deep-research/google', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(body),
-		});
-
-		const startPayload = await res.json().catch(() => ({}));
-		if (!res.ok) {
-			throw new Error(String(startPayload?.error ?? 'Failed to start Google Deep Research'));
-		}
-
-		if (typeof startPayload.interactionId !== 'string' || !startPayload.interactionId) {
-			throw new Error('Google Deep Research did not return an interaction ID');
-		}
-
-		promptExecutionStatus = pendingLabel;
-		const finalPayload = await pollGoogleDeepResearch(startPayload.interactionId);
-		if (finalPayload.status !== 'completed') {
-			throw new Error(String(finalPayload.error?.message ?? `Google Deep Research ended with status ${finalPayload.status}`));
-		}
-
-		return finalPayload;
-	}
-
-	function setGooglePromptResult(topic: ResearchTopic, payload: Awaited<ReturnType<typeof submitGoogleDeepResearchRequest>>, mode: 'report' | 'plan') {
-		promptResult = {
-			answer: payload.textOutput || (mode === 'plan'
-				? 'Google Deep Research prepared a plan without inline text output.'
-				: 'Google Deep Research completed without text output.'),
-			pipeline: 'google-deep-research',
-			durationMs: payload.durationMs,
-			provider: 'google',
-			mode,
-			topicId: topic.id,
-			topicTitle: topic.title,
-			interactionId: payload.interactionId,
-			imageCount: payload.imageCount,
-			images: payload.images,
-			thoughtSummaries: payload.thoughtSummaries,
-		};
-	}
 
 	async function queueResearchTask(topic: ResearchTopic) {
 		queuedTaskMessage = null;
@@ -312,7 +213,7 @@
 				title: topic.title,
 				selfPrompt: topic.selfPrompt,
 				pipelineHint: topic.pipelineHint,
-				provider: deepResearchExecutionProvider,
+				provider: 'ollama',
 				priority: topic.priority,
 				summary: topic.description,
 				runNow: false,
@@ -321,90 +222,8 @@
 		);
 
 		queuedTaskMessage = task
-			? `Queued ${deepResearchExecutionProvider === 'google' ? 'Google Deep Research' : 'Ollama'} task in the research task panel.`
+			? 'Queued Ollama task in the research task panel.'
 			: 'Failed to queue research task.';
-	}
-
-	async function startCollaborativePlan(topic: ResearchTopic) {
-		executingPromptId = topic.id;
-		promptResult = null;
-		promptExecutionError = null;
-		queuedTaskMessage = null;
-		promptPlanFollowUp = '';
-		promptExecutionStatus = 'Google Deep Research: drafting collaborative plan…';
-
-		try {
-			const finalPayload = await submitGoogleDeepResearchRequest({
-				action: 'start',
-				input: topic.selfPrompt,
-				collaborativePlanning: true,
-				visualization: 'auto',
-				thinkingSummaries: 'auto',
-			}, 'Google Deep Research: drafting collaborative plan…');
-
-			setGooglePromptResult(topic, finalPayload, 'plan');
-			promptExecutionStatus = 'Collaborative plan ready for review.';
-		} catch (error) {
-			promptExecutionError = error instanceof Error ? error.message : 'Failed to generate collaborative plan';
-		} finally {
-			executingPromptId = null;
-		}
-	}
-
-	async function refineCollaborativePlan() {
-		const topic = activePromptTopic();
-		const refinement = promptPlanFollowUp.trim();
-		if (!topic || !promptResult?.interactionId || !refinement) return;
-
-		executingPromptId = topic.id;
-		promptExecutionError = null;
-		queuedTaskMessage = null;
-		promptExecutionStatus = 'Google Deep Research: refining collaborative plan…';
-
-		try {
-			const finalPayload = await submitGoogleDeepResearchRequest({
-				action: 'follow-up',
-				interactionId: promptResult.interactionId,
-				input: refinement,
-				collaborativePlanning: true,
-				visualization: 'auto',
-				thinkingSummaries: 'auto',
-			}, 'Google Deep Research: refining collaborative plan…');
-
-			setGooglePromptResult(topic, finalPayload, 'plan');
-			promptExecutionStatus = 'Collaborative plan updated.';
-			promptPlanFollowUp = '';
-		} catch (error) {
-			promptExecutionError = error instanceof Error ? error.message : 'Failed to refine collaborative plan';
-		} finally {
-			executingPromptId = null;
-		}
-	}
-
-	async function approveCollaborativePlan() {
-		const topic = activePromptTopic();
-		if (!topic || !promptResult?.interactionId) return;
-
-		executingPromptId = topic.id;
-		promptExecutionError = null;
-		queuedTaskMessage = null;
-		promptExecutionStatus = 'Google Deep Research: executing approved plan…';
-
-		try {
-			const finalPayload = await submitGoogleDeepResearchRequest({
-				action: 'approve-plan',
-				interactionId: promptResult.interactionId,
-				message: promptPlanFollowUp.trim() || 'Plan approved. Execute the research.',
-			}, 'Google Deep Research: executing approved plan…');
-
-			setGooglePromptResult(topic, finalPayload, 'report');
-			promptExecutionStatus = `Approved plan completed${finalPayload.imageCount ? ` with ${finalPayload.imageCount} generated visual${finalPayload.imageCount === 1 ? '' : 's'}` : ''}.`;
-			promptPlanFollowUp = '';
-		} catch (error) {
-			promptExecutionError = error instanceof Error ? error.message : 'Failed to approve collaborative plan';
-		} finally {
-			executingPromptId = null;
-		}
 	}
 
 	async function loadDeepResearch(refresh = false) {
@@ -430,25 +249,8 @@
 		promptResult = null;
 		promptExecutionError = null;
 		queuedTaskMessage = null;
-		promptPlanFollowUp = '';
-		promptExecutionStatus = deepResearchExecutionProvider === 'google'
-			? 'Starting Google Deep Research…'
-			: 'Running via Ollama…';
+		promptExecutionStatus = 'Running via Ollama…';
 		try {
-			if (deepResearchExecutionProvider === 'google') {
-				const finalPayload = await submitGoogleDeepResearchRequest({
-					action: 'start',
-					input: topic.selfPrompt,
-					collaborativePlanning: false,
-					visualization: 'auto',
-					thinkingSummaries: 'auto',
-				}, 'Google Deep Research: running full report…');
-
-				setGooglePromptResult(topic, finalPayload, 'report');
-				promptExecutionStatus = `Google Deep Research completed${finalPayload.imageCount ? ` with ${finalPayload.imageCount} generated visual${finalPayload.imageCount === 1 ? '' : 's'}` : ''}.`;
-				return;
-			}
-
 			const res = await fetch('/api/analytics/deep-research', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -461,7 +263,6 @@
 				const result = await res.json();
 				promptResult = {
 					...result,
-					mode: 'report',
 					topicId: topic.id,
 					topicTitle: topic.title,
 					provider: 'ollama',
@@ -990,25 +791,9 @@
 			<div class="ana-card-head" style="display:flex;align-items:center;justify-content:space-between">
 				<div>
 					<h3 class="ana-card-title">Deep Research Topics</h3>
-					<p class="ana-card-desc">Self-prompting research topics generated from RAG/KAG/DAG/ACE hits, feedback signals, and graph analysis via Ollama. Topic execution can run locally or through Google Deep Research.</p>
+					<p class="ana-card-desc">Self-prompting research topics generated from RAG/KAG/DAG/ACE hits, feedback signals, and graph analysis via the local Ollama stack.</p>
 				</div>
 				<div class="dr-head-actions">
-					<div class="dr-provider-toggle" role="group" aria-label="Deep research execution provider">
-						<button
-							type="button"
-							class:dr-provider-btn-active={deepResearchExecutionProvider === 'ollama'}
-							onclick={() => deepResearchExecutionProvider = 'ollama'}
-						>
-							Ollama
-						</button>
-						<button
-							type="button"
-							class:dr-provider-btn-active={deepResearchExecutionProvider === 'google'}
-							onclick={() => deepResearchExecutionProvider = 'google'}
-						>
-							Google
-						</button>
-					</div>
 					<button class="dr-refresh-btn" onclick={() => loadDeepResearch(true)} disabled={deepResearchLoading}>
 						<Icon name="refresh-cw" />
 						{deepResearchLoading ? 'Generating…' : 'Regenerate'}
@@ -1042,15 +827,6 @@
 							<div class="dr-topic-prompt">
 								<code class="dr-self-prompt">{topic.selfPrompt}</code>
 								<div class="dr-topic-actions">
-									{#if deepResearchExecutionProvider === 'google'}
-										<button
-											class="dr-secondary-btn"
-											disabled={executingPromptId !== null}
-											onclick={() => startCollaborativePlan(topic)}
-										>
-											{executingPromptId === topic.id ? 'Working…' : 'Plan'}
-										</button>
-									{/if}
 									<button class="dr-secondary-btn" onclick={() => queueResearchTask(topic)}>
 										Queue
 									</button>
@@ -1074,7 +850,7 @@
 				{#if promptResult}
 					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(96, 165, 250, 0.2)">
 						<div class="ana-card-head">
-							<h3 class="ana-card-title">{promptResult.mode === 'plan' ? 'Collaborative Research Plan' : 'Deep Research Result'}</h3>
+							<h3 class="ana-card-title">Deep Research Result</h3>
 							<p class="ana-card-desc">
 								Provider: {promptResult.provider} · Pipeline: {promptResult.pipeline}
 								{#if promptResult.topicTitle}
@@ -1088,70 +864,13 @@
 						{#if promptExecutionStatus}
 							<div class="dr-status-note">{promptExecutionStatus}</div>
 						{/if}
-						{#if promptResult.mode === 'plan'}
-							<div class="dr-plan-note">Review the proposed plan, refine it, or approve it to run the full research report.</div>
-						{/if}
-						{#if promptResult.thoughtSummaries?.length}
-							<div class="dr-thought-list">
-								{#each promptResult.thoughtSummaries as summaryText}
-									<div class="dr-thought-summary">{summaryText}</div>
-								{/each}
-							</div>
-						{/if}
 						<div class="dr-result-text">{promptResult.answer}</div>
-						{#if promptResult.images?.some((image) => image.src)}
-							<div class="dr-image-grid">
-								{#each promptResult.images as image, index}
-									{#if image.src}
-										<figure class="dr-image-card">
-											<img src={image.src} alt={`Generated research visualization ${index + 1}`} loading="lazy" />
-											<figcaption>
-												{image.mimeType ?? 'image'}
-												{#if image.resolution}
-													 · {image.resolution.replaceAll('_', ' ')}
-												{/if}
-											</figcaption>
-										</figure>
-									{/if}
-								{/each}
-							</div>
-						{:else if promptResult.imageCount}
-							<div class="dr-status-note">{promptResult.imageCount} visual output{promptResult.imageCount === 1 ? '' : 's'} generated, but the provider returned no embeddable image payload.</div>
-						{/if}
-						{#if promptResult.mode === 'plan' && promptResult.provider === 'google' && promptResult.interactionId}
-							<div class="dr-plan-controls">
-								<label class="dr-plan-label" for="dr-plan-follow-up">Refine the plan before approval</label>
-								<textarea
-									id="dr-plan-follow-up"
-									class="dr-plan-input"
-									rows="4"
-									bind:value={promptPlanFollowUp}
-									placeholder="Ask Google to expand, narrow, or reorder the plan before it runs the full report."
-								></textarea>
-								<div class="dr-plan-actions">
-									<button
-										class="dr-secondary-btn"
-										disabled={executingPromptId !== null || !promptPlanFollowUp.trim()}
-										onclick={refineCollaborativePlan}
-									>
-										Refine plan
-									</button>
-									<button
-										class="dr-execute-btn"
-										disabled={executingPromptId !== null}
-										onclick={approveCollaborativePlan}
-									>
-										Approve and run
-									</button>
-								</div>
-							</div>
-						{/if}
 					</div>
 				{:else if promptExecutionError}
 					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(248, 113, 113, 0.2)">
 						<div class="ana-card-head">
 							<h3 class="ana-card-title">Deep Research Error</h3>
-							<p class="ana-card-desc">Provider: {deepResearchExecutionProvider}</p>
+							<p class="ana-card-desc">Provider: ollama</p>
 						</div>
 						<div class="dr-error-note">{promptExecutionError}</div>
 					</div>
@@ -1159,7 +878,7 @@
 					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(96, 165, 250, 0.2)">
 						<div class="ana-card-head">
 							<h3 class="ana-card-title">Deep Research Status</h3>
-							<p class="ana-card-desc">Provider: {deepResearchExecutionProvider}</p>
+							<p class="ana-card-desc">Provider: ollama</p>
 						</div>
 						<div class="dr-status-note">{promptExecutionStatus}</div>
 					</div>

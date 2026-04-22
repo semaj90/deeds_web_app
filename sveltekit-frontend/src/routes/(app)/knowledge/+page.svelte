@@ -11,13 +11,6 @@
     'Explain reactive declarations in Svelte'
   ];
 
-  const webSearchQueries = [
-    'Latest TypeScript 5.7 features December 2024',
-    'What are the newest SvelteKit 2.0 breaking changes?',
-    'How to implement OAuth2 in modern SvelteKit apps?',
-    'Best practices for pg_vector embeddings 2024'
-  ];
-
   // Event handlers
   async function handleSearch() {
     if (search.synthesizeEnabled) {
@@ -39,11 +32,6 @@
   function useSampleQuery(sample: string) {
     search.query = sample;
     handleSearch();
-  }
-
-  function handleProviderChange(e: Event) {
-    const target = e.target as HTMLSelectElement;
-    search.setProvider(target.value as any);
   }
 </script>
 
@@ -77,31 +65,17 @@
 		</label>
 
 		{#if search.synthesizeEnabled}
-			<select value={search.provider} onchange={handleProviderChange} class="provider-select">
-				<option value="ollama">🦙 Ollama (Local) - Recommended</option>
-				<option value="gemini">🔮 Gemini 3 (Web Search) - Limited Quota</option>
-				<option value="claude">🧠 Claude - Not configured</option>
-				<option value="openai">🤖 GPT-4 - Not configured</option>
-			</select>
-
-			{#if search.isGemini}
-				<label class="checkbox-label web-search-toggle">
-					<input type="checkbox" bind:checked={search.useWebSearch} />
-					<span>🌐 Enable Google Search Grounding</span>
-				</label>
-			{:else}
-				<span class="fallback-notice">
-					<span class="icon">✅</span>
-					Using Local Ollama (stable & always available)
-				</span>
-			{/if}
+			<span class="fallback-notice">
+				<span class="icon">✅</span>
+				Using Local Ollama (stable & always available)
+			</span>
 		{/if}
 	</div>
 
 	<!-- Sample Queries -->
 	<div class="samples">
 		<span class="samples-label">Try:</span>
-		{#each (search.canUseWebSearch ? webSearchQueries : sampleQueries) as sample}
+		{#each sampleQueries as sample}
 			<button onclick={() => useSampleQuery(sample)} class="sample-button">
 				{sample}
 			</button>

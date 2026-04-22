@@ -62,7 +62,7 @@ const createSchema = z.object({
   title: z.string().min(1).max(200),
   selfPrompt: z.string().min(3).max(1000),
   pipelineHint: z.enum(['ace', 'rag', 'kag', 'dag', 'all']).default('ace'),
-  provider: z.enum(['ollama', 'google']).default('ollama'),
+  provider: z.enum(['ollama']).default('ollama'),
   priority: z.enum(['high', 'medium', 'low']).default('medium'),
   sourceText: z.string().max(2000).optional(),
   summary: z.string().max(1000).optional(),

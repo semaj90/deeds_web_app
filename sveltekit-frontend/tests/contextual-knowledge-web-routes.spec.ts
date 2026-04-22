@@ -46,7 +46,6 @@ vi.mock('$lib/server/env.server.js', () => ({
     LANGEXTRACT_URL: 'http://localhost:8095',
     LANGEXTRACT_ENABLED: 'true',
     MINIO_EVIDENCE_BUCKET: 'evidence',
-    GEMINI_API_KEY: '',
   },
 }));
 vi.mock('$lib/config/env.server.js', () => ({

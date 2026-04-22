@@ -33,7 +33,6 @@ const qd = qdrant as QdrantClient & {
 };
 
 const OLLAMA_URL_VAR = ENV.OLLAMA_BASE_URL;
-const GEMINI_API_KEY = ENV.GEMINI_API_KEY;
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
 const LOCAL_LLM = 'gemma4-legal:latest';
@@ -423,7 +422,6 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 const knowledgeQuerySchema = z.object({
   prompt: z.string().min(1, 'Prompt required').max(10000),
   max_context_chunks: z.number().int().min(1).max(50).optional().default(5),
-  use_gemini: z.boolean().optional().default(false)
 });
 
 /**
@@ -437,7 +435,7 @@ export const PATCH: RequestHandler = async ({ request, locals }) => {
     if (!parsed.success) {
       return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
-    const { prompt, max_context_chunks, use_gemini } = parsed.data;
+    const { prompt, max_context_chunks } = parsed.data;
 
     await ensureQdrantCollection();
 
@@ -488,43 +486,23 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
 
     // 3. Route to LLM (Gemini for complex, Gemma for simple)
     let response = '';
-    let llmUsed = '';
+    const llmUsed = 'gemma4-legal:latest';
+    const ollamaRes = await ollamaFetch(`${OLLAMA_URL_VAR}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: LOCAL_LLM,
+        prompt: augmentedPrompt,
+        stream: false,
+      }),
+      signal: AbortSignal.timeout(60_000),
+    });
 
-    if (use_gemini && GEMINI_API_KEY && GEMINI_API_KEY.length > 0) {
-      llmUsed = 'gemini-2.0-flash-exp';
-      const geminiRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: augmentedPrompt }] }],
-          }),
-          signal: AbortSignal.timeout(30_000),
-        }
-      );
-
-      const geminiData = await geminiRes.json();
-      response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    } else {
-      llmUsed = 'gemma4-legal:latest';
-      const ollamaRes = await ollamaFetch(`${OLLAMA_URL_VAR}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: LOCAL_LLM,
-          prompt: augmentedPrompt,
-          stream: false,
-        }),
-        signal: AbortSignal.timeout(60_000),
-      });
-
-      if (!ollamaRes.ok) {
-        console.error(`[Knowledge] Ollama generate returned ${ollamaRes.status}`);
-      }
-      const ollamaData = await ollamaRes.json();
-      response = ollamaData?.response ?? '';
+    if (!ollamaRes.ok) {
+      console.error(`[Knowledge] Ollama generate returned ${ollamaRes.status}`);
     }
+    const ollamaData = await ollamaRes.json();
+    response = ollamaData?.response ?? '';
 
     return json({
       success: true,

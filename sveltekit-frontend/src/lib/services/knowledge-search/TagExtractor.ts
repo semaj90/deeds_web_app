@@ -62,7 +62,6 @@ export class TagExtractor {
     'tensorflow',
     'pytorch',
     'ollama',
-    'gemini',
     'claude',
     'openai',
     'llm',
@@ -75,7 +74,7 @@ export class TagExtractor {
     'grpc',
     'websocket',
     'oauth',
-    'jwt'
+    'jwt',
   ]);
 
   /**
@@ -223,7 +222,8 @@ export class TagExtractor {
     const normalized = this.normalizeTag(partial);
     if (normalized.length < 2) return [];
 
-    const suggestions = existingTags.filter((tag: any) => this.normalizeTag(tag).includes(normalized))
+    const suggestions = existingTags
+      .filter((tag: any) => this.normalizeTag(tag).includes(normalized))
       .slice(0, 10);
 
     return suggestions;

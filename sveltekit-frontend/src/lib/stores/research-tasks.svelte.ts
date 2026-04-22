@@ -8,7 +8,7 @@
  */
 import { browser } from '$app/environment';
 
-type ResearchTaskProvider = 'ollama' | 'google';
+type ResearchTaskProvider = 'ollama';
 
 interface ResearchTaskImage {
   src?: string | null;

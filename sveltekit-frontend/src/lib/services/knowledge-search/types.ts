@@ -38,7 +38,7 @@ export interface SearchOptions {
   includeContent?: boolean;
   useCache?: boolean;
   synthesize?: boolean;
-  llmProvider?: 'ollama' | 'gemini' | 'claude';
+  llmProvider?: 'ollama';
 }
 
 export interface SearchFilters {
@@ -132,7 +132,7 @@ export interface SearchRequest {
   filters?: SearchFilters;
   includeContent?: boolean;
   synthesize?: boolean;
-  llmProvider?: 'ollama' | 'gemini' | 'claude';
+  llmProvider?: 'ollama';
 }
 
 export interface ReindexStats {

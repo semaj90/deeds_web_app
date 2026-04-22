@@ -1,9 +1,9 @@
 /**
  * Web Search Integration — External Knowledge Retrieval
  *
- * Provides web search via multiple backends:
- *   1. Google Custom Search API (requires GOOGLE_SEARCH_API_KEY + GOOGLE_SEARCH_CX)
- *   2. DuckDuckGo Instant Answer API (free, no key required, fallback)
+ * Provides web search via privacy-first backends:
+ *   1. SearXNG (self-hosted, preferred)
+ *   2. DuckDuckGo Instant Answer API (fallback)
  *
  * Returns structured results that can be injected into ACE context.
  */
@@ -19,19 +19,19 @@ export interface WebSearchResult {
   title: string;
   url: string;
   snippet: string;
-  source: 'google' | 'duckduckgo' | 'searxng';
+  source: 'duckduckgo' | 'searxng';
 }
 
 export interface WebSearchResponse {
   results: WebSearchResult[];
   query: string;
-  provider: 'google' | 'duckduckgo' | 'searxng' | 'none';
+  provider: 'duckduckgo' | 'searxng' | 'none';
   searchMs: number;
 }
 
 /**
  * Search the web for legal information.
- * Tries Google Custom Search first, falls back to DuckDuckGo.
+ * Tries SearXNG first, falls back to DuckDuckGo.
  *
  * @param query - Search query (automatically appended with "legal" context)
  * @param maxResults - Maximum results to return (default 5)
@@ -50,25 +50,7 @@ export async function webSearch(query: string, maxResults: number = 5): Promise<
         searchMs: Math.round(performance.now() - start),
       };
     } catch (err) {
-      console.warn('[WebSearch] SearXNG failed, trying Google/DDG:', err);
-    }
-  }
-
-  // Try Google if configured
-  const googleKey = ENV.GOOGLE_SEARCH_API_KEY;
-  const googleCx = ENV.GOOGLE_SEARCH_CX;
-
-  if (googleKey && googleCx) {
-    try {
-      const results = await googleSearch(query, googleKey, googleCx, maxResults);
-      return {
-        results,
-        query,
-        provider: 'google',
-        searchMs: Math.round(performance.now() - start),
-      };
-    } catch (err) {
-      console.warn('[WebSearch] Google failed, falling back to DuckDuckGo:', err);
+      console.warn('[WebSearch] SearXNG failed, falling back to DuckDuckGo:', err);
     }
   }
 
@@ -90,43 +72,6 @@ export async function webSearch(query: string, maxResults: number = 5): Promise<
       searchMs: Math.round(performance.now() - start),
     };
   }
-}
-
-/** Google Custom Search JSON API. */
-async function googleSearch(
-  query: string,
-  apiKey: string,
-  cx: string,
-  maxResults: number
-): Promise<WebSearchResult[]> {
-  const params = new URLSearchParams({
-    key: apiKey,
-    cx,
-    q: query,
-    num: String(Math.min(maxResults, 10)),
-  });
-
-  const res = await fetch(`https://www.googleapis.com/customsearch/v1?${params}`, {
-    signal: AbortSignal.timeout(8000),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Google Search API ${res.status}: ${await res.text()}`);
-  }
-
-  const data = await res.json();
-  const items = (data.items ?? []) as Array<{
-    title: string;
-    link: string;
-    snippet: string;
-  }>;
-
-  return items.slice(0, maxResults).map((item) => ({
-    title: item.title,
-    url: item.link,
-    snippet: item.snippet,
-    source: 'google' as const,
-  }));
 }
 
 /** DuckDuckGo Instant Answer API (free, no key). */

@@ -9,9 +9,6 @@ import { json } from '@sveltejs/kit';
 
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
 
-import { ENV } from '$lib/server/env.server.js';
-import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { routeStreamingInference } from '$lib/server/inference/inference-router.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -21,14 +18,27 @@ import { z } from 'zod';
 
 // Zod schema validates query (trimmed, 1-5000), topK (1-100), llmProvider enum
 const knowledgeStreamSchema = z.object({
-	query: z.string().trim().min(1, 'Query is required').max(5000),
-	topK: z.number().int().min(1).max(100).optional().default(5),
-	llmProvider: z.enum(['ollama', 'gemini']).optional().default('ollama'),
-	sectionTypes: z.array(z.enum([
-		'facts', 'issues', 'reasoning', 'holding', 'citations',
-		'parties', 'motions', 'bibliography', 'procedural_history',
-		'sentencing', 'judgment'
-	])).max(11).optional(),
+  query: z.string().trim().min(1, 'Query is required').max(5000),
+  topK: z.number().int().min(1).max(100).optional().default(5),
+  llmProvider: z.enum(['ollama']).optional().default('ollama'),
+  sectionTypes: z
+    .array(
+      z.enum([
+        'facts',
+        'issues',
+        'reasoning',
+        'holding',
+        'citations',
+        'parties',
+        'motions',
+        'bibliography',
+        'procedural_history',
+        'sentencing',
+        'judgment',
+      ])
+    )
+    .max(11)
+    .optional(),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -41,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				{ status: 400, headers: { 'Content-Type': 'application/json' } }
 			);
 		}
-		const { query, topK, llmProvider, sectionTypes } = parsed.data;
+		const { query, topK, sectionTypes } = parsed.data;
 		const abortSignal = request.signal;
 
 		// Create SSE stream
@@ -131,15 +141,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					const prompt = `Question: ${query}\n\nContext:\n${fullContext}\n\nProvide a clear, comprehensive answer. Reference the source numbers [1], [2], etc. when citing information.`;
 
 					// Step 5: Stream LLM response
-					sendEvent('synthesis_started', { provider: llmProvider });
-
-					if (llmProvider === 'ollama') {
-						await streamOllamaResponse(prompt, controller, encoder, sendEvent);
-					} else if (llmProvider === 'gemini') {
-						await streamGeminiResponse(prompt, controller, encoder, sendEvent);
-					} else {
-						sendEvent('synthesis_chunk', { text: 'Streaming not supported for this provider.' });
-					}
+					sendEvent('synthesis_started', { provider: 'ollama' });
+          await streamOllamaResponse(prompt, controller, encoder, sendEvent);
 
 					// Step 6: Send completion event
 					sendEvent('complete', {
@@ -192,73 +195,37 @@ async function streamOllamaResponse(
 	_encoder: TextEncoder,
 	sendEvent: (event: string, data: unknown) => void
 ): Promise<void> {
-	const start = performance.now();
-	let fullResponse = '';
-	let backend: string = 'ollama';
-	let tokenCount = 0;
+  const start = performance.now();
+  let fullResponse = '';
+  let backend: string = 'ollama';
+  let tokenCount = 0;
 
-	for await (const chunk of routeStreamingInference({ prompt, temperature: 0.3, maxTokens: 2048 })) {
-		if (chunk.done) {
-			sendEvent('synthesis_complete', {
-				fullResponse,
-				backend: chunk.backend ?? backend,
-			});
-			break;
-		}
-		if (chunk.content) {
-			fullResponse += chunk.content;
-			tokenCount++;
-			sendEvent('synthesis_chunk', { text: chunk.content });
-			if (chunk.backend) backend = chunk.backend;
-		}
-	}
+  for await (const chunk of routeStreamingInference({
+    prompt,
+    temperature: 0.3,
+    maxTokens: 2048,
+  })) {
+    if (chunk.done) {
+      sendEvent('synthesis_complete', {
+        fullResponse,
+        backend: chunk.backend ?? backend,
+      });
+      break;
+    }
+    if (chunk.content) {
+      fullResponse += chunk.content;
+      tokenCount++;
+      sendEvent('synthesis_chunk', { text: chunk.content });
+      if (chunk.backend) backend = chunk.backend;
+    }
+  }
 
-	logInference({
-		type: 'llm',
-		model: backend === 'ollama' ? 'gemma4-legal:latest' : backend,
-		backend: backend as 'ollama' | 'tensorrt' | 'triton',
-		latencyMs: Math.round(performance.now() - start),
-		tokenCount,
-		cacheHit: false,
-	});
-}
-
-/**
- * Stream Gemini response (if available)
- */
-async function streamGeminiResponse(
-	prompt: string,
-	_controller: ReadableStreamDefaultController,
-	_encoder: TextEncoder,
-	sendEvent: (event: string, data: unknown) => void
-): Promise<void> {
-	const apiKey = ENV.GEMINI_API_KEY;
-	if (!apiKey) {
-		sendEvent('synthesis_chunk', { text: 'Gemini API key not configured. Falling back to summary.' });
-		return;
-	}
-
-	try {
-		const { GoogleGenerativeAI } = await import('@google/generative-ai');
-		const genAI = new GoogleGenerativeAI(apiKey);
-		const model = genAI.getGenerativeModel({
-			model: 'gemini-2.0-flash-exp'
-		});
-
-		const result = await model.generateContentStream(prompt);
-		let fullResponse = '';
-
-		for await (const chunk of result.stream) {
-			const text = chunk.text();
-			fullResponse += text;
-			sendEvent('synthesis_chunk', { text });
-		}
-
-		sendEvent('synthesis_complete', { fullResponse });
-
-	} catch (error) {
-		sendEvent('error', {
-			message: 'Gemini streaming failed'
-		});
-	}
+  logInference({
+    type: 'llm',
+    model: backend === 'ollama' ? 'gemma4-legal:latest' : backend,
+    backend: backend as 'ollama' | 'tensorrt' | 'triton',
+    latencyMs: Math.round(performance.now() - start),
+    tokenCount,
+    cacheHit: false,
+  });
 }
