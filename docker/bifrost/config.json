@@ -1,16 +1,16 @@
 {
-  "$schema": "https://www.getbifrost.ai/schema",
+  "version": 1,
   "vector_store": {
     "enabled": true,
     "type": "qdrant",
     "config": {
-      "host": "host.docker.internal",
+      "host": "172.18.0.5",
       "port": 6334
     }
   },
   "plugins": [
     {
-      "enabled": true,
+      "enabled": false,
       "name": "semantic_cache",
       "config": {
         "default_cache_key": "global",
@@ -34,29 +34,22 @@
   },
   "providers": {
     "ollama": {
+      "network_config": {
+        "base_url": "http://host.docker.internal:11434"
+      },
       "keys": [
         {
           "name": "ollama-key",
-          "value": "dummy",
-          "models": [
-            "gemma4-legal-vlm:latest",
-            "gemma4-legal-fast:latest",
-            "gemma4-legal:latest",
-            "gemma4:e4b-it-q4_K_M",
-            "embeddinggemma:latest",
-            "nomic-embed-text:latest",
-            "gemma3:270m",
-            "ibm/granite-docling:258m"
-          ],
+          "value": "dummy-key",
           "weight": 1.0,
+          "models": [
+            "*"
+          ],
           "ollama_key_config": {
             "url": "http://host.docker.internal:11434"
           }
         }
-      ],
-      "network_config": {
-        "default_request_timeout_in_seconds": 120
-      }
+      ]
     }
   }
 }

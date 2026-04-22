@@ -1417,6 +1417,180 @@ func (s *retrievalServer) Health(ctx context.Context, _ *pb.HealthRequest) (*pb.
 	return resp, nil
 }
 
+func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunksRequest) (*pb.SearchChunksResponse, error) {
+	slog.Info("[retrieval] SearchChunks", "query", req.Query, "collection", req.Collection)
+	atomic.AddInt64(&s.totalRequests, 1)
+
+	vec, err := s.embed(ctx, req.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	start := time.Now()
+	// Default to codebase if not specified
+	collection := req.Collection
+	if collection == "" {
+		collection = collectionCodebase
+	}
+
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, nil, nil, int(req.Limit))
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]*pb.CodebaseChunk, len(chunks))
+	for i, c := range chunks {
+		results[i] = &pb.CodebaseChunk{
+			ChunkId:        c.ID,
+			FilePath:       c.FilePath,
+			Kind:           c.Kind,
+			HttpMethod:     c.HTTPMethod,
+			RouteId:        c.RouteID,
+			Tags:           c.Tags,
+			ContentPreview: c.ContentPreview,
+			Score:          c.Score,
+			StartLine:      c.StartLine,
+			EndLine:        c.EndLine,
+		}
+	}
+
+	return &pb.SearchChunksResponse{
+		Results:  results,
+		TotalMs:  float32(time.Since(start).Seconds() * 1000),
+	}, nil
+}
+
+func (s *retrievalServer) GetClusterSummary(ctx context.Context, req *pb.ClusterSummaryRequest) (*pb.ClusterSummaryResponse, error) {
+	slog.Info("[retrieval] GetClusterSummary", "id", req.ClusterId, "type", req.ClusterType)
+	atomic.AddInt64(&s.totalRequests, 1)
+
+	var query string
+	if req.ClusterType == "som" {
+		query = "SELECT gpu_cluster, summary, patterns, metadata FROM cluster_summaries WHERE som_cluster = $1 LIMIT 1"
+	} else {
+		query = "SELECT gpu_cluster, summary, patterns, metadata FROM cluster_summaries WHERE gpu_cluster = $1 LIMIT 1"
+	}
+
+	var summary string
+	var patterns []string
+	var metadataJSON []byte
+	var clusterID int32
+
+	err := s.pool.QueryRow(ctx, query, req.ClusterId).Scan(&clusterID, &summary, &patterns, &metadataJSON)
+	if err != nil {
+		return nil, fmt.Errorf("cluster summary not found: %w", err)
+	}
+
+	var metadata map[string]string
+	json.Unmarshal(metadataJSON, &metadata)
+
+	return &pb.ClusterSummaryResponse{
+		ClusterId: clusterID,
+		Summary:   summary,
+		Patterns:  patterns,
+		Metadata:  metadata,
+	}, nil
+}
+
+func (s *retrievalServer) ExpandAstNeighbors(ctx context.Context, req *pb.AstExpansionRequest) (*pb.AstExpansionResponse, error) {
+	slog.Info("[retrieval] ExpandAstNeighbors", "symbol", req.Symbol, "file", req.FilePath)
+	atomic.AddInt64(&s.totalRequests, 1)
+
+	// 1. Find the anchor node
+	var anchorID string
+	err := s.pool.QueryRow(ctx, "SELECT id FROM ast_nodes WHERE (symbol = $1 OR file_path = $2) LIMIT 1", req.Symbol, req.FilePath).Scan(&anchorID)
+	if err != nil {
+		return nil, fmt.Errorf("anchor node not found: %w", err)
+	}
+
+	// 2. Find neighbors (1-hop)
+	rows, err := s.pool.Query(ctx, `
+		SELECT n.id, n.symbol, n.kind, n.file_path, e.edge_type
+		FROM ast_edges e
+		JOIN ast_nodes n ON n.id = e.target_node_id
+		WHERE e.source_node_id = $1
+		UNION
+		SELECT n.id, n.symbol, n.kind, n.file_path, e.edge_type
+		FROM ast_edges e
+		JOIN ast_nodes n ON n.id = e.source_node_id
+		WHERE e.target_node_id = $1
+	`, anchorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var nodes []*pb.AstNode
+	var edges []*pb.AstEdge
+	for rows.Next() {
+		var id, sym, kind, path, edgeType string
+		if err := rows.Scan(&id, &sym, &kind, &path, &edgeType); err != nil {
+			continue
+		}
+		nodes = append(nodes, &pb.AstNode{
+			Id:       id,
+			Symbol:   sym,
+			Kind:     kind,
+			FilePath: path,
+		})
+		edges = append(edges, &pb.AstEdge{
+			SourceId: anchorID,
+			TargetId: id,
+			EdgeType: edgeType,
+		})
+	}
+
+	return &pb.AstExpansionResponse{
+		Neighbors: nodes,
+		Edges:     edges,
+	}, nil
+}
+
+func (s *retrievalServer) GetTopologyContext(ctx context.Context, req *pb.TopologyRequest) (*pb.TopologyResponse, error) {
+	slog.Info("[retrieval] GetTopologyContext", "row", req.BmuRow, "col", req.BmuCol, "radius", req.Radius)
+	atomic.AddInt64(&s.totalRequests, 1)
+
+	// Radius defaults to 1
+	radius := req.Radius
+	if radius <= 0 {
+		radius = 1
+	}
+
+	// Find chunks in the SOM neighborhood
+	rows, err := s.pool.Query(ctx, `
+		SELECT id, qdrant_id, relative_path, symbol, kind, line_start, line_end, content
+		FROM codebase_chunk_index
+		WHERE som_bmu_row BETWEEN $1 - $3 AND $1 + $3
+		  AND som_bmu_col BETWEEN $2 - $3 AND $2 + $3
+		LIMIT 20
+	`, req.BmuRow, req.BmuCol, radius)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var neighbors []*pb.CodebaseChunk
+	for rows.Next() {
+		var id, qid, path, sym, kind, content string
+		var start, end int32
+		if err := rows.Scan(&id, &qid, &path, &sym, &kind, &start, &end, &content); err != nil {
+			continue
+		}
+		neighbors = append(neighbors, &pb.CodebaseChunk{
+			ChunkId:        qid,
+			FilePath:       path,
+			Kind:           kind,
+			ContentPreview: truncate(content, 500),
+			StartLine:      start,
+			EndLine:        end,
+		})
+	}
+
+	return &pb.TopologyResponse{
+		Neighbors: neighbors,
+	}, nil
+}
+
 // ── HTTP handlers ──────────────────────────────────────────────────────────
 
 func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {

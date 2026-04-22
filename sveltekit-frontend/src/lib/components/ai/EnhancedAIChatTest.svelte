@@ -1,10 +1,10 @@
 <!-- Enhanced AI Chat Test Component - Svelte 5 with bits-ui -->
 <script lang="ts">
-	import type { Case, User } from '$lib/types';
+	import type { Case as User } from '$lib/types';
 	import type { Document } from '$lib/types';
 	import { browser } from '$app/environment';
 	import { tick } from 'svelte';
-	import { DialogRoot, DialogTrigger, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogClose } from "$lib/components/ui/dialog";
+	import { Dialog as DialogRoot, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogPortal, DialogOverlay, DialogClose } from "$lib/components/ui/dialog";
 import Button from "$lib/components/ui/Button.svelte";
 	import Input from "$lib/components/ui/Input.svelte";
 	import Card from "$lib/components/ui/card/Card.svelte";

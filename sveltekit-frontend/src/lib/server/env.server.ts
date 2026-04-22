@@ -110,6 +110,12 @@ export const ENV = {
   OBSIDIAN_API_KEY: privateEnv.OBSIDIAN_API_KEY ?? '',
   // Firecrawl Web Scraping API (optional — used for YouTube transcript extraction + web crawling)
   FIRECRAWL_API_KEY: privateEnv.FIRECRAWL_API_KEY ?? '',
+  // GitHub API — Lane 3 deep research (issues, code, repo search)
+  GITHUB_TOKEN: privateEnv.GITHUB_TOKEN ?? '',
+  // Reddit OAuth2 — Lane 3 research (keyword search, quality posts)
+  REDDIT_CLIENT_ID: privateEnv.REDDIT_CLIENT_ID ?? '',
+  REDDIT_CLIENT_SECRET: privateEnv.REDDIT_CLIENT_SECRET ?? '',
+  REDDIT_USERNAME: privateEnv.REDDIT_USERNAME ?? '',
   // Go Legal Library Search Service (parallel fan-out: citation + FTS + pgvector + Qdrant)
   GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? '',
   GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055',
@@ -145,7 +151,7 @@ export const ENV = {
   JWT_SECRET: privateEnv.JWT_SECRET ?? DEV.JWT_SECRET,
   SERVICE_AUTH_TOKEN: privateEnv.SERVICE_AUTH_TOKEN ?? DEV.SERVICE_AUTH_TOKEN,
   // Google Gemini (optional — fallback to local Ollama)
-  GEMINI_API_KEY: privateEnv.GEMINI_API_KEY ?? '',
+  GEMINI_API_KEY: privateEnv.GEMINI_API_KEY ?? privateEnv.GOOGLE_GEMINI_API_KEY ?? '',
   // MinIO library bucket
   MINIO_LIBRARY_BUCKET: privateEnv.MINIO_LIBRARY_BUCKET ?? 'legal-library',
   // Whisper persistent server (whisper-server.exe HTTP mode — eliminates cold start)
@@ -185,4 +191,6 @@ export const ENV = {
   })(),
   // Node environment
   NODE_ENV: process.env.NODE_ENV ?? 'development',
+  /** Development bypass auth (Sprint 6/Phase 76) */
+  DEV_BYPASS_AUTH: (privateEnv.DEV_BYPASS_AUTH ?? 'false') === 'true',
 };

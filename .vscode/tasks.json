@@ -60,6 +60,40 @@
       }
     },
     {
+      "label": "Lane Latency: Mock Benchmark (Unit)",
+      "type": "shell",
+      "command": "npx vitest run tests/lane-latency-benchmark.spec.ts --config vitest.config.ts --reporter=verbose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Lane Latency: Integration Benchmark (Live Services)",
+      "type": "shell",
+      "command": "npx vitest run tests/lane-latency-integration.spec.ts --config vitest.config.ts --reporter=verbose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
       "label": "Diagnostics Regression Slice",
       "type": "shell",
       "command": "npm run test:diagnostics",
@@ -779,6 +813,48 @@
         "clear": false
       },
       "detail": "Smoke-test MCP vector retrieval against the current knowledge-base path"
+    },
+    {
+      "label": "🧠 CodeIntel: Cache Stack Smoke",
+      "type": "shell",
+      "command": "node scripts/tests/test-cache-stack.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Verify L1/L2/L3 cache stack: exact hit, semantic hit, passthrough miss, and async write-back"
+    },
+    {
+      "label": "🧠 CodeIntel: Benchmark (L1/L2/L3 + Throughput)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "scripts/tests/test-cache-benchmark.mjs",
+        "--rounds",
+        "5",
+        "--verbose"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Measure L1/L2/L3 hit latencies, tokens/sec, and cache hit rate across 5 round-trip cycles. Requires dev server on port 5173."
     },
     {
       "label": "🕸️ Phase 76: Test MCP Knowledge Graph",
@@ -5042,12 +5118,28 @@
     {
       "label": "⚡ GPU Karpathy Tag (progress bar)",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs gpu-tag",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Default wrapper: checks localhost:5173 before launching the GPU tag runner.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ GPU Karpathy Tag (progress bar, direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs gpu-tag",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "GPU batch cosine tagging with ANSI progress bars. 100x faster than Ollama LLM.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5058,12 +5150,44 @@
     {
       "label": "⚡ GPU Karpathy Tag (dry run)",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs gpu-tag --dry-run --limit 500",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Default wrapper: checks localhost:5173 before launching the dry-run GPU tag runner.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ GPU Karpathy Tag (dry run, direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs gpu-tag --dry-run --limit 500",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "detail": "Dry run: GPU classify chunks but do NOT write tags to Qdrant.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Codebase Intelligence Status (direct)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs status",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5074,15 +5198,15 @@
     {
       "label": "📊 Codebase Intelligence Status (progress bars)",
       "type": "shell",
-      "command": "node scripts/gpu-pipeline-runner.mjs status",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs status",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "detail": "Dashboard: pgvector mirror stats, GPU tag coverage with bar charts, predictive todos summary.",
+      "detail": "Default wrapper: checks localhost:5173 before launching the status runner.",
       "presentation": {
         "reveal": "always",
-        "panel": "shared",
+        "panel": "dedicated",
         "clear": true
       },
       "problemMatcher": []
@@ -5090,12 +5214,28 @@
     {
       "label": "🗂️ Index Stream: Cluster pipeline (progress bars)",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs index-stream",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Default wrapper: checks localhost:5173 before launching the cluster pipeline runner.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster pipeline (progress bars, direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs index-stream",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "7-stage SSE pipeline with per-stage progress: scroll → summarize → autoencode → qdrant_upsert → mirror → GPU tag → complete.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5106,12 +5246,124 @@
     {
       "label": "🗂️ Index Stream: Cluster pipeline (dry run)",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs index-stream --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Default wrapper: checks localhost:5173 before launching the dry-run cluster pipeline runner.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster pipeline (dry run, direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs index-stream --dry-run",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "detail": "Dry run: scroll + summarize + classify, skip all Qdrant/PostgreSQL writes.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster 0 (dry run)",
+      "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs index-stream --cluster 0 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Automation-friendly wrapper: checks localhost:5173 and runs a fixed cluster 0 dry run without prompting.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster 0 (dry run, direct)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs index-stream --cluster 0 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Direct runner call: fixed cluster 0 dry run without the prompt wrapper.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster 1 (dry run)",
+      "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs index-stream --cluster 1 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Automation-friendly wrapper: checks localhost:5173 and runs a fixed cluster 1 dry run without prompting.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster 1 (dry run, direct)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs index-stream --cluster 1 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Direct runner call: fixed cluster 1 dry run without the prompt wrapper.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster 2 (dry run)",
+      "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs index-stream --cluster 2 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Automation-friendly wrapper: checks localhost:5173 and runs a fixed cluster 2 dry run without prompting.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗂️ Index Stream: Cluster 2 (dry run, direct)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs index-stream --cluster 2 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Direct runner call: fixed cluster 2 dry run without the prompt wrapper.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5122,12 +5374,44 @@
     {
       "label": "🧠 Predictive Todos: Generate (progress bar)",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs generate-todos",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Default wrapper: checks localhost:5173 before launching the predictive todo runner.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 Predictive Todos: Generate (progress bar, direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs generate-todos",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Gemma4 gap analysis over 7 days of search analytics → actionable todos with progress polling.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Pipeline: Full GPU Intelligence (progress bars, direct)",
+      "type": "shell",
+      "command": "node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-5",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5138,12 +5422,12 @@
     {
       "label": "🚀 Pipeline: Full GPU Intelligence (progress bars)",
       "type": "shell",
-      "command": "node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-5",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-5",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Full 4-phase pipeline with progress bars: (1) Index clusters 0-5, (2) GPU Karpathy backfill, (3) Gemma4 gap analysis, (4) Status report. Feeds 4D topological graph into Claude Code.",
+      "detail": "Default wrapper: checks localhost:5173 before launching the full GPU pipeline.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5154,12 +5438,28 @@
     {
       "label": "🧬 Codebase Spine: Full indexing graph",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs codebase-index-spine --clusters 0-5",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Default wrapper: checks localhost:5173 before launching the codebase spine runner.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧬 Codebase Spine: Full indexing graph (direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs codebase-index-spine --clusters 0-5",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Explicit top-level indexing spine: assign → index → backfill → todos → status.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5170,12 +5470,28 @@
     {
       "label": "🚀 Pipeline: Full GPU Intelligence — Extended (clusters 0-11)",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-11",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Default wrapper: checks localhost:5173 before launching the extended full pipeline.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Pipeline: Full GPU Intelligence — Extended (clusters 0-11, direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-11",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Extended pipeline: all 12 clusters with summaries, pgvector mirror, GPU tagging, gap analysis.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5186,12 +5502,28 @@
     {
       "label": "🚀 Pipeline: Full GPU Intelligence (dry run)",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-5 --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Default wrapper: checks localhost:5173 before launching the dry-run full pipeline.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Pipeline: Full GPU Intelligence (dry run, direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs full-pipeline --clusters 0-5 --dry-run",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "detail": "Dry run: full pipeline preview — no Qdrant/PostgreSQL writes.",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5902,12 +6234,32 @@
     {
       "label": "🏗️ ACE: Full Pipeline",
       "type": "shell",
+      "command": "$probeUri = 'http://localhost:5173/favicon.ico'; & curl.exe --silent --show-error --fail $probeUri --output NUL; if ($LASTEXITCODE -ne 0) { Write-Host ('Dev server probe failed: ' + $probeUri) -ForegroundColor Red; Write-Host 'Start npm run dev in sveltekit-frontend and rerun this task.' -ForegroundColor Yellow; exit 1 }; node scripts/gpu-pipeline-runner.mjs codebase-index-spine --clusters 0-20 --limit 50",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Default wrapper: checks localhost:5173 before launching the ACE pipeline runner.",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🏗️ ACE: Full Pipeline (direct)",
+      "type": "shell",
       "command": "node scripts/gpu-pipeline-runner.mjs codebase-index-spine --clusters 0-20 --limit 50",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Full codebase index spine: K-Means assign → cluster index → GPU tag backfill → predictive todos → status",
+      "detail": "Direct runner call: rely on the in-script preflight only.",
       "isBackground": true,
       "presentation": {
         "echo": true,
@@ -6295,6 +6647,307 @@
         "clear": true
       },
       "detail": "Forces a full codebase index and exports the Markdown wiki (use after large refactors)"
+    },
+    {
+      "label": "🧠 CodeIntel: Cache Stack Smoke (L1/L2/L3)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '=== L1/L2/L3 Cache Stack Smoke Test ===' -ForegroundColor Cyan; $base = 'http://localhost:5173'; $q1 = 'What is hearsay evidence in a legal context?'; Write-Host '--- Priming L3 (cold miss) ---' -ForegroundColor Yellow; $body1 = @{ message = $q1 } | ConvertTo-Json; try { $r1 = Invoke-RestMethod -Uri \"$base/api/sse/chat\" -Method POST -Body $body1 -ContentType 'application/json' -TimeoutSec 60; Write-Host 'L3 cold: OK' -ForegroundColor Green } catch { Write-Host \"L3 cold: FAILED - $_\" -ForegroundColor Red }; Write-Host '--- L1 Exact-Match Hit ---' -ForegroundColor Yellow; try { $r2 = Invoke-RestMethod -Uri \"$base/api/sse/chat\" -Method POST -Body $body1 -ContentType 'application/json' -TimeoutSec 10; Write-Host 'L1 hit: OK' -ForegroundColor Green } catch { Write-Host \"L1 hit: FAILED - $_\" -ForegroundColor Red }; Write-Host '--- L2 Semantic Hit (rephrase) ---' -ForegroundColor Yellow; $q2 = 'Define hearsay in law and evidence rules'; $body2 = @{ message = $q2 } | ConvertTo-Json; try { $r3 = Invoke-RestMethod -Uri \"$base/api/sse/chat\" -Method POST -Body $body2 -ContentType 'application/json' -TimeoutSec 30; Write-Host 'L2 semantic: OK' -ForegroundColor Green } catch { Write-Host \"L2 semantic: FAILED - $_\" -ForegroundColor Red }; Write-Host '--- Fix Recommender (bifrostChat path) ---' -ForegroundColor Yellow; $fixBody = @{ file_path = 'src/lib/test.ts'; errors = @(\"Type 'string' not assignable to 'number'\") } | ConvertTo-Json; try { $r4 = Invoke-RestMethod -Uri \"$base/api/admin/agent/fix\" -Method POST -Body $fixBody -ContentType 'application/json' -TimeoutSec 60; Write-Host \"Fix recommender: OK (fixes=$($r4.fixes.Count))\" -ForegroundColor Green } catch { Write-Host \"Fix recommender: FAILED - $_\" -ForegroundColor Red }; Write-Host '=== Smoke Test Complete ===' -ForegroundColor Cyan"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Runs L1 exact-match, L2 semantic, L3 cold-miss, and fix-recommender bifrostChat path. Requires dev server on port 5173."
+    },
+    {
+      "label": "🔬 Lane 3: GitHub Search + Ingest",
+      "type": "shell",
+      "command": "curl",
+      "args": [
+        "-s",
+        "-X",
+        "POST",
+        "http://localhost:5173/api/research/ingest",
+        "-H",
+        "Content-Type: application/json",
+        "-d",
+        "{\"source\":\"github_issues\",\"query\":\"${input:researchQuery}\",\"limit\":20,\"semantic\":false}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "Search GitHub issues and ingest into chunks_web_search Qdrant collection. Requires dev server on port 5173 + GITHUB_TOKEN in .env."
+    },
+    {
+      "label": "🔬 Lane 3: Reddit Search + Ingest",
+      "type": "shell",
+      "command": "curl",
+      "args": [
+        "-s",
+        "-X",
+        "POST",
+        "http://localhost:5173/api/research/ingest",
+        "-H",
+        "Content-Type: application/json",
+        "-d",
+        "{\"source\":\"reddit\",\"query\":\"${input:researchQuery}\",\"limit\":25}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "Search Reddit and ingest into chunks_web_search Qdrant collection. Requires dev server on port 5173."
+    },
+    {
+      "label": "🔬 Lane 3: Search Research Chunks",
+      "type": "shell",
+      "command": "curl",
+      "args": [
+        "-s",
+        "-X",
+        "POST",
+        "http://localhost:5173/api/research/search",
+        "-H",
+        "Content-Type: application/json",
+        "-d",
+        "{\"query\":\"${input:researchQuery}\",\"limit\":10,\"scoreThreshold\":0.55}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "Semantic search over chunks_web_search (GitHub/Reddit/web research). Requires dev server on port 5173 + embedding gRPC on 50051."
+    },
+    {
+      "label": "🦙 Lane 3: Launch llama-server (Gemma 4, port 8090)",
+      "type": "shell",
+      "command": "& 'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe'",
+      "args": [
+        "-m",
+        "C:\\Users\\james\\Downloads\\gemma4-legal-vlm-q4_k_m.gguf",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8090",
+        "--ctx-size",
+        "4096",
+        "--flash-attn",
+        "on",
+        "--ngl",
+        "99"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "detail": "Start Tier 3 llama-server.exe with Gemma 4 GGUF on CUDA (RTX 3060 Ti). Listens on 127.0.0.1:8090."
+    },
+    {
+      "label": "🦙 Lane 3: Test llama-server Health (port 8090)",
+      "type": "shell",
+      "command": "curl",
+      "args": [
+        "-s",
+        "http://127.0.0.1:8090/health"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": false
+      },
+      "detail": "Health-check the llama-server on port 8090. Must launch '🦙 Lane 3: Launch llama-server' first."
+    },
+    {
+      "label": "🧠 Phase 78: Incremental Index",
+      "type": "shell",
+      "command": "npm run codebase:index",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Phase 78: Incremental ts-morph AST scan → Qdrant codebase_chunks_768 + Neo4j nodes"
+    },
+    {
+      "label": "🧠 Phase 78: GPU Cluster Assign",
+      "type": "shell",
+      "command": "npm run phase78:cluster",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Phase 78: GPU k-means cluster assignment on indexed codebase embeddings"
+    },
+    {
+      "label": "🧠 Phase 78: SOM Topology",
+      "type": "shell",
+      "command": "npm run phase78:embed-clusters",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Phase 78: Train SOM topology grid, write SIMILAR_TOPOLOGY Neo4j edges"
+    },
+    {
+      "label": "🧠 Phase 78: Cluster Summaries",
+      "type": "shell",
+      "command": "npm run summarize:clusters",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Phase 78: Generate Gemma4 cluster summaries and persist to CouchDB + Postgres"
+    },
+    {
+      "label": "🧠 Phase 78: Karpathy Tags",
+      "type": "shell",
+      "command": "npm run codebase:index:tags",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Phase 78: Karpathy-style tag enrichment — writes semantic tags to Qdrant payload + Neo4j"
+    },
+    {
+      "label": "🧠 Phase 78: Deep Research Sync",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/research/ingest -H \"Content-Type: application/json\" -d \"{\\\"source\\\":\\\"github_issues\\\",\\\"query\\\":\\\"sveltekit svelte 5 runes\\\",\\\"limit\\\":20}\" | python -m json.tool",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Phase 78: Sync fresh GitHub issues research into chunks_web_search Qdrant collection (Lane 3 feed)"
+    },
+    {
+      "label": "🧠 Phase 78: Hypergraph Regression Tests",
+      "type": "shell",
+      "command": "npx vitest run tests/hypergraph-research-grounding.spec.ts tests/hypergraph-merge-semantics.spec.ts tests/cross-language-synthesis.spec.ts tests/lane4-feedback.spec.ts --config vitest.config.ts --reporter=verbose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Phase 78: Regression tests — sessionId propagation (Part A) + MERGE semantics (Part B) + cross-language synthesis (5 tests) + Lane 4 feedback (8 tests)"
+    },
+    {
+      "label": "🧠 Phase 78: Full GPU Loop",
+      "dependsOn": [
+        "🧠 Phase 78: Incremental Index",
+        "🧠 Phase 78: GPU Cluster Assign",
+        "🧠 Phase 78: SOM Topology",
+        "🧠 Phase 78: Cluster Summaries",
+        "🧠 Phase 78: Karpathy Tags",
+        "🧠 Phase 78: Deep Research Sync",
+        "🧠 Phase 78: Hypergraph Regression Tests"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "problemMatcher": [],
+      "detail": "Phase 78: Full GPU codebase intelligence loop — index → cluster → SOM → summaries → tags → research sync → regression tests"
     }
   ],
   "inputs": [

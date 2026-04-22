@@ -357,7 +357,7 @@ export async function runDeepResearchIndex(
     // 5. Recursion (Depth 2)
     if (depth < maxDepth && depth < 2) {
       const links = Array.from(doc.querySelectorAll('a'))
-        .map((a) => a.href)
+        .map((a) => (a as HTMLAnchorElement).href)
         .filter(
           (href) =>
             href.startsWith('http') && !href.includes('google.com') && !href.includes('search')

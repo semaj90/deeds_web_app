@@ -233,6 +233,52 @@ const tools = {
         };
       }
     }
+  },
+
+  'diagnose-error': {
+    name: 'diagnose-error',
+    description: 'Perform AST-powered deep diagnosis of a code error or failure',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'The error message or description' },
+        filePath: { type: 'string', description: 'Optional path to the file causing the error' },
+        mode: { type: 'string', enum: ['file', 'route', 'page', 'test'], default: 'file' }
+      },
+      required: ['query']
+    },
+    handler: async (args) => {
+      const response = await fetch('http://localhost:5173/api/error-brain/diagnose', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(args)
+      });
+      if (!response.ok) throw new Error(`Diagnosis failed: ${response.statusText}`);
+      return await response.json();
+    }
+  },
+
+  'recommend-fix': {
+    name: 'recommend-fix',
+    description: 'Get AI-powered fix recommendations for a specific code snippet and error',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        error: { type: 'string', description: 'The error message' },
+        filePath: { type: 'string', description: 'The file path' },
+        codeSnippet: { type: 'string', description: 'The code causing the issue' }
+      },
+      required: ['error', 'filePath']
+    },
+    handler: async (args) => {
+      const response = await fetch('http://localhost:5173/api/codebase-index/recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(args)
+      });
+      if (!response.ok) throw new Error(`Recommendation failed: ${response.statusText}`);
+      return await response.json();
+    }
   }
 };
 

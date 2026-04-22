@@ -773,7 +773,7 @@ export class RabbitMQManager extends EventEmitter {
         filesProcessed: allFiles.length,
       });
 
-      const chunks = chunkFiles(allFiles, ROOT);
+      const chunks = await chunkFiles(allFiles, ROOT);
 
       await updateRedisProgress({
         status: 'embedding',

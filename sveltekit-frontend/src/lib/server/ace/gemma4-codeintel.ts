@@ -11,7 +11,11 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
+import { bifrostChat } from '../ollama.js';
+import * as Hypergraph from '../ai/hypergraph-store.js';
+import { retrievalClient } from '../ai/retrieval-client.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -33,6 +37,11 @@ export interface Gemma4AceOpts {
    * When set, jsonMode is implied true.
    */
   responseSchema?: Record<string, unknown>;
+  lane?: string;
+  taskType?: string;
+  sessionId?: string;
+  /** Use multi-step tool loop */
+  useTools?: boolean;
 }
 
 export interface Gemma4AceResult {
@@ -57,36 +66,50 @@ export interface AceFixRecommendation {
 // Prompt builder
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function buildGemma4AcePrompt(
-  context: AceCodeIntelContext,
-  task?: string,
-): string {
+export function buildGemma4AcePrompt(context: AceCodeIntelContext, task?: string): string {
   const sections: string[] = [];
 
   // 1. CLUSTER SUMMARIES (Highly Stable Prefix) ─────────────────────────────
   if (context.clusterContext.length > 0) {
-    const clusterLines = context.clusterContext.map(c => {
+    const clusterLines = context.clusterContext.map((c) => {
       const parts = [`  Cluster ${c.gpuCluster} — ${c.purpose ?? 'unknown purpose'}`];
       if (c.summary) parts.push(`  Summary: ${c.summary}`);
       if (c.patterns.length) parts.push(`  Patterns: ${c.patterns.join(', ')}`);
       if (c.warnings.length) parts.push(`  Warnings: ${c.warnings.join('; ')}`);
-      if (c.tags.length)     parts.push(`  Tags: ${c.tags.join(', ')}`);
+      if (c.tags.length) parts.push(`  Tags: ${c.tags.join(', ')}`);
       return parts.join('\n');
     });
-    sections.push(`## CLUSTER REVIEWS (${context.clusterContext.length})\n${clusterLines.join('\n\n')}`);
+    sections.push(
+      `## CLUSTER REVIEWS (${context.clusterContext.length})\n${clusterLines.join('\n\n')}`
+    );
   }
 
   // 2. RELEVANT CHUNKS ──────────────────────────────────────────────────────
   if (context.chunkContext.length > 0) {
-    const chunkLines = context.chunkContext.map(c => {
+    const chunkLines = context.chunkContext.map((c) => {
       const meta = [c.kind, c.domain, c.language].filter(Boolean).join(' | ');
       const tags = c.semanticTags.slice(0, 4).join(', ');
       const parts = [`  ${c.relativePath ?? c.chunkId} [${meta}]`];
-      if (tags)      parts.push(`  Tags: ${tags}`);
+      if (tags) parts.push(`  Tags: ${tags}`);
       if (c.summary) parts.push(`  Summary: ${c.summary.slice(0, 300)}`);
       return parts.join('\n');
     });
     sections.push(`## SOURCE CONTEXT (${context.chunkContext.length})\n${chunkLines.join('\n\n')}`);
+  }
+
+  // 3. RESEARCH CONTEXT (Lane 3) ────────────────────────────────────────────
+  if (context.researchContext && context.researchContext.length > 0) {
+    const researchLines = context.researchContext.map((r) => {
+      const tags = r.semanticTags.slice(0, 4).join(', ');
+      const parts = [`  [${r.source.toUpperCase()}] ${r.title}`];
+      if (r.url) parts.push(`  Source: ${r.url}`);
+      if (tags) parts.push(`  Tags: ${tags}`);
+      parts.push(`  Content: ${r.body.slice(0, 800)}`);
+      return parts.join('\n');
+    });
+    sections.push(
+      `## RESEARCH INSIGHTS (${context.researchContext.length})\n${researchLines.join('\n\n')}`
+    );
   }
 
   // 3. SYSTEM HEALTH ────────────────────────────────────────────────────────
@@ -118,15 +141,19 @@ const DEFAULT_MODEL = 'gemma4-legal-fast:latest';
 export async function callGemma4WithAceContext(
   context: AceCodeIntelContext,
   userPrompt: string,
-  opts: Gemma4AceOpts = {},
+  opts: Gemma4AceOpts = {}
 ): Promise<Gemma4AceResult> {
-  const model       = opts.model       ?? DEFAULT_MODEL;
+  const model = opts.model ?? DEFAULT_MODEL;
   const temperature = opts.temperature ?? 0.2;
-  const maxTokens   = opts.maxTokens   ?? 1024;
-  const jsonMode    = opts.jsonMode    ?? !!opts.responseSchema;
-  const startMs     = Date.now();
+  const maxTokens = opts.maxTokens ?? 1024;
+  const jsonMode = opts.jsonMode ?? !!opts.responseSchema;
+  const startMs = Date.now();
 
-  if (context.degraded && context.clusterContext.length === 0 && context.chunkContext.length === 0) {
+  if (
+    context.degraded &&
+    context.clusterContext.length === 0 &&
+    context.chunkContext.length === 0
+  ) {
     return {
       ok: false,
       text: '',
@@ -137,49 +164,114 @@ export async function callGemma4WithAceContext(
     };
   }
 
-  const systemPrompt =
-    opts.systemPromptOverride?.trim()
-      ? opts.systemPromptOverride
-      : buildGemma4AcePrompt(context);
+  const systemPrompt = opts.systemPromptOverride?.trim()
+    ? opts.systemPromptOverride
+    : buildGemma4AcePrompt(context);
+
+  const sessionId = opts.sessionId ?? crypto.randomUUID();
+  const lane = opts.lane ?? 'interactive-agent';
+  const taskType = opts.taskType ?? 'streaming-chat';
+
+  if (lane === 'interactive-agent') {
+    await Hypergraph.recordSessionStart({
+      sessionId,
+      lane: lane as any,
+      taskType: taskType as any,
+      startTime: Date.now(),
+      metadata: { model, query: context.query },
+    });
+  }
 
   // Build the format field: prefer explicit schema, then json string, then omit
   const formatField = opts.responseSchema ?? (jsonMode ? 'json' : undefined);
 
-  try {
-    const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        prompt:  userPrompt,
-        system:  systemPrompt,
-        stream:  false,
-        ...(formatField !== undefined ? { format: formatField } : {}),
-        options: { 
-          temperature, 
-          num_predict: maxTokens,
-          num_ctx: 16384, // ACE architectural contexts are large
-        },
-        keep_alive: '1h', // Maximize KV cache reuse for agentic loops
-      }),
-      signal: AbortSignal.timeout(90_000),
+  if (opts.useTools) {
+    const toolResult = await callGemma4WithTools(systemPrompt, userPrompt, ACE_TOOLS, {
+      model: opts.model,
+      temperature: opts.temperature,
+      maxTokens: opts.maxTokens,
+      lane,
+      taskType,
     });
 
-    if (!resp.ok) throw new Error(`Ollama HTTP ${resp.status}`);
-    const data = await resp.json() as { response?: string };
-    const text = (data.response ?? '').trim();
+    // Link chunks for tool loop as well
+    if (lane === 'interactive-agent') {
+      for (const chunk of context.chunkContext) {
+        if (chunk.relativePath) {
+          await Hypergraph.linkKnowledgeToSession(sessionId, chunk.relativePath, 1.0);
+        }
+      }
+      for (const res of context.researchContext) {
+        await Hypergraph.linkResearchToSession(sessionId, res.url, res.source, 1.0);
+      }
+      await Hypergraph.finalizeSession(sessionId, 'completed');
+    }
+
+    return {
+      ok: toolResult.ok,
+      text: toolResult.text,
+      parsed: undefined, // caller will parse toolResult.text if jsonMode
+      degraded: toolResult.degraded,
+      error: toolResult.error,
+      latencyMs: toolResult.latencyMs,
+      model: toolResult.model,
+    };
+  }
+
+  // ── Route through bifrostChat for Hypergraph & Lane Support ────────────────
+  try {
+    const content = await bifrostChat(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model,
+      {
+        temperature,
+        maxTokens,
+        lane: lane as any,
+        taskType: taskType as any,
+        sessionId,
+        timeoutMs: 90_000,
+      }
+    );
+
+    const text = typeof content === 'string' ? content : (content as { content: string }).content;
+
+    // ── Link Consulted Chunks to Hypergraph ──
+    if (lane === 'interactive-agent') {
+      for (const chunk of context.chunkContext) {
+        if (chunk.relativePath) {
+          await Hypergraph.linkKnowledgeToSession(sessionId, chunk.relativePath, 1.0);
+        }
+      }
+      for (const res of context.researchContext) {
+        await Hypergraph.linkResearchToSession(sessionId, res.url, res.source, 1.0);
+      }
+      await Hypergraph.finalizeSession(sessionId, 'completed');
+    }
 
     let parsed: unknown;
     if (jsonMode) {
       try {
-        const cleaned = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+        const cleaned = text
+          .replace(/^```(?:json)?\n?/m, '')
+          .replace(/\n?```$/m, '')
+          .trim();
         parsed = JSON.parse(cleaned);
       } catch {
         // non-fatal — return text as-is
       }
     }
 
-    return { ok: true, text, parsed, degraded: context.degraded, latencyMs: Date.now() - startMs, model };
+    return {
+      ok: true,
+      text,
+      parsed,
+      degraded: context.degraded,
+      latencyMs: Date.now() - startMs,
+      model,
+    };
   } catch (e: unknown) {
     return {
       ok: false,
@@ -223,6 +315,96 @@ export interface Gemma4ToolCallResult {
 
 const MAX_TOOL_ROUNDS = 5;
 
+// ── Default Tools ────────────────────────────────────────────────────────────
+
+/**
+ * Standard gRPC tools for the Lane 1 agent loop.
+ */
+export const ACE_TOOLS: Gemma4Tool[] = [
+  {
+    name: 'search_codebase',
+    description:
+      'Search for codebase chunks using semantic vector search. Returns code snippets and metadata.',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'The search query (e.g. "auth middleware logic")' },
+        limit: { type: 'integer', description: 'Max results to return (default 5)' },
+      },
+      required: ['query'],
+    },
+    execute: async (args) => {
+      const results = await retrievalClient.searchChunks(
+        String(args.query),
+        Number(args.limit ?? 5)
+      );
+      return JSON.stringify(results.results);
+    },
+  },
+  {
+    name: 'get_cluster_summary',
+    description: 'Fetch the narrative summary and patterns for a GPU/SOM cluster.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cluster_id: { type: 'integer', description: 'The ID of the cluster' },
+        cluster_type: {
+          type: 'string',
+          enum: ['gpu', 'som'],
+          description: 'Type of cluster (default gpu)',
+        },
+      },
+      required: ['cluster_id'],
+    },
+    execute: async (args) => {
+      const result = await retrievalClient.getClusterSummary(
+        Number(args.cluster_id),
+        (args.cluster_type as any) ?? 'gpu'
+      );
+      return JSON.stringify(result);
+    },
+  },
+  {
+    name: 'expand_ast',
+    description: 'Find 1-hop AST neighbors (callers, callees, types) for a symbol or file.',
+    parameters: {
+      type: 'object',
+      properties: {
+        symbol: { type: 'string', description: 'Symbol name (e.g. "UserStore")' },
+        file_path: { type: 'string', description: 'Relative path to file' },
+      },
+    },
+    execute: async (args) => {
+      const result = await retrievalClient.expandAstNeighbors(
+        String(args.symbol ?? ''),
+        String(args.file_path ?? '')
+      );
+      return JSON.stringify(result);
+    },
+  },
+  {
+    name: 'get_topology_context',
+    description: 'Get code neighbors based on SOM (Self-Organizing Map) topology.',
+    parameters: {
+      type: 'object',
+      properties: {
+        bmu_row: { type: 'integer', description: 'Best Matching Unit row' },
+        bmu_col: { type: 'integer', description: 'Best Matching Unit column' },
+        radius: { type: 'integer', description: 'Neighborhood radius (default 1)' },
+      },
+      required: ['bmu_row', 'bmu_col'],
+    },
+    execute: async (args) => {
+      const result = await retrievalClient.getTopologyContext(
+        Number(args.bmu_row),
+        Number(args.bmu_col),
+        Number(args.radius ?? 1)
+      );
+      return JSON.stringify(result);
+    },
+  },
+];
+
 type OllamaMessage = {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
@@ -248,47 +430,45 @@ export async function callGemma4WithTools(
   systemPrompt: string,
   userMessage: string,
   tools: Gemma4Tool[],
-  opts: Pick<Gemma4AceOpts, 'model' | 'temperature' | 'maxTokens'> = {},
+  opts: Pick<Gemma4AceOpts, 'model' | 'temperature' | 'maxTokens' | 'lane' | 'taskType'> = {}
 ): Promise<Gemma4ToolCallResult> {
-  const model       = opts.model       ?? DEFAULT_MODEL;
+  const model = opts.model ?? DEFAULT_MODEL;
   const temperature = opts.temperature ?? 0.2;
-  const maxTokens   = opts.maxTokens   ?? 1024;
-  const startMs     = Date.now();
+  const maxTokens = opts.maxTokens ?? 1024;
+  const startMs = Date.now();
 
   // Ollama tool definitions — executor stripped (local-only)
-  const ollamaTools = tools.map(t => ({
+  const ollamaTools = tools.map((t) => ({
     type: 'function' as const,
     function: { name: t.name, description: t.description, parameters: t.parameters },
   }));
 
-  const executorMap = new Map(tools.map(t => [t.name, t.execute]));
+  const executorMap = new Map(tools.map((t) => [t.name, t.execute]));
 
   const messages: OllamaMessage[] = [
     { role: 'system', content: systemPrompt },
-    { role: 'user',   content: userMessage  },
+    { role: 'user', content: userMessage },
   ];
 
   let toolCallsExecuted = 0;
 
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-      const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model,
-          messages,
-          tools:   ollamaTools,
-          stream:  false,
-          options: { temperature, num_predict: maxTokens },
-        }),
-        signal: AbortSignal.timeout(90_000),
+      const result = await bifrostChat(messages, model, {
+        tools: ollamaTools,
+        temperature,
+        maxTokens,
+        timeoutMs: 90_000,
+        cacheKey: `codeintel-loop:${model}`,
+        lane: opts.lane as any,
+        taskType: opts.taskType as any,
       });
 
-      if (!resp.ok) throw new Error(`Ollama HTTP ${resp.status}`);
+      const msg: OllamaMessage =
+        typeof result === 'string'
+          ? { role: 'assistant', content: result }
+          : { role: 'assistant', content: result.content, tool_calls: result.tool_calls };
 
-      const data = await resp.json() as { message: OllamaMessage; done: boolean };
-      const msg  = data.message;
       messages.push(msg); // append assistant turn
 
       // No tool calls → final answer ready
@@ -309,8 +489,11 @@ export async function callGemma4WithTools(
         const executor = executorMap.get(name);
         let result: string;
         if (executor) {
-          try   { result = await executor(args); }
-          catch (err) { result = `Error: ${err instanceof Error ? err.message : String(err)}`; }
+          try {
+            result = await executor(args);
+          } catch (err) {
+            result = `Error: ${err instanceof Error ? err.message : String(err)}`;
+          }
         } else {
           result = `Error: unknown tool "${name}"`;
         }
@@ -320,7 +503,7 @@ export async function callGemma4WithTools(
     }
 
     // Exceeded MAX_TOOL_ROUNDS — return last assistant content
-    const last = [...messages].reverse().find(m => m.role === 'assistant');
+    const last = [...messages].reverse().find((m) => m.role === 'assistant');
     return {
       ok: false,
       text: last?.content ?? '',
@@ -332,9 +515,13 @@ export async function callGemma4WithTools(
     };
   } catch (e: unknown) {
     return {
-      ok: false, text: '', toolCallsExecuted, degraded: true,
+      ok: false,
+      text: '',
+      toolCallsExecuted,
+      degraded: true,
       error: `Tool loop failed: ${e instanceof Error ? e.message : String(e)}`,
-      latencyMs: Date.now() - startMs, model,
+      latencyMs: Date.now() - startMs,
+      model,
     };
   }
 }
@@ -357,34 +544,84 @@ const FIX_SYSTEM =
 export async function generateFixRecommendationsFromAce(
   context: AceCodeIntelContext,
   failingArea: string,
-  opts: Gemma4AceOpts = {},
-): Promise<{ ok: boolean; recommendation: AceFixRecommendation; degraded: boolean; error?: string }> {
+  opts: Gemma4AceOpts = {}
+): Promise<{
+  ok: boolean;
+  recommendation: AceFixRecommendation;
+  degraded: boolean;
+  error?: string;
+}> {
   const fallback: AceFixRecommendation = {
-    problem:             failingArea,
-    likely_causes:       ['Unknown — LLM unavailable or context degraded'],
-    recommended_files:   context.chunkContext.slice(0, 3).map(c => c.relativePath ?? c.chunkId),
+    problem: failingArea,
+    likely_causes: ['Unknown — LLM unavailable or context degraded'],
+    recommended_files: context.chunkContext.slice(0, 3).map((c) => c.relativePath ?? c.chunkId),
     recommended_actions: ['Inspect the files above for the error', 'Check service connectivity'],
-    safety_checks:       ['Confirm DB connection', 'Confirm Ollama reachability'],
+    safety_checks: ['Confirm DB connection', 'Confirm Ollama reachability'],
   };
 
   // Build a rich task description for the model
-  const clusterWarnings = context.clusterContext.flatMap(c => c.warnings).slice(0, 5);
-  const relevantPurposes = context.clusterContext.map(c => c.purpose).filter(Boolean).slice(0, 3);
-  const refFiles = context.chunkContext.slice(0, 5).map(c => c.relativePath ?? c.chunkId).join('\n');
+  const clusterWarnings = context.clusterContext.flatMap((c) => c.warnings).slice(0, 5);
+  const relevantPurposes = context.clusterContext
+    .map((c) => c.purpose)
+    .filter(Boolean)
+    .slice(0, 3);
+  const refFiles = context.chunkContext
+    .slice(0, 5)
+    .map((c) => c.relativePath ?? c.chunkId)
+    .join('\n');
 
   const userPrompt = [
     `Failing area: ${failingArea}`,
     relevantPurposes.length ? `Cluster purposes: ${relevantPurposes.join('; ')}` : '',
-    clusterWarnings.length  ? `Known warnings: ${clusterWarnings.join('; ')}` : '',
+    clusterWarnings.length ? `Known warnings: ${clusterWarnings.join('; ')}` : '',
     refFiles ? `Reference files:\n${refFiles}` : '',
     'Diagnose and return the fix recommendation JSON.',
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 
-  const result = await callGemma4WithAceContext(
-    { ...context, query: failingArea },
-    userPrompt,
-    { ...opts, jsonMode: true },
-  );
+  if (opts.useTools) {
+    const toolResult = await callGemma4WithTools(
+      FIX_SYSTEM + '\n\n' + buildGemma4AcePrompt(context),
+      userPrompt,
+      ACE_TOOLS,
+      {
+        ...opts,
+        lane: 'interactive-agent',
+        taskType: 'fix-recommender',
+      }
+    );
+
+    if (toolResult.ok) {
+      try {
+        const cleaned = toolResult.text
+          .replace(/^```(?:json)?\n?/m, '')
+          .replace(/\n?```$/m, '')
+          .trim();
+        const parsed = JSON.parse(cleaned);
+        return {
+          ok: true,
+          degraded: context.degraded,
+          recommendation: parsed as AceFixRecommendation,
+        };
+      } catch {
+        return {
+          ok: false,
+          degraded: true,
+          error: 'Failed to parse tool loop response as JSON',
+          recommendation: fallback,
+        };
+      }
+    }
+    return { ok: false, degraded: true, error: toolResult.error, recommendation: fallback };
+  }
+
+  const result = await callGemma4WithAceContext({ ...context, query: failingArea }, userPrompt, {
+    ...opts,
+    jsonMode: true,
+    lane: 'interactive-agent',
+    taskType: 'fix-recommender',
+  } as Gemma4AceOpts);
 
   if (!result.ok || !result.parsed) {
     // Heuristic fallback using cluster metadata
@@ -395,8 +632,10 @@ export async function generateFixRecommendationsFromAce(
         error: result.error,
         recommendation: {
           ...fallback,
-          likely_causes:   clusterWarnings.length ? clusterWarnings : fallback.likely_causes,
-          recommended_files: context.chunkContext.slice(0, 5).map(c => c.relativePath ?? c.chunkId),
+          likely_causes: clusterWarnings.length ? clusterWarnings : fallback.likely_causes,
+          recommended_files: context.chunkContext
+            .slice(0, 5)
+            .map((c) => c.relativePath ?? c.chunkId),
         },
       };
     }
@@ -406,11 +645,15 @@ export async function generateFixRecommendationsFromAce(
   // Parse and normalize the structured response
   const raw = result.parsed as any;
   const recommendation: AceFixRecommendation = {
-    problem:             String(raw.problem ?? failingArea),
-    likely_causes:       Array.isArray(raw.likely_causes) ? raw.likely_causes.map(String) : [],
-    recommended_files:   Array.isArray(raw.recommended_files) ? raw.recommended_files.map(String) : [],
-    recommended_actions: Array.isArray(raw.recommended_actions) ? raw.recommended_actions.map(String) : [],
-    safety_checks:       Array.isArray(raw.safety_checks) ? raw.safety_checks.map(String) : [],
+    problem: String(raw.problem ?? failingArea),
+    likely_causes: Array.isArray(raw.likely_causes) ? raw.likely_causes.map(String) : [],
+    recommended_files: Array.isArray(raw.recommended_files)
+      ? raw.recommended_files.map(String)
+      : [],
+    recommended_actions: Array.isArray(raw.recommended_actions)
+      ? raw.recommended_actions.map(String)
+      : [],
+    safety_checks: Array.isArray(raw.safety_checks) ? raw.safety_checks.map(String) : [],
   };
 
   return { ok: true, degraded: context.degraded, recommendation };

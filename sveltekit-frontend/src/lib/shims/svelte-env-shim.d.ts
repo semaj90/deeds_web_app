@@ -6,6 +6,7 @@ declare module '$env/static/private' {
 	export const OLLAMA_BASE_URL: string | undefined;
 	export const OPENAI_API_KEY: string | undefined;
 	export const GEMINI_API_KEY: string | undefined;
+	export const GOOGLE_GEMINI_API_KEY: string | undefined;
 	export const INGEST_SERVICE_URL: string | undefined;
 	export const LLAMARPC_ENDPOINT: string | undefined;
 	export const NODE_ENV: string | undefined;

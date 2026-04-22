@@ -43,7 +43,10 @@ async function scrollAllVectors(): Promise<Array<{ id: string; vector: number[] 
 			signal: AbortSignal.timeout(30_000),
 		});
 
-		if (!res.ok) break;
+		if (!res.ok) {
+			const errorText = await res.text().catch(() => 'Unknown error');
+			throw new Error(`[scrollAllVectors] Qdrant scroll failed: ${res.status} ${errorText}`);
+		}
 
 		const data = await res.json();
 		const points: unknown[] = data.result?.points ?? [];

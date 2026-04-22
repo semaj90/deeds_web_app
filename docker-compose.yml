@@ -414,6 +414,8 @@ services:
       # volume initialisation, so the file-level override works correctly).
       - bifrost_data:/app/data
       - ./docker/bifrost/config.json:/app/data/config.json:ro
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

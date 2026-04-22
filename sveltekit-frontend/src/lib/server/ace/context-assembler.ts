@@ -120,6 +120,8 @@ export async function assembleACEContext(opts: {
   enableWebSearch?: boolean;
   enableWikipedia?: boolean;
   enableCodebaseContext?: boolean;
+  /** Include Lane 3 deep-research chunks from chunks_web_search (Qdrant). */
+  includeResearch?: boolean;
   sectionTypes?: string[];
 }): Promise<ACEContext> {
   return traceGraph(
@@ -154,6 +156,7 @@ export async function assembleACEContext(opts: {
         codebaseContext,
         topQueryTags,
         webResearchRows,
+        lane3Research,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -175,6 +178,11 @@ export async function assembleACEContext(opts: {
         fetchWebResearchRows(query).catch(
           () => [] as import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]
         ),
+        opts.includeResearch
+          ? import('$lib/server/ace/codeintel-datastore.js').then((m) =>
+              m.getWebResearchForAce(query, 8).catch(() => ({ research: [] }))
+            )
+          : Promise.resolve({ research: [] }),
       ]);
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
@@ -228,6 +236,13 @@ export async function assembleACEContext(opts: {
           [
             webResults ? formatWebResultsAsContext(webResults) : '',
             wikiResults ? formatWikipediaAsContext(wikiResults) : '',
+            lane3Research?.research?.length
+              ? `\n## Deep Research (Grounding: Docs > GitHub > Reddit)\n` +
+                lane3Research.research
+                  .slice(0, 5)
+                  .map((r, i) => `[${i + 1}] [${r.source}] ${r.url}\n${r.body.slice(0, 600)}`)
+                  .join('\n\n')
+              : '',
           ]
             .filter(Boolean)
             .join('\n') || null,

@@ -54,21 +54,21 @@ export default defineConfig({
     '**/vision-gpu-tools-topology-routes.spec.ts',
     '**/yorha-v1-routes.spec.ts',
     // Tests targeting non-existent routes or wrong ports
-    '**/ux-layout-tests.spec.ts',       // port 5174 + /demo/* routes don't exist
-    '**/simple-ux-test.spec.ts',        // port 5174 + /demo/* routes don't exist
-    '**/integrated-system.spec.ts',     // port 5178 (QUIC proxy) not running
-    '**/redis-gpu-pipeline.spec.ts',    // /upload route doesn't exist
+    '**/ux-layout-tests.spec.ts', // port 5174 + /demo/* routes don't exist
+    '**/simple-ux-test.spec.ts', // port 5174 + /demo/* routes don't exist
+    '**/integrated-system.spec.ts', // port 5178 (QUIC proxy) not running
+    '**/redis-gpu-pipeline.spec.ts', // /upload route doesn't exist
     '**/poi-manager-integration.spec.ts', // /poi-manager route doesn't exist
-    '**/barrel-store.spec.ts',           // hardcoded selectors don't match DOM
-    '**/phase99-production.spec.ts',     // stale data-testid/class selectors
-    '**/nes-architecture.spec.ts',       // /admin/redis route doesn't exist
-    '**/architecture-demo.spec.ts',     // stale .msg.user/.loading selectors, no dev auth
-    '**/user-migration.spec.ts',        // /test-user-store route doesn't exist
-    '**/minio-upload.spec.ts',          // /api/minio/upload route doesn't exist
+    '**/barrel-store.spec.ts', // hardcoded selectors don't match DOM
+    '**/phase99-production.spec.ts', // stale data-testid/class selectors
+    '**/nes-architecture.spec.ts', // /admin/redis route doesn't exist
+    '**/architecture-demo.spec.ts', // stale .msg.user/.loading selectors, no dev auth
+    '**/user-migration.spec.ts', // /test-user-store route doesn't exist
+    '**/minio-upload.spec.ts', // /api/minio/upload route doesn't exist
     // Stale routes/selectors — need full rewrite
-    '**/legal-workflow.spec.ts',        // 8/13 routes invalid, deprecated :has-text selectors
-    '**/legal-ai.spec.ts',             // stale .msg.user/.loading/.chat-window selectors
-    '**/yorha-bw-theme.spec.ts',       // old 4-theme selector, --yorha-* CSS vars (now 7 themes + --t-*)
+    '**/legal-workflow.spec.ts', // 8/13 routes invalid, deprecated :has-text selectors
+    '**/legal-ai.spec.ts', // stale .msg.user/.loading/.chat-window selectors
+    '**/yorha-bw-theme.spec.ts', // old 4-theme selector, --yorha-* CSS vars (now 7 themes + --t-*)
     '**/phase96-all-routes-mcp.spec.ts', // 97-route suite, timeouts in dev
   ],
 
@@ -143,11 +143,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
-          args: [
-            '--enable-features=WebAssemblySimd',
-            '--enable-unsafe-webgpu',
-            '--no-sandbox',
-          ],
+          args: ['--enable-features=WebAssemblySimd', '--enable-unsafe-webgpu', '--no-sandbox'],
         },
       },
     },
@@ -155,10 +151,10 @@ export default defineConfig({
 
   // Web server: auto-start in CI, reuse existing locally
   webServer: {
-    command: 'npm run build && npm run preview -- --port 5173',
+    command: 'npm run dev',
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 300000,
+    timeout: 120000,
   },
 
   // Output directory for test artifacts (screenshots, videos, traces)

@@ -61,12 +61,13 @@ async function scrollEmbeddings(maxFiles: number): Promise<FileEmbedding[]> {
 			});
 		} catch (err) {
 			console.error('[som-topology] Qdrant scroll network error:', err);
-			break;
+			throw new Error(`[som-topology] Qdrant scroll network error: ${(err as Error).message}`);
 		}
 
 		if (!res.ok) {
-			console.error(`[som-topology] Qdrant scroll ${res.status}: ${await res.text().catch(() => '')}`);
-			break;
+			const errorText = await res.text().catch(() => 'Unknown error');
+			console.error(`[som-topology] Qdrant scroll ${res.status}: ${errorText}`);
+			throw new Error(`[som-topology] Qdrant scroll failed: ${res.status} ${errorText}`);
 		}
 
 		const data = (await res.json()) as {

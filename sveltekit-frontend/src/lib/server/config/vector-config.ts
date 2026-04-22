@@ -66,6 +66,8 @@ export const VECTOR_CONFIG = {
     knowledge: 'knowledge_base',
     audio_segments: 'audio_segments',
     legal_glossary: 'legal_glossary',
+    /** Lane 3 deep research — GitHub / Reddit / web crawl chunks */
+    research_chunks: 'chunks_web_search',
   },
 
   /** Per-collection vector schema (vector name → used by health checks + init) */
@@ -90,6 +92,8 @@ export const VECTOR_CONFIG = {
     knowledge_base: { vectors: ['default'] },
     audio_segments: { vectors: ['content'], on_disk_payload: true },
     legal_glossary: { vectors: ['content'], on_disk_payload: true },
+    /** Lane 3 deep research collection — GitHub/Reddit/web research chunks */
+    chunks_web_search: { vectors: ['content'], on_disk_payload: true },
   },
 
   /** Qdrant HNSW config applied to all collections */

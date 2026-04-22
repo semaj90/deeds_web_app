@@ -3,7 +3,7 @@ import { ENV } from '$lib/server/env.server.js';
 function broadcastAgentProgress(_data: unknown) { /* no-op: progress tracked via returned fixes array */ }
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -96,7 +96,7 @@ async function generateFix(
 		progress: 0,
 		message: 'Analyzing errors and retrieving context...'
 	});
-  
+
 	const prompt = `You are an expert TypeScript/Svelte developer fixing errors in: ${ filePath }
 
 ERRORS TO FIX:
@@ -131,39 +131,25 @@ Return fixes in JSON format:
 	});
 
 	try {
-		const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'gemma4-legal:latest',
-				prompt,
-				stream: false,
-				options: { temperature: 0.3,
-					top_p: 0.9,
-					num_predict: 2048
-				}
-			})
-		});
+    // L1/L2/L3 cache path: Redis exact → Qdrant semantic → Bifrost gateway
+    const text = await bifrostChat([{ role: 'user', content: prompt }], 'gemma4-legal-vlm:latest', {
+      temperature: 0.3,
+      maxTokens: 2048,
+    });
 
-		if (!response.ok) {
-			throw new Error('LLM generation failed');
-		}
+    onProgress({
+      status: 'testing',
+      file_path: filePath,
+      progress: 70,
+      message: 'Parsing and validating fixes...',
+    });
 
-		const data = await response.json();
-		const text = data?.response ?? '';
-
-		onProgress({
-			status: 'testing',
-			file_path: filePath,
-			progress: 70,
-			message: 'Parsing and validating fixes...'
-		});
-  
-		const jsonMatch = text.match(/\{[\s\S]*"fixes"[\s\S]*\}/);
-		if (jsonMatch) {
-			const parsed = JSON.parse(jsonMatch[0]);
-			fixes.push(
-				...parsed.fixes.map(
-					(f: Record<string, any>) => `
+    const jsonMatch = text.match(/\{[\s\S]*"fixes"[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      fixes.push(
+        ...parsed.fixes.map(
+          (f: Record<string, any>) => `
 **Error:** ${f.error}
 **Solution:** ${f.solution}
 \`\`\`typescript
@@ -171,31 +157,31 @@ ${f.code}
 \`\`\`
 **Explanation:** ${f.explanation}
 `
-				)
-			);
-		} else {
-			// Fallback: use raw text
-			fixes.push(text);
-		}
+        )
+      );
+    } else {
+      // Fallback: use raw text
+      fixes.push(text);
+    }
 
-		onProgress({
-			status: 'complete',
-			file_path: filePath,
-			progress: 100,
-			message: `Generated ${fixes.length} fixes`,
-			fixes
-		});
+    onProgress({
+      status: 'complete',
+      file_path: filePath,
+      progress: 100,
+      message: `Generated ${fixes.length} fixes`,
+      fixes,
+    });
 
-		return fixes;
-	} catch (error) {
-		onProgress({
-			status: 'failed',
-			file_path: filePath,
-			progress: 100,
-			message: 'Fix execution failed'
-		});
-		throw error;
-	}
+    return fixes;
+  } catch (error) {
+    onProgress({
+      status: 'failed',
+      file_path: filePath,
+      progress: 100,
+      message: 'Fix execution failed',
+    });
+    throw error;
+  }
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {

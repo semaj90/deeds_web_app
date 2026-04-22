@@ -646,7 +646,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   // === PER-ROUTE RATE LIMITING (Sprint 4 → Sprint 6: Redis-backed) ===
-  const skipRateLimit = dev && process.env.DEV_BYPASS_AUTH === 'true';
+  const skipRateLimit = dev && ENV.DEV_BYPASS_AUTH;
   if (
     !skipRateLimit &&
     event.url.pathname.startsWith('/api/') &&
@@ -690,7 +690,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     event.locals.user = user;
     event.locals.session = session;
-  } else if (dev && process.env.DEV_BYPASS_AUTH === 'true') {
+  } else if (dev && ENV.DEV_BYPASS_AUTH) {
     const devUserId = '00000000-0000-0000-0000-000000000001';
     event.locals.user = {
       id: devUserId,

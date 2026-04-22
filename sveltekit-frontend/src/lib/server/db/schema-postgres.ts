@@ -796,6 +796,32 @@ export const codebaseAuditReports = pgTable('codebase_audit_reports', {
   createdIdx: index('codebase_audit_reports_created_idx').on(t.createdAt),
 }));
 
+// === AGENT SESSIONS (Phase 76+ / Lane-Aware Store) ===
+/**
+ * Stores interactive and background agent sessions.
+ * This is the 'Hypergraph Store' for Lane 1 and background lanes.
+ */
+export const agentSessions = pgTable('agent_sessions', {
+  id: serial('id').primaryKey().notNull(),
+  sessionId: varchar('session_id', { length: 255 }).unique().notNull(),
+  lane: varchar('lane', { length: 64 }).notNull(), // 'interactive-agent', 'background-analysis'
+  taskType: varchar('task_type', { length: 64 }).notNull(), // 'fix-recommender', 'wiki-generation', etc.
+  status: varchar('status', { length: 32 }).notNull().default('active'),
+  outcome: text('outcome'),
+  metadata: jsonb('metadata').default({}),
+  startTime: timestamp('start_time', { withTimezone: true }).defaultNow().notNull(),
+  endTime: timestamp('end_time', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+  sessionIdx: index('idx_agent_sessions_id').on(t.sessionId),
+  laneIdx: index('idx_agent_sessions_lane').on(t.lane),
+  statusIdx: index('idx_agent_sessions_status').on(t.status),
+}));
+
+export type AgentSession = typeof agentSessions.$inferSelect;
+export type NewAgentSession = typeof agentSessions.$inferInsert;
+
 export type CodebaseAuditReport = typeof codebaseAuditReports.$inferSelect;
 export type NewCodebaseAuditReport = typeof codebaseAuditReports.$inferInsert;
 
@@ -4066,4 +4092,84 @@ export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
 export type NewEnrichmentJob = typeof enrichmentJobs.$inferInsert;
 export type ContextBuffer = typeof contextBuffers.$inferSelect;
 export type NewContextBuffer = typeof contextBuffers.$inferInsert;
+
+// ── AST Graph Tables ─────────────────────────────────────────────────────────
+// Created April 21, 2026 — structured sidecar for the workspace indexing pipeline.
+// ts-morph-derived for TS/JS; heuristic fallback for all other languages.
+// Feeds: 4D topology, cluster summaries, fix-recommender graph expansion, ACE context.
+
+/**
+ * One row per named symbol extracted from the AST.
+ * For TS/JS: functions, classes, variables, type aliases, route handlers, etc.
+ * For other languages: whatever the heuristic parser can identify.
+ */
+export const astNodes = pgTable('ast_nodes', {
+  id:        uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  repoId:    text('repo_id').notNull().default('default'),
+  filePath:  text('file_path').notNull(),
+  symbol:    text('symbol'),
+  kind:      text('kind').notNull(),          // function | class | type | route-handler | const | …
+  startLine: integer('start_line'),
+  endLine:   integer('end_line'),
+  /** gpu_cluster / som_cluster / semantic_tags / ast_features — enriched by pipeline */
+  metadata:  jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  index('ast_nodes_file_path_idx').on(t.filePath),
+  index('ast_nodes_kind_idx').on(t.kind),
+  index('ast_nodes_repo_file_idx').on(t.repoId, t.filePath),
+]);
+
+/**
+ * Import, call, and type-reference edges between AST nodes.
+ * Edge types: import | call | re-export | type-ref | implements | extends
+ */
+export const astEdges = pgTable('ast_edges', {
+  id:           uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  repoId:       text('repo_id').notNull().default('default'),
+  sourceNodeId: uuid('source_node_id').notNull(),
+  targetNodeId: uuid('target_node_id').notNull(),
+  edgeType:     text('edge_type').notNull(),  // import | call | type-ref | re-export | extends
+  metadata:     jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+  createdAt:    timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  index('ast_edges_source_idx').on(t.sourceNodeId),
+  index('ast_edges_target_idx').on(t.targetNodeId),
+  index('ast_edges_type_repo_idx').on(t.edgeType, t.repoId),
+]);
+
+/**
+ * One row per file — aggregated feature counts plus language metadata.
+ * Primary key is (repo_id, file_path) — upserted on every pipeline run.
+ * Used by fix-recommender for graph expansion and cluster summary enrichment.
+ */
+export const astFileFeatures = pgTable('ast_file_features', {
+  repoId:        text('repo_id').notNull().default('default'),
+  filePath:      text('file_path').notNull(),
+  language:      text('language'),        // typescript | python | go | rust | svelte | …
+  extension:     text('extension'),       // .ts | .py | .go | …
+  importCount:   integer('import_count').notNull().default(0),
+  exportCount:   integer('export_count').notNull().default(0),
+  functionCount: integer('function_count').notNull().default(0),
+  classCount:    integer('class_count').notNull().default(0),
+  callCount:     integer('call_count').notNull().default(0),
+  semanticTags:  text('semantic_tags').array().notNull().default(sql`ARRAY[]::text[]`),
+  domain:        text('domain'),           // api | server | client | route | component | migration
+  /** 'ts-morph' | 'heuristic' — which extractor produced this row */
+  parser:        text('parser').notNull().default('heuristic'),
+  /** gpu_cluster, som_cluster, and any ast_features dict */
+  metadata:      jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+  updatedAt:     timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  primaryKey({ columns: [t.repoId, t.filePath] }),
+  index('ast_file_features_lang_idx').on(t.language),
+  index('ast_file_features_domain_idx').on(t.domain),
+]);
+
+export type AstNode          = typeof astNodes.$inferSelect;
+export type NewAstNode       = typeof astNodes.$inferInsert;
+export type AstEdge          = typeof astEdges.$inferSelect;
+export type NewAstEdge       = typeof astEdges.$inferInsert;
+export type AstFileFeature   = typeof astFileFeatures.$inferSelect;
+export type NewAstFileFeature = typeof astFileFeatures.$inferInsert;
 

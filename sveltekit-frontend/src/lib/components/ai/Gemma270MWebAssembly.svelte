@@ -372,7 +372,7 @@
 						Select Image
 						<input type="file" class="hidden-input" accept="image/*" onchange={handleFileInput} />
 					</label>
-					<p class="drop-formats">PNG, JPG, TIFF, WebP, BMP (max 50MB)</p>
+					<p class="drop-formats">PNG: JPG, TIFF: WebP, BMP (max 50MB)</p>
 				</div>
 			{:else}
 				<div class="preview-container">

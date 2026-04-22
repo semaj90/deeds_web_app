@@ -1,4 +1,4 @@
-<!-- Enhanced File Upload with Real OCR, Embeddings, and Database Integration -->
+<!-- Enhanced File Upload with Real OCR: Embeddings, and Database Integration -->
 <script lang="ts">
 	import type { Document } from '$lib/types';
 	import { createUploadMachine } from '$lib/machines/uploadMachine';
@@ -344,7 +344,7 @@
 		<label for="file-input" class="upload-label">
 			<span class="i-lucide-upload w-12 h-12 mb-4 inline-block"></span>
 			<p class="text-lg">Drop files here or click to upload</p>
-			<p class="text-sm text-sand/60">Supports: PDF, DOCX, TXT, Images with real OCR processing</p>
+			<p class="text-sm text-sand/60">Supports: PDF: DOCX: TXT, Images with real OCR processing</p>
 			<p class="text-xs text-sand/40">Max size: {formatFileSize(maxSize)}</p>
 		</label>
 	</div>

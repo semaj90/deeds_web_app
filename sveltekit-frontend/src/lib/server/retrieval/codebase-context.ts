@@ -24,6 +24,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithGemma4 } from './cross-encoder-reranker.js';
+import { logRagHitWithTopology } from '$lib/server/indexer/ast-ingest-logger.js';
 import {
   getCachedEmbedding,
   getCachedSearchResults,
@@ -48,7 +49,16 @@ export interface ChunkMetadata {
   signature: string;
   lineStart: number;
   lineEnd: number;
+  qdrantId?: string | number;
 }
+
+export type RetrievalCaller =
+  | 'fix-recommender'
+  | 'ace-wiki'
+  | 'sse-chat'
+  | 'tool-loop'
+  | 'deep-research'
+  | string;
 
 export interface RankedChunk {
   path: string;
@@ -63,6 +73,7 @@ export interface RankedChunk {
   score: number;
   lineStart: number;
   lineEnd: number;
+  qdrantId?: string | number;
   // neo4j enriched fields
   gpuCluster?: number | null;
   pageRankScore?: number | null;
@@ -72,6 +83,7 @@ export interface RankedChunk {
   somBmuRow?: number | null;
   somBmuCol?: number | null;
   authorityScore?: number;
+  language?: string | null;
 }
 
 // -- Module-level Fuse.js metadata cache -------------------------------------
@@ -174,6 +186,7 @@ export async function searchByCluster(
 ): Promise<RankedChunk[]> {
   const res = await rerankChunks(query, {
     limit,
+    caller: 'search-by-cluster',
     filter: {
       should: [
         { key: 'neo4j_gpuCluster', match: { value: clusterId } },
@@ -303,6 +316,10 @@ export interface RerankOptions {
   errorQuery?: string;
   /** Optional Qdrant filter to restrict the search space (e.g. for cluster-scoped queries). */
   filter?: Record<string, unknown>;
+  /** Caller label — propagated into ingest-log rag_hit events for tracing. */
+  caller?: RetrievalCaller;
+  includeClusterSummary?: boolean;
+  includeTopologyContext?: boolean;
 }
 
 export interface RerankResult {
@@ -315,6 +332,16 @@ export interface RerankResult {
     errorResults: number;
     merged: number;
     returned: number;
+  };
+  clusterSummary?: {
+    gpuClusters: number[];
+    somClusters: number[];
+    semanticTags: string[];
+    relativePaths: string[];
+  };
+  topologyContext?: {
+    graphRegions: string[];
+    hyperEdges: string[];
   };
 }
 
@@ -362,11 +389,11 @@ export async function rerankChunks(
   ]);
   const searchMs = performance.now() - searchStart;
 
-  const scoreMap = new Map<string, { payload: Record<string, unknown>; score: number }>();
+  const scoreMap = new Map<string, { payload: Record<string, unknown>; score: number; id: string | number }>();
 
   for (const r of contentResults) {
     const key = String(r.id);
-    scoreMap.set(key, { payload: r.payload, score: r.score * contentWeight });
+    scoreMap.set(key, { payload: r.payload, score: r.score * contentWeight, id: r.id });
   }
 
   for (const r of signatureResults) {
@@ -375,7 +402,7 @@ export async function rerankChunks(
     if (existing) {
       existing.score += r.score * signatureWeight;
     } else {
-      scoreMap.set(key, { payload: r.payload, score: r.score * signatureWeight });
+      scoreMap.set(key, { payload: r.payload, score: r.score * signatureWeight, id: r.id });
     }
   }
 
@@ -388,7 +415,7 @@ export async function rerankChunks(
     if (existing) {
       existing.score += r.score * errorWeight;
     } else {
-      scoreMap.set(key, { payload: r.payload, score: r.score * errorWeight });
+      scoreMap.set(key, { payload: r.payload, score: r.score * errorWeight, id: r.id });
     }
   }
 
@@ -429,14 +456,67 @@ export async function rerankChunks(
       score: Math.round(r.score * 1000) / 1000,
       lineStart: p.lineStart as number,
       lineEnd: p.lineEnd as number,
+      qdrantId: String(r.id),
       gpuCluster,
       pageRankScore,
       routeType: (p.routeType as string | null) ?? null,
       hasAuthGuard: (p.hasAuthGuard as boolean | null) ?? null,
       somBmuRow: numPayload(p, 'som_bmu_row'),
       somBmuCol: numPayload(p, 'som_bmu_col'),
+      language: (p.language as string | null) ?? null,
     };
   });
+
+  // ── populate summaries ──
+  let clusterSummary: RerankResult['clusterSummary'] | undefined;
+  if (options.includeClusterSummary) {
+    clusterSummary = {
+      gpuClusters: [...new Set(results.map(r => r.gpuCluster).filter((c): c is number => c != null))],
+      somClusters: [...new Set(results.map(r => r.somCluster).filter((c): c is number => c != null))],
+      semanticTags: [...new Set(results.flatMap(r => r.tags))],
+      relativePaths: [...new Set(results.map(r => r.relativePath))],
+    };
+  }
+
+  let topologyContext: RerankResult['topologyContext'] | undefined;
+  if (options.includeTopologyContext) {
+    // Stub for future graph region detection
+    topologyContext = {
+      graphRegions: [],
+      hyperEdges: [],
+    };
+  }
+
+  // ── ingest logger ──────────────────────────────────────────────────────────
+  try {
+    const vectorLanes: ('content' | 'signature' | 'error')[] = ['content', 'signature'];
+    if (options.errorQuery) vectorLanes.push('error');
+    logRagHitWithTopology({
+      query,
+      topHits: results.slice(0, 3).map((r) => ({
+        relativePath: r.relativePath,
+        symbol: r.symbol,
+        score: r.score,
+        gpuCluster: r.gpuCluster ?? null,
+        kind: r.kind,
+        qdrantId: r.qdrantId,
+        somCluster: r.somCluster ?? null,
+      })),
+      returned: results.length,
+      vectorLanes,
+      embedMs: Math.round(embedMs),
+      searchMs: Math.round(searchMs),
+      totalMs: Math.round(totalMs),
+      caller: options.caller,
+      gpuClusters: clusterSummary?.gpuClusters ?? [],
+      somClusters: clusterSummary?.somClusters ?? [],
+      semanticTags: clusterSummary?.semanticTags ?? [],
+      relativePaths: results.map(r => r.relativePath),
+      qdrantIds: results.map(r => String(r.qdrantId)),
+    });
+  } catch {
+    // logging is non-fatal
+  }
 
   return {
     results,
@@ -453,6 +533,8 @@ export async function rerankChunks(
       merged: scoreMap.size,
       returned: results.length,
     },
+    clusterSummary,
+    topologyContext,
   };
 }
 
@@ -473,7 +555,11 @@ export async function loadCodebaseContext(query: string): Promise<{
     if (goodCandidates.length === 0) return null;
 
     const candidatePaths = goodCandidates.map((c) => c.path);
-    const multiVectorResult = await rerankChunks(query, { candidatePaths, limit: 12 });
+    const multiVectorResult = await rerankChunks(query, {
+      candidatePaths,
+      limit: 12,
+      caller: 'codebase-context-multi-vector',
+    });
 
     if (multiVectorResult.results.length === 0) return null;
 

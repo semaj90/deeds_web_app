@@ -63,7 +63,7 @@ async function handleCodebaseSearch(args: Record<string, unknown>): Promise<unkn
 
   try {
     const { rerankChunks } = await import('$lib/server/retrieval/codebase-context.js');
-    const reranked = await rerankChunks(query, { limit });
+    const reranked = await rerankChunks(query, { limit, caller: 'tool-loop' });
     return {
       results: reranked.results.slice(0, limit).map((r) => ({
         filePath: r.relativePath ?? r.path ?? 'unknown',

@@ -36,6 +36,37 @@ class AgentOrchestrator {
             {
                 type: 'function',
                 function: {
+                    name: 'github_search',
+                    description: 'Search GitHub for issues, pull requests, and code. Use for deep technical research.',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            query: { type: 'string', description: 'Search query' },
+                            search_type: { type: 'string', enum: ['issues', 'code', 'repositories'], description: 'Type of search (default: issues)' },
+                            limit: { type: 'integer', description: 'Max results to return (max 10)' }
+                        },
+                        required: ['query']
+                    }
+                }
+            },
+            {
+                type: 'function',
+                function: {
+                    name: 'reddit_search',
+                    description: 'Search Reddit for community discussions and unofficial workarounds.',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            query: { type: 'string', description: 'Search query' },
+                            limit: { type: 'integer', description: 'Max results to return (max 10)' }
+                        },
+                        required: ['query']
+                    }
+                }
+            },
+            {
+                type: 'function',
+                function: {
                     name: 'kb_vector_search',
                     description: 'Search the knowledge base using vector similarity',
                     parameters: {
@@ -418,12 +449,14 @@ class AgentOrchestrator {
         for (const attempt of attempts) {
             try {
                 const response = await fetch(attempt.url, attempt.init);
-                const payload = await attempt.parser(response);
-
                 if (!response.ok) {
+                    const text = await response.text();
+                    console.log(`   ⚠️ Endpoint ${attempt.candidateName} returned ${response.status}: ${text.substring(0, 200)}`);
                     failures.push(`${attempt.kind}:${attempt.candidateName}:${response.status}`);
                     continue;
                 }
+
+                const payload = await attempt.parser(response);
 
                 if (payload?.success === false) {
                     failures.push(`${attempt.kind}:${attempt.candidateName}:${payload.error || 'execution failed'}`);
@@ -459,7 +492,8 @@ class AgentOrchestrator {
         for (const call of toolCalls) {
             const toolId = call.id || 'unknown';
             const toolName = call.function?.name || '';
-            const args = JSON.parse(call.function?.arguments || '{}');
+            const rawArgs = call.function?.arguments || '{}';
+            const args = typeof rawArgs === 'string' ? JSON.parse(rawArgs) : rawArgs;
 
             console.log(`   🔧 Calling ${toolName}...`);
 
@@ -479,7 +513,7 @@ class AgentOrchestrator {
                     `   ✅ ${toolName} succeeded via ${execution.endpointKind} (${execution.candidateName})`
                   );
                 } else {
-                  console.log(`   ❌ ${toolName} failed across all configured tool endpoints`);
+                  console.log(`   ❌ ${toolName} failed across all configured tool endpoints:`, execution.result.attempts);
                 }
 
                 results.push({
@@ -532,7 +566,9 @@ class AgentOrchestrator {
 }
 
 // CLI for testing
-if (process.argv[1] === new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1')) {
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] && (process.argv[1] === __filename || process.argv[1].endsWith('agent-orchestrator.mjs'))) {
     const backend = process.argv[2] || 'ollama';
     const query = process.argv.slice(3).join(' ') || 'Search for TypeScript 5.7 features and summarize';
 

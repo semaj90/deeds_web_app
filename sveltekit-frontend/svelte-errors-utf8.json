@@ -1,0 +1,200 @@
+﻿Loading svelte-check in workspace: c:\Users\james\Videos\deeds-web-app\sveltekit-frontend
+Getting Svelte diagnostics...
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\server\indexer\ast-chunker.ts[39m:298:23
+[31mError[39m: Argument of type 'Promise<WorkspaceFileMetadata>' is not assignable to parameter of type 'WorkspaceFileMetadata'.
+  Type 'Promise<WorkspaceFileMetadata>' is missing the following properties from type 'WorkspaceFileMetadata': repoId, relativePath, language, extension, and 17 more. 
+[36m			const meta = extractMetadata(fp, { repoRoot: rootDir, content: sourceFile.getText() });
+			persistFileFeature([35mmeta[36m).catch(() => {});
+		} catch (err) {[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\server\retrieval\codebase-context.ts[39m:459:26
+[31mError[39m: Property 'id' does not exist on type '{ payload: Record<string, unknown>; score: number; }'. 
+[36m      lineEnd: p.lineEnd as number,
+      qdrantId: String(r.[35mid[36m),
+      gpuCluster,[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\server\codeintel\fix-recommender.ts[39m:94:23
+[31mError[39m: Cannot find name 'RerankResult'. 
+[36m  let searchResults: SearchHit[] = [];
+  let clusterSummary: [35mRerankResult[36m['clusterSummary'] | undefined;
+  let topologyContext: RerankResult['topologyContext'] | undefined;[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\server\codeintel\fix-recommender.ts[39m:95:24
+[31mError[39m: Cannot find name 'RerankResult'. 
+[36m  let clusterSummary: RerankResult['clusterSummary'] | undefined;
+  let topologyContext: [35mRerankResult[36m['topologyContext'] | undefined;[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\SimpleWorkingChat.svelte[39m:11:24
+[31mError[39m: Unexpected token
+https://svelte.dev/e/js_parse_error
+
+If you expect this syntax to work, here are some suggestions: 
+If you use typescript with `svelte-preprocess`, did you add `lang="ts"` to your `script` tag? 
+Did you setup a `svelte.config.js`? 
+See https://github.com/sveltejs/language-tools/tree/master/docs#using-with-preprocessors for more info. (svelte)
+[36m	import { ttsService } from '$lib/services/tts.js';
+	import { voiceCommands[35m[36m: COMMAND_PATTERNS, type CommandFeedback } from '$lib/services/voice-commands.js';[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\SimpleWorkingChat.svelte[39m:11:24
+[31mError[39m: ',' expected. (ts)
+[36m	import { ttsService } from '$lib/services/tts.js';
+	import { voiceCommands[35m:[36m COMMAND_PATTERNS, type CommandFeedback } from '$lib/services/voice-commands.js';[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\AIStatusIndicator.svelte[39m:212:2
+[31mError[39m: at-rule or selector expected (css)
+[36m		font-size: 0.75rem;
+	[35m}[36m[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\AIStatusIndicator.svelte[39m:206:44
+[31mError[39m: semi-colon expected (css)
+[36m	.model-name {
+		font-family: ui-monospace, SFMono-Regular[35m:[36m Menlo: Monaco, 'Roboto Mono', 'Courier New', monospace;
+		background: var(--bg-muted, #f1f5f9);[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\AIStatusIndicator.svelte[39m:207:13
+[31mError[39m: { expected (css)
+[36m		font-family: ui-monospace, SFMono-Regular: Menlo: Monaco, 'Roboto Mono', 'Courier New', monospace;
+		background[35m:[36m var(--bg-muted, #f1f5f9);
+		padding: 1px 6px;[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\AIStatusIndicator.svelte[39m:208:10
+[31mError[39m: { expected (css)
+[36m		background: var(--bg-muted, #f1f5f9);
+		padding[35m:[36m 1px 6px;
+		border-radius: 4px;[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\AIStatusIndicator.svelte[39m:209:16
+[31mError[39m: { expected (css)
+[36m		padding: 1px 6px;
+		border-radius[35m:[36m 4px;
+		color: var(--text-primary, #1e293b);[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\AIStatusIndicator.svelte[39m:210:8
+[31mError[39m: { expected (css)
+[36m		border-radius: 4px;
+		color[35m:[36m var(--text-primary, #1e293b);
+		font-size: 0.75rem;[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\AIStatusIndicator.svelte[39m:211:12
+[31mError[39m: { expected (css)
+[36m		color: var(--text-primary, #1e293b);
+		font-size[35m:[36m 0.75rem;
+	}[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\ClientSideAIChat.svelte[39m:268:3
+[31mError[39m: at-rule or selector expected (css)
+[36m    z-index: 50;
+  [35m}[36m
+  .client-ai-chat.collapsed {[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\ClientSideAIChat.svelte[39m:265:55
+[31mError[39m: semi-colon expected (css)
+[36m  .client-ai-chat {
+    font-family: 'Inter', ui-monospace, SFMono-Regular[35m:[36m Menlo, Monaco: Consolas, "Liberation Mono", "Courier New", monospace;
+    width: 320px;[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\ClientSideAIChat.svelte[39m:266:10
+[31mError[39m: { expected (css)
+[36m    font-family: 'Inter', ui-monospace, SFMono-Regular: Menlo, Monaco: Consolas, "Liberation Mono", "Courier New", monospace;
+    width[35m:[36m 320px;
+    z-index: 50;[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\ClientSideAIChat.svelte[39m:267:12
+[31mError[39m: { expected (css)
+[36m    width: 320px;
+    z-index[35m:[36m 50;
+  }[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\ContextualChatDemo.svelte[39m:11:31
+[31mError[39m: Unexpected token
+https://svelte.dev/e/js_parse_error
+
+If you expect this syntax to work, here are some suggestions: 
+If you use typescript with `svelte-preprocess`, did you add `lang="ts"` to your `script` tag? 
+Did you setup a `svelte.config.js`? 
+See https://github.com/sveltejs/language-tools/tree/master/docs#using-with-preprocessors for more info. (svelte)
+[36m<script lang="ts">
+	import type { ContextualState[35m[36m: NextStepPrediction,
+		LegalEntity: ConversationTurn } from '$lib/types/sharedTypes';[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\ContextualChatDemo.svelte[39m:11:31
+[31mError[39m: ',' expected. (ts)
+[36m<script lang="ts">
+	import type { ContextualState[35m:[36m NextStepPrediction,
+		LegalEntity: ConversationTurn } from '$lib/types/sharedTypes';[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\ContextualChatDemo.svelte[39m:12:14
+[31mError[39m: ',' expected. (ts)
+[36m	import type { ContextualState: NextStepPrediction,
+		LegalEntity[35m:[36m ConversationTurn } from '$lib/types/sharedTypes';[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\EnhancedAIChatTest.svelte[39m:3:20
+[31mError[39m: Unexpected token
+https://svelte.dev/e/js_parse_error
+
+If you expect this syntax to work, here are some suggestions: 
+If you use typescript with `svelte-preprocess`, did you add `lang="ts"` to your `script` tag? 
+Did you setup a `svelte.config.js`? 
+See https://github.com/sveltejs/language-tools/tree/master/docs#using-with-preprocessors for more info. (svelte)
+[36m<script lang="ts">
+	import type { Case[35m[36m: User } from '$lib/types';
+	import type { Document } from '$lib/types';[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\EnhancedAIChatTest.svelte[39m:3:20
+[31mError[39m: ',' expected. (ts)
+[36m<script lang="ts">
+	import type { Case[35m:[36m User } from '$lib/types';
+	import type { Document } from '$lib/types';[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\EnhancedAIChatTest.svelte[39m:7:21
+[31mError[39m: ',' expected. (ts)
+[36m	import { tick } from 'svelte';
+	import { DialogRoot[35m:[36m DialogTrigger, DialogPortal: DialogOverlay, DialogContent: DialogTitle, DialogClose } from "$lib/components/ui/dialog";
+import Button from "$lib/components/ui/Button.svelte";[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\EnhancedAIChatTest.svelte[39m:7:50
+[31mError[39m: ',' expected. (ts)
+[36m	import { tick } from 'svelte';
+	import { DialogRoot: DialogTrigger, DialogPortal[35m:[36m DialogOverlay, DialogContent: DialogTitle, DialogClose } from "$lib/components/ui/dialog";
+import Button from "$lib/components/ui/Button.svelte";[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\EnhancedAIChatTest.svelte[39m:7:80
+[31mError[39m: ',' expected. (ts)
+[36m	import { tick } from 'svelte';
+	import { DialogRoot: DialogTrigger, DialogPortal: DialogOverlay, DialogContent[35m:[36m DialogTitle, DialogClose } from "$lib/components/ui/dialog";
+import Button from "$lib/components/ui/Button.svelte";[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\Gemma270MWebAssembly.svelte[39m:8:25
+[31mError[39m: Unexpected token
+https://svelte.dev/e/js_parse_error
+
+If you expect this syntax to work, here are some suggestions: 
+If you use typescript with `svelte-preprocess`, did you add `lang="ts"` to your `script` tag? 
+Did you setup a `svelte.config.js`? 
+See https://github.com/sveltejs/language-tools/tree/master/docs#using-with-preprocessors for more info. (svelte)
+[36m	import {
+		CLIENT_EMBEDDING_MODEL[35m[36m: CLIENT_EMBEDDING_DIMS,
+		CLIENT_EMBEDDING_ONNX_PATH: CLIENT_LLM_MODEL,[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\Gemma270MWebAssembly.svelte[39m:8:25
+[31mError[39m: ',' expected. (ts)
+[36m	import {
+		CLIENT_EMBEDDING_MODEL[35m:[36m CLIENT_EMBEDDING_DIMS,
+		CLIENT_EMBEDDING_ONNX_PATH: CLIENT_LLM_MODEL,[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\Gemma270MWebAssembly.svelte[39m:9:29
+[31mError[39m: ',' expected. (ts)
+[36m		CLIENT_EMBEDDING_MODEL: CLIENT_EMBEDDING_DIMS,
+		CLIENT_EMBEDDING_ONNX_PATH[35m:[36m CLIENT_LLM_MODEL,
+		SERVER_EMBEDDING_MODEL: ONNX_EXECUTION_PROVIDERS[39m
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\lib\components\ai\Gemma270MWebAssembly.svelte[39m:10:25
+[31mError[39m: ',' expected. (ts)
+[36m		CLIENT_EMBEDDING_ONNX_PATH: CLIENT_LLM_MODEL,
+		SERVER_EMBEDDING_MODEL[35m:[36m ONNX_EXECUTION_PROVIDERS
+	} from '$lib/ai/model-ids.js';[39m
+
+====================================
+[31msvelte-check found 29 errors and 0 warnings in 9 files
+[39m

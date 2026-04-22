@@ -13,7 +13,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
-import { loadCodebaseContext, rerankChunks } from '$lib/server/retrieval/codebase-context.js';
+import { loadCodebaseContext, rerankChunks, type RerankResult } from '$lib/server/retrieval/codebase-context.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
@@ -90,15 +90,23 @@ export async function getFixRecommendations(req: FixRecommendRequest): Promise<F
   // ── Step 1: Build search query from error + context ───────────────────────
   const searchQuery = buildSearchQuery(req);
 
-  // ── Step 2: Semantic search via Stage C (Pointwise Cross-Encoder) ──────────
   let searchResults: SearchHit[] = [];
+  let clusterSummary: RerankResult['clusterSummary'] | undefined;
+  let topologyContext: RerankResult['topologyContext'] | undefined;
+  
   try {
     const reranked = await rerankChunks(searchQuery, {
       limit: 15,
       contentWeight: 0.6,
       signatureWeight: 0.4,
+      caller: 'fix-recommender',
+      includeClusterSummary: true,
+      includeTopologyContext: true,
     });
-    
+
+    clusterSummary = reranked.clusterSummary;
+    topologyContext = reranked.topologyContext;
+
     searchResults = reranked.results.map((r) => ({
       filePath: r.relativePath,
       content: r.content,
@@ -201,6 +209,22 @@ export async function getFixRecommendations(req: FixRecommendRequest): Promise<F
 
   // ── Step 5: Build structured prompt ──────────────────────────────────────
   const chunksUsed = searchResults.slice(0, 8);
+  
+  // Apply language-aware boost stub as requested
+  for (const hit of chunksUsed) {
+    hit.score = applyLanguageAwareBoost(hit, req.filePath);
+  }
+  chunksUsed.sort((a, b) => b.score - a.score);
+
+  // Context envelope for logging and future logic
+  const contextEnvelope = {
+    query: searchQuery,
+    caller: 'fix-recommender',
+    hits: chunksUsed,
+    clusterSummary: clusterSummary ?? null,
+    topologyContext: topologyContext ?? null,
+  };
+
   const systemPrompt = buildSystemPrompt(req, chunksUsed, clusterContext, topK);
 
   // ── Step 6: Call Gemma4 ───────────────────────────────────────────────────
@@ -307,6 +331,20 @@ function applyKarpathyTagBoost(hits: SearchHit[], errorText: string): void {
     const overlap = (hit.semanticTags ?? []).filter((t) => matchingTags.has(t)).length;
     if (overlap > 0) hit.score += Math.min(overlap * 0.08, 0.24);
   }
+}
+
+/** Lightweight language-aware score boost as requested in the Phase 89 plan */
+function applyLanguageAwareBoost(hit: SearchHit, activeFile?: string): number {
+  if (!activeFile) return hit.score;
+  const activeExt = activeFile.split('.').pop();
+  const hitExt = hit.filePath.split('.').pop();
+  
+  let score = hit.score;
+  // Same-extension boost
+  if (activeExt && hitExt && activeExt === hitExt) {
+    score *= 1.05;
+  }
+  return Math.min(1.0, score);
 }
 
 function buildSearchQuery(req: FixRecommendRequest): string {

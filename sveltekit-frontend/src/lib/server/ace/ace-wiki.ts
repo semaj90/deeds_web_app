@@ -25,6 +25,7 @@ export interface AceWikiRequest {
 	clusterIds?: number[];
 	maxWords?: number;
 	task?: 'explain' | 'troubleshoot' | 'overview' | 'deep-dive';
+	useTools?: boolean;
 }
 
 export interface AceWikiSection {
@@ -211,6 +212,9 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
 		maxTokens: 1400,
 		systemPromptOverride,
 		responseSchema: WIKI_RESPONSE_SCHEMA,
+		lane: 'interactive-agent' as any, // Use Lane 1
+		taskType: 'wiki-generation',
+		useTools: req.useTools,
 	});
 
 	if (!llmResult.ok) {

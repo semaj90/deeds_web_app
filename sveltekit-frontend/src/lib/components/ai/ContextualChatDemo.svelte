@@ -8,8 +8,7 @@
   - Redis contextual caching
 -->
 <script lang="ts">
-	import type { ContextualState, NextStepPrediction,
-		LegalEntity, ConversationTurn } from '$lib/types/sharedTypes';
+	import type { ContextualState, LegalEntity, ConversationTurn, NextStepPrediction } from '$lib/types/sharedTypes';
 
 	interface Props {
 		sessionId?: string;

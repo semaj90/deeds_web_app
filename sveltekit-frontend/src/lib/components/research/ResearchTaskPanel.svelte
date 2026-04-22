@@ -64,6 +64,10 @@
 		return '#a8a29e';
 	}
 
+	function providerLabel(provider: string): string {
+		return provider === 'google' ? 'GOOGLE' : 'OLLAMA';
+	}
+
 	async function handleRun(id: string) {
 		if (!isAuthenticated) { onNeedsAuth?.(); return; }
 		await researchTasks.runTask(id, isAuthenticated);
@@ -153,6 +157,7 @@
 										{task.status}
 									</span>
 									<span class="rtp-task-time">{formatTime(task.createdAt)}</span>
+									<span class="rtp-provider">{providerLabel(task.provider)}</span>
 									<span class="rtp-pipeline">{task.pipelineHint.toUpperCase()}</span>
 								</div>
 
@@ -170,7 +175,7 @@
 
 									{#if activeTaskId === task.id}
 										<div class="rtp-result">
-											<div class="rtp-result-meta">{task.result.pipeline.toUpperCase()} · {task.result.durationMs}ms</div>
+											<div class="rtp-result-meta">{providerLabel(task.provider)} · {task.result.pipeline.toUpperCase()} · {task.result.durationMs}ms</div>
 											<div class="rtp-result-text">{task.result.answer}</div>
 											<div class="rtp-result-links">
 												<a href="/analytics#deep-research" class="rtp-open-link" onclick={toggle}>
@@ -194,7 +199,7 @@
 								{#if task.status === 'running'}
 									<div class="rtp-running">
 										<span class="rtp-spinner"></span>
-										Researching via Ollama…
+										Researching via {task.provider === 'google' ? 'Google Deep Research' : 'Ollama'}…
 									</div>
 								{/if}
 							</div>
@@ -465,6 +470,15 @@
 	}
 
 	.rtp-task-time { color: #57534e; }
+
+	.rtp-provider {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.6rem;
+		color: #60a5fa;
+		background: rgba(96, 165, 250, 0.08);
+		padding: 0.1rem 0.3rem;
+		border-radius: 3px;
+	}
 
 	.rtp-pipeline {
 		font-family: 'JetBrains Mono', monospace;

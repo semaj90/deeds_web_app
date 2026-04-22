@@ -19,11 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	RetrievalService_SearchEvidence_FullMethodName = "/yorha.retrieval.RetrievalService/SearchEvidence"
-	RetrievalService_StreamEvidence_FullMethodName = "/yorha.retrieval.RetrievalService/StreamEvidence"
-	RetrievalService_SearchCodebase_FullMethodName = "/yorha.retrieval.RetrievalService/SearchCodebase"
-	RetrievalService_StreamCodebase_FullMethodName = "/yorha.retrieval.RetrievalService/StreamCodebase"
-	RetrievalService_Health_FullMethodName         = "/yorha.retrieval.RetrievalService/Health"
+	RetrievalService_SearchEvidence_FullMethodName     = "/yorha.retrieval.RetrievalService/SearchEvidence"
+	RetrievalService_StreamEvidence_FullMethodName     = "/yorha.retrieval.RetrievalService/StreamEvidence"
+	RetrievalService_SearchCodebase_FullMethodName     = "/yorha.retrieval.RetrievalService/SearchCodebase"
+	RetrievalService_StreamCodebase_FullMethodName     = "/yorha.retrieval.RetrievalService/StreamCodebase"
+	RetrievalService_SearchChunks_FullMethodName       = "/yorha.retrieval.RetrievalService/SearchChunks"
+	RetrievalService_GetClusterSummary_FullMethodName  = "/yorha.retrieval.RetrievalService/GetClusterSummary"
+	RetrievalService_ExpandAstNeighbors_FullMethodName = "/yorha.retrieval.RetrievalService/ExpandAstNeighbors"
+	RetrievalService_GetTopologyContext_FullMethodName = "/yorha.retrieval.RetrievalService/GetTopologyContext"
+	RetrievalService_Health_FullMethodName             = "/yorha.retrieval.RetrievalService/Health"
 )
 
 // RetrievalServiceClient is the client API for RetrievalService service.
@@ -38,6 +42,14 @@ type RetrievalServiceClient interface {
 	SearchCodebase(ctx context.Context, in *CodebaseSearchRequest, opts ...grpc.CallOption) (*CodebaseSearchResponse, error)
 	// Streaming: progressive codebase chunk delivery
 	StreamCodebase(ctx context.Context, in *CodebaseSearchRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[CodebaseChunkEvent], error)
+	// Unary: generic chunk search (Lane 1/2 optimized)
+	SearchChunks(ctx context.Context, in *SearchChunksRequest, opts ...grpc.CallOption) (*SearchChunksResponse, error)
+	// Unary: GPU/SOM cluster summary lookup
+	GetClusterSummary(ctx context.Context, in *ClusterSummaryRequest, opts ...grpc.CallOption) (*ClusterSummaryResponse, error)
+	// Unary: AST neighbor expansion
+	ExpandAstNeighbors(ctx context.Context, in *AstExpansionRequest, opts ...grpc.CallOption) (*AstExpansionResponse, error)
+	// Unary: SOM/Topology neighborhood expansion
+	GetTopologyContext(ctx context.Context, in *TopologyRequest, opts ...grpc.CallOption) (*TopologyResponse, error)
 	// Health check: pgvector, Qdrant, Redis, embedding service
 	Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error)
 }
@@ -108,6 +120,46 @@ func (c *retrievalServiceClient) StreamCodebase(ctx context.Context, in *Codebas
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type RetrievalService_StreamCodebaseClient = grpc.ServerStreamingClient[CodebaseChunkEvent]
 
+func (c *retrievalServiceClient) SearchChunks(ctx context.Context, in *SearchChunksRequest, opts ...grpc.CallOption) (*SearchChunksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SearchChunksResponse)
+	err := c.cc.Invoke(ctx, RetrievalService_SearchChunks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *retrievalServiceClient) GetClusterSummary(ctx context.Context, in *ClusterSummaryRequest, opts ...grpc.CallOption) (*ClusterSummaryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ClusterSummaryResponse)
+	err := c.cc.Invoke(ctx, RetrievalService_GetClusterSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *retrievalServiceClient) ExpandAstNeighbors(ctx context.Context, in *AstExpansionRequest, opts ...grpc.CallOption) (*AstExpansionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AstExpansionResponse)
+	err := c.cc.Invoke(ctx, RetrievalService_ExpandAstNeighbors_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *retrievalServiceClient) GetTopologyContext(ctx context.Context, in *TopologyRequest, opts ...grpc.CallOption) (*TopologyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TopologyResponse)
+	err := c.cc.Invoke(ctx, RetrievalService_GetTopologyContext_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *retrievalServiceClient) Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(HealthResponse)
@@ -130,6 +182,14 @@ type RetrievalServiceServer interface {
 	SearchCodebase(context.Context, *CodebaseSearchRequest) (*CodebaseSearchResponse, error)
 	// Streaming: progressive codebase chunk delivery
 	StreamCodebase(*CodebaseSearchRequest, grpc.ServerStreamingServer[CodebaseChunkEvent]) error
+	// Unary: generic chunk search (Lane 1/2 optimized)
+	SearchChunks(context.Context, *SearchChunksRequest) (*SearchChunksResponse, error)
+	// Unary: GPU/SOM cluster summary lookup
+	GetClusterSummary(context.Context, *ClusterSummaryRequest) (*ClusterSummaryResponse, error)
+	// Unary: AST neighbor expansion
+	ExpandAstNeighbors(context.Context, *AstExpansionRequest) (*AstExpansionResponse, error)
+	// Unary: SOM/Topology neighborhood expansion
+	GetTopologyContext(context.Context, *TopologyRequest) (*TopologyResponse, error)
 	// Health check: pgvector, Qdrant, Redis, embedding service
 	Health(context.Context, *HealthRequest) (*HealthResponse, error)
 	mustEmbedUnimplementedRetrievalServiceServer()
@@ -153,6 +213,18 @@ func (UnimplementedRetrievalServiceServer) SearchCodebase(context.Context, *Code
 }
 func (UnimplementedRetrievalServiceServer) StreamCodebase(*CodebaseSearchRequest, grpc.ServerStreamingServer[CodebaseChunkEvent]) error {
 	return status.Error(codes.Unimplemented, "method StreamCodebase not implemented")
+}
+func (UnimplementedRetrievalServiceServer) SearchChunks(context.Context, *SearchChunksRequest) (*SearchChunksResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SearchChunks not implemented")
+}
+func (UnimplementedRetrievalServiceServer) GetClusterSummary(context.Context, *ClusterSummaryRequest) (*ClusterSummaryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetClusterSummary not implemented")
+}
+func (UnimplementedRetrievalServiceServer) ExpandAstNeighbors(context.Context, *AstExpansionRequest) (*AstExpansionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ExpandAstNeighbors not implemented")
+}
+func (UnimplementedRetrievalServiceServer) GetTopologyContext(context.Context, *TopologyRequest) (*TopologyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTopologyContext not implemented")
 }
 func (UnimplementedRetrievalServiceServer) Health(context.Context, *HealthRequest) (*HealthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
@@ -236,6 +308,78 @@ func _RetrievalService_StreamCodebase_Handler(srv interface{}, stream grpc.Serve
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type RetrievalService_StreamCodebaseServer = grpc.ServerStreamingServer[CodebaseChunkEvent]
 
+func _RetrievalService_SearchChunks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchChunksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RetrievalServiceServer).SearchChunks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RetrievalService_SearchChunks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RetrievalServiceServer).SearchChunks(ctx, req.(*SearchChunksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RetrievalService_GetClusterSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClusterSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RetrievalServiceServer).GetClusterSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RetrievalService_GetClusterSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RetrievalServiceServer).GetClusterSummary(ctx, req.(*ClusterSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RetrievalService_ExpandAstNeighbors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AstExpansionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RetrievalServiceServer).ExpandAstNeighbors(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RetrievalService_ExpandAstNeighbors_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RetrievalServiceServer).ExpandAstNeighbors(ctx, req.(*AstExpansionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RetrievalService_GetTopologyContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TopologyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RetrievalServiceServer).GetTopologyContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RetrievalService_GetTopologyContext_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RetrievalServiceServer).GetTopologyContext(ctx, req.(*TopologyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RetrievalService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HealthRequest)
 	if err := dec(in); err != nil {
@@ -268,6 +412,22 @@ var RetrievalService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchCodebase",
 			Handler:    _RetrievalService_SearchCodebase_Handler,
+		},
+		{
+			MethodName: "SearchChunks",
+			Handler:    _RetrievalService_SearchChunks_Handler,
+		},
+		{
+			MethodName: "GetClusterSummary",
+			Handler:    _RetrievalService_GetClusterSummary_Handler,
+		},
+		{
+			MethodName: "ExpandAstNeighbors",
+			Handler:    _RetrievalService_ExpandAstNeighbors_Handler,
+		},
+		{
+			MethodName: "GetTopologyContext",
+			Handler:    _RetrievalService_GetTopologyContext_Handler,
 		},
 		{
 			MethodName: "Health",

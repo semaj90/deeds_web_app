@@ -103,8 +103,11 @@ async function qdrantScroll(collection: string, limit: number, filter?: Record<s
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(15_000),
-  }).catch(() => null);
-  if (!res?.ok) return [];
+  });
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => 'Unknown error');
+    throw new Error(`[qdrantScroll] Qdrant scroll failed on collection ${collection}: ${res.status} ${errorText}`);
+  }
   const data = await res.json();
   return data.result?.points ?? [];
 }
@@ -122,8 +125,11 @@ async function qdrantSearch(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(15_000),
-  }).catch(() => null);
-  if (!res?.ok) return [];
+  });
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => 'Unknown error');
+    throw new Error(`[qdrantSearch] Qdrant search failed on collection ${collection}: ${res.status} ${errorText}`);
+  }
   const data = await res.json();
   return data.result ?? [];
 }
@@ -139,8 +145,8 @@ async function embedQuery(text: string): Promise<number[] | null> {
     if (!res.ok) return null;
     const data = await res.json();
     return data.embeddings?.[0] ?? null;
-  } catch {
-    return null;
+  } catch (err) {
+    throw new Error(`[embedQuery] Ollama embedding failed: ${(err as Error).message}`);
   }
 }
 
@@ -969,7 +975,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFe
       const tsFiles = files.filter(
         (f) => f.endsWith('.ts') || f.endsWith('.js') || f.endsWith('.mts')
       );
-      const chunks = chunkFiles(tsFiles.slice(0, 2000), srcRoot);
+      const chunks = await chunkFiles(tsFiles.slice(0, 2000), srcRoot);
       recomputeResults.chunksGenerated = chunks.length;
 
       // Dual-embed → Qdrant upsert (batched, adaptive GPU VRAM)

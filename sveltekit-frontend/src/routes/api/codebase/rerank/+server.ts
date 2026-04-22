@@ -41,14 +41,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	try {
 		const rerank = await rerankChunks(body.query, {
-			candidatePaths: body.candidatePaths,
-			limit: body.limit,
-			contentWeight: body.contentWeight,
-			signatureWeight: body.signatureWeight,
-			errorWeight: body.errorWeight,
-			pathBoosts: body.pathBoosts,
-			errorQuery: body.errorQuery,
-		});
+      candidatePaths: body.candidatePaths,
+      limit: body.limit,
+      contentWeight: body.contentWeight,
+      signatureWeight: body.signatureWeight,
+      errorWeight: body.errorWeight,
+      pathBoosts: body.pathBoosts,
+      errorQuery: body.errorQuery,
+      caller: 'api-rerank',
+    });
 
 		// -- Stage C: Gemma4 Pointwise Rerank (Optional/Default) ---------------
 		let finalResults = rerank.results;

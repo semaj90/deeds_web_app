@@ -1,0 +1,11 @@
+Loading svelte-check in workspace: c:\Users\james\Videos\deeds-web-app\sveltekit-frontend
+Getting Svelte diagnostics...
+
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\routes\api\admin\agent\fix\+server.ts[39m:143:66
+[31mError[39m: Property 'content' does not exist on type 'never'. 
+[36m    );
+    const text = typeof _result === 'string' ? _result : _result.[35mcontent[36m;[39m
+
+====================================
+[31msvelte-check found 1 error and 0 warnings in 1 file
+[39m

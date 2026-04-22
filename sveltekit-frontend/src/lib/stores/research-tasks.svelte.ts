@@ -8,21 +8,44 @@
  */
 import { browser } from '$app/environment';
 
+type ResearchTaskProvider = 'ollama' | 'google';
+
+interface ResearchTaskImage {
+  src?: string | null;
+  uri?: string | null;
+  mimeType?: string | null;
+  resolution?: string | null;
+}
+
+interface ResearchTaskResult {
+  answer: string;
+  pipeline: string;
+  durationMs: number | null;
+  provider?: ResearchTaskProvider;
+  interactionId?: string;
+  imageCount?: number;
+  images?: ResearchTaskImage[];
+  thoughtSummaries?: string[];
+  error?: string;
+  summaryId?: string;
+}
+
 export interface ResearchTask {
-	id: string;
-	title: string;
-	selfPrompt: string;
-	pipelineHint: string;
-	priority: 'high' | 'medium' | 'low';
-	status: 'pending' | 'running' | 'done' | 'failed';
-	sourceText?: string;
-	summary?: string;
-	result?: { answer: string; pipeline: string; durationMs: number };
-	/** ID of the research_summaries row persisted for this task's result */
-	summaryId?: string;
-	notified: boolean;
-	createdAt: string;
-	completedAt?: string | null;
+  id: string;
+  title: string;
+  selfPrompt: string;
+  pipelineHint: string;
+  provider: ResearchTaskProvider;
+  priority: 'high' | 'medium' | 'low';
+  status: 'pending' | 'running' | 'done' | 'failed';
+  sourceText?: string;
+  summary?: string;
+  result?: ResearchTaskResult;
+  /** ID of the research_summaries row persisted for this task's result */
+  summaryId?: string;
+  notified: boolean;
+  createdAt: string;
+  completedAt?: string | null;
 }
 
 const LS_KEY = 'research_tasks_anon';
@@ -74,21 +97,45 @@ class ResearchTaskStore {
 	}
 
 	private normalize(t: Record<string, unknown>): ResearchTask {
+		const result = (typeof t.result === 'object' && t.result !== null ? t.result : undefined) as ResearchTask['result'] | undefined;
+		const resultRecord = (result ?? {}) as Record<string, unknown>;
+		const provider = (t.provider as ResearchTask['provider'])
+			?? (resultRecord.provider as ResearchTask['provider'])
+			?? 'ollama';
+
 		return {
-			id:           String(t.id ?? crypto.randomUUID()),
-			title:        String(t.title ?? ''),
-			selfPrompt:   String(t.selfPrompt ?? t.self_prompt ?? ''),
-			pipelineHint: String(t.pipelineHint ?? t.pipeline_hint ?? 'ace'),
-			priority:     (t.priority as ResearchTask['priority']) ?? 'medium',
-			status:       (t.status as ResearchTask['status']) ?? 'pending',
-			sourceText:   t.sourceText != null ? String(t.sourceText) : (t.source_text != null ? String(t.source_text) : undefined),
-			summary:      t.summary != null ? String(t.summary) : undefined,
-			result:       t.result as ResearchTask['result'] ?? undefined,
-			summaryId:    t.summaryId != null ? String(t.summaryId) : (t.summary_id != null ? String(t.summary_id) : ((t.result as Record<string, unknown>)?.summaryId != null ? String((t.result as Record<string, unknown>).summaryId) : undefined)),
-			notified:     Boolean(t.notified),
-			createdAt:    String(t.createdAt ?? t.created_at ?? new Date().toISOString()),
-			completedAt:  t.completedAt != null ? String(t.completedAt) : (t.completed_at != null ? String(t.completed_at) : null),
-		};
+      id: String(t.id ?? crypto.randomUUID()),
+      title: String(t.title ?? ''),
+      selfPrompt: String(t.selfPrompt ?? t.self_prompt ?? ''),
+      pipelineHint: String(t.pipelineHint ?? t.pipeline_hint ?? 'ace'),
+      provider,
+      priority: (t.priority as ResearchTask['priority']) ?? 'medium',
+      status: (t.status as ResearchTask['status']) ?? 'pending',
+      sourceText:
+        t.sourceText != null
+          ? String(t.sourceText)
+          : t.source_text != null
+            ? String(t.source_text)
+            : undefined,
+      summary: t.summary != null ? String(t.summary) : undefined,
+      result,
+      summaryId:
+        t.summaryId != null
+          ? String(t.summaryId)
+          : t.summary_id != null
+            ? String(t.summary_id)
+            : (t.result as Record<string, unknown>)?.summaryId != null
+              ? String((t.result as Record<string, unknown>).summaryId)
+              : undefined,
+      notified: Boolean(t.notified),
+      createdAt: String(t.createdAt ?? t.created_at ?? new Date().toISOString()),
+      completedAt:
+        t.completedAt != null
+          ? String(t.completedAt)
+          : t.completed_at != null
+            ? String(t.completed_at)
+            : null,
+    };
 	}
 
 	/** Add a task. If anon, stores locally and sets needsAuth flag. */
@@ -97,6 +144,7 @@ class ResearchTaskStore {
 			title: string;
 			selfPrompt: string;
 			pipelineHint?: string;
+			provider?: ResearchTaskProvider;
 			priority?: ResearchTask['priority'];
 			sourceText?: string;
 			summary?: string;
@@ -115,6 +163,7 @@ class ResearchTaskStore {
 				title:        opts.title,
 				selfPrompt:   opts.selfPrompt,
 				pipelineHint: opts.pipelineHint ?? 'ace',
+				provider:     opts.provider ?? 'ollama',
 				priority:     opts.priority ?? 'medium',
 				status:       'pending',
 				sourceText:   opts.sourceText,
@@ -132,6 +181,7 @@ class ResearchTaskStore {
 
 	private async addToServer(opts: {
 		title: string; selfPrompt: string; pipelineHint?: string;
+		provider?: ResearchTaskProvider;
 		priority?: ResearchTask['priority']; sourceText?: string; summary?: string; runNow?: boolean;
 	}): Promise<ResearchTask | null> {
 		try {
@@ -142,6 +192,7 @@ class ResearchTaskStore {
 					title:        opts.title,
 					selfPrompt:   opts.selfPrompt,
 					pipelineHint: opts.pipelineHint ?? 'ace',
+					provider:     opts.provider ?? 'ollama',
 					priority:     opts.priority ?? 'medium',
 					sourceText:   opts.sourceText,
 					summary:      opts.summary,
@@ -222,7 +273,7 @@ class ResearchTaskStore {
 
 				this.tasks = this.tasks.map(t =>
 					t.id === task.id
-						? { ...t, status: 'done', result, summaryId, completedAt: new Date().toISOString() }
+						? { ...t, status: 'done', result: { ...result, provider: task.provider }, summaryId, completedAt: new Date().toISOString() }
 						: t
 				);
 			} else {

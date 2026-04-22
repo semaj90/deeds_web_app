@@ -12,6 +12,10 @@
 
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { searchResearchChunks, type ResearchSource } from '../research/web-research-ingester.js';
+import { generateEmbedding } from '../grpc/embedding-client.js';
+import { linkResearchToSession } from '../ai/hypergraph-store.js';
+import { recordResearchHits } from '../research/lane4-feedback.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Canonical shapes
@@ -39,6 +43,16 @@ export interface AceChunkContext {
   gpuCluster: number | null;
 }
 
+export interface AceResearchContext {
+  chunkId: string;
+  source: ResearchSource;
+  url: string;
+  title: string;
+  body: string;
+  score: number;
+  semanticTags: string[];
+}
+
 export interface AceHealthSummary {
   ok: boolean;
   chunkCount: number;
@@ -51,6 +65,7 @@ export interface AceCodeIntelContext {
   repoId: string;
   clusterContext: AceClusterSummary[];
   chunkContext: AceChunkContext[];
+  researchContext: AceResearchContext[];
   health: AceHealthSummary;
   degraded: boolean;
   errors: string[];
@@ -66,7 +81,7 @@ export async function getClusterSummariesForAce(opts: {
   limit?: number;
 }): Promise<{ summaries: AceClusterSummary[]; error?: string }> {
   const repoId = opts.repoId ?? 'default';
-  const limit  = Math.min(opts.limit ?? 20, 50);
+  const limit = Math.min(opts.limit ?? 20, 50);
 
   try {
     const rows = opts.clusterIds?.length
@@ -99,11 +114,11 @@ export async function getClusterSummariesForAce(opts: {
     return {
       summaries: rows.rows.map((r: any) => ({
         gpuCluster: Number(r.gpu_cluster),
-        summary:    r.summary   || null,
-        purpose:    r.purpose   || null,
-        patterns:   Array.isArray(r.patterns) ? r.patterns : [],
-        warnings:   Array.isArray(r.warnings) ? r.warnings : [],
-        tags:       Array.isArray(r.tags)     ? r.tags     : [],
+        summary: r.summary || null,
+        purpose: r.purpose || null,
+        patterns: Array.isArray(r.patterns) ? r.patterns : [],
+        warnings: Array.isArray(r.warnings) ? r.warnings : [],
+        tags: Array.isArray(r.tags) ? r.tags : [],
         memberCount: Number(r.member_count),
       })),
     };
@@ -114,7 +129,7 @@ export async function getClusterSummariesForAce(opts: {
 
 export async function getClusterSummaryForAce(
   repoId: string,
-  clusterId: number,
+  clusterId: number
 ): Promise<{ cluster: AceClusterSummary | null; error?: string }> {
   try {
     const rows = await db.execute(sql`
@@ -135,11 +150,11 @@ export async function getClusterSummaryForAce(
     return {
       cluster: {
         gpuCluster: Number(r.gpu_cluster),
-        summary:    r.summary  || null,
-        purpose:    r.purpose  || null,
-        patterns:   Array.isArray(r.patterns) ? r.patterns : [],
-        warnings:   Array.isArray(r.warnings) ? r.warnings : [],
-        tags:       Array.isArray(r.tags)     ? r.tags     : [],
+        summary: r.summary || null,
+        purpose: r.purpose || null,
+        patterns: Array.isArray(r.patterns) ? r.patterns : [],
+        warnings: Array.isArray(r.warnings) ? r.warnings : [],
+        tags: Array.isArray(r.tags) ? r.tags : [],
         memberCount: Number(r.member_count),
       },
     };
@@ -150,7 +165,7 @@ export async function getClusterSummaryForAce(
 
 export async function getChunkForAce(
   _repoId: string,
-  chunkIdOrPath: string,
+  chunkIdOrPath: string
 ): Promise<{ chunk: AceChunkContext | null; error?: string }> {
   try {
     // Try by qdrant_id first, then by relative_path
@@ -170,15 +185,15 @@ export async function getChunkForAce(
 
     return {
       chunk: {
-        chunkId:      String(r.qdrant_id ?? ''),
-        relativePath: r.relative_path   || null,
-        kind:         r.kind            || null,
-        domain:       r.domain          || null,
-        language:     r.language        || null,
-        extension:    r.extension       || null,
+        chunkId: String(r.qdrant_id ?? ''),
+        relativePath: r.relative_path || null,
+        kind: r.kind || null,
+        domain: r.domain || null,
+        language: r.language || null,
+        extension: r.extension || null,
         semanticTags: Array.isArray(r.semantic_tags) ? r.semantic_tags : [],
-        summary:      r.summary         || null,
-        gpuCluster:   r.gpu_cluster != null ? Number(r.gpu_cluster) : null,
+        summary: r.summary || null,
+        gpuCluster: r.gpu_cluster != null ? Number(r.gpu_cluster) : null,
       },
     };
   } catch {
@@ -201,19 +216,70 @@ export async function getCodeIntelHealthForAce(): Promise<AceHealthSummary> {
       `),
     ]);
 
-    const total   = Number((chunkStats.rows[0] as any)?.total ?? 0);
+    const total = Number((chunkStats.rows[0] as any)?.total ?? 0);
     const withSum = Number((chunkStats.rows[0] as any)?.with_summary ?? 0);
     const clusters = Number((clusterStats.rows[0] as any)?.total ?? 0);
-    const withEmb  = Number((clusterStats.rows[0] as any)?.with_embedding ?? 0);
+    const withEmb = Number((clusterStats.rows[0] as any)?.with_embedding ?? 0);
 
     return {
-      ok:                true,
-      chunkCount:        total,
-      clusterCount:      clusters,
+      ok: true,
+      chunkCount: total,
+      clusterCount: clusters,
       embeddingCoverage: clusters > 0 ? Math.round((withEmb / clusters) * 100) / 100 : null,
     };
   } catch {
     return { ok: false, chunkCount: 0, clusterCount: 0, embeddingCoverage: null };
+  }
+}
+
+/**
+ * Fetch and sort web research chunks by trust priority:
+ * official_docs > github_issue > reddit_post
+ */
+export async function getWebResearchForAce(
+  query: string,
+  limit: number = 10
+): Promise<{ research: AceResearchContext[]; error?: string }> {
+  try {
+    const embedRes = await generateEmbedding(query);
+    if (!embedRes?.length) return { research: [] };
+
+    const results = await searchResearchChunks({
+      queryEmbedding: embedRes,
+      limit: limit * 2, // Fetch extra to allow for priority sorting
+      scoreThreshold: 0.5,
+    });
+
+    // Trust Priority Mapping
+    const priority: Record<ResearchSource, number> = {
+      official_docs: 0,
+      github_issue: 1,
+      github_code: 2,
+      github_repo: 3,
+      web_page: 4,
+      reddit_post: 5,
+    };
+
+    const sorted = results.sort((a, b) => {
+      const pA = priority[a.source] ?? 99;
+      const pB = priority[b.source] ?? 99;
+      if (pA !== pB) return pA - pB;
+      return b.score - a.score; // fall back to vector score
+    });
+
+    return {
+      research: sorted.slice(0, limit).map((r) => ({
+        chunkId: r.chunk_id,
+        source: r.source,
+        url: r.url,
+        title: r.title,
+        body: r.body,
+        score: r.score,
+        semanticTags: r.semantic_tags,
+      })),
+    };
+  } catch (e: any) {
+    return { research: [], error: `web_research fetch failed: ${e.message}` };
   }
 }
 
@@ -228,22 +294,30 @@ export async function assembleAceContext(
     clusterIds?: number[];
     chunkIds?: string[];
     limit?: number;
-  } = {},
+    includeResearch?: boolean;
+    sessionId?: string;
+  } = {}
 ): Promise<AceCodeIntelContext> {
   const repoId = opts.repoId ?? 'default';
   const errors: string[] = [];
   let degraded = false;
 
   // Fetch all in parallel
-  const [clustersResult, chunksResults, health] = await Promise.all([
+  const [clustersResult, chunksResults, researchResult, health] = await Promise.all([
     getClusterSummariesForAce({
       repoId,
       clusterIds: opts.clusterIds,
       limit: opts.limit ?? 20,
     }),
     opts.chunkIds?.length
-      ? Promise.all(opts.chunkIds.map(id => getChunkForAce(repoId, id)))
+      ? Promise.all(opts.chunkIds.map((id) => getChunkForAce(repoId, id)))
       : Promise.resolve([]),
+    opts.includeResearch
+      ? getWebResearchForAce(query, opts.limit ?? 5)
+      : Promise.resolve({
+          research: [] as AceResearchContext[],
+          error: undefined as string | undefined,
+        }),
     getCodeIntelHealthForAce(),
   ]);
 
@@ -261,13 +335,36 @@ export async function assembleAceContext(
     if (result.chunk) chunkContext.push(result.chunk);
   }
 
+  if (researchResult?.error) {
+    errors.push(researchResult.error);
+  }
+
   if (!health.ok) degraded = true;
+
+  // Fire-and-forget: link each research chunk to the session in Neo4j
+  const researchChunks = researchResult?.research ?? [];
+  if (opts.sessionId && researchChunks.length > 0) {
+    for (const chunk of researchChunks) {
+      linkResearchToSession(opts.sessionId, chunk.url, chunk.source, chunk.score).catch(() => {
+        /* non-fatal */
+      });
+    }
+  }
+
+  // Lane 4: record hits for trust-score feedback loop (fire-and-forget)
+  if (researchChunks.length > 0) {
+    recordResearchHits(
+      researchChunks.map((c) => ({ source: c.source, score: c.score })),
+      'ace'
+    );
+  }
 
   return {
     query,
     repoId,
     clusterContext: clustersResult.summaries,
     chunkContext,
+    researchContext: researchChunks,
     health,
     degraded,
     errors,

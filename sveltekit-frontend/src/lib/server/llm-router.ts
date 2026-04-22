@@ -18,7 +18,7 @@ import { isLegalTask, getOptimalModel, OLLAMA_CONFIG } from '$lib/server/ai/olla
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? '';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GEMINI_API_KEY ?? '';
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.0-flash-exp';
 
 interface StreamRequest {

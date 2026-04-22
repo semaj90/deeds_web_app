@@ -1,6 +1,6 @@
 <!--
   Enhanced Legal AI Chat with Input Synthesis and LegalBERT Integration
-  Combines all advanced services: input synthesis, LegalBERT analysis, RAG pipeline, and streaming
+  Combines all advanced services: input synthesis: LegalBERT analysis: RAG pipeline, and streaming
 -->
 <script lang="ts">
   import { onMount, tick } from 'svelte';

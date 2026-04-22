@@ -265,10 +265,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const rerank = await rerankChunks(query, {
-			candidatePaths,
-			limit:       maxContextChunks * 2,
-			errorQuery:  errorQuery,
-		});
+      candidatePaths,
+      limit: maxContextChunks * 2,
+      errorQuery: errorQuery,
+      caller: 'claude-assist',
+    });
 
 		contentChunks = rerank.results.map((r) => ({
 			score:   r.score,

@@ -74,9 +74,11 @@ async function scrollAllVectors(limit: number): Promise<QdrantPoint[]> {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body),
 			signal: AbortSignal.timeout(30_000),
-		}).catch(() => null);
-
-		if (!res?.ok) break;
+		});
+		if (!res.ok) {
+			const errorText = await res.text().catch(() => 'Unknown error');
+			throw new Error(`[scrollAllVectors] Qdrant scroll failed: ${res.status} ${errorText}`);
+		}
 		const data = await res.json();
 		const batch = data.result?.points ?? [];
 		if (batch.length === 0) break;

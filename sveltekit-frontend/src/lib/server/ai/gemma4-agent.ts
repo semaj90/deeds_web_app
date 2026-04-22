@@ -21,7 +21,7 @@
  * produce high-quality answers.
  */
 
-import { ollamaFetch, VLM_MODELS, getOllamaEndpoint } from '$lib/server/ollama.js';
+import { ollamaFetch, VLM_MODELS, getOllamaEndpoint, bifrostChat } from '$lib/server/ollama.js';
 import { generateEmbedding }                           from '$lib/server/grpc/embedding-client.js';
 import { qdrant }                                      from '$lib/server/vector/qdrant-manager.js';
 import { selectAdaptiveMemory, queryTopHyperedges }    from '$lib/server/graph/hypergraph-4d.js';
@@ -507,19 +507,17 @@ export async function runGemma4Agent(
       options:  { temperature: 0.2, num_predict: 2048 },
     });
 
-    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      signal:  AbortSignal.timeout(TIMEOUT_MS),
-    } as RequestInit);
+    const result = await bifrostChat(messages, TOOL_MODEL, {
+      tools: AGENT_TOOLS,
+      temperature: 0.2,
+      maxTokens: 2048,
+      timeoutMs: TIMEOUT_MS,
+      cacheKey: `agent-tool-loop:${pipeline}`,
+    });
 
-    if (!res.ok) {
-      throw new Error(`Ollama /api/chat ${res.status}: ${await res.text().catch(() => '')}`);
-    }
-
-    const data = (await res.json()) as OllamaChatResponse;
-    const msg  = data.message;
+    const msg: OllamaMessage = typeof result === 'string' 
+      ? { role: 'assistant', content: result }
+      : { role: 'assistant', content: result.content, tool_calls: result.tool_calls };
 
     // Final answer — no tool calls
     if (!msg.tool_calls?.length) {

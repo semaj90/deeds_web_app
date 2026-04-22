@@ -37,8 +37,7 @@ import { logLLMInference } from '$lib/server/observability/inference-log.js';
 import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbiter.js';
 import { inferLLM, healthCheck as trtHealthCheck, streamLLM as streamTrtLLM } from '$lib/server/trt-llm.js';
 import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM as streamTritonLLM } from '$lib/server/triton-llm.js';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat, ollamaFetch, type OllamaMessage } from '$lib/server/ollama.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 import { TURBOQUANT_BASE_URL, LITERT_BASE_URL, VLM_BASE_URL } from '$lib/ai/model-ids.js';
 import { isPrefixWarm } from '$lib/server/inference/turbo-prefix-cache.js';
@@ -656,7 +655,7 @@ async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number
 
 async function tryBifrost(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
 	const model = 'gemma4-legal';
-	const messages: Array<{ role: string; content: string }> = [];
+	const messages: Array<OllamaMessage> = [];
 	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
 	messages.push({ role: 'user', content: request.prompt });
 

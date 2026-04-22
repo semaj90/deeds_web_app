@@ -18,6 +18,7 @@ import type { CodeChunk } from './ast-chunker.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { runWithAdaptiveBatch } from '$lib/server/gpu/libtorch-bridge.js';
 import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
+import { logEmbedIndex } from './ast-ingest-logger.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const INITIAL_BATCH = 24; // starting batch size; runWithAdaptiveBatch halves on OOM
@@ -384,13 +385,27 @@ export async function indexChunks(chunks: CodeChunk[]): Promise<IndexResult> {
     { initialBatch: INITIAL_BATCH, minBatch: 4 }
   );
 
-  return {
+  const result: IndexResult = {
     chunksProcessed: chunks.length,
     embeddingsGenerated,
     storedInQdrant,
     failed,
     durationMs: Math.round(performance.now() - start),
   };
+
+  // ── ingest logger ────────────────────────────────────────────────────────
+  logEmbedIndex({
+    mode: 'full',
+    samplePath: chunks[0]?.metadata?.relativePath ?? '',
+    chunksProcessed: result.chunksProcessed,
+    skippedExisting: 0,
+    embeddingsGenerated: result.embeddingsGenerated,
+    storedInQdrant: result.storedInQdrant,
+    failed: result.failed,
+    durationMs: result.durationMs,
+  });
+
+  return result;
 }
 
 /**
@@ -446,7 +461,7 @@ export async function indexChunksIncremental(chunks: CodeChunk[]): Promise<Incre
   const skippedExisting = chunks.length - newChunks.length;
 
   if (newChunks.length === 0) {
-    return {
+    const zeroResult = {
       chunksProcessed: chunks.length,
       embeddingsGenerated: 0,
       storedInQdrant: 0,
@@ -454,8 +469,31 @@ export async function indexChunksIncremental(chunks: CodeChunk[]): Promise<Incre
       skippedExisting,
       durationMs: 0,
     };
+    logEmbedIndex({
+      mode: 'incremental',
+      samplePath: chunks[0]?.metadata?.relativePath ?? '',
+      chunksProcessed: zeroResult.chunksProcessed,
+      skippedExisting,
+      embeddingsGenerated: 0,
+      storedInQdrant: 0,
+      failed: 0,
+      durationMs: 0,
+    });
+    return zeroResult;
   }
 
   const result = await indexChunks(newChunks);
+  // Override the 'full' log written by indexChunks with an incremental one
+  // (the full log was already emitted inside indexChunks above — this is a summary)
+  logEmbedIndex({
+    mode: 'incremental',
+    samplePath: chunks[0]?.metadata?.relativePath ?? '',
+    chunksProcessed: chunks.length,
+    skippedExisting,
+    embeddingsGenerated: result.embeddingsGenerated,
+    storedInQdrant: result.storedInQdrant,
+    failed: result.failed,
+    durationMs: result.durationMs,
+  });
   return { ...result, chunksProcessed: chunks.length, skippedExisting };
 }

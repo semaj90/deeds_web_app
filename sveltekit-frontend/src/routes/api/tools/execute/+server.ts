@@ -30,18 +30,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     // Execute tool
+    console.log(`[ACE Tools] Executing ${parsed.data.tool} with args:`, parsed.data.args);
     const result = await toolRegistry.execute(parsed.data.tool, parsed.data.args);
 
     if (!result.success) {
+      console.warn(`[ACE Tools] Tool ${parsed.data.tool} returned error:`, result.error);
       return json(result, { status: 400 });
     }
 
     return json(result);
   } catch (error) {
     console.error('[ACE Tools] Execution error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return json({
       success: false,
-      error: 'Tool execution failed',
+      error: `Tool execution failed: ${errorMsg}`,
       timestamp: new Date().toISOString()
     }, { status: 500 });
   }

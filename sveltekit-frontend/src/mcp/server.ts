@@ -553,6 +553,12 @@ export function setupToolHandlers() {
               description: 'Include codebase/AST semantic search in context',
               default: true,
             },
+            includeResearch: {
+              type: 'boolean',
+              description:
+                'Include Lane 3 deep research chunks (chunks_web_search Qdrant collection). Grounding order: Docs > GitHub Issues > Reddit.',
+              default: false,
+            },
             persona: {
               type: 'string',
               enum: ['neutral', 'prosecutor', 'defense', 'plain-language', 'academic'],
@@ -1373,6 +1379,179 @@ export function setupToolHandlers() {
           required: ['query'],
         },
       },
+
+      // ─────────────────────────────────────────────────────────────────────
+      // Lane 3: Deep Research — GitHub / Reddit / chunks_web_search
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'research:github_search',
+        description:
+          'Search GitHub issues, code, or repositories for deep research context. ' +
+          'Results are embedded and upserted into the chunks_web_search Qdrant collection. ' +
+          'Priority for ACE assembly: official docs > GitHub issues > Reddit posts.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'GitHub search query (max 256 chars, supports language:TypeScript etc.)',
+            },
+            type: {
+              type: 'string',
+              enum: ['issues', 'code', 'repos'],
+              description: 'Search type — semantic only works for issues',
+              default: 'issues',
+            },
+            semantic: {
+              type: 'boolean',
+              description: 'Use semantic search (issues only, requires GITHUB_TOKEN)',
+              default: false,
+            },
+            limit: {
+              type: 'number',
+              description: 'Max results (1-100, default 20)',
+              default: 20,
+            },
+            ingest: {
+              type: 'boolean',
+              description: 'Embed + upsert results into chunks_web_search (default: true)',
+              default: true,
+            },
+          },
+          required: ['query'],
+        },
+      },
+      {
+        name: 'research:reddit_search',
+        description:
+          'Search Reddit posts for community knowledge. Always uses raw_json=1 to prevent ' +
+          'HTML entity corruption. Keyword only (no semantic variant). ' +
+          'Uses sort=top + t=year for highest quality signal.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Keyword search query (max 512 chars)',
+            },
+            subreddit: {
+              type: 'string',
+              description:
+                'Limit to a subreddit (e.g. "svelte", "typescript") — omit for all-Reddit',
+            },
+            sort: {
+              type: 'string',
+              enum: ['relevance', 'top', 'hot', 'new', 'comments'],
+              default: 'top',
+            },
+            timeRange: {
+              type: 'string',
+              enum: ['hour', 'day', 'week', 'month', 'year', 'all'],
+              default: 'year',
+            },
+            limit: {
+              type: 'number',
+              description: 'Max results (1-100, default 25)',
+              default: 25,
+            },
+            ingest: {
+              type: 'boolean',
+              description: 'Embed + upsert results into chunks_web_search (default: true)',
+              default: true,
+            },
+          },
+          required: ['query'],
+        },
+      },
+      {
+        name: 'research:search_chunks',
+        description:
+          'Semantic search over the chunks_web_search collection. Returns ranked results from ' +
+          'previously ingested GitHub issues, Reddit posts, and web pages. ' +
+          'Use to retrieve research context for ACE assembly.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Search query to embed and match against research chunks',
+            },
+            sources: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: [
+                  'github_issue',
+                  'github_code',
+                  'github_repo',
+                  'reddit_post',
+                  'web_page',
+                  'official_docs',
+                ],
+              },
+              description: 'Filter by source type (omit for all)',
+            },
+            limit: {
+              type: 'number',
+              description: 'Max results to return (1-50, default 10)',
+              default: 10,
+            },
+            scoreThreshold: {
+              type: 'number',
+              description: 'Min cosine similarity threshold (0-1, default 0.55)',
+              default: 0.55,
+            },
+          },
+          required: ['query'],
+        },
+      },
+      {
+        name: 'ast:cross_language',
+        description:
+          'Synthesize cross-language equivalents for a TypeScript/JS function. ' +
+          'Uses codebase AST context (GPU k-means clusters) + Lane 3 deep-research grounding ' +
+          '(official_docs > github_issue > reddit_post) to produce idiomatic translations. ' +
+          'Runs background-only (never blocks interactive chat). ' +
+          'Supported targets: python, rust, go, java, csharp.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            sourceCode: {
+              type: 'string',
+              description: 'Source function code to translate',
+            },
+            sourceLanguage: {
+              type: 'string',
+              enum: ['typescript', 'python', 'rust', 'go', 'java', 'csharp'],
+              description: 'Language of the source code (default: typescript)',
+              default: 'typescript',
+            },
+            targetLanguages: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['python', 'rust', 'go', 'java', 'csharp', 'typescript'],
+              },
+              description: 'Target languages to synthesize',
+              minItems: 1,
+            },
+            functionName: {
+              type: 'string',
+              description: 'Optional function/method name hint for context retrieval',
+            },
+            domainHint: {
+              type: 'string',
+              description: 'Optional domain hint (e.g. "evidence pipeline", "auth")',
+            },
+            maxTokensPerTarget: {
+              type: 'number',
+              description: 'Max tokens per target language synthesis (default: 1024)',
+              default: 1024,
+            },
+          },
+          required: ['sourceCode', 'targetLanguages'],
+        },
+      },
     ],
   }));
 
@@ -2021,12 +2200,14 @@ export function setupToolHandlers() {
           query: aceQuery,
           caseId: aceCaseId,
           enableCodebaseContext,
+          includeResearch,
           persona: acePersona,
           maxTokens: aceMaxTokens,
         } = args as {
           query: string;
           caseId?: string;
           enableCodebaseContext?: boolean;
+          includeResearch?: boolean;
           persona?: string;
           maxTokens?: number;
         };
@@ -2039,6 +2220,7 @@ export function setupToolHandlers() {
           query: aceQuery,
           caseId: aceCaseId,
           enableCodebaseContext: enableCodebaseContext ?? true,
+          includeResearch: includeResearch ?? false,
           enableWebSearch: false,
           enableWikipedia: true,
           persona: acePersona as
@@ -2077,6 +2259,7 @@ export function setupToolHandlers() {
                   hasGlossary: !!context.glossaryMatches?.length,
                   hasUserProfile: !!context.userProfile,
                   hasCaseContext: !!context.caseContext,
+                  hasResearch: !!context.webSearchContext?.includes('Deep Research'),
                 },
                 model: llmData.model,
                 tokensUsed: llmData.prompt_eval_count + (llmData.eval_count ?? 0),
@@ -3257,6 +3440,174 @@ export function setupToolHandlers() {
         );
 
         return { content: [{ type: 'text', text: JSON.stringify(wikiResult) }] };
+      }
+
+      // ── Lane 3: Deep Research ──────────────────────────────────────────────
+      case 'research:github_search': {
+        const {
+          query,
+          type = 'issues',
+          semantic = false,
+          limit = 20,
+          ingest = true,
+        } = args as {
+          query: string;
+          type?: string;
+          semantic?: boolean;
+          limit?: number;
+          ingest?: boolean;
+        };
+
+        const { searchGitHubIssues, searchGitHubCode, searchGitHubRepos } = await import(
+          '../lib/server/research/github-harvester.js'
+        );
+
+        let chunks: any[] = [];
+        if (type === 'issues') chunks = await searchGitHubIssues({ query, limit, semantic });
+        else if (type === 'code') chunks = await searchGitHubCode({ query, limit });
+        else if (type === 'repos') chunks = await searchGitHubRepos({ query, limit });
+
+        let ingestResult = null;
+        if (ingest && chunks.length) {
+          const { ingestResearchChunks } = await import(
+            '../lib/server/research/web-research-ingester.js'
+          );
+          ingestResult = await ingestResearchChunks(chunks, false);
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                fetched: chunks.length,
+                ingest: ingestResult,
+                preview: chunks.slice(0, 3),
+              }),
+            },
+          ],
+        };
+      }
+
+      case 'research:reddit_search': {
+        const {
+          query,
+          subreddit,
+          sort = 'top',
+          timeRange = 'year',
+          limit = 25,
+          ingest = true,
+        } = args as {
+          query: string;
+          subreddit?: string;
+          sort?: any;
+          timeRange?: any;
+          limit?: number;
+          ingest?: boolean;
+        };
+
+        const { searchReddit } = await import('../lib/server/research/reddit-harvester.js');
+        const { chunks } = await searchReddit({ query, subreddit, sort, timeRange, limit });
+
+        let ingestResult = null;
+        if (ingest && chunks.length) {
+          const { ingestResearchChunks } = await import(
+            '../lib/server/research/web-research-ingester.js'
+          );
+          ingestResult = await ingestResearchChunks(chunks, false);
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                fetched: chunks.length,
+                ingest: ingestResult,
+                preview: chunks.slice(0, 3),
+              }),
+            },
+          ],
+        };
+      }
+
+      case 'research:search_chunks': {
+        const {
+          query,
+          sources,
+          limit = 10,
+          scoreThreshold = 0.55,
+        } = args as { query: string; sources?: any[]; limit?: number; scoreThreshold?: number };
+
+        // Embed the query then search chunks_web_search
+        const { generateEmbedding } = await import('../lib/server/grpc/embedding-client.js');
+        const embedding = await generateEmbedding(query);
+        if (!embedding?.length) {
+          return {
+            content: [
+              { type: 'text', text: JSON.stringify({ results: [], error: 'embedding failed' }) },
+            ],
+          };
+        }
+
+        const { searchResearchChunks } = await import(
+          '../lib/server/research/web-research-ingester.js'
+        );
+        const results = await searchResearchChunks({
+          queryEmbedding: embedding,
+          limit,
+          sourceFilter: sources?.length ? sources : undefined,
+          scoreThreshold,
+        });
+
+        return { content: [{ type: 'text', text: JSON.stringify({ results }) }] };
+      }
+
+      // ── AST Cross-Language Synthesis ──────────────────────────────────────
+      case 'ast:cross_language': {
+        const {
+          sourceCode,
+          sourceLanguage = 'typescript',
+          targetLanguages,
+          functionName,
+          domainHint,
+          maxTokensPerTarget = 1024,
+        } = args as {
+          sourceCode: string;
+          sourceLanguage?: string;
+          targetLanguages: string[];
+          functionName?: string;
+          domainHint?: string;
+          maxTokensPerTarget?: number;
+        };
+
+        if (!sourceCode?.trim() || !targetLanguages?.length) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({ error: 'sourceCode and targetLanguages are required' }),
+              },
+            ],
+          };
+        }
+
+        const { synthesizeCrossLanguage } = await import(
+          '../lib/server/ast/cross-language-synthesis.js'
+        );
+        const result = await synthesizeCrossLanguage(
+          {
+            sourceCode,
+            sourceLanguage: sourceLanguage as any,
+            targetLanguages: targetLanguages as any,
+            functionName,
+            domainHint,
+            maxTokensPerTarget,
+          },
+          { temperature: 0.3 }
+        );
+
+        return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       }
 
       default:

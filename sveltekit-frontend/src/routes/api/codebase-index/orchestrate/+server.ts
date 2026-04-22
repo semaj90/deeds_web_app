@@ -9,6 +9,10 @@ import { randomUUID } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { db } from '$lib/server/db/client';
 import { chunkFiles } from '$lib/server/indexer/ast-chunker.js';
+import {
+  extractMetadataBatch,
+  persistFileFeatureBatch,
+} from '$lib/server/indexer/workspace-metadata-extractor.js';
 import { indexChunks, indexChunksIncremental } from '$lib/server/indexer/dual-embedder.js';
 import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import { isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
@@ -642,7 +646,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
               throw new Error(`No indexable files found for scope ${scope}`);
             }
 
-            const chunks = chunkFiles(allFiles, ROOT);
+            const chunks = await chunkFiles(allFiles, ROOT);
             emit('chunk_done', {
               stage: 'chunk',
               filesProcessed: allFiles.length,
@@ -673,6 +677,25 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
               embedResult = { filesProcessed: allFiles.length, ...indexResult };
             }
             emit('embed_done', { stage: 'embed', ...embedResult });
+
+            // ── Fire-and-forget: extract metadata for .svelte files (not in allFiles) ──
+            if (!dryRun) {
+              void (async () => {
+                try {
+                  const svelteFiles: string[] = [];
+                  for (const dir of scopeDirs) {
+                    const sf = await collectFiles(resolve(ROOT, dir), 5000);
+                    svelteFiles.push(...sf.filter((f) => f.endsWith('.svelte')));
+                  }
+                  if (svelteFiles.length > 0) {
+                    const metas = extractMetadataBatch(svelteFiles, { repoRoot: ROOT });
+                    await persistFileFeatureBatch(metas);
+                  }
+                } catch {
+                  // non-fatal — metadata extraction is best-effort
+                }
+              })();
+            }
 
             stageTimings.ast_embed = Date.now() - stageStart;
             completedStages.push('ast_embed');

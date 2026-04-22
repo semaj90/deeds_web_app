@@ -66,7 +66,7 @@ export const actions: Actions = {
             const cluster = clusterResult.rows[0] as any;
 
             // Call Gemini
-            const apiKey = env.GEMINI_API_KEY;
+            const apiKey = env.GEMINI_API_KEY ?? env.GOOGLE_GEMINI_API_KEY;
             if (!apiKey) return { success: false, error: 'Missing GEMINI_API_KEY' };
 
             const genAI = new GoogleGenerativeAI(apiKey);

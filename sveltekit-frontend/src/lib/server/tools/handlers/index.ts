@@ -11,6 +11,7 @@ import './clusterTag.js';
 import './chunkEmbed.js';
 import './langextractBatch.js';
 import './crawlDocs.js';
+import './research.js';
 
 // Re-export registry
 export { toolRegistry, toolRegistry as getToolDefinitions } from '../registry.js';

@@ -13,6 +13,8 @@
  */
 import { Project, SyntaxKind, type SourceFile, type Node } from 'ts-morph';
 import { basename, relative, extname } from 'path';
+import { logAstParse } from './ast-ingest-logger.js';
+import { extractMetadata, persistFileFeature } from './workspace-metadata-extractor.js';
 
 export interface CodeChunk {
 	id: string;
@@ -254,7 +256,7 @@ function chunkSourceFile(sourceFile: SourceFile, rootDir: string): CodeChunk[] {
  * @param rootDir - Root directory for relative path computation
  * @returns Array of code chunks with metadata + signatures
  */
-export function chunkFiles(filePaths: string[], rootDir: string): CodeChunk[] {
+export async function chunkFiles(filePaths: string[], rootDir: string): Promise<CodeChunk[]> {
 	const project = new Project({
 		skipAddingFilesFromTsConfig: true,
 		compilerOptions: {
@@ -270,13 +272,41 @@ export function chunkFiles(filePaths: string[], rootDir: string): CodeChunk[] {
 		const ext = extname(fp);
 		if (ext !== '.ts' && ext !== '.js' && ext !== '.mts' && ext !== '.mjs') continue;
 
+		const t0 = performance.now();
 		try {
 			const sourceFile = project.addSourceFileAtPath(fp);
 			const chunks = chunkSourceFile(sourceFile, rootDir);
 			allChunks.push(...chunks);
 			project.removeSourceFile(sourceFile); // free memory
-		} catch {
+
+			// ── ingest logger ──────────────────────────────────────────────
+			const kindBreakdown: Record<string, number> = {};
+			for (const c of chunks) {
+				kindBreakdown[c.metadata.kind] = (kindBreakdown[c.metadata.kind] ?? 0) + 1;
+			}
+			logAstParse({
+				filePath: fp,
+				relativePath: relative(rootDir, fp).replace(/\\/g, '/'),
+				chunkCount: chunks.length,
+				kindBreakdown,
+				durationMs: Math.round(performance.now() - t0),
+				skipped: false,
+			});
+
+			// ── workspace metadata (fire-and-forget DB persist) ────────────
+			const meta = await extractMetadata(fp, { repoRoot: rootDir, content: sourceFile.getText() });
+			persistFileFeature(meta).catch(() => {});
+		} catch (err) {
 			// Skip files that fail to parse (corrupted, etc.)
+			logAstParse({
+				filePath: fp,
+				relativePath: relative(rootDir, fp).replace(/\\/g, '/'),
+				chunkCount: 0,
+				kindBreakdown: {},
+				durationMs: Math.round(performance.now() - t0),
+				skipped: true,
+				error: err instanceof Error ? err.message : String(err),
+			});
 		}
 	}
 

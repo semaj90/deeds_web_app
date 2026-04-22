@@ -316,8 +316,8 @@
         });
         for (let i = 1; i < verts.length - 1; i++) {
           for (const { vi, ni } of [verts[0], verts[i], verts[i+1]]) {
-            const px = positions[vi*3]??0, py = positions[vi*3+1]??0, pz = positions[vi*3+2]??0;
-            const nx = normals[ni*3]??0,  ny = normals[ni*3+1]??0,  nz = normals[ni*3+2]??0;
+            const px = positions[vi*3] ??0, py = positions[vi*3+1] ??0, pz = positions[vi*3+2] ??0;
+            const nx = normals[ni*3] ??0,  ny = normals[ni*3+1] ??0,  nz = normals[ni*3+2] ??0;
             finalVerts.push(px, py, pz, nx, ny, nz, 0, 0);
             finalIdx.push(idx++);
           }

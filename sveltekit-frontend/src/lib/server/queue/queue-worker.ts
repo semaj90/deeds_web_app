@@ -609,7 +609,7 @@ export class CodebaseIndexWorker extends QueueWorker<{
 			allFiles.push(...(await collectFiles(resolve(ROOT, dir))));
 		}
 
-		const chunks = chunkFiles(allFiles, ROOT);
+		const chunks = await chunkFiles(allFiles, ROOT);
 		await indexChunks(chunks);
 		console.log(
 			`[Worker:codebase.index] Indexed ${allFiles.length} files, ${chunks.length} chunks`

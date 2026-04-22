@@ -27,8 +27,14 @@ export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4', str
 export type VLMModel = string;
 
 export interface OllamaMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant' | 'system' | 'tool';
   content: string;
+  tool_calls?: Array<{
+    function: {
+      name: string;
+      arguments: Record<string, unknown>;
+    };
+  }>;
 }
 
 export interface OllamaResponse {
@@ -51,6 +57,8 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { Agent } from 'undici';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import crypto from 'node:crypto';
+import * as Hypergraph from './ai/hypergraph-store.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -62,10 +70,27 @@ const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 const CHAT_MODEL = ENV.OLLAMA_CHAT_MODEL;
 const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '300000');
 
+function parseTimeoutMs(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function isAbortTimeoutError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return error.name === 'AbortError' || /abort|timeout/i.test(error.message);
+}
+
+const BIFROST_GATEWAY_TIMEOUT_MS = parseTimeoutMs(process.env?.BIFROST_TIMEOUT_MS, 8000);
+const BIFROST_L2_EMBED_TIMEOUT_MS = parseTimeoutMs(process.env?.BIFROST_L2_EMBED_TIMEOUT_MS, 2000);
+const BIFROST_L2_QDRANT_TIMEOUT_MS = parseTimeoutMs(
+  process.env?.BIFROST_L2_QDRANT_TIMEOUT_MS,
+  1500
+);
+
 // Populate VLM_MODELS from ENV now that ENV is initialized
 VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL;
 VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL;
-VLM_MODELS.legal     = ENV.OLLAMA_CHAT_MODEL;
+VLM_MODELS.legal = ENV.OLLAMA_CHAT_MODEL;
 VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL;
 
 // ── HTTP Keep-Alive Agent ───────────────────────────────────────────────────
@@ -223,25 +248,68 @@ function normalizeBifrostMessage(content: string): string {
     .trim();
 }
 
-export async function bifrostChat(
-  messages: Array<{ role: string; content: string }>,
+/** Options shared by all bifrostChat overloads */
+type BifrostChatOptions = {
+  temperature?: number;
+  maxTokens?: number;
+  timeoutMs?: number;
+  cacheKey?: string;
+  /**
+   * Entity tags from Qdrant payload enrichment (e.g. from generateEmbeddingsWithTags).
+   * Top-4 sorted tags are appended to the Bifrost x-bf-cache-key so that semantically
+   * similar queries about different legal domains get distinct cache entries.
+   * Example: 'hearsay evidence' vs 'hearsay objection' both embed similarly but
+   * tag differently (evidence-rules vs courtroom-procedure) → separate cache slots.
+   */
+  entityTags?: string[];
+  tools?: ReadonlyArray<unknown>;
+  toolChoice?: string | object;
+  lane?: Hypergraph.AgentLane;
+  taskType?: Hypergraph.TaskType;
+  sessionId?: string;
+};
+
+/** Overload: no tools → guaranteed string */
+export function bifrostChat(
+  messages: Array<OllamaMessage>,
   model: string,
-  options?: {
-    temperature?: number;
-    maxTokens?: number;
-    timeoutMs?: number;
-    cacheKey?: string;
-    /**
-     * Entity tags from Qdrant payload enrichment (e.g. from generateEmbeddingsWithTags).
-     * Top-4 sorted tags are appended to the Bifrost x-bf-cache-key so that semantically
-     * similar queries about different legal domains get distinct cache entries.
-     * Example: 'hearsay evidence' vs 'hearsay objection' both embed similarly but
-     * tag differently (evidence-rules vs courtroom-procedure) → separate cache slots.
-     */
-    entityTags?: string[];
+  options?: Omit<BifrostChatOptions, 'tools' | 'toolChoice'> & { tools?: never }
+): Promise<string>;
+/** Overload: with tools → may return tool_calls object */
+export function bifrostChat(
+  messages: Array<OllamaMessage>,
+  model: string,
+  options: BifrostChatOptions & { tools: ReadonlyArray<unknown> }
+): Promise<string | { content: string; tool_calls?: any[]; sessionId: string }>;
+/** Implementation */
+export async function bifrostChat(
+  messages: Array<OllamaMessage>,
+  model: string,
+  options?: BifrostChatOptions
+): Promise<string | { content: string; tool_calls?: any[]; sessionId: string }> {
+  // ── Hypergraph Recording Start ──
+  const sessionId = options?.sessionId ?? crypto.randomUUID();
+  const lane = options?.lane ?? Hypergraph.AgentLane.Interactive;
+  const taskType = options?.taskType ?? 'streaming-chat';
+
+  if (lane === Hypergraph.AgentLane.Interactive && !options?.sessionId) {
+    await Hypergraph.recordSessionStart({
+      sessionId,
+      lane,
+      taskType,
+      startTime: Date.now(),
+      metadata: { model, options: { temperature: options?.temperature } },
+    });
   }
-): Promise<string> {
-  const bifrostModel = model.includes('/') ? model : `ollama/${model}`; // Fixed: ollama-local → ollama
+
+  // ── Lane 1 Routing & VLM Escalation ──
+  // Rule: VLM escalation only when images/screenshots are present, or as a fallback
+  const hasImages = messages.some(
+    (m) => m.content.includes('data:image/') || m.content.includes('base64')
+  );
+  const effectiveModel = hasImages ? VLM_MODELS.vision : model;
+
+  const bifrostModel = effectiveModel.includes('/') ? effectiveModel : `ollama/${effectiveModel}`;
   // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
   // Without it, every request bypasses the cache entirely (Bifrost docs).
   // 'legal-ai-global' creates a shared namespace: semantically similar questions
@@ -259,7 +327,7 @@ export async function bifrostChat(
 
   // ── L1 Cache: Redis Exact-Match (sub-ms lookup, 17,500× speedup) ──
   const { generateCacheKey, getExactMatchCache, setExactMatchCache } = await import(
-    '$lib/server/cache/redis-exact-match.js'
+    './cache/redis-exact-match.js'
   );
   const exactCacheKey = generateCacheKey({
     model: bifrostModel,
@@ -268,19 +336,121 @@ export async function bifrostChat(
     maxTokens: options?.maxTokens,
   });
 
+  const t_start = performance.now();
+  let t_l1 = 0;
+  let t_embed = 0;
+  let t_qdrant = 0;
+  let t_l3 = 0;
+  let cacheHitLevel: 'L1' | 'L2' | 'L3' = 'L3';
+  let writebackQueued = false;
+
   const exactMatch = await getExactMatchCache(exactCacheKey);
+  t_l1 = performance.now() - t_start;
+
   if (exactMatch) {
-    console.log(`[bifrost] L1 EXACT-MATCH HIT (${exactMatch.backend}) — instant return`);
+    cacheHitLevel = 'L1';
+    console.log(`[bifrost] L1 EXACT-MATCH HIT (${exactMatch.backend}) — l1_ms=${t_l1.toFixed(2)}`);
     return exactMatch.content;
   }
 
-  // ── L2 Cache: Bifrost Semantic Search (5s lookup via Qdrant) ──
-  // Bifrost timeout: 30s (short) — falls through to L3 direct Ollama on failure
-  const BIFROST_TIMEOUT_MS = Math.min(options?.timeoutMs ?? 30_000, 30_000);
+  // ── L2 Cache: Qdrant HTTP Semantic Search (bypasses Bifrost gRPC bug) ──
+  // Bifrost's semantic_cache plugin uses gRPC to Qdrant which hangs due to Docker IPv6 resolution.
+  // We implement equivalent functionality using Qdrant's HTTP REST API directly.
+  const bifrostGatewayTimeoutMs = Math.min(
+    options?.timeoutMs ?? BIFROST_GATEWAY_TIMEOUT_MS,
+    BIFROST_GATEWAY_TIMEOUT_MS
+  );
+  const L2_SEMANTIC_THRESHOLD = 0.82;
+  const BIFROST_CACHE_COLLECTION = 'BifrostSemanticCachePlugin';
+
+  const lastUserMsg = normalizedMessages.findLast((m) => m.role === 'user')?.content ?? '';
+  let l2CacheHit = false;
+  if (lastUserMsg) {
+    try {
+      // Embed the query using Ollama (embeddinggemma, 768-dim)
+      const t0_embed = performance.now();
+      const embedRes = await fetch(`${OLLAMA_BASE_URL}/api/embed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: VLM_MODELS.embedding, input: lastUserMsg }),
+        signal: AbortSignal.timeout(BIFROST_L2_EMBED_TIMEOUT_MS),
+      });
+      t_embed = performance.now() - t0_embed;
+
+      if (embedRes.ok) {
+        const embedData = (await embedRes.json()) as { embeddings?: number[][] };
+        const vec = embedData.embeddings?.[0];
+        if (vec?.length === 768) {
+          // Search Qdrant HTTP for similar cached response (filter by model + cache_key)
+          const t0_qdrant = performance.now();
+          const searchRes = await fetch(
+            `${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points/search`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                vector: vec,
+                limit: 1,
+                score_threshold: L2_SEMANTIC_THRESHOLD,
+                with_payload: true,
+                with_vector: false,
+                filter: {
+                  must: [
+                    { key: 'model', match: { value: bifrostModel } },
+                    { key: 'cache_key', match: { value: 'global' } },
+                  ],
+                },
+              }),
+              signal: AbortSignal.timeout(BIFROST_L2_QDRANT_TIMEOUT_MS),
+            }
+          );
+          t_qdrant = performance.now() - t0_qdrant;
+
+          if (searchRes.ok) {
+            const searchData = (await searchRes.json()) as {
+              result?: Array<{ score: number; payload?: { response?: string } }>;
+            };
+            const hit = searchData.result?.[0];
+            if (hit && hit.score >= L2_SEMANTIC_THRESHOLD && hit.payload?.response) {
+              try {
+                const parsed = JSON.parse(hit.payload.response) as {
+                  choices?: Array<{ message?: { content?: string } }>;
+                };
+                const cachedContent = parsed.choices?.[0]?.message?.content ?? '';
+                if (cachedContent) {
+                  cacheHitLevel = 'L2';
+                  console.debug(
+                    `[bifrost] L2 QDRANT-HTTP HIT score=${hit.score.toFixed(
+                      3
+                    )} — qdrant_ms=${t_qdrant.toFixed(2)}`
+                  );
+                  await setExactMatchCache(exactCacheKey, {
+                    content: cachedContent,
+                    model: bifrostModel,
+                    backend: 'qdrant-semantic',
+                  });
+                  l2CacheHit = true;
+                  return cachedContent;
+                }
+              } catch {
+                // malformed response JSON in Qdrant payload — fall through
+              }
+            }
+          }
+        }
+      }
+    } catch {
+      // L2 probe failed — fall through to Bifrost gateway (L3)
+    }
+  }
+  // ── L3: Bifrost Gateway → Ollama ──────────────────────────────────────────
+  // Bifrost acts as a pure forwarding gateway (vector_store removed from config to
+  // avoid Docker gRPC hang). L1/L2 handled above; L3 does the actual inference.
   const bifrostStart = performance.now();
   let content = '';
   let cacheHit = false;
   let hitType: string | undefined;
+  let tool_calls: any[] | undefined;
 
   try {
     const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
@@ -295,8 +465,10 @@ export async function bifrostChat(
         temperature: options?.temperature ?? 0.7,
         max_tokens: options?.maxTokens ?? 2048,
         stream: false,
+        ...(options?.tools ? { tools: options.tools } : {}),
+        ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
       }),
-      signal: AbortSignal.timeout(BIFROST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(bifrostGatewayTimeoutMs),
     });
 
     if (!res.ok) {
@@ -307,26 +479,41 @@ export async function bifrostChat(
     // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
     const rawText = await res.text();
     const data = fastJsonParse<{
-      choices?: Array<{ message?: { content?: string } }>;
+      choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
       extra_fields?: {
         cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
       };
     }>(rawText);
     const debug = data.extra_fields?.cache_debug;
-    content = data.choices?.[0]?.message?.content ?? '';
+    const choice = data.choices?.[0]?.message;
+    content = choice?.content ?? '';
+    tool_calls = choice?.tool_calls;
     cacheHit = !!debug?.cache_hit;
     hitType = debug?.hit_type;
 
+    t_l3 = performance.now() - bifrostStart;
     if (debug?.cache_hit) {
       console.debug(
         `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
       );
     }
+
+    if (tool_calls?.length) {
+      return { content, tool_calls, sessionId };
+    }
   } catch (bifrostErr) {
     // ── L3 Fallback: Direct Ollama (bypasses broken Bifrost) ──
-    console.warn(
-      `[bifrost] L2 failed (${(bifrostErr as Error)?.message?.slice(0, 80)}), falling back to L3 direct Ollama`
-    );
+    const gatewayTimedOut = isAbortTimeoutError(bifrostErr);
+    const errorMessage = (bifrostErr as Error)?.message?.slice(0, 120) ?? 'unknown error';
+
+    if (gatewayTimedOut) {
+      console.info(
+        `[bifrost] Gateway timeout after ${bifrostGatewayTimeoutMs}ms, falling back to direct Ollama`
+      );
+    } else {
+      console.warn(`[bifrost] Gateway error (${errorMessage}), falling back to direct Ollama`);
+    }
+
     const ollamaRes = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -334,6 +521,7 @@ export async function bifrostChat(
         model: model, // use original model name (not bifrost prefixed)
         messages: normalizedMessages,
         stream: false,
+        ...(options?.tools ? { tools: options.tools } : {}),
         options: {
           temperature: options?.temperature ?? 0.7,
           num_predict: options?.maxTokens ?? 2048,
@@ -348,11 +536,73 @@ export async function bifrostChat(
 
     const ollamaData = (await ollamaRes.json()) as OllamaResponse;
     content = ollamaData.message?.content ?? '';
-    console.log(`[bifrost] L3 DIRECT OLLAMA OK (${Math.round(performance.now() - bifrostStart)}ms)`);
+    tool_calls = ollamaData.message?.tool_calls;
+    t_l3 = performance.now() - bifrostStart;
+    console.log(`[bifrost] L3 DIRECT OLLAMA OK (l3_ms=${Math.round(t_l3)})`);
+    if (tool_calls?.length) {
+      return { content, tool_calls, sessionId };
+    }
   }
 
   // Store in Redis exact-match cache for instant future retrieval
-  if (content) {
+  if (content && !l2CacheHit) {
+    // Write-back to Qdrant semantic cache (L2) so future similar queries hit L2
+    // Fire-and-forget (non-blocking) — we don't want to delay the response
+    if (lastUserMsg) {
+      writebackQueued = true;
+      (async () => {
+        try {
+          const embedRes = await fetch(`${OLLAMA_BASE_URL}/api/embed`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: VLM_MODELS.embedding, input: lastUserMsg }),
+            signal: AbortSignal.timeout(5_000),
+          });
+          if (embedRes.ok) {
+            const embedData = (await embedRes.json()) as { embeddings?: number[][] };
+            const vec = embedData.embeddings?.[0];
+            if (vec?.length === 768) {
+              const pointId = crypto.randomUUID();
+              const cachedResponse = JSON.stringify({
+                id: `bifrost-l3-${Date.now()}`,
+                object: 'chat.completion',
+                model: bifrostModel,
+                choices: [
+                  { index: 0, message: { role: 'assistant', content }, finish_reason: 'stop' },
+                ],
+                usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+              });
+              await fetch(`${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  points: [
+                    {
+                      id: pointId,
+                      vector: vec,
+                      payload: {
+                        request_hash: exactCacheKey,
+                        params_hash: cacheKey,
+                        cache_key: 'global',
+                        model: bifrostModel,
+                        provider: 'ollama',
+                        response: cachedResponse,
+                        stream_chunks: '',
+                        from_bifrost_semantic_cache_plugin: true,
+                        expires_at: Math.floor(Date.now() / 1000) + 7200, // 2h TTL
+                      },
+                    },
+                  ],
+                }),
+                signal: AbortSignal.timeout(3_000),
+              });
+            }
+          }
+        } catch {
+          // write-back failure is non-fatal
+        }
+      })();
+    }
     // Log L3 cold inference to CouchDB for QLoRA distillation
     if (!cacheHit) {
       logInference({
@@ -374,6 +624,27 @@ export async function bifrostChat(
       model: bifrostModel,
       backend: cacheHit ? `bifrost-semantic${hitType ? '-' + hitType : ''}` : 'ollama-direct',
     });
+  }
+
+  const total_ms = performance.now() - t_start;
+  console.log(
+    `[bifrost-stats] hit_level=${cacheHitLevel} total_ms=${total_ms.toFixed(
+      2
+    )} l1_ms=${t_l1.toFixed(2)} embed_ms=${t_embed.toFixed(2)} qdrant_ms=${t_qdrant.toFixed(
+      2
+    )} l3_ms=${t_l3.toFixed(2)} writeback=${writebackQueued}`
+  );
+
+  // ── Hypergraph Recording End ──
+  if (lane === Hypergraph.AgentLane.Interactive && content) {
+    await Hypergraph.recordInferenceStep(sessionId, { role: 'assistant', content }, total_ms);
+    if (!options?.sessionId) {
+      await Hypergraph.finalizeSession(sessionId, 'completed');
+    }
+  }
+
+  if (tool_calls?.length) {
+    return { content, tool_calls, sessionId };
   }
 
   return content;

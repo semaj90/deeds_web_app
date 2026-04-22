@@ -2,8 +2,10 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { researchTasks } from '$lib/stores/research-tasks.svelte.js';
 
 	let { data } = $props();
+	const isAuthenticated = $derived(Boolean(data.userId));
 
 	let summary = $derived(data.summary);
 	let patterns = $derived(data.patterns);
@@ -181,10 +183,229 @@
 	let deepResearch = $state<DeepResearchData | null>(null);
 	let deepResearchLoading = $state(false);
 	let deepResearchError = $state<string | null>(null);
+	let deepResearchExecutionProvider = $state<'ollama' | 'google'>('ollama');
+
+	interface GoogleVisualOutput {
+		src: string | null;
+		uri: string | null;
+		mimeType: string | null;
+		resolution: string | null;
+	}
+
+	interface PromptResultState {
+		answer: string;
+		pipeline: string;
+		durationMs: number | null;
+		provider: 'ollama' | 'google';
+		mode: 'report' | 'plan';
+		topicId?: string;
+		topicTitle?: string;
+		interactionId?: string;
+		imageCount?: number;
+		images?: GoogleVisualOutput[];
+		thoughtSummaries?: string[];
+	}
 
 	// Self-prompt execution state
 	let executingPromptId = $state<string | null>(null);
-	let promptResult = $state<{ answer: string; pipeline: string; durationMs: number } | null>(null);
+	let promptExecutionError = $state<string | null>(null);
+	let promptExecutionStatus = $state<string | null>(null);
+	let promptResult = $state<PromptResultState | null>(null);
+	let promptPlanFollowUp = $state('');
+	let queuedTaskMessage = $state<string | null>(null);
+
+	const GOOGLE_DEEP_RESEARCH_POLL_INTERVAL_MS = 5000;
+	const GOOGLE_DEEP_RESEARCH_MAX_POLLS = 120;
+
+	function sleep(ms: number): Promise<void> {
+		return new Promise((resolve) => window.setTimeout(resolve, ms));
+	}
+
+	async function pollGoogleDeepResearch(interactionId: string) {
+		for (let attempt = 0; attempt < GOOGLE_DEEP_RESEARCH_MAX_POLLS; attempt++) {
+			const res = await fetch(`/api/analytics/deep-research/google?interactionId=${encodeURIComponent(interactionId)}`);
+			const payload = await res.json().catch(() => ({}));
+
+			if (!res.ok) {
+				throw new Error(String(payload?.error ?? 'Failed to poll Google Deep Research'));
+			}
+
+			promptExecutionStatus = `Google Deep Research: ${String(payload.status ?? 'in_progress').replaceAll('_', ' ')}`;
+
+			if (payload.status === 'completed' || payload.status === 'failed' || payload.status === 'cancelled') {
+				return payload as {
+					interactionId: string;
+					status: string;
+					textOutput: string;
+					durationMs: number | null;
+					imageCount: number;
+					images: GoogleVisualOutput[];
+					thoughtSummaries: string[];
+					error?: { message?: string } | null;
+				};
+			}
+
+			await sleep(GOOGLE_DEEP_RESEARCH_POLL_INTERVAL_MS);
+		}
+
+		throw new Error('Google Deep Research timed out before completion');
+	}
+
+	function activePromptTopic(): ResearchTopic | null {
+		if (!promptResult?.topicId || !deepResearch?.topics?.length) return null;
+		return deepResearch.topics.find((topic) => topic.id === promptResult?.topicId) ?? null;
+	}
+
+	async function submitGoogleDeepResearchRequest(body: Record<string, unknown>, pendingLabel: string) {
+		const res = await fetch('/api/analytics/deep-research/google', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+		});
+
+		const startPayload = await res.json().catch(() => ({}));
+		if (!res.ok) {
+			throw new Error(String(startPayload?.error ?? 'Failed to start Google Deep Research'));
+		}
+
+		if (typeof startPayload.interactionId !== 'string' || !startPayload.interactionId) {
+			throw new Error('Google Deep Research did not return an interaction ID');
+		}
+
+		promptExecutionStatus = pendingLabel;
+		const finalPayload = await pollGoogleDeepResearch(startPayload.interactionId);
+		if (finalPayload.status !== 'completed') {
+			throw new Error(String(finalPayload.error?.message ?? `Google Deep Research ended with status ${finalPayload.status}`));
+		}
+
+		return finalPayload;
+	}
+
+	function setGooglePromptResult(topic: ResearchTopic, payload: Awaited<ReturnType<typeof submitGoogleDeepResearchRequest>>, mode: 'report' | 'plan') {
+		promptResult = {
+			answer: payload.textOutput || (mode === 'plan'
+				? 'Google Deep Research prepared a plan without inline text output.'
+				: 'Google Deep Research completed without text output.'),
+			pipeline: 'google-deep-research',
+			durationMs: payload.durationMs,
+			provider: 'google',
+			mode,
+			topicId: topic.id,
+			topicTitle: topic.title,
+			interactionId: payload.interactionId,
+			imageCount: payload.imageCount,
+			images: payload.images,
+			thoughtSummaries: payload.thoughtSummaries,
+		};
+	}
+
+	async function queueResearchTask(topic: ResearchTopic) {
+		queuedTaskMessage = null;
+
+		if (!isAuthenticated) {
+			queuedTaskMessage = 'Sign in is required before queued research tasks can run on the server.';
+			return;
+		}
+
+		const task = await researchTasks.addTask(
+			{
+				title: topic.title,
+				selfPrompt: topic.selfPrompt,
+				pipelineHint: topic.pipelineHint,
+				provider: deepResearchExecutionProvider,
+				priority: topic.priority,
+				summary: topic.description,
+				runNow: false,
+			},
+			isAuthenticated,
+		);
+
+		queuedTaskMessage = task
+			? `Queued ${deepResearchExecutionProvider === 'google' ? 'Google Deep Research' : 'Ollama'} task in the research task panel.`
+			: 'Failed to queue research task.';
+	}
+
+	async function startCollaborativePlan(topic: ResearchTopic) {
+		executingPromptId = topic.id;
+		promptResult = null;
+		promptExecutionError = null;
+		queuedTaskMessage = null;
+		promptPlanFollowUp = '';
+		promptExecutionStatus = 'Google Deep Research: drafting collaborative plan…';
+
+		try {
+			const finalPayload = await submitGoogleDeepResearchRequest({
+				action: 'start',
+				input: topic.selfPrompt,
+				collaborativePlanning: true,
+				visualization: 'auto',
+				thinkingSummaries: 'auto',
+			}, 'Google Deep Research: drafting collaborative plan…');
+
+			setGooglePromptResult(topic, finalPayload, 'plan');
+			promptExecutionStatus = 'Collaborative plan ready for review.';
+		} catch (error) {
+			promptExecutionError = error instanceof Error ? error.message : 'Failed to generate collaborative plan';
+		} finally {
+			executingPromptId = null;
+		}
+	}
+
+	async function refineCollaborativePlan() {
+		const topic = activePromptTopic();
+		const refinement = promptPlanFollowUp.trim();
+		if (!topic || !promptResult?.interactionId || !refinement) return;
+
+		executingPromptId = topic.id;
+		promptExecutionError = null;
+		queuedTaskMessage = null;
+		promptExecutionStatus = 'Google Deep Research: refining collaborative plan…';
+
+		try {
+			const finalPayload = await submitGoogleDeepResearchRequest({
+				action: 'follow-up',
+				interactionId: promptResult.interactionId,
+				input: refinement,
+				collaborativePlanning: true,
+				visualization: 'auto',
+				thinkingSummaries: 'auto',
+			}, 'Google Deep Research: refining collaborative plan…');
+
+			setGooglePromptResult(topic, finalPayload, 'plan');
+			promptExecutionStatus = 'Collaborative plan updated.';
+			promptPlanFollowUp = '';
+		} catch (error) {
+			promptExecutionError = error instanceof Error ? error.message : 'Failed to refine collaborative plan';
+		} finally {
+			executingPromptId = null;
+		}
+	}
+
+	async function approveCollaborativePlan() {
+		const topic = activePromptTopic();
+		if (!topic || !promptResult?.interactionId) return;
+
+		executingPromptId = topic.id;
+		promptExecutionError = null;
+		queuedTaskMessage = null;
+		promptExecutionStatus = 'Google Deep Research: executing approved plan…';
+
+		try {
+			const finalPayload = await submitGoogleDeepResearchRequest({
+				action: 'approve-plan',
+				interactionId: promptResult.interactionId,
+				message: promptPlanFollowUp.trim() || 'Plan approved. Execute the research.',
+			}, 'Google Deep Research: executing approved plan…');
+
+			setGooglePromptResult(topic, finalPayload, 'report');
+			promptExecutionStatus = `Approved plan completed${finalPayload.imageCount ? ` with ${finalPayload.imageCount} generated visual${finalPayload.imageCount === 1 ? '' : 's'}` : ''}.`;
+			promptPlanFollowUp = '';
+		} catch (error) {
+			promptExecutionError = error instanceof Error ? error.message : 'Failed to approve collaborative plan';
+		} finally {
+			executingPromptId = null;
+		}
+	}
 
 	async function loadDeepResearch(refresh = false) {
 		if (deepResearch && !refresh) return;
@@ -207,7 +428,27 @@
 	async function executeSelfPrompt(topic: ResearchTopic) {
 		executingPromptId = topic.id;
 		promptResult = null;
+		promptExecutionError = null;
+		queuedTaskMessage = null;
+		promptPlanFollowUp = '';
+		promptExecutionStatus = deepResearchExecutionProvider === 'google'
+			? 'Starting Google Deep Research…'
+			: 'Running via Ollama…';
 		try {
+			if (deepResearchExecutionProvider === 'google') {
+				const finalPayload = await submitGoogleDeepResearchRequest({
+					action: 'start',
+					input: topic.selfPrompt,
+					collaborativePlanning: false,
+					visualization: 'auto',
+					thinkingSummaries: 'auto',
+				}, 'Google Deep Research: running full report…');
+
+				setGooglePromptResult(topic, finalPayload, 'report');
+				promptExecutionStatus = `Google Deep Research completed${finalPayload.imageCount ? ` with ${finalPayload.imageCount} generated visual${finalPayload.imageCount === 1 ? '' : 's'}` : ''}.`;
+				return;
+			}
+
 			const res = await fetch('/api/analytics/deep-research', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -217,10 +458,23 @@
 				}),
 			});
 			if (res.ok) {
-				promptResult = await res.json();
+				const result = await res.json();
+				promptResult = {
+					...result,
+					mode: 'report',
+					topicId: topic.id,
+					topicTitle: topic.title,
+					provider: 'ollama',
+				};
+				promptExecutionStatus = 'Ollama deep research complete.';
+			} else {
+				promptExecutionError = 'Failed to execute self-prompt';
 			}
-		} catch { /* non-fatal */ }
-		executingPromptId = null;
+		} catch (error) {
+			promptExecutionError = error instanceof Error ? error.message : 'Deep research execution failed';
+		} finally {
+			executingPromptId = null;
+		}
 	}
 
 	// ── MapReduce Matrix state ──────────────────────────────────────────
@@ -736,12 +990,30 @@
 			<div class="ana-card-head" style="display:flex;align-items:center;justify-content:space-between">
 				<div>
 					<h3 class="ana-card-title">Deep Research Topics</h3>
-					<p class="ana-card-desc">Self-prompting research topics generated from RAG/KAG/DAG/ACE hits, feedback signals, and graph analysis via Ollama</p>
+					<p class="ana-card-desc">Self-prompting research topics generated from RAG/KAG/DAG/ACE hits, feedback signals, and graph analysis via Ollama. Topic execution can run locally or through Google Deep Research.</p>
 				</div>
-				<button class="dr-refresh-btn" onclick={() => loadDeepResearch(true)} disabled={deepResearchLoading}>
-					<Icon name="refresh-cw" />
-					{deepResearchLoading ? 'Generating…' : 'Regenerate'}
-				</button>
+				<div class="dr-head-actions">
+					<div class="dr-provider-toggle" role="group" aria-label="Deep research execution provider">
+						<button
+							type="button"
+							class:dr-provider-btn-active={deepResearchExecutionProvider === 'ollama'}
+							onclick={() => deepResearchExecutionProvider = 'ollama'}
+						>
+							Ollama
+						</button>
+						<button
+							type="button"
+							class:dr-provider-btn-active={deepResearchExecutionProvider === 'google'}
+							onclick={() => deepResearchExecutionProvider = 'google'}
+						>
+							Google
+						</button>
+					</div>
+					<button class="dr-refresh-btn" onclick={() => loadDeepResearch(true)} disabled={deepResearchLoading}>
+						<Icon name="refresh-cw" />
+						{deepResearchLoading ? 'Generating…' : 'Regenerate'}
+					</button>
+				</div>
 			</div>
 
 			{#if deepResearchLoading}
@@ -769,25 +1041,127 @@
 							</div>
 							<div class="dr-topic-prompt">
 								<code class="dr-self-prompt">{topic.selfPrompt}</code>
-								<button
-									class="dr-execute-btn"
-									disabled={executingPromptId !== null}
-									onclick={() => executeSelfPrompt(topic)}
-								>
-									{executingPromptId === topic.id ? 'Running…' : 'Execute'}
-								</button>
+								<div class="dr-topic-actions">
+									{#if deepResearchExecutionProvider === 'google'}
+										<button
+											class="dr-secondary-btn"
+											disabled={executingPromptId !== null}
+											onclick={() => startCollaborativePlan(topic)}
+										>
+											{executingPromptId === topic.id ? 'Working…' : 'Plan'}
+										</button>
+									{/if}
+									<button class="dr-secondary-btn" onclick={() => queueResearchTask(topic)}>
+										Queue
+									</button>
+									<button
+										class="dr-execute-btn"
+										disabled={executingPromptId !== null}
+										onclick={() => executeSelfPrompt(topic)}
+									>
+										{executingPromptId === topic.id ? 'Running…' : 'Execute'}
+									</button>
+								</div>
 							</div>
 						</div>
 					{/each}
 				</div>
 
+				{#if queuedTaskMessage}
+					<div class="dr-status-note" style="margin-top: 0.75rem;">{queuedTaskMessage}</div>
+				{/if}
+
 				{#if promptResult}
 					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(96, 165, 250, 0.2)">
 						<div class="ana-card-head">
-							<h3 class="ana-card-title">Deep Research Result</h3>
-							<p class="ana-card-desc">Pipeline: {promptResult.pipeline} — {promptResult.durationMs}ms</p>
+							<h3 class="ana-card-title">{promptResult.mode === 'plan' ? 'Collaborative Research Plan' : 'Deep Research Result'}</h3>
+							<p class="ana-card-desc">
+								Provider: {promptResult.provider} · Pipeline: {promptResult.pipeline}
+								{#if promptResult.topicTitle}
+									· Topic: {promptResult.topicTitle}
+								{/if}
+								{#if promptResult.durationMs != null}
+									 — {promptResult.durationMs}ms
+								{/if}
+							</p>
 						</div>
+						{#if promptExecutionStatus}
+							<div class="dr-status-note">{promptExecutionStatus}</div>
+						{/if}
+						{#if promptResult.mode === 'plan'}
+							<div class="dr-plan-note">Review the proposed plan, refine it, or approve it to run the full research report.</div>
+						{/if}
+						{#if promptResult.thoughtSummaries?.length}
+							<div class="dr-thought-list">
+								{#each promptResult.thoughtSummaries as summaryText}
+									<div class="dr-thought-summary">{summaryText}</div>
+								{/each}
+							</div>
+						{/if}
 						<div class="dr-result-text">{promptResult.answer}</div>
+						{#if promptResult.images?.some((image) => image.src)}
+							<div class="dr-image-grid">
+								{#each promptResult.images as image, index}
+									{#if image.src}
+										<figure class="dr-image-card">
+											<img src={image.src} alt={`Generated research visualization ${index + 1}`} loading="lazy" />
+											<figcaption>
+												{image.mimeType ?? 'image'}
+												{#if image.resolution}
+													 · {image.resolution.replaceAll('_', ' ')}
+												{/if}
+											</figcaption>
+										</figure>
+									{/if}
+								{/each}
+							</div>
+						{:else if promptResult.imageCount}
+							<div class="dr-status-note">{promptResult.imageCount} visual output{promptResult.imageCount === 1 ? '' : 's'} generated, but the provider returned no embeddable image payload.</div>
+						{/if}
+						{#if promptResult.mode === 'plan' && promptResult.provider === 'google' && promptResult.interactionId}
+							<div class="dr-plan-controls">
+								<label class="dr-plan-label" for="dr-plan-follow-up">Refine the plan before approval</label>
+								<textarea
+									id="dr-plan-follow-up"
+									class="dr-plan-input"
+									rows="4"
+									bind:value={promptPlanFollowUp}
+									placeholder="Ask Google to expand, narrow, or reorder the plan before it runs the full report."
+								></textarea>
+								<div class="dr-plan-actions">
+									<button
+										class="dr-secondary-btn"
+										disabled={executingPromptId !== null || !promptPlanFollowUp.trim()}
+										onclick={refineCollaborativePlan}
+									>
+										Refine plan
+									</button>
+									<button
+										class="dr-execute-btn"
+										disabled={executingPromptId !== null}
+										onclick={approveCollaborativePlan}
+									>
+										Approve and run
+									</button>
+								</div>
+							</div>
+						{/if}
+					</div>
+				{:else if promptExecutionError}
+					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(248, 113, 113, 0.2)">
+						<div class="ana-card-head">
+							<h3 class="ana-card-title">Deep Research Error</h3>
+							<p class="ana-card-desc">Provider: {deepResearchExecutionProvider}</p>
+						</div>
+						<div class="dr-error-note">{promptExecutionError}</div>
+					</div>
+				{:else if promptExecutionStatus}
+					<div class="ana-card" style="margin-top: 0.75rem; border-color: rgba(96, 165, 250, 0.2)">
+						<div class="ana-card-head">
+							<h3 class="ana-card-title">Deep Research Status</h3>
+							<p class="ana-card-desc">Provider: {deepResearchExecutionProvider}</p>
+						</div>
+						<div class="dr-status-note">{promptExecutionStatus}</div>
 					</div>
 				{/if}
 			{:else}
@@ -1643,6 +2017,46 @@
 	}
 
 	/* ── Deep Research ── */
+	.dr-head-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+
+	.dr-provider-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.125rem;
+		padding: 0.2rem;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		border-radius: 0.45rem;
+	}
+
+	.dr-provider-toggle button {
+		padding: 0.28rem 0.55rem;
+		font-size: 0.65rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.45);
+		background: transparent;
+		border: 0;
+		border-radius: 0.3rem;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.dr-provider-toggle button:hover {
+		color: rgba(212, 199, 163, 0.8);
+		background: rgba(255, 255, 255, 0.04);
+	}
+
+	.dr-provider-toggle button.dr-provider-btn-active {
+		color: rgba(15, 23, 42, 0.9);
+		background: rgba(212, 199, 163, 0.9);
+	}
+
 	.dr-refresh-btn {
 		display: inline-flex;
 		align-items: center;
@@ -1739,6 +2153,13 @@
 		padding-top: 0.375rem;
 		border-top: 1px solid rgba(212, 199, 163, 0.05);
 	}
+	.dr-topic-actions {
+		display: flex;
+		gap: 0.375rem;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		flex-shrink: 0;
+	}
 	.dr-self-prompt {
 		flex: 1;
 		font-size: 0.68rem;
@@ -1747,18 +2168,28 @@
 		line-height: 1.4;
 		word-break: break-word;
 	}
+	.dr-secondary-btn,
 	.dr-execute-btn {
 		padding: 0.25rem 0.625rem !important;
 		font-size: 0.65rem;
 		font-weight: 600;
-		color: rgba(52, 211, 153, 0.85);
-		background: rgba(52, 211, 153, 0.08) !important;
-		border: 1px solid rgba(52, 211, 153, 0.2) !important;
 		border-radius: 0.25rem;
 		cursor: pointer;
 		transition: all 0.15s;
 		flex-shrink: 0;
 		white-space: nowrap;
+	}
+	.dr-secondary-btn {
+		color: rgba(96, 165, 250, 0.85);
+		background: rgba(96, 165, 250, 0.08) !important;
+		border: 1px solid rgba(96, 165, 250, 0.2) !important;
+	}
+	.dr-secondary-btn:hover { background: rgba(96, 165, 250, 0.15) !important; }
+	.dr-secondary-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	.dr-execute-btn {
+		color: rgba(52, 211, 153, 0.85);
+		background: rgba(52, 211, 153, 0.08) !important;
+		border: 1px solid rgba(52, 211, 153, 0.2) !important;
 	}
 	.dr-execute-btn:hover { background: rgba(52, 211, 153, 0.15) !important; }
 	.dr-execute-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -1770,6 +2201,101 @@
 		white-space: pre-wrap;
 		max-height: 24rem;
 		overflow-y: auto;
+	}
+
+	.dr-status-note {
+		font-size: 0.68rem;
+		color: rgba(96, 165, 250, 0.8);
+		margin-bottom: 0.5rem;
+	}
+	.dr-plan-note {
+		font-size: 0.72rem;
+		color: rgba(212, 199, 163, 0.65);
+		margin-bottom: 0.75rem;
+	}
+	.dr-thought-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.dr-thought-summary {
+		font-size: 0.68rem;
+		color: rgba(212, 199, 163, 0.45);
+		font-style: italic;
+		padding-left: 0.75rem;
+		border-left: 2px solid rgba(96, 165, 250, 0.25);
+	}
+
+	.dr-image-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 0.75rem;
+		margin-top: 0.75rem;
+	}
+	.dr-image-card {
+		margin: 0;
+		padding: 0.5rem;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		border-radius: 0.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+	.dr-image-card img {
+		width: 100%;
+		height: auto;
+		border-radius: 0.35rem;
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		background: rgba(0, 0, 0, 0.2);
+	}
+	.dr-image-card figcaption {
+		font-size: 0.62rem;
+		color: rgba(212, 199, 163, 0.45);
+	}
+	.dr-plan-controls {
+		margin-top: 0.9rem;
+		padding-top: 0.9rem;
+		border-top: 1px solid rgba(212, 199, 163, 0.08);
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.dr-plan-label {
+		font-size: 0.68rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.65);
+	}
+	.dr-plan-input {
+		width: 100%;
+		resize: vertical;
+		min-height: 5.5rem;
+		padding: 0.65rem 0.75rem;
+		background: rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(212, 199, 163, 0.12);
+		border-radius: 0.4rem;
+		color: rgba(212, 199, 163, 0.8);
+		font-size: 0.72rem;
+		line-height: 1.5;
+	}
+	.dr-plan-input:focus {
+		outline: none;
+		border-color: rgba(96, 165, 250, 0.35);
+		box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.15);
+	}
+	.dr-plan-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+
+	.dr-error-note {
+		font-size: 0.72rem;
+		color: rgba(248, 113, 113, 0.85);
+		line-height: 1.55;
 	}
 
 	.dr-thumb-up {

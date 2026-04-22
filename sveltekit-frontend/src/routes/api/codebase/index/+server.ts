@@ -110,7 +110,7 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 	}
 
 	// 2. AST-aware chunking
-	const chunks = chunkFiles(allFiles, ROOT);
+	const chunks = await chunkFiles(allFiles, ROOT);
 
 	const chunkMs = performance.now() - start;
 

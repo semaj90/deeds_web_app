@@ -192,57 +192,11 @@ async function importProcessor() {
 
   // Pattern definitions
   const patterns = [
-    // Import type block with colons instead of commas (type { A: B: C } -> type { A, B, C })
-    {
-      name: 'import-type-colon-fix',
-      pattern: /import\s+type\s*\{\s*([^}]+)\s*\}\s*from/g,
-      replacement: (match, imports) => {
-        // Replace colons between identifiers with commas
-        // Simple approach: replace : with , inside import type blocks
-        let fixed = imports.trim();
-        // Only replace colons that are between identifiers (not type annotations)
-        fixed = fixed.replace(/:\s+/g, ', ').replace(/:/g, ', ');
-        return `import type { ${fixed} } from`;
-      },
-    },
-    // Regular import block with colons instead of commas
-    {
-      name: 'import-block-colon-fix',
-      pattern: /import\s*\{([^}]+)\}\s*from/g,
-      replacement: (match, imports) => {
-        // Fix type, X -> type X
-        let fixed = imports.replace(/type,\s*([A-Z])/g, 'type $1');
-        // Fix A: B -> A, B (multiple passes)
-        for (let i = 0; i < 5; i++) {
-          fixed = fixed.replace(
-            /([A-Za-z_][A-Za-z0-9_]*):\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?=[,}])/g,
-            '$1, $2'
-          );
-          fixed = fixed.replace(
-            /([A-Za-z_][A-Za-z0-9_]*):([A-Za-z_][A-Za-z0-9_]*)\s*(?=[,}])/g,
-            '$1, $2'
-          );
-        }
-        return `import {${fixed}} from`;
-      },
-    },
-    // Import type syntax
-    {
-      name: 'import-type-syntax',
-      pattern: /type,\s*([A-Z][a-zA-Z0-9_]*)/g,
-      replacement: 'type $1',
-    },
     // Drizzle eq() fix
     {
       name: 'drizzle-eq-fix',
       pattern: /eq\((\w+(?:\.\w+)*):\s*(\w+(?:\.\w+)*)\)/g,
       replacement: 'eq($1, $2)',
-    },
-    // Property type fix
-    {
-      name: 'property-type-fix',
-      pattern: /(\w+),\s*([A-Z][a-zA-Z0-9_<>\[\]|&\s]*?)([;}\),])/g,
-      replacement: '$1: $2$3',
     },
     // Nullish coalescing space
     {
