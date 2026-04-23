@@ -16,11 +16,13 @@
 
 import crypto from 'node:crypto';
 import process from 'node:process';
+import net from 'node:net';
 
 const args = process.argv.slice(2);
 const baseIndex = args.indexOf('--base');
 const BASE = baseIndex >= 0 ? args[baseIndex + 1] : process.env.BASE_URL || 'http://localhost:5173';
 const VERBOSE = args.includes('--verbose');
+const RETRIEVAL_GRPC_PORT = Number(process.env.RETRIEVAL_GRPC_PORT || '50053');
 
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
 const red = (s) => `\x1b[31m${s}\x1b[0m`;
@@ -50,6 +52,30 @@ async function waitForServer(maxAttempts = 20, delayMs = 2000) {
   return false;
 }
 
+async function canConnectPort(port, host = '127.0.0.1', timeoutMs = 2000) {
+  return await new Promise((resolve) => {
+    const socket = new net.Socket();
+    const done = (result) => {
+      socket.destroy();
+      resolve(result);
+    };
+    socket.setTimeout(timeoutMs);
+    socket.once('connect', () => done(true));
+    socket.once('timeout', () => done(false));
+    socket.once('error', () => done(false));
+    socket.connect(port, host);
+  });
+}
+
+async function waitForGrpc(maxAttempts = 30, delayMs = 2000) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (await canConnectPort(RETRIEVAL_GRPC_PORT)) return true;
+    logVerbose(`waiting for retrieval gRPC (${attempt}/${maxAttempts})`);
+    await sleep(delayMs);
+  }
+  return false;
+}
+
 async function postJson(path, body, timeoutMs = 120_000) {
   const started = performance.now();
   const res = await fetch(`${BASE}${path}`, {
@@ -73,7 +99,9 @@ const results = [];
 
 function pass(label, latencyMs, note = '') {
   results.push({ label, ok: true, latencyMs, note });
-  console.log(`  ${green('PASS')} ${label.padEnd(34)} ${String(latencyMs).padStart(6)}ms  ${note}`.trimEnd());
+  console.log(
+    `  ${green('PASS')} ${label.padEnd(34)} ${String(latencyMs).padStart(6)}ms  ${note}`.trimEnd()
+  );
 }
 
 function fail(label, note) {
@@ -86,6 +114,11 @@ console.log(dim(`base=${BASE}`));
 
 if (!(await waitForServer())) {
   console.error(red(`Dev server not ready at ${BASE}`));
+  process.exit(1);
+}
+
+if (!(await waitForGrpc())) {
+  console.error(red(`Retrieval gRPC not ready on 127.0.0.1:${RETRIEVAL_GRPC_PORT}`));
   process.exit(1);
 }
 

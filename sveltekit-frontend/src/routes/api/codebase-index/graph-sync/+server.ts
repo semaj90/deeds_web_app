@@ -36,91 +36,113 @@ export interface SyncJob {
 
 const jobs = new Map<string, SyncJob>();
 
+function triggerFollowUp(
+  requestFetch: typeof fetch | undefined,
+  path: string,
+  init: RequestInit,
+  onSuccess: () => void,
+  onFailure: (error: unknown) => void
+) {
+  if (typeof requestFetch !== 'function') return;
+  requestFetch(path, init)
+    .then((response) => {
+      if (response.ok) {
+        onSuccess();
+      } else {
+        onFailure(`HTTP ${response.status}`);
+      }
+    })
+    .catch(onFailure);
+}
+
 // ── POST — fire and forget ────────────────────────────────────────────────────
-export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+export const POST: RequestHandler = async ({ request, locals, fetch: requestFetch }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const raw = await request.json().catch(() => ({}));
-	const parsed = bodySchema.safeParse(raw);
-	const { maxFiles } = parsed.success ? parsed.data : { maxFiles: 2000 };
+  const raw = await request.json().catch(() => ({}));
+  const parsed = bodySchema.safeParse(raw);
+  const { maxFiles } = parsed.success ? parsed.data : { maxFiles: 2000 };
 
-	// Phase 7: Clear stale context buffers for the initial sync phase
-	try {
-		const { invalidateBuffers } = await import('$lib/server/retrieval/context-buffer.js');
-		await invalidateBuffers();
-	} catch (e) {
-		console.warn('[graph-sync] Failed to invalidate buffers:', e);
-	}
+  // Phase 7: Clear stale context buffers for the initial sync phase
+  try {
+    const { invalidateBuffers } = await import('$lib/server/retrieval/context-buffer.js');
+    await invalidateBuffers();
+  } catch (e) {
+    console.warn('[graph-sync] Failed to invalidate buffers:', e);
+  }
 
-	const jobId = randomUUID();
-	const job: SyncJob = { jobId, status: 'running', startedAt: new Date().toISOString() };
-	jobs.set(jobId, job);
+  const jobId = randomUUID();
+  const job: SyncJob = { jobId, status: 'running', startedAt: new Date().toISOString() };
+  jobs.set(jobId, job);
 
-	// Fire-and-forget — do NOT await
-	const onPhase = (phase: string, extra?: { files?: number; edges?: number }) => {
-		job.phase = phase;
-		job.lastHeartbeat = new Date().toISOString();
-		if (extra?.files !== undefined) job.processedFiles = extra.files;
-		if (extra?.edges !== undefined) job.processedEdges = extra.edges;
-	};
-	syncCodebaseToNeo4j({ maxFiles, onPhase }).then((result) => {
-		job.status = result.errors.length && !result.files ? 'error' : 'done';
-		job.finishedAt = new Date().toISOString();
-		job.result = result;
-		job.phase = job.status === 'done' ? 'complete' : 'failed';
-		if (job.status === 'error') {
-			console.error('[codebase-index/graph-sync] Pipeline errors:', result.errors);
-			job.error = 'Graph sync failed';
-		}
-		// Step 10: auto-trigger enrich-qdrant so Qdrant payloads stay in sync with Neo4j
-		if (job.status === 'done') {
-			onPhase('enrich-qdrant');
-			fetch('/api/codebase-index/enrich-qdrant', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ dryRun: false, batchSize: 50 }),
-			}).then((r) => {
-				if (r.ok) {
-					console.log('[codebase-index/graph-sync] enrich-qdrant triggered automatically');
-				} else {
-					console.warn('[codebase-index/graph-sync] enrich-qdrant trigger returned', r.status);
-				}
-			}).catch((e) => {
-				console.warn('[codebase-index/graph-sync] enrich-qdrant auto-trigger failed:', e?.message ?? e);
-			});
+  // Fire-and-forget — do NOT await
+  const onPhase = (phase: string, extra?: { files?: number; edges?: number }) => {
+    job.phase = phase;
+    job.lastHeartbeat = new Date().toISOString();
+    if (extra?.files !== undefined) job.processedFiles = extra.files;
+    if (extra?.edges !== undefined) job.processedEdges = extra.edges;
+  };
+  syncCodebaseToNeo4j({ maxFiles, onPhase })
+    .then((result) => {
+      job.status = result.errors.length && !result.files ? 'error' : 'done';
+      job.finishedAt = new Date().toISOString();
+      job.result = result;
+      job.phase = job.status === 'done' ? 'complete' : 'failed';
+      if (job.status === 'error') {
+        console.error('[codebase-index/graph-sync] Pipeline errors:', result.errors);
+        job.error = 'Graph sync failed';
+      }
+      // Step 10: auto-trigger enrich-qdrant so Qdrant payloads stay in sync with Neo4j
+      if (job.status === 'done') {
+        onPhase('enrich-qdrant');
+        triggerFollowUp(
+          requestFetch,
+          '/api/codebase-index/enrich-qdrant',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dryRun: false, batchSize: 50 }),
+          },
+          () => {
+            console.log('[codebase-index/graph-sync] enrich-qdrant triggered automatically');
+          },
+          (e) => {
+            console.warn('[codebase-index/graph-sync] enrich-qdrant auto-trigger failed:', e);
+          }
+        );
 
-			// Step 6: auto-trigger cluster-summary synthesis (Phase 6)
-			// Trigger the batch pre-warm (PUT) to ensure narratives match latest graph clusters.
-			fetch('/api/codebase-index/cluster-summary', {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ force: false }),
-			})
-				.then((r) => {
-					if (r.ok) {
-						console.log('[codebase-index/graph-sync] cluster-summary synthesis triggered');
-					}
-				})
-				.catch((e) => {
-					console.warn(
-						'[codebase-index/graph-sync] cluster-summary auto-trigger failed:',
-						e?.message ?? e
-					);
-				});
-		}
-	}).catch((err) => {
-		console.error('[codebase-index/graph-sync] Pipeline error:', err);
-		job.status = 'error';
-		job.finishedAt = new Date().toISOString();
-		job.error = 'Graph sync failed';
-		job.phase = 'failed';
-	});
+        // Step 6: auto-trigger cluster-summary synthesis (Phase 6)
+        // Trigger the batch pre-warm (PUT) to ensure narratives match latest graph clusters.
+        triggerFollowUp(
+          requestFetch,
+          '/api/codebase-index/cluster-summary',
+          {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ force: false }),
+          },
+          () => {
+            console.log('[codebase-index/graph-sync] cluster-summary synthesis triggered');
+          },
+          (e) => {
+            console.warn('[codebase-index/graph-sync] cluster-summary auto-trigger failed:', e);
+          }
+        );
+      }
+    })
+    .catch((err) => {
+      console.error('[codebase-index/graph-sync] Pipeline error:', err);
+      job.status = 'error';
+      job.finishedAt = new Date().toISOString();
+      job.error = 'Graph sync failed';
+      job.phase = 'failed';
+    });
 
-	return json({
-		jobId,
-		status: 'started',
-		message: `Sync job started (maxFiles: ${maxFiles}). Poll GET /api/codebase-index/graph-sync/status?jobId=${jobId}`,
-	});
+  return json({
+    jobId,
+    status: 'started',
+    message: `Sync job started (maxFiles: ${maxFiles}). Poll GET /api/codebase-index/graph-sync/status?jobId=${jobId}`,
+  });
 };
 
 // ── GET — status poll ─────────────────────────────────────────────────────────
