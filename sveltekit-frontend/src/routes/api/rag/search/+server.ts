@@ -25,7 +25,11 @@ import { setCache, getFromMemoryCache, getFromRedisCache } from '$lib/server/cac
 import { getRedis } from '$lib/server/redis.js';
 
 // ── BM42 hybrid search collections (must have sparse 'bm25' vector configured) ──
-const BM42_COLLECTIONS = ['legal_documents', 'evidence_items'];
+// legal_documents and evidence_items remain intentionally dense-only in the live corpus.
+// A constitution-specific pipeline can write bm25 into legal_documents, but the main
+// document/evidence ingestion paths and the current production collections do not.
+// Keep BM42 disabled here until a corpus-wide sparse backfill exists for both collections.
+const BM42_COLLECTIONS: string[] = [];
 
 // ── Corrective RAG: query reformulation on low-confidence retrieval ──────
 const CORRECTIVE_RAG_THRESHOLD = 0.5;

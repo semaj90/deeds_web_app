@@ -13,7 +13,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
-import { bifrostChat } from '../ollama.js';
+import { bifrostChat, getChatModelKeepAlive, ollamaFetch } from '../ollama.js';
 import * as Hypergraph from '../ai/hypergraph-store.js';
 import { retrievalClient } from '../grpc/retrieval-client.js';
 
@@ -52,6 +52,37 @@ export interface Gemma4AceResult {
   error?: string;
   latencyMs: number;
   model: string;
+  toolCallsExecuted: number;
+  toolCallNames: string[];
+  stageTimings: Gemma4StageTimings;
+}
+
+export interface Gemma4AssistantTurnTiming {
+  round: number;
+  durationMs: number;
+  toolCalls: number;
+}
+
+export interface Gemma4ToolTiming {
+  round: number;
+  toolName: string;
+  durationMs: number;
+}
+
+export interface Gemma4StageTimings {
+  totalMs: number;
+  assistantTurns: Gemma4AssistantTurnTiming[];
+  toolCalls: Gemma4ToolTiming[];
+  finalAssistantMs: number;
+}
+
+export function createEmptyGemmaStageTimings(totalMs = 0): Gemma4StageTimings {
+  return {
+    totalMs,
+    assistantTurns: [],
+    toolCalls: [],
+    finalAssistantMs: 0,
+  };
 }
 
 export interface AceFixRecommendation {
@@ -136,7 +167,7 @@ export function buildGemma4AcePrompt(context: AceCodeIntelContext, task?: string
 // LLM caller
 // ─────────────────────────────────────────────────────────────────────────────
 
-const DEFAULT_MODEL = 'gemma4-legal-fast:latest';
+const DEFAULT_MODEL = ENV.OLLAMA_CHAT_MODEL ?? ENV.GEMMA4_MODEL;
 
 export async function callGemma4WithAceContext(
   context: AceCodeIntelContext,
@@ -161,6 +192,9 @@ export async function callGemma4WithAceContext(
       error: 'No context available — all data sources degraded',
       latencyMs: Date.now() - startMs,
       model,
+      toolCallsExecuted: 0,
+      toolCallNames: [],
+      stageTimings: createEmptyGemmaStageTimings(Date.now() - startMs),
     };
   }
 
@@ -183,7 +217,7 @@ export async function callGemma4WithAceContext(
   }
 
   // Build the format field: prefer explicit schema, then json string, then omit
-  const formatField = opts.responseSchema ?? (jsonMode ? 'json' : undefined);
+  const formatField = jsonMode ? 'json' : undefined;
 
   if (opts.useTools) {
     const toolResult = await callGemma4WithTools(systemPrompt, userPrompt, ACE_TOOLS, {
@@ -215,26 +249,63 @@ export async function callGemma4WithAceContext(
       error: toolResult.error,
       latencyMs: toolResult.latencyMs,
       model: toolResult.model,
+      toolCallsExecuted: toolResult.toolCallsExecuted,
+      toolCallNames: toolResult.toolCallNames,
+      stageTimings: toolResult.stageTimings,
     };
   }
 
   // ── Route through bifrostChat for Hypergraph & Lane Support ────────────────
   try {
-    const content = await bifrostChat(
-      [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      model,
-      {
-        temperature,
-        maxTokens,
-        lane: lane as any,
-        taskType: taskType as any,
-        sessionId,
-        timeoutMs: 90_000,
-      }
-    );
+    const assistantStartedAt = Date.now();
+    const content = formatField
+      ? await (async () => {
+          const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt },
+              ],
+              stream: false,
+              keep_alive: getChatModelKeepAlive(),
+              format: formatField,
+              options: {
+                temperature,
+                num_predict: maxTokens,
+                num_ctx: 32768,
+                repeat_penalty: 1.05,
+              },
+            }),
+            signal: AbortSignal.timeout(90_000),
+          });
+
+          if (!response.ok) {
+            const errText = await response.text().catch(() => '');
+            throw new Error(`Ollama /api/chat failed: ${response.status} ${errText.slice(0, 200)}`);
+          }
+
+          const data = (await response.json()) as { message?: { content?: string } };
+          return data.message?.content ?? '';
+        })()
+      : await bifrostChat(
+          [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          model,
+          {
+            temperature,
+            maxTokens,
+            lane: lane as any,
+            taskType: taskType as any,
+            sessionId,
+            timeoutMs: 90_000,
+          }
+        );
+    const assistantDurationMs = Date.now() - assistantStartedAt;
 
     const text = typeof content === 'string' ? content : (content as { content: string }).content;
 
@@ -271,6 +342,14 @@ export async function callGemma4WithAceContext(
       degraded: context.degraded,
       latencyMs: Date.now() - startMs,
       model,
+      toolCallsExecuted: 0,
+      toolCallNames: [],
+      stageTimings: {
+        totalMs: Date.now() - startMs,
+        assistantTurns: [{ round: 1, durationMs: assistantDurationMs, toolCalls: 0 }],
+        toolCalls: [],
+        finalAssistantMs: assistantDurationMs,
+      },
     };
   } catch (e: unknown) {
     return {
@@ -280,6 +359,9 @@ export async function callGemma4WithAceContext(
       error: `LLM call failed: ${e instanceof Error ? e.message : String(e)}`,
       latencyMs: Date.now() - startMs,
       model,
+      toolCallsExecuted: 0,
+      toolCallNames: [],
+      stageTimings: createEmptyGemmaStageTimings(Date.now() - startMs),
     };
   }
 }
@@ -307,10 +389,12 @@ export interface Gemma4ToolCallResult {
   ok: boolean;
   text: string;
   toolCallsExecuted: number;
+  toolCallNames: string[];
   degraded: boolean;
   error?: string;
   latencyMs: number;
   model: string;
+  stageTimings: Gemma4StageTimings;
 }
 
 const MAX_TOOL_ROUNDS = 5;
@@ -409,6 +493,7 @@ type OllamaMessage = {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
   tool_calls?: Array<{ function: { name: string; arguments: Record<string, unknown> } }>;
+  tool_name?: string;
 };
 
 /**
@@ -436,6 +521,7 @@ export async function callGemma4WithTools(
   const temperature = opts.temperature ?? 0.2;
   const maxTokens = opts.maxTokens ?? 1024;
   const startMs = Date.now();
+  const keepAlive = getChatModelKeepAlive();
 
   // Ollama tool definitions — executor stripped (local-only)
   const ollamaTools = tools.map((t) => ({
@@ -451,23 +537,58 @@ export async function callGemma4WithTools(
   ];
 
   let toolCallsExecuted = 0;
+  const toolCallNames: string[] = [];
+  const assistantTurns: Gemma4AssistantTurnTiming[] = [];
+  const toolCallTimings: Gemma4ToolTiming[] = [];
 
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-      const result = await bifrostChat(messages, model, {
-        tools: ollamaTools,
-        temperature,
-        maxTokens,
-        timeoutMs: 90_000,
-        cacheKey: `codeintel-loop:${model}`,
-        lane: opts.lane as any,
-        taskType: opts.taskType as any,
+      const assistantStartedAt = Date.now();
+      const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages,
+          tools: ollamaTools,
+          stream: false,
+          keep_alive: keepAlive,
+          options: {
+            temperature,
+            num_predict: maxTokens,
+            num_ctx: 32768,
+            repeat_penalty: 1.05,
+          },
+        }),
+        signal: AbortSignal.timeout(90_000),
       });
 
-      const msg: OllamaMessage =
-        typeof result === 'string'
-          ? { role: 'assistant', content: result }
-          : { role: 'assistant', content: result.content, tool_calls: result.tool_calls };
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        throw new Error(`Ollama /api/chat failed: ${response.status} ${errText.slice(0, 200)}`);
+      }
+
+      const data = (await response.json()) as {
+        message?: {
+          content?: string;
+          tool_calls?: Array<{ function: { name: string; arguments: Record<string, unknown> } }>;
+        };
+      };
+      const assistantDurationMs = Date.now() - assistantStartedAt;
+      const emittedToolCalls = data.message?.tool_calls?.length ?? 0;
+      assistantTurns.push({
+        round: round + 1,
+        durationMs: assistantDurationMs,
+        toolCalls: emittedToolCalls,
+      });
+
+      const msg: OllamaMessage = data.message
+        ? {
+            role: 'assistant',
+            content: data.message.content ?? '',
+            tool_calls: data.message.tool_calls,
+          }
+        : { role: 'assistant', content: '' };
 
       messages.push(msg); // append assistant turn
 
@@ -477,9 +598,16 @@ export async function callGemma4WithTools(
           ok: true,
           text: msg.content.trim(),
           toolCallsExecuted,
+          toolCallNames,
           degraded: false,
           latencyMs: Date.now() - startMs,
           model,
+          stageTimings: {
+            totalMs: Date.now() - startMs,
+            assistantTurns,
+            toolCalls: toolCallTimings,
+            finalAssistantMs: assistantDurationMs,
+          },
         };
       }
 
@@ -488,6 +616,7 @@ export async function callGemma4WithTools(
         const { name, arguments: args } = tc.function;
         const executor = executorMap.get(name);
         let result: string;
+        const toolStartedAt = Date.now();
         if (executor) {
           try {
             result = await executor(args);
@@ -497,8 +626,14 @@ export async function callGemma4WithTools(
         } else {
           result = `Error: unknown tool "${name}"`;
         }
-        messages.push({ role: 'tool', content: result });
+        messages.push({ role: 'tool', content: result, tool_name: name });
         toolCallsExecuted++;
+        toolCallNames.push(name);
+        toolCallTimings.push({
+          round: round + 1,
+          toolName: name,
+          durationMs: Date.now() - toolStartedAt,
+        });
       }
     }
 
@@ -508,20 +643,34 @@ export async function callGemma4WithTools(
       ok: false,
       text: last?.content ?? '',
       toolCallsExecuted,
+      toolCallNames,
       degraded: true,
       error: `Exceeded max tool rounds (${MAX_TOOL_ROUNDS})`,
       latencyMs: Date.now() - startMs,
       model,
+      stageTimings: {
+        totalMs: Date.now() - startMs,
+        assistantTurns,
+        toolCalls: toolCallTimings,
+        finalAssistantMs: assistantTurns.at(-1)?.durationMs ?? 0,
+      },
     };
   } catch (e: unknown) {
     return {
       ok: false,
       text: '',
       toolCallsExecuted,
+      toolCallNames,
       degraded: true,
       error: `Tool loop failed: ${e instanceof Error ? e.message : String(e)}`,
       latencyMs: Date.now() - startMs,
       model,
+      stageTimings: {
+        totalMs: Date.now() - startMs,
+        assistantTurns,
+        toolCalls: toolCallTimings,
+        finalAssistantMs: assistantTurns.at(-1)?.durationMs ?? 0,
+      },
     };
   }
 }

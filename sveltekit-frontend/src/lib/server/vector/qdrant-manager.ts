@@ -35,6 +35,9 @@ export function deterministicPointId(key: string): number {
   return raw % 2147483648;
 }
 
+const sparseSupportCache = new Map<string, boolean>();
+const denseOnlyNoticeEmitted = new Set<string>();
+
 export class QdrantManager {
   public client: QdrantClient;
   /** Canonical collection names — sourced from VECTOR_CONFIG */
@@ -42,6 +45,44 @@ export class QdrantManager {
 
   constructor(url = ENV.QDRANT_URL) {
     this.client = new QdrantClient({ url });
+  }
+
+  private sparseSupportCacheKey(collectionName: string, sparseVectorName: string): string {
+    return `${collectionName}:${sparseVectorName}`;
+  }
+
+  private async getSparseSupport(
+    collectionName: string,
+    sparseVectorName: string
+  ): Promise<boolean | null> {
+    const cacheKey = this.sparseSupportCacheKey(collectionName, sparseVectorName);
+    if (sparseSupportCache.has(cacheKey)) {
+      return sparseSupportCache.get(cacheKey) ?? null;
+    }
+
+    try {
+      const info = await this.client.getCollection(collectionName);
+      const sparseVectors =
+        (info as any).config?.params?.sparse_vectors ??
+        (info as any).config?.sparse_vectors ??
+        (info as any).result?.config?.params?.sparse_vectors;
+      const supported = Boolean(
+        sparseVectors &&
+          typeof sparseVectors === 'object' &&
+          Object.prototype.hasOwnProperty.call(sparseVectors, sparseVectorName)
+      );
+      sparseSupportCache.set(cacheKey, supported);
+      return supported;
+    } catch {
+      return null;
+    }
+  }
+
+  private noteDenseOnly(collectionName: string, sparseVectorName: string, reason: string): void {
+    const key = `${collectionName}:${sparseVectorName}:${reason}`;
+    if (denseOnlyNoticeEmitted.has(key)) return;
+    denseOnlyNoticeEmitted.add(key);
+    console.info(`[qdrant] ${collectionName} using dense-only search (${reason})`);
   }
 
   async initializeCollections() {
@@ -139,19 +180,19 @@ export class QdrantManager {
       // component/schema/migration), by K-means cluster, by SOM neuron, by file path,
       // by extracted symbol, and by repo for future multi-repo support.
       // Without these indexes Qdrant does a full O(n) payload scan on every query.
-      { collection: this.collections.codebase_chunks, field: 'kind',        schema: 'keyword' },
-      { collection: this.collections.codebase_chunks, field: 'language',    schema: 'keyword' },
-      { collection: this.collections.codebase_chunks, field: 'cluster_id',  schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'kind', schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'language', schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'cluster_id', schema: 'keyword' },
       { collection: this.collections.codebase_chunks, field: 'som_cluster', schema: 'integer' },
-      { collection: this.collections.codebase_chunks, field: 'path',        schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'path', schema: 'keyword' },
       { collection: this.collections.codebase_chunks, field: 'symbol_name', schema: 'keyword' },
-      { collection: this.collections.codebase_chunks, field: 'tags',        schema: 'keyword' },
-      { collection: this.collections.codebase_chunks, field: 'repo',        schema: 'keyword' },
-      { collection: this.collections.codebase_chunks, field: 'error_id',    schema: 'keyword' },
-      { collection: this.collections.codebase_chunks, field: 'updated_at',  schema: 'integer' },
+      { collection: this.collections.codebase_chunks, field: 'tags', schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'repo', schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'error_id', schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'updated_at', schema: 'integer' },
       // evidence_items: add cluster + tag indexes for cross-case similarity
-      { collection: this.collections.evidence, field: 'cluster_id',   schema: 'keyword' },
-      { collection: this.collections.evidence, field: 'tags',         schema: 'keyword' },
+      { collection: this.collections.evidence, field: 'cluster_id', schema: 'keyword' },
+      { collection: this.collections.evidence, field: 'tags', schema: 'keyword' },
       { collection: this.collections.evidence, field: 'entity_labels', schema: 'keyword' },
     ];
 
@@ -213,85 +254,91 @@ export class QdrantManager {
     scoreThreshold?: number;
     skipCache?: boolean;
   }): Promise<QdrantSearchResult> {
-    return traceVectorSearch(params.collection, { searchType: 'dense-cosine', query: params.query, limit: params.limit }, async () => {
-    const startTime = Date.now();
+    return traceVectorSearch(
+      params.collection,
+      { searchType: 'dense-cosine', query: params.query, limit: params.limit },
+      async () => {
+        const startTime = Date.now();
 
-    // Check Redis cache for identical query+collection+filters
-    const cacheKey = params.skipCache ? null : await this.buildSearchCacheKey(params);
-    if (cacheKey) {
-      try {
-        const { getRedis } = await import('../redis.js');
-        const redis = getRedis();
-        if (redis) {
-          const cached = await redis.get(cacheKey);
-          if (cached) {
-            const parsed = fastJsonParse<QdrantSearchResult>(cached);
-            parsed.metadata.responseTime = Date.now() - startTime;
-            parsed.metadata.cached = true;
-            return parsed;
+        // Check Redis cache for identical query+collection+filters
+        const cacheKey = params.skipCache ? null : await this.buildSearchCacheKey(params);
+        if (cacheKey) {
+          try {
+            const { getRedis } = await import('../redis.js');
+            const redis = getRedis();
+            if (redis) {
+              const cached = await redis.get(cacheKey);
+              if (cached) {
+                const parsed = fastJsonParse<QdrantSearchResult>(cached);
+                parsed.metadata.responseTime = Date.now() - startTime;
+                parsed.metadata.cached = true;
+                return parsed;
+              }
+            }
+          } catch {
+            /* cache miss — proceed */
           }
         }
-      } catch {
-        /* cache miss — proceed */
-      }
-    }
 
-    try {
-      // Resolve collection name and build correct vector payload from VECTOR_CONFIG
-      const collectionName = this.collections[params.collection as keyof typeof this.collections] ?? params.collection;
-      const vectorField = buildVectorPayload(collectionName, params.queryEmbedding);
-
-      const searchRequest: any = {
-        vector: vectorField,
-        limit: params.limit ?? 10,
-        score_threshold: params.scoreThreshold ?? 0.7,
-        with_payload: true,
-        with_vector: false,
-      };
-
-      if (params.filters) {
-        searchRequest.filter = this.buildQdrantFilter(params.filters);
-      }
-
-      const results = await this.client.search(collectionName, searchRequest);
-
-      const responseTime = Date.now() - startTime;
-
-      const response = {
-        results: results.map((result) => ({
-          id: result.id,
-          score: result.score,
-          payload: result.payload,
-        })),
-        metadata: {
-          query: params.query,
-          collection: params.collection,
-          responseTime,
-          total_results: results.length,
-          cached: false,
-          searchType: 'dense-cosine',
-        },
-      };
-
-      // Cache for 5 minutes
-      if (cacheKey) {
         try {
-          const { getRedis } = await import('../redis.js');
-          const redis = getRedis();
-          if (redis) {
-            await redis.set(cacheKey, JSON.stringify(response), 'EX', 300);
+          // Resolve collection name and build correct vector payload from VECTOR_CONFIG
+          const collectionName =
+            this.collections[params.collection as keyof typeof this.collections] ??
+            params.collection;
+          const vectorField = buildVectorPayload(collectionName, params.queryEmbedding);
+
+          const searchRequest: any = {
+            vector: vectorField,
+            limit: params.limit ?? 10,
+            score_threshold: params.scoreThreshold ?? 0.7,
+            with_payload: true,
+            with_vector: false,
+          };
+
+          if (params.filters) {
+            searchRequest.filter = this.buildQdrantFilter(params.filters);
           }
-        } catch {
-          /* cache write failure — non-fatal */
+
+          const results = await this.client.search(collectionName, searchRequest);
+
+          const responseTime = Date.now() - startTime;
+
+          const response = {
+            results: results.map((result) => ({
+              id: result.id,
+              score: result.score,
+              payload: result.payload,
+            })),
+            metadata: {
+              query: params.query,
+              collection: params.collection,
+              responseTime,
+              total_results: results.length,
+              cached: false,
+              searchType: 'dense-cosine',
+            },
+          };
+
+          // Cache for 5 minutes
+          if (cacheKey) {
+            try {
+              const { getRedis } = await import('../redis.js');
+              const redis = getRedis();
+              if (redis) {
+                await redis.set(cacheKey, JSON.stringify(response), 'EX', 300);
+              }
+            } catch {
+              /* cache write failure — non-fatal */
+            }
+          }
+
+          return response;
+        } catch (error: any) {
+          console.error('Qdrant dense search error:', error);
+          throw new Error(`Qdrant search failed: ${error.message}`);
         }
       }
-
-      return response;
-    } catch (error: any) {
-      console.error('Qdrant dense search error:', error);
-      throw new Error(`Qdrant search failed: ${error.message}`);
-    }
-    }); // end traceVectorSearch
+    ); // end traceVectorSearch
   }
 
   /**
@@ -306,54 +353,60 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
   }): Promise<QdrantSearchResult> {
-    return traceVectorSearch('evidence', { searchType: 'section-filtered', query: params.query, sectionTypes: params.sectionTypes }, async () => {
-    const startTime = Date.now();
-    const mustConditions: any[] = [{ key: 'section_type', match: { any: params.sectionTypes } }];
-    if (params.caseId) {
-      mustConditions.push({ key: 'case_id', match: { value: params.caseId } });
-    }
+    return traceVectorSearch(
+      'evidence',
+      { searchType: 'section-filtered', query: params.query, sectionTypes: params.sectionTypes },
+      async () => {
+        const startTime = Date.now();
+        const mustConditions: any[] = [
+          { key: 'section_type', match: { any: params.sectionTypes } },
+        ];
+        if (params.caseId) {
+          mustConditions.push({ key: 'case_id', match: { value: params.caseId } });
+        }
 
-    try {
-      const results = await this.client.search(this.collections.evidence, {
-        vector: { name: 'content', vector: params.queryEmbedding },
-        limit: params.limit ?? 10,
-        score_threshold: params.scoreThreshold ?? 0.5,
-        filter: { must: mustConditions },
-        with_payload: true,
-        with_vector: false,
-      });
+        try {
+          const results = await this.client.search(this.collections.evidence, {
+            vector: { name: 'content', vector: params.queryEmbedding },
+            limit: params.limit ?? 10,
+            score_threshold: params.scoreThreshold ?? 0.5,
+            filter: { must: mustConditions },
+            with_payload: true,
+            with_vector: false,
+          });
 
-      return {
-        results: results.map((r) => ({
-          id: r.id,
-          score: r.score,
-          payload: r.payload,
-        })),
-        metadata: {
-          query: params.query,
-          collection: 'evidence',
-          sectionTypes: params.sectionTypes,
-          responseTime: Date.now() - startTime,
-          total_results: results.length,
-          cached: false,
-          searchType: 'section-filtered',
-        },
-      };
-    } catch (error: any) {
-      console.error('Qdrant section-filtered search error:', error);
-      return {
-        results: [],
-        metadata: {
-          query: params.query,
-          collection: 'evidence',
-          responseTime: Date.now() - startTime,
-          total_results: 0,
-          cached: false,
-          searchType: 'section-filtered',
-        },
-      };
-    }
-    }); // end traceVectorSearch
+          return {
+            results: results.map((r) => ({
+              id: r.id,
+              score: r.score,
+              payload: r.payload,
+            })),
+            metadata: {
+              query: params.query,
+              collection: 'evidence',
+              sectionTypes: params.sectionTypes,
+              responseTime: Date.now() - startTime,
+              total_results: results.length,
+              cached: false,
+              searchType: 'section-filtered',
+            },
+          };
+        } catch (error: any) {
+          console.error('Qdrant section-filtered search error:', error);
+          return {
+            results: [],
+            metadata: {
+              query: params.query,
+              collection: 'evidence',
+              responseTime: Date.now() - startTime,
+              total_results: 0,
+              cached: false,
+              searchType: 'section-filtered',
+            },
+          };
+        }
+      }
+    ); // end traceVectorSearch
   }
 
   private async buildSearchCacheKey(params: {
@@ -637,87 +690,116 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
   }): Promise<QdrantSearchResult> {
-    return traceVectorSearch(params.collection, { searchType: 'hybrid-rrf', query: params.query, limit: params.limit }, async () => {
-    const startTime = Date.now();
-    const collectionName = this.collections[params.collection] ?? params.collection;
-    const denseVecName = params.denseVectorName ?? 'content';
-    const sparseVecName = params.sparseVectorName ?? 'bm25';
-    const limit = params.limit ?? 10;
+    return traceVectorSearch(
+      params.collection,
+      { searchType: 'hybrid-rrf', query: params.query, limit: params.limit },
+      async () => {
+        const startTime = Date.now();
+        const collectionName = this.collections[params.collection] ?? params.collection;
+        const denseVecName = params.denseVectorName ?? 'content';
+        const sparseVecName = params.sparseVectorName ?? 'bm25';
+        const limit = params.limit ?? 10;
 
-    // Generate sparse vector from query text
-    const sparseVec = generateSparseVector(params.query);
+        const sparseSupport = await this.getSparseSupport(collectionName, sparseVecName);
+        if (sparseSupport === false) {
+          this.noteDenseOnly(collectionName, sparseVecName, `${sparseVecName} not configured`);
+          const denseResult = await this._denseSearch({
+            query: params.query,
+            queryEmbedding: params.queryEmbedding,
+            collection: params.collection,
+            filters: params.filters,
+            limit,
+            scoreThreshold: params.scoreThreshold,
+          });
+          denseResult.metadata.sparseAvailable = false;
+          denseResult.metadata.sparseFallback = 'collection-dense-only';
+          return denseResult;
+        }
 
-    try {
-      // Try hybrid query with RRF fusion (dense + sparse prefetch)
-      const queryParams: any = {
-        prefetch: [
-          {
-            query: { indices: sparseVec.indices, values: sparseVec.values },
-            using: sparseVecName,
-            limit: limit * 3,
-          },
-          {
-            query: params.queryEmbedding,
-            using: denseVecName,
-            limit: limit * 3,
-          },
-        ],
-        query: { fusion: 'rrf' },
-        limit,
-        with_payload: true,
-        with_vector: false,
-      };
+        // Generate sparse vector from query text
+        const sparseVec = generateSparseVector(params.query);
 
-      if (params.filters) {
-        queryParams.filter = this.buildQdrantFilter(params.filters);
+        try {
+          // Try hybrid query with RRF fusion (dense + sparse prefetch)
+          const queryParams: any = {
+            prefetch: [
+              {
+                query: { indices: sparseVec.indices, values: sparseVec.values },
+                using: sparseVecName,
+                limit: limit * 3,
+              },
+              {
+                query: params.queryEmbedding,
+                using: denseVecName,
+                limit: limit * 3,
+              },
+            ],
+            query: { fusion: 'rrf' },
+            limit,
+            with_payload: true,
+            with_vector: false,
+          };
+
+          if (params.filters) {
+            queryParams.filter = this.buildQdrantFilter(params.filters);
+          }
+
+          const response = await this.client.query(collectionName, queryParams);
+          const points = (response as any).points ?? response ?? [];
+
+          return {
+            results: Array.isArray(points)
+              ? points.map((p: any) => ({
+                  id: p.id,
+                  score: p.score,
+                  payload: p.payload,
+                }))
+              : [],
+            metadata: {
+              query: params.query,
+              collection: params.collection,
+              responseTime: Date.now() - startTime,
+              total_results: Array.isArray(points) ? points.length : 0,
+              searchType: 'hybrid-rrf',
+              cached: false,
+            },
+          };
+        } catch (error: any) {
+          // Fallback to dense-only if collection doesn't have sparse vectors
+          const errMsg = String(error?.message ?? '') + String(error?.data?.status?.error ?? '');
+          if (
+            errMsg.includes('sparse') ||
+            errMsg.includes('not found') ||
+            errMsg.includes('does not exist') ||
+            errMsg.includes('not configured') ||
+            error?.status === 400
+          ) {
+            sparseSupportCache.set(
+              this.sparseSupportCacheKey(collectionName, sparseVecName),
+              false
+            );
+            this.noteDenseOnly(
+              collectionName,
+              sparseVecName,
+              `${sparseVecName} unavailable at query time`
+            );
+            const denseResult = await this._denseSearch({
+              query: params.query,
+              queryEmbedding: params.queryEmbedding,
+              collection: params.collection,
+              filters: params.filters,
+              limit,
+              scoreThreshold: params.scoreThreshold,
+            });
+            denseResult.metadata.sparseAvailable = false;
+            denseResult.metadata.sparseFallback = 'runtime-dense-only';
+            return denseResult;
+          }
+          console.error('Qdrant sparse hybrid search error:', error);
+          throw new Error(`Qdrant hybrid search failed: ${error.message}`);
+        }
       }
-
-      const response = await this.client.query(collectionName, queryParams);
-      const points = (response as any).points ?? response ?? [];
-
-      return {
-        results: Array.isArray(points)
-          ? points.map((p: any) => ({
-              id: p.id,
-              score: p.score,
-              payload: p.payload,
-            }))
-          : [],
-        metadata: {
-          query: params.query,
-          collection: params.collection,
-          responseTime: Date.now() - startTime,
-          total_results: Array.isArray(points) ? points.length : 0,
-          searchType: 'hybrid-rrf',
-          cached: false,
-        },
-      };
-    } catch (error: any) {
-      // Fallback to dense-only if collection doesn't have sparse vectors
-      const errMsg = String(error?.message ?? '') + String(error?.data?.status?.error ?? '');
-      if (
-        errMsg.includes('sparse') ||
-        errMsg.includes('not found') ||
-        errMsg.includes('does not exist') ||
-        errMsg.includes('not configured') ||
-        error?.status === 400
-      ) {
-        console.warn(
-          `[qdrant] Sparse vector not available on ${collectionName}, falling back to dense-only`
-        );
-        return this._denseSearch({
-          query: params.query,
-          queryEmbedding: params.queryEmbedding,
-          collection: params.collection,
-          filters: params.filters,
-          limit,
-          scoreThreshold: params.scoreThreshold,
-        });
-      }
-      console.error('Qdrant sparse hybrid search error:', error);
-      throw new Error(`Qdrant hybrid search failed: ${error.message}`);
-    }
-    }); // end traceVectorSearch
+    ); // end traceVectorSearch
   }
 
   /**
@@ -729,6 +811,7 @@ export class QdrantManager {
       const info = await this.client.getCollection(collectionName);
       const sparseVecs = (info as any).config?.params?.sparse_vectors;
       if (sparseVecs && sparseVectorName in sparseVecs) {
+        sparseSupportCache.set(this.sparseSupportCacheKey(collectionName, sparseVectorName), true);
         return; // Already configured
       }
       // Update collection to add sparse vector
@@ -737,6 +820,7 @@ export class QdrantManager {
           [sparseVectorName]: {},
         },
       });
+      sparseSupportCache.set(this.sparseSupportCacheKey(collectionName, sparseVectorName), true);
       console.log(`✅ Added sparse vector '${sparseVectorName}' to ${collectionName}`);
     } catch (error: any) {
       console.warn(`⚠️ Could not add sparse vectors to ${collectionName}:`, error?.message);

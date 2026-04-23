@@ -23,6 +23,7 @@ import {
 } from '$lib/server/db/schema-postgres.js';
 import { ilike, or, desc, sql, eq } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { buildGrpcClientChannelOptions } from '$lib/server/grpc/client-options.js';
 import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.js';
 import { getSemanticCacheHit, setSemanticCache } from '$lib/server/search/semantic-cache.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
@@ -133,14 +134,13 @@ async function tryGoGrpcSearch(q: string, limit: number): Promise<PlatformSearch
 				?? proto.LibrarySearchService;
 			if (!ServiceClass) throw new Error('LibrarySearchService not found in proto');
 			goGrpcClient = new ServiceClass(
-				grpcUrl,
-				grpc.credentials.createInsecure(),
-				{
-					'grpc.keepalive_time_ms': 10000,
-					'grpc.keepalive_timeout_ms': 5000,
-					'grpc.max_receive_message_length': 10 * 1024 * 1024,
-				}
-			);
+        grpcUrl,
+        grpc.credentials.createInsecure(),
+        buildGrpcClientChannelOptions({
+          maxConnectionIdleMs: 300_000,
+          maxReceiveMessageLength: 10 * 1024 * 1024,
+        })
+      );
 		}
 
 		return await new Promise<PlatformSearchHit[]>((resolve, reject) => {

@@ -86,6 +86,11 @@ const BIFROST_L2_QDRANT_TIMEOUT_MS = parseTimeoutMs(
   process.env?.BIFROST_L2_QDRANT_TIMEOUT_MS,
   1500
 );
+const BIFROST_GATEWAY_FAILURE_COOLDOWN_MS = parseTimeoutMs(
+  process.env?.BIFROST_GATEWAY_COOLDOWN_MS,
+  30_000
+);
+let bifrostGatewayUnavailableUntil = 0;
 
 // Populate VLM_MODELS from ENV now that ENV is initialized
 VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL;
@@ -452,68 +457,7 @@ export async function bifrostChat(
   let hitType: string | undefined;
   let tool_calls: any[] | undefined;
 
-  try {
-    const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-bf-cache-key': cacheKey,
-      },
-      body: JSON.stringify({
-        model: bifrostModel,
-        messages: normalizedMessages,
-        temperature: options?.temperature ?? 0.7,
-        max_tokens: options?.maxTokens ?? 2048,
-        stream: false,
-        ...(options?.tools ? { tools: options.tools } : {}),
-        ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
-      }),
-      signal: AbortSignal.timeout(bifrostGatewayTimeoutMs),
-    });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
-    }
-
-    // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
-    const rawText = await res.text();
-    const data = fastJsonParse<{
-      choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
-      extra_fields?: {
-        cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
-      };
-    }>(rawText);
-    const debug = data.extra_fields?.cache_debug;
-    const choice = data.choices?.[0]?.message;
-    content = choice?.content ?? '';
-    tool_calls = choice?.tool_calls;
-    cacheHit = !!debug?.cache_hit;
-    hitType = debug?.hit_type;
-
-    t_l3 = performance.now() - bifrostStart;
-    if (debug?.cache_hit) {
-      console.debug(
-        `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
-      );
-    }
-
-    if (tool_calls?.length) {
-      return { content, tool_calls, sessionId };
-    }
-  } catch (bifrostErr) {
-    // ── L3 Fallback: Direct Ollama (bypasses broken Bifrost) ──
-    const gatewayTimedOut = isAbortTimeoutError(bifrostErr);
-    const errorMessage = (bifrostErr as Error)?.message?.slice(0, 120) ?? 'unknown error';
-
-    if (gatewayTimedOut) {
-      console.info(
-        `[bifrost] Gateway timeout after ${bifrostGatewayTimeoutMs}ms, falling back to direct Ollama`
-      );
-    } else {
-      console.warn(`[bifrost] Gateway error (${errorMessage}), falling back to direct Ollama`);
-    }
-
+  const callDirectOllamaFallback = async () => {
     const ollamaRes = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -539,6 +483,108 @@ export async function bifrostChat(
     tool_calls = ollamaData.message?.tool_calls;
     t_l3 = performance.now() - bifrostStart;
     console.log(`[bifrost] L3 DIRECT OLLAMA OK (l3_ms=${Math.round(t_l3)})`);
+  };
+
+  try {
+    if (Date.now() < bifrostGatewayUnavailableUntil) {
+      logInference({
+        type: 'llm',
+        model: bifrostModel,
+        backend: 'bifrost',
+        latencyMs: 0,
+        cacheHit: false,
+        error: 'gateway cooldown active',
+        metadata: {
+          source: 'bifrostChat',
+          stage: 'gateway-skip',
+          fallback: 'ollama-direct',
+          retryAt: new Date(bifrostGatewayUnavailableUntil).toISOString(),
+        },
+      });
+      await callDirectOllamaFallback();
+    } else {
+      const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bf-cache-key': cacheKey,
+        },
+        body: JSON.stringify({
+          model: bifrostModel,
+          messages: normalizedMessages,
+          temperature: options?.temperature ?? 0.7,
+          max_tokens: options?.maxTokens ?? 2048,
+          stream: false,
+          ...(options?.tools ? { tools: options.tools } : {}),
+          ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
+        }),
+        signal: AbortSignal.timeout(bifrostGatewayTimeoutMs),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
+      }
+
+      // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
+      const rawText = await res.text();
+      const data = fastJsonParse<{
+        choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
+        extra_fields?: {
+          cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
+        };
+      }>(rawText);
+      const debug = data.extra_fields?.cache_debug;
+      const choice = data.choices?.[0]?.message;
+      content = choice?.content ?? '';
+      tool_calls = choice?.tool_calls;
+      cacheHit = !!debug?.cache_hit;
+      hitType = debug?.hit_type;
+      bifrostGatewayUnavailableUntil = 0;
+
+      t_l3 = performance.now() - bifrostStart;
+      if (debug?.cache_hit) {
+        console.debug(
+          `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
+        );
+      }
+    }
+
+    if (tool_calls?.length) {
+      return { content, tool_calls, sessionId };
+    }
+  } catch (bifrostErr) {
+    // ── L3 Fallback: Direct Ollama (bypasses broken Bifrost) ──
+    const gatewayTimedOut = isAbortTimeoutError(bifrostErr);
+    const errorMessage = (bifrostErr as Error)?.message?.slice(0, 120) ?? 'unknown error';
+    bifrostGatewayUnavailableUntil = Date.now() + BIFROST_GATEWAY_FAILURE_COOLDOWN_MS;
+
+    logInference({
+      type: 'llm',
+      model: bifrostModel,
+      backend: 'bifrost',
+      latencyMs: Math.round(performance.now() - bifrostStart),
+      cacheHit: false,
+      error: errorMessage,
+      metadata: {
+        source: 'bifrostChat',
+        stage: 'gateway-error',
+        fallback: 'ollama-direct',
+        timedOut: gatewayTimedOut,
+        cooldownMs: BIFROST_GATEWAY_FAILURE_COOLDOWN_MS,
+        retryAt: new Date(bifrostGatewayUnavailableUntil).toISOString(),
+      },
+    });
+
+    if (gatewayTimedOut) {
+      console.info(
+        `[bifrost] Gateway timeout after ${bifrostGatewayTimeoutMs}ms, falling back to direct Ollama`
+      );
+    } else {
+      console.warn(`[bifrost] Gateway error (${errorMessage}), falling back to direct Ollama`);
+    }
+
+    await callDirectOllamaFallback();
     if (tool_calls?.length) {
       return { content, tool_calls, sessionId };
     }

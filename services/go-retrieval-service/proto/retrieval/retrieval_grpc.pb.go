@@ -27,6 +27,7 @@ const (
 	RetrievalService_GetClusterSummary_FullMethodName  = "/yorha.retrieval.RetrievalService/GetClusterSummary"
 	RetrievalService_ExpandAstNeighbors_FullMethodName = "/yorha.retrieval.RetrievalService/ExpandAstNeighbors"
 	RetrievalService_GetTopologyContext_FullMethodName = "/yorha.retrieval.RetrievalService/GetTopologyContext"
+	RetrievalService_GetResearchContext_FullMethodName = "/yorha.retrieval.RetrievalService/GetResearchContext"
 	RetrievalService_Health_FullMethodName             = "/yorha.retrieval.RetrievalService/Health"
 )
 
@@ -50,6 +51,8 @@ type RetrievalServiceClient interface {
 	ExpandAstNeighbors(ctx context.Context, in *AstExpansionRequest, opts ...grpc.CallOption) (*AstExpansionResponse, error)
 	// Unary: SOM/Topology neighborhood expansion
 	GetTopologyContext(ctx context.Context, in *TopologyRequest, opts ...grpc.CallOption) (*TopologyResponse, error)
+	// Unary: research-backed context retrieval (Lane 3, optional fallback)
+	GetResearchContext(ctx context.Context, in *ResearchContextRequest, opts ...grpc.CallOption) (*ResearchContextResponse, error)
 	// Health check: pgvector, Qdrant, Redis, embedding service
 	Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error)
 }
@@ -160,6 +163,16 @@ func (c *retrievalServiceClient) GetTopologyContext(ctx context.Context, in *Top
 	return out, nil
 }
 
+func (c *retrievalServiceClient) GetResearchContext(ctx context.Context, in *ResearchContextRequest, opts ...grpc.CallOption) (*ResearchContextResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResearchContextResponse)
+	err := c.cc.Invoke(ctx, RetrievalService_GetResearchContext_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *retrievalServiceClient) Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(HealthResponse)
@@ -190,6 +203,8 @@ type RetrievalServiceServer interface {
 	ExpandAstNeighbors(context.Context, *AstExpansionRequest) (*AstExpansionResponse, error)
 	// Unary: SOM/Topology neighborhood expansion
 	GetTopologyContext(context.Context, *TopologyRequest) (*TopologyResponse, error)
+	// Unary: research-backed context retrieval (Lane 3, optional fallback)
+	GetResearchContext(context.Context, *ResearchContextRequest) (*ResearchContextResponse, error)
 	// Health check: pgvector, Qdrant, Redis, embedding service
 	Health(context.Context, *HealthRequest) (*HealthResponse, error)
 	mustEmbedUnimplementedRetrievalServiceServer()
@@ -225,6 +240,9 @@ func (UnimplementedRetrievalServiceServer) ExpandAstNeighbors(context.Context, *
 }
 func (UnimplementedRetrievalServiceServer) GetTopologyContext(context.Context, *TopologyRequest) (*TopologyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTopologyContext not implemented")
+}
+func (UnimplementedRetrievalServiceServer) GetResearchContext(context.Context, *ResearchContextRequest) (*ResearchContextResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetResearchContext not implemented")
 }
 func (UnimplementedRetrievalServiceServer) Health(context.Context, *HealthRequest) (*HealthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
@@ -380,6 +398,24 @@ func _RetrievalService_GetTopologyContext_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RetrievalService_GetResearchContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResearchContextRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RetrievalServiceServer).GetResearchContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RetrievalService_GetResearchContext_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RetrievalServiceServer).GetResearchContext(ctx, req.(*ResearchContextRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RetrievalService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HealthRequest)
 	if err := dec(in); err != nil {
@@ -428,6 +464,10 @@ var RetrievalService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTopologyContext",
 			Handler:    _RetrievalService_GetTopologyContext_Handler,
+		},
+		{
+			MethodName: "GetResearchContext",
+			Handler:    _RetrievalService_GetResearchContext_Handler,
 		},
 		{
 			MethodName: "Health",

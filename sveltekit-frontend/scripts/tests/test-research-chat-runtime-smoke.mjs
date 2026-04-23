@@ -5,7 +5,8 @@
  * Covers:
  *   1. POST /api/codebase-index/deep-research
  *   2. POST /api/codeintel/ace with includeResearch=true
- *   3. POST /api/ai/contextual-chat
+ *   3. POST /api/codeintel/wiki with useTools=true
+ *   4. POST /api/ai/contextual-chat
  *
  * Usage:
  *   node scripts/tests/test-research-chat-runtime-smoke.mjs [--base http://localhost:5173] [--verbose]
@@ -23,6 +24,7 @@ const baseIndex = args.indexOf('--base');
 const BASE = baseIndex >= 0 ? args[baseIndex + 1] : process.env.BASE_URL || 'http://localhost:5173';
 const VERBOSE = args.includes('--verbose');
 const RETRIEVAL_GRPC_PORT = Number(process.env.RETRIEVAL_GRPC_PORT || '50053');
+const READY_PATH = '/@vite/client';
 
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
 const red = (s) => `\x1b[31m${s}\x1b[0m`;
@@ -41,7 +43,7 @@ async function sleep(ms) {
 async function waitForServer(maxAttempts = 20, delayMs = 2000) {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const res = await fetch(BASE, { signal: AbortSignal.timeout(3000) });
+      const res = await fetch(`${BASE}${READY_PATH}`, { signal: AbortSignal.timeout(3000) });
       if (res.ok || res.status < 500) return true;
     } catch {
       // keep retrying
@@ -126,8 +128,15 @@ console.log(cyan('\n--- POST /api/codebase-index/deep-research ---'));
 try {
   const deep = await postJson(
     '/api/codebase-index/deep-research',
-    { maxClusters: 1, resultsPerQuery: 1, maxDepth: 1, skipQdrant: true },
-    240_000,
+    {
+      mode: 'wait',
+      maxClusters: 1,
+      resultsPerQuery: 1,
+      maxDepth: 1,
+      maxPages: 5,
+      skipQdrant: true,
+    },
+    240_000
   );
   const payload = deep.json ?? {};
   if (
@@ -166,6 +175,43 @@ try {
   }
 } catch (err) {
   fail('ace includeResearch', String(err));
+}
+
+console.log(cyan('\n--- POST /api/codeintel/wiki useTools=true ---'));
+try {
+  const wiki = await postJson(
+    '/api/codeintel/wiki',
+    {
+      query:
+        'Before answering, call the tool named search_codebase for dashboard or case-related Svelte components, then call get_topology_context with bmu_row 0, bmu_col 0, radius 1, and include whether topology neighbors were found.',
+      task: 'deep-dive',
+      maxWords: 350,
+      useTools: true,
+    },
+    120_000,
+  );
+  const payload = wiki.json ?? {};
+  const toolCallNames = Array.isArray(payload.toolCallNames) ? payload.toolCallNames : [];
+  const hasSearch = toolCallNames.includes('search_codebase');
+  const hasTopology = toolCallNames.includes('get_topology_context');
+  const sectionCount = Array.isArray(payload.sections) ? payload.sections.length : 0;
+  if (
+    (wiki.status === 200 || wiki.status === 207) &&
+    Number(payload.toolCallsExecuted ?? 0) >= 2 &&
+    hasSearch &&
+    hasTopology &&
+    sectionCount > 0
+  ) {
+    pass(
+      'ace wiki tool-loop',
+      wiki.latencyMs,
+      `tools=${toolCallNames.join(',')} sections=${sectionCount}`,
+    );
+  } else {
+    fail('ace wiki tool-loop', `status=${wiki.status} body=${wiki.text.slice(0, 320)}`);
+  }
+} catch (err) {
+  fail('ace wiki tool-loop', String(err));
 }
 
 console.log(cyan('\n--- POST /api/ai/contextual-chat ---'));

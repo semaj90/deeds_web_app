@@ -4,7 +4,7 @@
  * Generate a wiki-style article about any query using ACE codebase context.
  * Clusters + code chunks are pulled from Postgres; Gemma4 assembles the article.
  *
- * Request body: { query, repoId?, clusterIds?, maxWords?, task? }
+ * Request body: { query, repoId?, clusterIds?, maxWords?, task?, useTools? }
  * Response:     AceWikiResult — same shape on success and degraded paths.
  *
  * Status codes:
@@ -23,6 +23,7 @@ const wikiSchema = z.object({
 	clusterIds: z.array(z.number().int().min(0)).max(10).optional(),
 	maxWords: z.number().int().min(100).max(1200).optional(),
 	task: z.enum(['explain', 'troubleshoot', 'overview', 'deep-dive']).optional(),
+	useTools: z.boolean().optional(),
 });
 
 const DEGRADED_WIKI = {
@@ -33,6 +34,16 @@ const DEGRADED_WIKI = {
 	relatedFiles: [] as string[],
 	relatedClusters: [] as number[],
 	degraded: true,
+	toolCallsExecuted: 0,
+	toolCallNames: [] as string[],
+	stageTimings: {
+		assembleContextMs: 0,
+		draftPassMs: 0,
+		formatPassMs: 0,
+		totalMs: 0,
+		draft: { totalMs: 0, assistantTurns: [], toolCalls: [], finalAssistantMs: 0 },
+		format: { totalMs: 0, assistantTurns: [], toolCalls: [], finalAssistantMs: 0 },
+	},
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {

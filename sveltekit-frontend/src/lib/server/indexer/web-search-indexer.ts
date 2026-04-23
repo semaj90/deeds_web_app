@@ -22,13 +22,18 @@ import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { webSearch } from '$lib/server/retrieval/web-search.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { getRedis } from '$lib/server/redis.js';
 import { JSDOM } from 'jsdom';
 
 const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
 const KNOWLEDGE_COLLECTION = 'knowledge_base';
 const PAGE_FETCH_TIMEOUT = 12_000; // ms
-const MAX_CONTENT_CHARS = 8_000;   // truncate long pages before embedding
-const RESULTS_PER_QUERY = 5;
+const MAX_CONTENT_CHARS = 4_000; // truncate long pages before embedding
+const RESULTS_PER_QUERY = 3;
+const DEFAULT_MAX_PAGES = 25;
+const DEFAULT_CHILD_LINKS_PER_PAGE = 2;
+const SEARCH_CACHE_TTL_S = 15 * 60;
+const PAGE_CACHE_TTL_S = 60 * 60;
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -43,6 +48,14 @@ export interface DeepResearchOptions {
   skipQdrant?: boolean;
   /** Recursive depth (default: 1, max: 2) */
   maxDepth?: number;
+  /** Hard cap on total fetched/indexed pages for this run */
+  maxPages?: number;
+  /** Max child links to follow per page when depth > 1 */
+  childLinksPerPage?: number;
+  /** Max characters retained per page before embedding */
+  contentCharBudget?: number;
+  /** Optional maintenance step after indexing */
+  runMaintenance?: boolean;
   /** Progress callback (optional) */
   onProgress?: (msg: string) => void;
 }
@@ -65,6 +78,11 @@ interface ClusterSummaryRow {
   tags: string[] | string | null;
 }
 
+interface CachedPageArtifacts {
+  cleanText: string;
+  links: string[];
+}
+
 // ── HTML stripping ───────────────────────────────────────────────────────────
 
 function stripHtml(html: string): string {
@@ -84,8 +102,42 @@ function stripHtml(html: string): string {
 
 // ── Page fetcher ─────────────────────────────────────────────────────────────
 
-async function fetchPageContent(url: string): Promise<string | null> {
+async function cachedWebSearch(
+  query: string,
+  limit: number
+): Promise<Awaited<ReturnType<typeof webSearch>>['results']> {
   try {
+    const redis = getRedis();
+    const cacheKey = `deep-research:search:${createHash('sha256').update(`${query}:${limit}`).digest('hex')}`;
+    const cached = await redis.get(cacheKey).catch(() => null);
+    if (cached) {
+      return JSON.parse(cached) as Awaited<ReturnType<typeof webSearch>>['results'];
+    }
+
+    const searchResp = await webSearch(query, limit);
+    redis.setex(cacheKey, SEARCH_CACHE_TTL_S, JSON.stringify(searchResp.results)).catch(() => {});
+    return searchResp.results;
+  } catch {
+    return [];
+  }
+}
+
+async function fetchPageArtifacts(
+  url: string,
+  allowLinkExpansion: boolean,
+  contentCharBudget: number,
+  childLinksPerPage: number
+): Promise<CachedPageArtifacts | null> {
+  try {
+    const redis = getRedis();
+    const cacheKey = `deep-research:page:${createHash('sha256')
+      .update(`${url}:${allowLinkExpansion ? 1 : 0}:${contentCharBudget}:${childLinksPerPage}`)
+      .digest('hex')}`;
+    const cached = await redis.get(cacheKey).catch(() => null);
+    if (cached) {
+      return JSON.parse(cached) as CachedPageArtifacts;
+    }
+
     const res = await fetch(url, {
       signal: AbortSignal.timeout(PAGE_FETCH_TIMEOUT),
       headers: {
@@ -99,7 +151,20 @@ async function fetchPageContent(url: string): Promise<string | null> {
     if (!contentType.includes('html') && !contentType.includes('text')) return null;
 
     const html = await res.text();
-    return stripHtml(html).slice(0, MAX_CONTENT_CHARS);
+    const cleanText = stripHtml(html).slice(0, contentCharBudget);
+    const links = allowLinkExpansion
+      ? Array.from(new JSDOM(html).window.document.querySelectorAll('a'))
+          .map((a) => (a as HTMLAnchorElement).href)
+          .filter(
+            (href) =>
+              href.startsWith('http') && !href.includes('google.com') && !href.includes('search')
+          )
+          .slice(0, childLinksPerPage)
+      : [];
+
+    const artifacts: CachedPageArtifacts = { cleanText, links };
+    redis.setex(cacheKey, PAGE_CACHE_TTL_S, JSON.stringify(artifacts)).catch(() => {});
+    return artifacts;
   } catch {
     return null;
   }
@@ -168,6 +233,10 @@ export async function runDeepResearchIndex(
   const log = opts.onProgress ?? (() => {});
   const maxClusters = opts.maxClusters ?? 20;
   const resultsPerQuery = opts.resultsPerQuery ?? RESULTS_PER_QUERY;
+  const maxPages = opts.maxPages ?? DEFAULT_MAX_PAGES;
+  const childLinksPerPage = opts.childLinksPerPage ?? DEFAULT_CHILD_LINKS_PER_PAGE;
+  const contentCharBudget = opts.contentCharBudget ?? MAX_CONTENT_CHARS;
+  const runMaintenance = opts.runMaintenance ?? false;
   const runId = opts.runId ?? `dr-${Date.now()}`;
 
   let queriesRun = 0;
@@ -176,6 +245,7 @@ export async function runDeepResearchIndex(
   let pagesFailed = 0;
   let rowsInserted = 0;
   let rowsUpdated = 0;
+  let pagesTouched = 0;
 
   // ── 1. Load cluster summaries ──────────────────────────────────────────────
   log('[deep-research] Loading cluster summaries…');
@@ -233,8 +303,7 @@ export async function runDeepResearchIndex(
     // ── 3. Web search ────────────────────────────────────────────────────────
     let searchResults: Awaited<ReturnType<typeof webSearch>>['results'] = [];
     try {
-      const searchResp = await webSearch(query, resultsPerQuery);
-      searchResults = searchResp.results;
+      searchResults = await cachedWebSearch(query, resultsPerQuery);
       queriesRun++;
     } catch (err) {
       log(
@@ -251,6 +320,7 @@ export async function runDeepResearchIndex(
 
     // ── 4. Fetch, embed, persist each result ─────────────────────────────────
     for (const result of searchResults) {
+      if (pagesTouched >= maxPages) break;
       await processAndIndexUrl(
         result.url,
         result.title,
@@ -258,8 +328,18 @@ export async function runDeepResearchIndex(
         query,
         cluster.gpu_cluster,
         1,
-        opts
+        opts,
+        {
+          maxPages,
+          childLinksPerPage,
+          contentCharBudget,
+        }
       );
+    }
+
+    if (pagesTouched >= maxPages) {
+      log(`[deep-research] Page budget reached (${maxPages}) — stopping early`);
+      break;
     }
 
     log(
@@ -268,12 +348,14 @@ export async function runDeepResearchIndex(
   }
 
   // ── 5. Autonomous Sync (Chronicler) ────────────────────────────────────────
-  try {
-    log('[deep-research] Triggering autonomous maintenance cycle…');
-    const { execSync } = await import('node:child_process');
-    execSync('node scripts/maintain-repo.mjs');
-  } catch (err) {
-    log(`[deep-research] Maintenance failed: ${(err as Error).message}`);
+  if (runMaintenance) {
+    try {
+      log('[deep-research] Triggering autonomous maintenance cycle…');
+      const { execSync } = await import('node:child_process');
+      execSync('node scripts/maintain-repo.mjs');
+    } catch (err) {
+      log(`[deep-research] Maintenance failed: ${(err as Error).message}`);
+    }
   }
 
   /** Internal processor for individual URLs (recursive) */
@@ -284,27 +366,37 @@ export async function runDeepResearchIndex(
     query: string,
     clusterId: number,
     depth: number,
-    opts: DeepResearchOptions
+    opts: DeepResearchOptions,
+    limits: {
+      maxPages: number;
+      childLinksPerPage: number;
+      contentCharBudget: number;
+    }
   ): Promise<void> {
+    if (pagesTouched >= limits.maxPages) {
+      pagesSkipped++;
+      return;
+    }
+    pagesTouched++;
+
     const urlHash = createHash('sha256').update(url).digest('hex').slice(0, 16);
     const runId = opts.runId ?? `dr-${Date.now()}`;
     const maxDepth = opts.maxDepth ?? 1;
+    const allowLinkExpansion = depth < maxDepth && depth < 2 && limits.childLinksPerPage > 0;
 
-    // 1. Fetch
-    let rawHtml = '';
-    try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(PAGE_FETCH_TIMEOUT) });
-      if (res.ok) rawHtml = await res.text();
-    } catch {
+    // 1. Fetch + extract (cached)
+    const page = await fetchPageArtifacts(
+      url,
+      allowLinkExpansion,
+      limits.contentCharBudget,
+      limits.childLinksPerPage
+    );
+    if (!page) {
+      pagesFailed++;
       return;
     }
 
-    if (!rawHtml) return;
-
-    // 2. Parse & Extract
-    const dom = new JSDOM(rawHtml);
-    const doc = dom.window.document;
-    const cleanText = stripHtml(rawHtml).slice(0, MAX_CONTENT_CHARS);
+    const cleanText = page.cleanText;
 
     if (cleanText.length < 50) return;
 
@@ -355,16 +447,9 @@ export async function runDeepResearchIndex(
     }
 
     // 5. Recursion (Depth 2)
-    if (depth < maxDepth && depth < 2) {
-      const links = Array.from(doc.querySelectorAll('a'))
-        .map((a) => (a as HTMLAnchorElement).href)
-        .filter(
-          (href) =>
-            href.startsWith('http') && !href.includes('google.com') && !href.includes('search')
-        )
-        .slice(0, 3); // Max 3 child links per page
-
-      for (const link of links) {
+    if (allowLinkExpansion) {
+      for (const link of page.links) {
+        if (pagesTouched >= limits.maxPages) break;
         await processAndIndexUrl(
           link,
           `Child: ${title}`,
@@ -372,7 +457,8 @@ export async function runDeepResearchIndex(
           query,
           clusterId,
           depth + 1,
-          opts
+          opts,
+          limits
         );
       }
     }

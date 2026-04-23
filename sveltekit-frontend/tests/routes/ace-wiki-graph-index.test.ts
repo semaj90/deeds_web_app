@@ -19,6 +19,13 @@ mockCallGemma4: vi.fn(),
 mockGetHealth: vi.fn(),
 }));
 
+const emptyGemmaStageTimings = (totalMs = 0) => ({
+  totalMs,
+  assistantTurns: [],
+  toolCalls: [],
+  finalAssistantMs: 0,
+});
+
 // ── module mocks ──────────────────────────────────────────────────────────────
 
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
@@ -37,8 +44,9 @@ getCodeIntelHealthForAce: mockGetHealth,
 }));
 
 vi.mock('$lib/server/ace/gemma4-codeintel.js', () => ({
-buildGemma4AcePrompt: () => '## QUERY\ntest',
-callGemma4WithAceContext: mockCallGemma4,
+  buildGemma4AcePrompt: () => '## QUERY\ntest',
+  callGemma4WithAceContext: mockCallGemma4,
+  createEmptyGemmaStageTimings: emptyGemmaStageTimings,
 }));
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
@@ -67,7 +75,21 @@ relatedClusters: [3],
 
 // ── shape assertions ──────────────────────────────────────────────────────────
 
-const WIKI_KEYS = ['ok', 'query', 'title', 'summary', 'sections', 'relatedFiles', 'relatedClusters', 'degraded', 'errors', 'latencyMs'] as const;
+const WIKI_KEYS = [
+  'ok',
+  'query',
+  'title',
+  'summary',
+  'sections',
+  'relatedFiles',
+  'relatedClusters',
+  'degraded',
+  'errors',
+  'latencyMs',
+  'toolCallsExecuted',
+  'toolCallNames',
+  'stageTimings',
+] as const;
 
 function assertWikiShape(r: Record<string, unknown>, label = '') {
 for (const k of WIKI_KEYS) {
@@ -76,12 +98,29 @@ expect(r, `${label} missing key: ${k}`).toHaveProperty(k);
 expect(typeof r.ok).toBe('boolean');
 expect(typeof r.degraded).toBe('boolean');
 expect(typeof r.latencyMs).toBe('number');
+expect(typeof r.toolCallsExecuted).toBe('number');
 expect(Array.isArray(r.sections)).toBe(true);
 expect(Array.isArray(r.relatedFiles)).toBe(true);
 expect(Array.isArray(r.relatedClusters)).toBe(true);
 expect(Array.isArray(r.errors)).toBe(true);
+expect(Array.isArray(r.toolCallNames)).toBe(true);
 expect(r.title === null || typeof r.title === 'string').toBe(true);
 expect(r.summary === null || typeof r.summary === 'string').toBe(true);
+const t = r.stageTimings as Record<string, unknown>;
+expect(typeof t.assembleContextMs).toBe('number');
+expect(typeof t.draftPassMs).toBe('number');
+expect(typeof t.formatPassMs).toBe('number');
+expect(typeof t.totalMs).toBe('number');
+const draft = t.draft as Record<string, unknown>;
+const format = t.format as Record<string, unknown>;
+expect(Array.isArray(draft.assistantTurns)).toBe(true);
+expect(Array.isArray(draft.toolCalls)).toBe(true);
+expect(typeof draft.totalMs).toBe('number');
+expect(typeof draft.finalAssistantMs).toBe('number');
+expect(Array.isArray(format.assistantTurns)).toBe(true);
+expect(Array.isArray(format.toolCalls)).toBe(true);
+expect(typeof format.totalMs).toBe('number');
+expect(typeof format.finalAssistantMs).toBe('number');
 }
 
 const GRAPH_INDEX_KEYS = ['ok', 'jobId', 'accepted', 'requestedStages', 'degraded', 'error'] as const;
@@ -132,7 +171,16 @@ vi.resetAllMocks();
 
 it('returns full wiki shape on LLM success', async () => {
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
-mockCallGemma4.mockResolvedValue({ ok: true, text: JSON.stringify(GOOD_PARSED), parsed: GOOD_PARSED, degraded: false, latencyMs: 80, model: 'gemma4' });
+mockCallGemma4.mockResolvedValue({
+  ok: true,
+  text: JSON.stringify(GOOD_PARSED),
+  parsed: GOOD_PARSED,
+  degraded: false,
+  latencyMs: 80,
+  model: 'gemma4',
+  toolCallsExecuted: 0,
+  toolCallNames: [],
+});
 
 const r = await generateAceWiki({ query: 'auth flow' }) as unknown as Record<string, unknown>;
 assertWikiShape(r, 'happy path');
@@ -144,7 +192,16 @@ assertNoLeak(r);
 
 it('returns degraded heuristic shape when LLM fails', async () => {
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
-mockCallGemma4.mockResolvedValue({ ok: false, text: '', degraded: true, error: 'LLM timeout', latencyMs: 90000, model: 'gemma4' });
+mockCallGemma4.mockResolvedValue({
+  ok: false,
+  text: '',
+  degraded: true,
+  error: 'LLM timeout',
+  latencyMs: 90000,
+  model: 'gemma4',
+  toolCallsExecuted: 0,
+  toolCallNames: [],
+});
 
 const r = await generateAceWiki({ query: 'auth flow' }) as unknown as Record<string, unknown>;
 assertWikiShape(r, 'llm-fail');
@@ -165,7 +222,16 @@ expect(r.degraded).toBe(true);
 
 it('returns degraded when LLM returns unparseable text', async () => {
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
-mockCallGemma4.mockResolvedValue({ ok: true, text: 'Sorry, I cannot help.', parsed: undefined, degraded: false, latencyMs: 50, model: 'gemma4' });
+mockCallGemma4.mockResolvedValue({
+  ok: true,
+  text: 'Sorry, I cannot help.',
+  parsed: undefined,
+  degraded: false,
+  latencyMs: 50,
+  model: 'gemma4',
+  toolCallsExecuted: 0,
+  toolCallNames: [],
+});
 
 const r = await generateAceWiki({ query: 'auth flow' }) as unknown as Record<string, unknown>;
 assertWikiShape(r, 'parse-fail');
@@ -175,7 +241,16 @@ assertNoLeak(r);
 
 it('never leaks raw LLM error strings', async () => {
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
-mockCallGemma4.mockResolvedValue({ ok: false, text: '', degraded: true, error: 'ECONNREFUSED 127.0.0.1:11434', latencyMs: 0, model: 'gemma4' });
+mockCallGemma4.mockResolvedValue({
+  ok: false,
+  text: '',
+  degraded: true,
+  error: 'ECONNREFUSED 127.0.0.1:11434',
+  latencyMs: 0,
+  model: 'gemma4',
+  toolCallsExecuted: 0,
+  toolCallNames: [],
+});
 
 const r = await generateAceWiki({ query: 'auth flow' }) as unknown as Record<string, unknown>;
 assertWikiShape(r, 'no-leak');
@@ -228,7 +303,16 @@ expect(resp.status).toBe(400);
 
 it('207 — degraded wiki on LLM failure', async () => {
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
-mockCallGemma4.mockResolvedValue({ ok: false, text: '', degraded: true, error: 'timeout', latencyMs: 90000, model: 'gemma4' });
+mockCallGemma4.mockResolvedValue({
+  ok: false,
+  text: '',
+  degraded: true,
+  error: 'timeout',
+  latencyMs: 90000,
+  model: 'gemma4',
+  toolCallsExecuted: 0,
+  toolCallNames: [],
+});
 
 const resp = await POST({ request: makeReq({ query: 'auth flow' }), locals: { user: { id: 'u1' } } });
 expect(resp.status).toBe(207);
@@ -240,7 +324,16 @@ assertNoLeak(body);
 
 it('200 — full wiki on happy path', async () => {
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
-mockCallGemma4.mockResolvedValue({ ok: true, text: JSON.stringify(GOOD_PARSED), parsed: GOOD_PARSED, degraded: false, latencyMs: 100, model: 'gemma4' });
+mockCallGemma4.mockResolvedValue({
+  ok: true,
+  text: JSON.stringify(GOOD_PARSED),
+  parsed: GOOD_PARSED,
+  degraded: false,
+  latencyMs: 100,
+  model: 'gemma4',
+  toolCallsExecuted: 0,
+  toolCallNames: [],
+});
 
 const resp = await POST({ request: makeReq({ query: 'auth flow', task: 'explain' }), locals: { user: { id: 'u1' } } });
 expect(resp.status).toBe(200);
@@ -250,13 +343,88 @@ expect(body.ok).toBe(true);
 assertNoLeak(body);
 });
 
+it('200 — accepts useTools and returns tool telemetry', async () => {
+  mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
+  mockCallGemma4.mockResolvedValueOnce({
+    ok: true,
+    text: 'TITLE: Auth Flow\nSUMMARY: JWT-based session handling.\nSECTION 1: Overview\nValidates JWT.\nRELATED FILES: src/lib/auth.ts\nRELATED CLUSTERS: 3',
+    parsed: undefined,
+    degraded: false,
+    latencyMs: 120,
+    model: 'gemma4',
+    toolCallsExecuted: 2,
+    toolCallNames: ['search_codebase', 'get_topology_context'],
+    stageTimings: {
+      totalMs: 120,
+      assistantTurns: [
+        { round: 1, durationMs: 70, toolCalls: 2 },
+        { round: 2, durationMs: 20, toolCalls: 0 },
+      ],
+      toolCalls: [
+        { round: 1, toolName: 'search_codebase', durationMs: 12 },
+        { round: 1, toolName: 'get_topology_context', durationMs: 8 },
+      ],
+      finalAssistantMs: 20,
+    },
+  });
+  mockCallGemma4.mockResolvedValueOnce({
+    ok: true,
+    text: JSON.stringify(GOOD_PARSED),
+    parsed: GOOD_PARSED,
+    degraded: false,
+    latencyMs: 35,
+    model: 'gemma4',
+    toolCallsExecuted: 0,
+    toolCallNames: [],
+    stageTimings: {
+      totalMs: 35,
+      assistantTurns: [{ round: 1, durationMs: 35, toolCalls: 0 }],
+      toolCalls: [],
+      finalAssistantMs: 35,
+    },
+  });
+
+  const resp = await POST({
+    request: makeReq({ query: 'auth flow', task: 'deep-dive', useTools: true }),
+    locals: { user: { id: 'u1' } },
+  });
+  expect(resp.status).toBe(200);
+  const body = (await resp.json()) as Record<string, unknown>;
+  assertWikiShape(body, '200-useTools');
+  expect(body.toolCallsExecuted).toBe(2);
+  expect(body.toolCallNames).toEqual(['search_codebase', 'get_topology_context']);
+  expect(mockCallGemma4).toHaveBeenCalledTimes(2);
+  expect(mockCallGemma4.mock.calls[0]?.[2]).toMatchObject({
+    useTools: true,
+    taskType: 'wiki-generation-draft',
+  });
+  expect(mockCallGemma4.mock.calls[1]?.[2]).toMatchObject({
+    taskType: 'wiki-generation-format',
+    responseSchema: expect.any(Object),
+  });
+  const timings = body.stageTimings as Record<string, unknown>;
+  expect(typeof timings.draftPassMs).toBe('number');
+  expect(typeof timings.formatPassMs).toBe('number');
+  expect((timings.draft as Record<string, unknown>).totalMs).toBe(120);
+  expect((timings.format as Record<string, unknown>).totalMs).toBe(35);
+});
+
 it('same top-level keys across all 4 status paths', async () => {
 const r1 = await (await POST({ request: makeReq({ query: 'q' }), locals: {} })).json() as Record<string, unknown>;
 const r2 = await (await POST({ request: makeReq({}), locals: { user: { id: 'u1' } } })).json() as Record<string, unknown>;
 mockAssembleCtx.mockResolvedValue({ ...HEALTHY_CTX, clusterContext: [], chunkContext: [], degraded: true });
 const r3 = await (await POST({ request: makeReq({ query: 'q' }), locals: { user: { id: 'u1' } } })).json() as Record<string, unknown>;
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
-mockCallGemma4.mockResolvedValue({ ok: true, text: JSON.stringify(GOOD_PARSED), parsed: GOOD_PARSED, degraded: false, latencyMs: 100, model: 'gemma4' });
+mockCallGemma4.mockResolvedValue({
+  ok: true,
+  text: JSON.stringify(GOOD_PARSED),
+  parsed: GOOD_PARSED,
+  degraded: false,
+  latencyMs: 100,
+  model: 'gemma4',
+  toolCallsExecuted: 0,
+  toolCallNames: [],
+});
 const r4 = await (await POST({ request: makeReq({ query: 'q' }), locals: { user: { id: 'u1' } } })).json() as Record<string, unknown>;
 
 for (const [label, r] of [['401', r1], ['400', r2], ['207', r3], ['200', r4]] as [string, Record<string, unknown>][]) {

@@ -13,6 +13,7 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import type { ResearchSource } from '$lib/server/research/web-research-ingester.js';
+import { buildGrpcClientChannelOptions } from './client-options.js';
 // Proto types were in generated/proto (archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types (mirror retrieval.proto messages — validated against generated types) ─
@@ -132,6 +133,15 @@ export interface SearchChunksResponse {
   totalMs: number;
 }
 
+export interface RetrievalClusterContext {
+  clusterId?: string;
+  clusterType?: string;
+  gpuCluster?: number;
+  somCluster?: number;
+  bmuRow?: number;
+  bmuCol?: number;
+}
+
 export interface ClusterSummaryLookupResponse {
   clusterId: number;
   summary: string;
@@ -161,6 +171,7 @@ export interface AstExpansionResponse {
 export interface TopologyContextResponse {
   neighbors: RetrievedCodebaseChunk[];
   somMetadataJson?: string;
+  clusterMetadata?: RetrievalClusterContext;
 }
 
 export interface ResearchContextChunk {
@@ -241,20 +252,16 @@ async function getGrpcClient(): Promise<any> {
     const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
     const RetrievalService = protoDescriptor.yorha.retrieval.RetrievalService;
 
-    grpcClient = new RetrievalService(RETRIEVAL_GRPC_URL, grpc.credentials.createInsecure(), {
-      // Keepalive: detect dead connections early (10s ping, 5s timeout)
-      'grpc.keepalive_time_ms': 10_000,
-      'grpc.keepalive_timeout_ms': 5_000,
-      'grpc.keepalive_permit_without_calls': 1,
-      // Connection lifecycle: prevent stale connections
-      'grpc.max_connection_idle_ms': 300_000, // 5min idle disconnect
-      'grpc.max_connection_age_ms': 600_000, // 10min max age
-      // Message size: 10MB for large retrieval responses
-      'grpc.max_send_message_length': 10 * 1024 * 1024,
-      'grpc.max_receive_message_length': 10 * 1024 * 1024,
-      // HTTP/2: allow pings without active streams
-      'grpc.http2.max_pings_without_data': 0,
-    });
+    grpcClient = new RetrievalService(
+      RETRIEVAL_GRPC_URL,
+      grpc.credentials.createInsecure(),
+      buildGrpcClientChannelOptions({
+        maxConnectionIdleMs: 300_000,
+        maxConnectionAgeMs: 600_000,
+        maxSendMessageLength: 10 * 1024 * 1024,
+        maxReceiveMessageLength: 10 * 1024 * 1024,
+      })
+    );
 
     return grpcClient;
   } catch (err) {
@@ -305,12 +312,10 @@ async function getGoSearchHealthClient(): Promise<any> {
     goSearchHealthClient = new LibrarySearchService(
       GO_SEARCH_GRPC_URL,
       grpc.credentials.createInsecure(),
-      {
-        'grpc.keepalive_time_ms': 10_000,
-        'grpc.keepalive_timeout_ms': 5_000,
-        'grpc.keepalive_permit_without_calls': 1,
-        'grpc.max_receive_message_length': 10 * 1024 * 1024,
-      }
+      buildGrpcClientChannelOptions({
+        maxConnectionIdleMs: 300_000,
+        maxReceiveMessageLength: 10 * 1024 * 1024,
+      })
     );
 
     return goSearchHealthClient;
@@ -523,6 +528,21 @@ function mapCodebaseChunk(chunk: any): RetrievedCodebaseChunk {
   };
 }
 
+function mapClusterContext(clusterMetadata: any): RetrievalClusterContext | undefined {
+  if (!clusterMetadata || typeof clusterMetadata !== 'object') return undefined;
+
+  return {
+    clusterId: clusterMetadata?.clusterId || undefined,
+    clusterType: clusterMetadata?.clusterType || undefined,
+    gpuCluster:
+      typeof clusterMetadata?.gpuCluster === 'number' ? clusterMetadata.gpuCluster : undefined,
+    somCluster:
+      typeof clusterMetadata?.somCluster === 'number' ? clusterMetadata.somCluster : undefined,
+    bmuRow: typeof clusterMetadata?.bmuRow === 'number' ? clusterMetadata.bmuRow : undefined,
+    bmuCol: typeof clusterMetadata?.bmuCol === 'number' ? clusterMetadata.bmuCol : undefined,
+  };
+}
+
 function mapSearchChunksResponse(response: any): SearchChunksResponse {
   return {
     results: Array.isArray(response?.results) ? response.results.map(mapCodebaseChunk) : [],
@@ -564,6 +584,7 @@ function mapTopologyResponse(response: any): TopologyContextResponse {
   return {
     neighbors: Array.isArray(response?.neighbors) ? response.neighbors.map(mapCodebaseChunk) : [],
     somMetadataJson: response?.somMetadataJson || undefined,
+    clusterMetadata: mapClusterContext(response?.clusterMetadata),
   };
 }
 

@@ -21,6 +21,7 @@ import {
   isPytorchGpuAvailable,
 } from '$lib/server/gpu/pytorch-graph.js';
 import { ENV } from '$lib/server/env.server.js';
+import { buildGrpcClientChannelOptions } from './client-options.js';
 
 // ── Result types ──────────────────────────────────────────────────────────────
 
@@ -92,14 +93,15 @@ async function getGrpcClient(): Promise<any> {
     if (!GraphMLService) throw new Error('GraphMLService not found in proto descriptor');
 
     const url = ENV.GRAPH_ML_GRPC_URL;
-    _grpcClient = new GraphMLService(url, grpc.credentials.createInsecure(), {
-      'grpc.keepalive_time_ms': 10_000,
-      'grpc.keepalive_timeout_ms': 5_000,
-      'grpc.keepalive_permit_without_calls': 1,
-      'grpc.max_connection_idle_ms': 300_000,
-      'grpc.max_send_message_length': 32 * 1024 * 1024,
-      'grpc.max_receive_message_length': 32 * 1024 * 1024,
-    });
+    _grpcClient = new GraphMLService(
+      url,
+      grpc.credentials.createInsecure(),
+      buildGrpcClientChannelOptions({
+        maxConnectionIdleMs: 300_000,
+        maxSendMessageLength: 32 * 1024 * 1024,
+        maxReceiveMessageLength: 32 * 1024 * 1024,
+      })
+    );
 
     return _grpcClient;
   } catch (err) {

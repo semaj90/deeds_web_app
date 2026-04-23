@@ -11,6 +11,7 @@
  *   CHR97_GRPC_ENABLED — "true" to enable (default: "false")
  */
 import { ENV } from '$lib/server/env.server.js';
+import { buildGrpcClientChannelOptions } from './client-options.js';
 
 // ── Public types ───────────────────────────────────────────────────────────
 
@@ -107,15 +108,15 @@ async function getClient(): Promise<unknown> {
       options?: Record<string, unknown>
     ) => unknown;
 
-    _client = new Chr97Agent(ENV.CHR97_GRPC_URL, grpc.credentials.createInsecure(), {
-      'grpc.keepalive_time_ms': 10_000,
-      'grpc.keepalive_timeout_ms': 5_000,
-      'grpc.keepalive_permit_without_calls': 1,
-      'grpc.max_connection_idle_ms': 300_000,
-      'grpc.max_send_message_length': 32 * 1024 * 1024,
-      'grpc.max_receive_message_length': 32 * 1024 * 1024,
-      'grpc.http2.max_pings_without_data': 0,
-    });
+    _client = new Chr97Agent(
+      ENV.CHR97_GRPC_URL,
+      grpc.credentials.createInsecure(),
+      buildGrpcClientChannelOptions({
+        maxConnectionIdleMs: 300_000,
+        maxSendMessageLength: 32 * 1024 * 1024,
+        maxReceiveMessageLength: 32 * 1024 * 1024,
+      })
+    );
 
     return _client;
   } catch (err) {

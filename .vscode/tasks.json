@@ -40,6 +40,41 @@
       }
     },
     {
+      "label": "Dev Server (gRPC Retrieval)",
+      "type": "shell",
+      "command": "npm run dev:grpc",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "build",
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^([^\\s].*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Start the Go retrieval gRPC service and the GPU/WebGPU-optimized frontend dev server with RETRIEVAL_GRPC_ENABLED=true"
+    },
+    {
       "label": "Svelte Check",
       "type": "shell",
       "command": "npx svelte-kit sync && npx svelte-check --threshold error --tsconfig ./tsconfig.json",
@@ -5964,11 +5999,12 @@
       "dependsOn": [
         "🗺️ Codebase: Verify PG Mirror",
         "🗺️ Codebase: Test Orchestrator Route Contract",
-        "🗺️ Codebase: Smoke Test (with Dev Server)"
+        "🗺️ Codebase: Smoke Test (with Dev Server)",
+        "🧪 Runtime: Research + Chat Smoke (with dev:grpc)"
       ],
       "dependsOrder": "sequence",
       "group": "test",
-      "detail": "Run the full orchestrator preflight in order: Postgres mirror check, focused route regression, then smoke after the Dev Server background task is ready",
+      "detail": "Run the full codebase guardrail in order: Postgres mirror check, focused route regression, orchestrator smoke, then live deep-research + ACE + contextual-chat smoke on the dev:grpc stack",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -5985,6 +6021,73 @@
       },
       "group": "test",
       "detail": "Smoke test: GET status + POST SSE dry-run. Add --live for write-enabled sync core, --full for all graph stages",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Runtime: Ensure dev:grpc Ready",
+      "type": "shell",
+      "command": "$testPort = { param([int]$port) try { $client = [System.Net.Sockets.TcpClient]::new(); $iar = $client.BeginConnect('127.0.0.1', $port, $null, $null); if (-not $iar.AsyncWaitHandle.WaitOne(1000)) { $client.Dispose(); return $false }; $null = $client.EndConnect($iar); $client.Dispose(); return $true } catch { return $false } }; $frontendReady = & $testPort 5173; $grpcReady = & $testPort 50053; if ($frontendReady -and $grpcReady) { Write-Host 'dev:grpc already ready'; exit 0 }; if ($frontendReady) { Write-Host 'frontend ready, starting retrieval only'; npm run go:retrieval:run } else { npm run dev:grpc }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "test",
+      "detail": "Reuse localhost:5173 + retrieval gRPC on 50053 when already ready; start only go:retrieval:run if the frontend is already running; otherwise start npm run dev:grpc",
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^([^\\s].*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "dev:grpc already ready|frontend ready, starting retrieval only|ready in|\\[retrieval\\] ready"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🧪 Runtime: Research + Chat Smoke",
+      "type": "shell",
+      "command": "npm run test:smoke:research-chat",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Live runtime smoke for deep-research indexing, ACE includeResearch, and contextual chat",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Runtime: Research + Chat Smoke (with dev:grpc)",
+      "dependsOn": [
+        "🧪 Runtime: Ensure dev:grpc Ready",
+        "🧪 Runtime: Research + Chat Smoke"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "detail": "Ensure the gRPC retrieval dev stack is ready, then run the deep-research + ACE + contextual-chat smoke runner",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",

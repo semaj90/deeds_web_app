@@ -1,37 +1,41 @@
 // Package main — Go gRPC Retrieval Service
 //
 // Implements RetrievalService proto (proto/active/retrieval.proto):
-//   SearchEvidence  — RAG+KAG+DAG evidence search (pgvector + Qdrant + graph)
-//   StreamEvidence  — streaming progressive bundle delivery
-//   SearchCodebase  — dual-vector codebase chunk search (content + signature)
-//   StreamCodebase  — streaming codebase chunk delivery
-//   Health          — deep health check (pgvector, Qdrant, Redis, embedding)
+//
+//	SearchEvidence  — RAG+KAG+DAG evidence search (pgvector + Qdrant + graph)
+//	StreamEvidence  — streaming progressive bundle delivery
+//	SearchCodebase  — dual-vector codebase chunk search (content + signature)
+//	StreamCodebase  — streaming codebase chunk delivery
+//	Health          — deep health check (pgvector, Qdrant, Redis, embedding)
 //
 // HTTP on :8100:
-//   GET  /health           — deep health check
-//   POST /search/evidence  — evidence RAG+KAG+DAG (JSON body)
-//   POST /search/codebase  — codebase dual-vector (JSON body)
-//   GET  /stats            — request counts + cache hit rate
+//
+//	GET  /health           — deep health check
+//	POST /search/evidence  — evidence RAG+KAG+DAG (JSON body)
+//	POST /search/codebase  — codebase dual-vector (JSON body)
+//	GET  /stats            — request counts + cache hit rate
 //
 // Enhancement overview:
-//   GPU embedding   — direct Ollama :11434 (RTX 3060 Ti) with Redis embedding cache
-//   ONNX passthrough — pre-computed 768-dim client embeddings bypasses GPU call
-//   JSONB matching  — metadata @> filter for section_type / entity_type / tags
-//   Proto-binary cache — cache stores gob-encoded proto bytes (2-3× smaller than JSON)
+//
+//	GPU embedding   — direct Ollama :11434 (RTX 3060 Ti) with Redis embedding cache
+//	ONNX passthrough — pre-computed 768-dim client embeddings bypasses GPU call
+//	JSONB matching  — metadata @> filter for section_type / entity_type / tags
+//	Proto-binary cache — cache stores gob-encoded proto bytes (2-3× smaller than JSON)
 //
 // ENV:
-//   DATABASE_URL        — PostgreSQL (default postgresql://legal_admin:123456@localhost:5432/legal_ai_db)
-//   QDRANT_URL          — Qdrant REST endpoint (default http://localhost:6333)
-//   QDRANT_GRPC_HOST    — Qdrant gRPC host (default localhost)
-//   QDRANT_GRPC_PORT    — Qdrant gRPC port (default 6334)
-//   REDIS_URL           — Redis (default redis://localhost:6379)
-//   EMBED_SERVICE_URL   — Go embedding service HTTP (default http://localhost:8097)
-//   OLLAMA_URL          — Ollama API GPU path (default http://localhost:11434)
-//   EMBED_MODEL         — Model name (default embeddinggemma:latest)
-//   GRPC_PORT           — gRPC port (default 50053)
-//   HTTP_PORT           — HTTP port (default 8100)
-//   RETRIEVAL_CACHE_TTL — Redis cache TTL seconds (default 300)
-//   GPU_EMBED_ENABLED   — "true" to prefer direct Ollama GPU over embed service (default true)
+//
+//	DATABASE_URL        — PostgreSQL (default postgresql://legal_admin:123456@localhost:5432/legal_ai_db)
+//	QDRANT_URL          — Qdrant REST endpoint (default http://localhost:6333)
+//	QDRANT_GRPC_HOST    — Qdrant gRPC host (default localhost)
+//	QDRANT_GRPC_PORT    — Qdrant gRPC port (default 6334)
+//	REDIS_URL           — Redis (default redis://localhost:6379)
+//	EMBED_SERVICE_URL   — Go embedding service HTTP (default http://localhost:8097)
+//	OLLAMA_URL          — Ollama API GPU path (default http://localhost:11434)
+//	EMBED_MODEL         — Model name (default embeddinggemma:latest)
+//	GRPC_PORT           — gRPC port (default 50053)
+//	HTTP_PORT           — HTTP port (default 8100)
+//	RETRIEVAL_CACHE_TTL — Redis cache TTL seconds (default 300)
+//	GPU_EMBED_ENABLED   — "true" to prefer direct Ollama GPU over embed service (default true)
 package main
 
 import (
@@ -136,6 +140,7 @@ type retrievalServer struct {
 const (
 	collectionEvidence = "evidence_items"
 	collectionCodebase = "codebase_chunks_768"
+	collectionResearch = "chunks_web_search"
 	searchTimeout      = 12 * time.Second
 	embedTimeout       = 6 * time.Second
 	defaultLimit       = 10
@@ -492,6 +497,22 @@ type qdrantChunk struct {
 	EndLine    int32
 }
 
+type researchQdrantChunk struct {
+	ID           string
+	ChunkID      string
+	Source       string
+	URL          string
+	Title        string
+	Body         string
+	Score        float32
+	SemanticTags []string
+	Tags         []string
+	Repo         string
+	Language     string
+	Subreddit    string
+	FetchedAt    string
+}
+
 func (s *retrievalServer) qdrantSearchEvidence(ctx context.Context, vec []float32, caseID string, limit int) ([]qdrantChunk, error) {
 	contentVec := "content"
 	qlimit := uint64(limit)
@@ -577,6 +598,260 @@ func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float3
 		chunks = filtered
 	}
 	return chunks, nil
+}
+
+func (s *retrievalServer) qdrantSearchResearch(ctx context.Context, vec []float32, sourceFilter []string, limit int) ([]researchQdrantChunk, error) {
+	contentVec := "content"
+	qlimit := uint64(limit)
+
+	queryReq := &qdrantclient.QueryPoints{
+		CollectionName: collectionResearch,
+		Query:          qdrantclient.NewQuery(vec...),
+		Using:          &contentVec,
+		Limit:          &qlimit,
+		WithPayload:    qdrantclient.NewWithPayload(true),
+	}
+
+	if len(sourceFilter) > 0 {
+		conds := make([]*qdrantclient.Condition, len(sourceFilter))
+		for i, source := range sourceFilter {
+			source := source
+			conds[i] = qdrantclient.NewMatch("source", source)
+		}
+		queryReq.Filter = &qdrantclient.Filter{Should: conds}
+	}
+
+	points, err := s.qdrant.Query(ctx, queryReq)
+	if err != nil {
+		return s.qdrantSearchResearchREST(ctx, vec, sourceFilter, limit)
+	}
+
+	return qdrantPointsToResearchChunks(points), nil
+}
+
+func qdrantPointsToResearchChunks(points []*qdrantclient.ScoredPoint) []researchQdrantChunk {
+	chunks := make([]researchQdrantChunk, 0, len(points))
+	for _, p := range points {
+		chunk := researchQdrantChunk{Score: p.Score}
+		if p.GetId() != nil {
+			chunk.ID = p.GetId().GetUuid()
+			if chunk.ID == "" {
+				chunk.ID = fmt.Sprintf("%d", p.GetId().GetNum())
+			}
+		}
+
+		payload := p.GetPayload()
+		if payload != nil {
+			chunk.ChunkID = qdrantStr(payload, "chunk_id")
+			chunk.Source = qdrantStr(payload, "source")
+			chunk.URL = qdrantStr(payload, "url")
+			chunk.Title = qdrantStr(payload, "title")
+			chunk.Body = qdrantStr(payload, "body")
+			chunk.SemanticTags = qdrantStrSlice(payload, "semantic_tags")
+			chunk.Tags = qdrantStrSlice(payload, "tags")
+			chunk.Repo = qdrantStr(payload, "repo")
+			chunk.Language = qdrantStr(payload, "language")
+			chunk.Subreddit = qdrantStr(payload, "subreddit")
+			chunk.FetchedAt = qdrantStr(payload, "fetched_at")
+		}
+
+		if chunk.ChunkID == "" {
+			chunk.ChunkID = chunk.ID
+		}
+		chunks = append(chunks, chunk)
+	}
+	return chunks
+}
+
+func (s *retrievalServer) qdrantSearchResearchREST(ctx context.Context, vec []float32, sourceFilter []string, limit int) ([]researchQdrantChunk, error) {
+	body := map[string]any{
+		"limit":        limit,
+		"with_payload": true,
+		"vector": map[string]any{
+			"name":   "content",
+			"vector": vec,
+		},
+	}
+	if len(sourceFilter) > 0 {
+		must := make([]any, len(sourceFilter))
+		for i, source := range sourceFilter {
+			must[i] = map[string]any{"key": "source", "match": map[string]any{"value": source}}
+		}
+		body["filter"] = map[string]any{"should": must}
+	}
+
+	b, _ := json.Marshal(body)
+	url := fmt.Sprintf("%s/collections/%s/points/query", s.cfg.QdrantURL, collectionResearch)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Result []struct {
+			ID      any            `json:"id"`
+			Score   float32        `json:"score"`
+			Payload map[string]any `json:"payload"`
+		} `json:"result"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	chunks := make([]researchQdrantChunk, 0, len(result.Result))
+	for _, r := range result.Result {
+		chunk := researchQdrantChunk{Score: r.Score}
+		switch v := r.ID.(type) {
+		case string:
+			chunk.ID = v
+		case float64:
+			chunk.ID = strconv.FormatFloat(v, 'f', 0, 64)
+		}
+		if p := r.Payload; p != nil {
+			chunk.ChunkID = anyStr(p["chunk_id"])
+			chunk.Source = anyStr(p["source"])
+			chunk.URL = anyStr(p["url"])
+			chunk.Title = anyStr(p["title"])
+			chunk.Body = anyStr(p["body"])
+			chunk.SemanticTags = anyStrSlice(p["semantic_tags"])
+			chunk.Tags = anyStrSlice(p["tags"])
+			chunk.Repo = anyStr(p["repo"])
+			chunk.Language = anyStr(p["language"])
+			chunk.Subreddit = anyStr(p["subreddit"])
+			chunk.FetchedAt = anyStr(p["fetched_at"])
+		}
+		if chunk.ChunkID == "" {
+			chunk.ChunkID = chunk.ID
+		}
+		chunks = append(chunks, chunk)
+	}
+
+	return chunks, nil
+}
+
+func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
+	id := chunk.ID
+	if id == "" {
+		id = fmt.Sprintf("%s:%d", chunk.FilePath, chunk.ChunkIndex)
+	}
+
+	return &pb.SearchChunkResult{
+		Id:             id,
+		ChunkId:        id,
+		ContentPreview: chunk.ContentPreview,
+		Kind:           chunk.Kind,
+		HttpMethod:     chunk.HTTPMethod,
+		RouteId:        chunk.RouteID,
+		Tags:           chunk.Tags,
+		SourceMetadata: &pb.RetrievalSourceMetadata{
+			Source:     "qdrant",
+			SourceId:   id,
+			SourceType: "codebase_chunk",
+			FilePath:   chunk.FilePath,
+			RouteId:    chunk.RouteID,
+			Collection: collectionCodebase,
+		},
+		ScoreMetadata: &pb.RetrievalScoreMetadata{
+			Score:         chunk.Score,
+			SemanticScore: chunk.Score,
+		},
+		FilePath:  chunk.FilePath,
+		StartLine: chunk.StartLine,
+		EndLine:   chunk.EndLine,
+	}
+}
+
+func buildResearchContextChunk(chunk researchQdrantChunk) *pb.ResearchContextChunk {
+	id := chunk.ID
+	if id == "" {
+		id = chunk.ChunkID
+	}
+
+	metadata := map[string]string{}
+	if chunk.Repo != "" {
+		metadata["repo"] = chunk.Repo
+	}
+	if chunk.Language != "" {
+		metadata["language"] = chunk.Language
+	}
+	if chunk.Subreddit != "" {
+		metadata["subreddit"] = chunk.Subreddit
+	}
+
+	return &pb.ResearchContextChunk{
+		Id:           id,
+		ChunkId:      chunk.ChunkID,
+		Source:       chunk.Source,
+		Url:          chunk.URL,
+		Title:        chunk.Title,
+		Body:         chunk.Body,
+		Score:        chunk.Score,
+		SemanticTags: chunk.SemanticTags,
+		Tags:         chunk.Tags,
+		SourceMetadata: &pb.RetrievalSourceMetadata{
+			Source:     "qdrant",
+			SourceId:   chunk.ChunkID,
+			SourceType: chunk.Source,
+			Url:        chunk.URL,
+			Title:      chunk.Title,
+			Collection: collectionResearch,
+			Metadata:   metadata,
+		},
+		ScoreMetadata: &pb.RetrievalScoreMetadata{
+			Score:         chunk.Score,
+			SemanticScore: chunk.Score,
+		},
+		Timestamps: &pb.TransportTimestamps{
+			CreatedAt: chunk.FetchedAt,
+			IndexedAt: chunk.FetchedAt,
+		},
+	}
+}
+
+func matchesResearchFilters(chunk researchQdrantChunk, req *pb.ResearchContextRequest) bool {
+	if len(req.Ids) > 0 {
+		match := false
+		for _, id := range req.Ids {
+			if id == chunk.ID || id == chunk.ChunkID {
+				match = true
+				break
+			}
+		}
+		if !match {
+			return false
+		}
+	}
+
+	if len(req.Tags) > 0 {
+		available := make(map[string]struct{}, len(chunk.Tags)+len(chunk.SemanticTags))
+		for _, tag := range chunk.Tags {
+			available[tag] = struct{}{}
+		}
+		for _, tag := range chunk.SemanticTags {
+			available[tag] = struct{}{}
+		}
+
+		match := false
+		for _, tag := range req.Tags {
+			if _, ok := available[tag]; ok {
+				match = true
+				break
+			}
+		}
+		if !match {
+			return false
+		}
+	}
+
+	return true
 }
 
 // qdrantPointsToChunks converts ScoredPoint slice to qdrantChunk slice.
@@ -1438,20 +1713,9 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 		return nil, err
 	}
 
-	results := make([]*pb.CodebaseChunk, len(chunks))
+	results := make([]*pb.SearchChunkResult, len(chunks))
 	for i, c := range chunks {
-		results[i] = &pb.CodebaseChunk{
-			ChunkId:        c.ID,
-			FilePath:       c.FilePath,
-			Kind:           c.Kind,
-			HttpMethod:     c.HTTPMethod,
-			RouteId:        c.RouteID,
-			Tags:           c.Tags,
-			ContentPreview: c.ContentPreview,
-			Score:          c.Score,
-			StartLine:      c.StartLine,
-			EndLine:        c.EndLine,
-		}
+		results[i] = buildCodebaseSearchChunkResult(c)
 	}
 
 	return &pb.SearchChunksResponse{
@@ -1569,25 +1833,83 @@ func (s *retrievalServer) GetTopologyContext(ctx context.Context, req *pb.Topolo
 	}
 	defer rows.Close()
 
-	var neighbors []*pb.CodebaseChunk
+	var neighbors []*pb.SearchChunkResult
 	for rows.Next() {
 		var id, qid, path, sym, kind, content string
 		var start, end int32
 		if err := rows.Scan(&id, &qid, &path, &sym, &kind, &start, &end, &content); err != nil {
 			continue
 		}
-		neighbors = append(neighbors, &pb.CodebaseChunk{
-			ChunkId:        qid,
+		neighbors = append(neighbors, buildCodebaseSearchChunkResult(qdrantChunk{
+			ID:             id,
 			FilePath:       path,
 			Kind:           kind,
 			ContentPreview: truncate(content, 500),
 			StartLine:      start,
 			EndLine:        end,
-		})
+			Score:          0,
+		}))
 	}
 
 	return &pb.TopologyResponse{
 		Neighbors: neighbors,
+	}, nil
+}
+
+func (s *retrievalServer) GetResearchContext(ctx context.Context, req *pb.ResearchContextRequest) (*pb.ResearchContextResponse, error) {
+	slog.Info("[retrieval] GetResearchContext", "query", req.Query, "limit", req.Limit)
+	atomic.AddInt64(&s.totalRequests, 1)
+
+	ctx, cancel := context.WithTimeout(ctx, searchTimeout)
+	defer cancel()
+
+	limit := int(req.Limit)
+	if limit <= 0 {
+		limit = 5
+	}
+	if limit > maxLimit {
+		limit = maxLimit
+	}
+
+	var vec []float32
+	var err error
+	if len(req.QueryEmbedding) == 768 {
+		vec = req.QueryEmbedding
+	} else {
+		vec, err = s.embed(ctx, req.Query)
+		if err != nil {
+			return nil, fmt.Errorf("embed research query: %w", err)
+		}
+	}
+
+	start := time.Now()
+	chunks, err := s.qdrantSearchResearch(ctx, vec, req.SourceFilter, limit*2)
+	if err != nil {
+		return nil, fmt.Errorf("research search failed: %w", err)
+	}
+
+	threshold := req.ScoreThreshold
+	if threshold <= 0 {
+		threshold = 0.55
+	}
+
+	research := make([]*pb.ResearchContextChunk, 0, min(len(chunks), limit))
+	for _, chunk := range chunks {
+		if chunk.Score < threshold {
+			continue
+		}
+		if !matchesResearchFilters(chunk, req) {
+			continue
+		}
+		research = append(research, buildResearchContextChunk(chunk))
+		if len(research) >= limit {
+			break
+		}
+	}
+
+	return &pb.ResearchContextResponse{
+		Research: research,
+		TotalMs:  float32(time.Since(start).Seconds() * 1000),
 	}, nil
 }
 

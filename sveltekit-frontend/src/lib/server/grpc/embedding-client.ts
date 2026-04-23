@@ -16,13 +16,26 @@
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { buildGrpcClientChannelOptions } from './client-options.js';
 // Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export interface ProtoEmbeddingRequest { texts: string[]; model?: string; dimensions?: number; }
-export interface ProtoEmbeddingResponse { embeddings: number[][]; model: string; dimensions: number; }
-export interface ProtoHealthResponse { status: string; model: string; ready: boolean; }
+export interface ProtoEmbeddingRequest {
+  texts: string[];
+  model?: string;
+  dimensions?: number;
+}
+export interface ProtoEmbeddingResponse {
+  embeddings: number[][];
+  model: string;
+  dimensions: number;
+}
+export interface ProtoHealthResponse {
+  status: string;
+  model: string;
+  ready: boolean;
+}
 
 export interface EmbeddingOptions {
   httpBatchTimeoutMs?: number;
@@ -74,15 +87,15 @@ export interface EmbeddingTransportHealth {
  * and is used by bifrostChat() to sharpen the semantic cache key.
  */
 export interface EmbeddingCacheEntry {
-  vector:      number[];
-  source:      EmbeddingSource;
-  model:       string;
-  dimension:   number;
+  vector: number[];
+  source: EmbeddingSource;
+  model: string;
+  dimension: number;
   /** Top entity tags from nearest-neighbor Qdrant payload — used in Bifrost cache key */
-  qdrantTags:  string[];
-  queryHash:   string;   // FNV-1a of original text (8 hex chars)
-  createdAt:   string;   // ISO timestamp
-  hitCount:    number;   // incremented on cache hits (approximate)
+  qdrantTags: string[];
+  queryHash: string; // FNV-1a of original text (8 hex chars)
+  createdAt: string; // ISO timestamp
+  hitCount: number; // incremented on cache hits (approximate)
 }
 
 /** Legacy narrow shape for backwards-compat reads. */
@@ -154,20 +167,16 @@ async function getGrpcClient(): Promise<any> {
     const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
     const EmbeddingService = protoDescriptor.embedding.EmbeddingService;
 
-    grpcClient = new EmbeddingService(ENV.EMBEDDING_GRPC_URL, grpc.credentials.createInsecure(), {
-      // Keepalive: detect dead connections early (10s ping, 5s timeout)
-      'grpc.keepalive_time_ms': 10_000,
-      'grpc.keepalive_timeout_ms': 5_000,
-      'grpc.keepalive_permit_without_calls': 1,
-      // Connection lifecycle: prevent stale connections
-      'grpc.max_connection_idle_ms': 300_000, // 5min idle disconnect
-      'grpc.max_connection_age_ms': 600_000, // 10min max age
-      // Message size: 10MB for large batch embeddings
-      'grpc.max_send_message_length': 10 * 1024 * 1024,
-      'grpc.max_receive_message_length': 10 * 1024 * 1024,
-      // HTTP/2: allow pings without active streams
-      'grpc.http2.max_pings_without_data': 0,
-    });
+    grpcClient = new EmbeddingService(
+      ENV.EMBEDDING_GRPC_URL,
+      grpc.credentials.createInsecure(),
+      buildGrpcClientChannelOptions({
+        maxConnectionIdleMs: 300_000,
+        maxConnectionAgeMs: 600_000,
+        maxSendMessageLength: 10 * 1024 * 1024,
+        maxReceiveMessageLength: 10 * 1024 * 1024,
+      })
+    );
 
     return grpcClient;
   } catch (err) {
