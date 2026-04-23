@@ -44,6 +44,7 @@
     "test:diagnostics:e2e": "npm run test:diagnostics:e2e:core",
     "test:diagnostics": "npm run test:diagnostics:unit && npm run test:diagnostics:e2e",
     "test:cache": "vitest run src/lib/cache/__tests__",
+    "test:smoke:research-chat": "node scripts/tests/test-research-chat-runtime-smoke.mjs",
     "test:e2e": "playwright test",
     "test:e2e:cache": "playwright test tests/cache-system.spec.ts",
     "test:e2e:cache:headed": "playwright test tests/cache-system.spec.ts --headed",

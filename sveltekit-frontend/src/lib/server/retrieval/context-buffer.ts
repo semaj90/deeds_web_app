@@ -1,12 +1,9 @@
 import { pool } from '$lib/server/db/client';
-import { sql } from 'drizzle-orm';
-import { db } from '$lib/server/db/client';
-import { contextBuffers } from '$lib/server/db/schema-postgres';
 import { createHash } from 'node:crypto';
 
 /**
  * Context Buffer Service
- * 
+ *
  * Manages pre-assembled context blocks for IDE retrieval.
  */
 
@@ -15,6 +12,11 @@ export interface BufferResult {
   tokenCount: number;
   updatedAt: string;
   hash: string;
+}
+
+function hasPgErrorCode(err: unknown, code: string): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  return (err as { code?: string }).code === code;
 }
 
 /**
@@ -29,7 +31,7 @@ export async function getBuffer(key: string): Promise<BufferResult | null> {
       metadata: any;
     }>(
       `SELECT content, token_count, updated_at, metadata
-       FROM context_buffers 
+       FROM context_buffers
        WHERE buffer_key = $1`,
       [key]
     );
@@ -39,7 +41,7 @@ export async function getBuffer(key: string): Promise<BufferResult | null> {
       const content = row.content;
       // Use stored hash or calculate on the fly
       const hash = row.metadata?.hash || createHash('sha256').update(content).digest('hex');
-      
+
       return {
         content,
         tokenCount: row.token_count,
@@ -75,7 +77,9 @@ export async function setBuffer(key: string, content: string, metadata: any = {}
            updated_at = NOW()`,
       [key, content, tokenCount, JSON.stringify(enrichedMetadata)]
     );
-    console.log(`[context-buffer] Cached buffer: ${key} (${tokenCount} tokens, hash: ${hash.slice(0, 8)})`);
+    console.log(
+      `[context-buffer] Cached buffer: ${key} (${tokenCount} tokens, hash: ${hash.slice(0, 8)})`
+    );
   } catch (err) {
     console.error(`[context-buffer] Failed to set buffer ${key}:`, err);
   }
@@ -87,7 +91,7 @@ export async function setBuffer(key: string, content: string, metadata: any = {}
  */
 export async function bakeArchitectureBuffer(): Promise<string> {
   console.log('[context-buffer] Baking full architecture buffer...');
-  
+
   // 1. Fetch all cluster summaries
   const result = await pool.query<{
     gpu_cluster: number;
@@ -123,7 +127,7 @@ export async function bakeArchitectureBuffer(): Promise<string> {
 
   // 3. Persist
   await setBuffer('architecture-overview', md, { clusterCount: result.rows.length });
-  
+
   return md;
 }
 
@@ -135,6 +139,7 @@ export async function invalidateBuffers(): Promise<void> {
     await pool.query(`DELETE FROM context_buffers WHERE buffer_key LIKE 'architecture-%'`);
     console.log('[context-buffer] Architectural buffers invalidated.');
   } catch (err) {
+    if (hasPgErrorCode(err, '42P01')) return;
     console.error('[context-buffer] Invalidation failed:', err);
   }
 }
