@@ -20,11 +20,31 @@ const TEST_USER_ID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
 
 // ── Redis mock ──
 const mockRedisStore: Record<string, string> = {};
+const mockRedisHashes: Record<string, Record<string, string>> = {};
 const mockRedis = {
-	get: vi.fn(async (key: string) => mockRedisStore[key] ?? null),
-	set: vi.fn(async (key: string, val: string) => { mockRedisStore[key] = val; }),
-	del: vi.fn(async (key: string) => { delete mockRedisStore[key]; }),
-	setex: vi.fn(async (k: string, _ttl: number, v: string) => { mockRedisStore[k] = v; }),
+  get: vi.fn(async (key: string) => mockRedisStore[key] ?? null),
+  set: vi.fn(async (key: string, val: string) => {
+    mockRedisStore[key] = val;
+  }),
+  del: vi.fn(async (key: string) => {
+    delete mockRedisStore[key];
+  }),
+  setex: vi.fn(async (k: string, _ttl: number, v: string) => {
+    mockRedisStore[k] = v;
+  }),
+  zincrby: vi.fn(async (key: string, amount: number, member: string) => {
+    const current = Number(mockRedisStore[`${key}:${member}`] ?? '0');
+    const next = current + amount;
+    mockRedisStore[`${key}:${member}`] = String(next);
+    return next;
+  }),
+  expire: vi.fn(async () => 1),
+  hsetnx: vi.fn(async (key: string, field: string, value: string) => {
+    const hash = (mockRedisHashes[key] ??= {});
+    if (field in hash) return 0;
+    hash[field] = value;
+    return 1;
+  }),
 };
 vi.mock('$lib/server/middleware/cache-headers.js', () => ({
   cacheControl: { private: {}, public: {} },

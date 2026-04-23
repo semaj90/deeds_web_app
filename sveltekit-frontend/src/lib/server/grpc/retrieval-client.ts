@@ -12,85 +12,189 @@
  *   RETRIEVAL_GRPC_ENABLED — "true" to enable gRPC path (default: "false")
  */
 import { ENV } from '$lib/server/env.server.js';
+import type { ResearchSource } from '$lib/server/research/web-research-ingester.js';
 // Proto types were in generated/proto (archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types (mirror retrieval.proto messages — validated against generated types) ─
 
 export interface EvidenceSearchParams {
-	query: string;
-	caseId?: string;
-	limit?: number;
-	expandSections?: boolean;
-	jurisdiction?: string;
+  query: string;
+  caseId?: string;
+  limit?: number;
+  expandSections?: boolean;
+  jurisdiction?: string;
 }
 
 export interface SearchResult {
-	evidenceId: string;
-	chunkIndex: number;
-	content: string;
-	score: number;
-	metadata: {
-		sectionPath?: string[];
-		heading?: string;
-		citations?: string[];
-		fileName?: string;
-		tokenCount?: number;
-		extractionMethod?: string;
-	};
-	rerank?: {
-		cosine: number;
-		sharedCitations: number;
-		jurisdictionMatch: number;
-		sectionProximity: number;
-		finalScore: number;
-	};
+  evidenceId: string;
+  chunkIndex: number;
+  content: string;
+  score: number;
+  metadata: {
+    sectionPath?: string[];
+    heading?: string;
+    citations?: string[];
+    fileName?: string;
+    tokenCount?: number;
+    extractionMethod?: string;
+  };
+  rerank?: {
+    cosine: number;
+    sharedCitations: number;
+    jurisdictionMatch: number;
+    sectionProximity: number;
+    finalScore: number;
+  };
 }
 
 export interface GraphNeighbor {
-	nodeId: string;
-	title: string;
-	evidenceType: string;
-	connectionType: string;
-	strength: number;
-	confidence: number;
-	aiReasoning?: string;
+  nodeId: string;
+  title: string;
+  evidenceType: string;
+  connectionType: string;
+  strength: number;
+  confidence: number;
+  aiReasoning?: string;
 }
 
 export interface DocumentContext {
-	evidenceId: string;
-	fileName: string;
-	fileType: string;
-	description: string;
-	aiSummary?: string;
-	aiTagsJson?: string;
-	keyEntitiesJson?: string;
+  evidenceId: string;
+  fileName: string;
+  fileType: string;
+  description: string;
+  aiSummary?: string;
+  aiTagsJson?: string;
+  keyEntitiesJson?: string;
 }
 
 export interface ContextBundle {
-	hit: SearchResult;
-	siblings: SearchResult[];
-	sectionPath: string[];
-	heading: string;
-	citations: string[];
-	graphNeighbors: GraphNeighbor[];
-	documentContext?: DocumentContext;
+  hit: SearchResult;
+  siblings: SearchResult[];
+  sectionPath: string[];
+  heading: string;
+  citations: string[];
+  graphNeighbors: GraphNeighbor[];
+  documentContext?: DocumentContext;
 }
 
 export interface SearchTiming {
-	embedMs: number;
-	searchMs: number;
-	rerankMs: number;
-	hopMs: number;
-	kagMs: number;
-	dagMs: number;
-	totalMs: number;
+  embedMs: number;
+  searchMs: number;
+  rerankMs: number;
+  hopMs: number;
+  kagMs: number;
+  dagMs: number;
+  totalMs: number;
 }
 
 export interface EvidenceSearchResponse {
-	results: SearchResult[];
-	bundles: ContextBundle[];
-	timing: SearchTiming;
-	cacheSource?: string;
+  results: SearchResult[];
+  bundles: ContextBundle[];
+  timing: SearchTiming;
+  cacheSource?: string;
+}
+
+export interface RetrievedCodebaseChunk {
+  id: string;
+  chunkId: string;
+  filePath: string;
+  kind: string;
+  httpMethod: string;
+  routeId: string;
+  source?: string;
+  sourceId?: string;
+  sourceType?: string;
+  url?: string;
+  title?: string;
+  collection?: string;
+  sourceMetadata: Record<string, string>;
+  tags: string[];
+  contentPreview: string;
+  score: number;
+  semanticScore?: number;
+  lexicalScore?: number;
+  rerankScore?: number;
+  clusterId?: string;
+  clusterType?: string;
+  gpuCluster?: number;
+  somCluster?: number;
+  bmuRow?: number;
+  bmuCol?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  indexedAt?: string;
+  startLine: number;
+  endLine: number;
+}
+
+export interface SearchChunksResponse {
+  results: RetrievedCodebaseChunk[];
+  totalMs: number;
+}
+
+export interface ClusterSummaryLookupResponse {
+  clusterId: number;
+  summary: string;
+  patterns: string[];
+  keywords: string[];
+  metadata: Record<string, string>;
+}
+
+export interface AstNode {
+  id: string;
+  symbol: string;
+  kind: string;
+  filePath: string;
+}
+
+export interface AstEdge {
+  sourceId: string;
+  targetId: string;
+  edgeType: string;
+}
+
+export interface AstExpansionResponse {
+  neighbors: AstNode[];
+  edges: AstEdge[];
+}
+
+export interface TopologyContextResponse {
+  neighbors: RetrievedCodebaseChunk[];
+  somMetadataJson?: string;
+}
+
+export interface ResearchContextChunk {
+  id: string;
+  chunkId: string;
+  source: ResearchSource;
+  sourceId?: string;
+  sourceType?: string;
+  sourceMetadata: Record<string, string>;
+  url: string;
+  title: string;
+  body: string;
+  score: number;
+  semanticScore?: number;
+  lexicalScore?: number;
+  rerankScore?: number;
+  tags: string[];
+  semanticTags: string[];
+  clusterId?: string;
+  clusterType?: string;
+  gpuCluster?: number;
+  somCluster?: number;
+  bmuRow?: number;
+  bmuCol?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  indexedAt?: string;
+}
+
+export interface ResearchContextResponse {
+  research: ResearchContextChunk[];
+  totalMs: number;
+  source: 'grpc' | 'unavailable';
+  error?: string;
 }
 
 // ── gRPC client (lazy-loaded, singleton) ────────────────────────────────
@@ -124,7 +228,7 @@ async function getGrpcClient(): Promise<any> {
     const protoLoader = await import('@grpc/proto-loader');
     const { resolve } = await import('path');
 
-    const PROTO_PATH = resolve(process.cwd(), 'proto/active/retrieval.proto');
+    const PROTO_PATH = resolve(process.cwd(), '../proto/active/retrieval.proto');
 
     const packageDefinition = await protoLoader.load(PROTO_PATH, {
       keepCase: false,
@@ -219,6 +323,33 @@ async function getGoSearchHealthClient(): Promise<any> {
     goSearchHealthRetryAt = Date.now() + 30_000;
     return null;
   }
+}
+
+async function callGrpcMethod<T>(
+  methodName: string,
+  request: Record<string, unknown>,
+  timeoutMs = 10_000
+): Promise<T | null> {
+  if (!RETRIEVAL_GRPC_ENABLED) return null;
+
+  const client = await getGrpcClient();
+  const method = client?.[methodName];
+  if (typeof method !== 'function') {
+    return null;
+  }
+
+  return new Promise((resolve) => {
+    const deadline = new Date(Date.now() + timeoutMs);
+    method.call(client, request, { deadline }, (err: Error | null, response: T | null) => {
+      if (err) {
+        console.warn(`[retrieval-client] gRPC ${methodName} failed:`, err.message);
+        resolve(null);
+        return;
+      }
+
+      resolve(response ?? null);
+    });
+  });
 }
 
 // ── gRPC evidence search ────────────────────────────────────────────────
@@ -344,6 +475,236 @@ function mapProtoResponse(response: any): EvidenceSearchResponse {
     cacheSource: response.cacheSource || undefined,
   };
 }
+
+function mapCodebaseChunk(chunk: any): RetrievedCodebaseChunk {
+  const sourceMetadata = chunk?.sourceMetadata ?? {};
+  const scoreMetadata = chunk?.scoreMetadata ?? {};
+  const clusterMetadata = chunk?.clusterMetadata ?? {};
+  const timestamps = chunk?.timestamps ?? {};
+  return {
+    id: chunk?.id ?? chunk?.chunkId ?? '',
+    chunkId: chunk?.chunkId ?? '',
+    filePath: chunk?.filePath ?? sourceMetadata?.filePath ?? '',
+    kind: chunk?.kind ?? '',
+    httpMethod: chunk?.httpMethod ?? '',
+    routeId: chunk?.routeId ?? sourceMetadata?.routeId ?? '',
+    source: sourceMetadata?.source || undefined,
+    sourceId: sourceMetadata?.sourceId || undefined,
+    sourceType: sourceMetadata?.sourceType || undefined,
+    url: sourceMetadata?.url || undefined,
+    title: sourceMetadata?.title || undefined,
+    collection: sourceMetadata?.collection || undefined,
+    sourceMetadata:
+      sourceMetadata?.metadata && typeof sourceMetadata.metadata === 'object'
+        ? sourceMetadata.metadata
+        : {},
+    tags: Array.isArray(chunk?.tags) ? chunk.tags : [],
+    contentPreview: chunk?.contentPreview ?? '',
+    score: Number(scoreMetadata?.score ?? chunk?.score ?? 0),
+    semanticScore:
+      typeof scoreMetadata?.semanticScore === 'number' ? scoreMetadata.semanticScore : undefined,
+    lexicalScore:
+      typeof scoreMetadata?.lexicalScore === 'number' ? scoreMetadata.lexicalScore : undefined,
+    rerankScore:
+      typeof scoreMetadata?.rerankScore === 'number' ? scoreMetadata.rerankScore : undefined,
+    clusterId: clusterMetadata?.clusterId || undefined,
+    clusterType: clusterMetadata?.clusterType || undefined,
+    gpuCluster:
+      typeof clusterMetadata?.gpuCluster === 'number' ? clusterMetadata.gpuCluster : undefined,
+    somCluster:
+      typeof clusterMetadata?.somCluster === 'number' ? clusterMetadata.somCluster : undefined,
+    bmuRow: typeof clusterMetadata?.bmuRow === 'number' ? clusterMetadata.bmuRow : undefined,
+    bmuCol: typeof clusterMetadata?.bmuCol === 'number' ? clusterMetadata.bmuCol : undefined,
+    createdAt: timestamps?.createdAt || undefined,
+    updatedAt: timestamps?.updatedAt || undefined,
+    indexedAt: timestamps?.indexedAt || undefined,
+    startLine: chunk?.startLine ?? 0,
+    endLine: chunk?.endLine ?? 0,
+  };
+}
+
+function mapSearchChunksResponse(response: any): SearchChunksResponse {
+  return {
+    results: Array.isArray(response?.results) ? response.results.map(mapCodebaseChunk) : [],
+    totalMs: Number(response?.totalMs ?? 0),
+  };
+}
+
+function mapClusterSummaryResponse(response: any): ClusterSummaryLookupResponse {
+  return {
+    clusterId: Number(response?.clusterId ?? 0),
+    summary: response?.summary ?? '',
+    patterns: Array.isArray(response?.patterns) ? response.patterns : [],
+    keywords: Array.isArray(response?.keywords) ? response.keywords : [],
+    metadata: response?.metadata && typeof response.metadata === 'object' ? response.metadata : {},
+  };
+}
+
+function mapAstExpansionResponse(response: any): AstExpansionResponse {
+  return {
+    neighbors: Array.isArray(response?.neighbors)
+      ? response.neighbors.map((neighbor: any) => ({
+          id: neighbor?.id ?? '',
+          symbol: neighbor?.symbol ?? '',
+          kind: neighbor?.kind ?? '',
+          filePath: neighbor?.filePath ?? '',
+        }))
+      : [],
+    edges: Array.isArray(response?.edges)
+      ? response.edges.map((edge: any) => ({
+          sourceId: edge?.sourceId ?? '',
+          targetId: edge?.targetId ?? '',
+          edgeType: edge?.edgeType ?? '',
+        }))
+      : [],
+  };
+}
+
+function mapTopologyResponse(response: any): TopologyContextResponse {
+  return {
+    neighbors: Array.isArray(response?.neighbors) ? response.neighbors.map(mapCodebaseChunk) : [],
+    somMetadataJson: response?.somMetadataJson || undefined,
+  };
+}
+
+function mapResearchContextResponse(response: any): ResearchContextResponse {
+  return {
+    research: Array.isArray(response?.research)
+      ? response.research.map((chunk: any) => ({
+          id: chunk?.id ?? chunk?.chunkId ?? '',
+          chunkId: chunk?.chunkId ?? '',
+          source: (chunk?.source ?? 'web_page') as ResearchSource,
+          sourceId: chunk?.sourceMetadata?.sourceId || undefined,
+          sourceType: chunk?.sourceMetadata?.sourceType || undefined,
+          sourceMetadata:
+            chunk?.sourceMetadata?.metadata && typeof chunk.sourceMetadata.metadata === 'object'
+              ? chunk.sourceMetadata.metadata
+              : {},
+          url: chunk?.url ?? '',
+          title: chunk?.title ?? '',
+          body: chunk?.body ?? '',
+          score: Number(chunk?.scoreMetadata?.score ?? chunk?.score ?? 0),
+          semanticScore:
+            typeof chunk?.scoreMetadata?.semanticScore === 'number'
+              ? chunk.scoreMetadata.semanticScore
+              : undefined,
+          lexicalScore:
+            typeof chunk?.scoreMetadata?.lexicalScore === 'number'
+              ? chunk.scoreMetadata.lexicalScore
+              : undefined,
+          rerankScore:
+            typeof chunk?.scoreMetadata?.rerankScore === 'number'
+              ? chunk.scoreMetadata.rerankScore
+              : undefined,
+          tags: Array.isArray(chunk?.tags) ? chunk.tags : [],
+          semanticTags: Array.isArray(chunk?.semanticTags) ? chunk.semanticTags : [],
+          clusterId: chunk?.clusterMetadata?.clusterId || undefined,
+          clusterType: chunk?.clusterMetadata?.clusterType || undefined,
+          gpuCluster:
+            typeof chunk?.clusterMetadata?.gpuCluster === 'number'
+              ? chunk.clusterMetadata.gpuCluster
+              : undefined,
+          somCluster:
+            typeof chunk?.clusterMetadata?.somCluster === 'number'
+              ? chunk.clusterMetadata.somCluster
+              : undefined,
+          bmuRow:
+            typeof chunk?.clusterMetadata?.bmuRow === 'number'
+              ? chunk.clusterMetadata.bmuRow
+              : undefined,
+          bmuCol:
+            typeof chunk?.clusterMetadata?.bmuCol === 'number'
+              ? chunk.clusterMetadata.bmuCol
+              : undefined,
+          createdAt: chunk?.timestamps?.createdAt || undefined,
+          updatedAt: chunk?.timestamps?.updatedAt || undefined,
+          indexedAt: chunk?.timestamps?.indexedAt || undefined,
+        }))
+      : [],
+    totalMs: Number(response?.totalMs ?? 0),
+    source: 'grpc',
+  };
+}
+
+export async function searchChunksViaGrpc(
+  query: string,
+  limit = 10,
+  collection = 'codebase_chunks_768'
+): Promise<SearchChunksResponse | null> {
+  const response = await callGrpcMethod<any>('searchChunks', { query, limit, collection });
+  return response ? mapSearchChunksResponse(response) : null;
+}
+
+export async function getClusterSummaryViaGrpc(
+  clusterId: number,
+  clusterType: 'gpu' | 'som' = 'gpu'
+): Promise<ClusterSummaryLookupResponse | null> {
+  const response = await callGrpcMethod<any>('getClusterSummary', { clusterId, clusterType });
+  return response ? mapClusterSummaryResponse(response) : null;
+}
+
+export async function expandAstNeighborsViaGrpc(
+  symbol?: string,
+  filePath?: string,
+  depth = 1
+): Promise<AstExpansionResponse | null> {
+  const response = await callGrpcMethod<any>('expandAstNeighbors', { symbol, filePath, depth });
+  return response ? mapAstExpansionResponse(response) : null;
+}
+
+export async function getTopologyContextViaGrpc(
+  bmuRow: number,
+  bmuCol: number,
+  radius = 1
+): Promise<TopologyContextResponse | null> {
+  const response = await callGrpcMethod<any>('getTopologyContext', { bmuRow, bmuCol, radius });
+  return response ? mapTopologyResponse(response) : null;
+}
+
+export async function getResearchContextViaGrpc(opts: {
+  query: string;
+  limit?: number;
+  sourceFilter?: ResearchSource[];
+  scoreThreshold?: number;
+  queryEmbedding?: number[];
+}): Promise<ResearchContextResponse> {
+  const response = await callGrpcMethod<any>('getResearchContext', {
+    query: opts.query,
+    limit: opts.limit ?? 5,
+    sourceFilter: opts.sourceFilter ?? [],
+    scoreThreshold: opts.scoreThreshold ?? 0.55,
+    queryEmbedding: opts.queryEmbedding ?? [],
+  });
+
+  if (response) {
+    return mapResearchContextResponse(response);
+  }
+  return {
+    research: [],
+    totalMs: 0,
+    source: 'unavailable',
+    error: 'gRPC getResearchContext unavailable',
+  };
+}
+
+export const retrievalClient = {
+  searchChunks: async (query: string, limit = 10, collection = 'codebase_chunks_768') =>
+    (await searchChunksViaGrpc(query, limit, collection)) ?? { results: [], totalMs: 0 },
+  getClusterSummary: async (clusterId: number, clusterType: 'gpu' | 'som' = 'gpu') =>
+    (await getClusterSummaryViaGrpc(clusterId, clusterType)) ?? {
+      clusterId,
+      summary: '',
+      patterns: [],
+      keywords: [],
+      metadata: {},
+    },
+  expandAstNeighbors: async (symbol?: string, filePath?: string, depth = 1) =>
+    (await expandAstNeighborsViaGrpc(symbol, filePath, depth)) ?? { neighbors: [], edges: [] },
+  getTopologyContext: async (bmuRow: number, bmuCol: number, radius = 1) =>
+    (await getTopologyContextViaGrpc(bmuRow, bmuCol, radius)) ?? { neighbors: [] },
+  getResearchContext: getResearchContextViaGrpc,
+  health: checkRetrievalHealth,
+};
 
 // ── HTTP REST fast-path (go-retrieval-service :8100) ────────────────────
 //

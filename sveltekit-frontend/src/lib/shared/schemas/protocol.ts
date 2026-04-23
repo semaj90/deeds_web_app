@@ -20,6 +20,7 @@ export type {
   JsonRecord,
   JsonValue,
   OllamaMessage,
+  PersistedEnvelope,
   PersistedPayloadEnvelope,
   ProtocolBoundary,
   ResearchChunk,
@@ -28,12 +29,3 @@ export type {
 } from '../../types/protocol.js';
 
 export { PersistedPayloadEnvelopeSchema as PersistedEnvelopeSchema } from '../../types/protocol.js';
-
-import type { JsonValue, PersistedPayloadEnvelope } from '../../types/protocol.js';
-
-export type PersistedEnvelope<T extends JsonValue = JsonValue> = Omit<
-  PersistedPayloadEnvelope,
-  'payload'
-> & {
-  payload?: T;
-};

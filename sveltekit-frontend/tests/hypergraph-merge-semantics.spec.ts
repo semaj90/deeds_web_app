@@ -1,7 +1,7 @@
 /**
  * hypergraph-merge-semantics.spec.ts  (Part B)
  *
- * Unit test for linkResearchToSession MERGE semantics.
+ * Unit test for hypergraph research provenance helpers.
  *
  * Guards against the silent-failure bug (April 2026):
  *   MATCH (s:InteractiveSession ...) returned nothing when session didn't pre-exist,
@@ -14,9 +14,11 @@
  *   Part B: keep it real (verify its own Cypher via neo4j-driver mock)
  *
  * Tests:
- *   1. MERGE present: InteractiveSession created without prior recordSessionStart
- *   2. ResearchSource + CONSULTED_RESEARCH are MERGEd (not MATCH+CREATE)
- *   3. Edge payload: relevance = passed score, timestamp = datetime()
+ *   1. linkResearchToSession MERGE present: InteractiveSession created without prior recordSessionStart
+ *   2. linkResearchToSession ResearchSource + CONSULTED_RESEARCH are MERGEd
+ *   3. linkResearchToSession edge payload: relevance = passed score, timestamp = datetime()
+ *   4. linkResearchBatchToSession dedupes repeated URLs before writing provenance
+ *   5. linkResearchBatchToSession reuses an existing canonical ResearchSource node
  */
 
 // @vitest-environment node
@@ -33,8 +35,27 @@ vi.mock('$lib/server/env.server.js', () => ({
 // ── Neo4j driver mock — captures every run() call ────────────────────────────
 
 const runCalls: Array<{ cypher: string; params: Record<string, unknown> }> = [];
+const researchNodeIds = new Map<string, string>();
+let nextNodeId = 1;
 const mockNeoRun = vi.fn(async (cypher: string, params: Record<string, unknown>) => {
   runCalls.push({ cypher, params });
+
+  if (cypher.includes('MATCH (r:ResearchSource {url: $chunkUrl})')) {
+    const existingId = researchNodeIds.get(String(params.chunkUrl));
+    return {
+      records: existingId ? [{ get: () => existingId }] : [],
+    };
+  }
+
+  if (cypher.includes('CREATE (r:ResearchSource {url: $chunkUrl, source: $source})')) {
+    const nodeId = `node-${nextNodeId++}`;
+    researchNodeIds.set(String(params.chunkUrl), nodeId);
+    return {
+      records: [{ get: () => nodeId }],
+    };
+  }
+
+  return { records: [] };
 });
 const mockNeoSession = {
   run: mockNeoRun,
@@ -52,6 +73,8 @@ describe('linkResearchToSession — MERGE semantics', () => {
 
   beforeEach(() => {
     runCalls.length = 0;
+    researchNodeIds.clear();
+    nextNodeId = 1;
     mockNeoRun.mockClear();
     mockNeoSession.close.mockClear();
     mockDriver.session.mockClear();
@@ -111,5 +134,47 @@ describe('linkResearchToSession — MERGE semantics', () => {
     expect(params.relevance).toBe(score);
     expect(cypher).toContain('rel.relevance = $relevance');
     expect(cypher).toContain('rel.timestamp = datetime()');
+  });
+
+  it('4. linkResearchBatchToSession dedupes repeated URLs before creating provenance edges', async () => {
+    const { linkResearchBatchToSession } = await import('$lib/server/ai/hypergraph-store.js');
+
+    await linkResearchBatchToSession(crypto.randomUUID(), [
+      { url: 'https://github.com/sveltejs/svelte/issues/1', source: 'github_issue', relevance: 0.61 },
+      { url: 'https://github.com/sveltejs/svelte/issues/1', source: 'github_issue', relevance: 0.52 },
+      { url: 'https://svelte.dev/blog/runes', source: 'official_docs', relevance: 0.91 },
+    ]);
+
+    const createCalls = runCalls.filter((call) =>
+      call.cypher.includes('CREATE (r:ResearchSource {url: $chunkUrl, source: $source})')
+    );
+    const edgeCalls = runCalls.filter((call) =>
+      call.cypher.includes('MERGE (s)-[rel:CONSULTED_RESEARCH]->(r)')
+    );
+
+    expect(createCalls).toHaveLength(2);
+    expect(edgeCalls).toHaveLength(2);
+    expect(edgeCalls.map((call) => call.params.nodeId)).toEqual(['node-1', 'node-2']);
+  });
+
+  it('5. linkResearchBatchToSession reuses an existing canonical ResearchSource node', async () => {
+    const { linkResearchBatchToSession } = await import('$lib/server/ai/hypergraph-store.js');
+
+    researchNodeIds.set('https://github.com/nextxm/paisa/issues/230', 'node-existing');
+
+    await linkResearchBatchToSession(crypto.randomUUID(), [
+      { url: 'https://github.com/nextxm/paisa/issues/230', source: 'github_issue', relevance: 0.51 },
+    ]);
+
+    const createCalls = runCalls.filter((call) =>
+      call.cypher.includes('CREATE (r:ResearchSource {url: $chunkUrl, source: $source})')
+    );
+    const edgeCalls = runCalls.filter((call) =>
+      call.cypher.includes('MERGE (s)-[rel:CONSULTED_RESEARCH]->(r)')
+    );
+
+    expect(createCalls).toHaveLength(0);
+    expect(edgeCalls).toHaveLength(1);
+    expect(edgeCalls[0]?.params.nodeId).toBe('node-existing');
   });
 });

@@ -57,49 +57,73 @@ export const OllamaMessageSchema = z.object({
 });
 
 export const ResearchChunkSchema = z.object({
-	id: z.string().min(1),
-	content: z.string(),
-	title: z.string().optional(),
-	url: z.string().optional(),
-	source: z.string().min(1),
-	score: z.number().optional(),
-	tags: z.array(z.string()).optional(),
-	clusterId: z.string().optional(),
-	metadata: JsonRecordSchema.optional(),
+  id: z.string().min(1),
+  chunkId: z.string().optional(),
+  content: z.string(),
+  title: z.string().optional(),
+  url: z.string().optional(),
+  source: z.string().min(1),
+  sourceId: z.string().optional(),
+  sourceType: z.string().optional(),
+  sourceMetadata: JsonRecordSchema.optional(),
+  score: z.number().optional(),
+  semanticScore: z.number().optional(),
+  lexicalScore: z.number().optional(),
+  rerankScore: z.number().optional(),
+  tags: z.array(z.string()).optional(),
+  clusterId: z.string().optional(),
+  clusterType: z.string().optional(),
+  gpuCluster: z.number().int().optional(),
+  somCluster: z.number().int().optional(),
+  bmuRow: z.number().int().optional(),
+  bmuCol: z.number().int().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+  indexedAt: z.string().datetime().optional(),
+  metadata: JsonRecordSchema.optional(),
 });
 
 export const ToolCallResponseSchema = EnvelopeMetadataSchema.extend({
-	protocol: z.enum(['json-rpc', 'http']),
-	toolName: z.string().min(1),
-	arguments: JsonRecordSchema.default({}),
-	ok: z.boolean(),
-	result: JsonValueSchema.optional(),
-	error: z.string().optional(),
-	cache: CacheHitMetadataSchema.optional(),
-	metadata: JsonRecordSchema.optional(),
+  protocol: z.enum(['json-rpc', 'http']),
+  toolName: z.string().min(1),
+  arguments: JsonRecordSchema.default({}),
+  ok: z.boolean(),
+  result: JsonValueSchema.optional(),
+  error: z.string().optional(),
+  cache: CacheHitMetadataSchema.optional(),
+  metadata: JsonRecordSchema.optional(),
 }).catchall(JsonValueSchema);
 
 export const AceContextEnvelopeSchema = EnvelopeMetadataSchema.extend({
-	protocol: ProtocolBoundarySchema.default('internal'),
-	query: z.string(),
-	messages: z.array(OllamaMessageSchema).default([]),
-	chunks: z.array(ResearchChunkSchema).default([]),
-	cache: CacheHitMetadataSchema.optional(),
-	metadata: JsonRecordSchema.optional(),
+  protocol: ProtocolBoundarySchema.default('internal'),
+  query: z.string(),
+  messages: z.array(OllamaMessageSchema).default([]),
+  chunks: z.array(ResearchChunkSchema).default([]),
+  cache: CacheHitMetadataSchema.optional(),
+  metadata: JsonRecordSchema.optional(),
 }).catchall(JsonValueSchema);
 
 export const SessionEdgePayloadSchema = EnvelopeMetadataSchema.extend({
-	protocol: ProtocolBoundarySchema.default('internal'),
-	from: z.string().min(1),
-	to: z.string().min(1),
-	relation: z.string().min(1),
-	weight: z.number().optional(),
-	metadata: JsonRecordSchema.optional(),
+  protocol: ProtocolBoundarySchema.default('internal'),
+  from: z.string().min(1),
+  to: z.string().min(1),
+  relation: z.string().min(1),
+  weight: z.number().optional(),
+  metadata: JsonRecordSchema.optional(),
 }).catchall(JsonValueSchema);
 
 export type ProtocolBoundary = z.infer<typeof ProtocolBoundarySchema>;
 export type CacheHitMetadata = z.infer<typeof CacheHitMetadataSchema>;
 export type PersistedPayloadEnvelope = z.infer<typeof PersistedPayloadEnvelopeSchema>;
+export type PersistedEnvelope<T extends JsonValue = JsonValue> = Omit<
+  PersistedPayloadEnvelope,
+  'payload' | 'protocol' | 'ok'
+> & {
+  payload?: T;
+  protocol?: ProtocolBoundary;
+  ok?: boolean;
+  kind?: string;
+};
 export type OllamaMessage = z.infer<typeof OllamaMessageSchema>;
 export type ResearchChunk = z.infer<typeof ResearchChunkSchema>;
 export type ToolCallResponse = z.infer<typeof ToolCallResponseSchema>;

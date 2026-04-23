@@ -12,9 +12,9 @@
 
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { searchResearchChunks, type ResearchSource } from '../research/web-research-ingester.js';
-import { generateEmbedding } from '../grpc/embedding-client.js';
-import { linkResearchToSession } from '../ai/hypergraph-store.js';
+import type { ResearchSource } from '../research/web-research-ingester.js';
+import { retrievalClient } from '../grpc/retrieval-client.js';
+import { linkResearchBatchToSession } from '../ai/hypergraph-store.js';
 import { recordResearchHits } from '../research/lane4-feedback.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -241,14 +241,18 @@ export async function getWebResearchForAce(
   limit: number = 10
 ): Promise<{ research: AceResearchContext[]; error?: string }> {
   try {
-    const embedRes = await generateEmbedding(query);
-    if (!embedRes?.length) return { research: [] };
-
-    const results = await searchResearchChunks({
-      queryEmbedding: embedRes,
+    const result = await retrievalClient.getResearchContext({
+      query,
       limit: limit * 2, // Fetch extra to allow for priority sorting
       scoreThreshold: 0.5,
     });
+
+    if (result.source !== 'grpc') {
+      return {
+        research: [],
+        error: result.error ?? 'web_research fetch failed: gRPC getResearchContext unavailable',
+      };
+    }
 
     // Trust Priority Mapping
     const priority: Record<ResearchSource, number> = {
@@ -260,7 +264,7 @@ export async function getWebResearchForAce(
       reddit_post: 5,
     };
 
-    const sorted = results.sort((a, b) => {
+    const sorted = result.research.sort((a, b) => {
       const pA = priority[a.source] ?? 99;
       const pB = priority[b.source] ?? 99;
       if (pA !== pB) return pA - pB;
@@ -269,13 +273,13 @@ export async function getWebResearchForAce(
 
     return {
       research: sorted.slice(0, limit).map((r) => ({
-        chunkId: r.chunk_id,
+        chunkId: r.chunkId || r.id,
         source: r.source,
         url: r.url,
         title: r.title,
         body: r.body,
         score: r.score,
-        semanticTags: r.semantic_tags,
+        semanticTags: r.semanticTags,
       })),
     };
   } catch (e: any) {
@@ -341,14 +345,17 @@ export async function assembleAceContext(
 
   if (!health.ok) degraded = true;
 
-  // Fire-and-forget: link each research chunk to the session in Neo4j
+  // Link research provenance in one Neo4j write to avoid duplicate MERGE races.
   const researchChunks = researchResult?.research ?? [];
   if (opts.sessionId && researchChunks.length > 0) {
-    for (const chunk of researchChunks) {
-      linkResearchToSession(opts.sessionId, chunk.url, chunk.source, chunk.score).catch(() => {
-        /* non-fatal */
-      });
-    }
+    await linkResearchBatchToSession(
+      opts.sessionId,
+      researchChunks.map((chunk) => ({
+        url: chunk.url,
+        source: chunk.source,
+        relevance: chunk.score,
+      }))
+    );
   }
 
   // Lane 4: record hits for trust-score feedback loop (fire-and-forget)

@@ -15,7 +15,7 @@ import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
 import { bifrostChat } from '../ollama.js';
 import * as Hypergraph from '../ai/hypergraph-store.js';
-import { retrievalClient } from '../ai/retrieval-client.js';
+import { retrievalClient } from '../grpc/retrieval-client.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

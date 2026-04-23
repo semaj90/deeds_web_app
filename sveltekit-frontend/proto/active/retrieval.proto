@@ -4,160 +4,401 @@ package yorha.retrieval;
 
 option go_package = "github.com/deeds-web-app/proto/retrieval";
 
-/**
- * RetrievalService — RAG + KAG + DAG evidence retrieval.
- *
- * RAG: embed query → pgvector cosine + Qdrant ANN → legal-aware rerank
- * KAG: traverse yorha_evidence_connections graph for related nodes
- * DAG: resolve citation cross-references across documents
- *
- * This is the single retrieval backend. SvelteKit gateway calls this
- * instead of inline pgvector/Qdrant logic.
- */
+// ─────────────────────────────────────────────────────────────────────────
+// RetrievalService — the single RAG + KAG + DAG retrieval boundary.
+//
+//   RAG: embed query → dual search (pgvector + Qdrant ANN) → legal-aware rerank
+//   KAG: traverse yorha_evidence_connections graph for related evidence nodes
+//   DAG: resolve parent document context + cross-document citation refs
+//
+// SvelteKit gateway calls this instead of inline pgvector/Qdrant logic.
+// Streaming variants map to existing SSE progress pattern.
+// ─────────────────────────────────────────────────────────────────────────
 
 service RetrievalService {
-  // Full RAG+KAG+DAG search returning context bundles
+  // Unary: full RAG+KAG+DAG search returning context bundles
   rpc SearchEvidence(EvidenceSearchRequest) returns (EvidenceSearchResponse);
 
-  // Codebase chunk search (dual-vector: content + signature)
+  // Streaming: progressive bundle delivery (maps to SSE updateJob pattern)
+  rpc StreamEvidence(EvidenceSearchRequest) returns (stream EvidenceBundleEvent);
+
+  // Unary: codebase chunk search (dual-vector: content + signature)
   rpc SearchCodebase(CodebaseSearchRequest) returns (CodebaseSearchResponse);
 
-  // Health check
+  // Streaming: progressive codebase chunk delivery
+  rpc StreamCodebase(CodebaseSearchRequest) returns (stream CodebaseChunkEvent);
+
+  // Unary: generic chunk search (Lane 1/2 optimized)
+  rpc SearchChunks(SearchChunksRequest) returns (SearchChunksResponse);
+
+  // Unary: GPU/SOM cluster summary lookup
+  rpc GetClusterSummary(ClusterSummaryRequest) returns (ClusterSummaryResponse);
+
+  // Unary: AST neighbor expansion
+  rpc ExpandAstNeighbors(AstExpansionRequest) returns (AstExpansionResponse);
+
+  // Unary: SOM/Topology neighborhood expansion
+  rpc GetTopologyContext(TopologyRequest) returns (TopologyResponse);
+
+  // Unary: research-backed context retrieval (Lane 3, optional fallback)
+  rpc GetResearchContext(ResearchContextRequest) returns (ResearchContextResponse);
+
+  // Health check: pgvector, Qdrant, Redis, embedding service
   rpc Health(HealthRequest) returns (HealthResponse);
 }
 
 // ── Evidence Search (RAG + KAG + DAG) ──────────────────────────────────
 
-/**
- * Evidence search request.
- * Maps 1:1 to POST /api/evidence/search body.
- */
 message EvidenceSearchRequest {
-  string query = 1;                    // Natural language query
-  string case_id = 2;                  // Optional: scope to case
-  int32 limit = 3;                     // Max results (default 10)
-  bool expand_sections = 4;            // Graph-hop to section siblings
-  string jurisdiction = 5;             // Optional: jurisdiction filter
+  string query = 1;
+  string case_id = 2;
+  int32 limit = 3;
+  string jurisdiction = 4;
+
+  GraphHopPolicy hop = 5;
+  PrefilterPolicy prefilter = 6;
+  RankPolicy rank = 7;
+
+  // Pre-computed query embedding (768-dim embeddinggemma). Skip embed step if set.
+  repeated float query_embedding = 8 [packed = true];
+
+  bool include_debug = 9;
 }
 
-/**
- * Evidence search response with context bundles.
- */
 message EvidenceSearchResponse {
-  repeated SearchResult results = 1;   // Flat ranked results
-  repeated ContextBundle bundles = 2;  // Section-grouped bundles
-  SearchTiming timing = 3;            // Pipeline timing breakdown
-  string cache_source = 4;            // "memory", "redis", or empty (miss)
+  repeated SearchResult results = 1;
+  repeated ContextBundle bundles = 2;
+  SearchTiming timing = 3;
+  string cache_source = 4;            // "memory", "redis", or ""
+  string debug_json = 5;
 }
 
-/**
- * A single search hit from pgvector or Qdrant.
- */
+message EvidenceBundleEvent {
+  oneof event {
+    ContextBundle bundle = 1;
+    RetrievalProgress progress = 2;
+    RetrievalError error = 3;
+  }
+}
+
+// ── Core messages ──────────────────────────────────────────────────────
+
 message SearchResult {
   string evidence_id = 1;
   int32 chunk_index = 2;
   string content = 3;
   float score = 4;
   ChunkMetadata metadata = 5;
-  RerankExplain rerank = 6;            // Present after legal-aware reranking
+  RerankExplain rerank = 6;
 }
 
-/**
- * Chunk metadata from the evidence_vectors table.
- */
 message ChunkMetadata {
-  repeated string section_path = 1;    // Hierarchical section path
-  string heading = 2;                  // Section heading
-  repeated string citations = 3;      // Legal citations found in chunk
-  string file_name = 4;               // Source file name
-  int32 token_count = 5;              // Token count
-  string extraction_method = 6;       // "pdf-parse", "ocr-tesseract", "ocr-tesseractjs"
+  repeated string section_path = 1;    // ["ARTICLE I", "SECTION 2", "§ 8"]
+  string heading = 2;
+  repeated string citations = 3;
+  string file_name = 4;
+  int32 token_count = 5;
+  string extraction_method = 6;       // "pdf-parse", "ocr-tesseract", "utf8"
+  string jurisdiction = 7;
 }
 
-/**
- * Rerank explanation (75% cosine + 15% shared citations + 10% section proximity).
- */
 message RerankExplain {
-  float cosine = 1;
-  float shared_citations = 2;
-  float section_proximity = 3;
-  float final_score = 4;
+  float cosine = 1;                    // Raw cosine similarity
+  float shared_citations = 2;         // Citation overlap count (capped at 3)
+  float jurisdiction_match = 3;       // 1.0 = exact, 0.5 = text mention, 0.0 = absent
+  float section_proximity = 4;        // 0..1 based on section depth
+  float final_score = 5;              // 0.75*cosine + 0.15*citations + 0.10*context
 }
 
-/**
- * A context bundle: primary hit + section siblings + citations.
- * This is the unit of context passed to the LLM.
- */
 message ContextBundle {
-  SearchResult hit = 1;                // Primary search hit
-  repeated SearchResult siblings = 2;  // Sibling chunks from same section
-  repeated string section_path = 3;    // Section hierarchy
-  string heading = 4;                  // Section heading
-  repeated string citations = 5;      // All citations in this bundle
+  SearchResult hit = 1;               // Primary hit (anchor)
+  repeated SearchResult siblings = 2; // Sibling chunks from same section
+  repeated string section_path = 3;
+  string heading = 4;
+  repeated string citations = 5;      // All citations in bundle
+
+  // KAG: 1-hop graph neighbors from yorha_evidence_connections
+  repeated GraphNeighbor graph_neighbors = 6;
+
+  // DAG: parent document context from evidence + yorha_evidence_nodes
+  DocumentContext document_context = 7;
 }
 
-/**
- * Pipeline timing breakdown.
- */
+message GraphNeighbor {
+  string node_id = 1;                 // yorha_evidence_nodes.id
+  string title = 2;
+  string evidence_type = 3;          // "document-section", etc.
+  string connection_type = 4;        // "HAS_SECTION", "cites", "contradicts", "explains"
+  int32 strength = 5;                // 0-100
+  int32 confidence = 6;              // 0-100
+  string ai_reasoning = 7;
+}
+
+message DocumentContext {
+  string evidence_id = 1;
+  string file_name = 2;
+  string file_type = 3;
+  string description = 4;
+  string ai_summary = 5;             // From yorha_evidence_nodes
+  string ai_tags_json = 6;           // JSONB passthrough
+  string key_entities_json = 7;      // JSONB passthrough
+}
+
 message SearchTiming {
-  float embed_ms = 1;                 // Query embedding time
-  float search_ms = 2;               // Dual search (pgvector + Qdrant)
-  float rerank_ms = 3;               // Legal-aware reranking
-  float hop_ms = 4;                  // Graph-hop expansion
-  float total_ms = 5;                // End-to-end latency
+  float embed_ms = 1;
+  float search_ms = 2;              // Dual: pgvector + Qdrant
+  float rerank_ms = 3;
+  float hop_ms = 4;                 // Section sibling expansion
+  float kag_ms = 5;                 // Graph neighbor traversal
+  float dag_ms = 6;                 // Document context enrichment
+  float total_ms = 7;
 }
 
-// ── Codebase Search (dual-vector) ──────────────────────────────────────
+// ── Codebase Search ────────────────────────────────────────────────────
 
-/**
- * Codebase chunk search request.
- * Uses dual named vectors: content (raw code) + signature (AST metadata).
- */
 message CodebaseSearchRequest {
-  string query = 1;                    // Natural language or code query
-  int32 limit = 2;                     // Max results (default 10)
-  float content_weight = 3;           // Weight for content vector (default 0.6)
-  float signature_weight = 4;         // Weight for signature vector (default 0.4)
-  repeated string kinds = 5;          // Filter by kind: "route", "component", "server", "lib"
-  string http_method = 6;             // Filter by HTTP method
+  string query = 1;
+  int32 limit = 2;
+  float content_weight = 3;          // Default 0.6
+  float signature_weight = 4;        // Default 0.4
+  repeated string kinds = 5;         // "route", "component", "server", "lib"
+  string http_method = 6;
+  repeated string path_prefixes = 7; // ["src/routes/api", "src/lib/server"]
+  bool include_debug = 8;
 }
 
-/**
- * Codebase search response.
- */
 message CodebaseSearchResponse {
   repeated CodebaseChunk chunks = 1;
   float total_ms = 2;
+  string debug_json = 3;
 }
 
-/**
- * A codebase chunk result.
- */
+message CodebaseChunkEvent {
+  oneof event {
+    CodebaseChunk chunk = 1;
+    RetrievalProgress progress = 2;
+    RetrievalError error = 3;
+  }
+}
+
 message CodebaseChunk {
   string chunk_id = 1;
   string file_path = 2;
-  string kind = 3;                     // "route", "component", "server", "lib"
-  string http_method = 4;             // GET, POST, etc.
-  string route_id = 5;                // SvelteKit route ID
-  repeated string tags = 6;           // AST-extracted tags
-  string content_preview = 7;         // First N chars of content
-  float score = 8;                    // Combined score
+  string kind = 3;
+  string http_method = 4;
+  string route_id = 5;
+  repeated string tags = 6;
+  string content_preview = 7;
+  float score = 8;
+  int32 start_line = 9;
+  int32 end_line = 10;
 }
 
-// ── Shared messages ────────────────────────────────────────────────────
+// ── Policies ────────────────────────────────────────────────────────────
 
-/**
- * Health check request.
- */
+message GraphHopPolicy {
+  int32 mode = 1;                     // 0=off, 1=siblings, 2=siblings+parent/child
+  int32 max_hop_chunks = 2;           // Default 10
+  bool within_same_evidence_only = 3;
+}
+
+message PrefilterPolicy {
+  bool enable_qdrant = 1;             // Default true
+  int32 qdrant_shortlist = 2;         // Default 3x limit
+  float score_threshold = 3;          // Default 0.3
+  bool allow_pgvector_fallback = 4;   // Default true
+}
+
+message RankPolicy {
+  float cosine_weight = 1;            // Default 0.75
+  float citations_weight = 2;         // Default 0.15
+  float jurisdiction_weight = 3;      // Default 0.10
+}
+
+// ── Diagnostics ─────────────────────────────────────────────────────────
+
+message RetrievalProgress {
+  string stage = 1;                   // "embed", "search", "rerank", "hop", "kag", "dag"
+  int32 current = 2;
+  int32 total = 3;
+  string message = 4;
+}
+
+message RetrievalError {
+  string code = 1;                    // "UNAVAILABLE", "TIMEOUT", "INVALID_ARGUMENT"
+  string message = 2;
+  string details_json = 3;
+}
+
+// ── Shared ──────────────────────────────────────────────────────────────
+
+message RetrievalSourceMetadata {
+  string source = 1;
+  string source_id = 2;
+  string source_type = 3;
+  string url = 4;
+  string title = 5;
+  string file_path = 6;
+  string route_id = 7;
+  string collection = 8;
+  map<string, string> metadata = 9;
+}
+
+message RetrievalScoreMetadata {
+  float score = 1;
+  float semantic_score = 2;
+  float lexical_score = 3;
+  float rerank_score = 4;
+}
+
+message RetrievalClusterMetadata {
+  string cluster_id = 1;
+  string cluster_type = 2;
+  int32 gpu_cluster = 3;
+  int32 som_cluster = 4;
+  int32 bmu_row = 5;
+  int32 bmu_col = 6;
+}
+
+message TransportTimestamps {
+  string created_at = 1;
+  string updated_at = 2;
+  string indexed_at = 3;
+}
+
+// ── Lane 1/2 Specialized Requests ──────────────────────────────────────
+
+message SearchChunksRequest {
+  string query = 1;
+  int32 limit = 2;
+  string collection = 3;            // "codebase_chunks_768" or "research_chunks"
+  repeated string filters = 4;      // Key:Value pairs
+  repeated string ids = 5;
+  repeated string tags = 6;
+  repeated string source_filter = 7;
+  repeated string cluster_ids = 8;
+  repeated int32 som_clusters = 9;
+  string created_after = 10;
+  string updated_after = 11;
+}
+
+message SearchChunkResult {
+  string id = 1;
+  string chunk_id = 2;
+  string content_preview = 3;
+  string kind = 4;
+  string http_method = 5;
+  string route_id = 6;
+  int32 start_line = 7;
+  int32 end_line = 8;
+  repeated string tags = 9;
+  RetrievalSourceMetadata source_metadata = 10;
+  RetrievalScoreMetadata score_metadata = 11;
+  RetrievalClusterMetadata cluster_metadata = 12;
+  TransportTimestamps timestamps = 13;
+  string file_path = 14;
+}
+
+message SearchChunksResponse {
+  repeated SearchChunkResult results = 1;
+  float total_ms = 2;
+}
+
+message ClusterSummaryRequest {
+  int32 cluster_id = 1;
+  string cluster_type = 2;          // "gpu" or "som"
+}
+
+message ClusterSummaryResponse {
+  int32 cluster_id = 1;
+  string summary = 2;
+  repeated string patterns = 3;
+  repeated string keywords = 4;
+  map<string, string> metadata = 5;
+}
+
+message AstExpansionRequest {
+  string symbol = 1;
+  string file_path = 2;
+  int32 depth = 3;                  // Default 1
+}
+
+message AstExpansionResponse {
+  repeated AstNode neighbors = 1;
+  repeated AstEdge edges = 2;
+}
+
+message AstNode {
+  string id = 1;
+  string symbol = 2;
+  string kind = 3;
+  string file_path = 4;
+}
+
+message AstEdge {
+  string source_id = 1;
+  string target_id = 2;
+  string edge_type = 3;             // "calls", "imports", "extends"
+}
+
+message TopologyRequest {
+  string query = 1;
+  int32 bmu_row = 2;                // Best Matching Unit row
+  int32 bmu_col = 3;                // Best Matching Unit col
+  int32 radius = 4;                 // Neighborhood radius
+  repeated string ids = 5;
+  repeated string tags = 6;
+  string created_after = 7;
+  string updated_after = 8;
+}
+
+message TopologyResponse {
+  repeated SearchChunkResult neighbors = 1;
+  string som_metadata_json = 2;
+  RetrievalClusterMetadata cluster_metadata = 3;
+}
+
+message ResearchContextRequest {
+  string query = 1;
+  int32 limit = 2;
+  repeated string source_filter = 3;
+  float score_threshold = 4;
+  repeated float query_embedding = 5 [packed = true];
+  repeated string ids = 6;
+  repeated string tags = 7;
+  repeated string cluster_ids = 8;
+  repeated int32 som_clusters = 9;
+  string created_after = 10;
+  string updated_after = 11;
+}
+
+message ResearchContextChunk {
+  string id = 1;
+  string chunk_id = 2;
+  string source = 3;
+  string url = 4;
+  string title = 5;
+  string body = 6;
+  float score = 7;
+  repeated string semantic_tags = 8;
+  repeated string tags = 9;
+  RetrievalSourceMetadata source_metadata = 10;
+  RetrievalScoreMetadata score_metadata = 11;
+  RetrievalClusterMetadata cluster_metadata = 12;
+  TransportTimestamps timestamps = 13;
+}
+
+message ResearchContextResponse {
+  repeated ResearchContextChunk research = 1;
+  float total_ms = 2;
+}
+
 message HealthRequest {
   string service = 1;
 }
 
-/**
- * Health check response.
- */
 message HealthResponse {
-  string status = 1;                   // "healthy" or "unhealthy"
+  string status = 1;
   bool pgvector_connected = 2;
   bool qdrant_connected = 3;
   bool redis_connected = 4;

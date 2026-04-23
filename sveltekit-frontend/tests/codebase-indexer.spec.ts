@@ -31,30 +31,46 @@ vi.mock('$lib/config/env.server.js', () => ({
 
 const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+  ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+  VLM_MODELS: {
+    vision: 'gemma4-legal-vlm:latest',
+    embedding: 'embeddinggemma:latest',
+    legal: 'gemma4-legal-vlm:latest',
+    gemma4: 'gemma4-legal-vlm:latest',
+  },
 }));
 
 vi.mock('$lib/server/gpu/simdjson-bridge.js', () => ({
-	fastJsonParse: (text: string) => JSON.parse(text),
-	isSimdJsonAvailable: () => false,
+  fastJsonParse: (text: string) => JSON.parse(text),
+  isSimdJsonAvailable: () => false,
 }));
 
 const mockSyncCodebaseToNeo4j = vi.fn();
 vi.mock('$lib/server/graph/codebase-neo4j-sync.js', () => ({
-	syncCodebaseToNeo4j: (...args: unknown[]) => mockSyncCodebaseToNeo4j(...args),
+  syncCodebaseToNeo4j: (...args: unknown[]) => mockSyncCodebaseToNeo4j(...args),
 }));
 
 const mockDetectCodebaseClusters = vi.fn();
 vi.mock('$lib/server/graph/codebase-cluster-detection.js', () => ({
-	detectCodebaseClusters: (...args: unknown[]) => mockDetectCodebaseClusters(...args),
+  detectCodebaseClusters: (...args: unknown[]) => mockDetectCodebaseClusters(...args),
+}));
+
+const mockOrchestrateRetrieval = vi.fn();
+vi.mock('$lib/server/retrieval/orchestrator.js', () => ({
+  orchestrateRetrieval: (...args: unknown[]) => mockOrchestrateRetrieval(...args),
+}));
+
+const mockRecordSearchQuery = vi.fn();
+vi.mock('$lib/server/analytics/search-analytics.js', () => ({
+  recordSearchQuery: (...args: unknown[]) => mockRecordSearchQuery(...args),
 }));
 
 const mockCouchdb = {
-	get: vi.fn(),
-	allDocs: vi.fn(),
+  get: vi.fn(),
+  allDocs: vi.fn(),
 };
 vi.mock('$lib/services/couchdb-client.js', () => ({
-	couchdb: mockCouchdb,
+  couchdb: mockCouchdb,
 }));
 
 // child_process.exec mock — used by ingest-errors live mode.
@@ -64,65 +80,65 @@ vi.mock('$lib/services/couchdb-client.js', () => ({
 // vi.hoisted ensures the variable is available when vi.mock factory runs.
 const mockExecAsync = vi.hoisted(() => vi.fn().mockResolvedValue({ stdout: '', stderr: '' }));
 vi.mock('child_process', () => ({
-	exec: vi.fn(),
-	execSync: vi.fn(),
-	execFile: vi.fn(),
-	fork: vi.fn(),
-	spawn: vi.fn(),
-	spawnSync: vi.fn(),
-	default: {},
+  exec: vi.fn(),
+  execSync: vi.fn(),
+  execFile: vi.fn(),
+  fork: vi.fn(),
+  spawn: vi.fn(),
+  spawnSync: vi.fn(),
+  default: {},
 }));
 // Intercept util.promisify so it returns our controllable async mock
 // instead of trying to wrap the vi.fn() exec (which lacks Node internal symbols).
 // The route only calls promisify(exec) once at module scope — so we always return mockExecAsync.
 vi.mock('util', async (importOriginal) => {
-	const actual = await importOriginal<typeof import('util')>();
-	return {
-		...actual,
-		promisify: (fn: unknown) => {
-			// Guard: only real functions pass through to actual promisify.
-			// Vitest mocks fail Node's internal typeof check, so redirect them.
-			try {
-				return actual.promisify(fn as (...args: any[]) => any);
-			} catch {
-				return mockExecAsync;
-			}
-		},
-	};
+  const actual = await importOriginal<typeof import('util')>();
+  return {
+    ...actual,
+    promisify: (fn: unknown) => {
+      // Guard: only real functions pass through to actual promisify.
+      // Vitest mocks fail Node's internal typeof check, so redirect them.
+      try {
+        return actual.promisify(fn as (...args: any[]) => any);
+      } catch {
+        return mockExecAsync;
+      }
+    },
+  };
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function jsonFetch(body: unknown, status = 200) {
-	return async () =>
-		new Response(JSON.stringify(body), {
-			status,
-			headers: { 'Content-Type': 'application/json' },
-		});
+  return async () =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    });
 }
 
 const SAMPLE_POINT = {
-	id: 1,
-	payload: {
-		file_path: 'src/routes/api/cases/+server.ts',
-		role: 'api-route',
-		surface: ['server'],
-		dependencies: ['$lib/server/db/client'],
-		exports: ['GET', 'POST'],
-		imports: ['@sveltejs/kit'],
-		comments: [],
-		risk: 'high',
-		change_frequency: 'weekly',
-		related_routes: ['/cases'],
-		tags: ['cases', 'api'],
-		summary: 'CRUD API for legal cases',
-		generated_at: '2026-04-15T00:00:00Z',
-	},
+  id: 1,
+  payload: {
+    file_path: 'src/routes/api/cases/+server.ts',
+    role: 'api-route',
+    surface: ['server'],
+    dependencies: ['$lib/server/db/client'],
+    exports: ['GET', 'POST'],
+    imports: ['@sveltejs/kit'],
+    comments: [],
+    risk: 'high',
+    change_frequency: 'weekly',
+    related_routes: ['/cases'],
+    tags: ['cases', 'api'],
+    summary: 'CRUD API for legal cases',
+    generated_at: '2026-04-15T00:00:00Z',
+  },
 };
 
 const QDRANT_SCROLL_RESPONSE = {
-	result: { points: [SAMPLE_POINT], next_page_offset: null },
-	status: 'ok',
+  result: { points: [SAMPLE_POINT], next_page_offset: null },
+  status: 'ok',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -130,80 +146,85 @@ const QDRANT_SCROLL_RESPONSE = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('GET /api/codebase-index', () => {
-	beforeEach(() => {
-		vi.clearAllMocks();
-		// The GET handler uses global fetch (not event.fetch) for Qdrant
-		vi.stubGlobal('fetch', vi.fn(jsonFetch(QDRANT_SCROLL_RESPONSE)));
-	});
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // The GET handler uses global fetch (not event.fetch) for Qdrant
+    vi.stubGlobal('fetch', vi.fn(jsonFetch(QDRANT_SCROLL_RESPONSE)));
+  });
 
-	it('returns 401 when unauthenticated', async () => {
-		const { GET } = await import('../src/routes/api/codebase-index/+server.js');
-		const url = new URL('http://localhost/api/codebase-index');
-		const res = await GET({ url, locals: {} } as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { GET } = await import('../src/routes/api/codebase-index/+server.js');
+    const url = new URL('http://localhost/api/codebase-index');
+    const res = await GET({ url, locals: {} } as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns files and stats on successful scroll', async () => {
-		const { GET } = await import('../src/routes/api/codebase-index/+server.js');
-		const url = new URL('http://localhost/api/codebase-index');
-		const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(200);
-		const body = await res.json();
-		expect(body.files).toHaveLength(1);
-		expect(body.files[0].payload.file_path).toBe('src/routes/api/cases/+server.ts');
-		expect(body.stats.totalFiles).toBe(1);
-		expect(body.stats.byRole['api-route']).toBe(1);
-		expect(body.stats.byRisk['high']).toBe(1);
-		expect(body.stats.bySurface['server']).toBe(1);
-	});
+  it('returns files and stats on successful scroll', async () => {
+    const { GET } = await import('../src/routes/api/codebase-index/+server.js');
+    const url = new URL('http://localhost/api/codebase-index');
+    const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.files).toHaveLength(1);
+    expect(body.files[0].payload.file_path).toBe('src/routes/api/cases/+server.ts');
+    expect(body.stats.totalFiles).toBe(1);
+    expect(body.stats.byRole['api-route']).toBe(1);
+    expect(body.stats.byRisk['high']).toBe(1);
+    expect(body.stats.bySurface['server']).toBe(1);
+  });
 
-	it('filters by role query param', async () => {
-		const { GET } = await import('../src/routes/api/codebase-index/+server.js');
-		const url = new URL('http://localhost/api/codebase-index?role=api-route');
-		await GET({ url, locals: { user: { id: 'u1' } } } as any);
-		const [, fetchInit] = (fetch as any).mock.calls[0];
-		const body = JSON.parse(fetchInit.body);
-		expect(body.filter.must).toEqual(
-			expect.arrayContaining([{ key: 'role', match: { value: 'api-route' } }])
-		);
-	});
+  it('filters by role query param', async () => {
+    const { GET } = await import('../src/routes/api/codebase-index/+server.js');
+    const url = new URL('http://localhost/api/codebase-index?role=api-route');
+    await GET({ url, locals: { user: { id: 'u1' } } } as any);
+    const [, fetchInit] = (fetch as any).mock.calls[0];
+    const body = JSON.parse(fetchInit.body);
+    expect(body.filter.must).toEqual(
+      expect.arrayContaining([{ key: 'role', match: { value: 'api-route' } }])
+    );
+  });
 
-	it('applies client-side search filter on the returned points', async () => {
-		const secondPoint = {
-			...SAMPLE_POINT,
-			id: 2,
-			payload: { ...SAMPLE_POINT.payload, file_path: 'src/lib/utils.ts', summary: 'Utility helpers', tags: ['utils'] },
-		};
-		vi.stubGlobal(
-			'fetch',
-			vi.fn(jsonFetch({ result: { points: [SAMPLE_POINT, secondPoint] }, status: 'ok' }))
-		);
-		const { GET } = await import('../src/routes/api/codebase-index/+server.js');
-		const url = new URL('http://localhost/api/codebase-index?search=cases');
-		const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
-		const body = await res.json();
-		// Only the 'cases' file matches the search term
-		expect(body.files).toHaveLength(1);
-		expect(body.files[0].payload.file_path).toContain('cases');
-	});
+  it('applies client-side search filter on the returned points', async () => {
+    const secondPoint = {
+      ...SAMPLE_POINT,
+      id: 2,
+      payload: {
+        ...SAMPLE_POINT.payload,
+        file_path: 'src/lib/utils.ts',
+        summary: 'Utility helpers',
+        tags: ['utils'],
+      },
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(jsonFetch({ result: { points: [SAMPLE_POINT, secondPoint] }, status: 'ok' }))
+    );
+    const { GET } = await import('../src/routes/api/codebase-index/+server.js');
+    const url = new URL('http://localhost/api/codebase-index?search=cases');
+    const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
+    const body = await res.json();
+    // Only the 'cases' file matches the search term
+    expect(body.files).toHaveLength(1);
+    expect(body.files[0].payload.file_path).toContain('cases');
+  });
 
-	it('returns 400 for invalid query params (limit out of range)', async () => {
-		const { GET } = await import('../src/routes/api/codebase-index/+server.js');
-		const url = new URL('http://localhost/api/codebase-index?limit=999');
-		const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 for invalid query params (limit out of range)', async () => {
+    const { GET } = await import('../src/routes/api/codebase-index/+server.js');
+    const url = new URL('http://localhost/api/codebase-index?limit=999');
+    const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns empty files with error field when Qdrant fails', async () => {
-		vi.stubGlobal('fetch', vi.fn(jsonFetch({ error: 'not found' }, 404)));
-		const { GET } = await import('../src/routes/api/codebase-index/+server.js');
-		const url = new URL('http://localhost/api/codebase-index');
-		const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(200);
-		const body = await res.json();
-		expect(body.files).toEqual([]);
-		expect(body.error).toMatch(/Qdrant request failed/);
-	});
+  it('returns empty files with error field when Qdrant fails', async () => {
+    vi.stubGlobal('fetch', vi.fn(jsonFetch({ error: 'not found' }, 404)));
+    const { GET } = await import('../src/routes/api/codebase-index/+server.js');
+    const url = new URL('http://localhost/api/codebase-index');
+    const res = await GET({ url, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.files).toEqual([]);
+    expect(body.error).toBe('Qdrant unavailable');
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -211,69 +232,69 @@ describe('GET /api/codebase-index', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('POST /api/codebase-index', () => {
-	const EMBED_VEC = Array.from({ length: 768 }, (_, i) => 0.001 * (i + 1));
+  const EMBED_VEC = Array.from({ length: 768 }, (_, i) => 0.001 * (i + 1));
 
-	beforeEach(() => {
-		vi.clearAllMocks();
-		mockOllamaFetch.mockResolvedValue(
-			new Response(JSON.stringify({ embedding: EMBED_VEC }), { status: 200 })
-		);
-		// Second global fetch call is Qdrant search
-		vi.stubGlobal(
-			'fetch',
-			vi.fn(jsonFetch({ result: [{ id: 'p1', score: 0.92, payload: SAMPLE_POINT.payload }] }))
-		);
-	});
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockOllamaFetch.mockResolvedValue(
+      new Response(JSON.stringify({ embedding: EMBED_VEC }), { status: 200 })
+    );
+    // Second global fetch call is Qdrant search
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(jsonFetch({ result: [{ id: 'p1', score: 0.92, payload: SAMPLE_POINT.payload }] }))
+    );
+  });
 
-	it('returns 401 when unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/codebase-index/+server.js');
-		const req = new Request('http://localhost/api/codebase-index', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: 'auth guard pattern' }),
-		});
-		const res = await POST({ request: req, locals: {} } as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 401 when unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/codebase-index/+server.js');
+    const req = new Request('http://localhost/api/codebase-index', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'auth guard pattern' }),
+    });
+    const res = await POST({ request: req, locals: {} } as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 400 when query is empty', async () => {
-		const { POST } = await import('../src/routes/api/codebase-index/+server.js');
-		const req = new Request('http://localhost/api/codebase-index', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: '' }),
-		});
-		const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns 400 when query is empty', async () => {
+    const { POST } = await import('../src/routes/api/codebase-index/+server.js');
+    const req = new Request('http://localhost/api/codebase-index', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: '' }),
+    });
+    const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns semantic search results', async () => {
-		const { POST } = await import('../src/routes/api/codebase-index/+server.js');
-		const req = new Request('http://localhost/api/codebase-index', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: 'cases API route', limit: 5 }),
-		});
-		const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(200);
-		const body = await res.json();
-		expect(body.query).toBe('cases API route');
-		expect(Array.isArray(body.files)).toBe(true);
-	});
+  it('returns semantic search results', async () => {
+    const { POST } = await import('../src/routes/api/codebase-index/+server.js');
+    const req = new Request('http://localhost/api/codebase-index', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'cases API route', limit: 5 }),
+    });
+    const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.query).toBe('cases API route');
+    expect(Array.isArray(body.files)).toBe(true);
+  });
 
-	it('returns 500 when Ollama embedding fails', async () => {
-		mockOllamaFetch.mockResolvedValue(new Response('Server Error', { status: 503 }));
-		const { POST } = await import('../src/routes/api/codebase-index/+server.js');
-		const req = new Request('http://localhost/api/codebase-index', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: 'test' }),
-		});
-		const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(500);
-		const body = await res.json();
-		expect(body.error).toMatch(/embed/i);
-	});
+  it('returns 500 when Ollama embedding fails', async () => {
+    mockOllamaFetch.mockResolvedValue(new Response('Server Error', { status: 503 }));
+    const { POST } = await import('../src/routes/api/codebase-index/+server.js');
+    const req = new Request('http://localhost/api/codebase-index', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'test' }),
+    });
+    const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toMatch(/embed/i);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -281,92 +302,81 @@ describe('POST /api/codebase-index', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('POST /api/codebase-index/search', () => {
-	const EMBED_VEC = Array.from({ length: 768 }, (_, i) => 0.002 * i);
-	const QDRANT_SEARCH_RESULT = {
-		result: {
-			points: [
-				{
-					id: 'chunk-abc',
-					score: 0.87,
-					payload: {
-						file_path: 'src/lib/server/rag-pipeline.ts',
-						file_name: 'rag-pipeline.ts',
-						extension: '.ts',
-						content: 'export async function ragQuery(query: string) {',
-						chunk_index: 0,
-						total_chunks: 3,
-						tags: ['rag', 'search'],
-					},
-				},
-			],
-		},
-	};
+  beforeEach(() => {
+    mockOrchestrateRetrieval.mockReset();
+    mockRecordSearchQuery.mockReset();
+    mockOrchestrateRetrieval.mockResolvedValue({
+      chunks: [
+        {
+          documentId: 'chunk-abc',
+          similarity: 0.87,
+          sourceId: 'src/lib/server/rag-pipeline.ts',
+          content: 'export async function ragQuery(query: string) {',
+        },
+      ],
+      latencyMs: { total: 42 },
+    });
+  });
 
-	function makeFetch(embedOk = true, searchOk = true) {
-		let callCount = 0;
-		return vi.fn(async (url: string, _init?: RequestInit) => {
-			callCount++;
-			if (String(url).includes('/api/embed'))
-				return new Response(
-					JSON.stringify({ embeddings: [EMBED_VEC] }),
-					{ status: embedOk ? 200 : 503 }
-				);
-			return new Response(
-				JSON.stringify(QDRANT_SEARCH_RESULT),
-				{ status: searchOk ? 200 : 500 }
-			);
-		});
-	}
+  it('returns 401 when unauthenticated', async () => {
+    const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
+    const req = new Request('http://localhost/api/codebase-index/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'rag pipeline' }),
+    });
+    const res = await POST({ request: req, locals: {} } as any);
+    expect(res.status).toBe(401);
+  });
 
-	it('returns 401 when unauthenticated', async () => {
-		const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
-		const req = new Request('http://localhost/api/codebase-index/search', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: 'rag pipeline' }),
-		});
-		const res = await POST({ request: req, fetch: makeFetch(), locals: {} } as any);
-		expect(res.status).toBe(401);
-	});
+  it('returns 400 when query is missing', async () => {
+    const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
+    const req = new Request('http://localhost/api/codebase-index/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(400);
+  });
 
-	it('returns 400 when query is missing', async () => {
-		const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
-		const req = new Request('http://localhost/api/codebase-index/search', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({}),
-		});
-		const res = await POST({ request: req, fetch: makeFetch(), locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(400);
-	});
+  it('returns search results with correct shape', async () => {
+    const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
+    const req = new Request('http://localhost/api/codebase-index/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'rag pipeline', limit: 5 }),
+    });
+    const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.query).toBe('rag pipeline');
+    expect(body.results).toHaveLength(1);
+    expect(body.results[0].score).toBe(0.87);
+    expect(body.total).toBe(1);
+    expect(body.vector_used).toBe('content');
+    expect(mockOrchestrateRetrieval).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: 'rag pipeline',
+        pipeline: 'codebase',
+        topK: 5,
+      })
+    );
+  });
 
-	it('returns search results with correct shape', async () => {
-		const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
-		const req = new Request('http://localhost/api/codebase-index/search', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: 'rag pipeline', limit: 5 }),
-		});
-		const res = await POST({ request: req, fetch: makeFetch(), locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(200);
-		const body = await res.json();
-		expect(body.query).toBe('rag pipeline');
-		expect(body.results).toHaveLength(1);
-		expect(body.results[0].score).toBe(0.87);
-		expect(body.total).toBe(1);
-		expect(body.vector_used).toBe('content');
-	});
-
-	it('returns 500 when embedding service fails', async () => {
-		const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
-		const req = new Request('http://localhost/api/codebase-index/search', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: 'test' }),
-		});
-		const res = await POST({ request: req, fetch: makeFetch(false), locals: { user: { id: 'u1' } } } as any);
-		expect(res.status).toBe(500);
-	});
+  it('returns 500 when retrieval orchestrator fails', async () => {
+    mockOrchestrateRetrieval.mockRejectedValueOnce(new Error('embed service unavailable'));
+    const { POST } = await import('../src/routes/api/codebase-index/search/+server.js');
+    const req = new Request('http://localhost/api/codebase-index/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'test' }),
+    });
+    const res = await POST({ request: req, locals: { user: { id: 'u1' } } } as any);
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('Internal server error');
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

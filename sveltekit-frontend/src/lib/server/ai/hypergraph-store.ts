@@ -122,6 +122,91 @@ export async function linkResearchToSession(sessionId: string, chunkUrl: string,
   }
 }
 
+export async function linkResearchBatchToSession(
+  sessionId: string,
+  researchChunks: Array<{ url: string; source: string; relevance?: number }>
+): Promise<void> {
+  if (researchChunks.length === 0) {
+    return;
+  }
+
+  const dedupedChunks = Array.from(
+    new Map(
+      researchChunks.map((chunk) => [
+        chunk.url,
+        {
+          url: chunk.url,
+          source: chunk.source,
+          relevance: chunk.relevance ?? 1.0,
+        },
+      ])
+    ).values()
+  );
+
+  const driver = getNeo4jDriver();
+  const neoSession = driver.session({ database: 'neo4j' });
+
+  try {
+    await neoSession.run(
+      `
+        MERGE (s:InteractiveSession {id: $sessionId})
+      `,
+      { sessionId }
+    );
+
+    for (const chunk of dedupedChunks) {
+      const existingResult = await neoSession.run(
+        `
+          MATCH (r:ResearchSource {url: $chunkUrl})
+          RETURN elementId(r) AS nodeId
+          LIMIT 1
+        `,
+        { chunkUrl: chunk.url }
+      );
+
+      let nodeId = existingResult.records[0]?.get('nodeId') as string | undefined;
+
+      if (!nodeId) {
+        const createdResult = await neoSession.run(
+          `
+            CREATE (r:ResearchSource {url: $chunkUrl, source: $source})
+            RETURN elementId(r) AS nodeId
+          `,
+          { chunkUrl: chunk.url, source: chunk.source }
+        );
+
+        nodeId = createdResult.records[0]?.get('nodeId') as string | undefined;
+      }
+
+      if (!nodeId) {
+        continue;
+      }
+
+      await neoSession.run(
+        `
+          MERGE (s:InteractiveSession {id: $sessionId})
+          WITH s
+          MATCH (r)
+          WHERE elementId(r) = $nodeId
+          SET r.source = $source
+          MERGE (s)-[rel:CONSULTED_RESEARCH]->(r)
+          SET rel.relevance = $relevance, rel.timestamp = datetime()
+        `,
+        {
+          sessionId,
+          nodeId,
+          source: chunk.source,
+          relevance: chunk.relevance,
+        }
+      );
+    }
+  } catch (error) {
+    console.warn(`[hypergraph] Failed to link research batch for session: ${sessionId}`, error);
+  } finally {
+    await neoSession.close();
+  }
+}
+
 /**
  * Records an Inference Step (Message) in the session.
  */

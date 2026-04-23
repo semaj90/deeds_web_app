@@ -1,10 +1,10 @@
 /**
  * hypergraph-research-grounding.spec.ts  (Part A)
  *
- * Regression test: assembleAceContext → linkResearchToSession wiring.
+ * Regression test: assembleAceContext → linkResearchBatchToSession wiring.
  *
  * Proves the exact bugs found in live verification (April 2026) are fixed:
- *   - assembleAceContext now propagates sessionId to linkResearchToSession
+ *   - assembleAceContext now propagates sessionId to linkResearchBatchToSession
  *   - source-priority sort (official_docs > reddit_post) is preserved in output
  *
  * Part B (MERGE cypher semantics) lives in hypergraph-merge-semantics.spec.ts
@@ -17,16 +17,15 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 // ── vi.hoisted: all mock fns + fixture declared before vi.mock factories run ──
-const { mockLinkResearch, mockSearchResearch, mockGenerateEmbedding, MOCK_RESEARCH } = vi.hoisted(() => {
+const { mockLinkResearchBatch, mockGetResearchContext, MOCK_RESEARCH } = vi.hoisted(() => {
   const MOCK_RESEARCH = [
     { chunk_id: 'c1', source: 'official_docs', url: 'https://svelte.dev/blog/runes',              title: 'Runes',  body: 'Svelte 5 runes intro', score: 0.82, semantic_tags: ['svelte5'] },
     { chunk_id: 'c2', source: 'github_issue',  url: 'https://github.com/sveltejs/svelte/issues/1', title: 'Issue',  body: 'perf bug',            score: 0.74, semantic_tags: [] },
     { chunk_id: 'c3', source: 'reddit_post',   url: 'https://reddit.com/r/sveltejs/1',             title: 'Reddit', body: 'community post',       score: 0.91, semantic_tags: [] },
   ];
   return {
-    mockLinkResearch: vi.fn(),
-    mockSearchResearch: vi.fn(),
-    mockGenerateEmbedding: vi.fn(),
+    mockLinkResearchBatch: vi.fn(),
+    mockGetResearchContext: vi.fn(),
     MOCK_RESEARCH,
   };
 });
@@ -43,25 +42,20 @@ vi.mock('$lib/server/db/client.js', () => ({
 }));
 
 vi.mock('$lib/server/ai/hypergraph-store.js', () => ({
-  linkResearchToSession: (...args: unknown[]) => mockLinkResearch(...args),
+  linkResearchBatchToSession: (...args: unknown[]) => mockLinkResearchBatch(...args),
   recordSessionStart: vi.fn(),
   recordInferenceStep: vi.fn(),
 }));
 
-vi.mock('$lib/server/research/web-research-ingester.js', () => ({
-  // Delegate to hoisted fn so beforeEach can re-establish implementation after vi.restoreAllMocks()
-  searchResearchChunks: (...args: unknown[]) => mockSearchResearch(...args),
-  ensureResearchCollection: vi.fn(),
-}));
-
-vi.mock('$lib/server/grpc/embedding-client.js', () => ({
-  generateEmbedding: (...args: unknown[]) => mockGenerateEmbedding(...args),
-  generateSingleEmbedding: (...args: unknown[]) => mockGenerateEmbedding(...args),
+vi.mock('$lib/server/grpc/retrieval-client.js', () => ({
+  retrievalClient: {
+    getResearchContext: (...args: unknown[]) => mockGetResearchContext(...args),
+  },
 }));
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Part A — assembleAceContext session wiring
-// Mocks linkResearchToSession directly (spy) — no Neo4j timing dependency
+// Mocks linkResearchBatchToSession directly (spy) — no Neo4j timing dependency
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe('Part A — assembleAceContext session wiring', () => {
@@ -75,52 +69,62 @@ describe('Part A — assembleAceContext session wiring', () => {
     // vi.restoreAllMocks() in afterEach, which strips .mockImplementation().
     // The vi.mock factory delegates to hoisted fns, so re-setting here is
     // sufficient — the factory wrapper is never cleared.
-    mockLinkResearch.mockResolvedValue(undefined);
-    mockSearchResearch.mockImplementation(() => Promise.resolve([...MOCK_RESEARCH]));
-    mockGenerateEmbedding.mockResolvedValue(new Array(768).fill(0.1));
+    mockLinkResearchBatch.mockResolvedValue(undefined);
+    mockGetResearchContext.mockResolvedValue({
+      research: MOCK_RESEARCH.map((chunk) => ({
+        id: chunk.chunk_id,
+        chunkId: chunk.chunk_id,
+        source: chunk.source,
+        url: chunk.url,
+        title: chunk.title,
+        body: chunk.body,
+        score: chunk.score,
+        semanticTags: chunk.semantic_tags,
+      })),
+      totalMs: 12,
+      source: 'grpc',
+    });
 
     const mod = await import('$lib/server/ace/codeintel-datastore.js');
     assembleAceContext = mod.assembleAceContext as typeof assembleAceContext;
   });
 
-  it('1. sessionId propagation: linkResearchToSession called once per research chunk', async () => {
+  it('1. sessionId propagation: linkResearchBatchToSession called once with the session id', async () => {
     const sessionId = crypto.randomUUID();
 
     await assembleAceContext('svelte runes performance', { includeResearch: true, sessionId });
-    // fire-and-forget: wait one microtask tick for the .catch() wrappers to settle
-    await new Promise<void>((r) => setImmediate(r));
 
-    expect(mockLinkResearch).toHaveBeenCalledTimes(MOCK_RESEARCH.length);
-    for (const call of mockLinkResearch.mock.calls) {
-      expect(call[0]).toBe(sessionId);
-    }
+    expect(mockLinkResearchBatch).toHaveBeenCalledTimes(1);
+    expect(mockLinkResearchBatch.mock.calls[0]?.[0]).toBe(sessionId);
   });
 
-  it('2. Call args: correct url, source, and score passed for each chunk', async () => {
+  it('2. Call args: correct url, source, and score array passed to the batch helper', async () => {
     const sessionId = crypto.randomUUID();
 
     await assembleAceContext('svelte runes performance', { includeResearch: true, sessionId });
-    await new Promise<void>((r) => setImmediate(r));
 
-    for (const chunk of MOCK_RESEARCH) {
-      expect(mockLinkResearch).toHaveBeenCalledWith(sessionId, chunk.url, chunk.source, chunk.score);
-    }
+    expect(mockLinkResearchBatch).toHaveBeenCalledWith(
+      sessionId,
+      MOCK_RESEARCH.map((chunk) => ({
+        url: chunk.url,
+        source: chunk.source,
+        relevance: chunk.score,
+      }))
+    );
   });
 
-  it('3. includeResearch: false → linkResearchToSession never called', async () => {
+  it('3. includeResearch: false → linkResearchBatchToSession never called', async () => {
     const sessionId = crypto.randomUUID();
 
     await assembleAceContext('svelte runes performance', { includeResearch: false, sessionId });
-    await new Promise<void>((r) => setImmediate(r));
 
-    expect(mockLinkResearch).not.toHaveBeenCalled();
+    expect(mockLinkResearchBatch).not.toHaveBeenCalled();
   });
 
-  it('4. No sessionId → linkResearchToSession never called', async () => {
+  it('4. No sessionId → linkResearchBatchToSession never called', async () => {
     await assembleAceContext('svelte runes performance', { includeResearch: true });
-    await new Promise<void>((r) => setImmediate(r));
 
-    expect(mockLinkResearch).not.toHaveBeenCalled();
+    expect(mockLinkResearchBatch).not.toHaveBeenCalled();
   });
 
   it('5. Trust-priority: researchContext sorted official_docs < github_issue < reddit_post', async () => {
