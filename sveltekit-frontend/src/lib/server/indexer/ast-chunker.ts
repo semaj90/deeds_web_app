@@ -365,6 +365,18 @@ export async function chunkFiles(
     },
   });
 
+  // Phase 108 fix (regressed, re-applied 2026-04-24):
+  // Add all AST-parseable source files ONCE via addSourceFilesAtPaths() instead
+  // of per-file addSourceFileAtPath in the loop. The per-file variant triggers
+  // ts-morph's module resolver on each call, which chases imports and rebuilds
+  // the program graph incrementally — O(n²) total cost when the set has 1000+
+  // interconnected files (15-file test ~34s, 2571-file run ~20+ min).
+  // Batch form resolves once for the full set, bringing 1335 nodes to 28s.
+  const astPaths = filePaths.filter((fp) => AST_SOURCE_EXTENSIONS.has(extname(fp)));
+  if (astPaths.length > 0) {
+    project.addSourceFilesAtPaths(astPaths);
+  }
+
   const allChunks: CodeChunk[] = [];
   let filesProcessed = 0;
 
@@ -391,10 +403,19 @@ export async function chunkFiles(
       let chunks: CodeChunk[] = [];
 
       if (AST_SOURCE_EXTENSIONS.has(ext)) {
-        const sourceFile = project.addSourceFileAtPath(fp);
-        fileContent = sourceFile.getFullText();
-        chunks = chunkSourceFile(sourceFile, rootDir);
-        project.removeSourceFile(sourceFile);
+        // Source file was already added via addSourceFilesAtPaths above —
+        // getSourceFile() is O(1) Map lookup. Don't removeSourceFile() either;
+        // that would reintroduce incremental graph churn.
+        const sourceFile = project.getSourceFile(fp);
+        if (!sourceFile) {
+          // Shouldn't happen — addSourceFilesAtPaths covered this path — but
+          // fall through to raw text chunking if ts-morph somehow skipped it.
+          fileContent = await readFile(fp, 'utf8');
+          chunks = chunkRawFile(fileContent, fp, rootDir);
+        } else {
+          fileContent = sourceFile.getFullText();
+          chunks = chunkSourceFile(sourceFile, rootDir);
+        }
       } else {
         fileContent = await readFile(fp, 'utf8');
         chunks = chunkRawFile(fileContent, fp, rootDir);
