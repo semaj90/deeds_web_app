@@ -7333,6 +7333,34 @@
       },
       "problemMatcher": [],
       "detail": "Start the TypeScript stdio MCP server (src/mcp/server.ts) — 60+ tools including codebase:export_bundle. For agent clients that spawn via stdio."
+    },
+    {
+      "label": "🔍 Schema: Audit Drizzle Drift",
+      "type": "shell",
+      "command": "node scripts/audit-schema-drift.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Compare schema-postgres.ts against last saved snapshot. Reports tables/enums added/dropped. Run with --save to update baseline, --exit-1 for CI gate."
+    },
+    {
+      "label": "🔍 Schema: Save Drift Baseline",
+      "type": "shell",
+      "command": "node scripts/audit-schema-drift.mjs --save",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Snapshot current schema state to scripts/audit-schema-drift.snapshot.json — future drift runs compare against this."
     }
   ],
   "inputs": [
