@@ -18,6 +18,7 @@ import type { CodeChunk } from './ast-chunker.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { runWithAdaptiveBatch } from '$lib/server/gpu/libtorch-bridge.js';
 import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
+import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { logEmbedIndex } from './ast-ingest-logger.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
@@ -360,6 +361,12 @@ export async function indexChunks(
   // runWithAdaptiveBatch handles CUDA OOM by halving batch size and retrying.
   // On success it doubles back toward INITIAL_BATCH (adaptive oscillation).
   // Embedding is the GPU bottleneck — batch size of 24 fills ~350 MB VRAM on RTX 3060 Ti.
+  //
+  // Embedding flow: generateEmbeddings() routes to the gRPC tier when
+  // EMBEDDING_GRPC_ENABLED=true (Go embedding service on :50051), which batches
+  // N texts in one RPC round-trip. Fallbacks: HTTP batch → sequential Ollama.
+  // For a batch of 24 chunks we issue ONE call with 48 texts (24 content + 24
+  // signature) instead of 48 sequential Ollama round-trips.
   await runWithAdaptiveBatch<CodeChunk>(
     chunks,
     async (batch, batchIndex) => {
@@ -369,26 +376,54 @@ export async function indexChunks(
         payload: Record<string, unknown>;
       }> = [];
 
+      // Flatten: [content_0, signature_0, content_1, signature_1, ...]
+      const texts: string[] = [];
       for (const chunk of batch) {
-        try {
-          const [contentEmb, signatureEmb] = await Promise.all([
-            embed(chunk.content.slice(0, 2_000)), // cap content to avoid token limits
-            embed(chunk.signature),
-          ]);
-          embeddingsGenerated += 2;
+        texts.push(chunk.content.slice(0, 2_000));
+        texts.push(chunk.signature);
+      }
 
-          points.push({
-            id: chunk.id,
-            vectors: { content: contentEmb, signature: signatureEmb },
-            payload: {
-              content: chunk.content.slice(0, 4_000), // store truncated for retrieval
-              signature: chunk.signature,
-              ...chunk.metadata,
-            },
-          });
-        } catch {
+      let vectors: number[][] = [];
+      try {
+        const result = await generateEmbeddings(texts);
+        vectors = result.vectors;
+      } catch {
+        // Full batch failure — mark all as failed and skip Qdrant upsert
+        failed += batch.length;
+        chunksCompleted += batch.length;
+        await options.onProgress?.({
+          totalChunks: chunks.length,
+          chunksCompleted,
+          embeddingsGenerated,
+          storedInQdrant,
+          failed,
+          batchIndex,
+          batchSize: batch.length,
+        });
+        return;
+      }
+
+      // Split pairs back into content + signature per chunk
+      for (let i = 0; i < batch.length; i++) {
+        const contentEmb = vectors[i * 2];
+        const signatureEmb = vectors[i * 2 + 1];
+        if (
+          !isValidEmbedding(contentEmb) ||
+          !isValidEmbedding(signatureEmb)
+        ) {
           failed++;
+          continue;
         }
+        embeddingsGenerated += 2;
+        points.push({
+          id: batch[i].id,
+          vectors: { content: contentEmb, signature: signatureEmb },
+          payload: {
+            content: batch[i].content.slice(0, 4_000),
+            signature: batch[i].signature,
+            ...batch[i].metadata,
+          },
+        });
       }
 
       if (points.length > 0) {

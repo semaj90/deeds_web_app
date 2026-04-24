@@ -294,6 +294,89 @@ async def graph_cypher_query(
 
 
 # ═══════════════════════════════════════════════════════════════
+# CODEBASE INDEX EXPORT (agentic bundle)
+# ═══════════════════════════════════════════════════════════════
+
+@mcp.tool()
+async def codebase_export_bundle(
+    include: str = None,
+    limit: int = 2000,
+    repo_id: str = "default"
+) -> dict:
+    """
+    Return the unified codebase indexing export bundle — the full graph state in
+    one call. Includes: graph (nodes + edges), cluster summaries (Gemma4-generated
+    purpose + patterns + warnings), Karpathy wiki feedback notes (playbook +
+    cluster + research), 4D manifold coords, tile atlas stats, and live Redis
+    cache key counts.
+
+    Use this whenever an agent needs broad context — it's far cheaper than
+    chaining rag_search + graph_query + cluster_lookup + wiki_list.
+
+    Args:
+        include: Comma-separated subset. Defaults to all parts. Options:
+                 graph, clusters, wikiNotes, manifold4, tileAtlas, cacheStats
+        limit: Cap graph.nodes and manifold4 rows (10-10000, default 2000)
+        repo_id: Repository ID for cluster_summaries filter
+
+    Returns:
+        Full bundle JSON. On network failure, returns same top-level keys with
+        nulls so the response shape is stable (degraded-contract).
+    """
+    import httpx
+    base_url = os.getenv('SVELTEKIT_URL', 'http://localhost:5173')
+    params = {}
+    if include:
+        params['include'] = include
+    if limit:
+        params['limit'] = limit
+    if repo_id:
+        params['repoId'] = repo_id
+
+    start = time.time()
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(
+                f"{base_url}/api/codebase-index/export/bundle",
+                params=params
+            )
+            response.raise_for_status()
+            data = response.json()
+            log_llm_call(
+                tool_name="codebase_export_bundle",
+                latency_ms=(time.time() - start) * 1000,
+                metadata={
+                    "limit": limit,
+                    "include": include,
+                    "counts": data.get("meta", {}).get("counts", {}),
+                }
+            )
+            return data
+    except Exception as e:
+        log_llm_call(
+            tool_name="codebase_export_bundle",
+            success=False,
+            error=str(e),
+            latency_ms=(time.time() - start) * 1000,
+        )
+        # Degraded shape — same keys as success for stable client destructuring
+        return {
+            "graph": None,
+            "clusters": None,
+            "wikiNotes": None,
+            "manifold4": None,
+            "tileAtlas": None,
+            "cacheStats": None,
+            "meta": {
+                "exportedAt": datetime.now().isoformat(),
+                "counts": {},
+                "sources": {},
+                "errors": {"fetch": str(e)},
+            },
+        }
+
+
+# ═══════════════════════════════════════════════════════════════
 # SERVER STARTUP
 # ═══════════════════════════════════════════════════════════════
 
@@ -315,6 +398,7 @@ if __name__ == "__main__":
    • graph_upsert_nodes       - Create/update graph nodes
    • graph_upsert_relationships - Create/update graph edges
    • graph_cypher_query       - Execute Cypher queries
+   • codebase_export_bundle   - Unified codebase indexing bundle
 
 🌐 Server: http://localhost:{port}
 📡 Protocol: MCP (Model Context Protocol)

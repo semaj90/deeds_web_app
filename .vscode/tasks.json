@@ -7301,6 +7301,38 @@
       },
       "problemMatcher": [],
       "detail": "Show Karpathy wiki note counts by type (playbook/cluster/research/retrieval) — evidence the feedback loop is writing durable memory."
+    },
+    {
+      "label": "🔌 MCP: Restart FastMCP Server (Python)",
+      "type": "shell",
+      "command": "npm run mcp:server",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Start/restart the Python FastMCP server (scripts/mcp/fastmcp_server.py on :3003). Registers all 8 tools including the new codebase_export_bundle."
+    },
+    {
+      "label": "🔌 MCP: Restart Stdio Server (TypeScript)",
+      "type": "shell",
+      "command": "npx tsx src/mcp/server.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Start the TypeScript stdio MCP server (src/mcp/server.ts) — 60+ tools including codebase:export_bundle. For agent clients that spawn via stdio."
     }
   ],
   "inputs": [
