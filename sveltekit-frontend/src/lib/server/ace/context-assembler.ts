@@ -60,6 +60,7 @@ import {
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
+import { recallPastChats } from './chat-memory.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -188,10 +189,13 @@ export async function assembleACEContext(opts: {
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
 
-      // Fetch evidence metadata and connections separately (avoids hoisting issues)
-      const [evidenceMetadata, evidenceConnections] = await Promise.all([
+      // Fetch evidence metadata, connections, and semantic chat recall in parallel.
+      // Chat recall searches Qdrant chat_messages for past turns similar to the
+      // current query (across ALL prior sessions, not just the active conversation).
+      const [evidenceMetadata, evidenceConnections, chatMemory] = await Promise.all([
         caseId ? fetchEvidenceMetadataForCase(caseId) : Promise.resolve(null),
         caseId ? fetchEvidenceConnections(caseId) : Promise.resolve(null),
+        fetchChatMemory(query, conversationId).catch(() => []),
       ]);
 
       // Determine practice area from case or user profile
@@ -230,6 +234,7 @@ export async function assembleACEContext(opts: {
         caseChunks: assignRanks(sortByBestScore(caseChunks.map(toUnified))),
         kagNeighbors,
         chatHistory,
+        chatMemory,
         entities,
         practiceTemplate,
         queryTags,
@@ -827,6 +832,19 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
       .join('\n');
     lines.push(`\n## Conversation History\n${historyText}`);
     confidenceFactors.chatHistory = 0.6;
+  }
+
+  // 8b. Semantic recall from past sessions (Qdrant chat_messages)
+  if (context.chatMemory && context.chatMemory.length > 0) {
+    const memoryText = context.chatMemory
+      .slice(0, limits.chatMemoryCount)
+      .map(
+        (m) =>
+          `[${m.score.toFixed(2)}] ${m.role}: ${truncate(m.content, limits.chatMessageChars)}`
+      )
+      .join('\n');
+    lines.push(`\n## Recalled From Prior Sessions\n${memoryText}`);
+    confidenceFactors.chatMemory = 0.5;
   }
 
   // 9. Entity context
@@ -1687,6 +1705,42 @@ async function fetchChatHistory(
       }));
   } catch (err) {
     console.warn('[ACE context] chat history fetch failed:', (err as Error)?.message ?? err);
+    return [];
+  }
+}
+
+/**
+ * Semantic recall across ALL past chat sessions via Qdrant chat_messages.
+ * Excludes the active conversation (covered by fetchChatHistory above).
+ * Budget: 500ms hard cap so it can never block request path.
+ */
+async function fetchChatMemory(
+  query: string,
+  excludeSessionId?: string
+): Promise<NonNullable<ACEContext['chatMemory']>> {
+  try {
+    const queryEmb = await Promise.race([
+      getQueryEmbedding(query),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 500)),
+    ]);
+    if (!queryEmb) return [];
+    // Don't pass scoreThreshold — let recallPastChats read it from the Redis
+    // settings so the admin toggle + threshold slider take effect immediately.
+    // When the toggle is disabled, this returns [] without hitting Qdrant.
+    const hits = await recallPastChats(queryEmb, {
+      excludeSessionId,
+      // Over-fetch a bit (6) to give the renderer room; it will slice to
+      // limits.chatMemoryCount (2-6 depending on tier) when assembling the prompt.
+      limit: 6,
+    });
+    return hits.map((h) => ({
+      sessionId: h.sessionId,
+      role: h.role,
+      content: h.content.slice(0, 400),
+      timestamp: h.timestamp,
+      score: h.score,
+    }));
+  } catch {
     return [];
   }
 }

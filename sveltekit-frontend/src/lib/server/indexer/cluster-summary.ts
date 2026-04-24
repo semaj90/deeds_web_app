@@ -85,7 +85,10 @@ async function fetchClusterChunksFromPostgres(clusterId: number): Promise<Qdrant
 			        som_cluster,
 			        cluster_summary
 		   FROM codebase_chunk_index
-		  WHERE gpu_cluster = $1 OR som_cluster = $1
+		  WHERE (gpu_cluster = $1 OR som_cluster = $1)
+		    AND relative_path IS NOT NULL
+		    AND relative_path <> ''
+		    AND relative_path <> '__unknown__'
 		  ORDER BY COALESCE(page_rank_score, 0) DESC,
 		           indexed_at DESC
 		  LIMIT 50`,
@@ -192,13 +195,17 @@ async function embedSummary(summary: string): Promise<number[] | null> {
 
 async function persistClusterSummary(summary: ClusterSummary): Promise<void> {
   try {
-    // 1. Update codebase_chunk_index.cluster_summary JSONB for all chunks in this cluster
+    // 1. Update codebase_chunk_index.cluster_summary JSONB for all chunks in this cluster.
+    //    Skip path-less stub rows — they have no content for the summary to describe.
     await pool.query(
       `UPDATE codebase_chunk_index
 			    SET cluster_summary = $1::jsonb,
 			        enriched_at = NOW(),
 			        updated_at = NOW()
-			  WHERE gpu_cluster = $2 OR som_cluster = $2`,
+			  WHERE (gpu_cluster = $2 OR som_cluster = $2)
+			    AND relative_path IS NOT NULL
+			    AND relative_path <> ''
+			    AND relative_path <> '__unknown__'`,
       [JSON.stringify(summary), summary.clusterId]
     );
 
@@ -209,7 +216,10 @@ async function persistClusterSummary(summary: ClusterSummary): Promise<void> {
 				    SET summary_embedding = $1::vector,
 				        enriched_at = NOW(),
 				        updated_at = NOW()
-				  WHERE gpu_cluster = $2 OR som_cluster = $2`,
+				  WHERE (gpu_cluster = $2 OR som_cluster = $2)
+				    AND relative_path IS NOT NULL
+				    AND relative_path <> ''
+				    AND relative_path <> '__unknown__'`,
         [JSON.stringify(summaryEmbedding), summary.clusterId]
       );
     }

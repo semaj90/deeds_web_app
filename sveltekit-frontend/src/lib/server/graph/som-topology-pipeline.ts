@@ -134,10 +134,11 @@ async function updateQdrantSomClusters(
       string,
       { ids: Array<number | string>; payload: Record<string, number> }
     >();
-    for (let j = 0; j < batch.length; j++) {
+
+		for (let j = 0; j < batch.length; j++) {
       const f = batch[j];
       const bmuIdx = bmuAssignments[i + j];
-      const gridW = opts?.gridW ?? 10; // Fallback to 10 if not provided
+      const gridW = opts?.gridW ?? 10;
       const payload = {
         som_cluster: bmuIdx,
         som_bmu_row: Math.floor(bmuIdx / gridW),
@@ -156,7 +157,7 @@ async function updateQdrantSomClusters(
 			await Promise.all(
         [...payloadGroups.values()].map(async ({ ids, payload }) => {
           const res = await fetch(`${qdrantUrl}/collections/${COLLECTION}/points/payload`, {
-            method: 'PUT',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ points: ids, payload }),
             signal: AbortSignal.timeout(15_000),
@@ -175,7 +176,8 @@ async function updateQdrantSomClusters(
     { field_name: 'som_bmu_row', field_schema: { type: 'integer', lookup: true, range: true } },
     { field_name: 'som_bmu_col', field_schema: { type: 'integer', lookup: true, range: true } },
   ];
-  for (const def of indexDefs) {
+
+	for (const def of indexDefs) {
     fetch(`${qdrantUrl}/collections/${COLLECTION}/index`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

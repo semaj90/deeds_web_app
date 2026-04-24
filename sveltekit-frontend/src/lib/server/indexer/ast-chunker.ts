@@ -11,6 +11,7 @@
  * Each chunk includes metadata for Qdrant payload:
  * { path, kind, symbol, routeId, exports, httpMethod, tags, lineStart, lineEnd }
  */
+import { readFile } from 'fs/promises';
 import { Project, SyntaxKind, type SourceFile, type Node } from 'ts-morph';
 import { basename, relative, extname } from 'path';
 import { logAstParse } from './ast-ingest-logger.js';
@@ -37,6 +38,35 @@ export interface ChunkMetadata {
 }
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] as const;
+const AST_SOURCE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mts',
+  '.mjs',
+  '.cts',
+  '.cjs',
+]);
+const INDEXABLE_SOURCE_EXTENSIONS = new Set([
+  ...AST_SOURCE_EXTENSIONS,
+  '.svelte',
+  '.json',
+  '.sql',
+  '.proto',
+  '.py',
+  '.go',
+  '.rs',
+  '.css',
+  '.scss',
+  '.yml',
+  '.yaml',
+  '.html',
+  '.wgsl',
+  '.ps1',
+  '.sh',
+  '.toml',
+]);
 
 /**
  * Derive a routeId from a file path.
@@ -249,68 +279,194 @@ function chunkSourceFile(sourceFile: SourceFile, rootDir: string): CodeChunk[] {
 	return chunks;
 }
 
+function chunkRawFile(content: string, filePath: string, rootDir: string): CodeChunk[] {
+  const normalizedContent = content.trim();
+  if (normalizedContent.length < 10) return [];
+
+  const relPath = relative(rootDir, filePath).replace(/\\/g, '/');
+  const tags = deriveTags(relPath, content);
+  const routeId = deriveRouteId(relPath);
+  const lineCount = content.split(/\r?\n/).length;
+  const kind = extname(filePath) === '.svelte' ? 'component' : 'unknown';
+  const partialChunk = {
+    id: `${relPath}::file::0`,
+    content: normalizedContent.slice(0, 4000),
+    metadata: {
+      path: filePath,
+      relativePath: relPath,
+      kind,
+      symbol: basename(filePath),
+      routeId,
+      exports: [],
+      tags,
+      lineStart: 1,
+      lineEnd: lineCount,
+    },
+  };
+
+  return [
+    {
+      ...partialChunk,
+      signature: buildSignature(partialChunk),
+    },
+  ];
+}
+
+function kindBreakdownFor(chunks: CodeChunk[]): Record<string, number> {
+  const breakdown: Record<string, number> = {};
+  for (const chunk of chunks) {
+    breakdown[chunk.metadata.kind] = (breakdown[chunk.metadata.kind] ?? 0) + 1;
+  }
+  return breakdown;
+}
+
+async function persistMetadataForFile(
+  filePath: string,
+  rootDir: string,
+  content: string
+): Promise<void> {
+  const meta = await extractMetadata(filePath, { repoRoot: rootDir, content });
+  persistFileFeature(meta).catch(() => {});
+}
+
+export interface ChunkFilesProgress {
+  totalFiles: number;
+  filesProcessed: number;
+  chunksGenerated: number;
+  chunksTotal: number;
+  relativePath: string;
+  skipped: boolean;
+  durationMs: number;
+  error?: string;
+}
+
+export interface ChunkFilesOptions {
+  onProgress?: (progress: ChunkFilesProgress) => void | Promise<void>;
+}
+
 /**
  * Chunk multiple files using AST-aware extraction.
  *
- * @param filePaths - Absolute paths to .ts files
+ * @param filePaths - Absolute paths to indexable source files
  * @param rootDir - Root directory for relative path computation
  * @returns Array of code chunks with metadata + signatures
  */
-export async function chunkFiles(filePaths: string[], rootDir: string): Promise<CodeChunk[]> {
-	const project = new Project({
-		skipAddingFilesFromTsConfig: true,
-		compilerOptions: {
-			allowJs: true,
-			noEmit: true,
-			skipLibCheck: true
-		}
-	});
+export async function chunkFiles(
+  filePaths: string[],
+  rootDir: string,
+  options: ChunkFilesOptions = {}
+): Promise<CodeChunk[]> {
+  const project = new Project({
+    skipAddingFilesFromTsConfig: true,
+    compilerOptions: {
+      allowJs: true,
+      noEmit: true,
+      skipLibCheck: true,
+    },
+  });
 
-	const allChunks: CodeChunk[] = [];
+  const allChunks: CodeChunk[] = [];
+  let filesProcessed = 0;
 
-	for (const fp of filePaths) {
-		const ext = extname(fp);
-		if (ext !== '.ts' && ext !== '.js' && ext !== '.mts' && ext !== '.mjs') continue;
+  async function reportProgress(
+    progress: Omit<ChunkFilesProgress, 'totalFiles' | 'filesProcessed'>
+  ): Promise<void> {
+    filesProcessed += 1;
+    await options.onProgress?.({
+      totalFiles: filePaths.length,
+      filesProcessed,
+      chunksTotal: allChunks.length,
+      ...progress,
+    });
+  }
 
-		const t0 = performance.now();
-		try {
-			const sourceFile = project.addSourceFileAtPath(fp);
-			const chunks = chunkSourceFile(sourceFile, rootDir);
-			allChunks.push(...chunks);
-			project.removeSourceFile(sourceFile); // free memory
+  for (const fp of filePaths) {
+    const ext = extname(fp);
+    if (!INDEXABLE_SOURCE_EXTENSIONS.has(ext)) continue;
 
-			// ── ingest logger ──────────────────────────────────────────────
-			const kindBreakdown: Record<string, number> = {};
-			for (const c of chunks) {
-				kindBreakdown[c.metadata.kind] = (kindBreakdown[c.metadata.kind] ?? 0) + 1;
-			}
-			logAstParse({
-				filePath: fp,
-				relativePath: relative(rootDir, fp).replace(/\\/g, '/'),
-				chunkCount: chunks.length,
-				kindBreakdown,
-				durationMs: Math.round(performance.now() - t0),
-				skipped: false,
-			});
+    const t0 = performance.now();
+    const relativePath = relative(rootDir, fp).replace(/\\/g, '/');
+    try {
+      let fileContent = '';
+      let chunks: CodeChunk[] = [];
 
-			// ── workspace metadata (fire-and-forget DB persist) ────────────
-			const meta = await extractMetadata(fp, { repoRoot: rootDir, content: sourceFile.getText() });
-			persistFileFeature(meta).catch(() => {});
-		} catch (err) {
-			// Skip files that fail to parse (corrupted, etc.)
-			logAstParse({
-				filePath: fp,
-				relativePath: relative(rootDir, fp).replace(/\\/g, '/'),
-				chunkCount: 0,
-				kindBreakdown: {},
-				durationMs: Math.round(performance.now() - t0),
-				skipped: true,
-				error: err instanceof Error ? err.message : String(err),
-			});
-		}
-	}
+      if (AST_SOURCE_EXTENSIONS.has(ext)) {
+        const sourceFile = project.addSourceFileAtPath(fp);
+        fileContent = sourceFile.getFullText();
+        chunks = chunkSourceFile(sourceFile, rootDir);
+        project.removeSourceFile(sourceFile);
+      } else {
+        fileContent = await readFile(fp, 'utf8');
+        chunks = chunkRawFile(fileContent, fp, rootDir);
+      }
 
-	return allChunks;
+      allChunks.push(...chunks);
+
+      logAstParse({
+        filePath: fp,
+        relativePath,
+        chunkCount: chunks.length,
+        kindBreakdown: kindBreakdownFor(chunks),
+        durationMs: Math.round(performance.now() - t0),
+        skipped: false,
+      });
+
+      await persistMetadataForFile(fp, rootDir, fileContent);
+      await reportProgress({
+        relativePath,
+        chunksGenerated: chunks.length,
+        skipped: false,
+        durationMs: Math.round(performance.now() - t0),
+      });
+    } catch (err) {
+      try {
+        const fileContent = await readFile(fp, 'utf8');
+        const chunks = chunkRawFile(fileContent, fp, rootDir);
+        if (chunks.length > 0) {
+          allChunks.push(...chunks);
+          logAstParse({
+            filePath: fp,
+            relativePath,
+            chunkCount: chunks.length,
+            kindBreakdown: kindBreakdownFor(chunks),
+            durationMs: Math.round(performance.now() - t0),
+            skipped: false,
+            error: err instanceof Error ? err.message : String(err),
+          });
+          await persistMetadataForFile(fp, rootDir, fileContent);
+          await reportProgress({
+            relativePath,
+            chunksGenerated: chunks.length,
+            skipped: false,
+            durationMs: Math.round(performance.now() - t0),
+            error: err instanceof Error ? err.message : String(err),
+          });
+          continue;
+        }
+      } catch {
+        // fall through to skipped log below
+      }
+
+      logAstParse({
+        filePath: fp,
+        relativePath,
+        chunkCount: 0,
+        kindBreakdown: {},
+        durationMs: Math.round(performance.now() - t0),
+        skipped: true,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      await reportProgress({
+        relativePath,
+        chunksGenerated: 0,
+        skipped: true,
+        durationMs: Math.round(performance.now() - t0),
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
+  return allChunks;
 }
 
 /**
@@ -318,6 +474,12 @@ export async function chunkFiles(filePaths: string[], rootDir: string): Promise<
  * Useful for indexing in-memory or piping from ripgrep results.
  */
 export function chunkFileContent(content: string, filePath: string, rootDir: string): CodeChunk[] {
+	const ext = extname(filePath);
+  if (!INDEXABLE_SOURCE_EXTENSIONS.has(ext)) return [];
+  if (!AST_SOURCE_EXTENSIONS.has(ext)) {
+    return chunkRawFile(content, filePath, rootDir);
+  }
+
 	const project = new Project({
 		skipAddingFilesFromTsConfig: true,
 		compilerOptions: { allowJs: true, noEmit: true, skipLibCheck: true }

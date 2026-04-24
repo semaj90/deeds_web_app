@@ -6,7 +6,8 @@
  *
  * Adapted for the existing schema:
  *   - PK column is `id` (UUID), conflict target is `qdrant_id` (unique)
- *   - relative_path maps from payload.file_path (fallback '__unknown__')
+ *   - relative_path maps from payload.file_path → relativePath → path
+ *   - points with no recoverable path are skipped instead of writing '__unknown__'
  *   - tags stored in `semantic_tags text[]` (separate from legacy `tags jsonb`)
  *   - summary_embedding NOT mirrored here (requires separate embedding pass)
  *
@@ -158,10 +159,18 @@ async function updateJob(
 // Upsert one chunk
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<void> {
+async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
   const payload      = point.payload ?? {};
   const qdrantId     = String(point.id);
-  const filePath     = textOrNull(payload.file_path) ?? '__unknown__';
+  const filePath     = textOrNull(payload.file_path)
+                    ?? textOrNull(payload.relativePath)
+                    ?? textOrNull(payload.path)
+                    ?? null;
+
+  if (!filePath) {
+    return false;
+  }
+
   const semanticTags = stringArray(payload.tags);
 
   const metadata = {
@@ -203,7 +212,7 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<void> {
      )
      ON CONFLICT (qdrant_id) DO UPDATE SET
        repo_id           = EXCLUDED.repo_id,
-       relative_path     = EXCLUDED.relative_path,
+       relative_path     = COALESCE(NULLIF(EXCLUDED.relative_path, ''), codebase_chunk_index.relative_path),
        symbol            = EXCLUDED.symbol,
        kind              = EXCLUDED.kind,
        domain            = EXCLUDED.domain,
@@ -247,6 +256,8 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<void> {
       JSON.stringify(metadata),
     ]
   );
+
+  return true;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -283,6 +294,7 @@ async function main(): Promise<void> {
   let processed = 0;
   let upserted  = 0;
   let failed    = 0;
+  let skipped   = 0;
 
   try {
     while (true) {
@@ -293,8 +305,9 @@ async function main(): Promise<void> {
       for (const point of points) {
         processed += 1;
         try {
-          await upsertChunk(pg, point);
-          upserted += 1;
+          const wroteRow = await upsertChunk(pg, point);
+          if (wroteRow) upserted += 1;
+          else skipped += 1;
         } catch (err) {
           failed += 1;
           console.error('[mirror] upsertChunk failed', {
@@ -314,7 +327,7 @@ async function main(): Promise<void> {
       });
 
       console.log(
-        `[mirror] batch done — processed=${processed} upserted=${upserted} failed=${failed}` +
+        `[mirror] batch done — processed=${processed} upserted=${upserted} skipped=${skipped} failed=${failed}` +
         (offset != null ? ` cursor=${offset}` : ' (last page)')
       );
 
@@ -322,12 +335,12 @@ async function main(): Promise<void> {
     }
 
     await updateJob(pg, jobId, { processed, upserted, failed, status: 'completed' });
-    console.log(JSON.stringify({ ok: true, jobId, processed, upserted, failed }, null, 2));
+    console.log(JSON.stringify({ ok: true, jobId, processed, upserted, skipped, failed }, null, 2));
 
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     await updateJob(pg, jobId, { processed, upserted, failed, status: 'failed', error: msg });
-    console.error(JSON.stringify({ ok: false, jobId, processed, upserted, failed, error: msg }, null, 2));
+    console.error(JSON.stringify({ ok: false, jobId, processed, upserted, skipped, failed, error: msg }, null, 2));
     process.exitCode = 1;
 
   } finally {

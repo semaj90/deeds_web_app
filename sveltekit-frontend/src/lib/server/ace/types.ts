@@ -59,6 +59,7 @@ export interface ACEBudgetProfile {
     kagNeighborCount: number;
     chatHistoryMessages: number;
     chatMessageChars: number;
+    chatMemoryCount: number;
     evidenceMetadataCount: number;
     evidenceConnectionCount: number;
     codebaseContextCount: number;
@@ -102,6 +103,15 @@ export interface ACEContext {
   kagNeighbors: Array<{ nodeId: string; title: string; relationship: string; score?: number }>;
   /** Chat history (recent turns) */
   chatHistory: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>;
+  /** Semantic recall across ALL past sessions — not just the current conversation.
+   *  Populated from Qdrant chat_messages collection by cosine similarity on the query. */
+  chatMemory?: Array<{
+    sessionId: string;
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    timestamp: number;
+    score: number;
+  }>;
   /** NER-extracted entities from the current query */
   entities: {
     statutes: string[];
@@ -229,8 +239,9 @@ export const TOKEN_BUDGET = {
   evidenceConnections: 300,
   kagNeighbors: 400,
   chatHistory: 800,
+  chatMemory: 500,
   userProfile: 150,
   codebaseContext: 400,
   selfPrompt: 100,
-  total: 5100,
+  total: 5600,
 } as const;

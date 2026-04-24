@@ -614,6 +614,9 @@
 										<Icon name="brain" />
 									{/if}
 								</button>
+								<a href="/cases/{caseItem.id}/board" class="cs-action-icon" title="Open evidence board">
+									<Icon name="layout-grid" />
+								</a>
 								<a href="/cases/{caseItem.id}" class="cs-action-icon" title="Open full case">
 									<Icon name="arrow-right" />
 								</a>
@@ -630,6 +633,7 @@
 							{caseItem}
 							onView={(id) => { viewCaseId = id; showViewModal = true; }}
 							onEdit={(id) => goto(`/cases/${id}`)}
+							onBoard={(id) => goto(`/cases/${id}/board`)}
 						/>
 					{/each}
 					{#if richCaseCards.length === 0}

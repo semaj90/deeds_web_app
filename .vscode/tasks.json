@@ -7110,6 +7110,51 @@
       "detail": "Open the pipeline how-to doc with Mermaid diagram (use Ctrl+Shift+V for markdown preview)"
     },
     {
+      "label": "🧠 Admin: Open Chat Memory Inspector",
+      "type": "shell",
+      "command": "echo Opening chat memory inspector at http://localhost:5173/admin/chat-memory",
+      "windows": {
+        "command": "cmd /c \"start http://localhost:5173/admin/chat-memory && echo Opened /admin/chat-memory in default browser. If dev server is down, run 'Dev Server' first.\""
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Open /admin/chat-memory in browser — inspect Qdrant chat_messages collection stats and test semantic recall queries. Requires dev server on :5173."
+    },
+    {
+      "label": "🧠 Admin: Chat Memory Stats (curl)",
+      "type": "shell",
+      "command": "curl -s http://localhost:6333/collections/chat_messages | python -m json.tool 2>/dev/null || curl -s http://localhost:6333/collections/chat_messages",
+      "windows": {
+        "command": "powershell -NoProfile -Command \"(Invoke-RestMethod -Uri 'http://localhost:6333/collections/chat_messages').result | ConvertTo-Json -Depth 6\""
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Quick raw Qdrant stats for chat_messages collection (no auth, direct to Qdrant on :6333)."
+    },
+    {
+      "label": "🧠 Admin: Chat Memory Backfill (dry-run preview)",
+      "type": "shell",
+      "command": "echo Use the Admin Chat Memory Inspector page for backfill (requires admin auth)",
+      "windows": {
+        "command": "cmd /c \"start http://localhost:5173/admin/chat-memory && echo Scroll to the Backfill section. Leave 'Dry run' checked to preview.\""
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Open admin page with focus on the Backfill section — re-embed existing Postgres chat_messages into Qdrant. Requires admin login."
+    },
+    {
       "label": "🔄 Pipeline: Run Full Orchestrate (SSE)",
       "type": "shell",
       "command": "curl -N -X POST http://localhost:5173/api/codebase-index/orchestrate -H \"Content-Type: application/json\" -d \"{\\\"stages\\\":[\\\"ast_embed\\\",\\\"cluster_assign\\\",\\\"som_topology\\\",\\\"neo4j_sync\\\",\\\"pagerank\\\",\\\"summarize\\\",\\\"tag\\\",\\\"wiki_export\\\",\\\"hypergraph_4d\\\",\\\"deep_research\\\"],\\\"summarize\\\":true,\\\"deepResearch\\\":true,\\\"exportWiki\\\":true}\"",

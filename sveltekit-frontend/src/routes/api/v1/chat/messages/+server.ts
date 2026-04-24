@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { chatMessages, chatMetadata } from '$lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
+import { recordChatMessageForRecall } from '$lib/server/ace/chat-memory.js';
 
 const createMessageSchema = z.object({
 	sessionId: z.string().min(1),
@@ -52,9 +53,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.set({ updatedAt: new Date(), lastMessageAt: new Date() })
 			.where(eq(chatMetadata.chatId, sessionId));
 
+		// Fire-and-forget: embed content and upsert into Qdrant chat_messages
+		// for future semantic recall across sessions.
+		void recordChatMessageForRecall({ id: msgId, sessionId, role, content });
+
 		return json({ success: true, messageId: msgId }, { status: 201 });
 	} catch (err) {
 		console.error('[/api/v1/chat/messages] POST error:', err);
 		return json({ error: 'Failed to save message' }, { status: 500 });
 	}
 };
+

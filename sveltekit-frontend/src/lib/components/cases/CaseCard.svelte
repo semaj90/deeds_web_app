@@ -22,6 +22,7 @@
     caseItem: CaseData;
     onView?: (id: string) => void;
     onEdit?: (id: string) => void;
+    onBoard?: (id: string) => void;
     onArchive?: (id: string) => void;
     onDelete?: (id: string) => void }
 
@@ -29,6 +30,7 @@
     caseItem: caseData,
     onView = () => {},
 	onEdit = () => {},
+	onBoard = () => {},
 	onArchive = () => {},
 	onDelete = () => {}
   }: Props = $props();
@@ -216,6 +218,14 @@
         View Details
       </Button>
       <Button
+        onclick={() => onBoard(caseData.id)}
+        variant="ghost"
+        size="sm"
+        title="Open evidence board"
+      >
+        <Icon name="layout-grid" class="w-4 h-4" />
+      </Button>
+      <Button
         onclick={() => onEdit(caseData.id)}
         variant="ghost"
         size="sm"
@@ -244,6 +254,15 @@
     >
       <Icon name="eye" class="w-4 h-4 mr-2" />
       View Details
+    </Button>
+    <Button
+      onclick={() => { onBoard(caseData.id); open = false }}
+      variant="ghost"
+      class="w-full justify-start"
+      size="sm"
+    >
+      <Icon name="layout-grid" class="w-4 h-4 mr-2" />
+      Open Board
     </Button>
     <Button
       onclick={() => { onEdit(caseData.id); open = false }}

@@ -30,6 +30,102 @@
 	let showAIChat = $state(false);
 	let isGeneratingLayout = $state(false);
 
+	// File type detection helpers for media preview
+	function isEvidenceAudio(ft: string | undefined): boolean {
+		if (!ft) return false;
+		const t = ft.toLowerCase();
+		return t.startsWith('audio') || t === 'mp3' || t === 'wav' || t === 'ogg' || t === 'aac';
+	}
+	function isEvidenceVideo(ft: string | undefined): boolean {
+		if (!ft) return false;
+		const t = ft.toLowerCase();
+		return t.startsWith('video') || t === 'mp4' || t === 'mov' || t === 'avi' || t === 'webm';
+	}
+	function isEvidenceImage(ft: string | undefined): boolean {
+		if (!ft) return false;
+		const t = ft.toLowerCase();
+		return t.startsWith('image') || t === 'jpg' || t === 'jpeg' || t === 'png' || t === 'gif' || t === 'webp';
+	}
+
+	// Case switcher (lets user jump between cases without leaving board)
+	interface CaseListItem { id: string; title: string; status: string; updatedAt?: string }
+	let caseList = $state<CaseListItem[]>([]);
+	let showCaseSwitcher = $state(false);
+	let caseSwitcherQuery = $state('');
+	let filteredCases = $derived.by(() => {
+		const q = caseSwitcherQuery.trim().toLowerCase();
+		if (!q) return caseList;
+		return caseList.filter(c => c.title.toLowerCase().includes(q) || c.id.startsWith(q));
+	});
+
+	// Inline case creation from command palette
+	let isCreatingCase = $state(false);
+	let showCreateCaseForm = $state(false);
+	let newCaseTitle = $state('');
+	let newCaseDescription = $state('');
+
+	async function createNewCase() {
+		const title = newCaseTitle.trim();
+		const description = (newCaseDescription.trim() || `Created from board ${new Date().toLocaleDateString()}`);
+		if (!title) return;
+		isCreatingCase = true;
+		try {
+			const res = await fetch('/api/cases', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ title, description, status: 'open', priority: 'medium' })
+			});
+			if (res.ok) {
+				const body = await res.json();
+				// API wraps as { success, data: { case, message }, timestamp }; some routes return raw { case }
+				const created = body?.data?.case || body?.case || body?.data || body;
+				const newId = created?.id;
+				if (newId) {
+					// Reset and navigate
+					newCaseTitle = '';
+					newCaseDescription = '';
+					showCreateCaseForm = false;
+					showCaseSwitcher = false;
+					window.location.href = `/cases/${newId}/board`;
+					return;
+				}
+			}
+			notificationStore.add({ type: 'error', title: 'Create failed', message: 'Could not create case.' });
+		} catch (e) {
+			console.error('Create case failed:', e);
+			notificationStore.add({ type: 'error', title: 'Create failed', message: 'Network error creating case.' });
+		} finally {
+			isCreatingCase = false;
+		}
+	}
+
+	async function loadCaseList() {
+		try {
+			const res = await fetch('/api/cases?limit=50');
+			if (res.ok) {
+				const data = await res.json();
+				caseList = (data.cases || []).map((c: any) => ({
+					id: c.id,
+					title: c.title || 'Untitled Case',
+					status: c.status || 'open',
+					updatedAt: c.updatedAt
+				}));
+			}
+		} catch (e) {
+			console.error('Failed to load case list:', e);
+		}
+	}
+
+	function switchToCase(targetId: string) {
+		if (targetId === caseId) {
+			showCaseSwitcher = false;
+			return;
+		}
+		showCaseSwitcher = false;
+		// Use SvelteKit's goto for client-side navigation
+		window.location.href = `/cases/${targetId}/board`;
+	}
+
 	// Fuse.js fuzzy search for evidence sidebar
 	let searchQuery = $state('');
 	const fuseOptions = { keys: ['title', 'description', 'type', 'location', 'fileType'], threshold: 0.4, ignoreLocation: true };
@@ -260,6 +356,9 @@
 		// Load timeline events (non-blocking)
 		loadTimeline();
 
+		// Load case list for the case switcher (non-blocking)
+		loadCaseList();
+
 		// Seed board edges from DB connections (after board mounts)
 		if (board && dbConnections.length > 0) {
 			const existingNodes = board.getNodes();
@@ -337,6 +436,18 @@
 
 	// Keyboard shortcuts (from CollaborativeEvidenceCanvas analysis)
 	function handleKeyboard(e: KeyboardEvent) {
+		// Quick switch case: Ctrl/Cmd + K (command palette pattern)
+		if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+			e.preventDefault();
+			showCaseSwitcher = !showCaseSwitcher;
+			if (showCaseSwitcher && caseList.length === 0) loadCaseList();
+			return;
+		}
+		// Close case switcher with Escape
+		if (e.key === 'Escape' && showCaseSwitcher) {
+			showCaseSwitcher = false;
+			return;
+		}
 		// Save: Ctrl/Cmd + S
 		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 			e.preventDefault();
@@ -701,6 +812,19 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</div>
 
 		<div class="header-actions">
+			<!-- Case Switcher -->
+			<div class="case-switcher">
+				<button
+					class="action-btn"
+					onclick={() => { showCaseSwitcher = !showCaseSwitcher; if (showCaseSwitcher && caseList.length === 0) loadCaseList(); }}
+					title="Switch to another case (Ctrl+K)"
+				>
+					<Icon name="arrow-left-right" />
+					Switch Case
+					<kbd class="kbd-hint">⌘K</kbd>
+				</button>
+			</div>
+
 			<button
 				class="action-btn"
 				onclick={generateAILayout}
@@ -872,7 +996,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</div>
 
 		<div class="keyboard-hint">
-			<span class="hint-text">V=Select • E=Evidence • C=Connect • N=Note • 1-4=Views • P=Particles • O=CRT • Ctrl+0=Fit</span>
+			<span class="hint-text">V=Select • E=Evidence • C=Connect • N=Note • Drag=Marquee • Alt+Drag=Quick Connect • 1-4=Views • Ctrl+0=Fit</span>
 		</div>
 	</div>
 
@@ -901,28 +1025,53 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 			<div class="evidence-list">
 				{#each filteredEvidence as item (item.id)}
+					{@const ft = (item.fileType || '').toLowerCase()}
+					{@const isAudio = ft.startsWith('audio') || ft === 'mp3' || ft === 'wav' || ft === 'ogg'}
+					{@const isVideo = ft.startsWith('video') || ft === 'mp4' || ft === 'mov' || ft === 'avi'}
+					{@const isImage = ft.startsWith('image') || ft === 'jpg' || ft === 'jpeg' || ft === 'png' || ft === 'gif'}
+					{@const isPdf = ft === 'pdf' || ft === 'application/pdf'}
+					{@const typeColor = isAudio ? '#8b5cf6' : isVideo ? '#ef4444' : isImage ? '#3b82f6' : isPdf ? '#f59e0b' : '#6b7280'}
+					{@const typeIcon = isAudio ? 'headphones' : isVideo ? 'video' : isImage ? 'image' : isPdf ? 'file-text' : 'file'}
 					<div
 						class="evidence-card"
 						class:selected={selectedEvidence?.id === item.id}
 						onclick={() => (selectedEvidence = item)}
+						draggable="true"
+						ondragstart={(e: DragEvent) => {
+							if (!e.dataTransfer) return;
+							e.dataTransfer.effectAllowed = 'copy';
+							e.dataTransfer.setData('application/json', JSON.stringify({
+								evidenceId: item.id,
+								title: item.title,
+								fileType: item.fileType,
+								thumbnailUrl: item.thumbnail
+							}));
+						}}
+						style="border-left: 3px solid {typeColor}"
 					>
 						<div class="evidence-thumbnail">
-							{#if item.thumbnail}
+							{#if item.thumbnail && (isImage || isPdf)}
 								<img src={item.thumbnail} alt={item.title} />
 							{:else}
-								<div class="placeholder">
-									<Icon name="play-circle" size={32} />
+								<div class="placeholder" style="background: {typeColor}15">
+									<Icon name={typeIcon} size={28} />
 								</div>
 							{/if}
+							<span class="file-type-badge" style="background: {typeColor}">{ft.split('/').pop() || 'file'}</span>
 						</div>
 						<div class="evidence-info">
 							<h4>{item.title}</h4>
-							<p class="evidence-meta">{item.date}</p>
-							<p class="evidence-location">{item.location}</p>
+							<p class="evidence-meta">
+								{#if item.date}<span>{item.date}</span>{/if}
+								{#if item.type}<span class="evidence-type-tag">{item.type}</span>{/if}
+							</p>
+							{#if item.location}
+								<p class="evidence-location"><Icon name="map-pin" size={10} /> {item.location}</p>
+							{/if}
 						</div>
-						<button class="evidence-menu">
-							<Icon name="ellipsis-vertical" />
-						</button>
+						<div class="drag-hint">
+							<Icon name="grip-vertical" size={14} />
+						</div>
 					</div>
 				{/each}
 			</div>
@@ -1055,6 +1204,26 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				</div>
 
 				<div class="details-content">
+					<!-- Inline media preview -->
+					{#if isEvidenceImage(selectedEvidence.fileType) && selectedEvidence.thumbnail}
+						<div class="detail-section media-preview">
+							<img src={selectedEvidence.thumbnail} alt={selectedEvidence.title} class="preview-image" />
+						</div>
+					{:else if isEvidenceAudio(selectedEvidence.fileType)}
+						<div class="detail-section media-preview">
+							<audio controls preload="metadata" class="preview-audio">
+								<source src="/api/evidence/{selectedEvidence.id}/download" />
+							</audio>
+						</div>
+					{:else if isEvidenceVideo(selectedEvidence.fileType)}
+						<div class="detail-section media-preview">
+							<!-- svelte-ignore a11y_media_has_caption -->
+							<video controls preload="metadata" class="preview-video" poster={selectedEvidence.thumbnail || undefined}>
+								<source src="/api/evidence/{selectedEvidence.id}/download" />
+							</video>
+						</div>
+					{/if}
+
 					<div class="detail-section">
 						<h4>Evidence Details</h4>
 						<p class="evidence-description">{selectedEvidence.description || 'No description available'}</p>
@@ -1343,6 +1512,111 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			</div>
 		</div>
 	{/if}
+
+	<!-- Case Switcher Overlay (click-outside backdrop) -->
+	{#if showCaseSwitcher}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div
+			class="case-switcher-backdrop"
+			onclick={() => (showCaseSwitcher = false)}
+			onkeydown={(e) => e.key === 'Escape' && (showCaseSwitcher = false)}
+		>
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="case-switcher-dropdown" onclick={(e) => e.stopPropagation()}>
+				<div class="case-switcher-header">
+					<Icon name="search" />
+					<input
+						type="text"
+						placeholder="Search cases by title or ID..."
+						bind:value={caseSwitcherQuery}
+						class="case-switcher-search"
+					/>
+					<button class="close-btn" onclick={() => (showCaseSwitcher = false)} title="Close (Esc)">
+						<Icon name="x" />
+					</button>
+				</div>
+				<div class="case-switcher-list">
+					{#if !showCreateCaseForm}
+						<button
+							class="case-switcher-item case-switcher-new"
+							onclick={() => { showCreateCaseForm = true; if (!newCaseTitle && caseSwitcherQuery) newCaseTitle = caseSwitcherQuery; }}
+						>
+							<span class="case-switcher-new-icon">
+								<Icon name="plus" size={14} />
+							</span>
+							<div class="case-switcher-info">
+								<div class="case-switcher-title">
+									{caseSwitcherQuery ? `Create "${caseSwitcherQuery}"` : 'New Case'}
+								</div>
+								<div class="case-switcher-id">Quick-create from here</div>
+							</div>
+						</button>
+					{:else}
+						<div class="case-switcher-create-form">
+							<input
+								type="text"
+								class="case-switcher-input"
+								placeholder="Case title (required)"
+								bind:value={newCaseTitle}
+								onkeydown={(e) => {
+									if (e.key === 'Enter') createNewCase();
+									if (e.key === 'Escape') { showCreateCaseForm = false; newCaseTitle = ''; newCaseDescription = ''; }
+								}}
+							/>
+							<textarea
+								class="case-switcher-textarea"
+								placeholder="Description (optional)"
+								rows="2"
+								bind:value={newCaseDescription}
+							></textarea>
+							<div class="case-switcher-form-actions">
+								<button
+									class="case-switcher-btn-cancel"
+									onclick={() => { showCreateCaseForm = false; newCaseTitle = ''; newCaseDescription = ''; }}
+								>
+									Cancel
+								</button>
+								<button
+									class="case-switcher-btn-create"
+									onclick={createNewCase}
+									disabled={!newCaseTitle.trim() || isCreatingCase}
+								>
+									<Icon name={isCreatingCase ? 'loader' : 'plus'} size={12} />
+									{isCreatingCase ? 'Creating...' : 'Create & Open'}
+								</button>
+							</div>
+						</div>
+					{/if}
+
+					{#if filteredCases.length === 0 && !showCreateCaseForm}
+						<div class="case-switcher-empty">
+							{caseList.length === 0 ? 'Loading cases...' : 'No matches — create one above'}
+						</div>
+					{:else if !showCreateCaseForm}
+						{#each filteredCases as c (c.id)}
+							<button
+								class="case-switcher-item"
+								class:active={c.id === caseId}
+								onclick={() => switchToCase(c.id)}
+							>
+								<span class="case-switcher-status status-{c.status}" title={c.status}></span>
+								<div class="case-switcher-info">
+									<div class="case-switcher-title">{c.title}</div>
+									<div class="case-switcher-id">#{c.id.substring(0, 8)} • {c.status}</div>
+								</div>
+								{#if c.id === caseId}
+									<span class="case-switcher-current">CURRENT</span>
+								{/if}
+							</button>
+						{/each}
+					{/if}
+				</div>
+				<div class="case-switcher-footer">
+					<span class="kbd-hint">Esc</span> close • <span class="kbd-hint">⌘K</span> toggle • <span class="kbd-hint">Enter</span> create
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -1408,6 +1682,267 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		display: flex;
 		gap: 0.75rem;
 		align-items: center;
+	}
+
+	/* Case switcher (command palette pattern) */
+	.case-switcher {
+		position: relative;
+	}
+
+	.kbd-hint {
+		display: inline-block;
+		padding: 1px 5px;
+		margin-left: 0.4rem;
+		font-size: 0.65rem;
+		font-family: 'JetBrains Mono', monospace;
+		font-weight: 600;
+		color: #6b7280;
+		background: #f3f4f6;
+		border: 1px solid #d1d5db;
+		border-bottom-width: 2px;
+		border-radius: 3px;
+	}
+
+	.case-switcher-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(15, 23, 42, 0.4);
+		backdrop-filter: blur(4px);
+		z-index: 1000;
+		display: flex;
+		justify-content: center;
+		align-items: flex-start;
+		padding-top: 10vh;
+	}
+
+	.case-switcher-dropdown {
+		width: 480px;
+		max-height: 60vh;
+		background: white;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.75rem;
+		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		animation: switcherSlide 0.15s ease-out;
+	}
+
+	@keyframes switcherSlide {
+		from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+		to { opacity: 1; transform: translateY(0) scale(1); }
+	}
+
+	.case-switcher-footer {
+		padding: 0.5rem 0.75rem;
+		font-size: 0.7rem;
+		color: #9ca3af;
+		border-top: 1px solid #f3f4f6;
+		background: #fafafa;
+	}
+
+	.case-switcher-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem;
+		border-bottom: 1px solid #e5e7eb;
+	}
+
+	.case-switcher-search {
+		flex: 1;
+		padding: 0.4rem 0.6rem;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.3rem;
+		font-size: 0.8rem;
+		outline: none;
+	}
+
+	.case-switcher-search:focus {
+		border-color: #3b82f6;
+	}
+
+	.case-switcher-list {
+		overflow-y: auto;
+		flex: 1;
+	}
+
+	.case-switcher-empty {
+		padding: 1.5rem;
+		text-align: center;
+		color: #9ca3af;
+		font-size: 0.8rem;
+	}
+
+	.case-switcher-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		padding: 0.6rem 0.75rem;
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid #f3f4f6;
+		text-align: left;
+		cursor: pointer;
+		transition: background 0.15s;
+	}
+
+	.case-switcher-item:hover {
+		background: #f9fafb;
+	}
+
+	.case-switcher-item.active {
+		background: #eff6ff;
+	}
+
+	.case-switcher-status {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #9ca3af;
+		flex-shrink: 0;
+	}
+
+	.case-switcher-status.status-open {
+		background: #22c55e;
+	}
+
+	.case-switcher-status.status-in_progress {
+		background: #3b82f6;
+	}
+
+	.case-switcher-status.status-closed {
+		background: #6b7280;
+	}
+
+	.case-switcher-status.status-archived {
+		background: #d1d5db;
+	}
+
+	.case-switcher-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.case-switcher-title {
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #1f2937;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.case-switcher-id {
+		font-size: 0.65rem;
+		color: #9ca3af;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.case-switcher-current {
+		font-size: 0.6rem;
+		font-weight: 700;
+		color: #3b82f6;
+		padding: 1px 5px;
+		background: #dbeafe;
+		border-radius: 3px;
+	}
+
+	/* New Case button + inline create form */
+	.case-switcher-new {
+		background: #f0fdf4;
+	}
+
+	.case-switcher-new:hover {
+		background: #dcfce7;
+	}
+
+	.case-switcher-new-icon {
+		width: 22px;
+		height: 22px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #22c55e;
+		color: white;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.case-switcher-create-form {
+		padding: 0.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		background: #fafafa;
+		border-bottom: 1px solid #e5e7eb;
+	}
+
+	.case-switcher-input,
+	.case-switcher-textarea {
+		width: 100%;
+		padding: 0.45rem 0.6rem;
+		border: 1px solid #d1d5db;
+		border-radius: 0.3rem;
+		font-size: 0.8rem;
+		outline: none;
+		font-family: inherit;
+	}
+
+	.case-switcher-input:focus,
+	.case-switcher-textarea:focus {
+		border-color: #3b82f6;
+		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+	}
+
+	.case-switcher-textarea {
+		resize: vertical;
+		min-height: 50px;
+	}
+
+	.case-switcher-form-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+
+	.case-switcher-btn-cancel,
+	.case-switcher-btn-create {
+		padding: 0.4rem 0.75rem;
+		border-radius: 0.3rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		border: 1px solid transparent;
+		transition: all 0.15s;
+	}
+
+	.case-switcher-btn-cancel {
+		background: transparent;
+		color: #6b7280;
+		border-color: #d1d5db;
+	}
+
+	.case-switcher-btn-cancel:hover {
+		background: #f3f4f6;
+	}
+
+	.case-switcher-btn-create {
+		background: #22c55e;
+		color: white;
+	}
+
+	.case-switcher-btn-create:hover:not(:disabled) {
+		background: #16a34a;
+	}
+
+	.case-switcher-btn-create:disabled {
+		background: #d1d5db;
+		cursor: not-allowed;
 	}
 
 	.action-btn {
@@ -1772,8 +2307,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		background: #fafafa;
 		border: 1px solid #e5e7eb;
 		border-radius: 0.5rem;
-		cursor: pointer;
+		cursor: grab;
 		transition: all 0.2s;
+	}
+
+	.evidence-card:active {
+		cursor: grabbing;
+		opacity: 0.7;
+		transform: scale(0.97);
 	}
 
 	.evidence-card:hover {
@@ -1787,12 +2328,13 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	}
 
 	.evidence-thumbnail {
+		position: relative;
 		width: 100%;
-		height: 120px;
+		height: 100px;
 		background: #1f2937;
 		border-radius: 0.375rem;
 		overflow: hidden;
-		margin-bottom: 0.75rem;
+		margin-bottom: 0.5rem;
 	}
 
 	.placeholder {
@@ -1804,23 +2346,99 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		color: #6b7280;
 	}
 
+	.file-type-badge {
+		position: absolute;
+		top: 6px;
+		right: 6px;
+		padding: 1px 6px;
+		border-radius: 4px;
+		font-size: 0.6rem;
+		font-weight: 700;
+		color: white;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.evidence-info {
+		flex: 1;
+		min-width: 0;
+	}
+
 	.evidence-info h4 {
-		font-size: 0.875rem;
+		font-size: 0.8rem;
 		font-weight: 600;
 		color: #1f2937;
 		margin: 0 0 0.25rem 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.evidence-meta {
-		font-size: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.7rem;
 		color: #6b7280;
 		margin: 0;
 	}
 
+	.evidence-type-tag {
+		padding: 0 4px;
+		border-radius: 3px;
+		background: #e5e7eb;
+		font-size: 0.6rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.3px;
+	}
+
 	.evidence-location {
-		font-size: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 3px;
+		font-size: 0.65rem;
 		color: #9ca3af;
-		margin: 0.25rem 0 0 0;
+		margin: 0.2rem 0 0 0;
+	}
+
+	.drag-hint {
+		display: flex;
+		align-items: center;
+		color: #d1d5db;
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+
+	.evidence-card:hover .drag-hint {
+		opacity: 1;
+	}
+
+	/* Media preview in detail sidebar */
+	.media-preview {
+		padding: 0 !important;
+		overflow: hidden;
+		border-radius: 0.5rem;
+		background: #111827;
+	}
+
+	.preview-image {
+		width: 100%;
+		max-height: 200px;
+		object-fit: contain;
+		display: block;
+	}
+
+	.preview-audio {
+		width: 100%;
+		display: block;
+		padding: 0.75rem;
+	}
+
+	.preview-video {
+		width: 100%;
+		max-height: 200px;
+		display: block;
 	}
 
 	/* Canvas Area */

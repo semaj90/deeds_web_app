@@ -306,10 +306,10 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
         await Promise.all(
           updates.slice(i, i + BATCH).map((u) =>
             fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-              method:  'PUT',
+              method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body:    JSON.stringify({ payload: { tags: u.tags }, points: [u.id] }),
-              signal:  AbortSignal.timeout(15_000),
+              body: JSON.stringify({ payload: { tags: u.tags }, points: [u.id] }),
+              signal: AbortSignal.timeout(15_000),
             })
           )
         );

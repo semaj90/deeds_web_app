@@ -35,6 +35,20 @@ interface IndexResult {
   durationMs: number;
 }
 
+export interface IndexChunksProgress {
+  totalChunks: number;
+  chunksCompleted: number;
+  embeddingsGenerated: number;
+  storedInQdrant: number;
+  failed: number;
+  batchIndex: number;
+  batchSize: number;
+}
+
+interface IndexChunksOptions {
+  onProgress?: (progress: IndexChunksProgress) => void | Promise<void>;
+}
+
 function isValidEmbedding(value: unknown): value is number[] {
   return Array.isArray(value) && value.length === SERVER_EMBEDDING_DIMS;
 }
@@ -331,11 +345,15 @@ async function searchVector(
 /**
  * Index an array of AST code chunks into Qdrant with dual embeddings.
  */
-export async function indexChunks(chunks: CodeChunk[]): Promise<IndexResult> {
+export async function indexChunks(
+  chunks: CodeChunk[],
+  options: IndexChunksOptions = {}
+): Promise<IndexResult> {
   const start = performance.now();
   let embeddingsGenerated = 0;
   let storedInQdrant = 0;
   let failed = 0;
+  let chunksCompleted = 0;
 
   await ensureCollection();
 
@@ -344,7 +362,7 @@ export async function indexChunks(chunks: CodeChunk[]): Promise<IndexResult> {
   // Embedding is the GPU bottleneck — batch size of 24 fills ~350 MB VRAM on RTX 3060 Ti.
   await runWithAdaptiveBatch<CodeChunk>(
     chunks,
-    async (batch) => {
+    async (batch, batchIndex) => {
       const points: Array<{
         id: string;
         vectors: { content: number[]; signature: number[] };
@@ -381,6 +399,17 @@ export async function indexChunks(chunks: CodeChunk[]): Promise<IndexResult> {
           failed += points.length;
         }
       }
+
+      chunksCompleted += batch.length;
+      await options.onProgress?.({
+        totalChunks: chunks.length,
+        chunksCompleted,
+        embeddingsGenerated,
+        storedInQdrant,
+        failed,
+        batchIndex,
+        batchSize: batch.length,
+      });
     },
     { initialBatch: INITIAL_BATCH, minBatch: 4 }
   );
@@ -450,7 +479,10 @@ interface IncrementalIndexResult extends IndexResult {
  * Index chunks incrementally — skip chunks whose point ID already exists in Qdrant.
  * On re-run, only new/changed chunks get embedded and upserted.
  */
-export async function indexChunksIncremental(chunks: CodeChunk[]): Promise<IncrementalIndexResult> {
+export async function indexChunksIncremental(
+  chunks: CodeChunk[],
+  options: IndexChunksOptions = {}
+): Promise<IncrementalIndexResult> {
   await ensureCollection();
 
   // Check which chunks are already in Qdrant
@@ -482,7 +514,7 @@ export async function indexChunksIncremental(chunks: CodeChunk[]): Promise<Incre
     return zeroResult;
   }
 
-  const result = await indexChunks(newChunks);
+  const result = await indexChunks(newChunks, options);
   // Override the 'full' log written by indexChunks with an incremental one
   // (the full log was already emitted inside indexChunks above — this is a summary)
   logEmbedIndex({

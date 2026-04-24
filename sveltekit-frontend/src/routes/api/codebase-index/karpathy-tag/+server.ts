@@ -121,11 +121,11 @@ async function scrollBatch(offset: string | number | null, limit: number): Promi
 async function patchQdrantTags(id: string | number, existing: string[], newTags: string[]): Promise<boolean> {
 	const merged = [...new Set([...existing, ...newTags])];
 	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-		method:  'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body:    JSON.stringify({ payload: { tags: merged }, points: [id] }),
-		signal:  AbortSignal.timeout(10_000),
-	}).catch(() => null);
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ payload: { tags: merged }, points: [id] }),
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => null);
 	return res?.ok ?? false;
 }
 
@@ -270,11 +270,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 								// ── Qdrant payload: ml_schema field ─────────────────────────
 								fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-									method:  'PUT',
-									headers: { 'Content-Type': 'application/json' },
-									body:    JSON.stringify({ payload: { ml_schema: meta }, points: [chunk.id] }),
-									signal:  AbortSignal.timeout(10_000),
-								}).catch(() => {});
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ payload: { ml_schema: meta }, points: [chunk.id] }),
+                  signal: AbortSignal.timeout(10_000),
+                }).catch(() => {});
 
 								// ── Redis inverted index: ml-schema:{framework} → chunkIds ──
 								// Enables O(1) lookup of all ML chunks by framework/modelType

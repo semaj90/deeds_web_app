@@ -107,14 +107,29 @@ async function mirrorToPostgres(
 	signatureVec: number[] | null,
 ): Promise<boolean> {
 	const p = chunk.payload;
+	const relativePath =
+    typeof p['file_path'] === 'string' && p['file_path'].length > 0
+      ? (p['file_path'] as string)
+      : typeof p['relativePath'] === 'string' && p['relativePath'].length > 0
+        ? (p['relativePath'] as string)
+        : typeof p['path'] === 'string' && p['path'].length > 0
+          ? (p['path'] as string)
+          : null;
+
+  if (!relativePath) {
+    console.warn('[index-stream] skipping pg mirror for point without path', { pointId: chunk.id });
+    return false;
+  }
+
 	try {
 		await pool.query(
-			`INSERT INTO codebase_chunk_index
+      `INSERT INTO codebase_chunk_index
 			   (qdrant_id, relative_path, symbol, kind, line_start, line_end, content,
 			    content_embedding, signature_embedding, summary_embedding,
 			    gpu_cluster, som_cluster, page_rank_score, tags, cluster_summary, updated_at)
 			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15::jsonb, NOW())
 			 ON CONFLICT (qdrant_id) DO UPDATE SET
+			    relative_path      = COALESCE(NULLIF(EXCLUDED.relative_path, ''), codebase_chunk_index.relative_path),
 			    content            = EXCLUDED.content,
 			    content_embedding  = COALESCE(EXCLUDED.content_embedding, codebase_chunk_index.content_embedding),
 			    signature_embedding= COALESCE(EXCLUDED.signature_embedding, codebase_chunk_index.signature_embedding),
@@ -125,24 +140,24 @@ async function mirrorToPostgres(
 			    tags               = EXCLUDED.tags,
 			    cluster_summary    = EXCLUDED.cluster_summary,
 			    updated_at         = NOW()`,
-			[
-				String(chunk.id),
-				String(p['relativePath'] ?? p['path'] ?? ''),
-				(p['symbol'] as string) ?? null,
-				(p['kind'] as string) ?? null,
-				(p['lineStart'] as number) ?? null,
-				(p['lineEnd'] as number) ?? null,
-				(p['content'] as string) ?? null,
-				contentVec ? JSON.stringify(contentVec) : null,
-				signatureVec ? JSON.stringify(signatureVec) : null,
-				summaryVec ? JSON.stringify(summaryVec) : null,
-				(p['neo4j_gpuCluster'] as number) ?? (p['gpu_cluster'] as number) ?? null,
-				(p['som_cluster'] as number) ?? null,
-				(p['pagerank_score'] as number) ?? (p['pagerank_score_couchdb'] as number) ?? null,
-				JSON.stringify(p['tags'] ?? []),
-				JSON.stringify(clusterSummary ?? {}),
-			],
-		);
+      [
+        String(chunk.id),
+        relativePath,
+        (p['symbol'] as string) ?? null,
+        (p['kind'] as string) ?? null,
+        (p['lineStart'] as number) ?? null,
+        (p['lineEnd'] as number) ?? null,
+        (p['content'] as string) ?? null,
+        contentVec ? JSON.stringify(contentVec) : null,
+        signatureVec ? JSON.stringify(signatureVec) : null,
+        summaryVec ? JSON.stringify(summaryVec) : null,
+        (p['neo4j_gpuCluster'] as number) ?? (p['gpu_cluster'] as number) ?? null,
+        (p['som_cluster'] as number) ?? null,
+        (p['pagerank_score'] as number) ?? (p['pagerank_score_couchdb'] as number) ?? null,
+        JSON.stringify(p['tags'] ?? []),
+        JSON.stringify(clusterSummary ?? {}),
+      ]
+    );
 		return true;
 	} catch (err) {
 		console.warn('[index-stream] pgvector mirror failed:', (err as Error)?.message);
@@ -316,11 +331,11 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 									const existing = (chunk?.payload?.['tags'] as string[] | undefined) ?? [];
 									const merged = [...new Set([...existing, ...r.tags])];
 									await fetch(QDRANT, {
-										method: 'PUT',
-										headers: { 'Content-Type': 'application/json' },
-										body: JSON.stringify({ payload: { tags: merged }, points: [r.id] }),
-										signal: AbortSignal.timeout(10_000),
-									}).catch(() => null);
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ payload: { tags: merged }, points: [r.id] }),
+                    signal: AbortSignal.timeout(10_000),
+                  }).catch(() => null);
 									gpuTagged++;
 								}
 							} else {

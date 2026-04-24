@@ -249,11 +249,11 @@ export async function gpuTagBatch(
 			const merged = [...new Set([...existing, ...r.tags])];
 
 			const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ payload: { tags: merged }, points: [r.id] }),
-				signal: AbortSignal.timeout(10_000),
-			}).catch(() => null);
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload: { tags: merged }, points: [r.id] }),
+        signal: AbortSignal.timeout(10_000),
+      }).catch(() => null);
 
 			if (res?.ok) tagged++;
 		}

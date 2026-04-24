@@ -24,24 +24,66 @@ import { resolve } from 'path';
 import { readdir, stat } from 'fs/promises';
 
 const postQuerySchema = z.object({
-	scope: z.enum(['routes', 'lib', 'tests', 'all']).default('all'),
-	async: z.enum(['true', 'false']).default('false')
+  scope: z.enum(['routes', 'lib', 'tests', 'all', 'workspace']).default('all'),
+  async: z.enum(['true', 'false']).default('false'),
 });
 
 const ROOT = resolve(process.cwd());
 
 const SCOPE_GLOBS: Record<string, string[]> = {
-	routes: ['src/routes'],
-	lib: ['src/lib'],
-	tests: ['tests'],
-	all: ['src/routes', 'src/lib', 'tests']
+  routes: ['src/routes'],
+  lib: ['src/lib'],
+  tests: ['tests'],
+  all: ['src/routes', 'src/lib', 'tests'],
+  workspace: [ROOT],
 };
 
-const INDEXABLE_EXTENSIONS = new Set(['.ts', '.js', '.mts', '.mjs']);
-const SKIP_DIRS = new Set(['node_modules', '.svelte-kit', 'archives', 'backups', 'phase104-backups']);
+const INDEXABLE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mts',
+  '.mjs',
+  '.cts',
+  '.cjs',
+  '.svelte',
+  '.json',
+  '.sql',
+  '.proto',
+  '.py',
+  '.go',
+  '.rs',
+  '.css',
+  '.scss',
+  '.yml',
+  '.yaml',
+  '.html',
+  '.wgsl',
+  '.ps1',
+  '.sh',
+  '.toml',
+]);
+const SKIP_DIRS = new Set([
+  'node_modules',
+  '.git',
+  '.venv',
+  '.svelte-kit',
+  'coverage',
+  'dist',
+  'build',
+  'test-results',
+  'playwright-report',
+  'logs',
+  'artifacts',
+  'archives',
+  'backups',
+  'phase104-backups',
+  '__pycache__',
+]);
 
 /**
- * Recursively collect .ts/.js files from a directory.
+ * Recursively collect indexable source files from a directory.
  */
 async function collectFiles(dir: string): Promise<string[]> {
 	const files: string[] = [];

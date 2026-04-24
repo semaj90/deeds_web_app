@@ -95,11 +95,11 @@ async function scrollWithVectors(
 
 async function patchQdrantTags(id: string | number, merged: string[]): Promise<boolean> {
 	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-		method:  'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body:    JSON.stringify({ payload: { tags: merged }, points: [id] }),
-		signal:  AbortSignal.timeout(10_000),
-	}).catch(() => null);
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ payload: { tags: merged }, points: [id] }),
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => null);
 	return res?.ok ?? false;
 }
 

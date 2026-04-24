@@ -759,7 +759,7 @@ async function stageTagEnrichment(
 
   try {
     const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/payload`, {
-      method: 'PUT',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(10_000),

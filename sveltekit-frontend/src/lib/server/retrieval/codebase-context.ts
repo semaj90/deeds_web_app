@@ -708,7 +708,10 @@ export async function searchCodebaseByCluster(
 			        som_cluster,
 			        cluster_summary
 		   FROM codebase_chunk_index
-		  WHERE gpu_cluster = $1 OR som_cluster = $1
+		  WHERE (gpu_cluster = $1 OR som_cluster = $1)
+		    AND relative_path IS NOT NULL
+		    AND relative_path <> ''
+		    AND relative_path <> '__unknown__'
 		  ORDER BY COALESCE(page_rank_score, 0) DESC,
 		           indexed_at DESC
 		  LIMIT $2`,

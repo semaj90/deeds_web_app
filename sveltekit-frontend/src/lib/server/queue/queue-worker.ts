@@ -525,22 +525,21 @@ export class ChatContextWorker extends QueueWorker<{
 
 		if (!embedding?.length) return;
 
-		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-		await qdrant.batchUpsert({
-      collection: 'chat_history' as Parameters<typeof qdrant.batchUpsert>[0]['collection'],
-      points: [
-        {
-          id: crypto.randomUUID(),
-          vector: embedding,
-          payload: {
-            sessionId: data.sessionId,
-            role: data.role ?? 'user',
-            content: data.message.slice(0, 500),
-            timestamp: Date.now(),
-          },
-        },
-      ],
-    });
+		// Route through the canonical chat-memory indexer so writes land in the
+		// Qdrant `chat_messages` collection with the `message` named vector —
+		// matching what ACE's recallPastChats() reads from.
+		const { indexChatMessage } = await import('$lib/server/ace/chat-memory.js');
+		const id = Math.floor(Math.random() * 0x1fffffffffffff);
+		await indexChatMessage(
+			{
+				id,
+				sessionId: data.sessionId,
+				role: data.role ?? 'user',
+				content: data.message.slice(0, 2000),
+				timestamp: Date.now(),
+			},
+			embedding,
+		);
 	}
 }
 

@@ -22,19 +22,55 @@ const QDRANT_URL = ENV.QDRANT_URL;
 const COLLECTION = 'codebase_chunks_768';
 const ROOT = resolve(process.cwd());
 
-const SCOPE_DIRS: Record<'routes' | 'lib' | 'all', string[]> = {
-	routes: ['src/routes'],
-	lib: ['src/lib'],
-	all: ['src/routes', 'src/lib'],
+const SCOPE_DIRS: Record<'routes' | 'lib' | 'all' | 'workspace', string[]> = {
+  routes: ['src/routes'],
+  lib: ['src/lib'],
+  all: ['src/routes', 'src/lib'],
+  workspace: [ROOT],
 };
 
-const INDEXABLE_EXTENSIONS = new Set(['.ts', '.js', '.mts', '.mjs']);
+const INDEXABLE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mts',
+  '.mjs',
+  '.cts',
+  '.cjs',
+  '.svelte',
+  '.json',
+  '.sql',
+  '.proto',
+  '.py',
+  '.go',
+  '.rs',
+  '.css',
+  '.scss',
+  '.yml',
+  '.yaml',
+  '.html',
+  '.wgsl',
+  '.ps1',
+  '.sh',
+  '.toml',
+]);
 const SKIP_DIRS = new Set([
-	'node_modules',
-	'.svelte-kit',
-	'archives',
-	'backups',
-	'phase104-backups',
+  'node_modules',
+  '.git',
+  '.venv',
+  '.svelte-kit',
+  'coverage',
+  'dist',
+  'build',
+  'test-results',
+  'playwright-report',
+  'logs',
+  'artifacts',
+  'archives',
+  'backups',
+  'phase104-backups',
+  '__pycache__',
 ]);
 
 type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
@@ -58,7 +94,7 @@ const ALL_STAGES = [
 
 const orchestrateSchema = z.object({
   mode: z.enum(['sync', 'async']).default('sync'),
-  scope: z.enum(['routes', 'lib', 'all']).default('all'),
+  scope: z.enum(['routes', 'lib', 'all', 'workspace']).default('all'),
   incremental: z.boolean().default(false),
   runIndexing: z.boolean().optional(),
   indexFileLimit: z.number().int().min(1).max(10000).optional(),
@@ -227,37 +263,121 @@ async function getPgMirrorStatus(): Promise<PgMirrorStatus> {
 
 // ── File collection ─────────────────────────────────────────────────────────
 
-async function collectFiles(dir: string, limit?: number): Promise<string[]> {
-	const files: string[] = [];
+type CollectFilesProgress = {
+  currentDir: string;
+  directoriesVisited: number;
+  filesFound: number;
+  limit: number | null;
+};
 
-	async function walk(currentDir: string): Promise<void> {
-		if (limit != null && files.length >= limit) return;
+type CollectFilesOptions = {
+  onProgress?: (progress: CollectFilesProgress) => void;
+};
 
-		try {
-			const entries = await readdir(currentDir, { withFileTypes: true });
-			for (const entry of entries) {
-				if (limit != null && files.length >= limit) return;
-				if (SKIP_DIRS.has(entry.name)) continue;
+async function collectFiles(
+  dir: string,
+  limit?: number,
+  options: CollectFilesOptions = {}
+): Promise<string[]> {
+  const files: string[] = [];
+  let directoriesVisited = 0;
 
-				const fullPath = resolve(currentDir, entry.name);
-				if (entry.isDirectory()) {
-					await walk(fullPath);
-					continue;
-				}
+  function reportProgress(currentDir: string): void {
+    options.onProgress?.({
+      currentDir,
+      directoriesVisited,
+      filesFound: files.length,
+      limit: limit ?? null,
+    });
+  }
 
-				if (!entry.isFile()) continue;
-				const extension = entry.name.slice(entry.name.lastIndexOf('.'));
-				if (!INDEXABLE_EXTENSIONS.has(extension)) continue;
-				if (fullPath.includes('lib/services/') && !fullPath.includes('lib/server/services/')) continue;
-				files.push(fullPath);
-			}
-		} catch {
-			/* directory missing or unreadable */
-		}
-	}
+  async function walk(currentDir: string): Promise<void> {
+    if (limit != null && files.length >= limit) return;
 
-	await walk(dir);
-	return files;
+    try {
+      directoriesVisited += 1;
+      reportProgress(currentDir);
+      const entries = await readdir(currentDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (limit != null && files.length >= limit) return;
+        if (SKIP_DIRS.has(entry.name)) continue;
+
+        const fullPath = resolve(currentDir, entry.name);
+        if (entry.isDirectory()) {
+          await walk(fullPath);
+          continue;
+        }
+
+        if (!entry.isFile()) continue;
+        const extension = entry.name.slice(entry.name.lastIndexOf('.'));
+        if (!INDEXABLE_EXTENSIONS.has(extension)) continue;
+        if (fullPath.includes('lib/services/') && !fullPath.includes('lib/server/services/'))
+          continue;
+        files.push(fullPath);
+        if (
+          files.length === 1 ||
+          files.length % 25 === 0 ||
+          (limit != null && files.length >= limit)
+        ) {
+          reportProgress(currentDir);
+        }
+      }
+    } catch {
+      /* directory missing or unreadable */
+    }
+  }
+
+  await walk(dir);
+  reportProgress(dir);
+  return files;
+}
+
+function createScanProgressEmitter(
+  emit: (event: string, data: unknown) => void,
+  minIntervalMs = 750
+): (payload: Record<string, unknown> & { filesFound: number; limit: number | null }) => void {
+  let lastEmitAt = 0;
+  let lastFilesFound = -1;
+
+  return (payload) => {
+    const now = Date.now();
+    const filesFound = Math.max(0, Number(payload.filesFound ?? 0));
+    const limit = payload.limit == null ? null : Math.max(0, Number(payload.limit));
+    const pct = limit && limit > 0 ? Math.min(100, Math.round((filesFound / limit) * 100)) : null;
+    const shouldEmit = filesFound !== lastFilesFound || now - lastEmitAt >= minIntervalMs;
+    if (!shouldEmit) return;
+
+    lastEmitAt = now;
+    lastFilesFound = filesFound;
+    emit('scan_progress', { stage: 'scan', pct, ...payload, filesFound, limit });
+    const currentDir = typeof payload.currentDir === 'string' ? payload.currentDir : 'unknown';
+    const limitText = limit != null ? `/${limit}` : '';
+    console.info(`[orchestrate][scan] scan_progress ${filesFound}${limitText} @ ${currentDir}`);
+  };
+}
+
+function createProgressEmitter(
+  emit: (event: string, data: unknown) => void,
+  eventName: string,
+  stage: string,
+  minIntervalMs = 750
+): (payload: Record<string, unknown> & { completed: number; total: number }) => void {
+  let lastEmitAt = 0;
+  let lastPct = -1;
+
+  return (payload) => {
+    const total = Math.max(0, Number(payload.total ?? 0));
+    const completed = Math.min(total, Math.max(0, Number(payload.completed ?? 0)));
+    const pct = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 100;
+    const now = Date.now();
+    const shouldEmit = pct >= 100 || pct !== lastPct || now - lastEmitAt >= minIntervalMs;
+    if (!shouldEmit) return;
+
+    lastEmitAt = now;
+    lastPct = pct;
+    emit(eventName, { stage, pct, ...payload });
+    console.info(`[orchestrate][${stage}] ${eventName} ${pct}% (${completed}/${total})`);
+  };
 }
 
 // ── Cluster range parser ────────────────────────────────────────────────────
@@ -627,10 +747,23 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
 
             const allFiles: string[] = [];
             const targetLimit = indexFileLimit ?? Number.MAX_SAFE_INTEGER;
+            const emitScanProgress = createScanProgressEmitter(emit);
             for (const dir of scopeDirs) {
               const remaining = targetLimit - allFiles.length;
               if (remaining <= 0) break;
-              const scopedFiles = await collectFiles(resolve(ROOT, dir), remaining);
+              const fileOffset = allFiles.length;
+              const scopedFiles = await collectFiles(resolve(ROOT, dir), remaining, {
+                onProgress: (progress) => {
+                  emitScanProgress({
+                    scope,
+                    scopeDir: dir,
+                    currentDir: progress.currentDir,
+                    directoriesVisited: progress.directoriesVisited,
+                    filesFound: fileOffset + progress.filesFound,
+                    limit: indexFileLimit ?? null,
+                  });
+                },
+              });
               allFiles.push(...scopedFiles);
             }
 
@@ -646,7 +779,23 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
               throw new Error(`No indexable files found for scope ${scope}`);
             }
 
-            const chunks = await chunkFiles(allFiles, ROOT);
+            const emitChunkProgress = createProgressEmitter(emit, 'chunk_progress', 'ast_embed');
+            const chunks = await chunkFiles(allFiles, ROOT, {
+              onProgress: (progress) => {
+                emitChunkProgress({
+                  completed: progress.filesProcessed,
+                  total: progress.totalFiles,
+                  filesProcessed: progress.filesProcessed,
+                  totalFiles: progress.totalFiles,
+                  chunksGenerated: progress.chunksGenerated,
+                  chunksTotal: progress.chunksTotal,
+                  currentFile: progress.relativePath,
+                  skipped: progress.skipped,
+                  durationMs: progress.durationMs,
+                  error: progress.error ?? null,
+                });
+              },
+            });
             emit('chunk_done', {
               stage: 'chunk',
               filesProcessed: allFiles.length,
@@ -658,6 +807,30 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
             }
 
             let embedResult: Record<string, unknown> = {};
+            const emitEmbedProgress = createProgressEmitter(emit, 'embed_progress', 'ast_embed');
+            const indexProgress = {
+              onProgress: (progress: {
+                totalChunks: number;
+                chunksCompleted: number;
+                embeddingsGenerated: number;
+                storedInQdrant: number;
+                failed: number;
+                batchIndex: number;
+                batchSize: number;
+              }) => {
+                emitEmbedProgress({
+                  completed: progress.chunksCompleted,
+                  total: progress.totalChunks,
+                  chunksCompleted: progress.chunksCompleted,
+                  totalChunks: progress.totalChunks,
+                  embeddingsGenerated: progress.embeddingsGenerated,
+                  storedInQdrant: progress.storedInQdrant,
+                  failed: progress.failed,
+                  batchIndex: progress.batchIndex,
+                  batchSize: progress.batchSize,
+                });
+              },
+            };
             if (dryRun) {
               embedResult = {
                 dryRun: true,
@@ -670,10 +843,10 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
                 storedInQdrant: 0,
               };
             } else if (incremental && !recompute) {
-              const indexResult = await indexChunksIncremental(chunks);
+              const indexResult = await indexChunksIncremental(chunks, indexProgress);
               embedResult = { incremental: true, filesProcessed: allFiles.length, ...indexResult };
             } else {
-              const indexResult = await indexChunks(chunks);
+              const indexResult = await indexChunks(chunks, indexProgress);
               embedResult = { filesProcessed: allFiles.length, ...indexResult };
             }
             emit('embed_done', { stage: 'embed', ...embedResult });
@@ -1304,40 +1477,42 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const pgMirror = await getPgMirrorStatus();
 
 	return json({
-		endpoint: '/api/codebase-index/orchestrate',
-		description: 'Core codebase index pipeline — AST scan, dual embed, cluster assignment, cluster summaries, and GPU tag backfill, with heavier topology stages opt-in',
-		collection,
-		pgMirror,
-		tagCoverage,
-		cuda: isCudaAvailable(),
-		stages: ALL_STAGES,
-		params: {
-			mode: 'sync | async (default sync)',
-			scope: 'routes | lib | all (default all)',
-			incremental: 'boolean (default false)',
-			runIndexing: 'boolean (default true unless dryRun=true)',
-			indexFileLimit: 'optional max files for sync inline indexing',
-			clusterCount: 'number (2-100, default 20)',
-			clusterRange: 'range string, e.g. 0-5 or 0,2,4',
-			limit: 'per-cluster summarize limit (1-200, default 50)',
-			backfillLimit: 'GPU tag + SOM file limit (10-10000, default 2000)',
-			dryRun: 'boolean (default false)',
-			force: 'boolean (default false)',
-			gpuTag: 'boolean (default true)',
-			summarize: 'boolean (default true)',
-			forceRetag: 'boolean (default false)',
-			recompute: 'boolean (default false) — force full re-index even if data exists',
-			somTopology: 'boolean (default false) — optional GPU Kohonen SOM + Neo4j SIMILAR_TOPOLOGY edges',
-			neo4jSync: 'boolean (default false) — optional CodebaseFile + IMPORTS sync to Neo4j',
-			pageRank: 'boolean (default false) — optional CouchDB power-iteration PageRank',
-			exportWiki: 'boolean (default false) — generate Karpathy wiki notes per cluster',
-			hypergraph: 'boolean (default false) — build 4D SOM×cosine×GRPO hypergraph',
-			runId: 'string (auto-generated if omitted) — checkpoint ID for resume on disconnect',
-			resume: 'boolean (default false) — skip stages already cached under this runId (2h TTL)',
-		},
-		statusHint: {
-			byJobId: '/api/codebase-index/orchestrate?jobId=<job-id>',
-			byScope: '/api/codebase-index/orchestrate?scope=all',
-		},
-	});
+    endpoint: '/api/codebase-index/orchestrate',
+    description:
+      'Core codebase index pipeline — AST scan, dual embed, cluster assignment, cluster summaries, and GPU tag backfill, with heavier topology stages opt-in',
+    collection,
+    pgMirror,
+    tagCoverage,
+    cuda: isCudaAvailable(),
+    stages: ALL_STAGES,
+    params: {
+      mode: 'sync | async (default sync)',
+      scope: 'routes | lib | all | workspace (default all)',
+      incremental: 'boolean (default false)',
+      runIndexing: 'boolean (default true unless dryRun=true)',
+      indexFileLimit: 'optional max files for sync inline indexing',
+      clusterCount: 'number (2-100, default 20)',
+      clusterRange: 'range string, e.g. 0-5 or 0,2,4',
+      limit: 'per-cluster summarize limit (1-200, default 50)',
+      backfillLimit: 'GPU tag + SOM file limit (10-10000, default 2000)',
+      dryRun: 'boolean (default false)',
+      force: 'boolean (default false)',
+      gpuTag: 'boolean (default true)',
+      summarize: 'boolean (default true)',
+      forceRetag: 'boolean (default false)',
+      recompute: 'boolean (default false) — force full re-index even if data exists',
+      somTopology:
+        'boolean (default false) — optional GPU Kohonen SOM + Neo4j SIMILAR_TOPOLOGY edges',
+      neo4jSync: 'boolean (default false) — optional CodebaseFile + IMPORTS sync to Neo4j',
+      pageRank: 'boolean (default false) — optional CouchDB power-iteration PageRank',
+      exportWiki: 'boolean (default false) — generate Karpathy wiki notes per cluster',
+      hypergraph: 'boolean (default false) — build 4D SOM×cosine×GRPO hypergraph',
+      runId: 'string (auto-generated if omitted) — checkpoint ID for resume on disconnect',
+      resume: 'boolean (default false) — skip stages already cached under this runId (2h TTL)',
+    },
+    statusHint: {
+      byJobId: '/api/codebase-index/orchestrate?jobId=<job-id>',
+      byScope: '/api/codebase-index/orchestrate?scope=all',
+    },
+  });
 };

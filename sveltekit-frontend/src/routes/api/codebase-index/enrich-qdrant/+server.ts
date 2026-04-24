@@ -47,6 +47,9 @@ interface EnrichJob {
   pathGroupsUpdated?: number;
   pathGroupsSkipped?: number;
   pathPointsUpdated?: number;
+  chunkRowsQueried?: number;
+  chunkRowsUpdated?: number;
+  chunkRowsSkipped?: number;
   nodesQueried: number;
   qdrantUpdated: number;
   qdrantSkipped: number;
@@ -58,6 +61,25 @@ interface EnrichJob {
 }
 
 const jobs = new Map<string, EnrichJob>();
+
+interface ChunkRestoreRow {
+  qdrant_id: string;
+  relative_path: string;
+  symbol: string | null;
+  kind: string | null;
+  domain: string | null;
+  language: string | null;
+  extension: string | null;
+  line_start: number | null;
+  line_end: number | null;
+  content: string | null;
+  gpu_cluster: number | null;
+  som_cluster: number | null;
+  som_bmu_row: number | null;
+  som_bmu_col: number | null;
+  tags: unknown;
+  semantic_tags: string[] | null;
+}
 
 // ── POST — fire and forget ────────────────────────────────────────────────────
 
@@ -113,83 +135,112 @@ async function _runEnrichment(job: EnrichJob, batchSize: number): Promise<void> 
   const session = driver.session({ defaultAccessMode: 'READ' });
 
   try {
-    // 1. Restore file path payloads from the Postgres mirror.
-    //    This is the cheapest reliable source for live codebase chunk paths.
-    const pathResult = await pool.query<{
-      relative_path: string;
-      qdrant_ids: string[];
-    }>(
-      `SELECT relative_path,
-              array_agg(qdrant_id::text ORDER BY qdrant_id::text) AS qdrant_ids
+    const columnResult = await pool.query<{ column_name: string }>(
+      `SELECT column_name
+       FROM information_schema.columns
+       WHERE table_schema = 'public'
+         AND table_name = 'codebase_chunk_index'`
+    );
+    const availableColumns = new Set(columnResult.rows.map((row) => row.column_name));
+    const somBmuRowSelect = availableColumns.has('som_bmu_row')
+      ? 'som_bmu_row'
+      : 'NULL::integer AS som_bmu_row';
+    const somBmuColSelect = availableColumns.has('som_bmu_col')
+      ? 'som_bmu_col'
+      : 'NULL::integer AS som_bmu_col';
+
+    // 1. Restore chunk payloads from the Postgres mirror using merge semantics.
+    //    This repairs missing file_path metadata and can safely repopulate chunk-
+    //    level fields without clobbering the rest of each payload.
+    const chunkResult = await pool.query<ChunkRestoreRow>(
+      `SELECT qdrant_id,
+              relative_path,
+              symbol,
+              kind,
+              domain,
+              language,
+              extension,
+              line_start,
+              line_end,
+              content,
+              gpu_cluster,
+              som_cluster,
+              ${somBmuRowSelect},
+              ${somBmuColSelect},
+              tags,
+              semantic_tags
        FROM codebase_chunk_index
-       WHERE relative_path IS NOT NULL
+       WHERE qdrant_id IS NOT NULL
+         AND relative_path IS NOT NULL
          AND relative_path <> ''
-         AND relative_path <> '__unknown__'
-       GROUP BY relative_path`
+         AND relative_path <> '__unknown__'`
     );
 
-    job.pathGroupsQueried = pathResult.rows.length;
+    const restoredAt = new Date().toISOString();
+    const updatedPaths = new Set<string>();
+    job.pathGroupsQueried = new Set(chunkResult.rows.map((row) => row.relative_path)).size;
     job.pathGroupsUpdated = 0;
     job.pathGroupsSkipped = 0;
     job.pathPointsUpdated = 0;
+    job.chunkRowsQueried = chunkResult.rows.length;
+    job.chunkRowsUpdated = 0;
+    job.chunkRowsSkipped = 0;
 
     if (job.dryRun) {
-      job.pathGroupsSkipped = pathResult.rows.length;
+      job.pathGroupsSkipped = job.pathGroupsQueried;
+      job.chunkRowsSkipped = job.chunkRowsQueried;
     } else {
-      for (let i = 0; i < pathResult.rows.length; i += batchSize) {
-        const batch = pathResult.rows.slice(i, i + batchSize);
+      for (let i = 0; i < chunkResult.rows.length; i += batchSize) {
+        const batch = chunkResult.rows.slice(i, i + batchSize);
 
         await Promise.all(
-          batch.map(async ({ relative_path, qdrant_ids }) => {
-            const relativePath = String(relative_path ?? '').trim();
-            if (!relativePath || !Array.isArray(qdrant_ids) || qdrant_ids.length === 0) {
-              job.pathGroupsSkipped = (job.pathGroupsSkipped ?? 0) + 1;
-              return;
-            }
-
+          batch.map(async (row) => {
             try {
               const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
-                method: 'PUT',
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  points: qdrant_ids,
-                  payload: {
-                    file_path: relativePath,
-                    relativePath,
-                    extension: inferExtension(relativePath),
-                    pg_path_restored_at: new Date().toISOString(),
-                  },
+                  points: [row.qdrant_id],
+                  payload: buildChunkRestorePayload(row, restoredAt),
                 }),
                 signal: AbortSignal.timeout(15_000),
               });
 
               if (res.ok) {
-                job.pathGroupsUpdated = (job.pathGroupsUpdated ?? 0) + 1;
-                job.pathPointsUpdated = (job.pathPointsUpdated ?? 0) + qdrant_ids.length;
+                updatedPaths.add(row.relative_path);
+                job.chunkRowsUpdated = (job.chunkRowsUpdated ?? 0) + 1;
+                job.pathPointsUpdated = (job.pathPointsUpdated ?? 0) + 1;
               } else {
-                job.pathGroupsSkipped = (job.pathGroupsSkipped ?? 0) + 1;
+                job.chunkRowsSkipped = (job.chunkRowsSkipped ?? 0) + 1;
                 console.warn(
-                  `[enrich-qdrant] Path restore failed (${res.status}) for ${relativePath}`
+                  `[enrich-qdrant] Chunk restore failed (${res.status}) for ${row.qdrant_id}`
                 );
               }
             } catch (err) {
-              job.pathGroupsSkipped = (job.pathGroupsSkipped ?? 0) + 1;
-              console.warn(`[enrich-qdrant] Path restore error for ${relativePath}:`, err);
+              job.chunkRowsSkipped = (job.chunkRowsSkipped ?? 0) + 1;
+              console.warn(`[enrich-qdrant] Chunk restore error for ${row.qdrant_id}:`, err);
             }
           })
         );
 
         console.log(
-          `[enrich-qdrant] Path restore progress: ` +
-            `${Math.min(i + batchSize, pathResult.rows.length)}/${pathResult.rows.length} groups processed`
+          `[enrich-qdrant] Chunk restore progress: ` +
+            `${Math.min(i + batchSize, chunkResult.rows.length)}/${chunkResult.rows.length} rows processed`
         );
       }
     }
+
+    job.pathGroupsUpdated = updatedPaths.size;
+    job.pathGroupsSkipped = Math.max(0, (job.pathGroupsQueried ?? 0) - updatedPaths.size);
 
     const preIndexDefs = [
       { field_name: 'file_path', field_schema: { type: 'keyword', lookup: true } },
       { field_name: 'relativePath', field_schema: { type: 'keyword', lookup: true } },
       { field_name: 'extension', field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'kind', field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'domain', field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'som_bmu_row', field_schema: { type: 'integer', lookup: true, range: true } },
+      { field_name: 'som_bmu_col', field_schema: { type: 'integer', lookup: true, range: true } },
     ];
     for (const def of preIndexDefs) {
       fetch(`${QDRANT_URL}/collections/${COLLECTION}/index`, {
@@ -256,7 +307,7 @@ async function _runEnrichment(job: EnrichJob, batchSize: number): Promise<void> 
         idx >= 0
           ? norm.slice(idx + srcRoot.length)
           : norm.includes(fallbackRoot)
-            ? norm.slice(norm.indexOf(fallbackRoot) + fallbackRoot.length)
+            ? norm.slice(norm.indexOf(fallbackRoot))
             : fp;
 
       return {
@@ -407,4 +458,60 @@ function _strArr(v: unknown): string[] {
 function inferExtension(relativePath: string): string | null {
   const extension = extname(relativePath).trim();
   return extension || null;
+}
+
+function buildChunkRestorePayload(
+  row: ChunkRestoreRow,
+  restoredAt: string
+): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    file_path: row.relative_path,
+    relativePath: row.relative_path,
+    extension: row.extension ?? inferExtension(row.relative_path),
+    pg_payload_restored_at: restoredAt,
+  };
+
+  if (row.symbol) payload.symbol = row.symbol;
+  if (row.kind) payload.kind = row.kind;
+  if (row.domain) payload.domain = row.domain;
+  if (row.language) payload.language = row.language;
+  if (typeof row.line_start === 'number') payload.lineStart = row.line_start;
+  if (typeof row.line_end === 'number') payload.lineEnd = row.line_end;
+  if (typeof row.content === 'string' && row.content.length > 0) payload.content = row.content;
+  if (typeof row.gpu_cluster === 'number') payload.gpu_cluster = row.gpu_cluster;
+  if (typeof row.som_cluster === 'number') payload.som_cluster = row.som_cluster;
+  if (typeof row.som_bmu_row === 'number') payload.som_bmu_row = row.som_bmu_row;
+  if (typeof row.som_bmu_col === 'number') payload.som_bmu_col = row.som_bmu_col;
+
+  const tags = normalizeTags(row.tags, row.semantic_tags);
+  if (tags.length > 0) payload.tags = tags;
+
+  return payload;
+}
+
+function normalizeTags(tagsValue: unknown, semanticTags: string[] | null): string[] {
+  const merged = new Set<string>();
+
+  const addTag = (value: unknown) => {
+    const text = String(value ?? '').trim();
+    if (text) merged.add(text);
+  };
+
+  if (Array.isArray(tagsValue)) {
+    tagsValue.forEach(addTag);
+  } else if (typeof tagsValue === 'string' && tagsValue.trim()) {
+    try {
+      const parsed = JSON.parse(tagsValue) as unknown;
+      if (Array.isArray(parsed)) parsed.forEach(addTag);
+    } catch {
+      addTag(tagsValue);
+    }
+  } else if (tagsValue && typeof tagsValue === 'object') {
+    const maybeArray = (tagsValue as { tags?: unknown }).tags;
+    if (Array.isArray(maybeArray)) maybeArray.forEach(addTag);
+  }
+
+  if (Array.isArray(semanticTags)) semanticTags.forEach(addTag);
+
+  return [...merged];
 }

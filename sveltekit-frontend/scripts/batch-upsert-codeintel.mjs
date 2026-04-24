@@ -62,7 +62,7 @@ INSERT INTO codebase_chunk_index (
   $17, now(), now()
 )
 ON CONFLICT (qdrant_id) DO UPDATE SET
-  relative_path = EXCLUDED.relative_path,
+  relative_path = COALESCE(NULLIF(EXCLUDED.relative_path, ''), codebase_chunk_index.relative_path),
   symbol = EXCLUDED.symbol,
   kind = EXCLUDED.kind,
   domain = EXCLUDED.domain,
@@ -85,24 +85,31 @@ function extractParams(point) {
   const p = point.payload ?? {};
   const id = String(point.id);
 
-  // Derive language/extension from file_path
-  const filePath = p.file_path ?? p.relative_path ?? '';
+  // Derive language/extension from the full path fallback chain used by the mirror.
+  const filePath = p.file_path ?? p.relativePath ?? p.relative_path ?? p.path ?? '';
+  if (!filePath) return null;
+
   const ext = filePath.match(/(\.[^./]+)$/)?.[1] ?? null;
-  const lang = ext === '.ts' ? 'typescript'
-    : ext === '.js' ? 'javascript'
-    : ext === '.svelte' ? 'svelte'
-    : ext === '.mjs' ? 'javascript'
-    : ext === '.mts' ? 'typescript'
-    : null;
+  const lang =
+    ext === '.ts'
+      ? 'typescript'
+      : ext === '.js'
+        ? 'javascript'
+        : ext === '.svelte'
+          ? 'svelte'
+          : ext === '.mjs'
+            ? 'javascript'
+            : ext === '.mts'
+              ? 'typescript'
+              : null;
 
   // Tags: ensure array
   const rawTags = p.tags ?? [];
   const tags = Array.isArray(rawTags) ? rawTags : [rawTags];
 
   // Cluster summary: normalize to object
-  const clusterSummary = typeof p.cluster_summary === 'object' && p.cluster_summary
-    ? p.cluster_summary
-    : {};
+  const clusterSummary =
+    typeof p.cluster_summary === 'object' && p.cluster_summary ? p.cluster_summary : {};
 
   // Neo4j metadata
   const neoMeta = {};
@@ -112,9 +119,21 @@ function extractParams(point) {
 
   // Flexible metadata: everything not captured in typed columns
   const TYPED_KEYS = new Set([
-    'file_path', 'relative_path', 'content', 'symbol', 'kind', 'domain',
-    'extension', 'tags', 'gpu_cluster', 'som_cluster', 'page_rank_score',
-    'community_id', 'cluster_summary', 'line_start', 'line_end',
+    'file_path',
+    'relative_path',
+    'content',
+    'symbol',
+    'kind',
+    'domain',
+    'extension',
+    'tags',
+    'gpu_cluster',
+    'som_cluster',
+    'page_rank_score',
+    'community_id',
+    'cluster_summary',
+    'line_start',
+    'line_end',
   ]);
   const metadata = {};
   for (const [k, v] of Object.entries(p)) {
@@ -124,23 +143,23 @@ function extractParams(point) {
   }
 
   return [
-    id,                                           // $1 qdrant_id
-    filePath,                                     // $2 relative_path
-    p.symbol ?? null,                             // $3 symbol
-    p.kind ?? null,                               // $4 kind
-    p.domain ?? null,                             // $5 domain
-    lang,                                         // $6 language
-    ext,                                          // $7 extension
-    p.gpu_cluster ?? null,                        // $8 gpu_cluster
-    p.som_cluster ?? null,                        // $9 som_cluster
-    p.page_rank_score ?? null,                    // $10 page_rank_score
-    p.community_id ?? null,                       // $11 community_id
-    JSON.stringify(tags),                          // $12 tags (jsonb)
-    tags,                                          // $13 semantic_tags (text[])
-    JSON.stringify(clusterSummary),                // $14 cluster_summary
-    JSON.stringify(neoMeta),                       // $15 neo4j_meta
-    JSON.stringify(metadata),                      // $16 metadata
-    (p.content ?? '').slice(0, 50_000),            // $17 content (capped)
+    id, // $1 qdrant_id
+    filePath, // $2 relative_path
+    p.symbol ?? null, // $3 symbol
+    p.kind ?? null, // $4 kind
+    p.domain ?? null, // $5 domain
+    lang, // $6 language
+    ext, // $7 extension
+    p.gpu_cluster ?? null, // $8 gpu_cluster
+    p.som_cluster ?? null, // $9 som_cluster
+    p.page_rank_score ?? null, // $10 page_rank_score
+    p.community_id ?? null, // $11 community_id
+    JSON.stringify(tags), // $12 tags (jsonb)
+    tags, // $13 semantic_tags (text[])
+    JSON.stringify(clusterSummary), // $14 cluster_summary
+    JSON.stringify(neoMeta), // $15 neo4j_meta
+    JSON.stringify(metadata), // $16 metadata
+    (p.content ?? '').slice(0, 50_000), // $17 content (capped)
   ];
 }
 
@@ -165,6 +184,9 @@ async function main() {
       for (const point of points) {
         try {
           const params = extractParams(point);
+          if (!params) {
+            continue;
+          }
           if (!DRY_RUN) {
             await client.query(UPSERT_SQL, params);
           }

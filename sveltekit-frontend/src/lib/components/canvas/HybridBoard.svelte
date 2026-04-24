@@ -87,6 +87,7 @@
 
 	let rootEl = $state<HTMLDivElement | null>(null);
 	let canvasEl = $state<HTMLCanvasElement | null>(null);
+	let minimapEl = $state<HTMLCanvasElement | null>(null);
 
 	// State
 	const getInitialViewport = (): BoardViewport =>
@@ -116,6 +117,11 @@
 	// Connection drawing state
 	let connectionSourceId = $state<string | null>(null);
 	let connectionPreviewEnd = $state<Vec2 | null>(null);
+
+	// Marquee box-selection state (drag empty canvas to select multiple nodes)
+	let isMarqueeSelecting = $state(false);
+	let marqueeStart = $state<Vec2>({ x: 0, y: 0 });
+	let marqueeEnd = $state<Vec2>({ x: 0, y: 0 });
 
 	// Text editing overlay
 	let editing = $state<{ id: string; value: string; mode: 'title' | 'body' } | null>(null);
@@ -150,6 +156,147 @@
 		if (t === 'pdf' || t === 'application/pdf') return '\u{1F4D1}';
 		if (t.startsWith('image') || t === 'jpg' || t === 'png' || t === 'jpeg') return '\u{1F5BC}';
 		return '\u{1F4C4}';
+	}
+
+	function isAudioType(ft: string | undefined): boolean {
+		if (!ft) return false;
+		const t = ft.toLowerCase();
+		return t.startsWith('audio') || t === 'mp3' || t === 'wav' || t === 'ogg' || t === 'aac' || t === 'flac';
+	}
+
+	function isVideoType(ft: string | undefined): boolean {
+		if (!ft) return false;
+		const t = ft.toLowerCase();
+		return t.startsWith('video') || t === 'mp4' || t === 'mov' || t === 'avi' || t === 'webm';
+	}
+
+	function isImageType(ft: string | undefined): boolean {
+		if (!ft) return false;
+		const t = ft.toLowerCase();
+		return t.startsWith('image') || t === 'jpg' || t === 'jpeg' || t === 'png' || t === 'gif' || t === 'webp' || t === 'svg';
+	}
+
+	/** Draw a faux waveform visualization for audio nodes */
+	function drawAudioWaveform(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, inv: number, isPlaying: boolean) {
+		const barCount = Math.floor(w / (4 * inv));
+		const barWidth = 2 * inv;
+		const gap = (w - barCount * barWidth) / (barCount + 1);
+		const midY = y + h / 2;
+		const maxBarH = h * 0.7;
+
+		c.save();
+		for (let i = 0; i < barCount; i++) {
+			// Generate pseudo-random heights from a simple seed
+			const seed = Math.sin(i * 127.1 + 311.7) * 43758.5453;
+			const barH = (Math.abs(seed - Math.floor(seed)) * 0.6 + 0.2) * maxBarH;
+			const bx = x + gap + i * (barWidth + gap);
+
+			const gradient = c.createLinearGradient(bx, midY - barH / 2, bx, midY + barH / 2);
+			if (isPlaying) {
+				gradient.addColorStop(0, 'rgba(59, 130, 246, 0.9)');
+				gradient.addColorStop(1, 'rgba(147, 51, 234, 0.6)');
+			} else {
+				gradient.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
+				gradient.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
+			}
+			c.fillStyle = gradient;
+			c.fillRect(bx, midY - barH / 2, barWidth, barH);
+		}
+		c.restore();
+	}
+
+	/** Draw a play/pause button overlay for media nodes */
+	function drawPlayButton(c: CanvasRenderingContext2D, cx: number, cy: number, radius: number, inv: number, isPlaying: boolean) {
+		c.save();
+		// Circle background
+		c.beginPath();
+		c.arc(cx, cy, radius, 0, Math.PI * 2);
+		c.fillStyle = isPlaying ? 'rgba(59, 130, 246, 0.7)' : 'rgba(0, 0, 0, 0.5)';
+		c.fill();
+		c.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+		c.lineWidth = 1.5 * inv;
+		c.stroke();
+
+		// Play triangle or pause bars
+		c.fillStyle = 'rgba(255, 255, 255, 0.9)';
+		if (isPlaying) {
+			// Pause bars
+			const barW = radius * 0.25;
+			const barH = radius * 1.0;
+			c.fillRect(cx - barW * 1.5, cy - barH / 2, barW, barH);
+			c.fillRect(cx + barW * 0.5, cy - barH / 2, barW, barH);
+		} else {
+			// Play triangle
+			const triSize = radius * 0.65;
+			c.beginPath();
+			c.moveTo(cx - triSize * 0.35, cy - triSize);
+			c.lineTo(cx + triSize * 0.85, cy);
+			c.lineTo(cx - triSize * 0.35, cy + triSize);
+			c.closePath();
+			c.fill();
+		}
+		c.restore();
+	}
+
+	// ── Audio playback for board nodes ──
+	let activeAudioNodeId = $state<string | null>(null);
+	let audioEl: HTMLAudioElement | null = null;
+
+	function toggleAudioPlayback(nodeId: string, evidenceId?: string) {
+		if (activeAudioNodeId === nodeId) {
+			// Stop
+			audioEl?.pause();
+			audioEl = null;
+			activeAudioNodeId = null;
+			scheduleDraw();
+			return;
+		}
+		// Start new audio
+		if (audioEl) { audioEl.pause(); audioEl = null; }
+		if (!evidenceId) return;
+		audioEl = new Audio(`/api/evidence/${evidenceId}/download`);
+		audioEl.onended = () => { activeAudioNodeId = null; audioEl = null; scheduleDraw(); };
+		audioEl.play().catch(() => { activeAudioNodeId = null; audioEl = null; });
+		activeAudioNodeId = nodeId;
+		scheduleDraw();
+	}
+
+	// ── Drag-and-drop from external (evidence sidebar) ──
+	let isDragOver = $state(false);
+
+	function handleDragOver(e: DragEvent) {
+		if (readonly) return;
+		e.preventDefault();
+		if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+		isDragOver = true;
+	}
+
+	function handleDragLeave() {
+		isDragOver = false;
+	}
+
+	function handleDrop(e: DragEvent) {
+		if (readonly || !canvasEl) return;
+		e.preventDefault();
+		isDragOver = false;
+
+		const json = e.dataTransfer?.getData('application/json');
+		if (!json) return;
+
+		try {
+			const data = JSON.parse(json);
+			if (data.evidenceId && data.title) {
+				const rect = canvasEl.getBoundingClientRect();
+				const screen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+				const world = screenToWorld(screen);
+				addEvidenceNode(data.evidenceId, data.title, world.x - 140, world.y - 80, data.fileType);
+				if (data.thumbnailUrl) {
+					// Set thumbnail on the newly added node
+					const newNode = nodes[nodes.length - 1];
+					if (newNode) newNode.thumbnailUrl = data.thumbnailUrl;
+				}
+			}
+		} catch { /* invalid drop data */ }
 	}
 
 	// Coordinate transforms
@@ -290,6 +437,21 @@
 			}
 		}
 
+		// Marquee selection box
+		if (isMarqueeSelecting) {
+			const minX = Math.min(marqueeStart.x, marqueeEnd.x);
+			const maxX = Math.max(marqueeStart.x, marqueeEnd.x);
+			const minY = Math.min(marqueeStart.y, marqueeEnd.y);
+			const maxY = Math.max(marqueeStart.y, marqueeEnd.y);
+			ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+			ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
+			ctx.strokeStyle = 'rgba(59, 130, 246, 0.6)';
+			ctx.lineWidth = 1.5 * inv;
+			ctx.setLineDash([4 * inv, 3 * inv]);
+			ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+			ctx.setLineDash([]);
+		}
+
 		// Connection preview line (while drawing)
 		if (connectionSourceId && connectionPreviewEnd) {
 			const src = getNodeById(connectionSourceId);
@@ -343,19 +505,56 @@
 			ctx.font = `bold ${9 * inv}px system-ui`;
 			ctx.fillText(badgeLabel, n.x + 10 * inv, n.y + 16 * inv);
 
-			// Thumbnail
-			if (n.kind === 'evidence' && n.thumbnailUrl) {
-				const img = loadImage(n.thumbnailUrl);
-				if (img) {
-					const thumbH = n.h * 0.5, thumbW = n.w - 20 * inv;
-					const thumbX = n.x + 10 * inv, thumbY = n.y + n.h - thumbH - 8 * inv;
-					ctx.save();
+			// Media content area (thumbnail, waveform, or play button)
+			if (n.kind === 'evidence') {
+				const contentX = n.x + 10 * inv;
+				const contentY = n.y + 38 * inv;
+				const contentW = n.w - 20 * inv;
+				const contentH = n.h - 50 * inv;
+
+				if (isAudioType(n.fileType)) {
+					// Audio waveform visualization
+					const isPlaying = activeAudioNodeId === n.id;
+					drawAudioWaveform(ctx, contentX, contentY, contentW, contentH * 0.6, inv, isPlaying);
+					// Play button centered below waveform
+					drawPlayButton(ctx, n.x + n.w / 2, contentY + contentH * 0.8, 14 * inv, inv, isPlaying);
+				} else if (isVideoType(n.fileType)) {
+					// Video: dark preview area with play button
+					ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
 					ctx.beginPath();
-					if (typeof ctx.roundRect === 'function') ctx.roundRect(thumbX, thumbY, thumbW, thumbH, 6 * inv);
-					else ctx.rect(thumbX, thumbY, thumbW, thumbH);
-					ctx.clip();
-					ctx.drawImage(img, thumbX, thumbY, thumbW, thumbH);
-					ctx.restore();
+					if (typeof ctx.roundRect === 'function') ctx.roundRect(contentX, contentY, contentW, contentH, 6 * inv);
+					else ctx.rect(contentX, contentY, contentW, contentH);
+					ctx.fill();
+					if (n.thumbnailUrl) {
+						const img = loadImage(n.thumbnailUrl);
+						if (img) {
+							ctx.save();
+							ctx.beginPath();
+							if (typeof ctx.roundRect === 'function') ctx.roundRect(contentX, contentY, contentW, contentH, 6 * inv);
+							else ctx.rect(contentX, contentY, contentW, contentH);
+							ctx.clip();
+							// Aspect-ratio-preserving draw
+							const scale = Math.max(contentW / img.naturalWidth, contentH / img.naturalHeight);
+							const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+							ctx.drawImage(img, contentX + (contentW - dw) / 2, contentY + (contentH - dh) / 2, dw, dh);
+							ctx.restore();
+						}
+					}
+					drawPlayButton(ctx, n.x + n.w / 2, contentY + contentH / 2, 18 * inv, inv, false);
+				} else if (n.thumbnailUrl) {
+					// Image/PDF thumbnail with aspect-ratio-preserving draw
+					const img = loadImage(n.thumbnailUrl);
+					if (img) {
+						ctx.save();
+						ctx.beginPath();
+						if (typeof ctx.roundRect === 'function') ctx.roundRect(contentX, contentY, contentW, contentH, 6 * inv);
+						else ctx.rect(contentX, contentY, contentW, contentH);
+						ctx.clip();
+						const scale = Math.min(contentW / img.naturalWidth, contentH / img.naturalHeight);
+						const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+						ctx.drawImage(img, contentX + (contentW - dw) / 2, contentY + (contentH - dh) / 2, dw, dh);
+						ctx.restore();
+					}
 				}
 			}
 
@@ -385,7 +584,7 @@
 		ctx.restore();
 	}
 
-	$effect(() => { viewport; nodes; edges; selected; hoveredId; connectionSourceId; connectionPreviewEnd; scheduleDraw(); });
+	$effect(() => { viewport; nodes; edges; selected; hoveredId; connectionSourceId; connectionPreviewEnd; isMarqueeSelecting; marqueeEnd; scheduleDraw(); drawMinimap(); });
 	$effect(() => { nodes; edges; viewport; if (!readonly) setDirty(true); });
 
 	function selectedBounds(): { x: number; y: number; w: number; h: number } | null {
@@ -415,6 +614,7 @@
 	// Cursor derivation
 	let cursorStyle = $derived.by(() => {
 		if (isPanning || spaceDown) return 'grab';
+		if (isMarqueeSelecting) return 'crosshair';
 		if (activeTool === 'connection') return connectionSourceId ? 'crosshair' : 'cell';
 		if (activeTool === 'note') return 'cell';
 		if (activeTool === 'evidence') return 'copy';
@@ -465,6 +665,28 @@
 		}
 
 		if (hitId) {
+			// Check if clicking play button on audio/video node
+			const hitNode = getNodeById(hitId);
+			if (hitNode && hitNode.kind === 'evidence' && isAudioType(hitNode.fileType)) {
+				const contentY = hitNode.y + 38 / viewport.zoom;
+				const contentH = hitNode.h - 50 / viewport.zoom;
+				const btnCx = hitNode.x + hitNode.w / 2;
+				const btnCy = contentY + contentH * 0.8;
+				const btnR = 14 / viewport.zoom;
+				const dx = world.x - btnCx, dy = world.y - btnCy;
+				if (dx * dx + dy * dy <= btnR * btnR) {
+					toggleAudioPlayback(hitNode.id, hitNode.evidenceId);
+					return;
+				}
+			}
+
+			// Alt-drag from a node starts a quick connection (no tool switch needed)
+			if (e.altKey) {
+				connectionSourceId = hitId;
+				connectionPreviewEnd = world;
+				return;
+			}
+
 			if (e.shiftKey) {
 				const next = new Set(selected);
 				if (next.has(hitId)) next.delete(hitId); else next.add(hitId);
@@ -483,7 +705,14 @@
 		} else {
 			if (!e.shiftKey) selected = new Set();
 			onNodeSelect?.(null);
-			onCanvasClick?.(world);
+			// Start marquee selection on empty canvas with select tool
+			if (activeTool === 'select' && e.button === 0) {
+				isMarqueeSelecting = true;
+				marqueeStart = world;
+				marqueeEnd = world;
+			} else {
+				onCanvasClick?.(world);
+			}
 		}
 	}
 
@@ -492,9 +721,15 @@
 		const screen = getLocalScreen(e);
 		const world = screenToWorld(screen);
 
-		// Update connection preview
-		if (activeTool === 'connection' && connectionSourceId) {
+		// Update connection preview (connection tool OR alt-drag quick-connect)
+		if (connectionSourceId) {
 			connectionPreviewEnd = world;
+			return;
+		}
+
+		// Update marquee selection box
+		if (isMarqueeSelecting) {
+			marqueeEnd = world;
 			return;
 		}
 
@@ -522,6 +757,40 @@
 
 	function onPointerUp(e: PointerEvent) {
 		if (canvasEl) canvasEl.releasePointerCapture(e.pointerId);
+
+		// Alt-drag quick-connect: commit edge if released on a different node
+		// (only when NOT in connection tool — that flow uses click-to-click)
+		if (connectionSourceId && activeTool !== 'connection') {
+			const screen = getLocalScreen(e);
+			const world = screenToWorld(screen);
+			const targetId = hitTestNode(world);
+			if (targetId && targetId !== connectionSourceId) {
+				onConnectionCreated?.(connectionSourceId, targetId);
+			}
+			connectionSourceId = null;
+			connectionPreviewEnd = null;
+		}
+
+		// Commit marquee selection (find all nodes intersecting the box)
+		if (isMarqueeSelecting) {
+			const minX = Math.min(marqueeStart.x, marqueeEnd.x);
+			const maxX = Math.max(marqueeStart.x, marqueeEnd.x);
+			const minY = Math.min(marqueeStart.y, marqueeEnd.y);
+			const maxY = Math.max(marqueeStart.y, marqueeEnd.y);
+			// Only commit if box has meaningful size (avoid tiny accidental boxes)
+			if (Math.abs(maxX - minX) > 5 / viewport.zoom || Math.abs(maxY - minY) > 5 / viewport.zoom) {
+				const next = new Set(e.shiftKey ? selected : []);
+				for (const n of nodes) {
+					// Node intersects box if any corner overlaps
+					if (n.x + n.w >= minX && n.x <= maxX && n.y + n.h >= minY && n.y <= maxY) {
+						next.add(n.id);
+					}
+				}
+				selected = next;
+			}
+			isMarqueeSelecting = false;
+		}
+
 		isPanning = false;
 		isDraggingNode = false;
 		dragNodeIds = [];
@@ -668,6 +937,70 @@
 		};
 	}
 
+	function getNodeBounds(): { minX: number; minY: number; maxX: number; maxY: number } | null {
+		if (nodes.length === 0) return null;
+		let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+		for (const n of nodes) {
+			minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+			maxX = Math.max(maxX, n.x + n.w); maxY = Math.max(maxY, n.y + n.h);
+		}
+		return isFinite(minX) ? { minX, minY, maxX, maxY } : null;
+	}
+
+	function drawMinimap() {
+		if (!minimapEl || !canvasEl || nodes.length === 0) return;
+		const mc = minimapEl.getContext('2d');
+		if (!mc) return;
+		const mw = 160, mh = 100;
+		mc.clearRect(0, 0, mw, mh);
+
+		const bounds = getNodeBounds();
+		if (!bounds) return;
+		const pad = 40;
+		const bw = bounds.maxX - bounds.minX + pad * 2;
+		const bh = bounds.maxY - bounds.minY + pad * 2;
+		const scale = Math.min(mw / bw, mh / bh);
+		const offX = (mw - bw * scale) / 2;
+		const offY = (mh - bh * scale) / 2;
+
+		// Draw edges
+		mc.strokeStyle = 'rgba(255,255,255,0.15)';
+		mc.lineWidth = 0.5;
+		for (const e of edges) {
+			const a = getNodeById(e.fromId);
+			const b = getNodeById(e.toId);
+			if (!a || !b) continue;
+			mc.beginPath();
+			mc.moveTo(offX + (a.x + a.w / 2 - bounds.minX + pad) * scale, offY + (a.y + a.h / 2 - bounds.minY + pad) * scale);
+			mc.lineTo(offX + (b.x + b.w / 2 - bounds.minX + pad) * scale, offY + (b.y + b.h / 2 - bounds.minY + pad) * scale);
+			mc.stroke();
+		}
+
+		// Draw nodes
+		for (const n of nodes) {
+			const nx = offX + (n.x - bounds.minX + pad) * scale;
+			const ny = offY + (n.y - bounds.minY + pad) * scale;
+			const nw = Math.max(2, n.w * scale);
+			const nh = Math.max(2, n.h * scale);
+			mc.fillStyle = n.kind === 'evidence' ? 'rgba(59,130,246,0.6)' : n.kind === 'document' ? 'rgba(16,185,129,0.5)' : 'rgba(168,85,247,0.4)';
+			if (selected.has(n.id)) mc.fillStyle = 'rgba(255,255,255,0.7)';
+			mc.fillRect(nx, ny, nw, nh);
+		}
+
+		// Draw viewport rectangle
+		const cw = canvasEl.clientWidth;
+		const ch = canvasEl.clientHeight;
+		const vpWorldTL = screenToWorld({ x: 0, y: 0 });
+		const vpWorldBR = screenToWorld({ x: cw, y: ch });
+		const vx = offX + (vpWorldTL.x - bounds.minX + pad) * scale;
+		const vy = offY + (vpWorldTL.y - bounds.minY + pad) * scale;
+		const vw = (vpWorldBR.x - vpWorldTL.x) * scale;
+		const vh = (vpWorldBR.y - vpWorldTL.y) * scale;
+		mc.strokeStyle = 'rgba(255,255,255,0.5)';
+		mc.lineWidth = 1;
+		mc.strokeRect(vx, vy, vw, vh);
+	}
+
 	$effect(() => {
 		if (!canvasEl) return;
 		ctx = canvasEl.getContext('2d');
@@ -713,6 +1046,7 @@
 	<canvas
 		bind:this={canvasEl}
 		class="absolute inset-0 w-full h-full"
+		class:drag-over={isDragOver}
 		style:cursor={cursorStyle}
 		onpointerdown={onPointerDown}
 		onpointermove={onPointerMove}
@@ -720,6 +1054,9 @@
 		onpointercancel={onPointerUp}
 		oncontextmenu={handleContextMenu}
 		ondblclick={onDblClick}
+		ondragover={handleDragOver}
+		ondragleave={handleDragLeave}
+		ondrop={handleDrop}
 	></canvas>
 
 	<!-- DOM overlay -->
@@ -778,6 +1115,15 @@
 		{/if}
 	</div>
 
+	<!-- Drop zone overlay -->
+	{#if isDragOver}
+		<div class="absolute inset-0 pointer-events-none rounded-2xl border-2 border-dashed border-info/60 bg-info/5 z-10">
+			<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-info/70 text-sm font-mono">
+				Drop evidence here
+			</div>
+		</div>
+	{/if}
+
 	<!-- HUD -->
 	<div class="absolute left-3 bottom-3 pointer-events-none text-[10px] text-white/30 font-mono">
 		<div class="flex gap-4">
@@ -798,5 +1144,36 @@
 				</span>
 			{/each}
 		</div>
+	{/if}
+
+	<!-- Minimap -->
+	{#if nodes.length > 0}
+		<canvas
+			bind:this={minimapEl}
+			class="absolute top-3 right-3 rounded-lg border border-white/15 bg-black/60 backdrop-blur-sm"
+			width={160}
+			height={100}
+			style="width:160px;height:100px;pointer-events:auto;cursor:pointer;"
+			onclick={(e: MouseEvent) => {
+				if (!minimapEl || !canvasEl || nodes.length === 0) return;
+				const rect = minimapEl.getBoundingClientRect();
+				const mx = e.clientX - rect.left;
+				const my = e.clientY - rect.top;
+				// Convert minimap click to world coords and center viewport there
+				const bounds = getNodeBounds();
+				if (!bounds) return;
+				const pad = 40;
+				const bw = bounds.maxX - bounds.minX + pad * 2;
+				const bh = bounds.maxY - bounds.minY + pad * 2;
+				const scale = Math.min(160 / bw, 100 / bh);
+				const offX = (160 - bw * scale) / 2;
+				const offY = (100 - bh * scale) / 2;
+				const worldX = (mx - offX) / scale + bounds.minX - pad;
+				const worldY = (my - offY) / scale + bounds.minY - pad;
+				const cw = canvasEl.clientWidth;
+				const ch = canvasEl.clientHeight;
+				viewport = { ...viewport, pan: { x: -worldX + cw / (2 * viewport.zoom), y: -worldY + ch / (2 * viewport.zoom) } };
+			}}
+		></canvas>
 	{/if}
 </div>
