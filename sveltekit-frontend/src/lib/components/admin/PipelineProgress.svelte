@@ -132,10 +132,23 @@
 			return;
 		}
 
+		if (evt === 'chunk_progress') {
+			// Server-reported pct (files processed / total files). Map 0-100 → 40-70
+			// so the bar visibly advances through chunk phase between scan (≤40%)
+			// and embed (≥80%).
+			const pct = Number(payload.pct ?? 0);
+			updateStage('ast_embed', {
+				status: 'running',
+				progress: 40 + Math.min(30, Math.round(pct * 0.3)),
+				message: `chunking (${payload.filesProcessed ?? 0}/${payload.totalFiles ?? '?'}, ${payload.chunksTotal ?? 0} chunks)`
+			});
+			return;
+		}
+
 		if (evt === 'chunk_done') {
 			updateStage('ast_embed', {
 				status: 'running',
-				progress: 60,
+				progress: 75,
 				message: `chunked ${payload.chunksTotal ?? '?'} chunks`
 			});
 			return;
