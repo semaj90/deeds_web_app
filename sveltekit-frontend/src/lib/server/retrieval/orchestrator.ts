@@ -23,6 +23,7 @@ import { authorityChainExpansion, type EmbedFn } from './authority-chain.js';
 import { orderByDependency, extractCitationRefs } from './document-dag.js';
 import type { DAGDocument } from './document-dag.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
+import { rerankChunksGRPO, type RerankableChunk } from '$lib/server/retrieval/langextract-reranker.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { ENV } from '$lib/server/env.server.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
@@ -57,6 +58,8 @@ export interface RetrievalRequest {
 	skipCorrectiveRag?: boolean;
 	/** Skip authority chain drill-down */
 	skipAuthority?: boolean;
+	/** Skip LangExtract entity-aware GRPO reranking */
+	skipRerank?: boolean;
 	/** Qdrant filter to apply to case collections */
 	graphFilter?: Record<string, unknown>;
 	/** Timeout in ms for the entire retrieval */
@@ -335,6 +338,24 @@ export async function orchestrateRetrieval(req: RetrievalRequest): Promise<Retri
 		chunks = corrective.docs;
 		reformulated = corrective.reformulated;
 		timings.correctiveRag = Math.round(performance.now() - t3);
+	}
+
+	// 4.5. LangExtract entity-aware GRPO reranking (legal pipeline only)
+	if (!req.skipRerank && req.pipeline !== 'codebase' && chunks.length > 1) {
+		const t45 = performance.now();
+		try {
+			const rerankable: RerankableChunk[] = chunks.map((d) => ({
+				content: d.content,
+				score: d.similarity,
+				source: d.sourceId ?? d.documentId,
+			}));
+			const reranked = await rerankChunksGRPO(req.query, rerankable);
+			chunks = reranked.map((r, i) => ({
+				...chunks.find((c) => c.content === r.content) ?? chunks[i],
+				similarity: r.score,
+			}));
+		} catch { /* non-fatal — skip rerank */ }
+		timings.rerank = Math.round(performance.now() - t45);
 	}
 
 	// 5. DAG ordering (citation dependency sorting)
