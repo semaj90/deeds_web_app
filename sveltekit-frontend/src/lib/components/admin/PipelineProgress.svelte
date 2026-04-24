@@ -53,21 +53,52 @@
 	let passCount = $state(3);
 
 	// ── Live cache stats (passive fetch, non-blocking) ────────────────────
-	let cacheStats = $state<{ turbo: number; summary: number; research: number } | null>(null);
+	let cacheStats = $state<{
+		turbo: number;
+		summary: number;
+		research: number;
+		totalMB: number;
+	} | null>(null);
 
 	async function refreshCacheStats() {
+		// Two sources:
+		//   /api/cache/exact-match/stats — Redis memory totals (totalKeys, memoryUsedMB)
+		//   /api/cache/stats?pattern=X  — per-pattern key counts (if route exists)
+		// Fall back gracefully if the count endpoint is absent.
 		try {
-			const res = await fetch('/api/cache/exact-match/stats', { signal: AbortSignal.timeout(3000) });
-			if (!res.ok) return;
-			const data = (await res.json()) as Record<string, unknown>;
-			// Try multiple shapes (legacy vs new)
+			const summary = await fetch('/api/cache/exact-match/stats', {
+				signal: AbortSignal.timeout(3000)
+			})
+				.then((r) => (r.ok ? r.json() : null))
+				.catch(() => null);
+
+			const counts = await Promise.all([
+				countKeys('turbo:*'),
+				countKeys('summary:cluster:*'),
+				countKeys('research_bundle:*')
+			]);
+
 			cacheStats = {
-				turbo: Number(data.turboKeys ?? data.turbo ?? 0),
-				summary: Number(data.summaryKeys ?? data.summary ?? 0),
-				research: Number(data.researchKeys ?? data.research ?? 0)
+				turbo: counts[0],
+				summary: counts[1],
+				research: counts[2],
+				totalMB: Number(summary?.stats?.memoryUsedMB ?? 0)
 			};
 		} catch {
 			/* non-fatal */
+		}
+	}
+
+	async function countKeys(pattern: string): Promise<number> {
+		try {
+			const res = await fetch(`/api/cache/stats?pattern=${encodeURIComponent(pattern)}`, {
+				signal: AbortSignal.timeout(2000)
+			});
+			if (!res.ok) return 0;
+			const data = (await res.json()) as { count?: number; keys?: unknown[] };
+			return Number(data.count ?? data.keys?.length ?? 0);
+		} catch {
+			return 0;
 		}
 	}
 
@@ -501,6 +532,9 @@
 					<span>turbo:<span class="text-cyan-400">{cacheStats.turbo}</span></span>
 					<span>summary:<span class="text-cyan-400">{cacheStats.summary}</span></span>
 					<span>research:<span class="text-cyan-400">{cacheStats.research}</span></span>
+					{#if cacheStats.totalMB > 0}
+						<span>redis:<span class="text-cyan-400">{cacheStats.totalMB.toFixed(1)}MB</span></span>
+					{/if}
 				</div>
 			{:else}
 				<span class="text-slate-600">cache stats: click 🔄 Cache</span>

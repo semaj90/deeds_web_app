@@ -31,8 +31,43 @@ async function scanCount(redis: Redis, pattern: string): Promise<number> {
 	return count;
 }
 
-export const GET: RequestHandler = async ({ locals, request }) => {
+export const GET: RequestHandler = async ({ locals, request, url }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	// Pattern-count fast path — `?pattern=turbo:*` returns just { count, pattern }
+	// Allowed prefixes match the invalidation cascade so the admin pipeline panel
+	// can display live key counts without a full stats dump.
+	const patternParam = url.searchParams.get('pattern');
+	if (patternParam) {
+		const ALLOWED_COUNT_PREFIXES = [
+			'turbo:',
+			'summary:cluster:',
+			'research_bundle:',
+			'kb_bundle:',
+			'graph:case:',
+			'rag:search',
+			'llm:semantic:',
+			'template:',
+			'case:',
+			'evidence:',
+			'report:',
+			'user:'
+		];
+		if (!ALLOWED_COUNT_PREFIXES.some((p) => patternParam.startsWith(p))) {
+			return json({ error: 'Pattern prefix not allowed' }, { status: 400 });
+		}
+		try {
+			const redis = getRedis();
+			const count = await scanCount(redis, patternParam);
+			return json({ success: true, pattern: patternParam, count });
+		} catch (err) {
+			return json(
+				{ success: false, pattern: patternParam, count: 0, error: String(err) },
+				{ status: 200 } // degraded shape, same keys
+			);
+		}
+	}
+
 	try {
 		const redis: Redis = getRedis();
 
