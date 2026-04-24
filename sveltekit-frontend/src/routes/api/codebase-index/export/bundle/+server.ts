@@ -311,10 +311,14 @@ async function buildCacheStatsPart(
 			'wiki:*',
 			'embed:embeddinggemma:latest:*'
 		];
+		// Parallel SCAN — ioredis pipelines same-client commands so 6 concurrent
+		// scanKeys() calls finish in roughly the time of the slowest pattern
+		// instead of the sum. Safe because scanKeys itself serializes its own
+		// cursor loop; Promise.all just overlaps the 6 loops.
+		const keyLists = await Promise.all(patterns.map((p) => scanKeys(redis, p, 10_000)));
 		const counts: Record<string, number> = {};
-		for (const p of patterns) {
-			const keys = await scanKeys(redis, p, 10_000);
-			counts[p] = keys.length;
+		for (let i = 0; i < patterns.length; i++) {
+			counts[patterns[i]] = keyLists[i].length;
 		}
 		return counts;
 	} catch (err) {
