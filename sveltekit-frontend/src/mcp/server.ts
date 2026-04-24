@@ -1223,6 +1223,31 @@ export function setupToolHandlers() {
         },
       },
       {
+        name: 'codebase:export_bundle',
+        description:
+          'Return the unified codebase indexing export bundle: graph (nodes + edges), cluster summaries (purpose + patterns + warnings + embedding flag), Karpathy wiki feedback notes (playbook + cluster), 4D manifold coords, tile atlas stats, and live Redis cache key counts. Primary entry point for agentic tools that need the full state — far cheaper than calling 6 individual endpoints. Degrades per-part (meta.sources / meta.errors) so a failing backend never breaks the shape.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            include: {
+              type: 'string',
+              description:
+                "Comma-separated subset: 'graph,clusters,wikiNotes,manifold4,tileAtlas,cacheStats'. Omit for all parts.",
+            },
+            limit: {
+              type: 'number',
+              description: 'Cap graph.nodes and manifold4 rows (10-10000, default 2000)',
+              default: 2000,
+            },
+            repoId: {
+              type: 'string',
+              description: 'Repository ID for cluster_summaries filter',
+              default: 'default',
+            },
+          },
+        },
+      },
+      {
         name: 'codeintel.fix_recommend',
         description:
           'Given a TypeScript/SvelteKit compiler error or runtime exception, retrieves semantically similar codebase chunks from the 16,626-row enriched index, fetches the GPU cluster narrative, and calls Gemma4 to return 1-6 concrete fix recommendations with reference files. Use this for any error-fixing workflow targeting this codebase.',
@@ -3144,6 +3169,64 @@ export function setupToolHandlers() {
             { type: 'text', text: JSON.stringify({ chunk, error: chunk ? null : 'not found' }) },
           ],
         };
+      }
+
+      case 'codebase:export_bundle': {
+        const { include, limit, repoId } = args as {
+          include?: string;
+          limit?: number;
+          repoId?: string;
+        };
+        const baseUrl = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
+        const params = new URLSearchParams();
+        if (include) params.set('include', include);
+        if (typeof limit === 'number' && limit > 0) params.set('limit', String(limit));
+        if (repoId) params.set('repoId', repoId);
+        const qs = params.toString() ? `?${params.toString()}` : '';
+        try {
+          const res = await fetch(`${baseUrl}/api/codebase-index/export/bundle${qs}`, {
+            signal: AbortSignal.timeout(30_000),
+          });
+          if (!res.ok) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    error: `bundle endpoint returned HTTP ${res.status}`,
+                    graph: null,
+                    clusters: null,
+                    wikiNotes: null,
+                    manifold4: null,
+                    tileAtlas: null,
+                    cacheStats: null,
+                    meta: { sources: {}, errors: { fetch: `HTTP ${res.status}` } },
+                  }),
+                },
+              ],
+            };
+          }
+          const data = await res.text();
+          return { content: [{ type: 'text', text: data }] };
+        } catch (err) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  error: err instanceof Error ? err.message : String(err),
+                  graph: null,
+                  clusters: null,
+                  wikiNotes: null,
+                  manifold4: null,
+                  tileAtlas: null,
+                  cacheStats: null,
+                  meta: { sources: {}, errors: { fetch: 'request failed' } },
+                }),
+              },
+            ],
+          };
+        }
       }
 
       // ─────────────────────────────────────────────────────────────────────
