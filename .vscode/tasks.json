@@ -7185,7 +7185,7 @@
     {
       "label": "📊 Pipeline: Inspect TurboQuant KV Keys",
       "type": "shell",
-      "command": "docker exec deeds-redis-prod redis-cli --scan --pattern \"turbo:*\" | head -20",
+      "command": "docker exec legal-ai-redis redis-cli --scan --pattern \"turbo:*\" | head -20",
       "presentation": {
         "reveal": "always",
         "panel": "shared"
