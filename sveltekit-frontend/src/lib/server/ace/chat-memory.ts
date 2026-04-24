@@ -26,6 +26,10 @@ const EMBED_MODEL = 'embeddinggemma:latest';
 const SETTINGS_KEY = 'chat_memory:settings';
 const DEFAULT_SETTINGS = { enabled: true, scoreThreshold: 0.65 };
 
+/** Rolling metrics — admin page reads these for the observability panel.
+ *  Keys use HINCRBY/HINCRBYFLOAT so there's no read-modify-write race. */
+const METRICS_KEY = 'chat_memory:metrics';
+
 /** In-memory settings cache to avoid hitting Redis on every recall call.
  *  5-second TTL — admin toggles propagate within 5s, zero overhead in between. */
 let _settingsCache: { value: typeof DEFAULT_SETTINGS; fetchedAt: number } | null = null;
@@ -102,6 +106,7 @@ export async function recallPastChats(
   const limit = Math.min(opts.limit ?? 5, 20);
 
   const filter: Record<string, unknown> | undefined = buildFilter(opts);
+  const startedAt = Date.now();
 
   try {
     const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
@@ -118,7 +123,10 @@ export async function recallPastChats(
       signal: AbortSignal.timeout(2000),
     });
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      void recordMetrics({ calls: 1, hits: 0, totalScore: 0, latencyMs: Date.now() - startedAt, failures: 1 });
+      return [];
+    }
     const data = (await res.json()) as {
       result?: Array<{
         id: string | number;
@@ -132,7 +140,7 @@ export async function recallPastChats(
       }>;
     };
 
-    return (data.result ?? [])
+    const hits = (data.result ?? [])
       .filter((p) => p.payload?.content && p.payload?.sessionId)
       .map((p) => ({
         id: p.id,
@@ -142,8 +150,84 @@ export async function recallPastChats(
         timestamp: Number(p.payload!.timestamp ?? 0),
         score: p.score,
       }));
+
+    void recordMetrics({
+      calls: 1,
+      hits: hits.length,
+      totalScore: hits.reduce((s, h) => s + h.score, 0),
+      latencyMs: Date.now() - startedAt,
+      failures: 0,
+    });
+
+    return hits;
   } catch {
+    void recordMetrics({ calls: 1, hits: 0, totalScore: 0, latencyMs: Date.now() - startedAt, failures: 1 });
     return [];
+  }
+}
+
+/** Fire-and-forget rolling counters for the admin observability panel. */
+async function recordMetrics(m: {
+  calls: number;
+  hits: number;
+  totalScore: number;
+  latencyMs: number;
+  failures: number;
+}): Promise<void> {
+  try {
+    const redis = getRedis();
+    const pipeline = redis.pipeline();
+    pipeline.hincrby(METRICS_KEY, 'calls', m.calls);
+    pipeline.hincrby(METRICS_KEY, 'hits', m.hits);
+    pipeline.hincrby(METRICS_KEY, 'failures', m.failures);
+    pipeline.hincrby(METRICS_KEY, 'latencyMsTotal', m.latencyMs);
+    if (m.totalScore > 0) {
+      pipeline.hincrbyfloat(METRICS_KEY, 'scoreTotal', m.totalScore);
+    }
+    await pipeline.exec();
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** Admin-facing read of rolling metrics. Returns zeroes when no calls yet. */
+export async function readChatMemoryMetrics(): Promise<{
+  calls: number;
+  hits: number;
+  failures: number;
+  avgLatencyMs: number;
+  avgHitsPerCall: number;
+  avgScore: number;
+}> {
+  try {
+    const redis = getRedis();
+    const raw = await redis.hgetall(METRICS_KEY);
+    const calls = Number(raw.calls ?? 0);
+    const hits = Number(raw.hits ?? 0);
+    const failures = Number(raw.failures ?? 0);
+    const latencyMsTotal = Number(raw.latencyMsTotal ?? 0);
+    const scoreTotal = Number(raw.scoreTotal ?? 0);
+    return {
+      calls,
+      hits,
+      failures,
+      avgLatencyMs: calls > 0 ? Math.round(latencyMsTotal / calls) : 0,
+      avgHitsPerCall: calls > 0 ? Number((hits / calls).toFixed(2)) : 0,
+      avgScore: hits > 0 ? Number((scoreTotal / hits).toFixed(3)) : 0,
+    };
+  } catch {
+    return { calls: 0, hits: 0, failures: 0, avgLatencyMs: 0, avgHitsPerCall: 0, avgScore: 0 };
+  }
+}
+
+/** Reset metrics counters. Admin-facing. */
+export async function resetChatMemoryMetrics(): Promise<boolean> {
+  try {
+    const redis = getRedis();
+    await redis.del(METRICS_KEY);
+    return true;
+  } catch {
+    return false;
   }
 }
 

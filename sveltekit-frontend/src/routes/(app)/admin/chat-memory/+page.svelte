@@ -41,9 +41,19 @@
 		error?: string;
 	};
 
+	type Metrics = {
+		calls: number;
+		hits: number;
+		failures: number;
+		avgLatencyMs: number;
+		avgHitsPerCall: number;
+		avgScore: number;
+	};
+
 	type Settings = {
 		enabled: boolean;
 		scoreThreshold: number;
+		metrics?: Metrics;
 	};
 
 	type BackfillEvent =
@@ -58,6 +68,7 @@
 	let scoreThreshold = $state(0.5);
 	let limit = $state(10);
 	let excludeSession = $state('');
+	let showPromptPreview = $state(false);
 	let loading = $state(false);
 	let searchResult = $state<SearchResponse | null>(null);
 	let searchError = $state<string | null>(null);
@@ -184,6 +195,27 @@
 		void saveSettings({ scoreThreshold: v });
 	}
 
+	async function resetMetrics() {
+		if (settingsSaving) return;
+		settingsSaving = true;
+		try {
+			await fetch('/api/chat/memory/settings?target=metrics', { method: 'DELETE' });
+			await loadSettings();
+		} catch (e) {
+			settingsError = (e as Error).message;
+		} finally {
+			settingsSaving = false;
+		}
+	}
+
+	/** Auto-refresh metrics every 5s while page is visible. */
+	$effect(() => {
+		const id = setInterval(() => {
+			if (!document.hidden) void loadSettings();
+		}, 5000);
+		return () => clearInterval(id);
+	});
+
 	async function runBackfill() {
 		if (backfillRunning) return;
 		backfillRunning = true;
@@ -287,6 +319,22 @@
 				error: evt.data.message,
 			};
 		}
+	}
+
+	/**
+	 * Render hits in the exact format ACE's context-assembler.ts injects into
+	 * the LLM system prompt (see section 8b). Kept in sync with that renderer.
+	 */
+	function renderPromptSection(hits: RecalledHit[], tierCount = 4, charCap = 400): string {
+		if (!hits.length) return '(no recalled messages — ACE would skip this section)';
+		const body = hits
+			.slice(0, tierCount)
+			.map((m) => {
+				const truncated = m.content.length > charCap ? m.content.slice(0, charCap) + '…' : m.content;
+				return `[${m.score.toFixed(2)}] ${m.role}: ${truncated}`;
+			})
+			.join('\n');
+		return `## Recalled From Prior Sessions\n${body}`;
 	}
 
 	function formatTimestamp(ts: number): string {
@@ -403,6 +451,70 @@
 			{/if}
 		{/if}
 	</section>
+
+	<!-- Metrics -->
+	{#if settings?.metrics}
+		<section class="mb-6 rounded-lg border border-stone-700 bg-stone-900 p-4">
+			<div class="mb-3 flex items-center justify-between">
+				<h2 class="text-sm font-semibold uppercase tracking-wide text-stone-300">Recall Metrics</h2>
+				<div class="flex items-center gap-2">
+					<span class="text-xs text-stone-500">Auto-refresh 5s</span>
+					<button
+						onclick={resetMetrics}
+						disabled={settingsSaving}
+						class="rounded bg-stone-800 px-3 py-1 text-xs text-stone-200 hover:bg-stone-700 disabled:opacity-50"
+					>
+						Reset
+					</button>
+				</div>
+			</div>
+
+			<div class="grid grid-cols-2 gap-3 md:grid-cols-6">
+				<div>
+					<div class="text-xs uppercase text-stone-500">Calls</div>
+					<div class="font-mono text-lg text-stone-100">
+						{settings.metrics.calls.toLocaleString()}
+					</div>
+				</div>
+				<div>
+					<div class="text-xs uppercase text-stone-500">Hits</div>
+					<div class="font-mono text-lg text-emerald-400">
+						{settings.metrics.hits.toLocaleString()}
+					</div>
+				</div>
+				<div>
+					<div class="text-xs uppercase text-stone-500">Failures</div>
+					<div class="font-mono text-lg {settings.metrics.failures > 0 ? 'text-red-400' : 'text-stone-400'}">
+						{settings.metrics.failures.toLocaleString()}
+					</div>
+				</div>
+				<div>
+					<div class="text-xs uppercase text-stone-500">Hits/call</div>
+					<div class="font-mono text-lg text-stone-100">
+						{settings.metrics.avgHitsPerCall.toFixed(2)}
+					</div>
+				</div>
+				<div>
+					<div class="text-xs uppercase text-stone-500">Avg score</div>
+					<div class="font-mono text-lg {scoreColor(settings.metrics.avgScore)}">
+						{settings.metrics.avgScore > 0 ? settings.metrics.avgScore.toFixed(3) : '—'}
+					</div>
+				</div>
+				<div>
+					<div class="text-xs uppercase text-stone-500">Latency</div>
+					<div class="font-mono text-lg text-stone-100">
+						{settings.metrics.avgLatencyMs}ms
+					</div>
+				</div>
+			</div>
+
+			{#if settings.metrics.calls > 0 && settings.metrics.hits === 0}
+				<div class="mt-3 rounded border border-amber-900 bg-amber-950 p-2 text-xs text-amber-300">
+					{settings.metrics.calls} calls with zero hits — threshold may be too strict, or Qdrant is empty.
+				</div>
+			{/if}
+		</section>
+	{/if}
 
 	<!-- Collection Stats -->
 	<section class="mb-6 rounded-lg border border-stone-700 bg-stone-900 p-4">
@@ -660,9 +772,28 @@
 	<!-- Results -->
 	{#if searchResult && !searchResult.error}
 		<section class="rounded-lg border border-stone-700 bg-stone-900 p-4">
-			<h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-stone-300">
-				Results for <span class="font-mono text-stone-100">"{searchResult.query}"</span>
-			</h2>
+			<div class="mb-3 flex items-center justify-between">
+				<h2 class="text-sm font-semibold uppercase tracking-wide text-stone-300">
+					Results for <span class="font-mono text-stone-100">"{searchResult.query}"</span>
+				</h2>
+				<label class="flex cursor-pointer items-center gap-2 text-xs text-stone-300">
+					<input
+						type="checkbox"
+						bind:checked={showPromptPreview}
+						class="h-4 w-4 rounded border-stone-600 bg-stone-950 text-sky-600 focus:ring-sky-500"
+					/>
+					Show ACE prompt preview
+				</label>
+			</div>
+
+			{#if showPromptPreview}
+				<pre class="mb-3 whitespace-pre-wrap rounded border border-sky-900 bg-sky-950/30 p-3 font-mono text-xs text-sky-100">{renderPromptSection(searchResult.hits)}</pre>
+				<p class="mb-3 text-xs text-stone-500">
+					This is the exact string ACE injects into the LLM system prompt. Tier chars/count
+					defaults shown here; production tier applies <code>limits.chatMemoryCount</code> (2–6)
+					and <code>limits.chatMessageChars</code> (220–400).
+				</p>
+			{/if}
 
 			{#if searchResult.hits.length === 0}
 				<p class="text-sm text-stone-500">

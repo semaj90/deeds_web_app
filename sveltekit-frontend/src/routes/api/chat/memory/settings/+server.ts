@@ -20,8 +20,12 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
+import {
+	readChatMemoryMetrics,
+	resetChatMemoryMetrics,
+} from '$lib/server/ace/chat-memory.js';
 
-export const SETTINGS_KEY = 'chat_memory:settings';
+const SETTINGS_KEY = 'chat_memory:settings';
 const DEFAULTS = { enabled: true, scoreThreshold: 0.65 };
 
 const patchSchema = z.object({
@@ -33,8 +37,23 @@ export const GET: RequestHandler = async ({ locals }) => {
 	if (locals.user?.role !== 'admin') {
 		return json({ error: 'Forbidden' }, { status: 403 });
 	}
-	const settings = await readSettings();
-	return json(settings);
+	const [settings, metrics] = await Promise.all([
+		readSettings(),
+		readChatMemoryMetrics(),
+	]);
+	return json({ ...settings, metrics });
+};
+
+/** DELETE /api/chat/memory/settings?target=metrics — reset rolling counters. */
+export const DELETE: RequestHandler = async ({ url, locals }) => {
+	if (locals.user?.role !== 'admin') {
+		return json({ error: 'Forbidden' }, { status: 403 });
+	}
+	if (url.searchParams.get('target') !== 'metrics') {
+		return json({ error: 'Only target=metrics is supported' }, { status: 400 });
+	}
+	const ok = await resetChatMemoryMetrics();
+	return json({ ok });
 };
 
 export const PATCH: RequestHandler = async ({ request, locals }) => {
