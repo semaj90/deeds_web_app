@@ -495,6 +495,10 @@ type qdrantChunk struct {
 	Tags       []string
 	StartLine  int32
 	EndLine    int32
+	GPUCluster *int32
+	SomCluster *int32
+	BmuRow     *int32
+	BmuCol     *int32
 }
 
 type researchQdrantChunk struct {
@@ -743,6 +747,23 @@ func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
 		id = fmt.Sprintf("%s:%d", chunk.FilePath, chunk.ChunkIndex)
 	}
 
+	var clusterMetadata *pb.RetrievalClusterMetadata
+	if chunk.GPUCluster != nil || chunk.SomCluster != nil || chunk.BmuRow != nil || chunk.BmuCol != nil {
+		clusterMetadata = &pb.RetrievalClusterMetadata{}
+		if chunk.GPUCluster != nil {
+			clusterMetadata.GpuCluster = *chunk.GPUCluster
+		}
+		if chunk.SomCluster != nil {
+			clusterMetadata.SomCluster = *chunk.SomCluster
+		}
+		if chunk.BmuRow != nil {
+			clusterMetadata.BmuRow = *chunk.BmuRow
+		}
+		if chunk.BmuCol != nil {
+			clusterMetadata.BmuCol = *chunk.BmuCol
+		}
+	}
+
 	return &pb.SearchChunkResult{
 		Id:             id,
 		ChunkId:        id,
@@ -766,6 +787,7 @@ func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
 		FilePath:  chunk.FilePath,
 		StartLine: chunk.StartLine,
 		EndLine:   chunk.EndLine,
+		ClusterMetadata: clusterMetadata,
 	}
 }
 
@@ -881,6 +903,10 @@ func qdrantPointsToChunks(points []*qdrantclient.ScoredPoint, isCodebase bool) [
 			c.Tags       = qdrantStrSlice(payload, "tags")
 			c.StartLine  = qdrantInt32(payload, "start_line")
 			c.EndLine    = qdrantInt32(payload, "end_line")
+			c.GPUCluster = qdrantInt32Ptr(payload, "gpu_cluster")
+			c.SomCluster = qdrantInt32Ptr(payload, "som_cluster")
+			c.BmuRow     = qdrantInt32Ptr(payload, "som_bmu_row")
+			c.BmuCol     = qdrantInt32Ptr(payload, "som_bmu_col")
 		} else {
 			c.EvidenceID       = qdrantStr(payload, "evidence_id")
 			c.CaseID           = qdrantStr(payload, "case_id")
@@ -958,6 +984,12 @@ func (s *retrievalServer) qdrantSearchREST(ctx context.Context, collection, vect
 				c.HTTPMethod     = anyStr(p["httpMethod"])
 				c.ContentPreview = truncate(anyStr(p["content"]), 500)
 				c.Tags           = anyStrSlice(p["tags"])
+				c.StartLine      = anyInt32(p["start_line"])
+				c.EndLine        = anyInt32(p["end_line"])
+				c.GPUCluster     = anyInt32Ptr(p["gpu_cluster"])
+				c.SomCluster     = anyInt32Ptr(p["som_cluster"])
+				c.BmuRow         = anyInt32Ptr(p["som_bmu_row"])
+				c.BmuCol         = anyInt32Ptr(p["som_bmu_col"])
 			} else {
 				c.EvidenceID       = anyStr(p["evidence_id"])
 				c.ContentPreview   = anyStr(p["content_preview"])
@@ -973,6 +1005,88 @@ func (s *retrievalServer) qdrantSearchREST(ctx context.Context, collection, vect
 		}
 		chunks = append(chunks, c)
 	}
+	return chunks, nil
+}
+
+func (s *retrievalServer) qdrantTopologyContext(ctx context.Context, bmuRow, bmuCol, radius int32, limit int) ([]qdrantChunk, error) {
+	body := map[string]any{
+		"limit":        limit,
+		"with_payload": true,
+		"filter": map[string]any{
+			"must": []any{
+				map[string]any{
+					"key": "som_bmu_row",
+					"range": map[string]any{
+						"gte": bmuRow - radius,
+						"lte": bmuRow + radius,
+					},
+				},
+				map[string]any{
+					"key": "som_bmu_col",
+					"range": map[string]any{
+						"gte": bmuCol - radius,
+						"lte": bmuCol + radius,
+					},
+				},
+			},
+		},
+	}
+	b, _ := json.Marshal(body)
+	url := fmt.Sprintf("%s/collections/%s/points/scroll", s.cfg.QdrantURL, collectionCodebase)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("qdrant topology scroll: status %d", resp.StatusCode)
+	}
+
+	var result struct {
+		Result struct {
+			Points []struct {
+				ID      any            `json:"id"`
+				Payload map[string]any `json:"payload"`
+			} `json:"points"`
+		} `json:"result"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	chunks := make([]qdrantChunk, 0, len(result.Result.Points))
+	for _, point := range result.Result.Points {
+		chunk := qdrantChunk{}
+		switch v := point.ID.(type) {
+		case string:
+			chunk.ID = v
+		case float64:
+			chunk.ID = strconv.FormatFloat(v, 'f', 0, 64)
+		}
+		if p := point.Payload; p != nil {
+			chunk.FilePath = anyStr(p["file_path"])
+			chunk.Kind = anyStr(p["kind"])
+			chunk.HTTPMethod = anyStr(p["httpMethod"])
+			chunk.RouteID = anyStr(p["routeId"])
+			chunk.ContentPreview = truncate(anyStr(p["content"]), 500)
+			chunk.Tags = anyStrSlice(p["tags"])
+			chunk.StartLine = anyInt32(p["start_line"])
+			chunk.EndLine = anyInt32(p["end_line"])
+			chunk.GPUCluster = anyInt32Ptr(p["gpu_cluster"])
+			chunk.SomCluster = anyInt32Ptr(p["som_cluster"])
+			chunk.BmuRow = anyInt32Ptr(p["som_bmu_row"])
+			chunk.BmuCol = anyInt32Ptr(p["som_bmu_col"])
+		}
+		chunks = append(chunks, chunk)
+	}
+
 	return chunks, nil
 }
 
@@ -1820,39 +1934,23 @@ func (s *retrievalServer) GetTopologyContext(ctx context.Context, req *pb.Topolo
 		radius = 1
 	}
 
-	// Find chunks in the SOM neighborhood
-	rows, err := s.pool.Query(ctx, `
-		SELECT id, qdrant_id, relative_path, symbol, kind, line_start, line_end, content
-		FROM codebase_chunk_index
-		WHERE som_bmu_row BETWEEN $1 - $3 AND $1 + $3
-		  AND som_bmu_col BETWEEN $2 - $3 AND $2 + $3
-		LIMIT 20
-	`, req.BmuRow, req.BmuCol, radius)
+	chunks, err := s.qdrantTopologyContext(ctx, req.BmuRow, req.BmuCol, radius, 20)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	var neighbors []*pb.SearchChunkResult
-	for rows.Next() {
-		var id, qid, path, sym, kind, content string
-		var start, end int32
-		if err := rows.Scan(&id, &qid, &path, &sym, &kind, &start, &end, &content); err != nil {
-			continue
-		}
-		neighbors = append(neighbors, buildCodebaseSearchChunkResult(qdrantChunk{
-			ID:             id,
-			FilePath:       path,
-			Kind:           kind,
-			ContentPreview: truncate(content, 500),
-			StartLine:      start,
-			EndLine:        end,
-			Score:          0,
-		}))
+	neighbors := make([]*pb.SearchChunkResult, 0, len(chunks))
+	for _, chunk := range chunks {
+		neighbors = append(neighbors, buildCodebaseSearchChunkResult(chunk))
 	}
 
 	return &pb.TopologyResponse{
 		Neighbors: neighbors,
+		ClusterMetadata: &pb.RetrievalClusterMetadata{
+			ClusterType: "som",
+			BmuRow:      req.BmuRow,
+			BmuCol:      req.BmuCol,
+		},
 	}, nil
 }
 
@@ -2162,6 +2260,15 @@ func qdrantInt32(m map[string]*qdrantclient.Value, key string) int32 {
 	return 0
 }
 
+func qdrantInt32Ptr(m map[string]*qdrantclient.Value, key string) *int32 {
+	v, ok := m[key]
+	if !ok || v == nil {
+		return nil
+	}
+	value := qdrantInt32(m, key)
+	return &value
+}
+
 func qdrantStrSlice(m map[string]*qdrantclient.Value, key string) []string {
 	v, ok := m[key]
 	if !ok || v == nil {
@@ -2206,6 +2313,34 @@ func anyStrSlice(v any) []string {
 		return result
 	}
 	return nil
+}
+
+func anyInt32(v any) int32 {
+	if v == nil {
+		return 0
+	}
+	switch value := v.(type) {
+	case float64:
+		return int32(value)
+	case float32:
+		return int32(value)
+	case int:
+		return int32(value)
+	case int32:
+		return value
+	case int64:
+		return int32(value)
+	default:
+		return 0
+	}
+}
+
+func anyInt32Ptr(v any) *int32 {
+	if v == nil {
+		return nil
+	}
+	value := anyInt32(v)
+	return &value
 }
 
 func truncate(s string, max int) string {

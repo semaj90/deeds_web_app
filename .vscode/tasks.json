@@ -72,7 +72,38 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Start the Go retrieval gRPC service and the GPU/WebGPU-optimized frontend dev server with RETRIEVAL_GRPC_ENABLED=true"
+      "detail": "Start TurboQuant llama-server (gemma4-legal-vlm + mmproj VLM on :8090), Go retrieval gRPC (:50053), and the GPU-optimized frontend dev server (:5173)"
+    },
+    {
+      "label": "TurboQuant llama-server (VLM)",
+      "type": "shell",
+      "command": "npm run turbo:start",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "build",
+      "problemMatcher": {
+        "owner": "llama-server",
+        "pattern": {
+          "regexp": "^(.*)$",
+          "message": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "all slots are idle"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Start TurboQuant llama-server.exe with gemma4-legal-vlm GGUF + mmproj VLM on port 8090 (turbo3 KV cache, flash-attn, 99 GPU layers)"
     },
     {
       "label": "Svelte Check",
@@ -6031,13 +6062,13 @@
     {
       "label": "🧪 Runtime: Ensure dev:grpc Ready",
       "type": "shell",
-      "command": "$testPort = { param([int]$port) try { $client = [System.Net.Sockets.TcpClient]::new(); $iar = $client.BeginConnect('127.0.0.1', $port, $null, $null); if (-not $iar.AsyncWaitHandle.WaitOne(1000)) { $client.Dispose(); return $false }; $null = $client.EndConnect($iar); $client.Dispose(); return $true } catch { return $false } }; $frontendReady = & $testPort 5173; $grpcReady = & $testPort 50053; if ($frontendReady -and $grpcReady) { Write-Host 'dev:grpc already ready'; exit 0 }; if ($frontendReady) { Write-Host 'frontend ready, starting retrieval only'; npm run go:retrieval:run } else { npm run dev:grpc }",
+      "command": "$testPort = { param([int]$port) try { $client = [System.Net.Sockets.TcpClient]::new(); $iar = $client.BeginConnect('127.0.0.1', $port, $null, $null); if (-not $iar.AsyncWaitHandle.WaitOne(1000)) { $client.Dispose(); return $false }; $null = $client.EndConnect($iar); $client.Dispose(); return $true } catch { return $false } }; $frontendReady = & $testPort 5173; $grpcReady = & $testPort 50053; $turboReady = & $testPort 8090; if ($frontendReady -and $grpcReady -and $turboReady) { Write-Host 'dev:grpc already ready (frontend + retrieval + TurboQuant)'; exit 0 }; if ($frontendReady -and $grpcReady) { Write-Host 'frontend + retrieval ready, starting TurboQuant only'; npm run turbo:start } elseif ($frontendReady) { Write-Host 'frontend ready, starting retrieval + TurboQuant'; concurrently -n TurboQuant,Retrieval -c magenta,green 'npm run turbo:start' 'npm run go:retrieval:run' } else { npm run dev:grpc }",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
       "group": "test",
-      "detail": "Reuse localhost:5173 + retrieval gRPC on 50053 when already ready; start only go:retrieval:run if the frontend is already running; otherwise start npm run dev:grpc",
+      "detail": "Reuse localhost:5173 + retrieval gRPC on 50053 + TurboQuant on 8090 when already ready; start missing services individually; otherwise start full npm run dev:grpc",
       "problemMatcher": {
         "owner": "vite",
         "pattern": {

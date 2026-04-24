@@ -12,13 +12,19 @@
  * Always returns AceWikiResult — never throws.
  * Falls back gracefully at every stage.
  */
-import { assembleAceContext, type AceCodeIntelContext } from './codeintel-datastore.js';
+import {
+  assembleAceContext,
+  getChunkForAce,
+  type AceCodeIntelContext,
+} from './codeintel-datastore.js';
 import {
   buildGemma4AcePrompt,
   callGemma4WithAceContext,
   createEmptyGemmaStageTimings,
   type Gemma4StageTimings,
 } from './gemma4-codeintel.js';
+import { retrievalClient, type RetrievedCodebaseChunk } from '../grpc/retrieval-client.js';
+import { searchByCluster, type RankedChunk } from '../retrieval/codebase-context.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -61,6 +67,13 @@ export interface AceWikiStageTimings {
   totalMs: number;
   draft: Gemma4StageTimings;
   format: Gemma4StageTimings;
+}
+
+interface WikiToolPrefetchResult {
+  prompt: string;
+  toolCallsExecuted: number;
+  toolCallNames: string[];
+  toolCalls: Gemma4StageTimings['toolCalls'];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -165,6 +178,7 @@ function buildWikiDraftSystemPrompt(
   task: string
 ): string {
   const instruction = TASK_INSTRUCTION[task] ?? TASK_INSTRUCTION.explain;
+  const draftWordBudget = Math.min(maxWords, 420);
   return [
     contextPrompt,
     '',
@@ -183,15 +197,182 @@ function buildWikiDraftSystemPrompt(
     '<content>',
     'RELATED FILES: path1 | path2',
     'RELATED CLUSTERS: id1 | id2',
+    'Use 2 or 3 sections only. Keep each section concise and evidence-driven.',
+    `Keep the total body under ${draftWordBudget} words.`,
+  ].join('\n');
+}
+
+function buildWikiFormatterSystemPrompt(maxWords: number): string {
+  return [
+    'You are a JSON formatter for an internal code intelligence wiki pipeline.',
+    'Transform the provided draft notes into one valid JSON object only.',
+    'Do not add commentary, markdown fences, or any text before or after the JSON object.',
+    'Use exactly these keys: title, summary, sections, relatedFiles, relatedClusters.',
+    'Each section must be an object with heading and content keys.',
+    'Do not invent files or clusters that are missing from the draft notes.',
+    'If a field is missing in the draft, use an empty array or a concise fallback string.',
     `Keep the total body under ${maxWords} words.`,
   ].join('\n');
+}
+
+function formatPrefetchedChunk(chunk: RetrievedCodebaseChunk): string {
+  const meta = [chunk.filePath || chunk.chunkId, chunk.kind, chunk.routeId]
+    .filter(Boolean)
+    .join(' | ');
+  const location =
+    typeof chunk.bmuRow === 'number' && typeof chunk.bmuCol === 'number'
+      ? `BMU: (${chunk.bmuRow}, ${chunk.bmuCol})`
+      : null;
+  return [meta, location, chunk.contentPreview?.slice(0, 220) || null].filter(Boolean).join('\n');
+}
+
+function formatClusterPrefetchedChunk(chunk: RankedChunk): string {
+  const meta = [
+    chunk.relativePath || chunk.path || String(chunk.qdrantId ?? ''),
+    chunk.kind,
+    chunk.routeId,
+  ]
+    .filter(Boolean)
+    .join(' | ');
+  const location = typeof chunk.somCluster === 'number' ? `SOM cluster: ${chunk.somCluster}` : null;
+  return [meta, location, chunk.content?.slice(0, 220) || null].filter(Boolean).join('\n');
+}
+
+async function prefetchWikiToolEvidence(
+  query: string,
+  repoId: string
+): Promise<WikiToolPrefetchResult> {
+  const toolCallNames: string[] = [];
+  const toolCalls: Gemma4StageTimings['toolCalls'] = [];
+  const sections: string[] = [];
+
+  let searchResults: Awaited<ReturnType<typeof retrievalClient.searchChunks>> | null = null;
+  const searchStartedAt = Date.now();
+  try {
+    searchResults = await retrievalClient.searchChunks(query, 3);
+    toolCallNames.push('search_codebase');
+    toolCalls.push({
+      round: 1,
+      toolName: 'search_codebase',
+      durationMs: Date.now() - searchStartedAt,
+    });
+  } catch {
+    searchResults = null;
+  }
+
+  if (searchResults?.results?.length) {
+    sections.push(
+      [
+        '## PREFETCHED SEARCH RESULTS',
+        ...searchResults.results.slice(0, 3).map(formatPrefetchedChunk),
+      ].join('\n\n')
+    );
+  }
+
+  let anchor = searchResults?.results?.find(
+    (result) => typeof result.bmuRow === 'number' && typeof result.bmuCol === 'number'
+  );
+  let somClusterAnchor = searchResults?.results?.find(
+    (result) => typeof result.somCluster === 'number'
+  );
+
+  if ((!anchor || !somClusterAnchor) && searchResults?.results?.length) {
+    for (const result of searchResults.results.slice(0, 3)) {
+      const identifiers = [result.filePath, result.id, result.chunkId].filter(Boolean);
+
+      for (const identifier of identifiers) {
+        const { chunk } = await getChunkForAce(repoId, identifier);
+        if (
+          !anchor &&
+          typeof chunk?.somBmuRow === 'number' &&
+          typeof chunk?.somBmuCol === 'number'
+        ) {
+          anchor = {
+            ...result,
+            bmuRow: chunk.somBmuRow,
+            bmuCol: chunk.somBmuCol,
+          };
+        }
+
+        if (!somClusterAnchor && typeof chunk?.somCluster === 'number') {
+          somClusterAnchor = {
+            ...result,
+            somCluster: chunk.somCluster,
+          };
+        }
+
+        if (anchor && somClusterAnchor) {
+          break;
+        }
+      }
+
+      if (anchor && somClusterAnchor) {
+        break;
+      }
+    }
+  }
+
+  const recordTopologyCall = (durationMs: number) => {
+    if (!toolCallNames.includes('get_topology_context')) {
+      toolCallNames.push('get_topology_context');
+    }
+    toolCalls.push({
+      round: 1,
+      toolName: 'get_topology_context',
+      durationMs,
+    });
+  };
+
+  if (anchor && typeof anchor.bmuRow === 'number' && typeof anchor.bmuCol === 'number') {
+    const topologyStartedAt = Date.now();
+    try {
+      const topology = await retrievalClient.getTopologyContext(anchor.bmuRow, anchor.bmuCol, 1);
+      recordTopologyCall(Date.now() - topologyStartedAt);
+
+      if (topology.neighbors.length) {
+        sections.push(
+          [
+            `## PREFETCHED TOPOLOGY CONTEXT (${anchor.bmuRow}, ${anchor.bmuCol})`,
+            ...topology.neighbors.slice(0, 3).map(formatPrefetchedChunk),
+          ].join('\n\n')
+        );
+      }
+    } catch {
+      // Non-fatal: drafting can still proceed with search results only.
+    }
+  } else if (somClusterAnchor && typeof somClusterAnchor.somCluster === 'number') {
+    const topologyStartedAt = Date.now();
+    try {
+      const topology = await searchByCluster(query, somClusterAnchor.somCluster, 3);
+      recordTopologyCall(Date.now() - topologyStartedAt);
+
+      if (topology.length) {
+        sections.push(
+          [
+            `## PREFETCHED TOPOLOGY CONTEXT (SOM cluster ${somClusterAnchor.somCluster})`,
+            ...topology.slice(0, 3).map(formatClusterPrefetchedChunk),
+          ].join('\n\n')
+        );
+      }
+    } catch {
+      // Non-fatal: drafting can still proceed with search results only.
+    }
+  }
+
+  return {
+    prompt: sections.join('\n\n'),
+    toolCallsExecuted: toolCallNames.length,
+    toolCallNames,
+    toolCalls,
+  };
 }
 
 function buildWikiFormattingUserPrompt(query: string, maxWords: number, draftText: string): string {
   return [
     `Convert the draft wiki notes below into the required JSON article for "${query}".`,
     `Keep the total body under ${maxWords} words.`,
-    'Return ONLY valid JSON matching the required schema.',
+    'Return ONLY valid JSON matching this shape:',
+    '{"title":"...","summary":"...","sections":[{"heading":"...","content":"..."}],"relatedFiles":["src/..."],"relatedClusters":[0]}',
     '',
     'Draft notes:',
     draftText,
@@ -259,6 +440,76 @@ function parseWikiJson(raw: unknown): {
   };
 }
 
+function parseWikiDraftText(raw: string): {
+  title: string;
+  summary: string;
+  sections: AceWikiSection[];
+  relatedFiles: string[];
+  relatedClusters: number[];
+} | null {
+  const text = String(raw ?? '').trim();
+  if (!text) return null;
+
+  const titleMatch = text.match(/(?:^|\n)TITLE:\s*(.+)/i);
+  const summaryMatch = text.match(
+    /(?:^|\n)SUMMARY:\s*([\s\S]*?)(?=\nSECTION\s+\d+:|\nRELATED FILES:|\nRELATED CLUSTERS:|$)/i
+  );
+  const sectionMatches = [
+    ...text.matchAll(
+      /(?:^|\n)SECTION\s+\d+:\s*(.+)\n([\s\S]*?)(?=\nSECTION\s+\d+:|\nRELATED FILES:|\nRELATED CLUSTERS:|$)/gi
+    ),
+  ];
+  const filesMatch = text.match(/(?:^|\n)RELATED FILES:\s*(.+)/i);
+  const clustersMatch = text.match(/(?:^|\n)RELATED CLUSTERS:\s*(.+)/i);
+
+  const sections = sectionMatches
+    .map((match) => ({
+      heading: match[1]?.trim().slice(0, 100) ?? '',
+      content: match[2]?.trim().slice(0, 800) ?? '',
+    }))
+    .filter((section) => section.heading || section.content)
+    .slice(0, 5);
+
+  if (!titleMatch && !summaryMatch && sections.length === 0) return null;
+
+  const relatedFiles = filesMatch?.[1]
+    ? filesMatch[1]
+        .split('|')
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, 10)
+    : [];
+
+  const relatedClusters = clustersMatch?.[1]
+    ? clustersMatch[1]
+        .split('|')
+        .map((value) => Number(value.trim()))
+        .filter((value) => !Number.isNaN(value))
+        .slice(0, 10)
+    : [];
+
+  return {
+    title: titleMatch?.[1]?.trim().slice(0, 200) || 'Codebase Overview',
+    summary:
+      summaryMatch?.[1]?.trim().slice(0, 400) ||
+      sections[0]?.content.slice(0, 400) ||
+      'No summary available.',
+    sections,
+    relatedFiles,
+    relatedClusters,
+  };
+}
+
+function normalizeWikiTopicQuery(query: string): string {
+  const cleaned = query
+    .split(/(?<=[.!?])\s+/)
+    .filter((part) => !/search_codebase|get_topology_context/i.test(part))
+    .join(' ')
+    .trim();
+
+  return cleaned || query.trim();
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Main export
 // ─────────────────────────────────────────────────────────────────────────────
@@ -270,11 +521,12 @@ function parseWikiJson(raw: unknown): {
 export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResult> {
   const start = Date.now();
   const { query, repoId = 'default', clusterIds, maxWords = 600, task = 'explain' } = req;
+  const topicQuery = normalizeWikiTopicQuery(query);
   const collectedErrors: string[] = [];
   const assembleStartedAt = Date.now();
 
   // ── Stage 1: Assemble ACE context ───────────────────────────────────────
-  const ctx = await assembleAceContext(query, {
+  const ctx = await assembleAceContext(topicQuery, {
     repoId,
     clusterIds: clusterIds?.length ? clusterIds : undefined,
     limit: 6,
@@ -321,28 +573,54 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
   }
 
   // ── Stage 2: Build system prompt override ────────────────────────────────
+  const draftStartedAt = Date.now();
+  const prefetchedToolEvidence = req.useTools
+    ? await prefetchWikiToolEvidence(topicQuery, repoId)
+    : null;
   const baseContextPrompt = buildWikiContextPrompt(ctx);
+  const draftContextPrompt =
+    req.useTools && prefetchedToolEvidence?.prompt
+      ? [baseContextPrompt, prefetchedToolEvidence.prompt].filter(Boolean).join('\n\n')
+      : baseContextPrompt;
   const draftSystemPrompt = req.useTools
-    ? buildWikiDraftSystemPrompt(baseContextPrompt, query, maxWords, task)
-    : buildWikiSystemPrompt(baseContextPrompt, query, maxWords, task);
+    ? buildWikiDraftSystemPrompt(draftContextPrompt, topicQuery, maxWords, task)
+    : buildWikiSystemPrompt(baseContextPrompt, topicQuery, maxWords, task);
 
   // ── Stage 3: Call shared Gemma4 helper ───────────────────────────────────
   const userPrompt = req.useTools
-    ? `Draft a ${task} wiki article about: ${query}`
-    : `Generate a ${task} wiki article about: ${query}`;
+    ? `Draft a ${task} wiki article about: ${topicQuery}`
+    : `Generate a ${task} wiki article about: ${topicQuery}`;
 
-  const draftStartedAt = Date.now();
   const draftResult = await callGemma4WithAceContext(ctx, userPrompt, {
     temperature: 0.1,
-    maxTokens: req.useTools ? 700 : 900,
+    maxTokens: req.useTools ? 540 : 900,
     systemPromptOverride: draftSystemPrompt,
     responseSchema: req.useTools ? undefined : WIKI_RESPONSE_SCHEMA,
     lane: 'interactive-agent' as any, // Use Lane 1
     taskType: req.useTools ? 'wiki-generation-draft' : 'wiki-generation',
-    useTools: req.useTools,
   });
   const draftPassMs = Date.now() - draftStartedAt;
-  const draftStageTimings = draftResult.stageTimings ?? createEmptyGemmaStageTimings(draftPassMs);
+  const draftStageTimings = req.useTools
+    ? {
+        totalMs: draftPassMs,
+        assistantTurns: (draftResult.stageTimings?.assistantTurns?.length
+          ? draftResult.stageTimings.assistantTurns
+          : [{ round: 1, durationMs: draftResult.latencyMs, toolCalls: 0 }]
+        ).map((turn, index) =>
+          index === 0
+            ? { ...turn, toolCalls: prefetchedToolEvidence?.toolCallsExecuted ?? 0 }
+            : turn
+        ),
+        toolCalls: prefetchedToolEvidence?.toolCalls ?? [],
+        finalAssistantMs: draftResult.stageTimings?.finalAssistantMs ?? draftResult.latencyMs,
+      }
+    : (draftResult.stageTimings ?? createEmptyGemmaStageTimings(draftPassMs));
+  const wikiToolCallsExecuted = req.useTools
+    ? (prefetchedToolEvidence?.toolCallsExecuted ?? 0)
+    : draftResult.toolCallsExecuted;
+  const wikiToolCallNames = req.useTools
+    ? (prefetchedToolEvidence?.toolCallNames ?? [])
+    : draftResult.toolCallNames;
 
   if (!draftResult.ok) {
     collectedErrors.push('LLM unavailable — returning heuristic wiki from cluster summaries.');
@@ -357,8 +635,8 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
       degraded: true,
       errors: collectedErrors,
       latencyMs: Date.now() - start,
-      toolCallsExecuted: draftResult.toolCallsExecuted,
-      toolCallNames: draftResult.toolCallNames,
+      toolCallsExecuted: wikiToolCallsExecuted,
+      toolCallNames: wikiToolCallNames,
       stageTimings: buildWikiStageTimings({
         assembleContextMs,
         draftPassMs,
@@ -369,14 +647,16 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
     };
   }
 
-  const formatSystemPrompt = buildWikiSystemPrompt(baseContextPrompt, query, maxWords, task);
+  const formatSystemPrompt = req.useTools
+    ? buildWikiFormatterSystemPrompt(maxWords)
+    : buildWikiSystemPrompt(baseContextPrompt, topicQuery, maxWords, task);
   const finalResult = req.useTools
     ? await callGemma4WithAceContext(
         ctx,
-        buildWikiFormattingUserPrompt(query, maxWords, draftResult.text),
+        buildWikiFormattingUserPrompt(topicQuery, maxWords, draftResult.text),
         {
           temperature: 0.05,
-          maxTokens: 700,
+          maxTokens: 520,
           systemPromptOverride: formatSystemPrompt,
           responseSchema: WIKI_RESPONSE_SCHEMA,
           lane: 'interactive-agent' as any,
@@ -404,8 +684,8 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
       degraded: true,
       errors: collectedErrors,
       latencyMs: Date.now() - start,
-      toolCallsExecuted: draftResult.toolCallsExecuted,
-      toolCallNames: draftResult.toolCallNames,
+      toolCallsExecuted: wikiToolCallsExecuted,
+      toolCallNames: wikiToolCallNames,
       stageTimings: buildWikiStageTimings({
         assembleContextMs,
         draftPassMs,
@@ -420,6 +700,41 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
   // ── Stage 4: Parse JSON ──────────────────────────────────────────────────
   const parsed = parseWikiJson(finalResult.parsed ?? finalResult.text);
   if (!parsed) {
+    const recoveredFromDraft = req.useTools ? parseWikiDraftText(draftResult.text) : null;
+    if (recoveredFromDraft) {
+      collectedErrors.push(
+        'Recovered structured wiki from draft outline after formatter JSON parse failure.'
+      );
+      return {
+        ok: true,
+        query,
+        title: recoveredFromDraft.title,
+        summary: recoveredFromDraft.summary,
+        sections: recoveredFromDraft.sections.length
+          ? recoveredFromDraft.sections
+          : fallbackSections,
+        relatedFiles: recoveredFromDraft.relatedFiles.length
+          ? recoveredFromDraft.relatedFiles
+          : fallbackFiles,
+        relatedClusters: recoveredFromDraft.relatedClusters.length
+          ? recoveredFromDraft.relatedClusters
+          : fallbackClusters,
+        degraded: ctx.degraded,
+        errors: collectedErrors,
+        latencyMs: Date.now() - start,
+        toolCallsExecuted: wikiToolCallsExecuted,
+        toolCallNames: wikiToolCallNames,
+        stageTimings: buildWikiStageTimings({
+          assembleContextMs,
+          draftPassMs,
+          formatPassMs,
+          totalMs: Date.now() - start,
+          draft: draftStageTimings,
+          format: formatStageTimings,
+        }),
+      };
+    }
+
     collectedErrors.push('Wiki formatting response could not be parsed as structured wiki.');
     return {
       ok: false,
@@ -432,8 +747,8 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
       degraded: true,
       errors: collectedErrors,
       latencyMs: Date.now() - start,
-      toolCallsExecuted: draftResult.toolCallsExecuted,
-      toolCallNames: draftResult.toolCallNames,
+      toolCallsExecuted: wikiToolCallsExecuted,
+      toolCallNames: wikiToolCallNames,
       stageTimings: buildWikiStageTimings({
         assembleContextMs,
         draftPassMs,
@@ -452,8 +767,8 @@ export async function generateAceWiki(req: AceWikiRequest): Promise<AceWikiResul
     degraded: ctx.degraded,
     errors: collectedErrors,
     latencyMs: Date.now() - start,
-    toolCallsExecuted: draftResult.toolCallsExecuted,
-    toolCallNames: draftResult.toolCallNames,
+    toolCallsExecuted: wikiToolCallsExecuted,
+    toolCallNames: wikiToolCallNames,
     stageTimings: buildWikiStageTimings({
       assembleContextMs,
       draftPassMs,

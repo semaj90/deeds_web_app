@@ -59,6 +59,7 @@ import {
 } from '$lib/server/analytics/search-analytics.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -1579,6 +1580,18 @@ async function fetchRAGChunks(
       score: s.similarity,
       source: s.documentId,
     }));
+  }
+
+  // LangExtract + GRPO reranking: entity overlap + section relevance + retrieval fusion
+  // Non-fatal — falls back to retrieval-only scoring if LangExtract is unavailable
+  if (ragChunks.length > 0) {
+    try {
+      ragChunks = await rerankChunksGRPO(query, ragChunks, {
+        sectionTypes: sectionTypes,
+      });
+    } catch {
+      /* LangExtract unavailable — continue with existing scores */
+    }
   }
 
   return { ragChunks, kbChunks, caseChunks };

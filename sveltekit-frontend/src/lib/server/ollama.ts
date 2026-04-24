@@ -70,6 +70,10 @@ const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 const CHAT_MODEL = ENV.OLLAMA_CHAT_MODEL;
 const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '300000');
 
+export function getOllamaRequestTimeoutMs(): number {
+  return REQUEST_TIMEOUT_MS;
+}
+
 function parseTimeoutMs(value: unknown, fallback: number): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;

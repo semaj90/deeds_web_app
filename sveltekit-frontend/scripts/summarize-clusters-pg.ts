@@ -16,9 +16,10 @@ import pg from 'pg';
 import { createClient } from 'redis';
 import crypto from 'node:crypto';
 
-const OLLAMA_URL  = process.env.OLLAMA_URL ?? 'http://localhost:11434';
-const MODEL       = process.env.OLLAMA_MODEL ?? 'gemma4-legal-vlm:latest';
-const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
+const OLLAMA_URL      = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const TURBOQUANT_URL  = process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
+const MODEL           = process.env.OLLAMA_MODEL ?? 'gemma4-legal-vlm:latest';
+const EMBED_MODEL     = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const PG_URL      = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
 const REDIS_URL   = process.env.REDIS_URL ?? 'redis://localhost:6379';
 const FORCE       = process.argv.includes('--force');
@@ -99,6 +100,58 @@ async function callOllamaChat(systemPrompt: string, userPrompt: string): Promise
   if (!res.ok) throw new Error(`Ollama ${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = await res.json() as { message?: { content?: string } };
   return (data.message?.content ?? '').trim();
+}
+
+/**
+ * Try TurboQuant (llama-server :8090) first, fallback to Ollama.
+ * TurboQuant uses turbo3 KV cache compression — the system prompt KV state
+ * is computed once and reused across all clusters via cache_prompt: true.
+ */
+let turboAvailable: boolean | null = null; // cached after first probe
+
+async function callInferenceChat(systemPrompt: string, userPrompt: string): Promise<string> {
+  // Probe TurboQuant health once per run
+  if (turboAvailable === null) {
+    try {
+      const h = await fetch(`${TURBOQUANT_URL}/health`, { signal: AbortSignal.timeout(2_000) });
+      turboAvailable = h.ok;
+      if (turboAvailable) console.log(`  ✓ TurboQuant available at ${TURBOQUANT_URL}`);
+    } catch {
+      turboAvailable = false;
+      console.log(`  ⚠ TurboQuant not available, using Ollama`);
+    }
+  }
+
+  if (turboAvailable) {
+    try {
+      const res = await fetch(`${TURBOQUANT_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gemma4-legal',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.2,
+          max_tokens: 512,
+          stream: false,
+          cache_prompt: true,
+        }),
+        signal: AbortSignal.timeout(120_000),
+      });
+      if (res.ok) {
+        const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+        const content = data.choices?.[0]?.message?.content?.trim();
+        if (content) return content;
+      }
+    } catch {
+      // TurboQuant failed mid-run — mark unavailable and fallback
+      turboAvailable = false;
+    }
+  }
+
+  return callOllamaChat(systemPrompt, userPrompt);
 }
 
 async function embedText(text: string): Promise<number[] | null> {
@@ -271,7 +324,7 @@ async function processCluster(cluster: number): Promise<boolean> {
 
   // Generate summary (LLM) if not cached
   if (!result) {
-    const raw = await callOllamaChat(SYSTEM_PROMPT, buildUserPrompt(cluster, memberCount, chunks));
+    const raw = await callInferenceChat(SYSTEM_PROMPT, buildUserPrompt(cluster, memberCount, chunks));
     result = parseResult(raw);
     process.stdout.write(`summary OK → `);
 

@@ -17,6 +17,27 @@ import { retrievalClient } from '../grpc/retrieval-client.js';
 import { linkResearchBatchToSession } from '../ai/hypergraph-store.js';
 import { recordResearchHits } from '../research/lane4-feedback.js';
 
+/**
+ * Resolve 'default' repoId to the actual repo UUID from the database.
+ * Cached after first resolution. Falls back to 'default' if no repos exist.
+ */
+let _cachedDefaultRepoId: string | null = null;
+async function resolveRepoId(repoId: string): Promise<string> {
+  if (repoId !== 'default') return repoId;
+  if (_cachedDefaultRepoId) return _cachedDefaultRepoId;
+  try {
+    const rows = await db.execute(sql`
+      SELECT repo_id FROM codebase_chunk_index LIMIT 1
+    `);
+    const id = (rows.rows[0] as any)?.repo_id;
+    if (id) {
+      _cachedDefaultRepoId = String(id);
+      return _cachedDefaultRepoId;
+    }
+  } catch { /* non-fatal */ }
+  return repoId;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Canonical shapes
 // ─────────────────────────────────────────────────────────────────────────────
@@ -41,6 +62,9 @@ export interface AceChunkContext {
   semanticTags: string[];
   summary: string | null;
   gpuCluster: number | null;
+  somCluster?: number | null;
+  somBmuRow?: number | null;
+  somBmuCol?: number | null;
 }
 
 export interface AceResearchContext {
@@ -80,7 +104,7 @@ export async function getClusterSummariesForAce(opts: {
   clusterIds?: number[];
   limit?: number;
 }): Promise<{ summaries: AceClusterSummary[]; error?: string }> {
-  const repoId = opts.repoId ?? 'default';
+  const repoId = await resolveRepoId(opts.repoId ?? 'default');
   const limit = Math.min(opts.limit ?? 20, 50);
 
   try {
@@ -164,19 +188,28 @@ export async function getClusterSummaryForAce(
 }
 
 export async function getChunkForAce(
-  _repoId: string,
+  repoIdRaw: string,
   chunkIdOrPath: string
 ): Promise<{ chunk: AceChunkContext | null; error?: string }> {
   try {
-    // Try by qdrant_id first, then by relative_path
+    const repoId = await resolveRepoId(repoIdRaw);
+    const shouldFilterByRepoId =
+      typeof repoId === 'string' &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(repoId);
+
+    // Try by qdrant_id first, then by relative_path.
+    // repo_id filter is ANDed with BOTH branches to prevent cross-repo leakage.
     const rows = await db.execute(sql`
       SELECT qdrant_id, relative_path, kind, domain, language, extension,
              COALESCE(semantic_tags, '{}') AS semantic_tags,
              COALESCE(summary, '') AS summary,
-             gpu_cluster
+             gpu_cluster,
+             som_cluster,
+             som_bmu_row,
+             som_bmu_col
       FROM codebase_chunk_index
-      WHERE qdrant_id = ${chunkIdOrPath}
-         OR relative_path = ${chunkIdOrPath}
+      WHERE ${shouldFilterByRepoId ? sql`repo_id = ${repoId} AND` : sql`TRUE AND`}
+            (qdrant_id = ${chunkIdOrPath} OR relative_path = ${chunkIdOrPath})
       LIMIT 1
     `);
 
@@ -194,6 +227,9 @@ export async function getChunkForAce(
         semanticTags: Array.isArray(r.semantic_tags) ? r.semantic_tags : [],
         summary: r.summary || null,
         gpuCluster: r.gpu_cluster != null ? Number(r.gpu_cluster) : null,
+        somCluster: r.som_cluster != null ? Number(r.som_cluster) : null,
+        somBmuRow: r.som_bmu_row != null ? Number(r.som_bmu_row) : null,
+        somBmuCol: r.som_bmu_col != null ? Number(r.som_bmu_col) : null,
       },
     };
   } catch {
@@ -302,7 +338,7 @@ export async function assembleAceContext(
     sessionId?: string;
   } = {}
 ): Promise<AceCodeIntelContext> {
-  const repoId = opts.repoId ?? 'default';
+  const repoId = await resolveRepoId(opts.repoId ?? 'default');
   const errors: string[] = [];
   let degraded = false;
 

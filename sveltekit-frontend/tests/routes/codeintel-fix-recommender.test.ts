@@ -15,11 +15,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── hoisted mocks ─────────────────────────────────────────────────────────────
 
-const { mockDbExecute, mockSearchCodebase, mockFetch } = vi.hoisted(() => {
+const { mockDbExecute, mockSearchCodebase, mockFetch, mockRunGemma4Agent, mockRerankChunks } = vi.hoisted(() => {
   const mockDbExecute = vi.fn();
   const mockSearchCodebase = vi.fn();
   const mockFetch = vi.fn();
-  return { mockDbExecute, mockSearchCodebase, mockFetch };
+  const mockRunGemma4Agent = vi.fn();
+  const mockRerankChunks = vi.fn();
+  return { mockDbExecute, mockSearchCodebase, mockFetch, mockRunGemma4Agent, mockRerankChunks };
 });
 
 // ── module mocks ──────────────────────────────────────────────────────────────
@@ -41,6 +43,15 @@ vi.mock('$lib/server/env.server.js', () => ({
 
 vi.mock('$lib/server/indexer/dual-embedder.js', () => ({
   searchCodebase: mockSearchCodebase,
+}));
+
+vi.mock('$lib/server/ai/gemma4-agent.js', () => ({
+  runGemma4Agent: mockRunGemma4Agent,
+}));
+
+vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
+  rerankChunks: mockRerankChunks,
+  loadCodebaseContext: vi.fn().mockResolvedValue({ chunks: [], metadata: {} }),
 }));
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -132,6 +143,18 @@ describe('getFixRecommendations()', () => {
     vi.clearAllMocks();
     vi.stubGlobal('fetch', mockFetch);
     mockSearchCodebase.mockResolvedValue([makeSearchHit()]);
+    mockRerankChunks.mockResolvedValue({
+      results: [{
+        relativePath: 'src/types.ts',
+        content: 'export type Y = {}',
+        score: 0.85,
+        kind: 'type',
+        gpuCluster: 3,
+        tags: ['typescript', 'types'],
+      }],
+      clusterSummary: null,
+      topologyContext: null,
+    });
     mockDbExecute
       .mockResolvedValueOnce(CHUNK_ROWS)   // step 3: Postgres enrichment
       .mockResolvedValueOnce(CLUSTER_ROWS); // step 4: cluster summary
@@ -140,7 +163,7 @@ describe('getFixRecommendations()', () => {
   });
 
   it('returns stable shape on Gemma4 success', async () => {
-    mockFetch.mockReturnValue(makeOllamaOk(GEMMA_RECS_JSON));
+    mockRunGemma4Agent.mockResolvedValue({ answer: GEMMA_RECS_JSON, toolsUsed: [], rounds: 1, sources: [], durationMs: 100 });
     const result = await getFixRecommendations({ error: "Property 'X' does not exist on type 'Y'. ts(2339)" });
 
     for (const key of STABLE_KEYS) expect(result).toHaveProperty(key);
@@ -264,6 +287,13 @@ describe('POST /api/codeintel/fix', () => {
     vi.clearAllMocks();
     vi.stubGlobal('fetch', mockFetch);
     mockSearchCodebase.mockResolvedValue([makeSearchHit()]);
+    mockRerankChunks.mockResolvedValue({
+      results: [{
+        relativePath: 'src/types.ts', content: 'export type Y = {}',
+        score: 0.85, kind: 'type', gpuCluster: 3, tags: ['typescript', 'types'],
+      }],
+      clusterSummary: null, topologyContext: null,
+    });
     mockDbExecute
       .mockResolvedValueOnce(CHUNK_ROWS)
       .mockResolvedValueOnce(CLUSTER_ROWS);
@@ -300,7 +330,7 @@ describe('POST /api/codeintel/fix', () => {
   });
 
   it('returns stable shape on successful recommendation', async () => {
-    mockFetch.mockReturnValue(makeOllamaOk(GEMMA_RECS_JSON));
+    mockRunGemma4Agent.mockResolvedValue({ answer: GEMMA_RECS_JSON, toolsUsed: [], rounds: 1, sources: [], durationMs: 50 });
     const resp = await POST(makeEvent({
       error: "Property 'X' does not exist on type 'Y'. ts(2339)",
       filePath: 'src/routes/(app)/cases/+page.svelte',
@@ -372,6 +402,13 @@ describe('codeintel.fix_recommend MCP tool handler', () => {
     vi.clearAllMocks();
     vi.stubGlobal('fetch', mockFetch);
     mockSearchCodebase.mockResolvedValue([makeSearchHit()]);
+    mockRerankChunks.mockResolvedValue({
+      results: [{
+        relativePath: 'src/types.ts', content: 'export type Y = {}',
+        score: 0.85, kind: 'type', gpuCluster: 3, tags: ['typescript', 'types'],
+      }],
+      clusterSummary: null, topologyContext: null,
+    });
     mockDbExecute
       .mockResolvedValueOnce(CHUNK_ROWS)
       .mockResolvedValueOnce(CLUSTER_ROWS);
@@ -385,7 +422,7 @@ describe('codeintel.fix_recommend MCP tool handler', () => {
   });
 
   it('returns typed recommendations on success', async () => {
-    mockFetch.mockReturnValue(makeOllamaOk(GEMMA_RECS_JSON));
+    mockRunGemma4Agent.mockResolvedValue({ answer: GEMMA_RECS_JSON, toolsUsed: [], rounds: 1, sources: [], durationMs: 50 });
     const result = await callFixRecommend({
       error: "Property 'X' does not exist on type 'Y'. ts(2339)",
       filePath: 'src/routes/(app)/cases/+page.svelte',
@@ -424,7 +461,7 @@ describe('codeintel.fix_recommend MCP tool handler', () => {
   });
 
   it('includes diagnostics.clusterHit as number or null', async () => {
-    mockFetch.mockReturnValue(makeOllamaOk(GEMMA_RECS_JSON));
+    mockRunGemma4Agent.mockResolvedValue({ answer: GEMMA_RECS_JSON, toolsUsed: [], rounds: 1, sources: [], durationMs: 50 });
     const result = await callFixRecommend({ error: 'some error ts(1234)' });
     const parsed = JSON.parse(result.content[0].text);
 

@@ -469,6 +469,13 @@ export async function runDeepResearchIndex(
     `[deep-research] Complete — queries:${queriesRun} indexed:${pagesIndexed} inserted:${rowsInserted} updated:${rowsUpdated} failed:${pagesFailed} (${durationMs}ms)`
   );
 
+  // Invalidate TurboQuant prefix anchors that reference stale research summaries
+  if (pagesIndexed > 0) {
+    import('$lib/server/cache/invalidation.js')
+      .then((m) => m.invalidateResearchCaches())
+      .catch(() => {});
+  }
+
   return {
     queriesRun,
     pagesIndexed,

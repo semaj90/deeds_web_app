@@ -118,6 +118,50 @@ export async function setCachedDAG(
 }
 
 /**
+ * Purge ALL DAG cache documents from CouchDB (regardless of TTL).
+ * Used after codebase re-indexing to ensure stale orderings are cleared.
+ * Non-blocking, non-fatal — safe to call fire-and-forget.
+ */
+export async function purgeAllDAGCache(): Promise<{ deleted: number; error?: string }> {
+	try {
+		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const allDocs = await couchdb.allDocs(DAG_CACHE_DB, { include_docs: true }) as {
+			rows: Array<{ id: string; doc?: Record<string, unknown> & { _rev?: string } }>
+		};
+
+		const toDelete: Array<{ _id: string; _rev: string; _deleted: true }> = [];
+		for (const row of allDocs.rows) {
+			if (row.id.startsWith('_design/')) continue;
+			if (row.doc?._rev) {
+				toDelete.push({ _id: row.id, _rev: row.doc._rev, _deleted: true });
+			}
+		}
+
+		if (toDelete.length === 0) return { deleted: 0 };
+
+		const baseUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+		const auth = 'Basic ' + Buffer.from(
+			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
+		).toString('base64');
+
+		const res = await fetch(`${baseUrl}/${DAG_CACHE_DB}/_bulk_docs`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', Authorization: auth },
+			body: JSON.stringify({ docs: toDelete }),
+			signal: AbortSignal.timeout(10_000),
+		});
+
+		const deleted = res.ok ? toDelete.length : 0;
+		console.log(`[DAG Cache] Purge: deleted ${deleted} docs`);
+		return { deleted };
+	} catch (err) {
+		const msg = (err as Error)?.message ?? String(err);
+		console.warn('[DAG Cache] Purge failed (non-fatal):', msg);
+		return { deleted: 0, error: msg };
+	}
+}
+
+/**
  * Purge expired DAG cache documents from CouchDB.
  * Scans all docs, checks cachedAt + ttlMs, bulk-deletes expired ones.
  * Non-blocking, non-fatal — safe to call from boot tasks or scheduled interval.

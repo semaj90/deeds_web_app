@@ -13,10 +13,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── hoisted mocks ─────────────────────────────────────────────────────────────
 
-const { mockAssembleCtx, mockCallGemma4, mockGetHealth } = vi.hoisted(() => ({
-mockAssembleCtx: vi.fn(),
-mockCallGemma4: vi.fn(),
-mockGetHealth: vi.fn(),
+const {
+  mockAssembleCtx,
+  mockCallGemma4,
+  mockGetHealth,
+  mockSearchChunks,
+  mockGetTopologyContext,
+  mockGetChunkForAce,
+  mockSearchByCluster,
+} = vi.hoisted(() => ({
+  mockAssembleCtx: vi.fn(),
+  mockCallGemma4: vi.fn(),
+  mockGetHealth: vi.fn(),
+  mockSearchChunks: vi.fn(),
+  mockGetTopologyContext: vi.fn(),
+  mockGetChunkForAce: vi.fn(),
+  mockSearchByCluster: vi.fn(),
 }));
 
 const emptyGemmaStageTimings = (totalMs = 0) => ({
@@ -39,14 +51,26 @@ cb({ end: () => {} }),
 }));
 
 vi.mock('$lib/server/ace/codeintel-datastore.js', () => ({
-assembleAceContext: mockAssembleCtx,
-getCodeIntelHealthForAce: mockGetHealth,
+  assembleAceContext: mockAssembleCtx,
+  getCodeIntelHealthForAce: mockGetHealth,
+  getChunkForAce: mockGetChunkForAce,
 }));
 
 vi.mock('$lib/server/ace/gemma4-codeintel.js', () => ({
   buildGemma4AcePrompt: () => '## QUERY\ntest',
   callGemma4WithAceContext: mockCallGemma4,
   createEmptyGemmaStageTimings: emptyGemmaStageTimings,
+}));
+
+vi.mock('$lib/server/grpc/retrieval-client.js', () => ({
+  retrievalClient: {
+    searchChunks: mockSearchChunks,
+    getTopologyContext: mockGetTopologyContext,
+  },
+}));
+
+vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
+  searchByCluster: mockSearchByCluster,
 }));
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
@@ -166,6 +190,10 @@ let generateAceWiki: typeof import('$lib/server/ace/ace-wiki.js').generateAceWik
 
 beforeEach(async () => {
 vi.resetAllMocks();
+  mockSearchChunks.mockResolvedValue({ results: [], totalMs: 0 });
+  mockGetTopologyContext.mockResolvedValue({ neighbors: [] });
+  mockGetChunkForAce.mockResolvedValue({ chunk: null });
+  mockSearchByCluster.mockResolvedValue([]);
 ({ generateAceWiki } = await import('$lib/server/ace/ace-wiki.js'));
 });
 
@@ -239,6 +267,79 @@ expect(r.degraded).toBe(true);
 assertNoLeak(r);
 });
 
+it('recovers structured wiki from tool draft when formatter JSON parse fails', async () => {
+  mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
+  mockSearchChunks.mockResolvedValue({
+    results: [
+      {
+        id: 'r1',
+        chunkId: 'c1',
+        filePath: 'src/lib/auth.ts',
+        kind: 'function',
+        httpMethod: '',
+        routeId: '',
+        sourceMetadata: {},
+        tags: [],
+        contentPreview: 'JWT validation helper.',
+        score: 0.9,
+        startLine: 10,
+        endLine: 40,
+        bmuRow: 3,
+        bmuCol: 4,
+      },
+    ],
+    totalMs: 12,
+  });
+  mockGetTopologyContext.mockResolvedValue({
+    neighbors: [],
+    clusterMetadata: { bmuRow: 3, bmuCol: 4 },
+  });
+  mockCallGemma4.mockResolvedValueOnce({
+    ok: true,
+    text: 'TITLE: Auth Flow\nSUMMARY: JWT-based session handling.\nSECTION 1: Overview\nValidates JWT.\nSECTION 2: Risks\nGuard sensitive routes.\nRELATED FILES: src/lib/auth.ts | src/routes/+layout.server.ts\nRELATED CLUSTERS: 3 | 4',
+    parsed: undefined,
+    degraded: false,
+    latencyMs: 120,
+    model: 'gemma4',
+    toolCallsExecuted: 2,
+    toolCallNames: ['search_codebase', 'get_topology_context'],
+    stageTimings: {
+      totalMs: 120,
+      assistantTurns: [{ round: 1, durationMs: 120, toolCalls: 2 }],
+      toolCalls: [{ round: 1, toolName: 'search_codebase', durationMs: 12 }],
+      finalAssistantMs: 120,
+    },
+  });
+  mockCallGemma4.mockResolvedValueOnce({
+    ok: true,
+    text: 'not valid json',
+    parsed: undefined,
+    degraded: false,
+    latencyMs: 35,
+    model: 'gemma4',
+    toolCallsExecuted: 0,
+    toolCallNames: [],
+    stageTimings: {
+      totalMs: 35,
+      assistantTurns: [{ round: 1, durationMs: 35, toolCalls: 0 }],
+      toolCalls: [],
+      finalAssistantMs: 35,
+    },
+  });
+
+  const r = (await generateAceWiki({ query: 'auth flow', useTools: true })) as unknown as Record<
+    string,
+    unknown
+  >;
+  assertWikiShape(r, 'draft-recovery');
+  expect(r.ok).toBe(true);
+  expect(r.degraded).toBe(false);
+  expect(r.title).toBe('Auth Flow');
+  expect(r.toolCallsExecuted).toBe(2);
+  expect(r.toolCallNames).toEqual(['search_codebase', 'get_topology_context']);
+  expect((r.errors as string[])[0]).toMatch(/Recovered structured wiki from draft outline/i);
+});
+
 it('never leaks raw LLM error strings', async () => {
 mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
 mockCallGemma4.mockResolvedValue({
@@ -267,6 +368,9 @@ let POST: (evt: { request: Request; locals: Record<string, unknown> }) => Promis
 
 beforeEach(async () => {
 vi.resetAllMocks();
+  mockSearchChunks.mockResolvedValue({ results: [], totalMs: 0 });
+  mockGetTopologyContext.mockResolvedValue({ neighbors: [] });
+  mockGetChunkForAce.mockResolvedValue({ chunk: null });
 ({ POST } = await import('../../src/routes/api/codeintel/wiki/+server.js') as unknown as typeof import('../../src/routes/api/codeintel/wiki/+server.js'));
 });
 
@@ -345,6 +449,31 @@ assertNoLeak(body);
 
 it('200 — accepts useTools and returns tool telemetry', async () => {
   mockAssembleCtx.mockResolvedValue(HEALTHY_CTX);
+  mockSearchChunks.mockResolvedValue({
+    results: [
+      {
+        id: 'r1',
+        chunkId: 'c1',
+        filePath: 'src/lib/auth.ts',
+        kind: 'function',
+        httpMethod: '',
+        routeId: '',
+        sourceMetadata: {},
+        tags: [],
+        contentPreview: 'JWT validation helper.',
+        score: 0.9,
+        startLine: 10,
+        endLine: 40,
+        bmuRow: 3,
+        bmuCol: 4,
+      },
+    ],
+    totalMs: 12,
+  });
+  mockGetTopologyContext.mockResolvedValue({
+    neighbors: [],
+    clusterMetadata: { bmuRow: 3, bmuCol: 4 },
+  });
   mockCallGemma4.mockResolvedValueOnce({
     ok: true,
     text: 'TITLE: Auth Flow\nSUMMARY: JWT-based session handling.\nSECTION 1: Overview\nValidates JWT.\nRELATED FILES: src/lib/auth.ts\nRELATED CLUSTERS: 3',
@@ -394,8 +523,9 @@ it('200 — accepts useTools and returns tool telemetry', async () => {
   expect(body.toolCallsExecuted).toBe(2);
   expect(body.toolCallNames).toEqual(['search_codebase', 'get_topology_context']);
   expect(mockCallGemma4).toHaveBeenCalledTimes(2);
+  expect(mockSearchChunks).toHaveBeenCalledWith('auth flow', 3);
+  expect(mockGetTopologyContext).toHaveBeenCalledWith(3, 4, 1);
   expect(mockCallGemma4.mock.calls[0]?.[2]).toMatchObject({
-    useTools: true,
     taskType: 'wiki-generation-draft',
   });
   expect(mockCallGemma4.mock.calls[1]?.[2]).toMatchObject({
@@ -405,7 +535,8 @@ it('200 — accepts useTools and returns tool telemetry', async () => {
   const timings = body.stageTimings as Record<string, unknown>;
   expect(typeof timings.draftPassMs).toBe('number');
   expect(typeof timings.formatPassMs).toBe('number');
-  expect((timings.draft as Record<string, unknown>).totalMs).toBe(120);
+  expect(Array.isArray((timings.draft as Record<string, unknown>).toolCalls)).toBe(true);
+  expect(((timings.draft as Record<string, unknown>).toolCalls as unknown[]).length).toBe(2);
   expect((timings.format as Record<string, unknown>).totalMs).toBe(35);
 });
 

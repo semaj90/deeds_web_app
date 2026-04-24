@@ -130,36 +130,58 @@ async function updateQdrantSomClusters(
 
 	for (let i = 0; i < files.length; i += BATCH) {
 		const batch = files.slice(i, i + BATCH);
-		const points = batch.map((f, j) => {
-			const bmuIdx = bmuAssignments[i + j];
-			const gridW = opts?.gridW ?? 10; // Fallback to 10 if not provided
-			return {
-				id: f.pointId,
-				payload: {
-					som_cluster: bmuIdx,
-					som_bmu_row: Math.floor(bmuIdx / gridW),
-					som_bmu_col: bmuIdx % gridW,
-				},
-			};
-		});
+		const payloadGroups = new Map<
+      string,
+      { ids: Array<number | string>; payload: Record<string, number> }
+    >();
+    for (let j = 0; j < batch.length; j++) {
+      const f = batch[j];
+      const bmuIdx = bmuAssignments[i + j];
+      const gridW = opts?.gridW ?? 10; // Fallback to 10 if not provided
+      const payload = {
+        som_cluster: bmuIdx,
+        som_bmu_row: Math.floor(bmuIdx / gridW),
+        som_bmu_col: bmuIdx % gridW,
+      };
+      const key = `${payload.som_cluster}:${payload.som_bmu_row}:${payload.som_bmu_col}`;
+      const existing = payloadGroups.get(key);
+      if (existing) {
+        existing.ids.push(f.pointId);
+      } else {
+        payloadGroups.set(key, { ids: [f.pointId], payload });
+      }
+    }
 
 		try {
-			const res = await fetch(
-				`${qdrantUrl}/collections/${COLLECTION}/points/payload`,
-				{
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ points }),
-					signal: AbortSignal.timeout(15_000),
-				}
-			);
-			if (!res.ok) {
-				console.warn(`[som-topology] Qdrant payload update batch ${i} failed: ${res.status}`);
-			}
+			await Promise.all(
+        [...payloadGroups.values()].map(async ({ ids, payload }) => {
+          const res = await fetch(`${qdrantUrl}/collections/${COLLECTION}/points/payload`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ points: ids, payload }),
+            signal: AbortSignal.timeout(15_000),
+          });
+          if (!res.ok) {
+            console.warn(`[som-topology] Qdrant payload update batch ${i} failed: ${res.status}`);
+          }
+        })
+      );
 		} catch (err) {
 			console.warn(`[som-topology] Qdrant payload update batch ${i} error:`, err);
 		}
 	}
+
+	const indexDefs = [
+    { field_name: 'som_bmu_row', field_schema: { type: 'integer', lookup: true, range: true } },
+    { field_name: 'som_bmu_col', field_schema: { type: 'integer', lookup: true, range: true } },
+  ];
+  for (const def of indexDefs) {
+    fetch(`${qdrantUrl}/collections/${COLLECTION}/index`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(def),
+    }).catch(() => {});
+  }
 }
 
 // ── Neo4j edge creation ────────────────────────────────────────────────────────
@@ -360,7 +382,7 @@ export async function runSOMTopologyPipeline(opts?: {
   await updateQdrantSomClusters(files, bmu, { gridW }).catch((err) => {
     console.warn('[som-topology] Qdrant payload update failed (non-fatal):', err);
   });
-  
+
   // 5b. Mirror som_cluster + coordinates back to Postgres codebase_chunk_index
   await updatePostgresSomClusters(files, bmu, { gridW }).catch((err) => {
     console.warn('[som-topology] Postgres som_cluster mirror failed (non-fatal):', err);

@@ -749,6 +749,11 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
               (clusterComplete as Record<string, unknown>) ?? {},
               stageTimings.cluster_assign
             );
+
+            // Invalidate downstream caches after cluster boundaries changed
+            import('$lib/server/cache/invalidation.js')
+              .then((m) => m.invalidateIndexingCaches(locals.user?.id))
+              .catch(() => {});
           }
         }
 
@@ -942,6 +947,20 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
             stageTimings.summarize = Date.now() - stageStart;
             completedStages.push('summarize');
             void cacheStage(runId, 'summarize', resultData, stageTimings.summarize);
+
+            // Invalidate TurboQuant prefix anchors (embed cluster summaries)
+            import('$lib/server/cache/invalidation.js')
+              .then((m) => m.invalidateResearchCaches(locals.user?.id))
+              .catch(() => {});
+
+            // Fire-and-forget: build error playbooks from context_timeline
+            import('$lib/server/indexer/karpathy-wiki.js')
+              .then((m) => {
+                for (const domain of ['ace', 'rag', 'indexer']) {
+                  void m.buildPlaybookNote(`indexing errors in ${domain}`, domain);
+                }
+              })
+              .catch(() => {});
           }
         } else {
           emit('stage', {
@@ -1145,6 +1164,28 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
               stageTimings.deep_research = Date.now() - stageStart;
               completedStages.push('deep_research');
               void cacheStage(runId, 'deep_research', resultData, stageTimings.deep_research);
+
+              // Invalidate caches that reference stale research summaries
+              import('$lib/server/cache/invalidation.js')
+                .then((m) => m.invalidateResearchCaches(locals.user?.id))
+                .catch(() => {});
+
+              // Persist deep research findings as durable Karpathy wiki note
+              import('$lib/server/indexer/karpathy-wiki.js')
+                .then((m) =>
+                  m.recordResearchNote({
+                    query: `codebase-deep-research-${runId}`,
+                    outsideSources: [],
+                    internalAreas: clusterIds.map((id: number) => `cluster:${id}`),
+                    confidence: resultData.pagesIndexed > 0 ? 0.7 : 0.3,
+                    pipeline: 'deep_research',
+                    unresolvedQuestions:
+                      resultData.pagesFailed > 0
+                        ? [`${resultData.pagesFailed} page(s) failed to index`]
+                        : [],
+                  })
+                )
+                .catch(() => {});
             } catch (err) {
               emit('stage', {
                 stage: 'deep_research',

@@ -13,7 +13,12 @@
 import { ENV } from '$lib/server/env.server.js';
 import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
-import { bifrostChat, getChatModelKeepAlive, ollamaFetch } from '../ollama.js';
+import {
+  bifrostChat,
+  getChatModelKeepAlive,
+  getOllamaRequestTimeoutMs,
+  ollamaFetch,
+} from '../ollama.js';
 import * as Hypergraph from '../ai/hypergraph-store.js';
 import { retrievalClient } from '../grpc/retrieval-client.js';
 
@@ -175,6 +180,7 @@ export async function callGemma4WithAceContext(
   opts: Gemma4AceOpts = {}
 ): Promise<Gemma4AceResult> {
   const model = opts.model ?? DEFAULT_MODEL;
+  const requestTimeoutMs = getOllamaRequestTimeoutMs();
   const temperature = opts.temperature ?? 0.2;
   const maxTokens = opts.maxTokens ?? 1024;
   const jsonMode = opts.jsonMode ?? !!opts.responseSchema;
@@ -279,7 +285,7 @@ export async function callGemma4WithAceContext(
                 repeat_penalty: 1.05,
               },
             }),
-            signal: AbortSignal.timeout(90_000),
+            signal: AbortSignal.timeout(requestTimeoutMs),
           });
 
           if (!response.ok) {
@@ -302,7 +308,7 @@ export async function callGemma4WithAceContext(
             lane: lane as any,
             taskType: taskType as any,
             sessionId,
-            timeoutMs: 90_000,
+            timeoutMs: requestTimeoutMs,
           }
         );
     const assistantDurationMs = Date.now() - assistantStartedAt;
@@ -518,6 +524,7 @@ export async function callGemma4WithTools(
   opts: Pick<Gemma4AceOpts, 'model' | 'temperature' | 'maxTokens' | 'lane' | 'taskType'> = {}
 ): Promise<Gemma4ToolCallResult> {
   const model = opts.model ?? DEFAULT_MODEL;
+  const requestTimeoutMs = getOllamaRequestTimeoutMs();
   const temperature = opts.temperature ?? 0.2;
   const maxTokens = opts.maxTokens ?? 1024;
   const startMs = Date.now();
@@ -560,7 +567,7 @@ export async function callGemma4WithTools(
             repeat_penalty: 1.05,
           },
         }),
-        signal: AbortSignal.timeout(90_000),
+        signal: AbortSignal.timeout(requestTimeoutMs),
       });
 
       if (!response.ok) {

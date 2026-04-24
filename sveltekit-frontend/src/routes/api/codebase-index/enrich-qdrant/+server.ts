@@ -21,8 +21,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
+import { extname } from 'path';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { ENV } from '$lib/server/env.server.js';
+import { pool } from '$lib/server/db/client';
 
 const COLLECTION = 'codebase_chunks_768';
 const QDRANT_URL  = ENV.QDRANT_URL;
@@ -35,20 +37,24 @@ const bodySchema = z.object({
 // ── Job tracker (in-process) ──────────────────────────────────────────────────
 
 interface EnrichJob {
-  jobId:       string;
-  status:      'running' | 'done' | 'error';
-  startedAt:   string;
+  jobId: string;
+  status: 'running' | 'done' | 'error';
+  startedAt: string;
   finishedAt?: string;
-  dryRun:      boolean;
+  dryRun: boolean;
   // progress
-  nodesQueried:    number;
-  qdrantUpdated:   number;
-  qdrantSkipped:   number;
-  durationMs?:     number;
-  error?:          string;
+  pathGroupsQueried?: number;
+  pathGroupsUpdated?: number;
+  pathGroupsSkipped?: number;
+  pathPointsUpdated?: number;
+  nodesQueried: number;
+  qdrantUpdated: number;
+  qdrantSkipped: number;
+  durationMs?: number;
+  error?: string;
   // enrichment coverage (set after Neo4j query)
-  nodesWithPageRankColab?: number;  // f.pagerank_score (Colab GPU PageRank)
-  nodesWithSomCluster?:    number;  // f.som_cluster (Colab SOM BMU index)
+  nodesWithPageRankColab?: number; // f.pagerank_score (Colab GPU PageRank)
+  nodesWithSomCluster?: number; // f.som_cluster (Colab SOM BMU index)
 }
 
 const jobs = new Map<string, EnrichJob>();
@@ -107,7 +113,93 @@ async function _runEnrichment(job: EnrichJob, batchSize: number): Promise<void> 
   const session = driver.session({ defaultAccessMode: 'READ' });
 
   try {
-    // 1. Pull all CodebaseFile nodes with enrichable fields
+    // 1. Restore file path payloads from the Postgres mirror.
+    //    This is the cheapest reliable source for live codebase chunk paths.
+    const pathResult = await pool.query<{
+      relative_path: string;
+      qdrant_ids: string[];
+    }>(
+      `SELECT relative_path,
+              array_agg(qdrant_id::text ORDER BY qdrant_id::text) AS qdrant_ids
+       FROM codebase_chunk_index
+       WHERE relative_path IS NOT NULL
+         AND relative_path <> ''
+         AND relative_path <> '__unknown__'
+       GROUP BY relative_path`
+    );
+
+    job.pathGroupsQueried = pathResult.rows.length;
+    job.pathGroupsUpdated = 0;
+    job.pathGroupsSkipped = 0;
+    job.pathPointsUpdated = 0;
+
+    if (job.dryRun) {
+      job.pathGroupsSkipped = pathResult.rows.length;
+    } else {
+      for (let i = 0; i < pathResult.rows.length; i += batchSize) {
+        const batch = pathResult.rows.slice(i, i + batchSize);
+
+        await Promise.all(
+          batch.map(async ({ relative_path, qdrant_ids }) => {
+            const relativePath = String(relative_path ?? '').trim();
+            if (!relativePath || !Array.isArray(qdrant_ids) || qdrant_ids.length === 0) {
+              job.pathGroupsSkipped = (job.pathGroupsSkipped ?? 0) + 1;
+              return;
+            }
+
+            try {
+              const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  points: qdrant_ids,
+                  payload: {
+                    file_path: relativePath,
+                    relativePath,
+                    extension: inferExtension(relativePath),
+                    pg_path_restored_at: new Date().toISOString(),
+                  },
+                }),
+                signal: AbortSignal.timeout(15_000),
+              });
+
+              if (res.ok) {
+                job.pathGroupsUpdated = (job.pathGroupsUpdated ?? 0) + 1;
+                job.pathPointsUpdated = (job.pathPointsUpdated ?? 0) + qdrant_ids.length;
+              } else {
+                job.pathGroupsSkipped = (job.pathGroupsSkipped ?? 0) + 1;
+                console.warn(
+                  `[enrich-qdrant] Path restore failed (${res.status}) for ${relativePath}`
+                );
+              }
+            } catch (err) {
+              job.pathGroupsSkipped = (job.pathGroupsSkipped ?? 0) + 1;
+              console.warn(`[enrich-qdrant] Path restore error for ${relativePath}:`, err);
+            }
+          })
+        );
+
+        console.log(
+          `[enrich-qdrant] Path restore progress: ` +
+            `${Math.min(i + batchSize, pathResult.rows.length)}/${pathResult.rows.length} groups processed`
+        );
+      }
+    }
+
+    const preIndexDefs = [
+      { field_name: 'file_path', field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'relativePath', field_schema: { type: 'keyword', lookup: true } },
+      { field_name: 'extension', field_schema: { type: 'keyword', lookup: true } },
+    ];
+    for (const def of preIndexDefs) {
+      fetch(`${QDRANT_URL}/collections/${COLLECTION}/index`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(def),
+      }).catch(() => {});
+    }
+
+    // 2. Pull all CodebaseFile nodes with enrichable fields.
     const result = await session.run(
       `MATCH (f:CodebaseFile)
        WHERE f.filePath IS NOT NULL
@@ -139,100 +231,110 @@ async function _runEnrichment(job: EnrichJob, batchSize: number): Promise<void> 
     );
 
     job.nodesQueried = result.records.length;
-    job.nodesWithPageRankColab = result.records.filter(r => r.get('pageRankScoreColab') != null).length;
-    job.nodesWithSomCluster    = result.records.filter(r => r.get('somCluster') != null).length;
+    job.nodesWithPageRankColab = result.records.filter(
+      (r) => r.get('pageRankScoreColab') != null
+    ).length;
+    job.nodesWithSomCluster = result.records.filter((r) => r.get('somCluster') != null).length;
     console.log(
       `[enrich-qdrant] Queried ${job.nodesQueried} Neo4j nodes — ` +
-      `pagerank_score=${job.nodesWithPageRankColab} som_cluster=${job.nodesWithSomCluster} ` +
-      `(run Colab notebook if 0)`
+        `pagerank_score=${job.nodesWithPageRankColab} som_cluster=${job.nodesWithSomCluster} ` +
+        `(run Colab notebook if 0)`
     );
 
-    // 2. Derive relative path from absolute file path
-    //    Neo4j stores full absolute paths — Qdrant payloads use relativePath from src/ root
-    const srcRoot   = 'sveltekit-frontend/src/';
+    // 3. Derive relative path from absolute file path.
+    //    Keep the leading src/ segment because the live codebase collection stores
+    //    file_path values like src/routes/... and the Postgres mirror follows that shape.
+    const srcRoot = 'sveltekit-frontend/';
     const fallbackRoot = 'src/';
 
     const nodes = result.records.map((r) => {
       const fp: string = r.get('filePath') ?? '';
       // Normalise to forward slashes
       const norm = fp.replace(/\\/g, '/');
-      const idx  = norm.indexOf(srcRoot);
-      const relativePath = idx >= 0
-        ? norm.slice(idx + srcRoot.length)
-        : (norm.includes(fallbackRoot) ? norm.slice(norm.indexOf(fallbackRoot) + fallbackRoot.length) : fp);
+      const idx = norm.indexOf(srcRoot);
+      const relativePath =
+        idx >= 0
+          ? norm.slice(idx + srcRoot.length)
+          : norm.includes(fallbackRoot)
+            ? norm.slice(norm.indexOf(fallbackRoot) + fallbackRoot.length)
+            : fp;
 
       return {
         relativePath,
         payload: {
-          neo4j_complexity:            _num(r.get('complexity')),
-          neo4j_hasAuthGuard:          _bool(r.get('hasAuthGuard')),
-          neo4j_hasZodValidation:      _bool(r.get('hasZodValidation')),
-          neo4j_hasCachePattern:       _bool(r.get('hasCachePattern')),
-          neo4j_isSseEndpoint:         _bool(r.get('isSseEndpoint')),
-          neo4j_isWorkerBoundary:      _bool(r.get('isWorkerBoundary')),
-          neo4j_hasErrorHandling:      _bool(r.get('hasErrorHandling')),
-          neo4j_isRouteFile:           _bool(r.get('isRouteFile')),
-          neo4j_routeType:             _str(r.get('routeType')),
-          neo4j_symbolCount:           _num(r.get('symbolCount')),
-          neo4j_maxCallDepth:          _num(r.get('maxCallDepth')),
-          neo4j_dynamicImportTargets:  _strArr(r.get('dynamicImportTargets')),
-          neo4j_callees:               _strArr(r.get('callees')),
-          neo4j_gpuCluster:            _num(r.get('gpuCluster')),
-          neo4j_pageRankScore:         _num(r.get('pageRankScore')),
-          neo4j_communityId:           _num(r.get('communityId')),
+          neo4j_complexity: _num(r.get('complexity')),
+          neo4j_hasAuthGuard: _bool(r.get('hasAuthGuard')),
+          neo4j_hasZodValidation: _bool(r.get('hasZodValidation')),
+          neo4j_hasCachePattern: _bool(r.get('hasCachePattern')),
+          neo4j_isSseEndpoint: _bool(r.get('isSseEndpoint')),
+          neo4j_isWorkerBoundary: _bool(r.get('isWorkerBoundary')),
+          neo4j_hasErrorHandling: _bool(r.get('hasErrorHandling')),
+          neo4j_isRouteFile: _bool(r.get('isRouteFile')),
+          neo4j_routeType: _str(r.get('routeType')),
+          neo4j_symbolCount: _num(r.get('symbolCount')),
+          neo4j_maxCallDepth: _num(r.get('maxCallDepth')),
+          neo4j_dynamicImportTargets: _strArr(r.get('dynamicImportTargets')),
+          neo4j_callees: _strArr(r.get('callees')),
+          neo4j_gpuCluster: _num(r.get('gpuCluster')),
+          neo4j_pageRankScore: _num(r.get('pageRankScore')),
+          neo4j_communityId: _num(r.get('communityId')),
           // Bare keys (no neo4j_ prefix) — read directly by contextual-tools.ts
           // codebase_som fallback: p.gpuCluster, p.som_cluster
           // codebase_pagerank: sorts by neo4j_pageRankScore already, but Colab version is authoritative
-          gpuCluster:                  _num(r.get('gpuCluster')),
-          som_cluster:                 _num(r.get('somCluster')),       // Colab Cell 10 BMU index
-          pagerank_score:              _num(r.get('pageRankScoreColab')), // Colab GPU PageRank
-          neo4j_isSvelteComponent:     _bool(r.get('isSvelteComponent')),
-          neo4j_hasSvelte4Props:       _bool(r.get('hasSvelte4Props')),
-          neo4j_hasSvelte4Reactive:    _bool(r.get('hasSvelte4Reactive')),
-          neo4j_hasSvelte4Events:      _bool(r.get('hasSvelte4Events')),
-          neo4j_hasRunesInPlainTs:     _bool(r.get('hasRunesInPlainTs')),
-          neo4j_enrichedAt:            new Date().toISOString(),
+          gpuCluster: _num(r.get('gpuCluster')),
+          som_cluster: _num(r.get('somCluster')), // Colab Cell 10 BMU index
+          pagerank_score: _num(r.get('pageRankScoreColab')), // Colab GPU PageRank
+          neo4j_isSvelteComponent: _bool(r.get('isSvelteComponent')),
+          neo4j_hasSvelte4Props: _bool(r.get('hasSvelte4Props')),
+          neo4j_hasSvelte4Reactive: _bool(r.get('hasSvelte4Reactive')),
+          neo4j_hasSvelte4Events: _bool(r.get('hasSvelte4Events')),
+          neo4j_hasRunesInPlainTs: _bool(r.get('hasRunesInPlainTs')),
+          neo4j_enrichedAt: new Date().toISOString(),
         },
       };
     });
 
     if (job.dryRun) {
-      job.status       = 'done';
-      job.finishedAt   = new Date().toISOString();
-      job.durationMs   = Date.now() - t0;
+      job.status = 'done';
+      job.finishedAt = new Date().toISOString();
+      job.durationMs = Date.now() - t0;
       job.qdrantUpdated = 0;
       job.qdrantSkipped = nodes.length;
       console.log(`[enrich-qdrant] Dry run — would update ${nodes.length} paths`);
       return;
     }
 
-    // 3. Batch-update Qdrant payloads via filter on relativePath
+    // 4. Batch-update Qdrant payloads via file_path.
+    //    Stage 1 restores file_path for most points, so matching here avoids the
+    //    old src/ prefix mismatch from relativePath-only updates.
     for (let i = 0; i < nodes.length; i += batchSize) {
       const batch = nodes.slice(i, i + batchSize);
 
       await Promise.all(
         batch.map(async ({ relativePath, payload }) => {
-          if (!relativePath) { job.qdrantSkipped++; return; }
+          if (!relativePath) {
+            job.qdrantSkipped++;
+            return;
+          }
           try {
-            const res = await fetch(
-              `${QDRANT_URL}/collections/${COLLECTION}/points/payload`,
-              {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  payload,
-                  filter: {
-                    must: [{ key: 'relativePath', match: { value: relativePath } }],
-                  },
-                }),
-                signal: AbortSignal.timeout(15_000),
-              }
-            );
+            const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                payload,
+                filter: {
+                  must: [{ key: 'file_path', match: { value: relativePath } }],
+                },
+              }),
+              signal: AbortSignal.timeout(15_000),
+            });
             if (res.ok) {
               job.qdrantUpdated++;
             } else {
               job.qdrantSkipped++;
-              console.warn(`[enrich-qdrant] Qdrant update failed (${res.status}) for ${relativePath}`);
+              console.warn(
+                `[enrich-qdrant] Qdrant update failed (${res.status}) for ${relativePath}`
+              );
             }
           } catch (err) {
             job.qdrantSkipped++;
@@ -241,29 +343,39 @@ async function _runEnrichment(job: EnrichJob, batchSize: number): Promise<void> 
         })
       );
 
-      console.log(`[enrich-qdrant] Progress: ${Math.min(i + batchSize, nodes.length)}/${nodes.length} nodes processed`);
+      console.log(
+        `[enrich-qdrant] Progress: ${Math.min(i + batchSize, nodes.length)}/${nodes.length} nodes processed`
+      );
     }
 
     // Ensure payload indexes for the fields we just wrote — enables O(1) prefiltering.
     // Qdrant PUT /index is idempotent; fire-and-forget after the main update loop.
     const indexDefs = [
-      { field_name: 'neo4j_gpuCluster',  field_schema: { type: 'integer', lookup: true, range: false } },
-      { field_name: 'som_cluster',        field_schema: { type: 'integer', lookup: true, range: false } },
-      { field_name: 'neo4j_routeType',    field_schema: { type: 'keyword', lookup: true } },
-      { field_name: 'neo4j_communityId',  field_schema: { type: 'integer', lookup: true, range: false } },
+      {
+        field_name: 'neo4j_gpuCluster',
+        field_schema: { type: 'integer', lookup: true, range: false },
+      },
+      { field_name: 'som_cluster', field_schema: { type: 'integer', lookup: true, range: false } },
+      { field_name: 'neo4j_routeType', field_schema: { type: 'keyword', lookup: true } },
+      {
+        field_name: 'neo4j_communityId',
+        field_schema: { type: 'integer', lookup: true, range: false },
+      },
     ];
     for (const def of indexDefs) {
       fetch(`${QDRANT_URL}/collections/${COLLECTION}/index`, {
-        method:  'PUT',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(def),
+        body: JSON.stringify(def),
       }).catch(() => {});
     }
 
-    job.status     = 'done';
+    job.status = 'done';
     job.finishedAt = new Date().toISOString();
     job.durationMs = Date.now() - t0;
-    console.log(`[enrich-qdrant] Done — ${job.qdrantUpdated} updated, ${job.qdrantSkipped} skipped in ${job.durationMs}ms`);
+    console.log(
+      `[enrich-qdrant] Done — ${job.qdrantUpdated} updated, ${job.qdrantSkipped} skipped in ${job.durationMs}ms`
+    );
   } finally {
     await session.close();
   }
@@ -290,4 +402,9 @@ function _str(v: unknown): string | null {
 function _strArr(v: unknown): string[] {
   if (!Array.isArray(v)) return [];
   return v.map(String);
+}
+
+function inferExtension(relativePath: string): string | null {
+  const extension = extname(relativePath).trim();
+  return extension || null;
 }
