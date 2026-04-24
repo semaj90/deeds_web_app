@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import PipelineProgress from '$lib/components/admin/PipelineProgress.svelte';
+	import BundlePreview from '$lib/components/admin/BundlePreview.svelte';
 
 	// Props from server load (properly typed via SvelteKit)
 	let { data } = $props();
@@ -127,6 +128,9 @@
 	<main class="container mx-auto px-6 py-8">
 		<!-- Pipeline Progress (SSE-driven) -->
 		<PipelineProgress />
+
+		<!-- Export Bundle Preview (unified agentic export surface) -->
+		<BundlePreview />
 
 		<!-- Stats Cards -->
 		<div class="mb-8 grid grid-cols-4 gap-4">
