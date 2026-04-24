@@ -160,6 +160,86 @@ assembly and GRPO reranking on the next query.
 
 ---
 
+## Export & Analysis Surface
+
+All export paths share the indexed state built by the orchestrate pipeline
+(Postgres `codebase_chunk_index` + `cluster_summaries`, Qdrant `codebase_chunks_768`
++ `knowledge_base`, Neo4j `CodebaseFile` nodes, Redis `wiki:note:*`).
+
+### Unified Bundle (primary entry point)
+
+`GET /api/codebase-index/export/bundle` returns everything in one JSON payload:
+
+```json
+{
+  "graph":     { "nodes": [...], "edges": [...] },
+  "clusters":  [{ "id", "purpose", "patterns", "warnings", "tags", "memberCount" }],
+  "wikiNotes": [{ "id", "type", "body": { ... } }],
+  "manifold4": [{ "id", "manifold": [som_cluster, gpu_cluster, pageRank, community_id] }],
+  "tileAtlas": { "tileCount", "source" },
+  "cacheStats":{ "turbo:*", "summary:cluster:*", "wiki:*", ... }
+}
+```
+
+Query params:
+- `?include=graph,clusters,wikiNotes,manifold4,tileAtlas,cacheStats` — selective parts
+- `?limit=N` — cap graph nodes/edges (default 2000)
+- `?repoId=default` — filter cluster_summaries by repo
+- `?format=ipynb` — 302 redirect to `/api/graph/colab-export` (Jupyter notebook)
+
+Degrades per-part: if Postgres is down, `graph`/`clusters`/`manifold4` are null
+but `wikiNotes`/`tileAtlas`/`cacheStats` (different backends) still return.
+
+### Downstream Consumers
+
+| Consumer | Path | What it ingests |
+|---|---|---|
+| **Google Colab (PyTorch)** | `GET /api/graph/colab-export` → `.ipynb` | 768-dim embeddings from Qdrant + Neo4j adjacency → GPU PageRank + K-Means + Kohonen SOM → writes `pagerank_score` + `SIMILAR_TOPOLOGY` back |
+| **LangGraph synthesis** | Docker `legal-ai-langgraph:8091` via `langgraph-client.ts` | HMM Baum-Welch + Redis KAG neighbor cache + `torch.compile()` GPU kernels |
+| **CouchDB PageRank** | `src/lib/server/graph/couchdb-pagerank.ts` | MapReduce views (`link_matrix`, `in_degree`, `out_degree`) → power iteration → Redis cache `couchdb:pagerank_scores` |
+| **Glyph Tile Atlas** | `src/lib/server/cartridge/glyph-tile-engine.ts` | kMeans centroids → 2D Voronoi → CouchDB `glyph_topology` + Redis tile cache |
+| **Minified Research** | `src/lib/server/analytics/minified-research-cache.ts` | Int8-quantized summary embeddings (768 f32 → Int8Array) + 64-bit tag bitmask atlas |
+| **Obsidian export** | `POST /api/codebase-index/export/obsidian` | Karpathy wiki notes → `.md` files with frontmatter |
+
+### Gemma4 → embeddinggemma Summary Path
+
+Stage 6 (`summarize`) writes:
+1. **Text summary** → Postgres `cluster_summaries.summary` (gemma4-legal-vlm via Ollama/TurboQuant)
+2. **768-dim embedding** → Postgres `cluster_summaries.summary_embedding` halfvec (embeddinggemma)
+3. **Qdrant mirror** → `codebase_chunks_768` payload `summary_embedding` vector (named-vector mode)
+4. **Minified** → Int8 quantized via `minified-research-cache.ts` (serves L1/L2/L3 cache tiers)
+
+This feeds back into:
+- **Graph nodes** — bundled via `/api/codebase-index/export/bundle` (`clusters[].hasSummaryEmbedding`)
+- **ACE context** — `assembleACEContext` pulls `cluster_summaries.summary` for query-relevant clusters
+- **MCP tools** — `rag:search` + `evidence:search_similar` over the Int8 atlas
+
+### FastMCP Agentic Tool Calling
+
+MCP server at `src/mcp/server.ts` exposes 28+ tools over stdio. Cosine similarity
+flows: WebGPU compute shader → WASM fallback → CPU (see `src/lib/gpu/gpu-compute-pipeline.ts`).
+
+Tool examples wired to the indexed state:
+- `rag:search` → Qdrant `codebase_chunks_768` / `knowledge_base` hybrid search
+- `evidence:search_similar` — cross-modal (CLIP/Whisper embeddings)
+- `neo4j_dependency_graph` — traverses `IMPORTS` + `SIMILAR_TOPOLOGY` edges
+- `cross_language_similarity` — GPU batch cosine over N:M vector sets
+- `agentic_recommendation` — combines cluster_summaries + wiki playbooks + PageRank to suggest fixes
+
+### Topological DB Backends (summary)
+
+| Backend | Role | Written By | Read By |
+|---|---|---|---|
+| **Postgres** `codebase_chunk_index` | Chunk metadata + halfvec embeddings | Stage 1 (ast_embed) | Bundle endpoint, cluster_summaries joins |
+| **Postgres** `cluster_summaries` | Gemma4 cluster summaries + embeddings | Stage 6 (summarize) | ACE context, bundle, MCP |
+| **Qdrant** `codebase_chunks_768` | Dual-vector (content + signature) ANN index | Stage 1 + mirror from Postgres | RAG search, MCP `rag:search` |
+| **Qdrant** `knowledge_base` | Deep research web results | Stage 10 (deep_research) | ACE, MCP |
+| **Neo4j** `CodebaseFile` + `SIMILAR_TOPOLOGY` | Graph relationships | Stage 3 (som_topology) + Colab write-back | Graph queries, bundle edges |
+| **CouchDB** `wiki_notes`, `glyph_topology`, `dag_cache` | Durable memory layer | Stages 6/8/10 + DAG ordering | Karpathy wiki browser, glyph renderer |
+| **Redis** `wiki:note:*`, `turbo:*`, `summary:cluster:*`, `embed:*` | Hot cache tier | Every stage (write-through) | Bundle cacheStats, invalidation cascade |
+
+---
+
 ## Admin Visualization
 
 **URL:** [http://localhost:5173/admin/codebase-index](http://localhost:5173/admin/codebase-index)
