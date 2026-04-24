@@ -7248,6 +7248,59 @@
       "group": "build",
       "problemMatcher": [],
       "detail": "One-shot: opens admin visualization AND runs full 10-stage orchestrate — watch progress in browser + terminal SSE simultaneously."
+    },
+    {
+      "label": "📦 Export: Unified Bundle (JSON)",
+      "type": "shell",
+      "command": "curl -s \"http://localhost:5173/api/codebase-index/export/bundle?limit=500\" -o bundle-export.json && echo \"Wrote bundle-export.json ($(wc -c < bundle-export.json) bytes)\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Dump the full indexing graph (graph+clusters+wikiNotes+manifold4+tileAtlas+cacheStats) to bundle-export.json for ad-hoc analysis or agentic tool ingestion."
+    },
+    {
+      "label": "📦 Export: Graph Only (JSON, 2000 nodes)",
+      "type": "shell",
+      "command": "curl -s \"http://localhost:5173/api/codebase-index/export/bundle?include=graph&limit=2000\" -o graph-export.json && echo \"Wrote graph-export.json ($(wc -c < graph-export.json) bytes)\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Export only graph nodes+edges (SOM/GPU cluster adjacency) for Neo4j / PyTorch / LangGraph downstream."
+    },
+    {
+      "label": "📦 Export: Colab Notebook (.ipynb)",
+      "type": "shell",
+      "command": "curl -s -L \"http://localhost:5173/api/graph/colab-export\" -o codebase-graph-analysis.ipynb && echo \"Wrote codebase-graph-analysis.ipynb ($(wc -c < codebase-graph-analysis.ipynb) bytes) — upload to Colab for GPU PageRank + K-Means + SOM\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Fetch the Jupyter notebook that pulls Qdrant embeddings + Neo4j adjacency and runs GPU graph analysis on Colab (T4)."
+    },
+    {
+      "label": "📦 Export: Wiki Notes Only (Karpathy feedback)",
+      "type": "shell",
+      "command": "curl -s \"http://localhost:5173/api/codebase-index/export/bundle?include=wikiNotes&limit=500\" | jq '.wikiNotes | group_by(.type) | map({type: .[0].type, count: length})'",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Show Karpathy wiki note counts by type (playbook/cluster/research/retrieval) — evidence the feedback loop is writing durable memory."
     }
   ],
   "inputs": [
