@@ -5,7 +5,14 @@
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
 	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
-	import { scheduleSave, flushSave, loadLayout, type BoardLayout } from '$lib/components/evidence/board-persistence.svelte.js';
+	import {
+		scheduleSave,
+		flushSave,
+		scheduleServerSave,
+		flushServerSave,
+		loadLayout,
+		type BoardLayout,
+	} from '$lib/components/evidence/board-persistence.svelte.js';
 	import WebGPUParticleOverlay from '$lib/components/evidence/WebGPUParticleOverlay.svelte';
 	import Fuse from 'fuse.js';
 	import type { PageData } from './$types';
@@ -23,6 +30,18 @@
 	let board: HybridBoard = $state() as HybridBoard;
 	let isDirty = $state(false);
 	let isSaving = $state(false);
+	// Set of evidence IDs currently on the canvas (updated via refreshPlacedIds)
+	let placedEvidenceIds = $state<Set<string>>(new Set());
+
+	function refreshPlacedIds() {
+		if (!board) return;
+		const nodes = board.getNodes();
+		const next = new Set<string>();
+		for (const n of nodes) {
+			if (n.evidenceId) next.add(n.evidenceId);
+		}
+		placedEvidenceIds = next;
+	}
 	let activeView = $state<'wall' | 'line' | 'file' | 'list'>('wall');
 	let selectedEvidence = $state<any>(null);
 	let showAddEvidence = $state(false);
@@ -128,12 +147,35 @@
 
 	// Fuse.js fuzzy search for evidence sidebar
 	let searchQuery = $state('');
+	let placementFilter = $state<'all' | 'unplaced' | 'placed'>('all');
 	const fuseOptions = { keys: ['title', 'description', 'type', 'location', 'fileType'], threshold: 0.4, ignoreLocation: true };
 	let fuse = $derived(new Fuse(evidenceItems, fuseOptions));
 	let filteredEvidence = $derived.by(() => {
-		if (!searchQuery.trim()) return evidenceItems;
-		return fuse.search(searchQuery).map((r: any) => r.item);
+		const base = searchQuery.trim()
+			? fuse.search(searchQuery).map((r: any) => r.item)
+			: evidenceItems;
+		if (placementFilter === 'unplaced') return base.filter((it: any) => !placedEvidenceIds.has(it.id));
+		if (placementFilter === 'placed') return base.filter((it: any) => placedEvidenceIds.has(it.id));
+		return base;
 	});
+
+	// Position of the currently-selected evidence within the filtered list (1-based)
+	let selectedEvidenceIndex = $derived.by(() => {
+		if (!selectedEvidence) return -1;
+		return filteredEvidence.findIndex((it: any) => it.id === selectedEvidence.id);
+	});
+
+	function navEvidence(direction: 1 | -1) {
+		if (filteredEvidence.length === 0) return;
+		const current = selectedEvidenceIndex;
+		const next = direction === 1
+			? (current < 0 ? 0 : (current + 1) % filteredEvidence.length)
+			: (current <= 0 ? filteredEvidence.length - 1 : current - 1);
+		selectedEvidence = filteredEvidence[next];
+		queueMicrotask(() => {
+			document.querySelector(`.evidence-card.selected`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+		});
+	}
 
 	// AI Chat session (contextual to this case)
 	let chatSession: ChatSession | null = $state(null);
@@ -359,6 +401,9 @@
 		// Load case list for the case switcher (non-blocking)
 		loadCaseList();
 
+		// Initial scan of placed evidence (after board mounts + initialState hydrates)
+		queueMicrotask(refreshPlacedIds);
+
 		// Seed board edges from DB connections (after board mounts)
 		if (board && dbConnections.length > 0) {
 			const existingNodes = board.getNodes();
@@ -391,19 +436,29 @@
 			});
 		}
 
-		// Flush pending saves on page unload
-		const onBeforeUnload = () => flushSave();
+		// Flush pending saves on page unload.
+		// flushSave() writes to IndexedDB (local); flushServerSave() uses
+		// navigator.sendBeacon so the POST survives page teardown.
+		const onBeforeUnload = () => {
+			flushSave();
+			flushServerSave();
+		};
 		window.addEventListener('beforeunload', onBeforeUnload);
 
 		return () => {
 			chatSession?.destroy();
 			boardHistory.clear();
 			flushSave();
+			flushServerSave();
 			window.removeEventListener('beforeunload', onBeforeUnload);
 		};
 	});
 
-	// Auto-save to IndexedDB when board is dirty (debounced 2s via scheduleSave)
+	// Auto-save when the board is dirty. Two-tier debounce:
+	//   IndexedDB (2s) — survives refresh on the same device
+	//   Server (4s)   — survives device-switch, browser wipe, tab close via sendBeacon
+	// The client cache is still the fast read path on load, but the server is now
+	// the durable source of truth even when the user never clicks Save.
 	const isValidCaseId = $derived(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId));
 	$effect(() => {
 		if (isDirty && board && isValidCaseId) {
@@ -416,6 +471,7 @@
 				timestamp: Date.now()
 			};
 			scheduleSave(layout);
+			scheduleServerSave(caseId, snapshot);
 		}
 	});
 
@@ -447,6 +503,66 @@
 		if (e.key === 'Escape' && showCaseSwitcher) {
 			showCaseSwitcher = false;
 			return;
+		}
+
+		// Arrow up/down, Home/End: navigate evidence sidebar when not typing
+		const target = e.target as HTMLElement | null;
+		const inEditable = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+		if (!inEditable && !showCaseSwitcher && filteredEvidence.length > 0) {
+			if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+				e.preventDefault();
+				navEvidence(e.key === 'ArrowDown' ? 1 : -1);
+				return;
+			}
+			if (e.key === 'Home') {
+				e.preventDefault();
+				selectedEvidence = filteredEvidence[0];
+				queueMicrotask(() => document.querySelector(`.evidence-card.selected`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+				return;
+			}
+			if (e.key === 'End') {
+				e.preventDefault();
+				selectedEvidence = filteredEvidence[filteredEvidence.length - 1];
+				queueMicrotask(() => document.querySelector(`.evidence-card.selected`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+				return;
+			}
+			// Enter: place evidence on canvas — OR pan to it if already placed
+			if (e.key === 'Enter' && selectedEvidence && board) {
+				e.preventDefault();
+				const existing = board.findNodeByEvidenceId(selectedEvidence.id);
+				if (existing) {
+					// Already on canvas — pan to the existing node instead of duplicating
+					board.centerOnNode(existing.id);
+					notificationStore.add({
+						type: 'info',
+						title: 'Already on board',
+						message: `Centered on "${existing.title ?? selectedEvidence.title}"`
+					});
+					return;
+				}
+				// Use world-space visible center (respects pan/zoom)
+				const center = board.getVisibleCenter();
+				// Stagger so repeated presses don't overlap exactly
+				const jitter = (Math.random() - 0.5) * 120;
+				const placedTitle = selectedEvidence.title;
+				const newId = board.addEvidenceNode(
+					selectedEvidence.id,
+					placedTitle,
+					center.x - 140 + jitter,
+					center.y - 80 + jitter,
+					selectedEvidence.fileType
+				);
+				// Brief flash + toast to confirm placement
+				if (newId) {
+					board.flashNode(newId);
+					notificationStore.add({
+						type: 'success',
+						title: 'Evidence placed',
+						message: placedTitle
+					});
+				}
+				return;
+			}
 		}
 		// Save: Ctrl/Cmd + S
 		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -774,6 +890,9 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 		try {
 			const snapshot = board.serialize();
+			// Manual save flushes any pending debounced server save first to
+			// avoid a double-POST + give the user accurate "saved at" feedback.
+			flushServerSave();
 			const res = await fetch(`/api/cases/${caseId}/canvas`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -996,7 +1115,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</div>
 
 		<div class="keyboard-hint">
-			<span class="hint-text">V=Select • E=Evidence • C=Connect • N=Note • Drag=Marquee • Alt+Drag=Quick Connect • 1-4=Views • Ctrl+0=Fit</span>
+			<span class="hint-text">↑↓=Nav • Enter=Place • Home/End=Jump • ⌘K=Switch • V=Select • C=Connect • N=Note • Drag=Marquee • Alt+Drag=Quick Connect</span>
 		</div>
 	</div>
 
@@ -1006,7 +1125,15 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		<aside class="evidence-sidebar">
 			<div class="sidebar-header">
 				<h3>EVIDENCE</h3>
-				<span class="count-badge">{filteredEvidence.length}/{evidenceItems.length}</span>
+				<div class="sidebar-header-counts">
+					<span class="count-badge" title="Matching / total">{filteredEvidence.length}/{evidenceItems.length}</span>
+					{#if placedEvidenceIds.size > 0}
+						<span class="count-badge count-placed" title="Placed on board">
+							<Icon name="check" size={10} />
+							{placedEvidenceIds.size}
+						</span>
+					{/if}
+				</div>
 			</div>
 
 			<div class="search-box">
@@ -1023,6 +1150,40 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				{/if}
 			</div>
 
+			<!-- Placement filter toggle -->
+			<div class="placement-filter" role="tablist" aria-label="Filter by placement">
+				<button
+					class="placement-filter-btn"
+					class:active={placementFilter === 'all'}
+					onclick={() => (placementFilter = 'all')}
+					role="tab"
+					aria-selected={placementFilter === 'all'}
+				>
+					All
+				</button>
+				<button
+					class="placement-filter-btn"
+					class:active={placementFilter === 'unplaced'}
+					onclick={() => (placementFilter = 'unplaced')}
+					role="tab"
+					aria-selected={placementFilter === 'unplaced'}
+					title="Evidence not yet on the board"
+				>
+					Unplaced
+				</button>
+				<button
+					class="placement-filter-btn"
+					class:active={placementFilter === 'placed'}
+					onclick={() => (placementFilter = 'placed')}
+					role="tab"
+					aria-selected={placementFilter === 'placed'}
+					title="Evidence already on the board"
+				>
+					<Icon name="check" size={10} />
+					Placed
+				</button>
+			</div>
+
 			<div class="evidence-list">
 				{#each filteredEvidence as item (item.id)}
 					{@const ft = (item.fileType || '').toLowerCase()}
@@ -1035,6 +1196,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					<div
 						class="evidence-card"
 						class:selected={selectedEvidence?.id === item.id}
+						class:on-board={placedEvidenceIds.has(item.id)}
 						onclick={() => (selectedEvidence = item)}
 						draggable="true"
 						ondragstart={(e: DragEvent) => {
@@ -1058,6 +1220,11 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 								</div>
 							{/if}
 							<span class="file-type-badge" style="background: {typeColor}">{ft.split('/').pop() || 'file'}</span>
+							{#if placedEvidenceIds.has(item.id)}
+								<span class="on-board-badge" title="On board — press Enter to center">
+									<Icon name="check" size={10} />
+								</span>
+							{/if}
 						</div>
 						<div class="evidence-info">
 							<h4>{item.title}</h4>
@@ -1084,7 +1251,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					<HybridBoard
 						bind:this={board}
 						initialSnapshot={initialState as any}
-						onDirtyChange={(d) => (isDirty = d)}
+						onDirtyChange={(d) => { isDirty = d; refreshPlacedIds(); }}
 						onCanvasClick={handleCanvasClick}
 						onNodeSelect={handleNodeSelect}
 						onConnectionCreated={handleConnectionCreated}
@@ -1197,10 +1364,27 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		{#if selectedEvidence}
 			<aside class="details-sidebar">
 				<div class="details-header">
-					<h3>Detailed Evidence</h3>
-					<button class="close-btn" onclick={() => (selectedEvidence = null)}>
-						<Icon name="x" />
-					</button>
+					<div class="details-header-title">
+						<h3>Detailed Evidence</h3>
+						{#if selectedEvidenceIndex >= 0 && filteredEvidence.length > 1}
+							<span class="details-position" title="Use ↑↓ arrow keys to navigate">
+								{selectedEvidenceIndex + 1} of {filteredEvidence.length}
+							</span>
+						{/if}
+					</div>
+					<div class="details-header-actions">
+						{#if filteredEvidence.length > 1}
+							<button class="details-nav-btn" onclick={() => navEvidence(-1)} title="Previous (↑)">
+								<Icon name="chevron-up" size={14} />
+							</button>
+							<button class="details-nav-btn" onclick={() => navEvidence(1)} title="Next (↓)">
+								<Icon name="chevron-down" size={14} />
+							</button>
+						{/if}
+						<button class="close-btn" onclick={() => (selectedEvidence = null)} title="Close">
+							<Icon name="x" />
+						</button>
+					</div>
 				</div>
 
 				<div class="details-content">
@@ -2240,6 +2424,12 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		margin: 0;
 	}
 
+	.sidebar-header-counts {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+	}
+
 	.count-badge {
 		padding: 0.125rem 0.5rem;
 		background: #eff6ff;
@@ -2247,6 +2437,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		border-radius: 1rem;
 		font-size: 0.75rem;
 		font-weight: 600;
+	}
+
+	.count-badge.count-placed {
+		background: #dcfce7;
+		color: #166534;
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
 	}
 
 	.search-box {
@@ -2265,6 +2463,42 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	.search-box:focus-within {
 		border-color: #3b82f6;
 		background: white;
+	}
+
+	.placement-filter {
+		display: flex;
+		gap: 2px;
+		margin: 0 0.5rem 0.5rem;
+		padding: 2px;
+		background: #f3f4f6;
+		border-radius: 0.375rem;
+	}
+
+	.placement-filter-btn {
+		flex: 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 3px;
+		padding: 0.3rem;
+		border: none;
+		background: transparent;
+		color: #6b7280;
+		font-size: 0.7rem;
+		font-weight: 600;
+		border-radius: 0.25rem;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.placement-filter-btn:hover {
+		color: #1f2937;
+	}
+
+	.placement-filter-btn.active {
+		background: white;
+		color: #1f2937;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 	}
 
 	.search-box input {
@@ -2357,6 +2591,29 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		color: white;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+	}
+
+	.on-board-badge {
+		position: absolute;
+		top: 6px;
+		left: 6px;
+		width: 18px;
+		height: 18px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #22c55e;
+		color: white;
+		border-radius: 50%;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+	}
+
+	.evidence-card.on-board {
+		background: #f0fdf4;
+	}
+
+	.evidence-card.on-board .evidence-info h4 {
+		color: #065f46;
 	}
 
 	.evidence-info {
@@ -2470,6 +2727,46 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		letter-spacing: 0.05em;
 		color: #1f2937;
 		margin: 0;
+	}
+
+	.details-header-title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.details-header-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.details-position {
+		font-size: 0.7rem;
+		font-family: 'JetBrains Mono', monospace;
+		color: #6b7280;
+		padding: 2px 6px;
+		background: #f3f4f6;
+		border-radius: 3px;
+	}
+
+	.details-nav-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.25rem;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.25rem;
+		background: white;
+		color: #6b7280;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.details-nav-btn:hover {
+		background: #f3f4f6;
+		color: #1f2937;
+		border-color: #d1d5db;
 	}
 
 	.close-btn {
