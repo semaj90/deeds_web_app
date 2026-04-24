@@ -125,7 +125,7 @@ function removeLokiCache(caseId: string): void {
 	if (entry) coll.remove(entry);
 }
 
-// ── Debounced Auto-Save ────────────────────────────────────────
+// ── Debounced Auto-Save (IndexedDB) ────────────────────────────
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let pendingLayout: BoardLayout | null = null;
@@ -149,5 +149,83 @@ export function flushSave(): void {
 	if (pendingLayout) {
 		saveLayout(pendingLayout);
 		pendingLayout = null;
+	}
+}
+
+// ── Debounced Server Auto-Save ─────────────────────────────────
+//
+// IndexedDB keeps the user's work safe on *their* device, but a cross-device
+// switch (or a browser data wipe) loses everything unless the snapshot also
+// reaches the server. We mirror the client debounce with a longer window (4s)
+// so the server gets fewer, coarser writes than the local cache.
+//
+// On beforeunload the caller should invoke flushServerSave(), which uses
+// navigator.sendBeacon() so the request survives page teardown.
+
+interface ServerSnapshot {
+	version: number;
+	viewport: { pan: { x: number; y: number }; zoom: number };
+	nodes: unknown[];
+	edges: unknown[];
+	updatedAt?: string;
+}
+
+let serverSaveTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingServerSave: { caseId: string; snapshot: ServerSnapshot } | null = null;
+
+/**
+ * Post the board snapshot to /api/cases/{caseId}/canvas. Intended shape is
+ * the same one board.serialize() returns — NOT the LokiJS/IndexedDB BoardLayout,
+ * because the server validates against boardSnapshotSchema.
+ */
+export function scheduleServerSave(caseId: string, snapshot: ServerSnapshot): void {
+	if (!caseId) return;
+	pendingServerSave = { caseId, snapshot };
+
+	if (serverSaveTimer) clearTimeout(serverSaveTimer);
+	serverSaveTimer = setTimeout(async () => {
+		if (pendingServerSave) {
+			await postSnapshotToServer(pendingServerSave.caseId, pendingServerSave.snapshot);
+			pendingServerSave = null;
+		}
+	}, 4000);
+}
+
+export function flushServerSave(): void {
+	if (serverSaveTimer) clearTimeout(serverSaveTimer);
+	if (!pendingServerSave) return;
+	const { caseId, snapshot } = pendingServerSave;
+	pendingServerSave = null;
+
+	// sendBeacon survives beforeunload; falls back to fetch in other contexts.
+	if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+		try {
+			const blob = new Blob([JSON.stringify(snapshot)], {
+				type: 'application/json',
+			});
+			const ok = navigator.sendBeacon(`/api/cases/${caseId}/canvas`, blob);
+			if (ok) return;
+		} catch {
+			/* fall through to fetch */
+		}
+	}
+	// Fallback: fire-and-forget fetch. Await is pointless here — page may unload.
+	void postSnapshotToServer(caseId, snapshot);
+}
+
+async function postSnapshotToServer(
+	caseId: string,
+	snapshot: ServerSnapshot,
+): Promise<void> {
+	try {
+		await fetch(`/api/cases/${caseId}/canvas`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(snapshot),
+			// Avoid cancellation on navigate
+			keepalive: true,
+		});
+	} catch (err) {
+		console.warn('[board-persistence] server save failed:', (err as Error)?.message);
 	}
 }
