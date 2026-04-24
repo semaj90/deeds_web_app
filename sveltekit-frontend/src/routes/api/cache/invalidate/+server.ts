@@ -24,7 +24,8 @@ const ALLOWED_PREFIXES = [
 
 const cacheInvalidateSchema = z.object({
 	pattern: z.string().min(1, 'Pattern is required').max(200).optional(),
-	tier: z.enum(['redis', 'all']).optional()
+	tier: z.enum(['redis', 'all']).optional(),
+	type: z.enum(['indexing_complete', 'research_update']).optional()
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -39,7 +40,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		if (!parsed.success) {
 			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
-		const { pattern: rawPattern, tier } = parsed.data;
+		const { pattern: rawPattern, tier, type } = parsed.data;
+
+		// Pipeline cascade path — delegate to high-level invalidation helpers
+		if (type) {
+			const mod = await import('$lib/server/cache/invalidation.js');
+			const result = type === 'indexing_complete'
+				? await mod.invalidateIndexingCaches(locals.user?.id)
+				: await mod.invalidateResearchCaches(locals.user?.id);
+			return json({
+				success: true,
+				message: `Cascade ${type}: cleared ${result.redisKeysCleared} Redis keys, ${result.memoryKeysCleared} memory keys`,
+				invalidated: result.redisKeysCleared + result.memoryKeysCleared,
+				patterns: result.patterns,
+				type
+			});
+		}
 
 		// Default to LLM exact-match cache if tier=redis specified
 		let pattern = rawPattern ?? 'llm:exact:*';

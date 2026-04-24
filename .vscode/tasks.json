@@ -7082,6 +7082,127 @@
       "group": "build",
       "problemMatcher": [],
       "detail": "Phase 78: Full GPU codebase intelligence loop — index → cluster → SOM → summaries → tags → research sync → regression tests"
+    },
+    {
+      "label": "📚 Admin: Open Codebase Pipeline",
+      "type": "shell",
+      "command": "echo Opening admin pipeline visualization at http://localhost:5173/admin/codebase-index",
+      "windows": {
+        "command": "cmd /c \"start http://localhost:5173/admin/codebase-index && echo Opened /admin/codebase-index in default browser. If dev server is down, run 'Dev: npm run dev (GPU)' first.\""
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Open /admin/codebase-index in browser (pipeline visualization + SSE progress). Requires dev server on :5173."
+    },
+    {
+      "label": "📚 Admin: Open How-To Doc",
+      "type": "shell",
+      "command": "code docs/CODEBASE_INDEXING_PIPELINE.md",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Open the pipeline how-to doc with Mermaid diagram (use Ctrl+Shift+V for markdown preview)"
+    },
+    {
+      "label": "🔄 Pipeline: Run Full Orchestrate (SSE)",
+      "type": "shell",
+      "command": "curl -N -X POST http://localhost:5173/api/codebase-index/orchestrate -H \"Content-Type: application/json\" -d \"{\\\"stages\\\":[\\\"ast_embed\\\",\\\"cluster_assign\\\",\\\"som_topology\\\",\\\"neo4j_sync\\\",\\\"pagerank\\\",\\\"summarize\\\",\\\"tag\\\",\\\"wiki_export\\\",\\\"hypergraph_4d\\\",\\\"deep_research\\\"],\\\"summarize\\\":true,\\\"deepResearch\\\":true,\\\"exportWiki\\\":true}\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run all 10 pipeline stages end-to-end. SSE events stream to terminal. Fires cache invalidation at Stage 2, 6, 10."
+    },
+    {
+      "label": "🔄 Pipeline: Summarize Only (TurboQuant)",
+      "type": "shell",
+      "command": "curl -N -X POST http://localhost:5173/api/codebase-index/orchestrate -H \"Content-Type: application/json\" -d \"{\\\"stages\\\":[\\\"summarize\\\"],\\\"summarize\\\":true}\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Regenerate cluster summaries via TurboQuant :8090 (cache_prompt:true). Triggers invalidateResearchCaches."
+    },
+    {
+      "label": "🔄 Pipeline: Deep Research Only",
+      "type": "shell",
+      "command": "curl -N -X POST http://localhost:5173/api/codebase-index/orchestrate -H \"Content-Type: application/json\" -d \"{\\\"stages\\\":[\\\"deep_research\\\"],\\\"deepResearch\\\":true}\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Stage 10 only — web-search-indexer crawls cluster-seeded queries, mirrors to Qdrant knowledge_base, records Karpathy research notes."
+    },
+    {
+      "label": "🔄 Pipeline: Summarize via TurboQuant (standalone script)",
+      "type": "shell",
+      "command": "npx tsx scripts/summarize-clusters-pg.ts --force",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Standalone summarizer — tries TurboQuant :8090 first, falls back to Ollama :11434. Bypasses SvelteKit."
+    },
+    {
+      "label": "🗑️ Pipeline: Invalidate Downstream Caches",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/cache/invalidate -H \"Content-Type: application/json\" -d \"{\\\"type\\\":\\\"indexing_complete\\\"}\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Manually trigger invalidateIndexingCaches — clears TURBO_PREFIX, GRAPH_NEIGHBORS, KB_BUNDLE, RESEARCH_BUNDLE, CLUSTER_SUMMARY, RAG_SEARCH, LLM_SEMANTIC + DAG cache purge."
+    },
+    {
+      "label": "🗑️ Pipeline: Invalidate Research Caches Only",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/cache/invalidate -H \"Content-Type: application/json\" -d \"{\\\"type\\\":\\\"research_update\\\"}\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Lighter cascade — clears TURBO_PREFIX, TURBO_WARM, RESEARCH_BUNDLE, KB_BUNDLE, RAG_SEARCH (skips graph + summary)."
+    },
+    {
+      "label": "📊 Pipeline: Inspect TurboQuant KV Keys",
+      "type": "shell",
+      "command": "docker exec deeds-redis-prod redis-cli --scan --pattern \"turbo:*\" | head -20",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Peek at live TurboQuant KV cache keys (turbo:prefix, turbo:warm, turbo:dym)."
+    },
+    {
+      "label": "📚 Pipeline: Full Loop (Open Admin + Run Orchestrate)",
+      "dependsOn": [
+        "📚 Admin: Open Codebase Pipeline",
+        "🔄 Pipeline: Run Full Orchestrate (SSE)"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "problemMatcher": [],
+      "detail": "One-shot: opens admin visualization AND runs full 10-stage orchestrate — watch progress in browser + terminal SSE simultaneously."
     }
   ],
   "inputs": [
