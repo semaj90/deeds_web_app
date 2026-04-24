@@ -33,10 +33,49 @@
 	let totalMs = $state(0);
 	let abortController: AbortController | null = null;
 
+	// ── Run options (user-toggleable) ─────────────────────────────────────
+	let enabledStages = $state<Record<string, boolean>>({
+		ast_embed: true,
+		cluster_assign: true,
+		som_topology: false,
+		neo4j_sync: false,
+		pagerank: false,
+		summarize: true,
+		tag: false,
+		wiki_export: false,
+		hypergraph_4d: false,
+		deep_research: false
+	});
+	let scope = $state<'all' | 'lib' | 'routes' | 'workspace'>('lib');
+	let fileLimit = $state<number | ''>(100);
+	let resumeFromCache = $state(true);
+	let multiPass = $state(false);
+	let passCount = $state(3);
+
+	// ── Live cache stats (passive fetch, non-blocking) ────────────────────
+	let cacheStats = $state<{ turbo: number; summary: number; research: number } | null>(null);
+
+	async function refreshCacheStats() {
+		try {
+			const res = await fetch('/api/cache/exact-match/stats', { signal: AbortSignal.timeout(3000) });
+			if (!res.ok) return;
+			const data = (await res.json()) as Record<string, unknown>;
+			// Try multiple shapes (legacy vs new)
+			cacheStats = {
+				turbo: Number(data.turboKeys ?? data.turbo ?? 0),
+				summary: Number(data.summaryKeys ?? data.summary ?? 0),
+				research: Number(data.researchKeys ?? data.research ?? 0)
+			};
+		} catch {
+			/* non-fatal */
+		}
+	}
+
 	const completedCount = $derived(
 		stages.filter((s) => s.status === 'done' || s.status === 'cached').length
 	);
 	const overallProgress = $derived(Math.round((completedCount / STAGES.length) * 100));
+	const selectedStageIds = $derived(STAGES.filter((s) => enabledStages[s.id]).map((s) => s.id));
 
 	function resetStages() {
 		stages = STAGES.map((s) => ({
@@ -177,72 +216,91 @@
 		}
 	}
 
-	async function runOrchestrate(opts: { summarize: boolean; deepResearch: boolean }) {
+	async function streamOrchestrate(
+		body: Record<string, unknown>,
+		signal: AbortSignal
+	): Promise<void> {
+		const res = await fetch('/api/codebase-index/orchestrate', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			signal,
+			body: JSON.stringify(body)
+		});
+		if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+		const reader = res.body.getReader();
+		const decoder = new TextDecoder();
+		let buffer = '';
+
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			buffer += decoder.decode(value, { stream: true });
+			const frames = buffer.split('\n\n');
+			buffer = frames.pop() ?? '';
+			for (const frame of frames) {
+				const lines = frame.split('\n');
+				let evtName = 'message';
+				let data = '';
+				for (const line of lines) {
+					if (line.startsWith('event:')) evtName = line.slice(6).trim();
+					else if (line.startsWith('data:')) data += line.slice(5).trim();
+				}
+				if (!data) continue;
+				try {
+					handleEvent(evtName, JSON.parse(data));
+				} catch {
+					/* non-JSON frame — skip */
+				}
+			}
+		}
+	}
+
+	async function runOrchestrate() {
 		if (running) return;
 		resetStages();
 		running = true;
 		abortController = new AbortController();
 
+		const baseBody = {
+			stages: selectedStageIds,
+			summarize: enabledStages.summarize,
+			deepResearch: enabledStages.deep_research,
+			exportWiki: enabledStages.wiki_export,
+			scope,
+			indexFileLimit: typeof fileLimit === 'number' && fileLimit > 0 ? fileLimit : undefined,
+			resume: resumeFromCache
+		};
+
 		try {
-			const res = await fetch('/api/codebase-index/orchestrate', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				signal: abortController.signal,
-				body: JSON.stringify({
-					stages: STAGES.map((s) => s.id),
-					summarize: opts.summarize,
-					deepResearch: opts.deepResearch,
-					exportWiki: true
-				})
-			});
-
-			if (!res.ok || !res.body) {
-				throw new Error(`HTTP ${res.status}`);
-			}
-
-			const reader = res.body.getReader();
-			const decoder = new TextDecoder();
-			let buffer = '';
-
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-				buffer += decoder.decode(value, { stream: true });
-
-				// Parse SSE frames (event: X\ndata: Y\n\n)
-				const frames = buffer.split('\n\n');
-				buffer = frames.pop() ?? '';
-
-				for (const frame of frames) {
-					const lines = frame.split('\n');
-					let evtName = 'message';
-					let data = '';
-					for (const line of lines) {
-						if (line.startsWith('event:')) evtName = line.slice(6).trim();
-						else if (line.startsWith('data:')) data += line.slice(5).trim();
-					}
-					if (!data) continue;
-					try {
-						handleEvent(evtName, JSON.parse(data));
-					} catch {
-						/* non-JSON frame — skip */
-					}
-				}
+			if (multiPass && passCount > 1) {
+				// Split file budget across passes, each with its own runId suffix so
+				// cache keys stay distinct and Redis cache hits are visible per pass.
+				const limit =
+					typeof fileLimit === 'number' && fileLimit > 0
+						? Math.max(1, Math.floor(fileLimit / passCount))
+						: undefined;
+				const passes = Array.from({ length: passCount }, (_, i) => ({
+					...baseBody,
+					indexFileLimit: limit,
+					runId: `admin-pass-${Date.now()}-${i}`
+				}));
+				// Concurrent fan-out — SSE streams merged, per-stage bars advance as
+				// any pass completes each stage. Promise.all waits for all to finish.
+				await Promise.all(passes.map((body) => streamOrchestrate(body, abortController!.signal)));
+			} else {
+				await streamOrchestrate(baseBody, abortController.signal);
 			}
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
-			// Mark current running stage as error
 			const running_idx = stages.findIndex((s) => s.status === 'running');
 			if (running_idx !== -1) {
-				stages[running_idx] = {
-					...stages[running_idx],
-					status: 'error',
-					message: msg
-				};
+				stages[running_idx] = { ...stages[running_idx], status: 'error', message: msg };
 			}
 		} finally {
 			running = false;
 			abortController = null;
+			refreshCacheStats();
 		}
 	}
 
@@ -295,18 +353,11 @@
 		</div>
 		<div class="flex items-center gap-2">
 			<button
-				onclick={() => runOrchestrate({ summarize: true, deepResearch: false })}
-				disabled={running}
+				onclick={runOrchestrate}
+				disabled={running || selectedStageIds.length === 0}
 				class="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
-				Run (no research)
-			</button>
-			<button
-				onclick={() => runOrchestrate({ summarize: true, deepResearch: true })}
-				disabled={running}
-				class="rounded-lg bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-			>
-				Run full (with research)
+				{running ? 'Running…' : `Run (${selectedStageIds.length} stages)`}
 			</button>
 			{#if running}
 				<button
@@ -316,8 +367,146 @@
 					Cancel
 				</button>
 			{/if}
+			<button
+				onclick={refreshCacheStats}
+				disabled={running}
+				class="rounded-lg border border-slate-600 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700/50 disabled:opacity-50"
+				title="Refresh Redis cache stats"
+			>
+				🔄 Cache
+			</button>
 		</div>
 	</div>
+
+	<!-- Options panel -->
+	<details class="mb-4 rounded-lg border border-slate-700 bg-slate-900/30 p-3" open>
+		<summary class="cursor-pointer text-sm font-medium text-slate-300">
+			Options — stages · scope · multi-pass · cache
+		</summary>
+
+		<div class="mt-3 grid grid-cols-2 gap-4 lg:grid-cols-3">
+			<!-- Scope -->
+			<div>
+				<div class="mb-1 text-xs text-slate-400">Scope</div>
+				<select
+					bind:value={scope}
+					disabled={running}
+					class="w-full rounded border border-slate-600 bg-slate-800 px-2 py-1 text-sm focus:border-orange-500 focus:outline-none disabled:opacity-50"
+				>
+					<option value="lib">lib/ (recommended)</option>
+					<option value="routes">routes/</option>
+					<option value="all">all (lib + routes)</option>
+					<option value="workspace">workspace (full repo)</option>
+				</select>
+			</div>
+
+			<!-- File limit -->
+			<div>
+				<div class="mb-1 text-xs text-slate-400">File limit (blank = unlimited)</div>
+				<input
+					type="number"
+					min="1"
+					max="10000"
+					bind:value={fileLimit}
+					disabled={running}
+					placeholder="100"
+					class="w-full rounded border border-slate-600 bg-slate-800 px-2 py-1 text-sm focus:border-orange-500 focus:outline-none disabled:opacity-50"
+				/>
+			</div>
+
+			<!-- Multi-pass -->
+			<div>
+				<div class="mb-1 flex items-center gap-2 text-xs text-slate-400">
+					<label class="flex cursor-pointer items-center gap-1">
+						<input
+							type="checkbox"
+							bind:checked={multiPass}
+							disabled={running}
+							class="accent-orange-500"
+						/>
+						Multi-pass (parallel)
+					</label>
+				</div>
+				<input
+					type="number"
+					min="2"
+					max="10"
+					bind:value={passCount}
+					disabled={running || !multiPass}
+					class="w-full rounded border border-slate-600 bg-slate-800 px-2 py-1 text-sm focus:border-orange-500 focus:outline-none disabled:opacity-50"
+					title="File limit split across N concurrent passes"
+				/>
+			</div>
+		</div>
+
+		<!-- Stage checkboxes -->
+		<div class="mt-4">
+			<div class="mb-2 flex items-center justify-between">
+				<span class="text-xs text-slate-400">Enabled stages ({selectedStageIds.length}/{STAGES.length})</span>
+				<div class="flex gap-2 text-xs">
+					<button
+						type="button"
+						disabled={running}
+						onclick={() => { for (const s of STAGES) enabledStages[s.id] = true; }}
+						class="text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+					>
+						all
+					</button>
+					<span class="text-slate-600">·</span>
+					<button
+						type="button"
+						disabled={running}
+						onclick={() => { for (const s of STAGES) enabledStages[s.id] = false; }}
+						class="text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+					>
+						none
+					</button>
+					<span class="text-slate-600">·</span>
+					<button
+						type="button"
+						disabled={running}
+						onclick={() => {
+							const fast = ['ast_embed', 'cluster_assign', 'summarize'];
+							for (const s of STAGES) enabledStages[s.id] = fast.includes(s.id);
+						}}
+						class="text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+					>
+						fast (1,2,6)
+					</button>
+				</div>
+			</div>
+			<div class="grid grid-cols-2 gap-1 lg:grid-cols-5">
+				{#each STAGES as stage (stage.id)}
+					<label class="flex cursor-pointer items-center gap-1.5 rounded px-1.5 py-1 text-xs hover:bg-slate-800/50">
+						<input
+							type="checkbox"
+							bind:checked={enabledStages[stage.id]}
+							disabled={running}
+							class="accent-orange-500"
+						/>
+						<span class="truncate text-slate-300">{stage.label}</span>
+					</label>
+				{/each}
+			</div>
+		</div>
+
+		<!-- Resume + Cache stats -->
+		<div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 pt-3 text-xs">
+			<label class="flex cursor-pointer items-center gap-2 text-slate-400">
+				<input type="checkbox" bind:checked={resumeFromCache} disabled={running} class="accent-cyan-500" />
+				Resume from cached stages (skip if already complete)
+			</label>
+			{#if cacheStats}
+				<div class="flex gap-3 text-slate-500">
+					<span>turbo:<span class="text-cyan-400">{cacheStats.turbo}</span></span>
+					<span>summary:<span class="text-cyan-400">{cacheStats.summary}</span></span>
+					<span>research:<span class="text-cyan-400">{cacheStats.research}</span></span>
+				</div>
+			{:else}
+				<span class="text-slate-600">cache stats: click 🔄 Cache</span>
+			{/if}
+		</div>
+	</details>
 
 	<!-- Overall progress -->
 	<div class="mb-6">
