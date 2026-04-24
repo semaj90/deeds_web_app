@@ -115,11 +115,37 @@
 		}
 
 		if (evt === 'scan_progress') {
-			const pct = Number(payload.pct ?? 0);
+			// Server sends pct: null during scan (files still being discovered).
+			// Use filesFound as a visual proxy — grows monotonically, capped at 40%
+			// so chunk/embed phases can advance the bar further.
+			const rawPct = payload.pct;
+			const filesFound = Number(payload.filesFound ?? 0);
+			const progress =
+				typeof rawPct === 'number' && rawPct >= 0
+					? Math.max(5, rawPct)
+					: Math.min(40, 5 + Math.floor(filesFound / 50));
 			updateStage('ast_embed', {
 				status: 'running',
-				progress: Math.max(5, pct),
-				message: `scanning (${payload.filesFound ?? 0} files)`
+				progress,
+				message: `scanning (${filesFound} files found)`
+			});
+			return;
+		}
+
+		if (evt === 'chunk_done') {
+			updateStage('ast_embed', {
+				status: 'running',
+				progress: 60,
+				message: `chunked ${payload.chunksTotal ?? '?'} chunks`
+			});
+			return;
+		}
+		if (evt === 'embed_done') {
+			updateStage('ast_embed', {
+				status: 'done',
+				progress: 100,
+				message: `embedded ${payload.embeddedTotal ?? '?'}`,
+				durationMs: Number(payload.durationMs ?? 0)
 			});
 			return;
 		}
