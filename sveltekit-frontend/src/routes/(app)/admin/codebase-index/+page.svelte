@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import PipelineProgress from '$lib/components/admin/PipelineProgress.svelte';
 
 	// Props from server load (properly typed via SvelteKit)
 	let { data } = $props();
@@ -124,6 +125,9 @@
 	</header>
 
 	<main class="container mx-auto px-6 py-8">
+		<!-- Pipeline Progress (SSE-driven) -->
+		<PipelineProgress />
+
 		<!-- Stats Cards -->
 		<div class="mb-8 grid grid-cols-4 gap-4">
 			<div class="rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 backdrop-blur">
