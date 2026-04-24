@@ -13,7 +13,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
-import type { Redis } from 'ioredis';
+import IORedis, { type Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
@@ -47,6 +47,8 @@ export const GET: RequestHandler = async ({ locals, request, url }) => {
 			'graph:case:',
 			'rag:search',
 			'llm:semantic:',
+			'wiki:',
+			'embed:',
 			'template:',
 			'case:',
 			'evidence:',
@@ -57,8 +59,28 @@ export const GET: RequestHandler = async ({ locals, request, url }) => {
 			return json({ error: 'Pattern prefix not allowed' }, { status: 400 });
 		}
 		try {
-			const redis = getRedis();
-			const count = await scanCount(redis, patternParam);
+			let count: number;
+			try {
+				count = await scanCount(getRedis(), patternParam);
+			} catch (innerErr) {
+				// Pool connection may have gone stale (e.g., Docker restart).
+				// One-shot retry with a fresh ioredis client bypasses the pool.
+				const msg = String(innerErr);
+				if (/closed|ECONNRESET|ENOTFOUND/i.test(msg)) {
+					const fresh = new IORedis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+						maxRetriesPerRequest: 1,
+						connectTimeout: 3000,
+						lazyConnect: false
+					});
+					try {
+						count = await scanCount(fresh, patternParam);
+					} finally {
+						fresh.disconnect();
+					}
+				} else {
+					throw innerErr;
+				}
+			}
 			return json({ success: true, pattern: patternParam, count });
 		} catch (err) {
 			return json(
