@@ -901,6 +901,45 @@
 		setDirty(true); scheduleDraw();
 	}
 
+	/** Returns the world-space coordinates of the visible canvas center (respects pan + zoom). */
+	export function getVisibleCenter(): Vec2 {
+		if (!canvasEl) return { x: 0, y: 0 };
+		return screenToWorld({ x: canvasEl.clientWidth / 2, y: canvasEl.clientHeight / 2 });
+	}
+
+	/** Flashes a brief highlight on a node (visual cue for keyboard-placed evidence). */
+	export function flashNode(nodeId: string) {
+		const node = getNodeById(nodeId);
+		if (!node) return;
+		selected = new Set([nodeId]);
+		// Clear any prior timer-based selection drop so it doesn't fight with this one
+		scheduleDraw();
+	}
+
+	/** Pans the viewport to center on the given node (keeps current zoom). */
+	export function centerOnNode(nodeId: string) {
+		const node = getNodeById(nodeId);
+		if (!node || !canvasEl) return;
+		const cw = canvasEl.clientWidth;
+		const ch = canvasEl.clientHeight;
+		const centerWorldX = node.x + node.w / 2;
+		const centerWorldY = node.y + node.h / 2;
+		viewport = {
+			zoom: viewport.zoom,
+			pan: {
+				x: cw / (2 * viewport.zoom) - centerWorldX,
+				y: ch / (2 * viewport.zoom) - centerWorldY
+			}
+		};
+		selected = new Set([nodeId]);
+		scheduleDraw();
+	}
+
+	/** Finds an existing node by evidenceId (useful for detecting duplicates). */
+	export function findNodeByEvidenceId(evidenceId: string): BoardNode | null {
+		return nodes.find((n) => n.evidenceId === evidenceId) ?? null;
+	}
+
 	export function zoomToFit() {
 		if (!canvasEl || nodes.length === 0) return;
 		const pad = 80;
