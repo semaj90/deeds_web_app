@@ -40,7 +40,7 @@ const DIM = 768;
 
 async function scrollEmbeddings(maxFiles: number): Promise<FileEmbedding[]> {
 	const qdrantUrl = ENV.QDRANT_URL;
-	const seen = new Map<string, FileEmbedding>(); // file_path → first entry
+	const seen = new Map<string, FileEmbedding>(); // filePath → first entry
 	let offset: string | number | null = null;
 
 	do {
@@ -74,13 +74,7 @@ async function scrollEmbeddings(maxFiles: number): Promise<FileEmbedding[]> {
 			result?: {
 				points?: Array<{
 					id: number | string;
-					payload?: {
-						file_path?: string;
-						chunk_index?: number;
-						content?: string;
-						language?: string;
-						tags?: string[];
-					};
+					payload?: Record<string, unknown>;
 					vector?: number[] | Record<string, number[]>;
 				}>;
 				next_page_offset?: string | number | null;
@@ -91,7 +85,9 @@ async function scrollEmbeddings(maxFiles: number): Promise<FileEmbedding[]> {
 		offset = data.result?.next_page_offset ?? null;
 
 		for (const pt of points) {
-			const filePath = pt.payload?.relativePath ?? pt.payload?.file_path ?? pt.payload?.path ?? '';
+			const p = pt.payload ?? {};
+			// Qdrant payload uses relativePath, file_path, or path depending on indexer version
+			const filePath = ((p['relativePath'] ?? p['file_path'] ?? p['path']) as string | undefined) ?? '';
 			if (!filePath) continue;
 
 			// Resolve vector — may be bare array or named-vector map
@@ -104,7 +100,7 @@ async function scrollEmbeddings(maxFiles: number): Promise<FileEmbedding[]> {
 			}
 			if (!vec || vec.length !== DIM) continue;
 
-			// Deduplicate: keep first chunk per file_path
+			// Deduplicate: keep first chunk per filePath
 			if (!seen.has(filePath)) {
 				seen.set(filePath, { pointId: pt.id, filePath, vector: vec });
 			}
@@ -131,59 +127,59 @@ async function updateQdrantSomClusters(
 	for (let i = 0; i < files.length; i += BATCH) {
 		const batch = files.slice(i, i + BATCH);
 		const payloadGroups = new Map<
-      string,
-      { ids: Array<number | string>; payload: Record<string, number> }
-    >();
+			string,
+			{ ids: Array<number | string>; payload: Record<string, number> }
+		>();
 
 		for (let j = 0; j < batch.length; j++) {
-      const f = batch[j];
-      const bmuIdx = bmuAssignments[i + j];
-      const gridW = opts?.gridW ?? 10;
-      const payload = {
-        som_cluster: bmuIdx,
-        som_bmu_row: Math.floor(bmuIdx / gridW),
-        som_bmu_col: bmuIdx % gridW,
-      };
-      const key = `${payload.som_cluster}:${payload.som_bmu_row}:${payload.som_bmu_col}`;
-      const existing = payloadGroups.get(key);
-      if (existing) {
-        existing.ids.push(f.pointId);
-      } else {
-        payloadGroups.set(key, { ids: [f.pointId], payload });
-      }
-    }
+			const f = batch[j];
+			const bmuIdx = bmuAssignments[i + j];
+			const gridW = opts.gridW;
+			const payload = {
+				som_cluster: bmuIdx,
+				som_bmu_row: Math.floor(bmuIdx / gridW),
+				som_bmu_col: bmuIdx % gridW,
+			};
+			const key = `${payload.som_cluster}:${payload.som_bmu_row}:${payload.som_bmu_col}`;
+			const existing = payloadGroups.get(key);
+			if (existing) {
+				existing.ids.push(f.pointId);
+			} else {
+				payloadGroups.set(key, { ids: [f.pointId], payload });
+			}
+		}
 
 		try {
 			await Promise.all(
-        [...payloadGroups.values()].map(async ({ ids, payload }) => {
-          const res = await fetch(`${qdrantUrl}/collections/${COLLECTION}/points/payload`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ points: ids, payload }),
-            signal: AbortSignal.timeout(15_000),
-          });
-          if (!res.ok) {
-            console.warn(`[som-topology] Qdrant payload update batch ${i} failed: ${res.status}`);
-          }
-        })
-      );
+				[...payloadGroups.values()].map(async ({ ids, payload }) => {
+					const res = await fetch(`${qdrantUrl}/collections/${COLLECTION}/points/payload`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ points: ids, payload }),
+						signal: AbortSignal.timeout(15_000),
+					});
+					if (!res.ok) {
+						console.warn(`[som-topology] Qdrant payload update batch ${i} failed: ${res.status}`);
+					}
+				})
+			);
 		} catch (err) {
 			console.warn(`[som-topology] Qdrant payload update batch ${i} error:`, err);
 		}
 	}
 
 	const indexDefs = [
-    { field_name: 'som_bmu_row', field_schema: { type: 'integer', lookup: true, range: true } },
-    { field_name: 'som_bmu_col', field_schema: { type: 'integer', lookup: true, range: true } },
-  ];
+		{ field_name: 'som_bmu_row', field_schema: { type: 'integer', lookup: true, range: true } },
+		{ field_name: 'som_bmu_col', field_schema: { type: 'integer', lookup: true, range: true } },
+	];
 
 	for (const def of indexDefs) {
-    fetch(`${qdrantUrl}/collections/${COLLECTION}/index`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(def),
-    }).catch(() => {});
-  }
+		fetch(`${qdrantUrl}/collections/${COLLECTION}/index`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(def),
+		}).catch(() => {});
+	}
 }
 
 // ── Neo4j edge creation ────────────────────────────────────────────────────────
@@ -204,7 +200,7 @@ async function createNeo4jTopologyEdges(
 	gridH: number
 ): Promise<number> {
 	// Build neuron → file list map
-	const neuronMap = new Map<number, string[]>(); // bmuIdx → [file_path, ...]
+	const neuronMap = new Map<number, string[]>(); // bmuIdx → [filePath, ...]
 	for (let i = 0; i < files.length; i++) {
 		const bmu = bmuAssignments[i];
 		const fp = files[i].filePath;
@@ -305,12 +301,12 @@ async function updatePostgresSomClusters(
 			.join(', ');
 		const params = batch.flatMap((f, j) => {
 			const bmuIdx = bmuAssignments[i + j];
-			const gridW = opts?.gridW ?? 10;
+			const gridW = opts.gridW;
 			return [
 				String(f.pointId),
 				bmuIdx,
 				Math.floor(bmuIdx / gridW),
-				bmuIdx % gridW
+				bmuIdx % gridW,
 			];
 		});
 
@@ -335,88 +331,88 @@ export async function runSOMTopologyPipeline(opts?: {
 	gridH?: number;
 	iters?: number;
 }): Promise<SOMTopologyResult> {
-  const t0 = Date.now();
-  const maxFiles = Math.min(opts?.maxFiles ?? 2000, 5000);
-  const iters = opts?.iters ?? 1000;
+	const t0 = Date.now();
+	const maxFiles = Math.min(opts?.maxFiles ?? 2000, 5000);
+	const iters = opts?.iters ?? 1000;
 
-  // 1. Fetch embeddings from Qdrant, deduplicated by file_path
-  const files = await scrollEmbeddings(maxFiles);
-  const n = files.length;
+	// 1. Fetch embeddings from Qdrant, deduplicated by filePath
+	const files = await scrollEmbeddings(maxFiles);
+	const n = files.length;
 
-  if (n === 0) {
-    return {
-      filesProcessed: 0,
-      gridSize: '0x0',
-      neuronsUsed: 0,
-      edgesCreated: 0,
-      durationMs: Date.now() - t0,
-      source: 'cpu',
-    };
-  }
+	if (n === 0) {
+		return {
+			filesProcessed: 0,
+			gridSize: '0x0',
+			neuronsUsed: 0,
+			edgesCreated: 0,
+			durationMs: Date.now() - t0,
+			source: 'cpu',
+		};
+	}
 
-  // 2. Compute grid dimensions using standard SOM sizing rule
-  const gridW = opts?.gridW ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
-  const gridH = opts?.gridH ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
-  const radInit = Math.max(gridW, gridH) / 2;
+	// 2. Compute grid dimensions using standard SOM sizing rule
+	const gridW = opts?.gridW ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
+	const gridH = opts?.gridH ?? Math.ceil(Math.sqrt(Math.sqrt(n) * 5));
+	const radInit = Math.max(gridW, gridH) / 2;
 
-  // 3. Build flat Float32Array [n × 768]
-  const flatVectors = new Float32Array(n * DIM);
-  for (let i = 0; i < n; i++) {
-    const vec = files[i].vector;
-    for (let d = 0; d < DIM; d++) flatVectors[i * DIM + d] = vec[d];
-  }
+	// 3. Build flat Float32Array [n × 768]
+	const flatVectors = new Float32Array(n * DIM);
+	for (let i = 0; i < n; i++) {
+		const vec = files[i].vector;
+		for (let d = 0; d < DIM; d++) flatVectors[i * DIM + d] = vec[d];
+	}
 
-  // 4. Train SOM
-  const { bmu, source } = trainSOM(
-    flatVectors,
-    n,
-    DIM,
-    gridW,
-    gridH,
-    iters,
-    0.1, // lrInit
-    0.01, // lrFinal
-    radInit,
-    1.0 // radFinal
-  );
+	// 4. Train SOM
+	const { bmu, source } = trainSOM(
+		flatVectors,
+		n,
+		DIM,
+		gridW,
+		gridH,
+		iters,
+		0.1,  // lrInit
+		0.01, // lrFinal
+		radInit,
+		1.0   // radFinal
+	);
 
-  // 5. Bulk-update Qdrant payloads with som_cluster + coordinates
-  await updateQdrantSomClusters(files, bmu, { gridW }).catch((err) => {
-    console.warn('[som-topology] Qdrant payload update failed (non-fatal):', err);
-  });
+	// 5. Bulk-update Qdrant payloads with som_cluster + coordinates
+	await updateQdrantSomClusters(files, bmu, { gridW }).catch((err) => {
+		console.warn('[som-topology] Qdrant payload update failed (non-fatal):', err);
+	});
 
-  // 5b. Mirror som_cluster + coordinates back to Postgres codebase_chunk_index
-  await updatePostgresSomClusters(files, bmu, { gridW }).catch((err) => {
-    console.warn('[som-topology] Postgres som_cluster mirror failed (non-fatal):', err);
-  });
+	// 5b. Mirror som_cluster + coordinates back to Postgres codebase_chunk_index
+	await updatePostgresSomClusters(files, bmu, { gridW }).catch((err) => {
+		console.warn('[som-topology] Postgres som_cluster mirror failed (non-fatal):', err);
+	});
 
-  // 6. Create SIMILAR_TOPOLOGY edges in Neo4j
-  const edgesCreated = await createNeo4jTopologyEdges(files, bmu, gridW, gridH).catch((err) => {
-    console.warn('[som-topology] Neo4j edge creation failed (non-fatal):', err);
-    return 0;
-  });
+	// 6. Create SIMILAR_TOPOLOGY edges in Neo4j
+	const edgesCreated = await createNeo4jTopologyEdges(files, bmu, gridW, gridH).catch((err) => {
+		console.warn('[som-topology] Neo4j edge creation failed (non-fatal):', err);
+		return 0;
+	});
 
-  // 7. Compute stats
-  const neuronsUsed = new Set(Array.from(bmu)).size;
+	// 7. Compute stats
+	const neuronsUsed = new Set(Array.from(bmu)).size;
 
-  // 7b. Fire-and-forget: generate cluster summaries for each distinct SOM cluster
-  const distinctClusters = Array.from(new Set(Array.from(bmu)));
-  if (distinctClusters.length > 0) {
-    import('$lib/server/indexer/cluster-summary.js')
-      .then(({ generateClusterSummary }) => {
-        for (const clusterId of distinctClusters) {
-          generateClusterSummary(clusterId, false).catch(() => {});
-        }
-      })
-      .catch(() => {});
-  }
+	// 7b. Fire-and-forget: generate cluster summaries for each distinct SOM cluster
+	const distinctClusters = Array.from(new Set(Array.from(bmu)));
+	if (distinctClusters.length > 0) {
+		import('$lib/server/indexer/cluster-summary.js')
+			.then(({ generateClusterSummary }) => {
+				for (const clusterId of distinctClusters) {
+					generateClusterSummary(clusterId, false).catch(() => {});
+				}
+			})
+			.catch(() => {});
+	}
 
-  return {
-    filesProcessed: n,
-    gridSize: `${gridW}x${gridH}`,
-    neuronsUsed,
-    edgesCreated,
-    durationMs: Date.now() - t0,
-    source,
-  };
+	return {
+		filesProcessed: n,
+		gridSize: `${gridW}x${gridH}`,
+		neuronsUsed,
+		edgesCreated,
+		durationMs: Date.now() - t0,
+		source,
+	};
 }

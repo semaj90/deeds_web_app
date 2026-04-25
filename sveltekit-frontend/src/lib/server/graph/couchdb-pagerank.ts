@@ -17,8 +17,27 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+// Strip credentials from the URL and expose them as a Basic auth header.
+// fetch() rejects URLs with embedded credentials in Node 18+ / WHATWG spec.
+function parseCouchUrl(rawUrl: string): { baseUrl: string; authHeader: Record<string, string> } {
+	try {
+		const u = new URL(rawUrl);
+		const authHeader: Record<string, string> = {};
+		if (u.username) {
+			authHeader['Authorization'] = `Basic ${btoa(`${u.username}:${u.password}`)}`;
+			u.username = '';
+			u.password = '';
+		}
+		return { baseUrl: u.toString().replace(/\/$/, ''), authHeader };
+	} catch {
+		return { baseUrl: rawUrl, authHeader: {} };
+	}
+}
+
+const { baseUrl: COUCHDB_BASE, authHeader: COUCH_AUTH } = parseCouchUrl(ENV.COUCHDB_URL);
+const COUCHDB_URL = COUCHDB_BASE;
 const COUCHDB_DB  = 'codebase_graph';
 const DAMPING     = 0.85;
 const MAX_ITER    = 100;
@@ -38,7 +57,7 @@ export async function ensureCouchDbDesignDoc(): Promise<void> {
 
 	// Check if it already exists
 	const checkRes = await fetch(designUrl, {
-		headers: { Accept: 'application/json' }
+		headers: { Accept: 'application/json', ...COUCH_AUTH }
 	}).catch(() => null);
 
 	const doc: Record<string, unknown> = {
@@ -85,7 +104,7 @@ export async function ensureCouchDbDesignDoc(): Promise<void> {
 
 	await fetch(designUrl, {
 		method:  'PUT',
-		headers: { 'Content-Type': 'application/json' },
+		headers: { 'Content-Type': 'application/json', ...COUCH_AUTH },
 		body:    JSON.stringify(doc),
 	}).catch(() => {}); // non-fatal
 }
@@ -98,7 +117,7 @@ async function loadEdges(): Promise<Edge[]> {
 	const res = await fetch(
 		`${COUCHDB_URL}/${COUCHDB_DB}/_design/codebase_graph/_view/link_matrix?reduce=false`,
 		{
-			headers: { Accept: 'application/json' },
+			headers: { Accept: 'application/json', ...COUCH_AUTH },
 			signal:  AbortSignal.timeout(30_000),
 		}
 	);
@@ -192,7 +211,7 @@ async function persistToCouchDb(scores: Map<string, number>): Promise<number> {
 		const ids = batch.map(([id]) => id);
 		const allDocsRes = await fetch(`${COUCHDB_URL}/${COUCHDB_DB}/_all_docs`, {
 			method:  'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', ...COUCH_AUTH },
 			body:    JSON.stringify({ keys: ids }),
 		}).catch(() => null);
 
@@ -219,7 +238,7 @@ async function persistToCouchDb(scores: Map<string, number>): Promise<number> {
 
 		const bulkRes = await fetch(`${COUCHDB_URL}/${COUCHDB_DB}/_bulk_docs`, {
 			method:  'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', ...COUCH_AUTH },
 			body:    JSON.stringify({ docs }),
 		}).catch(() => null);
 
@@ -338,7 +357,7 @@ export async function syncNodesToCouchDb(
 	try {
 		const allDocsRes = await fetch(`${COUCHDB_URL}/${COUCHDB_DB}/_all_docs`, {
 			method:  'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', ...COUCH_AUTH },
 			body:    JSON.stringify({ keys: ids }),
 			signal:  AbortSignal.timeout(15_000),
 		});
@@ -381,7 +400,7 @@ export async function syncNodesToCouchDb(
 		try {
 			const res = await fetch(`${COUCHDB_URL}/${COUCHDB_DB}/_bulk_docs`, {
 				method:  'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { 'Content-Type': 'application/json', ...COUCH_AUTH },
 				body:    JSON.stringify({ docs: batch }),
 				signal:  AbortSignal.timeout(15_000),
 			});

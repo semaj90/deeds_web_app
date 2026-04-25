@@ -100,7 +100,7 @@ export const ENV = {
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',
   NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'password',
   // CouchDB document store
-  COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:password@localhost:5984',
+  COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:legal_ai_pass@localhost:5984',
   // Web search (optional — SearXNG first, DuckDuckGo fallback)
   SEARXNG_URL: privateEnv.SEARXNG_URL ?? 'http://localhost:8888', // Docker: 8888→8080 internal
   // Obsidian Local REST API (optional — vault sync via obsidian-local-rest-api plugin)
