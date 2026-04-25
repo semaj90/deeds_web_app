@@ -22,7 +22,7 @@
  */
 
 import pg from 'pg';
-import { createClient } from 'redis';
+import Redis from 'ioredis';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ const FORCE        = process.argv.includes('--force');
 const MAX_NODES    = parseInt(process.argv.find(a => a.startsWith('--max-nodes='))?.split('=')[1] ?? '2000');
 const K_CLUSTERS   = parseInt(process.argv.find(a => a.startsWith('--k='))?.split('=')[1] ?? '20');
 const BATCH_SIZE        = 200; // gradient checkpoint batch — process this many at a time
-const SUMMARIZE_BATCH   = 3;   // concurrent Ollama summarization calls (GPU-sensitive)
+const SUMMARIZE_BATCH   = 3;   // concurrent Ollama summarization calls
 const DIM               = 768;
 const HG_EDGE_TTL       = 4 * 3600;
 const HG_COORD_TTL      = 1 * 3600;
@@ -44,13 +44,10 @@ const GRADE_A           = 0.75;
 const GRADE_B           = 0.55;
 const GRADE_C           = 0.35;
 
-// ── Redis ─────────────────────────────────────────────────────────────────────
+// ── Redis (ioredis — matches the project's redis.ts singleton) ────────────────
 
-const redis = createClient({
-  url:      REDIS_URL,
-  password: REDIS_PASS,
-});
-redis.on('error', () => {}); // non-fatal
+const redis = new Redis(REDIS_URL, { password: REDIS_PASS, lazyConnect: true });
+redis.on('error', () => {});
 
 // ── Postgres ─────────────────────────────────────────────────────────────────
 
@@ -179,7 +176,7 @@ async function scrollQdrant(maxNodes: number): Promise<Node[]> {
 
 async function hydratePagerankScores(nodes: Node[]): Promise<void> {
   try {
-    const raw = await redis.hGetAll('couchdb:pagerank_scores');
+    const raw = await redis.hgetall('couchdb:pagerank_scores');
     if (!raw) return;
     let hits = 0;
     for (const node of nodes) {
@@ -242,7 +239,7 @@ async function cpuKmeans(nodes: Node[], k: number): Promise<KMeansResult> {
       centroids.push(Array.from(rawCentroids.slice(c * DIM, (c + 1) * DIM)));
     }
     const result: KMeansResult = { labels: Array.from(assignments), centroids };
-    await redis.setEx(ckptKey, 3600, JSON.stringify(result)).catch(() => {});
+    await redis.setex(ckptKey, 3600, JSON.stringify(result)).catch(() => {});
     console.log('[hg] k-means: GPU done ✓');
     return result;
   } catch (err) {
@@ -287,7 +284,7 @@ async function cpuKmeans(nodes: Node[], k: number): Promise<KMeansResult> {
 
     // Checkpoint every 10 iterations
     if ((iter + 1) % 10 === 0) {
-      await redis.setEx(ckptKey, 3600, JSON.stringify({ labels, centroids })).catch(() => {});
+      await redis.setex(ckptKey, 3600, JSON.stringify({ labels, centroids })).catch(() => {});
     }
 
     if (!moved) { console.log(`\r[hg] k-means converged at iter ${iter + 1}.`); break; }
@@ -295,7 +292,7 @@ async function cpuKmeans(nodes: Node[], k: number): Promise<KMeansResult> {
   console.log('');
 
   const result: KMeansResult = { labels, centroids };
-  await redis.setEx(ckptKey, 3600, JSON.stringify(result)).catch(() => {});
+  await redis.setex(ckptKey, 3600, JSON.stringify(result)).catch(() => {});
   return result;
 }
 
@@ -352,7 +349,7 @@ async function summarizeEdge(memberPaths: string[], _centroid: number[], cluster
     if (res.ok) {
       const data = (await res.json()) as { response?: string };
       const summary = (data.response ?? '').trim().slice(0, 300);
-      await redis.setEx(`hg:sum:${hash}`, HG_EDGE_TTL, summary).catch(() => {});
+      await redis.setex(`hg:sum:${hash}`, HG_EDGE_TTL, summary).catch(() => {});
       return summary;
     }
   } catch { /* noop */ }
@@ -451,21 +448,21 @@ async function buildHyperedges(
         builtAt,
       };
 
-      await redis.setEx(`hg:edge:${w.hash}`, HG_EDGE_TTL, JSON.stringify(edge)).catch(() => {});
-      await redis.zAdd('hg:edge:idx', { score: w.gradeScore, value: w.hash }).catch(() => {});
+      await redis.setex(`hg:edge:${w.hash}`, HG_EDGE_TTL, JSON.stringify(edge)).catch(() => {});
+      await redis.zadd('hg:edge:idx', w.gradeScore, w.hash).catch(() => {});
 
       // 4D coords for member nodes — batch within the edge
       await Promise.allSettled(w.memberIdxs.map(async idx => {
         const node = nodes[idx];
         const z = 1 - cosine(node.vec, w.centroid);
         const coord = { x: node.somX ?? 0, y: node.somY ?? 0, z, w: node.pagerank, type: 'codebase' };
-        await redis.setEx(`hg:4d:${node.id}`, HG_COORD_TTL, JSON.stringify(coord)).catch(() => {});
+        await redis.setex(`hg:4d:${node.id}`, HG_COORD_TTL, JSON.stringify(coord)).catch(() => {});
       }));
     }));
   }
 
   // Set build timestamp + TTL on index
-  await redis.setEx('hg:built_at', HG_EDGE_TTL, builtAt).catch(() => {});
+  await redis.setex('hg:built_at', HG_EDGE_TTL, builtAt).catch(() => {});
   await redis.expire('hg:edge:idx', HG_EDGE_TTL).catch(() => {});
 
   console.log(`\n[hg] Done: A=${gradeA} B=${gradeB} C=${gradeC} D=${gradeD}`);
@@ -475,16 +472,16 @@ async function buildHyperedges(
 
 async function main() {
   console.log('[hg] Connecting to Redis...');
-  await redis.connect();
+  await redis.ping(); // ioredis auto-connects; ping verifies
   console.log('[hg] Redis connected.');
 
   // Check if already built and not forcing
   if (!FORCE) {
     const builtAt = await redis.get('hg:built_at').catch(() => null);
-    const edgeCount = await redis.zCard('hg:edge:idx').catch(() => 0);
+    const edgeCount = await redis.zcard('hg:edge:idx').catch(() => 0);
     if (builtAt && edgeCount > 0) {
       console.log(`[hg] Already built at ${builtAt} (${edgeCount} edges). Use --force to rebuild.`);
-      await redis.quit();
+      redis.disconnect();
       await pool.end();
       return;
     }
@@ -513,10 +510,10 @@ async function main() {
   await buildHyperedges(nodes, kmeans);
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
-  const edgeCount = await redis.zCard('hg:edge:idx').catch(() => 0);
+  const edgeCount = await redis.zcard('hg:edge:idx').catch(() => 0);
   console.log(`[hg] Build complete in ${elapsed}s — ${nodes.length} nodes, ${edgeCount} edges.`);
 
-  await redis.quit();
+  redis.disconnect();
   await pool.end();
 }
 
