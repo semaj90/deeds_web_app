@@ -302,7 +302,7 @@ async function searchEvidence(q: string, limit: number): Promise<PlatformSearchH
 			id: evidence.id,
 			title: evidence.title,
 			description: evidence.description,
-			type: evidence.type,
+			evidenceType: evidence.evidenceType,
 			createdAt: evidence.createdAt,
 		})
 		.from(evidence)
@@ -318,7 +318,7 @@ async function searchEvidence(q: string, limit: number): Promise<PlatformSearchH
 		score: 0.75,
 		matchType: 'ilike' as const,
 		route: `/evidence?id=${r.id}`,
-		metadata: { type: r.type },
+		metadata: { type: r.evidenceType },
 	}));
 }
 

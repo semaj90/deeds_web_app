@@ -1,6 +1,6 @@
 # Drizzle Schema Reference
 
-Generated from next_steps/active/SCHEMA_MANIFEST.json on 2026-04-25T01:27:32.612Z.
+Generated from next_steps/active/SCHEMA_MANIFEST.json on 2026-04-25T01:28:36.139Z.
 
 > This file is generated. Current schema code is the authority; prose summaries are stale if they diverge from the manifest.
 

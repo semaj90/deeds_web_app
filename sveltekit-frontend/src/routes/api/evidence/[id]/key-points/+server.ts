@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       summary: evidence.summary,
       aiSummary: evidence.aiSummary,
       aiAnalysis: evidence.aiAnalysis,
-      type: evidence.type,
+      evidenceType: evidence.evidenceType,
       caseId: evidence.caseId,
     })
     .from(evidence)

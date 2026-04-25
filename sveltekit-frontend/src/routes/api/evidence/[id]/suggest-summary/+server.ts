@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
         title: evidence.title,
         description: evidence.description,
         summary: evidence.summary,
-        type: evidence.type,
+        evidenceType: evidence.evidenceType,
       })
       .from(evidence)
       .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
