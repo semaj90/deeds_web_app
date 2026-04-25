@@ -1,0 +1,27 @@
+CompileFlags:
+  Add:
+    - -std=c++14
+    - -I"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/include"
+    - -I"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/include/cuda"
+    - -D__CUDACC__
+    - -D__NVCC__
+    - -DCUDA_VERSION=12080
+    - --expt-relaxed-constexpr
+    - -x
+    - cu
+  Remove:
+    - -W*
+  Compiler: clang++
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+  ClangTidy:
+    Add:
+      - modernize-*
+      - performance-*
+    Remove:
+      - modernize-use-trailing-return-type
+
+Index:
+  Background: Build

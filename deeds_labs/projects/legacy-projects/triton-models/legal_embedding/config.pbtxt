@@ -1,0 +1,184 @@
+# Triton Model Configuration for Legal Document Embedding
+# Optimized for Gemma embeddings with TensorRT backend
+
+name: "legal_embedding"
+backend: "tensorrt"
+max_batch_size: 32
+platform: "tensorrt_plan"
+
+# Model versioning
+version_policy: { latest { num_versions: 1 } }
+
+# Input tensors for legal document processing
+input [
+  {
+    name: "input_ids"
+    data_type: TYPE_INT32
+    dims: [ -1 ]  # Dynamic sequence length up to 512 tokens
+    allow_ragged_batch: false
+    optional: false
+  },
+  {
+    name: "attention_mask"
+    data_type: TYPE_INT32
+    dims: [ -1 ]  # Matches input_ids sequence length
+    allow_ragged_batch: false
+    optional: false
+  }
+]
+
+# Output embeddings (768-dimensional for Gemma)
+output [
+  {
+    name: "embeddings"
+    data_type: TYPE_FP32
+    dims: [ 768 ]
+    label_filename: "legal_embedding_labels.txt"
+  }
+]
+
+# TensorRT-specific optimizations for RTX 3060
+optimization {
+  priority: PRIORITY_MAX
+
+  # Memory optimizations
+  input_pinned_memory {
+    enable: true
+  }
+  output_pinned_memory {
+    enable: true
+  }
+
+  # GPU execution settings
+  execution_accelerators {
+    gpu_execution_accelerator : [ {
+      name : "tensorrt"
+      parameters { key: "precision_mode" value: "FP16" }
+      parameters { key: "max_workspace_size_bytes" value: "2147483648" }  # 2GB for RTX 3060
+      parameters { key: "minimum_segment_size" value: "1" }
+      parameters { key: "max_cached_engines" value: "100" }
+      parameters { key: "trt_engine_cache_enable" value: "1" }
+      parameters { key: "trt_engine_cache_path" value: "/models/legal_embedding/engine_cache" }
+    }]
+  }
+}
+
+# Dynamic batching optimized for legal document processing
+dynamic_batching {
+  # Preferred batch sizes for legal AI workloads
+  preferred_batch_size: [ 1, 2, 4, 8, 16 ]
+  max_queue_delay_microseconds: 500  # 0.5ms max queue delay
+  preserve_ordering: false
+  priority_levels: 2
+  default_priority_level: 1
+  default_queue_policy: {
+    timeout_action: REJECT
+    default_timeout_microseconds: 10000  # 10ms timeout
+    allow_timeout_override: true
+    max_queue_size: 128
+  }
+}
+
+# Instance groups for RTX 3060 optimization
+instance_group [
+  {
+    count: 2  # Dual instances for parallel processing
+    kind: KIND_GPU
+    gpus: [ 0 ]
+    profile: [ "legal_high_throughput" ]
+    host_policy: "numa_node_1"  # NUMA optimization if applicable
+  }
+]
+
+# Model warmup with representative legal text samples
+model_warmup [
+  {
+    name: "legal_contract_warmup"
+    batch_size: 1
+    inputs: {
+      key: "input_ids"
+      value: {
+        data_type: TYPE_INT32
+        dims: [ 256 ]
+        zero_data: false
+        random_data: true
+      }
+    }
+    inputs: {
+      key: "attention_mask"
+      value: {
+        data_type: TYPE_INT32
+        dims: [ 256 ]
+        zero_data: false
+        random_data: true
+      }
+    }
+  },
+  {
+    name: "legal_batch_warmup"
+    batch_size: 8
+    inputs: {
+      key: "input_ids"
+      value: {
+        data_type: TYPE_INT32
+        dims: [ 512 ]
+        zero_data: false
+        random_data: true
+      }
+    }
+    inputs: {
+      key: "attention_mask"
+      value: {
+        data_type: TYPE_INT32
+        dims: [ 512 ]
+        zero_data: false
+        random_data: true
+      }
+    }
+  }
+]
+
+# Model ensemble configuration for legal AI pipeline
+ensemble_scheduling {
+  step [
+    {
+      model_name: "legal_embedding"
+      model_version: 1
+      input_map: {
+        key: "input_ids"
+        value: "input_ids"
+      }
+      input_map: {
+        key: "attention_mask"
+        value: "attention_mask"
+      }
+      output_map: {
+        key: "embeddings"
+        value: "embeddings"
+      }
+    }
+  ]
+}
+
+# Response cache for identical legal document queries
+response_cache {
+  enable: true
+}
+
+# Model metadata for legal AI monitoring
+parameters: {
+  key: "legal_model_type"
+  value: { string_value: "embedding" }
+}
+parameters: {
+  key: "target_practice_areas"
+  value: { string_value: "contract,litigation,intellectual_property,employment" }
+}
+parameters: {
+  key: "max_document_length"
+  value: { string_value: "512_tokens" }
+}
+parameters: {
+  key: "embedding_dimension"
+  value: { string_value: "768" }
+}

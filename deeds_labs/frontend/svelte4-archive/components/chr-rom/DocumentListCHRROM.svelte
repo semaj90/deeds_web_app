@@ -1,0 +1,517 @@
+<!--
+  Zero-Latency Document List with CHR-ROM Patterns
+  Demonstrates instant UI rendering with pre-computed patterns
+-->
+<script lang="ts">
+  import { chrROMCacheReader } from '$lib/services/chr-rom-cache-reader.js';
+  import type { CHRROMPattern } from '$lib/services/chr-rom-pattern-optimizer.js';
+  import { drizzleCHRROMBridge } from '$lib/services/drizzle-chr-rom-bridge.js';
+  import '$lib/styles/chr-rom-rendering.css';
+  import { slide } from 'svelte/transition';
+
+  interface Props {
+    documents?: unknown[];
+    showPerformanceMetrics?: boolean;
+  }
+
+  let { documents = [], showPerformanceMetrics = false }: Props = $props();
+
+  // Reactive state for CHR-ROM patterns
+  let documentPatterns = $state(new Map<string, Map<string, CHRROMPattern | null>>());
+  let performanceStats: unknown = $state(null);
+  let hoveredDocument: string | null = $state(null);
+
+  // Pattern types to load
+  const patternTypes = ['summary_icon', 'category_color', 'confidence_badge', 'status_indicator', 'risk_gauge'];
+
+  // Performance tracking
+  let totalRequests = $state(0);
+  let cacheHits = $state(0);
+  let averageLatency = $state(0);
+
+  /**
+   * Initialize CHR-ROM system and load patterns
+   */
+  $effect(() => {
+    (async () => {
+      console.log('🎮 Initializing CHR-ROM Document List...');
+      try {
+        // Initialize the Drizzle bridge
+        await drizzleCHRROMBridge.initialize();
+
+        // Prefetch patterns for all visible documents
+        await prefetchAllPatterns();
+
+        // Start performance monitoring
+        if (showPerformanceMetrics) {
+          startPerformanceMonitoring();
+        }
+
+        console.log('✅ CHR-ROM Document List initialized');
+      } catch (error) {
+        console.error('❌ CHR-ROM initialization failed:', error);
+      }
+    })();
+  });
+
+  /**
+   * Prefetch all patterns for visible documents
+   */
+  async function prefetchAllPatterns(): Promise<void> {
+    const docIds = documents.map((doc: any) => doc.id);
+    console.log(`🔮 Prefetching patterns for ${docIds.length} documents...`);
+
+    const startTime = performance.now();
+
+    // Retrieve patterns individually using available API
+    try {
+      for (const docId of docIds) {
+        if (!documentPatterns.has(docId)) {
+          documentPatterns.set(docId, new Map());
+        }
+        for (const patternType of patternTypes) {
+          const result = await chrROMCacheReader.getPattern(docId, patternType);
+          totalRequests++;
+          if (result.hit && result.pattern) {
+            const pattern: CHRROMPattern = {
+              type: (result.pattern.type as CHRROMPattern['type']) ?? 'default',
+              size: 'md',
+              data: result.pattern.data,
+              metadata: {
+                confidence: 0,
+                timestamp: Date.now(),
+                version: '1.0',
+                ...(result.pattern.metadata ?? {})
+              }
+            };
+            documentPatterns.get(docId)!.set(patternType, pattern);
+          } else {
+            documentPatterns.get(docId)!.set(patternType, null);
+          }
+          if (result.source === 'cache') {
+            cacheHits++;
+          }
+          averageLatency = (averageLatency * (totalRequests - 1) + result.latencyMs) / totalRequests;
+        }
+      }
+
+      const totalTime = performance.now() - startTime;
+      console.log(`Prefetch completed in ${totalTime.toFixed(1)}ms`);
+    } catch (error) {
+      console.error('Prefetch failed:', error);
+    }
+  }
+
+  /**
+   * Start performance monitoring
+   */
+  function startPerformanceMonitoring(): void {
+    setInterval(() => {
+      performanceStats = {
+        hitRate: totalRequests > 0 ? cacheHits / totalRequests : 0,
+        averageLatency,
+        totalRequests,
+        performance: averageLatency < 5 ? 'excellent' : averageLatency < 20 ? 'good' : 'slow'
+      };
+    }, 5000);
+  }
+
+  function getPattern(docId: string, patternType: string): CHRROMPattern | null {
+    return documentPatterns.get(docId)?.get(patternType) ?? null;
+  }
+
+  /**
+   * Get pattern data (the actual HTML/SVG content)
+   */
+  function getPatternData(docId: string, patternType: string): string {
+    const pattern = getPattern(docId, patternType);
+    return pattern?.data ?? '';
+  }
+
+  /**
+   * Get CSS class for optimal rendering
+   */
+  function getPatternRenderingClass(docId: string, patternType: string): string {
+    const pattern = getPattern(docId, patternType);
+    if (!pattern) return 'chr-rom-pattern chr-rom-auto';
+    // Generate optimized CSS class based on pattern metadata
+    const hint = pattern.metadata?.renderingHint ?? 'auto';
+    return `chr-rom-pattern chr-rom-${hint}`;
+  }
+
+  async function handleDocumentHover(docId: string): Promise<void> {
+    hoveredDocument = docId;
+
+    // Check if we need additional patterns for hover state
+    const hoverPatterns = ['entity_heatmap', 'similarity_graph'];
+
+    for (const patternType of hoverPatterns) {
+      const result = await chrROMCacheReader.getPattern(docId, patternType);
+
+      if (!documentPatterns.has(docId)) {
+        documentPatterns.set(docId, new Map());
+      }
+
+      if (result.hit && result.pattern) {
+        const pattern: CHRROMPattern = {
+          type: (result.pattern.type as CHRROMPattern['type']) ?? 'default',
+          size: 'md',
+          data: result.pattern.data,
+          metadata: {
+            confidence: 0,
+            timestamp: Date.now(),
+            version: '1.0',
+            ...(result.pattern.metadata ?? {})
+          }
+        };
+        documentPatterns.get(docId)!.set(patternType, pattern);
+      } else {
+        documentPatterns.get(docId)!.set(patternType, null);
+      }
+    }
+  }
+
+  /**
+   * Handle mouse leave
+   */
+  function handleDocumentLeave(): void {
+    hoveredDocument = null;
+  }
+
+  /**
+   * Get category color for document
+   */
+  function getCategoryColor(docId: string): string {
+    return getPatternData(docId, 'category_color') || '#6B7280';
+  }
+
+  /**
+   * Refresh patterns for all documents
+   */
+  async function refreshPatterns(): Promise<void> {
+    console.log('🔄 Refreshing all CHR-ROM patterns...');
+
+    // Clear current patterns
+    documentPatterns.clear();
+
+    // Reload patterns
+    await prefetchAllPatterns();
+
+    console.log('✅ Pattern refresh completed');
+  }
+</script>
+
+<!-- Zero-Latency Document List UI -->
+<div class="chr-rom-document-list">
+  <!-- Performance Metrics (optional) -->
+  {#if showPerformanceMetrics && performanceStats}
+    <div class="performance-panel">
+      <h4>🎯 CHR-ROM Performance</h4>
+      <div class="metrics-grid">
+        <div class="metric">
+          <span class="label">Cache Hit Rate:</span>
+          <span class="value" class:excellent={(performanceStats as any).hitRate > 0.9}>
+            {((performanceStats as any).hitRate * 100).toFixed(1)}%
+          </span>
+        </div>
+        <div class="metric">
+          <span class="label">Avg Latency:</span>
+          <span class="value" class:excellent={(performanceStats as any).averageLatency < 5}>
+            {(performanceStats as any).averageLatency.toFixed(2)}ms
+          </span>
+        </div>
+        <div class="metric">
+          <span class="label">Total Requests:</span>
+          <span class="value">{(performanceStats as any).totalRequests}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Performance:</span>
+          <span class="value">
+            {(performanceStats as any).performance}
+          </span>
+        </div>
+      </div>
+      <button onclick={refreshPatterns} class="refresh-btn">
+        🔄 Refresh Patterns
+      </button>
+    </div>
+  {/if}
+
+  <!-- Document List with Instant CHR-ROM Patterns -->
+  <div class="document-grid">
+    {#each Array.isArray(documents) ? documents : [] as doc}
+      <div
+        class="document-card"
+        style="border-left-color: {getCategoryColor((doc as any).id)}"
+        onmouseenter={() => handleDocumentHover((doc as any).id)}
+        onmouseleave={handleDocumentLeave}
+        role="button"
+        tabindex="0"
+      >
+        <!-- Document Header with Instant Icons -->
+        <div class="document-header">
+          <div class="document-icon {getPatternRenderingClass((doc as any).id, 'summary_icon')}">
+            {@html getPatternData((doc as any).id, 'summary_icon')}
+          </div>
+          <div class="document-title">
+            <h3>{(doc as any).title}</h3>
+          </div>
+          <div class="status-indicator {getPatternRenderingClass((doc as any).id, 'status_indicator')}">
+            {@html getPatternData((doc as any).id, 'status_indicator')}
+          </div>
+        </div>
+
+        <!-- Zero-Latency Metadata Display -->
+        <div class="document-metadata">
+          <div class="confidence-badge {getPatternRenderingClass((doc as any).id, 'confidence_badge')}">
+            {@html getPatternData((doc as any).id, 'confidence_badge')}
+          </div>
+          <div class="risk-gauge">
+            <span class="label">Risk:</span>
+            <div class="{getPatternRenderingClass((doc as any).id, 'risk_gauge')}">
+              {@html getPatternData((doc as any).id, 'risk_gauge')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Hover-Triggered Patterns (Advanced) -->
+        {#if hoveredDocument === (doc as any).id}
+          <div class="hover-details" transition:slide>
+            <div class="entity-heatmap">
+              <span class="label">Entities:</span>
+              <div class="{getPatternRenderingClass((doc as any).id, 'entity_heatmap')}">
+                {@html getPatternData((doc as any).id, 'entity_heatmap')}
+              </div>
+            </div>
+            <div class="similarity-graph">
+              <span class="label">Similarity:</span>
+              <div class="{getPatternRenderingClass((doc as any).id, 'similarity_graph')}">
+                {@html getPatternData((doc as any).id, 'similarity_graph')}
+              </div>
+            </div>
+          </div>
+        {/if}
+
+        <!-- Performance Debug Info (development only) -->
+        {#if showPerformanceMetrics}
+          <div class="debug-info">
+            <small>
+              Patterns: {patternTypes.map(type => (getPattern((doc as any).id, type) ? '✅' : '❌')).join(' ')}
+            </small>
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+
+  <!-- Zero State -->
+  {#if documents.length === 0}
+    <div class="zero-state">
+      <div class="zero-icon">📄</div>
+      <h3>No Documents Found</h3>
+      <p>Upload documents to see CHR-ROM patterns in action</p>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .chr-rom-document-list {
+    padding: 1rem;
+    font-family: system-ui, sans-serif;
+  }
+
+  /* Performance Panel */
+  .performance-panel {
+    background: #f8fafc;
+	border: 1px solid #e2e8f0;
+    border-radius: 8px;
+	padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .performance-panel h4 {
+    margin: 0 0 1rem 0;
+    color: #374151;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .metric {
+    display: flex;
+    justify-content: space-between;
+	padding: 0.5rem;
+    background: white;
+    border-radius: 4px;
+	border: 1px solid #e5e7eb;
+  }
+
+  .metric .label {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .metric .value {
+    font-weight: 600;
+	color: #374151;
+  }
+
+  .metric .value.excellent {
+    color: #10b981;
+  }
+
+  .refresh-btn {
+    background: #3b82f6;
+	color: white;
+    border: none;
+	padding: 0.5rem 1rem;
+    border-radius: 4px;
+	cursor: pointer;
+    font-size: 0.875rem;
+  }
+
+  .refresh-btn:hover {
+    background: #2563eb;
+  }
+
+  /* Document Grid */
+  .document-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1rem;
+  }
+
+  /* Document Cards with Instant CHR-ROM Rendering */
+  .document-card {
+    background: white;
+	border: 1px solid #e5e7eb;
+    border-left: 4px solid #6b7280;
+    border-radius: 8px;
+	padding: 1rem;
+    cursor: pointer;
+	transition:all 0.15s ease;
+  }
+
+  .document-card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transform: translateY(-1px);
+  }
+
+  .document-header {
+    display: flex;
+    align-items: center;
+	gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .document-icon {
+    flex-shrink: 0;
+	width: 24px;
+    height: 24px;
+  }
+
+  .document-title h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+	color: #111827;
+    line-height: 1.25;
+  }
+
+  .status-indicator {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .document-metadata {
+    display: flex;
+    align-items: center;
+	gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .risk-gauge {
+    display: flex;
+    align-items: center;
+	gap: 0.5rem;
+  }
+
+  .risk-gauge .label {
+    font-size: 0.75rem;
+	color: #6b7280;
+    font-weight: 500;
+  }
+
+  /* Hover Details (Advanced Patterns) */
+  .hover-details {
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+	gap: 1rem;
+    align-items: center;
+  }
+
+  .entity-heatmap,
+  .similarity-graph {
+    display: flex;
+    align-items: center;
+	gap: 0.5rem;
+  }
+
+  .entity-heatmap .label,
+  .similarity-graph .label {
+    font-size: 0.75rem;
+	color: #6b7280;
+    font-weight: 500;
+  }
+
+  /* Debug Info */
+  .debug-info {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .debug-info small {
+    color: #9ca3af;
+    font-family: monospace;
+  }
+
+  /* Zero State */
+  .zero-state {
+    text-align: center;
+	padding: 3rem;
+    color: #6b7280;
+  }
+
+  .zero-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .zero-state h3 {
+    margin: 0 0 0.5rem 0;
+    color: #374151;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .document-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .metrics-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hover-details {
+      flex-direction: column;
+      align-items: flex-start;
+	gap: 0.5rem;
+    }
+  }
+</style>

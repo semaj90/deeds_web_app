@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto-Login Test - Legal AI Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+      <div class="w-full max-w-md">
+        <div class="bg-gray-800 p-8 rounded-lg border border-gray-700">
+          <h1 class="text-3xl font-bold text-center text-yellow-400 mb-8">Legal AI Platform - Test</h1>
+
+          <div
+            id="error-message"
+            class="hidden bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded mb-4"
+          ></div>
+
+          <form id="login-form" class="space-y-6">
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-300 mb-2"> Email </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-yellow-400"
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label for="password" class="block text-sm font-medium text-gray-300 mb-2"> Password </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                required
+                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-yellow-400"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded transition-colors"
+            >
+              Sign In
+            </button>
+          </form>
+
+          <!-- Quick Demo Login -->
+          <div class="mt-4 space-y-2">
+            <button
+              type="button"
+              id="quick-demo-login"
+              class="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded transition-colors flex items-center justify-center"
+            >
+              <span id="quick-login-text">⚡ Quick Demo Login</span>
+              <svg
+                id="loading-spinner"
+                class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              id="auto-fill-demo"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+            >
+              📝 Auto-fill Demo Credentials
+            </button>
+          </div>
+
+          <div class="mt-4 text-center">
+            <p class="text-gray-400 text-sm">Demo Account: demo@legalai.gov / demo123456</p>
+            <div class="text-gray-500 text-xs mt-2 space-y-1">
+              <p>⚡ Quick Login: Instant access (one-click)</p>
+              <p>📝 Auto-fill: Fill form then click Sign In</p>
+            </div>
+          </div>
+
+          <!-- Test Results -->
+          <div id="test-results" class="mt-6 p-4 bg-gray-900/50 rounded border border-gray-700 hidden">
+            <h3 class="text-yellow-400 font-semibold mb-2">Test Results:</h3>
+            <div id="results-content" class="text-sm text-gray-300 space-y-1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Test functionality
+      let isAutoLoggingIn = false;
+
+      function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+      }
+
+      function hideError() {
+        document.getElementById('error-message').classList.add('hidden');
+      }
+
+      function showResults(message, type = 'info') {
+        const resultsDiv = document.getElementById('test-results');
+        const contentDiv = document.getElementById('results-content');
+
+        const timestamp = new Date().toLocaleTimeString();
+        const colorClass =
+          type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-yellow-400';
+
+        contentDiv.innerHTML += `<div class="${colorClass}">[${timestamp}] ${message}</div>`;
+        resultsDiv.classList.remove('hidden');
+        resultsDiv.scrollTop = resultsDiv.scrollHeight;
+      }
+
+      // Auto-fill demo credentials
+      function autoFillDemo() {
+        hideError();
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        emailInput.value = 'demo@legalai.gov';
+        passwordInput.value = 'demo123456';
+
+        showResults('✅ Auto-fill completed - demo credentials filled', 'success');
+      }
+
+      // Quick demo login (simulated)
+      async function quickDemoLogin() {
+        if (isAutoLoggingIn) return;
+
+        hideError();
+        isAutoLoggingIn = true;
+
+        const button = document.getElementById('quick-demo-login');
+        const spinner = document.getElementById('loading-spinner');
+        const text = document.getElementById('quick-login-text');
+
+        // Update UI
+        button.disabled = true;
+        spinner.classList.remove('hidden');
+        text.textContent = 'Logging in...';
+
+        showResults('🔄 Attempting quick demo login...', 'info');
+
+        try {
+          // Simulate API call to /auth/login/auto
+          const response = await fetch('http://localhost:5177/auth/login/auto', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            showResults(`✅ Quick login successful! Redirect to: ${result.redirectTo || '/dashboard'}`, 'success');
+
+            // Simulate redirect
+            setTimeout(() => {
+              showResults('🔄 Redirecting to dashboard...', 'info');
+            }, 1000);
+          } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+        } catch (error) {
+          console.error('Quick demo login failed:', error);
+          showResults(`❌ Quick login failed: ${error.message}`, 'error');
+          showResults('🔄 Falling back to auto-fill...', 'info');
+          autoFillDemo();
+        } finally {
+          isAutoLoggingIn = false;
+          button.disabled = false;
+          spinner.classList.add('hidden');
+          text.textContent = '⚡ Quick Demo Login';
+        }
+      }
+
+      // Form submission
+      document.getElementById('login-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        showResults(`🔄 Form submitted with: ${email}`, 'info');
+
+        if (email === 'demo@legalai.gov' && password === 'demo123456') {
+          showResults('✅ Demo credentials validated!', 'success');
+          showResults('🔄 Would redirect to dashboard...', 'info');
+        } else {
+          showResults('❌ Invalid credentials', 'error');
+        }
+      });
+
+      // Event listeners
+      document.getElementById('quick-demo-login').addEventListener('click', quickDemoLogin);
+      document.getElementById('auto-fill-demo').addEventListener('click', autoFillDemo);
+
+      // Initialize
+      showResults('🚀 Auto-login test page loaded', 'success');
+    </script>
+  </body>
+</html>

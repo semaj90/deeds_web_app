@@ -1,0 +1,15 @@
+{
+  "name": "legal-ai-wasm-parser",
+  "version": "1.0.0",
+  "description": "AssemblyScript SIMD parser for legal documents",
+  "scripts": {
+    "build": "npx asc src/index.ts --binaryFile ../sveltekit-frontend/static/wasm/simd_parser.wasm --textFile ../sveltekit-frontend/static/wasm/simd_parser.wat --exportRuntime --optimize --noAssert --use abort=",
+    "build:debug": "npx asc src/index.ts --binaryFile ../sveltekit-frontend/static/wasm/simd_parser_debug.wasm --debug --exportRuntime",
+    "test": "node test/test-wasm.js"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.27.0",
+    "json-as": "^0.9.0"
+  },
+  "dependencies": {}
+}

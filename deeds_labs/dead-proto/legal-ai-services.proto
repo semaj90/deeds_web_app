@@ -1,0 +1,316 @@
+// Legal AI Platform - Native Windows Microservices
+// Protocol Buffer Definitions for Efficient Communication
+// Reduces network footprint and improves CPU performance
+
+syntax = "proto3";
+
+package legal_ai;
+option go_package = "github.com/semaj90/dweb-app/proto/legal_ai";
+
+// ===============================
+// Legal Document Processing Service
+// ===============================
+service DocumentProcessingService {
+  rpc ProcessDocument(ProcessDocumentRequest) returns (ProcessDocumentResponse);
+  rpc GetDocumentStatus(DocumentStatusRequest) returns (DocumentStatusResponse);
+  rpc SearchDocuments(DocumentSearchRequest) returns (DocumentSearchResponse);
+}
+
+message ProcessDocumentRequest {
+  string document_id = 1;
+  string case_id = 2;
+  string user_id = 3;
+  bytes document_content = 4;
+  string document_type = 5; // "pdf", "docx", "txt", "image"
+  DocumentProcessingOptions options = 6;
+}
+
+message DocumentProcessingOptions {
+  bool extract_text = 1;
+  bool generate_summary = 2;
+  bool create_embeddings = 3;
+  bool analyze_sentiment = 4;
+  bool extract_entities = 5;
+  string language = 6; // "en", "es", "fr", etc.
+}
+
+message ProcessDocumentResponse {
+  string document_id = 1;
+  ProcessingStatus status = 2;
+  string extracted_text = 3;
+  string summary = 4;
+  repeated float embeddings = 5; // 384-dimensional vector
+  repeated EntityMention entities = 6;
+  float sentiment_score = 7;
+  int64 processing_time_ms = 8;
+  string error_message = 9;
+}
+
+message DocumentStatusRequest {
+  string document_id = 1;
+}
+
+message DocumentStatusResponse {
+  string document_id = 1;
+  ProcessingStatus status = 2;
+  int32 progress_percent = 3;
+  string status_message = 4;
+}
+
+message DocumentSearchRequest {
+  string query = 1;
+  string case_id = 2;
+  int32 limit = 3;
+  float similarity_threshold = 4;
+  repeated string document_types = 5;
+}
+
+message DocumentSearchResponse {
+  repeated DocumentSearchResult results = 1;
+  int32 total_count = 2;
+  int64 search_time_ms = 3;
+}
+
+message DocumentSearchResult {
+  string document_id = 1;
+  string title = 2;
+  string snippet = 3;
+  float relevance_score = 4;
+  string document_type = 5;
+  int64 created_at = 6;
+}
+
+// ===============================
+// AI Summary Service
+// ===============================
+service AISummaryService {
+  rpc GenerateSummary(SummaryRequest) returns (SummaryResponse);
+  rpc StreamSummary(SummaryRequest) returns (stream SummaryStreamResponse);
+  rpc GetSummaryHistory(SummaryHistoryRequest) returns (SummaryHistoryResponse);
+}
+
+message SummaryRequest {
+  string case_id = 1;
+  string user_id = 2;
+  repeated string evidence_ids = 3;
+  SummaryType type = 4;
+  SummaryDepth depth = 5;
+  SummaryOptions options = 6;
+}
+
+message SummaryOptions {
+  bool include_rag = 1;
+  bool include_user_activity = 2;
+  bool enable_streaming = 3;
+  int32 chunk_size = 4;
+  string target_language = 5;
+}
+
+message SummaryResponse {
+  string summary_id = 1;
+  string summary = 2;
+  repeated string key_insights = 3;
+  repeated string action_items = 4;
+  float confidence = 5;
+  repeated SourceReference sources = 6;
+  repeated string next_steps = 7;
+  repeated string warnings = 8;
+  int64 processing_time_ms = 9;
+}
+
+message SummaryStreamResponse {
+  StreamEventType event_type = 1;
+  string content = 2;
+  int32 progress = 3;
+  string status_message = 4;
+}
+
+message SummaryHistoryRequest {
+  string case_id = 1;
+  string user_id = 2;
+  int32 limit = 3;
+}
+
+message SummaryHistoryResponse {
+  repeated SummaryHistoryItem summaries = 1;
+}
+
+message SummaryHistoryItem {
+  string summary_id = 1;
+  string summary = 2;
+  int64 created_at = 3;
+  SummaryType type = 4;
+  float confidence = 5;
+}
+
+// ===============================
+// Vector Search Service
+// ===============================
+service VectorSearchService {
+  rpc SearchSimilar(VectorSearchRequest) returns (VectorSearchResponse);
+  rpc IndexDocument(IndexDocumentRequest) returns (IndexDocumentResponse);
+  rpc GetVectorStats(VectorStatsRequest) returns (VectorStatsResponse);
+}
+
+message VectorSearchRequest {
+  repeated float query_vector = 1;
+  string collection_name = 2;
+  int32 limit = 3;
+  float threshold = 4;
+  repeated VectorFilter filters = 5;
+}
+
+message VectorSearchResponse {
+  repeated VectorSearchResult results = 1;
+  int64 search_time_ms = 2;
+}
+
+message VectorSearchResult {
+  string id = 1;
+  float score = 2;
+  map<string, string> metadata = 3;
+  repeated float vector = 4;
+}
+
+message IndexDocumentRequest {
+  string id = 1;
+  repeated float vector = 2;
+  map<string, string> metadata = 3;
+  string collection_name = 4;
+}
+
+message IndexDocumentResponse {
+  bool success = 1;
+  string message = 2;
+  int64 indexing_time_ms = 3;
+}
+
+message VectorStatsRequest {
+  string collection_name = 1;
+}
+
+message VectorStatsResponse {
+  int64 total_vectors = 1;
+  int32 vector_dimension = 2;
+  repeated string available_collections = 3;
+  int64 total_size_bytes = 4;
+}
+
+// ===============================
+// Upload Service
+// ===============================
+service UploadService {
+  rpc UploadFile(stream FileUploadRequest) returns (FileUploadResponse);
+  rpc GetUploadStatus(UploadStatusRequest) returns (UploadStatusResponse);
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+}
+
+message FileUploadRequest {
+  oneof data {
+    FileMetadata metadata = 1;
+    bytes chunk = 2;
+  }
+}
+
+message FileMetadata {
+  string filename = 1;
+  string case_id = 2;
+  string user_id = 3;
+  int64 file_size = 4;
+  string content_type = 5;
+  string upload_id = 6;
+}
+
+message FileUploadResponse {
+  string file_id = 1;
+  string upload_url = 2;
+  bool success = 3;
+  string error_message = 4;
+  int64 upload_time_ms = 5;
+}
+
+message UploadStatusRequest {
+  string upload_id = 1;
+}
+
+message UploadStatusResponse {
+  string upload_id = 1;
+  UploadStatus status = 2;
+  int32 progress_percent = 3;
+  int64 bytes_uploaded = 4;
+  int64 total_bytes = 5;
+}
+
+message DeleteFileRequest {
+  string file_id = 1;
+  string user_id = 2;
+}
+
+message DeleteFileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ===============================
+// Common Types and Enums
+// ===============================
+enum ProcessingStatus {
+  PROCESSING_STATUS_UNKNOWN = 0;
+  PROCESSING_STATUS_PENDING = 1;
+  PROCESSING_STATUS_PROCESSING = 2;
+  PROCESSING_STATUS_COMPLETED = 3;
+  PROCESSING_STATUS_FAILED = 4;
+  PROCESSING_STATUS_CANCELLED = 5;
+}
+
+enum SummaryType {
+  SUMMARY_TYPE_UNKNOWN = 0;
+  SUMMARY_TYPE_CASE = 1;
+  SUMMARY_TYPE_EVIDENCE = 2;
+  SUMMARY_TYPE_LEGAL_DOCUMENT = 3;
+  SUMMARY_TYPE_CROSS_ANALYSIS = 4;
+}
+
+enum SummaryDepth {
+  SUMMARY_DEPTH_UNKNOWN = 0;
+  SUMMARY_DEPTH_QUICK = 1;
+  SUMMARY_DEPTH_COMPREHENSIVE = 2;
+  SUMMARY_DEPTH_FORENSIC = 3;
+}
+
+enum StreamEventType {
+  STREAM_EVENT_TYPE_UNKNOWN = 0;
+  STREAM_EVENT_TYPE_STATUS = 1;
+  STREAM_EVENT_TYPE_LLM_CHUNK = 2;
+  STREAM_EVENT_TYPE_COMPLETE = 3;
+  STREAM_EVENT_TYPE_ERROR = 4;
+}
+
+enum UploadStatus {
+  UPLOAD_STATUS_UNKNOWN = 0;
+  UPLOAD_STATUS_PENDING = 1;
+  UPLOAD_STATUS_UPLOADING = 2;
+  UPLOAD_STATUS_PROCESSING = 3;
+  UPLOAD_STATUS_COMPLETED = 4;
+  UPLOAD_STATUS_FAILED = 5;
+}
+
+message EntityMention {
+  string text = 1;
+  string entity_type = 2; // "PERSON", "ORG", "DATE", "MONEY", etc.
+  int32 start_offset = 3;
+  int32 end_offset = 4;
+  float confidence = 5;
+}
+
+message SourceReference {
+  string type = 1; // "llm", "rag", "user_activity"
+  float contribution = 2;
+  map<string, string> details = 3;
+}
+
+message VectorFilter {
+  string key = 1;
+  string operator = 2; // "eq", "ne", "gt", "lt", "in"
+  string value = 3;
+}

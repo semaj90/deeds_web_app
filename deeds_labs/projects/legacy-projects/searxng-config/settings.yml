@@ -1,0 +1,140 @@
+# SearXNG Configuration
+# Documentation: https://docs.searxng.org/admin/settings/
+
+# General settings
+general:
+  debug: false
+  instance_name: "Deeds Legal AI Search"
+  contact_url: false
+  enable_metrics: true
+
+# Search settings
+search:
+  safe_search: 0  # 0=off, 1=moderate, 2=strict
+  autocomplete: "google"
+  default_lang: "en"
+  max_page: 0  # unlimited
+  formats:
+    - html
+    - json
+
+# Server settings
+server:
+  port: 8080
+  bind_address: "0.0.0.0"
+  secret_key: "change_this_secret_key_in_production"  # Override with SEARXNG_SECRET env var
+  limiter: false  # Rate limiting (disable for local use)
+  image_proxy: true
+  http_protocol_version: "1.1"
+
+# UI settings
+ui:
+  static_use_hash: true
+  default_theme: simple
+  default_locale: en
+  theme_args:
+    simple_style: auto  # auto, light, dark
+  results_on_new_tab: false
+  advanced_search: true
+  query_in_title: true
+  infinite_scroll: false
+  center_alignment: false
+  cache_url: "https://web.archive.org/web/"
+
+# Enabled search engines (optimized for legal/technical searches)
+engines:
+  # General search
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    disabled: false
+
+  - name: google
+    engine: google
+    shortcut: go
+    disabled: false
+
+  - name: bing
+    engine: bing
+    shortcut: bi
+    disabled: false
+
+  # Technical documentation
+  - name: stackoverflow
+    engine: stackoverflow
+    shortcut: so
+    disabled: false
+
+  - name: github
+    engine: github
+    shortcut: gh
+    disabled: false
+
+  - name: npm
+    engine: npm
+    shortcut: npm
+    disabled: false
+
+  # Legal resources
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: false
+
+  - name: wikidata
+    engine: wikidata
+    shortcut: wd
+    disabled: false
+
+  # Code search
+  - name: "github code"
+    engine: github
+    categories: [it]
+    search_type: code
+    shortcut: ghc
+    disabled: false
+
+  # Documentation search
+  - name: readthedocs
+    engine: readthedocs
+    shortcut: rtd
+    disabled: false
+
+# Disabled engines (reduce noise)
+disabled_engines:
+  - reddit
+  - twitter
+  - youtube
+  - spotify
+  - soundcloud
+  - currency
+  - stock
+  - recipe
+
+# Outgoing request settings
+outgoing:
+  request_timeout: 3.0  # seconds
+  max_request_timeout: 10.0
+  pool_connections: 100
+  pool_maxsize: 20
+  enable_http2: true
+
+# Redis caching (if searxng-redis service is running)
+redis:
+  url: redis://searxng-redis:6379/0
+
+# Result formatting
+result_proxy:
+  url: ""
+  key: ""
+
+# Plugins
+enabled_plugins:
+  - "Hash plugin"
+  - "Self Information"
+  - "Tracker URL remover"
+  - "Hostname replace"
+
+disabled_plugins:
+  - "Open Access DOI rewrite"
+  - "Tor check plugin"

@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evidence Processing System Test</title>
+    <style>
+      body {
+        font-family: 'Courier New', monospace;
+        background: #1a1a1a;
+        color: #00ff00;
+        padding: 20px;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        border: 2px solid #00ff00;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: #2a2a2a;
+      }
+
+      .section {
+        border: 1px solid #333;
+        margin: 20px 0;
+        padding: 20px;
+        background: #2a2a2a;
+      }
+
+      .section h3 {
+        color: #00ccff;
+        margin-top: 0;
+        border-bottom: 1px solid #00ccff;
+        padding-bottom: 10px;
+      }
+
+      .button {
+        background: #005500;
+        color: #00ff00;
+        border: 2px solid #00ff00;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin: 5px;
+        font-family: inherit;
+      }
+
+      .button:hover {
+        background: #007700;
+      }
+
+      .button:disabled {
+        background: #333;
+        color: #666;
+        cursor: not-allowed;
+      }
+
+      .log {
+        background: #000;
+        color: #00ff00;
+        padding: 15px;
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #00ff00;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 5px;
+        border-radius: 3px;
+        font-weight: bold;
+      }
+
+      .status.success {
+        background: #004400;
+        color: #00ff00;
+      }
+      .status.error {
+        background: #440000;
+        color: #ff4444;
+      }
+      .status.warning {
+        background: #444400;
+        color: #ffff00;
+      }
+      .status.info {
+        background: #004444;
+        color: #00ffff;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        background: #333;
+        border: 1px solid #00ff00;
+        margin: 10px 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00ff00, #00ccff);
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      .file-info {
+        background: #333;
+        padding: 10px;
+        margin: 10px 0;
+        border-left: 4px solid #00ff00;
+      }
+
+      input[type='file'] {
+        background: #333;
+        color: #00ff00;
+        border: 1px solid #00ff00;
+        padding: 10px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🧪 Evidence Processing System - Browser Test</h1>
+        <p>Real-time WebSocket + Queue-based Processing Pipeline</p>
+      </div>
+
+      <div class="section">
+        <h3>📋 System Status</h3>
+        <div id="systemStatus">
+          <span class="status info">Initializing...</span>
+        </div>
+        <button class="button" onclick="checkSystemHealth()">🔍 Check System Health</button>
+      </div>
+
+      <div class="section">
+        <h3>📤 File Upload & Processing</h3>
+        <input type="file" id="fileInput" multiple accept=".pdf,.txt,.doc,.docx" />
+        <br /><br />
+        <button class="button" onclick="startProcessing()" id="startBtn"> 🚀 Start Evidence Processing </button>
+        <button class="button" onclick="testWithoutFile()" id="testBtn"> 🧪 Test Without File </button>
+        <button class="button" onclick="clearLog()" id="clearBtn">🗑️ Clear Log</button>
+      </div>
+
+      <div class="section">
+        <h3>📊 Processing Progress</h3>
+        <div id="progressInfo">
+          <div>Session ID: <span id="sessionId">None</span></div>
+          <div>Evidence ID: <span id="evidenceId">None</span></div>
+          <div>Current Step: <span id="currentStep">None</span></div>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div id="progressText">0% - Waiting...</div>
+
+        <div id="fileStatus"></div>
+      </div>
+
+      <div class="section">
+        <h3>📡 WebSocket Connection</h3>
+        <div id="wsStatus">
+          <span class="status warning">Disconnected</span>
+        </div>
+        <button class="button" onclick="connectWebSocket()" id="connectBtn"> 🔌 Connect WebSocket </button>
+        <button class="button" onclick="disconnectWebSocket()" id="disconnectBtn"> ❌ Disconnect </button>
+      </div>
+
+      <div class="section">
+        <h3>📝 System Log</h3>
+        <div class="log" id="systemLog"></div>
+      </div>
+    </div>
+
+    <script>
+      // Configuration
+      const API_BASE = window.location.origin;
+      const WS_BASE = API_BASE.replace(/^http/, 'ws');
+
+      // Global state
+      let currentSession = null;
+      let websocket = null;
+      let processingStartTime = null;
+
+      // Logging function
+      function log(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logElement = document.getElementById('systemLog');
+        const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+        logElement.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+        logElement.scrollTop = logElement.scrollHeight;
+        console.log(`[${type.toUpperCase()}] ${message}`);
+      }
+
+      function clearLog() {
+        document.getElementById('systemLog').textContent = '';
+        log('Log cleared');
+      }
+
+      // Update UI elements
+      function updateStatus(elementId, status, text) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `<span class="status ${status}">${text}</span>`;
+      }
+
+      function updateProgress(percentage, step = 'Processing') {
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const currentStepElement = document.getElementById('currentStep');
+
+        progressFill.style.width = `${percentage}%`;
+        progressText.textContent = `${percentage}% - ${step}`;
+        currentStepElement.textContent = step;
+      }
+
+      // System health check
+      async function checkSystemHealth() {
+        log('Checking system health...');
+        updateStatus('systemStatus', 'info', 'Checking...');
+
+        try {
+          // Check if SvelteKit server is running
+          const response = await fetch(`${API_BASE}/api/health`);
+          if (response.ok) {
+            const health = await response.json();
+            log('✅ SvelteKit server is running');
+            log(`Server status: ${JSON.stringify(health, null, 2)}`);
+            updateStatus('systemStatus', 'success', 'SvelteKit Server: Online');
+          } else {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+        } catch (error) {
+          log(`❌ SvelteKit server check failed: ${error.message}`, 'error');
+          updateStatus('systemStatus', 'error', 'SvelteKit Server: Offline');
+        }
+      }
+
+      // WebSocket connection
+      function connectWebSocket(sessionId = null) {
+        if (!sessionId && !currentSession) {
+          log('⚠️ No session ID available for WebSocket connection', 'warning');
+          return;
+        }
+
+        const wsSessionId = sessionId || currentSession.sessionId;
+        const wsUrl = `${WS_BASE}/api/evidence/stream/${wsSessionId}`;
+
+        log(`Connecting to WebSocket: ${wsUrl}`);
+
+        try {
+          websocket = new WebSocket(wsUrl);
+
+          websocket.onopen = function () {
+            log('✅ WebSocket connected successfully');
+            updateStatus('wsStatus', 'success', 'Connected');
+          };
+
+          websocket.onmessage = function (event) {
+            try {
+              const message = JSON.parse(event.data);
+              handleWebSocketMessage(message);
+            } catch (error) {
+              log(`WebSocket message parse error: ${error.message}`, 'error');
+            }
+          };
+
+          websocket.onerror = function (error) {
+            log(`WebSocket error: ${error}`, 'error');
+            updateStatus('wsStatus', 'error', 'Error');
+          };
+
+          websocket.onclose = function (event) {
+            log(`WebSocket closed: ${event.code} - ${event.reason}`);
+            updateStatus('wsStatus', 'warning', 'Disconnected');
+          };
+        } catch (error) {
+          log(`Failed to create WebSocket connection: ${error.message}`, 'error');
+          updateStatus('wsStatus', 'error', 'Connection Failed');
+        }
+      }
+
+      function disconnectWebSocket() {
+        if (websocket) {
+          websocket.close();
+          websocket = null;
+          log('WebSocket disconnected manually');
+          updateStatus('wsStatus', 'warning', 'Disconnected');
+        }
+      }
+
+      // Handle WebSocket messages
+      function handleWebSocketMessage(message) {
+        log(`WebSocket message: ${JSON.stringify(message)}`);
+
+        switch (message.type) {
+          case 'upload-progress':
+            updateProgress(message.progress, 'Uploading');
+            log(`Upload progress: ${message.progress}%`);
+            break;
+
+          case 'processing-step':
+            const stepProgress = message.stepProgress || 0;
+            updateProgress(stepProgress, message.step);
+            log(`Processing step: ${message.step} (${stepProgress}%)`);
+
+            if (message.fragment) {
+              log(`Step fragment: ${JSON.stringify(message.fragment)}`);
+            }
+            break;
+
+          case 'processing-complete':
+            updateProgress(100, 'Completed');
+            log('✅ Processing completed successfully!', 'success');
+
+            if (message.finalResult) {
+              log(`Final result: ${JSON.stringify(message.finalResult, null, 2)}`);
+            }
+
+            const processingTime = processingStartTime
+              ? Math.round((Date.now() - processingStartTime) / 1000)
+              : 'unknown';
+            log(`Total processing time: ${processingTime} seconds`);
+            break;
+
+          case 'error':
+            log(`❌ Processing error: ${message.error.message}`, 'error');
+            updateProgress(0, 'Error');
+            updateStatus('systemStatus', 'error', `Error: ${message.error.message}`);
+            break;
+
+          default:
+            log(`Unknown message type: ${message.type}`, 'warning');
+        }
+      }
+
+      // Start processing (with or without files)
+      async function startProcessing() {
+        const fileInput = document.getElementById('fileInput');
+        const files = fileInput.files;
+
+        if (files.length === 0) {
+          log('⚠️ No files selected, starting test processing...', 'warning');
+          return testWithoutFile();
+        }
+
+        log(`Starting processing for ${files.length} file(s)...`);
+
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          await processFile(file);
+        }
+      }
+
+      async function processFile(file) {
+        log(`Processing file: ${file.name} (${Math.round(file.size / 1024)}KB)`);
+
+        // For now, we'll simulate file processing since we need actual file upload integration
+        // In a real implementation, you'd upload the file to MinIO first, then process
+        await testWithoutFile(file.name);
+      }
+
+      async function testWithoutFile(fileName = 'test-document.pdf') {
+        try {
+          log('🧪 Starting test evidence processing...');
+          updateStatus('systemStatus', 'info', 'Processing...');
+          processingStartTime = Date.now();
+
+          // Generate test evidence ID
+          const testEvidenceId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+          // Start evidence processing
+          const response = await fetch(`${API_BASE}/api/evidence/process`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              evidenceId: testEvidenceId,
+              steps: ['ocr', 'embedding', 'analysis'],
+            }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+          }
+
+          const result = await response.json();
+
+          log('✅ Evidence processing started successfully!', 'success');
+          log(`Session ID: ${result.sessionId}`);
+          log(`Evidence ID: ${result.evidenceId}`);
+          log(`Processing steps: ${result.steps.join(', ')}`);
+
+          // Update UI
+          document.getElementById('sessionId').textContent = result.sessionId;
+          document.getElementById('evidenceId').textContent = result.evidenceId;
+
+          // Store session info
+          currentSession = result;
+
+          // Connect WebSocket for progress updates
+          connectWebSocket(result.sessionId);
+
+          updateStatus('systemStatus', 'success', 'Processing Started');
+
+          // Create file status display
+          const fileStatusDiv = document.getElementById('fileStatus');
+          fileStatusDiv.innerHTML = `
+                    <div class="file-info">
+                        <strong>📄 ${fileName}</strong><br>
+                        Evidence ID: ${result.evidenceId}<br>
+                        Session ID: ${result.sessionId}<br>
+                        Steps: ${result.steps.join(' → ')}<br>
+                        Status: <span class="status info">Processing...</span>
+                    </div>
+                `;
+        } catch (error) {
+          log(`❌ Test processing failed: ${error.message}`, 'error');
+          updateStatus('systemStatus', 'error', `Failed: ${error.message}`);
+          updateProgress(0, 'Failed');
+        }
+      }
+
+      // Initialize on page load
+      window.onload = function () {
+        log('🚀 Evidence Processing System Test initialized');
+        log(`API Base: ${API_BASE}`);
+        log(`WebSocket Base: ${WS_BASE}`);
+        checkSystemHealth();
+      };
+
+      // Cleanup on page unload
+      window.onbeforeunload = function () {
+        if (websocket) {
+          websocket.close();
+        }
+      };
+    </script>
+  </body>
+</html>

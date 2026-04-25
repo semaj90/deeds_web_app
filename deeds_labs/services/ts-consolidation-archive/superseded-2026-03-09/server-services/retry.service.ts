@@ -1,0 +1,191 @@
+/**
+ * Retry Service
+ * Implements retry logic with exponential backoff for transient errors
+ */
+
+export interface RetryOptions {
+    maxRetries?: number;
+    initialDelayMs?: number;
+    maxDelayMs?: number;
+    backoffMultiplier?: number;
+    shouldRetry?: (error: any) => boolean;
+}
+
+const DEFAULT_OPTIONS: Required<RetryOptions> = {
+    maxRetries: 3,
+    initialDelayMs: 1000,
+    maxDelayMs: 30000,
+    backoffMultiplier: 2,
+    shouldRetry: (error: any) => {
+        // Retry on network errors, timeouts, and 5xx errors
+        if (error instanceof TypeError) return true; // Network error
+        if (error.code === 'ECONNREFUSED') return true;
+        if (error.code === 'ETIMEDOUT') return true;
+        if (error.status && error.status >= 500) return true;
+        return false;
+    },
+	};
+
+/**
+ * Execute a function with retry logic and exponential backoff
+ */
+export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
+    const config = { ...DEFAULT_OPTIONS, ...options };
+    let lastError: any;
+
+    for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            lastError = error;
+
+            // Check if we should retry
+            if (!config.shouldRetry(error)) {
+                throw error;
+            }
+
+            // Don't retry after last attempt
+            if (attempt === config.maxRetries) {
+                throw error;
+            }
+
+            // Calculate delay with exponential backoff
+            const delay = calculateBackoffDelay(
+                attempt,
+                config.initialDelayMs,
+                config.maxDelayMs,
+                config.backoffMultiplier
+            );
+
+            console.log(`Retry attempt ${attempt + 1}/${config.maxRetries} after ${delay}ms`, error);
+
+            // Wait before retrying
+            await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+    }
+
+    throw lastError;
+}
+
+/**
+ * Execute a function with timeout
+ */
+export async function withTimeout<T>(fn: () => Promise<T>, timeoutMs: number): Promise<T> {
+    return Promise.race([
+        fn(),
+        new Promise<T>((_, reject) =>
+            setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+        )
+    ]);
+}
+
+/**
+ * Execute a function with retry and timeout
+ */
+export async function withRetryAndTimeout<T>(
+    fn: () => Promise<T>,
+    retryOptions: RetryOptions = {},
+	timeoutMs: number = 30000
+): Promise<T> {
+    return withRetry(() => withTimeout(fn, timeoutMs), retryOptions);
+}
+
+/**
+ * Circuit breaker pattern for handling cascading failures
+ */
+export class CircuitBreaker {
+    private failureCount = 0;
+    private successCount = 0;
+    private lastFailureTime: number | null = null;
+    private state: 'closed' | 'open' | 'half-open' = 'closed';
+
+    constructor(
+        private failureThreshold: number = 5,
+        private successThreshold: number = 2,
+        private resetTimeoutMs: number = 60000
+    ) {}
+
+    async execute<T>(fn: () => Promise<T>): Promise<T> {
+        // Check if circuit should be reset
+        if (
+            this.state === 'open' &&
+            this.lastFailureTime &&
+            Date.now() - this.lastFailureTime > this.resetTimeoutMs
+        ) {
+            this.state = 'half-open';
+            this.successCount = 0;
+        }
+
+        // Reject if circuit is open
+        if (this.state === 'open') {
+            throw new Error('Circuit breaker is open');
+        }
+
+        try {
+            const result = await fn();
+
+            // Handle success
+            if (this.state === 'half-open') {
+                this.successCount++;
+                if (this.successCount >= this.successThreshold) {
+                    this.state = 'closed';
+                    this.failureCount = 0;
+                    this.successCount = 0;
+                }
+            } else if (this.state === 'closed') {
+                this.failureCount = 0;
+            }
+
+            return result;
+        } catch (error) {
+            // Handle failure
+            this.failureCount++;
+            this.lastFailureTime = Date.now();
+
+            if (this.failureCount >= this.failureThreshold) {
+                this.state = 'open';
+            }
+
+            throw error;
+        }
+    }
+
+    getState(): string {
+        return this.state;
+    }
+
+    reset(): void {
+        this.state = 'closed';
+        this.failureCount = 0;
+        this.successCount = 0;
+        this.lastFailureTime = null;
+    }
+}
+
+/**
+ * Exponential backoff calculator
+ */
+export function calculateBackoffDelay(
+    attempt: number,
+    initialDelayMs: number = 1000,
+    maxDelayMs: number = 30000,
+    multiplier: number = 2
+): number {
+    const delay = initialDelayMs * Math.pow(multiplier, attempt);
+    return Math.min(delay, maxDelayMs);
+}
+
+/**
+ * Jittered backoff to prevent thundering herd
+ */
+export function calculateJitteredBackoffDelay(
+    attempt: number,
+    initialDelayMs: number = 1000,
+    maxDelayMs: number = 30000,
+    multiplier: number = 2
+): number {
+    const baseDelay = calculateBackoffDelay(attempt, initialDelayMs, maxDelayMs, multiplier);
+    // Add random jitter: ±10% of base delay
+    const jitter = baseDelay * 0.1 * (Math.random() * 2 - 1);
+    return Math.max(0, baseDelay + jitter);
+}

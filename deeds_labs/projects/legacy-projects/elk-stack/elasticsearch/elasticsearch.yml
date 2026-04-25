@@ -1,0 +1,35 @@
+# Elasticsearch configuration for Legal AI system
+# This is a placeholder configuration for development
+
+cluster.name: legal-ai-cluster
+node.name: legal-ai-node-01
+
+# Network settings
+network.host: localhost
+http.port: 9200
+transport.port: 9300
+
+# Path settings (Windows-specific)
+path.data: C:\ProgramData\Elasticsearch\data
+path.logs: C:\ProgramData\Elasticsearch\logs
+
+# Memory settings
+bootstrap.memory_lock: false
+
+# Discovery settings for single node
+discovery.type: single-node
+
+# Security (disable for development)
+xpack.security.enabled: false
+xpack.ml.enabled: false
+
+# Index settings for legal documents
+index.number_of_shards: 1
+index.number_of_replicas: 0
+
+# Performance settings
+indices.memory.index_buffer_size: 256mb
+indices.fielddata.cache.size: 512mb
+
+# Legal AI specific settings
+action.auto_create_index: legal-ai-*,+apm-*,-*

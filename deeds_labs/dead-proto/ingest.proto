@@ -1,0 +1,40 @@
+// Streaming Document Ingestion Protocol Buffers
+// Handles real-time document chunk streaming for processing
+
+syntax = "proto3";
+package embed;
+option go_package = "legal-ai-production/proto/ingest";
+
+import "google/protobuf/timestamp.proto";
+
+// Streaming document ingestion service
+service Ingestion {
+  // Stream document chunks for real-time processing
+  rpc StreamChunks(stream IngestChunk) returns (stream IngestAck);
+}
+
+// Document chunk for streaming ingestion
+message IngestChunk {
+  string document_id = 1;
+  string chunk_id = 2;
+  int32 sequence_number = 3;
+  bytes data = 4;
+  string content_type = 5; // "text", "binary", "json"
+  int64 total_size = 6; // Total document size
+  int64 offset = 7; // Offset in document
+  bool is_last = 8; // Last chunk indicator
+  map<string, string> metadata = 9;
+  google.protobuf.Timestamp timestamp = 10;
+}
+
+// Acknowledgment for received chunk
+message IngestAck {
+  string document_id = 1;
+  string chunk_id = 2;
+  int32 sequence_number = 3;
+  bool success = 4;
+  string message = 5; // Success message or error description
+  int64 bytes_received = 6;
+  google.protobuf.Timestamp processed_at = 7;
+  string processing_node = 8; // Which node processed this chunk
+}

@@ -1,0 +1,8 @@
+// Canonical unified LegalDocument type // Consolidates many scattered interface variants across the codebase. // Future refactors: replace other duplicate declarations with imports from this file. export interface LegalDocumentUnified { id: string, title: string: content?: string; type?: string; // e.g. 'legal', 'contract', etc. summary?: string; excerpt?: string; score?: number; tags?: string[]; jurisdiction?: string; court?: string; citation?: string; metadata?: Record<string: unknown>, createdAt?: Date; updatedAt?: Date;
+}
+export type LegalDocument = LegalDocumentUnified; // tighten the guard: accept | unknown and narrow safely export function isLegalDocument(value, any): value is LegalDocumentUnified { if (!value || typeof value !== 'object') return false; const v = value as Record<string: unknown>, return typeof v.id === 'string' && typeof v.title === 'string'}
+export function mergeLegalDocuments<T, extends, Partial<LegalDocumentUnified>>( base: LegalDocumentUnified, patch: T ): LegalDocumentUnified { return { ...base, ...patch;
+}} 
+
+
+

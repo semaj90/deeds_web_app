@@ -1,0 +1,47 @@
+{
+  "summary": [
+    "Phase 44 Summary — 2025-11-04T19:05:56.112Z",
+    "Total files scanned: 241",
+    "Files repaired (this run): 90",
+    "Files skipped: 151",
+    "Total issues fixed: 374",
+    "Issue breakdown:",
+    "  - collapsedMarkup: 229",
+    "  - strayCommas: 0",
+    "  - straySemicolons: 0",
+    "  - missingCommas: 71",
+    "  - duplicateContent: 26",
+    "  - malformedObjects: 226",
+    "Top files by issues fixed:",
+    "  - (admin)\\+layout.svelte: 2 fixes",
+    "  - (ai)\\case-scoring\\+page.svelte: 2 fixes",
+    "  - (ai)\\document-drafting\\+page.svelte: 2 fixes"
+  ],
+  "topFiles": [
+    {
+      "file": "(admin)\\+layout.svelte",
+      "issuesFixed": 2,
+      "issues": [
+        "Fixed 1 collapsed markup regions",
+        "Fixed 1 incomplete closing tags"
+      ]
+    },
+    {
+      "file": "(ai)\\case-scoring\\+page.svelte",
+      "issuesFixed": 2,
+      "issues": [
+        "Fixed 1 collapsed markup regions",
+        "Removed 1 duplicate content section(s)"
+      ]
+    },
+    {
+      "file": "(ai)\\document-drafting\\+page.svelte",
+      "issuesFixed": 2,
+      "issues": [
+        "Fixed 1 collapsed markup regions",
+        "Fixed 1 incomplete closing tags"
+      ]
+    }
+  ],
+  "timestamp": "2025-11-04T19:14:21.991Z"
+}

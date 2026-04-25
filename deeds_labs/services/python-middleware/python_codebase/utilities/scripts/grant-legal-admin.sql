@@ -1,0 +1,14 @@
+-- Grant privileges to legal_admin on public schema and objects
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'legal_admin') THEN
+    CREATE ROLE legal_admin LOGIN PASSWORD '123456';
+  END IF;
+END$$;
+
+GRANT USAGE ON SCHEMA public TO legal_admin;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO legal_admin;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO legal_admin;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO legal_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO legal_admin;

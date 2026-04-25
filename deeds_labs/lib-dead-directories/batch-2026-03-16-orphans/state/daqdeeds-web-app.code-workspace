@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../../../.."
+		},
+		{
+			"path": "../../../../.."
+		}
+	],
+	"settings": {
+		"terminal.integrated.defaultProfile.windows": "PowerShell",
+		"terminal.integrated.fontSize": 14,
+		"workbench.colorCustomizations": {
+			"terminal.background": "#1e1e1e",
+			"terminal.foreground": "#d4d4d4"
+		},
+		"git.ignoreLimitWarning": true
+	}
+}

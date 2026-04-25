@@ -1,0 +1,46 @@
+{
+  "version": "1.1.0rc5",
+  "architecture": "GemmaForCausalLM",
+  "dtype": "float16",
+  "num_hidden_layers": 48,
+  "num_attention_heads": 16,
+  "num_key_value_heads": 8,
+  "hidden_size": 3840,
+  "intermediate_size": 15360,
+  "vocab_size": 262208,
+  "max_position_embeddings": 4096,
+  "builder_config": {
+    "name": "gemma",
+    "precision": "float16",
+    "tensor_parallel": 1,
+    "pipeline_parallel": 1
+  },
+  "architectures": [
+    "Gemma3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "attn_logit_softcapping": null,
+  "bos_token_id": 2,
+  "cache_implementation": "hybrid",
+  "eos_token_id": 1,
+  "final_logit_softcapping": null,
+  "head_dim": 256,
+  "hidden_activation": "gelu_pytorch_tanh",
+  "initializer_range": 0.02,
+  "model_type": "gemma",
+  "pad_token_id": 0,
+  "query_pre_attn_scalar": 256,
+  "rms_norm_eps": 1e-06,
+  "rope_local_base_freq": 10000.0,
+  "rope_scaling": {
+    "factor": 8.0,
+    "rope_type": "linear"
+  },
+  "rope_theta": 1000000.0,
+  "sliding_window": 1024,
+  "sliding_window_pattern": 6,
+  "torch_dtype": "float16",
+  "transformers_version": "4.51.3",
+  "use_cache": true
+}

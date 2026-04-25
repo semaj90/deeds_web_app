@@ -1,0 +1,179 @@
+{
+  "name": "unified-ast-graph",
+  "version": "1.0.0",
+  "description": "Multi-language AST error analysis and fix recommendation system",
+  "tools": [
+    {
+      "name": "unified_ast_query",
+      "description": "Query unified AST graph across TypeScript, Go, and Python errors",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query"
+          },
+          "languages": {
+            "type": "array",
+            "description": ""
+          },
+          "limit": {
+            "type": "integer",
+            "description": ""
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "cross_language_similarity",
+      "description": "Find similar errors across different programming languages",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "error_message": {
+            "type": "string",
+            "description": ""
+          },
+          "source_language": {
+            "type": "string",
+            "description": ""
+          },
+          "target_languages": {
+            "type": "array",
+            "description": ""
+          }
+        },
+        "required": [
+          "error_message",
+          "source_language"
+        ]
+      }
+    },
+    {
+      "name": "cuda_fix_priority",
+      "description": "GPU-accelerated computation of optimal error fix order using CUDA PageRank",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cluster_id": {
+            "type": "integer",
+            "description": ""
+          },
+          "algorithm": {
+            "type": "string",
+            "description": ""
+          }
+        },
+        "required": [
+          "cluster_id"
+        ]
+      }
+    },
+    {
+      "name": "glyph_metadata",
+      "description": "Query Redis for cached glyph tensor metadata",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cluster_id": {
+            "type": "integer",
+            "description": ""
+          },
+          "glyph_type": {
+            "type": "string",
+            "description": ""
+          }
+        },
+        "required": [
+          "cluster_id"
+        ]
+      }
+    },
+    {
+      "name": "neo4j_dependency_graph",
+      "description": "Visualize cross-language dependency graph from Neo4j",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "start_node": {
+            "type": "string",
+            "description": ""
+          },
+          "depth": {
+            "type": "integer",
+            "description": ""
+          }
+        },
+        "required": [
+          "start_node"
+        ]
+      }
+    },
+    {
+      "name": "agentic_recommendation",
+      "description": "Get AI-generated fix recommendations for specific error types",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "description": ""
+          },
+          "error_type": {
+            "type": "string",
+            "description": ""
+          },
+          "context": {
+            "type": "object",
+            "description": "Additional context (file path, line number, etc.)"
+          }
+        },
+        "required": [
+          "language",
+          "error_type"
+        ]
+      }
+    },
+    {
+      "name": "batch_error_analysis",
+      "description": "Analyze multiple errors in batch for efficiency",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "error_ids": {
+            "type": "array",
+            "description": "List of error IDs to analyze"
+          },
+          "analysis_type": {
+            "type": "string",
+            "description": ""
+          }
+        },
+        "required": [
+          "error_ids"
+        ]
+      }
+    },
+    {
+      "name": "redis_cache_stats",
+      "description": "Get Redis cache statistics and performance metrics",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "system_health_check",
+      "description": "Check health status of all unified AST graph components",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  ]
+}

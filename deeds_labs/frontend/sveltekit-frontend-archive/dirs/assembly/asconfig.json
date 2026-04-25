@@ -1,0 +1,22 @@
+{
+  "targets": {
+    "debug": {
+      "outFile": "../build/vector-ops.debug.wasm",
+      "textFile": "../build/vector-ops.debug.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "../build/vector-ops.wasm",
+      "textFile": "../build/vector-ops.wat",
+      "sourceMap": false,
+      "optimizeLevel": 3,
+      "shrinkLevel": 1,
+      "converge": true,
+      "noAssert": true
+    }
+  },
+  "options": {
+    "bindings": "esm"
+  }
+}

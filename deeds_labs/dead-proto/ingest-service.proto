@@ -1,0 +1,376 @@
+// Document Ingest Service Protocol Buffers
+// Handles document upload, processing, chunking, and indexing pipeline
+
+syntax = "proto3";
+package legal.ingest;
+option go_package = "legal-ai-production/proto/ingest";
+
+import "google/protobuf/timestamp.proto";
+
+// Document ingest and processing service
+service IngestService {
+  // Submit document for processing
+  rpc SubmitDocument(SubmitDocumentRequest) returns (SubmitDocumentResponse);
+  
+  // Get processing status
+  rpc GetProcessingStatus(ProcessingStatusRequest) returns (ProcessingStatusResponse);
+  
+  // Stream processing updates
+  rpc StreamProcessingUpdates(ProcessingStatusRequest) returns (stream ProcessingUpdate);
+  
+  // Cancel processing job
+  rpc CancelProcessing(CancelProcessingRequest) returns (CancelProcessingResponse);
+  
+  // Retry failed processing
+  rpc RetryProcessing(RetryProcessingRequest) returns (RetryProcessingResponse);
+  
+  // Get processed document chunks
+  rpc GetDocumentChunks(GetChunksRequest) returns (GetChunksResponse);
+  
+  // Search processed documents
+  rpc SearchDocuments(SearchDocumentsRequest) returns (SearchDocumentsResponse);
+  
+  // Get service statistics
+  rpc GetStatistics(StatisticsRequest) returns (StatisticsResponse);
+}
+
+// Document submission
+message SubmitDocumentRequest {
+  string document_id = 1; // Optional: if not provided, will be generated
+  string filename = 2;
+  string mime_type = 3;
+  int64 file_size = 4;
+  string source_uri = 5; // MinIO URI: minio://bucket/key
+  string case_id = 6; // Optional: associate with legal case
+  string uploaded_by = 7; // User ID
+  DocumentMetadata metadata = 8;
+  ProcessingOptions options = 9;
+}
+
+// Document metadata
+message DocumentMetadata {
+  string title = 1;
+  string description = 2;
+  repeated string tags = 3;
+  string document_type = 4; // "contract", "evidence", "brief", "memo"
+  string language = 5;
+  int32 page_count = 6;
+  google.protobuf.Timestamp created_date = 7;
+  map<string, string> custom_fields = 8;
+}
+
+// Processing options
+message ProcessingOptions {
+  bool enable_ocr = 1;
+  bool enable_entity_extraction = 2;
+  bool enable_chunking = 3;
+  bool enable_embedding = 4;
+  bool enable_neo4j_sync = 5;
+  
+  ChunkingOptions chunking = 6;
+  EmbeddingOptions embedding = 7;
+  OCROptions ocr = 8;
+}
+
+// Chunking configuration
+message ChunkingOptions {
+  int32 chunk_size = 1; // tokens
+  int32 overlap = 2; // overlap tokens
+  bool preserve_structure = 3; // Respect document structure
+  int32 min_chunk_size = 4;
+  repeated string section_patterns = 5; // Custom section detection patterns
+}
+
+// Embedding configuration
+message EmbeddingOptions {
+  string model = 1; // "nomic-embed-text", "bge-small"
+  int32 dimensions = 2;
+  bool normalize = 3;
+  bool enable_hierarchical = 4; // Create parent-child chunk relationships
+}
+
+// OCR configuration
+message OCROptions {
+  string language = 1; // "eng", "spa", etc.
+  float confidence_threshold = 2;
+  bool enable_preprocessing = 3; // Image enhancement
+  repeated string engines = 4; // ["tesseract", "aws-textract"]
+}
+
+// Document submission response
+message SubmitDocumentResponse {
+  string document_id = 1;
+  string job_id = 2;
+  ProcessingStatus status = 3;
+  google.protobuf.Timestamp submitted_at = 4;
+  int32 estimated_processing_time_seconds = 5;
+}
+
+// Processing status
+enum ProcessingStatus {
+  PENDING = 0;
+  DOWNLOADING = 1;
+  EXTRACTING_TEXT = 2;
+  CHUNKING = 3;
+  EMBEDDING = 4;
+  EXTRACTING_ENTITIES = 5;
+  SYNCING_NEO4J = 6;
+  COMPLETED = 7;
+  FAILED = 8;
+  CANCELLED = 9;
+  RETRYING = 10;
+}
+
+// Processing status request
+message ProcessingStatusRequest {
+  string document_id = 1;
+  string job_id = 2; // Alternative lookup
+}
+
+// Processing status response
+message ProcessingStatusResponse {
+  string document_id = 1;
+  string job_id = 2;
+  ProcessingStatus status = 3;
+  float progress_percentage = 4;
+  string current_step = 5;
+  ProcessingMetrics metrics = 6;
+  repeated ProcessingError errors = 7;
+  google.protobuf.Timestamp started_at = 8;
+  google.protobuf.Timestamp completed_at = 9;
+}
+
+// Processing metrics
+message ProcessingMetrics {
+  int64 bytes_processed = 1;
+  int32 pages_processed = 2;
+  int32 chunks_created = 3;
+  int32 embeddings_generated = 4;
+  int32 entities_extracted = 5;
+  int32 processing_time_ms = 6;
+  string worker_node = 7;
+}
+
+// Processing error
+message ProcessingError {
+  string step = 1;
+  string error_message = 2;
+  string error_code = 3;
+  google.protobuf.Timestamp occurred_at = 4;
+  bool is_retryable = 5;
+}
+
+// Processing update (streaming)
+message ProcessingUpdate {
+  string document_id = 1;
+  ProcessingStatus status = 2;
+  float progress_percentage = 3;
+  string message = 4;
+  ProcessingMetrics metrics = 5;
+  google.protobuf.Timestamp timestamp = 6;
+}
+
+// Cancel processing
+message CancelProcessingRequest {
+  string document_id = 1;
+  string reason = 2;
+}
+
+message CancelProcessingResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Retry processing
+message RetryProcessingRequest {
+  string document_id = 1;
+  ProcessingOptions options = 2; // Override original options
+}
+
+message RetryProcessingResponse {
+  string new_job_id = 1;
+  ProcessingStatus status = 2;
+  google.protobuf.Timestamp retry_started_at = 3;
+}
+
+// Get document chunks
+message GetChunksRequest {
+  string document_id = 1;
+  int32 page_size = 2; // Pagination
+  int32 page_number = 3;
+  ChunkFilter filter = 4;
+}
+
+// Chunk filtering
+message ChunkFilter {
+  int32 min_tokens = 1;
+  int32 max_tokens = 2;
+  float min_confidence = 3;
+  repeated string sections = 4; // Filter by document sections
+  bool include_embeddings = 5;
+}
+
+// Chunks response
+message GetChunksResponse {
+  repeated DocumentChunk chunks = 1;
+  int32 total_chunks = 2;
+  int32 page_size = 3;
+  int32 page_number = 4;
+  bool has_more = 5;
+}
+
+// Document chunk
+message DocumentChunk {
+  string chunk_id = 1;
+  string document_id = 2;
+  int32 chunk_index = 3;
+  string text = 4;
+  int32 tokens = 5;
+  int32 start_offset = 6;
+  int32 end_offset = 7;
+  repeated float embedding = 8;
+  string embedding_model = 9;
+  float confidence = 10;
+  ChunkMetadata metadata = 11;
+  google.protobuf.Timestamp created_at = 12;
+}
+
+// Chunk metadata
+message ChunkMetadata {
+  repeated int32 page_numbers = 1;
+  string section = 2;
+  float importance = 3;
+  repeated string key_phrases = 4;
+  float sentiment = 5;
+  repeated string topic_labels = 6;
+  repeated EntityMention entities = 7;
+  string parent_chunk_id = 8; // For hierarchical chunking
+  int32 hierarchy_level = 9;
+}
+
+// Entity mention in chunk
+message EntityMention {
+  string text = 1;
+  string type = 2; // "PERSON", "ORGANIZATION", "LOCATION"
+  float confidence = 3;
+  int32 start_offset = 4;
+  int32 end_offset = 5;
+}
+
+// Search documents
+message SearchDocumentsRequest {
+  string query = 1;
+  SearchOptions options = 2;
+  SearchFilter filter = 3;
+  int32 limit = 4;
+  int32 offset = 5;
+}
+
+// Search options
+message SearchOptions {
+  SearchType search_type = 1;
+  bool include_chunks = 2;
+  bool include_embeddings = 3;
+  float similarity_threshold = 4;
+  repeated string highlight_fields = 5;
+}
+
+// Search type
+enum SearchType {
+  KEYWORD = 0;
+  SEMANTIC = 1;
+  HYBRID = 2;
+  EXACT = 3;
+}
+
+// Search filter
+message SearchFilter {
+  repeated string document_types = 1;
+  repeated string case_ids = 2;
+  string uploaded_by = 3;
+  google.protobuf.Timestamp from_date = 4;
+  google.protobuf.Timestamp to_date = 5;
+  repeated string tags = 6;
+  ProcessingStatus status = 7;
+}
+
+// Search response
+message SearchDocumentsResponse {
+  repeated SearchResult results = 1;
+  int32 total_found = 2;
+  float search_time_ms = 3;
+  string query_id = 4; // For tracking
+  SearchAggregations aggregations = 5;
+}
+
+// Search result
+message SearchResult {
+  string document_id = 1;
+  string filename = 2;
+  string title = 3;
+  float relevance_score = 4;
+  DocumentMetadata metadata = 5;
+  repeated SearchHighlight highlights = 6;
+  repeated DocumentChunk matching_chunks = 7;
+}
+
+// Search highlighting
+message SearchHighlight {
+  string field = 1;
+  repeated string fragments = 2;
+}
+
+// Search aggregations
+message SearchAggregations {
+  map<string, int32> document_types = 1;
+  map<string, int32> case_ids = 2;
+  map<string, int32> tags = 3;
+  map<string, int32> processing_status = 4;
+}
+
+// Service statistics
+message StatisticsRequest {
+  google.protobuf.Timestamp from_date = 1;
+  google.protobuf.Timestamp to_date = 2;
+  bool detailed = 3;
+}
+
+message StatisticsResponse {
+  ServiceStatistics statistics = 1;
+  google.protobuf.Timestamp generated_at = 2;
+}
+
+message ServiceStatistics {
+  int64 total_documents = 1;
+  int64 total_chunks = 2;
+  int64 total_embeddings = 3;
+  int64 processing_queue_size = 4;
+  int64 failed_jobs = 5;
+  ProcessingStatistics processing = 6;
+  StorageStatistics storage = 7;
+  PerformanceStatistics performance = 8;
+}
+
+message ProcessingStatistics {
+  int64 documents_processed_today = 1;
+  float avg_processing_time_minutes = 2;
+  int64 total_pages_processed = 3;
+  int64 total_entities_extracted = 4;
+  map<string, int32> processing_status_counts = 5;
+}
+
+message StorageStatistics {
+  int64 total_storage_bytes = 1;
+  int64 minio_storage_bytes = 2;
+  int64 database_size_bytes = 3;
+  int64 neo4j_nodes = 4;
+  int64 neo4j_relationships = 5;
+}
+
+message PerformanceStatistics {
+  float avg_chunk_processing_ms = 1;
+  float avg_embedding_generation_ms = 2;
+  float avg_ocr_processing_ms = 3;
+  int32 active_workers = 4;
+  float queue_processing_rate = 5; // documents/hour
+}

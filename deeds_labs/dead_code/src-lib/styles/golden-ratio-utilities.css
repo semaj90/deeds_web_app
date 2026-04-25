@@ -1,0 +1,485 @@
+/**
+ * Golden Ratio CSS Utilities
+ * Following Context7 best practices for mathematical design proportions
+ * φ (phi) ≈ 1.618033988749 - The Golden Ratio
+ */
+
+:root {
+ /* Golden Ratio Constants */
+ --golden-ratio: 1.618033988749;
+ --inverse-golden-ratio: 0.618033988749; /* 1/φ */
+ --golden-ratio-squared: 2.618033988749; /* φ² */
+ --golden-ratio-cubed: 4.236067977499; /* φ³ */
+
+ /* Golden Ratio Based Spacing Scale */
+ --space-phi-xs: calc(0.25rem * var(--inverse-golden-ratio)); /* ~0.154rem */
+ --space-phi-sm: calc(0.5rem * var(--inverse-golden-ratio)); /* ~0.309rem */
+ --space-phi-md: calc(1rem * var(--inverse-golden-ratio)); /* ~0.618rem */
+ --space-phi-lg: calc(1rem * var(--golden-ratio)); /* ~1.618rem */
+ --space-phi-xl: calc(2rem * var(--golden-ratio)); /* ~3.236rem */
+ --space-phi-2xl: calc(3rem * var(--golden-ratio)); /* ~4.854rem */
+ --space-phi-3xl: calc(4rem * var(--golden-ratio)); /* ~6.472rem */
+
+ /* Golden Ratio Typography Scale */
+ --text-phi-xs: calc(0.75rem * var(--inverse-golden-ratio)); /* ~0.464rem */
+ --text-phi-sm: calc(0.875rem * var(--inverse-golden-ratio)); /* ~0.541rem */
+ --text-phi-base: 1rem;
+ --text-phi-lg: calc(1rem * var(--golden-ratio)); /* ~1.618rem */
+ --text-phi-xl: calc(1.25rem * var(--golden-ratio)); /* ~2.023rem */
+ --text-phi-2xl: calc(1.5rem * var(--golden-ratio)); /* ~2.427rem */
+ --text-phi-3xl: calc(1.875rem * var(--golden-ratio)); /* ~3.034rem */
+ --text-phi-4xl: calc(2.25rem * var(--golden-ratio)); /* ~3.641rem */
+
+ /* Golden Ratio Layout Proportions */
+ --layout-phi-sidebar: calc(300px * var(--inverse-golden-ratio)); /* ~185px */
+ --layout-phi-main: calc(300px * var(--golden-ratio)); /* ~485px */
+ --layout-phi-content-width: calc(100vw / var(--golden-ratio)); /* ~61.8vw */
+ --layout-phi-sidebar-width: calc(100vw / var(--golden-ratio-squared)); /* ~38.2vw */
+
+ /* Golden Rectangle Aspect Ratios */
+ --aspect-phi-landscape: var(--golden-ratio) / 1; /* 1.618:1 */
+ --aspect-phi-portrait: 1 / var(--golden-ratio); /* 1:1.618 */
+ --aspect-phi-square: 1 / 1; /* 1:1 */
+
+ /* Legal AI Color Harmonies Based on Golden Ratio */
+ --color-phi-primary-hue: 210; /* Blue base */
+ --color-phi-secondary-hue: calc(
+ var(--color-phi-primary-hue) + (360 / var(--golden-ratio))
+ ); /* ~432.16 → 72.16 */
+ --color-phi-tertiary-hue: calc(
+ var(--color-phi-primary-hue) - (360 / var(--golden-ratio))
+ ); /* ~-12.16 → 347.84 */
+
+ /* Legal AI Golden Ratio Colors */
+ --color-nier-golden-primary: hsl(var(--color-phi-primary-hue), 45%, 25%);
+ --color-nier-golden-secondary: hsl(var(--color-phi-secondary-hue), 35%, 35%);
+ --color-nier-golden-tertiary: hsl(var(--color-phi-tertiary-hue), 40%, 30%);
+ --color-nier-golden-accent: hsl(var(--color-phi-primary-hue), 60%, 55%);
+}
+
+/* Golden Ratio Spacing Utilities */
+.space-phi-xs {
+ margin: var(--space-phi-xs);
+}
+.space-phi-sm {
+ margin: var(--space-phi-sm);
+}
+.space-phi-md {
+ margin: var(--space-phi-md);
+}
+.space-phi-lg {
+ margin: var(--space-phi-lg);
+}
+.space-phi-xl {
+ margin: var(--space-phi-xl);
+}
+.space-phi-2xl {
+ margin: var(--space-phi-2xl);
+}
+.space-phi-3xl {
+ margin: var(--space-phi-3xl);
+}
+
+.p-phi-xs {
+ padding: var(--space-phi-xs);
+}
+.p-phi-sm {
+ padding: var(--space-phi-sm);
+}
+.p-phi-md {
+ padding: var(--space-phi-md);
+}
+.p-phi-lg {
+ padding: var(--space-phi-lg);
+}
+.p-phi-xl {
+ padding: var(--space-phi-xl);
+}
+.p-phi-2xl {
+ padding: var(--space-phi-2xl);
+}
+.p-phi-3xl {
+ padding: var(--space-phi-3xl);
+}
+
+.gap-phi-xs {
+ gap: var(--space-phi-xs);
+}
+.gap-phi-sm {
+ gap: var(--space-phi-sm);
+}
+.gap-phi-md {
+ gap: var(--space-phi-md);
+}
+.gap-phi-lg {
+ gap: var(--space-phi-lg);
+}
+.gap-phi-xl {
+ gap: var(--space-phi-xl);
+}
+.gap-phi-2xl {
+ gap: var(--space-phi-2xl);
+}
+.gap-phi-3xl {
+ gap: var(--space-phi-3xl);
+}
+
+/* Golden Ratio Typography Utilities */
+.text-phi-xs {
+ font-size: var(--text-phi-xs);
+}
+.text-phi-sm {
+ font-size: var(--text-phi-sm);
+}
+.text-phi-base {
+ font-size: var(--text-phi-base);
+}
+.text-phi-lg {
+ font-size: var(--text-phi-lg);
+}
+.text-phi-xl {
+ font-size: var(--text-phi-xl);
+}
+.text-phi-2xl {
+ font-size: var(--text-phi-2xl);
+}
+.text-phi-3xl {
+ font-size: var(--text-phi-3xl);
+}
+.text-phi-4xl {
+ font-size: var(--text-phi-4xl);
+}
+
+/* Golden Ratio Line Heights */
+.leading-phi {
+ line-height: var(--golden-ratio);
+}
+.leading-phi-tight {
+ line-height: var(--inverse-golden-ratio);
+}
+.leading-phi-loose {
+ line-height: var(--golden-ratio-squared);
+}
+
+/* Golden Ratio Layout Utilities */
+.w-phi {
+ width: calc(100% / var(--golden-ratio));
+} /* ~61.8% */
+.w-phi-inverse {
+ width: calc(100% * var(--inverse-golden-ratio));
+} /* ~61.8% */
+.w-phi-complement {
+ width: calc(100% - (100% / var(--golden-ratio)));
+} /* ~38.2% */
+
+.h-phi {
+ height: calc(100vh / var(--golden-ratio));
+} /* ~61.8vh */
+.h-phi-inverse {
+ height: calc(100vh * var(--inverse-golden-ratio));
+} /* ~61.8vh */
+.h-phi-complement {
+ height: calc(100vh - (100vh / var(--golden-ratio)));
+} /* ~38.2vh */
+
+/* Golden Rectangle Aspect Ratios */
+.aspect-phi-landscape {
+ aspect-ratio: var(--aspect-phi-landscape);
+}
+.aspect-phi-portrait {
+ aspect-ratio: var(--aspect-phi-portrait);
+}
+.aspect-phi-square {
+ aspect-ratio: var(--aspect-phi-square);
+}
+
+/* Golden Ratio Grid Templates */
+.grid-cols-phi {
+ display: grid;
+ grid-template-columns: var(--golden-ratio) fr 1fr;
+}
+
+.grid-cols-phi-reverse {
+ display: grid;
+ grid-template-columns: 1fr var(--golden-ratio) fr;
+}
+
+.grid-cols-phi-triple {
+ display: grid;
+ grid-template-columns: var(--golden-ratio) fr 1fr var(--inverse-golden-ratio) fr;
+}
+
+.grid-rows-phi {
+ display: grid;
+ grid-template-rows: var(--golden-ratio) fr 1fr;
+}
+
+.grid-rows-phi-reverse {
+ display: grid;
+ grid-template-rows: 1fr var(--golden-ratio) fr;
+}
+
+/* Legal AI Specific Golden Ratio Components */
+.nier-golden-sidebar {
+ width: var(--layout-phi-sidebar);
+ background: var(--color-nier-golden-primary);
+ border-right: 1px solid var(--color-nier-golden-accent);
+}
+
+.nier-golden-main {
+ flex: var(--golden-ratio);
+ background: var(--color-nier-golden-secondary);
+}
+
+.nier-golden-panel {
+ padding: var(--space-phi-lg);
+ margin: var(--space-phi-md);
+ border-radius: calc(var(--space-phi-sm) * var(--golden-ratio));
+ background: var(--color-nier-golden-tertiary);
+ box-shadow: 0 calc(var(--space-phi-xs) * var(--golden-ratio))
+ calc(var(--space-phi-md) * var(--golden-ratio)) rgba(0, 0, 0, 0.15);
+}
+
+/* Evidence Cards with Golden Ratio */
+.evidence-card-phi {
+ width: calc(300px * var(--golden-ratio));
+ height: calc(300px / var(--golden-ratio));
+ padding: var(--space-phi-md);
+ margin: var(--space-phi-sm);
+ border-radius: var(--space-phi-sm);
+ background: var(--color-nier-golden-secondary);
+ border: 1px solid var(--color-nier-golden-accent);
+ transition: transform calc(0.3s / var(--golden-ratio)) ease;
+}
+
+.evidence-card-phi:hover {
+ transform: scale(calc(1 + var(--inverse-golden-ratio) * 0.1));
+}
+
+/* Case Management Layout with Golden Ratio */
+.case-layout-phi {
+ display: grid;
+ grid-template-columns:
+ calc(var(--layout-phi-sidebar) * var(--inverse-golden-ratio))
+ var(--golden-ratio) fr
+ 1fr;
+ grid-template-rows:
+ calc(60px * var(--inverse-golden-ratio))
+ var(--golden-ratio) fr
+ calc(60px * var(--inverse-golden-ratio));
+ grid-template-areas:
+ 'header header header'
+ 'sidebar main secondary'
+ 'footer footer footer';
+ gap: var(--space-phi-md);
+ min-height: 100vh;
+}
+
+/* AI Analysis Panels with Golden Ratio */
+.ai-panel-phi {
+ display: flex;
+ flex-direction: column;
+ gap: var(--space-phi-md);
+ padding: var(--space-phi-lg);
+ background: linear-gradient(
+ calc(137.5deg * var(--inverse-golden-ratio)),
+ var(--color-nier-golden-primary),
+ var(--color-nier-golden-secondary)
+ );
+ border-radius: var(--space-phi-md);
+ border: 1px solid var(--color-nier-golden-accent);
+}
+
+.ai-confidence-phi-high {
+ border-left: calc(var(--space-phi-xs) * var(--golden-ratio)) solid #10b981;
+ background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent);
+}
+
+.ai-confidence-phi-medium {
+ border-left: calc(var(--space-phi-xs) * var(--golden-ratio)) solid #f59e0b;
+ background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent);
+}
+
+.ai-confidence-phi-low {
+ border-left: calc(var(--space-phi-xs) * var(--golden-ratio)) solid #ef4444;
+ background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), transparent);
+}
+
+/* Responsive Golden Ratio Breakpoints */
+@media (max-width: calc(768px * var(--golden-ratio))) {
+ /* ~1242px */
+ .nier-golden-sidebar {
+ width: 100%;
+ height: var(--layout-phi-sidebar);
+ }
+
+ .case-layout-phi {
+ grid-template-columns: 1fr;
+ grid-template-rows:
+ calc(60px * var(--inverse-golden-ratio))
+ auto
+ var(--golden-ratio) fr
+ 1fr
+ calc(60px * var(--inverse-golden-ratio));
+ grid-template-areas:
+ 'header'
+ 'sidebar'
+ 'main'
+ 'secondary'
+ 'footer';
+ }
+}
+
+@media (max-width: calc(480px * var(--golden-ratio))) {
+ /* ~777px */
+ .evidence-card-phi {
+ width: calc(250px * var(--golden-ratio));
+ height: calc(250px / var(--golden-ratio));
+ padding: var(--space-phi-sm);
+ margin: var(--space-phi-xs);
+ }
+
+ .ai-panel-phi {
+ padding: var(--space-phi-md);
+ gap: var(--space-phi-sm);
+ }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+ .nier-golden-panel,
+ .evidence-card-phi,
+ .ai-panel-phi {
+ border-width: 2px;
+ border-color: currentColor;
+ }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+ .evidence-card-phi {
+ transition: none;
+ }
+
+ .evidence-card-phi:hover {
+ transform: none;
+ }
+}
+
+/* Print Styles */
+@media print {
+ .nier-golden-sidebar {
+ display: none;
+ }
+
+ .case-layout-phi {
+ grid-template-columns: 1fr;
+ grid-template-areas:
+ 'header'
+ 'main'
+ 'secondary'
+ 'footer';
+ }
+
+ .evidence-card-phi,
+ .ai-panel-phi {
+ break-inside: avoid;
+ page-break-inside: avoid;
+ }
+}
+
+/* Focus and Accessibility */
+.evidence-card-phi:focus-visible,
+.ai-panel-phi:focus-visible,
+.nier-golden-panel:focus-visible {
+ outline: 2px solid var(--color-nier-golden-accent);
+ outline-offset: 2px;
+}
+
+/* Animation and Transitions with Golden Ratio */
+@keyframes phi-fade-in {
+ from {
+ opacity: 0;
+ transform: translateY(calc(var(--space-phi-md) * -1));
+ }
+ to {
+ opacity: 1;
+ transform: translateY(0);
+ }
+}
+
+@keyframes phi-slide-in {
+ from {
+ transform: translateX(calc(var(--space-phi-lg) * -1));
+ opacity: 0;
+ }
+ to {
+ transform: translateX(0);
+ opacity: 1;
+ }
+}
+
+.animate-phi-fade-in {
+ animation: phi-fade-in calc(0.5s * var(--golden-ratio)) ease-out;
+}
+
+.animate-phi-slide-in {
+ animation: phi-slide-in calc(0.6s * var(--golden-ratio)) ease-out;
+}
+
+/* Utility Classes for Common Golden Ratio Patterns */
+.golden-section {
+ display: flex;
+ gap: var(--space-phi-md);
+}
+
+.golden-section > :first-child {
+ flex: var(--golden-ratio);
+}
+
+.golden-section > :last-child {
+ flex: 1;
+}
+
+.golden-container {
+ max-width: calc(1200px * var(--inverse-golden-ratio));
+ margin: 0 auto;
+ padding: var(--space-phi-lg);
+}
+
+.golden-card {
+ padding: var(--space-phi-lg);
+ border-radius: var(--space-phi-sm);
+ background: var(--color-nier-golden-secondary);
+ border: 1px solid var(--color-nier-golden-accent);
+ box-shadow: 0 var(--space-phi-xs) var(--space-phi-md) rgba(0, 0, 0, 0.1);
+}
+
+/* Debug Utilities (Remove in Production) */
+.debug-golden-ratio::before {
+ content: 'φ = ' var(--golden-ratio);
+ position: absolute;
+ top: 0;
+ left: 0;
+ background: #ff0000;
+ color: white;
+ padding: 2px 4px;
+ font-size: 10px;
+ z-index: 1000;
+}
+
+.debug-golden-grid {
+ background-image:
+ linear-gradient(
+ to right,
+ rgba(255, 0, 0, 0.1) 0,
+ rgba(255, 0, 0, 0.1) calc(100% / var(--golden-ratio)),
+ transparent calc(100% / var(--golden-ratio))
+ ),
+ linear-gradient(
+ to bottom,
+ rgba(0, 255, 0, 0.1) 0,
+ rgba(0, 255, 0, 0.1) calc(100% / var(--golden-ratio)),
+ transparent calc(100% / var(--golden-ratio))
+ );
+}

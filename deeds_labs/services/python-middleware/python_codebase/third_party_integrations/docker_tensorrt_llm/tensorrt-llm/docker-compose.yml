@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  tensorrt-llm:
+    # Replace this image with the specific TensorRT/Triton image you intend to run.
+    # Examples: nvcr.io/nvidia/tritonserver:23.08-py3  (NGC) or nvcr.io/nvidia/tensorrtserver:<tag>
+    image: nvcr.io/nvidia/tritonserver:23.08-py3
+    # If you're using Docker Desktop with WSL2 + NVIDIA Container Toolkit, the runtime is handled
+    # automatically. We still set visible devices and recommended env vars.
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    # Mount your Triton model repository here. Each model folder must follow Triton layout.
+    volumes:
+      - ./models:/models:ro
+    ports:
+      - '8000:8000' # HTTP
+      - '8001:8001' # gRPC
+      - '8002:8002' # Metrics
+    command: ["tritonserver", "--model-repository=/models", "--log-verbose=1", "--strict-model-config=false"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+
+# Notes:
+# - On Windows using Docker Desktop + WSL2, ensure "Use the WSL 2 based engine" is enabled and
+#   NVIDIA Container Toolkit is installed on the WSL2 distro (see NVIDIA docs).
+# - Building TensorRT engines (trtexec) often requires more GPU RAM than inference; consider
+#   building on Colab or a larger GPU and copying the .plan files into ./models.

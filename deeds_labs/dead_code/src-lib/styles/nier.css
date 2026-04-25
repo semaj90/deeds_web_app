@@ -1,0 +1,71 @@
+/* nier.css - Nier Automata inspired theme for shadcn-svelte + UnoCSS */
+:root {
+ --color-primary: #e5e5e5;
+ --color-secondary: #222326;
+ --color-accent: #b5b5b5;
+ --color-bg: #18181b;
+ --color-fg: #f4f4f4;
+ --color-border: #44444a;
+ --color-danger: #e06c75;
+ --color-success: #98c379;
+ --color-warning: #e5c07b;
+ --color-info: #61afef;
+ --font-family: 'Noto Sans', 'Segoe UI', 'Arial', sans-serif;
+}
+
+body {
+ background: var(--color-bg);
+ color: var(--color-fg);
+ font-family: var(--font-family);
+}
+
+.button,
+.btn,
+.shadcn-btn,
+.bits-btn {
+ background: var(--color-secondary);
+ color: var(--color-primary);
+ border: 1px solid var(--color-border);
+ border-radius: 0.5rem;
+ padding: 0.5rem 1.25rem;
+ font-weight: 600;
+ transition:
+ background 0.2s,
+ color 0.2s;
+}
+button:hover,
+.btn:hover,
+.shadcn-btn:hover,
+.bits-btn:hover {
+ background: var(--color-accent);
+ color: var(--color-bg);
+}
+
+.card,
+.shadcn-card,
+.bits-card {
+ background: var(--color-secondary);
+ color: var(--color-primary);
+ border: 1px solid var(--color-border);
+ border-radius: 1rem;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+ padding: 1.5rem;
+}
+
+input,
+textarea,
+select {
+ background: var(--color-bg);
+ color: var(--color-primary);
+ border: 1px solid var(--color-border);
+ border-radius: 0.5rem;
+ padding: 0.5rem 1rem;
+}
+
+/* Accent for focus */
+:focus {
+ outline: 2px solid var(--color-info);
+ outline-offset: 2px;
+}
+
+/* Add more component overrides as needed */

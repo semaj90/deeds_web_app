@@ -1,0 +1,20 @@
+/* Tooltip Global Styles */
+.legal-ai-tooltip {
+ font-family: var(--legal-ai-font-family-sans);
+ animation: legal-ai-fade-in 150ms ease-out;
+}
+
+.legal-ai-tooltip-trigger {
+ cursor: help;
+}
+
+@keyframes legal-ai-fade-in {
+ from {
+ opacity: 0;
+ transform: scale(0.95);
+ }
+ to {
+ opacity: 1;
+ transform: scale(1);
+ }
+}

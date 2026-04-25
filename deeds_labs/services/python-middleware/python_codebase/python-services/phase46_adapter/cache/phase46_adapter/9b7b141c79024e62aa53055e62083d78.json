@@ -1,0 +1,29 @@
+{
+  "doc_id": "9b7b141c79024e62aa53055e62083d78",
+  "title": "sample-doc.md",
+  "source": "typescript",
+  "lang": "en",
+  "fetched_at": "2025-11-06T18:55:06+00:00",
+  "checksum": "830debe9fa7ff971a7540747a6de40fb2a15a7eee899e749c28083f7f7080c55",
+  "chunks": [
+    {
+      "index": 0,
+      "text": "# Phase46 sample doc This page documents handling of TS2322 errors when migrating to SvelteKit 2 and Bits-UI SSR. ## Steps 1. Ensure `npm run dev:quic` is running after Ollama endpoints are configured. 2. Configure Drizzle ORM migrations with Postgres and pgvector. 3. Enable UnoCSS and NES.css for consistent styling. ```ts // Example: src/routes/+page.svelte const value: string = 42; // TS2322 ``` ## Remediation - Cast numeric inputs with `String(value)` before assignment. - Update Svelte 5 components to use typed stores. - Verify Redis + Neo4j health via `/api/system/cluster-status`.",
+      "tokens_estimate": 89,
+      "embedding_key": "embedding:doc:9b7b141c79024e62aa53055e62083d78:chunk:0"
+    }
+  ],
+  "extractions": [
+    {
+      "extraction_class": "error",
+      "extraction_text": "LangExtract failed",
+      "attributes": {
+        "message": "Ollama API error: Ollama Model timed out (timeout=120, num_threads=None)"
+      }
+    }
+  ],
+  "metadata": {
+    "adapter": "phase46",
+    "comment": "tensorRT-llm handoff coming later once getOllamaEndpoint() wiring moves to PyTorch/TensorRT runner."
+  }
+}

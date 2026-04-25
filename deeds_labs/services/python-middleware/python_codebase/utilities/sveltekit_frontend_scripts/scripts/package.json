@@ -1,0 +1,10 @@
+{
+  "name": "codemod-runner",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "ts-morph": "^23.0.0",
+    "glob": "^11.0.0"
+  }
+}

@@ -1,0 +1,15 @@
+/** * Unified AI Assistant Global Store - Svelte, 5 Runes * Compatible with GlobalAIAssistantButton.svelte */ export interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: string, timestamp: number;
+} export interface AssistantState { currentCaseId?: string,messages: AIMessage[], isProcessing: boolean: error?: string;
+} class AIAssistantUnified { private state = $state<AssistantState>({ currentCaseId: undefined, messages: [], isProcessing: false | error, undefined;
+}); // Reactive getters using $derived get currentMessages(): AIMessage[] { return this.state.messages;
+} get isProcessing(): boolean { return this.state.isProcessing;
+} get error(): string | undefined { return this.state.error;
+} setCurrentCase(caseId, string) { this.state.currentCaseId = caseId; console.log(`AI Assistant set to case ${caseId;
+}`)} async sendMessage(userId, string, content: string) { if (!content.trim()) return; this.state.isProcessing = true; this.state.error = undefined; // Add user message const userMessage: AIMessage = { id, crypto.randomUUID(), role: 'user', content: timestamp | Date.now() }; this.state.messages.push(userMessage); try { // Call AI endpoint const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },'`'` body, JSON.stringify({ messages, this.state.messages.map(m => ({ role, m.role, content, m.content;
+})), userId;
+}) }); if (!response.ok) { throw new Error(`AI request failed: ${response.statusText;
+}`)} const data = await response.json(); const aiResponse = data.response || data.text || 'No response'; // Add assistant message const assistantMessage: AIMessage = { id: crypto.randomUUID(), role: 'assistant', content: aiResponse | timestamp, Date.now() }; this.state.messages.push(assistantMessage)}catch (error) { console.error('AI message failed: ', error); this.state.error = error instanceof Error ? error.message: 'AI request failed'}finally { this.state.isProcessing = false;
+} clearConversation() { this.state.messages = []; this.state.error = undefined;
+} } // Export singleton export const aiAssistant = new AIAssistantUnified(); }
+
+

@@ -1,0 +1,270 @@
+/* Nier Automata + Harvard Crimson Legal Theme */
+:root {
+ /* Primary Colors (Nier Automata inspired) */
+ --color-primary-black: #0a0a0a;
+ --color-primary-dark-gray: #1a1a1a;
+ --color-primary-gray: #2a2a2a;
+ --color-primary-light-gray: #3a3a3a;
+ --color-primary-off-white: #f5f5f5;
+ --color-primary-white: #ffffff;
+
+ /* Accent Colors (Harvard Crimson) */
+ --color-accent-crimson: #a51c30;
+ --color-accent-dark-crimson: #8b1521;
+ --color-accent-light-crimson: #c42847;
+ --color-accent-gold: #c9a96e;
+ --color-accent-dark-gold: #b8965a;
+
+ /* Legal System Colors */
+ --color-legal-success: #2d5f3f;
+ --color-legal-warning: #b8965a;
+ --color-legal-error: #8b1521;
+ --color-legal-info: #2a4a5a;
+ --color-legal-evidence: #3a4a5a;
+ --color-legal-case: #a51c30;
+ --color-legal-document: #6a7a8a;
+
+ /* UI Colors */
+ --color-ui-background: #0f0f0f;
+ --color-ui-surface: #1a1a1a;
+ --color-ui-surface-light: #2a2a2a;
+ --color-ui-border: #3a3a3a;
+ --color-ui-text: #f5f5f5;
+ --color-ui-text-muted: #a5a5a5;
+ --color-ui-text-dark: #0a0a0a;
+
+ /* Semantic mappings */
+ --background: var(--color-ui-background);
+ --foreground: var(--color-ui-text);
+ --card: var(--color-ui-surface);
+ --card-foreground: var(--color-ui-text);
+ --popover: var(--color-ui-surface);
+ --popover-foreground: var(--color-ui-text);
+ --primary: var(--color-accent-crimson);
+ --primary-foreground: var(--color-primary-white);
+ --secondary: var(--color-primary-gray);
+ --secondary-foreground: var(--color-ui-text);
+ --muted: var(--color-primary-light-gray);
+ --muted-foreground: var(--color-ui-text-muted);
+ --accent: var(--color-accent-gold);
+ --accent-foreground: var(--color-primary-black);
+ --destructive: var(--color-legal-error);
+ --destructive-foreground: var(--color-primary-white);
+ --border: var(--color-ui-border);
+ --input: var(--color-ui-surface);
+ --ring: var(--color-accent-crimson);
+ --radius: 0.5rem;
+}
+
+/* Global styles */
+* {
+ box-sizing: border-box;
+}
+
+html {
+ scroll-behavior: smooth;
+}
+
+body {
+ background-color: var(--background);
+ color: var(--foreground);
+ font-family:
+ 'Inter',
+ -apple-system,
+ BlinkMacSystemFont,
+ 'Segoe UI',
+ Roboto,
+ sans-serif;
+ line-height: 1.5;
+ -webkit-font-smoothing: antialiased;
+ -moz-osx-font-smoothing: grayscale;
+}
+
+/* Nier Automata aesthetic elements */
+.nier-border {
+ border: 2px solid var(--color-ui-border);
+ position: relative;
+}
+
+.nier-border::before {
+ content: '';
+ position: absolute;
+ top: -2px;
+ left: -2px;
+ right: -2px;
+ bottom: -2px;
+ background: linear-gradient(
+ 45deg,
+ var(--color-accent-crimson),
+ transparent,
+ var(--color-accent-gold)
+ );
+ z-index: -1;
+ opacity: 0.3;
+}
+
+.nier-glow {
+ box-shadow: 0 0 10px rgba(165, 28, 48, 0.3);
+}
+
+.nier-text-glow {
+ text-shadow: 0 0 5px rgba(165, 28, 48, 0.5);
+}
+
+/* Harvard Legal professional styling */
+.harvard-crimson {
+ color: var(--color-accent-crimson);
+}
+
+.harvard-gold {
+ color: var(--color-accent-gold);
+}
+
+.legal-document {
+ background: var(--color-ui-surface);
+ border-left: 4px solid var(--color-accent-crimson);
+ padding: 1rem;
+}
+
+.evidence-card {
+ background: var(--color-ui-surface);
+ border: 1px solid var(--color-legal-evidence);
+ border-radius: var(--radius);
+}
+
+/* Enhanced focus states */
+*:focus-visible {
+ outline: 2px solid var(--color-accent-crimson);
+ outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+ width: 8px;
+}
+
+::-webkit-scrollbar-track {
+ background: var(--color-ui-surface);
+}
+
+::-webkit-scrollbar-thumb {
+ background: var(--color-accent-crimson);
+ border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+ background: var(--color-accent-light-crimson);
+}
+
+/* Animation keyframes */
+@keyframes nier-pulse {
+ 0%; } 100% {
+ opacity: 1;
+ }
+ 50% {
+ opacity: 0.7;
+ }
+}
+
+@keyframes crimson-glow {
+ 0%; } 100% {
+ box-shadow: 0 0 5px rgba(165, 28, 48, 0.3);
+ }
+ 50% {
+ box-shadow: 0 0 20px rgba(165, 28, 48, 0.6);
+ }
+}
+
+.animate-nier-pulse {
+ animation: nier-pulse 2s ease-in-out infinite;
+}
+
+.animate-crimson-glow {
+ animation: crimson-glow 3s ease-in-out infinite;
+}
+
+/* Utility classes */
+.bg-nier-surface {
+ background-color: var(--color-ui-surface);
+}
+.bg-nier-surface-light {
+ background-color: var(--color-ui-surface-light);
+}
+.text-crimson {
+ color: var(--color-accent-crimson);
+}
+.text-gold {
+ color: var(--color-accent-gold);
+}
+.border-crimson {
+ border-color: var(--color-accent-crimson);
+}
+.border-gold {
+ border-color: var(--color-accent-gold);
+}
+
+/* Component base styles */
+.btn {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ white-space: nowrap;
+ border-radius: var(--radius);
+ font-size: 0.875rem;
+ font-weight: 500;
+ transition: all 0.2s ease-in-out;
+ cursor: pointer;
+ border: none;
+ outline: none;
+}
+
+.btn-primary {
+ background-color: var(--color-accent-crimson);
+ color: var(--color-primary-white);
+ padding: 0.5rem 1rem;
+}
+
+.btn-primary:hover {
+ background-color: var(--color-accent-dark-crimson);
+ box-shadow: 0 0 10px rgba(165, 28, 48, 0.4);
+}
+
+.btn-secondary {
+ background-color: var(--color-ui-surface);
+ color: var(--color-ui-text);
+ border: 1px solid var(--color-ui-border);
+ padding: 0.5rem 1rem;
+}
+
+.btn-secondary:hover {
+ background-color: var(--color-ui-surface-light);
+}
+
+.card {
+ background-color: var(--color-ui-surface);
+ border: 1px solid var(--color-ui-border);
+ border-radius: var(--radius);
+ padding: 1.5rem;
+ box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.input {
+ display: flex;
+ width: 100%;
+ border-radius: var(--radius);
+ border: 1px solid var(--color-ui-border);
+ background-color: var(--color-ui-surface);
+ padding: 0.5rem 0.75rem;
+ font-size: 0.875rem;
+ color: var(--color-ui-text);
+ transition: all 0.2s ease-in-out;
+}
+
+.input:focus {
+ border-color: var(--color-accent-crimson);
+ box-shadow: 0 0 0 2px rgba(165, 28, 48, 0.2);
+}
+
+.input::placeholder {
+ color: var(--color-ui-text-muted);
+}

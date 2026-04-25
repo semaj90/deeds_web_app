@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": [
+      "@types/node"
+    ]
+  },
+  "include": [
+    "src/lib/stores/chatStore.ts",
+    "src/lib/stores/notification.ts",
+    "src/lib/components/ui/**/*.ts",
+    "src/lib/types/**/*.d.ts"
+  ]
+}

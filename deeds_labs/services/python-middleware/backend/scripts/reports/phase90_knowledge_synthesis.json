@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-01-03T13:23:47.800534",
+  "clusters_processed": 12,
+  "total_time_sec": 92.82385921478271,
+  "results": [
+    {
+      "cluster_id": 0,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `cuda-service-worker.js` module. The error message indicates that the module's type declarations are not valid, leading to the `Object literal` type being used instead of `data`. This is a common issue with modules that are not properly documented or that are not properly used.\n\n**Fix Strategy:**\n\nThe most effective fix is to ensure that the module's type declarations are valid and that the `data` type is present in the type definitions. This could be done by adding a `data` type to the module's type definitions or by ensuring that the module's type definitions are properly formatted.\n\n**Actionable Steps:**\n\n1.  **Add `data` type to module type definitions:** Add a `data` type to the module's type definitions.\n2.  **Verify `data` type:** Ensure that the `data` type is present in the",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_00.json.gz"
+    },
+    {
+      "cluster_id": 1,
+      "total_errors": 200,
+      "summary": "**1. Root Cause:** The TypeScript error cluster is experiencing a problem with the `setex` property in Redis. This property is used to set a value for a Redis key. The error occurs when the key is not found, leading to an undefined value.\n\n**2. Affected Components:** The error cluster is affected by the `setex` property, which is a crucial part of Redis's functionality.\n\n**3. Fix Strategy:** The fix strategy is to resolve the `setex` property issue by checking if the key exists before attempting to set it. This ensures that the code doesn't attempt to set a key that doesn't exist.\n\n**Analysis:** The error cluster is experiencing a problem with the `setex` property in Redis. The fix strategy involves checking if the key exists before attempting to set it, preventing the error from occurring. This ensures that the code doesn't attempt to set a key that doesn't exist.",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_01.json.gz"
+    },
+    {
+      "cluster_id": 2,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `tags` property in the `command` expression. This is likely due to a syntax error in the `tags` property definition. The error is likely related to the `tags` property being defined outside of the `command` expression, or the `tags` property being used in a way that is not allowed in the `command` expression.\n\n**Fix Strategy:**\n\nThe fix strategy is to:\n\n1.  **Declare the `tags` property:** Declare the `tags` property as a property of the `command` expression.\n2.  **Provide an initial value:** Provide an initial value for the `tags` property.\n3.  **Handle the error:** Handle the error by either declaring the property or providing an initial value.\n\n**Actionable Steps:**\n\n1.  **Declare the property:** Declare the `tags` property as a property of the `command` expression.",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_02.json.gz"
+    },
+    {
+      "cluster_id": 3,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `createHash` property of the `Crypto` type. This is a common issue with Node.js and requires addressing the `createHash` property.\n\n**Fix Strategy:**\n\n1.  **Identify the root cause:** Determine the underlying reason for the error.\n2.  **Implement a fix:** Implement a solution to resolve the `createHash` property.\n3.  **Test the fix:** Thoroughly test the fix to ensure it resolves the issue.\n\n**Cluster #3 Statistics:**\n\n- Total errors: 200\n- Top error codes: UNKNOWN (98x), TS2304 (57x), SYNTAX (44x)\n- Affected surfaces:\n- Tech stack: xstate",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_03.json.gz"
+    },
+    {
+      "cluster_id": 4,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `EvidenceAPI` property in the `evidence` component of the `types/api-contracts.js` module. This issue is likely due to a missing or incorrect export of the `EvidenceAPI` member. The error message indicates that the property is not defined on the type `'(evidence: { evidence_type: \\\"document\\\" | \\\"video\\\" | \\\n\\\nThe root cause is a missing or incorrect export of the `EvidenceAPI` member in the `evidence` component. This is likely due to a bug in the TypeScript code that is attempting to access the property. The error message indicates that the property is not defined on the type `'(evidence: { evidence_type: \\\"document\\\" | \\\"video\\\" | \\\n\\\nThe fix strategy involves adding the `EvidenceAPI` member to the `evidence` component and then ensuring that the property is exported correctly. This will resolve the issue",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_04.json.gz"
+    },
+    {
+      "cluster_id": 5,
+      "total_errors": 200,
+      "summary": "Here's the analysis of the TypeScript error cluster and the provided solution:\n\n**1. Root Cause:**\n\nThe TypeScript error cluster is experiencing a problem with the `UNKNOWN` error code. This indicates that the code is not correctly identifying the expected type of the input value.\n\n**2. Affected Components:**\n\n*   **`UNKNOWN` error code:** This is the most significant issue. It signifies that the code is not correctly identifying the expected type of the input value.\n*   **`SYNTAX` error code:** This error code indicates that the code is not correctly identifying the expected type of the input value.\n*   **`TS2304` error code:** This error code indicates that the code is not correctly identifying the expected type of the input value.\n\n**3. Fix Strategy:**\n\nThe fix strategy is to:\n\n*   **Identify the expected type:** The most direct solution is to identify the expected type of the input value",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_05.json.gz"
+    },
+    {
+      "cluster_id": 6,
+      "total_errors": 200,
+      "summary": "Here's the analysis of the TypeScript error cluster and the provided solution:\n\n**1. Root Cause:**\n\nThe TypeScript error cluster is experiencing a problem with the `require` function in the `svelte` module. The `require` function is intended to be a standard library module that imports modules from the `src` directory. When the `require` function is called, it attempts to import the `stores/global-user-store.svelte` module, which is not a standard library module. This leads to the `require` function not being able to find the necessary module, resulting in an error.\n\n**2. Affected Components:**\n\nThe affected components are:\n\n*   `svelte` module\n*   `stores/global-user-store.svelte` module\n\n**3. Fix Strategy:**\n\nThe fix strategy is to:\n\n*   **Identify the missing module:**  The most common cause is the missing `stores/global-user-store.",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_06.json.gz"
+    },
+    {
+      "cluster_id": 7,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `enableMemPattern` and `similarity` functions. The error is likely due to a mismatch between the `enableMemPattern` and `similarity` functions, leading to a `TypeError`. The error is also likely due to a missing or incorrect `similarity` function.\n\n**Fix Strategy:**\n\n1.  **Verify `enableMemPattern`:**  Double-check the `enableMemPattern` function to ensure it correctly identifies the pattern to be used for the similarity calculation.\n2.  **Check `similarity` Function:**  Verify that the `similarity` function is correctly defined and that it returns the correct similarity score.\n3.  **Correct `similarity` Function:**  Correct the `similarity` function to correctly calculate the similarity score.\n\n**Actionable Steps:**\n\n1.  **Verify `enableMemPattern`:**  Ensure the `enableMemPattern` function is defined and that it",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_07.json.gz"
+    },
+    {
+      "cluster_id": 8,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `confidentialityLevel` property in the `similarity` property of the `AITask` class. This is a common issue with the `embeddings` component, as the `confidentialityLevel` property is not defined in the `similarity` property.\n\n**Fix Strategy:**\n\nThe most effective fix is to define the `confidentialityLevel` property in the `similarity` property of the `AITask` class. This will ensure that the `confidentialityLevel` property is defined in the `similarity` property, preventing the `confidentialityLevel` property from being incorrectly identified as a property of the `AITask` class.\n\n**Actionable Steps:**\n\n1.  **Define `confidentialityLevel` in `similarity` property:** Add the `confidentialityLevel` property to the `similarity` property of the `AITask` class.\n2",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_08.json.gz"
+    },
+    {
+      "cluster_id": 9,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `documentChunks` property in the `PgTableWithColumns` module. This property is not defined on the `PgTableWithColumns` module, leading to a `Cannot redeclare block-scoped variable` error. The `userId` property does not exist on the `PgTableWithColumns` module, causing the error. This indicates a potential issue with the module's structure or the data being passed to the module.",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_09.json.gz"
+    },
+    {
+      "cluster_id": 10,
+      "total_errors": 200,
+      "summary": "**Analysis:**\n\nThe TypeScript error cluster is experiencing a problem with the `similarity` property of the `ClientEmbeddingService` type. The error is not assigning the property to a type, leading to a `null` value and a `null` property. This indicates a potential issue with the underlying implementation or data being used.\n\n**Fix Strategy:**\n\nThe most likely fix is to assign the `similarity` property to a type that represents the similarity between the client and the server. This could involve:\n\n*   **Data Transformation:** Transforming the client's data into a format suitable for the server's similarity calculation.\n*   **Similarity Calculation:** Implementing a similarity calculation algorithm that can be applied to the client's data.\n*   **Data Validation:** Ensuring that the client's data is validated to ensure it meets the required similarity criteria.\n\n**Actionable Steps:**\n\n1.  **Data Transformation:** Transform the client's data into a format that",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_10.json.gz"
+    },
+    {
+      "cluster_id": 11,
+      "total_errors": 200,
+      "summary": "Here's an analysis of the TypeScript error cluster and a concise solution:\n\n**Analysis:**\n\nThe TypeScript error cluster is experiencing a high number of errors related to the `SYNTAX` error, specifically `UNKNOWN` and `SYNTAX`. This indicates a potential issue with the underlying implementation of the `SYNTAX` function. The `SYNTAX` function is responsible for generating the `PROMPT` message, which is used to display the context of the conversation. The error is likely due to a bug in the `SYNTAX` function, possibly due to a lack of proper error handling or a misinterpretation of the input.\n\n**Solution:**\n\nThe recommended solution is to:\n\n1.  **Identify the root cause:** Determine the exact reason behind the errors. This might involve a bug in the `SYNTAX` function, a problem with the input data, or a misinterpretation of the conversation context.\n2.  **Implement error handling:** Add error handling to",
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_chunks\\cluster_11.json.gz"
+    }
+  ]
+}

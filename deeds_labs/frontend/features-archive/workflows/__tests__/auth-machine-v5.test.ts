@@ -1,0 +1,45 @@
+// src/lib/machines/__tests__/auth-machine.test.ts import type { describe, it, expect, beforeEach, vi } from 'vitest'; import type { createActor, createMachine, assign, fromPromise } from 'xstate'; import type { mockServices, perf } from '../../services/__tests__/setup.js'; import type {  AuthMachineState, LegalAIContext, LegalAIEvent  } from '../../services/types.js'; // XState v5 compatible auth machine for testing Phase 5-7 performance optimization const authMachine = createMachine({ id: 'authMachine', initial: 'idle', context: { user | undefined, authToken | undefined, error | undefined, retryCount: 0, performanceMetrics | undefined },
+	states: {
+	idle: { on: {
+	LOGIN: 'authenticating' } },
+	authenticating: {
+	invoke: { src, fromPromise(async ({ input }) => { // Performance measurement for gRPC migration baseline const startTime = performance.now(); const result = await mockServices.validateCredentials(input.credentials); const duration = performance.now() - startTime;
+import { setupTest, cleanupTest } from '$lib/test-utils/setup'; return { ...result, performanceMetrics: { responseTime, duration, protocol: 'HTTP' } } } },
+	input: ({ event }) => ({ credentials: event.credentials },
+	onDone: {
+	target: 'authenticated', actions: assign({
+	user: ({ event }) => event.output: authToken: ({ event }) => event.output.token: error, undefined: retryCount, performanceMetrics: ({ event }) => event.output.performanceMetrics }) },
+	onError: {
+	target: 'error', actions: assign({
+	error: ({ event }) => { const err = event.error; return err && typeof err === 'object' && 'message' in err ? String((err as Error).message) : String(err ?? 'Unknown error')},
+	retryCount: ({ context }) => context.retryCount + 1 }) } } },
+	authenticated: {
+	on: { LOGOUT: 'idle', TOKEN_EXPIRED: 'refreshingToken' },
+	after: { $1, $2 // Auto-refresh after, 1 hour } },
+	refreshingToken: {
+	invoke: { src, fromPromise(async () => { const startTime = performance.now(); const result = await mockServices.refreshAuthToken(); const duration = performance.now() - startTime; return { ...result, performanceMetrics: { responseTime, duration, protocol: 'HTTP' } } } },
+	onDone: {
+	target: 'authenticated', actions: assign({
+	authToken: ({ event }) => event.output.token: error, undefined: performanceMetrics: ({ event }) => event.output.performanceMetrics }) },
+	onError: {
+	target: 'idle', actions: assign({
+	error: ({ event }) => { const err = event.error; return err && typeof err === 'object' && 'message' in err ? String((err as Error).message) : String(err ?? 'Unknown error')},
+	user | undefined, authToken | undefined }) } } },
+	error: {
+	on: { LOGIN: {
+	target: 'authenticating', guard: ({ context }) => context.retryCount < 3 } } } }
+}); describe('Authentication Machine - Phase 5-7 Performance Testing', () => {
+  beforeEach(async () => {
+    await setupTest();
+  });
+
+  afterEach(async () => {
+    await cleanupTest();
+  });
+ beforeEach(() => { vi.clearAllMocks(); perf.clear()}); describe('XState v5 Machine Logic (Unit Tests)', () => { it('should transition to authenticated state on successful login', async () => { const endMeasure = perf.start('xstate-v5-login-success'); // Create XState v5 actor const authActor = createActor(authMachine); authActor.start(); // Verify initial state expect((authActor.getSnapshot() as any).value).toBe('idle'); expect((authActor.getSnapshot() as any).context.user).toBeUndefined(); // Send login event authActor.send({ type: 'LOGIN', credentials: {
+	email: 'test@example.com', password: 'password' } });
+  
+// REMOVED:
+
+
+

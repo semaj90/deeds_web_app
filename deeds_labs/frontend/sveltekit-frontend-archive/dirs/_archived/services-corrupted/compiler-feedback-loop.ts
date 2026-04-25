@@ -1,0 +1,2 @@
+/** * Compiler Feedback Loop Service * Implements the AI-driven development architecture with: * - Real-time compilation monitoring * - Vector embedding of compiler logs * - Self-Organizing Map clustering * - Enhanced RAG search for similar issues * - Multi-agent patch generation */ 
+

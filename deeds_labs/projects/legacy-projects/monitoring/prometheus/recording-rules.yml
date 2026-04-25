@@ -1,0 +1,224 @@
+groups:
+  # Legal AI Platform - High-Performance Recording Rules
+  # Pre-calculated expensive queries for efficient dashboards and alerts
+  
+  - name: legal_ai_latency_recordings
+    interval: 30s
+    rules:
+      # P99 latency recordings for all critical endpoints
+      - record: legal_ai:http_request_duration_p99
+        expr: |
+          histogram_quantile(0.99, 
+            sum(rate(http_request_duration_seconds_bucket{
+              job=~"legal-ai-.*",
+              endpoint!~"/health|/metrics|/ready"
+            }[5m])) by (job, endpoint, method, le)
+          )
+        labels:
+          quantile: "0.99"
+          
+      - record: legal_ai:http_request_duration_p95
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(http_request_duration_seconds_bucket{
+              job=~"legal-ai-.*",
+              endpoint!~"/health|/metrics|/ready"
+            }[5m])) by (job, endpoint, method, le)
+          )
+        labels:
+          quantile: "0.95"
+          
+      - record: legal_ai:http_request_duration_p50
+        expr: |
+          histogram_quantile(0.50, 
+            sum(rate(http_request_duration_seconds_bucket{
+              job=~"legal-ai-.*",
+              endpoint!~"/health|/metrics|/ready"
+            }[5m])) by (job, endpoint, method, le)
+          )
+        labels:
+          quantile: "0.50"
+
+  - name: legal_ai_queue_recordings
+    interval: 15s
+    rules:
+      # Redis queue depth and wait times
+      - record: legal_ai:redis_queue_depth
+        expr: |
+          sum(redis_list_length{
+            job="legal-ai-redis",
+            key=~".*queue.*|.*pending.*|.*job.*"
+          }) by (key, instance)
+          
+      - record: legal_ai:redis_queue_wait_time_p99
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(redis_queue_wait_duration_seconds_bucket{
+              job="legal-ai-redis"
+            }[2m])) by (queue_name, le)
+          )
+          
+      - record: legal_ai:redis_queue_processing_rate
+        expr: |
+          sum(rate(redis_queue_processed_total{
+            job="legal-ai-redis"
+          }[1m])) by (queue_name, status)
+
+  - name: legal_ai_gpu_recordings
+    interval: 10s
+    rules:
+      # GPU utilization and memory recordings
+      - record: legal_ai:gpu_utilization_avg
+        expr: |
+          avg(gpu_utilization_percent{
+            job="legal-ai-gpu-monitor"
+          }) by (gpu_uuid, gpu_name)
+          
+      - record: legal_ai:gpu_memory_usage_percent
+        expr: |
+          (gpu_memory_used_bytes{job="legal-ai-gpu-monitor"} / 
+           gpu_memory_total_bytes{job="legal-ai-gpu-monitor"}) * 100
+           
+      - record: legal_ai:gpu_inference_throughput
+        expr: |
+          sum(rate(gpu_inference_requests_total{
+            job="legal-ai-gpu-monitor"
+          }[1m])) by (model, gpu_uuid)
+
+  - name: legal_ai_ollama_recordings
+    interval: 30s
+    rules:
+      # Ollama model performance recordings
+      - record: legal_ai:ollama_model_latency_p99
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(ollama_request_duration_seconds_bucket{
+              job="legal-ai-ollama",
+              model=~"gemma3-legal.*|embeddinggemma.*"
+            }[5m])) by (model, operation, le)
+          )
+          
+      - record: legal_ai:ollama_context_utilization
+        expr: |
+          (ollama_context_used{job="legal-ai-ollama"} / 
+           ollama_context_limit{job="legal-ai-ollama"}) * 100
+           
+      - record: legal_ai:ollama_tokens_per_second
+        expr: |
+          rate(ollama_tokens_generated_total{
+            job="legal-ai-ollama"
+          }[1m]) / 
+          rate(ollama_request_duration_seconds_total{
+            job="legal-ai-ollama"
+          }[1m])
+
+  - name: legal_ai_database_recordings
+    interval: 60s
+    rules:
+      # PostgreSQL performance recordings
+      - record: legal_ai:postgres_query_duration_p99
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(postgres_query_duration_seconds_bucket{
+              job="legal-ai-postgres",
+              database="legal_ai_db"
+            }[5m])) by (operation, table, le)
+          )
+          
+      - record: legal_ai:postgres_connection_utilization
+        expr: |
+          (postgres_active_connections{
+            job="legal-ai-postgres",
+            database="legal_ai_db"
+          } / postgres_max_connections{
+            job="legal-ai-postgres"
+          }) * 100
+          
+      - record: legal_ai:pgvector_search_performance
+        expr: |
+          avg(postgres_query_duration_seconds{
+            job="legal-ai-postgres",
+            operation="vector_search",
+            table=~".*documents.*|.*evidence.*|.*cases.*"
+          }) by (table, index_type)
+
+  - name: legal_ai_sveltekit_recordings
+    interval: 30s
+    rules:
+      # SvelteKit frontend performance
+      - record: legal_ai:frontend_page_load_p99
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(sveltekit_page_load_duration_seconds_bucket{
+              job="legal-ai-frontend"
+            }[5m])) by (route, le)
+          )
+          
+      - record: legal_ai:frontend_api_error_rate
+        expr: |
+          sum(rate(sveltekit_api_requests_total{
+            job="legal-ai-frontend",
+            status=~"4..|5.."
+          }[5m])) /
+          sum(rate(sveltekit_api_requests_total{
+            job="legal-ai-frontend"
+          }[5m]))
+          
+      - record: legal_ai:frontend_active_sessions
+        expr: |
+          sum(sveltekit_active_sessions{
+            job="legal-ai-frontend"
+          }) by (route_pattern)
+
+  - name: legal_ai_business_metrics
+    interval: 120s
+    rules:
+      # Legal AI business logic recordings
+      - record: legal_ai:document_processing_throughput
+        expr: |
+          sum(rate(legal_documents_processed_total{
+            job=~"legal-ai-.*"
+          }[5m])) by (document_type, processing_stage)
+          
+      - record: legal_ai:case_analysis_success_rate
+        expr: |
+          sum(rate(legal_case_analysis_total{
+            job=~"legal-ai-.*",
+            status="success"
+          }[10m])) /
+          sum(rate(legal_case_analysis_total{
+            job=~"legal-ai-.*"
+          }[10m]))
+          
+      - record: legal_ai:embedding_generation_rate
+        expr: |
+          sum(rate(legal_embeddings_generated_total{
+            job=~"legal-ai-.*"
+          }[5m])) by (model, dimension)
+          
+      - record: legal_ai:search_accuracy_score
+        expr: |
+          avg(legal_search_relevance_score{
+            job=~"legal-ai-.*"
+          }) by (search_type, model)
+
+  - name: legal_ai_cost_efficiency
+    interval: 300s  # 5 minutes for cost metrics
+    rules:
+      # Cost and efficiency recordings
+      - record: legal_ai:gpu_cost_per_inference
+        expr: |
+          (legal_ai:gpu_utilization_avg * gpu_hourly_cost{job="legal-ai-cost-tracker"}) /
+          (legal_ai:gpu_inference_throughput * 3600)
+          
+      - record: legal_ai:document_processing_cost
+        expr: |
+          sum(rate(legal_processing_compute_cost_total{
+            job="legal-ai-cost-tracker"
+          }[5m])) by (service, operation)
+          
+      - record: legal_ai:storage_efficiency_ratio
+        expr: |
+          (legal_documents_stored_total{job="legal-ai-storage"} * 
+           avg(legal_document_size_bytes{job="legal-ai-storage"})) /
+          storage_used_bytes{job="legal-ai-storage"}

@@ -1,0 +1,78 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "=€ Start MCP Multi-Core Server",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "mcp:multicore"],
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "detail": "Start enhanced MCP multi-core server with GPU acceleration"
+    },
+    {
+      "label": "=Ê MCP Health Check",
+      "type": "shell",
+      "command": "curl",
+      "args": [
+        "-s",
+        "http://localhost:3000/mcp/health"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "detail": "Check MCP server health status"
+    },
+    {
+      "label": "¡ MCP Metrics Dashboard",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "Write-Host '=Ê MCP Server Metrics Dashboard' -ForegroundColor Cyan; $health = Invoke-RestMethod -Uri 'http://localhost:3000/mcp/health'; $metrics = Invoke-RestMethod -Uri 'http://localhost:3000/mcp/metrics'; $workers = Invoke-RestMethod -Uri 'http://localhost:3000/mcp/workers'; Write-Host \" Status: $($health.status)\" -ForegroundColor Green; Write-Host \"=e Workers: $($workers.active)/$($workers.total)\" -ForegroundColor Yellow; Write-Host \"=¥ Memory: $([math]::Round($metrics.memory.heapUsed / 1MB, 2)) MB\" -ForegroundColor Magenta; Write-Host \"ñ Uptime: $([math]::Round($health.uptime, 2))s\" -ForegroundColor Cyan"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "detail": "Display detailed MCP server metrics"
+    },
+    {
+      "label": "= Restart MCP Server",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "Write-Host '= Restarting MCP Server...' -ForegroundColor Yellow; taskkill /F /IM node.exe /FI \"WINDOWTITLE eq *mcp-multicore*\" 2>$null; Start-Sleep 2; Write-Host ' Starting fresh MCP instance...' -ForegroundColor Green"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "detail": "Restart MCP multi-core server"
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+# NVIDIA Triton Inference Server with Ubuntu 22.04 + CUDA 12.8
+# Optimized for WSL2 GPU integration and legal AI workloads
+
+FROM nvidia/cuda:12.8-devel-ubuntu22.04
+
+# Set environment variables for CUDA 12.8
+ENV CUDA_VERSION=12.8
+ENV CUDA_PKG_VERSION=12-8=$CUDA_VERSION-1
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV CUDA_CACHE_DISABLE=0
+ENV CUDA_LAUNCH_BLOCKING=0
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    libb64-dev \
+    libre2-dev \
+    libssl-dev \
+    rapidjson-dev \
+    libboost-dev \
+    zlib1g-dev \
+    pkg-config \
+    uuid-dev \
+    software-properties-common \
+    autoconf \
+    automake \
+    libtool \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install TensorRT 9.5+ for CUDA 12.8 compatibility
+ENV TENSORRT_VERSION=9.5.0
+RUN wget https://developer.nvidia.com/downloads/compute/machine-learning/tensorrt/9.5.0/tensorrt-9.5.0.6.linux.x86_64-gnu.cuda-12.8.cudnn9.5.tar.gz \
+    && tar -xzf tensorrt-9.5.0.6.linux.x86_64-gnu.cuda-12.8.cudnn9.5.tar.gz \
+    && cp -r TensorRT-9.5.0.6/lib/* /usr/lib/x86_64-linux-gnu/ \
+    && cp -r TensorRT-9.5.0.6/include/* /usr/include/ \
+    && cp -r TensorRT-9.5.0.6/bin/* /usr/local/bin/ \
+    && rm -rf TensorRT-9.5.0.6 tensorrt-9.5.0.6.linux.x86_64-gnu.cuda-12.8.cudnn9.5.tar.gz
+
+# Set TensorRT paths
+ENV TENSORRT_ROOT=/usr
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu
+
+# Install Triton Server compatible with CUDA 12.8
+ENV TRITON_VERSION=24.08
+RUN wget https://github.com/triton-inference-server/server/releases/download/v${TRITON_VERSION}/tritonserver${TRITON_VERSION}-jetpack5.1.tgz \
+    && tar -xzf tritonserver${TRITON_VERSION}-jetpack5.1.tgz \
+    && mv tritonserver /opt/tritonserver \
+    && rm tritonserver${TRITON_VERSION}-jetpack5.1.tgz
+
+# Create triton user for security
+RUN useradd -m -u 1000 triton && \
+    mkdir -p /models /logs /workspace && \
+    chown -R triton:triton /models /logs /workspace
+
+# Install Python dependencies for legal AI
+RUN pip3 install --no-cache-dir \
+    numpy \
+    torch==2.1.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html \
+    transformers>=4.36.0 \
+    tokenizers \
+    accelerate \
+    optimum[onnxruntime-gpu] \
+    tritonclient[all] \
+    psutil \
+    gpustat
+
+# Legal AI specific Python packages
+RUN pip3 install --no-cache-dir \
+    sentence-transformers \
+    langchain \
+    chromadb \
+    faiss-cpu \
+    spacy \
+    nltk
+
+# Download spaCy legal model
+RUN python3 -m spacy download en_core_web_sm
+
+# Copy legal AI utilities
+COPY scripts/legal_ai_utils.py /opt/tritonserver/legal_ai_utils.py
+COPY scripts/tensorrt_engine_validator.py /opt/tritonserver/tensorrt_engine_validator.py
+
+# Set up WSL2 GPU compatibility
+RUN echo 'export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}' >> ~/.bashrc && \
+    echo 'export NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}' >> ~/.bashrc
+
+# Create engine validation script
+RUN cat > /opt/tritonserver/validate_cuda128_engines.py << 'EOF'
+#!/usr/bin/env python3
+"""
+Validate TensorRT engines are compatible with CUDA 12.8
+"""
+import os
+import sys
+import subprocess
+
+def check_cuda_version():
+    """Check CUDA runtime version"""
+    try:
+        result = subprocess.run(['nvcc', '--version'], capture_output=True, text=True)
+        if 'release 12.8' in result.stdout:
+            print("✅ CUDA 12.8 detected")
+            return True
+        else:
+            print(f"❌ CUDA version mismatch: {result.stdout}")
+            return False
+    except FileNotFoundError:
+        print("❌ nvcc not found")
+        return False
+
+def validate_engine_file(engine_path):
+    """Validate TensorRT engine file"""
+    if not os.path.exists(engine_path):
+        print(f"❌ Engine not found: {engine_path}")
+        return False
+
+    # Check file size (should be > 1MB for valid engines)
+    size_mb = os.path.getsize(engine_path) / 1024 / 1024
+    if size_mb < 1:
+        print(f"❌ Engine too small: {engine_path} ({size_mb:.1f}MB)")
+        return False
+
+    print(f"✅ Engine valid: {engine_path} ({size_mb:.1f}MB)")
+    return True
+
+def main():
+    print("🔍 Validating CUDA 12.8 + TensorRT engine compatibility...")
+
+    # Check CUDA version
+    if not check_cuda_version():
+        print("❌ CUDA 12.8 required for engine compatibility")
+        sys.exit(1)
+
+    # Check engines
+    engines = [
+        "/models/legal_embedding/1/model.plan",
+        "/models/legal_generation/1/model.plan"
+    ]
+
+    all_valid = True
+    for engine in engines:
+        if not validate_engine_file(engine):
+            all_valid = False
+
+    if all_valid:
+        print("🎉 All engines compatible with CUDA 12.8!")
+        sys.exit(0)
+    else:
+        print("❌ Engine validation failed!")
+        print("💡 Rebuild engines with: trtexec --onnx=model.onnx --saveEngine=model.plan --fp16")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+EOF
+
+RUN chmod +x /opt/tritonserver/validate_cuda128_engines.py
+
+# Triton server startup with CUDA 12.8 optimizations
+ENV PATH=/opt/tritonserver/bin:$PATH
+ENV LD_LIBRARY_PATH=/opt/tritonserver/lib:$LD_LIBRARY_PATH
+
+# WSL2 specific optimizations
+ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
+ENV CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=100
+
+# Legal AI model paths
+ENV LEGAL_MODEL_REPOSITORY=/models
+ENV LEGAL_LOGS_PATH=/logs
+
+WORKDIR /workspace
+USER triton
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/v2/health/ready || exit 1
+
+# Expose Triton ports
+EXPOSE 8000 8001 8002
+
+# Start Triton with legal AI optimizations
+CMD ["/opt/tritonserver/bin/tritonserver", \
+     "--model-repository=/models", \
+     "--strict-model-config=false", \
+     "--grpc-infer-allocation-pool-size=16", \
+     "--http-thread-count=8", \
+     "--grpc-max-response-message-size=268435456", \
+     "--backend-config=tensorrt,coalesce-request-input=true", \
+     "--backend-config=tensorrt,max-candidate-sequences=4", \
+     "--log-verbose=1", \
+     "--log-info=true", \
+     "--metrics-port=8002", \
+     "--allow-metrics=true", \
+     "--allow-gpu-metrics=true"]

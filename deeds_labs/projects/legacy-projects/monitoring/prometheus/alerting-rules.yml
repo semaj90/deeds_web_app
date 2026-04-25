@@ -1,0 +1,81 @@
+groups:
+  # Legal AI Platform - Production Alerting Rules
+  # Based on recording rules for high-performance monitoring
+  
+  - name: legal_ai_critical_alerts
+    rules:
+      # Critical system failures requiring immediate response
+      - alert: LegalAIServiceDown
+        expr: up{job=~"legal-ai-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: legal-ai-platform
+          runbook: "https://docs.legal-ai.com/runbooks/service-down"
+        annotations:
+          summary: "Legal AI service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} on {{ $labels.instance }} has been down for more than 1 minute."
+          impact: "Legal document processing and analysis unavailable"
+          
+      - alert: LegalAIHighLatency
+        expr: legal_ai:http_request_duration_p99 > 10
+        for: 5m
+        labels:
+          severity: critical
+          team: legal-ai-platform
+          runbook: "https://docs.legal-ai.com/runbooks/high-latency"
+        annotations:
+          summary: "Extremely high P99 latency on {{ $labels.endpoint }}"
+          description: "P99 latency for {{ $labels.job }}/{{ $labels.endpoint }} is {{ $value }}s, exceeding 10s threshold."
+          impact: "User experience severely degraded, legal workflows blocked"
+          
+      - alert: LegalAIGPUOutOfMemory
+        expr: legal_ai:gpu_memory_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+          team: legal-ai-platform
+          runbook: "https://docs.legal-ai.com/runbooks/gpu-memory"
+        annotations:
+          summary: "GPU {{ $labels.gpu_name }} out of memory"
+          description: "GPU memory usage at {{ $value }}%, critical threshold exceeded."
+          impact: "AI inference and embeddings generation will fail"
+
+  - name: legal_ai_performance_alerts
+    rules:
+      # Performance degradation alerts
+      - alert: LegalAILatencyDegraded
+        expr: legal_ai:http_request_duration_p95 > 3
+        for: 10m
+        labels:
+          severity: warning
+          team: legal-ai-platform
+          runbook: "https://docs.legal-ai.com/runbooks/performance-degradation"
+        annotations:
+          summary: "Performance degradation on {{ $labels.endpoint }}"
+          description: "P95 latency for {{ $labels.endpoint }} is {{ $value }}s, exceeding 3s SLA."
+          impact: "User experience degraded, response times slower than expected"
+          
+      - alert: LegalAIQueueBacklog
+        expr: legal_ai:redis_queue_depth > 1000
+        for: 5m
+        labels:
+          severity: warning
+          team: legal-ai-platform
+          runbook: "https://docs.legal-ai.com/runbooks/queue-backlog"
+        annotations:
+          summary: "Queue backlog on {{ $labels.queue_name }}"
+          description: "Queue {{ $labels.key }} has {{ $value }} pending items, indicating processing bottleneck."
+          impact: "Document processing delays, increased wait times"
+          
+      - alert: LegalAIOllamaSlowInference
+        expr: legal_ai:ollama_model_latency_p99 > 30
+        for: 3m
+        labels:
+          severity: warning
+          team: legal-ai-platform
+          runbook: "https://docs.legal-ai.com/runbooks/ollama-performance"
+        annotations:
+          summary: "Slow Ollama inference for {{ $labels.model }}"
+          description: "P99 inference latency for {{ $labels.model }} is {{ $value }}s, exceeding 30s threshold."
+          impact: "Legal AI analysis and embeddings generation significantly delayed"

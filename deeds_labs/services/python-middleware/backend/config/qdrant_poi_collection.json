@@ -1,0 +1,76 @@
+{
+  "collection_name": "persons_of_interest",
+  "vectors": {
+    "size": 384,
+    "distance": "Cosine",
+    "hnsw_config": {
+      "m": 16,
+      "ef_construct": 200,
+      "ef": 200,
+      "max_indexing_threads": 4
+    }
+  },
+  "payload_schema": {
+    "poi_id": {
+      "type": "keyword",
+      "description": "UUID of the person of interest"
+    },
+    "case_id": {
+      "type": "keyword",
+      "description": "UUID of the associated case"
+    },
+    "name": {
+      "type": "text",
+      "description": "Full name of the person"
+    },
+    "status": {
+      "type": "keyword",
+      "description": "Status: person_of_interest, witness, suspect, victim, informant"
+    },
+    "priority": {
+      "type": "keyword",
+      "description": "Priority level: low, medium, high, critical"
+    },
+    "threat_level": {
+      "type": "keyword",
+      "description": "Threat level: low, medium, high, extreme"
+    },
+    "occupation": {
+      "type": "text",
+      "description": "Occupation or profession"
+    },
+    "last_known_location": {
+      "type": "text",
+      "description": "Last known location"
+    },
+    "physical_description": {
+      "type": "text",
+      "description": "Physical description"
+    },
+    "created_at": {
+      "type": "datetime",
+      "description": "Creation timestamp"
+    },
+    "updated_at": {
+      "type": "datetime",
+      "description": "Last update timestamp"
+    }
+  },
+  "quantization_config": {
+    "scalar": {
+      "type": "int8",
+      "quantile": 0.99,
+      "always_ram": true
+    }
+  },
+  "optimizers_config": {
+    "deleted_threshold": 0.2,
+    "vacuum_min_dead_byte": 1000000,
+    "default_segment_number": 0,
+    "max_segment_size": null,
+    "memmap_threshold": 268435456,
+    "indexing_threshold": 20000,
+    "flush_interval_sec": 10,
+    "max_optimization_threads": 4
+  }
+}
