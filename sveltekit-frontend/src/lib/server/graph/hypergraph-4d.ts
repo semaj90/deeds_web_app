@@ -23,6 +23,16 @@
  *   A ≥ 0.75 · B ≥ 0.55 · C ≥ 0.35 · D < 0.35
  *   Stored in Redis hg:edge:idx ZSET for O(log n) range queries.
  *
+ * Pre-ingestion enrichment pipeline (Step 0 — fires before SOM/k-means):
+ *   Docling  — layout-aware PDF/DOCX block extraction → richer summary text
+ *   YOLO     — object detection on image nodes → bbox entity tags
+ *   Gemma4 VLM — multimodal description of image/PDF visual content
+ *   LangGraph — HMM-adapted RAG+KAG synthesis → enriched summary field
+ *
+ * GPU batch summarization (Step 9):
+ *   Hyperedge summarization is batched in groups of SUMMARIZE_BATCH_SIZE
+ *   (default 5) with Promise.allSettled — 5× throughput vs sequential awaits.
+ *
  * Deep research summarization:
  *   Each hyperedge gets an ACE-style summary via bifrostChat (gemma4-legal).
  *   Summary cached in Redis hg:edge:{hash} (4h TTL) + Postgres hypergraph_edges.
@@ -48,6 +58,10 @@ import {
   topKIndices,
   trainSOM,
 } from '$lib/server/gpu/pytorch-graph.js';
+import { analyzeDocumentWithDocling } from '$lib/server/docling.js';
+import { YOLOService }               from '$lib/server/yolo.js';
+import { analyzeImageWithVLM }       from '$lib/server/analysis/vlm-evidence-analyzer.js';
+import { langGraphSynthesize }       from '$lib/server/ai/langgraph-client.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -58,9 +72,10 @@ const HG_EDGE_TTL     = 4 * 60 * 60; // 4h Redis TTL for edge blobs
 const HG_COORD_TTL    = 1 * 60 * 60; // 1h Redis TTL for 4D coords
 const HG_IDX_TTL      = 4 * 60 * 60;
 const MAX_ROWS        = 4_000;        // cap DB fetch
-const SOM_GRID_W      = 12;          // research SOM grid (smaller than codebase 44×44)
-const SOM_GRID_H      = 12;
-const MODEL           = 'gemma4-legal:latest';
+const SOM_GRID_W           = 12;   // research SOM grid (smaller than codebase 44×44)
+const SOM_GRID_H           = 12;
+const MODEL                = 'gemma4-legal:latest';
+const SUMMARIZE_BATCH_SIZE = 5;    // parallel hyperedge summarization batch width
 
 // Grade thresholds
 const GRADE_A = 0.75;
@@ -153,6 +168,93 @@ function cosineDist(a: number[], b: Float32Array): number {
   return 1 - Math.max(-1, Math.min(1, dot));
 }
 
+// ── Step 0: Pre-ingestion enrichment ──────────────────────────────────────────
+//
+// Runs before SOM/k-means on rows that have a storage_path (PDF/DOCX/image).
+// Enriches the summary field in-place so downstream steps see richer text:
+//   • Docling   → structured blocks (headings, tables) replace raw OCR text
+//   • YOLO      → object bbox classes appended as entity_tags
+//   • Gemma4 VLM → visual description prepended to summary for image nodes
+//   • LangGraph → HMM-adapted synthesis replaces flat summary when available
+//
+// All sub-steps are non-fatal: if a service is down the original summary is kept.
+// Fire-and-forget parallel batching (Promise.allSettled) — no sequential stalling.
+
+const _yoloService = new YOLOService();
+
+async function enrichSummaryRow(row: SummaryRow & { storage_path?: string; mime_type?: string }): Promise<void> {
+  const storagePath = row.storage_path;
+  const mimeType    = row.mime_type ?? '';
+  if (!storagePath) return;
+
+  const isImage    = mimeType.startsWith('image/');
+  const isDocument = mimeType === 'application/pdf' || mimeType.includes('word');
+
+  await Promise.allSettled([
+    // ── Docling: layout-aware block extraction for PDFs/DOCX ────────────────
+    (async () => {
+      if (!isDocument) return;
+      try {
+        const { ENV } = await import('$lib/server/env.server.js');
+        if (!ENV.DOCLING_SERVICE_URL) return;
+        const fileRes = await fetch(storagePath, { signal: AbortSignal.timeout(10_000) }).catch(() => null);
+        if (!fileRes?.ok) return;
+        const buf = Buffer.from(await fileRes.arrayBuffer());
+        const result = await analyzeDocumentWithDocling({ fileBuffer: buf, mimeType });
+        if (result.fullText && result.fullText.length > row.summary.length) {
+          // Prefer Docling structured text — headings + tables beat raw OCR
+          row.summary = result.fullText.slice(0, 2000);
+        }
+      } catch { /* Docling service unavailable — keep original */ }
+    })(),
+
+    // ── YOLO: object/layout detection for image evidence nodes ──────────────
+    (async () => {
+      if (!isImage) return;
+      try {
+        if (!await _yoloService.isModelAvailable()) return;
+        const fileRes = await fetch(storagePath, { signal: AbortSignal.timeout(10_000) }).catch(() => null);
+        if (!fileRes?.ok) return;
+        const buf = Buffer.from(await fileRes.arrayBuffer());
+        const yoloResult = await _yoloService.analyze(buf);
+        const classes = yoloResult.objects
+          .filter(o => o.confidence > 0.5)
+          .map(o => o.class)
+          .filter((c, i, a) => a.indexOf(c) === i); // unique
+        if (classes.length > 0) {
+          row.entity_tags = [...new Set([...row.entity_tags, ...classes])];
+        }
+      } catch { /* YOLO model unavailable */ }
+    })(),
+
+    // ── Gemma4 VLM: visual description for image nodes ──────────────────────
+    (async () => {
+      if (!isImage) return;
+      try {
+        const fileRes = await fetch(storagePath, { signal: AbortSignal.timeout(10_000) }).catch(() => null);
+        if (!fileRes?.ok) return;
+        const buf = Buffer.from(await fileRes.arrayBuffer());
+        const vlm = await analyzeImageWithVLM({ buffer: buf, mimeType, contextHint: row.summary });
+        if (vlm?.summary) {
+          row.summary = `[VLM] ${vlm.summary}\n\n${row.summary}`.slice(0, 2000);
+          row.entity_tags = [...new Set([...row.entity_tags, ...vlm.suggestedTags])];
+        }
+      } catch { /* VLM unavailable */ }
+    })(),
+
+    // ── LangGraph: HMM-adapted synthesis replaces flat summary ──────────────
+    (async () => {
+      if (row.summary.length < 20) return;
+      try {
+        const lg = await langGraphSynthesize({ query: row.summary.slice(0, 500), skip_cache: false });
+        if (lg?.answer && lg.answer.length > 80) {
+          row.summary = lg.answer.slice(0, 2000);
+        }
+      } catch { /* LangGraph service unavailable */ }
+    })(),
+  ]);
+}
+
 // ── DB fetch ────────────────────────────────────────────────────────────────────
 
 interface SummaryRow {
@@ -162,6 +264,10 @@ interface SummaryRow {
   summary: string;
   embedding: number[];
   relevance_score: number;
+  // Pre-computed SOM BMU coordinates from Qdrant payload (codebase nodes only).
+  // When present, buildHypergraph4D skips the GPU SOM re-training step.
+  somX?: number;
+  somY?: number;
 }
 
 async function fetchEmbeddedSummaries(): Promise<SummaryRow[]> {
@@ -262,9 +368,10 @@ async function fetchCodebaseNodes(): Promise<SummaryRow[]> {
       // Deduplicate: keep first chunk per file path
       if (!seen.has(filePath)) {
         const tags = Array.isArray(p['tags']) ? (p['tags'] as string[]) : [];
-        const pagerankScore = typeof p['pagerank_score'] === 'number'
-          ? (p['pagerank_score'] as number)
-          : 0.5;
+
+        // Read SOM BMU coords written by som-topology-pipeline (44×44 grid)
+        const somRow = typeof p['som_bmu_row'] === 'number' ? (p['som_bmu_row'] as number) : undefined;
+        const somCol = typeof p['som_bmu_col'] === 'number' ? (p['som_bmu_col'] as number) : undefined;
 
         seen.set(filePath, {
           id:              String(pt.id),
@@ -272,7 +379,9 @@ async function fetchCodebaseNodes(): Promise<SummaryRow[]> {
           entity_tags:     tags,
           summary:         filePath,
           embedding:       vec,
-          relevance_score: pagerankScore,
+          relevance_score: 0.5, // placeholder — overwritten below from Redis PageRank
+          somX:            somCol, // SOM col = x axis
+          somY:            somRow, // SOM row = y axis
         });
       }
 
@@ -281,6 +390,24 @@ async function fetchCodebaseNodes(): Promise<SummaryRow[]> {
 
     if (seen.size >= MAX_ROWS) break;
   } while (offset !== null);
+
+  // Hydrate CouchDB PageRank scores from Redis (written by runCouchDbPageRank).
+  // Keys are relative file paths; values are normalised 0–1 floats.
+  try {
+    const { getRedis } = await import('$lib/server/redis.js');
+    const redis = getRedis();
+    const rawScores = await redis.hgetall('couchdb:pagerank_scores').catch(() => ({}));
+    if (rawScores && Object.keys(rawScores).length > 0) {
+      for (const [filePath, row] of seen) {
+        const score = rawScores[filePath];
+        if (score !== undefined) {
+          row.relevance_score = parseFloat(score);
+        }
+      }
+    }
+  } catch {
+    // Redis unavailable — keep 0.5 default
+  }
 
   return [...seen.values()];
 }
@@ -718,12 +845,33 @@ export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
     return { nodesTagged: 0, hyperedges: 0, gradeA: 0, gradeB: 0, gradeC: 0, gradeD: 0, durationMs: 0, source: 'cpu' };
   }
 
+  // ── Step 0: Pre-ingestion enrichment (Docling / YOLO / VLM / LangGraph) ──────
+  // Enriches summary + entity_tags in-place on rows that carry a storage_path.
+  // Batched 10 at a time; Promise.allSettled guarantees the pipeline continues
+  // even if every external service is down (all failures are silently swallowed).
+  const ENRICH_BATCH = 10;
+  const rowsWithPath = summaries.filter(s => (s as { storage_path?: string }).storage_path);
+  if (rowsWithPath.length > 0) {
+    for (let i = 0; i < rowsWithPath.length; i += ENRICH_BATCH) {
+      await Promise.allSettled(
+        rowsWithPath.slice(i, i + ENRICH_BATCH).map(s =>
+          enrichSummaryRow(s as SummaryRow & { storage_path?: string; mime_type?: string })
+        )
+      );
+    }
+  }
+
   const n = summaries.length;
   const k = Math.min(K_CLUSTERS, Math.floor(n / 3));
   const flat = flatF32(summaries.map(s => s.embedding));
 
   // ── Step 1: SOM (x, y) ──────────────────────────────────────────────────────
-  const somCoords = await computeSomCoords(summaries.map(s => s.embedding));
+  // Codebase nodes carry pre-computed SOM BMU coords from som-topology-pipeline.
+  // Use them directly — no need to re-train SOM on already-topologically-grouped data.
+  const hasBmuCoords = summaries.every(s => s.somX !== undefined && s.somY !== undefined);
+  const somCoords: Array<{ x: number; y: number }> = hasBmuCoords
+    ? summaries.map(s => ({ x: s.somX!, y: s.somY! }))
+    : await computeSomCoords(summaries.map(s => s.embedding));
 
   // ── Step 2: k-means (cluster assignments + centroids) ──────────────────────
   const { centroids, labels } = await runGpuKmeans(flat, n, k);
@@ -816,40 +964,68 @@ export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
     return Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'ace';
   });
 
-  const edges: HyperEdge[] = [];
+  // ── Step 9a: Collect edge metadata (no I/O) ─────────────────────────────────
+  interface EdgeDraft {
+    j:              number;
+    memberIds:      string[];
+    memberSummaries: string[];
+    gradeScore:     number;
+    gradeLabel:     HyperEdgeGrade;
+    pipeline:       string;
+    summary:        string; // filled in Step 9b
+  }
+  const drafts: EdgeDraft[] = [];
   const gradeCount = { A: 0, B: 0, C: 0, D: 0 };
   let gpuUsed = false;
 
   for (let j = 0; j < k; j++) {
-    if (members[j].length < 2) continue; // skip singleton clusters
+    if (members[j].length < 2) continue;
 
-    const memberIds = members[j].map(i => summaries[i].id);
-    const gradeScore = edgeWeights[j];
-    const gradeLabel = scoreToGrade(gradeScore);
+    const memberIds      = members[j].map(i => summaries[i].id);
+    const gradeScore     = edgeWeights[j];
+    const gradeLabel     = scoreToGrade(gradeScore);
     gradeCount[gradeLabel]++;
 
-    const pipeline = clusterPipelines[j];
-    const memberSummaries = members[j].map(i => summaries[i].summary);
-    const summary = await summarizeHyperedge(memberSummaries, pipeline, gradeLabel);
-
-    edges.push({
-      hash:        edgeHash(memberIds),
-      type:        'RESEARCH_CLUSTER',
+    drafts.push({
+      j,
       memberIds,
-      // X_prime[j] is the HGNN-enriched centroid (reward-weighted mean of member
-      // embeddings). More semantically precise than raw k-means centroid.
-      // Used by: scoreGRPOReward gRPC path, FastMCP search_hypergraph, KAG
-      // LoRA memory loader (reads this vector to select which adapter to load).
-      centroid:    Array.from(X_prime.slice(j * DIM, (j + 1) * DIM)),
+      memberSummaries: members[j].map(i => summaries[i].summary),
       gradeScore,
       gradeLabel,
-      summary,
-      pipeline,
-      memberCount: memberIds.length,
-      builtAt:     new Date().toISOString(),
+      pipeline: clusterPipelines[j],
+      summary: '',
     });
     gpuUsed = true;
   }
+
+  // ── Step 9b: Batch summarize (SUMMARIZE_BATCH_SIZE parallel at a time) ────────
+  // Promise.allSettled keeps going if individual summarizations fail (service down,
+  // timeout, etc.). Sequential awaits would make each build take k × ~5s.
+  for (let b = 0; b < drafts.length; b += SUMMARIZE_BATCH_SIZE) {
+    await Promise.allSettled(
+      drafts.slice(b, b + SUMMARIZE_BATCH_SIZE).map(async d => {
+        d.summary = await summarizeHyperedge(d.memberSummaries, d.pipeline, d.gradeLabel);
+      })
+    );
+  }
+
+  // ── Step 9c: Build final HyperEdge objects ────────────────────────────────────
+  const edges: HyperEdge[] = drafts.map(d => ({
+    hash:        edgeHash(d.memberIds),
+    type:        'RESEARCH_CLUSTER' as const,
+    memberIds:   d.memberIds,
+    // X_prime[j] is the HGNN-enriched centroid (reward-weighted mean of member
+    // embeddings). More semantically precise than raw k-means centroid.
+    // Used by: scoreGRPOReward gRPC path, FastMCP search_hypergraph, KAG
+    // LoRA memory loader (reads this vector to select which adapter to load).
+    centroid:    Array.from(X_prime.slice(d.j * DIM, (d.j + 1) * DIM)),
+    gradeScore:  d.gradeScore,
+    gradeLabel:  d.gradeLabel,
+    summary:     d.summary,
+    pipeline:    d.pipeline,
+    memberCount: d.memberIds.length,
+    builtAt:     new Date().toISOString(),
+  }));
 
   // ── Step 10: Persist ─────────────────────────────────────────────────────────
   await persistToRedis(edges, nodes);
