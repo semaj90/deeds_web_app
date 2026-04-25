@@ -91,7 +91,7 @@ async function scrollEmbeddings(maxFiles: number): Promise<FileEmbedding[]> {
 		offset = data.result?.next_page_offset ?? null;
 
 		for (const pt of points) {
-			const filePath = pt.payload?.file_path ?? '';
+			const filePath = pt.payload?.relativePath ?? pt.payload?.file_path ?? pt.payload?.path ?? '';
 			if (!filePath) continue;
 
 			// Resolve vector — may be bare array or named-vector map
@@ -265,8 +265,8 @@ async function createNeo4jTopologyEdges(
 			try {
 				const result = await session.run(
 					`UNWIND $pairs AS pair
-					 MATCH (a:CodebaseFile {file_path: pair.a})
-					 MATCH (b:CodebaseFile {file_path: pair.b})
+					 MATCH (a:CodebaseFile) WHERE a.filePath = pair.a OR a.file_path = pair.a
+					 MATCH (b:CodebaseFile) WHERE b.filePath = pair.b OR b.file_path = pair.b
 					 MERGE (a)-[r:SIMILAR_TOPOLOGY]-(b)
 					 ON CREATE SET r.createdAt = datetime()
 					 SET r.updatedAt = datetime()
