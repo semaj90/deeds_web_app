@@ -17,8 +17,10 @@ Reference documentation extracted from `deeds_labs/projects/legacy-projects/`. T
 
 ## Live Extracts (Separate Repos)
 
-These legacy projects were extracted to standalone repositories:
+These projects were extracted to standalone repositories:
 
+- **[deeds_web_app](https://github.com/semaj90/deeds_web_app)** — Full SvelteKit 2 legal AI platform (this repo, full history)
+- **[libtorch_node_bridge](https://github.com/semaj90/libtorch_node_bridge)** — LibTorch CUDA + simdjson AVX-512 N-API addon for Node.js (standalone build)
 - **[deeds_error_fixer](https://github.com/semaj90/deeds_error_fixer)** — 3-phase agentic TypeScript/Svelte error resolution pipeline
 - **[evidence_microservice](https://github.com/semaj90/evidence_microservice)** — GraphQL evidence processing microservice (Apollo + RabbitMQ + Drizzle)
 - **[deeds-ingestion-pipeline](https://github.com/semaj90/deeds-ingestion-pipeline)** — Enterprise GPU document ingestion (PDF/DOCX/image, Python workers)
