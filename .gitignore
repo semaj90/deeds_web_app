@@ -788,3 +788,4 @@ tmp-*.ps1
 # deeds_labs/
 
 *.profraw
+deeds_labs/snapshots/
