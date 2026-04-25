@@ -23,14 +23,18 @@
 
 import pg from 'pg';
 import Redis from 'ioredis';
+import neo4j, { type Driver } from 'neo4j-driver';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://127.0.0.1:6333';
-const PG_URL       = process.env.DATABASE_URL  ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
-const REDIS_URL    = process.env.REDIS_URL     ?? 'redis://127.0.0.1:6379';
-const REDIS_PASS   = process.env.REDIS_PASSWORD ?? 'redis';
-const OLLAMA_URL   = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+const QDRANT_URL   = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
+const PG_URL       = process.env.DATABASE_URL       ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const REDIS_URL    = process.env.REDIS_URL          ?? 'redis://127.0.0.1:6379';
+const REDIS_PASS   = process.env.REDIS_PASSWORD     ?? 'redis';
+const OLLAMA_URL   = process.env.OLLAMA_BASE_URL    ?? 'http://127.0.0.1:11434';
+const NEO4J_URI    = process.env.NEO4J_URI          ?? 'bolt://localhost:7687';
+const NEO4J_USER   = process.env.NEO4J_USER         ?? 'neo4j';
+const NEO4J_PASS   = process.env.NEO4J_PASSWORD     ?? 'neo4j123';
 
 const FORCE        = process.argv.includes('--force');
 const MAX_NODES    = parseInt(process.argv.find(a => a.startsWith('--max-nodes='))?.split('=')[1] ?? '2000');
@@ -176,13 +180,19 @@ async function scrollQdrant(maxNodes: number): Promise<Node[]> {
 
 async function hydratePagerankScores(nodes: Node[]): Promise<void> {
   try {
-    const raw = await redis.hgetall('couchdb:pagerank_scores');
+    // Stored as JSON string by run-pagerank.ts: { [filePath]: score }
+    const raw = await redis.get('couchdb:pagerank_scores');
     if (!raw) return;
+    const scores = JSON.parse(raw) as Record<string, number>;
     let hits = 0;
     for (const node of nodes) {
-      const score = raw[node.filePath];
+      // Keys are relative paths like "lib/server/db/schema-postgres.ts"
+      // Node filePaths from Qdrant may be "src/lib/..." or "lib/..." — try both
+      const score = scores[node.filePath]
+        ?? scores[node.filePath.replace(/^src\//, '')]
+        ?? scores['src/' + node.filePath];
       if (score !== undefined) {
-        node.pagerank = parseFloat(score);
+        node.pagerank = score;
         hits++;
       }
     }
@@ -468,6 +478,145 @@ async function buildHyperedges(
   console.log(`\n[hg] Done: A=${gradeA} B=${gradeB} C=${gradeC} D=${gradeD}`);
 }
 
+// ── Neo4j sync — File / Cluster / SomCell nodes ───────────────────────────────
+
+interface EdgeBlob {
+  hash: string;
+  memberIds: string[];
+  centroid: number[];
+  gradeScore: number;
+  gradeLabel: string;
+  summary: string;
+  memberCount: number;
+  builtAt: string;
+}
+
+async function syncToNeo4j(nodes: Node[], kmeans: KMeansResult): Promise<void> {
+  let driver: Driver | null = null;
+  try {
+    driver = neo4j.driver(NEO4J_URI, neo4j.auth.basic(NEO4J_USER, NEO4J_PASS));
+    await driver.verifyConnectivity();
+    const session = driver.session({ database: 'neo4j' });
+
+    const k = kmeans.centroids.length;
+    const gridW = Math.ceil(Math.sqrt(k));
+
+    // Read edge blobs from Redis to get hashes + member lists
+    const hashes = await redis.zrange('hg:edge:idx', 0, -1);
+    const edgeBlobs: EdgeBlob[] = (
+      await Promise.all(hashes.map(h => redis.get(`hg:edge:${h}`)))
+    )
+      .filter(Boolean)
+      .map(s => JSON.parse(s!) as EdgeBlob);
+
+    console.log(`[hg→neo4j] Syncing ${nodes.length} File nodes + ${edgeBlobs.length} Cluster nodes...`);
+
+    // Upsert File + SomCell nodes in batches of 200
+    const FILE_BATCH = 200;
+    for (let i = 0; i < nodes.length; i += FILE_BATCH) {
+      const batch = nodes.slice(i, i + FILE_BATCH).map((n, bi) => {
+        const idx = i + bi;
+        const c = kmeans.labels[idx];
+        return {
+          id:      n.id,
+          path:    n.filePath,
+          x:       n.somX ?? (c % gridW),
+          y:       n.somY ?? Math.floor(c / gridW),
+          z:       0,
+          w:       n.pagerank,
+          cluster: c,
+        };
+      });
+      await session.run(
+        `UNWIND $batch AS r
+         MERGE (f:File { id: r.id })
+           SET f.filePath = r.path, f.som_x = r.x, f.som_y = r.y,
+               f.semantic_z = r.z, f.reward_w = r.w, f.gpuCluster = r.cluster,
+               f.nodeType = 'codebase'
+         WITH f, r
+         MERGE (sc:SomCell { col: r.x, row: r.y })
+         MERGE (f)-[:IN_SOM_CELL]->(sc)`,
+        { batch }
+      );
+    }
+
+    // Upsert Cluster nodes + IN_CLUSTER edges
+    for (const edge of edgeBlobs) {
+      await session.run(
+        `MERGE (cl:Cluster { hash: $hash })
+           SET cl.gradeScore = $grade, cl.gradeLabel = $label,
+               cl.summary = $summary, cl.memberCount = $count, cl.builtAt = $builtAt
+         WITH cl
+         UNWIND $memberIds AS mid
+           MATCH (f:File { id: mid })
+           MERGE (f)-[:IN_CLUSTER]->(cl)`,
+        {
+          hash:      edge.hash,
+          grade:     edge.gradeScore,
+          label:     edge.gradeLabel,
+          summary:   edge.summary,
+          count:     edge.memberCount,
+          builtAt:   edge.builtAt,
+          memberIds: edge.memberIds,
+        }
+      );
+    }
+
+    // Cross-cluster adjacency via shared SomCells
+    await session.run(
+      `MATCH (fa:File)-[:IN_CLUSTER]->(a:Cluster),
+             (fb:File)-[:IN_CLUSTER]->(b:Cluster),
+             (fa)-[:IN_SOM_CELL]->(sc:SomCell)<-[:IN_SOM_CELL]-(fb)
+       WHERE a.hash <> b.hash
+       WITH a, b, count(sc) AS sharedCells WHERE sharedCells > 0
+       MERGE (a)-[r:ADJACENT_CLUSTER]->(b)
+         SET r.sharedCells = sharedCells`
+    );
+
+    await session.close();
+    console.log(`[hg→neo4j] Done — File/Cluster/SomCell nodes written.`);
+  } catch (err) {
+    console.warn('[hg→neo4j] Non-fatal:', (err as Error).message.slice(0, 120));
+  } finally {
+    await driver?.close();
+  }
+}
+
+// ── Qdrant cluster payload update ─────────────────────────────────────────────
+
+async function updateQdrantPayloads(nodes: Node[], kmeans: KMeansResult): Promise<void> {
+  const BATCH = 100;
+  let updated = 0;
+  try {
+    for (let i = 0; i < nodes.length; i += BATCH) {
+      const slice = nodes.slice(i, i + BATCH);
+      await Promise.allSettled(slice.map(async (node, bi) => {
+        const idx = i + bi;
+        const c = kmeans.labels[idx];
+        const gridW = Math.ceil(Math.sqrt(kmeans.centroids.length));
+        const somCluster = (node.somY ?? Math.floor(c / gridW)) * 44 + (node.somX ?? (c % gridW));
+        const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/${node.id}/payload`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            payload: {
+              gpu_cluster:  c,
+              som_cluster:  somCluster,
+              som_bmu_col:  node.somX ?? (c % gridW),
+              som_bmu_row:  node.somY ?? Math.floor(c / gridW),
+            },
+          }),
+          signal: AbortSignal.timeout(5_000),
+        }).catch(() => null);
+        if (res?.ok) updated++;
+      }));
+    }
+    console.log(`[hg→qdrant] Updated ${updated}/${nodes.length} cluster payloads.`);
+  } catch (err) {
+    console.warn('[hg→qdrant] Non-fatal:', (err as Error).message.slice(0, 80));
+  }
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -506,8 +655,14 @@ async function main() {
   // 4. Assign SOM x/y coordinates
   assignSomCoords(nodes, kmeans.labels, k);
 
-  // 5. Build + store hyperedges
+  // 5. Build + store hyperedges (Redis)
   await buildHyperedges(nodes, kmeans);
+
+  // 6. Sync to Neo4j — File / Cluster / SomCell nodes (non-fatal)
+  await syncToNeo4j(nodes, kmeans);
+
+  // 7. Update Qdrant cluster payloads — gpu_cluster + som_cluster (non-fatal)
+  await updateQdrantPayloads(nodes, kmeans);
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
   const edgeCount = await redis.zcard('hg:edge:idx').catch(() => 0);
