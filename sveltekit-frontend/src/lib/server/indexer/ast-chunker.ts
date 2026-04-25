@@ -287,14 +287,13 @@ function chunkRawFile(content: string, filePath: string, rootDir: string): CodeC
   const tags = deriveTags(relPath, content);
   const routeId = deriveRouteId(relPath);
   const lineCount = content.split(/\r?\n/).length;
-  const kind = extname(filePath) === '.svelte' ? 'component' : 'unknown';
-  const partialChunk = {
+  const partialChunk: Omit<CodeChunk, 'signature'> = {
     id: `${relPath}::file::0`,
     content: normalizedContent.slice(0, 4000),
     metadata: {
       path: filePath,
       relativePath: relPath,
-      kind,
+      kind: extname(filePath) === '.svelte' ? 'component' : 'unknown',
       symbol: basename(filePath),
       routeId,
       exports: [],
@@ -304,12 +303,7 @@ function chunkRawFile(content: string, filePath: string, rootDir: string): CodeC
     },
   };
 
-  return [
-    {
-      ...partialChunk,
-      signature: buildSignature(partialChunk),
-    },
-  ];
+  return [{ ...partialChunk, signature: buildSignature(partialChunk) }];
 }
 
 function kindBreakdownFor(chunks: CodeChunk[]): Record<string, number> {
@@ -381,7 +375,7 @@ export async function chunkFiles(
   let filesProcessed = 0;
 
   async function reportProgress(
-    progress: Omit<ChunkFilesProgress, 'totalFiles' | 'filesProcessed'>
+    progress: Omit<ChunkFilesProgress, 'totalFiles' | 'filesProcessed' | 'chunksTotal'>
   ): Promise<void> {
     filesProcessed += 1;
     await options.onProgress?.({

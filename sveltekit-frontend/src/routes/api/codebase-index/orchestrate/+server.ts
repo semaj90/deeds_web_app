@@ -471,7 +471,7 @@ async function throwIfNotOk(response: Response, label: string): Promise<void> {
 
 async function startIndexJob(
 	fetcher: FetchLike,
-	options: { scope: 'routes' | 'lib' | 'all'; incremental: boolean },
+	options: { scope: 'routes' | 'lib' | 'all' | 'workspace'; incremental: boolean },
 ): Promise<{ success?: boolean; jobId?: string; backend?: string; message?: string; error?: string }> {
 	const response = await fetcher('/api/codebase/wiki/index', {
 		method: 'POST',
