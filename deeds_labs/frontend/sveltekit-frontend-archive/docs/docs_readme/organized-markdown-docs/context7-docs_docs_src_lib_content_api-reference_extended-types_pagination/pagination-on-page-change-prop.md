@@ -1,3 +1,0 @@
-```ts
-(page: number) => void
-```

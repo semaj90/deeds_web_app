@@ -1,5 +1,0 @@
-# Page snapshot
-
-```yaml
-- generic [ref=e2]: "Error: Failed to load url /.svelte-kit/generated/server/internal.js (resolved id: C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/server/internal.js) in C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/@sveltejs/kit/src/runtime/server/index.js. Does the file exist? at loadAndTransform (file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:35729:17) at async fetchModule (file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:46858:16) at async handleInvoke (file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:39002:22) at async EventEmitter.listenerForInvokeHandler (file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:39075:19)"
-```

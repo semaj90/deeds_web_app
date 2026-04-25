@@ -1,3 +1,0 @@
-```ts
-"partial" | "always"
-```

@@ -1,3 +1,0 @@
-```ts
-(event: KeyboardEvent) => void
-```

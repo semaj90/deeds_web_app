@@ -1,3 +1,0 @@
-```ts
-"fixed" | "absolute"
-```

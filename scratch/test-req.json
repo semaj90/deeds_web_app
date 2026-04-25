@@ -1,4 +1,0 @@
-{
-  "model": "ollama/embeddinggemma:latest",
-  "input": "test request for bifrost"
-}
