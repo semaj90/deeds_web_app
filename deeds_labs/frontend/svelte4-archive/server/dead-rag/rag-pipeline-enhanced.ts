@@ -1,0 +1,255 @@
+import Redis from 'ioredis';
+import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { PromptTemplate } from '@langchain/core/prompts';
+import { RunnableSequence } from '@langchain/core/runnables';
+import { StringOutputParser } from '@langchain/core/output_parsers';
+import * as schema from '$lib/server/db/schema-postgres';
+import { checkOllamaHealth, OllamaHTTPEmbeddings, OllamaHTTPLLM } from '$lib/server/ollama';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+// Configuration Interfaces
+export interface RAGConfig {
+	database: DatabaseConfig;
+	redis: RedisConfig;
+	ollama: OllamaConfig;
+	rag: RAGSettings;
+	security: SecuritySettings;
+}
+
+export interface DatabaseConfig {
+	databaseUrl: string;
+	max: number;
+	idle_timeout: number;
+	ssl: boolean | 'require' | 'allow' | 'prefer' | 'verify-full';
+	connect_timeout: number;
+}
+
+export interface RedisConfig {
+	redisUrl: string;
+	maxRetriesPerRequest: number;
+	cacheTtl: number;
+	enableReadyCheck: boolean;
+	lazyConnect: boolean;
+}
+
+export interface OllamaConfig {
+	baseUrl: string;
+	embeddingModel: string;
+	llmModel: string;
+	embeddingDimensions: number;
+	temperature: number;
+}
+
+export interface RAGSettings {
+	chunkSize: number;
+	chunkOverlap: number;
+	maxSources: number;
+	similarityThreshold: number;
+	timeoutMs: number;
+	batchSize: number;
+	enableCaching: boolean;
+	enableAutoTagging: boolean;
+}
+
+export interface SecuritySettings {
+	rateLimit: {
+	perMinute: number;
+		windowMs: number;
+	};
+	validation: {
+	maxInputLength: number;
+		maxDocumentSize: number;
+	};
+}
+
+// Data Interfaces
+export interface DocumentIngestionParams {
+	title: string;
+	content: string;
+	documentType: string;
+	userId: string;
+	metadata?: Record<string, unknown>;
+	caseId?: string;
+	confidentialityLevel?: string;
+	jurisdiction?: string;
+	clientId?: string;
+}
+
+export interface SearchParams {
+	query: string;
+	userId?: string;
+	caseId?: string;
+	documentType?: string;
+	limit?: number;
+	threshold?: number;
+	includeMetadata?: boolean;
+	sortBy?: 'relevance' | 'date' | 'score';
+}
+
+export interface QuestionParams {
+	question: string;
+	userId: string;
+	caseId?: string;
+	conversationContext?: string;
+	confidentialityLevel?: string;
+	requireSources?: boolean;
+	maxSources?: number;
+}
+
+export class EnhancedRAGService {
+	private config: RAGConfig;
+	private sql: postgres.Sql | null = null;
+	private db: DrizzleTypes.DatabaseConfig = null; // Drizzle instance
+	private redis: Redis | null = null;
+	private embeddings: any = null;
+	private llm: any = null;
+	private initialized = false;
+	private metrics: any; // Placeholder for MetricsCollector
+	private chunker: any; // Placeholder for LegalChunker
+
+	constructor(config: RAGConfig) {
+		this.config = config;
+		this.metrics = {
+			incrementCounter: (name: string) => console.log(`[Metric] Inc: ${name}`),
+			recordTiming: (name: string, val: number) => console.log(`[Metric] Time: ${name} ${val}ms`)
+		};
+		this.chunker = {
+			chunkDocument: (content: string) => [content], // Simple fallback
+			extractLegalSections: () => ({})
+		};
+	}
+
+	async initialize(): Promise<void> {
+		if (this.initialized) return;
+
+		try {
+			await this.initializeDatabase();
+			await this.initializeRedis();
+			await this.initializeOllama();
+			this.initialized = true;
+			console.log('[RAG] Service initialized successfully');
+		} catch (error) {
+			console.error('[RAG] Initialization failed:', error);
+			throw error;
+		}
+	}
+
+	private async initializeDatabase() {
+		this.sql = postgres(this.config.database.databaseUrl, {
+			max: this.config.database.max,
+			idle_timeout: this.config.database.idle_timeout,
+			ssl: this.config.database.ssl,
+			connect_timeout: this.config.database.connect_timeout
+		});
+		this.db = drizzle(this.sql, { schema });
+	}
+
+	private async initializeRedis() {
+		this.redis = new Redis(this.config.redis.redisUrl, {
+			maxRetriesPerRequest: this.config.redis.maxRetriesPerRequest,
+			lazyConnect: true
+		});
+		await this.redis.connect();
+	}
+
+	private async initializeOllama() {
+		const { baseUrl, embeddingModel, llmModel, temperature } = this.config.ollama;
+		this.embeddings = new OllamaHTTPEmbeddings(baseUrl, embeddingModel);
+		this.llm = new OllamaHTTPLLM(baseUrl, llmModel, temperature);
+	}
+
+	private async ensureInitialized() {
+		if (!this.initialized) await this.initialize();
+	}
+
+	private async generateEmbedding(text: string): Promise<number[]> {
+		if (!this.embeddings) throw new Error('Embeddings not initialized');
+
+		const cacheKey = `embedding:${Buffer.from(text).toString('base64')}`;
+		if (this.config.rag.enableCaching && this.redis) {
+			const cached = await this.redis.get(cacheKey);
+			if (cached) return JSON.parse(cached);
+		}
+
+		const embedding = await this.embeddings.embedQuery(text);
+
+		if (this.config.rag.enableCaching && this.redis) {
+			await this.redis.setex(cacheKey, this.config.redis.cacheTtl, JSON.stringify(embedding));
+		}
+		return embedding;
+	}
+
+	// Ingestion
+	async ingestLegalDocument(params: DocumentIngestionParams): Promise<any> {
+		await this.ensureInitialized();
+
+		const { title, content, documentType, userId, metadata = {} } = params;
+
+		// Create document record
+		const [doc] = await this.db.insert((schema as any).legalDocuments || (schema as any).documents).values({
+			title,
+			content, // Assuming simplified schema for now
+			documentType,
+			userId,
+			metadata,
+			createdAt: new Date().toISOString()
+		}).returning();
+
+		// Generate embedding
+		const embedding = await this.generateEmbedding(content.slice(0, 1000));
+
+		// Update embedding (using raw SQL for vector type)
+		if (this.sql) {
+			await this.sql`UPDATE legal_documents SET embedding = ${JSON.stringify(embedding)} WHERE id = ${doc.id}`;
+		}
+
+		return { success: true, documentId: doc.id };
+	}
+
+	// Search
+	async hybridSearch(params: SearchParams): Promise<any[]> {
+		await this.ensureInitialized();
+		const { query, limit = 5 } = params;
+		const embedding = await this.generateEmbedding(query);
+
+		// Raw SQL hybrid search
+		if (this.sql) {
+			const results = await this.sql`
+				SELECT id, content, metadata,
+				1 - (embedding::vector <=> ${JSON.stringify(embedding)}::vector) as similarity
+				FROM legal_documents
+				ORDER BY similarity DESC
+				LIMIT ${limit}
+			`;
+			return results;
+		}
+		return [];
+	}
+
+	// QA
+	async answerLegalQuestion(params: QuestionParams): Promise<any> {
+		await this.ensureInitialized();
+		const { question, maxSources = 3 } = params;
+
+		const docs = await this.hybridSearch({ query: question, limit: maxSources });
+		const context = docs.map((d: any) => d.content).join('\n\n');
+
+		const prompt = PromptTemplate.fromTemplate(`
+			Answer the question based on the context below.
+			Context: {context}
+			Question: {question}
+			Answer:
+		`);
+
+		const chain = RunnableSequence.from([prompt, this.llm, new StringOutputParser()]);
+		const answer = await chain.invoke({ context, question });
+
+		return {
+			answer,
+			sources: docs,
+			confidence: 0.9 // Placeholder
+		};
+	}
+}
+

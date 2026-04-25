@@ -1,0 +1,19 @@
+{
+  "totalErrors": 0,
+  "errorsByType": {},
+  "memoryUsage": {
+    "rss": 20684800,
+    "heapTotal": 11755520,
+    "heapUsed": 9814328,
+    "external": 4025187,
+    "arrayBuffers": 128644
+  },
+  "cpuUsage": {
+    "user": 484000,
+    "system": 31000
+  },
+  "duration": 510438,
+  "gpuAvailable": false,
+  "ollamaAvailable": true,
+  "gemmaModelLoaded": true
+}

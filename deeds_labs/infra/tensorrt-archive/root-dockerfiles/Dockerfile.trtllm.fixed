@@ -1,0 +1,89 @@
+# TensorRT-LLM Fixed Dockerfile
+# Fixes: Unified transformers version, Linux-only build, no Windows artifacts
+# Base: NVIDIA TensorRT-LLM release
+
+FROM nvcr.io/nvidia/tensorrt-llm/release:latest
+
+LABEL maintainer="LegalAI Team"
+LABEL description="TensorRT-LLM with CUDA Tokenizer Service - Production Ready"
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies (Linux-only)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    rustc \
+    cargo \
+    git \
+    wget \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install unified Python dependencies (CRITICAL FIX)
+# Use exact versions to avoid mismatches
+RUN pip install --no-cache-dir --no-deps \
+    'transformers==4.45.0' \
+    'tokenizers>=0.21,<0.22' \
+    'safetensors>=0.4.0' \
+    'numpy>=1.24.0,<2.0.0'
+
+# Install service dependencies
+RUN pip install --no-cache-dir \
+    'fastapi==0.104.1' \
+    'uvicorn[standard]==0.24.0' \
+    'pydantic==2.5.0' \
+    'sentence-transformers==2.7.0' \
+    'redis==5.0.1' \
+    'psycopg2-binary==2.9.9' \
+    'aioredis==2.0.1' \
+    'httpx==0.25.2' \
+    'pika==1.3.2'
+
+# Install TensorRT-LLM specific dependencies
+RUN pip install --no-cache-dir \
+    'tensorrt-llm==0.10.0' \
+    'tensorrt==8.6.1.post1'
+
+# Set critical environment variables (CRITICAL)
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV CUDA_VISIBLE_DEVICES=0
+ENV TOKENIZERS_PARALLELISM=false
+ENV CUDA_DEVICE_MAX_CONNECTIONS=1
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
+ENV TRANSFORMERS_CACHE=/models/transformers_cache
+ENV HF_HOME=/models/huggingface
+
+# Create necessary directories
+RUN mkdir -p \
+    /app/backend/services \
+    /app/backend/workers \
+    /app/backend/mq \
+    /models/tensorrt_engines \
+    /models/transformers_cache \
+    /models/huggingface \
+    /models/tokenizers
+
+# Copy application code
+COPY backend/services/ ./backend/services/
+COPY backend/workers/ ./backend/workers/
+COPY backend/mq_client.py ./backend/
+COPY backend/chunker_langextract.py ./backend/
+COPY backend/docling_gateway.py ./backend/
+
+# Create __init__.py files for Python packages
+RUN touch ./backend/__init__.py
+RUN touch ./backend/services/__init__.py
+RUN touch ./backend/workers/__init__.py
+
+# Health check (verify CUDA and TensorRT)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python3 -c "import torch; import tensorrt_llm; print('OK')" || exit 1
+
+# Expose ports
+EXPOSE 8000 8001 8002
+
+# Default command: Start CUDA Tokenizer Service
+CMD ["python", "-m", "uvicorn", "backend.services.cuda_tokenizer_service:app", "--host", "0.0.0.0", "--port", "8000"]

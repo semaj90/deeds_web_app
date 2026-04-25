@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LawPDFs API Test - File Upload</title>
+    <style>
+      body {
+        font-family: 'Courier New', monospace;
+        background: #1a1a1a;
+        color: #00ff00;
+        padding: 20px;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        border: 2px solid #00ff00;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: #2a2a2a;
+      }
+
+      .section {
+        border: 1px solid #333;
+        margin: 20px 0;
+        padding: 20px;
+        background: #2a2a2a;
+      }
+
+      .section h3 {
+        color: #00ccff;
+        margin-top: 0;
+        border-bottom: 1px solid #00ccff;
+        padding-bottom: 10px;
+      }
+
+      .button {
+        background: #005500;
+        color: #00ff00;
+        border: 2px solid #00ff00;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin: 5px;
+        font-family: inherit;
+      }
+
+      .button:hover {
+        background: #007700;
+      }
+
+      .button:disabled {
+        background: #333;
+        color: #666;
+        cursor: not-allowed;
+      }
+
+      .log {
+        background: #000;
+        color: #00ff00;
+        padding: 15px;
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #00ff00;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 5px;
+        border-radius: 3px;
+        font-weight: bold;
+      }
+
+      .status.success {
+        background: #004400;
+        color: #00ff00;
+      }
+      .status.error {
+        background: #440000;
+        color: #ff4444;
+      }
+      .status.warning {
+        background: #444400;
+        color: #ffff00;
+      }
+      .status.info {
+        background: #004444;
+        color: #00ffff;
+      }
+
+      .file-drop-zone {
+        border: 3px dashed #00ff00;
+        padding: 40px;
+        text-align: center;
+        margin: 20px 0;
+        background: #333;
+        cursor: pointer;
+      }
+
+      .file-drop-zone.dragover {
+        background: #004400;
+        border-color: #00ccff;
+      }
+
+      .file-list {
+        background: #333;
+        padding: 15px;
+        margin: 10px 0;
+        border-left: 4px solid #00ff00;
+      }
+
+      .file-item {
+        padding: 10px;
+        margin: 5px 0;
+        background: #2a2a2a;
+        border: 1px solid #555;
+      }
+
+      .file-item.processing {
+        border-color: #00ccff;
+      }
+
+      .file-item.success {
+        border-color: #00ff00;
+      }
+
+      .file-item.error {
+        border-color: #ff4444;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        background: #555;
+        border: 1px solid #777;
+        margin: 5px 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00ff00, #00ccff);
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      input[type='file'] {
+        display: none;
+      }
+
+      .checkbox-group {
+        margin: 10px 0;
+      }
+
+      .checkbox-group label {
+        display: block;
+        margin: 5px 0;
+        cursor: pointer;
+      }
+
+      .checkbox-group input[type='checkbox'] {
+        margin-right: 10px;
+      }
+
+      .results-section {
+        background: #1a1a1a;
+        border: 1px solid #00ccff;
+        padding: 15px;
+        margin: 10px 0;
+      }
+
+      .json-output {
+        background: #000;
+        color: #00ccff;
+        padding: 10px;
+        border: 1px solid #00ccff;
+        font-size: 11px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📄 LawPDFs API Test - File Upload</h1>
+        <p>Test PDF uploads with OCR, Embeddings & RAG Analysis</p>
+      </div>
+
+      <div class="section">
+        <h3>📋 System Status</h3>
+        <div id="systemStatus">
+          <span class="status info">Initializing...</span>
+        </div>
+        <button class="button" onclick="checkAPIHealth()">🔍 Check LawPDFs API</button>
+        <button class="button" onclick="testJSONAPI()">🧪 Test JSON API</button>
+      </div>
+
+      <div class="section">
+        <h3>📤 File Upload</h3>
+
+        <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+          <div>🗂️ Click here or drag & drop PDF files</div>
+          <div style="font-size: 12px; margin-top: 10px">Supported: PDF, DOC, DOCX, TXT</div>
+          <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt" />
+        </div>
+
+        <div class="checkbox-group">
+          <h4>Processing Options:</h4>
+          <label><input type="checkbox" id="enableOCR" checked /> Enable OCR (Text Extraction)</label>
+          <label><input type="checkbox" id="enableEmbedding" checked /> Enable Embeddings (Vector Generation)</label>
+          <label><input type="checkbox" id="enableRAG" checked /> Enable RAG (Analysis)</label>
+        </div>
+
+        <button class="button" onclick="uploadFiles()" id="uploadBtn" disabled> 🚀 Upload & Process Files </button>
+        <button class="button" onclick="clearFiles()">🗑️ Clear Files</button>
+      </div>
+
+      <div class="section">
+        <h3>📊 Upload Progress</h3>
+        <div id="fileList" class="file-list">
+          <div>No files selected</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>📝 System Log</h3>
+        <button class="button" onclick="clearLog()">🗑️ Clear Log</button>
+        <div class="log" id="systemLog"></div>
+      </div>
+
+      <div class="section">
+        <h3>📊 Results</h3>
+        <div id="resultsSection"></div>
+      </div>
+    </div>
+
+    <script>
+      // Configuration
+      const API_BASE = window.location.origin;
+      const LAWPDFS_API = `${API_BASE}/api/ai/lawpdfs`;
+
+      // Global state
+      let selectedFiles = [];
+      let uploadResults = [];
+
+      // Logging function
+      function log(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logElement = document.getElementById('systemLog');
+        const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+        logElement.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+        logElement.scrollTop = logElement.scrollHeight;
+        console.log(`[${type.toUpperCase()}] ${message}`);
+      }
+
+      function clearLog() {
+        document.getElementById('systemLog').textContent = '';
+        log('Log cleared');
+      }
+
+      // Update UI elements
+      function updateStatus(elementId, status, text) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `<span class="status ${status}">${text}</span>`;
+      }
+
+      // Check API health
+      async function checkAPIHealth() {
+        log('Checking LawPDFs API health...');
+        updateStatus('systemStatus', 'info', 'Checking...');
+
+        try {
+          // First check if the endpoint exists
+          const response = await fetch(LAWPDFS_API, { method: 'OPTIONS' });
+          log(`API endpoint response: ${response.status}`);
+
+          if (response.status === 404) {
+            throw new Error('LawPDFs API endpoint not found');
+          }
+
+          updateStatus('systemStatus', 'success', 'LawPDFs API: Available');
+          log('✅ LawPDFs API is accessible', 'success');
+        } catch (error) {
+          log(`❌ LawPDFs API check failed: ${error.message}`, 'error');
+          updateStatus('systemStatus', 'error', 'LawPDFs API: Unavailable');
+        }
+      }
+
+      // Test JSON API
+      async function testJSONAPI() {
+        log('Testing LawPDFs JSON API...');
+
+        const testData = {
+          content:
+            'This is a test legal document. It contains contract terms and liability clauses for demonstration purposes. The parties agree to indemnification terms under federal jurisdiction.',
+          fileName: 'test-legal-document.pdf',
+          analysisType: 'comprehensive',
+          useLocalModels: false,
+          modelPreferences: {
+            summaryModel: 'gemma3-legal',
+            embeddingModel: 'nomic-embed-text',
+          },
+        };
+
+        try {
+          const response = await fetch(LAWPDFS_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(testData),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API returned ${response.status}: ${errorText}`);
+          }
+
+          const result = await response.json();
+          log('✅ JSON API test successful!', 'success');
+          log(`Processing time: ${result.metadata?.processingTime}ms`);
+          log(`Model used: ${result.metadata?.modelUsed}`);
+
+          displayResults('JSON API Test', result);
+        } catch (error) {
+          log(`❌ JSON API test failed: ${error.message}`, 'error');
+        }
+      }
+
+      // File handling
+      function setupFileHandling() {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Drag and drop
+        dropZone.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', function (e) {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', function (e) {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+          const files = Array.from(e.dataTransfer.files);
+          handleFileSelection(files);
+        });
+
+        // File input change
+        fileInput.addEventListener('change', function (e) {
+          const files = Array.from(e.target.files);
+          handleFileSelection(files);
+        });
+      }
+
+      function handleFileSelection(files) {
+        const pdfFiles = files.filter(
+          file =>
+            file.type === 'application/pdf' ||
+            file.name.toLowerCase().endsWith('.pdf') ||
+            file.type.includes('document') ||
+            file.type === 'text/plain'
+        );
+
+        if (pdfFiles.length === 0) {
+          log('⚠️ No supported files selected. Please select PDF, DOC, DOCX, or TXT files.', 'warning');
+          return;
+        }
+
+        selectedFiles = pdfFiles;
+        displaySelectedFiles();
+
+        document.getElementById('uploadBtn').disabled = false;
+        log(`Selected ${pdfFiles.length} file(s) for upload`);
+      }
+
+      function displaySelectedFiles() {
+        const fileListDiv = document.getElementById('fileList');
+
+        if (selectedFiles.length === 0) {
+          fileListDiv.innerHTML = '<div>No files selected</div>';
+          return;
+        }
+
+        const filesHTML = selectedFiles
+          .map((file, index) => {
+            const fileSize = (file.size / 1024).toFixed(1);
+            return `
+                    <div class="file-item" id="file-${index}">
+                        <strong>📄 ${file.name}</strong><br>
+                        Size: ${fileSize} KB | Type: ${file.type || 'Unknown'}<br>
+                        Status: <span id="status-${index}" class="status info">Ready</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-${index}"></div>
+                        </div>
+                        <div id="result-${index}"></div>
+                    </div>
+                `;
+          })
+          .join('');
+
+        fileListDiv.innerHTML = filesHTML;
+      }
+
+      function clearFiles() {
+        selectedFiles = [];
+        uploadResults = [];
+        document.getElementById('fileInput').value = '';
+        document.getElementById('uploadBtn').disabled = true;
+        displaySelectedFiles();
+        log('Files cleared');
+      }
+
+      // Upload files
+      async function uploadFiles() {
+        if (selectedFiles.length === 0) {
+          log('⚠️ No files to upload', 'warning');
+          return;
+        }
+
+        const enableOCR = document.getElementById('enableOCR').checked;
+        const enableEmbedding = document.getElementById('enableEmbedding').checked;
+        const enableRAG = document.getElementById('enableRAG').checked;
+
+        log(`Starting upload of ${selectedFiles.length} file(s)...`);
+        log(`Options: OCR=${enableOCR}, Embedding=${enableEmbedding}, RAG=${enableRAG}`);
+
+        const startTime = Date.now();
+        uploadResults = [];
+
+        // Process files one by one
+        for (let i = 0; i < selectedFiles.length; i++) {
+          await uploadFile(selectedFiles[i], i, enableOCR, enableEmbedding, enableRAG);
+        }
+
+        const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+        const successCount = uploadResults.filter(r => r.success).length;
+
+        log(`\n📊 UPLOAD COMPLETE`);
+        log(`Total time: ${totalTime}s`);
+        log(`Success: ${successCount}/${selectedFiles.length}`);
+
+        displayUploadSummary();
+      }
+
+      async function uploadFile(file, index, enableOCR, enableEmbedding, enableRAG) {
+        const statusElement = document.getElementById(`status-${index}`);
+        const progressElement = document.getElementById(`progress-${index}`);
+        const resultElement = document.getElementById(`result-${index}`);
+        const fileItemElement = document.getElementById(`file-${index}`);
+
+        try {
+          log(`📤 Uploading: ${file.name}`);
+
+          // Update UI
+          statusElement.innerHTML = '<span class="status info">Uploading...</span>';
+          fileItemElement.classList.add('processing');
+          progressElement.style.width = '10%';
+
+          // Create FormData
+          const formData = new FormData();
+          formData.append('files', file);
+          formData.append('enableOCR', enableOCR.toString());
+          formData.append('enableEmbedding', enableEmbedding.toString());
+          formData.append('enableRAG', enableRAG.toString());
+
+          // Upload file
+          const response = await fetch(LAWPDFS_API, {
+            method: 'POST',
+            body: formData,
+          });
+
+          progressElement.style.width = '50%';
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+          }
+
+          const result = await response.json();
+          progressElement.style.width = '100%';
+
+          // Handle response
+          if (result.success && result.results && result.results.length > 0) {
+            const fileResult = result.results[0];
+            log(`✅ Successfully processed: ${file.name}`, 'success');
+            log(`   Document ID: ${fileResult.documentId}`);
+            log(`   Processing time: ${fileResult.processingTime}`);
+
+            statusElement.innerHTML = '<span class="status success">Success</span>';
+            fileItemElement.classList.remove('processing');
+            fileItemElement.classList.add('success');
+
+            resultElement.innerHTML = `
+                        <div style="font-size: 11px; color: #00ccff; margin-top: 10px;">
+                            Document ID: ${fileResult.documentId}<br>
+                            ${fileResult.sessionId ? `Session ID: ${fileResult.sessionId}<br>` : ''}
+                            Steps: ${fileResult.steps ? fileResult.steps.join(' → ') : 'N/A'}<br>
+                            Size: ${fileResult.contentLength || file.size} bytes<br>
+                            ${fileResult.webSocketUrl ? `WebSocket: Available<br>` : ''}
+                        </div>
+                    `;
+
+            uploadResults.push({
+              success: true,
+              file: file.name,
+              result: fileResult,
+            });
+
+            displayResults(file.name, result);
+          } else {
+            throw new Error(result.error || 'Unknown processing error');
+          }
+        } catch (error) {
+          log(`❌ Failed to process: ${file.name} - ${error.message}`, 'error');
+
+          statusElement.innerHTML = '<span class="status error">Failed</span>';
+          fileItemElement.classList.remove('processing');
+          fileItemElement.classList.add('error');
+
+          resultElement.innerHTML = `
+                    <div style="color: #ff4444; margin-top: 10px;">
+                        Error: ${error.message}
+                    </div>
+                `;
+
+          uploadResults.push({
+            success: false,
+            file: file.name,
+            error: error.message,
+          });
+        }
+      }
+
+      function displayResults(filename, result) {
+        const resultsSection = document.getElementById('resultsSection');
+        const timestamp = new Date().toLocaleTimeString();
+
+        const resultHTML = `
+                <div class="results-section">
+                    <h4>📊 ${filename} - ${timestamp}</h4>
+                    <div class="json-output">${JSON.stringify(result, null, 2)}</div>
+                </div>
+            `;
+
+        resultsSection.innerHTML = resultHTML + resultsSection.innerHTML;
+      }
+
+      function displayUploadSummary() {
+        const successCount = uploadResults.filter(r => r.success).length;
+        const failCount = uploadResults.filter(r => !r.success).length;
+
+        updateStatus(
+          'systemStatus',
+          successCount > 0 ? 'success' : 'error',
+          `Processed: ${successCount} success, ${failCount} failed`
+        );
+      }
+
+      // Initialize on page load
+      window.onload = function () {
+        log('🚀 LawPDFs API Test initialized');
+        log(`API Endpoint: ${LAWPDFS_API}`);
+
+        setupFileHandling();
+        checkAPIHealth();
+
+        // Show help message
+        setTimeout(() => {
+          log('\n💡 How to use:');
+          log('1. Check API health first');
+          log('2. Test JSON API (optional)');
+          log('3. Drag & drop PDF files or click to select');
+          log('4. Choose processing options (OCR, Embedding, RAG)');
+          log('5. Click "Upload & Process Files"');
+          log('6. Watch real-time progress and results');
+        }, 1000);
+      };
+    </script>
+  </body>
+</html>

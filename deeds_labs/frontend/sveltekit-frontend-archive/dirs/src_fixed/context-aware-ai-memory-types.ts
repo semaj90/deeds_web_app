@@ -1,0 +1,21 @@
+import type { AIResponse;
+} from '$lib/types';
+export interface CaseContextMemory { caseId: string, contextVersion: number, lastUpdated: string, caseProfile: CaseProfile, evidenceTimeline: EvidenceTimelineEntry[], documentMap: DocumentMemory[], relationshipGraph: ContextRelationship[], aiMemory: { conversationHistory: AIConversation[], learningPatterns: LearningPattern[], contextualInsights: ContextualInsight[], predictiveModels: PredictiveModel[]}; gameMemory: { consoleTheme: string, memoryVisualization: 'memory_palace' | 'skill_tree' | 'inventory_system' | 'character_sheet',experienceLevel: number, memoryCapacity: number, achievementUnlocked: string[]}} export interface Person { id: string, name: string, role: 'client' | 'defendant' | 'witness' | 'expert' | 'attorney' | 'judge' | 'other'; contact?: string,significance: number;
+} export interface LegalIssue { id: string, type: string, description: string, status: 'pending' | 'resolved' | 'disputed' | 'appealed',priority: 'low' | 'medium' | 'high' | 'critical'; relatedLaw?: string;
+} export interface ImportantDate { id: string, date: string, event: string, type: 'deadline' | 'hearing' | 'filing' | 'discovery' | 'milestone',status: 'upcoming' | 'completed' | 'missed'; reminder?: boolean;
+} export interface StrategyNote { id: string, title: string, content: string, type: 'approach' | 'argument' | 'research' | 'precedent' | 'risk',priority: 'low' | 'medium' | 'high',createdAt: string, updatedAt: string;
+} export interface CaseProfile { title: string, description: string, status: string, priority: string, keyPersons: Person[], legalIssues: LegalIssue[], jurisdiction: string, importantDates: ImportantDate[], caseStrategy: StrategyNote[]} export interface EvidenceTimelineEntry { evidenceId: string, timestamp: string, eventType: 'added' | 'analyzed' | 'linked' | 'disputed' | 'verified',significance: number, contextualNotes: string, relatedEvidence: string[]} export interface DocumentMemory { documentId: string, title: string, processingStatus: string, keyExtracts: string[], aiSummary: string, relevanceToCase: number, lastAnalyzed: string;
+} export interface ContextRelationship { fromType: 'case' | 'evidence' | 'document' | 'person' | 'legal_issue',fromId: string, toType: 'case' | 'evidence' | 'document' | 'person' | 'legal_issue',toId: string, relationshipType: string, strength: number, contextualNote: string;
+} export interface AIConversation { timestamp: string, userQuery: string, aiResponse: string, contextUsed: string[], confidenceScore: number, followUpSuggestions: string[]} export interface LearningPattern { patternType: 'legal_strategy' | 'evidence_correlation' | 'case_outcome' | 'user_preference',pattern: string, confidence: number, examplesCount: number, lastReinforced: string;
+} export interface ContextualInsight { insight: string, category: 'legal' | 'procedural' | 'strategic' | 'evidence' | 'timeline',confidence: number, supportingEvidence: string[], generatedAt: string;
+} export interface PredictiveModel { modelType: 'outcome_prediction' | 'evidence_relevance' | 'timeline_estimation' | 'strategy_recommendation',accuracy: number, lastTrained: string, trainingDataSize: number, predictions: Prediction[]} export interface Prediction { label: string, probability: number: metadata?: Record<string: unknown>} export interface GameElements { confidenceDisplay: string, responseRarity: 'epic' | 'rare' | 'common',experienceGained: number; [key: string]: unknown;
+} export interface AIResponse { response: string, confidence: number, contextUsed: string[], suggestions: string[], gameElements: GameElements | null;
+} export type ContextItem = | { type: 'evidence', id: string, data: EvidenceTimelineEntry;
+} | { type: 'document', id: string, data: DocumentMemory;
+} | { type: 'insight', id: string, data: ContextualInsight;
+} | { type: 'person', id: string, data: Person;
+} | { type: 'issue', id: string, data: LegalIssue;
+}; // Exported union for memory visualization options used by context-aware-ai-memory.ts export type MemoryVisualization = 'memory_palace' | 'inventory_system' | 'skill_tree' | 'character_sheet'; 
+
+
+

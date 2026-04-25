@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-11-03T20:13:03.078Z",
+  "mode": "APPLY",
+  "stats": {
+    "scanned": 11,
+    "migrated": 10,
+    "skipped": 1,
+    "errors": [],
+    "replacements": [
+      {
+        "file": "src/lib/bullmq/bullmqService.ts",
+        "type": "BullMQ imports → RabbitMQ wrapper",
+        "count": 1
+      },
+      {
+        "file": "src/lib/phase14/server/queues/logQueue.ts",
+        "type": "BullMQ imports → RabbitMQ wrapper",
+        "count": 1
+      },
+      {
+        "file": "src/lib/phase14/server/queues/logWorker.ts",
+        "type": "BullMQ imports → RabbitMQ wrapper",
+        "count": 1
+      },
+      {
+        "file": "src/lib/phase14/server/workers/logWorker.ts",
+        "type": "BullMQ imports → RabbitMQ wrapper",
+        "count": 1
+      },
+      {
+        "file": "src/lib/services/job-queue.ts",
+        "type": "BullMQ imports → RabbitMQ wrapper",
+        "count": 1
+      },
+      {
+        "file": "src/lib/services/queue-service.ts",
+        "type": "BullMQ imports → RabbitMQ wrapper",
+        "count": 1
+      }
+    ]
+  },
+  "config": {
+    "local": "amqp://guest:guest@localhost:5672",
+    "docker": "amqp://legal_admin:123456@rabbitmq:5672",
+    "managementUI": "http://localhost:15672"
+  }
+}

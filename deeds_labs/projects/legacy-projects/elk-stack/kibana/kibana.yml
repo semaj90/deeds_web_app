@@ -1,0 +1,39 @@
+# Kibana configuration for Legal AI system
+# This is a placeholder configuration for development
+
+# Server settings
+server.port: 5601
+server.host: "localhost"
+server.name: "legal-ai-kibana"
+
+# Elasticsearch settings
+elasticsearch.hosts: ["http://localhost:9200"]
+elasticsearch.username: "kibana_system"
+elasticsearch.password: ""
+
+# Security (disable for development)
+xpack.security.enabled: false
+xpack.ml.enabled: false
+
+# Kibana index
+kibana.index: ".kibana-legal-ai"
+
+# Legal AI specific settings
+server.basePath: ""
+server.publicBaseUrl: "http://localhost:5601"
+
+# Logging
+logging.appenders.file.type: file
+logging.appenders.file.fileName: "C:/ProgramData/Kibana/logs/kibana.log"
+logging.appenders.file.layout.type: json
+
+logging.root.appenders: ["default", "file"]
+logging.root.level: info
+
+# Dashboard settings
+map.includeElasticMapsService: false
+telemetry.enabled: false
+
+# Legal AI dashboard defaults
+discover.sampleSize: 500
+histogram.bucketSize: auto

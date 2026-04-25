@@ -1,0 +1,64 @@
+server:
+  name: "modular-cluster-service"
+  version: "v1.0.0"
+  http:
+    addr: ":8085"
+    timeout: "30s"
+  grpc:
+    addr: ":50051"
+    timeout: "30s"
+
+gpu:
+  max_memory_gb: 8
+  max_concurrent_jobs: 4
+  device_id: 0
+
+algorithms:
+  enabled: ["kmeans", "dbscan", "hierarchical", "som"]
+  defaults:
+    kmeans:
+      max_iterations: 1000
+      tolerance: 0.0001
+    dbscan:
+      eps: 0.5
+      min_samples: 5
+    hierarchical:
+      linkage: "ward"
+    som:
+      grid_width: 10
+      grid_height: 10
+      learning_rate: 0.5
+
+registry:
+  type: "etcd"
+  endpoints: ["127.0.0.1:2379"]
+  namespace: "clustering"
+  ttl: 30
+
+auth:
+  enabled: true
+  jwt_secret: "your-secret-key-change-in-production"
+  api_keys:
+    - "admin-key-12345"
+    - "client-key-67890"
+
+monitoring:
+  metrics:
+    enabled: true
+    path: "/metrics"
+  tracing:
+    enabled: true
+    endpoint: "http://localhost:14268/api/traces"
+  logging:
+    level: "info"
+    format: "json"
+
+rate_limiting:
+  enabled: true
+  requests_per_minute: 100
+  burst: 10
+
+cache:
+  enabled: true
+  ttl: "5m"
+  max_size: 1000

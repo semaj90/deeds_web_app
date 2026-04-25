@@ -1,0 +1,342 @@
+// FlatBuffers schema for high-performance legal data operations
+// Optimized for large documents, vector embeddings, and real-time streaming
+
+namespace LegalData;
+
+// High-performance document storage with compression
+table DocumentContent {
+  id: string;
+  title: string;
+  content: [ubyte]; // Raw document bytes (potentially compressed)
+  content_type: string;
+  compressed: bool;
+  compression_type: string; // gzip, brotli, lz4
+  checksum: uint32;
+  original_size: uint64;
+  compressed_size: uint64;
+  encoding: string; // utf-8, latin-1, etc.
+  language: string;
+}
+
+// Vector embeddings optimized for memory efficiency
+table VectorEmbedding {
+  document_id: string;
+  embedding: [float]; // 1536 dimensions for OpenAI, 768 for others
+  model: string;
+  model_version: string;
+  dimension: uint32;
+  metadata: VectorMetadata;
+  quantized: bool; // Whether this is a quantized embedding
+  quantized_data: [ubyte]; // Quantized embedding data (int8)
+}
+
+table VectorMetadata {
+  created_at: uint64; // Unix timestamp
+  chunk_index: uint32;
+  chunk_text: string;
+  chunk_start: uint32; // Character offset in original document
+  chunk_end: uint32;
+  confidence: float;
+  extraction_method: string; // sliding_window, semantic_chunking, etc.
+}
+
+// Batch operations for high-throughput processing
+table EmbeddingBatch {
+  batch_id: string;
+  embeddings: [VectorEmbedding];
+  total_count: uint32;
+  processed_count: uint32;
+  failed_count: uint32;
+  processing_start: uint64;
+  processing_end: uint64;
+  model_config: ModelConfig;
+}
+
+table ModelConfig {
+  model_name: string;
+  max_tokens: uint32;
+  temperature: float;
+  batch_size: uint32;
+  gpu_enabled: bool;
+  quantization: bool;
+}
+
+// Search results optimized for speed and memory
+table SearchResults {
+  query_id: string;
+  query: string;
+  query_embedding: [float];
+  results: [SearchHit];
+  total_hits: uint32;
+  max_score: float;
+  processing_time_ms: uint32;
+  search_type: ubyte; // 0=text, 1=semantic, 2=vector, 3=hybrid
+  pagination: PaginationInfo;
+}
+
+table SearchHit {
+  document_id: string;
+  score: float;
+  rank: uint32;
+  highlights: [string];
+  excerpt: string;
+  embedding: VectorEmbedding;
+  metadata: SearchHitMetadata;
+}
+
+table SearchHitMetadata {
+  document_type: string;
+  jurisdiction: string;
+  practice_areas: [string];
+  parties: [string];
+  risk_level: ubyte; // 0=low, 1=medium, 2=high, 3=critical
+  confidence: float;
+}
+
+table PaginationInfo {
+  current_page: uint32;
+  page_size: uint32;
+  total_pages: uint32;
+  has_next: bool;
+  has_previous: bool;
+}
+
+// Real-time chat streaming optimized for latency
+table ChatStream {
+  session_id: string;
+  messages: [ChatMessage];
+  active_users: [string];
+  last_activity: uint64;
+  message_count: uint32;
+  total_tokens: uint32;
+  session_metadata: ChatSessionMetadata;
+}
+
+table ChatMessage {
+  id: string;
+  user_id: string;
+  content: string;
+  content_encoded: [ubyte]; // For large messages, encoded content
+  message_type: ubyte; // 0=user, 1=ai, 2=system, 3=error
+  timestamp: uint64;
+  tokens: uint32;
+  processing_time: uint32; // milliseconds
+  attachments: [MessageAttachment];
+  citations: [LegalCitationFB];
+}
+
+table ChatSessionMetadata {
+  case_id: string;
+  document_context: [string]; // Document IDs in context
+  user_preferences: UserPreferences;
+  ai_model: string;
+  total_cost: float; // In cents
+}
+
+table UserPreferences {
+  theme: string;
+  language: string;
+  timezone: string;
+  citation_style: string; // bluebook, apa, mla
+  ai_temperature: float;
+}
+
+table MessageAttachment {
+  filename: string;
+  content_type: string;
+  size: uint64;
+  data: [ubyte]; // For small attachments
+  url: string; // For large attachments
+  checksum: string;
+  thumbnail: [ubyte]; // For images/documents
+}
+
+table LegalCitationFB {
+  citation_text: string;
+  source: string;
+  url: string;
+  citation_type: ubyte; // 0=case, 1=statute, 2=regulation, 3=secondary
+  jurisdiction: string;
+  date: uint64;
+  relevance_score: float;
+}
+
+// Legal analysis cache structures for performance
+table AnalysisCache {
+  key: string;
+  analysis_type: string;
+  document_id: string;
+  result_data: [ubyte]; // Serialized analysis result
+  confidence: float;
+  created_at: uint64;
+  expires_at: uint64;
+  dependencies: [string]; // Document IDs this analysis depends on
+  cache_metadata: CacheMetadata;
+}
+
+table CacheMetadata {
+  version: string;
+  model_used: string;
+  computation_time_ms: uint32;
+  memory_usage_mb: float;
+  hit_count: uint32;
+  last_accessed: uint64;
+}
+
+// Legal entity recognition optimized for bulk processing
+table EntityExtractionResult {
+  document_id: string;
+  entities: [LegalEntity];
+  extraction_time: uint32;
+  model_confidence: float;
+  processing_metadata: ProcessingMetadata;
+}
+
+table LegalEntity {
+  text: string;
+  entity_type: string; // PERSON, ORGANIZATION, LOCATION, DATE, CASE, STATUTE
+  start_pos: uint32;
+  end_pos: uint32;
+  confidence: float;
+  canonical_form: string; // Normalized entity name
+  related_entities: [string]; // IDs of related entities
+  attributes: [EntityAttribute];
+}
+
+table EntityAttribute {
+  name: string;
+  value: string;
+  confidence: float;
+}
+
+table ProcessingMetadata {
+  processor_version: string;
+  language_detected: string;
+  text_quality_score: float;
+  processing_flags: [string];
+}
+
+// Risk assessment results for legal documents
+table RiskAssessment {
+  document_id: string;
+  overall_risk: ubyte; // 0=low, 1=medium, 2=high, 3=critical
+  risk_factors: [RiskFactor];
+  recommendations: [RiskRecommendation];
+  assessment_time: uint64;
+  assessor_model: string;
+  confidence_score: float;
+}
+
+table RiskFactor {
+  category: string;
+  description: string;
+  severity: ubyte;
+  confidence: float;
+  mitigation_urgency: ubyte;
+  supporting_text: [string];
+  legal_precedents: [LegalCitationFB];
+}
+
+table RiskRecommendation {
+  title: string;
+  description: string;
+  action_type: string; // immediate, short_term, long_term
+  priority: ubyte;
+  estimated_effort: string;
+  cost_impact: string;
+  timeline: string;
+}
+
+// Performance monitoring for real-time optimization
+table PerformanceMetrics {
+  timestamp: uint64;
+  service_name: string;
+  operation: string;
+  duration_ms: uint32;
+  memory_usage_mb: float;
+  cpu_usage_percent: float;
+  gpu_usage_percent: float;
+  success: bool;
+  error_code: string;
+  metadata: [MetricAttribute];
+}
+
+table MetricAttribute {
+  key: string;
+  value: string;
+  numeric_value: float;
+}
+
+// Bulk document processing pipeline
+table DocumentProcessingBatch {
+  batch_id: string;
+  documents: [DocumentProcessingJob];
+  batch_status: ubyte; // 0=pending, 1=processing, 2=completed, 3=failed
+  started_at: uint64;
+  completed_at: uint64;
+  total_documents: uint32;
+  processed_documents: uint32;
+  failed_documents: uint32;
+  processing_config: ProcessingConfig;
+}
+
+table DocumentProcessingJob {
+  job_id: string;
+  document_id: string;
+  operations: [string]; // embedding, extraction, analysis, etc.
+  status: ubyte;
+  result_data: [ubyte];
+  error_message: string;
+  processing_time: uint32;
+  retry_count: ubyte;
+}
+
+table ProcessingConfig {
+  enable_embedding: bool;
+  enable_entity_extraction: bool;
+  enable_risk_assessment: bool;
+  enable_citation_extraction: bool;
+  parallel_jobs: uint32;
+  timeout_seconds: uint32;
+  retry_failed: bool;
+  max_retries: ubyte;
+}
+
+// WebGPU texture streaming for legal document visualization
+table TextureStreamData {
+  document_id: string;
+  texture_data: [ubyte];
+  width: uint32;
+  height: uint32;
+  format: string; // RGBA8, RGB565, etc.
+  mip_levels: uint32;
+  compression_format: string; // DXT5, ETC2, ASTC, etc.
+  streaming_metadata: StreamingMetadata;
+}
+
+table StreamingMetadata {
+  chunk_size: uint32;
+  total_chunks: uint32;
+  current_chunk: uint32;
+  quality_level: ubyte; // 0=low, 1=medium, 2=high, 3=ultra
+  adaptive_quality: bool;
+  bandwidth_estimate: float; // Mbps
+  target_fps: ubyte;
+}
+
+// Root types for different use cases
+file_identifier "LGLD";
+
+root_type DocumentContent; // Default root for document storage
+union RootType {
+  DocumentContent,
+  EmbeddingBatch,
+  SearchResults,
+  ChatStream,
+  AnalysisCache,
+  EntityExtractionResult,
+  RiskAssessment,
+  PerformanceMetrics,
+  DocumentProcessingBatch,
+  TextureStreamData
+}

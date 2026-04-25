@@ -1,0 +1,78 @@
+# Triton Inference Server Model Repository Configuration
+# Two models: FP16 (quality) and INT8 (performance)
+
+models:
+  gemma3_legal_fp16:
+    backend: tensorrtllm
+    path: /models/gemma3_fp16/
+    config:
+      name: "gemma3_legal_fp16"
+      platform: "tensorrt_llm"
+      max_batch_size: 8
+      input:
+        - name: "input_ids"
+          data_type: TYPE_INT32
+          dims: [-1, -1]
+        - name: "input_lengths"
+          data_type: TYPE_INT32
+          dims: [-1]
+      output:
+        - name: "output_ids"
+          data_type: TYPE_INT32
+          dims: [-1, -1]
+      instance_group:
+        - count: 1
+          kind: KIND_GPU
+          gpus: [0]
+      parameters:
+        engine_path: "/home/james/gemma3_engines/fp16/gemma_fp16.plan"
+        max_tokens_in_paged_kv_cache: 10000
+        batch_scheduler_policy: "max_utilization"
+      optimization:
+        cuda_graph: true
+        gather_all_token_logits: false
+
+  gemma3_legal_int8:
+    backend: tensorrtllm
+    path: /models/gemma3_int8/
+    config:
+      name: "gemma3_legal_int8"
+      platform: "tensorrt_llm"
+      max_batch_size: 16  # Higher batch for INT8
+      input:
+        - name: "input_ids"
+          data_type: TYPE_INT32
+          dims: [-1, -1]
+        - name: "input_lengths"
+          data_type: TYPE_INT32
+          dims: [-1]
+      output:
+        - name: "output_ids"
+          data_type: TYPE_INT32
+          dims: [-1, -1]
+      instance_group:
+        - count: 1
+          kind: KIND_GPU
+          gpus: [0]
+      parameters:
+        engine_path: "/home/james/gemma3_engines/int8/gemma_int8.plan"
+        max_tokens_in_paged_kv_cache: 20000  # More tokens due to lower memory
+        batch_scheduler_policy: "max_utilization"
+      optimization:
+        cuda_graph: true
+        gather_all_token_logits: false
+
+# Ensemble model for automatic selection
+ensemble:
+  name: "gemma3_legal_auto"
+  platform: "ensemble"
+  config:
+    step:
+      - model_name: "engine_selector"
+        model_version: 1
+      - model_name: "gemma3_legal_fp16"
+        model_version: 1
+        when: "quality == 'high'"
+      - model_name: "gemma3_legal_int8"
+        model_version: 1
+        when: "quality != 'high'"

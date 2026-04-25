@@ -1,0 +1,2756 @@
+[
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\agent_api.py",
+    "line": 130,
+    "col": 0,
+    "message": "Function 'record_event' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\agent_api.py",
+    "line": 152,
+    "col": 0,
+    "message": "Function 'get_timeline' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\kb_fixing_api_v2.py",
+    "line": 554,
+    "col": 0,
+    "message": "Function 'init_auto_approval_rules' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\main.py",
+    "line": 175,
+    "col": 0,
+    "message": "Function 'health_check' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\main.py",
+    "line": 185,
+    "col": 0,
+    "message": "Function 'api_health_check' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\main_minimal.py",
+    "line": 23,
+    "col": 0,
+    "message": "Function 'health_check' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\phase72_agent_api.py",
+    "line": 150,
+    "col": 0,
+    "message": "Function 'record_event' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\phase72_agent_api.py",
+    "line": 172,
+    "col": 0,
+    "message": "Function 'get_timeline' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\api\\poi_routes_complete.py",
+    "line": 62,
+    "col": 0,
+    "message": "Function 'get_poi_service_dependency' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\bootstrap.py",
+    "line": 229,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\bootstrap.py",
+    "line": 176,
+    "col": 4,
+    "message": "Function 'print_summary' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\run_migrations.py",
+    "line": 148,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\run_migrations.py",
+    "line": 32,
+    "col": 4,
+    "message": "Function 'connect' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\run_migrations.py",
+    "line": 41,
+    "col": 4,
+    "message": "Function 'disconnect' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\run_migrations.py",
+    "line": 47,
+    "col": 4,
+    "message": "Function 'create_migrations_table' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\setup_db.py",
+    "line": 15,
+    "col": 0,
+    "message": "Function 'run_migrations' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\setup_minio_buckets.py",
+    "line": 119,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\analytics_api_server.py",
+    "line": 54,
+    "col": 0,
+    "message": "Function 'health_check' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\analytics_api_server.py",
+    "line": 68,
+    "col": 0,
+    "message": "Function 'health_check' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\apply_gemini_key.py",
+    "line": 11,
+    "col": 0,
+    "message": "Function 'update_env_file' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\apply_gemini_key.py",
+    "line": 42,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 12,
+    "col": 0,
+    "message": "Function 'check_pytorch' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 54,
+    "col": 0,
+    "message": "Function 'check_libtorch' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 106,
+    "col": 0,
+    "message": "Function 'check_ripgrep' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 155,
+    "col": 0,
+    "message": "Function 'check_awk' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 198,
+    "col": 0,
+    "message": "Function 'check_cmake' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 227,
+    "col": 0,
+    "message": "Function 'generate_cmake_config' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 227,
+    "col": 26,
+    "message": "Parameter 'pytorch_info' in 'generate_cmake_config' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 227,
+    "col": 40,
+    "message": "Parameter 'libtorch_info' in 'generate_cmake_config' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 257,
+    "col": 0,
+    "message": "Function 'test_cuda_performance' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 313,
+    "col": 0,
+    "message": "Function 'print_summary' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\check_system_capabilities.py",
+    "line": 313,
+    "col": 18,
+    "message": "Parameter 'results' in 'print_summary' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\docling_to_qdrant.py",
+    "line": 417,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\docling_to_qdrant.py",
+    "line": 80,
+    "col": 4,
+    "message": "Function 'ensure_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\docling_to_qdrant.py",
+    "line": 253,
+    "col": 4,
+    "message": "Function 'cache_embedding_redis' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\docling_to_qdrant.py",
+    "line": 275,
+    "col": 4,
+    "message": "Function 'get_cached_embedding' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\export_chr97_with_emb16.py",
+    "line": 163,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\fastmcp_cuda_indexer.py",
+    "line": 196,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\generate_summaries.py",
+    "line": 383,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\index_codebase.py",
+    "line": 219,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\index_codebase.py",
+    "line": 150,
+    "col": 4,
+    "message": "Function 'index_file' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\index_codebase.py",
+    "line": 199,
+    "col": 4,
+    "message": "Function 'index_directory' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\index_codebase.py",
+    "line": 207,
+    "col": 4,
+    "message": "Function 'print_stats' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\init_phase89_collections.py",
+    "line": 101,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\integrate_gpu_clusters.py",
+    "line": 339,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_2_migration_tagger.py",
+    "line": 307,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_2_migration_tagger.py",
+    "line": 278,
+    "col": 4,
+    "message": "Function 'create_indexes' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_3_agentic_fixer.py",
+    "line": 361,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_3_agentic_fixer.py",
+    "line": 290,
+    "col": 4,
+    "message": "Function 'run' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_vlm_timeline_integration_example.py",
+    "line": 25,
+    "col": 0,
+    "message": "Function 'log_code_fix_event' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_vlm_timeline_integration_example.py",
+    "line": 65,
+    "col": 0,
+    "message": "Function 'log_seal_detection_event' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_vlm_timeline_integration_example.py",
+    "line": 144,
+    "col": 0,
+    "message": "Function 'search_timeline_examples' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_vlm_timeline_integration_example.py",
+    "line": 183,
+    "col": 0,
+    "message": "Function 'query_recent_events' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase89_vlm_timeline_integration_example.py",
+    "line": 232,
+    "col": 0,
+    "message": "Function 'phase89_pipeline_integration_example' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_analyze_clusters.py",
+    "line": 15,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_cluster_errors.py",
+    "line": 21,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_cuda_embedder.py",
+    "line": 83,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_fast_knowledge_indexer.py",
+    "line": 293,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_fast_knowledge_indexer.py",
+    "line": 147,
+    "col": 4,
+    "message": "Function 'store_recommendation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_fast_knowledge_indexer.py",
+    "line": 234,
+    "col": 4,
+    "message": "Function 'process_all' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_glyph_indexer.py",
+    "line": 119,
+    "col": 0,
+    "message": "Function 'index_glyphs_from_qdrant' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_glyph_indexer.py",
+    "line": 284,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_synthesizer.py",
+    "line": 377,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_synthesizer.py",
+    "line": 176,
+    "col": 4,
+    "message": "Function 'create_neo4j_nodes' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_knowledge_synthesizer.py",
+    "line": 238,
+    "col": 4,
+    "message": "Function 'store_fix_recommendation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_parallel_embedder.py",
+    "line": 166,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_rag_kag_dag_unified.py",
+    "line": 558,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_rag_kag_dag_unified.py",
+    "line": 143,
+    "col": 4,
+    "message": "Function 'set_embedding' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_rag_kag_dag_unified.py",
+    "line": 152,
+    "col": 4,
+    "message": "Function 'set_glyph' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_rag_query.py",
+    "line": 163,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_setup_qdrant.py",
+    "line": 14,
+    "col": 0,
+    "message": "Function 'setup_error_cards_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_setup_qdrant.py",
+    "line": 79,
+    "col": 0,
+    "message": "Function 'setup_cluster_cards_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_setup_qdrant.py",
+    "line": 125,
+    "col": 0,
+    "message": "Function 'setup_file_profile_indexes' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_setup_qdrant.py",
+    "line": 170,
+    "col": 0,
+    "message": "Function 'print_example_queries' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_smart_embedder.py",
+    "line": 148,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase90_unified_diagnostics.py",
+    "line": 92,
+    "col": 4,
+    "message": "Function 'extract_surface_and_tech' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase91_go_integration.py",
+    "line": 172,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase91_go_integration.py",
+    "line": 87,
+    "col": 4,
+    "message": "Function 'create_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase91_go_integration.py",
+    "line": 99,
+    "col": 4,
+    "message": "Function 'embed_errors' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase91_go_integration.py",
+    "line": 130,
+    "col": 4,
+    "message": "Function 'run' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase92_python_integration.py",
+    "line": 200,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase92_python_integration.py",
+    "line": 115,
+    "col": 4,
+    "message": "Function 'create_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase92_python_integration.py",
+    "line": 127,
+    "col": 4,
+    "message": "Function 'embed_errors' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase92_python_integration.py",
+    "line": 158,
+    "col": 4,
+    "message": "Function 'run' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase94_unified_pipeline.py",
+    "line": 351,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase94_unified_pipeline.py",
+    "line": 88,
+    "col": 4,
+    "message": "Function 'create_unified_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase94_unified_pipeline.py",
+    "line": 117,
+    "col": 4,
+    "message": "Function 'embed_unified_errors' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase94_unified_pipeline.py",
+    "line": 157,
+    "col": 4,
+    "message": "Function 'create_neo4j_graph' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase94_unified_pipeline.py",
+    "line": 199,
+    "col": 4,
+    "message": "Function 'compute_cuda_tensor_analysis' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase94_unified_pipeline.py",
+    "line": 239,
+    "col": 4,
+    "message": "Function 'generate_agentic_recommendations' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\phase94_unified_pipeline.py",
+    "line": 277,
+    "col": 4,
+    "message": "Function 'run' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\query_indexed_codebase.py",
+    "line": 135,
+    "col": 4,
+    "message": "Function 'format_result' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\query_phase90.py",
+    "line": 114,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_couchdb.py",
+    "line": 22,
+    "col": 0,
+    "message": "Function 'check_couchdb_health' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_couchdb.py",
+    "line": 39,
+    "col": 0,
+    "message": "Function 'create_design_docs' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_couchdb.py",
+    "line": 247,
+    "col": 0,
+    "message": "Function 'print_stats' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_couchdb.py",
+    "line": 265,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_qdrant_v2.py",
+    "line": 29,
+    "col": 0,
+    "message": "Function 'setup_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_qdrant_v2.py",
+    "line": 123,
+    "col": 0,
+    "message": "Function 'verify_collection' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_redis_v2.py",
+    "line": 175,
+    "col": 0,
+    "message": "Function 'setup_redis' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\setup_redis_v2.py",
+    "line": 281,
+    "col": 0,
+    "message": "Function 'verify_redis' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_api.py",
+    "line": 29,
+    "col": 0,
+    "message": "Function 'print_section' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_api.py",
+    "line": 36,
+    "col": 0,
+    "message": "Function 'test_endpoint' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_api.py",
+    "line": 115,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 23,
+    "col": 0,
+    "message": "Function 'print_section' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 30,
+    "col": 0,
+    "message": "Function 'test_stats' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 75,
+    "col": 0,
+    "message": "Function 'test_summaries' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 99,
+    "col": 0,
+    "message": "Function 'test_dependencies' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 128,
+    "col": 0,
+    "message": "Function 'test_file_complexity' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 164,
+    "col": 0,
+    "message": "Function 'test_error_propagation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 189,
+    "col": 0,
+    "message": "Function 'test_clusters' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 221,
+    "col": 0,
+    "message": "Function 'test_file_with_clusters' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_analytics_direct.py",
+    "line": 251,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_kb_fixing_workflow.py",
+    "line": 205,
+    "col": 0,
+    "message": "Function 'test_fix_history' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_kb_fixing_workflow.py",
+    "line": 234,
+    "col": 0,
+    "message": "Function 'test_stats' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_kb_fixing_workflow.py",
+    "line": 255,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 38,
+    "col": 0,
+    "message": "Function 'print_header' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 46,
+    "col": 0,
+    "message": "Function 'print_success' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 50,
+    "col": 0,
+    "message": "Function 'print_error' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 54,
+    "col": 0,
+    "message": "Function 'print_info' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 62,
+    "col": 0,
+    "message": "Function 'test_timeline_logger' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 174,
+    "col": 0,
+    "message": "Function 'test_api_health' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 200,
+    "col": 0,
+    "message": "Function 'test_api_recent_events' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 233,
+    "col": 0,
+    "message": "Function 'test_api_semantic_search' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 270,
+    "col": 0,
+    "message": "Function 'test_api_file_timeline' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 295,
+    "col": 0,
+    "message": "Function 'test_api_stats' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 325,
+    "col": 0,
+    "message": "Function 'test_api_collections' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 358,
+    "col": 0,
+    "message": "Function 'test_edge_cases' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_timeline_system.py",
+    "line": 456,
+    "col": 0,
+    "message": "Function 'run_all_tests' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_week3_tasks_2_4.py",
+    "line": 28,
+    "col": 0,
+    "message": "Function 'test_auto_approval_rules' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_week3_tasks_2_4.py",
+    "line": 69,
+    "col": 0,
+    "message": "Function 'test_provenance_tracking' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_week3_tasks_2_4.py",
+    "line": 98,
+    "col": 0,
+    "message": "Function 'test_agentic_fix_generation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_week3_tasks_2_4.py",
+    "line": 147,
+    "col": 0,
+    "message": "Function 'test_integration_workflow' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\test_week3_tasks_2_4.py",
+    "line": 211,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\verify_dashboard_ready.py",
+    "line": 23,
+    "col": 0,
+    "message": "Function 'print_section' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\verify_dashboard_ready.py",
+    "line": 30,
+    "col": 0,
+    "message": "Function 'check_couchdb' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\verify_dashboard_ready.py",
+    "line": 50,
+    "col": 0,
+    "message": "Function 'check_data_content' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\verify_dashboard_ready.py",
+    "line": 77,
+    "col": 0,
+    "message": "Function 'check_api_server' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\verify_dashboard_ready.py",
+    "line": 109,
+    "col": 0,
+    "message": "Function 'check_component_files' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\verify_dashboard_ready.py",
+    "line": 136,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\scripts\\verify_week3_ready.py",
+    "line": 114,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\ace_knowledge_graph_bridge.py",
+    "line": 556,
+    "col": 0,
+    "message": "Function 'test_bridge' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\ace_knowledge_graph_bridge.py",
+    "line": 64,
+    "col": 4,
+    "message": "Function 'close' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\ace_timeline_service.py",
+    "line": 224,
+    "col": 4,
+    "message": "Function 'close' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\admin_api_routes.py",
+    "line": 166,
+    "col": 0,
+    "message": "Function 'get_orchestrator' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\admin_api_routes.py",
+    "line": 175,
+    "col": 0,
+    "message": "Function 'get_ai_recommendation_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\admin_api_routes.py",
+    "line": 184,
+    "col": 0,
+    "message": "Function 'get_clustering_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\admin_api_routes.py",
+    "line": 682,
+    "col": 0,
+    "message": "Function 'register_admin_routes' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\admin_api_routes.py",
+    "line": 682,
+    "col": 26,
+    "message": "Parameter 'app' in 'register_admin_routes' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\chr97_image_processor.py",
+    "line": 548,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 103,
+    "col": 4,
+    "message": "Function 'on_modified' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 103,
+    "col": 26,
+    "message": "Parameter 'event' in 'on_modified' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 108,
+    "col": 4,
+    "message": "Function 'on_created' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 108,
+    "col": 25,
+    "message": "Parameter 'event' in 'on_created' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 113,
+    "col": 4,
+    "message": "Function 'on_deleted' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 113,
+    "col": 25,
+    "message": "Parameter 'event' in 'on_deleted' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 167,
+    "col": 4,
+    "message": "Function 'start_watching' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\codebase_indexer_service.py",
+    "line": 180,
+    "col": 4,
+    "message": "Function 'stop_watching' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\coordinate_cache_service.py",
+    "line": 310,
+    "col": 0,
+    "message": "Function 'example_usage' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\cuda_embedding_service.py",
+    "line": 341,
+    "col": 4,
+    "message": "Function 'clear_cache' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\cuda_tokenizer_service.py",
+    "line": 117,
+    "col": 4,
+    "message": "Function 'shutdown' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\fastapi_middleware.py",
+    "line": 175,
+    "col": 0,
+    "message": "Function 'register_tool' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\fastapi_middleware.py",
+    "line": 610,
+    "col": 0,
+    "message": "Function 'run_server' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\fastapi_middleware.py",
+    "line": 177,
+    "col": 4,
+    "message": "Function 'decorator' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\fastapi_middleware.py",
+    "line": 177,
+    "col": 18,
+    "message": "Parameter 'func' in 'decorator' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\fastmcp_agentic_middleware.py",
+    "line": 373,
+    "col": 4,
+    "message": "Function 'register_tool' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\fastmcp_agentic_middleware.py",
+    "line": 375,
+    "col": 8,
+    "message": "Function 'decorator' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\feature_vector.py",
+    "line": 256,
+    "col": 4,
+    "message": "Function 'set_llm_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\feature_vector.py",
+    "line": 259,
+    "col": 4,
+    "message": "Function 'set_vlm_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\feature_vector.py",
+    "line": 262,
+    "col": 4,
+    "message": "Function 'set_web_rag_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\feature_vector.py",
+    "line": 265,
+    "col": 4,
+    "message": "Function 'set_tool_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\feature_vector.py",
+    "line": 268,
+    "col": 4,
+    "message": "Function 'set_phase_ast_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\feature_vector.py",
+    "line": 271,
+    "col": 4,
+    "message": "Function 'set_legal_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\feature_vector.py",
+    "line": 274,
+    "col": 4,
+    "message": "Function 'set_runtime_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\ingest_pdf_worker.py",
+    "line": 420,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 77,
+    "col": 4,
+    "message": "Function 'codebase_indexer' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 85,
+    "col": 4,
+    "message": "Function 'ast_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 93,
+    "col": 4,
+    "message": "Function 'multi_db_coordinator' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 101,
+    "col": 4,
+    "message": "Function 'enhanced_tag_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 109,
+    "col": 4,
+    "message": "Function 'clustering_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 117,
+    "col": 4,
+    "message": "Function 'ai_recommendation_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 124,
+    "col": 4,
+    "message": "Function 'subscribe' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\integration_orchestrator.py",
+    "line": 128,
+    "col": 4,
+    "message": "Function 'unsubscribe' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\legal_complaint_ingestion.py",
+    "line": 556,
+    "col": 0,
+    "message": "Function 'main' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\multi_db_coordinator.py",
+    "line": 123,
+    "col": 4,
+    "message": "Function 'connect' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\multi_db_coordinator.py",
+    "line": 156,
+    "col": 4,
+    "message": "Function 'disconnect' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\multi_db_coordinator.py",
+    "line": 174,
+    "col": 4,
+    "message": "Function 'add_operation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\rag_kag_server.py",
+    "line": 265,
+    "col": 0,
+    "message": "Function 'serve' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\rag_kag_server.py",
+    "line": 80,
+    "col": 4,
+    "message": "Function 'ContextQuery' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\rag_kag_server.py",
+    "line": 80,
+    "col": 27,
+    "message": "Parameter 'request' in 'ContextQuery' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\rag_kag_server.py",
+    "line": 80,
+    "col": 36,
+    "message": "Parameter 'context' in 'ContextQuery' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\rag_kag_server.py",
+    "line": 125,
+    "col": 4,
+    "message": "Function 'IndexEvidence' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\rag_kag_server.py",
+    "line": 125,
+    "col": 28,
+    "message": "Parameter 'request' in 'IndexEvidence' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\rag_kag_server.py",
+    "line": 125,
+    "col": 37,
+    "message": "Parameter 'context' in 'IndexEvidence' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\services\\retry_queue_processor.py",
+    "line": 375,
+    "col": 4,
+    "message": "Function 'stop' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\conftest.py",
+    "line": 19,
+    "col": 28,
+    "message": "Parameter 'sample_embedding_fp16' in 'sample_embeddings_batch' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\conftest.py",
+    "line": 49,
+    "col": 21,
+    "message": "Parameter 'base_runes' in 'sample_rune_bank' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\conftest.py",
+    "line": 102,
+    "col": 29,
+    "message": "Parameter 'sample_retrieval_result' in 'sample_retrieval_results' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\conftest.py",
+    "line": 133,
+    "col": 0,
+    "message": "Function 'pytest_configure' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\conftest.py",
+    "line": 133,
+    "col": 21,
+    "message": "Parameter 'config' in 'pytest_configure' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_ai_recommendation.py",
+    "line": 44,
+    "col": 0,
+    "message": "Function 'recommendation_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_ai_recommendation.py",
+    "line": 50,
+    "col": 0,
+    "message": "Function 'sample_tsc_output' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_ai_recommendation.py",
+    "line": 64,
+    "col": 0,
+    "message": "Function 'sample_svelte_check_output' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_ai_recommendation.py",
+    "line": 74,
+    "col": 0,
+    "message": "Function 'sample_event_log_output' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_ast_analysis.py",
+    "line": 50,
+    "col": 0,
+    "message": "Function 'sample_typescript_file' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_ast_analysis.py",
+    "line": 84,
+    "col": 0,
+    "message": "Function 'sample_svelte_file' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_codebase_indexer.py",
+    "line": 38,
+    "col": 0,
+    "message": "Function 'indexer_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_codebase_indexer.py",
+    "line": 44,
+    "col": 0,
+    "message": "Function 'temp_workspace' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_coordinate_cache.py",
+    "line": 33,
+    "col": 0,
+    "message": "Function 'cache_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_enhanced_tagging.py",
+    "line": 134,
+    "col": 0,
+    "message": "Function 'tag_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 484,
+    "col": 0,
+    "message": "Function 'run_tests' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 36,
+    "col": 4,
+    "message": "Function 'setUp' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 41,
+    "col": 4,
+    "message": "Function 'tearDown' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 46,
+    "col": 4,
+    "message": "Function 'test_extract_single_line_comments' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 66,
+    "col": 4,
+    "message": "Function 'test_extract_multi_line_comments' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 83,
+    "col": 4,
+    "message": "Function 'test_extract_jsdoc_comments' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 113,
+    "col": 4,
+    "message": "Function 'test_extract_todo_comments' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 140,
+    "col": 4,
+    "message": "Function 'test_extract_with_context' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 167,
+    "col": 4,
+    "message": "Function 'setUp' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 172,
+    "col": 4,
+    "message": "Function 'tearDown' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 177,
+    "col": 4,
+    "message": "Function 'test_search_function_calls' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 199,
+    "col": 4,
+    "message": "Function 'test_search_imports' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 215,
+    "col": 4,
+    "message": "Function 'test_search_variable_usage' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 231,
+    "col": 4,
+    "message": "Function 'test_search_component_usage' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 254,
+    "col": 4,
+    "message": "Function 'setUp' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 258,
+    "col": 4,
+    "message": "Function 'test_analyze_patterns' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 289,
+    "col": 4,
+    "message": "Function 'test_generate_summary' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 313,
+    "col": 4,
+    "message": "Function 'test_confidence_calculation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 357,
+    "col": 4,
+    "message": "Function 'setUp' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 363,
+    "col": 4,
+    "message": "Function 'tearDown' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 368,
+    "col": 4,
+    "message": "Function 'test_property_11_pattern_search_completeness' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 413,
+    "col": 4,
+    "message": "Function 'test_comment_extraction_accuracy' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 433,
+    "col": 4,
+    "message": "Function 'test_pattern_search_completeness' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_file_analysis.py",
+    "line": 452,
+    "col": 4,
+    "message": "Function 'test_ai_analysis_quality' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 26,
+    "col": 0,
+    "message": "Function 'temp_workspace' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 65,
+    "col": 0,
+    "message": "Function 'mock_services' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 81,
+    "col": 4,
+    "message": "Function 'test_orchestrator_initialization' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 81,
+    "col": 47,
+    "message": "Parameter 'temp_workspace' in 'test_orchestrator_initialization' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 130,
+    "col": 4,
+    "message": "Function 'test_event_subscription' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 130,
+    "col": 38,
+    "message": "Parameter 'temp_workspace' in 'test_event_subscription' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 180,
+    "col": 4,
+    "message": "Function 'test_stats_endpoint_model' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 200,
+    "col": 4,
+    "message": "Function 'test_error_card_model' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 222,
+    "col": 4,
+    "message": "Function 'test_cluster_summary_model' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 239,
+    "col": 4,
+    "message": "Function 'test_graph_node_model' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 259,
+    "col": 4,
+    "message": "Function 'test_search_result_model' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 312,
+    "col": 4,
+    "message": "Function 'test_cluster_request_validation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 405,
+    "col": 4,
+    "message": "Function 'test_singleton_orchestrator' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 142,
+    "col": 8,
+    "message": "Function 'event_handler' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_integration_orchestrator.py",
+    "line": 142,
+    "col": 26,
+    "message": "Parameter 'event' in 'event_handler' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_kmeans_clustering.py",
+    "line": 34,
+    "col": 0,
+    "message": "Function 'clustering_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_kmeans_clustering.py",
+    "line": 40,
+    "col": 0,
+    "message": "Function 'sample_embeddings' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_multi_db_integration.py",
+    "line": 404,
+    "col": 0,
+    "message": "Function 'run_tests' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_multi_db_integration.py",
+    "line": 40,
+    "col": 4,
+    "message": "Function 'coordinator' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_multi_db_integration.py",
+    "line": 356,
+    "col": 4,
+    "message": "Function 'coordinator' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_properties.py",
+    "line": 20,
+    "col": 0,
+    "message": "Function 'poi_data_strategy' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_properties.py",
+    "line": 20,
+    "col": 22,
+    "message": "Parameter 'draw' in 'poi_data_strategy' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_properties.py",
+    "line": 90,
+    "col": 4,
+    "message": "Function 'test_search_results_ranked_by_similarity' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_properties.py",
+    "line": 90,
+    "col": 55,
+    "message": "Parameter 'similarity_scores' in 'test_search_results_ranked_by_similarity' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_properties.py",
+    "line": 136,
+    "col": 4,
+    "message": "Function 'test_status_is_valid_enum' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_properties.py",
+    "line": 136,
+    "col": 40,
+    "message": "Parameter 'status' in 'test_status_is_valid_enum' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 17,
+    "col": 4,
+    "message": "Function 'mock_db_pool' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 22,
+    "col": 4,
+    "message": "Function 'mock_embedding_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 29,
+    "col": 4,
+    "message": "Function 'mock_qdrant_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 140,
+    "col": 4,
+    "message": "Function 'mock_db_pool' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 145,
+    "col": 4,
+    "message": "Function 'mock_embedding_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 152,
+    "col": 4,
+    "message": "Function 'mock_qdrant_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 214,
+    "col": 4,
+    "message": "Function 'test_build_profile_text_all_fields' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 234,
+    "col": 4,
+    "message": "Function 'test_build_profile_text_partial_fields' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_poi_unit.py",
+    "line": 250,
+    "col": 4,
+    "message": "Function 'test_build_profile_text_empty_fields' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 45,
+    "col": 4,
+    "message": "Function 'test_retrieve_candidates_request_minimal' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 52,
+    "col": 4,
+    "message": "Function 'test_retrieve_candidates_request_full' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 68,
+    "col": 4,
+    "message": "Function 'test_retrieved_chunk_creation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 89,
+    "col": 4,
+    "message": "Function 'test_source_validation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 101,
+    "col": 4,
+    "message": "Function 'test_validate_sources_request' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 117,
+    "col": 4,
+    "message": "Function 'test_approved_context' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 148,
+    "col": 4,
+    "message": "Function 'test_citation_creation' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 160,
+    "col": 4,
+    "message": "Function 'test_action_item' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 171,
+    "col": 4,
+    "message": "Function 'test_answer_with_citations' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 206,
+    "col": 4,
+    "message": "Function 'test_canvas_pin' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 228,
+    "col": 4,
+    "message": "Function 'test_case_canvas_state' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 249,
+    "col": 4,
+    "message": "Function 'test_high_confidence' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 267,
+    "col": 4,
+    "message": "Function 'test_medium_confidence' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 271,
+    "col": 4,
+    "message": "Function 'test_low_confidence' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 275,
+    "col": 4,
+    "message": "Function 'test_marginal_confidence' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 283,
+    "col": 4,
+    "message": "Function 'test_all_source_types' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 296,
+    "col": 4,
+    "message": "Function 'test_all_statuses' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 306,
+    "col": 4,
+    "message": "Function 'test_success_response' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 318,
+    "col": 4,
+    "message": "Function 'test_error_response' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_rag_source_validation.py",
+    "line": 334,
+    "col": 4,
+    "message": "Function 'test_end_to_end_flow' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\tests\\test_tag_rename.py",
+    "line": 35,
+    "col": 0,
+    "message": "Function 'rename_service' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\utils\\fast_json.py",
+    "line": 112,
+    "col": 0,
+    "message": "Function 'info' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\utils\\fast_json.py",
+    "line": 37,
+    "col": 14,
+    "message": "Parameter 'obj' in 'dumps' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\utils\\fast_json.py",
+    "line": 54,
+    "col": 4,
+    "message": "Function 'loads' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\utils\\fast_json.py",
+    "line": 54,
+    "col": 14,
+    "message": "Parameter 's' in 'loads' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\utils\\fast_json.py",
+    "line": 70,
+    "col": 14,
+    "message": "Parameter 'obj' in 'dumpb' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\utils\\fast_json.py",
+    "line": 99,
+    "col": 14,
+    "message": "Parameter 'obj' in 'dumpb' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ace_web_worker.py",
+    "line": 84,
+    "col": 4,
+    "message": "Function 'start' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ace_web_worker.py",
+    "line": 94,
+    "col": 12,
+    "message": "Function 'callback' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ace_web_worker.py",
+    "line": 94,
+    "col": 25,
+    "message": "Parameter 'ch' in 'callback' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ace_web_worker.py",
+    "line": 94,
+    "col": 29,
+    "message": "Parameter 'method' in 'callback' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ace_web_worker.py",
+    "line": 94,
+    "col": 37,
+    "message": "Parameter 'properties' in 'callback' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ace_web_worker.py",
+    "line": 94,
+    "col": 49,
+    "message": "Parameter 'body' in 'callback' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ocr_chunk_worker.py",
+    "line": 398,
+    "col": 4,
+    "message": "Function 'shutdown' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ocr_chunk_worker.py",
+    "line": 50,
+    "col": 4,
+    "message": "Function 'nvtx_range' missing return type annotation",
+    "errorType": "missing-return-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\workers\\ocr_chunk_worker.py",
+    "line": 50,
+    "col": 19,
+    "message": "Parameter 'name' in 'nvtx_range' missing type annotation",
+    "errorType": "missing-param-type",
+    "severity": "info",
+    "language": "python"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\backend\\evidence-pipeline\\evidence_pipeline\\progress\\rabbitmq_subscriber.py",
+    "line": 74,
+    "col": 34,
+    "message": "invalid syntax",
+    "errorType": "syntax-error",
+    "severity": "error",
+    "language": "python"
+  }
+]

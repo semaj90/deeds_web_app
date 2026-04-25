@@ -1,0 +1,41 @@
+# EmbeddingGemma ONNX Service Dockerfile
+FROM nvidia/cuda:12.2-runtime-ubuntu22.04
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CUDA_VISIBLE_DEVICES=0
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3.10-pip \
+    python3.10-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY python-services/requirements-embedding.txt /app/
+
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r requirements-embedding.txt
+
+# Copy application code
+COPY python-services/embedding_service.py /app/
+COPY python-services/test_embedding_service.py /app/
+
+# Copy models (will be mounted as volume)
+# VOLUME ["/app/models"]
+
+# Expose port
+EXPOSE 8094
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8094/health || exit 1
+
+# Run the service
+CMD ["python", "embedding_service.py"]

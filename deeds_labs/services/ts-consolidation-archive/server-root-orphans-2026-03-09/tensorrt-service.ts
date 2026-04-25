@@ -1,0 +1,185 @@
+// TensorRT inference service for SvelteKit
+import { spawn } from 'child_process';
+import { env } from '$env/dynamic/private';
+
+export interface LegalAIRequest {
+    prompt: string;
+    context?: string;
+    max_tokens?: number;
+    temperature?: number;
+}
+
+export interface LegalAIResponse {
+    text: string;
+	tokens: number;
+    inference_time: number;
+	model_used: string;
+}
+
+class TensorRTLegalAI {
+    private pythonEnv: string;
+    private enginePath: string;
+    private awq4ModelPath: string;
+    private tritonServerUrl: string;
+    private ollamaUrl: string;
+    private ollamaModel: string;
+
+    constructor() {
+        this.pythonEnv = env?.TENSORRT_PYTHON_ENV ?? '/home/james/trt_env_310/bin/python';
+        this.enginePath = env?.TENSORRT_ENGINE_PATH ?? '/home/james/gemma3_engine_flash';
+        this.awq4ModelPath = env?.AWQ4_MODEL_PATH ?? '/home/james/gemma3_awq4_working';
+        this.tritonServerUrl = env?.TRITON_SERVER_URL ?? 'http://localhost:8000';
+        this.ollamaUrl = env?.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+        this.ollamaModel = env?.OLLAMA_LEGAL_MODEL ?? 'gemma3-legal-v2';
+    }
+
+    async infer(request: LegalAIRequest): Promise<LegalAIResponse> {
+        // Try TensorRT first, fallback to Ollama
+        try {
+            return await this.tensorrtInference(request);
+        } catch (error) {
+            console.warn('TensorRT inference failed, falling back to Ollama:', error);
+            return await this.ollamaInference(request);
+        }
+    }
+
+    private async tensorrtInference(request: LegalAIRequest): Promise<LegalAIResponse> {
+        const escapedPrompt = request.prompt.replace(/'/g, "\\'");
+        const escapedContext = (request?.context ?? '').replace(/'/g, "\\'");
+        const maxTokens = request?.max_tokens ?? 256;
+        const temperature = request?.temperature ?? 0.3;
+
+        const script = `
+import sys
+import os
+import time
+import json
+
+# Set CUDA environment
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+try:
+    import tensorrt_llm
+    from tensorrt_llm.runtime import ModelRunner
+
+    def run_tensorrt_inference():
+        engine_path = "${this.enginePath}"
+        prompt = '''${escapedPrompt}'''
+        context = '''${escapedContext}'''
+        max_tokens = ${maxTokens}
+        temperature = ${temperature}
+
+        # Format legal prompt
+        formatted_prompt = f"Legal Analysis Request: {prompt}"
+        if context:
+            formatted_prompt += f"\\n\\nContext: {context}"
+        formatted_prompt += "\\n\\nLegal Response:"
+
+        # Load TensorRT engine
+        model = ModelRunner.from_dir(engine_path)
+
+        # Run inference
+        start_time = time.time()
+        outputs = model.generate(
+            batch_input_ids=[formatted_prompt],
+            max_new_tokens=max_tokens,
+            temperature=temperature,
+            top_p=0.9,
+            end_id=None,
+            pad_id=None,
+            streaming=False
+        )
+        inference_time = time.time() - start_time
+
+        response_text = outputs[0][0] if outputs and outputs[0] else "No response generated"
+
+        result = {
+            "text": response_text,
+            "tokens": len(response_text.split()),
+            "inference_time": inference_time,
+            "model_used": "TensorRT-LLM"
+        }
+        print("TENSORRT_RESULT:", json.dumps(result))
+
+    run_tensorrt_inference()
+except ImportError as e:
+    print("TENSORRT_ERROR: TensorRT-LLM not available:", str(e))
+    sys.exit(1)
+except Exception as e:
+    print("TENSORRT_ERROR:", str(e))
+    sys.exit(1)
+`;
+
+        return new Promise((resolve, reject) => {
+            const pythonProcess = spawn(this.pythonEnv, ['-c', script]);
+            let output = '';
+            let error = '';
+
+            pythonProcess.stdout.on('data', (data) => {
+                output += data.toString();
+            });
+
+            pythonProcess.stderr.on('data', (data) => {
+                error += data.toString();
+            });
+
+            pythonProcess.on('close', (code) => {
+                if (code === 0) {
+                    const match = output.match(/TENSORRT_RESULT: (.+)/);
+                    if (match) {
+                        try {
+                            const result = JSON.parse(match[1]);
+                            resolve(result);
+                        } catch (e) {
+                            reject(new Error(`Failed to parse TensorRT result: ${e}`));
+                        }
+                    } else {
+                        reject(new Error('No TensorRT result found'));
+                    }
+                } else {
+                    reject(new Error(`TensorRT inference failed: ${error}`));
+                }
+            });
+        });
+    }
+
+    private async ollamaInference(request: LegalAIRequest): Promise<LegalAIResponse> {
+        const startTime = performance.now();
+        let prompt = request.prompt;
+        if (request.context) {
+            prompt = `Context: ${request.context}\n\n${prompt}`;
+        }
+
+        const response = await fetch(`${this.ollamaUrl}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: this.ollamaModel,
+                prompt,
+                stream: false,
+                options: {
+                    num_predict: request.max_tokens ?? 256,
+                    temperature: request.temperature ?? 0.3,
+                    top_p: 0.9,
+                },
+            }),
+            signal: AbortSignal.timeout(60000),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama HTTP ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        const inferenceTime = performance.now() - startTime;
+
+        return {
+            text: data.response ?? '',
+            tokens: data.eval_count ?? 0,
+            inference_time: inferenceTime / 1000,
+            model_used: 'Ollama-Fallback',
+        };
+    }
+}
+
+export const tensorrtService = new TensorRTLegalAI();

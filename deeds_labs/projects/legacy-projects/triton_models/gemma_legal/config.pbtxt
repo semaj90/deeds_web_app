@@ -1,0 +1,52 @@
+name: "gemma_legal"
+platform: "tensorrtllm"
+max_batch_size: 4
+
+input [
+  {
+    name: "input_ids"
+    data_type: TYPE_INT64
+    dims: [ -1 ]
+  },
+  {
+    name: "attention_mask"
+    data_type: TYPE_INT64
+    dims: [ -1 ]
+  }
+]
+
+output [
+  {
+    name: "logits"
+    data_type: TYPE_FP32
+    dims: [ -1, 262208 ]
+  }
+]
+
+instance_group [
+  {
+    count: 1
+    kind: KIND_GPU
+    gpus: [ 0 ]
+  }
+]
+
+dynamic_batching {
+  preferred_batch_size: [ 1, 2, 4 ]
+  max_queue_delay_microseconds: 1000
+}
+
+parameters {
+  key: "engine_dir"
+  value: { string_value: "/models/gemma3_12b_int4" }
+}
+
+parameters {
+  key: "max_tokens_in_paged_kv_cache"
+  value: { string_value: "4096" }
+}
+
+parameters {
+  key: "batch_scheduler_policy"
+  value: { string_value: "inflight_fused_batching" }
+}

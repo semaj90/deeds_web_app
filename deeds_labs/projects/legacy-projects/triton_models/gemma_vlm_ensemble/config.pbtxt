@@ -1,0 +1,77 @@
+name: "gemma_vlm_ensemble"
+platform: "ensemble"
+max_batch_size: 4
+
+# VLM ensemble: SigLIP vision → Projector → Gemma3 text decoder
+# Chains three models into a single inference call
+
+input [
+  {
+    name: "pixel_values"
+    data_type: TYPE_FP32
+    dims: [ 3, 384, 384 ]
+  },
+  {
+    name: "input_ids"
+    data_type: TYPE_INT64
+    dims: [ -1 ]
+  },
+  {
+    name: "attention_mask"
+    data_type: TYPE_INT64
+    dims: [ -1 ]
+  }
+]
+
+output [
+  {
+    name: "logits"
+    data_type: TYPE_FP32
+    dims: [ -1, 262208 ]
+  }
+]
+
+ensemble_scheduling {
+  step [
+    {
+      model_name: "siglip_vision"
+      model_version: -1
+      input_map {
+        key: "pixel_values"
+        value: "pixel_values"
+      }
+      output_map {
+        key: "image_features"
+        value: "vision_output"
+      }
+    },
+    {
+      model_name: "gemma_projector"
+      model_version: -1
+      input_map {
+        key: "image_features"
+        value: "vision_output"
+      }
+      output_map {
+        key: "projected_tokens"
+        value: "projected_vision"
+      }
+    },
+    {
+      model_name: "gemma_legal"
+      model_version: -1
+      input_map {
+        key: "input_ids"
+        value: "input_ids"
+      }
+      input_map {
+        key: "attention_mask"
+        value: "attention_mask"
+      }
+      output_map {
+        key: "logits"
+        value: "logits"
+      }
+    }
+  ]
+}

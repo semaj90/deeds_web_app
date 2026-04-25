@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts",
+    "src/types/integrations.d.ts"
+  ],
+  "exclude": []
+}

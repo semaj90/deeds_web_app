@@ -1,0 +1,12 @@
+{
+  "runId": "2025-12-24T17-59-30-112Z",
+  "timestamp": "2025-12-24T17:59:30.124Z",
+  "collection": "knowledge_base",
+  "parsed": 131,
+  "embeddingsOK": 101,
+  "embeddingsFailed": 0,
+  "upsertsOK": 101,
+  "upsertsFailed": 0,
+  "filesProcessed": 7,
+  "checkpointPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\data\\phase76\\kb-checkpoint-2025-12-24T17-59-30-112Z.json"
+}

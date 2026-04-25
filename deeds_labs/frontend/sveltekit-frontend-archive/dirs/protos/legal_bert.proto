@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package legalbert;
+
+service LegalBert {
+  rpc Predict (PredictRequest) returns (PredictResponse) {}
+}
+
+message PredictRequest {
+  string text = 1;
+}
+
+message PredictResponse {
+  string summary = 1;
+  map<string, double> scores = 2;
+}

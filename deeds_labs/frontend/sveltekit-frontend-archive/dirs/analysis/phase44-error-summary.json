@@ -1,0 +1,41 @@
+{
+  "totalFiles": 241,
+  "filesRepaired": 90,
+  "filesSkipped": 151,
+  "totalIssuesFixed": 374,
+  "issues": {
+    "collapsedMarkup": 229,
+    "strayCommas": 0,
+    "straySemicolons": 0,
+    "missingCommas": 71,
+    "duplicateContent": 26,
+    "malformedObjects": 226
+  },
+  "timestamp": "2025-11-04T19:05:56.112Z",
+  "files": [
+    {
+      "file": "(admin)\\+layout.svelte",
+      "issuesFixed": 2,
+      "issues": [
+        "Fixed 1 collapsed markup regions",
+        "Fixed 1 incomplete closing tags"
+      ]
+    },
+    {
+      "file": "(ai)\\case-scoring\\+page.svelte",
+      "issuesFixed": 2,
+      "issues": [
+        "Fixed 1 collapsed markup regions",
+        "Removed 1 duplicate content section(s)"
+      ]
+    },
+    {
+      "file": "(ai)\\document-drafting\\+page.svelte",
+      "issuesFixed": 2,
+      "issues": [
+        "Fixed 1 collapsed markup regions",
+        "Fixed 1 incomplete closing tags"
+      ]
+    }
+  ]
+}

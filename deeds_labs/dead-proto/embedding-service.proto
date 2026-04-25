@@ -1,0 +1,220 @@
+// Embedding Service Protocol Buffers
+// Comprehensive embedding generation and vector operations for Legal AI
+
+syntax = "proto3";
+package legal.embedding;
+option go_package = "legal-ai-production/proto/embedding";
+
+import "google/protobuf/timestamp.proto";
+
+// Embedding generation service
+service EmbeddingService {
+  // Generate single embedding
+  rpc GenerateEmbedding(EmbeddingRequest) returns (EmbeddingResponse);
+  
+  // Generate embeddings in batch (more efficient)
+  rpc BatchEmbedding(stream BatchEmbeddingRequest) returns (stream BatchEmbeddingResponse);
+  
+  // Compare two embeddings for similarity
+  rpc CompareSimilarity(SimilarityRequest) returns (SimilarityResponse);
+  
+  // Find nearest neighbors in vector space
+  rpc FindSimilar(SimilarSearchRequest) returns (SimilarSearchResponse);
+  
+  // Get embedding model information
+  rpc GetModelInfo(ModelInfoRequest) returns (ModelInfoResponse);
+  
+  // Health check
+  rpc HealthCheck(HealthRequest) returns (HealthResponse);
+}
+
+// Request for single embedding
+message EmbeddingRequest {
+  string text = 1;
+  string model = 2; // e.g., "nomic-embed-text", "bge-small"
+  bool normalize = 3; // Whether to normalize the embedding
+  string request_id = 4;
+  EmbeddingOptions options = 5;
+}
+
+// Embedding generation options
+message EmbeddingOptions {
+  int32 max_tokens = 1;
+  float temperature = 2; // For some models
+  repeated string context_tags = 3; // For contextual embeddings
+  string document_type = 4; // "legal", "contract", "evidence"
+  bool enable_chunking = 5; // Auto-chunk large text
+  int32 chunk_size = 6;
+  int32 chunk_overlap = 7;
+}
+
+// Single embedding response
+message EmbeddingResponse {
+  repeated float vector = 1;
+  int32 dimensions = 2;
+  string model_used = 3;
+  string request_id = 4;
+  google.protobuf.Timestamp generated_at = 5;
+  EmbeddingMetadata metadata = 6;
+}
+
+// Metadata for embeddings
+message EmbeddingMetadata {
+  int32 processing_time_ms = 1;
+  int32 tokens_processed = 2;
+  float confidence = 3;
+  repeated string detected_entities = 4;
+  string language = 5;
+  repeated TextChunk chunks = 6; // If text was chunked
+}
+
+// Text chunk information
+message TextChunk {
+  string text = 1;
+  int32 start_offset = 2;
+  int32 end_offset = 3;
+  repeated float embedding = 4;
+  float confidence = 5;
+}
+
+// Batch embedding request
+message BatchEmbeddingRequest {
+  repeated EmbeddingRequest requests = 1;
+  int32 batch_size = 2; // Process in batches of this size
+  bool parallel = 3; // Process batches in parallel
+}
+
+// Batch embedding response
+message BatchEmbeddingResponse {
+  repeated EmbeddingResponse responses = 1;
+  int32 total_processed = 2;
+  int32 failed_count = 3;
+  repeated string errors = 4;
+}
+
+// Similarity comparison request
+message SimilarityRequest {
+  repeated float vector_a = 1;
+  repeated float vector_b = 2;
+  SimilarityMetric metric = 3;
+  string request_id = 4;
+}
+
+// Similarity metrics
+enum SimilarityMetric {
+  COSINE = 0;
+  EUCLIDEAN = 1;
+  DOT_PRODUCT = 2;
+  MANHATTAN = 3;
+}
+
+// Similarity response
+message SimilarityResponse {
+  float similarity = 1;
+  float distance = 2;
+  SimilarityMetric metric_used = 3;
+  string request_id = 4;
+}
+
+// Find similar vectors request
+message SimilarSearchRequest {
+  repeated float query_vector = 1;
+  repeated VectorDocument candidate_vectors = 2;
+  int32 top_k = 3; // Return top K similar vectors
+  SimilarityMetric metric = 4;
+  float threshold = 5; // Minimum similarity threshold
+  string request_id = 6;
+}
+
+// Vector document for similarity search
+message VectorDocument {
+  string id = 1;
+  repeated float vector = 2;
+  map<string, string> metadata = 3;
+}
+
+// Similar search response
+message SimilarSearchResponse {
+  repeated SimilarDocument results = 1;
+  int32 total_candidates = 2;
+  string request_id = 3;
+}
+
+// Similar document result
+message SimilarDocument {
+  string id = 1;
+  float similarity = 2;
+  float distance = 3;
+  map<string, string> metadata = 4;
+  int32 rank = 5;
+}
+
+// Model information request
+message ModelInfoRequest {
+  string model_name = 1; // Empty for all models
+}
+
+// Model information response
+message ModelInfoResponse {
+  repeated ModelInfo models = 1;
+}
+
+// Model information
+message ModelInfo {
+  string name = 1;
+  string provider = 2; // "llama-cpp", "ollama", "openai"
+  int32 dimensions = 3;
+  int32 max_tokens = 4;
+  string version = 5;
+  ModelStatus status = 6;
+  ModelPerformance performance = 7;
+}
+
+// Model status
+enum ModelStatus {
+  UNKNOWN = 0;
+  LOADING = 1;
+  READY = 2;
+  ERROR = 3;
+  UNLOADED = 4;
+}
+
+// Model performance metrics
+message ModelPerformance {
+  float avg_processing_time_ms = 1;
+  int32 total_requests = 2;
+  float success_rate = 3;
+  int64 memory_usage_mb = 4;
+  float tokens_per_second = 5;
+}
+
+// Health check messages
+message HealthRequest {
+  bool detailed = 1; // Include detailed metrics
+}
+
+message HealthResponse {
+  ServiceStatus status = 1;
+  repeated ModelInfo model_status = 2;
+  SystemMetrics metrics = 3;
+  string version = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}
+
+// Service status
+enum ServiceStatus {
+  HEALTHY = 0;
+  DEGRADED = 1;
+  UNHEALTHY = 2;
+  MAINTENANCE = 3;
+}
+
+// System metrics
+message SystemMetrics {
+  float cpu_usage = 1;
+  int64 memory_usage_mb = 2;
+  int64 disk_usage_mb = 3;
+  int32 active_connections = 4;
+  float gpu_utilization = 5; // If using GPU
+  int64 gpu_memory_mb = 6;
+}

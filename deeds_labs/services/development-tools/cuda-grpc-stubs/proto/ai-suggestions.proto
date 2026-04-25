@@ -1,0 +1,215 @@
+syntax = "proto3";
+
+package ai_suggestions;
+
+option go_package = "github.com/deeds-web/ai-suggestions;ai_suggestions";
+
+// AI Suggestions Service
+service AISuggestionsService {
+  // Generate contextual suggestions for legal documents
+  rpc GenerateSuggestions(SuggestionRequest) returns (SuggestionResponse);
+  
+  // Get suggestion with vector context
+  rpc GenerateContextualSuggestions(ContextualSuggestionRequest) returns (SuggestionResponse);
+  
+  // Rate a suggestion for feedback learning
+  rpc RateSuggestion(SuggestionRating) returns (RatingResponse);
+  
+  // Stream real-time suggestions as user types
+  rpc StreamSuggestions(SuggestionRequest) returns (stream SuggestionResponse);
+}
+
+// Request message for AI suggestions
+message SuggestionRequest {
+  string content = 1;
+  ReportType report_type = 2;
+  string model = 3;
+  SuggestionContext context = 4;
+  int32 max_suggestions = 5;
+  double confidence_threshold = 6;
+}
+
+// Request with vector search context
+message ContextualSuggestionRequest {
+  SuggestionRequest base_request = 1;
+  repeated VectorContext vector_context = 2;
+  GraphContext graph_context = 3;
+}
+
+// Suggestion context for better AI recommendations
+message SuggestionContext {
+  string case_id = 1;
+  string user_id = 2;
+  repeated string document_ids = 3;
+  repeated string related_cases = 4;
+  UserProfile user_profile = 5;
+  DocumentMetadata document_metadata = 6;
+}
+
+// Vector search context
+message VectorContext {
+  string document_id = 1;
+  string content = 2;
+  double similarity_score = 3;
+  string document_type = 4;
+  map<string, string> metadata = 5;
+}
+
+// Graph database context
+message GraphContext {
+  repeated GraphNode related_nodes = 1;
+  repeated GraphRelationship relationships = 2;
+}
+
+message GraphNode {
+  string id = 1;
+  string type = 2; // case, evidence, precedent, person
+  map<string, string> properties = 3;
+}
+
+message GraphRelationship {
+  string from_node = 1;
+  string to_node = 2;
+  string relationship_type = 3;
+  double weight = 4;
+}
+
+// User profile for personalized suggestions
+message UserProfile {
+  string user_type = 1; // attorney, paralegal, investigator
+  string experience_level = 2; // junior, mid, senior, expert
+  repeated string specializations = 3;
+  UserPreferences preferences = 4;
+}
+
+message UserPreferences {
+  bool include_case_law = 1;
+  bool include_statutes = 2;
+  bool prefer_detailed_analysis = 3;
+  SuggestionStyle style = 4;
+}
+
+// Document metadata
+message DocumentMetadata {
+  string document_type = 1;
+  string jurisdiction = 2;
+  string case_type = 3;
+  repeated string tags = 4;
+  int64 created_at = 5;
+  int64 modified_at = 6;
+}
+
+// Report types
+enum ReportType {
+  REPORT_TYPE_UNSPECIFIED = 0;
+  PROSECUTION_MEMO = 1;
+  CASE_BRIEF = 2;
+  EVIDENCE_SUMMARY = 3;
+  MOTION = 4;
+  DISCOVERY_REQUEST = 5;
+  WITNESS_STATEMENT = 6;
+  LEGAL_RESEARCH = 7;
+  CLOSING_ARGUMENT = 8;
+}
+
+// Suggestion styles
+enum SuggestionStyle {
+  SUGGESTION_STYLE_UNSPECIFIED = 0;
+  CONCISE = 1;
+  DETAILED = 2;
+  FORMAL = 3;
+  CONVERSATIONAL = 4;
+}
+
+// Response message with suggestions
+message SuggestionResponse {
+  repeated Suggestion suggestions = 1;
+  string model = 2;
+  double overall_confidence = 3;
+  int64 timestamp = 4;
+  ProcessingMetrics metrics = 5;
+  string request_id = 6;
+}
+
+// Individual suggestion
+message Suggestion {
+  string id = 1;
+  string content = 2;
+  SuggestionType type = 3;
+  double confidence = 4;
+  int32 priority = 5;
+  SuggestionCategory category = 6;
+  repeated string supporting_evidence = 7;
+  repeated string relevant_statutes = 8;
+  repeated string case_citations = 9;
+  SuggestionMetadata metadata = 10;
+}
+
+// Suggestion types
+enum SuggestionType {
+  SUGGESTION_TYPE_UNSPECIFIED = 0;
+  CONTENT_ENHANCEMENT = 1;
+  LEGAL_ANALYSIS = 2;
+  EVIDENCE_REVIEW = 3;
+  PROCEDURAL_CHECK = 4;
+  CITATION_NEEDED = 5;
+  FORMATTING_IMPROVEMENT = 6;
+  CONSISTENCY_CHECK = 7;
+  COMPLETENESS_CHECK = 8;
+}
+
+// Suggestion categories
+enum SuggestionCategory {
+  SUGGESTION_CATEGORY_UNSPECIFIED = 0;
+  LEGAL_SUBSTANCE = 1;
+  PROCEDURAL_COMPLIANCE = 2;
+  EVIDENCE_HANDLING = 3;
+  WRITING_QUALITY = 4;
+  CASE_STRATEGY = 5;
+  RISK_ASSESSMENT = 6;
+}
+
+// Suggestion metadata
+message SuggestionMetadata {
+  repeated string source_documents = 1;
+  string reasoning = 2;
+  repeated string alternative_approaches = 3;
+  double urgency_score = 4;
+  repeated string related_suggestions = 5;
+}
+
+// Processing metrics
+message ProcessingMetrics {
+  int64 processing_time_ms = 1;
+  int32 vector_results_count = 2;
+  int32 graph_nodes_explored = 3;
+  string model_version = 4;
+  double gpu_utilization = 5;
+  int64 tokens_processed = 6;
+}
+
+// Suggestion rating for feedback
+message SuggestionRating {
+  string suggestion_id = 1;
+  string user_id = 2;
+  Rating rating = 3;
+  string feedback = 4;
+  bool was_applied = 5;
+  int64 timestamp = 6;
+}
+
+enum Rating {
+  RATING_UNSPECIFIED = 0;
+  VERY_POOR = 1;
+  POOR = 2;
+  FAIR = 3;
+  GOOD = 4;
+  EXCELLENT = 5;
+}
+
+// Rating response
+message RatingResponse {
+  bool success = 1;
+  string message = 2;
+  string suggestion_id = 3;
+}

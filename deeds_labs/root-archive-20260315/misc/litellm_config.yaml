@@ -1,0 +1,70 @@
+model_list:
+  # ── Primary Legal LLM (Ollama via OpenAI-compat endpoint) ─────────
+  - model_name: gemma3-legal
+    litellm_params:
+      model: openai/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
+      max_retries: 2
+      timeout: 60
+      rpm: 30
+      tpm: 100000
+
+  # ── TRT-LLM via Triton (when engine is built) ──────────────────────
+  # Uncomment when TRT engine is available on port 8099
+  # - model_name: gemma3-legal
+  #   litellm_params:
+  #     model: triton/gemma3-legal
+  #     api_base: http://host.docker.internal:8099/generate
+
+  # ── Embedding Model ─────────────────────────────────────────────────
+  - model_name: embeddinggemma
+    litellm_params:
+      model: ollama/embeddinggemma:latest
+      api_base: http://host.docker.internal:11434
+      rpm: 60
+
+  # ── Smaller context model ───────────────────────────────────────────
+  - model_name: gemma-270m-context
+    litellm_params:
+      model: openai/gemma3:270m
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
+      rpm: 60
+      timeout: 30
+
+  # ── Claude → local Ollama aliases (for tools expecting OpenAI API) ──
+  - model_name: claude-sonnet-4-5
+    litellm_params:
+      model: openai/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
+
+  - model_name: claude-3-5-sonnet-20241022
+    litellm_params:
+      model: openai/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  num_retries: 2
+  request_timeout: 60
+  max_parallel_requests: 4
+  # ── Semantic Cache (Redis Stack + embeddinggemma) ───────────────────
+  cache: true
+  cache_params:
+    type: redis-semantic
+    host: deeds-redis-prod
+    port: 6379
+    password: ""
+    similarity_threshold: 0.85
+    ttl: 3600
+    redis_semantic_cache_embedding_model: ollama/embeddinggemma:latest
+    redis_semantic_cache_use_async: true
+    namespace: "llm_cache"
+
+general_settings:
+  master_key: sk-deeds-litellm-2026
+  database_url: null

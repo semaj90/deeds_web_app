@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package legalai.qlora;
+
+import "training_metrics.proto";
+
+service QLoRATrainer {
+  rpc StartTraining(TrainingRequest) returns (TrainingResponse);
+  rpc StopTraining(StopRequest) returns (StopResponse);
+  rpc GetTrainingStatus(StatusRequest) returns (TrainingStatus);
+  rpc StreamMetrics(MetricsRequest) returns (stream TrainingMetrics);
+  rpc CheckpointModel(CheckpointRequest) returns (CheckpointResponse);
+}
+
+message TrainingRequest {
+  string model_name = 1;
+  string dataset_path = 2;
+  TrainingConfig config = 3;
+  string checkpoint_path = 4;
+}
+
+message TrainingConfig {
+  int32 lora_rank = 1;
+  float lora_alpha = 2;
+  float learning_rate = 3;
+  int32 batch_size = 4;
+  int32 max_steps = 5;
+  bool use_nf4 = 6;
+  bool fused_operations = 7;
+  int32 gradient_accumulation_steps = 8;
+}
+
+message TrainingResponse {
+  string training_id = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message StopRequest {
+  string training_id = 1;
+}
+
+message StopResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message StatusRequest {
+  string training_id = 1;
+}
+
+message TrainingStatus {
+  string training_id = 1;
+  TrainingState state = 2;
+  float progress = 3;
+  int64 current_step = 4;
+  int64 total_steps = 5;
+  TrainingMetrics latest_metrics = 6;
+}
+
+enum TrainingState {
+  INITIALIZING = 0;
+  TRAINING = 1;
+  VALIDATING = 2;
+  CHECKPOINTING = 3;
+  COMPLETED = 4;
+  FAILED = 5;
+  STOPPED = 6;
+}
+
+message MetricsRequest {
+  string training_id = 1;
+  int32 interval_seconds = 2;
+}
+
+message CheckpointRequest {
+  string training_id = 1;
+  string checkpoint_path = 2;
+}
+
+message CheckpointResponse {
+  bool success = 1;
+  string checkpoint_path = 2;
+  string message = 3;
+}

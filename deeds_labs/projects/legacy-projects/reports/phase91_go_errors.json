@@ -1,0 +1,142 @@
+[
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\code-indexer\\main.go",
+    "line": 14,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/bytedance/sonic (imported by context7-code-indexer); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "code-indexer"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\code-indexer\\main.go",
+    "line": 15,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/gin-gonic/gin (imported by context7-code-indexer); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "code-indexer"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\code-indexer\\main.go",
+    "line": 16,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/go-redis/redis/v8 (imported by context7-code-indexer); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "code-indexer"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\code-indexer\\main.go",
+    "line": 17,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package golang.org/x/net/context (imported by context7-code-indexer); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "code-indexer"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\error-parser\\main.go",
+    "line": 15,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/go-redis/redis/v8 (imported by error-parser); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "error-parser"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\error-parser\\main.go",
+    "line": 18,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/json-iterator/go (imported by error-parser); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "error-parser"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\error-parser\\main.go",
+    "line": 16,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/minio/minio-go/v7 (imported by error-parser); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "error-parser"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\error-parser\\main.go",
+    "line": 17,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/minio/minio-go/v7/pkg/credentials (imported by error-parser); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "error-parser"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\legal-bert-onnx\\go",
+    "line": 0,
+    "col": 0,
+    "message": "\"./...\" matched no packages",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "legal-bert-onnx"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\vite-hmr-bridge\\main.go",
+    "line": 19,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/bytedance/sonic (imported by vite-hmr-bridge); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "vite-hmr-bridge"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\vite-hmr-bridge\\main.go",
+    "line": 20,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/fsnotify/fsnotify (imported by vite-hmr-bridge); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "vite-hmr-bridge"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\vite-hmr-bridge\\main.go",
+    "line": 21,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/gorilla/mux (imported by vite-hmr-bridge); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "vite-hmr-bridge"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\vite-hmr-bridge\\main.go",
+    "line": 22,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/gorilla/websocket (imported by vite-hmr-bridge); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "vite-hmr-bridge"
+  },
+  {
+    "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\go-services\\websocket-server\\main.go",
+    "line": 12,
+    "col": 0,
+    "message": "2: missing go.sum entry for module providing package github.com/gorilla/websocket (imported by github.com/deeds-web-app/websocket-server); to add:",
+    "errorType": "go-vet",
+    "severity": "warning",
+    "language": "go",
+    "service": "websocket-server"
+  }
+]

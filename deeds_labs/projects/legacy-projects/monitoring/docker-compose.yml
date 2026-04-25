@@ -1,0 +1,286 @@
+version: '3.8'
+
+# Legal AI Platform - Production Monitoring Stack
+# Complete observability solution with Prometheus, Grafana, and Alertmanager
+
+services:
+  # Prometheus - Time series database and monitoring
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: legal-ai-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--storage.tsdb.retention.size=50GB'
+      - '--storage.tsdb.wal-compression'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+      - '--query.max-concurrency=20'
+      - '--query.timeout=2m'
+      - '--query.max-samples=50000000'
+    networks:
+      - legal-ai-monitoring
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=9090"
+
+  # Grafana - Visualization and dashboards
+  grafana:
+    image: grafana/grafana:10.0.3
+    container_name: legal-ai-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=legal-ai-admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
+      - GF_SERVER_ROOT_URL=http://localhost:3000/grafana
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+    networks:
+      - legal-ai-monitoring
+    depends_on:
+      - prometheus
+
+  # Alertmanager - Alert routing and notification
+  alertmanager:
+    image: prom/alertmanager:v0.25.0
+    container_name: legal-ai-alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+      - '--cluster.listen-address=0.0.0.0:9094'
+    networks:
+      - legal-ai-monitoring
+
+  # Node Exporter - System metrics
+  node-exporter:
+    image: prom/node-exporter:v1.6.1
+    container_name: legal-ai-node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - legal-ai-monitoring
+
+  # DCGM Exporter - NVIDIA GPU metrics
+  dcgm-exporter:
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.1.8-3.1.5-ubuntu20.04
+    container_name: legal-ai-dcgm-exporter
+    restart: unless-stopped
+    ports:
+      - "9400:9400"
+    environment:
+      - DCGM_EXPORTER_LISTEN=:9400
+      - DCGM_EXPORTER_KUBERNETES=false
+    runtime: nvidia
+    cap_add:
+      - SYS_ADMIN
+    networks:
+      - legal-ai-monitoring
+
+  # Postgres Exporter - Database metrics
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.12.0
+    container_name: legal-ai-postgres-exporter
+    restart: unless-stopped
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://legal_admin:123456@host.docker.internal:5433/legal_ai_db?sslmode=disable
+      - PG_EXPORTER_EXTEND_QUERY_PATH=/etc/postgres_exporter/queries.yaml
+    volumes:
+      - ./postgres-exporter/queries.yaml:/etc/postgres_exporter/queries.yaml:ro
+    networks:
+      - legal-ai-monitoring
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Redis Exporter - Cache metrics
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.52.0
+    container_name: legal-ai-redis-exporter
+    restart: unless-stopped
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://host.docker.internal:6379
+      - REDIS_PASSWORD=redis
+    networks:
+      - legal-ai-monitoring
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Blackbox Exporter - Endpoint monitoring
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.24.0
+    container_name: legal-ai-blackbox-exporter
+    restart: unless-stopped
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./blackbox-exporter/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    networks:
+      - legal-ai-monitoring
+
+  # cAdvisor - Container metrics
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: legal-ai-cadvisor
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+    networks:
+      - legal-ai-monitoring
+
+  # Victoria Metrics - Long-term storage
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics:v1.93.0
+    container_name: legal-ai-victoria-metrics
+    restart: unless-stopped
+    ports:
+      - "8428:8428"
+    volumes:
+      - victoria_metrics_data:/victoria-metrics-data
+    command:
+      - '--storageDataPath=/victoria-metrics-data'
+      - '--retentionPeriod=1y'
+      - '--httpListenAddr=:8428'
+      - '--maxConcurrentInserts=16'
+      - '--search.maxQueryDuration=30m'
+    networks:
+      - legal-ai-monitoring
+
+  # Loki - Log aggregation
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: legal-ai-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki:/etc/loki
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - legal-ai-monitoring
+
+  # Promtail - Log collection
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: legal-ai-promtail
+    restart: unless-stopped
+    volumes:
+      - ./promtail:/etc/promtail
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - legal-ai-monitoring
+
+  # Legal AI Metrics Server (Custom)
+  legal-ai-metrics-server:
+    build:
+      context: ../
+      dockerfile: cmd/metrics-server/Dockerfile
+    container_name: legal-ai-metrics-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"  # HTTP metrics endpoint
+      - "9090:9090"  # gRPC service
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - LOG_LEVEL=info
+    networks:
+      - legal-ai-monitoring
+    depends_on:
+      - prometheus
+
+  # Jaeger - Distributed tracing
+  jaeger:
+    image: jaegertracing/all-in-one:1.47
+    container_name: legal-ai-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"  # Web UI
+      - "14268:14268"  # HTTP collector
+      - "6831:6831/udp"  # UDP agent
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - legal-ai-monitoring
+
+  # OTEL Collector - Observability data collection
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.82.0
+    container_name: legal-ai-otel-collector
+    restart: unless-stopped
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8889:8889"   # Prometheus metrics
+    volumes:
+      - ./otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    networks:
+      - legal-ai-monitoring
+    depends_on:
+      - jaeger
+      - prometheus
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+  victoria_metrics_data:
+    driver: local
+  loki_data:
+    driver: local
+
+networks:
+  legal-ai-monitoring:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

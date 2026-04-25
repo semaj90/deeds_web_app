@@ -1,0 +1,77 @@
+{
+  "doc_id": "2c57ed96f50a40de8bc60561f685f2f5",
+  "title": "Sample Doc",
+  "source": "docs",
+  "lang": "en",
+  "fetched_at": "2025-11-06T18:15:27+00:00",
+  "checksum": "830debe9fa7ff971a7540747a6de40fb2a15a7eee899e749c28083f7f7080c55",
+  "chunks": [
+    {
+      "index": 0,
+      "text": "# Phase46 sample doc This page documents handling of TS2322 errors when migrating to SvelteKit 2 and Bits-UI SSR. ## Steps 1. Ensure `npm run dev:quic` is running after Ollama endpoints are configured. 2. Configure Drizzle ORM migrations with Postgres and pgvector. 3. Enable UnoCSS and NES.css for consistent styling. ```ts // Example: src/routes/+page.svelte const value: string = 42; // TS2322 ``` ## Remediation - Cast numeric inputs with `String(value)` before assignment. - Update Svelte 5 components to use typed stores. - Verify Redis + Neo4j health via `/api/system/cluster-status`.",
+      "tokens_estimate": 89,
+      "embedding_key": "embedding:doc:2c57ed96f50a40de8bc60561f685f2f5:chunk:0"
+    }
+  ],
+  "extractions": [
+    {
+      "extraction_class": "error_code",
+      "extraction_text": "TS2322",
+      "char_interval": {
+        "start_pos": 53,
+        "end_pos": 59
+      },
+      "alignment_status": {},
+      "extraction_index": 1,
+      "group_index": 0,
+      "description": null,
+      "attributes": {
+        "offset_start": 0,
+        "offset_end": 6
+      }
+    },
+    {
+      "extraction_class": "file_path",
+      "extraction_text": "src/routes/+page.svelte",
+      "char_interval": {
+        "start_pos": 339,
+        "end_pos": 362
+      },
+      "alignment_status": {},
+      "extraction_index": 2,
+      "group_index": 1,
+      "description": null,
+      "attributes": {
+        "offset_start": 63,
+        "offset_end": 83
+      }
+    },
+    {
+      "extraction_class": "rule",
+      "extraction_text": "Type 'string' is not assignable to type 'string'",
+      "char_interval": null,
+      "alignment_status": null,
+      "extraction_index": 3,
+      "group_index": 2,
+      "description": null,
+      "attributes": {
+        "offset_start": 27,
+        "offset_end": 76
+      }
+    },
+    {
+      "extraction_class": "suggested_fix",
+      "extraction_text": "Ensure variable is declared as string or convert the number to string",
+      "char_interval": null,
+      "alignment_status": null,
+      "extraction_index": 4,
+      "group_index": 3,
+      "description": null,
+      "attributes": {}
+    }
+  ],
+  "metadata": {
+    "adapter": "phase46",
+    "comment": "tensorRT-llm handoff coming later once getOllamaEndpoint() wiring moves to PyTorch/TensorRT runner."
+  }
+}

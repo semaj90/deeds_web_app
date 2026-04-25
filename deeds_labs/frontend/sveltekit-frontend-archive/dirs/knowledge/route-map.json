@@ -1,0 +1,668 @@
+[
+  {
+    "path": "/(app)/active-cases",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/all-routes",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/analysis-center",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/cases",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/create",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/new",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]/ai",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]/board",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]/canvas",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]/chat",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]/evidence/upload",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/cases/[id]/overview",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]/persons",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/cases/[id]/reports",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/command-center",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/dashboard",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/evidence",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte",
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/evidence/analyze",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/evidence/hash",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/evidence/manage",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/evidence/realtime",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/evidence/upload",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/evidence-library",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/global-search",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/gpu-evidence-graph",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/persons-of-interest",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/persons-of-interest/create",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/persons-of-interest/[id]",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/phase78/monitor",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/phase78/patches",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/phase78/routes/[routePath]",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/(app)/system-configuration",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/(app)/terminal",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/.well-known/appspecific/com.chrome.devtools.json",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/acp",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/api/ace/context",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/ace/web/ingest",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/acp/execute",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/acp/tools",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/auth/debug",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/auth/demo-login",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/auth/health",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/auth/login",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/auth/logout",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/auth/register",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/auth/session",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/cases",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/cases/[id]",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/evidence/upload",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health/database",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health/neo4j",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health/ocr",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health/ollama",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health/redis",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health/search",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/health/services",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/indexing",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/ingest",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/knowledge",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/knowledge/document/[id]",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/knowledge/search",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/knowledge/stats",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/knowledge/stream",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/llm-improvement/analyze",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/llm-improvement/escalate",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/llm-improvement/fix",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/llm-improvement/learn",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/llm-improvement/metrics",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/ollama/pull",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/persons",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/reports",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/routes/events",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/routes/[routeId]/health-event",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/routes/[routeId]/interactions",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/sse/chat",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/sse/[id]",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/stream/[chatId]",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/system/env",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/system/health",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/system/phase13",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/system/phase78/apply-patch",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/system/phase78/status",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/api/system/services",
+    "files": [
+      "+server.ts"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/chat",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/chat/[id]",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/indexing",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/knowledge",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/odin",
+    "files": [
+      "+page.server.ts",
+      "+page.svelte"
+    ],
+    "type": "api"
+  },
+  {
+    "path": "/test",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  },
+  {
+    "path": "/test-user-store",
+    "files": [
+      "+page.svelte"
+    ],
+    "type": "page"
+  }
+]

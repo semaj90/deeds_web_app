@@ -1,0 +1,49 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-playwright"],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "true",
+        "PLAYWRIGHT_TIMEOUT": "30000"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "browser_navigate",
+        "browser_screenshot",
+        "browser_click",
+        "browser_type",
+        "browser_get_text"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-filesystem", "C:/Users/james/Videos/deeds-web-app"],
+      "disabled": false,
+      "autoApprove": []
+    },
+    "legal-ai-tools": {
+      "command": "uvx",
+      "args": ["fastmcp", "run", "mcp/legal_ai_mcp_server.py"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "INFO",
+        "MINIO_SIMD_PORT": "8096",
+        "MINIO_SIMD_URL": "http://localhost:8096",
+        "MINIO_ENDPOINT": "localhost:9000",
+        "MINIO_ACCESS_KEY": "minioadmin",
+        "MINIO_SECRET_KEY": "minioadmin",
+        "OLLAMA_HOST": "http://localhost:11434",
+        "QDRANT_HOST": "http://localhost:6333",
+        "NEO4J_URI": "bolt://localhost:7687"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "search_legal_documents",
+        "analyze_evidence",
+        "get_case_status",
+        "get_document_chunks",
+        "get_case_evidence_metadata"
+      ]
+    }
+  }
+}

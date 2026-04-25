@@ -1,0 +1,53 @@
+# Git repositories and submodules
+.git/
+**/.git/
+langextract-go/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+.svelte-kit/
+build/
+dist/
+**/.svelte-kit/
+**/build/
+**/dist/
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+**/*.test.js
+**/*.spec.js
+
+# Archived files
+archived-*/
+**/archived-*/
+
+# Logs
+*.log
+**/*.log
+
+# Cache
+.eslintcache
+**/.eslintcache
+*.cache
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.tmp
+*.temp
+**/*.tmp
+**/*.temp
+
+# Binary files
+*.exe
+*.dll
+*.so
+*.dylib
+go-microservice/**/*.exe

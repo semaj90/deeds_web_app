@@ -1,0 +1,53 @@
+[
+  {
+    "from": "organized-files/svelte-components/+Dropdown.svelte",
+    "to": "sveltekit-frontend/src/lib/components/ui/Dropdown.svelte",
+    "mode": "symlink"
+  },
+  {
+    "from": "organized-files/svelte-components/+Checkbox.svelte",
+    "to": "sveltekit-frontend/src/lib/components/ui/Checkbox.svelte",
+    "mode": "symlink"
+  },
+  {
+    "from": "organized-files/svelte-components/+SearchBar.svelte",
+    "to": "sveltekit-frontend/src/lib/components/ui/SearchBar.svelte",
+    "mode": "symlink"
+  },
+  {
+    "from": "organized-files/svelte-components/sveltekit-frontend_src_lib_components_upload/MinIOUpload.svelte",
+    "to": "sveltekit-frontend/src/lib/components/upload/MinIOUpload.svelte",
+    "mode": "copy"
+  },
+  {
+    "from": "organized-files/typescript-source/sveltekit-frontend_src_lib_ai_cache/multiTierCache.ts",
+    "to": "sveltekit-frontend/src/lib/ai/cache/multiTierCache.ts",
+    "mode": "copy"
+  },
+  {
+    "from": "organized-files/typescript-source/sveltekit-frontend_src_lib_server_db",
+    "to": "sveltekit-frontend/src/lib/server/db",
+    "mode": "copy",
+    "recursive": true
+  },
+  {
+    "from": "organized-files/javascript-modules/sveltekit-frontend",
+    "to": "sveltekit-frontend/src/lib/utils",
+    "mode": "copy",
+    "recursive": true,
+    "filter": "*.mjs"
+  },
+  {
+    "from": "organized-files/backup-files/sveltekit-frontend_src_lib_server_database",
+    "to": "sveltekit-frontend/src/lib/server/database-backup",
+    "mode": "copy",
+    "recursive": true
+  },
+  {
+    "from": "organized-files/svelte-components",
+    "to": "sveltekit-frontend/src/lib/components-backup",
+    "mode": "copy",
+    "recursive": true,
+    "filter": "*.svelte"
+  }
+]

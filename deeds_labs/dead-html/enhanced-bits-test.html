@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced-Bits + NES.css Font Test</title>
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <link rel="stylesheet" href="../node_modules/nes.css/css/nes.min.css" />
+    <style>
+      :root {
+        /* Enhanced-Bits Font System */
+        --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+        --font-legal: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+        --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+        --font-japanese: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+
+        /* Enhanced-Bits Colors */
+        --enhanced-bg-primary: #0a0a0a;
+        --enhanced-bg-secondary: #1a1a1a;
+        --enhanced-bg-tertiary: #2a2a2a;
+        --enhanced-text-primary: #e0e0e0;
+        --enhanced-text-secondary: #b0b0b0;
+        --enhanced-text-muted: #808080;
+        --enhanced-accent: #00ff41;
+        --enhanced-accent-secondary: #3cbcfc;
+        --enhanced-border: #606060;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        background: var(--enhanced-bg-primary);
+        color: var(--enhanced-text-primary);
+        padding: 2rem;
+        line-height: 1.6;
+      }
+
+      .font-test {
+        margin: 1rem 0;
+        padding: 1rem;
+        border: 1px solid var(--enhanced-border);
+        background: var(--enhanced-bg-secondary);
+      }
+
+      .font-sans {
+        font-family: var(--font-sans);
+      }
+      .font-mono {
+        font-family: var(--font-mono);
+      }
+      .font-legal {
+        font-family: var(--font-legal);
+      }
+      .font-pixel {
+        font-family: var(--font-pixel);
+        font-size: 0.8rem;
+      }
+      .font-japanese {
+        font-family: var(--font-japanese);
+      }
+
+      .enhanced-btn {
+        font-family: var(--font-sans);
+        background: var(--enhanced-bg-secondary);
+        color: var(--enhanced-text-primary);
+        border: 2px solid var(--enhanced-border);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.3s ease;
+      }
+
+      .enhanced-btn:hover {
+        border-color: var(--enhanced-accent);
+        color: var(--enhanced-accent);
+      }
+
+      .enhanced-btn-primary {
+        background: linear-gradient(45deg, var(--enhanced-accent), var(--enhanced-accent-secondary));
+        color: var(--enhanced-bg-primary);
+        border-color: var(--enhanced-accent);
+      }
+
+      .enhanced-card {
+        background: var(--enhanced-bg-secondary);
+        border: 1px solid var(--enhanced-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+      }
+
+      .enhanced-input {
+        background: var(--enhanced-bg-tertiary);
+        border: 1px solid var(--enhanced-border);
+        color: var(--enhanced-text-primary);
+        font-family: var(--font-mono);
+        padding: 0.75rem;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .enhanced-input:focus {
+        border-color: var(--enhanced-accent);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.2);
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: var(--enhanced-accent);
+      }
+
+      .status {
+        color: var(--enhanced-accent-secondary);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>✅ Enhanced-Bits + NES.css Integration Test</h1>
+
+    <div class="status">Status: App-wide font system with local loading (no network dependency)</div>
+
+    <h2>Font System Tests</h2>
+
+    <div class="font-test font-sans">
+      <strong>Sans Font (Inter):</strong> This is the main app font using Inter from local files. Professional and readable
+      for legal documents and UI text.
+    </div>
+
+    <div class="font-test font-mono">
+      <strong>Mono Font (JetBrains Mono):</strong> This is for code, timestamps, and technical data. Excellent for legal
+      case numbers and structured data.
+    </div>
+
+    <div class="font-test font-legal">
+      <strong>Legal Font (IBM Plex Sans):</strong> This is optimized for legal document display with excellent readability
+      for long-form text.
+    </div>
+
+    <div class="font-test font-pixel">
+      <strong>Pixel Font (Press Start 2P):</strong> This is for gaming UI elements and retro aesthetic components.
+    </div>
+
+    <div class="font-test font-japanese">
+      <strong>Japanese Font (Noto Sans JP):</strong> これは日本語テキスト用のフォントです。Legal AI platform with international
+      support.
+    </div>
+
+    <h2>Enhanced-Bits Components</h2>
+
+    <div class="enhanced-card">
+      <h3>Enhanced Card Component</h3>
+      <p>This card uses the enhanced-bits design system with proper font loading and NES.css integration.</p>
+
+      <button class="enhanced-btn">Secondary Button</button>
+      <button class="enhanced-btn enhanced-btn-primary">Primary Button</button>
+
+      <div style="margin-top: 1rem;">
+        <input type="text" class="enhanced-input" placeholder="Enhanced input with mono font" />
+      </div>
+    </div>
+
+    <h2>NES.css Integration</h2>
+
+    <div class="nes-container with-title">
+      <p class="title">NES Container</p>
+      <p>This container uses NES.css with enhanced-bits color overrides for consistent theming.</p>
+    </div>
+
+    <div style="margin: 1rem 0;">
+      <button type="button" class="nes-btn">Normal NES Button</button>
+      <button type="button" class="nes-btn is-primary">Primary NES Button</button>
+      <button type="button" class="nes-btn is-success">Success NES Button</button>
+      <button type="button" class="nes-btn is-warning">Warning NES Button</button>
+      <button type="button" class="nes-btn is-error">Error NES Button</button>
+    </div>
+
+    <div class="nes-field" style="margin: 1rem 0;">
+      <label for="nes-input">NES Input:</label>
+      <input type="text" id="nes-input" class="nes-input" placeholder="NES input with enhanced colors" />
+    </div>
+
+    <div class="nes-field">
+      <label for="nes-textarea">NES Textarea:</label>
+      <textarea id="nes-textarea" class="nes-textarea" placeholder="NES textarea with enhanced styling"></textarea>
+    </div>
+
+    <h2>Font Loading Verification</h2>
+    <div class="enhanced-card">
+      <p><strong>Font Loading Status:</strong></p>
+      <ul>
+        <li>✅ Inter: Local font loading (no network dependency)</li>
+        <li>✅ JetBrains Mono: Optimized for code and data</li>
+        <li>✅ IBM Plex Sans: Legal document readability</li>
+        <li>✅ Press Start 2P: Gaming aesthetic</li>
+        <li>✅ Noto Sans JP: International support</li>
+      </ul>
+      <p style="color: var(--enhanced-accent); font-weight: 600;">
+        All fonts load instantly from local files - no Google Fonts timeout issues!
+      </p>
+    </div>
+
+    <script>
+      // Verify font loading
+      document.fonts.ready.then(() => {
+        console.log('✅ Enhanced-Bits font system loaded successfully');
+        console.log(
+          'Available fonts:',
+          Array.from(document.fonts).map(f => f.family)
+        );
+      });
+    </script>
+  </body>
+</html>

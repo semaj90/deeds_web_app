@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/routes/(app)/all-routes/$types.d.ts",
+    "src/routes_parked/api/evidence-canvas/[id]/$types.d.ts",
+    "src/routes_parked/api/v1/rag/cached/$types.d.ts",
+    "src/routes_parked/api/webgpu/topology/$types.d.ts",
+    "src/routes_parked/api/workers/$types.d.ts",
+    "src/routes_parked/yorha/detective/$types.d.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true
+  }
+}

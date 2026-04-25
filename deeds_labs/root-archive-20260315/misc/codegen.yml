@@ -1,0 +1,38 @@
+overwrite: true
+schema: 
+  - "src/lib/graphql/schema.ts"
+  - "http://localhost:5173/api/graphql"
+documents: 
+  - "src/**/*.{ts,tsx,svelte}"
+  - "sveltekit-frontend/src/**/*.{ts,tsx,svelte}"
+  - "!src/lib/graphql/generated/**/*"
+generates:
+  src/lib/graphql/generated/types.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+    config:
+      skipTypename: false
+      withHooks: true
+      withHOC: false
+      withComponent: false
+      scalars:
+        JSON: any
+  
+  sveltekit-frontend/src/lib/graphql/generated/types.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+    config:
+      skipTypename: false
+      withHooks: true
+      scalars:
+        JSON: any
+        
+  src/lib/graphql/generated/schema.json:
+    plugins:
+      - "introspection"
+
+hooks:
+  afterAllFileWrite:
+    - prettier --write

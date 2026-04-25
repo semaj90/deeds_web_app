@@ -1,0 +1,2 @@
+# Start TensorRT-LLM container with GPU support
+docker run -d --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 --name tensorrt-llm-gpu -v ${PWD}:/workspace nvcr.io/nvidia/tensorrt-llm/release:latest sleep infinity
