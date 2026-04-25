@@ -794,5 +794,22 @@ lawpdfs/
 scratch/
 logs/
 tmp/
+uploads/
 
+# Screenshots / test artifacts
+scripts/tests/screenshots/
+scripts/tests/*.png
+sveltekit-frontend/scripts/tests/fixtures/*.wav
+sveltekit-frontend/scripts/tests/fixtures/*.mp3
+
+# JSON dump reports / tsbuildinfo
+sveltekit-frontend/docs_readme/deeds_labs_archive/
+sveltekit-frontend/tsconfig.check.tsbuildinfo
+sveltekit-frontend/tsc_after_fix_docs1.txt
+sveltekit-frontend/svelte-server-errors.json
+
+# Large binary / model data
+sveltekit-frontend/eng.traineddata
+sveltekit-frontend/static/yorha-celestial.png
+*.traineddata
 *.profraw
