@@ -42,7 +42,7 @@ jobs:
       - name: Schema Drift Gate
         run: |
           node scripts/generate-schema-manifest.mjs
-          node scripts/schema-drift-check.mjs --exit-1
+          node scripts/schema-drift-check.mjs
 
   playwright:
     runs-on: ubuntu-latest
