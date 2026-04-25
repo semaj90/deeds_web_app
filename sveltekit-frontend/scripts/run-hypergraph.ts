@@ -229,10 +229,11 @@ async function cpuKmeans(nodes: Node[], k: number): Promise<KMeansResult> {
 
   // Try GPU first via pytorch-graph N-API
   try {
+    // scripts/ is one level below sveltekit-frontend/, addon is at repo root simd-bridge/
     const addonPath = new URL(
-      '../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node',
+      '../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node',
       import.meta.url
-    ).pathname.replace(/^\/([A-Z]:)/, '$1');
+    ).pathname.replace(/^\/([A-Z]:)/i, '$1').replace(/\//g, '\\');
     const { createRequire } = await import('module');
     const req = createRequire(import.meta.url);
     const addon = req(addonPath) as {
@@ -585,30 +586,35 @@ async function syncToNeo4j(nodes: Node[], kmeans: KMeansResult): Promise<void> {
 // ── Qdrant cluster payload update ─────────────────────────────────────────────
 
 async function updateQdrantPayloads(nodes: Node[], kmeans: KMeansResult): Promise<void> {
-  const BATCH = 100;
+  const BATCH = 250;
+  const gridW = Math.ceil(Math.sqrt(kmeans.centroids.length));
   let updated = 0;
   try {
     for (let i = 0; i < nodes.length; i += BATCH) {
       const slice = nodes.slice(i, i + BATCH);
-      await Promise.allSettled(slice.map(async (node, bi) => {
-        const idx = i + bi;
-        const c = kmeans.labels[idx];
-        const gridW = Math.ceil(Math.sqrt(kmeans.centroids.length));
-        const somCluster = (node.somY ?? Math.floor(c / gridW)) * 44 + (node.somX ?? (c % gridW));
-        const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/${node.id}/payload`, {
+      // Group by cluster so each batch call sets one payload for multiple points
+      const byCluster = new Map<number, { ids: (string | number)[]; somX: number; somY: number }>();
+      slice.forEach((node, bi) => {
+        const c = kmeans.labels[i + bi];
+        const sx = node.somX ?? (c % gridW);
+        const sy = node.somY ?? Math.floor(c / gridW);
+        if (!byCluster.has(c)) byCluster.set(c, { ids: [], somX: sx, somY: sy });
+        const numId = parseInt(node.id, 10);
+        byCluster.get(c)!.ids.push(isNaN(numId) ? node.id : numId);
+      });
+
+      await Promise.allSettled([...byCluster.entries()].map(async ([c, { ids, somX, somY }]) => {
+        const somCluster = somY * 44 + somX;
+        const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/payload`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
-            payload: {
-              gpu_cluster:  c,
-              som_cluster:  somCluster,
-              som_bmu_col:  node.somX ?? (c % gridW),
-              som_bmu_row:  node.somY ?? Math.floor(c / gridW),
-            },
+            payload: { gpu_cluster: c, som_cluster: somCluster, som_bmu_col: somX, som_bmu_row: somY },
+            points:  ids,
           }),
-          signal: AbortSignal.timeout(5_000),
+          signal: AbortSignal.timeout(10_000),
         }).catch(() => null);
-        if (res?.ok) updated++;
+        if (res?.ok) updated += ids.length;
       }));
     }
     console.log(`[hg→qdrant] Updated ${updated}/${nodes.length} cluster payloads.`);
