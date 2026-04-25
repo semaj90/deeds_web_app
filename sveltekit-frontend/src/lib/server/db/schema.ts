@@ -101,6 +101,9 @@ export {
 	type CaseLibraryLink, type NewCaseLibraryLink
 } from './schema/case-library-links';
 
+// Case ↔ person junction (persons_of_interest canonical def is in schema-postgres.ts)
+export { casePersons } from './schema/persons';
+
 // Drizzle relations for all legal corpus tables
 export {
 	jurisdictionsRelations, libraryDocumentsRelations,

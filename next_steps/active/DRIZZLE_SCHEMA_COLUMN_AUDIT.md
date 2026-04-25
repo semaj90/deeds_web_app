@@ -412,3 +412,116 @@ sed -n '266,320p' sveltekit-frontend/src/lib/server/db/schema-postgres.ts   # ev
 - `drizzle-schema-reference.md` — unchanged
 - `schema-postgres.ts` / `schema-chat.ts` — unchanged
 - `DRIZZLE_SCHEMA_DRIFT_AUDIT.md` — unchanged
+
+---
+
+## Codebase Indexing Deep Audit (2026-04-24)
+
+**Method**: Grep `src/routes/` and `src/lib/server/` for all 48 wrong column names from the 35 critical-drift tables. Verified against manifest (`SCHEMA_MANIFEST.json`) and `drizzle.config.ts` migration set.
+
+### Finding 1 — RUNTIME BREAK: `schema/persons.ts` is out-of-migration-set
+
+**File**: `src/routes/api/cases/[id]/persons/+server.ts:8`
+```typescript
+import { personsOfInterest, casePersons } from '$lib/server/db/schema/persons';
+```
+
+**Problem**: `schema/persons.ts` defines a **simpler, older** `persons_of_interest` table (`fullName`, `role`, `riskLevel`, `dob`, `lastKnownLocation`) and a `case_persons` junction table. Neither is exported from `schema.ts` — the barrel that `drizzle.config.ts` uses as its single schema source. Drizzle migrations have never created these two tables.
+
+The canonical `personsOfInterest` in `schema-postgres.ts` has entirely different columns (`name`, `threatLevel`, `aiProfile`, `who/what/why/how`, etc.) and is the table that actually exists in Postgres.
+
+**Runtime impact**: Every GET/POST/DELETE call to `/api/cases/[id]/persons` queries a table shape (`full_name`, `role`, `risk_level`, `dob`) that doesn't exist in Postgres. The query either fails with `column does not exist` or silently returns empty rows if `case_persons` was never created.
+
+**Fix**: Change import to `schema-postgres.ts`. The junction is `poiRelationships` (not `casePersons`) for the AI-augmented POI system, or create a proper migration to add `case_persons` if that simpler pattern is intentional.
+
+---
+
+### Finding 2 — SAFE: `sourceId`/`targetId` are NOT Drizzle table references
+
+All 15+ hits for `.sourceId` and `.targetId` in routes and server libs are on **plain JS objects / Qdrant payload fields / gRPC response objects** — not Drizzle column accessors on `evidenceRelationships` or `evidenceBoardConnections`. The column rename (`sourceId` → `fromEvidenceId`) has NOT leaked into live Drizzle queries. Zero Drizzle `.sourceId` column accesses found.
+
+**Confirmed files**: `sse/chat/+server.ts`, `synthesis/generate/+server.ts`, `cartridge/glyph-mappers.ts`, `grpc/retrieval-client.ts` — all reference `sourceId` on Qdrant/gRPC result objects, not on Drizzle schema tables.
+
+---
+
+### Finding 3 — SAFE: pgvector column names (Groups 2, 3) — zero live breakage
+
+Grep for all 10 wrong pgvector/citation/statute column names returned **zero hits** in routes and server libs:
+- `evidenceVectors.embedding` → 0 hits (correct `.vector` used)
+- `legalDocuments.embedding` → 0 hits (correct `.contentEmbedding` used)
+- `statutes.embedding` → 0 hits (no code attempts ANN on statutes directly)
+- `documentChunks.embedding` → 0 hits (removed column not accessed)
+- `embeddingCache.contentHash` → 0 hits
+- `citations.citation/.court/.year/.summary` → 0 hits
+- `statutes.code/.fullText` → 0 hits
+
+**Conclusion**: These drift issues exist in the reference doc but are not causing live failures — the code was updated when the columns were renamed/removed, only the doc lagged.
+
+---
+
+### Finding 4 — SAFE: Canvas, error-brain, workspace, hash columns — zero live breakage
+
+All Groups 4, 6, 7, 8, 9 wrong column names returned **zero hits** in `src/routes/` and `src/lib/server/`. The features (canvas autosaves, error suggestions state machine, workspace sessions, hash verifications) either:
+- Use the correct renamed column names already, OR
+- Are not yet called from any live route (dormant/not-yet-wired)
+
+---
+
+### Finding 5 — SCHEMA DIVERGENCE: `schema/persons.ts` defines a parallel DB table
+
+`schema/persons.ts` (`personsOfInterest` + `casePersons`) creates a **second, different definition** of `persons_of_interest` in Drizzle's type system. Because `schema.ts` doesn't re-export it, it was never migrated. The manifest classifies it `"status": "active", "imported by runtime"` — meaning the route uses it but the migration has never run.
+
+This is the **single highest-priority fix** from the entire drift audit.
+
+---
+
+### Finding 6 — INFORMATIONAL: `evidence.type` vs `evidence.evidenceType`
+
+6 routes access `evidence.type` (the `varchar(100)` column). The audit notes that `evidenceType` (the enum column) is the semantically correct column for typed filtering. Both exist in the real schema — this is a code quality issue, not a runtime break. Routes should prefer `evidenceType` when filtering by category.
+
+Affected routes:
+- `src/routes/api/evidence/[id]/suggest-summary/+server.ts:25`
+- `src/routes/api/evidence/[id]/key-points/+server.ts:77`
+- `src/routes/api/cases/[id]/evidence/+server.ts:40`
+- `src/routes/api/cases/[id]/key-points/+server.ts:45`
+- `src/routes/api/evidence/+server.ts:39, 59`
+- `src/routes/api/search/+server.ts:305`
+
+---
+
+### Codebase Audit Summary
+
+| Finding | Severity | Files Affected | Action |
+|---------|----------|----------------|--------|
+| `schema/persons.ts` not in migration set — route queries non-existent table shape | **RUNTIME BREAK** | `api/cases/[id]/persons/+server.ts` | Fix import + column refs |
+| `sourceId`/`targetId` on Qdrant/gRPC objects (not Drizzle columns) | SAFE | 6 files | No action |
+| pgvector/citation/statute column renames (Groups 2, 3) | SAFE | 0 live hits | Doc only |
+| Canvas/error-brain/workspace/hash column renames (Groups 4-9) | SAFE | 0 live hits | Doc only |
+| `evidence.type` used where `evidence.evidenceType` (enum) intended | LOW | 6 routes | Review + update |
+
+**35 documented drift issues → only 1 is causing a live runtime problem.** The rest are documentation-only drift or safe patterns.
+
+---
+
+### Recommended fix for Finding 1
+
+`src/routes/api/cases/[id]/persons/+server.ts` — change import and column references:
+
+```typescript
+// BEFORE (broken — uses schema/persons.ts which is not migrated)
+import { personsOfInterest, casePersons } from '$lib/server/db/schema/persons';
+// ...
+fullName: personsOfInterest.fullName,
+role: personsOfInterest.role,
+riskLevel: personsOfInterest.riskLevel,
+
+// AFTER (correct — uses schema-postgres.ts canonical table)
+import { personsOfInterest, poiRelationships } from '$lib/server/db/schema-postgres.js';
+// ...
+name: personsOfInterest.name,
+threatLevel: personsOfInterest.threatLevel,
+// Remove: fullName, role, riskLevel, dob, lastKnownLocation (don't exist)
+// Use poiRelationships instead of casePersons junction if linking POI to cases
+```
+
+Also add `schema/persons.ts` to the `Legacy / Dead Candidates` section of the drizzle-schema-reference.md manifest regeneration config — it is an orphaned schema file with a stale table definition.

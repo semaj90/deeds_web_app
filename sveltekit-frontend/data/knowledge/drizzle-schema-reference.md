@@ -1,330 +1,554 @@
-# Drizzle ORM 0.44 Schema Reference
+# Drizzle Schema Reference
 
-## Last Updated: February 16, 2026
+Generated from next_steps/active/SCHEMA_MANIFEST.json on 2026-04-25T01:27:32.612Z.
 
----
+> This file is generated. Current schema code is the authority; prose summaries are stale if they diverge from the manifest.
 
-## Schema Files
+## Current Totals
 
-**Main schema**: `src/lib/server/db/schema-postgres.ts` (canonical, 70+ tables)
-**Schema barrel**: `src/lib/server/db/schema/index.ts` (re-exports from sub-schemas)
-**Chat schema**: `src/lib/server/db/schema-chat.ts` (chatMessages, chatMetadata)
-**JSONB schema**: `src/lib/server/db/jsonb-legal-schema.ts` (JSONB-optimized variants)
-**Charges schema**: `src/lib/server/db/schema-charges.ts` (charges, caseTimeline)
-**GPU cache schema**: `src/lib/server/db/schema-gpu-cache.ts` (shader cache)
-**Enhanced embedding**: `src/lib/server/db/enhanced-embedding-schema.ts`
+| Metric | Count |
+| --- | --- |
+| table declarations | 302 |
+| enum declarations | 49 |
+| unique table names | 252 |
+| unique enum names | 37 |
+| active unique table names | 182 |
+| active unique enum names | 25 |
+| root schema files | 31 |
 
-### Schema Subdirectory (`schema/`)
-```
-citations.ts, evidence.ts, legal-cases.ts, persons.ts, reports.ts,
-ai_chat.ts, error_clusters.ts, error_events.ts, error_feedback.ts,
-error_suggestions.ts, error_timeline.ts, route_error_patches.ts,
-route_health.ts, route_metadata.ts, error_brain_analysis.ts,
-errorBrainDiffs.ts, ace-web-crawl.ts, gpu-cache-schema.ts,
-legal-index.ts, legal-laws.ts, poi.ts, precedent-graph.ts,
-user-management.ts, userIntent.ts, cases.ts
-```
+## Feature Buckets
 
----
+| Bucket | Tables | Enums |
+| --- | --- | --- |
+| legal corpus | 34 | 5 |
+| courtroom / simulation | 23 | 3 |
+| audio | 2 | 0 |
+| research / synthesis | 7 | 1 |
+| AST intelligence | 20 | 1 |
+| context engine | 23 | 0 |
+| chat | 17 | 1 |
+| analytics | 28 | 5 |
+| infra/runtime | 99 | 21 |
 
-## Enums (14 pgEnum types)
+## Active Schema Files
 
-```typescript
-import { pgEnum } from 'drizzle-orm/pg-core';
+| File | Owner | Tables | Enums |
+| --- | --- | --- | --- |
+| sveltekit-frontend/src/lib/db/schema/ace-web.ts | context engine | 5 | 0 |
+| sveltekit-frontend/src/lib/server/db/client.ts | core runtime db | 0 | 0 |
+| sveltekit-frontend/src/lib/server/db/index.ts | core runtime db | 0 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts | courtroom / simulation | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema-canvas.ts | AST intelligence | 2 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema-charges.ts | courtroom / simulation | 2 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema-chat.ts | chat | 2 | 1 |
+| sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | analytics | 4 | 3 |
+| sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | legacy compatibility layer | 30 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema-postgres.ts | canonical postgres schema | 139 | 33 |
+| sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts | courtroom / simulation | 5 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema-unified.ts | core runtime db | 0 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema-web.ts | core runtime db | 2 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema.ts | schema compatibility barrel | 0 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts | context engine | 3 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts | chat | 3 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/analytics.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/case-library-links.ts | core runtime db | 1 | 1 |
+| sveltekit-frontend/src/lib/server/db/schema/citations.ts | legal corpus | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/codebase-intelligence.ts | AST intelligence | 2 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/error_brain_analysis.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/error_clusters.ts | AST intelligence | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/error_events.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/error_feedback.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/error_suggestions.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/error_timeline.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/errorBrainDiffs.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/evidence.ts | core runtime db | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/index.ts | domain schema barrel | 0 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/ingestion-jobs.ts | core runtime db | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/jurisdictions.ts | legal corpus | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts | legal corpus | 3 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/legal-chunks.ts | legal corpus | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/legal-citations.ts | legal corpus | 1 | 1 |
+| sveltekit-frontend/src/lib/server/db/schema/legal-definitions.ts | legal corpus | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/legal-nodes.ts | legal corpus | 1 | 1 |
+| sveltekit-frontend/src/lib/server/db/schema/legal-relations.ts | core runtime db | 0 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/library-document-versions.ts | legal corpus | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/library-documents.ts | core runtime db | 1 | 3 |
+| sveltekit-frontend/src/lib/server/db/schema/page-artifacts.ts | legal corpus | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/persons.ts | courtroom / simulation | 2 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/reports.ts | AST intelligence | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/route_error_patches.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/route_health.ts | analytics | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/route_metadata.ts | core runtime db | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | analytics | 10 | 0 |
+| sveltekit-frontend/src/lib/server/db/schema/state-constitution-sources.ts | core runtime db | 1 | 0 |
+| sveltekit-frontend/src/lib/server/db/unified-client.ts | core runtime db | 0 | 0 |
+| sveltekit-frontend/src/lib/server/db/warden-schema.ts | core runtime db | 12 | 0 |
 
-userRoleEnum        // 'prosecutor' | 'detective' | 'admin' | 'analyst' | 'paralegal'
-caseStatusEnum      // 'open' | 'in_progress' | 'pending_review' | 'closed' | 'archived'
-casePriorityEnum    // 'low' | 'medium' | 'high' | 'critical' | 'urgent'
-evidenceTypeEnum    // 'document' | 'photo' | 'video' | 'audio' | 'physical' | 'digital' | 'witness_statement' | 'forensic'
-relationTypeEnum    // 'supports' | 'contradicts' | 'same_person' | 'timeline' | 'chain_of_custody' | ... (18 values)
-threatLevelEnum     // 'low' | 'medium' | 'high' | 'critical'
-patchStatusEnum     // 'suggested' | 'applied' | 'rejected'
-documentStatusEnum  // 'queued' | 'processing' | 'completed' | 'failed'
-documentTypeEnum    // 'pleading' | 'motion' | 'brief' | 'contract' | 'evidence' | 'correspondence' | 'court_order' | 'transcript' | 'affidavit' | 'other'
-summaryTypeEnum     // 'brief' | 'detailed' | 'executive' | 'technical'
-activityStatusEnum  // 'pending' | 'in_progress' | 'completed' | 'cancelled'
-verificationStatusEnum // 'pending' | 'verified' | 'failed' | 'rejected'
-reportStatusEnum    // 'draft' | 'pending' | 'completed' | 'published'
-caseRiskLevelEnum   // 'low' | 'medium' | 'high' | 'critical'
-```
+## Legacy / Dead Candidates
 
----
+| File | Classification | Runtime imported? | Notes |
+| --- | --- | --- | --- |
+| sveltekit-frontend/src/lib/server/db/additional-tables.ts | legacy duplicate | no | duplicate definitions: case_embeddings, document_chunks, embedding_cache, evidence_vectors, legal_precedents, rag_messages, rag_sessions, user_ai_queries |
+| sveltekit-frontend/src/lib/server/db/cases.ts | dead candidate | no | no external importers found |
+| sveltekit-frontend/src/lib/server/db/enhanced-legal-schema.ts | imported only by tests/scripts | tests/scripts only | ts-nocheck compatibility layer, family peers: sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts, sveltekit-frontend/src/lib/server/db/legal-schema.ts, sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts, sveltekit-frontend/src/lib/server/db/schema/legal-chunks.ts, sveltekit-frontend/src/lib/server/db/schema/legal-citations.ts, sveltekit-frontend/src/lib/server/db/schema/legal-definitions.ts, sveltekit-frontend/src/lib/server/db/schema/legal-nodes.ts, sveltekit-frontend/src/lib/server/db/schema/legal-relations.ts |
+| sveltekit-frontend/src/lib/server/db/legal-schema.ts | dead candidate | no | family peers: sveltekit-frontend/src/lib/server/db/enhanced-legal-schema.ts, sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts, sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts, sveltekit-frontend/src/lib/server/db/schema/legal-chunks.ts, sveltekit-frontend/src/lib/server/db/schema/legal-citations.ts, sveltekit-frontend/src/lib/server/db/schema/legal-definitions.ts, sveltekit-frontend/src/lib/server/db/schema/legal-nodes.ts, sveltekit-frontend/src/lib/server/db/schema/legal-relations.ts |
+| sveltekit-frontend/src/lib/server/db/lucia-schema.ts | imported only by tests/scripts | tests/scripts only | duplicate definitions: sessions, users |
+| sveltekit-frontend/src/lib/server/db/schema-actual.ts | legacy duplicate | no | family peers: sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts, duplicate definitions: cases, documents, evidence, users |
+| sveltekit-frontend/src/lib/server/db/schema-enhanced.ts | legacy duplicate | no | ts-nocheck compatibility layer, family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts | dead candidate | no | placeholder or compatibility module, family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | imported only by tests/scripts | tests/scripts only | family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts, duplicate definitions: document_chunks, document_summaries, processing_status |
+| sveltekit-frontend/src/lib/server/db/schema-old.ts | legacy duplicate | no | re-export wrapper, ts-nocheck compatibility layer, placeholder or compatibility module, family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts | dead candidate | no | family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-phase78.ts | imported only by tests/scripts | tests/scripts only | family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts, duplicate definitions: error_clusters, error_events, error_kind, error_severity, error_suggestion_states, error_suggestions, route_health, route_health_state, suggestion_state |
+| sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts | imported only by tests/scripts | tests/scripts only | re-export wrapper, family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-sqlite.ts | legacy duplicate | no | ts-nocheck compatibility layer, family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-test-rag.ts | imported only by tests/scripts | tests/scripts only | family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-timeline.ts | unknown owner | no | family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts | legacy duplicate | no | family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts | legacy duplicate | no | placeholder or compatibility module, family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema.ts |
+| sveltekit-frontend/src/lib/server/db/unified-schema.ts | imported only by tests/scripts | tests/scripts only | ts-nocheck compatibility layer, family peers: sveltekit-frontend/src/lib/server/db/schema-actual.ts, sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts, sveltekit-frontend/src/lib/server/db/schema-canvas.ts, sveltekit-frontend/src/lib/server/db/schema-charges.ts, sveltekit-frontend/src/lib/server/db/schema-chat.ts, sveltekit-frontend/src/lib/server/db/schema-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts, sveltekit-frontend/src/lib/server/db/schema-gpu-metrics.ts, sveltekit-frontend/src/lib/server/db/schema-ingestion.ts, sveltekit-frontend/src/lib/server/db/schema-old.ts, sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts, sveltekit-frontend/src/lib/server/db/schema-phase78.ts, sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts, sveltekit-frontend/src/lib/server/db/schema-postgres-enhanced.ts, sveltekit-frontend/src/lib/server/db/schema-postgres.ts, sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts, sveltekit-frontend/src/lib/server/db/schema-sqlite.ts, sveltekit-frontend/src/lib/server/db/schema-test-rag.ts, sveltekit-frontend/src/lib/server/db/schema-timeline.ts, sveltekit-frontend/src/lib/server/db/schema-unified.ts, sveltekit-frontend/src/lib/server/db/schema-web.ts, sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts, sveltekit-frontend/src/lib/server/db/schema.ts, sveltekit-frontend/src/lib/server/db/unified-schema-clean.ts |
+| sveltekit-frontend/src/lib/server/db/vector-schema.ts | legacy duplicate | no | duplicate definitions: document_embeddings |
 
-## Core Tables (schema-postgres.ts)
+## Tables By Feature
 
-### Auth & Users
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `users` | `users` | id (uuid), email, passwordHash, firstName, lastName, role (userRoleEnum), isActive |
-| `sessions` | `sessions` | id (text PK), userId → users, expiresAt |
-| `emailVerificationCodes` | `email_verification_codes` | userId → users, code, expiresAt |
-| `passwordResetTokens` | `password_reset_tokens` | tokenHash (PK), userId → users |
+### legal corpus Tables
 
-### Case Management
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `cases` | `cases` | id (uuid), title, caseNumber, status (caseStatusEnum), priority (casePriorityEnum), jurisdiction, court, clientName, opposingParty, metadata (jsonb) |
-| `caseActivities` | `case_activities` | caseId → cases, type, description, status (activityStatusEnum) |
-| `caseNotes` | `case_notes` | caseId → cases, userId → users, title, content (text), metadata (jsonb) |
-| `caseStatuteLinks` | `case_statute_links` | caseId → cases, statuteId → statutes (junction table) |
-| `caseScores` | `case_scores` | caseId → cases, score (real), category |
-| `caseReports` | `case_reports` | caseId → cases, title, content, status |
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| canonical_chunks | canonicalChunks | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| canonical_documents | canonicalDocuments | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_chunks | caseChunks | sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts | active |
+| case_library_links | caseLibraryLinks | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| case_library_links | caseLibraryLinks | sveltekit-frontend/src/lib/server/db/schema/case-library-links.ts | duplicate candidate |
+| case_statute_links | caseStatuteLinks | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| cases | cases | sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts | duplicate candidate |
+| cases_jsonb | casesJsonb | sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts | legacy |
+| citation_collections | citationCollections | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| citation_tags | citationTags | sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | duplicate candidate |
+| citation_tags | citationTags | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| citations | citations | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| collection_citations | collectionCitations | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| crimes | crimes | sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts | active |
+| document_relationships_jsonb | documentRelationshipsJsonb | sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts | legacy |
+| evidence_jsonb | evidenceJsonb | sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts | legacy |
+| jurisdictions | jurisdictions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| jurisdictions | jurisdictions | sveltekit-frontend/src/lib/server/db/schema/jurisdictions.ts | duplicate candidate |
+| legal_analysis_sessions | legalAnalysisSessions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| legal_chunks | legalChunks | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| legal_chunks | legalChunks | sveltekit-frontend/src/lib/server/db/schema/legal-chunks.ts | duplicate candidate |
+| legal_citations | legalCitations | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| legal_citations | legalCitations | sveltekit-frontend/src/lib/server/db/schema/legal-citations.ts | duplicate candidate |
+| legal_definitions | legalDefinitions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| legal_definitions | legalDefinitions | sveltekit-frontend/src/lib/server/db/schema/legal-definitions.ts | duplicate candidate |
+| legal_documents | legalDocuments | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| legal_documents_jsonb | legalDocumentsJsonb | sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts | legacy |
+| legal_glossary | legalGlossary | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| legal_nodes | legalNodes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| legal_nodes | legalNodes | sveltekit-frontend/src/lib/server/db/schema/legal-nodes.ts | duplicate candidate |
+| legal_precedents | legalPrecedents | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| legal_precedents | legalPrecedents | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| legal_terms | legalTerms | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| library_document_versions | libraryDocumentVersions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| library_document_versions | libraryDocumentVersions | sveltekit-frontend/src/lib/server/db/schema/library-document-versions.ts | duplicate candidate |
+| library_documents | libraryDocuments | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| library_documents | libraryDocuments | sveltekit-frontend/src/lib/server/db/schema/library-documents.ts | duplicate candidate |
+| page_artifacts | pageArtifacts | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| page_artifacts | pageArtifacts | sveltekit-frontend/src/lib/server/db/schema/page-artifacts.ts | duplicate candidate |
+| saved_citations | savedCitations | sveltekit-frontend/src/lib/server/db/schema/citations.ts | active |
+| statute_chunks | statuteChunks | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| statutes | statutes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| term_examples | termExamples | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| warden_citation_graph | wardenCitationGraph | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_citations | wardenCitations | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
 
-### Criminal Records
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `criminals` | `criminals` | id (uuid), firstName, lastName, dateOfBirth, nationalId, threatLevel (threatLevelEnum), caseId → cases |
+### courtroom / simulation Tables
 
-### Evidence
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `evidence` | `evidence` | id (uuid), title, description, type (evidenceTypeEnum), filePath, fileHash, fileSize, mimeType, caseId → cases, userId → users |
-| `evidenceRelationships` | `evidence_relationships` | sourceId → evidence, targetId → evidence, relationType (relationTypeEnum), confidence (real) |
-| `evidenceBoardConnections` | `evidence_board_connections` | sourceId → evidence, targetId → evidence, connectionType, label |
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| canvas_annotations | canvasAnnotations | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| canvas_autosaves | canvasAutosaves | sveltekit-frontend/src/lib/server/db/schema-canvas-autosaves.ts | duplicate candidate |
+| canvas_autosaves | canvasAutosaves | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| canvas_states | canvasStates | sveltekit-frontend/src/lib/server/db/schema-canvas.ts | duplicate candidate |
+| canvas_states | canvasStates | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| case_timeline | caseTimeline | sveltekit-frontend/src/lib/server/db/schema-charges.ts | active |
+| charges | charges | sveltekit-frontend/src/lib/server/db/schema-charges.ts | active |
+| courtroom_animations | courtroomAnimations | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| courtroom_keyframes | courtroomKeyframes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| courtroom_models | courtroomModels | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| fictional_case_actors | fictionalCaseActors | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| fictional_case_charges | fictionalCaseCharges | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| fictional_case_events | fictionalCaseEvents | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| fictional_cases | fictionalCases | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| persons_of_interest | personsOfInterest | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| persons_of_interest | personsOfInterest | sveltekit-frontend/src/lib/server/db/schema/persons.ts | duplicate candidate |
+| poi_photos | poiPhotos | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| poi_relationships | poiRelationships | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| prosecutor_case_persons | prosecutorCasePersons | sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts | active |
+| prosecutor_cases | prosecutorCases | sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts | active |
+| prosecutor_evidence | prosecutorEvidence | sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts | active |
+| prosecutor_persons | prosecutorPersons | sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts | active |
+| timeline_events | timelineEvents | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| yorha_cases | yorhaCases | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| yorha_evidence_connections | yorhaEvidenceConnections | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| yorha_evidence_nodes | yorhaEvidenceNodes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-### Documents & Legal
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `documents` | `documents` | id (uuid), title, content, filePath, type (documentTypeEnum), status (documentStatusEnum), caseId → cases |
-| `legalDocuments` | `legal_documents` | id (uuid), title, content, embedding (vector 768), metadata (jsonb), documentType, jurisdiction |
-| `citations` | `citations` | id (uuid), title, citation, court, year, summary, caseId → cases |
-| `statutes` | `statutes` | id (uuid), title, code, section, jurisdiction, fullText, embedding (vector 768) |
-| `statuteChunks` | `statute_chunks` | statuteId → statutes, chunkIndex, content, embedding (vector 768) |
-| `legalPrecedents` | `legal_precedents` | title, citation, jurisdiction, relevanceScore, caseId → cases |
-| `legalAnalysisSessions` | `legal_analysis_sessions` | caseId → cases, userId → users, analysisType, results (jsonb) |
-| `legalResearch` | `legal_research` | caseId → cases, query, results (jsonb), sources (jsonb) |
+### audio Tables
 
-### Document Processing
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `documentProcessing` | `document_processing` | documentId → documents, status (documentStatusEnum), ocrText, aiSummary, extractedEntities (jsonb) |
-| `documentChunks` | `document_chunks` | documentId → documents, chunkIndex, content, embedding (vector 768) |
-| `documentSummaries` | `document_summaries` | documentId → documents, summaryType (summaryTypeEnum), summary |
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| audio_transcripts | audioTranscripts | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| whisper_segments | whisperSegments | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-### Embeddings & Vectors
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `contentEmbeddings` | `content_embeddings` | contentId, contentType, embedding (vector 768), model |
-| `userEmbeddings` | `user_embeddings` | userId → users, embedding (vector 768), model |
-| `chatEmbeddings` | `chat_embeddings` | chatId, embedding (vector 768), model |
-| `evidenceVectors` | `evidence_vectors` | evidenceId → evidence, embedding (vector 768), model |
-| `caseEmbeddings` | `case_embeddings` | caseId → cases, embedding (vector 768), model |
-| `embeddingCache` | `embedding_cache` | contentHash, embedding (vector 768), model |
-| `vectorMetadata` | `vector_metadata` | id (uuid), collection, documentId, metadata (jsonb) |
-| `vectorOutbox` | `vector_outbox` | id (uuid), tableName, recordId, operation, processedAt |
-| `vectorJobs` | `vector_jobs` | id (uuid), jobType, status, payload (jsonb) |
+### research / synthesis Tables
 
-### RAG & Chat
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `ragSessions` | `rag_sessions` | id (uuid), userId → users, title, metadata (jsonb) |
-| `ragMessages` | `rag_messages` | sessionId → ragSessions, role, content, sources (jsonb) |
-| `chatMessages` | `chat_messages` | id (uuid), sessionId, role, content, metadata (jsonb) |
-| `chatMetadata` | `chat_metadata` | sessionId, model, totalTokens |
-| `userAiQueries` | `user_ai_queries` | userId → users, query, response, model, tokensUsed |
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| knowledge_artifacts | knowledgeArtifacts | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| legal_research | legalResearch | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| qlora_examples | qloraExamples | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| research_summaries | researchSummaries | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| synthesis_runs | synthesisRuns | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| user_research_tasks | userResearchTasks | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| web_search_index | webSearchIndex | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-### Persons of Interest
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `personsOfInterest` | `persons` | id (uuid), firstName, lastName, role, organization, riskLevel, notes, metadata (jsonb), caseId → cases |
-| `poiPhotos` | `poi_photos` | personId → persons, url, caption, isPrimary |
+### AST intelligence Tables
 
-### Storage & Files
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `storageFiles` | `storage_files` | id (uuid), filename, mimeType, size (bigint), bucket, key, caseId → cases |
-| `hashVerifications` | `hash_verifications` | fileId → storageFiles, algorithm, hash, isValid |
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| ai_reports | aiReports | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ast_edges | astEdges | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ast_file_features | astFileFeatures | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ast_nodes | astNodes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_reports | caseReports | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| cluster_narratives | clusterNarratives | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| cluster_summaries | clusterSummaries | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| cluster_summaries | clusterSummaries | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | duplicate candidate |
+| code_repos | codeRepos | sveltekit-frontend/src/lib/server/db/schema/codebase-intelligence.ts | active |
+| codebase_audit_reports | codebaseAuditReports | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| codebase_chunk_index | codebaseChunkIndex | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| codebase_chunk_index | codebaseChunkIndex | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | duplicate candidate |
+| enrichment_jobs | enrichmentJobs | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| enrichment_jobs | enrichmentJobs | sveltekit-frontend/src/lib/server/db/schema/codebase-intelligence.ts | duplicate candidate |
+| error_cluster | errorClusterTable | sveltekit-frontend/src/lib/server/db/schema/error_clusters.ts | active |
+| error_clusters | errorClusters | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| error_clusters | errorClusters | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| phase89_ast_signatures | phase89AstSignatures | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_error_clusters | phase89ErrorClusters | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| prosecutor_reports | prosecutorReports | sveltekit-frontend/src/lib/server/db/schema-prosecutor.ts | active |
+| report_audit_log | reportAuditLog | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| report_versions | reportVersions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| reports | reports | sveltekit-frontend/src/lib/server/db/schema-canvas.ts | duplicate candidate |
+| reports | reports | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| reports | reports | sveltekit-frontend/src/lib/server/db/schema/reports.ts | duplicate candidate |
+| saved_reports | savedReports | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-### Workspaces
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `workspaces` | `workspaces` | id (uuid), name, caseId → cases, userId → users, settings (jsonb) |
-| `workspaceSessions` | `workspace_sessions` | workspaceId → workspaces, userId → users, isActive |
-| `workspaceEvidence` | `workspace_evidence` | workspaceId → workspaces, evidenceId → evidence |
-| `workspaceStatutes` | `workspace_statutes` | workspaceId → workspaces, statuteId → statutes |
-| `workspaceNotes` | `workspace_notes` | workspaceId → workspaces, content, metadata (jsonb) |
-| `workspaceCitations` | `workspace_citations` | workspaceId → workspaces, citationId → citations |
+### context engine Tables
 
-### YoRHa Theme
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `yorhaCases` | `yorha_cases` | id (uuid), title, status, metadata (jsonb) |
-| `yorhaEvidenceNodes` | `yorha_evidence_nodes` | caseId → yorhaCases, label, type, position (jsonb) |
-| `yorhaEvidenceConnections` | `yorha_evidence_connections` | sourceId → yorhaEvidenceNodes, targetId → yorhaEvidenceNodes |
-| `yorhaChatSessions` | `yorha_chat_sessions` | caseId → yorhaCases, userId, title |
-| `yorhaChatMessages` | `yorha_chat_messages` | sessionId → yorhaChatSessions, role, content |
-| `yorhaSystemMetrics` | `yorha_system_metrics` | metricType, value (real), metadata (jsonb) |
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| ace_chunks | aceChunks | sveltekit-frontend/src/lib/db/schema/ace-web.ts | active |
+| ace_context_cache | aceContextCache | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ace_docs | aceDocs | sveltekit-frontend/src/lib/db/schema/ace-web.ts | active |
+| ace_edges | aceEdges | sveltekit-frontend/src/lib/db/schema/ace-web.ts | active |
+| ace_entities | aceEntities | sveltekit-frontend/src/lib/db/schema/ace-web.ts | active |
+| ace_error_embeddings | aceErrorEmbeddings | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| ace_sources | aceSources | sveltekit-frontend/src/lib/db/schema/ace-web.ts | active |
+| agent_sessions | agentSessions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ai_chat_sessions | aiChatSessions | sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts | active |
+| context_buffers | contextBuffers | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| context_timeline | contextTimeline | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| glyph_records | glyphRecords | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| model_registry | modelRegistry | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| route_context_cache | routeContextCache | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | migration-only |
+| service_capabilities | serviceCapabilities | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| user_analytics | userAnalytics | sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts | active |
+| web_crawl_jobs | webCrawlJobs | sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts | active |
+| workspace_citations | workspaceCitations | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| workspace_evidence | workspaceEvidence | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| workspace_notes | workspaceNotes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| workspace_sessions | workspaceSessions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| workspace_statutes | workspaceStatutes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| workspaces | workspaces | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-### Route Health & Error Tracking
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `routeHealth` | `route_health` | id (uuid), routePath, status, responseTime (integer), errorCount |
-| `errorEvents` | `error_events` | id (uuid), routePath, message, stack, severity, metadata (jsonb) |
-| `errorClusters` | `error_clusters` | id (uuid), pattern, count, firstSeen, lastSeen |
-| `errorSuggestions` | `error_suggestions` | clusterId → errorClusters, suggestion, confidence (real), status (patchStatusEnum) |
-| `routeErrorPatches` | `route_error_patches` | routePath, patch, status (patchStatusEnum), appliedAt |
-| `errorTimeline` | `error_timeline` | errorId → errorEvents, action, details |
-| `errorSuggestionStates` | `error_suggestion_states` | suggestionId → errorSuggestions, state, reason |
-| `errorFeedback` | `error_feedback` | suggestionId → errorSuggestions, userId, rating (integer), comment |
+### chat Tables
 
-### Other
-| Table | DB Name | Key Columns |
-|-------|---------|-------------|
-| `autoTags` | `auto_tags` | documentId → documents, tag, confidence (real), model |
-| `aiReports` | `ai_reports` | id (uuid), title, content (jsonb), caseId → cases |
-| `reports` | `reports` | id (uuid), title, content, caseId → cases, status (reportStatusEnum) |
-| `savedReports` | `saved_reports` | reportId → reports, userId → users, savedAt |
-| `themes` | `themes` | id (uuid), name, settings (jsonb), userId → users |
-| `canvasStates` | `canvas_states` | id (uuid), caseId → cases, state (jsonb) |
-| `canvasAnnotations` | `canvas_annotations` | canvasId → canvasStates, type, data (jsonb) |
-| `canvasAutosaves` | `canvas_autosaves` | canvasId → canvasStates, state (jsonb) |
-| `attachmentVerifications` | `attachment_verifications` | evidenceId → evidence, isVerified, verifiedBy → users |
-| `auditLog` | `audit_log` | userId, action, entityType, entityId, details (jsonb) |
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| ai_memory | aiMemory | sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts | active |
+| chat_document_attachments | chatDocumentAttachments | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| chat_embeddings | chatEmbeddings | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| chat_messages | chatMessages | sveltekit-frontend/src/lib/server/db/schema-chat.ts | active |
+| chat_metadata | chatMetadata | sveltekit-frontend/src/lib/server/db/schema-chat.ts | active |
+| conversations | conversations | sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts | active |
+| messages | messages | sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts | active |
+| rag_index_metadata | ragIndexMetadata | sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | active |
+| rag_messages | ragMessages | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| rag_messages | ragMessages | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| rag_query_log | ragQueryLog | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| rag_sessions | ragSessions | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| rag_sessions | ragSessions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| storage_files | storageFiles | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| test_rag_documents | testRagDocuments | sveltekit-frontend/src/lib/server/db/schema-test-rag.ts | migration-only |
+| test_rag_embeddings | testRagEmbeddings | sveltekit-frontend/src/lib/server/db/schema-test-rag.ts | migration-only |
+| test_rag_search_sessions | testRagSearchSessions | sveltekit-frontend/src/lib/server/db/schema-test-rag.ts | migration-only |
+| yorha_chat_messages | yorhaChatMessages | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| yorha_chat_sessions | yorhaChatSessions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
----
+### analytics Tables
 
-## Type Inference Patterns
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| ai_usage_log | aiUsageLog | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| analytics_events | analyticsEvents | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| api_audit_log | apiAuditLog | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| audit_log | auditLog | sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | duplicate candidate |
+| audit_log | auditLog | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| chunk_hit_log | chunkHitLog | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| diagnosis_events | diagnosisEvents | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| error_brain_analysis | errorBrainAnalysisTable | sveltekit-frontend/src/lib/server/db/schema/error_brain_analysis.ts | active |
+| error_brain_diffs | errorBrainDiffs | sveltekit-frontend/src/lib/server/db/schema/errorBrainDiffs.ts | active |
+| error_events | errorEvents | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| error_events | errorEvents | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| error_events | errorEventsTable | sveltekit-frontend/src/lib/server/db/schema/error_events.ts | duplicate candidate |
+| error_feedback | errorFeedback | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| error_feedback | errorFeedbackTable | sveltekit-frontend/src/lib/server/db/schema/error_feedback.ts | duplicate candidate |
+| error_patch_log | errorPatchLog | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | migration-only |
+| error_sessions | errorSessions | sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts | duplicate candidate |
+| error_suggestion_states | errorSuggestionStates | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| error_suggestion_states | errorSuggestionStates | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| error_suggestions | errorSuggestions | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| error_suggestions | errorSuggestions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| error_suggestions | errorSuggestionsTable | sveltekit-frontend/src/lib/server/db/schema/error_suggestions.ts | duplicate candidate |
+| error_timeline | errorTimeline | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| error_timeline | errorTimelineTable | sveltekit-frontend/src/lib/server/db/schema/error_timeline.ts | duplicate candidate |
+| error_topk_index | errorTopkIndex | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| evidence_audit_log | evidenceAuditLog | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| llm_output_chunks | llmOutputChunks | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| llm_outputs | llmOutputs | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| phase89_error_instances | phase89ErrorInstances | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| predictive_todos | predictiveTodos | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| query_variance_pairs | queryVariancePairs | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| raw_error_embeddings | rawErrorEmbeddings | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| response_feedback | responseFeedback | sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts | active |
+| route_error_patches | routeErrorPatches | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| route_error_patches | routeErrorPatchesTable | sveltekit-frontend/src/lib/server/db/schema/route_error_patches.ts | duplicate candidate |
+| route_health | routeHealth | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| route_health | routeHealth | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| route_health | routeHealthTable | sveltekit-frontend/src/lib/server/db/schema/route_health.ts | duplicate candidate |
+| user_analytics_events | userAnalyticsEvents | sveltekit-frontend/src/lib/server/db/schema/analytics.ts | active |
+| warden_audit_log | wardenAuditLog | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
 
-```typescript
-// Drizzle 0.44 — use $inferSelect / $inferInsert
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
+### infra/runtime Tables
 
-export type Case = typeof cases.$inferSelect;
-export type NewCase = typeof cases.$inferInsert;
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| ai_models | aiModels | sveltekit-frontend/src/lib/server/db/vector-schema.ts | duplicate candidate |
+| analysis_jobs | analysisJobs | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| attachment_verifications | attachmentVerifications | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| auto_approval_rules | autoApprovalRules | sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts | duplicate candidate |
+| auto_tags | autoTags | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_activities | caseActivities | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_assignments | caseAssignments | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| case_embeddings | caseEmbeddings | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| case_embeddings | caseEmbeddings | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| case_note_evidence_refs | caseNoteEvidenceRefs | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_note_versions | caseNoteVersions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_notes | caseNotes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_persons | casePersons | sveltekit-frontend/src/lib/server/db/schema/persons.ts | active |
+| case_scores | caseScores | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| cases | cases | sveltekit-frontend/src/lib/server/db/schema-actual.ts | duplicate candidate |
+| cases | cases | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| content_embeddings | contentEmbeddings | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| cpg_edges | cpgEdges | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| cpg_nodes | cpgNodes | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| criminals | criminals | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| document_chunks | additionalDocumentChunks | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| document_chunks | ingestedDocumentChunks | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | duplicate candidate |
+| document_chunks | documentChunks | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| document_embeddings | documentEmbeddings | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | duplicate candidate |
+| document_embeddings | documentEmbeddings | sveltekit-frontend/src/lib/server/db/vector-schema.ts | duplicate candidate |
+| document_processing | documentProcessing | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| document_summaries | documentSummaries | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | duplicate candidate |
+| document_summaries | documentSummaries | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| document_topics | documentTopics | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| documents | documents | sveltekit-frontend/src/lib/server/db/schema-actual.ts | duplicate candidate |
+| documents | documents | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| email_verification_codes | emailVerificationCodes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| embedding_cache | embeddingCache | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| embedding_cache | embeddingCache | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| embedding_cache_enhanced | embeddingCacheTable | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | migration-only |
+| evidence | evidence | sveltekit-frontend/src/lib/server/db/schema-actual.ts | duplicate candidate |
+| evidence | evidence | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| evidence | evidence | sveltekit-frontend/src/lib/server/db/schema/evidence.ts | duplicate candidate |
+| evidence_analysis_cache | evidenceAnalysisCache | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| evidence_board_connections | evidenceBoardConnections | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| evidence_chain_of_custody | evidenceChainOfCustody | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| evidence_entities | evidenceEntities | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| evidence_forensic_flags | evidenceForensicFlags | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| evidence_relationships | evidenceRelationships | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| evidence_tags | evidenceTags | sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | active |
+| evidence_vectors | evidenceVectors | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| evidence_vectors | evidenceVectors | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| evidence_versions | evidenceVersions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| failed_jobs | failedJobs | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| file_index | fileIndex | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| generated_fixes | generatedFixes | sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts | duplicate candidate |
+| hash_verifications | hashVerifications | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ingested_documents | ingestedDocuments | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | migration-only |
+| ingestion_buffers | ingestionBuffers | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ingestion_jobs | ingestionJobs | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| ingestion_jobs | ingestionJobs | sveltekit-frontend/src/lib/server/db/schema/ingestion-jobs.ts | duplicate candidate |
+| kb_provenance_graph | kbProvenanceGraph | sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts | duplicate candidate |
+| kg_nodes | kgNodes | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| multi_db_transactions | multiDbTransactions | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| ocr_processing_queue | ocrProcessingQueue | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | migration-only |
+| password_reset_tokens | passwordResetTokens | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| phase89_agentic_calls | phase89AgenticCalls | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_cache_hits | phase89CacheHits | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_collection_summaries | phase89CollectionSummaries | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_cosine_rankings | phase89CosineRankings | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_edit_comparisons | phase89EditComparisons | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_edit_log | phase89EditLog | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_embeddings | phase89Embeddings | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_file_timeline | phase89FileTimeline | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_fix_attempts | phase89FixAttempts | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_import_edges | phase89ImportEdges | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_kb_cards | phase89KbCards | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_ripgrep_cache | phase89RipgrepCache | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_tag_mirror | phase89TagMirror | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_timeline | phase89Timeline | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_unit_index | phase89UnitIndex | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_vector_events | phase89VectorEvents | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| phase89_vector_events_vlm | phase89VectorEventsVlm | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| route_metadata | routeMetadata | sveltekit-frontend/src/lib/server/db/schema/route_metadata.ts | active |
+| search_queries | searchQueries | sveltekit-frontend/src/lib/server/db/vector-schema.ts | duplicate candidate |
+| sessions | sessions | sveltekit-frontend/src/lib/server/db/lucia-schema.ts | duplicate candidate |
+| sessions | sessions | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| shader_cache_entries | shaderCacheEntries | sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts | legacy |
+| shader_compilation_queue | shaderCompilationQueue | sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts | legacy |
+| shader_dependencies | shaderDependencies | sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts | legacy |
+| shader_preload_rules | shaderPreloadRules | sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts | legacy |
+| shader_recommendations_view | shaderRecommendationsView | sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts | legacy |
+| shader_user_patterns | shaderUserPatterns | sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts | legacy |
+| state_constitution_sources | stateConstitutionSources | sveltekit-frontend/src/lib/server/db/schema/state-constitution-sources.ts | active |
+| themes | themes | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| ts_errors | tsErrors | sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts | active |
+| user_ai_queries | userAiQueries | sveltekit-frontend/src/lib/server/db/additional-tables.ts | duplicate candidate |
+| user_ai_queries | userAiQueries | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| user_embeddings | userEmbeddings | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| user_interaction_history | userInteractionHistory | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| user_timeline | userTimeline | sveltekit-frontend/src/lib/server/db/schema-timeline.ts | legacy |
+| users | users | sveltekit-frontend/src/lib/server/db/lucia-schema.ts | duplicate candidate |
+| users | users | sveltekit-frontend/src/lib/server/db/schema-actual.ts | duplicate candidate |
+| users | users | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| vector_jobs | vectorJobs | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| vector_metadata | vectorMetadata | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| vector_outbox | vectorOutbox | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| vector_search_logs | vectorSearchLogs | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | migration-only |
+| warden_cases | wardenCases | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_chunks | wardenChunks | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_evidence | wardenEvidence | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_evidence_summaries | wardenEvidenceSummaries | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_file_locks | wardenFileLocks | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_hmm_topics | wardenHMMTopics | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_holdings | wardenHoldings | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_ocr | wardenOCR | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| warden_users | wardenUsers | sveltekit-frontend/src/lib/server/db/warden-schema.ts | active |
+| web_embeddings | webEmbeddings | sveltekit-frontend/src/lib/server/db/schema-web.ts | active |
+| web_pages | webPages | sveltekit-frontend/src/lib/server/db/schema-web.ts | active |
+| yorha_system_metrics | yorhaSystemMetrics | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-export type Evidence = typeof evidence.$inferSelect;
-export type NewEvidence = typeof evidence.$inferInsert;
+## Enums By Feature
 
-// Convention: Select = read, Insert = write (Insert omits defaults/auto-generated)
-```
+### legal corpus
 
----
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| authority_level | authorityLevelEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| citation_type | citationTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| citation_type | citationTypeEnum | sveltekit-frontend/src/lib/server/db/schema/legal-citations.ts | duplicate candidate |
+| corpus_type | corpusTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| corpus_type | corpusTypeEnum | sveltekit-frontend/src/lib/server/db/schema/library-documents.ts | duplicate candidate |
+| jurisdiction | jurisdictionEnum | sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | duplicate candidate |
+| jurisdiction | jurisdictionEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| legal_node_type | legalNodeTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| legal_node_type | legalNodeTypeEnum | sveltekit-frontend/src/lib/server/db/schema/legal-nodes.ts | duplicate candidate |
 
-## Import Patterns
+### courtroom / simulation
 
-```typescript
-// Table + enum imports
-import { users, cases, evidence, caseStatusEnum } from '$lib/server/db/schema-postgres.js';
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| courtroom_anim_type | courtroomAnimTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| fictional_actor_role | fictionalCaseActorRoleEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| fictional_case_category | fictionalCaseCategoryEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-// Type imports
-import type { User, NewUser } from '$lib/server/db/schema-postgres.js';
+### audio
 
-// Drizzle query utilities
-import { eq, and, or, desc, asc, sql, like, inArray } from 'drizzle-orm';
+No enums in this bucket.
 
-// Column type imports
-import { pgTable, uuid, text, varchar, timestamp, jsonb, integer, boolean, real, serial, bigint, numeric, index, unique, foreignKey } from 'drizzle-orm/pg-core';
+### research / synthesis
 
-// Relations
-import { relations } from 'drizzle-orm/relations';
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| summary_type | summaryTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-// IMPORTANT: Use .js extension (bundler resolves .js → .ts)
-import { cases } from '$lib/server/db/schema-postgres.js'; // ✅
-import { cases } from '$lib/server/db/schema-postgres.ts';  // ❌
-```
+### AST intelligence
 
----
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| report_status | reportStatusEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
-## Common Query Patterns
+### context engine
 
-```typescript
-import { db } from '$lib/server/db/client.js';
-import { cases, evidence } from '$lib/server/db/schema-postgres.js';
-import { eq, desc, and } from 'drizzle-orm';
+No enums in this bucket.
 
-// Select with where
-const result = await db.select().from(cases).where(eq(cases.status, 'open'));
+### chat
 
-// Select with relations (Drizzle relational queries)
-const caseWithEvidence = await db.query.cases.findFirst({
-  where: eq(cases.id, caseId),
-  with: { evidence: true }
-});
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| chat_message_role | chatMessageRoleEnum | sveltekit-frontend/src/lib/server/db/schema-chat.ts | active |
 
-// Insert
-const [newCase] = await db.insert(cases).values({ title, status: 'open', priority: 'medium' }).returning();
+### analytics
 
-// Update
-await db.update(cases).set({ status: 'closed' }).where(eq(cases.id, caseId));
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| audit_operation | auditOperationEnum | sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | active |
+| audit_table | auditTableEnum | sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts | active |
+| error_kind | errorKindEnum | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| error_kind | errorKindEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| error_severity | errorSeverityEnum | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| error_severity | errorSeverityEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| route_health_state | routeHealthStateEnum | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| route_health_state | routeHealthStateEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
 
-// Delete
-await db.delete(evidence).where(eq(evidence.id, evidenceId));
+### infra/runtime
 
-// Pagination
-const result = await db.select().from(cases)
-  .orderBy(desc(cases.createdAt))
-  .limit(20)
-  .offset(0);
-```
+| DB name | Export | Source file | Status |
+| --- | --- | --- | --- |
+| activity_status | activityStatusEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_link_category | caseLinkCategoryEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| case_link_category | caseLinkCategoryEnum | sveltekit-frontend/src/lib/server/db/schema/case-library-links.ts | duplicate candidate |
+| case_link_type | caseLinkTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_priority | casePriorityEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_risk_level | caseRiskLevelEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| case_status | caseStatusEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| chunk_level | chunkLevelEnum | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | migration-only |
+| document_status | documentStatusEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| document_type | documentTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| evidence_type | evidenceTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| inference_backend | inferenceBackendEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| model_capability | modelCapabilityEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| patch_status | patchStatusEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| processing_status | processingStatusEnum | sveltekit-frontend/src/lib/server/db/schema-ingestion.ts | duplicate candidate |
+| processing_status | processingStatusEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| processing_status | processingStatusEnum | sveltekit-frontend/src/lib/server/db/schema/library-documents.ts | duplicate candidate |
+| relation_type | relationTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| service_tier | serviceTierEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| source_type | sourceTypeEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| source_type | sourceTypeEnum | sveltekit-frontend/src/lib/server/db/schema/library-documents.ts | duplicate candidate |
+| suggestion_state | suggestionStateEnum | sveltekit-frontend/src/lib/server/db/schema-phase78.ts | duplicate candidate |
+| suggestion_state | suggestionStateEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | duplicate candidate |
+| threat_level | threatLevelEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| user_role | userRoleEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
+| verification_status | verificationStatusEnum | sveltekit-frontend/src/lib/server/db/schema-postgres.ts | active |
 
----
-
-## Indexes (Key Ones)
-
-```typescript
-// Cases: composite indexes for common queries
-index('idx_cases_created_at').on(table.createdAt)
-index('idx_cases_status_priority').on(table.status, table.priority)
-index('idx_cases_status_priority_created').on(table.status, table.priority, table.createdAt)
-
-// Vector indexes (HNSW for pgvector)
-index('idx_legal_docs_embedding_hnsw').using('hnsw', table.embedding.op('vector_cosine_ops'))
-
-// JSONB indexes (GIN for metadata)
-index('idx_legal_docs_metadata_gin').using('gin', table.metadata)
-```
-
----
-
-## Route Map
-
-### App Routes (23 — under `src/routes/(app)/`)
-| Route | Purpose |
-|-------|---------|
-| `/active-cases` | Active case list |
-| `/admin/*` | Admin tools (dev-tools, knowledge-search, codebase-viewer, etc.) |
-| `/agentic-errors` | Agentic error analysis |
-| `/ai-dashboard` | AI model dashboard |
-| `/all-routes` | SSE real-time route health monitoring |
-| `/analysis-center` | Analysis tools hub |
-| `/ast-topology` | AST topology visualization |
-| `/cases` | Case management (CRUD, board, overview, details) |
-| `/citations` | Citation management |
-| `/codebase-index` | Codebase indexing tools |
-| `/command-center` | Error command center |
-| `/dashboard` | Main dashboard |
-| `/error-brain` | Error brain analysis |
-| `/evidence` | Evidence management |
-| `/evidence-library` | Evidence library browser |
-| `/global-search` | Global search across entities |
-| `/gpu-evidence-graph` | GPU-accelerated evidence graph |
-| `/persons-of-interest` | POI management |
-| `/phase78` | Phase 78 error analysis |
-| `/system-configuration` | System settings |
-| `/terminal` | Terminal interface |
-
-### API Routes (43 — under `src/routes/api/`)
-| Route | Purpose |
-|-------|---------|
-| `/api/auth/*` | Authentication (login, register, logout) |
-| `/api/cases/*` | Case CRUD + linking |
-| `/api/chat/*` | Chat/LLM streaming |
-| `/api/citations/*` | Citation management |
-| `/api/evidence/*` | Evidence CRUD + analysis |
-| `/api/health/*` | Health checks (database, neo4j) |
-| `/api/indexing/*` | Codebase indexing to Qdrant + MinIO |
-| `/api/kb/*` | Knowledge base CRUD (CouchDB) |
-| `/api/knowledge/*` | Knowledge search (Qdrant) |
-| `/api/ollama/*` | Ollama model proxy |
-| `/api/persons/*` | POI management |
-| `/api/rag/*` | RAG pipeline (search, validate, answer) |
-| `/api/reports/*` | Report generation |
-| `/api/routes/*` | Route health SSE |
-| `/api/sse/*` | Server-Sent Events |
-| `/api/summarize/*` | Document summarization |
-| `/api/embed` | Embedding generation |
-| `/api/stream` | Streaming responses |
-| `/api/topology/*` | Network topology |
-| `/api/tools/*` | Tool registry |
-| Other | ace, acp, admin, analyze-file, analyze-tag, codebase, codebase-index, generate-cluster-summaries, ingest, llm-improvement, phase72-90, ping, pipeline, qlora, rabbitmq, retrieve, security, synthesize, system |
