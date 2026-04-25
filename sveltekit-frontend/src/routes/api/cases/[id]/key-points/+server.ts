@@ -65,7 +65,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 		const contentForAnalysis = [
 			item.title && `Title: ${item.title}`,
 			item.description && `Description: ${item.description}`,
-			item.type && `Type: ${item.type}`,
+			item.evidenceType && `Type: ${item.evidenceType}`,
 			item.aiSummary && `AI Summary: ${String(item.aiSummary)}`,
 			item.summary && `Summary: ${String(item.summary)}`
 		].filter(Boolean).join('\n');
