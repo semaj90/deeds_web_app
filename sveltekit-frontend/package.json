@@ -6,6 +6,8 @@
   "scripts": {
     "precheck": "pwsh scripts/guard-route-params.ps1",
     "check": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" svelte-check --tsconfig ./tsconfig.json",
+    "schema:manifest": "node scripts/generate-schema-manifest.mjs",
+    "schema:drift:check": "node scripts/schema-drift-check.mjs",
     "check:json": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" svelte-check --tsconfig ./tsconfig.json --output json > svelte-errors.json",
     "check:production": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" svelte-check --tsconfig ./tsconfig.check.json --threshold error",
     "check:services": "npx tsc --noEmit --project tsconfig.check.json",

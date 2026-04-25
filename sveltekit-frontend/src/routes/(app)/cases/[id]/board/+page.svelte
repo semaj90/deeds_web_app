@@ -165,6 +165,40 @@
 		return filteredEvidence.findIndex((it: any) => it.id === selectedEvidence.id);
 	});
 
+	/** Places every filtered+unplaced evidence item onto the canvas in a grid around the visible center. */
+	function placeAllVisible() {
+		if (!board || filteredEvidence.length === 0) return;
+		const toPlace = filteredEvidence.filter((it: any) => !placedEvidenceIds.has(it.id));
+		if (toPlace.length === 0) {
+			notificationStore.add({ type: 'info', title: 'Nothing to place', message: 'All visible evidence is already on the board.' });
+			return;
+		}
+		const center = board.getVisibleCenter();
+		const nodeW = 280, nodeH = 160, gap = 40;
+		const columns = Math.max(1, Math.ceil(Math.sqrt(toPlace.length)));
+		const rows = Math.ceil(toPlace.length / columns);
+		// Grid origin so the block is centered on the viewport center
+		const originX = center.x - (columns * (nodeW + gap) - gap) / 2;
+		const originY = center.y - (rows * (nodeH + gap) - gap) / 2;
+		for (let i = 0; i < toPlace.length; i++) {
+			const col = i % columns;
+			const row = Math.floor(i / columns);
+			const item = toPlace[i];
+			board.addEvidenceNode(
+				item.id,
+				item.title,
+				originX + col * (nodeW + gap),
+				originY + row * (nodeH + gap),
+				item.fileType
+			);
+		}
+		notificationStore.add({
+			type: 'success',
+			title: `${toPlace.length} placed`,
+			message: `Laid out in a ${columns}×${rows} grid`
+		});
+	}
+
 	function navEvidence(direction: 1 | -1) {
 		if (filteredEvidence.length === 0) return;
 		const current = selectedEvidenceIndex;
@@ -1183,6 +1217,17 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					Placed
 				</button>
 			</div>
+
+			<!-- Bulk action: place all visible (unplaced) evidence -->
+			{#if placementFilter !== 'placed'}
+				{@const unplacedVisible = filteredEvidence.filter((it: any) => !placedEvidenceIds.has(it.id)).length}
+				{#if unplacedVisible > 0}
+					<button class="place-all-btn" onclick={placeAllVisible} title="Arrange all unplaced visible evidence in a grid on the canvas">
+						<Icon name="layout-grid" size={12} />
+						Place all ({unplacedVisible})
+					</button>
+				{/if}
+			{/if}
 
 			<div class="evidence-list">
 				{#each filteredEvidence as item (item.id)}
@@ -2499,6 +2544,27 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		background: white;
 		color: #1f2937;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+	}
+
+	.place-all-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.375rem;
+		margin: 0 0.5rem 0.5rem;
+		padding: 0.4rem 0.75rem;
+		background: #22c55e;
+		color: white;
+		border: none;
+		border-radius: 0.375rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.15s;
+	}
+
+	.place-all-btn:hover {
+		background: #16a34a;
 	}
 
 	.search-box input {

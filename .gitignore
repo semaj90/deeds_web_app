@@ -784,7 +784,7 @@ scripts/tests/screenshots/glossary/
 # Temporary diagnostic scripts (root-level throwaway ps1)
 tmp-*.ps1
 
-# Archive directory — all subdirs are archived legacy code
-deeds_labs/
+# Archive directory — tracked in git (removed ignore so schema retirements are preserved)
+# deeds_labs/
 
 *.profraw
