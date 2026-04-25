@@ -784,8 +784,15 @@ scripts/tests/screenshots/glossary/
 # Temporary diagnostic scripts (root-level throwaway ps1)
 tmp-*.ps1
 
-# Archive directory — tracked in git (removed ignore so schema retirements are preserved)
-# deeds_labs/
+# Archive + bulk local dirs — not tracked in deeds_web_app (use deeds_lab repo instead)
+deeds_labs/
+
+# Local bulk output dirs
+test-results/
+next_steps/
+lawpdfs/
+scratch/
+logs/
+tmp/
 
 *.profraw
-deeds_labs/snapshots/

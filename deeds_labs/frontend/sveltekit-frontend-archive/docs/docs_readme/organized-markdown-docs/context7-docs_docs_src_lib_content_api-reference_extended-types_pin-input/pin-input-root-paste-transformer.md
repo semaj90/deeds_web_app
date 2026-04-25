@@ -1,3 +1,0 @@
-```ts
-;(pastedText: string) => string
-```

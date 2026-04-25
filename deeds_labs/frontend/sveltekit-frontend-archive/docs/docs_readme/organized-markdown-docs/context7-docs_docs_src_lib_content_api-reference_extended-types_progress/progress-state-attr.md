@@ -1,3 +1,0 @@
-```ts
-;"indeterminate" | "loaded" | "loading"
-```

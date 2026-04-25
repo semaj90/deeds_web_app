@@ -1,3 +1,0 @@
-```ts
-(indeterminate: boolean) => void
-```

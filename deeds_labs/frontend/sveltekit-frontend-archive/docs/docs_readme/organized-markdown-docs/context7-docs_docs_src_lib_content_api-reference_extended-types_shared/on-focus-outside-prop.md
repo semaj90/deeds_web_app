@@ -1,3 +1,0 @@
-```ts
-(event: FocusEvent) => void
-```

@@ -1,3 +1,0 @@
-```ts
-;"active" | "partial" | "inactive"
-```

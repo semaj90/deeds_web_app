@@ -1,3 +1,0 @@
-```ts
-;"narrow" | "short" | "long"
-```

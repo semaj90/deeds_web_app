@@ -1,3 +1,0 @@
-```ts
-Element | null
-```

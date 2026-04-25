@@ -1,3 +1,0 @@
-```ts
-(time: TimeValue) => void;
-```

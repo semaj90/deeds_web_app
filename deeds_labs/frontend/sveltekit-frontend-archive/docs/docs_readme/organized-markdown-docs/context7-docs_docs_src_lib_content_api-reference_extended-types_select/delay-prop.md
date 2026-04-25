@@ -1,3 +1,0 @@
-```ts
-;(tick: number) => number
-```
