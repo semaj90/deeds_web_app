@@ -39,11 +39,10 @@ jobs:
       - name: Vite Build
         run: npx vite build
 
-      - name: Schema Drift Warning
-        continue-on-error: true
+      - name: Schema Drift Gate
         run: |
           node scripts/generate-schema-manifest.mjs
-          node scripts/schema-drift-check.mjs --warn-only
+          node scripts/schema-drift-check.mjs --exit-1
 
   playwright:
     runs-on: ubuntu-latest

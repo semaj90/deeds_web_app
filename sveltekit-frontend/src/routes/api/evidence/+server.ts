@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
     const conditions = [];
     conditions.push(eq(evidence.userId, locals.user.id));
     if (caseId) conditions.push(eq(evidence.caseId, caseId));
-    if (type) conditions.push(eq(evidence.type, type));
+    if (type) conditions.push(eq(evidence.evidenceType, type as (typeof evidence.evidenceType.enumValues)[number]));
     if (search) {
       conditions.push(
         or(
