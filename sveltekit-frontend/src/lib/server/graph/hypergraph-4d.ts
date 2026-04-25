@@ -60,7 +60,7 @@ import {
 } from '$lib/server/gpu/pytorch-graph.js';
 import { analyzeDocumentWithDocling } from '$lib/server/docling.js';
 import { YOLOService }               from '$lib/server/yolo.js';
-import { analyzeImageWithVLM }       from '$lib/server/analysis/vlm-evidence-analyzer.js';
+import { analyzeEvidenceImage }      from '$lib/server/analysis/vlm-evidence-analyzer.js';
 import { langGraphSynthesize }       from '$lib/server/ai/langgraph-client.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -196,7 +196,7 @@ async function enrichSummaryRow(row: SummaryRow & { storage_path?: string; mime_
       if (!isDocument) return;
       try {
         const { ENV } = await import('$lib/server/env.server.js');
-        if (!ENV.DOCLING_SERVICE_URL) return;
+        if (!ENV.GRANITE_DOCLING_ENABLED) return;
         const fileRes = await fetch(storagePath, { signal: AbortSignal.timeout(10_000) }).catch(() => null);
         if (!fileRes?.ok) return;
         const buf = Buffer.from(await fileRes.arrayBuffer());
@@ -216,11 +216,11 @@ async function enrichSummaryRow(row: SummaryRow & { storage_path?: string; mime_
         const fileRes = await fetch(storagePath, { signal: AbortSignal.timeout(10_000) }).catch(() => null);
         if (!fileRes?.ok) return;
         const buf = Buffer.from(await fileRes.arrayBuffer());
-        const yoloResult = await _yoloService.analyze(buf);
-        const classes = yoloResult.objects
-          .filter(o => o.confidence > 0.5)
-          .map(o => o.class)
-          .filter((c, i, a) => a.indexOf(c) === i); // unique
+        const yoloResult = await _yoloService.analyzeDocument(buf, 'evidence');
+        const classes = (yoloResult.objects ?? [])
+          .filter((o: { confidence: number; class: string }) => o.confidence > 0.5)
+          .map((o: { confidence: number; class: string }) => o.class)
+          .filter((c: string, i: number, a: string[]) => a.indexOf(c) === i); // unique
         if (classes.length > 0) {
           row.entity_tags = [...new Set([...row.entity_tags, ...classes])];
         }
@@ -234,10 +234,12 @@ async function enrichSummaryRow(row: SummaryRow & { storage_path?: string; mime_
         const fileRes = await fetch(storagePath, { signal: AbortSignal.timeout(10_000) }).catch(() => null);
         if (!fileRes?.ok) return;
         const buf = Buffer.from(await fileRes.arrayBuffer());
-        const vlm = await analyzeImageWithVLM({ buffer: buf, mimeType, contextHint: row.summary });
+        const vlm = await analyzeEvidenceImage({ buffer: buf, fileName: 'evidence' });
         if (vlm?.summary) {
           row.summary = `[VLM] ${vlm.summary}\n\n${row.summary}`.slice(0, 2000);
-          row.entity_tags = [...new Set([...row.entity_tags, ...vlm.suggestedTags])];
+          if (vlm.suggestedTags?.length) {
+            row.entity_tags = [...new Set([...row.entity_tags, ...vlm.suggestedTags])];
+          }
         }
       } catch { /* VLM unavailable */ }
     })(),
@@ -642,37 +644,40 @@ async function syncHypergraphToNeo4j(
     if (!driver) return;
     const session = driver.session();
     try {
-      // 1. Upsert 4D coordinates on ResearchSummary nodes
+      // 1. Upsert File nodes with 4D coordinates + SomCell / Cluster nodes
       for (const node of nodes) {
+        // File node — one per codebase file (or research summary)
         await session.run(
-          `MERGE (n:ResearchSummary { id: $id })
-           SET   n.som_x        = $x,
-                 n.som_y        = $y,
-                 n.semantic_z   = $z,
-                 n.reward_w     = $w,
-                 n.nodeType     = $type`,
+          `MERGE (f:File { id: $id })
+           SET   f.som_x      = $x,
+                 f.som_y      = $y,
+                 f.semantic_z = $z,
+                 f.reward_w   = $w,
+                 f.nodeType   = $type
+           WITH  f
+           MERGE (sc:SomCell { col: $x, row: $y })
+           MERGE (f)-[:IN_SOM_CELL]->(sc)`,
           { id: node.id, x: node.x, y: node.y, z: node.z, w: node.w, type: node.type },
         );
       }
 
-      // 2. Upsert HyperEdge nodes + MEMBER_OF relationships
+      // 2. Upsert Cluster nodes + IN_CLUSTER edges, then MEMBER_OF → HyperEdge
       for (const edge of edges) {
         await session.run(
-          `MERGE (e:HyperEdge { hash: $hash })
-           SET   e.type        = $type,
-                 e.gradeScore  = $gradeScore,
-                 e.gradeLabel  = $gradeLabel,
-                 e.summary     = $summary,
-                 e.pipeline    = $pipeline,
-                 e.memberCount = $memberCount,
-                 e.builtAt     = $builtAt
-           WITH  e
+          `MERGE (cl:Cluster { hash: $hash })
+           SET   cl.gradeScore  = $gradeScore,
+                 cl.gradeLabel  = $gradeLabel,
+                 cl.summary     = $summary,
+                 cl.pipeline    = $pipeline,
+                 cl.memberCount = $memberCount,
+                 cl.builtAt     = $builtAt
+           WITH  cl
            UNWIND $memberIds AS mid
-             MATCH (n:ResearchSummary { id: mid })
-             MERGE (n)-[:MEMBER_OF { weight: n.reward_w }]->(e)`,
+             MATCH (f:File { id: mid })
+             MERGE (f)-[:IN_CLUSTER]->(cl)
+             MERGE (f)-[:MEMBER_OF { weight: f.reward_w }]->(cl)`,
           {
             hash:        edge.hash,
-            type:        edge.type,
             gradeScore:  edge.gradeScore,
             gradeLabel:  edge.gradeLabel,
             summary:     edge.summary,
@@ -684,20 +689,18 @@ async function syncHypergraphToNeo4j(
         );
       }
 
-      // 3. Cross-hyperedge links: connect hyperedges whose centroids are close
-      //    (enables "which Grade-A hyperedges are semantically adjacent?" queries)
+      // 3. Cross-cluster adjacency: Grade A/B clusters that share SomCell neighbors
       await session.run(
-        `MATCH (a:HyperEdge), (b:HyperEdge)
+        `MATCH (a:Cluster), (b:Cluster)
          WHERE a.hash < b.hash
            AND a.gradeLabel IN ['A','B']
            AND b.gradeLabel IN ['A','B']
-         WITH  a, b
-         MATCH (an:ResearchSummary)-[:MEMBER_OF]->(a),
-               (bn:ResearchSummary)-[:MEMBER_OF]->(b)
-         WITH  a, b, count(DISTINCT an) AS aSize, count(DISTINCT bn) AS bSize,
-               count(DISTINCT an) + count(DISTINCT bn) AS totalUniq
-         WHERE totalUniq > 0
-         MERGE (a)-[:ADJACENT_HYPEREDGE]->(b)`,
+         MATCH (fa:File)-[:IN_CLUSTER]->(a),
+               (fb:File)-[:IN_CLUSTER]->(b),
+               (fa)-[:IN_SOM_CELL]->(sc:SomCell)<-[:IN_SOM_CELL]-(fb)
+         WITH  a, b, count(sc) AS sharedCells
+         WHERE sharedCells > 0
+         MERGE (a)-[:ADJACENT_CLUSTER { sharedCells: sharedCells }]->(b)`,
       );
     } finally {
       await session.close();
@@ -730,35 +733,42 @@ async function syncHypergraphToNeo4j(
  *   POST /collections/research_summaries/index
  *   { "field_name": "som_cluster", "field_schema": "integer" }
  */
-async function updateQdrantSomPayloads(
+/**
+ * Mirror gpu_cluster + som_cluster payload fields into Qdrant codebase_chunks_768.
+ *
+ * Qdrant's job: fast ANN serving with payload prefilters.
+ * Fields written here enable:
+ *   filter: { must: [{ key: 'gpu_cluster', match: { value: 7 } }] }
+ *   filter: { must: [{ key: 'som_cluster', match: { value: 12 } }] }
+ *
+ * NOT written here: manifold4 float[] — that is Postgres's job (durable truth,
+ * cursor pagination, offline analytics). Qdrant payloads are fast-serving only.
+ */
+async function updateQdrantClusterPayloads(
   summaries: SummaryRow[],
-  labels:    Uint32Array,
+  gpuLabels: Uint32Array,   // k-means cluster assignment per node
   somCoords: Array<{ x: number; y: number }>,
-  wCoords:   Float32Array,
 ): Promise<void> {
   if (!summaries.length) return;
   try {
     const { ENV } = await import('$lib/server/env.server.js');
-    const QDRANT_URL = ENV.QDRANT_URL;
-    if (!QDRANT_URL) return;
-    const base = QDRANT_URL.replace(/\/$/, '');
-    const COLLECTION = 'research_summaries';
+    const base = (ENV.QDRANT_URL ?? '').replace(/\/$/, '');
+    if (!base) return;
+    // Write to codebase_chunks_768 (the collection fetchCodebaseNodes reads from)
+    const COLLECTION = 'codebase_chunks_768';
 
-    // Batch set_payload — 100 points per request to stay under Qdrant's 16MB body limit
     const BATCH = 100;
     for (let start = 0; start < summaries.length; start += BATCH) {
       const slice = summaries.slice(start, start + BATCH);
       const points = slice.map((s, idx) => {
         const i = start + idx;
         return {
-          id:      s.id,   // UUID string
+          id:      s.id,
           payload: {
-            som_cluster: labels[i],
-            som_x:       somCoords[i].x,
-            som_y:       somCoords[i].y,
-            manifold4:   [somCoords[i].x, somCoords[i].y,
-                          /* z= */ 1 - Math.cos(Math.PI * 0.5 * wCoords[i]),
-                          /* w= */ wCoords[i]],
+            gpu_cluster: gpuLabels[i],
+            som_cluster: (somCoords[i].y * 44) + somCoords[i].x, // flatten (col,row) → neuron index
+            som_bmu_col: somCoords[i].x,
+            som_bmu_row: somCoords[i].y,
           },
         };
       });
@@ -767,21 +777,20 @@ async function updateQdrantSomPayloads(
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ points }),
-      });
+        signal:  AbortSignal.timeout(15_000),
+      }).catch(() => {});
     }
 
-    // Ensure integer payload index on som_cluster for O(1) pre-filtering.
-    // Qdrant is idempotent — safe to call every build.
-    await fetch(`${base}/collections/${COLLECTION}/index`, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        field_name:   'som_cluster',
-        field_schema: { type: 'integer', lookup: true, range: false },
-      }),
-    });
+    // Payload indexes — idempotent, safe to call every build
+    for (const field of ['gpu_cluster', 'som_cluster']) {
+      fetch(`${base}/collections/${COLLECTION}/index`, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ field_name: field, field_schema: { type: 'integer', lookup: true, range: false } }),
+      }).catch(() => {});
+    }
   } catch {
-    // Qdrant not running — silently skip; Redis + Postgres have the coordinates
+    // Qdrant not running — Redis + Postgres have the coordinates
   }
 }
 
@@ -1056,7 +1065,7 @@ export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
   // This closes the pgvector ↔ Qdrant mirror contract:
   //   Postgres manifold4 real[] = durable truth (offline analytics, cursor pagination)
   //   Qdrant som_cluster payload = fast serving prefilter (live ACE/KAG retrieval)
-  updateQdrantSomPayloads(summaries, labels, somCoords, wCoords).catch(() => {});
+  updateQdrantClusterPayloads(summaries, labels, somCoords).catch(() => {});
 
   const durationMs = Date.now() - t0;
   const source     = gpuUsed ? 'gpu' : 'cpu';
