@@ -1,14 +1,19 @@
 /**
  * GET/POST/DELETE /api/cases/[id]/persons
  * Manage persons of interest linked to a case via the case_persons junction.
+ *
+ * personsOfInterest — canonical AI-augmented table in schema-postgres.ts
+ * casePersons       — junction table in schema/persons.ts (exported via schema.ts)
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
-import { personsOfInterest, casePersons } from '$lib/server/db/schema/persons';
-import { cases } from '$lib/server/db/schema-postgres.js';
+import { personsOfInterest, cases } from '$lib/server/db/schema-postgres.js';
+import { casePersons } from '$lib/server/db/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const personLinkSchema = z.object({
   personId: z.string().uuid(),
@@ -19,9 +24,6 @@ const personLinkSchema = z.object({
 const personDeleteSchema = z.object({
   personId: z.string().uuid(),
 });
-
-import { isUuid } from '$lib/server/validation.js';
-import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 /** GET — list all POI linked to a case with relationship metadata */
 export const GET: RequestHandler = async ({ params, locals, request }) => {
@@ -43,12 +45,15 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
       .select({
         linkId: casePersons.id,
         personId: personsOfInterest.id,
-        fullName: personsOfInterest.fullName,
-        role: personsOfInterest.role,
-        riskLevel: personsOfInterest.riskLevel,
-        dob: personsOfInterest.dob,
-        lastKnownLocation: personsOfInterest.lastKnownLocation,
+        name: personsOfInterest.name,
+        threatLevel: personsOfInterest.threatLevel,
+        status: personsOfInterest.status,
+        description: personsOfInterest.description,
+        aliases: personsOfInterest.aliases,
+        relationship: personsOfInterest.relationship,
+        photoUrl: personsOfInterest.photoUrl,
         notes: personsOfInterest.notes,
+        confidence: personsOfInterest.confidence,
         relationshipType: casePersons.relationshipType,
         isPrimary: casePersons.isPrimary,
         linkedAt: casePersons.createdAt,
@@ -74,10 +79,12 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 
 /** POST — link a person to a case */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const caseId = params.id;
-	const [targetCase] = await db
+  const caseId = params.id;
+  if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
+
+  const [targetCase] = await db
     .select({ id: cases.id })
     .from(cases)
     .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
@@ -85,28 +92,33 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
   if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
 
-	const raw = await request.json().catch(() => ({}));
+  const raw = await request.json().catch(() => ({}));
   const parsed = personLinkSchema.safeParse(raw);
   if (!parsed.success)
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
   const { personId, relationshipType, isPrimary } = parsed.data;
 
-	const [link] = await db.insert(casePersons).values({
-		caseId,
-		personId,
-		relationshipType: relationshipType || 'other',
-		isPrimary: isPrimary ? 'true' : 'false',
-	}).returning({ id: casePersons.id });
+  const [link] = await db
+    .insert(casePersons)
+    .values({
+      caseId,
+      personId,
+      relationshipType: relationshipType || 'other',
+      isPrimary: isPrimary ? 'true' : 'false',
+    })
+    .returning({ id: casePersons.id });
 
-	return json({ id: link.id, success: true }, { status: 201 });
+  return json({ id: link.id, success: true }, { status: 201 });
 };
 
 /** DELETE — unlink a person from a case */
 export const DELETE: RequestHandler = async ({ params, request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const caseId = params.id;
-	const [targetCase] = await db
+  const caseId = params.id;
+  if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
+
+  const [targetCase] = await db
     .select({ id: cases.id })
     .from(cases)
     .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
@@ -114,15 +126,15 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 
   if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
 
-	const raw = await request.json().catch(() => ({}));
+  const raw = await request.json().catch(() => ({}));
   const parsed = personDeleteSchema.safeParse(raw);
   if (!parsed.success)
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
   const { personId } = parsed.data;
 
-	await db.delete(casePersons).where(
-		and(eq(casePersons.caseId, caseId), eq(casePersons.personId, personId))
-	);
+  await db
+    .delete(casePersons)
+    .where(and(eq(casePersons.caseId, caseId), eq(casePersons.personId, personId)));
 
-	return json({ success: true });
+  return json({ success: true });
 };

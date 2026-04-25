@@ -298,6 +298,10 @@
 			summarize: enabledStages.summarize,
 			deepResearch: enabledStages.deep_research,
 			exportWiki: enabledStages.wiki_export,
+			somTopology: enabledStages.som_topology,
+			neo4jSync: enabledStages.neo4j_sync,
+			pageRank: enabledStages.pagerank,
+			hypergraph: enabledStages.hypergraph_4d,
 			scope,
 			indexFileLimit: typeof fileLimit === 'number' && fileLimit > 0 ? fileLimit : undefined,
 			resume: resumeFromCache
