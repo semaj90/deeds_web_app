@@ -186,6 +186,105 @@ async function fetchEmbeddedSummaries(): Promise<SummaryRow[]> {
   }));
 }
 
+/**
+ * Scroll `codebase_chunks_768` in Qdrant and return one entry per unique file
+ * (deduplicated by relativePath / file_path / path payload field), formatted as
+ * SummaryRow so the rest of the hypergraph pipeline works unchanged.
+ *
+ * Mirrors the logic in som-topology-pipeline.ts scrollEmbeddings().
+ */
+async function fetchCodebaseNodes(): Promise<SummaryRow[]> {
+  const { ENV } = await import('$lib/server/env.server.js');
+  const qdrantUrl = ENV.QDRANT_URL;
+  if (!qdrantUrl) return [];
+
+  const base = qdrantUrl.replace(/\/$/, '');
+  const CODEBASE_COLLECTION = 'codebase_chunks_768';
+
+  const seen = new Map<string, SummaryRow>(); // filePath → first entry
+  let offset: string | number | null = null;
+
+  do {
+    const body: Record<string, unknown> = {
+      limit: 250,
+      with_vector: true,
+      with_payload: true,
+    };
+    if (offset !== null) body.offset = offset;
+
+    let res: Response;
+    try {
+      res = await fetch(`${base}/collections/${CODEBASE_COLLECTION}/points/scroll`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(30_000),
+      });
+    } catch {
+      break; // network error — return what we have
+    }
+
+    if (!res.ok) break;
+
+    const data = (await res.json()) as {
+      result?: {
+        points?: Array<{
+          id: number | string;
+          payload?: Record<string, unknown>;
+          vector?: number[] | Record<string, number[]>;
+        }>;
+        next_page_offset?: string | number | null;
+      };
+    };
+
+    const points = data.result?.points ?? [];
+    offset = data.result?.next_page_offset ?? null;
+
+    for (const pt of points) {
+      const p = pt.payload ?? {};
+
+      // Resolve file path from whichever payload field is present
+      const filePath = (
+        (p['relativePath'] ?? p['file_path'] ?? p['path']) as string | undefined
+      ) ?? '';
+      if (!filePath) continue;
+
+      // Resolve vector — may be bare array or named-vector map
+      let vec: number[] | undefined;
+      if (Array.isArray(pt.vector)) {
+        vec = pt.vector as number[];
+      } else if (pt.vector && typeof pt.vector === 'object') {
+        vec = (pt.vector as Record<string, number[]>)['content'] ??
+              Object.values(pt.vector as Record<string, number[]>)[0];
+      }
+      if (!vec || vec.length !== DIM) continue;
+
+      // Deduplicate: keep first chunk per file path
+      if (!seen.has(filePath)) {
+        const tags = Array.isArray(p['tags']) ? (p['tags'] as string[]) : [];
+        const pagerankScore = typeof p['pagerank_score'] === 'number'
+          ? (p['pagerank_score'] as number)
+          : 0.5;
+
+        seen.set(filePath, {
+          id:              String(pt.id),
+          pipeline:        'codebase',
+          entity_tags:     tags,
+          summary:         filePath,
+          embedding:       vec,
+          relevance_score: pagerankScore,
+        });
+      }
+
+      if (seen.size >= MAX_ROWS) break;
+    }
+
+    if (seen.size >= MAX_ROWS) break;
+  } while (offset !== null);
+
+  return [...seen.values()];
+}
+
 // ── SOM BMU assignment (x, y coordinates) ────────────────────────────────────
 
 async function computeSomCoords(
@@ -601,7 +700,20 @@ async function persistToRedis(
 export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
   const t0 = Date.now();
 
-  const summaries = await fetchEmbeddedSummaries();
+  // ── Node set: codebase files first, fall back to research_summaries ──────────
+  // fetchCodebaseNodes() scrolls codebase_chunks_768 (same data the SOM topology
+  // pipeline uses). Falls back to Postgres research_summaries if < 10 codebase
+  // nodes are available (e.g. Qdrant is down or collection is empty).
+  let summaries: SummaryRow[] = await fetchCodebaseNodes().catch(() => []);
+  if (summaries.length < 10) {
+    const pgRows = await fetchEmbeddedSummaries().catch(() => [] as SummaryRow[]);
+    // Merge both sources if we got some codebase nodes; otherwise use pgRows only
+    summaries = summaries.length > 0 ? [...summaries, ...pgRows] : pgRows;
+  }
+
+  // Cap at 2000 nodes so downstream GPU ops stay tractable
+  if (summaries.length > 2000) summaries = summaries.slice(0, 2000);
+
   if (summaries.length < 10) {
     return { nodesTagged: 0, hyperedges: 0, gradeA: 0, gradeB: 0, gradeC: 0, gradeD: 0, durationMs: 0, source: 'cpu' };
   }
