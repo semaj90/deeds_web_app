@@ -229,9 +229,9 @@ async function cpuKmeans(nodes: Node[], k: number): Promise<KMeansResult> {
 
   // Try GPU first via pytorch-graph N-API
   try {
-    // scripts/ is one level below sveltekit-frontend/, addon is at repo root simd-bridge/
+    // scripts/ → sveltekit-frontend/ → deeds-web-app/ → simd-bridge/
     const addonPath = new URL(
-      '../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node',
+      '../../simd-bridge/cpp/build/Release/tensorrt_bridge.node',
       import.meta.url
     ).pathname.replace(/^\/([A-Z]:)/i, '$1').replace(/\//g, '\\');
     const { createRequire } = await import('module');
