@@ -165,6 +165,7 @@ export async function tieredLLMQuery(
       model,
       messages,
       stream: false,
+      cache_prompt: true,
       options: {
         temperature,
         num_predict: maxTokens,
@@ -178,9 +179,19 @@ export async function tieredLLMQuery(
 
   const data = await res.json();
   const response = data.message?.content ?? '';
+  const promptTokens: number = data.prompt_eval_count ?? 0;
+  const completionTokens: number = data.eval_count ?? 0;
+  // Ollama reports prompt_eval_count=0 when prompt was fully served from KV cache
+  const cachedPromptTokens: number = promptTokens === 0 && completionTokens > 0
+    ? (data.prompt_tokens_details?.cached_tokens ?? 0)
+    : 0;
 
   const latencyMs = Math.round(performance.now() - startTime);
-  console.log(`[tiered-cache] L3 OLLAMA COLD (${latencyMs}ms)`);
+  console.log(
+    `[tiered-cache] L3 OLLAMA COLD (${latencyMs}ms)` +
+    ` prompt=${promptTokens} completion=${completionTokens}` +
+    (cachedPromptTokens ? ` kv_cached=${cachedPromptTokens}` : '')
+  );
 
   // Store in both L1 + L2 for future hits (fire-and-forget)
   if (!bypassCache) {
@@ -191,8 +202,15 @@ export async function tieredLLMQuery(
       maxTokens,
     });
 
-    // L1: Redis exact-match
-    setExactMatchCache(exactCacheKey, response).catch(err => {
+    // L1: Redis exact-match (with token metadata for observability)
+    setExactMatchCache(exactCacheKey, {
+      content: response,
+      model,
+      backend: 'ollama',
+      promptTokens,
+      completionTokens,
+      cachedPromptTokens: cachedPromptTokens || undefined,
+    }).catch(err => {
       console.error('[tiered-cache] Failed to store in L1:', err);
     });
 
@@ -216,36 +234,51 @@ export async function tieredLLMQuery(
 }
 
 /**
- * Get cache statistics across all tiers
+ * Get cache statistics across all tiers.
+ * Uses `await using` (Node 22 explicit resource management) to guarantee
+ * the redis scan cursor is released even if an error is thrown mid-stats.
  */
 export async function getTieredCacheStats() {
-  const redis = getRedis();
+  // Disposable wrapper so the Redis connection is released on scope exit
+  await using redisScope = {
+    redis: getRedis(),
+    [Symbol.asyncDispose](): Promise<void> {
+      // getRedis() returns a pooled singleton — we just signal done, not quit
+      return Promise.resolve();
+    },
+  };
+
+  const { redis } = redisScope;
 
   // L1: Redis exact-match stats
   const l1Stats = await getExactMatchStats();
 
-  // L2: Qdrant collection stats (via Redis count - approximation)
-  const l2Keys = await redis.keys('llm_cache:*');
-
-  // L3: No cache stats (always cold)
+  // L2: approximate key count via SCAN (avoids blocking KEYS on large keyspaces)
+  let l2KeyCount = 0;
+  let cursor = '0';
+  do {
+    const [next, keys] = await redis.scan(cursor, 'MATCH', 'llm_cache:*', 'COUNT', 100);
+    cursor      = next;
+    l2KeyCount += keys.length;
+  } while (cursor !== '0');
 
   return {
     l1_redis: {
       totalKeys: l1Stats.totalKeys,
-      memoryMB: (l1Stats.memoryUsedBytes / (1024 * 1024)).toFixed(2),
-      hitRate: '70-90%', // Estimated based on validation tests
+      memoryMB:  (l1Stats.memoryUsedBytes / (1024 * 1024)).toFixed(2),
+      hitRate:   '70-90%',
     },
     l2_qdrant: {
-      approxKeys: l2Keys.length,
-      threshold: 0.88,
-      hitRate: '40-60%', // Estimated based on semantic similarity
+      approxKeys: l2KeyCount,
+      threshold:  0.88,
+      hitRate:    '40-60%',
     },
     l3_ollama: {
-      avgLatencyMs: 3200, // gemma3:270m baseline
-      throughput: '~18 QPM per worker',
+      avgLatencyMs: 3200,
+      throughput:   '~18 QPM per worker',
     },
     combined: {
-      expectedAvgLatency: '50-200ms (weighted)',
+      expectedAvgLatency:   '50-200ms (weighted)',
       expectedTotalHitRate: '90-95%',
     },
   };
