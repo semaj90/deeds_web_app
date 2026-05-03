@@ -496,6 +496,9 @@ export interface AgentRunResult {
   durationMs: number;
   cacheTier?: 'L1_redis' | 'L2_qdrant' | 'L3_ollama';
   cacheLatencyMs?: number;
+  cacheTrace?:         unknown;
+  errorFixMemoryHit?:  boolean;
+  verificationStatus?: string;
 }
 
 // ── Agent loop ────────────────────────────────────────────────────────────────
@@ -513,6 +516,7 @@ export async function runGemma4Agent(
     userId?:       string;
     sessionId?:    string;
     bypassCache?:  boolean;
+    metadata?:     Record<string, unknown>;
   },
 ): Promise<AgentRunResult> {
   const t0          = Date.now();
