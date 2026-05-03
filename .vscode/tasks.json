@@ -7361,6 +7361,444 @@
       },
       "problemMatcher": [],
       "detail": "Snapshot current schema state to scripts/audit-schema-drift.snapshot.json — future drift runs compare against this."
+    },
+    {
+      "label": "🔥 Standalone: Run PageRank (CouchDB → Redis, no Vite)",
+      "type": "shell",
+      "command": "npx tsx scripts/run-pagerank.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "PATH": "C:\\libtorch-win-shared-with-deps-2.9.0+cu130\\libtorch\\lib;${env:PATH}",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Standalone PageRank: CouchDB link_matrix → power-iteration → Redis couchdb:pagerank_scores (6h TTL). No Vite required. ~1.1s. Falls back to Neo4j IMPORTS if link_matrix empty."
+    },
+    {
+      "label": "🔥 Standalone: Run Hypergraph 4D (GPU k-means, no Vite)",
+      "type": "shell",
+      "command": "npx tsx scripts/run-hypergraph.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "PATH": "C:\\libtorch-win-shared-with-deps-2.9.0+cu130\\libtorch\\lib;${env:PATH}",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Standalone 4D hypergraph: Qdrant scroll 2000 nodes → GPU k-means (RTX 3060 Ti via tensorrt_bridge.node) → SOM BMU → hyperedge grading by CouchDB PageRank → Neo4j + Qdrant sync. ~128s. k-means state checkpointed to Redis every 10 iters under hg:checkpoint:kmeans:k{k}:n{n}."
+    },
+    {
+      "label": "🔥 Standalone: Run Hypergraph 4D (--force, skip checkpoint)",
+      "type": "shell",
+      "command": "npx tsx scripts/run-hypergraph.ts --force",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "PATH": "C:\\libtorch-win-shared-with-deps-2.9.0+cu130\\libtorch\\lib;${env:PATH}",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Force-rebuild 4D hypergraph: skips Redis k-means checkpoint, recomputes GPU clustering from scratch. Use after Qdrant re-index or when checkpoint is stale."
+    },
+    {
+      "label": "🔥 Standalone: PageRank → Hypergraph (sequential, GPU safe)",
+      "dependsOn": [
+        "🔥 Standalone: Run PageRank (CouchDB → Redis, no Vite)",
+        "🔥 Standalone: Run Hypergraph 4D (GPU k-means, no Vite)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Full standalone GPU pipeline: PageRank scores first (~1.1s), then 4D hypergraph uses them for edge grading (~128s). No Vite segfault risk — runs outside dev server process."
+    },
+    {
+      "label": "🔥 Standalone: GPU Master Pipeline (TurboQuant + PageRank + Hypergraph)",
+      "dependsOn": [
+        "⚡ TurboQuant: Start (text-only, :8090)",
+        "🔥 Standalone: PageRank → Hypergraph (sequential, GPU safe)"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Start TurboQuant llama-server (port 8090) in parallel while running the standalone PageRank→Hypergraph pipeline. All GPU ops, no Vite required."
+    },
+    {
+      "label": "🧩 Hypergraph: CI Smoke (generate → build → topology → tag dry-run)",
+      "type": "shell",
+      "command": "node scripts/ci-smoke-hypergraph.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "REDIS_URL": "redis://127.0.0.1:6379",
+          "HG_PREFIX": "hypergraph:v1"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Smoke: generate 500 synthetic embeddings → streaming k-means (50 clusters) → topology writer → dry-run Qdrant tag. Verifies Redis keys hypergraph:v1:centroids + :neighbors."
+    },
+    {
+      "label": "🧩 Hypergraph: Export Embeddings from Qdrant",
+      "type": "shell",
+      "command": "node sveltekit-frontend/scripts/export-embeddings-qdrant.mjs --collection ${input:hgCollection} --output ./sveltekit-frontend/tmp/${input:hgCollection}-embeddings.ndjson --qdrant-url http://127.0.0.1:6333 --batch 500",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Scroll all vectors from a Qdrant collection into an NDJSON file for the standalone hypergraph builder. Prompts for collection name."
+    },
+    {
+      "label": "🧩 Hypergraph: Build (streaming k-means + Redis checkpoints)",
+      "type": "shell",
+      "command": "node sveltekit-frontend/scripts/hypergraph-build.mjs --input ./sveltekit-frontend/tmp/${input:hgCollection}-embeddings.ndjson --clusters ${input:hgClusters} --redis redis://127.0.0.1:6379 --checkpoint-every 500 --out ./sveltekit-frontend/tmp/centroids-${input:hgCollection}.json --assignments ./sveltekit-frontend/tmp/assignments-${input:hgCollection}.ndjson",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Streaming online k-means outside Vite (no OOM risk). Checkpoints centroids to Redis every 500 vectors. Writes centroids JSON + assignments NDJSON."
+    },
+    {
+      "label": "🧩 Hypergraph: Write Topology (centroid k-NN → Redis)",
+      "type": "shell",
+      "command": "node sveltekit-frontend/scripts/hypergraph-topology-writer.mjs --centroids ./sveltekit-frontend/tmp/centroids-${input:hgCollection}.json --redis redis://127.0.0.1:6379 --k 16 --prefix hypergraph:v1",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Builds a centroid k-NN adjacency graph (k=16) from the centroids JSON and stores it as hypergraph:v1:neighbors in Redis."
+    },
+    {
+      "label": "🧩 Hypergraph: Tag Qdrant Points (som_cluster payload)",
+      "type": "shell",
+      "command": "node sveltekit-frontend/scripts/hypergraph-tag-qdrant.mjs --assignments ./sveltekit-frontend/tmp/assignments-${input:hgCollection}.ndjson --collection ${input:hgCollection} --qdrant http://127.0.0.1:6333 --batch 64",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Writes som_cluster: N payload field to each Qdrant point in the collection, enabling cluster-scoped RAG retrieval. Reads assignments NDJSON from the build step."
+    },
+    {
+      "label": "🧩 Hypergraph: Full Pipeline (export → build → topology → tag)",
+      "dependsOn": [
+        "🧩 Hypergraph: Export Embeddings from Qdrant",
+        "🧩 Hypergraph: Build (streaming k-means + Redis checkpoints)",
+        "🧩 Hypergraph: Write Topology (centroid k-NN → Redis)",
+        "🧩 Hypergraph: Tag Qdrant Points (som_cluster payload)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Full standalone pipeline: Qdrant export → streaming k-means → topology writer → Qdrant som_cluster tag. No Vite required, no OOM risk."
+    },
+    {
+      "label": "🧩 Hypergraph: Start Lookup Server (:3099)",
+      "type": "shell",
+      "command": "node sveltekit-frontend/scripts/hypergraph-lookup-server.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "REDIS_URL": "redis://127.0.0.1:6379",
+          "HG_PREFIX": "hypergraph:v1",
+          "PORT": "3099"
+        }
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": {
+        "owner": "hypergraph-lookup",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Listening on"
+        }
+      },
+      "detail": "Standalone HTTP lookup server on :3099 — GET /lookup/:centroid?k=8 and POST /lookup. Reads centroids + neighbors from Redis (hypergraph:v1)."
+    },
+    {
+      "label": "⚡ TurboQuant: Gemma4 Agentic Chat (compressed KV tokens)",
+      "type": "shell",
+      "command": "node -e \"const q=process.env.TQ_QUERY||'Summarize the key legal principles around hearsay evidence and chain of custody'; fetch('http://localhost:8090/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-legal',messages:[{role:'system',content:'You are a legal AI assistant with access to case law and evidence rules.'},{role:'user',content:q}],max_tokens:512,temperature:0.3,stream:false})}).then(r=>r.json()).then(d=>{const m=d.choices?.[0]?.message?.content??JSON.stringify(d,null,2);console.log('\\n=== TurboQuant Agentic Response ===\\n');console.log(m);console.log('\\nTokens:',d.usage?.total_tokens??'?','Prompt:',d.usage?.prompt_tokens??'?','Completion:',d.usage?.completion_tokens??'?');}).catch(e=>console.error('TurboQuant not running on :8090 —',e.message))\"",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "TQ_QUERY": "${input:turboQuantQuery}"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Send an agentic query to TurboQuant llama-server on :8090 (turbo3 KV compression, -ctk/-ctv turbo3). Reports token usage. Requires TurboQuant running."
+    },
+    {
+      "label": "⚡ TurboQuant: Gemma4 VLM Vision + Text (compressed KV)",
+      "type": "shell",
+      "command": "node -e \"fetch('http://localhost:8090/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-legal-vlm',messages:[{role:'user',content:[{type:'text',text:'${input:vlmTextPrompt}'},{type:'image_url',image_url:{url:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}}]}],max_tokens:256,temperature:0.3})}).then(r=>r.json()).then(d=>console.log('VLM Response:',d.choices?.[0]?.message?.content??JSON.stringify(d,null,2))).catch(e=>console.error('TurboQuant VLM not running on :8090 (launch VLM variant first) —',e.message))\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Test VLM inference via TurboQuant on :8090 with mmproj. Requires 'TurboQuant: Start (vision + text)' variant running. Sends a 1-pixel placeholder image — replace with real base64 for actual VLM use."
+    },
+    {
+      "label": "🕸️ Knowledge Graph: Web Search → Deep Research Index",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/codebase-index/deep-research -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"mode\\\":\\\"wait\\\",\\\"maxClusters\\\":20,\\\"resultsPerQuery\\\":5,\\\"maxDepth\\\":1,\\\"maxPages\\\":25,\\\"childLinksPerPage\\\":2,\\\"contentCharBudget\\\":4000}\" | python -m json.tool 2>/dev/null || curl -s -X POST http://localhost:5173/api/codebase-index/deep-research -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"mode\\\":\\\"wait\\\",\\\"maxClusters\\\":20,\\\"resultsPerQuery\\\":5}\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Agentic web-search deep indexer: loads cluster summaries → builds search queries per cluster → fetches + strips HTML → embeds → writes to knowledge_base Qdrant + Postgres web_search_index. Requires dev server :5173."
+    },
+    {
+      "label": "🕸️ Knowledge Graph: Full Pipeline (AST → Clusters → Hypergraph → Web Search)",
+      "type": "shell",
+      "command": "curl -s -N -X POST http://localhost:5173/api/codebase-index/orchestrate -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"stages\\\":[\\\"ast_embed\\\",\\\"cluster_assign\\\",\\\"som_topology\\\",\\\"neo4j_sync\\\",\\\"pagerank\\\",\\\"summarize\\\",\\\"tag\\\",\\\"wiki_export\\\",\\\"hypergraph_4d\\\",\\\"complete\\\"],\\\"summarize\\\":true,\\\"deepResearch\\\":true,\\\"somTopology\\\":true,\\\"neo4jSync\\\":true,\\\"pageRank\\\":true,\\\"hypergraph\\\":true,\\\"exportWiki\\\":true,\\\"scope\\\":\\\"all\\\",\\\"incremental\\\":true}\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Full 10-stage orchestrated pipeline (SSE stream): AST embed → k-means cluster → SOM topology → Neo4j sync → PageRank → Ollama summaries (cache_prompt) → Karpathy tags → wiki export → 4D hypergraph → deep-research web search. Incremental (skips unchanged files)."
+    },
+    {
+      "label": "🕸️ Knowledge Graph: Incremental AST + Cluster Only (fast)",
+      "type": "shell",
+      "command": "curl -s -N -X POST http://localhost:5173/api/codebase-index/orchestrate -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"stages\\\":[\\\"ast_embed\\\",\\\"cluster_assign\\\",\\\"complete\\\"],\\\"scope\\\":\\\"all\\\",\\\"incremental\\\":true,\\\"force\\\":false}\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Fast incremental: AST embed (skips unchanged) + cluster reassign only. Use after small code changes. ~30-60s vs full 10-stage pipeline."
+    },
+    {
+      "label": "🕸️ Knowledge Graph: Stats (Qdrant + Redis hyperedges)",
+      "type": "shell",
+      "command": "node -e \"Promise.all([fetch('http://localhost:6333/collections/codebase_chunks_768').then(r=>r.json()).catch(()=>({})),fetch('http://localhost:5173/api/codebase-index/stats',{headers:{'x-dev-bypass-auth':'true'}}).then(r=>r.json()).catch(()=>({}))]).then(([q,s])=>{console.log('\\n=== Knowledge Graph Stats ===');console.log('Qdrant codebase_chunks_768:',q?.result?.points_count??'?','points');console.log('Indexed files:',s?.indexed??'?');console.log('Clusters:',s?.clusters??'?');console.log('Last indexed:',s?.lastIndexed??'?');console.log('Hyperedge count:',s?.hyperedgeCount??'(run standalone hypergraph to populate)');}).catch(e=>console.error(e.message))\"",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Show live knowledge graph stats: Qdrant point count, indexed file count, cluster count, hyperedge count, last indexed timestamp."
+    },
+    {
+      "label": "🕸️ Knowledge Graph: Standalone GPU + Web Search (no Vite)",
+      "dependsOn": [
+        "🔥 Standalone: PageRank → Hypergraph (sequential, GPU safe)",
+        "🕸️ Knowledge Graph: Web Search → Deep Research Index"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Standalone GPU pipeline first (PageRank → Hypergraph, no Vite), then deep-research web search via dev server. Complete knowledge graph refresh with web augmentation."
+    },
+    {
+      "label": "🔍 Web Search: Ingest via ACE Tool Loop (TurboVec + Google)",
+      "type": "shell",
+      "command": "node -e \"const q='${input:webSearchQuery}'; fetch('http://localhost:5173/api/ai/agent',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({query:q,pipeline:'ace',tools:['web_search','rag_search','memory_recall']})}).then(r=>r.json()).then(d=>{console.log('\\n=== Agent Answer ===');console.log(d.answer??d.error??JSON.stringify(d,null,2));console.log('\\nTools used:',d.toolsUsed?.join(', ')??'none','Rounds:',d.rounds,'Latency:',d.durationMs,'ms');}).catch(e=>console.error('Dev server not running on :5173 —',e.message))\"",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Run a web-search-augmented query through the Gemma4 agentic tool loop (web_search + rag_search + memory_recall). Requires dev server on :5173 and TurboQuant on :8090."
+    },
+    {
+      "label": "🔍 Web Search: Crawl + Ingest URL into Knowledge Base",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/library/crawl -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"url\\\":\\\"${input:crawlUrl}\\\",\\\"topic\\\":\\\"${input:researchQuery}\\\",\\\"embed\\\":true}\" | python -m json.tool 2>/dev/null || curl -s -X POST http://localhost:5173/api/library/crawl -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"url\\\":\\\"${input:crawlUrl}\\\",\\\"topic\\\":\\\"${input:researchQuery}\\\",\\\"embed\\\":true}\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Crawl a URL and embed the content into the knowledge base (chunks_web_search Qdrant collection). Requires dev server + embedding gRPC on :50051."
+    },
+    {
+      "label": "🔍 Web Search: Semantic Search Research Chunks",
+      "type": "shell",
+      "command": "curl -s -X POST http://localhost:5173/api/research/search -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"query\\\":\\\"${input:webSearchQuery}\\\",\\\"limit\\\":10,\\\"scoreThreshold\\\":0.55}\" | python -m json.tool 2>/dev/null || curl -s -X POST http://localhost:5173/api/research/search -H \"Content-Type: application/json\" -H \"x-dev-bypass-auth: true\" -d \"{\\\"query\\\":\\\"${input:webSearchQuery}\\\",\\\"limit\\\":10,\\\"scoreThreshold\\\":0.55}\"",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Semantic search over web-ingested research chunks (chunks_web_search). Returns top-10 hits by score threshold ≥0.55."
+    },
+    {
+      "label": "🚀 GPU Pipeline: Full Operator Stack (Docker + TurboQuant + Standalone GPU)",
+      "dependsOn": [
+        "Docker Services Up",
+        "🔥 Standalone: GPU Master Pipeline (TurboQuant + PageRank + Hypergraph)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Full cold-start: Docker services up first, then TurboQuant + standalone GPU pipeline (PageRank → Hypergraph). Safe for RTX 3060 Ti 8GB VRAM."
+    },
+    {
+      "label": "💬 Gemma4: Prompt from VS Code (TurboQuant :8090)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "-e",
+        "const q=process.env.GEMMA_PROMPT; if(!q){console.error('No prompt set');process.exit(1);} const sys=process.env.GEMMA_SYSTEM||'You are a legal AI assistant specializing in case law, evidence rules, and document analysis.'; const maxTok=parseInt(process.env.GEMMA_MAX_TOKENS||'1024'); const temp=parseFloat(process.env.GEMMA_TEMP||'0.3'); const base=process.env.GEMMA_BASE||'http://localhost:8090'; console.log('\\n🦙 Querying TurboQuant at '+base+' ...\\n'); fetch(base+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-legal',messages:[{role:'system',content:sys},{role:'user',content:q}],max_tokens:maxTok,temperature:temp,stream:false})}).then(r=>r.json()).then(d=>{if(d.error){console.error('Error:',JSON.stringify(d.error));process.exit(1);} const reply=d.choices?.[0]?.message?.content; console.log(reply); console.log('\\n---'); console.log('Tokens: prompt='+d.usage?.prompt_tokens+' completion='+d.usage?.completion_tokens+' total='+d.usage?.total_tokens); console.log('Model:',d.model,'Finish:',d.choices?.[0]?.finish_reason);}).catch(e=>{console.error('\\n❌ TurboQuant not reachable on '+base);console.error('   Start it with: ⚡ TurboQuant: Start (text-only, :8090)');console.error('   Error:',e.message);process.exit(1);});"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "GEMMA_PROMPT": "${input:gemma4Prompt}",
+          "GEMMA_SYSTEM": "${input:gemma4System}",
+          "GEMMA_MAX_TOKENS": "${input:gemma4MaxTokens}",
+          "GEMMA_TEMP": "${input:gemma4Temp}",
+          "GEMMA_BASE": "http://localhost:8090"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Interactive Gemma4 prompt from VS Code — type your query in the input box, response streams to terminal. Uses TurboQuant turbo3 KV cache on :8090. Run '⚡ TurboQuant: Start (text-only, :8090)' first."
+    },
+    {
+      "label": "💬 Gemma4: Agentic Tool Loop from VS Code (dev server :5173)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "-e",
+        "const q=process.env.GEMMA_PROMPT; if(!q){console.error('No prompt');process.exit(1);} const pipeline=process.env.GEMMA_PIPELINE||'ace'; console.log('\\n🤖 Gemma4 Agentic Tool Loop (pipeline='+pipeline+')\\n Query: '+q+'\\n'); fetch('http://localhost:5173/api/ai/agent',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({query:q,pipeline,tools:['rag_search','case_search','memory_recall','hyperedge_stats']})}).then(r=>r.json()).then(d=>{if(d.error){console.error('Agent error:',d.error);process.exit(1);} console.log('\\n=== Answer ===\\n'); console.log(d.answer??JSON.stringify(d,null,2)); console.log('\\n--- Meta ---'); console.log('Tools used:',d.toolsUsed?.join(', ')??'none'); console.log('Rounds:',d.rounds,'| Latency:',d.durationMs,'ms');}).catch(e=>{console.error('\\n❌ Dev server not running on :5173');console.error('   Start it with: Dev: npm run dev (SvelteKit)');console.error('   Error:',e.message);process.exit(1);});"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "GEMMA_PROMPT": "${input:gemma4Prompt}",
+          "GEMMA_PIPELINE": "${input:gemma4Pipeline}"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Gemma4 multi-step agentic loop via /api/ai/agent — uses rag_search, case_search, memory_recall, hyperedge_stats tools. Requires dev server on :5173. TurboQuant on :8090 speeds up inference."
     }
   ],
   "inputs": [
@@ -7617,6 +8055,80 @@
       "type": "promptString",
       "description": "Session cookie for dev server auth (paste from browser DevTools → Application → Cookies). Leave empty if DEV_BYPASS_AUTH=true is set.",
       "default": ""
+    },
+    {
+      "id": "turboQuantQuery",
+      "type": "promptString",
+      "description": "TurboQuant agentic query — sent to llama-server on :8090 (turbo3 KV cache compression)",
+      "default": "Summarize the key legal principles around hearsay evidence and chain of custody"
+    },
+    {
+      "id": "vlmTextPrompt",
+      "type": "promptString",
+      "description": "VLM text prompt for TurboQuant vision+text inference (pair with an image)",
+      "default": "Describe this legal document and identify any key entities or dates"
+    },
+    {
+      "id": "webSearchQuery",
+      "type": "promptString",
+      "description": "Web search / TurboVec query — routed through Gemma4 agent tool loop + research corpus",
+      "default": "Latest SvelteKit 2 performance optimizations and Svelte 5 runes best practices"
+    },
+    {
+      "id": "gemma4Prompt",
+      "type": "promptString",
+      "description": "Your question or instruction for Gemma4 (TurboQuant :8090 or dev server agent)",
+      "default": "Explain the hearsay rule and its exceptions under the Federal Rules of Evidence"
+    },
+    {
+      "id": "gemma4System",
+      "type": "promptString",
+      "description": "System prompt for Gemma4 (leave blank for legal AI default)",
+      "default": "You are a legal AI assistant specializing in case law, evidence rules, and document analysis."
+    },
+    {
+      "id": "gemma4MaxTokens",
+      "type": "promptString",
+      "description": "Max tokens for Gemma4 response (default 1024, use 256 for quick answers)",
+      "default": "1024"
+    },
+    {
+      "id": "gemma4Temp",
+      "type": "promptString",
+      "description": "Temperature for Gemma4 (0.1=deterministic, 0.7=creative, default 0.3)",
+      "default": "0.3"
+    },
+    {
+      "id": "gemma4Pipeline",
+      "type": "pickString",
+      "description": "Agent pipeline for Gemma4 tool loop",
+      "options": [
+        "ace",
+        "rag",
+        "kag",
+        "dag"
+      ],
+      "default": "ace"
+    },
+    {
+      "id": "hgCollection",
+      "type": "pickString",
+      "description": "Qdrant collection for hypergraph build/tag",
+      "options": [
+        "evidence_items",
+        "codebase_chunks_768",
+        "legal_documents",
+        "legal_cases",
+        "chat_messages",
+        "embedding_cache"
+      ],
+      "default": "evidence_items"
+    },
+    {
+      "id": "hgClusters",
+      "type": "promptString",
+      "description": "Number of k-means clusters for the hypergraph build (e.g. 50, 100, 200)",
+      "default": "100"
     }
   ]
 }

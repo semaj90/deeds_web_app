@@ -42,13 +42,50 @@ async function main() {
   run('node', ['./sveltekit-frontend/scripts/generate-smoke-embeddings.mjs']);
 
   // Build hypergraph with Redis checkpointing
-  run('node', ['./sveltekit-frontend/scripts/hypergraph-build.mjs', '--input', './sveltekit-frontend/tmp/embeddings-smoke.ndjson', '--clusters', '50', '--redis', REDIS, '--checkpoint-every', '100', '--out', './sveltekit-frontend/tmp/centroids-ci.json', '--assignments', './sveltekit-frontend/tmp/assignments-ci.ndjson']);
+  run('node', [
+    './sveltekit-frontend/scripts/hypergraph-build.mjs',
+    '--input',
+    './sveltekit-frontend/tmp/embeddings-smoke.ndjson',
+    '--clusters',
+    '50',
+    '--redis',
+    REDIS,
+    '--checkpoint-every',
+    '100',
+    '--out',
+    './sveltekit-frontend/tmp/centroids-ci.json',
+    '--assignments',
+    './sveltekit-frontend/tmp/assignments-ci.ndjson',
+  ]);
 
   // Write topology into Redis
-  run('node', ['./sveltekit-frontend/scripts/hypergraph-topology-writer.mjs', '--centroids', './sveltekit-frontend/tmp/centroids-ci.json', '--redis', REDIS, '--k', '16', '--prefix', PREFIX]);
+  run('node', [
+    './sveltekit-frontend/scripts/hypergraph-topology-writer.mjs',
+    '--centroids',
+    './sveltekit-frontend/tmp/centroids-ci.json',
+    '--redis',
+    REDIS,
+    '--k',
+    '16',
+    '--prefix',
+    PREFIX,
+  ]);
+
+  // Dry-run Qdrant tagging (no real Qdrant needed in CI — just validates parse + batch logic)
+  run('node', [
+    './sveltekit-frontend/scripts/hypergraph-tag-qdrant.mjs',
+    '--assignments',
+    './sveltekit-frontend/tmp/assignments-ci.ndjson',
+    '--collection',
+    'evidence_items',
+    '--dry-run',
+  ]);
 
   const rc = await checkRedis();
-  if (rc !== 0) { console.error('CI smoke: Redis verification failed'); process.exit(rc); }
+  if (rc !== 0) {
+    console.error('CI smoke: Redis verification failed');
+    process.exit(rc);
+  }
   console.log('CI smoke succeeded');
 }
 

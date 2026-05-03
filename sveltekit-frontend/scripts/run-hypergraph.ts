@@ -44,9 +44,11 @@ const SUMMARIZE_BATCH   = 3;   // concurrent Ollama summarization calls
 const DIM               = 768;
 const HG_EDGE_TTL       = 4 * 3600;
 const HG_COORD_TTL      = 1 * 3600;
-const GRADE_A           = 0.75;
-const GRADE_B           = 0.55;
-const GRADE_C           = 0.35;
+// Grade thresholds computed dynamically from score percentiles in buildHyperedges()
+// These are placeholders overridden at runtime.
+let GRADE_A = 0.75;
+let GRADE_B = 0.55;
+let GRADE_C = 0.35;
 
 // ── Redis (ioredis — matches the project's redis.ts singleton) ────────────────
 
@@ -159,7 +161,7 @@ async function scrollQdrant(maxNodes: number): Promise<Node[]> {
         id:       String(pt.id),
         filePath,
         vec:      l2norm(vec),
-        pagerank: 0.5,
+        pagerank: 0, // sentinel: 0 = unscored; real scores hydrated from Redis below
         somX:     typeof p['som_bmu_col'] === 'number' ? (p['som_bmu_col'] as number) : undefined,
         somY:     typeof p['som_bmu_row'] === 'number' ? (p['som_bmu_row'] as number) : undefined,
         pipeline: 'codebase',
@@ -354,7 +356,7 @@ async function summarizeEdge(memberPaths: string[], _centroid: number[], cluster
     const res = await fetch(`${OLLAMA_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gemma4-legal-vlm:latest', prompt, stream: false }),
+      body: JSON.stringify({ model: 'gemma4-legal-vlm:latest', prompt, stream: false, cache_prompt: true }),
       signal: AbortSignal.timeout(30_000),
     });
     if (res.ok) {
@@ -387,6 +389,19 @@ async function buildHyperedges(
     clusters.get(c)!.push(i);
   }
 
+  // Calibrate grade thresholds from scored nodes only (exclude 0.5 sentinel defaults)
+  {
+    const scored = nodes.map(n => n.pagerank).filter(s => s > 0).sort((a, b) => a - b);
+    if (scored.length >= 10) {
+      GRADE_A = scored[Math.floor(scored.length * 0.95)]; // top 5%  — hub files only
+      GRADE_B = scored[Math.floor(scored.length * 0.80)]; // top 20% — frequently imported
+      GRADE_C = scored[Math.floor(scored.length * 0.50)]; // top 50% — above median
+      console.log(`[hg] Grade thresholds (${scored.length} scored nodes): A≥${GRADE_A.toFixed(4)} B≥${GRADE_B.toFixed(4)} C≥${GRADE_C.toFixed(4)}`);
+    } else {
+      console.log('[hg] Grade thresholds: using defaults (too few scored nodes)');
+    }
+  }
+
   // Clear old index
   await redis.del('hg:edge:idx').catch(() => {});
 
@@ -415,7 +430,10 @@ async function buildHyperedges(
     const memberIds   = memberNodes.map(n => n.id);
     const memberPaths = memberNodes.map(n => n.filePath);
     const centroid    = centroids[c];
-    const gradeScore  = memberNodes.reduce((s, n) => s + n.pagerank, 0) / memberNodes.length;
+    // Grade by max PageRank member — a cluster is only as good as its highest-ranked hub file.
+    // Using max (not mean) avoids diluting hub-containing clusters with unscored leaf nodes.
+    const maxPagerank = Math.max(...memberNodes.map(n => n.pagerank));
+    const gradeScore  = maxPagerank;
     const gradeLabel  = gradeScore >= GRADE_A ? 'A' : gradeScore >= GRADE_B ? 'B' : gradeScore >= GRADE_C ? 'C' : 'D';
     work.push({ c, memberIdxs, memberNodes, memberIds, memberPaths, centroid, gradeScore, gradeLabel, hash: fnv1a(memberIds.sort().join(',')) });
   }

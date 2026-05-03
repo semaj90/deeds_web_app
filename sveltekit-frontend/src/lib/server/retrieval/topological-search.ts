@@ -1,86 +1,182 @@
 /**
  * Advanced Topological Retrieval Boost
  *
- * Leverages SOM (Self-Organizing Map) grid coordinates and PageRank centrality
- * to refine vector search results.
+ * Leverages SOM (Self-Organizing Map) grid coordinates, PageRank centrality,
+ * and hyperedge cluster membership (from run-hypergraph.ts Redis keys) to
+ * refine vector search results.
  */
 
 import type { RankedChunk } from './codebase-context';
 
 export interface BoostOptions {
-  radius?: number;          // Manhattan distance for spatial boost (default: 2)
-  spatialWeight?: number;   // Multiplier for nearby buddies (default: 1.2)
+  radius?: number;           // Manhattan distance for spatial boost (default: 2)
+  spatialWeight?: number;    // Multiplier for nearby buddies (default: 1.2)
   centralityWeight?: number; // Multiplier for pageRankScore (default: 0.3)
-  densityMaxBoost?: number; // Cap for cluster density boost (default: 1.5)
+  densityMaxBoost?: number;  // Cap for cluster density boost (default: 1.5)
+  hyperedgeBoost?: number;   // Additive boost for same-hyperedge chunks (default: 0.06)
+}
+
+/**
+ * Hyperedge grade → numeric boost mapping.
+ * Grade A (top 10% PageRank) → strongest signal; D → neutral.
+ */
+const GRADE_BOOST: Record<string, number> = { A: 0.10, B: 0.07, C: 0.04, D: 0.01 };
+
+/**
+ * Load hyperedge membership for a set of Qdrant point IDs from Redis.
+ * Keys: hg:edge:{hash} → JSON { memberIds: string[], gradeLabel: string }
+ * Index: hg:edge:idx ZSET (hashes sorted by gradeScore)
+ *
+ * Returns a Map<qdrantId → { hash, gradeLabel }> for O(1) lookup.
+ */
+async function loadHyperedgeMembership(
+  ids: string[]
+): Promise<Map<string, { hash: string; gradeLabel: string; gradeScore: number }>> {
+  const map = new Map<string, { hash: string; gradeLabel: string; gradeScore: number }>();
+  if (ids.length === 0) return map;
+
+  try {
+    const { getRedis } = await import('$lib/server/redis.js');
+    const redis = getRedis();
+
+    // Read top-scoring hyperedges from index (cap at 50 to stay fast)
+    const hashes = await redis.zrange('hg:edge:idx', 0, 49, 'REV');
+    if (!hashes.length) return map;
+
+    const blobs = await Promise.all(hashes.map((h) => redis.get(`hg:edge:${h}`)));
+    const idSet = new Set(ids);
+
+    for (let i = 0; i < hashes.length; i++) {
+      const raw = blobs[i];
+      if (!raw) continue;
+      try {
+        const edge = JSON.parse(raw) as {
+          hash: string;
+          memberIds: string[];
+          gradeLabel: string;
+          gradeScore: number;
+        };
+        for (const mid of edge.memberIds) {
+          if (idSet.has(mid)) {
+            // Keep highest-grade edge if a chunk belongs to multiple
+            const existing = map.get(mid);
+            if (!existing || edge.gradeScore > existing.gradeScore) {
+              map.set(mid, { hash: edge.hash, gradeLabel: edge.gradeLabel, gradeScore: edge.gradeScore });
+            }
+          }
+        }
+      } catch { /* malformed blob — skip */ }
+    }
+  } catch { /* Redis unavailable — non-fatal */ }
+
+  return map;
 }
 
 /**
  * Apply topological boosts to a set of ranked chunks.
  *
- * 1. Spatial Adjacency: Chunks near each other on the SOM grid (even in different
- *    k-means clusters) are boosted, promoting semantically related groups.
- * 2. Centrality (PageRank): High-authority files (e.g. entrypoints, shared utils)
- *    receive a secondary boost to surface them as structural context.
+ * 1. Hyperedge coherence: chunks sharing the same GPU k-means hyperedge get a
+ *    grade-weighted boost (A=+0.10, B=+0.07, C=+0.04, D=+0.01).
+ * 2. Spatial Adjacency: chunks near each other on the SOM grid get a density boost.
+ * 3. Centrality (PageRank): high-authority files get a multiplier boost.
  */
-export function applyTopologicalBoost(
+export async function applyTopologicalBoostAsync(
   results: RankedChunk[],
   opts: BoostOptions = {}
-): RankedChunk[] {
+): Promise<RankedChunk[]> {
   if (results.length === 0) return results;
 
   const {
     radius = 2,
     spatialWeight = 1.2,
     centralityWeight = 0.3,
-    densityMaxBoost = 1.5
+    densityMaxBoost = 1.5,
+    hyperedgeBoost: _he = 0.06,
   } = opts;
 
-  // 1. Identify "Spatial Neighbors" across the result set
-  // This helps identify thematic "hotspots" in the current query retrieval
-  const boosted = results.map((r) => {
-    let adjacencyCount = 0;
+  // Collect Qdrant IDs from results (stored as qdrantId or id field)
+  const qdrantIds = results
+    .map((r) => (r as Record<string, unknown>).qdrantId ?? (r as Record<string, unknown>).id)
+    .filter((id): id is string => typeof id === 'string');
 
-    // Check every other result for spatial proximity
+  const edgeMap = await loadHyperedgeMembership(qdrantIds);
+
+  const boosted = results.map((r) => {
+    const qdrantId = String((r as Record<string, unknown>).qdrantId ?? (r as Record<string, unknown>).id ?? '');
+    let boost = 0;
+
+    // 1. Hyperedge coherence boost
+    const edgeInfo = edgeMap.get(qdrantId);
+    if (edgeInfo) {
+      boost += GRADE_BOOST[edgeInfo.gradeLabel] ?? 0.01;
+    }
+
+    // 2. SOM spatial adjacency
+    let adjacencyCount = 0;
     if (r.somBmuRow != null && r.somBmuCol != null) {
       for (const other of results) {
         if (other.relativePath === r.relativePath) continue;
         if (other.somBmuRow == null || other.somBmuCol == null) continue;
-
         const dist = Math.abs(r.somBmuRow - other.somBmuRow) + Math.abs(r.somBmuCol - other.somBmuCol);
-        if (dist <= radius) {
-          adjacencyCount++;
-        }
+        if (dist <= radius) adjacencyCount++;
       }
     }
-
-    // 2. Calculate Boosts
-    // A. Topological Density Boost (exponential multiplier capped at densityMaxBoost)
     const densityBoost = adjacencyCount > 0
       ? Math.min(densityMaxBoost, Math.pow(spatialWeight, Math.min(adjacencyCount, 4)))
       : 1.0;
 
-    // B. PageRank Centrality Boost
-    // Maps [0,1] PageRank to a [1.0, 1.3] multiplier
-    const rankValue = (r.pageRankScore ?? 0);
-    const pagerankBoost = 1.0 + (rankValue * centralityWeight);
+    // 3. PageRank centrality
+    const pagerankBoost = 1.0 + ((r.pageRankScore ?? 0) * centralityWeight);
 
-    // 3. Apply Boosts
-    // Final score = raw_score * density * pagerank
-    const finalScore = Math.min(1.0, r.score * densityBoost * pagerankBoost);
+    const finalScore = Math.min(1.0, (r.score + boost) * densityBoost * pagerankBoost);
 
     return {
       ...r,
       score: finalScore,
-      // Metadata enrichment for observability
       _topological_stats: {
         neighbors: adjacencyCount,
         densityBoost,
         pagerankBoost,
-        originalScore: r.score
-      }
+        hyperedgeGrade: edgeInfo?.gradeLabel ?? null,
+        hyperedgeBoost: boost,
+        originalScore: r.score,
+      },
     };
   });
 
-  // 4. Re-sort by boosted score
+  return boosted.sort((a, b) => b.score - a.score);
+}
+
+/** Sync version (no Redis) — used as fallback when async context unavailable */
+export function applyTopologicalBoost(
+  results: RankedChunk[],
+  opts: BoostOptions = {}
+): RankedChunk[] {
+  if (results.length === 0) return results;
+
+  const { radius = 2, spatialWeight = 1.2, centralityWeight = 0.3, densityMaxBoost = 1.5 } = opts;
+
+  const boosted = results.map((r) => {
+    let adjacencyCount = 0;
+    if (r.somBmuRow != null && r.somBmuCol != null) {
+      for (const other of results) {
+        if (other.relativePath === r.relativePath) continue;
+        if (other.somBmuRow == null || other.somBmuCol == null) continue;
+        const dist = Math.abs(r.somBmuRow - other.somBmuRow) + Math.abs(r.somBmuCol - other.somBmuCol);
+        if (dist <= radius) adjacencyCount++;
+      }
+    }
+    const densityBoost = adjacencyCount > 0
+      ? Math.min(densityMaxBoost, Math.pow(spatialWeight, Math.min(adjacencyCount, 4)))
+      : 1.0;
+    const pagerankBoost = 1.0 + ((r.pageRankScore ?? 0) * centralityWeight);
+    const finalScore = Math.min(1.0, r.score * densityBoost * pagerankBoost);
+    return {
+      ...r,
+      score: finalScore,
+      _topological_stats: { neighbors: adjacencyCount, densityBoost, pagerankBoost, originalScore: r.score },
+    };
+  });
+
   return boosted.sort((a, b) => b.score - a.score);
 }
