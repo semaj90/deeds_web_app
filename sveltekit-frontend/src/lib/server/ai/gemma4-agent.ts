@@ -27,6 +27,7 @@ import { qdrant }                                      from '$lib/server/vector/
 import { selectAdaptiveMemory, queryTopHyperedges }    from '$lib/server/graph/hypergraph-4d.js';
 import { db, pool }                                    from '$lib/server/db/client';
 import { contextTimeline }                             from '$lib/server/db/schema-postgres.js';
+import { trackTokenUsage }                             from '$lib/server/ai/token-tracker.js';
 import { ENV } from '$lib/server/env.server.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -509,6 +510,8 @@ export async function runGemma4Agent(
   let round          = 0;
   let resultCacheTier: AgentRunResult['cacheTier']  = undefined;
   let resultCacheMs:   number | undefined           = undefined;
+  let totalPromptTokens     = 0;
+  let totalCompletionTokens = 0;
 
   // ── Pre-loop cache check (L1 Redis → L2 Qdrant) ──────────────────────────
   // Skip the entire tool-calling loop if a cached final answer exists.
@@ -537,15 +540,7 @@ export async function runGemma4Agent(
   while (!finalAnswer && round < MAX_ROUNDS) {
     round++;
 
-    const body = JSON.stringify({
-      model:    TOOL_MODEL,
-      messages,
-      tools:    AGENT_TOOLS,
-      stream:   false,
-      options:  { temperature: 0.2, num_predict: 2048 },
-    });
-
-    const result = await bifrostChat(messages, TOOL_MODEL, {
+    const rawResult = await bifrostChat(messages, TOOL_MODEL, {
       tools: AGENT_TOOLS,
       temperature: 0.2,
       maxTokens: 2048,
@@ -553,9 +548,16 @@ export async function runGemma4Agent(
       cacheKey: `agent-tool-loop:${pipeline}`,
     });
 
-    const msg: OllamaMessage = typeof result === 'string' 
-      ? { role: 'assistant', content: result }
-      : { role: 'assistant', content: result.content, tool_calls: result.tool_calls };
+    // Accumulate token counts across rounds (Ollama returns these on non-streaming calls)
+    if (typeof rawResult === 'object' && rawResult !== null) {
+      const rd = rawResult as Record<string, unknown>;
+      if (typeof rd.prompt_eval_count === 'number')  totalPromptTokens     += rd.prompt_eval_count;
+      if (typeof rd.eval_count         === 'number')  totalCompletionTokens += rd.eval_count;
+    }
+
+    const msg: OllamaMessage = typeof rawResult === 'string'
+      ? { role: 'assistant', content: rawResult }
+      : { role: 'assistant', content: rawResult.content, tool_calls: rawResult.tool_calls };
 
     // Final answer — no tool calls
     if (!msg.tool_calls?.length) {
@@ -609,6 +611,24 @@ export async function runGemma4Agent(
   }
 
   const durationMs = Date.now() - t0;
+
+  // Fire-and-forget token usage log (with template + pipeline context in metadata JSONB)
+  trackTokenUsage({
+    userId:           options?.userId,
+    endpoint:         '/api/ai/agent',
+    model:            TOOL_MODEL,
+    promptTokens:     totalPromptTokens,
+    completionTokens: totalCompletionTokens,
+    durationMs,
+    cached:           resultCacheTier !== undefined,
+    metadata: {
+      chatTemplate:  'gemma',
+      pipeline,
+      rounds:        round,
+      toolsUsed,
+      cachedTier:    resultCacheTier ?? null,
+    },
+  });
 
   // Fire-and-forget timeline record
   db.insert(contextTimeline).values({
