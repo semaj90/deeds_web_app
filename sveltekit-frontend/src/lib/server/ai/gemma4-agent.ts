@@ -33,12 +33,24 @@ import fs from 'fs/promises';
 import path from 'path';
 import { LinterService } from './linter-service.js';
 import { tieredLLMQuery } from '$lib/server/ai/tiered-llm-cache.js';
+import { logInference } from '$lib/server/observability/inference-log.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const MAX_ROUNDS  = 5;   // max tool-call rounds before forcing a final answer
-const TOOL_MODEL  = VLM_MODELS.legal;   // gemma4-legal-vlm:latest (unified)
-const TIMEOUT_MS  = 90_000;
+const MAX_ROUNDS = 5;    // max tool-call rounds before forcing a final answer
+const TIMEOUT_MS = 90_000;
+
+// ── Model broker boundary ─────────────────────────────────────────────────────
+// PLANNER_MODEL  — Gemma 4 legal VLM: planning, reasoning, synthesis (5.3GB)
+// TOOL_MODEL     — FunctionGemma (or same VLM until model is available):
+//                  structured-call translation / function-call parsing (270M target)
+// EMBED_MODEL    — embeddinggemma: retrieval embeddings (separate, always)
+//
+// To activate FunctionGemma once pulled:
+//   Set FUNCTION_GEMMA_MODEL=functiongemma:latest in .env
+//   The TOOL_MODEL slot will route structured calls through it automatically.
+const PLANNER_MODEL = VLM_MODELS.legal;  // full reasoning + synthesis
+const TOOL_MODEL    = VLM_MODELS.tool;   // structured-call translation (FunctionGemma when available)
 
 // ── Ollama wire types ──────────────────────────────────────────────────────────
 
@@ -227,10 +239,16 @@ async function dispatchTool(
       const collection = String(args.collection ?? 'research_summaries');
       const topK       = Math.min(Number(args.topK ?? 5), 20);
 
-      const emb = await generateEmbedding(query);
-      if (!emb) return { tool: name, result: [], errorMsg: 'Embedding unavailable' };
+      let emb: number[] | null = null;
+      try {
+        emb = await Promise.race([
+          generateEmbedding(query),
+          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('embed-timeout')), 12_000)),
+        ]);
+      } catch { emb = null; }
+      if (!emb) return { tool: name, result: [], errorMsg: 'Embedding unavailable (VRAM contention)' };
 
-      const VALID = ['research_summaries', 'legal_documents', 'evidence_items'] as const;
+      const VALID = ['research_summaries', 'codebase_chunks_768', 'legal_documents', 'evidence_items'] as const;
       const col   = VALID.includes(collection as typeof VALID[number])
         ? (collection as typeof VALID[number])
         : 'research_summaries';
@@ -279,8 +297,14 @@ async function dispatchTool(
       const query = String(args.query ?? '');
       const topK  = Math.min(Number(args.topK ?? 3), 10);
 
-      const emb = await generateEmbedding(query);
-      if (!emb) return { tool: name, result: [], errorMsg: 'Embedding unavailable' };
+      let emb: number[] | null = null;
+      try {
+        emb = await Promise.race([
+          generateEmbedding(query),
+          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('embed-timeout')), 12_000)),
+        ]);
+      } catch { emb = null; }
+      if (!emb) return { tool: name, result: [], errorMsg: 'Embedding unavailable (VRAM contention)' };
 
       const modules = await selectAdaptiveMemory(emb, topK);
       return {
@@ -379,7 +403,10 @@ async function dispatchTool(
 
       // 3. Qdrant research_summaries semantic fallback
       try {
-        const emb = await generateEmbedding(query);
+        const emb = await Promise.race([
+          generateEmbedding(query),
+          new Promise<null>((_, reject) => setTimeout(() => reject(new Error('embed-timeout')), 12_000)),
+        ]).catch(() => null);
         if (emb) {
           const hits = await qdrant.hybridSearch({
             collection: 'research_summaries',
@@ -519,7 +546,7 @@ export async function runGemma4Agent(
   if (!bypassCache) {
     try {
       const cached = await tieredLLMQuery(messages, {
-        model:       TOOL_MODEL,
+        model:       PLANNER_MODEL,
         temperature: 0.2,
         maxTokens:   2048,
         context:     pipeline,
@@ -600,7 +627,7 @@ export async function runGemma4Agent(
         { role: 'user', content: 'Please now provide a final answer based on what you found.' },
       ],
       {
-        model:       TOOL_MODEL,
+        model:       PLANNER_MODEL,
         temperature: 0.2,
         maxTokens:   2048,
         context:     pipeline,
@@ -627,6 +654,24 @@ export async function runGemma4Agent(
       rounds:        round,
       toolsUsed,
       cachedTier:    resultCacheTier ?? null,
+      plannerModel:  PLANNER_MODEL,
+      toolModel:     TOOL_MODEL,
+    },
+  });
+
+  // Inference observability — model_role + cache_tier for CI gate
+  logInference({
+    type: 'llm',
+    model: PLANNER_MODEL,
+    backend: 'ollama',
+    latencyMs: durationMs,
+    cacheHit: resultCacheTier !== undefined,
+    metadata: {
+      model_role: 'gemma4-agent-planner',
+      cache_tier: resultCacheTier ?? 'L4',
+      toolsUsed,
+      rounds: round,
+      pipeline,
     },
   });
 
