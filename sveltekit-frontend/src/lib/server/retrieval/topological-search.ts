@@ -96,13 +96,14 @@ export async function applyTopologicalBoostAsync(
 
   // Collect Qdrant IDs from results (stored as qdrantId or id field)
   const qdrantIds = results
-    .map((r) => (r as Record<string, unknown>).qdrantId ?? (r as Record<string, unknown>).id)
+    .map((r) => (r as unknown as Record<string, unknown>).qdrantId ?? (r as unknown as Record<string, unknown>).id)
     .filter((id): id is string => typeof id === 'string');
 
   const edgeMap = await loadHyperedgeMembership(qdrantIds);
 
   const boosted = results.map((r) => {
-    const qdrantId = String((r as Record<string, unknown>).qdrantId ?? (r as Record<string, unknown>).id ?? '');
+    const rx = r as unknown as Record<string, unknown>;
+    const qdrantId = String(rx.qdrantId ?? rx.id ?? '');
     let boost = 0;
 
     // 1. Hyperedge coherence boost

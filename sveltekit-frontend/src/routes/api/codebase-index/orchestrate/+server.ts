@@ -114,6 +114,7 @@ const orchestrateSchema = z.object({
   pageRank: z.boolean().default(false),
   exportWiki: z.boolean().default(false),
   hypergraph: z.boolean().default(false),
+  communityGraph: z.boolean().default(false),
   deepResearch: z.boolean().default(false),
   // Checkpoint / resume
   runId: z.string().max(64).optional(),
@@ -623,6 +624,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
 		resume,
 	} = parsed.data;
 	const deepResearch = parsed.data.deepResearch ?? false;
+	const communityGraph = parsed.data.communityGraph ?? false;
 	const runId = parsed.data.runId ?? randomUUID().slice(0, 8);
 	const runIndexing = parsed.data.runIndexing ?? mode === 'sync';
 	if (mode === 'async' && dryRun) {
@@ -1295,6 +1297,72 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
             stage: 'hypergraph_4d',
             step: 'skipped',
             reason: dryRun ? 'dryRun' : 'hypergraph disabled',
+          });
+        }
+
+        // ── Stage 9b: GraphRAG community detection ──────────────────────
+        if (communityGraph && !dryRun) {
+          const cached = cachedStages.get('community_detection');
+          if (cached) {
+            emit('stage', {
+              stage: 'community_detection',
+              step: 'cached',
+              cachedAt: cached.completedAt,
+              durationMs: cached.durationMs,
+            });
+            emit('community_done', { stage: 'community_detection', ...cached.result });
+            stageTimings.community_detection = cached.durationMs;
+            completedStages.push('community_detection');
+          } else {
+            const stageStart = Date.now();
+            emit('community_started', { stage: 'community_detection' });
+
+            try {
+              const { buildCommunityGraph } = await import('$lib/server/graph/community-graph.js');
+              const cgResult = await buildCommunityGraph({
+                force,
+                onProgress: (msg) => {
+                  emit('stage', { stage: 'community_detection', step: 'progress', message: msg });
+                },
+              });
+
+              const resultData = {
+                communities: cgResult.communities,
+                totalClusters: cgResult.totalClusters,
+                totalMembers: cgResult.totalMembers,
+                turboHits: cgResult.turboHits,
+                turboMisses: cgResult.turboMisses,
+                avgLlmMs: cgResult.avgLlmMs,
+                avgEmbedMs: cgResult.avgEmbedMs,
+                durationMs: cgResult.durationMs,
+              };
+              emit('community_done', { stage: 'community_detection', ...resultData });
+              stageTimings.community_detection = Date.now() - stageStart;
+              completedStages.push('community_detection');
+              void cacheStage(runId, 'community_detection', resultData, stageTimings.community_detection);
+
+              // Encoding log summary event for the GPU dashboard
+              emit('encoding_log', {
+                stage: 'community_detection',
+                turboHits: cgResult.turboHits,
+                turboMisses: cgResult.turboMisses,
+                avgLlmMs: cgResult.avgLlmMs,
+                avgEmbedMs: cgResult.avgEmbedMs,
+                totalInferences: cgResult.communities,
+              });
+            } catch (err) {
+              emit('stage', {
+                stage: 'community_detection',
+                step: 'failed',
+                error: (err as Error).message,
+              });
+            }
+          }
+        } else {
+          emit('stage', {
+            stage: 'community_detection',
+            step: 'skipped',
+            reason: dryRun ? 'dryRun' : 'communityGraph disabled',
           });
         }
 
