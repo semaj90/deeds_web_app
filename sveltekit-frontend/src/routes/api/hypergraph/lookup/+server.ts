@@ -14,6 +14,7 @@ try { Redis = require('ioredis'); } catch (e) { Redis = null; }
 
 // Simple in-memory TTL cache
 const localCache = new Map<string, { value: any; expiresAt: number }>();
+const rateCache = new Map<string, { stamps: number[]; expiresAt: number }>();
 function getLocalCache(key: string) {
   const v = localCache.get(key);
   if (!v) return null;
@@ -48,10 +49,10 @@ async function checkRateLimit(redisClient: any, ip: string) {
   } catch (e) { /* fall through to local */ }
   // local sliding window counter
   const now = Date.now();
-  const entry = (localCache.get(`rl:${ip}`) || { stamps: [] });
+  const entry = (rateCache.get(`rl:${ip}`) || { stamps: [], expiresAt: 0 });
   const stamps: number[] = entry.stamps.filter((t: number) => now - t < RATE_WINDOW * 1000);
   stamps.push(now);
-  localCache.set(`rl:${ip}`, { stamps, expiresAt: now + RATE_WINDOW * 1000 });
+  rateCache.set(`rl:${ip}`, { stamps, expiresAt: now + RATE_WINDOW * 1000 });
   return stamps.length <= RATE_LIMIT;
 }
 
@@ -132,7 +133,7 @@ export async function POST(event: any) {
     const items: { id: string; vector: number[] }[] = [];
     for (const [field, value] of Object.entries(all)) {
       if (field === 'meta') continue;
-      try { const o = JSON.parse(value); items.push({ id: field, vector: o.vector }); } catch (e) { continue; }
+      try { const o = JSON.parse(String(value)); items.push({ id: field, vector: o.vector }); } catch (e) { continue; }
     }
     const scored = items.map(it => ({ id: it.id, dist: l2sq(vec, it.vector) }));
     scored.sort((a, b) => a.dist - b.dist);
