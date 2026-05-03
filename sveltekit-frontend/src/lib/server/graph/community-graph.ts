@@ -36,7 +36,7 @@ import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const TURBOQUANT_URL   = process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
-const OLLAMA_URL       = ENV.OLLAMA_URL;
+const OLLAMA_URL       = ENV.OLLAMA_BASE_URL;
 const CHAT_MODEL       = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
 const NEO4J_URL        = ENV.NEO4J_URI ?? 'bolt://127.0.0.1:7687';
 const NEO4J_USER       = ENV.NEO4J_USER ?? 'neo4j';
@@ -517,7 +517,7 @@ export async function getCommunityContext(
     `, [JSON.stringify(Array.from(queryVec)), communityIds, limit]).catch(() => ({ rows: [] as Record<string, unknown>[] }));
 
     const simMap = new Map<number, number>(
-      rows.map((r: Record<string, unknown>) => [Number(r.community_id), Number(r.similarity)])
+      rows.map((r: Record<string, unknown>) => [Number(r.community_id), Number(r.similarity)] as [number, number])
     );
 
     // Merge similarities into records
