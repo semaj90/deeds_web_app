@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "YoRHa-styled legal AI frontend with Gemma3 integration",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "predev": "node scripts/ensure-dev-runtime.mjs dev",
     "precheck": "pwsh scripts/guard-route-params.ps1",

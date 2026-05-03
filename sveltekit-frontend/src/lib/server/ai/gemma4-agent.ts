@@ -31,6 +31,7 @@ import { ENV } from '$lib/server/env.server.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { LinterService } from './linter-service.js';
+import { tieredLLMQuery } from '$lib/server/ai/tiered-llm-cache.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -465,9 +466,16 @@ export interface AgentRunResult {
   rounds:     number;
   sources:    unknown[];
   durationMs: number;
+  cacheTier?: 'L1_redis' | 'L2_qdrant' | 'L3_ollama';
+  cacheLatencyMs?: number;
 }
 
 // ── Agent loop ────────────────────────────────────────────────────────────────
+
+// Tools that write state — their results must never be served from cache.
+// Serving a stale "patch applied" or "file written" response to a different
+// caller would silently corrupt state (side-effect cache poisoning).
+const SIDE_EFFECT_TOOLS = new Set(['apply_shadow_patch', 'revert_fix', 'verify_fix']);
 
 export async function runGemma4Agent(
   query:       string,
@@ -476,12 +484,16 @@ export async function runGemma4Agent(
     pipeline?:     string;
     userId?:       string;
     sessionId?:    string;
+    bypassCache?:  boolean;
   },
 ): Promise<AgentRunResult> {
-  const t0       = Date.now();
-  const pipeline = options?.pipeline ?? 'ace';
-  const toolsUsed: string[] = [];
-  const sources:  unknown[] = [];
+  const t0          = Date.now();
+  const pipeline    = options?.pipeline ?? 'ace';
+  const toolsUsed:  string[]  = [];
+  const sources:    unknown[] = [];
+  // Bypass cache when caller requests it, or when side-effect tools were used
+  let hasSideEffect = false;
+  let bypassCache   = options?.bypassCache ?? false;
 
   const system = options?.systemPrompt ??
     'You are a legal research assistant with access to a knowledge graph and case database. ' +
@@ -493,10 +505,36 @@ export async function runGemma4Agent(
     { role: 'user',    content: query  },
   ];
 
-  let finalAnswer = '';
-  let round       = 0;
+  let finalAnswer    = '';
+  let round          = 0;
+  let resultCacheTier: AgentRunResult['cacheTier']  = undefined;
+  let resultCacheMs:   number | undefined           = undefined;
 
-  while (round < MAX_ROUNDS) {
+  // ── Pre-loop cache check (L1 Redis → L2 Qdrant) ──────────────────────────
+  // Skip the entire tool-calling loop if a cached final answer exists.
+  // Only applies when bypassCache is false AND caller didn't force fresh inference.
+  if (!bypassCache) {
+    try {
+      const cached = await tieredLLMQuery(messages, {
+        model:       TOOL_MODEL,
+        temperature: 0.2,
+        maxTokens:   2048,
+        context:     pipeline,
+        bypassCache: false,
+      });
+      // Only accept cache hits — L3 would just be a cold Ollama call with no tools
+      if (cached.tier !== 'L3_ollama') {
+        finalAnswer    = cached.response;
+        resultCacheTier = cached.tier;
+        resultCacheMs   = cached.latencyMs;
+        round = 0; // no tool rounds consumed
+      }
+    } catch {
+      // Cache unavailable — proceed normally
+    }
+  }
+
+  while (!finalAnswer && round < MAX_ROUNDS) {
     round++;
 
     const body = JSON.stringify({
@@ -532,6 +570,7 @@ export async function runGemma4Agent(
     for (const tc of msg.tool_calls) {
       const { name, arguments: tArgs } = tc.function;
       toolsUsed.push(name);
+      if (SIDE_EFFECT_TOOLS.has(name)) hasSideEffect = true;
 
       const result = await dispatchTool(name, tArgs ?? {});
       if (Array.isArray(result.result)) sources.push(...result.result);
@@ -547,27 +586,26 @@ export async function runGemma4Agent(
     }
   }
 
-  // If we ran out of rounds without a final answer, ask for one explicitly
+  // If we ran out of rounds without a final answer, synthesise one.
+  // Use tieredLLMQuery so the synthesis is cached (L1→L2→L3).
+  // Bypass cache when any side-effect tool ran — stale "patch applied"
+  // answers must never be served to a different caller.
   if (!finalAnswer && round >= MAX_ROUNDS) {
-    const body = JSON.stringify({
-      model:    TOOL_MODEL,
-      messages: [
+    bypassCache = bypassCache || hasSideEffect;
+    const forced = await tieredLLMQuery(
+      [
         ...messages,
         { role: 'user', content: 'Please now provide a final answer based on what you found.' },
       ],
-      stream:  false,
-      options: { temperature: 0.2, num_predict: 2048 },
-    });
-    const res  = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      signal:  AbortSignal.timeout(TIMEOUT_MS),
-    } as RequestInit);
-    if (res.ok) {
-      const data = (await res.json()) as OllamaChatResponse;
-      finalAnswer = data.message?.content ?? '';
-    }
+      {
+        model:       TOOL_MODEL,
+        temperature: 0.2,
+        maxTokens:   2048,
+        context:     pipeline,
+        bypassCache,
+      },
+    );
+    finalAnswer = forced.response;
   }
 
   const durationMs = Date.now() - t0;
@@ -586,5 +624,13 @@ export async function runGemma4Agent(
     } as Record<string, unknown>,
   }).catch(() => { /* non-fatal */ });
 
-  return { answer: finalAnswer, toolsUsed, rounds: round, sources, durationMs };
+  return {
+    answer:        finalAnswer,
+    toolsUsed,
+    rounds:        round,
+    sources,
+    durationMs,
+    cacheTier:     resultCacheTier,
+    cacheLatencyMs: resultCacheMs,
+  };
 }
