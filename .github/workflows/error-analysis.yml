@@ -1,262 +1,108 @@
-name: Error Analysis Pipeline
+name: Error Analysis
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
     branches: [main, develop]
-  schedule:
-    # Run weekly maintenance on Mondays at 9 AM UTC
-    - cron: '0 9 * * 1'
+  push:
+    branches: [main, develop]
 
 jobs:
   error-analysis:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Full history for trend analysis
+    defaults:
+      run:
+        working-directory: sveltekit-frontend
 
-      - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '22'
+          cache: npm
           cache-dependency-path: sveltekit-frontend/package-lock.json
 
-      - name: 🐍 Setup Python (for backend services)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: 🔨 Setup MSVC (for C++ compilation)
-        uses: microsoft/setup-msbuild@v2
-
-      - name: 🎯 Setup CMake
-        uses: lukka/get-cmake@latest
-
-      - name: 📦 Install Node Dependencies
-        working-directory: sveltekit-frontend
+      - name: Install dependencies
         run: npm ci
 
-      - name: 🗂️ Create Logs Directory
-        working-directory: sveltekit-frontend
-        run: mkdir -p logs
+      - name: Create log directories
+        run: mkdir -p logs reports
 
-      # ==================== STEP 1: TypeScript Check ====================
-      - name: 🔍 Run TypeScript/Svelte Check
-        id: ts-check
-        working-directory: sveltekit-frontend
-        continue-on-error: true
+      - name: Type and Svelte checks
+        id: type-check
         run: |
-          npm run check:svelte:machine > logs/svelte-check.log 2>&1 || true
-          echo "ts_errors=$?" >> $GITHUB_OUTPUT
+          npm run check 2>&1 | tee logs/svelte-check.log || true
+          npm run check:ts7 2>&1 | tee logs/ts7-check.log || true
 
-      # ==================== STEP 2: C++ Build & Check ====================
-      - name: 🏗️ Configure CMake
-        working-directory: sveltekit-frontend
-        continue-on-error: true
-        run: |
-          cmake -S . -B build -G "Visual Studio 17 2022" `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DENABLE_CUDA=ON `
-            -DENABLE_OPTIMIZATIONS=ON
+      - name: Phase78 AST-rank (collects svelte-check.log → ranked errors)
+        id: phase78-rank
+        run: npm run phase78:ast-rank 2>&1 | tee logs/phase78-ast-rank.log || true
 
-      - name: 🔨 Build C++ Components
-        id: cpp-build
-        working-directory: sveltekit-frontend
-        continue-on-error: true
-        run: |
-          npm run cpp:build > logs/cpp-build.log 2>&1 || true
-          echo "cpp_errors=$?" >> $GITHUB_OUTPUT
-
-      - name: 📊 Parse C++ Errors
-        working-directory: sveltekit-frontend
-        continue-on-error: true
-        run: npm run cpp:check:json
-
-      # ==================== STEP 3: Consolidate Errors ====================
-      - name: 🔗 Consolidate All Errors
-        id: consolidate
-        working-directory: sveltekit-frontend
-        continue-on-error: true
-        run: |
-          npm run errors:consolidate
-          echo "consolidate_exit=$?" >> $GITHUB_OUTPUT
-
-      - name: 📈 Monitor Error Rate
-        id: monitor
-        working-directory: sveltekit-frontend
-        continue-on-error: true
-        run: |
-          npm run errors:monitor
-          echo "monitor_exit=$?" >> $GITHUB_OUTPUT
-
-      # ==================== STEP 4: AI Clustering (Weekly) ====================
-      - name: 🧠 AI Error Clustering (Weekly Only)
-        if: github.event_name == 'schedule'
-        working-directory: sveltekit-frontend
+      - name: Phase78 insert errors into DB
+        id: phase78-insert
         continue-on-error: true
         env:
-          OLLAMA_URL: http://localhost:11434
-        run: npm run errors:cluster
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run phase78:insert 2>&1 | tee logs/phase78-insert.log || true
 
-      # ==================== STEP 5: Generate Report ====================
-      - name: 📋 Generate Summary Report
+      - name: Phase78 cluster errors
+        id: phase78-cluster
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run phase78:cluster 2>&1 | tee logs/phase78-cluster.log || true
+
+      - name: Phase78 generate suggestions
+        id: phase78-suggest
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          OLLAMA_BASE_URL: ${{ secrets.OLLAMA_BASE_URL || 'http://localhost:11434' }}
+        run: npm run phase78:suggest 2>&1 | tee logs/phase78-suggest.log || true
+
+      - name: Summarize error counts
         id: summary
-        working-directory: sveltekit-frontend
         run: |
-          $consolidated = Get-Content logs/all-errors-consolidated.json -ErrorAction SilentlyContinue | ConvertFrom-Json
-          $rateSummary = Get-Content logs/error-rate-summary.json -ErrorAction SilentlyContinue | ConvertFrom-Json
+          TS_ERRORS=$(grep -c "Error\b" logs/svelte-check.log 2>/dev/null || echo 0)
+          TS7_ERRORS=$(grep -c "error TS" logs/ts7-check.log 2>/dev/null || echo 0)
+          echo "ts_errors=$TS_ERRORS" >> "$GITHUB_OUTPUT"
+          echo "ts7_errors=$TS7_ERRORS" >> "$GITHUB_OUTPUT"
+          echo "Svelte-check errors: $TS_ERRORS"
+          echo "TS7 errors: $TS7_ERRORS"
 
-          $tsErrors = $consolidated.summary.totalTSErrors
-          $cppErrors = $consolidated.summary.totalCPPErrors
-          $totalErrors = $consolidated.summary.totalErrors
-          $criticalErrors = $consolidated.summary.criticalErrors
-
-          $trend = $rateSummary.trend
-          $anomalies = $rateSummary.anomaliesDetected
-
-          Write-Host "=========================================="
-          Write-Host "  Error Analysis Summary"
-          Write-Host "=========================================="
-          Write-Host ""
-          Write-Host "TypeScript Errors:  $tsErrors"
-          Write-Host "C++ Errors:         $cppErrors"
-          Write-Host "Total Errors:       $totalErrors"
-          Write-Host "Critical Errors:    $criticalErrors"
-          Write-Host ""
-          Write-Host "Trend:              $trend"
-          Write-Host "Anomalies Detected: $anomalies"
-          Write-Host ""
-          Write-Host "=========================================="
-
-          echo "total_errors=$totalErrors" >> $GITHUB_OUTPUT
-          echo "critical_errors=$criticalErrors" >> $GITHUB_OUTPUT
-          echo "trend=$trend" >> $GITHUB_OUTPUT
-          echo "anomalies=$anomalies" >> $GITHUB_OUTPUT
-
-      # ==================== STEP 6: Check Thresholds ====================
-      - name: ⚠️ Check Error Thresholds
-        id: thresholds
-        working-directory: sveltekit-frontend
-        run: |
-          $criticalErrors = ${{ steps.summary.outputs.critical_errors }}
-          $anomalies = ${{ steps.summary.outputs.anomalies }}
-
-          if ($criticalErrors -gt 0) {
-            Write-Host "❌ CRITICAL: $criticalErrors critical errors detected!"
-            echo "critical_fail=true" >> $GITHUB_OUTPUT
-          } else {
-            Write-Host "✅ No critical errors"
-            echo "critical_fail=false" >> $GITHUB_OUTPUT
-          }
-
-          if ($anomalies -gt 0) {
-            Write-Host "⚠️ WARNING: $anomalies anomalies detected!"
-            echo "anomaly_warn=true" >> $GITHUB_OUTPUT
-          } else {
-            Write-Host "✅ No anomalies"
-            echo "anomaly_warn=false" >> $GITHUB_OUTPUT
-          }
-
-      # ==================== STEP 7: Upload Artifacts ====================
-      - name: 📤 Upload Error Reports
-        uses: actions/upload-artifact@v4
+      - name: Upload phase78 artifacts
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: error-reports-${{ github.run_number }}
-          path: |
-            sveltekit-frontend/logs/*.json
-            sveltekit-frontend/logs/*.log
+          name: phase78-error-analysis-${{ github.run_number }}
           retention-days: 30
+          path: |
+            sveltekit-frontend/logs/svelte-check.log
+            sveltekit-frontend/logs/ts7-check.log
+            sveltekit-frontend/logs/phase78-*.log
+            sveltekit-frontend/reports/phase78/**
 
-      - name: 📤 Upload Consolidated Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: consolidated-report-${{ github.run_number }}
-          path: sveltekit-frontend/logs/all-errors-consolidated.json
-          retention-days: 90
-
-      # ==================== STEP 8: Create PR Comment ====================
-      - name: 💬 Comment on PR
+      - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            const consolidated = JSON.parse(
-              fs.readFileSync('sveltekit-frontend/logs/all-errors-consolidated.json', 'utf8')
-            );
-
-            const summary = consolidated.summary;
-            const hotspots = consolidated.hotspots.slice(0, 5);
-
-            let comment = `## 🔍 Error Analysis Report\n\n`;
-            comment += `**Total Errors:** ${summary.totalErrors} `;
-            comment += `(TS: ${summary.totalTSErrors}, C++: ${summary.totalCPPErrors})\n`;
-            comment += `**Critical:** ${summary.criticalErrors}\n\n`;
-
-            if (hotspots.length > 0) {
-              comment += `### 🔥 Top Error Hotspots\n\n`;
-              comment += `| File | Errors | Top Category |\n`;
-              comment += `|------|--------|---------------|\n`;
-              hotspots.forEach(h => {
-                const topCat = Object.entries(h.categories)
-                  .sort(([,a], [,b]) => b - a)[0][0];
-                comment += `| \`${h.file}\` | ${h.count} | ${topCat} |\n`;
-              });
-              comment += `\n`;
-            }
-
-            comment += `\n📊 [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-
+            const tsErrors  = '${{ steps.summary.outputs.ts_errors }}';
+            const ts7Errors = '${{ steps.summary.outputs.ts7_errors }}';
+            const body = [
+              '## Error Analysis Report',
+              '',
+              `**Svelte-check errors:** ${tsErrors}`,
+              `**TS7 (tsgo) errors:** ${ts7Errors}`,
+              '',
+              `📊 [Full artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+            ].join('\n');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
+              body,
             });
-
-      # ==================== STEP 9: Fail Job if Critical ====================
-      - name: ❌ Fail if Critical Errors
-        if: steps.thresholds.outputs.critical_fail == 'true'
-        run: |
-          Write-Host "Build failed due to critical errors"
-          exit 1
-
-      - name: ⚠️ Warn if Anomalies
-        if: steps.thresholds.outputs.anomaly_warn == 'true'
-        run: |
-          Write-Host "Warning: Error rate anomalies detected - investigate trends"
-          # Don't fail, just warn
-
-# ==================== Notification Job ====================
-  notify:
-    runs-on: ubuntu-latest
-    needs: error-analysis
-    if: always() && github.event_name == 'schedule'
-
-    steps:
-      - name: 📧 Send Weekly Report Email
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "Weekly Error Analysis Report - YoRHa Legal AI"
-          to: ${{ secrets.NOTIFICATION_EMAIL }}
-          from: GitHub Actions
-          body: |
-            Weekly error analysis complete.
-
-            Status: ${{ needs.error-analysis.result }}
-
-            View full report:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
