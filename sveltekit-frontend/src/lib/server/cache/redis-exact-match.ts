@@ -35,6 +35,10 @@ export interface CachedLLMResponse {
 	cachedAt: string;
 	promptTokens?: number;
 	completionTokens?: number;
+	cachedPromptTokens?: number;   // Ollama cache_prompt saved tokens
+	somCluster?: number;           // SOM cluster of query embedding at cache time
+	gpuCluster?: number;           // GPU k-means cluster
+	hyperedgeGrade?: string;       // A/B/C/D from run-hypergraph.ts
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -69,10 +73,15 @@ export async function getExactMatchCache(cacheKey: string): Promise<CachedLLMRes
 		const entry = parseEntry(cached, cacheKey);
 		if (!entry) return null;
 
-		console.log(
-			`[Redis Exact-Match] HIT key=${cacheKey.slice(-8)} ` +
-				`age=${Math.round((Date.now() - new Date(entry.cachedAt).getTime()) / 1000)}s`
-		);
+		const ageS = Math.round((Date.now() - new Date(entry.cachedAt).getTime()) / 1000);
+		const hitMeta = [
+			`age=${ageS}s`,
+			entry.promptTokens != null ? `tokens=${entry.promptTokens}+${entry.completionTokens ?? 0}` : '',
+			entry.cachedPromptTokens ? `ollama_cached=${entry.cachedPromptTokens}` : '',
+			entry.somCluster != null ? `som=${entry.somCluster}` : '',
+			entry.hyperedgeGrade ? `grade=${entry.hyperedgeGrade}` : '',
+		].filter(Boolean).join(' ');
+		console.log(`[Redis Exact-Match] HIT key=${cacheKey.slice(-8)} ${hitMeta}`);
 		return entry;
 	} catch (err) {
 		console.error('[Redis Exact-Match] GET error:', (err as Error)?.message ?? err);
@@ -96,9 +105,14 @@ export async function setExactMatchCache(
 			cachedAt: new Date().toISOString(),
 		};
 		await redis.set(cacheKey, JSON.stringify(payload), 'EX', ttlSeconds);
+		const tokenInfo = response.promptTokens != null
+			? ` prompt=${response.promptTokens} completion=${response.completionTokens ?? 0}` +
+			  (response.cachedPromptTokens ? ` cached=${response.cachedPromptTokens}` : '')
+			: '';
+		const graphInfo = response.somCluster != null ? ` som=${response.somCluster}` : '';
 		console.log(
 			`[Redis Exact-Match] SET key=${cacheKey.slice(-8)} ` +
-				`model=${response.model} backend=${response.backend} ttl=${ttlSeconds}s`
+				`model=${response.model} backend=${response.backend} ttl=${ttlSeconds}s${tokenInfo}${graphInfo}`
 		);
 	} catch (err) {
 		console.error('[Redis Exact-Match] SET error (non-fatal):', (err as Error)?.message ?? err);

@@ -101,6 +101,17 @@ export async function applyTopologicalBoostAsync(
 
   const edgeMap = await loadHyperedgeMembership(qdrantIds);
 
+  // Observability: log hyperedge match rate so we can diagnose qdrantId format drift
+  if (qdrantIds.length > 0) {
+    const matchCount = qdrantIds.filter((id) => edgeMap.has(id)).length;
+    const matchRate  = (matchCount / qdrantIds.length * 100).toFixed(0);
+    if (matchCount === 0) {
+      console.warn(`[topological] 0/${qdrantIds.length} chunks matched hg:edge:* — check qdrantId format (sample: ${qdrantIds[0]})`);
+    } else if (Number(matchRate) < 30) {
+      console.debug(`[topological] hg:edge match rate low: ${matchCount}/${qdrantIds.length} (${matchRate}%)`);
+    }
+  }
+
   const boosted = results.map((r) => {
     const rx = r as unknown as Record<string, unknown>;
     const qdrantId = String(rx.qdrantId ?? rx.id ?? '');
