@@ -1,5 +1,5 @@
 # Deeds Web App — Codebase Map
-## Last Updated: May 3, 2026 (src subtree classification + model lanes + PLE/capability routing notes + readiness anchors)
+## Last Updated: May 3, 2026 (full-GPU audit harness + gemma4-agent tool expansion + AgentRunResult type fixes)
 
 ## April 3, 2026 Audit Note
 
@@ -132,7 +132,7 @@ This quick-sort table mirrors the root-level triage view, but for the noisiest `
 | `src/lib/components/` | ACTIVE | Use for interaction and rendering behavior after the route or store owner is identified. | This is the main UI implementation surface. |
 | `src/lib/services/` | REVIEW | Treat as a mixed live surface; confirm imports before editing or classifying. | This directory was heavily cleaned, but it still attracts dead-code assumptions because of its history. |
 | `src/mcp/` | ACTIVE | Inspect when the task touches tool exposure, MCP handlers, or agent-facing capabilities. | This is the app-local tool ingress layer. |
-| `scripts/` | ACTIVE | Treat as real workflow control, not just helper code. | Many audits, diagnostics, and maintenance flows live here instead of in app routes. |
+| `scripts/` | ACTIVE | Treat as real workflow control, not just helper code. | Many audits, diagnostics, and maintenance flows live here instead of in app routes. `scripts/tests/test-production-readiness.mjs` is the full-GPU pipeline harness (8 parallel verification gates, cluster synthesis, `--full-gpu` / `--require-inference` flags). |
 | `tests/` and `test/` | ACTIVE | Use for focused validation and contract checks after local changes. | This is the main executable verification surface in the frontend workspace. |
 | `drizzle/` and `proto/` | INFRA | Inspect for schema, migration, or contract issues rather than feature logic. | These directories define persistence and protocol boundaries. |
 | `static/` and `public/` | ASSET | Treat as runtime assets, model files, or public resources rather than business logic. | Client ONNX models, ORT files, fonts, and static payloads live here. |
@@ -171,9 +171,9 @@ The current repo already follows the clean split: EmbeddingGemma is the vector b
 | Lane | Primary anchors | Current status | Notes |
 |------|-----------------|----------------|-------|
 | Embedding lane | `src/lib/ai/model-ids.ts`, `src/lib/server/vector/embedding-gemma.ts`, `src/routes/api/embed/+server.ts`, `static/embeddinggemma_300m_onnx/` | ACTIVE | `embeddinggemma:latest` is the authoritative server embedding model at 768 dimensions, and the client also carries the 300M EmbeddingGemma ONNX assets. This is the retrieval/Qdrant/cache embedding path, not a Gemma 4 text-model fallback. |
-| Server reasoning and synthesis lane | `src/lib/server/env.server.ts`, `src/lib/server/ollama.ts`, `src/lib/server/inference/inference-router.ts`, `src/lib/server/ai/gemma4-agent.ts` | ACTIVE | The generation lane is Gemma 4-family reasoning and synthesis work. Current anchors include runtime defaults around `gemma4-legal-vlm:latest` plus shared model IDs for `gemma4-legal:latest` and `gemma4:e4b-it-q4_K_M`. |
+| Server reasoning and synthesis lane | `src/lib/server/env.server.ts`, `src/lib/server/ollama.ts`, `src/lib/server/inference/inference-router.ts`, `src/lib/server/ai/gemma4-agent.ts` | ACTIVE | The generation lane is Gemma 4-family reasoning and synthesis work. `gemma4-agent.ts` now uses a PLANNER_MODEL / TOOL_MODEL split (`VLM_MODELS.legal` / `VLM_MODELS.tool`), carries 9 in-process tools (`rag_search`, `case_search`, `memory_recall`, `hyperedge_stats`, `web_search`, `read_file`, `verify_fix`, `apply_shadow_patch`, `revert_fix`), accepts a `metadata` option, and returns `cacheTrace`, `errorFixMemoryHit`, and `verificationStatus` on `AgentRunResult`. |
 | Smaller local generation lanes | `src/lib/ai/model-ids.ts`, `src/lib/ai/client-router.ts`, `src/lib/components/ai/Gemma270MWebAssembly.svelte` | ACTIVE | Yes, this repo does use smaller models: Gemma 4 E2B ONNX/WebGPU, LiteRT Gemma 4 E2B/E4B, and the legacy Gemma 3 270M ONNX fallback. |
-| Optional small tool-call normalizer | No repo-local anchors confirmed in this pass | NOT WIRED | No current `FunctionGemma` wiring was confirmed. If added later, it should stay separate from both the embedding lane and the main synthesis lane. |
+| Optional small tool-call normalizer | `src/lib/server/ollama.ts` (`VLM_MODELS.tool`), `src/lib/server/env.server.ts` (`FUNCTION_GEMMA_MODEL`), `src/lib/server/ai/gemma4-agent.ts` (`TOOL_MODEL`) | WIRED (env-gated) | `VLM_MODELS.tool` is now defined and populated from `ENV.FUNCTION_GEMMA_MODEL` (defaults to `gemma4-legal-vlm:latest` until `functiongemma:latest` is pulled). `gemma4-agent.ts` uses it as `TOOL_MODEL` for the structured-call translation slot. Pull `functiongemma:latest` and set `FUNCTION_GEMMA_MODEL=functiongemma:latest` in `.env` to activate the dedicated tool-call lane. |
 
 ### Gemma PLE vs Retrieval Embeddings
 Some smaller Gemma-family edge models use Per-Layer Embeddings (PLE) and MatFormer-style parameter-efficient execution. PLE is an internal inference/runtime optimization that helps smaller effective-parameter models run efficiently on local devices. It is not the same thing as the semantic embeddings used for vector search.
@@ -189,6 +189,7 @@ For retrieval, semantic caching, clustering, and Qdrant indexing, this codebase 
 - `src/lib/services/knowledge-search/ACPToolRegistry.ts` now delegates `knowledgeSearch` to the live searcher and returns real result bundles instead of an empty placeholder payload.
 - **bifrostChat dual-cache fact (May 3, 2026):** `bifrostChat()` in `src/lib/server/ollama.ts` implements its own inline L1 (Redis exact-match via `getExactMatchCache`) + L2 (Qdrant HTTP search against `BifrostSemanticCachePlugin` collection) before forwarding to Bifrost gateway. `tieredLLMQuery()` in `src/lib/server/ai/tiered-llm-cache.ts` is a separate, parallel cache path using `llm_cache:*` Redis keys — it is NOT called by bifrostChat. These are two independent caches for two different callers, not a missing integration.
 - Remaining gap: LLM call logs do not yet include model role, prompt template, or cache-tier metadata across the ACE and ACP path. CI gate in `.github/workflows/error-analysis.yml` now surfaces this gap on every PR via the "Inference Observability" section.
+- **Production readiness harness (May 3, 2026):** `scripts/tests/test-production-readiness.mjs` is the canonical full-stack audit script. It runs 8 parallel verification gates (chunk delta, dual embeddings, error vectors, attention wiring, CUDA, SOM topology, Neo4j edges, PageRank), performs GPU cluster synthesis (top-5 clusters → parallel LLM calls → master plan), and gates on `--require-inference` to abort rather than degrade when no LLM is reachable. Orchestrate calls now correctly use `postSseCollect` (SSE stream reader) instead of `postJson`; stats field names align to `totalFiles`/`indexedFiles` from the stats endpoint and `vectors_count` from Qdrant directly. Run with `npm run test:prod-readiness:full-gpu` before schema changes or major retrieval refactors.
 
 ### Codebase-Index Route Readiness (May 3, 2026)
 Readiness rubric used in this pass: `High` means a direct UI or MCP consumer and/or dedicated route tests were observed. `Medium` means the route is clearly wired as an internal stage or admin/ops surface, but with weaker direct user-surface proof. `Low` means the handler exists, but this pass only found limited registry/comment evidence and no strong consumer or dedicated test anchor.
@@ -796,3 +797,34 @@ Status note: percentages below are carried forward from earlier project tracking
 - **bits-ui Dialog**: TDZ bug in Svelte 5.46.0 SSR — routes with Dialog need `ssr = false`
 - **VAPID keys**: Currently empty defaults — push notifications skip when empty
 - **GPU VRAM**: RTX 3060 Ti 8GB — Ollama + TRT-LLM cannot coexist (gpu-arbiter.ts mutex)
+- **VRAM budget (measured May 3)**: Windows/browser overhead ~3.5GB; `gemma4-legal-vlm` needs 1.5–3GB; embedding model (`embeddinggemma:latest`) needs 0.6GB. Running both LLM + embedding simultaneously is borderline — eject other models first. Use `ollama ps` to check active VRAM usage.
+- **TurboQuant** (`llama-server.exe`): 1.6s/call vs Ollama ~34s. Generative GGUFs do NOT support `--embeddings` (pooling type incompatible). Start with `--embeddings` only for dedicated embedding models.
+- **gemma4-agent embedding timeout**: All `generateEmbedding()` calls in `gemma4-agent.ts` now wrapped in a 12s `Promise.race` timeout. If embedding VRAM is unavailable, `rag_search` falls back to Qdrant scroll (keyword tag filter) rather than hanging 180s.
+- **ACP+ACE+schema wired** (confirmed May 3): `ACPToolRegistry.knowledgeSearch` → `qdrant.hybridSearch(codebase_chunks_768)`; `fetchACPKnowledgeResults` live with ACP_MAX_RESULTS=8, ACP_MAX_SCORE=0.08; `gemma4-agent` includes `codebase_chunks_768` in VALID collections + `logInference(model_role='gemma4-agent-planner')`; `communityReports` + `hypergraphEdges` Drizzle tables exist; ollama.ts L3 `logInference` with `model_role`, `cache_tier=L3_ollama`, `tokenizerFamily=gemma`.
+
+---
+## Production Readiness Test Harness (May 3, 2026)
+
+`scripts/tests/test-production-readiness.mjs` — 5-phase local validation harness.
+
+**Last run (May 3, 2026 — infrastructure-only)**: ✅ 11 passed, 0 failed, 3 warned
+
+| Phase | What it checks | Result |
+|-------|---------------|--------|
+| 1 — Service Health | Dev :5173, Qdrant :6333, Ollama :11434, Redis | ✅ All pass |
+| 2 — GPU Codebase Index | Qdrant chunk count, dual-vector, cluster field | Skipped (--skip-index) |
+| 3 — Gemma4 Agent | 5 agent queries via `/api/ai/agent` | ⚠️ Requires VRAM headroom |
+| 3b — Per-Dir Deep Audit | Agent audit per `src/lib/server/` subdirectory | ⚠️ Requires VRAM headroom |
+| 5 — Plan writing | Writes 4 markdown plans to `next_steps/active/` | ✅ Passes |
+
+**Run commands**:
+```bash
+# Infrastructure only (fast, always works)
+node scripts/tests/test-production-readiness.mjs --skip-index --skip-agent
+
+# Full run (requires VRAM: close Chrome/Edge first)
+node scripts/tests/test-production-readiness.mjs --skip-index --dry-run
+
+# With TurboQuant routing (llama-server.exe must be running on :8090)
+node scripts/tests/test-production-readiness.mjs --skip-index --turbo --dry-run
+```
