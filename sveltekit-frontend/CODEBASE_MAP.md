@@ -1,5 +1,5 @@
 # Deeds Web App — Codebase Map
-## Last Updated: April 8, 2026 (Gemini 10-Layer Audit Integration + API Route Recount)
+## Last Updated: May 3, 2026 (src subtree classification + model lanes + PLE/capability routing notes + readiness anchors)
 
 ## April 3, 2026 Audit Note
 
@@ -7,6 +7,11 @@
 - Several newer docs and live checks have moved faster than this map, so counts and readiness statements may drift until the next full recount.
 - Recent verified runtime work since this map was last updated includes: case/report SSR preload fixes, contextual chat cold-start stabilization, native CUDA runtime proof, and a broad route smoke validation pass.
 - Still open as of April 3: a full cross-check of API validation coverage, GET degraded-shape consistency, Drizzle schema/runtime parity, and route-by-route SSR/render status.
+
+## May 3, 2026 Reality Check
+
+- The additions in this pass focus on `src/` subtree classification and the live graph/ACE/Bifrost/LangGraph spine rather than on a full recount of file totals.
+- Treat older counts in this document as inventory guidance unless they are reverified by the newer readiness notes below.
 
 ---
 ## Grand Totals
@@ -116,7 +121,134 @@ sveltekit-frontend/
 | `test/` | Test configs |
 | `tests/` | Playwright specs |
 | `vite-plugins/` | Custom Vite plugins |
+
+### High-Noise App Triage (May 3, 2026)
+This quick-sort table mirrors the root-level triage view, but for the noisiest `sveltekit-frontend/` surfaces. `ACTIVE` means normal contributor attention is expected. `GENERATED` and `LOCAL-STATE` mean inspect only when debugging the build/test toolchain. `ARCHIVE` means historical or parked material.
+
+| Path | Triage class | Default handling | Why it matters |
+|------|--------------|------------------|----------------|
+| `src/routes/` | ACTIVE | Start here for user-visible behavior and callable APIs. | Route files decide what is actually rendered and reachable. |
+| `src/lib/server/` | ACTIVE | Use for retrieval, graph, cache, DB, and inference control flow after the route entrypoint is known. | Most server-side behavior is decided here rather than in route files themselves. |
+| `src/lib/components/` | ACTIVE | Use for interaction and rendering behavior after the route or store owner is identified. | This is the main UI implementation surface. |
+| `src/lib/services/` | REVIEW | Treat as a mixed live surface; confirm imports before editing or classifying. | This directory was heavily cleaned, but it still attracts dead-code assumptions because of its history. |
+| `src/mcp/` | ACTIVE | Inspect when the task touches tool exposure, MCP handlers, or agent-facing capabilities. | This is the app-local tool ingress layer. |
+| `scripts/` | ACTIVE | Treat as real workflow control, not just helper code. | Many audits, diagnostics, and maintenance flows live here instead of in app routes. |
+| `tests/` and `test/` | ACTIVE | Use for focused validation and contract checks after local changes. | This is the main executable verification surface in the frontend workspace. |
+| `drizzle/` and `proto/` | INFRA | Inspect for schema, migration, or contract issues rather than feature logic. | These directories define persistence and protocol boundaries. |
+| `static/` and `public/` | ASSET | Treat as runtime assets, model files, or public resources rather than business logic. | Client ONNX models, ORT files, fonts, and static payloads live here. |
+| `docs/`, `docs_readme/`, and `next_steps/` | REFERENCE | Useful for context, but reverify claims against live code before trusting them. | These are documentation and planning surfaces, not runtime truth. |
+| `reports/`, `playwright-report/`, `screenshots/`, and `test-results/` | GENERATED | Read for diagnostics only; do not treat as canonical implementation. | These folders capture run artifacts, reports, and screenshot output. |
+| `.svelte-kit/`, `build/`, `.cache/`, and `.tmp-audit/` | LOCAL-STATE | Ignore for normal audits unless the task is about the toolchain itself. | These are generated caches and build outputs. |
+| `deeds_labs/` | ARCHIVE | Do not treat as live implementation unless the task explicitly targets recovery work. | This is parked app-local code, not the current production surface. |
 ---
+### src/ Major Subtree Classification (May 3, 2026)
+| Subtree | Role | Current note |
+|---------|------|--------------|
+| `src/routes/` | Runtime entrypoints | Highest-signal page and API surface. Route groups, `+page*`, and `+server.ts` files decide what is user-visible and what is actually callable. |
+| `src/lib/` | Shared application core | Main implementation surface for client UI, server logic, caches, retrieval, graph code, stores, and shared contracts. This is where most non-route behavior is decided. |
+| `src/mcp/` | Agent/tool ingress | FastMCP server and tool registrations. Treat this as the agent-facing interface over codebase search, ACE, graph, and evidence tooling. |
+| `src/shims/` | Compatibility-critical support | Browser/runtime shims that the repo instructions explicitly say to preserve. These are support files, but they can break the app if moved or simplified casually. |
+| `src/native/`, `src/wasm/`, `src/workers/` | Specialized runtime adapters | Optional but live execution helpers for native bridges, browser workers, and WASM-backed behavior. Important for performance and compatibility, not general feature routing. |
+| `src/stores/`, `src/*.svelte.ts`, `src/auth-store.svelte.ts`, `src/poi-store.ts` | State surfaces | Thin entrypoints for client state and app-local stores. Useful when tracing UI behavior that does not originate directly from a route load. |
+| `src/types/`, `src/*.d.ts`, `src/env.d.ts` | Type and environment contracts | Shared type declarations and env typing. These files rarely contain business logic, but they do define compile-time boundaries and integration assumptions. |
+| `src/hooks.server.ts`, `src/hooks.client.ts`, `src/app.*`, `src/service-worker.*` | App shell and bootstrapping | Global request handling, SSR/client hooks, app shell, and service-worker behavior. Use these when behavior affects every route or startup sequence. |
+| `src/tests/`, `src/test-setup.ts` | App-local verification | Unit and integration test support for the frontend workspace. Reach here after a local change when a narrower executable check exists. |
+
+### Current Analysis and Synthesis Spine
+| Surface | Primary anchors | Why it matters |
+|---------|-----------------|----------------|
+| Codebase indexing | `src/routes/api/codebase-index/orchestrate/+server.ts`, `src/routes/api/codebase-index/index-stream/+server.ts`, `src/lib/components/admin/PipelineProgress.svelte` | This is the live indexing spine that scans files, builds embeddings, summarizes clusters, and writes graph/search artifacts. It also has direct UI consumers. |
+| ACE context assembly | `src/lib/server/ace/context-assembler.ts`, `src/routes/api/synthesis/generate/+server.ts`, `src/routes/api/sse/chat/+server.ts` | This is the main synthesis plane. It merges RAG, KAG, graph/community context, chat memory, and optional codebase context into promptable bundles used by live routes. |
+| ACP tool plane | `src/lib/services/knowledge-search/ACPToolRegistry.ts`, `src/routes/api/acp/tools/+server.ts`, `src/routes/api/acp/execute/+server.ts` | This is the bounded execution surface for tool schemas and tool calls. Keep it distinct from ACE: ACP executes tools, ACE assembles context. |
+| Graph augmentation | `src/lib/server/graph/community-graph.ts`, `src/lib/server/retrieval/topological-search.ts`, `src/lib/server/graph/hypergraph-4d.ts` | These modules add GraphRAG communities and hypergraph/topological boosts on top of vector retrieval. They are the graph-memory path that already exists in live code. |
+| Cache and semantic retrieval | `src/lib/server/ollama.ts`, `src/lib/server/cache/redis-exact-match.ts`, `src/routes/api/cache/bifrost/check/+server.ts` | This is the L1 exact-match plus L2 Bifrost semantic-cache path used across synthesis, analytics, and codebase analysis. |
+| Inference routing | `src/lib/server/inference/inference-router.ts`, `src/routes/api/ai/chat/+server.ts`, `src/routes/api/knowledge/stream/+server.ts` | This is the active server-side inference cascade. Use it when validating which backend tier is actually serving a request. |
+| LangGraph sidecar | `src/lib/server/ai/langgraph-client.ts`, `src/routes/api/synthesis/generate/+server.ts`, `src/mcp/server.ts` | This is a real optional integration layer, not just a planning concept. It is live code behind env gating and Docker wiring. |
+
+### Gemma-Family Model Lanes (May 3, 2026)
+The current repo already follows the clean split: EmbeddingGemma is the vector backbone, Gemma 4-family models handle reasoning/synthesis, and smaller local models exist for client-side fallback. This pass found no repo-local `FunctionGemma` or `functiongemma` anchors, so treat that lane as optional future work rather than current wiring.
+
+| Lane | Primary anchors | Current status | Notes |
+|------|-----------------|----------------|-------|
+| Embedding lane | `src/lib/ai/model-ids.ts`, `src/lib/server/vector/embedding-gemma.ts`, `src/routes/api/embed/+server.ts`, `static/embeddinggemma_300m_onnx/` | ACTIVE | `embeddinggemma:latest` is the authoritative server embedding model at 768 dimensions, and the client also carries the 300M EmbeddingGemma ONNX assets. This is the retrieval/Qdrant/cache embedding path, not a Gemma 4 text-model fallback. |
+| Server reasoning and synthesis lane | `src/lib/server/env.server.ts`, `src/lib/server/ollama.ts`, `src/lib/server/inference/inference-router.ts`, `src/lib/server/ai/gemma4-agent.ts` | ACTIVE | The generation lane is Gemma 4-family reasoning and synthesis work. Current anchors include runtime defaults around `gemma4-legal-vlm:latest` plus shared model IDs for `gemma4-legal:latest` and `gemma4:e4b-it-q4_K_M`. |
+| Smaller local generation lanes | `src/lib/ai/model-ids.ts`, `src/lib/ai/client-router.ts`, `src/lib/components/ai/Gemma270MWebAssembly.svelte` | ACTIVE | Yes, this repo does use smaller models: Gemma 4 E2B ONNX/WebGPU, LiteRT Gemma 4 E2B/E4B, and the legacy Gemma 3 270M ONNX fallback. |
+| Optional small tool-call normalizer | No repo-local anchors confirmed in this pass | NOT WIRED | No current `FunctionGemma` wiring was confirmed. If added later, it should stay separate from both the embedding lane and the main synthesis lane. |
+
+### Gemma PLE vs Retrieval Embeddings
+Some smaller Gemma-family edge models use Per-Layer Embeddings (PLE) and MatFormer-style parameter-efficient execution. PLE is an internal inference/runtime optimization that helps smaller effective-parameter models run efficiently on local devices. It is not the same thing as the semantic embeddings used for vector search.
+
+For retrieval, semantic caching, clustering, and Qdrant indexing, this codebase uses EmbeddingGemma. For planning, synthesis, tool-call generation, and multimodal reasoning, it uses Gemma 4-family reasoning models. PLE-capable edge models may eventually be used as cheaper local routers or planners, but their per-layer embeddings are not the authoritative vector representation in Qdrant.
+
+### Capability Routing Reality Check (May 3, 2026)
+- `src/lib/ai/model-ids.ts` now carries a central `MODEL_CAPABILITIES` registry plus `pickModelForRole`, `getModelCapabilities`, and embedding-model validation helpers.
+- Shared embedding-call helpers now reject registered planner/synthesis/VLM models when they are passed as embedding models. This is the current guardrail that keeps retrieval vectors on EmbeddingGemma-style lanes.
+- The registry intentionally does not claim active PLE support for current runtime lanes yet. PLE is runtime/model-format dependent, and this pass did not verify a repo-local PLE-aware execution path.
+- `assembleACEContext()` now fetches ACP-adjacent knowledge-search results in parallel through the live `KnowledgeSearcher` path and folds them into the legal-corpus tier with a bounded score bump, so cross-feed can supplement retrieval without swamping the main RAG lanes.
+- `src/lib/services/knowledge-search/KnowledgeSearcher.ts` now embeds the query before Qdrant search instead of passing a raw string into the store. That fixes the previously inert semantic-search path for both `/api/knowledge/search` and ACP `knowledgeSearch` delegation.
+- `src/lib/services/knowledge-search/ACPToolRegistry.ts` now delegates `knowledgeSearch` to the live searcher and returns real result bundles instead of an empty placeholder payload.
+- **bifrostChat dual-cache fact (May 3, 2026):** `bifrostChat()` in `src/lib/server/ollama.ts` implements its own inline L1 (Redis exact-match via `getExactMatchCache`) + L2 (Qdrant HTTP search against `BifrostSemanticCachePlugin` collection) before forwarding to Bifrost gateway. `tieredLLMQuery()` in `src/lib/server/ai/tiered-llm-cache.ts` is a separate, parallel cache path using `llm_cache:*` Redis keys — it is NOT called by bifrostChat. These are two independent caches for two different callers, not a missing integration.
+- Remaining gap: LLM call logs do not yet include model role, prompt template, or cache-tier metadata across the ACE and ACP path. CI gate in `.github/workflows/error-analysis.yml` now surfaces this gap on every PR via the "Inference Observability" section.
+
+### Codebase-Index Route Readiness (May 3, 2026)
+Readiness rubric used in this pass: `High` means a direct UI or MCP consumer and/or dedicated route tests were observed. `Medium` means the route is clearly wired as an internal stage or admin/ops surface, but with weaker direct user-surface proof. `Low` means the handler exists, but this pass only found limited registry/comment evidence and no strong consumer or dedicated test anchor.
+
+#### Browse, Search, and Graph Surfaces
+| Route | Methods | Evidence | Readiness | Notes |
+|-------|---------|----------|-----------|-------|
+| `/api/codebase-index` | `GET`, `POST` | Tests | High | Base listing and semantic search are covered by `tests/codebase-indexer.spec.ts` and `tests/routes/codebase-index-degraded-shape.test.ts`. |
+| `/api/codebase-index/stats` | `GET` | UI + tests | High | Used by `command-center/codebase` and `analysis-panel.svelte.ts`; contract tests cover degraded shape. |
+| `/api/codebase-index/clusters` | `GET` | UI + tests | High | Used by `command-center/codebase` and `analysis-panel.svelte.ts`; covered by indexer and degraded-shape tests. |
+| `/api/codebase-index/graph` | `GET` | Multi-page UI | High | Fetched by `codebase-graph` pages, `command-center/codebase/graph`, and `error-brain/diagnose`. |
+| `/api/codebase-index/search` | `POST` | UI + tests | High | Used by `SemanticSearch.svelte` and covered by `tests/codebase-indexer.spec.ts`. |
+| `/api/codebase-index/related` | `POST` | UI | High | Used by `analysis-panel.svelte.ts` and `NodeDetailPanel.svelte`. |
+| `/api/codebase-index/route-components` | `GET` | Internal route consumer | Medium | Used by `/api/analysis/page-context` to map route-to-component trees. |
+| `/api/codebase-index/file-intel` | `GET` | Limited | Low | Handler is documented, but this pass did not confirm a direct UI or dedicated route test. |
+| `/api/codebase-index/wiki` | `GET`, `POST` | Limited | Low | Present as a content surface, but no strong consumer or dedicated test anchor was confirmed in this pass. |
+| `/api/codebase-index/topology-hits` | `GET` | Limited | Low | Topology query surface exists, but this pass did not confirm an active consumer. |
+| `/api/codebase-index/tags` | `GET`, `DELETE` | UI + tests | High | Used by `TagDeleteDialog.svelte`; covered by `codebase-index-tags.test.ts` and `codebase-index-tags-delete.test.ts`. |
+
+#### Pipeline and Orchestration Surfaces
+| Route | Methods | Evidence | Readiness | Notes |
+|-------|---------|----------|-----------|-------|
+| `/api/codebase-index/orchestrate` | `GET`, `POST` | UI + tests | High | Central pipeline surface used by `PipelineProgress.svelte` and `admin/search-intelligence`; covered by `tests/routes/codebase-index-orchestrate.test.ts`. |
+| `/api/codebase-index/index-stream` | `GET`, `POST` | Internal orchestrator stage | Medium | This is a real pipeline stage invoked from `orchestrate`, but this pass did not find a direct standalone UI. |
+| `/api/codebase-index/cluster-assign` | `POST` | Internal orchestrator stage | Medium | Called from `orchestrate` during clustering; reachable through the live pipeline even without a direct page consumer. |
+| `/api/codebase-index/cluster-detect` | `GET`, `POST` | Tests | Medium | Covered by `tests/codebase-indexer.spec.ts`; no strong direct page consumer was confirmed in this pass. |
+| `/api/codebase-index/cluster-summary` | `GET`, `POST`, `PUT` | Limited | Low | Multi-verb cluster summary surface exists, but this pass did not confirm a dedicated consumer or route test. |
+| `/api/codebase-index/reindex` | `POST` | UI + tests | High | Triggered from `command-center/codebase` and `analysis-panel.svelte.ts`; covered by `tests/codebase-indexer.spec.ts`. |
+| `/api/codebase-index/graph-sync` | `GET`, `POST` | Internal + tests | High | Background graph sync is covered by `tests/codebase-indexer.spec.ts` and is also used as a substage in orchestration flows. |
+| `/api/codebase-index/enrich-qdrant` | `GET`, `POST` | Internal + tests | High | Covered by `tests/routes/codebase-index-enrich-qdrant.test.ts` and invoked from `graph-sync`. |
+| `/api/codebase-index/karpathy-tag/gpu` | `GET`, `POST` | Internal orchestrator stage | Medium | Real GPU tagging stage called by `orchestrate`; GET/POST surface exists, but no direct page consumer was confirmed. |
+| `/api/codebase-index/karpathy-tag` | `GET`, `POST` | Ops surface | Low | Base Karpathy tag route exists, but this pass did not confirm dedicated UI or tests. |
+| `/api/codebase-index/karpathy-tag/backfill` | `GET` | Ops surface | Low | Backfill helper exists with no strong direct consumer or route test confirmed in this pass. |
+| `/api/codebase-index/batch-gpu` | `POST` | Internal pipeline stage | Medium | The handler describes itself as the GPU spine for orchestrated work, but this pass did not confirm direct UI or tests. |
+| `/api/codebase-index/gpu-pipeline` | `GET`, `POST` | Internal pipeline stage | Medium | Large pipeline helper with multi-action GET support; treated here as a real ops surface rather than a direct user route. |
+
+#### Notebook, Assist, and Export Surfaces
+| Route | Methods | Evidence | Readiness | Notes |
+|-------|---------|----------|-----------|-------|
+| `/api/codebase-index/kag-notebook` | `GET`, `POST` | UI + tests | High | Used by `admin/kag-notebook` and `admin/phase89`; covered by `tests/codebase-indexer.spec.ts` and `tests/routes/kag-ingest-notebook-contract.test.ts`. |
+| `/api/codebase-index/ingest-errors` | `GET`, `POST` | UI + tests | High | Used by notebook/admin flows and covered by `tests/codebase-indexer.spec.ts` plus `kag-ingest-notebook-contract.test.ts`. |
+| `/api/codebase-index/ingest-log` | `GET`, `DELETE` | Limited | Low | Log maintenance surface exists, but this pass did not confirm a strong active consumer or dedicated route test. |
+| `/api/codebase-index/claude-assist` | `POST` | UI | Medium | Used by `admin/search-intelligence` and `LiveResearchPanel.svelte`, but this pass did not find direct route-specific tests. |
+| `/api/codebase-index/claude-assist/defaults` | `GET`, `POST` | UI + tests | High | Used by `admin/search-intelligence`; covered by `tests/assist-defaults.spec.ts`. |
+| `/api/codebase-index/claude-assist/feedback` | `GET`, `POST` | UI + tests | High | Used by `admin/search-intelligence`; covered by `tests/assist-feedback.spec.ts`. |
+| `/api/codebase-index/claude-assist/feedback/analysis` | `GET` | UI + tests | High | Used by `admin/search-intelligence`; covered by `tests/assist-feedback-analysis.spec.ts`. |
+| `/api/codebase-index/export/bundle` | `GET` | UI + MCP + tests | High | Used by `BundlePreview.svelte` and `src/mcp/server.ts`; covered by `tests/routes/codebase-index-export-bundle.test.ts`. |
+| `/api/codebase-index/export/obsidian` | `GET`, `POST` | UI | Medium | Used by `admin/phase89` for export workflows, but this pass did not find a dedicated route test. |
+
+#### Specialized and Ops Surfaces
+| Route | Methods | Evidence | Readiness | Notes |
+|-------|---------|----------|-----------|-------|
+| `/api/codebase-index/analyze` | `POST` | Limited | Low | Analysis endpoint exists, but this pass did not confirm a strong direct consumer or dedicated test. |
+| `/api/codebase-index/deep-research` | `GET`, `POST` | Tests | Medium | Dedicated route tests exist in `src/routes/api/codebase-index/deep-research/server.route.test.ts`, but no direct page consumer was confirmed in this pass. |
+| `/api/codebase-index/couchdb-pagerank` | `GET`, `POST` | Limited | Low | Pagerank surface exists as an ops/helper endpoint without strong current consumer proof in this pass. |
+| `/api/codebase-index/evidence-analyze` | `GET`, `POST` | Ops surface | Low | Evidence-analysis helper exists and exposes job polling, but this pass did not find a direct UI or dedicated route test. |
+| `/api/codebase-index/recommendations` | `GET`, `POST` | Ops surface | Low | Recommendation job surface exists, but this pass did not confirm active page or test anchors. |
+| `/api/codebase-index/errors` | `GET` | Limited | Low | Error-listing endpoint exists, but this pass did not confirm a strong current consumer. |
+| `/api/codebase-index/error-filters` | `GET` | Limited | Low | Filter metadata surface exists, but no direct consumer or route test was confirmed in this pass. |
+
 ## App Routes — src/routes/(app)/ (17 groups, 86 pages)
 Status note: `ACTIVE` in this table means the route group is present in `src/routes/(app)`; it does not imply route-level runtime verification.
 
@@ -149,7 +281,7 @@ Status note: `ACTIVE` in this table means the route group is present in `src/rou
 | `health/` | 14 | Health checks (DB, Redis, Qdrant, Neo4j, Ollama, GPU, OCR, circuit breakers) |
 | `phase89/` | 22 | Legacy phase 89 migration endpoints |
 | `routes/` | 9 | Route health SSE + error brain analyses |
-| `codebase-index/` | 8 | Codebase search + indexing + clusters |
+| `codebase-index/` | 40 route handlers / 63 verb surfaces | Codebase search, indexing, graph, assist, export, notebook, and ops surfaces |
 | `evidence/` | 18 | Upload, search, analysis, realtime, audit, GPU analysis, chain of custody |
 | `auth/` | 8 | Authentication (login, register, session, debug, health) |
 | `reports/` | 8 | Report generation, export, publish, preview, save |
