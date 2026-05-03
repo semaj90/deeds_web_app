@@ -48,7 +48,7 @@ import {
 } from '$lib/server/observability/langfuse.js';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithGemma4 } from '../retrieval/cross-encoder-reranker.js';
-import { applyTopologicalBoost } from '../retrieval/topological-search.js';
+import { applyTopologicalBoostAsync } from '../retrieval/topological-search.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from './policy.js';
 import {
@@ -61,6 +61,7 @@ import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
 import { recallPastChats } from './chat-memory.js';
+import { getCommunityContext } from '$lib/server/graph/community-graph.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -159,6 +160,7 @@ export async function assembleACEContext(opts: {
         topQueryTags,
         webResearchRows,
         lane3Research,
+        communityContext,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -185,6 +187,8 @@ export async function assembleACEContext(opts: {
               m.getWebResearchForAce(query, 8).catch(() => ({ research: [] }))
             )
           : Promise.resolve({ research: [] }),
+        // GraphRAG community context: cosine-ranked community summary for this query
+        getCommunityContext(query, 2).catch(() => [] as Awaited<ReturnType<typeof getCommunityContext>>),
       ]);
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
@@ -240,6 +244,13 @@ export async function assembleACEContext(opts: {
         queryTags,
         webSearchContext:
           [
+            // GraphRAG community context — coarse "what team/layer does this query touch?"
+            communityContext?.length
+              ? `\n## Codebase Community Context (GraphRAG)\n` +
+                communityContext.map((c) =>
+                  `**${c.purpose}** (similarity=${c.similarity.toFixed(2)})\n${c.summary}\nTags: ${c.tags.join(', ')}`
+                ).join('\n\n')
+              : '',
             webResults ? formatWebResultsAsContext(webResults) : '',
             wikiResults ? formatWikipediaAsContext(wikiResults) : '',
             lane3Research?.research?.length
@@ -1934,9 +1945,9 @@ async function fetchCodebaseContext(
             return toCtx(r, scoreMap.get(docId) ?? r.score);
           });
 
-          // Phase 8: Apply 4D topological boost (PageRank + SOM grid distance)
+          // Phase 8: Apply 4D topological boost (PageRank + SOM + hyperedge grade)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const boosted = applyTopologicalBoost(unsorted as any);
+          const boosted = await applyTopologicalBoostAsync(unsorted as any);
 
           return applyKarpathyBoost(boosted.slice(0, 10) as any, query);
         }
@@ -1993,6 +2004,13 @@ const QUERY_TAG_MAP: Record<string, string[]> = {
   config: ['config'],
   neo4j: ['graph-db'],
   graph: ['graph-db'],
+  graphify: ['graph-db', 'ml-inference'],
+  hyperedge: ['graph-db', 'ml-inference'],
+  hypergraph: ['graph-db', 'ml-inference'],
+  som: ['ml-inference', 'vector-search'],
+  topology: ['graph-db', 'vector-search'],
+  cluster: ['ml-inference', 'vector-search'],
+  pagerank: ['graph-db'],
   gpu: ['ml-inference'],
   cuda: ['ml-inference'],
   inference: ['ml-inference'],
