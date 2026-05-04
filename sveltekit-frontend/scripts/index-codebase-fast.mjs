@@ -294,7 +294,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v4';
+const META_CACHE_VERSION = 'v5';
 
 for (const filePath of walk(scanRoot)) {
   let src;
