@@ -227,7 +227,15 @@ function resolveClusterIds(dirPath: string, rows: ClusterSummaryMatchRow[]): num
 
 // ── Neo4j edge writer ─────────────────────────────────────────────────────────
 
-async function writeNeo4jEdges(entries: Array<{ dir: string; clusterIds: number[] }>): Promise<number> {
+async function writeNeo4jEdges(
+  entries: Array<{
+    dir: string;
+    clusterIds: number[];
+    somCluster?: number | null;
+    somBmuRow?: number | null;
+    somBmuCol?: number | null;
+  }>
+): Promise<number> {
   let neo4j: typeof import('neo4j-driver');
   try { neo4j = await import('neo4j-driver'); }
   catch { return 0; }
@@ -237,16 +245,32 @@ async function writeNeo4jEdges(entries: Array<{ dir: string; clusterIds: number[
   let created = 0;
 
   try {
-    for (const { dir, clusterIds } of entries) {
+    for (const { dir, clusterIds, somCluster, somBmuRow, somBmuCol } of entries) {
       if (clusterIds.length === 0) continue;
       for (const clusterId of clusterIds) {
+        // Persist SOM topology coords as edge properties so Neo4j queries can
+        // filter HAS_DIRECTORY_SUMMARY edges by SOM grid neighborhood
+        // (e.g. for ACE topological context expansion).
         await session.run(
           `MERGE (c:GPUCluster {id: $clusterId})
            MERGE (d:DirectorySummary {path: $dir})
            MERGE (c)-[r:HAS_DIRECTORY_SUMMARY]->(d)
            ON CREATE SET r.createdAt = $now
-           ON MATCH  SET r.updatedAt = $now`,
-          { clusterId, dir, now: new Date().toISOString() }
+           ON MATCH  SET r.updatedAt = $now
+           SET r.somCluster = $somCluster,
+               r.somBmuRow  = $somBmuRow,
+               r.somBmuCol  = $somBmuCol,
+               d.somCluster = $somCluster,
+               d.somBmuRow  = $somBmuRow,
+               d.somBmuCol  = $somBmuCol`,
+          {
+            clusterId,
+            dir,
+            now: new Date().toISOString(),
+            somCluster: somCluster ?? null,
+            somBmuRow:  somBmuRow  ?? null,
+            somBmuCol:  somBmuCol  ?? null,
+          }
         );
         created++;
       }
@@ -432,7 +456,16 @@ export async function ingestDirectorySummaries(
       if (clusterIds.length > 0) {
         await upsertCommunityReport(entry.rel, clusterIds, summary, tags, embedding);
         result.communityRowsUpserted++;
-        neo4jBatch.push({ dir: entry.rel, clusterIds });
+        // Forward SOM coords so Neo4j HAS_DIRECTORY_SUMMARY edges can be queried
+        // by topological position (SOM grid neighborhood). Closes the
+        // "SOM topology missing in graph" gap reported by the pipeline audit.
+        neo4jBatch.push({
+          dir: entry.rel,
+          clusterIds,
+          somCluster: entry.somCluster ?? null,
+          somBmuRow,
+          somBmuCol,
+        });
       }
 
       // Queue web-search enrichment for low-score or agent-unprocessed dirs
