@@ -20,7 +20,8 @@ const directChatSchema = z
   .refine((d) => d.message?.trim() || d.prompt?.trim(), { message: 'Message is required' });
 
 /** POST /api/ai/chat-direct — Direct Ollama endpoint for load testing (bypasses inference router, uses fast model) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json();
     const parsed = directChatSchema.safeParse(raw);
