@@ -1,6 +1,6 @@
 {
   "mode": "fast-ast",
-  "createdAt": "2026-05-04T14:59:08.846Z",
+  "createdAt": "2026-05-04T15:31:46.243Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
   "fileCount": 2581,
   "routeCount": 876,
@@ -27,7 +27,7 @@
     "routesWithTest": 51,
     "routesWithoutTest": 534,
     "routesWithErrorHandling": 593,
-    "cyclicPairCount": 1
+    "cyclicPairCount": 0
   },
   "files": [
     {
@@ -119084,14 +119084,9 @@
       "routesWithTest": 51,
       "routesWithoutTest": 534,
       "routesWithErrorHandling": 593,
-      "cyclicPairCount": 1
+      "cyclicPairCount": 0
     },
-    "cyclicPairs": [
-      [
-        "src/lib/server/queue/dispatch-inline.ts",
-        "src/lib/server/queue/queue-worker.ts"
-      ]
-    ],
+    "cyclicPairs": [],
     "topFanIn": [
       {
         "mod": "$lib/server/db/client",
