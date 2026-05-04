@@ -296,7 +296,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v6';
+const META_CACHE_VERSION = 'v7';
 
 for (const filePath of walk(scanRoot)) {
   let src;
@@ -637,7 +637,9 @@ console.log(`📄 Graph JSON → ${path.relative(ROOT, graphJsonPath)}`);
 
 // ── Codebase Map ──────────────────────────────────────────────────────────────
 
-const apiFiles   = files.filter(f => f.routeHandlers.length > 0);
+// Only files at SvelteKit route paths (+server.ts, +page.server.ts) are real API endpoints.
+// Library files in lib/server/ may contain "export const POST" inside JSDoc comments — exclude them.
+const apiFiles   = files.filter(f => f.isServerRoute && f.routeHandlers.length > 0);
 const noAuthApis = apiFiles.filter(f => !f.hasAuth);
 const noZodApis  = apiFiles.filter(f => !f.hasZod && f.parsesBody);
 const ssrUnsafeFiles = files.filter(f => f.ssrUnsafe && !f.isTest);

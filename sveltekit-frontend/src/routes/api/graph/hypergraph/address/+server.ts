@@ -29,8 +29,10 @@ const AddressSchema = z.object({
   limit:  z.number().int().min(1).max(20).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
-  // Internal endpoint — no auth required (called server-side by ACE assembler)
+export const POST: RequestHandler = async ({ request, locals }) => {
+  // Internal endpoint, but still HTTP-exposed — require auth (defense in depth).
+  // ACE server-internal calls already pass through locals.user via DEV_BYPASS_AUTH/session.
+  if (!locals.user) return json({ edges: [], error: 'Unauthorized' }, { status: 401 });
   let body: unknown;
   try { body = await request.json(); } catch { body = {}; }
 

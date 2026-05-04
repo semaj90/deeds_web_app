@@ -31,6 +31,9 @@ const DRY_RUN    = process.argv.includes('--dry-run');
 const LIMIT      = parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] ?? '0');
 const BATCH_SIZE = parseInt(process.argv.find(a => a.startsWith('--batch='))?.split('=')[1] ?? '50');
 const DOMAIN_FILTER = process.argv.find(a => a.startsWith('--domain='))?.split('=')[1] ?? null;
+// --turbo routes inference to llama-server (TurboQuant) at :8090 with strict-JSON system prompt
+const USE_TURBO   = process.argv.includes('--turbo');
+const TURBO_URL   = process.env.TURBO_URL ?? 'http://127.0.0.1:8090';
 
 // ── 20-atom semantic vocabulary ──────────────────────────────────────────────
 //
@@ -166,7 +169,49 @@ async function callOllama(prompt) {
   return data.response ?? '';
 }
 
+// TurboQuant (llama-server :8090) — OpenAI-compatible /v1/chat/completions with strict JSON system prompt
+async function callTurbo(prompt) {
+  const sysPrompt = `Return STRICT JSON only matching this schema, no prose, no markdown fences:\n{"tags":["atom1","atom2"],"language":"typescript","confidence":0.0}\n\nValid tags (use only these, lowercase, exact match):\n${ATOMS.join(', ')}`;
+  const res = await fetch(`${TURBO_URL}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gemma4-legal',
+      messages: [
+        { role: 'system', content: sysPrompt },
+        { role: 'user',   content: prompt },
+      ],
+      max_tokens: 120,
+      temperature: 0.1,
+      stream: false,
+      cache_prompt: true,    // TurboQuant KV cache reuse for the static system prompt
+    }),
+    signal: AbortSignal.timeout(60_000),
+  });
+  if (!res.ok) throw new Error(`TurboQuant ${res.status}`);
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content ?? '';
+}
+
+// Permissive JSON extractor: handles markdown code fences, prose padding, partial JSON.
+function extractJsonObject(text) {
+  if (!text) return null;
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start) return null;
+  try { return JSON.parse(text.slice(start, end + 1)); } catch { return null; }
+}
+
 function parseTags(raw) {
+  // Path 1 — TurboQuant strict-JSON path: prefer the JSON envelope if present.
+  const obj = extractJsonObject(raw);
+  if (obj && Array.isArray(obj.tags)) {
+    return obj.tags
+      .map(t => String(t).trim().toLowerCase().replace(/[^a-z0-9\-]/g, ''))
+      .filter(t => ATOMS.includes(t))
+      .slice(0, 5);
+  }
+  // Path 2 — Ollama freeform comma-separated path (legacy).
   return raw
     .split(',')
     .map(t => t.trim().toLowerCase().replace(/[^a-z0-9\-]/g, ''))
@@ -193,7 +238,8 @@ async function processChunk(chunk, stats) {
 
   let tags = [];
   try {
-    const raw = await callOllama(buildPrompt({ ...chunk, language }));
+    const prompt = buildPrompt({ ...chunk, language });
+    const raw = USE_TURBO ? await callTurbo(prompt) : await callOllama(prompt);
     tags = parseTags(raw);
     if (tags.length === 0) {
       stats.noTags++;
@@ -244,7 +290,10 @@ async function processChunk(chunk, stats) {
 async function main() {
   const total = await getTotalCount();
   const cap = LIMIT > 0 ? Math.min(LIMIT, total) : total;
-  console.log(`Karpathy tag: ${cap} chunks (model=${OLLAMA_MODEL}, concurrency=${CONCURRENCY}, dry=${DRY_RUN})`);
+  const transport = USE_TURBO
+    ? `turbo→${TURBO_URL} (gemma4-legal, strict-JSON)`
+    : `ollama→${OLLAMA_URL} (${OLLAMA_MODEL})`;
+  console.log(`Karpathy tag: ${cap} chunks  ${transport}  concurrency=${CONCURRENCY}  dry=${DRY_RUN}`);
   console.log(`Vocabulary: ${ATOMS.length} atoms`);
   if (DOMAIN_FILTER) console.log(`Domain filter: ${DOMAIN_FILTER}`);
 
