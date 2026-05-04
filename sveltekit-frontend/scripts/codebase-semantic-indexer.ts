@@ -50,6 +50,14 @@ const concurrency = concIdx >= 0 ? parseInt(args[concIdx + 1]) : 4;
 const queryIdx = args.indexOf('--query');
 const searchQuery = queryIdx >= 0 ? args[queryIdx + 1] : null;
 
+// Progress mode: 'tty' (default — overwrite same line with \r) or 'lines'
+// (one log line per progressEvery batches — log-friendly, survives tee/redirects).
+const progressIdx   = args.indexOf('--progress-every');
+const progressEvery = progressIdx >= 0 ? Math.max(1, parseInt(args[progressIdx + 1]) || 100) : 100;
+const progressMode: 'tty' | 'lines' =
+  args.includes('--progress-mode=lines') || args.includes('--progress-lines') ? 'lines' :
+  (process.stdout.isTTY ? 'tty' : 'lines');  // auto: lines when piped/redirected
+
 // ─── File Extensions ─────────────────────────────────────────────────────────
 const CODE_EXTENSIONS = new Set([
   '.ts', '.svelte', '.js', '.mjs', '.mts', '.json', '.css',
@@ -404,10 +412,18 @@ async function processChunkBatch(
     stats.chunksIndexed += points.length;
 
     // Progress
-    const pct = Math.round(((i + batch.length) / chunks.length) * 100);
-    process.stdout.write(`\r  Progress: ${pct}% (${stats.chunksIndexed} indexed, ${stats.chunksSkipped} cached, ${stats.errors} errors)`);
+    const done = i + batch.length;
+    const pct  = Math.round((done / chunks.length) * 100);
+    if (progressMode === 'tty') {
+      process.stdout.write(`\r  Progress: ${pct}% (${stats.chunksIndexed} indexed, ${stats.chunksSkipped} cached, ${stats.errors} errors)`);
+    } else {
+      // Lines mode: emit one durable log line every `progressEvery` chunks (or at completion)
+      if (done >= chunks.length || done % progressEvery < batch.length) {
+        console.log(`  Progress: ${pct}% (${done.toLocaleString()}/${chunks.length.toLocaleString()}) — ${stats.chunksIndexed} indexed, ${stats.chunksSkipped} cached, ${stats.errors} errors`);
+      }
+    }
   }
-  console.log(''); // newline after progress
+  if (progressMode === 'tty') console.log(''); // newline after \r progress
 }
 
 // ─── Search Mode ─────────────────────────────────────────────────────────────
