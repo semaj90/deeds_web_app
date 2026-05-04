@@ -771,6 +771,9 @@ scripts/tests/screenshots/cases-ui/
 # GPU demo and route pages (override gpu-* pattern for directories)
 !sveltekit-frontend/src/routes/**/gpu-*/
 
+# G16 auto-generated route test stubs that mirror gpu-* route paths
+!sveltekit-frontend/tests/routes/auto/**/gpu-*
+
 # ONNX Runtime WASM loaders (small .mjs files, not .wasm binaries)
 !sveltekit-frontend/static/ort/*.mjs
 
