@@ -1,16 +1,16 @@
 # Codebase Directory Map
-> Generated: 2026-05-04 00:03:07
+> Generated: 2026-05-04 04:01:34
 > Source: `sveltekit-frontend/src/`
 > Script: `scripts/tests/generate-codebase-directory-map.mjs`
-> Wiki notes from Redis: 1100 / 819 directories
+> Wiki notes from Redis: 0 / 819 directories
 
 ## Overview
 
 | Tier | Count | Description |
 |------|-------|-------------|
-| 🔴 Critical (score < 40) | 5 | Auth/Zod/hardcoded-URL gaps |
-| 🟡 Warning (40–69) | 144 | Minor production gaps |
-| 🟢 Good (≥ 70) | 670 | Production-ready |
+| 🔴 Critical (score < 40) | 3 | Auth/Zod/hardcoded-URL gaps |
+| 🟡 Warning (40–69) | 148 | Minor production gaps |
+| 🟢 Good (≥ 70) | 668 | Production-ready |
 | **Total** | **819** | Directories with ≥1 code file(s) |
 
 **Score formula:** Zod(20) + Auth(20) + NoTODO(15) + NoHardURL(20) + NoSvelte4(15) + HasExports(10) = 100
@@ -128,23 +128,23 @@
 | 🟡 | `lib/machines/` | 12 | 4,613 | 40 | 1×URL no-zod |  |
 | 🟡 | `lib/models/` | 1 | 1,357 | 55 | 1×TODO no-zod |  |
 | 🟢 | `lib/schemas/` | 5 | 558 | 100 | ✅ |  |
-| 🟢 | `lib/server/` | 57 | 12,184 | 75 | 1×TODO 60×URL |  |
+| 🟢 | `lib/server/` | 57 | 12,230 | 80 | 60×URL |  |
 | 🟢 | `lib/server/__tests__/` | 1 | 43 | 70 | ✅ |  |
-| 🟡 | `lib/server/ace/` | 17 | 7,046 | 60 | 9×URL no-auth |  |
+| 🟡 | `lib/server/ace/` | 17 | 7,061 | 60 | 9×URL no-auth |  |
 | 🟢 | `lib/server/acp/` | 1 | 476 | 80 | ✅ |  |
 | 🟢 | `lib/server/acp/tools/` | 1 | 331 | 80 | ✅ |  |
 | 🟡 | `lib/server/adapters/` | 1 | 638 | 60 | 3×URL no-auth |  |
 | 🟢 | `lib/server/agent/` | 3 | 2,074 | 85 | 5×TODO |  |
 | 🟡 | `lib/server/agent/tools/` | 8 | 2,104 | 55 | 1×TODO 2×URL |  |
-| 🟡 | `lib/server/ai/` | 23 | 6,195 | 60 | 2×URL no-auth |  |
+| 🟡 | `lib/server/ai/` | 23 | 6,278 | 65 | 4×TODO 2×URL |  |
 | 🟢 | `lib/server/ai/__tests__/` | 2 | 254 | 70 | ✅ |  |
-| 🟢 | `lib/server/analysis/` | 11 | 2,781 | 80 | no-auth |  |
+| 🟡 | `lib/server/analysis/` | 12 | 2,988 | 65 | 3×TODO no-auth |  |
 | 🟡 | `lib/server/analytics/` | 15 | 6,690 | 40 | 2×URL no-zod no-auth |  |
 | 🟢 | `lib/server/api/` | 1 | 195 | 80 | ✅ |  |
 | 🟢 | `lib/server/ast/` | 1 | 313 | 80 | ✅ |  |
 | 🟢 | `lib/server/audit/` | 4 | 1,415 | 80 | no-auth |  |
-| 🟢 | `lib/server/auth/` | 1 | 42 | 75 | 1×TODO |  |
-| 🟡 | `lib/server/cache/` | 8 | 2,681 | 40 | 3×URL no-zod |  |
+| 🟢 | `lib/server/auth/` | 1 | 41 | 80 | ✅ |  |
+| 🟡 | `lib/server/cache/` | 8 | 2,682 | 40 | 3×URL no-zod |  |
 | 🟡 | `lib/server/cartridge/` | 5 | 1,614 | 60 | no-zod |  |
 | 🟢 | `lib/server/cases/` | 1 | 189 | 80 | ✅ |  |
 | 🟡 | `lib/server/chrrom/` | 3 | 412 | 60 | 3×URL |  |
@@ -161,16 +161,16 @@
 | 🟢 | `lib/server/engagement/` | 1 | 367 | 80 | ✅ |  |
 | 🟡 | `lib/server/env/` | 1 | 14 | 60 | 2×URL |  |
 | 🟡 | `lib/server/error-brain/` | 5 | 885 | 60 | 4×URL |  |
-| 🟢 | `lib/server/error-brain/transport/` | 6 | 251 | 75 | 1×TODO |  |
+| 🟡 | `lib/server/error-brain/transport/` | 6 | 271 | 60 | 1×URL |  |
 | 🟡 | `lib/server/evidence/` | 9 | 987 | 55 | 1×TODO 1×URL no-auth |  |
 | 🟢 | `lib/server/evidence/services/` | 5 | 229 | 80 | no-auth |  |
 | 🟢 | `lib/server/glyph/` | 2 | 170 | 80 | ✅ |  |
 | 🟡 | `lib/server/gpu/` | 9 | 3,515 | 40 | 3×URL no-zod no-auth |  |
-| 🟡 | `lib/server/graph/` | 16 | 6,577 | 60 | 4×URL no-zod |  |
+| 🟡 | `lib/server/graph/` | 17 | 6,953 | 45 | 3×TODO 4×URL no-zod |  |
 | 🔴 | `lib/server/grpc/` | 10 | 4,100 | 35 | 1×TODO 17×URL no-zod |  |
 | 🟡 | `lib/server/helpers/` | 2 | 299 | 60 | 7×URL |  |
 | 🟢 | `lib/server/image/` | 1 | 88 | 80 | ✅ |  |
-| 🟡 | `lib/server/indexer/` | 11 | 5,108 | 60 | 2×URL no-auth |  |
+| 🟡 | `lib/server/indexer/` | 11 | 5,209 | 60 | 2×URL no-auth |  |
 | 🟡 | `lib/server/inference/` | 4 | 2,054 | 60 | no-zod no-auth |  |
 | 🟢 | `lib/server/init/` | 1 | 105 | 80 | ✅ |  |
 | 🟡 | `lib/server/integrations/` | 1 | 241 | 40 | 2×URL no-zod |  |
@@ -214,9 +214,9 @@
 | 🟢 | `lib/server/utils/` | 13 | 941 | 80 | 12×URL |  |
 | 🟢 | `lib/server/validation/` | 2 | 402 | 100 | ✅ |  |
 | 🟡 | `lib/server/vector/` | 10 | 2,831 | 55 | 1×TODO 2×URL no-auth |  |
-| 🔴 | `lib/server/workers/` | 5 | 1,759 | 35 | 1×TODO 6×URL no-zod no-auth |  |
+| 🟡 | `lib/server/workers/` | 5 | 1,769 | 40 | 6×URL no-zod no-auth |  |
 | 🟡 | `lib/services/` | 7 | 872 | 40 | 3×URL no-zod |  |
-| 🔴 | `lib/services/error-analysis/` | 17 | 4,761 | 35 | 1×TODO 8×URL no-zod |  |
+| 🟡 | `lib/services/error-analysis/` | 17 | 4,788 | 40 | 8×URL no-zod |  |
 | 🟡 | `lib/services/knowledge-search/` | 11 | 3,965 | 40 | 13×URL no-zod |  |
 | 🟢 | `lib/shared/` | 3 | 238 | 80 | ✅ |  |
 | 🟢 | `lib/shared/schemas/` | 1 | 32 | 80 | ✅ |  |
@@ -227,7 +227,7 @@
 | 🟡 | `lib/stores/unified/` | 6 | 1,211 | 60 | no-zod |  |
 | 🟢 | `lib/test-utils/` | 1 | 11 | 80 | ✅ |  |
 | 🟢 | `lib/types/` | 51 | 7,019 | 80 | ✅ |  |
-| 🟡 | `lib/utils/` | 42 | 7,054 | 45 | 23×TODO 27×URL no-zod |  |
+| 🟡 | `lib/utils/` | 42 | 7,081 | 45 | 16×TODO 27×URL no-zod |  |
 | 🟡 | `lib/webgpu/` | 19 | 5,518 | 40 | 2×URL no-zod |  |
 | 🟢 | `lib/workers/` | 4 | 1,086 | 75 | 2×TODO |  |
 | 🟡 | `mcp/` | 2 | 4,233 | 40 | 15×URL no-zod |  |
@@ -369,7 +369,7 @@
 | 🟢 | `routes/(app)/demos/yorha-icons/` | 2 | 468 | 80 | ✅ |  |
 | 🟢 | `routes/(app)/demos/yorha-terminal/` | 2 | 28 | 80 | ✅ |  |
 | 🟢 | `routes/(app)/error-brain/` | 1 | 6 | 80 | ✅ |  |
-| 🟢 | `routes/(app)/evidence/` | 6 | 835 | 100 | ✅ |  |
+| 🟢 | `routes/(app)/evidence/` | 6 | 843 | 100 | ✅ |  |
 | 🟢 | `routes/(app)/evidence-library/` | 2 | 281 | 80 | no-zod |  |
 | 🟢 | `routes/(app)/evidence/analyze/` | 2 | 682 | 80 | no-zod |  |
 | 🟢 | `routes/(app)/evidence/hash/` | 2 | 642 | 80 | ✅ |  |
@@ -456,7 +456,7 @@
 | 🟢 | `routes/api/analytics/deep-research/` | 1 | 134 | 100 | ✅ |  |
 | 🟢 | `routes/api/analytics/events/` | 1 | 122 | 100 | ✅ |  |
 | 🟢 | `routes/api/analytics/feedback/` | 1 | 279 | 100 | ✅ |  |
-| 🟢 | `routes/api/analytics/focus/` | 1 | 48 | 80 | ✅ |  |
+| 🟢 | `routes/api/analytics/focus/` | 1 | 53 | 100 | ✅ |  |
 | 🟢 | `routes/api/analytics/generate-todos/` | 1 | 381 | 100 | ✅ |  |
 | 🟡 | `routes/api/analytics/health/` | 1 | 98 | 60 | no-zod |  |
 | 🟢 | `routes/api/analytics/mapreduce-matrix/` | 1 | 158 | 100 | ✅ |  |
@@ -479,7 +479,7 @@
 | 🟢 | `routes/api/analyze-file/` | 1 | 295 | 95 | 2×TODO |  |
 | 🟢 | `routes/api/analyze-tag/` | 1 | 185 | 100 | ✅ |  |
 | 🟡 | `routes/api/audio/search/` | 1 | 213 | 60 | 4×URL no-zod |  |
-| 🟢 | `routes/api/audio/upload/` | 1 | 109 | 80 | ✅ |  |
+| 🟢 | `routes/api/audio/upload/` | 1 | 122 | 100 | ✅ |  |
 | 🟢 | `routes/api/audit/gpu/` | 1 | 110 | 100 | ✅ |  |
 | 🟢 | `routes/api/audit/planner/` | 1 | 90 | 100 | ✅ |  |
 | 🟢 | `routes/api/auth/debug/` | 1 | 23 | 80 | ✅ |  |
@@ -552,23 +552,23 @@
 | 🟢 | `routes/api/codebase-index/ingest-log/` | 1 | 102 | 80 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/kag-notebook/` | 1 | 444 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/karpathy-tag/` | 1 | 401 | 100 | ✅ |  |
-| 🟢 | `routes/api/codebase-index/orchestrate/` | 1 | 1,616 | 100 | ✅ |  |
+| 🟢 | `routes/api/codebase-index/orchestrate/` | 1 | 1,618 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/recommendations/` | 1 | 125 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/reindex/` | 1 | 95 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/related/` | 1 | 134 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/route-components/` | 1 | 328 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/search/` | 1 | 66 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/stats/` | 1 | 157 | 80 | no-zod |  |
-| 🟢 | `routes/api/codebase-index/summarize-dirs/` | 1 | 99 | 80 | ✅ |  |
+| 🟡 | `routes/api/codebase-index/summarize-dirs/` | 1 | 194 | 60 | 1×URL no-zod |  |
 | 🟢 | `routes/api/codebase-index/tags/` | 1 | 329 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/topology-hits/` | 1 | 83 | 80 | ✅ |  |
 | 🟢 | `routes/api/codebase-index/wiki/` | 1 | 154 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase/analyze/` | 1 | 348 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase/apply-patch/` | 1 | 142 | 95 | 2×TODO |  |
 | 🟢 | `routes/api/codebase/auto-research/` | 1 | 333 | 100 | ✅ |  |
-| 🟢 | `routes/api/codebase/buffer/` | 1 | 33 | 80 | ✅ |  |
+| 🟢 | `routes/api/codebase/buffer/` | 1 | 34 | 80 | ✅ |  |
 | 🟢 | `routes/api/codebase/index/` | 1 | 210 | 100 | ✅ |  |
-| 🟢 | `routes/api/codebase/narratives/` | 1 | 114 | 100 | ✅ |  |
+| 🟢 | `routes/api/codebase/narratives/` | 1 | 116 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase/recall/` | 1 | 142 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase/rerank/` | 1 | 106 | 100 | ✅ |  |
 | 🟢 | `routes/api/codebase/wiki/` | 1 | 117 | 100 | ✅ |  |
@@ -593,7 +593,7 @@
 | 🟢 | `routes/api/docs/` | 1 | 56 | 100 | ✅ |  |
 | 🟢 | `routes/api/document/[docId]/` | 1 | 33 | 80 | ✅ |  |
 | 🟢 | `routes/api/documents/[id]/` | 1 | 119 | 100 | ✅ |  |
-| 🟢 | `routes/api/documents/upload/` | 1 | 163 | 80 | ✅ |  |
+| 🟢 | `routes/api/documents/upload/` | 1 | 178 | 100 | ✅ |  |
 | 🟢 | `routes/api/embed/` | 1 | 125 | 100 | ✅ |  |
 | 🟢 | `routes/api/engagement/heartbeat/` | 1 | 38 | 80 | ✅ |  |
 | 🟢 | `routes/api/engagement/scan/` | 1 | 23 | 80 | ✅ |  |
@@ -619,7 +619,7 @@
 | 🟢 | `routes/api/evidence/relationships/` | 1 | 104 | 100 | ✅ |  |
 | 🟢 | `routes/api/evidence/search/` | 1 | 791 | 100 | ✅ |  |
 | 🟢 | `routes/api/evidence/upload/` | 1 | 2,275 | 100 | ✅ |  |
-| 🟢 | `routes/api/evidence/upload-test/` | 1 | 45 | 80 | ✅ |  |
+| 🟢 | `routes/api/evidence/upload-test/` | 1 | 55 | 100 | ✅ |  |
 | 🟢 | `routes/api/feedback/` | 1 | 41 | 100 | ✅ |  |
 | 🟢 | `routes/api/fictional-cases/` | 1 | 130 | 100 | ✅ |  |
 | 🟢 | `routes/api/fictional-cases/[id]/` | 1 | 165 | 100 | ✅ |  |
@@ -659,7 +659,7 @@
 | 🟢 | `routes/api/health/services/` | 1 | 118 | 80 | ✅ |  |
 | 🟢 | `routes/api/health/status/` | 1 | 41 | 80 | ✅ |  |
 | 🟢 | `routes/api/health/system/` | 1 | 33 | 80 | ✅ |  |
-| 🟡 | `routes/api/hypergraph/lookup/` | 1 | 151 | 60 | 3×URL |  |
+| 🟢 | `routes/api/hypergraph/lookup/` | 1 | 149 | 80 | 1×URL |  |
 | 🟢 | `routes/api/indexing/` | 1 | 547 | 100 | ✅ |  |
 | 🟡 | `routes/api/infrastructure/status/` | 1 | 335 | 60 | no-zod |  |
 | 🟢 | `routes/api/ingest/` | 1 | 98 | 100 | ✅ |  |
@@ -845,16 +845,14 @@
 
 ## Tier Breakdown
 
-### 🔴 Critical — needs immediate attention (5)
+### 🔴 Critical — needs immediate attention (3)
 
 - `lib/components/` — 56 files, 15,890 lines, score **35/100**
 - `lib/server/grpc/` — 10 files, 4,100 lines, score **35/100**
-- `lib/server/workers/` — 5 files, 1,759 lines, score **35/100**
-- `lib/services/error-analysis/` — 17 files, 4,761 lines, score **35/100**
 - `routes/(app)/couchdb-analytics/` — 5 files, 1,833 lines, score **30/100**
 
 
-### 🟡 Warning — production gaps (144)
+### 🟡 Warning — production gaps (148)
 
 - `lib/` — 11 files, 1,568 lines, score **60/100**
 - `lib/ai/` — 13 files, 4,102 lines, score **40/100**
@@ -899,12 +897,13 @@
 - `lib/gpu/` — 16 files, 4,323 lines, score **60/100**
 - `lib/machines/` — 12 files, 4,613 lines, score **40/100**
 - `lib/models/` — 1 files, 1,357 lines, score **55/100**
-- `lib/server/ace/` — 17 files, 7,046 lines, score **60/100**
+- `lib/server/ace/` — 17 files, 7,061 lines, score **60/100**
 - `lib/server/adapters/` — 1 files, 638 lines, score **60/100**
 - `lib/server/agent/tools/` — 8 files, 2,104 lines, score **55/100**
-- `lib/server/ai/` — 23 files, 6,195 lines, score **60/100**
+- `lib/server/ai/` — 23 files, 6,278 lines, score **65/100**
+- `lib/server/analysis/` — 12 files, 2,988 lines, score **65/100**
 - `lib/server/analytics/` — 15 files, 6,690 lines, score **40/100**
-- `lib/server/cache/` — 8 files, 2,681 lines, score **40/100**
+- `lib/server/cache/` — 8 files, 2,682 lines, score **40/100**
 - `lib/server/cartridge/` — 5 files, 1,614 lines, score **60/100**
 - `lib/server/chrrom/` — 3 files, 412 lines, score **60/100**
 - `lib/server/clients/` — 1 files, 17 lines, score **60/100**
@@ -912,11 +911,12 @@
 - `lib/server/connections/` — 1 files, 346 lines, score **60/100**
 - `lib/server/env/` — 1 files, 14 lines, score **60/100**
 - `lib/server/error-brain/` — 5 files, 885 lines, score **60/100**
+- `lib/server/error-brain/transport/` — 6 files, 271 lines, score **60/100**
 - `lib/server/evidence/` — 9 files, 987 lines, score **55/100**
 - `lib/server/gpu/` — 9 files, 3,515 lines, score **40/100**
-- `lib/server/graph/` — 16 files, 6,577 lines, score **60/100**
+- `lib/server/graph/` — 17 files, 6,953 lines, score **45/100**
 - `lib/server/helpers/` — 2 files, 299 lines, score **60/100**
-- `lib/server/indexer/` — 11 files, 5,108 lines, score **60/100**
+- `lib/server/indexer/` — 11 files, 5,209 lines, score **60/100**
 - `lib/server/inference/` — 4 files, 2,054 lines, score **60/100**
 - `lib/server/integrations/` — 1 files, 241 lines, score **40/100**
 - `lib/server/langextract/` — 1 files, 132 lines, score **40/100**
@@ -936,12 +936,14 @@
 - `lib/server/streaming/` — 2 files, 364 lines, score **60/100**
 - `lib/server/tools/handlers/` — 8 files, 1,152 lines, score **60/100**
 - `lib/server/vector/` — 10 files, 2,831 lines, score **55/100**
+- `lib/server/workers/` — 5 files, 1,769 lines, score **40/100**
 - `lib/services/` — 7 files, 872 lines, score **40/100**
+- `lib/services/error-analysis/` — 17 files, 4,788 lines, score **40/100**
 - `lib/services/knowledge-search/` — 11 files, 3,965 lines, score **40/100**
 - `lib/shims/` — 11 files, 1,235 lines, score **60/100**
 - `lib/stores/` — 14 files, 2,623 lines, score **60/100**
 - `lib/stores/unified/` — 6 files, 1,211 lines, score **60/100**
-- `lib/utils/` — 42 files, 7,054 lines, score **45/100**
+- `lib/utils/` — 42 files, 7,081 lines, score **45/100**
 - `lib/webgpu/` — 19 files, 5,518 lines, score **40/100**
 - `mcp/` — 2 files, 4,233 lines, score **40/100**
 - `mcp/tools/` — 1 files, 195 lines, score **60/100**
@@ -990,10 +992,10 @@
 - `routes/api/analytics/health/` — 1 files, 98 lines, score **60/100**
 - `routes/api/audio/search/` — 1 files, 213 lines, score **60/100**
 - `routes/api/cache/stats/` — 1 files, 246 lines, score **60/100**
+- `routes/api/codebase-index/summarize-dirs/` — 1 files, 194 lines, score **60/100**
 - `routes/api/graph/colab-export/` — 1 files, 659 lines, score **60/100**
 - `routes/api/health/capabilities/` — 1 files, 228 lines, score **60/100**
 - `routes/api/health/ollama/` — 1 files, 59 lines, score **60/100**
-- `routes/api/hypergraph/lookup/` — 1 files, 151 lines, score **60/100**
 - `routes/api/infrastructure/status/` — 1 files, 335 lines, score **60/100**
 - `routes/api/metrics/` — 1 files, 84 lines, score **60/100**
 - `routes/api/system/health/` — 1 files, 166 lines, score **60/100**
@@ -1002,7 +1004,7 @@
 - `stores/` — 1 files, 47 lines, score **60/100**
 
 
-### 🟢 Good — production-ready (670)
+### 🟢 Good — production-ready (668)
 
 - `./` — 17 files, 4,534 lines, score **80/100**
 - `lib/ai/e2b/` — 2 files, 524 lines, score **75/100**
@@ -1067,17 +1069,16 @@
 - `lib/features/evidence-command-center/` — 5 files, 419 lines, score **70/100**
 - `lib/icons/yorha/` — 15 files, 572 lines, score **80/100**
 - `lib/schemas/` — 5 files, 558 lines, score **100/100**
-- `lib/server/` — 57 files, 12,184 lines, score **75/100**
+- `lib/server/` — 57 files, 12,230 lines, score **80/100**
 - `lib/server/__tests__/` — 1 files, 43 lines, score **70/100**
 - `lib/server/acp/` — 1 files, 476 lines, score **80/100**
 - `lib/server/acp/tools/` — 1 files, 331 lines, score **80/100**
 - `lib/server/agent/` — 3 files, 2,074 lines, score **85/100**
 - `lib/server/ai/__tests__/` — 2 files, 254 lines, score **70/100**
-- `lib/server/analysis/` — 11 files, 2,781 lines, score **80/100**
 - `lib/server/api/` — 1 files, 195 lines, score **80/100**
 - `lib/server/ast/` — 1 files, 313 lines, score **80/100**
 - `lib/server/audit/` — 4 files, 1,415 lines, score **80/100**
-- `lib/server/auth/` — 1 files, 42 lines, score **75/100**
+- `lib/server/auth/` — 1 files, 41 lines, score **80/100**
 - `lib/server/cases/` — 1 files, 189 lines, score **80/100**
 - `lib/server/codeintel/` — 1 files, 498 lines, score **80/100**
 - `lib/server/concurrency/` — 3 files, 741 lines, score **100/100**
@@ -1087,7 +1088,6 @@
 - `lib/server/embedding/` — 8 files, 1,052 lines, score **80/100**
 - `lib/server/embeddings/` — 1 files, 70 lines, score **80/100**
 - `lib/server/engagement/` — 1 files, 367 lines, score **80/100**
-- `lib/server/error-brain/transport/` — 6 files, 251 lines, score **75/100**
 - `lib/server/evidence/services/` — 5 files, 229 lines, score **80/100**
 - `lib/server/glyph/` — 2 files, 170 lines, score **80/100**
 - `lib/server/image/` — 1 files, 88 lines, score **80/100**
@@ -1229,7 +1229,7 @@
 - `routes/(app)/demos/yorha-icons/` — 2 files, 468 lines, score **80/100**
 - `routes/(app)/demos/yorha-terminal/` — 2 files, 28 lines, score **80/100**
 - `routes/(app)/error-brain/` — 1 files, 6 lines, score **80/100**
-- `routes/(app)/evidence/` — 6 files, 835 lines, score **100/100**
+- `routes/(app)/evidence/` — 6 files, 843 lines, score **100/100**
 - `routes/(app)/evidence-library/` — 2 files, 281 lines, score **80/100**
 - `routes/(app)/evidence/analyze/` — 2 files, 682 lines, score **80/100**
 - `routes/(app)/evidence/hash/` — 2 files, 642 lines, score **80/100**
@@ -1303,7 +1303,7 @@
 - `routes/api/analytics/deep-research/` — 1 files, 134 lines, score **100/100**
 - `routes/api/analytics/events/` — 1 files, 122 lines, score **100/100**
 - `routes/api/analytics/feedback/` — 1 files, 279 lines, score **100/100**
-- `routes/api/analytics/focus/` — 1 files, 48 lines, score **80/100**
+- `routes/api/analytics/focus/` — 1 files, 53 lines, score **100/100**
 - `routes/api/analytics/generate-todos/` — 1 files, 381 lines, score **100/100**
 - `routes/api/analytics/mapreduce-matrix/` — 1 files, 158 lines, score **100/100**
 - `routes/api/analytics/mirror-health/` — 1 files, 90 lines, score **80/100**
@@ -1324,7 +1324,7 @@
 - `routes/api/analytics/web-research/` — 1 files, 332 lines, score **100/100**
 - `routes/api/analyze-file/` — 1 files, 295 lines, score **95/100**
 - `routes/api/analyze-tag/` — 1 files, 185 lines, score **100/100**
-- `routes/api/audio/upload/` — 1 files, 109 lines, score **80/100**
+- `routes/api/audio/upload/` — 1 files, 122 lines, score **100/100**
 - `routes/api/audit/gpu/` — 1 files, 110 lines, score **100/100**
 - `routes/api/audit/planner/` — 1 files, 90 lines, score **100/100**
 - `routes/api/auth/debug/` — 1 files, 23 lines, score **80/100**
@@ -1396,23 +1396,22 @@
 - `routes/api/codebase-index/ingest-log/` — 1 files, 102 lines, score **80/100**
 - `routes/api/codebase-index/kag-notebook/` — 1 files, 444 lines, score **100/100**
 - `routes/api/codebase-index/karpathy-tag/` — 1 files, 401 lines, score **100/100**
-- `routes/api/codebase-index/orchestrate/` — 1 files, 1,616 lines, score **100/100**
+- `routes/api/codebase-index/orchestrate/` — 1 files, 1,618 lines, score **100/100**
 - `routes/api/codebase-index/recommendations/` — 1 files, 125 lines, score **100/100**
 - `routes/api/codebase-index/reindex/` — 1 files, 95 lines, score **100/100**
 - `routes/api/codebase-index/related/` — 1 files, 134 lines, score **100/100**
 - `routes/api/codebase-index/route-components/` — 1 files, 328 lines, score **100/100**
 - `routes/api/codebase-index/search/` — 1 files, 66 lines, score **100/100**
 - `routes/api/codebase-index/stats/` — 1 files, 157 lines, score **80/100**
-- `routes/api/codebase-index/summarize-dirs/` — 1 files, 99 lines, score **80/100**
 - `routes/api/codebase-index/tags/` — 1 files, 329 lines, score **100/100**
 - `routes/api/codebase-index/topology-hits/` — 1 files, 83 lines, score **80/100**
 - `routes/api/codebase-index/wiki/` — 1 files, 154 lines, score **100/100**
 - `routes/api/codebase/analyze/` — 1 files, 348 lines, score **100/100**
 - `routes/api/codebase/apply-patch/` — 1 files, 142 lines, score **95/100**
 - `routes/api/codebase/auto-research/` — 1 files, 333 lines, score **100/100**
-- `routes/api/codebase/buffer/` — 1 files, 33 lines, score **80/100**
+- `routes/api/codebase/buffer/` — 1 files, 34 lines, score **80/100**
 - `routes/api/codebase/index/` — 1 files, 210 lines, score **100/100**
-- `routes/api/codebase/narratives/` — 1 files, 114 lines, score **100/100**
+- `routes/api/codebase/narratives/` — 1 files, 116 lines, score **100/100**
 - `routes/api/codebase/recall/` — 1 files, 142 lines, score **100/100**
 - `routes/api/codebase/rerank/` — 1 files, 106 lines, score **100/100**
 - `routes/api/codebase/wiki/` — 1 files, 117 lines, score **100/100**
@@ -1437,7 +1436,7 @@
 - `routes/api/docs/` — 1 files, 56 lines, score **100/100**
 - `routes/api/document/[docId]/` — 1 files, 33 lines, score **80/100**
 - `routes/api/documents/[id]/` — 1 files, 119 lines, score **100/100**
-- `routes/api/documents/upload/` — 1 files, 163 lines, score **80/100**
+- `routes/api/documents/upload/` — 1 files, 178 lines, score **100/100**
 - `routes/api/embed/` — 1 files, 125 lines, score **100/100**
 - `routes/api/engagement/heartbeat/` — 1 files, 38 lines, score **80/100**
 - `routes/api/engagement/scan/` — 1 files, 23 lines, score **80/100**
@@ -1463,7 +1462,7 @@
 - `routes/api/evidence/relationships/` — 1 files, 104 lines, score **100/100**
 - `routes/api/evidence/search/` — 1 files, 791 lines, score **100/100**
 - `routes/api/evidence/upload/` — 1 files, 2,275 lines, score **100/100**
-- `routes/api/evidence/upload-test/` — 1 files, 45 lines, score **80/100**
+- `routes/api/evidence/upload-test/` — 1 files, 55 lines, score **100/100**
 - `routes/api/feedback/` — 1 files, 41 lines, score **100/100**
 - `routes/api/fictional-cases/` — 1 files, 130 lines, score **100/100**
 - `routes/api/fictional-cases/[id]/` — 1 files, 165 lines, score **100/100**
@@ -1500,6 +1499,7 @@
 - `routes/api/health/services/` — 1 files, 118 lines, score **80/100**
 - `routes/api/health/status/` — 1 files, 41 lines, score **80/100**
 - `routes/api/health/system/` — 1 files, 33 lines, score **80/100**
+- `routes/api/hypergraph/lookup/` — 1 files, 149 lines, score **80/100**
 - `routes/api/indexing/` — 1 files, 547 lines, score **100/100**
 - `routes/api/ingest/` — 1 files, 98 lines, score **100/100**
 - `routes/api/ingest-constitution/` — 1 files, 47 lines, score **80/100**
