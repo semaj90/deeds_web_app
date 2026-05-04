@@ -47,6 +47,8 @@
     "graphify:daily": "npm run index:codebase:fast:plan && npm run smoke:fast-ast && npm run smoke:kag",
     "graphify:full": "npm run graphify:daily && npm run codebase:index && npm run hypergraph:build:redis && npm run smoke:ace:full",
     "smoke:graphify": "node scripts/tests/smoke-graphify.mjs",
+    "audit:test-stubs": "node scripts/generate-route-test-stubs.mjs",
+    "audit:test-stubs:dry": "node scripts/generate-route-test-stubs.mjs --dry-run",
     "index:codebase:fast": "node scripts/index-codebase-fast.mjs",
     "index:codebase:fast:plan": "node scripts/index-codebase-fast.mjs --write-plan",
     "index:codebase:full": "npm run test:prod-readiness:full-gpu",
