@@ -265,6 +265,16 @@ ${warningsList}
 
 ${pageRankList}
 ` : ''}
+## Agentic tool-calling — quick ACE hits
+
+In-process tools the Gemma4 agent can call to dig deeper into this directory:
+
+- \`graph_search({ query: "${dirRel.split('/').pop()}", topK: 8 })\` — files in this dir with tags, TODOs, audit flags
+- \`wiki_note_lookup({ query: "${dirRel.split('/').slice(-2).join(' ')}", limit: 5 })\` — KAG narrative + audit score
+- \`audit_hotspots({ limit: 10 })\` — if this dir is failing gates, surfaces the broader hotspot set
+- \`read_file({ filePath: "${dirRel}/<file>" })\` — fetch any file's contents (sandboxed to src/)
+${m.apiCount > 0 ? `\nFor route handlers in this dir, also try:\n- \`verify_fix({ filePath: "${dirRel}/+server.ts" })\` — runs svelte-check / tsc on a single file` : ''}
+
 ## How to use this file
 
 Agents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest \`AGENTS.md\` when editing files in this tree. The root \`AGENTS.md\` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.
@@ -387,8 +397,22 @@ if (DRY_RUN) {
     mkdirSync(path.dirname(t.path), { recursive: true });
     writeFileSync(t.path, t.content, 'utf8');
     wrote++;
+
+    // Mirror into Redis as agents:dir:<rel> for ACE quick-hit tool calls.
+    // ACE context-assembler can fetch this in one round-trip alongside the
+    // existing KAG note, getting pre-rendered audit-summarized markdown
+    // instead of having to re-derive from the JSON-shaped wiki:note:dir:*.
+    if (redis && t.label !== 'root') {
+      try {
+        const dirRel = t.label;
+        await redis.setex(`agents:dir:${dirRel}`, 24 * 3600, t.content);
+      } catch { /* non-fatal */ }
+    } else if (redis && t.label === 'root') {
+      try { await redis.setex('agents:root', 24 * 3600, t.content); } catch {}
+    }
   }
-  console.log(`✓ wrote ${wrote} AGENTS.md file(s)${humanEdited ? `, preserved ${humanEdited} human-edited` : ''}`);
+  const mirrored = redis ? `, mirrored to Redis agents:dir:* (${wrote} keys, 24h TTL)` : '';
+  console.log(`✓ wrote ${wrote} AGENTS.md file(s)${humanEdited ? `, preserved ${humanEdited} human-edited` : ''}${mirrored}`);
 }
 
 if (redis) await redis.quit();

@@ -1,7 +1,7 @@
 # AGENTS.md — `src/routes/(app)/demos/yorha/components`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:03:00.655Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)/demos/yorha/components
 
@@ -18,6 +18,25 @@
 - `EnhancedYoRHaAIAssistant.svelte`
 - `JudicialAnalysisAgent.svelte`
 - `YoRHaAIChat.svelte`
+
+## Hypergraph cluster
+
+This directory is part of cluster **C97** — component chunks in \`src/lib/components/yorha\` (tag: embedding)
+
+- **Top kinds**: component×2
+- **Top tags**: `embedding`
+
+See `docs/graph/hypergraph-clusters.md` § Cluster 97 for full digest.
+
+
+## Agentic tool-calling — quick ACE hits
+
+In-process tools the Gemma4 agent can call to dig deeper into this directory:
+
+- `graph_search({ query: "components", topK: 8 })` — files in this dir with tags, TODOs, audit flags
+- `wiki_note_lookup({ query: "yorha components", limit: 5 })` — KAG narrative + audit score
+- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
+- `read_file({ filePath: "src/routes/(app)/demos/yorha/components/<file>" })` — fetch any file's contents (sandboxed to src/)
 
 
 ## How to use this file
