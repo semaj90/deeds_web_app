@@ -93,6 +93,187 @@ export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
 /** IBM Granite-Docling-258M — document understanding VLM via Ollama (522 MB) */
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
 
+/** gemma4-legal-vlm:latest — merged Gemma 4 legal VLM exposed through the VLM server */
+export const SERVER_VLM_MODEL = 'gemma4-legal-vlm:latest';
+
+export type ModelRole =
+	| 'planner'
+	| 'synthesizer'
+	| 'tool_router'
+	| 'embedding'
+	| 'vlm'
+	| 'reward_scorer';
+
+export type ModelRuntime =
+	| 'llama-server'
+	| 'ollama'
+	| 'transformers'
+	| 'tensorrt'
+	| 'litert'
+	| 'onnx';
+
+export type ModelCapabilities = {
+	id: string;
+	roles: ModelRole[];
+	supportsFunctionCalling: boolean;
+	/**
+	 * PLE is an internal inference/runtime feature, not a retrieval-vector feature.
+	 * Keep this false unless the exact runtime/model format has been verified.
+	 */
+	supportsPLE: boolean;
+	supportsVision: boolean;
+	supportsAudio: boolean;
+	contextWindow?: number;
+	embeddingDimensions?: number;
+	recommendedRuntime: ModelRuntime;
+	notes?: string;
+};
+
+// Capability registry for routing and validation. Retrieval embeddings stay on
+// EmbeddingGemma/nomic-style embedding models; planner/synthesis models are not
+// valid substitutes for Qdrant or semantic-cache vectors.
+export const MODEL_CAPABILITIES: Record<string, ModelCapabilities> = {
+	[SERVER_EMBEDDING_MODEL]: {
+		id: SERVER_EMBEDDING_MODEL,
+		roles: ['embedding'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		contextWindow: 2048,
+		embeddingDimensions: SERVER_EMBEDDING_DIMS,
+		recommendedRuntime: 'ollama',
+		notes: 'Authoritative retrieval/vector model for Qdrant, semantic cache, clustering, and RAG recall.',
+	},
+	[SERVER_EMBEDDING_FALLBACK]: {
+		id: SERVER_EMBEDDING_FALLBACK,
+		roles: ['embedding'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		recommendedRuntime: 'ollama',
+		notes: 'Fallback retrieval embedding model when EmbeddingGemma is unavailable.',
+	},
+	[`${SERVER_EMBEDDING_FALLBACK}:latest`]: {
+		id: `${SERVER_EMBEDDING_FALLBACK}:latest`,
+		roles: ['embedding'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		recommendedRuntime: 'ollama',
+		notes: 'Latest-tag fallback retrieval embedding model.',
+	},
+	[SERVER_CHAT_MODEL]: {
+		id: SERVER_CHAT_MODEL,
+		roles: ['planner', 'synthesizer', 'reward_scorer'],
+		supportsFunctionCalling: true,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		recommendedRuntime: 'ollama',
+		notes: 'Primary server reasoning/synthesis model. Do not use for retrieval vectors.',
+	},
+	[SERVER_GEMMA4_MODEL]: {
+		id: SERVER_GEMMA4_MODEL,
+		roles: ['planner', 'synthesizer'],
+		supportsFunctionCalling: true,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		contextWindow: 131072,
+		recommendedRuntime: 'ollama',
+		notes: 'General Gemma 4 reasoning model. Treat as planning/synthesis only.',
+	},
+	[SERVER_VLM_MODEL]: {
+		id: SERVER_VLM_MODEL,
+		roles: ['planner', 'synthesizer', 'vlm', 'reward_scorer'],
+		supportsFunctionCalling: true,
+		supportsPLE: false,
+		supportsVision: true,
+		supportsAudio: false,
+		recommendedRuntime: 'transformers',
+		notes: 'Merged legal VLM served by the FastAPI VLM server.',
+	},
+	[CLIENT_E2B_MODEL_ID]: {
+		id: CLIENT_E2B_MODEL_ID,
+		roles: ['planner', 'synthesizer'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		recommendedRuntime: 'transformers',
+		notes: 'Primary client-side Gemma 4 E2B model. No retrieval-vector role.',
+	},
+	[LITERT_E2B_MODEL_ID]: {
+		id: LITERT_E2B_MODEL_ID,
+		roles: ['planner', 'synthesizer'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		recommendedRuntime: 'litert',
+		notes: 'On-device LiteRT Gemma lane for smaller local inference.',
+	},
+	[LITERT_E4B_MODEL_ID]: {
+		id: LITERT_E4B_MODEL_ID,
+		roles: ['planner', 'synthesizer'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		recommendedRuntime: 'litert',
+		notes: 'Larger LiteRT local reasoning lane.',
+	},
+	[CLIENT_LLM_MODEL]: {
+		id: CLIENT_LLM_MODEL,
+		roles: ['planner'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		recommendedRuntime: 'onnx',
+		notes: 'Legacy Gemma 3 270M ONNX fallback for simple local generation/routing.',
+	},
+	[CLIENT_EMBEDDING_MODEL]: {
+		id: CLIENT_EMBEDDING_MODEL,
+		roles: ['embedding'],
+		supportsFunctionCalling: false,
+		supportsPLE: false,
+		supportsVision: false,
+		supportsAudio: false,
+		embeddingDimensions: CLIENT_EMBEDDING_DIMS,
+		recommendedRuntime: 'onnx',
+		notes: 'Client-side EmbeddingGemma ONNX for local semantic embedding.',
+	},
+};
+
+export function getModelCapabilities(modelId: string): ModelCapabilities | null {
+	return MODEL_CAPABILITIES[modelId] ?? null;
+}
+
+export function pickModelForRole(role: ModelRole): ModelCapabilities | undefined {
+	return Object.values(MODEL_CAPABILITIES).find((model) => model.roles.includes(role));
+}
+
+export function isEmbeddingModel(modelId: string): boolean {
+	return MODEL_CAPABILITIES[modelId]?.roles.includes('embedding') ?? false;
+}
+
+export function assertEmbeddingModel(modelId: string): string {
+	const capabilities = getModelCapabilities(modelId);
+	if (!capabilities) return modelId;
+
+	if (!capabilities.roles.includes('embedding')) {
+		throw new Error(
+			`Model ${modelId} is registered for ${capabilities.roles.join(', ')} and cannot be used as a retrieval embedding model.`
+		);
+	}
+
+	return modelId;
+}
+
 // ── Server-side VLM Server (HF Transformers + NF4, vision + text + audio) ──
 //
 // FastAPI server wrapping the merged Gemma 4 E4B legal VLM checkpoint.

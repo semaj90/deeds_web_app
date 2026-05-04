@@ -14,7 +14,7 @@
 // VLM model configurations — resolved from ENV so .env overrides work without code changes.
 // Keys are populated after ENV is imported below (see ── Config ──).
 // Callers use VLM_MODELS.legal / .vision / .embedding / .gemma4 as before.
-export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4', string> = {
+export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4' | 'tool', string> = {
   /** Unified legal+VLM model (GRPO legal LoRA merged, mmproj vision, 5.3GB) */
   vision: 'gemma4-legal-vlm:latest',
   embedding: 'embeddinggemma:latest',
@@ -22,6 +22,13 @@ export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4', str
   legal: 'gemma4-legal-vlm:latest',
   /** Gemma 4 unified — tool calling + thinking + vision */
   gemma4: 'gemma4-legal-vlm:latest',
+  /**
+   * Structured-call translator (broker boundary).
+   * Defaults to unified Gemma 4. Set FUNCTION_GEMMA_MODEL=functiongemma:latest
+   * to route structured tool-call translation through the lighter 270M model
+   * once `ollama pull functiongemma:latest` has completed.
+   */
+  tool: 'gemma4-legal-vlm:latest',
 };
 
 export type VLMModel = string;
@@ -57,8 +64,10 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { Agent } from 'undici';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 import crypto from 'node:crypto';
 import * as Hypergraph from './ai/hypergraph-store.js';
+import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -101,6 +110,7 @@ VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL;
 VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL;
 VLM_MODELS.legal = ENV.OLLAMA_CHAT_MODEL;
 VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL;
+VLM_MODELS.tool = ENV.FUNCTION_GEMMA_MODEL;
 
 // ── HTTP Keep-Alive Agent ───────────────────────────────────────────────────
 // Reuses TCP connections to Ollama instead of creating new ones per request.
@@ -208,6 +218,41 @@ function logOllamaDiagnostics(
   console.warn(`[ollama-diag] ${details.join(' ')} error=${errorMessage}`);
 }
 
+function buildBifrostCacheTrace(
+  hitLevel: 'L1' | 'L2' | 'L3',
+  latencyMs: number,
+  similarity?: number
+): LlmCacheTrace {
+  return {
+    modelRole: 'bifrost-chat-synthesis',
+    cacheTier: hitLevel === 'L1' ? 'L1_exact' : hitLevel === 'L2' ? 'L2_semantic' : 'L3_ollama',
+    tokenizerFamily: 'gemma',
+    provider: hitLevel === 'L3' ? 'ollama' : 'bifrost',
+    latencyMs,
+    similarity,
+  };
+}
+
+function logBifrostCacheTrace(
+  model: string,
+  trace: LlmCacheTrace,
+  metadata: Record<string, unknown>
+): void {
+  logInference({
+    type: 'llm',
+    model,
+    backend: trace.provider === 'ollama' ? 'ollama' : 'bifrost',
+    latencyMs: trace.latencyMs ?? 0,
+    cacheHit: trace.cacheTier !== 'L3_ollama',
+    metadata: {
+      model_role: trace.modelRole,
+      cache_tier: trace.cacheTier,
+      tokenizerFamily: trace.tokenizerFamily,
+      ...metadata,
+    },
+  });
+}
+
 /**
  * Shared fetch wrapper for Ollama requests with connection pooling.
  * All Ollama HTTP calls should use this instead of raw fetch().
@@ -277,6 +322,147 @@ type BifrostChatOptions = {
   taskType?: Hypergraph.TaskType;
   sessionId?: string;
 };
+
+function normalizeToolCalls(toolCalls: unknown): any[] | undefined {
+  if (!Array.isArray(toolCalls) || toolCalls.length === 0) return undefined;
+
+  return toolCalls
+    .map((toolCall) => {
+      const rawFunction =
+        typeof toolCall === 'object' && toolCall !== null && 'function' in toolCall
+          ? (toolCall as { function?: { name?: unknown; arguments?: unknown } }).function
+          : undefined;
+      const name = typeof rawFunction?.name === 'string' ? rawFunction.name : '';
+      const rawArguments = rawFunction?.arguments;
+      let parsedArguments: Record<string, unknown> = {};
+
+      if (typeof rawArguments === 'string') {
+        try {
+          const parsed = JSON.parse(rawArguments);
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            parsedArguments = parsed as Record<string, unknown>;
+          }
+        } catch {
+          parsedArguments = {};
+        }
+      } else if (rawArguments && typeof rawArguments === 'object' && !Array.isArray(rawArguments)) {
+        parsedArguments = rawArguments as Record<string, unknown>;
+      }
+
+      if (!name) return null;
+      return {
+        function: {
+          name,
+          arguments: parsedArguments,
+        },
+      };
+    })
+    .filter(Boolean);
+}
+
+/** Overload: no tools → guaranteed string */
+export function turboQuantChat(
+  messages: Array<OllamaMessage>,
+  model: string,
+  options?: Omit<BifrostChatOptions, 'tools' | 'toolChoice'> & { tools?: never }
+): Promise<string>;
+/** Overload: with tools → may return tool_calls object */
+export function turboQuantChat(
+  messages: Array<OllamaMessage>,
+  model: string,
+  options: BifrostChatOptions & { tools: ReadonlyArray<unknown> }
+): Promise<string | { content: string; tool_calls?: any[]; sessionId: string }>;
+/** Implementation */
+export async function turboQuantChat(
+  messages: Array<OllamaMessage>,
+  model: string,
+  options?: BifrostChatOptions
+): Promise<string | { content: string; tool_calls?: any[]; sessionId: string }> {
+  const sessionId = options?.sessionId ?? crypto.randomUUID();
+  const timeoutMs = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
+
+  const healthRes = await fetch(`${TURBOQUANT_BASE_URL}/health`, {
+    signal: AbortSignal.timeout(Math.min(timeoutMs, 1_000)),
+  }).catch(() => null);
+
+  if (!healthRes?.ok) {
+    throw new Error('TurboQuant is unavailable on :8090');
+  }
+
+  const normalizedMessages = messages.map((message) =>
+    message.role === 'user'
+      ? { ...message, content: normalizeBifrostMessage(message.content) }
+      : message
+  );
+
+  const requestBody = {
+    model,
+    messages: normalizedMessages.map((message) => ({
+      role: message.role,
+      content: message.content,
+      ...(message.tool_calls?.length ? { tool_calls: message.tool_calls } : {}),
+    })),
+    max_tokens: options?.maxTokens ?? 2048,
+    temperature: options?.temperature ?? 0.2,
+    stream: false,
+    cache_prompt: true,
+    ...(options?.tools ? { tools: options.tools } : {}),
+    ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
+  };
+
+  const startedAt = Date.now();
+  const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestBody),
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => '');
+    throw new Error(`TurboQuant chat failed (${res.status}): ${errorText.slice(0, 240)}`);
+  }
+
+  const data = (await res.json()) as {
+    usage?: {
+      prompt_tokens?: number;
+      completion_tokens?: number;
+      total_tokens?: number;
+    };
+    choices?: Array<{
+      message?: {
+        content?: string;
+        reasoning_content?: string;
+        tool_calls?: unknown;
+      };
+    }>;
+  };
+
+  const choice = data.choices?.[0]?.message;
+  const content = choice?.content ?? choice?.reasoning_content ?? '';
+  const toolCalls = normalizeToolCalls(choice?.tool_calls);
+
+  logInference({
+    type: 'llm',
+    model,
+    backend: 'turboquant',
+    latencyMs: Date.now() - startedAt,
+    cacheHit: false,
+    metadata: {
+      model_role: 'turboquant-chat',
+      cache_tier: 'L4_none',
+      tokenizerFamily: 'gemma',
+      toolCalls: toolCalls?.length ?? 0,
+      sessionId,
+    },
+  });
+
+  if (options?.tools) {
+    return { content, tool_calls: toolCalls, sessionId };
+  }
+
+  return content;
+}
 
 /** Overload: no tools → guaranteed string */
 export function bifrostChat(
@@ -359,6 +545,10 @@ export async function bifrostChat(
   if (exactMatch) {
     cacheHitLevel = 'L1';
     console.log(`[bifrost] L1 EXACT-MATCH HIT (${exactMatch.backend}) — l1_ms=${t_l1.toFixed(2)}`);
+    logBifrostCacheTrace(bifrostModel, buildBifrostCacheTrace('L1', Math.round(t_l1)), {
+      source: 'bifrostChat',
+      cache_backend: 'redis-exact-match',
+    });
     return exactMatch.content;
   }
 
@@ -439,6 +629,18 @@ export async function bifrostChat(
                     backend: 'qdrant-semantic',
                   });
                   l2CacheHit = true;
+                  logBifrostCacheTrace(
+                    bifrostModel,
+                    buildBifrostCacheTrace(
+                      'L2',
+                      Math.round(performance.now() - t_start),
+                      hit.score
+                    ),
+                    {
+                      source: 'bifrostChat',
+                      cache_backend: 'qdrant-semantic',
+                    }
+                  );
                   return cachedContent;
                 }
               } catch {
@@ -555,6 +757,16 @@ export async function bifrostChat(
     }
 
     if (tool_calls?.length) {
+      logBifrostCacheTrace(
+        bifrostModel,
+        buildBifrostCacheTrace('L3', Math.round(performance.now() - t_start)),
+        {
+          source: 'bifrostChat',
+          gatewayCacheHit: cacheHit,
+          hitType: hitType ?? null,
+          toolCalls: tool_calls.length,
+        }
+      );
       return { content, tool_calls, sessionId };
     }
   } catch (bifrostErr) {
@@ -590,6 +802,15 @@ export async function bifrostChat(
 
     await callDirectOllamaFallback();
     if (tool_calls?.length) {
+      logBifrostCacheTrace(
+        bifrostModel,
+        buildBifrostCacheTrace('L3', Math.round(performance.now() - t_start)),
+        {
+          source: 'bifrostChat',
+          fallback: 'ollama-direct',
+          toolCalls: tool_calls.length,
+        }
+      );
       return { content, tool_calls, sessionId };
     }
   }
@@ -653,22 +874,6 @@ export async function bifrostChat(
         }
       })();
     }
-    // Log L3 cold inference to CouchDB for QLoRA distillation
-    if (!cacheHit) {
-      logInference({
-        type: 'llm',
-        model: bifrostModel,
-        backend: 'ollama',
-        latencyMs: Math.round(performance.now() - bifrostStart),
-        tokenCount: content.split(/\s+/).length,
-        cacheHit: false,
-        metadata: {
-          response: content.slice(0, 20_000),
-          temperature: options?.temperature ?? 0.7,
-          source: 'bifrostChat',
-        },
-      });
-    }
     await setExactMatchCache(exactCacheKey, {
       content,
       model: bifrostModel,
@@ -693,6 +898,19 @@ export async function bifrostChat(
     }
   }
 
+  if (content) {
+    const trace = buildBifrostCacheTrace('L3', Math.round(total_ms));
+    logBifrostCacheTrace(bifrostModel, trace, {
+      source: 'bifrostChat',
+      gatewayCacheHit: cacheHit,
+      hitType: hitType ?? null,
+      chatTemplate: 'gemma',
+      response: content.slice(0, 20_000),
+      temperature: options?.temperature ?? 0.7,
+      writebackQueued,
+    });
+  }
+
   if (tool_calls?.length) {
     return { content, tool_calls, sessionId };
   }
@@ -703,50 +921,58 @@ export async function bifrostChat(
 // ── Chat Functions (merged from ollama-service.ts) ──────────────────────
 
 export async function generateText(prompt: string): Promise<string> {
-	// Route through Bifrost gateway when enabled (gets semantic caching)
-	if (ENV.BIFROST_ENABLED) {
-		return traceLLM('generate-text', { model: CHAT_MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
-			const content = await bifrostChat(
-				[{ role: 'user', content: prompt }],
-				CHAT_MODEL
-			);
-			gen.end({ output: content.slice(0, 1000) });
-			return content;
-		});
-	}
+  // Route through Bifrost gateway when enabled (gets semantic caching)
+  if (ENV.BIFROST_ENABLED) {
+    return traceLLM(
+      'generate-text',
+      { model: CHAT_MODEL, prompt: prompt.slice(0, 500) },
+      async (gen) => {
+        const content = await bifrostChat([{ role: 'user', content: prompt }], CHAT_MODEL);
+        gen.end({ output: content.slice(0, 1000) });
+        return content;
+      }
+    );
+  }
 
-	const body = {
-		model: CHAT_MODEL,
-		messages: [{ role: 'user', content: prompt }],
-		stream: false,
-		keep_alive: getChatModelKeepAlive(),
-	};
+  const body = {
+    model: CHAT_MODEL,
+    messages: [{ role: 'user', content: prompt }],
+    stream: false,
+    keep_alive: getChatModelKeepAlive(),
+  };
 
-	return traceLLM('generate-text', { model: CHAT_MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
-		const content = await ollamaBreaker.call(() =>
-			retry(async () => {
-				const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(body),
-					signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-				});
+  return traceLLM(
+    'generate-text',
+    { model: CHAT_MODEL, prompt: prompt.slice(0, 500) },
+    async (gen) => {
+      const content = await ollamaBreaker.call(() =>
+        retry(
+          async () => {
+            const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+            });
 
-				if (!res.ok) {
-					const text = await res.text().catch(() => '');
-					console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
-					throw new Error(`Ollama chat failed: ${res.status}`);
-				}
+            if (!res.ok) {
+              const text = await res.text().catch(() => '');
+              console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
+              throw new Error(`Ollama chat failed: ${res.status}`);
+            }
 
-				// GPU-accelerated JSON parsing via simdjson (5× faster for large LLM responses)
-				const rawText = await res.text();
-				const data = fastJsonParse<{ message?: { content: string } }>(rawText);
-				return data.message?.content ?? '';
-			}, { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer })
-		);
-		gen.end({ output: content.slice(0, 1000) });
-		return content;
-	});
+            // GPU-accelerated JSON parsing via simdjson (5× faster for large LLM responses)
+            const rawText = await res.text();
+            const data = fastJsonParse<{ message?: { content: string } }>(rawText);
+            return data.message?.content ?? '';
+          },
+          { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer }
+        )
+      );
+      gen.end({ output: content.slice(0, 1000) });
+      return content;
+    }
+  );
 }
 
 export async function callOllamaChat(
@@ -780,7 +1006,7 @@ export async function callOllamaChat(
       { role: 'user', content: userPrompt },
     ],
     stream: false,
-		keep_alive: getChatModelKeepAlive(),
+    keep_alive: getChatModelKeepAlive(),
   };
   if (options?.format) body.format = options.format;
   if (options?.num_predict || options?.temperature !== undefined) {
@@ -816,9 +1042,31 @@ export async function callOllamaChat(
 
             // GPU-accelerated JSON parsing via simdjson (5× faster for large LLM responses)
             const rawText = await res.text();
-            const data = fastJsonParse<{ message?: { content: string } }>(rawText);
+            const data = fastJsonParse<{
+              message?: { content: string };
+              prompt_eval_count?: number;
+              eval_count?: number;
+            }>(rawText);
             const result = data.message?.content ?? '';
             console.log(`[ollama] Chat completed in ${duration}ms (${result.length} chars)`);
+
+            // Fire-and-forget token tracking (covers all callOllamaChat callers)
+            import('$lib/server/ai/token-tracker.js')
+              .then(({ trackTokenUsage }) => {
+                trackTokenUsage({
+                  endpoint: 'callOllamaChat',
+                  model: CHAT_MODEL,
+                  promptTokens: data.prompt_eval_count ?? 0,
+                  completionTokens: data.eval_count ?? 0,
+                  durationMs: duration,
+                  cached: false,
+                  metadata: { chatTemplate: 'gemma' },
+                });
+              })
+              .catch(() => {
+                /* non-fatal */
+              });
+
             return result;
           },
           { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer }

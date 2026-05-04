@@ -12,6 +12,7 @@
  */
 
 import type { SearchResult } from './types.js';
+import { redis } from '$lib/server/redis.js';
 
 export interface RedisCacheConfig {
   url: string;
@@ -29,7 +30,7 @@ export interface CachedSearchResult {
 const DEFAULT_CONFIG: RedisCacheConfig = {
   url: process.env?.REDIS_URL ?? 'redis://localhost:6379',
   defaultTTL: 3600, // 1 hour (Requirement 6.1)
-  keyPrefix: 'kb:search:' // Requirement 6.2
+  keyPrefix: 'kb:search:', // Requirement 6.2
 };
 
 /**
@@ -74,7 +75,7 @@ export class RedisCacheService {
       results,
       cachedAt: new Date().toISOString(),
       queryHash,
-      ttl
+      ttl,
     };
 
     if (this.isAvailable) {
@@ -149,11 +150,7 @@ export class RedisCacheService {
   /**
    * Cache document content
    */
-  async cacheDocument(
-    docId: string,
-    content: string,
-    ttl: number = 86400
-  ): Promise<void> {
+  async cacheDocument(docId: string, content: string, ttl: number = 86400): Promise<void> {
     const key = `kb:doc:${docId}`;
 
     if (this.isAvailable) {
@@ -164,7 +161,7 @@ export class RedisCacheService {
           results: [],
           cachedAt: new Date().toISOString(),
           queryHash: docId,
-          ttl
+          ttl,
         });
       }
     }
@@ -272,7 +269,7 @@ export class RedisCacheService {
     let hash = 0;
     for (let i = 0; i < query.length; i++) {
       const char = query.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return Math.abs(hash).toString(16);
@@ -282,47 +279,31 @@ export class RedisCacheService {
    * Set value with TTL
    */
   private async setWithTTL(key: string, value: string, ttl: number): Promise<void> {
-    const response = await fetch('/api/cache/set', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value, ttl })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Cache set failed: ${response.status}`);
-    }
+    await redis.set(key, value, 'EX', ttl);
   }
 
   /**
    * Get value
    */
   private async get(key: string): Promise<string | null> {
-    const response = await fetch(`/api/cache/get?key=${encodeURIComponent(key)}`);
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return data.value ?? null;
+    return await redis.get(key);
   }
 
   /**
    * Delete key
    */
   private async delete(key: string): Promise<void> {
-    await fetch(`/api/cache/delete?key=${encodeURIComponent(key)}`, {
-      method: 'DELETE'
-    });
+    await redis.del(key);
   }
 
   /**
    * Delete keys matching pattern
    */
   private async deletePattern(pattern: string): Promise<void> {
-    await fetch(`/api/cache/delete-pattern?pattern=${encodeURIComponent(pattern)}`, {
-      method: 'DELETE'
-    });
+    const keys = await redis.keys(pattern);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
   }
 }
 

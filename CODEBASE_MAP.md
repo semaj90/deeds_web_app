@@ -241,6 +241,27 @@ Three workflows exist under `.github/workflows/`. `sveltekit-ci.yml` is the cano
 - `error-brain-check.yml` is now runnable. The `batch-merger-fixer-v2.mjs` stub produces a `reports/batch-analysis-{ts}.json` with a `.summary` field the workflow validates via `jq`.
 - `error-analysis.yml` is now the `phase78:*` error-analysis workflow. The `phase78:insert`, `phase78:cluster`, and `phase78:suggest` steps require a `DATABASE_URL` GitHub secret for Postgres access; they run with `continue-on-error: true` so the workflow passes on CI runners without a database configured. Only `check`, `check:ts7`, and `phase78:ast-rank` run unconditionally.
 
+## Production Readiness Audit Harness
+
+`scripts/tests/test-production-readiness.mjs` is now the primary local production-readiness harness. It validates the runtime stack and writes timestamped markdown plans under `next_steps/active/`.
+
+The script degrades through three modes:
+
+1. **Full agent mode** — uses `/api/ai/agent`, Gemma4, ACE retrieval, and `codebase_chunks_768`.
+2. **RAG-only mode** — uses direct Qdrant access against `codebase_chunks_768` when no LLM is available.
+3. **Static-scan mode** — uses filesystem scans for TODOs, hardcoded localhost URLs, Zod coverage, and other production risks.
+
+Inference readiness is handled by `ensureInference()`. If neither Ollama nor TurboQuant is healthy and `--turbo` is passed, the script can spawn `llama-server.exe` on port `8090` with stable `q8_0` KV cache. TurboQuant-style aggressive KV modes remain benchmark-only.
+
+Useful commands:
+
+```bash
+node sveltekit-frontend/scripts/tests/test-production-readiness.mjs
+node sveltekit-frontend/scripts/tests/test-production-readiness.mjs --turbo
+node sveltekit-frontend/scripts/tests/test-production-readiness.mjs --skip-index
+node sveltekit-frontend/scripts/tests/test-production-readiness.mjs --turbo --skip-index
+```
+
 ## Analysis Path Mapping
 
 This repository already has a live codebase-intelligence pipeline; the main work is in extending and stabilizing that path, not inventing a second one from scratch. The most important split is: `codebase-index/*` builds and enriches graph/search artifacts, `ace/*` assembles those artifacts into synthesis context, and `ACPToolRegistry` is a separate tool-execution plane.
@@ -264,13 +285,16 @@ This repository already has a live codebase-intelligence pipeline; the main work
   This is the server-side hypergraph model layer. It documents the 4D coordinate system, uses `bifrostChat` and `langGraphSynthesize` during enrichment, and treats `hg:4d:*`, `hg:edge:*`, and `hg:edge:idx` as the central topology store.
 
 - `sveltekit-frontend/src/lib/server/retrieval/topological-search.ts`
-  This is the retrieval-time consumer for hypergraph Redis state. If ACE or graph-aware ranking stops seeing hyperedge boosts, this is the first reader to check alongside the hypergraph writers and the smoke script.
+  This is the retrieval-time consumer for hypergraph Redis state. If ACE or graph-aware ranking stops seeing hyperedge boosts, this is the first reader to check alongside the hypergraph writers and the smoke script. Now accepts `queryBmu: QueryBmuResult` in `BoostOptions` — chunks whose `somBmuRow`/`somBmuCol` are close to the query's own BMU receive a linear-decay proximity boost (default `queryBmuWeight=0.03`).
+
+- `sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts` — Query-Time SOM BMU Caching
+  `queryBmuCached(embedding, gridW, gridH)` maps a live query embedding to its SOM Best Matching Unit via the `somCache` CUDA kernel, caches the result in Redis under `som:bmu:{fp_hash}` for 30 minutes, and falls back to CPU argmin over `som:weights` when the GPU path is unavailable. Returns `{ bmuRow, bmuCol, source: 'gpu'|'cpu'|'cache' }`. This makes SOM a live query-time ranking signal rather than only an offline clustering artifact. `attentionScoreChunks(queryEmbedding, chunkEmbeddings[])` exposes `attentionScoreGPU` for n-ary GPU attention scoring across a candidate set; falls back to CPU cosine. The `NativeAddon` interface now types all previously invisible exports: `trainSOM`, `kmeansWithCentroids`, `attentionScoreGPU`, `rewardScoreGPU`, `pageRankGPU`, `softmaxGPU`, `topKIndicesGPU`.
 
 - `sveltekit-frontend/src/lib/server/graph/community-graph.ts`
   This adds a GraphRAG-style community layer over the existing codebase graph. It groups GPU/SOM clusters into higher-level communities, summarizes them with LLM help, stores them in Redis/Postgres, and exposes context back to retrieval and ACE.
 
 - `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
-  This is where codebase intelligence flows back into synthesis. ACE pulls RAG chunks, KAG neighbors, web research, chat memory, optional codebase context, and GraphRAG community summaries into one promptable context bundle.
+  This is where codebase intelligence flows back into synthesis. ACE pulls RAG chunks, KAG neighbors, web research, chat memory, optional codebase context, and GraphRAG community summaries into one promptable context bundle. Phase 8 now runs `queryBmuCached()` against the query embedding before calling `applyTopologicalBoostAsync`, passing the query's BMU grid coordinates so chunks near the query's own SOM position receive an extra ranking signal. ACE scoring spine: `semantic×0.60 + tag×0.12 + ast_graph×0.10 + som_chunk_proximity×0.05 + query_bmu_proximity×0.03 + hyperedge×0.10` (caps: MAX_QUERY_BMU_BOOST=0.03, MAX_ATTENTION_BOOST=0.04).
 
 - `sveltekit-frontend/src/lib/server/ollama.ts`
   This is the canonical `bifrostChat` gateway. It owns the Ollama and Bifrost request path, so it is the first file to inspect when cache tiering, semantic-cache fallbacks, or model routing behave unexpectedly.
@@ -355,6 +379,19 @@ The tiered cache system is now a first-class citizen of the agentic inference pa
 | `sveltekit-frontend/package.json` | Added `"engines": { "node": ">=22.0.0" }` and `"check:ts7": "tsgo --noEmit"` |
 | `sveltekit-frontend/.nvmrc` | Created with content `22` |
 
+### CI Command Consolidation (May 3, 2026)
+
+`package.json` now has a `ci:all` script that chains the three main local CI gates:
+
+```
+npm run ci:all
+→ check:ts7 (tsgo --noEmit — hard gate)
+→ ci:smoke:hypergraph (hg:edge:* namespace shape guard — hard gate)
+→ grpc:health:retrieval (advisory — passes even if Docker is down)
+```
+
+VS Code task: `✅ CI: All Checks (TS7 + hypergraph smoke + retrieval health)`.
+
 ### Hypergraph CI Namespace Guard (commit `cda52f1962`)
 
 The CI smoke test for the hypergraph pipeline is now a hard gate, not an informational check:
@@ -394,9 +431,9 @@ The agent discovery card is served at `GET /.well-known/agent.json`.
 
 Both paths write through to Redis L1 on L2 hits, so repeated queries see sub-ms responses on either path. The two caches do **not** share keys — an agent hit does not warm the bifrost cache and vice versa.
 
-### Gemma Family Model Lanes (verified May 3, 2026)
+### Gemma Family Model Lanes (updated May 3, 2026)
 
-The repo already uses smaller Gemma-family models across multiple lanes. No current FunctionGemma wiring was found in this codebase.
+The repo uses smaller Gemma-family models across multiple lanes. A FunctionGemma broker slot is now wired but dormant — the slot defaults to the unified Gemma 4 model until `functiongemma:latest` is pulled from Ollama.
 
 | Lane | Model | Runtime | Purpose |
 |------|-------|---------|---------|
@@ -404,10 +441,26 @@ The repo already uses smaller Gemma-family models across multiple lanes. No curr
 | Client Tier 2 | LiteRT Gemma 4 E2B/E4B | LiteRT-LM (XNNPACK/MTP) | CPU/iGPU fallback with MTP speculative heads |
 | Client Tier 3 | Gemma 3 270M ONNX | onnxruntime-web | Legacy fallback, any device |
 | Client embeddings | EmbeddingGemma 300M ONNX | onnxruntime-web | 768-dim client-side vectors |
-| Server LLM | `gemma4-legal-vlm:latest` | Ollama + CUDA RTX | Synthesis, tool-call generation, vision |
+| Server LLM | `gemma4-legal-vlm:latest` | Ollama + CUDA RTX | Synthesis, planning, vision (`PLANNER_MODEL`) |
+| Server tool-call | `FUNCTION_GEMMA_MODEL` env var | Ollama | Structured-call translation (`TOOL_MODEL` slot in `gemma4-agent.ts`) — defaults to unified model; set `FUNCTION_GEMMA_MODEL=functiongemma:latest` to activate the 270M lane once the Ollama tag is available |
 | Server embeddings | `embeddinggemma:latest` | Ollama | Qdrant vectors, semantic cache, clustering, SOM |
 
+**Model broker boundary:** `gemma4-agent.ts` now separates `PLANNER_MODEL` (full Gemma 4 legal VLM — reasoning, planning, synthesis) from `TOOL_MODEL` (structured-call translation — FunctionGemma target slot). Both currently resolve to `gemma4-legal-vlm:latest`. To activate the lighter lane: `ollama pull functiongemma:latest` then set `FUNCTION_GEMMA_MODEL=functiongemma:latest` in `.env`.
+
 **PLE (Per-Layer Embeddings) clarification:** Some smaller Gemma edge models (E2B/E4B) use Per-Layer Embeddings and MatFormer-style parameter-efficient execution as internal inference optimizations. PLE helps smaller effective-parameter models run efficiently on local devices. It is **not** the same as the retrieval embeddings used for Qdrant vector search. Retrieval remains anchored on EmbeddingGemma (`embeddinggemma:latest` server-side, EmbeddingGemma 300M ONNX client-side). The PLE internal tensors are not stored in Qdrant and are not part of the semantic cache or clustering pipeline.
+
+## Compiler and Runtime Boundaries
+
+See [`docs/compiler-landscape.md`](docs/compiler-landscape.md) for the boundary between TypeScript compilation, GPU tensor execution, and browser WASM fallback. Short version:
+
+| "Compiler" | What it actually does | GPU? |
+|------------|----------------------|------|
+| `tsgo` / TypeScript 7 | Type-checks and transforms TypeScript source using Go goroutines | No — CPU only |
+| PyTorch / LibTorch / Triton | Traces and executes tensor graphs, fuses kernel launches, generates PTX | Yes — CUDA/cuBLAS |
+| `tensorrt_bridge.node` | Native N-API bridge: k-means, PageRank, cosine, attention (fixed ops) | Yes — CUDA/cuBLAS |
+| WASM / ONNX Runtime | Portable bytecode; WASM SIMD is 128-bit, not equivalent to GPU GEMM | Partial — WebGPU preferred; WASM SIMD as fallback |
+
+`tsgo` is purely for developer speed and type health. It never performs ML tensor computation.
 
 ## How to Use This Map
 

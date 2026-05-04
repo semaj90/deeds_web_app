@@ -1136,6 +1136,35 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
                 }
               })
               .catch(() => {});
+
+            // Fire-and-forget: ingest cluster summaries as directory summaries
+            import('$lib/server/db/client')
+              .then(async ({ pool: pg }) => {
+                const rows = await pg.query<{
+                  gpu_cluster: number;
+                  purpose: string | null;
+                  summary: string | null;
+                  representative_files: string[] | null;
+                  tags: string[] | null;
+                }>(`SELECT gpu_cluster, purpose, summary, representative_files, tags
+                    FROM cluster_summaries
+                    WHERE gpu_cluster = ANY($1)`, [clusterIds]);
+                if (rows.rows.length === 0) return;
+                const { ingestDirectorySummaries } = await import(
+                  '$lib/server/indexer/directory-summarizer.js'
+                );
+                const entries = rows.rows.map((r) => ({
+                  rel: (r.representative_files?.[0] ?? `cluster-${r.gpu_cluster}`)
+                    .replace(/[^/]*$/, '').replace(/\/$/, '') || `cluster-${r.gpu_cluster}`,
+                  score: 75,
+                  metrics: { gpuCluster: r.gpu_cluster },
+                  ragSummary: r.summary ?? null,
+                  agentSummary: r.purpose ?? null,
+                  hyperedge: null,
+                }));
+                await ingestDirectorySummaries(entries);
+              })
+              .catch(() => {});
           }
         } else {
           emit('stage', {

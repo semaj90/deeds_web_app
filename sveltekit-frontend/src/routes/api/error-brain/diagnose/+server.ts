@@ -18,6 +18,7 @@ import { createHash } from 'crypto';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { callOllamaChat, bifrostChat } from '$lib/server/ollama.js';
+import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
 import { searchSimilarErrors, embedErrorEvent } from '$lib/server/pipeline/error-embedding-pipeline.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
@@ -470,7 +471,7 @@ SIMILAR PAST ERRORS:
 ${errorContext || 'No past error matches'}`;
 
 	// Call LLM with Langfuse tracing + Bifrost semantic cache (when enabled)
-	const { raw, llmTimeMs } = await traceLLM(
+	const { raw } = await traceLLM(
 		'error-diagnosis',
 		{
 			model: 'gemma4-legal:latest',
@@ -508,7 +509,17 @@ ${errorContext || 'No past error matches'}`;
 			}
 
 			const durationMs = performance.now() - startTime;
-			gen.end({ output: content.slice(0, 1000), usage: { completionTokens: Math.ceil(content.length / 4) } });
+			const estimatedTokens = Math.ceil(content.length / 4);
+			gen.end({ output: content.slice(0, 1000), usage: { completionTokens: estimatedTokens } });
+			trackTokenUsage({
+				endpoint: '/api/error-brain/diagnose',
+				model: 'gemma4-legal',
+				promptTokens: 0,
+				completionTokens: estimatedTokens,
+				durationMs,
+				cached: false,
+				metadata: { chatTemplate: 'gemma', mode, via: ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama' },
+			});
 			return { raw: content, llmTimeMs: durationMs };
 		}
 	);

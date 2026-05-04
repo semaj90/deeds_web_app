@@ -77,24 +77,12 @@
     {
       "label": "TurboQuant llama-server (VLM)",
       "type": "shell",
-      "command": "npm run turbo:start",
+      "command": "npm run turbo:start:detached",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
-      "isBackground": true,
       "group": "build",
-      "problemMatcher": {
-        "owner": "llama-server",
-        "pattern": {
-          "regexp": "^(.*)$",
-          "message": 1
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": ".",
-          "endsPattern": "all slots are idle"
-        }
-      },
+      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -103,7 +91,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Start TurboQuant llama-server.exe with gemma4-legal-vlm GGUF + mmproj VLM on port 8090 (turbo3 KV cache, flash-attn, 99 GPU layers)"
+      "detail": "Spawn TurboQuant llama-server.exe as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache and adds mmproj automatically if present."
     },
     {
       "label": "Svelte Check",
@@ -1711,7 +1699,7 @@
       },
       "group": "build",
       "presentation": {
-        "reveal": "always",
+        "reveal": "silent",
         "panel": "shared",
         "clear": true
       },
@@ -1781,8 +1769,7 @@
     {
       "label": "⚡ TurboQuant: Start (text-only, :8090)",
       "type": "shell",
-      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096 --log-disable",
-      "isBackground": true,
+      "command": "npm run turbo:start:text:detached",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -1791,13 +1778,12 @@
         "showReuseMessage": false
       },
       "problemMatcher": [],
-      "detail": "Start gemma4-legal with TurboQuant turbo3 KV cache (3-4 bit, 2× speedup, 3.4 GB VRAM) on :8090"
+      "detail": "Spawn text-only TurboQuant as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache."
     },
     {
       "label": "⚡ TurboQuant: Start (vision + text, :8090)",
       "type": "shell",
-      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096",
-      "isBackground": true,
+      "command": "npm run turbo:start:detached",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -1806,7 +1792,7 @@
         "showReuseMessage": false
       },
       "problemMatcher": [],
-      "detail": "Start gemma4-legal + mmproj VLM with TurboQuant turbo3 KV cache (5.8 GB VRAM, text + vision) on :8090"
+      "detail": "Spawn vision + text TurboQuant as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache."
     },
     {
       "label": "⚡ TurboQuant: Health Check",
@@ -2343,7 +2329,7 @@
     {
       "label": "🔴 Redis: Cache Stats",
       "type": "shell",
-      "command": "redis-cli INFO memory | findstr used_memory_human && redis-cli INFO keyspace && redis-cli DBSIZE",
+      "command": "redis-cli INFO memory | grep used_memory_human && redis-cli INFO keyspace && redis-cli DBSIZE",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -2392,7 +2378,7 @@
     {
       "label": "🔴 Redis: Concurrent Pipeline Test",
       "type": "shell",
-      "command": "redis-cli --pipe-mode --pipe-timeout 5 < NUL && redis-cli PING && redis-cli SET bifrost:test:parallel \"ok\" EX 60 && redis-cli GET bifrost:test:parallel && redis-cli INFO clients | findstr connected_clients",
+      "command": "redis-cli --pipe-mode --pipe-timeout 5 && redis-cli PING && redis-cli SET bifrost:test:parallel \"ok\" EX 60 && redis-cli GET bifrost:test:parallel && redis-cli INFO clients | grep connected_clients",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -2568,7 +2554,7 @@
     {
       "label": "🔎 Go Search: Start Docker Service",
       "type": "shell",
-      "command": "docker start go-search-service 2>NUL || docker run -d --name go-search-service -p 8096:8096 -p 50055:50055 -e DATABASE_URL=\"postgresql://legal_admin:123456@host.docker.internal:5432/legal_ai_db\" -e QDRANT_URL=\"http://host.docker.internal:6333\" -e QDRANT_GRPC_HOST=\"host.docker.internal\" -e QDRANT_GRPC_PORT=\"6334\" -e REDIS_URL=\"redis://host.docker.internal:6379\" -e OLLAMA_URL=\"http://host.docker.internal:11434\" go-search-service:latest",
+      "command": "docker start go-search-service 2>/dev/null || docker run -d --name go-search-service -p 8096:8096 -p 50055:50055 -e DATABASE_URL=\"postgresql://legal_admin:123456@host.docker.internal:5432/legal_ai_db\" -e QDRANT_URL=\"http://host.docker.internal:6333\" -e QDRANT_GRPC_HOST=\"host.docker.internal\" -e QDRANT_GRPC_PORT=\"6334\" -e REDIS_URL=\"redis://host.docker.internal:6379\" -e OLLAMA_URL=\"http://host.docker.internal:11434\" go-search-service:latest",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -2604,7 +2590,7 @@
     {
       "label": "🚀 Full Stack: All Services",
       "type": "shell",
-      "command": "docker start phase66-postgres phase66-redis phase66-minio phase66-qdrant go-search-service 2>NUL; echo '✓ Docker services started' && timeout /t 3 >NUL && curl -s http://127.0.0.1:6333/collections | jq '.result.collections | length' && echo ' Qdrant collections' && curl -s http://127.0.0.1:8096/health | jq '.status' && redis-cli PING && curl -s http://127.0.0.1:11434/api/tags | jq '.models | length' && echo ' Ollama models'",
+      "command": "docker start phase66-postgres phase66-redis phase66-minio phase66-qdrant go-search-service 2>/dev/null; echo '✓ Docker services started' && sleep 3 && curl -s http://127.0.0.1:6333/collections | jq '.result.collections | length' && echo ' Qdrant collections' && curl -s http://127.0.0.1:8096/health | jq '.status' && redis-cli PING && curl -s http://127.0.0.1:11434/api/tags | jq '.models | length' && echo ' Ollama models'",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -3538,8 +3524,7 @@
     {
       "label": "⚡ TurboQuant: Start (text-only, port 8090)",
       "type": "shell",
-      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096 --log-disable",
-      "isBackground": true,
+      "command": "npm run turbo:start:text:detached",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -3551,8 +3536,7 @@
     {
       "label": "⚡ TurboQuant: Start (vision mode, port 8090)",
       "type": "shell",
-      "command": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m \"C:\\Users\\james\\.ollama\\blobs\\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43\" --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" --port 8090 -ngl 99 --flash-attn on -ctk turbo3 -ctv turbo3 -c 4096",
-      "isBackground": true,
+      "command": "npm run turbo:start:detached",
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -5616,12 +5600,18 @@
     {
       "label": "🚀 Start TurboQuant",
       "type": "shell",
-      "command": "Start-Process -FilePath 'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe' -ArgumentList '--host 0.0.0.0 --port 8090 --ctx-size 8192 --n-gpu-layers 99 -m C:\\Users\\james\\.ollama\\models\\blobs\\sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7' -PassThru | ForEach-Object { Write-Host ('TurboQuant started — PID ' + $_.Id + ' — http://localhost:8090') -ForegroundColor Green }",
+      "command": "npm run turbo:start:detached",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
       "group": "build",
-      "detail": "Launch llama-server.exe (TurboQuant) on port 8090 with full GPU offload for fast primary inference",
+      "detail": "Auto-start TurboQuant on folder open using the detached launcher. If :8090 is already healthy it exits cleanly; otherwise it spawns llama-server, waits for /health, and returns.",
       "presentation": {
         "echo": true,
-        "reveal": "always",
+        "reveal": "silent",
         "focus": false,
         "panel": "shared",
         "showReuseMessage": false,
@@ -6062,13 +6052,13 @@
     {
       "label": "🧪 Runtime: Ensure dev:grpc Ready",
       "type": "shell",
-      "command": "$testPort = { param([int]$port) try { $client = [System.Net.Sockets.TcpClient]::new(); $iar = $client.BeginConnect('127.0.0.1', $port, $null, $null); if (-not $iar.AsyncWaitHandle.WaitOne(1000)) { $client.Dispose(); return $false }; $null = $client.EndConnect($iar); $client.Dispose(); return $true } catch { return $false } }; $frontendReady = & $testPort 5173; $grpcReady = & $testPort 50053; $turboReady = & $testPort 8090; if ($frontendReady -and $grpcReady -and $turboReady) { Write-Host 'dev:grpc already ready (frontend + retrieval + TurboQuant)'; exit 0 }; if ($frontendReady -and $grpcReady) { Write-Host 'frontend + retrieval ready, starting TurboQuant only'; npm run turbo:start } elseif ($frontendReady) { Write-Host 'frontend ready, starting retrieval + TurboQuant'; concurrently -n TurboQuant,Retrieval -c magenta,green 'npm run turbo:start' 'npm run go:retrieval:run' } else { npm run dev:grpc }",
+      "command": "$testPort = { param([int]$port) try { $client = [System.Net.Sockets.TcpClient]::new(); $iar = $client.BeginConnect('127.0.0.1', $port, $null, $null); if (-not $iar.AsyncWaitHandle.WaitOne(1000)) { $client.Dispose(); return $false }; $null = $client.EndConnect($iar); $client.Dispose(); return $true } catch { return $false } }; $frontendReady = & $testPort 5173; $grpcReady = & $testPort 50053; $turboReady = & $testPort 8090; if ($frontendReady -and $grpcReady -and $turboReady) { Write-Host 'dev:grpc already ready (frontend + retrieval + TurboQuant)'; exit 0 }; if ($frontendReady -and $grpcReady) { Write-Host 'frontend + retrieval ready, starting TurboQuant only'; npm run turbo:start:text:detached } elseif ($frontendReady) { Write-Host 'frontend ready, starting retrieval + TurboQuant'; concurrently -n TurboQuant,Retrieval -c magenta,green 'npm run turbo:start:text:detached' 'npm run go:retrieval:run' } else { npm run dev:grpc }",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
       "group": "test",
-      "detail": "Reuse localhost:5173 + retrieval gRPC on 50053 + TurboQuant on 8090 when already ready; start missing services individually; otherwise start full npm run dev:grpc",
+      "detail": "Reuse localhost:5173 + retrieval gRPC on 50053 + TurboQuant on 8090 when already ready; start missing services with the detached TurboQuant launcher; otherwise start full npm run dev:grpc.",
       "problemMatcher": {
         "owner": "vite",
         "pattern": {
@@ -7606,7 +7596,7 @@
         "clear": true
       },
       "problemMatcher": [],
-      "detail": "Send an agentic query to TurboQuant llama-server on :8090 (turbo3 KV compression, -ctk/-ctv turbo3). Reports token usage. Requires TurboQuant running."
+      "detail": "Send an agentic query to TurboQuant llama-server on :8090 using the stable q8_0 KV cache path. Reports token usage. Requires TurboQuant running."
     },
     {
       "label": "⚡ TurboQuant: Gemma4 VLM Vision + Text (compressed KV)",
@@ -7773,7 +7763,7 @@
         "focus": true
       },
       "problemMatcher": [],
-      "detail": "Interactive Gemma4 prompt from VS Code — type your query in the input box, response streams to terminal. Uses TurboQuant turbo3 KV cache on :8090. Run '⚡ TurboQuant: Start (text-only, :8090)' first."
+      "detail": "Interactive Gemma4 prompt from VS Code — type your query in the input box, response streams to terminal. Uses TurboQuant on :8090 via the stable q8_0 KV cache path. Run '⚡ TurboQuant: Start (text-only, :8090)' first."
     },
     {
       "label": "💬 Gemma4: Agentic Tool Loop from VS Code (dev server :5173)",
@@ -7799,6 +7789,546 @@
       },
       "problemMatcher": [],
       "detail": "Gemma4 multi-step agentic loop via /api/ai/agent — uses rag_search, case_search, memory_recall, hyperedge_stats tools. Requires dev server on :5173. TurboQuant on :8090 speeds up inference."
+    },
+    {
+      "label": "🌐 A2A: Discover AgentCard (/.well-known/agent.json)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "-e",
+        "fetch('http://localhost:5173/.well-known/agent.json').then(r=>r.json()).then(d=>{console.log('\\n=== A2A AgentCard ===');console.log('Name:',d.name);console.log('URL:',d.url);console.log('Streaming:',d.capabilities?.streaming);console.log('Skills:');(d.skills||[]).forEach(s=>console.log(' -',s.id+':',s.name));console.log('\\nFull JSON:\\n',JSON.stringify(d,null,2));}).catch(e=>{console.error('❌ Dev server not running on :5173\\n   Error:',e.message);process.exit(1);});"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Fetch the A2A AgentCard from /.well-known/agent.json — shows agent capabilities, skills, auth scheme. Requires dev server on :5173."
+    },
+    {
+      "label": "🌐 A2A: Send Task (tasks/send — non-streaming)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "-e",
+        "const q=process.env.A2A_QUERY||'What is hearsay evidence?'; const taskId='vscode-'+Date.now(); const task={id:taskId,message:{role:'user',parts:[{text:q}]},metadata:{pipeline:'ace'}}; console.log('\\n🤖 A2A Task (non-streaming)\\n ID:',taskId,'\\n Query:',q,'\\n'); fetch('http://localhost:5173/api/ai/agent',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify(task)}).then(r=>r.json()).then(d=>{if(d.error){console.error('A2A error:',JSON.stringify(d.error));process.exit(1);} console.log('Status:',d.status?.state); const answer=d.artifacts?.find(a=>a.name==='answer')?.parts?.[0]?.text; const meta=d.artifacts?.find(a=>a.name==='metadata')?.parts?.[0]?.data; console.log('\\n=== Answer ===\\n',answer??'(no answer artifact)'); if(meta)console.log('\\nTools:',meta.toolsUsed?.join(', '),'| Rounds:',meta.rounds,'| Latency:',meta.durationMs+'ms');}).catch(e=>{console.error('❌ Error:',e.message);process.exit(1);});"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "A2A_QUERY": "${input:a2aQuery}"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Send an A2A Task envelope to /api/ai/agent (non-streaming). Returns A2A TaskResult with artifacts. Requires dev server on :5173."
+    },
+    {
+      "label": "🌐 A2A: Send Task SSE (tasks/sendSubscribe — streaming)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "-e",
+        "const q=process.env.A2A_QUERY||'Explain the hearsay rule and its exceptions'; const taskId='vscode-stream-'+Date.now(); const task={id:taskId,message:{role:'user',parts:[{text:q}]},metadata:{pipeline:'ace'}}; console.log('\\n🌊 A2A Streaming Task\\n ID:',taskId,'\\n Query:',q,'\\n'); fetch('http://localhost:5173/api/ai/agent',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream','x-dev-bypass-auth':'true'},body:JSON.stringify(task)}).then(async r=>{if(!r.body){console.error('No stream body');process.exit(1);} const reader=r.body.getReader(); const dec=new TextDecoder(); let buf=''; while(true){const{done,value}=await reader.read(); if(done)break; buf+=dec.decode(value,{stream:true}); const lines=buf.split('\\n'); buf=lines.pop()||''; for(const line of lines){if(line.startsWith('event: '))process.stdout.write('['+line.slice(7)+'] '); if(line.startsWith('data: ')){try{const d=JSON.parse(line.slice(6)); if(d.status)console.log('state='+d.status.state+(d.final?' (final)':'')); if(d.artifact)console.log('artifact:',d.artifact.name,'parts:',d.artifact.parts?.length);}catch{console.log(line);}}}} console.log('\\nStream complete');}).catch(e=>{console.error('❌ Error:',e.message);process.exit(1);});"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "A2A_QUERY": "${input:a2aQuery}"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Stream an A2A Task via SSE (tasks/sendSubscribe). Shows task_status + task_artifact events in real time. Requires dev server on :5173."
+    },
+    {
+      "label": "🌐 A2A: Full Protocol Test (discover → send → stream)",
+      "dependsOn": [
+        "🌐 A2A: Discover AgentCard (/.well-known/agent.json)",
+        "🌐 A2A: Send Task (tasks/send — non-streaming)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Full A2A protocol validation: AgentCard discovery then non-streaming task send. Requires dev server on :5173."
+    },
+    {
+      "label": "✅ CI: All Checks (TS7 + hypergraph smoke + retrieval health)",
+      "type": "shell",
+      "command": "npm run ci:all",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Runs check:ts7 → ci:smoke:hypergraph → grpc:health:retrieval (retrieval is advisory — won't fail if Docker is down)"
+    },
+    {
+      "label": "🧠 smoke:som-bmu (query-time SOM BMU cache)",
+      "type": "shell",
+      "command": "node scripts/smoke-som-bmu.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Verifies Redis som:weights, BMU CPU argmin, cache round-trip (som:bmu:{hash}), TTL, and reverse cell index. Use --inject-weights if Redis lacks som:weights."
+    },
+    {
+      "label": "🧠 smoke:som-bmu:inject (inject synthetic weights + verbose)",
+      "type": "shell",
+      "command": "node scripts/smoke-som-bmu.mjs --inject-weights --verbose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Same as smoke:som-bmu but writes synthetic 10×10 SOM weights to Redis first (safe — TTL 1h). Use when run-hypergraph hasn't populated som:weights yet."
+    },
+    {
+      "label": "🔬 agent:smoke:retrieval-topology",
+      "dependsOn": [
+        "🧩 Hypergraph: CI Smoke (generate → build → topology → tag dry-run)",
+        "🧠 smoke:som-bmu (query-time SOM BMU cache)",
+        "✅ CI: All Checks (TS7 + hypergraph smoke + retrieval health)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Full retrieval topology smoke suite: hyperedge key shape → SOM BMU cache round-trip → TS7 + CI gates. Run before merging topology or ACE changes."
+    },
+    {
+      "label": "🏭 Prod: Full Readiness Test (index + agent + plans)",
+      "type": "shell",
+      "command": "node scripts/tests/test-production-readiness.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "GPU codebase index → 5 Gemma4 agent queries (orphan routes, duplicates, dir consolidation, auth gaps, prod blockers) → writes 4 timestamped .md plans to next_steps/active/"
+    },
+    {
+      "label": "🏭 Prod: Readiness Test (skip index, fast)",
+      "type": "shell",
+      "command": "node scripts/tests/test-production-readiness.mjs --skip-index",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Skip GPU indexing — run 5 Gemma4 agent queries + static scan + write plans. Use when Qdrant is already indexed."
+    },
+    {
+      "label": "🏭 Prod: Readiness Test (dry run, prints to terminal)",
+      "type": "shell",
+      "command": "node scripts/tests/test-production-readiness.mjs --skip-index --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Dry run — prints plans to terminal without writing files. Good for a quick review before committing."
+    },
+    {
+      "label": "🏭 Prod: Readiness Test (TurboQuant :8090)",
+      "type": "shell",
+      "command": "node scripts/tests/test-production-readiness.mjs --skip-index --turbo",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Same as fast readiness test but routes agent inference through TurboQuant :8090 (faster than Ollama). Requires TurboQuant running."
+    },
+    {
+      "label": "audit:production:turbo-fast",
+      "type": "shell",
+      "command": "npm run audit:production:turbo-fast",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🏭 Prod: GPU Index + Readiness (TurboQuant master)",
+      "dependsOn": [
+        "⚡ TurboQuant: Start (text-only, :8090)",
+        "🏭 Prod: Readiness Test (TurboQuant :8090)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Start TurboQuant then run full production readiness suite (agent queries via :8090). ~5-10 min total."
+    },
+    {
+      "label": "🏭 Prod: Full GPU Pipeline (SOM + Neo4j + PageRank + synthesis)",
+      "type": "shell",
+      "command": "node scripts/tests/test-production-readiness.mjs --full-gpu",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": [],
+      "detail": "Full GPU pipeline: AST embed + k-means + SOM topology + Neo4j sync + PageRank + hypergraph + cluster synthesis via LLM. Expect 5-10 min."
+    },
+    {
+      "label": "🏭 Prod: Full GPU Pipeline (TurboQuant + --full-gpu)",
+      "dependsOn": [
+        "⚡ TurboQuant: Start (text-only, :8090)",
+        "🏭 Prod: Full GPU Pipeline (SOM + Neo4j + PageRank + synthesis)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Start TurboQuant then run full GPU pipeline with LLM cluster synthesis. ~8-12 min total."
+    },
+    {
+      "label": "agent:fix:diagnose",
+      "type": "shell",
+      "command": "npm run agent:fix:diagnose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Run npm check + tsgo, send the diagnostics to /api/ai/agent, and write a markdown repair note under next_steps/active/<date>/."
+    },
+    {
+      "label": "agent:fix:fast",
+      "type": "shell",
+      "command": "npm run agent:fix:fast",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Run the fast VS Code-style Gemma diagnose loop with ultra-fast TypeScript + svelte-check diagnostics, prefer TurboQuant, and save the report under next_steps/active/<date>/."
+    },
+    {
+      "label": "agent:fix:full",
+      "type": "shell",
+      "command": "npm run agent:fix:full",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Run the full VS Code-style Gemma repair loop prompt against current diagnostics and save the report under next_steps/active/<date>/."
+    },
+    {
+      "label": "🧠 ACE: Standalone Embed → Qdrant (no dev server, no GPU pipeline)",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --dir src --concurrency 4",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "OLLAMA_BASE_URL": "http://127.0.0.1:11434",
+          "QDRANT_URL": "http://127.0.0.1:6333",
+          "OLLAMA_EMBED_MODEL": "embeddinggemma:latest"
+        }
+      },
+      "group": "build",
+      "detail": "Embed entire src/ into codebase_chunks_768 via Ollama + Qdrant directly. No dev server or GPU pipeline required. Uses embeddinggemma:latest (768-dim).",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 ACE: Standalone Embed → lib/server only (fast, ~2 min)",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --dir src/lib/server --concurrency 6",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "OLLAMA_BASE_URL": "http://127.0.0.1:11434",
+          "QDRANT_URL": "http://127.0.0.1:6333",
+          "OLLAMA_EMBED_MODEL": "embeddinggemma:latest"
+        }
+      },
+      "group": "build",
+      "detail": "Embed only src/lib/server/ into codebase_chunks_768. Fastest targeted reindex after server-side changes. No dev server needed.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 ACE: Verify Qdrant codebase_chunks_768 count",
+      "type": "shell",
+      "command": "curl -sf http://localhost:6333/collections/codebase_chunks_768 | python -m json.tool",
+      "group": "test",
+      "detail": "Check how many chunks are indexed in Qdrant. If points_count=0, run the standalone embed task first.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 ACE: Deep Directory Audit (Qdrant → AST → Gemma4 direct, no dev server)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs lib/server --no-rag --no-graph --no-agent --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "QDRANT_URL": "http://127.0.0.1:6333",
+          "TURBO_URL": "http://127.0.0.1:8090"
+        }
+      },
+      "group": "test",
+      "detail": "Static rg-only audit of src/lib/server (no Qdrant, no LLM). Fast structural metrics: file counts, exports, TODOs, complexity scores. Dry-run output only.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 ACE: Deep Directory Audit (Qdrant RAG + direct LLM, no dev server, dry-run)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs lib/server --no-graph --direct --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "QDRANT_URL": "http://127.0.0.1:6333",
+          "TURBO_URL": "http://127.0.0.1:8090"
+        }
+      },
+      "group": "test",
+      "detail": "Full Qdrant semantic retrieval per directory + direct LLM summarization (TurboQuant :8090 or Ollama :11434 fallback). No dev server, no SvelteKit 120s timeout. Dry-run.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 ACE: Deep Directory Audit → Write Plan (lib/server, Qdrant + direct LLM)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs lib/server --no-graph --direct",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "QDRANT_URL": "http://127.0.0.1:6333",
+          "TURBO_URL": "http://127.0.0.1:8090"
+        }
+      },
+      "group": "build",
+      "detail": "Full audit that WRITES plan to next_steps/active/. Qdrant chunks + direct LLM (TurboQuant or Ollama). No dev server required.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 ACE: Index → Audit Pipeline (standalone embed then deep audit, no dev server)",
+      "dependsOn": [
+        "🧠 ACE: Standalone Embed → lib/server only (fast, ~2 min)",
+        "🔍 ACE: Deep Directory Audit → Write Plan (lib/server, Qdrant + direct LLM)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "detail": "Sequential: embed lib/server into Qdrant codebase_chunks_768, then deep audit with Qdrant context + TurboQuant LLM. Writes plan. No dev server required.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🔍 ACE: Production Readiness (direct LLM, no dev server)",
+      "type": "shell",
+      "command": "node scripts/tests/test-production-readiness.mjs --skip-index --direct --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Production readiness scan using --direct LLM mode (TurboQuant :8090 or Ollama :11434). No dev server, no SvelteKit 120s timeout. ~90s total.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 ACE: Production Readiness → Write Plans (direct LLM)",
+      "type": "shell",
+      "command": "node scripts/tests/test-production-readiness.mjs --skip-index --direct",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Production readiness scan + WRITES plans to next_steps/active/. Direct LLM (no dev server). Includes orphan routes, auth gaps, blockers, directory consolidation.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 ACE: Full Codebase Intelligence (no dev server) — Embed + Audit + Readiness",
+      "dependsOn": [
+        "🧠 ACE: Standalone Embed → Qdrant (no dev server, no GPU pipeline)",
+        "🔍 ACE: Production Readiness → Write Plans (direct LLM)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "detail": "Full ACE refresh: embed all of src/ into Qdrant, then production readiness scan with direct LLM. Writes all plans. Requires only Ollama :11434 + Qdrant :6333 (or TurboQuant :8090).",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🧠 Index: Codebase Fast AST",
+      "type": "shell",
+      "command": "npm run index:codebase:fast",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "CPU-only AST scan → Redis code:index:* keys (6h TTL) + docs/graph/codebase-graph.json. No GPU required. ~5–15s.",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "🧠 Index: Codebase Fast AST + Write Plan",
+      "type": "shell",
+      "command": "npm run index:codebase:fast:plan",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Fast AST scan + writes docs/graph/codebase-graph.md with route map, TODO list, and ACE usage notes.",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "🤖 Agent: Copilot Fast Plan",
+      "type": "shell",
+      "command": "npm run agent:copilot:fast",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Fast AST index → agentic-error-fix plan mode. CPU only, no GPU. Writes patch plan.",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "🤖 Agent: Copilot Fast Direct (no dev server)",
+      "type": "shell",
+      "command": "npm run agent:copilot:fast:direct",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Fast AST index (no Redis) + production-readiness --direct --skip-index. Requires only Ollama/TurboQuant.",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
     }
   ],
   "inputs": [
@@ -8059,7 +8589,7 @@
     {
       "id": "turboQuantQuery",
       "type": "promptString",
-      "description": "TurboQuant agentic query — sent to llama-server on :8090 (turbo3 KV cache compression)",
+      "description": "TurboQuant agentic query — sent to llama-server on :8090 using the stable q8_0 KV cache path",
       "default": "Summarize the key legal principles around hearsay evidence and chain of custody"
     },
     {
@@ -8079,6 +8609,12 @@
       "type": "promptString",
       "description": "Your question or instruction for Gemma4 (TurboQuant :8090 or dev server agent)",
       "default": "Explain the hearsay rule and its exceptions under the Federal Rules of Evidence"
+    },
+    {
+      "id": "a2aQuery",
+      "type": "promptString",
+      "description": "A2A Task query — sent as an Agent2Agent Task envelope to /api/ai/agent",
+      "default": "What is hearsay evidence and what are its main exceptions?"
     },
     {
       "id": "gemma4System",

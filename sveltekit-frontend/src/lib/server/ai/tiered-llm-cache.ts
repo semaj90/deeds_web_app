@@ -235,20 +235,9 @@ export async function tieredLLMQuery(
 
 /**
  * Get cache statistics across all tiers.
- * Uses `await using` (Node 22 explicit resource management) to guarantee
- * the redis scan cursor is released even if an error is thrown mid-stats.
  */
 export async function getTieredCacheStats() {
-  // Disposable wrapper so the Redis connection is released on scope exit
-  await using redisScope = {
-    redis: getRedis(),
-    [Symbol.asyncDispose](): Promise<void> {
-      // getRedis() returns a pooled singleton — we just signal done, not quit
-      return Promise.resolve();
-    },
-  };
-
-  const { redis } = redisScope;
+  const redis = getRedis();
 
   // L1: Redis exact-match stats
   const l1Stats = await getExactMatchStats();

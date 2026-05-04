@@ -13,6 +13,7 @@
 
 import type { SearchOptions, SearchResult,
   FullDocument, CollectionStats } from './types.js';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
 import { getMinioKnowledgeStore } from './MinioKnowledgeStore.js';
@@ -49,8 +50,21 @@ export class KnowledgeSearcher {
       }
     }
 
+    // Embed the query before hitting Qdrant. Passing a raw string to the
+    // store returns no results by design because the caller is expected to
+    // supply a 768-dim retrieval embedding.
+    const queryEmbedding = await generateSingleEmbedding(query);
+    if (!Array.isArray(queryEmbedding) || queryEmbedding.length !== 768) {
+      console.warn('[KnowledgeSearcher] invalid query embedding; returning no results');
+      return [];
+    }
+
     // Perform semantic search in Qdrant
-    const semanticResults = await this.qdrant.search(query, { topK: topK * 2, threshold });
+    const semanticResults = await this.qdrant.search(Array.from(queryEmbedding), {
+      topK: topK * 2,
+      threshold,
+      filters,
+    });
 
     const hybridResults: SearchResult[] = [];
 

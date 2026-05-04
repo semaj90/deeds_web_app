@@ -21,7 +21,13 @@
  * produce high-quality answers.
  */
 
-import { ollamaFetch, VLM_MODELS, getOllamaEndpoint, bifrostChat } from '$lib/server/ollama.js';
+import {
+  ollamaFetch,
+  VLM_MODELS,
+  getOllamaEndpoint,
+  bifrostChat,
+  turboQuantChat,
+} from '$lib/server/ollama.js';
 import { generateEmbedding }                           from '$lib/server/grpc/embedding-client.js';
 import { qdrant }                                      from '$lib/server/vector/qdrant-manager.js';
 import { selectAdaptiveMemory, queryTopHyperedges }    from '$lib/server/graph/hypergraph-4d.js';
@@ -34,6 +40,7 @@ import path from 'path';
 import { LinterService } from './linter-service.js';
 import { tieredLLMQuery } from '$lib/server/ai/tiered-llm-cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -489,16 +496,19 @@ async function dispatchTool(
 // ── Public result type ────────────────────────────────────────────────────────
 
 export interface AgentRunResult {
-  answer:     string;
-  toolsUsed:  string[];
-  rounds:     number;
-  sources:    unknown[];
+  answer: string;
+  toolsUsed: string[];
+  rounds: number;
+  sources: unknown[];
   durationMs: number;
   cacheTier?: 'L1_redis' | 'L2_qdrant' | 'L3_ollama';
   cacheLatencyMs?: number;
-  cacheTrace?:         unknown;
-  errorFixMemoryHit?:  boolean;
+  cacheTrace?: LlmCacheTrace;
+  errorFixMemoryHit?: boolean;
   verificationStatus?: string;
+  requestedBackend?: 'bifrost' | 'turboquant';
+  inferenceBackend?: 'bifrost' | 'turboquant' | 'ollama' | 'cache';
+  backendFallbackReason?: string;
 }
 
 // ── Agent loop ────────────────────────────────────────────────────────────────
@@ -507,6 +517,10 @@ export interface AgentRunResult {
 // Serving a stale "patch applied" or "file written" response to a different
 // caller would silently corrupt state (side-effect cache poisoning).
 const SIDE_EFFECT_TOOLS = new Set(['apply_shadow_patch', 'revert_fix', 'verify_fix']);
+
+function getPreferredBackend(metadata?: Record<string, unknown>): 'bifrost' | 'turboquant' {
+  return metadata?.preferredBackend === 'turboquant' ? 'turboquant' : 'bifrost';
+}
 
 export async function runGemma4Agent(
   query:       string,
@@ -543,6 +557,42 @@ export async function runGemma4Agent(
   let resultCacheMs:   number | undefined           = undefined;
   let totalPromptTokens     = 0;
   let totalCompletionTokens = 0;
+  const requestedBackend = getPreferredBackend(options?.metadata);
+  let inferenceBackend: AgentRunResult['inferenceBackend'] = requestedBackend;
+  let backendFallbackReason: string | undefined;
+
+  const runPreferredToolCall = async (currentMessages: OllamaMessage[]) => {
+    if (requestedBackend !== 'turboquant') {
+      inferenceBackend = 'bifrost';
+      return bifrostChat(currentMessages, TOOL_MODEL, {
+        tools: AGENT_TOOLS,
+        temperature: 0.2,
+        maxTokens: 2048,
+        timeoutMs: TIMEOUT_MS,
+        cacheKey: `agent-tool-loop:${pipeline}`,
+      });
+    }
+
+    try {
+      inferenceBackend = 'turboquant';
+      return await turboQuantChat(currentMessages, TOOL_MODEL, {
+        tools: AGENT_TOOLS,
+        temperature: 0.2,
+        maxTokens: 2048,
+        timeoutMs: TIMEOUT_MS,
+      });
+    } catch (error) {
+      backendFallbackReason = (error as Error).message;
+      inferenceBackend = 'bifrost';
+      return bifrostChat(currentMessages, TOOL_MODEL, {
+        tools: AGENT_TOOLS,
+        temperature: 0.2,
+        maxTokens: 2048,
+        timeoutMs: TIMEOUT_MS,
+        cacheKey: `agent-tool-loop:${pipeline}`,
+      });
+    }
+  };
 
   // ── Pre-loop cache check (L1 Redis → L2 Qdrant) ──────────────────────────
   // Skip the entire tool-calling loop if a cached final answer exists.
@@ -561,6 +611,7 @@ export async function runGemma4Agent(
         finalAnswer    = cached.response;
         resultCacheTier = cached.tier;
         resultCacheMs   = cached.latencyMs;
+        inferenceBackend = 'cache';
         round = 0; // no tool rounds consumed
       }
     } catch {
@@ -571,13 +622,7 @@ export async function runGemma4Agent(
   while (!finalAnswer && round < MAX_ROUNDS) {
     round++;
 
-    const rawResult = await bifrostChat(messages, TOOL_MODEL, {
-      tools: AGENT_TOOLS,
-      temperature: 0.2,
-      maxTokens: 2048,
-      timeoutMs: TIMEOUT_MS,
-      cacheKey: `agent-tool-loop:${pipeline}`,
-    });
+    const rawResult = await runPreferredToolCall(messages);
 
     // Accumulate token counts across rounds (Ollama returns these on non-streaming calls)
     if (typeof rawResult === 'object' && rawResult !== null) {
@@ -625,41 +670,85 @@ export async function runGemma4Agent(
   // answers must never be served to a different caller.
   if (!finalAnswer && round >= MAX_ROUNDS) {
     bypassCache = bypassCache || hasSideEffect;
-    const forced = await tieredLLMQuery(
-      [
-        ...messages,
-        { role: 'user', content: 'Please now provide a final answer based on what you found.' },
-      ],
+    const finalMessages = [
+      ...messages,
       {
-        model:       PLANNER_MODEL,
-        temperature: 0.2,
-        maxTokens:   2048,
-        context:     pipeline,
-        bypassCache,
+        role: 'user' as const,
+        content: 'Please now provide a final answer based on what you found.',
       },
-    );
-    finalAnswer = forced.response;
+    ];
+
+    if (requestedBackend === 'turboquant') {
+      try {
+        inferenceBackend = 'turboquant';
+        const forced = await turboQuantChat(finalMessages, PLANNER_MODEL, {
+          temperature: 0.2,
+          maxTokens: 2048,
+          timeoutMs: TIMEOUT_MS,
+        });
+        finalAnswer = typeof forced === 'string' ? forced : forced.content;
+      } catch (error) {
+        backendFallbackReason = backendFallbackReason ?? (error as Error).message;
+        const forced = await tieredLLMQuery(finalMessages, {
+          model: PLANNER_MODEL,
+          temperature: 0.2,
+          maxTokens: 2048,
+          context: pipeline,
+          bypassCache,
+        });
+        finalAnswer = forced.response;
+        inferenceBackend = forced.tier === 'L3_ollama' ? 'ollama' : 'cache';
+      }
+    } else {
+      const forced = await tieredLLMQuery(finalMessages, {
+        model: PLANNER_MODEL,
+        temperature: 0.2,
+        maxTokens: 2048,
+        context: pipeline,
+        bypassCache,
+      });
+      finalAnswer = forced.response;
+      inferenceBackend = forced.tier === 'L3_ollama' ? 'ollama' : 'cache';
+    }
   }
 
   const durationMs = Date.now() - t0;
+  const cacheTrace: LlmCacheTrace = {
+    modelRole: 'gemma4-agent-planner',
+    cacheTier: resultCacheTier ?? 'L4_none',
+    tokenizerFamily: 'gemma',
+    provider:
+      inferenceBackend === 'turboquant'
+        ? 'turboquant'
+        : inferenceBackend === 'bifrost'
+          ? 'bifrost'
+          : inferenceBackend === 'ollama'
+            ? 'ollama'
+            : 'tiered-llm-cache',
+    latencyMs: resultCacheMs ?? durationMs,
+  };
 
   // Fire-and-forget token usage log (with template + pipeline context in metadata JSONB)
   trackTokenUsage({
-    userId:           options?.userId,
-    endpoint:         '/api/ai/agent',
-    model:            TOOL_MODEL,
-    promptTokens:     totalPromptTokens,
+    userId: options?.userId,
+    endpoint: '/api/ai/agent',
+    model: TOOL_MODEL,
+    promptTokens: totalPromptTokens,
     completionTokens: totalCompletionTokens,
     durationMs,
-    cached:           resultCacheTier !== undefined,
+    cached: resultCacheTier !== undefined,
     metadata: {
-      chatTemplate:  'gemma',
+      chatTemplate: 'gemma',
       pipeline,
-      rounds:        round,
+      rounds: round,
       toolsUsed,
-      cachedTier:    resultCacheTier ?? null,
-      plannerModel:  PLANNER_MODEL,
-      toolModel:     TOOL_MODEL,
+      cachedTier: resultCacheTier ?? null,
+      cacheTrace,
+      plannerModel: PLANNER_MODEL,
+      toolModel: TOOL_MODEL,
+      requestedBackend,
+      inferenceBackend,
+      backendFallbackReason: backendFallbackReason ?? null,
     },
   });
 
@@ -667,39 +756,58 @@ export async function runGemma4Agent(
   logInference({
     type: 'llm',
     model: PLANNER_MODEL,
-    backend: 'ollama',
+    backend:
+      inferenceBackend === 'turboquant'
+        ? 'turboquant'
+        : inferenceBackend === 'bifrost'
+          ? 'bifrost'
+          : 'ollama',
     latencyMs: durationMs,
     cacheHit: resultCacheTier !== undefined,
     metadata: {
-      model_role: 'gemma4-agent-planner',
-      cache_tier: resultCacheTier ?? 'L4',
+      model_role: cacheTrace.modelRole,
+      cache_tier: cacheTrace.cacheTier,
       toolsUsed,
       rounds: round,
       pipeline,
+      requested_backend: requestedBackend,
+      inference_backend: inferenceBackend,
+      turbo_fallback_reason: backendFallbackReason ?? null,
     },
   });
 
   // Fire-and-forget timeline record
-  db.insert(contextTimeline).values({
-    userId:    options?.userId    ?? undefined,
-    sessionId: options?.sessionId ?? '',
-    eventType: 'tool_call',
-    pipeline,
-    payload: {
-      query,
-      toolsUsed,
-      rounds: round,
-      durationMs,
-    } as Record<string, unknown>,
-  }).catch(() => { /* non-fatal */ });
+  db.insert(contextTimeline)
+    .values({
+      userId: options?.userId ?? undefined,
+      sessionId: options?.sessionId ?? '',
+      eventType: 'tool_call',
+      pipeline,
+      payload: {
+        query,
+        toolsUsed,
+        rounds: round,
+        durationMs,
+        requestedBackend,
+        inferenceBackend,
+        backendFallbackReason: backendFallbackReason ?? null,
+      } as Record<string, unknown>,
+    })
+    .catch(() => {
+      /* non-fatal */
+    });
 
   return {
-    answer:        finalAnswer,
+    answer: finalAnswer,
     toolsUsed,
-    rounds:        round,
+    rounds: round,
     sources,
     durationMs,
-    cacheTier:     resultCacheTier,
+    cacheTier: resultCacheTier,
     cacheLatencyMs: resultCacheMs,
+    cacheTrace,
+    requestedBackend,
+    inferenceBackend,
+    backendFallbackReason,
   };
 }

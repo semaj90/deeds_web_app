@@ -5,13 +5,14 @@
  * Returns null on failure or if the server is unavailable.
  */
 
+import { assertEmbeddingModel } from '$lib/ai/model-ids.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 export type OllamaEmbedResult = {
   model: string;
-	embedding: number[];
+  embedding: number[];
 };
 
 type OllamaEmbedResponse = {
@@ -23,13 +24,13 @@ type OllamaEmbedResponse = {
 export async function tryEmbedOllama(
   text: string,
   opts?: {
-    model?: string,
-    baseUrl?: string,
+    model?: string;
+    baseUrl?: string;
     signal?: AbortSignal;
     timeoutMs?: number;
   }
 ): Promise<OllamaEmbedResult | null> {
-  const model = opts?.model ?? 'embeddinggemma:latest';
+  const model = assertEmbeddingModel(opts?.model ?? 'embeddinggemma:latest');
   const baseUrl = (opts?.baseUrl ?? ENV.OLLAMA_BASE_URL).replace(/\/$/, '');
   const url = `${baseUrl}/api/embeddings`;
 
@@ -43,7 +44,7 @@ export async function tryEmbedOllama(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model, prompt: text }),
-        signal
+        signal,
       });
 
       if (!res.ok) return null;
@@ -53,7 +54,7 @@ export async function tryEmbedOllama(
 
       return {
         model: data.model ?? model,
-        embedding: data.embedding
+        embedding: data.embedding,
       };
     });
   } catch (err) {

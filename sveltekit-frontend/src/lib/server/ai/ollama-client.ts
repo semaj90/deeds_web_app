@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { assertEmbeddingModel } from '$lib/ai/model-ids.js';
 import { traceLLM, traceEmbedding } from '$lib/server/observability/langfuse.js';
 import {
   getChatModelKeepAlive,
@@ -105,7 +106,9 @@ export async function generateCompletion(
 export async function generateEmbedding(
   params: OllamaEmbeddingParams
 ): Promise<OllamaEmbeddingResponse> {
-  const model = params.model ?? DEFAULT_EMBED_MODEL;
+  const model = assertEmbeddingModel(
+    params.model ?? DEFAULT_EMBED_MODEL ?? 'embeddinggemma:latest'
+  );
   const body = {
     model,
     prompt: params.text,

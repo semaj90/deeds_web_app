@@ -1,4 +1,3 @@
-import { pgRows } from '$lib/server/db/client';
 /**
  * Phase 76: ACP (Agent Communication Protocol) Tool Registry
  *
@@ -7,10 +6,32 @@ import { pgRows } from '$lib/server/db/client';
  * SQL injection hardening, cache namespace restrictions.
  */
 
+import { pgRows } from '$lib/server/db/client';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { redis } from '$lib/server/redis.js';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import type { ACPTool, ToolResult, ToolPlanStep } from './types.js';
+
+export interface ACPKnowledgeSearchResult {
+  ok: true;
+  query: string;
+  results: Array<{
+    id: string;
+    source: 'qdrant' | 'postgres' | 'neo4j' | 'redis';
+    title?: string;
+    content: string;
+    score: number;
+    path?: string;
+    metadata?: Record<string, unknown>;
+  }>;
+  metadata: {
+    embeddingModel: string;
+    collection: string;
+    latencyMs: number;
+  };
+}
 
 const CONFIG = {
   endpoints: {
@@ -129,25 +150,64 @@ type HandlerFn = (args: any, options?: ACPToolOptions) => Promise<ToolResult>;
 const handlers: Record<string, HandlerFn> = {
   async knowledgeSearch(args: any, options?: ACPToolOptions): Promise<ToolResult> {
     const startTime = Date.now();
-    const { query } = args;
+    const { query, limit, collection } = args;
+
+    if (!query || typeof query !== 'string' || !query.trim()) {
+      return fail('query must be a non-empty string', startTime);
+    }
+
+    const resolvedCollection: string = typeof collection === 'string' && collection.trim()
+      ? collection.trim()
+      : 'codebase_chunks_768';
+    const resolvedLimit = Math.min(typeof limit === 'number' ? limit : 8, 12);
 
     if (options?.dryRun) {
       return planResult([
-        { action: 'embed', target: 'query', detail: `Generate embedding for: "${query}"` },
-        { action: 'search', target: 'qdrant', detail: 'Vector similarity search in legal-documents collection' },
-        { action: 'synthesize', target: 'ollama', detail: 'Synthesize answer from top results' }
+        { action: 'embed', target: 'query', detail: `Generate 768-dim embedding for: "${query}"` },
+        { action: 'search', target: `qdrant/${resolvedCollection}`, detail: `Hybrid semantic search, limit=${resolvedLimit}` },
       ], startTime);
     }
 
     try {
+      const emb = await generateSingleEmbedding(query.trim());
+      if (!Array.isArray(emb) || emb.length !== 768) {
+        return fail('Embedding unavailable — embeddinggemma not responding', startTime);
+      }
+
+      const hits = await qdrant.hybridSearch({
+        collection: resolvedCollection,
+        query: query.trim(),
+        queryEmbedding: Array.from(emb),
+        limit: resolvedLimit,
+      });
+
+      const searchResult: ACPKnowledgeSearchResult = {
+        ok: true,
+        query: query.trim(),
+        results: hits.results.map((h) => ({
+          id: String(h.id),
+          source: 'qdrant' as const,
+          title: (h.payload?.['title'] ?? h.payload?.['path'] ?? undefined) as string | undefined,
+          content: (h.payload?.['content'] ?? h.payload?.['summary'] ?? h.payload?.['text'] ?? '') as string,
+          score: h.score,
+          path: (h.payload?.['path'] ?? h.payload?.['relative_path'] ?? undefined) as string | undefined,
+          metadata: h.payload as Record<string, unknown> | undefined,
+        })),
+        metadata: {
+          embeddingModel: 'embeddinggemma:latest',
+          collection: resolvedCollection,
+          latencyMs: Date.now() - startTime,
+        },
+      };
+
       return {
         success: true,
         kind: 'result',
-        data: { results: [], synthesized: null },
-        duration: Date.now() - startTime
+        data: searchResult,
+        duration: Date.now() - startTime,
       };
     } catch (error: any) {
-      return fail(error.message, startTime);
+      return fail(error.message ?? String(error), startTime);
     }
   },
 

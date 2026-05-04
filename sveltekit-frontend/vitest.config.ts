@@ -94,6 +94,8 @@ export default defineConfig({
       'tests/hypergraph-merge-semantics.spec.ts',
       'tests/cross-language-synthesis.spec.ts',
       'tests/lane4-feedback.spec.ts',
+      'tests/routes/directory-summarizer.test.ts',
+      'tests/routes/codebase-index-directory-summaries.test.ts',
     ],
     exclude: [
       'node_modules/**',

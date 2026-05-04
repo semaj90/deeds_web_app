@@ -123,6 +123,27 @@ interface NativeAddon {
     outputLen: number
   ) => number;
   poolStats?: () => NativeAddonPoolStats;
+  // Extended N-API exports (wired after Phase 110)
+  trainSOM?: (
+    data: Float32Array, n: number, dim: number,
+    gridW: number, gridH: number, iters: number,
+    lrInit: number, lrFinal: number,
+    radiusInit: number, radiusFinal: number
+  ) => { weights: Float32Array; bmu: Int32Array };
+  kmeansWithCentroids?: (
+    embeddings: Float32Array, n: number, dim: number,
+    k: number, maxIters: number
+  ) => { assignments: Int32Array; centroids: Float32Array };
+  attentionScoreGPU?: (
+    query: Float32Array, dim: number,
+    keys: Float32Array, n: number
+  ) => Float32Array;
+  rewardScoreGPU?: (
+    gen: Float32Array, ref: Float32Array, n: number, dim: number
+  ) => Float32Array;
+  pageRankGPU?: (adj: Float32Array, n: number, damping: number, iters: number) => Float32Array;
+  softmaxGPU?: (logits: Float32Array, n: number) => Float32Array;
+  topKIndicesGPU?: (scores: Float32Array, n: number, k: number) => Int32Array;
 }
 
 let addon: NativeAddon | null = null;
@@ -720,6 +741,130 @@ export async function somCache(input: number[]): Promise<SOMCacheResult> {
     }
   }
 	return { output: [...input], n, source: 'cpu' };
+}
+
+export interface QueryBmuResult {
+  bmuRow: number;
+  bmuCol: number;
+  gridW: number;
+  gridH: number;
+  source: 'gpu' | 'cpu' | 'cache';
+}
+
+/**
+ * Map a query embedding to its SOM Best Matching Unit (BMU) via the CUDA somCache kernel.
+ * Result is Redis-cached for 30 min so repeated queries (e.g. rephrased variants) skip GPU.
+ *
+ * The SOM weights are loaded from Redis key `som:weights` (written by run-hypergraph.ts).
+ * If weights aren't cached or CUDA unavailable, falls back to CPU argmin over L2 distances.
+ *
+ * Returns { bmuRow, bmuCol } in [0, gridH) × [0, gridW) coordinates —
+ * directly comparable to `somBmuRow` / `somBmuCol` stored in Qdrant payloads.
+ */
+export async function queryBmuCached(
+  embedding: number[],
+  gridW = 10,
+  gridH = 10
+): Promise<QueryBmuResult> {
+  const dim = embedding.length;
+  if (dim === 0) return { bmuRow: 0, bmuCol: 0, gridW, gridH, source: 'cpu' };
+
+  try {
+    const { getRedis } = await import('$lib/server/redis.js');
+    const redis = getRedis();
+
+    // Cache key: deterministic hash of first+last 8 floats (fast approximation)
+    const fp = embedding;
+    const hashKey = [fp[0], fp[1], fp[7], fp[dim - 1], fp[dim - 8] ?? 0]
+      .map((v) => (v ?? 0).toFixed(5))
+      .join(':');
+    const cacheKey = `som:bmu:${hashKey}`;
+
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached) as { bmuRow: number; bmuCol: number };
+      return { ...parsed, gridW, gridH, source: 'cache' };
+    }
+
+    // Try GPU forward pass via somCache kernel
+    const native = getAddon();
+    let bmuIdx: number | null = null;
+
+    if (native?.somCache) {
+      // somCache does a forward pass against stored neuron weights in GPU memory
+      const input = new Float32Array(embedding);
+      const result = native.somCache(input, dim);
+      // result[0] = argmin neuron index (linearized)
+      bmuIdx = Math.round(result[0]);
+    }
+
+    if (bmuIdx === null) {
+      // CPU fallback: load SOM weights from Redis and compute argmin
+      const weightsJson = await redis.get('som:weights');
+      if (weightsJson) {
+        const weights = JSON.parse(weightsJson) as number[];
+        const neurons = Math.floor(weights.length / dim);
+        let minDist = Infinity;
+        for (let i = 0; i < neurons; i++) {
+          let dist = 0;
+          for (let d = 0; d < dim; d++) {
+            const diff = embedding[d] - (weights[i * dim + d] ?? 0);
+            dist += diff * diff;
+          }
+          if (dist < minDist) { minDist = dist; bmuIdx = i; }
+        }
+      }
+    }
+
+    if (bmuIdx === null) return { bmuRow: 0, bmuCol: 0, gridW, gridH, source: 'cpu' };
+
+    const bmuRow = Math.floor(bmuIdx / gridW);
+    const bmuCol = bmuIdx % gridW;
+
+    // Cache result for 30 min
+    await redis.setex(cacheKey, 1800, JSON.stringify({ bmuRow, bmuCol }));
+
+    return { bmuRow, bmuCol, gridW, gridH, source: native?.somCache ? 'gpu' : 'cpu' };
+  } catch {
+    return { bmuRow: 0, bmuCol: 0, gridW, gridH, source: 'cpu' };
+  }
+}
+
+/**
+ * GPU-accelerated attention-weighted scoring: given a query embedding and a set of
+ * candidate chunk embeddings (as a flat Float32Array), returns per-chunk attention scores.
+ * Falls back to CPU dot-product if GPU unavailable.
+ */
+export async function attentionScoreChunks(
+  queryEmbedding: number[],
+  chunkEmbeddings: number[][]
+): Promise<number[]> {
+  const n = chunkEmbeddings.length;
+  if (n === 0) return [];
+  const dim = queryEmbedding.length;
+
+  const native = getAddon();
+  if (native?.attentionScoreGPU) {
+    try {
+      const query = new Float32Array(queryEmbedding);
+      const keys = new Float32Array(n * dim);
+      for (let i = 0; i < n; i++) {
+        const ce = chunkEmbeddings[i];
+        for (let d = 0; d < dim; d++) keys[i * dim + d] = ce[d] ?? 0;
+      }
+      const scores = native.attentionScoreGPU(query, dim, keys, n);
+      return Array.from(scores);
+    } catch { /* fall through */ }
+  }
+
+  // CPU fallback: cosine similarity (dot product after L2 norm)
+  const qNorm = Math.sqrt(queryEmbedding.reduce((s, v) => s + v * v, 0)) || 1;
+  return chunkEmbeddings.map((ce) => {
+    const cNorm = Math.sqrt(ce.reduce((s, v) => s + v * v, 0)) || 1;
+    let dot = 0;
+    for (let d = 0; d < dim; d++) dot += (queryEmbedding[d] ?? 0) * (ce[d] ?? 0);
+    return dot / (qNorm * cNorm);
+  });
 }
 
 export async function dotProduct(a: number[], b: number[]): Promise<DotProductResult> {

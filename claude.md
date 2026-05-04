@@ -1,6 +1,6 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: April 19, 2026 (Unified model + gRPC audit + Docker VHDX audit)
+## Last Updated: May 3, 2026 (GraphRAG community layer + deep compiler stack audit)
 ## Status: svelte-check 0 errors, 0 warnings | vite build PASSES | Playwright 20/20
 
 ---
@@ -1346,6 +1346,58 @@ safelist: [
   'px-2', 'px-3', 'px-4', 'py-1', 'py-2',
 ]
 ```
+
+---
+
+## Post-Audit Alignment (May 3, 2026 — Deep Compiler Stack Audit)
+
+### Inference Cascade (8 tiers — verified live)
+```
+TensorRT-LLM :8099 (INT4 AWQ, GPU lease) →
+Triton TensorRT :8000 →
+Bifrost :3040 (ε-greedy, 500ms deadline, ~5ms hits) →
+TurboQuant :8090 (llama-server, cache_prompt:true, KV q8_0) →
+VLM :8085 (Gemma4 E4B HF, NF4, vision) →
+LiteRT-LM :8070 (CPU MTP speculative) →
+Ollama :11434 (final fallback)
+```
+
+### Compiler Stack — Correct Mental Model
+- **tsgo** = type graph traversal (Go goroutines). NO GPU, NO matmul. 10× speed = CPU parallelism only.
+- **tensorrt_bridge.node** = LibTorch N-API. cuBLAS GEMM on RTX 3060 Ti. 100–500× faster than WASM for matmul.
+- **WASM SIMD128** = 128-bit lanes, no GPU access, ~500× slower than cuBLAS for 768×768 matmul. Browser-only last resort.
+- **ioredis** = `setex` (lowercase), no `.connect()`, use `.quit()` not `.disconnect()`.
+
+### KV Cache Policy (llama-server.exe)
+- **Production**: `-ctk q8_0 -ctv q8_0` (18% VRAM savings, stable)
+- **Experimental only**: `-ctk turbo3` — benchmark on your exact GGUF + CUDA backend first; crash reports exist on some backends
+- **TurboQuant `cache_prompt: true`**: safe for system prompt KV reuse across communities/clusters
+
+### ACE Scoring Spine (verified weights)
+```
+semantic_vector × 0.60 + tag_score × 0.12 + ast_graph × 0.10 + som_boost × 0.08 + hyperedge × 0.10
++ community_context (GraphRAG preamble, not scored inline)
+```
+
+### A2A / MCP / ACP Wiring (verified)
+- **A2A AgentCard**: `GET /.well-known/agent.json` — LIVE (`src/routes/.well-known/agent.json/+server.ts`)
+- **Agent API**: `POST /api/ai/agent` — native + A2A Task + SSE streaming — LIVE
+- **MCP**: `src/mcp/server.ts` — 29 tools, FastMCP, auth guard — LIVE
+- **ACP**: `GET /api/acp/tools`, `POST /api/acp/execute` — LIVE
+
+### `using` / `await using` — Available Now (TS 5.2+)
+Add `"lib": ["es2025", "esnext.disposable"]` to tsconfig, then:
+```typescript
+class DisposableRedis extends Redis {
+  async [Symbol.asyncDispose]() { await this.quit(); }
+}
+await using redis = new DisposableRedis(REDIS_URL, { password: REDIS_PASS });
+// no explicit quit() needed — fires on scope exit even if exception thrown
+```
+Replaces manual `if (redisReady) await redis.quit().catch(() => {})` in all pipeline scripts.
+
+### Full Compiler Doc
+See `sveltekit-frontend/scripts/docs/compiler-stack-explainer.md` for complete reference.
 
 ---
 

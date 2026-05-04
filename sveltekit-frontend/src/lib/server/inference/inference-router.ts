@@ -491,7 +491,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
 
     return {
       text,
-      model: 'gemma4-legal-turbo3',
+      model: 'gemma4-legal-q8_0',
       backend: 'turboquant',
       usage: data.usage
         ? {
