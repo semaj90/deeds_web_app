@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-04T15:34:33.679Z
+> Generated: 2026-05-04T15:54:28.566Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -36,7 +36,7 @@
 | G14b | No `$:` reactive declarations | 2581 | 0 |
 | G14c | No `on:event=` directives | 2581 | 0 |
 | G14d | No `createEventDispatcher()` | 2581 | 0 |
-| G14e | No runes in plain `.ts` files | 2570 | 11 |
+| G14e | No runes in plain `.ts` files | 2581 | 0 |
 | G15 | No SSR-unsafe globals (unguarded) | 2536 | 45 |
 | G16 | Server routes have test pairing | 51 | 534 |
 | G17 | Server routes have error handling | 593 | 73 |
