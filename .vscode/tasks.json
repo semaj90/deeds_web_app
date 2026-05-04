@@ -8389,9 +8389,87 @@
       "detail": "Audit lib/server, then POST to /api/codebase-index/summarize-dirs to ingest into Redis/Postgres for ACE KAG",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
+    },
+
+    {
+      "label": "🦙 llama-server: Start Gemma4 VLM (TurboQuant :8090)",
+      "type": "shell",
+      "command": "npm run turbo:start:detached",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Start llama-server.exe with gemma4-legal-vlm GGUF + mmproj on :8090 (q8_0 KV, flash-attn, ngl 99). Detached — returns when /health responds.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🦙 llama-server: Prompt Gemma4 — Directory Analysis",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Analyze the directory structure and return: (1) dominant purpose, (2) missing auth/validation gaps, (3) suggested refactor. Be concise.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $resp.choices[0].message.content\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Prompt Gemma4 via llama-server :8090 for directory analysis. Uses system prompt + cache_prompt:true for KV reuse. Input: directory path or question.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🦙 llama-server: Prompt Gemma4 — KAG Wiki Note (single dir)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$dir = '${input:targetDir}'; $fileList = Get-ChildItem -Path (Join-Path '${workspaceFolder}/sveltekit-frontend/src' $dir) -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 20 | ForEach-Object { $_.Name }; $files = $fileList -join ', '; $sys = 'You are a codebase knowledge-graph agent. Given a source directory and its files, produce a structured wiki note for the KAG system. Format: PURPOSE: <one sentence> | PATTERNS: <comma list> | GAPS: <auth/validation/test gaps> | TAGS: <tag list>'; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = \\\"Directory: $dir\\nFiles: $files\\nProduce the KAG wiki note.\\\" }); max_tokens = 300; temperature = 0.15; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host \\\"\\n--- KAG note for $dir ---\\\"; $resp.choices[0].message.content\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "List up to 20 files in the target dir, then prompt Gemma4 via llama-server to generate a structured KAG wiki note (PURPOSE/PATTERNS/GAPS/TAGS). Input: relative path from src/ e.g. lib/server/cache",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🦙 llama-server: Audit + KAG Ingest + Gemma4 Summary (full pipeline)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host '=== Step 1: Dir audit ===' -ForegroundColor Cyan; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map; Write-Host '=== Step 2: KAG ingest (Qdrant SOM coords + Redis wiki notes) ===' -ForegroundColor Cyan; $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true'; 'Content-Type' = 'application/json' } -TimeoutSec 300; Write-Host (\\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted, $($ingest.wikiNotesWritten) wiki notes\\\"); Write-Host '=== Step 3: Gemma4 meta-summary ===' -ForegroundColor Cyan; $sys = 'You are a legal AI platform architect. Summarize the codebase health in 5 bullet points covering: auth coverage, cache utilization, inference routing, SOM topology coverage, and top refactor priority.'; $ctx = \\\"Directories indexed: $($ingest.directoriesFound). Wiki notes written: $($ingest.wikiNotesWritten). Upserted community_reports: $($ingest.upserted).\\\"; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = $ctx }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- Gemma4 codebase health summary ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Full pipeline: (1) deep-directory-audit lib/server → (2) POST /api/codebase-index/summarize-dirs (Qdrant SOM coords + Redis wiki notes + Postgres) → (3) Gemma4 meta-summary via llama-server :8090. Requires TurboQuant running.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🦙 llama-server: Interactive Chat with Gemma4 (terminal REPL)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host 'Gemma4 Chat via llama-server :8090 — type your query, empty line to quit' -ForegroundColor Green; $history = @(); while ($true) { $line = Read-Host 'You'; if ([string]::IsNullOrWhiteSpace($line)) { break }; $history += @{ role = 'user'; content = $line }; $msgs = @(@{ role = 'system'; content = 'You are a legal AI assistant with deep knowledge of SvelteKit, TypeScript, and legal document analysis.' }) + $history; $body = @{ model = 'gemma4-legal'; messages = $msgs; max_tokens = 512; temperature = 0.3; cache_prompt = $true } | ConvertTo-Json -Depth 6; try { $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $reply = $resp.choices[0].message.content; $history += @{ role = 'assistant'; content = $reply }; Write-Host ('Gemma4: ' + $reply) -ForegroundColor Yellow } catch { Write-Host ('Error: ' + $_.Exception.Message) -ForegroundColor Red } }\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Interactive multi-turn chat with Gemma4 via llama-server :8090. Maintains conversation history. cache_prompt:true reuses system prompt KV across turns. Empty line exits.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🦙 llama-server: Prompt Gemma4 — 4D SOM Topology Report",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"Write-Host 'Fetching SOM topology from Redis wiki notes...' -ForegroundColor Cyan; $keys = redis-cli KEYS 'wiki:note:dir:*' 2>$null; if (-not $keys) { Write-Host 'No wiki notes in Redis — run KAG ingest first' -ForegroundColor Red; exit 1 }; $sample = $keys | Select-Object -First 5 | ForEach-Object { $val = redis-cli GET $_ 2>$null; try { $doc = $val | ConvertFrom-Json; \\\"dir=$($doc.directoryPath) SOM=($($doc.somBmuRow),$($doc.somBmuCol)) cluster=$($doc.somCluster) score=$($doc.auditScore)\\\" } catch { $_ } }; $ctx = $sample -join \\\"`n\\\"; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'You are a codebase topology analyst. Given SOM grid positions and cluster assignments for source directories, identify: (1) which clusters group related infrastructure, (2) outlier directories (isolated SOM positions), (3) recommended directory merges or splits.' }, @{ role = 'user'; content = \\\"SOM topology sample (`n$ctx`n)`nAnalyze the topology and give recommendations.\\\" }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- SOM Topology Analysis ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Read a sample of Redis wiki notes, extract SOM grid positions (row, col, cluster), then prompt Gemma4 via llama-server to analyse the 4D topology and suggest structural improvements.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [
+    {
+      "id": "dirAnalysisQuery",
+      "type": "promptString",
+      "description": "Directory path or analysis question for Gemma4 (e.g., 'lib/server/cache — what auth gaps exist?')",
+      "default": "lib/server/cache — summarize purpose and identify any missing auth guards or Zod validation"
+    },
+    {
+      "id": "targetDir",
+      "type": "promptString",
+      "description": "Relative path from src/ for KAG wiki note generation (e.g., lib/server/cache)",
+      "default": "lib/server/cache"
+    },
     {
       "id": "screenshotRoute",
       "type": "promptString",

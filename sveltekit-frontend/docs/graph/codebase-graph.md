@@ -1,5 +1,5 @@
-# Codebase Graph Plan — Fast AST
-> Generated: 2026-05-03T23:54:32.382Z
+# Codebase Graph Plan — Fast AST (20-Gate)
+> Generated: 2026-05-04T01:10:46.577Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
@@ -8,8 +8,20 @@
 | Files | 2576 |
 | Routes | 873 |
 | Components | 848 |
-| API handlers | 1 |
+| API handlers | 581 |
 | TODOs | 27 |
+| Dirs | 349 |
+
+## Gate Failures (action needed)
+| Gate | Fail Count |
+|------|-----------|
+| G4 No auth | 54 |
+| G5 No Zod  | 160 |
+| G11 Localhost | 94 |
+| G14 Svelte4 | 0 |
+| G15 SSR unsafe | 529 |
+| G16 No test | 532 |
+| G20 Cyclic | 36 |
 
 ## Files with TODO/FIXME
 - `src/lib/utils/dynamic-imports.ts` — 7 marker(s)
@@ -31,7 +43,7 @@
 - `src/routes/api/synthesis/generate/+server.ts` — 1 marker(s)
 
 ## ACE usage
-Redis `code:index:manifest`, `code:index:tag:{word}`, `wiki:note:dir:*`
+Redis `code:index:manifest`, `code:index:tag:{word}`, `code:index:gate-stats`, `wiki:note:dir:*`
 Score cap: 0.07 (fast-ast), 0.08 (KAG dir notes)
 
 ## Full GPU

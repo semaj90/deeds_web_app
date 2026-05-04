@@ -1,7 +1,14 @@
 import { json } from '@sveltejs/kit';
 import crypto from 'crypto';
+import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
 import type { RequestHandler } from './$types';
+
+const lookupPostSchema = z.object({
+  embedding: z.array(z.number()).optional(),
+  vector: z.array(z.number()).optional(),
+  k: z.number().int().min(1).max(100).default(8),
+});
 
 const PREFIX    = process.env.HG_PREFIX      || 'hypergraph:v1';
 const CACHE_TTL = Number(process.env.HG_CACHE_TTL  || 60);  // seconds
@@ -105,11 +112,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const ip = getIp(request);
   if (!(await checkRateLimit(ip))) return json({ error: 'rate limit' }, { status: 429 });
 
-  let body: { embedding?: number[]; vector?: number[]; k?: number };
-  try { body = await request.json(); } catch { return json({ error: 'invalid JSON' }, { status: 400 }); }
+  const parsed = lookupPostSchema.safeParse(await request.json().catch(() => ({})));
+  if (!parsed.success) return json({ error: 'invalid JSON' }, { status: 400 });
+  const body = parsed.data;
 
-  const vec = body?.embedding ?? body?.vector;
-  const k   = Number(body?.k ?? 8);
+  const vec = body.embedding ?? body.vector;
+  const k = body.k;
   if (!Array.isArray(vec)) return json({ error: 'missing embedding array' }, { status: 400 });
 
   const cacheKey = `lookup:vector:${hashString(JSON.stringify(vec))}:k:${k}`;

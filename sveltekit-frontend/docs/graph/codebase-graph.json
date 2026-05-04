@@ -1,8 +1,8 @@
 {
   "mode": "fast-ast",
-  "createdAt": "2026-05-04T01:28:00.808Z",
+  "createdAt": "2026-05-04T01:53:12.140Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
-  "fileCount": 2576,
+  "fileCount": 2577,
   "routeCount": 873,
   "componentCount": 848,
   "apiCount": 581,
@@ -15,8 +15,8 @@
   "gateStats": {
     "routesWithAuth": 619,
     "routesWithoutAuth": 45,
-    "routesWithZod": 425,
-    "routesWithoutZod": 160,
+    "routesWithZod": 461,
+    "routesWithoutZod": 131,
     "filesWithLocalhost": 95,
     "sv4PropsCount": 0,
     "sv4ReactiveCount": 0,
@@ -565,6 +565,7 @@
         "src",
         "lib",
         "ai",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Client-Side Quality Schema — Determines when local synthesis is sufficient",
@@ -591,7 +592,7 @@
       "isSvelteComp": false,
       "lineCount": 341,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -1235,6 +1236,7 @@
         "src",
         "lib",
         "cache",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "LokiJS In-Memory Reactive Cache",
@@ -1258,7 +1260,7 @@
       "isSvelteComp": false,
       "lineCount": 356,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -1349,7 +1351,8 @@
         "ts",
         "src",
         "lib",
-        "client"
+        "client",
+        "zod"
       ],
       "summary": "Type-safe search client for legal search system",
       "imports": [
@@ -1377,7 +1380,7 @@
       "isSvelteComp": false,
       "lineCount": 170,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -1393,7 +1396,8 @@
         "ts",
         "src",
         "lib",
-        "client"
+        "client",
+        "zod"
       ],
       "summary": "Streaming Response Handler",
       "imports": [],
@@ -1413,7 +1417,7 @@
       "isSvelteComp": false,
       "lineCount": 120,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -1429,7 +1433,8 @@
         "ts",
         "src",
         "lib",
-        "client"
+        "client",
+        "zod"
       ],
       "summary": "Embedding Stream Subscription — Svelte 5 runes",
       "imports": [
@@ -1451,7 +1456,7 @@
       "isSvelteComp": false,
       "lineCount": 106,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -1504,7 +1509,8 @@
         "ts",
         "src",
         "lib",
-        "client"
+        "client",
+        "zod"
       ],
       "summary": "Client-Side Workflow Event Stream",
       "imports": [],
@@ -1523,7 +1529,7 @@
       "isSvelteComp": false,
       "lineCount": 153,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -1720,7 +1726,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -1735,7 +1742,7 @@
       "isSvelteComp": true,
       "lineCount": 687,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -1752,7 +1759,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -1767,7 +1775,7 @@
       "isSvelteComp": true,
       "lineCount": 590,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -2186,7 +2194,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -2206,7 +2215,7 @@
       "isSvelteComp": true,
       "lineCount": 539,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -2656,6 +2665,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -2691,7 +2701,7 @@
       "isSvelteComp": true,
       "lineCount": 514,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -2709,6 +2719,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -2733,7 +2744,7 @@
       "isSvelteComp": true,
       "lineCount": 989,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -2750,7 +2761,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -2773,7 +2785,7 @@
       "isSvelteComp": true,
       "lineCount": 516,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -2790,7 +2802,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -2809,7 +2822,7 @@
       "isSvelteComp": true,
       "lineCount": 343,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -2826,7 +2839,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -2852,7 +2866,7 @@
       "isSvelteComp": true,
       "lineCount": 1596,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -2990,7 +3004,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -3011,7 +3026,7 @@
       "isSvelteComp": true,
       "lineCount": 307,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -3098,6 +3113,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -3120,7 +3136,7 @@
       "isSvelteComp": true,
       "lineCount": 316,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -3410,7 +3426,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -3427,7 +3444,7 @@
       "isSvelteComp": true,
       "lineCount": 962,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -3603,6 +3620,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -3621,7 +3639,7 @@
       "isSvelteComp": true,
       "lineCount": 468,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -3638,7 +3656,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -3662,7 +3681,7 @@
       "isSvelteComp": true,
       "lineCount": 725,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -3711,7 +3730,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -3735,7 +3755,7 @@
       "isSvelteComp": true,
       "lineCount": 2405,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -3825,7 +3845,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "Forward completed research to claude-assist (compact defaults).",
       "imports": [
@@ -3845,7 +3866,7 @@
       "isSvelteComp": true,
       "lineCount": 597,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -3900,6 +3921,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "API Tester Modal - NES Edition",
@@ -3918,7 +3940,7 @@
       "isSvelteComp": true,
       "lineCount": 483,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -4122,6 +4144,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -4145,7 +4168,7 @@
       "isSvelteComp": true,
       "lineCount": 654,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -4265,6 +4288,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Draw a faux waveform visualization for audio nodes",
@@ -4306,7 +4330,7 @@
       "isSvelteComp": true,
       "lineCount": 1219,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -4355,7 +4379,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -4372,7 +4397,7 @@
       "isSvelteComp": true,
       "lineCount": 173,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -4925,7 +4950,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -4942,7 +4968,7 @@
       "isSvelteComp": true,
       "lineCount": 150,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -5026,7 +5052,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -5049,7 +5076,7 @@
       "isSvelteComp": true,
       "lineCount": 268,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -6819,7 +6846,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "Initialize the component",
       "imports": [
@@ -6840,7 +6868,7 @@
       "isSvelteComp": true,
       "lineCount": 789,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -6858,6 +6886,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -6890,7 +6919,7 @@
       "isSvelteComp": true,
       "lineCount": 346,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -7515,7 +7544,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -7530,7 +7560,7 @@
       "isSvelteComp": true,
       "lineCount": 365,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -7779,6 +7809,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -7800,7 +7831,7 @@
       "isSvelteComp": true,
       "lineCount": 387,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -8167,6 +8198,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -8186,7 +8218,7 @@
       "isSvelteComp": true,
       "lineCount": 635,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -8545,7 +8577,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "EvidenceRecall — Recently viewed/accessed evidence tracker",
       "imports": [
@@ -8566,7 +8599,7 @@
       "isSvelteComp": true,
       "lineCount": 205,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -8803,7 +8836,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "Evidence Upload Progress with Real-Time SSE Tracking",
       "imports": [
@@ -8823,7 +8857,7 @@
       "isSvelteComp": true,
       "lineCount": 539,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -8878,6 +8912,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -8902,7 +8937,7 @@
       "isSvelteComp": true,
       "lineCount": 1329,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -9176,7 +9211,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -9200,7 +9236,7 @@
       "isSvelteComp": true,
       "lineCount": 144,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -9506,6 +9542,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Upload file to MinIO via POST /api/evidence/upload, then track via SSE",
@@ -9527,7 +9564,7 @@
       "isSvelteComp": true,
       "lineCount": 939,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -10030,7 +10067,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -10057,7 +10095,7 @@
       "isSvelteComp": true,
       "lineCount": 310,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -10296,7 +10334,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -10329,7 +10368,7 @@
       "isSvelteComp": true,
       "lineCount": 507,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -10451,6 +10490,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -10468,7 +10508,7 @@
       "isSvelteComp": true,
       "lineCount": 117,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -10807,7 +10847,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "StatuteActionPanel — AI-powered legal statute actions",
       "imports": [],
@@ -10822,7 +10863,7 @@
       "isSvelteComp": true,
       "lineCount": 312,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -10915,7 +10956,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -10932,7 +10974,7 @@
       "isSvelteComp": true,
       "lineCount": 516,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -12415,7 +12457,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "Phase 72 Error Brain Modal",
       "imports": [
@@ -12435,7 +12478,7 @@
       "isSvelteComp": true,
       "lineCount": 561,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -13743,7 +13786,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -13758,7 +13802,7 @@
       "isSvelteComp": true,
       "lineCount": 340,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -21280,7 +21324,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -21310,7 +21355,7 @@
       "isSvelteComp": true,
       "lineCount": 677,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -23778,6 +23823,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -23798,7 +23844,7 @@
       "isSvelteComp": true,
       "lineCount": 748,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -24017,7 +24063,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -24032,7 +24079,7 @@
       "isSvelteComp": true,
       "lineCount": 209,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -24049,7 +24096,8 @@
         "src",
         "lib",
         "components",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -24075,7 +24123,7 @@
       "isSvelteComp": true,
       "lineCount": 655,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -26707,6 +26755,7 @@
         "src",
         "lib",
         "gpu",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -26724,7 +26773,7 @@
       "isSvelteComp": false,
       "lineCount": 145,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -27591,6 +27640,7 @@
         "src",
         "lib",
         "machines",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Audio Upload State Machine - XState v5",
@@ -27612,7 +27662,7 @@
       "isSvelteComp": false,
       "lineCount": 305,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -27743,7 +27793,8 @@
         "ts",
         "src",
         "lib",
-        "machines"
+        "machines",
+        "zod"
       ],
       "summary": "Unified Evidence Lifecycle Machine (XState v5)",
       "imports": [
@@ -27765,7 +27816,7 @@
       "isSvelteComp": false,
       "lineCount": 548,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -28020,7 +28071,8 @@
         "ts",
         "src",
         "lib",
-        "models"
+        "models",
+        "zod"
       ],
       "summary": "Phase 76: ChatSession Reactive Class (Svelte 5 Runes)",
       "imports": [
@@ -28061,7 +28113,7 @@
       "isSvelteComp": false,
       "lineCount": 1357,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -28077,7 +28129,8 @@
         "ts",
         "src",
         "lib",
-        "polyfills.ts"
+        "polyfills.ts",
+        "zod"
       ],
       "summary": "Browser polyfills for Node.js modules and enhanced compatibility",
       "imports": [],
@@ -28100,7 +28153,7 @@
       "isSvelteComp": false,
       "lineCount": 209,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -28660,7 +28713,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "ace-error-kag.ts — Error summarization → KAG pipeline",
       "imports": [
@@ -28684,7 +28738,7 @@
       "isSvelteComp": false,
       "lineCount": 240,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -28702,7 +28756,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "ace-wiki.ts — Generate wiki-style articles from ACE codebase context.",
       "imports": [
@@ -28728,7 +28783,7 @@
       "isSvelteComp": false,
       "lineCount": 782,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -28785,7 +28840,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "chat-memory.ts — past chat recall via Qdrant `chat_messages` collection.",
       "imports": [
@@ -28813,7 +28869,7 @@
       "isSvelteComp": false,
       "lineCount": 358,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -28887,6 +28943,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "ACE Context Assembler — Central Orchestration Module",
@@ -28920,7 +28977,7 @@
         "./chat-memory.js",
         "$lib/server/redis.js",
         "$lib/server/graph/community-graph.js",
-        "$lib/services/knowledge-search/ACPToolRegistry.js"
+        "$lib/server/graph/graph-intel.js"
       ],
       "exports": [
         "assembleACEContext",
@@ -28951,9 +29008,9 @@
       "components": [],
       "isRoute": false,
       "isSvelteComp": false,
-      "lineCount": 2295,
+      "lineCount": 2301,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -29011,7 +29068,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "gemma4-codeintel.ts — Gemma4 prompt builder + LLM caller for CodeIntel ACE context.",
       "imports": [
@@ -29048,7 +29106,7 @@
       "isSvelteComp": false,
       "lineCount": 817,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -29219,7 +29277,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "ACE Tag Generator",
       "imports": [
@@ -29241,7 +29300,7 @@
       "isSvelteComp": false,
       "lineCount": 157,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -29357,7 +29416,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "User Analytics Context for ACE Chat Enrichment",
       "imports": [
@@ -29382,7 +29442,7 @@
       "isSvelteComp": false,
       "lineCount": 126,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -29435,7 +29495,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Phase 90: Agentic Tool Registry for RAG+KAG+DAG Knowledge Base",
       "imports": [
@@ -29465,7 +29526,7 @@
       "isSvelteComp": false,
       "lineCount": 476,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -29519,7 +29580,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Server-Side Service Integration Adapters",
       "imports": [
@@ -29558,7 +29620,7 @@
       "isSvelteComp": false,
       "lineCount": 638,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -30111,7 +30173,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "CachingLayer — 3-tier cache: Hot (in-memory) → LRU → Redis",
       "imports": [
@@ -30136,7 +30199,7 @@
       "isSvelteComp": false,
       "lineCount": 395,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -30275,7 +30338,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -30300,7 +30364,7 @@
       "isSvelteComp": false,
       "lineCount": 109,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -30317,7 +30381,8 @@
         "src",
         "lib",
         "server",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "Gemma4 Tool-Calling Agent",
       "imports": [
@@ -30342,7 +30407,10 @@
       ],
       "dynImports": [
         "$lib/server/redis.js",
-        "$lib/server/redis.js"
+        "$lib/server/redis.js",
+        "$lib/server/graph/graph-intel.js",
+        "$lib/server/graph/graph-intel.js",
+        "$lib/server/graph/graph-intel.js"
       ],
       "reExports": [],
       "routeHandlers": [],
@@ -30351,9 +30419,9 @@
       "components": [],
       "isRoute": false,
       "isSvelteComp": false,
-      "lineCount": 814,
+      "lineCount": 897,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -30468,7 +30536,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "LangGraph Synthesis Service Client",
       "imports": [
@@ -30500,7 +30569,7 @@
       "isSvelteComp": false,
       "lineCount": 280,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -30566,7 +30635,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Legal Reasoning Chain — 4-Step Sequential Analysis",
       "imports": [
@@ -30589,7 +30659,7 @@
       "isSvelteComp": false,
       "lineCount": 201,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31065,7 +31135,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Drizzle-based analysis job tracking with DB-backed queue.",
       "imports": [
@@ -31101,7 +31172,7 @@
       "isSvelteComp": false,
       "lineCount": 333,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31203,6 +31274,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Evidence Analysis Pipeline",
@@ -31241,7 +31313,7 @@
       "isSvelteComp": false,
       "lineCount": 455,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31460,6 +31532,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "VLM Evidence Analyzer — Server-side image analysis for evidence pipeline",
@@ -31486,7 +31559,7 @@
       "isSvelteComp": false,
       "lineCount": 362,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31626,6 +31699,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Codebase Deep Research Scanner",
@@ -31656,7 +31730,7 @@
       "isSvelteComp": false,
       "lineCount": 417,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31673,6 +31747,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Deep Research — Self-Prompting Research Topic Generator",
@@ -31708,7 +31783,7 @@
       "isSvelteComp": false,
       "lineCount": 613,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -31774,6 +31849,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "MapReduce Matrix Analysis — Unified Pipeline Hit Query System",
@@ -31808,7 +31884,7 @@
       "isSvelteComp": false,
       "lineCount": 816,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31827,7 +31903,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "minified-research-cache.ts",
       "imports": [
@@ -31874,7 +31951,7 @@
       "isSvelteComp": false,
       "lineCount": 654,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31890,7 +31967,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Research Cache — Redis-indexed QLoRA JSONL query layer.",
       "imports": [
@@ -31918,7 +31996,7 @@
       "isSvelteComp": false,
       "lineCount": 255,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -31935,7 +32013,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "research-graph-rl.ts",
       "imports": [
@@ -31976,7 +32055,7 @@
       "isSvelteComp": false,
       "lineCount": 684,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -32035,6 +32114,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "research-summaries-db.ts",
@@ -32075,7 +32155,7 @@
       "isSvelteComp": false,
       "lineCount": 472,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -32092,6 +32172,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Search Analytics — hot-query ring buffer + Bifrost variance pairs + chunk hit recording.",
@@ -32129,7 +32210,7 @@
       "isSvelteComp": false,
       "lineCount": 622,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -32148,6 +32229,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Unified Research Query — Orchestrates all analytics data sources.",
@@ -32187,7 +32269,7 @@
       "isSvelteComp": false,
       "lineCount": 680,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -32240,6 +32322,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Web Research Crawler — Search → Summarize → Tag → Cosine Rank → Index",
@@ -32286,7 +32369,7 @@
       "isSvelteComp": false,
       "lineCount": 746,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -32952,6 +33035,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Cartridge-Tensor Bridge — Redis ↔ CHR-ROM97 ↔ GPU Tensor ↔ NES Adaptive Memory",
@@ -32995,7 +33079,7 @@
       "isSvelteComp": false,
       "lineCount": 531,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -33116,7 +33200,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Report Export Caching Service",
       "imports": [
@@ -33144,7 +33229,7 @@
       "isSvelteComp": false,
       "lineCount": 337,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -33160,7 +33245,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Redis Exact-Match Cache Layer (L1)",
       "imports": [
@@ -33186,7 +33272,7 @@
       "isSvelteComp": false,
       "lineCount": 285,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -33202,7 +33288,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Report Template Caching Service",
       "imports": [
@@ -33238,7 +33325,7 @@
       "isSvelteComp": false,
       "lineCount": 424,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -33381,7 +33468,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Instrumented Redis GET — records hit/miss + latency in cacheMetrics.",
       "imports": [
@@ -33412,7 +33500,7 @@
       "isSvelteComp": false,
       "lineCount": 264,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -33428,7 +33516,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "CH-ROM97 Cartridge Builder/Reader — TypeScript port",
       "imports": [
@@ -33454,7 +33543,7 @@
       "isSvelteComp": false,
       "lineCount": 320,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -33564,6 +33653,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "NES CHR97 Glyph Tile Engine — Server-side",
@@ -33595,7 +33685,7 @@
       "isSvelteComp": false,
       "lineCount": 421,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -33885,7 +33975,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "fix-recommender.ts — CodeIntel-aware error-fix recommendation engine",
       "imports": [
@@ -33914,7 +34005,7 @@
       "isSvelteComp": false,
       "lineCount": 498,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -34134,7 +34225,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Ollama Configuration",
       "imports": [
@@ -34158,7 +34250,7 @@
       "isSvelteComp": false,
       "lineCount": 201,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -34666,7 +34758,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Drizzle Query Cache — ioredis-backed implementation of Drizzle's Cache interface",
       "imports": [
@@ -34691,7 +34784,7 @@
       "isSvelteComp": false,
       "lineCount": 161,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -35534,6 +35627,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "PostgreSQL + pgvector Integration",
@@ -35567,7 +35661,7 @@
       "isSvelteComp": false,
       "lineCount": 345,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -35629,6 +35723,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Qdrant Mirror Sync Pipeline",
@@ -35663,7 +35758,7 @@
       "isSvelteComp": false,
       "lineCount": 408,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -39251,7 +39346,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Embedding Persistence Service — PostgreSQL L4 cache tier",
       "imports": [
@@ -39280,7 +39376,7 @@
       "isSvelteComp": false,
       "lineCount": 180,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -39487,7 +39583,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Enhanced Embedding Cache Service",
       "imports": [
@@ -39507,7 +39604,7 @@
       "isSvelteComp": false,
       "lineCount": 253,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -39956,7 +40053,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "lib/server/error-brain/run-tracker.ts",
       "imports": [
@@ -39982,7 +40080,7 @@
       "isSvelteComp": false,
       "lineCount": 263,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -40147,7 +40245,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Redis transport for error-brain",
       "imports": [
@@ -40170,7 +40269,7 @@
       "isSvelteComp": false,
       "lineCount": 44,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -40421,7 +40520,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Evidence Metadata Protobuf Serializer",
       "imports": [
@@ -40459,7 +40559,7 @@
       "isSvelteComp": false,
       "lineCount": 334,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -40475,7 +40575,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -40496,7 +40597,7 @@
       "isSvelteComp": false,
       "lineCount": 41,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -40928,7 +41029,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Glyph Diffusion Service",
       "imports": [
@@ -40964,7 +41066,7 @@
       "isSvelteComp": false,
       "lineCount": 517,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -41161,7 +41263,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "LibTorch N-API Bridge — server-only.",
       "imports": [
@@ -41203,7 +41306,7 @@
       "isSvelteComp": false,
       "lineCount": 1096,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -41387,7 +41490,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "simdjson N-API Bridge — server-only.",
       "imports": [
@@ -41417,7 +41521,7 @@
       "isSvelteComp": false,
       "lineCount": 393,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -41433,7 +41537,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "GPU Codebase Cluster Detection",
       "imports": [
@@ -41463,7 +41568,7 @@
       "isSvelteComp": false,
       "lineCount": 358,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -41608,6 +41713,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "community-graph.ts — GraphRAG-style community detection over the codebase graph.",
@@ -41642,7 +41748,7 @@
       "isSvelteComp": false,
       "lineCount": 708,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -41661,6 +41767,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "CouchDB MapReduce PageRank — Step 21",
@@ -41686,7 +41793,7 @@
       "isSvelteComp": false,
       "lineCount": 423,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -41823,13 +41930,62 @@
       "localhostRefs": []
     },
     {
+      "rel": "src/lib/server/graph/graph-intel.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "summary": "Graph Intel — fast codebase-graph.json reader for ACE + Gemma4 tool-calling",
+      "imports": [
+        "node:fs/promises",
+        "node:fs",
+        "node:path",
+        "$lib/server/redis.js"
+      ],
+      "exports": [
+        "GraphFile",
+        "GraphDir",
+        "GraphData",
+        "GraphSearchResult",
+        "searchGraph",
+        "AuditHotspot",
+        "getAuditHotspots",
+        "WikiNoteLookupResult",
+        "lookupWikiNotes",
+        "getGraphIntelContext"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "lineCount": 304,
+      "hasAuth": false,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": []
+    },
+    {
       "rel": "src/lib/server/graph/hypergraph-4d.ts",
       "ext": ".ts",
       "tags": [
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "4D Hypergraph — GPU-backed legal knowledge hypergraph",
       "imports": [
@@ -41876,7 +42032,7 @@
       "isSvelteComp": false,
       "lineCount": 1392,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -42148,7 +42304,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "CHR97 Agent gRPC Client — server-only.",
       "imports": [
@@ -42181,7 +42338,7 @@
       "isSvelteComp": false,
       "lineCount": 351,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -42277,7 +42434,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Multi-Protocol Embedding Client — server-only.",
       "imports": [
@@ -42325,7 +42483,7 @@
       "isSvelteComp": false,
       "lineCount": 914,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -42342,6 +42500,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "gRPC Generation Client (Gemma 4 VLM + Tool Calling)",
@@ -42378,7 +42537,7 @@
       "isSvelteComp": false,
       "lineCount": 390,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -42602,7 +42761,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "ToolRouter gRPC Client — MCP JSON-RPC ↔ internal gRPC bridge.",
       "imports": [
@@ -42634,7 +42794,7 @@
       "isSvelteComp": false,
       "lineCount": 253,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -42650,7 +42810,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Docker Container Discovery Helper",
       "imports": [
@@ -42671,7 +42832,7 @@
       "isSvelteComp": false,
       "lineCount": 189,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -42870,7 +43031,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "VLM Cluster-to-Narrative Synthesis (Step 5)",
       "imports": [
@@ -42899,7 +43061,7 @@
       "isSvelteComp": false,
       "lineCount": 473,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43012,6 +43174,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "GPU-Accelerated Karpathy Semantic Tagger",
@@ -43042,7 +43205,7 @@
       "isSvelteComp": false,
       "lineCount": 273,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43059,6 +43222,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Karpathy Wiki — Layer 3 Durable Memory",
@@ -43095,7 +43259,7 @@
       "isSvelteComp": false,
       "lineCount": 733,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43189,6 +43353,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Agentic Deep-Research Web Search Indexer",
@@ -43223,7 +43388,7 @@
       "isSvelteComp": false,
       "lineCount": 489,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43290,7 +43455,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Adapter Manifest — Tracks merged LoRA adapter artifacts",
       "imports": [
@@ -43314,7 +43480,7 @@
       "isSvelteComp": false,
       "lineCount": 107,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43330,7 +43496,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "GPU Arbiter — VRAM Mutex for TRT-LLM / Ollama Exclusive Access",
       "imports": [
@@ -43357,7 +43524,7 @@
       "isSvelteComp": false,
       "lineCount": 209,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43374,6 +43541,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Server-Side Inference Router",
@@ -43408,7 +43576,7 @@
       "isSvelteComp": false,
       "lineCount": 1261,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43424,7 +43592,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "TurboQuant Graph-Aware KV Prefix Cache",
       "imports": [
@@ -43452,7 +43621,7 @@
       "isSvelteComp": false,
       "lineCount": 477,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43627,6 +43796,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Keyword Extractor Module",
@@ -43649,7 +43819,7 @@
       "isSvelteComp": false,
       "lineCount": 330,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -43665,7 +43835,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Redis caching layer for knowledge base queries",
       "imports": [
@@ -43700,7 +43871,7 @@
       "isSvelteComp": false,
       "lineCount": 228,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -44192,6 +44363,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Gemma 4 + Ollama Multi-Step Tool-Calling Loop",
@@ -44236,7 +44408,7 @@
       "isSvelteComp": false,
       "lineCount": 665,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -44252,7 +44424,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -44275,7 +44448,7 @@
       "isSvelteComp": false,
       "lineCount": 112,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -44416,7 +44589,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "LLM Router - Local-first streaming with GPU acceleration",
       "imports": [
@@ -44441,7 +44615,7 @@
       "isSvelteComp": false,
       "lineCount": 165,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -45853,7 +46027,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Ollama Integration Service — canonical Ollama client.",
       "imports": [
@@ -45903,7 +46078,7 @@
       "isSvelteComp": false,
       "lineCount": 1113,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -46366,7 +46541,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "PNG Tensor Embedding & Extraction Service",
       "imports": [
@@ -46393,7 +46569,7 @@
       "isSvelteComp": false,
       "lineCount": 298,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -46641,6 +46817,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "QueueWorker — Typed Base Class for RabbitMQ Consumers",
@@ -46680,7 +46857,7 @@
       "isSvelteComp": false,
       "lineCount": 647,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -46787,6 +46964,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Publish a message, waiting up to `timeoutMs` for RabbitMQ to be fully",
@@ -46823,7 +47001,7 @@
       "isSvelteComp": false,
       "lineCount": 1963,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -46927,7 +47105,8 @@
         "js",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -46952,7 +47131,7 @@
       "isSvelteComp": false,
       "lineCount": 166,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -46968,7 +47147,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -46995,7 +47175,7 @@
       "isSvelteComp": false,
       "lineCount": 261,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -47127,6 +47307,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -47152,7 +47333,7 @@
       "isSvelteComp": false,
       "lineCount": 109,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -47363,7 +47544,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -47384,7 +47566,7 @@
       "isSvelteComp": false,
       "lineCount": 60,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -47400,7 +47582,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "redis-streams.ts",
       "imports": [
@@ -47424,7 +47607,7 @@
       "isSvelteComp": false,
       "lineCount": 178,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -47440,7 +47623,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Redis Connection Pool",
       "imports": [
@@ -47469,7 +47653,7 @@
       "isSvelteComp": false,
       "lineCount": 230,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -47524,7 +47708,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Report Audit Logging + Version Tracking",
       "imports": [
@@ -47551,7 +47736,7 @@
       "isSvelteComp": false,
       "lineCount": 112,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -47756,7 +47941,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "lane4-feedback.ts — Lane 4: Research hit logging → trust-score RL loop",
       "imports": [
@@ -47788,7 +47974,7 @@
       "isSvelteComp": false,
       "lineCount": 196,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -48030,7 +48216,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "web-research-ingester.ts — Lane 3: Qdrant chunks_web_search indexer",
       "imports": [
@@ -48058,7 +48245,7 @@
       "isSvelteComp": false,
       "lineCount": 291,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -48164,6 +48351,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Citation Network Graph — Iterative PageRank for Legal Documents",
@@ -48185,7 +48373,7 @@
       "isSvelteComp": false,
       "lineCount": 389,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -48563,7 +48751,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "LangExtract Entity-Aware GRPO Reranker",
       "imports": [
@@ -48588,7 +48777,7 @@
       "isSvelteComp": false,
       "lineCount": 251,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -48838,7 +49027,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Advanced Topological Retrieval Boost",
       "imports": [
@@ -48862,7 +49052,7 @@
       "isSvelteComp": false,
       "lineCount": 210,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -49088,7 +49278,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Semantic Search Cache — Redis-backed with embedding similarity",
       "imports": [
@@ -49113,7 +49304,7 @@
       "isSvelteComp": false,
       "lineCount": 241,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -49524,6 +49715,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Chunked Response Handler - Server-Side Streaming",
@@ -49550,7 +49742,7 @@
       "isSvelteComp": false,
       "lineCount": 340,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -49811,7 +50003,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "langextract_batch Tool Handler",
       "imports": [
@@ -49831,7 +50024,7 @@
       "isSvelteComp": false,
       "lineCount": 187,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -49888,7 +50081,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "scan_repo Tool Handler",
       "imports": [
@@ -49907,7 +50101,7 @@
       "isSvelteComp": false,
       "lineCount": 161,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -50018,7 +50212,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Streaming inference via Triton generate_stream endpoint.",
       "imports": [
@@ -50041,7 +50236,7 @@
       "isSvelteComp": false,
       "lineCount": 171,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -50057,7 +50252,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "TensorRT-LLM Inference Client",
       "imports": [
@@ -50079,7 +50275,7 @@
       "isSvelteComp": false,
       "lineCount": 136,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -50726,7 +50922,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Fast JSON parsing with optional SIMD acceleration.",
       "imports": [],
@@ -50746,7 +50943,7 @@
       "isSvelteComp": false,
       "lineCount": 63,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -51185,6 +51382,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Streaming Embedding Service — AsyncGenerator-based embedding with progress events",
@@ -51209,7 +51407,7 @@
       "isSvelteComp": false,
       "lineCount": 192,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -51567,6 +51765,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Universal Vector Search Cache System",
@@ -51599,7 +51798,7 @@
       "isSvelteComp": false,
       "lineCount": 496,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -51616,7 +51815,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Audio Processing Worker",
       "imports": [
@@ -51646,7 +51846,7 @@
       "isSvelteComp": false,
       "lineCount": 616,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -51669,7 +51869,8 @@
         "ts",
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "summary": "Audio Queue Consumer",
       "imports": [
@@ -51690,7 +51891,7 @@
       "isSvelteComp": false,
       "lineCount": 55,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -51752,6 +51953,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Document Embedding Consumer",
@@ -51782,7 +51984,7 @@
       "isSvelteComp": false,
       "lineCount": 247,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -51799,7 +52001,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "summary": "Video VLM Processor — Gemma4 Visual Analysis",
       "imports": [
@@ -51830,7 +52033,7 @@
       "isSvelteComp": false,
       "lineCount": 475,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -51847,6 +52050,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Resolve the best available YOLO ONNX model.",
@@ -51872,7 +52076,7 @@
       "isSvelteComp": false,
       "lineCount": 314,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -52575,7 +52779,8 @@
         "ts",
         "src",
         "lib",
-        "services"
+        "services",
+        "zod"
       ],
       "summary": "RAG Retriever Service for LLM Self-Improvement System",
       "imports": [
@@ -52599,7 +52804,7 @@
       "isSvelteComp": false,
       "lineCount": 342,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -52896,6 +53101,7 @@
         "src",
         "lib",
         "services",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "MinIO Knowledge Store",
@@ -52918,7 +53124,7 @@
       "isSvelteComp": false,
       "lineCount": 440,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -53017,6 +53223,7 @@
         "src",
         "lib",
         "services",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Redis Cache Service",
@@ -53040,7 +53247,7 @@
       "isSvelteComp": false,
       "lineCount": 323,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -53356,7 +53563,8 @@
         "ts",
         "src",
         "lib",
-        "shared"
+        "shared",
+        "zod"
       ],
       "summary": "CH-ROM97 Cartridge Reader — browser-compatible subset",
       "imports": [],
@@ -53378,7 +53586,7 @@
       "isSvelteComp": false,
       "lineCount": 144,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -53704,7 +53912,8 @@
         "js",
         "src",
         "lib",
-        "shims"
+        "shims",
+        "zod"
       ],
       "summary": "IORedis Browser Shim for Legal AI Platform",
       "imports": [],
@@ -53723,7 +53932,7 @@
       "isSvelteComp": false,
       "lineCount": 416,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -54248,6 +54457,7 @@
         "src",
         "lib",
         "stores",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "SSE Status Store - Svelte 5 Runes (Session 30)",
@@ -54267,7 +54477,7 @@
       "isSvelteComp": false,
       "lineCount": 166,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -54357,6 +54567,7 @@
         "src",
         "lib",
         "stores",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Knowledge Search Store - Svelte 5 Barrel Export",
@@ -54379,7 +54590,7 @@
       "isSvelteComp": false,
       "lineCount": 231,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -54430,7 +54641,8 @@
         "ts",
         "src",
         "lib",
-        "stores"
+        "stores",
+        "zod"
       ],
       "summary": "Phase 76: User Preferences Store",
       "imports": [],
@@ -54448,7 +54660,7 @@
       "isSvelteComp": false,
       "lineCount": 130,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -54465,6 +54677,7 @@
         "src",
         "lib",
         "stores",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Research Tasks Store — Svelte 5 runes",
@@ -54485,7 +54698,7 @@
       "isSvelteComp": false,
       "lineCount": 339,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -54538,7 +54751,8 @@
         "ts",
         "src",
         "lib",
-        "stores"
+        "stores",
+        "zod"
       ],
       "summary": "Unified Theme Store — Single Source of Truth",
       "imports": [
@@ -54557,7 +54771,7 @@
       "isSvelteComp": false,
       "lineCount": 159,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -55756,7 +55970,8 @@
         "ts",
         "src",
         "lib",
-        "types"
+        "types",
+        "zod"
       ],
       "summary": "Central type export hub for all API response types",
       "imports": [
@@ -55784,7 +55999,7 @@
       "isSvelteComp": false,
       "lineCount": 153,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -56359,7 +56574,8 @@
         "ts",
         "src",
         "lib",
-        "types"
+        "types",
+        "zod"
       ],
       "summary": "QLoRA Protobuf Types — compressed transport for GPU embedding bridge.",
       "imports": [],
@@ -56378,7 +56594,7 @@
       "isSvelteComp": false,
       "lineCount": 56,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -57655,6 +57871,7 @@
         "src",
         "lib",
         "utils",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "High-Performance JSON Utilities for Legal AI",
@@ -57678,7 +57895,7 @@
       "isSvelteComp": false,
       "lineCount": 184,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -57793,7 +58010,8 @@
         "ts",
         "src",
         "lib",
-        "utils"
+        "utils",
+        "zod"
       ],
       "summary": "Map a fetch Response to a ServiceError",
       "imports": [],
@@ -57812,7 +58030,7 @@
       "isSvelteComp": false,
       "lineCount": 88,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -57828,7 +58046,8 @@
         "ts",
         "src",
         "lib",
-        "utils"
+        "utils",
+        "zod"
       ],
       "summary": "Comprehensive Utility Functions",
       "imports": [
@@ -57868,7 +58087,7 @@
       "isSvelteComp": false,
       "lineCount": 259,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -58242,7 +58461,8 @@
         "src",
         "lib",
         "utils",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "Security utilities for the Legal AI Platform",
       "imports": [
@@ -58281,7 +58501,7 @@
       "isSvelteComp": false,
       "lineCount": 567,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -58335,7 +58555,8 @@
         "ts",
         "src",
         "lib",
-        "utils"
+        "utils",
+        "zod"
       ],
       "summary": "SIMD-Accelerated JSON Parser for Legal AI",
       "imports": [],
@@ -58357,7 +58578,7 @@
       "isSvelteComp": false,
       "lineCount": 254,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -58418,7 +58639,8 @@
         "ts",
         "src",
         "lib",
-        "utils"
+        "utils",
+        "zod"
       ],
       "summary": "Client-side SSE (Server-Sent Events) helper for contextual chat",
       "imports": [
@@ -58439,7 +58661,7 @@
       "isSvelteComp": false,
       "lineCount": 158,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -58664,7 +58886,8 @@
         "ts",
         "src",
         "lib",
-        "utils"
+        "utils",
+        "zod"
       ],
       "summary": "UltraJSONParser - Browser-side JSON parsing with WASM acceleration",
       "imports": [],
@@ -58683,7 +58906,7 @@
       "isSvelteComp": false,
       "lineCount": 105,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -58813,7 +59036,8 @@
         "ts",
         "src",
         "lib",
-        "utils.ts"
+        "utils.ts",
+        "zod"
       ],
       "summary": "Utility function to merge CSS classes",
       "imports": [
@@ -58852,7 +59076,7 @@
       "isSvelteComp": false,
       "lineCount": 362,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -59807,6 +60031,7 @@
         "mcp",
         "server.ts",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Setup tool handlers for MCP server",
@@ -59843,7 +60068,7 @@
       "isSvelteComp": false,
       "lineCount": 3768,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -59919,6 +60144,7 @@
         "ts",
         "src",
         "mcp-gpu-orchestrator.ts",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "MCP GPU Orchestrator - Advanced Multi-Protocol AI Task Dispatcher",
@@ -59943,7 +60169,7 @@
       "isSvelteComp": false,
       "lineCount": 576,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -61018,7 +61244,8 @@
         "route",
         "component",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -61035,7 +61262,7 @@
       "isSvelteComp": true,
       "lineCount": 613,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -61547,7 +61774,8 @@
         "(app)",
         "route",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "6.1: Query database for route metadata directly",
       "imports": [
@@ -61573,7 +61801,7 @@
       "isSvelteComp": false,
       "lineCount": 300,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -61592,7 +61820,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -61642,7 +61871,7 @@
       "isSvelteComp": true,
       "lineCount": 2288,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -61861,7 +62090,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -61878,7 +62108,7 @@
       "isSvelteComp": true,
       "lineCount": 783,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -62135,6 +62365,7 @@
         "route",
         "component",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Auto-refresh metrics every 5s while page is visible.",
@@ -62154,7 +62385,7 @@
       "isSvelteComp": true,
       "lineCount": 823,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -62543,7 +62774,8 @@
         "route",
         "component",
         "has-todo",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -62565,7 +62797,7 @@
       "isSvelteComp": true,
       "lineCount": 876,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -62884,7 +63116,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -62903,7 +63136,7 @@
       "isSvelteComp": true,
       "lineCount": 184,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -63137,7 +63370,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -63156,7 +63390,7 @@
       "isSvelteComp": true,
       "lineCount": 736,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -63801,7 +64035,8 @@
         "(app)",
         "route",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -63827,7 +64062,7 @@
       "isSvelteComp": false,
       "lineCount": 134,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -63847,7 +64082,8 @@
         "route",
         "component",
         "has-todo",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -63871,7 +64107,7 @@
       "isSvelteComp": true,
       "lineCount": 1593,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -64007,6 +64243,7 @@
         "route",
         "component",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -64041,7 +64278,7 @@
       "isSvelteComp": true,
       "lineCount": 4175,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -64094,7 +64331,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -64112,7 +64350,7 @@
       "isSvelteComp": true,
       "lineCount": 663,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -65031,7 +65269,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -65098,7 +65337,7 @@
       "isSvelteComp": true,
       "lineCount": 1344,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -65194,7 +65433,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -65211,7 +65451,7 @@
       "isSvelteComp": true,
       "lineCount": 226,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -65233,6 +65473,7 @@
         "route",
         "db-schema",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -65261,7 +65502,7 @@
       "isSvelteComp": false,
       "lineCount": 110,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -65708,7 +65949,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "Scan a text-based file for PII before upload",
       "imports": [
@@ -65728,7 +65970,7 @@
       "isSvelteComp": true,
       "lineCount": 599,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -65838,6 +66080,7 @@
         "route",
         "db-schema",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -65867,7 +66110,7 @@
       "isSvelteComp": false,
       "lineCount": 117,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -66042,7 +66285,8 @@
         "(app)",
         "route",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -66071,7 +66315,7 @@
       "isSvelteComp": false,
       "lineCount": 61,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -66254,7 +66498,8 @@
         "routes",
         "(app)",
         "route",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "Phase 76: Chat Route Server",
       "imports": [
@@ -66281,7 +66526,7 @@
       "isSvelteComp": false,
       "lineCount": 291,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -67540,7 +67785,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -67592,7 +67838,7 @@
       "isSvelteComp": true,
       "lineCount": 1995,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -67946,7 +68192,8 @@
         "routes",
         "(app)",
         "route",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -67967,7 +68214,7 @@
       "isSvelteComp": false,
       "lineCount": 30,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -68025,7 +68272,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -68043,7 +68291,7 @@
       "isSvelteComp": true,
       "lineCount": 229,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -68062,7 +68310,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -68080,7 +68329,7 @@
       "isSvelteComp": true,
       "lineCount": 287,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -69531,7 +69780,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -69551,7 +69801,7 @@
       "isSvelteComp": true,
       "lineCount": 691,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -73612,7 +73862,8 @@
         "routes",
         "(app)",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -73627,7 +73878,7 @@
       "isSvelteComp": true,
       "lineCount": 209,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -73645,7 +73896,8 @@
         "routes",
         "(app)",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -73671,7 +73923,7 @@
       "isSvelteComp": true,
       "lineCount": 655,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -75283,6 +75535,7 @@
         "route",
         "component",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -75305,7 +75558,7 @@
       "isSvelteComp": true,
       "lineCount": 442,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -77567,7 +77820,8 @@
         "(app)",
         "route",
         "component",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -77605,7 +77859,7 @@
       "isSvelteComp": true,
       "lineCount": 838,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -77668,6 +77922,7 @@
         "route",
         "component",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
@@ -77705,7 +77960,7 @@
       "isSvelteComp": true,
       "lineCount": 1013,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -77910,7 +78165,8 @@
         "routes",
         "(dev)",
         "route",
-        "component"
+        "component",
+        "zod"
       ],
       "summary": "Streaming Response Demo",
       "imports": [],
@@ -77925,7 +78181,7 @@
       "isSvelteComp": true,
       "lineCount": 280,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -79349,7 +79605,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -79378,7 +79635,7 @@
       "isSvelteComp": false,
       "lineCount": 243,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": true,
@@ -81273,12 +81530,14 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "POST /api/analytics/focus",
       "imports": [
         "@sveltejs/kit",
         "./$types.js",
+        "zod",
         "$lib/server/analytics/architectural-guard.js",
         "$lib/server/redis.js"
       ],
@@ -81295,9 +81554,9 @@
       "components": [],
       "isRoute": true,
       "isSvelteComp": false,
-      "lineCount": 48,
+      "lineCount": 53,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -82372,7 +82631,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/audio/analysis/[evidenceId]",
       "imports": [
@@ -82395,7 +82655,7 @@
       "isSvelteComp": false,
       "lineCount": 96,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -82416,7 +82676,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/audio/progress/[evidenceId]",
       "imports": [
@@ -82438,7 +82699,7 @@
       "isSvelteComp": false,
       "lineCount": 88,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -84614,7 +84875,8 @@
         "route",
         "api-handler",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -84648,7 +84910,7 @@
       "isSvelteComp": false,
       "lineCount": 101,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -85748,7 +86010,8 @@
         "route",
         "api-handler",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "POST /api/chat/memory/backfill — embed existing Postgres chat_messages → Qdrant.",
       "imports": [
@@ -85776,7 +86039,7 @@
       "isSvelteComp": false,
       "lineCount": 217,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -88226,7 +88489,8 @@
         "route",
         "api-handler",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/codebase-index/export/bundle",
       "imports": [
@@ -88254,7 +88518,7 @@
       "isSvelteComp": false,
       "lineCount": 412,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -88622,7 +88886,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET  /api/codebase-index/ingest-log",
       "imports": [
@@ -88650,7 +88915,7 @@
       "isSvelteComp": false,
       "lineCount": 102,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -88808,11 +89073,13 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "POST /api/codebase-index/karpathy-tag/gpu",
       "imports": [
         "./$types",
+        "zod",
         "$lib/server/env.server.js",
         "$lib/server/streaming/sse-utils.js",
         "$lib/server/gpu/libtorch-bridge.js",
@@ -88833,9 +89100,9 @@
       "components": [],
       "isRoute": true,
       "isSvelteComp": false,
-      "lineCount": 332,
+      "lineCount": 342,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -89204,7 +89471,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -89234,7 +89502,7 @@
       "isSvelteComp": false,
       "lineCount": 194,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -89302,7 +89570,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/codebase-index/topology-hits",
       "imports": [
@@ -89325,7 +89594,7 @@
       "isSvelteComp": false,
       "lineCount": 83,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -89531,12 +89800,14 @@
         "route",
         "api-handler",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET  /api/codeintel/clusters/[id]  — fetch one cluster summary",
       "imports": [
         "@sveltejs/kit",
         "./$types",
+        "zod",
         "$lib/server/db/client",
         "$lib/server/db/schema-postgres.js",
         "drizzle-orm",
@@ -89559,9 +89830,9 @@
       "components": [],
       "isRoute": true,
       "isSvelteComp": false,
-      "lineCount": 177,
+      "lineCount": 184,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -90447,6 +90718,7 @@
         "route",
         "api-handler",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "GET /api/document/analysis/[evidenceId]",
@@ -90470,7 +90742,7 @@
       "isSvelteComp": false,
       "lineCount": 115,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -91053,6 +91325,7 @@
         "api-handler",
         "db-schema",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "Backfill embeddings for diagnosis events that lack queryEmbedding.",
@@ -91082,7 +91355,7 @@
       "isSvelteComp": false,
       "lineCount": 250,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -93109,7 +93382,8 @@
         "route",
         "api-handler",
         "db-schema",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "Phase 89: Cluster Summary Generation API",
       "imports": [
@@ -93144,7 +93418,7 @@
       "isSvelteComp": false,
       "lineCount": 379,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -94864,12 +95138,14 @@
         "route",
         "api-handler",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "",
       "imports": [
         "@sveltejs/kit",
         "crypto",
+        "zod",
         "$lib/server/redis.js",
         "./$types"
       ],
@@ -94888,9 +95164,9 @@
       "components": [],
       "isRoute": true,
       "isSvelteComp": false,
-      "lineCount": 141,
+      "lineCount": 149,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -98813,7 +99089,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "Phase 89: Activity Stream API",
       "imports": [
@@ -98836,7 +99113,7 @@
       "isSvelteComp": false,
       "lineCount": 70,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -99213,7 +99490,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "API: GET /api/phase89/graph",
       "imports": [
@@ -99239,7 +99517,7 @@
       "isSvelteComp": false,
       "lineCount": 55,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -99972,6 +100250,7 @@
         "route",
         "api-handler",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "GET /api/pipeline/status/[jobId]",
@@ -99997,7 +100276,7 @@
       "isSvelteComp": false,
       "lineCount": 58,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -100980,7 +101259,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/recommendations/jobs/[jobId]",
       "imports": [
@@ -101003,7 +101283,7 @@
       "isSvelteComp": false,
       "lineCount": 98,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -101864,7 +102144,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/route-operations/log — Route operations log for monitoring dashboard",
       "imports": [
@@ -101888,7 +102169,7 @@
       "isSvelteComp": false,
       "lineCount": 49,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -102875,7 +103156,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "POST /api/simulation/[sessionId]/strategy",
       "imports": [
@@ -102901,7 +103183,7 @@
       "isSvelteComp": false,
       "lineCount": 51,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -103007,7 +103289,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "Phase 76: Server-Sent Events (SSE) Endpoint",
       "imports": [
@@ -103034,7 +103317,7 @@
       "isSvelteComp": false,
       "lineCount": 179,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -103213,6 +103496,7 @@
         "api-handler",
         "db-schema",
         "auth",
+        "zod",
         "ssr-unsafe"
       ],
       "summary": "POST /api/statutes/[id]/summary",
@@ -103244,7 +103528,7 @@
       "isSvelteComp": false,
       "lineCount": 168,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": true,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -103549,7 +103833,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/synthesis/evaluation/[id]",
       "imports": [
@@ -103573,7 +103858,7 @@
       "isSvelteComp": false,
       "lineCount": 64,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -104654,7 +104939,8 @@
         "routes",
         "api",
         "route",
-        "api-handler"
+        "api-handler",
+        "zod"
       ],
       "summary": "POST /api/test/redis-write",
       "imports": [
@@ -104677,7 +104963,7 @@
       "isSvelteComp": false,
       "lineCount": 43,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -104970,7 +105256,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "",
       "imports": [
@@ -104994,7 +105281,7 @@
       "isSvelteComp": false,
       "lineCount": 122,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -105960,7 +106247,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/video/analysis/[evidenceId]",
       "imports": [
@@ -105983,7 +106271,7 @@
       "isSvelteComp": false,
       "lineCount": 105,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -106300,7 +106588,8 @@
         "api",
         "route",
         "api-handler",
-        "auth"
+        "auth",
+        "zod"
       ],
       "summary": "GET /api/workflow-events/[sessionId]",
       "imports": [
@@ -106322,7 +106611,7 @@
       "isSvelteComp": false,
       "lineCount": 133,
       "hasAuth": true,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -106779,7 +107068,8 @@
       "tags": [
         "ts",
         "src",
-        "service-worker.ts"
+        "service-worker.ts",
+        "zod"
       ],
       "summary": "Handle background sync for cache warming and data sync",
       "imports": [],
@@ -106794,7 +107084,7 @@
       "isSvelteComp": false,
       "lineCount": 585,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -107211,7 +107501,8 @@
         "ts",
         "src",
         "types",
-        "global-shims.d.ts"
+        "global-shims.d.ts",
+        "zod"
       ],
       "summary": "",
       "imports": [],
@@ -107230,7 +107521,7 @@
       "isSvelteComp": false,
       "lineCount": 37,
       "hasAuth": false,
-      "hasZod": false,
+      "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
@@ -107940,35 +108231,6 @@
   ],
   "directories": [
     {
-      "dir": "src/lib/server/indexer",
-      "score": 45,
-      "summary": "server module directory with 11 files, 1 API handlers, 4 Drizzle refs, 5 SSR-unsafe",
-      "tagList": [
-        "src",
-        "lib",
-        "server",
-        "api-handler",
-        "db-schema",
-        "ssr-unsafe"
-      ],
-      "fileCount": 11,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 4,
-      "apis": 1,
-      "auth": 0,
-      "zod": 0,
-      "lines": 5209,
-      "ssrUnsafe": 5,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 8,
-      "dynImports": 6,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/.well-known/agent.json",
       "score": 45,
       "summary": "route handler directory with 1 files, 1 API handlers",
@@ -108138,35 +108400,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/test",
-      "score": 59,
-      "summary": "route handler directory with 8 files, 8 API handlers",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "zod"
-      ],
-      "fileCount": 8,
-      "todos": 0,
-      "routes": 8,
-      "components": 0,
-      "db": 0,
-      "apis": 8,
-      "auth": 0,
-      "zod": 5,
-      "lines": 776,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 8,
-      "localhostRefs": 0,
-      "tryCatch": 8,
-      "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/db",
       "score": 60,
       "summary": "route handler directory with 1 files, 1 API handlers, 1 Drizzle refs",
@@ -108283,6 +108516,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/test",
+      "score": 61,
+      "summary": "route handler directory with 8 files, 8 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "zod"
+      ],
+      "fileCount": 8,
+      "todos": 0,
+      "routes": 8,
+      "components": 0,
+      "db": 0,
+      "apis": 8,
+      "auth": 0,
+      "zod": 6,
+      "lines": 776,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 8,
+      "localhostRefs": 0,
+      "tryCatch": 8,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/components/ui",
       "score": 65,
       "summary": "shared library directory with 245 files, 0 API handlers, 3 TODOs, 27 SSR-unsafe",
@@ -108301,7 +108563,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 24174,
       "ssrUnsafe": 27,
       "sv4Legacy": 0,
@@ -108309,35 +108571,6 @@
       "localhostRefs": 0,
       "tryCatch": 17,
       "dynImports": 3,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/hypergraph",
-      "score": 65,
-      "summary": "route handler directory with 1 files, 1 API handlers, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 1,
-      "components": 0,
-      "db": 0,
-      "apis": 1,
-      "auth": 1,
-      "zod": 0,
-      "lines": 141,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 1,
-      "localhostRefs": 0,
-      "tryCatch": 1,
-      "dynImports": 0,
       "fanInTotal": 0
     },
     {
@@ -108349,6 +108582,7 @@
         "lib",
         "ai",
         "ssr-unsafe",
+        "zod",
         "has-todo"
       ],
       "fileCount": 13,
@@ -108358,7 +108592,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 4966,
       "ssrUnsafe": 4,
       "sv4Legacy": 0,
@@ -108387,7 +108621,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 3,
       "lines": 11961,
       "ssrUnsafe": 13,
       "sv4Legacy": 0,
@@ -108407,7 +108641,7 @@
         "components",
         "component",
         "ssr-unsafe",
-        "db-schema"
+        "zod"
       ],
       "fileCount": 56,
       "todos": 6,
@@ -108416,7 +108650,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 2,
+      "zod": 44,
       "lines": 159240,
       "ssrUnsafe": 143,
       "sv4Legacy": 0,
@@ -108485,35 +108719,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/phase89",
-      "score": 72,
-      "summary": "route handler directory with 24 files, 24 API handlers, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 24,
-      "todos": 0,
-      "routes": 24,
-      "components": 0,
-      "db": 0,
-      "apis": 24,
-      "auth": 24,
-      "zod": 11,
-      "lines": 2425,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 23,
-      "localhostRefs": 0,
-      "tryCatch": 23,
-      "dynImports": 4,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/workers",
       "score": 73,
       "summary": "shared library directory with 4 files, 0 API handlers, 2 TODOs, 2 SSR-unsafe",
@@ -108561,7 +108766,7 @@
       "db": 0,
       "apis": 0,
       "auth": 4,
-      "zod": 0,
+      "zod": 1,
       "lines": 865,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -108601,9 +108806,9 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/pipeline",
+      "dir": "src/routes/api/phase89",
       "score": 73,
-      "summary": "route handler directory with 2 files, 2 API handlers, 1 SSR-unsafe",
+      "summary": "route handler directory with 24 files, 24 API handlers, 1 SSR-unsafe",
       "tagList": [
         "src",
         "routes",
@@ -108612,21 +108817,21 @@
         "api-handler",
         "auth"
       ],
-      "fileCount": 2,
+      "fileCount": 24,
       "todos": 0,
-      "routes": 2,
+      "routes": 24,
       "components": 0,
       "db": 0,
-      "apis": 2,
-      "auth": 2,
-      "zod": 1,
-      "lines": 124,
+      "apis": 24,
+      "auth": 24,
+      "zod": 13,
+      "lines": 2425,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
-      "noTest": 2,
+      "noTest": 23,
       "localhostRefs": 0,
-      "tryCatch": 2,
-      "dynImports": 1,
+      "tryCatch": 23,
+      "dynImports": 4,
       "fanInTotal": 0
     },
     {
@@ -108667,7 +108872,8 @@
         "lib",
         "components",
         "component",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 46,
       "todos": 0,
@@ -108676,7 +108882,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 11,
       "lines": 19715,
       "ssrUnsafe": 12,
       "sv4Legacy": 0,
@@ -108723,7 +108929,8 @@
         "src",
         "lib",
         "gpu",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 16,
       "todos": 0,
@@ -108732,7 +108939,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 4323,
       "ssrUnsafe": 8,
       "sv4Legacy": 0,
@@ -108751,6 +108958,7 @@
         "lib",
         "machines",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 12,
@@ -108760,7 +108968,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 4613,
       "ssrUnsafe": 5,
       "sv4Legacy": 0,
@@ -108778,6 +108986,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 8,
@@ -108787,7 +108996,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 4,
       "lines": 2681,
       "ssrUnsafe": 3,
       "sv4Legacy": 0,
@@ -108832,6 +109041,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe",
         "test"
       ],
@@ -108842,7 +109052,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 4,
       "lines": 4100,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -108968,6 +109178,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 2,
@@ -108977,7 +109188,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 364,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -108995,6 +109206,7 @@
         "src",
         "lib",
         "utils",
+        "zod",
         "ssr-unsafe",
         "auth"
       ],
@@ -109005,7 +109217,7 @@
       "db": 0,
       "apis": 0,
       "auth": 2,
-      "zod": 0,
+      "zod": 7,
       "lines": 7081,
       "ssrUnsafe": 8,
       "sv4Legacy": 0,
@@ -109100,35 +109312,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/document",
-      "score": 75,
-      "summary": "route handler directory with 2 files, 2 API handlers, 1 Drizzle refs, 2 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 2,
-      "todos": 0,
-      "routes": 2,
-      "components": 0,
-      "db": 1,
-      "apis": 2,
-      "auth": 2,
-      "zod": 0,
-      "lines": 148,
-      "ssrUnsafe": 2,
-      "sv4Legacy": 0,
-      "noTest": 2,
-      "localhostRefs": 0,
-      "tryCatch": 2,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/ingest-constitution",
       "score": 75,
       "summary": "route handler directory with 1 files, 1 API handlers",
@@ -109184,35 +109367,6 @@
       "localhostRefs": 0,
       "tryCatch": 1,
       "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/route-operations",
-      "score": 75,
-      "summary": "route handler directory with 1 files, 1 API handlers",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 1,
-      "components": 0,
-      "db": 0,
-      "apis": 1,
-      "auth": 1,
-      "zod": 0,
-      "lines": 49,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 1,
-      "localhostRefs": 0,
-      "tryCatch": 1,
-      "dynImports": 1,
       "fanInTotal": 0
     },
     {
@@ -109274,93 +109428,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/topology",
-      "score": 75,
-      "summary": "route handler directory with 2 files, 2 API handlers",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 2,
-      "todos": 0,
-      "routes": 2,
-      "components": 0,
-      "db": 0,
-      "apis": 2,
-      "auth": 2,
-      "zod": 0,
-      "lines": 215,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 2,
-      "localhostRefs": 0,
-      "tryCatch": 2,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/video",
-      "score": 75,
-      "summary": "route handler directory with 1 files, 1 API handlers",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 1,
-      "components": 0,
-      "db": 0,
-      "apis": 1,
-      "auth": 1,
-      "zod": 0,
-      "lines": 105,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 1,
-      "localhostRefs": 0,
-      "tryCatch": 1,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/workflow-events",
-      "score": 75,
-      "summary": "route handler directory with 1 files, 1 API handlers",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 1,
-      "components": 0,
-      "db": 0,
-      "apis": 1,
-      "auth": 1,
-      "zod": 0,
-      "lines": 133,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 1,
-      "localhostRefs": 0,
-      "tryCatch": 1,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/minio/[...path]",
       "score": 75,
       "summary": "route handler directory with 1 files, 1 API handlers",
@@ -109408,7 +109475,7 @@
       "db": 3,
       "apis": 0,
       "auth": 184,
-      "zod": 0,
+      "zod": 6,
       "lines": 28199,
       "ssrUnsafe": 28,
       "sv4Legacy": 0,
@@ -109419,35 +109486,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/synthesis",
-      "score": 79,
-      "summary": "route handler directory with 7 files, 7 API handlers, 1 Drizzle refs, 1 TODOs, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 7,
-      "todos": 1,
-      "routes": 7,
-      "components": 0,
-      "db": 1,
-      "apis": 7,
-      "auth": 7,
-      "zod": 5,
-      "lines": 1854,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 7,
-      "localhostRefs": 0,
-      "tryCatch": 7,
-      "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/cache",
       "score": 80,
       "summary": "shared library directory with 5 files, 0 API handlers, 2 SSR-unsafe",
@@ -109455,7 +109493,8 @@
         "src",
         "lib",
         "cache",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 5,
       "todos": 0,
@@ -109464,7 +109503,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 1046,
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
@@ -109483,6 +109522,7 @@
         "lib",
         "client",
         "ssr-unsafe",
+        "zod",
         "component"
       ],
       "fileCount": 4,
@@ -109492,7 +109532,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 4,
       "lines": 766,
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
@@ -109566,7 +109606,8 @@
         "lib",
         "components",
         "component",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 5,
       "todos": 0,
@@ -109575,7 +109616,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 2560,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -109594,6 +109635,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 3,
@@ -109603,7 +109645,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 2809,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -109622,6 +109664,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 2,
@@ -109631,7 +109674,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 1161,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -109678,6 +109721,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 6,
@@ -109687,7 +109731,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 2338,
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
@@ -109706,7 +109750,8 @@
         "lib",
         "components",
         "component",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 11,
       "todos": 0,
@@ -109715,7 +109760,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 3154,
       "ssrUnsafe": 3,
       "sv4Legacy": 0,
@@ -109734,6 +109779,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 4,
@@ -109743,7 +109789,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 768,
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
@@ -109846,6 +109892,7 @@
         "lib",
         "components",
         "component",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 6,
@@ -109855,7 +109902,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 1884,
       "ssrUnsafe": 5,
       "sv4Legacy": 0,
@@ -109902,7 +109949,8 @@
         "lib",
         "components",
         "ssr-unsafe",
-        "component"
+        "component",
+        "zod"
       ],
       "fileCount": 41,
       "todos": 0,
@@ -109911,7 +109959,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 5,
       "lines": 14655,
       "ssrUnsafe": 18,
       "sv4Legacy": 0,
@@ -109940,7 +109988,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 2,
       "lines": 4163,
       "ssrUnsafe": 3,
       "sv4Legacy": 0,
@@ -109959,7 +110007,8 @@
         "lib",
         "components",
         "component",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 33,
       "todos": 0,
@@ -109968,7 +110017,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 5,
       "lines": 11235,
       "ssrUnsafe": 8,
       "sv4Legacy": 0,
@@ -110322,6 +110371,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 5,
@@ -110331,7 +110381,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 1614,
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
@@ -110403,6 +110453,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 4,
@@ -110412,7 +110463,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 4,
       "lines": 2054,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -110485,6 +110536,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 7,
@@ -110494,7 +110546,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 527,
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
@@ -110577,7 +110629,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 3,
       "lines": 1508,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -110595,7 +110647,8 @@
         "src",
         "lib",
         "stores",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 14,
       "todos": 0,
@@ -110604,7 +110657,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 5,
       "lines": 4488,
       "ssrUnsafe": 8,
       "sv4Legacy": 0,
@@ -110622,7 +110675,8 @@
         "src",
         "lib",
         "stores",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 3,
       "todos": 0,
@@ -110631,7 +110685,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 654,
       "ssrUnsafe": 3,
       "sv4Legacy": 0,
@@ -111133,35 +111187,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/audio",
-      "score": 80,
-      "summary": "route handler directory with 4 files, 4 API handlers, 1 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 4,
-      "todos": 0,
-      "routes": 4,
-      "components": 0,
-      "db": 1,
-      "apis": 4,
-      "auth": 4,
-      "zod": 0,
-      "lines": 506,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 3,
-      "localhostRefs": 1,
-      "tryCatch": 4,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/detective",
       "score": 80,
       "summary": "route handler directory with 2 files, 2 API handlers, 2 SSR-unsafe",
@@ -111246,6 +111271,35 @@
       "localhostRefs": 1,
       "tryCatch": 10,
       "dynImports": 3,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/hypergraph",
+      "score": 80,
+      "summary": "route handler directory with 1 files, 1 API handlers, 1 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 1,
+      "components": 0,
+      "db": 0,
+      "apis": 1,
+      "auth": 1,
+      "zod": 1,
+      "lines": 149,
+      "ssrUnsafe": 1,
+      "sv4Legacy": 0,
+      "noTest": 1,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 0,
       "fanInTotal": 0
     },
     {
@@ -111336,6 +111390,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/pipeline",
+      "score": 80,
+      "summary": "route handler directory with 2 files, 2 API handlers, 1 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 2,
+      "todos": 0,
+      "routes": 2,
+      "components": 0,
+      "db": 0,
+      "apis": 2,
+      "auth": 2,
+      "zod": 2,
+      "lines": 124,
+      "ssrUnsafe": 1,
+      "sv4Legacy": 0,
+      "noTest": 2,
+      "localhostRefs": 0,
+      "tryCatch": 2,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/summarize",
       "score": 80,
       "summary": "route handler directory with 3 files, 3 API handlers, 2 SSR-unsafe",
@@ -111422,8 +111505,37 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/analytics",
+      "dir": "src/routes/api/synthesis",
       "score": 81,
+      "summary": "route handler directory with 7 files, 7 API handlers, 1 Drizzle refs, 1 TODOs, 1 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 7,
+      "todos": 1,
+      "routes": 7,
+      "components": 0,
+      "db": 1,
+      "apis": 7,
+      "auth": 7,
+      "zod": 6,
+      "lines": 1854,
+      "ssrUnsafe": 1,
+      "sv4Legacy": 0,
+      "noTest": 7,
+      "localhostRefs": 0,
+      "tryCatch": 7,
+      "dynImports": 2,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/analytics",
+      "score": 82,
       "summary": "route handler directory with 26 files, 26 API handlers, 4 Drizzle refs, 3 SSR-unsafe",
       "tagList": [
         "src",
@@ -111440,43 +111552,14 @@
       "db": 4,
       "apis": 26,
       "auth": 25,
-      "zod": 21,
-      "lines": 4107,
+      "zod": 22,
+      "lines": 4112,
       "ssrUnsafe": 3,
       "sv4Legacy": 0,
       "noTest": 23,
       "localhostRefs": 1,
       "tryCatch": 23,
       "dynImports": 8,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/codebase-index",
-      "score": 81,
-      "summary": "route handler directory with 43 files, 42 API handlers, 7 Drizzle refs, 4 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 43,
-      "todos": 0,
-      "routes": 42,
-      "components": 0,
-      "db": 7,
-      "apis": 42,
-      "auth": 42,
-      "zod": 30,
-      "lines": 12596,
-      "ssrUnsafe": 4,
-      "sv4Legacy": 0,
-      "noTest": 39,
-      "localhostRefs": 3,
-      "tryCatch": 41,
-      "dynImports": 18,
       "fanInTotal": 0
     },
     {
@@ -111504,35 +111587,6 @@
       "localhostRefs": 0,
       "tryCatch": 2,
       "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes",
-      "score": 83,
-      "summary": "module directory with 6 files, 578 API handlers, 242 Drizzle refs, 7 TODOs, 158 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "(admin)",
-        "component",
-        "auth",
-        "ssr-unsafe"
-      ],
-      "fileCount": 6,
-      "todos": 7,
-      "routes": 873,
-      "components": 258,
-      "db": 242,
-      "apis": 578,
-      "auth": 960,
-      "zod": 430,
-      "lines": 214383,
-      "ssrUnsafe": 158,
-      "sv4Legacy": 0,
-      "noTest": 613,
-      "localhostRefs": 18,
-      "tryCatch": 719,
-      "dynImports": 166,
       "fanInTotal": 0
     },
     {
@@ -111594,9 +111648,9 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/chat",
+      "dir": "src/routes/api/codebase-index",
       "score": 83,
-      "summary": "route handler directory with 7 files, 7 API handlers, 3 Drizzle refs, 1 SSR-unsafe",
+      "summary": "route handler directory with 43 files, 42 API handlers, 7 Drizzle refs, 4 SSR-unsafe",
       "tagList": [
         "src",
         "routes",
@@ -111605,34 +111659,34 @@
         "api-handler",
         "auth"
       ],
-      "fileCount": 7,
+      "fileCount": 43,
       "todos": 0,
-      "routes": 7,
+      "routes": 42,
       "components": 0,
-      "db": 3,
-      "apis": 7,
-      "auth": 7,
-      "zod": 6,
-      "lines": 1334,
-      "ssrUnsafe": 1,
+      "db": 7,
+      "apis": 42,
+      "auth": 42,
+      "zod": 35,
+      "lines": 12606,
+      "ssrUnsafe": 4,
       "sv4Legacy": 0,
-      "noTest": 6,
-      "localhostRefs": 2,
-      "tryCatch": 7,
-      "dynImports": 3,
+      "noTest": 39,
+      "localhostRefs": 3,
+      "tryCatch": 41,
+      "dynImports": 18,
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/sse",
+      "dir": "src/routes/api/document",
       "score": 83,
-      "summary": "route handler directory with 2 files, 2 API handlers, 1 Drizzle refs, 1 SSR-unsafe",
+      "summary": "route handler directory with 2 files, 2 API handlers, 1 Drizzle refs, 2 SSR-unsafe",
       "tagList": [
         "src",
         "routes",
         "api",
         "route",
         "api-handler",
-        "db-schema"
+        "auth"
       ],
       "fileCount": 2,
       "todos": 0,
@@ -111642,13 +111696,71 @@
       "apis": 2,
       "auth": 2,
       "zod": 1,
-      "lines": 2744,
-      "ssrUnsafe": 1,
+      "lines": 148,
+      "ssrUnsafe": 2,
       "sv4Legacy": 0,
       "noTest": 2,
       "localhostRefs": 0,
       "tryCatch": 2,
-      "dynImports": 1,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/topology",
+      "score": 83,
+      "summary": "route handler directory with 2 files, 2 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 2,
+      "todos": 0,
+      "routes": 2,
+      "components": 0,
+      "db": 0,
+      "apis": 2,
+      "auth": 2,
+      "zod": 1,
+      "lines": 215,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 2,
+      "localhostRefs": 0,
+      "tryCatch": 2,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes",
+      "score": 84,
+      "summary": "module directory with 6 files, 578 API handlers, 242 Drizzle refs, 7 TODOs, 158 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "(admin)",
+        "component",
+        "auth",
+        "ssr-unsafe"
+      ],
+      "fileCount": 6,
+      "todos": 7,
+      "routes": 873,
+      "components": 258,
+      "db": 242,
+      "apis": 578,
+      "auth": 960,
+      "zod": 489,
+      "lines": 214413,
+      "ssrUnsafe": 158,
+      "sv4Legacy": 0,
+      "noTest": 613,
+      "localhostRefs": 18,
+      "tryCatch": 719,
+      "dynImports": 166,
       "fanInTotal": 0
     },
     {
@@ -111688,9 +111800,9 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe",
-        "db-schema",
-        "zod"
+        "db-schema"
       ],
       "fileCount": 17,
       "todos": 0,
@@ -111699,8 +111811,8 @@
       "db": 3,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
-      "lines": 7055,
+      "zod": 8,
+      "lines": 7061,
       "ssrUnsafe": 4,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -111746,8 +111858,8 @@
         "src",
         "lib",
         "server",
-        "db-schema",
         "zod",
+        "db-schema",
         "auth"
       ],
       "fileCount": 23,
@@ -111757,8 +111869,8 @@
       "db": 4,
       "apis": 0,
       "auth": 1,
-      "zod": 3,
-      "lines": 6195,
+      "zod": 8,
+      "lines": 6278,
       "ssrUnsafe": 4,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -111776,8 +111888,8 @@
         "lib",
         "server",
         "ssr-unsafe",
-        "db-schema",
-        "test"
+        "zod",
+        "db-schema"
       ],
       "fileCount": 15,
       "todos": 0,
@@ -111786,7 +111898,7 @@
       "db": 5,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 10,
       "lines": 6690,
       "ssrUnsafe": 8,
       "sv4Legacy": 0,
@@ -111841,7 +111953,7 @@
       "db": 87,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 4,
       "lines": 17492,
       "ssrUnsafe": 21,
       "sv4Legacy": 0,
@@ -111887,7 +111999,7 @@
         "server",
         "db-schema",
         "ssr-unsafe",
-        "mjs"
+        "zod"
       ],
       "fileCount": 9,
       "todos": 0,
@@ -111896,7 +112008,7 @@
       "db": 2,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 3515,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -111909,29 +112021,29 @@
     {
       "dir": "src/lib/server/graph",
       "score": 85,
-      "summary": "server module directory with 16 files, 0 API handlers, 2 Drizzle refs, 5 SSR-unsafe",
+      "summary": "server module directory with 17 files, 0 API handlers, 2 Drizzle refs, 5 SSR-unsafe",
       "tagList": [
         "src",
         "lib",
         "server",
+        "zod",
         "auth",
-        "ssr-unsafe",
-        "db-schema"
+        "ssr-unsafe"
       ],
-      "fileCount": 16,
+      "fileCount": 17,
       "todos": 0,
       "routes": 0,
       "components": 0,
       "db": 2,
       "apis": 0,
       "auth": 1,
-      "zod": 0,
-      "lines": 6646,
+      "zod": 5,
+      "lines": 6950,
       "ssrUnsafe": 5,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 3,
-      "tryCatch": 16,
+      "tryCatch": 17,
       "dynImports": 7,
       "fanInTotal": 0
     },
@@ -111942,7 +112054,8 @@
       "tagList": [
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "fileCount": 2,
       "todos": 0,
@@ -111951,7 +112064,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 299,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -112034,7 +112147,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 3,
       "lines": 3812,
       "ssrUnsafe": 5,
       "sv4Legacy": 0,
@@ -112052,9 +112165,9 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe",
-        "test",
-        "db-schema"
+        "test"
       ],
       "fileCount": 24,
       "todos": 0,
@@ -112063,7 +112176,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 3,
       "lines": 6342,
       "ssrUnsafe": 10,
       "sv4Legacy": 0,
@@ -112090,7 +112203,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 2,
       "lines": 941,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -112108,6 +112221,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe",
         "db-schema"
       ],
@@ -112118,7 +112232,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 2831,
       "ssrUnsafe": 4,
       "sv4Legacy": 0,
@@ -112137,6 +112251,7 @@
         "lib",
         "server",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 5,
@@ -112146,7 +112261,7 @@
       "db": 3,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 4,
       "lines": 1769,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -112164,6 +112279,7 @@
         "src",
         "lib",
         "services",
+        "zod",
         "db-schema",
         "ssr-unsafe"
       ],
@@ -112174,7 +112290,7 @@
       "db": 2,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 3,
       "lines": 9625,
       "ssrUnsafe": 9,
       "sv4Legacy": 0,
@@ -112191,7 +112307,8 @@
       "tagList": [
         "src",
         "lib",
-        "services"
+        "services",
+        "zod"
       ],
       "fileCount": 17,
       "todos": 0,
@@ -112200,7 +112317,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 4788,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -112219,7 +112336,8 @@
         "lib",
         "services",
         "db-schema",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 11,
       "todos": 0,
@@ -112228,7 +112346,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 3965,
       "ssrUnsafe": 9,
       "sv4Legacy": 0,
@@ -112257,7 +112375,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 2,
       "lines": 4428,
       "ssrUnsafe": 3,
       "sv4Legacy": 0,
@@ -112294,6 +112412,35 @@
       "localhostRefs": 1,
       "tryCatch": 5,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/chat",
+      "score": 85,
+      "summary": "route handler directory with 7 files, 7 API handlers, 3 Drizzle refs, 1 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 7,
+      "todos": 0,
+      "routes": 7,
+      "components": 0,
+      "db": 3,
+      "apis": 7,
+      "auth": 7,
+      "zod": 7,
+      "lines": 1334,
+      "ssrUnsafe": 1,
+      "sv4Legacy": 0,
+      "noTest": 6,
+      "localhostRefs": 2,
+      "tryCatch": 7,
+      "dynImports": 3,
       "fanInTotal": 0
     },
     {
@@ -112442,35 +112589,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/generate-cluster-summaries",
-      "score": 85,
-      "summary": "route handler directory with 1 files, 1 API handlers, 1 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "db-schema"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 1,
-      "components": 0,
-      "db": 1,
-      "apis": 1,
-      "auth": 1,
-      "zod": 0,
-      "lines": 379,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 1,
-      "localhostRefs": 0,
-      "tryCatch": 1,
-      "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/phase109",
       "score": 85,
       "summary": "route handler directory with 2 files, 2 API handlers",
@@ -112529,35 +112647,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/admin",
-      "score": 86,
-      "summary": "route handler directory with 10 files, 10 API handlers, 2 Drizzle refs, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 10,
-      "todos": 0,
-      "routes": 10,
-      "components": 0,
-      "db": 2,
-      "apis": 10,
-      "auth": 10,
-      "zod": 7,
-      "lines": 1790,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 9,
-      "localhostRefs": 0,
-      "tryCatch": 10,
-      "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/canon",
       "score": 86,
       "summary": "route handler directory with 4 files, 4 API handlers, 4 Drizzle refs, 2 SSR-unsafe",
@@ -112587,90 +112676,61 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/statutes",
-      "score": 86,
-      "summary": "route handler directory with 4 files, 4 API handlers, 3 Drizzle refs, 1 SSR-unsafe",
+      "dir": "src/routes/api/admin",
+      "score": 87,
+      "summary": "route handler directory with 10 files, 10 API handlers, 2 Drizzle refs, 1 SSR-unsafe",
       "tagList": [
         "src",
         "routes",
         "api",
         "route",
         "api-handler",
-        "db-schema"
+        "auth"
+      ],
+      "fileCount": 10,
+      "todos": 0,
+      "routes": 10,
+      "components": 0,
+      "db": 2,
+      "apis": 10,
+      "auth": 10,
+      "zod": 8,
+      "lines": 1790,
+      "ssrUnsafe": 1,
+      "sv4Legacy": 0,
+      "noTest": 9,
+      "localhostRefs": 0,
+      "tryCatch": 10,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/audio",
+      "score": 88,
+      "summary": "route handler directory with 4 files, 4 API handlers, 1 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
       ],
       "fileCount": 4,
       "todos": 0,
       "routes": 4,
       "components": 0,
-      "db": 3,
+      "db": 1,
       "apis": 4,
       "auth": 4,
-      "zod": 3,
-      "lines": 585,
-      "ssrUnsafe": 1,
+      "zod": 2,
+      "lines": 506,
+      "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 3,
-      "localhostRefs": 0,
+      "localhostRefs": 1,
       "tryCatch": 4,
       "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/cases",
-      "score": 87,
-      "summary": "route handler directory with 25 files, 25 API handlers, 22 Drizzle refs, 2 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "db-schema"
-      ],
-      "fileCount": 25,
-      "todos": 0,
-      "routes": 25,
-      "components": 0,
-      "db": 22,
-      "apis": 25,
-      "auth": 25,
-      "zod": 20,
-      "lines": 4737,
-      "ssrUnsafe": 2,
-      "sv4Legacy": 0,
-      "noTest": 21,
-      "localhostRefs": 0,
-      "tryCatch": 23,
-      "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/recommendations",
-      "score": 87,
-      "summary": "route handler directory with 5 files, 5 API handlers, 3 Drizzle refs, 3 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "db-schema"
-      ],
-      "fileCount": 5,
-      "todos": 0,
-      "routes": 5,
-      "components": 0,
-      "db": 3,
-      "apis": 5,
-      "auth": 5,
-      "zod": 4,
-      "lines": 1178,
-      "ssrUnsafe": 3,
-      "sv4Legacy": 0,
-      "noTest": 5,
-      "localhostRefs": 0,
-      "tryCatch": 5,
-      "dynImports": 1,
       "fanInTotal": 0
     },
     {
@@ -112700,6 +112760,35 @@
       "localhostRefs": 0,
       "tryCatch": 6,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/cases",
+      "score": 88,
+      "summary": "route handler directory with 25 files, 25 API handlers, 22 Drizzle refs, 2 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema"
+      ],
+      "fileCount": 25,
+      "todos": 0,
+      "routes": 25,
+      "components": 0,
+      "db": 22,
+      "apis": 25,
+      "auth": 25,
+      "zod": 21,
+      "lines": 4737,
+      "ssrUnsafe": 2,
+      "sv4Legacy": 0,
+      "noTest": 21,
+      "localhostRefs": 0,
+      "tryCatch": 23,
+      "dynImports": 2,
       "fanInTotal": 0
     },
     {
@@ -112758,35 +112847,6 @@
       "localhostRefs": 0,
       "tryCatch": 9,
       "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/error-brain",
-      "score": 89,
-      "summary": "route handler directory with 11 files, 11 API handlers, 9 Drizzle refs, 2 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "db-schema"
-      ],
-      "fileCount": 11,
-      "todos": 0,
-      "routes": 11,
-      "components": 0,
-      "db": 9,
-      "apis": 11,
-      "auth": 11,
-      "zod": 10,
-      "lines": 2490,
-      "ssrUnsafe": 2,
-      "sv4Legacy": 0,
-      "noTest": 10,
-      "localhostRefs": 0,
-      "tryCatch": 11,
-      "dynImports": 1,
       "fanInTotal": 0
     },
     {
@@ -113555,7 +113615,8 @@
       "tagList": [
         "src",
         "lib",
-        "models"
+        "models",
+        "zod"
       ],
       "fileCount": 1,
       "todos": 0,
@@ -113564,7 +113625,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 1357,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -113608,7 +113669,8 @@
       "tagList": [
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "fileCount": 2,
       "todos": 0,
@@ -113617,7 +113679,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 807,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -113646,7 +113708,7 @@
       "db": 2,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 4,
       "lines": 2781,
       "ssrUnsafe": 7,
       "sv4Legacy": 0,
@@ -113770,7 +113832,8 @@
       "tagList": [
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "fileCount": 4,
       "todos": 0,
@@ -113779,7 +113842,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 695,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -113824,7 +113887,8 @@
         "lib",
         "server",
         "ssr-unsafe",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "fileCount": 8,
       "todos": 0,
@@ -113833,7 +113897,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 1052,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -113878,8 +113942,8 @@
         "lib",
         "server",
         "test",
-        "db-schema",
-        "ssr-unsafe"
+        "zod",
+        "db-schema"
       ],
       "fileCount": 14,
       "todos": 0,
@@ -113888,7 +113952,7 @@
       "db": 2,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 1216,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -113985,7 +114049,8 @@
         "lib",
         "server",
         "db-schema",
-        "ssr-unsafe"
+        "ssr-unsafe",
+        "zod"
       ],
       "fileCount": 6,
       "todos": 0,
@@ -113994,7 +114059,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 1643,
       "ssrUnsafe": 3,
       "sv4Legacy": 0,
@@ -114272,6 +114337,7 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe",
         "db-schema"
       ],
@@ -114282,7 +114348,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 1380,
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
@@ -114299,7 +114365,8 @@
       "tagList": [
         "src",
         "lib",
-        "server"
+        "server",
+        "zod"
       ],
       "fileCount": 1,
       "todos": 0,
@@ -114308,7 +114375,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 241,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -114513,7 +114580,8 @@
       "tagList": [
         "src",
         "lib",
-        "shared"
+        "shared",
+        "zod"
       ],
       "fileCount": 3,
       "todos": 0,
@@ -114522,7 +114590,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 284,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -114593,6 +114661,7 @@
         "lib",
         "shims",
         "db-schema",
+        "zod",
         "ssr-unsafe"
       ],
       "fileCount": 11,
@@ -114602,7 +114671,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 1235,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -114657,7 +114726,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 1,
+      "zod": 3,
       "lines": 7019,
       "ssrUnsafe": 10,
       "sv4Legacy": 0,
@@ -114829,7 +114898,7 @@
       "db": 9,
       "apis": 0,
       "auth": 37,
-      "zod": 4,
+      "zod": 10,
       "lines": 10448,
       "ssrUnsafe": 8,
       "sv4Legacy": 0,
@@ -114945,7 +115014,7 @@
       "db": 0,
       "apis": 0,
       "auth": 1,
-      "zod": 0,
+      "zod": 1,
       "lines": 1995,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -115204,7 +115273,7 @@
       "db": 0,
       "apis": 0,
       "auth": 1,
-      "zod": 0,
+      "zod": 1,
       "lines": 838,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -115233,7 +115302,7 @@
       "db": 1,
       "apis": 0,
       "auth": 3,
-      "zod": 0,
+      "zod": 1,
       "lines": 1045,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
@@ -115281,7 +115350,8 @@
         "routes",
         "(dev)",
         "route",
-        "component"
+        "component",
+        "zod"
       ],
       "fileCount": 3,
       "todos": 0,
@@ -115290,7 +115360,7 @@
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 538,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -115617,35 +115687,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/codeintel",
-      "score": 90,
-      "summary": "route handler directory with 9 files, 9 API handlers, 7 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 9,
-      "todos": 0,
-      "routes": 9,
-      "components": 0,
-      "db": 7,
-      "apis": 9,
-      "auth": 9,
-      "zod": 3,
-      "lines": 1035,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 9,
-      "localhostRefs": 0,
-      "tryCatch": 7,
-      "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/contextual",
       "score": 90,
       "summary": "route handler directory with 4 files, 4 API handlers, 1 Drizzle refs, 2 SSR-unsafe",
@@ -115701,6 +115742,35 @@
       "localhostRefs": 0,
       "tryCatch": 1,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/error-brain",
+      "score": 90,
+      "summary": "route handler directory with 11 files, 11 API handlers, 9 Drizzle refs, 2 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema"
+      ],
+      "fileCount": 11,
+      "todos": 0,
+      "routes": 11,
+      "components": 0,
+      "db": 9,
+      "apis": 11,
+      "auth": 11,
+      "zod": 11,
+      "lines": 2490,
+      "ssrUnsafe": 2,
+      "sv4Legacy": 0,
+      "noTest": 10,
+      "localhostRefs": 0,
+      "tryCatch": 11,
+      "dynImports": 1,
       "fanInTotal": 0
     },
     {
@@ -116081,6 +116151,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/recommendations",
+      "score": 90,
+      "summary": "route handler directory with 5 files, 5 API handlers, 3 Drizzle refs, 3 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema"
+      ],
+      "fileCount": 5,
+      "todos": 0,
+      "routes": 5,
+      "components": 0,
+      "db": 3,
+      "apis": 5,
+      "auth": 5,
+      "zod": 5,
+      "lines": 1178,
+      "ssrUnsafe": 3,
+      "sv4Legacy": 0,
+      "noTest": 5,
+      "localhostRefs": 0,
+      "tryCatch": 5,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/research",
       "score": 90,
       "summary": "route handler directory with 4 files, 4 API handlers",
@@ -116110,6 +116209,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/route-operations",
+      "score": 90,
+      "summary": "route handler directory with 1 files, 1 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 1,
+      "components": 0,
+      "db": 0,
+      "apis": 1,
+      "auth": 1,
+      "zod": 1,
+      "lines": 49,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 1,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/search",
       "score": 90,
       "summary": "route handler directory with 6 files, 6 API handlers, 6 Drizzle refs, 2 SSR-unsafe",
@@ -116136,6 +116264,64 @@
       "localhostRefs": 0,
       "tryCatch": 6,
       "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/sse",
+      "score": 90,
+      "summary": "route handler directory with 2 files, 2 API handlers, 1 Drizzle refs, 1 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema"
+      ],
+      "fileCount": 2,
+      "todos": 0,
+      "routes": 2,
+      "components": 0,
+      "db": 1,
+      "apis": 2,
+      "auth": 2,
+      "zod": 2,
+      "lines": 2744,
+      "ssrUnsafe": 1,
+      "sv4Legacy": 0,
+      "noTest": 2,
+      "localhostRefs": 0,
+      "tryCatch": 2,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/statutes",
+      "score": 90,
+      "summary": "route handler directory with 4 files, 4 API handlers, 3 Drizzle refs, 1 SSR-unsafe",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema"
+      ],
+      "fileCount": 4,
+      "todos": 0,
+      "routes": 4,
+      "components": 0,
+      "db": 3,
+      "apis": 4,
+      "auth": 4,
+      "zod": 4,
+      "lines": 585,
+      "ssrUnsafe": 1,
+      "sv4Legacy": 0,
+      "noTest": 3,
+      "localhostRefs": 0,
+      "tryCatch": 4,
+      "dynImports": 0,
       "fanInTotal": 0
     },
     {
@@ -116284,6 +116470,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/video",
+      "score": 90,
+      "summary": "route handler directory with 1 files, 1 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 1,
+      "components": 0,
+      "db": 0,
+      "apis": 1,
+      "auth": 1,
+      "zod": 1,
+      "lines": 105,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 1,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/vision",
       "score": 90,
       "summary": "route handler directory with 1 files, 1 API handlers",
@@ -116397,6 +116612,35 @@
       "localhostRefs": 0,
       "tryCatch": 1,
       "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/workflow-events",
+      "score": 90,
+      "summary": "route handler directory with 1 files, 1 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 1,
+      "components": 0,
+      "db": 0,
+      "apis": 1,
+      "auth": 1,
+      "zod": 1,
+      "lines": 133,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 1,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 0,
       "fanInTotal": 0
     },
     {
@@ -116532,6 +116776,35 @@
       "localhostRefs": 0,
       "tryCatch": 0,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/codeintel",
+      "score": 92,
+      "summary": "route handler directory with 9 files, 9 API handlers, 7 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 9,
+      "todos": 0,
+      "routes": 9,
+      "components": 0,
+      "db": 7,
+      "apis": 9,
+      "auth": 9,
+      "zod": 4,
+      "lines": 1042,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 9,
+      "localhostRefs": 0,
+      "tryCatch": 7,
+      "dynImports": 2,
       "fanInTotal": 0
     },
     {
@@ -116680,35 +116953,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/simulation",
-      "score": 96,
-      "summary": "route handler directory with 4 files, 4 API handlers, 2 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "db-schema"
-      ],
-      "fileCount": 4,
-      "todos": 0,
-      "routes": 4,
-      "components": 0,
-      "db": 2,
-      "apis": 4,
-      "auth": 4,
-      "zod": 3,
-      "lines": 1098,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 4,
-      "localhostRefs": 0,
-      "tryCatch": 4,
-      "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/yorha",
       "score": 96,
       "summary": "route handler directory with 4 files, 4 API handlers, 3 Drizzle refs",
@@ -116804,8 +117048,8 @@
         "lib",
         "ai",
         "ssr-unsafe",
-        "has-todo",
-        "ambient-events.d.ts"
+        "zod",
+        "has-todo"
       ],
       "fileCount": 11,
       "todos": 9,
@@ -116814,13 +117058,13 @@
       "db": 160,
       "apis": 3,
       "auth": 10,
-      "zod": 36,
-      "lines": 353959,
+      "zod": 210,
+      "lines": 354352,
       "ssrUnsafe": 361,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 74,
-      "tryCatch": 649,
+      "tryCatch": 650,
       "dynImports": 132,
       "fanInTotal": 0
     },
@@ -116859,9 +117103,9 @@
         "src",
         "lib",
         "server",
+        "zod",
         "ssr-unsafe",
-        "db-schema",
-        "zod"
+        "db-schema"
       ],
       "fileCount": 57,
       "todos": 0,
@@ -116870,13 +117114,13 @@
       "db": 142,
       "apis": 3,
       "auth": 7,
-      "zod": 24,
-      "lines": 129909,
+      "zod": 125,
+      "lines": 130302,
       "ssrUnsafe": 139,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 46,
-      "tryCatch": 316,
+      "tryCatch": 317,
       "dynImports": 101,
       "fanInTotal": 0
     },
@@ -116888,7 +117132,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "fileCount": 1,
       "todos": 0,
@@ -116897,7 +117142,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 638,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -116970,7 +117215,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "fileCount": 1,
       "todos": 0,
@@ -116979,7 +117225,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 498,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -117024,7 +117270,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "fileCount": 11,
       "todos": 0,
@@ -117033,7 +117280,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 2,
       "lines": 1156,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -117044,6 +117291,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/server/indexer",
+      "score": 100,
+      "summary": "server module directory with 11 files, 1 API handlers, 4 Drizzle refs, 5 SSR-unsafe",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "api-handler",
+        "db-schema",
+        "ssr-unsafe"
+      ],
+      "fileCount": 11,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 4,
+      "apis": 1,
+      "auth": 0,
+      "zod": 4,
+      "lines": 5209,
+      "ssrUnsafe": 5,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 1,
+      "tryCatch": 8,
+      "dynImports": 6,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/server/reports",
       "score": 100,
       "summary": "server module directory with 1 files, 0 API handlers, 1 Drizzle refs",
@@ -117051,7 +117327,8 @@
         "src",
         "lib",
         "server",
-        "db-schema"
+        "db-schema",
+        "zod"
       ],
       "fileCount": 1,
       "todos": 0,
@@ -117060,7 +117337,7 @@
       "db": 1,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 112,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -117089,7 +117366,7 @@
       "db": 29,
       "apis": 4,
       "auth": 416,
-      "zod": 10,
+      "zod": 39,
       "lines": 109217,
       "ssrUnsafe": 69,
       "sv4Legacy": 0,
@@ -117118,7 +117395,7 @@
       "db": 1,
       "apis": 0,
       "auth": 1,
-      "zod": 0,
+      "zod": 1,
       "lines": 613,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -117176,7 +117453,7 @@
       "db": 3,
       "apis": 3,
       "auth": 72,
-      "zod": 0,
+      "zod": 11,
       "lines": 25781,
       "ssrUnsafe": 9,
       "sv4Legacy": 0,
@@ -117205,7 +117482,7 @@
       "db": 3,
       "apis": 1,
       "auth": 16,
-      "zod": 3,
+      "zod": 4,
       "lines": 3813,
       "ssrUnsafe": 4,
       "sv4Legacy": 0,
@@ -117477,6 +117754,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/generate-cluster-summaries",
+      "score": 100,
+      "summary": "route handler directory with 1 files, 1 API handlers, 1 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 1,
+      "components": 0,
+      "db": 1,
+      "apis": 1,
+      "auth": 1,
+      "zod": 1,
+      "lines": 379,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 1,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/glossary",
       "score": 100,
       "summary": "route handler directory with 3 files, 3 API handlers, 2 Drizzle refs",
@@ -117680,6 +117986,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/simulation",
+      "score": 100,
+      "summary": "route handler directory with 4 files, 4 API handlers, 2 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema"
+      ],
+      "fileCount": 4,
+      "todos": 0,
+      "routes": 4,
+      "components": 0,
+      "db": 2,
+      "apis": 4,
+      "auth": 4,
+      "zod": 4,
+      "lines": 1098,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 4,
+      "localhostRefs": 0,
+      "tryCatch": 4,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/tasks",
       "score": 100,
       "summary": "route handler directory with 2 files, 2 API handlers, 2 Drizzle refs",
@@ -117756,7 +118091,7 @@
       "db": 2,
       "apis": 0,
       "auth": 0,
-      "zod": 0,
+      "zod": 1,
       "lines": 889,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
@@ -117945,55 +118280,55 @@
     ],
     "zod": [
       "src/global.d.ts",
+      "src/lib/ai/client-quality.ts",
+      "src/lib/cache/loki-cache.svelte.ts",
+      "src/lib/client/search-client.ts",
+      "src/lib/client/streaming-handler.ts",
+      "src/lib/client/subscribeEmbedding.svelte.ts",
+      "src/lib/client/workflow-event-stream.ts",
+      "src/lib/components/admin/EvidenceDrawer.svelte",
+      "src/lib/components/admin/PipelineProgress.svelte",
+      "src/lib/components/ai/AskAI.svelte",
+      "src/lib/components/ai/EnhancedAIChatTest.svelte",
+      "src/lib/components/ai/EnhancedDocumentUploader.svelte",
+      "src/lib/components/ai/EnhancedFileUpload.svelte",
+      "src/lib/components/ai/EnhancedInlineEditor.svelte",
+      "src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte",
+      "src/lib/components/ai/GPUAIAssistant.svelte",
+      "src/lib/components/ai/LegalDocumentDrafting.svelte",
+      "src/lib/components/ai/RecommendationEngine.svelte",
+      "src/lib/components/ai/VectorIntelligenceDemo.svelte",
+      "src/lib/components/ai/YorhaAIAssistant.svelte",
+      "src/lib/components/analysis/AnalysisPanel.svelte",
+      "src/lib/components/analytics/LiveResearchPanel.svelte",
+      "src/lib/components/APITesterModal.svelte",
+      "src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte",
+      "src/lib/components/canvas/HybridBoard.svelte",
+      "src/lib/components/CanvasEditor.svelte",
+      "src/lib/components/cases/StreamingAnalysisPanel.svelte",
+      "src/lib/components/chat/AudioUploadWidget.svelte",
+      "src/lib/components/detective/ContextualDetectiveBoard.svelte",
+      "src/lib/components/detective/DetectiveBoard.svelte",
+      "src/lib/components/ErrorStreamMonitor.svelte",
+      "src/lib/components/evidence/DraggableEvidenceNode.svelte",
+      "src/lib/components/evidence/EvidenceCanvas.svelte",
+      "src/lib/components/evidence/EvidenceRecall.svelte",
+      "src/lib/components/evidence/EvidenceUploadProgress.svelte",
+      "src/lib/components/evidence/EvidenceViewModal.svelte",
+      "src/lib/components/EvidenceCard.svelte",
       "src/lib/components/forms/CaseForm.svelte",
+      "src/lib/components/forms/SmartDocumentForm.svelte",
+      "src/lib/components/legal/CollaborationPanel.svelte",
+      "src/lib/components/legal/EvidenceCustodyFlow.svelte",
+      "src/lib/components/legal/IngestionProgress.svelte",
+      "src/lib/components/legal/StatuteActionPanel.svelte",
+      "src/lib/components/legal/WorkspacePanel.svelte",
+      "src/lib/components/Phase72ErrorBrain.svelte",
       "src/lib/components/poi/POIForm.svelte",
-      "src/lib/config/env.server.ts",
-      "src/lib/db/schema.ts",
-      "src/lib/env.server.ts",
-      "src/lib/schemas/auth.ts",
-      "src/lib/schemas/board.ts",
-      "src/lib/schemas/evidence-upload.ts",
-      "src/lib/schemas/evidence.ts",
-      "src/lib/schemas/forms.ts",
-      "src/lib/schemas.ts",
-      "src/lib/server/ace/self-prompt.ts",
-      "src/lib/server/agent/autonomous-agent.ts",
-      "src/lib/server/agent/tools/analyze-file.ts",
-      "src/lib/server/agent/tools/analyze-imports.ts",
-      "src/lib/server/agent/tools/extract-pattern.ts",
-      "src/lib/server/agent/tools/find-files.ts",
-      "src/lib/server/agent/tools/ripgrep-search.ts",
-      "src/lib/server/agent/tools/web-search-searxng.ts",
-      "src/lib/server/agent/tools/web-search.ts",
-      "src/lib/server/ai/contextual-tools.ts",
-      "src/lib/server/ai/lang-extract.ts",
-      "src/lib/server/ai/langgraph-research.ts",
-      "src/lib/server/analysis/entity-extraction.ts",
-      "src/lib/server/audit/gemma-tool-router.ts",
-      "src/lib/server/concurrency/queue-manager.ts",
-      "src/lib/server/db/jsonb-legal-schema.ts",
-      "src/lib/server/middleware/validate-and-rate.ts",
-      "src/lib/server/nlp/analyzer.ts",
-      "src/lib/server/queue/rabbitmq-client.ts",
-      "src/lib/server/simulation/grpo-strategy.ts",
-      "src/lib/server/tools/registry.ts",
-      "src/lib/server/utils/vector-schemas.ts",
-      "src/lib/server/validation/query-params.ts",
-      "src/lib/server/z-schemas.ts",
-      "src/lib/types/protocol.ts",
-      "src/mcp/tools/video-analysis.ts",
-      "src/routes/(app)/analysis-center/+page.server.ts",
-      "src/routes/(app)/analysis-center/schema.ts",
-      "src/routes/(app)/cases/+page.server.ts",
-      "src/routes/(app)/cases/new/+page.server.ts",
-      "src/routes/(app)/cases/new/schema.ts",
-      "src/routes/(app)/cases/schema.ts",
-      "src/routes/(app)/evidence/+page.server.ts",
-      "src/routes/(app)/evidence/schema.ts",
-      "src/routes/(app)/evidence/upload/+page.server.ts",
-      "src/routes/(app)/persons-of-interest/create/+page.server.ts",
-      "src/routes/api/ace/agent/+server.ts",
-      "src/routes/api/ace/context/+server.ts"
+      "src/lib/components/SearchBox.svelte",
+      "src/lib/components/ui/RichTextEditor.svelte",
+      "src/lib/components/yorha/EnhancedYoRHaAIAssistant.svelte",
+      "src/lib/components/yorha/PhoenixEventMonitor.svelte"
     ],
     "hooks.client.ts": [
       "src/hooks.client.ts"
@@ -119302,8 +119637,8 @@
     "gateStats": {
       "routesWithAuth": 619,
       "routesWithoutAuth": 45,
-      "routesWithZod": 425,
-      "routesWithoutZod": 160,
+      "routesWithZod": 461,
+      "routesWithoutZod": 131,
       "filesWithLocalhost": 95,
       "sv4PropsCount": 0,
       "sv4ReactiveCount": 0,
@@ -119413,7 +119748,7 @@
       },
       {
         "mod": "$lib/server/redis.js",
-        "n": 176
+        "n": 177
       },
       {
         "mod": "$lib/server/ollama.js",
