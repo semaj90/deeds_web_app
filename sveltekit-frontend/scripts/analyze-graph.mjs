@@ -108,12 +108,13 @@ console.log();
 // Re-derive which specific files trigger which gate by walking files[] and
 // applying the same heuristics. Gives us actionable lists.
 
-const unguarded   = []; // API route handlers without auth (+server.ts only)
-const noTest      = []; // API route handlers without paired test
-const ssrUnsafe   = []; // components with browser globals
-const localhost   = []; // files with localhostRefs[]
-const runeInTs    = []; // .ts files (not .svelte.ts) using runes
-const sv4Legacy   = []; // files still using Svelte 4 patterns
+const unguarded         = []; // API route handlers without auth (+server.ts only)
+const noTest            = []; // API route handlers without paired test
+const ssrUnsafe         = []; // components with browser globals
+const localhost         = []; // ALL files with localhostRefs[]
+const localhostBreaks   = []; // ONLY server-side files (production-breaking)
+const runeInTs          = []; // .ts files (not .svelte.ts) using runes
+const sv4Legacy         = []; // files still using Svelte 4 patterns
 
 const isApiRoute = (f) => f.isRoute && (f.rel.endsWith('+server.ts') || f.rel.endsWith('+server.js'));
 
@@ -122,6 +123,7 @@ for (const f of files) {
   if (isApiRoute(f) && f.hasPairedTest === false) noTest.push(f);
   if (f.ssrUnsafe) ssrUnsafe.push(f);
   if (Array.isArray(f.localhostRefs) ? f.localhostRefs.length > 0 : f.localhostRefs) localhost.push(f);
+  if (f.localhostBreaks) localhostBreaks.push(f);
   if (f.sv4Legacy) sv4Legacy.push(f);
   if (f.runeInTs) runeInTs.push(f);
 }
@@ -281,18 +283,36 @@ if (ssrUnsafe.length === 0) {
 }
 push('');
 
-// 4. Localhost
-push(`## 4. Hardcoded localhost references (${localhost.length})`);
+// 4. Localhost (split: production-breaking server-side vs cosmetic client-side)
+push(`## 4. Hardcoded localhost (${localhost.length} total — ${localhostBreaks.length} server-side production-breaking)`);
 push('');
 if (localhost.length === 0) {
   push('_None._');
+} else if (localhostBreaks.length === 0) {
+  push(`All ${localhost.length} hits are client-side fallback constants — safe in dev, no production impact (Vite substitutes at build time).`);
 } else {
-  push('| File |');
-  push('|------|');
-  for (const f of localhost.slice(0, TOP)) push(`| \`${f.rel}\` |`);
-  if (localhost.length > TOP) push(`\n_…${localhost.length - TOP} more_`);
+  push(`### 4a. Server-side (real bugs — fix these first)`);
   push('');
-  push('**Action:** route through `ENV.*` getters in `lib/server/env.server.ts`. Hardcoded URLs break Docker/prod deploys.');
+  push('These run inside Node.js process at request time and **will break in Docker/prod** when `localhost` resolves to the wrong network namespace.');
+  push('');
+  push('| File | First ref |');
+  push('|------|-----------|');
+  for (const f of localhostBreaks.slice(0, TOP)) {
+    const ref = Array.isArray(f.localhostRefs) ? f.localhostRefs[0] : '?';
+    push(`| \`${f.rel}\` | \`${ref}\` |`);
+  }
+  if (localhostBreaks.length > TOP) push(`\n_…${localhostBreaks.length - TOP} more_`);
+  push('');
+  push('**Action:** import from `$lib/server/env.server.js` and use `ENV.OLLAMA_URL`, `ENV.QDRANT_URL`, etc. The DEV fallback there already points to `http://localhost:PORT` so behaviour is identical in dev but production env vars take effect.');
+  push('');
+
+  const clientSide = localhost.filter(f => !localhostBreaks.includes(f));
+  if (clientSide.length > 0) {
+    push(`### 4b. Client-side (cosmetic — Vite handles in prod)`);
+    push('');
+    push(`${clientSide.length} client-side hits in \`src/lib/components/\`, \`src/lib/ai/\`, etc. These run in the browser; \`localhost\` resolves to the user's machine. Use \`PUBLIC_*\` env vars from \`$env/static/public\` if you need build-time substitution.`);
+    push('');
+  }
 }
 push('');
 

@@ -122,7 +122,7 @@ const RE_REEXPORT    = /export\s+(?:\*|\{[^}]*\})\s+from\s+['"]([^'"]+)['"]/g;
 // "Auth" here is broader than locals.user — it includes any access gate that
 // blocks the handler from running in production. `if (!dev) return 403` is a
 // valid gate (route is dev-only, returns 403 in prod) so we accept it.
-const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{|if\s*\(\s*!\s*dev\s*\)/;
+const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{|if\s*\(\s*!\s*dev\s*\)|process\.env\.\w*AUTH_TOKEN|MCP_AUTH_TOKEN/;
 function isLayoutGuarded(rel) {
   // Routes under (app)/ are protected by +layout.server.ts auth redirect
   return rel.includes('/routes/(app)/') || rel.includes('/routes/(admin)/');
@@ -210,7 +210,30 @@ function extractMeta(filePath, src) {
     ? [...new Set([...src.matchAll(RE_COMPONENT)].map(m => m[1]))]
     : [];
   // G11 — hardcoded localhost
-  const localhostRefs = [...src.matchAll(RE_LOCALHOST)].map(m => m[1]);
+  // G11 — hardcoded localhost detection.
+  // Exclude legitimate uses:
+  //   - env.server.ts (canonical fallback definitions)
+  //   - *.test.ts / *.spec.ts (tests legitimately point to local services)
+  //   - lines containing `DEV.` or `DEV =` (env-default const blocks)
+  // Client-side localhost is reported separately (cosmetic) so server-side
+  // hits stand out as real production-breaking bugs.
+  const isEnvServer  = rel.endsWith('src/lib/server/env.server.ts') || rel.endsWith('/env.server.ts');
+  const isTestFile   = /\.(test|spec)\.[mc]?[jt]s$/.test(rel);
+  const isServerSide = rel.startsWith('src/lib/server/') || rel.includes('/+server.') || rel.includes('/+page.server.') || rel.includes('/+layout.server.') || rel.includes('/hooks.server.');
+  const localhostRefs = (isEnvServer || isTestFile)
+    ? []
+    : [...src.matchAll(RE_LOCALHOST)]
+        .filter(m => {
+          // Skip lines that look like env-default fallbacks: DEV.X = '...', or
+          // a declaration immediately preceded by '= ' inside a const block.
+          const lineStart = src.lastIndexOf('\n', m.index) + 1;
+          const lineEnd   = src.indexOf('\n', m.index);
+          const line      = src.slice(lineStart, lineEnd === -1 ? src.length : lineEnd);
+          return !/\bDEV\s*[.=]|FALLBACK|DEFAULT_\w*_URL\s*=/.test(line);
+        })
+        .map(m => m[1]);
+  // Per-file flag: is this a real production-breaking hit?
+  const localhostBreaks = isServerSide && localhostRefs.length > 0;
   const hasRawPort    = RE_RAW_PORT.test(src) && !rel.includes('env.server');
   // G12 — type-only imports
   const typeImportCount = (src.match(RE_TYPE_IMPORT) ?? []).length;
@@ -283,7 +306,7 @@ function extractMeta(filePath, src) {
     // G4-G8
     hasAuth, hasZod, parsesBody, routeHandlers, drizzleRefs, todos,
     // G9-G12
-    lineCount, components, localhostRefs, hasRawPort, typeImportCount,
+    lineCount, components, localhostRefs, localhostBreaks, hasRawPort, typeImportCount,
     // G13 (cross-ref later)
     exportedNames,
     // G14
@@ -311,7 +334,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v9'; // bumped 2026-05-04 — G14e strips comments/strings before rune detection
+const META_CACHE_VERSION = 'v11'; // bumped 2026-05-04 — G11 splits server-side localhost (production-breaking) from client-side (cosmetic), excludes env.server.ts/test files/DEV-fallback lines
 
 for (const filePath of walk(scanRoot)) {
   let src;
@@ -586,7 +609,8 @@ const gateStats = {
   // Only flag routes that actually parse a body — pure GET handlers don't need body validation
   routesWithoutZod:   files.filter(f => f.isServerRoute && !f.hasZod && f.routeHandlers.length && f.parsesBody).length,
   // G11
-  filesWithLocalhost: files.filter(f => f.localhostRefs.length && !f.rel.includes('env.server')).length,
+  filesWithLocalhost:       files.filter(f => f.localhostRefs.length && !f.rel.includes('env.server')).length,
+  filesWithLocalhostBreaks: files.filter(f => f.localhostBreaks).length,
   // G14
   sv4PropsCount:      files.filter(f => f.sv4Props).length,
   sv4ReactiveCount:   files.filter(f => f.sv4Reactive).length,
@@ -637,6 +661,7 @@ const graphJson = {
     hasPairedTest: f.hasPairedTest, fanIn: f.fanIn ?? 0,
     routeParams: f.routeParams, routeDepth: f.routeDepth,
     localhostRefs: f.localhostRefs,
+    localhostBreaks: f.localhostBreaks ?? false,
   })),
   directories: dirRows,
   tags: tagMap,
