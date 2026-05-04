@@ -621,6 +621,7 @@ const graphJson = {
     isRoute: f.isRoute, isSvelteComp: f.isSvelteComp, lineCount: f.lineCount,
     hasAuth: f.hasAuth, hasZod: f.hasZod, ssrUnsafe: f.ssrUnsafe,
     sv4Legacy: f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch,
+    runeInTs: f.runeInTs ?? false,
     hasPairedTest: f.hasPairedTest, fanIn: f.fanIn ?? 0,
     routeParams: f.routeParams, routeDepth: f.routeDepth,
     localhostRefs: f.localhostRefs,
