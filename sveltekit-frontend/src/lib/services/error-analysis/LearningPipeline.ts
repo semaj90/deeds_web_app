@@ -15,7 +15,7 @@ import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getPatternStorage } from './PatternStorage.js';
 import { getErrorClustering } from './ErrorClustering.js';
-import type { PolicyState, Experience } from './types.js';
+import type { PolicyState } from './types.js';
 
 export interface LearningPipelineConfig {
 	updateIntervalMs: number;
@@ -231,7 +231,6 @@ export class LearningPipeline {
 	 */
 	private async updateClusters(): Promise<void> {
 		const recorder = getExperienceRecorder();
-		const clustering = getErrorClustering();
 
 		// Get recent experiences
 		const groups = recorder.getAllGroups();
@@ -243,11 +242,39 @@ export class LearningPipeline {
 	}
 
 	/**
-	 * Update patterns from clusters
+	 * Update patterns from clusters — maps each ErrorGroup → ErrorPattern and persists.
 	 */
 	private async updatePatterns(): Promise<void> {
-		// TODO: Implement when ErrorClustering exposes getClusters/clusterToPattern
-		return;
+		const clustering = getErrorClustering();
+		const storage = getPatternStorage();
+		const clusters = clustering.getClusters();
+
+		for (const group of clusters) {
+			const existing = await storage.getPattern(group.id);
+			const now = new Date();
+			const pattern = {
+				id: group.id,
+				pattern: group.commonPattern,
+				embedding: group.centroid,
+				errorType: 'runtime' as const,
+				fixStrategies: existing?.fixStrategies ?? [],
+				clusterMetadata: {
+					clusterId: group.id,
+					centroid: group.centroid,
+					size: group.members.length,
+					commonFeatures: [group.commonPattern],
+				},
+				successRate: existing?.successRate ?? 0,
+				occurrences: group.members.length,
+				lastSeen: now,
+				createdAt: existing?.createdAt ?? now,
+			};
+			await storage.storePattern(pattern);
+		}
+
+		if (clusters.length > 0) {
+			this.stats.clustersUpdated += clusters.length;
+		}
 	}
 
 	/**

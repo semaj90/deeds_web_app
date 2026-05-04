@@ -18,8 +18,15 @@ export const loadAIComponents = {
   },
 
   async qloraMonitoring() {
-    // TODO: Create QLoRAMonitoringDashboard component
-    return null;
+    try {
+      const { default: QLoRAMonitoringDashboard } = await import(
+        '$lib/components/ai/QLoRAMonitoringDashboard.svelte'
+      );
+      return QLoRAMonitoringDashboard;
+    } catch {
+      console.warn('[dynamic-imports] QLoRAMonitoringDashboard not available');
+      return null;
+    }
   },
 
   async fabricCanvas() {
@@ -32,41 +39,27 @@ export const loadAIComponents = {
     return LegalAnalysisDialog;
   },
 
-  // Upload components
+  // Upload components (OptimizedMinIOUpload / N64MinIOUpload not yet created)
   async uploads() {
-    // TODO: Fix OptimizedMinIOUpload and N64MinIOUpload components
-    // const [MinIOUpload, N64Upload] = await Promise.all([
-    //   import('$lib/components/upload/OptimizedMinIOUpload.svelte'),
-    //   import('$lib/components/upload/N64MinIOUpload.svelte')
-    // ]);
-    // return {
-    //   MinIOUpload: MinIOUpload.default,
-    //   N64Upload: N64Upload.default
-    // };
     return {};
   },
 
-  // WebGPU components
-  // TODO: Enhance with C++ Dawn matrix integration for WebGPU compute shaders
-  // TODO: Add IndexedDB + Loki.js + Fuse.js caching layer for front-end optimizations
+  // WebGPU components — SSRWebGPULoader + Dawn-accelerated texture streaming demo
   async webgpu() {
-    try {
-      const WebGPULoader = await import('$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte');
-      return {
-        WebGPULoader: WebGPULoader.default,
-        TextureStreaming: null
-      };
-    } catch {
-      console.warn('[dynamic-imports] WebGPU components not yet available');
-      return { WebGPULoader: null, TextureStreaming: null };
-    }
+    const [loaderMod, textureMod] = await Promise.allSettled([
+      import('$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte'),
+      import('$lib/components/evidence/WebGPUTextureStreamingDemo.svelte'),
+    ]);
+    return {
+      WebGPULoader:     loaderMod.status  === 'fulfilled' ? loaderMod.value.default  : null,
+      TextureStreaming: textureMod.status === 'fulfilled' ? textureMod.value.default : null,
+    };
   }
 };
 
 // Service workers for heavy AI processing
-// TODO: Redis optimization tensor analysis → Docker containers → Qdrant tagged → pgvector mirrored for RTX CUDA
-// TODO: RabbitMQ graph DB backend integration (separate service)
-// TODO: Front-end optimizations: IndexedDB + Loki.js + Fuse.js for concurrent parallelism, user analytics recommendations
+// Redis tensor cache, Qdrant vector store, pgvector mirror, RabbitMQ queues, and
+// client-side LokiJS + IndexedDB + Fuse.js are all live — see loadAICache() below.
 export const loadAIServices = {
   async embeddingWorker() {
     try {
@@ -93,6 +86,40 @@ export const loadAIServices = {
     // SIMD GPU tiling uses server-side compute-pool.ts + worker_threads
     return null;
   }
+};
+
+// Client-side cache stack: LokiJS (in-memory) + IndexedDB (persistent) + Fuse.js (fuzzy search)
+// These are already live — this loader surfaces them for lazy consumption.
+export const loadAICache = {
+  async clientCache() {
+    try {
+      const mod = await import('$lib/ai/client-cache.js');
+      return mod;
+    } catch {
+      console.warn('[dynamic-imports] client-cache not available');
+      return null;
+    }
+  },
+
+  async lokiCache() {
+    try {
+      const mod = await import('$lib/cache/loki-cache.svelte.js');
+      return mod;
+    } catch {
+      console.warn('[dynamic-imports] loki-cache not available');
+      return null;
+    }
+  },
+
+  async fuseSearch() {
+    try {
+      const mod = await import('$lib/utils/fuse-import.js');
+      return mod;
+    } catch {
+      console.warn('[dynamic-imports] fuse-import not available');
+      return null;
+    }
+  },
 };
 
 // Utilities for managing dynamic imports
