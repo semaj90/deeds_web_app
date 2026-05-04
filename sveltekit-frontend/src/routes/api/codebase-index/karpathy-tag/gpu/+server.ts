@@ -21,7 +21,17 @@
  * Cost: ZERO (local GPU/CPU cosine similarity, no LLM inference)
  */
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+
+const gpuTagSchema = z.object({
+	batchSize: z.number().int().min(10).max(500).default(100),
+	threshold: z.number().min(0.1).max(0.9).default(0.35),
+	maxTags: z.number().int().min(1).max(10).default(4),
+	dryRun: z.boolean().default(false),
+	forceRetag: z.boolean().default(false),
+	limit: z.number().int().min(10).max(10_000).default(2000),
+});
 import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import { isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
 import {
@@ -113,15 +123,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 	}
 
-	let body: Record<string, unknown> = {};
-	try { body = await request.json(); } catch { /* defaults */ }
+	const parsed = gpuTagSchema.safeParse(await request.json().catch(() => ({})));
+	const body = parsed.success ? parsed.data : gpuTagSchema.parse({});
 
-	const batchSize  = Math.min(Math.max(Number(body.batchSize ?? 100), 10), 500);
-	const threshold  = Math.min(Math.max(Number(body.threshold ?? 0.35), 0.1), 0.9);
-	const maxTags    = Math.min(Math.max(Number(body.maxTags ?? 4), 1), 10);
-	const dryRun     = body.dryRun === true;
-	const forceRetag = body.forceRetag === true;
-	const maxTotal   = Math.min(Math.max(Number(body.limit ?? 2000), 10), 10_000);
+	const batchSize  = body.batchSize;
+	const threshold  = body.threshold;
+	const maxTags    = body.maxTags;
+	const dryRun     = body.dryRun;
+	const forceRetag = body.forceRetag;
+	const maxTotal   = body.limit;
 
 	const enc = new TextEncoder();
 

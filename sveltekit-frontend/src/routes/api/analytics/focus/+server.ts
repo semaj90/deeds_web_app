@@ -1,7 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
 import { getFileHealth, triggerProactiveGuarding } from '$lib/server/analytics/architectural-guard.js';
 import { getRedis } from '$lib/server/redis.js';
+
+const focusSchema = z.object({
+	filePath: z.string().min(1).max(500),
+});
 
 /**
  * POST /api/analytics/focus
@@ -12,8 +17,9 @@ import { getRedis } from '$lib/server/redis.js';
  * to the retrieval pipeline.
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
-	const { filePath } = await request.json();
-	if (!filePath) return json({ error: 'filePath is required' }, { status: 400 });
+	const parsed = focusSchema.safeParse(await request.json().catch(() => ({})));
+	if (!parsed.success) return json({ error: 'filePath is required' }, { status: 400 });
+	const { filePath } = parsed.data;
 
 	try {
 		// 1. Evaluate file health
@@ -36,8 +42,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			success: true,
 			health,
 			triggered,
-			message: triggered 
-				? `Proactive guarding started for ${filePath}` 
+			message: triggered
+				? `Proactive guarding started for ${filePath}`
 				: `File ${filePath} is healthy or recently guarded.`
 		});
 	} catch (err) {
