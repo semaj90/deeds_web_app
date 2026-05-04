@@ -8638,6 +8638,61 @@
       "detail": "Same as parallel batch fix, but redirects all output to logs/task-output/agent-batch-fix-latest.log. Terminal shows only the last 40 lines (summary). Plans still written to next_steps/active/. Use this when running large topN to avoid VS Code chat buffer overflow.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
+    },
+
+    {
+      "label": "🗺️ Graphify: Daily Map (fast AST + smoke)",
+      "type": "shell",
+      "command": "npm run graphify:daily",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Layer 1 — fast AST indexer (no GPU, no dev server) + smoke-fast-ast + smoke-kag. Refreshes docs/graph/codebase-graph.json + Redis code:index:* + wiki:note:dir:* in ~3-5s. Run this every morning.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🔎 Graphify: Semantic Index (Qdrant + ACE smoke)",
+      "type": "shell",
+      "command": "npm run graphify:semantic",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Layer 2 — codebase-semantic-indexer (EmbeddingGemma 768-dim → Qdrant codebase_chunks_768) + ACE smoke. Run after big code changes. Requires Qdrant on :6333 and EmbeddingGemma reachable.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🧠 Graphify: Full ACE Index (daily + semantic + hypergraph)",
+      "type": "shell",
+      "command": "npm run graphify:full",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Full pipeline — daily map + Qdrant semantic + hypergraph build (Redis-backed) + ACE full smoke. Takes ~2-5 min. Use before a big agent run or production-readiness audit.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🏭 Graphify: Full GPU + TurboQuant",
+      "type": "shell",
+      "command": "npm run graphify:gpu:turbo",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Layer 3 — start TurboQuant detached + full GPU production-readiness (SOM BMU + hypergraph + PageRank + Neo4j + cluster synthesis + ACE plans). Heavy (~5-10 min, RTX 3060 Ti). Output: next_steps/active/.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🩺 Graphify: Smoke (5-pillar health check)",
+      "type": "shell",
+      "command": "npm run smoke:graphify",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Read-only health check across all 5 Graphify pillars: graph JSON, codebase-map.md, Redis fast cache + KAG notes, Qdrant codebase_chunks_768, ACE FAST_AST_SCORE_CAP. Use --no-redis or --no-qdrant to skip service-dependent pillars.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [
