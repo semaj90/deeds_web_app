@@ -176,7 +176,11 @@ const RE_SVELTE_SCRIPT = /<script[^>]*>/;
 function extractMeta(filePath, src) {
   const rel    = path.relative(ROOT, filePath).replace(/\\/g, '/');
   const ext    = path.extname(filePath);
-  const isTest = rel.includes('/tests/') || rel.includes('.test.') || rel.includes('.spec.');
+  // Accept either '/tests/' (nested) OR 'tests/' / 'test/' / 'e2e/' / 'integration/' / 'playwright/'
+  // at the START of rel (top-level test dirs from EXTRA_INDEX_DIRS), plus the .test. / .spec. filename markers.
+  const isTest = /(?:^|\/)(?:tests?|e2e|integration|playwright)\//.test(rel)
+              || rel.includes('.test.')
+              || rel.includes('.spec.');
   const isRoute = rel.includes('/routes/') && (
     rel.endsWith('+server.ts') || rel.endsWith('+page.server.ts') ||
     rel.endsWith('+page.svelte') || rel.endsWith('+layout.svelte')
@@ -336,7 +340,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v14'; // bumped 2026-05-04 — G16 walks tests/, test/, e2e/, integration/, playwright/ (centralized auto-stubs and hand-written tests now count toward pairing)
+const META_CACHE_VERSION = 'v16'; // bumped 2026-05-04 — G16 also matches dynamic-segment auto-stubs ([id] → __id translation in routePathDyn)
 
 for (const filePath of walk(scanRoot)) {
   let src;
@@ -373,6 +377,47 @@ for (const filePath of walk(scanRoot)) {
   await rset(`code:index:path:${pathHash}`, {
     rel: meta.rel, imports: meta.imports.slice(0, 20), exports: meta.exportedNames.slice(0, 20),
   });
+}
+
+// ── Second pass: index test directories as first-class files ─────────────────
+// Walks tests/ test/ e2e/ integration/ playwright/ at repo-root level so test
+// files become indexed entries (with their own rel, tags, summary, kind).
+// This makes:
+//   - tests/routes/auto/AGENTS.md generation possible
+//   - per-source-file AGENTS.md "tested by" cross-references possible
+//   - test directories visible in codebase-map.md Directory Scorecard
+// Without this, EXTRA_TEST_DIRS are only walked into testRels (line 430+) for
+// pairing detection — useful for G16 metrics, but the files don't show up in
+// the graph anywhere else.
+
+const EXTRA_INDEX_DIRS = ['tests', 'test', 'e2e', 'integration', 'playwright'];
+let extraIndexed = 0;
+for (const dirName of EXTRA_INDEX_DIRS) {
+  const dir = path.resolve(ROOT, dirName);
+  if (!fs.existsSync(dir)) continue;
+  for (const filePath of walk(dir)) {
+    let src;
+    try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
+    const contentHash = createHash('sha1').update(src).digest('hex').slice(0, 16);
+    const cacheKey = `code:index:meta:${META_CACHE_VERSION}:${contentHash}`;
+    let meta = await rget(cacheKey);
+    if (meta && meta.rel) {
+      if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
+      cacheHits++;
+    } else {
+      meta = extractMeta(filePath, src);
+      cacheMisses++;
+      const metaForCache = { ...meta, typeImports: Array.from(meta.typeImports ?? []) };
+      await rset(cacheKey, metaForCache);
+    }
+    files.push(meta);
+    extraIndexed++;
+    if (meta.routeHandlers.length) apiCount++;     // unlikely but possible
+    todoCount += meta.todos.length;
+  }
+}
+if (extraIndexed > 0 && !process.argv.includes('--quiet')) {
+  console.log(`   + ${extraIndexed} test files indexed from ${EXTRA_INDEX_DIRS.join(', ')}`);
 }
 
 // ── Cross-file analysis passes ────────────────────────────────────────────────
@@ -456,11 +501,17 @@ for (const f of files) {
   // For server routes, look for centralized stub at tests/routes/auto/<route-path>.test.ts
   if (!hasPairedTest && f.isServerRoute) {
     // src/routes/api/foo/bar/+server.ts → tests/routes/auto/api/foo/bar.test.ts
-    const routePath = stem.replace(/^src\/routes\//, '');
-    const autoStub = `tests/routes/auto/${routePath}.test.ts`;
-    if (testRels.has(autoStub)) hasPairedTest = true;
-    // Also check tests/routes/<route>.test.ts (non-auto folder)
-    if (!hasPairedTest && testRels.has(`tests/routes/${routePath}.test.ts`)) hasPairedTest = true;
+    // Dynamic segments [id] → __id (the auto-generator can't put `[` in filenames)
+    const routePath    = stem.replace(/^src\/routes\//, '');
+    const routePathDyn = routePath.replace(/\[([^\]]+)\]/g, '__$1');
+    for (const candidate of [
+      `tests/routes/auto/${routePath}.test.ts`,
+      `tests/routes/auto/${routePathDyn}.test.ts`,
+      `tests/routes/${routePath}.test.ts`,
+      `tests/routes/${routePathDyn}.test.ts`,
+    ]) {
+      if (testRels.has(candidate)) { hasPairedTest = true; break; }
+    }
   }
   // Last resort: basename match anywhere (fuzzy)
   if (!hasPairedTest) {
@@ -692,7 +743,7 @@ const graphJson = {
     dynImports: f.dynImports.slice(0, 10), reExports: f.reExports.slice(0, 10),
     routeHandlers: f.routeHandlers, drizzleRefs: f.drizzleRefs,
     todos: f.todos, components: f.components.slice(0, 20),
-    isRoute: f.isRoute, isSvelteComp: f.isSvelteComp, lineCount: f.lineCount,
+    isRoute: f.isRoute, isSvelteComp: f.isSvelteComp, isTest: f.isTest, lineCount: f.lineCount,
     hasAuth: f.hasAuth, hasZod: f.hasZod, ssrUnsafe: f.ssrUnsafe,
     sv4Legacy: f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch,
     runeInTs: f.runeInTs ?? false,
