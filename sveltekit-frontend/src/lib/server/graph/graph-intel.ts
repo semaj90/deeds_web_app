@@ -35,16 +35,19 @@ export interface GraphDir {
   fileCount: number;
   lines:     number;
   apis:      number;
-  authCount: number;
+  auth:      number;        // count of files in dir with auth guard (matches indexer)
   todos:     number;
   tagList:   string[];
   summary:   string;
 }
 
 export interface GraphData {
-  files:     GraphFile[];
-  dirs?:     GraphDir[];
-  metadata:  { createdAt: string; fileCount: number; mode: string };
+  files:        GraphFile[];
+  directories?: GraphDir[];  // matches indexer key
+  dirs?:        GraphDir[];  // legacy alias
+  createdAt?:   string;
+  fileCount?:   number;
+  mode?:        string;
 }
 
 // ── In-process mtime-gated cache ────────────────────────────────────────────
@@ -158,14 +161,14 @@ export async function getAuditHotspots(limit = 10): Promise<AuditHotspot[]> {
 
   const hotspots: AuditHotspot[] = [];
 
-  // Use pre-computed dirs if available
-  const dirs: GraphDir[] = graph.dirs ?? [...dirMap.entries()].map(([dir, { files }]) => ({
+  // Use pre-computed dirs if available (graph indexer writes `directories`, legacy alias `dirs`)
+  const dirs: GraphDir[] = graph.directories ?? graph.dirs ?? [...dirMap.entries()].map(([dir, { files }]) => ({
     dir,
     score:     files.reduce((s, f) => s + (f.auditScore ?? 80), 0) / files.length,
     fileCount: files.length,
     lines:     files.reduce((s, f) => s + (f.lineCount ?? 0), 0),
     apis:      files.filter((f) => f.isRoute).length,
-    authCount: files.filter((f) => f.hasAuth).length,
+    auth:      files.filter((f) => f.hasAuth).length,
     todos:     files.reduce((s, f) => s + f.todos.length, 0),
     tagList:   [...new Set(files.flatMap((f) => f.tags))].slice(0, 6),
     summary:   '',
@@ -173,9 +176,9 @@ export async function getAuditHotspots(limit = 10): Promise<AuditHotspot[]> {
 
   for (const d of dirs) {
     const reason: string[] = [];
-    if (d.score < 60)               reason.push(`low-score(${d.score})`);
-    if (d.todos > 2)                reason.push(`todos(${d.todos})`);
-    if (d.apis > 0 && d.authCount < d.apis) reason.push(`auth-gap(${d.apis - d.authCount}/${d.apis})`);
+    if (d.score < 60)                  reason.push(`low-score(${d.score})`);
+    if (d.todos > 2)                   reason.push(`todos(${d.todos})`);
+    if (d.apis > 0 && d.auth < d.apis) reason.push(`auth-gap(${d.apis - d.auth}/${d.apis})`);
     if (reason.length === 0) continue;
 
     hotspots.push({
@@ -183,7 +186,7 @@ export async function getAuditHotspots(limit = 10): Promise<AuditHotspot[]> {
       score:     d.score,
       reason,
       todos:     d.todos,
-      authGaps:  Math.max(0, d.apis - d.authCount),
+      authGaps:  Math.max(0, d.apis - d.auth),
       fileCount: d.fileCount,
       tags:      d.tagList,
     });

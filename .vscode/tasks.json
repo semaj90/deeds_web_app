@@ -8455,9 +8455,87 @@
       "detail": "Read a sample of Redis wiki notes, extract SOM grid positions (row, col, cluster), then prompt Gemma4 via llama-server to analyse the 4D topology and suggest structural improvements.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
+    },
+
+    {
+      "label": "🤫 Quiet: Dir Audit (lib/server) → log file",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/dir-audit-lib-server-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph *>&1 | Tee-Object -FilePath $log | Select-Object -First 80; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full log: $log\\\" -ForegroundColor Green; $size = (Get-Item $log).Length; Write-Host \\\"Size: $([math]::Round($size/1KB,1)) KB\\\" -ForegroundColor Green\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Run dir audit, write full output to logs/dir-audit-lib-server-<timestamp>.log, show first 80 lines + log path. Prevents VS Code chat session bloat.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🤫 Quiet: Prompt Gemma4 → log file",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/gemma4-prompt-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; $query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Return concise, structured analysis.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $content = $resp.choices[0].message.content; Set-Content -Path $log -Value $content -Encoding UTF8; if ($content.Length -le 4000) { Write-Host $content } else { Write-Host ($content.Substring(0,4000)); Write-Host \\\"... truncated $($content.Length - 4000) chars\\\" -ForegroundColor Yellow }; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full response: $log ($($content.Length) chars)\\\" -ForegroundColor Green\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Prompt Gemma4 via llama-server :8090, write full response to logs/gemma4-prompt-<timestamp>.log, show first 4000 chars inline. Safe for VS Code chat — caps inline output.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🤫 Quiet: Full pipeline (audit + KAG + Gemma4) → log file",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/full-pipeline-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; '=== Step 1: Dir audit (lib/server) ===' | Out-File $log; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map *>>&1 $log; '=== Step 2: KAG ingest ===' | Add-Content $log; try { $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true' } -TimeoutSec 300; \\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted\\\" | Add-Content $log } catch { \\\"KAG ingest skipped (dev server not running): $_\\\" | Add-Content $log }; '=== Step 3: Gemma4 summary ===' | Add-Content $log; $body = @{ model = 'gemma4-legal'; messages = @(@{ role = 'system'; content = 'Codebase health analyst. 5 bullets: auth, cache, inference, topology, top refactor priority.' }, @{ role = 'user'; content = 'Summarize codebase production readiness.' }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $r.choices[0].message.content | Add-Content $log } catch { \\\"Gemma4 unreachable: $_\\\" | Add-Content $log }; Get-Content $log | Select-Object -Last 60; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full pipeline log: $log\\\" -ForegroundColor Green; Write-Host \\\"Size: $([math]::Round((Get-Item $log).Length/1KB,1)) KB\\\" -ForegroundColor Green\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Full 3-step pipeline (audit → KAG ingest → Gemma4) → all output to logs/full-pipeline-<timestamp>.log → show last 60 lines. KAG step gracefully skips if dev server not running.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "📁 Open latest log file",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$latest = Get-ChildItem logs/*.log -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if ($latest) { Write-Host \\\"Latest: $($latest.FullName) ($([math]::Round($latest.Length/1KB,1)) KB)\\\" -ForegroundColor Green; code $latest.FullName } else { Write-Host 'No logs found in logs/ — run a 🤫 Quiet task first' -ForegroundColor Yellow }\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Open the most recently-written file in logs/ in VS Code. Pairs with the 🤫 Quiet tasks.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🤖 Agent: Batch Error Fix — Dry Run (list hotspots)",
+      "type": "shell",
+      "command": "node scripts/agentic-batch-fix.mjs ${input:batchTopN} --dry-run",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "List the top-N audit hotspot directories from codebase-graph.json without dispatching to the agent. Safe to run anytime — no dev server needed.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🤖 Agent: Batch Error Fix — Parallel (top-N hotspots → fix plans)",
+      "type": "shell",
+      "command": "node scripts/agentic-batch-fix.mjs ${input:batchTopN} --concurrency=${input:batchConcurrency}",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Fan out top-N audit hotspots from codebase-graph.json to /api/ai/agent/batch (SSE). Runs Gemma4 agent loops in parallel (default 3-way) — one fix plan per directory. Plans written to next_steps/active/{date}/batch-fix-{ts}/. Requires dev server on :5173.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [
+    {
+      "id": "batchTopN",
+      "type": "promptString",
+      "description": "How many audit hotspot directories to analyze in parallel (1-30)",
+      "default": "5"
+    },
+    {
+      "id": "batchConcurrency",
+      "type": "promptString",
+      "description": "Concurrent agent loops (1-8). Higher = faster but more VRAM contention. Default 3.",
+      "default": "3"
+    },
     {
       "id": "dirAnalysisQuery",
       "type": "promptString",
