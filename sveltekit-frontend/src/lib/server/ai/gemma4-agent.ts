@@ -216,6 +216,62 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'graph_search',
+      description:
+        'Search the fast-AST codebase graph (docs/graph/codebase-graph.json) by keyword. ' +
+        'Returns matching source files with their tags, TODO count, auth status, and audit score. ' +
+        'Use this to locate relevant files before reading or patching them.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query:       { type: 'string',  description: 'Keywords to search for (file path, tags, or summary words)' },
+          topK:        { type: 'number',  description: 'Max files to return (default 8, max 20)' },
+          onlyRoutes:  { type: 'boolean', description: 'Restrict to SvelteKit route files (+server.ts, +page.server.ts)' },
+          onlyNoAuth:  { type: 'boolean', description: 'Return only routes missing auth guard (locals.user check)' },
+          hasTodos:    { type: 'boolean', description: 'Return only files with at least one TODO/FIXME' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'wiki_note_lookup',
+      description:
+        'Look up KAG wiki notes (wiki:note:dir:*) from Redis for directories matching a query. ' +
+        'Each note contains an AI-written directory summary, audit score, and SOM topology coordinates ' +
+        'written by the directory summarizer pipeline. Use this to understand what a directory does before editing.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'Directory name, tag, or topic to look up (e.g. "server/cache", "auth", "embedding")' },
+          limit: { type: 'number', description: 'Max notes to return (default 5, max 15)' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'audit_hotspots',
+      description:
+        'Return the worst-scoring directories from the fast-AST codebase audit. ' +
+        'Each result explains WHY the directory scored low: low audit score, TODO density, or missing auth on API routes. ' +
+        'Use this first when asked to improve code quality or find areas needing attention.',
+      parameters: {
+        type: 'object',
+        properties: {
+          limit: { type: 'number', description: 'How many hotspot directories to return (default 10, max 30)' },
+        },
+        required: [],
+      },
+    },
+  },
 ] as const;
 
 // ── FNV-1a 32-bit hash (for Redis cache keys) ─────────────────────────────────
@@ -487,6 +543,32 @@ async function dispatchTool(
       }
     }
 
+    if (name === 'graph_search') {
+      const { searchGraph } = await import('$lib/server/graph/graph-intel.js');
+      const query      = String(args.query ?? '');
+      const topK       = Math.min(Number(args.topK ?? 8), 20);
+      const onlyRoutes = Boolean(args.onlyRoutes ?? false);
+      const onlyNoAuth = Boolean(args.onlyNoAuth ?? false);
+      const hasTodos   = Boolean(args.hasTodos   ?? false);
+      const hits       = await searchGraph(query, topK, { onlyRoutes, onlyNoAuth, hasTodos });
+      return { tool: name, result: hits };
+    }
+
+    if (name === 'wiki_note_lookup') {
+      const { lookupWikiNotes } = await import('$lib/server/graph/graph-intel.js');
+      const query  = String(args.query ?? '');
+      const limit  = Math.min(Number(args.limit ?? 5), 15);
+      const notes  = await lookupWikiNotes(query, limit);
+      return { tool: name, result: notes };
+    }
+
+    if (name === 'audit_hotspots') {
+      const { getAuditHotspots } = await import('$lib/server/graph/graph-intel.js');
+      const limit    = Math.min(Number(args.limit ?? 10), 30);
+      const hotspots = await getAuditHotspots(limit);
+      return { tool: name, result: hotspots };
+    }
+
     return { tool: name, result: null, errorMsg: `Unknown tool: ${name}` };
   } catch (err) {
     return { tool: name, result: null, errorMsg: (err as Error).message };
@@ -631,9 +713,10 @@ export async function runGemma4Agent(
       if (typeof rd.eval_count         === 'number')  totalCompletionTokens += rd.eval_count;
     }
 
-    const msg: OllamaMessage = typeof rawResult === 'string'
-      ? { role: 'assistant', content: rawResult }
-      : { role: 'assistant', content: rawResult.content, tool_calls: rawResult.tool_calls };
+    const raw = rawResult as { content?: string; tool_calls?: OllamaToolCall[] } | string;
+    const msg: OllamaMessage = typeof raw === 'string'
+      ? { role: 'assistant', content: raw }
+      : { role: 'assistant', content: raw.content ?? '', tool_calls: raw.tool_calls };
 
     // Final answer — no tool calls
     if (!msg.tool_calls?.length) {

@@ -64,6 +64,7 @@ import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js'
 import { recallPastChats } from './chat-memory.js';
 import { getRedis } from '$lib/server/redis.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
+import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
 import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/ACPToolRegistry.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
@@ -252,6 +253,7 @@ export async function assembleACEContext(opts: {
         communityContext,
         directoryKagContext,
         acpKnowledgeResults,
+        graphIntelContext,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -286,6 +288,8 @@ export async function assembleACEContext(opts: {
           () => [] as Awaited<ReturnType<typeof getDirectoryKAGContext>>
         ),
         fetchACPKnowledgeResults(query, ACP_MAX_RESULTS, 'codebase_chunks_768').catch(() => null),
+        // Fast-AST graph intel: top relevant files + audit hotspots from codebase-graph.json
+        getGraphIntelContext(query).catch(() => null),
       ]);
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
@@ -344,6 +348,8 @@ export async function assembleACEContext(opts: {
         queryTags,
         webSearchContext:
           [
+            // Fast-AST graph intel: relevant files + audit hotspots from codebase-graph.json
+            graphIntelContext ?? '',
             // GraphRAG community context — coarse "what team/layer does this query touch?"
             communityContext?.length
               ? `\n## Codebase Community Context (GraphRAG)\n` +
@@ -358,10 +364,19 @@ export async function assembleACEContext(opts: {
               ? `\n## KAG Directory Audit Notes\n` +
                 directoryKagContext
                   .map(
-                    (entry) =>
-                      `**${entry.dir}** (score=${entry.score.toFixed(2)}${typeof entry.auditScore === 'number' ? `, audit=${entry.auditScore}` : ''})\n` +
-                      `${entry.summary}\n` +
-                      (entry.tags.length ? `Tags: ${entry.tags.join(', ')}` : '')
+                    (entry) => {
+                      const topo =
+                        entry.somBmuRow != null && entry.somBmuCol != null
+                          ? `, SOM(${entry.somBmuRow},${entry.somBmuCol})`
+                          : '';
+                      const method =
+                        entry.scoringMethod === 'gpu-cosine' ? ' 🔵gpu' : ' ⬜kw';
+                      return (
+                        `**${entry.dir}** (score=${entry.score.toFixed(2)}${method}${typeof entry.auditScore === 'number' ? `, audit=${entry.auditScore}` : ''}${topo})\n` +
+                        `${entry.summary}\n` +
+                        (entry.tags.length ? `Tags: ${entry.tags.join(', ')}` : '')
+                      );
+                    }
                   )
                   .join('\n\n')
               : '',
