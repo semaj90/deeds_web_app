@@ -48,6 +48,8 @@
     "graphify:daily": "npm run index:codebase:fast:plan && npm run smoke:fast-ast && npm run smoke:kag",
     "graphify:full": "npm run graphify:daily && npm run codebase:index && npm run graphify:topology && npm run smoke:ace:full",
     "smoke:graphify": "node scripts/tests/smoke-graphify.mjs",
+    "analyze:graph": "node scripts/analyze-graph.mjs",
+    "analyze:graph:console": "node scripts/analyze-graph.mjs --no-write",
     "audit:test-stubs": "node scripts/generate-route-test-stubs.mjs",
     "audit:test-stubs:dry": "node scripts/generate-route-test-stubs.mjs --dry-run",
     "test:stubs": "vitest run --no-file-parallelism tests/routes/auto",
