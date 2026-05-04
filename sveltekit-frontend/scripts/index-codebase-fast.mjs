@@ -93,7 +93,7 @@ const RE_EXPORT    = /export\s+(?:default\s+)?(?:async\s+)?(?:function|class|con
 const RE_SVELTE_C  = /<script[^>]*>/;
 const RE_TODO      = /\/\/\s*(TODO|FIXME|HACK|XXX)[:\s]/g;
 const RE_DRIZZLE   = /\b(pgTable|mysqlTable|sqliteTable|InferSelect|InferInsert|drizzle)\b/g;
-const RE_ROUTE_H   = /export\s+(?:async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s*\(/g;
+const RE_ROUTE_H   = /export\s+(?:(?:async\s+)?function\s+|const\s+)(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/g;
 const RE_COMPONENT = /<([A-Z][A-Za-z0-9]+)\s/g;
 const RE_AUTH      = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH/;
 
