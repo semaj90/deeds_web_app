@@ -1401,6 +1401,70 @@ See `sveltekit-frontend/scripts/docs/compiler-stack-explainer.md` for complete r
 
 ---
 
+## Graphify/Karpathy Stack (May 4, 2026)
+
+3-layer codebase intelligence with `graphify:*` npm aliases over existing scripts:
+
+| Layer | Command | Output | Cost |
+|-------|---------|--------|------|
+| 1 — Map | `graphify:daily` / `graphify:map` | `docs/graph/codebase-graph.json` + `codebase-map.md` + Redis `code:index:*` + `wiki:note:dir:*` | ~3-5s, no GPU |
+| 2 — Semantic | `graphify:semantic` / `graphify:topology` | Qdrant `codebase_chunks_768` + hypergraph + Qdrant tags | ~30-60s |
+| 3 — Full GPU | `graphify:full` / `graphify:gpu:turbo` | SOM + hypergraph + PageRank + Neo4j + cluster synthesis + ACE plans | ~5-10 min |
+
+**5-pillar smoke**: `npm run smoke:graphify` (read-only, <1s) — checks graph JSON + map.md + Redis fast cache + KAG notes + Qdrant `codebase_chunks_768` + ACE `FAST_AST_SCORE_CAP ≤ 0.07`. Flags: `--strict`, `--no-redis`, `--no-qdrant`.
+
+**ACE priority order** (verified in `context-assembler.ts`): Qdrant semantic → ACP cross-feed → Redis KAG (cap 0.08) → Redis fast-AST (`FAST_AST_SCORE_CAP = 0.07` named constant) → SOM/hypergraph/PageRank.
+
+VS Code tasks: `🗺️ Graphify: Daily Map`, `🔎 Graphify: Semantic Index`, `🧠 Graphify: Full ACE Index`, `🏭 Graphify: Full GPU + TurboQuant`, `🩺 Graphify: Smoke (5-pillar health check)`.
+
+---
+
+## Route Test Pairing (G16 — May 4, 2026)
+
+Closes the test-coverage visibility gap: every `+server.ts` without a paired test gets a placeholder stub written to `tests/routes/auto/` (already in vitest include glob).
+
+- Generator: `scripts/generate-route-test-stubs.mjs` (NOT `scripts/tests/...` — duplicate removed)
+- npm: `audit:test-stubs` / `audit:test-stubs:dry`
+- Filter: `--mutating-only` targets ~355 high-risk POST/PUT/PATCH/DELETE routes
+- Stub format: G26 pattern (`@vitest-environment node` + `vi.hoisted` + lazy `beforeEach` import + `it.todo()` for the 3 unimplemented baseline cases + 1 real `401-unauth` assertion)
+
+**Important**: this G16 is *route test pairing*, distinct from the existing G16 audit gate (worker thread coupling) defined earlier in this file. Same name, different scope — don't confuse them in commit messages.
+
+---
+
+## SOM Topology on Neo4j (May 4, 2026)
+
+`directory-summarizer.ts` now persists SOM coords as `HAS_DIRECTORY_SUMMARY` edge properties AND mirrors them on the `DirectorySummary` node:
+
+```cypher
+MATCH (c:GPUCluster)-[r:HAS_DIRECTORY_SUMMARY]->(d:DirectorySummary)
+WHERE r.somBmuRow = $row AND r.somBmuCol = $col
+RETURN d.dir, r.somCluster
+```
+
+Closes the audit gap "SOM coords stored in Qdrant but no `HAS_SOM_POSITION` edges in Neo4j; ACE topological boosting underutilized 4D structure". ACE Cypher queries can now filter directory summaries by SOM grid neighborhood.
+
+Coords flow: `DirAuditEntry.somBmuRow/Col/Cluster` → `ingestDirectorySummaries()` → `writeNeo4jEdges()` → SET on both edge `r.*` and node `d.*`.
+
+---
+
+## Bounded Output for VS Code Chat (May 4, 2026)
+
+Prevents `RangeError: Invalid string length` when running long-running audit/agent tasks that emit multi-MB markdown.
+
+Helper: `sveltekit-frontend/scripts/lib/bounded-output.mjs` — `writeBoundedOutput({label, text, root, maxChars, silent})` and `writeSummary({label, summaryLines, fullText})`. Default `MAX_STDOUT_CHARS=12_000`, env-overridable.
+
+Scripts with `--quiet` / `--summary-only` flags:
+- `agentic-batch-fix.mjs` (parallel hotspot fix planner)
+- `generate-codebase-directory-map.mjs`
+- `tests/deep-directory-audit.mjs`
+
+VS Code task pattern: `mkdir -p logs/task-output && node X.mjs --quiet > logs/task-output/X-latest.log 2>&1 && tail -40 logs/task-output/X-latest.log`. `.gitignore` excludes `logs/task-output/` and `logs/*.log`.
+
+NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `audit:dirs:map:{quiet,summary}`.
+
+---
+
 ## Key Lessons (Proven Patterns)
 
 - **$derived vs $derived.by**: `$derived(() => {...})` returns a function. Use `$derived.by(() => {...})` for complex computations
