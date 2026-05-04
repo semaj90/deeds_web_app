@@ -336,7 +336,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v13'; // bumped 2026-05-04 — RE_SSR_GUARD now recognizes typeof <storage>=='undefined' guards (localStorage, sessionStorage, indexedDB)
+const META_CACHE_VERSION = 'v14'; // bumped 2026-05-04 — G16 walks tests/, test/, e2e/, integration/, playwright/ (centralized auto-stubs and hand-written tests now count toward pairing)
 
 for (const filePath of walk(scanRoot)) {
   let src;
@@ -421,17 +421,53 @@ for (const f of files) {
   f.fanIn = (fanIn[modPath] ?? 0) + (fanIn[f.rel] ?? 0);
 }
 
-// G16 — Test pairing: check if a test file exists for each server route / lib module
+// G16 — Test pairing: check if a test file exists for each server route / lib module.
+// Tests live in three places:
+//   1. Co-located: src/lib/foo.ts  →  src/lib/foo.test.ts
+//   2. Centralized auto-stubs: src/routes/api/foo/+server.ts → tests/routes/auto/api/foo.test.ts
+//   3. Hand-written: tests/routes/api/foo.test.ts, tests/integration/*, e2e/*, test/*
+// Walk EVERY sibling test directory so all paired tests count, regardless of style.
 const testRels = new Set(files.filter(f => f.isTest).map(f => f.rel));
+const EXTRA_TEST_DIRS = ['tests', 'test', 'e2e', 'integration', 'playwright'];
+for (const dirName of EXTRA_TEST_DIRS) {
+  const dir = path.resolve(ROOT, dirName);
+  if (!fs.existsSync(dir)) continue;
+  for (const file of walk(dir)) {
+    if (/\.(test|spec)\.[mc]?[jt]s$/.test(file)) {
+      testRels.add(path.relative(ROOT, file).replace(/\\/g, '/'));
+    }
+  }
+}
+// Build a lookup of test-file basenames for fuzzy matching when paths don't align.
+const testBasenames = new Map(); // basename → [full rel paths]
+for (const t of testRels) {
+  const base = path.basename(t).replace(/\.(test|spec)\.[mc]?[jt]s$/, '');
+  if (!testBasenames.has(base)) testBasenames.set(base, []);
+  testBasenames.get(base).push(t);
+}
+
 for (const f of files) {
   const stem = f.rel
     .replace(/\/\+server\.ts$/, '')
     .replace(/\/\+page\.server\.ts$/, '')
     .replace(/\.(ts|js|svelte)$/, '');
-  // Look for matching test file pattern
-  const hasPairedTest = testRels.has(`${stem}.test.ts`) ||
-    testRels.has(`${stem}.spec.ts`) ||
-    [...testRels].some(t => t.includes(path.basename(stem)));
+  // Direct match first (co-located test)
+  let hasPairedTest = testRels.has(`${stem}.test.ts`) || testRels.has(`${stem}.spec.ts`);
+  // For server routes, look for centralized stub at tests/routes/auto/<route-path>.test.ts
+  if (!hasPairedTest && f.isServerRoute) {
+    // src/routes/api/foo/bar/+server.ts → tests/routes/auto/api/foo/bar.test.ts
+    const routePath = stem.replace(/^src\/routes\//, '');
+    const autoStub = `tests/routes/auto/${routePath}.test.ts`;
+    if (testRels.has(autoStub)) hasPairedTest = true;
+    // Also check tests/routes/<route>.test.ts (non-auto folder)
+    if (!hasPairedTest && testRels.has(`tests/routes/${routePath}.test.ts`)) hasPairedTest = true;
+  }
+  // Last resort: basename match anywhere (fuzzy)
+  if (!hasPairedTest) {
+    const base = path.basename(stem);
+    const candidates = testBasenames.get(base) ?? [];
+    if (candidates.length > 0) hasPairedTest = true;
+  }
   f.hasPairedTest = hasPairedTest;
 }
 
