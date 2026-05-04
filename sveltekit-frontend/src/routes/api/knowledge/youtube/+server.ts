@@ -85,7 +85,8 @@ async function upsertPoint(
   }
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ success: false, indexed: 0, error: 'Unauthorized' }, { status: 401 });
   let body: unknown;
   try {
     body = await request.json();

@@ -6,9 +6,11 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async () => {
+	if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
 	const results: Record<string, string> = {};
 	const timings: Record<string, number> = {};
 	let allPassed = true;
