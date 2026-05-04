@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-04T16:05:53.632Z
+> Generated: 2026-05-04T16:11:39.502Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -15,7 +15,7 @@
 | API handlers | 583 |
 | API routes without auth | 30 |
 | API routes without Zod | 1 |
-| SSR-unsafe files | 45 |
+| SSR-unsafe files | 42 |
 | Svelte 4 legacy patterns | 0 |
 | Hardcoded localhost refs | 52 |
 | Routes without test pairing | 534 |
@@ -37,7 +37,7 @@
 | G14c | No `on:event=` directives | 2581 | 0 |
 | G14d | No `createEventDispatcher()` | 2581 | 0 |
 | G14e | No runes in plain `.ts` files | 2581 | 0 |
-| G15 | No SSR-unsafe globals (unguarded) | 2536 | 45 |
+| G15 | No SSR-unsafe globals (unguarded) | 2539 | 42 |
 | G16 | Server routes have test pairing | 51 | 534 |
 | G17 | Server routes have error handling | 593 | 73 |
 | G20 | Cyclic import pairs | — | 0 |
@@ -111,7 +111,6 @@
 | ✅ | `src/lib/server/services` | 85 | 2 | 703 | 0 | 0/0 | 0 | 🟠lh | C32: function chunks in `src/lib/server/services` (tag: api-route) |
 | ✅ | `src/lib/server/utils` | 85 | 13 | 941 | 0 | 0/2 | 0 | 🟠lh | C19: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/lib/services/error-analysis` | 85 | 17 | 4788 | 0 | 0/1 | 0 | 🟠lh | C17: function chunks in `src/lib/services/error-analysis` (tag: embedding) |
-| ✅ | `src/mcp` | 85 | 2 | 4428 | 0 | 1/2 | 0 | 🔴ssr 🟠lh | — |
 | ✅ | `src/mcp/tools` | 85 | 1 | 195 | 0 | 0/1 | 0 | 🟠lh | — |
 | ✅ | `src/routes/(app)/couchdb-analytics` | 85 | 5 | 1833 | 0 | 5/0 | 0 | 🟠lh | — |
 | ✅ | `src/routes/api/consolidation` | 85 | 1 | 42 | 1 | 1/0 | 0 | ⬜notest | — |
@@ -217,7 +216,6 @@
 | ✅ | `src/lib/shims` | 90 | 11 | 1235 | 0 | 0/1 | 0 | 🔴ssr | C57: const chunks in `src/lib/shims` (tag: embedding) |
 | ✅ | `src/lib/stores/dashboard` | 90 | 3 | 654 | 0 | 0/1 | 0 | — | C68: function chunks in `src/lib/stores/dashboard` (tag: server-module) |
 | ✅ | `src/lib/test-utils` | 90 | 1 | 11 | 0 | 0/0 | 0 | — | — |
-| ✅ | `src/lib/types` | 90 | 51 | 7019 | 0 | 0/3 | 0 | 🔴ssr | C77: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/routes/(analysis)` | 90 | 4 | 3236 | 0 | 8/0 | 0 | ⬜notest | — |
 | ✅ | `src/routes/(analysis)/audio-analysis` | 90 | 3 | 985 | 0 | 2/0 | 0 | ⬜notest | — |
 | ✅ | `src/routes/(analysis)/document-analysis` | 90 | 3 | 990 | 0 | 2/0 | 0 | ⬜notest | — |
@@ -316,6 +314,7 @@
 | ✅ | `src/lib/server/workers` | 95 | 5 | 1769 | 0 | 0/4 | 0 | 🟠lh | C24: class chunks in `src/lib/server/workers` (tag: redis) |
 | ✅ | `src/lib/services` | 95 | 7 | 9625 | 0 | 0/3 | 0 | 🟠lh | C43: type chunks in `src/lib/services/knowledge-search` (tag: embedding) |
 | ✅ | `src/lib/services/knowledge-search` | 95 | 11 | 3965 | 0 | 0/2 | 0 | 🟠lh | C17: function chunks in `src/lib/services/error-analysis` (tag: embedding) |
+| ✅ | `src/mcp` | 95 | 2 | 4428 | 0 | 1/2 | 0 | 🟠lh | — |
 | ✅ | `src/routes/api/errors` | 95 | 3 | 253 | 3 | 3/2 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/canon` | 96 | 4 | 574 | 4 | 4/3 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/persons-of-interest` | 96 | 14 | 2737 | 14 | 14/10 | 0 | ⬜notest | — |
@@ -331,12 +330,12 @@
 | ✅ | `src/routes/api/rag` | 98 | 10 | 2244 | 9 | 9/8 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/reports` | 98 | 9 | 2311 | 9 | 9/8 | 0 | ⬜notest | C85: route-handler chunks in `src/routes/api/citations/collections/[collectionId]/citations` (tag: api) |
 | ✅ | `src/routes/api/routes` | 98 | 9 | 1005 | 9 | 9/8 | 0 | ⬜notest | — |
-| ✅ | `src/lib` | 100 | 11 | 363829 | 3 | 11/212 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
+| ✅ | `src/lib` | 100 | 11 | 363871 | 3 | 11/212 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — | C29: const chunks in `src/lib/schemas` (tag: auth) |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — | C91: type chunks in `src/lib/server/db` (tag: database) |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — | C51: table-def chunks in `src/lib/db/schema` (tag: database) |
-| ✅ | `src/lib/server` | 100 | 57 | 130546 | 3 | 8/125 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
+| ✅ | `src/lib/server` | 100 | 57 | 130588 | 3 | 8/125 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 638 | 0 | 0/1 | 0 | — | — |
 | ✅ | `src/lib/server/ai` | 100 | 23 | 6278 | 0 | 1/8 | 0 | — | C19: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/lib/server/analysis` | 100 | 12 | 2988 | 0 | 0/4 | 0 | — | C54: function chunks in `src/lib/server/analysis` |
@@ -349,7 +348,7 @@
 | ✅ | `src/lib/server/engagement` | 100 | 1 | 367 | 0 | 0/0 | 0 | — | — |
 | ✅ | `src/lib/server/error-brain` | 100 | 11 | 1156 | 0 | 1/2 | 0 | — | — |
 | ✅ | `src/lib/server/evidence` | 100 | 14 | 1216 | 0 | 0/2 | 0 | — | C66: type chunks in `src/lib/server/services` (tag: types) |
-| ✅ | `src/lib/server/graph` | 100 | 17 | 6953 | 0 | 1/5 | 0 | — | C73: function chunks in `src/lib/server/retrieval` (tag: vector) |
+| ✅ | `src/lib/server/graph` | 100 | 17 | 6995 | 0 | 1/5 | 0 | — | C73: function chunks in `src/lib/server/retrieval` (tag: vector) |
 | ✅ | `src/lib/server/indexer` | 100 | 11 | 5242 | 1 | 0/4 | 0 | — | C58: type chunks in `src/lib/server/indexer` (tag: vector) |
 | ✅ | `src/lib/server/llm` | 100 | 6 | 1643 | 0 | 0/2 | 0 | — | C44: route-handler chunks in `src/lib/server/llm` (tag: api) |
 | ✅ | `src/lib/server/queue` | 100 | 8 | 3812 | 0 | 0/3 | 0 | — | C96: type chunks in `src/lib/server` (tag: embedding) |
@@ -358,6 +357,7 @@
 | ✅ | `src/lib/server/retrieval` | 100 | 24 | 6342 | 0 | 0/3 | 0 | — | C73: function chunks in `src/lib/server/retrieval` (tag: vector) |
 | ✅ | `src/lib/server/types` | 100 | 10 | 1099 | 0 | 0/0 | 0 | — | C73: function chunks in `src/lib/server/retrieval` (tag: vector) |
 | ✅ | `src/lib/server/unified` | 100 | 1 | 284 | 0 | 0/0 | 0 | — | — |
+| ✅ | `src/lib/types` | 100 | 51 | 7019 | 0 | 0/3 | 0 | — | C77: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/routes/(app)` | 100 | 2 | 100616 | 4 | 389/39 | 6 | 🔴ssr 🟠lh ⬜notest | — |
 | ✅ | `src/routes/(app)/acp` | 100 | 1 | 613 | 0 | 1/1 | 0 | — | — |
 | ✅ | `src/routes/(app)/active-cases` | 100 | 2 | 1154 | 0 | 2/0 | 0 | ⬜notest | — |
@@ -517,7 +517,7 @@ _No Svelte 4 patterns found. ✅_
 
 ---
 
-## G15 — SSR-Unsafe Globals (45 files · unguarded window/document/localStorage)
+## G15 — SSR-Unsafe Globals (42 files · unguarded window/document/localStorage)
 - `src/lib/ai/client-quality.ts`
 - `src/lib/client/ui/POIPhotoUploader.svelte`
 - `src/lib/components/ai/AutomatedLegalResearch.svelte`
@@ -531,13 +531,13 @@ _No Svelte 4 patterns found. ✅_
 - `src/lib/components/phase78/SuggestionsList.svelte`
 - `src/lib/components/POIPhotoModal.svelte`
 - `src/lib/components/rag/DocumentCard.svelte`
-- `src/lib/components/types.ts`
 - `src/lib/components/ui/SearchResults.svelte`
 - `src/lib/components/ui/tabs/TabsList.svelte`
 - `src/lib/components/yorha/CaseTheoryConstructor.svelte`
 - `src/lib/components/yorha/CrossExaminationAssistant.svelte`
 - `src/lib/components/yorha/JudicialAnalysisAgent.svelte`
 - `src/lib/machines/audio-upload-machine.ts`
+- `src/lib/schemas/evidence-upload.ts`
 
 ---
 
