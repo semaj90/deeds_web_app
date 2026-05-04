@@ -1,16 +1,18 @@
 #!/usr/bin/env node
-import { createRequire } from 'module';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const require = createRequire(import.meta.url);
 const scriptName = process.argv[2] || 'dev';
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(scriptDir, '..');
 
 const requiredPackages = ['cross-env', 'vite'];
 const missing = [];
 
 for (const pkg of requiredPackages) {
-  try {
-    require.resolve(`${pkg}/package.json`);
-  } catch {
+  const packageJsonPath = path.join(projectRoot, 'node_modules', ...pkg.split('/'), 'package.json');
+  if (!existsSync(packageJsonPath)) {
     missing.push(pkg);
   }
 }

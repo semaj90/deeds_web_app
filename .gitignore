@@ -28,8 +28,10 @@ x86/
 bld/
 [Oo]bj/
 [Oo]ut/
-[Ll]og/
-[Ll]ogs/
+# Build-artifact log dirs at repo root only — NOT anywhere in src/ tree.
+# Without the leading slash, this would match e.g. src/routes/api/route-operations/log/.
+/[Ll]og/
+/[Ll]ogs/
 
 # Build results on 'Bin' directories
 **/[Bb]in/*

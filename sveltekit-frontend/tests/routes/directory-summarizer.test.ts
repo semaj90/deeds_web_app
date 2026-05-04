@@ -132,6 +132,7 @@ describe('ingestDirectorySummaries', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.resetModules();
 
     // Default: CouchDB GET returns 404 (new doc), PUT returns 201
     mockFetch.mockImplementation((url: string, opts?: RequestInit) => {
@@ -295,12 +296,27 @@ describe('ingestDirectorySummaries', () => {
     expect(result.errors).toHaveLength(0);
 
     // The community_reports upsert SQL should have been called with NULL vector
-    const communityCall = mockPoolQuery.mock.calls.find(
-      ([sql]: [string]) => sql.includes('community_reports')
+    const communityCall = mockPoolQuery.mock.calls.find(([sql]: [string]) =>
+      sql.includes('INSERT INTO community_reports')
     );
     expect(communityCall).toBeDefined();
     expect(communityCall![0]).toContain('$8::vector');
     expect(communityCall![1][7]).toBeNull();
+  });
+
+  it('ensures community_reports exists before attempting the upsert', async () => {
+    await ingestDirectorySummaries([makeEntry()]);
+
+    const createTableCallIndex = mockPoolQuery.mock.calls.findIndex(([sql]: [string]) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS community_reports')
+    );
+    const insertCallIndex = mockPoolQuery.mock.calls.findIndex(([sql]: [string]) =>
+      sql.includes('INSERT INTO community_reports')
+    );
+
+    expect(createTableCallIndex).toBeGreaterThan(-1);
+    expect(insertCallIndex).toBeGreaterThan(-1);
+    expect(createTableCallIndex).toBeLessThan(insertCallIndex);
   });
 
   it('strips CouchDB credentials from fetch URLs and sends Basic auth header', async () => {
@@ -343,5 +359,10 @@ describe('ingestDirectorySummaries', () => {
     expect(result.wikiNotesWritten).toBe(2);
     // Each dir matched 1 cluster → 2 Neo4j edges total
     expect(result.neo4jEdgesCreated).toBe(2);
+
+    const clusterSummaryQueryCount = mockPoolQuery.mock.calls.filter(([sql]: [string]) =>
+      sql.includes('FROM cluster_summaries')
+    ).length;
+    expect(clusterSummaryQueryCount).toBe(1);
   });
 });

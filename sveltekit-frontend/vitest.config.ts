@@ -97,6 +97,7 @@ export default defineConfig({
       'tests/routes/directory-summarizer.test.ts',
       'tests/routes/codebase-index-directory-summaries.test.ts',
       'tests/routes/codebase-index-summarize-dirs.test.ts',
+      'tests/unit/ensure-dev-runtime.test.ts',
     ],
     exclude: [
       'node_modules/**',

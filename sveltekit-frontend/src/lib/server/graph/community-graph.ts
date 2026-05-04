@@ -548,11 +548,27 @@ export async function invalidateCommunityCache(): Promise<void> {
 // ── Directory KAG context ─────────────────────────────────────────────────────
 
 export interface DirectoryKAGResult {
-  dir:     string;
-  summary: string;
-  tags:    string[];
-  score:   number;
+  dir:        string;
+  summary:    string;
+  tags:       string[];
+  /** Cosine similarity to query (0–1 GPU, 0–0.08 keyword fallback) */
+  score:      number;
   auditScore?: number;
+  /** 4D topology: SOM Best Matching Unit grid position (10×10) */
+  somBmuRow?: number | null;
+  somBmuCol?: number | null;
+  /** Scoring method used for transparency in ACE context */
+  scoringMethod?: 'gpu-cosine' | 'keyword';
+}
+
+interface WikiNoteRecord {
+  directoryPath?: string;
+  summary?: string;
+  dominantTags?: string[];
+  auditScore?: number;
+  somBmuRow?: number | null;
+  somBmuCol?: number | null;
+  summaryEmbedding?: number[] | null;
 }
 
 /**
@@ -561,7 +577,15 @@ export interface DirectoryKAGResult {
  * the /api/codebase-index/directory-summaries route).
  *
  * Keys: wiki:note:dir:{docId}  (JSON ClusterNote shape, TTL 24h)
- * Scoring: keyword overlap with query words, capped at 0.08.
+ *
+ * Scoring (ranked priority):
+ *   1. GPU batch cosine similarity via libtorch batchCosineSimilarity()
+ *      — uses cached summaryEmbedding stored in wiki note (version ≥ 2)
+ *   2. Postgres community_reports cosine via pgvector (embedding <=> query)
+ *   3. Keyword overlap fallback (legacy notes without embeddings), capped 0.08
+ *
+ * 4D topology: SOM BMU coords are surfaced in results so ACE context
+ * can show topological locality ("this dir is in cluster grid 3,7").
  *
  * Returns at most `limit` results ranked by relevance.
  */
@@ -572,61 +596,106 @@ export async function getDirectoryKAGContext(
   try {
     const redis = getRedis();
 
-    // Resolve candidate keys via fast-AST manifest dir index
+    // ── Step 1: Resolve candidate keys via fast-AST tag index ──────────────
     const manifestRaw = await redis.get('code:index:manifest').catch(() => null);
     const indexKeys: string[] = [];
 
     if (manifestRaw) {
       const manifest = JSON.parse(manifestRaw) as { mode?: string };
       if (manifest.mode === 'fast-ast') {
-        // Pull file paths matching query keywords to narrow which dirs to check
         const words = query.toLowerCase().split(/\W+/).filter((w) => w.length > 3).slice(0, 5);
         for (const word of words) {
           const raw = await redis.get(`code:index:tag:${word}`).catch(() => null);
           if (!raw) continue;
           const paths: string[] = JSON.parse(raw);
           for (const p of paths.slice(0, 8)) {
-            // Derive parent dir from file path
-            const dir = p.split('/').slice(0, -1).join('/');
+            const dir   = p.split('/').slice(0, -1).join('/');
             const docId = `dir:${dir.replace(/[^a-z0-9]/gi, '_')}`;
-            const key = `wiki:note:dir:${docId}`;
+            const key   = `wiki:note:dir:${docId}`;
             if (!indexKeys.includes(key)) indexKeys.push(key);
           }
         }
       }
     }
 
-    // Fallback: scan a small prefix window when index is cold
+    // Fallback: scan server dirs when index is cold
     if (indexKeys.length === 0) {
       const scanned = await redis.keys('wiki:note:dir:dir_src_lib_server*').catch(() => [] as string[]);
-      indexKeys.push(...scanned.slice(0, 20));
+      indexKeys.push(...scanned.slice(0, 30));
     }
 
     if (indexKeys.length === 0) return [];
 
-    // Load and score wiki note records
-    const queryWords = new Set(query.toLowerCase().split(/\W+/).filter((w) => w.length > 3));
-    const results: DirectoryKAGResult[] = [];
-
+    // ── Step 2: Load all candidate notes from Redis ─────────────────────────
+    const notes: Array<WikiNoteRecord & { _key: string }> = [];
     for (const key of indexKeys) {
       const raw = await redis.get(key).catch(() => null);
       if (!raw) continue;
-      let note: Record<string, unknown>;
-      try { note = JSON.parse(raw); } catch { continue; }
+      try {
+        const parsed = JSON.parse(raw) as WikiNoteRecord;
+        notes.push({ ...parsed, _key: key });
+      } catch { continue; }
+    }
 
-      const dir     = String(note.directoryPath ?? '');
+    if (notes.length === 0) return [];
+
+    // ── Step 3: GPU batch cosine similarity over stored embeddings ──────────
+    // Notes with version ≥ 2 carry summaryEmbedding (768-dim Float32).
+    // Embed query once, then GPU-rank all notes in a single kernel call.
+    let scoringMethod: 'gpu-cosine' | 'keyword' = 'keyword';
+    const scoreMap = new Map<string, number>();
+
+    const notesWithEmbedding = notes.filter(
+      (n) => Array.isArray(n.summaryEmbedding) && n.summaryEmbedding.length === 768
+    );
+
+    if (notesWithEmbedding.length > 0) {
+      try {
+        const queryEmbedding = await generateSingleEmbedding(query);
+        if (queryEmbedding && queryEmbedding.length === 768) {
+          const { batchCosineSimilarity } = await import('$lib/server/gpu/libtorch-bridge.js');
+          const corpus = notesWithEmbedding.map((n) => n.summaryEmbedding as number[]);
+          const { scores } = await batchCosineSimilarity(queryEmbedding, corpus);
+          for (let i = 0; i < notesWithEmbedding.length; i++) {
+            const dir = String(notesWithEmbedding[i].directoryPath ?? '');
+            if (dir) scoreMap.set(dir, scores[i] ?? 0);
+          }
+          scoringMethod = 'gpu-cosine';
+        }
+      } catch { /* fall through to keyword */ }
+    }
+
+    // ── Step 4: Keyword fallback for notes without embeddings ───────────────
+    const queryWords = new Set(query.toLowerCase().split(/\W+/).filter((w) => w.length > 3));
+    for (const note of notes) {
+      const dir = String(note.directoryPath ?? '');
+      if (!dir || scoreMap.has(dir)) continue;
       const summary = String(note.summary ?? '');
       const tags    = Array.isArray(note.dominantTags) ? (note.dominantTags as string[]) : [];
-      const auditScore = typeof note.auditScore === 'number' ? note.auditScore : undefined;
-
-      if (!dir || !summary) continue;
-
-      // Keyword overlap score
       const textWords = new Set((dir + ' ' + summary + ' ' + tags.join(' ')).toLowerCase().split(/\W+/));
       const overlap = [...queryWords].filter((w) => textWords.has(w)).length;
-      const score = Math.min(0.08, 0.02 + overlap * 0.015);
+      scoreMap.set(dir, Math.min(0.08, 0.02 + overlap * 0.015));
+    }
 
-      results.push({ dir, summary, tags, score, auditScore });
+    // ── Step 5: Build ranked results ────────────────────────────────────────
+    const results: DirectoryKAGResult[] = [];
+    for (const note of notes) {
+      const dir      = String(note.directoryPath ?? '');
+      const summary  = String(note.summary ?? '');
+      const tags     = Array.isArray(note.dominantTags) ? (note.dominantTags as string[]) : [];
+      const auditScore = typeof note.auditScore === 'number' ? note.auditScore : undefined;
+      if (!dir || !summary) continue;
+
+      results.push({
+        dir,
+        summary,
+        tags,
+        score:     scoreMap.get(dir) ?? 0,
+        auditScore,
+        somBmuRow: note.somBmuRow ?? null,
+        somBmuCol: note.somBmuCol ?? null,
+        scoringMethod,
+      });
     }
 
     return results

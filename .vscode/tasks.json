@@ -8341,6 +8341,26 @@
       "problemMatcher": []
     },
     {
+      "label": "📂 Dir Map: Generate (quiet → logs/task-output)",
+      "type": "shell",
+      "command": "mkdir -p logs/task-output && node scripts/tests/generate-codebase-directory-map.mjs --quiet > logs/task-output/dir-map-latest.log 2>&1 && tail -20 logs/task-output/dir-map-latest.log",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Same as Generate but redirects all phase logs to logs/task-output/dir-map-latest.log. Terminal shows only the last 20 lines (final summary). The CODEBASE_DIRECTORY_MAP.md is still written normally.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Map: Summary only (1 line)",
+      "type": "shell",
+      "command": "node scripts/tests/generate-codebase-directory-map.mjs --summary-only",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Generate the map and emit a single summary line — safe for VS Code chat. Output: 'Map written: <path>' + 'Summary: N critical, N warning, N good, N total'.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
       "label": "📂 Dir Map: Dry-run (print to terminal)",
       "type": "shell",
       "command": "node scripts/tests/generate-codebase-directory-map.mjs --dry-run",
@@ -8357,6 +8377,26 @@
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "test",
       "detail": "Audit src/lib/server/ — structural metrics + TurboQuant/Ollama AI summaries → next_steps/active/",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Audit: lib/server (quiet → logs/task-output)",
+      "type": "shell",
+      "command": "mkdir -p logs/task-output && node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --quiet > logs/task-output/dir-audit-lib-server-latest.log 2>&1 && tail -30 logs/task-output/dir-audit-lib-server-latest.log",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Same as lib/server audit but redirects all phase logs to logs/task-output/dir-audit-lib-server-latest.log. Terminal shows only the last 30 lines. Plan still written to next_steps/active/.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Audit: lib/server (summary only — 1 line)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --summary-only",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Run the lib/server audit and emit only the final summary line — safe for VS Code chat. Plan still written to next_steps/active/.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     },
