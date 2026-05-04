@@ -51,6 +51,7 @@
     "audit:test-stubs": "node scripts/generate-route-test-stubs.mjs",
     "audit:test-stubs:dry": "node scripts/generate-route-test-stubs.mjs --dry-run",
     "test:stubs": "vitest run --no-file-parallelism tests/routes/auto",
+    "test:stubs:progress": "node scripts/run-test-stubs-progress.mjs",
     "index:codebase:fast": "node scripts/index-codebase-fast.mjs",
     "index:codebase:fast:plan": "node scripts/index-codebase-fast.mjs --write-plan",
     "index:codebase:full": "npm run test:prod-readiness:full-gpu",
