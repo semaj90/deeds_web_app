@@ -53,6 +53,10 @@ export interface DirAuditEntry {
   ragSummary: string | DirRagSummary | null;    // RAG-retrieved context blurb
   agentSummary: string | null;  // LLM-generated summary (null if inference skipped)
   hyperedge?: string | DirHyperedgeSummary | null;    // hyperedge metadata if connected
+  // 4D topology coords from Qdrant codebase_chunks_768 payload (optional)
+  somBmuRow?: number;
+  somBmuCol?: number;
+  somCluster?: number;
 }
 
 export interface IngestResult {
@@ -161,6 +165,11 @@ interface ClusterSummaryRow {
   metadata?: Record<string, unknown> | null;
 }
 
+interface ClusterSummaryMatchRow {
+  gpu_cluster: number;
+  paths: string[];
+}
+
 function extractClusterPaths(row: ClusterSummaryRow): string[] {
   const tagPaths = Array.isArray(row.tags)
     ? row.tags.filter((value): value is string => typeof value === 'string' && value.includes('/'))
@@ -182,7 +191,7 @@ function extractClusterPaths(row: ClusterSummaryRow): string[] {
   ];
 }
 
-async function resolveClusterIds(dirPath: string): Promise<number[]> {
+async function loadClusterSummaryRows(): Promise<ClusterSummaryMatchRow[]> {
   try {
     const rows = await pool.query<ClusterSummaryRow>(
       `SELECT repo_id, gpu_cluster, tags, metadata
@@ -191,23 +200,29 @@ async function resolveClusterIds(dirPath: string): Promise<number[]> {
        LIMIT 500`
     );
 
-    const normalised = dirPath.replace(/\\/g, '/').toLowerCase();
-    const matched = new Set<number>();
-
-    for (const row of rows.rows) {
-      const files = extractClusterPaths(row);
-      for (const f of files) {
-        if (f === normalised || f.startsWith(`${normalised}/`) || f.includes(`/${normalised}/`)) {
-          matched.add(row.gpu_cluster);
-          break;
-        }
-      }
-    }
-
-    return [...matched];
+    return rows.rows.map((row) => ({
+      gpu_cluster: row.gpu_cluster,
+      paths: extractClusterPaths(row),
+    }));
   } catch {
     return [];
   }
+}
+
+function resolveClusterIds(dirPath: string, rows: ClusterSummaryMatchRow[]): number[] {
+  const normalised = dirPath.replace(/\\/g, '/').toLowerCase();
+  const matched = new Set<number>();
+
+  for (const row of rows) {
+    for (const f of row.paths) {
+      if (f === normalised || f.startsWith(`${normalised}/`) || f.includes(`/${normalised}/`)) {
+        matched.add(row.gpu_cluster);
+        break;
+      }
+    }
+  }
+
+  return [...matched];
 }
 
 // ── Neo4j edge writer ─────────────────────────────────────────────────────────
@@ -337,14 +352,19 @@ export async function ingestDirectorySummaries(
     errors: [],
   };
 
+  if (dirOutputs.length === 0) {
+    return result;
+  }
+
   const neo4jBatch: Array<{ dir: string; clusterIds: number[] }> = [];
   const webSearchDirs: DirAuditEntry[] = [];
+  const clusterSummaryRows = await loadClusterSummaryRows();
 
   for (const entry of dirOutputs) {
     result.directoriesProcessed++;
 
     try {
-      const clusterIds = await resolveClusterIds(entry.rel);
+      const clusterIds = resolveClusterIds(entry.rel, clusterSummaryRows);
       const ragSummary = normalizeSummaryText(entry.ragSummary);
       const ragTags = extractRagTags(entry.ragSummary);
 
@@ -357,9 +377,27 @@ export async function ingestDirectorySummaries(
         ...ragTags.slice(0, 4),
       ].filter((value, index, all) => value.length > 0 && all.indexOf(value) === index);
 
+      // Embed summary first — needed for both community_reports and SOM BMU lookup
+      let embedding: number[] | null = null;
+      try {
+        embedding = await generateSingleEmbedding(summary);
+      } catch { /* non-fatal */ }
+
+      // 4D topology: compute SOM BMU coords from embedding (GPU, non-fatal)
+      // Prefer Qdrant-sourced coords from DirAuditEntry if already available
+      let somBmuRow: number | null = entry.somBmuRow ?? null;
+      let somBmuCol: number | null = entry.somBmuCol ?? null;
+      if ((somBmuRow == null || somBmuCol == null) && embedding) {
+        try {
+          const { queryBmuCached } = await import('$lib/server/gpu/libtorch-bridge.js');
+          const bmu = await (queryBmuCached as (e: number[], gw: number, gh: number) => Promise<{ bmuRow: number; bmuCol: number } | null>)(embedding, 10, 10);
+          if (bmu) { somBmuRow = bmu.bmuRow; somBmuCol = bmu.bmuCol; }
+        } catch { /* addon not loaded or CUDA unavailable */ }
+      }
+
       const wikiDoc = {
         type: 'cluster' as const,
-        clusterId: clusterIds[0] ?? -1,
+        clusterId: clusterIds[0] ?? entry.somCluster ?? -1,
         clusterType: 'gpu' as const,
         purpose: `Directory audit: ${entry.rel}`,
         summary,
@@ -375,19 +413,21 @@ export async function ingestDirectorySummaries(
         auditMetrics: entry.metrics,
         ragSummary: entry.ragSummary,
         hyperedge: entry.hyperedge ?? null,
+        // 4D topology: SOM Best Matching Unit in 10×10 grid (null when GPU unavailable)
+        somBmuRow,
+        somBmuCol,
+        somGridW: 10,
+        somGridH: 10,
+        somCluster: entry.somCluster ?? null,
+        // Cached 768-dim embedding for GPU cosine retrieval (omitted from Redis slim cache via JSON.stringify)
+        summaryEmbedding: embedding,
         generatedAt: new Date().toISOString(),
-        version: 1,
+        version: 2,
       };
 
       const docId = `dir:${entry.rel.replace(/[^a-z0-9]/gi, '_')}`;
       await upsertWikiNote(docId, wikiDoc);
       result.wikiNotesWritten++;
-
-      // Embed summary for community_reports
-      let embedding: number[] | null = null;
-      try {
-        embedding = await generateSingleEmbedding(summary);
-      } catch { /* non-fatal */ }
 
       if (clusterIds.length > 0) {
         await upsertCommunityReport(entry.rel, clusterIds, summary, tags, embedding);

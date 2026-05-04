@@ -30,9 +30,11 @@ const ROOT      = path.resolve(__dirname, '../..');   // sveltekit-frontend/
 const SRC       = path.join(ROOT, 'src');
 const DOCS_DIR  = path.resolve(ROOT, '..', 'docs');  // repo root docs/
 
-const args       = process.argv.slice(2);
-const DRY_RUN    = args.includes('--dry-run');
-const NO_REDIS   = args.includes('--no-redis');
+const args         = process.argv.slice(2);
+const DRY_RUN      = args.includes('--dry-run');
+const NO_REDIS     = args.includes('--no-redis');
+const QUIET        = args.includes('--quiet');
+const SUMMARY_ONLY = args.includes('--summary-only');
 function getArg(flag, def) {
   const i = args.indexOf(flag);
   if (i === -1) return def;
@@ -209,36 +211,40 @@ function computeScore(abs) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log(c.bold('\n📂 Codebase Directory Map Generator'));
-  console.log(c.dim(`   Source: ${SRC}`));
-  console.log(c.dim(`   Redis: ${NO_REDIS ? 'skip' : 'enabled'} | Depth: ${MAX_DEPTH} | DryRun: ${DRY_RUN}`));
+  // Quiet shim — silences phase logs in --quiet / --summary-only modes.
+  const log    = (QUIET || SUMMARY_ONLY) ? () => {} : (...a) => console.log(...a);
+  const writeP = (QUIET || SUMMARY_ONLY) ? () => {} : (s)    => process.stdout.write(s);
+
+  log(c.bold('\n📂 Codebase Directory Map Generator'));
+  log(c.dim(`   Source: ${SRC}`));
+  log(c.dim(`   Redis: ${NO_REDIS ? 'skip' : 'enabled'} | Depth: ${MAX_DEPTH} | DryRun: ${DRY_RUN} | Quiet: ${QUIET}`));
 
   // Phase 1: Walk src/ tree
-  console.log('\n' + c.cyan('Phase 1 — Walking src/ tree...'));
+  log('\n' + c.cyan('Phase 1 — Walking src/ tree...'));
   const dirs = walkDirs(SRC, MAX_DEPTH);
-  console.log(`  Found ${dirs.length} directories`);
+  log(`  Found ${dirs.length} directories`);
 
   // Phase 2: Structural metrics (progress dots)
-  console.log(c.cyan('Phase 2 — Computing structural metrics...'));
-  process.stdout.write('  ');
+  log(c.cyan('Phase 2 — Computing structural metrics...'));
+  writeP('  ');
   let dot = 0;
   for (const d of dirs) {
     const { score, metrics } = computeScore(d.abs);
     d.score   = score;
     d.metrics = metrics;
     d.lines   = lineCount(d.abs);
-    if (++dot % 10 === 0) process.stdout.write('.');
+    if (++dot % 10 === 0) writeP('.');
   }
-  process.stdout.write('\n');
+  writeP('\n');
 
   // Phase 3: Redis wiki notes
   const wikiNotes = new Map();
   if (!NO_REDIS) {
-    console.log(c.cyan('Phase 3 — Fetching Redis wiki notes...'));
+    log(c.cyan('Phase 3 — Fetching Redis wiki notes...'));
     try {
       const keys = await redisKeys('wiki:note:dir:*');
       if (keys.length > 0) {
-        console.log(`  Found ${keys.length} wiki note keys`);
+        log(`  Found ${keys.length} wiki note keys`);
         for (const key of keys) {
           const raw = await redisGet(key);
           if (!raw) continue;
@@ -248,17 +254,17 @@ async function main() {
             if (dirPath) wikiNotes.set(dirPath, note);
           } catch { /* parse error */ }
         }
-        console.log(`  Loaded ${wikiNotes.size} valid notes`);
+        log(`  Loaded ${wikiNotes.size} valid notes`);
       } else {
-        console.log(c.dim('  No wiki notes cached yet (run deep-directory-audit.mjs to populate)'));
+        log(c.dim('  No wiki notes cached yet (run deep-directory-audit.mjs to populate)'));
       }
     } catch (e) {
-      console.log(c.dim(`  Redis unavailable (${e.message}) — structural metrics only`));
+      log(c.dim(`  Redis unavailable (${e.message}) — structural metrics only`));
     }
   }
 
   // Phase 4: Build markdown
-  console.log(c.cyan('Phase 4 — Building markdown...'));
+  log(c.cyan('Phase 4 — Building markdown...'));
 
   const timestamp  = new Date().toISOString().slice(0, 19).replace('T', ' ');
   const critical   = dirs.filter(d => d.score < 40);
@@ -377,17 +383,29 @@ Injected by: \`assembleACEContext()\` → \`webSearchContext\` → \`## KAG Dire
 
   // Phase 5: Write or print
   if (DRY_RUN) {
-    console.log('\n' + md.split('\n').slice(0, 60).join('\n'));
-    console.log(c.dim(`\n... [${md.split('\n').length - 60} more lines — remove --dry-run to write]`));
+    if (SUMMARY_ONLY) {
+      console.log(`Map(dry): ${dirs.length} dirs, ${md.length.toLocaleString()} chars`);
+    } else if (QUIET) {
+      const { writeBoundedOutput } = await import('../lib/bounded-output.mjs');
+      writeBoundedOutput({ label: 'codebase-directory-map', text: md, root: ROOT, silent: true });
+    } else {
+      console.log('\n' + md.split('\n').slice(0, 60).join('\n'));
+      console.log(c.dim(`\n... [${md.split('\n').length - 60} more lines — remove --dry-run to write]`));
+    }
   } else {
     const outDir = path.dirname(OUT_PATH);
     if (!existsSync(outDir)) await mkdir(outDir, { recursive: true });
     await writeFile(OUT_PATH, md, 'utf8');
-    console.log(`\n  ${c.green('✅')} Written: ${c.cyan(OUT_PATH)}`);
+    if (SUMMARY_ONLY) console.log(`Map written: ${OUT_PATH}`);
+    else              console.log(`\n  ${c.green('✅')} Written: ${c.cyan(OUT_PATH)}`);
   }
 
   const RED = s => `\x1b[31m${s}\x1b[0m`;
-  console.log(`\n  ${c.bold('Summary:')} ${RED(`${critical.length} critical`)}  ${c.yellow(`${warning.length} warning`)}  ${c.green(`${good.length} good`)}  (${dirs.length} total)\n`);
+  if (SUMMARY_ONLY) {
+    console.log(`Summary: ${critical.length} critical, ${warning.length} warning, ${good.length} good, ${dirs.length} total`);
+  } else {
+    log(`\n  ${c.bold('Summary:')} ${RED(`${critical.length} critical`)}  ${c.yellow(`${warning.length} warning`)}  ${c.green(`${good.length} good`)}  (${dirs.length} total)\n`);
+  }
 }
 
 main().catch(e => { console.error('\n❌', e.message); process.exit(1); });

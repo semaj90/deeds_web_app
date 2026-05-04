@@ -65,6 +65,8 @@ const NO_RAG            = args.includes('--no-rag');
 const NO_GRAPH          = args.includes('--no-graph');
 const NO_AGENT          = args.includes('--no-agent');
 const DRY_RUN           = args.includes('--dry-run');
+const QUIET             = args.includes('--quiet');
+const SUMMARY_ONLY      = args.includes('--summary-only');
 const USE_TURBO         = args.includes('--turbo');
 const USE_DIRECT        = args.includes('--direct'); // bypass /api/ai/agent, call LLM directly
 const REQUIRE_INFERENCE = args.includes('--require-inference');
@@ -653,22 +655,32 @@ node scripts/tests/deep-directory-audit.mjs ${TARGET_ARG} --no-agent
 `;
 
   if (DRY_RUN) {
-    console.log('\n' + plan.split('\n').slice(0, 40).join('\n'));
-    console.log(c.dim(`\n... [${plan.split('\n').length - 40} more lines — remove --dry-run to write]`));
+    if (SUMMARY_ONLY) {
+      console.log(`Plan(dry): ${plan.split('\n').length} lines, ${plan.length.toLocaleString()} chars`);
+    } else if (QUIET) {
+      const { writeBoundedOutput } = await import('../lib/bounded-output.mjs');
+      writeBoundedOutput({ label: 'deep-directory-audit', text: plan, root: ROOT, silent: true });
+    } else {
+      console.log('\n' + plan.split('\n').slice(0, 40).join('\n'));
+      console.log(c.dim(`\n... [${plan.split('\n').length - 40} more lines — remove --dry-run to write]`));
+    }
   } else {
     if (!existsSync(PLANS_DIR)) await mkdir(PLANS_DIR, { recursive: true });
     const fname = `${fileTs()}-dir-audit-${TARGET_ARG.replace(/\//g, '-')}.md`;
     const out = path.join(PLANS_DIR, fname);
     await writeFile(out, plan, 'utf8');
-    console.log(`\n  ${c.green('✅')} Written: ${c.cyan(out)}`);
+    if (SUMMARY_ONLY) console.log(`Plan written: ${out}`);
+    else              console.log(`\n  ${c.green('✅')} Written: ${c.cyan(out)}`);
   }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-  console.log(c.bold(`\n🔬 Deep Directory Audit — src/${TARGET_ARG}/`));
-  console.log(c.dim(`   Depth: ${DEPTH} | Limit: ${LIMIT} | Started: ${stamp()}`));
-  console.log(c.dim(`   RAG: ${!NO_RAG} | Graph: ${!NO_GRAPH} | Agent: ${!NO_AGENT} | DryRun: ${DRY_RUN}`));
+  if (!QUIET && !SUMMARY_ONLY) {
+    console.log(c.bold(`\n🔬 Deep Directory Audit — src/${TARGET_ARG}/`));
+    console.log(c.dim(`   Depth: ${DEPTH} | Limit: ${LIMIT} | Started: ${stamp()}`));
+    console.log(c.dim(`   RAG: ${!NO_RAG} | Graph: ${!NO_GRAPH} | Agent: ${!NO_AGENT} | DryRun: ${DRY_RUN}`));
+  }
 
   let dirs = await enumerateDirs();
   dirs     = await structuralMetrics(dirs);
@@ -699,7 +711,12 @@ async function main() {
 
   const critical = auditedDirs.filter(d => d.score < 40).length;
   const warned   = auditedDirs.filter(d => d.score >= 40 && d.score < 70).length;
-  console.log(`\n  ${c.bold('Done.')} ${c.red(`${critical} critical`)}  ${c.yellow(`${warned} warn`)}  ${c.green(`${auditedDirs.length - critical - warned} good`)}\n`);
+  const good     = auditedDirs.length - critical - warned;
+  if (SUMMARY_ONLY) {
+    console.log(`Audit done: ${critical} critical, ${warned} warn, ${good} good (${auditedDirs.length} total)`);
+  } else {
+    console.log(`\n  ${c.bold('Done.')} ${c.red(`${critical} critical`)}  ${c.yellow(`${warned} warn`)}  ${c.green(`${good} good`)}\n`);
+  }
 
   // --write-map: regenerate CODEBASE_DIRECTORY_MAP.md after audit completes
   if (WRITE_MAP && !DRY_RUN) {

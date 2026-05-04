@@ -75,6 +75,18 @@ async function rset(key, value, ttl = REDIS_TTL) {
   } catch { /* non-fatal */ }
 }
 
+async function rget(key) {
+  if (!redis) return null;
+  try {
+    const v = await redis.get(key);
+    if (!v) return null;
+    try { return JSON.parse(v); } catch { return v; }
+  } catch { return null; }
+}
+
+// KV cache stats — exposed in final summary so user sees cache impact
+let cacheHits = 0, cacheMisses = 0;
+
 // ── File discovery ────────────────────────────────────────────────────────────
 
 const EXTENSIONS   = new Set(['.ts', '.svelte', '.js', '.mjs', '.cjs', '.json']);
@@ -134,8 +146,14 @@ const RE_SV4_EVENT   = /\bon:[a-z][a-z]+=\s*\{/;
 const RE_SV4_DISPATCH= /createEventDispatcher\(\)/;
 const RE_RUNE_IN_TS  = /\$(?:state|derived|effect|props)\s*[(<]/;
 // G15 — SSR unsafe globals
-const RE_SSR_UNSAFE  = /\b(?:window|document|localStorage|sessionStorage|IndexedDB)\b/;
-const RE_SSR_GUARD   = /typeof\s+window|onMount|browser\s*&&|import\.meta\.env\.SSR/;
+// Match true global identifier usage: not preceded by `.`, alphanum, or `-` (so `document-embed`, `documents:`, `myDocument` don't match).
+// Must also be followed by `.`, `[`, `(`, whitespace, comparison, or end-of-token — typical global-access patterns.
+const RE_SSR_UNSAFE  = /(?:^|[^\w.\-])(window|document|localStorage|sessionStorage|indexedDB|IndexedDB)(?=\s*[.\[(=!<>?,;)]|\s*$)/m;
+// Recognized SSR-safe markers: explicit guards, lifecycle hooks (run only in browser),
+// reactive runes ($effect runs only browser-side), event handler functions ("function ... {" preceding window/document refs).
+const RE_SSR_GUARD   = /typeof\s+window|typeof\s+document|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;
+// Server-only files cannot run in browser SSR context — they ARE the server
+const RE_SERVER_ONLY = /(?:^|\/)(?:hooks\.server\.ts|.+\.server\.(?:ts|js)|\+server\.ts|lib\/server\/)/;
 // G17 — error handling
 const RE_TRY_CATCH   = /\btry\s*\{/;
 const RE_SAFE_FN     = /\bsafe\s*\(|\bloadError\b/;
@@ -200,7 +218,18 @@ function extractMeta(filePath, src) {
   const sv4Dispatch = ext === '.svelte' && RE_SV4_DISPATCH.test(src);
   const runeInTs    = ext === '.ts' && !rel.endsWith('.svelte.ts') && !rel.endsWith('.d.ts') && RE_RUNE_IN_TS.test(src);
   // G15 — SSR safety
-  const ssrUnsafe = RE_SSR_UNSAFE.test(src) && !RE_SSR_GUARD.test(src);
+  // Fast path: skip server-only files (lib/server/, *.server.ts, +server.ts, hooks.server.ts)
+  // and skip files with explicit SSR guards before the costly strip+regex.
+  const isServerOnly = RE_SERVER_ONLY.test('/' + rel);
+  let ssrUnsafe = false;
+  if (!isServerOnly && !RE_SSR_GUARD.test(src) && RE_SSR_UNSAFE.test(src)) {
+    // Strip comments + string literals only when there's a candidate hit; confirms it's a real ref.
+    const stripped = src
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/[^\n]*/g, '')
+      .replace(/(['"`])(?:\\.|(?!\1)[\s\S])*\1/g, '""');
+    ssrUnsafe = RE_SSR_UNSAFE.test(stripped);
+  }
   // G16 — test pairing (resolved later via cross-file pass)
   // G17 — error handling
   const hasTryCatch = RE_TRY_CATCH.test(src);
@@ -264,11 +293,29 @@ let apiCount       = 0;
 let dbTableCount   = 0;
 let todoCount      = 0;
 
+// Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
+const META_CACHE_VERSION = 'v4';
+
 for (const filePath of walk(scanRoot)) {
   let src;
   try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
 
-  const meta = extractMeta(filePath, src);
+  // Full-content hash for cache key (vs prior 4KB-prefix hash which missed late-file edits).
+  const contentHash = createHash('sha1').update(src).digest('hex').slice(0, 16);
+  const cacheKey = `code:index:meta:${META_CACHE_VERSION}:${contentHash}`;
+  let meta = await rget(cacheKey);
+
+  if (meta && meta.rel) {
+    // Restore Set fields that JSON.parse turned back into arrays
+    if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
+    cacheHits++;
+  } else {
+    meta = extractMeta(filePath, src);
+    cacheMisses++;
+    // Persist meta with Set serialized as array (rget restores it)
+    const metaForCache = { ...meta, typeImports: Array.from(meta.typeImports ?? []) };
+    await rset(cacheKey, metaForCache);
+  }
   files.push(meta);
 
   if (meta.isRoute)              routeCount++;
@@ -278,9 +325,7 @@ for (const filePath of walk(scanRoot)) {
   todoCount += meta.todos.length;
 
   const pathHash = createHash('sha1').update(meta.rel).digest('hex').slice(0, 12);
-  const fileHash = createHash('sha1').update(src.slice(0, 4096)).digest('hex').slice(0, 12);
-
-  await rset(`code:index:file:${fileHash}`, {
+  await rset(`code:index:file:${contentHash}`, {
     rel: meta.rel, summary: meta.summary, tags: meta.tags, routeHandlers: meta.routeHandlers,
   });
   await rset(`code:index:path:${pathHash}`, {
@@ -890,6 +935,9 @@ const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 console.log(`\n✅ Fast index complete in ${elapsed}s`);
 console.log(`   Files: ${manifest.fileCount}  Dirs: ${manifest.dirCount}  Routes: ${routeCount}  Components: ${componentCount}  API handlers: ${apiCount}  TODOs: ${todoCount}`);
 console.log(`   G4 auth: ${gateStats.routesWithAuth}✅ ${gateStats.routesWithoutAuth}❌  G5 zod: ${gateStats.routesWithZod}✅ ${gateStats.routesWithoutZod}❌  G15 ssr-unsafe: ${gateStats.ssrUnsafeCount}  G20 cyclic: ${gateStats.cyclicPairCount}`);
+const totalScanned = cacheHits + cacheMisses;
+const hitRate = totalScanned ? ((cacheHits / totalScanned) * 100).toFixed(1) : '0.0';
+console.log(`   KV cache: ${cacheHits} hit / ${cacheMisses} miss (${hitRate}% hit rate)  ${redis ? '' : '(redis offline — no caching)'}`);
 console.log(`   Redis wiki:note:dir: ${redis ? dirRows.length + ' written' : 'skipped (no Redis)'}`);
 console.log(`   Outputs: docs/graph/codebase-graph.json  docs/graph/codebase-map.md`);
 
