@@ -54,9 +54,12 @@ console.log(`▶ Running ${total} test stubs (serial, --no-file-parallelism)${FI
 console.log(`  ${STUB_DIR}\n`);
 
 // ── Spawn vitest ─────────────────────────────────────────────────────────────
+// When filtering, pass each matching file path as an explicit argument so
+// vitest only runs that subset (passing the directory + filter via env doesn't
+// intersect with the include glob in vitest.config.ts).
 const args = ['vitest', 'run', '--no-file-parallelism', '--reporter=basic'];
 if (FILTER) {
-  args.push(STUB_DIR);  // Let vitest config glob handle inclusion; we filter by detecting matching filenames
+  for (const t of targets) args.push(path.relative(ROOT, t).replace(/\\/g, '/'));
 } else {
   args.push(STUB_DIR);
 }
@@ -64,7 +67,8 @@ if (FILTER) {
 const child = spawn('npx', args, {
   cwd: ROOT,
   shell: true,
-  env: { ...process.env, FORCE_COLOR: '0' },  // strip ANSI so our regex catches the lines cleanly
+  // We strip ANSI ourselves before regex-matching, so let vitest emit color
+  // (the colors don't reach our progress bar — they're consumed by stripAnsi).
 });
 
 // ── Progress state ───────────────────────────────────────────────────────────
@@ -76,11 +80,15 @@ let lastFile = '';
 let summaryStart = false;
 const summaryLines = [];
 
-// vitest --reporter=basic with FORCE_COLOR=0 emits one of:
-//   ✓ tests/routes/auto/path/x.test.ts (4 tests | 3 skipped) 1234ms
-//   ✗ tests/routes/auto/path/x.test.ts (...)
-//   ❯ tests/routes/auto/path/x.test.ts (...)
-const RE_FILE_DONE = /^\s*[✓✗❯×]\s+(tests\/routes\/auto\/\S+\.test\.ts)\s+\(/;
+// vitest --reporter=basic emits per-file lines like:
+//   <ANSI>✓<ANSI> tests/routes/auto/path/x.test.ts (4 tests | 3 skipped) 1234ms
+// Match the file path directly; the ✓/✗ marker lives in the same line so we can
+// detect status by looking at what precedes the path in the stripped text.
+// Also normalize Windows path separators (vitest sometimes emits backslashes).
+const RE_FILE_DONE = /(?:^|\s)([✓✗❯×])\s+(tests[\/\\]routes[\/\\]auto[\/\\]\S+\.test\.ts)\s+\(/;
+// Strip ANSI escape sequences (CSI codes) from a string
+const ANSI_RE = /\x1b\[[0-9;]*[a-zA-Z]/g;
+function stripAnsi(s) { return s.replace(ANSI_RE, ''); }
 
 function fmt(s) {
   const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -89,8 +97,9 @@ function fmt(s) {
 }
 
 function bar(frac, width = 24) {
-  const filled = Math.round(frac * width);
-  return '█'.repeat(filled) + '░'.repeat(width - filled);
+  const clamped = Math.max(0, Math.min(1, frac));
+  const filled = Math.round(clamped * width);
+  return '█'.repeat(filled) + '░'.repeat(Math.max(0, width - filled));
 }
 
 let lastPaintMs = 0;
@@ -119,11 +128,13 @@ function consumeLines(chunk) {
   stdoutBuf += chunk.toString();
   let nl;
   while ((nl = stdoutBuf.indexOf('\n')) !== -1) {
-    const line = stdoutBuf.slice(0, nl).replace(/\r$/, '');
+    const rawLine = stdoutBuf.slice(0, nl).replace(/\r$/, '');
     stdoutBuf = stdoutBuf.slice(nl + 1);
 
+    const line = stripAnsi(rawLine);
+
     // Detect summary block start (vitest prints "Test Files" near the end)
-    if (line.includes('Test Files') || line.includes('Tests ') || line.includes('Duration')) {
+    if (line.includes('Test Files') || line.includes(' Tests ') || line.includes('Duration')) {
       summaryStart = true;
     }
     if (summaryStart) {
@@ -133,11 +144,11 @@ function consumeLines(chunk) {
 
     const m = line.match(RE_FILE_DONE);
     if (m) {
+      const marker = m[1];
       completed++;
-      lastFile = m[1].replace(/\\/g, '/');
-      const status = line.trim()[0];
-      if (status === '✓') passed++;
-      else if (status === '✗' || status === '×' || status === '❯') failed++;
+      lastFile = m[2].replace(/\\/g, '/');
+      if (marker === '✓') passed++;
+      else if (marker === '✗' || marker === '×' || marker === '❯') failed++;
       paint();
     }
   }
