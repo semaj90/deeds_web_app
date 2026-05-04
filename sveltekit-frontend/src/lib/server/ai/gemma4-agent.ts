@@ -175,6 +175,33 @@ const AGENT_TOOLS = [
   {
     type: 'function',
     function: {
+      name: 'agents_md',
+      description:
+        'Quick-hit fetch of the per-directory AGENTS.md (agents.md spec) for a path. ' +
+        'Returns pre-rendered Markdown with: directory purpose, audit score, ' +
+        'top warnings (auth/Zod/SSR/Svelte4/localhost), dominant tags, ' +
+        'topological neighbors, and representative files. Walks UP the tree to ' +
+        'the nearest AGENTS.md (Cursor/Codex/Aider use the same convention). ' +
+        'Use this BEFORE editing files in an unfamiliar directory — it gives you ' +
+        'the same snapshot a human reviewer would expect from the dir README. ' +
+        'Sub-5ms latency vs ~50-100ms for the full KAG pipeline.',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: {
+            type: 'string',
+            description:
+              'Directory or file path. If a file, the dirname is used. ' +
+              'Examples: "src/lib/server/ace", "src/routes/api/cases/[id]/+server.ts".',
+          },
+        },
+        required: ['path'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'verify_fix',
       description: 'Run svelte-check or tsc on a specific file to verify it is free of syntax/type errors. Use this AFTER applying a shadow patch.',
       parameters: {
@@ -501,6 +528,19 @@ async function dispatchTool(
       try {
         const content = await fs.readFile(abs, 'utf-8');
         return { tool: name, result: { content, lines: content.split('\n').length } };
+      } catch (e: any) {
+        return { tool: name, result: null, errorMsg: e.message };
+      }
+    }
+
+    if (name === 'agents_md') {
+      const p = String(args.path ?? '');
+      if (!p) return { tool: name, result: null, errorMsg: 'path is required' };
+      try {
+        const { getAgentsMdQuickHit } = await import('$lib/server/graph/community-graph.js');
+        const md = await getAgentsMdQuickHit(p);
+        if (!md) return { tool: name, result: null, errorMsg: 'No AGENTS.md found for this path (run `npm run agents:write`)' };
+        return { tool: name, result: { path: p, markdown: md, length: md.length } };
       } catch (e: any) {
         return { tool: name, result: null, errorMsg: e.message };
       }
