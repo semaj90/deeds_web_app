@@ -26,6 +26,23 @@ If 13/13 gates pass, the full path is operational. Run `npm run audit:dirs:full`
 
 ---
 
+## Visual viewer
+
+Once the dev server is running (`npm run dev`), browse the live graph at:
+
+```
+http://localhost:5173/codebase-graph/fast-ast
+```
+
+Reads `docs/graph/codebase-graph.json` via `/api/codebase-graph/json` and renders nodes/edges through `CodebaseGraphCanvas` + `GraphExport`. URL params:
+- `?limit=N` — cap nodes (default 500, max 5000)
+- `?dirsOnly=1` — directory-level only (~349 nodes instead of 2,579)
+- `?lowScore=N` — show only dirs with score ≤ N (focus on hotspots)
+
+Refresh the JSON anytime with `npm run graphify:daily`, then reload the viewer.
+
+---
+
 ## Architecture at a glance
 
 ```
