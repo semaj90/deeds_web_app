@@ -17,81 +17,81 @@ console.log();
 
 // Sample evidence metadata (realistic structure from evidence upload pipeline)
 const testMetadata = {
-	evidenceId: 'c9b79f5d-8f4e-4c3a-9d2a-1b3c4d5e6f7a',
-	schemaVersion: 1,
-	timestamp: Date.now(),
-	extraction: {
-		method: 'pdf-parse',
-		textLength: 15420,
-		ocrFallbackUsed: false,
-	},
-	entities: [
-		{
-			type: 'PERSON',
-			value: 'John Doe',
-			confidence: 0.95,
-			startOffset: 142,
-			endOffset: 150,
-			source: 'langextract',
-		},
-		{
-			type: 'DATE',
-			value: '2024-03-15',
-			confidence: 0.98,
-			startOffset: 245,
-			endOffset: 255,
-			source: 'langextract',
-		},
-		{
-			type: 'MONEY',
-			value: '$50,000',
-			confidence: 0.92,
-			startOffset: 512,
-			endOffset: 519,
-			source: 'langextract',
-		},
-	],
-	vlm: {
-		summary: 'Legal contract document with signatures and official seal visible',
-		keyFindings: [
-			'Two signatures present at bottom of page',
-			'Official notary seal in lower right',
-			'Date stamp: March 15, 2024',
-		],
-		suggestedTags: ['contract', 'signed', 'notarized'],
-		model: 'gemma4-legal-turbo3 (turboquant)',
-		cached: false,
-	},
-	forensics: {
-		flags: ['signature_detected', 'legal_keywords_high'],
-		riskScore: 0.15,
-	},
-	sections: [
-		{
-			sectionType: 'ARTICLE',
-			confidence: 0.88,
-			startOffset: 0,
-			endOffset: 1240,
-		},
-		{
-			sectionType: 'SECTION',
-			confidence: 0.92,
-			startOffset: 1240,
-			endOffset: 3580,
-		},
-	],
-	nlp: {
-		documentType: 'contract',
-		practiceArea: 'civil',
-		confidence: 0.87,
-		keyPhrases: ['whereas party', 'agrees to', 'consideration of'],
-	},
-	suggestedTags: ['contract', 'signed', 'notarized', 'civil', 'legal'],
-	pipelineStats: {
-		llmEscalated: true,
-		graphConnectionsCreated: 3,
-		processingTimeMs: 2450,
-	},
+  evidenceId: 'c9b79f5d-8f4e-4c3a-9d2a-1b3c4d5e6f7a',
+  schemaVersion: 1,
+  timestamp: Date.now(),
+  extraction: {
+    method: 'pdf-parse',
+    textLength: 15420,
+    ocrFallbackUsed: false,
+  },
+  entities: [
+    {
+      type: 'PERSON',
+      value: 'John Doe',
+      confidence: 0.95,
+      startOffset: 142,
+      endOffset: 150,
+      source: 'langextract',
+    },
+    {
+      type: 'DATE',
+      value: '2024-03-15',
+      confidence: 0.98,
+      startOffset: 245,
+      endOffset: 255,
+      source: 'langextract',
+    },
+    {
+      type: 'MONEY',
+      value: '$50,000',
+      confidence: 0.92,
+      startOffset: 512,
+      endOffset: 519,
+      source: 'langextract',
+    },
+  ],
+  vlm: {
+    summary: 'Legal contract document with signatures and official seal visible',
+    keyFindings: [
+      'Two signatures present at bottom of page',
+      'Official notary seal in lower right',
+      'Date stamp: March 15, 2024',
+    ],
+    suggestedTags: ['contract', 'signed', 'notarized'],
+    model: 'gemma4-legal-q8_0 (turboquant)',
+    cached: false,
+  },
+  forensics: {
+    flags: ['signature_detected', 'legal_keywords_high'],
+    riskScore: 0.15,
+  },
+  sections: [
+    {
+      sectionType: 'ARTICLE',
+      confidence: 0.88,
+      startOffset: 0,
+      endOffset: 1240,
+    },
+    {
+      sectionType: 'SECTION',
+      confidence: 0.92,
+      startOffset: 1240,
+      endOffset: 3580,
+    },
+  ],
+  nlp: {
+    documentType: 'contract',
+    practiceArea: 'civil',
+    confidence: 0.87,
+    keyPhrases: ['whereas party', 'agrees to', 'consideration of'],
+  },
+  suggestedTags: ['contract', 'signed', 'notarized', 'civil', 'legal'],
+  pipelineStats: {
+    llmEscalated: true,
+    graphConnectionsCreated: 3,
+    processingTimeMs: 2450,
+  },
 };
 
 console.log('📋 Test Metadata:');

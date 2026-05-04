@@ -29,6 +29,7 @@
  *   --turbo             Route Gemma4 inference through TurboQuant :8090
  *   --require-inference Abort if no LLM backend is reachable
  *   --limit N           Max directories to audit in detail (default: 30)
+ *   --write-map         After audit, regenerate docs/CODEBASE_DIRECTORY_MAP.md
  */
 
 import { writeFile, mkdir, readdir, stat } from 'fs/promises';
@@ -699,6 +700,22 @@ async function main() {
   const critical = auditedDirs.filter(d => d.score < 40).length;
   const warned   = auditedDirs.filter(d => d.score >= 40 && d.score < 70).length;
   console.log(`\n  ${c.bold('Done.')} ${c.red(`${critical} critical`)}  ${c.yellow(`${warned} warn`)}  ${c.green(`${auditedDirs.length - critical - warned} good`)}\n`);
+
+  // --write-map: regenerate CODEBASE_DIRECTORY_MAP.md after audit completes
+  if (WRITE_MAP && !DRY_RUN) {
+    console.log(c.dim('  [map] Regenerating CODEBASE_DIRECTORY_MAP.md...'));
+    try {
+      const { spawnSync } = await import('child_process');
+      const mapScript = path.join(__dirname, 'generate-codebase-directory-map.mjs');
+      const result = spawnSync(process.execPath, [mapScript], { stdio: 'inherit' });
+      if (result.status !== 0) {
+        console.warn(c.yellow('  [map] Map generator exited with error — run manually: npm run audit:dirs:map'));
+      }
+    } catch (e) {
+      console.warn(c.yellow(`  [map] Map generator failed: ${e.message}`));
+    }
+  }
+
   process.exit(critical > 0 ? 1 : 0);
 }
 

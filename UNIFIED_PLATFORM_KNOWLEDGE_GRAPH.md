@@ -1,6 +1,6 @@
 # Unified Platform Knowledge Graph — Complete Architecture Spec
 
-**Last Updated**: 2026-04-12
+**Last Updated**: 2026-05-03
 **Status**: Design Complete, Phase 1-2 Implemented
 **Vision**: Four-layer knowledge graph unifying runtime, codebase, legal, and AST graphs
 
@@ -41,6 +41,29 @@ The **Unified Platform Knowledge Graph** integrates four distinct graph layers i
 - "Which evidence items use this inference lane?" (Layer 3 → Layer 1)
 - "Which components import this orphaned module?" (Layer 4 → Layer 2)
 - "Which cases cite statutes that are missing embeddings?" (Layer 3 → Layer 3)
+
+## May 2026 Readiness Matrix
+
+The architecture below remains the target model, but the live repository is unevenly implemented. Use this matrix as the current reality check before treating every later section as equally production-ready.
+
+| Surface | Primary anchors | Readiness | Current reality |
+|---------|-----------------|-----------|-----------------|
+| ACE synthesis and context assembly | `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`, `sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts`, `sveltekit-frontend/src/routes/api/sse/chat/+server.ts` | Live | This is an active request-path surface. It assembles RAG, KAG, graph/community context, chat memory, and codebase context for synthesis routes that are already in use. |
+| ACP tool plane | `sveltekit-frontend/src/lib/services/knowledge-search/ACPToolRegistry.ts`, `sveltekit-frontend/src/routes/api/acp/tools/+server.ts`, `sveltekit-frontend/src/routes/api/acp/execute/+server.ts` | Live | Tool discovery and execution are wired as a separate bounded plane. This is not just a design concept and should be documented separately from ACE. |
+| Bifrost L1/L2 cache chain | `sveltekit-frontend/src/lib/server/ollama.ts`, `sveltekit-frontend/src/lib/server/cache/redis-exact-match.ts`, `sveltekit-frontend/src/routes/api/cache/bifrost/check/+server.ts`, `docker-compose.yml` | Production | Redis exact-match and Bifrost semantic caching are real runtime tiers used by synthesis, analytics, and codebase analysis flows. |
+| Codebase-index pipeline | `sveltekit-frontend/src/routes/api/codebase-index/orchestrate/+server.ts`, `sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts`, `sveltekit-frontend/src/lib/components/admin/PipelineProgress.svelte` | Implemented | The indexing and summarization spine is live, has direct UI entrypoints, and already writes graph/search artifacts to the backing stores. |
+| Community Graph / GraphRAG layer | `sveltekit-frontend/src/lib/server/graph/community-graph.ts`, `sveltekit-frontend/src/lib/server/ace/context-assembler.ts` | Implemented | Community detection is a real graph-memory layer and ACE can consume it today. This is the nearest thing to GraphRAG already present in the repo. |
+| Hypergraph 4D topology | `sveltekit-frontend/scripts/run-hypergraph.ts`, `sveltekit-frontend/src/lib/server/graph/hypergraph-4d.ts`, `sveltekit-frontend/src/lib/server/retrieval/topological-search.ts`, `sveltekit-frontend/scripts/ci-smoke-hypergraph.mjs` | Implemented, build-dependent | Retrieval code reads the Redis hyperedge shape today, but freshness depends on the standalone hypergraph writer being run and the smoke guard staying green. |
+| LangGraph sidecar | `sveltekit-frontend/src/lib/server/ai/langgraph-client.ts`, `sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts`, `docker-compose.yml` | Optional live integration | There is real client and container wiring for LangGraph on port `8091`, but it is env-gated rather than a mandatory always-on tier. |
+| Inference router and TurboQuant cascade | `sveltekit-frontend/src/lib/server/inference/inference-router.ts`, `sveltekit-frontend/src/routes/api/ai/chat/+server.ts`, `sveltekit-frontend/src/routes/api/knowledge/stream/+server.ts` | Live with optional backends | The cascade is actively consumed by server routes, but several tiers remain optional depending on which runtimes are up. |
+| Unified four-layer knowledge graph | This document plus Neo4j/Qdrant/Postgres integration points above | Partial | The repo has live slices of the runtime graph, codebase graph, graph augmentation, and legal retrieval, but the full cross-layer graph described below is still only partially unified. |
+
+### Recommended Order Of Trust
+
+- Treat ACE, ACP, Bifrost, the inference router, and the codebase-index pipeline as live operational surfaces first.
+- Treat community graph and hypergraph layers as implemented augmentation layers whose value depends on upstream build freshness.
+- Treat LangGraph as a real optional sidecar, not a guaranteed baseline.
+- Treat the fully unified four-layer graph below as the long-form target architecture rather than as a claim that every cross-layer edge already exists.
 
 ---
 
@@ -401,6 +424,28 @@ RETURN s.name, s.port
 ---
 
 ## Layer 3: Legal / Evidence Graph
+
+### May 2026 Reality Check
+The legal/evidence side is not just a conceptual mirror of the codebase graph. Its most trustworthy current substrate is the evidence upload and retrieval path backed by PostgreSQL, vector storage, and `yorha_evidence_connections`, with Neo4j and hypergraph layers acting as augmentation rather than the sole graph of record.
+
+| Surface | What is actually live now | Current trust |
+|---------|---------------------------|---------------|
+| Evidence upload lifecycle | `POST /api/evidence/upload` is an auth-guarded multipart pipeline that writes to MinIO and PostgreSQL, then runs extraction, chunking, embedding, entity extraction, forensics, summaries, and downstream invalidation. It is paired with `GET /api/evidence/[docId]/status`, `GET /api/evidence/realtime`, and `GET /api/evidence/[id]/download`, which completes the upload → progress → retrieval loop. | High |
+| Evidence search and KAG retrieval | `POST /api/evidence/search` is already a real RAG + KAG + DAG route, not a thin placeholder. It embeds with gRPC/HTTP fallback, caches results, reranks with legal signals, and explicitly traverses `yorha_evidence_connections` for graph-hop enrichment. Multiple pages, upload flows, and machines call it directly. | High |
+| Evidence relationships and board graph | `GET/POST /api/evidence/relationships` and `POST /api/evidence/connections` are live board-level graph surfaces used by evidence board and relationship inspector components. These are concrete graph-editing/readout routes, even though they are narrower than a full unified knowledge graph. | Medium-High |
+| Postgres evidence graph of record | The most concrete current graph layer is the Postgres-backed `yorha_evidence_nodes` and `yorha_evidence_connections` model. `evidence-analysis-pipeline.ts` and the upload path write into it, `graph-context.ts` traverses it, and `/api/sse/chat`, `/api/evidence/search`, and `/api/rag/search` consume it for KAG-style expansion. | High |
+| Citation and authority enrichment | Legal authority logic is already present inside retrieval through `CitationGraph` and optional `legalPageRank` within `/api/evidence/search`, but this is still embedded in search/rerank logic rather than exposed as one standalone legal authority graph route. | Medium |
+| Neo4j evidence graph | `evidence-graph-service.ts` can upsert Evidence, Case, and Entity nodes and create similarity links, while `pg-neo4j-sync.ts` mirrors PG evidence edges into Neo4j. In this pass, these looked like augmentation and sync layers, not the primary request-path graph of record. | Medium |
+| Hypergraph 4D overlay | `/api/graph/hypergraph` and `/api/graph/hypergraph/address` are real runtime surfaces. They expose build, stats, grade-filtered edge lookup, invalidation, and ACE contextual addressing, with an observed admin consumer in `admin/search-intelligence`. This is best treated as a topological overlay on top of retrieval, not the baseline legal graph store. | Medium |
+| Fully unified legal/evidence knowledge graph | The node and edge model below remains the target architecture. Pieces of it are already real, but this pass did not find one uniform runtime substrate that exposes every listed node type and edge type as a single live graph system. | Target state |
+
+### Current Order Of Trust For Layer 3
+- Trust the upload/status/realtime/download loop first when checking whether evidence storage and retrieval are truly working.
+- Trust `yorha_evidence_connections` and `graph-context.ts` next when checking whether graph-aware retrieval is live in SSE chat, RAG search, or evidence search.
+- Treat Neo4j sync and hypergraph routes as implemented augmentation layers that improve traversal and topology, not as the only graph source of truth.
+- Treat the full node and edge taxonomy below as the desired end state, not as a claim that every legal surface is already unified behind one runtime graph.
+
+One important seam in the current system is `graph-context.ts`: it is the live KAG bridge, and it explicitly handles mixed evidence identifiers and file-path-derived IDs before querying `yorha_evidence_connections`. That makes it part of the real retrieval path, not just a speculative helper module.
 
 ### Node Types
 
