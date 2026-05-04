@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:16:37.991Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-04T16:32:31.706Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -36,7 +36,7 @@ These tools are wired in-process in [`src/lib/server/ai/gemma4-agent.ts`](./src/
 |------|--------|
 | G4  Auth on API routes | 636✅ / 30❌ |
 | G5  Zod on body-parsing routes | 468✅ / 1❌ |
-| G15 SSR-unsafe globals | 42❌ |
+| G15 SSR-unsafe globals | 37❌ |
 | G16 Routes without tests | 534❌ |
 | G20 Cyclic import pairs | 0 |
 
@@ -54,7 +54,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/ai` | 13 | 🔴 1 ssr | C14 | `src_lib_ai` | `agents_md({ path: "src/lib/ai" })` |
+| `src/lib/ai` | 13 | — | C14 | `src_lib_ai` | `agents_md({ path: "src/lib/ai" })` |
 | `src/lib/ai/e2b` | 2 | — | C21 | `src_lib_ai_e2b` | `agents_md({ path: "src/lib/ai/e2b" })` |
 | `src/lib/ai/onnx` | 2 | — | — | `src_lib_ai_onnx` | `agents_md({ path: "src/lib/ai/onnx" })` |
 
@@ -189,7 +189,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/machines` | 12 | 🔴 1 ssr | C96 | `src_lib_machines` | `agents_md({ path: "src/lib/machines" })` |
+| `src/lib/machines` | 12 | — | C96 | `src_lib_machines` | `agents_md({ path: "src/lib/machines" })` |
 
 ### `src/lib/models/` (1 dir)
 
@@ -200,7 +200,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/schemas` | 5 | 🔴 1 ssr | C29 | `src_lib_schemas` | `agents_md({ path: "src/lib/schemas" })` |
+| `src/lib/schemas` | 5 | — | C29 | `src_lib_schemas` | `agents_md({ path: "src/lib/schemas" })` |
 | `src/lib/schemas/tools` | 8 | — | C32 | `src_lib_schemas_tools` | `agents_md({ path: "src/lib/schemas/tools" })` |
 
 ### `src/lib/server/` (87 dirs)
@@ -269,7 +269,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/services` | 7 | — | C43 | `src_lib_services` | `agents_md({ path: "src/lib/services" })` |
 | `src/lib/services/error-analysis` | 17 | — | C17 | `src_lib_services_error_analysis` | `agents_md({ path: "src/lib/services/error-analysis" })` |
-| `src/lib/services/knowledge-search` | 11 | — | C17 | `src_lib_services_knowledge_search` | `agents_md({ path: "src/lib/services/knowledge-search" })` |
+| `src/lib/services/knowledge-search` | 11 | 🔴 1 ssr | C17 | `src_lib_services_knowledge_search` | `agents_md({ path: "src/lib/services/knowledge-search" })` |
 
 ### `src/lib/shared/` (3 dirs)
 
@@ -289,7 +289,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/stores` | 14 | — | C52 | `src_lib_stores` | `agents_md({ path: "src/lib/stores" })` |
 | `src/lib/stores/dashboard` | 3 | — | C68 | `src_lib_stores_dashboard` | `agents_md({ path: "src/lib/stores/dashboard" })` |
-| `src/lib/stores/unified` | 6 | 🔴 1 ssr | C52 | `src_lib_stores_unified` | `agents_md({ path: "src/lib/stores/unified" })` |
+| `src/lib/stores/unified` | 6 | — | C52 | `src_lib_stores_unified` | `agents_md({ path: "src/lib/stores/unified" })` |
 
 ### `src/lib/test-utils/` (1 dir)
 
@@ -306,13 +306,13 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/utils` | 42 | 🔴 2 ssr | C1 | `src_lib_utils` | `agents_md({ path: "src/lib/utils" })` |
+| `src/lib/utils` | 42 | 🔴 1 ssr | C1 | `src_lib_utils` | `agents_md({ path: "src/lib/utils" })` |
 
 ### `src/lib/webgpu/` (1 dir)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/webgpu` | 19 | 🔴 2 ssr | C23 | `src_lib_webgpu` | `agents_md({ path: "src/lib/webgpu" })` |
+| `src/lib/webgpu` | 19 | 🔴 1 ssr | C23 | `src_lib_webgpu` | `agents_md({ path: "src/lib/webgpu" })` |
 
 ### `src/lib/workers/` (1 dir)
 
@@ -529,3 +529,10 @@ When an agent (or human) needs to work in a directory:
 The per-dir AGENTS.md files live INSIDE the directories themselves (e.g. `src/lib/server/cache/AGENTS.md`), so any agent walking UP the tree from a file under work picks them up automatically.
 
 Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.
+
+## Further reading
+
+- [`docs/agents-md-howto.md`](./docs/agents-md-howto.md) — full guide: 5-source join, idempotency, Bifrost L1+L2 cache integration, Qdrant tag-cluster compression, TypeScript reranker pattern, future ideas
+- [`docs/ace-kag-howto.md`](./docs/ace-kag-howto.md) — KAG ingestion + ACE retrieval pipeline (this is what populates `wiki:note:dir:*`)
+- [`docs/graph/codebase-map.md`](./docs/graph/codebase-map.md) — 20-gate audit dashboard (G4/G5/G15/G16/G20 coverage)
+- [`docs/graph/hypergraph-clusters.md`](./docs/graph/hypergraph-clusters.md) — full per-cluster digest (topic + member files)
