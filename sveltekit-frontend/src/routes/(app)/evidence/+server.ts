@@ -1,6 +1,11 @@
 import { json } from '@sveltejs/kit';
 import { randomUUID } from 'node:crypto';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const evidenceUploadFieldsSchema = z.object({
+  caseId: z.string().min(1).max(200).default('unknown'),
+});
 
 // Allow GET requests to pass through to the page
 export const GET: RequestHandler = async () => {
@@ -12,7 +17,10 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const form = await request.formData();
     const file = form.get('file') as File;
-    const caseId = (form.get('caseId') as string) ?? 'unknown';
+    const fieldsParsed = evidenceUploadFieldsSchema.safeParse({
+      caseId: form.get('caseId') ?? 'unknown',
+    });
+    const caseId = fieldsParsed.success ? fieldsParsed.data.caseId : 'unknown';
 
     if (!file) return json({ success: false, error: 'No file' }, { status: 400 });
 

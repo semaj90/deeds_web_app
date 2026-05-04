@@ -6,7 +6,12 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
+
+const audioUploadFieldsSchema = z.object({
+  caseId: z.string().uuid().nullable().optional(),
+});
 import { evidence } from '$lib/server/db/schema-postgres';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed';
 import { getRedis } from '$lib/server/redis';
@@ -23,11 +28,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     const formData = await request.formData();
     const audioFile = formData.get('audio') as File | null;
-    const caseId = formData.get('caseId') as string | null;
+    const caseIdRaw = formData.get('caseId') as string | null;
 
     if (!audioFile) {
       return json({ error: 'No audio file provided' }, { status: 400 });
     }
+
+    const fieldsParsed = audioUploadFieldsSchema.safeParse({
+      caseId: caseIdRaw && caseIdRaw.length > 0 ? caseIdRaw : null,
+    });
+    if (!fieldsParsed.success) {
+      return json({ error: 'Invalid caseId — must be UUID' }, { status: 400 });
+    }
+    const caseId = fieldsParsed.data.caseId ?? null;
 
     // Validate file type
     const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/m4a', 'audio/ogg', 'audio/webm'];

@@ -4,12 +4,17 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { startClusteringJob, getClusteringStatus } from '$lib/server/ml/topic-clustering-worker.js';
+
+const agenticLoopSchema = z.object({
+	iterations: z.number().int().min(1).max(100).default(1),
+});
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json().catch(() => ({}));
-		const { iterations = 1 } = body as { iterations?: number };
+		const parsed = agenticLoopSchema.safeParse(await request.json().catch(() => ({})));
+		const { iterations } = parsed.success ? parsed.data : { iterations: 1 };
 
 		// Start the clustering pipeline (XState: idle → fetch → cluster → persist → cache)
 		const jobId = await startClusteringJob();
