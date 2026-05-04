@@ -5,10 +5,12 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 
 export const POST: RequestHandler = async () => {
+	if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
 	try {
 		const redis = getRedis();
 		const testKey = 'test:redis:direct:' + Date.now();

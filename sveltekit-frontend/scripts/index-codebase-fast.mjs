@@ -119,7 +119,10 @@ const RE_DYN_VAR     = /@vite-ignore/;
 const RE_REEXPORT    = /export\s+(?:\*|\{[^}]*\})\s+from\s+['"]([^'"]+)['"]/g;
 // G4 — auth guard (locals.user, cast pattern, requireAuth, getSession, DEV_BYPASS)
 // Also treat (app)/ routes as auth-guarded — layout.server.ts enforces redirect
-const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{/;
+// "Auth" here is broader than locals.user — it includes any access gate that
+// blocks the handler from running in production. `if (!dev) return 403` is a
+// valid gate (route is dev-only, returns 403 in prod) so we accept it.
+const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{|if\s*\(\s*!\s*dev\s*\)/;
 function isLayoutGuarded(rel) {
   // Routes under (app)/ are protected by +layout.server.ts auth redirect
   return rel.includes('/routes/(app)/') || rel.includes('/routes/(admin)/');
@@ -296,7 +299,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v7';
+const META_CACHE_VERSION = 'v8';
 
 for (const filePath of walk(scanRoot)) {
   let src;
