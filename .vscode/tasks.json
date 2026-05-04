@@ -8607,6 +8607,58 @@
       "problemMatcher": []
     },
 
+    // ─── 🎮 nes-arch — agents.md spec / Redis quick-hit context ──────────────
+    {
+      "label": "🎮 nes-arch: Regen all AGENTS.md (disk + Redis mirror)",
+      "type": "shell",
+      "command": "npm run agents:write",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Generate per-directory AGENTS.md files from KAG notes + graph JSON, mirror to Redis agents:dir:* (24h TTL) for sub-5ms agent tool-call lookups. ~5s.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎮 nes-arch: Regen root AGENTS.md only",
+      "type": "shell",
+      "command": "npm run agents:write:root",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Only rebuild repo-root AGENTS.md (audit gate snapshot). Skip the 248 per-dir files. <1s.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎮 nes-arch: Inspect Redis agents:dir:* mirror",
+      "type": "shell",
+      "command": "npm run nes:inspect:agents",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Read-only inspector — confirm Redis mirror is populated and which keys exist. Shows TTLs, char lengths, top 10 keys. NEVER writes.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎮 nes-arch: Inspect underlying KAG notes (debug empty AGENTS.md)",
+      "type": "shell",
+      "command": "npm run nes:inspect:kag",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Peek at the underlying ClusterNote JSON in wiki:note:dir:*. Use this when an AGENTS.md looks empty — confirm whether the indexer captured the data the renderer expects.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎮 nes-arch: Walk-up resolution test (path → AGENTS.md key)",
+      "type": "shell",
+      "command": "npm run nes:inspect:agents -- --path ${input:nesPath}",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Given a file/dir path, replicate the getAgentsMdQuickHit walk-up logic and show which agents:dir:* key resolves. Useful for debugging tool-call context.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
     {
       "label": "📊 Graphify: Live Progress (latest log)",
       "type": "shell",
@@ -8751,6 +8803,12 @@
     }
   ],
   "inputs": [
+    {
+      "id": "nesPath",
+      "type": "promptString",
+      "description": "File or directory path (e.g. src/lib/server/ace/agent.ts or src/routes/api/cases) — walks UP to nearest AGENTS.md in Redis",
+      "default": "src/lib/server/ace"
+    },
     {
       "id": "batchTopN",
       "type": "promptString",
