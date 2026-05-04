@@ -24,34 +24,44 @@ let isConsuming = false;
 
 /**
  * Extract text from document (basic implementation)
- * TODO: Use pdf-parse for PDFs, mammoth for DOCX
  */
 async function extractText(filePath: string, mimeType: string): Promise<string> {
   try {
     if (mimeType === 'text/plain' || mimeType === 'text/markdown' || filePath.endsWith('.txt') || filePath.endsWith('.md')) {
-      // Plain text - read directly
       return await readFile(filePath, 'utf-8');
     } else if (mimeType === 'application/json' || filePath.endsWith('.json')) {
-      // JSON - read and format
       const content = await readFile(filePath, 'utf-8');
       return JSON.stringify(JSON.parse(content), null, 2);
     } else if (mimeType === 'application/pdf' || filePath.endsWith('.pdf')) {
-      // PDF - use pdf-parse (install: npm install pdf-parse)
       try {
         const pdfParse = await import('pdf-parse/lib/pdf-parse.js');
         const buffer = await readFile(filePath);
         const data = await pdfParse.default(buffer);
         return data.text;
       } catch (err) {
-        console.warn('pdf-parse failed, using fallback:', err);
-        return '[PDF content extraction failed - install pdf-parse package]';
+        console.warn('[doc-embed] pdf-parse failed:', err);
+        return '[PDF content extraction failed]';
+      }
+    } else if (
+      mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+      mimeType === 'application/msword' ||
+      filePath.endsWith('.docx') || filePath.endsWith('.doc')
+    ) {
+      try {
+        const mammoth = await import('mammoth');
+        const buffer = await readFile(filePath);
+        const result = await mammoth.extractRawText({ buffer });
+        if (result.messages.length) console.debug('[doc-embed] mammoth warnings:', result.messages);
+        return result.value;
+      } catch (err) {
+        console.warn('[doc-embed] mammoth failed:', err);
+        return '[DOCX content extraction failed]';
       }
     } else {
-      // Unsupported - return placeholder
       return `[Document type ${mimeType} not yet supported for text extraction]`;
     }
   } catch (error) {
-    console.error('Text extraction error:', error);
+    console.error('[doc-embed] Text extraction error:', error);
     throw error;
   }
 }

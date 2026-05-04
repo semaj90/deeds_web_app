@@ -156,28 +156,74 @@ export async function ensureRedis() {
 }
 
 // =============================================================================
-// TODO: Chat Message Caching & Tensor Store
+// Chat Message Cache
+// Keys: chat:msg:{conversationId}:{index}  → JSON {role,content,timestamp}
+//       chat:session:{sessionId}            → Redis Set of conversationIds
+// TTL: 24 h (hot cache) — long-term storage handled by Qdrant/pgvector consumers
 // =============================================================================
-// Phase: Redis optimization tensor analysis for chat persistence
-//
-// 1. Cache user chat messages as Redis hashes keyed by `chat:{conversationId}:{msgIndex}`
-// 2. Generate embeddings (embeddinggemma:latest) for each user message on write
-// 3. Store embedding tensors as Redis binary buffers: `chat:embed:{conversationId}:{msgIndex}`
-// 4. Ripgrep-style semantic search: query cached directives using cosine similarity
-// 5. Mirror embeddings to Qdrant collection `chat_directives` for long-term vector retrieval
-// 6. Mirror to pgvector `chat_message_embeddings` table for SQL-based analytics
-// 7. TTL: 24h for hot cache, Qdrant/pgvector for permanent storage
-// 8. Use case: retrieve past user instructions across context window resets
-//    e.g. "user said use Ollama not OpenAI" → searchable via embedding similarity
-//
-// Redis key schema:
-//   chat:msg:{conversationId}:{index}     → JSON { role, content, timestamp }
-//   chat:embed:{conversationId}:{index}   → Float32Array (768-dim embeddinggemma)
-//   chat:session:{sessionId}              → Set of conversationIds
-//   chat:directives:{userId}              → Sorted set of user instructions by recency
-//
-// Integration points:
-//   - src/routes/api/sse/chat/+server.ts  → write-through on message save
-//   - src/routes/api/chat/migrate/+server.ts → bulk cache on login migration
-//   - src/lib/stores/chat-store.svelte.ts → client-side IndexedDB mirror (Loki.js)
-// =============================================================================
+
+export interface CachedChatMessage {
+	role: 'user' | 'assistant' | 'system';
+	content: string;
+	timestamp: number;
+}
+
+const CHAT_MSG_TTL = 24 * 3600; // 24 h
+
+/**
+ * Persist a single chat message to Redis.
+ * Call fire-and-forget from the SSE chat handler.
+ */
+export async function cacheMessage(
+	conversationId: string,
+	index: number,
+	msg: CachedChatMessage,
+	sessionId?: string
+): Promise<void> {
+	try {
+		const redis = getRedis();
+		const key = `chat:msg:${conversationId}:${index}`;
+		await redis.set(key, JSON.stringify(msg), 'EX', CHAT_MSG_TTL);
+		if (sessionId) {
+			await redis.sadd(`chat:session:${sessionId}`, conversationId);
+			await redis.expire(`chat:session:${sessionId}`, CHAT_MSG_TTL);
+		}
+	} catch {
+		// non-fatal — DB is the source of truth
+	}
+}
+
+/**
+ * Read cached messages for a conversation in insertion order.
+ * Returns [] on cache miss or Redis unavailability.
+ */
+export async function getCachedMessages(
+	conversationId: string,
+	limit = 100
+): Promise<CachedChatMessage[]> {
+	try {
+		const redis = getRedis();
+		const msgs: CachedChatMessage[] = [];
+		for (let i = 0; i < limit; i++) {
+			const raw = await redis.get(`chat:msg:${conversationId}:${i}`);
+			if (!raw) break;
+			msgs.push(JSON.parse(raw) as CachedChatMessage);
+		}
+		return msgs;
+	} catch {
+		return [];
+	}
+}
+
+/**
+ * Invalidate all cached messages for a conversation.
+ */
+export async function invalidateChatCache(conversationId: string, length: number): Promise<void> {
+	try {
+		const redis = getRedis();
+		const keys = Array.from({ length }, (_, i) => `chat:msg:${conversationId}:${i}`);
+		if (keys.length) await redis.del(...keys);
+	} catch {
+		// non-fatal
+	}
+}

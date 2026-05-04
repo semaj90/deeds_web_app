@@ -18,7 +18,6 @@ export async function verifyPassword(
 	password: string,
 	hashedPassword: string
 ): Promise<boolean> {
-	// TODO: ACE: Async function without await (check if async is needed)
 	return bcrypt.compare(password, hashedPassword);
 }
 
