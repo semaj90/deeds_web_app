@@ -398,7 +398,7 @@ docker run -d \
 llama-server \
   -m /models/gemma4-legal-Q4_K_M.gguf \
   --mmproj /models/mmproj-gemma4-BF16.gguf \
-  --kv-cache-type turbo3 \
+  -ctk q8_0 -ctv q8_0 \
   --port 8090 \
   --ctx-size 32768 \
   --n-gpu-layers 40 \

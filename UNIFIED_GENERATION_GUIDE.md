@@ -153,9 +153,12 @@ const result = await generateText({
 **Status**: ✅ **RUNNING** on `:8090`
 
 **Features**:
-- **turbo3 KV cache** — 5× VRAM savings, 8× attention speedup
+- **q8_0 KV cache (stable default)** — current Windows/CUDA startup path
 - **Vision support** — `--mmproj` for unified text+vision
 - **OpenAI-compatible** — `/v1/chat/completions`
+
+**Experimental note**:
+- `turbo3` remains benchmark-only on this machine; keep `q8_0` as the default unless you are explicitly testing the experimental cache path.
 
 **Cascade position**:
 ```

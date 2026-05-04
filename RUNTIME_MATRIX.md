@@ -170,22 +170,22 @@ node -e "const addon = require('./simd-bridge/cpp/build/Release/tensorrt_bridge.
 
 ---
 
-### 4. TurboQuant Lane 🚀 (Future Enhancement)
+### 4. TurboQuant Lane 🚀 (Current Windows Default)
 
-**Purpose**: 5× VRAM compression + 8× GPU attention speedup via training-free KV cache quantization
+**Purpose**: Stable Windows llama-server lane with q8_0 KV cache; benchmark `turbo3` separately if you need the experimental compression path
 
 **Technology Stack**:
 - **Algorithm**: TurboQuant ICLR 2026 (training-free KV cache compression)
-- **Quantization**: turbo3 (3-bit per value), 99.5% attention fidelity
-- **Compression**: 5× cache size reduction, 8× faster GPU attention
-- **Model**: llama-server with `--kv-cache-type turbo3`
-- **Latency**: 15-20s for 200 tokens (with turbo3 KV)
+- **Quantization**: q8_0 KV cache (current production default on this Windows/CUDA setup)
+- **Compression**: Lower VRAM than FP16 KV with a stable startup path on the current backend
+- **Model**: llama-server with `-ctk q8_0 -ctv q8_0`
+- **Latency**: 15-20s for 200 tokens on the current q8_0 lane
 
 **Configuration**:
 ```bash
 # Environment Variables
 TURBOQUANT_BASE_URL=http://127.0.0.1:8090
-TURBOQUANT_KV_CACHE=turbo3
+TURBOQUANT_KV_CACHE=q8_0
 TURBOQUANT_VISION_CAPABLE=true
 TURBOQUANT_MMPROJ_PATH=/models/mmproj-gemma4-BF16.gguf
 
@@ -199,7 +199,7 @@ PROTOCOL: HTTP/1.1 (OpenAI-compatible /v1/chat/completions)
 llama-server \
   -m /models/gemma4-legal-Q4_K_M.gguf \
   --mmproj /models/mmproj-gemma4-BF16.gguf \
-  --kv-cache-type turbo3 \
+   -ctk q8_0 -ctv q8_0 \
   --port 8090 \
   --ctx-size 32768 \
   --n-gpu-layers 40 \
@@ -220,7 +220,7 @@ llama-server \
 **Health Check**:
 ```bash
 curl http://localhost:8090/health
-# Expected: {"status":"ok","model":"gemma4-legal","kv_cache":"turbo3","vram_usage":"3.2GB"}
+# Expected: {"status":"ok","model":"gemma4-legal","kv_cache":"q8_0","vram_usage":"3.2GB"}
 ```
 
 **Status**: ✅ **INTEGRATED** (inference-router.ts lines 421-496, health monitoring lines 1209-1214)
@@ -536,7 +536,7 @@ SERVER CASCADE (SvelteKit Backend):
    ├─ Success → Store in L1+L2, return
    └─ Fail (TRT down) → Tier 4
 
-4. TurboQuant llama-server (turbo3 KV, 15-20s)
+4. TurboQuant llama-server (q8_0 KV, 15-20s)
    ├─ Success → Store in L1+L2, return
    └─ Fail (health check failed) → Tier 5
 
@@ -600,7 +600,7 @@ BIFROST_ENABLED=true
 ```bash
 # TurboQuant
 TURBOQUANT_BASE_URL=http://127.0.0.1:8090
-TURBOQUANT_KV_CACHE=turbo3
+TURBOQUANT_KV_CACHE=q8_0
 TURBOQUANT_ENABLED=true
 
 # LiteRT-LM
@@ -869,7 +869,7 @@ curl http://localhost:8090/health  # TurboQuant
 **TurboQuant health check fails**:
 - Verify llama-server running: `ps aux | grep llama-server`
 - Check port: `lsof -i :8090`
-- Restart: `pkill llama-server && llama-server -m ... --kv-cache-type turbo3 --port 8090`
+- Restart: `pkill llama-server && llama-server -m ... -ctk q8_0 -ctv q8_0 --port 8090`
 
 **Ollama timeout**:
 - Check VRAM: `nvidia-smi` (need ≥2GB free for gemma4-legal)
@@ -909,7 +909,7 @@ curl http://localhost:8090/health  # TurboQuant
 │  │  ├─ Redis L1 Cache (5ms exact match) ─────────────── 20-30% hit │ │
 │  │  ├─ Bifrost L2 Cache (2-5s semantic) ─────────────── 70-90% hit │ │
 │  │  ├─ TensorRT GPU (INT4 quantized) — 15-20s                      │ │
-│  │  ├─ TurboQuant llama-server (turbo3 KV) — 15-20s                │ │
+│  │  ├─ TurboQuant llama-server (q8_0 KV) — 15-20s                  │ │
 │  │  ├─ VLM Server (HF NF4 + mmproj) — 25-30s                       │ │
 │  │  ├─ LiteRT Sidecar (CPU XNNPACK) — 30-40s                       │ │
 │  │  └─ Ollama (gemma4-legal Q4_K_M) — 20-30s ────────── ALWAYS ✅  │ │

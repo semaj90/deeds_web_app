@@ -8329,6 +8329,66 @@
       "group": "test",
       "detail": "Fast AST index (no Redis) + production-readiness --direct --skip-index. Requires only Ollama/TurboQuant.",
       "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "📂 Dir Map: Generate CODEBASE_DIRECTORY_MAP.md",
+      "type": "shell",
+      "command": "node scripts/tests/generate-codebase-directory-map.mjs",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Walk src/ tree + fetch Redis wiki notes → write docs/CODEBASE_DIRECTORY_MAP.md",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Map: Dry-run (print to terminal)",
+      "type": "shell",
+      "command": "node scripts/tests/generate-codebase-directory-map.mjs --dry-run",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Preview CODEBASE_DIRECTORY_MAP.md without writing file",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Audit: lib/server (direct LLM, no graph)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Audit src/lib/server/ — structural metrics + TurboQuant/Ollama AI summaries → next_steps/active/",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Audit: routes/api (direct LLM, no graph)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs routes/api --direct --no-graph",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Audit src/routes/api/ — structural metrics + TurboQuant/Ollama AI summaries → next_steps/active/",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Audit: Full (lib + routes + write-map)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs lib --direct --no-graph --depth 3 --write-map && node scripts/tests/deep-directory-audit.mjs routes/api --direct --no-graph",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Audit lib/ + routes/api/, then regenerate CODEBASE_DIRECTORY_MAP.md. Requires TurboQuant or Ollama.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "📂 Dir Audit + KAG Ingest: lib/server (via summarize-dirs API)",
+      "type": "shell",
+      "command": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph && curl -s -X POST http://localhost:5173/api/codebase-index/summarize-dirs -H 'Content-Type: application/json' -H 'x-dev-bypass-auth: true' | pwsh -NoProfile -Command \"$input | ConvertFrom-Json | ConvertTo-Json -Depth 3\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Audit lib/server, then POST to /api/codebase-index/summarize-dirs to ingest into Redis/Postgres for ACE KAG",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [

@@ -11,8 +11,8 @@ llama-server.exe ^
   --mmproj "C:\Users\james\Downloads\gemma4-mmproj\mmproj-BF16.gguf" ^
   --port 8090 ^
   --host 0.0.0.0 ^
-  --cache-type-k turbo3 ^
-  --cache-type-v q8_0 ^
+  -ctk q8_0 ^
+  -ctv q8_0 ^
   --n-gpu-layers 99 ^
   --ctx-size 32768 ^
   --n-threads 8 ^
@@ -31,10 +31,14 @@ curl http://localhost:8090/props | jq '.modalities'
 ```
 
 ### Benefits
-- **5× VRAM savings** (turbo3 KV cache compression)
-- **8× attention speedup** (optimized CUDA kernels)
+- **Stable q8_0 startup path** on the current Windows/CUDA backend
+- **Lower KV memory than FP16** without the backend instability seen on some turbo3 runs
 - **Unified VLM** (text + vision in ONE process, no VRAM swap)
 - **~80 tok/s** inference speed on RTX 3060 Ti
+
+### Experimental turbo3 path
+- `turbo3` is still an optional benchmark path if you want to test the more aggressive KV compression.
+- Keep the default launcher on `q8_0`; only switch to `turbo3` when you are explicitly profiling that backend.
 
 ---
 
@@ -307,7 +311,7 @@ Inference Cascade:
 1. TensorRT (GPU, fastest)
 2. Triton (GPU, production)
 3. Bifrost (semantic cache, 6.9×)
-4. TurboQuant (turbo3 KV, 5× VRAM) ← AUTO ROUTE
+4. TurboQuant (q8_0 KV, stable default) ← AUTO ROUTE
 5. Ollama (fallback)
 ```
 

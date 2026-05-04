@@ -22,7 +22,7 @@ User Query (text)
    ├─ Health: GET /v2/health/ready
    └─ Fallback: Triton offline
   ↓
-3. TurboQuant (:8090)            — turbo3 KV cache, ~80 tok/s, 3.4GB VRAM
+3. TurboQuant (:8090)            — q8_0 KV cache (stable default), ~80 tok/s, 3.4GB VRAM
    ├─ Health: GET /health
    ├─ Vision: GET /props → modalities.vision
    └─ Fallback: llama-server not running
@@ -93,8 +93,8 @@ User Query (image + text)
 llama-server \
   -m gemma4-legal.gguf \
   --mmproj siglip.gguf \
-  -ctk turbo3 \
-  -ctv turbo3 \
+  -ctk q8_0 \
+  -ctv q8_0 \
   --port 8090 \
   -ngl 99 \
   --flash-attn on \
@@ -103,8 +103,8 @@ llama-server \
 # Text-only (fallback if mmproj unavailable)
 llama-server \
   -m gemma4-legal.gguf \
-  -ctk turbo3 \
-  -ctv turbo3 \
+  -ctk q8_0 \
+  -ctv q8_0 \
   --port 8090 \
   -ngl 99 \
   --flash-attn on \
@@ -140,7 +140,7 @@ Router extracts `modalities.vision` and uses it to determine VLM routing priorit
 |---------|------|------|-------|-------|
 | **TensorRT-LLM** | Text | 7.4 GB | ~120 tok/s | INT4 AWQ, requires GPU lease |
 | **Triton** | Text | 7.4 GB | ~110 tok/s | Production TRT backend |
-| **TurboQuant** | Text | 3.4 GB | ~80 tok/s | turbo3 KV cache compression |
+| **TurboQuant** | Text | 3.4 GB | ~80 tok/s | stable q8_0 KV cache (turbo3 benchmark-only) |
 | **TurboQuant** | Vision | 5.0 GB | ~80 tok/s | +1.6GB for SigLIP (on-demand) |
 | **HF VLM** | Vision | 9.2 GB | ~40 tok/s | Needs offload or swap |
 | **Ollama VLM** | Vision | 9.6 GB | ~30 tok/s | Requires VRAM swap from TurboQuant |
@@ -207,7 +207,7 @@ Response:
 ```json
 {
   "text": "This image shows a signed contract dated March 15, 2024...",
-  "model": "gemma4-legal-turbo3",
+  "model": "gemma4-legal-q8_0",
   "backend": "turboquant",
   "usage": {
     "prompt_tokens": 156,
@@ -251,7 +251,7 @@ Returns:
 {
   "tensorrt": { "available": true, "url": "http://localhost:8099", "vramSufficient": false },
   "triton": { "available": false, "url": "http://localhost:8000" },
-  "turboquant": { "available": true, "url": "http://localhost:8090", "kvCache": "turbo3", "visionCapable": true },
+  "turboquant": { "available": true, "url": "http://localhost:8090", "kvCache": "q8_0", "visionCapable": true },
   "vlm": { "available": false, "url": "http://localhost:8085" },
   "ollamaVlm": { "available": true, "model": "gemma4:e4b-it-q4_K_M" },
   "litert": { "available": true, "url": "http://localhost:8070" },
@@ -307,7 +307,7 @@ Buffered writes to `inference_log` database:
 import { logLLMInference } from '$lib/server/observability/inference-log.js';
 
 logLLMInference({
-  model: 'gemma4-legal-turbo3',
+  model: 'gemma4-legal-q8_0',
   backend: 'turboquant',
   latencyMs: 1847,
   tokenCount: 245,
@@ -352,7 +352,7 @@ ollama serve
 ```bash
 # Single process handles both text + vision
 llama-server -m gemma4-legal.gguf --mmproj siglip.gguf \
-  -ctk turbo3 -ctv turbo3 --port 8090 -ngl 99 --flash-attn on
+  -ctk q8_0 -ctv q8_0 --port 8090 -ngl 99 --flash-attn on
 ```
 
 **Code changes**: NONE — inference-router.ts auto-detects vision capability via `/props`
