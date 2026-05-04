@@ -299,7 +299,7 @@ ${STAMP}
 - **Frontend**: \`sveltekit-frontend/\` — SvelteKit + Svelte 5 runes only. ${apiTotal} server routes across ${totalDirs} dirs, ${files.length} indexed files.
 - **GPU bridge**: \`simd-bridge/cpp/\` — N-API addon for LibTorch CUDA + simdjson AVX2.
 - **Go services**: \`go-microservice/\`, \`services/go-retrieval-service/\` — gRPC :50051-50057 (see \`CLAUDE.md#grpc-port-map\`).
-- **Docs**: \`docs/graph/codebase-graph.json\` (auto), \`docs/graph/codebase-map.md\`, \`docs/ace-kag-howto.md\`.
+- **Docs**: \`docs/graph/codebase-graph.json\` (auto), \`docs/graph/codebase-map.md\`, \`docs/ace-kag-howto.md\`, \`docs/agents-md-howto.md\`.
 
 ## Audit gate snapshot
 
@@ -344,6 +344,7 @@ npm run smoke:graphify          # 5-pillar codebase intelligence health check
 
 - **Frontend directory wiki** (LLM jump table): [\`sveltekit-frontend/AGENTS.md\`](./sveltekit-frontend/AGENTS.md) — every dir + cluster + KAG slug + tool call
 - **Per-directory context** (~250 files): \`AGENTS.md\` files throughout \`sveltekit-frontend/src/\` — agents auto-discover via tree walk
+- **AGENTS.md system how-to**: [\`sveltekit-frontend/docs/agents-md-howto.md\`](./sveltekit-frontend/docs/agents-md-howto.md) — generation, idempotency, cache integration, reranking pattern
 - **Root long-form docs**: [\`CLAUDE.md\`](./CLAUDE.md), [\`docs/ace-kag-howto.md\`](./docs/ace-kag-howto.md)
 - **Audit dashboard**: [\`sveltekit-frontend/docs/graph/codebase-map.md\`](./sveltekit-frontend/docs/graph/codebase-map.md)
 - **Cluster digest**: [\`sveltekit-frontend/docs/graph/hypergraph-clusters.md\`](./sveltekit-frontend/docs/graph/hypergraph-clusters.md)
@@ -464,6 +465,13 @@ When an agent (or human) needs to work in a directory:
 The per-dir AGENTS.md files live INSIDE the directories themselves (e.g. \`src/lib/server/cache/AGENTS.md\`), so any agent walking UP the tree from a file under work picks them up automatically.
 
 Run \`npm run agents:write\` to regenerate after \`npm run index:codebase:fast\`.
+
+## Further reading
+
+- [\`docs/agents-md-howto.md\`](./docs/agents-md-howto.md) — full guide: 5-source join, idempotency, Bifrost L1+L2 cache integration, Qdrant tag-cluster compression, TypeScript reranker pattern, future ideas
+- [\`docs/ace-kag-howto.md\`](./docs/ace-kag-howto.md) — KAG ingestion + ACE retrieval pipeline (this is what populates \`wiki:note:dir:*\`)
+- [\`docs/graph/codebase-map.md\`](./docs/graph/codebase-map.md) — 20-gate audit dashboard (G4/G5/G15/G16/G20 coverage)
+- [\`docs/graph/hypergraph-clusters.md\`](./docs/graph/hypergraph-clusters.md) — full per-cluster digest (topic + member files)
 `;
 }
 
