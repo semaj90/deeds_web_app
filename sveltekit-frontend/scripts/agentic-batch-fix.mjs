@@ -38,6 +38,8 @@ const concurrency = (() => {
 })();
 const dryRun       = args.includes('--dry-run');
 const bypassCache  = args.includes('--bypass-cache');
+const quiet        = args.includes('--quiet');
+const summaryOnly  = args.includes('--summary-only');
 
 // ── Pre-flight checks ────────────────────────────────────────────────────────
 
@@ -64,14 +66,18 @@ if (dryRun) {
     .filter((d) => d.score < 60 || d.todos > 2 || (d.apis > 0 && (d.auth ?? 0) < d.apis))
     .sort((a, b) => a.score - b.score || b.todos - a.todos)
     .slice(0, topN);
-  console.log(`\n📋 Top ${dirs.length} hotspots (dry-run, no API call):\n`);
-  for (const d of dirs) {
-    const authGap = (d.apis ?? 0) - (d.auth ?? 0);
-    const reasons = [];
-    if (d.score < 60)  reasons.push(`score=${d.score}`);
-    if (d.todos > 2)   reasons.push(`todos=${d.todos}`);
-    if (authGap > 0)   reasons.push(`auth-gap=${authGap}/${d.apis}`);
-    console.log(`  • ${d.dir.padEnd(50)} ${reasons.join(' ')}`);
+  if (summaryOnly) {
+    console.log(`Hotspots(dry): ${dirs.length} dirs, lowest score=${dirs[0]?.score ?? 'n/a'}`);
+  } else {
+    console.log(`\n📋 Top ${dirs.length} hotspots (dry-run, no API call):\n`);
+    for (const d of dirs) {
+      const authGap = (d.apis ?? 0) - (d.auth ?? 0);
+      const reasons = [];
+      if (d.score < 60)  reasons.push(`score=${d.score}`);
+      if (d.todos > 2)   reasons.push(`todos=${d.todos}`);
+      if (authGap > 0)   reasons.push(`auth-gap=${authGap}/${d.apis}`);
+      console.log(`  • ${d.dir.padEnd(50)} ${reasons.join(' ')}`);
+    }
   }
   process.exit(0);
 }
@@ -108,8 +114,10 @@ const indexLines = [];
 async function handleEvent(event, data) {
   if (event === 'started') {
     totalTasks = data.totalTasks;
-    console.log(`▶️  Started — ${totalTasks} tasks, concurrency=${data.concurrency}`);
-    for (const dir of data.dirs) console.log(`   • ${dir}`);
+    if (!summaryOnly) {
+      console.log(`▶️  Started — ${totalTasks} tasks, concurrency=${data.concurrency}`);
+      if (!quiet) for (const dir of data.dirs) console.log(`   • ${dir}`);
+    }
   } else if (event === 'progress') {
     const idx     = (completedCount + failedCount + 1).toString().padStart(2, '0');
     const slug    = data.dir.replace(/[^a-z0-9]/gi, '_').slice(0, 60);
@@ -117,7 +125,9 @@ async function handleEvent(event, data) {
     const fpath   = path.join(outDir, fname);
     const status  = data.status === 'completed' ? '✅' : '❌';
     const dur     = (data.durationMs / 1000).toFixed(1);
-    console.log(`${status} [${idx}/${totalTasks}] ${data.dir}  (${dur}s, rounds=${data.result?.rounds ?? 0}, tools=${(data.result?.toolsUsed ?? []).join(',') || 'none'})`);
+    if (!summaryOnly) {
+      console.log(`${status} [${idx}/${totalTasks}] ${data.dir}  (${dur}s, rounds=${data.result?.rounds ?? 0}, tools=${(data.result?.toolsUsed ?? []).join(',') || 'none'})`);
+    }
 
     const md = [
       `# Batch fix plan — \`${data.dir}\``,
@@ -141,7 +151,11 @@ async function handleEvent(event, data) {
     else failedCount++;
   } else if (event === 'completed') {
     const dur = (data.durationMs / 1000).toFixed(1);
-    console.log(`\n🏁 Done — ${data.totalCompleted}✅ / ${data.totalFailed}❌ in ${dur}s`);
+    if (!summaryOnly) {
+      console.log(`\n🏁 Done — ${data.totalCompleted}✅ / ${data.totalFailed}❌ in ${dur}s`);
+    } else {
+      console.log(`Batch fix: ${data.totalCompleted}✅/${data.totalFailed}❌ tasks=${totalTasks} dur=${dur}s`);
+    }
 
     // Write index.md
     const indexMd = [

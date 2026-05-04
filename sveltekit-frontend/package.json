@@ -45,6 +45,8 @@
     "agent:fix:full": "node scripts/agentic-error-fix.mjs full",
     "agent:fix:batch": "node scripts/agentic-batch-fix.mjs",
     "agent:fix:batch:dry": "node scripts/agentic-batch-fix.mjs --dry-run",
+    "agent:fix:batch:quiet": "node scripts/agentic-batch-fix.mjs --quiet",
+    "agent:fix:batch:summary": "node scripts/agentic-batch-fix.mjs --summary-only",
     "hypergraph:lookup": "node ./scripts/hypergraph-lookup-server.mjs",
     "hypergraph:tag": "node ./scripts/hypergraph-tag-qdrant.mjs",
     "schema:drift:check": "node scripts/schema-drift-check.mjs",
