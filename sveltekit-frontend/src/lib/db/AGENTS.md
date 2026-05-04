@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/db`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:03:00.655Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/db
 
@@ -18,6 +18,25 @@
 - `pool.ts`
 - `schema.ts`
 - `vite-error-schema.ts`
+
+## Hypergraph cluster
+
+This directory is part of cluster **C91** — type chunks in \`src/lib/server/db\` (tag: database)
+
+- **Top kinds**: type×16
+- **Top tags**: `database` `schema` `drizzle` `embedding` `auth`
+
+See `docs/graph/hypergraph-clusters.md` § Cluster 91 for full digest.
+
+
+## Agentic tool-calling — quick ACE hits
+
+In-process tools the Gemma4 agent can call to dig deeper into this directory:
+
+- `graph_search({ query: "db", topK: 8 })` — files in this dir with tags, TODOs, audit flags
+- `wiki_note_lookup({ query: "lib db", limit: 5 })` — KAG narrative + audit score
+- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
+- `read_file({ filePath: "src/lib/db/<file>" })` — fetch any file's contents (sandboxed to src/)
 
 
 ## How to use this file

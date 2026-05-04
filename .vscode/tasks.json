@@ -8726,6 +8726,28 @@
       "detail": "Join hypergraph k-means assignments + Qdrant payloads → docs/graph/hypergraph-clusters.{md,json}. Pure aggregation (no LLM). Each cluster gets: inferredTopic, topKinds, topTags, topSymbols, topPaths, memberFiles. Requires hypergraph:build:redis to have run first. ~1-2s for K=100 / 32k vectors.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
+    },
+
+    {
+      "label": "🤖 Graphify: Write AGENTS.md per directory",
+      "type": "shell",
+      "command": "npm run agents:write",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Synthesize one AGENTS.md per non-trivial directory from codebase-graph.json + hypergraph-clusters.json + Redis wiki:note:dir:* KAG notes. Files include: purpose, audit score, file list, hypergraph cluster topic + tags, agentic tool-calling examples (graph_search/wiki_note_lookup/audit_hotspots/read_file). Idempotent: human-edited files (no AGENTS-GEN marker) are preserved. ~249 files generated. Use --dry-run/--filter for partial regen.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🤖 Graphify: AGENTS.md (dry-run preview)",
+      "type": "shell",
+      "command": "npm run agents:write:dry",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Preview which AGENTS.md files would be written (no file IO). Shows KAG-enriched vs graph-only flag per dir. Safe to run anytime.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [

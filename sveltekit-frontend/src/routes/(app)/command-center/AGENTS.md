@@ -1,7 +1,7 @@
 # AGENTS.md — `src/routes/(app)/command-center`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:03:00.655Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)/command-center
 
@@ -18,10 +18,29 @@
 - `+page.svelte`
 - `+page.ts`
 
+## Hypergraph cluster
+
+This directory is part of cluster **C3** — const chunks in \`src/routes/(app)/demos/detective-command\`
+
+- **Top kinds**: const×16
+
+
+See `docs/graph/hypergraph-clusters.md` § Cluster 3 for full digest.
+
 ## Warnings
 
 - ⚠️ 1 SSR-unsafe globals
 - ⚠️ 4 routes lack test pairing
+
+## Agentic tool-calling — quick ACE hits
+
+In-process tools the Gemma4 agent can call to dig deeper into this directory:
+
+- `graph_search({ query: "command-center", topK: 8 })` — files in this dir with tags, TODOs, audit flags
+- `wiki_note_lookup({ query: "(app) command-center", limit: 5 })` — KAG narrative + audit score
+- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
+- `read_file({ filePath: "src/routes/(app)/command-center/<file>" })` — fetch any file's contents (sandboxed to src/)
+
 
 ## How to use this file
 
