@@ -8704,6 +8704,17 @@
       "detail": "Read-only health check across all 5 Graphify pillars: graph JSON, codebase-map.md, Redis fast cache + KAG notes, Qdrant codebase_chunks_768, ACE FAST_AST_SCORE_CAP. Use --no-redis or --no-qdrant to skip service-dependent pillars.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
+    },
+
+    {
+      "label": "📚 Graphify: Cluster Digest (per-centroid topic + members)",
+      "type": "shell",
+      "command": "npm run hypergraph:digest",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Join hypergraph k-means assignments + Qdrant payloads → docs/graph/hypergraph-clusters.{md,json}. Pure aggregation (no LLM). Each cluster gets: inferredTopic, topKinds, topTags, topSymbols, topPaths, memberFiles. Requires hypergraph:build:redis to have run first. ~1-2s for K=100 / 32k vectors.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [
