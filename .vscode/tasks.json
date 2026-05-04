@@ -8502,6 +8502,17 @@
     },
 
     {
+      "label": "📖 Open ACE/KAG/Gemma4 how-to guide",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"code docs/ace-kag-howto.md\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Open docs/ace-kag-howto.md — operator's manual for fast AST → Redis KAG → Gemma4 → ACE workflows, all VS Code tasks, npm scripts, and troubleshooting.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "problemMatcher": []
+    },
+
+    {
       "label": "🤖 Agent: Batch Error Fix — Dry Run (list hotspots)",
       "type": "shell",
       "command": "node scripts/agentic-batch-fix.mjs ${input:batchTopN} --dry-run",
@@ -8519,6 +8530,17 @@
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "build",
       "detail": "Fan out top-N audit hotspots from codebase-graph.json to /api/ai/agent/batch (SSE). Runs Gemma4 agent loops in parallel (default 3-way) — one fix plan per directory. Plans written to next_steps/active/{date}/batch-fix-{ts}/. Requires dev server on :5173.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🤖 Agent: Batch Error Fix — Quiet (logs/task-output)",
+      "type": "shell",
+      "command": "mkdir -p logs/task-output && node scripts/agentic-batch-fix.mjs ${input:batchTopN} --concurrency=${input:batchConcurrency} --quiet > logs/task-output/agent-batch-fix-latest.log 2>&1 && tail -40 logs/task-output/agent-batch-fix-latest.log",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Same as parallel batch fix, but redirects all output to logs/task-output/agent-batch-fix-latest.log. Terminal shows only the last 40 lines (summary). Plans still written to next_steps/active/. Use this when running large topN to avoid VS Code chat buffer overflow.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     }

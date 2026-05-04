@@ -64,3 +64,8 @@ _archived/native-simdjson/src/native/simdjson-addon/simdjson/
 
 # Courtroom 3D models (1-41 MB each, converted from FBX via Blender)
 static/models/courtroom/*.glb
+
+# Bounded task output (logs/task-output/) — large generated audit content
+# Do NOT commit; keep next_steps/active/ tracked for the .md plans themselves
+logs/task-output/
+logs/*.log
