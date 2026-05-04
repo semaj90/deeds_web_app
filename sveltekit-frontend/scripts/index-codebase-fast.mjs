@@ -221,7 +221,19 @@ function extractMeta(filePath, src) {
   const sv4Reactive = ext === '.svelte' && RE_SV4_REACT.test(src);
   const sv4Events   = ext === '.svelte' && RE_SV4_EVENT.test(src);
   const sv4Dispatch = ext === '.svelte' && RE_SV4_DISPATCH.test(src);
-  const runeInTs    = ext === '.ts' && !rel.endsWith('.svelte.ts') && !rel.endsWith('.d.ts') && RE_RUNE_IN_TS.test(src);
+  // G14e — runes in plain .ts. Strip line/block comments and string literals
+  // before testing so JSDoc examples, error-message templates, and code-mod
+  // migration guides don't false-positive (they often contain "$props()" etc.
+  // as documentation, not as executable code).
+  const stripped = ext === '.ts'
+    ? src
+        .replace(/\/\*[\s\S]*?\*\//g, '')                    // /* block comments */
+        .replace(/(^|[^:\\])\/\/[^\n]*/g, '$1')              // // line comments (not :// in URLs)
+        .replace(/`(?:\\.|[^`\\])*`/g, '``')                  // template strings
+        .replace(/'(?:\\.|[^'\\])*'/g, "''")                  // single-quoted strings
+        .replace(/"(?:\\.|[^"\\])*"/g, '""')                  // double-quoted strings
+    : src;
+  const runeInTs    = ext === '.ts' && !rel.endsWith('.svelte.ts') && !rel.endsWith('.d.ts') && RE_RUNE_IN_TS.test(stripped);
   // G15 — SSR safety
   // Fast path: skip server-only files (lib/server/, *.server.ts, +server.ts, hooks.server.ts)
   // and skip files with explicit SSR guards before the costly strip+regex.
@@ -299,7 +311,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v8';
+const META_CACHE_VERSION = 'v9'; // bumped 2026-05-04 — G14e strips comments/strings before rune detection
 
 for (const filePath of walk(scanRoot)) {
   let src;
