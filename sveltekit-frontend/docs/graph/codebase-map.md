@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-04T05:06:08.792Z
+> Generated: 2026-05-04T07:30:28.595Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,17 +8,17 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 2579 |
-| Directories analysed | 346 |
-| Route files | 874 |
-| Svelte components | 848 |
-| API handlers | 582 |
-| API routes without auth | 42 |
+| Files scanned | 2581 |
+| Directories analysed | 347 |
+| Route files | 876 |
+| Svelte components | 849 |
+| API handlers | 583 |
+| API routes without auth | 32 |
 | API routes without Zod | 1 |
 | SSR-unsafe files | 45 |
 | Svelte 4 legacy patterns | 0 |
 | Hardcoded localhost refs | 53 |
-| Routes without test pairing | 533 |
+| Routes without test pairing | 534 |
 | Cyclic import pairs | 1 |
 | Drizzle table refs | 407 |
 | TODO/FIXME markers | 16 |
@@ -29,22 +29,22 @@
 
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
-| G4  | Auth guard on API routes | 623 | 42 |
-| G5  | Zod validation on API routes | 467 | 1 |
-| G11 | No hardcoded localhost (excl env.server) | 2526 | 53 |
-| G14a | No `export let` (Svelte 4 props) | 2579 | 0 |
-| G14b | No `$:` reactive declarations | 2579 | 0 |
-| G14c | No `on:event=` directives | 2579 | 0 |
-| G14d | No `createEventDispatcher()` | 2579 | 0 |
-| G14e | No runes in plain `.ts` files | 2568 | 11 |
-| G15 | No SSR-unsafe globals (unguarded) | 2534 | 45 |
-| G16 | Server routes have test pairing | 51 | 533 |
-| G17 | Server routes have error handling | 592 | 73 |
+| G4  | Auth guard on API routes | 634 | 32 |
+| G5  | Zod validation on API routes | 468 | 1 |
+| G11 | No hardcoded localhost (excl env.server) | 2528 | 53 |
+| G14a | No `export let` (Svelte 4 props) | 2581 | 0 |
+| G14b | No `$:` reactive declarations | 2581 | 0 |
+| G14c | No `on:event=` directives | 2581 | 0 |
+| G14d | No `createEventDispatcher()` | 2581 | 0 |
+| G14e | No runes in plain `.ts` files | 2570 | 11 |
+| G15 | No SSR-unsafe globals (unguarded) | 2536 | 45 |
+| G16 | Server routes have test pairing | 51 | 534 |
+| G17 | Server routes have error handling | 593 | 73 |
 | G20 | Cyclic import pairs | — | 1 |
 
 ---
 
-## Directory Scorecard (346 dirs · lowest score = most attention needed)
+## Directory Scorecard (347 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -62,7 +62,6 @@
 | ⚠️ | `src/routes/api/docs` | 60 | 1 | 56 | 1 | 0/1 | 0 | ⬜notest |
 | ⚠️ | `src/routes/api/health` | 60 | 15 | 1792 | 15 | 1/3 | 0 | 🟠lh ⬜notest |
 | ⚠️ | `src/routes/api/infrastructure` | 60 | 1 | 335 | 1 | 0/0 | 0 | ⬜notest |
-| ⚠️ | `src/routes/api/test` | 61 | 8 | 776 | 8 | 0/6 | 0 | ⬜notest |
 | ⚠️ | `src/lib/components/ui` | 65 | 245 | 24174 | 0 | 0/1 | 3 | 🔴ssr |
 | ⚠️ | `src/lib/ai` | 68 | 13 | 4966 | 0 | 0/1 | 1 | 🔴ssr 🟠lh |
 | ⚠️ | `src/lib/components/yorha` | 68 | 68 | 20736 | 0 | 0/5 | 1 | 🔴ssr 🟠lh |
@@ -73,13 +72,13 @@
 | ✅ | `src/lib/machines` | 75 | 12 | 4613 | 0 | 0/2 | 0 | 🔴ssr 🟠lh |
 | ✅ | `src/lib/utils` | 75 | 42 | 7081 | 0 | 2/7 | 0 | 🔴ssr 🟠lh |
 | ✅ | `src/lib/webgpu` | 75 | 19 | 5518 | 0 | 0/0 | 0 | 🔴ssr 🟠lh |
-| ✅ | `src/routes/api/auth` | 75 | 10 | 758 | 10 | 3/5 | 0 | ⬜notest |
 | ✅ | `src/routes/api/ingest-constitution` | 75 | 1 | 47 | 1 | 1/0 | 0 | ⬜notest |
 | ✅ | `src/routes/api/observability` | 75 | 1 | 35 | 1 | 1/0 | 0 | ⬜notest |
 | ✅ | `src/routes/api/security` | 75 | 1 | 45 | 1 | 1/0 | 0 | ⬜notest |
 | ✅ | `src/routes/api/system` | 75 | 6 | 719 | 6 | 3/1 | 0 | ⬜notest |
 | ✅ | `src/routes/minio/[...path]` | 75 | 1 | 57 | 1 | 1/0 | 0 | ⬜notest |
 | ✅ | `src/routes/(app)/demos` | 78 | 102 | 19317 | 0 | 102/4 | 1 | 🔴ssr 🟠lh ⬜notest |
+| ✅ | `src/routes/api/auth` | 78 | 10 | 758 | 10 | 4/5 | 0 | ⬜notest |
 | ✅ | `src/lib/client` | 80 | 4 | 766 | 0 | 0/4 | 0 | 🔴ssr |
 | ✅ | `src/lib/client/ui` | 80 | 1 | 126 | 0 | 0/0 | 0 | 🔴ssr |
 | ✅ | `src/lib/components/detective` | 80 | 6 | 1884 | 0 | 0/2 | 0 | 🔴ssr |
@@ -95,11 +94,10 @@
 | ✅ | `src/routes/(app)/citations` | 80 | 10 | 2390 | 0 | 10/0 | 0 | 🔴ssr ⬜notest |
 | ✅ | `src/lib/ai/onnx` | 83 | 2 | 340 | 0 | 0/0 | 1 | — |
 | ✅ | `src/lib/workers` | 83 | 4 | 1086 | 0 | 0/0 | 2 | — |
-| ✅ | `src/routes` | 83 | 6 | 205355 | 579 | 934/493 | 7 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `src/routes/(app)/chat` | 83 | 4 | 865 | 0 | 4/1 | 1 | ⬜notest |
-| ✅ | `src/routes/api/knowledge` | 83 | 8 | 1696 | 8 | 7/6 | 0 | ⬜notest |
 | ✅ | `src/routes/api/phase89` | 83 | 24 | 2425 | 24 | 24/13 | 0 | ⬜notest |
 | ✅ | `src/routes/api/topology` | 83 | 2 | 215 | 2 | 2/1 | 0 | ⬜notest |
+| ✅ | `src/routes` | 84 | 6 | 205712 | 580 | 946/494 | 7 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `src/routes/api/cache` | 84 | 14 | 1428 | 14 | 14/8 | 0 | ⬜notest |
 | ✅ | `src/lib/config` | 85 | 8 | 1504 | 0 | 1/1 | 0 | 🟠lh |
 | ✅ | `src/lib/gpu` | 85 | 16 | 4323 | 0 | 0/1 | 0 | 🟠lh |
@@ -118,6 +116,8 @@
 | ✅ | `src/routes/api/dashboard` | 85 | 1 | 111 | 1 | 1/0 | 0 | ⬜notest |
 | ✅ | `src/routes/api/dev` | 85 | 1 | 63 | 1 | 1/0 | 0 | ⬜notest |
 | ✅ | `src/routes/api/websearch` | 85 | 1 | 63 | 1 | 1/1 | 0 | 🟠lh ⬜notest |
+| ✅ | `src/routes/api/knowledge` | 86 | 8 | 1697 | 8 | 8/6 | 0 | ⬜notest |
+| ✅ | `src/routes/api/test` | 86 | 8 | 782 | 8 | 8/6 | 0 | ⬜notest |
 | ✅ | `src/routes/api/cartridge` | 88 | 6 | 669 | 6 | 6/5 | 0 | ⬜notest |
 | ✅ | `src/lib/ai/e2b` | 90 | 2 | 524 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/cache` | 90 | 5 | 1046 | 0 | 0/1 | 0 | — |
@@ -228,7 +228,7 @@
 | ✅ | `src/routes/(app)/analytics` | 90 | 2 | 2385 | 0 | 2/0 | 0 | — |
 | ✅ | `src/routes/(app)/cache-monitor` | 90 | 1 | 146 | 0 | 1/0 | 0 | — |
 | ✅ | `src/routes/(app)/cases` | 90 | 39 | 10476 | 0 | 39/10 | 0 | 🔴ssr ⬜notest |
-| ✅ | `src/routes/(app)/codebase-graph` | 90 | 3 | 583 | 0 | 3/0 | 0 | — |
+| ✅ | `src/routes/(app)/codebase-graph` | 90 | 4 | 743 | 0 | 4/0 | 0 | — |
 | ✅ | `src/routes/(app)/codebase-wiki` | 90 | 1 | 25 | 0 | 1/0 | 0 | — |
 | ✅ | `src/routes/(app)/command-center` | 90 | 11 | 3456 | 0 | 11/0 | 0 | 🔴ssr ⬜notest |
 | ✅ | `src/routes/(app)/dashboard` | 90 | 1 | 1995 | 0 | 1/1 | 0 | — |
@@ -257,6 +257,7 @@
 | ✅ | `src/routes/api/case-theory` | 90 | 1 | 170 | 1 | 1/1 | 0 | ⬜notest |
 | ✅ | `src/routes/api/charges` | 90 | 1 | 45 | 1 | 1/1 | 0 | ⬜notest |
 | ✅ | `src/routes/api/chrrom` | 90 | 3 | 169 | 3 | 3/3 | 0 | ⬜notest |
+| ✅ | `src/routes/api/codebase-graph` | 90 | 1 | 190 | 1 | 1/1 | 0 | ⬜notest |
 | ✅ | `src/routes/api/detective` | 90 | 2 | 434 | 2 | 2/2 | 0 | ⬜notest |
 | ✅ | `src/routes/api/embed` | 90 | 1 | 125 | 1 | 1/1 | 0 | ⬜notest |
 | ✅ | `src/routes/api/feedback` | 90 | 1 | 41 | 1 | 1/1 | 0 | ⬜notest |
@@ -328,12 +329,12 @@
 | ✅ | `src/routes/api/rag` | 98 | 10 | 2244 | 9 | 9/8 | 0 | ⬜notest |
 | ✅ | `src/routes/api/reports` | 98 | 9 | 2311 | 9 | 9/8 | 0 | ⬜notest |
 | ✅ | `src/routes/api/routes` | 98 | 9 | 1005 | 9 | 9/8 | 0 | ⬜notest |
-| ✅ | `src/lib` | 100 | 11 | 363796 | 3 | 10/212 | 9 | 🔴ssr 🟠lh |
+| ✅ | `src/lib` | 100 | 11 | 363829 | 3 | 10/212 | 9 | 🔴ssr 🟠lh |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server` | 100 | 57 | 130513 | 3 | 7/125 | 0 | 🟠lh |
+| ✅ | `src/lib/server` | 100 | 57 | 130546 | 3 | 7/125 | 0 | 🟠lh |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 638 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/ai` | 100 | 23 | 6278 | 0 | 1/8 | 0 | — |
 | ✅ | `src/lib/server/analysis` | 100 | 12 | 2988 | 0 | 0/4 | 0 | — |
@@ -347,7 +348,7 @@
 | ✅ | `src/lib/server/error-brain` | 100 | 11 | 1156 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/evidence` | 100 | 14 | 1216 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/graph` | 100 | 17 | 6953 | 0 | 1/5 | 0 | — |
-| ✅ | `src/lib/server/indexer` | 100 | 11 | 5209 | 1 | 0/4 | 0 | — |
+| ✅ | `src/lib/server/indexer` | 100 | 11 | 5242 | 1 | 0/4 | 0 | — |
 | ✅ | `src/lib/server/llm` | 100 | 6 | 1643 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/queue` | 100 | 8 | 3812 | 0 | 0/3 | 0 | — |
 | ✅ | `src/lib/server/reports` | 100 | 1 | 112 | 0 | 0/1 | 0 | — |
@@ -355,7 +356,7 @@
 | ✅ | `src/lib/server/retrieval` | 100 | 24 | 6342 | 0 | 0/3 | 0 | — |
 | ✅ | `src/lib/server/types` | 100 | 10 | 1099 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/unified` | 100 | 1 | 284 | 0 | 0/0 | 0 | — |
-| ✅ | `src/routes/(app)` | 100 | 2 | 100456 | 4 | 388/39 | 6 | 🔴ssr 🟠lh ⬜notest |
+| ✅ | `src/routes/(app)` | 100 | 2 | 100616 | 4 | 389/39 | 6 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `src/routes/(app)/acp` | 100 | 1 | 613 | 0 | 1/1 | 0 | — |
 | ✅ | `src/routes/(app)/active-cases` | 100 | 2 | 1154 | 0 | 2/0 | 0 | ⬜notest |
 | ✅ | `src/routes/(app)/admin` | 100 | 130 | 25903 | 3 | 130/12 | 4 | 🔴ssr 🟠lh ⬜notest |
@@ -401,7 +402,7 @@
 
 ---
 
-## API Routes (579 total · top 60)
+## API Routes (580 total · top 60)
 
 | Route [params] | Methods | Auth | Zod | Error handling |
 |----------------|---------|------|-----|----------------|
@@ -461,20 +462,19 @@
 | `api/analytics/web-research/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `api/audit/gpu/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `api/audit/planner/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
-| `api/auth/demo-login/+server.ts` | POST, GET | ❌ | ✅ | ✅ |
+| `api/auth/demo-login/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `api/auth/logout/+server.ts` | POST, GET | ❌ | ❌ | ✅ |
 | `api/cache/recent-queries/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `api/canon/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 
-_…and 519 more. See `codebase-graph.json` for full list._
+_…and 520 more. See `codebase-graph.json` for full list._
 
 ---
 
-## G4 — API Routes Missing Auth Guard (42)
+## G4 — API Routes Missing Auth Guard (32)
 - `src/routes/.well-known/agent.json/+server.ts` · GET
 - `src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts` · GET
 - `src/routes/api/analytics/health/+server.ts` · GET
-- `src/routes/api/auth/demo-login/+server.ts` · POST/GET
 - `src/routes/api/auth/health/+server.ts` · GET
 - `src/routes/api/auth/login/+server.ts` · POST
 - `src/routes/api/auth/logout/+server.ts` · POST/GET
@@ -498,9 +498,10 @@ _…and 519 more. See `codebase-graph.json` for full list._
 - `src/routes/api/health/status/+server.ts` · GET
 - `src/routes/api/health/system/+server.ts` · GET
 - `src/routes/api/infrastructure/status/+server.ts` · GET
-- `src/routes/api/knowledge/youtube/+server.ts` · POST
 - `src/routes/api/mcp/+server.ts` · GET/POST
 - `src/routes/api/ping/+server.ts` · GET
+- `src/routes/api/queue/dispatch-stats/+server.ts` · GET
+- `src/routes/api/system/env/+server.ts` · GET
 
 ---
 
@@ -538,7 +539,7 @@ _No Svelte 4 patterns found. ✅_
 
 ---
 
-## G16 — Routes Without Test Pairing (533)
+## G16 — Routes Without Test Pairing (534)
 - `src/routes/(app)/admin/api-testing/agentic-events/+server.ts` · GET
 - `src/routes/(app)/admin/api-testing/agentic-loop/+server.ts` · POST/GET
 - `src/routes/(app)/admin/api-testing/ast-topology/+server.ts` · GET
@@ -664,7 +665,7 @@ _No Svelte 4 patterns found. ✅_
 
 ---
 
-## Svelte Components (60 shown of 848)
+## Svelte Components (60 shown of 849)
 | File | Sub-components | Key `$lib` Imports |
 |------|---------------|---------------------|
 | `src/lib/client/ui/POIPhotoUploader.svelte` | Button |  |
@@ -733,20 +734,20 @@ _No Svelte 4 patterns found. ✅_
 ## Top External Module Imports
 | Module | Consumer Count |
 |--------|----------------|
-| `@sveltejs/kit` | 647 |
+| `@sveltejs/kit` | 648 |
 | `zod` | 472 |
 | `$lib/server/db/client` | 387 |
 | `drizzle-orm` | 311 |
 | `$lib/server/env.server.js` | 284 |
 | `$lib/components/ui/Icon.svelte` | 252 |
-| `svelte` | 217 |
+| `svelte` | 218 |
 | `$lib/server/ollama.js` | 139 |
 | `$lib/server/db/schema-postgres.js` | 125 |
 | `$lib/server/redis.js` | 117 |
 | `$lib/server/middleware/cache-headers.js` | 112 |
 | `$lib/server/validation.js` | 93 |
 | `$lib/components/ui/Button.svelte` | 88 |
-| `$app/environment` | 75 |
+| `$app/environment` | 78 |
 | `crypto` | 73 |
 | `drizzle-orm/pg-core` | 68 |
 | `path` | 68 |
@@ -768,7 +769,7 @@ _No Svelte 4 patterns found. ✅_
 
 ## Directories with TODO/FIXME
 - `src/lib` — 9 marker(s), score 100
-- `src/routes` — 7 marker(s), score 83
+- `src/routes` — 7 marker(s), score 84
 - `src/lib/components` — 6 marker(s), score 70
 - `src/routes/(app)` — 6 marker(s), score 100
 - `src/routes/(app)/admin` — 4 marker(s), score 100
