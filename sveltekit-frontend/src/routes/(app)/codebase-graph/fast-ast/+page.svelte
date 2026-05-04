@@ -109,7 +109,15 @@
     {#if loading}
       <div class="loading">Loading graph…</div>
     {:else if nodes.length}
-      <CodebaseGraphCanvas {nodes} {edges} onNodeClick={(n) => (selected = n)} />
+      {@const canvasNodes = nodes.map((n) => ({ id: n.id, label: n.label, type: n.type, path: n.path, extension: n.extension, size: n.size, group: n.group }))}
+      <CodebaseGraphCanvas
+        nodes={canvasNodes}
+        {edges}
+        onNodeClick={(n: { id: string }) => {
+          const found: ViewerNode | undefined = nodes.find((vn) => vn.id === n.id);
+          selected = found ?? null;
+        }}
+      />
     {:else}
       <div class="empty">No nodes. Try `npm run index:codebase:fast` then Reload.</div>
     {/if}
