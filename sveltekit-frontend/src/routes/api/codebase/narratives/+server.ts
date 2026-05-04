@@ -22,7 +22,8 @@ const getNarrativesSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) return json({ narratives: [], total: 0, error: 'Unauthorized' }, { status: 401 });
   try {
     const parsed = getNarrativesSchema.safeParse({
       clusterId: url.searchParams.get('clusterId') ?? undefined,
@@ -86,6 +87,7 @@ export const GET: RequestHandler = async ({ url }) => {
  * Body: { k?: number }
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json().catch(() => ({}));
     const parsed = z.object({ k: z.number().int().min(2).max(200).optional() }).safeParse(raw);

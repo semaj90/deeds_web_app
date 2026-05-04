@@ -103,8 +103,13 @@ const RE_DYN_IMPORT  = /(?:await\s+)?import\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
 const RE_DYN_VAR     = /@vite-ignore/;
 // G3 — barrel re-exports
 const RE_REEXPORT    = /export\s+(?:\*|\{[^}]*\})\s+from\s+['"]([^'"]+)['"]/g;
-// G4 — auth guard
-const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH/;
+// G4 — auth guard (locals.user, cast pattern, requireAuth, getSession, DEV_BYPASS)
+// Also treat (app)/ routes as auth-guarded — layout.server.ts enforces redirect
+const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{/;
+function isLayoutGuarded(rel) {
+  // Routes under (app)/ are protected by +layout.server.ts auth redirect
+  return rel.includes('/routes/(app)/') || rel.includes('/routes/(admin)/');
+}
 // G5 — Zod validation
 const RE_ZOD         = /\bz\.\w+|from\s+['"]zod['"]|zodSchema|zod\(/;
 // G6 — route handlers (both const and function form)
@@ -159,8 +164,8 @@ function extractMeta(filePath, src) {
   const hasViteIgnore = RE_DYN_VAR.test(src);
   // G3 — barrel re-exports
   const reExports = [...src.matchAll(RE_REEXPORT)].map(m => m[1]);
-  // G4 — auth
-  const hasAuth = RE_AUTH.test(src);
+  // G4 — auth (inline guard OR layout-level protection)
+  const hasAuth = RE_AUTH.test(src) || isLayoutGuarded(rel);
   // G5 — zod
   const hasZod = RE_ZOD.test(src);
   // G6 — route handlers
