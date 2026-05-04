@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-04T15:54:28.566Z
+> Generated: 2026-05-04T16:05:53.632Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -13,11 +13,11 @@
 | Route files | 876 |
 | Svelte components | 849 |
 | API handlers | 583 |
-| API routes without auth | 32 |
+| API routes without auth | 30 |
 | API routes without Zod | 1 |
 | SSR-unsafe files | 45 |
 | Svelte 4 legacy patterns | 0 |
-| Hardcoded localhost refs | 53 |
+| Hardcoded localhost refs | 52 |
 | Routes without test pairing | 534 |
 | Cyclic import pairs | 0 |
 | Drizzle table refs | 407 |
@@ -29,9 +29,9 @@
 
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
-| G4  | Auth guard on API routes | 634 | 32 |
+| G4  | Auth guard on API routes | 636 | 30 |
 | G5  | Zod validation on API routes | 468 | 1 |
-| G11 | No hardcoded localhost (excl env.server) | 2528 | 53 |
+| G11 | No hardcoded localhost (excl env.server) | 2529 | 52 |
 | G14a | No `export let` (Svelte 4 props) | 2581 | 0 |
 | G14b | No `$:` reactive declarations | 2581 | 0 |
 | G14c | No `on:event=` directives | 2581 | 0 |
@@ -57,8 +57,6 @@
 | ⚠️ | `src/routes/.well-known/agent.json` | 45 | 1 | 119 | 1 | 0/0 | 0 | ⬜notest | — |
 | ⚠️ | `src/routes/.well-known/appspecific` | 45 | 1 | 22 | 1 | 0/0 | 0 | ⬜notest | — |
 | ⚠️ | `src/routes/api/ping` | 45 | 1 | 13 | 1 | 0/0 | 0 | ⬜notest | — |
-| ⚠️ | `src/routes/api/queue` | 45 | 1 | 26 | 1 | 0/0 | 0 | ⬜notest | — |
-| ⚠️ | `src/routes/api/mcp` | 50 | 1 | 99 | 1 | 0/0 | 0 | ⬜notest | — |
 | ⚠️ | `src/lib/server/middleware` | 58 | 4 | 693 | 2 | 0/1 | 0 | — | — |
 | ⚠️ | `src/routes/api/db` | 60 | 1 | 29 | 1 | 0/0 | 0 | ⬜notest | — |
 | ⚠️ | `src/routes/api/docs` | 60 | 1 | 56 | 1 | 0/1 | 0 | ⬜notest | — |
@@ -70,11 +68,13 @@
 | ✅ | `src/lib/components` | 70 | 56 | 168473 | 0 | 0/46 | 6 | 🔴ssr 🟠lh | C92: component chunks in `src/lib/components/evidence` (tag: embedding) |
 | ✅ | `src/routes/api/engagement` | 70 | 2 | 61 | 2 | 2/0 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/metrics` | 70 | 1 | 84 | 1 | 1/0 | 0 | ⬜notest | — |
+| ✅ | `src/routes/api/queue` | 70 | 1 | 27 | 1 | 1/0 | 0 | ⬜notest | — |
 | ✅ | `src/lib/components/ai` | 75 | 46 | 19715 | 0 | 0/11 | 0 | 🔴ssr 🟠lh | C5: component chunks in `src/lib/components/ai` (tag: ai) |
 | ✅ | `src/lib/machines` | 75 | 12 | 4613 | 0 | 0/2 | 0 | 🔴ssr 🟠lh | C96: type chunks in `src/lib/server` (tag: embedding) |
 | ✅ | `src/lib/utils` | 75 | 42 | 7081 | 0 | 2/7 | 0 | 🔴ssr 🟠lh | C1: type chunks in `src/lib/utils` (tag: page-component) |
 | ✅ | `src/lib/webgpu` | 75 | 19 | 5518 | 0 | 0/0 | 0 | 🔴ssr 🟠lh | C23: class chunks in `src/lib/webgpu` (tag: embedding) |
 | ✅ | `src/routes/api/ingest-constitution` | 75 | 1 | 47 | 1 | 1/0 | 0 | ⬜notest | — |
+| ✅ | `src/routes/api/mcp` | 75 | 1 | 99 | 1 | 1/0 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/observability` | 75 | 1 | 35 | 1 | 1/0 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/security` | 75 | 1 | 45 | 1 | 1/0 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/system` | 75 | 6 | 719 | 6 | 3/1 | 0 | ⬜notest | — |
@@ -99,7 +99,7 @@
 | ✅ | `src/routes/(app)/chat` | 83 | 4 | 865 | 0 | 4/1 | 1 | ⬜notest | — |
 | ✅ | `src/routes/api/phase89` | 83 | 24 | 2425 | 24 | 24/13 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/topology` | 83 | 2 | 215 | 2 | 2/1 | 0 | ⬜notest | — |
-| ✅ | `src/routes` | 84 | 6 | 205712 | 580 | 946/494 | 7 | 🔴ssr 🟠lh ⬜notest | — |
+| ✅ | `src/routes` | 84 | 6 | 205713 | 580 | 948/494 | 7 | 🔴ssr 🟠lh ⬜notest | — |
 | ✅ | `src/routes/api/cache` | 84 | 14 | 1428 | 14 | 14/8 | 0 | ⬜notest | — |
 | ✅ | `src/lib/config` | 85 | 8 | 1504 | 0 | 1/1 | 0 | 🟠lh | C75: function chunks in `src/lib/config` (tag: embedding) |
 | ✅ | `src/lib/gpu` | 85 | 16 | 4323 | 0 | 0/1 | 0 | 🟠lh | C17: function chunks in `src/lib/services/error-analysis` (tag: embedding) |
@@ -111,7 +111,7 @@
 | ✅ | `src/lib/server/services` | 85 | 2 | 703 | 0 | 0/0 | 0 | 🟠lh | C32: function chunks in `src/lib/server/services` (tag: api-route) |
 | ✅ | `src/lib/server/utils` | 85 | 13 | 941 | 0 | 0/2 | 0 | 🟠lh | C19: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/lib/services/error-analysis` | 85 | 17 | 4788 | 0 | 0/1 | 0 | 🟠lh | C17: function chunks in `src/lib/services/error-analysis` (tag: embedding) |
-| ✅ | `src/mcp` | 85 | 2 | 4428 | 0 | 0/2 | 0 | 🔴ssr 🟠lh | — |
+| ✅ | `src/mcp` | 85 | 2 | 4428 | 0 | 1/2 | 0 | 🔴ssr 🟠lh | — |
 | ✅ | `src/mcp/tools` | 85 | 1 | 195 | 0 | 0/1 | 0 | 🟠lh | — |
 | ✅ | `src/routes/(app)/couchdb-analytics` | 85 | 5 | 1833 | 0 | 5/0 | 0 | 🟠lh | — |
 | ✅ | `src/routes/api/consolidation` | 85 | 1 | 42 | 1 | 1/0 | 0 | ⬜notest | — |
@@ -331,12 +331,12 @@
 | ✅ | `src/routes/api/rag` | 98 | 10 | 2244 | 9 | 9/8 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/reports` | 98 | 9 | 2311 | 9 | 9/8 | 0 | ⬜notest | C85: route-handler chunks in `src/routes/api/citations/collections/[collectionId]/citations` (tag: api) |
 | ✅ | `src/routes/api/routes` | 98 | 9 | 1005 | 9 | 9/8 | 0 | ⬜notest | — |
-| ✅ | `src/lib` | 100 | 11 | 363829 | 3 | 10/212 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
+| ✅ | `src/lib` | 100 | 11 | 363829 | 3 | 11/212 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — | C29: const chunks in `src/lib/schemas` (tag: auth) |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — | C91: type chunks in `src/lib/server/db` (tag: database) |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — | C51: table-def chunks in `src/lib/db/schema` (tag: database) |
-| ✅ | `src/lib/server` | 100 | 57 | 130546 | 3 | 7/125 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
+| ✅ | `src/lib/server` | 100 | 57 | 130546 | 3 | 8/125 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 638 | 0 | 0/1 | 0 | — | — |
 | ✅ | `src/lib/server/ai` | 100 | 23 | 6278 | 0 | 1/8 | 0 | — | C19: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/lib/server/analysis` | 100 | 12 | 2988 | 0 | 0/4 | 0 | — | C54: function chunks in `src/lib/server/analysis` |
@@ -347,7 +347,7 @@
 | ✅ | `src/lib/server/concurrency` | 100 | 3 | 741 | 0 | 0/1 | 0 | — | C61: const chunks in `src/lib/server/concurrency` (tag: auth) |
 | ✅ | `src/lib/server/embedding` | 100 | 9 | 1122 | 0 | 0/1 | 0 | — | C77: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/lib/server/engagement` | 100 | 1 | 367 | 0 | 0/0 | 0 | — | — |
-| ✅ | `src/lib/server/error-brain` | 100 | 11 | 1156 | 0 | 0/2 | 0 | — | — |
+| ✅ | `src/lib/server/error-brain` | 100 | 11 | 1156 | 0 | 1/2 | 0 | — | — |
 | ✅ | `src/lib/server/evidence` | 100 | 14 | 1216 | 0 | 0/2 | 0 | — | C66: type chunks in `src/lib/server/services` (tag: types) |
 | ✅ | `src/lib/server/graph` | 100 | 17 | 6953 | 0 | 1/5 | 0 | — | C73: function chunks in `src/lib/server/retrieval` (tag: vector) |
 | ✅ | `src/lib/server/indexer` | 100 | 11 | 5242 | 1 | 0/4 | 0 | — | C58: type chunks in `src/lib/server/indexer` (tag: vector) |
@@ -473,7 +473,7 @@ _…and 520 more. See `codebase-graph.json` for full list._
 
 ---
 
-## G4 — API Routes Missing Auth Guard (32)
+## G4 — API Routes Missing Auth Guard (30)
 - `src/routes/.well-known/agent.json/+server.ts` · GET
 - `src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts` · GET
 - `src/routes/api/analytics/health/+server.ts` · GET
@@ -500,10 +500,10 @@ _…and 520 more. See `codebase-graph.json` for full list._
 - `src/routes/api/health/status/+server.ts` · GET
 - `src/routes/api/health/system/+server.ts` · GET
 - `src/routes/api/infrastructure/status/+server.ts` · GET
-- `src/routes/api/mcp/+server.ts` · GET/POST
 - `src/routes/api/ping/+server.ts` · GET
-- `src/routes/api/queue/dispatch-stats/+server.ts` · GET
 - `src/routes/api/system/env/+server.ts` · GET
+- `src/routes/api/system/health/+server.ts` · GET
+- `src/routes/api/system/phase13/+server.ts` · GET
 
 ---
 
@@ -575,7 +575,7 @@ _No Svelte 4 patterns found. ✅_
 
 ---
 
-## G11 — Hardcoded Localhost References (53 files)
+## G11 — Hardcoded Localhost References (52 files)
 - `src/lib/ai/model-ids.ts` · http://127.0.0.1:8070, http://127.0.0.1:8085
 - `src/lib/ai/ollama-config.ts` · http://localhost:11434
 - `src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte` · http://localhost:11434, http://localhost:11434
