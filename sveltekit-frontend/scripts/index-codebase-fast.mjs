@@ -135,7 +135,9 @@ const RE_TODO        = /\/\/\s*(TODO|FIXME|HACK|XXX)[:\s]/g;
 // G10 — component sub-imports from svelte files
 const RE_COMPONENT   = /<([A-Z][A-Za-z0-9]+)\s/g;
 // G11 — hardcoded localhost / raw port references
-const RE_LOCALHOST   = /['"`](https?:\/\/(?:localhost|127\.0\.0\.1):\d+)/g;
+// Match 'http://localhost:PORT' OR "http://127.0.0.1:PORT" but NOT inside an ENV.X ?? 'fallback' pattern
+// (negative lookbehind for `?? `, which is the env-default pattern that's already wired through env.server.ts)
+const RE_LOCALHOST   = /(?<!\?\?\s*)['"`](https?:\/\/(?:localhost|127\.0\.0\.1):\d+)/g;
 const RE_RAW_PORT    = /:\s*(?:5432|6379|6333|9000|5672|50051|8090|11434|3040)\b/;
 // G12 — type-only imports
 const RE_TYPE_IMPORT = /import\s+type\s+/g;
@@ -294,7 +296,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v5';
+const META_CACHE_VERSION = 'v6';
 
 for (const filePath of walk(scanRoot)) {
   let src;
