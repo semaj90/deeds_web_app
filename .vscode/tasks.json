@@ -8542,6 +8542,61 @@
     },
 
     {
+      "label": "🗺️ Graphify: Daily Map (fast AST + smoke)",
+      "type": "shell",
+      "command": "npm run graphify:daily",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Fast AST → docs/graph/codebase-graph.json + codebase-map.md → Redis cache → smoke (fast-ast + KAG synthetic). ~10s, no LLM, no GPU.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🔎 Graphify: Semantic Index (Qdrant codebase_chunks_768)",
+      "type": "shell",
+      "command": "npm run graphify:semantic",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "EmbeddingGemma → Qdrant codebase_chunks_768 → smoke:ace verification. Slower (embedding pass), enables semantic search and ACE retrieval.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🧠 Graphify: Full ACE Index (daily + semantic + topology)",
+      "type": "shell",
+      "command": "npm run graphify:full",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Full stack refresh: fast AST + EmbeddingGemma + hypergraph topology + smoke:ace:full (14 gates). Use weekly or before deploys.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🏭 Graphify: Full GPU + TurboQuant",
+      "type": "shell",
+      "command": "npm run graphify:gpu:turbo",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Heavy: starts TurboQuant (:8090) + runs full GPU production-readiness pipeline (SOM BMU, hypergraph, PageRank, Neo4j, Gemma4 plans). Hour+ runtime.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "✅ Graphify: 5-Pillar Smoke",
+      "type": "shell",
+      "command": "npm run smoke:graphify",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Verify all 5 Graphify pillars: fast AST graph, Redis cache, KAG wiki notes, Qdrant semantic index, ACE fallback contract. ~3s. Use --strict to fail on any absent pillar.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
       "label": "📖 Open ACE/KAG/Gemma4 how-to guide",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"code docs/ace-kag-howto.md\"",
