@@ -123,6 +123,7 @@ for (const f of files) {
   if (f.ssrUnsafe) ssrUnsafe.push(f);
   if (Array.isArray(f.localhostRefs) ? f.localhostRefs.length > 0 : f.localhostRefs) localhost.push(f);
   if (f.sv4Legacy) sv4Legacy.push(f);
+  if (f.runeInTs) runeInTs.push(f);
 }
 
 // ── Section 3: cluster cross-join ──────────────────────────────────────────
@@ -292,6 +293,23 @@ if (localhost.length === 0) {
   if (localhost.length > TOP) push(`\n_…${localhost.length - TOP} more_`);
   push('');
   push('**Action:** route through `ENV.*` getters in `lib/server/env.server.ts`. Hardcoded URLs break Docker/prod deploys.');
+}
+push('');
+
+// 4b. Runes in plain .ts (svelte 5 leakage — runes are inert outside .svelte/.svelte.ts)
+push(`## 4b. Runes in plain .ts files (${runeInTs.length})`);
+push('');
+if (runeInTs.length === 0) {
+  push('_None._');
+} else {
+  push('Files using `$state`/`$derived`/`$effect`/`$props` syntax outside `.svelte` or `.svelte.ts` — runes are inert in plain .ts and produce no reactivity.');
+  push('');
+  push('| File |');
+  push('|------|');
+  for (const f of runeInTs.slice(0, TOP)) push(`| \`${f.rel}\` |`);
+  if (runeInTs.length > TOP) push(`\n_…${runeInTs.length - TOP} more_`);
+  push('');
+  push('**Action:** rename to `.svelte.ts` (works in stores/utils used by Svelte components), OR refactor to plain TS classes/functions if the file has no Svelte consumer.');
 }
 push('');
 
