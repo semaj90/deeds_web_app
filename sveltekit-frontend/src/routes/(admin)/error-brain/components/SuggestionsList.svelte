@@ -36,10 +36,10 @@
 
 	async function applySuggestion(id: string) {
 		try {
-			const response = await fetch(`/api/phase78/suggestions/${id}/apply`, {
+			const response = await fetch('/api/error-brain/apply-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ userId: 'current-user' })
+				body: JSON.stringify({ suggestionId: id }),
 			});
 			if (response.ok) window.location.reload();
 		} catch (err) {
@@ -49,7 +49,7 @@
 
 	async function dismissSuggestion(id: string) {
 		try {
-			const response = await fetch(`/api/phase78/suggestions/${id}`, { method: 'DELETE' });
+			const response = await fetch(`/api/error-brain/suggestions?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
 			if (response.ok) window.location.reload();
 		} catch (err) {
 			console.error('Failed to dismiss suggestion:', err);

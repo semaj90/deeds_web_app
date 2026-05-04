@@ -7,6 +7,20 @@ const { dbExecuteMock, redisGetMock, redisSetMock } = vi.hoisted(() => ({
   redisSetMock: vi.fn(),
 }));
 
+vi.mock('$env/dynamic/private', () => ({ env: {} }));
+vi.mock('$env/dynamic/public', () => ({ env: {} }));
+vi.mock('$lib/server/env.server.js', () => ({
+  ENV: {
+    OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
+    OLLAMA_CHAT_MODEL: 'gemma4-legal:latest',
+    OLLAMA_EMBED_MODEL: 'embeddinggemma:latest',
+    OLLAMA_VLM_MODEL: 'gemma4-legal-vlm:latest',
+    GEMMA4_MODEL: 'gemma4-legal-vlm:latest',
+    FUNCTION_GEMMA_MODEL: 'gemma4-legal-vlm:latest',
+    NODE_ENV: 'test',
+  },
+}));
+
 vi.mock('$lib/server/db/client', () => ({
   db: {
     execute: dbExecuteMock,
@@ -17,6 +31,8 @@ vi.mock('$lib/server/redis.js', () => ({
   redis: {
     get: redisGetMock,
     set: redisSetMock,
+    del: vi.fn(async () => 1),
+    keys: vi.fn(async () => []),
   },
 }));
 

@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 
 /** GBNF-constrained response schema for error fix generation */
 const fixResponseSchema = z.object({
@@ -115,6 +116,19 @@ Respond in JSON format:
 			};
 		}
 
+		const durationMs = data.total_duration ? Math.round(data.total_duration / 1e6) : null;
+
+		trackTokenUsage({
+			userId: locals.user?.id,
+			endpoint: '/api/error-brain/generate-fix',
+			model: 'gemma4-legal:latest',
+			promptTokens:     data.prompt_eval_count ?? 0,
+			completionTokens: data.eval_count ?? 0,
+			durationMs:       durationMs ?? undefined,
+			cached: false,
+			metadata: { filePath, sourcesUsed: sources.length, chatTemplate: 'gemma' },
+		});
+
 		return json({
 			success: true,
 			fix: {
@@ -131,7 +145,7 @@ Respond in JSON format:
 				model: 'gemma4-legal:latest',
 				generatedAt: new Date().toISOString(),
 				tokenCount: data.eval_count ?? null,
-				durationMs: data.total_duration ? Math.round(data.total_duration / 1e6) : null,
+				durationMs,
 			},
 		});
 	} catch (e) {

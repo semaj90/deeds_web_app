@@ -544,3 +544,95 @@ export async function invalidateCommunityCache(): Promise<void> {
     if (keys.length > 0) await redis.del(...keys);
   } catch { /* non-fatal */ }
 }
+
+// ── Directory KAG context ─────────────────────────────────────────────────────
+
+export interface DirectoryKAGResult {
+  dir:     string;
+  summary: string;
+  tags:    string[];
+  score:   number;
+  auditScore?: number;
+}
+
+/**
+ * KAG source for ACE: fetches directory-level wiki notes written by
+ * ingestDirectorySummaries (via index-codebase-fast --write-plan or
+ * the /api/codebase-index/directory-summaries route).
+ *
+ * Keys: wiki:note:dir:{docId}  (JSON ClusterNote shape, TTL 24h)
+ * Scoring: keyword overlap with query words, capped at 0.08.
+ *
+ * Returns at most `limit` results ranked by relevance.
+ */
+export async function getDirectoryKAGContext(
+  query: string,
+  limit = 3
+): Promise<DirectoryKAGResult[]> {
+  try {
+    const redis = getRedis();
+
+    // Resolve candidate keys via fast-AST manifest dir index
+    const manifestRaw = await redis.get('code:index:manifest').catch(() => null);
+    const indexKeys: string[] = [];
+
+    if (manifestRaw) {
+      const manifest = JSON.parse(manifestRaw) as { mode?: string };
+      if (manifest.mode === 'fast-ast') {
+        // Pull file paths matching query keywords to narrow which dirs to check
+        const words = query.toLowerCase().split(/\W+/).filter((w) => w.length > 3).slice(0, 5);
+        for (const word of words) {
+          const raw = await redis.get(`code:index:tag:${word}`).catch(() => null);
+          if (!raw) continue;
+          const paths: string[] = JSON.parse(raw);
+          for (const p of paths.slice(0, 8)) {
+            // Derive parent dir from file path
+            const dir = p.split('/').slice(0, -1).join('/');
+            const docId = `dir:${dir.replace(/[^a-z0-9]/gi, '_')}`;
+            const key = `wiki:note:dir:${docId}`;
+            if (!indexKeys.includes(key)) indexKeys.push(key);
+          }
+        }
+      }
+    }
+
+    // Fallback: scan a small prefix window when index is cold
+    if (indexKeys.length === 0) {
+      const scanned = await redis.keys('wiki:note:dir:dir_src_lib_server*').catch(() => [] as string[]);
+      indexKeys.push(...scanned.slice(0, 20));
+    }
+
+    if (indexKeys.length === 0) return [];
+
+    // Load and score wiki note records
+    const queryWords = new Set(query.toLowerCase().split(/\W+/).filter((w) => w.length > 3));
+    const results: DirectoryKAGResult[] = [];
+
+    for (const key of indexKeys) {
+      const raw = await redis.get(key).catch(() => null);
+      if (!raw) continue;
+      let note: Record<string, unknown>;
+      try { note = JSON.parse(raw); } catch { continue; }
+
+      const dir     = String(note.directoryPath ?? '');
+      const summary = String(note.summary ?? '');
+      const tags    = Array.isArray(note.dominantTags) ? (note.dominantTags as string[]) : [];
+      const auditScore = typeof note.auditScore === 'number' ? note.auditScore : undefined;
+
+      if (!dir || !summary) continue;
+
+      // Keyword overlap score
+      const textWords = new Set((dir + ' ' + summary + ' ' + tags.join(' ')).toLowerCase().split(/\W+/));
+      const overlap = [...queryWords].filter((w) => textWords.has(w)).length;
+      const score = Math.min(0.08, 0.02 + overlap * 0.015);
+
+      results.push({ dir, summary, tags, score, auditScore });
+    }
+
+    return results
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}

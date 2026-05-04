@@ -47,6 +47,14 @@ export const ENV = {
   OLLAMA_EMBED_MODEL: privateEnv.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
   /** Gemma 4 unified legal+VLM — tool calling + thinking + vision (5.3GB) */
   GEMMA4_MODEL: privateEnv.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest',
+  /**
+   * Structured-call / function-calling translator.
+   * Defaults to the unified Gemma 4 model until a lighter FunctionGemma
+   * Ollama tag is available. Override with FUNCTION_GEMMA_MODEL=functiongemma:latest
+   * once the 270M model is pulled: `ollama pull functiongemma:latest`
+   */
+  FUNCTION_GEMMA_MODEL:
+    privateEnv.FUNCTION_GEMMA_MODEL ?? privateEnv.GEMMA4_MODEL ?? 'gemma4-legal-vlm:latest',
   /** Granite-Docling-258M for layout-aware document extraction (Ollama multimodal) */
   GRANITE_DOCLING_MODEL: privateEnv.GRANITE_DOCLING_MODEL ?? 'ibm/granite-docling:258m',
   GRANITE_DOCLING_ENABLED: (privateEnv.GRANITE_DOCLING_ENABLED ?? 'true') === 'true',

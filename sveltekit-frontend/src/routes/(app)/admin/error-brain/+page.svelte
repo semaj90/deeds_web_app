@@ -11,6 +11,7 @@ import ErrorStreamMonitor from '$lib/components/ErrorStreamMonitor.svelte';
 import ErrorModal from '$lib/components/phase78/ErrorModal.svelte';
 import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelte';
 import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
+import SuggestionsList from '../../../(admin)/error-brain/components/SuggestionsList.svelte';
 // Migrated to $effect
 
  let showErrorStream = $state(false);
@@ -58,6 +59,29 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
  let autoPatchError = $state('');
  let autoPatchRunning = $state(false);
  let autoPatchResult = $state<any>(null);
+
+ // Phase78 suggestions state
+ let suggestions = $state<any[]>([]);
+ let suggestionsLoading = $state(false);
+ let suggestionsRouteFilter = $state('');
+ let showSuggestions = $state(false);
+
+ async function fetchSuggestions() {
+   suggestionsLoading = true;
+   try {
+     const params = new URLSearchParams({ limit: '50' });
+     if (suggestionsRouteFilter) params.set('routePath', suggestionsRouteFilter);
+     const res = await fetch(`/api/error-brain/suggestions?${params}`);
+     if (res.ok) {
+       const data = await res.json();
+       suggestions = data.suggestions ?? [];
+     }
+   } catch (err) {
+     console.error('Failed to fetch suggestions:', err);
+   } finally {
+     suggestionsLoading = false;
+   }
+ }
 
  // KAG (Knowledge-Augmented Generation) state
  let kagErrorId = $state('');
@@ -535,6 +559,36 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
 			{/if}
 		</div>
 	</CardContent>
+ </Card>
+
+ <!-- Phase78 Fix Suggestions -->
+ <Card>
+	<CardHeader>
+		<CardTitle class="flex items-center justify-between">
+			<span>Phase78 Fix Suggestions</span>
+			<button
+				onclick={() => { showSuggestions = !showSuggestions; if (showSuggestions && suggestions.length === 0) fetchSuggestions(); }}
+				class="text-sm font-normal text-blue-600 hover:underline"
+			>{showSuggestions ? 'Hide' : 'Show'}</button>
+		</CardTitle>
+		<CardDescription>LLM-generated fix suggestions from phase78 error clustering pipeline</CardDescription>
+	</CardHeader>
+	{#if showSuggestions}
+		<CardContent>
+			<div class="flex gap-3 items-center mb-4">
+				<input
+					type="text"
+					placeholder="Filter by route path..."
+					bind:value={suggestionsRouteFilter}
+					class="flex-1 px-2 py-1.5 border border-gray-300 rounded font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+				/>
+				<Button onclick={fetchSuggestions} disabled={suggestionsLoading}>
+					{suggestionsLoading ? 'Loading...' : 'Refresh'}
+				</Button>
+			</div>
+			<SuggestionsList {suggestions} isLoading={suggestionsLoading} />
+		</CardContent>
+	{/if}
  </Card>
 
  <!-- Runs List -->

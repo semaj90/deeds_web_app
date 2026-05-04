@@ -74,7 +74,66 @@ const DRY_RUN           = process.argv.includes('--dry-run');
 const USE_TURBO         = process.argv.includes('--turbo');
 const FULL_GPU          = process.argv.includes('--full-gpu');
 const REQUIRE_INFERENCE = process.argv.includes('--require-inference');
+// --direct: bypass /api/ai/agent and call TurboQuant or Ollama directly for analysis queries.
+// Avoids SvelteKit's 120s server timeout. Reads codebase context from Qdrant scroll instead of rag_search.
+const USE_DIRECT        = process.argv.includes('--direct');
 const TIMEOUT_MS        = 120_000;
+
+// ── Direct LLM inference (bypasses /api/ai/agent SvelteKit timeout) ───────────
+async function directLLMQuery(prompt, { timeoutMs = 60_000 } = {}) {
+  // Try TurboQuant first (fast), then Ollama
+  const backends = [
+    { url: `${TURBO_URL}/v1/chat/completions`, model: 'gemma4-legal', check: `${TURBO_URL}/health` },
+    { url: `${OLLAMA_URL}/api/chat`, model: 'gemma4-legal-vlm:latest', check: `${OLLAMA_URL}/api/tags`, ollama: true },
+  ];
+
+  for (const b of backends) {
+    try {
+      const health = await fetch(b.check, { signal: AbortSignal.timeout(2000) });
+      if (!health.ok) continue;
+    } catch { continue; }
+
+    try {
+      const body = b.ollama
+        ? { model: b.model, messages: [{ role: 'user', content: prompt }], stream: false, options: { num_predict: 1024 } }
+        : { model: b.model, messages: [{ role: 'user', content: prompt }], max_tokens: 1024, temperature: 0.2, stream: false };
+
+      const res = await fetch(b.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      if (!res.ok) continue;
+      const d = await res.json();
+      const text = b.ollama
+        ? d?.message?.content
+        : d?.choices?.[0]?.message?.content;
+      if (text) return { answer: text, backend: b.ollama ? 'ollama' : 'turboquant' };
+    } catch { continue; }
+  }
+  return null;
+}
+
+// ── Qdrant context fetch (for --direct mode rag replacement) ──────────────────
+async function qdrantContextFetch(keywords, collection = 'codebase_chunks_768', limit = 8) {
+  try {
+    const res = await fetch(`http://localhost:6333/collections/${collection}/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        limit,
+        with_payload: { include: ['file_path', 'chunk_text', 'summary', 'domain', 'tags'] },
+        filter: { must: [{ key: 'tags', match: { any: keywords.slice(0, 5) } }] },
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const d = await res.json();
+    return (d?.result?.points ?? []).map(p =>
+      `[${p.payload?.file_path ?? p.id}] ${(p.payload?.chunk_text ?? p.payload?.summary ?? '').slice(0, 300)}`
+    ).join('\n\n');
+  } catch { return ''; }
+}
 
 // ── Colour helpers (no deps) ──────────────────────────────────────────────────
 const c = {
@@ -553,6 +612,62 @@ async function ragOnlyFallback() {
   return outputs;
 }
 
+// ── Direct query runner (--direct flag) ──────────────────────────────────────
+// Calls LLM directly without routing through /api/ai/agent. Pulls Qdrant context
+// via keyword scroll instead of semantic rag_search to avoid embedding VRAM contention.
+async function runDirectQueries() {
+  const directQueries = [
+    {
+      id: 'orphan_routes',
+      label: 'Orphan/dead API routes',
+      keywords: ['orphan', 'unused', 'dead', 'route', 'api'],
+      prompt: (ctx) => `You are auditing a SvelteKit codebase. Based on the following code context, identify API routes in src/routes/api/ that appear to have no frontend consumers. List up to 10 route paths.\n\nContext:\n${ctx || '(no context retrieved)'}\n\nList orphaned API routes:`,
+    },
+    {
+      id: 'duplicate_services',
+      label: 'Duplicate service implementations',
+      keywords: ['duplicate', 'service', 'redis', 'embedding', 'cache'],
+      prompt: (ctx) => `You are auditing a SvelteKit codebase. Find duplicate or near-duplicate service implementations in src/lib/server/. Look for two files implementing the same concept.\n\nContext:\n${ctx || '(no context retrieved)'}\n\nList duplicate pairs:`,
+    },
+    {
+      id: 'dir_consolidation',
+      label: 'Directory consolidation targets',
+      keywords: ['directory', 'consolidate', 'merge', 'subdirectory', 'lib'],
+      prompt: (ctx) => `You are auditing a SvelteKit codebase. Which src/lib/ subdirectories have fewer than 3 files and could be merged? Which overlap in purpose?\n\nContext:\n${ctx || '(no context retrieved)'}\n\nList consolidation targets:`,
+    },
+    {
+      id: 'auth_gaps',
+      label: 'Auth guard coverage gaps',
+      keywords: ['auth', 'guard', 'locals', 'session', 'unauthorized'],
+      prompt: (ctx) => `You are auditing a SvelteKit codebase. Which API routes in src/routes/api/ lack authentication guards (locals.user check)?\n\nContext:\n${ctx || '(no context retrieved)'}\n\nList unguarded routes:`,
+    },
+    {
+      id: 'prod_blockers',
+      label: 'Production readiness blockers',
+      keywords: ['todo', 'fixme', 'hardcoded', 'localhost', 'mock', 'stub'],
+      prompt: (ctx) => `You are auditing a SvelteKit codebase. Identify the top 5 production readiness blockers: hardcoded localhost URLs, TODO/FIXME in server code, missing Zod validation, mock data in production paths.\n\nContext:\n${ctx || '(no context retrieved)'}\n\nList top 5 blockers:`,
+    },
+  ];
+
+  const outputs = {};
+  for (const q of directQueries) {
+    console.log(`\n  ${c.dim(`Running (direct): ${q.label}...`)}`);
+    const t0 = Date.now();
+    const ctx = await qdrantContextFetch(q.keywords);
+    const result = await directLLMQuery(q.prompt(ctx), { timeoutMs: 60_000 });
+    const ms = Date.now() - t0;
+
+    if (result?.answer) {
+      log('agent', q.label, 'pass', `direct:${result.backend}, ${Math.round(ctx.length / 100) * 100} chars context`, ms);
+      outputs[q.id] = { label: q.label, pipeline: 'direct', answer: result.answer, toolsUsed: ['qdrant_scroll', result.backend], rounds: 1, sources: [], ms };
+    } else {
+      log('agent', q.label, 'fail', 'LLM unavailable or timed out (60s)', ms);
+      outputs[q.id] = { label: q.label, pipeline: 'direct', answer: null, error: 'LLM timeout', ms };
+    }
+  }
+  return { infResult: null, outputs };
+}
+
 // ── Phase 3: Gemma4 Agentic Tool-Calling ─────────────────────────────────────
 async function runAgentQueries(health) {
   section('Phase 3 — Gemma4 Agentic Analysis');
@@ -560,6 +675,13 @@ async function runAgentQueries(health) {
   if (SKIP_AGENT) {
     log('agent', 'Agent queries', 'skip', '--skip-agent flag set');
     return { infResult: null, outputs: {} };
+  }
+
+  // --direct mode bypasses /api/ai/agent entirely — no dev server needed.
+  if (USE_DIRECT) {
+    log('agent', 'Direct inference mode', 'pass',
+      'Bypassing /api/ai/agent — calling LLM directly (TurboQuant or Ollama)');
+    return runDirectQueries();
   }
 
   if (!health['Dev server :5173']) {

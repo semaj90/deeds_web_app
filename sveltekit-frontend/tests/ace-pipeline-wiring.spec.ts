@@ -71,12 +71,24 @@ vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
 
 // ── Mock Ollama ─────────────────────────────────────────────────────────
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: vi.fn(async () => ({
-		ok: true,
-		json: async () => ({ response: 'test response', model: 'gemma4-legal', eval_count: 100, prompt_eval_count: 50 }),
-	})),
-	bifrostChat: vi.fn(async () => 'test response'),
-	getChatModelKeepAlive: vi.fn(() => '24h'),
+  ollamaFetch: vi.fn(async () => ({
+    ok: true,
+    json: async () => ({
+      response: 'test response',
+      model: 'gemma4-legal',
+      eval_count: 100,
+      prompt_eval_count: 50,
+    }),
+  })),
+  bifrostChat: vi.fn(async () => 'test response'),
+  getChatModelKeepAlive: vi.fn(() => '24h'),
+  VLM_MODELS: {
+    vision: 'gemma4-legal-vlm:latest',
+    embedding: 'embeddinggemma:latest',
+    legal: 'gemma4-legal-vlm:latest',
+    gemma4: 'gemma4-legal-vlm:latest',
+    tool: 'gemma4-legal-vlm:latest',
+  },
 }));
 
 // ── Mock analytics ──────────────────────────────────────────────────────
@@ -89,7 +101,8 @@ vi.mock('$lib/server/analytics/event-logger.js', () => ({
 	})),
 }));
 vi.mock('$lib/server/ace/user-analytics-context.js', () => ({
-	fetchUserAnalyticsContext: vi.fn(async () => null),
+  fetchUserAnalyticsContext: vi.fn(async () => null),
+  fetchTopQueryTags: vi.fn(async () => []),
 }));
 vi.mock('$lib/server/retrieval/web-search.js', () => ({
 	webSearch: vi.fn(async () => null),
@@ -120,7 +133,7 @@ describe('ACE pipeline wiring', () => {
 
 			expect(TOKEN_BUDGET).toHaveProperty('codebaseContext');
 			expect(TOKEN_BUDGET.codebaseContext).toBe(400);
-      expect(TOKEN_BUDGET.total).toBe(5100);
+			expect(TOKEN_BUDGET.total).toBe(5600);
 		});
 	});
 

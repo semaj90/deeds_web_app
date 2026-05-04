@@ -49,6 +49,7 @@ import {
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithGemma4 } from '../retrieval/cross-encoder-reranker.js';
 import { applyTopologicalBoostAsync } from '../retrieval/topological-search.js';
+import { queryBmuCached } from '$lib/server/gpu/libtorch-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from './policy.js';
 import {
@@ -61,7 +62,9 @@ import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
 import { recallPastChats } from './chat-memory.js';
-import { getCommunityContext } from '$lib/server/graph/community-graph.js';
+import { getRedis } from '$lib/server/redis.js';
+import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
+import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/ACPToolRegistry.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -107,6 +110,92 @@ async function fetchWebResearchRows(
   } catch {
     return [];
   }
+}
+
+const ACP_MAX_RESULTS = 8;
+const ACP_MAX_SCORE = 0.08; // ACP boosts capped — must not dominate Qdrant/graph/SOM ranking
+
+async function fetchACPKnowledgeResults(
+  query: string,
+  limit = ACP_MAX_RESULTS,
+  collection = 'codebase_chunks_768'
+): Promise<ACPKnowledgeSearchResult | null> {
+  try {
+    const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+    const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
+    const startedAt = Date.now();
+
+    const emb = await generateSingleEmbedding(query);
+    if (!Array.isArray(emb) || emb.length !== 768) return null;
+
+    const hits = await qdrant.hybridSearch({
+      collection,
+      query,
+      queryEmbedding: Array.from(emb),
+      limit: Math.min(limit, ACP_MAX_RESULTS),
+    });
+
+    return {
+      ok: true,
+      query,
+      results: hits.results.map((h) => ({
+        id: String(h.id),
+        source: 'qdrant' as const,
+        title: (h.payload?.['title'] ?? h.payload?.['path'] ?? undefined) as string | undefined,
+        content: (h.payload?.['content'] ??
+          h.payload?.['summary'] ??
+          h.payload?.['text'] ??
+          '') as string,
+        score: h.score,
+        path: (h.payload?.['path'] ?? h.payload?.['relative_path'] ?? undefined) as
+          | string
+          | undefined,
+        metadata: h.payload as Record<string, unknown> | undefined,
+      })),
+      metadata: {
+        embeddingModel: 'embeddinggemma:latest',
+        collection,
+        latencyMs: Date.now() - startedAt,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function mergeACPKnowledgeChunks(
+  existing: import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[],
+  acpResult: ACPKnowledgeSearchResult | null
+): import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[] {
+  if (!acpResult?.results?.length) return existing;
+
+  const seen = new Set(existing.map((r) => `${r.sourceId ?? r.id}|${r.content.slice(0, 120)}`));
+
+  const merged = [...existing];
+  for (const hit of acpResult.results.slice(0, ACP_MAX_RESULTS)) {
+    const title = hit.title?.trim() ?? '';
+    const content = title ? `${title}\n${hit.content}`.trim() : hit.content.trim();
+    const key = `${hit.id}|${content.slice(0, 120)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push({
+      id: `acp:${hit.id}`,
+      kind: 'kb_doc' as const,
+      source: 'qdrant' as const,
+      content,
+      score: Math.min(hit.score, ACP_MAX_SCORE),
+      tags: ['acp_cross_feed'],
+      sourceId: hit.path ?? hit.id,
+      metadata: {
+        ...hit.metadata,
+        acpCrossFeed: true,
+        acpCollection: acpResult.metadata.collection,
+        acpBoost: Math.min(hit.score * 0.08, ACP_MAX_SCORE),
+      },
+    });
+  }
+
+  return assignRanks(sortByBestScore(merged));
 }
 
 /**
@@ -161,6 +250,8 @@ export async function assembleACEContext(opts: {
         webResearchRows,
         lane3Research,
         communityContext,
+        directoryKagContext,
+        acpKnowledgeResults,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -188,7 +279,13 @@ export async function assembleACEContext(opts: {
             )
           : Promise.resolve({ research: [] }),
         // GraphRAG community context: cosine-ranked community summary for this query
-        getCommunityContext(query, 2).catch(() => [] as Awaited<ReturnType<typeof getCommunityContext>>),
+        getCommunityContext(query, 2).catch(
+          () => [] as Awaited<ReturnType<typeof getCommunityContext>>
+        ),
+        getDirectoryKAGContext(query, 3).catch(
+          () => [] as Awaited<ReturnType<typeof getDirectoryKAGContext>>
+        ),
+        fetchACPKnowledgeResults(query, ACP_MAX_RESULTS, 'codebase_chunks_768').catch(() => null),
       ]);
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
@@ -234,7 +331,10 @@ export async function assembleACEContext(opts: {
         caseContext,
         glossaryMatches,
         ragChunks: assignRanks(sortByBestScore(allRag)),
-        kbChunks: assignRanks(sortByBestScore(kbChunks.map(toUnified))),
+        kbChunks: mergeACPKnowledgeChunks(
+          assignRanks(sortByBestScore(kbChunks.map(toUnified))),
+          acpKnowledgeResults ?? null
+        ),
         caseChunks: assignRanks(sortByBestScore(caseChunks.map(toUnified))),
         kagNeighbors,
         chatHistory,
@@ -247,9 +347,23 @@ export async function assembleACEContext(opts: {
             // GraphRAG community context — coarse "what team/layer does this query touch?"
             communityContext?.length
               ? `\n## Codebase Community Context (GraphRAG)\n` +
-                communityContext.map((c) =>
-                  `**${c.purpose}** (similarity=${c.similarity.toFixed(2)})\n${c.summary}\nTags: ${c.tags.join(', ')}`
-                ).join('\n\n')
+                communityContext
+                  .map(
+                    (c) =>
+                      `**${c.purpose}** (similarity=${c.similarity.toFixed(2)})\n${c.summary}\nTags: ${c.tags.join(', ')}`
+                  )
+                  .join('\n\n')
+              : '',
+            directoryKagContext?.length
+              ? `\n## KAG Directory Audit Notes\n` +
+                directoryKagContext
+                  .map(
+                    (entry) =>
+                      `**${entry.dir}** (score=${entry.score.toFixed(2)}${typeof entry.auditScore === 'number' ? `, audit=${entry.auditScore}` : ''})\n` +
+                      `${entry.summary}\n` +
+                      (entry.tags.length ? `Tags: ${entry.tags.join(', ')}` : '')
+                  )
+                  .join('\n\n')
               : '',
             webResults ? formatWebResultsAsContext(webResults) : '',
             wikiResults ? formatWikipediaAsContext(wikiResults) : '',
@@ -258,6 +372,17 @@ export async function assembleACEContext(opts: {
                 lane3Research.research
                   .slice(0, 5)
                   .map((r, i) => `[${i + 1}] [${r.source}] ${r.url}\n${r.body.slice(0, 600)}`)
+                  .join('\n\n')
+              : '',
+            acpKnowledgeResults?.results?.length
+              ? `\n## ACP Knowledge Cross-Feed (${acpKnowledgeResults.metadata.collection})\n` +
+                acpKnowledgeResults.results
+                  .slice(0, 3)
+                  .map((r, i) => {
+                    const title = r.title?.trim() || r.path || `ACP Result ${i + 1}`;
+                    const snippet = r.content.slice(0, 300);
+                    return `[ACP ${i + 1}] ${title} (score: ${r.score.toFixed(2)})${snippet ? `\n${snippet}` : ''}`;
+                  })
                   .join('\n\n')
               : '',
           ]
@@ -317,6 +442,66 @@ export async function assembleACEContext(opts: {
         );
       }
 
+      // Fast-AST graph cache fallback (source priority 4 — lower than Qdrant/ACP/graph)
+      // Only injected when codebase context is sparse (< 3 chunks) to avoid diluting ranked results
+      const FAST_AST_SCORE_CAP = 0.07;
+      if (opts.enableCodebaseContext && (codebaseContext?.length ?? 0) < 3) {
+        try {
+          const redis = getRedis();
+          const manifestRaw = await redis.get('code:index:manifest');
+          if (manifestRaw) {
+            const manifest = JSON.parse(manifestRaw) as {
+              mode: string;
+              fileCount: number;
+              createdAt: string;
+            };
+            if (manifest.mode === 'fast-ast') {
+              // Pull tag-matched file records for the query
+              const queryWords = query
+                .toLowerCase()
+                .split(/\W+/)
+                .filter((w) => w.length > 3)
+                .slice(0, 6);
+              const fastChunks: import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[] =
+                [];
+              for (const word of queryWords) {
+                const raw = await redis.get(`code:index:tag:${word}`);
+                if (!raw) continue;
+                const filePaths: string[] = JSON.parse(raw);
+                for (const fp of filePaths.slice(0, 4)) {
+                  fastChunks.push({
+                    id: `fast-ast:${fp}`,
+                    kind: 'code_chunk' as const,
+                    source: 'redis' as const,
+                    content: fp,
+                    summary: `[fast-ast] ${fp}`,
+                    score: Math.min(
+                      0.05 + queryWords.filter((w) => fp.includes(w)).length * 0.01,
+                      FAST_AST_SCORE_CAP
+                    ),
+                    tags: ['fast-ast', word],
+                    filePath: fp,
+                    metadata: { indexMode: 'fast-ast', manifestCreatedAt: manifest.createdAt },
+                  });
+                }
+              }
+              if (fastChunks.length > 0) {
+                const dedupedFast = fastChunks.filter(
+                  (c) => !baseContext.ragChunks?.some((r) => r.filePath === c.filePath)
+                );
+                if (dedupedFast.length > 0) {
+                  baseContext.ragChunks = assignRanks(
+                    sortByBestScore([...(baseContext.ragChunks ?? []), ...dedupedFast])
+                  );
+                }
+              }
+            }
+          }
+        } catch {
+          /* non-fatal — fast-ast cache is best-effort */
+        }
+      }
+
       // Step 6: fetch VLM cluster narrative for the top matched cluster
       let activeClusterSummary: ACEContext['activeClusterSummary'] = null;
       if (opts.enableCodebaseContext && codebaseContext?.length) {
@@ -349,6 +534,8 @@ export async function assembleACEContext(opts: {
         latencyMs: Date.now() - policyStartedAt,
         cacheHit: false,
         metadata: {
+          model_role: 'ace-policy',
+          cache_tier: 'L4',
           action: policyDecision.action,
           confidence: policyDecision.confidence,
           retrievalConfidence: policyDecision.retrievalConfidence,
@@ -639,7 +826,12 @@ export async function fetchCachedACEChunks(
       latencyMs: elapsedMs,
       cacheHit: isHit,
       resultCount: result.rows.length,
-      metadata: { op: 'read', caseId: caseId.slice(0, 8) },
+      metadata: {
+        op: 'read',
+        model_role: 'ace-retrieval',
+        cache_tier: isHit ? 'L3' : 'L4',
+        caseId: caseId.slice(0, 8),
+      },
     });
 
     return result.rows.map((r: any) => ({
@@ -850,8 +1042,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     const memoryText = context.chatMemory
       .slice(0, limits.chatMemoryCount)
       .map(
-        (m) =>
-          `[${m.score.toFixed(2)}] ${m.role}: ${truncate(m.content, limits.chatMessageChars)}`
+        (m) => `[${m.score.toFixed(2)}] ${m.role}: ${truncate(m.content, limits.chatMessageChars)}`
       )
       .join('\n');
     lines.push(`\n## Recalled From Prior Sessions\n${memoryText}`);
@@ -1945,9 +2136,14 @@ async function fetchCodebaseContext(
             return toCtx(r, scoreMap.get(docId) ?? r.score);
           });
 
-          // Phase 8: Apply 4D topological boost (PageRank + SOM + hyperedge grade)
+          // Phase 8: Apply 4D topological boost (PageRank + SOM + hyperedge grade + query BMU)
+          // queryBmuCached: Redis-cached CUDA SOM forward pass — maps query to grid position
+          // so chunks near the query's own SOM neuron get an extra affinity signal.
+          const queryBmu = await queryBmuCached(
+            await generateSingleEmbedding(query).catch(() => [])
+          ).catch(() => undefined);
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const boosted = await applyTopologicalBoostAsync(unsorted as any);
+          const boosted = await applyTopologicalBoostAsync(unsorted as any, { queryBmu });
 
           return applyKarpathyBoost(boosted.slice(0, 10) as any, query);
         }

@@ -7,6 +7,7 @@
  */
 
 import type { RankedChunk } from './codebase-context';
+import type { QueryBmuResult } from '$lib/server/gpu/libtorch-bridge.js';
 
 export interface BoostOptions {
   radius?: number;           // Manhattan distance for spatial boost (default: 2)
@@ -14,6 +15,8 @@ export interface BoostOptions {
   centralityWeight?: number; // Multiplier for pageRankScore (default: 0.3)
   densityMaxBoost?: number;  // Cap for cluster density boost (default: 1.5)
   hyperedgeBoost?: number;   // Additive boost for same-hyperedge chunks (default: 0.06)
+  queryBmu?: QueryBmuResult; // Query embedding's BMU — nearby chunks get extra SOM affinity boost
+  queryBmuWeight?: number;   // Additive boost per SOM grid step toward query BMU (default: 0.03)
 }
 
 /**
@@ -92,6 +95,8 @@ export async function applyTopologicalBoostAsync(
     centralityWeight = 0.3,
     densityMaxBoost = 1.5,
     hyperedgeBoost: _he = 0.06,
+    queryBmu,
+    queryBmuWeight = 0.03,
   } = opts;
 
   // Collect Qdrant IDs from results (stored as qdrantId or id field)
@@ -137,10 +142,19 @@ export async function applyTopologicalBoostAsync(
       ? Math.min(densityMaxBoost, Math.pow(spatialWeight, Math.min(adjacencyCount, 4)))
       : 1.0;
 
-    // 3. PageRank centrality
+    // 3. Query BMU proximity: chunks near the query's SOM position get affinity boost
+    let queryProximityBoost = 0;
+    if (queryBmu && r.somBmuRow != null && r.somBmuCol != null) {
+      const distToQuery = Math.abs(r.somBmuRow - queryBmu.bmuRow) + Math.abs(r.somBmuCol - queryBmu.bmuCol);
+      // Closest neurons get full weight; each step away decays by half of queryBmuWeight
+      const maxRadius = Math.max(queryBmu.gridW, queryBmu.gridH);
+      queryProximityBoost = Math.max(0, queryBmuWeight * (1 - distToQuery / maxRadius));
+    }
+
+    // 4. PageRank centrality
     const pagerankBoost = 1.0 + ((r.pageRankScore ?? 0) * centralityWeight);
 
-    const finalScore = Math.min(1.0, (r.score + boost) * densityBoost * pagerankBoost);
+    const finalScore = Math.min(1.0, (r.score + boost + queryProximityBoost) * densityBoost * pagerankBoost);
 
     return {
       ...r,
@@ -151,6 +165,7 @@ export async function applyTopologicalBoostAsync(
         pagerankBoost,
         hyperedgeGrade: edgeInfo?.gradeLabel ?? null,
         hyperedgeBoost: boost,
+        queryProximityBoost,
         originalScore: r.score,
       },
     };

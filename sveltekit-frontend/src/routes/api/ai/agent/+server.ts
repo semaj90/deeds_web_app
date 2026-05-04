@@ -25,6 +25,7 @@ import { z }              from 'zod';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 import { getRedis }       from '$lib/server/redis.js';
 import { recordSearchQuery, type HitPipeline } from '$lib/server/analytics/search-analytics.js';
+import { ENV } from '$lib/server/env.server.js';
 import type { RequestHandler } from './$types';
 
 const RATE_LIMIT    = 20;
@@ -34,10 +35,11 @@ const RATE_WINDOW_S = 60;
 
 // Native format
 const NativeSchema = z.object({
-  query:        z.string().min(1).max(4000),
+  query: z.string().min(1).max(4000),
   systemPrompt: z.string().max(2000).optional(),
-  pipeline:     z.string().max(20).optional().default('ace'),
-  bypassCache:  z.boolean().optional().default(false),
+  pipeline: z.string().max(20).optional().default('ace'),
+  bypassCache: z.boolean().optional().default(false),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 // A2A Task format (Google Agent2Agent spec)
@@ -137,16 +139,30 @@ async function handleNative(body: unknown, userId: string): Promise<Response> {
     return json({ error: parsed.error.issues[0]?.message ?? 'Bad request' }, { status: 400 });
   }
 
-  const { query, systemPrompt, pipeline, bypassCache } = parsed.data;
+  const { query, systemPrompt, pipeline, bypassCache, metadata } = parsed.data;
 
   try {
-    const result = await runGemma4Agent(query, { systemPrompt, pipeline, userId, sessionId: userId, bypassCache });
+    const result = await runGemma4Agent(query, {
+      systemPrompt,
+      pipeline,
+      userId,
+      sessionId: userId,
+      bypassCache,
+      metadata,
+    });
     const cacheHit = result.cacheTier === 'L1_redis' || result.cacheTier === 'L2_qdrant';
     recordSearchQuery({ query, pipeline: pipeline as HitPipeline, cacheHit, userId });
     return json(result);
   } catch (err) {
-    console.error('[agent] native call failed:', (err as Error).message);
-    return json({ error: 'Agent failed — model may be unavailable' }, { status: 503 });
+    const message = (err as Error).message;
+    console.error('[agent] native call failed:', message);
+    return json(
+      {
+        error: 'Agent failed — model may be unavailable',
+        ...(ENV.NODE_ENV !== 'production' || ENV.DEV_BYPASS_AUTH ? { detail: message } : {}),
+      },
+      { status: 503 }
+    );
   }
 }
 
@@ -183,10 +199,15 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
 
   // Non-streaming A2A (tasks/send) — return completed TaskResult
   try {
-    const result = await runGemma4Agent(query, { pipeline, userId, sessionId: userId });
+    const result = await runGemma4Agent(query, {
+      pipeline,
+      userId,
+      sessionId: userId,
+      metadata: task.metadata,
+    });
 
     const taskResult: A2ATaskResult = {
-      id:     task.id,
+      id: task.id,
       status: { state: 'completed' },
       artifacts: [
         {
@@ -195,12 +216,19 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
         },
         {
           name: 'metadata',
-          parts: [{ data: {
-            toolsUsed:  result.toolsUsed,
-            rounds:     result.rounds,
-            durationMs: result.durationMs,
-            sources:    result.sources,
-          }}],
+          parts: [
+            {
+              data: {
+                toolsUsed: result.toolsUsed,
+                rounds: result.rounds,
+                durationMs: result.durationMs,
+                sources: result.sources,
+                cacheTrace: result.cacheTrace,
+                errorFixMemoryHit: result.errorFixMemoryHit,
+                verificationStatus: result.verificationStatus,
+              },
+            },
+          ],
         },
       ],
       metadata: { pipeline, userId },
@@ -208,13 +236,24 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
 
     return json(taskResult);
   } catch (err) {
-    console.error('[agent] A2A task failed:', (err as Error).message);
+    const message = (err as Error).message;
+    console.error('[agent] A2A task failed:', message);
 
     const failedResult: A2ATaskResult = {
-      id:     task.id,
+      id: task.id,
       status: {
-        state:   'failed',
-        message: { role: 'agent', parts: [{ text: 'Agent failed — model may be unavailable' }] },
+        state: 'failed',
+        message: {
+          role: 'agent',
+          parts: [
+            {
+              text:
+                ENV.NODE_ENV !== 'production' || ENV.DEV_BYPASS_AUTH
+                  ? `Agent failed — ${message}`
+                  : 'Agent failed — model may be unavailable',
+            },
+          ],
+        },
       },
     };
     return json(failedResult, { status: 503 });
@@ -245,7 +284,15 @@ function handleA2AStream(taskId: string, query: string, pipeline: string, userId
       });
 
       try {
-        const result = await runGemma4Agent(query, { pipeline, userId, sessionId: userId });
+        const result = await runGemma4Agent(query, {
+          pipeline,
+          userId,
+          sessionId: userId,
+          metadata: {
+            source: 'a2a-stream',
+            ...(typeof taskId === 'string' ? { route: taskId } : {}),
+          },
+        });
 
         // Emit answer artifact
         send('task_artifact', {

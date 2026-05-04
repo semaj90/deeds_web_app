@@ -4044,6 +4044,40 @@ export const clusterSummaries = pgTable('cluster_summaries', {
 	repoClusterIdx: index('cluster_summaries_repo_cluster_idx').on(table.repoId, table.gpuCluster),
 }));
 
+/** GraphRAG community reports — one row per Leiden community (GraphRAG Stage 9b) */
+export const communityReports = pgTable('community_reports', {
+	communityId: integer('community_id').primaryKey().notNull(),
+	clusterIds: integer('cluster_ids').array().notNull().default(sql`'{}'::int[]`),
+	memberCount: integer('member_count').notNull().default(0),
+	summary: text('summary').notNull().default(''),
+	purpose: text('purpose').notNull().default(''),
+	tags: text('tags').array().notNull().default(sql`'{}'::text[]`),
+	cohesionScore: real('cohesion_score').notNull().default(0),
+	embedding: vector('embedding', { dimensions: 768 }),
+	builtAt: timestamp('built_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (table) => ({
+	cohesionIdx: index('community_reports_cohesion_idx').on(table.cohesionScore),
+	builtAtIdx: index('community_reports_built_at_idx').on(table.builtAt),
+}));
+
+/** Hypergraph edges — durable Postgres mirror of Redis hg:edge:* keys */
+export const hypergraphEdges = pgTable('hypergraph_edges', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	edgeHash: varchar('edge_hash', { length: 64 }).notNull(),
+	memberIds: text('member_ids').array().notNull().default(sql`'{}'::text[]`),
+	gradeLabel: varchar('grade_label', { length: 4 }).notNull().default('D'),
+	gradeScore: real('grade_score').notNull().default(0),
+	gpuCluster: integer('gpu_cluster'),
+	communityId: integer('community_id'),
+	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (table) => ({
+	edgeHashUq: unique('hypergraph_edges_edge_hash_uq').on(table.edgeHash),
+	gradeIdx: index('hypergraph_edges_grade_idx').on(table.gradeLabel),
+	clusterIdx: index('hypergraph_edges_cluster_idx').on(table.gpuCluster),
+}));
+
 /** Enrichment job tracking — one row per background enrichment run */
 export const enrichmentJobs = pgTable('enrichment_jobs', {
 	jobId: uuid('job_id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
