@@ -261,6 +261,11 @@ function getImageFormatFromMime(mime: string): 'jpeg' | 'png' | 'gif' | 'webp' |
 export async function generateMetadataFromFile(
 	file: File, evidenceType: string
 ): Promise<EvidenceMetadata> {
+	// Browser-only — uses Image, video, audio elements via document.createElement.
+	// Caller is the upload UI; this function should never run in SSR/Node.
+	if (typeof document === 'undefined') {
+		throw new Error('generateMetadataFromFile is browser-only');
+	}
 	const baseMetadata = {
 		fileSize: file.size, uploadedAt: new Date().toISOString()
 	};

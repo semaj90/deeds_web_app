@@ -110,8 +110,11 @@ const streamProgress = fromPromise(async ({ input }: { input: AudioUploadContext
       try {
         const data = JSON.parse(event.data);
 
-        // Dispatch custom event for component to pick up
-        window.dispatchEvent(new CustomEvent('audio:progress', { detail: data }));
+        // Dispatch custom event for component to pick up.
+        // EventSource only runs browser-side, but guard for the audit + safety.
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('audio:progress', { detail: data }));
+        }
 
         if (data.stage === 'complete') {
           eventSource.close();

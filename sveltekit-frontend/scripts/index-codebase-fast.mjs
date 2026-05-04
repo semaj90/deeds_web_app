@@ -158,7 +158,7 @@ const RE_RUNE_IN_TS  = /\$(?:state|derived|effect|props)\s*[(<]/;
 const RE_SSR_UNSAFE  = /(?:^|[^\w.\-])(window|document|localStorage|sessionStorage|indexedDB|IndexedDB)(?=\s*(?:\.[a-zA-Z_]|\[|\()|\s*(?:===|!==|==|!=|<|>|=[^=]))/m;
 // Recognized SSR-safe markers: explicit guards, lifecycle hooks (run only in browser),
 // reactive runes ($effect runs only browser-side), event handler functions ("function ... {" preceding window/document refs).
-const RE_SSR_GUARD   = /typeof\s+window|typeof\s+document|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;
+const RE_SSR_GUARD   = /typeof\s+(?:window|document|localStorage|sessionStorage|indexedDB|IndexedDB)\s*[!=]==?\s*['"]undefined['"]|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;
 // Server-only files cannot run in browser SSR context — they ARE the server
 const RE_SERVER_ONLY = /(?:^|\/)(?:hooks\.server\.ts|.+\.server\.(?:ts|js)|\+server\.ts|lib\/server\/)/;
 // G17 — error handling
@@ -336,7 +336,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v12'; // bumped 2026-05-04 — G15 lookahead requires real access syntax (.x | [ | ( | == | =), rejects TS field markers (?:, :)
+const META_CACHE_VERSION = 'v13'; // bumped 2026-05-04 — RE_SSR_GUARD now recognizes typeof <storage>=='undefined' guards (localStorage, sessionStorage, indexedDB)
 
 for (const filePath of walk(scanRoot)) {
   let src;

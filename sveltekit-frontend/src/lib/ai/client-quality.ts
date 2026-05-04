@@ -314,6 +314,7 @@ function _adjustThresholds(feedbackHistory: QualityFeedback[]): void {
 }
 
 async function _loadFeedbackHistory(): Promise<QualityFeedback[]> {
+	if (typeof localStorage === 'undefined') return []; // SSR guard
 	try {
 		const raw = localStorage.getItem(FEEDBACK_STORE_KEY);
 		return raw ? JSON.parse(raw) : [];
@@ -323,6 +324,7 @@ async function _loadFeedbackHistory(): Promise<QualityFeedback[]> {
 }
 
 async function _saveFeedbackHistory(history: QualityFeedback[]): Promise<void> {
+	if (typeof localStorage === 'undefined') return; // SSR guard
 	try {
 		localStorage.setItem(FEEDBACK_STORE_KEY, JSON.stringify(history));
 	} catch {

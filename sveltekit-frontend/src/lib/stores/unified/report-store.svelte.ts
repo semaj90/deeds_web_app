@@ -265,6 +265,7 @@ class ReportStore {
   }
 
   async exportReport(reportId: string, format: ExportFormat) {
+    if (typeof window === 'undefined') return; // browser-only download trigger
     try {
       const response = await fetch(`/api/reports/${reportId}/export?format=${format}`, {
         credentials: 'include',

@@ -298,6 +298,7 @@ function generateRecommendations(result: FormAuditResult): void {
 }
 
 export function auditAllForms(): FormAuditResult[] {
+  if (typeof document === 'undefined') return []; // browser-only — needs DOM
   const forms = document.querySelectorAll('form');
   return Array.from(forms).map((form) => auditFormElement(form as HTMLFormElement));
 }
