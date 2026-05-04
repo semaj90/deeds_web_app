@@ -151,7 +151,7 @@ const lookupResearchSummary: Gemma4Tool = {
 
     try {
       const resp = await fetch(
-        `http://localhost:5173/api/analytics/research-graph`,
+        `${ENV.PUBLIC_API_URL ?? 'http://localhost:5173'}/api/analytics/research-graph`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

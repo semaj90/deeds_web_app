@@ -98,6 +98,8 @@ function* walk(dir) {
 
 // G1 — static ESM imports
 const RE_IMPORT      = /import\s+(?:type\s+)?(?:\{[^}]*\}|[\w*]+(?:\s+as\s+\w+)?)\s+from\s+['"]([^'"]+)['"]/g;
+// G1b — type-only imports with capture (erased at compile time, do not create runtime cycles)
+const RE_TYPE_IMPORT_PATH = /import\s+type\s+(?:\{[^}]*\}|[\w*]+(?:\s+as\s+\w+)?)\s+from\s+['"]([^'"]+)['"]/g;
 // G2 — dynamic imports
 const RE_DYN_IMPORT  = /(?:await\s+)?import\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
 const RE_DYN_VAR     = /@vite-ignore/;
@@ -110,8 +112,8 @@ function isLayoutGuarded(rel) {
   // Routes under (app)/ are protected by +layout.server.ts auth redirect
   return rel.includes('/routes/(app)/') || rel.includes('/routes/(admin)/');
 }
-// G5 — Zod validation
-const RE_ZOD         = /\bz\.\w+|from\s+['"]zod['"]|zodSchema|zod\(/;
+// G5 — Zod validation (direct z.*, zod import, named schema from $lib/schemas, or .safeParse/.parse call)
+const RE_ZOD         = /\bz\.\w+|from\s+['"]zod['"]|zodSchema|zod\(|from\s+['"][^'"]*\/schemas\/|\.safeParse\(|\.parse\(|Schema\s*=\s*z\./;
 // G6 — route handlers (both const and function form)
 const RE_ROUTE_H     = /export\s+(?:(?:async\s+)?function\s+|const\s+)(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/g;
 // G7 — Drizzle schema refs
@@ -159,6 +161,8 @@ function extractMeta(filePath, src) {
 
   // G1 — static imports
   const imports = [...src.matchAll(RE_IMPORT)].map(m => m[1]);
+  // G1b — type-only imports (compile-time erased, cannot form runtime cycles)
+  const typeImports = new Set([...src.matchAll(RE_TYPE_IMPORT_PATH)].map(m => m[1]));
   // G2 — dynamic imports
   const dynImports    = [...src.matchAll(RE_DYN_IMPORT)].map(m => m[1]);
   const hasViteIgnore = RE_DYN_VAR.test(src);
@@ -227,7 +231,7 @@ function extractMeta(filePath, src) {
   return {
     rel, ext, isRoute, isServerRoute, isSvelteComp, isTest,
     // G1-G3
-    imports, dynImports, hasViteIgnore, reExports,
+    imports, dynImports, hasViteIgnore, reExports, typeImports,
     // G4-G8
     hasAuth, hasZod, routeHandlers, drizzleRefs, todos,
     // G9-G12
@@ -342,10 +346,11 @@ for (const f of files) {
   f.hasPairedTest = hasPairedTest;
 }
 
-// G20 — Cyclic import risk: detect mutual A→B and B→A pairs (top 20)
+// G20 — Cyclic import risk: detect mutual A→B and B→A pairs (runtime only, excludes type-only imports)
 const importMap = {};
 for (const f of files) {
-  importMap[f.rel] = new Set([...f.imports, ...f.dynImports]);
+  const ti = f.typeImports ?? new Set();
+  importMap[f.rel] = new Set([...f.imports, ...f.dynImports].filter(i => !ti.has(i)));
 }
 const cyclicPairs = [];
 const seen = new Set();
@@ -356,9 +361,18 @@ for (const [rel, deps] of Object.entries(importMap)) {
       ? path.relative(ROOT, path.resolve(path.dirname(path.join(ROOT, rel)), dep)).replace(/\\/g, '/').replace(/\.(ts|js)$/, '')
       : null;
     if (!depRel) continue;
-    const depFull = files.find(f => f.rel.startsWith(depRel));
-    if (!depFull) continue;
-    if (importMap[depFull.rel]?.has(rel) || [...(importMap[depFull.rel] ?? [])].some(d => d.includes(path.basename(rel, path.extname(rel))))) {
+    const depFull = files.find(f => f.rel === depRel || f.rel.startsWith(depRel + '.') || f.rel === depRel + '/index.ts');
+    if (!depFull || depFull.rel === rel) continue; // skip self-loops
+    // Strict mutual: B's imports must contain a relative path that resolves back to A
+    const reverseDeps = importMap[depFull.rel] ?? new Set();
+    const aBase = path.basename(rel, path.extname(rel));
+    const aDir = path.dirname(rel);
+    const mutual = [...reverseDeps].some(d => {
+      if (!d.startsWith('.')) return false;
+      const resolved = path.relative(ROOT, path.resolve(path.dirname(path.join(ROOT, depFull.rel)), d)).replace(/\\/g, '/').replace(/\.(ts|js)$/, '');
+      return resolved === rel.replace(/\.(ts|js|svelte)$/, '') || (path.basename(resolved) === aBase && path.dirname(resolved) === aDir);
+    });
+    if (mutual) {
       const key = [rel, depFull.rel].sort().join('↔');
       if (!seen.has(key)) { seen.add(key); cyclicPairs.push([rel, depFull.rel]); }
     }

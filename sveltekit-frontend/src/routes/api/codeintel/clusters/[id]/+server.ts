@@ -4,10 +4,16 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { clusterSummaries } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+
+const resummarizeSchema = z.object({
+	model: z.string().min(1).max(100).optional(),
+	repoId: z.string().max(200).optional(),
+});
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL = 'gemma4-legal-fast:latest';
@@ -66,8 +72,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({ ok: false, item: null, degraded: false, error: 'Invalid cluster id' }, { status: 400 });
 	}
 
-	const body = await request.json().catch(() => ({}));
-	const model = (body.model as string) || DEFAULT_MODEL;
+	const parsed = resummarizeSchema.safeParse(await request.json().catch(() => ({})));
+	const body = parsed.success ? parsed.data : {};
+	const model = body.model || DEFAULT_MODEL;
 
 	// Fetch representative chunks from DB
 	let chunkResult: Awaited<ReturnType<typeof db.execute>>;
