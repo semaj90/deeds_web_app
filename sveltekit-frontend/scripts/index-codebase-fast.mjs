@@ -398,11 +398,15 @@ for (const f of files) {
   f.hasPairedTest = hasPairedTest;
 }
 
-// G20 — Cyclic import risk: detect mutual A→B and B→A pairs (runtime only, excludes type-only imports)
+// G20 — Cyclic import risk: detect mutual A→B and B→A pairs.
+// Static imports ONLY: dynamic imports (await import()) and type-only imports
+// cannot create at-load circular evaluation, so they are not cycles. Including
+// them produced false positives — e.g. dispatch-inline.ts ↔ queue-worker.ts
+// where both sides only cross-imported via await import() lazy loads.
 const importMap = {};
 for (const f of files) {
   const ti = f.typeImports ?? new Set();
-  importMap[f.rel] = new Set([...f.imports, ...f.dynImports].filter(i => !ti.has(i)));
+  importMap[f.rel] = new Set(f.imports.filter(i => !ti.has(i)));
 }
 const cyclicPairs = [];
 const seen = new Set();
@@ -670,6 +674,51 @@ const topFanIn = Object.entries(fanIn)
 
 const componentFiles = files.filter(f => f.isSvelteComp).slice(0, 60);
 
+// ── Optional cluster enrichment: load hypergraph-clusters.json if present ────
+// For each directory, find its dominant cluster (the cluster with the most
+// member files in that dir) and surface the inferredTopic + cluster id.
+// Source: docs/graph/hypergraph-clusters.json (written by hypergraph:digest).
+const clustersPath = path.join(GRAPH_DIR, 'hypergraph-clusters.json');
+const dirCluster = new Map(); // dir → { id, topic, hits }
+if (fs.existsSync(clustersPath)) {
+  try {
+    const cd = JSON.parse(fs.readFileSync(clustersPath, 'utf8'));
+    // Join by cluster.topDirs (each cluster knows its dominant directories).
+    // Per (dir, cluster) we accumulate hits = count from topDirs entries +
+    // additional credit from topPaths whose parent matches the dir.
+    const dirHits = new Map(); // `${dir}|${cid}` → hits
+    for (const cluster of cd.clusters ?? []) {
+      const cid = cluster.id;
+      for (const entry of cluster.topDirs ?? []) {
+        const dir = String(entry.dir ?? '').replace(/\\/g, '/');
+        if (!dir) continue;
+        const k = `${dir}|${cid}`;
+        dirHits.set(k, (dirHits.get(k) ?? 0) + (entry.count ?? 1));
+      }
+      for (const entry of cluster.topPaths ?? []) {
+        const p = String(entry.path ?? '').replace(/\\/g, '/');
+        if (!p) continue;
+        const dir = p.split('/').slice(0, -1).join('/');
+        if (!dir) continue;
+        const k = `${dir}|${cid}`;
+        dirHits.set(k, (dirHits.get(k) ?? 0) + (entry.count ?? 1));
+      }
+    }
+    // Reduce to the dominant cluster per dir (highest hits, ties → lowest id)
+    for (const [k, hits] of dirHits) {
+      const [dir, cidStr] = k.split('|');
+      const cid = Number(cidStr);
+      const existing = dirCluster.get(dir);
+      if (!existing || existing.hits < hits || (existing.hits === hits && cid < existing.id)) {
+        const cluster = (cd.clusters ?? []).find((c) => c.id === cid);
+        const topic   = String(cluster?.inferredTopic ?? '').replace(/\|/g, '\\|');
+        dirCluster.set(dir, { id: cid, topic, hits });
+      }
+    }
+  } catch { /* malformed — skip enrichment */ }
+}
+const clusterEnriched = dirCluster.size > 0;
+
 const dirSummaryRows = dirRows.map(d => {
   const icon = d.score >= 70 ? '✅' : d.score >= 40 ? '⚠️' : '❌';
   const flags = [
@@ -678,6 +727,11 @@ const dirSummaryRows = dirRows.map(d => {
     d.localhostRefs ? `🟠lh` : '',
     d.noTest    ? `⬜notest` : '',
   ].filter(Boolean).join(' ');
+  if (clusterEnriched) {
+    const c = dirCluster.get(d.dir);
+    const clusterCol = c ? `C${c.id}: ${c.topic}` : '—';
+    return `| ${icon} | \`${d.dir}\` | ${d.score} | ${d.fileCount} | ${d.lines} | ${d.apis} | ${d.auth}/${d.zod} | ${d.todos} | ${flags || '—'} | ${clusterCol} |`;
+  }
   return `| ${icon} | \`${d.dir}\` | ${d.score} | ${d.fileCount} | ${d.lines} | ${d.apis} | ${d.auth}/${d.zod} | ${d.todos} | ${flags || '—'} |`;
 });
 
@@ -753,9 +807,11 @@ const codebaseMap = `# Codebase Map — 20-Gate Deep Audit
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
 **Flags**: 🔴ssr = SSR-unsafe globals · 🟡sv4 = Svelte4 legacy · 🟠lh = localhost hardcoded · ⬜notest = routes lack tests
+${clusterEnriched ? '\n**Cluster**: dominant hypergraph k-means cluster (from `hypergraph-clusters.json`) — `C<id>: <inferredTopic>`. Run `npm run hypergraph:digest` to refresh.' : ''}
 
-| Status | Directory | Score | Files | Lines | APIs | Auth/Zod | TODOs | Flags |
-|--------|-----------|-------|-------|-------|------|----------|-------|-------|
+${clusterEnriched
+  ? '| Status | Directory | Score | Files | Lines | APIs | Auth/Zod | TODOs | Flags | Cluster |\n|--------|-----------|-------|-------|-------|------|----------|-------|-------|---------|'
+  : '| Status | Directory | Score | Files | Lines | APIs | Auth/Zod | TODOs | Flags |\n|--------|-----------|-------|-------|-------|------|----------|-------|-------|'}
 ${dirSummaryRows.join('\n')}
 
 ---
