@@ -1,6 +1,6 @@
 {
   "mode": "fast-ast",
-  "createdAt": "2026-05-04T03:59:58.454Z",
+  "createdAt": "2026-05-04T05:06:08.792Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
   "fileCount": 2579,
   "routeCount": 874,
@@ -13,17 +13,17 @@
   "graphJsonPath": "docs/graph/codebase-graph.json",
   "codebaseMapPath": "docs/graph/codebase-map.md",
   "gateStats": {
-    "routesWithAuth": 621,
-    "routesWithoutAuth": 44,
+    "routesWithAuth": 623,
+    "routesWithoutAuth": 42,
     "routesWithZod": 467,
     "routesWithoutZod": 1,
-    "filesWithLocalhost": 95,
+    "filesWithLocalhost": 53,
     "sv4PropsCount": 0,
     "sv4ReactiveCount": 0,
     "sv4EventsCount": 0,
     "sv4DispatchCount": 0,
     "runeInTsCount": 11,
-    "ssrUnsafeCount": 51,
+    "ssrUnsafeCount": 45,
     "routesWithTest": 51,
     "routesWithoutTest": 533,
     "routesWithErrorHandling": 592,
@@ -347,10 +347,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434",
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/ai/base64-fp32-quantizer.ts",
@@ -1652,8 +1649,7 @@
         "src",
         "lib",
         "components",
-        "component",
-        "ssr-unsafe"
+        "component"
       ],
       "summary": "",
       "imports": [],
@@ -1671,7 +1667,7 @@
       "lineCount": 284,
       "hasAuth": false,
       "hasZod": false,
-      "ssrUnsafe": true,
+      "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
       "fanIn": 0,
@@ -5729,8 +5725,7 @@
         "src",
         "lib",
         "components",
-        "component",
-        "ssr-unsafe"
+        "component"
       ],
       "summary": "═══════════════════════════════════════════════════════════════════════",
       "imports": [
@@ -5750,7 +5745,7 @@
       "lineCount": 281,
       "hasAuth": false,
       "hasZod": false,
-      "ssrUnsafe": true,
+      "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
       "fanIn": 0,
@@ -15108,8 +15103,7 @@
         "src",
         "lib",
         "components",
-        "component",
-        "ssr-unsafe"
+        "component"
       ],
       "summary": "Message shown above the form explaining why auth is needed",
       "imports": [
@@ -15131,7 +15125,7 @@
       "lineCount": 389,
       "hasAuth": false,
       "hasZod": false,
-      "ssrUnsafe": true,
+      "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
       "fanIn": 0,
@@ -24772,10 +24766,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434",
-        "http://localhost:5173"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/config/mcp-context7-registration.json",
@@ -24997,8 +24988,7 @@
         "ts",
         "src",
         "lib",
-        "courtroom",
-        "ssr-unsafe"
+        "courtroom"
       ],
       "summary": "Phoenix Wright-style 3D courtroom scene manager.",
       "imports": [
@@ -25027,7 +25017,7 @@
       "lineCount": 1071,
       "hasAuth": false,
       "hasZod": false,
-      "ssrUnsafe": true,
+      "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
       "fanIn": 0,
@@ -26402,9 +26392,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/gpu/gpu-search-reranker.ts",
@@ -26647,8 +26635,7 @@
         "ts",
         "src",
         "lib",
-        "gpu",
-        "ssr-unsafe"
+        "gpu"
       ],
       "summary": "NES Memory Architecture — Phase 14",
       "imports": [],
@@ -26669,7 +26656,7 @@
       "lineCount": 376,
       "hasAuth": false,
       "hasZod": false,
-      "ssrUnsafe": true,
+      "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
       "fanIn": 0,
@@ -28547,12 +28534,8 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [
-        "http://localhost:6333",
-        "http://localhost:6333",
         "http://localhost:5173",
-        "http://localhost:5173",
-        "http://localhost:5173",
-        "http://localhost:6333"
+        "http://localhost:5173"
       ]
     },
     {
@@ -28594,9 +28577,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/ace/ace-wiki.ts",
@@ -28724,10 +28705,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333",
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/ace/codeintel-datastore.ts",
@@ -30744,9 +30722,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/ai/onnx-server.ts",
@@ -31761,9 +31737,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:5984"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/analytics/minified-research-cache.ts",
@@ -32085,9 +32059,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/analytics/unified-research-query.ts",
@@ -32994,10 +32966,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:5984",
-        "http://localhost:5984"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/cache/invalidation.ts",
@@ -35615,9 +35584,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/db/queries.ts",
@@ -39686,24 +39653,7 @@
         "http://localhost:6333",
         "http://localhost:11434",
         "http://localhost:8000",
-        "http://localhost:5173",
-        "http://localhost:8100",
-        "http://127.0.0.1:8095",
-        "http://localhost:8099",
-        "http://localhost:8888",
-        "https://127.0.0.1:27124",
-        "http://127.0.0.1:5178",
-        "http://localhost:8001",
-        "http://localhost:3030",
-        "http://localhost:3040",
-        "http://localhost:3040",
-        "http://127.0.0.1:8178",
-        "http://localhost:8090",
-        "http://localhost:8102",
-        "http://localhost:8765",
-        "http://localhost:8091",
-        "http://localhost:8103",
-        "http://localhost:15672"
+        "http://localhost:5173"
       ]
     },
     {
@@ -41402,9 +41352,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/graph/codebase-neo4j-sync.ts",
@@ -41579,9 +41527,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://127.0.0.1:8090"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/graph/couchdb-pagerank.ts",
@@ -41950,9 +41896,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/graph/neo4j-schema.ts",
@@ -43210,9 +43154,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/indexer/workspace-metadata-extractor.ts",
@@ -43523,9 +43465,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "https://127.0.0.1:27124"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/kb/embed-text.ts",
@@ -43726,9 +43666,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/langextract-client.ts",
@@ -43909,9 +43847,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/legal/constitution-registry.ts",
@@ -45529,10 +45465,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:5984",
-        "http://localhost:5984"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/observability/langfuse.ts",
@@ -46457,9 +46390,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/qdrant-integration.ts",
@@ -46794,9 +46725,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:5984"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/queue/rabbitmq-xstate-integration.ts",
@@ -48345,11 +48274,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434",
-        "http://localhost:8099",
-        "http://localhost:8000"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/retrieval/document-dag.ts",
@@ -48910,9 +48835,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/retrieval/web-search.ts",
@@ -49515,10 +49438,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434",
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/streaming/sse-utils.ts",
@@ -50563,10 +50483,7 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [
-        "http://localhost:8080",
-        "http://localhost:8080",
-        "http://localhost:6333",
-        "http://localhost:11434"
+        "http://localhost:8080"
       ]
     },
     {
@@ -50746,9 +50663,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/utils/ollama-endpoint.ts",
@@ -50782,9 +50697,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/utils/retry.ts",
@@ -51421,9 +51334,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/server/vector/qdrant-manager.ts",
@@ -51957,10 +51868,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:5984",
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/services/error-analysis/CacheService.ts",
@@ -52485,10 +52393,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434",
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/services/error-analysis/PatternStorage.ts",
@@ -52565,9 +52470,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/services/error-analysis/ToolInvoker.ts",
@@ -52796,10 +52699,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333",
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/services/knowledge-search/KnowledgeSearcher.ts",
@@ -52959,9 +52859,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/services/knowledge-search/RedisCacheService.ts",
@@ -57552,9 +57450,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/utils/ensure-error.ts",
@@ -58351,11 +58247,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
-      "localhostRefs": [
-        "http://localhost:8097",
-        "http://localhost:8098",
-        "http://localhost:5173"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/lib/utils/sse-client.ts",
@@ -59802,8 +59694,7 @@
         "http://localhost:8095",
         "http://localhost:8095",
         "http://localhost:8095",
-        "http://localhost:8095",
-        "http://localhost:5173"
+        "http://localhost:8095"
       ]
     },
     {
@@ -62576,9 +62467,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 5,
-      "localhostRefs": [
-        "http://localhost:2375"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/(app)/admin/dev-tools/+page.svelte",
@@ -76401,8 +76290,7 @@
         "(app)",
         "route",
         "component",
-        "auth",
-        "ssr-unsafe"
+        "auth"
       ],
       "summary": "",
       "imports": [
@@ -76434,7 +76322,7 @@
       "lineCount": 771,
       "hasAuth": true,
       "hasZod": false,
-      "ssrUnsafe": true,
+      "ssrUnsafe": false,
       "sv4Legacy": false,
       "hasPairedTest": false,
       "fanIn": 0,
@@ -78587,11 +78475,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 5,
-      "localhostRefs": [
-        "http://localhost:6333",
-        "http://localhost:6333",
-        "http://localhost:8091"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/ace/ingest/+server.ts",
@@ -79906,6 +79790,7 @@
         "api",
         "route",
         "api-handler",
+        "auth",
         "zod"
       ],
       "summary": "POST /api/ai/chat-direct — Direct Ollama endpoint for load testing (bypasses inference router, uses fast model)",
@@ -79928,8 +79813,8 @@
       "components": [],
       "isRoute": true,
       "isSvelteComp": false,
-      "lineCount": 104,
-      "hasAuth": false,
+      "lineCount": 105,
+      "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -81556,10 +81441,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 5,
-      "localhostRefs": [
-        "http://localhost:5984",
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/analytics/research-graph/+server.ts",
@@ -85705,10 +85587,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 6,
-      "localhostRefs": [
-        "http://localhost:11434",
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/chat/memory/search/+server.ts",
@@ -85758,10 +85637,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 6,
-      "localhostRefs": [
-        "http://localhost:6333",
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/chat/memory/settings/+server.ts",
@@ -87812,9 +87688,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 5,
-      "localhostRefs": [
-        "http://localhost:5984"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/codebase-index/deep-research/+server.ts",
@@ -88181,9 +88055,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 6,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/codebase-index/export/obsidian/+server.ts",
@@ -89162,9 +89034,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 5,
-      "localhostRefs": [
-        "http://localhost:6333"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/codebase-index/tags/+server.ts",
@@ -93804,6 +93674,7 @@
         "api",
         "route",
         "api-handler",
+        "auth",
         "zod"
       ],
       "summary": "POST /api/graph/hypergraph/address",
@@ -93826,8 +93697,8 @@
       "components": [],
       "isRoute": true,
       "isSvelteComp": false,
-      "lineCount": 43,
-      "hasAuth": false,
+      "lineCount": 45,
+      "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
       "sv4Legacy": false,
@@ -98273,9 +98144,7 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 5,
-      "localhostRefs": [
-        "http://localhost:11434"
-      ]
+      "localhostRefs": []
     },
     {
       "rel": "src/routes/api/phase72/errors/+server.ts",
@@ -108144,14 +108013,14 @@
     {
       "dir": "src/lib/components/ui",
       "score": 65,
-      "summary": "shared library directory with 245 files, 0 API handlers, 3 TODOs, 3 SSR-unsafe",
+      "summary": "shared library directory with 245 files, 0 API handlers, 3 TODOs, 2 SSR-unsafe",
       "tagList": [
         "src",
         "lib",
         "components",
         "component",
-        "ssr-unsafe",
-        "has-todo"
+        "has-todo",
+        "zod"
       ],
       "fileCount": 245,
       "todos": 3,
@@ -108162,7 +108031,7 @@
       "auth": 0,
       "zod": 1,
       "lines": 24174,
-      "ssrUnsafe": 3,
+      "ssrUnsafe": 2,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
@@ -108231,14 +108100,14 @@
     {
       "dir": "src/lib/components",
       "score": 70,
-      "summary": "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs, 21 SSR-unsafe",
+      "summary": "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs, 18 SSR-unsafe",
       "tagList": [
         "src",
         "lib",
         "components",
         "component",
-        "ssr-unsafe",
-        "zod"
+        "zod",
+        "ssr-unsafe"
       ],
       "fileCount": 56,
       "todos": 6,
@@ -108249,7 +108118,7 @@
       "auth": 0,
       "zod": 46,
       "lines": 168473,
-      "ssrUnsafe": 21,
+      "ssrUnsafe": 18,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 5,
@@ -108345,34 +108214,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/gpu",
-      "score": 75,
-      "summary": "shared library directory with 16 files, 0 API handlers, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "lib",
-        "gpu",
-        "zod",
-        "ssr-unsafe"
-      ],
-      "fileCount": 16,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 1,
-      "lines": 4323,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 2,
-      "tryCatch": 11,
-      "dynImports": 3,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/machines",
       "score": 75,
       "summary": "shared library directory with 12 files, 0 API handlers, 1 SSR-unsafe",
@@ -108425,7 +108266,7 @@
       "ssrUnsafe": 2,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 6,
+      "localhostRefs": 4,
       "tryCatch": 19,
       "dynImports": 2,
       "fanInTotal": 0
@@ -108718,63 +108559,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/components/admin",
-      "score": 80,
-      "summary": "shared library directory with 5 files, 0 API handlers, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "lib",
-        "components",
-        "component",
-        "ssr-unsafe",
-        "zod"
-      ],
-      "fileCount": 5,
-      "todos": 0,
-      "routes": 0,
-      "components": 5,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 2,
-      "lines": 2560,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 0,
-      "tryCatch": 4,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/lib/components/codebase",
-      "score": 80,
-      "summary": "shared library directory with 12 files, 0 API handlers, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "lib",
-        "components",
-        "component",
-        "ssr-unsafe"
-      ],
-      "fileCount": 12,
-      "todos": 0,
-      "routes": 0,
-      "components": 11,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 0,
-      "lines": 5497,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 0,
-      "tryCatch": 8,
-      "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/components/detective",
       "score": 80,
       "summary": "shared library directory with 6 files, 0 API handlers, 1 SSR-unsafe",
@@ -108946,33 +108730,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/courtroom",
-      "score": 80,
-      "summary": "shared library directory with 4 files, 0 API handlers, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "lib",
-        "courtroom",
-        "ssr-unsafe"
-      ],
-      "fileCount": 4,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 0,
-      "lines": 1560,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 0,
-      "tryCatch": 1,
-      "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/schemas",
       "score": 80,
       "summary": "shared library directory with 5 files, 0 API handlers, 1 SSR-unsafe",
@@ -109115,35 +108872,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/(app)/library",
-      "score": 80,
-      "summary": "route handler directory with 13 files, 0 API handlers, 1 SSR-unsafe",
-      "tagList": [
-        "src",
-        "routes",
-        "(app)",
-        "route",
-        "component",
-        "auth"
-      ],
-      "fileCount": 13,
-      "todos": 0,
-      "routes": 13,
-      "components": 7,
-      "db": 0,
-      "apis": 0,
-      "auth": 13,
-      "zod": 0,
-      "lines": 4358,
-      "ssrUnsafe": 1,
-      "sv4Legacy": 0,
-      "noTest": 6,
-      "localhostRefs": 0,
-      "tryCatch": 11,
-      "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/ai/onnx",
       "score": 83,
       "summary": "shared library directory with 2 files, 0 API handlers, 1 TODOs",
@@ -109201,7 +108929,7 @@
     {
       "dir": "src/routes",
       "score": 83,
-      "summary": "module directory with 6 files, 579 API handlers, 242 Drizzle refs, 7 TODOs, 16 SSR-unsafe",
+      "summary": "module directory with 6 files, 579 API handlers, 242 Drizzle refs, 7 TODOs, 15 SSR-unsafe",
       "tagList": [
         "src",
         "routes",
@@ -109216,13 +108944,13 @@
       "components": 229,
       "db": 242,
       "apis": 579,
-      "auth": 932,
+      "auth": 934,
       "zod": 493,
-      "lines": 205352,
-      "ssrUnsafe": 16,
+      "lines": 205355,
+      "ssrUnsafe": 15,
       "sv4Legacy": 0,
       "noTest": 614,
-      "localhostRefs": 18,
+      "localhostRefs": 9,
       "tryCatch": 704,
       "dynImports": 166,
       "fanInTotal": 0
@@ -109396,35 +109124,35 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 3,
+      "localhostRefs": 2,
       "tryCatch": 1,
       "dynImports": 0,
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/server/cache",
+      "dir": "src/lib/gpu",
       "score": 85,
-      "summary": "server module directory with 8 files, 0 API handlers",
+      "summary": "shared library directory with 16 files, 0 API handlers",
       "tagList": [
         "src",
         "lib",
-        "server",
+        "gpu",
         "zod"
       ],
-      "fileCount": 8,
+      "fileCount": 16,
       "todos": 0,
       "routes": 0,
       "components": 0,
       "db": 0,
       "apis": 0,
       "auth": 0,
-      "zod": 4,
-      "lines": 2682,
+      "zod": 1,
+      "lines": 4323,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 1,
-      "tryCatch": 7,
+      "tryCatch": 11,
       "dynImports": 3,
       "fanInTotal": 0
     },
@@ -109562,110 +109290,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/server/integrations",
-      "score": 85,
-      "summary": "server module directory with 1 files, 0 API handlers",
-      "tagList": [
-        "src",
-        "lib",
-        "server"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 0,
-      "lines": 241,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 1,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/lib/server/langextract",
-      "score": 85,
-      "summary": "server module directory with 1 files, 0 API handlers",
-      "tagList": [
-        "src",
-        "lib",
-        "server"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 0,
-      "lines": 132,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 1,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/lib/server/legal",
-      "score": 85,
-      "summary": "server module directory with 7 files, 0 API handlers",
-      "tagList": [
-        "src",
-        "lib",
-        "server"
-      ],
-      "fileCount": 7,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 0,
-      "lines": 2618,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 3,
-      "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/lib/server/observability",
-      "score": 85,
-      "summary": "server module directory with 3 files, 0 API handlers",
-      "tagList": [
-        "src",
-        "lib",
-        "server"
-      ],
-      "fileCount": 3,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 0,
-      "lines": 970,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 3,
-      "dynImports": 3,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/server/services",
       "score": 85,
       "summary": "server module directory with 2 files, 0 API handlers",
@@ -109692,33 +109316,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/server/streaming",
-      "score": 85,
-      "summary": "server module directory with 2 files, 0 API handlers",
-      "tagList": [
-        "src",
-        "lib",
-        "server",
-        "zod"
-      ],
-      "fileCount": 2,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 0,
-      "apis": 0,
-      "auth": 0,
-      "zod": 1,
-      "lines": 364,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 1,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/server/utils",
       "score": 85,
       "summary": "server module directory with 13 files, 0 API handlers",
@@ -109740,7 +109337,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 3,
+      "localhostRefs": 1,
       "tryCatch": 4,
       "dynImports": 1,
       "fanInTotal": 0
@@ -109767,7 +109364,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 3,
+      "localhostRefs": 1,
       "tryCatch": 9,
       "dynImports": 1,
       "fanInTotal": 0
@@ -109945,35 +109542,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/phase109",
-      "score": 85,
-      "summary": "route handler directory with 2 files, 2 API handlers",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 2,
-      "todos": 0,
-      "routes": 2,
-      "components": 0,
-      "db": 0,
-      "apis": 2,
-      "auth": 2,
-      "zod": 2,
-      "lines": 259,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 2,
-      "localhostRefs": 1,
-      "tryCatch": 2,
-      "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/websearch",
       "score": 85,
       "summary": "route handler directory with 1 files, 1 API handlers",
@@ -110107,6 +109675,34 @@
       "noTest": 0,
       "localhostRefs": 0,
       "tryCatch": 0,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/components/admin",
+      "score": 90,
+      "summary": "shared library directory with 5 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod"
+      ],
+      "fileCount": 5,
+      "todos": 0,
+      "routes": 0,
+      "components": 5,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 2,
+      "lines": 2560,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 4,
       "dynImports": 0,
       "fanInTotal": 0
     },
@@ -110437,6 +110033,33 @@
       "localhostRefs": 0,
       "tryCatch": 4,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/components/codebase",
+      "score": 90,
+      "summary": "shared library directory with 12 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "components",
+        "component"
+      ],
+      "fileCount": 12,
+      "todos": 0,
+      "routes": 0,
+      "components": 11,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 5497,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 8,
+      "dynImports": 1,
       "fanInTotal": 0
     },
     {
@@ -111117,6 +110740,32 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/courtroom",
+      "score": 90,
+      "summary": "shared library directory with 4 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "courtroom"
+      ],
+      "fileCount": 4,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 1560,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 2,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/env",
       "score": 90,
       "summary": "shared library directory with 2 files, 0 API handlers",
@@ -111382,6 +111031,33 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/server/cache",
+      "score": 90,
+      "summary": "server module directory with 8 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "fileCount": 8,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 4,
+      "lines": 2682,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 7,
+      "dynImports": 3,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/server/cartridge",
       "score": 90,
       "summary": "server module directory with 5 files, 0 API handlers",
@@ -111593,6 +111269,32 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/server/integrations",
+      "score": 90,
+      "summary": "server module directory with 1 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 241,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/server/kb",
       "score": 90,
       "summary": "server module directory with 2 files, 0 API handlers",
@@ -111616,6 +111318,58 @@
       "localhostRefs": 0,
       "tryCatch": 0,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/server/langextract",
+      "score": 90,
+      "summary": "server module directory with 1 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 132,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/server/legal",
+      "score": 90,
+      "summary": "server module directory with 7 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server"
+      ],
+      "fileCount": 7,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 2618,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 3,
+      "dynImports": 2,
       "fanInTotal": 0
     },
     {
@@ -111721,6 +111475,32 @@
       "localhostRefs": 0,
       "tryCatch": 1,
       "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/server/observability",
+      "score": 90,
+      "summary": "server module directory with 3 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server"
+      ],
+      "fileCount": 3,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 970,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 3,
+      "dynImports": 3,
       "fanInTotal": 0
     },
     {
@@ -112109,6 +111889,33 @@
       "auth": 0,
       "zod": 0,
       "lines": 568,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 1,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/server/streaming",
+      "score": 90,
+      "summary": "server module directory with 2 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "fileCount": 2,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 1,
+      "lines": 364,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -113077,6 +112884,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/(app)/library",
+      "score": 90,
+      "summary": "route handler directory with 13 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "(app)",
+        "route",
+        "component",
+        "auth"
+      ],
+      "fileCount": 13,
+      "todos": 0,
+      "routes": 13,
+      "components": 7,
+      "db": 0,
+      "apis": 0,
+      "auth": 13,
+      "zod": 0,
+      "lines": 4358,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 6,
+      "localhostRefs": 0,
+      "tryCatch": 11,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/(app)/rag-search",
       "score": 90,
       "summary": "route handler directory with 2 files, 0 API handlers",
@@ -113682,35 +113518,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/graph",
-      "score": 90,
-      "summary": "route handler directory with 11 files, 11 API handlers, 1 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 11,
-      "todos": 0,
-      "routes": 11,
-      "components": 0,
-      "db": 1,
-      "apis": 11,
-      "auth": 10,
-      "zod": 9,
-      "lines": 1630,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 11,
-      "localhostRefs": 1,
-      "tryCatch": 10,
-      "dynImports": 3,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/hypergraph",
       "score": 90,
       "summary": "route handler directory with 1 files, 1 API handlers",
@@ -114027,6 +113834,35 @@
       "localhostRefs": 0,
       "tryCatch": 3,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/phase109",
+      "score": 90,
+      "summary": "route handler directory with 2 files, 2 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 2,
+      "todos": 0,
+      "routes": 2,
+      "components": 0,
+      "db": 0,
+      "apis": 2,
+      "auth": 2,
+      "zod": 2,
+      "lines": 259,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 2,
+      "localhostRefs": 0,
+      "tryCatch": 2,
+      "dynImports": 2,
       "fanInTotal": 0
     },
     {
@@ -114687,35 +114523,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/analytics",
-      "score": 92,
-      "summary": "route handler directory with 26 files, 26 API handlers, 4 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 26,
-      "todos": 0,
-      "routes": 26,
-      "components": 0,
-      "db": 4,
-      "apis": 26,
-      "auth": 25,
-      "zod": 22,
-      "lines": 4112,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 23,
-      "localhostRefs": 1,
-      "tryCatch": 23,
-      "dynImports": 8,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/codeintel",
       "score": 92,
       "summary": "route handler directory with 9 files, 9 API handlers, 7 Drizzle refs",
@@ -114745,9 +114552,9 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/ace",
-      "score": 93,
-      "summary": "route handler directory with 8 files, 8 API handlers, 1 Drizzle refs",
+      "dir": "src/routes/api/graph",
+      "score": 92,
+      "summary": "route handler directory with 11 files, 11 API handlers, 1 Drizzle refs",
       "tagList": [
         "src",
         "routes",
@@ -114756,79 +114563,21 @@
         "api-handler",
         "auth"
       ],
-      "fileCount": 8,
+      "fileCount": 11,
       "todos": 0,
-      "routes": 8,
+      "routes": 11,
       "components": 0,
       "db": 1,
-      "apis": 8,
-      "auth": 8,
-      "zod": 7,
-      "lines": 1706,
+      "apis": 11,
+      "auth": 11,
+      "zod": 9,
+      "lines": 1632,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 7,
+      "noTest": 11,
       "localhostRefs": 1,
-      "tryCatch": 5,
+      "tryCatch": 10,
       "dynImports": 3,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/ai",
-      "score": 93,
-      "summary": "route handler directory with 30 files, 30 API handlers, 6 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 30,
-      "todos": 0,
-      "routes": 30,
-      "components": 0,
-      "db": 6,
-      "apis": 30,
-      "auth": 29,
-      "zod": 28,
-      "lines": 3085,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 29,
-      "localhostRefs": 1,
-      "tryCatch": 28,
-      "dynImports": 7,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/codebase-index",
-      "score": 93,
-      "summary": "route handler directory with 43 files, 42 API handlers, 7 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 43,
-      "todos": 0,
-      "routes": 42,
-      "components": 0,
-      "db": 7,
-      "apis": 42,
-      "auth": 42,
-      "zod": 35,
-      "lines": 12606,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 39,
-      "localhostRefs": 3,
-      "tryCatch": 41,
-      "dynImports": 18,
       "fanInTotal": 0
     },
     {
@@ -114919,6 +114668,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/ai",
+      "score": 94,
+      "summary": "route handler directory with 30 files, 30 API handlers, 6 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 30,
+      "todos": 0,
+      "routes": 30,
+      "components": 0,
+      "db": 6,
+      "apis": 30,
+      "auth": 30,
+      "zod": 28,
+      "lines": 3086,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 29,
+      "localhostRefs": 1,
+      "tryCatch": 28,
+      "dynImports": 7,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/library",
       "score": 94,
       "summary": "route handler directory with 21 files, 21 API handlers, 1 Drizzle refs",
@@ -114970,7 +114748,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 3,
+      "localhostRefs": 1,
       "tryCatch": 13,
       "dynImports": 5,
       "fanInTotal": 0
@@ -115004,64 +114782,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/server/ai",
-      "score": 95,
-      "summary": "server module directory with 23 files, 0 API handlers, 4 Drizzle refs",
-      "tagList": [
-        "src",
-        "lib",
-        "server",
-        "zod",
-        "db-schema",
-        "auth"
-      ],
-      "fileCount": 23,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 4,
-      "apis": 0,
-      "auth": 1,
-      "zod": 8,
-      "lines": 6278,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 15,
-      "dynImports": 4,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/lib/server/analytics",
-      "score": 95,
-      "summary": "server module directory with 15 files, 0 API handlers, 5 Drizzle refs",
-      "tagList": [
-        "src",
-        "lib",
-        "server",
-        "zod",
-        "db-schema",
-        "test"
-      ],
-      "fileCount": 15,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 5,
-      "apis": 0,
-      "auth": 0,
-      "zod": 10,
-      "lines": 6690,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 2,
-      "tryCatch": 14,
-      "dynImports": 6,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/server/db",
       "score": 95,
       "summary": "server module directory with 106 files, 0 API handlers, 87 Drizzle refs",
@@ -115085,7 +114805,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 2,
+      "localhostRefs": 1,
       "tryCatch": 25,
       "dynImports": 0,
       "fanInTotal": 0
@@ -115120,35 +114840,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/server/graph",
-      "score": 95,
-      "summary": "server module directory with 17 files, 0 API handlers, 2 Drizzle refs",
-      "tagList": [
-        "src",
-        "lib",
-        "server",
-        "zod",
-        "auth",
-        "db-schema"
-      ],
-      "fileCount": 17,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 2,
-      "apis": 0,
-      "auth": 1,
-      "zod": 5,
-      "lines": 6953,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 3,
-      "tryCatch": 17,
-      "dynImports": 7,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/server/ml",
       "score": 95,
       "summary": "server module directory with 8 files, 0 API handlers, 3 Drizzle refs",
@@ -115176,63 +114867,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/lib/server/queue",
-      "score": 95,
-      "summary": "server module directory with 8 files, 0 API handlers, 1 Drizzle refs",
-      "tagList": [
-        "src",
-        "lib",
-        "server",
-        "zod",
-        "db-schema"
-      ],
-      "fileCount": 8,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 1,
-      "apis": 0,
-      "auth": 0,
-      "zod": 3,
-      "lines": 3812,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 1,
-      "tryCatch": 6,
-      "dynImports": 6,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/lib/server/retrieval",
-      "score": 95,
-      "summary": "server module directory with 24 files, 0 API handlers, 1 Drizzle refs",
-      "tagList": [
-        "src",
-        "lib",
-        "server",
-        "zod",
-        "test",
-        "db-schema"
-      ],
-      "fileCount": 24,
-      "todos": 0,
-      "routes": 0,
-      "components": 0,
-      "db": 1,
-      "apis": 0,
-      "auth": 0,
-      "zod": 3,
-      "lines": 6342,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 2,
-      "tryCatch": 20,
-      "dynImports": 10,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/lib/server/vector",
       "score": 95,
       "summary": "server module directory with 10 files, 0 API handlers, 1 Drizzle refs",
@@ -115255,7 +114889,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 2,
+      "localhostRefs": 1,
       "tryCatch": 7,
       "dynImports": 2,
       "fanInTotal": 0
@@ -115311,7 +114945,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 8,
+      "localhostRefs": 3,
       "tryCatch": 22,
       "dynImports": 3,
       "fanInTotal": 0
@@ -115339,38 +114973,9 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 4,
+      "localhostRefs": 2,
       "tryCatch": 8,
       "dynImports": 1,
-      "fanInTotal": 0
-    },
-    {
-      "dir": "src/routes/api/chat",
-      "score": 95,
-      "summary": "route handler directory with 7 files, 7 API handlers, 3 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 7,
-      "todos": 0,
-      "routes": 7,
-      "components": 0,
-      "db": 3,
-      "apis": 7,
-      "auth": 7,
-      "zod": 7,
-      "lines": 1334,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 6,
-      "localhostRefs": 2,
-      "tryCatch": 7,
-      "dynImports": 3,
       "fanInTotal": 0
     },
     {
@@ -115548,6 +115153,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/analytics",
+      "score": 97,
+      "summary": "route handler directory with 26 files, 26 API handlers, 4 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 26,
+      "todos": 0,
+      "routes": 26,
+      "components": 0,
+      "db": 4,
+      "apis": 26,
+      "auth": 25,
+      "zod": 22,
+      "lines": 4112,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 23,
+      "localhostRefs": 0,
+      "tryCatch": 23,
+      "dynImports": 8,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/evidence",
       "score": 97,
       "summary": "route handler directory with 27 files, 27 API handlers, 19 Drizzle refs",
@@ -115574,6 +115208,35 @@
       "localhostRefs": 0,
       "tryCatch": 25,
       "dynImports": 8,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/ace",
+      "score": 98,
+      "summary": "route handler directory with 8 files, 8 API handlers, 1 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 8,
+      "todos": 0,
+      "routes": 8,
+      "components": 0,
+      "db": 1,
+      "apis": 8,
+      "auth": 8,
+      "zod": 7,
+      "lines": 1706,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 7,
+      "localhostRefs": 0,
+      "tryCatch": 5,
+      "dynImports": 3,
       "fanInTotal": 0
     },
     {
@@ -115632,6 +115295,35 @@
       "localhostRefs": 0,
       "tryCatch": 12,
       "dynImports": 4,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/codebase-index",
+      "score": 98,
+      "summary": "route handler directory with 43 files, 42 API handlers, 7 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 43,
+      "todos": 0,
+      "routes": 42,
+      "components": 0,
+      "db": 7,
+      "apis": 42,
+      "auth": 42,
+      "zod": 35,
+      "lines": 12606,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 39,
+      "localhostRefs": 0,
+      "tryCatch": 41,
+      "dynImports": 18,
       "fanInTotal": 0
     },
     {
@@ -115724,7 +115416,7 @@
     {
       "dir": "src/lib",
       "score": 100,
-      "summary": "module directory with 11 files, 3 API handlers, 160 Drizzle refs, 9 TODOs, 34 SSR-unsafe",
+      "summary": "module directory with 11 files, 3 API handlers, 160 Drizzle refs, 9 TODOs, 29 SSR-unsafe",
       "tagList": [
         "src",
         "lib",
@@ -115742,10 +115434,10 @@
       "auth": 10,
       "zod": 212,
       "lines": 363796,
-      "ssrUnsafe": 34,
+      "ssrUnsafe": 29,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 74,
+      "localhostRefs": 42,
       "tryCatch": 667,
       "dynImports": 132,
       "fanInTotal": 0
@@ -115884,7 +115576,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 46,
+      "localhostRefs": 23,
       "tryCatch": 318,
       "dynImports": 101,
       "fanInTotal": 0
@@ -115918,6 +115610,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/server/ai",
+      "score": 100,
+      "summary": "server module directory with 23 files, 0 API handlers, 4 Drizzle refs",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "db-schema",
+        "auth"
+      ],
+      "fileCount": 23,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 4,
+      "apis": 0,
+      "auth": 1,
+      "zod": 8,
+      "lines": 6278,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 15,
+      "dynImports": 4,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/server/analysis",
       "score": 100,
       "summary": "server module directory with 12 files, 0 API handlers, 2 Drizzle refs",
@@ -115943,6 +115664,35 @@
       "localhostRefs": 0,
       "tryCatch": 10,
       "dynImports": 2,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/server/analytics",
+      "score": 100,
+      "summary": "server module directory with 15 files, 0 API handlers, 5 Drizzle refs",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "db-schema",
+        "test"
+      ],
+      "fileCount": 15,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 5,
+      "apis": 0,
+      "auth": 0,
+      "zod": 10,
+      "lines": 6690,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 14,
+      "dynImports": 6,
       "fanInTotal": 0
     },
     {
@@ -116169,6 +115919,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/server/graph",
+      "score": 100,
+      "summary": "server module directory with 17 files, 0 API handlers, 2 Drizzle refs",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "auth",
+        "db-schema"
+      ],
+      "fileCount": 17,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 2,
+      "apis": 0,
+      "auth": 1,
+      "zod": 5,
+      "lines": 6953,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 17,
+      "dynImports": 7,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/server/indexer",
       "score": 100,
       "summary": "server module directory with 11 files, 1 API handlers, 4 Drizzle refs",
@@ -116192,7 +115971,7 @@
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
-      "localhostRefs": 1,
+      "localhostRefs": 0,
       "tryCatch": 8,
       "dynImports": 6,
       "fanInTotal": 0
@@ -116223,6 +116002,34 @@
       "localhostRefs": 0,
       "tryCatch": 4,
       "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/lib/server/queue",
+      "score": 100,
+      "summary": "server module directory with 8 files, 0 API handlers, 1 Drizzle refs",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "db-schema"
+      ],
+      "fileCount": 8,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 1,
+      "apis": 0,
+      "auth": 0,
+      "zod": 3,
+      "lines": 3812,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 6,
+      "dynImports": 6,
       "fanInTotal": 0
     },
     {
@@ -116282,6 +116089,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/server/retrieval",
+      "score": 100,
+      "summary": "server module directory with 24 files, 0 API handlers, 1 Drizzle refs",
+      "tagList": [
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "test",
+        "db-schema"
+      ],
+      "fileCount": 24,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 1,
+      "apis": 0,
+      "auth": 0,
+      "zod": 3,
+      "lines": 6342,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 20,
+      "dynImports": 10,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/server/types",
       "score": 100,
       "summary": "server module directory with 10 files, 0 API handlers, 1 Drizzle refs",
@@ -116338,7 +116174,7 @@
     {
       "dir": "src/routes/(app)",
       "score": 100,
-      "summary": "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs, 14 SSR-unsafe",
+      "summary": "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs, 13 SSR-unsafe",
       "tagList": [
         "src",
         "routes",
@@ -116356,10 +116192,10 @@
       "auth": 388,
       "zod": 39,
       "lines": 100456,
-      "ssrUnsafe": 14,
+      "ssrUnsafe": 13,
       "sv4Legacy": 0,
       "noTest": 76,
-      "localhostRefs": 5,
+      "localhostRefs": 4,
       "tryCatch": 150,
       "dynImports": 20,
       "fanInTotal": 0
@@ -116446,7 +116282,7 @@
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
       "noTest": 22,
-      "localhostRefs": 2,
+      "localhostRefs": 1,
       "tryCatch": 40,
       "dynImports": 7,
       "fanInTotal": 0
@@ -116768,6 +116604,35 @@
       "localhostRefs": 0,
       "tryCatch": 1,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/chat",
+      "score": 100,
+      "summary": "route handler directory with 7 files, 7 API handlers, 3 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 7,
+      "todos": 0,
+      "routes": 7,
+      "components": 0,
+      "db": 3,
+      "apis": 7,
+      "auth": 7,
+      "zod": 7,
+      "lines": 1334,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 6,
+      "localhostRefs": 0,
+      "tryCatch": 7,
+      "dynImports": 3,
       "fanInTotal": 0
     },
     {
@@ -117914,10 +117779,8 @@
     "ssr-unsafe": [
       "src/lib/ai/client-quality.ts",
       "src/lib/client/ui/POIPhotoUploader.svelte",
-      "src/lib/components/admin/BundlePreview.svelte",
       "src/lib/components/ai/AutomatedLegalResearch.svelte",
       "src/lib/components/ai/VectorIntelligenceDemo.svelte",
-      "src/lib/components/codebase/GraphExport.svelte",
       "src/lib/components/detective/UploadZone.svelte",
       "src/lib/components/evidence/EvidenceUpload.svelte",
       "src/lib/components/evidence/VisionImageAnalyzer.svelte",
@@ -117928,14 +117791,11 @@
       "src/lib/components/POIPhotoModal.svelte",
       "src/lib/components/rag/DocumentCard.svelte",
       "src/lib/components/types.ts",
-      "src/lib/components/ui/AuthModal.svelte",
       "src/lib/components/ui/SearchResults.svelte",
       "src/lib/components/ui/tabs/TabsList.svelte",
       "src/lib/components/yorha/CaseTheoryConstructor.svelte",
       "src/lib/components/yorha/CrossExaminationAssistant.svelte",
       "src/lib/components/yorha/JudicialAnalysisAgent.svelte",
-      "src/lib/courtroom/courtroom-scene.svelte.ts",
-      "src/lib/gpu/nes-memory-architecture.ts",
       "src/lib/machines/audio-upload-machine.ts",
       "src/lib/schemas/evidence-upload.ts",
       "src/lib/shims/lokijs-browser-adapter.js",
@@ -117961,7 +117821,7 @@
       "src/routes/(app)/demos/yorha/components/CrossExaminationAssistant.svelte",
       "src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte",
       "src/routes/(app)/evidence/upload/+page.svelte",
-      "src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte"
+      "src/routes/+error.svelte"
     ],
     "has-todo": [
       "src/lib/ai/onnx/inference.ts",
@@ -119080,17 +118940,17 @@
   },
   "audit": {
     "gateStats": {
-      "routesWithAuth": 621,
-      "routesWithoutAuth": 44,
+      "routesWithAuth": 623,
+      "routesWithoutAuth": 42,
       "routesWithZod": 467,
       "routesWithoutZod": 1,
-      "filesWithLocalhost": 95,
+      "filesWithLocalhost": 53,
       "sv4PropsCount": 0,
       "sv4ReactiveCount": 0,
       "sv4EventsCount": 0,
       "sv4DispatchCount": 0,
       "runeInTsCount": 11,
-      "ssrUnsafeCount": 51,
+      "ssrUnsafeCount": 45,
       "routesWithTest": 51,
       "routesWithoutTest": 533,
       "routesWithErrorHandling": 592,
