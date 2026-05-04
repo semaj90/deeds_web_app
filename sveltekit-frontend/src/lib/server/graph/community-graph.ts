@@ -705,3 +705,45 @@ export async function getDirectoryKAGContext(
     return [];
   }
 }
+
+/**
+ * Quick-hit AGENTS.md fetcher for agent tool-calls.
+ *
+ * Returns the pre-rendered markdown for a directory's AGENTS.md file (mirrored
+ * into Redis by `npm run agents:write`). Use this in ACE tool-call paths when
+ * an agent needs directory-scoped context in <5ms — much cheaper than the
+ * full `getDirectoryKAGContext()` which does GPU cosine + multi-key reads.
+ *
+ * Walks UP the directory tree (per agents.md spec) until a key is found:
+ *   src/lib/server/ace/foo  → tries agents:dir:src/lib/server/ace/foo
+ *                           → falls back to agents:dir:src/lib/server/ace
+ *                           → ... → agents:root (always-present root)
+ *
+ * Keys: agents:dir:<rel>           rendered AGENTS.md per directory (24h TTL)
+ *       agents:root                rendered repo-root AGENTS.md (24h TTL)
+ *
+ * Refresh: `npm run agents:write` (after `npm run index:codebase:fast`).
+ */
+export async function getAgentsMdQuickHit(dirOrFilePath: string): Promise<string | null> {
+  try {
+    const redis = getRedis();
+    // Normalize to a directory path (strip trailing filename if present)
+    let dir = dirOrFilePath.replace(/\\/g, '/');
+    if (/\.[a-z]{1,5}$/i.test(dir)) dir = dir.split('/').slice(0, -1).join('/');
+    // Strip any leading "sveltekit-frontend/" so keys match the indexer's relative paths
+    dir = dir.replace(/^sveltekit-frontend\//, '');
+
+    // Walk up the tree, nearest-wins per agents.md spec
+    while (dir && dir !== '.' && dir !== '/') {
+      const v = await redis.get(`agents:dir:${dir}`).catch(() => null);
+      if (v) return v;
+      const parent = dir.split('/').slice(0, -1).join('/');
+      if (parent === dir) break;
+      dir = parent;
+    }
+    // Final fallback: repo root
+    return await redis.get('agents:root').catch(() => null);
+  } catch {
+    return null;
+  }
+}
