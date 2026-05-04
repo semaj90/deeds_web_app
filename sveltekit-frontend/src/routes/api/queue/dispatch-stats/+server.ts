@@ -11,7 +11,8 @@ import { getDispatchStats } from '$lib/server/queue/dispatch-inline.js';
  * - skipped: RabbitMQ unavailable and queue not inline-capable
  * - errors: Inline execution failed
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const stats = getDispatchStats();
 
 	return json({
