@@ -289,10 +289,10 @@ async function main() {
     ? withNotes
         .sort((a, b) => b.score - a.score)
         .map(d => {
-          const note = wikiNotes.get(d.rel)!;
-          const sum  = String(note.summary ?? note.purpose ?? '');
-          const tags = (Array.isArray(note.dominantTags) ? note.dominantTags as string[] : []).join(', ');
-          const as   = note.auditScore != null ? ` | Audit ${note.auditScore}/100` : '';
+          const note = wikiNotes.get(d.rel);
+          const sum  = String((note?.summary ?? note?.purpose) ?? '');
+          const tags = (Array.isArray(note?.dominantTags) ? note.dominantTags : []).join(', ');
+          const as   = note?.auditScore != null ? ` | Audit ${note.auditScore}/100` : '';
           return `### \`${d.rel}/\`\n\n> ${sum}\n\n**Tags:** ${tags || '_none_'}${as}\n`;
         })
         .join('\n')
@@ -386,7 +386,8 @@ Injected by: \`assembleACEContext()\` → \`webSearchContext\` → \`## KAG Dire
     console.log(`\n  ${c.green('✅')} Written: ${c.cyan(OUT_PATH)}`);
   }
 
-  console.log(`\n  ${c.bold('Summary:')} ${c.red(`${critical.length} critical`)}  ${c.yellow(`${warning.length} warning`)}  ${c.green(`${good.length} good`)}  (${dirs.length} total)\n`);
+  const RED = s => `\x1b[31m${s}\x1b[0m`;
+  console.log(`\n  ${c.bold('Summary:')} ${RED(`${critical.length} critical`)}  ${c.yellow(`${warning.length} warning`)}  ${c.green(`${good.length} good`)}  (${dirs.length} total)\n`);
 }
 
-main().catch(e => { console.error(c.cyan('\n❌'), e.message); process.exit(1); });
+main().catch(e => { console.error('\n❌', e.message); process.exit(1); });

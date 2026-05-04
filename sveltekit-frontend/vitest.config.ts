@@ -96,6 +96,7 @@ export default defineConfig({
       'tests/lane4-feedback.spec.ts',
       'tests/routes/directory-summarizer.test.ts',
       'tests/routes/codebase-index-directory-summaries.test.ts',
+      'tests/routes/codebase-index-summarize-dirs.test.ts',
     ],
     exclude: [
       'node_modules/**',

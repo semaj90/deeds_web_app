@@ -97,9 +97,14 @@ vi.mock('$lib/server/indexer/web-search-indexer.js', () => ({
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
-/** Cluster row returned by pool.query (representative_files matches dirPath) */
+/** Cluster row returned by pool.query (tags/metadata.topFiles match dirPath) */
 function makeClusterRow(gpuCluster: number, filePath: string) {
-  return { gpu_cluster: gpuCluster, representative_files: [filePath] };
+  return {
+    repo_id: 'default',
+    gpu_cluster: gpuCluster,
+    tags: [filePath],
+    metadata: { topFiles: [filePath] },
+  };
 }
 
 /** Minimal DirAuditEntry */
@@ -294,8 +299,8 @@ describe('ingestDirectorySummaries', () => {
       ([sql]: [string]) => sql.includes('community_reports')
     );
     expect(communityCall).toBeDefined();
-    // embeddingLiteral becomes 'NULL' when embedding is null
-    expect(communityCall![0]).toContain('NULL');
+    expect(communityCall![0]).toContain('$8::vector');
+    expect(communityCall![1][7]).toBeNull();
   });
 
   it('strips CouchDB credentials from fetch URLs and sends Basic auth header', async () => {
