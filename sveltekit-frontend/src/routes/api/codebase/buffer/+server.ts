@@ -9,7 +9,8 @@ import { getIngestionBuffer, getAllIngestionBuffers } from '$lib/server/graph/in
  *   ?scope=cluster              → all cluster buffers
  *   ?k=20                       → cluster count (default 20)
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user) return json({ buffers: [], total: 0, error: 'Unauthorized' }, { status: 401 });
 	try {
 		const scope = url.searchParams.get('scope') ?? 'cluster';
 		const idParam = url.searchParams.get('id');
