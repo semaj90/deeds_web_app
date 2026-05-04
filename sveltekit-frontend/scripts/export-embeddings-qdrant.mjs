@@ -12,9 +12,28 @@ function parseArgs() {
     else if (a === '--output') out.output = args[++i];
     else if (a === '--batch') out.batch = Number(args[++i]);
     else if (a === '--api-key') out.apiKey = args[++i];
+    // For named-vector collections (e.g. codebase_chunks_768 has {signature, content})
+    // pick which vector to export. Default tries 'content' then first available key.
+    else if (a === '--vector-name') out.vectorName = args[++i];
     else if (a === '--help') out.help = true;
   }
   return out;
+}
+
+// Resolve a flat Float[] from either a flat array or a named-vector dict.
+function resolveVector(raw, preferredName) {
+  if (Array.isArray(raw)) return raw;
+  if (raw && typeof raw === 'object') {
+    if (preferredName && Array.isArray(raw[preferredName])) return raw[preferredName];
+    // Fallbacks: 'content', 'embedding', 'default', then first array-valued key
+    for (const k of ['content', 'embedding', 'default']) {
+      if (Array.isArray(raw[k])) return raw[k];
+    }
+    for (const k of Object.keys(raw)) {
+      if (Array.isArray(raw[k])) return raw[k];
+    }
+  }
+  return null;
 }
 
 async function main() {
@@ -31,36 +50,38 @@ async function main() {
   fs.mkdirSync(path.dirname(out), { recursive: true });
   const ws = fs.createWriteStream(out, { flags: 'w' });
 
-  let offset = 0;
+  // Qdrant scroll API uses cursor-based pagination via next_page_offset.
+  // Response shape: { result: { points: [...], next_page_offset: <id|null> } }
+  let cursor = null;
+  let totalExported = 0;
   while (true) {
     const url = `${qdrant}/collections/${encodeURIComponent(coll)}/points/scroll`;
-    const body = { limit: batch, offset, with_vector: true, with_payload: false };
+    const body = { limit: batch, with_vector: true, with_payload: false };
+    if (cursor !== null) body.offset = cursor;
     const headers = { 'Content-Type': 'application/json' };
     if (cfg.apiKey) headers['api-key'] = cfg.apiKey;
     const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
     if (!res.ok) throw new Error(`Qdrant request failed: ${res.status} ${res.statusText}`);
     const j = await res.json();
-    const points = j.result || j.points || [];
-    if (!points.length) break;
+    // Handle both { result: { points, next_page_offset } } and legacy { points }
+    const result = j.result ?? {};
+    const points = Array.isArray(result.points) ? result.points
+                  : Array.isArray(result)         ? result
+                  : Array.isArray(j.points)        ? j.points
+                  : [];
+    if (points.length === 0) break;
     for (const p of points) {
       const id = p.id ?? p.point_id ?? null;
-      const vector = p.vector ?? p.payload?.vector ?? p.payload?.embedding ?? null;
-      const payload = p.payload ?? null;
-      if (!vector) {
-        // try payload fields
-        if (payload && Array.isArray(payload.embedding)) {
-          ws.write(JSON.stringify({ id, embedding: payload.embedding }) + '\n');
-        } else {
-          // skip
-          continue;
-        }
-      } else {
-        ws.write(JSON.stringify({ id, embedding: vector }) + '\n');
+      const rawVec = p.vector ?? p.payload?.vector ?? p.payload?.embedding ?? null;
+      const flat = resolveVector(rawVec, cfg.vectorName);
+      if (Array.isArray(flat) && flat.length > 0) {
+        ws.write(JSON.stringify({ id, embedding: flat }) + '\n');
+        totalExported++;
       }
     }
-    offset += points.length;
-    console.log(`Exported ${offset} points...`);
-    if (points.length < batch) break;
+    cursor = result.next_page_offset ?? null;
+    console.log(`Exported ${totalExported} points...`);
+    if (cursor === null || cursor === undefined) break;
   }
   ws.end();
   console.log('Finished export to', out);
