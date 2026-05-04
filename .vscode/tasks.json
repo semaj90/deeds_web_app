@@ -8597,6 +8597,17 @@
     },
 
     {
+      "label": "📊 Graphify: Live Progress (latest log)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$latest = Get-ChildItem logs/task-output/graphify-full-*.log -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if (-not $latest) { Write-Host 'No graphify-full log yet — run graphify:full first' -ForegroundColor Yellow; exit 0 }; Write-Host \\\"Log: $($latest.FullName)\\\" -ForegroundColor Cyan; Write-Host \\\"Size: $([math]::Round($latest.Length/1KB,1)) KB, modified $($latest.LastWriteTime)\\\" -ForegroundColor Cyan; Write-Host '---'; $content = Get-Content $latest.FullName -Raw; $matches = [regex]::Matches($content, 'Progress: (\\d+)% \\((\\d+) indexed, (\\d+) cached, (\\d+) errors\\)'); if ($matches.Count -gt 0) { $last = $matches[$matches.Count-1]; Write-Host \\\"Latest: $($last.Value)\\\" -ForegroundColor Green; if ($matches.Count -gt 5) { $first = $matches[0]; $rate = ([int]$last.Groups[2].Value - [int]$first.Groups[2].Value); Write-Host \\\"Indexed delta since first sample: $rate chunks\\\" -ForegroundColor Cyan } } else { Write-Host 'No progress lines (job may have finished or failed)' -ForegroundColor Yellow }; Write-Host '---'; Write-Host 'Tail (last 15 non-progress lines):' -ForegroundColor Cyan; (Get-Content $latest.FullName) | Where-Object { $_ -notmatch 'Progress:' } | Select-Object -Last 15\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Read latest logs/task-output/graphify-full-*.log — show progress %, chunks indexed, and last 15 non-progress lines. Use during long graphify:full runs to check status without blocking.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
       "label": "📖 Open ACE/KAG/Gemma4 how-to guide",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"code docs/ace-kag-howto.md\"",
