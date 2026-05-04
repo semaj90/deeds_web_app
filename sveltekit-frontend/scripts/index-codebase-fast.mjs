@@ -172,6 +172,8 @@ function extractMeta(filePath, src) {
   const hasAuth = RE_AUTH.test(src) || isLayoutGuarded(rel);
   // G5 — zod
   const hasZod = RE_ZOD.test(src);
+  // G5b — does this route actually parse a body? (Zod is irrelevant for pure GETs)
+  const parsesBody = /request\.(?:json|formData|text|arrayBuffer)\s*\(\s*\)/.test(src);
   // G6 — route handlers
   const routeHandlers = [...src.matchAll(RE_ROUTE_H)].map(m => m[1]);
   // G7 — drizzle
@@ -233,7 +235,7 @@ function extractMeta(filePath, src) {
     // G1-G3
     imports, dynImports, hasViteIgnore, reExports, typeImports,
     // G4-G8
-    hasAuth, hasZod, routeHandlers, drizzleRefs, todos,
+    hasAuth, hasZod, parsesBody, routeHandlers, drizzleRefs, todos,
     // G9-G12
     lineCount, components, localhostRefs, hasRawPort, typeImportCount,
     // G13 (cross-ref later)
@@ -515,7 +517,8 @@ const gateStats = {
   routesWithoutAuth:  files.filter(f => f.isServerRoute && !f.hasAuth && f.routeHandlers.length).length,
   // G5
   routesWithZod:      files.filter(f => f.isServerRoute && f.hasZod).length,
-  routesWithoutZod:   files.filter(f => f.isServerRoute && !f.hasZod && f.routeHandlers.length).length,
+  // Only flag routes that actually parse a body — pure GET handlers don't need body validation
+  routesWithoutZod:   files.filter(f => f.isServerRoute && !f.hasZod && f.routeHandlers.length && f.parsesBody).length,
   // G11
   filesWithLocalhost: files.filter(f => f.localhostRefs.length && !f.rel.includes('env.server')).length,
   // G14
@@ -589,7 +592,7 @@ console.log(`📄 Graph JSON → ${path.relative(ROOT, graphJsonPath)}`);
 
 const apiFiles   = files.filter(f => f.routeHandlers.length > 0);
 const noAuthApis = apiFiles.filter(f => !f.hasAuth);
-const noZodApis  = apiFiles.filter(f => !f.hasZod);
+const noZodApis  = apiFiles.filter(f => !f.hasZod && f.parsesBody);
 const ssrUnsafeFiles = files.filter(f => f.ssrUnsafe && !f.isTest);
 const sv4Files   = files.filter(f => f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch);
 const lhFiles    = files.filter(f => f.localhostRefs.length && !f.rel.includes('env.server'));

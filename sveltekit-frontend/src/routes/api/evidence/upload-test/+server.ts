@@ -4,13 +4,23 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
-export const POST: RequestHandler = async ({ request }) => {
+const uploadTestFieldsSchema = z.object({
+  filename: z.string().max(500).optional(),
+});
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   try {
     console.log('[UploadTest] Headers:', Object.fromEntries(request.headers.entries()));
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
+    // Validate optional auxiliary fields with Zod (defense-in-depth)
+    uploadTestFieldsSchema.safeParse({
+      filename: formData.get('filename') ?? undefined,
+    });
 
     if (!file) {
       return json({

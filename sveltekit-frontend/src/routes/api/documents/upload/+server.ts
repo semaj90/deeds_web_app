@@ -6,7 +6,13 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
+
+const documentUploadFieldsSchema = z.object({
+  sessionId: z.string().min(1).max(200),
+  caseId: z.string().uuid().nullable().optional(),
+});
 import { documents, chatDocumentAttachments } from '$lib/server/db/schema-postgres';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed';
 import { minio } from '$lib/server/minio/client';
@@ -20,16 +26,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const sessionId = formData.get('sessionId') as string | null;
-    const caseId = formData.get('caseId') as string | null;
+    const sessionIdRaw = formData.get('sessionId') as string | null;
+    const caseIdRaw = formData.get('caseId') as string | null;
 
     if (!file) {
       return json({ error: 'No file provided' }, { status: 400 });
     }
 
-    if (!sessionId) {
-      return json({ error: 'Session ID required' }, { status: 400 });
+    const fieldsParsed = documentUploadFieldsSchema.safeParse({
+      sessionId: sessionIdRaw,
+      caseId: caseIdRaw && caseIdRaw.length > 0 ? caseIdRaw : null,
+    });
+    if (!fieldsParsed.success) {
+      return json(
+        { error: 'Invalid form fields', details: fieldsParsed.error.flatten() },
+        { status: 400 }
+      );
     }
+    const { sessionId } = fieldsParsed.data;
+    const caseId = fieldsParsed.data.caseId ?? null;
 
     // Validate file type
     const allowedTypes = [
