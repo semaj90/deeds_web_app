@@ -152,8 +152,10 @@ const RE_SV4_DISPATCH= /createEventDispatcher\(\)/;
 const RE_RUNE_IN_TS  = /\$(?:state|derived|effect|props)\s*[(<]/;
 // G15 — SSR unsafe globals
 // Match true global identifier usage: not preceded by `.`, alphanum, or `-` (so `document-embed`, `documents:`, `myDocument` don't match).
-// Must also be followed by `.`, `[`, `(`, whitespace, comparison, or end-of-token — typical global-access patterns.
-const RE_SSR_UNSAFE  = /(?:^|[^\w.\-])(window|document|localStorage|sessionStorage|indexedDB|IndexedDB)(?=\s*[.\[(=!<>?,;)]|\s*$)/m;
+// Must be followed by access syntax (.X, [...], (...), ` =`, `==`, comparison) — typical global-access patterns.
+// Reject `?:` (TS optional field marker) and `:` (TS type annotation) which produce false positives like
+// `document?: DocumentInfo` and `interface Foo { document: any }`.
+const RE_SSR_UNSAFE  = /(?:^|[^\w.\-])(window|document|localStorage|sessionStorage|indexedDB|IndexedDB)(?=\s*(?:\.[a-zA-Z_]|\[|\()|\s*(?:===|!==|==|!=|<|>|=[^=]))/m;
 // Recognized SSR-safe markers: explicit guards, lifecycle hooks (run only in browser),
 // reactive runes ($effect runs only browser-side), event handler functions ("function ... {" preceding window/document refs).
 const RE_SSR_GUARD   = /typeof\s+window|typeof\s+document|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;
@@ -334,7 +336,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v11'; // bumped 2026-05-04 — G11 splits server-side localhost (production-breaking) from client-side (cosmetic), excludes env.server.ts/test files/DEV-fallback lines
+const META_CACHE_VERSION = 'v12'; // bumped 2026-05-04 — G15 lookahead requires real access syntax (.x | [ | ( | == | =), rejects TS field markers (?:, :)
 
 for (const filePath of walk(scanRoot)) {
   let src;
