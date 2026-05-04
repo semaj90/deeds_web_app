@@ -2,7 +2,7 @@
  * Directory Summarizer — Graph Layer Integration
  *
  * Ingests deep-directory-audit output into the codebase knowledge graph:
- *   1. Match each directory to GPU cluster(s) via cluster_summaries.representative_files
+ *   1. Match each directory to GPU cluster(s) via cluster_summaries.tags + metadata.topFiles
  *   2. Store a ClusterNote in karpathy-wiki (CouchDB + Redis) per directory
  *   3. Fire runDeepResearchIndex for low-score/unsummarized directories
  *   4. Create Neo4j HAS_DIRECTORY_SUMMARY edges from cluster nodes to directory paths
@@ -155,26 +155,49 @@ async function upsertWikiNote(id: string, doc: Record<string, unknown>): Promise
 // ── Cluster ID resolution ─────────────────────────────────────────────────────
 
 interface ClusterSummaryRow {
+  repo_id?: string;
   gpu_cluster: number;
-  representative_files: string[] | null;
+  tags?: string[] | null;
+  metadata?: Record<string, unknown> | null;
+}
+
+function extractClusterPaths(row: ClusterSummaryRow): string[] {
+  const tagPaths = Array.isArray(row.tags)
+    ? row.tags.filter((value): value is string => typeof value === 'string' && value.includes('/'))
+    : [];
+
+  const metadata = row.metadata && typeof row.metadata === 'object' ? row.metadata : null;
+  const topFilesRaw =
+    metadata && Array.isArray(metadata.topFiles)
+      ? metadata.topFiles
+      : metadata && Array.isArray(metadata.representativeFiles)
+        ? metadata.representativeFiles
+        : [];
+  const topFiles = topFilesRaw.filter(
+    (value): value is string => typeof value === 'string' && value.includes('/')
+  );
+
+  return [
+    ...new Set([...tagPaths, ...topFiles].map((value) => value.replace(/\\/g, '/').toLowerCase())),
+  ];
 }
 
 async function resolveClusterIds(dirPath: string): Promise<number[]> {
   try {
     const rows = await pool.query<ClusterSummaryRow>(
-      `SELECT gpu_cluster, representative_files
+      `SELECT repo_id, gpu_cluster, tags, metadata
        FROM cluster_summaries
-       WHERE representative_files IS NOT NULL
-       LIMIT 200`
+       WHERE repo_id = 'default'
+       LIMIT 500`
     );
 
     const normalised = dirPath.replace(/\\/g, '/').toLowerCase();
     const matched = new Set<number>();
 
     for (const row of rows.rows) {
-      const files = row.representative_files ?? [];
+      const files = extractClusterPaths(row);
       for (const f of files) {
-        if (f.replace(/\\/g, '/').toLowerCase().includes(normalised)) {
+        if (f === normalised || f.startsWith(`${normalised}/`) || f.includes(`/${normalised}/`)) {
           matched.add(row.gpu_cluster);
           break;
         }
@@ -222,6 +245,36 @@ async function writeNeo4jEdges(entries: Array<{ dir: string; clusterIds: number[
 
 // ── Community reports upsert ──────────────────────────────────────────────────
 
+let ensureCommunityReportsTablePromise: Promise<void> | null = null;
+
+function ensureCommunityReportsTable(): Promise<void> {
+  if (!ensureCommunityReportsTablePromise) {
+    ensureCommunityReportsTablePromise = pool
+      .query(
+        `
+      CREATE TABLE IF NOT EXISTS community_reports (
+        community_id   INT         PRIMARY KEY,
+        cluster_ids    INT[]       NOT NULL DEFAULT '{}',
+        member_count   INT         NOT NULL DEFAULT 0,
+        summary        TEXT        NOT NULL DEFAULT '',
+        purpose        TEXT        NOT NULL DEFAULT '',
+        tags           TEXT[]      NOT NULL DEFAULT '{}',
+        cohesion_score REAL        NOT NULL DEFAULT 0,
+        embedding      vector(768),
+        built_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `
+      )
+      .then(() => undefined)
+      .catch((error) => {
+        ensureCommunityReportsTablePromise = null;
+        throw error;
+      });
+  }
+
+  return ensureCommunityReportsTablePromise;
+}
+
 async function upsertCommunityReport(
   dirPath: string,
   clusterIds: number[],
@@ -231,27 +284,33 @@ async function upsertCommunityReport(
 ): Promise<void> {
   if (clusterIds.length === 0) return;
 
+  await ensureCommunityReportsTable();
+
   const communityId = clusterIds[0]; // use smallest cluster as community anchor
-  const embeddingLiteral = embedding ? `'[${embedding.join(',')}]'::vector` : 'NULL';
 
   await pool.query(
     `INSERT INTO community_reports
        (community_id, cluster_ids, member_count, summary, purpose, tags,
         cohesion_score, embedding, built_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, ${embeddingLiteral}, NOW())
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8::vector, NOW())
      ON CONFLICT (community_id) DO UPDATE
-       SET summary     = EXCLUDED.summary,
+       SET cluster_ids  = EXCLUDED.cluster_ids,
+           member_count = EXCLUDED.member_count,
+         summary     = EXCLUDED.summary,
            purpose     = EXCLUDED.purpose,
            tags        = EXCLUDED.tags,
+           cohesion_score = EXCLUDED.cohesion_score,
+           embedding   = EXCLUDED.embedding,
            built_at    = NOW()`,
     [
       communityId,
-      JSON.stringify(clusterIds),
+      clusterIds,
       clusterIds.length,
       summary,
       `Directory: ${dirPath}`,
-      JSON.stringify(tags),
+      tags,
       0.5, // neutral cohesion — not built from edge density
+      embedding ? JSON.stringify(embedding) : null,
     ]
   );
 
@@ -259,7 +318,9 @@ async function upsertCommunityReport(
   try {
     const redis = getRedis();
     await redis.del(`hg:community:${communityId}`);
-  } catch { /* non-fatal */ }
+  } catch {
+    /* non-fatal */
+  }
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────

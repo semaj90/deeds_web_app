@@ -1144,17 +1144,19 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
                   gpu_cluster: number;
                   purpose: string | null;
                   summary: string | null;
-                  representative_files: string[] | null;
                   tags: string[] | null;
-                }>(`SELECT gpu_cluster, purpose, summary, representative_files, tags
+                  metadata: Record<string, unknown> | null;
+                }>(`SELECT gpu_cluster, purpose, summary, tags, metadata
                     FROM cluster_summaries
-                    WHERE gpu_cluster = ANY($1)`, [clusterIds]);
+                    WHERE repo_id = 'default' AND gpu_cluster = ANY($1)`, [clusterIds]);
                 if (rows.rows.length === 0) return;
                 const { ingestDirectorySummaries } = await import(
                   '$lib/server/indexer/directory-summarizer.js'
                 );
                 const entries = rows.rows.map((r) => ({
-                  rel: (r.representative_files?.[0] ?? `cluster-${r.gpu_cluster}`)
+                  rel: ((((Array.isArray(r.metadata?.topFiles) ? r.metadata.topFiles[0] : null) as string | null)
+                    ?? r.tags?.find((tag) => tag.includes('/'))
+                    ?? `cluster-${r.gpu_cluster}`)
                     .replace(/[^/]*$/, '').replace(/\/$/, '') || `cluster-${r.gpu_cluster}`,
                   score: 75,
                   metrics: { gpuCluster: r.gpu_cluster },
