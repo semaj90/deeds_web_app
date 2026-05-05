@@ -274,7 +274,24 @@ function extractMeta(filePath, src) {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '')
       .replace(/(['"`])(?:\\.|(?!\1)[\s\S])*\1/g, '""');
-    ssrUnsafe = RE_SSR_UNSAFE.test(stripped);
+    if (RE_SSR_UNSAFE.test(stripped)) {
+      // Final check: are ALL matches inside function bodies (callbacks, event handlers,
+      // function declarations)? Those only fire when called — and in components, that
+      // means user interaction → browser-only by virtue of execution context.
+      // We approximate "inside a function" by counting unmatched { before each match,
+      // with a loose check for `function`, `=>`, or onXxx=  preceding the match line.
+      const ssrMatchesGlobal = new RegExp(RE_SSR_UNSAFE.source, 'gm');
+      const matches = [...stripped.matchAll(ssrMatchesGlobal)];
+      let allInFunctions = matches.length > 0;
+      for (const m of matches) {
+        const before = stripped.slice(0, m.index);
+        // Crude brace balance: positive depth means we're inside a function/block.
+        const opens  = (before.match(/\{/g) ?? []).length;
+        const closes = (before.match(/\}/g) ?? []).length;
+        if (opens <= closes) { allInFunctions = false; break; }
+      }
+      ssrUnsafe = !allInFunctions;
+    }
   }
   // G16 — test pairing (resolved later via cross-file pass)
   // G17 — error handling
@@ -340,7 +357,7 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 // Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v16'; // bumped 2026-05-04 — G16 also matches dynamic-segment auto-stubs ([id] → __id translation in routePathDyn)
+const META_CACHE_VERSION = 'v17'; // bumped 2026-05-04 — G15 brace-depth check: all-matches-inside-function-body counts as guarded (event handlers fire only browser-side)
 
 for (const filePath of walk(scanRoot)) {
   let src;

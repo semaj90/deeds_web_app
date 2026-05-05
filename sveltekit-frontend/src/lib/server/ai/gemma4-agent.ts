@@ -537,10 +537,26 @@ async function dispatchTool(
       const p = String(args.path ?? '');
       if (!p) return { tool: name, result: null, errorMsg: 'path is required' };
       try {
-        const { getAgentsMdQuickHit } = await import('$lib/server/graph/community-graph.js');
-        const md = await getAgentsMdQuickHit(p);
-        if (!md) return { tool: name, result: null, errorMsg: 'No AGENTS.md found for this path (run `npm run agents:write`)' };
-        return { tool: name, result: { path: p, markdown: md, length: md.length } };
+        const { resolveAgentsMdQuickHit } = await import('$lib/server/graph/community-graph.js');
+        const hit = await resolveAgentsMdQuickHit(p);
+        if (!hit) {
+          return {
+            tool: name,
+            result: null,
+            errorMsg: 'No AGENTS.md found for this path (run `npm run agents:write`)',
+          };
+        }
+        return {
+          tool: name,
+          result: {
+            path: p,
+            markdown: hit.markdown,
+            length: hit.markdown.length,
+            resolvedBy: hit.source,
+            resolvedPath: hit.resolvedPath,
+            resolvedKey: hit.resolvedKey ?? null,
+          },
+        };
       } catch (e: any) {
         return { tool: name, result: null, errorMsg: e.message };
       }
@@ -809,7 +825,7 @@ export async function runGemma4Agent(
           maxTokens: 2048,
           timeoutMs: TIMEOUT_MS,
         });
-        finalAnswer = typeof forced === 'string' ? forced : forced.content;
+        finalAnswer = forced;
       } catch (error) {
         backendFallbackReason = backendFallbackReason ?? (error as Error).message;
         const forced = await tieredLLMQuery(finalMessages, {

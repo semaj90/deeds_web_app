@@ -6715,6 +6715,91 @@
       "problemMatcher": [],
       "detail": "Canonical end-to-end operator flow: start → preflight → fast health → smoke tests → tool loop query → svelte-check"
     },
+// ─── 🧠 CodeIntel: nes-arch agents.md path-first context ───────────────
+{
+  "label": "🧠 CodeIntel: Agents Health",
+  "type": "shell",
+  "command": "npm run smoke:graphify && npm run nes:inspect:agents",
+  "options": {
+    "cwd": "${workspaceFolder}/sveltekit-frontend"
+  },
+  "group": "test",
+  "detail": "Quick health: 5-pillar Graphify smoke + count of agents:dir:* keys + presence of agents:root. Use after a git pull or to verify the path-first ACE preflight is live.",
+  "presentation": {
+    "reveal": "always",
+    "panel": "dedicated",
+    "clear": true
+  },
+  "problemMatcher": []
+},
+{
+  "label": "🧠 CodeIntel: Agents Regen",
+  "type": "shell",
+  "command": "npm run agents:write && npm run nes:inspect:agents",
+  "options": {
+    "cwd": "${workspaceFolder}/sveltekit-frontend"
+  },
+  "group": "build",
+  "detail": "Regenerate per-directory AGENTS.md from KAG + graph JSON, mirror to Redis agents:dir:* (24h TTL), then verify the mirror count. ~5s.",
+  "presentation": {
+    "reveal": "always",
+    "panel": "dedicated",
+    "clear": true
+  },
+  "problemMatcher": []
+},
+{
+  "label": "🧠 CodeIntel: NES Inspect (agents:dir:* mirror)",
+  "type": "shell",
+  "command": "npm run nes:inspect:agents",
+  "options": {
+    "cwd": "${workspaceFolder}/sveltekit-frontend"
+  },
+  "group": "test",
+  "detail": "Read-only Redis inspector: list agents:dir:* keys with TTLs and char lengths. Verify the path-first quick-hit cache is populated.",
+  "presentation": {
+    "reveal": "always",
+    "panel": "dedicated",
+    "clear": true
+  },
+  "problemMatcher": []
+},
+{
+  "label": "🧠 CodeIntel: NES Health (full diagnostic chain)",
+  "type": "shell",
+  "command": "test -f docs/graph/codebase-graph.json || npm run index:codebase:fast; npm run smoke:graphify; npm run nes:inspect:agents; npm run nes:inspect:kag",
+  "options": {
+    "cwd": "${workspaceFolder}/sveltekit-frontend"
+  },
+  "group": "test",
+  "detail": "Full nes-arch diagnostic: ensure graph JSON exists (re-index if not) → 5-pillar smoke → agents:dir:* mirror → underlying KAG notes. Use this when ACE feels context-poor or after big git pulls.",
+  "presentation": {
+    "reveal": "always",
+    "panel": "dedicated",
+    "clear": true
+  },
+  "problemMatcher": []
+},
+// ─── 🧠 CodeIntel: Full GPU Loop (canonical lifecycle) ─────────────────
+// Splices agents:write + nes:inspect:agents into the deep refresh so
+// AGENTS.md generation is part of the index lifecycle. Run after each
+// significant code change to keep the path-first cache fresh.
+{
+  "label": "🧠 CodeIntel: Full GPU Loop",
+  "type": "shell",
+  "command": "npm run graphify:full && npm run agents:write && npm run nes:inspect:agents",
+  "options": {
+    "cwd": "${workspaceFolder}/sveltekit-frontend"
+  },
+  "group": "build",
+  "detail": "Deep refresh + AGENTS.md regen + mirror verification. Pipeline: graphify:daily → codebase:index → graphify:topology → agents:write → smoke:ace:full → nes:inspect:agents. Heavy (~3-10 min). Use before major reviews or after big merges.",
+  "presentation": {
+    "reveal": "always",
+    "panel": "dedicated",
+    "clear": true
+  },
+  "problemMatcher": []
+},
     {
       "label": "🧠 CodeIntel: Deep Legal Backfill",
       "type": "shell",
@@ -7740,10 +7825,12 @@
     {
       "label": "💬 Gemma4: Prompt from VS Code (TurboQuant :8090)",
       "type": "shell",
+      // Was: node -e '...'  inline. PowerShell on Windows treats `(text-only, :8090)`
+      // inside the inline expression as a parameter list and throws ParserError.
+      // Moving the script on-disk avoids the quoting hell entirely.
       "command": "node",
       "args": [
-        "-e",
-        "const q=process.env.GEMMA_PROMPT; if(!q){console.error('No prompt set');process.exit(1);} const sys=process.env.GEMMA_SYSTEM||'You are a legal AI assistant specializing in case law, evidence rules, and document analysis.'; const maxTok=parseInt(process.env.GEMMA_MAX_TOKENS||'1024'); const temp=parseFloat(process.env.GEMMA_TEMP||'0.3'); const base=process.env.GEMMA_BASE||'http://localhost:8090'; console.log('\\n🦙 Querying TurboQuant at '+base+' ...\\n'); fetch(base+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gemma4-legal',messages:[{role:'system',content:sys},{role:'user',content:q}],max_tokens:maxTok,temperature:temp,stream:false})}).then(r=>r.json()).then(d=>{if(d.error){console.error('Error:',JSON.stringify(d.error));process.exit(1);} const reply=d.choices?.[0]?.message?.content; console.log(reply); console.log('\\n---'); console.log('Tokens: prompt='+d.usage?.prompt_tokens+' completion='+d.usage?.completion_tokens+' total='+d.usage?.total_tokens); console.log('Model:',d.model,'Finish:',d.choices?.[0]?.finish_reason);}).catch(e=>{console.error('\\n❌ TurboQuant not reachable on '+base);console.error('   Start it with: ⚡ TurboQuant: Start (text-only, :8090)');console.error('   Error:',e.message);process.exit(1);});"
+        "${workspaceFolder}/sveltekit-frontend/scripts/tools/gemma4-turboquant-prompt.mjs"
       ],
       "options": {
         "cwd": "${workspaceFolder}",
@@ -7768,10 +7855,11 @@
     {
       "label": "💬 Gemma4: Agentic Tool Loop from VS Code (dev server :5173)",
       "type": "shell",
+      // Same fix as the TurboQuant prompt task — the inline node -e body
+      // exploded under PowerShell's parser. Now an on-disk module.
       "command": "node",
       "args": [
-        "-e",
-        "const q=process.env.GEMMA_PROMPT; if(!q){console.error('No prompt');process.exit(1);} const pipeline=process.env.GEMMA_PIPELINE||'ace'; console.log('\\n🤖 Gemma4 Agentic Tool Loop (pipeline='+pipeline+')\\n Query: '+q+'\\n'); fetch('http://localhost:5173/api/ai/agent',{method:'POST',headers:{'Content-Type':'application/json','x-dev-bypass-auth':'true'},body:JSON.stringify({query:q,pipeline,tools:['rag_search','case_search','memory_recall','hyperedge_stats']})}).then(r=>r.json()).then(d=>{if(d.error){console.error('Agent error:',d.error);process.exit(1);} console.log('\\n=== Answer ===\\n'); console.log(d.answer??JSON.stringify(d,null,2)); console.log('\\n--- Meta ---'); console.log('Tools used:',d.toolsUsed?.join(', ')??'none'); console.log('Rounds:',d.rounds,'| Latency:',d.durationMs,'ms');}).catch(e=>{console.error('\\n❌ Dev server not running on :5173');console.error('   Start it with: Dev: npm run dev (SvelteKit)');console.error('   Error:',e.message);process.exit(1);});"
+        "${workspaceFolder}/sveltekit-frontend/scripts/tools/gemma4-agent-prompt.mjs"
       ],
       "options": {
         "cwd": "${workspaceFolder}",
@@ -8604,6 +8692,39 @@
       "group": "test",
       "detail": "Read codebase-graph.json + hypergraph-clusters.json, cross-correlate gate failures with hypergraph clusters, write next_steps/active/<date>-graph-analysis.md with prioritized findings. ~3s, no LLM.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Graphify: Analyze × Gemma4 → AI next_steps plan",
+      "type": "shell",
+      "command": "npm run analyze:graph:ai",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Same as Graphify:Analyze but queries Gemma4 (TurboQuant :8090) for LLM-written root-cause analysis, cluster recommendations, FF1 routing plan, and production blockers. Requires TurboQuant running. Writes next_steps/active/<date>-graph-analysis-ai.md.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ TypeScript 7: Check (tsgo --noEmit)",
+      "type": "shell",
+      "command": "npm run check:tsgo",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Run tsgo (TypeScript 7 native Go compiler) for fast type-checking. Side-by-side with svelte-check. ~5-10× faster on large projects.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
 

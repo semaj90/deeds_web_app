@@ -186,6 +186,28 @@ export interface ACEContext {
   } | null;
   /** Deterministic policy decision used to size context and route tools */
   policyDecision: ACEPolicyDecision | null;
+  /**
+   * nes-arch path-first directory context (agents.md spec).
+   * Populated when assembleACEContext receives a `filePath` opt — walks UP to
+   * the nearest AGENTS.md in Redis (`agents:dir:*`) and returns the rendered
+   * markdown with audit summary. Sub-5ms hit before any expensive retrieval.
+   * Rendered FIRST in the LLM prompt so the model knows the directory's
+   * conventions, audit warnings, and dominant tags before reading chunks.
+   */
+  agentsMd?: {
+    /** Resolved Redis key, e.g. "agents:dir:src/lib/server/ace" */
+    resolvedKey: string;
+    /** Original requested path (file or dir) */
+    requestedPath: string;
+    /** Directory the resolver landed on (after walk-up) */
+    resolvedDir: string;
+    /** Pre-rendered AGENTS.md markdown content */
+    markdown: string;
+    /** Cache freshness — null if Redis missing the key */
+    ttlSeconds: number | null;
+    /** Whether this is a fallback to the repo-root AGENTS.md */
+    fallbackToRoot: boolean;
+  } | null;
 }
 
 export interface ACEPrompt {

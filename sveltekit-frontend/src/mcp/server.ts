@@ -513,6 +513,21 @@ export function setupToolHandlers() {
           required: ['prompt'],
         },
       },
+      {
+        name: 'agents_md',
+        description:
+          'Resolve the nearest applicable AGENTS.md instructions for a file or directory. Prefers Redis-rendered mirrors and falls back to on-disk AGENTS.md walk-up.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path: {
+              type: 'string',
+              description: 'Workspace-relative or absolute file/directory path',
+            },
+          },
+          required: ['path'],
+        },
+      },
       // ─────────────────────────────────────────────────────────────────────
       // Codebase Search — Dual-vector semantic search (Qdrant 768-dim)
       // ─────────────────────────────────────────────────────────────────────
@@ -2178,6 +2193,46 @@ export function setupToolHandlers() {
             ],
           };
         }
+      }
+
+      case 'agents_md': {
+        const targetPath = String(args.path ?? '').trim();
+        if (!targetPath) throw new Error('path is required');
+
+        const { resolveAgentsMdQuickHit } = await import('../lib/server/graph/community-graph.js');
+        const hit = await resolveAgentsMdQuickHit(targetPath);
+
+        if (!hit) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  path: targetPath,
+                  markdown: null,
+                  error: 'No AGENTS.md found for this path (run npm run agents:write)',
+                }),
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                path: targetPath,
+                markdown: hit.markdown,
+                length: hit.markdown.length,
+                resolvedBy: hit.source,
+                resolvedPath: hit.resolvedPath,
+                resolvedKey: hit.resolvedKey ?? null,
+              }),
+            },
+          ],
+        };
       }
 
       // ─────────────────────────────────────────────────────────────────────
