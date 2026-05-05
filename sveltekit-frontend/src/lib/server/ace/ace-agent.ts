@@ -184,7 +184,7 @@ const getSystemHealth: Gemma4Tool = {
   },
   execute: async (_args) => {
     try {
-      const resp = await fetch('http://localhost:5173/api/infrastructure/status', {
+      const resp = await fetch(`${ENV.PUBLIC_API_URL ?? 'http://localhost:5173'}/api/infrastructure/status`, {
         signal: AbortSignal.timeout(8_000),
       });
       if (!resp.ok) throw new Error(`Health HTTP ${resp.status}`);
@@ -227,7 +227,7 @@ const webSearch: Gemma4Tool = {
 
     // Try live web search via the internal proxy
     try {
-      const resp = await fetch('http://localhost:5173/api/research/web-search', {
+      const resp = await fetch(`${ENV.PUBLIC_API_URL ?? 'http://localhost:5173'}/api/research/web-search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-dev-bypass-auth': 'true' },
         body: JSON.stringify({ query, limit: topK }),
