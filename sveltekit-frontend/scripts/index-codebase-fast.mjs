@@ -40,12 +40,19 @@ const GRAPH_DIR = path.resolve(ROOT, 'docs', 'graph');
 
 const WRITE_PLAN   = process.argv.includes('--write-plan');
 const SKIP_REDIS   = process.argv.includes('--skip-redis');
+const RESUME       = process.argv.includes('--resume');    // gradient checkpoint resume
+const RUN_TSC      = process.argv.includes('--tsc');       // inline tsc diagnostic cache
 const SRC_OVERRIDE = (() => {
   const idx = process.argv.indexOf('--src');
   return idx !== -1 ? path.resolve(process.argv[idx + 1]) : null;
 })();
 
 const scanRoot = SRC_OVERRIDE ?? SRC_DIR;
+
+// ── Gradient checkpoint constants ──────────────────────────────────────────────
+const CHECKPOINT_KEY   = 'code:index:checkpoint:hashes';  // Redis set of done contentHashes
+const CHECKPOINT_TTL   = 2 * 3600;                        // 2h — auto-expires after full run
+const CHECKPOINT_EVERY = 200;                             // flush batch every N files
 
 // ── Redis (optional) ──────────────────────────────────────────────────────────
 
@@ -86,6 +93,78 @@ async function rget(key) {
 
 // KV cache stats — exposed in final summary so user sees cache impact
 let cacheHits = 0, cacheMisses = 0;
+
+// ── Gradient checkpoint: load prior-run hashes ────────────────────────────────
+// --resume: skip files whose contentHash was checkpointed in a prior run.
+// This lets an interrupted 3000-file scan continue from where it left off.
+const checkpointHashes = new Set();
+if (RESUME && redis) {
+  try {
+    const members = await redis.smembers(CHECKPOINT_KEY);
+    for (const h of members) checkpointHashes.add(h);
+    if (checkpointHashes.size > 0)
+      console.log(`⏭️  Gradient checkpoint: resuming — skipping ${checkpointHashes.size} already-indexed files`);
+  } catch { /* non-fatal */ }
+}
+let checkpointBatchCount = 0;
+let checkpointPendingHashes = [];
+
+async function flushCheckpoint() {
+  if (!redis || checkpointPendingHashes.length === 0) return;
+  try {
+    await redis.sadd(CHECKPOINT_KEY, ...checkpointPendingHashes);
+    await redis.expire(CHECKPOINT_KEY, CHECKPOINT_TTL);
+    checkpointPendingHashes = [];
+  } catch { /* non-fatal */ }
+}
+
+// ── TypeScript diagnostic cache (--tsc or pre-cached) ────────────────────────
+// Reads per-directory error counts from Redis code:ts:diag:manifest (written by
+// a prior --tsc run or by `npm run check:typescript`). Falls back to inline tsc
+// if --tsc flag is set and no valid manifest exists.
+const TS_DIAG_KEY = 'code:ts:diag:manifest';
+const TS_DIAG_TTL = 2 * 3600; // 2h TTL — stale after 2 hours
+let tsDiagByDir = {};  // dir → error count
+
+async function loadTsDiagnostics() {
+  if (SKIP_REDIS) return;
+  const cached = await rget(TS_DIAG_KEY);
+  if (cached && cached.generatedAt) {
+    const age = Date.now() - new Date(cached.generatedAt).getTime();
+    if (age < TS_DIAG_TTL * 1000) {
+      tsDiagByDir = cached.byDir ?? {};
+      const total = Object.values(tsDiagByDir).reduce((s, n) => s + n, 0);
+      console.log(`📋 TS diagnostics (cached, ${Math.round(age/60000)}m old): ${total} errors across ${Object.keys(tsDiagByDir).length} dirs`);
+      return;
+    }
+  }
+  if (!RUN_TSC) {
+    if (!cached) console.log('💡 Tip: run with --tsc to populate TypeScript error counts in wiki notes');
+    return;
+  }
+  // Run tsc inline and cache results
+  console.log('🔍 Running tsc --noEmit (caching results for 2h)…');
+  const { spawnSync } = await import('child_process');
+  const r = spawnSync('npx', ['tsc', '--noEmit', '--pretty', 'false'], {
+    cwd: ROOT, encoding: 'utf8', shell: process.platform === 'win32',
+    timeout: 120_000,
+  });
+  const lines = (r.stdout + r.stderr).split('\n');
+  const byDir = {};
+  for (const line of lines) {
+    const m = line.match(/^([^(]+)\(\d+,\d+\):\s+error\s+TS/);
+    if (!m) continue;
+    const rel = m[1].replace(/\\/g, '/').replace(/^src\//, 'src/');
+    const dir = rel.split('/').slice(0, -1).join('/');
+    byDir[dir] = (byDir[dir] ?? 0) + 1;
+  }
+  tsDiagByDir = byDir;
+  const total = Object.values(byDir).reduce((s, n) => s + n, 0);
+  await rset(TS_DIAG_KEY, { byDir, generatedAt: new Date().toISOString(), total }, TS_DIAG_TTL);
+  console.log(`✅ tsc: ${total} errors cached across ${Object.keys(byDir).length} dirs`);
+}
+
+await loadTsDiagnostics();
 
 // ── File discovery ────────────────────────────────────────────────────────────
 
@@ -365,6 +444,20 @@ for (const filePath of walk(scanRoot)) {
 
   // Full-content hash for cache key (vs prior 4KB-prefix hash which missed late-file edits).
   const contentHash = createHash('sha1').update(src).digest('hex').slice(0, 16);
+
+  // Gradient checkpoint resume: skip files already indexed in a prior interrupted run.
+  if (RESUME && checkpointHashes.has(contentHash)) {
+    // Still need to load meta from Redis cache so aggregation is complete.
+    const cacheKey = `code:index:meta:${META_CACHE_VERSION}:${contentHash}`;
+    let meta = await rget(cacheKey);
+    if (meta && meta.rel) {
+      if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
+      cacheHits++;
+      files.push(meta);
+    }
+    continue;
+  }
+
   const cacheKey = `code:index:meta:${META_CACHE_VERSION}:${contentHash}`;
   let meta = await rget(cacheKey);
 
@@ -380,6 +473,11 @@ for (const filePath of walk(scanRoot)) {
     await rset(cacheKey, metaForCache);
   }
   files.push(meta);
+
+  // Gradient checkpoint: flush batch every CHECKPOINT_EVERY files so interrupted runs can resume.
+  checkpointPendingHashes.push(contentHash);
+  checkpointBatchCount++;
+  if (checkpointBatchCount % CHECKPOINT_EVERY === 0) await flushCheckpoint();
 
   if (meta.isRoute)              routeCount++;
   if (meta.isSvelteComp)         componentCount++;
@@ -597,6 +695,8 @@ for (const f of files.filter(f => f.isRoute)) {
 // ── Directory-level aggregation ───────────────────────────────────────────────
 
 const dirMap = {};
+// filesByDir: dir → file meta objects (leaf depth only) — used for representativeFiles ranking
+const filesByDir = {};
 for (const f of files) {
   const parts = f.rel.split('/').filter(Boolean);
   if (parts.length < 2) continue;
@@ -612,7 +712,12 @@ for (const f of files) {
       };
     }
     const e = dirMap[dir];
-    if (d === depth) e.files.push(f.rel);
+    if (d === depth) {
+      e.files.push(f.rel);
+      // Keep full meta object for ranking in wiki notes
+      if (!filesByDir[dir]) filesByDir[dir] = [];
+      filesByDir[dir].push(f);
+    }
     e.todos        += f.todos.length;
     e.lines        += f.lineCount;
     e.fanInTotal   += f.fanIn ?? 0;
@@ -681,17 +786,24 @@ for (const d of dirRows) {
     purpose:  `Directory audit: ${d.dir}`,
     summary:  d.summary,
     dominantTags: d.tagList,
-    representativeFiles: [], topologicalNeighbors: [], relatedErrors: [], patterns: [],
+    // Top-5 files by fanIn score (most imported = most representative)
+    representativeFiles: (filesByDir[d.dir] ?? [])
+      .sort((a, b) => (b.fanIn ?? 0) - (a.fanIn ?? 0))
+      .slice(0, 5)
+      .map(f => f.rel),
+    topologicalNeighbors: [], relatedErrors: [], patterns: [],
     warnings: [
       ...(d.score < 40          ? [`Low quality score: ${d.score}`]        : []),
       ...(d.ssrUnsafe > 0       ? [`${d.ssrUnsafe} SSR-unsafe globals`]    : []),
       ...(d.sv4Legacy > 0       ? [`${d.sv4Legacy} Svelte 4 legacy patterns`] : []),
       ...(d.localhostRefs > 0   ? [`Hardcoded localhost refs`]              : []),
       ...(d.noTest > 0          ? [`${d.noTest} routes lack test pairing`]  : []),
+      ...(tsDiagByDir[d.dir] > 0 ? [`${tsDiagByDir[d.dir]} TypeScript errors`] : []),
     ],
     pageRankTop5: [], directoryPath: d.dir, auditScore: d.score,
     auditMetrics: {
-      fileCount: d.fileCount, lineCount: d.lines, tsErrors: 0,
+      fileCount: d.fileCount, lineCount: d.lines,
+      tsErrors: tsDiagByDir[d.dir] ?? 0,
       todoCount: d.todos, apiCount: d.apis, authCount: d.auth,
       zodCount: d.zod, ssrUnsafeCount: d.ssrUnsafe, sv4LegacyCount: d.sv4Legacy,
       noTestCount: d.noTest, dynImportCount: d.dynImports,
@@ -1148,4 +1260,9 @@ console.log(`   KV cache: ${cacheHits} hit / ${cacheMisses} miss (${hitRate}% hi
 console.log(`   Redis wiki:note:dir: ${redis ? dirRows.length + ' written' : 'skipped (no Redis)'}`);
 console.log(`   Outputs: docs/graph/codebase-graph.json  docs/graph/codebase-map.md`);
 
-if (redis) await redis.quit();
+// Flush any remaining checkpoint batch then clear the key — run completed successfully.
+await flushCheckpoint();
+if (redis) {
+  try { await redis.del(CHECKPOINT_KEY); } catch { /* non-fatal */ }
+  await redis.quit();
+}
