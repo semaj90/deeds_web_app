@@ -2,8 +2,12 @@
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "module": "esnext",
-    "target": "es2022",
-    "lib": ["es2023", "esnext.disposable", "dom"],
+    // TS 7 (tsgo) target bump — gives access to ES2025 stdlib features:
+    //   Promise.withResolvers, Iterator Helpers (.map/.filter on iterators),
+    //   Set methods (.union/.intersection/.difference), Object.groupBy.
+    // CLAUDE.md flags these as already usable; this lets tsgo + tsc resolve them.
+    "target": "es2024",
+    "lib": ["es2025", "esnext.disposable", "dom"],
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noEmit": true,
@@ -13,6 +17,11 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    // TS 7 / Node native-TS-execution friendly: forces explicit
+    // `import type` vs `import` so transpilation is purely erasure.
+    // (Note: NOT enabling erasableSyntaxOnly yet — repo has 8 enums + 11
+    // parameter-property constructors that would need refactor first.)
+    "verbatimModuleSyntax": false,
     "types": [
       "svelte",
       "node",
