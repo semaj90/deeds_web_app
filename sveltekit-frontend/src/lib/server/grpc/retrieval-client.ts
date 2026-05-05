@@ -663,7 +663,25 @@ export async function getClusterSummaryViaGrpc(
   clusterType: 'gpu' | 'som' = 'gpu'
 ): Promise<ClusterSummaryLookupResponse | null> {
   const response = await callGrpcMethod<any>('getClusterSummary', { clusterId, clusterType });
-  return response ? mapClusterSummaryResponse(response) : null;
+  const mapped = response ? mapClusterSummaryResponse(response) : null;
+
+  // Fire-and-forget: cache the cluster summary at a synthetic cluster:<id> path
+  // so ACE preflight can pull it via getLlmOutputHit on the same key. KAG-tagged
+  // because cluster summaries are produced by KAG-style graph traversal of files.
+  if (mapped?.summary) {
+    void (async () => {
+      try {
+        const { recordKagAnswer } = await import('$lib/server/cache/code-llm-index.js');
+        await recordKagAnswer(`cluster:${clusterType}:${clusterId}`, mapped.summary, {
+          glyphClusterId: clusterId,
+          tokensUsed:     Math.ceil(mapped.summary.length / 4),
+          model:          'gemma4-legal-vlm:latest',
+        });
+      } catch { /* non-fatal */ }
+    })();
+  }
+
+  return mapped;
 }
 
 export async function expandAstNeighborsViaGrpc(
@@ -681,7 +699,32 @@ export async function getTopologyContextViaGrpc(
   radius = 1
 ): Promise<TopologyContextResponse | null> {
   const response = await callGrpcMethod<any>('getTopologyContext', { bmuRow, bmuCol, radius });
-  return response ? mapTopologyResponse(response) : null;
+  const mapped = response ? mapTopologyResponse(response) : null;
+
+  // Fire-and-forget: cache topology neighborhood as a DAG-style entry. The path
+  // key encodes the SOM coords so re-queries within the same neighborhood hit
+  // the cache. The body is a synthesized neighbor-list summary for ACE preflight.
+  if (mapped?.neighbors?.length) {
+    void (async () => {
+      try {
+        const { recordDagAnswer } = await import('$lib/server/cache/code-llm-index.js');
+        const summary = `SOM cell (${bmuRow},${bmuCol}) neighborhood (radius ${radius}): ${mapped.neighbors.length} neighbors. ` +
+          `Top files: ${mapped.neighbors.slice(0, 3).map((n) => n.filePath).filter(Boolean).join(', ')}.`;
+        const clusterIdRaw = mapped.clusterMetadata?.clusterId;
+        const clusterIdNum = typeof clusterIdRaw === 'number'
+          ? clusterIdRaw
+          : (clusterIdRaw != null && /^\d+$/.test(String(clusterIdRaw))
+              ? parseInt(String(clusterIdRaw), 10)
+              : undefined);
+        await recordDagAnswer(`som:${bmuRow}:${bmuCol}:r${radius}`, summary, {
+          glyphClusterId: clusterIdNum,
+          tokensUsed:     Math.ceil(summary.length / 4),
+        });
+      } catch { /* non-fatal */ }
+    })();
+  }
+
+  return mapped;
 }
 
 export async function getResearchContextViaGrpc(opts: {
