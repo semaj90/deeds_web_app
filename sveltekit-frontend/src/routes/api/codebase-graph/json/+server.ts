@@ -52,6 +52,7 @@ interface RawGraph {
   mode?:        string;
   fileCount?:   number;
   createdAt?:   string;
+  meta?:        { createdAt?: string; fileCount?: number; mode?: string };
 }
 
 // ── In-process mtime cache ───────────────────────────────────────────────────
@@ -102,6 +103,15 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       { error: 'codebase-graph.json not found. Run `npm run index:codebase:fast` first.', nodes: [], edges: [], stats: {} },
       { status: 424 }
     );
+  }
+
+  // raw=1 — return files[] array directly for GraphifyViewer (no node/edge transform)
+  const raw = url.searchParams.get('raw') === '1';
+  if (raw) {
+    const files = (graph.files ?? []).slice(0, 5000);
+    return json({ files, meta: graph.meta ?? {} }, {
+      headers: { 'cache-control': 'public, max-age=60' },
+    });
   }
 
   const limit    = Math.min(Math.max(parseInt(url.searchParams.get('limit') ?? '500', 10) || 500, 1), 5000);

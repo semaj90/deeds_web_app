@@ -1,27 +1,27 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-04T05:06:08.792Z
+> Generated: 2026-05-05T01:17:23.685Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 2579 |
-| Routes | 874 |
-| Components | 848 |
-| API handlers | 582 |
+| Files | 3374 |
+| Routes | 876 |
+| Components | 849 |
+| API handlers | 586 |
 | TODOs | 16 |
-| Dirs | 346 |
+| Dirs | 365 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
-| G4 No auth | 42 |
-| G5 No Zod  | 1 |
-| G11 Localhost | 53 |
+| G4 No auth | 30 |
+| G5 No Zod  | 0 |
+| G11 Localhost | 56 |
 | G14 Svelte4 | 0 |
-| G15 SSR unsafe | 45 |
-| G16 No test | 533 |
-| G20 Cyclic | 1 |
+| G15 SSR unsafe | 8 |
+| G16 No test | 0 |
+| G20 Cyclic | 0 |
 
 ## Files with TODO/FIXME
 - `src/lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte` — 2 marker(s)
