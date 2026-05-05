@@ -619,6 +619,8 @@ src/lib/wasm/dist/
 !CHANGELOG*.txt
 !CONTRIBUTING*.txt
 !python-services/phase46_adapter/requirements.txt
+!sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts
+!sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts
 
 ########################################
 # Go caches & compiled binaries
