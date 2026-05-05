@@ -8685,6 +8685,27 @@
     },
 
     {
+      "label": "🧠 Graphify: Batch GPU Analysis",
+      "type": "shell",
+      "command": "npm run graphify:batch-gpu-analysis",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "8-stage pipeline: codebase map → PageRank enrichment → cluster/SOM audit → Gemma4 glyph summaries → embed → Qdrant upsert → tag write-back → ACE hit logging → report → smoke. Full run ~5-10 min. Use :test (--limit 10) or :dry for quick checks.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Graphify: ACE Smoke (retrieval probe)",
+      "type": "shell",
+      "command": "npm run graphify:ace-smoke",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Probe /api/graph/bow-texture + /api/graph/traverse to verify glyph embeddings are reachable via ACE. ~5s. Run after batch GPU analysis to confirm end-to-end wiring.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
       "label": "📈 Graphify: Analyze → next_steps plan",
       "type": "shell",
       "command": "npm run analyze:graph",
