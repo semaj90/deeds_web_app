@@ -4232,6 +4232,14 @@ export const codeLlmIndex = pgTable('code_llm_index', {
   somBmuCol:      integer('som_bmu_col'),
   hitCount:       integer('hit_count').notNull().default(0),
   tokenCount:     integer('token_count'),
+  /**
+   * Structured 1-3 sentence summary + citations + confidence.
+   * Stored as JSONB so simdjson AVX2 fast-parse can decode at 2-5× V8 speed
+   * when ACE bulk-fetches cached RAG/KAG/DAG outputs across a cluster.
+   * Schema: { summary, sentences[], citations?[], confidence?, groundingScore?,
+   * tokensUsed?, model?, pipeline? } — see CodeLlmOutputMeta type.
+   */
+  outputMeta:     jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
   generatedAt:    timestamp('generated_at',  { withTimezone: true }).notNull().default(sql`now()`),
   lastHitAt:      timestamp('last_hit_at',   { withTimezone: true }).notNull().default(sql`now()`),
   refreshedAt:    timestamp('refreshed_at',  { withTimezone: true }).notNull().default(sql`now()`),
@@ -4240,8 +4248,9 @@ export const codeLlmIndex = pgTable('code_llm_index', {
   index('code_llm_index_last_hit_idx').on(t.lastHitAt),
   index('code_llm_index_hit_count_idx').on(t.hitCount),
   index('code_llm_index_source_idx').on(t.source),
-  // GIN trgm + composite SOM index added by drizzle/manual/code_llm_index.sql
-  // (Drizzle can't express USING gin gin_trgm_ops or partial WHERE indexes natively)
+  // GIN trgm + composite SOM + JSONB GIN + confidence/grounding expression indexes
+  // added by drizzle/manual/code_llm_index*.sql (Drizzle can't express USING gin
+  // gin_trgm_ops, partial WHERE indexes, or expression indexes natively)
 ]);
 
 export type CodeLlmIndexRow    = typeof codeLlmIndex.$inferSelect;

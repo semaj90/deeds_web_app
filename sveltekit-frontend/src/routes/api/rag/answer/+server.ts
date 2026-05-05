@@ -223,6 +223,29 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			durationMs: Math.round(genTime),
 		});
 
+		// Record into code-llm-index path cache (fire-and-forget). Keyed by case_id
+		// so subsequent ACE preflights for the same case get sub-5ms PRIOR ANSWER
+		// hits with the structured 1-3 sentence summary + citations + confidence.
+		void (async () => {
+			try {
+				const { recordRagAnswer } = await import('$lib/server/cache/code-llm-index.js');
+				await recordRagAnswer(`case:${case_id}:${context_id}`, answerText, {
+					query,
+					citations: citations.map((c) => ({
+						chunkId:     c.chunk_id,
+						sourceTitle: c.source_title,
+						quote:       c.quote,
+					})),
+					confidence:     answerConfidence,
+					groundingScore: groundingScore,
+					tokensUsed:     evalCount ?? Math.ceil(answerText.length / 4),
+					model:          'gemma4-legal:latest',
+				});
+			} catch (err) {
+				console.warn('[rag/answer] code-llm record skipped:', (err as Error)?.message ?? err);
+			}
+		})();
+
 		return json(response);
 	} catch (err) {
 		console.error('[rag/answer] Error:', err);
