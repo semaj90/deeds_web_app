@@ -62,6 +62,10 @@ import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { rerankChunksGRPO } from '$lib/server/retrieval/langextract-reranker.js';
 import { recallPastChats } from './chat-memory.js';
+import {
+  getLlmOutputHitsBulk,
+  recordLlmOutputHit,
+} from '$lib/server/cache/code-llm-index.js';
 import { getRedis } from '$lib/server/redis.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
@@ -648,10 +652,41 @@ export async function assembleACEContext(opts: {
         }
       }
 
+      // ─── code-llm-index path-level preflight ─────────────────────────────
+      // File-specific LLM output cache. More targeted than agentsMd (per-dir).
+      // When the same file is queried twice within the 6h TTL we serve the
+      // prior LLM synthesis verbatim — sub-5ms Redis hit. The prompt builder
+      // injects this above raw chunks so the model can refine vs re-derive.
+      let codeLlmHit: ACEContext['codeLlmHit'] = null;
+      if (opts.filePath) {
+        try {
+          const { getLlmOutputHit } = await import('$lib/server/cache/code-llm-index.js');
+          // Static import is also available at top of file; the dynamic import is
+          // retained here only to keep this block side-effect-free if the module
+          // is unavailable at startup. Both resolve to the same singleton.
+          const hit = await getLlmOutputHit(opts.filePath);
+          if (hit) {
+            codeLlmHit = {
+              path:           hit.path,
+              source:         hit.source,
+              llmOutput:      hit.llmOutput,
+              // hitCount was incremented to (priorHits + 1) on this read; report the prior count
+              priorHits:      Math.max(0, (hit.hitCount ?? 1) - 1),
+              glyphClusterId: hit.glyphClusterId,
+              generatedAt:    hit.generatedAt,
+              tokenCount:     hit.tokenCount,
+            };
+          }
+        } catch (err) {
+          console.warn('[ACE code-llm preflight] skipped:', (err as Error)?.message ?? err);
+        }
+      }
+
       const finalContext = {
         ...baseContext,
         policyDecision,
         agentsMd,
+        codeLlmHit,
       };
 
       // Fire-and-forget: persist top chunks to ace_chunks for future cache hits
@@ -2471,10 +2506,28 @@ async function applyKarpathyBoost(
     return { ...c, score: final, rerankBreakdown: breakdown };
   });
 
-  return boosted
+  const top = boosted
     .sort((a, b) => b.score - a.score)
     .slice(0, 5)
     .filter((r) => r.score >= 0.45);
+
+  // Step 7: attach cached LLM outputs from code-llm-index (single MGET, <5ms)
+  // Path-keyed cache lets two queries that touch the same file share a synthesis
+  // without going back to the LLM.
+  if (top.length > 0) {
+    try {
+      const hits = await getLlmOutputHitsBulk(top.map((c) => c.filePath));
+      for (let i = 0; i < top.length; i++) {
+        const hit = hits[i];
+        if (hit) {
+          top[i].cachedLlmOutput = hit.llmOutput;
+          top[i].cachedLlmSource = hit.source;
+        }
+      }
+    } catch {/* best-effort — cache miss is fine */}
+  }
+
+  return top;
 }
 
 function extractPracticeArea(

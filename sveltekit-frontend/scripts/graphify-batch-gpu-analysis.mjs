@@ -564,6 +564,26 @@ async function processGlyphBatch(batch) {
       const noteKey = key ?? `wiki:note:dir:dir:${dir.replace(/[^a-z0-9]/gi, '_')}`;
       await rset(noteKey, updatedNote, WIKI_TTL);
 
+      // code-llm-index: path-level Redis entry so ACE preflight gets sub-5ms hit on this dir
+      // Stores under code:llm_output:path:<sha1(dir)> with hot/recent/cluster ZSETs maintained
+      const codeLlmEntry = {
+        path:           dir,
+        pathHash:       crypto.createHash('sha1').update(dir.replace(/\\/g, '/').toLowerCase()).digest('hex').slice(0, 16),
+        isDir:          true,
+        llmOutput:      summary,
+        source:         'gemma4-summary',
+        glyphClusterId: clusterId >= 0 ? clusterId : undefined,
+        generatedAt:    new Date().toISOString(),
+        hitCount:       0,
+        lastHitMs:      Date.now(),
+      };
+      const codeLlmKey = `code:llm_output:path:${codeLlmEntry.pathHash}`;
+      await rset(codeLlmKey, codeLlmEntry, GLYPH_TTL); // 6h
+      if (clusterId >= 0) {
+        await redis.sadd(`code:llm_output:by-cluster:${clusterId}`, codeLlmEntry.pathHash).catch(() => null);
+      }
+      await redis.zadd('code:llm_output:recent', Date.now(), codeLlmEntry.pathHash).catch(() => null);
+
       log(`  ${c.green('✓')} ${dir.split('/').slice(-2).join('/')} → id=${pointId} [${llmSource}]`);
       glyphOk++;
     } catch (err) {
@@ -592,6 +612,7 @@ stage('4.5', 'NES-arch write-back (agents:dir:* + summary:cluster:*)');
 // agents:dir:<rel> — NES-arch preflight keys read by getAgentsMdQuickHit() in context-assembler
 // Format mirrors generate-agents-md.mjs output so both paths produce the same schema
 let agentsWritten = 0;
+let codeLlmWritten = 0;
 if (!DRY_RUN) {
   for (const [dir, dfiles] of dirMap) {
     const wikiEntry   = wikiNotes.get(dir);
@@ -622,6 +643,38 @@ if (!DRY_RUN) {
     agentsWritten++;
   }
   log(`  ${c.green('✓')} agents:dir:* keys written: ${agentsWritten}`);
+
+  // Backfill code:llm_output:* for every dir that has a Gemma4 summary so ACE
+  // path-level preflight gets cache hits even for dirs we didn't reprocess.
+  for (const [dir, dfiles] of dirMap) {
+    const wikiEntry = wikiNotes.get(dir);
+    const note      = wikiEntry?.note ?? null;
+    const summary   = note?.gemma4Summary ?? note?.summary ?? null;
+    if (!summary) continue;
+
+    const clusterId = dirClusterMap.get(dir) ?? -1;
+    const pathNorm  = dir.replace(/\\/g, '/').toLowerCase();
+    const pathHash  = crypto.createHash('sha1').update(pathNorm).digest('hex').slice(0, 16);
+
+    const codeLlmEntry = {
+      path:           dir,
+      pathHash,
+      isDir:          true,
+      llmOutput:      summary,
+      source:         'gemma4-summary',
+      glyphClusterId: clusterId >= 0 ? clusterId : undefined,
+      generatedAt:    note?.summaryUpdatedAt ?? new Date().toISOString(),
+      hitCount:       0,
+      lastHitMs:      Date.now(),
+      tokenCount:     Math.ceil(summary.length / 4), // rough estimate
+    };
+    await rset(`code:llm_output:path:${pathHash}`, codeLlmEntry, GLYPH_TTL);
+    if (clusterId >= 0) {
+      await redis.sadd(`code:llm_output:by-cluster:${clusterId}`, pathHash).catch(() => null);
+    }
+    codeLlmWritten++;
+  }
+  log(`  ${c.green('✓')} code:llm_output:path:* keys written: ${codeLlmWritten}`);
 } else {
   log(`  ${c.dim('agents:dir:* write skipped (dry-run)')}`);
 }
@@ -775,6 +828,7 @@ const report = {
     tagsUpdated:     tagUpdated,
     agentsWritten,
     clusterSummaries: clusterSummariesWritten,
+    codeLlmWritten,
     turboUsed:       turboHealthy,
   },
   topDirectoriesByPageRank: [...dirPageRank.entries()]
@@ -883,6 +937,7 @@ log(`  PageRank:   ${prSource} (${Object.keys(pageRankScores).length} entries)`)
 log(`  Tags:       ${tagUpdated} Qdrant points patched`);
 log(`  agents:dir: ${agentsWritten} NES-arch preflight keys`);
 log(`  clusters:   ${clusterSummariesWritten} summary:cluster:* keys (llms.txt feed)`);
+log(`  code-llm:   ${codeLlmWritten} code:llm_output:path:* keys (ACE path preflight)`);
 log(`  TurboQuant: ${turboHealthy ? c.green('cache_prompt active') : c.yellow('fell back to Ollama')}`);
 log(`  Reports:    ${DRY_RUN ? '(dry-run)' : 'docs/graph/batch-gpu-analysis-report.{json,md}'}`);
 if (DRY_RUN) log(`\n  ${c.yellow('DRY RUN — no Redis/Qdrant/Postgres writes performed')}`);

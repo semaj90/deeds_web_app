@@ -189,6 +189,10 @@ export interface ACEContext {
     somBmuRow?: number | null;
     somBmuCol?: number | null;
     rerankBreakdown?: RerankBreakdown | null;
+    /** Precomputed LLM output for this path from code-llm-index Redis cache */
+    cachedLlmOutput?: string | null;
+    /** Source pipeline of the cached LLM output */
+    cachedLlmSource?: 'ace' | 'gemma4-summary' | 'kag' | 'rag' | 'agent' | 'other' | null;
   }> | null;
   /** GPU cluster narratives (compiled knowledge from k-means clustering) */
   clusterNarratives?: Array<{
@@ -232,6 +236,30 @@ export interface ACEContext {
     ttlSeconds: number | null;
     /** Whether this is a fallback to the repo-root AGENTS.md */
     fallbackToRoot: boolean;
+  } | null;
+  /**
+   * Path-level LLM output cache hit (code-llm-index, NES Tiny RAM tier).
+   * Sub-5ms exact-match recall of the last successful LLM synthesis for the
+   * exact filePath the user is asking about. More specific than agentsMd:
+   * agentsMd is per-directory, codeLlmHit is per-file. When present, prompt
+   * builder injects "PRIOR ANSWER:" block above raw chunks so the model can
+   * reuse or refine the cached output instead of re-deriving from scratch.
+   */
+  codeLlmHit?: {
+    /** Canonical normalised path */
+    path: string;
+    /** Pipeline that generated the cached output */
+    source: 'ace' | 'gemma4-summary' | 'kag' | 'rag' | 'agent' | 'other';
+    /** Cached LLM synthesis */
+    llmOutput: string;
+    /** Hit count BEFORE this lookup (informative for staleness heuristics) */
+    priorHits: number;
+    /** Glyph cluster this entry belongs to, if known */
+    glyphClusterId?: number;
+    /** When the cached output was generated */
+    generatedAt: string;
+    /** Token count of the cached output */
+    tokenCount?: number;
   } | null;
 }
 
