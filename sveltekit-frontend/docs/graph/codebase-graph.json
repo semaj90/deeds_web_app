@@ -415,7 +415,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 52,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/ai/citation-cache.ts",
@@ -548,7 +552,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 14,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/ai/client-llm-synthesis.ts",
@@ -770,7 +778,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/lib/ai/emotion-context.ts",
@@ -1264,7 +1276,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/cache/indexdb-cache.svelte.ts",
@@ -1305,7 +1321,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/cache/loki-cache.svelte.ts",
@@ -1597,7 +1617,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/client/workflow-event-stream.ts",
@@ -1937,7 +1961,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 7,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/agent/AutonomousInvestigator.svelte",
@@ -2301,7 +2329,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ai/AIStatusIndicator.svelte",
@@ -2898,7 +2930,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ai/EnhancedDocumentUploader.svelte",
@@ -3121,7 +3157,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ai/GamingAIButton.svelte",
@@ -3744,7 +3784,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ai/SmartSearchInterface.svelte",
@@ -3981,7 +4025,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/analysis/AnalysisPanel.svelte",
@@ -5200,7 +5248,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 2,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/lib/components/cases/EvidenceCard.svelte",
@@ -5286,7 +5338,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 18,
+      "somBmuRow": 6,
+      "somBmuCol": 7,
+      "somCluster": 55
     },
     {
       "rel": "src/lib/components/cases/StreamingAnalysisPanel.svelte",
@@ -6554,7 +6610,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ContextConfirmModal.svelte",
@@ -7001,7 +7061,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/lib/components/dashboard/index.ts",
@@ -8141,7 +8205,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 86,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/components/evidence/board-persistence.svelte.ts",
@@ -8187,7 +8255,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 59,
+      "somBmuRow": 1,
+      "somBmuCol": 7,
+      "somCluster": 15
     },
     {
       "rel": "src/lib/components/evidence/BoardMinimap.svelte",
@@ -8262,7 +8334,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/lib/components/evidence/CaseEvidenceOrganizer.svelte",
@@ -8429,7 +8505,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 29,
+      "somBmuRow": 6,
+      "somBmuCol": 5,
+      "somCluster": 53
     },
     {
       "rel": "src/lib/components/evidence/EvidenceAdvancedToolsMenu.svelte",
@@ -8752,7 +8832,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/evidence/EvidenceCanvas.svelte",
@@ -9715,7 +9799,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/evidence/VisionImageAnalyzer.svelte",
@@ -10192,7 +10280,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 1,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/components/forms/SmartDocumentForm.svelte",
@@ -10680,7 +10772,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/lib/components/legal/CitationSaveTooltip.svelte",
@@ -11207,7 +11303,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/legal/IngestionProgress.svelte",
@@ -11398,7 +11498,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/lib/components/legal/LegalResearchSpellbook.svelte",
@@ -11435,7 +11539,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/legal/OfficialTextPane.svelte",
@@ -12410,7 +12518,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/legal-corpus/CitedSourcesDrawer.svelte",
@@ -12490,7 +12602,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/legal-corpus/LegalBreadcrumbs.svelte",
@@ -15660,7 +15776,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/AILoadingIndicator.svelte",
@@ -16191,7 +16311,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/alert-dialog/index.js",
@@ -16281,7 +16405,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 4,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/AuthModal.svelte",
@@ -18685,7 +18813,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 4,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/Dialog.svelte",
@@ -18837,7 +18969,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 41,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/ui/dropdown/Svelte5DropdownMenu.svelte",
@@ -19232,7 +19368,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/FeedbackButtons.svelte",
@@ -20015,7 +20155,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/gaming/n64/HTML5Canvas.svelte",
@@ -20834,7 +20978,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/gaming/n64/N64Select.svelte",
@@ -21104,7 +21252,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 52,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/components/ui/gaming/n64/N64Checkbox.svelte",
@@ -21342,7 +21494,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 30,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/components/ui/gaming/types/gaming-types.ts",
@@ -21388,7 +21544,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 30,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/components/ui/GlobalCommandPalette.svelte",
@@ -21558,7 +21718,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 34,
+      "somBmuRow": 3,
+      "somBmuCol": 5,
+      "somCluster": 29
     },
     {
       "rel": "src/lib/components/ui/IconContainer.svelte",
@@ -21835,7 +21999,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/Input.svelte",
@@ -22368,7 +22536,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 4,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/NESElementsShowcase.svelte",
@@ -23326,7 +23498,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/select/SelectTrigger.svelte",
@@ -24018,7 +24194,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 67,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/tabs/Svelte5TabPanel.svelte",
@@ -24341,7 +24521,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 4,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/TagInput.svelte",
@@ -24939,7 +25123,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 50,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/ui/wrappers/bits/bits-overrides.ts",
@@ -25770,7 +25958,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/yorha/EvidenceBoard.svelte",
@@ -25883,7 +26075,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 97,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
@@ -26660,7 +26856,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 75,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/config/env.server.ts",
@@ -26720,7 +26920,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 75,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/config/env.ts",
@@ -26888,7 +27092,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 75,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/config/retro-console-palettes.ts",
@@ -27373,7 +27581,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 86,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/db/client-db.ts",
@@ -27477,7 +27689,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 57,
+      "somBmuRow": 2,
+      "somBmuCol": 4,
+      "somCluster": 20
     },
     {
       "rel": "src/lib/db/queries/route-health-archive.ts",
@@ -27642,7 +27858,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 60,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/db/schema/cutlass.ts",
@@ -27749,7 +27969,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/db/schema/gpuInferenceDemo.ts",
@@ -27794,7 +28018,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 55,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/db/schema/route-health-tables.ts",
@@ -27856,7 +28084,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 91,
+      "somBmuRow": 1,
+      "somBmuCol": 4,
+      "somCluster": 12
     },
     {
       "rel": "src/lib/db/schema/yorha.ts",
@@ -27973,7 +28205,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 91,
+      "somBmuRow": 1,
+      "somBmuCol": 4,
+      "somCluster": 12
     },
     {
       "rel": "src/lib/db/vite-error-schema.ts",
@@ -28035,7 +28271,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 91,
+      "somBmuRow": 1,
+      "somBmuCol": 4,
+      "somCluster": 12
     },
     {
       "rel": "src/lib/env/index.ts",
@@ -28150,7 +28390,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 78,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/features/evidence-command-center/CommandCenterShell.svelte",
@@ -28261,7 +28505,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/features/evidence-command-center/EvidenceCommandPalette.svelte",
@@ -28458,7 +28706,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 23,
+      "somBmuRow": 7,
+      "somBmuCol": 5,
+      "somCluster": 61
     },
     {
       "rel": "src/lib/gpu/gpu-embedding-bridge.ts",
@@ -28918,7 +29170,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 20,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/gpu/webgpu-palace-compression.ts",
@@ -29576,7 +29832,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 4,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/index.ts",
@@ -29833,7 +30093,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/machines/evidence-lifecycle-machine.ts",
@@ -29875,7 +30139,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/machines/evidence-processing-machine.ts",
@@ -30046,7 +30314,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 74,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/machines/uploadMachine.ts",
@@ -30232,7 +30504,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 23,
+      "somBmuRow": 7,
+      "somBmuCol": 5,
+      "somCluster": 61
     },
     {
       "rel": "src/lib/schemas/auth.ts",
@@ -30317,7 +30593,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 78,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/schemas/evidence-upload.ts",
@@ -30376,7 +30656,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 78,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/schemas/evidence.ts",
@@ -30418,7 +30702,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 29,
+      "somBmuRow": 6,
+      "somBmuCol": 5,
+      "somCluster": 53
     },
     {
       "rel": "src/lib/schemas/forms.ts",
@@ -30629,7 +30917,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 32,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/schemas/tools/llm-log.schema.json",
@@ -30905,7 +31197,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 72,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/ace/auto-tagger.ts",
@@ -31139,7 +31435,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 72,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/ace/error-kag-writer.ts",
@@ -31241,7 +31541,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/lib/server/ace/policy.ts",
@@ -31284,7 +31588,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 72,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/ace/practice-templates.ts",
@@ -31505,7 +31813,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 6,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/ace/types.ts",
@@ -31639,7 +31951,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 39,
+      "somBmuRow": 3,
+      "somBmuCol": 2,
+      "somCluster": 26
     },
     {
       "rel": "src/lib/server/acp/phase90-tools.ts",
@@ -31896,7 +32212,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 74,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/agent/supervisor.ts",
@@ -32746,7 +33066,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 78,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/server/ai/langgraph-client.ts",
@@ -32798,7 +33122,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 46,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/server/ai/langgraph-research.ts",
@@ -32850,7 +33178,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 72,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/ai/legal-reasoning-chain.ts",
@@ -33104,7 +33436,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 19,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/ai/ollama-config.ts",
@@ -33149,7 +33485,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 87,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/ai/onnx-server.ts",
@@ -33438,7 +33778,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 54,
+      "somBmuRow": 3,
+      "somBmuCol": 2,
+      "somCluster": 26
     },
     {
       "rel": "src/lib/server/analysis/batch-error-analysis.ts",
@@ -33573,7 +33917,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 66,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/analysis/evidence-analysis-pipeline.ts",
@@ -33980,7 +34328,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/analytics/architectural-guard.ts",
@@ -34573,7 +34925,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 60,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/analytics/unified-research-query.ts",
@@ -35105,7 +35461,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 84,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/lib/server/audit/gpu-audit-orchestrator.ts",
@@ -35163,7 +35523,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 84,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/lib/server/auth/password.ts",
@@ -35245,7 +35609,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 90,
+      "somBmuRow": 0,
+      "somBmuCol": 2,
+      "somCluster": 2
     },
     {
       "rel": "src/lib/server/auth-helpers.ts",
@@ -35345,7 +35713,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 90,
+      "somBmuRow": 0,
+      "somBmuCol": 2,
+      "somCluster": 2
     },
     {
       "rel": "src/lib/server/batch-embedder.ts",
@@ -35491,7 +35863,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 49,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/lib/server/cache/dag-cache.ts",
@@ -35647,7 +36023,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/cache/redis-exact-match.ts",
@@ -35749,7 +36129,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/cache/warm-up.ts",
@@ -35845,7 +36229,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/server/cache-metrics.ts",
@@ -35935,7 +36323,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/cartridge/chr97-builder.ts",
@@ -35981,7 +36373,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 12,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/server/cartridge/glyph-mappers.ts",
@@ -36032,7 +36428,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 86,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/server/cartridge/glyph-record.ts",
@@ -36130,7 +36530,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 22,
+      "somBmuRow": 6,
+      "somBmuCol": 1,
+      "somCluster": 49
     },
     {
       "rel": "src/lib/server/cartridge/index.ts",
@@ -36512,7 +36916,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 61,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/concurrency/queue-manager.ts",
@@ -36733,7 +37141,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 75,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/config/vector-config.ts",
@@ -36841,7 +37253,11 @@
         "http://localhost:8001",
         "http://localhost:6333"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 75,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/connections/connection-pool.ts",
@@ -37256,7 +37672,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 15,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/drizzle-cache.ts",
@@ -37433,7 +37853,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 52,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/server/db/health-check.ts",
@@ -37682,7 +38106,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 91,
+      "somBmuRow": 1,
+      "somBmuCol": 4,
+      "somCluster": 12
     },
     {
       "rel": "src/lib/server/db/legal-db-init.ts",
@@ -37997,7 +38425,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 48,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/server/db/mirror-query.ts",
@@ -38136,7 +38568,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 6,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/pgvector-utils.ts",
@@ -38186,7 +38622,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 15,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/postgres-knowledge.ts",
@@ -38240,7 +38680,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 6,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/qdrant-integration.ts",
@@ -38341,7 +38785,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 6,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/queries.ts",
@@ -38476,7 +38924,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 88,
+      "somBmuRow": 0,
+      "somBmuCol": 4,
+      "somCluster": 4
     },
     {
       "rel": "src/lib/server/db/schema/ace-web-crawl.ts",
@@ -38526,7 +38978,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/server/db/schema/ai_chat.ts",
@@ -38930,7 +39386,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 91,
+      "somBmuRow": 1,
+      "somBmuCol": 4,
+      "somCluster": 12
     },
     {
       "rel": "src/lib/server/db/schema/error_feedback.ts",
@@ -39196,7 +39656,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 55,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/server/db/schema/jurisdictions.ts",
@@ -39335,7 +39799,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/server/db/schema/legal-citations.ts",
@@ -39382,7 +39850,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 53,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/db/schema/legal-definitions.ts",
@@ -39536,7 +40008,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 88,
+      "somBmuRow": 0,
+      "somBmuCol": 4,
+      "somCluster": 4
     },
     {
       "rel": "src/lib/server/db/schema/library-document-versions.ts",
@@ -39852,7 +40328,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/server/db/schema/route_metadata.ts",
@@ -39958,7 +40438,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/server/db/schema/state-constitution-sources.ts",
@@ -40004,7 +40488,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/server/db/schema-actual.ts",
@@ -40190,7 +40678,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 13,
+      "somBmuRow": 0,
+      "somBmuCol": 1,
+      "somCluster": 1
     },
     {
       "rel": "src/lib/server/db/schema-chat.ts",
@@ -40239,7 +40731,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 53,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/db/schema-enhanced.ts",
@@ -40345,7 +40841,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 53,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/db/schema-gpu-cache.ts",
@@ -40408,7 +40908,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 98,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/schema-gpu-metrics.d.ts",
@@ -40534,7 +41038,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 53,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/db/schema-old.ts",
@@ -40617,7 +41125,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 48,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/server/db/schema-phase78.ts",
@@ -40678,7 +41190,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 55,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/server/db/schema-phase89-preserved.ts",
@@ -40740,7 +41256,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 13,
+      "somBmuRow": 0,
+      "somBmuCol": 1,
+      "somCluster": 1
     },
     {
       "rel": "src/lib/server/db/schema-postgres-enhanced.ts",
@@ -40842,7 +41362,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/server/db/schema-prosecutor.ts",
@@ -40982,7 +41506,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 63,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/schema-timeline.ts",
@@ -41027,7 +41555,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 13,
+      "somBmuRow": 0,
+      "somBmuCol": 1,
+      "somCluster": 1
     },
     {
       "rel": "src/lib/server/db/schema-unified.ts",
@@ -41109,7 +41641,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 55,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/server/db/schema-week3-kb.ts",
@@ -41735,7 +42271,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 6,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/db/vector-schema.ts",
@@ -41788,7 +42328,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 88,
+      "somBmuRow": 0,
+      "somBmuCol": 4,
+      "somCluster": 4
     },
     {
       "rel": "src/lib/server/db/verify-canvas-table.ts",
@@ -41894,7 +42438,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 88,
+      "somBmuRow": 0,
+      "somBmuCol": 4,
+      "somCluster": 4
     },
     {
       "rel": "src/lib/server/db/workspace-operations.ts",
@@ -41983,7 +42531,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 56,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/server/docling.ts",
@@ -42034,7 +42586,11 @@
       "localhostRefs": [
         "http://localhost:8085"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 56,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/server/embedding/embed-schema.ts",
@@ -42085,7 +42641,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 95,
+      "somBmuRow": 2,
+      "somBmuCol": 3,
+      "somCluster": 19
     },
     {
       "rel": "src/lib/server/embedding/embed.ts",
@@ -43432,7 +43992,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 66,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/evidence/rabbitmq.ts",
@@ -43599,7 +44163,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 66,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/evidence/services/forensics.ts",
@@ -43718,7 +44286,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/server/evidence/worker-embed.ts",
@@ -43839,7 +44411,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/server/ff1/agent/gemma4-repair-planner.ts",
@@ -44288,7 +44864,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 22,
+      "somBmuRow": 6,
+      "somBmuCol": 1,
+      "somCluster": 49
     },
     {
       "rel": "src/lib/server/gpu/background-analyzer.ts",
@@ -44343,7 +44923,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 80,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/lib/server/gpu/cuda-bridge.ts",
@@ -44496,7 +45080,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 57,
+      "somBmuRow": 2,
+      "somBmuCol": 4,
+      "somCluster": 20
     },
     {
       "rel": "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
@@ -44550,7 +45138,11 @@
       "localhostRefs": [
         "http://127.0.0.1:11434"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/gpu/mapreduce-runner.mjs",
@@ -45013,7 +45605,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/graph/evidence-graph-service.ts",
@@ -45450,7 +46046,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/graph/som-topology-pipeline.ts",
@@ -45538,7 +46138,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 6,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/grpc/chr97-agent-client.ts",
@@ -45677,7 +46281,11 @@
       "localhostRefs": [
         "http://localhost:5173"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/grpc/embedding-client.ts",
@@ -45862,7 +46470,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 20,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/server/grpc/retrieval-client.test.ts",
@@ -45968,7 +46580,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/grpc/tool-calling-client.ts",
@@ -46018,7 +46634,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/grpc/tool-router-client.ts",
@@ -46070,7 +46690,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/helpers/docker-discovery.ts",
@@ -46202,7 +46826,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 99,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/server/indexer/ast-chunker.ts",
@@ -46257,7 +46885,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 58,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/indexer/ast-ingest-logger.ts",
@@ -46505,7 +47137,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 20,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/server/indexer/karpathy-wiki.ts",
@@ -46561,7 +47197,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 74,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/indexer/legal-chunker.ts",
@@ -46894,7 +47534,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 58,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/inference/turbo-prefix-cache.ts",
@@ -47152,7 +47796,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 32,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/knowledge-cache.ts",
@@ -47207,7 +47855,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 25,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/langextract/google-langextract.ts",
@@ -47300,7 +47952,11 @@
         "http://127.0.0.1:8095",
         "http://127.0.0.1:8095"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 66,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/law-mapping.ts",
@@ -47385,7 +48041,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/legal/constitution-pipeline.ts",
@@ -47478,7 +48138,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 89,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/legal/constitution-tagger.ts",
@@ -47557,7 +48221,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/legal/ingestion-worker.ts",
@@ -47652,7 +48320,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/llm/contextual-chat.ts",
@@ -47900,7 +48572,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 72,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/llm/ollamaClient.ts",
@@ -47943,7 +48619,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/lib/server/llm-router.ts",
@@ -48048,7 +48728,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 90,
+      "somBmuRow": 0,
+      "somBmuCol": 2,
+      "somCluster": 2
     },
     {
       "rel": "src/lib/server/mcp/mcp-internal.ts",
@@ -48087,7 +48771,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/mcp/mcp-logger.ts",
@@ -48581,7 +49269,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 75,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/ml/feedback-store.ts",
@@ -48719,7 +49411,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 86,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/server/ml/recommendation-metrics.ts",
@@ -48899,7 +49595,11 @@
       "localhostRefs": [
         "http://localhost:6333"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 69,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/lib/server/ml/user-history.ts",
@@ -49170,7 +49870,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 59,
+      "somBmuRow": 1,
+      "somBmuCol": 7,
+      "somCluster": 15
     },
     {
       "rel": "src/lib/server/observability/langfuse.ts",
@@ -49691,7 +50395,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/lib/server/pgai/analysis.ts",
@@ -49977,7 +50685,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 58,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/pipeline/error-embedding-pipeline.ts",
@@ -50067,7 +50779,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 86,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/server/production-logger.ts",
@@ -50164,7 +50880,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 77,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/qdrant-integration.ts",
@@ -50204,7 +50924,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 6,
+      "somBmuRow": 0,
+      "somBmuCol": 3,
+      "somCluster": 3
     },
     {
       "rel": "src/lib/server/queue/dispatch-inline.ts",
@@ -50611,7 +51335,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/server/rabbitmq.js",
@@ -50703,7 +51431,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/server/rag/evidenceRag.ts",
@@ -50788,7 +51520,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 43,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/server/rag/ranker.ts",
@@ -50827,7 +51563,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/rag/sdk.ts",
@@ -51426,7 +52166,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 43,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/server/research/github-mcp.ts",
@@ -51559,7 +52303,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/research/normalize-html.ts",
@@ -51638,7 +52386,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 43,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/server/research/reddit-search.ts",
@@ -51849,7 +52601,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 58,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/server/retrieval/authority-chain.ts",
@@ -51985,7 +52741,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/retrieval/codebase-context.ts",
@@ -52045,7 +52805,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/retrieval/context-buffer.test.ts",
@@ -52128,7 +52892,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 57,
+      "somBmuRow": 2,
+      "somBmuCol": 4,
+      "somCluster": 20
     },
     {
       "rel": "src/lib/server/retrieval/cross-encoder-reranker.ts",
@@ -52225,7 +52993,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/retrieval/gpu-reranker.ts",
@@ -52320,7 +53092,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/retrieval/graph-informed-retrieval.ts",
@@ -52446,7 +53222,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/retrieval/orchestrator.ts",
@@ -52700,7 +53480,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/retrieval/triton-reranker.ts",
@@ -52878,7 +53662,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 32,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/retrieval/youtube-transcript.ts",
@@ -53060,7 +53848,11 @@
         "http://localhost:8095",
         "http://localhost:8090"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 66,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/services/pipeline-orchestrator.ts",
@@ -53621,7 +54413,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/tools/handlers/index.ts",
@@ -53696,7 +54492,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/lib/server/tools/handlers/langextractBatch.ts",
@@ -53736,7 +54536,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 32,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/tools/handlers/research.ts",
@@ -53877,7 +54681,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 78,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/server/training/query-logger.ts",
@@ -53920,7 +54728,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 82,
+      "somBmuRow": 3,
+      "somBmuCol": 4,
+      "somCluster": 28
     },
     {
       "rel": "src/lib/server/triton-llm.ts",
@@ -54239,7 +55051,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 79,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/types/qdrant.ts",
@@ -54278,7 +55094,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 77,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/types/retrieval.ts",
@@ -54330,7 +55150,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 73,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/types/runtime-globals.d.ts",
@@ -54409,7 +55233,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 46,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/server/unified/legal-ai-service.ts",
@@ -54520,7 +55348,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 19,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/utils/endpoints.ts",
@@ -54986,7 +55818,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 43,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/server/validation/evidence-validators.ts",
@@ -55090,7 +55926,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 43,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/server/validation.ts",
@@ -55297,7 +56137,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 71,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/lib/server/vector/pgvector.ts",
@@ -55342,7 +56186,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 18,
+      "somBmuRow": 6,
+      "somBmuCol": 7,
+      "somCluster": 55
     },
     {
       "rel": "src/lib/server/vector/PgVectorService.ts",
@@ -55535,7 +56383,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 77,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/server/vector/quantize.ts",
@@ -55624,7 +56476,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/server/workers/audio-processor.ts",
@@ -55682,7 +56538,11 @@
         "http://localhost:6333",
         "http://localhost:11434"
       ],
-      "localhostBreaks": true
+      "localhostBreaks": true,
+      "clusterId": 24,
+      "somBmuRow": 6,
+      "somBmuCol": 4,
+      "somCluster": 52
     },
     {
       "rel": "src/lib/server/workers/audio-queue-consumer.ts",
@@ -55723,7 +56583,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 24,
+      "somBmuRow": 6,
+      "somBmuCol": 4,
+      "somCluster": 52
     },
     {
       "rel": "src/lib/server/workers/compute-pool.ts",
@@ -55770,7 +56634,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 17,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/server/workers/document-embed-consumer.ts",
@@ -55873,7 +56741,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 24,
+      "somBmuRow": 6,
+      "somBmuCol": 4,
+      "somCluster": 52
     },
     {
       "rel": "src/lib/server/yolo.ts",
@@ -56008,7 +56880,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 43,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/services/couchdb-client.ts",
@@ -56085,7 +56961,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 17,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/services/error-analysis/DecisionEngine.ts",
@@ -56131,7 +57011,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 17,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/services/error-analysis/ErrorClustering.ts",
@@ -56262,7 +57146,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 19,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/services/error-analysis/FixSynthesizer.ts",
@@ -56305,7 +57193,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 17,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/services/error-analysis/GRPOPolicy.ts",
@@ -56516,7 +57408,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 19,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/services/error-analysis/MetricsCollector.ts",
@@ -56788,7 +57684,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 42,
+      "somBmuRow": 3,
+      "somBmuCol": 0,
+      "somCluster": 24
     },
     {
       "rel": "src/lib/services/knowledge-search/ACPToolRegistry.ts",
@@ -56984,7 +57884,11 @@
       "localhostRefs": [
         "http://localhost:11434"
       ],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 81,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/services/knowledge-search/MinioKnowledgeStore.ts",
@@ -57026,7 +57930,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 17,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/services/knowledge-search/PostgresKnowledgeStore.ts",
@@ -57068,7 +57976,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 17,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
@@ -57110,7 +58022,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 75,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/lib/services/knowledge-search/RedisCacheService.ts",
@@ -57276,7 +58192,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 43,
+      "somBmuRow": 5,
+      "somBmuCol": 0,
+      "somCluster": 40
     },
     {
       "rel": "src/lib/services/qdrant-client.ts",
@@ -57517,7 +58437,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 12,
+      "somBmuRow": 5,
+      "somBmuCol": 2,
+      "somCluster": 42
     },
     {
       "rel": "src/lib/shared/embedding-types.ts",
@@ -57668,7 +58592,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 56,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/shims/commonjs-shim.js",
@@ -58154,7 +59082,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 86,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/stores/analysis-panel.svelte.ts",
@@ -58433,7 +59365,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 68,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/stores/dashboard/SSEStatusStore.svelte.ts",
@@ -58510,7 +59446,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 52,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/stores/index.ts",
@@ -58870,7 +59810,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 38,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/stores/unified/index.svelte.ts",
@@ -58933,7 +59877,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 57,
+      "somBmuRow": 2,
+      "somBmuCol": 4,
+      "somCluster": 20
     },
     {
       "rel": "src/lib/stores/unified/notification-store.svelte.ts",
@@ -58976,7 +59924,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 38,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/stores/unified/report-store.svelte.ts",
@@ -59017,7 +59969,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 52,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/stores/unified/toast-store.svelte.ts",
@@ -59054,7 +60010,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 52,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/stores/user.svelte.ts",
@@ -59138,7 +60098,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 57,
+      "somBmuRow": 2,
+      "somBmuCol": 4,
+      "somCluster": 20
     },
     {
       "rel": "src/lib/test-utils/setup.ts",
@@ -59300,7 +60264,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 66,
+      "somBmuRow": 4,
+      "somBmuCol": 0,
+      "somCluster": 32
     },
     {
       "rel": "src/lib/types/api.ts",
@@ -59352,7 +60320,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 74,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/app.d.ts",
@@ -59426,7 +60398,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 90,
+      "somBmuRow": 0,
+      "somBmuCol": 2,
+      "somCluster": 2
     },
     {
       "rel": "src/lib/types/case-summary.ts",
@@ -59468,7 +60444,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 18,
+      "somBmuRow": 6,
+      "somBmuCol": 7,
+      "somCluster": 55
     },
     {
       "rel": "src/lib/types/case-theory.ts",
@@ -59512,7 +60492,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 18,
+      "somBmuRow": 6,
+      "somBmuCol": 7,
+      "somCluster": 55
     },
     {
       "rel": "src/lib/types/chat.ts",
@@ -59650,7 +60634,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 4,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/types/database.ts",
@@ -59705,7 +60693,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 77,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/enhanced-svelte5-types.ts",
@@ -59864,7 +60856,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 96,
+      "somBmuRow": 7,
+      "somBmuCol": 6,
+      "somCluster": 62
     },
     {
       "rel": "src/lib/types/external-services.ts",
@@ -59916,7 +60912,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 77,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/fast-locals-shim.d.ts",
@@ -60050,7 +61050,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 62,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/lib/types/index.ts",
@@ -60141,7 +61145,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 86,
+      "somBmuRow": 5,
+      "somBmuCol": 7,
+      "somCluster": 47
     },
     {
       "rel": "src/lib/types/legal-corpus.ts",
@@ -60193,7 +61201,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 18,
+      "somBmuRow": 6,
+      "somBmuCol": 7,
+      "somCluster": 55
     },
     {
       "rel": "src/lib/types/locals-allow-any.d.ts",
@@ -60511,7 +61523,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 77,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/pipeline.ts",
@@ -60599,7 +61615,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 93,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/protocol.ts",
@@ -60657,7 +61677,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 78,
+      "somBmuRow": 6,
+      "somBmuCol": 6,
+      "somCluster": 54
     },
     {
       "rel": "src/lib/types/qdrant.ts",
@@ -60792,7 +61816,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 72,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/types/rag.ts",
@@ -60844,7 +61872,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 58,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/lib/types/rowlist-augment.d.ts",
@@ -61084,7 +62116,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 18,
+      "somBmuRow": 6,
+      "somBmuCol": 7,
+      "somCluster": 55
     },
     {
       "rel": "src/lib/types/source-validation.ts",
@@ -61139,7 +62175,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 74,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/svelte5-api-types.d.ts",
@@ -61196,7 +62236,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 33,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/tiptap-shims.d.ts",
@@ -61285,7 +62329,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 77,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types/webassembly-enhanced.d.ts",
@@ -61356,7 +62404,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 23,
+      "somBmuRow": 7,
+      "somBmuCol": 5,
+      "somCluster": 61
     },
     {
       "rel": "src/lib/types/webgpu.d.ts",
@@ -61411,7 +62463,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 23,
+      "somBmuRow": 7,
+      "somBmuCol": 5,
+      "somCluster": 61
     },
     {
       "rel": "src/lib/types/yorha-interface.ts",
@@ -61466,7 +62522,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 74,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/types.ts",
@@ -61719,7 +62779,11 @@
         "http://localhost:11434",
         "http://localhost:11434"
       ],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 37,
+      "somBmuRow": 7,
+      "somBmuCol": 3,
+      "somCluster": 59
     },
     {
       "rel": "src/lib/utils/bits-ui-adapter.ts",
@@ -62672,7 +63736,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 11,
+      "somBmuRow": 7,
+      "somBmuCol": 3,
+      "somCluster": 59
     },
     {
       "rel": "src/lib/utils/route-operation-logger.ts",
@@ -62711,7 +63779,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 57,
+      "somBmuRow": 2,
+      "somBmuCol": 4,
+      "somCluster": 20
     },
     {
       "rel": "src/lib/utils/security.ts",
@@ -62771,7 +63843,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 52,
+      "somBmuRow": 7,
+      "somBmuCol": 2,
+      "somCluster": 58
     },
     {
       "rel": "src/lib/utils/sensitive-info-detector.ts",
@@ -63118,7 +64194,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 9,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/utils/type-utils.ts",
@@ -63245,7 +64325,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 19,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/utils/xstate-compat.ts",
@@ -63419,7 +64503,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 20,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/webgpu/dimensional-tensor-store.ts",
@@ -63461,7 +64549,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 74,
+      "somBmuRow": 7,
+      "somBmuCol": 7,
+      "somCluster": 63
     },
     {
       "rel": "src/lib/webgpu/gaussian-splat-renderer.ts",
@@ -63545,7 +64637,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 36,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/webgpu/legal-compute-shaders.ts",
@@ -63750,7 +64846,11 @@
       "localhostRefs": [
         "http://localhost:8080"
       ],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 20,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/webgpu/texture-streaming.ts",
@@ -63938,7 +65038,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 23,
+      "somBmuRow": 7,
+      "somBmuCol": 5,
+      "somCluster": 61
     },
     {
       "rel": "src/lib/webgpu/webgpu-polyfill.ts",
@@ -64018,7 +65122,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 23,
+      "somBmuRow": 7,
+      "somBmuCol": 5,
+      "somCluster": 61
     },
     {
       "rel": "src/lib/webgpu/webgpu-similarity-engine.ts",
@@ -64101,7 +65209,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 20,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/lib/webgpu/wire-telemetry.ts",
@@ -64141,7 +65253,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 23,
+      "somBmuRow": 7,
+      "somBmuCol": 5,
+      "somCluster": 61
     },
     {
       "rel": "src/lib/workers/ast-graph-worker.mjs",
@@ -66480,7 +67596,11 @@
       "routeParams": [],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 69,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/(app)/admin/api-testing/ast-topology/+server.ts",
@@ -67494,7 +68614,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/admin/dev-tools/+page.ts",
@@ -68273,7 +69397,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/admin/knowledge-search/+page.svelte",
@@ -68870,7 +69998,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/admin/search-intelligence/+page.svelte",
@@ -69879,7 +71011,11 @@
       ],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/routes/(app)/cases/[id]/+layout.ts",
@@ -70137,7 +71273,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/cases/[id]/ai/+page.svelte",
@@ -70371,7 +71511,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/cases/[id]/canvas/+page.svelte",
@@ -70491,7 +71635,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/cases/[id]/chat/+page.svelte",
@@ -70731,7 +71879,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/routes/(app)/cases/[id]/notes/+page.server.ts",
@@ -71004,7 +72156,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/cases/[id]/persons/+page.svelte",
@@ -71659,7 +72815,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/(app)/citations/law/[citation]/+page.svelte",
@@ -72142,7 +73302,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 3,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/(app)/command-center/codebase/+page.svelte",
@@ -73176,7 +74340,11 @@
       "routeParams": [],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/demos/agentic-errors/analysis/+page.svelte",
@@ -73710,7 +74878,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 28,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/(app)/admin/library/+page.ts",
@@ -73788,7 +74960,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 28,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
@@ -74027,7 +75203,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 34,
+      "somBmuRow": 3,
+      "somBmuCol": 5,
+      "somCluster": 29
     },
     {
       "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
@@ -74108,7 +75288,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/routes/(app)/admin/library/+page.ts",
@@ -75591,7 +76775,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 28,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/(app)/admin/library/+page.ts",
@@ -75751,7 +76939,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 28,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/(app)/demos/investigate/+page.svelte",
@@ -77414,7 +78606,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/routes/(app)/admin/library/+page.ts",
@@ -77616,7 +78812,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 40,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/routes/(app)/admin/library/+page.ts",
@@ -79142,7 +80342,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/lib/components/yorha/EvidenceBoard.svelte",
@@ -79256,7 +80460,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 97,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
@@ -80117,7 +81325,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 34,
+      "somBmuRow": 3,
+      "somBmuCol": 5,
+      "somCluster": 29
     },
     {
       "rel": "src/routes/(app)/admin/dev-tools/component-showcase/+page.ts",
@@ -80587,7 +81799,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/evidence/analyze/+page.svelte",
@@ -80677,7 +81893,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/(app)/evidence/hash/+page.svelte",
@@ -80939,7 +82159,11 @@
       "routeParams": [],
       "routeDepth": 0,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 29,
+      "somBmuRow": 6,
+      "somBmuCol": 5,
+      "somCluster": 53
     },
     {
       "rel": "src/routes/(app)/evidence/upload/+page.server.ts",
@@ -81040,7 +82264,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 92,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/routes/(app)/evidence-library/+page.server.ts",
@@ -81644,7 +82872,11 @@
       "routeParams": [],
       "routeDepth": 4,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/(app)/legal-corpus/+page.svelte",
@@ -81735,7 +82967,11 @@
       ],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/(app)/legal-corpus/[id]/+page.svelte",
@@ -82043,7 +83279,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/(app)/library/corpus/+page.svelte",
@@ -82175,7 +83415,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/routes/(app)/library/[documentId]/+page.server.ts",
@@ -82310,7 +83554,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte",
@@ -82366,7 +83614,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 35,
+      "somBmuRow": 3,
+      "somBmuCol": 7,
+      "somCluster": 31
     },
     {
       "rel": "src/routes/(app)/library/[documentId]/reader/+page.server.ts",
@@ -82410,7 +83662,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/(app)/library/[documentId]/reader/+page.svelte",
@@ -83427,7 +84683,11 @@
       "routeParams": [],
       "routeDepth": 4,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/routes/(app)/system-configuration/+page.svelte",
@@ -83594,7 +84854,11 @@
       "routeParams": [],
       "routeDepth": 4,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 5,
+      "somBmuRow": 4,
+      "somBmuCol": 7,
+      "somCluster": 39
     },
     {
       "rel": "src/routes/(app)/admin/library/+page.ts",
@@ -83672,7 +84936,11 @@
       "routeParams": [],
       "routeDepth": 4,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 28,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/(dev)/cache-demo/+page.svelte",
@@ -85487,7 +86755,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/api/agent/investigate/+server.ts",
@@ -85842,7 +87114,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/ai/case-prediction/+server.ts",
@@ -86153,7 +87429,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 26,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/api/ai/contextual-chat/+server.ts",
@@ -86249,7 +87529,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/ai/feedback/+server.ts",
@@ -86500,7 +87784,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/ai/memo-skeleton/+server.ts",
@@ -86548,7 +87836,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/ai/models/+server.ts",
@@ -87251,7 +88543,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 13,
+      "somBmuRow": 0,
+      "somBmuCol": 1,
+      "somCluster": 1
     },
     {
       "rel": "src/routes/api/analytics/deep-research/+server.ts",
@@ -87971,7 +89267,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/api/analytics/research-summaries/[id]/+server.ts",
@@ -88836,7 +90136,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 84,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/routes/api/audit/planner/+server.ts",
@@ -89134,7 +90438,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 90,
+      "somBmuRow": 0,
+      "somBmuCol": 2,
+      "somCluster": 2
     },
     {
       "rel": "src/routes/api/auth/me/+server.ts",
@@ -89231,7 +90539,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 27,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/auth/register/+server.ts",
@@ -89381,7 +90693,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 90,
+      "somBmuRow": 0,
+      "somBmuCol": 2,
+      "somCluster": 2
     },
     {
       "rel": "src/routes/api/cache/+server.ts",
@@ -89764,7 +91080,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 25,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/routes/api/cache/nintendo/+server.ts",
@@ -90008,7 +91328,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 25,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/routes/api/cache/warm-up/+server.ts",
@@ -90911,7 +92235,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/cases/[id]/authorities/+server.ts",
@@ -91605,7 +92933,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 27,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/cases/[id]/notes/[noteId]/evidence/+server.ts",
@@ -91666,7 +92998,11 @@
       ],
       "routeDepth": 8,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/cases/[id]/notes/[noteId]/versions/+server.ts",
@@ -92628,7 +93964,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 25,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/routes/api/citations/+server.ts",
@@ -92805,7 +94145,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/citations/collections/[collectionId]/citations/+server.ts",
@@ -92864,7 +94208,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/citations/collections/[collectionId]/export/+server.ts",
@@ -92974,7 +94322,11 @@
       "routeParams": [],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/citations/export/pdf/+server.ts",
@@ -93200,7 +94552,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/codebase/analyze/+server.ts",
@@ -94336,7 +95692,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 69,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/codebase-index/cluster-summary/+server.ts",
@@ -95040,7 +96400,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/api/codebase-index/graph/+server.ts",
@@ -95496,7 +96860,11 @@
       "routeParams": [],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 20,
+      "somBmuRow": 7,
+      "somBmuCol": 4,
+      "somCluster": 60
     },
     {
       "rel": "src/routes/api/codebase-index/orchestrate/+server.ts",
@@ -95621,7 +96989,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 69,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/codebase-index/reindex/+server.ts",
@@ -96835,7 +98207,11 @@
       ],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 27,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/courtroom/models/+server.ts",
@@ -97137,7 +98513,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 90,
+      "somBmuRow": 0,
+      "somBmuCol": 2,
+      "somCluster": 2
     },
     {
       "rel": "src/routes/api/docs/+server.ts",
@@ -97822,7 +99202,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/error-brain/diagnosis-history/backfill/+server.ts",
@@ -98035,7 +99419,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 64,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/api/error-brain/search/+server.ts",
@@ -99020,7 +100408,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 27,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/evidence/upload/+server.ts",
@@ -99325,7 +100717,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 27,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/evidence/[id]/audit/+server.ts",
@@ -99999,7 +101395,11 @@
       ],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/generate-cluster-summaries/+server.ts",
@@ -100377,7 +101777,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 25,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/routes/api/gpu/compute/+server.ts",
@@ -100923,7 +102327,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 72,
+      "somBmuRow": 0,
+      "somBmuCol": 6,
+      "somCluster": 6
     },
     {
       "rel": "src/routes/api/graph/relationships/+server.ts",
@@ -101815,7 +103223,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 25,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/routes/api/health/system/+server.ts",
@@ -102241,7 +103653,11 @@
       "routeParams": [],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 64,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/api/internal/error-brain/status/+server.ts",
@@ -102344,7 +103760,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 31,
+      "somBmuRow": 5,
+      "somBmuCol": 3,
+      "somCluster": 43
     },
     {
       "rel": "src/routes/api/kb/search/+server.ts",
@@ -102599,7 +104019,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/knowledge/lint/+server.ts",
@@ -102997,7 +104421,11 @@
       "routeParams": [],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 47,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/api/library/crawl/+server.ts",
@@ -103048,7 +104476,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 70,
+      "somBmuRow": 4,
+      "somBmuCol": 4,
+      "somCluster": 36
     },
     {
       "rel": "src/routes/api/library/document/[id]/+server.ts",
@@ -103097,7 +104529,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/library/document/[id]/node/[nodeId]/+server.ts",
@@ -103147,7 +104583,11 @@
       ],
       "routeDepth": 8,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/library/document/[id]/toc/+server.ts",
@@ -103196,7 +104636,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/library/documents/+server.ts",
@@ -103400,7 +104844,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/library/documents/[documentId]/summary/+server.ts",
@@ -103498,7 +104946,11 @@
       ],
       "routeDepth": 7,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 8,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/library/health/+server.ts",
@@ -104046,7 +105498,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 69,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/nlp/classify/+server.ts",
@@ -104766,7 +106222,11 @@
       ],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 27,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/persons-of-interest/[id]/associates/+server.ts",
@@ -105044,7 +106504,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 80,
+      "somBmuRow": 0,
+      "somBmuCol": 7,
+      "somCluster": 7
     },
     {
       "rel": "src/routes/api/persons-of-interest/[id]/photos/+server.ts",
@@ -105345,7 +106809,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 13,
+      "somBmuRow": 0,
+      "somBmuCol": 1,
+      "somCluster": 1
     },
     {
       "rel": "src/routes/api/pgai/analyze/+server.ts",
@@ -105745,7 +107213,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 44,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/phase78/monitor/+server.ts",
@@ -108173,7 +109645,11 @@
       "routeParams": [],
       "routeDepth": 5,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 21,
+      "somBmuRow": 3,
+      "somBmuCol": 6,
+      "somCluster": 30
     },
     {
       "rel": "src/routes/api/rag/unified/+server.ts",
@@ -108619,7 +110095,11 @@
       "routeParams": [],
       "routeDepth": 4,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 85,
+      "somBmuRow": 0,
+      "somBmuCol": 0,
+      "somCluster": 0
     },
     {
       "rel": "src/routes/api/reports/batch-export/+server.ts",
@@ -109572,7 +111052,11 @@
       ],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 27,
+      "somBmuRow": 1,
+      "somBmuCol": 0,
+      "somCluster": 8
     },
     {
       "rel": "src/routes/api/routes/[routeId]/error-brain-patch/[patchId]/+server.ts",
@@ -113486,7 +114970,11 @@
       "routeParams": [],
       "routeDepth": 6,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 94,
+      "somBmuRow": 7,
+      "somBmuCol": 0,
+      "somCluster": 56
     },
     {
       "rel": "src/routes/api/v1/reports/chat-associations/+server.ts",
@@ -114314,7 +115802,11 @@
       "routeParams": [],
       "routeDepth": 3,
       "localhostRefs": [],
-      "localhostBreaks": false
+      "localhostBreaks": false,
+      "clusterId": 83,
+      "somBmuRow": 2,
+      "somBmuCol": 0,
+      "somCluster": 16
     },
     {
       "rel": "src/routes/login/+page.svelte",

@@ -1,16 +1,16 @@
 # Graphify Health Report
 
-*Generated: 2026-05-05T03:26:59.492Z*
+*Generated: 2026-05-05T03:57:24.417Z*
 
 ## Summary
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| Redis wiki notes | 423 | ✅ |
-| Gemma4 summaries | 203 / 423 (48%) | ⚠️ |
+| Redis wiki notes | 733 | ✅ |
+| Gemma4 summaries | 586 / 733 (80%) | ✅ |
 | BoW chunk tiles | 3263 | ✅ |
-| BoW cluster tiles | 0 | ✅ |
-| Qdrant glyph_atlas | 190 pts | ✅ |
+| BoW cluster tiles | 100 | ✅ |
+| Qdrant glyph_atlas | 573 pts | ✅ |
 | Graph JSON nodes | 0 | ⚠️ |
 | Graph JSON edges | 0 | ⚠️ |
 | AGENTS.md mirrors | 250 | ✅ |
@@ -21,13 +21,13 @@
 |------|---------|--------|
 | **Daily map** | `npm run graphify:daily` | ✅ populated |
 | **Semantic index** | `npm run graphify:semantic` | ⚠️ run needed |
-| **GPU batch** | `npm run graphify:batch-gpu-analysis` | ⚠️ 48% done |
+| **GPU batch** | `npm run graphify:batch-gpu-analysis` | ✅ complete |
 | **BoW tiles** | `npm run graphify:bow-tiles:fast` | ✅ built |
 | **ACE smoke** | `npm run graphify:ace-smoke` | ✅ pass |
 
 ## Recommendations
 
-- ⚠️  Run `npm run graphify:batch-gpu-analysis` — only 48% of wiki notes have Gemma4 summaries
+- ✅ All tiers healthy — no action needed
 
 ## Raw JSON
 
