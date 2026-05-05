@@ -1,6 +1,6 @@
 # Deep AST Audit
 
-Generated: 2026-05-05T14:05:41.807Z
+Generated: 2026-05-05T16:05:04.067Z
 Graph files: 3374
 
 ## Summary
@@ -10,12 +10,12 @@ Graph files: 3374
 | D1 | @vite-ignore variable imports | 8 |
 | D2 | CJS require() in .ts/.mjs | 7 |
 | D3 | Native .node addon loads | 15 |
-| D4 | worker_threads / new Worker | 23 |
+| D4 | worker_threads / new Worker | 26 |
 | D5 | Proto / gRPC contract refs | 13 |
-| D6 | Hardcoded localhost outside env.server.ts | 9 |
-| D7 | Browser globals in SSR .svelte without guard | 4 |
-| D8 | ssrUnsafe routes missing ssr=false | 5 |
-| D9 | Likely orphans (0 fanIn, no dynImport ref) | 840 |
+| D6 | Hardcoded localhost outside env.server.ts | 0 |
+| D7 | Browser globals in SSR .svelte without guard | 0 |
+| D8 | ssrUnsafe routes missing ssr=false | 0 |
+| D9 | Likely orphans (0 fanIn, no dynImport ref) | 386 |
 | D10 | ACE synthesis missing recordLlmOutputHit | 0 |
 
 ---
@@ -39,7 +39,7 @@ Graph files: 3374
 
 **7** findings
 
-- `src\mcp\server.ts:1674` — const { createHash } = require('crypto') as typeof import('crypto');
+- `src\mcp\server.ts:1688` — const { createHash } = require('crypto') as typeof import('crypto');
 - `src\lib\utils\fuse-import.ts:6` — Fuse = require('fuse.js');
 - `src\lib\server\db\index-new.ts:20` — const { drizzle } = require('drizzle-orm/postgres-js');
 - `src\routes\api\yorha\cluster-health\+server.ts:28` — const totalMem = require('os').totalmem();
@@ -73,7 +73,7 @@ Graph files: 3374
 
 ## D4 — worker_threads / new Worker
 
-**23** findings
+**26** findings
 
 - `src\lib\workers\compute-worker.mjs:10` — import { parentPort } from 'worker_threads';
 - `src\lib\workers\ast-graph-worker.mjs:16` — import { parentPort } from 'worker_threads';
@@ -84,17 +84,20 @@ Graph files: 3374
 - `src\lib\server\workers\compute-pool.ts:80` — const worker = new Worker(workerPath);
 - `src\lib\server\workers\compute-pool.ts:300` — // SharedArrayBuffer is always available in Node.js worker_threads context
 - `src\lib\server\ml\topic-cluster.ts:275` — * Offloads to worker_threads to avoid blocking the event loop.
-- `src\lib\server\graph\codebase-scanner-v2.ts:121` — const RE_WORKER     = /worker_threads|new Worker\(|Worker\('/;
+- `src\lib\server\langextract\native.ts:18` — *          worker_threads via compute-pool — escapes the V8 main loop the
+- `src\lib\server\langextract\native.ts:116` — * which dispatches to a worker_threads-bound Gemma4 call.
+- `src\lib\server\langextract\native.ts:195` — * Run native extraction inside the existing compute-pool worker_threads pool.
 - `src\lib\server\gpu\mapreduce-worker.mjs:10` — import { parentPort, workerData } from 'worker_threads';
 - `src\lib\server\gpu\mapreduce-runner.mjs:8` — * Vite dev server transforms worker_threads internally, causing spawned
 - `src\lib\server\gpu\mapreduce-runner.mjs:29` — import { Worker } from 'worker_threads';
 - `src\lib\server\gpu\mapreduce-runner.mjs:77` — const worker = new Worker(workerPath, {
 - `src\lib\server\gpu\mapreduce-cuda-analyzer.ts:137` — // Vite dev server transforms worker_threads internally, causing zombie workers.
+- `src\lib\server\graph\codebase-scanner-v2.ts:121` — const RE_WORKER     = /worker_threads|new Worker\(|Worker\('/;
 - `src\lib\server\ff1\registry.ts:13` — *   worker        — offload to a Node worker_threads worker
 - `src\lib\server\analysis\forensics.ts:6` — * For large documents (>10KB), offloads regex work to worker_threads.
 - `src\lib\server\analysis\forensics.ts:196` — * Async forensics — offloads to worker_threads for large documents.
-- `src\lib\components\graph\GraphifyViewer.svelte:332` — layoutWorker = new Worker(
 - `src\lib\ai\onnx\session.ts:95` — worker_threads: { Worker: undefined, parentPort: null, isMainThread: true, workerData: undefined, threadId: 0 },
+- `src\lib\components\graph\GraphifyViewer.svelte:332` — layoutWorker = new Worker(
 - `src\routes\api\codebase\wiki\index\+server.ts:10` — *   POST → try RabbitMQ publish → if unavailable, fall back to mapreduce worker_threads
 - `src\routes\api\codebase\wiki\index\+server.ts:108` — * Fallback to mapreduce worker_threads path.
 - `src\routes\api\codebase\wiki\index\+server.ts:158` — // Fallback to mapreduce worker_threads
@@ -121,76 +124,61 @@ Graph files: 3374
 
 ---
 
-## D6 — Hardcoded localhost outside env.server.ts
-
-**9** findings
-
-- `src\lib\server\langextract-client.ts:117` — const probe = await fetch(`http://127.0.0.1:${port}/health`, {
-- `src\lib\server\langextract-client.ts:124` — resolvedUrl = `http://127.0.0.1:${port}`;
-- `src\lib\server\endpoints.ts:16` — return getEnvUrl('ENHANCED_RAG_URL', 'http://enhanced-rag:8094', 'http://localhost:8094');
-- `src\lib\server\services\langextract-service.ts:50` — 'http://localhost:8095', // python (phase66)
-- `src\lib\server\services\langextract-service.ts:51` — 'http://localhost:8090' // go (langextract-go)
-- `src\lib\server\grpc\generation-client.ts:142` — constructor(baseUrl: string = 'http://localhost:50052', timeout: number = 120_000) {
-- `src\lib\server\env\endpoints.ts:6` — const localFallback = 'http://localhost:11434';
-- `src\lib\server\db\seed-citations.ts:168` — curl http://localhost:5173/api/citations
-- `src\lib\server\clients\ollama.ts:14` — const localhostFallback = 'http://localhost:11434';
-
----
-
-## D7 — Browser globals in SSR .svelte without guard
-
-**4** findings
-
-- `src\routes\(app)\rag-search\+page.svelte:38` — const urlParams = $derived(typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null);
-- `src\routes\(app)\chat\+page.svelte:9` — const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-- `src\routes\(app)\analysis-center\+page.svelte:223` — let webgpuCapable = $derived(typeof navigator !== 'undefined' && !!navigator.gpu);
-- `src\routes\(app)\chat\[id]\+page.svelte:16` — const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-
----
-
-## D8 — ssrUnsafe routes missing ssr=false
-
-**5** findings
-
-- `src/routes/(app)/admin/dev-tools/+page.svelte:1` — ssrUnsafe + isRoute, no `export const ssr = false` on sibling +page.{ts,server.ts}
-- `src/routes/(app)/citations/law/+page.svelte:1` — ssrUnsafe + isRoute, no `export const ssr = false` on sibling +page.{ts,server.ts}
-- `src/routes/(app)/citations/law/[citation]/+page.svelte:1` — ssrUnsafe + isRoute, no `export const ssr = false` on sibling +page.{ts,server.ts}
-- `src/routes/(app)/citations/[...label]/+page.svelte:1` — ssrUnsafe + isRoute, no `export const ssr = false` on sibling +page.{ts,server.ts}
-- `src/routes/(app)/demos/ace-pipeline/+page.svelte:1` — ssrUnsafe + isRoute, no `export const ssr = false` on sibling +page.{ts,server.ts}
-
----
-
 ## D9 — Likely orphans (0 fanIn, no dynImport ref)
 
-**840** findings (showing first 30)
+> **D9 is a candidate queue, not a deletion list.**
+>
+> D9 no longer uses Graphify `fanIn` as a deletion signal. It uses `fanIn=0` only as a candidate source, then verifies candidates by scanning runtime imports, dynamic imports, type-only imports, and barrel re-exports. SvelteKit route entrypoints, hooks, service workers, type shims, generated declarations, stores, and barrels are excluded.
+>
+> Files listed here are likely unused, but still require `/audit-components` disposition before deletion or archive. Do not bulk-prune — let the skill classify the first 20-30, then archive in batches.
 
-- `src/ambient-legacy.d.ts:1` — fanIn=0, no dynImport consumer, 16 LOC, tags=[ts,src,ambient-legacy.d.ts]
-- `src/app.d.ts:1` — fanIn=0, no dynImport consumer, 95 LOC, tags=[ts,src,app.d.ts]
-- `src/custom-modules.d.ts:1` — fanIn=0, no dynImport consumer, 29 LOC, tags=[ts,src,custom-modules.d.ts]
-- `src/env.d.ts:1` — fanIn=0, no dynImport consumer, 14 LOC, tags=[ts,src,env.d.ts]
-- `src/global.d.ts:1` — fanIn=0, no dynImport consumer, 124 LOC, tags=[ts,src,global.d.ts]
-- `src/hooks.client.ts:1` — fanIn=0, no dynImport consumer, 159 LOC, tags=[ts,src,hooks.client.ts]
-- `src/hooks.server.ts:1` — fanIn=0, no dynImport consumer, 1015 LOC, tags=[ts,src,hooks.server.ts]
-- `src/lib/ai/base64-fp32-quantizer.ts:1` — fanIn=0, no dynImport consumer, 340 LOC, tags=[ts,src,lib]
-- `src/lib/ai/citation-cache.ts:1` — fanIn=0, no dynImport consumer, 430 LOC, tags=[ts,src,lib]
-- `src/lib/ai/client-quality.ts:1` — fanIn=0, no dynImport consumer, 343 LOC, tags=[ts,src,lib]
-- `src/lib/ai/e2b/inference.ts:1` — fanIn=0, no dynImport consumer, 213 LOC, tags=[ts,src,lib]
-- `src/lib/ai/e2b/session.ts:1` — fanIn=0, no dynImport consumer, 311 LOC, tags=[ts,src,lib]
-- `src/lib/ai/emotion-context.ts:1` — fanIn=0, no dynImport consumer, 317 LOC, tags=[ts,src,lib]
-- `src/lib/ai/hypergraph.ts:1` — fanIn=0, no dynImport consumer, 88 LOC, tags=[ts,src,lib]
-- `src/lib/ai/model-ids.ts:1` — fanIn=0, no dynImport consumer, 356 LOC, tags=[ts,src,lib]
-- `src/lib/ai/ollama-config.ts:1` — fanIn=0, no dynImport consumer, 69 LOC, tags=[ts,src,lib]
-- `src/lib/ai/unified-generation.ts:1` — fanIn=0, no dynImport consumer, 435 LOC, tags=[ts,src,lib]
-- `src/lib/ambient-events.d.ts:1` — fanIn=0, no dynImport consumer, 22 LOC, tags=[ts,src,lib]
-- `src/lib/cache/cache-invalidation.ts:1` — fanIn=0, no dynImport consumer, 49 LOC, tags=[ts,src,lib]
-- `src/lib/cache/offline-fetch.ts:1` — fanIn=0, no dynImport consumer, 75 LOC, tags=[ts,src,lib]
-- `src/lib/client/db/loki-client.ts:1` — fanIn=0, no dynImport consumer, 91 LOC, tags=[ts,src,lib]
-- `src/lib/client/search-client.ts:1` — fanIn=0, no dynImport consumer, 170 LOC, tags=[ts,src,lib]
-- `src/lib/client-logging.ts:1` — fanIn=0, no dynImport consumer, 29 LOC, tags=[ts,src,lib]
-- `src/lib/command-center-manifest.ts:1` — fanIn=0, no dynImport consumer, 270 LOC, tags=[ts,src,lib]
-- `src/lib/components/ai/index.ts:1` — fanIn=0, no dynImport consumer, 15 LOC, tags=[ts,src,lib]
-- `src/lib/components/canvas/hybrid/types.ts:1` — fanIn=0, no dynImport consumer, 50 LOC, tags=[ts,src,lib]
-- `src/lib/components/cases/index.ts:1` — fanIn=0, no dynImport consumer, 17 LOC, tags=[ts,src,lib]
-- `src/lib/components/codebase/index.ts:1` — fanIn=0, no dynImport consumer, 15 LOC, tags=[ts,src,lib]
-- `src/lib/components/components-shims.d.ts:1` — fanIn=0, no dynImport consumer, 7 LOC, tags=[ts,src,lib]
-- `src/lib/components/dashboard/gamification-types.ts:1` — fanIn=0, no dynImport consumer, 134 LOC, tags=[ts,src,lib]
+**386** findings (showing first 30)
+
+- `src/ambient-legacy.d.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/app.d.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/custom-modules.d.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/env.d.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/global.d.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/ai/base64-fp32-quantizer.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/ai/unified-generation.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/ambient-events.d.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/client/db/loki-client.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/client-logging.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/audio/AudioAnalysisView.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/chat/AudioUploadWidget.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/chat/ChatPromptBar.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/codebase/TagDeleteDialog.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/components-shims.d.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/document/DocumentAnalysisView.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/glyph/GlyphAtlasPanel.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/monitoring/CacheWarmUpControl.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/ui/bits/compound.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/ui/ContextMenuSeparator.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/ui/gaming/constants/gaming-constants-minimal.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/ui/gaming/types/gaming-types-minimal.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/ui/IconContainer.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/ui/wrappers/bits/bits-overrides.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/components/video/VideoAnalysisView.svelte:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/config/pgvector-gpu-config.js:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/config/redis-config.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/data/route-groups-config.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/db/schema/gpuInferenceDemo.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+- `src/lib/db/vite-error-schema.ts:1` — 0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate
+
+---
+
+## Recommended Claude Code skills
+
+Each skill is a multi-gate agentic pipeline that drills deeper than this AST audit. Run from Claude Code via `/<skill-name>`:
+
+- /audit-components — verify 386 D9 orphan candidates with 8-gate test (G0 transitive-dep, G0.5 dynamic-import, G1-G8 disposition)
+- /prune-codebase — full archive flow with G6 route reachability + reverse-dependency chain
+- /deep-audit — full 47-gate sweep covering G1-G47 (compounds D1-D10 with infra, security, RL pipeline)
+- /graphify — refresh codebase-graph.json + glyph_atlas + cluster_summaries; D9 false-positive count drops once new fanIn data lands
+
+**Composition pattern**:
+1. `/graphify` — refresh codebase-graph.json + cluster_summaries (~5 min)
+2. `npm run audit:deep-ast` — refresh D1-D10 findings (~2s)
+3. `/audit-components` (D9 candidates) — 8-gate disposition (wire/rewrite/archive/defer)
+4. `/wire-modules` (D10 missing-import) — fix orphan call sites
+5. `/deep-audit` — 47-gate sweep including this audit's output as Tier A baseline
