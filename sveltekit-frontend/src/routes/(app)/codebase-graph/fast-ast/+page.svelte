@@ -52,6 +52,7 @@
     isRoute?: boolean; isTest?: boolean; hasPairedTest?: boolean;
     ssrUnsafe?: boolean; sv4Legacy?: boolean; clusterId?: number;
     hasAuth?: boolean; hasZod?: boolean; lineCount?: number;
+    somBmuRow?: number; somBmuCol?: number; somCluster?: number;
   }
   let graphFiles = $state<GFile[]>([]);
   let graphifyLoading = $state(false);
