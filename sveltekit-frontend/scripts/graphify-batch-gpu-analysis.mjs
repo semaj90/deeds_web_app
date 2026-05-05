@@ -55,7 +55,7 @@ const TURBO_URL    = process.env.TURBO_URL       ?? 'http://127.0.0.1:8090';
 const QDRANT_URL   = process.env.QDRANT_URL      ?? 'http://127.0.0.1:6333';
 const REDIS_URL    = process.env.REDIS_URL        ?? 'redis://127.0.0.1:6379';
 const APP_URL      = process.env.APP_URL          ?? 'http://localhost:5173';
-const COLLECTION   = 'codebase_chunks_768';
+const COLLECTION   = 'glyph_atlas'; // dedicated directory-glyph collection (768-dim, embeddinggemma)
 const LLM_MODEL    = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
 const EMBED_MODEL  = 'embeddinggemma:latest';
 const WIKI_TTL     = 24 * 3600;
@@ -199,11 +199,82 @@ for (const f of files) {
   if (hasCluster) clusterCounts[f.clusterId] = (clusterCounts[f.clusterId] ?? 0) + 1;
 }
 
-const clusterCount = Object.keys(clusterCounts).length;
-log(`  ${c.green('✓')} ${clusterCount} GPU clusters found`);
-if (missingCluster > 0) log(`  ${c.yellow('○')} ${missingCluster} files missing clusterId — run graphify:semantic`);
+let clusterCount = Object.keys(clusterCounts).length;
+log(`  ${c.green('✓')} ${clusterCount} GPU clusters found in graph JSON`);
+if (missingCluster > 0) log(`  ${c.yellow('○')} ${missingCluster} files missing clusterId in graph JSON`);
 if (missingSom > 0)     log(`  ${c.yellow('○')} ${missingSom} files missing SOM coordinates — run graphify:topology`);
 log(`  ${c.dim(`Files both missing: ${missingBoth}`)}`);
+
+// If graph JSON has no cluster info, query Qdrant codebase_chunks_768 for dominant gpuCluster per dir
+const dirClusterMap = new Map(); // dir → dominant gpuCluster int
+if (clusterCount === 0 && !DRY_RUN) {
+  log(`  ${c.dim('Querying Qdrant for gpuCluster assignments…')}`);
+  try {
+    let offset = null;
+    let totalScrolled = 0;
+    const dirHits = {}; // dir → { [clusterId]: count }
+
+    while (true) {
+      const body = { limit: 500, with_payload: ['filePath', 'relativePath', 'gpuCluster', 'gpu_cluster'], with_vector: false };
+      if (offset) body.offset = offset;
+      const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) { warn(`  ${c.yellow('⚠')} Qdrant scroll HTTP ${res.status}`); break; }
+      const d = await res.json();
+      const pts = d.result?.points ?? [];
+      totalScrolled += pts.length;
+
+      for (const pt of pts) {
+        const fp = pt.payload?.relativePath ?? pt.payload?.filePath ?? '';
+        if (!fp) continue;
+        const dir = fp.includes('/') ? fp.split('/').slice(0, -1).join('/') : '.';
+        const cid = pt.payload?.gpuCluster ?? pt.payload?.gpu_cluster;
+        if (cid == null || cid < 0) continue;
+        if (!dirHits[dir]) dirHits[dir] = {};
+        dirHits[dir][cid] = (dirHits[dir][cid] ?? 0) + 1;
+      }
+
+      offset = d.result?.next_page_offset;
+      if (!offset || pts.length === 0) break;
+    }
+
+    // Dominant cluster per dir = max hits
+    for (const [dir, counts] of Object.entries(dirHits)) {
+      const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+      if (dominant) dirClusterMap.set(dir, parseInt(dominant[0], 10));
+    }
+
+    clusterCount = new Set(dirClusterMap.values()).size;
+    log(`  ${c.green('✓')} Qdrant: ${totalScrolled} chunks → ${dirClusterMap.size} dirs mapped to ${clusterCount} clusters`);
+
+    // Back-fill into files array and wiki notes
+    for (const f of files) {
+      if ((f.clusterId === undefined || f.clusterId < 0) && f.rel) {
+        const fdir = f.rel.includes('/') ? f.rel.split('/').slice(0, -1).join('/') : '.';
+        const cid = dirClusterMap.get(fdir);
+        if (cid !== undefined) f.clusterId = cid;
+      }
+    }
+  } catch (err) {
+    warn(`  ${c.yellow('⚠')} Qdrant cluster lookup failed: ${err.message} — proceeding without cluster data`);
+  }
+} else if (clusterCount > 0) {
+  // Populate dirClusterMap from graph JSON data
+  for (const [dir, dfiles] of dirMap) {
+    const counts = {};
+    for (const f of dfiles) {
+      if (f.clusterId !== undefined && f.clusterId >= 0) {
+        counts[f.clusterId] = (counts[f.clusterId] ?? 0) + 1;
+      }
+    }
+    const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    if (dominant) dirClusterMap.set(dir, parseInt(dominant[0], 10));
+  }
+}
 
 // ── Stage 4: Glyph generation ─────────────────────────────────────────────────
 
@@ -225,40 +296,91 @@ for (const [dir, dfiles] of dirMap) {
 const glyphTargets = LIMIT > 0 ? needsGlyph.slice(0, LIMIT) : needsGlyph;
 log(`  ${c.cyan(`${glyphTargets.length} directories`)} need glyph generation (${needsGlyph.length} total without summary)`);
 
-// Try TurboQuant (:8090 llama-server) first, fall back to Ollama, then use a placeholder.
-// Returns { summary, source } — never throws.
-async function callLLM(prompt) {
-  // 1. TurboQuant (llama.cpp OpenAI-compat endpoint)
+// ── LLM inference (TurboQuant-first with KV prefix caching) ──────────────────
+//
+// Token budget: gemma4 thinking models consume ~250-350 tokens on <think> blocks before
+// outputting the final answer. num_predict/max_tokens must be >= 500 to clear the think phase.
+const LLM_MAX_TOKENS = parseInt(process.env.LLM_MAX_TOKENS ?? '600', 10);
+
+// Constant system prompt — TurboQuant's cache_prompt:true KV-caches this prefix across
+// all directory calls. Saves ~18s of redundant prefill per call after the first.
+const GLYPH_SYSTEM_PROMPT =
+  'You are a senior TypeScript/SvelteKit architect analysing a legal AI platform codebase. ' +
+  'When asked about a directory, respond with exactly 2-3 sentences describing its technical ' +
+  'purpose and data flow. Be specific. No markdown headers, no bullet points, plain prose only.';
+
+// Check TurboQuant health once at startup
+let turboHealthy = false;
+try {
+  const hres = await fetch(`${TURBO_URL}/health`, { signal: AbortSignal.timeout(2_000) });
+  turboHealthy = hres.ok;
+  if (turboHealthy) log(`${c.green('✓')} TurboQuant healthy at ${TURBO_URL} (cache_prompt enabled)`);
+} catch { /* not running — will fall back to Ollama */ }
+
+async function callLLM(userPrompt) {
+  // 1. TurboQuant (llama.cpp OpenAI-compat) — system prompt KV-cached via cache_prompt:true
+  if (turboHealthy) {
+    try {
+      const res = await fetch(`${TURBO_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: LLM_MODEL,
+          messages: [
+            { role: 'system', content: GLYPH_SYSTEM_PROMPT },
+            { role: 'user',   content: userPrompt },
+          ],
+          max_tokens:   LLM_MAX_TOKENS,
+          temperature:  0.2,
+          cache_prompt: true,  // KV-reuse system prompt prefix across all dir calls
+        }),
+        signal: AbortSignal.timeout(90_000),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        const msg = d.choices?.[0]?.message ?? {};
+        // Gemma4 thinking models put the final answer in content; reasoning_content holds <think> block.
+        const text = (msg.content ?? '').trim();
+        if (text.length > 20) return { summary: text, source: 'turbo' };
+        if (text.length === 0 && (msg.reasoning_content ?? '').length > 0) {
+          warn(`  ${c.yellow('⚠')} TurboQuant: content empty (think block used all ${LLM_MAX_TOKENS} tokens) — falling back to Ollama`);
+          turboHealthy = false; // avoid wasting more calls this run
+        }
+      } else {
+        const errBody = await res.text().catch(() => '');
+        warn(`  ${c.yellow('⚠')} TurboQuant HTTP ${res.status}: ${errBody.slice(0, 80)} — falling back to Ollama`);
+        turboHealthy = false;
+      }
+    } catch (err) {
+      if (!String(err).includes('ECONNREFUSED') && !String(err).includes('fetch failed')) {
+        warn(`  ${c.yellow('⚠')} TurboQuant error (${err.message}) — falling back to Ollama`);
+      }
+      turboHealthy = false;
+    }
+  }
+
+  // 2. Ollama chat (system + user split for consistency)
   try {
-    const res = await fetch(`${TURBO_URL}/v1/chat/completions`, {
+    const res = await fetch(`${OLLAMA_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: LLM_MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 220, temperature: 0.2,
+        model:    LLM_MODEL,
+        messages: [
+          { role: 'system', content: GLYPH_SYSTEM_PROMPT },
+          { role: 'user',   content: userPrompt },
+        ],
+        stream:  false,
+        options: { temperature: 0.2, num_predict: LLM_MAX_TOKENS },
       }),
-      signal: AbortSignal.timeout(60_000),
+      signal: AbortSignal.timeout(45_000),
     });
     if (res.ok) {
       const d = await res.json();
-      const text = (d.choices?.[0]?.message?.content ?? '').trim();
-      if (text.length > 20) return { summary: text, source: 'turbo' };
-    }
-  } catch { /* TurboQuant not running — fall through */ }
-
-  // 2. Ollama generate
-  try {
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: LLM_MODEL, prompt, stream: false, options: { temperature: 0.2, num_predict: 220 } }),
-      signal: AbortSignal.timeout(90_000),
-    });
-    if (res.ok) {
-      const text = ((await res.json()).response ?? '').trim();
+      const text = (d.message?.content ?? d.response ?? '').trim();
       if (text.length > 20) return { summary: text, source: 'ollama' };
-      throw new Error('empty response');
+      warn(`  ${c.yellow('⚠')} Ollama returned empty response (think tokens > ${LLM_MAX_TOKENS}?) — using placeholder`);
+      return { summary: null, source: 'placeholder' };
     }
     const errBody = await res.text().catch(() => '');
     throw new Error(`Ollama HTTP ${res.status}: ${errBody.slice(0, 120)}`);
@@ -290,6 +412,24 @@ function dirToPointId(dir) {
   return parseInt(h.slice(0, 7), 16);
 }
 
+async function ensureQdrantCollection() {
+  if (SKIP_QDRANT || DRY_RUN) return;
+  const infoRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}`, { signal: AbortSignal.timeout(5000) });
+  if (infoRes.ok) return; // already exists
+  const createRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      vectors: { size: 768, distance: 'Cosine' },
+      hnsw_config: { m: 16, ef_construct: 64 },
+      optimizers_config: { indexing_threshold: 0 },
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!createRes.ok) throw new Error(`Qdrant create collection ${createRes.status}: ${await createRes.text()}`);
+  log(`  ${c.green('✓')} Created Qdrant collection: ${COLLECTION}`);
+}
+
 async function upsertQdrantPoint(id, vector, payload) {
   if (SKIP_QDRANT || DRY_RUN) return;
   const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, {
@@ -302,27 +442,40 @@ async function upsertQdrantPoint(id, vector, payload) {
 }
 
 function buildGlyphPrompt(dir, dfiles, note) {
-  const files  = dfiles.sort((a,b) => (b.fanIn ?? 0) - (a.fanIn ?? 0)).slice(0, 5).map(f => f.rel).join('\n  - ');
-  const tags   = [...new Set(dfiles.flatMap(f => f.tags ?? []))].slice(0, 8).join(', ') || 'none';
-  const ssrRisk= dfiles.filter(f => f.ssrUnsafe).length;
-  const noTest = dfiles.filter(f => f.isRoute && !f.hasPairedTest).length;
-  return `You are analysing a directory in a legal AI SvelteKit + TypeScript platform.
-
-Directory: ${dir}
+  // User message only — system prompt is constant and sent separately (KV-cached by TurboQuant)
+  const repFiles = dfiles.sort((a,b) => (b.fanIn ?? 0) - (a.fanIn ?? 0)).slice(0, 5).map(f => f.rel).join('\n  - ');
+  const tags     = [...new Set(dfiles.flatMap(f => f.tags ?? []))].slice(0, 8).join(', ') || 'none';
+  const ssrRisk  = dfiles.filter(f => f.ssrUnsafe).length;
+  const noTest   = dfiles.filter(f => f.isRoute && !f.hasPairedTest).length;
+  const somFile  = dfiles.find(f => f.somBmuRow !== undefined);
+  const somHint  = somFile ? ` · SOM grid (${somFile.somBmuRow},${somFile.somBmuCol})` : '';
+  return `Directory: ${dir}${somHint}
 Representative files (top by fan-in):
-  - ${files}
+  - ${repFiles}
 
 Stats: ${dfiles.length} files, ${ssrRisk} SSR-unsafe, ${noTest} routes without tests
 Tags: ${tags}
 ${note?.warnings?.length ? 'Warnings: ' + note.warnings.slice(0, 3).join('; ') : ''}
 
-Write a 2-3 sentence technical summary of what this directory does and its key responsibilities. Focus on purpose and data flow.`;
+Summarise what this directory does and its data flow.`;
 }
 
 let glyphOk = 0, glyphFailed = 0;
 
+const DIR_TIMEOUT_MS = 75_000; // hard cap per directory (TurboQuant 90s + embed 30s budget → 75s safe)
+
+function withDirTimeout(promise, dir) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`dir timeout after ${DIR_TIMEOUT_MS / 1000}s`)), DIR_TIMEOUT_MS)
+    ),
+  ]);
+}
+
 async function processGlyphBatch(batch) {
-  await Promise.all(batch.map(async ({ dir, dfiles, note, key }) => {
+  await Promise.all(batch.map(({ dir, dfiles, note, key }) =>
+    withDirTimeout((async () => {
     // In dry-run mode just log what would happen — no LLM, no embed, no writes
     if (DRY_RUN) {
       const hasSummary = !!note?.gemma4Summary;
@@ -352,8 +505,8 @@ async function processGlyphBatch(batch) {
       } catch (embedErr) {
         warn(`  ${c.yellow('⚠')} embed failed for ${dir}: ${embedErr.message} — skipping Qdrant upsert`);
         // Still write summary back to Redis if we have one
-        if (summary && !SKIP_QDRANT) {
-          const noteKey = key ?? `wiki:note:dir:${dir.replace(/\//g, '_')}`;
+        if (summary) {
+          const noteKey = key ?? `wiki:note:dir:dir:${dir.replace(/[^a-z0-9]/gi, '_')}`;
           const pr = dirPageRank.get(dir) ?? { avg: 0, max: 0, source: 'none' };
           await rset(noteKey, { ...(note ?? {}), directoryPath: dir, gemma4Summary: summary, pageRankAvg: pr.avg, pageRankSource: pr.source, summaryUpdatedAt: new Date().toISOString() }, WIKI_TTL);
         }
@@ -364,20 +517,32 @@ async function processGlyphBatch(batch) {
       const pointId = dirToPointId(dir);
       const pr = dirPageRank.get(dir) ?? { avg: 0, max: 0, source: 'none' };
 
+      // SOM coordinates — use first file that has them as representative coords for this dir
+      const somFile   = dfiles.find(f => f.somBmuRow !== undefined);
+      const clusterId = note?.clusterId != null && note.clusterId >= 0
+        ? note.clusterId
+        : (dirClusterMap.get(dir)
+            ?? dfiles.find(f => f.clusterId !== undefined && f.clusterId >= 0)?.clusterId
+            ?? -1);
+
       const payload = {
         kind:               'directory-cluster',
         dir,
-        summary,
+        gemma4Summary:      summary,
+        summary,            // keep for backward compat with ACE consumers that use .summary
         representativeFiles: dfiles.sort((a,b) => (b.fanIn ?? 0) - (a.fanIn ?? 0)).slice(0, 5).map(f => f.rel),
         dominantTags:        [...new Set(dfiles.flatMap(f => f.tags ?? []))].slice(0, 8),
         fileCount:           dfiles.length,
         ssrRisk:             dfiles.filter(f => f.ssrUnsafe).length,
         pairedPct:           dfiles.length ? Math.round(dfiles.filter(f => f.hasPairedTest).length / dfiles.length * 100) : 0,
-        clusterId:           note?.clusterId ?? dfiles.find(f => f.clusterId !== undefined)?.clusterId ?? -1,
+        clusterId,
         clusterType:         'directory-glyph',
         pageRankAvg:         pr.avg,
         pageRankMax:         pr.max,
         pageRankSource:      pr.source,
+        somBmuRow:           somFile?.somBmuRow,
+        somBmuCol:           somFile?.somBmuCol,
+        somCluster:          somFile?.somCluster,
         llmSource,
         generatedAt:         new Date().toISOString(),
       };
@@ -395,7 +560,8 @@ async function processGlyphBatch(batch) {
         llmSource,
         summaryUpdatedAt: new Date().toISOString(),
       };
-      const noteKey = key ?? `wiki:note:dir:${dir.replace(/\//g, '_')}`;
+      // Key format matches fast-indexer: wiki:note:dir:dir:<slug> where slug replaces all non-alnum with _
+      const noteKey = key ?? `wiki:note:dir:dir:${dir.replace(/[^a-z0-9]/gi, '_')}`;
       await rset(noteKey, updatedNote, WIKI_TTL);
 
       log(`  ${c.green('✓')} ${dir.split('/').slice(-2).join('/')} → id=${pointId} [${llmSource}]`);
@@ -404,7 +570,13 @@ async function processGlyphBatch(batch) {
       warn(`  ${c.red('✗')} ${dir}: ${err.message}`);
       glyphFailed++;
     }
-  }));
+  })(), dir)
+  ));
+}
+
+// Ensure Qdrant collection exists before processing
+try { await ensureQdrantCollection(); } catch (err) {
+  warn(`  ${c.yellow('⚠')} Could not create Qdrant collection "${COLLECTION}": ${err.message} — Qdrant upserts will fail`);
 }
 
 // Process in concurrency batches
@@ -412,6 +584,86 @@ for (let i = 0; i < glyphTargets.length; i += SUMMARY_CONCURRENCY) {
   await processGlyphBatch(glyphTargets.slice(i, i + SUMMARY_CONCURRENCY));
 }
 log(`  ${c.green(`${glyphOk} glyphs`)} upserted${glyphFailed ? `, ${c.red(glyphFailed + ' failed')}` : ''}`);
+
+// ── Stage 4.5: NES-arch write-back — agents:dir:* + summary:cluster:* ────────
+
+stage('4.5', 'NES-arch write-back (agents:dir:* + summary:cluster:*)');
+
+// agents:dir:<rel> — NES-arch preflight keys read by getAgentsMdQuickHit() in context-assembler
+// Format mirrors generate-agents-md.mjs output so both paths produce the same schema
+let agentsWritten = 0;
+if (!DRY_RUN) {
+  for (const [dir, dfiles] of dirMap) {
+    const wikiEntry   = wikiNotes.get(dir);
+    const note        = wikiEntry?.note ?? null;
+    const summary     = note?.gemma4Summary ?? note?.summary ?? null;
+    if (!summary) continue; // skip dirs that have no summary yet (not processed this run)
+
+    const tags        = [...new Set(dfiles.flatMap(f => f.tags ?? []))].slice(0, 12);
+    const ssrFiles    = dfiles.filter(f => f.ssrUnsafe).map(f => f.rel.split('/').pop());
+    const noTestFiles = dfiles.filter(f => f.isRoute && !f.hasPairedTest).map(f => f.rel.split('/').pop());
+    const clusterId   = dirClusterMap.get(dir);
+
+    const agentsMd = [
+      `# ${dir}`,
+      '',
+      `> AGENTS-GEN v1 | files:${dfiles.length} | cluster:${clusterId ?? 'n/a'} | llm:${note?.llmSource ?? 'unknown'}`,
+      '',
+      '## Summary',
+      summary,
+      '',
+      tags.length ? `## Tags\n${tags.join(', ')}` : null,
+      ssrFiles.length ? `## SSR Risks\n${ssrFiles.slice(0, 5).join(', ')}` : null,
+      noTestFiles.length ? `## Missing Tests\n${noTestFiles.slice(0, 5).join(', ')}` : null,
+    ].filter(l => l !== null).join('\n');
+
+    const agentKey = `agents:dir:${dir.replace(/\\/g, '/')}`;
+    await rset(agentKey, agentsMd, 24 * 3600);
+    agentsWritten++;
+  }
+  log(`  ${c.green('✓')} agents:dir:* keys written: ${agentsWritten}`);
+} else {
+  log(`  ${c.dim('agents:dir:* write skipped (dry-run)')}`);
+}
+
+// summary:cluster:<id> — read by /.well-known/llms.txt and /.well-known/llms-full.txt
+// Build per-cluster summary by combining wiki notes from dirs in each cluster
+const clusterSummaryMap = new Map(); // clusterId → { dirs[], topTags[], summary }
+for (const [dir, clusterId] of dirClusterMap) {
+  if (clusterId < 0) continue;
+  if (!clusterSummaryMap.has(clusterId)) {
+    clusterSummaryMap.set(clusterId, { dirs: [], topTags: new Set(), summaries: [], fileCount: 0 });
+  }
+  const entry   = clusterSummaryMap.get(clusterId);
+  const wikiEntry = wikiNotes.get(dir);
+  const note    = wikiEntry?.note ?? null;
+  const dfiles  = dirMap.get(dir) ?? [];
+  entry.dirs.push(dir);
+  entry.fileCount += dfiles.length;
+  for (const t of (note?.dominantTags ?? [])) entry.topTags.add(t);
+  if (note?.gemma4Summary) entry.summaries.push(note.gemma4Summary);
+}
+
+let clusterSummariesWritten = 0;
+if (!DRY_RUN) {
+  for (const [clusterId, entry] of clusterSummaryMap) {
+    const combined = entry.summaries.slice(0, 3).join(' ');
+    if (!combined) continue;
+    const clusterSummary = {
+      clusterId,
+      dirs:     entry.dirs.slice(0, 10),
+      fileCount: entry.fileCount,
+      topTags:  [...entry.topTags].slice(0, 10),
+      summary:  combined.slice(0, 500),
+      generatedAt: new Date().toISOString(),
+    };
+    await rset(`summary:cluster:${clusterId}`, clusterSummary, GLYPH_TTL);
+    clusterSummariesWritten++;
+  }
+  log(`  ${c.green('✓')} summary:cluster:* keys written: ${clusterSummariesWritten}`);
+} else {
+  log(`  ${c.dim('summary:cluster:* write skipped (dry-run)')}`);
+}
 
 // ── Stage 5: Tag write-back ───────────────────────────────────────────────────
 
@@ -517,10 +769,13 @@ const report = {
     entries: Object.keys(pageRankScores).length,
   },
   glyphs: {
-    processed: glyphTargets.length,
-    ok:        glyphOk,
-    failed:    glyphFailed,
-    tagsUpdated: tagUpdated,
+    processed:       glyphTargets.length,
+    ok:              glyphOk,
+    failed:          glyphFailed,
+    tagsUpdated:     tagUpdated,
+    agentsWritten,
+    clusterSummaries: clusterSummariesWritten,
+    turboUsed:       turboHealthy,
   },
   topDirectoriesByPageRank: [...dirPageRank.entries()]
     .sort((a, b) => b[1].max - a[1].max)
@@ -557,6 +812,9 @@ Generated: ${report.generatedAt}${DRY_RUN ? '  \n**DRY RUN — no writes**' : ''
 | PageRank source | ${report.pageRank.source} (${report.pageRank.entries} entries) |
 | Glyphs generated | ${report.glyphs.ok} / ${report.glyphs.processed} |
 | Tags updated | ${report.glyphs.tagsUpdated} |
+| agents:dir:* keys | ${report.glyphs.agentsWritten} |
+| summary:cluster:* keys | ${report.glyphs.clusterSummaries} |
+| TurboQuant (cache_prompt) | ${report.glyphs.turboUsed ? '✅ active' : '⚠️ fallback to Ollama'} |
 
 ## Top Directories by PageRank
 
@@ -623,6 +881,9 @@ log(`  Dirs:       ${dirs.length}`);
 log(`  Glyphs:     ${c.green(glyphOk)} ok${glyphFailed ? ', ' + c.red(glyphFailed + ' failed') : ''}`);
 log(`  PageRank:   ${prSource} (${Object.keys(pageRankScores).length} entries)`);
 log(`  Tags:       ${tagUpdated} Qdrant points patched`);
+log(`  agents:dir: ${agentsWritten} NES-arch preflight keys`);
+log(`  clusters:   ${clusterSummariesWritten} summary:cluster:* keys (llms.txt feed)`);
+log(`  TurboQuant: ${turboHealthy ? c.green('cache_prompt active') : c.yellow('fell back to Ollama')}`);
 log(`  Reports:    ${DRY_RUN ? '(dry-run)' : 'docs/graph/batch-gpu-analysis-report.{json,md}'}`);
 if (DRY_RUN) log(`\n  ${c.yellow('DRY RUN — no Redis/Qdrant/Postgres writes performed')}`);
 
