@@ -1,23 +1,26 @@
 {
-  "generatedAt": "2026-05-05T03:05:54.482Z",
+  "generatedAt": "2026-05-05T13:25:08.879Z",
   "dryRun": false,
   "skipLlm": false,
   "graph": {
     "files": 3374,
     "directories": 365,
-    "clusters": 20,
-    "missingCluster": 3374,
-    "missingSom": 3374
+    "clusters": 93,
+    "missingCluster": 3001,
+    "missingSom": 3001
   },
   "pageRank": {
     "source": "fanin",
     "entries": 1377
   },
   "glyphs": {
-    "processed": 5,
-    "ok": 5,
+    "processed": 1,
+    "ok": 1,
     "failed": 0,
-    "tagsUpdated": 0
+    "tagsUpdated": 0,
+    "agentsWritten": 1217,
+    "clusterSummaries": 70,
+    "turboUsed": true
   },
   "topDirectoriesByPageRank": [
     {
@@ -113,34 +116,10 @@
   ],
   "hotDirectories": [
     {
-      "dir": "src/lib/components/cache",
-      "files": 3,
-      "ssrRisk": 0,
-      "pairedPct": 0
-    },
-    {
-      "dir": "src/lib/components/canvas",
-      "files": 5,
-      "ssrRisk": 0,
-      "pairedPct": 0
-    },
-    {
-      "dir": "src/lib/components/canvas/hybrid",
+      "dir": "src/routes/api/codebase/index",
       "files": 1,
       "ssrRisk": 0,
-      "pairedPct": 0
-    },
-    {
-      "dir": "src/lib/components/case",
-      "files": 3,
-      "ssrRisk": 0,
-      "pairedPct": 0
-    },
-    {
-      "dir": "src/lib/components/cases",
-      "files": 11,
-      "ssrRisk": 0,
-      "pairedPct": 9
+      "pairedPct": 100
     }
   ]
 }
