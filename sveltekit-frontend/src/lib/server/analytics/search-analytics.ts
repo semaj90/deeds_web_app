@@ -32,12 +32,13 @@ export type HitPipeline =
   | 'contextual';
 
 export interface ChunkHit {
-	id:           string;
-	relativePath?: string;
-	gpuCluster?:  number | null;
-	somCluster?:  number | null;
-	score:        number;
-	rerankScore?: number;
+	id:              string;
+	relativePath?:   string;
+	gpuCluster?:     number | null;
+	somCluster?:     number | null;
+	score:           number;
+	rerankScore?:    number;
+	rerankBreakdown?: import('$lib/server/ace/types.js').RerankBreakdown | null;
 }
 
 export interface QueryLogEntry {
@@ -123,14 +124,14 @@ export function recordChunkHits(
     .query(
       `INSERT INTO chunk_hit_log
 		   (chunk_id, relative_path, gpu_cluster, som_cluster, pipeline, query_hash,
-		    score, rerank_score, user_id, case_id)
+		    score, rerank_score, rerank_breakdown, user_id, case_id)
 		 SELECT t.chunk_id, t.relative_path, t.gpu_cluster::int, t.som_cluster::int,
 		        t.pipeline, t.query_hash, t.score::real, t.rerank_score::real,
-		        t.user_id::uuid, t.case_id::uuid
+		        t.rerank_breakdown::jsonb, t.user_id::uuid, t.case_id::uuid
 		 FROM jsonb_to_recordset($1::jsonb) AS t(
 		   chunk_id text, relative_path text, gpu_cluster text, som_cluster text,
 		   pipeline text, query_hash text, score text, rerank_score text,
-		   user_id text, case_id text
+		   rerank_breakdown text, user_id text, case_id text
 		 )`,
       [
         JSON.stringify(
@@ -143,6 +144,7 @@ export function recordChunkHits(
             query_hash: qHash,
             score: String(h.score),
             rerank_score: h.rerankScore != null ? String(h.rerankScore) : null,
+            rerank_breakdown: h.rerankBreakdown != null ? JSON.stringify(h.rerankBreakdown) : null,
             user_id: opts.userId ?? null,
             case_id: opts.caseId ?? null,
           }))
