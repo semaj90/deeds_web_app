@@ -46,6 +46,8 @@ export const TTL = {
   CASE_VERSION: 0, // no TTL (explicit invalidation)
   /** Cluster summary narratives: medium-lived, LLM-generated */
   CLUSTER_SUMMARY: 6 * 60 * 60, // 6 hours
+  /** Cluster/SOM centroid vectors: same TTL as cluster summaries */
+  CENTROID: 6 * 60 * 60, // 6 hours
   /** User activity heartbeat: long-lived engagement tracking */
   USER_ACTIVITY: 30 * 24 * 60 * 60, // 30 days
 } as const;
@@ -149,6 +151,15 @@ export const jobKey = {
 export const clusterSummaryKey = {
   /** cluster-summary:{clusterId} — LLM-generated cluster narrative */
   cached: (clusterId: number) => `cluster-summary:${clusterId}`,
+};
+
+// ── Centroid Cache Keys ───────────────────────────────────────────────────
+
+export const centroidKey = {
+  /** centroid:cluster:{clusterId} — Float32Array packed as JSON number[] */
+  cluster: (clusterId: number) => `centroid:cluster:${clusterId}`,
+  /** centroid:som:{x}:{y} — SOM cell centroid vector */
+  som: (x: number, y: number) => `centroid:som:${x}:${y}`,
 };
 
 // ── User Engagement Keys ──────────────────────────────────────────────────

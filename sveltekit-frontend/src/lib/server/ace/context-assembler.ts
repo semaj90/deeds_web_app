@@ -66,6 +66,9 @@ import { getRedis } from '$lib/server/redis.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
 import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/ACPToolRegistry.js';
+import { applyClusterCoherenceBoost, extractDominantCluster } from '$lib/server/retrieval/cluster-aware-reranker.js';
+import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
+import { getClusterBowTexture } from '$lib/server/langextract/bag-cache.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -545,6 +548,20 @@ export async function assembleACEContext(opts: {
       }
       if (activeClusterSummary) {
         (baseContext as ACEContext).activeClusterSummary = activeClusterSummary;
+      }
+
+      // Step 6b: SOM cell neighbourhood summary — topological context for the top cluster
+      if (opts.enableCodebaseContext && codebaseContext?.length) {
+        const topChunk = codebaseContext[0];
+        const somRow = (topChunk as Record<string, unknown>)?.somBmuRow as number | undefined;
+        const somCol = (topChunk as Record<string, unknown>)?.somBmuCol as number | undefined;
+        if (somRow != null && somCol != null) {
+          const somSummary = await getSomCellSummary(somCol, somRow).catch(() => null);
+          if (somSummary?.summary) {
+            baseContext.webSearchContext = (baseContext.webSearchContext ?? '') +
+              `\n## SOM Neighbourhood (cell ${somCol},${somRow})\n${somSummary.summary}\nTags: ${somSummary.tags.join(', ')}`;
+          }
+        }
       }
 
       const policyDecision = await tracePolicy(
@@ -1912,6 +1929,27 @@ async function fetchRAGChunks(
       });
     } catch {
       /* LangExtract unavailable — continue with existing scores */
+    }
+  }
+
+  // Cluster-coherence boost: chunks from the dominant GPU cluster get 1.08× score boost.
+  // BoW tile top-terms are appended to in-cluster chunks for richer cross-encoder context.
+  if (ragChunks.length > 1) {
+    try {
+      const domCluster = extractDominantCluster(
+        ragChunks.map((c) => ({ content: c.content, score: c.score, source: c.source, gpuCluster: (c as Record<string, unknown>).gpuCluster as number | undefined })),
+        5
+      );
+      const bowTile = domCluster != null
+        ? await getClusterBowTexture(domCluster).catch(() => null)
+        : null;
+      const boosted = await applyClusterCoherenceBoost(
+        ragChunks.map((c) => ({ content: c.content, score: c.score, source: c.source, gpuCluster: (c as Record<string, unknown>).gpuCluster as number | undefined })),
+        { bowTile }
+      );
+      ragChunks = boosted.map((c) => ({ content: c.content, score: c.score, source: c.source }));
+    } catch {
+      /* cluster reranker unavailable — non-fatal */
     }
   }
 
