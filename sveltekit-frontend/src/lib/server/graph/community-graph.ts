@@ -32,6 +32,8 @@ import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -724,26 +726,144 @@ export async function getDirectoryKAGContext(
  *
  * Refresh: `npm run agents:write` (after `npm run index:codebase:fast`).
  */
-export async function getAgentsMdQuickHit(dirOrFilePath: string): Promise<string | null> {
-  try {
-    const redis = getRedis();
-    // Normalize to a directory path (strip trailing filename if present)
-    let dir = dirOrFilePath.replace(/\\/g, '/');
-    if (/\.[a-z]{1,5}$/i.test(dir)) dir = dir.split('/').slice(0, -1).join('/');
-    // Strip any leading "sveltekit-frontend/" so keys match the indexer's relative paths
-    dir = dir.replace(/^sveltekit-frontend\//, '');
+export interface AgentsMdQuickHitResult {
+  markdown: string;
+  source: 'redis' | 'disk';
+  resolvedPath: string;
+  resolvedKey?: string;
+}
 
-    // Walk up the tree, nearest-wins per agents.md spec
-    while (dir && dir !== '.' && dir !== '/') {
-      const v = await redis.get(`agents:dir:${dir}`).catch(() => null);
-      if (v) return v;
-      const parent = dir.split('/').slice(0, -1).join('/');
-      if (parent === dir) break;
-      dir = parent;
+function getAgentsMdRoots(): { frontendRoot: string; repoRoot: string } {
+  const cwd = process.cwd();
+  if (path.basename(cwd) === 'sveltekit-frontend') {
+    return { frontendRoot: cwd, repoRoot: path.resolve(cwd, '..') };
+  }
+  return { frontendRoot: path.join(cwd, 'sveltekit-frontend'), repoRoot: cwd };
+}
+
+function isPathInsideRoot(relativePath: string): boolean {
+  return relativePath !== '' && !relativePath.startsWith('..') && !path.isAbsolute(relativePath);
+}
+
+function normalizeAgentsLookupDir(
+  dirOrFilePath: string,
+  frontendRoot: string,
+  repoRoot: string
+): string {
+  let normalized = dirOrFilePath.trim();
+  if (!normalized) return '';
+
+  if (path.isAbsolute(normalized)) {
+    const relToFrontend = path.relative(frontendRoot, normalized);
+    if (isPathInsideRoot(relToFrontend)) {
+      normalized = relToFrontend;
+    } else {
+      const relToRepo = path.relative(repoRoot, normalized);
+      if (isPathInsideRoot(relToRepo)) normalized = relToRepo;
     }
-    // Final fallback: repo root
-    return await redis.get('agents:root').catch(() => null);
+  }
+
+  normalized = normalized.replace(/\\/g, '/');
+  normalized = normalized.replace(/^\.\//, '');
+  normalized = normalized.replace(/^sveltekit-frontend\//, '');
+  normalized = normalized.replace(/\/+$/, '');
+
+  if (/\.[a-z0-9]{1,8}$/i.test(path.posix.basename(normalized))) {
+    normalized = path.posix.dirname(normalized);
+  }
+
+  return normalized === '.' ? '' : normalized;
+}
+
+function buildLookupDirs(dir: string): string[] {
+  if (!dir) return [];
+
+  const dirs: string[] = [];
+  let current = dir;
+
+  while (current && current !== '.' && current !== '/') {
+    dirs.push(current);
+    const parent = path.posix.dirname(current);
+    if (!parent || parent === '.' || parent === current) break;
+    current = parent;
+  }
+
+  return dirs;
+}
+
+function toFrontendAgentsRepoPath(dir: string): string {
+  return dir ? `sveltekit-frontend/${dir}/AGENTS.md` : 'sveltekit-frontend/AGENTS.md';
+}
+
+async function readAgentsMarkdown(filePath: string): Promise<string | null> {
+  try {
+    return await readFile(filePath, 'utf-8');
   } catch {
     return null;
   }
+}
+
+export async function resolveAgentsMdQuickHit(
+  dirOrFilePath: string
+): Promise<AgentsMdQuickHitResult | null> {
+  const { frontendRoot, repoRoot } = getAgentsMdRoots();
+  const normalizedDir = normalizeAgentsLookupDir(dirOrFilePath, frontendRoot, repoRoot);
+  const lookupDirs = buildLookupDirs(normalizedDir);
+
+  try {
+    const redis = getRedis();
+    for (const dir of lookupDirs) {
+      const key = `agents:dir:${dir}`;
+      const markdown = await redis.get(key).catch(() => null);
+      if (markdown) {
+        return {
+          markdown,
+          source: 'redis',
+          resolvedPath: toFrontendAgentsRepoPath(dir),
+          resolvedKey: key,
+        };
+      }
+    }
+
+    const rootMarkdown = await redis.get('agents:root').catch(() => null);
+    if (rootMarkdown) {
+      return {
+        markdown: rootMarkdown,
+        source: 'redis',
+        resolvedPath: 'AGENTS.md',
+        resolvedKey: 'agents:root',
+      };
+    }
+  } catch {
+    // Fall through to disk when Redis is unavailable or stale.
+  }
+
+  for (const dir of [...lookupDirs, '']) {
+    const filePath = dir
+      ? path.join(frontendRoot, ...dir.split('/'), 'AGENTS.md')
+      : path.join(frontendRoot, 'AGENTS.md');
+    const markdown = await readAgentsMarkdown(filePath);
+    if (markdown) {
+      return {
+        markdown,
+        source: 'disk',
+        resolvedPath: toFrontendAgentsRepoPath(dir),
+      };
+    }
+  }
+
+  const repoRootAgents = path.join(repoRoot, 'AGENTS.md');
+  const repoMarkdown = await readAgentsMarkdown(repoRootAgents);
+  if (!repoMarkdown) return null;
+
+  return {
+    markdown: repoMarkdown,
+    source: 'disk',
+    resolvedPath: 'AGENTS.md',
+  };
+}
+
+export async function getAgentsMdQuickHit(dirOrFilePath: string): Promise<string | null> {
+  const hit = await resolveAgentsMdQuickHit(dirOrFilePath);
+  return hit?.markdown ?? null;
 }

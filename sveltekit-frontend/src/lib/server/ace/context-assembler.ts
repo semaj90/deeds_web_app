@@ -216,6 +216,16 @@ export async function assembleACEContext(opts: {
   /** Include Lane 3 deep-research chunks from chunks_web_search (Qdrant). */
   includeResearch?: boolean;
   sectionTypes?: string[];
+  /**
+   * nes-arch path-first preflight (agents.md spec). When provided, the
+   * assembler does a sub-5ms Redis lookup for the nearest AGENTS.md
+   * (walks up the dir tree) and prepends the rendered markdown to the
+   * context. Useful for code-editing agents that already know which file
+   * they're touching — gives them directory conventions + audit warnings
+   * BEFORE expensive semantic retrieval. Pass a file or directory path
+   * relative to the repo root (e.g. `src/lib/server/ace/agent.ts`).
+   */
+  filePath?: string;
 }): Promise<ACEContext> {
   return traceGraph(
     'ace-assembly',
@@ -561,9 +571,70 @@ export async function assembleACEContext(opts: {
         },
       });
 
+      // ─── nes-arch path-first preflight ────────────────────────────────────
+      // Sub-5ms Redis hit for the nearest AGENTS.md (agents.md spec). Walks UP
+      // the dir tree from opts.filePath. Only runs when caller passed a path —
+      // pure overhead otherwise. The rendered markdown is injected at the TOP
+      // of the prompt by the prompt-builder so the model sees directory
+      // conventions before raw chunks.
+      let agentsMd: ACEContext['agentsMd'] = null;
+      if (opts.filePath) {
+        try {
+          const { getAgentsMdQuickHit } = await import('$lib/server/graph/community-graph.js');
+          const md = await getAgentsMdQuickHit(opts.filePath);
+          if (md) {
+            // Resolve which key actually matched by replicating the walk-up rule
+            let dir = opts.filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+            if (/\.[a-z]{1,5}$/i.test(dir)) dir = dir.split('/').slice(0, -1).join('/');
+            const requestedDir = dir;
+            try {
+              const { getRedis } = await import('$lib/server/redis.js');
+              const redis = getRedis();
+              let resolvedKey = 'agents:root';
+              let resolvedDir = '';
+              let ttl: number | null = null;
+              while (dir && dir !== '.' && dir !== '/') {
+                const key = `agents:dir:${dir}`;
+                if (await redis.exists(key)) {
+                  resolvedKey = key;
+                  resolvedDir = dir;
+                  ttl = await redis.ttl(key).catch(() => null);
+                  break;
+                }
+                const parent = dir.split('/').slice(0, -1).join('/');
+                if (parent === dir) break;
+                dir = parent;
+              }
+              if (resolvedKey === 'agents:root') ttl = await redis.ttl('agents:root').catch(() => null);
+              agentsMd = {
+                resolvedKey,
+                requestedPath: opts.filePath,
+                resolvedDir,
+                markdown: md,
+                ttlSeconds: ttl,
+                fallbackToRoot: resolvedKey === 'agents:root',
+              };
+            } catch {
+              // Couldn't introspect the key, but we still have the markdown
+              agentsMd = {
+                resolvedKey: 'agents:dir:?',
+                requestedPath: opts.filePath,
+                resolvedDir: requestedDir,
+                markdown: md,
+                ttlSeconds: null,
+                fallbackToRoot: false,
+              };
+            }
+          }
+        } catch (err) {
+          console.warn('[ACE nes-arch preflight] skipped:', (err as Error)?.message ?? err);
+        }
+      }
+
       const finalContext = {
         ...baseContext,
         policyDecision,
+        agentsMd,
       };
 
       // Fire-and-forget: persist top chunks to ace_chunks for future cache hits
@@ -950,6 +1021,21 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
 
   // 1. System instructions
   lines.push('You are YorHA, a legal AI assistant. Provide accurate, well-cited legal analysis.');
+
+  // 1b. nes-arch path-first AGENTS.md (renders FIRST so the model sees
+  // directory conventions, audit warnings, and dominant tags before chunks).
+  // Only present when the caller passed `filePath` to assembleACEContext.
+  if (context.agentsMd?.markdown) {
+    const a = context.agentsMd;
+    const ttlNote = a.ttlSeconds != null
+      ? `TTL: ${Math.floor(a.ttlSeconds / 3600)}h ${Math.floor((a.ttlSeconds % 3600) / 60)}m`
+      : 'TTL: unknown';
+    const fallbackNote = a.fallbackToRoot ? ' _(fallback to repo-root AGENTS.md)_' : '';
+    lines.push(
+      `\n## Directory Context — AGENTS.md\nResolved: \`${a.resolvedKey}\`${fallbackNote} · ${ttlNote}\n\n${a.markdown}`
+    );
+    confidenceFactors.agentsMd = a.fallbackToRoot ? 0.4 : 0.85;
+  }
 
   // 2. Practice template
   if (context.practiceTemplate) {

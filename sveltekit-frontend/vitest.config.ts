@@ -97,6 +97,7 @@ export default defineConfig({
       'tests/routes/directory-summarizer.test.ts',
       'tests/routes/codebase-index-directory-summaries.test.ts',
       'tests/routes/codebase-index-summarize-dirs.test.ts',
+      'tests/unit/agents-md-quick-hit.test.ts',
       'tests/unit/ensure-dev-runtime.test.ts',
       // G16 auto-generated route test stubs (npm run audit:generate-route-stubs)
       'tests/routes/auto/**/*.test.ts',
