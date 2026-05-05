@@ -20,6 +20,7 @@ export default defineConfig({
       'tests/code-llm-index.spec.ts',
       'tests/openai-facade.spec.ts',
       'tests/agents-md-relations.spec.ts',
+      'tests/redis-disposable.spec.ts',
       'tests/langextract-native.spec.ts',
       'tests/ace-context-glossary.spec.ts',
       'tests/ace-ingest-route.spec.ts',
