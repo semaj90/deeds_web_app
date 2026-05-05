@@ -755,6 +755,9 @@ export const handle: Handle = async ({ event, resolve }) => {
       '/api/tools',
       '/api/system',
       '/api/ollama',
+      '/api/test',
+      '/api/graph/hypergraph',
+      '/api/mcp',
     ];
 
     const isPublic = PUBLIC.some((p) => path.startsWith(p));

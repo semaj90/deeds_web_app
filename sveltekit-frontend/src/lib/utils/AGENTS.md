@@ -1,15 +1,15 @@
 # AGENTS.md — `src/lib/utils`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/utils
 
 ## Snapshot
 
-- shared library directory with 42 files, 0 API handlers, 2 SSR-unsafe
+- shared library directory with 42 files, 0 API handlers, 1 SSR-unsafe
 - Audit score: **75/100**
-- 🔴 SSR-unsafe: 2 · 🟠 hardcoded localhost: 4
+- 🔴 SSR-unsafe: 1 · 🟠 hardcoded localhost: 4
 - Tags: `src` `lib` `utils` `zod` `ssr-unsafe` `auth`
 
 ## Files (42)
@@ -34,7 +34,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 1 for full digest.
 
 ## Warnings
 
-- ⚠️ 2 SSR-unsafe globals
+- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
 
 ## Agentic tool-calling — quick ACE hits

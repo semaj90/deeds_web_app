@@ -11,6 +11,14 @@ import { error, text, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { server, setupToolHandlers } from '../../../mcp/server.js';
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from 'zod';
+
+const JsonRpcRequestSchema = z.object({
+  jsonrpc: z.literal('2.0'),
+  id: z.union([z.string(), z.number(), z.null()]).optional(),
+  method: z.string().min(1).max(256),
+  params: z.record(z.string(), z.unknown()).optional(),
+});
 
 // Ensure tools are registered
 setupToolHandlers();
@@ -76,7 +84,19 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   try {
-    const body = await request.json();
+    const rawBody = await request.json();
+    const parsed = JsonRpcRequestSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return json(
+        {
+          jsonrpc: '2.0',
+          id: null,
+          error: { code: -32600, message: 'Invalid Request: ' + parsed.error.issues[0]?.message },
+        },
+        { status: 400 }
+      );
+    }
+    const body = parsed.data;
 
     // 2. Direct Server Handling
     // Instead of a full transport layer, we use the server's internal request handler

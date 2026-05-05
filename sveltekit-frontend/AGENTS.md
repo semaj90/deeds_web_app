@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:32:31.706Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -35,9 +35,9 @@ These tools are wired in-process in [`src/lib/server/ai/gemma4-agent.ts`](./src/
 | Gate | Status |
 |------|--------|
 | G4  Auth on API routes | 636✅ / 30❌ |
-| G5  Zod on body-parsing routes | 468✅ / 1❌ |
-| G15 SSR-unsafe globals | 37❌ |
-| G16 Routes without tests | 534❌ |
+| G5  Zod on body-parsing routes | 469✅ / 0❌ |
+| G15 SSR-unsafe globals | 46❌ |
+| G16 Routes without tests | 0❌ |
 | G20 Cyclic import pairs | 0 |
 
 Refresh with `npm run index:codebase:fast && npm run agents:write`.
@@ -132,7 +132,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/components/yorha` | 38 | 🔴 4 ssr | C50 | `src_lib_components_yorha` | `agents_md({ path: "src/lib/components/yorha" })` |
 | `src/lib/components/yorha/_simulations` | 12 | — | — | `src_lib_components_yorha__simulations` | `agents_md({ path: "src/lib/components/yorha/_simulations" })` |
 | `src/lib/components/yorha/cases` | 3 | — | — | `src_lib_components_yorha_cases` | `agents_md({ path: "src/lib/components/yorha/cases" })` |
-| `src/lib/components/yorha/dashboard` | 10 | — | — | `src_lib_components_yorha_dashboard` | `agents_md({ path: "src/lib/components/yorha/dashboard" })` |
+| `src/lib/components/yorha/dashboard` | 14 | — | — | `src_lib_components_yorha_dashboard` | `agents_md({ path: "src/lib/components/yorha/dashboard" })` |
 | `src/lib/components/yorha/evidence` | 5 | — | C92 | `src_lib_components_yorha_evidence` | `agents_md({ path: "src/lib/components/yorha/evidence" })` |
 
 ### `src/lib/config/` (1 dir)

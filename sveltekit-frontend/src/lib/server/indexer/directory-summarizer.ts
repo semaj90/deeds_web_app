@@ -380,7 +380,13 @@ export async function ingestDirectorySummaries(
     return result;
   }
 
-  const neo4jBatch: Array<{ dir: string; clusterIds: number[] }> = [];
+  const neo4jBatch: Array<{
+    dir: string;
+    clusterIds: number[];
+    somCluster?: number | null;
+    somBmuRow?: number;
+    somBmuCol?: number;
+  }> = [];
   const webSearchDirs: DirAuditEntry[] = [];
   const clusterSummaryRows = await loadClusterSummaryRows();
 

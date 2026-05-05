@@ -1154,10 +1154,16 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
                   '$lib/server/indexer/directory-summarizer.js'
                 );
                 const entries = rows.rows.map((r) => ({
-                  rel: ((((Array.isArray(r.metadata?.topFiles) ? r.metadata.topFiles[0] : null) as string | null)
-                    ?? r.tags?.find((tag) => tag.includes('/'))
-                    ?? `cluster-${r.gpu_cluster}`)
-                    .replace(/[^/]*$/, '').replace(/\/$/, '') || `cluster-${r.gpu_cluster}`,
+                  rel:
+                    (
+                      ((Array.isArray(r.metadata?.topFiles) ? r.metadata.topFiles[0] : null) as
+                        | string
+                        | null) ??
+                      r.tags?.find((tag: string) => tag.includes('/')) ??
+                      `cluster-${r.gpu_cluster}`
+                    )
+                      .replace(/[^/]*$/, '')
+                      .replace(/\/$/, '') || `cluster-${r.gpu_cluster}`,
                   score: 75,
                   metrics: { gpuCluster: r.gpu_cluster },
                   ragSummary: r.summary ?? null,

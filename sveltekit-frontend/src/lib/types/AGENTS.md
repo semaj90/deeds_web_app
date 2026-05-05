@@ -1,16 +1,16 @@
 # AGENTS.md — `src/lib/types`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/types
 
 ## Snapshot
 
-- shared library directory with 51 files, 0 API handlers, 1 Drizzle refs, 1 SSR-unsafe
-- Audit score: **90/100**
-- 🔴 SSR-unsafe: 1
-- Tags: `src` `lib` `types` `db-schema` `zod` `ssr-unsafe`
+- shared library directory with 51 files, 0 API handlers, 1 Drizzle refs
+- Audit score: **100/100**
+- no audit signals
+- Tags: `src` `lib` `types` `db-schema` `zod`
 
 ## Files (51)
 
@@ -32,9 +32,6 @@ This directory is part of cluster **C77** — type chunks in \`src/lib/types\` (
 
 See `docs/graph/hypergraph-clusters.md` § Cluster 77 for full digest.
 
-## Warnings
-
-- ⚠️ 1 SSR-unsafe globals
 
 ## Agentic tool-calling — quick ACE hits
 

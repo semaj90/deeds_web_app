@@ -33,11 +33,11 @@ import { getAuditHotspots } from '$lib/server/graph/graph-intel.js';
 // ── Zod ──────────────────────────────────────────────────────────────────────
 
 const batchTaskSchema = z.object({
-  id:       z.string().min(1).max(120),
-  dir:      z.string().min(1).max(200),
-  reason:   z.array(z.string()).max(10),
-  query:    z.string().min(1).max(8000),
-  metadata: z.record(z.unknown()).default({}),
+  id: z.string().min(1).max(120),
+  dir: z.string().min(1).max(200),
+  reason: z.array(z.string()).max(10),
+  query: z.string().min(1).max(8000),
+  metadata: z.record(z.string(), z.unknown()).default({}),
 });
 
 const requestSchema = z.discriminatedUnion('mode', [

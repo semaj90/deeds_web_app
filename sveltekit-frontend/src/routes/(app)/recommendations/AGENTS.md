@@ -1,7 +1,7 @@
 # AGENTS.md — `src/routes/(app)/recommendations`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)/recommendations
 
@@ -17,9 +17,6 @@
 - `+page.server.ts`
 - `+page.svelte`
 
-## Warnings
-
-- ⚠️ 1 routes lack test pairing
 
 ## Agentic tool-calling — quick ACE hits
 

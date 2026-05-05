@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/components/yorha/dashboard`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/components/yorha/dashboard
 
@@ -12,7 +12,7 @@
 - TODOs: 1
 - Tags: `dashboard` `low-score` `has-errors`
 
-## Files (10)
+## Files (14)
 
 - `ActiveCasesWidget.svelte`
 - `EvidenceStats.svelte`
