@@ -51,9 +51,9 @@
         "lineEnd": 181
       }
     ],
-    "somRow": 0,
+    "somRow": 2,
     "somCol": 7,
-    "somCluster": 7,
+    "somCluster": 23,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -206,9 +206,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 4,
-    "somCluster": 60,
+    "somRow": 4,
+    "somCol": 0,
+    "somCluster": 32,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -300,9 +300,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 7,
+    "somCol": 5,
+    "somCluster": 61,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -431,8 +431,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somCol": 3,
+    "somCluster": 3,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -597,9 +597,9 @@
         "lineEnd": 26
       }
     ],
-    "somRow": 4,
+    "somRow": 6,
     "somCol": 7,
-    "somCluster": 39,
+    "somCluster": 55,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -764,9 +764,9 @@
         "lineEnd": 46
       }
     ],
-    "somRow": 4,
+    "somRow": 7,
     "somCol": 7,
-    "somCluster": 39,
+    "somCluster": 63,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -936,8 +936,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1015,9 +1015,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 7,
-    "somCluster": 31,
+    "somRow": 7,
+    "somCol": 6,
+    "somCluster": 62,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1175,8 +1175,8 @@
       }
     ],
     "somRow": 1,
-    "somCol": 0,
-    "somCluster": 8,
+    "somCol": 3,
+    "somCluster": 11,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1313,9 +1313,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1380,8 +1380,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1498,9 +1498,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 4,
+    "somCol": 0,
+    "somCluster": 32,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1617,9 +1617,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1785,8 +1785,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 1,
-    "somCluster": 1,
+    "somCol": 2,
+    "somCluster": 2,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1843,8 +1843,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -1958,8 +1958,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -2015,9 +2015,9 @@
         "lineEnd": 294
       }
     ],
-    "somRow": 3,
+    "somRow": 7,
     "somCol": 0,
-    "somCluster": 24,
+    "somCluster": 56,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -2182,9 +2182,9 @@
         "lineEnd": 669
       }
     ],
-    "somRow": 4,
-    "somCol": 0,
-    "somCluster": 32,
+    "somRow": 7,
+    "somCol": 1,
+    "somCluster": 57,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -2349,9 +2349,9 @@
         "lineEnd": 44
       }
     ],
-    "somRow": 6,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 55,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -2516,9 +2516,9 @@
         "lineEnd": 26
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -2695,9 +2695,9 @@
         "lineEnd": 331
       }
     ],
-    "somRow": 7,
-    "somCol": 4,
-    "somCluster": 60,
+    "somRow": 5,
+    "somCol": 2,
+    "somCluster": 42,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -2878,9 +2878,9 @@
         "lineEnd": 207
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 7,
+    "somCol": 7,
+    "somCluster": 63,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -3037,9 +3037,9 @@
         "lineEnd": 249
       }
     ],
-    "somRow": 6,
-    "somCol": 1,
-    "somCluster": 49,
+    "somRow": 5,
+    "somCol": 4,
+    "somCluster": 44,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -3220,9 +3220,9 @@
         "lineEnd": 75
       }
     ],
-    "somRow": 7,
-    "somCol": 5,
-    "somCluster": 61,
+    "somRow": 0,
+    "somCol": 6,
+    "somCluster": 6,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -3355,9 +3355,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 6,
-    "somCol": 4,
-    "somCluster": 52,
+    "somRow": 4,
+    "somCol": 2,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -3526,9 +3526,9 @@
         "lineEnd": 48
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 0,
+    "somCol": 3,
+    "somCluster": 3,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -3638,8 +3638,8 @@
       }
     ],
     "somRow": 2,
-    "somCol": 0,
-    "somCluster": 16,
+    "somCol": 2,
+    "somCluster": 18,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -3804,9 +3804,9 @@
         "lineEnd": 155
       }
     ],
-    "somRow": 1,
-    "somCol": 0,
-    "somCluster": 8,
+    "somRow": 0,
+    "somCol": 2,
+    "somCluster": 2,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -3932,8 +3932,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somCol": 3,
+    "somCluster": 3,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4110,9 +4110,9 @@
         "lineEnd": 228
       }
     ],
-    "somRow": 6,
+    "somRow": 0,
     "somCol": 5,
-    "somCluster": 53,
+    "somCluster": 5,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4167,8 +4167,8 @@
       }
     ],
     "somRow": 5,
-    "somCol": 7,
-    "somCluster": 47,
+    "somCol": 6,
+    "somCluster": 46,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4277,9 +4277,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
-    "somCol": 3,
-    "somCluster": 43,
+    "somRow": 3,
+    "somCol": 2,
+    "somCluster": 26,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4448,9 +4448,9 @@
         "lineEnd": 112
       }
     ],
-    "somRow": 4,
-    "somCol": 0,
-    "somCluster": 32,
+    "somRow": 7,
+    "somCol": 2,
+    "somCluster": 58,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4498,9 +4498,9 @@
         "lineEnd": 190
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4621,9 +4621,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 5,
-    "somCluster": 29,
+    "somRow": 7,
+    "somCol": 4,
+    "somCluster": 60,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4784,9 +4784,9 @@
         "lineEnd": 93
       }
     ],
-    "somRow": 3,
+    "somRow": 7,
     "somCol": 7,
-    "somCluster": 31,
+    "somCluster": 63,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4878,9 +4878,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 4,
-    "somCluster": 60,
+    "somRow": 5,
+    "somCol": 2,
+    "somCluster": 42,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -4982,9 +4982,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 3,
-    "somCluster": 59,
+    "somRow": 4,
+    "somCol": 0,
+    "somCluster": 32,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5121,9 +5121,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 2,
-    "somCluster": 58,
+    "somRow": 4,
+    "somCol": 3,
+    "somCluster": 35,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5248,9 +5248,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
+    "somRow": 5,
     "somCol": 2,
-    "somCluster": 26,
+    "somCluster": 42,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5351,9 +5351,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 6,
-    "somCluster": 30,
+    "somRow": 7,
+    "somCol": 5,
+    "somCluster": 61,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5445,9 +5445,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 7,
-    "somCluster": 31,
+    "somRow": 7,
+    "somCol": 6,
+    "somCluster": 62,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5510,9 +5510,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
+    "somRow": 7,
     "somCol": 0,
-    "somCluster": 24,
+    "somCluster": 56,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5681,9 +5681,9 @@
         "lineEnd": 110
       }
     ],
-    "somRow": 5,
-    "somCol": 0,
-    "somCluster": 40,
+    "somRow": 7,
+    "somCol": 3,
+    "somCluster": 59,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5853,8 +5853,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somCol": 3,
+    "somCluster": 3,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -5920,9 +5920,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -6001,9 +6001,9 @@
         "lineEnd": 48
       }
     ],
-    "somRow": 6,
+    "somRow": 1,
     "somCol": 6,
-    "somCluster": 54,
+    "somCluster": 14,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -6180,9 +6180,9 @@
         "lineEnd": 372
       }
     ],
-    "somRow": 4,
+    "somRow": 2,
     "somCol": 4,
-    "somCluster": 36,
+    "somCluster": 20,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -6343,9 +6343,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -6424,9 +6424,9 @@
         "lineEnd": 29
       }
     ],
-    "somRow": 0,
+    "somRow": 3,
     "somCol": 7,
-    "somCluster": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -6583,9 +6583,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 4,
+    "somRow": 6,
     "somCol": 7,
-    "somCluster": 39,
+    "somCluster": 55,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -6710,9 +6710,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -6877,9 +6877,9 @@
         "lineEnd": 312
       }
     ],
-    "somRow": 7,
-    "somCol": 2,
-    "somCluster": 58,
+    "somRow": 4,
+    "somCol": 3,
+    "somCluster": 35,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -7048,9 +7048,9 @@
         "lineEnd": 22
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -7158,9 +7158,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
+    "somRow": 5,
     "somCol": 2,
-    "somCluster": 26,
+    "somCluster": 42,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -7325,9 +7325,9 @@
         "lineEnd": 3150
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -7476,9 +7476,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 6,
-    "somCluster": 62,
+    "somCluster": 6,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -7656,8 +7656,8 @@
       }
     ],
     "somRow": 2,
-    "somCol": 4,
-    "somCluster": 20,
+    "somCol": 0,
+    "somCluster": 16,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -7822,9 +7822,9 @@
         "lineEnd": 994
       }
     ],
-    "somRow": 0,
-    "somCol": 6,
-    "somCluster": 6,
+    "somRow": 3,
+    "somCol": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -7953,9 +7953,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 1,
+    "somRow": 4,
     "somCol": 7,
-    "somCluster": 15,
+    "somCluster": 39,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8116,9 +8116,9 @@
         "lineEnd": 320
       }
     ],
-    "somRow": 4,
-    "somCol": 4,
-    "somCluster": 36,
+    "somRow": 3,
+    "somCol": 1,
+    "somCluster": 25,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8167,8 +8167,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8224,9 +8224,9 @@
         "lineEnd": 169
       }
     ],
-    "somRow": 0,
+    "somRow": 2,
     "somCol": 7,
-    "somCluster": 7,
+    "somCluster": 23,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8323,8 +8323,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8433,9 +8433,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 2,
+    "somRow": 6,
     "somCol": 0,
-    "somCluster": 16,
+    "somCluster": 48,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8499,9 +8499,9 @@
         "lineEnd": 1560
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8658,9 +8658,9 @@
         "lineEnd": 42
       }
     ],
-    "somRow": 4,
-    "somCol": 0,
-    "somCluster": 32,
+    "somRow": 7,
+    "somCol": 2,
+    "somCluster": 58,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8725,9 +8725,9 @@
         "lineEnd": 21
       }
     ],
-    "somRow": 4,
+    "somRow": 6,
     "somCol": 7,
-    "somCluster": 39,
+    "somCluster": 55,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8790,9 +8790,9 @@
         "lineEnd": 127
       }
     ],
-    "somRow": 7,
-    "somCol": 2,
-    "somCluster": 58,
+    "somRow": 5,
+    "somCol": 4,
+    "somCluster": 44,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -8942,8 +8942,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somCol": 3,
+    "somCluster": 3,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -9116,9 +9116,9 @@
         "lineEnd": 138
       }
     ],
-    "somRow": 4,
-    "somCol": 4,
-    "somCluster": 36,
+    "somRow": 3,
+    "somCol": 1,
+    "somCluster": 25,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -9170,9 +9170,9 @@
         "lineEnd": 43
       }
     ],
-    "somRow": 0,
+    "somRow": 3,
     "somCol": 7,
-    "somCluster": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -9345,9 +9345,9 @@
         "lineEnd": 621
       }
     ],
-    "somRow": 0,
-    "somCol": 6,
-    "somCluster": 6,
+    "somRow": 3,
+    "somCol": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -9520,9 +9520,9 @@
         "lineEnd": 77
       }
     ],
-    "somRow": 7,
+    "somRow": 1,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 15,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -9687,9 +9687,9 @@
         "lineEnd": 20
       }
     ],
-    "somRow": 7,
+    "somRow": 1,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 15,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -9862,9 +9862,9 @@
         "lineEnd": 38
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 4,
+    "somCol": 5,
+    "somCluster": 37,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -9928,9 +9928,9 @@
         "lineEnd": 825
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -10095,9 +10095,9 @@
         "lineEnd": 21
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -10266,9 +10266,9 @@
         "lineEnd": 9
       }
     ],
-    "somRow": 6,
+    "somRow": 1,
     "somCol": 6,
-    "somCluster": 54,
+    "somCluster": 14,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -10311,9 +10311,9 @@
         "lineEnd": 31
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -10442,9 +10442,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 0,
+    "somRow": 3,
     "somCol": 7,
-    "somCluster": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -10553,9 +10553,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
-    "somCol": 0,
-    "somCluster": 40,
+    "somRow": 7,
+    "somCol": 3,
+    "somCluster": 59,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -10729,8 +10729,8 @@
       }
     ],
     "somRow": 3,
-    "somCol": 4,
-    "somCluster": 28,
+    "somCol": 1,
+    "somCluster": 25,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -10896,8 +10896,8 @@
       }
     ],
     "somRow": 2,
-    "somCol": 0,
-    "somCluster": 16,
+    "somCol": 3,
+    "somCluster": 19,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -11062,9 +11062,9 @@
         "lineEnd": 84
       }
     ],
-    "somRow": 0,
+    "somRow": 3,
     "somCol": 7,
-    "somCluster": 7,
+    "somCluster": 31,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -11230,8 +11230,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 0,
-    "somCluster": 0,
+    "somCol": 4,
+    "somCluster": 4,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -11511,9 +11511,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 4,
+    "somCol": 5,
+    "somCluster": 37,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -11679,8 +11679,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 4,
-    "somCluster": 4,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -11784,9 +11784,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 4,
+    "somRow": 3,
     "somCol": 4,
-    "somCluster": 36,
+    "somCluster": 28,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -11952,8 +11952,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 2,
-    "somCluster": 2,
+    "somCol": 1,
+    "somCluster": 1,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -12118,9 +12118,9 @@
         "lineEnd": 3606
       }
     ],
-    "somRow": 1,
-    "somCol": 4,
-    "somCluster": 12,
+    "somRow": 0,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -12289,9 +12289,9 @@
         "lineEnd": 140
       }
     ],
-    "somRow": 4,
+    "somRow": 6,
     "somCol": 7,
-    "somCluster": 39,
+    "somCluster": 55,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -12339,9 +12339,9 @@
         "lineEnd": 45
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 7,
-    "somCluster": 63,
+    "somCluster": 7,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -12514,9 +12514,9 @@
         "lineEnd": 284
       }
     ],
-    "somRow": 7,
-    "somCol": 0,
-    "somCluster": 56,
+    "somRow": 4,
+    "somCol": 5,
+    "somCluster": 37,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -12681,9 +12681,9 @@
         "lineEnd": 156
       }
     ],
-    "somRow": 2,
-    "somCol": 3,
-    "somCluster": 19,
+    "somRow": 1,
+    "somCol": 0,
+    "somCluster": 8,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -12856,9 +12856,9 @@
         "lineEnd": 92
       }
     ],
-    "somRow": 7,
+    "somRow": 0,
     "somCol": 6,
-    "somCluster": 62,
+    "somCluster": 6,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -12963,9 +12963,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 3,
-    "somCol": 7,
-    "somCluster": 31,
+    "somRow": 7,
+    "somCol": 6,
+    "somCluster": 62,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -13074,8 +13074,8 @@
       }
     ],
     "somRow": 0,
-    "somCol": 3,
-    "somCluster": 3,
+    "somCol": 0,
+    "somCluster": 0,
     "somGridW": 8,
     "somGridH": 8
   },
@@ -13176,9 +13176,9 @@
         "lineEnd": null
       }
     ],
-    "somRow": 5,
+    "somRow": 4,
     "somCol": 2,
-    "somCluster": 42,
+    "somCluster": 34,
     "somGridW": 8,
     "somGridH": 8
   }
