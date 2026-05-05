@@ -29,6 +29,8 @@ const argv = process.argv.slice(2);
 const PATH_ARG = argv.find((a, i) => argv[i - 1] === '--path') ?? null;
 const FILTER = argv.find((a, i) => argv[i - 1] === '--filter') ?? null;
 const CONTENT = argv.find((a, i) => argv[i - 1] === '--content') ?? null;
+const STRICT  = argv.includes('--strict');
+const MIN_KEYS = parseInt(argv.find((a, i) => argv[i - 1] === '--min-keys') ?? '50', 10);
 
 const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379');
 
@@ -91,3 +93,19 @@ for (const k of sample) {
 if (keys.length > 10) console.log(`  ... and ${keys.length - 10} more`);
 
 await r.quit();
+
+// Strict mode (CI gate / smoke:agents): non-zero exit when the NES-arch
+// preflight cache is materially empty. Used by graphify:full to fail fast.
+if (STRICT) {
+  const failures = [];
+  if (!rootExists) failures.push('agents:root missing — run `npm run agents:write`');
+  if (allKeys.length < MIN_KEYS) {
+    failures.push(`agents:dir:* count = ${allKeys.length} (expected ≥ ${MIN_KEYS}) — run \`npm run agents:write\``);
+  }
+  if (failures.length > 0) {
+    console.error('\n✗ smoke:agents FAILED:');
+    for (const f of failures) console.error('   - ' + f);
+    process.exit(1);
+  }
+  console.log(`\n✓ smoke:agents OK (${allKeys.length} dir keys + agents:root)`);
+}
