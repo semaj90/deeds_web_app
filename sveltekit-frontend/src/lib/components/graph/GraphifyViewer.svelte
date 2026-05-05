@@ -19,6 +19,9 @@
     hasAuth?: boolean;
     hasZod?: boolean;
     lineCount?: number;
+    somBmuRow?: number;
+    somBmuCol?: number;
+    somCluster?: number;
   }
 
   interface ClusterSummary {
@@ -29,6 +32,17 @@
     ssrRisk: number;
     pairedPct: number;
     topFiles: GraphFile[];
+    somRow?: number;
+    somCol?: number;
+  }
+
+  interface GlyphInfo {
+    qdrantPointCount: number;
+    llmSource?: string;
+    topTerms: string[];
+    somRow?: number;
+    somCol?: number;
+    aceSmokeOk: boolean;
   }
 
   interface TraverseNode {
@@ -85,6 +99,10 @@
   let showBow         = $state(false);
   let bowClusterId    = $state<number | undefined>(undefined);
 
+  // Glyph info panel state
+  let glyphInfo       = $state<GlyphInfo | null>(null);
+  let glyphLoading    = $state(false);
+
   // ── Derived ────────────────────────────────────────────────────────────────
   let showCanvas = $derived(
     !!traverseResult && traverseResult.nodes.length > 0 && traverseResult.nodes.length <= 50
@@ -99,16 +117,22 @@
     }
     return [...map.entries()]
       .sort((a, b) => b[1].length - a[1].length)
-      .map(([id, files]) => ({
-        id,
-        fileCount: files.length,
-        ssrRisk:   files.filter(f => f.ssrUnsafe).length,
-        pairedPct: files.length
-          ? Math.round(files.filter(f => f.hasPairedTest).length / files.length * 100)
-          : 0,
-        topTags: [...new Set(files.flatMap(f => f.tags ?? []))].slice(0, 5),
-        topFiles: files.slice(0, 25),
-      }));
+      .map(([id, files]) => {
+        // Derive SOM position from first file that has coords
+        const somFile = files.find(f => f.somBmuRow !== undefined);
+        return {
+          id,
+          fileCount: files.length,
+          ssrRisk:   files.filter(f => f.ssrUnsafe).length,
+          pairedPct: files.length
+            ? Math.round(files.filter(f => f.hasPairedTest).length / files.length * 100)
+            : 0,
+          topTags: [...new Set(files.flatMap(f => f.tags ?? []))].slice(0, 5),
+          topFiles: files.slice(0, 25),
+          somRow:  somFile?.somBmuRow,
+          somCol:  somFile?.somBmuCol,
+        };
+      });
   });
 
   let clusterFiles = $derived.by((): GraphFile[] => {
@@ -280,16 +304,60 @@
     }
   }
 
+  async function loadGlyphInfo(clusterId: number) {
+    if (clusterId < 0) return;
+    glyphInfo = null;
+    glyphLoading = true;
+    try {
+      // Fetch BoW tile for this cluster (checks Redis texture:bow:cluster:*)
+      const bowRes = await fetch('/api/graph/bow-texture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'cluster', clusterId }),
+      });
+      const bowData = bowRes.ok ? await bowRes.json() : null;
+
+      // Count Qdrant glyph_atlas points for this cluster via scroll filter
+      let qdrantCount = 0;
+      try {
+        const qRes = await fetch('/api/graph/traverse?nodeId=cluster:' + clusterId + '&mode=cluster&limit=1');
+        if (qRes.ok) {
+          const qData = await qRes.json() as TraverseResult;
+          // nodes array contains cluster members from Neo4j graph
+          qdrantCount = qData.total ?? 0;
+        }
+      } catch { /* non-fatal */ }
+
+      // SOM coords from the cluster summary entry we have in state
+      const clusterEntry = clusters.find(c => c.id === clusterId);
+
+      glyphInfo = {
+        qdrantPointCount: qdrantCount,
+        llmSource: (bowData?.tile as { source?: string } | null)?.source ?? (bowData?.cache?.hit ? 'redis' : undefined),
+        topTerms:  (bowData?.tile as { terms?: string[] } | null)?.terms?.slice(0, 8) ?? [],
+        somRow:    clusterEntry?.somRow,
+        somCol:    clusterEntry?.somCol,
+        aceSmokeOk: bowData?.tile !== null && bowData?.tile !== undefined,
+      };
+    } catch {
+      glyphInfo = null;
+    } finally {
+      glyphLoading = false;
+    }
+  }
+
   function selectCluster(id: number) {
     selectedCluster = selectedCluster === id ? null : id;
     page = 0;
     searchQuery = '';
     if (selectedCluster !== null) {
       loadClusterSummary(id);
+      loadGlyphInfo(id);
       bowClusterId = id;
       showBow = true;
     } else {
       clusterSummary = '';
+      glyphInfo = null;
       bowClusterId = undefined;
       showBow = false;
     }
@@ -346,10 +414,13 @@
         class:selected={selectedCluster === c.id}
         class:hot={c.ssrRisk > 0}
         onclick={() => selectCluster(c.id)}
-        title="Cluster {c.id} · {c.fileCount} files · {c.ssrRisk} SSR risks"
+        title="Cluster {c.id} · {c.fileCount} files · {c.ssrRisk} SSR risks{c.somRow !== undefined ? ` · SOM (${c.somRow},${c.somCol})` : ''}"
       >
         <span class="cid">#{c.id}</span>
         <span class="cfiles">{c.fileCount}</span>
+        {#if c.somRow !== undefined}
+          <span class="som-pos">{c.somRow},{c.somCol}</span>
+        {/if}
         {#if c.ssrRisk}  <span class="ssr-badge">🔴{c.ssrRisk}</span> {/if}
         {#if c.pairedPct < 20}  <span class="test-badge">⚠️{c.pairedPct}%</span> {/if}
         <span class="ctags">{c.topTags?.slice(0,3).join(' ')}</span>
@@ -384,6 +455,38 @@
         <button class="bow-open-btn" onclick={() => { bowClusterId = selectedCluster!; showBow = true; }}>
           📊 Show BoW Texture
         </button>
+      {/if}
+    </div>
+  {/if}
+
+  <!-- ── Glyph atlas info panel ────────────────────────────────────────── -->
+  {#if selectedCluster !== null && (glyphLoading || glyphInfo)}
+    <div class="glyph-info-panel">
+      <span class="glyph-title">Glyph Atlas — Cluster #{selectedCluster}</span>
+      {#if glyphLoading}
+        <span class="glyph-loading">⏳ loading…</span>
+      {:else if glyphInfo}
+        <div class="glyph-chips">
+          {#if glyphInfo.somRow !== undefined}
+            <span class="glyph-chip som">🗺 SOM ({glyphInfo.somRow},{glyphInfo.somCol})</span>
+          {/if}
+          {#if glyphInfo.llmSource}
+            <span class="glyph-chip src" title="LLM source for Gemma4 summary">
+              {glyphInfo.llmSource === 'turbo' ? '⚡ TurboQuant' : glyphInfo.llmSource === 'ollama' ? '🦙 Ollama' : glyphInfo.llmSource === 'redis' ? '🔴 Redis' : glyphInfo.llmSource}
+            </span>
+          {/if}
+          <span class="glyph-chip ace" class:ace-ok={glyphInfo.aceSmokeOk} class:ace-miss={!glyphInfo.aceSmokeOk}
+            title="ACE smoke: BoW tile present in Redis">
+            {glyphInfo.aceSmokeOk ? '✅ ACE BoW' : '⚠️ No BoW tile'}
+          </span>
+        </div>
+        {#if glyphInfo.topTerms.length > 0}
+          <div class="glyph-terms">
+            {#each glyphInfo.topTerms as term}
+              <span class="glyph-term">{term}</span>
+            {/each}
+          </div>
+        {/if}
       {/if}
     </div>
   {/if}
@@ -546,6 +649,7 @@
   .ssr-badge  { color: #f66; }
   .test-badge { color: #fa0; }
   .ctags { color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; text-align: center; }
+  .som-pos { color: #4a8; font-size: 0.6rem; font-variant-numeric: tabular-nums; }
 
   /* Cluster detail row: summary + BoW panel side by side */
   .cluster-detail-row {
@@ -587,6 +691,30 @@
     border-radius: 4px; cursor: pointer; font-size: 0.72rem;
   }
   .bow-open-btn:hover { background: #1a1a2e; border-color: #668; }
+
+  /* Glyph info panel */
+  .glyph-info-panel {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    border: 1px solid #1a2a1a; border-radius: 6px; padding: 0.4rem 0.75rem;
+    background: #0a120a; font-size: 0.72rem;
+  }
+  .glyph-title { color: #4a8; font-weight: 600; margin-right: 0.25rem; white-space: nowrap; }
+  .glyph-loading { color: #66a; font-style: italic; }
+  .glyph-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .glyph-chip {
+    padding: 1px 6px; border-radius: 3px; font-size: 0.68rem; white-space: nowrap;
+    border: 1px solid #234;
+  }
+  .glyph-chip.som   { background: #0a1a1a; color: #4a8; border-color: #1a3a2a; }
+  .glyph-chip.src   { background: #0a0a1a; color: #88f; border-color: #224; }
+  .glyph-chip.ace   { background: #0a0a0a; border-color: #333; }
+  .glyph-chip.ace-ok   { color: #4d4; border-color: #1a3a1a; background: #0a160a; }
+  .glyph-chip.ace-miss { color: #d84; border-color: #3a2a1a; background: #160f0a; }
+  .glyph-terms { display: flex; flex-wrap: wrap; gap: 3px; }
+  .glyph-term {
+    padding: 1px 5px; background: #111a11; border: 1px solid #1a2a1a;
+    border-radius: 3px; color: #6a6; font-size: 0.65rem;
+  }
 
   .ego-graph { border: 1px solid #223; border-radius: 6px; padding: 0.75rem; background: #0d0d1a; }
   .ego-graph h3 { margin: 0 0 0.5rem; font-size: 0.8rem; color: #88f; }
