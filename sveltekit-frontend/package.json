@@ -79,6 +79,7 @@
     "smoke:graphify": "node scripts/tests/smoke-graphify.mjs",
     "audit:d9": "node scripts/deep-audit-ast.mjs --gate=D9",
     "audit:d9:strict": "node scripts/deep-audit-ast.mjs --gate=D9 --strict",
+    "audit:d9:json": "node scripts/deep-audit-ast.mjs --gate=D9 --json",
     "analyze:graph": "node scripts/analyze-graph.mjs",
     "analyze:graph:console": "node scripts/analyze-graph.mjs --no-write",
     "analyze:graph:ai": "node scripts/analyze-graph-ai.mjs",
