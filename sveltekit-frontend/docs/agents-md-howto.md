@@ -84,12 +84,87 @@ This directory is part of cluster **C22** — function chunks in `src/lib/server
 ## Patterns / Warnings     ← from KAG
 ## PageRank Top-5          ← from KAG (GPU)
 
+## Retrieval / Rerank Hints              ← NEW (Slice 1, May 2026)
+- Cluster: C22 — topic label from hypergraph-clusters.json
+- BoW texture key: `texture:bow:cluster:22` (Redis 1h TTL)
+- Qdrant tags: `redis` `cache` `exact-match`
+- SOM cell: 3:7 (majority vote, from somBmuRow/Col payload)
+- PageRank top files: listed from KAG wiki note
+- Paired tests: N/M files have paired test
+
 ## Agentic tool-calling — quick ACE hits   ← context for LLM tool calls
 - graph_search({ query: "cache", topK: 8 })
 - wiki_note_lookup({ query: "server cache", limit: 5 })
 - audit_hotspots({ limit: 10 })
 - read_file({ filePath: "src/lib/server/cache/<file>" })
+- cluster_bag_lookup({ clusterId: 22 })            ← NEW
+- rag_search({ query: "…", collection: "codebase_chunks_768",
+               filter: { gpuCluster: 22 } })       ← NEW
 ```
+
+---
+
+## 3b. Retrieval / Rerank Hints section (added May 2026)
+
+Every per-dir AGENTS.md now includes a `## Retrieval / Rerank Hints` section. This is the
+primary pre-retrieval path-mapping surface for the ACE context-assembler and the Gemma4 agent.
+
+### What's in it
+
+| Field | Source | Used by |
+|-------|--------|---------|
+| Cluster: C\<N\> | `hypergraph-clusters.json` → dominant cluster for dir | ACE cluster-coherence boost, Qdrant filter pre-search |
+| BoW texture key | `texture:bow:cluster:<N>` Redis key (1h TTL) | ACE BoW overlap boost (Slice 2), GraphifyViewer BagOfWordsTexturePanel |
+| Qdrant tags | Top tags from cluster digest | ACE Karpathy tag boost, `rag_search` filter hints |
+| SOM cell | Majority-vote `somBmuRow:somBmuCol` from file payloads | ACE SOM proximity boost (+0.03) |
+| PageRank top files | `kagDoc.pageRankTop5` from Redis KAG note | ACE pagerank boost lane (Slice 4 downstream) |
+| Paired tests | `hasPairedTest` count/total from graph JSON | Test coverage signal |
+
+### New agentic tools
+
+Two new tool-call hints appear in the Agentic tool-calling section:
+
+```
+cluster_bag_lookup({ clusterId: N })
+  → Redis GET texture:bow:cluster:N → BowTextureTile { terms[], weights[] }
+  → Used to inspect which terms dominate this cluster before running a Qdrant search
+
+rag_search({ query: "…", collection: "codebase_chunks_768",
+             filter: { gpuCluster: N } })
+  → ~100× faster than unfiltered search (300 vs 32k vectors)
+  → Use the clusterId from the Retrieval/Rerank Hints section as the filter value
+```
+
+### ACE boost pipeline (post-retrieval)
+
+The `## Retrieval / Rerank Hints` section feeds directly into `applyKarpathyBoost()` in
+[`src/lib/server/ace/context-assembler.ts`](../src/lib/server/ace/context-assembler.ts):
+
+```
+Per-chunk scoring (RerankBreakdown):
+  semantic      base cosine / cross-encoder score
+  qdrantTag    +0.08 per Karpathy tag match (max +0.24)
+  cluster      +0.04 if same GPU cluster as top result
+  som          +0.03 if same SOM cell as top result
+  bow          +0.03 per query-term ∩ chunk-term ∩ tile-term match (max +0.12)
+  pagerank      0.00  (downstream, when PageRank top-list is wired)
+  pairedTest    0.00  (downstream, when test-file check is wired)
+  final         sum of all above
+```
+
+The `RerankBreakdown` is persisted to `chunk_hit_log.rerank_breakdown` (JSONB) on every
+ACE codebase retrieval pass — powering the RL feedback loop in `context_timeline`.
+
+### Rebuild schedule
+
+| When to run | Command |
+|-------------|---------|
+| After code changes | `npm run graphify:daily && npm run agents:write` |
+| After cluster/SOM changes | `npm run graphify:topology && npm run agents:write` |
+| After BoW tile update | `npm run graphify:bow-tiles && npm run agents:write` |
+| Full rebuild | `npm run graphify:full` (includes agents:write) |
+| Validate tiles | `npm run graphify:bow-tiles:dry` (dry-run, no Redis writes) |
+| Test batch (3 dirs) | `npm run graphify:cluster-summaries:test` |
 
 ---
 
@@ -346,6 +421,10 @@ npm run agents:write              # Regen all (~249 files)
 npm run agents:write:dry          # Preview
 npm run agents:write:root         # Repo-root only
 npm run graphify:full             # Full pipeline (refresh sources THEN agents:write)
+npm run graphify:bow-tiles        # Rebuild cluster BoW texture tiles → Redis (1h TTL)
+npm run graphify:bow-tiles:dry    # Preview tile build, no Redis writes
+npm run graphify:ace-smoke        # 4-probe retrieval check (BoW + traverse + KAG + glyph_atlas)
+npm run check:ts7                 # TypeScript 7 (tsgo) full check — 10× faster pre-flight
 ```
 
 ### Inspect
