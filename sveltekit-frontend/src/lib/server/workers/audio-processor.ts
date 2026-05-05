@@ -284,7 +284,7 @@ export class AudioProcessor {
    */
   private async extractEntities(text: string): Promise<EntityExtractionResult> {
     try {
-      const response = await fetch('http://localhost:8095/extract', {
+      const response = await fetch(`${ENV.LANGEXTRACT_URL}/extract`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
@@ -322,7 +322,7 @@ Respond in JSON format:
   "tags": ["tag1", "tag2", "tag3"]
 }`;
 
-      const response = await fetch('http://localhost:11434/api/generate', {
+      const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -374,7 +374,7 @@ Respond in JSON format:
   ): Promise<void> {
     try {
       // Get embedding from embeddinggemma
-      const embedResponse = await fetch('http://localhost:11434/api/embeddings', {
+      const embedResponse = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -391,7 +391,7 @@ Respond in JSON format:
 
       // Upsert to Qdrant evidence_items collection
       const qdrantResponse = await fetch(
-        'http://localhost:6333/collections/evidence_items/points',
+        `${ENV.QDRANT_URL}/collections/evidence_items/points`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -520,7 +520,7 @@ Respond in JSON format:
 
       // 3. Upsert to Qdrant audio_segments collection
       if (qdrantPoints.length > 0) {
-        await fetch('http://localhost:6333/collections/audio_segments/points', {
+        await fetch(`${ENV.QDRANT_URL}/collections/audio_segments/points`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ points: qdrantPoints }),
@@ -541,7 +541,7 @@ Respond in JSON format:
    */
   private async getEmbedding(text: string): Promise<number[] | null> {
     try {
-      const response = await fetch('http://localhost:11434/api/embeddings', {
+      const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),
