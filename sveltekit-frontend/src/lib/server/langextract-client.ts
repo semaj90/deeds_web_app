@@ -179,10 +179,41 @@ export function invalidateLangExtractResolution(): void {
 
 /**
  * Low-level fetch through the langextract adapter.
- * Handles URL resolution, health gating, and enabled check.
- * Returns null if service is disabled or unhealthy.
+ *
+ * Native-TS short-circuit (default): when LANGEXTRACT_NATIVE='true' (now the
+ * default in env.server.ts), this returns a synthetic Response with the
+ * pure-TS extractor output, bypassing the Python service entirely. All five
+ * existing callers that POST to `/extract` auto-migrate transparently.
+ *
+ * Fall-through to the Python FastAPI service only when:
+ *   - LANGEXTRACT_NATIVE='false' (explicit opt-out)
+ *   - AND LANGEXTRACT_ENABLED=true
+ *   - AND the service responds to /health
  */
 export async function langextractFetch(path: string, init?: RequestInit): Promise<Response | null> {
+  // Native-TS path — covers /extract POST. Other paths (e.g. /health) fall
+  // through to legacy network fetch since the native module doesn't expose them.
+  if (ENV.LANGEXTRACT_NATIVE === 'true' && path === '/extract' && init?.method === 'POST') {
+    try {
+      const body = init.body ? JSON.parse(String(init.body)) : {};
+      const text   = body.text ?? body.content ?? '';
+      const docId  = body.doc_id ?? body.document_id ?? `inline-${Date.now()}`;
+      const docType = (body.document_type ?? 'case') as 'statute' | 'case';
+      const { extractDocumentNative } = await import('$lib/server/langextract/native.js');
+      const out = extractDocumentNative(text, docId, docType);
+      // Return an OK Response shaped like the Python /extract output so callers
+      // that JSON.parse the body get the same fields they always did.
+      return new Response(JSON.stringify(out), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'x-langextract-source': 'native-ts' },
+      });
+    } catch (err) {
+      console.warn('[langextract-native] short-circuit failed, falling through to Python:', (err as Error).message);
+      // Continue to network fallback below
+    }
+  }
+
+  // Python FastAPI fallback (now opt-in)
   if (!ENV.LANGEXTRACT_ENABLED) return null;
   const healthy = await checkHealth();
   if (!healthy) return null;

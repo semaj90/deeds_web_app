@@ -83,14 +83,21 @@ export const ENV = {
   /** CodeIntel gRPC service (cluster summaries, chunk lookup, job status, port 50058) */
   CODEINTEL_GRPC_URL: privateEnv.CODEINTEL_GRPC_URL ?? '127.0.0.1:50058',
   CODEINTEL_GRPC_ENABLED: (privateEnv.CODEINTEL_GRPC_ENABLED ?? 'false') === 'true',
-  // LangExtract service (Python FastAPI + spaCy + NER, container: phase66-langextract)
+  // LangExtract — pure-TS native extractor (langextract/native.ts) is now the default.
+  // The Python FastAPI service (phase66-langextract :8095) is DECOMMISSIONED:
+  //   - 11/11 native tests pass (citations, statutes, case names, money, dates, persons, etc.)
+  //   - No network hop, no GIL, ~10× faster than the Python service for typical legal text
+  //   - To re-enable the Python service for benchmarking: set LANGEXTRACT_ENABLED=true
+  //     AND LANGEXTRACT_NATIVE=false explicitly.
+  // The Python service remains in docker/langextract-optimized/ as an archived reference
+  // until the next housekeeping pass — see next_steps for archive plan.
   LANGEXTRACT_ENABLED:
     (privateEnv.LANGEXTRACT_ENABLED ?? privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
   LANGEXTRACT_URL:
-    privateEnv.LANGEXTRACT_URL ??
-    privateEnv.LANGEXTRACT_API_URL ??
-    privateEnv.MINIO_SIMD_URL ??
-    'http://127.0.0.1:8095',
+    privateEnv.LANGEXTRACT_URL?.trim() || privateEnv.LANGEXTRACT_API_URL?.trim() || '',
+  /** Native TS langextract is the default. Override to 'false' to fall back to the Python service. */
+  LANGEXTRACT_NATIVE:
+    (privateEnv.LANGEXTRACT_NATIVE ?? 'true') === 'true' ? 'true' : 'false',
   // QUIC/NATS embedding transport
   EMBEDDING_QUIC_ENABLED:
     (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',
@@ -108,7 +115,7 @@ export const ENV = {
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',
   NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'password',
   // CouchDB document store
-  COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:legal_ai_pass@localhost:5984',
+  COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:password@localhost:5984',
   // Web search (optional — SearXNG first, DuckDuckGo fallback)
   SEARXNG_URL: privateEnv.SEARXNG_URL ?? 'http://localhost:8888', // Docker: 8888→8080 internal
   // Obsidian Local REST API (optional — vault sync via obsidian-local-rest-api plugin)
