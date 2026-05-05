@@ -1092,6 +1092,26 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.agentsMd = a.fallbackToRoot ? 0.4 : 0.85;
   }
 
+  // 1c. code-llm-index PRIOR ANSWER — sub-5ms file-level Redis hit. Injected
+  // BEFORE raw chunks so the model can refine vs. re-derive when the same
+  // file is queried twice within the 6h TTL. More targeted than agentsMd
+  // (per-file vs per-dir). Confidence weighted by hit count and source.
+  if (context.codeLlmHit?.llmOutput) {
+    const h = context.codeLlmHit;
+    const ageMs   = Date.now() - new Date(h.generatedAt).getTime();
+    const ageHrs  = Math.max(0, ageMs / 3_600_000);
+    const ageNote = ageHrs < 1 ? `${Math.round(ageMs / 60_000)}m ago` : `${ageHrs.toFixed(1)}h ago`;
+    const clusterTag = h.glyphClusterId != null ? ` · cluster #${h.glyphClusterId}` : '';
+    const hitsNote   = h.priorHits > 0 ? ` · ${h.priorHits} prior hit${h.priorHits === 1 ? '' : 's'}` : '';
+    lines.push(
+      `\n## Prior Answer (cached for \`${h.path}\`)\n_Source: ${h.source} · generated ${ageNote}${clusterTag}${hitsNote}_\n\n${h.llmOutput}\n\n_Refine or correct the above using the chunks below if needed; do not contradict it without evidence._`
+    );
+    // Confidence: gemma4 summaries from atlas are most authoritative for code intel; agent/ace synthesis weighted by hit reuse
+    const baseConf = h.source === 'gemma4-summary' ? 0.75 : h.source === 'kag' ? 0.7 : 0.6;
+    const reuseBoost = Math.min(0.15, h.priorHits * 0.02); // up to +0.15 for hot paths
+    confidenceFactors.codeLlmHit = Math.min(0.95, baseConf + reuseBoost);
+  }
+
   // 2. Practice template
   if (context.practiceTemplate) {
     lines.push(`\n## Practice Area Guidelines\n${context.practiceTemplate}`);
