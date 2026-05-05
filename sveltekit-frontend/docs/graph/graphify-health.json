@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-05-05T03:26:59.492Z",
+  "wikiNoteCount": 423,
+  "gemma4SummaryCount": 203,
+  "gemma4Coverage": 48,
+  "bowChunkTiles": 3263,
+  "bowClusterTiles": 0,
+  "glyphCount": 190,
+  "qdrantReachable": true,
+  "graphNodeCount": 0,
+  "graphEdgeCount": 0,
+  "graphLastModified": "2026-05-05T03:26:59.341Z",
+  "agentsMdCount": 250,
+  "aceSmokeWikiOk": true,
+  "aceSmokeGlyphOk": true,
+  "aceSmokeHttpSkipped": true,
+  "ts7Available": false,
+  "ts7Note": "run npm run check:ts7 separately"
+}

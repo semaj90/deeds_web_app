@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-05-05T03:05:54.482Z",
+  "dryRun": false,
+  "skipLlm": false,
+  "graph": {
+    "files": 3374,
+    "directories": 365,
+    "clusters": 20,
+    "missingCluster": 3374,
+    "missingSom": 3374
+  },
+  "pageRank": {
+    "source": "fanin",
+    "entries": 1377
+  },
+  "glyphs": {
+    "processed": 5,
+    "ok": 5,
+    "failed": 0,
+    "tagsUpdated": 0
+  },
+  "topDirectoriesByPageRank": [
+    {
+      "dir": "src",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/ai",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/ai/e2b",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/ai/onnx",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/cache",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/client/db",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/client",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/client/ui",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/components",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/components/admin",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/components/agent",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/components/agentic",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/components/ai",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    },
+    {
+      "dir": "src/lib/components/ai/CaseScoringDashboard",
+      "avg": 0,
+      "max": 0,
+      "source": "fanin"
+    }
+  ],
+  "hotDirectories": [
+    {
+      "dir": "src/lib/components/cache",
+      "files": 3,
+      "ssrRisk": 0,
+      "pairedPct": 0
+    },
+    {
+      "dir": "src/lib/components/canvas",
+      "files": 5,
+      "ssrRisk": 0,
+      "pairedPct": 0
+    },
+    {
+      "dir": "src/lib/components/canvas/hybrid",
+      "files": 1,
+      "ssrRisk": 0,
+      "pairedPct": 0
+    },
+    {
+      "dir": "src/lib/components/case",
+      "files": 3,
+      "ssrRisk": 0,
+      "pairedPct": 0
+    },
+    {
+      "dir": "src/lib/components/cases",
+      "files": 11,
+      "ssrRisk": 0,
+      "pairedPct": 9
+    }
+  ]
+}
