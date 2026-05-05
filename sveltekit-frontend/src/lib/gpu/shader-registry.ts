@@ -224,6 +224,24 @@ export const SHADER_REGISTRY: ShaderSpec[] = [
 		],
 		vectorDim: 0,
 		specRef: 'W3C WebGPU Spec § 11.1'
+	},
+	{
+		id: 'pagerank-iter',
+		name: 'PageRank Power Iteration',
+		description: 'WebGPU power-iteration PageRank on transposed CSR graph (1 dispatch = 1 iteration). Mirrors pytorch-graph.ts pageRankGPU() for browser-side codebase scoring.',
+		source: `// See src/lib/webgpu/pagerank.wgsl — inlined in webgpu-pagerank.ts`,
+		workgroupSize: [256],
+		bindings: [
+			{ binding: 0, type: 'uniform',           name: 'params',      description: 'PageRankParams { n: u32, damping: f32, _pad×2 }' },
+			{ binding: 1, type: 'storage-read',      name: 'row_offsets', description: 'Transposed CSR row offsets (n+1 u32s)' },
+			{ binding: 2, type: 'storage-read',      name: 'col_indices', description: 'Transposed CSR column indices (edge u32s)' },
+			{ binding: 3, type: 'storage-read',      name: 'out_degree',  description: '1/out-degree per node (f32, 0 = dangling)' },
+			{ binding: 4, type: 'storage-read',      name: 'scores_in',   description: 'Current PageRank scores (f32 × n)' },
+			{ binding: 5, type: 'storage-read-write',name: 'scores_out',  description: 'Next PageRank scores (f32 × n)' },
+		],
+		vectorDim: 0,
+		cudaMirror: 'pageRankGPU (pytorch-graph.ts)',
+		specRef: 'W3C WebGPU Spec § 11.1'
 	}
 ];
 
