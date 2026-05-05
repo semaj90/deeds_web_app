@@ -12,7 +12,7 @@
 - no audit signals
 - Tags: `src` `lib` `server` `zod` `auth` `db-schema`
 
-## Files (17)
+## Files (18)
 
 - `codebase-cluster-detection.ts`
 - `codebase-neo4j-sync.ts`
@@ -22,6 +22,7 @@
 - `couchdb-pagerank.ts`
 - `evidence-graph-service.ts`
 - `gpu-graph-analysis.ts`
+- `graph-remote-functions.ts` — UI reads: getGraphOverview, getGraphNode, getGraphPageRankTop, getDirectoryEgoGraph, getBagOfWordsTexture; all wrapped in withRpcCache (Redis 5-min TTL)
 
 ## Hypergraph cluster
 
