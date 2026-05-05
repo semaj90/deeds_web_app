@@ -4207,3 +4207,43 @@ export type NewAstEdge       = typeof astEdges.$inferInsert;
 export type AstFileFeature   = typeof astFileFeatures.$inferSelect;
 export type NewAstFileFeature = typeof astFileFeatures.$inferInsert;
 
+/**
+ * code_llm_index — durable Postgres mirror of the Redis path-level LLM-output cache.
+ *
+ * Source of truth is Redis (`code:llm_output:*`, 6h TTL). This table backs the cache
+ * for survival across Redis flushes and provides a SQL surface for cluster+SOM
+ * analytics that aren't ergonomic to do via Redis ZSET/SET ops.
+ *
+ * The trigram index on `path` enables substring lookups used by the admin route's
+ * `?q=...` similarity search. Composite SOM index supports 4D topology aggregations
+ * (manifold4 RL pipeline reuses this surface).
+ *
+ * Migration: drizzle/manual/code_llm_index.sql
+ */
+export const codeLlmIndex = pgTable('code_llm_index', {
+  pathHash:       varchar('path_hash', { length: 16 }).primaryKey(),
+  path:           text('path').notNull(),
+  isDir:          boolean('is_dir').notNull().default(false),
+  llmOutput:      text('llm_output').notNull(),
+  source:         varchar('source', { length: 32 }).notNull().default('ace'),
+  query:          text('query'),
+  glyphClusterId: integer('glyph_cluster_id'),
+  somBmuRow:      integer('som_bmu_row'),
+  somBmuCol:      integer('som_bmu_col'),
+  hitCount:       integer('hit_count').notNull().default(0),
+  tokenCount:     integer('token_count'),
+  generatedAt:    timestamp('generated_at',  { withTimezone: true }).notNull().default(sql`now()`),
+  lastHitAt:      timestamp('last_hit_at',   { withTimezone: true }).notNull().default(sql`now()`),
+  refreshedAt:    timestamp('refreshed_at',  { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  index('code_llm_index_cluster_idx').on(t.glyphClusterId),
+  index('code_llm_index_last_hit_idx').on(t.lastHitAt),
+  index('code_llm_index_hit_count_idx').on(t.hitCount),
+  index('code_llm_index_source_idx').on(t.source),
+  // GIN trgm + composite SOM index added by drizzle/manual/code_llm_index.sql
+  // (Drizzle can't express USING gin gin_trgm_ops or partial WHERE indexes natively)
+]);
+
+export type CodeLlmIndexRow    = typeof codeLlmIndex.$inferSelect;
+export type NewCodeLlmIndexRow = typeof codeLlmIndex.$inferInsert;
+
