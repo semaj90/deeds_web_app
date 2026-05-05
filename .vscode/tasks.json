@@ -8716,6 +8716,31 @@
     },
 
     {
+      "label": "🔁 Graphify: Resume Batch (fill missing Gemma4)",
+      "type": "shell",
+      "command": "node scripts/graphify-batch-gpu-analysis.mjs --skip-ace",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": { "SUMMARY_CONCURRENCY": "2" }
+      },
+      "group": "test",
+      "detail": "Second-pass enrichment: skips dirs that already have gemma4Summary, processes only the remaining backlog. Safe to re-run repeatedly — idempotent.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🗾 Graphify: SOM Topology",
+      "type": "shell",
+      "command": "npm run graphify:som",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Run CPU SOM on 100 clusters (8×8 grid, 600 iters) → assign somRow/Col → enrich hypergraph-clusters.json + codebase-graph.json → write 100 cluster BoW tiles to Redis → write cluster-topology.json",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
       "label": "🩺 Graphify: Health Report",
       "type": "shell",
       "command": "npm run graphify:health",
