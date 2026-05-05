@@ -1,16 +1,16 @@
 # AGENTS.md — `src/lib`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib
 
 ## Snapshot
 
-- module directory with 11 files, 3 API handlers, 160 Drizzle refs, 9 TODOs, 29 SSR-unsafe
+- module directory with 11 files, 3 API handlers, 160 Drizzle refs, 9 TODOs, 22 SSR-unsafe
 - Audit score: **100/100**
 - no audit signals
-- Tags: `src` `lib` `ai` `zod` `ssr-unsafe` `has-todo`
+- Tags: `src` `lib` `ai` `zod` `has-todo` `ambient-events.d.ts`
 
 ## Files (11)
 
@@ -34,7 +34,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 57 for full digest.
 
 ## Warnings
 
-- ⚠️ 29 SSR-unsafe globals
+- ⚠️ 22 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
 
 ## Agentic tool-calling — quick ACE hits

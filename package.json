@@ -53,6 +53,7 @@
     "@types/ws": "8.18.1",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "@unocss/core": "^66.0.0",
     "@unocss/preset-uno": "^66.0.0",
     "@unocss/vite": "^66.0.0",

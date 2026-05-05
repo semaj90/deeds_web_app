@@ -1,7 +1,7 @@
 # AGENTS.md — `src/routes`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes
 
@@ -25,7 +25,7 @@
 
 - ⚠️ 15 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
-- ⚠️ 615 routes lack test pairing
+- ⚠️ 60 routes lack test pairing
 
 ## Agentic tool-calling — quick ACE hits
 

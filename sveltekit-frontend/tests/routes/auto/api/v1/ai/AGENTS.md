@@ -1,0 +1,38 @@
+# AGENTS.md — `tests/routes/auto/api/v1/ai`
+
+<!-- AGENTS-GEN v1 · do not edit below this line -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+
+> Directory: tests/routes/auto/api/v1/ai
+
+## Snapshot
+
+- 5 file(s), 0 handler(s)
+- Audit score: _(no GPU audit)_
+- no audit signals
+
+
+## Files (5)
+
+- `cache-result.test.ts`
+- `canvas-suggestions.test.ts`
+- `generate-layout.test.ts`
+- `summarize-async.test.ts`
+- `summary-cache.test.ts`
+
+
+## Agentic tool-calling — quick ACE hits
+
+In-process tools the Gemma4 agent can call to dig deeper into this directory:
+
+- `graph_search({ query: "ai", topK: 8 })` — files in this dir with tags, TODOs, audit flags
+- `wiki_note_lookup({ query: "v1 ai", limit: 5 })` — KAG narrative + audit score
+- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
+- `read_file({ filePath: "tests/routes/auto/api/v1/ai/<file>" })` — fetch any file's contents (sandboxed to src/)
+
+
+## How to use this file
+
+Agents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest `AGENTS.md` when editing files in this tree. The root `AGENTS.md` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.
+
+Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.

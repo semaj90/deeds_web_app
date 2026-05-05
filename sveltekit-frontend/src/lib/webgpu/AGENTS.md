@@ -1,15 +1,15 @@
 # AGENTS.md — `src/lib/webgpu`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-04T16:09:09.941Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/webgpu
 
 ## Snapshot
 
-- shared library directory with 19 files, 0 API handlers, 2 SSR-unsafe
+- shared library directory with 19 files, 0 API handlers, 1 SSR-unsafe
 - Audit score: **75/100**
-- 🔴 SSR-unsafe: 2 · 🟠 hardcoded localhost: 1
+- 🔴 SSR-unsafe: 1 · 🟠 hardcoded localhost: 1
 - Tags: `src` `lib` `webgpu` `ssr-unsafe`
 
 ## Files (19)
@@ -34,7 +34,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 23 for full digest.
 
 ## Warnings
 
-- ⚠️ 2 SSR-unsafe globals
+- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
 
 ## Agentic tool-calling — quick ACE hits
