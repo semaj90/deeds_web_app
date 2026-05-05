@@ -826,6 +826,38 @@ export function setupToolHandlers() {
           required: ['path'],
         },
       },
+      {
+        name: 'codebase:graph_traverse',
+        description:
+          'Multi-hop graph traversal from a start file. Returns subgraph nodes and edges with LibTorch PageRank scores. Use mode=ego for immediate neighbors, mode=bfs for N-hop subgraph, mode=cluster for same GPU cluster. Results are limited to 50 nodes by default.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path: {
+              type: 'string',
+              description: 'Start file path (e.g. src/lib/server/ace/context-assembler.ts)',
+            },
+            hops: {
+              type: 'number',
+              description: 'Number of hops (1-4, default 2)',
+            },
+            mode: {
+              type: 'string',
+              enum: ['bfs', 'ego', 'cluster'],
+              description: 'Traversal mode',
+            },
+            direction: {
+              type: 'string',
+              enum: ['both', 'imports', 'importedBy'],
+            },
+            limit: {
+              type: 'number',
+              description: 'Max nodes to return (default 50)',
+            },
+          },
+          required: ['path'],
+        },
+      },
       // ─────────────────────────────────────────────────────────────────────
       // Analytics — Deep Research + JSONL Research Index (feedback-weighted)
       // ─────────────────────────────────────────────────────────────────────
@@ -1595,8 +1627,95 @@ export function setupToolHandlers() {
     ],
   }));
 
+  // ── SNES RPC Cache Bus — MCP read-only tool cache ────────────────────────
+  //
+  // Deterministic read-only MCP tools get a Redis-backed L1 cache so repeated
+  // agent calls within the TTL window return immediately. Mutating tools are
+  // excluded (apply_patch, write_file, run_command, state-altering calls).
+  //
+  // Key shape: rpc:mcp:<tool>:v1:<sha256(args)[0:16]>
+  // TTL: 3600s (1 hr) — overridable per tool via MCP_CACHE_TTL_SECONDS env.
+
+  const MCP_READONLY_TOOLS = new Set([
+    'agents_md',
+    'codebase:search',
+    'codebase:ace_context',
+    'codebase:graph_neighbors',
+    'codebase:explain_cluster',
+    'codebase:file_intel',
+    'codebase:export_bundle',
+    'cluster.summary.get',
+    'chunk.lookup',
+    'rag:search',
+    'gpu:similarity',
+    'embedding:generate',
+    'citations:search',
+    'citations:list_by_case',
+    'reports:list',
+    'analytics:deep_research',
+    'analytics:research_topics',
+  ]);
+
+  const MCP_CACHE_TTL = parseInt(process.env.MCP_CACHE_TTL_SECONDS ?? '3600', 10);
+
+  let _mcpRedis: any = null;
+  async function getMcpRedis() {
+    if (_mcpRedis) return _mcpRedis;
+    try {
+      const { default: Redis } = await import('ioredis');
+      const url = process.env.REDIS_URL ?? 'redis://localhost:6379';
+      _mcpRedis = new Redis(url, { lazyConnect: false, maxRetriesPerRequest: 1, enableOfflineQueue: false, connectTimeout: 1000 });
+      _mcpRedis.on('error', () => { _mcpRedis = null; });
+    } catch { _mcpRedis = null; }
+    return _mcpRedis;
+  }
+
+  function mcpArgsHash(args: Record<string, any>): string {
+    const { createHash } = require('crypto') as typeof import('crypto');
+    return createHash('sha256').update(JSON.stringify(args)).digest('hex').slice(0, 16);
+  }
+
+  async function withMcpCache(
+    name: string,
+    args: Record<string, any>,
+    compute: () => Promise<any>,
+  ): Promise<any> {
+    if (!MCP_READONLY_TOOLS.has(name)) return compute();
+    const key = `rpc:mcp:${name}:v1:${mcpArgsHash(args)}`;
+    try {
+      const redis = await getMcpRedis();
+      if (redis) {
+        const cached = await redis.get(key);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          // Inject cache metadata into first text content block
+          if (Array.isArray(parsed?.content) && parsed.content[0]?.type === 'text') {
+            try {
+              const payload = JSON.parse(parsed.content[0].text);
+              parsed.content[0].text = JSON.stringify({ ...payload, _rpc_cache: { hit: true, key } });
+            } catch { /* non-JSON text content — return as-is */ }
+          }
+          return parsed;
+        }
+      }
+    } catch { /* Redis unavailable — fall through */ }
+
+    const result = await compute();
+
+    try {
+      const redis = await getMcpRedis();
+      if (redis) await redis.set(key, JSON.stringify(result), 'EX', MCP_CACHE_TTL);
+    } catch { /* non-fatal */ }
+
+    return result;
+  }
+
   // Reusable tool handler for compose:pipeline reuse
   async function handleToolCall(name: string, args: Record<string, any>): Promise<any> {
+    return withMcpCache(name, args, () => _handleToolCallInner(name, args));
+  }
+
+  async function _handleToolCallInner(name: string, args: Record<string, any>): Promise<any> {
     switch (name) {
       case 'cases:load': {
         const result = await mcpTools.cases.loadCases(args);
@@ -2828,6 +2947,250 @@ export function setupToolHandlers() {
                 imports,
                 importedBy,
                 summary: { importCount: imports.length, importedByCount: importedBy.length },
+              }),
+            },
+          ],
+        };
+      }
+
+      // ── Codebase: Multi-hop Graph Traversal ──────────────────────────────
+      case 'codebase:graph_traverse': {
+        const {
+          path: traversePath,
+          hops: rawHops = 2,
+          mode: traverseMode = 'bfs',
+          direction: traverseDir = 'both',
+          limit: rawLimit = 50,
+        } = args as {
+          path: string;
+          hops?: number;
+          mode?: string;
+          direction?: string;
+          limit?: number;
+        };
+
+        if (!traversePath) throw new Error('path is required');
+
+        const hops = Math.min(4, Math.max(1, Number(rawHops)));
+        const limit = Math.min(200, Math.max(1, Number(rawLimit)));
+        const mode = ['bfs', 'ego', 'cluster'].includes(traverseMode) ? traverseMode : 'bfs';
+        const direction = ['imports', 'importedBy', 'both'].includes(traverseDir)
+          ? traverseDir
+          : 'both';
+
+        const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
+        const fileId = (
+          traversePath.startsWith('src/') ? traversePath : `src/${traversePath}`
+        ).replace(/[^a-zA-Z0-9/_.-]/g, '_');
+
+        const driver = getNeo4jDriver();
+        const session = driver.session({ database: 'neo4j' });
+
+        const nodeMap = new Map<
+          string,
+          { id: string; filePath: string; type: string; cluster: number }
+        >();
+        const edgeSet = new Set<string>();
+        const edges: Array<{ source: string; target: string }> = [];
+
+        const addEdge = (src: string, tgt: string) => {
+          const key = `${src}→${tgt}`;
+          if (!edgeSet.has(key)) {
+            edgeSet.add(key);
+            edges.push({ source: src, target: tgt });
+          }
+        };
+
+        try {
+          const toNum = (v: unknown): number => {
+            if (v != null && typeof (v as { toNumber?: () => number }).toNumber === 'function') {
+              return (v as { toNumber: () => number }).toNumber();
+            }
+            return (v as number) ?? 0;
+          };
+
+          if (mode === 'ego') {
+            const [rOut, rIn] = await Promise.all([
+              session.run(
+                `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS]->(b:CodebaseFile)
+                 RETURN b.id AS id, b.filePath AS fp, b.type AS type, b.cluster AS cluster
+                 LIMIT $limit`,
+                { id: fileId, limit }
+              ),
+              session.run(
+                `MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile {id: $id})
+                 RETURN a.id AS id, a.filePath AS fp, a.type AS type, a.cluster AS cluster
+                 LIMIT $limit`,
+                { id: fileId, limit }
+              ),
+            ]);
+            for (const rec of rOut.records) {
+              const id = rec.get('id') as string;
+              if (id) {
+                nodeMap.set(id, {
+                  id,
+                  filePath: (rec.get('fp') as string) ?? id,
+                  type: (rec.get('type') as string) ?? '',
+                  cluster: toNum(rec.get('cluster')),
+                });
+                addEdge(fileId, id);
+              }
+            }
+            for (const rec of rIn.records) {
+              const id = rec.get('id') as string;
+              if (id) {
+                nodeMap.set(id, {
+                  id,
+                  filePath: (rec.get('fp') as string) ?? id,
+                  type: (rec.get('type') as string) ?? '',
+                  cluster: toNum(rec.get('cluster')),
+                });
+                addEdge(id, fileId);
+              }
+            }
+          } else if (mode === 'cluster') {
+            const r = await session.run(
+              `MATCH (a:CodebaseFile {id: $id})
+               MATCH (b:CodebaseFile) WHERE b.cluster = a.cluster AND b.id <> $id
+               RETURN b.id AS id, b.filePath AS fp, b.type AS type, b.cluster AS cluster
+               LIMIT $limit`,
+              { id: fileId, limit }
+            );
+            for (const rec of r.records) {
+              const id = rec.get('id') as string;
+              if (id) {
+                nodeMap.set(id, {
+                  id,
+                  filePath: (rec.get('fp') as string) ?? id,
+                  type: (rec.get('type') as string) ?? '',
+                  cluster: toNum(rec.get('cluster')),
+                });
+              }
+            }
+          } else {
+            // bfs — variable-length path
+            const hopStr = `1..${hops}`;
+            const queries: Promise<{ records: unknown[] }>[] = [];
+
+            if (direction === 'imports' || direction === 'both') {
+              queries.push(
+                session.run(
+                  `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS*${hopStr}]->(b:CodebaseFile)
+                   WITH a, b
+                   MATCH path=(a)-[:IMPORTS*${hopStr}]->(b)
+                   UNWIND relationships(path) AS rel
+                   WITH startNode(rel) AS src, endNode(rel) AS tgt
+                   RETURN DISTINCT
+                     src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
+                     tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
+                   LIMIT $limit`,
+                  { id: fileId, limit }
+                ) as Promise<{ records: unknown[] }>
+              );
+            }
+            if (direction === 'importedBy' || direction === 'both') {
+              queries.push(
+                session.run(
+                  `MATCH (b:CodebaseFile)-[:IMPORTS*${hopStr}]->(a:CodebaseFile {id: $id})
+                   WITH a, b
+                   MATCH path=(b)-[:IMPORTS*${hopStr}]->(a)
+                   UNWIND relationships(path) AS rel
+                   WITH startNode(rel) AS src, endNode(rel) AS tgt
+                   RETURN DISTINCT
+                     src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
+                     tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
+                   LIMIT $limit`,
+                  { id: fileId, limit }
+                ) as Promise<{ records: unknown[] }>
+              );
+            }
+
+            const results = await Promise.all(queries);
+            for (const r of results) {
+              for (const _rec of r.records) {
+                const rec = _rec as { get: (k: string) => unknown };
+                const srcId = rec.get('srcId') as string;
+                const tgtId = rec.get('tgtId') as string;
+                if (!srcId || !tgtId) continue;
+                if (!nodeMap.has(srcId)) {
+                  nodeMap.set(srcId, {
+                    id: srcId,
+                    filePath: (rec.get('srcFp') as string) ?? srcId,
+                    type: (rec.get('srcType') as string) ?? '',
+                    cluster: toNum(rec.get('srcCluster')),
+                  });
+                }
+                if (!nodeMap.has(tgtId)) {
+                  nodeMap.set(tgtId, {
+                    id: tgtId,
+                    filePath: (rec.get('tgtFp') as string) ?? tgtId,
+                    type: (rec.get('tgtType') as string) ?? '',
+                    cluster: toNum(rec.get('tgtCluster')),
+                  });
+                }
+                addEdge(srcId, tgtId);
+              }
+            }
+          }
+        } finally {
+          await session.close();
+        }
+
+        // Always include the start node
+        if (!nodeMap.has(fileId)) {
+          nodeMap.set(fileId, { id: fileId, filePath: traversePath, type: '', cluster: 0 });
+        }
+
+        const rawNodes = Array.from(nodeMap.values());
+        const n = rawNodes.length;
+        const pageRankScores: number[] = new Array(n).fill(1 / Math.max(n, 1));
+
+        if (n >= 2 && edges.length > 0) {
+          try {
+            const { pageRankGPU } = await import('../lib/server/gpu/pytorch-graph.js');
+            const nodeIndex = new Map(rawNodes.map((nd, i) => [nd.id, i]));
+            const adj = new Float32Array(n * n);
+            for (const e of edges) {
+              const src = nodeIndex.get(e.source);
+              const tgt = nodeIndex.get(e.target);
+              if (src !== undefined && tgt !== undefined) {
+                adj[src * n + tgt] = 1;
+              }
+            }
+            const { scores } = pageRankGPU(adj, n);
+            for (let i = 0; i < n; i++) pageRankScores[i] = scores[i];
+          } catch {
+            // addon not loaded or OOM — leave uniform scores
+          }
+        }
+
+        const nodes = rawNodes.map((nd, i) => ({ ...nd, pageRankScore: pageRankScores[i] }));
+        const topByRank = [...nodes]
+          .sort((a, b) => b.pageRankScore - a.pageRankScore)
+          .slice(0, 5)
+          .map((nd) => nd.filePath);
+
+        const summary =
+          `Traversed ${mode} graph from ${traversePath} (${hops} hop${hops === 1 ? '' : 's'}, ` +
+          `direction=${direction}). Found ${nodes.length} nodes and ${edges.length} edges. ` +
+          (topByRank.length > 0
+            ? `Top nodes by PageRank: ${topByRank.join(', ')}.`
+            : 'No edges found (start node may be isolated).');
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                nodes,
+                edges,
+                pageRankScores: Object.fromEntries(
+                  nodes.map((nd) => [nd.filePath, nd.pageRankScore])
+                ),
+                total: nodes.length,
+                truncated: nodes.length >= limit,
+                meta: { hops, mode, direction, startNode: traversePath },
+                summary,
               }),
             },
           ],

@@ -14,6 +14,8 @@
 import { ENV } from '$lib/server/env.server.js';
 import type { ResearchSource } from '$lib/server/research/web-research-ingester.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
+import { withRpcCache } from '$lib/server/cache/rpc-cache.js';
+import { RPC_TTL_SECONDS, RPC_DEADLINES_MS } from '$lib/types/rpc-cache.js';
 // Proto types were in generated/proto (archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types (mirror retrieval.proto messages — validated against generated types) ─
@@ -708,22 +710,62 @@ export async function getResearchContextViaGrpc(opts: {
   };
 }
 
+// ── SNES RPC Cache Bus — cached retrieval client ─────────────────────────
+//
+// Each public method wraps its gRPC call with withRpcCache() so repeated
+// calls within the TTL window return from Redis (L1) rather than the Go
+// service. TTLs and deadlines come from rpc-cache.ts constants.
+
 export const retrievalClient = {
-  searchChunks: async (query: string, limit = 10, collection = 'codebase_chunks_768') =>
-    (await searchChunksViaGrpc(query, limit, collection)) ?? { results: [], totalMs: 0 },
-  getClusterSummary: async (clusterId: number, clusterType: 'gpu' | 'som' = 'gpu') =>
-    (await getClusterSummaryViaGrpc(clusterId, clusterType)) ?? {
-      clusterId,
-      summary: '',
-      patterns: [],
-      keywords: [],
-      metadata: {},
-    },
-  expandAstNeighbors: async (symbol?: string, filePath?: string, depth = 1) =>
-    (await expandAstNeighborsViaGrpc(symbol, filePath, depth)) ?? { neighbors: [], edges: [] },
-  getTopologyContext: async (bmuRow: number, bmuCol: number, radius = 1) =>
-    (await getTopologyContextViaGrpc(bmuRow, bmuCol, radius)) ?? { neighbors: [] },
-  getResearchContext: getResearchContextViaGrpc,
+  searchChunks: async (query: string, limit = 10, collection = 'codebase_chunks_768') => {
+    const args = { query, limit, collection };
+    const { value } = await withRpcCache(
+      args,
+      async () => (await searchChunksViaGrpc(query, limit, collection)) ?? { results: [], totalMs: 0 },
+      { transport: 'grpc', method: 'SearchChunks', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.SearchChunks'] },
+    );
+    return value;
+  },
+
+  getClusterSummary: async (clusterId: number, clusterType: 'gpu' | 'som' = 'gpu') => {
+    const args = { clusterId, clusterType };
+    const { value } = await withRpcCache(
+      args,
+      async () => (await getClusterSummaryViaGrpc(clusterId, clusterType)) ?? { clusterId, summary: '', patterns: [], keywords: [], metadata: {} },
+      { transport: 'grpc', method: 'GetClusterSummary', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.GetClusterSummary'] },
+    );
+    return value;
+  },
+
+  expandAstNeighbors: async (symbol?: string, filePath?: string, depth = 1) => {
+    const args = { symbol, filePath, depth };
+    const { value } = await withRpcCache(
+      args,
+      async () => (await expandAstNeighborsViaGrpc(symbol, filePath, depth)) ?? { neighbors: [], edges: [] },
+      { transport: 'grpc', method: 'ExpandAstNeighbors', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.ExpandAstNeighbors'] },
+    );
+    return value;
+  },
+
+  getTopologyContext: async (bmuRow: number, bmuCol: number, radius = 1) => {
+    const args = { bmuRow, bmuCol, radius };
+    const { value } = await withRpcCache(
+      args,
+      async () => (await getTopologyContextViaGrpc(bmuRow, bmuCol, radius)) ?? { neighbors: [] },
+      { transport: 'grpc', method: 'GetTopologyContext', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.GetTopologyContext'] },
+    );
+    return value;
+  },
+
+  getResearchContext: async (opts: Parameters<typeof getResearchContextViaGrpc>[0]) => {
+    const { value } = await withRpcCache(
+      opts,
+      () => getResearchContextViaGrpc(opts),
+      { transport: 'grpc', method: 'GetResearchContext', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.GetResearchContext'] },
+    );
+    return value;
+  },
+
   health: checkRetrievalHealth,
 };
 
