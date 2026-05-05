@@ -15,7 +15,7 @@ import { pgRows, db } from '$lib/server/db/client';
  */
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import type { ACEContext, ACEPrompt, ACEUserProfile } from './types.js';
+import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown } from './types.js';
 import { TOKEN_BUDGET } from './types.js';
 import { selectPracticeTemplate } from './practice-templates.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
@@ -68,7 +68,7 @@ import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
 import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/ACPToolRegistry.js';
 import { applyClusterCoherenceBoost, extractDominantCluster } from '$lib/server/retrieval/cluster-aware-reranker.js';
 import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
-import { getClusterBowTexture } from '$lib/server/langextract/bag-cache.js';
+import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/bag-cache.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -2284,7 +2284,7 @@ async function fetchCodebaseContext(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const boosted = await applyTopologicalBoostAsync(unsorted as any, { queryBmu });
 
-          return applyKarpathyBoost(boosted.slice(0, 10) as any, query);
+          return await applyKarpathyBoost(boosted.slice(0, 10) as any, query);
         }
       } catch {
         // Reranker unavailable — fall through to cosine-only results below
@@ -2292,7 +2292,7 @@ async function fetchCodebaseContext(
     }
 
     // Fallback: cosine-score filtering only + Karpathy boost
-    return applyKarpathyBoost(
+    return await applyKarpathyBoost(
       results
         .filter((r) => r.score >= 0.5)
         .slice(0, 10)
@@ -2355,17 +2355,20 @@ const QUERY_TAG_MAP: Record<string, string[]> = {
 };
 
 /**
- * Apply Karpathy semantic tag boost + GPU cluster coherence scoring.
+ * Apply Karpathy semantic tag boost + GPU cluster coherence scoring + BoW overlap.
  *
  * 1. Infer query's probable semantic tags from keywords
- * 2. Boost chunks whose Karpathy tags overlap with inferred tags (+0.08 per match)
+ * 2. Boost chunks whose Karpathy tags overlap with inferred tags (+0.08 per match, max +0.24)
  * 3. Boost chunks from same GPU cluster as top-ranked result (+0.04)
- * 4. Re-sort, return top 5 above 0.45
+ * 4. Fetch cluster BoW texture tile and boost chunks with term overlap (+0.03 per hit, max +0.12)
+ * 5. Boost chunks from same SOM cell as top result (+0.03)
+ * 6. Attach RerankBreakdown per chunk for RL feedback
+ * 7. Re-sort, return top 5 above 0.45
  */
-function applyKarpathyBoost(
+async function applyKarpathyBoost(
   candidates: NonNullable<ACEContext['codebaseContext']>,
   query: string
-): NonNullable<ACEContext['codebaseContext']> {
+): Promise<NonNullable<ACEContext['codebaseContext']>> {
   if (!candidates || candidates.length === 0) return candidates;
 
   // Step 1: infer query semantic tags from keywords
@@ -2377,12 +2380,33 @@ function applyKarpathyBoost(
     }
   }
 
-  // Step 2: identify top result's GPU cluster for coherence boost
+  // Step 2: identify top result's GPU cluster + SOM cell for coherence boosts
   const topCluster = candidates[0]?.gpuCluster ?? null;
+  const topSomRow  = candidates[0]?.somBmuRow ?? null;
+  const topSomCol  = candidates[0]?.somBmuCol ?? null;
 
-  // Step 3: apply boosts
+  // Step 4 pre-fetch: load cluster BoW tile + SOM tile (non-blocking, best-effort)
+  const [clusterTile, somTile] = await Promise.all([
+    topCluster != null ? getClusterBowTexture(topCluster).catch(() => null) : Promise.resolve(null),
+    topSomRow != null && topSomCol != null
+      ? getSomBowTexture(topSomRow, topSomCol).catch(() => null)
+      : Promise.resolve(null),
+  ]);
+
+  // Build query BoW from query terms for overlap scoring
+  const queryTerms = new Set(
+    queryLower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length >= 3)
+  );
+
+  // Step 3–6: apply boosts and build breakdown
   const boosted = candidates.map((c) => {
-    let boost = 0;
+    const semantic = c.score;
+    let qdrantTagBoost = 0;
+    let clusterBoost = 0;
+    let somBoost = 0;
+    let bowBoost = 0;
+    const pagerankBoost = 0; // populated downstream by PageRank top-list check
+    const pairedTestBoost = 0; // populated downstream by paired test check
 
     // Tag overlap boost: +0.08 per matching Karpathy tag (max +0.24)
     if (inferredTags.size > 0 && c.tags?.length) {
@@ -2390,15 +2414,58 @@ function applyKarpathyBoost(
       for (const tag of c.tags) {
         if (inferredTags.has(tag)) tagMatches++;
       }
-      boost += Math.min(tagMatches * 0.08, 0.24);
+      qdrantTagBoost = Math.min(tagMatches * 0.08, 0.24);
     }
 
     // GPU cluster coherence: +0.04 if same cluster as top result
     if (topCluster != null && c.gpuCluster === topCluster && c !== candidates[0]) {
-      boost += 0.04;
+      clusterBoost = 0.04;
     }
 
-    return { ...c, score: c.score + boost };
+    // SOM cell proximity: +0.03 if same SOM cell as top result
+    if (
+      topSomRow != null && topSomCol != null &&
+      c.somBmuRow === topSomRow && c.somBmuCol === topSomCol &&
+      c !== candidates[0]
+    ) {
+      somBoost = 0.03;
+    }
+
+    // BoW term overlap: check chunk content against cluster texture tile terms
+    if (clusterTile && clusterTile.terms.length > 0) {
+      const chunkTerms = new Set(
+        c.content.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length >= 3)
+      );
+      let bowMatches = 0;
+      for (const term of clusterTile.terms) {
+        if (queryTerms.has(term) && chunkTerms.has(term)) bowMatches++;
+      }
+      bowBoost = Math.min(bowMatches * 0.03, 0.12);
+    } else if (somTile && somTile.terms.length > 0) {
+      // Fall back to SOM tile if cluster tile absent
+      const chunkTerms = new Set(
+        c.content.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length >= 3)
+      );
+      let bowMatches = 0;
+      for (const term of somTile.terms) {
+        if (queryTerms.has(term) && chunkTerms.has(term)) bowMatches++;
+      }
+      bowBoost = Math.min(bowMatches * 0.03, 0.12);
+    }
+
+    const final = semantic + qdrantTagBoost + clusterBoost + somBoost + bowBoost + pagerankBoost + pairedTestBoost;
+    const breakdown: RerankBreakdown = {
+      semantic,
+      qdrantTag: qdrantTagBoost,
+      cluster: clusterBoost,
+      som: somBoost,
+      pagerank: pagerankBoost,
+      bow: bowBoost,
+      pairedTest: pairedTestBoost,
+      final,
+    };
+
+    return { ...c, score: final, rerankBreakdown: breakdown };
   });
 
   return boosted
