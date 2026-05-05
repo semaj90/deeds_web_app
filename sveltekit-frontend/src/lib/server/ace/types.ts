@@ -76,6 +76,30 @@ export interface ACEPolicyDecision {
   budget: ACEBudgetProfile;
 }
 
+/**
+ * Per-chunk scoring breakdown from the post-retrieval rerank pipeline.
+ * All component scores are additive boosts above the base semantic score.
+ * Persisted alongside chunk hits for RL feedback loop (context_timeline).
+ */
+export interface RerankBreakdown {
+  /** Base cosine / cross-encoder semantic score */
+  semantic: number;
+  /** Boost from Qdrant tag overlap with inferred query tags */
+  qdrantTag: number;
+  /** Boost from GPU cluster coherence (same cluster as top result) */
+  cluster: number;
+  /** Boost from SOM cell proximity (same BMU row/col) */
+  som: number;
+  /** Boost from PageRank top-file list membership */
+  pagerank: number;
+  /** Boost from BoW term overlap with cluster texture tile */
+  bow: number;
+  /** Boost from paired test file presence */
+  pairedTest: number;
+  /** Final composite score (semantic + all boosts) */
+  final: number;
+}
+
 export interface ACEContext {
   /** User behavioral profile from analytics */
   userProfile: ACEUserProfile | null;
@@ -164,6 +188,7 @@ export interface ACEContext {
     somCluster?: number | null;
     somBmuRow?: number | null;
     somBmuCol?: number | null;
+    rerankBreakdown?: RerankBreakdown | null;
   }> | null;
   /** GPU cluster narratives (compiled knowledge from k-means clustering) */
   clusterNarratives?: Array<{
