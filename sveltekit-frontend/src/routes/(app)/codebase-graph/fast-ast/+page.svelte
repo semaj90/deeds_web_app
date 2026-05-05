@@ -18,14 +18,17 @@
   import CodebaseGraphCanvas from '../CodebaseGraphCanvas.svelte';
   import GraphExport from '$lib/components/codebase/GraphExport.svelte';
   import GraphifyViewer from '$lib/components/graph/GraphifyViewer.svelte';
+  import GlyphAtlasViewer from '$lib/components/graph/GlyphAtlasViewer.svelte';
 
   // ── SSR props from page.server.ts ─────────────────────────────────────────
   let { data } = $props();
-  const overview  = data.overview;
-  const serverPR  = data.pageRankTop ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const d = data as any;
+  const overview  = d.overview  ?? null;
+  const serverPR  = d.pageRankTop ?? [];
 
   // ── Tab state ─────────────────────────────────────────────────────────────
-  type Tab = 'canvas' | 'graphify' | 'pagerank' | 'batch';
+  type Tab = 'canvas' | 'graphify' | 'pagerank' | 'batch' | 'atlas';
   let activeTab = $state<Tab>('graphify');
 
   // ── Canvas tab state ──────────────────────────────────────────────────────
@@ -53,6 +56,22 @@
   let graphFiles = $state<GFile[]>([]);
   let graphifyLoading = $state(false);
   let graphifyLoaded  = $state(false);
+
+  // ── Glyph Atlas state ─────────────────────────────────────────────────────
+  let atlasManifest  = $state<import('$lib/server/graph/glyph-atlas-builder.js').GlyphAtlasManifest | null>(null);
+  let atlasBase64    = $state<string | null>(null);
+  let atlasLoaded    = $state(false);
+
+  async function loadAtlas() {
+    if (atlasLoaded) return;
+    try {
+      const res  = await fetch('/api/graph/glyph-atlas');
+      const body = await res.json();
+      atlasManifest = body.manifest ?? null;
+      atlasBase64   = body.atlasBase64 ?? null;
+    } catch { atlasManifest = null; }
+    atlasLoaded = true;
+  }
 
   // ── Batch GPU panel state ─────────────────────────────────────────────────
   let batchRunning  = $state(false);
@@ -139,6 +158,7 @@
     activeTab = t;
     if (t === 'canvas' && nodes.length === 0) loadCanvas();
     if (t === 'graphify' || t === 'pagerank') loadGraphFiles();
+    if (t === 'atlas') loadAtlas();
   }
 
   onMount(() => loadGraphFiles());
@@ -164,9 +184,9 @@
 
   <!-- ── Tab bar ──────────────────────────────────────────────────────────── -->
   <nav class="tabs">
-    {#each (['graphify','pagerank','batch','canvas'] as Tab[]) as t}
+    {#each (['graphify','atlas','pagerank','batch','canvas'] as Tab[]) as t}
       <button class="tab" class:active={activeTab === t} onclick={() => switchTab(t)}>
-        {{ graphify:'🗂️ Cluster View', pagerank:'⚡ PageRank', batch:'🔧 GPU Batch', canvas:'🔵 Canvas' }[t]}
+        {{ graphify:'🗂️ Cluster View', atlas:'🧩 Glyph Atlas', pagerank:'⚡ PageRank', batch:'🔧 GPU Batch', canvas:'🔵 Canvas' }[t]}
       </button>
     {/each}
   </nav>
@@ -178,6 +198,10 @@
     {:else}
       <GraphifyViewer graphFiles={graphFiles} />
     {/if}
+
+  <!-- ── Glyph Atlas tab ──────────────────────────────────────────────────── -->
+  {:else if activeTab === 'atlas'}
+    <GlyphAtlasViewer manifest={atlasManifest} atlasBase64={atlasBase64} />
 
   <!-- ── PageRank tab ──────────────────────────────────────────────────────── -->
   {:else if activeTab === 'pagerank'}
