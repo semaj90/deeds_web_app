@@ -1507,6 +1507,91 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 
 ---
 
+## TypeScript 7 Native-Preview Lane (May 5, 2026)
+
+Microsoft's Go-based TS 7.0 compiler (`tsgo`) now runs as a parallel audit lane. **Does NOT replace `tsc` / `svelte-check`** — keep both. Per Microsoft, the stable programmatic API isn't expected until 7.1.
+
+**Install** (already in `package.json` devDependencies; `package-lock.json` is gitignored so re-run after pulling):
+```bash
+cd sveltekit-frontend && npm install
+npx tsgo --version   # → Version 7.0.0-dev.20260421.2
+```
+
+**Scripts**:
+- `typecheck:native` — `tsgo --noEmit` (~10× faster than tsc on full repo)
+- `typecheck:native:pretty` — developer-friendly output
+- `typecheck:native:nightly` — pulls `@typescript/native-preview@latest` at run
+- `audit:tsgo` — `pretty=false` for CI parsing
+- `audit:tsgo:json` — runs tsgo + writes JSONB report to `scratch/audits/tsgo-diagnostics.json`
+
+**JSONB diagnostics importer** (`scripts/tsgo-diagnostics-to-jsonb.mjs`): output shape feeds directly into the AGENTS.md spine tables `metadata_envelopes(source_type='diagnostic')`, `code_relations(DIAGNOSTIC_IN_FILE)`, `ace_context_sources(source_kind='tsgo_diagnostic')`. Each diagnostic carries a stable_key (sha1 of file:line:col:code:msg) so re-runs are idempotent.
+
+**Side-by-side rule**: `typescript` package stays installed for SvelteKit, eslint, typescript-eslint, and any compiler-API consumer. CI keeps using `svelte-check` until TS 7 stable lands.
+
+Baseline run uncovered exactly 1 real error tsc/svelte-check missed (TS2345 in `sync-to-obsidian/+server.ts:51` — wrong arg order on `listWikiNotes`). After fix: `tsgo` reports 0 errors, 0 warnings repo-wide.
+
+---
+
+## AGENTS.md Relationship Spine (May 5, 2026)
+
+Path-first NES-arch memory bank now has structural backing. Three Postgres tables tie every `AGENTS.md` to the directory graph + retrieval scoring + ACE source-of-truth audit.
+
+**Tables** (`drizzle/manual/agents_md_relations.sql`):
+- `agent_context_files` — parsed envelope per AGENTS.md (rules JSONB, tools JSONB, constraints JSONB, semantic_tags TEXT[], qdrant_tags TEXT[], content_hash for idempotent re-index, schema_version for shape evolution). GIN indexes on tags + rules JSONB path ops.
+- `directory_context_bindings` — walk-up resolution map. binding_type ∈ {exact, nearest-parent, inherited, override}; depth, priority, confidence. Unique on (agent_context_key, directory_path, binding_type).
+- `ace_context_sources` — audit trail. source_kind ∈ {agents_md, qdrant_chunk, wiki_note, code_llm_cache, prior_answer, graph_neighbor, fast_ast}. Powers `yorha.agentsMdFiles` transparency in OpenAI facade responses.
+
+**Code** (`src/lib/server/agents-md/`):
+- `schema.ts` — Zod `agentsMdEnvelopeSchema` + `AGENTS_MD_SCHEMA_VERSION` constant
+- `parse-agents-md.ts` — pure function (no I/O). Lenient extraction: title (first H1), summary (first para after H1), rules (bullets under "Rules"/"Conventions"/"Standards" with inline `[tag,tag]` suffix + severity inferred from Critical/High/Note keywords), tools (bullets OR markdown table, allowed/forbidden + scope + reason), constraints (bullets under "Forbidden"/"Constraints"), tags (bullets under "Semantic Tags"/"Qdrant Tags"). Confidence rises with structure, floor 0.5. content_hash = sha256(normalised body).
+- `resolve-directory-context.ts` — pure-function resolver: `candidateAgentsMdPaths(filePath)` walks UP nearest-first; `nearestAgentsMdForFile(path, knownSet)` matches direct path, `agents:<file>` prefix, OR `agents:dir:<dir>` shape (the live Redis key form); `bindingsForAgentsMd({key, path, dirs})` produces 1 exact (depth=0, priority=100) + N inherited (priority+10*depth, confidence decays 0.1/depth, floor 0.4)
+
+**Tests**: `tests/agents-md-relations.spec.ts` — 7 tests covering parser structured/bare/table forms + resolver walk-up + binding generation.
+
+---
+
+## OpenAI-Compatible v1 Facade (May 5, 2026)
+
+OpenWebUI / Continue / Cursor / Aider can now talk to the YorHA agent brain via standard OpenAI-shape requests. Routes the request through ACE/KAG/RAG context-assembler + code-llm-index PRIOR ANSWER cache + bifrostChat cascade before returning.
+
+**Endpoints**:
+- `POST /api/v1/chat/completions` — chat (stream:false v1; streaming follow-up)
+- `GET  /api/v1/models` — model list for client dropdowns
+
+**OpenWebUI wiring**:
+```
+Connections → Add Provider →
+  Base URL: http://localhost:5173/api/v1
+  API Key:  any-non-empty-string  (real auth via session cookie)
+```
+
+Available models: `yorha-legal`, `yorha-fast`, `gemma4-legal`, `gemma3-legal`, `gemma3:270m`. Friendly IDs map to internal Ollama tags via `resolveInternalModel()`.
+
+**YorHA-only request extensions** (ignored by stock OpenAI clients):
+- `file_path` — triggers nes-arch AGENTS.md preflight + same-dir rerank boost
+- `case_id` — case-scoped RAG retrieval
+- `raw: true` — skip ACE entirely (model-layer benchmarking; tries TurboQuant first then bifrostChat fallback)
+
+**Response includes a `yorha` block alongside `choices`** — transparency about which caches and sources fed the answer:
+```json
+"yorha": {
+  "aceUsed": true,
+  "contextChunks": 7,
+  "agentsMd": true,
+  "codeLlmHit": true,
+  "cacheHit": "prior-answer",   // or "agents-md" or "none"
+  "durationMs": 1247
+}
+```
+
+**Tests**: `tests/openai-facade.spec.ts` — 7 tests (message split, raw passthrough, cacheHit reporting, 401/400 contracts).
+
+**Skipped for v1**:
+- `stream: true` — explicit 400 with `code: "streaming_not_supported"`. Follow-up wires bifrostChat's existing SSE path.
+- `tools` / `tool_choice` — accepted but ignored. Use `/api/ai/agent` for tool loops.
+
+---
+
 ## Reference Docs
 
 - `memory/drizzle-schema-reference.md` — 70+ tables, 14 enums, type patterns, route map
