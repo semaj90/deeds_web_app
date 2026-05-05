@@ -3,6 +3,7 @@
   import { computePageRankWebGPU, graphJsonToPageRankInput } from '$lib/gpu/webgpu-pagerank.js';
   import type { PageRankOutput } from '$lib/gpu/webgpu-pagerank.js';
   import type { RpcCacheResult } from '$lib/types/rpc-cache.js';
+  import type { GlyphDescriptor, GlyphAtlasManifest } from '$lib/server/graph/glyph-atlas-builder.js';
   import BagOfWordsTexturePanel from './BagOfWordsTexturePanel.svelte';
 
   interface GraphFile {
@@ -95,6 +96,60 @@
   let layoutStatus    = $state<'idle' | 'running' | 'done'>('idle');
   let layoutJobSeq    = 0;   // sequence counter — stale replies dropped
 
+  // SOM grid panel state
+  let showSomGrid     = $state(false);
+
+  interface SomCell {
+    row: number;
+    col: number;
+    clusters: number[];        // cluster IDs occupying this cell
+    fileCount: number;
+    ssrRisk: number;
+    dominantCluster: number | null;
+  }
+
+  let somGrid = $derived.by((): SomCell[][] => {
+    const rows = 10, cols = 10;
+    const grid: SomCell[][] = Array.from({ length: rows }, (_, r) =>
+      Array.from({ length: cols }, (_, c) => ({
+        row: r, col: c, clusters: [], fileCount: 0, ssrRisk: 0, dominantCluster: null,
+      }))
+    );
+    for (const f of graphFiles) {
+      if (f.somBmuRow == null || f.somBmuCol == null) continue;
+      const r = Math.min(Math.max(f.somBmuRow, 0), rows - 1);
+      const c = Math.min(Math.max(f.somBmuCol, 0), cols - 1);
+      const cell = grid[r][c];
+      cell.fileCount++;
+      if (f.ssrUnsafe) cell.ssrRisk++;
+      if (f.clusterId != null && !cell.clusters.includes(f.clusterId)) {
+        cell.clusters.push(f.clusterId);
+      }
+    }
+    // Dominant cluster = most frequent cluster in each cell
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = grid[r][c];
+        if (!cell.clusters.length) continue;
+        const freq = new Map<number, number>();
+        for (const f of graphFiles) {
+          if (f.somBmuRow !== r || f.somBmuCol !== c || f.clusterId == null) continue;
+          freq.set(f.clusterId, (freq.get(f.clusterId) ?? 0) + 1);
+        }
+        let best = -1, bestCount = 0;
+        for (const [cid, cnt] of freq) { if (cnt > bestCount) { best = cid; bestCount = cnt; } }
+        cell.dominantCluster = best >= 0 ? best : null;
+      }
+    }
+    return grid;
+  });
+
+  let somMaxFiles = $derived.by(() => {
+    let m = 0;
+    for (const row of somGrid) for (const cell of row) if (cell.fileCount > m) m = cell.fileCount;
+    return m || 1;
+  });
+
   // BoW panel state
   let showBow         = $state(false);
   let bowClusterId    = $state<number | undefined>(undefined);
@@ -102,6 +157,26 @@
   // Glyph info panel state
   let glyphInfo       = $state<GlyphInfo | null>(null);
   let glyphLoading    = $state(false);
+
+  // ── Glyph Atlas (manifest + compare) ──────────────────────────────────────
+  let atlasManifest   = $state<any | null>(null);
+  let atlasLoading    = $state(false);
+  let atlasError      = $state<string | null>(null);
+
+  let selectedAtlasGlyph = $derived.by(() => {
+    if (!atlasManifest || selectedCluster == null) return null;
+    const glyphs: any[] = atlasManifest.glyphs ?? atlasManifest.clusters ?? [];
+    return glyphs.find((g: any) =>
+      g.clusterId === selectedCluster ||
+      g.cluster   === selectedCluster ||
+      g.id        === selectedCluster
+    ) ?? null;
+  });
+
+  let compareTargetCluster = $state<number | null>(null);
+  let compareLoading       = $state(false);
+  let compareResult        = $state<any | null>(null);
+  let compareError         = $state<string | null>(null);
 
   // ── Derived ────────────────────────────────────────────────────────────────
   let showCanvas = $derived(
@@ -165,6 +240,42 @@
       .slice(0, 25);
   });
 
+  // ── Glyph Atlas fetch + compare ───────────────────────────────────────────
+  async function loadGlyphAtlas(force = false) {
+    atlasLoading = true;
+    atlasError   = null;
+    try {
+      const url = force ? '/api/graph/glyph-atlas?force=1' : '/api/graph/glyph-atlas';
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Glyph atlas ${res.status}`);
+      atlasManifest = await res.json();
+    } catch (err) {
+      atlasError = err instanceof Error ? err.message : String(err);
+    } finally {
+      atlasLoading = false;
+    }
+  }
+
+  async function compareSelectedGlyph() {
+    if (selectedCluster == null || compareTargetCluster == null) return;
+    compareLoading = true;
+    compareError   = null;
+    compareResult  = null;
+    try {
+      const res = await fetch('/api/graph/glyph-atlas/compare', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ a: selectedCluster, b: compareTargetCluster }),
+      });
+      if (!res.ok) throw new Error(`Compare ${res.status}`);
+      compareResult = await res.json();
+    } catch (err) {
+      compareError = err instanceof Error ? err.message : String(err);
+    } finally {
+      compareLoading = false;
+    }
+  }
+
   // ── Web Worker for force layout ───────────────────────────────────────────
   let layoutWorker: Worker | null = null;
 
@@ -174,6 +285,9 @@
       new URL('$lib/workers/graph-layout.worker.ts', import.meta.url),
       { type: 'module' }
     );
+
+    // Eagerly load glyph atlas manifest (non-blocking)
+    void loadGlyphAtlas(false);
 
     if (!graphFiles.length) return;
     prLoading = true;
@@ -350,11 +464,16 @@
     selectedCluster = selectedCluster === id ? null : id;
     page = 0;
     searchQuery = '';
+    // Reset compare state on every cluster change
+    compareResult = null;
+    compareError  = null;
     if (selectedCluster !== null) {
       loadClusterSummary(id);
       loadGlyphInfo(id);
       bowClusterId = id;
       showBow = true;
+      // Lazily hydrate atlas if not yet loaded
+      if (!atlasManifest && !atlasLoading) void loadGlyphAtlas(false);
     } else {
       clusterSummary = '';
       glyphInfo = null;
@@ -428,6 +547,47 @@
     {/each}
   </div>
 
+  <!-- ── SOM Grid Heat Map ────────────────────────────────────────────────── -->
+  {#if graphFiles.some(f => f.somBmuRow != null)}
+    <div class="som-section">
+      <button class="som-toggle" onclick={() => (showSomGrid = !showSomGrid)}>
+        {showSomGrid ? '▾' : '▸'} SOM Grid ({graphFiles.filter(f => f.somBmuRow != null).length} files placed)
+      </button>
+      {#if showSomGrid}
+        <div class="som-grid">
+          {#each somGrid as row, r}
+            {#each row as cell (r + ',' + cell.col)}
+              {@const intensity = cell.fileCount / somMaxFiles}
+              {@const isSelected = selectedCluster !== null && cell.dominantCluster === selectedCluster}
+              <button
+                class="som-cell"
+                class:som-cell-active={isSelected}
+                class:som-cell-ssr={cell.ssrRisk > 0}
+                style="--intensity: {intensity}; background: rgba({cell.ssrRisk > 0 ? '160,40,40' : '40,80,160'},{intensity * 0.85 + 0.05})"
+                title="{cell.fileCount} files · {cell.clusters.length} clusters · {cell.ssrRisk} SSR risks · row {r} col {cell.col}{cell.dominantCluster != null ? ' · dom #' + cell.dominantCluster : ''}"
+                onclick={() => { if (cell.dominantCluster != null) selectCluster(cell.dominantCluster); }}
+                disabled={cell.fileCount === 0}
+              >
+                {#if cell.fileCount > 0}
+                  <span class="som-count">{cell.fileCount}</span>
+                  {#if cell.dominantCluster != null}
+                    <span class="som-cid">#{cell.dominantCluster}</span>
+                  {/if}
+                {/if}
+              </button>
+            {/each}
+          {/each}
+        </div>
+        <div class="som-legend">
+          <span class="som-leg-item"><span class="som-leg-swatch" style="background:rgba(40,80,160,0.7)"></span> low SSR risk</span>
+          <span class="som-leg-item"><span class="som-leg-swatch" style="background:rgba(160,40,40,0.7)"></span> SSR risk</span>
+          <span class="som-leg-item"><span class="som-leg-swatch som-leg-active"></span> selected cluster</span>
+          <span class="som-leg-item dim">intensity = file density</span>
+        </div>
+      {/if}
+    </div>
+  {/if}
+
   <!-- ── Gemma4 cluster summary + BoW panel (side by side when both visible) -->
   {#if selectedCluster !== null}
     <div class="cluster-detail-row">
@@ -489,6 +649,97 @@
         {/if}
       {/if}
     </div>
+  {/if}
+
+  <!-- ── Glyph Atlas Descriptor panel ───────────────────────────────────── -->
+  {#if selectedCluster != null}
+    <section class="atlas-panel">
+      <div class="panel-header">
+        <h3>🧩 Glyph Atlas — Cluster #{selectedCluster}</h3>
+        <button onclick={() => loadGlyphAtlas(true)} disabled={atlasLoading}>
+          {atlasLoading ? 'Refreshing…' : 'Rebuild / Refresh'}
+        </button>
+      </div>
+
+      {#if atlasError}
+        <p class="atlas-error">Glyph atlas unavailable: {atlasError}</p>
+      {:else if !selectedAtlasGlyph}
+        <p class="atlas-muted">
+          No glyph descriptor for cluster {selectedCluster}. Run
+          <code>npm run graphify:bow-tiles:fast</code> then rebuild the atlas.
+        </p>
+      {:else}
+        <div class="atlas-grid">
+          <div>
+            <strong>Cluster</strong>
+            <span>{selectedAtlasGlyph.clusterId ?? selectedCluster}</span>
+          </div>
+          <div>
+            <strong>SOM</strong>
+            <span>
+              {selectedAtlasGlyph.somX ?? selectedAtlasGlyph.som?.x ?? '—'} :
+              {selectedAtlasGlyph.somY ?? selectedAtlasGlyph.som?.y ?? '—'}
+            </span>
+          </div>
+          <div>
+            <strong>PageRank mean</strong>
+            <span>{Number(selectedAtlasGlyph.pageRankMean ?? 0).toFixed(4)}</span>
+          </div>
+          <div>
+            <strong>Audit score</strong>
+            <span>{Number(selectedAtlasGlyph.auditScore ?? 0).toFixed(1)}</span>
+          </div>
+          <div>
+            <strong>SSR risk</strong>
+            <span>{Number(selectedAtlasGlyph.ssrRisk ?? selectedAtlasGlyph.ssrRiskRatio ?? 0).toFixed(2)}</span>
+          </div>
+          <div>
+            <strong>Paired-test ratio</strong>
+            <span>{Number(selectedAtlasGlyph.pairedTestRatio ?? 0).toFixed(2)}</span>
+          </div>
+        </div>
+
+        {#if selectedAtlasGlyph.topTerms?.length}
+          <div class="atlas-terms">
+            <strong>Top BoW terms</strong>
+            <div class="atlas-term-list">
+              {#each (selectedAtlasGlyph.topTerms as any[]).slice(0, 12) as term}
+                <span>{typeof term === 'string' ? term : (term as any).term}</span>
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        <div class="atlas-compare-row">
+          <label>
+            Compare with cluster
+            <input
+              type="number"
+              min="0"
+              bind:value={compareTargetCluster}
+              placeholder="cluster id"
+            />
+          </label>
+          <button
+            onclick={compareSelectedGlyph}
+            disabled={compareLoading || compareTargetCluster == null}
+          >
+            {compareLoading ? 'Comparing…' : 'Compare'}
+          </button>
+        </div>
+
+        {#if compareError}
+          <p class="atlas-error">{compareError}</p>
+        {/if}
+
+        {#if compareResult}
+          <div class="atlas-compare-result">
+            <h4>Comparison result</h4>
+            <pre>{JSON.stringify(compareResult, null, 2)}</pre>
+          </div>
+        {/if}
+      {/if}
+    </section>
   {/if}
 
   <!-- ── Level 1: Ego graph for selected cluster ────────────────────────── -->
@@ -780,4 +1031,113 @@
   .pagination button { padding: 4px 12px; background: #111; border: 1px solid #333; color: #eee; border-radius: 4px; cursor: pointer; }
   .pagination button:disabled { opacity: 0.3; cursor: default; }
   .pagination span { color: #666; font-size: 0.75rem; }
+
+  /* Glyph Atlas panel */
+  .atlas-panel {
+    margin-top: 0.25rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(136, 136, 255, 0.18);
+    border-radius: 12px;
+    background: rgba(20, 20, 30, 0.75);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .panel-header h3 { margin: 0; font-size: 0.82rem; color: #88f; }
+  .panel-header button {
+    padding: 3px 10px; background: #111; border: 1px solid #334; color: #aaa;
+    border-radius: 4px; cursor: pointer; font-size: 0.72rem;
+  }
+  .panel-header button:hover:not(:disabled) { background: #1a1a2e; border-color: #668; color: #eee; }
+  .panel-header button:disabled { opacity: 0.4; cursor: default; }
+  .atlas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.6rem;
+  }
+  .atlas-grid > div {
+    padding: 0.5rem 0.65rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+  }
+  .atlas-grid strong {
+    display: block;
+    font-size: 0.68rem;
+    opacity: 0.65;
+    margin-bottom: 0.2rem;
+    color: #99b;
+  }
+  .atlas-grid span { font-size: 0.78rem; color: #dde; font-variant-numeric: tabular-nums; }
+  .atlas-terms { display: flex; flex-direction: column; gap: 0.3rem; }
+  .atlas-terms strong { font-size: 0.68rem; color: #99b; opacity: 0.8; }
+  .atlas-term-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .atlas-term-list span {
+    padding: 2px 7px; border-radius: 999px;
+    background: rgba(136, 136, 255, 0.15); border: 1px solid rgba(136,136,255,0.2);
+    font-size: 0.72rem; color: #aaf;
+  }
+  .atlas-compare-row {
+    display: flex; align-items: flex-end; gap: 0.65rem; flex-wrap: wrap; margin-top: 0.25rem;
+  }
+  .atlas-compare-row label { font-size: 0.72rem; color: #99b; display: flex; flex-direction: column; gap: 3px; }
+  .atlas-compare-row input {
+    width: 90px; padding: 3px 6px; background: #111; border: 1px solid #334;
+    color: #eee; border-radius: 4px; font-size: 0.75rem;
+  }
+  .atlas-compare-row button {
+    padding: 4px 12px; background: #111; border: 1px solid #334; color: #88f;
+    border-radius: 4px; cursor: pointer; font-size: 0.75rem;
+  }
+  .atlas-compare-row button:hover:not(:disabled) { background: #1a1a2e; border-color: #668; }
+  .atlas-compare-row button:disabled { opacity: 0.35; cursor: default; }
+  .atlas-compare-result pre {
+    overflow: auto; max-height: 240px; padding: 0.65rem;
+    border-radius: 6px; background: rgba(0,0,0,0.4);
+    font-size: 0.7rem; color: #cce; margin: 0;
+  }
+  .atlas-compare-result h4 { margin: 0 0 0.4rem; font-size: 0.75rem; color: #88f; }
+  .atlas-error { color: #ff8a8a; margin: 0; font-size: 0.75rem; }
+  .atlas-muted  { opacity: 0.65; margin: 0; font-size: 0.75rem; }
+
+  /* SOM grid */
+  .som-section { display: flex; flex-direction: column; gap: 0.4rem; }
+  .som-toggle {
+    align-self: flex-start; background: none; border: 1px solid #334; border-radius: 4px;
+    color: #88f; font-size: 0.72rem; padding: 2px 8px; cursor: pointer;
+  }
+  .som-toggle:hover { background: #1a1a2e; }
+  .som-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+    max-width: 440px;
+  }
+  .som-cell {
+    aspect-ratio: 1;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0; overflow: hidden; transition: border-color 0.1s;
+  }
+  .som-cell:disabled { cursor: default; opacity: 0.25; }
+  .som-cell:not(:disabled):hover { border-color: #88f; }
+  .som-cell-active { border-color: #88f !important; outline: 1px solid #88f; }
+  .som-count { font-size: 0.5rem; color: rgba(255,255,255,0.85); line-height: 1; }
+  .som-cid   { font-size: 0.42rem; color: rgba(200,200,255,0.7); line-height: 1; }
+  .som-legend {
+    display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+    font-size: 0.65rem; color: #888;
+  }
+  .som-leg-item { display: flex; align-items: center; gap: 4px; }
+  .som-leg-swatch {
+    width: 10px; height: 10px; border-radius: 2px; display: inline-block;
+  }
+  .som-leg-active { background: #1a1a2e; border: 1px solid #88f; }
+  .dim { opacity: 0.6; }
 </style>
