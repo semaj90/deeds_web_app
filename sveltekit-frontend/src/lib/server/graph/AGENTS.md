@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/graph`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T02:57:03.966Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/graph
 
@@ -12,17 +12,13 @@
 - no audit signals
 - Tags: `src` `lib` `server` `zod` `auth` `db-schema`
 
-## Files (18)
+## Files (17)
 
-- `codebase-cluster-detection.ts`
-- `codebase-neo4j-sync.ts`
-- `codebase-scanner-v2.ts`
-- `codebase-scanner.ts`
-- `community-graph.ts`
-- `couchdb-pagerank.ts`
-- `evidence-graph-service.ts`
-- `gpu-graph-analysis.ts`
-- `graph-remote-functions.ts` — UI reads: getGraphOverview, getGraphNode, getGraphPageRankTop, getDirectoryEgoGraph, getBagOfWordsTexture; all wrapped in withRpcCache (Redis 5-min TTL)
+- `src/lib/server/graph/codebase-cluster-detection.ts`
+- `src/lib/server/graph/codebase-neo4j-sync.ts`
+- `src/lib/server/graph/codebase-scanner-v2.ts`
+- `src/lib/server/graph/codebase-scanner.ts`
+- `src/lib/server/graph/community-graph.ts`
 
 ## Hypergraph cluster
 
@@ -34,6 +30,15 @@ This directory is part of cluster **C73** — function chunks in \`src/lib/serve
 See `docs/graph/hypergraph-clusters.md` § Cluster 73 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C73 — function chunks in `src/lib/server/retrieval` (tag: vector)
+- **BoW texture key**: `texture:bow:cluster:73` (Redis 1h TTL)
+- **Qdrant tags**: `vector` `redis` `embedding` `rag-pipeline` `graph-db`
+- **Paired tests**: 1/17 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -42,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server graph", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/graph/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 73 })` — BoW texture tile for cluster C73
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 73 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

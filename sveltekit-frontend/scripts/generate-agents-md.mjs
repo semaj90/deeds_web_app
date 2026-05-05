@@ -265,6 +265,32 @@ ${warningsList}
 
 ${pageRankList}
 ` : ''}
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+${cluster ? `- **Cluster**: C${cluster.id}${cluster.topic ? ` — ${cluster.topic}` : ''}
+- **BoW texture key**: \`texture:bow:cluster:${cluster.id}\` (Redis 1h TTL)
+- **Qdrant tags**: ${cluster.tags?.slice(0, 6).map(t => `\`${t.tag ?? t}\``).join(' ') || '_(none)_'}
+` : '- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_\n'}\
+${(() => {
+  // Derive SOM cell from the most-common somBmuRow/Col across dir files
+  const somCounts = new Map();
+  for (const f of dirFiles) {
+    if (f.somBmuRow != null && f.somBmuCol != null) {
+      const k = `${f.somBmuRow}:${f.somBmuCol}`;
+      somCounts.set(k, (somCounts.get(k) ?? 0) + 1);
+    }
+  }
+  const topSom = [...somCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+  return topSom ? `- **SOM cell**: ${topSom[0]} (${topSom[1]}/${dirFiles.length} files)\n` : '';
+})()}\
+${pageRankList ? `- **PageRank top files**:\n${pageRank.slice(0, 5).map(p => {
+  const id = typeof p === 'string' ? p : (p.id ?? p.file ?? '?');
+  return `  - \`${id}\``;
+}).join('\n')}\n` : ''}\
+- **Paired tests**: ${m.apiCount > 0 ? `${m.apiCount - m.noTestCount}/${m.apiCount} route files paired` : `${dirFiles.filter(f => f.hasPairedTest).length}/${dirFiles.length} files have paired tests`}
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -273,6 +299,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - \`wiki_note_lookup({ query: "${dirRel.split('/').slice(-2).join(' ')}", limit: 5 })\` — KAG narrative + audit score
 - \`audit_hotspots({ limit: 10 })\` — if this dir is failing gates, surfaces the broader hotspot set
 - \`read_file({ filePath: "${dirRel}/<file>" })\` — fetch any file's contents (sandboxed to src/)
+${cluster ? `- \`cluster_bag_lookup({ clusterId: ${cluster.id} })\` — BoW texture tile for cluster C${cluster.id}\n- \`rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: ${cluster.id} } })\` — semantic search scoped to this cluster` : ''}\
 ${m.apiCount > 0 ? `\nFor route handlers in this dir, also try:\n- \`verify_fix({ filePath: "${dirRel}/+server.ts" })\` — runs svelte-check / tsc on a single file` : ''}
 
 ## How to use this file
