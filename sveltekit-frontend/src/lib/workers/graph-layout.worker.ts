@@ -21,6 +21,7 @@ export interface LayoutEdge {
 
 export interface LayoutInput {
   type: 'layout';
+  seq?: number;      // caller's sequence number — echoed back for stale-reply guard
   nodes: LayoutNode[];
   edges: LayoutEdge[];
   W: number;
@@ -38,11 +39,13 @@ export interface LayoutPosition {
 
 export interface LayoutOutput {
   type: 'done';
+  seq?: number;      // echoed from input for stale-reply guard
   positions: LayoutPosition[];
 }
 
 export interface LayoutError {
   type: 'error';
+  seq?: number;
   message: string;
 }
 
@@ -109,12 +112,13 @@ self.onmessage = (e: MessageEvent<LayoutInput | { type: string }>) => {
   const msg = e.data;
   if (msg.type !== 'layout') return;
 
+  const input = msg as LayoutInput;
   try {
-    const positions = runLayout(msg as LayoutInput);
-    const out: LayoutOutput = { type: 'done', positions };
+    const positions = runLayout(input);
+    const out: LayoutOutput = { type: 'done', seq: input.seq, positions };
     self.postMessage(out);
   } catch (err) {
-    const out: LayoutError = { type: 'error', message: (err as Error).message };
+    const out: LayoutError = { type: 'error', seq: input.seq, message: (err as Error).message };
     self.postMessage(out);
   }
 };

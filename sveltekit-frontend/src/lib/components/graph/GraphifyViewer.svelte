@@ -3,6 +3,7 @@
   import { computePageRankWebGPU, graphJsonToPageRankInput } from '$lib/gpu/webgpu-pagerank.js';
   import type { PageRankOutput } from '$lib/gpu/webgpu-pagerank.js';
   import type { RpcCacheResult } from '$lib/types/rpc-cache.js';
+  import BagOfWordsTexturePanel from './BagOfWordsTexturePanel.svelte';
 
   interface GraphFile {
     rel: string;
@@ -75,6 +76,14 @@
   let clusterSummary  = $state('');
   let summaryLoading  = $state(false);
   let canvasEl        = $state<HTMLCanvasElement | null>(null);
+
+  // Layout worker state
+  let layoutStatus    = $state<'idle' | 'running' | 'done'>('idle');
+  let layoutJobSeq    = 0;   // sequence counter — stale replies dropped
+
+  // BoW panel state
+  let showBow         = $state(false);
+  let bowClusterId    = $state<number | undefined>(undefined);
 
   // ── Derived ────────────────────────────────────────────────────────────────
   let showCanvas = $derived(
@@ -202,20 +211,31 @@
     }
   }
 
+  // ── Debounced worker dispatch with sequence guard ─────────────────────────
   $effect(() => {
     if (!showCanvas || !canvasEl || !traverseResult || !layoutWorker) return;
     const canvas = canvasEl;
     const data   = traverseResult;
-    const handler = (e: MessageEvent<{ type: string; positions?: Array<{ x: number; y: number }> }>) => {
-      if (e.data.type === 'done' && e.data.positions) {
-        drawPositions(canvas, data.nodes, data.edges, e.data.positions);
-      }
+
+    // Bump sequence — any older reply with a lower seq is dropped
+    const mySeq = ++layoutJobSeq;
+    layoutStatus = 'running';
+
+    const handler = (e: MessageEvent<{ type: string; seq?: number; positions?: Array<{ x: number; y: number }> }>) => {
+      if (e.data.type !== 'done') return;
+      // Drop stale replies
+      if ((e.data.seq ?? mySeq) !== mySeq) return;
       layoutWorker!.removeEventListener('message', handler);
+      if (e.data.positions) {
+        drawPositions(canvas, data.nodes, data.edges, e.data.positions);
+        layoutStatus = 'done';
+      }
     };
 
     layoutWorker.addEventListener('message', handler);
     layoutWorker.postMessage({
       type:  'layout',
+      seq:   mySeq,
       nodes: data.nodes.map(n => ({ id: n.id })),
       edges: data.edges,
       W:     canvas.width,
@@ -228,6 +248,7 @@
     selectedFile = filePath;
     traverseResult = null;
     traverseLoading = true;
+    layoutStatus = 'idle';
     try {
       const params = new URLSearchParams({
         nodeId: filePath,
@@ -263,8 +284,15 @@
     selectedCluster = selectedCluster === id ? null : id;
     page = 0;
     searchQuery = '';
-    if (selectedCluster !== null) loadClusterSummary(id);
-    else clusterSummary = '';
+    if (selectedCluster !== null) {
+      loadClusterSummary(id);
+      bowClusterId = id;
+      showBow = true;
+    } else {
+      clusterSummary = '';
+      bowClusterId = undefined;
+      showBow = false;
+    }
   }
 
   function flag(f: GraphFile) {
@@ -275,18 +303,38 @@
     if (f.hasAuth)      out.push('🔒Auth');
     return out.join(' ');
   }
+
+  // Status summary for cache pill
+  let prStatus = $derived.by(() => {
+    if (prLoading) return { label: '⏳ PageRank…', cls: 'loading' };
+    if (prError)   return { label: '⚠️ PR failed', cls: 'err' };
+    if (!pageRankResult) return null;
+    const cached = prCache?.hit ? ' (cached)' : ' (computed)';
+    return {
+      label: `⚡ PR via ${pageRankResult.backend} ${pageRankResult.durationMs.toFixed(0)}ms${cached}`,
+      cls: 'ok',
+    };
+  });
+
+  let layoutPill = $derived.by(() => {
+    if (layoutStatus === 'running') return { label: '⏳ Layout…', cls: 'loading' };
+    if (layoutStatus === 'done')    return { label: '✓ Layout done', cls: 'ok' };
+    return null;
+  });
 </script>
 
 <div class="graphify-viewer">
   <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <div class="viewer-header">
     <span class="title">Graphify — {graphFiles.length} files · {clusters.length} clusters</span>
-    {#if prLoading}
-      <span class="pr-badge loading">⏳ PageRank (WebGPU)…</span>
-    {:else if pageRankResult}
-      <span class="pr-badge ok">⚡ PageRank via {pageRankResult.backend} ({pageRankResult.durationMs.toFixed(0)}ms){prCache ? ` · ${prCache.hitLevel}${prCache.hit ? ' (cached)' : ' (computed)'}` : ''}</span>
-    {:else if prError}
-      <span class="pr-badge err" title={prError}>⚠️ PR failed</span>
+    {#if prStatus}
+      <span class="pr-badge {prStatus.cls}" title={prError || undefined}>{prStatus.label}</span>
+    {/if}
+    {#if layoutPill}
+      <span class="pr-badge {layoutPill.cls}">{layoutPill.label}</span>
+    {/if}
+    {#if prCache}
+      <span class="cache-hint">{prCache.hitLevel}{prCache.hit ? '' : ' miss'}</span>
     {/if}
   </div>
 
@@ -309,13 +357,33 @@
     {/each}
   </div>
 
-  <!-- ── Gemma4 cluster summary ─────────────────────────────────────────── -->
-  {#if selectedCluster !== null && (summaryLoading || clusterSummary)}
-    <div class="cluster-summary">
-      {#if summaryLoading}
-        <span class="summary-loading">💬 Loading Gemma4 summary…</span>
-      {:else}
-        <p class="summary-text">{clusterSummary}</p>
+  <!-- ── Gemma4 cluster summary + BoW panel (side by side when both visible) -->
+  {#if selectedCluster !== null}
+    <div class="cluster-detail-row">
+      <!-- Summary -->
+      {#if summaryLoading || clusterSummary}
+        <div class="cluster-summary">
+          {#if summaryLoading}
+            <span class="summary-loading">💬 Loading Gemma4 summary…</span>
+          {:else}
+            <p class="summary-text">{clusterSummary}</p>
+          {/if}
+        </div>
+      {/if}
+
+      <!-- BoW Texture Panel -->
+      {#if showBow && bowClusterId !== undefined}
+        <div class="bow-wrap">
+          <div class="bow-toggle-row">
+            <span class="bow-label">Bag-of-Words</span>
+            <button class="bow-close" onclick={() => { showBow = false; }}>✕</button>
+          </div>
+          <BagOfWordsTexturePanel clusterId={bowClusterId} />
+        </div>
+      {:else if selectedCluster !== null}
+        <button class="bow-open-btn" onclick={() => { bowClusterId = selectedCluster!; showBow = true; }}>
+          📊 Show BoW Texture
+        </button>
       {/if}
     </div>
   {/if}
@@ -356,9 +424,15 @@
             onchange={() => loadFileTraversal(selectedFile!)} />
         </label>
         {#if traverseLoading}
-          <span class="t-status">⏳</span>
+          <span class="t-status">⏳ loading…</span>
         {:else if traverseResult}
           <span class="t-status">{traverseResult.total} nodes{traverseResult.truncated ? ' (trunc)' : ''}</span>
+        {/if}
+        <!-- Layout status badge -->
+        {#if layoutStatus === 'running'}
+          <span class="t-status layout-status">⚙️ layout…</span>
+        {:else if layoutStatus === 'done' && showCanvas}
+          <span class="t-status layout-status ok">✓ layout</span>
         {/if}
       </div>
 
@@ -450,11 +524,12 @@
     font-size: 0.8rem;
     font-family: var(--font-mono, monospace);
   }
-  .viewer-header { display: flex; align-items: center; gap: 1rem; font-weight: 600; }
-  .pr-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+  .viewer-header { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; font-weight: 600; }
+  .pr-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; }
   .pr-badge.loading { background: #334; color: #aaf; }
   .pr-badge.ok      { background: #143; color: #4f4; }
   .pr-badge.err     { background: #431; color: #f84; }
+  .cache-hint { font-size: 0.68rem; color: #556; font-weight: 400; }
 
   .cluster-grid { display: flex; flex-wrap: wrap; gap: 4px; }
   .cluster-tile {
@@ -472,12 +547,46 @@
   .test-badge { color: #fa0; }
   .ctags { color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; text-align: center; }
 
+  /* Cluster detail row: summary + BoW panel side by side */
+  .cluster-detail-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
   .cluster-summary {
+    flex: 1;
+    min-width: 200px;
     border: 1px solid #223; border-radius: 4px; padding: 0.5rem 0.75rem;
     background: #0d0d1a; color: #99b; font-size: 0.75rem; line-height: 1.5;
   }
   .summary-loading { color: #66a; font-style: italic; }
   .summary-text { margin: 0; }
+  .bow-wrap {
+    width: 320px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .bow-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+  .bow-label { font-size: 0.7rem; color: #668; }
+  .bow-close {
+    background: none; border: none; color: #556; cursor: pointer; font-size: 0.75rem;
+    padding: 0 4px;
+  }
+  .bow-close:hover { color: #f84; }
+  .bow-open-btn {
+    align-self: flex-start;
+    padding: 4px 10px; background: #111; border: 1px solid #334; color: #88f;
+    border-radius: 4px; cursor: pointer; font-size: 0.72rem;
+  }
+  .bow-open-btn:hover { background: #1a1a2e; border-color: #668; }
 
   .ego-graph { border: 1px solid #223; border-radius: 6px; padding: 0.75rem; background: #0d0d1a; }
   .ego-graph h3 { margin: 0 0 0.5rem; font-size: 0.8rem; color: #88f; }
@@ -504,7 +613,9 @@
   }
   .hops-label { color: #888; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
   .hops-label input { width: 40px; }
-  .t-status { color: #668; font-size: 0.75rem; }
+  .t-status { color: #668; font-size: 0.72rem; }
+  .layout-status    { color: #66a; }
+  .layout-status.ok { color: #4a4; }
   .force-canvas {
     width: 100%; max-width: 600px; height: 300px; border: 1px solid #223;
     border-radius: 4px; background: #0a0a14; display: block;
