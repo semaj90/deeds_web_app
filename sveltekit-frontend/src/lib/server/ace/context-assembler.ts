@@ -286,7 +286,7 @@ export async function assembleACEContext(opts: {
           ? fetchUserAnalyticsContext(userId, query, caseId).catch(() => null)
           : Promise.resolve(null),
         opts.enableCodebaseContext
-          ? fetchCodebaseContext(query, userId ?? undefined).catch(() => null)
+          ? fetchCodebaseContext(query, userId ?? undefined, opts.filePath).catch(() => null)
           : Promise.resolve(null),
         fetchTopQueryTags(5).catch(() => [] as string[]),
         fetchWebResearchRows(query).catch(
@@ -2273,9 +2273,33 @@ function extractGlossaryCandidateTerms(query: string): { exact: string[]; prefix
 
 async function fetchCodebaseContext(
   query: string,
-  userId?: string
+  userId?: string,
+  filePath?: string,
 ): Promise<ACEContext['codebaseContext']> {
   try {
+    // Resolve nearest AGENTS.md directory from filePath via a Redis walk-up.
+    // Used by applyKarpathyBoost to add a ≤0.05 same-dir boost (architecture
+    // review item 3). Done inline here so the rerank doesn't need to wait for
+    // the parallel agentsMd preflight in assembleACEContext.
+    let agentsMdResolvedDir: string | undefined;
+    if (filePath) {
+      try {
+        const { getRedis } = await import('$lib/server/redis.js');
+        const redis = getRedis();
+        let dir = filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+        if (/\.[a-z]{1,5}$/i.test(dir)) dir = dir.split('/').slice(0, -1).join('/');
+        while (dir && dir !== '.' && dir !== '/') {
+          if (await redis.exists(`agents:dir:${dir}`)) {
+            agentsMdResolvedDir = dir;
+            break;
+          }
+          const parent = dir.split('/').slice(0, -1).join('/');
+          if (parent === dir) break;
+          dir = parent;
+        }
+      } catch { /* non-fatal — boost just won't apply */ }
+    }
+
     // Fetch broader initial set so the reranker has candidates to work with
     const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
     const results = await searchCodebase(query, {
@@ -2342,7 +2366,7 @@ async function fetchCodebaseContext(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const boosted = await applyTopologicalBoostAsync(unsorted as any, { queryBmu });
 
-          return await applyKarpathyBoost(boosted.slice(0, 10) as any, query);
+          return await applyKarpathyBoost(boosted.slice(0, 10) as any, query, agentsMdResolvedDir);
         }
       } catch {
         // Reranker unavailable — fall through to cosine-only results below
@@ -2355,7 +2379,8 @@ async function fetchCodebaseContext(
         .filter((r) => r.score >= 0.5)
         .slice(0, 10)
         .map((r) => toCtx(r)),
-      query
+      query,
+      agentsMdResolvedDir,
     );
   } catch (err) {
     console.warn('[ACE context] codebase context fetch failed:', (err as Error)?.message ?? err);
@@ -2425,9 +2450,16 @@ const QUERY_TAG_MAP: Record<string, string[]> = {
  */
 async function applyKarpathyBoost(
   candidates: NonNullable<ACEContext['codebaseContext']>,
-  query: string
+  query: string,
+  agentsMdResolvedDir?: string,
 ): Promise<NonNullable<ACEContext['codebaseContext']>> {
   if (!candidates || candidates.length === 0) return candidates;
+
+  // Normalise the AGENTS.md resolved dir for fast prefix-match checks.
+  // Empty string means "repo root fallback" — no useful prefix to match.
+  const agentsDir = agentsMdResolvedDir
+    ? agentsMdResolvedDir.replace(/\\/g, '/').replace(/\/+$/, '')
+    : '';
 
   // Step 1: infer query semantic tags from keywords
   const queryLower = query.toLowerCase();
@@ -2511,7 +2543,20 @@ async function applyKarpathyBoost(
       bowBoost = Math.min(bowMatches * 0.03, 0.12);
     }
 
-    const final = semantic + qdrantTagBoost + clusterBoost + somBoost + bowBoost + pagerankBoost + pairedTestBoost;
+    // Same-AGENTS.md-dir boost (architecture review item 3).
+    // Chunks under the resolved AGENTS.md directory get a small uplift so the
+    // model prefers local-context evidence when it has a directory map.
+    // Hard-capped at 0.05 per the architectural recommendation — must not
+    // override stronger semantic signals.
+    let sameAgentsDirBoost = 0;
+    if (agentsDir && c.filePath) {
+      const fp = c.filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+      if (fp === agentsDir || fp.startsWith(agentsDir + '/')) {
+        sameAgentsDirBoost = 0.05;
+      }
+    }
+
+    const final = semantic + qdrantTagBoost + clusterBoost + somBoost + bowBoost + pagerankBoost + pairedTestBoost + sameAgentsDirBoost;
     const breakdown: RerankBreakdown = {
       semantic,
       qdrantTag: qdrantTagBoost,
@@ -2520,6 +2565,7 @@ async function applyKarpathyBoost(
       pagerank: pagerankBoost,
       bow: bowBoost,
       pairedTest: pairedTestBoost,
+      sameAgentsDir: sameAgentsDirBoost,
       final,
     };
 

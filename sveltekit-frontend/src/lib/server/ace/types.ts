@@ -96,6 +96,8 @@ export interface RerankBreakdown {
   bow: number;
   /** Boost from paired test file presence */
   pairedTest: number;
+  /** Boost from chunk being under the resolved AGENTS.md directory (≤0.05 cap) */
+  sameAgentsDir?: number;
   /** Final composite score (semantic + all boosts) */
   final: number;
 }
