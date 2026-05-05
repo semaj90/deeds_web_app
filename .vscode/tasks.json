@@ -8704,6 +8704,27 @@
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     },
+    {
+      "label": "🗺️🧠 Graphify: Daily → Batch GPU (end-to-end Karpathy wiki)",
+      "type": "shell",
+      "command": "npm run graphify:daily && npm run graphify:batch-gpu-analysis:test && npm run graphify:ace-smoke",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Full Karpathy wiki pipeline: (1) fast-AST map → wiki:note:dir:* Redis notes, (2) batch GPU: Qdrant cluster lookup → TurboQuant/Ollama Gemma4 summaries → embed → glyph_atlas upsert → Redis wiki enrichment, (3) ACE smoke. ~10 min total.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🩺 Graphify: Health Report",
+      "type": "shell",
+      "command": "npm run graphify:health",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Collect Redis wiki/BoW tile counts, Qdrant glyph_atlas size, graph JSON stats, AGENTS.md mirror count → write docs/graph/graphify-health.json + .md",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
 
     {
       "label": "📈 Graphify: Analyze → next_steps plan",

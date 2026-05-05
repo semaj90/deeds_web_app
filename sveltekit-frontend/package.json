@@ -54,6 +54,8 @@
     "graphify:batch-gpu-analysis:test": "node scripts/graphify-batch-gpu-analysis.mjs --limit 10",
     "graphify:batch-gpu-analysis:dry": "node scripts/graphify-batch-gpu-analysis.mjs --dry-run",
     "graphify:ace-smoke": "node scripts/tests/test-ace-graphify-retrieval.mjs",
+    "graphify:health": "node scripts/graphify-health.mjs",
+    "graphify:health:json": "node scripts/graphify-health.mjs --json",
     "graphify:persist:couchdb": "node scripts/graphify-persist-couchdb.mjs",
     "graphify:persist:couchdb:test": "node scripts/graphify-persist-couchdb.mjs --limit 5",
     "graphify:bow-tiles": "node scripts/build-bow-tiles.mjs",
