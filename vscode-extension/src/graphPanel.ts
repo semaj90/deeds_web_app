@@ -1,329 +1,238 @@
 /**
- * GraphPanel — WebView with dual-layer text cache.
+ * GraphPanel — WebView topology viewer with WebGPU compute + Canvas 2D render.
  *
- * Layer 1 (session):  WebView acquireVsCodeApi().setState()
- *   - Survives panel hide/show and tab switches.
- *   - Cleared when VS Code closes or the extension deactivates.
+ * Cache layers:
+ *   Layer 1 (session):  acquireVsCodeApi().setState()  — survives hide/show
+ *   Layer 2 (durable):  workspaceState                 — survives VS Code restart
  *
- * Layer 2 (durable): vscode.ExtensionContext.workspaceState
- *   - Survives VS Code restarts, stored in workspace SQLite DB.
- *   - Written when the panel is hidden or disposed.
- *   - Read on first open to restore last session.
- *
- * Text cached: search query, active cluster index, scroll position, expanded node IDs.
+ * Graph data is loaded via localGraphCache (worker_threads, non-blocking).
+ * The media/topology-viewer.js script handles all rendering and interaction.
+ * Selecting a node in the viewer opens the file in the editor.
  */
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
+import { load as loadGraph, invalidate } from './localGraphCache';
 
-const PANEL_ID = 'deedsGraph';
-const CACHE_KEY = 'deedsGraph.panelState';
-
-interface PanelState {
-    query: string;
-    clusterIndex: number;
-    scrollTop: number;
-    expandedIds: string[];
-}
-
-const DEFAULT_STATE: PanelState = {
-    query: '',
-    clusterIndex: -1,
-    scrollTop: 0,
-    expandedIds: [],
-};
+const PANEL_ID  = 'deedsTopology';
+const CACHE_KEY = 'deedsGraph.viewerState';
 
 export class GraphPanel {
-    private static current: GraphPanel | undefined;
+	private static current: GraphPanel | undefined;
 
-    private readonly panel: vscode.WebviewPanel;
-    private readonly context: vscode.ExtensionContext;
-    private readonly disposables: vscode.Disposable[] = [];
+	private readonly panel: vscode.WebviewPanel;
+	private readonly context: vscode.ExtensionContext;
+	private readonly disposables: vscode.Disposable[] = [];
 
-    static createOrShow(context: vscode.ExtensionContext) {
-        if (GraphPanel.current) {
-            GraphPanel.current.panel.reveal(vscode.ViewColumn.Beside);
-            return;
-        }
-        GraphPanel.current = new GraphPanel(context);
-    }
+	static createOrShow(context: vscode.ExtensionContext) {
+		if (GraphPanel.current) {
+			GraphPanel.current.panel.reveal(vscode.ViewColumn.Beside);
+			return;
+		}
+		GraphPanel.current = new GraphPanel(context);
+	}
 
-    private constructor(context: vscode.ExtensionContext) {
-        this.context = context;
+	/** Highlight nodes in the open panel (called from tree-item selection). */
+	static highlight(ids: string[]) {
+		GraphPanel.current?.panel.webview.postMessage({ type: 'highlight', ids });
+	}
 
-        this.panel = vscode.window.createWebviewPanel(
-            PANEL_ID,
-            'Deeds — Codebase Graph',
-            vscode.ViewColumn.Beside,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true, // Layer 1: keeps WebView alive on tab switch
-                localResourceRoots: [
-                    vscode.Uri.file(path.join(context.extensionPath, 'out')),
-                ],
-            }
-        );
+	/** Reload graph data in the open panel (called on file-watcher change or refresh command). */
+	static reload() {
+		GraphPanel.current?.reload();
+	}
 
-        // Restore durable state → passed into HTML so WebView restores immediately
-        const saved = context.workspaceState.get<PanelState>(CACHE_KEY, DEFAULT_STATE);
-        this.panel.webview.html = buildHtml(saved, this.loadGraphData());
+	private constructor(context: vscode.ExtensionContext) {
+		this.context = context;
 
-        // Save to workspaceState whenever panel hides (layer 2 write)
-        this.panel.onDidChangeViewState(
-            ({ webviewPanel }) => {
-                if (!webviewPanel.visible) {
-                    this.panel.webview.postMessage({ type: 'requestState' });
-                }
-            },
-            null,
-            this.disposables
-        );
+		const mediaDir = vscode.Uri.file(path.join(context.extensionPath, 'media'));
 
-        // Messages from WebView
-        this.panel.webview.onDidReceiveMessage(
-            (msg: { type: string; state?: PanelState }) => {
-                if (msg.type === 'stateUpdate' && msg.state) {
-                    context.workspaceState.update(CACHE_KEY, msg.state);
-                }
-            },
-            null,
-            this.disposables
-        );
+		this.panel = vscode.window.createWebviewPanel(
+			PANEL_ID,
+			'Deeds — Topology',
+			vscode.ViewColumn.Beside,
+			{
+				enableScripts:          true,
+				retainContextWhenHidden: true,
+				localResourceRoots: [
+					mediaDir,
+					vscode.Uri.file(path.join(context.extensionPath, 'out')),
+				],
+			}
+		);
 
-        this.panel.onDidDispose(
-            () => {
-                GraphPanel.current = undefined;
-                this.disposables.forEach(d => d.dispose());
-            },
-            null,
-            this.disposables
-        );
-    }
+		const viewerUri = this.panel.webview.asWebviewUri(
+			vscode.Uri.file(path.join(context.extensionPath, 'media', 'topology-viewer.js'))
+		);
+		const savedState = context.workspaceState.get(CACHE_KEY, {});
+		this.panel.webview.html = buildHtml(this.panel.webview, viewerUri, savedState);
 
-    private loadGraphData(): { nodes: unknown[]; clusters: unknown[] } {
-        const root = path.join(this.context.extensionPath, '..', 'sveltekit-frontend', 'docs', 'graph');
-        try {
-            const graph = JSON.parse(fs.readFileSync(path.join(root, 'codebase-graph.json'), 'utf8'));
-            const clusters = JSON.parse(fs.readFileSync(path.join(root, 'hypergraph-clusters.json'), 'utf8'));
-            return {
-                nodes: Array.isArray(graph.nodes) ? graph.nodes.slice(0, 500) : [],
-                clusters: Array.isArray(clusters) ? clusters : [],
-            };
-        } catch {
-            return { nodes: [], clusters: [] };
-        }
-    }
+		// Push graph data once the WebView signals it is ready (or after 300 ms)
+		const pushData = () => {
+			loadGraph(context.extensionPath).then(data => {
+				// Cap nodes for rendering performance; edges already sliced in viewer
+				const nodes    = data.nodes.slice(0, 1500);
+				const edges    = data.edges.slice(0, 4000);
+				const clusters = data.clusters;
+				this.panel.webview.postMessage({ type: 'loadData', nodes, edges, clusters });
+			});
+		};
+
+		// Give the WebView 300 ms to execute its bootstrap then push data.
+		// If the viewer fires 'ready' we push sooner (handled in onDidReceiveMessage).
+		let pushed = false;
+		const timer = setTimeout(() => { pushed = true; pushData(); }, 300);
+
+		this.panel.webview.onDidReceiveMessage(
+			(msg: { type: string; id?: string; label?: string; cluster?: number; state?: unknown }) => {
+				switch (msg.type) {
+					case 'ready':
+						if (!pushed) { clearTimeout(timer); pushed = true; pushData(); }
+						break;
+
+					case 'nodeSelected':
+						if (msg.id) this.openNode(msg.id);
+						break;
+
+					case 'stateUpdate':
+						context.workspaceState.update(CACHE_KEY, msg.state);
+						break;
+				}
+			},
+			null,
+			this.disposables
+		);
+
+		// Save state on hide so workspaceState is fresh before restart
+		this.panel.onDidChangeViewState(({ webviewPanel }) => {
+			if (!webviewPanel.visible) {
+				this.panel.webview.postMessage({ type: 'requestState' });
+			}
+		}, null, this.disposables);
+
+		this.panel.onDidDispose(() => {
+			clearTimeout(timer);
+			GraphPanel.current = undefined;
+			this.disposables.forEach(d => d.dispose());
+		}, null, this.disposables);
+	}
+
+	private openNode(id: string) {
+		// id is usually a workspace-relative path (e.g. "src/lib/server/graph/hypergraph-4d.ts")
+		const root = path.join(this.context.extensionPath, '..', 'sveltekit-frontend');
+		const candidates = [
+			path.join(root, id),
+			path.join(this.context.extensionPath, '..', id),
+		];
+		for (const p of candidates) {
+			try {
+				const uri = vscode.Uri.file(p);
+				vscode.window.showTextDocument(uri, { preview: true, preserveFocus: false });
+				return;
+			} catch { /* try next candidate */ }
+		}
+	}
+
+	/** Reload graph data and push to viewer (e.g. after graphify run). */
+	reload() {
+		invalidate();
+		loadGraph(this.context.extensionPath).then(data => {
+			this.panel.webview.postMessage({
+				type: 'loadData',
+				nodes:    data.nodes.slice(0, 1500),
+				edges:    data.edges.slice(0, 4000),
+				clusters: data.clusters,
+			});
+		});
+	}
 }
 
-function buildHtml(state: PanelState, data: { nodes: unknown[]; clusters: unknown[] }): string {
-    const stateJson = JSON.stringify(state).replace(/</g, '\\u003c');
-    const dataJson  = JSON.stringify(data).replace(/</g, '\\u003c');
+function buildHtml(
+	webview: vscode.Webview,
+	viewerUri: vscode.Uri,
+	savedState: unknown,
+): string {
+	const stateJson = JSON.stringify(savedState).replace(/</g, '\\u003c');
+	const csp = [
+		`default-src 'none'`,
+		`script-src ${webview.cspSource} 'unsafe-inline'`,
+		`style-src 'unsafe-inline'`,
+		`img-src ${webview.cspSource} data:`,
+	].join('; ');
 
-    return /* html */`<!DOCTYPE html>
+	return /* html */`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
-  <title>Deeds Graph</title>
+  <meta http-equiv="Content-Security-Policy" content="${csp}">
+  <title>Deeds — Topology</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: var(--vscode-font-family);
-      font-size: var(--vscode-font-size);
-      color: var(--vscode-foreground);
       background: var(--vscode-editor-background);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
       overflow: hidden;
+      width: 100vw; height: 100vh;
     }
-    #toolbar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
+    #canvas { display: block; width: 100%; height: 100%; }
+    #overlay {
+      position: fixed; top: 6px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; align-items: center;
       background: var(--vscode-sideBar-background);
-      border-bottom: 1px solid var(--vscode-panel-border);
-      flex-shrink: 0;
+      border: 1px solid var(--vscode-panel-border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-family: var(--vscode-font-family);
+      font-size: 12px;
+      color: var(--vscode-foreground);
+      pointer-events: none;
+      opacity: 0.85;
     }
-    #search {
-      flex: 1;
-      background: var(--vscode-input-background);
-      color: var(--vscode-input-foreground);
-      border: 1px solid var(--vscode-input-border);
-      border-radius: 3px;
-      padding: 3px 8px;
-      font: inherit;
-    }
-    #search:focus { outline: 1px solid var(--vscode-focusBorder); }
-    #clusterSelect {
-      background: var(--vscode-dropdown-background);
-      color: var(--vscode-dropdown-foreground);
-      border: 1px solid var(--vscode-dropdown-border);
-      border-radius: 3px;
-      padding: 3px 6px;
-      font: inherit;
-    }
-    #count {
-      font-size: 11px;
-      color: var(--vscode-descriptionForeground);
-      white-space: nowrap;
-    }
-    #list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 4px 0;
-    }
-    .row {
-      display: flex;
-      align-items: center;
-      padding: 3px 10px;
-      cursor: pointer;
-      gap: 6px;
-      border-radius: 0;
-    }
-    .row:hover { background: var(--vscode-list-hoverBackground); }
-    .row.active { background: var(--vscode-list-activeSelectionBackground);
-                  color: var(--vscode-list-activeSelectionForeground); }
-    .badge {
+    #gpu-badge {
       font-size: 10px;
       padding: 1px 5px;
-      border-radius: 10px;
+      border-radius: 8px;
       background: var(--vscode-badge-background);
       color: var(--vscode-badge-foreground);
-      flex-shrink: 0;
-    }
-    .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #empty {
-      padding: 20px;
-      color: var(--vscode-descriptionForeground);
-      text-align: center;
     }
   </style>
 </head>
 <body>
-<div id="toolbar">
-  <input id="search" type="text" placeholder="Filter nodes…" autocomplete="off" spellcheck="false">
-  <select id="clusterSelect"><option value="-1">All clusters</option></select>
-  <span id="count"></span>
-</div>
-<div id="list"></div>
+  <canvas id="canvas"></canvas>
+  <div id="overlay">
+    <span id="node-count">Loading…</span>
+    <span id="gpu-badge" style="display:none">WebGPU</span>
+  </div>
 
-<script>
-  // ── VS Code API + dual-layer cache ────────────────────────────────────────
-  const vscode = acquireVsCodeApi();
-
-  // Layer 1: restore from session state (survives hide/show, set by VS Code)
-  let state = vscode.getState() || ${stateJson};
-
-  function saveState() {
-    vscode.setState(state);                               // layer 1 (session)
-    vscode.postMessage({ type: 'stateUpdate', state });   // layer 2 (durable)
-  }
-
-  // ── Data ─────────────────────────────────────────────────────────────────
-  const DATA = ${dataJson};
-  const nodes    = DATA.nodes    || [];
-  const clusters = DATA.clusters || [];
-
-  // ── DOM refs ─────────────────────────────────────────────────────────────
-  const searchEl  = document.getElementById('search');
-  const selectEl  = document.getElementById('clusterSelect');
-  const listEl    = document.getElementById('list');
-  const countEl   = document.getElementById('count');
-
-  // ── Populate cluster dropdown ─────────────────────────────────────────────
-  clusters.forEach((c, i) => {
-    const opt = document.createElement('option');
-    opt.value = String(i);
-    opt.textContent = (c.label || c.id || ('Cluster ' + i)) + ' (' + (c.members?.length ?? 0) + ')';
-    selectEl.appendChild(opt);
-  });
-
-  // ── Restore toolbar state ─────────────────────────────────────────────────
-  searchEl.value   = state.query       ?? '';
-  selectEl.value   = String(state.clusterIndex ?? -1);
-
-  // ── Render ────────────────────────────────────────────────────────────────
-  function render() {
-    const q   = state.query.toLowerCase();
-    const cid = state.clusterIndex;
-
-    const visible = nodes.filter(n => {
-      const label = (n.id || n.label || n.file || '').toLowerCase();
-      if (q && !label.includes(q)) return false;
-      if (cid >= 0 && n.cluster !== cid) return false;
-      return true;
+  <!-- Topology viewer: Canvas render + optional WebGPU compute boost -->
+  <script src="${viewerUri}"></script>
+  <script>
+    // Patch the viewer's draw() to update the overlay counter after loadData.
+    // The viewer fires window dispatchEvent('deedsDataLoaded') after initLayout().
+    window.addEventListener('deedsDataLoaded', function(e) {
+      const d = e.detail || {};
+      document.getElementById('node-count').textContent =
+        (d.nodeCount || 0) + ' nodes  •  ' + (d.edgeCount || 0) + ' edges';
+      if (d.gpuBoosted) {
+        document.getElementById('gpu-badge').style.display = '';
+      }
     });
 
-    countEl.textContent = visible.length + ' / ' + nodes.length;
-
-    if (visible.length === 0) {
-      listEl.innerHTML = '<div id="empty">No nodes match</div>';
-      return;
+    // Restore durable state from workspaceState
+    const _savedState = ${stateJson};
+    if (_savedState && Object.keys(_savedState).length) {
+      // The viewer initialises from vscode.getState() on its own;
+      // workspaceState is the durable fallback — merge if session state is empty.
+      if (!window.__deedsViewerStateRestored) {
+        const vs = typeof acquireVsCodeApi === 'function'
+          ? acquireVsCodeApi().getState()
+          : null;
+        if (!vs || !vs.zoom) {
+          // Inject as session state so the viewer's own bootstrap picks it up
+          try { acquireVsCodeApi().setState(_savedState); } catch {}
+        }
+      }
     }
-
-    listEl.innerHTML = '';
-    visible.forEach(n => {
-      const id    = String(n.id || n.label || n.file || '');
-      const label = id;
-      const cl    = n.cluster ?? '';
-
-      const row = document.createElement('div');
-      row.className = 'row' + (state.expandedIds.includes(id) ? ' active' : '');
-      row.innerHTML =
-        '<span class="label" title="' + escHtml(label) + '">' + escHtml(label) + '</span>' +
-        (cl !== '' ? '<span class="badge">' + cl + '</span>' : '');
-
-      row.addEventListener('click', () => {
-        const idx = state.expandedIds.indexOf(id);
-        if (idx >= 0) state.expandedIds.splice(idx, 1);
-        else state.expandedIds.push(id);
-        saveState();
-        render();
-      });
-
-      listEl.appendChild(row);
-    });
-
-    // Restore scroll
-    listEl.scrollTop = state.scrollTop ?? 0;
-  }
-
-  // ── Events ────────────────────────────────────────────────────────────────
-  searchEl.addEventListener('input', () => {
-    state.query = searchEl.value;
-    saveState();
-    render();
-  });
-
-  selectEl.addEventListener('change', () => {
-    state.clusterIndex = Number(selectEl.value);
-    saveState();
-    render();
-  });
-
-  listEl.addEventListener('scroll', () => {
-    state.scrollTop = listEl.scrollTop;
-    // throttle: only persist after scroll settles
-    clearTimeout(listEl._scrollTimer);
-    listEl._scrollTimer = setTimeout(() => saveState(), 300);
-  });
-
-  // Extension host requests state dump (on panel hide → workspaceState write)
-  window.addEventListener('message', e => {
-    if (e.data?.type === 'requestState') saveState();
-  });
-
-  function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  render();
-</script>
+  </script>
 </body>
 </html>`;
 }

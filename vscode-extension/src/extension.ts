@@ -21,18 +21,19 @@ export function activate(context: vscode.ExtensionContext) {
 		GraphPanel.createOrShow(context);
 	});
 
-	// Reload tree when graph JSON changes on disk
+	// Reload tree + topology panel when graph JSON changes on disk
 	const watcher = vscode.workspace.createFileSystemWatcher(
 		new vscode.RelativePattern(
 			vscode.Uri.file(context.extensionPath + '/../sveltekit-frontend/docs/graph'),
 			'*.json'
 		)
 	);
-	watcher.onDidChange(() => treeProvider.reload());
-	watcher.onDidCreate(() => treeProvider.reload());
+	watcher.onDidChange(() => { treeProvider.reload(); GraphPanel.reload(); });
+	watcher.onDidCreate(() => { treeProvider.reload(); GraphPanel.reload(); });
 
 	const refresh = vscode.commands.registerCommand('deeds.refreshGraph', () => {
 		treeProvider.reload();
+		GraphPanel.reload();
 	});
 
 	// Create Claude Plan — from tree item (cluster/node) or active editor
