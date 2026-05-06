@@ -91,12 +91,13 @@ async function qdrantContext(query: string): Promise<string> {
 async function kagNote(filePath: string): Promise<string> {
   try {
     const dir = path.dirname(filePath).replace(/\\/g, '/');
-    // Use HTTP Redis adapter if available, otherwise skip
+    const { attachDispose } = await import('$lib/server/redis-disposable.js');
     const { createClient } = await import('redis');
-    const r = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
-    await r.connect();
+    const raw = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
+    await raw.connect();
+    // D16: `await using` auto-calls .quit() on scope exit (even on throw)
+    await using r = attachDispose(raw);
     const note = await r.get(`wiki:note:dir:${dir}`) as string | null;
-    await r.quit();
     return (note ?? '').slice(0, 300);
   } catch {
     return '';
