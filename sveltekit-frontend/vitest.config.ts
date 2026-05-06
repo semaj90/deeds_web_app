@@ -109,6 +109,10 @@ export default defineConfig({
       'tests/manifold4-retrieval.spec.ts',
       'tests/autoencoder-projection-smoke.spec.ts',
       'tests/topology-projection-pipeline.spec.ts',
+      // GPU-accelerated ACE codebase indexing cache (added 2026-05-06)
+      'tests/centroid-cache-gpu.spec.ts',
+      'tests/ace-code-cache.spec.ts',
+      'tests/tensor-analysis-enqueue.spec.ts',
       // G16 auto-generated route test stubs (npm run audit:generate-route-stubs)
       'tests/routes/auto/**/*.test.ts',
     ],
