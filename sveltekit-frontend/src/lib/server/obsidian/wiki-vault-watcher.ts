@@ -14,7 +14,7 @@
 import { readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { parseMarkdownWikiNote } from './markdown-wiki-note.js';
-import { couchPut, docId } from '$lib/server/indexer/karpathy-wiki.js';
+import { couchPut, type WikiNote } from '$lib/server/indexer/karpathy-wiki.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 
@@ -131,23 +131,11 @@ async function ingestFile(absPath: string): Promise<void> {
 	const parsed = parseMarkdownWikiNote(raw, relPath);
 	if (!parsed) return; // not a wiki note (e.g. MOC index, reports/)
 
-	const { note, contentHash } = parsed;
+	const { note } = parsed;
 
 	// ── CouchDB upsert ─────────────────────────────────────────────────────
-	const id = docId(note);
-	// Fetch current rev to avoid conflict
-	let rev: string | undefined;
-	try {
-		const res = await couchFetch(`/${id}`);
-		if (res.ok) {
-			const doc = (await res.json()) as Record<string, unknown>;
-			rev = String(doc._rev);
-			// If content hash unchanged, skip upsert
-			if (doc._contentHash === contentHash) return;
-		}
-	} catch { /* doc doesn't exist yet — that's fine */ }
-
-	await couchPut(id, { ...note, _contentHash: contentHash, _rev: rev, source: 'obsidian-vault', lastSyncedAt: new Date().toISOString() });
+	// couchPut handles _rev conflict resolution internally
+	await couchPut(note);
 
 	// ── Redis refresh ───────────────────────────────────────────────────────
 	try {
@@ -161,41 +149,21 @@ async function ingestFile(absPath: string): Promise<void> {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function redisKeyForNote(note: { type: string; [k: string]: unknown }): string | null {
+function redisKeyForNote(note: WikiNote): string | null {
 	switch (note.type) {
-		case 'cluster': {
-			const n = note as { clusterType: string; clusterId: number };
-			return `wiki:note:cluster:${n.clusterType}:${n.clusterId}`;
-		}
-		case 'retrieval': {
-			const n = note as { queryHash: string };
-			return `wiki:note:retrieval:${n.queryHash}`;
-		}
-		case 'playbook': {
-			const n = note as { symptom: string };
-			return `wiki:note:playbook:${n.symptom.slice(0, 60).replace(/\W+/g, '_')}`;
-		}
-		case 'research': {
-			const n = note as { query: string };
-			return `wiki:note:research:${n.query.slice(0, 60).replace(/\W+/g, '_')}`;
-		}
-		case 'directory': {
-			const n = note as { path: string };
-			return `wiki:note:dir:${n.path.replace(/[/\\]/g, ':')}`;
-		}
+		case 'cluster':
+			return `wiki:note:cluster:${note.clusterType}:${note.clusterId}`;
+		case 'retrieval':
+			return `wiki:note:retrieval:${note.queryHash}`;
+		case 'playbook':
+			return `wiki:note:playbook:${note.symptom.slice(0, 60).replace(/\W+/g, '_')}`;
+		case 'research':
+			return `wiki:note:research:${note.query.slice(0, 60).replace(/\W+/g, '_')}`;
+		case 'directory':
+			return `wiki:note:dir:${note.path.replace(/[/\\]/g, ':')}`;
 		default: return null;
 	}
 }
 
-async function couchFetch(path: string, options: RequestInit = {}): Promise<Response> {
-	const urlObj = new URL(ENV.COUCHDB_URL || 'http://localhost:5984');
-	const username = urlObj.username;
-	const password = urlObj.password;
-	urlObj.username = '';
-	urlObj.password = '';
-	const headers = new Headers(options.headers || {});
-	if (username || password) {
-		headers.set('Authorization', `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`);
-	}
-	return fetch(`${urlObj.origin}/karpathy_wiki${path}`, { ...options, headers });
-}
+/** Alias for karpathy-wiki.ts callers that use the older name. */
+export const markObsidianAppWrite = markServerWrite;

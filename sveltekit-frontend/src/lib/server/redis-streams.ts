@@ -129,14 +129,17 @@ export async function consumeTokenStream(
   callback:   (entry: TokenEntry) => Promise<void>,
   stopAfterMs = 30_000,
 ): Promise<void> {
-  const key    = streamKey(requestId);
-  const redis  = sr(getRedis());
-  let   lastId = fromId;
-  const start  = Date.now();
+  const key      = streamKey(requestId);
+  const baseRedis = getRedis();
+  const redis    = sr(baseRedis);
+  let   lastId   = fromId;
+  const start    = Date.now();
 
   // Duplicate connection for blocking XREAD so we don't stall the main pool.
   // `await using` auto-calls .quit() on scope exit — even on throw.
-  await using reader = attachDispose(redis.duplicate());
+  const dupRaw = baseRedis.duplicate();
+  await using _dup = attachDispose(dupRaw);
+  const reader = sr(dupRaw);
 
   while (Date.now() - start < stopAfterMs) {
     const response = await reader.xread('BLOCK', 5000, 'STREAMS', key, lastId);

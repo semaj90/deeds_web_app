@@ -81,19 +81,23 @@ function parsePlaybook(fm: Fm, body: string): PlaybookNote {
 }
 
 function parseResearch(fm: Fm, body: string): ResearchNote {
+	// Parse outside sources from a "## Outside Sources" section
+	const sourcesRaw = extractBulletList(body, 'Outside Sources');
+	const outsideSources = sourcesRaw.map((line) => {
+		const m = line.match(/\[([^\]]+)\]\(([^)]+)\)\s*[—-]\s*(.*)/);
+		return m
+			? { title: m[1], url: m[2], snippet: m[3] }
+			: { title: line.slice(0, 60), url: '', snippet: line };
+	});
 	return {
 		type: 'research',
 		query: str(fm.query) || extractH1(body) || '',
-		topic: str(fm.topic) || '',
-		source: str(fm.source) || '',
-		trustTier: str(fm.trustTier) || 'unverified',
-		gainScore: num(fm.gainScore, 0),
-		externalFinding: extractSection(body, 'External Finding') || '',
-		internalAlignment: extractSection(body, 'Internal Alignment') || '',
-		recommendedAction: extractSection(body, 'Recommended Action') || '',
-		linkedFiles: extractWikiLinks(body, 'Linked Files'),
-		linkedClusters: extractBulletList(body, 'Linked Clusters'),
-		tags: arr(fm.tags).filter((t) => !['research', 'karpathy-wiki'].includes(t)),
+		outsideSources,
+		internalAreas: extractBulletList(body, 'Internal Code Areas'),
+		deltasFromPrior: extractBulletList(body, 'Deltas from Prior'),
+		confidence: num(fm.confidence, 0),
+		pipeline: str(fm.pipeline) || '',
+		unresolvedQuestions: extractBulletList(body, 'Unresolved Questions'),
 		generatedAt: str(fm.generated) || new Date().toISOString(),
 	};
 }

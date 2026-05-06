@@ -7,7 +7,7 @@
     //   Set methods (.union/.intersection/.difference), Object.groupBy.
     // CLAUDE.md flags these as already usable; this lets tsgo + tsc resolve them.
     "target": "es2024",
-    "lib": ["es2025", "esnext.disposable", "dom"],
+    "lib": ["es2024", "esnext.disposable", "dom"],
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noEmit": true,
