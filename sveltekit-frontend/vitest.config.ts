@@ -108,6 +108,7 @@ export default defineConfig({
       'tests/wiki-vault-watcher.spec.ts',
       'tests/manifold4-retrieval.spec.ts',
       'tests/autoencoder-projection-smoke.spec.ts',
+      'tests/topology-projection-pipeline.spec.ts',
       // G16 auto-generated route test stubs (npm run audit:generate-route-stubs)
       'tests/routes/auto/**/*.test.ts',
     ],
