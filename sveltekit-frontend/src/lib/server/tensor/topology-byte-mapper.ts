@@ -149,12 +149,15 @@ export function topoByteFromPath(filePath: string): number {
  */
 export function classifyQuery(query: string): TopoClass {
   const q = query.toLowerCase();
-  if (/cuda|rtx|gpu|tensor|topology|som|pagerank|louvain/.test(q)) return TOPO_CLASS.GRAPH_GPU_TOPOLOGY;
-  if (/route|endpoint|api|handler|server\.ts/.test(q)) return TOPO_CLASS.API_ROUTE;
+  // Test/audit checked before api-route so "route test coverage" → TEST_AUDIT_DEVTOOL
+  if (/\btest\b|coverage|\bspec\b|audit|vitest|playwright/.test(q)) return TOPO_CLASS.TEST_AUDIT_DEVTOOL;
+  if (/cuda|rtx|\bgpu\b|tensor|topology|\bsom\b|pagerank|louvain/.test(q)) return TOPO_CLASS.GRAPH_GPU_TOPOLOGY;
+  if (/\bapi\b|endpoint|handler|server\.ts/.test(q)) return TOPO_CLASS.API_ROUTE;
   if (/schema|table|drizzle|postgres|migration/.test(q)) return TOPO_CLASS.DATABASE_SCHEMA;
   if (/evidence|legal|statute|citation|document/.test(q)) return TOPO_CLASS.LEGAL_EVIDENCE;
-  if (/test|spec|audit|vitest|playwright/.test(q)) return TOPO_CLASS.TEST_AUDIT_DEVTOOL;
-  if (/rag|qdrant|embed|retrieval|ace|kag/.test(q)) return TOPO_CLASS.TRACE_RETRIEVAL;
-  if (/component|svelte|ui|button|dialog/.test(q)) return TOPO_CLASS.UI_COMPONENT;
+  if (/rag|qdrant|embed|retrieval|\bace\b|\bkag\b/.test(q)) return TOPO_CLASS.TRACE_RETRIEVAL;
+  if (/component|svelte|\bui\b|button|dialog/.test(q)) return TOPO_CLASS.UI_COMPONENT;
+  // "route" alone (without test/api context) → API_ROUTE
+  if (/route/.test(q)) return TOPO_CLASS.API_ROUTE;
   return TOPO_CLASS.UNCLASSIFIED;
 }
