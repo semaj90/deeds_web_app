@@ -42,9 +42,18 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         return json({ entries: [], stats: ingestLogger.getStats(), meta: { source: 'redis', returned: 0 } });
       }
       const raws = await redis.mget(hashes.map((h) => `rag:hit:${h}`));
+      // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. RAG hit blobs ~2-10KB.
+      const totalChars = raws.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+      let parseFn: (s: string) => unknown = (s) => JSON.parse(s);
+      if (raws.length >= 10 && totalChars >= 5_000) {
+        try {
+          const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+          if (isSimdJsonAvailable()) parseFn = fastJsonParse;
+        } catch { /* addon unavailable — keep V8 */ }
+      }
       const entries = raws
         .filter((r): r is string => r != null)
-        .map((r) => { try { return JSON.parse(r); } catch { return null; } })
+        .map((r) => { try { return parseFn(r); } catch { return null; } })
         .filter(Boolean);
       return json({ entries, stats: ingestLogger.getStats(), meta: { source: 'redis', returned: entries.length } });
     } catch (err) {

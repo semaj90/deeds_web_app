@@ -711,14 +711,18 @@ async function gateD18() {
     if (/fastJsonParse|parseEntriesBulk|isSimdJsonAvailable/.test(src)) continue;
     const lines = src.split('\n');
     for (let i = 0; i < lines.length; i++) {
-      if (/\.mget\s*\(/.test(lines[i])) {
-        findings.push({
-          file:    relative(ROOT, f),
-          line:    i + 1,
-          snippet: `${lines[i].trim().slice(0, 120)}  → consider parseEntriesBulk for ≥10/≥5KB aggregate`,
-        });
-        break;
-      }
+      if (!/\.mget\s*\(/.test(lines[i])) continue;
+      // Look ahead 12 lines for a JSON.parse that uses the MGET result.
+      // Files that just happen to have JSON.parse elsewhere (e.g. parseFloat
+      // over MGET-returned plain strings) are false positives.
+      const window = lines.slice(i, Math.min(lines.length, i + 12)).join('\n');
+      if (!/JSON\.parse\s*\(/.test(window)) break;
+      findings.push({
+        file:    relative(ROOT, f),
+        line:    i + 1,
+        snippet: `${lines[i].trim().slice(0, 120)}  → consider parseEntriesBulk for ≥10/≥5KB aggregate`,
+      });
+      break;
     }
   }
   return findings;

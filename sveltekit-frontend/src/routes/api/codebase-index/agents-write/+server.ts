@@ -209,6 +209,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       kagVals = await redis.mget(...kagKeys);
     } catch { /* non-fatal — proceed without KAG */ }
 
+    // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. KAG wiki notes 1-5KB
+    // each — ≥10 directories of indexed code clears the threshold.
+    const kagTotal = kagVals.reduce((sum, v) => sum + (v?.length ?? 0), 0);
+    let parseKag: (s: string) => WikiNote = (s) => JSON.parse(s) as WikiNote;
+    if (kagVals.length >= 10 && kagTotal >= 5_000) {
+      try {
+        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+        if (isSimdJsonAvailable()) parseKag = fastJsonParse<WikiNote>;
+      } catch { /* addon unavailable — keep V8 */ }
+    }
+
     for (let i = 0; i < dirs.length; i++) {
       const dirRel = dirs[i];
       const dirFiles = dirMap.get(dirRel)!;
@@ -218,7 +229,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       let kag: WikiNote | null = null;
       try {
-        if (kagVals[i]) kag = JSON.parse(kagVals[i]!) as WikiNote;
+        if (kagVals[i]) kag = parseKag(kagVals[i]!);
       } catch { /* malformed KAG note — ignore */ }
 
       const markdown = buildDirMarkdown(dirRel, dirFiles, kag, generatedAt);
