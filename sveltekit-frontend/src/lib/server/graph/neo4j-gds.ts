@@ -2,11 +2,15 @@
  * neo4j-gds.ts — Neo4j Graph Data Science + APOC integration.
  *
  * Provides:
- *   ensureGdsProjection()  — idempotent codeTopology graph projection
- *   runPageRankMutate()    — writes graphPageRank back to File/Cluster nodes
- *   runLouvainMutate()     — writes louvainCommunity back to File/Cluster nodes
- *   getImpactNeighborhood()— 3-hop APOC path expansion for impact analysis
- *   getGdsStatus()         — checks APOC + GDS availability
+ *   ensureGdsProjection()       — idempotent codeTopology graph projection
+ *   runPageRankMutate()         — writes graphPageRank back to File/Cluster nodes
+ *   runLouvainMutate()          — writes louvainCommunity back to File/Cluster nodes
+ *   runKnnMutate()              — GDS KNN on graphPageRank property, topK=10
+ *   writeAuthorityScoresToQdrant() — composite score → Qdrant payload field
+ *   getImpactNeighborhood()     — 3-hop APOC path expansion for impact analysis
+ *   getImpactCategorized()      — categorized APOC impact via expandConfig
+ *   getGdsStatus()              — checks APOC + GDS availability
+ *   syncManifold4ToNeo4j()      — sync 4D coords from Postgres to Neo4j File nodes
  */
 
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
@@ -55,6 +59,22 @@ export interface CategorizedImpactResult {
   totalCount: number;
   durationMs: number;
   apocUsed: boolean;
+}
+
+export interface KnnResult {
+  relationshipsWritten: number;
+  durationMs: number;
+}
+
+export interface AuthorityMirrorResult {
+  mirrored: number;
+  durationMs: number;
+}
+
+export interface OntologyResult {
+  conceptsSeeded: number;
+  filesClassified: number;
+  durationMs: number;
 }
 
 export interface PageRankResult {
@@ -462,6 +482,141 @@ export async function getTopAuthorityNodes(limit = 25): Promise<AuthorityNode[]>
   } finally {
     await session.close();
   }
+}
+
+// ── GDS KNN ───────────────────────────────────────────────────────────────────
+
+export interface KnnResult {
+  relationshipsWritten: number;
+  durationMs: number;
+}
+
+/**
+ * Run GDS K-Nearest Neighbours on graphPageRank to create
+ * SIMILAR_GRAPH_NEIGHBOR relationships in the projection.
+ * Writes those back to the live graph as KNN_SIMILAR edges.
+ *
+ * Requires ensureGdsProjection() + runPageRankMutate() to have been called.
+ */
+export async function runKnnMutate(topK = 10): Promise<KnnResult> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  const t0 = Date.now();
+
+  try {
+    // Mutate projection with KNN similarity
+    await session.run(`
+      CALL gds.knn.mutate($name, {
+        topK: $topK,
+        nodeProperties: ['graphPageRank'],
+        mutateRelationshipType: 'SIMILAR_GRAPH_NEIGHBOR',
+        mutateProperty: 'knnScore'
+      })
+    `, { name: PROJECTION_NAME, topK });
+
+    // Write KNN relationships back to the live graph
+    const writeResult = await session.run(`
+      CALL gds.graph.relationships.write($name, 'SIMILAR_GRAPH_NEIGHBOR')
+      YIELD relationshipsWritten
+      RETURN relationshipsWritten
+    `, { name: PROJECTION_NAME });
+
+    const relationshipsWritten = writeResult.records[0]?.get('relationshipsWritten') ?? 0;
+    return { relationshipsWritten, durationMs: Date.now() - t0 };
+  } finally {
+    await session.close();
+  }
+}
+
+// ── Authority score → Qdrant mirror ──────────────────────────────────────────
+
+export interface AuthorityMirrorResult {
+  mirrored: number;
+  durationMs: number;
+}
+
+/**
+ * Read graphPageRank + louvainCommunity from Neo4j, compute a normalised
+ * composite graphAuthorityScore, and write it into the Qdrant payload of the
+ * matching codebase_chunks_768 point.
+ *
+ * Composite formula:
+ *   graphAuthorityScore = clamp(normalisedPageRank × 0.7 + communityBoost × 0.3, 0, 1)
+ *
+ * Why mirror to Qdrant: ACE retrieval already reads Qdrant payloads — this lets
+ * context-assembler use graphAuthorityScore without a Neo4j round-trip per query.
+ */
+export async function writeAuthorityScoresToQdrant(
+  qdrantUrl = 'http://127.0.0.1:6333',
+  collection = 'codebase_chunks_768',
+  limit = 5000,
+): Promise<AuthorityMirrorResult> {
+  const nodes = await getTopAuthorityNodes(limit);
+  if (nodes.length === 0) return { mirrored: 0, durationMs: 0 };
+
+  const t0 = Date.now();
+  const maxPR = Math.max(...nodes.map(n => n.graphPageRank), 1e-9);
+
+  // Build stableKey → score map
+  const scoreMap = new Map<string, number>();
+  for (const node of nodes) {
+    const normPR  = node.graphPageRank / maxPR;
+    const commBoost = node.louvainCommunity !== undefined ? 0.1 : 0;
+    scoreMap.set(node.stableKey, Math.min(normPR * 0.7 + commBoost * 0.3, 1));
+  }
+
+  // Patch Qdrant payloads in batches of 100 via scroll + set_payload
+  let mirrored = 0;
+  let offset: string | null = null;
+  const BATCH = 100;
+
+  while (true) {
+    const scrollBody = JSON.stringify({
+      limit: BATCH,
+      with_payload: ['stable_key'],
+      with_vector: false,
+      ...(offset ? { offset } : {}),
+    });
+
+    const scrollRes = await fetch(`${qdrantUrl}/collections/${collection}/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: scrollBody,
+    }).catch(() => null);
+    if (!scrollRes?.ok) break;
+
+    const data = await scrollRes.json() as {
+      result: { points: Array<{ id: string; payload?: { stable_key?: string } }>; next_page_offset: string | null };
+    };
+    const pts = data.result?.points ?? [];
+    if (pts.length === 0) break;
+
+    const patches = pts
+      .filter(pt => {
+        const sk = pt.payload?.stable_key;
+        return sk && scoreMap.has(sk);
+      })
+      .map(pt => ({
+        id:      pt.id,
+        payload: { graphAuthorityScore: scoreMap.get(pt.payload!.stable_key!) },
+      }));
+
+    if (patches.length > 0) {
+      for (const patch of patches) {
+        await fetch(`${qdrantUrl}/collections/${collection}/points/payload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payload: patch.payload, points: [patch.id] }),
+        }).catch(() => {});
+        mirrored++;
+      }
+    }
+
+    offset = data.result?.next_page_offset ?? null;
+    if (!offset || pts.length < BATCH) break;
+  }
+
+  return { mirrored, durationMs: Date.now() - t0 };
 }
 
 // ── Categorized impact analysis ───────────────────────────────────────────────

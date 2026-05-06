@@ -2401,6 +2401,8 @@ async function fetchCodebaseContext(
       somCluster: r.chunk.som_cluster != null ? Number(r.chunk.som_cluster) : null,
       somBmuRow: r.chunk.som_bmu_row != null ? Number(r.chunk.som_bmu_row) : null,
       somBmuCol: r.chunk.som_bmu_col != null ? Number(r.chunk.som_bmu_col) : null,
+      // Pre-computed by nightly GDS job; avoids Neo4j RTT per ACE call
+      graphAuthorityScore: r.chunk.graph_authority_score != null ? Number(r.chunk.graph_authority_score) : null,
     });
 
     // Step 3 — cross-encoder reranker pass (noFallback prevents web search on code queries)
@@ -2555,18 +2557,25 @@ async function applyKarpathyBoost(
   const topSomRow  = candidates[0]?.somBmuRow ?? null;
   const topSomCol  = candidates[0]?.somBmuCol ?? null;
 
-  // Step 4 pre-fetch: load cluster BoW tile + SOM tile + Neo4j authority scores (non-blocking, best-effort)
+  // Step 4 pre-fetch: load cluster BoW tile + SOM tile (non-blocking, best-effort).
+  // graphAuthorityScore is pre-computed nightly by writeAuthorityScoresToQdrant() and
+  // already present in the Qdrant search payload — no Neo4j RTT needed here.
+  const payloadAuthorityAvailable = candidates.some(c => (c as Record<string, unknown>).graphAuthorityScore != null);
+
   const [clusterTile, somTile, authorityNodes] = await Promise.all([
     topCluster != null ? getClusterBowTexture(topCluster).catch(() => null) : Promise.resolve(null),
     topSomRow != null && topSomCol != null
       ? getSomBowTexture(topSomRow, topSomCol).catch(() => null)
       : Promise.resolve(null),
-    import('$lib/server/graph/neo4j-gds.js')
-      .then(m => m.getTopAuthorityNodes(50))
-      .catch(() => [] as import('$lib/server/graph/neo4j-gds.js').AuthorityNode[]),
+    // Only call Neo4j when payload scores aren't available (pre-nightly-job state)
+    payloadAuthorityAvailable
+      ? Promise.resolve([] as import('$lib/server/graph/neo4j-gds.js').AuthorityNode[])
+      : import('$lib/server/graph/neo4j-gds.js')
+          .then(m => m.getTopAuthorityNodes(50))
+          .catch(() => [] as import('$lib/server/graph/neo4j-gds.js').AuthorityNode[]),
   ]);
 
-  // Build stableKey/path → normalised PageRank score (0–1) for fast lookup
+  // Build stableKey/path → normalised PageRank score (0–1) for fast lookup (fallback path)
   const maxPR = authorityNodes.reduce((m, n) => Math.max(m, n.graphPageRank), 1e-9);
   const authorityMap = new Map(
     authorityNodes.map(n => [
@@ -2587,11 +2596,15 @@ async function applyKarpathyBoost(
     let clusterBoost = 0;
     let somBoost = 0;
     let bowBoost = 0;
-    // Neo4j GDS graphPageRank boost (+0–0.08, capped; zero when Neo4j offline)
+    // graphAuthorityScore boost (+0–0.08): prefers Qdrant payload (no Neo4j RTT);
+    // falls back to authorityMap from Neo4j when payload score not yet populated.
+    const payloadScore = (c as Record<string, unknown>).graphAuthorityScore as number | null | undefined;
     const fileLookup = c.filePath
       ? c.filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '')
       : '';
-    const pagerankBoost = fileLookup ? Math.min((authorityMap.get(fileLookup) ?? 0) * 0.08, 0.08) : 0;
+    const pagerankBoost = payloadScore != null
+      ? Math.min(payloadScore * 0.08, 0.08)
+      : fileLookup ? Math.min((authorityMap.get(fileLookup) ?? 0) * 0.08, 0.08) : 0;
     const pairedTestBoost = 0; // populated downstream by paired test check
 
     // Tag overlap boost: +0.08 per matching Karpathy tag (max +0.24)
