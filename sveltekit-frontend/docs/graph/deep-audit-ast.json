@@ -1,16 +1,11 @@
 {
-  "generatedAt": "2026-05-06T01:09:45.533Z",
+  "generatedAt": "2026-05-06T01:18:15.314Z",
   "graphFiles": 3417,
   "gates": {
     "D16": {
       "name": "await-using opportunity (try/finally + .quit/.disconnect)",
-      "count": 4,
+      "count": 2,
       "findings": [
-        {
-          "file": "scripts\\deep-audit-ast.mjs",
-          "line": 647,
-          "snippet": "// D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()"
-        },
         {
           "file": "scripts\\tests\\test-ace-graphify-retrieval.mjs",
           "line": 192,
@@ -20,11 +15,6 @@
           "file": "scripts\\lib\\phase89-sse-stream.mjs",
           "line": 199,
           "snippet": "await redis.quit();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\routes\\api\\health\\redis\\+server.ts",
-          "line": 74,
-          "snippet": "await client.quit();  → consider `await using` + getDisposableRedis()"
         }
       ]
     }
