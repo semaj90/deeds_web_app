@@ -1,2337 +1,406 @@
 {
-  "generatedAt": "2026-05-05T16:05:04.067Z",
-  "graphFiles": 3374,
+  "generatedAt": "2026-05-05T20:21:00.573Z",
+  "graphFiles": 3417,
   "gates": {
-    "D1": {
-      "name": "@vite-ignore variable imports",
+    "D16": {
+      "name": "await-using opportunity (try/finally + .quit/.disconnect)",
       "count": 8,
       "findings": [
         {
-          "file": "src\\lib\\server\\ocr\\hybrid.ts",
-          "line": 67,
-          "snippet": "const { getDocument } = await import(/* @vite-ignore */ pdfjsPath);"
+          "file": "scripts\\graphify-persist-couchdb.mjs",
+          "line": 345,
+          "snippet": "await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\ocr\\hybrid.ts",
-          "line": 68,
-          "snippet": "const { createCanvas } = await import(/* @vite-ignore */ canvasPath);"
+          "file": "scripts\\deep-audit-ast.mjs",
+          "line": 647,
+          "snippet": "// D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\db\\drizzle.ts",
-          "line": 27,
-          "snippet": "const mod = await import(/* @vite-ignore */ cachePath);"
+          "file": "scripts\\tests\\test-ace-graphify-retrieval.mjs",
+          "line": 192,
+          "snippet": "await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\analysis\\granite-docling.ts",
-          "line": 157,
-          "snippet": "const { getDocument } = await import(/* @vite-ignore */ pdfjsPath);"
+          "file": "scripts\\lib\\phase89-sse-stream.mjs",
+          "line": 199,
+          "snippet": "await redis.quit();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\analysis\\granite-docling.ts",
-          "line": 158,
-          "snippet": "const { createCanvas } = await import(/* @vite-ignore */ canvasPath);"
+          "file": "src\\lib\\server\\redis-streams.ts",
+          "line": 147,
+          "snippet": "reader.disconnect();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\analysis\\granite-docling.ts",
-          "line": 189,
-          "snippet": "const { getDocument } = await import(/* @vite-ignore */ pdfjsPath);"
+          "file": "src\\routes\\api\\health\\redis\\+server.ts",
+          "line": 74,
+          "snippet": "await client.quit();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\components\\yorha\\_simulations\\CanvasBoard.svelte",
-          "line": 160,
-          "snippet": "const module = await import(/* @vite-ignore */ enginePath).catch(() => null);"
+          "file": "src\\routes\\api\\cache\\stats\\+server.ts",
+          "line": 78,
+          "snippet": "fresh.disconnect();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\routes\\(app)\\demos\\yorha\\components\\_simulations\\CanvasBoard.svelte",
-          "line": 160,
-          "snippet": "const module = await import(/* @vite-ignore */ enginePath).catch(() => null);"
+          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
+          "line": 244,
+          "snippet": "redis.disconnect();  → consider `await using` + getDisposableRedis()"
         }
       ]
     },
-    "D2": {
-      "name": "CJS require() in .ts/.mjs",
-      "count": 7,
+    "D17": {
+      "name": "MGET bulk-read opportunity (3+ sequential redis.get)",
+      "count": 16,
       "findings": [
         {
-          "file": "src\\mcp\\server.ts",
-          "line": 1688,
-          "snippet": "const { createHash } = require('crypto') as typeof import('crypto');"
+          "file": "src\\lib\\server\\vector-cache.ts",
+          "line": 1,
+          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
-          "file": "src\\lib\\utils\\fuse-import.ts",
-          "line": 6,
-          "snippet": "Fuse = require('fuse.js');"
+          "file": "src\\lib\\server\\inference\\turbo-prefix-cache.ts",
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
-          "file": "src\\lib\\server\\db\\index-new.ts",
-          "line": 20,
-          "snippet": "const { drizzle } = require('drizzle-orm/postgres-js');"
-        },
-        {
-          "file": "src\\routes\\api\\yorha\\cluster-health\\+server.ts",
-          "line": 28,
-          "snippet": "const totalMem = require('os').totalmem();"
-        },
-        {
-          "file": "src\\routes\\api\\yorha\\cluster-health\\+server.ts",
-          "line": 29,
-          "snippet": "const freeMem = require('os').freemem();"
-        },
-        {
-          "file": "src\\lib\\server\\evidence\\services\\ocr.ts",
-          "line": 8,
-          "snippet": "const { createWorker } = require('tesseract.js');"
-        },
-        {
-          "file": "src\\lib\\server\\error-brain\\transport\\factory.ts",
-          "line": 49,
-          "snippet": "const { getErrorBrainConfig } = require('../feature-flags');"
-        }
-      ]
-    },
-    "D3": {
-      "name": "Native .node addon loads",
-      "count": 15,
-      "findings": [
-        {
-          "file": "src\\lib\\utils\\simd-markdown-parser.ts",
-          "line": 75,
-          "snippet": "const nodeRequire = isNode ? createRequire(import.meta.url) : null;"
-        },
-        {
-          "file": "src\\lib\\server\\phase72\\astVectorizer.ts",
-          "line": 9,
-          "snippet": "const candidate = path.resolve('build', 'Release', 'ast_error_vectorizer.node');"
-        },
-        {
-          "file": "src\\lib\\server\\phase72\\astVectorizer.ts",
-          "line": 18,
-          "snippet": "throw new Error('ASTVectorizer export missing from ast_error_vectorizer.node');"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\simdjson-bridge.ts",
-          "line": 22,
-          "snippet": "const esmRequire = createRequire(import.meta.url);"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\simdjson-bridge.ts",
-          "line": 40,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\simdjson-bridge.ts",
-          "line": 41,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\simdjson-bridge.ts",
-          "line": 42,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\pytorch-graph.ts",
-          "line": 18,
-          "snippet": "const esmRequire = createRequire(import.meta.url);"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\pytorch-graph.ts",
-          "line": 113,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\pytorch-graph.ts",
-          "line": 114,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\pytorch-graph.ts",
-          "line": 115,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\libtorch-bridge.ts",
-          "line": 25,
-          "snippet": "const esmRequire = createRequire(import.meta.url);"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\libtorch-bridge.ts",
-          "line": 200,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\libtorch-bridge.ts",
-          "line": 201,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\libtorch-bridge.ts",
-          "line": 202,
-          "snippet": "resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),"
-        }
-      ]
-    },
-    "D4": {
-      "name": "worker_threads / new Worker",
-      "count": 26,
-      "findings": [
-        {
-          "file": "src\\lib\\workers\\compute-worker.mjs",
-          "line": 10,
-          "snippet": "import { parentPort } from 'worker_threads';"
-        },
-        {
-          "file": "src\\lib\\workers\\ast-graph-worker.mjs",
-          "line": 16,
-          "snippet": "import { parentPort } from 'worker_threads';"
-        },
-        {
-          "file": "src\\lib\\webgpu\\texture-streaming.ts",
-          "line": 230,
-          "snippet": "this.compressionWorker = new Worker(this.workerUrl);"
-        },
-        {
-          "file": "src\\lib\\utils\\dynamic-imports.ts",
-          "line": 86,
-          "snippet": "// SIMD GPU tiling uses server-side compute-pool.ts + worker_threads"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\compute-pool.ts",
-          "line": 5,
-          "snippet": "* (clustering, forensics, regex, embeddings) to worker_threads."
-        },
-        {
-          "file": "src\\lib\\server\\workers\\compute-pool.ts",
-          "line": 19,
-          "snippet": "import { Worker } from 'worker_threads';"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\compute-pool.ts",
-          "line": 80,
-          "snippet": "const worker = new Worker(workerPath);"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\compute-pool.ts",
-          "line": 300,
-          "snippet": "// SharedArrayBuffer is always available in Node.js worker_threads context"
-        },
-        {
-          "file": "src\\lib\\server\\ml\\topic-cluster.ts",
-          "line": 275,
-          "snippet": "* Offloads to worker_threads to avoid blocking the event loop."
-        },
-        {
-          "file": "src\\lib\\server\\langextract\\native.ts",
-          "line": 18,
-          "snippet": "*          worker_threads via compute-pool — escapes the V8 main loop the"
-        },
-        {
-          "file": "src\\lib\\server\\langextract\\native.ts",
-          "line": 116,
-          "snippet": "* which dispatches to a worker_threads-bound Gemma4 call."
-        },
-        {
-          "file": "src\\lib\\server\\langextract\\native.ts",
-          "line": 195,
-          "snippet": "* Run native extraction inside the existing compute-pool worker_threads pool."
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\mapreduce-worker.mjs",
-          "line": 10,
-          "snippet": "import { parentPort, workerData } from 'worker_threads';"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\mapreduce-runner.mjs",
-          "line": 8,
-          "snippet": "* Vite dev server transforms worker_threads internally, causing spawned"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\mapreduce-runner.mjs",
-          "line": 29,
-          "snippet": "import { Worker } from 'worker_threads';"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\mapreduce-runner.mjs",
-          "line": 77,
-          "snippet": "const worker = new Worker(workerPath, {"
-        },
-        {
-          "file": "src\\lib\\server\\gpu\\mapreduce-cuda-analyzer.ts",
-          "line": 137,
-          "snippet": "// Vite dev server transforms worker_threads internally, causing zombie workers."
-        },
-        {
-          "file": "src\\lib\\server\\graph\\codebase-scanner-v2.ts",
-          "line": 121,
-          "snippet": "const RE_WORKER     = /worker_threads|new Worker\\(|Worker\\('/;"
-        },
-        {
-          "file": "src\\lib\\server\\ff1\\registry.ts",
-          "line": 13,
-          "snippet": "*   worker        — offload to a Node worker_threads worker"
-        },
-        {
-          "file": "src\\lib\\server\\analysis\\forensics.ts",
-          "line": 6,
-          "snippet": "* For large documents (>10KB), offloads regex work to worker_threads."
-        },
-        {
-          "file": "src\\lib\\server\\analysis\\forensics.ts",
-          "line": 196,
-          "snippet": "* Async forensics — offloads to worker_threads for large documents."
-        },
-        {
-          "file": "src\\lib\\ai\\onnx\\session.ts",
-          "line": 95,
-          "snippet": "worker_threads: { Worker: undefined, parentPort: null, isMainThread: true, workerData: undefined, threadId: 0 },"
-        },
-        {
-          "file": "src\\lib\\components\\graph\\GraphifyViewer.svelte",
-          "line": 332,
-          "snippet": "layoutWorker = new Worker("
-        },
-        {
-          "file": "src\\routes\\api\\codebase\\wiki\\index\\+server.ts",
-          "line": 10,
-          "snippet": "*   POST → try RabbitMQ publish → if unavailable, fall back to mapreduce worker_threads"
-        },
-        {
-          "file": "src\\routes\\api\\codebase\\wiki\\index\\+server.ts",
-          "line": 108,
-          "snippet": "* Fallback to mapreduce worker_threads path."
-        },
-        {
-          "file": "src\\routes\\api\\codebase\\wiki\\index\\+server.ts",
-          "line": 158,
-          "snippet": "// Fallback to mapreduce worker_threads"
-        }
-      ]
-    },
-    "D5": {
-      "name": "Proto / gRPC contract refs",
-      "count": 13,
-      "findings": [
-        {
-          "file": "src\\routes\\api\\search\\+server.ts",
-          "line": 120,
-          "snippet": "const grpc = await import('@grpc/grpc-js');"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\workspace-metadata-extractor.ts",
-          "line": 75,
-          "snippet": "'.proto':  'protobuf',"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\ast-chunker.ts",
-          "line": 56,
-          "snippet": "'.proto',"
-        },
-        {
-          "file": "src\\lib\\server\\grpc\\tool-router-client.ts",
-          "line": 100,
-          "snippet": "const grpc = await import('@grpc/grpc-js');"
-        },
-        {
-          "file": "src\\lib\\server\\grpc\\tool-calling-client.ts",
-          "line": 97,
-          "snippet": "const grpc = await import('@grpc/grpc-js');"
-        },
-        {
-          "file": "src\\lib\\server\\grpc\\retrieval-client.ts",
-          "line": 4,
-          "snippet": "* Uses retrieval.proto's RetrievalService for RAG+KAG+DAG evidence search"
-        },
-        {
-          "file": "src\\lib\\server\\grpc\\retrieval-client.test.ts",
-          "line": 7,
-          "snippet": "loadPackageDefinition: vi.fn(),"
-        },
-        {
-          "file": "src\\lib\\server\\grpc\\graph-ml-client.ts",
-          "line": 76,
-          "snippet": "const grpc = await import('@grpc/grpc-js');"
+          "file": "src\\lib\\server\\inference\\gpu-arbiter.ts",
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
           "file": "src\\lib\\server\\grpc\\embedding-client.ts",
-          "line": 152,
-          "snippet": "const grpc = await import('@grpc/grpc-js');"
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
-          "file": "src\\lib\\server\\grpc\\chr97-agent-client.ts",
-          "line": 89,
-          "snippet": "const grpc = await import('@grpc/grpc-js');"
+          "file": "src\\lib\\server\\graph\\hypergraph-4d.ts",
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
-          "file": "src\\lib\\server\\evidence\\proto-serializer.ts",
-          "line": 130,
-          "snippet": "const protoPath = join(process.cwd(), 'proto', 'active', 'evidence_metadata.proto');"
+          "file": "src\\lib\\server\\graph\\glyph-atlas-builder.ts",
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\lib\\server\\graph\\community-graph.ts",
+          "line": 1,
+          "snippet": "7 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\lib\\server\\engagement\\idle-reengagement.ts",
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\lib\\server\\cache\\report-template-cache.ts",
+          "line": 1,
+          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\lib\\server\\cache\\code-llm-index.ts",
+          "line": 1,
+          "snippet": "5 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\lib\\server\\ai\\error-fix-memory.ts",
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\lib\\server\\ace\\context-assembler.ts",
+          "line": 1,
+          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\routes\\api\\graph\\glyph-atlas\\+server.ts",
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
           "file": "src\\routes\\api\\codebase-index\\orchestrate\\+server.ts",
-          "line": 44,
-          "snippet": "'.proto',"
+          "line": 1,
+          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
-          "file": "src\\routes\\api\\codebase\\index\\+server.ts",
-          "line": 53,
-          "snippet": "'.proto',"
+          "file": "src\\lib\\server\\ff1\\storage\\redis-cache.ts",
+          "line": 1,
+          "snippet": "6 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+        },
+        {
+          "file": "src\\routes\\api\\synthesis\\evaluation\\[id]\\+server.ts",
+          "line": 1,
+          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         }
       ]
     },
-    "D6": {
-      "name": "Hardcoded localhost outside env.server.ts",
-      "count": 0,
-      "findings": []
-    },
-    "D7": {
-      "name": "Browser globals in SSR .svelte without guard",
-      "count": 0,
-      "findings": []
-    },
-    "D8": {
-      "name": "ssrUnsafe routes missing ssr=false",
-      "count": 0,
-      "findings": []
-    },
-    "D9": {
-      "name": "Likely orphans (0 fanIn, no dynImport ref)",
-      "count": 386,
+    "D18": {
+      "name": "simdjson opportunity (.mget + JSON.parse, no fast-parse)",
+      "count": 14,
       "findings": [
         {
-          "file": "src/ambient-legacy.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\retrieval\\centroid-cache.ts",
+          "line": 92,
+          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/app.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\research\\lane4-feedback.ts",
+          "line": 126,
+          "snippet": "const [scoreRaw, countRaw] = await redis.mget(  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/custom-modules.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\rag\\sdk.ts",
+          "line": 48,
+          "snippet": "const [statusRaw, shardCountRaw] = await redis.mget([  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/env.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\inference\\turbo-prefix-cache.ts",
+          "line": 108,
+          "snippet": "const blobs = await redis.mget(hashes.map(h => `web:research:sum:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/global.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\graph\\hypergraph-4d.ts",
+          "line": 1123,
+          "snippet": "const raw = await redis.mget(hashes.map(h => HG_EDGE_KEY(h))).catch(() => [] as (string|null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/ai/base64-fp32-quantizer.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\graph\\glyph-atlas-builder.ts",
+          "line": 326,
+          "snippet": "kagVals = kagKeys.length ? await redis.mget(...kagKeys) : [];  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/ai/unified-generation.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\graph\\codebase-cluster-detection.ts",
+          "line": 350,
+          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/ambient-events.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\cache\\redis-exact-match.ts",
+          "line": 160,
+          "snippet": "const values = await redis.mget(...cacheKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/client/db/loki-client.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\analytics\\web-research-crawler.ts",
+          "line": 396,
+          "snippet": ".mget(hashes.map(h => WEB_SUM_KEY(h)))  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/client-logging.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\lib\\server\\analytics\\research-cache.ts",
+          "line": 200,
+          "snippet": "const raw = await redis.mget(hashes.map(h => SKETCH_KEY(h))).catch(() => [] as (string | null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/components/audio/AudioAnalysisView.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\routes\\api\\codebase-index\\topology-hits\\+server.ts",
+          "line": 52,
+          "snippet": "const blobs = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/components/chat/AudioUploadWidget.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\routes\\api\\codebase-index\\ingest-log\\+server.ts",
+          "line": 44,
+          "snippet": "const raws = await redis.mget(hashes.map((h) => `rag:hit:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/components/chat/ChatPromptBar.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\routes\\api\\codebase-index\\agents-write\\+server.ts",
+          "line": 209,
+          "snippet": "kagVals = await redis.mget(...kagKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src/lib/components/codebase/TagDeleteDialog.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/components-shims.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/document/DocumentAnalysisView.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/glyph/GlyphAtlasPanel.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/monitoring/CacheWarmUpControl.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/ui/bits/compound.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/ui/ContextMenuSeparator.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/ui/gaming/constants/gaming-constants-minimal.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/ui/IconContainer.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/ui/wrappers/bits/bits-overrides.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/components/video/VideoAnalysisView.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/config/pgvector-gpu-config.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/config/redis-config.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/data/route-groups-config.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/db/schema/gpuInferenceDemo.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/db/vite-error-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/gpu/markdown-processor.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/machines/AIAssistantMachineComponent.svelte",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/machines/audio-upload-machine.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/machines/evidence-analysis-machine.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/machines/evidence-lifecycle-machine.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/machines/evidence-processing-machine.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/acp/phase90-tools.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/ai/caching-layer.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/ai/error-fix-memory.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/analysis/hmm-ace-analyzer.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/analytics/agentic-web-indexer.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/analytics/web-research-crawler.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/cache/cache-events.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/concurrency/queue-manager.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/config/dynamic-ports.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/data/legal-glossary-extended.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/database-simple.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/additional-tables.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/enhanced-legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/enhanced-vector-operations.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/index-clean.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/index-new.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/jsonb-legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/legal-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/lucia-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/migrate-test-rag.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/mirror-query.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/pgvector-utils.temp.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/query-utils.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-actual.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-enhanced.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-gpu-cache.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-gpu-metrics.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-gpu-metrics.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-ingestion.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-old.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-pgvector-512.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-phase78.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-postgres-enhanced.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-sqlite.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-test-rag.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-timeline.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/schema-week3-kb.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/seed-dev-user.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/seed-simple.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/setup-database.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/unified-client-backup.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/unified-schema-clean.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/unified-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/vector-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/db/workspace-operations.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/embedding/embed-schema.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/embedding/text-splitter.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/error-brain/run-tracker.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/error-brain/transport/factory.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/evidence/docling-structure.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/evidence/services/entity-extractor.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/evidence/worker-embed.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/evidence/worker-ocr.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/ff1/agent/tool-registry.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/graph/evidence-graph-service.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/grpc/generation-client.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/grpc/retrieval-client.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/init/legal-search-init.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/kb/payload-builders.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/langextract/google-langextract.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/llm/gemmaReports.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/llm/ollamaClient.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/mcp/mcp-internal.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/mcp/multi-core-integration.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/middleware/validate-and-rate.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/ocr/extractText.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/pdf/generateLegalPacketPDF.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/pdf/legalPacketGenerator.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/phase72/clusterErrors.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/phase78/contextBuilder.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/png-embed-extractor.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/queue/job-types.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/rag/evidenceRag.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/rag/rag-types.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/rate-limit/redis-rate-limit.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/redisPubSub.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/research/chunk-web-doc.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/research/normalize-html.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/retrieval/context-buffer.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/retrieval/query-expander.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/storage/.phase105-backup/1768605014945-minio-service.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/training/query-logger.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/types/globals.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/types/runtime-globals.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/utils/avatar-upload.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/utils/graceful-error-handler.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/utils/http-error-mapper.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/utils/json-fast.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/utils/sanitize-error.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/utils/vector-schemas.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/validation/evidence-validators.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/vector/embedding-gemma.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/vector/metadata-encoder.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/vector/multi-store.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/server/vector/qdrant-api-wrapper.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/commonjs-shim.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/dns-browser-shim.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/drizzle-node-postgres.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/fs-browser-shim.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/ioredis-browser-shim.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/lokijs-browser-adapter.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/missing-types-shim.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/os-browser-shim.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/piper-expressions-shim.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/svelte-env-shim.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/shims/worker-threads-browser-shim.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/advanced-patches.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/app.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/auth.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/common-props.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/env-enhanced.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/fast-locals-shim.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/locals-allow-any.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/locals.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/mermaid.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/missing-modules.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/modules.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/ollama.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/rowlist-augment.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/runtime-shims-override.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/server.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/svelte5-api-types.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/tiptap-shims.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/webassembly-enhanced.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/webgpu-navigator.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/types/webgpu.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/uno-shortcuts.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/accessibility-validator.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/bits-ui-adapter.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/case-logic.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/cn.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/cuid.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/ensure-error.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/fast-json.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/file-uploader.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/fuse-index.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/http-error-mapper.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/media-query.svelte.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/ollama-utils.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/parallaxDynamic.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/simd-json-parser.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/simd-markdown-parser.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/type-utils.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/ultra-json-parser.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/utils/xstate-compat.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/compute-shader-engine.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/dimensional-tensor-store.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/gaussian-splat-renderer.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/legal-compute-shaders.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/unified-runtime-abstraction.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/webgpu-gemma-client.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/webgpu-polyfill.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/webgpu-rag-service.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/lib/webgpu/wire-telemetry.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/localDocs.svelte.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/pgvector-search.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/poi-store.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/test-setup.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/ai-bridge.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/ambient.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/cbor.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/chartjs.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/components.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/d3.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/embeddinggemma.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/global-shims.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/global.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/gpu.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/integrations.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/langchain-rag.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/pako.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/pgvector-drizzle.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/shims.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/sveltekit-env.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/third-party.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/triage-shims.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/ui-components.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/webgpu-ambient-modules.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/webgpu-shims.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/webgpu.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/types/xstate.d.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "src/wasm/vector-operations-basic.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/accessibility/accessibility-tester.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/accessibility/accessibility.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ace-context-glossary.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ace-ingest-route.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ace-pipeline-wiring.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ace-policy.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ace-status-route.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ace-summarize-route.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ai-analysis-pipeline.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ai-canon-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ai-chat-functionality.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ai-chat-live.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ai-chat.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ai-routes-comprehensive.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/all-routes-screenshot.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/analysis-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/analysis-uis.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/analytics-tags-nlp-prefs-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/api-integration.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/app-routes-health.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/architecture-demo.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/assist-defaults.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/assist-feedback-analysis.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/assist-feedback.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/auth-api.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/auth-ui-flow.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/barrel-store-integration.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/barrel-store.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/cache-recommendations-ml-sys-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/cache-system.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/case-notes-lifecycle.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/cases-auth-evidence-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/cases-page.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/cases-sub-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/chat-attachment-floating-modal.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/chat-session-attachment-handoff.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/codebase-index-cache-reuse.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/codebase-index-postgres-fallback.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/codebase-index-rabbitmq-channel.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/codebase-indexer.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/codebase-observation-tools.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/codebase-viewer.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/compiled-knowledge-modules.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/contextual-knowledge-web-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/cross-language-synthesis.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/docs-sync-cartridge-system-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/all-routes-sse.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/auth-login-db.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/cases-real-data.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/chat-inference-routing.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/chat-rag-sse.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/chat.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/client-inference.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/demo-seed.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/e2b-client-inference.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/evidence-case-link-canvas.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/evidence-case-scoping.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/evidence-diagnostics-upload.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/homepage-screenshot.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/pipeline-happy-path.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/rag-sync.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/route-verification.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/service-health-probe.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/ui-screenshots.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/user-flows.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/utils/screenshot-utils.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/utils/test-fixtures.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e/vlm-inference-vision.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/e2e-workflow.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/error-brain-complete.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/error-brain-integration.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/error-brain-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/errors-feedback-fictional-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-detail-route.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-pipeline-e2e.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-rag-simple.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-simple.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-upload-modal.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-upload-rag.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-view-modal.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/evidence-workflow-integration.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/fixtures/demo-auth.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/fixtures/test-cases.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/fugitivedx-screenshot.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/full-user-workflow-screenshots.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/full_user_flow.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/gamification-poi-timeline.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/global-setup.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/global-teardown.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/glossary-health-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/graph-detective-search-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/helpers/env-ports.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/helpers/port-detector.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/helpers/route-test-utils.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/hypergraph-merge-semantics.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/hypergraph-research-grounding.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/infra-ollama-cache-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/infrastructure-overhaul.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/integrated-system.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/lane-latency-benchmark.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/lane-latency-integration.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/lane4-feedback.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/langextract-service.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/legal-ai.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/legal-workflow.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/library-upload-ingest.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/mcp-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/minio-upload.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/navigation.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/nes-architecture.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/nes-ui-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/performance-snapshot.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/phase76-acp-tools.property.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/phase94-cli.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/phase96-all-routes-mcp.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/phase97-authenticated-streaming.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/phase97-streaming-test.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/phase99-production.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/phase99-routes-validation.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/poi-citations-conversations-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/poi-creation-timeline.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/poi-manager-integration.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/poi-photo-lifecycle.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/poi-photo-upload.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/quick-routes-test.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/quick-ui-test.js",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/rag-search-ace-route.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/redis-gpu-pipeline.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/reports-embed-chat-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/research-evidence-e2e.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/research-graph-rl.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/research-pipeline-smoke.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/retrieval-path-wiring.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/retrieval-quality-regression.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/runes/svelte5-rune-compliance.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/runtime-connection-contract.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/scripts/check-tables.mjs",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/scripts/check-user.mjs",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/scripts/verify-routes-quick.mjs",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/seeded-cases-e2e.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/setup/playwright-setup.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/simple-ux-test.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/sprint1-critical-fixes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/sprint2-embedding-consolidation.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/sprint3-infrastructure.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/sprint4-production-readiness.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/sprint5-6-monitoring.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/sse-chat-attachment-metadata.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/sse-chat-glossary-metadata.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/stores-smoke-test.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/test-setup.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/theme-screenshots.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ui-smoke-placeholder.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ui-ux-walkthrough.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/unit/agents-md-quick-hit.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/unit/board-persistence-server.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/unit/chat-memory.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/unit/ensure-dev-runtime.test.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/user-case-creation.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/user-migration.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/utils/seed-cases.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/uuid-validation-audit.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/ux-layout-tests.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/vector-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/vector-search-rag.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/vision-gpu-tools-topology-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/yorha-bw-theme.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
-        },
-        {
-          "file": "tests/yorha-v1-routes.spec.ts",
-          "line": 1,
-          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
+          "line": 223,
+          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         }
       ]
     },
-    "D10": {
-      "name": "ACE synthesis missing recordLlmOutputHit",
-      "count": 0,
-      "findings": []
+    "D19": {
+      "name": "Missing outputMeta on recordLlmOutputHit (use Rag/Kag helper)",
+      "count": 3,
+      "findings": [
+        {
+          "file": "src\\lib\\server\\cache\\code-llm-index.ts",
+          "line": 184,
+          "snippet": "export async function recordLlmOutputHit(  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
+        },
+        {
+          "file": "src\\routes\\api\\graph\\traverse\\+server.ts",
+          "line": 254,
+          "snippet": "recordLlmOutputHit(`cluster:${clId}`, gemma4Summary!, {  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
+        },
+        {
+          "file": "src\\routes\\api\\codebase-index\\llm-output\\+server.ts",
+          "line": 98,
+          "snippet": "const entry = await recordLlmOutputHit(parsed.data.path, parsed.data.llmOutput, parsed.data);  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
+        }
+      ]
+    },
+    "D20": {
+      "name": "Direct ENV.*_URL fetch (use typed client)",
+      "count": 33,
+      "findings": [
+        {
+          "file": "src\\lib\\server\\ollama.ts",
+          "line": 1074,
+          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\video-vlm-processor.ts",
+          "line": 237,
+          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\video-vlm-processor.ts",
+          "line": 394,
+          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\document-embed-consumer.ts",
+          "line": 92,
+          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\document-embed-consumer.ts",
+          "line": 153,
+          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/chat_documents/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\audio-processor.ts",
+          "line": 287,
+          "snippet": "const response = await fetch(`${ENV.LANGEXTRACT_URL}/extract`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\audio-processor.ts",
+          "line": 325,
+          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\audio-processor.ts",
+          "line": 377,
+          "snippet": "const embedResponse = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\audio-processor.ts",
+          "line": 523,
+          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/audio_segments/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\workers\\audio-processor.ts",
+          "line": 544,
+          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\retrieval\\orchestrator.ts",
+          "line": 127,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/search`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\retrieval\\codebase-context.ts",
+          "line": 101,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\retrieval\\codebase-context.ts",
+          "line": 284,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\retrieval\\codebase-context.ts",
+          "line": 743,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\research\\web-research-ingester.ts",
+          "line": 123,
+          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\som-summary.ts",
+          "line": 72,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\run-cluster-assign.ts",
+          "line": 34,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\run-cluster-assign.ts",
+          "line": 86,
+          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/${COLLECTION}/points/batch`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\gpu-karpathy-tagger.ts",
+          "line": 71,
+          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
+          "line": 139,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
+          "line": 185,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
+          "line": 237,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
+          "line": 335,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
+          "line": 496,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\indexer\\cluster-summary.ts",
+          "line": 129,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\audit\\gpu-audit-orchestrator.ts",
+          "line": 174,
+          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\ai\\langgraph-research.ts",
+          "line": 289,
+          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\ace\\error-kag-writer.ts",
+          "line": 277,
+          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/knowledge_base/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\ace\\context-assembler.ts",
+          "line": 1632,
+          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\ace\\ace-error-kag.ts",
+          "line": 74,
+          "snippet": "const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\ace\\ace-error-kag.ts",
+          "line": 120,
+          "snippet": "const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\ace\\ace-agent.ts",
+          "line": 44,
+          "snippet": "const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        },
+        {
+          "file": "src\\lib\\server\\ace\\ace-agent.ts",
+          "line": 249,
+          "snippet": "const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
+        }
+      ]
     }
   }
 }
