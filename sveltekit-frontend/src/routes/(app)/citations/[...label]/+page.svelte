@@ -36,7 +36,7 @@
 				<Button 
 					variant="ghost" 
 					class="w-full text-sand/40 hover:text-sand" 
-					onclick={() => window.history.back()}
+					onclick={() => history.back()}
 				>
 					Go Back
 				</Button>
