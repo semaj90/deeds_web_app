@@ -80,40 +80,77 @@ export interface PlaybookNote {
 export interface ResearchNote {
 	type: 'research';
 	query: string;
-	outsideSources: Array<{ title: string; url: string; snippet: string }>;
-	internalAreas: string[];
-	deltasFromPrior: string[];
-	confidence: number;
-	unresolvedQuestions: string[];
-	pipeline: string;
+	topic: string;
+	source: string;
+	trustTier: string;
+	gainScore: number;
+	externalFinding: string;
+	internalAlignment: string;
+	recommendedAction: string;
+	linkedFiles: string[];
+	linkedClusters: string[];
+	tags: string[];
 	generatedAt: string;
 }
 
-export type WikiNote = ClusterNote | RetrievalNote | PlaybookNote | ResearchNote;
+export interface DirectoryNote {
+	type: 'directory';
+	path: string;
+	summary: string;
+	dominantTags: string[];
+	fileCount: number;
+	auditScore: number;
+	warnings: string[];
+	representativeFiles: string[];
+	generatedAt: string;
+	version: number;
+}
+
+export type WikiNote = ClusterNote | RetrievalNote | PlaybookNote | ResearchNote | DirectoryNote;
 
 // ── CouchDB helpers ──────────────────────────────────────────────────────────
 
-function docId(note: WikiNote): string {
+export function docId(note: WikiNote): string {
 	switch (note.type) {
 		case 'cluster':   return `cluster:${note.clusterType}:${note.clusterId}`;
 		case 'retrieval': return `retrieval:${note.queryHash}`;
 		case 'playbook':  return `playbook:${note.symptom.slice(0, 60).replace(/\W+/g, '_')}`;
 		case 'research':  return `research:${note.query.slice(0, 60).replace(/\W+/g, '_')}`;
+		case 'directory': return `dir:${note.path.replace(/[/\\]/g, ':')}`;
+		default:          return 'unknown';
 	}
+}
+
+async function couchFetch(path: string, options: RequestInit = {}): Promise<Response> {
+	const urlObj = new URL(COUCHDB_URL());
+	const username = urlObj.username;
+	const password = urlObj.password;
+	urlObj.username = '';
+	urlObj.password = '';
+
+	const headers = new Headers(options.headers || {});
+	if (username || password) {
+		headers.set('Authorization', `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`);
+	}
+
+	return fetch(`${urlObj.origin}${path}`, {
+		...options,
+		headers
+	});
 }
 
 async function ensureDb(): Promise<void> {
 	try {
-		await fetch(`${COUCHDB_URL()}/${COUCHDB_DB}`, { method: 'PUT' });
+		await couchFetch(`/${COUCHDB_DB}`, { method: 'PUT' });
 	} catch { /* exists or unavailable */ }
 }
 
-async function couchPut(note: WikiNote): Promise<boolean> {
+export async function couchPut(note: WikiNote): Promise<boolean> {
 	const id = docId(note);
 	try {
 		// Get current rev if exists
-		const getRes = await fetch(
-			`${COUCHDB_URL()}/${COUCHDB_DB}/${encodeURIComponent(id)}`,
+		const getRes = await couchFetch(
+			`/${COUCHDB_DB}/${encodeURIComponent(id)}`,
 			{ signal: AbortSignal.timeout(5_000) },
 		);
 		let rev: string | undefined;
@@ -123,8 +160,8 @@ async function couchPut(note: WikiNote): Promise<boolean> {
 		}
 
 		const doc = { _id: id, ...note, ...(rev ? { _rev: rev } : {}) };
-		const putRes = await fetch(
-			`${COUCHDB_URL()}/${COUCHDB_DB}/${encodeURIComponent(id)}`,
+		const putRes = await couchFetch(
+			`/${COUCHDB_DB}/${encodeURIComponent(id)}`,
 			{
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
@@ -140,8 +177,8 @@ async function couchPut(note: WikiNote): Promise<boolean> {
 
 async function couchGet<T extends WikiNote>(id: string): Promise<T | null> {
 	try {
-		const res = await fetch(
-			`${COUCHDB_URL()}/${COUCHDB_DB}/${encodeURIComponent(id)}`,
+		const res = await couchFetch(
+			`/${COUCHDB_DB}/${encodeURIComponent(id)}`,
 			{ signal: AbortSignal.timeout(5_000) },
 		);
 		if (!res.ok) return null;
@@ -156,8 +193,8 @@ async function couchGet<T extends WikiNote>(id: string): Promise<T | null> {
 
 async function couchList(type: WikiNote['type'], limit = 50): Promise<WikiNote[]> {
 	try {
-		const res = await fetch(
-			`${COUCHDB_URL()}/${COUCHDB_DB}/_all_docs?startkey="${type}:"&endkey="${type}:\ufff0"&include_docs=true&limit=${limit}`,
+		const res = await couchFetch(
+			`/${COUCHDB_DB}/_all_docs?startkey="${type}:"&endkey="${type}:\ufff0"&include_docs=true&limit=${limit}`,
 			{ signal: AbortSignal.timeout(10_000) },
 		);
 		if (!res.ok) return [];
@@ -178,10 +215,22 @@ async function couchList(type: WikiNote['type'], limit = 50): Promise<WikiNote[]
 
 // ── Redis cache helpers ──────────────────────────────────────────────────────
 
+// Memoize the redis-module dynamic import — was firing on every redisGet/Set
+// call (~20× per ACE preflight). Caches the *module*, not the connection (the
+// pool already memoizes that internally).
+let redisModulePromise: ReturnType<typeof loadRedisModule> | null = null;
+function loadRedisModule() {
+	return import('$lib/server/redis.js');
+}
+async function getMemoisedRedis() {
+	if (!redisModulePromise) redisModulePromise = loadRedisModule();
+	return (await redisModulePromise).getRedis();
+}
+
 async function redisGet<T>(key: string): Promise<T | null> {
 	try {
-		const { getRedis } = await import('$lib/server/redis.js');
-		const val = await getRedis().get(`${REDIS_PREFIX}${key}`);
+		const r = await getMemoisedRedis();
+		const val = await r.get(`${REDIS_PREFIX}${key}`);
 		return val ? (JSON.parse(val) as T) : null;
 	} catch {
 		return null;
@@ -190,9 +239,50 @@ async function redisGet<T>(key: string): Promise<T | null> {
 
 async function redisSet(key: string, value: unknown): Promise<void> {
 	try {
-		const { getRedis } = await import('$lib/server/redis.js');
-		await getRedis().set(`${REDIS_PREFIX}${key}`, JSON.stringify(value), 'EX', REDIS_TTL);
+		const r = await getMemoisedRedis();
+		await r.set(`${REDIS_PREFIX}${key}`, JSON.stringify(value), 'EX', REDIS_TTL);
 	} catch { /* non-fatal */ }
+}
+
+/**
+ * Bulk-read multiple wiki notes in one MGET round-trip. Uses simdjson AVX2
+ * fast-parse for ≥10 entries / ≥5KB aggregate. Hot path for ACE cluster
+ * preamble that fetches sibling notes for a community.
+ */
+export async function redisGetBulk<T>(keys: string[]): Promise<Array<T | null>> {
+	if (!keys.length) return [];
+	try {
+		const r       = await getMemoisedRedis();
+		const fullKeys = keys.map((k) => `${REDIS_PREFIX}${k}`);
+		const raws    = await r.mget(...fullKeys);
+
+		// Threshold: simdjson worth dispatching only on ≥10 entries / ≥5KB aggregate
+		const totalChars = raws.reduce((sum: number, raw: string | null) => sum + (raw?.length ?? 0), 0);
+		if (raws.length < 10 || totalChars < 5_000) {
+			return raws.map((raw: string | null) => {
+				if (!raw) return null;
+				try { return JSON.parse(raw) as T; } catch { return null; }
+			});
+		}
+
+		// Lazy-import simdjson bridge to avoid loading the addon when not needed
+		try {
+			const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+			if (isSimdJsonAvailable()) {
+				return raws.map((raw: string | null) => {
+					if (!raw) return null;
+					try { return fastJsonParse<T>(raw); } catch { return null; }
+				});
+			}
+		} catch { /* addon unavailable — fall through */ }
+
+		return raws.map((raw: string | null) => {
+			if (!raw) return null;
+			try { return JSON.parse(raw) as T; } catch { return null; }
+		});
+	} catch {
+		return keys.map(() => null);
+	}
 }
 
 // ── Cluster note generator ───────────────────────────────────────────────────
@@ -591,19 +681,35 @@ export async function exportToObsidian(note: WikiNote): Promise<boolean> {
 	const folder = `karpathy-wiki/${note.type}`;
 	const filename = docId(note).replace(/:/g, '-');
 
+	// Loopback HTTPS uses the plugin's self-signed cert — bypass cert check
+	// only for 127.0.0.1/localhost so production HTTPS calls still validate.
+	const isLoopbackHttps = /^https:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(ENV.OBSIDIAN_URL);
+	let dispatcher: unknown;
+	if (isLoopbackHttps) {
+		try {
+			const { Agent } = await import('undici');
+			dispatcher = new Agent({ connect: { rejectUnauthorized: false } });
+		} catch {/* fall through — will retry without dispatcher */}
+	}
+
 	try {
-		const res = await fetch(
-			`${ENV.OBSIDIAN_URL}/vault/${folder}/${filename}.md`,
-			{
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'text/markdown',
-					'Authorization': `Bearer ${ENV.OBSIDIAN_API_KEY}`,
-				},
-				body: md,
-				signal: AbortSignal.timeout(5_000),
+		const init: RequestInit & { dispatcher?: unknown } = {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'text/markdown',
+				'Authorization': `Bearer ${ENV.OBSIDIAN_API_KEY}`,
 			},
-		);
+			body: md,
+			signal: AbortSignal.timeout(5_000),
+		};
+		if (dispatcher) init.dispatcher = dispatcher;
+		const res = await fetch(`${ENV.OBSIDIAN_URL}/vault/${folder}/${filename}.md`, init);
+		if (res.ok) {
+			const { markObsidianAppWrite } = await import('../obsidian/wiki-vault-watcher.js');
+			// Use relative path format that the watcher will match against
+			markObsidianAppWrite(`karpathy-wiki/${note.type}/${filename}.md`.replace(/\//g, '\\'));
+			markObsidianAppWrite(`karpathy-wiki/${note.type}/${filename}.md`.replace(/\\/g, '/'));
+		}
 		return res.ok;
 	} catch {
 		return false;
@@ -612,12 +718,37 @@ export async function exportToObsidian(note: WikiNote): Promise<boolean> {
 
 // ── Markdown renderer ────────────────────────────────────────────────────────
 
+/**
+ * Render a Dataview/wikilink-friendly note. Adds:
+ *   - YAML frontmatter (queryable via Dataview)
+ *   - Tag links (#cluster/gpu, #ace, etc.) so Obsidian's tag pane lights up
+ *   - File-path wikilinks ([[path/to/file.ts]]) so right-click → "Open in default app"
+ *   - Cross-cluster wikilinks ([[cluster-gpu-998]]) for graph view
+ */
 function noteToMarkdown(note: WikiNote): string {
 	const lines: string[] = [];
 	const ts = note.generatedAt;
 
 	switch (note.type) {
 		case 'cluster': {
+			// ── YAML frontmatter (Dataview-queryable) ──────────────────────────
+			lines.push('---');
+			lines.push(`type: ${note.type}`);
+			lines.push(`clusterId: ${note.clusterId}`);
+			lines.push(`clusterType: ${note.clusterType}`);
+			lines.push(`generated: ${ts}`);
+			lines.push(`version: ${note.version}`);
+			lines.push(`source: graphify`);
+			if (note.dominantTags.length) {
+				const safeTags = note.dominantTags.map(t => t.replace(/[^a-z0-9_-]/gi, '_'));
+				lines.push(`tags: [cluster/${note.clusterType}, ${safeTags.join(', ')}]`);
+			}
+			if (note.pageRankTop5.length) {
+				lines.push(`pageRankTopScore: ${note.pageRankTop5[0].score.toFixed(4)}`);
+			}
+			lines.push('---');
+			lines.push('');
+
 			lines.push(`# Cluster ${note.clusterId} (${note.clusterType})`);
 			lines.push(`> Generated: ${ts} | Version: ${note.version}`);
 			lines.push('');
@@ -627,17 +758,17 @@ function noteToMarkdown(note: WikiNote): string {
 			lines.push(note.summary);
 			lines.push('');
 			lines.push(`## Dominant Tags`);
-			lines.push(note.dominantTags.map(t => `- \`${t}\``).join('\n'));
+			lines.push(note.dominantTags.map(t => `- #${t.replace(/[^a-z0-9_-]/gi, '_')}`).join('\n'));
 			lines.push('');
 			lines.push(`## Representative Files`);
-			lines.push(note.representativeFiles.map(f => `- \`${f}\``).join('\n'));
+			lines.push(note.representativeFiles.map(f => `- [[${f}]]`).join('\n'));
 			lines.push('');
 			if (note.pageRankTop5.length) {
 				lines.push(`## PageRank Top 5`);
 				lines.push('| File | Score |');
 				lines.push('|------|-------|');
 				for (const pr of note.pageRankTop5) {
-					lines.push(`| \`${pr.path}\` | ${pr.score.toFixed(4)} |`);
+					lines.push(`| [[${pr.path}]] | ${pr.score.toFixed(4)} |`);
 				}
 				lines.push('');
 			}
@@ -653,7 +784,7 @@ function noteToMarkdown(note: WikiNote): string {
 			}
 			if (note.topologicalNeighbors.length) {
 				lines.push(`## Topological Neighbors`);
-				lines.push(note.topologicalNeighbors.map(n => `- Cluster ${n}`).join('\n'));
+				lines.push(note.topologicalNeighbors.map(n => `- [[cluster-${note.clusterType}-${n}]]`).join('\n'));
 				lines.push('');
 			}
 			break;

@@ -30,10 +30,10 @@
  *   node scripts/deep-audit-ast.mjs --quiet        # write files, minimal stdout
  */
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { resolve, relative }          from 'node:path';
+import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
+import { resolve, relative }                  from 'node:path';
 import { glob }                        from 'glob';
-import { verifyReferences, summarise } from './lib/reference-verifier.mjs';
+import { verifyBatch, summarise, getCacheStats } from './lib/reference-verifier.mjs';
 
 const ROOT       = process.cwd();
 const GRAPH_PATH = resolve(ROOT, 'docs/graph/codebase-graph.json');
@@ -362,38 +362,59 @@ async function gateD8(files) {
 // the full classification breakdown (counts + true-orphan list).
 
 async function gateD9(files) {
-  // Step 1: filter to fanIn=0 candidates from the graph (cheap)
+  // Step 1: filter fanIn=0 candidates from the graph (cheap)
   const candidates = files.filter((f) => Number(f.fanIn ?? 0) === 0)
-                          .filter((f) => /\.(ts|tsx|svelte|svelte\.ts|js|mjs|cjs)$/.test(f.rel));
+                          .filter((f) => /\.(ts|tsx|svelte|svelte\.ts|js|mjs|cjs)$/.test(f.rel))
+                          .map((f) => f.rel);
 
-  // Step 2: run the reference verifier on each candidate (parallel, but sync rg
-  //         spawn — keep small batch sizes to avoid OS process limits)
-  const BATCH_SIZE = 12;
-  const verified = [];
-  for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
-    const batch = candidates.slice(i, i + BATCH_SIZE);
-    const results = batch.map((f) => verifyReferences(f.rel, ROOT));
-    verified.push(...results);
+  // Step 2: ensure output dir exists BEFORE the streamed verifier runs so
+  //         intermediate flushes have somewhere to land if we crash mid-run.
+  const reportDir  = resolve(ROOT, 'reports/deep-audit');
+  const reportPath = resolve(reportDir, 'd9-orphan-verification.json');
+  await mkdir(reportDir, { recursive: true }).catch(() => null);
+
+  // Step 3: stream verification in chunks. After each chunk, flush a partial
+  //         report so a Ctrl-C / crash leaves a usable artifact behind.
+  const accumulated = [];
+  const t0 = Date.now();
+  const verified = await verifyBatch(candidates, ROOT, {
+    onChunk: async ({ index, total, chunkResults, cumulativeCacheHits, elapsedMs }) => {
+      accumulated.push(...chunkResults);
+      const { counts, trueOrphans } = summarise(accumulated);
+      const partial = {
+        gate:                  'D9',
+        generatedAt:           new Date().toISOString(),
+        status:                index === total ? 'complete' : 'partial',
+        chunk:                 `${index}/${total}`,
+        reportedByFanIn:       candidates.length,
+        processed:             accumulated.length,
+        cacheHits:             cumulativeCacheHits,
+        cacheHitRate:          cumulativeCacheHits / Math.max(1, accumulated.length),
+        elapsedMs,
+        verifiedTrueOrphans:   trueOrphans.length,
+        falsePositives:        accumulated.length - trueOrphans.length,
+        classifications:       counts,
+        trueOrphans,
+        note:                  'D9 uses Graphify fanIn only as candidate source; final classification is rg-based static/dynamic/type/barrel/path-aware.',
+      };
+      // Crash-safe write: serialise once, write to .tmp, then OS-atomic rename
+      const tmp = reportPath + '.tmp';
+      await writeFile(tmp, JSON.stringify(partial, null, 2), 'utf8');
+      await rename(tmp, reportPath);
+      if (!QUIET) {
+        const pct = Math.round((accumulated.length / candidates.length) * 100);
+        const cacheRate = (partial.cacheHitRate * 100).toFixed(1);
+        log(`     ▸ chunk ${index}/${total} · ${accumulated.length}/${candidates.length} (${pct}%) · cache ${cacheRate}% · ${elapsedMs}ms`);
+      }
+    },
+  });
+
+  if (!QUIET) {
+    const stats = getCacheStats();
+    log(`     ✓ verifier cache: ${stats.cachedKeys} keys · ${stats.haystackKB} KB haystack · ${stats.importsKB} KB imports · hash ${stats.hash}`);
+    log(`     ✓ D9 streamed completion in ${Date.now() - t0}ms`);
   }
 
-  const { counts, trueOrphans } = summarise(verified);
-
-  // Step 3: write the durable verification artifact for downstream consumers
-  //         (CI, /deep-audit slash command, prune-codebase skill)
-  const reportPath = resolve(ROOT, 'reports/deep-audit/d9-orphan-verification.json');
-  await mkdir(resolve(ROOT, 'reports/deep-audit'), { recursive: true }).catch(() => null);
-  await writeFile(reportPath, JSON.stringify({
-    gate:                 'D9',
-    generatedAt:          new Date().toISOString(),
-    reportedByFanIn:      candidates.length,
-    verifiedTrueOrphans:  trueOrphans.length,
-    falsePositives:       candidates.length - trueOrphans.length,
-    classifications:      counts,
-    trueOrphans,
-    note:                 'D9 uses Graphify fanIn only as candidate source; final classification is rg-based static/dynamic/type/barrel/path-aware.',
-  }, null, 2), 'utf8');
-
-  // Step 4: return findings only for true-orphan-candidate classification
   return verified
     .filter((v) => v.classification === 'true-orphan-candidate')
     .map((v) => ({
@@ -430,6 +451,314 @@ async function gateD10() {
   return findings;
 }
 
+// ── Gate D11: Phantom service candidates (URL with no container/binary) ─────
+
+async function gateD11() {
+  // A "phantom service" is a URL listed in CANDIDATE_BASE_URLS / discovery
+  // tables that has no corresponding Docker container, Go binary, or local
+  // process implementation in the repo. e.g. "langextract-go" at :8090 was
+  // listed for years but no Go service was ever shipped.
+  const targets = await glob('src/lib/server/**/*.ts', { ignore: ['**/*.d.ts', '**/*.test.ts', '**/*.spec.ts'] });
+  const findings = [];
+  // Build set of port numbers backed by a real impl: docker-compose services
+  // and Go cmd/* directories.
+  const knownPorts = new Set();
+  const dockerCompose = await readFile(resolve(ROOT, '..', 'docker-compose.yml'), 'utf8').catch(() => '');
+  const dockerComposeFull = await readFile(resolve(ROOT, '..', 'docker-compose.full.yml'), 'utf8').catch(() => '');
+  const allCompose = dockerCompose + '\n' + dockerComposeFull;
+  for (const m of allCompose.matchAll(/['"]?(\d{2,5}):\d{2,5}['"]?/g)) knownPorts.add(m[1]);
+  // Common reserved local ports
+  for (const p of ['5173', '5432', '6379', '6333', '11434', '9000', '5672', '15672', '50051', '50052', '50053', '50057', '8095', '8094', '5173', '6334']) knownPorts.add(p);
+
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    if (!/CANDIDATE|fallback|discovery/i.test(src)) continue;
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(/https?:\/\/(?:localhost|127\.0\.0\.1):(\d{2,5})/);
+      if (!m) continue;
+      const port = m[1];
+      if (knownPorts.has(port)) continue;
+      // Skip env-fallback patterns (already handled in D6)
+      if (/(\?\?|\|\|)\s*['"`]/.test(lines[i])) continue;
+      findings.push({
+        file: relative(ROOT, f),
+        line: i + 1,
+        snippet: `Port ${port} referenced as fallback but no docker-compose service / Go cmd binds it`,
+      });
+    }
+  }
+  return findings;
+}
+
+// ── Gate D12: Over-engineered TS adapter wrappers ───────────────────────────
+
+async function gateD12(files) {
+  // High-LOC TS files that wrap a single external service with multiple
+  // levels of indirection (client + service + reranker + handler patterns).
+  // Heuristic: files matching <name>-client.ts AND <name>-service.ts AND
+  // <name>-reranker.ts (or any 2 of 3) where total LOC > 600 across the trio.
+  const byBasename = new Map();
+  for (const f of files) {
+    const name = f.rel.replace(/\\/g, '/').split('/').pop()?.replace(/\.[^.]+$/, '') ?? '';
+    const m = name.match(/^(.+?)-(client|service|reranker|handler|adapter|proxy)$/);
+    if (!m) continue;
+    const base = m[1];
+    if (!byBasename.has(base)) byBasename.set(base, []);
+    byBasename.get(base).push(f);
+  }
+  const findings = [];
+  for (const [base, group] of byBasename) {
+    if (group.length < 2) continue;
+    const totalLoc = group.reduce((a, b) => a + (b.lineCount ?? 0), 0);
+    if (totalLoc < 600) continue;
+    findings.push({
+      file: group[0].rel,
+      line: 1,
+      snippet: `${base}-* adapter chain: ${group.length} files, ${totalLoc} LOC total — candidate for native-TS consolidation`,
+    });
+  }
+  return findings;
+}
+
+// ── Gate D13: Python middleware with existing TS fallback ───────────────────
+
+async function gateD13() {
+  // Detect callers that fetch an external service AND have a same-module or
+  // sibling-module TS fallback. Indicates the external service can be retired.
+  const targets = await glob('src/lib/server/**/*.ts', { ignore: ['**/*.d.ts', '**/*.test.ts', '**/*.spec.ts'] });
+  const findings = [];
+  // Any fetch (literal or template) targeting a local URL; OR fetch using
+  // a baseUrl variable that was resolved against a localhost candidate list.
+  const FETCH_LOCAL = /fetch\s*\(\s*[`'"][^`'"]*https?:\/\/(?:localhost|127\.0\.0\.1)/;
+  const FETCH_BASEURL = /fetch\s*\(\s*`\$\{(?:baseUrl|base|serviceUrl|endpoint|apiUrl|resolvedUrl)\}/;
+  const FALLBACK_EXPORT = /\bexport\s+(?:async\s+)?function\s+(detect\w+|\w*Heuristic|\w*Fallback|native\w+|extractDocumentNative|extractEntitiesNative)/i;
+
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    const hasLocalFetch = FETCH_LOCAL.test(src) || FETCH_BASEURL.test(src);
+    if (!hasLocalFetch) continue;
+
+    // Same-file fallback?
+    let hasFallback = FALLBACK_EXPORT.test(src);
+    // Sibling fallback in the same directory? (e.g. langextract-service.ts +
+    // langextract/native.ts — the native sibling is the intended replacement)
+    if (!hasFallback) {
+      const dir = relative(ROOT, f).replace(/\\/g, '/').replace(/\/[^/]+$/, '');
+      const siblings = await glob(`${dir.replace(/-[a-z]+$/, '')}/**/native.ts`, { ignore: ['**/*.test.ts'] }).catch(() => []);
+      if (siblings.length > 0) hasFallback = true;
+    }
+    if (!hasFallback) continue;
+
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (FETCH_LOCAL.test(lines[i]) || FETCH_BASEURL.test(lines[i])) {
+        findings.push({
+          file: relative(ROOT, f),
+          line: i + 1,
+          snippet: `External-service fetch with TS fallback available — eligible for decommission`,
+        });
+        break;
+      }
+    }
+  }
+  return findings;
+}
+
+// ── Gate D14: ENV vars referenced but missing from env.server.ts ─────────────
+
+async function gateD14() {
+  const envSrc = await readFile(resolve(ROOT, 'src/lib/server/env.server.ts'), 'utf8').catch(() => '');
+  const declared = new Set();
+  for (const m of envSrc.matchAll(/^\s*(?:export\s+const\s+)?(?:get\s+)?([A-Z][A-Z_0-9]+)\s*[:=]/gm)) {
+    declared.add(m[1]);
+  }
+  // Also pick up `process.env.X` references inside env.server itself
+  for (const m of envSrc.matchAll(/process\.env\.([A-Z][A-Z_0-9]+)/g)) declared.add(m[1]);
+
+  const targets = await glob('src/lib/server/**/*.ts', { ignore: ['**/*.d.ts', '**/env.server.ts'] });
+  const referenced = new Map();
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    for (const m of src.matchAll(/\bENV\.([A-Z][A-Z_0-9]+)/g)) {
+      const name = m[1];
+      if (!declared.has(name)) {
+        if (!referenced.has(name)) referenced.set(name, relative(ROOT, f));
+      }
+    }
+  }
+  return [...referenced.entries()].map(([name, file]) => ({
+    file,
+    line: 1,
+    snippet: `ENV.${name} referenced but not declared in env.server.ts`,
+  }));
+}
+
+// ── Gate D15: Proto/contract files referenced but missing on disk ────────────
+
+async function gateD15() {
+  const targets = await glob('src/**/*.{ts,mjs}', { ignore: ['**/*.d.ts'] });
+  const findings = [];
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    // Path-shaped only: no spaces, slashes/dots/words/hyphens
+    const matches = src.matchAll(/['"`]([\w./-]+\.proto)['"`]/g);
+    for (const m of matches) {
+      const protoPath = m[1];
+      // Resolve relative to repo root (try a few common bases)
+      const candidates = [
+        resolve(ROOT, protoPath),
+        resolve(ROOT, '..', protoPath),
+        resolve(ROOT, 'proto', protoPath),
+        resolve(ROOT, '..', 'proto', protoPath),
+        resolve(ROOT, '..', 'proto', 'active', protoPath),
+        resolve(ROOT, '..', 'proto', 'legacy', protoPath),
+        resolve(ROOT, 'proto', 'active', protoPath),
+        resolve(ROOT, 'proto', 'legacy', protoPath),
+      ];
+      let exists = false;
+      for (const c of candidates) {
+        const r = await readFile(c, 'utf8').catch(() => null);
+        if (r !== null) { exists = true; break; }
+      }
+      if (!exists) {
+        findings.push({
+          file: relative(ROOT, f),
+          line: 1,
+          snippet: `Proto file referenced but not found: ${protoPath}`,
+        });
+      }
+    }
+  }
+  // Dedupe by (file, snippet)
+  const seen = new Set();
+  return findings.filter((f) => {
+    const k = `${f.file}::${f.snippet}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
+// ── Enhancement-finding gates (D16-D20) ──────────────────────────────────────
+// Unlike D1-D15 which catch bugs/smells, these surface OPPORTUNITIES to use
+// the JSONB/simdjson/AGENTS.md/await-using infrastructure that already exists.
+
+// D16: `await using` opportunities — try/finally with .quit()/.disconnect()
+async function gateD16() {
+  const targets = await glob('{src,scripts}/**/*.{ts,mjs}', { ignore: ['**/*.d.ts', '**/_archive/**'] });
+  const findings = [];
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    // Look for try { ... } finally { ... .quit() ... } or .disconnect() patterns
+    if (!/\bfinally\s*\{[^}]*\.(quit|disconnect)\(\)/s.test(src)) continue;
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (/\.(quit|disconnect)\(\)/.test(line) && /finally|catch/.test(lines.slice(Math.max(0, i - 5), i).join('\n'))) {
+        findings.push({
+          file:    relative(ROOT, f),
+          line:    i + 1,
+          snippet: `${line.trim().slice(0, 120)}  → consider \`await using\` + getDisposableRedis()`,
+        });
+        break; // one per file
+      }
+    }
+  }
+  return findings;
+}
+
+// D17: Bulk-read opportunities — N sequential getRedis().get() in one scope
+async function gateD17() {
+  const targets = await glob('src/**/*.{ts,mjs}', { ignore: ['**/*.d.ts', '**/*.test.ts', '**/*.spec.ts'] });
+  const findings = [];
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    // Heuristic: 3+ `await redis.get(...)` or `await getRedis().get(...)` in the file
+    const getCalls = (src.match(/\bawait\s+(?:getRedis\(\)|redis|r)\.get\s*\(/g) || []).length;
+    if (getCalls < 3) continue;
+    findings.push({
+      file:    relative(ROOT, f),
+      line:    1,
+      snippet: `${getCalls} sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)`,
+    });
+  }
+  return findings;
+}
+
+// D18: JSON.parse on Redis MGET result without simdjson dispatch
+async function gateD18() {
+  const targets = await glob('src/**/*.{ts,mjs}', { ignore: ['**/*.d.ts', '**/*.test.ts', '**/*.spec.ts'] });
+  const findings = [];
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    // Has .mget(...) AND a JSON.parse on the result, but no fastJsonParse/parseEntriesBulk import
+    if (!/\.mget\s*\(/.test(src)) continue;
+    if (!/JSON\.parse\(/.test(src)) continue;
+    if (/fastJsonParse|parseEntriesBulk|isSimdJsonAvailable/.test(src)) continue;
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (/\.mget\s*\(/.test(lines[i])) {
+        findings.push({
+          file:    relative(ROOT, f),
+          line:    i + 1,
+          snippet: `${lines[i].trim().slice(0, 120)}  → consider parseEntriesBulk for ≥10/≥5KB aggregate`,
+        });
+        break;
+      }
+    }
+  }
+  return findings;
+}
+
+// D19: recordLlmOutputHit calls missing outputMeta (no structured 1-3 sentence summary)
+async function gateD19() {
+  const targets = await glob('src/**/*.{ts,mjs}', { ignore: ['**/*.d.ts', '**/*.test.ts', '**/*.spec.ts'] });
+  const findings = [];
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    if (!/recordLlmOutputHit\s*\(/.test(src)) continue;
+    // Check each occurrence — does the call pass an `outputMeta` field?
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (!/recordLlmOutputHit\s*\(/.test(lines[i])) continue;
+      // Look ahead 8 lines for outputMeta or recordRagAnswer/recordKagAnswer (the helpers handle it)
+      const window = lines.slice(i, Math.min(lines.length, i + 8)).join(' ');
+      if (/outputMeta|recordRagAnswer|recordKagAnswer|recordDagAnswer/.test(window)) continue;
+      findings.push({
+        file:    relative(ROOT, f),
+        line:    i + 1,
+        snippet: `${lines[i].trim().slice(0, 120)}  → use recordRagAnswer/recordKagAnswer for structured outputMeta`,
+      });
+    }
+  }
+  return findings;
+}
+
+// D20: Direct fetch() to internal services bypassing the typed client wrapper
+async function gateD20() {
+  const targets = await glob('src/lib/server/**/*.ts', {
+    ignore: ['**/*.d.ts', '**/grpc/**', '**/clients/**', '**/services/**', '**/helpers/**', '**/env*'],
+  });
+  const findings = [];
+  for (const f of targets) {
+    const src = await readFile(f, 'utf8').catch(() => '');
+    // Look for fetch(`${ENV.QDRANT_URL}/...`) or fetch(`${ENV.OLLAMA_BASE_URL}/...`) outside dedicated clients
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const m = /fetch\s*\(\s*[`'"]\$?\{?\s*ENV\.(QDRANT_URL|OLLAMA_BASE_URL|TENSORRT_URL|TRITON_URL|LANGEXTRACT_URL)\}?/.exec(line);
+      if (!m) continue;
+      findings.push({
+        file:    relative(ROOT, f),
+        line:    i + 1,
+        snippet: `${line.trim().slice(0, 120)}  → use the typed client (qdrant-client, ollama-client, etc.)`,
+      });
+    }
+  }
+  return findings;
+}
+
 // ── Driver ────────────────────────────────────────────────────────────────────
 
 const GATES = [
@@ -443,6 +772,17 @@ const GATES = [
   ['D8',  'ssrUnsafe routes missing ssr=false',           gateD8],
   ['D9',  'Likely orphans (0 fanIn, no dynImport ref)',   gateD9],
   ['D10', 'ACE synthesis missing recordLlmOutputHit',     gateD10],
+  ['D11', 'Phantom service candidates (port w/ no impl)', gateD11],
+  ['D12', 'Over-engineered TS adapter wrappers',          gateD12],
+  ['D13', 'Python middleware with TS fallback',           gateD13],
+  ['D14', 'ENV var referenced but undeclared',            gateD14],
+  ['D15', 'Proto/contract files missing on disk',         gateD15],
+  // ── Enhancement gates (find OPPORTUNITIES, not bugs) ──
+  ['D16', 'await-using opportunity (try/finally + .quit/.disconnect)', gateD16],
+  ['D17', 'MGET bulk-read opportunity (3+ sequential redis.get)',      gateD17],
+  ['D18', 'simdjson opportunity (.mget + JSON.parse, no fast-parse)',  gateD18],
+  ['D19', 'Missing outputMeta on recordLlmOutputHit (use Rag/Kag helper)', gateD19],
+  ['D20', 'Direct ENV.*_URL fetch (use typed client)',     gateD20],
 ];
 
 async function main() {
