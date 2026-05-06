@@ -30,6 +30,7 @@ export interface ACPKnowledgeSearchResult {
     embeddingModel: string;
     collection: string;
     latencyMs: number;
+    topoPrefilter?: import('$lib/server/cache/topo-candidate-cache.js').TopoPrefilterStats;
   };
 }
 

@@ -80,6 +80,13 @@ import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 import { computeManifold4Centroid } from '$lib/server/retrieval/manifold4-search.js';
 import type { Manifold4Point } from '$lib/server/retrieval/manifold4-search.js';
 import { classifyQuery, TOPO_CLASS } from '$lib/server/tensor/topology-byte-mapper.js';
+import {
+  getTopoCandidates,
+  setTopoCandidates,
+  buildTopoPrefilterStats,
+  queryHash as topoQueryHash,
+} from '$lib/server/cache/topo-candidate-cache.js';
+import type { TopoPrefilterStats } from '$lib/server/cache/topo-candidate-cache.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -144,12 +151,36 @@ async function fetchACPKnowledgeResults(
     if (!Array.isArray(emb) || emb.length !== 768) return null;
 
     let filters: any = undefined;
+    let topoPrefilter: TopoPrefilterStats | undefined;
 
     // Stage A: Directory Summary Search + topo_class prefilter (codebase chunks only)
     if (collection === 'codebase_chunks_768') {
-      // Stage A0: topo_class prefilter — restricts ANN sweep to the most likely class
+      // Stage A0: topo_class prefilter — Redis quick-hit cache, then Qdrant topo_class filter
       const queryClass = classifyQuery(query);
+      const qHash = topoQueryHash(query);
+
       if (queryClass !== TOPO_CLASS.UNCLASSIFIED) {
+        const cached = await getTopoCandidates(queryClass, query);
+        if (cached && cached.length > 0) {
+          // Cache hit — return early, skip Qdrant entirely
+          topoPrefilter = buildTopoPrefilterStats({
+            used: true, topoClass: queryClass, cacheHit: true,
+            candidateCountAfter: cached.length, qdrantCollectionEstimate: null, queryHash: qHash,
+          });
+          return {
+            ok: true, query,
+            results: cached.map((c) => ({
+              id: c.stableKey, source: 'qdrant' as const, title: c.path,
+              content: '', score: c.score,
+              path: c.path, metadata: undefined,
+            })),
+            metadata: {
+              embeddingModel: 'embeddinggemma:latest', collection,
+              latencyMs: Date.now() - startedAt,
+              topoPrefilter,
+            },
+          };
+        }
         filters = { topo_class: queryClass };
       }
 
@@ -181,6 +212,24 @@ async function fetchACPKnowledgeResults(
       filters,
     });
 
+    // Persist candidates into Redis for next call (fire-and-forget)
+    const queryClass = classifyQuery(query);
+    const qHash = topoQueryHash(query);
+    if (collection === 'codebase_chunks_768' && queryClass !== TOPO_CLASS.UNCLASSIFIED) {
+      const entries = hits.results.map((h) => ({
+        stableKey: String(h.id),
+        score: h.score,
+        path: (h.payload?.['path'] ?? h.payload?.['relative_path'] ?? undefined) as string | undefined,
+      }));
+      setTopoCandidates(queryClass, query, entries).catch(() => {});
+      topoPrefilter = buildTopoPrefilterStats({
+        used: true, topoClass: queryClass, cacheHit: false,
+        candidateCountAfter: hits.results.length,
+        qdrantCollectionEstimate: null, // unknown without collection scan
+        queryHash: qHash,
+      });
+    }
+
     return {
       ok: true,
       query,
@@ -202,6 +251,7 @@ async function fetchACPKnowledgeResults(
         embeddingModel: 'embeddinggemma:latest',
         collection,
         latencyMs: Date.now() - startedAt,
+        topoPrefilter,
       },
     };
   } catch {
@@ -471,6 +521,9 @@ export async function assembleACEContext(opts: {
         userAnalyticsContext: userAnalyticsContext ?? null,
         codebaseContext: codebaseContext ?? null,
         policyDecision: null,
+        retrievalTrace: acpKnowledgeResults?.metadata?.topoPrefilter
+          ? { topoPrefilter: acpKnowledgeResults.metadata.topoPrefilter }
+          : undefined,
       };
 
       // ── Autonomous Research Ingestion (Phase 6) ─────────────────────

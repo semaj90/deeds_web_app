@@ -190,6 +190,8 @@ export interface ACEContext {
     somCluster?: number | null;
     somBmuRow?: number | null;
     somBmuCol?: number | null;
+    /** Normalised composite authority score mirrored from GDS nightly job via Qdrant payload */
+    graphAuthorityScore?: number | null;
     rerankBreakdown?: RerankBreakdown | null;
     /** Precomputed LLM output for this path from code-llm-index Redis cache */
     cachedLlmOutput?: string | null;
@@ -263,6 +265,22 @@ export interface ACEContext {
     /** Token count of the cached output */
     tokenCount?: number;
   } | null;
+  /**
+   * TRACE retrieval diagnostics — surfaced in the retrieval timeline UI.
+   * Populated by fetchACPKnowledgeResults when a topo prefilter was applied.
+   */
+  retrievalTrace?: {
+    topoPrefilter?: {
+      used:               boolean;
+      queryClass:         string;
+      topoClass:          number;
+      cacheHit:           boolean;
+      candidateCount:     number;
+      /** "32753 → 83" — shows reduction before expensive ANN sweep */
+      candidateReduction: string | null;
+      queryHash:          string;
+    };
+  };
 }
 
 export interface ACEPrompt {
