@@ -111,14 +111,27 @@ async function fetchFromRedisZset(
       rag: policy.rag, codebase: policy.codebase,
     };
 
+    // Choose parser per total payload — web research summaries can be 5-20KB
+    // each, so the simdjson AVX2 path tends to trip the ≥10/≥5KB threshold
+    // and gives 2-5× parse speedup over V8 JSON.parse.
+    type BlobShape = {
+      urlHash: string; query: string; summary: string;
+      pipeline: string; relevanceScore: number; entityTags: string[];
+    };
+    const totalChars = blobs.reduce((sum, b) => sum + (b?.length ?? 0), 0);
+    let parseFn: (s: string) => BlobShape = (s) => JSON.parse(s) as BlobShape;
+    if (blobs.length >= 10 && totalChars >= 5_000) {
+      try {
+        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+        if (isSimdJsonAvailable()) parseFn = fastJsonParse<BlobShape>;
+      } catch { /* addon unavailable — keep V8 */ }
+    }
+
     const summaries: ClusterSummary[] = [];
     for (const blob of blobs) {
       if (!blob) continue;
       try {
-        const s = JSON.parse(blob) as {
-          urlHash: string; query: string; summary: string;
-          pipeline: string; relevanceScore: number; entityTags: string[];
-        };
+        const s = parseFn(blob);
         summaries.push({
           id:            s.urlHash,
           query:         s.query,
