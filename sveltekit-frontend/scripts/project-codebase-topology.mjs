@@ -50,7 +50,7 @@ log('Loading codebase-graph.json …');
 const graph    = JSON.parse(readFileSync(graphPath,    'utf8'));
 const clusters = JSON.parse(readFileSync(clustersPath, 'utf8'));
 
-// ── Build file → cluster map ──────────────────────────────────────────────────
+// ── Build file → cluster map (exact + directory walk-up fallback) ────────────
 
 /** @type {Map<string, { clusterId: number; kind: string }>} */
 const fileClusterMap = new Map();
@@ -58,13 +58,48 @@ for (const cluster of clusters.clusters) {
   for (const member of (cluster.memberFiles ?? [])) {
     fileClusterMap.set(member.path, { clusterId: cluster.id, kind: member.kind });
   }
-  // also map topPaths
   for (const tp of (cluster.topPaths ?? [])) {
     if (!fileClusterMap.has(tp.path)) {
       fileClusterMap.set(tp.path, { clusterId: cluster.id, kind: 'file' });
     }
   }
 }
+
+// dir → clusterId fallback: first cluster that lists this dir in topDirs
+/** @type {Map<string, number>} */
+const dirClusterMap = new Map();
+for (const cluster of clusters.clusters) {
+  for (const d of (cluster.topDirs ?? [])) {
+    if (!dirClusterMap.has(d.dir)) dirClusterMap.set(d.dir, cluster.id);
+  }
+}
+
+/** Resolve clusterId for a file path (exact, then dir walk-up). */
+function resolveClusterId(rel) {
+  const exact = fileClusterMap.get(rel);
+  if (exact) return exact.clusterId;
+  const parts = rel.split('/');
+  for (let depth = parts.length - 1; depth > 0; depth--) {
+    const dir = parts.slice(0, depth).join('/');
+    if (dirClusterMap.has(dir)) return dirClusterMap.get(dir);
+  }
+  return -1;
+}
+
+// ── Load cluster summaries ────────────────────────────────────────────────────
+
+/** @type {Map<number, string>} clusterId → purpose text */
+const clusterSummaryMap = new Map();
+try {
+  const summPath = resolve(ROOT, 'docs/graph/cluster-summaries.json');
+  const summData = JSON.parse(readFileSync(summPath, 'utf8'));
+  for (const s of (summData.summaries ?? summData.clusters ?? [])) {
+    if (s.clusterId !== undefined) {
+      clusterSummaryMap.set(s.clusterId, s.purpose ?? s.summary ?? s.inferredTopic ?? '');
+    }
+  }
+  log(`  Loaded ${clusterSummaryMap.size} cluster summaries`);
+} catch { /* not present — skip */ }
 
 // ── Glyph metadata helpers ────────────────────────────────────────────────────
 
@@ -149,44 +184,55 @@ function syntheticManifold4(rel, clusterId, indexInCluster, clusterSize) {
 
 log(`Building file nodes (limit=${LIMIT === Infinity ? 'none' : LIMIT}) …`);
 
+// Deduplicate graph.files by rel (some entries appear twice in fast-ast mode)
+const seenRels = new Set();
+const dedupedFiles = graph.files.filter((f) => {
+  if (seenRels.has(f.rel)) return false;
+  seenRels.add(f.rel);
+  return true;
+});
+log(`  Deduped: ${graph.files.length} → ${dedupedFiles.length} files`);
+
 /** @type {Map<number, number>} clusterIndex → count of files so far */
 const clusterCounts = new Map();
 
 const fileNodes = [];
 const clusterNodeMap = new Map(); // clusterId → { stableKey, kind, label, size, topic }
 
-for (const f of graph.files) {
+for (const f of dedupedFiles) {
   if (fileNodes.length >= LIMIT) break;
 
-  const clusterEntry = fileClusterMap.get(f.rel);
-  const clusterId    = clusterEntry?.clusterId ?? -1;
-  const clusterIdx   = clusterCounts.get(clusterId) ?? 0;
-  const clusterMeta  = clusters.clusters.find((c) => c.id === clusterId);
-  const clusterSize  = clusterMeta?.memberFiles?.length ?? 1;
+  const clusterId   = resolveClusterId(f.rel);
+  const clusterIdx  = clusterCounts.get(clusterId) ?? 0;
+  const clusterMeta = clusters.clusters.find((c) => c.id === clusterId);
+  const clusterSize = clusterMeta?.memberFiles?.length ?? 1;
 
   clusterCounts.set(clusterId, clusterIdx + 1);
 
   const manifold4 = syntheticManifold4(f.rel, Math.max(0, clusterId), clusterIdx, clusterSize);
+  const clusterKey = clusterId >= 0 ? `cluster:gpu:${clusterId}` : null;
+  const summaryLens = clusterId >= 0 ? (clusterSummaryMap.get(clusterId) ?? clusterMeta?.inferredTopic ?? null) : null;
 
   fileNodes.push({
-    stableKey:  `file:${f.rel}`,
-    kind:       f.isSvelteComp ? 'component' : f.isRoute ? 'route' : f.isTest ? 'test' : 'file',
-    label:      f.rel.split('/').pop() ?? f.rel,
+    stableKey:   `file:${f.rel}`,
+    kind:        f.isSvelteComp ? 'component' : f.isRoute ? 'route' : f.isTest ? 'test' : 'file',
+    label:       f.rel.split('/').pop() ?? f.rel,
     manifold4,
-    clusterKey: clusterId >= 0 ? `cluster:gpu:${clusterId}` : null,
+    clusterKey,
+    summaryLens,
     glyph: {
       sprite:  glyphSprite(f),
       palette: glyphPalette(f.rel),
       risk:    glyphRisk(f),
       size:    glyphSize(f),
     },
-    tags: f.tags ?? [],
-    summary: f.summary ?? '',
+    tags:      f.tags ?? [],
+    summary:   f.summary ?? '',
     lineCount: f.lineCount ?? 0,
-    hasAuth:  f.hasAuth,
-    hasZod:   f.hasZod,
-    isRoute:  f.isRoute,
-    isTest:   f.isTest,
+    hasAuth:   f.hasAuth,
+    hasZod:    f.hasZod,
+    isRoute:   f.isRoute,
+    isTest:    f.isTest,
   });
 
   // Register cluster node if not yet seen
@@ -222,6 +268,27 @@ for (const fn of fileNodes) {
 
 const edges = [];
 
+// Directory nodes (for CONTAINS edges)
+const dirNodeMap = new Map(); // dir → node
+for (const fn of fileNodes) {
+  const rel = fn.stableKey.replace('file:', '');
+  const parts = rel.split('/');
+  for (let depth = 1; depth < parts.length; depth++) {
+    const dir = parts.slice(0, depth).join('/');
+    const key = `dir:${dir}`;
+    if (!dirNodeMap.has(key)) {
+      dirNodeMap.set(key, {
+        stableKey: key,
+        kind:      'directory',
+        label:     parts[depth - 1],
+        manifold4: syntheticManifold4(dir, dirClusterMap.get(dir) ?? -1, 0, 1),
+        clusterKey: dirClusterMap.has(dir) ? `cluster:gpu:${dirClusterMap.get(dir)}` : null,
+      });
+    }
+  }
+}
+const dirNodes = [...dirNodeMap.values()];
+
 // CONTAINS: directory → file
 for (const fn of fileNodes) {
   const rel = fn.stableKey.replace('file:', '');
@@ -232,16 +299,31 @@ for (const fn of fileNodes) {
   }
 }
 
-// IN_CLUSTER: file → cluster
+// BELONGS_TO_CLUSTER: file → cluster
 for (const fn of fileNodes) {
   if (fn.clusterKey) {
-    edges.push({ from: fn.stableKey, to: fn.clusterKey, type: 'IN_CLUSTER' });
+    edges.push({ from: fn.stableKey, to: fn.clusterKey, type: 'BELONGS_TO_CLUSTER' });
   }
+}
+
+// HAS_SUMMARY_LENS: cluster → summary lens node
+const summaryLensNodes = [];
+for (const [clusterId, purpose] of clusterSummaryMap) {
+  const lensKey = `summary:cluster:${clusterId}`;
+  summaryLensNodes.push({
+    stableKey: lensKey,
+    kind: 'summary_lens',
+    label: `Cluster ${clusterId} summary`,
+    clusterKey: `cluster:gpu:${clusterId}`,
+    manifold4: syntheticManifold4(`summary:${clusterId}`, clusterId, 0, 1),
+    purpose,
+  });
+  edges.push({ from: `cluster:gpu:${clusterId}`, to: lensKey, type: 'HAS_SUMMARY_LENS' });
 }
 
 // IMPORTS: file → file (from codebase-graph.json imports)
 const stableKeySet = new Set(fileNodes.map((f) => f.stableKey));
-for (const f of graph.files) {
+for (const f of dedupedFiles) {
   const fromKey = `file:${f.rel}`;
   if (!stableKeySet.has(fromKey)) continue;
   for (const imp of (f.imports ?? [])) {
@@ -281,7 +363,7 @@ const nesGlyphOut = {
     sourceGraph:  graph.createdAt,
     sourceClusters: clusters.generatedAt,
   },
-  nodes: [...fileNodes, ...clusterNodes],
+  nodes: [...fileNodes, ...clusterNodes, ...summaryLensNodes, ...dirNodes],
   edges: edges.slice(0, 50_000), // cap to 50K edges for file size
 };
 
@@ -312,7 +394,7 @@ const multihopNodes = fileNodes.map((fn) => {
     tags:            fn.tags,
     clusterKey:      fn.clusterKey,
     manifold4:       fn.manifold4,
-    summaryLensIds:  clusterId >= 0 && summaryLensMap.has(clusterId)
+    summaryLensIds:  clusterId >= 0 && (summaryLensMap.has(clusterId) || clusterSummaryMap.has(clusterId))
       ? [`summary:cluster:${clusterId}`]
       : [],
     wikiNoteIds:     [], // populated by Graphify wiki integration
@@ -323,25 +405,30 @@ const multihopNodes = fileNodes.map((fn) => {
       file:       fn.stableKey,
       directory:  fn.stableKey.replace('file:', '').split('/').slice(0, -1).join('/'),
       cluster:    fn.clusterKey ?? null,
-      summaryLens: clusterId >= 0 ? `summary:cluster:${clusterId}` : null,
+      summaryLens: fn.summaryLens ? `summary:cluster:${clusterId}` : null,
       topTags:    clusterMeta?.topTags?.slice(0, 4).map((t) => t.tag) ?? fn.tags.slice(0, 4),
     },
   };
 });
 
 const multihopEdges = edges.filter((e) =>
-  e.type === 'IMPORTS' || e.type === 'IN_CLUSTER'
+  e.type === 'IMPORTS' || e.type === 'BELONGS_TO_CLUSTER' || e.type === 'HAS_SUMMARY_LENS'
 ).slice(0, 100_000);
+
+const multihopAllNodes = [
+  ...multihopNodes,
+  ...summaryLensNodes.map((s) => ({ stableKey: s.stableKey, kind: 'summary_lens', label: s.label, manifold4: s.manifold4, clusterKey: s.clusterKey })),
+];
 
 const multihopOut = {
   version:     1,
   generatedAt: new Date().toISOString(),
   hopLayers:   ['file', 'directory', 'cluster', 'summaryLens', 'researchNote', 'memoryNote', 'retrievalRun'],
   stats: {
-    nodeCount: multihopNodes.length,
+    nodeCount: multihopAllNodes.length,
     edgeCount: multihopEdges.length,
   },
-  nodes: multihopNodes,
+  nodes: multihopAllNodes,
   edges: multihopEdges,
 };
 
