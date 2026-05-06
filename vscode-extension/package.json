@@ -1,0 +1,40 @@
+{
+  "name": "deeds-graph",
+  "displayName": "Deeds — Codebase Graph",
+  "description": "Codebase cluster graph with GPU-accelerated SOM/k-means — cached WebView",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "deeds.showGraph",
+        "title": "Deeds: Show Codebase Graph",
+        "icon": "$(graph)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "deeds.showGraph",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.39",
+    "@types/vscode": "^1.118.0",
+    "typescript": "^5.9.3"
+  }
+}
