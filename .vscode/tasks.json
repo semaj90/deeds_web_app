@@ -687,6 +687,27 @@
       }
     },
     {
+      "label": "Extension: Compile on Startup",
+      "type": "shell",
+      "command": "npm run compile",
+      "options": {
+        "cwd": "${workspaceFolder}/vscode-extension"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "group": "build",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
       "label": "Phase 14: Apply env + Phase 6 core check",
       "type": "shell",
       "command": "Copy-Item .env.phase14 ./.env -Force; npm run phase6:core",
