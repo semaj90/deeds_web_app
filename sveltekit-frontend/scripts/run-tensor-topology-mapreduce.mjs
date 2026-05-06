@@ -150,6 +150,118 @@ async function cacheTopoByte(redis, stableKey, byte) {
   await redis.setex(`topo:byte:${stableKey}`, REDIS_TTL, String(byte)).catch(() => {});
 }
 
+// ── OLS decoder fitting ───────────────────────────────────────────────────────
+// After PCA projection we have (embedding, manifold4) pairs.  We fit a linear
+// least-squares map  manifold4 → embedding  (the "decoder") so that the ACE
+// did-you-mean path can compute true reconstruction MSE at query time.
+//
+// Math: W [k×d], b [d]  such that  emb ≈ proj @ W + b
+//   Normal equations:  (Pc^T Pc) W = Pc^T Ec  where Pc/Ec are mean-centred.
+//
+// k=4, d=768, n≤2000 → A is 4×4, B is 4×768.  Total cost ≈ 12 ms.
+
+const DECODER_KEY = 'ace:autoencoder:decoder:weights';
+const DECODER_TTL = 3600 * 24; // 24 h — refreshed on every full pipeline run
+const DECODER_SAMPLE_CAP = 2000;
+
+/** 4×4 Gauss-Jordan inversion. @param {Float64Array} m @returns {Float64Array} */
+function invert4x4(m) {
+  const a   = new Float64Array(m);
+  const inv = new Float64Array(16);
+  for (let i = 0; i < 4; i++) inv[i * 4 + i] = 1;
+  for (let col = 0; col < 4; col++) {
+    let maxVal = Math.abs(a[col * 4 + col]), maxRow = col;
+    for (let row = col + 1; row < 4; row++) {
+      if (Math.abs(a[row * 4 + col]) > maxVal) { maxVal = Math.abs(a[row * 4 + col]); maxRow = row; }
+    }
+    if (maxRow !== col) {
+      for (let j = 0; j < 4; j++) {
+        [a[col*4+j], a[maxRow*4+j]]     = [a[maxRow*4+j], a[col*4+j]];
+        [inv[col*4+j], inv[maxRow*4+j]] = [inv[maxRow*4+j], inv[col*4+j]];
+      }
+    }
+    const pivot = a[col * 4 + col];
+    if (Math.abs(pivot) < 1e-12) throw new Error('Decoder: singular PCA matrix');
+    for (let j = 0; j < 4; j++) { a[col*4+j] /= pivot; inv[col*4+j] /= pivot; }
+    for (let row = 0; row < 4; row++) {
+      if (row === col) continue;
+      const fac = a[row * 4 + col];
+      for (let j = 0; j < 4; j++) { a[row*4+j] -= fac * a[col*4+j]; inv[row*4+j] -= fac * inv[col*4+j]; }
+    }
+  }
+  return inv;
+}
+
+/**
+ * Fit OLS linear decoder from (manifold4, embedding) pairs.
+ * @param {Float32Array[]} projList  n × 4 coordinate arrays
+ * @param {Float32Array[]} embList   n × 768 embedding arrays
+ * @returns {{ W: number[], b: number[], hidden: number, outputDim: number } | null}
+ */
+function fitLinearDecoder(projList, embList) {
+  const n = projList.length, k = 4, d = DIM;
+  if (n < k + 1) return null;
+
+  // Means
+  const pm = new Float64Array(k);
+  const em = new Float64Array(d);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < k; j++) pm[j] += projList[i][j] / n;
+    for (let j = 0; j < d; j++) em[j] += embList[i][j]  / n;
+  }
+
+  // A = Pc^T Pc: [k, k]
+  const A = new Float64Array(k * k);
+  // B = Pc^T Ec: [k, d]
+  const B = new Float64Array(k * d);
+  for (let i = 0; i < n; i++) {
+    const pc = projList[i].map((v, j) => v - pm[j]);
+    const ec = embList[i].map((v, j)  => v - em[j]);
+    for (let r = 0; r < k; r++) {
+      for (let c = 0; c < k; c++) A[r*k+c] += pc[r] * pc[c];
+      for (let c = 0; c < d; c++) B[r*d+c] += pc[r] * ec[c];
+    }
+  }
+
+  let Ainv;
+  try { Ainv = invert4x4(A); } catch { return null; }
+
+  // W = Ainv @ B: [k, d]
+  const Wf = new Float64Array(k * d);
+  for (let r = 0; r < k; r++)
+    for (let c = 0; c < d; c++) {
+      let s = 0;
+      for (let m = 0; m < k; m++) s += Ainv[r*k+m] * B[m*d+c];
+      Wf[r*d+c] = s;
+    }
+
+  // b = em - pm @ W: [d]
+  const bf = new Float64Array(d);
+  for (let c = 0; c < d; c++) {
+    bf[c] = em[c];
+    for (let r = 0; r < k; r++) bf[c] -= pm[r] * Wf[r*d+c];
+  }
+
+  return { W: Array.from(Wf), b: Array.from(bf), hidden: k, outputDim: d };
+}
+
+/**
+ * Persist decoder weights to Redis.
+ * @param {Redis} redis
+ * @param {Float32Array[]} projList
+ * @param {Float32Array[]} embList
+ */
+async function persistDecoderWeights(redis, projList, embList) {
+  try {
+    const weights = fitLinearDecoder(projList, embList);
+    if (!weights) { console.warn('  ⚠ decoder fit skipped (insufficient samples)'); return; }
+    await redis.setex(DECODER_KEY, DECODER_TTL, JSON.stringify(weights));
+    console.log(`  ✓ decoder weights saved → ${DECODER_KEY}  (n=${projList.length}, W=${weights.W.length} floats)`);
+  } catch (e) {
+    console.warn('  ⚠ decoder weight persistence failed:', e.message);
+  }
+}
+
 /** @param {Redis} redis @param {string} stableKey @param {number} contentHash */
 async function getCachedHash(redis, stableKey, contentHash) {
   const v = await redis.get(`tensor:hash:${stableKey}`).catch(() => null);
@@ -184,6 +296,8 @@ async function main() {
   let offset = null;
   let totalProcessed = 0, totalWritten = 0, totalSkipped = 0;
   const classDist = {};
+  /** @type {Float32Array[]} */ const decoderProjSample = [];
+  /** @type {Float32Array[]} */ const decoderEmbSample  = [];
 
   // Resume: read last processed offset from Redis
   if (RESUME) {
@@ -268,6 +382,17 @@ async function main() {
       }
 
       totalWritten += rows.length;
+
+      // Accumulate (proj, emb) pairs for decoder fitting (capped at DECODER_SAMPLE_CAP)
+      if (gpuAvailable && decoderProjSample.length < DECODER_SAMPLE_CAP) {
+        for (let si = 0; si < rows.length && decoderProjSample.length < DECODER_SAMPLE_CAP; si++) {
+          const r = rows[si];
+          if (r.vec) {
+            decoderProjSample.push(new Float32Array([r.mx, r.my, r.mz, r.mw]));
+            decoderEmbSample.push(r.vec);
+          }
+        }
+      }
     }
 
     totalProcessed += points.length;
@@ -282,6 +407,16 @@ async function main() {
 
   // Clear checkpoint on completion
   if (!DRY_RUN) await redis.del('tensor:mapreduce:offset').catch(() => {});
+
+  // Fit and persist linear decoder from accumulated (proj, emb) pairs
+  if (!DRY_RUN && gpuAvailable && decoderProjSample.length >= 5) {
+    console.log(`\n🔧 Fitting OLS decoder from ${decoderProjSample.length} samples…`);
+    await persistDecoderWeights(redis, decoderProjSample, decoderEmbSample);
+  } else if (DRY_RUN) {
+    console.log('\n   [dry-run] decoder fit skipped');
+  } else if (!gpuAvailable) {
+    console.log('\n   [topo-only] decoder fit skipped — no real embeddings available');
+  }
 
   console.log('\n');
   console.log(`✅ Done`);

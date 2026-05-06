@@ -23,6 +23,7 @@ import type {
 } from './openai-types.js';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
+import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 
 interface RunOpts {
   /** Authenticated user id (from locals.user) — used for ACE personalization */
@@ -134,6 +135,36 @@ export async function runChatCompletion(
       model:    internalModel,
       durationMs: Date.now() - startMs,
       ace:      { used: false, chunks: 0, agentsMd: false, codeLlmHit: false, cacheHit: 'none' },
+    });
+  }
+
+  // ── Agent loop path: route through Gemma4 tool-calling agent ──
+  // Triggered when the client requests model=gemma4-agent OR passes tools.
+  // The agent handles its own ACE context assembly internally.
+  const isAgentModel = req.model.toLowerCase().includes('agent');
+  const hasTools     = Array.isArray(req.tools) && req.tools.length > 0;
+  if (isAgentModel || hasTools) {
+    const agentResult = await runGemma4Agent(query, {
+      userId:    opts.userId,
+      pipeline:  'openai-facade',
+      metadata: {
+        filePath:        req.file_path,
+        caseId:          req.case_id,
+        allowWriteTools: false,   // OpenAI compat clients get read-only by default
+        allowGatedTools: false,
+      },
+    });
+    return wrapResponse({
+      content:    agentResult.answer,
+      model:      internalModel,
+      durationMs: Date.now() - startMs,
+      ace: {
+        used:       true,
+        chunks:     0,
+        agentsMd:   false,
+        codeLlmHit: agentResult.cacheTier !== undefined,
+        cacheHit:   agentResult.cacheTier ? 'prior-answer' : 'none',
+      },
     });
   }
 

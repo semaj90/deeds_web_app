@@ -2484,6 +2484,12 @@ export interface CodebaseFetchStats {
     expanded?: number;
     newChunks?: number;
   };
+  didYouMean?: {
+    reconstructionError: number;
+    isNovel: boolean;
+    errorSource: string;
+    neighborCount: number;
+  };
   aceCodeCache?: {
     used: boolean;
     hit: boolean;
@@ -2769,6 +2775,28 @@ export async function fetchCodebaseContext(
               expanded: manifold4Expanded,
               newChunks: manifold4NewChunks,
             };
+
+            // Phase 8c: "Did you mean" — fire-and-forget, non-fatal.
+            // Uses true autoencoder reconstruction error when decoder weights are in Redis
+            // (written by tensor:topology after graphify:full), otherwise falls back to
+            // 1 − cosine(query, BMU centroid).
+            if (queryBmu) {
+              import('$lib/server/retrieval/centroid-cache.js')
+                .then(async ({ didYouMeanClusters }) => {
+                  const qEmb = new Float32Array(await generateSingleEmbedding(query).catch(() => []));
+                  if (!qEmb.length) return;
+                  const dym = await didYouMeanClusters(qEmb, queryBmu.row, queryBmu.col, {
+                    manifold4Coords: manifold4Center as [number, number, number, number] | undefined,
+                  });
+                  statsOut!.didYouMean = {
+                    reconstructionError: dym.reconstructionError,
+                    isNovel:             dym.isNovel,
+                    errorSource:         dym.errorSource,
+                    neighborCount:       dym.neighbors.length,
+                  };
+                })
+                .catch(() => {});
+            }
           }
 
           const finalChunks = await applyKarpathyBoost(boosted.slice(0, 10) as any, query, agentsMdResolvedDir);

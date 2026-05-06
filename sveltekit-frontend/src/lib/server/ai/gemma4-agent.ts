@@ -360,7 +360,115 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'web_search',
+      description:
+        'Search the web via SearXNG (google+duckduckgo+bing engines). ' +
+        'Falls back to Qdrant research_summaries semantic search if SearXNG is unavailable. ' +
+        'Use this for current events, documentation, or information not in the codebase.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query:      { type: 'string', description: 'Web search query' },
+          maxResults: { type: 'number', description: 'Max results to return (default 3, max 5)' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'graph_expand',
+      description:
+        'Expand the ego-graph around a file or directory node in Neo4j. ' +
+        'Returns neighboring files, clusters, and summaries up to N hops away. ' +
+        'Use this to understand what else is affected when changing a file, or to ' +
+        'find related files that import or are imported by the target.',
+      parameters: {
+        type: 'object',
+        properties: {
+          stableKey: { type: 'string', description: 'Node stable key (e.g. "file:src/lib/server/ace/context-assembler.ts" or "dir:src/routes/api")' },
+          depth:     { type: 'number', description: 'Hop depth 1-3 (default 2)' },
+          limit:     { type: 'number', description: 'Max neighbors (default 30, max 80)' },
+        },
+        required: ['stableKey'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'graph_path',
+      description:
+        'Find the shortest relationship path between two nodes in the codebase graph. ' +
+        'Useful to understand how a route connects to a DB table, how a component reaches a service, etc.',
+      parameters: {
+        type: 'object',
+        properties: {
+          fromKey: { type: 'string', description: 'Source node stableKey' },
+          toKey:   { type: 'string', description: 'Target node stableKey' },
+          maxHops: { type: 'number', description: 'Max path length (default 5, max 8)' },
+        },
+        required: ['fromKey', 'toKey'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'graph_community',
+      description:
+        'Look up which GPU cluster and SOM cluster a file belongs to. ' +
+        'Also returns community ID if GDS community detection has been run. ' +
+        'Use this to understand which subsystem a file is part of.',
+      parameters: {
+        type: 'object',
+        properties: {
+          stableKey: { type: 'string', description: 'Node stableKey to look up' },
+        },
+        required: ['stableKey'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'graph_pagerank',
+      description:
+        'Return the top files or directories by PageRank score — these are the most ' +
+        'architecturally important nodes. High PageRank = many other files depend on it.',
+      parameters: {
+        type: 'object',
+        properties: {
+          limit:    { type: 'number', description: 'How many top nodes to return (default 15, max 50)' },
+          nodeType: { type: 'string', description: 'Optional Neo4j label filter (e.g. "CodebaseFile")' },
+        },
+        required: [],
+      },
+    },
+  },
 ] as const;
+
+// ── ALLOWED_TOOLS allowlist ────────────────────────────────────────────────────
+// read  — pure retrieval, no filesystem or DB writes; always allowed
+// write — filesystem or DB side-effect; requires explicit opt-in (ALLOW_WRITE_TOOLS)
+// gated — dangerous / indexing ops; require ALLOW_GATED_TOOLS flag or separate endpoint
+const ALLOWED_TOOLS = {
+  read: new Set([
+    'rag_search', 'case_search', 'memory_recall', 'hyperedge_stats',
+    'topology_search', 'trace_search', 'agents_md', 'read_file',
+    'graph_search', 'wiki_note_lookup', 'audit_hotspots', 'web_search',
+  ]),
+  write: new Set([
+    'apply_shadow_patch', 'revert_fix', 'verify_fix',
+  ]),
+  gated: new Set<string>([
+    // reserved for future indexing / DB-mutation tools
+  ]),
+} as const;
 
 // ── FNV-1a 32-bit hash (for Redis cache keys) ─────────────────────────────────
 function fnv1a32(s: string): string {
@@ -370,6 +478,42 @@ function fnv1a32(s: string): string {
     h = (Math.imul(h, 0x01000193) >>> 0);
   }
   return h.toString(16);
+}
+
+// ── Manual JSON tool-request fallback parser ──────────────────────────────────
+// Gemma 4 sometimes emits tool requests as raw JSON instead of native tool_calls.
+// Supported shapes:
+//   { "tool": "trace.search", "args": { "query": "...", "limit": 10 } }
+//   { "tool": "rag_search",   "arguments": { ... } }
+// Tool names may use dot notation (trace.search) or underscores (trace_search).
+export function parseToolRequest(content: string): OllamaToolCall[] {
+  const s = content.trim();
+  // Only try to parse content that looks like a JSON object starting with {
+  if (!s.startsWith('{') && !s.startsWith('```')) return [];
+
+  // Strip optional ```json fences
+  const json = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+
+  let parsed: unknown;
+  try { parsed = JSON.parse(json); } catch { return []; }
+
+  if (typeof parsed !== 'object' || parsed === null) return [];
+  const obj = parsed as Record<string, unknown>;
+
+  // Must have a "tool" string field
+  if (typeof obj['tool'] !== 'string') return [];
+
+  // Normalize dot.notation → underscore for matching against AGENT_TOOLS
+  const name = (obj['tool'] as string).replace(/\./g, '_');
+  const args = (
+    typeof obj['args'] === 'object' && obj['args'] !== null
+      ? obj['args']
+      : typeof obj['arguments'] === 'object' && obj['arguments'] !== null
+        ? obj['arguments']
+        : {}
+  ) as Record<string, unknown>;
+
+  return [{ function: { name, arguments: args } }];
 }
 
 // ── In-process tool dispatch ───────────────────────────────────────────────────
@@ -918,9 +1062,21 @@ export async function runGemma4Agent(
     }
 
     const raw = rawResult as { content?: string; tool_calls?: OllamaToolCall[] } | string;
-    const msg: OllamaMessage = typeof raw === 'string'
-      ? { role: 'assistant', content: raw }
-      : { role: 'assistant', content: raw.content ?? '', tool_calls: raw.tool_calls };
+    const msgContent = typeof raw === 'string' ? raw : (raw.content ?? '');
+    let toolCalls: OllamaToolCall[] | undefined =
+      typeof raw !== 'string' ? raw.tool_calls : undefined;
+
+    // Manual JSON fallback: if no native tool_calls, try parsing the content
+    if (!toolCalls?.length && msgContent.trim()) {
+      const parsed = parseToolRequest(msgContent);
+      if (parsed.length) toolCalls = parsed;
+    }
+
+    const msg: OllamaMessage = {
+      role: 'assistant',
+      content: msgContent,
+      tool_calls: toolCalls,
+    };
 
     // Final answer — no tool calls
     if (!msg.tool_calls?.length) {
@@ -934,6 +1090,22 @@ export async function runGemma4Agent(
     // Execute each tool call in-process
     for (const tc of msg.tool_calls) {
       const { name, arguments: tArgs } = tc.function;
+
+      // Enforce allowlist — skip tools the caller has not opted into
+      const allowWrite  = options?.metadata?.allowWriteTools  === true;
+      const allowGated  = options?.metadata?.allowGatedTools  === true;
+      if (
+        ALLOWED_TOOLS.write.has(name) && !allowWrite ||
+        ALLOWED_TOOLS.gated.has(name) && !allowGated ||
+        (!ALLOWED_TOOLS.read.has(name) && !ALLOWED_TOOLS.write.has(name) && !ALLOWED_TOOLS.gated.has(name))
+      ) {
+        messages.push({
+          role:    'tool',
+          content: JSON.stringify({ error: `Tool "${name}" is not permitted in this context.` }),
+        });
+        continue;
+      }
+
       toolsUsed.push(name);
       if (SIDE_EFFECT_TOOLS.has(name)) hasSideEffect = true;
 
