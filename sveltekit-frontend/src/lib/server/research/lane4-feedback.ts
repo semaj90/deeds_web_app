@@ -172,7 +172,15 @@ export async function computeSourceBias(): Promise<SourceBiasSnapshot | null> {
 export async function getCachedSourceBias(): Promise<SourceBiasSnapshot | null> {
   try {
     const raw = await getRedis().get(SOURCE_BIAS_KEY);
-    return raw ? (JSON.parse(raw) as SourceBiasSnapshot) : null;
+    if (!raw) return null;
+    // simdjson conditional dispatch — fastJsonParse internally skips native for
+    // payloads < 1KB, so small snapshots use V8; large ones get AVX2 acceleration.
+    try {
+      const { fastJsonParse } = await import('$lib/server/gpu/simdjson-bridge.js');
+      return fastJsonParse<SourceBiasSnapshot>(raw);
+    } catch {
+      return JSON.parse(raw) as SourceBiasSnapshot;
+    }
   } catch {
     return null;
   }

@@ -82,7 +82,15 @@ export async function getShardChunks(docId: string, shardId: number): Promise<an
     const redis: Redis = getRedis();
     const chunksKey = `rag:doc:${docId}:shard:${shardId}:chunks`;
     const chunksJson = await redis.get(chunksKey);
-    return chunksJson ? JSON.parse(chunksJson) : [];
+    if (!chunksJson) return [];
+    // simdjson conditional dispatch — shard chunk blobs are typically multi-KB,
+    // well above the 1KB threshold where AVX2 parsing outperforms V8.
+    try {
+        const { fastJsonParse } = await import('$lib/server/gpu/simdjson-bridge.js');
+        return fastJsonParse<any[]>(chunksJson);
+    } catch {
+        return JSON.parse(chunksJson);
+    }
 }
 
 export async function updateShardStatus(
