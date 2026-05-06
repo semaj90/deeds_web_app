@@ -22,6 +22,7 @@ if (missing.length === 0) {
   // ── Detached background services (same pattern as llama-server.exe) ──
   const bgScripts = [
     path.join(scriptDir, 'ensure-search-engine.mjs'),
+    path.join(scriptDir, 'ensure-mcp-server.mjs'),
   ];
   for (const script of bgScripts) {
     if (existsSync(script)) {
