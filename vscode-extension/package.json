@@ -17,13 +17,75 @@
         "command": "deeds.showGraph",
         "title": "Deeds: Show Codebase Graph",
         "icon": "$(graph)"
+      },
+      {
+        "command": "deeds.refreshGraph",
+        "title": "Deeds: Refresh Graph",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "deeds.createClaudePlan",
+        "title": "Deeds: Create Claude Plan",
+        "icon": "$(export)"
+      },
+      {
+        "command": "deeds.askGemma4Selection",
+        "title": "Deeds: Ask Gemma4 About Selection",
+        "icon": "$(comment-discussion)"
       }
     ],
+    "views": {
+      "explorer": [
+        {
+          "id": "deedsGraphTree",
+          "name": "Deeds Clusters",
+          "icon": "$(graph)",
+          "contextualTitle": "Codebase Clusters"
+        }
+      ]
+    },
     "menus": {
       "editor/title": [
+        { "command": "deeds.showGraph", "group": "navigation" }
+      ],
+      "view/title": [
+        {
+          "command": "deeds.refreshGraph",
+          "when": "view == deedsGraphTree",
+          "group": "navigation"
+        },
         {
           "command": "deeds.showGraph",
+          "when": "view == deedsGraphTree",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "deeds.createClaudePlan",
+          "when": "view == deedsGraphTree && viewItem == cluster",
+          "group": "deeds@1"
+        },
+        {
+          "command": "deeds.createClaudePlan",
+          "when": "view == deedsGraphTree && viewItem == node",
+          "group": "deeds@1"
+        },
+        {
+          "command": "deeds.askGemma4Selection",
+          "when": "view == deedsGraphTree && viewItem == cluster",
+          "group": "deeds@2"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "deeds.askGemma4Selection",
+          "when": "editorHasSelection",
+          "group": "deeds@1"
+        },
+        {
+          "command": "deeds.createClaudePlan",
+          "group": "deeds@2"
         }
       ]
     }

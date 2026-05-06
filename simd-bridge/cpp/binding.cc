@@ -88,6 +88,15 @@ extern "C" int trainSOM(const float* data, int n, int dim, int grid_w, int grid_
                          int iters, float lr_init, float lr_final,
                          float radius_init, float radius_final,
                          float* weights_out, int weights_len, int* bmu_out, int bmu_len);
+extern "C" int autoencoderEncodeGPU(const float* input, int n, int input_dim,
+                                     const float* W, const float* b, int hidden,
+                                     float* output, int output_len);
+extern "C" int autoencoderDecodeGPU(const float* encoded, int n, int hidden,
+                                     const float* W, const float* b, int output_dim,
+                                     float* output, int output_len);
+extern "C" int pcaProjectGPU(const float* data, int n, int dim,
+                               const float* mean, const float* components, int k,
+                               float* output, int output_len);
 
 // LibTorch graph analysis (libtorch_graph.cc)
 extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* output, int output_len);
@@ -884,6 +893,108 @@ static napi_value PoolStatsWrapper(napi_env env, napi_callback_info info) {
   return obj;
 }
 
+// ── AutoencoderEncode(Float32Array input, n, inputDim, Float32Array W, Float32Array b, hidden)
+//    → Float32Array[n * hidden]
+static napi_value AutoencoderEncodeWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6; napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 6) return throw_type_error(env, "autoencoderEncode(input, n, inputDim, W, b, hidden)");
+
+  void* in_ptr; size_t in_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &in_len, &in_ptr, nullptr, nullptr);
+  void* w_ptr; size_t w_len;
+  napi_get_typedarray_info(env, argv[3], nullptr, &w_len, &w_ptr, nullptr, nullptr);
+  void* b_ptr; size_t b_len;
+  napi_get_typedarray_info(env, argv[4], nullptr, &b_len, &b_ptr, nullptr, nullptr);
+  int32_t n, input_dim, hidden;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &input_dim);
+  napi_get_value_int32(env, argv[5], &hidden);
+  if (n <= 0 || input_dim <= 0 || hidden <= 0)
+    return throw_type_error(env, "autoencoderEncode: invalid dimensions");
+
+  void* out_data; napi_value out_ab;
+  if (create_pooled_ab(env, (size_t)n * hidden * sizeof(float), &out_data, &out_ab) != napi_ok)
+    return throw_error(env, "autoencoderEncode: output allocation failed");
+
+  int rc = autoencoderEncodeGPU((const float*)in_ptr, n, input_dim,
+                                 (const float*)w_ptr, (const float*)b_ptr, hidden,
+                                 (float*)out_data, n * hidden);
+  if (rc < 0) return throw_error(env, "autoencoderEncode failed");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, (size_t)n * hidden, out_ab, 0, &result);
+  return result;
+}
+
+// ── AutoencoderDecode(Float32Array encoded, n, hidden, Float32Array W, Float32Array b, outputDim)
+//    → Float32Array[n * outputDim]
+static napi_value AutoencoderDecodeWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6; napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 6) return throw_type_error(env, "autoencoderDecode(encoded, n, hidden, W, b, outputDim)");
+
+  void* enc_ptr; size_t enc_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &enc_len, &enc_ptr, nullptr, nullptr);
+  void* w_ptr; size_t w_len;
+  napi_get_typedarray_info(env, argv[3], nullptr, &w_len, &w_ptr, nullptr, nullptr);
+  void* b_ptr; size_t b_len;
+  napi_get_typedarray_info(env, argv[4], nullptr, &b_len, &b_ptr, nullptr, nullptr);
+  int32_t n, hidden, output_dim;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &hidden);
+  napi_get_value_int32(env, argv[5], &output_dim);
+  if (n <= 0 || hidden <= 0 || output_dim <= 0)
+    return throw_type_error(env, "autoencoderDecode: invalid dimensions");
+
+  void* out_data; napi_value out_ab;
+  if (create_pooled_ab(env, (size_t)n * output_dim * sizeof(float), &out_data, &out_ab) != napi_ok)
+    return throw_error(env, "autoencoderDecode: output allocation failed");
+
+  int rc = autoencoderDecodeGPU((const float*)enc_ptr, n, hidden,
+                                  (const float*)w_ptr, (const float*)b_ptr, output_dim,
+                                  (float*)out_data, n * output_dim);
+  if (rc < 0) return throw_error(env, "autoencoderDecode failed");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, (size_t)n * output_dim, out_ab, 0, &result);
+  return result;
+}
+
+// ── PcaProject(Float32Array data, n, dim, Float32Array mean, Float32Array components, k)
+//    → Float32Array[n * k]
+static napi_value PcaProjectWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6; napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 6) return throw_type_error(env, "pcaProject(data, n, dim, mean, components, k)");
+
+  void* data_ptr; size_t data_len;
+  napi_get_typedarray_info(env, argv[0], nullptr, &data_len, &data_ptr, nullptr, nullptr);
+  void* mean_ptr; size_t mean_len;
+  napi_get_typedarray_info(env, argv[3], nullptr, &mean_len, &mean_ptr, nullptr, nullptr);
+  void* comp_ptr; size_t comp_len;
+  napi_get_typedarray_info(env, argv[4], nullptr, &comp_len, &comp_ptr, nullptr, nullptr);
+  int32_t n, dim, k;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &dim);
+  napi_get_value_int32(env, argv[5], &k);
+  if (n <= 0 || dim <= 0 || k <= 0 || k > dim)
+    return throw_type_error(env, "pcaProject: invalid dimensions");
+
+  void* out_data; napi_value out_ab;
+  if (create_pooled_ab(env, (size_t)n * k * sizeof(float), &out_data, &out_ab) != napi_ok)
+    return throw_error(env, "pcaProject: output allocation failed");
+
+  int rc = pcaProjectGPU((const float*)data_ptr, n, dim,
+                          (const float*)mean_ptr, (const float*)comp_ptr, k,
+                          (float*)out_data, n * k);
+  if (rc < 0) return throw_error(env, "pcaProject failed");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, (size_t)n * k, out_ab, 0, &result);
+  return result;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -909,6 +1020,9 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "topKIndicesGPU", TopKIndicesGPUWrapper);
   registerFn(env, exports, "kmeansWithCentroids", KmeansWithCentroidsWrapper);
   registerFn(env, exports, "trainSOM", TrainSOMWrapper);
+  registerFn(env, exports, "autoencoderEncode", AutoencoderEncodeWrapper);
+  registerFn(env, exports, "autoencoderDecode", AutoencoderDecodeWrapper);
+  registerFn(env, exports, "pcaProject", PcaProjectWrapper);
   // ArrayBuffer pool telemetry
   registerFn(env, exports, "poolStats", PoolStatsWrapper);
   // simdjson functions

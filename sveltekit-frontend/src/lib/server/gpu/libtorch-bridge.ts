@@ -144,6 +144,19 @@ interface NativeAddon {
   pageRankGPU?: (adj: Float32Array, n: number, damping: number, iters: number) => Float32Array;
   softmaxGPU?: (logits: Float32Array, n: number) => Float32Array;
   topKIndicesGPU?: (scores: Float32Array, n: number, k: number) => Int32Array;
+  // Topology projection (pytorch_graph.cc)
+  autoencoderEncode?: (
+    input: Float32Array, n: number, inputDim: number,
+    W: Float32Array, b: Float32Array, hidden: number
+  ) => Float32Array;
+  autoencoderDecode?: (
+    encoded: Float32Array, n: number, hidden: number,
+    W: Float32Array, b: Float32Array, outputDim: number
+  ) => Float32Array;
+  pcaProject?: (
+    data: Float32Array, n: number, dim: number,
+    mean: Float32Array, components: Float32Array, k: number
+  ) => Float32Array;
 }
 
 let addon: NativeAddon | null = null;
@@ -190,7 +203,7 @@ function ensureLibtorchInPath(): void {
 	process.env.PATH = currentPath;
 }
 
-function getAddon(): NativeAddon | null {
+export function getAddonInternal(): NativeAddon | null {
 	if (loadAttempted) return addon;
 	loadAttempted = true;
 
@@ -232,7 +245,7 @@ function nextPow2(n: number): number {
 	return p;
 }
 
-function acquireFloat32(n: number): Float32Array {
+export function acquireFloat32(n: number): Float32Array {
 	const cap = nextPow2(n);
 	const bucket = float32Pool.get(cap);
 	if (bucket && bucket.length > 0) {
@@ -243,7 +256,7 @@ function acquireFloat32(n: number): Float32Array {
 	return new Float32Array(cap).subarray(0, n) as Float32Array;
 }
 
-function releaseFloat32(arr: Float32Array): void {
+export function releaseFloat32(arr: Float32Array): void {
 	// Recover the backing buffer capacity (subarray shares buffer)
 	const cap = arr.buffer.byteLength / 4;
 	const bucket = float32Pool.get(cap) ?? [];
@@ -262,7 +275,7 @@ const CUDA_OOM_MIN_MB = 256;  // require at least 256 MB free VRAM for GPU ops
  * True if Node.js V8 heap has enough headroom for a CPU allocation.
  * Prevents OOM crash in CPU fallback paths for large embedding matrices.
  */
-function heapHasRoom(requiredBytes: number): boolean {
+export function heapHasRoom(requiredBytes: number): boolean {
 	const m = process.memoryUsage();
 	// heapTotal grows dynamically; headroom = uncommitted space before next GC forced expand
 	return (m.heapTotal - m.heapUsed) >= requiredBytes;
@@ -272,8 +285,8 @@ function heapHasRoom(requiredBytes: number): boolean {
 let _cudaMemFreeBuf: BigInt64Array | null = null;
 let _cudaMemTotalBuf: BigInt64Array | null = null;
 
-function gpuHasRoom(requiredMB: number): boolean {
-	const native = getAddon();
+export function gpuHasRoom(requiredMB: number): boolean {
+	const native = getAddonInternal();
 	if (!native?.getCudaMemory) return false;
 	if (!_cudaMemFreeBuf)  _cudaMemFreeBuf  = new BigInt64Array(1);
 	if (!_cudaMemTotalBuf) _cudaMemTotalBuf = new BigInt64Array(1);
@@ -288,7 +301,7 @@ function gpuHasRoom(requiredMB: number): boolean {
 }
 
 /** Minimum VRAM (MB) needed for a Float32 matrix of shape [n × dim]. */
-function vramNeededMB(n: number, dim: number): number {
+export function vramNeededMB(n: number, dim: number): number {
 	return (n * dim * 4) / (1024 * 1024); // bytes → MB
 }
 
@@ -466,7 +479,7 @@ export async function graphSimilarity(embeddings: number[][]): Promise<Similarit
 	const n = embeddings.length;
   const dim = embeddings[0]?.length ?? 0;
 
-  const native = getAddon();
+  const native = getAddonInternal();
   if (native?.graphSimilarity && n > 0 && dim > 0) {
     const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
@@ -510,7 +523,7 @@ export async function clusterEmbeddings(embeddings: number[][], k: number): Prom
 	const n = embeddings.length;
 	const dim = embeddings[0]?.length ?? 0;
 
-	const native = getAddon();
+	const native = getAddonInternal();
 	if (native?.clusterEmbeddings && n > 0 && dim > 0) {
 		const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
@@ -540,7 +553,7 @@ export async function computeCaseEmbedding(
 	const n = embeddings.length;
 	const dim = embeddings[0]?.length ?? 0;
 
-	const native = getAddon();
+	const native = getAddonInternal();
 	if (native?.computeCaseEmbedding && n > 0 && dim > 0) {
 		if (gpuHasRoom(vramNeededMB(n, dim) + CUDA_OOM_MIN_MB)) {
       const wArr = new Float32Array(weights);
@@ -576,7 +589,7 @@ export async function batchCosineSimilarity(
   const dim = query.length;
   if (n === 0 || dim === 0) return { scores: [], n: 0, source: 'cpu' };
 
-  const native = getAddon();
+  const native = getAddonInternal();
   if (native?.batchCosineSimilarity) {
     const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
@@ -675,7 +688,7 @@ export async function graphSimilarityHalf(embeddings: number[][]): Promise<HalfP
 	const dim = embeddings[0]?.length ?? 0;
 	if (n === 0 || dim === 0) return { matrix: [], n: 0, source: 'cpu' };
 
-	const native = getAddon();
+	const native = getAddonInternal();
   if (native?.graphSimilarityHalf) {
     const mb = vramNeededMB(n, dim) / 2; // FP16 is half the bytes
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
@@ -714,7 +727,7 @@ export interface ReLUResult      { output: number[]; n: number; source: 'gpu' | 
 export async function lstmAdd(a: number[], b: number[]): Promise<LSTMAddResult> {
   const n = Math.min(a.length, b.length);
   if (n === 0) return { output: [], n: 0, source: 'cpu' };
-  const native = getAddon();
+  const native = getAddonInternal();
   if (native?.lstmAdd) {
     try {
       const result = native.lstmAdd(new Float32Array(a), new Float32Array(b), n);
@@ -731,7 +744,7 @@ export async function lstmAdd(a: number[], b: number[]): Promise<LSTMAddResult> 
 export async function somCache(input: number[]): Promise<SOMCacheResult> {
 	const n = input.length;
 	if (n === 0) return { output: [], n: 0, source: 'cpu' };
-	const native = getAddon();
+	const native = getAddonInternal();
 	if (native?.somCache) {
     try {
       const result = native.somCache(new Float32Array(input), n);
@@ -787,7 +800,7 @@ export async function queryBmuCached(
     }
 
     // Try GPU forward pass via somCache kernel
-    const native = getAddon();
+    const native = getAddonInternal();
     let bmuIdx: number | null = null;
 
     if (native?.somCache) {
@@ -843,7 +856,7 @@ export async function attentionScoreChunks(
   if (n === 0) return [];
   const dim = queryEmbedding.length;
 
-  const native = getAddon();
+  const native = getAddonInternal();
   if (native?.attentionScoreGPU) {
     try {
       const query = new Float32Array(queryEmbedding);
@@ -870,7 +883,7 @@ export async function attentionScoreChunks(
 export async function dotProduct(a: number[], b: number[]): Promise<DotProductResult> {
 	const n = Math.min(a.length, b.length);
 	if (n === 0) return { value: 0, n: 0, source: 'cpu' };
-	const native = getAddon();
+	const native = getAddonInternal();
 	if (native?.dotProduct) {
     try {
       const result = native.dotProduct(new Float32Array(a), new Float32Array(b), n);
@@ -899,7 +912,7 @@ export async function dotProduct(a: number[], b: number[]): Promise<DotProductRe
 export async function scaleArray(input: number[], scalar: number): Promise<ScaleResult> {
 	const n = input.length;
 	if (n === 0) return { output: [], n: 0, source: 'cpu' };
-	const native = getAddon();
+	const native = getAddonInternal();
 	if (native?.scale) {
     try {
       const result = native.scale(new Float32Array(input), scalar, n);
@@ -916,7 +929,7 @@ export async function scaleArray(input: number[], scalar: number): Promise<Scale
 export async function reluActivation(input: number[]): Promise<ReLUResult> {
   const n = input.length;
   if (n === 0) return { output: [], n: 0, source: 'cpu' };
-  const native = getAddon();
+  const native = getAddonInternal();
   if (native?.relu) {
     try {
       const result = native.relu(new Float32Array(input), n);
@@ -933,7 +946,7 @@ export async function reluActivation(input: number[]): Promise<ReLUResult> {
 // ── CUDA / Memory diagnostics ──────────────────────────────────────────────────
 
 export function getCudaMemoryInfo(): CudaMemoryInfo {
-	const native = getAddon();
+	const native = getAddonInternal();
 	if (native?.getCudaMemory) {
 		if (!_cudaMemFreeBuf) _cudaMemFreeBuf = new BigInt64Array(1);
     if (!_cudaMemTotalBuf) _cudaMemTotalBuf = new BigInt64Array(1);
@@ -1083,13 +1096,13 @@ export function estimateGpuBytes(rows: number, cols: number): number {
 }
 
 export function isCudaAvailable(): boolean {
-  const native = getAddon();
+  const native = getAddonInternal();
   if (!native?.checkCudaAvailable) return false;
   return native.checkCudaAvailable() >= 1;
 }
 
 export function isCudnnAvailable(): boolean {
-  const native = getAddon();
+  const native = getAddonInternal();
   if (!native?.checkCudaAvailable) return false;
   return native.checkCudaAvailable() === 2;
 }
