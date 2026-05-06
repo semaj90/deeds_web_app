@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "description": "Graphify/Karpathy intelligence pipeline stage manifest",
+  "stages": [
+    {
+      "name": "codebase-index",
+      "script": "index:codebase:fast:resume",
+      "description": "AST scan → Qdrant embeddings + Redis KAG notes",
+      "outputs": [
+        "codebase_chunk_index",
+        "codebase_chunks_768",
+        "code:index:*",
+        "wiki:note:dir:*"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "gpu-topology",
+      "script": "graphify:topology:gpu",
+      "description": "Synthetic manifold4 coordinates from cluster topology + NES glyph atlas",
+      "outputs": [
+        "docs/graph/nes-glyph-architecture.json",
+        "docs/graph/multihop-codebase-map.json",
+        "topology_positions",
+        "manifold4"
+      ],
+      "dependsOn": ["codebase-index"]
+    },
+    {
+      "name": "tensor-analysis",
+      "script": "tensor:topology",
+      "description": "Classify topo_byte per file; optional CUDA pcaProject → manifold4; write tensor_analysis_cache",
+      "outputs": [
+        "tensor_analysis_cache",
+        "topo:byte:*",
+        "topo:manifold4:*",
+        "tensor:hash:*"
+      ],
+      "dependsOn": ["codebase-index"]
+    },
+    {
+      "name": "qdrant-payload-patch",
+      "script": "qdrant:patch-topology",
+      "description": "Mirror tensor_analysis_cache fields into Qdrant codebase_chunks_768 payload",
+      "outputs": [
+        "qdrant.payload.topo_byte",
+        "qdrant.payload.topo_hex",
+        "qdrant.payload.topo_class",
+        "qdrant.payload.manifold4",
+        "qdrant.payload.graphAuthorityScore"
+      ],
+      "dependsOn": ["tensor-analysis"]
+    },
+    {
+      "name": "neo4j-manifold-sync",
+      "script": "neo4j:manifold-sync",
+      "description": "Write File.manifold4X/Y/Z/W + HAS_TOPO_CLASS edges to Neo4j",
+      "outputs": [
+        "File.manifold4X",
+        "File.manifold4Y",
+        "File.manifold4Z",
+        "File.manifold4W",
+        "(:File)-[:HAS_TOPO_CLASS]->(:TopologyClass)"
+      ],
+      "dependsOn": ["tensor-analysis"]
+    },
+    {
+      "name": "som-topology",
+      "script": "graphify:som",
+      "description": "SOM BMU assignment + SIMILAR_TOPOLOGY Neo4j edges",
+      "outputs": [
+        "qdrant.payload.som_cluster",
+        "qdrant.payload.som_bmu_row",
+        "qdrant.payload.som_bmu_col",
+        "(:File)-[:SIMILAR_TOPOLOGY]->(:File)"
+      ],
+      "dependsOn": ["codebase-index"]
+    },
+    {
+      "name": "cluster-summaries",
+      "script": "graphify:cluster-summaries",
+      "description": "LLM cluster summaries + bow-tiles + BoW tile atlas",
+      "outputs": [
+        "cluster_centroids",
+        "codebase_chunk_index.cluster_summary",
+        "Redis bow:tile:*"
+      ],
+      "dependsOn": ["som-topology"]
+    },
+    {
+      "name": "gds-full",
+      "script": "neo4j:gds:full",
+      "description": "Neo4j GDS: project → PageRank → Louvain → KNN → authority mirror to Qdrant",
+      "outputs": [
+        "File.graphPageRank",
+        "File.louvainCommunity",
+        "(:File)-[:SIMILAR_GRAPH_NEIGHBOR]->()",
+        "qdrant.payload.graphAuthorityScore"
+      ],
+      "dependsOn": ["neo4j-manifold-sync", "som-topology"]
+    },
+    {
+      "name": "topology-validate",
+      "script": "topology:validate",
+      "description": "Validate nes-glyph-architecture.json contract (stableKey, manifold4, edges, clusters)",
+      "outputs": [],
+      "dependsOn": ["gpu-topology"]
+    },
+    {
+      "name": "tensor-cache-smoke",
+      "script": "tensor:cache:verify",
+      "description": "Smoke test tensor_analysis_cache + Redis topo:byte + Qdrant payload presence",
+      "outputs": [],
+      "dependsOn": ["qdrant-payload-patch"]
+    }
+  ],
+  "pipelines": {
+    "fast-daily": [
+      "codebase-index",
+      "tensor-analysis",
+      "qdrant-payload-patch",
+      "topology-validate"
+    ],
+    "full": [
+      "codebase-index",
+      "gpu-topology",
+      "tensor-analysis",
+      "qdrant-payload-patch",
+      "neo4j-manifold-sync",
+      "som-topology",
+      "cluster-summaries",
+      "gds-full",
+      "topology-validate",
+      "tensor-cache-smoke"
+    ]
+  },
+  "cacheKeys": {
+    "topoBytePrefix": "topo:byte:",
+    "topoManifold4Prefix": "topo:manifold4:",
+    "tensorHashPrefix": "tensor:hash:",
+    "tensorAnalysisPrefix": "tensor:analysis:",
+    "aceQuickPrefix": "ace:quick:",
+    "mapreduceOffsetKey": "tensor:mapreduce:offset"
+  },
+  "tables": {
+    "tensorAnalysisCache": "tensor_analysis_cache",
+    "topologyPositions": "topology_positions",
+    "topologySnapshots": "topology_snapshots"
+  },
+  "qdrantCollection": "codebase_chunks_768",
+  "neo4jProjection": "codeTopology"
+}
