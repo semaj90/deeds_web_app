@@ -1121,10 +1121,23 @@ export async function queryTopHyperedges(
     .catch(() => [] as string[]);
   if (!hashes.length) return [];
   const raw = await redis.mget(hashes.map(h => HG_EDGE_KEY(h))).catch(() => [] as (string|null)[]);
+
+  // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. HyperEdge records carry
+  // node arrays + tags + grade metadata — typical 2-6KB per edge so 10+
+  // hyperedges easily clear the threshold.
+  const totalChars = raw.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+  let parseFn: (s: string) => HyperEdge = (s) => JSON.parse(s) as HyperEdge;
+  if (raw.length >= 10 && totalChars >= 5_000) {
+    try {
+      const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+      if (isSimdJsonAvailable()) parseFn = fastJsonParse<HyperEdge>;
+    } catch { /* addon unavailable — keep V8 */ }
+  }
+
   const out: HyperEdge[] = [];
   for (const r of raw) {
     if (!r) continue;
-    try { out.push(JSON.parse(r) as HyperEdge); } catch { /* */ }
+    try { out.push(parseFn(r)); } catch { /* */ }
   }
   return out;
 }
