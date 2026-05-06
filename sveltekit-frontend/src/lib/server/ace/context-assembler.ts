@@ -79,7 +79,7 @@ import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 import { computeManifold4Centroid } from '$lib/server/retrieval/manifold4-search.js';
 import type { Manifold4Point } from '$lib/server/retrieval/manifold4-search.js';
-import { classifyQuery, TOPO_CLASS } from '$lib/server/tensor/topology-byte-mapper.js';
+import { classifyQuery, TOPO_CLASS, TOPO_CLASS_LABEL } from '$lib/server/tensor/topology-byte-mapper.js';
 import {
   getTopoCandidates,
   setTopoCandidates,
@@ -87,6 +87,7 @@ import {
   queryHash as topoQueryHash,
 } from '$lib/server/cache/topo-candidate-cache.js';
 import type { TopoPrefilterStats } from '$lib/server/cache/topo-candidate-cache.js';
+import { aceCodeKey, TTL } from '$lib/server/cache-keys.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -339,6 +340,9 @@ export async function assembleACEContext(opts: {
         dates: [] as string[],
       };
 
+      // Mutable ref: fetchCodebaseContext writes topoPrefilter/graphAuthority/manifold4 here
+      const codebaseFetchStats: CodebaseFetchStats = {};
+
       // Run all data fetches in parallel (includes optional web search)
       // Tiered retrieval: KB (corpus) + Case (evidence) run as one call, split internally
       const [
@@ -374,7 +378,7 @@ export async function assembleACEContext(opts: {
           ? fetchUserAnalyticsContext(userId, query, caseId).catch(() => null)
           : Promise.resolve(null),
         opts.enableCodebaseContext
-          ? fetchCodebaseContext(query, userId ?? undefined, opts.filePath).catch(() => null)
+          ? fetchCodebaseContext(query, userId ?? undefined, opts.filePath, codebaseFetchStats).catch(() => null)
           : Promise.resolve(null),
         fetchTopQueryTags(5).catch(() => [] as string[]),
         fetchWebResearchRows(query).catch(
@@ -848,7 +852,11 @@ export async function assembleACEContext(opts: {
         metadata: {
           action: policyDecision.action,
           budgetTier: policyDecision.budget.tier,
-          latencyMs: Date.now() - policyStartedAt
+          latencyMs: Date.now() - policyStartedAt,
+          ...(codebaseFetchStats.topoPrefilter  && { topoPrefilter:  codebaseFetchStats.topoPrefilter }),
+          ...(codebaseFetchStats.graphAuthority && { graphAuthority: codebaseFetchStats.graphAuthority }),
+          ...(codebaseFetchStats.manifold4      && { manifold4:      codebaseFetchStats.manifold4 }),
+          ...(codebaseFetchStats.aceCodeCache   && { aceCodeCache:   codebaseFetchStats.aceCodeCache }),
         }
       }).catch((err) => console.warn('[ACE Run Log] failed:', (err as Error)?.message ?? err));
 
@@ -2380,10 +2388,47 @@ function extractGlossaryCandidateTerms(query: string): { exact: string[]; prefix
   return { exact, prefix };
 }
 
+/** Fire-and-forget write of boosted chunks to the ACE code cache. */
+function writeAceCodeCache(
+  query:       string,
+  topoClass:   number,
+  resolvedDir: string | undefined,
+  chunks:      NonNullable<ACEContext['codebaseContext']>,
+): void {
+  if (!chunks.length) return;
+  import('$lib/server/redis.js').then(({ getRedis }) => {
+    const key     = aceCodeKey.forQuery(query, topoClass, resolvedDir);
+    const payload = JSON.stringify(chunks.slice(0, 20));
+    getRedis().setex(key, TTL.ACE_CODE, payload).catch(() => {});
+  }).catch(() => {});
+}
+
+/** Stats collected during a codebase context fetch — surfaced in retrieval run logs. */
+export interface CodebaseFetchStats {
+  topoPrefilter?: TopoPrefilterStats;
+  graphAuthority?: {
+    used: boolean;
+    source: 'qdrant_payload';
+    score: number;
+    zeroRtt: true;
+  };
+  manifold4?: {
+    used: boolean;
+    boost: number;
+  };
+  aceCodeCache?: {
+    used: boolean;
+    hit: boolean;
+    key?: string;
+    chunks?: number;
+  };
+}
+
 async function fetchCodebaseContext(
   query: string,
   userId?: string,
   filePath?: string,
+  statsOut?: CodebaseFetchStats,
 ): Promise<ACEContext['codebaseContext']> {
   try {
     // Resolve nearest AGENTS.md directory from filePath via a Redis walk-up.
@@ -2409,9 +2454,70 @@ async function fetchCodebaseContext(
       } catch { /* non-fatal — boost just won't apply */ }
     }
 
-    // Centroid-based cluster pre-filter: resolve embedding once, find nearest
-    // GPU cluster in O(1) Redis scan, then scope Qdrant to that cluster.
-    // Falls back gracefully (no filter) when centroids aren't seeded.
+    // ── Stage 0: ACE codebase hit cache (ace:code:{qHash}:{topo}:{dirHash}) ──
+    // Check Redis for a cached boosted chunk array from a recent identical query.
+    // Keyed by query + topo class + agentsMd directory scope.
+    // TTL 15 min — short enough to reflect new graph indexing runs.
+    let aceCodeCacheHit = false;
+    try {
+      const { getRedis } = await import('$lib/server/redis.js');
+      const topoClassForKey = classifyQuery(query);
+      const cacheKey        = aceCodeKey.forQuery(query, topoClassForKey, agentsMdResolvedDir);
+      const rawCached       = await getRedis().get(cacheKey);
+      if (rawCached) {
+        const parsed = JSON.parse(rawCached) as NonNullable<ACEContext['codebaseContext']>;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          aceCodeCacheHit = true;
+          if (statsOut) {
+            statsOut.aceCodeCache = { used: true, hit: true, key: cacheKey, chunks: parsed.length };
+            statsOut.topoPrefilter = {
+              used: true, queryClass: TOPO_CLASS_LABEL[topoClassForKey] ?? 'unclassified',
+              topoClass: topoClassForKey, cacheHit: true,
+              candidateCount: parsed.length, candidateReduction: null,
+              queryHash: topoQueryHash(query),
+            };
+          }
+          return parsed;
+        }
+      }
+    } catch { /* non-fatal — proceed to live fetch */ }
+    if (!aceCodeCacheHit && statsOut) {
+      statsOut.aceCodeCache = { used: true, hit: false };
+    }
+
+    // ── Stage 1: topo-byte candidate cache (ace:topo:{class}:{hash}) ──────────
+    // classifyQuery assigns one of 8 topology classes from the query terms.
+    // Cache hit → use stored stableKeys + topo_class Qdrant filter, skip ANN.
+    // Cache miss → Qdrant topo_class-filtered ANN, then store results (5-min TTL).
+    let topoFilter: Record<string, unknown> | undefined;
+    let topoPrefilterStats: TopoPrefilterStats | undefined;
+    try {
+      const queryClass  = classifyQuery(query);
+      const qHash       = topoQueryHash(query);
+      if (queryClass !== TOPO_CLASS.UNCLASSIFIED) {
+        const cached = await getTopoCandidates(queryClass, query);
+        if (cached && cached.length > 0) {
+          topoPrefilterStats = buildTopoPrefilterStats({
+            used: true, topoClass: queryClass, cacheHit: true,
+            candidateCountAfter: cached.length,
+            qdrantCollectionEstimate: null, queryHash: qHash,
+          });
+          // Filter Qdrant to the class label stored in payload (e.g. "graph-gpu-topology")
+          topoFilter = { must: [{ key: 'topo_class', match: { value: TOPO_CLASS_LABEL[queryClass] } }] };
+        } else {
+          // Cache miss — apply topo_class filter to Qdrant; results will seed cache below
+          topoFilter = { must: [{ key: 'topo_class', match: { value: TOPO_CLASS_LABEL[queryClass] } }] };
+          topoPrefilterStats = buildTopoPrefilterStats({
+            used: true, topoClass: queryClass, cacheHit: false,
+            candidateCountAfter: 0, qdrantCollectionEstimate: null, queryHash: qHash,
+          });
+        }
+      }
+    } catch { /* non-fatal — proceed without topo prefilter */ }
+
+    // ── Stage 2: centroid-based GPU-cluster pre-filter ─────────────────────
+    // Resolves query embedding once → Redis MGET nearest centroid (O(k)).
+    // Falls back gracefully when centroids aren't seeded.
     let clusterFilter: Record<string, unknown> | undefined;
     try {
       const emb = await generateSingleEmbedding(query);
@@ -2419,10 +2525,15 @@ async function fetchCodebaseContext(
         const hit = await nearestCluster(new Float32Array(emb), 50);
         if (hit && hit.similarity > 0.35) {
           clusterFilter = { must: [{ key: 'neo4j_gpuCluster', match: { value: hit.clusterId } }] };
-          console.log(`[ACE Codebase] Centroid pre-filter → cluster=${hit.clusterId} (sim=${hit.similarity.toFixed(3)})`);
         }
       }
     } catch { /* non-fatal — continue without cluster pre-filter */ }
+
+    // Merge topo + cluster filters (both must-clauses stack cleanly)
+    const combinedFilter: Record<string, unknown> | undefined =
+      topoFilter && clusterFilter
+        ? { must: [...(topoFilter.must as unknown[]), ...(clusterFilter.must as unknown[])] }
+        : (topoFilter ?? clusterFilter);
 
     // Fetch broader initial set so the reranker has candidates to work with
     const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
@@ -2430,7 +2541,7 @@ async function fetchCodebaseContext(
       limit: 20,
       contentWeight: 0.6,
       signatureWeight: 0.4,
-      ...(clusterFilter ? { filter: clusterFilter } : {}),
+      ...(combinedFilter ? { filter: combinedFilter } : {}),
     });
 
     if (!results.length) return null;
@@ -2457,6 +2568,28 @@ async function fetchCodebaseContext(
       // Pre-computed by nightly GDS job; avoids Neo4j RTT per ACE call
       graphAuthorityScore: r.chunk.graph_authority_score != null ? Number(r.chunk.graph_authority_score) : null,
     });
+
+    // Seed topo cache on miss (fire-and-forget) — stableKey + score from Qdrant results
+    if (topoPrefilterStats && !topoPrefilterStats.cacheHit && results.length > 0) {
+      try {
+        const entries = results.map((r) => ({
+          stableKey: String(r.chunk.stableKey ?? r.chunk.path ?? ''),
+          score:     r.score,
+          path:      (r.chunk.path ?? r.chunk.relativePath ?? undefined) as string | undefined,
+        }));
+        const qc = classifyQuery(query);
+        setTopoCandidates(qc, query, entries).catch(() => {});
+        topoPrefilterStats = buildTopoPrefilterStats({
+          used: true,
+          cacheHit: false,
+          topoClass: topoPrefilterStats.topoClass,
+          queryHash: topoPrefilterStats.queryHash,
+          candidateCountAfter: entries.length,
+          qdrantCollectionEstimate: null,
+        });
+      } catch { /* non-fatal */ }
+    }
+    if (statsOut && topoPrefilterStats) statsOut.topoPrefilter = topoPrefilterStats;
 
     // Step 3 — cross-encoder reranker pass (noFallback prevents web search on code queries)
     if (results.length > 1) {
@@ -2501,7 +2634,25 @@ async function fetchCodebaseContext(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const boosted = await applyTopologicalBoostAsync(unsorted as any, { queryBmu, manifold4Center });
 
-          return await applyKarpathyBoost(boosted.slice(0, 10) as any, query, agentsMdResolvedDir);
+          // Collect graphAuthority + manifold4 stats for retrieval run log
+          if (statsOut) {
+            const authScores = boosted
+              .map((c) => (c as unknown as { graphAuthorityScore?: number | null }).graphAuthorityScore)
+              .filter((s): s is number => s != null);
+            if (authScores.length > 0) {
+              statsOut.graphAuthority = {
+                used: true,
+                source: 'qdrant_payload',
+                score: Math.max(...authScores),
+                zeroRtt: true,
+              };
+            }
+            statsOut.manifold4 = { used: manifold4Center != null, boost: 0.16 };
+          }
+
+          const finalChunks = await applyKarpathyBoost(boosted.slice(0, 10) as any, query, agentsMdResolvedDir);
+          writeAceCodeCache(query, classifyQuery(query), agentsMdResolvedDir, finalChunks ?? []);
+          return finalChunks;
         }
       } catch {
         // Reranker unavailable — fall through to cosine-only results below
@@ -2509,7 +2660,7 @@ async function fetchCodebaseContext(
     }
 
     // Fallback: cosine-score filtering only + Karpathy boost
-    return await applyKarpathyBoost(
+    const fallbackChunks = await applyKarpathyBoost(
       results
         .filter((r) => r.score >= 0.5)
         .slice(0, 10)
@@ -2517,6 +2668,8 @@ async function fetchCodebaseContext(
       query,
       agentsMdResolvedDir,
     );
+    writeAceCodeCache(query, classifyQuery(query), agentsMdResolvedDir, fallbackChunks ?? []);
+    return fallbackChunks;
   } catch (err) {
     console.warn('[ACE context] codebase context fetch failed:', (err as Error)?.message ?? err);
     return null;
