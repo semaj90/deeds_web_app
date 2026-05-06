@@ -461,6 +461,10 @@ const ALLOWED_TOOLS = {
     'rag_search', 'case_search', 'memory_recall', 'hyperedge_stats',
     'topology_search', 'trace_search', 'agents_md', 'read_file',
     'graph_search', 'wiki_note_lookup', 'audit_hotspots', 'web_search',
+    // TRACE MCP graph tools (proxy to :8788)
+    'graph_expand', 'graph_path', 'graph_community', 'graph_pagerank',
+    'graph.expand_neighborhood', 'graph.shortest_path',
+    'graph.community_for_node', 'graph.pagerank_top',
   ]),
   write: new Set([
     'apply_shadow_patch', 'revert_fix', 'verify_fix',
@@ -514,6 +518,34 @@ export function parseToolRequest(content: string): OllamaToolCall[] {
   ) as Record<string, unknown>;
 
   return [{ function: { name, arguments: args } }];
+}
+
+// ── TRACE MCP proxy helper ────────────────────────────────────────────────────
+// Calls a tool on the standalone TRACE MCP HTTP server at :8788.
+// Non-fatal: returns null if the server is not running.
+const TRACE_MCP_URL = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
+
+async function callTraceMcp(toolName: string, toolArgs: Record<string, unknown>): Promise<unknown> {
+  try {
+    const res = await fetch(`${TRACE_MCP_URL}/mcp`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        jsonrpc: '2.0',
+        id:      1,
+        method:  'tools/call',
+        params:  { name: toolName, arguments: toolArgs },
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) return { error: `TRACE MCP HTTP ${res.status}` };
+    const body = await res.json() as { result?: { content?: Array<{ text?: string }> }; error?: unknown };
+    const text = body.result?.content?.[0]?.text;
+    if (!text) return body.error ?? null;
+    try { return JSON.parse(text); } catch { return text; }
+  } catch (e) {
+    return { error: `TRACE MCP unavailable: ${(e as Error).message}` };
+  }
 }
 
 // ── In-process tool dispatch ───────────────────────────────────────────────────
@@ -894,6 +926,36 @@ async function dispatchTool(
           tags: h.payload?.tags
         }))
       };
+    }
+
+    // ── TRACE MCP graph tools — proxy to :8788 ─────────────────────────────
+    if (name === 'graph_expand' || name === 'graph.expand_neighborhood') {
+      const stableKey = String(args.stableKey ?? '');
+      const depth     = Math.min(Math.max(Number(args.depth ?? 2), 1), 3);
+      const limit     = Math.min(Number(args.limit ?? 30), 80);
+      const data = await callTraceMcp('graph.expand_neighborhood', { stableKey, depth, limit });
+      return { tool: name, result: data };
+    }
+
+    if (name === 'graph_path' || name === 'graph.shortest_path') {
+      const fromKey = String(args.fromKey ?? '');
+      const toKey   = String(args.toKey ?? '');
+      const maxHops = Math.min(Number(args.maxHops ?? 5), 8);
+      const data = await callTraceMcp('graph.shortest_path', { fromKey, toKey, maxHops });
+      return { tool: name, result: data };
+    }
+
+    if (name === 'graph_community' || name === 'graph.community_for_node') {
+      const stableKey = String(args.stableKey ?? '');
+      const data = await callTraceMcp('graph.community_for_node', { stableKey });
+      return { tool: name, result: data };
+    }
+
+    if (name === 'graph_pagerank' || name === 'graph.pagerank_top') {
+      const limit    = Math.min(Number(args.limit ?? 15), 50);
+      const nodeType = args.nodeType ? String(args.nodeType) : undefined;
+      const data = await callTraceMcp('graph.pagerank_top', { limit, ...(nodeType ? { nodeType } : {}) });
+      return { tool: name, result: data };
     }
 
     return { tool: name, result: null, errorMsg: `Unknown tool: ${name}` };
