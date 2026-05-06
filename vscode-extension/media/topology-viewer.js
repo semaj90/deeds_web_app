@@ -25,6 +25,9 @@
 (function() {
   const vscode = acquireVsCodeApi();
 
+  // Signal extension host that the script has executed and is ready for data.
+  vscode.postMessage({ type: 'ready' });
+
   // ── State ─────────────────────────────────────────────────────────────────
   let state = vscode.getState() || { zoom: 1, panX: 0, panY: 0, selectedId: null };
 
@@ -226,6 +229,9 @@
 
       buf.destroy(); readBuf.destroy();
       draw(); // re-render with improved positions
+      window.dispatchEvent(new CustomEvent('deedsDataLoaded', {
+        detail: { nodeCount: nodes.length, edgeCount: edges.length, gpuBoosted: true }
+      }));
     } catch { /* WebGPU failed — Canvas render already showing CPU layout */ }
   }
 
@@ -365,6 +371,10 @@
       clusters = msg.clusters ?? [];
       initLayout();
       draw();
+      // Notify overlay of counts; gpuBoosted updated by tryWebGpuBoost below
+      window.dispatchEvent(new CustomEvent('deedsDataLoaded', {
+        detail: { nodeCount: nodes.length, edgeCount: edges.length, gpuBoosted: false }
+      }));
       tryWebGpuBoost(); // non-blocking — updates positions if GPU is available
     } else if (msg.type === 'highlight') {
       highlighted = new Set(msg.ids ?? []);
