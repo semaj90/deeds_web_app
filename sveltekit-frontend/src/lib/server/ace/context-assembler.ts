@@ -79,6 +79,7 @@ import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 import { computeManifold4Centroid } from '$lib/server/retrieval/manifold4-search.js';
 import type { Manifold4Point } from '$lib/server/retrieval/manifold4-search.js';
+import { classifyQuery, TOPO_CLASS } from '$lib/server/tensor/topology-byte-mapper.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -144,8 +145,14 @@ async function fetchACPKnowledgeResults(
 
     let filters: any = undefined;
 
-    // Stage A: Directory Summary Search (if codebase chunks)
+    // Stage A: Directory Summary Search + topo_class prefilter (codebase chunks only)
     if (collection === 'codebase_chunks_768') {
+      // Stage A0: topo_class prefilter — restricts ANN sweep to the most likely class
+      const queryClass = classifyQuery(query);
+      if (queryClass !== TOPO_CLASS.UNCLASSIFIED) {
+        filters = { topo_class: queryClass };
+      }
+
       try {
         const dirHits = await qdrant.hybridSearch({
           collection: 'directory_summaries_768',
@@ -156,9 +163,9 @@ async function fetchACPKnowledgeResults(
         const dirs = dirHits.results
           .map((h) => h.payload?.['directory_path'])
           .filter(Boolean) as string[];
-        
+
         if (dirs.length > 0) {
-          filters = { directory_path: dirs };
+          filters = { ...(filters ?? {}), directory_path: dirs };
         }
       } catch (e) {
         console.warn('Stage A directory search failed or skipped:', e);
