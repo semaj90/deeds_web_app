@@ -18,9 +18,11 @@
  *   - Heap pressure check before large CPU allocations → prevents Node.js OOM
  */
 
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
 import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import { Worker } from 'worker_threads';
 
 const esmRequire = createRequire(import.meta.url);
 
@@ -1239,4 +1241,172 @@ export function reconstructionMse(
   }
   mse /= dim;
   return normalize ? mse * dim / 2 : mse;
+}
+
+// ── Async GPU worker wrappers ─────────────────────────────────────────────────
+//
+// Heavy synchronous N-API calls (kmeansWithCentroids n=2000: ~400ms, trainSOM: ~50ms)
+// would block the Node.js event loop entirely.  These wrappers move the work to a
+// worker thread (worker_threads) so the main loop stays responsive.
+//
+// The worker script (gpu-worker.mjs) loads the native addon, calls the sync function,
+// then copies results to fresh ArrayBuffers and transfers them back (zero-copy transfer,
+// not structured-clone copy — the send buffer is detached and the receive end owns it).
+//
+// Threshold: ops expected to take >10ms on the target corpus size use async; ops that
+// stay under 10ms on any realistic input (batchCosineSimilarity, attentionScoreGPU,
+// graphSimilarity with n<100) stay synchronous.
+
+let _addonPath: string | null = null;
+let _libPath: string | null   = null;
+
+function getWorkerPaths(): { addonPath: string; libPath: string; workerScriptPath: string } {
+  if (!_addonPath) {
+    // Resolve addon path using __dirname equivalent — absolute so the worker
+    // can require() it regardless of its own cwd.
+    const thisDir = dirname(fileURLToPath(import.meta.url));
+    const cwd = process.cwd();
+    const candidates = [
+      resolve(thisDir, '../../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+      resolve(cwd, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+      resolve(cwd, '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+    ];
+    _addonPath = candidates.find(existsSync) ?? candidates[0];
+
+    // Mirror the PATH additions from getAddonInternal
+    const libCandidates = [
+      'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
+      '/usr/local/lib/libtorch/lib',
+    ];
+    _libPath = libCandidates.find(existsSync) ?? '';
+  }
+
+  const workerScriptPath = resolve(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../../lib/workers/gpu-worker.mjs',
+  );
+
+  return { addonPath: _addonPath!, libPath: _libPath!, workerScriptPath };
+}
+
+function runGpuWorker<T>(fn: string, args: unknown[]): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const { addonPath, libPath, workerScriptPath } = getWorkerPaths();
+
+    // Collect transferable ArrayBuffers from args (Float32Array / Int32Array inputs)
+    const transferList: ArrayBuffer[] = [];
+    const argsCloned = args.map((a) => {
+      if (a instanceof Float32Array || a instanceof Int32Array) {
+        // Copy to a fresh ArrayBuffer so the caller retains usable data and
+        // the worker receives its own copy (avoids detach-on-transfer issues).
+        const buf: ArrayBuffer = a.buffer instanceof SharedArrayBuffer
+          ? new Uint8Array(a.buffer, a.byteOffset, a.byteLength).slice().buffer as ArrayBuffer
+          : (a.buffer as ArrayBuffer).slice(a.byteOffset, a.byteOffset + a.byteLength);
+        transferList.push(buf);
+        return a instanceof Float32Array ? new Float32Array(buf) : new Int32Array(buf);
+      }
+      return a;
+    });
+
+    let w: Worker;
+    try {
+      w = new Worker(workerScriptPath, {
+        workerData: { fn, addonPath, libPath, args: argsCloned },
+        transferList,
+      });
+    } catch (e) {
+      return reject(e);
+    }
+
+    const tid = setTimeout(() => {
+      w.terminate();
+      reject(new Error(`gpu-worker: ${fn} timed out after 120s`));
+    }, 120_000);
+
+    w.once('message', (msg: { ok: boolean; result?: T; error?: string }) => {
+      clearTimeout(tid);
+      w.terminate();
+      if (msg.ok) resolve(msg.result as T);
+      else reject(new Error(msg.error ?? 'gpu-worker: unknown error'));
+    });
+    w.once('error', (err) => { clearTimeout(tid); reject(err); });
+  });
+}
+
+export interface KmeansWithCentroidsResult {
+  assignments: Int32Array;
+  centroids:   Float32Array;
+  reseeded:    number;
+  source:      'gpu' | 'cpu';
+}
+
+/**
+ * Async k-means with centroids — offloads to worker thread to avoid blocking
+ * the event loop (n=2000 takes ~400ms on CPU, ~25ms on GPU).
+ */
+export async function kmeansWithCentroidsAsync(
+  embeddings: Float32Array,
+  n:          number,
+  dim:        number,
+  k:          number,
+  maxIters = 20,
+): Promise<KmeansWithCentroidsResult> {
+  const result = await runGpuWorker<{ assignments: Int32Array; centroids: Float32Array; reseeded: number }>(
+    'kmeansWithCentroids',
+    [embeddings, n, dim, k, maxIters],
+  );
+  return { ...result, source: isCudaAvailable() ? 'gpu' : 'cpu' };
+}
+
+export interface TrainSOMResult {
+  weights: Float32Array;  // [gridW * gridH * dim]
+  bmu:     Int32Array;    // [n] best-matching unit index per sample
+  source:  'gpu' | 'cpu';
+}
+
+/**
+ * Async SOM training — offloads to worker thread (n=500 takes ~50ms on CPU).
+ */
+export async function trainSOMAsync(
+  data:       Float32Array,
+  n:          number,
+  dim:        number,
+  gridW:      number,
+  gridH:      number,
+  iters:      number,
+  lrInit:     number,
+  lrFinal:    number,
+  radInit:    number,
+  radFinal:   number,
+): Promise<TrainSOMResult> {
+  const result = await runGpuWorker<{ weights: Float32Array; bmu: Int32Array }>(
+    'trainSOM',
+    [data, n, dim, gridW, gridH, iters, lrInit, lrFinal, radInit, radFinal],
+  );
+  return { ...result, source: isCudaAvailable() ? 'gpu' : 'cpu' };
+}
+
+/**
+ * Async graphSimilarity — for n > 100 (n*n comparisons become expensive).
+ * Returns n×n cosine similarity matrix as a flat Float32Array.
+ */
+export async function graphSimilarityAsync(
+  embeddings: Float32Array,
+  n:          number,
+  dim:        number,
+): Promise<{ matrix: Float32Array; n: number; source: 'gpu' | 'cpu' }> {
+  const result = await runGpuWorker<Float32Array>('graphSimilarity', [embeddings, n, dim]);
+  return { matrix: result, n, source: isCudaAvailable() ? 'gpu' : 'cpu' };
+}
+
+/**
+ * Async pageRankGPU — for large graphs (n > 500).
+ */
+export async function pageRankGPUAsync(
+  adj:     Float32Array,
+  n:       number,
+  damping  = 0.85,
+  iters    = 30,
+): Promise<Float32Array> {
+  return runGpuWorker<Float32Array>('pageRankGPU', [adj, n, damping, iters]);
 }
