@@ -57,7 +57,7 @@
       <button class="btn btn-primary" onclick={() => goto('/')}>
         Go Home
       </button>
-      <button class="btn btn-ghost" onclick={() => window.history.back()}>
+      <button class="btn btn-ghost" onclick={() => history.back()}>
         Go Back
       </button>
     </div>
