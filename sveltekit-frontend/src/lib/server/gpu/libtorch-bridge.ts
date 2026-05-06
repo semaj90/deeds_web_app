@@ -84,7 +84,7 @@ export interface NativeAddonPoolStats {
   totalCapacityBytes: number;
 }
 
-interface NativeAddon {
+export interface NativeAddon {
   bridgeSIMD: (json: string) => number;
   checkCudaAvailable: () => number;
   graphSimilarity?: (embeddings: Float32Array, n: number, dim: number) => Float32Array;
@@ -475,12 +475,28 @@ function cpuWeightedEmbedding(weights: number[], embeddings: number[][]): number
  * GPU: libtorch CUDA matmul. CPU: L2-cache-blocked, 8× unrolled dot product.
  * CUDA OOM guard: skips GPU if <256 MB VRAM free.
  */
+// P1: hard N-cap — n×n result matrix grows as O(n²). At n=2048 that is
+// 2048²×4 bytes = 16 MB (manageable); at n=4096 it is 64 MB on VRAM + 64 MB
+// copy-back, which saturates the 8 GB GPU budget alongside model weights.
+// C++ hard cap is MAX_N_SIMILARITY=4096 (libtorch_graph.cc:61); TS cap is stricter.
+export const GRAPH_SIM_MAX_N = 2048;
+
 export async function graphSimilarity(embeddings: number[][]): Promise<SimilarityResult> {
 	const n = embeddings.length;
   const dim = embeddings[0]?.length ?? 0;
 
+  if (n === 0 || dim === 0) return { matrix: [], n: 0, source: 'cpu' };
+
+  // P1: reject before allocating anything — gives a clear, actionable message
+  if (n > GRAPH_SIM_MAX_N) {
+    throw new RangeError(
+      `[libtorch-bridge] graphSimilarity: n=${n} exceeds hard cap ${GRAPH_SIM_MAX_N}. ` +
+      `Slice your input or use batchCosineSimilarity for pairwise scores instead.`
+    );
+  }
+
   const native = getAddonInternal();
-  if (native?.graphSimilarity && n > 0 && dim > 0) {
+  if (native?.graphSimilarity) {
     const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
       const flat = acquireFloat32(n * dim);
@@ -492,8 +508,8 @@ export async function graphSimilarity(embeddings: number[][]): Promise<Similarit
           matrix.push(Array.from(result.subarray(i * n, (i + 1) * n)));
         }
         return { matrix, n, source: 'gpu' };
-      } catch {
-        // fall through to CPU
+      } catch (err) {
+        console.warn(`[libtorch-bridge] graphSimilarity GPU failed (${(err as Error)?.message ?? err}), falling back to CPU`);
       } finally {
         releaseFloat32(flat);
       }
@@ -523,24 +539,44 @@ export async function clusterEmbeddings(embeddings: number[][], k: number): Prom
 	const n = embeddings.length;
 	const dim = embeddings[0]?.length ?? 0;
 
+  // P0: k > n would leave empty clusters with undefined centroids → NaN propagation
+  if (n === 0 || dim === 0) return { assignments: [], k: 0, source: 'cpu' };
+  const effectiveK = Math.max(1, Math.min(k, n));
+  if (effectiveK !== k) {
+    console.warn(`[libtorch-bridge] clusterEmbeddings: k=${k} clamped to ${effectiveK} (n=${n})`);
+  }
+
 	const native = getAddonInternal();
-	if (native?.clusterEmbeddings && n > 0 && dim > 0) {
+	if (native?.clusterEmbeddings) {
 		const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
       const flat = acquireFloat32(n * dim);
       try {
         for (let i = 0; i < n; i++) flat.set(embeddings[i], i * dim);
-        const result = native.clusterEmbeddings(flat, n, dim, k, 100);
-        return { assignments: Array.from(result), k, source: 'gpu' };
-      } catch {
-        // fall through
+        const result = native.clusterEmbeddings(flat, n, dim, effectiveK, 100);
+        const assignments = Array.from(result);
+
+        // P0: validate GPU result — NaN or out-of-range assignments indicate
+        // empty cluster → uninitialized centroid → silent NaN propagation.
+        const hasInvalid = assignments.some((a) => !Number.isFinite(a) || a < 0 || a >= effectiveK);
+        if (hasInvalid) {
+          console.warn(
+            `[libtorch-bridge] clusterEmbeddings: GPU returned invalid assignments (empty cluster?), ` +
+            `falling back to CPU k-means`
+          );
+          // fall through to CPU
+        } else {
+          return { assignments, k: effectiveK, source: 'gpu' };
+        }
+      } catch (err) {
+        console.warn(`[libtorch-bridge] clusterEmbeddings GPU failed (${(err as Error)?.message ?? err}), falling back to CPU`);
       } finally {
         releaseFloat32(flat);
       }
     }
 	}
 
-	return { assignments: cpuKMeans(embeddings, k), k, source: 'cpu' };
+	return { assignments: cpuKMeans(embeddings, effectiveK), k: effectiveK, source: 'cpu' };
 }
 
 /**
