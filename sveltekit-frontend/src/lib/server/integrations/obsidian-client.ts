@@ -19,6 +19,33 @@ import { ENV } from '$lib/server/env.server.js';
 const OBSIDIAN_URL = ENV.OBSIDIAN_URL ?? 'https://127.0.0.1:27124';
 const OBSIDIAN_API_KEY = ENV.OBSIDIAN_API_KEY ?? '';
 
+// Plugin's HTTPS listener uses a self-signed cert. Build a permissive undici
+// Agent ONLY for loopback HTTPS (so prod HTTPS calls still validate normally).
+// Lazy-loaded singleton — keeps import cost off the cold path.
+const IS_LOOPBACK_HTTPS = /^https:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(OBSIDIAN_URL);
+let _agentPromise: Promise<unknown> | null = null;
+async function loopbackAgent(): Promise<unknown> {
+	if (!IS_LOOPBACK_HTTPS) return undefined;
+	if (!_agentPromise) {
+		_agentPromise = import('undici').then(({ Agent }) => new Agent({
+			connect: { rejectUnauthorized: false },
+		}));
+	}
+	return _agentPromise;
+}
+
+/**
+ * Fetch wrapper that injects the loopback-HTTPS dispatcher when needed.
+ * Uses native fetch + undici dispatcher option.
+ */
+async function obsidianFetch(input: string, init: RequestInit = {}): Promise<Response> {
+	const dispatcher = await loopbackAgent();
+	const opts = dispatcher
+		? ({ ...init, dispatcher } as RequestInit & { dispatcher: unknown })
+		: init;
+	return fetch(input, opts);
+}
+
 interface ObsidianNote {
 	path: string;
 	content: string;
@@ -36,7 +63,7 @@ interface ObsidianSearchResult {
 export async function isObsidianAvailable(): Promise<boolean> {
 	if (!OBSIDIAN_API_KEY) return false;
 	try {
-		const res = await fetch(`${OBSIDIAN_URL}/`, {
+		const res = await obsidianFetch(`${OBSIDIAN_URL}/`, {
 			headers: { Authorization: `Bearer ${OBSIDIAN_API_KEY}` },
 			signal: AbortSignal.timeout(3_000),
 		});
@@ -60,7 +87,7 @@ function headers(): Record<string, string> {
  */
 export async function readNote(path: string): Promise<ObsidianNote | null> {
 	try {
-		const res = await fetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
+		const res = await obsidianFetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
 			headers: { Authorization: `Bearer ${OBSIDIAN_API_KEY}`, Accept: 'application/vnd.olrapi.note+json' },
 			signal: AbortSignal.timeout(5_000),
 		});
@@ -80,15 +107,26 @@ export async function readNote(path: string): Promise<ObsidianNote | null> {
 /**
  * Write/create a note in Obsidian vault.
  * Creates parent folders automatically.
+ * Marks the path in the vault watcher write-guard so the bidirectional watcher
+ * doesn't echo this server-originated write back to CouchDB.
  */
 export async function writeNote(path: string, content: string): Promise<boolean> {
 	try {
-		const res = await fetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
+		const res = await obsidianFetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
 			method: 'PUT',
 			headers: { ...headers(), 'Content-Type': 'text/markdown' },
 			body: content,
 			signal: AbortSignal.timeout(5_000),
 		});
+		if (res.ok && ENV.OBSIDIAN_VAULT_PATH) {
+			// Notify the watcher that we just wrote this path so it ignores the FS event
+			import('$lib/server/obsidian/wiki-vault-watcher.js')
+				.then(({ markServerWrite }) => {
+					const absPath = `${ENV.OBSIDIAN_VAULT_PATH}/${path}`.replace(/\\/g, '/');
+					markServerWrite(absPath);
+				})
+				.catch(() => { /* watcher not loaded — no-op */ });
+		}
 		return res.ok;
 	} catch {
 		return false;
@@ -100,7 +138,7 @@ export async function writeNote(path: string, content: string): Promise<boolean>
  */
 export async function appendToNote(path: string, content: string): Promise<boolean> {
 	try {
-		const res = await fetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
+		const res = await obsidianFetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
 			method: 'POST',
 			headers: { ...headers(), 'Content-Type': 'text/markdown' },
 			body: content,
@@ -118,7 +156,7 @@ export async function appendToNote(path: string, content: string): Promise<boole
  */
 export async function searchNotes(query: string): Promise<ObsidianSearchResult[]> {
 	try {
-		const res = await fetch(`${OBSIDIAN_URL}/search/simple/`, {
+		const res = await obsidianFetch(`${OBSIDIAN_URL}/search/simple/`, {
 			method: 'POST',
 			headers: headers(),
 			body: JSON.stringify({ query }),
@@ -137,7 +175,7 @@ export async function searchNotes(query: string): Promise<ObsidianSearchResult[]
  */
 export async function listFolder(folder: string): Promise<string[]> {
 	try {
-		const res = await fetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(folder)}/`, {
+		const res = await obsidianFetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(folder)}/`, {
 			headers: headers(),
 			signal: AbortSignal.timeout(5_000),
 		});
@@ -154,7 +192,7 @@ export async function listFolder(folder: string): Promise<string[]> {
  */
 export async function deleteNote(path: string): Promise<boolean> {
 	try {
-		const res = await fetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
+		const res = await obsidianFetch(`${OBSIDIAN_URL}/vault/${encodeURIComponent(path)}`, {
 			method: 'DELETE',
 			headers: headers(),
 			signal: AbortSignal.timeout(5_000),

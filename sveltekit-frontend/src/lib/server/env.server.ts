@@ -6,7 +6,7 @@ const DEV = {
   DATABASE_URL: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
   REDIS_URL: 'redis://localhost:6379',
   QDRANT_URL: 'http://localhost:6333',
-  RABBITMQ_URL: 'amqp://legal_admin:secret123@localhost:5672',
+  RABBITMQ_URL: 'amqp://guest:guest@localhost:5672',
   OLLAMA_URL: 'http://localhost:11434',
   TRITON_URL: 'http://localhost:8000',
   TRITON_VLM_MODEL: 'gemma_vlm_ensemble',
@@ -114,13 +114,21 @@ export const ENV = {
   NEO4J_URI: privateEnv.NEO4J_URI ?? privateEnv.NEO4J_URL ?? 'bolt://localhost:7687',
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',
   NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'password',
-  // CouchDB document store
-  COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:password@localhost:5984',
+  // CouchDB document store — default password matches docker-compose.yml
+  // (`COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-legal_ai_pass}`). Override via
+  // COUCHDB_URL or COUCHDB_PASSWORD in .env.production.
+  COUCHDB_URL:
+    privateEnv.COUCHDB_URL
+    ?? (privateEnv.COUCHDB_PASSWORD
+        ? `http://admin:${privateEnv.COUCHDB_PASSWORD}@localhost:5984`
+        : 'http://admin:legal_ai_pass@localhost:5984'),
   // Web search (optional — SearXNG first, DuckDuckGo fallback)
   SEARXNG_URL: privateEnv.SEARXNG_URL ?? 'http://localhost:8888', // Docker: 8888→8080 internal
   // Obsidian Local REST API (optional — vault sync via obsidian-local-rest-api plugin)
   OBSIDIAN_URL: privateEnv.OBSIDIAN_URL ?? 'https://127.0.0.1:27124',
   OBSIDIAN_API_KEY: privateEnv.OBSIDIAN_API_KEY ?? '',
+  // Absolute path to the Obsidian vault root (needed for chokidar watcher)
+  OBSIDIAN_VAULT_PATH: privateEnv.OBSIDIAN_VAULT_PATH ?? '',
   // Firecrawl Web Scraping API (optional — used for YouTube transcript extraction + web crawling)
   FIRECRAWL_API_KEY: privateEnv.FIRECRAWL_API_KEY ?? '',
   // GitHub API — Lane 3 deep research (issues, code, repo search)
@@ -196,8 +204,8 @@ export const ENV = {
   // RabbitMQ management API
   RABBITMQ_MGMT_URL: privateEnv.RABBITMQ_MGMT_URL ?? 'http://localhost:15672',
   RABBITMQ_MGMT_AUTH: (() => {
-    const user = privateEnv.RABBITMQ_MGMT_USER ?? privateEnv.RABBITMQ_USER ?? 'legal_admin';
-    const pass = privateEnv.RABBITMQ_MGMT_PASS ?? privateEnv.RABBITMQ_PASS ?? 'secret123';
+    const user = privateEnv.RABBITMQ_MGMT_USER ?? privateEnv.RABBITMQ_USER ?? 'guest';
+    const pass = privateEnv.RABBITMQ_MGMT_PASS ?? privateEnv.RABBITMQ_PASS ?? 'guest';
     return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
   })(),
   // Node environment
