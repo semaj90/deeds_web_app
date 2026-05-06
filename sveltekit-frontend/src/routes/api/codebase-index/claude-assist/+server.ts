@@ -32,6 +32,8 @@ import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { ASSIST_BUDGETS } from '$lib/server/ai/compact-budgets.js';
 import { rerankChunks } from '$lib/server/retrieval/codebase-context.js';
 import { publishWorkflowEvent, publishWorkflowComplete, publishWorkflowError } from '$lib/server/queue/workflow-publish.js';
+import { classifyQuery, TOPO_CLASS_LABEL } from '$lib/server/tensor/topology-byte-mapper.js';
+import { getTopoCandidates, queryHash as topoQueryHash } from '$lib/server/cache/topo-candidate-cache.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
 
@@ -355,6 +357,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		cacheSlot,
 	});
 
+	// ── Topo prefilter probe (5ms Redis check — no Qdrant RTT) ──────────────
+	let topoTrace: Record<string, unknown> | null = null;
+	try {
+		const topoClass  = classifyQuery(query);
+		const qHash      = topoQueryHash(query);
+		const cached     = await getTopoCandidates(topoClass, query);
+		topoTrace = {
+			queryClass:        TOPO_CLASS_LABEL[topoClass] ?? 'unclassified',
+			topoClass,
+			cacheHit:          cached !== null,
+			candidateCount:    cached?.length ?? null,
+			queryHash:         qHash,
+		};
+	} catch { /* non-fatal */ }
+
 	// ── Build response ───────────────────────────────────────────────────────
 	const researchPayload: Record<string, unknown> = {
 		markdown:    compact
@@ -398,6 +415,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		timing: {
 			...timing,
 			totalMs: Math.round(totalMs),
+		},
+		trace: {
+			topo_prefilter: topoTrace,
 		},
 	};
 

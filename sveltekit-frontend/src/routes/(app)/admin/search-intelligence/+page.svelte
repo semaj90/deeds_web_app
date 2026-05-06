@@ -2352,6 +2352,27 @@
 				</div>
 			</div>
 
+			<!-- TRACE: topo prefilter timeline -->
+			{#if r.trace?.topo_prefilter}
+				{@const tp = r.trace.topo_prefilter}
+				<div class="ad-trace">
+					<span class="ad-trace-hdr">
+						<Icon name="zap" class="w-3 h-3" style="color:#a78bfa" />
+						TRACE · Topo Prefilter
+					</span>
+					<span class="ad-trace-badge" class:hit={tp.cacheHit} class:miss={!tp.cacheHit}>
+						{tp.cacheHit ? 'CACHE HIT' : 'CACHE MISS'}
+					</span>
+					<span class="ad-trace-class">{tp.queryClass}</span>
+					{#if tp.cacheHit && tp.candidateCount != null}
+						<span class="ad-trace-stat">{tp.candidateCount} candidates recalled · Qdrant skipped</span>
+					{:else}
+						<span class="ad-trace-stat">Qdrant ANN sweep required</span>
+					{/if}
+					<span class="ad-trace-hash" title="Query hash">{tp.queryHash}</span>
+				</div>
+			{/if}
+
 			<!-- Timing breakdown -->
 			<div class="ad-timing">
 				<h4>Timing</h4>
@@ -3754,6 +3775,28 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 .ad-value { font-size: 0.85rem; font-weight: 700; color: #d4c7a3; }
 .ad-value.hit  { color: #4ade80; }
 .ad-value.miss { color: #f59e0b; }
+.ad-trace {
+	display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem;
+	padding: 0.4rem 0.6rem; border-radius: 6px;
+	background: #13121080; border: 1px solid #2a2760;
+	font-size: 0.68rem; margin-bottom: 0.6rem;
+}
+.ad-trace-hdr {
+	display: flex; align-items: center; gap: 0.25rem;
+	font-weight: 600; color: #a78bfa; white-space: nowrap;
+}
+.ad-trace-badge {
+	padding: 0.1rem 0.45rem; border-radius: 4px; font-weight: 700;
+	font-size: 0.62rem; letter-spacing: 0.05em;
+}
+.ad-trace-badge.hit  { background: #14532d; color: #86efac; }
+.ad-trace-badge.miss { background: #1c1917; color: #78716c; }
+.ad-trace-class { color: #60a5fa; font-family: 'JetBrains Mono', monospace; }
+.ad-trace-stat  { color: #d4c7a3; }
+.ad-trace-hash  {
+	margin-left: auto; color: #4b5563;
+	font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+}
 .ad-timing {
 	display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
 	font-size: 0.7rem; color: #9ca3af; margin-bottom: 0.6rem;
