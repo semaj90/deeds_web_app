@@ -106,6 +106,8 @@ export default defineConfig({
       'tests/unit/ensure-dev-runtime.test.ts',
       'tests/karpathy-hook.spec.ts',
       'tests/wiki-vault-watcher.spec.ts',
+      'tests/manifold4-retrieval.spec.ts',
+      'tests/gpu-projection-smoke.spec.ts',
       // G16 auto-generated route test stubs (npm run audit:generate-route-stubs)
       'tests/routes/auto/**/*.test.ts',
     ],

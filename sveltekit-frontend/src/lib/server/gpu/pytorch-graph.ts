@@ -351,6 +351,11 @@ export function kmeansWithCentroids(
 	k: number,
 	maxIters = 100
 ): { assignments: Int32Array; centroids: Float32Array; source: 'gpu' | 'cpu' } {
+	// Empty-input guard — prevents NaN propagation and undefined centroid state.
+	// Matches the C++ guard in kmeansWithCentroids() (pytorch_graph.cc: GPU_ERR_INVALID_ARGS).
+	if (n <= 0 || dim <= 0 || k <= 0) {
+		return { assignments: new Int32Array(0), centroids: new Float32Array(0), source: 'cpu' };
+	}
 	const a = getAddon();
 	if (a?.kmeansWithCentroids) {
     const mb = vramNeededMB(n * dim + k * dim); // embeddings + centroids
@@ -411,7 +416,23 @@ export function kmeansWithCentroids(
 			for (let d = 0; d < dim; d++) centroids[c * dim + d] += embeddings[i * dim + d];
 		}
 		for (let c = 0; c < kClamped; c++) {
-			if (counts[c] > 0) for (let d = 0; d < dim; d++) centroids[c * dim + d] /= counts[c];
+			if (counts[c] > 0) {
+				for (let d = 0; d < dim; d++) centroids[c * dim + d] /= counts[c];
+			} else {
+				// Empty cluster guard — re-seed from farthest data point (mirrors C++ pytorch_graph.cc).
+				// Without this, the centroid stays at zero → silent NaN propagation in next iter.
+				let farthestIdx = 0, farthestDist = -1;
+				for (let i = 0; i < n; i++) {
+					const ac = assignments[i];
+					let dist = 0;
+					for (let d = 0; d < dim; d++) {
+						const diff = embeddings[i * dim + d] - centroids[ac * dim + d];
+						dist += diff * diff;
+					}
+					if (dist > farthestDist) { farthestDist = dist; farthestIdx = i; }
+				}
+				for (let d = 0; d < dim; d++) centroids[c * dim + d] = embeddings[farthestIdx * dim + d];
+			}
 		}
 	}
 	return { assignments, centroids, source: 'cpu' };
