@@ -10,8 +10,7 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
-import { db } from '$lib/server/db/client.js';
-import { sql } from 'drizzle-orm';
+import { pool } from '$lib/server/db/client';
 import type { MemoryDatabase, MemoryDoc } from './mango-indexes.js';
 
 // ── Redis mirror ──────────────────────────────────────────────────────────────
@@ -51,23 +50,23 @@ async function mirrorToPostgres(dbName: MemoryDatabase, doc: MemoryDoc): Promise
   });
 
   // Upsert into embedded_summaries using its stable_key column
-  await db.execute(sql.raw(`
-    INSERT INTO embedded_summaries (stable_key, type, cluster_key, tags, metadata, synced_at, created_at)
-    VALUES (
-      ${JSON.stringify(doc.stableKey)},
-      ${JSON.stringify(doc.type)},
-      ${doc.clusterKey ? JSON.stringify(doc.clusterKey) : 'NULL'},
-      ARRAY[${(doc.tags ?? []).map((t) => JSON.stringify(t)).join(',')}]::text[],
-      ${JSON.stringify(metaJson)}::jsonb,
-      NOW(), NOW()
-    )
-    ON CONFLICT (stable_key) DO UPDATE
-      SET type       = EXCLUDED.type,
-          cluster_key= EXCLUDED.cluster_key,
-          tags       = EXCLUDED.tags,
-          metadata   = EXCLUDED.metadata,
-          synced_at  = NOW()
-  `));
+  await pool.query(
+    `INSERT INTO embedded_summaries (stable_key, type, cluster_key, tags, metadata, synced_at, created_at)
+     VALUES ($1, $2, $3, $4::text[], $5::jsonb, NOW(), NOW())
+     ON CONFLICT (stable_key) DO UPDATE
+       SET type        = EXCLUDED.type,
+           cluster_key = EXCLUDED.cluster_key,
+           tags        = EXCLUDED.tags,
+           metadata    = EXCLUDED.metadata,
+           synced_at   = NOW()`,
+    [
+      doc.stableKey,
+      doc.type,
+      doc.clusterKey ?? null,
+      doc.tags ?? [],
+      metaJson,
+    ],
+  );
 }
 
 // ── Neo4j mirror ──────────────────────────────────────────────────────────────
