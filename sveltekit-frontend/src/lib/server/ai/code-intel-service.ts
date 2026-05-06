@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { kagDagRuns, topologySnapshots, memoryGainAudits, qdrantCentroidClusters } from '$lib/server/db/schema.js';
+import { tensorAnalysisCache } from '$lib/server/db/schema/topology.js';
 import { desc, count, eq, sql, avg } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 
@@ -127,15 +128,41 @@ export async function getTopologySnapshot(snapshotId?: string) {
 	const snapshot = snapshotId
 		? await query.where(eq(topologySnapshots.id, snapshotId)).limit(1)
 		: await query.orderBy(desc(topologySnapshots.createdAt)).limit(1);
-	
+
 	if (!snapshot[0]) return null;
 
 	const { topologyPositions } = await import('$lib/server/db/schema.js');
-	const nodes = await db.select().from(topologyPositions).where(eq(topologyPositions.snapshotId, snapshot[0].id));
+
+	// LEFT JOIN tensorAnalysisCache to enrich nodes with authority + SOM data
+	const rows = await db
+		.select({
+			stable_key:           topologyPositions.stableKey,
+			x:                    topologyPositions.x,
+			y:                    topologyPositions.y,
+			z:                    topologyPositions.z,
+			t:                    topologyPositions.t,
+			cluster_key:          topologyPositions.clusterKey,
+			topo_byte:            topologyPositions.topoByte,
+			source_kind:          topologyPositions.sourceKind,
+			metadata:             topologyPositions.metadata,
+			// tensorAnalysisCache enrichment (null when no analysis yet)
+			graph_authority_score: tensorAnalysisCache.graphAuthorityScore,
+			tensor_affinity_score: tensorAnalysisCache.tensorAffinityScore,
+			som_cluster:          tensorAnalysisCache.somCluster,
+			manifold4_x:          tensorAnalysisCache.manifold4X,
+			manifold4_y:          tensorAnalysisCache.manifold4Y,
+			manifold4_z:          tensorAnalysisCache.manifold4Z,
+			manifold4_w:          tensorAnalysisCache.manifold4W,
+			topo_class:           tensorAnalysisCache.topoClass,
+			qdrant_payload:       tensorAnalysisCache.qdrantPayload,
+		})
+		.from(topologyPositions)
+		.leftJoin(tensorAnalysisCache, eq(topologyPositions.stableKey, tensorAnalysisCache.stableKey))
+		.where(eq(topologyPositions.snapshotId, snapshot[0].id));
 
 	return {
 		snapshot: snapshot[0],
-		nodes
+		nodes: rows,
 	};
 }
 

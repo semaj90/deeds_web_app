@@ -1,7 +1,7 @@
 # AGENTS.md — `src/routes/(app)/evidence-library`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)/evidence-library
 
@@ -14,12 +14,19 @@
 
 ## Files (2)
 
-- `+page.server.ts`
-- `+page.svelte`
+- `src/routes/(app)/evidence-library/+page.server.ts`
+- `src/routes/(app)/evidence-library/+page.svelte`
 
 ## Warnings
 
 - ⚠️ 1 routes lack test pairing
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 0/2 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

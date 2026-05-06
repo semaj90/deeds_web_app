@@ -1,27 +1,24 @@
 # AGENTS.md — `src/lib/gpu`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/gpu
 
 ## Snapshot
 
-- shared library directory with 16 files, 0 API handlers
+- shared library directory with 17 files, 0 API handlers
 - Audit score: **85/100**
 - 🟠 hardcoded localhost: 1
 - Tags: `src` `lib` `gpu` `zod`
 
-## Files (16)
+## Files (17)
 
-- `global-gpu-manager.ts`
-- `gpu-compute-pipeline.ts`
-- `gpu-embedding-bridge.ts`
-- `gpu-search-reranker.ts`
-- `hybrid-gpu-context.ts`
-- `index.ts`
-- `markdown-processor.ts`
-- `nes-glyph-webgpu.ts`
+- `src/lib/gpu/global-gpu-manager.ts`
+- `src/lib/gpu/gpu-compute-pipeline.ts`
+- `src/lib/gpu/gpu-embedding-bridge.ts`
+- `src/lib/gpu/gpu-search-reranker.ts`
+- `src/lib/gpu/hybrid-gpu-context.ts`
 
 ## Hypergraph cluster
 
@@ -36,6 +33,15 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 17 for full digest.
 
 - ⚠️ Hardcoded localhost refs
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C17 — function chunks in `src/lib/services/error-analysis` (tag: embedding)
+- **BoW texture key**: `texture:bow:cluster:17` (Redis 1h TTL)
+- **Qdrant tags**: `embedding` `server-module` `cache` `vector` `redis`
+- **Paired tests**: 1/17 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -44,7 +50,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "lib gpu", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/gpu/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 17 })` — BoW texture tile for cluster C17
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 17 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

@@ -1,28 +1,32 @@
 # AGENTS.md — `tests/routes/auto/api`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/routes/auto/api
 
 ## Snapshot
 
-- route handler directory with 571 files, 0 API handlers
+- route handler directory with 580 files, 0 API handlers
 - Audit score: **90/100**
 - no audit signals
 - Tags: `tests` `routes` `auto` `auth` `test`
 
 ## Files (43)
 
-- `analyze-file.test.ts`
-- `analyze-tag.test.ts`
-- `cache.test.ts`
-- `canon.test.ts`
-- `case-theory.test.ts`
-- `cases.test.ts`
-- `chat.test.ts`
-- `citations.test.ts`
+- `tests/routes/auto/api/ace/agent.test.ts`
+- `tests/routes/auto/api/ace/context.test.ts`
+- `tests/routes/auto/api/ace/error-kag.test.ts`
+- `tests/routes/auto/api/ace/health.test.ts`
+- `tests/routes/auto/api/ace/ingest.test.ts`
 
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 0/43 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

@@ -1,16 +1,16 @@
 # AGENTS.md — `src`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
-> Directory audit: src
+> Directory: src
 
 ## Snapshot
 
-- src/ambient-legacy.d.ts, src/app.d.ts, src/auth-store.svelte.ts, src/custom-modules.d.ts, src/env.d.ts
-- Audit score: **50/100** ⚠️
+- 17 file(s), 0 handler(s)
+- Audit score: _(no GPU audit)_
 - 🟠 hardcoded localhost: 1
-- Tags: `src`
+
 
 ## Files (17)
 
@@ -23,13 +23,13 @@
 - `hooks.client.ts`
 - `hooks.server.ts`
 
-## Topological neighbors
 
-- `7`
-- `9`
-- `86`
-- `3`
-- `4`
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 1/17 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

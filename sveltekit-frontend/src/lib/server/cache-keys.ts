@@ -50,6 +50,8 @@ export const TTL = {
   CENTROID: 6 * 60 * 60, // 6 hours
   /** ACE codebase hit cache: boosted chunks from last Qdrant+topology pass */
   ACE_CODE: 15 * 60, // 15 min — short enough to reflect new indexing
+  /** ACE token budget stats per (topoClass, clusterId): rolling window */
+  ACE_TOKEN_BUDGET: 2 * 60 * 60, // 2 hours
   /** User activity heartbeat: long-lived engagement tracking */
   USER_ACTIVITY: 30 * 24 * 60 * 60, // 30 days
 } as const;
@@ -204,6 +206,22 @@ export const aceCodeKey = {
    */
   forQuery: (query: string, topoClass: number, resolvedDir?: string): string =>
     `ace:code:${hashStr(query)}:${topoClass}:${hashStr(resolvedDir ?? 'root')}`,
+};
+
+// ── ACE Token Budget Keys ─────────────────────────────────────────────────────
+
+export const aceTokenBudgetKey = {
+  /**
+   * ace:token:budget:{topoClass}:{clusterId}
+   * Stores: { p50Tokens, p90Tokens, avgChunksPerQuery, sampleCount }
+   * Written fire-and-forget after each ACE codebase cache write.
+   * Used to pre-size the Qdrant fetch limit before any ANN call.
+   */
+  forCluster: (topoClass: number, clusterId: number): string =>
+    `ace:token:budget:${topoClass}:${clusterId}`,
+  /** Fallback when cluster is unknown — keyed by topoClass only. */
+  forClass: (topoClass: number): string =>
+    `ace:token:budget:${topoClass}:unknown`,
 };
 
 // ── LLM Cache Key Utilities ───────────────────────────────────────────────

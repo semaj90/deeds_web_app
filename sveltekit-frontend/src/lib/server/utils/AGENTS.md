@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/utils`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/utils
 
@@ -14,14 +14,11 @@
 
 ## Files (13)
 
-- `avatar-upload.ts`
-- `endpoints.ts`
-- `extract-component.ts`
-- `graceful-error-handler.ts`
-- `http-error-mapper.ts`
-- `json-fast.ts`
-- `ollama-client.ts`
-- `ollama-endpoint.ts`
+- `src/lib/server/utils/avatar-upload.ts`
+- `src/lib/server/utils/endpoints.ts`
+- `src/lib/server/utils/extract-component.ts`
+- `src/lib/server/utils/graceful-error-handler.ts`
+- `src/lib/server/utils/http-error-mapper.ts`
 
 ## Hypergraph cluster
 
@@ -36,6 +33,15 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 19 for full digest.
 
 - ⚠️ Hardcoded localhost refs
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C19 — type chunks in `src/lib/types` (tag: embedding)
+- **BoW texture key**: `texture:bow:cluster:19` (Redis 1h TTL)
+- **Qdrant tags**: `embedding` `vector` `redis` `rabbitmq` `ai`
+- **Paired tests**: 0/13 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -44,7 +50,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server utils", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/utils/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 19 })` — BoW texture tile for cluster C19
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 19 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

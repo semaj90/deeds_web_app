@@ -70,6 +70,8 @@ export const ENV = {
   EMBEDDING_GRPC_ENABLED: (privateEnv.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true',
   RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL ?? '127.0.0.1:50053',
   RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
+  /** Topology search engine — detached Node.js server (port 8101) */
+  TOPOLOGY_SEARCH_URL: privateEnv.TOPOLOGY_SEARCH_URL ?? 'http://127.0.0.1:8101',
   /** Go retrieval service HTTP REST API (port 8100) — lighter weight alternative to gRPC */
   RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? 'http://localhost:8100',
   RETRIEVAL_HTTP_ENABLED: (privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',

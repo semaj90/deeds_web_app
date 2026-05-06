@@ -1,23 +1,35 @@
 # AGENTS.md — `src/routes/(app)/codebase-graph`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)/codebase-graph
 
 ## Snapshot
 
-- route handler directory with 4 files, 0 API handlers
+- route handler directory with 5 files, 0 API handlers
 - Audit score: **90/100**
 - no audit signals
 - Tags: `src` `routes` `(app)` `route` `component` `auth`
 
 ## Files (3)
 
-- `+page.svelte`
-- `CodebaseGraphCanvas.svelte`
-- `CodebaseGraphSidebar.svelte`
+- `src/routes/(app)/codebase-graph/+page.svelte`
+- `src/routes/(app)/codebase-graph/CodebaseGraphCanvas.svelte`
+- `src/routes/(app)/codebase-graph/CodebaseGraphSidebar.svelte`
+- `src/routes/(app)/codebase-graph/fast-ast/+page.server.ts`
+- `src/routes/(app)/codebase-graph/fast-ast/+page.svelte`
 
+## Warnings
+
+- ⚠️ 1 routes lack test pairing
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 0/3 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

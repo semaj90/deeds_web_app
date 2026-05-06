@@ -1,27 +1,24 @@
 # AGENTS.md — `src/lib/server/ace`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/ace
 
 ## Snapshot
 
-- server module directory with 17 files, 0 API handlers, 3 Drizzle refs
-- Audit score: **95/100**
-- 🟠 hardcoded localhost: 1
-- Tags: `src` `lib` `server` `zod` `db-schema`
+- server module directory with 19 files, 0 API handlers, 4 Drizzle refs
+- Audit score: **100/100**
+- no audit signals
+- Tags: `src` `lib` `server` `zod` `db-schema` `test`
 
-## Files (17)
+## Files (19)
 
-- `ace-agent.ts`
-- `ace-error-kag.ts`
-- `ace-wiki.ts`
-- `auto-tagger.ts`
-- `chat-memory.ts`
-- `codeintel-datastore.ts`
-- `context-assembler.ts`
-- `error-kag-writer.ts`
+- `src/lib/server/ace/ace-agent.ts`
+- `src/lib/server/ace/ace-error-kag.ts`
+- `src/lib/server/ace/ace-wiki.ts`
+- `src/lib/server/ace/auto-tagger.ts`
+- `src/lib/server/ace/chat-memory.ts`
 
 ## Hypergraph cluster
 
@@ -32,9 +29,15 @@ This directory is part of cluster **C72** — function chunks in \`src/lib/serve
 
 See `docs/graph/hypergraph-clusters.md` § Cluster 72 for full digest.
 
-## Warnings
 
-- ⚠️ Hardcoded localhost refs
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C72 — function chunks in `src/lib/server/ace` (tag: vector)
+- **BoW texture key**: `texture:bow:cluster:72` (Redis 1h TTL)
+- **Qdrant tags**: `vector` `embedding` `redis` `auth` `ai`
+- **Paired tests**: 2/19 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
@@ -44,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server ace", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/ace/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 72 })` — BoW texture tile for cluster C72
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 72 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

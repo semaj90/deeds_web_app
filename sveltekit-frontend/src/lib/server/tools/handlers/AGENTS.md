@@ -1,16 +1,16 @@
 # AGENTS.md — `src/lib/server/tools/handlers`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
-> Directory audit: src/lib/server/tools/handlers
+> Directory: src/lib/server/tools/handlers
 
 ## Snapshot
 
-- src/lib/server/tools/handlers/chunkEmbed.ts, src/lib/server/tools/handlers/clusterTag.ts, src/lib/server/tools/handlers/crawlDocs.ts, src/lib/server/tools/handlers/index.ts, src/lib/server/tools/handlers/kbSearch.ts
-- Audit score: **50/100** ⚠️
+- 8 file(s), 0 handler(s)
+- Audit score: _(no GPU audit)_
 - no audit signals
-- Tags: `handlers`
+
 
 ## Files (8)
 
@@ -33,6 +33,15 @@ This directory is part of cluster **C70** — route-handler chunks in \`src/lib/
 See `docs/graph/hypergraph-clusters.md` § Cluster 70 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C70 — route-handler chunks in `src/lib/server/analytics` (tag: embedding)
+- **BoW texture key**: `texture:bow:cluster:70` (Redis 1h TTL)
+- **Qdrant tags**: `embedding` `api` `server` `vector` `redis`
+- **Paired tests**: 1/8 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -41,7 +50,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "tools handlers", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/tools/handlers/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 70 })` — BoW texture tile for cluster C70
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 70 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/types`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/types
 
@@ -14,14 +14,11 @@
 
 ## Files (10)
 
-- `ace.ts`
-- `globals.d.ts`
-- `glyph.ts`
-- `index.ts`
-- `ingestion-buffer.ts`
-- `kag.ts`
-- `qdrant.ts`
-- `retrieval.ts`
+- `src/lib/server/types/ace.ts`
+- `src/lib/server/types/globals.d.ts`
+- `src/lib/server/types/glyph.ts`
+- `src/lib/server/types/index.ts`
+- `src/lib/server/types/ingestion-buffer.ts`
 
 ## Hypergraph cluster
 
@@ -33,6 +30,15 @@ This directory is part of cluster **C73** — function chunks in \`src/lib/serve
 See `docs/graph/hypergraph-clusters.md` § Cluster 73 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C73 — function chunks in `src/lib/server/retrieval` (tag: vector)
+- **BoW texture key**: `texture:bow:cluster:73` (Redis 1h TTL)
+- **Qdrant tags**: `vector` `redis` `embedding` `rag-pipeline` `graph-db`
+- **Paired tests**: 4/10 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -41,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server types", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/types/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 73 })` — BoW texture tile for cluster C73
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 73 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

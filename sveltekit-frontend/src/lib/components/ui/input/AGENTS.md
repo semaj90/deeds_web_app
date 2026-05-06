@@ -1,16 +1,16 @@
 # AGENTS.md — `src/lib/components/ui/input`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
-> Directory audit: src/lib/components/ui/input
+> Directory: src/lib/components/ui/input
 
 ## Snapshot
 
-- src/lib/components/ui/input/index.ts, src/lib/components/ui/input/Input.svelte, src/lib/components/ui/input/InputBits.svelte, src/lib/components/ui/input/Svelte5Input.svelte
-- Audit score: **50/100** ⚠️
+- 4 file(s), 0 handler(s)
+- Audit score: _(no GPU audit)_
 - no audit signals
-- Tags: `input`
+
 
 ## Files (4)
 
@@ -29,6 +29,15 @@ This directory is part of cluster **C50** — component chunks in \`src/lib/comp
 See `docs/graph/hypergraph-clusters.md` § Cluster 50 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C50 — component chunks in `src/lib/components/ui/gaming/n64` (tag: page)
+- **BoW texture key**: `texture:bow:cluster:50` (Redis 1h TTL)
+- **Qdrant tags**: `page` `component`
+- **Paired tests**: 1/4 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -37,7 +46,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "ui input", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/components/ui/input/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 50 })` — BoW texture tile for cluster C50
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 50 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

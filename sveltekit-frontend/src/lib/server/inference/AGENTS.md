@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/inference`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/inference
 
@@ -14,10 +14,10 @@
 
 ## Files (4)
 
-- `adapter-manifest.ts`
-- `gpu-arbiter.ts`
-- `inference-router.ts`
-- `turbo-prefix-cache.ts`
+- `src/lib/server/inference/adapter-manifest.ts`
+- `src/lib/server/inference/gpu-arbiter.ts`
+- `src/lib/server/inference/inference-router.ts`
+- `src/lib/server/inference/turbo-prefix-cache.ts`
 
 ## Hypergraph cluster
 
@@ -29,6 +29,15 @@ This directory is part of cluster **C58** — type chunks in \`src/lib/server/in
 See `docs/graph/hypergraph-clusters.md` § Cluster 58 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C58 — type chunks in `src/lib/server/indexer` (tag: vector)
+- **BoW texture key**: `texture:bow:cluster:58` (Redis 1h TTL)
+- **Qdrant tags**: `vector` `embedding` `xstate` `auth` `schema`
+- **Paired tests**: 0/4 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -37,7 +46,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server inference", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/inference/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 58 })` — BoW texture tile for cluster C58
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 58 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 
