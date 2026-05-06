@@ -1,13 +1,14 @@
 /**
  * Compute Worker — runs CPU-bound tasks off the main event loop.
  *
- * Self-contained: all math functions are inlined (no imports).
- * Handles: kmeans, som, forensics, silhouette
+ * Handles: kmeans, som, forensics, silhouette, similarity, langextract.extract
+ *           chunk, hash, metadata, qdrant_payload
  *
  * Protocol: receives { taskId, type, payload }, sends back { taskId, result } or { taskId, error }
  */
 
 import { parentPort } from 'worker_threads';
+import { createHash } from 'node:crypto';
 
 // ═══════════════════════════════════════════════════════════════
 // MATH PRIMITIVES
@@ -479,6 +480,150 @@ function runLangExtract({ text, documentId, documentType }) {
 	};
 }
 
+// ═══════════════════════════════════════════════════════════════
+// INDEXER PIPELINE TASKS (chunk / hash / metadata / qdrant_payload)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Split file text into overlapping chunks for embedding.
+ * Uses line-count boundaries with a sliding window to keep context.
+ *
+ * Input:  { text, filePath, maxLines?, overlap? }
+ * Output: Array<{ text, startLine, endLine, chunkIndex, sizeBytes }>
+ */
+function runChunk({ text, filePath, maxLines = 80, overlap = 10 }) {
+	if (!text || typeof text !== 'string') return [];
+	const lines = text.split('\n');
+	const total = lines.length;
+	const chunks = [];
+	let idx = 0;
+
+	for (let start = 0; start < total; start += maxLines - overlap) {
+		const end = Math.min(start + maxLines, total);
+		const slice = lines.slice(start, end).join('\n');
+		if (slice.trim().length === 0) continue;
+		chunks.push({
+			text: slice,
+			startLine: start,
+			endLine: end - 1,
+			chunkIndex: idx++,
+			sizeBytes: Buffer.byteLength(slice, 'utf8'),
+			filePath,
+		});
+		if (end >= total) break;
+	}
+	return chunks;
+}
+
+/**
+ * Compute SHA-256 hex digest of content.
+ *
+ * Input:  { text }
+ * Output: { hash }
+ */
+function runHash({ text }) {
+	const hash = createHash('sha256').update(text ?? '', 'utf8').digest('hex');
+	return { hash };
+}
+
+/**
+ * Extract lightweight metadata envelope from source text.
+ * Regex-based (no AST) — runs ~1ms for a 1000-line file.
+ *
+ * Input:  { text, filePath }
+ * Output: { imports, exports, lineCount, sizeBytes, language, hasDefaultExport, hasTypes }
+ */
+function runMetadata({ text, filePath }) {
+	if (!text || typeof text !== 'string') {
+		return { imports: [], exports: [], lineCount: 0, sizeBytes: 0, language: 'unknown', hasDefaultExport: false, hasTypes: false };
+	}
+
+	const ext = (filePath ?? '').split('.').pop()?.toLowerCase() ?? '';
+	const language = ext === 'ts' || ext === 'tsx' ? 'typescript'
+	               : ext === 'js' || ext === 'mjs' || ext === 'cjs' ? 'javascript'
+	               : ext === 'svelte' ? 'svelte'
+	               : ext === 'py' ? 'python'
+	               : 'unknown';
+
+	const lines = text.split('\n');
+	const imports = [];
+	const exports = [];
+	let hasDefaultExport = false;
+	let hasTypes = false;
+
+	// Import extraction: covers static ESM + require
+	const importRe = /(?:import\s+(?:type\s+)?(?:[\w*{},\s]+\s+from\s+)?['"]([^'"]+)['"]|require\s*\(\s*['"]([^'"]+)['"]\s*\))/g;
+	let m;
+	const seen = new Set();
+	while ((m = importRe.exec(text)) !== null) {
+		const mod = m[1] || m[2];
+		if (mod && !seen.has(mod)) { seen.add(mod); imports.push(mod); }
+		if (imports.length >= 200) break;
+	}
+
+	// Export extraction: named + default
+	const exportRe = /^export\s+(?:async\s+)?(?:function|class|const|let|var|type|interface|enum)\s+(\w+)/gm;
+	const expSeen = new Set();
+	while ((m = exportRe.exec(text)) !== null) {
+		if (!expSeen.has(m[1])) { expSeen.add(m[1]); exports.push(m[1]); }
+	}
+	hasDefaultExport = /export\s+default\s/.test(text);
+	hasTypes = /^export\s+(?:type|interface)\s/m.test(text) || /:\s*(?:string|number|boolean|void|Record|Array|Promise)\b/.test(text);
+
+	return {
+		imports,
+		exports,
+		lineCount: lines.length,
+		sizeBytes: Buffer.byteLength(text, 'utf8'),
+		language,
+		hasDefaultExport,
+		hasTypes,
+	};
+}
+
+/**
+ * Build a Qdrant-ready payload object from a chunk + metadata envelope.
+ * Normalises field names to match existing codebase_chunks_768 payload schema.
+ *
+ * Input:  { chunk: { text, startLine, endLine, chunkIndex, filePath }, metadata, contentHash }
+ * Output: Qdrant payload Record<string, unknown>
+ */
+function runQdrantPayload({ chunk, metadata, contentHash }) {
+	const { text, startLine, endLine, chunkIndex, filePath } = chunk ?? {};
+	const {
+		imports = [], exports: exps = [], lineCount = 0, sizeBytes = 0,
+		language = 'unknown', hasDefaultExport = false, hasTypes = false,
+	} = metadata ?? {};
+
+	// Derive relative path: strip leading slash or drive letter
+	const relative = (filePath ?? '').replace(/^[A-Za-z]:[/\\]/, '').replace(/\\/g, '/');
+
+	return {
+		path:              filePath ?? '',
+		relative_path:     relative,
+		content:           text ?? '',
+		content_hash:      contentHash ?? createHash('sha256').update(text ?? '').digest('hex'),
+		chunk_index:       chunkIndex ?? 0,
+		start_line:        startLine ?? 0,
+		end_line:          endLine ?? 0,
+		line_count:        lineCount,
+		size_bytes:        sizeBytes,
+		language,
+		has_default_export: hasDefaultExport,
+		has_types:         hasTypes,
+		imports:           imports.slice(0, 50),
+		exports:           exps.slice(0, 50),
+		// Scores/topology fields — caller fills these in after embedding
+		graph_authority_score: null,
+		som_cluster:       null,
+		topo_class:        null,
+		manifold4_x:       null,
+		manifold4_y:       null,
+		manifold4_z:       null,
+		manifold4_w:       null,
+	};
+}
+
 const HANDLERS = {
 	kmeans:                runKMeans,
 	som:                   runSOM,
@@ -486,6 +631,10 @@ const HANDLERS = {
 	silhouette:            ({ embeddings, assignments, k }) => computeSilhouette(embeddings, assignments, k),
 	similarity:            runSimilarity,
 	'langextract.extract': runLangExtract,
+	chunk:                 runChunk,
+	hash:                  runHash,
+	metadata:              runMetadata,
+	qdrant_payload:        runQdrantPayload,
 };
 
 parentPort?.on('message', (msg) => {
