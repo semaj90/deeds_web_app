@@ -2424,7 +2424,7 @@ export interface CodebaseFetchStats {
   };
 }
 
-async function fetchCodebaseContext(
+export async function fetchCodebaseContext(
   query: string,
   userId?: string,
   filePath?: string,
