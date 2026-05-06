@@ -151,19 +151,26 @@ CREATE TABLE report_versions (
 
 ### 5. Report Collaboration
 **Impact:** Multi-user editing
-**Effort:** 6 hours
+**Effort:** 4 hours (was 6 — switching from websocket to SSE drops the standalone-server overhead)
 
 **Tech Stack:**
 - YJS for CRDT
-- WebSocket for sync
+- **SSE for sync** (replaces WebSocket — SvelteKit-native, no separate server, integrates with existing `/api/sse/*` infrastructure and `Promise.withResolvers()` stream pattern)
 - TipTap YJS extension
+- POST endpoint for client-to-server YJS update broadcast (since SSE is one-way)
 
 **Files to create:**
 ```
-src/lib/collaboration/yjs-provider.ts
-src/lib/collaboration/websocket-server.ts
-src/routes/api/reports/[id]/collaborate/+server.ts
+src/lib/collaboration/yjs-provider.ts          (SSE-based provider)
+src/routes/api/reports/[id]/collaborate/+server.ts  (SSE GET stream)
+src/routes/api/reports/[id]/collaborate/update/+server.ts  (POST YJS updates)
 ```
+
+**Why SSE over WebSocket here:**
+- App already has 8+ SSE routes (`/api/sse/chat`, `/api/sse/reports`, etc.) — same connection pool, same heartbeat patterns
+- No separate websocket server process; runs inside SvelteKit
+- HTTP/2 multiplexing makes per-connection cost cheap
+- Reconnect-with-Last-Event-ID is built into SSE; YJS state-vector handles the resumption
 
 ---
 
