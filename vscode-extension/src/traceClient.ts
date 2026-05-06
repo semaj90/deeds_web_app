@@ -40,6 +40,24 @@ export interface TopologyNode {
 	pagerank?: number;
 }
 
+export interface TopologyNeighbor {
+	id: string;
+	file: string;
+	projectedX: number;
+	projectedY: number;
+	distance: number;
+	somCluster?: number;
+}
+
+export interface TopologyNeighborsResult {
+	nodeId: string;
+	neighbors: TopologyNeighbor[];
+	projectedX: number;
+	projectedY: number;
+	source: 'gpu' | 'cpu-fallback';
+	durationMs: number;
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export async function fetchHealth(): Promise<TraceHealth> {
@@ -96,6 +114,20 @@ export async function fetchIndexStats(): Promise<{ totalChunks: number }> {
 		return await get<{ totalChunks: number }>('/api/codebase-index/stats');
 	} catch {
 		return { totalChunks: 0 };
+	}
+}
+
+export async function fetchTopologyNeighbors(
+	nodeId: string,
+	k = 12,
+	clusterId?: number,
+): Promise<TopologyNeighborsResult | null> {
+	try {
+		const params = new URLSearchParams({ nodeId, k: String(k) });
+		if (clusterId !== undefined) params.set('clusterId', String(clusterId));
+		return await get<TopologyNeighborsResult>(`/api/graph/topology-neighbors?${params}`);
+	} catch {
+		return null;
 	}
 }
 

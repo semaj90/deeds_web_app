@@ -13,6 +13,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { load as loadGraph, invalidate } from './localGraphCache';
+import { fetchTopologyNeighbors } from './traceClient';
 
 const PANEL_ID  = 'deedsTopology';
 const CACHE_KEY = 'deedsGraph.viewerState';
@@ -91,7 +92,16 @@ export class GraphPanel {
 						break;
 
 					case 'nodeSelected':
-						if (msg.id) this.openNode(msg.id);
+						if (msg.id) {
+							this.openNode(msg.id);
+							// Fetch PCA-projected neighbors and highlight them in the viewer
+							fetchTopologyNeighbors(msg.id, 12, msg.cluster).then(result => {
+								if (result && result.neighbors.length > 0) {
+									const ids = result.neighbors.map(n => n.id);
+									this.panel.webview.postMessage({ type: 'highlight', ids });
+								}
+							}).catch(() => { /* server offline — highlight skipped */ });
+						}
 						break;
 
 					case 'stateUpdate':
