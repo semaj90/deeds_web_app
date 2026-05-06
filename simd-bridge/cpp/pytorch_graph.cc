@@ -314,6 +314,122 @@ extern "C" int trainSOM(
     } catch (...) { return -3; }
 }
 
+// ── autoencoderEncodeGPU ─────────────────────────────────────────────────────
+// Linear encoder forward pass: encoded = tanh(input @ W^T + b)
+// Accepts pre-trained weight/bias tensors — no training performed here.
+//
+// input[n*input_dim]     — n input vectors (e.g. 768-dim embeddings)
+// W[hidden*input_dim]    — encoder weight matrix (row-major)
+// b[hidden]              — encoder bias vector
+// n, input_dim, hidden   — dimensions
+// output[n*hidden]       — encoded (reduced) vectors
+
+extern "C" int autoencoderEncodeGPU(
+    const float* input, int n, int input_dim,
+    const float* W, const float* b, int hidden,
+    float* output, int output_len
+) {
+    if (!input || !W || !b || !output) return GPU_ERR_INVALID_ARGS;
+    if (n <= 0 || input_dim <= 0 || hidden <= 0) return GPU_ERR_INVALID_ARGS;
+    if (output_len < n * hidden) return GPU_ERR_BUFFER_TOO_SMALL;
+    try {
+        torch::NoGradGuard ng;
+        auto dev  = pgDevice();
+        auto opts = torch::TensorOptions().dtype(torch::kFloat32);
+
+        auto X  = torch::from_blob(const_cast<float*>(input), {n, input_dim}, opts).to(dev);
+        auto Wt = torch::from_blob(const_cast<float*>(W),     {hidden, input_dim}, opts).to(dev);
+        auto bv = torch::from_blob(const_cast<float*>(b),     {hidden}, opts).to(dev);
+
+        // [n, input_dim] @ [input_dim, hidden] + [hidden] → tanh → [n, hidden]
+        auto encoded = torch::tanh(torch::mm(X, Wt.t()) + bv);
+
+        auto cpu_e = encoded.to(torch::kCPU).contiguous();
+        std::memcpy(output, cpu_e.data_ptr<float>(), n * hidden * sizeof(float));
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
+}
+
+// ── autoencoderDecodeGPU ─────────────────────────────────────────────────────
+// Linear decoder forward pass: reconstructed = tanh(encoded @ W^T + b)
+//
+// encoded[n*hidden]        — encoded vectors from autoencoderEncodeGPU
+// W[input_dim*hidden]      — decoder weight matrix (row-major)
+// b[input_dim]             — decoder bias vector
+// n, hidden, output_dim    — dimensions
+// output[n*output_dim]     — reconstructed vectors
+
+extern "C" int autoencoderDecodeGPU(
+    const float* encoded, int n, int hidden,
+    const float* W, const float* b, int output_dim,
+    float* output, int output_len
+) {
+    if (!encoded || !W || !b || !output) return GPU_ERR_INVALID_ARGS;
+    if (n <= 0 || hidden <= 0 || output_dim <= 0) return GPU_ERR_INVALID_ARGS;
+    if (output_len < n * output_dim) return GPU_ERR_BUFFER_TOO_SMALL;
+    try {
+        torch::NoGradGuard ng;
+        auto dev  = pgDevice();
+        auto opts = torch::TensorOptions().dtype(torch::kFloat32);
+
+        auto Z  = torch::from_blob(const_cast<float*>(encoded), {n, hidden}, opts).to(dev);
+        auto Wt = torch::from_blob(const_cast<float*>(W),       {output_dim, hidden}, opts).to(dev);
+        auto bv = torch::from_blob(const_cast<float*>(b),       {output_dim}, opts).to(dev);
+
+        auto recon = torch::tanh(torch::mm(Z, Wt.t()) + bv);
+
+        auto cpu_r = recon.to(torch::kCPU).contiguous();
+        std::memcpy(output, cpu_r.data_ptr<float>(), n * output_dim * sizeof(float));
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
+}
+
+// ── pcaProjectGPU ─────────────────────────────────────────────────────────────
+// Project embeddings onto k pre-computed principal components.
+// projected[i] = (data[i] - mean) @ components^T
+//
+// data[n*dim]        — n input vectors
+// mean[dim]          — mean vector (from PCA fit; pass zeros to skip centering)
+// components[k*dim]  — k principal component vectors (row-major, L2-normalised)
+// n, dim, k          — dimensions
+// output[n*k]        — projected (low-dim) coordinates
+
+extern "C" int pcaProjectGPU(
+    const float* data,       int n,   int dim,
+    const float* mean,
+    const float* components, int k,
+    float* output,           int output_len
+) {
+    if (!data || !mean || !components || !output) return GPU_ERR_INVALID_ARGS;
+    if (n <= 0 || dim <= 0 || k <= 0 || k > dim) return GPU_ERR_INVALID_ARGS;
+    if (output_len < n * k) return GPU_ERR_BUFFER_TOO_SMALL;
+    try {
+        torch::NoGradGuard ng;
+        auto dev  = pgDevice();
+        auto opts = torch::TensorOptions().dtype(torch::kFloat32);
+
+        auto X = torch::from_blob(const_cast<float*>(data),       {n, dim}, opts).to(dev);
+        auto u = torch::from_blob(const_cast<float*>(mean),       {1, dim}, opts).to(dev);
+        auto V = torch::from_blob(const_cast<float*>(components), {k, dim}, opts).to(dev);
+
+        // Center then project: [n, dim] - [1, dim] → [n, dim] @ [dim, k] → [n, k]
+        auto projected = torch::mm(X - u, V.t());
+
+        auto cpu_p = projected.to(torch::kCPU).contiguous();
+        std::memcpy(output, cpu_p.data_ptr<float>(), n * k * sizeof(float));
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) { return GPU_ERR_UNKNOWN; }
+}
+
 // ── topKIndicesGPU ───────────────────────────────────────────────────────────
 // GPU top-k selection — returns the k highest-scoring indices in descending order.
 // Used in retrieval ranking (pick best k chunks from n candidates).
