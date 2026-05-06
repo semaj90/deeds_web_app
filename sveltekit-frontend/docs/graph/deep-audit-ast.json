@@ -1,106 +1,116 @@
 {
-  "generatedAt": "2026-05-06T00:37:50.234Z",
+  "generatedAt": "2026-05-06T01:00:28.047Z",
   "graphFiles": 3417,
   "gates": {
-    "D17": {
-      "name": "MGET bulk-read opportunity (3+ sequential redis.get)",
-      "count": 16,
+    "D16": {
+      "name": "await-using opportunity (try/finally + .quit/.disconnect)",
+      "count": 7,
       "findings": [
         {
-          "file": "src\\lib\\server\\vector-cache.ts",
-          "line": 1,
-          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "file": "scripts\\deep-audit-ast.mjs",
+          "line": 647,
+          "snippet": "// D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\inference\\turbo-prefix-cache.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "file": "scripts\\tests\\test-ace-graphify-retrieval.mjs",
+          "line": 192,
+          "snippet": "await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\inference\\gpu-arbiter.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "file": "scripts\\lib\\phase89-sse-stream.mjs",
+          "line": 199,
+          "snippet": "await redis.quit();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\grpc\\embedding-client.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "file": "src\\lib\\server\\redis-streams.ts",
+          "line": 147,
+          "snippet": "reader.disconnect();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\graph\\hypergraph-4d.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "file": "src\\routes\\api\\health\\redis\\+server.ts",
+          "line": 74,
+          "snippet": "await client.quit();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\graph\\glyph-atlas-builder.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "file": "src\\routes\\api\\cache\\stats\\+server.ts",
+          "line": 78,
+          "snippet": "fresh.disconnect();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\graph\\community-graph.ts",
-          "line": 1,
-          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\lib\\server\\engagement\\idle-reengagement.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\lib\\server\\cache\\report-template-cache.ts",
-          "line": 1,
-          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\lib\\server\\cache\\code-llm-index.ts",
-          "line": 1,
-          "snippet": "5 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\lib\\server\\ai\\error-fix-memory.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\lib\\server\\ace\\context-assembler.ts",
-          "line": 1,
-          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\routes\\api\\graph\\glyph-atlas\\+server.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\orchestrate\\+server.ts",
-          "line": 1,
-          "snippet": "3 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\lib\\server\\ff1\\storage\\redis-cache.ts",
-          "line": 1,
-          "snippet": "6 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
-        },
-        {
-          "file": "src\\routes\\api\\synthesis\\evaluation\\[id]\\+server.ts",
-          "line": 1,
-          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
+          "line": 244,
+          "snippet": "redis.disconnect();  → consider `await using` + getDisposableRedis()"
         }
       ]
     },
-    "D19": {
-      "name": "Missing outputMeta on recordLlmOutputHit (use Rag/Kag helper)",
-      "count": 2,
+    "D18": {
+      "name": "simdjson opportunity (.mget + JSON.parse, no fast-parse)",
+      "count": 13,
       "findings": [
         {
-          "file": "src\\lib\\server\\cache\\code-llm-index.ts",
-          "line": 184,
-          "snippet": "export async function recordLlmOutputHit(  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
+          "file": "src\\lib\\server\\retrieval\\centroid-cache.ts",
+          "line": 92,
+          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src\\routes\\api\\codebase-index\\llm-output\\+server.ts",
-          "line": 98,
-          "snippet": "const entry = await recordLlmOutputHit(parsed.data.path, parsed.data.llmOutput, parsed.data);  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
+          "file": "src\\lib\\server\\research\\lane4-feedback.ts",
+          "line": 126,
+          "snippet": "const [scoreRaw, countRaw] = await redis.mget(  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\lib\\server\\rag\\sdk.ts",
+          "line": 48,
+          "snippet": "const [statusRaw, shardCountRaw] = await redis.mget([  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\lib\\server\\graph\\hypergraph-4d.ts",
+          "line": 1123,
+          "snippet": "const raw = await redis.mget(hashes.map(h => HG_EDGE_KEY(h))).catch(() => [] as (string|null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\lib\\server\\graph\\community-graph.ts",
+          "line": 491,
+          "snippet": "const commRaws = await redis.mget(...commKeys).catch(() => [] as Array<string | null>);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\lib\\server\\graph\\codebase-cluster-detection.ts",
+          "line": 350,
+          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\lib\\server\\cache\\redis-exact-match.ts",
+          "line": 160,
+          "snippet": "const values = await redis.mget(...cacheKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\lib\\server\\analytics\\web-research-crawler.ts",
+          "line": 396,
+          "snippet": ".mget(hashes.map(h => WEB_SUM_KEY(h)))  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\lib\\server\\analytics\\research-cache.ts",
+          "line": 200,
+          "snippet": "const raw = await redis.mget(hashes.map(h => SKETCH_KEY(h))).catch(() => [] as (string | null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\routes\\api\\codebase-index\\topology-hits\\+server.ts",
+          "line": 52,
+          "snippet": "const blobs = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\routes\\api\\codebase-index\\ingest-log\\+server.ts",
+          "line": 44,
+          "snippet": "const raws = await redis.mget(hashes.map((h) => `rag:hit:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\routes\\api\\codebase-index\\agents-write\\+server.ts",
+          "line": 209,
+          "snippet": "kagVals = await redis.mget(...kagKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+        },
+        {
+          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
+          "line": 223,
+          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         }
       ]
     }

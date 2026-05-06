@@ -82,6 +82,12 @@ async function createRedis() {
   }
   const client = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 2 });
   await client.connect();
+  // D16: attach Symbol.asyncDispose so callers can `await using redis = ...`
+  // The handler swallows quit errors (already-disconnected case is fine).
+  Object.defineProperty(client, Symbol.asyncDispose, {
+    value: async () => { try { await client.quit(); } catch { /* fine */ } },
+    configurable: true, writable: false, enumerable: false,
+  });
   return client;
 }
 
@@ -208,8 +214,9 @@ async function main() {
   console.log(`  CouchDB: ${COUCH_BASE}/${COUCHDB_DB}`);
   console.log(`  force=${FORCE}  limit=${LIMIT === Infinity ? 'none' : LIMIT}  dir=${SINGLE ?? 'all'}  quiet=${QUIET}`);
 
-  // 1. Connect to Redis
-  const redis = await createRedis();
+  // 1. Connect to Redis — D16: `await using` auto-disposes on scope exit
+  // even on throw. Replaces the previous try/finally redis.quit() pattern.
+  await using redis = await createRedis();
 
   try {
     // 2. Discover wiki:note:dir:* keys
@@ -340,10 +347,8 @@ async function main() {
     console.log(`  Docs skipped : ${skipped}`);
     console.log(`  Docs failed  : ${totalFailed}`);
     console.log(`  Design doc   : _design/directory_glyphs (cluster_links view)`);
-
-  } finally {
-    await redis.quit().catch(() => {});
   }
+  // No finally needed — `await using redis` disposes on scope exit (even on throw).
 }
 
 main().catch((err) => {

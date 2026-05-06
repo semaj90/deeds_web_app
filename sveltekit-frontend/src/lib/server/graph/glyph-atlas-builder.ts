@@ -318,21 +318,33 @@ export async function buildGlyphAtlas(opts: {
     }
   } catch { /* fallback to fanIn */ }
 
-  // Load KAG audit scores in bulk
+  // Load KAG audit scores in bulk — simdjson AVX2 fast-parse for ≥10/≥5KB
+  // aggregate (wiki notes are typically 1-5KB each so the threshold trips
+  // when the codebase has ≥10 directories with cached notes).
   const allDirs = [...new Set(files.map((f) => f.rel.split('/').slice(0, -1).join('/')))];
   const kagKeys = allDirs.map((d) => `wiki:note:dir:${d.replace(/[^a-z0-9]/gi, '_')}`);
   let kagVals: (string | null)[] = [];
   try {
     kagVals = kagKeys.length ? await redis.mget(...kagKeys) : [];
   } catch { /* non-fatal */ }
+
   const kagAuditMap = new Map<string, number>();
+  // Choose parser per total payload — V8 wins for tiny aggregates, simdjson wins for ≥5KB
+  const totalChars = kagVals.reduce((sum, v) => sum + (v?.length ?? 0), 0);
+  let parseFn: <T>(s: string) => T = (s) => JSON.parse(s) as never;
+  if (kagVals.length >= 10 && totalChars >= 5_000) {
+    try {
+      const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+      if (isSimdJsonAvailable()) parseFn = fastJsonParse;
+    } catch { /* addon unavailable — keep V8 */ }
+  }
   for (let i = 0; i < allDirs.length; i++) {
-    if (kagVals[i]) {
-      try {
-        const note = JSON.parse(kagVals[i]!) as { auditScore?: number };
-        if (note.auditScore != null) kagAuditMap.set(allDirs[i], note.auditScore / 100);
-      } catch { /* ignore */ }
-    }
+    const raw = kagVals[i];
+    if (!raw) continue;
+    try {
+      const note = parseFn<{ auditScore?: number }>(raw);
+      if (note.auditScore != null) kagAuditMap.set(allDirs[i], note.auditScore / 100);
+    } catch { /* ignore */ }
   }
 
   // Group files by cluster (Map phase)
