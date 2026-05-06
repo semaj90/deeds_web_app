@@ -1281,21 +1281,7 @@ return { data: rows[0], loadError: null };
 
 **NEVER delete working scripts.** Move them to `scripts/tests/` if they're in the wrong place. We keep scripts that worked — we might need them later.
 
-```bash
-# Quick test (7 core routes) — requires dev server running
-node scripts/tests/test-screenshots.mjs
-
-# All app routes (23 routes)
-node scripts/tests/test-screenshots.mjs --all
-
-# Single route
-node scripts/tests/test-screenshots.mjs --route /evidence
-
-# Custom port
-node scripts/tests/test-screenshots.mjs --port 3000
-```
-
-Outputs timestamped screenshots + JSON report to `scripts/tests/screenshots/`. Latest run always copied to `scripts/tests/screenshots/latest/`.
+Visual regression / route-screenshot testing is currently delegated to Playwright in `tests/e2e/`. The `scripts/tests/test-screenshots.mjs` referenced in older sessions was never committed to the tree (and isn't in `deeds_labs/` archive either) — it was a local-only helper. Re-create as needed using Playwright's `page.screenshot({ path })` per the existing `tests/e2e/*.spec.ts` patterns.
 
 ---
 
@@ -1603,7 +1589,7 @@ Available models: `yorha-legal`, `yorha-fast`, `gemma4-legal`, `gemma3-legal`, `
 - `memory/session-history.md` — Full session-by-session changelog (sessions 1-35)
 - `memory/svelte5-migration-guide.md` — Store → runes patterns, do's/don'ts, XState v5
 - `memory/docker-sveltekit.md` — Docker SSR deployment, Dockerfile, docker-compose
-- `scripts/tests/test-screenshots.mjs` — Playwright visual regression / 500-error tester
+- `tests/e2e/*.spec.ts` — Playwright visual regression / 500-error tester (uses `page.screenshot()`)
 
 Sources:
 - [Bits UI Docs](https://bits-ui.com/) | [Migration Guide](https://bits-ui.com/docs/migration-guide)
