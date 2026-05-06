@@ -69,6 +69,31 @@ export function getDisposableRedis(): DisposableRedis {
  *   await redis.ping();
  *   // .quit() fires automatically here, even on throw
  */
+/**
+ * Attach Symbol.asyncDispose to an EXISTING Redis client (e.g. one from
+ * `redis.duplicate()`, `createRedisConnection()`, or any factory that
+ * returns a standalone client we own). On scope exit calls `.quit()` if
+ * available, falls back to `.disconnect()`. Idempotent — re-attaching
+ * is a no-op.
+ *
+ *   await using reader = attachDispose(redis.duplicate());
+ *   // .quit() fires on scope exit, even on throw
+ */
+export function attachDispose<T extends { quit?: () => Promise<unknown>; disconnect?: () => void }>(client: T): T & { [Symbol.asyncDispose]: () => Promise<void> } {
+  const existing = (client as unknown as Record<symbol, unknown>)[Symbol.asyncDispose];
+  if (typeof existing === 'function') return client as T & { [Symbol.asyncDispose]: () => Promise<void> };
+  Object.defineProperty(client, Symbol.asyncDispose, {
+    value: async () => {
+      try {
+        if (typeof client.quit === 'function') await client.quit();
+        else if (typeof client.disconnect === 'function') client.disconnect();
+      } catch { /* already-disconnected — fine */ }
+    },
+    configurable: true, writable: false, enumerable: false,
+  });
+  return client as T & { [Symbol.asyncDispose]: () => Promise<void> };
+}
+
 export function createDisposableRedis(url: string = ENV.REDIS_URL): DisposableRedis {
   const r = new Redis(url, {
     maxRetriesPerRequest: 1,
