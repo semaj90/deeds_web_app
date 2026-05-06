@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-05-06T01:28:41.628Z",
+  "generatedAt": "2026-05-06T01:32:09.915Z",
   "graphFiles": 3417,
   "gates": {
-    "D18": {
-      "name": "simdjson opportunity (.mget + JSON.parse, no fast-parse)",
+    "D17": {
+      "name": "MGET bulk-read opportunity (3+ sequential redis.get)",
       "count": 0,
       "findings": []
     }
