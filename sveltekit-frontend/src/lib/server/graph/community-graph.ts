@@ -486,16 +486,15 @@ export async function getCommunityContext(
     // Embed query
     const queryVec = await generateSingleEmbedding(query).catch(() => null);
 
-    // Load community records
-    const records = (
-      await Promise.all(
-        ids.map(async (id) => {
-          const raw = await redis.get(`hg:community:${id}`).catch(() => null);
-          if (!raw) return null;
-          try { return JSON.parse(raw) as CommunityRecord; } catch { return null; }
-        })
-      )
-    ).filter((r): r is CommunityRecord => r !== null);
+    // Load community records — single MGET round-trip (was N parallel gets)
+    const commKeys = ids.map((id) => `hg:community:${id}`);
+    const commRaws = await redis.mget(...commKeys).catch(() => [] as Array<string | null>);
+    const records = commRaws
+      .map((raw): CommunityRecord | null => {
+        if (!raw) return null;
+        try { return JSON.parse(raw) as CommunityRecord; } catch { return null; }
+      })
+      .filter((r): r is CommunityRecord => r !== null);
 
     if (records.length === 0) return [];
 
@@ -606,8 +605,12 @@ export async function getDirectoryKAGContext(
       const manifest = JSON.parse(manifestRaw) as { mode?: string };
       if (manifest.mode === 'fast-ast') {
         const words = query.toLowerCase().split(/\W+/).filter((w) => w.length > 3).slice(0, 5);
-        for (const word of words) {
-          const raw = await redis.get(`code:index:tag:${word}`).catch(() => null);
+        // Single MGET for all word-tag keys (was N sequential gets)
+        const tagKeys = words.map((w) => `code:index:tag:${w}`);
+        const tagRaws = tagKeys.length
+          ? await redis.mget(...tagKeys).catch(() => [] as Array<string | null>)
+          : [];
+        for (const raw of tagRaws) {
           if (!raw) continue;
           const paths: string[] = JSON.parse(raw);
           for (const p of paths.slice(0, 8)) {
@@ -628,14 +631,15 @@ export async function getDirectoryKAGContext(
 
     if (indexKeys.length === 0) return [];
 
-    // ── Step 2: Load all candidate notes from Redis ─────────────────────────
+    // ── Step 2: Load all candidate notes from Redis (single MGET) ──────────
     const notes: Array<WikiNoteRecord & { _key: string }> = [];
-    for (const key of indexKeys) {
-      const raw = await redis.get(key).catch(() => null);
+    const noteRaws = await redis.mget(...indexKeys).catch(() => [] as Array<string | null>);
+    for (let i = 0; i < indexKeys.length; i++) {
+      const raw = noteRaws[i];
       if (!raw) continue;
       try {
         const parsed = JSON.parse(raw) as WikiNoteRecord;
-        notes.push({ ...parsed, _key: key });
+        notes.push({ ...parsed, _key: indexKeys[i] });
       } catch { continue; }
     }
 
