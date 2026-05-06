@@ -461,6 +461,17 @@ export async function generateClusterSummary(
   await setCache(summary);
   await persistClusterSummary(summary);
 
+  // D19: Record in code-llm-index via recordKagAnswer for ACE preflight memory cascade.
+  // This stores the summary in the structured outputMeta JSONB envelope (summary + pipeline tag).
+  void import('$lib/server/cache/code-llm-index.js')
+    .then(({ recordKagAnswer }) =>
+      recordKagAnswer(`cluster:${clusterId}`, summary.summary, {
+        glyphClusterId: clusterId,
+        model:          MODEL,
+      })
+    )
+    .catch(() => null);
+
   // Fire-and-forget: generate durable wiki note for this cluster
   import('$lib/server/indexer/karpathy-wiki.js')
     .then(({ generateClusterNote }) => generateClusterNote(clusterId, 'gpu'))

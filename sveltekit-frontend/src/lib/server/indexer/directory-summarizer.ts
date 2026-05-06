@@ -459,6 +459,18 @@ export async function ingestDirectorySummaries(
       await upsertWikiNote(docId, wikiDoc);
       result.wikiNotesWritten++;
 
+      // D19: Record in code-llm-index via recordKagAnswer for ACE preflight memory cascade.
+      // This populates the outputMeta JSONB column so ACE can serve prior-answer summaries
+      // for this directory in sub-5ms.
+      void import('$lib/server/cache/code-llm-index.js')
+        .then(({ recordKagAnswer }) =>
+          recordKagAnswer(entry.rel, summary, {
+            glyphClusterId: clusterIds[0] ?? -1,
+            model:          'agent-audit',
+          })
+        )
+        .catch(() => null);
+
       if (clusterIds.length > 0) {
         await upsertCommunityReport(entry.rel, clusterIds, summary, tags, embedding);
         result.communityRowsUpserted++;

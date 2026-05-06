@@ -94,11 +94,13 @@ export const ff1Tools = {
   /** Get KAG wiki note for a directory from Redis. */
   async getKagNote(params: { dir: string }): Promise<string> {
     try {
+      const { attachDispose } = await import('$lib/server/redis-disposable.js');
       const { createClient } = await import('redis');
-      const r = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
-      await r.connect();
+      const raw = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
+      await raw.connect();
+      // D16: `await using` auto-calls .quit() on scope exit (even on throw)
+      await using r = attachDispose(raw);
       const note = await r.get(`wiki:note:dir:${params.dir}`) as string | null;
-      await r.quit();
       return note ?? `No KAG note for: ${params.dir}`;
     } catch (err) {
       return `KAG lookup failed: ${(err as Error).message}`;
@@ -145,9 +147,12 @@ export const ff1Tools = {
   /** Get cached repair plans for a file from Redis. */
   async getRepairHistory(params: { filePath: string; limit?: number }): Promise<string> {
     try {
+      const { attachDispose } = await import('$lib/server/redis-disposable.js');
       const { createClient } = await import('redis');
-      const r = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
-      await r.connect();
+      const raw = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
+      await raw.connect();
+      // D16: `await using` auto-calls .quit() on scope exit (even on throw)
+      await using r = attachDispose(raw);
       const keys = await r.keys('ff1:repair:plan:*') as string[];
       const plans: unknown[] = [];
       for (const k of keys.slice(0, params.limit ?? 5)) {
@@ -159,7 +164,6 @@ export const ff1Tools = {
           }
         }
       }
-      await r.quit();
       return plans.length ? JSON.stringify(plans, null, 2) : 'No repair history found.';
     } catch (err) {
       return `History lookup failed: ${(err as Error).message}`;
