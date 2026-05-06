@@ -1,14 +1,14 @@
 # AGENTS.md — `src/routes/(app)/admin/phase78/monitor`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: src/routes/(app)/admin/phase78/monitor
 
 ## Snapshot
 
 - 2 file(s), 0 handler(s)
-- Audit score: **98/100**
+- Audit score: _(no GPU audit)_
 - no audit signals
 
 

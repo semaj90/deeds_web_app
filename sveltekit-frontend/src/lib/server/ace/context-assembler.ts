@@ -75,7 +75,7 @@ import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/AC
 import { applyClusterCoherenceBoost, extractDominantCluster } from '$lib/server/retrieval/cluster-aware-reranker.js';
 import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
 import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/bag-cache.js';
-import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
+import { classifyQuerySection, analyzeACEFlow } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 import {
   computeManifold4Centroid,
@@ -533,6 +533,40 @@ export async function assembleACEContext(opts: {
           ? { topoPrefilter: acpKnowledgeResults.metadata.topoPrefilter }
           : undefined,
       };
+
+      // ── HMM Wiki Logger — 4D topology note (fire-and-forget) ──────────
+      // Builds minimal GlyphRecord proxies from the top assembled chunks and
+      // logs an HMM flow analysis note to Redis wiki:note:hmm:{hash}.
+      // Non-blocking — errors are swallowed so assembly is never delayed.
+      (async () => {
+        try {
+          const { logHMMAnalysis } = await import('./hmm-wiki-logger.js');
+          const topChunks = [...baseContext.kbChunks.slice(0, 6), ...baseContext.ragChunks.slice(0, 4)];
+          if (topChunks.length === 0) return;
+          type GR = import('$lib/server/types/glyph.js').GlyphRecord;
+          type GS = import('$lib/server/types/glyph.js').GlyphSection;
+          const proxiedGlyphs: GR[] = topChunks.map((c, i) => ({
+            glyphId: c.sourceId ?? c.id ?? `chunk-${i}`,
+            sourceId: c.sourceId ?? c.id ?? `chunk-${i}`,
+            kind: 'chunk' as const,
+            schemaVersion: 1,
+            semantic: {
+              summary: (c.content ?? '').slice(0, 200),
+              tags: c.tags ?? [],
+              entities: [],
+              section: (querySection.section ?? 'UNKNOWN') as GS,
+              kagNeighbors: [],
+              dagPrev: [],
+              dagNext: [],
+            },
+            vector: { embedding768: new Float32Array(0), embeddingModel: '' },
+            topology: {},
+            render: {},
+          }));
+          const hmmAnalysis = await analyzeACEFlow(proxiedGlyphs);
+          await logHMMAnalysis(hmmAnalysis, proxiedGlyphs, { userId, caseId });
+        } catch { /* non-fatal */ }
+      })().catch(() => {});
 
       // ── Autonomous Research Ingestion (Phase 6) ─────────────────────
       // Persist all external research (Web + Wikipedia) to knowledge_base
@@ -2622,7 +2656,35 @@ export async function fetchCodebaseContext(
       ...(combinedFilter ? { filter: combinedFilter } : {}),
     });
 
-    if (!results.length) return null;
+    // ── Tier-2 fallback: Postgres FTS when Qdrant returns nothing ───────────
+    // searchCodeLexical hits code_retrieval_chunks (GIN tsvector) — no ANN needed.
+    // Results are weighted at 0.3× relative to Qdrant cosine scores to keep them
+    // ranked below any future Qdrant hits in merged result sets.
+    if (!results.length) {
+      try {
+        const { searchCodeLexical } = await import('$lib/server/search/postgres-fts.js');
+        const ftsRows = await searchCodeLexical(query, { limit: 10 });
+        if (ftsRows.length > 0) {
+          const ftsChunks = ftsRows.map((row) => ({
+            filePath:            row.file_path,
+            content:             row.content,
+            score:               (row.lexical_score ?? 0) * 0.3,
+            tags:                row.tags ? row.tags.split(',').filter(Boolean) : undefined,
+            gpuCluster:          null,
+            pageRankScore:       null,
+            routeType:           null,
+            hasAuthGuard:        null,
+            somCluster:          null,
+            somBmuRow:           null,
+            somBmuCol:           null,
+            graphAuthorityScore: row.graph_authority_score ?? null,
+          } as NonNullable<ACEContext['codebaseContext']>[number]));
+          writeAceCodeCache(query, classifyQuery(query), agentsMdResolvedDir, ftsChunks);
+          return ftsChunks;
+        }
+      } catch { /* FTS unavailable — fall through to null */ }
+      return null;
+    }
 
     // Helper to map a result (with optional rerank score override) to the context shape
     const toCtx = (

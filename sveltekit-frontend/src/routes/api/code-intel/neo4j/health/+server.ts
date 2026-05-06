@@ -27,14 +27,22 @@ export const GET: RequestHandler = async ({ locals }) => {
     return json({ ...DEGRADED, error: 'Neo4j driver not configured' });
   }
 
-  const session = driver.session();
   const t0 = Date.now();
+  let session;
+
+  try {
+    session = driver.session();
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return json({ ...DEGRADED, error: `Failed to open Neo4j session: ${msg}`, durationMs: Date.now() - t0 });
+  }
 
   let neo4j = false;
   let apoc  = false;
   let gds   = false;
   let gdsVersion: string | null = null;
   let apocCount: number | null = null;
+  let earlyError: string | null = null;
 
   try {
     // Gate 1 — basic connectivity
@@ -42,23 +50,24 @@ export const GET: RequestHandler = async ({ locals }) => {
       await session.run('RETURN 1 AS ok');
       neo4j = true;
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      return json({ ...DEGRADED, error: `Neo4j unreachable: ${msg}`, durationMs: Date.now() - t0 });
+      earlyError = `Neo4j unreachable: ${e instanceof Error ? e.message : String(e)}`;
     }
 
-    // Gate 2 — APOC
-    try {
-      const r = await session.run(`CALL apoc.help('apoc') YIELD name RETURN count(name) AS apocCount`);
-      apocCount = Number(r.records[0]?.get('apocCount') ?? 0);
-      apoc = apocCount > 0;
-    } catch { /* APOC not installed */ }
+    if (neo4j) {
+      // Gate 2 — APOC
+      try {
+        const r = await session.run(`CALL apoc.help('apoc') YIELD name RETURN count(name) AS apocCount`);
+        apocCount = Number(r.records[0]?.get('apocCount') ?? 0);
+        apoc = apocCount > 0;
+      } catch { /* APOC not installed */ }
 
-    // Gate 3 — GDS version
-    try {
-      const r = await session.run(`CALL gds.version() YIELD version RETURN version`);
-      gdsVersion = r.records[0]?.get('version') ?? null;
-      gds = gdsVersion !== null;
-    } catch { /* GDS not installed */ }
+      // Gate 3 — GDS version (field name is gdsVersion, not version)
+      try {
+        const r = await session.run(`CALL gds.version()`);
+        gdsVersion = r.records[0]?.get('gdsVersion') ?? null;
+        gds = gdsVersion !== null;
+      } catch { /* GDS not installed */ }
+    }
 
     return json({
       ok: neo4j && apoc && gds,
@@ -68,8 +77,12 @@ export const GET: RequestHandler = async ({ locals }) => {
       gdsVersion,
       apocProcedures: apocCount,
       durationMs: Date.now() - t0,
+      ...(earlyError ? { error: earlyError } : {}),
     });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return json({ ...DEGRADED, error: msg, durationMs: Date.now() - t0 });
   } finally {
-    await session.close();
+    await session.close().catch(() => {});
   }
 };

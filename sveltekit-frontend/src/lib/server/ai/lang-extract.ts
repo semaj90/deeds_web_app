@@ -2,7 +2,8 @@
  * LangExtract — typed structured extraction from LLM outputs.
  *
  * Wraps bifrostChat() with JSON-mode prompting + Zod schema validation.
- * Zero API cost: all requests route through L1 Redis → L2 Bifrost → L3 Ollama.
+ * Defaults to L1 Redis → L2 Bifrost → L3 Ollama, with optional OpenAI-compatible
+ * routing when the OpenAI provider is enabled.
  *
  * Memory / performance:
  *   - Schema fingerprint (L1 cache key) derived from Zod shape description
@@ -22,6 +23,7 @@
 
 import { z } from 'zod';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { AI_CONFIG } from '$lib/server/config.js';
 import { ENV } from '$lib/server/env.server.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -32,6 +34,53 @@ export interface ExtractResult<T> {
 	valid: boolean;
 	error?: string;
 	durationMs: number;
+}
+
+export async function chatCompletionViaOpenAICompat(
+	messages: Array<{ role: 'system' | 'user'; content: string }>,
+	model: string,
+	options?: {
+		temperature?: number;
+		maxTokens?: number;
+		timeoutMs?: number;
+	},
+): Promise<string> {
+	const baseUrl = ENV.OPENAI_BASE_URL.replace(/\/$/, '');
+	const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+	if (process.env.OPENAI_API_KEY) {
+		headers.Authorization = `Bearer ${process.env.OPENAI_API_KEY}`;
+	}
+
+	const res = await fetch(`${baseUrl}/chat/completions`, {
+		method: 'POST',
+		headers,
+		body: JSON.stringify({
+			model,
+			messages,
+			temperature: options?.temperature ?? 0,
+			max_tokens: options?.maxTokens ?? 800,
+			stream: false,
+		}),
+		signal: AbortSignal.timeout(options?.timeoutMs ?? 30_000),
+	});
+
+	if (!res.ok) {
+		const body = await res.text().catch(() => '');
+		throw new Error(`OpenAI-compatible chat failed: ${res.status}${body ? ` - ${body}` : ''}`);
+	}
+
+	const data = await res.json() as {
+		choices?: Array<{
+			message?: {
+				content?: string;
+				reasoning_content?: string;
+			};
+		}>;
+	};
+
+	return data.choices?.[0]?.message?.content
+		?? data.choices?.[0]?.message?.reasoning_content
+		?? '';
 }
 
 // ── Schema description builder ─────────────────────────────────────────────────
@@ -74,7 +123,8 @@ function describeShape(schema: z.ZodTypeAny, depth = 0): string {
 /**
  * Extract structured data from `content` using LLM + Zod schema validation.
  *
- * Routes through L1 Redis → L2 Bifrost → L3 Ollama (zero API cost).
+ * Routes through L1 Redis → L2 Bifrost → L3 Ollama by default, or an
+ * OpenAI-compatible endpoint when enabled.
  * Temperature defaults to 0 for deterministic extraction.
  *
  * @param schema      - Zod schema for expected output shape
@@ -121,13 +171,25 @@ export async function extractStructured<T>(
 	];
 
 	try {
-		const raw = await bifrostChat(messages, model, {
-			temperature: options?.temperature ?? 0,
-			maxTokens:   options?.maxTokens  ?? 800,
-			timeoutMs:   options?.timeoutMs  ?? 30_000,
-			cacheKey,
-			entityTags:  options?.entityTags,
-		});
+		const raw = AI_CONFIG.openai.enabled
+			? await chatCompletionViaOpenAICompat(messages, options?.model ?? AI_CONFIG.openai.model, {
+				temperature: options?.temperature ?? 0,
+				maxTokens:   options?.maxTokens  ?? 800,
+				timeoutMs:   options?.timeoutMs  ?? 30_000,
+			}).catch(async () => bifrostChat(messages, model, {
+				temperature: options?.temperature ?? 0,
+				maxTokens:   options?.maxTokens  ?? 800,
+				timeoutMs:   options?.timeoutMs  ?? 30_000,
+				cacheKey,
+				entityTags:  options?.entityTags,
+			}))
+			: await bifrostChat(messages, model, {
+				temperature: options?.temperature ?? 0,
+				maxTokens:   options?.maxTokens  ?? 800,
+				timeoutMs:   options?.timeoutMs  ?? 30_000,
+				cacheKey,
+				entityTags:  options?.entityTags,
+			});
 
 		// Strip markdown code fences (Ollama wraps despite system prompt ~15% of the time)
 		const cleaned = raw

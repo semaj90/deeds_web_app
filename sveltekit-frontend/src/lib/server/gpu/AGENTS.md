@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/gpu`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/gpu
 
@@ -20,15 +20,6 @@
 - `src/lib/server/gpu/gpu-monitor.ts`
 - `src/lib/server/gpu/libtorch-bridge.ts`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C20** — function chunks in \`src/lib/webgpu\` (tag: embedding)
-
-- **Top kinds**: function×9, class×5, const×1
-- **Top tags**: `embedding` `redis` `vector` `auth` `schema`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 20 for full digest.
-
 ## Warnings
 
 - ⚠️ Hardcoded localhost refs
@@ -37,9 +28,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 20 for full digest.
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C20 — function chunks in `src/lib/webgpu` (tag: embedding)
-- **BoW texture key**: `texture:bow:cluster:20` (Redis 1h TTL)
-- **Qdrant tags**: `embedding` `redis` `vector` `auth` `schema`
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
 - **Paired tests**: 0/11 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
@@ -50,8 +39,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server gpu", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/gpu/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 20 })` — BoW texture tile for cluster C20
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 20 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

@@ -74,6 +74,19 @@ export interface OpenAIChatCompletionResponse {
     codeLlmHit:     boolean;
     cacheHit:       'none' | 'agents-md' | 'prior-answer' | 'bifrost';
     durationMs:     number;
+    // Tool loop metadata (Step 5 — Gemma4 MCP tool controller)
+    toolsUsed?:        string[];
+    toolRounds?:       number;
+    toolResultChars?:  number;
+    priorAnswerKey?:   string;
+    mcpPort?:          number;
+    // KV context compression metadata (Step 5A)
+    kvPacketTaskId?:   string;
+    stablePrefixHash?: string;
+    // Dev context loop metadata (Step 5B)
+    selectedStableKeys?: string[];
+    selectedFiles?:      string[];
+    contextHitCount?:    number;
   };
 }
 

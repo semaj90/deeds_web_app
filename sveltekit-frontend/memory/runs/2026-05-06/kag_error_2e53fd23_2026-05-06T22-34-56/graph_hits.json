@@ -1,0 +1,36 @@
+{
+  "type": "graph_hits",
+  "task_id": "kag_error_2e53fd23_2026-05-06T22-34-56",
+  "degraded": false,
+  "reason": null,
+  "count": 1,
+  "hits": [
+    {
+      "stableKey": null,
+      "label": null,
+      "neighbors": [
+        {
+          "rel": "CLASSIFIED_AS",
+          "label": "DevCode",
+          "key": null
+        },
+        {
+          "rel": "IN_SOM_CELL",
+          "label": null,
+          "key": null
+        },
+        {
+          "rel": "IN_CLUSTER",
+          "label": null,
+          "key": null
+        },
+        {
+          "rel": "IN_SOM_CELL",
+          "label": null,
+          "key": null
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-05-06T22:34:56.620Z"
+}

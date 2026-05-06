@@ -3,8 +3,8 @@
  *
  * Karpathy-style semantic tag enrichment for codebase_chunks_768.
  *
- * Uses Ollama (gemma4-legal via Bifrost L1→L2→L3 cache) to classify each
- * code chunk into 1-4 semantic category tags. Runs incrementally — only
+ * Uses Ollama by default, or the OpenAI-compatible gateway when enabled, to
+ * classify each code chunk into 1-4 semantic category tags. Runs incrementally — only
  * processes chunks that have no semantic tags yet (or have only neo4j audit
  * flags). Results are written back to Qdrant payload `tags` field.
  *
@@ -21,17 +21,21 @@
  * Returns immediately with { jobId } — or { tags, updated } if batchSize is small
  *
  * Auth: requires locals.user
- * Cost: ZERO (Ollama local + Bifrost semantic cache — no Anthropic API)
+ * Cost: ZERO by default (Ollama local + Bifrost semantic cache). OpenAI-compatible
+ * mode can be enabled when you want this pipeline to use that endpoint.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { extractMLMetadata } from '$lib/server/ai/lang-extract.js';
+import { AI_CONFIG } from '$lib/server/config.js';
+import { chatCompletionViaOpenAICompat, extractMLMetadata } from '$lib/server/ai/lang-extract.js';
 
 const QDRANT_URL   = ENV.QDRANT_URL;
 const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
 const COLLECTION   = 'codebase_chunks_768';
+const OPENAI_TAG_MODEL = AI_CONFIG.openai.model;
+const OLLAMA_TAG_MODEL = ENV.OLLAMA_CHAT_MODEL;
 
 // ── Semantic tag vocabulary ────────────────────────────────────────────────────
 
@@ -90,6 +94,15 @@ function hasSemanticTags(pt: ChunkPoint): boolean {
 	return arr.some(t => (SEMANTIC_TAGS as readonly string[]).includes(t));
 }
 
+function parseSemanticTags(raw: string): string[] {
+	return raw
+		.replace(/\n/g, ' ')
+		.trim()
+		.split(/[,\s]+/)
+		.map(t => t.toLowerCase().replace(/[^a-z-]/g, '').trim())
+		.filter(t => (SEMANTIC_TAGS as readonly string[]).includes(t)) as string[];
+}
+
 async function scrollBatch(offset: string | number | null, limit: number): Promise<{ points: ChunkPoint[]; nextOffset: string | number | null }> {
 	const body: Record<string, unknown> = {
 		limit:        limit,
@@ -129,15 +142,25 @@ async function patchQdrantTags(id: string | number, existing: string[], newTags:
 	return res?.ok ?? false;
 }
 
+async function classifyChunkWithOpenAI(prompt: string): Promise<string[]> {
+	const raw = await chatCompletionViaOpenAICompat([
+		{ role: 'user', content: prompt },
+	], OPENAI_TAG_MODEL, {
+		temperature: 0,
+		maxTokens: 60,
+		timeoutMs: 30_000,
+	});
+	return parseSemanticTags(raw);
+}
+
 // ── LLM tagger ────────────────────────────────────────────────────────────────
 
 /**
- * Classify a batch of chunks via Ollama (with Bifrost L1+L2 semantic cache).
+ * Classify a batch of chunks via Ollama or the OpenAI-compatible gateway.
  * Returns map: chunkId → string[]
  */
 async function classifyChunks(chunks: ChunkPoint[]): Promise<Map<string | number, string[]>> {
 	const result = new Map<string | number, string[]>();
-	const model  = ENV.OLLAMA_CHAT_MODEL;
 
 	// Tag one chunk at a time — each gets its own cache slot via Bifrost
 	for (const chunk of chunks) {
@@ -168,13 +191,22 @@ async function classifyChunks(chunks: ChunkPoint[]): Promise<Map<string | number
 		].join('\n');
 
 		try {
+			if (AI_CONFIG.openai.enabled) {
+				try {
+					result.set(chunk.id, [...new Set(await classifyChunkWithOpenAI(prompt))]);
+					continue;
+				} catch {
+					// Fall back to Ollama below.
+				}
+			}
+
 			// Call Ollama directly (matches bifrostChat internal path)
 			// Using /api/generate for fast single-turn classification
 			const res = await fetch(`${OLLAMA_URL}/api/generate`, {
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body:    JSON.stringify({
-					model,
+					model: OLLAMA_TAG_MODEL,
 					prompt,
 					stream:   false,
 					options:  { temperature: 0, num_predict: 60 },
@@ -188,13 +220,7 @@ async function classifyChunks(chunks: ChunkPoint[]): Promise<Map<string | number
 			}
 
 			const data  = await res.json() as { response?: string };
-			const raw   = (data.response ?? '').replace(/\n/g, ' ').trim();
-
-			// Parse: "api-route, auth" → ['api-route', 'auth']
-			const tags: string[] = raw
-				.split(/[,\s]+/)
-				.map(t => t.toLowerCase().replace(/[^a-z-]/g, '').trim())
-				.filter(t => (SEMANTIC_TAGS as readonly string[]).includes(t)) as string[];
+			const tags  = parseSemanticTags(data.response ?? '');
 
 			result.set(chunk.id, [...new Set(tags)]);
 		} catch {
@@ -217,6 +243,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { batchSize, dryRun, forceRetag } = parsed.success
 		? parsed.data
 		: { batchSize: 20, dryRun: false, forceRetag: false };
+	const model = AI_CONFIG.openai.enabled ? OPENAI_TAG_MODEL : OLLAMA_TAG_MODEL;
 
 	const tagged: { id: string | number; tags: string[] }[] = [];
 	const skipped: number[] = [];
@@ -335,7 +362,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			semanticTagDist,
 			results:   dryRun ? tagged : tagged.map(t => ({ id: t.id, tagCount: t.tags.length })),
 			vocabulary: SEMANTIC_TAGS,
-			model:      ENV.OLLAMA_CHAT_MODEL,
+			model,
 		});
 	} catch (err) {
 		console.error('[karpathy-tag] Error:', err);
@@ -349,8 +376,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			semanticTagDist: {},
 			results:   [],
 			vocabulary: SEMANTIC_TAGS,
-			model:      ENV.OLLAMA_CHAT_MODEL,
-			error:     'Tagging failed — Ollama may be unavailable',
+			model,
+			error:     AI_CONFIG.openai.enabled
+				? 'Tagging failed — OpenAI-compatible provider may be unavailable'
+				: 'Tagging failed — Ollama may be unavailable',
 		});
 	}
 };
@@ -394,7 +423,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 		total,
 		pct:             total > 0 ? Math.round((tagged / total) * 100) : 0,
 		semanticTagDist: dist,
-		model:           ENV.OLLAMA_CHAT_MODEL,
-		note:            'Uses Ollama local + Bifrost L1/L2 cache — zero API cost',
+		model:           AI_CONFIG.openai.enabled ? OPENAI_TAG_MODEL : ENV.OLLAMA_CHAT_MODEL,
+		note:            AI_CONFIG.openai.enabled
+			? 'Uses the OpenAI-compatible gateway when enabled; otherwise local Ollama + Bifrost cache.'
+			: 'Uses Ollama local + Bifrost L1/L2 cache — zero API cost',
 	});
 };

@@ -75,7 +75,7 @@ export const AI_CONFIG = {
 	},
 	// Fallback: OpenAI API
 	openai: {
-		enabled: env.OPENAI_ENABLED === 'true',
+		enabled: env.OPENAI_ENABLED === 'true' || !!env.OPENAI_API_KEY,
 		apiKey: env.OPENAI_API_KEY,
 		model: env.OPENAI_MODEL || 'gpt-4',
 		timeout: 30000,
@@ -339,4 +339,3 @@ export function getConfigSummary() {
 		}
 	};
 }
-

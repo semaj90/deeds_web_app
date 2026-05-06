@@ -7,9 +7,10 @@
  *
  * All writes are non-blocking and non-fatal (errors logged, never thrown).
  */
-import { db } from '$lib/server/db/client';
-import { aiUsageLog } from '$lib/server/db/schema-postgres';
+import { db }           from '$lib/server/db/client';
+import { aiUsageLog }   from '$lib/server/db/schema-postgres';
 import { sql, desc, eq } from 'drizzle-orm';
+import { getRedis }      from '$lib/server/redis.js';
 
 export interface TokenUsageParams {
 	userId?: string;
@@ -58,6 +59,88 @@ export function extractOllamaTokens(data: Record<string, unknown>): {
 	const promptTokens = typeof data.prompt_eval_count === 'number' ? data.prompt_eval_count : 0;
 	const completionTokens = typeof data.eval_count === 'number' ? data.eval_count : 0;
 	return { promptTokens, completionTokens };
+}
+
+// ── KV Cache token budget tracker ─────────────────────────────────────────────
+
+const KV_BUDGET_KEY   = 'kv:budget:';
+const KV_BUDGET_TTL   = 60 * 60; // 1h per session
+
+export interface KVCacheTokenEvent {
+  sessionId:       string;
+  model:           string;
+  toolRound:       number;
+  prefixTokens:    number;   // system prompt + preamble (reused from KV prefix cache)
+  newTokens:       number;   // tokens added this round (tool call results)
+  summaryTokens:   number;   // tokens after MLA compression
+  savedTokens:     number;   // newTokens - summaryTokens
+  prefixCacheHit:  boolean;  // whether cache_prompt=true reused the prefix KV
+  totalBudget:     number;
+}
+
+/**
+ * Record a KV cache token budget event. Fire-and-forget.
+ * Accumulates per-session totals in Redis for dashboard display.
+ */
+export function trackKVCacheEvent(ev: KVCacheTokenEvent): void {
+  const key = `${KV_BUDGET_KEY}${ev.sessionId}`;
+  (async () => {
+    try {
+      const redis = getRedis();
+      await redis.hincrby(key, 'total_new_tokens',     ev.newTokens);
+      await redis.hincrby(key, 'total_summary_tokens', ev.summaryTokens);
+      await redis.hincrby(key, 'total_saved_tokens',   ev.savedTokens);
+      await redis.hincrby(key, 'tool_rounds',          1);
+      if (ev.prefixCacheHit) await redis.hincrby(key, 'prefix_cache_hits', 1);
+      await redis.expire(key, KV_BUDGET_TTL);
+
+      // Persist to Postgres ai_usage_log with extended metadata
+      trackTokenUsage({
+        endpoint: `agent:tool_round:${ev.toolRound}`,
+        model:    ev.model,
+        promptTokens:     ev.prefixTokens + ev.newTokens,
+        completionTokens: 0,
+        cached:           ev.prefixCacheHit,
+        metadata: {
+          kv_analysis: true,
+          prefix_tokens:   ev.prefixTokens,
+          summary_tokens:  ev.summaryTokens,
+          saved_tokens:    ev.savedTokens,
+          total_budget:    ev.totalBudget,
+          tool_round:      ev.toolRound,
+        },
+      });
+    } catch { /* non-fatal */ }
+  })();
+}
+
+/**
+ * Get KV budget summary for a session (for YorHA metadata block).
+ */
+export async function getKVBudgetSummary(sessionId: string): Promise<{
+  totalNewTokens:    number;
+  totalSavedTokens:  number;
+  toolRounds:        number;
+  prefixCacheHits:   number;
+  compressionRatio:  number;
+} | null> {
+  try {
+    const redis = getRedis();
+    const raw   = await redis.hgetall(`${KV_BUDGET_KEY}${sessionId}`);
+    if (!raw || !Object.keys(raw).length) return null;
+    const newT   = parseInt(raw.total_new_tokens     ?? '0', 10);
+    const savT   = parseInt(raw.total_saved_tokens   ?? '0', 10);
+    const sumT   = parseInt(raw.total_summary_tokens ?? '0', 10);
+    const rounds = parseInt(raw.tool_rounds          ?? '0', 10);
+    const hits   = parseInt(raw.prefix_cache_hits    ?? '0', 10);
+    return {
+      totalNewTokens:   newT,
+      totalSavedTokens: savT,
+      toolRounds:       rounds,
+      prefixCacheHits:  hits,
+      compressionRatio: sumT > 0 ? newT / sumT : 1,
+    };
+  } catch { return null; }
 }
 
 /**

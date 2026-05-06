@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/components/evidence`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/components/evidence
 
@@ -20,23 +20,12 @@
 - `src/lib/components/evidence/BoardSearchOverlay.svelte`
 - `src/lib/components/evidence/CaseEvidenceOrganizer.svelte`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C86** — function chunks in \`src/lib/components/evidence\` (tag: embedding)
-
-- **Top kinds**: function×14, const×2
-- **Top tags**: `embedding` `server-module` `vector` `page-component` `redis`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 86 for full digest.
-
 
 ## Retrieval / Rerank Hints
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C86 — function chunks in `src/lib/components/evidence` (tag: embedding)
-- **BoW texture key**: `texture:bow:cluster:86` (Redis 1h TTL)
-- **Qdrant tags**: `embedding` `server-module` `vector` `page-component` `redis`
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
 - **Paired tests**: 0/41 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
@@ -47,8 +36,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "components evidence", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/components/evidence/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 86 })` — BoW texture tile for cluster C86
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 86 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

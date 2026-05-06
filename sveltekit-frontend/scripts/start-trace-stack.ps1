@@ -26,7 +26,7 @@ if (Test-Path $LlamaExe) {
     "-m", $Model,
     "--host", "127.0.0.1",
     "--port", "8090",
-    "-c",  "8192",
+    "-c",  "65536",
     "-ngl", "99",
     "--cache-prompt",
     "-ctk", "q8_0",
@@ -54,17 +54,19 @@ if (Test-Path $TopoScript) {
   Write-Host "topology-search-server.mjs not found — skipping" -ForegroundColor Yellow
 }
 
-# ── 3. TRACE MCP server :8788 ─────────────────────────────────────────────────
+# ── 3. TRACE MCP cluster :8788 (multicore round-robin) ───────────────────────
 
-$TsxBin    = Join-Path $Frontend "node_modules\.bin\tsx.cmd"
-$McpServer = Join-Path $Frontend "src\mcp\trace-mcp-server.ts"
-if ((Test-Path $TsxBin) -and (Test-Path $McpServer)) {
-  Write-Host "Starting TRACE MCP server on :8788 ..." -ForegroundColor Cyan
-  Start-Process -FilePath $TsxBin -ArgumentList @($McpServer) `
+$ClusterScript = Join-Path $Frontend "scripts\start-trace-mcp-cluster.mjs"
+$McpServer     = Join-Path $Frontend "src\mcp\trace-mcp-server.ts"
+if ((Test-Path $ClusterScript) -and (Test-Path $McpServer)) {
+  $workers = [Math]::Min([System.Environment]::ProcessorCount, 4)
+  Write-Host "Starting TRACE MCP cluster on :8788 ($workers workers) ..." -ForegroundColor Cyan
+  Start-Process -FilePath "node.exe" `
+    -ArgumentList @($ClusterScript, $workers) `
     -WorkingDirectory $Frontend -WindowStyle Minimized
-  Start-Sleep -Milliseconds 800
+  Start-Sleep -Milliseconds 2500
 } else {
-  Write-Host "tsx or trace-mcp-server.ts not found — skipping MCP server" -ForegroundColor Yellow
+  Write-Host "start-trace-mcp-cluster.mjs or trace-mcp-server.ts not found — skipping" -ForegroundColor Yellow
 }
 
 # ── 4. SvelteKit dev server :5173 ─────────────────────────────────────────────

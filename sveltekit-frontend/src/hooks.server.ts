@@ -807,7 +807,9 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api/evidence/upload') ||
     event.url.pathname.startsWith('/api/codeintel/') ||
     event.url.pathname.startsWith('/api/codebase-index/') ||
-    event.url.pathname.startsWith('/api/graph/som-topology');
+    event.url.pathname.startsWith('/api/graph/som-topology') ||
+    event.url.pathname.startsWith('/api/v1/chat/') ||
+    event.url.pathname.startsWith('/api/v1/agentic/');
 
   if (isStreamRoute) {
     // No timeout for SSE / streaming routes

@@ -1,0 +1,45 @@
+{
+  "type": "context_packet",
+  "task": "Diagnose KAG/ACE failure",
+  "error_hash": "506389f1",
+  "task_id": "kag_error_506389f1_2026-05-06T22-32-43",
+  "top_files": [],
+  "top_symbols": [
+    "Redis",
+    "memberIds",
+    "buildHyperedge"
+  ],
+  "graph_hits": [
+    {
+      "stableKey": null,
+      "label": null,
+      "neighbors": [
+        {
+          "rel": "CLASSIFIED_AS",
+          "label": "DevCode",
+          "key": null
+        },
+        {
+          "rel": "IN_SOM_CELL",
+          "label": null,
+          "key": null
+        },
+        {
+          "rel": "IN_CLUSTER",
+          "label": null,
+          "key": null
+        },
+        {
+          "rel": "IN_SOM_CELL",
+          "label": null,
+          "key": null
+        }
+      ]
+    }
+  ],
+  "vector_hits": [],
+  "ace_hits": [],
+  "deep_research_needed": true,
+  "recommended_next_command": "POST /api/ai/agent { query, pipeline: \"coding\" } — then call kag.record_agent_run with needsDeepResearch:true",
+  "generated_at": "2026-05-06T22:32:43.322Z"
+}

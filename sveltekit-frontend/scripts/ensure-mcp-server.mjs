@@ -10,7 +10,7 @@
  *   isTraceMcpHealthy()  → exported health check
  */
 
-import { spawn }    from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path          from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,6 +23,7 @@ const PORT    = process.env.TRACE_MCP_PORT ?? '8788';
 const BASE    = `http://${HOST}:${PORT}`;
 const TIMEOUT = 500;
 const RETRIES = 20;
+const REQUIRED_TOOLS = ['kag.record_agent_run', 'kag.ingest_memory_directory'];
 
 export async function isTraceMcpHealthy() {
   try {
@@ -35,8 +36,62 @@ export async function isTraceMcpHealthy() {
   }
 }
 
+async function getTraceMcpTools() {
+  try {
+    const res = await fetch(`${BASE}/mcp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }),
+      signal: AbortSignal.timeout(TIMEOUT),
+    });
+    if (!res.ok) return null;
+
+    const raw = await res.text();
+    let parsed = null;
+    for (const line of raw.split('\n')) {
+      if (line.startsWith('data: ')) {
+        try {
+          parsed = JSON.parse(line.slice(6));
+          break;
+        } catch { /* keep scanning */ }
+      }
+    }
+    if (!parsed) {
+      try { parsed = JSON.parse(raw); } catch { return null; }
+    }
+
+    const tools = parsed?.result?.tools;
+    if (!Array.isArray(tools)) return null;
+    return tools.map((tool) => typeof tool?.name === 'string' ? tool.name : null).filter(Boolean);
+  } catch {
+    return null;
+  }
+}
+
+function stopTraceMcpListener() {
+  if (process.platform !== 'win32') return false;
+
+  try {
+    const ps = spawnSync('powershell', [
+      '-NoProfile',
+      '-Command',
+      `$tcp = Get-NetTCPConnection -LocalPort ${PORT} -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; if ($tcp) { Stop-Process -Id $tcp.OwningProcess -Force -ErrorAction SilentlyContinue }`,
+    ], { stdio: 'ignore' });
+    return ps.status === 0;
+  } catch {
+    return false;
+  }
+}
+
 export async function ensureTraceMcp() {
-  if (await isTraceMcpHealthy()) return true;
+  if (await isTraceMcpHealthy()) {
+    const tools = await getTraceMcpTools();
+    if (!tools || REQUIRED_TOOLS.every((tool) => tools.includes(tool))) return true;
+
+    console.warn('[ensure-mcp-server] TRACE MCP is healthy but missing KAG tools; restarting listener...');
+    stopTraceMcpListener();
+    await new Promise((r) => setTimeout(r, 500));
+  }
 
   const serverEntry = path.join(projectRoot, 'src', 'mcp', 'trace-mcp-server.ts');
   if (!existsSync(serverEntry)) {
@@ -44,10 +99,16 @@ export async function ensureTraceMcp() {
     return false;
   }
 
-  const tsxBin = path.join(projectRoot, 'node_modules', '.bin', 'tsx');
+  const tsxBin = process.platform === 'win32'
+    ? path.join(projectRoot, 'node_modules', '.bin', 'tsx.cmd')
+    : path.join(projectRoot, 'node_modules', '.bin', 'tsx');
   const runner = existsSync(tsxBin) ? tsxBin : 'tsx';
 
-  const child = spawn(runner, [serverEntry], {
+  const launchArgs = process.platform === 'win32'
+    ? ['/d', '/c', runner, serverEntry]
+    : [serverEntry];
+
+  const child = spawn(process.platform === 'win32' ? 'cmd.exe' : runner, launchArgs, {
     detached:    true,
     stdio:       'ignore',
     windowsHide: true,

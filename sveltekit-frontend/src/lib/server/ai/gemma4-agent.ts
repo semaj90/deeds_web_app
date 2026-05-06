@@ -44,11 +44,15 @@ import { logInference } from '$lib/server/observability/inference-log.js';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 import { getErrorFixMemory, saveErrorFixMemory } from '$lib/server/ai/error-fix-memory.js';
 import { buildAgentSystemPrompt } from '$lib/ai/prompts.js';
+import {
+  LLAMA_TOOL_DEFINITIONS,
+  LLAMA_TO_MCP_NAME,
+} from '$lib/server/ai/llama-tool-definitions.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const MAX_ROUNDS = 5;    // max tool-call rounds before forcing a final answer
-const TIMEOUT_MS = 90_000;
+const TIMEOUT_MS = 180_000;
 
 // ── Model broker boundary ─────────────────────────────────────────────────────
 // PLANNER_MODEL  — Gemma 4 legal VLM: planning, reasoning, synthesis (5.3GB)
@@ -450,7 +454,76 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'search_postgres_fts',
+      description:
+        'Lexical full-text search over the Postgres code_retrieval_chunks table ' +
+        '(populated from Qdrant after each indexing run). Preserves camelCase, dots, ' +
+        'and path segments — ideal for exact symbol/function/class name lookup. ' +
+        'Faster than Qdrant for known identifiers. Returns file paths, symbol names, ' +
+        'topo_class, and authority score. Use alongside topology_search for hybrid recall.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query:     { type: 'string',  description: 'Symbol name, function, or keywords to search for' },
+          topoClass: { type: 'string',  description: 'Optional: filter to a topology class (e.g. "gpu-cuda", "search-retrieval")' },
+          limit:     { type: 'number',  description: 'Max results (default 10, max 30)' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'search_hybrid',
+      description:
+        'Hybrid retrieval: combines Postgres FTS (lexical), Qdrant semantic search, ' +
+        'and Neo4j authority scoring. Best for queries that mix symbol names with ' +
+        'conceptual descriptions. Returns merged, re-scored results.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query:     { type: 'string', description: 'Natural language or mixed symbol+concept query' },
+          topoClass: { type: 'string', description: 'Optional topology class filter' },
+          limit:     { type: 'number', description: 'Max results (default 10, max 30)' },
+        },
+        required: ['query'],
+      },
+    },
+  },
 ] as const;
+
+// ── GEMMA4_ALLOWED_TOOLS — exported allowlist for MCP graph/search tools ──────
+export const GEMMA4_ALLOWED_TOOLS = {
+  'trace.kag_search':               { write: false },
+  'trace.explain_retrieval':        { write: false },
+  'topology.search_near':           { write: false },
+  'context.build_kv_packet':        { write: false },
+  'context.get_compressed_card':    { write: false },
+  'context.explain_compression':    { write: false },
+  'context.refresh_task_toc':       { write: false },
+  'topology.same_som_cluster':   { write: false },
+  'graph.expand_neighborhood':   { write: false },
+  'graph.shortest_path':         { write: false },
+  'graph.community_for_node':    { write: false },
+  'graph.pagerank_top':          { write: false },
+  'clusters.get_members':        { write: false },
+  'clusters.get_summary_lenses': { write: false },
+  'web.search':                  { write: false },
+  'search.dev_context':          { write: false },
+  'kag.record_agent_run':        { write: true,  requiresGainValidation: false },
+  'kag.ingest_memory_directory': { write: true,  requiresGainValidation: false },
+  'research.encode':             { write: true, requiresGainValidation: true },
+} as const;
+
+export function truncateToolResult(result: unknown, maxChars = 12_000): unknown {
+  const s = typeof result === 'string' ? result : JSON.stringify(result);
+  if (s.length <= maxChars) return result;
+  return s.slice(0, maxChars) + '\n[truncated]';
+}
 
 // ── ALLOWED_TOOLS allowlist ────────────────────────────────────────────────────
 // read  — pure retrieval, no filesystem or DB writes; always allowed
@@ -465,9 +538,27 @@ const ALLOWED_TOOLS = {
     'graph_expand', 'graph_path', 'graph_community', 'graph_pagerank',
     'graph.expand_neighborhood', 'graph.shortest_path',
     'graph.community_for_node', 'graph.pagerank_top',
+    'search_postgres_fts', 'search_hybrid',
+    'search.postgres_fts', 'search.hybrid',
+    // TRACE MCP topology + cluster + KAG tools
+    'trace.kag_search', 'trace.explain_retrieval',
+    'topology.search_near', 'topology.same_som_cluster',
+    'clusters.get_members', 'clusters.get_summary_lenses',
+    'web.search',
+    'context.build_kv_packet', 'context.get_compressed_card',
+    'context.explain_compression', 'context.refresh_task_toc',
+    // MCP dev-context tool (Step 5B)
+    'search.dev_context',
+    // LLAMA __ names (TurboQuant native function-call format)
+    'search__dev_context', 'graph__expand_neighborhood', 'graph__shortest_path',
+    'graph__community_for_node', 'graph__pagerank_top', 'topology__search_near',
+    'topology__same_som_cluster', 'clusters__get_members', 'clusters__get_summary_lenses',
+    'trace__kag_search', 'trace__explain_retrieval', 'context__get_compressed_card',
+    'context__build_kv_packet',
   ]),
   write: new Set([
     'apply_shadow_patch', 'revert_fix', 'verify_fix',
+    'research.encode',
   ]),
   gated: new Set<string>([
     // reserved for future indexing / DB-mutation tools
@@ -958,6 +1049,138 @@ async function dispatchTool(
       return { tool: name, result: data };
     }
 
+    if (name === 'search_postgres_fts' || name === 'search.postgres_fts') {
+      const query     = String(args.query ?? '');
+      const topoClass = args.topoClass ? String(args.topoClass) : undefined;
+      const limit     = Math.min(Number(args.limit ?? 10), 30);
+      const data = await callTraceMcp('search.postgres_fts', { query, limit, ...(topoClass ? { topo_class: topoClass } : {}) });
+      return { tool: name, result: data };
+    }
+
+    if (name === 'search_hybrid' || name === 'search.hybrid') {
+      const query     = String(args.query ?? '');
+      const topoClass = args.topoClass ? String(args.topoClass) : undefined;
+      const limit     = Math.min(Number(args.limit ?? 10), 30);
+      const data = await callTraceMcp('search.hybrid', { query, limit, ...(topoClass ? { topo_class: topoClass } : {}) });
+      return { tool: name, result: data };
+    }
+
+    if (name === 'trace.kag_search' || name === 'trace_kag_search') {
+      const query = String(args.query ?? '');
+      const limit = Math.min(Number(args.limit ?? 5), 15);
+      return { tool: name, result: await callTraceMcp('trace.kag_search', { query, limit }) };
+    }
+
+    if (name === 'trace.explain_retrieval' || name === 'trace_explain_retrieval') {
+      const query      = String(args.query ?? '');
+      const stableKeys = Array.isArray(args.stableKeys) ? args.stableKeys.map(String) : [];
+      return { tool: name, result: await callTraceMcp('trace.explain_retrieval', { query, stableKeys }) };
+    }
+
+    if (name === 'topology.same_som_cluster' || name === 'topology_same_som_cluster') {
+      const stableKey = String(args.stableKey ?? '');
+      const limit     = Math.min(Number(args.limit ?? 20), 50);
+      return { tool: name, result: await callTraceMcp('topology.same_som_cluster', { stableKey, limit }) };
+    }
+
+    if (name === 'clusters.get_members' || name === 'clusters_get_members') {
+      const clusterKey = String(args.clusterKey ?? '');
+      const limit      = Math.min(Number(args.limit ?? 30), 100);
+      return { tool: name, result: await callTraceMcp('clusters.get_members', { clusterKey, limit }) };
+    }
+
+    if (name === 'clusters.get_summary_lenses' || name === 'clusters_get_summary_lenses') {
+      const clusterKey = String(args.clusterKey ?? '');
+      const lenses     = Array.isArray(args.lenses) ? args.lenses.map(String) : undefined;
+      return { tool: name, result: await callTraceMcp('clusters.get_summary_lenses', { clusterKey, ...(lenses ? { lenses } : {}) }) };
+    }
+
+    if (name === 'research.encode' || name === 'research_encode') {
+      const content = String(args.content ?? '').trim();
+      const title   = String(args.title   ?? '').slice(0, 80);
+      const source  = String(args.source  ?? 'agent');
+      const tags    = Array.isArray(args.tags) ? args.tags.map(String) : [];
+      if (!content) return { tool: name, result: null, errorMsg: 'content is required' };
+      try {
+        const { validateInformationGain, heuristicQualityCheck } = await import('./information-gain-validator.js');
+        if (!heuristicQualityCheck(content))
+          return { tool: name, result: { encoded: false, reason: 'heuristic quality check failed' } };
+        const emb = await generateEmbedding(title || content.slice(0, 200)).catch(() => null);
+        let existingText = '';
+        if (emb) {
+          const existing = await qdrant.hybridSearch({ collection: 'research_summaries', query: title || content.slice(0, 100), queryEmbedding: emb, limit: 1 });
+          existingText = (existing.results[0]?.payload?.['summary'] as string) ?? '';
+        }
+        const validation = await validateInformationGain({ context: title, existing: existingText, candidate: content });
+        if (!validation.success || !validation.shouldUpdate || (validation.gainScore ?? 0) < 0.25)
+          return { tool: name, result: { encoded: false, reason: `gain check rejected (score=${validation.gainScore?.toFixed(2)})` } };
+        const { archiveSynthesisMemory } = await import('$lib/server/indexer/synthesis-memory-archiver.js');
+        await archiveSynthesisMemory({ title, content, source, tags, metadata: { gainScore: validation.gainScore } });
+        return { tool: name, result: { encoded: true, gainScore: validation.gainScore, title } };
+      } catch (e: any) {
+        return { tool: name, result: null, errorMsg: (e as Error).message };
+      }
+    }
+
+    // ── KV context tools — proxy to trace-mcp-server :8788 ────────────────
+    if (name === 'context.build_kv_packet' || name === 'context_build_kv_packet') {
+      const taskId  = String(args.taskId ?? `agent:${Date.now()}`);
+      const q       = String(args.query ?? '');
+      const files   = Array.isArray(args.hotFiles)     ? (args.hotFiles    as string[]) : [];
+      const syms    = Array.isArray(args.hotSymbols)   ? (args.hotSymbols  as string[]) : [];
+      const blocked = Array.isArray(args.blockedAreas) ? (args.blockedAreas as string[]) : [];
+      const maxTok  = Math.min(Number(args.maxInputTokens ?? 12000), 32000);
+      return { tool: name, result: await callTraceMcp('context.build_kv_packet', { taskId, query: q, hotFiles: files, hotSymbols: syms, blockedAreas: blocked, maxInputTokens: maxTok }) };
+    }
+
+    if (name === 'context.get_compressed_card' || name === 'context_get_compressed_card') {
+      const stableKey = String(args.stableKey ?? '');
+      if (!stableKey) return { tool: name, result: null, errorMsg: 'stableKey is required' };
+      return { tool: name, result: await callTraceMcp('context.get_compressed_card', { stableKey }) };
+    }
+
+    if (name === 'context.explain_compression' || name === 'context_explain_compression') {
+      return { tool: name, result: await callTraceMcp('context.explain_compression', { taskId: String(args.taskId ?? '') }) };
+    }
+
+    if (name === 'context.refresh_task_toc' || name === 'context_refresh_task_toc') {
+      const taskId  = String(args.taskId ?? '');
+      const files   = Array.isArray(args.hotFiles)     ? (args.hotFiles    as string[]) : [];
+      const syms    = Array.isArray(args.hotSymbols)   ? (args.hotSymbols  as string[]) : [];
+      const blocked = Array.isArray(args.blockedAreas) ? (args.blockedAreas as string[]) : [];
+      return { tool: name, result: await callTraceMcp('context.refresh_task_toc', { taskId, hotFiles: files, hotSymbols: syms, blockedAreas: blocked }) };
+    }
+
+    if (name === 'search.dev_context' || name === 'search__dev_context') {
+      const query    = String(args.query ?? '');
+      const filePath = args.filePath ? String(args.filePath) : undefined;
+      const limit    = Math.min(Number(args.limit ?? 8), 20);
+      return { tool: name, result: await callTraceMcp('search.dev_context', {
+        query,
+        limit,
+        ...(filePath ? { filePath } : {}),
+      }) };
+    }
+
+    if (name === 'kag.record_agent_run') {
+      return { tool: name, result: await callTraceMcp('kag.record_agent_run', {
+        taskId:            String(args.taskId ?? `kag-${Date.now().toString(36)}`),
+        errorSummary:      String(args.errorSummary ?? args.summary ?? ''),
+        files:             Array.isArray(args.files)   ? args.files   : [],
+        tags:              Array.isArray(args.tags)    ? args.tags    : [],
+        confidence:        typeof args.confidence === 'number' ? args.confidence : 0.5,
+        patchResult:       String(args.patchResult ?? 'unknown'),
+        researchNotes:     args.researchNotes ? String(args.researchNotes) : undefined,
+        needsDeepResearch: Boolean(args.needsDeepResearch ?? false),
+      }) };
+    }
+
+    if (name === 'kag.ingest_memory_directory') {
+      return { tool: name, result: await callTraceMcp('kag.ingest_memory_directory', {
+        dir: args.dir ? String(args.dir) : undefined,
+      }) };
+    }
+
     return { tool: name, result: null, errorMsg: `Unknown tool: ${name}` };
   } catch (err) {
     return { tool: name, result: null, errorMsg: (err as Error).message };
@@ -1013,11 +1236,49 @@ export async function runGemma4Agent(
   let hasSideEffect = false;
   let bypassCache   = options?.bypassCache ?? false;
 
-  const system = buildAgentSystemPrompt(options?.systemPrompt);
+  // ── Level-1: stable system prefix (KV-cacheable on llama-server) ──────────
+  // When a caller provides a custom systemPrompt (e.g. tests / raw mode) we
+  // use it verbatim. Otherwise we use the stable TRACE agent prefix so
+  // llama-server can reuse its KV cache across calls.
+  let system: string;
+  let kvPacketText = '';
+  if (options?.systemPrompt) {
+    system = options.systemPrompt;
+  } else {
+    const { getStableSystemPrefix } = await import('./kv-context-controller.js').catch(() => ({
+      getStableSystemPrefix: () => buildAgentSystemPrompt(),
+    }));
+    system = getStableSystemPrefix();
+
+    // ── Level 2 + 3: build KV context packet when caller provides hints ────
+    const taskId    = typeof options?.metadata?.taskId    === 'string' ? options.metadata.taskId    : undefined;
+    const hotFiles  = Array.isArray(options?.metadata?.hotFiles)  ? (options!.metadata!.hotFiles  as string[]) : [];
+    const hotSymbols = Array.isArray(options?.metadata?.hotSymbols) ? (options!.metadata!.hotSymbols as string[]) : [];
+    const blocked   = Array.isArray(options?.metadata?.blockedAreas) ? (options!.metadata!.blockedAreas as string[]) : [];
+
+    if (taskId || hotFiles.length > 0) {
+      try {
+        const { buildKvContextPacket, formatKvPacketForPrompt } = await import('./kv-context-controller.js');
+        const packet = await buildKvContextPacket({
+          taskId:      taskId ?? `agent:${pipeline}:${Date.now()}`,
+          query,
+          hotFiles,
+          hotSymbols,
+          blockedAreas: blocked,
+        });
+        kvPacketText = formatKvPacketForPrompt(packet);
+      } catch { /* non-fatal — run without KV packet */ }
+    }
+  }
+
+  // User content: prepend the KV packet (dynamic section) before the raw query
+  const userContent = kvPacketText
+    ? `${kvPacketText}\n\n---\n\nUser request: ${query}`
+    : query;
 
   const messages: OllamaMessage[] = [
-    { role: 'system',  content: system },
-    { role: 'user',    content: query  },
+    { role: 'system', content: system },
+    { role: 'user',   content: userContent },
   ];
 
   let finalAnswer    = '';
@@ -1053,11 +1314,48 @@ export async function runGemma4Agent(
     }
   } catch { /* non-fatal — Redis miss is fine */ }
 
+  // ── Stuck detector ────────────────────────────────────────────────────────
+  // Tracks how many times the same query fingerprint has been submitted.
+  // When count ≥ 2 (same error pattern seen before without resolution), the
+  // agent system prompt is updated to recommend kag.record_agent_run with
+  // needsDeepResearch:true and the stuck flag propagates to yorhaMetadata.
+  let isStuck = false;
+  let stuckCount = 0;
+  try {
+    const { createHash: _sha } = await import('node:crypto');
+    const queryHash  = _sha('sha1').update(query.slice(0, 200)).digest('hex').slice(0, 12);
+    const stuckKey   = `kag:stuck:${queryHash}`;
+    const { getRedis } = await import('$lib/server/redis.js');
+    const _redis = getRedis();
+    const raw    = await _redis.get(stuckKey);
+    stuckCount   = raw ? parseInt(raw, 10) : 0;
+    isStuck      = stuckCount >= 2;
+
+    // Increment counter (TTL 1h — resets after the session window)
+    await _redis.setex(stuckKey, 3600, String(stuckCount + 1));
+
+    if (isStuck) {
+      messages.splice(1, 0, {
+        role: 'system',
+        content: `## Stuck detector — escalation required\n` +
+          `This query pattern has been submitted ${stuckCount} time(s) without resolution.\n` +
+          `After your analysis, call **kag.record_agent_run** with:\n` +
+          `  taskId: "kag-${queryHash.slice(0,8)}", needsDeepResearch: true\n` +
+          `Do NOT retry the same approach. Escalate or propose a fundamentally different fix.`,
+      });
+    }
+  } catch { /* non-fatal — stuck detection is advisory */ }
+
+  // coding/openai-facade pipelines use MCP tool surface (LLAMA_TOOL_DEFINITIONS);
+  // legal pipelines use in-process Ollama tools (AGENT_TOOLS).
+  const isCodingPipeline = pipeline === 'openai-facade' || pipeline === 'coding';
+  const activeTools = isCodingPipeline ? LLAMA_TOOL_DEFINITIONS : AGENT_TOOLS;
+
   const runPreferredToolCall = async (currentMessages: OllamaMessage[]) => {
     if (requestedBackend !== 'turboquant') {
       inferenceBackend = 'bifrost';
       return bifrostChat(currentMessages, TOOL_MODEL, {
-        tools: AGENT_TOOLS,
+        tools: activeTools,
         temperature: 0.2,
         maxTokens: 2048,
         timeoutMs: TIMEOUT_MS,
@@ -1068,7 +1366,7 @@ export async function runGemma4Agent(
     try {
       inferenceBackend = 'turboquant';
       return await turboQuantChat(currentMessages, TOOL_MODEL, {
-        tools: AGENT_TOOLS,
+        tools: activeTools,
         temperature: 0.2,
         maxTokens: 2048,
         timeoutMs: TIMEOUT_MS,
@@ -1077,7 +1375,7 @@ export async function runGemma4Agent(
       backendFallbackReason = (error as Error).message;
       inferenceBackend = 'bifrost';
       return bifrostChat(currentMessages, TOOL_MODEL, {
-        tools: AGENT_TOOLS,
+        tools: activeTools,
         temperature: 0.2,
         maxTokens: 2048,
         timeoutMs: TIMEOUT_MS,
@@ -1151,7 +1449,18 @@ export async function runGemma4Agent(
 
     // Execute each tool call in-process
     for (const tc of msg.tool_calls) {
-      const { name, arguments: tArgs } = tc.function;
+      // Normalize LLAMA __ names → MCP dot names before allowlist/dispatch
+      let name = tc.function.name;
+      if (name.includes('__')) {
+        const mcpName = LLAMA_TO_MCP_NAME[name];
+        if (mcpName) name = mcpName;
+      }
+      // TurboQuant may return arguments as a JSON string; parse it to object
+      const rawArgs = tc.function.arguments as unknown;
+      const tArgs: Record<string, unknown> =
+        typeof rawArgs === 'string'
+          ? (() => { try { return JSON.parse(rawArgs) as Record<string, unknown>; } catch { return {}; } })()
+          : (rawArgs as Record<string, unknown> ?? {});
 
       // Enforce allowlist — skip tools the caller has not opted into
       const allowWrite  = options?.metadata?.allowWriteTools  === true;
@@ -1350,7 +1659,9 @@ export async function runGemma4Agent(
   let yorhaMetadata: any = {
     traceUsed: true,
     memoryEncoded: false,
-    informationGain: null
+    informationGain: null,
+    isStuck,
+    stuckCount,
   };
 
   // If the answer is substantial and successful, archive it as synthesis memory

@@ -1,0 +1,12 @@
+{
+  "type": "ace_hits",
+  "task_id": "kag_error_506389f1_2026-05-06T22-32-43",
+  "degraded": false,
+  "reason": null,
+  "cache_hit": false,
+  "count": 0,
+  "hits": [],
+  "cached": [],
+  "recommended_next_command": "npm run smoke:kag",
+  "generated_at": "2026-05-06T22:32:43.322Z"
+}

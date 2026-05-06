@@ -102,13 +102,77 @@ async function tryLoadGpu() {
   return false;
 }
 
-/** @param {Float32Array[]} embeddings @returns {Array<[number,number,number,number]>} */
-function gpuProjectManifold4(embeddings) {
-  if (!pcaProjectFn || !embeddings.length) return embeddings.map(() => [0, 0, 0, 0]);
+/**
+ * Power-iteration PCA fit: computes mean + top-k components in pure JS.
+ * Used once per run on the first batch, then reused for all subsequent batches.
+ * @param {Float32Array[]} embeddings
+ * @param {number} k
+ * @returns {{ mean: Float32Array, components: Float32Array }}
+ */
+function fitPca(embeddings, k = 4) {
+  const n = embeddings.length;
+  const dim = embeddings[0].length;
+  const mean = new Float32Array(dim);
+  for (const emb of embeddings) for (let j = 0; j < dim; j++) mean[j] += emb[j] / n;
+  // Center embeddings
+  const centered = embeddings.map(emb => {
+    const c = new Float32Array(dim);
+    for (let j = 0; j < dim; j++) c[j] = emb[j] - mean[j];
+    return c;
+  });
+  const components = new Float32Array(k * dim);
+  for (let c = 0; c < k; c++) {
+    // Init: use c-th sample as starting direction
+    let v = new Float32Array(centered[c % n]);
+    let norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0));
+    if (norm < 1e-10) { v = new Float32Array(dim); v[c] = 1; norm = 1; }
+    for (let j = 0; j < dim; j++) v[j] /= norm;
+    // 20 power iterations
+    for (let iter = 0; iter < 20; iter++) {
+      const newV = new Float32Array(dim);
+      for (const cx of centered) {
+        let dot = 0;
+        for (let j = 0; j < dim; j++) dot += cx[j] * v[j];
+        for (let j = 0; j < dim; j++) newV[j] += cx[j] * dot;
+      }
+      // Gram-Schmidt deflation against previous components
+      for (let prev = 0; prev < c; prev++) {
+        let dot = 0;
+        for (let j = 0; j < dim; j++) dot += components[prev * dim + j] * newV[j];
+        for (let j = 0; j < dim; j++) newV[j] -= dot * components[prev * dim + j];
+      }
+      norm = Math.sqrt(newV.reduce((s, x) => s + x * x, 0));
+      if (norm < 1e-10) break;
+      for (let j = 0; j < dim; j++) v[j] = newV[j] / norm;
+    }
+    for (let j = 0; j < dim; j++) components[c * dim + j] = v[j];
+  }
+  return { mean, components };
+}
+
+/** @param {Float32Array[]} embeddings @param {{mean:Float32Array,components:Float32Array}} pcaParams @returns {Array<[number,number,number,number]>} */
+function gpuProjectManifold4(embeddings, pcaParams) {
+  if (!embeddings.length) return [];
+  const { mean, components } = pcaParams;
   const n   = embeddings.length;
   const flat = new Float32Array(n * DIM);
   for (let i = 0; i < n; i++) flat.set(embeddings[i], i * DIM);
-  const proj = pcaProjectFn(flat, n, DIM, 4);
+  let proj;
+  if (pcaProjectFn) {
+    try { proj = pcaProjectFn(flat, n, DIM, mean, components, 4); }
+    catch { proj = null; }
+  }
+  if (!proj) {
+    // Pure JS projection fallback
+    proj = new Float32Array(n * 4);
+    for (let i = 0; i < n; i++) {
+      for (let c = 0; c < 4; c++) {
+        let dot = 0;
+        for (let j = 0; j < DIM; j++) dot += (flat[i * DIM + j] - mean[j]) * components[c * DIM + j];
+        proj[i * 4 + c] = dot;
+      }
+    }
+  }
   // Per-dim normalize [0,1]
   const mins = [1e9,1e9,1e9,1e9], maxs = [-1e9,-1e9,-1e9,-1e9];
   for (let i = 0; i < n; i++) for (let d = 0; d < 4; d++) {
@@ -298,6 +362,8 @@ async function main() {
   const classDist = {};
   /** @type {Float32Array[]} */ const decoderProjSample = [];
   /** @type {Float32Array[]} */ const decoderEmbSample  = [];
+  /** @type {{mean:Float32Array,components:Float32Array}|null} PCA params fitted on first real batch */
+  let globalPcaParams = null;
 
   // Resume: read last processed offset from Redis
   if (RESUME) {
@@ -334,8 +400,15 @@ async function main() {
     }
 
     if (toProcess.length > 0) {
-      const manifold4s = gpuAvailable
-        ? gpuProjectManifold4(toProcess.map(x => x.vec ?? new Float32Array(DIM)))
+      const vecs = toProcess.map(x => x.vec ?? new Float32Array(DIM));
+      // Fit PCA params on first real batch (reused for all subsequent batches)
+      if (!globalPcaParams && vecs.length >= 4) {
+        process.stdout.write(`   Fitting PCA on ${vecs.length} samples…`);
+        globalPcaParams = fitPca(vecs, 4);
+        console.log(' done');
+      }
+      const manifold4s = globalPcaParams
+        ? gpuProjectManifold4(vecs, globalPcaParams)
         : toProcess.map(() => [0, 0, 0, 0]);
 
       const rows = toProcess.map((item, idx) => {

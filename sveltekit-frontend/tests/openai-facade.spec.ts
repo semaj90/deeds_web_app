@@ -4,9 +4,14 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 // Mock the heavy deps so this is a unit test on the facade orchestration,
 // not a full integration test (the route handler test covers wiring).
 const mocks = vi.hoisted(() => ({
-  assembleACEContext: vi.fn(),
+  assembleACEContext:   vi.fn(),
   buildACEPromptCached: vi.fn(),
-  bifrostChat:        vi.fn(),
+  bifrostChat:          vi.fn(),
+  turboQuantChat:       vi.fn(),
+  runGemma4Agent:       vi.fn(),
+  recordRagAnswer:      vi.fn(),
+  buildDevContextPlan:  vi.fn(),
+  isCodingPrompt:       vi.fn(),
 }));
 
 vi.mock('$lib/server/ace/context-assembler.js', () => ({
@@ -15,7 +20,22 @@ vi.mock('$lib/server/ace/context-assembler.js', () => ({
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
-  bifrostChat: mocks.bifrostChat,
+  bifrostChat:    mocks.bifrostChat,
+  turboQuantChat: mocks.turboQuantChat,
+  VLM_MODELS:     { legal: 'gemma4-legal-vlm:latest', tool: 'gemma4-legal-vlm:latest' },
+}));
+
+vi.mock('$lib/server/ai/gemma4-agent.js', () => ({
+  runGemma4Agent: mocks.runGemma4Agent,
+}));
+
+vi.mock('$lib/server/ai/dev-context-planner.js', () => ({
+  buildDevContextPlan: mocks.buildDevContextPlan,
+  isCodingPrompt:      mocks.isCodingPrompt,
+}));
+
+vi.mock('$lib/server/cache/code-llm-index.js', () => ({
+  recordRagAnswer: mocks.recordRagAnswer,
 }));
 
 describe('openai-facade — runChatCompletion', () => {
@@ -23,6 +43,14 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.assembleACEContext.mockReset();
     mocks.buildACEPromptCached.mockReset();
     mocks.bifrostChat.mockReset();
+    mocks.turboQuantChat.mockReset();
+    mocks.runGemma4Agent.mockReset();
+    mocks.recordRagAnswer.mockResolvedValue(undefined);
+    mocks.buildDevContextPlan.mockResolvedValue(undefined);
+    // Default: non-coding prompts; tests that want coding override this
+    mocks.isCodingPrompt.mockReturnValue(false);
+    // Default: TurboQuant throws so bifrostChat is used (existing test expectations)
+    mocks.turboQuantChat.mockRejectedValue(new Error('TurboQuant unavailable'));
   });
 
   it('extracts last user message as query, earlier messages as history', async () => {
@@ -112,6 +140,47 @@ describe('openai-facade — runChatCompletion', () => {
     expect(res.yorha?.cacheHit).toBe('prior-answer');
   });
 
+  it('routes coding prompts through the agent path and populates yorha.toolsUsed', async () => {
+    mocks.isCodingPrompt.mockReturnValue(true);
+    mocks.buildDevContextPlan.mockResolvedValue({
+      contextSummary:     'auth module context',
+      kvPacketTaskId:     'task:abc123',
+      stablePrefixHash:   'hash:abc',
+      selectedStableKeys: ['src/lib/server/auth/session.ts:1'],
+      selectedFiles:      ['src/lib/server/auth/session.ts'],
+      contextHitCount:    1,
+      isCodingPrompt:     true,
+      toolsUsed:          ['search.dev_context'],
+    });
+    mocks.runGemma4Agent.mockResolvedValue({
+      answer:    'Here is the TypeScript fix...',
+      toolsUsed: ['search.dev_context'],
+      rounds:    1,
+      cacheTier: undefined,
+    });
+
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    const res = await runChatCompletion({
+      model:     'yorha-legal',
+      messages:  [{ role: 'user', content: 'Fix the TypeScript error in the auth module' }],
+      file_path: 'src/lib/server/auth/session.ts',
+      raw:       false,
+      stream:    false,
+      temperature: 0.2,
+    });
+
+    // Agent path — ACE not called
+    expect(mocks.runGemma4Agent).toHaveBeenCalledWith(
+      'Fix the TypeScript error in the auth module',
+      expect.objectContaining({ pipeline: 'openai-facade' }),
+    );
+    expect(mocks.assembleACEContext).not.toHaveBeenCalled();
+    // toolsUsed populated from agent result
+    expect(res.yorha?.toolsUsed).toContain('search.dev_context');
+    expect(res.yorha?.aceUsed).toBe(true);
+    expect(res.choices[0].message.content).toBe('Here is the TypeScript fix...');
+  });
+
   it('throws when last message is not a user message', async () => {
     const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
     await expect(
@@ -131,6 +200,12 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
     mocks.assembleACEContext.mockReset();
     mocks.buildACEPromptCached.mockReset();
     mocks.bifrostChat.mockReset();
+    mocks.turboQuantChat.mockReset();
+    mocks.runGemma4Agent.mockReset();
+    mocks.recordRagAnswer.mockResolvedValue(undefined);
+    mocks.buildDevContextPlan.mockResolvedValue(undefined);
+    mocks.isCodingPrompt.mockReturnValue(false);
+    mocks.turboQuantChat.mockRejectedValue(new Error('TurboQuant unavailable'));
   });
 
   it('returns 401 without locals.user', async () => {

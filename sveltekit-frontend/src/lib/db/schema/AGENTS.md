@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/db/schema`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/db/schema
 
@@ -20,23 +20,12 @@
 - `src/lib/db/schema/gpuInferenceDemo.ts`
 - `src/lib/db/schema/route-health-tables.ts`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C51** — table-def chunks in \`src/lib/db/schema\` (tag: database)
-
-- **Top kinds**: table-def×3
-- **Top tags**: `database` `schema` `drizzle` `vector` `redis`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 51 for full digest.
-
 
 ## Retrieval / Rerank Hints
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C51 — table-def chunks in `src/lib/db/schema` (tag: database)
-- **BoW texture key**: `texture:bow:cluster:51` (Redis 1h TTL)
-- **Qdrant tags**: `database` `schema` `drizzle` `vector` `redis`
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
 - **Paired tests**: 1/6 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
@@ -47,8 +36,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "db schema", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/db/schema/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 51 })` — BoW texture tile for cluster C51
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 51 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

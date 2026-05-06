@@ -745,3 +745,68 @@ npx svelte-check --threshold error 2>&1 | Select-String "found \d+ error"
 - Directory consolidation (`src/lib/features`) was preserved via Git commit prior to restoration.
 - Backups are restoring to legacy paths; duplicates must be managed.
 
+
+---
+
+## TRACE/Karpathy Performance Lane
+
+**Last Updated: May 6, 2026**
+
+Use this execution order for GPU, indexing, cache, and agentic tool-call work:
+
+### 1. `fix(cuda): harden clusterEmbeddings and graphSimilarity safety`
+- Add empty-cluster guard in `clusterEmbeddings`
+- Re-seed empty clusters from farthest point OR preserve previous centroid safely
+- Add hard C++ N-cap for `graphSimilarity`
+- Return useful error details to the TS bridge
+- **Tests**: no NaN centroids, safe rejection of n > cap
+
+### 2. `feat(cuda): async N-API GPU calls for large workloads`
+- Wrap `graphSimilarity`, `clusterEmbeddings`, `batchCosineSimilarity` in N-API async work for large n
+- Preserve sync path for small workloads (threshold: n < 256)
+- **Tests**: event-loop non-blocking test, large-n async path
+
+### 3. `feat(indexer): add worker-thread pool for chunk/metadata pipeline`
+- Worker threads for hashing, chunking, metadata envelopes, entity extraction, Qdrant payload generation
+- Transferable `ArrayBuffer`s where useful
+- Bounded queues and batch writers
+- Keep Gemma4 out of the worker pool **except** selective summary tasks
+
+### 4. `feat(cache): add tensor/similarity cache keys`
+- Cache embeddings by content hash
+- Cache centroid member lists
+- Cache repeated query+cluster similarity results
+- Redis pipeline batching
+- **Smoke test**: repeated query avoids GPU rerank (cache hit verified)
+
+### 5. `feat(agent): wire Gemma4 tool-call controller to TypeScript MCP graph/search tools`
+- Allowlist: read-only graph/topology/search tools only
+- Support OpenAI `tool_calls` + manual JSON tool requests
+- Call `trace-mcp-server` tools over Streamable HTTP (port 8788)
+- `maxToolRounds=3`, `maxToolResultChars=12000`
+- Expose tool usage in YorHA metadata (`yorha.toolsUsed`)
+
+### MCP Tool Surface (model-facing only, no raw DB access)
+
+```
+Gemma4 / Claude
+  ↓
+MCP tool call
+  ↓
+TypeScript tool handler (trace-mcp-server.ts :8788)
+  ↓
+gRPC client when needed (embedding :50051, retrieval :50053)
+  ↓
+Go/TS retrieval, embedding, indexer service
+```
+
+**Named tools**: `trace.kag_search`, `topology.search_near`, `graph.expand_neighborhood`,
+`graph.shortest_path`, `clusters.get_summary_lenses`, `trace.explain_retrieval`
+
+**Rule**: Gemma4 MUST call named MCP tools. It does NOT talk to gRPC, Qdrant, Neo4j, or Postgres directly.
+
+### TypeScript 7 Native Audit Lane
+- `tsgo` runs as a fast parallel type audit (10× faster than tsc)
+- Does NOT replace `svelte-check` or `tsc` — both remain in CI
+- JSONB diagnostics (`scripts/tsgo-diagnostics-to-jsonb.mjs`) feed ACE/TRACE as error-relevance signals
+- Protobuf contracts generated from Zod schemas via `npm run proto:from-zod`

@@ -1,0 +1,27 @@
+{
+  "type": "error_summary",
+  "error_hash": "2e53fd23",
+  "task_id": "kag_error_2e53fd23_2026-05-06T22-34-56",
+  "source": "cli-text",
+  "message": "Redis memberIds shape mismatch in hypergraph-store.ts at buildHyperedge line 42",
+  "tags": [
+    "Redis",
+    "memberIds",
+    "buildHyperedge",
+    "hypergraph-store"
+  ],
+  "related_files": [],
+  "entities": {
+    "files": [
+      "hypergraph-store.ts"
+    ],
+    "symbols": [
+      "Redis",
+      "memberIds",
+      "buildHyperedge"
+    ],
+    "routes": []
+  },
+  "confidence": 0.25,
+  "created_at": "2026-05-06T22:34:56.620Z"
+}
