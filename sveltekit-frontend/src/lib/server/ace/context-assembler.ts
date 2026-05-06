@@ -15,6 +15,7 @@ import { pgRows, db } from '$lib/server/db/client';
  */
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { aceRetrievalRuns } from '$lib/server/db/schema/metadata-spine.js';
 import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown } from './types.js';
 import { TOKEN_BUDGET } from './types.js';
 import { selectPracticeTemplate } from './practice-templates.js';
@@ -73,6 +74,8 @@ import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/AC
 import { applyClusterCoherenceBoost, extractDominantCluster } from '$lib/server/retrieval/cluster-aware-reranker.js';
 import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
 import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/bag-cache.js';
+import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
+import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -136,11 +139,36 @@ async function fetchACPKnowledgeResults(
     const emb = await generateSingleEmbedding(query);
     if (!Array.isArray(emb) || emb.length !== 768) return null;
 
+    let filters: any = undefined;
+
+    // Stage A: Directory Summary Search (if codebase chunks)
+    if (collection === 'codebase_chunks_768') {
+      try {
+        const dirHits = await qdrant.hybridSearch({
+          collection: 'directory_summaries_768',
+          query,
+          queryEmbedding: Array.from(emb),
+          limit: 5,
+        });
+        const dirs = dirHits.results
+          .map((h) => h.payload?.['directory_path'])
+          .filter(Boolean) as string[];
+        
+        if (dirs.length > 0) {
+          filters = { directory_path: dirs };
+        }
+      } catch (e) {
+        console.warn('Stage A directory search failed or skipped:', e);
+      }
+    }
+
+    // Stage B: File/Chunk Search Scoped by Directory Filters
     const hits = await qdrant.hybridSearch({
       collection,
       query,
       queryEmbedding: Array.from(emb),
       limit: Math.min(limit, ACP_MAX_RESULTS),
+      filters,
     });
 
     return {
@@ -324,12 +352,19 @@ export async function assembleACEContext(opts: {
       const practiceArea = extractPracticeArea(caseContext, userProfile);
       const practiceTemplate = selectPracticeTemplate(practiceArea);
 
+      // HMM section classification — labels the query as PARTIES / JURISDICTION /
+      // FACTS / LEGAL_AUTHORITY / CLAIMS / PRAYER_HOLDING / UNKNOWN with a
+      // confidence score. Adds `section:<NAME>` to queryTags so downstream
+      // retrieval and reranking can section-bias against the glyph atlas.
+      const querySection = classifyQuerySection(query);
+
       // Generate query tags from entities + practice area + Redis hot-query leaderboard
       const queryTags: string[] = [
         ...legalTags.statutes.slice(0, 3),
         ...legalTags.cases.slice(0, 3),
         ...(practiceArea ? [practiceArea] : []),
         ...(topQueryTags ?? []).slice(0, 3),
+        ...(querySection.confidence > 0.3 ? [`section:${querySection.section}`] : []),
       ];
 
       const toUnified = (
@@ -652,29 +687,30 @@ export async function assembleACEContext(opts: {
         }
       }
 
-      // ─── code-llm-index path-level preflight ─────────────────────────────
-      // File-specific LLM output cache. More targeted than agentsMd (per-dir).
-      // When the same file is queried twice within the 6h TTL we serve the
-      // prior LLM synthesis verbatim — sub-5ms Redis hit. The prompt builder
-      // injects this above raw chunks so the model can refine vs re-derive.
+      // ─── prior-answer 3-tier cascade (Redis L1 → Postgres L2 → Qdrant L3) ─
+      // L1 Redis (~5ms) — exact-path match, hot cache
+      // L2 Postgres (~30ms) — durable mirror, survives Redis flush
+      // L3 Qdrant (~50-200ms) — semantic similarity by query, no path required
+      // Returns the lowest-latency hit. ACE injects the compressed outputMeta
+      // envelope (summary + citations + confidence) above raw chunks.
       let codeLlmHit: ACEContext['codeLlmHit'] = null;
-      if (opts.filePath) {
+      if (opts.filePath || query) {
         try {
-          const { getLlmOutputHit } = await import('$lib/server/cache/code-llm-index.js');
-          // Static import is also available at top of file; the dynamic import is
-          // retained here only to keep this block side-effect-free if the module
-          // is unavailable at startup. Both resolve to the same singleton.
-          const hit = await getLlmOutputHit(opts.filePath);
+          const { lookupPriorAnswerMemory } = await import('$lib/server/cache/code-llm-index.js');
+          const hit = await lookupPriorAnswerMemory({
+            path:              opts.filePath,
+            query:             opts.filePath ? undefined : query, // L3 only when no path
+            includeFullOutput: true,
+          });
           if (hit) {
             codeLlmHit = {
               path:           hit.path,
               source:         hit.source,
-              llmOutput:      hit.llmOutput,
-              // hitCount was incremented to (priorHits + 1) on this read; report the prior count
-              priorHits:      Math.max(0, (hit.hitCount ?? 1) - 1),
+              llmOutput:      hit.llmOutput ?? hit.meta.summary ?? '',
+              priorHits:      0, // cascade hit doesn't track per-layer hit count
               glyphClusterId: hit.glyphClusterId,
-              generatedAt:    hit.generatedAt,
-              tokenCount:     hit.tokenCount,
+              generatedAt:    new Date().toISOString(),
+              tokenCount:     hit.meta.tokensUsed,
             };
           }
         } catch (err) {
@@ -731,7 +767,6 @@ export async function assembleACEContext(opts: {
         );
       }
 
-      // Fire-and-forget: persist per-query stats to rag_query_log (feeds search-patterns API)
       recordQueryLog({
         query,
         queryHash: queryHash(query),
@@ -742,6 +777,17 @@ export async function assembleACEContext(opts: {
         dagEnabled: true,
         hybridSearch: false,
       });
+
+      // Fire-and-forget: log to metadata_spine ace_retrieval_runs for caching
+      db.insert(aceRetrievalRuns).values({
+        query,
+        intent: querySection.section,
+        metadata: {
+          action: policyDecision.action,
+          budgetTier: policyDecision.budget.tier,
+          latencyMs: Date.now() - policyStartedAt
+        }
+      }).catch((err) => console.warn('[ACE Run Log] failed:', (err as Error)?.message ?? err));
 
       return finalContext;
     }
@@ -2300,12 +2346,28 @@ async function fetchCodebaseContext(
       } catch { /* non-fatal — boost just won't apply */ }
     }
 
+    // Centroid-based cluster pre-filter: resolve embedding once, find nearest
+    // GPU cluster in O(1) Redis scan, then scope Qdrant to that cluster.
+    // Falls back gracefully (no filter) when centroids aren't seeded.
+    let clusterFilter: Record<string, unknown> | undefined;
+    try {
+      const emb = await generateSingleEmbedding(query);
+      if (emb && emb.length === 768) {
+        const hit = await nearestCluster(new Float32Array(emb), 50);
+        if (hit && hit.similarity > 0.35) {
+          clusterFilter = { must: [{ key: 'neo4j_gpuCluster', match: { value: hit.clusterId } }] };
+          console.log(`[ACE Codebase] Centroid pre-filter → cluster=${hit.clusterId} (sim=${hit.similarity.toFixed(3)})`);
+        }
+      }
+    } catch { /* non-fatal — continue without cluster pre-filter */ }
+
     // Fetch broader initial set so the reranker has candidates to work with
     const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
     const results = await searchCodebase(query, {
       limit: 20,
       contentWeight: 0.6,
       signatureWeight: 0.4,
+      ...(clusterFilter ? { filter: clusterFilter } : {}),
     });
 
     if (!results.length) return null;

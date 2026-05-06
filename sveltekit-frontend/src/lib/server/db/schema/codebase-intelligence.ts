@@ -2,8 +2,9 @@
  * Codebase Intelligence Schema
  *
  * Tables that support the Qdrant → Postgres mirror pipeline:
- *   code_repos       — registry of indexed repositories
- *   enrichment_jobs  — durable progress tracking for batch workers
+ *   code_repos            — registry of indexed repositories
+ *   enrichment_jobs       — durable progress tracking for batch workers
+ *   gpu_cluster_centroids — persisted 768-dim cluster centroid vectors
  *
  * codebaseChunkIndex, clusterSummaries, llmOutputs, llmOutputChunks
  * are defined in search-analytics.ts and referenced here via import.
@@ -13,6 +14,7 @@ import {
 	integer,
 	jsonb,
 	pgTable,
+	real,
 	text,
 	timestamp,
 	uuid,
@@ -64,3 +66,29 @@ export const enrichmentJobs = pgTable('enrichment_jobs', {
 
 export type EnrichmentJob    = typeof enrichmentJobs.$inferSelect;
 export type NewEnrichmentJob = typeof enrichmentJobs.$inferInsert;
+
+// ── gpu_cluster_centroids ─────────────────────────────────────────────────────
+// Persists precomputed 768-dim cluster centroid vectors so they survive Redis
+// restarts. The graphify:semantic pipeline writes here after GPU k-means;
+// the ACE context-assembler reads these for nearest-cluster pre-filtering.
+//
+// centroid_vec uses real[] (pgvector halfvec is preferred but needs the
+// extension pre-enabled; real[] works everywhere and pgvector HNSW index
+// can be added manually via 0016_cluster_centroids.sql).
+
+export const gpuClusterCentroids = pgTable('gpu_cluster_centroids', {
+	clusterId:      integer('cluster_id').notNull().primaryKey(),
+	clusterType:    text('cluster_type').notNull().default('gpu'),  // 'gpu' | 'som'
+	centroidVec:    real('centroid_vec').array().notNull(),          // 768-dim
+	chunkCount:     integer('chunk_count').notNull().default(0),
+	dominantTags:   text('dominant_tags').array().notNull().default(sql`'{}'::text[]`),
+	purpose:        text('purpose'),
+	metadata:       jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	computedAt:     timestamp('computed_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt:      timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => ({
+	typeIdx: index('idx_gpu_cluster_centroids_type').on(t.clusterType),
+}));
+
+export type GpuClusterCentroid    = typeof gpuClusterCentroids.$inferSelect;
+export type NewGpuClusterCentroid = typeof gpuClusterCentroids.$inferInsert;
