@@ -98,6 +98,8 @@
     "graphify:sync-clusters-qdrant": "node scripts/sync-cluster-summaries-to-qdrant.mjs",
     "smoke:prior-answer-cache": "node scripts/tests/smoke-prior-answer-cache.mjs",
     "smoke:graphify": "node scripts/tests/smoke-graphify.mjs",
+    "smoke:agentic-tools": "node scripts/smoke-agentic-tools.mjs",
+    "smoke:agentic-tools:skip-agent": "node scripts/smoke-agentic-tools.mjs --skip-agent",
     "startup:analysis": "node scripts/startup-analysis.mjs",
     "startup:analysis:dry": "node scripts/startup-analysis.mjs --dry-run",
     "startup:analysis:no-gemma": "node scripts/startup-analysis.mjs --no-gemma",
@@ -547,7 +549,10 @@
     "codebase:index:dir": "npx tsx scripts/codebase-semantic-indexer.ts --dir",
     "codebase:search": "npx tsx scripts/codebase-semantic-indexer.ts --query",
     "knowledge:search": "npx tsx scripts/knowledge-base-builder.ts --search",
-    "knowledge:research": "npx tsx scripts/knowledge-base-builder.ts --auto-research"
+    "knowledge:research": "npx tsx scripts/knowledge-base-builder.ts --auto-research",
+    "mcp:trace": "tsx src/mcp/trace-mcp-server.ts",
+    "smoke:trace": "node scripts/ensure-mcp-server.mjs",
+    "trace:start": "powershell -ExecutionPolicy Bypass -File scripts/start-trace-stack.ps1"
   },
   "devDependencies": {
     "@babel/core": "7.28.5",
@@ -692,6 +697,7 @@
     "dexie": "4.3.0",
     "dotenv": "16.6.1",
     "drizzle-zod": "0.8.3",
+    "fastmcp": "4.0.1",
     "fuse.js": "7.1.0",
     "gray-matter": "4.0.3",
     "idb": "8.0.3",

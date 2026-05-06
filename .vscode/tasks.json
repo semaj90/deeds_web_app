@@ -9150,6 +9150,87 @@
       "detail": "Preview which AGENTS.md files would be written (no file IO). Shows KAG-enriched vs graph-only flag per dir. Safe to run anytime.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
+    },
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // TRACE STACK — GPU LLM + Karpathy wiki + MCP graph tools (May 2026)
+    // Architecture:
+    //   llama-server.exe :8090  — Gemma4 TurboQuant GGUF inference
+    //   topology-search  :8101  — 4D manifold search engine (detached)
+    //   trace-mcp-server :8788  — TypeScript MCP (graph/KAG/topology tools)
+    //   SvelteKit        :5173  — main app (spawns :8101 + :8788 via predev)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    {
+      "label": "🚀 TRACE: Start Full Stack (llama + topo + MCP + SvelteKit)",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File scripts/start-trace-stack.ps1",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": { "kind": "build", "isDefault": false },
+      "detail": "Launches: llama-server.exe :8090 (Gemma4 GGUF), topology-search :8101, TRACE MCP :8788, SvelteKit dev :5173",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 TRACE: Start MCP Server only (:8788)",
+      "type": "shell",
+      "command": "npm run mcp:trace",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "isBackground": true,
+      "group": "none",
+      "detail": "Starts trace-mcp-server.ts on :8788 — 10 graph/KAG/topology tools for Gemma4 agentic calls. Connect Claude Desktop: http://127.0.0.1:8788",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 TRACE: Smoke — MCP health check (:8788)",
+      "type": "shell",
+      "command": "npm run smoke:trace",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Checks TRACE MCP server health at :8788. Returns 'healthy' or 'not running'.",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 TRACE: Smoke — topology search health (:8101)",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:8101/health | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.parse(d)))\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Health-check the topology search server at :8101. Shows ok/version/uptime.",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 TRACE: Test topology search (hybrid query)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:8101/search/hybrid -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"ace context assembler retrieval\\\",\\\"limit\\\":5}\" | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{ const r=JSON.parse(d); console.log('Found:', r.totalFound, '| Hits:', r.hits?.length); r.hits?.forEach(h=>console.log(' -', h.stableKey || h.file_path, '| score:', h.hybridScore?.toFixed(3))); })\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "POST a hybrid search query to topology-search-server :8101 and print results. Requires server running and Ollama embedding model.",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 TRACE: Test MCP graph.expand_neighborhood",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:8788/mcp -H \"Content-Type: application/json\" -d \"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"method\\\":\\\"tools/call\\\",\\\"id\\\":1,\\\"params\\\":{\\\"name\\\":\\\"graph.expand_neighborhood\\\",\\\"arguments\\\":{\\\"stableKey\\\":\\\"dir:src/lib/server/ace\\\",\\\"depth\\\":2}}}\" | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.stringify(JSON.parse(d),null,2)))\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Test the graph.expand_neighborhood MCP tool — expands ego-graph for src/lib/server/ace directory.",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 TRACE: Test MCP topology.search_near",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:8788/mcp -H \"Content-Type: application/json\" -d \"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"method\\\":\\\"tools/call\\\",\\\"id\\\":1,\\\"params\\\":{\\\"name\\\":\\\"topology.search_near\\\",\\\"arguments\\\":{\\\"query\\\":\\\"auth route test gaps\\\",\\\"limit\\\":5}}}\" | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.stringify(JSON.parse(d),null,2)))\"",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Test the topology.search_near MCP tool — finds nodes near a query in 4D manifold space.",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
     }
   ],
   "inputs": [
