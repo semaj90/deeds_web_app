@@ -127,6 +127,8 @@
     "hypergraph:build:4d": "npx tsx --tsconfig scripts/tsconfig.scripts.json scripts/hypergraph-build-4d.ts",
     "audit:parity": "node scripts/audit-parity.mjs",
     "db:manifold4:propagate": "node scripts/propagate-manifold4-db.mjs",
+    "tensor:classify": "npx tsx --tsconfig scripts/tsconfig.scripts.json scripts/run-tensor-topology-mapreduce.ts",
+    "tensor:classify:dry": "npx tsx --tsconfig scripts/tsconfig.scripts.json scripts/run-tensor-topology-mapreduce.ts --dry-run",
     "graphify:digest": "npm run hypergraph:digest",
     "schema:drift:check": "node scripts/schema-drift-check.mjs",
     "check:json": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" svelte-check --tsconfig ./tsconfig.json --output json > svelte-errors.json",

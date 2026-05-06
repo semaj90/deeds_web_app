@@ -1,11 +1,11 @@
 /**
  * GET  /api/code-intel/graph/gds-status
  *   Returns APOC + GDS availability, projection existence, plugin versions.
- *   Used by the backend infrastructure audit (Gate G17-equivalent).
  *
  * POST /api/code-intel/graph/gds-status
- *   Body: { action: 'project' | 'pagerank' | 'louvain' | 'full' }
- *   Runs the requested GDS job. 'full' = project + pagerank + louvain.
+ *   Body: { action: 'project' | 'pagerank' | 'louvain' | 'knn' | 'authority' | 'full' }
+ *   Runs the requested GDS job.
+ *   'full' = project → pagerank → louvain → knn → authority mirror to Qdrant.
  *   Rate-limited to 1 full run per 5 min per user.
  */
 
@@ -17,10 +17,15 @@ import {
   ensureGdsProjection,
   runPageRankMutate,
   runLouvainMutate,
+  runKnnMutate,
+  writeAuthorityScoresToQdrant,
 } from '$lib/server/graph/neo4j-gds.js';
 
 const RATE_LIMIT_KEY = (userId: string) => `gds:rebuild:rl:${userId}`;
 const RATE_LIMIT_TTL = 300; // 5 min
+
+const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'full'] as const;
+type GdsAction = typeof VALID_ACTIONS[number];
 
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user) return json({ apocAvailable: false, gdsAvailable: false, projectionExists: false, error: 'Unauthorized' }, { status: 401 });
@@ -38,10 +43,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json().catch(() => ({})) as { action?: string };
-  const action = body.action ?? 'full';
+  const action = (body.action ?? 'full') as GdsAction;
 
-  if (!['project', 'pagerank', 'louvain', 'full'].includes(action)) {
-    return json({ error: 'action must be project | pagerank | louvain | full' }, { status: 400 });
+  if (!(VALID_ACTIONS as readonly string[]).includes(action)) {
+    return json({ error: `action must be ${VALID_ACTIONS.join(' | ')}` }, { status: 400 });
   }
 
   // Rate limit full rebuilds
@@ -67,6 +72,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
     if (action === 'louvain' || action === 'full') {
       result.louvain = await runLouvainMutate();
+    }
+    if (action === 'knn' || action === 'full') {
+      result.knn = await runKnnMutate();
+    }
+    if (action === 'authority' || action === 'full') {
+      result.authority = await writeAuthorityScoresToQdrant();
     }
     result.totalMs = Date.now() - t0;
     return json(result);
