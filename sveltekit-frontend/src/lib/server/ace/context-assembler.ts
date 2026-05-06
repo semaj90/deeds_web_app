@@ -77,7 +77,11 @@ import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
 import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/bag-cache.js';
 import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
-import { computeManifold4Centroid } from '$lib/server/retrieval/manifold4-search.js';
+import {
+  computeManifold4Centroid,
+  searchManifold4,
+  blendManifoldScore,
+} from '$lib/server/retrieval/manifold4-search.js';
 import type { Manifold4Point } from '$lib/server/retrieval/manifold4-search.js';
 import { classifyQuery, TOPO_CLASS, TOPO_CLASS_LABEL } from '$lib/server/tensor/topology-byte-mapper.js';
 import {
@@ -2394,13 +2398,73 @@ function writeAceCodeCache(
   topoClass:   number,
   resolvedDir: string | undefined,
   chunks:      NonNullable<ACEContext['codebaseContext']>,
+  opts:        { fromCache?: boolean } = {},
 ): void {
   if (!chunks.length) return;
   import('$lib/server/redis.js').then(({ getRedis }) => {
+    const redis   = getRedis();
     const key     = aceCodeKey.forQuery(query, topoClass, resolvedDir);
     const payload = JSON.stringify(chunks.slice(0, 20));
-    getRedis().setex(key, TTL.ACE_CODE, payload).catch(() => {});
+    redis.setex(key, TTL.ACE_CODE, payload).catch(() => {});
+
+    // Fire-and-forget: update rolling token density stats for this (topoClass, cluster)
+    writeTokenDensityBudget(redis, topoClass, chunks).catch(() => {});
   }).catch(() => {});
+
+  // Fire-and-forget: tag chunks in Qdrant + Redis hit counters
+  import('$lib/server/ace/ace-hit-tagger.js')
+    .then(({ tagAceHits }) => tagAceHits(chunks, opts))
+    .catch(() => {});
+}
+
+/**
+ * Update the rolling token budget stats for a (topoClass, clusterId) pair.
+ * Uses an exponential moving average (α=0.2) so recent queries dominate.
+ * Key: ace:token:budget:{topoClass}:{clusterId}  TTL: 2 h
+ */
+async function writeTokenDensityBudget(
+  redis:     import('ioredis').Redis,
+  topoClass: number,
+  chunks:    NonNullable<ACEContext['codebaseContext']>,
+): Promise<void> {
+  if (!chunks.length) return;
+
+  // Estimate tokens per chunk: chars / 4 is a standard approximation
+  const tokenCounts = chunks.map((c) =>
+    Math.ceil(((c.content ?? '') as string).length / 4),
+  );
+  const total     = tokenCounts.reduce((s, t) => s + t, 0);
+  const sorted    = [...tokenCounts].sort((a, b) => a - b);
+  const p50New    = sorted[Math.floor(sorted.length * 0.5)] ?? 0;
+  const p90New    = sorted[Math.floor(sorted.length * 0.9)] ?? 0;
+
+  // Derive clusterId from first chunk's gpuCluster payload field (may be absent)
+  const clusterId: number | null =
+    (chunks[0] as Record<string, unknown>).gpuCluster != null
+      ? Number((chunks[0] as Record<string, unknown>).gpuCluster)
+      : null;
+
+  const { aceTokenBudgetKey, TTL: KEY_TTL } = await import('$lib/server/cache-keys.js');
+  const key = clusterId != null
+    ? aceTokenBudgetKey.forCluster(topoClass, clusterId)
+    : aceTokenBudgetKey.forClass(topoClass);
+
+  // Load existing stats and blend with EMA (α=0.2)
+  const raw     = await redis.get(key).catch(() => null);
+  const prev    = raw ? (JSON.parse(raw) as import('$lib/server/retrieval/centroid-cache.js').TokenBudgetStats) : null;
+  const α       = 0.2;
+  const updated = {
+    p50Tokens:         prev ? Math.round(prev.p50Tokens * (1 - α) + p50New * α) : p50New,
+    p90Tokens:         prev ? Math.round(prev.p90Tokens * (1 - α) + p90New * α) : p90New,
+    avgChunksPerQuery: prev
+      ? Math.round(prev.avgChunksPerQuery * (1 - α) + chunks.length * α)
+      : chunks.length,
+    sampleCount: (prev?.sampleCount ?? 0) + 1,
+    updatedAt:   Date.now(),
+    totalTokens: total,
+  };
+
+  await redis.setex(key, KEY_TTL.ACE_TOKEN_BUDGET, JSON.stringify(updated)).catch(() => {});
 }
 
 /** Stats collected during a codebase context fetch — surfaced in retrieval run logs. */
@@ -2415,6 +2479,10 @@ export interface CodebaseFetchStats {
   manifold4?: {
     used: boolean;
     boost: number;
+    center?: Manifold4Point;
+    radius?: number;
+    expanded?: number;
+    newChunks?: number;
   };
   aceCodeCache?: {
     used: boolean;
@@ -2477,6 +2545,10 @@ export async function fetchCodebaseContext(
               queryHash: topoQueryHash(query),
             };
           }
+          // Fire-and-forget: tag cache-hit chunks in Qdrant + Redis counters
+          import('$lib/server/ace/ace-hit-tagger.js')
+            .then(({ tagAceHits }) => tagAceHits(parsed, { fromCache: true }))
+            .catch(() => {});
           return parsed;
         }
       }
@@ -2624,12 +2696,54 @@ export async function fetchCodebaseContext(
             await generateSingleEmbedding(query).catch(() => [])
           ).catch(() => undefined);
 
-          // Compute manifold4 centroid of the current hit-set so nearby chunks
-          // in 4D topology space get an extra 0.16-weight proximity signal.
+          // Phase 8a: Compute manifold4 centroid of the reranked hit-set.
+          // Used both for neighborhood expansion (below) and the per-chunk boost.
           const manifold4Points = unsorted
             .map((r) => (r as unknown as Record<string, unknown>).manifold4 as number[] | null | undefined)
             .map((m): Manifold4Point | null => (m?.length === 4 ? (m as Manifold4Point) : null));
           const manifold4Center = computeManifold4Centroid(manifold4Points) ?? undefined;
+
+          // Phase 8b: Manifold4 neighborhood expansion — search Postgres for chunks
+          // topologically close to the centroid that Qdrant cosine search may have missed.
+          // Fire-and-forget pattern: failure is non-fatal, results are merged deduped.
+          let manifold4Expanded = 0;
+          let manifold4NewChunks = 0;
+          const MANIFOLD4_RADIUS = 0.3;
+          if (manifold4Center) {
+            try {
+              const existingPaths = new Set(unsorted.map((r) => (r as { filePath?: string }).filePath ?? ''));
+              const neighbors = await searchManifold4({
+                center: manifold4Center,
+                radius: MANIFOLD4_RADIUS,
+                limit: 8,
+              });
+              manifold4Expanded = neighbors.hits.length;
+              for (const hit of neighbors.hits) {
+                if (existingPaths.has(hit.relativePath)) continue;
+                const blended = blendManifoldScore(0, hit.manifoldDistance);
+                unsorted.push({
+                  filePath: hit.relativePath,
+                  content: hit.content,
+                  score: blended,
+                  lineStart: hit.chunkIndex ?? undefined,
+                  lineEnd: undefined,
+                  tags: hit.semanticTags ?? undefined,
+                  gpuCluster: hit.gpuCluster ?? null,
+                  pageRankScore: hit.pageRankScore ?? null,
+                  routeType: null,
+                  hasAuthGuard: null,
+                  somCluster: hit.somCluster ?? null,
+                  somBmuRow: hit.somBmuRow ?? null,
+                  somBmuCol: hit.somBmuCol ?? null,
+                  graphAuthorityScore: null,
+                } as (typeof unsorted)[number]);
+                existingPaths.add(hit.relativePath);
+                manifold4NewChunks++;
+              }
+            } catch {
+              // Postgres manifold4 search unavailable — expansion skipped, boost still applies
+            }
+          }
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const boosted = await applyTopologicalBoostAsync(unsorted as any, { queryBmu, manifold4Center });
@@ -2647,7 +2761,14 @@ export async function fetchCodebaseContext(
                 zeroRtt: true,
               };
             }
-            statsOut.manifold4 = { used: manifold4Center != null, boost: 0.16 };
+            statsOut.manifold4 = {
+              used: manifold4Center != null,
+              boost: 0.16,
+              center: manifold4Center,
+              radius: MANIFOLD4_RADIUS,
+              expanded: manifold4Expanded,
+              newChunks: manifold4NewChunks,
+            };
           }
 
           const finalChunks = await applyKarpathyBoost(boosted.slice(0, 10) as any, query, agentsMdResolvedDir);
