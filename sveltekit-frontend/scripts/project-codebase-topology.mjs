@@ -435,18 +435,22 @@ for (const fn of fileNodes) {
 }
 
 // HAS_SUMMARY_LENS: cluster → summary lens node
+// Only emit when the cluster node itself exists (avoids dangling from-endpoint)
+const clusterNodeKeySet = new Set(clusterNodes.map((c) => c.stableKey));
 const summaryLensNodes = [];
 for (const [clusterId, purpose] of clusterSummaryMap) {
+  const clusterKey = `cluster:gpu:${clusterId}`;
+  if (!clusterNodeKeySet.has(clusterKey)) continue;
   const lensKey = `summary:cluster:${clusterId}`;
   summaryLensNodes.push({
     stableKey: lensKey,
     kind: 'summary_lens',
     label: `Cluster ${clusterId} summary`,
-    clusterKey: `cluster:gpu:${clusterId}`,
+    clusterKey,
     manifold4: syntheticManifold4(`summary:${clusterId}`, clusterId, 0, 1),
     purpose,
   });
-  edges.push({ from: `cluster:gpu:${clusterId}`, to: lensKey, type: 'HAS_SUMMARY_LENS' });
+  edges.push({ from: clusterKey, to: lensKey, type: 'HAS_SUMMARY_LENS' });
 }
 
 // IMPORTS: file → file (from codebase-graph.json imports)
