@@ -26,6 +26,8 @@
     "smoke:ace:full": "npm run smoke:gitignore && npm run smoke:fast-ast && npm run smoke:kag:gemma4",
     "smoke:som-bmu": "node ./scripts/smoke-som-bmu.mjs",
     "smoke:som-bmu:inject": "node ./scripts/smoke-som-bmu.mjs --inject-weights --verbose",
+    "smoke:topology-projection": "node ./scripts/smoke-topology-projection.mjs",
+    "smoke:topology-projection:gpu": "node ./scripts/smoke-topology-projection.mjs --gpu-only --verbose",
     "ci:all": "npm run check:ts7 && npm run ci:smoke:hypergraph && (npm run grpc:health:retrieval || true)",
     "audit:dirs": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph",
     "audit:dirs:quiet": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --quiet",
