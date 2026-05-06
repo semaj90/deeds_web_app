@@ -1,6 +1,7 @@
 
 
 import { createRedisConnection } from '$lib/server/redis';
+import { attachDispose } from '$lib/server/redis-disposable.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -22,12 +23,14 @@ function extractMessage(e: unknown): string {
 
 export const GET: RequestHandler = async () => {
  const timestamp = new Date().toISOString();
- let client: ReturnType<typeof createRedisConnection> | null = null;
 
  try {
-   // Use a short-lived connection for health checks to avoid errors when the
-   // global/shared client has been closed or is in a bad state.
-   client = createRedisConnection();
+   // Use a short-lived connection for health checks. D16: `await using` +
+   // attachDispose auto-closes the client on scope exit (success or throw),
+   // replacing the previous `let client = null; ... finally { if (client) client.quit() }`
+   // pattern. The dispose hook swallows quit errors so already-closed
+   // clients don't double-throw.
+   await using client = attachDispose(createRedisConnection());
 
    // Ping using the short-lived client
    if (client && typeof client.ping === 'function') {
@@ -67,15 +70,7 @@ export const GET: RequestHandler = async () => {
    },
    { status: 503 }
  );
- } finally {
- // Quit the short-lived client if possible to avoid leaking connections
- if (client && typeof client.quit === 'function') {
- try {
- await client.quit();
- } catch {
- /* ignore quit errors */
  }
- }
- }
+ // No finally — `await using client` auto-disposes on scope exit (even on throw)
 };
 

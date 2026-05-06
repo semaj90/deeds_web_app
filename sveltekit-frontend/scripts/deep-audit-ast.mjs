@@ -646,7 +646,17 @@ async function gateD15() {
 
 // D16: `await using` opportunities — try/finally with .quit()/.disconnect()
 async function gateD16() {
-  const targets = await glob('{src,scripts}/**/*.{ts,mjs}', { ignore: ['**/*.d.ts', '**/_archive/**'] });
+  // Exclude this audit script itself — its doc comments mention the pattern
+  // it's hunting (false self-match). Same for redis-disposable.ts, the
+  // helper file that DOCUMENTS the await-using pattern.
+  const targets = await glob('{src,scripts}/**/*.{ts,mjs}', {
+    ignore: [
+      '**/*.d.ts',
+      '**/_archive/**',
+      'scripts/deep-audit-ast.mjs',
+      'src/lib/server/redis-disposable.ts',
+    ],
+  });
   const findings = [];
   for (const f of targets) {
     const src = await readFile(f, 'utf8').catch(() => '');
@@ -655,6 +665,9 @@ async function gateD16() {
     const lines = src.split('\n');
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      // Skip pure comment lines (// ...) and JSDoc body lines (` * ...`)
+      const trimmed = line.trimStart();
+      if (trimmed.startsWith('//') || trimmed.startsWith('* ') || trimmed === '*') continue;
       if (/\.(quit|disconnect)\(\)/.test(line) && /finally|catch/.test(lines.slice(Math.max(0, i - 5), i).join('\n'))) {
         findings.push({
           file:    relative(ROOT, f),

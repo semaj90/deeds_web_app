@@ -1,24 +1,22 @@
 # Deep AST Audit
 
-Generated: 2026-05-06T01:09:45.533Z
+Generated: 2026-05-06T01:18:15.314Z
 Graph files: 3417
 
 ## Summary
 
 | Gate | Description | Count |
 | :--- | :--- | ---: |
-| D16 | await-using opportunity (try/finally + .quit/.disconnect) | 4 |
+| D16 | await-using opportunity (try/finally + .quit/.disconnect) | 2 |
 
 ---
 
 ## D16 — await-using opportunity (try/finally + .quit/.disconnect)
 
-**4** findings
+**2** findings
 
-- `scripts\deep-audit-ast.mjs:647` — // D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()
 - `scripts\tests\test-ace-graphify-retrieval.mjs:192` — await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()
 - `scripts\lib\phase89-sse-stream.mjs:199` — await redis.quit();  → consider `await using` + getDisposableRedis()
-- `src\routes\api\health\redis\+server.ts:74` — await client.quit();  → consider `await using` + getDisposableRedis()
 
 ---
 
