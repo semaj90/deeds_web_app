@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/observability`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/observability
 
@@ -14,9 +14,9 @@
 
 ## Files (3)
 
-- `inference-log-views.ts`
-- `inference-log.ts`
-- `langfuse.ts`
+- `src/lib/server/observability/inference-log-views.ts`
+- `src/lib/server/observability/inference-log.ts`
+- `src/lib/server/observability/langfuse.ts`
 
 ## Hypergraph cluster
 
@@ -28,6 +28,15 @@ This directory is part of cluster **C59** — function chunks in \`src/lib/serve
 See `docs/graph/hypergraph-clusters.md` § Cluster 59 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C59 — function chunks in `src/lib/server/observability` (tag: vector)
+- **BoW texture key**: `texture:bow:cluster:59` (Redis 1h TTL)
+- **Qdrant tags**: `vector` `embedding` `auth`
+- **Paired tests**: 0/3 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -36,7 +45,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server observability", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/observability/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 59 })` — BoW texture tile for cluster C59
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 59 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

@@ -284,6 +284,222 @@ export async function persistCentroidsToDB(
   return upserted;
 }
 
+// ── SOM grid neighbor lookup ──────────────────────────────────────────────────
+
+export interface SomNeighbor {
+  row:        number;
+  col:        number;
+  similarity: number; // cosine similarity to the primary BMU centroid
+}
+
+/**
+ * Return up to `maxNeighbors` SOM cells adjacent to `(row, col)` ranked by
+ * centroid similarity to the primary cell.  Uses the Moore neighbourhood
+ * (8 surrounding cells).  Missing cells (no centroid in Redis) are skipped.
+ *
+ * Used by the "did you mean" path: when a query lands far from any centroid
+ * (high reconstruction error), the adjacent cells surface related clusters
+ * the user may have intended.
+ */
+export async function nearestSomNeighbors(
+  row:          number,
+  col:          number,
+  gridSize    = 10,
+  maxNeighbors = 3,
+): Promise<SomNeighbor[]> {
+  try {
+    const redis = getRedis();
+
+    // Load the primary cell centroid for comparison baseline
+    const primaryRaw = await redis.get(centroidKey.som(row, col));
+    if (!primaryRaw) return [];
+    const primary = new Float32Array(JSON.parse(primaryRaw) as number[]);
+
+    // Enumerate Moore neighbourhood
+    const candidates: Array<{ row: number; col: number }> = [];
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const nr = row + dr;
+        const nc = col + dc;
+        if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
+          candidates.push({ row: nr, col: nc });
+        }
+      }
+    }
+    if (!candidates.length) return [];
+
+    const keys   = candidates.map((c) => centroidKey.som(c.row, c.col));
+    const values = await redis.mget(...keys);
+
+    const results: SomNeighbor[] = [];
+    for (let i = 0; i < candidates.length; i++) {
+      const raw = values[i];
+      if (!raw) continue;
+      const vec = new Float32Array(JSON.parse(raw) as number[]);
+      results.push({ ...candidates[i], similarity: cosine(primary, vec) });
+    }
+
+    return results
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, maxNeighbors);
+  } catch {
+    return [];
+  }
+}
+
+export interface DidYouMeanResult {
+  neighbors:           SomNeighbor[];
+  reconstructionError: number;
+  isNovel:             boolean; // true when error exceeds noveltyThreshold
+  errorSource:         'autoencoder-gpu' | 'autoencoder-cpu' | 'cosine-approx';
+}
+
+// ── Autoencoder weight loader ─────────────────────────────────────────────────
+
+/** Redis key written by the topology projection pipeline after autoencoder training. */
+const DECODER_WEIGHTS_KEY = 'ace:autoencoder:decoder:weights';
+
+interface StoredWeights {
+  W:         number[];
+  b:         number[];
+  hidden:    number;
+  outputDim: number;
+}
+
+/**
+ * Load decoder weights from Redis.
+ * Returns null when the autoencoder hasn't been trained / weights not yet cached.
+ * Results are NOT cached in-process — weights may be refreshed between SOM rebuilds.
+ */
+async function loadDecoderWeights() {
+  try {
+    const redis = getRedis();
+    const raw   = await redis.get(DECODER_WEIGHTS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredWeights;
+    if (!parsed.W?.length || !parsed.b?.length) return null;
+    return {
+      W:         new Float32Array(parsed.W),
+      b:         new Float32Array(parsed.b),
+      hidden:    parsed.hidden,
+      outputDim: parsed.outputDim,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * "Did you mean" cluster suggestions based on reconstruction error.
+ *
+ * When `manifold4Coords` are provided (4-dim encoded representation from
+ * tensorAnalysisCache), the function uses the true autoencoder reconstruction
+ * error: MSE(queryVec, decode(manifold4)) normalised to cosine-distance scale.
+ *
+ * Falls back to the approximation `1 − cosine(queryVec, primaryBmuCentroid)`
+ * when decoder weights aren't cached or manifold4 is not available.
+ *
+ * Routing guide (same thresholds apply regardless of error source):
+ *   error < 0.15 → familiar → ace:code cache hit path
+ *   error 0.15–0.40 → suggest neighbors (did you mean)
+ *   error > 0.40 → out-of-distribution → broader ANN / web fallback
+ */
+export async function didYouMeanClusters(
+  queryVec:      Float32Array | number[],
+  primaryBmuRow: number,
+  primaryBmuCol: number,
+  opts: {
+    gridSize?:         number;
+    maxSuggestions?:   number;
+    noveltyThreshold?: number;
+    /** 4-dim manifold representation from tensorAnalysisCache (manifold4_x/y/z/w). */
+    manifold4Coords?:  [number, number, number, number] | Float32Array;
+  } = {},
+): Promise<DidYouMeanResult> {
+  const { gridSize = 10, maxSuggestions = 3, noveltyThreshold = 0.15, manifold4Coords } = opts;
+
+  let reconstructionError = 0;
+  let errorSource: DidYouMeanResult['errorSource'] = 'cosine-approx';
+
+  // ── Attempt true autoencoder reconstruction error ─────────────────────────
+  if (manifold4Coords) {
+    try {
+      const weights = await loadDecoderWeights();
+      if (weights) {
+        const { decodeManifold4, reconstructionMse } = await import('$lib/server/gpu/libtorch-bridge.js');
+        const result = decodeManifold4(
+          manifold4Coords instanceof Float32Array
+            ? manifold4Coords
+            : new Float32Array(manifold4Coords),
+          weights,
+        );
+        const mse = reconstructionMse(queryVec, result.decoded);
+        if (mse !== null) {
+          reconstructionError = mse;
+          errorSource = result.source === 'gpu' ? 'autoencoder-gpu' : 'autoencoder-cpu';
+        }
+      }
+    } catch { /* non-fatal — fall through to cosine approx */ }
+  }
+
+  // ── Cosine approximation fallback ─────────────────────────────────────────
+  if (errorSource === 'cosine-approx') {
+    try {
+      const redis      = getRedis();
+      const primaryRaw = await redis.get(centroidKey.som(primaryBmuRow, primaryBmuCol));
+      if (primaryRaw) {
+        const centroid = new Float32Array(JSON.parse(primaryRaw) as number[]);
+        const qArr     = queryVec instanceof Float32Array ? queryVec : new Float32Array(queryVec);
+        reconstructionError = 1 - cosine(qArr, centroid);
+      }
+    } catch { /* non-fatal — stays 0 */ }
+  }
+
+  const neighbors = await nearestSomNeighbors(
+    primaryBmuRow, primaryBmuCol, gridSize, maxSuggestions,
+  );
+
+  return {
+    neighbors,
+    reconstructionError,
+    isNovel:     reconstructionError >= noveltyThreshold,
+    errorSource,
+  };
+}
+
+// ── Token density helpers ─────────────────────────────────────────────────────
+
+export interface TokenBudgetStats {
+  p50Tokens:         number;
+  p90Tokens:         number;
+  avgChunksPerQuery: number;
+  sampleCount:       number;
+  updatedAt:         number; // Unix ms
+}
+
+/**
+ * Read the pre-computed token budget stats for a (topoClass, clusterId) pair.
+ * Returns null when no stats have been recorded yet.
+ * Used before Qdrant fetch to pre-size the chunk limit.
+ */
+export async function getTokenBudget(
+  topoClass: number,
+  clusterId: number | null,
+): Promise<TokenBudgetStats | null> {
+  try {
+    const { aceTokenBudgetKey } = await import('$lib/server/cache-keys.js');
+    const redis = getRedis();
+    const key   = clusterId != null
+      ? aceTokenBudgetKey.forCluster(topoClass, clusterId)
+      : aceTokenBudgetKey.forClass(topoClass);
+    const raw = await redis.get(key);
+    return raw ? (JSON.parse(raw) as TokenBudgetStats) : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Warm Redis centroid cache from Postgres on startup / after Redis restart.
  * Returns number of centroids loaded into Redis.

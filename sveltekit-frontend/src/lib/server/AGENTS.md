@@ -1,27 +1,24 @@
 # AGENTS.md — `src/lib/server`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server
 
 ## Snapshot
 
-- server module directory with 57 files, 3 API handlers, 142 Drizzle refs
+- server module directory with 62 files, 3 API handlers, 155 Drizzle refs
 - Audit score: **100/100**
 - 🟠 hardcoded localhost: 5
-- Tags: `src` `lib` `server` `zod` `db-schema` `auth`
+- Tags: `src` `lib` `server` `zod` `db-schema` `test`
 
-## Files (57)
+## Files (62)
 
-- `ace-ingest-progress.ts`
-- `api-metadata-extractor.ts`
-- `api-registry.ts`
-- `api-response.ts`
-- `auth-guard.js`
-- `auth-helpers.ts`
-- `auth.ts`
-- `batch-embedder.ts`
+- `src/lib/server/ace-ingest-progress.ts`
+- `src/lib/server/api-metadata-extractor.ts`
+- `src/lib/server/api-registry.ts`
+- `src/lib/server/api-response.ts`
+- `src/lib/server/auth-guard.js`
 
 ## Hypergraph cluster
 
@@ -36,6 +33,15 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 90 for full digest.
 
 - ⚠️ Hardcoded localhost refs
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C90 — function chunks in `src/lib/server` (tag: auth)
+- **BoW texture key**: `texture:bow:cluster:90` (Redis 1h TTL)
+- **Qdrant tags**: `auth` `api` `server`
+- **Paired tests**: 9/62 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -44,7 +50,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "lib server", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 90 })` — BoW texture tile for cluster C90
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 90 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

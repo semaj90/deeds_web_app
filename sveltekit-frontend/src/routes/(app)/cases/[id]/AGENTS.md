@@ -1,16 +1,16 @@
 # AGENTS.md — `src/routes/(app)/cases/[id]`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
-> Directory audit: src/routes/(app)/cases/[id]
+> Directory: src/routes/(app)/cases/[id]
 
 ## Snapshot
 
-- src/routes/(app)/cases/[id]/+layout.server.ts, src/routes/(app)/cases/[id]/+layout.svelte, src/routes/(app)/cases/[id]/+layout.ts, src/routes/(app)/cases/[id]/+page.server.ts, src/routes/(app)/cases/[id]/+page.svelte
-- Audit score: **65/100** ⚠️
+- 6 file(s), 0 handler(s)
+- Audit score: **94/100**
 - no audit signals
-- Tags: `[id]`
+
 
 ## Files (6)
 
@@ -30,9 +30,15 @@ This directory is part of cluster **C35** — component chunks in \`src/lib/comp
 
 See `docs/graph/hypergraph-clusters.md` § Cluster 35 for full digest.
 
-## Topological neighbors
 
-- `15`
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C35 — component chunks in `src/lib/components/legal-ai` (tag: component)
+- **BoW texture key**: `texture:bow:cluster:35` (Redis 1h TTL)
+- **Qdrant tags**: `component` `page` `vector` `layout`
+- **Paired tests**: 0/6 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
@@ -42,7 +48,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "cases [id]", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/routes/(app)/cases/[id]/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 35 })` — BoW texture tile for cluster C35
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 35 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

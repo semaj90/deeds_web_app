@@ -1142,3 +1142,101 @@ export function isCudnnAvailable(): boolean {
   if (!native?.checkCudaAvailable) return false;
   return native.checkCudaAvailable() === 2;
 }
+
+// ── Autoencoder decoder ───────────────────────────────────────────────────────
+
+/**
+ * Pre-loaded decoder weights for the topology autoencoder.
+ * W: [hidden × outputDim] row-major — each row i is the weight vector for latent dim i.
+ * b: [outputDim] bias.
+ * Written to Redis as `ace:autoencoder:decoder:weights` by the topology pipeline.
+ */
+export interface AutoencoderWeights {
+  W:         Float32Array;
+  b:         Float32Array;
+  hidden:    number; // latent dim (typically 4)
+  outputDim: number; // reconstruction dim (typically 768)
+}
+
+export interface ManifoldDecodeResult {
+  decoded:   Float32Array;
+  source:    'gpu' | 'cpu';
+  durationMs: number;
+}
+
+/**
+ * Decode a manifold4 coordinate vector back to full-dim space.
+ *
+ * GPU path: calls native.autoencoderDecode via the LibTorch N-API addon (~0.1ms).
+ * CPU fallback: single-layer linear decode — decoded[j] = Σ_i W[i×outputDim+j]×enc[i] + b[j].
+ *
+ * Caller is responsible for loading `weights` from Redis before calling this function
+ * (see centroid-cache.ts `loadDecoderWeights()`).
+ */
+export function decodeManifold4(
+  encoded:  Float32Array | number[],
+  weights:  AutoencoderWeights,
+): ManifoldDecodeResult {
+  const t0 = performance.now();
+  const { W, b, hidden, outputDim } = weights;
+
+  const encF32 = encoded instanceof Float32Array
+    ? encoded
+    : new Float32Array(encoded);
+
+  // ── GPU path ─────────────────────────────────────────────────────────────
+  const native = getAddonInternal();
+  if (native?.autoencoderDecode && gpuHasRoom(vramNeededMB(1, outputDim) + 1)) {
+    try {
+      const out = native.autoencoderDecode(encF32, 1, hidden, W, b, outputDim);
+      return { decoded: out, source: 'gpu', durationMs: performance.now() - t0 };
+    } catch {
+      // Fall through to CPU
+    }
+  }
+
+  // ── CPU path: single-layer linear decode ─────────────────────────────────
+  // decoded = enc @ W_T + b  (W stored as [hidden × outputDim])
+  const out = new Float32Array(outputDim);
+  for (let j = 0; j < outputDim; j++) {
+    let s = b[j];
+    let i = 0;
+    // Unrolled 4× for auto-vectorization
+    for (; i + 3 < hidden; i += 4) {
+      s += W[i * outputDim + j]       * encF32[i]
+         + W[(i + 1) * outputDim + j] * encF32[i + 1]
+         + W[(i + 2) * outputDim + j] * encF32[i + 2]
+         + W[(i + 3) * outputDim + j] * encF32[i + 3];
+    }
+    for (; i < hidden; i++) s += W[i * outputDim + j] * encF32[i];
+    out[j] = s;
+  }
+  return { decoded: out, source: 'cpu', durationMs: performance.now() - t0 };
+}
+
+/**
+ * Compute the mean-squared reconstruction error between a 768-dim query vector
+ * and the autoencoder's decoded reconstruction of its manifold4 representation.
+ *
+ * Normalized to the same numeric range as `1 − cosine(a, b)` for unit vectors
+ * (mse × outputDim / 2), so the same novelty thresholds apply.
+ *
+ * Returns null if the query or decoded vector is zero-length.
+ */
+export function reconstructionMse(
+  queryVec: Float32Array | number[],
+  decoded:  Float32Array,
+  normalize = true,
+): number | null {
+  const q = queryVec instanceof Float32Array ? queryVec : new Float32Array(queryVec);
+  const dim = Math.min(q.length, decoded.length);
+  if (dim === 0) return null;
+
+  let mse = 0;
+  for (let i = 0; i < dim; i++) {
+    const diff = q[i] - decoded[i];
+    mse += diff * diff;
+  }
+  mse /= dim;
+  return normalize ? mse * dim / 2 : mse;
+}

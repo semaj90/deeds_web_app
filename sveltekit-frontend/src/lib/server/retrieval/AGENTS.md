@@ -1,27 +1,24 @@
 # AGENTS.md — `src/lib/server/retrieval`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/retrieval
 
 ## Snapshot
 
-- server module directory with 24 files, 0 API handlers, 1 Drizzle refs
+- server module directory with 28 files, 0 API handlers, 3 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
-- Tags: `src` `lib` `server` `zod` `test` `db-schema`
+- Tags: `src` `lib` `server` `db-schema` `zod` `test`
 
-## Files (24)
+## Files (28)
 
-- `authority-chain.ts`
-- `auto-backfill.ts`
-- `citation-graph.ts`
-- `codebase-context.ts`
-- `context-buffer.test.ts`
-- `context-buffer.ts`
-- `cross-encoder-reranker.ts`
-- `document-dag.ts`
+- `src/lib/server/retrieval/authority-chain.ts`
+- `src/lib/server/retrieval/auto-backfill.ts`
+- `src/lib/server/retrieval/centroid-cache.ts`
+- `src/lib/server/retrieval/citation-graph.ts`
+- `src/lib/server/retrieval/cluster-aware-reranker.ts`
 
 ## Hypergraph cluster
 
@@ -33,6 +30,15 @@ This directory is part of cluster **C73** — function chunks in \`src/lib/serve
 See `docs/graph/hypergraph-clusters.md` § Cluster 73 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C73 — function chunks in `src/lib/server/retrieval` (tag: vector)
+- **BoW texture key**: `texture:bow:cluster:73` (Redis 1h TTL)
+- **Qdrant tags**: `vector` `redis` `embedding` `rag-pipeline` `graph-db`
+- **Paired tests**: 1/28 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -41,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server retrieval", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/retrieval/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 73 })` — BoW texture tile for cluster C73
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 73 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

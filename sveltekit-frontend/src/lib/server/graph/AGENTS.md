@@ -1,18 +1,18 @@
 # AGENTS.md — `src/lib/server/graph`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T02:57:03.966Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/graph
 
 ## Snapshot
 
-- server module directory with 17 files, 0 API handlers, 2 Drizzle refs
-- Audit score: **100/100**
-- no audit signals
+- server module directory with 20 files, 0 API handlers, 2 Drizzle refs
+- Audit score: **95/100**
+- 🟠 hardcoded localhost: 1
 - Tags: `src` `lib` `server` `zod` `auth` `db-schema`
 
-## Files (17)
+## Files (20)
 
 - `src/lib/server/graph/codebase-cluster-detection.ts`
 - `src/lib/server/graph/codebase-neo4j-sync.ts`
@@ -29,6 +29,9 @@ This directory is part of cluster **C73** — function chunks in \`src/lib/serve
 
 See `docs/graph/hypergraph-clusters.md` § Cluster 73 for full digest.
 
+## Warnings
+
+- ⚠️ Hardcoded localhost refs
 
 ## Retrieval / Rerank Hints
 
@@ -37,7 +40,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 73 for full digest.
 - **Cluster**: C73 — function chunks in `src/lib/server/retrieval` (tag: vector)
 - **BoW texture key**: `texture:bow:cluster:73` (Redis 1h TTL)
 - **Qdrant tags**: `vector` `redis` `embedding` `rag-pipeline` `graph-db`
-- **Paired tests**: 1/17 files have paired tests
+- **Paired tests**: 1/20 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

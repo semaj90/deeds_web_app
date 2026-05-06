@@ -1,7 +1,7 @@
 # AGENTS.md — `src/routes/(app)/terminal`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)/terminal
 
@@ -14,8 +14,8 @@
 
 ## Files (2)
 
-- `+page.server.ts`
-- `+page.svelte`
+- `src/routes/(app)/terminal/+page.server.ts`
+- `src/routes/(app)/terminal/+page.svelte`
 
 ## Hypergraph cluster
 
@@ -30,6 +30,15 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 5 for full digest.
 
 - ⚠️ 1 routes lack test pairing
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C5 — component chunks in `src/lib/components/ai` (tag: ai)
+- **BoW texture key**: `texture:bow:cluster:5` (Redis 1h TTL)
+- **Qdrant tags**: `ai` `auth` `page` `component` `embedding`
+- **Paired tests**: 0/2 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -38,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "(app) terminal", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/routes/(app)/terminal/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 5 })` — BoW texture tile for cluster C5
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 5 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

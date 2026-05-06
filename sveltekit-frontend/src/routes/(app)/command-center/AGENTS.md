@@ -1,22 +1,24 @@
 # AGENTS.md — `src/routes/(app)/command-center`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)/command-center
 
 ## Snapshot
 
-- route handler directory with 11 files, 0 API handlers, 1 Drizzle refs, 1 SSR-unsafe
-- Audit score: **90/100**
+- route handler directory with 11 files, 0 API handlers, 1 Drizzle refs
+- Audit score: **100/100**
 - no audit signals
 - Tags: `src` `routes` `(app)` `route` `db-schema` `auth`
 
 ## Files (3)
 
-- `+page.server.ts`
-- `+page.svelte`
-- `+page.ts`
+- `src/routes/(app)/command-center/+page.server.ts`
+- `src/routes/(app)/command-center/+page.svelte`
+- `src/routes/(app)/command-center/+page.ts`
+- `src/routes/(app)/command-center/codebase/+page.svelte`
+- `src/routes/(app)/command-center/codebase/clusters/[id]/+page.server.ts`
 
 ## Hypergraph cluster
 
@@ -29,8 +31,16 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 3 for full digest.
 
 ## Warnings
 
-- ⚠️ 1 SSR-unsafe globals
 - ⚠️ 3 routes lack test pairing
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C3 — const chunks in `src/routes/(app)/demos/detective-command`
+- **BoW texture key**: `texture:bow:cluster:3` (Redis 1h TTL)
+- **Qdrant tags**: _(none)_
+- **Paired tests**: 0/3 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
@@ -40,7 +50,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "(app) command-center", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/routes/(app)/command-center/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 3 })` — BoW texture tile for cluster C3
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 3 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

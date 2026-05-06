@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/schemas`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/schemas
 
@@ -14,11 +14,11 @@
 
 ## Files (5)
 
-- `auth.ts`
-- `board.ts`
-- `evidence-upload.ts`
-- `evidence.ts`
-- `forms.ts`
+- `src/lib/schemas/auth.ts`
+- `src/lib/schemas/board.ts`
+- `src/lib/schemas/evidence-upload.ts`
+- `src/lib/schemas/evidence.ts`
+- `src/lib/schemas/forms.ts`
 
 ## Hypergraph cluster
 
@@ -30,6 +30,15 @@ This directory is part of cluster **C29** — const chunks in \`src/lib/schemas\
 See `docs/graph/hypergraph-clusters.md` § Cluster 29 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C29 — const chunks in `src/lib/schemas` (tag: auth)
+- **BoW texture key**: `texture:bow:cluster:29` (Redis 1h TTL)
+- **Qdrant tags**: `auth` `types` `embedding` `vector` `redis`
+- **Paired tests**: 1/5 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -38,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "lib schemas", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/schemas/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 29 })` — BoW texture tile for cluster C29
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 29 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

@@ -1,16 +1,16 @@
 # AGENTS.md — `src/routes/(app)/admin/ai-dashboard`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
-> Directory audit: src/routes/(app)/admin/ai-dashboard
+> Directory: src/routes/(app)/admin/ai-dashboard
 
 ## Snapshot
 
-- src/routes/(app)/admin/ai-dashboard/+page.server.ts, src/routes/(app)/admin/ai-dashboard/+page.svelte, src/routes/(app)/admin/ai-dashboard/+page.ts
-- Audit score: **65/100** ⚠️
+- 5 file(s), 0 handler(s)
+- Audit score: **92/100**
 - no audit signals
-- Tags: `ai-dashboard`
+
 
 ## Files (5)
 
@@ -20,6 +20,13 @@
 - `+page.server.ts`
 - `+page.server.ts`
 
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 0/5 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

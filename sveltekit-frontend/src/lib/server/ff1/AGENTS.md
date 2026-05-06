@@ -1,48 +1,45 @@
-# FF1 Compute Planner — `src/lib/server/ff1/`
+# AGENTS.md — `src/lib/server/ff1`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+
+> Directory audit: src/lib/server/ff1
 
 ## Snapshot
-| Metric | Value |
-|--------|-------|
-| Files | 7 (planner.ts, registry.ts + 5 sub-module files) |
-| Purpose | Runtime backend selection: Redis → LibTorch GPU → simdjson → WASM → JS |
-| Tags | compute, gpu, cache, inference |
 
-## Module Layout
+- server module directory with 9 files, 0 API handlers
+- Audit score: **90/100**
+- no audit signals
+- Tags: `src` `lib` `server` `zod`
 
-```
-ff1/
-  planner.ts          — ff1() dispatch entry point (auto-selects fastest backend)
-  registry.ts         — FF1FunctionName enum + capability registry
-  agent/
-    gemma4-repair-planner.ts  — Gemma4-based agentic repair planning
-    tool-registry.ts          — MCP-style tool registry for ff1 agents
-  audit/
-    diagnostic-collector.ts   — Collects svelte-check/tsc diagnostics for agent input
-  graph/
-    graph-schema.ts           — Zod schema for graph node/edge types
-```
+## Files (2)
 
-## Priority Ladder
+- `src/lib/server/ff1/agent/gemma4-repair-planner.ts`
+- `src/lib/server/ff1/agent/tool-registry.ts`
+- `src/lib/server/ff1/audit/diagnostic-collector.ts`
+- `src/lib/server/ff1/cli/ff1-audit.ts`
+- `src/lib/server/ff1/cli/ff1-propose.ts`
 
-1. **Redis cache** ~0.2ms — exact-match via SHA-256 key
-2. **LibTorch N-API GPU** ~1-5ms — CUDA cuBLAS on RTX 3060 Ti (`tensorrt_bridge.node`)
-3. **simdjson N-API** ~0.5ms — SIMD JSON ops only
-4. **WASM SIMD** ~5-20ms — 128-bit lanes, server-side
-5. **JS fallback** ~20-200ms — V8 JIT, always available
 
-## Usage
+## Retrieval / Rerank Hints
 
-```typescript
-import { ff1 } from '$lib/server/ff1/planner.js';
-const score = await ff1('embedding.cosine', vecA, vecB);
-const top   = await ff1('graph.pagerank', { nodes, edges, iters: 40 });
-```
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-## Agentic Hints
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 1/2 files have paired tests
 
-- To run a repair plan: call `gemma4-repair-planner.ts:buildRepairPlan(diagnostics)`
-- Diagnostics are collected by `diagnostic-collector.ts:collectDiagnostics()`
-- Tool names are declared in `tool-registry.ts` — search by `FF1_TOOL_*` prefix
-- `graph-schema.ts` exports `GraphNodeSchema` / `GraphEdgeSchema` for Zod validation
+## Agentic tool-calling — quick ACE hits
+
+In-process tools the Gemma4 agent can call to dig deeper into this directory:
+
+- `graph_search({ query: "ff1", topK: 8 })` — files in this dir with tags, TODOs, audit flags
+- `wiki_note_lookup({ query: "server ff1", limit: 5 })` — KAG narrative + audit score
+- `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
+- `read_file({ filePath: "src/lib/server/ff1/<file>" })` — fetch any file's contents (sandboxed to src/)
+
+
+## How to use this file
+
+Agents (Claude Code, Cursor, Codex, Aider) automatically pick up the nearest `AGENTS.md` when editing files in this tree. The root `AGENTS.md` provides repo-wide rules; this file overlays directory-specific signals from the Redis KAG cache.
+
+Run `npm run agents:write` to regenerate after `npm run index:codebase:fast`.

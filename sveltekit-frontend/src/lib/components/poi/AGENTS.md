@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/components/poi`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/components/poi
 
@@ -14,15 +14,19 @@
 
 ## Files (10)
 
-- `AddPoiModal.svelte`
-- `PersonOfInterestDetailView.svelte`
-- `POIEditor.svelte`
-- `POIFaceMatchDialog.svelte`
-- `POIForm.svelte`
-- `PoiImageUpload.svelte`
-- `POIPhotoGrid.svelte`
-- `POIQuickActions.svelte`
+- `src/lib/components/poi/AddPoiModal.svelte`
+- `src/lib/components/poi/PersonOfInterestDetailView.svelte`
+- `src/lib/components/poi/POIEditor.svelte`
+- `src/lib/components/poi/POIFaceMatchDialog.svelte`
+- `src/lib/components/poi/POIForm.svelte`
 
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 0/10 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

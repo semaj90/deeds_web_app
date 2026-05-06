@@ -31,6 +31,7 @@ import {
 import { generateEmbedding }                           from '$lib/server/grpc/embedding-client.js';
 import { qdrant }                                      from '$lib/server/vector/qdrant-manager.js';
 import { selectAdaptiveMemory, queryTopHyperedges }    from '$lib/server/graph/hypergraph-4d.js';
+import { queryTopology }                               from '$lib/server/retrieval/topology-search-client.js';
 import { db, pool }                                    from '$lib/server/db/client';
 import { contextTimeline }                             from '$lib/server/db/schema-postgres.js';
 import { trackTokenUsage }                             from '$lib/server/ai/token-tracker.js';
@@ -171,6 +172,42 @@ const AGENT_TOOLS = [
           filePath: { type: 'string', description: 'Path to the file relative to workspace root (e.g., src/routes/+page.svelte)' },
         },
         required: ['filePath'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'topology_search',
+      description:
+        'Search the 4D topology-indexed codebase using cosine retrieval (Qdrant 768-dim) ' +
+        'followed by manifold4 Euclidean neighborhood expansion. ' +
+        'The four manifold dimensions are: som_x/som_y (SOM grid — structural topology), ' +
+        'semantic_z (embedding centroid projection), grpo_w (RL quality signal). ' +
+        'Returns files closest in the combined vector+topology space. ' +
+        'Use this when you need to find structurally-related or topologically-adjacent files ' +
+        'beyond simple keyword or semantic search.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: 'Natural language query — embedded and used to find the 4D centroid',
+          },
+          radius: {
+            type: 'number',
+            description: 'Euclidean radius in manifold4 space (default 0.25, range 0.05–2.0)',
+          },
+          limit: {
+            type: 'number',
+            description: 'Max results to return (default 15, max 40)',
+          },
+          somCluster: {
+            type: 'number',
+            description: 'Restrict search to a specific SOM cluster index (optional)',
+          },
+        },
+        required: ['query'],
       },
     },
   },
@@ -451,6 +488,43 @@ async function dispatchTool(
           members:   e.memberIds.length,
           summary:   e.summary?.slice(0, 300) ?? '',
         })),
+      };
+    }
+
+    if (name === 'topology_search') {
+      const query      = String(args.query ?? '').trim();
+      const radius     = Math.min(Math.max(Number(args.radius ?? 0.25), 0.05), 2.0);
+      const limit      = Math.min(Number(args.limit ?? 15), 40);
+      const somCluster = args.somCluster != null ? Number(args.somCluster) : undefined;
+
+      const result = await queryTopology(query, { radius, limit, somCluster });
+      if (!result) {
+        return {
+          tool: name,
+          result: [],
+          errorMsg: 'Topology search engine unavailable (port 8101). Run: node scripts/topology-search-server.mjs',
+        };
+      }
+
+      return {
+        tool: name,
+        result: {
+          center:     result.center,
+          radius:     result.radius,
+          totalFound: result.totalFound,
+          durationMs: result.durationMs,
+          hits: (result.hits ?? []).slice(0, limit).map((h) => ({
+            path:               h.path,
+            topoClass:          h.topoClass,
+            topoHex:            h.topoHex,
+            somCluster:         h.somCluster,
+            hybridScore:        h.hybridScore ?? h.manifoldScore,
+            cosineScore:        h.cosineScore ?? null,
+            manifoldDistance:   h.manifoldDistance ?? null,
+            graphAuthorityScore: h.graphAuthorityScore ?? null,
+            summary:            (h.summary ?? h.contentPreview ?? ''),
+          })),
+        },
       };
     }
 

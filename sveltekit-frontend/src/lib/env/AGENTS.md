@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/env`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/env
 
@@ -14,9 +14,16 @@
 
 ## Files (2)
 
-- `index.ts`
-- `public.ts`
+- `src/lib/env/index.ts`
+- `src/lib/env/public.ts`
 
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 1/2 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

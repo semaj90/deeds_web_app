@@ -1,27 +1,34 @@
 # AGENTS.md — `src/routes/(app)`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)
 
 ## Snapshot
 
-- route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs, 13 SSR-unsafe
+- route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs, 1 SSR-unsafe
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `routes` `(app)` `auth` `route` `component`
 
 ## Files (2)
 
-- `+layout.server.ts`
-- `+layout.svelte`
+- `src/routes/(app)/+layout.server.ts`
+- `src/routes/(app)/+layout.svelte`
 
 ## Warnings
 
-- ⚠️ 13 SSR-unsafe globals
+- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
-- ⚠️ 53 routes lack test pairing
+- ⚠️ 54 routes lack test pairing
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 0/2 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

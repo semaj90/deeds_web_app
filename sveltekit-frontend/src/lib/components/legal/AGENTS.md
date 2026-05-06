@@ -1,27 +1,24 @@
 # AGENTS.md — `src/lib/components/legal`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/components/legal
 
 ## Snapshot
 
-- shared library directory with 33 files, 0 API handlers, 2 SSR-unsafe
-- Audit score: **80/100**
-- 🔴 SSR-unsafe: 2
-- Tags: `src` `lib` `components` `component` `ssr-unsafe` `zod`
+- shared library directory with 33 files, 0 API handlers
+- Audit score: **90/100**
+- no audit signals
+- Tags: `src` `lib` `components` `component` `zod`
 
 ## Files (33)
 
-- `AISummaryMiniModal.svelte`
-- `AISummaryReader.svelte`
-- `CaseTimeline.svelte`
-- `ChainOfCustodyTracker.svelte`
-- `CitationDrawer.svelte`
-- `CitationManager.svelte`
-- `CitationSaveTooltip.svelte`
-- `CitedSourcesOverlay.svelte`
+- `src/lib/components/legal/AISummaryMiniModal.svelte`
+- `src/lib/components/legal/AISummaryReader.svelte`
+- `src/lib/components/legal/CaseTimeline.svelte`
+- `src/lib/components/legal/ChainOfCustodyTracker.svelte`
+- `src/lib/components/legal/CitationDrawer.svelte`
 
 ## Hypergraph cluster
 
@@ -32,9 +29,15 @@ This directory is part of cluster **C35** — component chunks in \`src/lib/comp
 
 See `docs/graph/hypergraph-clusters.md` § Cluster 35 for full digest.
 
-## Warnings
 
-- ⚠️ 2 SSR-unsafe globals
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C35 — component chunks in `src/lib/components/legal-ai` (tag: component)
+- **BoW texture key**: `texture:bow:cluster:35` (Redis 1h TTL)
+- **Qdrant tags**: `component` `page` `vector` `layout`
+- **Paired tests**: 0/33 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
@@ -44,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "components legal", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/components/legal/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 35 })` — BoW texture tile for cluster C35
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 35 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

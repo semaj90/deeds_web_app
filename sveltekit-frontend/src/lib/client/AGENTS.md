@@ -1,27 +1,31 @@
 # AGENTS.md — `src/lib/client`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/client
 
 ## Snapshot
 
-- shared library directory with 4 files, 0 API handlers, 1 SSR-unsafe
-- Audit score: **80/100**
+- shared library directory with 4 files, 0 API handlers
+- Audit score: **90/100**
 - no audit signals
-- Tags: `src` `lib` `client` `zod` `component` `ssr-unsafe`
+- Tags: `src` `lib` `client` `zod` `component`
 
 ## Files (4)
 
-- `search-client.ts`
-- `streaming-handler.ts`
-- `subscribeEmbedding.svelte.ts`
-- `workflow-event-stream.ts`
+- `src/lib/client/search-client.ts`
+- `src/lib/client/streaming-handler.ts`
+- `src/lib/client/subscribeEmbedding.svelte.ts`
+- `src/lib/client/workflow-event-stream.ts`
 
-## Warnings
 
-- ⚠️ 1 SSR-unsafe globals
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 0/4 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

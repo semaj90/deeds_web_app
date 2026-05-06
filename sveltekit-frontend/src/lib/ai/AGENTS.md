@@ -1,27 +1,24 @@
 # AGENTS.md — `src/lib/ai`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/ai
 
 ## Snapshot
 
-- shared library directory with 13 files, 0 API handlers, 1 TODOs
+- shared library directory with 14 files, 0 API handlers, 1 TODOs
 - Audit score: **78/100**
 - 🟠 hardcoded localhost: 2
 - Tags: `src` `lib` `ai` `zod` `has-todo`
 
-## Files (13)
+## Files (14)
 
-- `base64-fp32-quantizer.ts`
-- `citation-cache.ts`
-- `client-cache.ts`
-- `client-embed.ts`
-- `client-llm-synthesis.ts`
-- `client-quality.ts`
-- `client-router.ts`
-- `emotion-context.ts`
+- `src/lib/ai/base64-fp32-quantizer.ts`
+- `src/lib/ai/citation-cache.ts`
+- `src/lib/ai/client-cache.ts`
+- `src/lib/ai/client-embed.ts`
+- `src/lib/ai/client-llm-synthesis.ts`
 
 ## Hypergraph cluster
 
@@ -36,6 +33,15 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 14 for full digest.
 
 - ⚠️ Hardcoded localhost refs
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C14 — function chunks in `src/lib/ai` (tag: ai)
+- **BoW texture key**: `texture:bow:cluster:14` (Redis 1h TTL)
+- **Qdrant tags**: `ai` `auth` `embedding`
+- **Paired tests**: 1/14 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -44,7 +50,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "lib ai", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/ai/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 14 })` — BoW texture tile for cluster C14
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 14 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

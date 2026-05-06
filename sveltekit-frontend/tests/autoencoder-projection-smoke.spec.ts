@@ -119,6 +119,94 @@ describe('clusterEmbeddings — P0 empty cluster guard', () => {
   });
 });
 
+// ── libtorch-bridge — decodeManifold4 + reconstructionMse ────────────────────
+
+let decodeManifold4: typeof import('../src/lib/server/gpu/libtorch-bridge.js').decodeManifold4;
+let reconstructionMse: typeof import('../src/lib/server/gpu/libtorch-bridge.js').reconstructionMse;
+
+beforeEach(async () => {
+  ({ decodeManifold4, reconstructionMse } =
+    await import('../src/lib/server/gpu/libtorch-bridge.js'));
+});
+
+describe('decodeManifold4 — CPU path (no native addon in test env)', () => {
+  const hidden = 4, outputDim = 8;
+
+  function makeWeights(h = hidden, o = outputDim) {
+    // W = identity-like: W[i * o + i] = 1.0 (i < min(h,o))
+    const W = new Float32Array(h * o);
+    for (let i = 0; i < Math.min(h, o); i++) W[i * o + i] = 1;
+    const b = new Float32Array(o);
+    return { W, b, hidden: h, outputDim: o };
+  }
+
+  it('returns a Float32Array of length outputDim', () => {
+    const enc = new Float32Array([0.1, 0.2, 0.3, 0.4]);
+    const result = decodeManifold4(enc, makeWeights());
+    expect(result.decoded).toBeInstanceOf(Float32Array);
+    expect(result.decoded.length).toBe(outputDim);
+  });
+
+  it('source is cpu in test environment', () => {
+    const enc = new Float32Array([0.5, 0.5, 0.5, 0.5]);
+    const result = decodeManifold4(enc, makeWeights());
+    expect(result.source).toBe('cpu');
+  });
+
+  it('with identity weight matrix, decoded[i] ≈ encoded[i] for i < hidden', () => {
+    const enc = new Float32Array([1, 2, 3, 4]);
+    const result = decodeManifold4(enc, makeWeights());
+    for (let i = 0; i < hidden; i++) {
+      expect(result.decoded[i]).toBeCloseTo(enc[i], 5);
+    }
+  });
+
+  it('all decoded values are finite (no silent NaN)', () => {
+    const enc = new Float32Array(hidden).fill(0.7);
+    const result = decodeManifold4(enc, makeWeights());
+    for (const v of result.decoded) expect(Number.isFinite(v)).toBe(true);
+  });
+
+  it('accepts number[] input as well as Float32Array', () => {
+    const enc = [0.1, 0.2, 0.3, 0.4];
+    expect(() => decodeManifold4(enc, makeWeights())).not.toThrow();
+  });
+
+  it('durationMs is non-negative', () => {
+    const enc = new Float32Array(hidden).fill(0.1);
+    const result = decodeManifold4(enc, makeWeights());
+    expect(result.durationMs).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('reconstructionMse', () => {
+  it('returns 0 for identical vectors', () => {
+    const v = new Float32Array([1, 0, 0, 1]);
+    expect(reconstructionMse(v, v)).toBeCloseTo(0);
+  });
+
+  it('returns null for empty vectors', () => {
+    expect(reconstructionMse(new Float32Array(0), new Float32Array(0))).toBeNull();
+  });
+
+  it('normalize=true scales to cosine-distance range', () => {
+    // For orthogonal unit vectors (cosine = 0), 1 - cosine = 1
+    // MSE of [1,0,...,0] vs [0,1,...,0] over dim=2: mse = (1+1)/2 = 1
+    // Normalised: mse * dim/2 = 1 * 2/2 = 1.0 ✓
+    const a = new Float32Array([1, 0]);
+    const b = new Float32Array([0, 1]);
+    const mse = reconstructionMse(a, b, true);
+    expect(mse).toBeCloseTo(1.0, 5);
+  });
+
+  it('normalize=false returns raw MSE', () => {
+    const a = new Float32Array([1, 0]);
+    const b = new Float32Array([0, 1]);
+    const raw = reconstructionMse(a, b, false);
+    expect(raw).toBeCloseTo(1.0, 5); // (1-0)²+(0-1)² / 2 = 1.0
+  });
+});
+
 // ── libtorch-bridge — P1 graphSimilarity N-cap ────────────────────────────────
 
 describe('graphSimilarity — P1 N-cap', () => {

@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/embedding`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/embedding
 
@@ -14,14 +14,11 @@
 
 ## Files (9)
 
-- `embed-schema.ts`
-- `embed.ts`
-- `embedding-persist.ts`
-- `embedding-repository.ts`
-- `ingestion-queue.ts`
-- `knn-helper.ts`
-- `ollama-embed.ts`
-- `text-splitter.ts`
+- `src/lib/server/embedding/embed-schema.ts`
+- `src/lib/server/embedding/embed.ts`
+- `src/lib/server/embedding/embedding-persist.ts`
+- `src/lib/server/embedding/embedding-repository.ts`
+- `src/lib/server/embedding/ingestion-queue.ts`
 
 ## Hypergraph cluster
 
@@ -33,6 +30,15 @@ This directory is part of cluster **C77** — type chunks in \`src/lib/types\` (
 See `docs/graph/hypergraph-clusters.md` § Cluster 77 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C77 — type chunks in `src/lib/types` (tag: embedding)
+- **BoW texture key**: `texture:bow:cluster:77` (Redis 1h TTL)
+- **Qdrant tags**: `embedding` `vector` `redis` `auth` `rabbitmq`
+- **Paired tests**: 1/9 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -41,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server embedding", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/embedding/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 77 })` — BoW texture tile for cluster C77
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 77 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

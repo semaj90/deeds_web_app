@@ -1,14 +1,14 @@
 # AGENTS.md — Deeds Web App
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T02:57:03.966Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Legal-AI platform: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > See [`CLAUDE.md`](./CLAUDE.md) for the canonical 600-line dev guide. This file is the agents.md-spec entry point — agents.md / Claude Code / Cursor / Codex all read it.
 
 ## Repo at a glance
 
-- **Frontend**: `sveltekit-frontend/` — SvelteKit + Svelte 5 runes only. 580 server routes across 1218 dirs, 3374 indexed files.
+- **Frontend**: `sveltekit-frontend/` — SvelteKit + Svelte 5 runes only. 620 server routes across 1281 dirs, 3529 indexed files.
 - **GPU bridge**: `simd-bridge/cpp/` — N-API addon for LibTorch CUDA + simdjson AVX2.
 - **Go services**: `go-microservice/`, `services/go-retrieval-service/` — gRPC :50051-50057 (see `CLAUDE.md#grpc-port-map`).
 - **Docs**: `docs/graph/codebase-graph.json` (auto), `docs/graph/codebase-map.md`, `docs/ace-kag-howto.md`, `docs/agents-md-howto.md`.
@@ -17,9 +17,9 @@
 
 | Gate | Status |
 |------|--------|
-| G4  Auth on API routes | 636✅ / 30❌ |
-| G5  Zod on body-parsing routes | 469✅ / 0❌ |
-| G15 SSR-unsafe globals (real) | 8❌ |
+| G4  Auth on API routes | 675✅ / 32❌ |
+| G5  Zod on body-parsing routes | 483✅ / 4❌ |
+| G15 SSR-unsafe globals (real) | 3❌ |
 | G20 Cyclic import pairs | 0 |
 
 Refresh: `npm run index:codebase:fast` then `npm run agents:write`.

@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/db`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/db
 
@@ -14,10 +14,10 @@
 
 ## Files (4)
 
-- `client-db.ts`
-- `pool.ts`
-- `schema.ts`
-- `vite-error-schema.ts`
+- `src/lib/db/client-db.ts`
+- `src/lib/db/pool.ts`
+- `src/lib/db/schema.ts`
+- `src/lib/db/vite-error-schema.ts`
 
 ## Hypergraph cluster
 
@@ -29,6 +29,15 @@ This directory is part of cluster **C91** — type chunks in \`src/lib/server/db
 See `docs/graph/hypergraph-clusters.md` § Cluster 91 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C91 — type chunks in `src/lib/server/db` (tag: database)
+- **BoW texture key**: `texture:bow:cluster:91` (Redis 1h TTL)
+- **Qdrant tags**: `database` `schema` `drizzle` `embedding` `auth`
+- **Paired tests**: 0/4 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -37,7 +46,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "lib db", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/db/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 91 })` — BoW texture tile for cluster C91
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 91 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

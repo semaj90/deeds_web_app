@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/features/evidence-command-center`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/features/evidence-command-center
 
@@ -14,11 +14,11 @@
 
 ## Files (5)
 
-- `CommandCenterShell.svelte`
-- `EvidenceBoardPane.svelte`
-- `EvidenceChatPane.svelte`
-- `EvidenceCommandPalette.svelte`
-- `EvidenceGraphPane.svelte`
+- `src/lib/features/evidence-command-center/CommandCenterShell.svelte`
+- `src/lib/features/evidence-command-center/EvidenceBoardPane.svelte`
+- `src/lib/features/evidence-command-center/EvidenceChatPane.svelte`
+- `src/lib/features/evidence-command-center/EvidenceCommandPalette.svelte`
+- `src/lib/features/evidence-command-center/EvidenceGraphPane.svelte`
 
 ## Hypergraph cluster
 
@@ -30,6 +30,15 @@ This directory is part of cluster **C5** — component chunks in \`src/lib/compo
 See `docs/graph/hypergraph-clusters.md` § Cluster 5 for full digest.
 
 
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C5 — component chunks in `src/lib/components/ai` (tag: ai)
+- **BoW texture key**: `texture:bow:cluster:5` (Redis 1h TTL)
+- **Qdrant tags**: `ai` `auth` `page` `component` `embedding`
+- **Paired tests**: 0/5 files have paired tests
+
 ## Agentic tool-calling — quick ACE hits
 
 In-process tools the Gemma4 agent can call to dig deeper into this directory:
@@ -38,7 +47,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "features evidence-command-center", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/features/evidence-command-center/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 5 })` — BoW texture tile for cluster C5
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 5 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 

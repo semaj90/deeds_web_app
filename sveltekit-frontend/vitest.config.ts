@@ -113,6 +113,7 @@ export default defineConfig({
       'tests/centroid-cache-gpu.spec.ts',
       'tests/ace-code-cache.spec.ts',
       'tests/tensor-analysis-enqueue.spec.ts',
+      'tests/ace-hit-tagger.spec.ts',
       // G16 auto-generated route test stubs (npm run audit:generate-route-stubs)
       'tests/routes/auto/**/*.test.ts',
     ],

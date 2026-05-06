@@ -1,27 +1,24 @@
 # AGENTS.md — `src/lib/services/knowledge-search`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/services/knowledge-search
 
 ## Snapshot
 
-- shared library directory with 11 files, 0 API handlers, 1 Drizzle refs, 1 SSR-unsafe
-- Audit score: **85/100**
-- 🔴 SSR-unsafe: 1 · 🟠 hardcoded localhost: 2
-- Tags: `src` `lib` `services` `db-schema` `ssr-unsafe` `zod`
+- shared library directory with 11 files, 0 API handlers, 1 Drizzle refs
+- Audit score: **95/100**
+- 🟠 hardcoded localhost: 2
+- Tags: `src` `lib` `services` `db-schema` `zod`
 
 ## Files (11)
 
-- `ACPToolRegistry.ts`
-- `index.ts`
-- `KnowledgeIndexer.ts`
-- `KnowledgeSearcher.ts`
-- `MinioKnowledgeStore.ts`
-- `PostgresKnowledgeStore.ts`
-- `QdrantKnowledgeStore.ts`
-- `RedisCacheService.ts`
+- `src/lib/services/knowledge-search/ACPToolRegistry.ts`
+- `src/lib/services/knowledge-search/index.ts`
+- `src/lib/services/knowledge-search/KnowledgeIndexer.ts`
+- `src/lib/services/knowledge-search/KnowledgeSearcher.ts`
+- `src/lib/services/knowledge-search/MinioKnowledgeStore.ts`
 
 ## Hypergraph cluster
 
@@ -34,8 +31,16 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 17 for full digest.
 
 ## Warnings
 
-- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
+
+## Retrieval / Rerank Hints
+
+> Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
+
+- **Cluster**: C17 — function chunks in `src/lib/services/error-analysis` (tag: embedding)
+- **BoW texture key**: `texture:bow:cluster:17` (Redis 1h TTL)
+- **Qdrant tags**: `embedding` `server-module` `cache` `vector` `redis`
+- **Paired tests**: 1/11 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
@@ -45,7 +50,8 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "services knowledge-search", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/services/knowledge-search/<file>" })` — fetch any file's contents (sandboxed to src/)
-
+- `cluster_bag_lookup({ clusterId: 17 })` — BoW texture tile for cluster C17
+- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 17 } })` — semantic search scoped to this cluster
 
 ## How to use this file
 
