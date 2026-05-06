@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-05T19:49:53.063Z
+> Generated: 2026-05-06T03:53:56.069Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,19 +8,19 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 3417 |
-| Directories analysed | 371 |
-| Route files | 891 |
-| Svelte components | 852 |
-| API handlers | 600 |
+| Files scanned | 3506 |
+| Directories analysed | 386 |
+| Route files | 920 |
+| Svelte components | 860 |
+| API handlers | 622 |
 | API routes without auth | 32 |
-| API routes without Zod | 0 |
-| SSR-unsafe files | 7 |
+| API routes without Zod | 4 |
+| SSR-unsafe files | 3 |
 | Svelte 4 legacy patterns | 0 |
 | Hardcoded localhost refs | 52 |
-| Routes without test pairing | 11 |
+| Routes without test pairing | 15 |
 | Cyclic import pairs | 0 |
-| Drizzle table refs | 409 |
+| Drizzle table refs | 417 |
 | TODO/FIXME markers | 16 |
 
 ---
@@ -29,22 +29,22 @@
 
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
-| G4  | Auth guard on API routes | 649 | 32 |
-| G5  | Zod validation on API routes | 480 | 0 |
-| G11 | No hardcoded localhost (excl env.server) | 3365 | 52 |
-| G14a | No `export let` (Svelte 4 props) | 3417 | 0 |
-| G14b | No `$:` reactive declarations | 3417 | 0 |
-| G14c | No `on:event=` directives | 3417 | 0 |
-| G14d | No `createEventDispatcher()` | 3417 | 0 |
-| G14e | No runes in plain `.ts` files | 3417 | 0 |
-| G15 | No SSR-unsafe globals (unguarded) | 3409 | 8 |
-| G16 | Server routes have test pairing | 609 | 11 |
-| G17 | Server routes have error handling | 606 | 75 |
+| G4  | Auth guard on API routes | 671 | 32 |
+| G5  | Zod validation on API routes | 482 | 4 |
+| G11 | No hardcoded localhost (excl env.server) | 3454 | 52 |
+| G14a | No `export let` (Svelte 4 props) | 3506 | 0 |
+| G14b | No `$:` reactive declarations | 3506 | 0 |
+| G14c | No `on:event=` directives | 3506 | 0 |
+| G14d | No `createEventDispatcher()` | 3506 | 0 |
+| G14e | No runes in plain `.ts` files | 3506 | 0 |
+| G15 | No SSR-unsafe globals (unguarded) | 3503 | 3 |
+| G16 | Server routes have test pairing | 627 | 15 |
+| G17 | Server routes have error handling | 614 | 89 |
 | G20 | Cyclic import pairs | — | 0 |
 
 ---
 
-## Directory Scorecard (371 dirs · lowest score = most attention needed)
+## Directory Scorecard (386 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -60,33 +60,33 @@
 | ⚠️ | `src/routes/api/db` | 60 | 1 | 29 | 1 | 0/0 | 0 | — |
 | ⚠️ | `src/routes/api/docs` | 60 | 1 | 56 | 1 | 0/1 | 0 | — |
 | ⚠️ | `src/routes/api/infrastructure` | 60 | 1 | 335 | 1 | 0/0 | 0 | — |
-| ⚠️ | `src/routes/api/health` | 61 | 16 | 1873 | 16 | 2/3 | 0 | 🟠lh |
-| ⚠️ | `src/routes/.well-known/llms-full.txt` | 65 | 1 | 103 | 1 | 0/1 | 0 | ⬜notest |
-| ⚠️ | `src/routes/.well-known/llms.txt` | 65 | 1 | 262 | 1 | 0/1 | 0 | ⬜notest |
-| ✅ | `src/lib/components` | 70 | 56 | 170786 | 0 | 0/46 | 6 | 🔴ssr 🟠lh |
+| ⚠️ | `src/routes/api/health` | 61 | 16 | 1879 | 16 | 2/3 | 0 | 🟠lh |
+| ⚠️ | `src/routes/.well-known/llms-full.txt` | 65 | 1 | 103 | 1 | 0/1 | 0 | — |
+| ⚠️ | `src/routes/.well-known/llms.txt` | 65 | 1 | 262 | 1 | 0/1 | 0 | — |
 | ✅ | `src/routes/api/engagement` | 70 | 2 | 61 | 2 | 2/0 | 0 | — |
 | ✅ | `src/routes/api/metrics` | 70 | 1 | 84 | 1 | 1/0 | 0 | — |
 | ✅ | `src/routes/api/queue` | 70 | 1 | 27 | 1 | 1/0 | 0 | — |
 | ✅ | `src/lib/components/ui` | 75 | 245 | 24174 | 0 | 0/1 | 3 | — |
+| ✅ | `src/routes/api/code-intel` | 75 | 16 | 174 | 16 | 16/0 | 0 | ⬜notest |
 | ✅ | `src/routes/api/ingest-constitution` | 75 | 1 | 47 | 1 | 1/0 | 0 | — |
 | ✅ | `src/routes/api/observability` | 75 | 1 | 35 | 1 | 1/0 | 0 | — |
 | ✅ | `src/routes/api/security` | 75 | 1 | 45 | 1 | 1/0 | 0 | — |
 | ✅ | `src/routes/api/system` | 75 | 6 | 719 | 6 | 3/1 | 0 | — |
+| ✅ | `src/routes/api/trace` | 75 | 1 | 28 | 1 | 1/0 | 0 | — |
 | ✅ | `src/routes/minio/[...path]` | 75 | 1 | 57 | 1 | 1/0 | 0 | — |
-| ✅ | `src/lib/ai` | 78 | 13 | 4968 | 0 | 0/1 | 1 | 🟠lh |
+| ✅ | `src/lib/ai` | 78 | 14 | 5099 | 0 | 0/1 | 1 | 🟠lh |
 | ✅ | `src/lib/components/yorha` | 78 | 72 | 20740 | 0 | 0/5 | 1 | 🟠lh |
-| ✅ | `src/routes/(app)/demos` | 78 | 102 | 19317 | 0 | 102/4 | 1 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `src/routes/api/auth` | 78 | 10 | 758 | 10 | 4/5 | 0 | — |
-| ✅ | `src/lib/components/rag` | 80 | 4 | 1259 | 0 | 0/0 | 0 | 🔴ssr |
+| ✅ | `src/lib/components` | 80 | 56 | 170786 | 0 | 0/46 | 6 | 🟠lh |
 | ✅ | `src/routes/(app)/citations` | 80 | 10 | 2390 | 0 | 10/0 | 0 | 🔴ssr ⬜notest |
+| ✅ | `src/routes` | 82 | 6 | 210336 | 616 | 983/509 | 7 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `src/lib/ai/onnx` | 83 | 2 | 340 | 0 | 0/0 | 1 | — |
 | ✅ | `src/lib/workers` | 83 | 5 | 1252 | 0 | 0/0 | 2 | — |
-| ✅ | `src/routes` | 83 | 6 | 207968 | 594 | 961/507 | 7 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `src/routes/(app)/chat` | 83 | 4 | 865 | 0 | 4/1 | 1 | ⬜notest |
-| ✅ | `src/routes/api/codebase-graph` | 83 | 2 | 317 | 2 | 2/1 | 0 | ⬜notest |
+| ✅ | `src/routes/api/codebase-graph` | 83 | 2 | 317 | 2 | 2/1 | 0 | — |
 | ✅ | `src/routes/api/phase89` | 83 | 24 | 2425 | 24 | 24/13 | 0 | — |
 | ✅ | `src/routes/api/topology` | 83 | 2 | 215 | 2 | 2/1 | 0 | — |
-| ✅ | `src/routes/api/cache` | 84 | 14 | 1428 | 14 | 14/8 | 0 | — |
+| ✅ | `src/routes/api/cache` | 84 | 14 | 1426 | 14 | 14/8 | 0 | — |
 | ✅ | `src/lib/components/ai` | 85 | 46 | 19715 | 0 | 0/11 | 0 | 🟠lh |
 | ✅ | `src/lib/config` | 85 | 8 | 1504 | 0 | 1/1 | 0 | 🟠lh |
 | ✅ | `src/lib/gpu` | 85 | 17 | 4763 | 0 | 0/2 | 0 | 🟠lh |
@@ -106,17 +106,21 @@
 | ✅ | `src/routes/api/dashboard` | 85 | 1 | 111 | 1 | 1/0 | 0 | — |
 | ✅ | `src/routes/api/dev` | 85 | 1 | 63 | 1 | 1/0 | 0 | — |
 | ✅ | `src/routes/api/websearch` | 85 | 1 | 63 | 1 | 1/1 | 0 | 🟠lh |
+| ✅ | `src/routes/api/wiki` | 85 | 3 | 309 | 3 | 3/2 | 0 | ⬜notest |
 | ✅ | `tests/fixtures` | 85 | 2 | 89 | 0 | 1/0 | 0 | 🟠lh |
 | ✅ | `tests/helpers` | 85 | 3 | 353 | 0 | 1/1 | 0 | 🟠lh |
 | ✅ | `tests/scripts` | 85 | 3 | 104 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `src/routes/api/knowledge` | 86 | 8 | 1697 | 8 | 8/6 | 0 | — |
 | ✅ | `src/routes/api/test` | 86 | 8 | 782 | 8 | 8/6 | 0 | — |
+| ✅ | `src/routes/api/research` | 87 | 5 | 808 | 5 | 5/4 | 0 | ⬜notest |
+| ✅ | `src/routes/(app)/demos` | 88 | 102 | 19317 | 0 | 102/4 | 1 | 🟠lh ⬜notest |
 | ✅ | `src/routes/api/cartridge` | 88 | 6 | 669 | 6 | 6/5 | 0 | — |
 | ✅ | `src/lib/ai/e2b` | 90 | 2 | 524 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/cache` | 90 | 5 | 1046 | 0 | 0/1 | 0 | — |
-| ✅ | `src/lib/client` | 90 | 4 | 766 | 0 | 0/4 | 0 | — |
+| ✅ | `src/lib/client` | 90 | 4 | 823 | 0 | 0/4 | 0 | — |
 | ✅ | `src/lib/client/db` | 90 | 1 | 91 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/client/ui` | 90 | 1 | 126 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/client/ui` | 90 | 2 | 183 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/collaboration` | 90 | 1 | 267 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/components/admin` | 90 | 5 | 2560 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/components/agent` | 90 | 1 | 391 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/components/agentic` | 90 | 2 | 498 | 0 | 0/0 | 0 | — |
@@ -153,6 +157,7 @@
 | ✅ | `src/lib/components/onboarding` | 90 | 1 | 1050 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/components/phase78` | 90 | 5 | 1086 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/components/poi` | 90 | 10 | 2460 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/components/rag` | 90 | 4 | 1259 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/components/recommendations` | 90 | 2 | 661 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/components/reports` | 90 | 1 | 244 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/components/research` | 90 | 1 | 585 | 0 | 0/0 | 0 | — |
@@ -168,7 +173,9 @@
 | ✅ | `src/lib/features/poi` | 90 | 1 | 124 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/graph` | 90 | 1 | 54 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/icons/yorha` | 90 | 15 | 572 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/messaging` | 90 | 1 | 168 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/models` | 90 | 1 | 1389 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/phase72` | 90 | 1 | 148 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/schemas` | 90 | 5 | 1049 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/schemas/tools` | 90 | 8 | 486 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/acp` | 90 | 2 | 807 | 0 | 0/1 | 0 | — |
@@ -176,17 +183,17 @@
 | ✅ | `src/lib/server/api` | 90 | 1 | 195 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/ast` | 90 | 1 | 313 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/auth` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/cache` | 90 | 10 | 3799 | 0 | 0/6 | 0 | — |
+| ✅ | `src/lib/server/cache` | 90 | 10 | 3814 | 0 | 0/6 | 0 | — |
 | ✅ | `src/lib/server/cartridge` | 90 | 5 | 1614 | 0 | 0/2 | 0 | — |
-| ✅ | `src/lib/server/config` | 90 | 4 | 695 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/config` | 90 | 4 | 701 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/connections` | 90 | 1 | 346 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/data` | 90 | 2 | 459 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/ff1` | 90 | 9 | 1812 | 0 | 0/5 | 0 | — |
+| ✅ | `src/lib/server/ff1` | 90 | 9 | 1817 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/glyph` | 90 | 2 | 170 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/image` | 90 | 1 | 88 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/inference` | 90 | 4 | 2054 | 0 | 0/4 | 0 | — |
+| ✅ | `src/lib/server/inference` | 90 | 4 | 2067 | 0 | 0/4 | 0 | — |
 | ✅ | `src/lib/server/init` | 90 | 1 | 105 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/integrations` | 90 | 1 | 241 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/integrations` | 90 | 1 | 279 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/kb` | 90 | 2 | 143 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/langextract` | 90 | 3 | 565 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/legal` | 90 | 7 | 2618 | 0 | 0/0 | 0 | — |
@@ -195,6 +202,7 @@
 | ✅ | `src/lib/server/nlp` | 90 | 1 | 140 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/notifications` | 90 | 1 | 210 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/observability` | 90 | 3 | 970 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/obsidian` | 90 | 2 | 384 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/ocr` | 90 | 3 | 392 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/optimize` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/orchestrators` | 90 | 1 | 39 | 0 | 0/0 | 0 | — |
@@ -203,8 +211,9 @@
 | ✅ | `src/lib/server/phase72` | 90 | 3 | 185 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/phase78` | 90 | 1 | 402 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/pipeline` | 90 | 1 | 211 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/rag` | 90 | 7 | 527 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/rag` | 90 | 7 | 535 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/rate-limit` | 90 | 2 | 318 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/redis` | 90 | 1 | 26 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/search` | 90 | 1 | 241 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/security` | 90 | 1 | 131 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/services` | 90 | 2 | 724 | 0 | 0/0 | 0 | — |
@@ -218,6 +227,7 @@
 | ✅ | `src/lib/shared` | 90 | 3 | 284 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/shared/schemas` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/shared/types` | 90 | 1 | 14 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/shims` | 90 | 11 | 1235 | 0 | 0/1 | 0 | 🔴ssr |
 | ✅ | `src/lib/stores` | 90 | 14 | 4489 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/stores/dashboard` | 90 | 3 | 654 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/stores/unified` | 90 | 6 | 1212 | 0 | 0/0 | 0 | — |
@@ -283,7 +293,6 @@
 | ✅ | `src/routes/api/pipeline` | 90 | 2 | 124 | 2 | 2/2 | 0 | — |
 | ✅ | `src/routes/api/playwright` | 90 | 1 | 44 | 1 | 1/1 | 0 | — |
 | ✅ | `src/routes/api/rabbitmq` | 90 | 1 | 134 | 1 | 1/1 | 0 | — |
-| ✅ | `src/routes/api/research` | 90 | 4 | 729 | 4 | 4/4 | 0 | — |
 | ✅ | `src/routes/api/route-operations` | 90 | 1 | 49 | 1 | 1/1 | 0 | — |
 | ✅ | `src/routes/api/summarize` | 90 | 3 | 217 | 3 | 3/3 | 0 | — |
 | ✅ | `src/routes/api/tags` | 90 | 3 | 151 | 3 | 3/1 | 0 | — |
@@ -294,42 +303,48 @@
 | ✅ | `src/routes/api/vision` | 90 | 1 | 233 | 1 | 1/1 | 0 | — |
 | ✅ | `src/routes/api/web` | 90 | 2 | 181 | 2 | 2/2 | 0 | — |
 | ✅ | `src/routes/api/whisper` | 90 | 1 | 417 | 1 | 1/1 | 0 | — |
-| ✅ | `src/routes/api/wiki` | 90 | 1 | 101 | 1 | 1/1 | 0 | ⬜notest |
 | ✅ | `src/routes/api/worker` | 90 | 1 | 186 | 1 | 1/1 | 0 | — |
 | ✅ | `src/routes/api/workflow-events` | 90 | 1 | 133 | 1 | 1/1 | 0 | — |
+| ✅ | `src/routes/code-intel` | 90 | 1 | 1694 | 0 | 0/0 | 0 | — |
+| ✅ | `src/routes/code-intel/clusters` | 90 | 1 | 200 | 0 | 0/0 | 0 | — |
+| ✅ | `src/routes/code-intel/memory` | 90 | 1 | 215 | 0 | 0/0 | 0 | — |
+| ✅ | `src/routes/code-intel/research` | 90 | 1 | 228 | 0 | 0/0 | 0 | — |
+| ✅ | `src/routes/code-intel/retrieval` | 90 | 1 | 279 | 0 | 0/0 | 0 | — |
+| ✅ | `src/routes/code-intel/subagents` | 90 | 1 | 156 | 0 | 0/0 | 0 | — |
+| ✅ | `src/routes/code-intel/topology` | 90 | 1 | 310 | 0 | 0/0 | 0 | — |
 | ✅ | `src/routes/register` | 90 | 1 | 542 | 0 | 0/0 | 0 | — |
 | ✅ | `src/stores` | 90 | 1 | 47 | 0 | 0/0 | 0 | — |
 | ✅ | `src/tests` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `src/wasm` | 90 | 2 | 524 | 0 | 0/0 | 0 | — |
-| ✅ | `src/workers` | 90 | 2 | 54 | 0 | 0/0 | 0 | — |
+| ✅ | `src/workers` | 90 | 3 | 241 | 0 | 0/0 | 0 | — |
 | ✅ | `tests/accessibility` | 90 | 2 | 557 | 0 | 0/0 | 0 | — |
-| ✅ | `tests/e2e` | 90 | 20 | 6073 | 0 | 3/1 | 0 | — |
+| ✅ | `tests/e2e` | 90 | 21 | 6134 | 0 | 3/1 | 0 | — |
 | ✅ | `tests/e2e/utils` | 90 | 3 | 505 | 0 | 0/0 | 0 | — |
 | ✅ | `tests/reports` | 90 | 2 | 64 | 0 | 0/0 | 0 | — |
-| ✅ | `tests/routes/auto` | 90 | 1 | 37290 | 0 | 578/0 | 0 | — |
-| ✅ | `tests/routes/auto/.well-known` | 90 | 2 | 106 | 0 | 2/0 | 0 | — |
+| ✅ | `tests/routes/auto` | 90 | 1 | 38001 | 0 | 589/0 | 0 | — |
+| ✅ | `tests/routes/auto/.well-known` | 90 | 4 | 212 | 0 | 4/0 | 0 | — |
 | ✅ | `tests/routes/auto/admin` | 90 | 3 | 191 | 0 | 3/0 | 0 | — |
-| ✅ | `tests/routes/auto/api` | 90 | 571 | 36855 | 0 | 571/0 | 0 | — |
+| ✅ | `tests/routes/auto/api` | 90 | 580 | 37460 | 0 | 580/0 | 0 | — |
 | ✅ | `tests/routes/auto/minio` | 90 | 1 | 53 | 0 | 1/0 | 0 | — |
 | ✅ | `tests/runes` | 90 | 1 | 230 | 0 | 0/0 | 0 | — |
 | ✅ | `tests/setup` | 90 | 1 | 226 | 0 | 0/0 | 0 | — |
-| ✅ | `tests/unit` | 90 | 4 | 1052 | 0 | 0/3 | 0 | — |
+| ✅ | `tests/unit` | 90 | 5 | 1109 | 0 | 0/3 | 0 | — |
 | ✅ | `tests/utils` | 90 | 1 | 134 | 0 | 0/0 | 0 | — |
 | ✅ | `src/routes/api/audio` | 91 | 4 | 519 | 4 | 4/3 | 0 | 🟠lh |
 | ✅ | `src/routes/api/synthesis` | 91 | 7 | 1854 | 7 | 7/6 | 1 | — |
 | ✅ | `src/routes/api/codeintel` | 92 | 9 | 1042 | 9 | 9/4 | 0 | — |
 | ✅ | `src/routes/api/document` | 93 | 2 | 148 | 2 | 2/1 | 0 | — |
-| ✅ | `src/routes/api/graph` | 93 | 16 | 2394 | 16 | 16/14 | 0 | 🟠lh ⬜notest |
+| ✅ | `src/routes/api/graph` | 93 | 16 | 2398 | 16 | 16/14 | 0 | 🟠lh |
 | ✅ | `src/routes/api/internal` | 93 | 2 | 114 | 2 | 2/1 | 0 | — |
 | ✅ | `src/routes/api/stream` | 93 | 2 | 102 | 2 | 2/1 | 0 | — |
 | ✅ | `src/routes/api/ai` | 94 | 30 | 3086 | 30 | 30/28 | 0 | 🟠lh |
 | ✅ | `src/routes/api/library` | 94 | 21 | 2860 | 21 | 21/12 | 0 | — |
 | ✅ | `src/lib/server/agent` | 95 | 11 | 4178 | 0 | 0/8 | 0 | 🟠lh |
-| ✅ | `src/lib/server/db` | 95 | 107 | 17670 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `src/lib/server/db` | 95 | 111 | 17963 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `src/lib/server/gpu` | 95 | 9 | 3515 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `src/lib/server/ml` | 95 | 8 | 2973 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `src/lib/server/vector` | 95 | 10 | 2831 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `src/lib/services` | 95 | 7 | 9625 | 0 | 0/3 | 0 | 🟠lh |
+| ✅ | `src/lib/server/vector` | 95 | 10 | 2837 | 0 | 0/1 | 0 | 🟠lh |
+| ✅ | `src/lib/services` | 95 | 8 | 9874 | 0 | 0/3 | 0 | 🟠lh |
 | ✅ | `src/lib/services/knowledge-search` | 95 | 11 | 3965 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `src/mcp` | 95 | 2 | 4884 | 0 | 1/2 | 0 | 🟠lh |
 | ✅ | `src/routes/api/errors` | 95 | 3 | 253 | 3 | 3/2 | 0 | — |
@@ -339,26 +354,27 @@
 | ✅ | `src/routes/api/yorha` | 96 | 4 | 510 | 4 | 4/3 | 0 | — |
 | ✅ | `src/routes/api/admin` | 97 | 10 | 1790 | 10 | 10/8 | 0 | — |
 | ✅ | `src/routes/api/analytics` | 97 | 26 | 4112 | 26 | 25/22 | 0 | — |
-| ✅ | `src/routes/api/evidence` | 97 | 27 | 5604 | 27 | 27/21 | 0 | — |
+| ✅ | `src/routes/api/codebase-index` | 97 | 47 | 13158 | 46 | 46/38 | 0 | ⬜notest |
+| ✅ | `src/routes/api/evidence` | 97 | 27 | 5622 | 27 | 27/21 | 0 | — |
 | ✅ | `src/routes/api/ace` | 98 | 8 | 1706 | 8 | 8/7 | 0 | — |
 | ✅ | `src/routes/api/cases` | 98 | 25 | 4737 | 25 | 25/21 | 0 | — |
 | ✅ | `src/routes/api/codebase` | 98 | 12 | 1912 | 12 | 12/10 | 0 | — |
-| ✅ | `src/routes/api/codebase-index` | 98 | 45 | 12999 | 44 | 44/37 | 0 | ⬜notest |
 | ✅ | `src/routes/api/rag` | 98 | 10 | 2267 | 9 | 9/8 | 0 | — |
 | ✅ | `src/routes/api/reports` | 98 | 9 | 2311 | 9 | 9/8 | 0 | — |
 | ✅ | `src/routes/api/routes` | 98 | 9 | 1005 | 9 | 9/8 | 0 | — |
-| ✅ | `src/routes/api/v1` | 99 | 19 | 1584 | 19 | 19/18 | 0 | ⬜notest |
-| ✅ | `src/lib` | 100 | 11 | 373276 | 3 | 12/229 | 9 | 🔴ssr 🟠lh |
+| ✅ | `src/routes/api/v1` | 99 | 19 | 1584 | 19 | 19/18 | 0 | — |
+| ✅ | `src/lib` | 100 | 11 | 379117 | 3 | 12/234 | 9 | 🔴ssr 🟠lh |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server` | 100 | 57 | 137417 | 3 | 9/142 | 0 | 🟠lh |
-| ✅ | `src/lib/server/ace` | 100 | 17 | 7460 | 0 | 0/8 | 0 | — |
+| ✅ | `src/lib/server` | 100 | 62 | 142238 | 3 | 9/145 | 0 | 🟠lh |
+| ✅ | `src/lib/server/ace` | 100 | 19 | 7773 | 0 | 0/8 | 0 | — |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 638 | 0 | 0/1 | 0 | — |
-| ✅ | `src/lib/server/ai` | 100 | 25 | 6727 | 0 | 2/9 | 0 | — |
+| ✅ | `src/lib/server/agents` | 100 | 4 | 256 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/ai` | 100 | 32 | 8153 | 0 | 2/11 | 0 | — |
 | ✅ | `src/lib/server/analysis` | 100 | 12 | 2988 | 0 | 0/4 | 0 | — |
-| ✅ | `src/lib/server/analytics` | 100 | 15 | 6692 | 0 | 0/10 | 0 | — |
+| ✅ | `src/lib/server/analytics` | 100 | 15 | 6715 | 0 | 0/10 | 0 | — |
 | ✅ | `src/lib/server/audit` | 100 | 4 | 1415 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/cases` | 100 | 1 | 189 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/codeintel` | 100 | 1 | 498 | 0 | 0/1 | 0 | — |
@@ -366,23 +382,22 @@
 | ✅ | `src/lib/server/embedding` | 100 | 9 | 1122 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/engagement` | 100 | 1 | 367 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/error-brain` | 100 | 11 | 1156 | 0 | 1/2 | 0 | — |
-| ✅ | `src/lib/server/evidence` | 100 | 14 | 1216 | 0 | 0/2 | 0 | — |
-| ✅ | `src/lib/server/graph` | 100 | 19 | 8056 | 0 | 1/7 | 0 | — |
-| ✅ | `src/lib/server/indexer` | 100 | 12 | 5462 | 1 | 0/5 | 0 | — |
+| ✅ | `src/lib/server/evidence` | 100 | 15 | 1229 | 0 | 0/2 | 0 | — |
+| ✅ | `src/lib/server/graph` | 100 | 19 | 8168 | 0 | 1/7 | 0 | — |
+| ✅ | `src/lib/server/indexer` | 100 | 19 | 6181 | 1 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/llm` | 100 | 6 | 1643 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/queue` | 100 | 8 | 3812 | 0 | 0/3 | 0 | — |
 | ✅ | `src/lib/server/reports` | 100 | 1 | 112 | 0 | 0/1 | 0 | — |
-| ✅ | `src/lib/server/research` | 100 | 13 | 1380 | 0 | 0/2 | 0 | — |
-| ✅ | `src/lib/server/retrieval` | 100 | 26 | 6639 | 0 | 0/5 | 0 | — |
+| ✅ | `src/lib/server/research` | 100 | 16 | 1604 | 0 | 0/3 | 0 | — |
+| ✅ | `src/lib/server/retrieval` | 100 | 26 | 6768 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/types` | 100 | 10 | 1099 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/unified` | 100 | 1 | 284 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/workers` | 100 | 5 | 1769 | 0 | 0/4 | 0 | — |
-| ✅ | `src/lib/shims` | 100 | 11 | 1235 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/types` | 100 | 52 | 7126 | 0 | 0/3 | 0 | — |
 | ✅ | `src/routes/(app)` | 100 | 2 | 100842 | 4 | 390/40 | 6 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `src/routes/(app)/acp` | 100 | 1 | 613 | 0 | 1/1 | 0 | — |
 | ✅ | `src/routes/(app)/active-cases` | 100 | 2 | 1154 | 0 | 2/0 | 0 | ⬜notest |
-| ✅ | `src/routes/(app)/admin` | 100 | 130 | 25903 | 3 | 130/12 | 4 | 🔴ssr 🟠lh ⬜notest |
+| ✅ | `src/routes/(app)/admin` | 100 | 130 | 25903 | 3 | 130/12 | 4 | 🟠lh ⬜notest |
 | ✅ | `src/routes/(app)/analysis-center` | 100 | 4 | 1574 | 0 | 4/2 | 0 | ⬜notest |
 | ✅ | `src/routes/(app)/cases` | 100 | 39 | 10476 | 0 | 39/10 | 0 | ⬜notest |
 | ✅ | `src/routes/(app)/command-center` | 100 | 11 | 3456 | 0 | 11/0 | 0 | ⬜notest |
@@ -423,11 +438,11 @@
 | ✅ | `src/routes/api/tasks` | 100 | 2 | 204 | 2 | 2/2 | 0 | — |
 | ✅ | `src/routes/login` | 100 | 3 | 462 | 0 | 1/2 | 0 | — |
 | ✅ | `src/types` | 100 | 23 | 890 | 0 | 0/1 | 0 | — |
-| ✅ | `tests/routes` | 100 | 30 | 47021 | 2 | 583/9 | 0 | — |
+| ✅ | `tests/routes` | 100 | 30 | 47732 | 2 | 594/9 | 0 | — |
 
 ---
 
-## API Routes (594 total · top 60)
+## API Routes (616 total · top 60)
 
 | Route [params] | Methods | Auth | Zod | Error handling |
 |----------------|---------|------|-----|----------------|
@@ -470,6 +485,7 @@
 | `api/push/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
 | `api/simulation/[sessionId]/+server.ts [sessionId]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
 | `api/statutes/[id]/+server.ts [id]` | GET, PUT, DELETE | ✅ | ✅ | ✅ |
+| `api/wiki/watch/+server.ts` | GET, POST, DELETE | ✅ | ❌ | ❌ |
 | `(app)/admin/api-testing/agentic-loop/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `(app)/evidence/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `api/admin/model/validate-checkpoint/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
@@ -490,9 +506,8 @@
 | `api/audit/planner/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `api/auth/demo-login/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `api/auth/logout/+server.ts` | POST, GET | ❌ | ❌ | ✅ |
-| `api/cache/recent-queries/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 
-_…and 534 more. See `codebase-graph.json` for full list._
+_…and 556 more. See `codebase-graph.json` for full list._
 
 ---
 
@@ -530,8 +545,11 @@ _…and 534 more. See `codebase-graph.json` for full list._
 
 ---
 
-## G5 — API Routes Missing Zod Validation (0)
-_All API handlers use Zod. ✅_
+## G5 — API Routes Missing Zod Validation (4)
+- `src/routes/api/code-intel/claude-plan/+server.ts` · POST
+- `src/routes/api/codebase-index/karpathy-hook/+server.ts` · POST
+- `src/routes/api/research/encode/+server.ts` · POST
+- `src/routes/api/trace/subagents/run/+server.ts` · POST
 
 ---
 
@@ -540,29 +558,29 @@ _No Svelte 4 patterns found. ✅_
 
 ---
 
-## G15 — SSR-Unsafe Globals (7 files · unguarded window/document/localStorage)
-- `src/lib/components/rag/DocumentCard.svelte`
-- `src/routes/(app)/admin/dev-tools/+page.svelte`
-- `src/routes/(app)/citations/law/+page.svelte`
-- `src/routes/(app)/citations/law/[citation]/+page.svelte`
+## G15 — SSR-Unsafe Globals (3 files · unguarded window/document/localStorage)
+- `src/lib/shims/os-browser-shim.js`
 - `src/routes/(app)/citations/[...label]/+page.svelte`
-- `src/routes/(app)/demos/ace-pipeline/+page.svelte`
 - `src/routes/+error.svelte`
 
 ---
 
-## G16 — Routes Without Test Pairing (11)
-- `src/routes/.well-known/llms-full.txt/+server.ts` · GET
-- `src/routes/.well-known/llms.txt/+server.ts` · GET
-- `src/routes/api/codebase-graph/agents-freshness/+server.ts` · GET
-- `src/routes/api/codebase-index/agents-write/+server.ts` · POST/GET
-- `src/routes/api/codebase-index/llm-output/+server.ts` · GET/POST/DELETE
-- `src/routes/api/graph/bow-texture/+server.ts` · POST
-- `src/routes/api/graph/cluster-summaries/+server.ts` · GET
-- `src/routes/api/graph/glyph-atlas/+server.ts` · GET/POST
-- `src/routes/api/graph/traverse/+server.ts` · GET
-- `src/routes/api/v1/chat/completions/+server.ts` · POST
-- `src/routes/api/wiki/sync-to-obsidian/+server.ts` · POST
+## G16 — Routes Without Test Pairing (15)
+- `src/routes/api/code-intel/claude-plan/+server.ts` · POST
+- `src/routes/api/code-intel/clusters/[clusterKey]/+server.ts` · GET
+- `src/routes/api/code-intel/clusters/[clusterKey]/lenses/+server.ts` · GET
+- `src/routes/api/code-intel/latest-index/+server.ts` · GET
+- `src/routes/api/code-intel/memory-gain/+server.ts` · GET
+- `src/routes/api/code-intel/memory-gain/rejected/+server.ts` · GET
+- `src/routes/api/code-intel/research-memory/+server.ts` · GET
+- `src/routes/api/code-intel/research-provenance/[id]/+server.ts` · GET
+- `src/routes/api/code-intel/retrieval-runs/+server.ts` · GET
+- `src/routes/api/code-intel/retrieval-runs/[id]/+server.ts` · GET
+- `src/routes/api/code-intel/topology/node/[stableKey]/+server.ts` · GET
+- `src/routes/api/codebase-index/centroids/+server.ts` · POST/GET
+- `src/routes/api/research/encode/+server.ts` · POST
+- `src/routes/api/wiki/moc/+server.ts` · POST
+- `src/routes/api/wiki/watch/+server.ts` · GET/POST/DELETE
 
 ---
 
@@ -608,6 +626,8 @@ _No Svelte 4 patterns found. ✅_
 | `api/cases/[id]/notes/[noteId]/+server.ts` | 7 | `[id] [noteId]` | GET, PATCH, DELETE |
 | `api/citations/collections/[collectionId]/citations/+server.ts` | 7 | `[collectionId]` | POST, DELETE, GET |
 | `api/citations/collections/[collectionId]/export/+server.ts` | 7 | `[collectionId]` | GET, POST |
+| `api/code-intel/clusters/[clusterKey]/lenses/+server.ts` | 7 | `[clusterKey]` | GET |
+| `api/code-intel/topology/node/[stableKey]/+server.ts` | 7 | `[stableKey]` | GET |
 | `api/codebase/clusters/[id]/summary/+server.ts` | 7 | `[id]` | GET |
 | `api/evidence/summary/[id]/approve/+server.ts` | 7 | `[id]` | POST |
 | `api/library/document/[id]/toc/+server.ts` | 7 | `[id]` | GET |
@@ -622,34 +642,32 @@ _No Svelte 4 patterns found. ✅_
 | `(app)/admin/codebase-index/[fileId]/+page.server.ts` | 6 | `[fileId]` |  |
 | `(app)/cases/[id]/ai/+page.server.ts` | 6 | `[id]` |  |
 | `(app)/cases/[id]/board/+page.server.ts` | 6 | `[id]` |  |
-| `(app)/cases/[id]/ai/+page.server.ts` | 6 | `[id]` |  |
-| `(app)/cases/[id]/ai/+page.server.ts` | 6 | `[id]` |  |
 
 ---
 
 ## G19 — Top Module Fan-In (most imported `$lib` paths)
 | Module | Import Count |
 |--------|-------------|
-| `$lib/server/db/client` | 510 |
-| `$lib/server/env.server.js` | 318 |
+| `$lib/server/db/client` | 517 |
+| `$lib/server/env.server.js` | 324 |
 | `$lib/components/ui/Icon.svelte` | 252 |
-| `$lib/server/redis.js` | 201 |
-| `$lib/server/ollama.js` | 163 |
+| `$lib/server/redis.js` | 205 |
+| `$lib/server/ollama.js` | 167 |
 | `$lib/server/db/schema-postgres.js` | 143 |
 | `$lib/server/middleware/cache-headers.js` | 113 |
 | `$lib/server/validation.js` | 93 |
 | `$lib/components/ui/Button.svelte` | 88 |
-| `$lib/server/grpc/embedding-client.js` | 80 |
-| `$lib/server/vector/qdrant-manager.js` | 66 |
+| `$lib/server/grpc/embedding-client.js` | 82 |
+| `$lib/server/vector/qdrant-manager.js` | 70 |
 | `$lib/server/db/schema` | 57 |
 | `$lib/server/observability/langfuse.js` | 45 |
+| `$lib/server/gpu/simdjson-bridge.js` | 40 |
 | `$lib/server/analytics/search-analytics.js` | 36 |
 | `$lib/server/db/schema-postgres` | 34 |
 | `$lib/server/ace/chat-memory.js` | 33 |
 | `$lib/types/enhanced-svelte5-types` | 27 |
 | `$lib/server/gpu/libtorch-bridge.js` | 27 |
-| `$lib/server/neo4j-driver.js` | 24 |
-| `$lib/services/couchdb-client.js` | 24 |
+| `$lib/server/db/schema.js` | 27 |
 
 ---
 
@@ -658,9 +676,10 @@ _No cyclic imports detected. ✅_
 
 ---
 
-## Svelte Components (60 shown of 852)
+## Svelte Components (60 shown of 860)
 | File | Sub-components | Key `$lib` Imports |
 |------|---------------|---------------------|
+| `src/lib/client/ui/POIPhotoModal.svelte` | POIPhotoModalImpl | $lib/components/POIPhotoModal.svelte |
 | `src/lib/client/ui/POIPhotoUploader.svelte` | Button |  |
 | `src/lib/components/ActionPopup.svelte` |  |  |
 | `src/lib/components/admin/BundlePreview.svelte` | BundleResponse |  |
@@ -720,59 +739,58 @@ _No cyclic imports detected. ✅_
 | `src/lib/components/analysis/AnalysisPanel.svelte` | Icon | $lib/components/ui/Icon.svelte, $lib/stores/analysis-panel.svelte.js, $lib/stores/analysis-panel.svelte.js |
 | `src/lib/components/analysis/AnalysisToast.svelte` | Icon | $lib/components/ui/Icon.svelte |
 | `src/lib/components/analysis/KeyboardShortcutsHelp.svelte` | Icon | $lib/components/ui/Icon.svelte |
-| `src/lib/components/analytics/LiveResearchPanel.svelte` | AbortController, Icon | $lib/components/ui/Icon.svelte |
 
 ---
 
 ## Top External Module Imports
 | Module | Consumer Count |
 |--------|----------------|
-| `vitest` | 681 |
-| `@sveltejs/kit` | 661 |
-| `zod` | 481 |
-| `$lib/server/db/client` | 388 |
-| `drizzle-orm` | 312 |
-| `$lib/server/env.server.js` | 287 |
+| `vitest` | 698 |
+| `@sveltejs/kit` | 683 |
+| `zod` | 483 |
+| `$lib/server/db/client` | 394 |
+| `drizzle-orm` | 316 |
+| `$lib/server/env.server.js` | 293 |
 | `$lib/components/ui/Icon.svelte` | 252 |
-| `svelte` | 219 |
-| `$lib/server/ollama.js` | 140 |
-| `$lib/server/redis.js` | 130 |
+| `svelte` | 226 |
+| `$lib/server/ollama.js` | 143 |
+| `$lib/server/redis.js` | 134 |
 | `$lib/server/db/schema-postgres.js` | 125 |
 | `$lib/server/middleware/cache-headers.js` | 112 |
-| `@playwright/test` | 101 |
-| `path` | 98 |
+| `@playwright/test` | 102 |
+| `path` | 99 |
 | `$lib/server/validation.js` | 93 |
 | `$lib/components/ui/Button.svelte` | 88 |
-| `crypto` | 80 |
+| `crypto` | 81 |
 | `$app/environment` | 79 |
-| `drizzle-orm/pg-core` | 69 |
+| `drizzle-orm/pg-core` | 73 |
 | `$app/navigation` | 63 |
+| `fs` | 54 |
 | `svelte/transition` | 53 |
-| `fs` | 53 |
+| `$lib/server/grpc/embedding-client.js` | 46 |
 | `$lib/server/observability/langfuse.js` | 44 |
-| `$lib/server/grpc/embedding-client.js` | 44 |
 | `$lib/server/db/schema` | 44 |
 | `bits-ui` | 41 |
 | `$lib/server/analytics/search-analytics.js` | 36 |
+| `$lib/server/vector/qdrant-manager.js` | 36 |
 | `$lib/server/db/schema-postgres` | 34 |
-| `$lib/server/vector/qdrant-manager.js` | 33 |
-| `ioredis` | 31 |
+| `ioredis` | 32 |
 
 ---
 
 ## Directories with TODO/FIXME
 - `src/lib` — 9 marker(s), score 100
-- `src/routes` — 7 marker(s), score 83
-- `src/lib/components` — 6 marker(s), score 70
+- `src/routes` — 7 marker(s), score 82
+- `src/lib/components` — 6 marker(s), score 80
 - `src/routes/(app)` — 6 marker(s), score 100
 - `src/routes/(app)/admin` — 4 marker(s), score 100
 - `src/lib/components/ui` — 3 marker(s), score 75
 - `src/lib/workers` — 2 marker(s), score 83
 - `src/lib/ai` — 1 marker(s), score 78
 - `src/lib/components/yorha` — 1 marker(s), score 78
-- `src/routes/(app)/demos` — 1 marker(s), score 78
 - `src/lib/ai/onnx` — 1 marker(s), score 83
 - `src/routes/(app)/chat` — 1 marker(s), score 83
+- `src/routes/(app)/demos` — 1 marker(s), score 88
 - `src/routes/api/synthesis` — 1 marker(s), score 91
 
 ---

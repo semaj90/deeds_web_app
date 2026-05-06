@@ -158,28 +158,22 @@ extern "C" int softmaxGPU(
     } catch (...) { return -2; }
 }
 
-// ── kmeansWithCentroids ──────────────────────────────────────────────────────
-// K-means clustering returning BOTH assignments AND centroids.
-// Extends the existing clusterEmbeddings (which returns assignments only).
-//
-// embeddings[n*dim]          — input vectors
-// n, dim, k, max_iters       — dimensions + hyperparams
-// assignments_out[n]         — cluster index (0..k-1) per point
-// centroids_out[k*dim]       — final centroid vectors
-//
-// Uses torch::cdist (cuBLAS) for O(n*k*dim) pairwise distance computation.
+#include "gpu_error_codes.h"
 
 extern "C" int kmeansWithCentroids(
     const float* embeddings, int n, int dim,
     int k, int max_iters,
     int* assignments_out, int assignments_len,
-    float* centroids_out, int centroids_len
+    float* centroids_out, int centroids_len,
+    int* out_reseeded_count
 ) {
-    if (!embeddings || !assignments_out || !centroids_out) return -1;
-    if (n <= 0 || dim <= 0 || k <= 0) return -1;
-    if (assignments_len < n || centroids_len < k * dim) return -2;
+    if (!embeddings || !assignments_out || !centroids_out) return GPU_ERR_INVALID_ARGS;
+    if (n <= 0 || dim <= 0 || k <= 0) return GPU_ERR_INVALID_ARGS;
+    if (assignments_len < n || centroids_len < k * dim) return GPU_ERR_BUFFER_TOO_SMALL;
     if (k > n) k = n;
     if (max_iters <= 0) max_iters = 100;
+
+    int reseeded_total = 0;
 
     try {
         torch::NoGradGuard ng;
@@ -187,12 +181,12 @@ extern "C" int kmeansWithCentroids(
         auto opts = torch::TensorOptions().dtype(torch::kFloat32);
 
         auto data      = torch::from_blob(const_cast<float*>(embeddings), {n, dim}, opts).to(dev);
-        auto centroids = data.slice(0, 0, k).clone();  // deterministic init (first k)
+        auto centroids = data.slice(0, 0, k).clone();
         auto assign    = torch::zeros({n}, torch::TensorOptions().dtype(torch::kLong).device(dev));
 
         for (int iter = 0; iter < max_iters; ++iter) {
-            auto dists      = torch::cdist(data, centroids, 2.0);  // [n, k]
-            auto new_assign = dists.argmin(1);                      // [n]
+            auto dists      = torch::cdist(data, centroids, 2.0);
+            auto new_assign = dists.argmin(1);
 
             if (iter > 0 && torch::equal(new_assign, assign)) {
                 assign = new_assign;
@@ -203,20 +197,34 @@ extern "C" int kmeansWithCentroids(
             for (int c = 0; c < k; ++c) {
                 auto mask  = (assign == c);
                 auto count = mask.sum().item<int64_t>();
-                if (count > 0) centroids[c] = data.index({mask}).mean(0);
+                if (count > 0) {
+                    centroids[c] = data.index({mask}).mean(0);
+                } else {
+                    // P0: Empty cluster guard — re-seed from farthest point
+                    auto current_centroids = centroids.index({assign});
+                    auto dists_to_assigned = torch::norm(data - current_centroids, 2, 1);
+                    auto farthest_idx = dists_to_assigned.argmax().item<int64_t>();
+                    centroids[c] = data[farthest_idx].clone();
+                    reseeded_total++;
+                }
             }
         }
 
-        // Copy assignments (int64 → int32)
+        if (out_reseeded_count) *out_reseeded_count = reseeded_total;
+
         auto cpu_a = assign.to(torch::kCPU).to(torch::kInt32).contiguous();
         std::memcpy(assignments_out, cpu_a.data_ptr<int32_t>(), n * sizeof(int32_t));
 
-        // Copy centroids
         auto cpu_c = centroids.to(torch::kCPU).contiguous();
         std::memcpy(centroids_out, cpu_c.data_ptr<float>(), k * dim * sizeof(float));
 
-        return 0;
-    } catch (...) { return -3; }
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) {
+        return GPU_ERR_UNKNOWN;
+    }
 }
 
 // ── trainSOM ─────────────────────────────────────────────────────────────────

@@ -56,62 +56,68 @@ static torch::Device getDevice() {
     return torch::kCPU;
 }
 
+#include "gpu_error_codes.h"
+
+static constexpr int MAX_N_SIMILARITY = 4096;
+static constexpr int MAX_N_SIMILARITY_HALF = 8192;
+static constexpr int MAX_N_CLUSTERING = 16384;
+
 /**
  * Cosine similarity matrix: torch::mm(normalized, normalized.T)
- * Input:  embeddings[n][dim] as flat float array
- * Output: similarity[n][n] as flat float array
  */
 extern "C" int graphSimilarity(
     const float* embeddings, int n, int dim,
     float* output, int output_len
 ) {
-    if (!embeddings || !output || n <= 0 || dim <= 0) return -1;
-    if (output_len < n * n) return -2;
+    if (!embeddings || !output || n <= 0 || dim <= 0) return GPU_ERR_INVALID_ARGS;
+    if (output_len < n * n) return GPU_ERR_BUFFER_TOO_SMALL;
+    if (n > MAX_N_SIMILARITY) return GPU_ERR_INPUT_TOO_LARGE;
 
     try {
-        torch::NoGradGuard no_grad;  // skip autograd tracking (inference only)
+        torch::NoGradGuard no_grad;
         auto device = getDevice();
 
-        // Create tensor from input data
         auto opts = torch::TensorOptions().dtype(torch::kFloat32);
         auto mat = torch::from_blob(
             const_cast<float*>(embeddings), {n, dim}, opts
         ).to(device);
 
-        // L2 normalize each row
-        auto norms = mat.norm(2, /*dim=*/1, /*keepdim=*/true).clamp_min(1e-12);
+        auto norms = mat.norm(2, 1, true).clamp_min(1e-12);
         auto normalized = mat / norms;
 
-        // Cosine similarity matrix via matrix multiply
         auto sim = torch::mm(normalized, normalized.t());
 
-        // Copy result back to CPU
         auto sim_cpu = sim.to(torch::kCPU).contiguous();
         std::memcpy(output, sim_cpu.data_ptr<float>(), n * n * sizeof(float));
 
-        return 0; // success
-    } catch (const std::exception& e) {
-        return -3;
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) {
+        return GPU_ERR_UNKNOWN;
     }
 }
 
 /**
- * K-means clustering on GPU via iterative assignment + centroid update.
- * Input:  embeddings[n][dim], k clusters, max_iters
- * Output: assignments[n] (cluster index per embedding)
+ * K-means clustering on GPU with empty cluster guard.
  */
 extern "C" int clusterEmbeddings(
     const float* embeddings, int n, int dim,
     int k, int max_iters,
-    int* assignments, int assignments_len
+    int* assignments, int assignments_len,
+    int* out_reseeded_count
 ) {
-    if (!embeddings || !assignments || n <= 0 || dim <= 0 || k <= 0) return -1;
+    if (!embeddings || !assignments || n <= 0 || dim <= 0 || k <= 0) return GPU_ERR_INVALID_ARGS;
     if (k > n) k = n;
-    if (assignments_len < n) return -2;
+    if (assignments_len < n) return GPU_ERR_BUFFER_TOO_SMALL;
+    if (n > MAX_N_CLUSTERING) return GPU_ERR_INPUT_TOO_LARGE;
     if (max_iters <= 0) max_iters = 100;
 
+    int reseeded_total = 0;
+
     try {
-        torch::NoGradGuard no_grad;  // skip autograd tracking (inference only)
+        torch::NoGradGuard no_grad;
         auto device = getDevice();
         auto opts = torch::TensorOptions().dtype(torch::kFloat32);
 
@@ -119,43 +125,46 @@ extern "C" int clusterEmbeddings(
             const_cast<float*>(embeddings), {n, dim}, opts
         ).to(device);
 
-        // Initialize centroids: first k points (deterministic)
         auto centroids = data.slice(0, 0, k).clone();
-
         auto assign_tensor = torch::zeros({n}, torch::TensorOptions().dtype(torch::kLong).device(device));
 
         for (int iter = 0; iter < max_iters; iter++) {
-            // Compute pairwise L2 distances: data[n,dim] vs centroids[k,dim] → [n,k]
-            // torch::cdist uses optimized cuBLAS path internally (avoids [n,k,dim] broadcast)
-            auto dists = torch::cdist(data, centroids, 2.0); // [n, k]
+            auto dists = torch::cdist(data, centroids, 2.0);
+            auto new_assign = dists.argmin(1);
 
-            // Assign each point to nearest centroid
-            auto new_assign = dists.argmin(1); // [n]
-
-            // Check convergence
             if (iter > 0 && torch::equal(new_assign, assign_tensor)) {
                 assign_tensor = new_assign;
                 break;
             }
             assign_tensor = new_assign;
 
-            // Update centroids
             for (int c = 0; c < k; c++) {
                 auto mask = (assign_tensor == c);
                 auto count = mask.sum().item<int64_t>();
                 if (count > 0) {
                     centroids[c] = data.index({mask}).mean(0);
+                } else {
+                    // P0: Empty cluster guard — re-seed from farthest point
+                    auto current_centroids = centroids.index({assign_tensor});
+                    auto dists_to_assigned = torch::norm(data - current_centroids, 2, 1);
+                    auto farthest_idx = dists_to_assigned.argmax().item<int64_t>();
+                    centroids[c] = data[farthest_idx].clone();
+                    reseeded_total++;
                 }
             }
         }
 
-        // Copy assignments to output
+        if (out_reseeded_count) *out_reseeded_count = reseeded_total;
+
         auto assign_cpu = assign_tensor.to(torch::kCPU).to(torch::kInt32).contiguous();
         std::memcpy(assignments, assign_cpu.data_ptr<int>(), n * sizeof(int));
 
-        return 0;
-    } catch (const std::exception& e) {
-        return -3;
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) {
+        return GPU_ERR_UNKNOWN;
     }
 }
 
@@ -169,11 +178,11 @@ extern "C" int computeCaseEmbedding(
     const float* embeddings, int dim,
     float* output, int output_len
 ) {
-    if (!weights || !embeddings || !output || n <= 0 || dim <= 0) return -1;
-    if (output_len < dim) return -2;
+    if (!weights || !embeddings || !output || n <= 0 || dim <= 0) return GPU_ERR_INVALID_ARGS;
+    if (output_len < dim) return GPU_ERR_BUFFER_TOO_SMALL;
 
     try {
-        torch::NoGradGuard no_grad;  // skip autograd tracking (inference only)
+        torch::NoGradGuard no_grad;
         auto device = getDevice();
         auto opts = torch::TensorOptions().dtype(torch::kFloat32);
 
@@ -185,23 +194,23 @@ extern "C" int computeCaseEmbedding(
             const_cast<float*>(embeddings), {n, dim}, opts
         ).to(device);
 
-        // Normalize weights
         auto w_sum = w.sum().clamp_min(1e-12);
         auto w_norm = w / w_sum;
 
-        // Weighted sum: w_norm[1,n] @ mat[n,dim] → [1,dim]
         auto result = torch::mm(w_norm.unsqueeze(0), mat).squeeze(0);
 
-        // L2 normalize the result
         auto norm = result.norm(2).clamp_min(1e-12);
         result = result / norm;
 
         auto result_cpu = result.to(torch::kCPU).contiguous();
         std::memcpy(output, result_cpu.data_ptr<float>(), dim * sizeof(float));
 
-        return 0;
-    } catch (const std::exception& e) {
-        return -3;
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) {
+        return GPU_ERR_UNKNOWN;
     }
 }
 
@@ -221,34 +230,27 @@ extern "C" int checkCudaAvailable() {
  * Returns 0 on success, -1 if CUDA unavailable, -2 on error.
  */
 extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes) {
-    if (!free_bytes || !total_bytes) return -1;
-    if (!torch::cuda::is_available()) return -1;
+    if (!free_bytes || !total_bytes) return GPU_ERR_INVALID_ARGS;
+    if (!torch::cuda::is_available()) return GPU_ERR_DEVICE_UNAVAILABLE;
 
     try {
-        // Use cudaMemGetInfo via PyTorch's CUDA allocator stats
         size_t free_mem = 0, total_mem = 0;
         cudaMemGetInfo(&free_mem, &total_mem);
         *free_bytes = static_cast<int64_t>(free_mem);
         *total_bytes = static_cast<int64_t>(total_mem);
-        return 0;
+        return GPU_SUCCESS;
     } catch (...) {
-        return -2;
+        return GPU_ERR_UNKNOWN;
     }
 }
 
-/**
- * Batch cosine similarity: query[1,dim] vs corpus[n,dim] → scores[n]
- * Useful for GPU-accelerated nearest-neighbor pre-filtering.
- * Input:  query[dim], corpus[n][dim] as flat float arrays
- * Output: scores[n] (cosine similarity of query vs each corpus row)
- */
 extern "C" int batchCosineSimilarity(
     const float* query, int dim,
     const float* corpus, int n,
     float* scores, int scores_len
 ) {
-    if (!query || !corpus || !scores || n <= 0 || dim <= 0) return -1;
-    if (scores_len < n) return -2;
+    if (!query || !corpus || !scores || n <= 0 || dim <= 0) return GPU_ERR_INVALID_ARGS;
+    if (scores_len < n) return GPU_ERR_BUFFER_TOO_SMALL;
 
     try {
         torch::NoGradGuard no_grad;
@@ -263,34 +265,33 @@ extern "C" int batchCosineSimilarity(
             const_cast<float*>(corpus), {n, dim}, opts
         ).to(device);
 
-        // L2 normalize
         auto q_norm = q / q.norm(2, 1, true).clamp_min(1e-12);
         auto c_norm = c / c.norm(2, 1, true).clamp_min(1e-12);
 
-        // Cosine similarity: q[1,dim] @ c[dim,n] → [1,n]
         auto sim = torch::mm(q_norm, c_norm.t()).squeeze(0);
 
         auto sim_cpu = sim.to(torch::kCPU).contiguous();
         std::memcpy(scores, sim_cpu.data_ptr<float>(), n * sizeof(float));
 
-        return 0;
-    } catch (const std::exception& e) {
-        return -3;
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) {
+        return GPU_ERR_UNKNOWN;
     }
 }
 
 /**
  * Half-precision cosine similarity matrix (FP16).
- * Uses 50% less VRAM than graphSimilarity for large embedding sets (>10K vectors).
- * Input:  embeddings[n][dim] as flat float array (FP32 input, internally cast to FP16)
- * Output: similarity[n][n] as flat float array (FP32 output)
  */
 extern "C" int graphSimilarityHalf(
     const float* embeddings, int n, int dim,
     float* output, int output_len
 ) {
-    if (!embeddings || !output || n <= 0 || dim <= 0) return -1;
-    if (output_len < n * n) return -2;
+    if (!embeddings || !output || n <= 0 || dim <= 0) return GPU_ERR_INVALID_ARGS;
+    if (output_len < n * n) return GPU_ERR_BUFFER_TOO_SMALL;
+    if (n > MAX_N_SIMILARITY_HALF) return GPU_ERR_INPUT_TOO_LARGE;
 
     try {
         torch::NoGradGuard no_grad;
@@ -301,22 +302,21 @@ extern "C" int graphSimilarityHalf(
             const_cast<float*>(embeddings), {n, dim}, opts
         ).to(device);
 
-        // Cast to half precision for VRAM savings
         auto mat_half = mat.to(torch::kFloat16);
 
-        // L2 normalize
         auto norms = mat_half.norm(2, 1, true).clamp_min(1e-6f);
         auto normalized = mat_half / norms;
 
-        // Cosine similarity via matmul in FP16
         auto sim = torch::mm(normalized, normalized.t());
 
-        // Cast back to FP32 for output
         auto sim_cpu = sim.to(torch::kFloat32).to(torch::kCPU).contiguous();
         std::memcpy(output, sim_cpu.data_ptr<float>(), n * n * sizeof(float));
 
-        return 0;
-    } catch (const std::exception& e) {
-        return -3;
+        return GPU_SUCCESS;
+    } catch (const std::runtime_error& e) {
+        if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
+        return GPU_ERR_TORCH_EXCEPTION;
+    } catch (...) {
+        return GPU_ERR_UNKNOWN;
     }
 }

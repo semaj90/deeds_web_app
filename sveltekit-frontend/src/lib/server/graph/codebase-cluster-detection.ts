@@ -90,22 +90,38 @@ async function scrollFiles(limit: number): Promise<FileEntry[]> {
     if (!res.ok)
       throw new Error(`Qdrant scroll ${res.status}: ${await res.text().catch(() => '')}`);
 
-    const data = (await res.json()) as {
-      result?: {
-        points?: Array<{
-          id: number | string;
-          payload?: {
-            relativePath?: string;
-            filePath?: string;
-            file_path?: string;
-            path?: string;
-            cluster?: string;
-          };
-          vector?: Record<string, number[]>;
-        }>;
-        next_page_offset?: string | number | null;
-      };
-    };
+93:     const raw = await res.text();
+94: 
+95:     // simdjson AVX2 fast-parse for Qdrant payloads. 250 points with 
+96:     // 768-dim vectors is ~1.5MB per scroll page — well above the 
+1KB native threshold.
+97:     let data: {
+98:       result?: {
+99:         points?: Array<{
+100:           id: number | string;
+101:           payload?: {
+102:             relativePath?: string;
+103:             filePath?: string;
+104:             file_path?: string;
+105:             path?: string;
+106:             cluster?: string;
+107:           };
+108:           vector?: Record<string, number[]>;
+109:         }>;
+110:         next_page_offset?: string | number | null;
+111:       };
+112:     };
+113: 
+114:     try {
+115:       const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+116:       if (isSimdJsonAvailable()) {
+117:         data = fastJsonParse(raw);
+118:       } else {
+119:         data = JSON.parse(raw);
+120:       }
+121:     } catch {
+122:       data = JSON.parse(raw);
+123:     }
 
     const points = data.result?.points ?? [];
     offset = data.result?.next_page_offset ?? null;
