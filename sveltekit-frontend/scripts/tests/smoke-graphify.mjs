@@ -85,7 +85,7 @@ function redisCmd(args) {
   });
 }
 
-console.log(c.bold('\n=== Graphify/Karpathy stack smoke (6 pillars) ===\n'));
+console.log(c.bold('\n=== Graphify/Karpathy stack smoke (6 pillars + D33) ===\n'));
 
 // ── Pillar 1: Fast AST graph ────────────────────────────────────────────────
 
@@ -236,6 +236,56 @@ if (!existsSync(centroidsPath)) {
         miss('  └─ Qdrant som_cluster coverage', `Qdrant unreachable: ${e.message}`);
       }
     }
+  }
+}
+
+// ── D33: Neo4j + APOC + GDS plugin health gate ──────────────────────────────
+// Probes the /api/code-intel/neo4j/health endpoint if the dev server is up.
+// Warns (miss) if Neo4j profile is not active; fails (bad) if any probe fails.
+
+const NO_NEO4J = process.argv.includes('--no-neo4j');
+if (NO_NEO4J) {
+  miss('D33 — Neo4j/APOC/GDS health', '--no-neo4j flag set, skipping');
+} else {
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 3000);
+    let resp;
+    try {
+      resp = await fetch('http://localhost:5173/api/code-intel/neo4j/health', {
+        signal: controller.signal,
+        headers: { cookie: '' },
+      });
+    } catch (fetchErr) {
+      // Dev server not running — treat as warn, not fail (gate is advisory outside CI)
+      miss('D33 — Neo4j/APOC/GDS health', `dev server unreachable: ${fetchErr.message}`);
+      resp = null;
+    } finally {
+      clearTimeout(tid);
+    }
+
+    if (resp !== null) {
+      if (resp.status === 401) {
+        // Auth required — server is up but we can't probe without a session
+        miss('D33 — Neo4j/APOC/GDS health', '401 — run with an authenticated session or pass --no-neo4j');
+      } else if (!resp.ok) {
+        bad('D33 — Neo4j/APOC/GDS health', `HTTP ${resp.status} from health endpoint`);
+      } else {
+        const h = await resp.json();
+        if (!h.neo4j) {
+          // Neo4j container not in active profile — warn only
+          miss('D33 — Neo4j connectivity', 'Neo4j not reachable — start with --profile full or docker compose up neo4j');
+        } else if (!h.apoc) {
+          bad('D33 — APOC not installed', 'NEO4J_PLUGINS must include "apoc" — see docker-compose.yml');
+        } else if (!h.gds) {
+          bad('D33 — GDS not installed', 'NEO4J_PLUGINS must include "graph-data-science" — see docker-compose.yml');
+        } else {
+          ok('D33 — Neo4j/APOC/GDS health', `neo4j=✓ apoc=✓ gds=${h.gdsVersion ?? '✓'} (${h.durationMs}ms)`);
+        }
+      }
+    }
+  } catch (e) {
+    miss('D33 — Neo4j/APOC/GDS health', `probe error: ${e.message}`);
   }
 }
 
