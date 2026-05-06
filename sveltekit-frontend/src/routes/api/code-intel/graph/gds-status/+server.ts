@@ -14,6 +14,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { getRedis } from '$lib/server/redis.js';
 import {
   getGdsStatus,
+  getGdsExtendedStats,
   ensureGdsProjection,
   runPageRankMutate,
   runLouvainMutate,
@@ -23,6 +24,9 @@ import {
   getUnclassifiedFileCount,
 } from '$lib/server/graph/neo4j-gds.js';
 
+const EXTENDED_STATS_CACHE_KEY = 'gds:extended-stats';
+const EXTENDED_STATS_TTL = 60; // 60s — safe to cache, Neo4j counts are not real-time
+
 const RATE_LIMIT_KEY = (userId: string) => `gds:rebuild:rl:${userId}`;
 const RATE_LIMIT_TTL = 300; // 5 min
 
@@ -30,12 +34,27 @@ const RATE_LIMIT_TTL = 300; // 5 min
 const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'ontology', 'd27', 'full'] as const;
 type GdsAction = typeof VALID_ACTIONS[number];
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, url }) => {
   if (!locals.user) return json({ apocAvailable: false, gdsAvailable: false, projectionExists: false, error: 'Unauthorized' }, { status: 401 });
 
+  const extended = url.searchParams.get('extended') === '1';
+
   try {
-    const status = await getGdsStatus();
-    return json(status);
+    if (!extended) {
+      const status = await getGdsStatus();
+      return json(status);
+    }
+
+    // Extended stats: try Redis cache first (60s TTL) then Neo4j + Qdrant probes
+    const redis = getRedis();
+    const cached = await redis.get(EXTENDED_STATS_CACHE_KEY).catch(() => null);
+    if (cached) {
+      return json({ ...JSON.parse(cached), cached: true });
+    }
+
+    const stats = await getGdsExtendedStats();
+    redis.setex(EXTENDED_STATS_CACHE_KEY, EXTENDED_STATS_TTL, JSON.stringify(stats)).catch(() => {});
+    return json({ ...stats, cached: false });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return json({ apocAvailable: false, gdsAvailable: false, projectionExists: false, error: msg });

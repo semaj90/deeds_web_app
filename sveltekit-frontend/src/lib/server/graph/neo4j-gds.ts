@@ -133,6 +133,88 @@ export async function getGdsStatus(): Promise<GdsStatus> {
   return { apocAvailable, gdsAvailable, projectionExists, apocVersion, gdsVersion };
 }
 
+// ── Extended GDS stats (for TRACE dashboard) ──────────────────────────────────
+
+export interface GdsExtendedStats extends GdsStatus {
+  pageRankNodeCount:       number;
+  louvainCommunityCount:   number;
+  knnRelationshipCount:    number;
+  unclassifiedFileCount:   number;
+  d27Passed:               boolean;
+  qdrantTopoByteCoverage:  number | null;  // fraction 0-1, null if Qdrant unreachable
+  qdrantManifold4Coverage: number | null;
+  qdrantAuthorityCoverage: number | null;
+}
+
+/**
+ * Extended status check for the TRACE graph dashboard.
+ * Runs Neo4j + Qdrant probes in parallel (all non-fatal).
+ * Results are suitable for Redis caching at the call site (TTL ~60s).
+ */
+export async function getGdsExtendedStats(
+  qdrantUrl = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333',
+): Promise<GdsExtendedStats> {
+  const base = await getGdsStatus().catch((): GdsStatus => ({
+    apocAvailable: false, gdsAvailable: false, projectionExists: false,
+  }));
+
+  // Neo4j counts — all queries are O(1) index scans on property indexes
+  const driver  = getNeo4jDriver();
+  const session = driver.session();
+  let pageRankNodeCount     = 0;
+  let louvainCommunityCount = 0;
+  let knnRelationshipCount  = 0;
+  let unclassifiedFileCount = 0;
+
+  try {
+    const [prRes, louRes, knnRes] = await Promise.allSettled([
+      session.run(`MATCH (f) WHERE f.graphPageRank IS NOT NULL RETURN count(f) AS n`),
+      session.run(`MATCH (f) WHERE f.louvainCommunity IS NOT NULL RETURN count(DISTINCT f.louvainCommunity) AS n`),
+      session.run(`MATCH ()-[r:SIMILAR_GRAPH_NEIGHBOR]->() RETURN count(r) AS n`),
+    ]);
+    if (prRes.status  === 'fulfilled') pageRankNodeCount     = Number(prRes.value.records[0]?.get('n') ?? 0);
+    if (louRes.status === 'fulfilled') louvainCommunityCount = Number(louRes.value.records[0]?.get('n') ?? 0);
+    if (knnRes.status === 'fulfilled') knnRelationshipCount  = Number(knnRes.value.records[0]?.get('n') ?? 0);
+    unclassifiedFileCount = await getUnclassifiedFileCount().catch(() => 0);
+  } finally {
+    await session.close().catch(() => {});
+  }
+
+  // Qdrant payload coverage probes — sample 200 points, check presence of key fields
+  let qdrantTopoByteCoverage:  number | null = null;
+  let qdrantManifold4Coverage: number | null = null;
+  let qdrantAuthorityCoverage: number | null = null;
+  try {
+    const r = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ limit: 200, with_payload: ['topo_byte', 'manifold4', 'graph_authority_score'], with_vector: false }),
+      signal: AbortSignal.timeout(4000),
+    });
+    if (r.ok) {
+      const d = await r.json() as { result?: { points?: Array<{ payload?: Record<string, unknown> }> } };
+      const pts = d.result?.points ?? [];
+      if (pts.length > 0) {
+        qdrantTopoByteCoverage  = pts.filter(p => p.payload?.topo_byte              != null).length / pts.length;
+        qdrantManifold4Coverage = pts.filter(p => p.payload?.manifold4              != null).length / pts.length;
+        qdrantAuthorityCoverage = pts.filter(p => p.payload?.graph_authority_score  != null).length / pts.length;
+      }
+    }
+  } catch { /* Qdrant unreachable — leave null */ }
+
+  return {
+    ...base,
+    pageRankNodeCount,
+    louvainCommunityCount,
+    knnRelationshipCount,
+    unclassifiedFileCount,
+    d27Passed: unclassifiedFileCount === 0,
+    qdrantTopoByteCoverage,
+    qdrantManifold4Coverage,
+    qdrantAuthorityCoverage,
+  };
+}
+
 // ── Graph projection ──────────────────────────────────────────────────────────
 
 /**

@@ -134,6 +134,9 @@ export async function writeTensorAnalysis(record: TensorAnalysisRecord): Promise
     const redis = getRedis();
     await redis.setex(redisKey(record.stableKey, record.contentHash), REDIS_TTL, JSON.stringify(record));
   } catch { /* non-fatal */ }
+
+  // Enqueue for GPU projection if manifold4 is missing/zero (fire-and-forget)
+  enqueueGpuProjectionIfNeeded([record]).catch(() => {});
 }
 
 // ── Batch write ───────────────────────────────────────────────────────────────
@@ -198,6 +201,51 @@ export async function writeTensorAnalysisBatch(records: TensorAnalysisRecord[]):
       pipeline.setex(redisKey(r.stableKey, r.contentHash), REDIS_TTL, JSON.stringify(r));
     }
     await pipeline.exec();
+  } catch { /* non-fatal */ }
+
+  // Enqueue any topo-only rows (manifold4=[0,0,0,0]) for GPU projection (fire-and-forget)
+  enqueueGpuProjectionIfNeeded(records).catch(() => {});
+}
+
+// ── GPU projection enqueue ────────────────────────────────────────────────────
+
+const GPU_PENDING_SET = 'topo:gpu:pending';
+
+/**
+ * Detect records with missing or zero manifold4 and enqueue them for GPU projection.
+ *
+ * Primary mechanism: Redis SADD to `topo:gpu:pending` (drained by `npm run tensor:topology`).
+ * Secondary mechanism: mark `tensor_json.needsProjection = true` in Postgres so cold starts
+ * can detect the backlog without Redis.
+ *
+ * Non-fatal: never throws, never delays the calling write path.
+ */
+export async function enqueueGpuProjectionIfNeeded(records: TensorAnalysisRecord[]): Promise<void> {
+  const pending = records.filter((r) =>
+    !r.manifold4 ||
+    r.manifold4.length !== 4 ||
+    r.manifold4.every((v) => v === 0)
+  );
+  if (!pending.length) return;
+
+  const stableKeys = pending.map((r) => r.stableKey);
+
+  // Redis SADD — quick, fire-and-forget
+  try {
+    const redis = getRedis();
+    await redis.sadd(GPU_PENDING_SET, ...stableKeys);
+  } catch {
+    console.warn(`[tensor-analysis-cache] Redis SADD ${GPU_PENDING_SET} failed; falling back to Postgres flag`);
+  }
+
+  // Postgres fallback — mark needsProjection in tensor_json
+  try {
+    for (const key of stableKeys) {
+      await db
+        .update(tensorAnalysisCache)
+        .set({ tensorJson: sql`tensor_json || '{"needsProjection":true}'::jsonb`, updatedAt: sql`now()` })
+        .where(eq(tensorAnalysisCache.stableKey, key));
+    }
   } catch { /* non-fatal */ }
 }
 

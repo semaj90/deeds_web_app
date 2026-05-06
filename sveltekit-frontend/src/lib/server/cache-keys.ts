@@ -48,6 +48,8 @@ export const TTL = {
   CLUSTER_SUMMARY: 6 * 60 * 60, // 6 hours
   /** Cluster/SOM centroid vectors: same TTL as cluster summaries */
   CENTROID: 6 * 60 * 60, // 6 hours
+  /** ACE codebase hit cache: boosted chunks from last Qdrant+topology pass */
+  ACE_CODE: 15 * 60, // 15 min — short enough to reflect new indexing
   /** User activity heartbeat: long-lived engagement tracking */
   USER_ACTIVITY: 30 * 24 * 60 * 60, // 30 days
 } as const;
@@ -190,6 +192,18 @@ export const invalidationPattern = {
 
   /** All graph data for a case */
   forCaseGraph: (caseId: string) => `graph:${caseId}:*`,
+};
+
+// ── ACE Codebase Context Cache Keys ──────────────────────────────────────────
+
+export const aceCodeKey = {
+  /**
+   * ace:code:{queryHash}:{topoClass}:{dirHash}
+   * Stores: boosted codebaseContext chunk array from the last Qdrant + topology pass.
+   * Keyed by query + topo class (routing dimension) + agentsMd directory scope.
+   */
+  forQuery: (query: string, topoClass: number, resolvedDir?: string): string =>
+    `ace:code:${hashStr(query)}:${topoClass}:${hashStr(resolvedDir ?? 'root')}`,
 };
 
 // ── LLM Cache Key Utilities ───────────────────────────────────────────────
