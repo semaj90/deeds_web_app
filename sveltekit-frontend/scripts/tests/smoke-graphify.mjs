@@ -290,36 +290,46 @@ if (NO_NEO4J) {
 }
 
 // ── D27: OntologyConcept CLASSIFIED_AS gate ───────────────────────────────────
-// Checks that every :File node has a CLASSIFIED_AS relationship to an OntologyConcept.
-// Warn (miss) if Neo4j is not reachable; fail (bad) if unclassified files > 0.
+// POSTs action="d27" to the gds-status endpoint (read-only, no rate-limit).
+// Returns unclassifiedFiles count — must be 0 to pass.
+// Warn (miss) when Neo4j is offline or dev server is unreachable.
 
-if (!NO_NEO4J) {
+if (NO_NEO4J) {
+  miss('D27 — File CLASSIFIED_AS coverage', '--no-neo4j flag set, skipping');
+} else {
   try {
     const controller27 = new AbortController();
-    const tid27 = setTimeout(() => controller27.abort(), 3000);
+    const tid27 = setTimeout(() => controller27.abort(), 5000);
     let d27resp;
     try {
-      d27resp = await fetch(
-        'http://localhost:5173/api/code-intel/graph/gds-status',
-        { signal: controller27.signal, headers: { cookie: '' } }
-      );
-    } catch {
+      d27resp = await fetch('http://localhost:5173/api/code-intel/graph/gds-status', {
+        method: 'POST',
+        signal: controller27.signal,
+        headers: { 'Content-Type': 'application/json', cookie: '' },
+        body: JSON.stringify({ action: 'd27' }),
+      });
+    } catch (fetchErr) {
+      miss('D27 — File CLASSIFIED_AS coverage', `dev server unreachable: ${fetchErr.message}`);
       d27resp = null;
     } finally {
       clearTimeout(tid27);
     }
 
-    if (d27resp === null || d27resp.status === 401) {
-      miss('D27 — File CLASSIFIED_AS coverage', d27resp === null ? 'dev server unreachable' : '401 — skip or authenticate');
-    } else {
-      const h27 = await d27resp.json();
-      // If Neo4j is not available, check is not meaningful
-      if (!h27.apocAvailable && !h27.gdsAvailable) {
-        miss('D27 — File CLASSIFIED_AS coverage', 'Neo4j offline — run with --profile full then POST action=ontology');
+    if (d27resp !== null) {
+      if (d27resp.status === 401) {
+        miss('D27 — File CLASSIFIED_AS coverage', '401 — pass --no-neo4j or authenticate');
+      } else if (!d27resp.ok) {
+        bad('D27 — File CLASSIFIED_AS coverage', `HTTP ${d27resp.status} from gds-status`);
       } else {
-        // Use a direct Cypher probe via Neo4j bolt if desired, but we use the
-        // gds-status endpoint to confirm connectivity then advise run
-        ok('D27 — OntologyConcept seed ready', 'POST /api/code-intel/graph/gds-status {action:"ontology"} to classify');
+        const h27 = await d27resp.json();
+        if (h27.unclassifiedFiles == null) {
+          miss('D27 — File CLASSIFIED_AS coverage', 'Neo4j offline or endpoint error — run docker compose up neo4j first');
+        } else if (h27.d27Passed) {
+          ok('D27 — File CLASSIFIED_AS coverage', 'all File nodes have CLASSIFIED_AS edge');
+        } else {
+          bad('D27 — File CLASSIFIED_AS coverage',
+            `${h27.unclassifiedFiles} File node(s) missing CLASSIFIED_AS — POST action=ontology to seed`);
+        }
       }
     }
   } catch (e) {
