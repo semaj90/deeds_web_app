@@ -243,6 +243,26 @@ export const GET: RequestHandler = async ({ url, locals }) => {
           } catch { /* skip */ }
         }
       } catch { /* non-fatal */ }
+
+      // Mirror the cluster summary into code-llm-index keyed on cluster:N path,
+      // so ACE preflight and bulk-lookup paths can hit it without scanning
+      // wiki:note:dir:* keys. Fire-and-forget — never blocks the response.
+      if (gemma4Summary && nodes[0]?.cluster !== undefined) {
+        const clId = Number(nodes[0].cluster);
+        // Use recordKagAnswer (D19): cluster summaries are KAG-style graph
+        // traversal answers — auto-extracts 1-3 sentence summary into the
+        // structured outputMeta JSONB envelope so ACE preflight can render
+        // a PRIOR ANSWER preamble for any file in this cluster.
+        void import('$lib/server/cache/code-llm-index.js')
+          .then(({ recordKagAnswer }) =>
+            recordKagAnswer(`cluster:${clId}`, gemma4Summary!, {
+              glyphClusterId: clId,
+              tokensUsed:     Math.ceil(gemma4Summary!.length / 4),
+              model:          'gemma4-legal-vlm:latest',
+            })
+          )
+          .catch(() => null);
+      }
     }
 
     return json({

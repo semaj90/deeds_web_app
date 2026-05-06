@@ -1,53 +1,7 @@
 {
-  "generatedAt": "2026-05-05T20:21:00.573Z",
+  "generatedAt": "2026-05-06T00:37:50.234Z",
   "graphFiles": 3417,
   "gates": {
-    "D16": {
-      "name": "await-using opportunity (try/finally + .quit/.disconnect)",
-      "count": 8,
-      "findings": [
-        {
-          "file": "scripts\\graphify-persist-couchdb.mjs",
-          "line": 345,
-          "snippet": "await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "scripts\\deep-audit-ast.mjs",
-          "line": 647,
-          "snippet": "// D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "scripts\\tests\\test-ace-graphify-retrieval.mjs",
-          "line": 192,
-          "snippet": "await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "scripts\\lib\\phase89-sse-stream.mjs",
-          "line": 199,
-          "snippet": "await redis.quit();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\lib\\server\\redis-streams.ts",
-          "line": 147,
-          "snippet": "reader.disconnect();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\routes\\api\\health\\redis\\+server.ts",
-          "line": 74,
-          "snippet": "await client.quit();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\routes\\api\\cache\\stats\\+server.ts",
-          "line": 78,
-          "snippet": "fresh.disconnect();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
-          "line": 244,
-          "snippet": "redis.disconnect();  → consider `await using` + getDisposableRedis()"
-        }
-      ]
-    },
     "D17": {
       "name": "MGET bulk-read opportunity (3+ sequential redis.get)",
       "count": 16,
@@ -85,7 +39,7 @@
         {
           "file": "src\\lib\\server\\graph\\community-graph.ts",
           "line": 1,
-          "snippet": "7 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
+          "snippet": "4 sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)"
         },
         {
           "file": "src\\lib\\server\\engagement\\idle-reengagement.ts",
@@ -134,85 +88,9 @@
         }
       ]
     },
-    "D18": {
-      "name": "simdjson opportunity (.mget + JSON.parse, no fast-parse)",
-      "count": 14,
-      "findings": [
-        {
-          "file": "src\\lib\\server\\retrieval\\centroid-cache.ts",
-          "line": 92,
-          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\research\\lane4-feedback.ts",
-          "line": 126,
-          "snippet": "const [scoreRaw, countRaw] = await redis.mget(  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\rag\\sdk.ts",
-          "line": 48,
-          "snippet": "const [statusRaw, shardCountRaw] = await redis.mget([  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\inference\\turbo-prefix-cache.ts",
-          "line": 108,
-          "snippet": "const blobs = await redis.mget(hashes.map(h => `web:research:sum:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\graph\\hypergraph-4d.ts",
-          "line": 1123,
-          "snippet": "const raw = await redis.mget(hashes.map(h => HG_EDGE_KEY(h))).catch(() => [] as (string|null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\graph\\glyph-atlas-builder.ts",
-          "line": 326,
-          "snippet": "kagVals = kagKeys.length ? await redis.mget(...kagKeys) : [];  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\graph\\codebase-cluster-detection.ts",
-          "line": 350,
-          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\cache\\redis-exact-match.ts",
-          "line": 160,
-          "snippet": "const values = await redis.mget(...cacheKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\analytics\\web-research-crawler.ts",
-          "line": 396,
-          "snippet": ".mget(hashes.map(h => WEB_SUM_KEY(h)))  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\analytics\\research-cache.ts",
-          "line": 200,
-          "snippet": "const raw = await redis.mget(hashes.map(h => SKETCH_KEY(h))).catch(() => [] as (string | null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\topology-hits\\+server.ts",
-          "line": 52,
-          "snippet": "const blobs = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\ingest-log\\+server.ts",
-          "line": 44,
-          "snippet": "const raws = await redis.mget(hashes.map((h) => `rag:hit:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\agents-write\\+server.ts",
-          "line": 209,
-          "snippet": "kagVals = await redis.mget(...kagKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
-          "line": 223,
-          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        }
-      ]
-    },
     "D19": {
       "name": "Missing outputMeta on recordLlmOutputHit (use Rag/Kag helper)",
-      "count": 3,
+      "count": 2,
       "findings": [
         {
           "file": "src\\lib\\server\\cache\\code-llm-index.ts",
@@ -220,185 +98,9 @@
           "snippet": "export async function recordLlmOutputHit(  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
         },
         {
-          "file": "src\\routes\\api\\graph\\traverse\\+server.ts",
-          "line": 254,
-          "snippet": "recordLlmOutputHit(`cluster:${clId}`, gemma4Summary!, {  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
-        },
-        {
           "file": "src\\routes\\api\\codebase-index\\llm-output\\+server.ts",
           "line": 98,
           "snippet": "const entry = await recordLlmOutputHit(parsed.data.path, parsed.data.llmOutput, parsed.data);  → use recordRagAnswer/recordKagAnswer for structured outputMeta"
-        }
-      ]
-    },
-    "D20": {
-      "name": "Direct ENV.*_URL fetch (use typed client)",
-      "count": 33,
-      "findings": [
-        {
-          "file": "src\\lib\\server\\ollama.ts",
-          "line": 1074,
-          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\video-vlm-processor.ts",
-          "line": 237,
-          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\video-vlm-processor.ts",
-          "line": 394,
-          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\document-embed-consumer.ts",
-          "line": 92,
-          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\document-embed-consumer.ts",
-          "line": 153,
-          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/chat_documents/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\audio-processor.ts",
-          "line": 287,
-          "snippet": "const response = await fetch(`${ENV.LANGEXTRACT_URL}/extract`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\audio-processor.ts",
-          "line": 325,
-          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\audio-processor.ts",
-          "line": 377,
-          "snippet": "const embedResponse = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\audio-processor.ts",
-          "line": 523,
-          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/audio_segments/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\workers\\audio-processor.ts",
-          "line": 544,
-          "snippet": "const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\retrieval\\orchestrator.ts",
-          "line": 127,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/search`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\retrieval\\codebase-context.ts",
-          "line": 101,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\retrieval\\codebase-context.ts",
-          "line": 284,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\retrieval\\codebase-context.ts",
-          "line": 743,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\research\\web-research-ingester.ts",
-          "line": 123,
-          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\som-summary.ts",
-          "line": 72,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\run-cluster-assign.ts",
-          "line": 34,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\run-cluster-assign.ts",
-          "line": 86,
-          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/${COLLECTION}/points/batch`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\gpu-karpathy-tagger.ts",
-          "line": 71,
-          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
-          "line": 139,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
-          "line": 185,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
-          "line": 237,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
-          "line": 335,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\dual-embedder.ts",
-          "line": 496,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\indexer\\cluster-summary.ts",
-          "line": 129,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\audit\\gpu-audit-orchestrator.ts",
-          "line": 174,
-          "snippet": "const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\ai\\langgraph-research.ts",
-          "line": 289,
-          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\ace\\error-kag-writer.ts",
-          "line": 277,
-          "snippet": "await fetch(`${ENV.QDRANT_URL}/collections/knowledge_base/points`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\ace\\context-assembler.ts",
-          "line": 1632,
-          "snippet": "const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\ace\\ace-error-kag.ts",
-          "line": 74,
-          "snippet": "const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\ace\\ace-error-kag.ts",
-          "line": 120,
-          "snippet": "const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\ace\\ace-agent.ts",
-          "line": 44,
-          "snippet": "const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
-        },
-        {
-          "file": "src\\lib\\server\\ace\\ace-agent.ts",
-          "line": 249,
-          "snippet": "const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {  → use the typed client (qdrant-client, ollama-client, etc.)"
         }
       ]
     }
