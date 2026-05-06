@@ -194,7 +194,7 @@ server.tool(
       const { createClient } = await import('redis');
       const redis = createClient({ url: REDIS_URL });
       await redis.connect();
-      const raw = await redis.get('couchdb:pagerank_scores');
+      const raw = await redis.get('couchdb:pagerank_scores') as string | null;
       await redis.quit();
       if (raw) {
         const scores: Record<string, number> = JSON.parse(raw);
@@ -372,7 +372,7 @@ server.tool(
       const keys = await redis.keys(`ace:trace:*`);
       let found: string | null = null;
       for (const k of keys.slice(0, 20)) {
-        const val = await redis.get(k);
+        const val = await redis.get(k) as string | null;
         if (val?.includes(query.slice(0, 30))) { found = val; break; }
       }
       await redis.quit();
