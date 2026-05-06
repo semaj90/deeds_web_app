@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/grpc`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/grpc
 
@@ -20,15 +20,6 @@
 - `src/lib/server/grpc/embedding-client.ts`
 - `src/lib/server/grpc/generation-client.ts`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C82** — function chunks in \`src/lib/server/grpc\` (tag: embedding)
-
-- **Top kinds**: function×14, class×1, const×1
-- **Top tags**: `embedding` `vector` `api-route` `auth` `analytics`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 82 for full digest.
-
 ## Warnings
 
 - ⚠️ Hardcoded localhost refs
@@ -37,9 +28,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 82 for full digest.
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C82 — function chunks in `src/lib/server/grpc` (tag: embedding)
-- **BoW texture key**: `texture:bow:cluster:82` (Redis 1h TTL)
-- **Qdrant tags**: `embedding` `vector` `api-route` `auth` `analytics`
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
 - **Paired tests**: 1/10 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
@@ -50,8 +39,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server grpc", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/grpc/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 82 })` — BoW texture tile for cluster C82
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 82 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/components/ui/gaming/n64`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: src/lib/components/ui/gaming/n64
 
@@ -23,23 +23,12 @@
 - `N643DContainer.svelte`
 - `N643DDialog.svelte`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C50** — component chunks in \`src/lib/components/ui/gaming/n64\` (tag: page)
-
-- **Top kinds**: component×14, unknown×2
-- **Top tags**: `page` `component`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 50 for full digest.
-
 
 ## Retrieval / Rerank Hints
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C50 — component chunks in `src/lib/components/ui/gaming/n64` (tag: page)
-- **BoW texture key**: `texture:bow:cluster:50` (Redis 1h TTL)
-- **Qdrant tags**: `page` `component`
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
 - **Paired tests**: 1/35 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
@@ -50,8 +39,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "gaming n64", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/components/ui/gaming/n64/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 50 })` — BoW texture tile for cluster C50
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 50 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

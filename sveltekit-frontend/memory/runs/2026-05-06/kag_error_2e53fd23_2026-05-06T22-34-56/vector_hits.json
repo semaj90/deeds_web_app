@@ -1,0 +1,9 @@
+{
+  "type": "vector_hits",
+  "task_id": "kag_error_2e53fd23_2026-05-06T22-34-56",
+  "degraded": false,
+  "reason": null,
+  "count": 0,
+  "hits": [],
+  "generated_at": "2026-05-06T22:34:56.620Z"
+}

@@ -47,6 +47,8 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+
+	"golang.org/x/sync/errgroup"
 	"time"
 	"unicode"
 
@@ -543,70 +545,87 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 		ms   int64
 	}
 
-	var wg sync.WaitGroup
 	results := make(chan result, 5)
 
+	g, gCtx := errgroup.WithContext(searchCtx)
+
 	// 1. Exact citation match
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	g.Go(func() error {
 		t := time.Now()
-		hits := s.searchCitation(searchCtx, req.Query, filters, params, req.Limit*2)
-		results <- result{hits, "citation", time.Since(t).Milliseconds()}
-	}()
+		hits := s.searchCitation(gCtx, req.Query, filters, params, req.Limit*2)
+		select {
+		case results <- result{hits, "citation", time.Since(t).Milliseconds()}:
+		case <-gCtx.Done():
+		}
+		return nil
+	})
 
 	// 2. GIN full-text search
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	g.Go(func() error {
 		t := time.Now()
-		hits := s.searchFTS(searchCtx, req.Query, filters, params, req.Limit*2)
-		results <- result{hits, "fts", time.Since(t).Milliseconds()}
-	}()
+		hits := s.searchFTS(gCtx, req.Query, filters, params, req.Limit*2)
+		select {
+		case results <- result{hits, "fts", time.Since(t).Milliseconds()}:
+		case <-gCtx.Done():
+		}
+		return nil
+	})
 
 	// 3. pgvector cosine similarity
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	g.Go(func() error {
 		if embedding == nil {
-			results <- result{nil, "pgvector", 0}
-			return
+			select {
+			case results <- result{nil, "pgvector", 0}:
+			case <-gCtx.Done():
+			}
+			return nil
 		}
 		t := time.Now()
-		hits := s.searchPgvector(searchCtx, embedding, filters, params, req.Limit*2)
-		results <- result{hits, "pgvector", time.Since(t).Milliseconds()}
-	}()
+		hits := s.searchPgvector(gCtx, embedding, filters, params, req.Limit*2)
+		select {
+		case results <- result{hits, "pgvector", time.Since(t).Milliseconds()}:
+		case <-gCtx.Done():
+		}
+		return nil
+	})
 
 	// 4. Qdrant ANN search (native gRPC with BM42 hybrid, REST fallback)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	g.Go(func() error {
 		if embedding == nil {
-			results <- result{nil, "qdrant", 0}
-			return
+			select {
+			case results <- result{nil, "qdrant", 0}:
+			case <-gCtx.Done():
+			}
+			return nil
 		}
 		t := time.Now()
-		hits := s.searchQdrant(searchCtx, embedding, req)
-		results <- result{hits, "qdrant", time.Since(t).Milliseconds()}
-	}()
+		hits := s.searchQdrant(gCtx, embedding, req)
+		select {
+		case results <- result{hits, "qdrant", time.Since(t).Milliseconds()}:
+		case <-gCtx.Done():
+		}
+		return nil
+	})
 
 	// 5. Knowledge base (Qdrant unnamed-vector collection from KB builder)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	g.Go(func() error {
 		if embedding == nil {
-			results <- result{nil, "knowledge", 0}
-			return
+			select {
+			case results <- result{nil, "knowledge", 0}:
+			case <-gCtx.Done():
+			}
+			return nil
 		}
 		t := time.Now()
-		hits := s.searchKnowledgeBase(searchCtx, embedding, req)
-		results <- result{hits, "knowledge", time.Since(t).Milliseconds()}
-	}()
+		hits := s.searchKnowledgeBase(gCtx, embedding, req)
+		select {
+		case results <- result{hits, "knowledge", time.Since(t).Milliseconds()}:
+		case <-gCtx.Done():
+		}
+		return nil
+	})
 
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
+	go func() { _ = g.Wait(); close(results) }()
 
 	allHits := map[string][]rankEntry{}
 	for r := range results {

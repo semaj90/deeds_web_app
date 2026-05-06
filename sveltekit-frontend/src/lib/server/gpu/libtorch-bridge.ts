@@ -135,7 +135,7 @@ export interface NativeAddon {
   kmeansWithCentroids?: (
     embeddings: Float32Array, n: number, dim: number,
     k: number, maxIters: number
-  ) => { assignments: Int32Array; centroids: Float32Array };
+  ) => { assignments: Int32Array; centroids: Float32Array; reseeded: number };
   attentionScoreGPU?: (
     query: Float32Array, dim: number,
     keys: Float32Array, n: number
@@ -1387,7 +1387,7 @@ export async function trainSOMAsync(
 }
 
 /**
- * Async graphSimilarity — for n > 100 (n*n comparisons become expensive).
+ * Async graphSimilarity — offloads to worker thread for n ≥ GPU_ASYNC_THRESHOLD_N.
  * Returns n×n cosine similarity matrix as a flat Float32Array.
  */
 export async function graphSimilarityAsync(
@@ -1397,6 +1397,62 @@ export async function graphSimilarityAsync(
 ): Promise<{ matrix: Float32Array; n: number; source: 'gpu' | 'cpu' }> {
   const result = await runGpuWorker<Float32Array>('graphSimilarity', [embeddings, n, dim]);
   return { matrix: result, n, source: isCudaAvailable() ? 'gpu' : 'cpu' };
+}
+
+// Threshold below which graphSimilarity runs synchronously (n×n = 65K floats = 256 KB VRAM).
+// At n=256 a single GPU call takes ~15ms — enough to drop an HTTP response deadline.
+export const GPU_ASYNC_THRESHOLD_N = 256;
+
+/**
+ * Threshold-dispatching graphSimilarity wrapper.
+ *
+ * - n < GPU_ASYNC_THRESHOLD_N  → sync GPU or CPU path (stays on main thread, <10ms)
+ * - n ≥ GPU_ASYNC_THRESHOLD_N  → async worker-thread path (event loop stays free)
+ *
+ * This is the preferred call-site for any code where n is variable.
+ * The return shape always matches SimilarityResult regardless of path.
+ */
+export async function graphSimilaritySafe(embeddings: number[][]): Promise<SimilarityResult> {
+  const n   = embeddings.length;
+  const dim = embeddings[0]?.length ?? 0;
+
+  if (n === 0 || dim === 0) return { matrix: [], n: 0, source: 'cpu' };
+
+  if (n > GRAPH_SIM_MAX_N) {
+    throw new RangeError(
+      `[libtorch-bridge] graphSimilarity: n=${n} exceeds hard cap ${GRAPH_SIM_MAX_N}. ` +
+      `Slice your input or use batchCosineSimilarity for pairwise scores instead.`
+    );
+  }
+
+  if (n >= GPU_ASYNC_THRESHOLD_N) {
+    // Flatten once and offload — avoids blocking the event loop for n*n GPU matmul
+    const flat = new Float32Array(n * dim);
+    for (let i = 0; i < n; i++) flat.set(embeddings[i], i * dim);
+    const res = await graphSimilarityAsync(flat, n, dim);
+    const matrix: number[][] = [];
+    for (let i = 0; i < n; i++) {
+      matrix.push(Array.from(res.matrix.subarray(i * n, (i + 1) * n)));
+    }
+    return { matrix, n, source: res.source };
+  }
+
+  // Small n: sync path (includes all OOM guards from graphSimilarity)
+  return graphSimilarity(embeddings);
+}
+
+/**
+ * Async batchCosineSimilarity — offloads to worker thread for large corpora.
+ * Prefer this over the sync variant when n > GPU_ASYNC_THRESHOLD_N.
+ */
+export async function batchCosineSimilarityAsync(
+  query:  Float32Array,
+  dim:    number,
+  corpus: Float32Array,
+  n:      number,
+): Promise<BatchSimilarityResult> {
+  const result = await runGpuWorker<Float32Array>('batchCosineSimilarity', [query, dim, corpus, n]);
+  return { scores: Array.from(result), n, source: isCudaAvailable() ? 'gpu' : 'cpu' };
 }
 
 /**

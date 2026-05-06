@@ -280,6 +280,14 @@ export interface ACEContext {
       candidateReduction: string | null;
       queryHash:          string;
     };
+    /** HMM 4D wiki note logged to wiki:note:hmm:* after assembly */
+    hmm?: {
+      stableKey:       string;
+      flowScore:       number;
+      dominantSection: string;
+      fromCache:       boolean;
+      analysisMs:      number;
+    };
   };
 }
 

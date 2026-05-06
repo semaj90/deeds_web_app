@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/ai`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/ai
 
@@ -20,15 +20,6 @@
 - `src/lib/ai/client-embed.ts`
 - `src/lib/ai/client-llm-synthesis.ts`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C14** — function chunks in \`src/lib/ai\` (tag: ai)
-
-- **Top kinds**: function×1
-- **Top tags**: `ai` `auth` `embedding`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 14 for full digest.
-
 ## Warnings
 
 - ⚠️ Hardcoded localhost refs
@@ -37,9 +28,7 @@ See `docs/graph/hypergraph-clusters.md` § Cluster 14 for full digest.
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C14 — function chunks in `src/lib/ai` (tag: ai)
-- **BoW texture key**: `texture:bow:cluster:14` (Redis 1h TTL)
-- **Qdrant tags**: `ai` `auth` `embedding`
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
 - **Paired tests**: 1/14 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
@@ -50,8 +39,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "lib ai", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/ai/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 14 })` — BoW texture tile for cluster C14
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 14 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

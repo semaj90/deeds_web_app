@@ -1,0 +1,28 @@
+{
+  "type": "agent_run",
+  "id": "kag-session-2026-05-06",
+  "hash": "5c832054",
+  "errorSummary": "Verified and fixed the KAG pipeline and trace MCP startup on Windows. Serialized the Gemma4 MCP smoke, narrowed heavy KAG probes, fixed ensure-mcp-server spawning, removed duplicate mcp:trace script warning, and confirmed kag:error dry-run, kag:error real run, and kag:ingest all succeed.",
+  "files": [
+    "scripts/kag-error.mjs",
+    "scripts/smoke-gemma4-mcp-tools.mjs",
+    "scripts/ensure-mcp-server.mjs",
+    "package.json"
+  ],
+  "tags": [
+    "kag",
+    "mcp",
+    "smoke",
+    "windows",
+    "ingest"
+  ],
+  "confidence": 0.95,
+  "patchResult": "passed",
+  "researchNotes": "kag:error now writes artifact runs and pending ingest JSONL; kag:ingest flushes pending queue once trace-mcp-server is restarted with the current source. Live tool registry now includes kag.record_agent_run and kag.ingest_memory_directory.",
+  "needsDeepResearch": false,
+  "generated_at": "2026-05-06T22:39:44.100Z",
+  "recommended_actions": [
+    "Verify fix with smoke tests",
+    "Ingest artifacts: kag.ingest_memory_directory"
+  ]
+}

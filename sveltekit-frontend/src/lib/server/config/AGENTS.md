@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/config`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/config
 
@@ -19,23 +19,12 @@
 - `src/lib/server/config/ollama.ts`
 - `src/lib/server/config/vector-config.ts`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C75** — function chunks in \`src/lib/config\` (tag: embedding)
-
-- **Top kinds**: function×12, const×3, type×1
-- **Top tags**: `embedding` `vector` `redis` `rabbitmq` `ai`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 75 for full digest.
-
 
 ## Retrieval / Rerank Hints
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C75 — function chunks in `src/lib/config` (tag: embedding)
-- **BoW texture key**: `texture:bow:cluster:75` (Redis 1h TTL)
-- **Qdrant tags**: `embedding` `vector` `redis` `rabbitmq` `ai`
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
 - **Paired tests**: 1/4 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
@@ -46,8 +35,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server config", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/config/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 75 })` — BoW texture tile for cluster C75
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 75 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

@@ -666,6 +666,88 @@
       }
     },
     {
+      "label": "🤖 Startup: TRACE MCP Server (:8788)",
+      "type": "shell",
+      "command": "node scripts/ensure-mcp-server.mjs --spawn && echo '🤖 TRACE MCP Server :8788 ready'",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": false,
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🩺 Startup: Service Health Check",
+      "type": "shell",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$services = @(@{Name='Redis'; Kind='redis'}, @{Name='Qdrant'; Url='http://127.0.0.1:6333/collections'}, @{Name='Ollama'; Url='http://127.0.0.1:11434/api/tags'}, @{Name='Postgres'; Kind='postgres'}, @{Name='Go Retrieval'; Url='http://127.0.0.1:8100/health'}, @{Name='Go Search'; Url='http://127.0.0.1:8096/health'}, @{Name='Bifrost'; Url='http://127.0.0.1:3040/health'}, @{Name='TurboQuant'; Url='http://127.0.0.1:8090/health'}, @{Name='MCP Server'; Url='http://127.0.0.1:8788/health'}); Write-Host '── Startup Health Check ──'; foreach ($s in $services) { try { if ($s.Kind -eq 'redis') { redis-cli PING | Out-Null; Write-Host '✅ Redis' } elseif ($s.Kind -eq 'postgres') { docker ps --format '{{.Names}}' | Select-String -Pattern 'postgres' | Out-Null; Write-Host '✅ Postgres container' } else { Invoke-WebRequest -Uri $s.Url -TimeoutSec 2 | Out-Null; Write-Host ('✅ ' + $s.Name) } } catch { Write-Host ('❌ ' + $s.Name) } }; Write-Host '── done ──'\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": false,
+      "dependsOn": "🤖 Startup: TRACE MCP Server (:8788)",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
+      "type": "shell",
+      "command": "$stamp = 'logs/task-output/.graphify-daily-last-run'; $cooldownSec = 3600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🗺️ graphify:daily skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { npm run graphify:daily 2>&1 | Tee-Object -FilePath logs/task-output/graphify-daily-startup.log; Set-Content $stamp (Get-Date -Format o); Write-Host '🗺️ graphify:daily complete' }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "GRAPHIFY_QUIET": "1"
+        }
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": true,
+      "dependsOn": "🩺 Startup: Service Health Check",
+      "problemMatcher": {
+        "owner": "graphify",
+        "pattern": {
+          "regexp": "^(ERROR|WARN):\\s+(.*)$",
+          "severity": 1,
+          "message": 2
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "graphify",
+          "endsPattern": "graphify:daily complete"
+        }
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
       "label": "CMake: Auto-Build on Startup",
       "type": "shell",
       "command": "if (Test-Path '${workspaceFolder}/simd-bridge/cpp/build/Release/tensorrt_bridge.node') { Write-Host 'tensorrt_bridge.node already built — skipping' } else { Write-Host 'Building tensorrt_bridge.node...'; cmake --preset windows-cuda; cmake --build build --config Release }",
@@ -8752,7 +8834,51 @@
       "command": "npm run graphify:daily",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "build",
-      "detail": "Fast AST → docs/graph/codebase-graph.json + codebase-map.md → Redis cache → smoke (fast-ast + KAG synthetic). ~10s, no LLM, no GPU.",
+      "detail": "Fast AST → docs/graph/codebase-graph.json + codebase-map.md → deep import graph (cycles/orphans/hotspots) → Redis cache → smoke. ~15s, no LLM, no GPU.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🔗 Graphify: Deep Import Graph (cycles + orphans + hotspots)",
+      "type": "shell",
+      "command": "npm run graphify:deep",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Phase A typed import graph (graphify-deep-imports.mjs): 14 edge types, zone classification, BFS neighborhoods. Outputs memory/graphify/deep/ + ACE ingest JSONL. ~3s.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🔗 Graphify: Deep Import Graph + Neo4j TRANSITIVELY_IMPORTS edges",
+      "type": "shell",
+      "command": "npm run graphify:deep:neo4j",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Same as deep import graph but also writes TRANSITIVELY_IMPORTS edges to Neo4j for top-50 hotspots. Requires Neo4j running. ~5s.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🔗 Graphify: Phase A Deep Imports (typed edges + zones + BFS neighborhoods)",
+      "type": "shell",
+      "command": "npm run graphify:deep-imports",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Phase A typed import graph: 14 edge types, zone classification, bounded BFS neighborhoods for hotspots/routes/tests. Outputs memory/graphify/deep/ + ACE ingest JSONL. ~3s.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🩺 Graphify: Phase A Deep Imports Smoke (8-gate)",
+      "type": "shell",
+      "command": "npm run graphify:deep:smoke",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "8-gate smoke: graph exists, node fields, edge count, >=50% resolved, infra edge types, unresolved map, ACE ingest JSONL, top hotspot fanIn>=100.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     },

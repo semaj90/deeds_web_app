@@ -144,6 +144,40 @@ func cacheKey(model, hash string) string {
 	return fmt.Sprintf("embed:%s:%s", model, hash)
 }
 
+// ── Request-scoped slice pool ──────────────────────────────────────────────
+//
+// Pools the three per-request slices that grow with chunk count.
+// Eliminates make() allocations and GC pressure at high QPS.
+
+type embedBatch struct {
+	texts    []string
+	indexMap []int
+	hashes   []string
+}
+
+var embedBatchPool = sync.Pool{
+	New: func() any { return &embedBatch{} },
+}
+
+func acquireEmbedBatch(n int) *embedBatch {
+	b := embedBatchPool.Get().(*embedBatch)
+	if n < 8 {
+		n = 8
+	}
+	if cap(b.texts) < n {
+		b.texts    = make([]string, 0, n)
+		b.indexMap = make([]int, 0, n)
+		b.hashes   = make([]string, 0, n)
+	} else {
+		b.texts    = b.texts[:0]
+		b.indexMap = b.indexMap[:0]
+		b.hashes   = b.hashes[:0]
+	}
+	return b
+}
+
+func releaseEmbedBatch(b *embedBatch) { embedBatchPool.Put(b) }
+
 // ── gRPC Service ──────────────────────────────────────────────────────────
 
 type embeddingServer struct {
@@ -177,14 +211,19 @@ func (s *embeddingServer) GenerateEmbeddings(ctx context.Context, req *pb.Embedd
 
 	embeddings := make([]*pb.Embedding, len(chunks))
 
-	// Check Redis cache first
-	textsToEmbed := make([]string, 0, len(chunks))
-	indexMap := make([]int, 0, len(chunks))      // maps textsToEmbed index → chunks index
-	hashes := make([]string, len(chunks))
+	// Check Redis cache first — use pooled slices to avoid per-request allocation
+	b := acquireEmbedBatch(len(chunks))
+	defer releaseEmbedBatch(b)
+
+	// grow hashes slice to match chunks length
+	for len(b.hashes) < len(chunks) {
+		b.hashes = append(b.hashes, "")
+	}
+	b.hashes = b.hashes[:len(chunks)]
 
 	for i, chunk := range chunks {
-		hashes[i] = textHash(chunk.GetText())
-		key := cacheKey(s.cfg.EmbedModel, hashes[i])
+		b.hashes[i] = textHash(chunk.GetText())
+		key := cacheKey(s.cfg.EmbedModel, b.hashes[i])
 
 		// Try cache
 		cached, err := s.rdb.Get(ctx, key).Bytes()
@@ -195,32 +234,32 @@ func (s *embeddingServer) GenerateEmbeddings(ctx context.Context, req *pb.Embedd
 				embeddings[i] = &pb.Embedding{
 					ChunkId:    chunk.GetChunkId(),
 					Vector:     vec,
-					TokenCount: int32(len(chunk.GetText()) / 4), // rough estimate
+					TokenCount: int32(len(chunk.GetText()) / 4),
 					Status:     "success",
 				}
 				continue
 			}
 		}
 		s.stats.cacheMisses.Add(1)
-		textsToEmbed = append(textsToEmbed, chunk.GetText())
-		indexMap = append(indexMap, i)
+		b.texts    = append(b.texts, chunk.GetText())
+		b.indexMap = append(b.indexMap, i)
 	}
 
 	// Batch embed uncached texts via Ollama
-	if len(textsToEmbed) > 0 {
-		for batchStart := 0; batchStart < len(textsToEmbed); batchStart += batchSize {
+	if len(b.texts) > 0 {
+		for batchStart := 0; batchStart < len(b.texts); batchStart += batchSize {
 			batchEnd := batchStart + batchSize
-			if batchEnd > len(textsToEmbed) {
-				batchEnd = len(textsToEmbed)
+			if batchEnd > len(b.texts) {
+				batchEnd = len(b.texts)
 			}
-			batch := textsToEmbed[batchStart:batchEnd]
+			batch := b.texts[batchStart:batchEnd]
 
 			vectors, err := ollamaEmbed(ctx, s.cfg.OllamaURL, s.cfg.EmbedModel, batch)
 			if err != nil {
 				slog.Error("ollama embed failed", "error", err, "batch_size", len(batch))
 				// Mark failed chunks
 				for j := batchStart; j < batchEnd; j++ {
-					idx := indexMap[j]
+					idx := b.indexMap[j]
 					embeddings[idx] = &pb.Embedding{
 						ChunkId: chunks[idx].GetChunkId(),
 						Status:  fmt.Sprintf("error: %v", err),
@@ -230,7 +269,7 @@ func (s *embeddingServer) GenerateEmbeddings(ctx context.Context, req *pb.Embedd
 			}
 
 			for j, vec := range vectors {
-				idx := indexMap[batchStart+j]
+				idx := b.indexMap[batchStart+j]
 				embeddings[idx] = &pb.Embedding{
 					ChunkId:          chunks[idx].GetChunkId(),
 					Vector:           vec,
@@ -241,7 +280,7 @@ func (s *embeddingServer) GenerateEmbeddings(ctx context.Context, req *pb.Embedd
 
 				// Cache in Redis
 				if data, err := json.Marshal(vec); err == nil {
-					s.rdb.Set(ctx, cacheKey(s.cfg.EmbedModel, hashes[idx]), data, s.cfg.CacheTTL)
+					s.rdb.Set(ctx, cacheKey(s.cfg.EmbedModel, b.hashes[idx]), data, s.cfg.CacheTTL)
 				}
 			}
 		}

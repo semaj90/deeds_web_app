@@ -861,6 +861,70 @@ export async function searchEvidenceViaHttp(
   }
 }
 
+export async function searchCodebaseViaHttp(params: {
+  query:      string;
+  topoClass?: string;
+  limit?:     number;
+}, timeoutMs = 8_000): Promise<SearchChunksResponse | null> {
+  if (!RETRIEVAL_HTTP_ENABLED) return null;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    const res = await fetch(`${RETRIEVAL_HTTP_URL}/search/codebase`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal:  controller.signal,
+      body: JSON.stringify({
+        query: params.query,
+        limit: params.limit ?? 10,
+        ...(params.topoClass ? { topo_class: params.topoClass } : {}),
+      }),
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      console.warn(`[retrieval-client] HTTP /search/codebase returned ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json() as { results?: unknown[]; total_ms?: number };
+    const raw = Array.isArray(data.results) ? data.results : [];
+    const results: RetrievedCodebaseChunk[] = raw.map((r: unknown) => {
+      const row = r as Record<string, unknown>;
+      return {
+        id:              String(row.id ?? ''),
+        chunkId:         String(row.chunk_id ?? row.chunkId ?? ''),
+        filePath:        String(row.file_path ?? row.filePath ?? ''),
+        kind:            String(row.kind ?? ''),
+        httpMethod:      String(row.http_method ?? ''),
+        routeId:         String(row.route_id ?? ''),
+        contentPreview:  String(row.content_preview ?? row.content ?? ''),
+        score:           Number(row.score ?? 0),
+        semanticScore:   row.semantic_score != null ? Number(row.semantic_score) : undefined,
+        lexicalScore:    row.lexical_score  != null ? Number(row.lexical_score)  : undefined,
+        rerankScore:     row.rerank_score   != null ? Number(row.rerank_score)   : undefined,
+        tags:            Array.isArray(row.tags) ? (row.tags as string[]) : [],
+        sourceMetadata:  (row.source_metadata as Record<string, string>) ?? {},
+        gpuCluster:      row.gpu_cluster  != null ? Number(row.gpu_cluster)  : undefined,
+        somCluster:      row.som_cluster  != null ? Number(row.som_cluster)  : undefined,
+        bmuRow:          row.bmu_row      != null ? Number(row.bmu_row)      : undefined,
+        bmuCol:          row.bmu_col      != null ? Number(row.bmu_col)      : undefined,
+        startLine:       Number(row.start_line ?? 0),
+        endLine:         Number(row.end_line ?? 0),
+      };
+    });
+
+    return { results, totalMs: Number(data.total_ms ?? 0) };
+  } catch (err) {
+    if ((err as Error).name !== 'AbortError') {
+      console.warn('[retrieval-client] HTTP /search/codebase failed:', (err as Error).message);
+    }
+    return null;
+  }
+}
+
 // ── Health check ────────────────────────────────────────────────────────
 
 /**

@@ -1,0 +1,26 @@
+{
+  "type": "agent_run",
+  "id": "kag-session-2026-05-06-windows-hardening",
+  "hash": "9fa171d7",
+  "errorSummary": "Hardened trace MCP startup on Windows so health checks also verify live KAG tool registration. ensure-mcp-server now inspects tools/list for kag.record_agent_run and kag.ingest_memory_directory, restarts stale listeners when needed, and kag:ingest now self-heals by spawning the MCP server before flushing pending JSONL. Verified the helper reports healthy and kag:ingest completes successfully.",
+  "files": [
+    "scripts/ensure-mcp-server.mjs",
+    "package.json"
+  ],
+  "tags": [
+    "kag",
+    "mcp",
+    "windows",
+    "launcher",
+    "health-check"
+  ],
+  "confidence": 0.93,
+  "patchResult": "passed",
+  "researchNotes": "The stale-process issue was a live trace-mcp-server answering /health while serving an old tool table. The fix verifies the live registry before declaring readiness, which prevents kag:ingest from failing against a stale process.",
+  "needsDeepResearch": false,
+  "generated_at": "2026-05-06T23:09:41.461Z",
+  "recommended_actions": [
+    "Verify fix with smoke tests",
+    "Ingest artifacts: kag.ingest_memory_directory"
+  ]
+}

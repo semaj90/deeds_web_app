@@ -16,6 +16,7 @@
  *                 → wrap in OpenAI choices/usage shape
  */
 
+import { createHash } from 'node:crypto';
 import type {
   OpenAIChatCompletionRequest,
   OpenAIChatCompletionResponse,
@@ -24,6 +25,8 @@ import type {
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
+import { compressToHCACard } from '$lib/server/ai/hca-compressor.js';
+import { buildDevContextPlan, isCodingPrompt } from '$lib/server/ai/dev-context-planner.js';
 
 interface RunOpts {
   /** Authenticated user id (from locals.user) — used for ACE personalization */
@@ -139,11 +142,24 @@ export async function runChatCompletion(
   }
 
   // ── Agent loop path: route through Gemma4 tool-calling agent ──
-  // Triggered when the client requests model=gemma4-agent OR passes tools.
-  // The agent handles its own ACE context assembly internally.
-  const isAgentModel = req.model.toLowerCase().includes('agent');
-  const hasTools     = Array.isArray(req.tools) && req.tools.length > 0;
-  if (isAgentModel || hasTools) {
+  // Triggered for: model=gemma4-agent, client-supplied tools[], or coding prompts.
+  // Coding prompts use LLAMA_TOOL_DEFINITIONS (native TurboQuant tool_calls) via
+  // the isCodingPipeline switch in gemma4-agent.ts, and expose toolsUsed in yorha.
+  const isAgentModel  = req.model.toLowerCase().includes('agent');
+  const hasTools      = Array.isArray(req.tools) && req.tools.length > 0;
+  const isCodingQuery = isCodingPrompt(query);
+  if (isAgentModel || hasTools || isCodingQuery) {
+    // Step 5B: pre-loop dev context planning for coding/debugging prompts
+    let devPlan: Awaited<ReturnType<typeof buildDevContextPlan>> | undefined;
+    if (isCodingPrompt(query)) {
+      try {
+        devPlan = await buildDevContextPlan(query, {
+          filePath:  req.file_path,
+          userId:    opts.userId,
+        });
+      } catch { /* non-fatal — proceed without dev context */ }
+    }
+
     const agentResult = await runGemma4Agent(query, {
       userId:    opts.userId,
       pipeline:  'openai-facade',
@@ -152,6 +168,7 @@ export async function runChatCompletion(
         caseId:          req.case_id,
         allowWriteTools: false,   // OpenAI compat clients get read-only by default
         allowGatedTools: false,
+        devContextSummary: devPlan?.contextSummary,
       },
     });
     return wrapResponse({
@@ -165,18 +182,52 @@ export async function runChatCompletion(
         codeLlmHit: agentResult.cacheTier !== undefined,
         cacheHit:   agentResult.cacheTier ? 'prior-answer' : 'none',
       },
+      toolLoop: {
+        toolsUsed:           agentResult.toolsUsed ?? [],
+        toolRounds:          agentResult.rounds ?? 0,
+        toolResultChars:     0,
+        mcpPort:             8788,
+        kvPacketTaskId:      devPlan?.kvPacketTaskId,
+        stablePrefixHash:    devPlan?.stablePrefixHash,
+        selectedStableKeys:  devPlan?.selectedStableKeys,
+        selectedFiles:       devPlan?.selectedFiles,
+        contextHitCount:     devPlan?.contextHitCount,
+      },
     });
   }
 
   // ── ACE path: full retrieval + prompt assembly ──
-  const aceCtx = await assembleACEContext({
+  // 20s guard: embeddinggemma won't load when VRAM is occupied by gemma4-legal-vlm.
+  // On timeout we fall through with an empty context — bifrostChat still fires.
+  const ACE_TIMEOUT_MS = 20_000;
+  const acePromise = assembleACEContext({
     query,
     userId:                opts.userId,
     caseId:                req.case_id,
     filePath:              req.file_path,
     enableCodebaseContext: true,
-    enableWebSearch:       false, // OpenWebUI clients tend to want fast first-token; web search via dedicated route
+    enableWebSearch:       false,
   });
+  acePromise.catch(() => {}); // prevent UnhandledPromiseRejection if race abandons it
+
+  type AceCtx = Awaited<ReturnType<typeof assembleACEContext>>;
+  let aceCtx: AceCtx;
+  try {
+    aceCtx = await Promise.race([
+      acePromise,
+      new Promise<never>((_, r) => setTimeout(() => r(new Error('ace-timeout')), ACE_TIMEOUT_MS)),
+    ]);
+  } catch {
+    aceCtx = {
+      userProfile: null, caseContext: null, glossaryMatches: null,
+      ragChunks: [], kbChunks: [], caseChunks: [], kagNeighbors: [],
+      chatHistory: history,
+      entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
+      practiceTemplate: null, queryTags: [], webSearchContext: null,
+      persona: 'assistant', evidenceMetadata: null, evidenceConnections: null,
+      userAnalyticsContext: null, codebaseContext: null, policyDecision: null,
+    } as AceCtx;
+  }
 
   // The ACE context already includes its own chatHistory injection (per-user
   // semantic recall). Append the request's conversation history on top so the
@@ -185,14 +236,49 @@ export async function runChatCompletion(
     aceCtx.chatHistory = [...(aceCtx.chatHistory ?? []), ...history];
   }
 
-  const prompt   = await buildACEPromptCached(aceCtx, query);
-  const sysFull  = systemPreamble
+  const prompt = await buildACEPromptCached(aceCtx, query);
+  const qHash  = createHash('sha1').update(query).digest('hex').slice(0, 16);
+
+  // ── KV context packet assembly (Step 5A) ────────────────────────────────
+  // Builds a 3-level compressed context packet from the ACE hot files.
+  // Allows llama-server to reuse the stable system prefix KV cache across calls.
+  // Non-fatal: if Redis is unavailable (tests, cold start) we fall back to ACE prompt.
+  let sysFull         = systemPreamble
     ? `${systemPreamble}\n\n${prompt.systemPrompt}`
     : prompt.systemPrompt;
+  let kvPacketTaskId: string | undefined;
+  let stablePrefixHash: string | undefined;
+  let kvContextBlock  = '';
+
+  try {
+    const kv = await import('$lib/server/ai/kv-context-controller.js');
+    const hotFiles = (aceCtx.ragChunks ?? [])
+      .map((c) => (c as unknown as Record<string, unknown>).filePath as string)
+      .filter(Boolean)
+      .slice(0, 8);
+
+    kvPacketTaskId   = `task:${qHash}`;
+    const packet     = await kv.buildKvContextPacket({
+      taskId:   kvPacketTaskId,
+      query,
+      hotFiles,
+    });
+    stablePrefixHash = packet.stablePrefixHash;
+
+    // Replace ACE system prompt with the stable prefix (KV cache reuse on llama-server)
+    const stablePrefix = kv.getStableSystemPrefix();
+    sysFull = systemPreamble
+      ? `${stablePrefix}\n\n${systemPreamble}\n\n${prompt.systemPrompt}`
+      : `${stablePrefix}\n\n${prompt.systemPrompt}`;
+
+    // Compressed TOC block injected before the user query
+    kvContextBlock = kv.formatKvPacketForPrompt(packet);
+  } catch { /* KV controller unavailable — use plain ACE prompt */ }
 
   const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [
     { role: 'system', content: sysFull },
     ...history,
+    ...(kvContextBlock ? [{ role: 'system' as const, content: kvContextBlock }] : []),
     { role: 'user',   content: query },
   ];
 
@@ -212,6 +298,25 @@ export async function runChatCompletion(
     text = typeof result === 'string' ? result : (result as { content: string }).content;
   }
 
+  // Fire-and-forget: store answer so run-2 gets a prior-answer cache hit
+  import('$lib/server/cache/code-llm-index.js').then(({ recordRagAnswer }) => {
+    recordRagAnswer(`query:${qHash}`, text, {
+      query,
+      glyphClusterId: aceCtx.ragChunks?.[0]?.somCluster,
+    }).catch(() => {});
+  }).catch(() => {});
+
+  // When a prior-answer cache hit is present, compress it to an HCA 128-token card
+  // so the next related query gets a compact prior-answer hint instead of full retrieval.
+  let priorAnswerKey: string | undefined;
+  if (aceCtx.codeLlmHit?.llmOutput) {
+    const hcaKey = `query:${qHash}`;
+    compressToHCACard(aceCtx.codeLlmHit.llmOutput, hcaKey, 'openai-facade', {
+      type: 'prior-answer', ttl: '6h', embeddingQueued: true, fromRedis: true,
+    });
+    priorAnswerKey = hcaKey;
+  }
+
   return wrapResponse({
     content:    text,
     model:      internalModel,
@@ -222,6 +327,15 @@ export async function runChatCompletion(
       agentsMd:   !!aceCtx.agentsMd?.markdown,
       codeLlmHit: !!aceCtx.codeLlmHit?.llmOutput,
       cacheHit:   aceCtx.codeLlmHit ? 'prior-answer' : (aceCtx.agentsMd ? 'agents-md' : 'none'),
+    },
+    toolLoop: {
+      toolsUsed:       [],
+      toolRounds:      0,
+      toolResultChars: 0,
+      priorAnswerKey,
+      mcpPort:         8788,
+      kvPacketTaskId,
+      stablePrefixHash,
     },
   });
 }
@@ -237,7 +351,20 @@ function wrapResponse(args: {
     chunks:     number;
     agentsMd:   boolean;
     codeLlmHit: boolean;
-    cacheHit:   OpenAIChatCompletionResponse['yorha']['cacheHit'];
+    cacheHit:   NonNullable<OpenAIChatCompletionResponse['yorha']>['cacheHit'];
+  };
+  toolLoop?: {
+    toolsUsed?:          string[];
+    toolRounds?:         number;
+    toolResultChars?:    number;
+    priorAnswerKey?:     string;
+    mcpPort?:            number;
+    kvPacketTaskId?:     string;
+    stablePrefixHash?:   string;
+    // Step 5B
+    selectedStableKeys?: string[];
+    selectedFiles?:      string[];
+    contextHitCount?:    number;
   };
 }): OpenAIChatCompletionResponse {
   // Token counts: rough estimate (chars/4). Real counts only available when
@@ -263,12 +390,22 @@ function wrapResponse(args: {
       total_tokens:      completionTokens,
     },
     yorha: {
-      aceUsed:       args.ace.used,
-      contextChunks: args.ace.chunks,
-      agentsMd:      args.ace.agentsMd,
-      codeLlmHit:    args.ace.codeLlmHit,
-      cacheHit:      args.ace.cacheHit,
-      durationMs:    args.durationMs,
+      aceUsed:         args.ace.used,
+      contextChunks:   args.ace.chunks,
+      agentsMd:        args.ace.agentsMd,
+      codeLlmHit:      args.ace.codeLlmHit,
+      cacheHit:        args.ace.cacheHit,
+      durationMs:      args.durationMs,
+      toolsUsed:        args.toolLoop?.toolsUsed,
+      toolRounds:       args.toolLoop?.toolRounds,
+      toolResultChars:  args.toolLoop?.toolResultChars,
+      priorAnswerKey:   args.toolLoop?.priorAnswerKey,
+      mcpPort:          args.toolLoop?.mcpPort ?? 8788,
+      kvPacketTaskId:      args.toolLoop?.kvPacketTaskId,
+      stablePrefixHash:    args.toolLoop?.stablePrefixHash,
+      selectedStableKeys:  args.toolLoop?.selectedStableKeys,
+      selectedFiles:       args.toolLoop?.selectedFiles,
+      contextHitCount:     args.toolLoop?.contextHitCount,
     },
   };
 }

@@ -12,13 +12,15 @@
  *   includeSimilarityMatrix?: boolean (default false),
  *   clusterCount?: number (default 8),
  *   halfPrecision?: boolean (default false),
- *   maxNodes?: number (default 500)
+ *   maxNodes?: number (default 500),
+ *   query?: string  — HMM section classification + sectionBias hint
  * }
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { analyzeGraph } from '$lib/server/graph/gpu-graph-analysis.js';
+import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
 
 const analyzeSchema = z.object({
 	caseId: z.string().uuid().optional(),
@@ -29,6 +31,8 @@ const analyzeSchema = z.object({
 	clusterCount: z.number().int().min(2).max(50).optional().default(8),
 	halfPrecision: z.boolean().optional().default(false),
 	maxNodes: z.number().int().min(10).max(5000).optional().default(500),
+	/** Optional query — HMM classifies intent and returns sectionBias in response */
+	query: z.string().max(2000).optional(),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -48,7 +52,24 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	try {
 		const result = await analyzeGraph(parsed.data);
-		return json(result);
+
+		// HMM section classification — appended when caller provides a query
+		const hmm = parsed.data.query
+			? classifyQuerySection(parsed.data.query)
+			: null;
+
+		return json({
+			...result,
+			...(hmm && {
+				ace: {
+					hmmAnalyzerUsed: true,
+					intent:     hmm.section,
+					confidence: hmm.confidence,
+					state:      'context_sufficient',
+					signals:    ['graph_neighbor'],
+				},
+			}),
+		});
 	} catch (err) {
 		console.error('[/api/graph/analyze] Failed:', (err as Error)?.message);
 		return json({ error: 'Graph analysis failed' }, { status: 500 });

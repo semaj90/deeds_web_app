@@ -1,24 +1,24 @@
 # AGENTS.md — `src/lib/workers`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/workers
 
 ## Snapshot
 
-- shared library directory with 5 files, 0 API handlers, 2 TODOs
+- shared library directory with 6 files, 0 API handlers, 2 TODOs
 - Audit score: **83/100**
 - TODOs: 2
 - Tags: `mjs` `src` `lib` `workers` `has-todo`
 
-## Files (5)
+## Files (6)
 
 - `src/lib/workers/ast-graph-worker.mjs`
 - `src/lib/workers/compute-worker.mjs`
 - `src/lib/workers/embedding-worker-enhanced.js`
 - `src/lib/workers/gpu-tensor-worker.ts`
-- `src/lib/workers/graph-layout.worker.ts`
+- `src/lib/workers/gpu-worker.mjs`
 
 
 ## Retrieval / Rerank Hints
@@ -26,7 +26,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/5 files have paired tests
+- **Paired tests**: 0/6 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

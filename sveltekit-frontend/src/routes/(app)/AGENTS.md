@@ -1,13 +1,13 @@
 # AGENTS.md — `src/routes/(app)`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/routes/(app)
 
 ## Snapshot
 
-- route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs, 1 SSR-unsafe
+- route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `routes` `(app)` `auth` `route` `component`
@@ -19,9 +19,8 @@
 
 ## Warnings
 
-- ⚠️ 1 SSR-unsafe globals
 - ⚠️ Hardcoded localhost refs
-- ⚠️ 54 routes lack test pairing
+- ⚠️ 57 routes lack test pairing
 
 ## Retrieval / Rerank Hints
 

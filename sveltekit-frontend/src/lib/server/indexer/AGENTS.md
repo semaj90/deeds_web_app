@@ -1,13 +1,13 @@
 # AGENTS.md — `src/lib/server/indexer`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/indexer
 
 ## Snapshot
 
-- server module directory with 19 files, 1 API handlers, 5 Drizzle refs
+- server module directory with 23 files, 1 API handlers, 5 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `lib` `server` `api-handler` `db-schema` `zod`
@@ -20,24 +20,13 @@
 - `src/lib/server/indexer/chunk-id.ts`
 - `src/lib/server/indexer/cluster-summary.ts`
 
-## Hypergraph cluster
-
-This directory is part of cluster **C58** — type chunks in \`src/lib/server/indexer\` (tag: vector)
-
-- **Top kinds**: type×9
-- **Top tags**: `vector` `embedding` `xstate` `auth` `schema`
-
-See `docs/graph/hypergraph-clusters.md` § Cluster 58 for full digest.
-
 
 ## Retrieval / Rerank Hints
 
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
-- **Cluster**: C58 — type chunks in `src/lib/server/indexer` (tag: vector)
-- **BoW texture key**: `texture:bow:cluster:58` (Redis 1h TTL)
-- **Qdrant tags**: `vector` `embedding` `xstate` `auth` `schema`
-- **Paired tests**: 3/19 files have paired tests
+- **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
+- **Paired tests**: 4/19 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
@@ -47,8 +36,7 @@ In-process tools the Gemma4 agent can call to dig deeper into this directory:
 - `wiki_note_lookup({ query: "server indexer", limit: 5 })` — KAG narrative + audit score
 - `audit_hotspots({ limit: 10 })` — if this dir is failing gates, surfaces the broader hotspot set
 - `read_file({ filePath: "src/lib/server/indexer/<file>" })` — fetch any file's contents (sandboxed to src/)
-- `cluster_bag_lookup({ clusterId: 58 })` — BoW texture tile for cluster C58
-- `rag_search({ query: "…", collection: "codebase_chunks_768", filter: { gpuCluster: 58 } })` — semantic search scoped to this cluster
+
 
 ## How to use this file
 

@@ -303,7 +303,16 @@ static napi_value GraphSimilarityWrapper(napi_env env, napi_callback_info info) 
     return throw_error(env, "graphSimilarity: output allocation failed");
 
   int rc = graphSimilarity((const float*)arr_data, n, dim, (float*)out_data, output_len);
-  if (rc != 0) return throw_error(env, "graphSimilarity failed (GPU/CPU error)");
+  if (rc != 0) {
+    const char* msg;
+    switch (rc) {
+      case GPU_ERR_INPUT_TOO_LARGE:    msg = "graphSimilarity: input too large (n > 4096)";   break;
+      case GPU_ERR_CUDA_OOM:           msg = "graphSimilarity: CUDA out of memory";            break;
+      case GPU_ERR_DEVICE_UNAVAILABLE: msg = "graphSimilarity: CUDA device unavailable";      break;
+      default:                         msg = "graphSimilarity: GPU error";                     break;
+    }
+    return throw_error(env, msg);
+  }
 
   napi_value result;
   napi_create_typedarray(env, napi_float32_array, output_len, arraybuffer, 0, &result);
@@ -798,11 +807,14 @@ static napi_value KmeansWithCentroidsWrapper(napi_env env, napi_callback_info in
   napi_create_typedarray(env, napi_int32_array,   (size_t)n,         a_ab, 0, &assignments);
   napi_create_typedarray(env, napi_float32_array, (size_t)(k * dim), c_ab, 0, &centroids);
 
-  // Build result object { assignments, centroids }
+  // Build result object { assignments, centroids, reseeded }
+  napi_value reseeded_val;
+  napi_create_int32(env, reseeded_kmeans, &reseeded_val);
   napi_value obj;
   napi_create_object(env, &obj);
   napi_set_named_property(env, obj, "assignments", assignments);
-  napi_set_named_property(env, obj, "centroids", centroids);
+  napi_set_named_property(env, obj, "centroids",   centroids);
+  napi_set_named_property(env, obj, "reseeded",    reseeded_val);
   return obj;
 }
 

@@ -1,21 +1,23 @@
 # AGENTS.md — `src/mcp`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T16:15:22.211Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/mcp
 
 ## Snapshot
 
-- module directory with 2 files, 0 API handlers, 1 Drizzle refs
+- module directory with 4 files, 0 API handlers, 1 Drizzle refs
 - Audit score: **95/100**
 - 🟠 hardcoded localhost: 1
-- Tags: `src` `mcp` `index.ts` `server.ts` `db-schema` `auth`
+- Tags: `src` `mcp` `index.ts` `server-fastmcp.ts` `server.ts` `db-schema`
 
-## Files (2)
+## Files (4)
 
 - `src/mcp/index.ts`
+- `src/mcp/server-fastmcp.ts`
 - `src/mcp/server.ts`
+- `src/mcp/trace-mcp-server.ts`
 
 ## Warnings
 
@@ -26,7 +28,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 1/2 files have paired tests
+- **Paired tests**: 1/4 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

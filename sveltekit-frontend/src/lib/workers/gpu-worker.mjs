@@ -96,6 +96,16 @@ try {
       parentPort.postMessage({ ok: true, result: out }, [out.buffer]);
       break;
     }
+    case 'batchCosineSimilarity': {
+      // args: [query_f32, dim, corpus_f32, n]
+      const [query, dim, corpus, n] = args;
+      const scores = new Float32Array(n);
+      const rc = addon.batchCosineSimilarity(query, dim, corpus, n, scores, n);
+      if (rc !== 0) throw new Error(`batchCosineSimilarity returned error code ${rc}`);
+      const out = copyTyped(scores);
+      parentPort.postMessage({ ok: true, result: out }, [out.buffer]);
+      break;
+    }
     default:
       throw new Error(`gpu-worker: unknown fn "${fn}"`);
   }

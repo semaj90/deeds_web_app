@@ -1488,6 +1488,35 @@ export const POST: RequestHandler = async ({ request, locals, fetch: eventFetch 
           });
         }
 
+        // ── Stage 11: Postgres FTS sync (code_retrieval_chunks) ───────────
+        // Runs after hypergraph/community to capture fresh topo/cluster data.
+        // Fire-and-forget: failures are logged but don't block the complete event.
+        if (!dryRun) {
+          const stageStart = Date.now();
+          emit('stage', { stage: 'pg_sync', step: 'started' });
+          try {
+            const { syncCodeRetrievalChunks } = await import('$lib/server/search/postgres-fts.js');
+            const syncResult = await syncCodeRetrievalChunks({ limit: 5000, quiet: true });
+            stageTimings.pg_sync = Date.now() - stageStart;
+            completedStages.push('pg_sync');
+            emit('pg_sync_done', {
+              stage:     'pg_sync',
+              upserted:  syncResult.upserted,
+              skipped:   syncResult.skipped,
+              errors:    syncResult.errors,
+              durationMs: stageTimings.pg_sync,
+            });
+          } catch (err) {
+            emit('stage', {
+              stage: 'pg_sync',
+              step:  'failed',
+              error: (err as Error).message,
+            });
+          }
+        } else {
+          emit('stage', { stage: 'pg_sync', step: 'skipped', reason: 'dryRun' });
+        }
+
         // ── Complete ─────────────────────────────────────────────────
         const resumedStages = [...cachedStages.keys()];
         emit('complete', {

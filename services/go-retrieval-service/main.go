@@ -59,6 +59,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"syscall"
+
+	"golang.org/x/sync/errgroup"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -1392,23 +1394,19 @@ func (s *retrievalServer) SearchEvidence(ctx context.Context, req *pb.EvidenceSe
 		pg    []pgChunk
 		qd    []qdrantChunk
 	}
-	dualCh := make(chan dualResult, 1)
-	go func() {
-		var wg sync.WaitGroup
-		var dr dualResult
-		wg.Add(2)
-		go func() {
-			defer wg.Done()
-			dr.pg, _ = s.pgvectorSearch(ctx, vec, req.CaseId, nil, limit*2)
-		}()
-		go func() {
-			defer wg.Done()
-			dr.qd, _ = s.qdrantSearchEvidence(ctx, vec, req.CaseId, limit*3)
-		}()
-		wg.Wait()
-		dualCh <- dr
-	}()
-	dr := <-dualCh
+	var dr dualResult
+	{
+		g2, dCtx := errgroup.WithContext(ctx)
+		g2.Go(func() error {
+			dr.pg, _ = s.pgvectorSearch(dCtx, vec, req.CaseId, nil, limit*2)
+			return nil
+		})
+		g2.Go(func() error {
+			dr.qd, _ = s.qdrantSearchEvidence(dCtx, vec, req.CaseId, limit*3)
+			return nil
+		})
+		_ = g2.Wait()
+	}
 	timing.SearchMs = float32(time.Since(t0).Milliseconds())
 
 	// Merge Qdrant + pgvector results
@@ -1450,55 +1448,49 @@ func (s *retrievalServer) SearchEvidence(ctx context.Context, req *pb.EvidenceSe
 		neighbors   map[string][]graphNeighborRow
 		docContexts map[string]docContextRow
 	}
-	prCh := make(chan parallelResults, 1)
-	go func() {
-		var wg sync.WaitGroup
-		var pr parallelResults
-		pr.siblings = make(map[string][]qdrantChunk)
+	var pr parallelResults
+	pr.siblings = make(map[string][]qdrantChunk)
+	{
 		var mu sync.Mutex
-
-		wg.Add(3)
-		// Sibling hop
-		go func() {
-			defer wg.Done()
+		g3, pCtx := errgroup.WithContext(ctx)
+		// Sibling hop — bounded to 8 concurrent Qdrant calls (prevents connection flood)
+		g3.Go(func() error {
 			if hopMode >= 1 {
-				var wg2 sync.WaitGroup
+				inner, innerCtx := errgroup.WithContext(pCtx)
+				inner.SetLimit(8)
 				for _, rc := range ranked {
 					rc := rc
-					wg2.Add(1)
-					go func() {
-						defer wg2.Done()
-						sibs := s.expandSiblings(ctx, rc, hopMax)
+					inner.Go(func() error {
+						sibs := s.expandSiblings(innerCtx, rc, hopMax)
 						if len(sibs) > 0 {
 							mu.Lock()
 							pr.siblings[rc.ID] = sibs
 							mu.Unlock()
 						}
-					}()
+						return nil
+					})
 				}
-				wg2.Wait()
+				return inner.Wait()
 			}
-		}()
+			return nil
+		})
 		// KAG graph neighbors
-		go func() {
-			defer wg.Done()
-			pr.neighbors, _ = s.fetchGraphNeighbors(ctx, evidenceIDs)
-		}()
+		g3.Go(func() error {
+			pr.neighbors, _ = s.fetchGraphNeighbors(pCtx, evidenceIDs)
+			return nil
+		})
 		// DAG document context
-		go func() {
-			defer wg.Done()
-			rows, _ := s.fetchDocContext(ctx, evidenceIDs)
+		g3.Go(func() error {
+			rows, _ := s.fetchDocContext(pCtx, evidenceIDs)
 			if rows != nil {
 				pr.docContexts = rows
 			} else {
 				pr.docContexts = make(map[string]docContextRow)
 			}
-		}()
-		wg.Wait()
-		prCh <- pr
-	}()
-
-	pr := <-prCh
+			return nil
+		})
+		_ = g3.Wait()
+	}
 	timing.HopMs = float32(time.Since(t0).Milliseconds())
 	timing.KagMs = timing.HopMs  // overlapped — both measured in same interval
 	timing.DagMs = timing.HopMs

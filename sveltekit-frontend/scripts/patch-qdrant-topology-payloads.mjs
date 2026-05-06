@@ -45,17 +45,30 @@ async function main() {
     return;
   }
 
-  // stableKey → payload map
+  // Build two lookup maps:
+  // 1. stable_key (payload field) → topology payload
+  // 2. qdrant point ID (from "qdrant:<id>" sentinel keys) → topology payload
   /** @type {Map<string, Record<string,unknown>>} */
-  const payloadMap = new Map(cacheRows.map(r => [r.stable_key, {
-    topo_byte:            r.topo_byte,
-    topo_hex:             r.topo_hex,
-    topo_class:           r.topo_class,
-    manifold4:            [r.manifold4_x, r.manifold4_y, r.manifold4_z, r.manifold4_w],
-    graphAuthorityScore:  r.graph_authority_score,
-  }]));
+  const payloadByStableKey = new Map();
+  /** @type {Map<string|number, Record<string,unknown>>} */
+  const payloadByQdrantId  = new Map();
 
-  console.log(`  Loaded ${payloadMap.size} cache entries`);
+  for (const r of cacheRows) {
+    const p = {
+      topo_byte:           r.topo_byte,
+      topo_hex:            r.topo_hex,
+      topo_class:          r.topo_class,
+      manifold4:           [r.manifold4_x, r.manifold4_y, r.manifold4_z, r.manifold4_w],
+      graphAuthorityScore: r.graph_authority_score,
+    };
+    if (r.stable_key.startsWith('qdrant:')) {
+      payloadByQdrantId.set(r.stable_key.slice(7), p);  // e.g. "8303"
+    } else {
+      payloadByStableKey.set(r.stable_key, p);
+    }
+  }
+
+  console.log(`  Loaded ${cacheRows.length} cache entries (${payloadByStableKey.size} by stableKey, ${payloadByQdrantId.size} by qdrantId)`);
 
   // 2. Scroll Qdrant and patch matching points
   let offset = null;
@@ -73,8 +86,14 @@ async function main() {
     if (!pts.length) break;
 
     const patches = pts
-      .filter(pt => payloadMap.has(pt.payload?.stable_key))
-      .map(pt => ({ id: pt.id, payload: payloadMap.get(pt.payload.stable_key) }));
+      .map(pt => {
+        const byKey = payloadByStableKey.get(pt.payload?.stable_key);
+        if (byKey) return { id: pt.id, payload: byKey };
+        const byId = payloadByQdrantId.get(String(pt.id));
+        if (byId) return { id: pt.id, payload: byId };
+        return null;
+      })
+      .filter(Boolean);
 
     missed += pts.length - patches.length;
 

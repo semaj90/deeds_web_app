@@ -215,6 +215,340 @@
 				"clear": true
 			},
 			"problemMatcher": []
+		},
+
+		// ── TRACE stack management ────────────────────────────────────────────────
+
+		{
+			"label": "🚀 TRACE: Start Stack",
+			"type": "shell",
+			"command": "npm run trace:start",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": true,
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "Start full TRACE stack (SvelteKit + MCP + Search + llama-server)"
+		},
+		{
+			"label": "✅ TRACE: Ensure Runtime",
+			"type": "shell",
+			"command": "npm run runtime:ensure",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "build",
+			"detail": "Ensure SvelteKit dev server is healthy before dispatching tasks"
+		},
+		{
+			"label": "🩺 TRACE: Smoke Stack",
+			"type": "shell",
+			"command": "npm run smoke:trace",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"detail": "Smoke-test all TRACE services in one shot"
+		},
+		{
+			"label": "🔌 TRACE: Start MCP Server",
+			"type": "shell",
+			"command": "npm run mcp:trace",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": true,
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "Start trace-mcp-server.ts on port 8788 (Streamable HTTP MCP)"
+		},
+		{
+			"label": "🔌 TRACE: Ensure MCP Server",
+			"type": "shell",
+			"command": "npm run mcp:ensure",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "build",
+			"detail": "Check MCP server health; spawn if not running"
+		},
+		{
+			"label": "🔍 TRACE: Start Search Engine",
+			"type": "shell",
+			"command": "npm run search:ensure",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": true,
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "Ensure go-search-service is running on :8096"
+		},
+		{
+			"label": "⚡ TRACE: Start llama-server (TurboQuant)",
+			"type": "shell",
+			"command": "npm run llama:ensure",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": true,
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "Ensure llama-server is running on :8090 with KV q8_0"
+		},
+
+		// ── GPU hardening + deep AST audit ────────────────────────────────────────
+
+		{
+			"label": "🔥 GPU: Smoke Hardening",
+			"type": "shell",
+			"command": "npm run gpu:smoke",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"detail": "Smoke-test CUDA clusterEmbeddings guard + graphSimilarity N-cap"
+		},
+		{
+			"label": "🔬 Audit: Deep AST",
+			"type": "shell",
+			"command": "node scripts/tests/deep-directory-audit.mjs --quiet",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"detail": "Agentic deep-directory AST audit with bounded stdout output"
+		},
+		{
+			"label": "🧩 Audit: D18 simdjson",
+			"type": "shell",
+			"command": "node -e \"const a = require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node'); console.log('simdjson:', typeof a.simdJsonParse === 'function' ? 'EXPORTED' : 'MISSING'); console.log('CUDA:', a.isCudaAvailable() ? 'YES' : 'NO');\"",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"detail": "D18: verify simdjson N-API addon loads and exports simdJsonParse + isCudaAvailable"
+		},
+		{
+			"label": "📐 Audit: D20 GPU Parity",
+			"type": "shell",
+			"command": "node -e \"const a = require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node'); const fns = ['kmeansWithCentroids','trainSOM','pageRankGPU','attentionScoreGPU','rewardScoreGPU','graphSimilarity','clusterEmbeddings','batchCosineSimilarity']; fns.forEach(f => console.log(f + ':', typeof a[f] === 'function' ? '✅ EXPORTED' : '❌ MISSING'));\"",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"detail": "D20: verify all 8 GPU N-API functions exported from tensorrt_bridge.node"
+		},
+		{
+			"label": "📋 Audit: Route Test Stubs (G16)",
+			"type": "shell",
+			"command": "npm run audit:test-stubs",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"detail": "G16: generate/check test stubs for POST/PUT/PATCH/DELETE routes missing coverage"
+		},
+
+		// ── TRACE startup compound (all ensure tasks parallel) ────────────────────
+		{
+			"label": "🚀 TRACE: Ensure Full Stack (parallel)",
+			"dependsOn": [
+				"✅ TRACE: Ensure Runtime",
+				"🔌 TRACE: Ensure MCP Server",
+				"🔍 TRACE: Start Search Engine",
+				"⚡ TRACE: Start llama-server (TurboQuant)"
+			],
+			"dependsOrder": "parallel",
+			"group": { "kind": "build", "isDefault": false },
+			"detail": "Ensure SvelteKit + MCP + Search Engine + llama-server all running simultaneously"
+		},
+		{
+			"label": "🩺 Audit: Full GPU Gate (D18+D20+GPU smoke parallel)",
+			"dependsOn": [
+				"🧩 Audit: D18 simdjson",
+				"📐 Audit: D20 GPU Parity",
+				"🔥 GPU: Smoke Hardening"
+			],
+			"dependsOrder": "parallel",
+			"group": { "kind": "test", "isDefault": false },
+			"detail": "Run all GPU gate checks at the same time"
+		},
+
+		// ── Concurrent pipeline primitives ─────────────────────────────────────
+		// Each task below is a detached background leaf; compound tasks combine them.
+
+		{
+			"label": "⚙️ [leaf] Graphify: Map",
+			"type": "shell",
+			"command": "npm run graphify:map",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "build",
+			"detail": "Layer 1: codebase graph JSON + Redis code:index:* + wiki notes (no GPU)"
+		},
+		{
+			"label": "⚙️ [leaf] Graphify: Semantic",
+			"type": "shell",
+			"command": "npm run graphify:semantic",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "build",
+			"detail": "Layer 2: Qdrant codebase_chunks_768 + hypergraph + Qdrant tags (~30-60s)"
+		},
+		{
+			"label": "⚙️ [leaf] Forest: Warm Clusters",
+			"type": "shell",
+			"command": "npm run forest:warm",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "build",
+			"detail": "Embed cluster summary text → Redis cluster:forest:embed:* (ACE prefilter warm-up)"
+		},
+		{
+			"label": "⚙️ [leaf] Typecheck: Native tsgo",
+			"type": "shell",
+			"command": "npm run typecheck:native",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "test",
+			"problemMatcher": "$tsc",
+			"detail": "TypeScript 7 native (tsgo) type-check — 10× faster than tsc"
+		},
+		{
+			"label": "⚙️ [leaf] Verify: TRACE Startup",
+			"type": "shell",
+			"command": "npm run verify:trace",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "test",
+			"detail": "Check SvelteKit :5173, TRACE MCP :8788, Topology :8101, TurboQuant :8090, graphify smoke"
+		},
+		{
+			"label": "⚙️ [leaf] Context: Build Plan",
+			"type": "shell",
+			"command": "npm run context:plan",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "build",
+			"detail": "Run rg searches + optional TRACE MCP → scratch/claude/context-plan.json+md"
+		},
+		{
+			"label": "⚙️ [leaf] Test: Code-Intel Suite",
+			"type": "shell",
+			"command": "npx vitest run tests/karpathy-persistence.spec.ts tests/trace-memory-gain.spec.ts tests/code-intel-dashboard.spec.ts",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "test",
+			"detail": "Run the 3 code-intel dashboard spec files"
+		},
+		{
+			"label": "⚙️ [leaf] GPU: SOM + Hypergraph",
+			"type": "shell",
+			"command": "npm run graphify:topology",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "build",
+			"detail": "SOM grid training + hyperedge construction + Neo4j SIMILAR_TOPOLOGY edges"
+		},
+		{
+			"label": "⚙️ [leaf] GPU: PageRank",
+			"type": "shell",
+			"command": "npm run run:pagerank",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "build",
+			"detail": "Standalone PageRank: CouchDB link_matrix → Redis couchdb:pagerank_scores (6h TTL)"
+		},
+		{
+			"label": "⚙️ [leaf] GPU: Cluster Summaries",
+			"type": "shell",
+			"command": "npm run graphify:cluster-summaries",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": false,
+			"group": "build",
+			"detail": "LLM-generate cluster summary text → Redis cluster:summary:* → also warms forest embeds"
+		},
+
+		// ── Compound: Phase A — fast map + quality checks (fully parallel) ──────
+		{
+			"label": "🚀 Pipeline: Phase A — Map + Verify (parallel)",
+			"dependsOn": [
+				"⚙️ [leaf] Graphify: Map",
+				"⚙️ [leaf] Verify: TRACE Startup",
+				"⚙️ [leaf] Typecheck: Native tsgo",
+				"⚙️ [leaf] Test: Code-Intel Suite"
+			],
+			"dependsOrder": "parallel",
+			"group": { "kind": "build", "isDefault": false },
+			"detail": "Run map indexing, TRACE verify, tsgo typecheck and code-intel tests all at once"
+		},
+
+		// ── Compound: Phase B — semantic + forest warm (parallel, GPU-light) ────
+		{
+			"label": "🚀 Pipeline: Phase B — Semantic + Forest (parallel)",
+			"dependsOn": [
+				"⚙️ [leaf] Graphify: Semantic",
+				"⚙️ [leaf] Forest: Warm Clusters",
+				"⚙️ [leaf] Context: Build Plan"
+			],
+			"dependsOrder": "parallel",
+			"group": "build",
+			"detail": "Qdrant semantic index + forest prefilter warm + context plan — GPU-light tier"
+		},
+
+		// ── Compound: Phase C — heavy GPU (SOM, PageRank, cluster summaries parallel) ─
+		{
+			"label": "🚀 Pipeline: Phase C — GPU Heavy (parallel)",
+			"dependsOn": [
+				"⚙️ [leaf] GPU: SOM + Hypergraph",
+				"⚙️ [leaf] GPU: PageRank",
+				"⚙️ [leaf] GPU: Cluster Summaries"
+			],
+			"dependsOrder": "parallel",
+			"group": "build",
+			"detail": "SOM+hypergraph, PageRank and cluster summaries concurrently — max GPU utilisation"
+		},
+
+		// ── Compound: Full sequential pipeline A→B→C with intra-phase parallelism ─
+		{
+			"label": "🧠 Pipeline: Full ACE Index (A→B→C sequential phases)",
+			"dependsOn": [
+				"🚀 Pipeline: Phase A — Map + Verify (parallel)"
+			],
+			"dependsOrder": "sequence",
+			"group": { "kind": "build", "isDefault": true },
+			"detail": "Complete Karpathy/ACE rebuild: Phase A (map+verify) then B (semantic+forest) then C (GPU). Run Phase B and C manually after A completes.",
+			"presentation": { "reveal": "always", "panel": "shared", "clear": false }
+		},
+
+		// ── Compound: Smoke + Audit (parallel health gate) ───────────────────────
+		{
+			"label": "🩺 Quality Gate: Smoke + Audit (parallel)",
+			"dependsOn": [
+				"⚙️ [leaf] Verify: TRACE Startup",
+				"⚙️ [leaf] Test: Code-Intel Suite",
+				"⚙️ [leaf] Typecheck: Native tsgo"
+			],
+			"dependsOrder": "parallel",
+			"group": { "kind": "test", "isDefault": false },
+			"detail": "Run all health + correctness checks concurrently — gate before committing"
+		},
+
+		// ── Leaf: Agent Diagnose (last-failure ranked bundle) ────────────────────
+		{
+			"label": "⚙️ [leaf] Agent: Diagnose Last Failure",
+			"type": "shell",
+			"command": "node scripts/agent-diagnose.mjs --last-failure",
+			"options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+			"group": "test",
+			"presentation": { "reveal": "always", "panel": "dedicated" },
+			"problemMatcher": [],
+			"detail": "Ranked failure context: failing files → importers → related tests → Redis errors → recommended commands"
+		},
+
+		// ── Leaf: TRACE full-loop smoke (5 prompts + cache test) ─────────────────
+		{
+			"label": "⚙️ [leaf] TRACE: Full-Loop Smoke",
+			"type": "shell",
+			"command": "node scripts/smoke-trace-full-loop.mjs",
+			"options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+			"group": "test",
+			"presentation": { "reveal": "always", "panel": "dedicated" },
+			"problemMatcher": [],
+			"detail": "Run 5 TRACE prompts + cache validation — logs to logs/trace-full-loop/latest.json"
+		},
+
+		// ── Compound: Quality + Full Loop ────────────────────────────────────────
+		{
+			"label": "🏁 TRACE: Quality + Full Loop (parallel)",
+			"dependsOn": [
+				"⚙️ [leaf] Verify: TRACE Startup",
+				"⚙️ [leaf] TRACE: Full-Loop Smoke",
+				"⚙️ [leaf] Test: Code-Intel Suite",
+				"⚙️ [leaf] Typecheck: Native tsgo",
+				"⚙️ [leaf] Agent: Diagnose Last Failure"
+			],
+			"dependsOrder": "parallel",
+			"group": { "kind": "test", "isDefault": false },
+			"detail": "Full quality gate: TRACE stack + 5-prompt loop + code-intel tests + tsgo — run before release"
 		}
 	],
 	"inputs": [
