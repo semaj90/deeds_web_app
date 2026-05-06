@@ -5,7 +5,7 @@ import type { KarpathyHookOutput } from './karpathy-hook.js';
 import db from '$lib/server/db/client.js';
 import { topologySnapshots, topologyPositions } from '$lib/server/db/schema.js';
 import { sql } from 'drizzle-orm';
-import { getGdsStatus } from '../graph/neo4j-gds.js';
+import { getGdsStatus, seedAndClassifyOntology } from '../graph/neo4j-gds.js';
 
 /**
  * Karpathy Persistence: Commits the organized artifacts from Karpathy Hook
@@ -27,6 +27,12 @@ export async function persistKarpathyHook(output: KarpathyHookOutput) {
 			` (${output.neo4jEdges.length} total)`
 		);
 	}
+
+	// ── 2b. D27 ontology gate — seed OntologyConcept nodes + CLASSIFIED_AS ──
+	// Fire-and-forget: non-fatal if Neo4j offline; idempotent MERGE calls.
+	seedAndClassifyOntology().catch((err) =>
+		console.warn('[persistence] D27 ontology classification failed (non-fatal):', (err as Error)?.message)
+	);
 
 	// ── 3. CouchDB/Redis: Wiki Notes ──────────────────────────────────────────
 	for (const note of output.wikiNotes) {
