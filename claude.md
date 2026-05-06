@@ -1401,6 +1401,12 @@ See `sveltekit-frontend/scripts/docs/compiler-stack-explainer.md` for complete r
 
 **ACE priority order** (verified in `context-assembler.ts`): Qdrant semantic → ACP cross-feed → Redis KAG (cap 0.08) → Redis fast-AST (`FAST_AST_SCORE_CAP = 0.07` named constant) → SOM/hypergraph/PageRank.
 
+**Topo-byte Redis cache (May 5, 2026)**: Stage A0 in `fetchACPKnowledgeResults()` checks `ace:topo:{topoClass}:{queryHash}` (TTL 300s) before ANN. On cache hit, Qdrant is skipped entirely. `TopoPrefilterStats` flows to `ACEContext.retrievalTrace.topoPrefilter`. Implementation: `src/lib/server/cache/topo-candidate-cache.ts`.
+
+**Topology node coloring**: `src/routes/code-intel/topology/+page.svelte` — color mode toggle (topo / node type), legend overlay for classes present in the node set, topo badge in inspector (glyph + label + hex byte).
+
+**Topology 6-tier fallback clusters (May 5, 2026)**: `scripts/project-codebase-topology.mjs` assigns every file a `clusterKey` via a priority ladder — `gpu-kmeans` (confidence 0.90) → `directory-fallback` (0.60, `cluster:dir:<slug>`) → `topo-class-fallback` (0.50) → `kind-fallback` (0.35) → `unclassified` (0.10). Fallback cluster nodes are included in both graph JSONs so all BELONGS_TO_CLUSTER edges are non-dangling. Validator reports **real** (gpu-kmeans) and **total** coverage separately. Do NOT treat fallback clusters as GPU clusters — filter by `clusterSource` before applying authority boosts.
+
 VS Code tasks: `🗺️ Graphify: Daily Map`, `🔎 Graphify: Semantic Index`, `🧠 Graphify: Full ACE Index`, `🏭 Graphify: Full GPU + TurboQuant`, `🩺 Graphify: Smoke (5-pillar health check)`.
 
 ---
