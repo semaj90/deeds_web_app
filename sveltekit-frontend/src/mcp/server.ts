@@ -873,6 +873,41 @@ export function setupToolHandlers() {
         },
       },
       // ─────────────────────────────────────────────────────────────────────
+      // Topology Search — 4D manifold neighbourhood + cosine hybrid search
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'topology_search',
+        description:
+          'Search the 4D topology-indexed codebase using cosine prefilter (Qdrant 768-dim) ' +
+          'followed by manifold4 Euclidean neighbourhood expansion. ' +
+          'The 4 dimensions are: som_x/som_y (SOM grid position), semantic_z (centroid projection), ' +
+          'grpo_w (RL quality score). Returns hits with hybridScore (0.60×cosine + 0.40×manifold), ' +
+          'topoClass, somCluster, graphAuthorityScore, and summary. ' +
+          'Requires topology-search-server running on port 8101 (npm run topology:search:ensure).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Natural-language search query (embedded to 768-dim for cosine stage)',
+            },
+            radius: {
+              type: 'number',
+              description: 'Manifold4 Euclidean search radius (0.05–2.0, default 0.25)',
+            },
+            limit: {
+              type: 'number',
+              description: 'Max hits to return (1–40, default 15)',
+            },
+            somCluster: {
+              type: 'number',
+              description: 'Optional SOM cluster filter (integer) to restrict neighbourhood search',
+            },
+          },
+          required: ['query'],
+        },
+      },
+      // ─────────────────────────────────────────────────────────────────────
       // Analytics — Deep Research + JSONL Research Index (feedback-weighted)
       // ─────────────────────────────────────────────────────────────────────
       {
@@ -4147,6 +4182,59 @@ export function setupToolHandlers() {
         );
 
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'topology_search': {
+        const { queryTopology: topoSearch } = await import(
+          '$lib/server/retrieval/topology-search-client.js'
+        );
+        const query    = String(args.query ?? '').trim();
+        const radius   = Math.min(Math.max(Number(args.radius   ?? 0.25), 0.05), 2.0);
+        const limit    = Math.min(Math.max(Number(args.limit    ?? 15),   1),    40);
+        const somCluster = args.somCluster != null ? Number(args.somCluster) : undefined;
+
+        if (!query) {
+          return { content: [{ type: 'text', text: 'Error: query is required' }], isError: true };
+        }
+
+        const result = await topoSearch(query, { radius, limit, somCluster });
+        if (!result) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                error: 'Topology search engine unavailable (port 8101).',
+                hint:  'Run: npm run topology:search:ensure',
+              }),
+            }],
+            isError: true,
+          };
+        }
+
+        const hits = result.hits.slice(0, limit).map((h) => ({
+          path:               h.path,
+          topoClass:          h.topoClass,
+          topoHex:            h.topoHex,
+          somCluster:         h.somCluster,
+          hybridScore:        h.hybridScore ?? h.manifoldScore,
+          cosineScore:        h.cosineScore ?? null,
+          graphAuthorityScore: h.graphAuthorityScore ?? null,
+          summary:            h.summary ?? h.contentPreview ?? '',
+        }));
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              query,
+              center:     result.center,
+              radius,
+              totalFound: result.totalFound,
+              durationMs: result.durationMs,
+              hits,
+            }),
+          }],
+        };
       }
 
       default:

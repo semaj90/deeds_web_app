@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync } from 'node:fs';
-import path from 'node:path';
+import { spawn }      from 'node:child_process';
+import path           from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const scriptName = process.argv[2] || 'dev';
@@ -18,6 +19,20 @@ for (const pkg of requiredPackages) {
 }
 
 if (missing.length === 0) {
+  // ── Detached background services (same pattern as llama-server.exe) ──
+  const bgScripts = [
+    path.join(scriptDir, 'ensure-search-engine.mjs'),
+  ];
+  for (const script of bgScripts) {
+    if (existsSync(script)) {
+      const child = spawn(process.execPath, [script, '--spawn'], {
+        detached:    true,
+        stdio:       'ignore',
+        windowsHide: true,
+      });
+      child.unref();
+    }
+  }
   process.exit(0);
 }
 
