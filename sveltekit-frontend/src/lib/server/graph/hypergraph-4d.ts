@@ -97,6 +97,7 @@ export interface HyperNode4D {
   z:     number;   // cosine distance to assigned centroid [0,1]
   w:     number;   // GRPO reward score [0,1]
   type:  string;   // 'research_summary' | 'legal_doc' | 'evidence' | 'statute'
+  table: 'research_summaries' | 'embedded_summaries' | 'codebase_chunks_768';
 }
 
 export type HyperEdgeGrade = 'A' | 'B' | 'C' | 'D';
@@ -270,20 +271,33 @@ interface SummaryRow {
   // When present, buildHypergraph4D skips the GPU SOM re-training step.
   somX?: number;
   somY?: number;
+  table: 'research_summaries' | 'embedded_summaries' | 'codebase_chunks_768';
 }
 
 async function fetchEmbeddedSummaries(): Promise<SummaryRow[]> {
-  const { rows } = await pool.query<SummaryRow>(
+  const research = await pool.query<SummaryRow>(
     `SELECT id::text, pipeline, entity_tags, summary,
-            embedding::text, relevance_score::real
+            embedding::text, relevance_score::real,
+            'research_summaries' as table
      FROM   research_summaries
      WHERE  embedding IS NOT NULL
      ORDER  BY relevance_score DESC
      LIMIT  $1`,
     [MAX_ROWS],
-  );
-  // Parse pgvector text representation "[f,f,f,...]" → number[]
-  return rows.map(r => ({
+  ).then(r => r.rows);
+
+  const embedded = await pool.query<any>(
+    `SELECT id::text, source_type as pipeline, tags as entity_tags, summary_text as summary,
+            NULL as embedding, confidence as relevance_score,
+            'embedded_summaries' as table
+     FROM   embedded_summaries
+     ORDER  BY confidence DESC
+     LIMIT  $1`,
+    [MAX_ROWS],
+  ).then(r => r.rows);
+
+  // Combine and parse embeddings
+  const all = [...research, ...embedded].map(r => ({
     ...r,
     embedding: typeof r.embedding === 'string'
       ? (r.embedding as string)
@@ -292,6 +306,10 @@ async function fetchEmbeddedSummaries(): Promise<SummaryRow[]> {
           .map(Number)
       : (r.embedding as unknown as number[]),
   }));
+
+  // Filter out any without embeddings (embedded_summaries might need Qdrant fetch)
+  // For now, we only include those with embeddings already in PG
+  return all.filter(a => a.embedding && a.embedding.length === DIM);
 }
 
 /**
@@ -334,7 +352,8 @@ async function fetchCodebaseNodes(): Promise<SummaryRow[]> {
 
     if (!res.ok) break;
 
-    const data = (await res.json()) as {
+    const raw = await res.text();
+    let data: {
       result?: {
         points?: Array<{
           id: number | string;
@@ -344,6 +363,17 @@ async function fetchCodebaseNodes(): Promise<SummaryRow[]> {
         next_page_offset?: string | number | null;
       };
     };
+
+    try {
+      const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+      if (isSimdJsonAvailable()) {
+        data = fastJsonParse(raw);
+      } else {
+        data = JSON.parse(raw);
+      }
+    } catch {
+      data = JSON.parse(raw);
+    }
 
     const points = data.result?.points ?? [];
     offset = data.result?.next_page_offset ?? null;
@@ -384,6 +414,7 @@ async function fetchCodebaseNodes(): Promise<SummaryRow[]> {
           relevance_score: 0.5, // placeholder — overwritten below from Redis PageRank
           somX:            somCol, // SOM col = x axis
           somY:            somRow, // SOM row = y axis
+          table:           'codebase_chunks_768',
         });
       }
 
@@ -614,19 +645,44 @@ async function summarizeHyperedge(
 async function writeManifold4ToDB(nodes: HyperNode4D[]): Promise<void> {
   if (!nodes.length) return;
   try {
-    // Pass coordinates as text strings "{x,y,z,w}" and cast → real[] in SQL.
-    const ids    = nodes.map(n => n.id);
-    const coords = nodes.map(n => `{${n.x},${n.y},${n.z},${n.w}}`);
-    await pool.query(
-      `UPDATE research_summaries AS rs
-       SET    manifold4 = u.coords::real[]
-       FROM   unnest($1::uuid[], $2::text[]) AS u(id, coords)
-       WHERE  rs.id = u.id`,
-      [ids, coords],
-    );
-  } catch {
-    // Non-fatal — Redis holds the live coordinates; Postgres write-back is a
-    // durability optimisation for offline queries.
+    const research = nodes.filter(n => n.table === 'research_summaries');
+    const embedded = nodes.filter(n => n.table === 'embedded_summaries');
+    const chunks   = nodes.filter(n => n.table === 'codebase_chunks_768');
+
+    if (research.length) {
+      await pool.query(
+        `UPDATE research_summaries AS rs
+         SET    manifold4 = u.coords::real[]
+         FROM   unnest($1::uuid[], $2::text[]) AS u(id, coords)
+         WHERE  rs.id = u.id`,
+        [research.map(n => n.id), research.map(n => `{${n.x},${n.y},${n.z},${n.w}}`)],
+      );
+    }
+
+    if (embedded.length) {
+      await pool.query(
+        `UPDATE embedded_summaries AS es
+         SET    manifold4 = u.coords::double precision[]
+         FROM   unnest($1::uuid[], $2::text[]) AS u(id, coords)
+         WHERE  es.id = u.id`,
+        [embedded.map(n => n.id), embedded.map(n => `{${n.x},${n.y},${n.z},${n.w}}`)],
+      );
+    }
+
+    if (chunks.length) {
+      // For codebase chunks, we update codebase_chunk_index.
+      // Chunks might have string IDs (from Qdrant) or UUIDs.
+      // We assume they map to the 'id' UUID column in Postgres.
+      await pool.query(
+        `UPDATE codebase_chunk_index AS cci
+         SET    manifold4 = u.coords::real[]
+         FROM   unnest($1::uuid[], $2::text[]) AS u(id, coords)
+         WHERE  cci.id = u.id`,
+        [chunks.map(n => n.id), chunks.map(n => `{${n.x},${n.y},${n.z},${n.w}}`)],
+      );
+    }
+  } catch (err) {
+    console.error('[hypergraph-4d] Failed to write manifold4 to DB:', err);
   }
 }
 
@@ -954,6 +1010,7 @@ export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
       z:    zCoords[i],
       w:    wCoords[i],
       type: 'research_summary',
+      table: s.table,
     };
     nodeMap.set(s.id, node);
     return node;
@@ -1175,16 +1232,33 @@ export async function addressHyperedges(opts: {
     if (edge.gradeScore < wMin) continue;
 
     // Check if enough members fall within the 4D region
+    const memberSlice = edge.memberIds.slice(0, 20);
+    const coordKeys   = memberSlice.map(id => HG_COORD_KEY(id));
+    const coordRaws   = await redis.mget(...coordKeys).catch(() => [] as Array<string | null>);
+
+    // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. HyperNode4D
+    // contains 4 floats + type — typical 200B per node so 20 members
+    // is ~4KB. Threshold check below handles smaller batches.
+    const totalChars = coordRaws.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+    let parseNode: (s: string) => HyperNode4D = (s) => JSON.parse(s) as HyperNode4D;
+    if (coordRaws.length >= 10 && totalChars >= 5_000) {
+      try {
+        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+        if (isSimdJsonAvailable()) parseNode = fastJsonParse<HyperNode4D>;
+      } catch { /* addon unavailable — keep V8 */ }
+    }
+
     let inRegion = 0;
-    for (const memberId of edge.memberIds.slice(0, 20)) {
-      const raw = await redis.get(HG_COORD_KEY(memberId)).catch(() => null);
+    for (const raw of coordRaws) {
       if (!raw) continue;
-      const node = JSON.parse(raw) as HyperNode4D;
-      const xOk = !xRange || (node.x >= xRange[0] && node.x <= xRange[1]);
-      const yOk = !yRange || (node.y >= yRange[0] && node.y <= yRange[1]);
-      const zOk = zMax === undefined || node.z <= zMax;
-      const wOk = node.w >= wMin;
-      if (xOk && yOk && zOk && wOk) inRegion++;
+      try {
+        const node = parseNode(raw);
+        const xOk = !xRange || (node.x >= xRange[0] && node.x <= xRange[1]);
+        const yOk = !yRange || (node.y >= yRange[0] && node.y <= yRange[1]);
+        const zOk = zMax === undefined || node.z <= zMax;
+        const wOk = node.w >= wMin;
+        if (xOk && yOk && zOk && wOk) inRegion++;
+      } catch { continue; }
     }
 
     if (inRegion >= 2) filtered.push(edge);

@@ -1,6 +1,6 @@
 # Hypergraph Cluster Digest
 
-> Generated 2026-05-04T15:21:37.048Z from `codebase_chunks_768` (K=100, 32,753 chunks clustered, 1,256 payloads sampled, 0.5s)
+> Generated 2026-05-06T04:16:15.679Z from `codebase_chunks_768` (K=100, 32,753 chunks clustered, 1,256 payloads sampled, 0.5s)
 
 Pure aggregation over hypergraph k-means assignments + Qdrant payloads — no LLM. Drives ACE community summaries and the audit-hotspots tool.
 

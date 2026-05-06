@@ -69,6 +69,8 @@ napi_status napi_create_object(napi_env, napi_value*);
 #include <vector>
 #include <cstring>
 
+#include "gpu_error_codes.h"
+
 // External C functions from other compilation units
 extern "C" int bridgeSIMDToTensorRT(const char* json);
 
@@ -80,7 +82,8 @@ extern "C" int softmaxGPU(const float* logits, int n, float* out, int out_len);
 extern "C" int topKIndicesGPU(const float* scores, int n, int k, int* out, int out_len);
 extern "C" int kmeansWithCentroids(const float* embeddings, int n, int dim, int k, int max_iters,
                                     int* assignments_out, int assignments_len,
-                                    float* centroids_out, int centroids_len);
+                                    float* centroids_out, int centroids_len,
+                                    int* out_reseeded_count);
 extern "C" int trainSOM(const float* data, int n, int dim, int grid_w, int grid_h,
                          int iters, float lr_init, float lr_final,
                          float radius_init, float radius_final,
@@ -88,7 +91,7 @@ extern "C" int trainSOM(const float* data, int n, int dim, int grid_w, int grid_
 
 // LibTorch graph analysis (libtorch_graph.cc)
 extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* output, int output_len);
-extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k, int max_iters, int* assignments, int assignments_len);
+extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k, int max_iters, int* assignments, int assignments_len, int* out_reseeded_count);
 extern "C" int computeCaseEmbedding(const float* weights, int n, const float* embeddings, int dim, float* output, int output_len);
 extern "C" int checkCudaAvailable();
 extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes);

@@ -3738,6 +3738,12 @@ export const researchSummaries = pgTable('research_summaries', {
    * pagination by manifold region).
    */
   manifold4:      real('manifold4').array(),
+  /**
+   * Structured 1-3 sentence summary + citations + confidence.
+   * Stored as JSONB so simdjson AVX2 fast-parse can decode at 2-5× V8 speed.
+   * Schema matches CodeLlmOutputMeta from code_llm_index.
+   */
+  outputMeta:     jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
   createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => [
   index('rs_pipeline_score_id').on(t.pipeline, t.relevanceScore, t.id),
@@ -3996,6 +4002,12 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	tags: jsonb('tags').default(sql`'[]'::jsonb`),
 	neo4jMeta: jsonb('neo4j_meta').default(sql`'{}'::jsonb`),
 	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	/**
+	 * Structured 1-3 sentence summary + citations + confidence.
+	 * Stored as JSONB so simdjson AVX2 fast-parse can decode at 2-5× V8 speed.
+	 * Schema matches CodeLlmOutputMeta from code_llm_index.
+	 */
+	outputMeta: jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
 
 	embeddingModel: varchar('embedding_model', { length: 100 }),
 	summaryModel: varchar('summary_model', { length: 100 }),

@@ -64,9 +64,9 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 // Tracks approximate heap usage of cached values to prevent unbounded growth.
 // Evicts by TTL first, then by oldest-insertion order.
 
-const LRU_BUDGET_BYTES = 8 * 1024 * 1024; // 8 MB
+const LRU_BUDGET_BYTES = 32 * 1024 * 1024; // 32 MB
 const LRU_TTL_MS       = 30_000;           // 30 s
-const MAX_ENTRY_BYTES  = 512 * 1024;       // skip caching single entries > 512 KB
+const MAX_ENTRY_BYTES  = 8 * 1024 * 1024;  // skip caching single entries > 8 MB
 
 interface CacheEntry {
 	value: unknown;
@@ -140,6 +140,7 @@ function lruGet(key: string): unknown | undefined {
 	// Refresh to MRU position
 	lruCache.delete(key);
 	lruCache.set(key, entry);
+	stats.hits++;
 	return entry.value;
 }
 
@@ -163,6 +164,22 @@ function lruSet(key: string, value: unknown): void {
 
 	lruCache.set(key, { value, expiresAt: Date.now() + LRU_TTL_MS, sizeBytes });
 	cacheBytes += sizeBytes;
+}
+
+// ── Telemetry ──────────────────────────────────────────────────────────────────
+
+const stats = {
+	hits:             0,
+	misses:           0,
+	nativeParses:     0,
+	fallbackParses:   0,
+	totalBytesParsed: 0,
+	nativeTimeMs:     0,
+};
+
+/** Return current simdjson bridge metrics. Useful for D18 audit gates. */
+export function getSimdStats() {
+	return { ...stats, cacheBytes, cacheSize: lruCache.size };
 }
 
 // ── OOM guard ──────────────────────────────────────────────────────────────────
@@ -193,18 +210,26 @@ export function fastJsonParse<T = unknown>(input: string): T {
 	const cached = lruGet(cacheKey);
 	if (cached !== undefined) return cached as T;
 
-	let result: T;
+	stats.misses++;
+	stats.totalBytesParsed += input.length;
 
+	let result: T;
 	const native = input.length >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
+
 	if (native) {
+		const start = performance.now();
 		try {
 			// simdjson validates + minifies; V8 parses the tightly-packed output
 			const validated = native.simdJsonParse(input);
 			result = JSON.parse(validated) as T;
+			stats.nativeParses++;
+			stats.nativeTimeMs += (performance.now() - start);
 		} catch {
+			stats.fallbackParses++;
 			result = JSON.parse(input) as T;
 		}
 	} else {
+		stats.fallbackParses++;
 		result = JSON.parse(input) as T;
 	}
 

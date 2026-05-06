@@ -238,6 +238,15 @@ export const codebaseChunkIndex = pgTable(
     metadata: jsonb('metadata')
       .notNull()
       .default(sql`'{}'::jsonb`), // flexible enrichment
+    /**
+     * Structured 1-3 sentence summary + citations + confidence.
+     * Stored as JSONB so simdjson AVX2 fast-parse can decode at 2-5× V8 speed
+     * when ACE bulk-fetches cached RAG/KAG/DAG outputs across a cluster.
+     * Schema matches CodeLlmOutputMeta from code_llm_index.
+     */
+    outputMeta: jsonb('output_meta')
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     indexedAt: timestamp('indexed_at', { withTimezone: true })
       .notNull()
       .default(sql`now()`),
