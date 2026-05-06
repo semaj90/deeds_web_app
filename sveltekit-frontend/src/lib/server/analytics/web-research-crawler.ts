@@ -396,10 +396,22 @@ export async function queryWebResearchIndex(
 		.mget(hashes.map(h => WEB_SUM_KEY(h)))
 		.catch(() => [] as (string | null)[]);
 
+	// simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Web research summaries
+	// (full-text + metadata + entity tags) are 5-20KB each — easily clears
+	// the threshold for typical pipeline-batch fetches.
+	const totalChars = raw.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+	let parseFn: (s: string) => WebResearchSummary = (s) => JSON.parse(s) as WebResearchSummary;
+	if (raw.length >= 10 && totalChars >= 5_000) {
+		try {
+			const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+			if (isSimdJsonAvailable()) parseFn = fastJsonParse<WebResearchSummary>;
+		} catch { /* addon unavailable — keep V8 */ }
+	}
+
 	const out: WebResearchSummary[] = [];
 	for (const r of raw) {
 		if (!r) continue;
-		try { out.push(JSON.parse(r) as WebResearchSummary); } catch { /* */ }
+		try { out.push(parseFn(r)); } catch { /* */ }
 	}
 	return out;
 }

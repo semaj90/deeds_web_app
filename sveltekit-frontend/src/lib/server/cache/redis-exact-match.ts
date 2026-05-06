@@ -43,9 +43,13 @@ export interface CachedLLMResponse {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function parseEntry(raw: string, key: string): CachedLLMResponse | null {
+/** Per-call parser injection — simdjson when bulk threshold trips, else V8. */
+type EntryParseFn = (s: string) => CachedLLMResponse;
+const v8Parse: EntryParseFn = (s) => JSON.parse(s) as CachedLLMResponse;
+
+function parseEntry(raw: string, key: string, parser: EntryParseFn = v8Parse): CachedLLMResponse | null {
 	try {
-		const parsed = JSON.parse(raw) as CachedLLMResponse;
+		const parsed = parser(raw);
 		if (!parsed.content || !parsed.model) {
 			console.warn('[Redis Exact-Match] Invalid cache entry, deleting:', key);
 			// Fire-and-forget delete — don't block the caller
@@ -159,11 +163,22 @@ export async function getExactMatchCacheBatch(
 		// MGET returns null for missing keys, string for hits — same order as input
 		const values = await redis.mget(...cacheKeys);
 
+		// simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Cached LLM responses
+		// can be 5-30KB each (full chat completion + metadata + token timings).
+		const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
+		let parser: EntryParseFn = v8Parse;
+		if (values.length >= 10 && totalChars >= 5_000) {
+			try {
+				const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+				if (isSimdJsonAvailable()) parser = fastJsonParse<CachedLLMResponse>;
+			} catch { /* addon unavailable — keep V8 */ }
+		}
+
 		let hits = 0;
 		for (let i = 0; i < cacheKeys.length; i++) {
 			const raw = values[i];
 			if (!raw) continue;
-			const entry = parseEntry(raw, cacheKeys[i]);
+			const entry = parseEntry(raw, cacheKeys[i], parser);
 			if (entry) {
 				result.set(cacheKeys[i], entry);
 				hits++;
