@@ -4017,6 +4017,9 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
 	// NOTE: content_embedding is halfvec(768) — not modelled here, use raw SQL
 
+	// 4D manifold coords: [som_x, som_y, semantic_z, grpo_w] — matches research_summaries.manifold4
+	manifold4: real('manifold4').array(),
+
 	indexedAt: timestamp('indexed_at', { withTimezone: true }).notNull().default(sql`now()`),
 	enrichedAt: timestamp('enriched_at', { withTimezone: true }),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),

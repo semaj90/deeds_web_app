@@ -77,6 +77,8 @@ import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
 import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/bag-cache.js';
 import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
+import { computeManifold4Centroid } from '$lib/server/retrieval/manifold4-search.js';
+import type { Manifold4Point } from '$lib/server/retrieval/manifold4-search.js';
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -2420,14 +2422,22 @@ async function fetchCodebaseContext(
             return toCtx(r, scoreMap.get(docId) ?? r.score);
           });
 
-          // Phase 8: Apply 4D topological boost (PageRank + SOM + hyperedge grade + query BMU)
+          // Phase 8: Apply 4D topological boost (PageRank + SOM + hyperedge grade + query BMU + manifold4)
           // queryBmuCached: Redis-cached CUDA SOM forward pass — maps query to grid position
           // so chunks near the query's own SOM neuron get an extra affinity signal.
           const queryBmu = await queryBmuCached(
             await generateSingleEmbedding(query).catch(() => [])
           ).catch(() => undefined);
+
+          // Compute manifold4 centroid of the current hit-set so nearby chunks
+          // in 4D topology space get an extra 0.16-weight proximity signal.
+          const manifold4Points = unsorted
+            .map((r) => (r as unknown as Record<string, unknown>).manifold4 as number[] | null | undefined)
+            .map((m): Manifold4Point | null => (m?.length === 4 ? (m as Manifold4Point) : null));
+          const manifold4Center = computeManifold4Centroid(manifold4Points) ?? undefined;
+
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const boosted = await applyTopologicalBoostAsync(unsorted as any, { queryBmu });
+          const boosted = await applyTopologicalBoostAsync(unsorted as any, { queryBmu, manifold4Center });
 
           return await applyKarpathyBoost(boosted.slice(0, 10) as any, query, agentsMdResolvedDir);
         }

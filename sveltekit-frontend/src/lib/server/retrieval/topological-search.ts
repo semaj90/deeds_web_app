@@ -8,6 +8,7 @@
 
 import type { RankedChunk } from './codebase-context';
 import type { QueryBmuResult } from '$lib/server/gpu/libtorch-bridge.js';
+import type { Manifold4Point } from './manifold4-search.js';
 
 export interface BoostOptions {
   radius?: number;           // Manhattan distance for spatial boost (default: 2)
@@ -17,6 +18,10 @@ export interface BoostOptions {
   hyperedgeBoost?: number;   // Additive boost for same-hyperedge chunks (default: 0.06)
   queryBmu?: QueryBmuResult; // Query embedding's BMU — nearby chunks get extra SOM affinity boost
   queryBmuWeight?: number;   // Additive boost per SOM grid step toward query BMU (default: 0.03)
+  /** 4D manifold center for Euclidean proximity boost (weight 0.16 per ACE spine) */
+  manifold4Center?: Manifold4Point;
+  /** Manifold4 boost weight (default: 0.16) */
+  manifold4Weight?: number;
 }
 
 /**
@@ -97,6 +102,8 @@ export async function applyTopologicalBoostAsync(
     hyperedgeBoost: _he = 0.06,
     queryBmu,
     queryBmuWeight = 0.03,
+    manifold4Center,
+    manifold4Weight = 0.16,
   } = opts;
 
   // Collect Qdrant IDs from results (stored as qdrantId or id field)
@@ -154,7 +161,24 @@ export async function applyTopologicalBoostAsync(
     // 4. PageRank centrality
     const pagerankBoost = 1.0 + ((r.pageRankScore ?? 0) * centralityWeight);
 
-    const finalScore = Math.min(1.0, (r.score + boost + queryProximityBoost) * densityBoost * pagerankBoost);
+    // 5. Manifold4 Euclidean proximity (ACE spine weight 0.16)
+    let manifold4Boost = 0;
+    let manifoldDistance: number | null = null;
+    if (manifold4Center) {
+      const m4 = (rx.manifold4 as number[] | null | undefined);
+      if (m4?.length === 4) {
+        const d2 = (
+          Math.pow(m4[0] - manifold4Center[0], 2) +
+          Math.pow(m4[1] - manifold4Center[1], 2) +
+          Math.pow(m4[2] - manifold4Center[2], 2) +
+          Math.pow(m4[3] - manifold4Center[3], 2)
+        );
+        manifoldDistance = Math.sqrt(d2);
+        manifold4Boost = manifold4Weight * (1 / (1 + manifoldDistance));
+      }
+    }
+
+    const finalScore = Math.min(1.0, (r.score + boost + queryProximityBoost + manifold4Boost) * densityBoost * pagerankBoost);
 
     return {
       ...r,
@@ -166,6 +190,8 @@ export async function applyTopologicalBoostAsync(
         hyperedgeGrade: edgeInfo?.gradeLabel ?? null,
         hyperedgeBoost: boost,
         queryProximityBoost,
+        manifold4Boost,
+        manifoldDistance,
         originalScore: r.score,
       },
     };
