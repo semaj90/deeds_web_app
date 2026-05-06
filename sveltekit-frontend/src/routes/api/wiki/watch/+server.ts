@@ -4,7 +4,7 @@
  * DELETE /api/wiki/watch — stop watcher
  *
  * Requires: OBSIDIAN_VAULT_PATH env var pointing to the vault root on disk.
- * The watcher watches `karpathy-wiki/**/*.md` and ingests any file edited
+ * The watcher watches karpathy-wiki/ (glob **\/*.md) and ingests any file edited
  * directly in Obsidian desktop back into CouchDB + Redis.
  */
 

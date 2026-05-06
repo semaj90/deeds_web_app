@@ -80,16 +80,12 @@ export interface PlaybookNote {
 export interface ResearchNote {
 	type: 'research';
 	query: string;
-	topic: string;
-	source: string;
-	trustTier: string;
-	gainScore: number;
-	externalFinding: string;
-	internalAlignment: string;
-	recommendedAction: string;
-	linkedFiles: string[];
-	linkedClusters: string[];
-	tags: string[];
+	outsideSources: Array<{ title: string; url: string; snippet: string }>;
+	internalAreas: string[];
+	deltasFromPrior: string[];
+	confidence: number;
+	pipeline: string;
+	unresolvedQuestions: string[];
 	generatedAt: string;
 }
 
