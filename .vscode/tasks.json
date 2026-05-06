@@ -9098,6 +9098,28 @@
     },
 
     {
+      "label": "🚀 Startup: Analysis (detached — smoke + topo + Gemma4 plan)",
+      "type": "shell",
+      "command": "mkdir -p logs/startup && node scripts/startup-analysis.mjs > logs/startup/latest.log 2>&1 & echo '[startup] Analysis running in background — tail logs/startup/latest.log'",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Runs smoke:graphify + topology:validate detached, feeds results to Gemma4 agent, writes timestamped plan to next_steps/plans/. Use startup:analysis:dry to preview in terminal.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "🚀 Startup: Analysis (dry-run — preview in terminal)",
+      "type": "shell",
+      "command": "node scripts/startup-analysis.mjs --dry-run",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Preview startup health report in terminal without writing files or calling Gemma4.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
       "label": "📚 Graphify: Cluster Digest (per-centroid topic + members)",
       "type": "shell",
       "command": "npm run hypergraph:digest",
