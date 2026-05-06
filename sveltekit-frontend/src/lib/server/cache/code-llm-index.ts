@@ -788,3 +788,144 @@ async function parseEntriesBulk(raws: Array<string | null>): Promise<Array<CodeL
 }
 
 export { parseEntriesBulk };
+
+// ── Prior-Answer Memory cascade (L1 Redis → L2 Postgres → L3 Qdrant) ─────────
+
+export interface PriorAnswerHit {
+  /** Where the entry was resolved from. */
+  layer:        'redis' | 'postgres' | 'qdrant';
+  /** ms spent resolving (one-shot, includes the winning lookup only). */
+  latencyMs:    number;
+  /** Path that owns the cached output. */
+  path:         string;
+  /** Compressed structured envelope (small — safe to inject in prompt). */
+  meta:         CodeLlmOutputMeta;
+  /** Full llmOutput, if cheap to return; null when the layer didn't carry it. */
+  llmOutput:    string | null;
+  /** glyph cluster (for ACE community-context drill-downs). */
+  glyphClusterId?: number;
+  /** Pipeline tag the entry was recorded under. */
+  source:       CodeLlmEntry['source'];
+}
+
+export interface PriorAnswerLookupOpts {
+  /** Path or directory to look up first (cheapest). */
+  path?:    string;
+  /** Free-text query to fall back to semantic Qdrant search if path miss. */
+  query?:   string;
+  /** Constrain to one cluster (cheaper Qdrant filter). */
+  clusterId?: number;
+  /** When true, include full llmOutput in the result (default false — only meta). */
+  includeFullOutput?: boolean;
+  /** Minimum cosine similarity for Qdrant matches. Default 0.78. */
+  minScore?: number;
+}
+
+/**
+ * 3-layer prior-answer cascade. Returns the first hit with the lowest
+ * latency. Used by ACE to inject "## Prior Answer Memory" preambles.
+ *
+ *   L1 Redis  (path-keyed, ~5ms)        — exact path match
+ *   L2 Postgres (path-keyed, ~30ms)      — durable mirror, survives Redis flush
+ *   L3 Qdrant (semantic, ~50-200ms)      — query-similarity fallback
+ *
+ * Returns `null` when no cache layer carries the entry.
+ *
+ * Performance: simdjson is used to parse Redis bulk reads when available
+ * (5× speedup on JSON >1KB). Qdrant search is gated by minScore so weak
+ * matches don't pollute the prompt.
+ */
+export async function lookupPriorAnswerMemory(
+  opts: PriorAnswerLookupOpts,
+): Promise<PriorAnswerHit | null> {
+  const { path: rawPath, query, clusterId, includeFullOutput = false, minScore = 0.78 } = opts;
+
+  // ── L1 Redis ────────────────────────────────────────────────────────────────
+  if (rawPath) {
+    const t0 = Date.now();
+    const entry = await getLlmOutputHit(rawPath);
+    if (entry?.outputMeta?.summary) {
+      return {
+        layer:          'redis',
+        latencyMs:      Date.now() - t0,
+        path:           entry.path,
+        meta:           entry.outputMeta,
+        llmOutput:      includeFullOutput ? entry.llmOutput : null,
+        glyphClusterId: entry.glyphClusterId,
+        source:         entry.source,
+      };
+    }
+  }
+
+  // ── L2 Postgres durable mirror ──────────────────────────────────────────────
+  if (rawPath) {
+    const t0 = Date.now();
+    try {
+      const { pool } = await import('$lib/server/db/client');
+      const { rows } = await pool.query(
+        `SELECT path, source, glyph_cluster_id, hit_count, llm_output, output_meta
+           FROM code_llm_index
+          WHERE path = $1
+          LIMIT 1`,
+        [normalisePath(rawPath)],
+      );
+      if (rows.length && rows[0].output_meta?.summary) {
+        return {
+          layer:          'postgres',
+          latencyMs:      Date.now() - t0,
+          path:           rows[0].path,
+          meta:           rows[0].output_meta as CodeLlmOutputMeta,
+          llmOutput:      includeFullOutput ? rows[0].llm_output : null,
+          glyphClusterId: rows[0].glyph_cluster_id ?? undefined,
+          source:         rows[0].source as CodeLlmEntry['source'],
+        };
+      }
+    } catch { /* DB unreachable — fall through */ }
+  }
+
+  // ── L3 Qdrant semantic fallback ─────────────────────────────────────────────
+  if (query) {
+    const t0 = Date.now();
+    const hits = await searchLlmOutputsBySimilarity(query, 3);
+    const best = hits.find((h) => h.score >= minScore && (clusterId === undefined || h.entry.glyphClusterId === clusterId));
+    if (best?.entry.outputMeta?.summary) {
+      return {
+        layer:          'qdrant',
+        latencyMs:      Date.now() - t0,
+        path:           best.entry.path,
+        meta:           best.entry.outputMeta,
+        llmOutput:      includeFullOutput ? best.entry.llmOutput : null,
+        glyphClusterId: best.entry.glyphClusterId,
+        source:         best.entry.source,
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Render a prior-answer hit as a compact ACE prompt section. Stays under
+ * ~600 chars so it fits inside the prompt budget without crowding out
+ * semantic chunks. Caller drops this between AGENTS.md context and the
+ * Qdrant chunk list.
+ */
+export function renderPriorAnswerSection(hit: PriorAnswerHit): string {
+  const m = hit.meta;
+  const lines = ['## Prior Answer Memory'];
+  lines.push(`Layer: ${hit.layer} (${hit.latencyMs}ms) · pipeline: ${m.pipeline ?? hit.source} · path: ${hit.path}`);
+  if (typeof m.confidence === 'number')     lines.push(`Confidence: ${m.confidence.toFixed(2)}`);
+  if (typeof m.groundingScore === 'number') lines.push(`Grounding: ${m.groundingScore.toFixed(2)}`);
+  if (m.summary) {
+    lines.push('');
+    lines.push(m.summary.length > 600 ? m.summary.slice(0, 597) + '…' : m.summary);
+  }
+  if (m.citations?.length) {
+    lines.push('');
+    lines.push('Citations:');
+    for (const c of m.citations.slice(0, 4)) {
+      lines.push(`- ${c.sourceTitle} (${c.chunkId})`);
+    }
+  }
+  return lines.join('\n');
+}

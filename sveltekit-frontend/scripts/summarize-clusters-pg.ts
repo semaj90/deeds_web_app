@@ -39,7 +39,7 @@ const CONFIG = {
   force:         process.argv.includes('--force'),
   noCache:       process.argv.includes('--no-cache'),
   singleCluster: parseInt(process.argv.find(a => a.startsWith('--cluster='))?.split('=')[1] ?? '-1'),
-  concurrency:   2,
+  concurrency:   parseInt(process.argv.find(a => a.startsWith('--concurrency='))?.split('=')[1] ?? process.env.SUMMARIZE_CONCURRENCY ?? '2'),
   topK:          12,
   cacheTtl:      86_400,
 } satisfies Record<string, string | number | boolean>;

@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-05T00:55:33.656Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-05T02:57:03.966Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -36,7 +36,7 @@ These tools are wired in-process in [`src/lib/server/ai/gemma4-agent.ts`](./src/
 |------|--------|
 | G4  Auth on API routes | 636✅ / 30❌ |
 | G5  Zod on body-parsing routes | 469✅ / 0❌ |
-| G15 SSR-unsafe globals | 46❌ |
+| G15 SSR-unsafe globals | 8❌ |
 | G16 Routes without tests | 0❌ |
 | G20 Cyclic import pairs | 0 |
 
@@ -74,10 +74,10 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/components` | 56 | 🔴 1 ssr | C92 | `src_lib_components` | `agents_md({ path: "src/lib/components" })` |
+| `src/lib/components` | 56 | — | C92 | `src_lib_components` | `agents_md({ path: "src/lib/components" })` |
 | `src/lib/components/admin` | 5 | — | C7 | `src_lib_components_admin` | `agents_md({ path: "src/lib/components/admin" })` |
 | `src/lib/components/agentic` | 2 | — | — | `src_lib_components_agentic` | `agents_md({ path: "src/lib/components/agentic" })` |
-| `src/lib/components/ai` | 45 | 🔴 2 ssr | C5 | `src_lib_components_ai` | `agents_md({ path: "src/lib/components/ai" })` |
+| `src/lib/components/ai` | 45 | — | C5 | `src_lib_components_ai` | `agents_md({ path: "src/lib/components/ai" })` |
 | `src/lib/components/analysis` | 3 | — | — | `src_lib_components_analysis` | `agents_md({ path: "src/lib/components/analysis" })` |
 | `src/lib/components/analytics` | 2 | — | — | `src_lib_components_analytics` | `agents_md({ path: "src/lib/components/analytics" })` |
 | `src/lib/components/cache` | 3 | — | — | `src_lib_components_cache` | `agents_md({ path: "src/lib/components/cache" })` |
@@ -89,22 +89,22 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/components/codebase` | 12 | — | — | `src_lib_components_codebase` | `agents_md({ path: "src/lib/components/codebase" })` |
 | `src/lib/components/courtroom` | 2 | — | — | `src_lib_components_courtroom` | `agents_md({ path: "src/lib/components/courtroom" })` |
 | `src/lib/components/dashboard` | 15 | — | C21 | `src_lib_components_dashboard` | `agents_md({ path: "src/lib/components/dashboard" })` |
-| `src/lib/components/detective` | 6 | 🔴 1 ssr | — | `src_lib_components_detective` | `agents_md({ path: "src/lib/components/detective" })` |
+| `src/lib/components/detective` | 6 | — | — | `src_lib_components_detective` | `agents_md({ path: "src/lib/components/detective" })` |
 | `src/lib/components/editor` | 7 | — | — | `src_lib_components_editor` | `agents_md({ path: "src/lib/components/editor" })` |
-| `src/lib/components/evidence` | 41 | 🔴 2 ssr | C86 | `src_lib_components_evidence` | `agents_md({ path: "src/lib/components/evidence" })` |
+| `src/lib/components/evidence` | 41 | — | C86 | `src_lib_components_evidence` | `agents_md({ path: "src/lib/components/evidence" })` |
 | `src/lib/components/forms` | 7 | — | C1 | `src_lib_components_forms` | `agents_md({ path: "src/lib/components/forms" })` |
-| `src/lib/components/legal` | 33 | 🔴 2 ssr | C35 | `src_lib_components_legal` | `agents_md({ path: "src/lib/components/legal" })` |
-| `src/lib/components/legal-ai` | 18 | 🔴 1 ssr | C35 | `src_lib_components_legal_ai` | `agents_md({ path: "src/lib/components/legal-ai" })` |
+| `src/lib/components/legal` | 33 | — | C35 | `src_lib_components_legal` | `agents_md({ path: "src/lib/components/legal" })` |
+| `src/lib/components/legal-ai` | 18 | — | C35 | `src_lib_components_legal_ai` | `agents_md({ path: "src/lib/components/legal-ai" })` |
 | `src/lib/components/legal-corpus` | 8 | — | C35 | `src_lib_components_legal_corpus` | `agents_md({ path: "src/lib/components/legal-corpus" })` |
 | `src/lib/components/modals` | 2 | — | — | `src_lib_components_modals` | `agents_md({ path: "src/lib/components/modals" })` |
 | `src/lib/components/monitoring` | 3 | — | — | `src_lib_components_monitoring` | `agents_md({ path: "src/lib/components/monitoring" })` |
-| `src/lib/components/phase78` | 5 | 🔴 1 ssr | — | `src_lib_components_phase78` | `agents_md({ path: "src/lib/components/phase78" })` |
+| `src/lib/components/phase78` | 5 | — | — | `src_lib_components_phase78` | `agents_md({ path: "src/lib/components/phase78" })` |
 | `src/lib/components/poi` | 10 | — | — | `src_lib_components_poi` | `agents_md({ path: "src/lib/components/poi" })` |
 | `src/lib/components/rag` | 4 | 🔴 1 ssr | — | `src_lib_components_rag` | `agents_md({ path: "src/lib/components/rag" })` |
 | `src/lib/components/recommendations` | 2 | — | — | `src_lib_components_recommendations` | `agents_md({ path: "src/lib/components/recommendations" })` |
 | `src/lib/components/shells` | 4 | — | — | `src_lib_components_shells` | `agents_md({ path: "src/lib/components/shells" })` |
 | `src/lib/components/source-validation` | 4 | — | — | `src_lib_components_source_validation` | `agents_md({ path: "src/lib/components/source-validation" })` |
-| `src/lib/components/ui` | 89 | 🔴 1 ssr | C34 | `src_lib_components_ui` | `agents_md({ path: "src/lib/components/ui" })` |
+| `src/lib/components/ui` | 89 | — | C34 | `src_lib_components_ui` | `agents_md({ path: "src/lib/components/ui" })` |
 | `src/lib/components/ui/alert-dialog` | 14 | — | C4 | `src_lib_components_ui_alert_dialog` | `agents_md({ path: "src/lib/components/ui/alert-dialog" })` |
 | `src/lib/components/ui/avatar` | 5 | — | — | `src_lib_components_ui_avatar` | `agents_md({ path: "src/lib/components/ui/avatar" })` |
 | `src/lib/components/ui/badge` | 3 | — | — | `src_lib_components_ui_badge` | `agents_md({ path: "src/lib/components/ui/badge" })` |
@@ -127,9 +127,9 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/components/ui/scrollarea` | 2 | — | — | `src_lib_components_ui_scrollarea` | `agents_md({ path: "src/lib/components/ui/scrollarea" })` |
 | `src/lib/components/ui/select` | 5 | — | C50 | `src_lib_components_ui_select` | `agents_md({ path: "src/lib/components/ui/select" })` |
 | `src/lib/components/ui/table` | 8 | — | — | `src_lib_components_ui_table` | `agents_md({ path: "src/lib/components/ui/table" })` |
-| `src/lib/components/ui/tabs` | 9 | 🔴 1 ssr | C67 | `src_lib_components_ui_tabs` | `agents_md({ path: "src/lib/components/ui/tabs" })` |
+| `src/lib/components/ui/tabs` | 9 | — | C67 | `src_lib_components_ui_tabs` | `agents_md({ path: "src/lib/components/ui/tabs" })` |
 | `src/lib/components/ui/textarea` | 2 | — | — | `src_lib_components_ui_textarea` | `agents_md({ path: "src/lib/components/ui/textarea" })` |
-| `src/lib/components/yorha` | 38 | 🔴 4 ssr | C50 | `src_lib_components_yorha` | `agents_md({ path: "src/lib/components/yorha" })` |
+| `src/lib/components/yorha` | 38 | — | C50 | `src_lib_components_yorha` | `agents_md({ path: "src/lib/components/yorha" })` |
 | `src/lib/components/yorha/_simulations` | 12 | — | — | `src_lib_components_yorha__simulations` | `agents_md({ path: "src/lib/components/yorha/_simulations" })` |
 | `src/lib/components/yorha/cases` | 3 | — | — | `src_lib_components_yorha_cases` | `agents_md({ path: "src/lib/components/yorha/cases" })` |
 | `src/lib/components/yorha/dashboard` | 14 | — | — | `src_lib_components_yorha_dashboard` | `agents_md({ path: "src/lib/components/yorha/dashboard" })` |
@@ -203,7 +203,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/schemas` | 5 | — | C29 | `src_lib_schemas` | `agents_md({ path: "src/lib/schemas" })` |
 | `src/lib/schemas/tools` | 8 | — | C32 | `src_lib_schemas_tools` | `agents_md({ path: "src/lib/schemas/tools" })` |
 
-### `src/lib/server/` (87 dirs)
+### `src/lib/server/` (91 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
@@ -229,6 +229,8 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/error-brain/transport` | 6 | — | — | `src_lib_server_error_brain_transport` | `agents_md({ path: "src/lib/server/error-brain/transport" })` |
 | `src/lib/server/evidence` | 9 | — | C66 | `src_lib_server_evidence` | `agents_md({ path: "src/lib/server/evidence" })` |
 | `src/lib/server/evidence/services` | 5 | — | C32 | `src_lib_server_evidence_services` | `agents_md({ path: "src/lib/server/evidence/services" })` |
+| `src/lib/server/ff1` | 2 | — | — | `src_lib_server_ff1` | `agents_md({ path: "src/lib/server/ff1" })` |
+| `src/lib/server/ff1/agent` | 2 | — | — | `src_lib_server_ff1_agent` | `agents_md({ path: "src/lib/server/ff1/agent" })` |
 | `src/lib/server/glyph` | 2 | — | — | `src_lib_server_glyph` | `agents_md({ path: "src/lib/server/glyph" })` |
 | `src/lib/server/gpu` | 9 | — | C20 | `src_lib_server_gpu` | `agents_md({ path: "src/lib/server/gpu" })` |
 | `src/lib/server/graph` | 17 | — | C73 | `src_lib_server_graph` | `agents_md({ path: "src/lib/server/graph" })` |
@@ -269,7 +271,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/services` | 7 | — | C43 | `src_lib_services` | `agents_md({ path: "src/lib/services" })` |
 | `src/lib/services/error-analysis` | 17 | — | C17 | `src_lib_services_error_analysis` | `agents_md({ path: "src/lib/services/error-analysis" })` |
-| `src/lib/services/knowledge-search` | 11 | 🔴 1 ssr | C17 | `src_lib_services_knowledge_search` | `agents_md({ path: "src/lib/services/knowledge-search" })` |
+| `src/lib/services/knowledge-search` | 11 | — | C17 | `src_lib_services_knowledge_search` | `agents_md({ path: "src/lib/services/knowledge-search" })` |
 
 ### `src/lib/shared/` (3 dirs)
 
@@ -281,7 +283,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/shims` | 11 | 🔴 1 ssr | C57 | `src_lib_shims` | `agents_md({ path: "src/lib/shims" })` |
+| `src/lib/shims` | 11 | — | C57 | `src_lib_shims` | `agents_md({ path: "src/lib/shims" })` |
 
 ### `src/lib/stores/` (3 dirs)
 
@@ -306,13 +308,13 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/utils` | 42 | 🔴 1 ssr | C1 | `src_lib_utils` | `agents_md({ path: "src/lib/utils" })` |
+| `src/lib/utils` | 42 | — | C1 | `src_lib_utils` | `agents_md({ path: "src/lib/utils" })` |
 
 ### `src/lib/webgpu/` (1 dir)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/webgpu` | 19 | 🔴 1 ssr | C23 | `src_lib_webgpu` | `agents_md({ path: "src/lib/webgpu" })` |
+| `src/lib/webgpu` | 19 | — | C23 | `src_lib_webgpu` | `agents_md({ path: "src/lib/webgpu" })` |
 
 ### `src/lib/workers/` (1 dir)
 
@@ -396,8 +398,8 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/cases/[id]/evidence/upload` | 2 | — | C92 | `src_routes__app__cases__id__evidence_upload` | `agents_md({ path: "src/routes/(app)/cases/[id]/evidence/upload" })` |
 | `src/routes/(app)/cases/[id]/notes` | 2 | — | — | `src_routes__app__cases__id__notes` | `agents_md({ path: "src/routes/(app)/cases/[id]/notes" })` |
 | `src/routes/(app)/cases/[id]/overview` | 3 | — | — | `src_routes__app__cases__id__overview` | `agents_md({ path: "src/routes/(app)/cases/[id]/overview" })` |
-| `src/routes/(app)/cases/[id]/reports` | 3 | 🔴 1 ssr | — | `src_routes__app__cases__id__reports` | `agents_md({ path: "src/routes/(app)/cases/[id]/reports" })` |
-| `src/routes/(app)/cases/new` | 3 | 🔴 1 ssr | — | `src_routes__app__cases_new` | `agents_md({ path: "src/routes/(app)/cases/new" })` |
+| `src/routes/(app)/cases/[id]/reports` | 3 | — | — | `src_routes__app__cases__id__reports` | `agents_md({ path: "src/routes/(app)/cases/[id]/reports" })` |
+| `src/routes/(app)/cases/new` | 3 | — | — | `src_routes__app__cases_new` | `agents_md({ path: "src/routes/(app)/cases/new" })` |
 | `src/routes/(app)/chat` | 2 | — | — | `src_routes__app__chat` | `agents_md({ path: "src/routes/(app)/chat" })` |
 | `src/routes/(app)/chat/[id]` | 2 | — | — | `src_routes__app__chat__id_` | `agents_md({ path: "src/routes/(app)/chat/[id]" })` |
 | `src/routes/(app)/citations` | 4 | — | — | `src_routes__app__citations` | `agents_md({ path: "src/routes/(app)/citations" })` |
@@ -408,7 +410,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/command-center` | 3 | — | C3 | `src_routes__app__command_center` | `agents_md({ path: "src/routes/(app)/command-center" })` |
 | `src/routes/(app)/command-center/codebase/clusters/[id]` | 2 | — | — | `src_routes__app__command_center_codebase_clusters__id_` | `agents_md({ path: "src/routes/(app)/command-center/codebase/clusters/[id]" })` |
 | `src/routes/(app)/command-center/codebase/components/[id]` | 2 | — | — | `src_routes__app__command_center_codebase_components__id_` | `agents_md({ path: "src/routes/(app)/command-center/codebase/components/[id]" })` |
-| `src/routes/(app)/command-center/codebase/errors` | 2 | 🔴 1 ssr | — | `src_routes__app__command_center_codebase_errors` | `agents_md({ path: "src/routes/(app)/command-center/codebase/errors" })` |
+| `src/routes/(app)/command-center/codebase/errors` | 2 | — | — | `src_routes__app__command_center_codebase_errors` | `agents_md({ path: "src/routes/(app)/command-center/codebase/errors" })` |
 | `src/routes/(app)/couchdb-analytics` | 5 | — | — | `src_routes__app__couchdb_analytics` | `agents_md({ path: "src/routes/(app)/couchdb-analytics" })` |
 | `src/routes/(app)/demos/agentic-errors` | 3 | — | — | `src_routes__app__demos_agentic_errors` | `agents_md({ path: "src/routes/(app)/demos/agentic-errors" })` |
 | `src/routes/(app)/demos/agentic-errors/analysis` | 2 | — | C83 | `src_routes__app__demos_agentic_errors_analysis` | `agents_md({ path: "src/routes/(app)/demos/agentic-errors/analysis" })` |
@@ -418,14 +420,14 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/demos/nes-graph` | 2 | — | — | `src_routes__app__demos_nes_graph` | `agents_md({ path: "src/routes/(app)/demos/nes-graph" })` |
 | `src/routes/(app)/demos/nes-routes` | 2 | — | — | `src_routes__app__demos_nes_routes` | `agents_md({ path: "src/routes/(app)/demos/nes-routes" })` |
 | `src/routes/(app)/demos/svelte5-components` | 2 | — | — | `src_routes__app__demos_svelte5_components` | `agents_md({ path: "src/routes/(app)/demos/svelte5-components" })` |
-| `src/routes/(app)/demos/yorha/components` | 4 | 🔴 2 ssr | C97 | `src_routes__app__demos_yorha_components` | `agents_md({ path: "src/routes/(app)/demos/yorha/components" })` |
+| `src/routes/(app)/demos/yorha/components` | 4 | — | C97 | `src_routes__app__demos_yorha_components` | `agents_md({ path: "src/routes/(app)/demos/yorha/components" })` |
 | `src/routes/(app)/demos/yorha/components/cases` | 3 | — | — | `src_routes__app__demos_yorha_components_cases` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/cases" })` |
 | `src/routes/(app)/demos/yorha/components/evidence` | 3 | — | C92 | `src_routes__app__demos_yorha_components_evidence` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/evidence" })` |
 | `src/routes/(app)/evidence` | 6 | 1/1 auth | C29 | `src_routes__app__evidence` | `agents_md({ path: "src/routes/(app)/evidence" })` |
 | `src/routes/(app)/evidence-library` | 2 | — | — | `src_routes__app__evidence_library` | `agents_md({ path: "src/routes/(app)/evidence-library" })` |
 | `src/routes/(app)/evidence/manage` | 2 | — | — | `src_routes__app__evidence_manage` | `agents_md({ path: "src/routes/(app)/evidence/manage" })` |
 | `src/routes/(app)/evidence/realtime` | 2 | — | — | `src_routes__app__evidence_realtime` | `agents_md({ path: "src/routes/(app)/evidence/realtime" })` |
-| `src/routes/(app)/evidence/upload` | 2 | 🔴 1 ssr | C92 | `src_routes__app__evidence_upload` | `agents_md({ path: "src/routes/(app)/evidence/upload" })` |
+| `src/routes/(app)/evidence/upload` | 2 | — | C92 | `src_routes__app__evidence_upload` | `agents_md({ path: "src/routes/(app)/evidence/upload" })` |
 | `src/routes/(app)/fictional-cases` | 2 | — | — | `src_routes__app__fictional_cases` | `agents_md({ path: "src/routes/(app)/fictional-cases" })` |
 | `src/routes/(app)/fictional-cases/[id]` | 2 | — | — | `src_routes__app__fictional_cases__id_` | `agents_md({ path: "src/routes/(app)/fictional-cases/[id]" })` |
 | `src/routes/(app)/legal-corpus` | 2 | — | C47 | `src_routes__app__legal_corpus` | `agents_md({ path: "src/routes/(app)/legal-corpus" })` |

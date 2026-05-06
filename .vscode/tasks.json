@@ -8630,6 +8630,102 @@
     },
 
     {
+      "label": "shell: 🔬 FF1: Audit (tsgo + svelte-check, OOM-safe)",
+      "type": "shell",
+      "command": "npm run ff1:audit",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Collect diagnostics (tsgo + svelte-check), rank by risk, write logs/ff1-diagnostics.json. READ-ONLY. OOM-safe: streaming, capped at 2000 entries.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "shell: ⚡ FF1: Audit Fast (tsgo only)",
+      "type": "shell",
+      "command": "npm run ff1:audit:fast",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Fast TypeScript-only audit via tsgo. Skips svelte-check. Use for quick diagnostic passes.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "shell: 🤔 FF1: Propose Fixes (Gemma4, read-only)",
+      "type": "shell",
+      "command": "npm run ff1:propose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Load diagnostics → call Gemma4 proposal_fixes → save logs/ff1-proposals.json. READ-ONLY. Requires ff1:audit to have run first.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "shell: ⚡ FF1: Propose Fast (top-3, no Qdrant)",
+      "type": "shell",
+      "command": "npm run ff1:propose:fast",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Propose fixes for top-3 errors without Qdrant lookup. OOM-safe mode.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "shell: 📊 FF1: Cache Stats",
+      "type": "shell",
+      "command": "npm run ff1:cache:stats",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Show FF1 Redis cache stats (key counts by prefix).",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "shell: 🔬 FF1: Full Pipeline (audit → propose)",
+      "type": "shell",
+      "command": "npm run ff1:audit && npm run ff1:propose",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Run audit then propose in sequence. OOM-safe: sequential, not parallel.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "🗺️ Graphify: Daily Map (fast AST + smoke)",
       "type": "shell",
       "command": "npm run graphify:daily",
@@ -8748,6 +8844,29 @@
       "group": "test",
       "detail": "Collect Redis wiki/BoW tile counts, Qdrant glyph_atlas size, graph JSON stats, AGENTS.md mirror count → write docs/graph/graphify-health.json + .md",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "♻️ Graphify: Re-seed LLM-Output Index",
+      "type": "shell",
+      "command": "npm run graphify:seed-llm-index",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Backfill code:llm_output:* from wiki notes — refreshes 6h TTL, repopulates by-cluster SETs, drives green tile tints in GraphifyViewer. Run after graphify:som / graphify:full.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "⏰ Graphify: LLM Index Hourly Refresh Loop",
+      "type": "shell",
+      "command": "while ($true) { npm run graphify:seed-llm-index; Start-Sleep -Seconds 3000 }",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend", "shell": { "executable": "pwsh" } },
+      "isBackground": true,
+      "group": "build",
+      "detail": "Run seed-llm-output-index every 50min (TTL/2 = keep entries warm). Stop with Terminal: Kill Task. Use during long ACE sessions without graphify:full.",
+      "presentation": { "reveal": "silent", "panel": "dedicated" },
       "problemMatcher": []
     },
 

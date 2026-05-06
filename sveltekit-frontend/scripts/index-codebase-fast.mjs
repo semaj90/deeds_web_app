@@ -234,7 +234,7 @@ const RE_RUNE_IN_TS  = /\$(?:state|derived|effect|props)\s*[(<]/;
 // Must be followed by access syntax (.X, [...], (...), ` =`, `==`, comparison) — typical global-access patterns.
 // Reject `?:` (TS optional field marker) and `:` (TS type annotation) which produce false positives like
 // `document?: DocumentInfo` and `interface Foo { document: any }`.
-const RE_SSR_UNSAFE  = /(?:^|[^\w.\-])(window|document|localStorage|sessionStorage|indexedDB|IndexedDB)(?=\s*(?:\.[a-zA-Z_]|\[|\()|\s*(?:===|!==|==|!=|<|>|=[^=]))/m;
+const RE_SSR_UNSAFE  = /\b(window|document|localStorage|indexedDB|navigator)\./;
 // Recognized SSR-safe markers: explicit guards, lifecycle hooks (run only in browser),
 // reactive runes ($effect runs only browser-side), event handler functions ("function ... {" preceding window/document refs).
 const RE_SSR_GUARD   = /typeof\s+(?:window|document|localStorage|sessionStorage|indexedDB|IndexedDB)\s*[!=]==?\s*['"]undefined['"]|\bonMount\b|\$effect\b|\bafterUpdate\b|\btick\s*\(|\bbrowser\s*[&|?]|import\.meta\.env\.SSR|from\s+['"]\$app\/environment['"]|export\s+const\s+ssr\s*=\s*false|window\.location\.href\s*=|setTimeout\s*\(\s*\(\s*\)\s*=>/;

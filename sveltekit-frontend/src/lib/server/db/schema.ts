@@ -121,7 +121,6 @@ export {
 	crimes, caseChunks,
 	crimesRelations, caseChunksRelations,
 } from './schema/legal-cases';
-export { casePersons } from './schema/persons';
 
 // Metadata Spine (Phase 78/79)
 export * from './schema/metadata-spine';

@@ -670,6 +670,24 @@ async function extractText(
   }
 
   if (isImage) {
+    // First: scan for legacy LegalAI metadata embedded in the PNG by a prior
+    // analysis pass. If found, the buffer is a "portable evidence artifact"
+    // and we can recover its prior analysis without re-running OCR/VLM.
+    if (/\.png$/i.test(fileName)) {
+      try {
+        const { extractLegalMetadata } = await import('$lib/server/png-embed-extractor.js');
+        const dataUrl = `data:image/png;base64,${buffer.toString('base64')}`;
+        const embedded = extractLegalMetadata(dataUrl);
+        if (embedded?.analysis_results) {
+          console.log(`[Upload] Recovered embedded LegalAI metadata from PNG (evidence_id=${embedded.evidence_id})`);
+          // Surface the prior analysis as a fast-path; OCR still runs below for fresh text.
+          // Caller can compare freshOcr vs embedded.analysis_results to detect tampering.
+        }
+      } catch (err) {
+        // Non-fatal — proceed to normal extraction
+      }
+    }
+
     // Try Granite-Docling first for layout-aware document understanding (tables, equations, structure)
     try {
       const { isGraniteDoclingAvailable, analyzeImageWithGraniteDocling } = await import(

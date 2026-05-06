@@ -99,6 +99,45 @@
   // SOM grid panel state
   let showSomGrid     = $state(false);
 
+  // Hottest LLM-output paths (path-keyed L1 cache leaderboard)
+  interface HottestPath { path: string; hitCount: number }
+  let hottestPaths    = $state<HottestPath[]>([]);
+  let showHottest     = $state(false);
+  let hottestLoading  = $state(false);
+
+  async function loadHottest() {
+    if (hottestLoading) return;
+    hottestLoading = true;
+    try {
+      const r = await fetch('/api/codebase-index/llm-output?hottest=20');
+      if (r.ok) {
+        const d = await r.json();
+        hottestPaths = Array.isArray(d.hottest) ? d.hottest : [];
+      }
+    } catch { /* non-fatal */ }
+    hottestLoading = false;
+  }
+
+  // Per-cluster LLM-hit counts (decorate cluster tiles with usage density)
+  let clusterHits = $state<Record<number, number>>({});
+  let clusterHitsMax = $derived.by(() => {
+    let m = 0;
+    for (const v of Object.values(clusterHits)) if (v > m) m = v;
+    return m;
+  });
+
+  async function loadClusterHits() {
+    try {
+      const r = await fetch('/api/codebase-index/llm-output?clusterStats=1');
+      if (r.ok) {
+        const d = await r.json();
+        clusterHits = (d.clusterHits ?? {}) as Record<number, number>;
+      }
+    } catch { /* non-fatal */ }
+  }
+
+  $effect(() => { loadClusterHits(); });
+
   interface SomCell {
     row: number;
     col: number;
@@ -159,23 +198,32 @@
   let glyphLoading    = $state(false);
 
   // ── Glyph Atlas (manifest + compare) ──────────────────────────────────────
-  let atlasManifest   = $state<any | null>(null);
+  let atlasManifest   = $state<GlyphAtlasManifest | null>(null);
   let atlasLoading    = $state(false);
   let atlasError      = $state<string | null>(null);
 
-  let selectedAtlasGlyph = $derived.by(() => {
+  let selectedAtlasGlyph = $derived.by((): GlyphDescriptor | null => {
     if (!atlasManifest || selectedCluster == null) return null;
-    const glyphs: any[] = atlasManifest.glyphs ?? atlasManifest.clusters ?? [];
-    return glyphs.find((g: any) =>
-      g.clusterId === selectedCluster ||
-      g.cluster   === selectedCluster ||
-      g.id        === selectedCluster
-    ) ?? null;
+    return atlasManifest.glyphs.find(g => g.clusterId === selectedCluster) ?? null;
+  });
+
+  let compareCandidates = $derived.by((): GlyphDescriptor[] => {
+    if (!atlasManifest || selectedCluster == null) return [];
+    return atlasManifest.glyphs.filter(g => g.clusterId !== selectedCluster);
   });
 
   let compareTargetCluster = $state<number | null>(null);
   let compareLoading       = $state(false);
-  let compareResult        = $state<any | null>(null);
+  let compareResult        = $state<{
+    glyphA: GlyphDescriptor;
+    glyphB: GlyphDescriptor;
+    comparison: {
+      cosineSimilarity: number;
+      l2Distance: number;
+      topDivergingTerms: Array<{ term: string; weightA: number; weightB: number; diff: number }>;
+      scalarDiff: { pageRank: number; ssrRisk: number; auditScore: number; pairedTest: number; somDistance: number };
+    };
+  } | null>(null);
   let compareError         = $state<string | null>(null);
 
   // ── Derived ────────────────────────────────────────────────────────────────
@@ -265,7 +313,7 @@
       const res = await fetch('/api/graph/glyph-atlas/compare', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ a: selectedCluster, b: compareTargetCluster }),
+        body:    JSON.stringify({ clusterIdA: selectedCluster, clusterIdB: compareTargetCluster }),
       });
       if (!res.ok) throw new Error(`Compare ${res.status}`);
       compareResult = await res.json();
@@ -403,13 +451,41 @@
     }
   }
 
+  // Rich cluster narrative from cluster_summaries × code_llm_index join
+  interface ClusterNarrative {
+    summary: string;
+    purpose?: string | null;
+    patterns: string[];
+    warnings: string[];
+    tags: string[];
+    bowTerms: string[];
+    representativePaths: string[];
+    memberCount: number;
+    llmPathCount: number;
+    llmTotalHits: number;
+    summaryModel?: string | null;
+  }
+  let clusterNarrative = $state<ClusterNarrative | null>(null);
+
   async function loadClusterSummary(clusterId: number) {
     if (clusterId < 0) return;
     clusterSummary = '';
+    clusterNarrative = null;
     summaryLoading = true;
     try {
-      const res = await fetch(`/api/graph/traverse?nodeId=cluster:${clusterId}&mode=cluster&limit=1`);
-      const data = await res.json() as TraverseResult;
+      const res = await fetch(`/api/graph/cluster-summaries?cluster=${clusterId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.cluster) {
+          clusterNarrative = data.cluster as ClusterNarrative;
+          clusterSummary   = data.cluster.summary ?? '';
+          summaryLoading = false;
+          return;
+        }
+      }
+      // Fallback to legacy gemma4Summary path
+      const legacy = await fetch(`/api/graph/traverse?nodeId=cluster:${clusterId}&mode=cluster&limit=1`);
+      const data = await legacy.json() as TraverseResult;
       clusterSummary = data.meta?.gemma4Summary ?? '';
     } catch {
       clusterSummary = '';
@@ -528,18 +604,23 @@
   <!-- ── Level 0: Cluster tiles ─────────────────────────────────────────── -->
   <div class="cluster-grid">
     {#each clusters.slice(0, 100) as c (c.id)}
+      {@const hits = clusterHits[c.id] ?? 0}
+      {@const hitIntensity = clusterHitsMax > 0 ? hits / clusterHitsMax : 0}
       <button
         class="cluster-tile"
         class:selected={selectedCluster === c.id}
         class:hot={c.ssrRisk > 0}
+        class:has-hits={hits > 0}
+        style={hits > 0 ? `--hit-intensity: ${hitIntensity}` : ''}
         onclick={() => selectCluster(c.id)}
-        title="Cluster {c.id} · {c.fileCount} files · {c.ssrRisk} SSR risks{c.somRow !== undefined ? ` · SOM (${c.somRow},${c.somCol})` : ''}"
+        title="Cluster {c.id} · {c.fileCount} files · {c.ssrRisk} SSR risks · {hits} LLM hits{c.somRow !== undefined ? ` · SOM (${c.somRow},${c.somCol})` : ''}"
       >
         <span class="cid">#{c.id}</span>
         <span class="cfiles">{c.fileCount}</span>
         {#if c.somRow !== undefined}
           <span class="som-pos">{c.somRow},{c.somCol}</span>
         {/if}
+        {#if hits > 0}  <span class="hit-badge">⚡{hits}</span> {/if}
         {#if c.ssrRisk}  <span class="ssr-badge">🔴{c.ssrRisk}</span> {/if}
         {#if c.pairedPct < 20}  <span class="test-badge">⚠️{c.pairedPct}%</span> {/if}
         <span class="ctags">{c.topTags?.slice(0,3).join(' ')}</span>
@@ -588,6 +669,30 @@
     </div>
   {/if}
 
+  <!-- ── Hottest LLM-Output Paths (Redis L1 leaderboard) ─────────────────── -->
+  <div class="hottest-section">
+    <button class="som-toggle" onclick={() => { showHottest = !showHottest; if (showHottest && !hottestPaths.length) loadHottest(); }}>
+      {showHottest ? '▾' : '▸'} Hottest LLM Outputs {hottestPaths.length ? `(${hottestPaths.length})` : ''}
+    </button>
+    {#if showHottest}
+      {#if hottestLoading}
+        <div class="hottest-loading">loading…</div>
+      {:else if hottestPaths.length === 0}
+        <div class="hottest-empty">No cached LLM outputs yet. Records appear here as ACE/Gemma4/RAG hit the cache.</div>
+      {:else}
+        <ol class="hottest-list">
+          {#each hottestPaths as h, i}
+            <li class="hottest-item">
+              <span class="hottest-rank">#{i + 1}</span>
+              <span class="hottest-path" title={h.path}>{h.path.split('/').slice(-3).join('/')}</span>
+              <span class="hottest-count">{h.hitCount}×</span>
+            </li>
+          {/each}
+        </ol>
+      {/if}
+    {/if}
+  </div>
+
   <!-- ── Gemma4 cluster summary + BoW panel (side by side when both visible) -->
   {#if selectedCluster !== null}
     <div class="cluster-detail-row">
@@ -598,6 +703,40 @@
             <span class="summary-loading">💬 Loading Gemma4 summary…</span>
           {:else}
             <p class="summary-text">{clusterSummary}</p>
+            {#if clusterNarrative}
+              <div class="narrative-meta">
+                {#if clusterNarrative.purpose}
+                  <div class="narrative-row"><span class="nm-label">Purpose</span> {clusterNarrative.purpose}</div>
+                {/if}
+                {#if clusterNarrative.patterns.length}
+                  <div class="narrative-row"><span class="nm-label">Patterns</span> {clusterNarrative.patterns.join(' · ')}</div>
+                {/if}
+                {#if clusterNarrative.warnings.length}
+                  <div class="narrative-row narrative-warn"><span class="nm-label">⚠ Warnings</span> {clusterNarrative.warnings.join('; ')}</div>
+                {/if}
+                {#if clusterNarrative.bowTerms.length}
+                  <div class="narrative-chips">
+                    {#each clusterNarrative.bowTerms as term}
+                      <span class="narrative-chip">{term}</span>
+                    {/each}
+                  </div>
+                {/if}
+                {#if clusterNarrative.representativePaths.length}
+                  <details class="narrative-paths">
+                    <summary>Representative paths ({clusterNarrative.representativePaths.length})</summary>
+                    {#each clusterNarrative.representativePaths as p}
+                      <div class="narrative-path">{p}</div>
+                    {/each}
+                  </details>
+                {/if}
+                <div class="narrative-stats">
+                  <span>{clusterNarrative.memberCount} members</span>
+                  {#if clusterNarrative.llmPathCount}<span>· ⚡{clusterNarrative.llmPathCount} LLM paths</span>{/if}
+                  {#if clusterNarrative.llmTotalHits > 0}<span>· {clusterNarrative.llmTotalHits} hits</span>{/if}
+                  {#if clusterNarrative.summaryModel}<span class="nm-model">{clusterNarrative.summaryModel}</span>{/if}
+                </div>
+              </div>
+            {/if}
           {/if}
         </div>
       {/if}
@@ -671,40 +810,46 @@
       {:else}
         <div class="atlas-grid">
           <div>
-            <strong>Cluster</strong>
-            <span>{selectedAtlasGlyph.clusterId ?? selectedCluster}</span>
+            <strong>Topic</strong>
+            <span>{selectedAtlasGlyph.topic || '—'}</span>
           </div>
           <div>
-            <strong>SOM</strong>
+            <strong>SOM centroid</strong>
             <span>
-              {selectedAtlasGlyph.somX ?? selectedAtlasGlyph.som?.x ?? '—'} :
-              {selectedAtlasGlyph.somY ?? selectedAtlasGlyph.som?.y ?? '—'}
+              ({selectedAtlasGlyph.somRowCentroid.toFixed(2)},
+               {selectedAtlasGlyph.somColCentroid.toFixed(2)})
             </span>
           </div>
           <div>
             <strong>PageRank mean</strong>
-            <span>{Number(selectedAtlasGlyph.pageRankMean ?? 0).toFixed(4)}</span>
+            <span>{selectedAtlasGlyph.pageRankMean.toFixed(4)}</span>
           </div>
           <div>
             <strong>Audit score</strong>
-            <span>{Number(selectedAtlasGlyph.auditScore ?? 0).toFixed(1)}</span>
+            <span>{selectedAtlasGlyph.auditScore.toFixed(2)}</span>
           </div>
           <div>
             <strong>SSR risk</strong>
-            <span>{Number(selectedAtlasGlyph.ssrRisk ?? selectedAtlasGlyph.ssrRiskRatio ?? 0).toFixed(2)}</span>
+            <span>{selectedAtlasGlyph.ssrRisk.toFixed(2)}</span>
           </div>
           <div>
             <strong>Paired-test ratio</strong>
-            <span>{Number(selectedAtlasGlyph.pairedTestRatio ?? 0).toFixed(2)}</span>
+            <span>{selectedAtlasGlyph.pairedTestRatio.toFixed(2)}</span>
+          </div>
+          <div>
+            <strong>Files / dirs</strong>
+            <span>{selectedAtlasGlyph.fileCount} / {selectedAtlasGlyph.dirCount}</span>
           </div>
         </div>
 
-        {#if selectedAtlasGlyph.topTerms?.length}
+        {#if selectedAtlasGlyph.terms?.length}
           <div class="atlas-terms">
             <strong>Top BoW terms</strong>
             <div class="atlas-term-list">
-              {#each (selectedAtlasGlyph.topTerms as any[]).slice(0, 12) as term}
-                <span>{typeof term === 'string' ? term : (term as any).term}</span>
+              {#each selectedAtlasGlyph.terms.slice(0, 12) as term, i}
+                <span title={`weight ${selectedAtlasGlyph.weights[i]?.toFixed(3) ?? '0'}`}>
+                  {term}
+                </span>
               {/each}
             </div>
           </div>
@@ -713,12 +858,12 @@
         <div class="atlas-compare-row">
           <label>
             Compare with cluster
-            <input
-              type="number"
-              min="0"
-              bind:value={compareTargetCluster}
-              placeholder="cluster id"
-            />
+            <select bind:value={compareTargetCluster}>
+              <option value={null}>—</option>
+              {#each compareCandidates.slice(0, 50) as g (g.clusterId)}
+                <option value={g.clusterId}>#{g.clusterId} {g.topic}</option>
+              {/each}
+            </select>
           </label>
           <button
             onclick={compareSelectedGlyph}
@@ -733,9 +878,35 @@
         {/if}
 
         {#if compareResult}
+          {@const cmp = compareResult.comparison}
           <div class="atlas-compare-result">
-            <h4>Comparison result</h4>
-            <pre>{JSON.stringify(compareResult, null, 2)}</pre>
+            <h4>
+              #{compareResult.glyphA.clusterId} vs #{compareResult.glyphB.clusterId}
+              <span class="cosine-sim">cos {cmp.cosineSimilarity.toFixed(3)}</span>
+              <span class="l2-dist">L2 {cmp.l2Distance.toFixed(3)}</span>
+            </h4>
+            <div class="scalar-diffs">
+              {#each Object.entries(cmp.scalarDiff) as [k, v]}
+                <span class="scalar-diff" class:pos={(v as number) > 0} class:neg={(v as number) < 0}>
+                  {k}: {(v as number).toFixed(3)}
+                </span>
+              {/each}
+            </div>
+            {#if cmp.topDivergingTerms?.length}
+              <div class="diverge-terms">
+                <strong>Top diverging terms</strong>
+                {#each cmp.topDivergingTerms.slice(0, 10) as t (t.term)}
+                  <div class="diverge-row">
+                    <span class="diverge-term">{t.term}</span>
+                    <span class="diverge-bar">
+                      <span class="bar-a" style="width:{(t.weightA * 100).toFixed(1)}%"></span>
+                      <span class="bar-b" style="width:{(t.weightB * 100).toFixed(1)}%"></span>
+                    </span>
+                    <span class="diverge-diff">{t.diff > 0 ? '+' : ''}{t.diff.toFixed(2)}</span>
+                  </div>
+                {/each}
+              </div>
+            {/if}
           </div>
         {/if}
       {/if}
@@ -895,6 +1066,11 @@
   .cluster-tile:hover   { border-color: #668; }
   .cluster-tile.selected { border-color: #88f; background: #1a1a2e; }
   .cluster-tile.hot     { border-color: #833; }
+  .cluster-tile.has-hits {
+    background: rgba(80, 180, 120, calc(var(--hit-intensity, 0) * 0.22 + 0.04));
+    border-color: rgba(80, 180, 120, calc(var(--hit-intensity, 0) * 0.6 + 0.25));
+  }
+  .hit-badge { color: #6c6; font-weight: 600; }
   .cid    { font-weight: 700; color: #88f; }
   .cfiles { color: #aaa; }
   .ssr-badge  { color: #f66; }
@@ -916,7 +1092,29 @@
     background: #0d0d1a; color: #99b; font-size: 0.75rem; line-height: 1.5;
   }
   .summary-loading { color: #66a; font-style: italic; }
-  .summary-text { margin: 0; }
+  .summary-text { margin: 0 0 0.5rem 0; color: #ccd; }
+
+  .narrative-meta { display: flex; flex-direction: column; gap: 4px; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #223; }
+  .narrative-row { font-size: 0.7rem; color: #99a; }
+  .narrative-warn { color: #c95; }
+  .nm-label { color: #6b7; font-weight: 600; margin-right: 6px; }
+  .nm-model { color: #557; font-family: ui-monospace, monospace; }
+  .narrative-chips { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+  .narrative-chip {
+    background: #1a1a2e; border: 1px solid #223; color: #88a;
+    padding: 1px 6px; border-radius: 3px; font-size: 0.65rem;
+    font-family: ui-monospace, monospace;
+  }
+  .narrative-paths { font-size: 0.68rem; color: #889; margin-top: 4px; }
+  .narrative-paths summary { cursor: pointer; color: #6b7; }
+  .narrative-path {
+    color: #99a; font-family: ui-monospace, monospace;
+    padding: 1px 0 1px 12px; word-break: break-all;
+  }
+  .narrative-stats {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;
+    font-size: 0.68rem; color: #67a; font-variant-numeric: tabular-nums;
+  }
   .bow-wrap {
     width: 320px;
     flex-shrink: 0;
@@ -1096,14 +1294,81 @@
   }
   .atlas-compare-row button:hover:not(:disabled) { background: #1a1a2e; border-color: #668; }
   .atlas-compare-row button:disabled { opacity: 0.35; cursor: default; }
-  .atlas-compare-result pre {
-    overflow: auto; max-height: 240px; padding: 0.65rem;
-    border-radius: 6px; background: rgba(0,0,0,0.4);
-    font-size: 0.7rem; color: #cce; margin: 0;
+  .atlas-compare-result {
+    margin-top: 0.5rem;
+    padding: 0.6rem;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid #234;
+    display: flex; flex-direction: column; gap: 0.45rem;
   }
-  .atlas-compare-result h4 { margin: 0 0 0.4rem; font-size: 0.75rem; color: #88f; }
+  .atlas-compare-result h4 {
+    margin: 0; font-size: 0.78rem; color: #88f;
+    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  }
+  .cosine-sim, .l2-dist {
+    font-size: 0.7rem; padding: 1px 6px; border-radius: 3px;
+    background: #112; color: #aaf; font-weight: 400;
+  }
+  .scalar-diffs { display: flex; flex-wrap: wrap; gap: 4px; }
+  .scalar-diff {
+    padding: 1px 6px; border-radius: 3px; font-size: 0.7rem;
+    background: #111; border: 1px solid #223; color: #99b;
+    font-variant-numeric: tabular-nums;
+  }
+  .scalar-diff.pos { color: #4d4; border-color: #1a3a1a; background: #0a160a; }
+  .scalar-diff.neg { color: #f66; border-color: #3a1a1a; background: #160a0a; }
+  .diverge-terms { display: flex; flex-direction: column; gap: 3px; }
+  .diverge-terms strong { font-size: 0.68rem; color: #99b; opacity: 0.8; }
+  .diverge-row {
+    display: grid; grid-template-columns: 110px 1fr 50px;
+    align-items: center; gap: 6px; font-size: 0.7rem;
+  }
+  .diverge-term { color: #cce; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .diverge-bar {
+    position: relative; height: 8px; background: #050510;
+    border-radius: 2px; overflow: hidden; display: flex;
+  }
+  .diverge-bar .bar-a { background: #4af; height: 100%; opacity: 0.7; }
+  .diverge-bar .bar-b { background: #4d4; height: 100%; opacity: 0.7; }
+  .diverge-diff {
+    text-align: right; color: #aaf;
+    font-variant-numeric: tabular-nums; font-size: 0.68rem;
+  }
+  .atlas-compare-row select {
+    background: #111; border: 1px solid #334; color: #eee;
+    padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; min-width: 200px;
+  }
   .atlas-error { color: #ff8a8a; margin: 0; font-size: 0.75rem; }
   .atlas-muted  { opacity: 0.65; margin: 0; font-size: 0.75rem; }
+
+  /* Hottest LLM outputs */
+  .hottest-section { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+  .hottest-loading, .hottest-empty {
+    font-size: 0.72rem; color: #778; padding: 0.5rem 0.75rem;
+    background: #0f1020; border: 1px solid #223; border-radius: 4px;
+  }
+  .hottest-list {
+    list-style: none; padding: 0; margin: 0;
+    background: #0f1020; border: 1px solid #223; border-radius: 4px;
+    max-height: 280px; overflow-y: auto;
+  }
+  .hottest-item {
+    display: grid; grid-template-columns: 32px 1fr 48px;
+    gap: 6px; align-items: center;
+    padding: 4px 8px; font-size: 0.72rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .hottest-item:last-child { border-bottom: none; }
+  .hottest-rank { color: #667; font-variant-numeric: tabular-nums; }
+  .hottest-path {
+    color: #ccd; font-family: ui-monospace, monospace;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hottest-count {
+    color: #6b6; text-align: right; font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
 
   /* SOM grid */
   .som-section { display: flex; flex-direction: column; gap: 0.4rem; }

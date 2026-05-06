@@ -168,17 +168,23 @@ async function probeRedisWikiNotes() {
     }
 
     let withSummary = 0;
-    for (const k of keys.slice(0, 20)) {
+    // Scan all keys (not just first 20) — batch writes typically go to non-alphabetically-first keys
+    for (const k of keys) {
       const raw = await redis.get(k);
       if (!raw) continue;
       try {
         const note = JSON.parse(raw);
-        if (note.gemma4Summary && note.gemma4Summary.length > 20) withSummary++;
+        if (note.gemma4Summary && note.gemma4Summary.length > 20) {
+          withSummary++;
+          if (withSummary <= 2) {
+            console.log(`    [sample] ${k.replace('wiki:note:dir:', '')} → "${note.gemma4Summary.slice(0, 70)}..."`);
+          }
+        }
       } catch { /* skip */ }
     }
 
     if (withSummary > 0) {
-      pass('wiki:note:dir Gemma4 summaries', `${withSummary}/${Math.min(keys.length, 20)} sampled have gemma4Summary`);
+      pass('wiki:note:dir Gemma4 summaries', `${withSummary}/${keys.length} keys have gemma4Summary`);
     } else {
       fail('wiki:note:dir Gemma4 summaries', `${keys.length} keys exist but none have gemma4Summary — re-run batch analysis`);
     }

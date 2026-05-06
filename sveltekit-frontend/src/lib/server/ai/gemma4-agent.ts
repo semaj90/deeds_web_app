@@ -700,6 +700,7 @@ export interface AgentRunResult {
   requestedBackend?: 'bifrost' | 'turboquant';
   inferenceBackend?: 'bifrost' | 'turboquant' | 'ollama' | 'cache';
   backendFallbackReason?: string;
+  yorha?: Record<string, unknown>;
 }
 
 // ── Agent loop ────────────────────────────────────────────────────────────────

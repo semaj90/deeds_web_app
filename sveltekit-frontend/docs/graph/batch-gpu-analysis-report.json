@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-05T13:25:08.879Z",
+  "generatedAt": "2026-05-05T13:36:44.270Z",
   "dryRun": false,
   "skipLlm": false,
   "graph": {
@@ -20,6 +20,7 @@
     "tagsUpdated": 0,
     "agentsWritten": 1217,
     "clusterSummaries": 70,
+    "codeLlmWritten": 1217,
     "turboUsed": true
   },
   "topDirectoriesByPageRank": [

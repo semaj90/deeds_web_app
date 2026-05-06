@@ -13,5 +13,6 @@ export function getEnvUrl(envName: string, dockerHost: string, localFallback?: s
 }
 
 export function getEnhancedRagEndpoint(): string {
+	// audit:ignore-localhost — third-tier dev fallback after ENV → Docker hostname
 	return getEnvUrl('ENHANCED_RAG_URL', 'http://enhanced-rag:8094', 'http://localhost:8094');
 }

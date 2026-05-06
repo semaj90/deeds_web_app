@@ -1,0 +1,12 @@
+{
+  "routes": {
+    "src/routes/.well-known/ai-plugin.json/+server.ts": {
+      "reason": "public well-known metadata endpoint",
+      "allowed": true
+    },
+    "src/routes/api/health/+server.ts": {
+      "reason": "public health check",
+      "allowed": true
+    }
+  }
+}

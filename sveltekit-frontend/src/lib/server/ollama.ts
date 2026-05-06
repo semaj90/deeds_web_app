@@ -253,13 +253,241 @@ function logBifrostCacheTrace(
   });
 }
 
+// ── TurboQuant Intercept ──────────────────────────────────────────────────
+// When enabled, ollamaFetch() transparently routes /api/chat and /api/generate
+// through TurboQuant llama-server (:8090) for ~78 tok/s GPU inference.
+// Ollama remains as automatic fallback when TurboQuant is unavailable.
+// Toggle: TURBOQUANT_INTERCEPT=false to disable.
+const TURBOQUANT_INTERCEPT_ENABLED =
+  (process.env?.TURBOQUANT_INTERCEPT ?? 'true') === 'true';
+
+/** Cached health status to avoid hitting /health on every single request */
+let _turboHealthy = false;
+let _turboHealthCheckedAt = 0;
+const TURBO_HEALTH_CACHE_MS = 5_000;
+
+async function isTurboQuantHealthy(): Promise<boolean> {
+  if (Date.now() - _turboHealthCheckedAt < TURBO_HEALTH_CACHE_MS) {
+    return _turboHealthy;
+  }
+  try {
+    const res = await fetch(`${TURBOQUANT_BASE_URL}/health`, {
+      signal: AbortSignal.timeout(800),
+    });
+    _turboHealthy = res.ok;
+  } catch {
+    _turboHealthy = false;
+  }
+  _turboHealthCheckedAt = Date.now();
+  return _turboHealthy;
+}
+
+/**
+ * Try to intercept an Ollama /api/chat or /api/generate request and route
+ * it through TurboQuant instead. Returns a Response in Ollama-compatible
+ * format, or null to fall through to Ollama.
+ *
+ * Only intercepts non-streaming requests (stream: false). Streaming stays
+ * on Ollama since TurboQuant SSE → Ollama ndjson conversion is non-trivial.
+ */
+async function tryTurboQuantIntercept(
+  url: string,
+  init?: RequestInit
+): Promise<Response | null> {
+  if (!TURBOQUANT_INTERCEPT_ENABLED) return null;
+  if (typeof init?.body !== 'string') return null;
+
+  // Detect endpoint from URL
+  let urlPath: string;
+  try {
+    urlPath = new URL(url, OLLAMA_BASE_URL).pathname;
+  } catch {
+    return null;
+  }
+  const isChatEndpoint = urlPath === '/api/chat';
+  const isGenerateEndpoint = urlPath === '/api/generate';
+  if (!isChatEndpoint && !isGenerateEndpoint) return null;
+
+  // Parse Ollama request body
+  let ollamaBody: Record<string, any>;
+  try {
+    ollamaBody = JSON.parse(init.body);
+  } catch {
+    return null;
+  }
+
+  // Only intercept non-streaming requests
+  if (ollamaBody.stream !== false) return null;
+
+  // Check TurboQuant health (cached 5s)
+  if (!(await isTurboQuantHealthy())) return null;
+
+  try {
+    const startMs = performance.now();
+
+    // Convert Ollama format → OpenAI messages format
+    const openaiMessages: Array<{ role: string; content: string }> = [];
+
+    if (isChatEndpoint) {
+      // /api/chat: { messages: [...], model, options: { temperature, num_predict } }
+      if (Array.isArray(ollamaBody.messages)) {
+        for (const msg of ollamaBody.messages) {
+          openaiMessages.push({ role: msg.role, content: msg.content });
+        }
+      }
+    } else {
+      // /api/generate: { prompt: "...", system: "...", model, options: {...} }
+      if (ollamaBody.system) {
+        openaiMessages.push({ role: 'system', content: ollamaBody.system });
+      }
+      openaiMessages.push({ role: 'user', content: ollamaBody.prompt ?? '' });
+    }
+
+    if (openaiMessages.length === 0) return null;
+
+    const temperature = ollamaBody.options?.temperature ?? 0.7;
+    const maxTokens = ollamaBody.options?.num_predict ?? 2048;
+
+    // Build TurboQuant request (OpenAI-compatible)
+    const tqRequestBody: Record<string, unknown> = {
+      messages: openaiMessages,
+      max_tokens: maxTokens,
+      temperature,
+      stream: false,
+      cache_prompt: true,
+    };
+
+    // Pass through tools if present (llama-server supports OpenAI tool calling)
+    if (ollamaBody.tools) {
+      tqRequestBody.tools = ollamaBody.tools;
+    }
+
+    const tqRes = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tqRequestBody),
+      signal: AbortSignal.timeout(120_000),
+    });
+
+    if (!tqRes.ok) return null;
+
+    const tqData = (await tqRes.json()) as {
+      choices?: Array<{
+        message?: {
+          content?: string;
+          reasoning_content?: string;
+          tool_calls?: Array<{
+            function: { name: string; arguments: string | Record<string, unknown> };
+          }>;
+        };
+      }>;
+      usage?: {
+        prompt_tokens?: number;
+        completion_tokens?: number;
+        total_tokens?: number;
+      };
+    };
+
+    const choice = tqData.choices?.[0]?.message;
+    const content = choice?.content ?? choice?.reasoning_content ?? '';
+    // Don't require content if tool_calls are present (tool-calling responses may have empty content)
+    if (!content && !choice?.tool_calls?.length) return null;
+
+    const latencyMs = Math.round(performance.now() - startMs);
+    const usage = tqData.usage ?? {};
+
+    // Convert OpenAI tool_calls format to Ollama format
+    // OpenAI: arguments is a JSON string; Ollama: arguments is a parsed object
+    let ollamaToolCalls: Array<{ function: { name: string; arguments: Record<string, unknown> } }> | undefined;
+    if (choice?.tool_calls?.length) {
+      ollamaToolCalls = choice.tool_calls.map((tc) => {
+        let args: Record<string, unknown> = {};
+        if (typeof tc.function.arguments === 'string') {
+          try {
+            args = JSON.parse(tc.function.arguments);
+          } catch { /* keep empty */ }
+        } else if (typeof tc.function.arguments === 'object' && tc.function.arguments !== null) {
+          args = tc.function.arguments as Record<string, unknown>;
+        }
+        return { function: { name: tc.function.name, arguments: args } };
+      });
+    }
+
+    // Convert response to Ollama format
+    let ollamaResponse: Record<string, unknown>;
+
+    if (isChatEndpoint) {
+      const message: Record<string, unknown> = { role: 'assistant', content };
+      if (ollamaToolCalls?.length) {
+        message.tool_calls = ollamaToolCalls;
+      }
+      ollamaResponse = {
+        model: ollamaBody.model ?? 'gemma4-legal:latest',
+        created_at: new Date().toISOString(),
+        message,
+        done: true,
+        total_duration: latencyMs * 1_000_000,
+        load_duration: 0,
+        prompt_eval_count: usage.prompt_tokens ?? 0,
+        prompt_eval_duration: 0,
+        eval_count: usage.completion_tokens ?? 0,
+        eval_duration: latencyMs * 1_000_000,
+      };
+    } else {
+      // /api/generate response format
+      ollamaResponse = {
+        model: ollamaBody.model ?? 'gemma4-legal:latest',
+        created_at: new Date().toISOString(),
+        response: content,
+        done: true,
+        total_duration: latencyMs * 1_000_000,
+        load_duration: 0,
+        prompt_eval_count: usage.prompt_tokens ?? 0,
+        prompt_eval_duration: 0,
+        eval_count: usage.completion_tokens ?? 0,
+        eval_duration: latencyMs * 1_000_000,
+      };
+    }
+
+    const tps =
+      usage.completion_tokens && latencyMs > 0
+        ? ((usage.completion_tokens / latencyMs) * 1000).toFixed(1)
+        : '?';
+    console.info(
+      `[turbo-intercept] ${urlPath} → TurboQuant ${latencyMs}ms ` +
+        `(${usage.completion_tokens ?? '?'} tokens, ${tps} tok/s)`
+    );
+
+    return new Response(JSON.stringify(ollamaResponse), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    console.debug(
+      `[turbo-intercept] Failed, falling back to Ollama: ${(err as Error)?.message?.slice(0, 100)}`
+    );
+    return null;
+  }
+}
+
 /**
  * Shared fetch wrapper for Ollama requests with connection pooling.
  * All Ollama HTTP calls should use this instead of raw fetch().
+ *
+ * When TurboQuant (llama-server :8090) is running, /api/chat and /api/generate
+ * requests are transparently routed through TurboQuant for ~78 tok/s GPU
+ * inference. Ollama is used as automatic fallback.
  */
 export async function ollamaFetch(url: string, init?: RequestInit): Promise<Response> {
   const meta = extractOllamaRequestMeta(url, init);
   const startedAt = Date.now();
+
+  // TurboQuant intercept: route /api/chat and /api/generate through GPU llama-server
+  const turboResponse = await tryTurboQuantIntercept(url, init);
+  if (turboResponse) {
+    logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200);
+    return turboResponse;
+  }
 
   try {
     const response = await fetch(url, {

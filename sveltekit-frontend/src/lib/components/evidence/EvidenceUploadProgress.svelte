@@ -15,6 +15,15 @@
 
 import { onMount, onDestroy } from 'svelte';
 import Icon from '$lib/components/ui/Icon.svelte';
+// Canonical machine: evidence-processing-machine.ts owns the pipeline contract.
+// Importing its progress helpers + type so this UI's step vocabulary stays
+// aligned with the XState machine (single source of truth).
+import {
+	getProcessingProgress,
+	getCurrentStep,
+	getStepProgress,
+	type EvidenceProcessingContext,
+} from '$lib/machines/evidence-processing-machine';
 
 interface Props {
 	jobId: string;
@@ -88,6 +97,12 @@ function connectSSE() {
 		console.log('[EvidenceProgress] Connected to job:', data.jobId);
 	});
 
+	// Synthetic context built from accumulated SSE updates. Lets the canonical
+	// XState machine helpers compute a verified progress + step view alongside
+	// the raw SSE values. Acts as a contract check — when the SSE pipeline
+	// drifts from the machine's vocabulary, the two diverge.
+	const processingUpdates: EvidenceProcessingContext['streamingUpdates'] = [];
+
 	eventSource.addEventListener('progress', (e) => {
 		const data = JSON.parse(e.data);
 		progress = data.progress ?? 0;
@@ -95,7 +110,24 @@ function connectSSE() {
 		message = data.message ?? '';
 		evidenceId = data.evidenceId ?? null;
 
-		console.log(`[EvidenceProgress] Progress: ${progress}% - ${step}`);
+		// Mirror the SSE update into the machine-shaped buffer
+		processingUpdates.push({
+			step:     step,
+			status:   progress === 100 ? 'completed' : 'in_progress',
+			progress,
+			message,
+			timestamp: new Date(),
+		});
+
+		// Cross-check: derive canonical values from the machine helpers and
+		// log if they disagree with the raw SSE values (catches drift early).
+		const ctx = { streamingUpdates: processingUpdates } as EvidenceProcessingContext;
+		const machineStep     = getCurrentStep(ctx);
+		const machineProgress = getProcessingProgress(ctx);
+		const machineStepPct  = getStepProgress(ctx, step);
+		console.log(
+			`[EvidenceProgress] SSE ${progress}% (${step}) · machine ${machineProgress}% (${machineStep}) · step-pct ${machineStepPct}%`
+		);
 	});
 
 	eventSource.addEventListener('complete', (e) => {

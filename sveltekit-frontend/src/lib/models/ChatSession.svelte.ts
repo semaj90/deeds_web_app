@@ -11,6 +11,7 @@ import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib
 import { isE2BReady } from '$lib/ai/gemma4-e2b-client.js';
 import { evaluateSynthesisQuality, scoreRetrievalConfidence, recordFeedback, getThresholds, type RetrievalSignals } from '$lib/ai/client-quality.js';
 import { synthesize } from '$lib/ai/client-llm-synthesis.js';
+import { generateText as unifiedGenerate } from '$lib/ai/unified-generation.js';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -632,6 +633,37 @@ export class ChatSession {
     const t0 = performance.now();
     this.status = 'thinking';
     this.error = null;
+
+    // Step 0: Bifrost L2 semantic cache fast-path. The unified-generation cascade
+    // checks Bifrost (vector similarity) BEFORE running local inference — a hit
+    // returns in 2-5s without touching E2B/ONNX/server. Only attempt for short
+    // queries; long-context messages bypass this and go straight to local infra.
+    if (message.length > 0 && message.length < 1000) {
+      try {
+        const bifrost = await unifiedGenerate({
+          prompt:           message,
+          forceLocal:       false,
+          useBifrostCache:  true,
+          bifrostThreshold: 0.85,
+          maxTokens:        400,
+        });
+        if (bifrost.cacheLayer === 'bifrost_l2' && bifrost.text) {
+          console.info(`[ChatRouter] Bifrost L2 hit (${bifrost.latencyMs}ms)`);
+          this.messages.push({
+            role: 'assistant',
+            content: bifrost.text,
+            timestamp: new Date().toISOString(),
+            source: 'local-e2b',
+            metadata: { routerDecision: decision },
+          });
+          clientCache.saveChatMessage(this._chatId, 'assistant', bifrost.text, {
+            source: 'local-e2b', routerDecision: decision,
+          });
+          this.status = 'idle';
+          return;
+        }
+      } catch { /* non-fatal — fall through to local cascade */ }
+    }
 
     // Check synthesis cache first (shared with ONNX path)
     const cached = await clientCache.getReply(message);

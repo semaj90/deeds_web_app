@@ -194,6 +194,12 @@ export class QdrantManager {
       { collection: this.collections.evidence, field: 'cluster_id', schema: 'keyword' },
       { collection: this.collections.evidence, field: 'tags', schema: 'keyword' },
       { collection: this.collections.evidence, field: 'entity_labels', schema: 'keyword' },
+      // ── summary_lenses — KAG/TRACE multi-lens retrieval ──────────────
+      { collection: this.collections.summary_lenses, field: 'stable_key', schema: 'keyword' },
+      { collection: this.collections.summary_lenses, field: 'lens_type', schema: 'keyword' },
+      // ── synthesis_memory — long-term agent memory ────────────────────
+      { collection: this.collections.synthesis_memory, field: 'source', schema: 'keyword' },
+      { collection: this.collections.synthesis_memory, field: 'tags', schema: 'keyword' },
     ];
 
     for (const { collection, field, schema } of indexConfigs) {

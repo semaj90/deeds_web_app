@@ -439,12 +439,53 @@ function runSimilarity({ sharedQuery, sharedCorpus, sharedScores, query, corpus,
 // MESSAGE HANDLER
 // ═══════════════════════════════════════════════════════════════
 
+// Inline regex-based langextract — duplicated from native.ts to keep this worker
+// self-contained (no TS resolver inside worker_threads). Kept in sync via the
+// langextract-native unit tests.
+const LE_PATTERNS = [
+	{ type: 'citation',   re: /\b(\d{1,4})\s+(U\.?S\.?|F\.?\d?d?|S\.?\s*Ct\.?|L\.?\s*Ed\.?\s*\d?d?|N\.?E\.?\d?d?|N\.?W\.?\d?d?|S\.?E\.?\d?d?|S\.?W\.?\d?d?|P\.?\d?d?|A\.?\d?d?)\s+(\d{1,5})(?:\s*\((\d{4})\))?/g, conf: 0.95 },
+	{ type: 'statute',    re: /\b(\d{1,3})\s+(U\.?S\.?C\.?|C\.?F\.?R\.?)\s*§+\s*(\d+(?:[a-z](?:-\d+)?)?(?:\([a-z0-9]+\))*)/gi, conf: 0.95 },
+	{ type: 'case_name',  re: /\b([A-Z][A-Za-z.&'-]+(?:\s+[A-Z][A-Za-z.&'-]+){0,3})\s+v\.?\s+([A-Z][A-Za-z.&'-]+(?:\s+[A-Z][A-Za-z.&'-]+){0,3})\b/g, conf: 0.85 },
+	{ type: 'monetary',   re: /\$\s?\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*(?:million|billion|thousand|M|B|K)?\b/gi, conf: 0.90 },
+	{ type: 'date',       re: /\b\d{4}-\d{2}-\d{2}\b|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}\b/g, conf: 0.95 },
+	{ type: 'person',     re: /\b(?:Justice|Judge|Chief Justice|Senator|Representative|Attorney General|Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/g, conf: 0.80 },
+	{ type: 'organization', re: /\b(?:ACLU|FBI|CIA|DOJ|EPA|FTC|SEC|IRS|DEA|ATF|Department\s+of\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/g, conf: 0.85 },
+];
+
+function runLangExtract({ text, documentId, documentType }) {
+	const entities = [];
+	const seen = new Set();
+	for (const { type, re, conf } of LE_PATTERNS) {
+		re.lastIndex = 0;
+		let m;
+		let count = 0;
+		while ((m = re.exec(text)) !== null && count < 50) {
+			const start = m.index;
+			const end = start + m[0].length;
+			const key = `${type}:${start}:${end}`;
+			if (seen.has(key)) continue;
+			seen.add(key);
+			entities.push({ type, text: m[0], start, end, confidence: conf });
+			count++;
+		}
+	}
+	entities.sort((a, b) => a.start - b.start || a.type.localeCompare(b.type));
+	return {
+		doc_id: documentId,
+		documentType,
+		sections: [],   // Section detection stays on main thread (heuristic is cheap)
+		entities,
+		extraction_confidence: entities.length > 0 ? 0.85 : 0.4,
+	};
+}
+
 const HANDLERS = {
-	kmeans:     runKMeans,
-	som:        runSOM,
-	forensics:  runForensics,
-	silhouette: ({ embeddings, assignments, k }) => computeSilhouette(embeddings, assignments, k),
-	similarity: runSimilarity,
+	kmeans:                runKMeans,
+	som:                   runSOM,
+	forensics:             runForensics,
+	silhouette:            ({ embeddings, assignments, k }) => computeSilhouette(embeddings, assignments, k),
+	similarity:            runSimilarity,
+	'langextract.extract': runLangExtract,
 };
 
 parentPort?.on('message', (msg) => {

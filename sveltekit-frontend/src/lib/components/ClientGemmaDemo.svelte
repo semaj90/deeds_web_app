@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { generateEmbedding, getOllamaEndpoint, getOllamaModel } from '$lib/ai/ollama-config';
+	import { generateText as unifiedGenerate } from '$lib/ai/unified-generation';
 	// Migrated to $effect - Using Ollama functions directly
 
 	let isInitialized = $state(true); // Ollama functions are always available
@@ -25,29 +26,18 @@
 		isGenerating = true;
 		response = '';
 		try {
-			const ollamaUrl = getOllamaEndpoint();
-			const model = getOllamaModel();
-
-			const res = await fetch(`${ollamaUrl}/api/generate`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model,
-					prompt,
-					stream: false,
-					options: {
-					temperature: 0.7,
-						num_predict: 200
-					}
-				})
+			// 5-tier unified cascade: Bifrost L2 → E2B → LiteRT → ONNX → server.
+			// Single call replaces the prior raw `fetch(/api/generate)` so the demo
+			// shows the actual production routing path.
+			const result = await unifiedGenerate({
+				prompt,
+				maxTokens:       200,
+				temperature:     0.7,
+				useBifrostCache: true,
 			});
-
-			if (!res.ok) {
-				throw new Error(`HTTP ${res.status}`);
-			}
-
-			const data = await res.json();
-			response = data.response;
+			response = result.text + (result.cacheLayer === 'bifrost_l2'
+				? `\n\n_(${result.source} · cache hit · ${result.latencyMs}ms)_`
+				: `\n\n_(${result.source} · ${result.latencyMs}ms)_`);
 		} catch (error) {
 			response = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
 		} finally {
