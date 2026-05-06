@@ -796,7 +796,8 @@ deeds_labs/
 
 # Local bulk output dirs
 test-results/
-next_steps/
+# next_steps/ is now tracked — see sveltekit-frontend/next_steps/ for the
+# active plan corpus. Karpathy GPU indexing reads it directly.
 lawpdfs/
 scratch/
 logs/
