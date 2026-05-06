@@ -230,13 +230,15 @@ for (const f of dedupedFiles) {
   const summaryLens = clusterId >= 0 ? (clusterSummaryMap.get(clusterId) ?? clusterMeta?.inferredTopic ?? null) : null;
 
   fileNodes.push({
-    stableKey:   `file:${f.rel}`,
-    kind:        f.isSvelteComp ? 'component' : f.isRoute ? 'route' : f.isTest ? 'test' : 'file',
-    label:       f.rel.split('/').pop() ?? f.rel,
+    stableKey:          `file:${f.rel}`,
+    kind:               f.isSvelteComp ? 'component' : f.isRoute ? 'route' : f.isTest ? 'test' : 'file',
+    label:              f.rel.split('/').pop() ?? f.rel,
     manifold4,
     clusterKey,
+    clusterSource:      clusterKey ? 'gpu-kmeans' : null,
+    clusterConfidence:  clusterKey ? 0.90 : null,
     summaryLens,
-    topoLabel:   topoLabel(f.rel),
+    topoLabel:          topoLabel(f.rel),
     glyph: {
       sprite:  glyphSprite(f),
       palette: glyphPalette(f.rel),
@@ -269,62 +271,107 @@ for (const f of dedupedFiles) {
 const clusterNodes = [...clusterNodeMap.values()];
 log(`  → ${fileNodes.length} file nodes, ${clusterNodes.length} cluster nodes`);
 
-// ── Fill-in: assign every unclustered file to nearest cluster ─────────────────
-// Pass 1: build dir-prefix → dominant clusterId vote from already-assigned files.
-/** @type {Map<string, Map<number, number>>} dir-prefix → (clusterId → vote count) */
-const dirVotes = new Map();
-for (const fn of fileNodes) {
-  if (!fn.clusterKey) continue;
-  const cid  = parseInt(fn.clusterKey.split(':').pop(), 10);
+// ── Fallback cluster assignment (6 tiers) ─────────────────────────────────────
+// Files without a GPU/Qdrant cluster are assigned a fallback so that every file
+// node has a clusterKey.  clusterSource + clusterConfidence let ACE weight real
+// clusters over fallback ones without discarding any node.
+//
+// Tier priority:
+//   1. gpu-kmeans   (already assigned above, confidence 0.90)
+//   2. directory-fallback   cluster:dir:<normalized-dir>  confidence 0.60
+//   3. topo-class-fallback  cluster:topo:<label>          confidence 0.50
+//   4. kind-fallback        cluster:kind:<kind>           confidence 0.35
+//   5. unclassified         cluster:unclassified          confidence 0.10
+
+/** Normalize a directory path to a stable cluster key slug. */
+function normDirKey(rel) {
+  return rel.replace(/\//g, '-').replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+}
+
+/**
+ * Resolve the fallback cluster for a file node that has no GPU clusterKey.
+ * Returns { clusterKey, clusterSource, clusterConfidence }.
+ */
+function assignFallbackCluster(fn) {
   const rel  = fn.stableKey.replace('file:', '');
-  const parts = rel.split('/');
-  for (let depth = 1; depth <= parts.length; depth++) {
-    const prefix = parts.slice(0, depth).join('/');
-    if (!dirVotes.has(prefix)) dirVotes.set(prefix, new Map());
-    const tally = dirVotes.get(prefix);
-    tally.set(cid, (tally.get(cid) ?? 0) + 1);
+  const dir  = rel.split('/').slice(0, -1).join('/');
+  const topo = fn.topoLabel ?? 'unclassified';
+
+  // Tier 2: directory
+  if (dir) {
+    return {
+      clusterKey:        `cluster:dir:${normDirKey(dir)}`,
+      clusterSource:     'directory-fallback',
+      clusterConfidence: 0.60,
+    };
   }
+
+  // Tier 3: topo class
+  if (topo !== 'unclassified') {
+    return {
+      clusterKey:        `cluster:topo:${topo}`,
+      clusterSource:     'topo-class-fallback',
+      clusterConfidence: 0.50,
+    };
+  }
+
+  // Tier 4: kind
+  if (fn.kind && fn.kind !== 'file') {
+    return {
+      clusterKey:        `cluster:kind:${fn.kind}`,
+      clusterSource:     'kind-fallback',
+      clusterConfidence: 0.35,
+    };
+  }
+
+  // Tier 5: unclassified
+  return {
+    clusterKey:        'cluster:unclassified',
+    clusterSource:     'unclassified-fallback',
+    clusterConfidence: 0.10,
+  };
 }
 
-/** Best cluster for a directory prefix — majority among already-assigned siblings. */
-function bestClusterForDir(rel) {
-  const parts = rel.split('/');
-  for (let depth = parts.length; depth > 0; depth--) {
-    const prefix = parts.slice(0, depth).join('/');
-    const tally  = dirVotes.get(prefix);
-    if (tally && tally.size > 0) {
-      return [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0];
-    }
-  }
-  return null;
+/** Map from fallback clusterKey → node (created on-demand). */
+const fallbackClusterNodeMap = new Map();
+
+function ensureFallbackClusterNode(clusterKey, source) {
+  if (clusterNodeMap.has(clusterKey) || fallbackClusterNodeMap.has(clusterKey)) return;
+  const label = clusterKey
+    .replace(/^cluster:(dir|topo|kind):/, '')
+    .replace(/-/g, ' ')
+    .replace(/_/g, '/');
+  fallbackClusterNodeMap.set(clusterKey, {
+    stableKey:         clusterKey,
+    kind:              'cluster',
+    label,
+    clusterSource:     source,
+    clusterConfidence: null,
+    tags:              ['fallback-cluster'],
+    manifold4:         [0, 0, 0, 0],
+  });
 }
 
-// Pass 2: fill in unassigned files.
+// Apply fallback to every unassigned file node
 let filled = 0;
-const fallbackClusterId = clusterNodes.length > 0
-  ? parseInt(clusterNodes[0].stableKey.split(':').pop(), 10)
-  : 0;
+const sourceTally = { 'directory-fallback': 0, 'topo-class-fallback': 0, 'kind-fallback': 0, 'unclassified-fallback': 0 };
 for (const fn of fileNodes) {
   if (fn.clusterKey) continue;
-  const rel = fn.stableKey.replace('file:', '');
-  const cid = bestClusterForDir(rel) ?? fallbackClusterId;
-  fn.clusterKey = `cluster:gpu:${cid}`;
-  // Ensure the cluster node exists
-  if (!clusterNodeMap.has(cid)) {
-    const meta = clusters.clusters.find((c) => c.id === cid);
-    clusterNodeMap.set(cid, {
-      stableKey: `cluster:gpu:${cid}`,
-      kind:      'cluster',
-      label:     meta?.inferredTopic ?? `Cluster ${cid}`,
-      manifold4: syntheticManifold4(`cluster:${cid}`, cid, 0, 1),
-      size:      meta?.size ?? 0,
-      topTags:   (meta?.topTags ?? []).map((t) => t.tag),
-      topDirs:   (meta?.topDirs ?? []).map((d) => d.dir),
-    });
-  }
+  const fb = assignFallbackCluster(fn);
+  fn.clusterKey        = fb.clusterKey;
+  fn.clusterSource     = fb.clusterSource;
+  fn.clusterConfidence = fb.clusterConfidence;
+  ensureFallbackClusterNode(fb.clusterKey, fb.clusterSource);
+  sourceTally[fb.clusterSource] = (sourceTally[fb.clusterSource] ?? 0) + 1;
   filled++;
 }
-if (filled > 0) log(`  → ${filled} files assigned to nearest cluster (fill-in pass)`);
+if (filled > 0) {
+  log(`  → ${filled} files assigned via fallback: ${
+    Object.entries(sourceTally).filter(([,v]) => v > 0).map(([k, v]) => `${v} ${k}`).join(', ')
+  }`);
+}
+
+const fallbackClusterNodes = [...fallbackClusterNodeMap.values()];
 
 // ── Build directory nodes ─────────────────────────────────────────────────────
 
@@ -374,9 +421,16 @@ for (const fn of fileNodes) {
 }
 
 // BELONGS_TO_CLUSTER: file → cluster
+// Include clusterSource + clusterConfidence on the edge so ACE/TRACE can filter by quality.
 for (const fn of fileNodes) {
   if (fn.clusterKey) {
-    edges.push({ from: fn.stableKey, to: fn.clusterKey, type: 'BELONGS_TO_CLUSTER' });
+    edges.push({
+      from:              fn.stableKey,
+      to:                fn.clusterKey,
+      type:              'BELONGS_TO_CLUSTER',
+      clusterSource:     fn.clusterSource ?? 'gpu-kmeans',
+      clusterConfidence: fn.clusterConfidence ?? 0.90,
+    });
   }
 }
 
@@ -431,19 +485,24 @@ const nesGlyphOut = {
     model:  DRY_RUN ? null : 'tensorrt_bridge.node',
   },
   stats: {
-    fileCount:    fileNodes.length,
-    clusterCount: clusterNodes.length,
-    edgeCount:    edges.length,
-    sourceGraph:  graph.createdAt,
-    sourceClusters: clusters.generatedAt,
+    fileCount:             fileNodes.length,
+    clusterCount:          clusterNodes.length + fallbackClusterNodes.length,
+    clusterCountGpu:       clusterNodes.length,
+    clusterCountFallback:  fallbackClusterNodes.length,
+    filesWithGpuCluster:   fileNodes.filter((f) => f.clusterSource === 'gpu-kmeans').length,
+    filesWithFallback:     filled,
+    edgeCount:             edges.length,
+    sourceGraph:           graph.createdAt,
+    sourceClusters:        clusters.generatedAt,
   },
-  nodes: [...fileNodes, ...clusterNodes, ...summaryLensNodes, ...dirNodes],
+  nodes: [...fileNodes, ...clusterNodes, ...fallbackClusterNodes, ...summaryLensNodes, ...dirNodes],
   edges: edges.slice(0, 50_000), // cap to 50K edges for file size
 };
 
 const nesGlyphPath = resolve(ROOT, 'docs/graph/nes-glyph-architecture.json');
 writeFileSync(nesGlyphPath, JSON.stringify(nesGlyphOut, null, 2));
-info(`Wrote ${nesGlyphPath} (${fileNodes.length + clusterNodes.length} nodes, ${edges.length} edges)`);
+const totalNesNodes = fileNodes.length + clusterNodes.length + fallbackClusterNodes.length;
+info(`Wrote ${nesGlyphPath} (${totalNesNodes} nodes, ${edges.length} edges)`);
 
 // ── Build multihop-codebase-map.json ─────────────────────────────────────────
 
@@ -460,27 +519,31 @@ try {
 }
 
 const multihopNodes = fileNodes.map((fn) => {
-  const clusterId = fn.clusterKey ? parseInt(fn.clusterKey.split(':').pop(), 10) : -1;
-  const clusterMeta = clusters.clusters.find((c) => c.id === clusterId);
+  // For GPU clusters use numeric id; for fallback clusters (dir/topo/kind) id is NaN — OK.
+  const clusterId    = fn.clusterKey?.startsWith('cluster:gpu:')
+    ? parseInt(fn.clusterKey.split(':').pop(), 10)
+    : -1;
+  const clusterMeta  = clusterId >= 0 ? clusters.clusters.find((c) => c.id === clusterId) : null;
   return {
-    stableKey:       fn.stableKey,
-    kind:            fn.kind,
-    tags:            fn.tags,
-    clusterKey:      fn.clusterKey,
-    manifold4:       fn.manifold4,
-    summaryLensIds:  clusterId >= 0 && (summaryLensMap.has(clusterId) || clusterSummaryMap.has(clusterId))
+    stableKey:         fn.stableKey,
+    kind:              fn.kind,
+    tags:              fn.tags,
+    clusterKey:        fn.clusterKey,
+    clusterSource:     fn.clusterSource,
+    clusterConfidence: fn.clusterConfidence,
+    manifold4:         fn.manifold4,
+    summaryLensIds:    clusterId >= 0 && (summaryLensMap.has(clusterId) || clusterSummaryMap.has(clusterId))
       ? [`summary:cluster:${clusterId}`]
       : [],
-    wikiNoteIds:     [], // populated by Graphify wiki integration
-    researchNoteIds: [],
-    auditGateIds:    fn.hasAuth ? ['gate:auth'] : [],
-    // Multi-hop hops:
+    wikiNoteIds:       [], // populated by Graphify wiki integration
+    researchNoteIds:   [],
+    auditGateIds:      fn.hasAuth ? ['gate:auth'] : [],
     hops: {
-      file:       fn.stableKey,
-      directory:  fn.stableKey.replace('file:', '').split('/').slice(0, -1).join('/'),
-      cluster:    fn.clusterKey ?? null,
-      summaryLens: fn.summaryLens ? `summary:cluster:${clusterId}` : null,
-      topTags:    clusterMeta?.topTags?.slice(0, 4).map((t) => t.tag) ?? fn.tags.slice(0, 4),
+      file:        fn.stableKey,
+      directory:   fn.stableKey.replace('file:', '').split('/').slice(0, -1).join('/'),
+      cluster:     fn.clusterKey ?? null,
+      summaryLens: fn.summaryLens && clusterId >= 0 ? `summary:cluster:${clusterId}` : null,
+      topTags:     clusterMeta?.topTags?.slice(0, 4).map((t) => t.tag) ?? fn.tags.slice(0, 4),
     },
   };
 });
@@ -489,18 +552,38 @@ const multihopEdges = edges.filter((e) =>
   e.type === 'IMPORTS' || e.type === 'BELONGS_TO_CLUSTER' || e.type === 'HAS_SUMMARY_LENS'
 ).slice(0, 100_000);
 
+// Include GPU cluster nodes, fallback cluster nodes, and summary lenses so every
+// BELONGS_TO_CLUSTER / HAS_SUMMARY_LENS edge target exists in the node set.
 const multihopAllNodes = [
   ...multihopNodes,
-  ...summaryLensNodes.map((s) => ({ stableKey: s.stableKey, kind: 'summary_lens', label: s.label, manifold4: s.manifold4, clusterKey: s.clusterKey })),
+  ...clusterNodes.map((c) => ({
+    stableKey: c.stableKey, kind: c.kind, label: c.label,
+    clusterSource: 'gpu-kmeans', clusterConfidence: 0.90,
+    manifold4: c.manifold4,
+  })),
+  ...fallbackClusterNodes.map((c) => ({
+    stableKey: c.stableKey, kind: c.kind, label: c.label,
+    clusterSource: c.clusterSource, clusterConfidence: null,
+    tags: c.tags, manifold4: c.manifold4,
+  })),
+  ...summaryLensNodes.map((s) => ({
+    stableKey: s.stableKey, kind: 'summary_lens', label: s.label,
+    manifold4: s.manifold4, clusterKey: s.clusterKey,
+  })),
 ];
+
+const gpuFilesCount      = fileNodes.filter((f) => f.clusterSource === 'gpu-kmeans').length;
+const fallbackFilesCount = fileNodes.filter((f) => f.clusterSource !== 'gpu-kmeans').length;
 
 const multihopOut = {
   version:     1,
   generatedAt: new Date().toISOString(),
   hopLayers:   ['file', 'directory', 'cluster', 'summaryLens', 'researchNote', 'memoryNote', 'retrievalRun'],
   stats: {
-    nodeCount: multihopAllNodes.length,
-    edgeCount: multihopEdges.length,
+    nodeCount:            multihopAllNodes.length,
+    edgeCount:            multihopEdges.length,
+    realClusterCoverage:  `${gpuFilesCount}/${fileNodes.length}`,
+    totalClusterCoverage: `${fileNodes.length}/${fileNodes.length}`,
   },
   nodes: multihopAllNodes,
   edges: multihopEdges,
@@ -508,12 +591,16 @@ const multihopOut = {
 
 const multihopPath = resolve(ROOT, 'docs/graph/multihop-codebase-map.json');
 writeFileSync(multihopPath, JSON.stringify(multihopOut, null, 2));
-info(`Wrote ${multihopPath} (${multihopNodes.length} nodes, ${multihopEdges.length} edges)`);
+info(`Wrote ${multihopPath} (${multihopAllNodes.length} nodes, ${multihopEdges.length} edges)`);
 
 // ── Summary ───────────────────────────────────────────────────────────────────
 
-const totalNodes = fileNodes.length + clusterNodes.length;
+const totalNodes = fileNodes.length + clusterNodes.length + fallbackClusterNodes.length;
 info(`Done. mode=${DRY_RUN ? 'dry-run(synthetic)' : 'live'}, nodes=${totalNodes}, edges=${edges.length}`);
+info(`Cluster coverage — real (gpu-kmeans): ${gpuFilesCount}/${fileNodes.length} | total: ${fileNodes.length}/${fileNodes.length} (100%)`);
+if (fallbackFilesCount > 0) {
+  info(`Fallback breakdown: ${Object.entries(sourceTally).filter(([,v]) => v > 0).map(([k,v]) => `${v} ${k}`).join(', ')}`);
+}
 if (DRY_RUN) {
   info('Re-run without --dry-run for GPU PCA projection from Qdrant embeddings.');
 }
