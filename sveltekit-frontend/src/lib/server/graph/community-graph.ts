@@ -643,31 +643,28 @@ export async function getDirectoryKAGContext(
     }
 
     if (indexKeys.length === 0) return [];
-647: 
-648:     // ── Step 2: Load all candidate notes from Redis (single MGET) ──────────
-649:     const notes: Array<WikiNoteRecord & { _key: string }> = [];
-650:     const noteRaws = await redis.mget(...indexKeys).catch(() => [] as Array<string | null>);
-651: 
-652:     // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. WikiNoteRecord
-653:     // contains rich summary text + dominant tags + SOM BMU coords —
-654:     // typical record is 2-4KB so 10+ notes easily clear the threshold.
-655:     const totalChars = noteRaws.reduce((sum, r) => sum + (r?.length ?? 0), 0);
-656:     let parseNote: (s: string) => WikiNoteRecord = (s) => JSON.parse(s) as WikiNoteRecord;
-657:     if (noteRaws.length >= 10 && totalChars >= 5_000) {
-658:       try {
-659:         const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
-660:         if (isSimdJsonAvailable()) parseNote = fastJsonParse<WikiNoteRecord>;
-661:       } catch { /* addon unavailable — keep V8 */ }
-662:     }
-663: 
-664:     for (let i = 0; i < indexKeys.length; i++) {
-665:       const raw = noteRaws[i];
-666:       if (!raw) continue;
-667:       try {
-668:         const parsed = parseNote(raw);
-669:         notes.push({ ...parsed, _key: indexKeys[i] });
-670:       } catch { continue; }
-671:     }
+// ── Step 2: Load all candidate notes from Redis (single MGET) ──────────
+const notes: Array<WikiNoteRecord & { _key: string }> = [];
+const noteRaws = await redis.mget(...indexKeys).catch(() => [] as Array<string | null>);
+// simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. WikiNoteRecord
+// contains rich summary text + dominant tags + SOM BMU coords —
+// typical record is 2-4KB so 10+ notes easily clear the threshold.
+const totalChars = noteRaws.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+let parseNote: (s: string) => WikiNoteRecord = (s) => JSON.parse(s) as WikiNoteRecord;
+if (noteRaws.length >= 10 && totalChars >= 5_000) {
+try {
+const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+if (isSimdJsonAvailable()) parseNote = fastJsonParse<WikiNoteRecord>;
+} catch { /* addon unavailable — keep V8 */ }
+}
+for (let i = 0; i < indexKeys.length; i++) {
+const raw = noteRaws[i];
+if (!raw) continue;
+try {
+const parsed = parseNote(raw);
+notes.push({ ...parsed, _key: indexKeys[i] });
+} catch { continue; }
+}
 
     if (notes.length === 0) return [];
 

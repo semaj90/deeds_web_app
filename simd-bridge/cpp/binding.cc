@@ -330,7 +330,8 @@ static napi_value ClusterEmbeddingsWrapper(napi_env env, napi_callback_info info
   if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &out_data, &arraybuffer) != napi_ok)
     return throw_error(env, "clusterEmbeddings: output allocation failed");
 
-  int rc = clusterEmbeddings((const float*)arr_data, n, dim, k, max_iters, (int*)out_data, n);
+  int reseeded_cluster = 0;
+  int rc = clusterEmbeddings((const float*)arr_data, n, dim, k, max_iters, (int*)out_data, n, &reseeded_cluster);
   if (rc != 0) return throw_error(env, "clusterEmbeddings failed (GPU/CPU error)");
 
   napi_value result;
@@ -778,8 +779,9 @@ static napi_value KmeansWithCentroidsWrapper(napi_env env, napi_callback_info in
   if (create_pooled_ab(env, (size_t)k * dim * sizeof(float), &c_data, &c_ab) != napi_ok)
     return throw_error(env, "kmeansWithCentroids: centroids allocation failed");
 
+  int reseeded_kmeans = 0;
   int rc = kmeansWithCentroids((const float*)emb_data, n, dim, k, max_iters,
-                                (int*)a_data, n, (float*)c_data, k * dim);
+                                (int*)a_data, n, (float*)c_data, k * dim, &reseeded_kmeans);
   if (rc < 0) return throw_error(env, "kmeansWithCentroids failed");
 
   // Return [assignments: Int32Array, centroids: Float32Array] as a 2-element JS Array

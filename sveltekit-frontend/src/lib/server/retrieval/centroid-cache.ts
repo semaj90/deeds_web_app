@@ -155,18 +155,18 @@ export async function buildAndCacheCentroids(
         }
       );
       if (!res.ok) continue;
-158:       const raw = await res.text();
-159:       let data: { result: { points: { vector: number[] | { content: number[] } }[] } };
-160:       try {
-161:         const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
-162:         if (isSimdJsonAvailable()) {
-163:           data = fastJsonParse(raw);
-164:         } else {
-165:           data = JSON.parse(raw);
-166:         }
-167:       } catch {
-168:         data = JSON.parse(raw);
-169:       }
+const raw = await res.text();
+let data: { result: { points: { vector: number[] | { content: number[] } }[] } };
+try {
+const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+if (isSimdJsonAvailable()) {
+data = fastJsonParse(raw);
+} else {
+data = JSON.parse(raw);
+}
+} catch {
+data = JSON.parse(raw);
+}
       const pts  = data.result?.points ?? [];
       if (!pts.length) continue;
 
@@ -208,31 +208,26 @@ export async function persistCentroidsToDB(
   const keys  = clusterIds.map((id) => centroidKey.cluster(id));
   if (!keys.length) return 0;
 
-200:   const values = await redis.mget(...keys);
-201: 
-202:   // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Each centroid is a
-203:   // 768-dim Float32Array serialized as JSON (~6KB), so 10+ centroids
-204:   // (a typical batch) is ~60KB — well above the threshold.
-205:   const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
-206:   let parseFn: (s: string) => number[] = (s) => JSON.parse(s) as number[];
-207:   if (values.length >= 10 && totalChars >= 5_000) {
-208:     try {
-209:       const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
-210:       if (isSimdJsonAvailable()) parseFn = fastJsonParse<number[]>;
-211:     } catch { /* addon unavailable — keep V8 */ }
-212:   }
-213: 
-214:   let upserted = 0;
-215: 
-216:   for (let i = 0; i < clusterIds.length; i++) {
-217:     const raw = values[i];
-218:     if (!raw) continue;
-219: 
-220:     try {
-221:       const vec = parseFn(raw);
-222:       if (!vec.length) continue;
-
+  const values = await redis.mget(...keys);
+  // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Each centroid is a
+  // 768-dim Float32Array serialized as JSON (~6KB), so 10+ centroids
+  // (a typical batch) is ~60KB — well above the threshold.
+  const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
+  let parseFn: (s: string) => number[] = (s) => JSON.parse(s) as number[];
+  if (values.length >= 10 && totalChars >= 5_000) {
     try {
+      const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+      if (isSimdJsonAvailable()) parseFn = fastJsonParse<number[]>;
+    } catch { /* addon unavailable — keep V8 */ }
+  }
+
+  let upserted = 0;
+  for (let i = 0; i < clusterIds.length; i++) {
+    const raw = values[i];
+    if (!raw) continue;
+    try {
+      const vec = parseFn(raw);
+      if (!vec.length) continue;
       await db
         .insert(gpuClusterCentroids)
         .values({
