@@ -1,13 +1,13 @@
 # Deep AST Audit
 
-Generated: 2026-05-06T01:28:41.628Z
+Generated: 2026-05-06T01:32:09.915Z
 Graph files: 3417
 
 ## Summary
 
 | Gate | Description | Count |
 | :--- | :--- | ---: |
-| D18 | simdjson opportunity (.mget + JSON.parse, no fast-parse) | 0 |
+| D17 | MGET bulk-read opportunity (3+ sequential redis.get) | 0 |
 
 ---
 

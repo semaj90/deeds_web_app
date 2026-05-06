@@ -685,15 +685,73 @@ async function gateD16() {
 async function gateD17() {
   const targets = await glob('src/**/*.{ts,mjs}', { ignore: ['**/*.d.ts', '**/*.test.ts', '**/*.spec.ts'] });
   const findings = [];
+
+  // Only flag gets that are TRULY sequential — i.e., 2+ `await ...get(` calls
+  // inside the SAME loop body (for/while/do). Independent gets in separate
+  // functions don't form a sequential MGET candidate, and gets inside
+  // Promise.all/.map(async) already run concurrently.
+  const GET_RE = /\bawait\s+(?:getRedis\(\)|redis|r|client|conn)\.get\s*\(/;
+
   for (const f of targets) {
     const src = await readFile(f, 'utf8').catch(() => '');
-    // Heuristic: 3+ `await redis.get(...)` or `await getRedis().get(...)` in the file
-    const getCalls = (src.match(/\bawait\s+(?:getRedis\(\)|redis|r)\.get\s*\(/g) || []).length;
-    if (getCalls < 3) continue;
+    if (!GET_RE.test(src)) continue;
+    const lines = src.split('\n');
+
+    // Find each loop block and count gets inside it. Naive bracket tracking:
+    // when we see `for|while|do (...) {` start counting; bracket depth tracks
+    // when we exit the loop body. Skips fancy nesting (good enough for the
+    // heuristic; falls back to per-file count for complex shapes).
+    let loopDepth = 0;
+    let braceAtLoopEntry = 0;
+    let braceDepth = 0;
+    let getsInCurrentLoop = 0;
+    let firstSeqLine = -1;
+    let maxSeqInLoop = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trimStart();
+      if (trimmed.startsWith('//') || trimmed.startsWith('* ') || trimmed === '*') continue;
+
+      // Track brace depth (best-effort — strings/comments may pollute, but
+      // we only need approximate scope membership).
+      const opens  = (line.match(/\{/g) || []).length;
+      const closes = (line.match(/\}/g) || []).length;
+
+      // Detect loop entry on this line: `for (` / `while (` / `do {`
+      if (loopDepth === 0 && /\b(for|while)\s*\(|\bdo\s*\{/.test(line)) {
+        loopDepth = 1;
+        braceAtLoopEntry = braceDepth + opens; // brace depth at end of this line
+        getsInCurrentLoop = 0;
+      }
+
+      braceDepth += opens - closes;
+
+      // If we've returned to the brace depth ABOVE the loop entry, we're out
+      if (loopDepth > 0 && braceDepth < braceAtLoopEntry) {
+        if (getsInCurrentLoop > maxSeqInLoop) {
+          maxSeqInLoop = getsInCurrentLoop;
+        }
+        loopDepth = 0;
+        getsInCurrentLoop = 0;
+      }
+
+      // Count gets that are inside the current loop body, NOT inside a
+      // Promise.all / Promise.allSettled / .map(async) within ±8 lines.
+      if (loopDepth > 0 && GET_RE.test(line)) {
+        const win = lines.slice(Math.max(0, i - 8), i).join('\n');
+        if (/Promise\.(all|allSettled)\s*\(|\.map\s*\(\s*async/.test(win)) continue;
+        getsInCurrentLoop++;
+        if (firstSeqLine < 0) firstSeqLine = i + 1;
+      }
+    }
+
+    // Final tally — flag only if ≥2 gets in any single loop body
+    if (maxSeqInLoop < 2) continue;
     findings.push({
       file:    relative(ROOT, f),
-      line:    1,
-      snippet: `${getCalls} sequential redis.get() calls — consider MGET via redisGetBulk() or .mget(...)`,
+      line:    firstSeqLine,
+      snippet: `${maxSeqInLoop} sequential redis.get() in loop body — consider MGET via redisGetBulk() or .mget(...)`,
     });
   }
   return findings;
