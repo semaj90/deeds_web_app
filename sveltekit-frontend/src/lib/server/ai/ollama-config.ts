@@ -2,6 +2,7 @@
 // Provides model registry, fallback chains, and helper utilities used by server AI services.
 
 import type { OllamaConfig, ModelConfig } from './types.js';
+import { SYSTEM_GEMMA4_LEGAL, SYSTEM_EMBEDDING } from '$lib/ai/prompts.js';
 
 /**
  * Ollama Configuration for High-Performance AI Assistant
@@ -18,7 +19,7 @@ export const MODELS: Record<string, ModelConfig> = {
     temperature: 0.7,
     topP: 0.9,
     topK: 40,
-    systemPrompt: `You are a sophisticated legal AI assistant powered by Gemma4, specialized in legal document analysis, contract review, and case law research. You provide accurate, context-aware legal insights while maintaining strict confidentiality and professional standards. Your responses are based on deep understanding of legal terminology, precedents, and regulatory frameworks.`,
+    systemPrompt: SYSTEM_GEMMA4_LEGAL,
     options: {
       num_gpu: 1, // Use GPU acceleration
       num_thread: 8, // Parallel processing threads
@@ -41,8 +42,7 @@ export const MODELS: Record<string, ModelConfig> = {
     embeddingDimension: 768,
     contextWindow: 8192,
     temperature: 0.0, // Deterministic embeddings
-    systemPrompt:
-      'Generate high-quality semantic embeddings for legal document analysis and retrieval.',
+    systemPrompt: SYSTEM_EMBEDDING,
   },
 };
 
