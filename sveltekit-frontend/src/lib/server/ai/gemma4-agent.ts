@@ -41,6 +41,8 @@ import { LinterService } from './linter-service.js';
 import { tieredLLMQuery } from '$lib/server/ai/tiered-llm-cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
+import { getErrorFixMemory, saveErrorFixMemory } from '$lib/server/ai/error-fix-memory.js';
+import { buildAgentSystemPrompt } from '$lib/ai/prompts.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -296,6 +298,28 @@ const AGENT_TOOLS = [
           limit: { type: 'number', description: 'How many hotspot directories to return (default 10, max 30)' },
         },
         required: [],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'trace_search',
+      description:
+        'Advanced multi-lens retrieval across codebase chunks, architectural summaries, and synthesis memory. ' +
+        'Use this for complex coding questions, architecture analysis, or finding the "why" behind code.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'Technical query or coding problem' },
+          topK: { type: 'number', description: 'Max results to return (default 5, max 15)' },
+          intent: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Optional intent lenses: purpose, risk, api_surface, dependencies, retrieval_role',
+          },
+        },
+        required: ['query'],
       },
     },
   },
@@ -625,6 +649,35 @@ async function dispatchTool(
       return { tool: name, result: hotspots };
     }
 
+    if (name === 'trace_search') {
+      const query = String(args.query ?? '');
+      const topK  = Math.min(Number(args.topK ?? 5), 15);
+      const intent = Array.isArray(args.intent) ? args.intent.map(String) : undefined;
+
+      const emb = await generateEmbedding(query).catch(() => null);
+      if (!emb) return { tool: name, result: [], errorMsg: 'Embedding unavailable' };
+
+      const { traceRerank } = await import('./trace-reranker.js');
+      const hits = await traceRerank({
+        query,
+        queryEmbedding: emb,
+        limit: topK,
+        intentOverride: intent
+      });
+
+      return {
+        tool: name,
+        result: hits.map(h => ({
+          id: h.id,
+          score: h.score,
+          path: h.payload?.path,
+          content: (h.payload?.content ?? '').slice(0, 1000),
+          lenses: h.lenses,
+          tags: h.payload?.tags
+        }))
+      };
+    }
+
     return { tool: name, result: null, errorMsg: `Unknown tool: ${name}` };
   } catch (err) {
     return { tool: name, result: null, errorMsg: (err as Error).message };
@@ -679,10 +732,7 @@ export async function runGemma4Agent(
   let hasSideEffect = false;
   let bypassCache   = options?.bypassCache ?? false;
 
-  const system = options?.systemPrompt ??
-    'You are a legal research assistant with access to a knowledge graph and case database. ' +
-    'Use the provided tools to gather information before answering. ' +
-    'Be precise and cite your sources.';
+  const system = buildAgentSystemPrompt(options?.systemPrompt);
 
   const messages: OllamaMessage[] = [
     { role: 'system',  content: system },
@@ -698,6 +748,29 @@ export async function runGemma4Agent(
   const requestedBackend = getPreferredBackend(options?.metadata);
   let inferenceBackend: AgentRunResult['inferenceBackend'] = requestedBackend;
   let backendFallbackReason: string | undefined;
+
+  // Error-fix memory pre-flight: if the query references an error / file /
+  // route, look up any previously verified fix for it. Populates the
+  // `errorFixMemoryHit` + `verificationStatus` fields on the result.
+  const filePathMeta = typeof options?.metadata?.filePath === 'string' ? options.metadata.filePath : undefined;
+  const routeMeta    = typeof options?.metadata?.route    === 'string' ? options.metadata.route    : undefined;
+  let errorFixMemoryHit = false;
+  let verificationStatus: string | undefined;
+  try {
+    const prior = await getErrorFixMemory({ errorText: query, filePath: filePathMeta, route: routeMeta });
+    if (prior) {
+      errorFixMemoryHit  = true;
+      verificationStatus = prior.verificationStatus;
+      // Inject the prior fix as a system hint so the model can reuse / refine
+      messages.splice(1, 0, {
+        role: 'system',
+        content: `## Prior fix memory\n` +
+          `Verification: ${prior.verificationStatus} · path: ${prior.filePath ?? 'n/a'} · tools: ${prior.toolCalls.join(', ')}\n\n` +
+          `Diagnosis: ${prior.diagnosis}\n\n` +
+          `Patch summary: ${prior.patchSummary}`.trim(),
+      });
+    }
+  } catch { /* non-fatal — Redis miss is fine */ }
 
   const runPreferredToolCall = async (currentMessages: OllamaMessage[]) => {
     if (requestedBackend !== 'turboquant') {
@@ -936,17 +1009,114 @@ export async function runGemma4Agent(
       /* non-fatal */
     });
 
+  // Persist a fresh fix-memory entry when the agent ran a side-effect tool
+  // (apply_shadow_patch / revert_fix / verify_fix). Verification status is
+  // 'unknown' until the next agent run probes the same error and confirms
+  // — that flips it to 'passed' or 'failed' via a separate update path.
+  if (hasSideEffect && !errorFixMemoryHit) {
+    void saveErrorFixMemory(
+      { errorText: query, filePath: filePathMeta, route: routeMeta },
+      {
+        diagnosis:          finalAnswer.slice(0, 600),
+        patchSummary:       toolsUsed.includes('apply_shadow_patch')
+          ? 'Patch applied via apply_shadow_patch'
+          : 'Side-effect tool sequence executed',
+        verificationStatus: 'unknown',
+        toolCalls:          toolsUsed.filter((t) => SIDE_EFFECT_TOOLS.has(t)),
+      },
+    ).catch(() => null);
+  }
+
+  // ── 7. Encode (Long-term Memory) ───────────────────────────────────────────
+  const MEMORY_THRESHOLDS = {
+    synthesis_memory: 0.30,
+    architecture_note: 0.35,
+    bug_fix_memory: 0.25,
+    audit_discovery: 0.20,
+    user_instruction: 0.10,
+    cluster_summary: 0.40,
+    directory_summary: 0.35
+  };
+
+  let yorhaMetadata: any = {
+    traceUsed: true,
+    memoryEncoded: false,
+    informationGain: null
+  };
+
+  // If the answer is substantial and successful, archive it as synthesis memory
+  if (finalAnswer.length > 500 && !finalAnswer.includes('I don\'t know') && !finalAnswer.includes('error')) {
+    try {
+      const { validateInformationGain, heuristicQualityCheck } = await import('./information-gain-validator.js');
+      
+      if (heuristicQualityCheck(finalAnswer)) {
+        // 1. Look up existing memory for this query
+        const emb = await generateEmbedding(query).catch(() => null);
+        let existingText = '';
+        
+        if (emb) {
+          const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+          const existing = await qdrant.hybridSearch({
+            collection: 'synthesis_memory',
+            query,
+            queryEmbedding: emb,
+            limit: 1
+          });
+          existingText = (existing.results[0]?.payload?.content as string) ?? '';
+        }
+
+        // 2. Validate Information Gain via Gemma4
+        const validation = await validateInformationGain({
+          context: query,
+          existing: existingText,
+          candidate: finalAnswer
+        });
+
+        // 3. Populate YorHA UI metadata
+        yorhaMetadata.informationGain = {
+          score: validation.gainScore,
+          decision: validation.shouldUpdate ? 'accepted' : 'rejected',
+          reason: validation.reasoning
+        };
+
+        // 4. Archive only if it provides significant improvement (respecting threshold)
+        const threshold = MEMORY_THRESHOLDS.synthesis_memory;
+        if (validation.success && validation.shouldUpdate && (validation.gainScore ?? 0) >= threshold) {
+          const { archiveSynthesisMemory } = await import('$lib/server/indexer/synthesis-memory-archiver.js');
+          await archiveSynthesisMemory({
+            title: query.slice(0, 60),
+            content: finalAnswer,
+            source: `chat:${options?.sessionId ?? 'anon'}`,
+            tags: toolsUsed,
+            metadata: { 
+              gainScore: validation.gainScore, 
+              reasoning: validation.reasoning,
+              validated_at: new Date().toISOString()
+            }
+          });
+          yorhaMetadata.memoryEncoded = true;
+          console.log(`[agent] High-gain memory encoded: ${query.slice(0, 30)}... (Gain: ${validation.gainScore})`);
+        }
+      }
+    } catch (e) {
+      console.error('[agent] Memory encoding failed:', e);
+      /* non-fatal */
+    }
+  }
+
   return {
-    answer: finalAnswer,
+    answer:      finalAnswer,
     toolsUsed,
-    rounds: round,
+    rounds:      round,
     sources,
-    durationMs,
-    cacheTier: resultCacheTier,
+    durationMs:  Date.now() - t0,
+    cacheTier:   resultCacheTier,
     cacheLatencyMs: resultCacheMs,
-    cacheTrace,
-    requestedBackend,
+    errorFixMemoryHit,
+    verificationStatus,
     inferenceBackend,
+    requestedBackend,
     backendFallbackReason,
+    yorha: yorhaMetadata
   };
 }

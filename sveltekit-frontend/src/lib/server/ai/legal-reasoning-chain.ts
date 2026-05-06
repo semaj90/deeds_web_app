@@ -24,6 +24,12 @@
 
 import { generateCompletion } from '$lib/server/ai/ollama-client.js';
 import { ENV } from '$lib/server/env.server.js';
+import {
+	SYSTEM_LEGAL_FRAMEWORK,
+	SYSTEM_LEGAL_FACT_MAPPING,
+	SYSTEM_LEGAL_PRECEDENT,
+	SYSTEM_LEGAL_POLICY,
+} from '$lib/ai/prompts.js';
 
 export interface ReasoningStepInput {
 	summary: string;
@@ -112,22 +118,10 @@ function buildContext(input: ReasoningStepInput, priorSteps: ReasoningStep[]): s
 }
 
 const STEP_DEFINITIONS = [
-	{
-		name: 'Foundational Framework',
-		systemPrompt: 'You are a legal analyst identifying the applicable legal framework. Determine which statutes, regulations, common law principles, and constitutional provisions apply. Identify the burden of proof and standards of review.'
-	},
-	{
-		name: 'Fact Pattern Analysis',
-		systemPrompt: 'You are a legal analyst mapping facts to the legal framework. For each key fact, assess whether it supports or weakens the legal theory. Identify gaps in the factual record and what additional evidence would strengthen the case.'
-	},
-	{
-		name: 'Precedent Hierarchy',
-		systemPrompt: 'You are a legal analyst assessing case precedent. Identify the most relevant supporting and opposing precedent. Rank precedent by jurisdiction authority (binding vs persuasive) and factual similarity. Note any circuit splits or evolving doctrine.'
-	},
-	{
-		name: 'Policy Considerations',
-		systemPrompt: 'You are a legal analyst evaluating policy implications. Consider the broader policy goals of the applicable law, potential unintended consequences of the legal theory, and how the case fits within larger legal trends. Assess jury/judge receptivity.'
-	}
+	{ name: 'Foundational Framework', systemPrompt: SYSTEM_LEGAL_FRAMEWORK },
+	{ name: 'Fact Pattern Analysis',  systemPrompt: SYSTEM_LEGAL_FACT_MAPPING },
+	{ name: 'Precedent Hierarchy',    systemPrompt: SYSTEM_LEGAL_PRECEDENT },
+	{ name: 'Policy Considerations',  systemPrompt: SYSTEM_LEGAL_POLICY },
 ];
 
 /**

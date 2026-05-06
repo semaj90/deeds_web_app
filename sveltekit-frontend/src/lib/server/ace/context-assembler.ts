@@ -39,6 +39,7 @@ import {
   type GraphNeighbor,
 } from '$lib/server/retrieval/graph-context.js';
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
+import { SYSTEM_YORHA_LEGAL } from '$lib/ai/prompts.js';
 import { sortByBestScore, assignRanks } from '$lib/server/types/retrieval.js';
 import {
   traceGraph,
@@ -1121,7 +1122,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   const limits = budgetProfile.limits;
 
   // 1. System instructions
-  lines.push('You are YorHA, a legal AI assistant. Provide accurate, well-cited legal analysis.');
+  lines.push(SYSTEM_YORHA_LEGAL);
 
   // 1b. nes-arch path-first AGENTS.md (renders FIRST so the model sees
   // directory conventions, audit warnings, and dominant tags before chunks).

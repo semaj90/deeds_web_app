@@ -316,6 +316,12 @@ function runSingletonBootTasks(): void {
       .catch((err) => console.warn('[Boot] Chat model warmup: failed:', (err as Error).message));
   }
 
+  // Probe all inference backends once so model-router has a warm status cache
+  import('$lib/server/ai/model-loader.js')
+    .then(({ warmupModelLoader }) => warmupModelLoader())
+    .then(() => console.log('[Boot] Model loader: backend status cached'))
+    .catch((err) => console.warn('[Boot] Model loader: probe failed:', (err as Error).message));
+
   // Pre-populate codebase Fuse.js index (avoids cold-start on first search)
   import('$lib/server/retrieval/codebase-context.js')
     .then(({ refreshMetadataCache }) => refreshMetadataCache())
