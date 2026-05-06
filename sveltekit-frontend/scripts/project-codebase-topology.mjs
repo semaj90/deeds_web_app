@@ -269,6 +269,63 @@ for (const f of dedupedFiles) {
 const clusterNodes = [...clusterNodeMap.values()];
 log(`  → ${fileNodes.length} file nodes, ${clusterNodes.length} cluster nodes`);
 
+// ── Fill-in: assign every unclustered file to nearest cluster ─────────────────
+// Pass 1: build dir-prefix → dominant clusterId vote from already-assigned files.
+/** @type {Map<string, Map<number, number>>} dir-prefix → (clusterId → vote count) */
+const dirVotes = new Map();
+for (const fn of fileNodes) {
+  if (!fn.clusterKey) continue;
+  const cid  = parseInt(fn.clusterKey.split(':').pop(), 10);
+  const rel  = fn.stableKey.replace('file:', '');
+  const parts = rel.split('/');
+  for (let depth = 1; depth <= parts.length; depth++) {
+    const prefix = parts.slice(0, depth).join('/');
+    if (!dirVotes.has(prefix)) dirVotes.set(prefix, new Map());
+    const tally = dirVotes.get(prefix);
+    tally.set(cid, (tally.get(cid) ?? 0) + 1);
+  }
+}
+
+/** Best cluster for a directory prefix — majority among already-assigned siblings. */
+function bestClusterForDir(rel) {
+  const parts = rel.split('/');
+  for (let depth = parts.length; depth > 0; depth--) {
+    const prefix = parts.slice(0, depth).join('/');
+    const tally  = dirVotes.get(prefix);
+    if (tally && tally.size > 0) {
+      return [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    }
+  }
+  return null;
+}
+
+// Pass 2: fill in unassigned files.
+let filled = 0;
+const fallbackClusterId = clusterNodes.length > 0
+  ? parseInt(clusterNodes[0].stableKey.split(':').pop(), 10)
+  : 0;
+for (const fn of fileNodes) {
+  if (fn.clusterKey) continue;
+  const rel = fn.stableKey.replace('file:', '');
+  const cid = bestClusterForDir(rel) ?? fallbackClusterId;
+  fn.clusterKey = `cluster:gpu:${cid}`;
+  // Ensure the cluster node exists
+  if (!clusterNodeMap.has(cid)) {
+    const meta = clusters.clusters.find((c) => c.id === cid);
+    clusterNodeMap.set(cid, {
+      stableKey: `cluster:gpu:${cid}`,
+      kind:      'cluster',
+      label:     meta?.inferredTopic ?? `Cluster ${cid}`,
+      manifold4: syntheticManifold4(`cluster:${cid}`, cid, 0, 1),
+      size:      meta?.size ?? 0,
+      topTags:   (meta?.topTags ?? []).map((t) => t.tag),
+      topDirs:   (meta?.topDirs ?? []).map((d) => d.dir),
+    });
+  }
+  filled++;
+}
+if (filled > 0) log(`  → ${filled} files assigned to nearest cluster (fill-in pass)`);
+
 // ── Build directory nodes ─────────────────────────────────────────────────────
 
 const dirSet = new Map(); // dir string → Set of file nodes
