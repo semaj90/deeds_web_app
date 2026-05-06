@@ -1,57 +1,11 @@
 {
-  "generatedAt": "2026-05-06T01:00:28.047Z",
+  "generatedAt": "2026-05-06T01:03:11.041Z",
   "graphFiles": 3417,
   "gates": {
-    "D16": {
-      "name": "await-using opportunity (try/finally + .quit/.disconnect)",
-      "count": 7,
-      "findings": [
-        {
-          "file": "scripts\\deep-audit-ast.mjs",
-          "line": 647,
-          "snippet": "// D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "scripts\\tests\\test-ace-graphify-retrieval.mjs",
-          "line": 192,
-          "snippet": "await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "scripts\\lib\\phase89-sse-stream.mjs",
-          "line": 199,
-          "snippet": "await redis.quit();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\lib\\server\\redis-streams.ts",
-          "line": 147,
-          "snippet": "reader.disconnect();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\routes\\api\\health\\redis\\+server.ts",
-          "line": 74,
-          "snippet": "await client.quit();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\routes\\api\\cache\\stats\\+server.ts",
-          "line": 78,
-          "snippet": "fresh.disconnect();  → consider `await using` + getDisposableRedis()"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
-          "line": 244,
-          "snippet": "redis.disconnect();  → consider `await using` + getDisposableRedis()"
-        }
-      ]
-    },
     "D18": {
       "name": "simdjson opportunity (.mget + JSON.parse, no fast-parse)",
-      "count": 13,
+      "count": 10,
       "findings": [
-        {
-          "file": "src\\lib\\server\\retrieval\\centroid-cache.ts",
-          "line": 92,
-          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
         {
           "file": "src\\lib\\server\\research\\lane4-feedback.ts",
           "line": 126,
@@ -68,11 +22,6 @@
           "snippet": "const raw = await redis.mget(hashes.map(h => HG_EDGE_KEY(h))).catch(() => [] as (string|null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
-          "file": "src\\lib\\server\\graph\\community-graph.ts",
-          "line": 491,
-          "snippet": "const commRaws = await redis.mget(...commKeys).catch(() => [] as Array<string | null>);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
           "file": "src\\lib\\server\\graph\\codebase-cluster-detection.ts",
           "line": 350,
           "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
@@ -86,11 +35,6 @@
           "file": "src\\lib\\server\\analytics\\web-research-crawler.ts",
           "line": 396,
           "snippet": ".mget(hashes.map(h => WEB_SUM_KEY(h)))  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\analytics\\research-cache.ts",
-          "line": 200,
-          "snippet": "const raw = await redis.mget(hashes.map(h => SKETCH_KEY(h))).catch(() => [] as (string | null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
         },
         {
           "file": "src\\routes\\api\\codebase-index\\topology-hits\\+server.ts",

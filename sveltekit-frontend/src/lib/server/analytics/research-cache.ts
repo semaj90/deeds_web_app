@@ -199,10 +199,21 @@ export async function queryResearchIndex(
 	// Fetch sketches in one round-trip (MGET)
 	const raw = await redis.mget(hashes.map(h => SKETCH_KEY(h))).catch(() => [] as (string | null)[]);
 
+	// simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Research sketches carry
+	// citations, entity tags, and summary text — typical sketch is 3-15KB.
+	const totalChars = raw.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+	let parseFn: (s: string) => ResearchSketch = (s) => JSON.parse(s) as ResearchSketch;
+	if (raw.length >= 10 && totalChars >= 5_000) {
+		try {
+			const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+			if (isSimdJsonAvailable()) parseFn = fastJsonParse<ResearchSketch>;
+		} catch { /* addon unavailable — keep V8 */ }
+	}
+
 	const sketches: ResearchSketch[] = [];
 	for (const r of raw) {
 		if (!r) continue;
-		try { sketches.push(JSON.parse(r) as ResearchSketch); } catch { /* */ }
+		try { sketches.push(parseFn(r)); } catch { /* */ }
 	}
 	return sketches;
 }
