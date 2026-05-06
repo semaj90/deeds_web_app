@@ -20,6 +20,7 @@ import { runWithAdaptiveBatch } from '$lib/server/gpu/libtorch-bridge.js';
 import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { logEmbedIndex } from './ast-ingest-logger.js';
+import { topoByteFromPath, classifyPath } from '$lib/server/tensor/topology-byte-mapper.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const INITIAL_BATCH = 24; // starting batch size; runWithAdaptiveBatch halves on OOM
@@ -422,6 +423,8 @@ export async function indexChunks(
             content: batch[i].content.slice(0, 4_000),
             signature: batch[i].signature,
             ...batch[i].metadata,
+            topo_byte:  topoByteFromPath(batch[i].metadata?.relativePath ?? ''),
+            topo_class: classifyPath(batch[i].metadata?.relativePath ?? ''),
           },
         });
       }

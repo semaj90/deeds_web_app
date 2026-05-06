@@ -27,6 +27,22 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
+// ── Topo classification (mirrors topology-byte-mapper.ts, no TS import needed) ─
+const TOPO_CLASS_LABEL = ['unclassified','legal-evidence','api-route','ui-component','database-schema','trace-retrieval','graph-gpu-topology','test-audit-devtool'];
+/** @param {string} rel @returns {string} */
+function topoLabel(rel) {
+  const p = rel.toLowerCase();
+  if (/\/(tests?|spec|__tests?__|e2e|playwright|vitest|scripts\/)/.test(p) || /\/(scripts?|tools?|devtools?|audit)\//.test(p)) return 'test-audit-devtool';
+  if (/\/(db|schema|drizzle|migrations?)\//.test(p) || /schema[-_]postgres|schema[-_]sqlite/.test(p)) return 'database-schema';
+  if (/\/(graph|hypergraph|tensor|topology|som|neo4j|gds)\//.test(p) || /gpu|libtorch|tensorrt|cuda|simd/.test(p)) return 'graph-gpu-topology';
+  if (/\/(ace|rag|kag|retrieval|indexer|vector|qdrant|embeddings?)\//.test(p)) return 'trace-retrieval';
+  if (/\/routes\/api\//.test(p) || /\+server\.ts$/.test(p)) return 'api-route';
+  if (/\/(evidence|legal|citations?|statutes?|documents?|cases?)\//.test(p)) return 'legal-evidence';
+  if (/\/(components?|routes\/\(app\)|svelte)/.test(p) && /\.svelte$/.test(p)) return 'ui-component';
+  if (/\/routes\/\(app\)\//.test(p)) return 'ui-component';
+  return 'unclassified';
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
@@ -220,6 +236,7 @@ for (const f of dedupedFiles) {
     manifold4,
     clusterKey,
     summaryLens,
+    topoLabel:   topoLabel(f.rel),
     glyph: {
       sprite:  glyphSprite(f),
       palette: glyphPalette(f.rel),
