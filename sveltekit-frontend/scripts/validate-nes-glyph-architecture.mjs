@@ -112,13 +112,23 @@ function validateFile(filePath, label) {
   if (badLens.length > 0) fail(`${badLens.length} HAS_SUMMARY_LENS edge(s) target non-existent nodes`);
   else if (lensEdges.length > 0) pass(`${lensEdges.length} summary lens edges all target existing nodes`);
 
-  // 8. Cluster coverage for file nodes
-  const totalFiles   = nodes.filter((n) => fileTypes.has(n.kind)).length;
-  const filesWithKey = nodes.filter((n) => fileTypes.has(n.kind) && n.clusterKey).length;
-  const pct = totalFiles > 0 ? Math.round((filesWithKey / totalFiles) * 100) : 0;
-  const coverMsg = `Cluster coverage: ${filesWithKey}/${totalFiles} files (${pct}%)`;
-  if (pct < 50) warn(coverMsg);
-  else          pass(coverMsg);
+  // 8. Cluster coverage — real (gpu-kmeans) + total (any fallback)
+  const fileNodeList   = nodes.filter((n) => fileTypes.has(n.kind));
+  const totalFiles     = fileNodeList.length;
+  const filesWithKey   = fileNodeList.filter((n) => n.clusterKey).length;
+  const filesRealGpu   = fileNodeList.filter((n) => n.clusterSource === 'gpu-kmeans').length;
+  const totalPct       = totalFiles > 0 ? Math.round((filesWithKey / totalFiles) * 100) : 0;
+  const realPct        = totalFiles > 0 ? Math.round((filesRealGpu / totalFiles) * 100) : 0;
+
+  const totalMsg = `Total cluster coverage: ${filesWithKey}/${totalFiles} files (${totalPct}%)`;
+  const realMsg  = `Real cluster coverage (gpu-kmeans): ${filesRealGpu}/${totalFiles} files (${realPct}%)`;
+
+  if (totalPct < 50) warn(totalMsg);
+  else               pass(totalMsg);
+
+  // Real coverage is informational — warn only if data shows 0 (no GPU run ever)
+  if (filesRealGpu === 0) warn(realMsg + ' — run graphify:topology to populate GPU clusters');
+  else                    pass(realMsg);
 
   console.log('');
 }
