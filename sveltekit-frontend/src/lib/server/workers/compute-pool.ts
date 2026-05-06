@@ -21,7 +21,9 @@ import path from 'path';
 import os from 'os';
 import { traceWorker } from '$lib/server/observability/langfuse.js';
 
-export type TaskType = 'kmeans' | 'som' | 'forensics' | 'silhouette' | 'similarity';
+export type TaskType =
+  | 'kmeans' | 'som' | 'forensics' | 'silhouette' | 'similarity'
+  | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).
