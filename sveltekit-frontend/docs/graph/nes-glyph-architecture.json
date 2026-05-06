@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-06T06:56:42.858Z",
+  "generatedAt": "2026-05-06T07:09:36.824Z",
   "mode": "gpu-pca",
   "projection": {
     "type": "manifold4",
@@ -20,9 +20,9 @@
     "clusterCountFallback": 953,
     "filesWithGpuCluster": 1687,
     "filesWithFallback": 1708,
-    "edgeCount": 9724,
+    "edgeCount": 9721,
     "sourceGraph": "2026-05-06T03:53:56.069Z",
-    "sourceClusters": "2026-05-06T04:16:15.679Z"
+    "sourceClusters": "2026-05-06T07:09:08.695Z"
   },
   "nodes": [
     {
@@ -138769,19 +138769,6 @@
       "purpose": "Core Data Modeling and Knowledge Retrieval Layer"
     },
     {
-      "stableKey": "summary:cluster:10",
-      "kind": "summary_lens",
-      "label": "Cluster 10 summary",
-      "clusterKey": "cluster:gpu:10",
-      "manifold4": [
-        0,
-        0.1111,
-        0,
-        0.0353
-      ],
-      "purpose": "Database Schema Type Definitions"
-    },
-    {
       "stableKey": "summary:cluster:12",
       "kind": "summary_lens",
       "label": "Cluster 12 summary",
@@ -138873,19 +138860,6 @@
       "purpose": "Document Processing and AI Pipeline Backend"
     },
     {
-      "stableKey": "summary:cluster:133",
-      "kind": "summary_lens",
-      "label": "Cluster 133 summary",
-      "clusterKey": "cluster:gpu:133",
-      "manifold4": [
-        0.3333,
-        0.3333,
-        0,
-        0.2157
-      ],
-      "purpose": "Error Monitoring Dashboard Component"
-    },
-    {
       "stableKey": "summary:cluster:79",
       "kind": "summary_lens",
       "label": "Cluster 79 summary",
@@ -138923,19 +138897,6 @@
         0.1569
       ],
       "purpose": "Utility and Data Transformation Layer"
-    },
-    {
-      "stableKey": "summary:cluster:65",
-      "kind": "summary_lens",
-      "label": "Cluster 65 summary",
-      "clusterKey": "cluster:gpu:65",
-      "manifold4": [
-        0.5556,
-        0.6667,
-        0,
-        0.4353
-      ],
-      "purpose": "Utility and Component Library"
     },
     {
       "stableKey": "summary:cluster:30",
@@ -197225,11 +197186,6 @@
       "type": "HAS_SUMMARY_LENS"
     },
     {
-      "from": "cluster:gpu:10",
-      "to": "summary:cluster:10",
-      "type": "HAS_SUMMARY_LENS"
-    },
-    {
       "from": "cluster:gpu:12",
       "to": "summary:cluster:12",
       "type": "HAS_SUMMARY_LENS"
@@ -197265,11 +197221,6 @@
       "type": "HAS_SUMMARY_LENS"
     },
     {
-      "from": "cluster:gpu:133",
-      "to": "summary:cluster:133",
-      "type": "HAS_SUMMARY_LENS"
-    },
-    {
       "from": "cluster:gpu:79",
       "to": "summary:cluster:79",
       "type": "HAS_SUMMARY_LENS"
@@ -197282,11 +197233,6 @@
     {
       "from": "cluster:gpu:63",
       "to": "summary:cluster:63",
-      "type": "HAS_SUMMARY_LENS"
-    },
-    {
-      "from": "cluster:gpu:65",
-      "to": "summary:cluster:65",
       "type": "HAS_SUMMARY_LENS"
     },
     {
