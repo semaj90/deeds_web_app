@@ -112,3 +112,22 @@ export {
 	legalCitationsRelations, pageArtifactsRelations,
 	ingestionJobsRelations, stateConstitutionSourcesRelations
 } from './schema/legal-relations';
+
+// Phase 102: Persons of Interest & Legal Cases (Metadata spine dependencies)
+// schema-postgres is the canonical source for `cases`, `casesRelations`,
+// and `personsOfInterest`. Re-export only the spine-only additions here
+// to avoid duplicate-symbol ambiguity errors (TS2308).
+export {
+	crimes, caseChunks,
+	crimesRelations, caseChunksRelations,
+} from './schema/legal-cases';
+export { casePersons } from './schema/persons';
+
+// Metadata Spine (Phase 78/79)
+export * from './schema/metadata-spine';
+
+// KAG-DAG Architecture (Phase 79)
+export * from './schema/kag-dag';
+export * from './schema/directory-clusters';
+export * from './schema/embedded-summaries';
+export * from './schema/topology';
