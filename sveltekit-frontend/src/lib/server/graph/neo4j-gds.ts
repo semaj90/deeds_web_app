@@ -743,3 +743,93 @@ export async function getImpactCategorized(
     await session.close();
   }
 }
+
+// ── D27 Ontology gate ─────────────────────────────────────────────────────────
+
+const ONTOLOGY_CONCEPTS = ['LegalEvidence', 'DevCode', 'WikiNote', 'ResearchNote'] as const;
+
+/**
+ * Seed the four OntologyConcept nodes (idempotent MERGE).
+ * Then bulk-classify File nodes based on path heuristics:
+ *   evidence/ | /legal/   → LegalEvidence
+ *   wiki:note:            → WikiNote
+ *   research              → ResearchNote
+ *   everything else       → DevCode
+ *
+ * D27 gate: MATCH (f:File) WHERE NOT (f)-[:CLASSIFIED_AS]->() RETURN count(f)
+ * should return 0 after this runs.
+ */
+export async function seedAndClassifyOntology(): Promise<OntologyResult> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  const t0 = Date.now();
+
+  try {
+    // Seed concept nodes
+    await session.run(`
+      UNWIND $concepts AS name
+      MERGE (:OntologyConcept {id: name, label: name})
+    `, { concepts: ONTOLOGY_CONCEPTS });
+
+    // Classify WikiNote stableKeys (prefix wiki:note:)
+    await session.run(`
+      MATCH (f:File) WHERE f.stableKey STARTS WITH 'wiki:note:'
+      MATCH (c:OntologyConcept {id: 'WikiNote'})
+      MERGE (f)-[:CLASSIFIED_AS]->(c)
+    `);
+
+    // Classify ResearchNote stableKeys
+    await session.run(`
+      MATCH (f:File) WHERE f.stableKey STARTS WITH 'research:'
+        OR (f.path IS NOT NULL AND toLower(f.path) CONTAINS 'research')
+      MATCH (c:OntologyConcept {id: 'ResearchNote'})
+      MERGE (f)-[:CLASSIFIED_AS]->(c)
+    `);
+
+    // Classify LegalEvidence (evidence/ or /legal/ in path)
+    await session.run(`
+      MATCH (f:File)
+      WHERE f.path IS NOT NULL
+        AND (toLower(f.path) CONTAINS 'evidence/' OR toLower(f.path) CONTAINS '/legal/')
+        AND NOT (f)-[:CLASSIFIED_AS]->()
+      MATCH (c:OntologyConcept {id: 'LegalEvidence'})
+      MERGE (f)-[:CLASSIFIED_AS]->(c)
+    `);
+
+    // Everything else → DevCode
+    const devResult = await session.run(`
+      MATCH (f:File) WHERE NOT (f)-[:CLASSIFIED_AS]->()
+      MATCH (c:OntologyConcept {id: 'DevCode'})
+      MERGE (f)-[:CLASSIFIED_AS]->(c)
+      RETURN count(f) AS classified
+    `);
+
+    const filesClassified = (devResult.records[0]?.get('classified') as number | null) ?? 0;
+
+    return {
+      conceptsSeeded: ONTOLOGY_CONCEPTS.length,
+      filesClassified,
+      durationMs: Date.now() - t0,
+    };
+  } finally {
+    await session.close();
+  }
+}
+
+/**
+ * D27 gate: returns count of File nodes without CLASSIFIED_AS.
+ * Should be 0 after seedAndClassifyOntology() has been run.
+ */
+export async function getUnclassifiedFileCount(): Promise<number> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  try {
+    const result = await session.run(`
+      MATCH (f:File) WHERE NOT (f)-[:CLASSIFIED_AS]->()
+      RETURN count(f) AS unclassified
+    `);
+    return (result.records[0]?.get('unclassified') as number | null) ?? 0;
+  } finally {
+    await session.close();
+  }
+}

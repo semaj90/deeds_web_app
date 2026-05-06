@@ -3,9 +3,9 @@
  *   Returns APOC + GDS availability, projection existence, plugin versions.
  *
  * POST /api/code-intel/graph/gds-status
- *   Body: { action: 'project' | 'pagerank' | 'louvain' | 'knn' | 'authority' | 'full' }
+ *   Body: { action: 'project' | 'pagerank' | 'louvain' | 'knn' | 'authority' | 'ontology' | 'full' }
  *   Runs the requested GDS job.
- *   'full' = project → pagerank → louvain → knn → authority mirror to Qdrant.
+ *   'full' = project → pagerank → louvain → knn → authority → ontology.
  *   Rate-limited to 1 full run per 5 min per user.
  */
 
@@ -19,12 +19,13 @@ import {
   runLouvainMutate,
   runKnnMutate,
   writeAuthorityScoresToQdrant,
+  seedAndClassifyOntology,
 } from '$lib/server/graph/neo4j-gds.js';
 
 const RATE_LIMIT_KEY = (userId: string) => `gds:rebuild:rl:${userId}`;
 const RATE_LIMIT_TTL = 300; // 5 min
 
-const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'full'] as const;
+const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'ontology', 'full'] as const;
 type GdsAction = typeof VALID_ACTIONS[number];
 
 export const GET: RequestHandler = async ({ locals }) => {
@@ -78,6 +79,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
     if (action === 'authority' || action === 'full') {
       result.authority = await writeAuthorityScoresToQdrant();
+    }
+    if (action === 'ontology' || action === 'full') {
+      result.ontology = await seedAndClassifyOntology();
     }
     result.totalMs = Date.now() - t0;
     return json(result);
