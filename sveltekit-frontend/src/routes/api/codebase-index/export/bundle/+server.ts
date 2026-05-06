@@ -88,6 +88,13 @@ function getRedisFresh(): IORedis {
 	});
 }
 
+// D16: `await using` wrapper — attaches Symbol.asyncDispose so callers can
+// drop their try/finally redis.disconnect() boilerplate.
+async function getRedisFreshDisposable() {
+	const { attachDispose } = await import('$lib/server/redis-disposable.js');
+	return attachDispose(getRedisFresh());
+}
+
 async function scanKeys(redis: IORedis, pattern: string, limit = 5000): Promise<string[]> {
 	const keys: string[] = [];
 	let cursor = '0';
@@ -216,7 +223,8 @@ async function buildWikiNotesPart(
 	errors: Record<string, string>,
 	limit: number
 ): Promise<WikiNote[] | null> {
-	const redis = getRedisFresh();
+	// D16: `await using` auto-disconnects on scope exit (replaces try/finally)
+	await using redis = await getRedisFreshDisposable();
 	try {
 		const keys = await scanKeys(redis, 'wiki:note:*', limit);
 		if (keys.length === 0) return [];
@@ -240,8 +248,6 @@ async function buildWikiNotesPart(
 	} catch (err) {
 		errors.wikiNotes = (err as Error).message;
 		return null;
-	} finally {
-		redis.disconnect();
 	}
 }
 
@@ -301,7 +307,8 @@ async function buildTileAtlasPart(
 async function buildCacheStatsPart(
 	errors: Record<string, string>
 ): Promise<Record<string, number> | null> {
-	const redis = getRedisFresh();
+	// D16: `await using` auto-disconnects on scope exit
+	await using redis = await getRedisFreshDisposable();
 	try {
 		const patterns = [
 			'turbo:*',
@@ -324,8 +331,6 @@ async function buildCacheStatsPart(
 	} catch (err) {
 		errors.cacheStats = (err as Error).message;
 		return null;
-	} finally {
-		redis.disconnect();
 	}
 }
 

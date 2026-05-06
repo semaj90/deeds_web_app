@@ -1,30 +1,24 @@
 # Deep AST Audit
 
-Generated: 2026-05-06T01:03:11.041Z
+Generated: 2026-05-06T01:09:45.533Z
 Graph files: 3417
 
 ## Summary
 
 | Gate | Description | Count |
 | :--- | :--- | ---: |
-| D18 | simdjson opportunity (.mget + JSON.parse, no fast-parse) | 10 |
+| D16 | await-using opportunity (try/finally + .quit/.disconnect) | 4 |
 
 ---
 
-## D18 — simdjson opportunity (.mget + JSON.parse, no fast-parse)
+## D16 — await-using opportunity (try/finally + .quit/.disconnect)
 
-**10** findings
+**4** findings
 
-- `src\lib\server\research\lane4-feedback.ts:126` — const [scoreRaw, countRaw] = await redis.mget(  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\lib\server\rag\sdk.ts:48` — const [statusRaw, shardCountRaw] = await redis.mget([  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\lib\server\graph\hypergraph-4d.ts:1123` — const raw = await redis.mget(hashes.map(h => HG_EDGE_KEY(h))).catch(() => [] as (string|null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\lib\server\graph\codebase-cluster-detection.ts:350` — const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\lib\server\cache\redis-exact-match.ts:160` — const values = await redis.mget(...cacheKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\lib\server\analytics\web-research-crawler.ts:396` — .mget(hashes.map(h => WEB_SUM_KEY(h)))  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\topology-hits\+server.ts:52` — const blobs = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\ingest-log\+server.ts:44` — const raws = await redis.mget(hashes.map((h) => `rag:hit:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\agents-write\+server.ts:209` — kagVals = await redis.mget(...kagKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\export\bundle\+server.ts:223` — const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
+- `scripts\deep-audit-ast.mjs:647` — // D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()
+- `scripts\tests\test-ace-graphify-retrieval.mjs:192` — await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()
+- `scripts\lib\phase89-sse-stream.mjs:199` — await redis.quit();  → consider `await using` + getDisposableRedis()
+- `src\routes\api\health\redis\+server.ts:74` — await client.quit();  → consider `await using` + getDisposableRedis()
 
 ---
 

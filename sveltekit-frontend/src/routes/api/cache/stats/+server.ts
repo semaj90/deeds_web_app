@@ -67,16 +67,14 @@ export const GET: RequestHandler = async ({ locals, request, url }) => {
 				// One-shot retry with a fresh ioredis client bypasses the pool.
 				const msg = String(innerErr);
 				if (/closed|ECONNRESET|ENOTFOUND/i.test(msg)) {
-					const fresh = new IORedis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+					// D16: `await using` auto-disconnects on scope exit (even on throw)
+					const { attachDispose } = await import('$lib/server/redis-disposable.js');
+					await using fresh = attachDispose(new IORedis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
 						maxRetriesPerRequest: 1,
 						connectTimeout: 3000,
 						lazyConnect: false
-					});
-					try {
-						count = await scanCount(fresh, patternParam);
-					} finally {
-						fresh.disconnect();
-					}
+					}));
+					count = await scanCount(fresh, patternParam);
 				} else {
 					throw innerErr;
 				}

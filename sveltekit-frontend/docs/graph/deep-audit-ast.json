@@ -1,60 +1,30 @@
 {
-  "generatedAt": "2026-05-06T01:03:11.041Z",
+  "generatedAt": "2026-05-06T01:09:45.533Z",
   "graphFiles": 3417,
   "gates": {
-    "D18": {
-      "name": "simdjson opportunity (.mget + JSON.parse, no fast-parse)",
-      "count": 10,
+    "D16": {
+      "name": "await-using opportunity (try/finally + .quit/.disconnect)",
+      "count": 4,
       "findings": [
         {
-          "file": "src\\lib\\server\\research\\lane4-feedback.ts",
-          "line": 126,
-          "snippet": "const [scoreRaw, countRaw] = await redis.mget(  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+          "file": "scripts\\deep-audit-ast.mjs",
+          "line": 647,
+          "snippet": "// D16: `await using` opportunities — try/finally with .quit()/.disconnect()  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\rag\\sdk.ts",
-          "line": 48,
-          "snippet": "const [statusRaw, shardCountRaw] = await redis.mget([  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+          "file": "scripts\\tests\\test-ace-graphify-retrieval.mjs",
+          "line": 192,
+          "snippet": "await redis.quit().catch(() => {});  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\graph\\hypergraph-4d.ts",
-          "line": 1123,
-          "snippet": "const raw = await redis.mget(hashes.map(h => HG_EDGE_KEY(h))).catch(() => [] as (string|null)[]);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+          "file": "scripts\\lib\\phase89-sse-stream.mjs",
+          "line": 199,
+          "snippet": "await redis.quit();  → consider `await using` + getDisposableRedis()"
         },
         {
-          "file": "src\\lib\\server\\graph\\codebase-cluster-detection.ts",
-          "line": 350,
-          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\cache\\redis-exact-match.ts",
-          "line": 160,
-          "snippet": "const values = await redis.mget(...cacheKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\lib\\server\\analytics\\web-research-crawler.ts",
-          "line": 396,
-          "snippet": ".mget(hashes.map(h => WEB_SUM_KEY(h)))  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\topology-hits\\+server.ts",
-          "line": 52,
-          "snippet": "const blobs = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\ingest-log\\+server.ts",
-          "line": 44,
-          "snippet": "const raws = await redis.mget(hashes.map((h) => `rag:hit:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\agents-write\\+server.ts",
-          "line": 209,
-          "snippet": "kagVals = await redis.mget(...kagKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
-        },
-        {
-          "file": "src\\routes\\api\\codebase-index\\export\\bundle\\+server.ts",
-          "line": 223,
-          "snippet": "const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate"
+          "file": "src\\routes\\api\\health\\redis\\+server.ts",
+          "line": 74,
+          "snippet": "await client.quit();  → consider `await using` + getDisposableRedis()"
         }
       ]
     }
