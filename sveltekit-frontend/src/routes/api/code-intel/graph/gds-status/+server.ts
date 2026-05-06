@@ -20,12 +20,14 @@ import {
   runKnnMutate,
   writeAuthorityScoresToQdrant,
   seedAndClassifyOntology,
+  getUnclassifiedFileCount,
 } from '$lib/server/graph/neo4j-gds.js';
 
 const RATE_LIMIT_KEY = (userId: string) => `gds:rebuild:rl:${userId}`;
 const RATE_LIMIT_TTL = 300; // 5 min
 
-const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'ontology', 'full'] as const;
+// 'd27' is read-only (getUnclassifiedFileCount), not rate-limited.
+const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'ontology', 'd27', 'full'] as const;
 type GdsAction = typeof VALID_ACTIONS[number];
 
 export const GET: RequestHandler = async ({ locals }) => {
@@ -82,6 +84,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
     if (action === 'ontology' || action === 'full') {
       result.ontology = await seedAndClassifyOntology();
+    }
+    if (action === 'd27') {
+      // Read-only gate check — returns unclassifiedFiles count (must be 0 to pass).
+      const unclassifiedFiles = await getUnclassifiedFileCount();
+      result.unclassifiedFiles = unclassifiedFiles;
+      result.d27Passed = unclassifiedFiles === 0;
     }
     result.totalMs = Date.now() - t0;
     return json(result);
