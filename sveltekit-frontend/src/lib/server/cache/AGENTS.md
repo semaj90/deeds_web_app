@@ -12,7 +12,7 @@
 - no audit signals
 - Tags: `src` `lib` `server` `zod`
 
-## Files (8)
+## Files (9)
 
 - `cache-events.ts`
 - `cartridge-tensor-bridge.ts`
@@ -21,6 +21,7 @@
 - `pdf-export-cache.ts`
 - `redis-exact-match.ts`
 - `report-template-cache.ts`
+- `topo-candidate-cache.ts` — Redis quick-hit cache for topo_class ANN candidates (`ace:topo:{class}:{hash}`, TTL 300s); see `TopoPrefilterStats` → `ACEContext.retrievalTrace`
 - `warm-up.ts`
 
 ## Hypergraph cluster
