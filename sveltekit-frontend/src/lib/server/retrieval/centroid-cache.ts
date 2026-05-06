@@ -17,6 +17,9 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { centroidKey, TTL } from '$lib/server/cache-keys.js';
+import { db } from '$lib/server/db/client';
+import { gpuClusterCentroids } from '$lib/server/db/schema/codebase-intelligence.js';
+import { eq, sql } from 'drizzle-orm';
 
 // ── get / set ─────────────────────────────────────────────────────────────────
 
@@ -90,6 +93,19 @@ export async function nearestCluster(
     if (!keys.length) return null;
 
     const values = await redis.mget(...keys);
+
+    // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Each centroid is a
+    // 768-dim Float32Array serialized as JSON (~6KB), so a typical 50-cluster
+    // MGET is ~300KB — well above the threshold where simdjson beats V8 2-5×.
+    const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
+    let parseFn: (s: string) => number[] = (s) => JSON.parse(s) as number[];
+    if (values.length >= 10 && totalChars >= 5_000) {
+      try {
+        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+        if (isSimdJsonAvailable()) parseFn = fastJsonParse<number[]>;
+      } catch { /* addon unavailable — keep V8 */ }
+    }
+
     let bestId   = -1;
     let bestSim  = -Infinity;
 
@@ -98,7 +114,7 @@ export async function nearestCluster(
       if (!raw) continue;
       const id  = parseInt(keys[i].split(':')[2], 10);
       if (isNaN(id)) continue;
-      const vec = new Float32Array(JSON.parse(raw) as number[]);
+      const vec = new Float32Array(parseFn(raw));
       const sim = cosine(queryVec, vec);
       if (sim > bestSim) { bestSim = sim; bestId = id; }
     }
@@ -164,4 +180,91 @@ export async function buildAndCacheCentroids(
 
   await pipe.exec();
   return written;
+}
+
+// ── Postgres persistence ──────────────────────────────────────────────────────
+
+/**
+ * Persist all currently cached centroids from Redis → Postgres.
+ * Called after buildAndCacheCentroids() to make them durable across restarts.
+ * Returns number of rows upserted.
+ */
+export async function persistCentroidsToDB(
+  clusterIds: number[],
+  clusterType: 'gpu' | 'som' = 'gpu',
+): Promise<number> {
+  const redis = getRedis();
+  const keys  = clusterIds.map((id) => centroidKey.cluster(id));
+  if (!keys.length) return 0;
+
+  const values = await redis.mget(...keys);
+  let upserted = 0;
+
+  for (let i = 0; i < clusterIds.length; i++) {
+    const raw = values[i];
+    if (!raw) continue;
+    const vec = JSON.parse(raw) as number[];
+    if (!vec.length) continue;
+
+    try {
+      await db
+        .insert(gpuClusterCentroids)
+        .values({
+          clusterId:   clusterIds[i],
+          clusterType,
+          centroidVec: vec,
+          chunkCount:  0,
+          updatedAt:   new Date(),
+        })
+        .onConflictDoUpdate({
+          target: gpuClusterCentroids.clusterId,
+          set: {
+            centroidVec: sql`EXCLUDED.centroid_vec`,
+            clusterType: sql`EXCLUDED.cluster_type`,
+            updatedAt:   sql`now()`,
+          },
+        });
+      upserted++;
+    } catch { /* non-fatal per centroid */ }
+  }
+
+  return upserted;
+}
+
+/**
+ * Warm Redis centroid cache from Postgres on startup / after Redis restart.
+ * Returns number of centroids loaded into Redis.
+ */
+export async function loadCentroidsFromDB(
+  clusterType: 'gpu' | 'som' = 'gpu',
+  ttlSeconds = TTL.CENTROID,
+): Promise<number> {
+  try {
+    const rows = await db
+      .select({
+        clusterId:   gpuClusterCentroids.clusterId,
+        centroidVec: gpuClusterCentroids.centroidVec,
+      })
+      .from(gpuClusterCentroids)
+      .where(eq(gpuClusterCentroids.clusterType, clusterType));
+
+    if (!rows.length) return 0;
+
+    const redis = getRedis();
+    const pipe  = redis.pipeline();
+
+    for (const row of rows) {
+      if (!row.centroidVec?.length) continue;
+      pipe.setex(
+        centroidKey.cluster(row.clusterId),
+        ttlSeconds,
+        JSON.stringify(row.centroidVec),
+      );
+    }
+
+    await pipe.exec();
+    return rows.length;
+  } catch {
+    return 0;
+  }
 }

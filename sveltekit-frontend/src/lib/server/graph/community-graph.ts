@@ -489,10 +489,23 @@ export async function getCommunityContext(
     // Load community records — single MGET round-trip (was N parallel gets)
     const commKeys = ids.map((id) => `hg:community:${id}`);
     const commRaws = await redis.mget(...commKeys).catch(() => [] as Array<string | null>);
+
+    // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Community records
+    // include rich metadata (member files, summary, tags, cohesion) — typical
+    // record is 2-8KB so 10+ communities easily clear the threshold.
+    const commTotal = commRaws.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+    let parseComm: (s: string) => CommunityRecord = (s) => JSON.parse(s) as CommunityRecord;
+    if (commRaws.length >= 10 && commTotal >= 5_000) {
+      try {
+        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+        if (isSimdJsonAvailable()) parseComm = fastJsonParse<CommunityRecord>;
+      } catch { /* addon unavailable — keep V8 */ }
+    }
+
     const records = commRaws
       .map((raw): CommunityRecord | null => {
         if (!raw) return null;
-        try { return JSON.parse(raw) as CommunityRecord; } catch { return null; }
+        try { return parseComm(raw); } catch { return null; }
       })
       .filter((r): r is CommunityRecord => r !== null);
 
