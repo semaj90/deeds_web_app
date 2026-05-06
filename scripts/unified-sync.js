@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import pg from 'pg';
+const { Client } = pg;
 
 /**
  * Unified Sync: Diagnostic -> Cleanup -> Obsidian
@@ -101,6 +103,26 @@ ${errorCount === 0 ? '*No issues detected! Base code is clean.*' : ''}
     fs.writeFileSync(filename, content, 'utf8');
     console.log(`✅ Obsidian Grounding Complete: ${filename}`);
     console.log(`📊 Status: ${errorCount} errors in ${uniqueFiles} files.`);
+
+    // 4. Log to Metadata Spine (codebase_audit_events)
+    console.log('💾 Writing audit event to Metadata Spine...');
+    try {
+        const dbUrl = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+        const client = new Client({ connectionString: dbUrl });
+        await client.connect();
+        await client.query(`
+            INSERT INTO codebase_audit_events (audit_type, status, output)
+            VALUES ($1, $2, $3)
+        `, [
+            'unified_sync',
+            errorCount === 0 ? 'success' : 'failure',
+            JSON.stringify({ errorCount, uniqueFiles, timestamp: new Date().toISOString() })
+        ]);
+        await client.end();
+        console.log('✅ Audit event logged to database.');
+    } catch (dbErr) {
+        console.error('⚠️ Failed to log audit event to database:', dbErr.message);
+    }
 }
 
 run().catch(console.error);

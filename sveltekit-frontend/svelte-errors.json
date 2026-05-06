@@ -1,11 +1,13 @@
 Loading svelte-check in workspace: c:\Users\james\Videos\deeds-web-app\sveltekit-frontend
 Getting Svelte diagnostics...
 
-c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\routes\api\admin\agent\fix\+server.ts[39m:143:66
-[31mError[39m: Property 'content' does not exist on type 'never'. 
-[36m    );
-    const text = typeof _result === 'string' ? _result : _result.[35mcontent[36m;[39m
+c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\[32msrc\routes\(app)\codebase-graph\fast-ast\+page.svelte[39m:26:13
+[33mWarn[39m: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+[36m  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const d = [35mdata[36m as any;
+  const overview  = d.overview  ?? null;[39m
 
 ====================================
-[31msvelte-check found 1 error and 0 warnings in 1 file
+[33msvelte-check found 0 errors and 1 warning in 1 file
 [39m

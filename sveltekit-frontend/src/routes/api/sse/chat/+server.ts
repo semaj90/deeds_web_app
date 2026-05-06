@@ -26,6 +26,7 @@ import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { traceEmbedding, traceLLM } from '$lib/server/observability/langfuse.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { fetchGlossaryMatches, fetchCachedACEChunks, persistACEChunks } from '$lib/server/ace/context-assembler.js';
+import { classifyQuerySection, getInterimInference } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
 import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
@@ -1097,6 +1098,44 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       controller.enqueue(encoder.encode('retry: 3000\n\n'));
 
       send({ id, role: 'assistant', content: '', status: 'thinking' });
+
+      // ── HMM section classification (sub-millisecond, no glyphs needed) ──
+      // First substantive event after `thinking` — lets the client pre-bias
+      // its UI (highlight matching glyph atlas section) while ACE assembles.
+      // Confidence > 0.3 is the same threshold used in queryTags.
+      try {
+        const querySection = classifyQuerySection(message);
+        if (querySection.confidence > 0.3) {
+          send({
+            id,
+            type:       'section-bias',
+            section:    querySection.section,
+            confidence: querySection.confidence,
+          });
+        }
+      } catch { /* non-fatal */ }
+
+      // ── HMM interim inference: glyph-prompt-cache (L0.5) draft answer ──
+      // Best-effort early SSE event using whatever glyphs are warm in the
+      // L0.5 cache. Returns in <10ms when populated; skipped silently when
+      // the cache is cold. Final answer arrives later via the normal stream.
+      try {
+        const cachedGlyphs = (globalThis as { __aceWarmGlyphs?: Array<unknown> }).__aceWarmGlyphs ?? [];
+        if (cachedGlyphs.length > 0) {
+          const interim = await getInterimInference(message, cachedGlyphs as never, { userId: locals.user?.id });
+          if (interim?.context && interim.cacheSource !== 'empty') {
+            send({
+              id,
+              type:         'interim-inference',
+              context:      interim.context,
+              sectionBias:  interim.sectionBias,
+              cacheSource:  interim.cacheSource,
+              flowScore:    interim.flowScore,
+              hmmLatencyMs: interim.hmmLatencyMs,
+            });
+          }
+        }
+      } catch { /* non-fatal */ }
 
       // L0.5 Glyph Cache: emit diagnostic metrics
       const glyphMetrics = getGlyphCacheMetrics();

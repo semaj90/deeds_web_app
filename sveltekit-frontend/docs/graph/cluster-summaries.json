@@ -1,0 +1,1639 @@
+{
+  "generatedAt": "2026-05-05T13:59:31.191Z",
+  "repoId": "default",
+  "clusterCount": 38,
+  "totalMembers": 16626,
+  "totalLlmHits": 0,
+  "clusters": [
+    {
+      "clusterId": 5,
+      "summary": "This cluster provides a comprehensive service layer for advanced AI capabilities, handling inference, context analysis (emotion), knowledge retrieval, and complex multi-step workflow orchestration.",
+      "purpose": "AI Service Layer and Workflow Orchestration",
+      "patterns": [
+        "Client/Service Layer",
+        "State Pattern",
+        "Strategy Pattern",
+        "Observer Pattern (Workflow Events)"
+      ],
+      "warnings": [
+        "The system manages several complex, potentially asynchronous AI components (E2B, ONNX, Quantization); robust resource cleanup and error handling are critical.",
+        "The `EmotionState` and `WorkflowEvent` interfaces are highly complex and require careful state management to prevent data inconsistency."
+      ],
+      "tags": [
+        "src/lib/client/workflow-event-stream.ts",
+        "src/lib/ai/client-router.ts",
+        "src/lib/ai/emotion-context.ts",
+        "src/lib/ai/gemma4-e2b-client.ts",
+        "src/lib/ai/base64-fp32-quantizer.ts"
+      ],
+      "bowTerms": [
+        "components",
+        "sym:chat",
+        "routes",
+        "topic:component",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/components",
+        "src/lib/features/evidence-command-center",
+        "src/routes/(app)/demos/chat-messages",
+        "src/routes/(app)/terminal",
+        "src/lib/components/ai"
+      ],
+      "memberCount": 1526,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/ClientGemmaInference.svelte",
+          "src/lib/components/legal-corpus/CorpusSidebar.svelte",
+          "src/lib/components/SearchBox.svelte",
+          "src/lib/components/ui/ExpandGrid.svelte",
+          "src/lib/components/ArchivedRoutesPanel.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:29:00.193Z"
+      },
+      "createdAt": "2026-04-20T19:29:00.193Z",
+      "updatedAt": "2026-04-24T21:47:48.301Z"
+    },
+    {
+      "clusterId": 7,
+      "summary": "This cluster provides a suite of components and pages for a legal research and analysis platform, handling tasks like evidence management, legal citation tracking, document comparison, and real-time data streaming.",
+      "purpose": "Legal Research and Evidence Analysis Platform",
+      "patterns": [
+        "Component-based Architecture (Svelte)",
+        "State Management (using $state)",
+        "Streaming Data Handling (EventSource/StreamingResponse)",
+        "Composition over Inheritance (reusing UI components)",
+        "Drag-and-Drop Interface"
+      ],
+      "warnings": [
+        "The `LegalPrecedentCard.svelte` component is incomplete (truncated code), potentially leading to runtime errors if not fully implemented.",
+        "The `TagSelector.svelte` component relies on external state management for `availableTags` and `isLoading`, ensuring proper API calls and state cleanup is critical to prevent stale data.",
+        "The `PhoenixEventMonitor.svelte` uses `EventSource` for real-time updates; robust error handling (e.g., reconnection logic) must be implemented to ensure continuous monitoring.",
+        "The `UploadZone.svelte` component handles file uploads; proper client-side validation and secure server-side processing (e.g., file type checking, size limits) are mandatory to prevent security vulnerabilities."
+      ],
+      "tags": [
+        "src/lib/components/legal/CitationManager.svelte",
+        "src/lib/components/admin/EvidenceDrawer.svelte",
+        "src/lib/components/yorha/PhoenixEventMonitor.svelte",
+        "src/lib/components/ui/DiffViewer.svelte",
+        "src/routes/(app)/admin/dev-tools/+page.svelte"
+      ],
+      "bowTerms": [
+        "topic:component",
+        "components"
+      ],
+      "representativePaths": [
+        "src/lib/components/admin"
+      ],
+      "memberCount": 1427,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/routes/(app)/command-center/codebase/clusters/[id]/+page.svelte",
+          "src/routes/(app)/admin/explorer/+page.svelte",
+          "src/lib/components/RouteOperationsDashboard.svelte",
+          "src/routes/(app)/admin/qlora-training/+page.svelte",
+          "src/routes/(app)/admin/ast-topology/+page.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:29:17.791Z"
+      },
+      "createdAt": "2026-04-20T19:29:17.841Z",
+      "updatedAt": "2026-04-25T02:11:34.364Z"
+    },
+    {
+      "clusterId": 14,
+      "summary": "This cluster provides utility functions and client-side logic for advanced AI tasks, including stable softmax calculation, WebGPU context management, image preprocessing for VLM, and specialized data parsing for genomic/cartridge data.",
+      "purpose": "AI/ML Utility and Client Infrastructure",
+      "patterns": [
+        "Utility Functions",
+        "WebGPU Context Management",
+        "Data Preprocessing Pipeline",
+        "Client-Server Communication (gRPC)"
+      ],
+      "warnings": [
+        "The `stableSoftmax` function is missing its return statement (incomplete code).",
+        "The `configureCanvas` function is missing its error handling logic (incomplete code).",
+        "The `src/lib/types/webgpu-navigator.d.ts` file is a partial type definition and may require careful maintenance as WebGPU standards evolve.",
+        "The `resizeForVLM` function relies on external libraries (sharp) and complex image processing logic, which can be performance-intensive."
+      ],
+      "tags": [
+        "src/lib/ai/client-embed.ts",
+        "src/lib/webgpu/init.ts",
+        "src/lib/server/image/resize-for-vlm.ts",
+        "src/lib/server/grpc/retrieval-client.ts",
+        "src/lib/types/webgpu-navigator.d.ts"
+      ],
+      "bowTerms": [
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/ai"
+      ],
+      "memberCount": 1360,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/utils/media-query.svelte.ts",
+          "src/lib/components/ui/radio/Svelte5RadioGroup.svelte",
+          "src/lib/components/NESGraphRenderer.svelte",
+          "src/lib/components/ui/RichTextEditor.svelte",
+          "src/lib/components/canvas/HybridBoard.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:25.134Z"
+      },
+      "createdAt": "2026-04-20T19:30:25.176Z",
+      "updatedAt": "2026-04-25T02:17:05.976Z"
+    },
+    {
+      "clusterId": 8,
+      "summary": "This cluster provides a comprehensive set of API route handlers responsible for managing core application features, including document access, user profiles, knowledge base indexing, and complex data retrieval like conversation history and RAG suggestions.",
+      "purpose": "API Gateway / Backend Service Layer",
+      "patterns": [
+        "Route Handler Pattern",
+        "Authorization Guard Pattern",
+        "Schema Validation (Zod/Joi)",
+        "Asynchronous Job Queue Pattern",
+        "Resource Ownership Check"
+      ],
+      "warnings": [
+        "Performance: The knowledge seeding endpoint (`seed-knowledge`) uses synchronous loops for database operations; consider implementing bulk operations or batch processing to prevent timeouts with large datasets.",
+        "Security: While authorization checks are present, ensure that all database queries (e.g., in `documents` and `cases`) strictly enforce ownership checks (user ID matching the resource owner) to prevent Insecure Direct Object Reference (IDOR).",
+        "Performance: The cache metrics endpoint reads Redis stats directly on every request; consider implementing a caching layer (e.g., Redis itself) for the metrics endpoint to reduce overhead.",
+        "Correctness: The `crawl` endpoint performs SSRF checks, but the complexity of validating external URLs requires rigorous testing to ensure all edge cases are covered."
+      ],
+      "tags": [
+        "src/routes/api/library/crawl/+server.ts",
+        "src/routes/api/codebase-index/recommendations/+server.ts",
+        "src/routes/api/error-brain/history/[filePath]/+server.ts",
+        "src/routes/api/documents/[documentId]/toc/+server.ts",
+        "src/routes/api/admin/seed-knowledge/+server.ts"
+      ],
+      "bowTerms": [
+        "routes",
+        "sym:load"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/library/[documentid]/node/[nodeid]",
+        "src/routes/api/library/document/[id]/toc",
+        "src/routes/api/library/documents/[documentid]/pdf",
+        "src/routes/api/library/documents/[documentid]/toc",
+        "src/routes/(app)/library/[documentid]/reader"
+      ],
+      "memberCount": 1215,
+      "llmPathCount": 8,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
+          "src/lib/server/indexer/legal-chunker.ts",
+          "src/poi-store.ts",
+          "src/lib/services/error-analysis/ExperienceRecorder.ts",
+          "src/lib/server/gpu/mapreduce-cuda-analyzer.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:29:36.556Z"
+      },
+      "createdAt": "2026-04-20T19:29:36.591Z",
+      "updatedAt": "2026-04-25T02:13:00.257Z"
+    },
+    {
+      "clusterId": 11,
+      "summary": "This cluster defines a comprehensive set of type definitions and data contracts for advanced, specialized system components, including GPU tensor management, AI embedding services, and complex user interface states.",
+      "purpose": "Type definitions and data contracts layer",
+      "patterns": [
+        "Data Transfer Objects (DTOs)",
+        "Configuration Object Pattern",
+        "Domain Modeling",
+        "State Management Structure"
+      ],
+      "warnings": [
+        "The complexity of the defined types (e.g., dimensional tensor store) requires extremely rigorous implementation to ensure memory safety and performance.",
+        "Given the high number of specialized types, maintaining consistency across all consuming modules is critical to prevent subtle type-related bugs."
+      ],
+      "tags": [
+        "src/lib/webgpu/dimensional-tensor-store.ts",
+        "src/lib/utils/progressive-enhancement-audit.ts",
+        "src/lib/knowledge-search/types.ts",
+        "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "src/lib/types/external-services.ts"
+      ],
+      "bowTerms": [
+        "utils",
+        "topic:utils",
+        "sym:progressive",
+        "types"
+      ],
+      "representativePaths": [],
+      "memberCount": 1126,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/evidence/EvidenceAssistant.svelte",
+          "src/lib/components/codebase/CodeEvidenceBoard.svelte",
+          "src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte",
+          "src/lib/stores/unified/evidence-store.svelte.ts",
+          "src/lib/components/evidence/EvidenceRecall.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:29:52.104Z"
+      },
+      "createdAt": "2026-04-20T19:29:52.136Z",
+      "updatedAt": "2026-04-25T02:16:27.521Z"
+    },
+    {
+      "clusterId": 19,
+      "summary": "This cluster defines the comprehensive data models and response types used across various backend services. It standardizes the structure for results coming from knowledge bases, web searches, document processing, and AI synthesis.",
+      "purpose": "Data Contract Definitions",
+      "patterns": [
+        "Data Transfer Objects (DTOs)",
+        "Response Standardization",
+        "Type Safety Enforcement",
+        "Layered Architecture"
+      ],
+      "warnings": [
+        "The use of `Record<string, any>` (e.g., in `QueryResultRow` and `KBSearchResult`) sacrifices compile-time type safety for flexibility. Consumers must implement robust runtime validation to prevent unexpected data access.",
+        "The definitions imply complex multi-stage pipelines (e.g., search -> cache -> synthesis). Error handling and fallback mechanisms for external services (like MinIO or vector stores) must be rigorously implemented outside of these type definitions."
+      ],
+      "tags": [
+        "src/lib/types/source-validation.ts",
+        "src/lib/server/retrieval/web-search.ts",
+        "src/lib/server/docling.ts",
+        "src/lib/server/types/synthesis.ts",
+        "src/lib/types/evidence.ts"
+      ],
+      "bowTerms": [
+        "types",
+        "utils",
+        "sym:ollama",
+        "sym:qdrant"
+      ],
+      "representativePaths": [
+        "src/lib/server/ai",
+        "src/lib/server/utils"
+      ],
+      "memberCount": 1052,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/observability/langfuse.ts",
+          "src/lib/server/redis-streams.ts",
+          "src/lib/server/api-registry.ts",
+          "src/lib/server/lucia.ts",
+          "src/lib/server/db/unified-client.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:59.623Z"
+      },
+      "createdAt": "2026-04-20T19:30:59.624Z",
+      "updatedAt": "2026-04-25T02:21:53.755Z"
+    },
+    {
+      "clusterId": 4,
+      "summary": "This file centralizes various constants and configuration limits necessary for the deployment and operation of AI models, defining resource minimums, model dimensions, and performance multipliers.",
+      "purpose": "AI Model Configuration Constants",
+      "patterns": [
+        "Constant Definition",
+        "Configuration Object"
+      ],
+      "warnings": [
+        "The file contains numerous hardcoded magic numbers (e.g., memory limits, dimensions). If hardware requirements change, these constants must be manually updated, increasing the risk of configuration drift."
+      ],
+      "tags": [
+        "src/lib/ai/model-ids.ts"
+      ],
+      "bowTerms": [
+        "components",
+        "sym:props",
+        "topic:vector"
+      ],
+      "representativePaths": [
+        "src/lib/components/ui/modular",
+        "src/lib/components/ui/tabs",
+        "src/lib/icons/yorha",
+        "src/lib/components/ui/alert-dialog",
+        "src/lib/components/ui/dialog"
+      ],
+      "memberCount": 934,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/courtroom/StrategyWizard.svelte",
+          "src/lib/components/ai/LocalImageGenerator.svelte",
+          "src/lib/components/ai/RecommendationEngine.svelte",
+          "src/lib/components/rag/RagDocumentGrid.svelte",
+          "src/lib/components/legal-corpus/LegalCorpusDemoView.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:28:57.437Z"
+      },
+      "createdAt": "2026-04-20T19:28:57.473Z",
+      "updatedAt": "2026-04-24T21:47:17.535Z"
+    },
+    {
+      "clusterId": 9,
+      "summary": "This cluster provides the foundational infrastructure for a complex application, managing core backend services like authentication, API routing, state persistence, and external service communication (AI/gRPC). It also includes essential frontend utilities for state management and network handling.",
+      "purpose": "Core Backend Infrastructure and State Management",
+      "patterns": [
+        "Registry Pattern",
+        "Service Layer",
+        "Command Pattern",
+        "Singleton/Global State Management",
+        "Wrapper/Decorator Pattern"
+      ],
+      "warnings": [
+        "The file src/lib/server/types/globals.d.ts uses ambient declarations with 'unknown' types, which is highly permissive and should be replaced with proper, strongly typed dependency injection or module imports to improve type safety and maintainability.",
+        "The function in src/lib/server/grpc/tool-router-client.ts appears truncated during error handling, potentially leading to runtime errors if the gRPC call fails.",
+        "src/lib/utils/api-endpoints.ts relies on an undefined function, `getFrontendApiBaseUrl()`, which must be defined or imported for the health check endpoint to function correctly."
+      ],
+      "tags": [
+        "src/lib/server/api-registry.ts",
+        "src/lib/server/types/globals.d.ts",
+        "src/lib/server/lucia.ts",
+        "src/lib/polyfills.ts",
+        "src/lib/stores.svelte.ts"
+      ],
+      "bowTerms": [
+        "types",
+        "sym:response",
+        "utils",
+        "sym:props",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/utils"
+      ],
+      "memberCount": 928,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/schemas/forms.ts",
+          "src/lib/server/utils/avatar-upload.ts",
+          "src/lib/server/pdf/legalPacketGenerator.ts",
+          "src/lib/server/agent/autonomous-agent.ts",
+          "src/lib/server/queue/rabbitmq-manager-fixed.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:29:37.126Z"
+      },
+      "createdAt": "2026-04-20T19:29:37.126Z",
+      "updatedAt": "2026-04-25T02:14:22.791Z"
+    },
+    {
+      "clusterId": 6,
+      "summary": "This cluster provides comprehensive services for advanced information retrieval, including vector search, document extraction, and hybrid ranking, while also managing audio processing and auditing tools.",
+      "purpose": "Knowledge Retrieval and AI Processing Pipeline",
+      "patterns": [
+        "Service Layer",
+        "Strategy Pattern (for different search/extraction methods)",
+        "Repository Pattern (for data access/caching)",
+        "Pipeline Processing (multi-stage data transformation, e.g., audio processing)"
+      ],
+      "warnings": [
+        "The use of 'pgvector-utils.temp.ts' suggests temporary or incomplete code; ensure proper migration to a stable module.",
+        "The `WebGPUSimilarityService` relies on WebGPU, which introduces platform dependency and potential browser/environment compatibility issues.",
+        "The `AudioProcessor` handles complex, multi-stage asynchronous tasks (transcription, entity extraction); robust error handling and state management are critical.",
+        "The `KnowledgeSearcher` combines multiple ranking methods (semantic, tfidf) and relies heavily on caching (Redis), requiring careful cache invalidation strategies to maintain data freshness."
+      ],
+      "tags": [
+        "src/lib/server/services/knowledge-search/KnowledgeSearcher.ts",
+        "src/lib/server/db/pgvector-utils.temp.ts",
+        "src/lib/server/workers/audio-processor.ts",
+        "src/lib/server/analytics/search-analytics.ts",
+        "src/lib/server/ace/policy.ts"
+      ],
+      "bowTerms": [
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/graph",
+        "src/lib/server/db"
+      ],
+      "memberCount": 918,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/api-registry.ts",
+          "src/lib/server/context/contextual.ts",
+          "src/lib/types/source-validation.ts",
+          "src/lib/server/agent/subagents.ts",
+          "src/lib/server/ace/context-assembler.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:29:18.433Z"
+      },
+      "createdAt": "2026-04-20T19:29:18.434Z",
+      "updatedAt": "2026-04-25T02:10:59.989Z"
+    },
+    {
+      "clusterId": 17,
+      "summary": "This cluster provides foundational, shared infrastructure services for the application, managing state, handling resource pooling (compute and GPU), and providing utilities for configuration, concurrency, and AI processing.",
+      "purpose": "Core Infrastructure Services / Utility Layer",
+      "patterns": [
+        "Singleton",
+        "State Management (Stores)",
+        "Resource Pooling",
+        "Dependency Injection (Implicit via singletons)"
+      ],
+      "warnings": [
+        "The heavy reliance on singletons (e.g., ComputePool, MultiVectorStore, routeLogger) can create tight coupling and make unit testing difficult, as dependencies are globally managed.",
+        "The GPU memory pool draining function (drainFloat32Pool) must be called reliably after large batch jobs; failure to do so could lead to memory leaks or resource exhaustion.",
+        "Ensure that state changes within the unified stores are handled immutably to prevent unexpected side effects across components."
+      ],
+      "tags": [
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/server/concurrency/advisory-locks.ts",
+        "src/lib/config/env.server.ts",
+        "src/lib/server/gpu/libtorch-bridge.ts"
+      ],
+      "bowTerms": [
+        "services",
+        "error",
+        "analysis",
+        "knowledge",
+        "search",
+        "sym:get",
+        "topic:error",
+        "sym:store"
+      ],
+      "representativePaths": [
+        "src/lib/services/error-analysis",
+        "src/lib/services/knowledge-search"
+      ],
+      "memberCount": 849,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/legal/ChainOfCustodyTracker.svelte",
+          "src/lib/components/case/SimilarCasesPanel.svelte",
+          "src/lib/components/yorha/CrossExaminationAssistant.svelte",
+          "src/routes/(app)/demos/yorha/components/cases/CaseStats.svelte",
+          "src/routes/(app)/active-cases/+page.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:40.967Z"
+      },
+      "createdAt": "2026-04-20T19:30:41.117Z",
+      "updatedAt": "2026-04-25T02:19:39.636Z"
+    },
+    {
+      "clusterId": 16,
+      "summary": "This cluster provides the foundational types, schemas, and infrastructure constants necessary for a complex, multi-stage evidence processing pipeline. It manages state, communication queues, and data persistence across various specialized AI agents.",
+      "purpose": "Core Data Modeling and Asynchronous Workflow Orchestration",
+      "patterns": [
+        "Event-Driven Architecture",
+        "Type/Enum Definition",
+        "Caching Strategy",
+        "Repository/Service Definition"
+      ],
+      "warnings": [
+        "The system relies heavily on asynchronous communication (RabbitMQ, workflow events); careful management of idempotency and transaction boundaries is critical to prevent race conditions.",
+        "Schema drift is a high risk; changes to any defined enums (e.g., `WorkflowEventType`, `citationTypeEnum`) must be coordinated across all consuming services.",
+        "The complexity of coordinating multiple specialized agents (YOLO, LLM, OCR) requires robust error handling and compensating transactions for failed pipeline stages."
+      ],
+      "tags": [
+        "src/lib/server/queue/workflow-publish.ts",
+        "src/lib/server/rabbitmq.ts",
+        "src/lib/server/cache-keys.ts",
+        "src/lib/stores/unified/evidence-store.svelte.ts",
+        "src/lib/server/agent/subagents.ts"
+      ],
+      "bowTerms": [
+        "topic:error",
+        "topic:vector",
+        "error",
+        "analysis",
+        "services"
+      ],
+      "representativePaths": [],
+      "memberCount": 791,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/db/migrations/004_add_missing_api_tables.sql",
+          "src/lib/db/migrations/enhanced-grpo-migration.sql",
+          "src/lib/server/db/0000_stiff_the_hood.sql",
+          "src/lib/server/db/schema-ingestion.ts",
+          "src/lib/server/db/schema/index.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:42.526Z"
+      },
+      "createdAt": "2026-04-20T19:30:42.526Z",
+      "updatedAt": "2026-04-25T02:18:36.469Z"
+    },
+    {
+      "clusterId": 2,
+      "summary": "This cluster provides a sophisticated, multi-tiered API for AI text generation and embedding. It orchestrates a complex cascade of local and remote inference engines, prioritizing performance via caching and hardware acceleration.",
+      "purpose": "Unified AI Inference and Generation Pipeline",
+      "patterns": [
+        "Facade",
+        "Strategy Pattern",
+        "Cache-Aside Pattern",
+        "Chain of Responsibility"
+      ],
+      "warnings": [
+        "The 5-tier generation cascade (generateText) is highly complex; robust error handling and graceful fallback logic are critical to prevent cascading failures.",
+        "Performance relies heavily on client-side hardware (WebGPU/WebAssembly); ensure comprehensive fallback mechanisms are in place for environments where these resources are unavailable.",
+        "The use of external endpoints (Ollama) requires careful management of network security, rate limiting, and API key handling.",
+        "The system's complexity increases the cognitive load for maintenance; clear documentation of the inference priority order is mandatory."
+      ],
+      "tags": [
+        "src/lib/ai/unified-generation.ts",
+        "src/lib/ai/e2b/inference.ts",
+        "src/lib/ai/client-embed.ts",
+        "src/lib/ai/client-llm-synthesis.ts",
+        "src/lib/ai/ollama-config.ts"
+      ],
+      "bowTerms": [
+        "topic:cases",
+        "topic:component",
+        "cases",
+        "components",
+        "sym:chat"
+      ],
+      "representativePaths": [
+        "src/lib/components/cases"
+      ],
+      "memberCount": 774,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/ml/recommendation-metrics.ts",
+          "src/lib/server/vector-cache.ts",
+          "src/lib/server/ml/multi-modal-ranker.ts",
+          "src/lib/server/db/qdrant-sync.ts",
+          "src/lib/webgpu/webgpu-similarity-engine.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:28:44.205Z"
+      },
+      "createdAt": "2026-04-20T19:28:44.206Z",
+      "updatedAt": "2026-04-24T21:46:39.727Z"
+    },
+    {
+      "clusterId": 15,
+      "summary": "This cluster provides backend services for managing complex data workflows, including job queuing, caching (Redis/memory), database extensions, and user authentication.",
+      "purpose": "Backend Service Layer",
+      "patterns": [
+        "Repository pattern",
+        "Cache-aside pattern",
+        "Worker Queue Pattern",
+        "Service Layer",
+        "Observability/Logging"
+      ],
+      "warnings": [
+        "In `src/lib/server/db/connections.ts`, running `CREATE EXTENSION` requires superuser privileges, which might be overly permissive for a standard application connection pool.",
+        "In `src/lib/server/auth/password.ts`, the `verifyPassword` function is marked with a TODO regarding `await` usage; ensure `bcrypt.compare` is awaited if it is an asynchronous operation.",
+        "In `src/lib/server/knowledge-cache.ts`, the cache parsing logic is incomplete and needs robust error handling for malformed JSON or unexpected data structures.",
+        "In `src/lib/server/cache/pdf-export-cache.ts`, the cache validation logic relies on `reportUpdatedAt` but the implementation detail for checking freshness is cut off and needs completion."
+      ],
+      "tags": [
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "src/lib/server/db/connections.ts",
+        "src/lib/server/observability/inference-log.ts",
+        "src/routes/api/v1/redis/cache/+server.ts"
+      ],
+      "bowTerms": [
+        "auth"
+      ],
+      "representativePaths": [],
+      "memberCount": 766,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/db/queries/route-health-queries.ts",
+          "src/routes/(app)/evidence/+page.server.ts",
+          "src/routes/(app)/admin/phase89/+page.server.ts",
+          "src/routes/(app)/command-center/+page.server.ts",
+          "src/routes/(app)/cases/[id]/evidence/+page.server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:26.106Z"
+      },
+      "createdAt": "2026-04-20T19:30:26.106Z",
+      "updatedAt": "2026-04-25T02:17:24.929Z"
+    },
+    {
+      "clusterId": 3,
+      "summary": "This module provides utility functions for managing WebAssembly (WASM) workers, but currently serves only as an archive placeholder, directing users to an alternative ONNX Runtime WebGPU path for client-side inference.",
+      "purpose": "AI Inference Client Router/Facade",
+      "patterns": [
+        "Facade",
+        "Service Locator (or Router)",
+        "Anti-Corruption Layer (for deprecation)"
+      ],
+      "warnings": [
+        "The functions are deprecated/archived, and the code should be updated to exclusively use the ONNX Runtime WebGPU path as indicated in the comments."
+      ],
+      "tags": [
+        "src/lib/ai/client-router.ts"
+      ],
+      "bowTerms": [
+        "routes"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/command-center"
+      ],
+      "memberCount": 653,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/ai/YorhaAIAssistant.svelte",
+          "src/lib/components/ai/YorhaAIAssistant.svelte",
+          "src/lib/components/ai/YorhaAIAssistant.svelte",
+          "src/lib/components/yorha/EnhancedYoRHaAIAssistant.svelte",
+          "src/routes/(app)/demos/ui-components/+page.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:28:41.660Z"
+      },
+      "createdAt": "2026-04-20T19:28:41.696Z",
+      "updatedAt": "2026-04-24T21:46:56.926Z"
+    },
+    {
+      "clusterId": 18,
+      "summary": "This cluster provides comprehensive data modeling and services for a sophisticated legal or investigative platform, managing case metadata, digital evidence, knowledge graph construction, and advanced vector retrieval.",
+      "purpose": "Core Data Modeling and Knowledge Retrieval Layer",
+      "patterns": [
+        "Repository Pattern",
+        "Retrieval Augmented Generation (RAG)",
+        "State Machine Pattern",
+        "Domain-Driven Design (DDD)",
+        "Graph Modeling"
+      ],
+      "warnings": [
+        "The use of `[key: string]: any;` in `CaseMetadata` weakens type safety and should be replaced with explicit property definitions.",
+        "The `EvidenceFile` interface is located in a `.svelte.ts` file, suggesting a potential mixing of concerns between data modeling and UI component logic.",
+        "Handling of `Date` objects (e.g., in `EscalationTicket`) requires careful serialization/deserialization logic (e.g., using ISO strings) to prevent runtime errors."
+      ],
+      "tags": [
+        "src/lib/types/database.ts",
+        "src/lib/stores/unified/evidence-store.svelte.ts",
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/services/error-analysis/types.ts",
+        "src/lib/types/external-services.ts"
+      ],
+      "bowTerms": [
+        "types",
+        "sym:case",
+        "cases",
+        "components",
+        "auth",
+        "analytics"
+      ],
+      "representativePaths": [
+        "src/lib/server/vector",
+        "src/lib/types"
+      ],
+      "memberCount": 643,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/ai/base64-fp32-quantizer.ts",
+          "src/lib/webgpu/som-webgpu-cache.ts",
+          "src/lib/components/ui/gaming/constants/gaming-constants.ts",
+          "src/lib/webgpu/webgpu-polyfill.ts",
+          "src/lib/webgpu/texture-streaming.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:57.390Z"
+      },
+      "createdAt": "2026-04-20T19:30:57.434Z",
+      "updatedAt": "2026-04-25T02:20:52.510Z"
+    },
+    {
+      "clusterId": 10,
+      "summary": "This cluster provides a collection of TypeScript type definitions that mirror the structure of various database tables, ensuring strong type safety across the application's data access layer.",
+      "purpose": "Database Schema Type Definitions",
+      "patterns": [
+        "Type Inference",
+        "Schema Definition",
+        "Data Transfer Object (DTO) Typing",
+        "Repository Pattern Preparation"
+      ],
+      "warnings": [
+        "These files only define types and do not enforce schema integrity at runtime. Developers must ensure that database migrations are always synchronized with the types defined here to prevent runtime errors due to schema drift."
+      ],
+      "tags": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema/error_events.ts",
+        "src/lib/server/db/schema/legal-chunks.ts",
+        "src/lib/server/db/schema/ace-web-crawl.ts"
+      ],
+      "bowTerms": [
+        "auth"
+      ],
+      "representativePaths": [],
+      "memberCount": 603,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/langextract/google-langextract.ts",
+          "src/routes/(app)/admin/dev-tools/+page.svelte",
+          "src/lib/server/analysis/evidence-analysis-pipeline.ts",
+          "src/lib/server/llm/ollama-client.ts",
+          "src/lib/server/nlp/analyzer.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:29:53.250Z"
+      },
+      "createdAt": "2026-04-20T19:29:53.250Z",
+      "updatedAt": "2026-04-25T02:15:16.556Z"
+    },
+    {
+      "clusterId": 12,
+      "summary": "This cluster provides utility functions and components for handling diverse data formats, including proprietary cartridge headers, legal document processing, UI state management, and general security/file handling utilities.",
+      "purpose": "Utility and Data Processing Layer",
+      "patterns": [
+        "Utility Functions",
+        "Data Parsing/Serialization",
+        "Configuration Management",
+        "Security Encoding (XSS Prevention)"
+      ],
+      "warnings": [
+        "The `parseCartridgeHeader` function relies on fixed byte offsets and assumes the input `Uint8Array` structure is always correct; robust error handling for malformed data is crucial.",
+        "The `PNGEmbedExtractor` uses `Buffer.concat` and manual byte manipulation; ensure proper handling of buffer boundaries and potential memory leaks in a high-throughput environment.",
+        "The `generateAvatarFileName` function uses `Math.random()` and MD5 hashing for uniqueness; while better than nothing, consider using a cryptographically secure random number generator (e.g., `crypto.randomBytes`) for true collision resistance in production systems.",
+        "The `ollama-config.ts` file uses a hardcoded list of keywords for legal task detection; this list will require continuous maintenance and expansion to remain effective."
+      ],
+      "tags": [
+        "src/lib/shared/chr97-reader.ts",
+        "src/lib/server/png-embed-extractor.ts",
+        "src/lib/server/legal/html-normalizer.ts",
+        "src/lib/utils/security.ts",
+        "src/lib/server/ai/ollama-config.ts"
+      ],
+      "bowTerms": [],
+      "representativePaths": [
+        "src/lib/server/cartridge",
+        "src/lib/shared"
+      ],
+      "memberCount": 509,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/db/drizzle-cache.ts",
+          "src/lib/cache/loki-cache.svelte.ts",
+          "src/lib/server/cache/invalidation.ts",
+          "src/lib/cache/__tests__/cache.test.ts",
+          "src/lib/services/knowledge-search/RedisCacheService.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:10.634Z"
+      },
+      "createdAt": "2026-04-20T19:30:10.635Z",
+      "updatedAt": "2026-04-25T02:16:49.035Z"
+    },
+    {
+      "clusterId": 1,
+      "summary": "This cluster provides various singleton services and utilities for data handling, including base64 encoding/decoding for floating-point numbers, and multiple caching mechanisms (Loki, unified, and IndexedDB).",
+      "purpose": "Utility and Caching Service Layer",
+      "patterns": [
+        "Singleton",
+        "Service Locator",
+        "State Management"
+      ],
+      "warnings": [],
+      "tags": [
+        "src/lib/cache/cache-service.svelte.ts",
+        "src/lib/cache/loki-cache.svelte.ts",
+        "src/lib/cache/indexdb-cache.svelte.ts",
+        "src/lib/ai/base64-fp32-quantizer.ts"
+      ],
+      "bowTerms": [
+        "sym:form",
+        "utils",
+        "sym:progressive",
+        "topic:utils",
+        "types",
+        "topic:component",
+        "components",
+        "sym:props",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/components/forms"
+      ],
+      "memberCount": 442,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/legal/CitationManager.svelte",
+          "src/lib/components/rag/AnswerWithCitations.svelte",
+          "src/lib/components/citations/CitationSaveForm.svelte",
+          "src/routes/(app)/citations/+page.svelte",
+          "src/lib/components/citations/CitationsSaveButton.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:28:28.559Z"
+      },
+      "createdAt": "2026-04-20T19:28:28.560Z",
+      "updatedAt": "2026-04-24T21:46:07.946Z"
+    },
+    {
+      "clusterId": 13,
+      "summary": "This cluster consists of multiple files that uniformly define a constant to explicitly disable Server-Side Rendering (SSR) for the module.",
+      "purpose": "Build configuration setting",
+      "patterns": [
+        "Configuration constant",
+        "Anti-pattern (Repetitive boilerplate)"
+      ],
+      "warnings": [
+        "The extreme repetition of this constant across multiple files suggests potential boilerplate or a lack of centralized configuration management. Consider consolidating this setting into a single, shared configuration file to improve maintainability."
+      ],
+      "tags": [
+        "__unknown__ [const: ssr]"
+      ],
+      "bowTerms": [
+        "routes",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/routes/api/analytics/context-timeline",
+        "src/routes/api/persons-of-interest/[id]/timeline"
+      ],
+      "memberCount": 61,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "__unknown__",
+          "__unknown__",
+          "__unknown__",
+          "__unknown__",
+          "__unknown__"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:30:02.147Z"
+      },
+      "createdAt": "2026-04-20T19:30:02.148Z",
+      "updatedAt": "2026-04-24T00:19:00.348Z"
+    },
+    {
+      "clusterId": 0,
+      "summary": "This cluster provides various TypeScript definitions and Zod validation schemas used for defining data structures, handling API query parameters, and structuring communication payloads within a server environment.",
+      "purpose": "Data validation and type definition layer",
+      "patterns": [
+        "Schema Validation (Zod)",
+        "Data Transfer Object (DTO)",
+        "Protocol Definition"
+      ],
+      "warnings": [
+        "The use of `jsonRecordFromUnknown` suggests potential runtime type safety issues if the input `defaults.fields` or `defaults.metadata` are not strictly controlled, leading to potential data loss or unexpected structure in the persisted payload envelope."
+      ],
+      "tags": [
+        "src/lib/types/protocol.ts",
+        "src/lib/server/validation/query-params.ts",
+        "src/lib/server/utils/vector-schemas.ts",
+        "src/lib/server/z-schemas.ts"
+      ],
+      "bowTerms": [
+        "topic:vector",
+        "types",
+        "sym:upload",
+        "sym:response"
+      ],
+      "representativePaths": [],
+      "memberCount": 49,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": true,
+      "metadata": {
+        "topFiles": [
+          "src/routes/(app)/cases/[id]/+page.ts",
+          "src/routes/(app)/cases/[id]/overview/+page.ts",
+          "src/routes/(app)/demos/bits-ui/+page.ts",
+          "src/routes/(app)/admin/component-analysis/+page.ts",
+          "src/routes/(app)/cases/[id]/canvas/+page.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-04-20T19:28:22.251Z"
+      },
+      "createdAt": "2026-04-20T19:28:22.326Z",
+      "updatedAt": "2026-04-25T10:43:05.245Z"
+    },
+    {
+      "clusterId": 34,
+      "summary": "This component renders an interactive, physics-simulated graph visualization, likely for displaying evidence relationships in an administrative context.",
+      "purpose": "Client-side visualization and simulation",
+      "patterns": [
+        "Simulation loop",
+        "Canvas rendering",
+        "Force-directed layout"
+      ],
+      "warnings": [
+        "The provided code snippet is incomplete and appears to be missing the core simulation logic (e.g., the full force calculation and update loop).",
+        "Performance may degrade with a large number of nodes due to the O(N^2) complexity of the repulsion calculation."
+      ],
+      "tags": [
+        "src/routes/(app)/admin/gpu-evidence-graph/+page.svelte"
+      ],
+      "bowTerms": [
+        "icons",
+        "topic:celestial",
+        "topic:icons",
+        "routes",
+        "topic:component",
+        "yorha",
+        "components"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/demos/yorha-icons",
+        "src/lib/components/ui",
+        "src/routes/(app)/demos/celestial-icons"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 3,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:47:18.189Z",
+      "updatedAt": "2026-04-24T00:47:18.189Z"
+    },
+    {
+      "clusterId": 25,
+      "summary": "This file appears to be a Svelte page component responsible for displaying and managing simulated Nintendo Entertainment System (NES) memory and cartridge data.",
+      "purpose": "UI Component / State Management",
+      "patterns": [
+        "Component-based architecture",
+        "State management (local/global)",
+        "Data transformation"
+      ],
+      "warnings": [
+        "The provided snippet is incomplete and lacks context regarding state initialization and data flow, making a full assessment difficult. Ensure that `nesMemory` and `cart` are correctly initialized and passed to this component."
+      ],
+      "tags": [
+        "src/routes/(app)/demos/memory-palace/+page.svelte"
+      ],
+      "bowTerms": [
+        "routes",
+        "sym:get"
+      ],
+      "representativePaths": [
+        "src/routes/api/cache/stats",
+        "src/routes/api/health/status",
+        "src/routes/api/cache/metrics",
+        "src/routes/api/glyph/tile-atlas",
+        "src/routes/api/chrrom/push"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:47:31.161Z",
+      "updatedAt": "2026-04-24T00:47:31.161Z"
+    },
+    {
+      "clusterId": 42,
+      "summary": "This cluster provides a comprehensive backend service for processing documents, including OCR, vector embedding generation, advanced analysis (like SOM clustering and glyph diffusion), and orchestrating these steps into a cohesive pipeline.",
+      "purpose": "Document Processing and AI Pipeline Backend",
+      "patterns": [
+        "Pipeline Orchestration",
+        "Worker Pool/Worker Threads",
+        "Caching (LRU/Memoization)",
+        "Service Layer Abstraction",
+        "Fallback/Degradation Handling"
+      ],
+      "warnings": [
+        "The use of `console.warn` and `try...catch` blocks to handle failures (e.g., Qdrant indexing, OpenAI embedding) suggests potential non-critical failures, but robust error handling and logging are crucial to ensure data integrity and proper failure reporting to the user.",
+        "The `som-cluster.ts` file shows fallback logic to run on the main thread when workers are unavailable, which could lead to performance bottlenecks or blocking the event loop if the dataset is large.",
+        "The `audio-processor.ts` and `evidence-record` update logic suggests complex state management involving multiple external services (Qdrant, DB) which requires careful transaction management to ensure atomicity.",
+        "The `ClientGemmaInference.svelte` component handles model loading and provider detection, which is good, but client-side model loading can be highly dependent on the user's local hardware and browser capabilities, requiring clear fallback mechanisms."
+      ],
+      "tags": [
+        "src/lib/server/services/pipeline-orchestrator.ts",
+        "src/lib/server/ai/embeddings-simple.ts",
+        "src/lib/server/ocr/tesseract.ts",
+        "src/lib/server/ml/som-cluster.ts",
+        "src/lib/server/workers/audio-processor.ts"
+      ],
+      "bowTerms": [
+        "topic:error",
+        "topic:vector",
+        "error",
+        "analysis",
+        "services"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:49:44.548Z",
+      "updatedAt": "2026-04-24T00:49:44.548Z"
+    },
+    {
+      "clusterId": 133,
+      "summary": "This component acts as a real-time dashboard for monitoring application errors, consuming an event stream to aggregate statistics and display detailed error information.",
+      "purpose": "Error Monitoring Dashboard Component",
+      "patterns": [
+        "Reactive State Management",
+        "Observer Pattern",
+        "Component-based Architecture",
+        "Data Aggregation"
+      ],
+      "warnings": [
+        "The type definition for `eventSource` is incomplete (`eventSource: Even`), which will cause compilation errors.",
+        "If the error samples or messages are rendered directly, the component is vulnerable to Cross-Site Scripting (XSS) attacks; proper sanitization must be implemented.",
+        "Handling high-frequency error streams requires careful performance consideration (e.g., throttling or debouncing) to prevent UI slowdowns."
+      ],
+      "tags": [
+        "src/lib/components/ErrorStreamMonitor.svelte"
+      ],
+      "bowTerms": [],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:50:12.205Z",
+      "updatedAt": "2026-04-24T00:50:12.205Z"
+    },
+    {
+      "clusterId": 79,
+      "summary": "This cluster provides core backend services for a complex AI application, handling data persistence (embeddings, graph databases), content processing (image resizing, chunk hit logging), and advanced AI features like knowledge synthesis and graph initialization.",
+      "purpose": "Backend Service Layer and Data Persistence",
+      "patterns": [
+        "Repository pattern",
+        "Service Layer",
+        "Cache-aside pattern",
+        "Singleton pattern"
+      ],
+      "warnings": [
+        "The `recordChunkHits` function uses a raw SQL query and relies on external `pool` management; ensure proper transaction handling and parameterized queries are used to prevent SQL injection.",
+        "The `getPersistedEmbedding` function relies on hashing the input text; if the hashing function is not cryptographically secure or if collisions are possible, it could lead to retrieving incorrect embeddings.",
+        "The `initializeNeo4jSchema` function is marked as safe to call multiple times, but complex schema initialization logic should be wrapped in robust transaction management to ensure atomicity.",
+        "The `resizeForVLM` function handles image transcoding (PNG/WebP/TIFF -> JPEG); ensure that the quality setting (92) is appropriate for the intended use case to balance file size and visual fidelity."
+      ],
+      "tags": [
+        "src/lib/server/analytics/search-analytics.ts",
+        "src/lib/server/embedding/embedding-persist.ts",
+        "src/lib/server/graph/neo4j-schema.ts",
+        "src/lib/server/image/resize-for-vlm.ts",
+        "src/lib/ai/client-llm-synthesis.ts"
+      ],
+      "bowTerms": [
+        "types"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:56:02.286Z",
+      "updatedAt": "2026-04-25T01:56:02.286Z"
+    },
+    {
+      "clusterId": 55,
+      "summary": "This cluster defines a comprehensive set of TypeScript types that mirror the structure of various underlying database tables. These types are used throughout the application to ensure type safety when interacting with the database, covering domains from web crawling to legal document management.",
+      "purpose": "Database Schema Type Definition Layer",
+      "patterns": [
+        "Type Inference",
+        "Schema Definition",
+        "Data Transfer Objects (DTOs)",
+        "Repository Pattern (Implied)"
+      ],
+      "warnings": [
+        "The strong coupling between TypeScript types and the underlying database schema means that any database migration must be immediately followed by an update to these type definitions to prevent runtime type errors."
+      ],
+      "tags": [
+        "src/lib/db/schema.ts",
+        "src/lib/server/db/schema/board.ts",
+        "src/lib/server/db/schema/error_events.ts",
+        "src/lib/server/db/schema/legal-chunks.ts"
+      ],
+      "bowTerms": [],
+      "representativePaths": [
+        "src/lib/db/schema"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:52:44.482Z",
+      "updatedAt": "2026-04-25T01:52:44.482Z"
+    },
+    {
+      "clusterId": 63,
+      "summary": "This cluster provides utility functions for generating visual representations (glyphs) of recommendations, building database query filters, and selecting the top K results based on associated scores.",
+      "purpose": "Utility and Data Transformation Layer",
+      "patterns": [
+        "Utility Functions",
+        "Builder Pattern (QueryBuilder)",
+        "Data Transformation",
+        "Top-K Selection"
+      ],
+      "warnings": [
+        "The `QueryBuilder` in `query-utils.ts` uses type assertions (`as AnyColumn`, `as AnyCol`) which can mask potential type safety issues and should be reviewed for stricter typing.",
+        "The `topKGlyphs` function assumes a direct index correspondence between `glyphs` and `scores` array, which is brittle if the input arrays are not guaranteed to be parallel and correctly ordered."
+      ],
+      "tags": [
+        "src/lib/server/ml/recommendation-glyph.ts",
+        "src/lib/server/db/query-utils.ts",
+        "src/lib/server/analytics/minified-research-cache.ts"
+      ],
+      "bowTerms": [
+        "auth"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:54:46.592Z",
+      "updatedAt": "2026-04-25T01:54:46.592Z"
+    },
+    {
+      "clusterId": 65,
+      "summary": "This cluster contains utility functions and components for advanced AI processing, database interaction, and frontend UI component management, alongside core policy and state management logic.",
+      "purpose": "Utility and Component Library",
+      "patterns": [
+        "Utility Functions",
+        "Component Props/Types",
+        "State Management/Policy",
+        "Dependency Injection/Overriding"
+      ],
+      "warnings": [
+        "The `GRPOPolicy` class appears to be missing the definition for `rollbackThreshold` in its constructor, leading to potential incompleteness or runtime errors.",
+        "The `stableSoftmax` function is incomplete (missing the return statement).",
+        "The `readBodyFast` function relies on an undefined `parseFast` function, which needs to be defined or imported.",
+        "The `RowList` type definition uses `any` extensively, which sacrifices type safety and should be reviewed for stricter typing."
+      ],
+      "tags": [
+        "src/lib/ai/client-embed.ts",
+        "src/lib/services/error-analysis/GRPOPolicy.ts",
+        "src/lib/server/grpc/retrieval-client.ts",
+        "src/lib/components/ai/index.ts",
+        "src/lib/server/db/connection.ts"
+      ],
+      "bowTerms": [],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:48:36.931Z",
+      "updatedAt": "2026-04-25T01:54:49.367Z"
+    },
+    {
+      "clusterId": 30,
+      "summary": "Defines a TypeScript type representing the expected response structure after a file upload operation.",
+      "purpose": "Data structure definition",
+      "patterns": [
+        "Type Definition",
+        "Data Transfer Object (DTO)"
+      ],
+      "warnings": [],
+      "tags": [
+        "src/lib/types/evidence.ts"
+      ],
+      "bowTerms": [
+        "gaming",
+        "topic:gaming",
+        "components",
+        "types"
+      ],
+      "representativePaths": [
+        "src/lib/components/ui/gaming/types"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:54:53.246Z",
+      "updatedAt": "2026-04-25T01:54:53.246Z"
+    },
+    {
+      "clusterId": 73,
+      "summary": "This cluster provides utilities for logging and analyzing various stages of a retrieval-augmented generation (RAG) pipeline, including recording chunk hits, chunking text by sentences, and generating aggregated inference statistics.",
+      "purpose": "Observability and Analytics Layer",
+      "patterns": [
+        "Service Layer",
+        "Logging/Metrics Collection",
+        "Data Aggregation",
+        "Utility Functions"
+      ],
+      "warnings": [
+        "The `recordChunkHits` function performs database writes and should ensure proper transaction management or batching if high throughput is expected.",
+        "The `getStatsByType` function relies on an external CouchDB view, which might introduce latency or failure points if the database is unavailable or the view is improperly configured."
+      ],
+      "tags": [
+        "src/lib/server/analytics/search-analytics.ts",
+        "src/lib/server/streaming/chunked-response.ts",
+        "src/lib/server/observability/inference-log-views.ts"
+      ],
+      "bowTerms": [
+        "types",
+        "topic:vector"
+      ],
+      "representativePaths": [
+        "src/lib/server/retrieval"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:54:54.584Z",
+      "updatedAt": "2026-04-25T01:54:54.584Z"
+    },
+    {
+      "clusterId": 86,
+      "summary": "This file appears to be a placeholder for defining a database schema or data structure related to court decisions, but it currently only exports a reference to an undefined variable.",
+      "purpose": "Database Schema Definition (Placeholder)",
+      "patterns": [
+        "Placeholder",
+        "Data Structure Definition"
+      ],
+      "warnings": [
+        "The file exports an undefined variable (`cases`), which will cause runtime errors and indicates incomplete implementation. This file should be updated with the actual schema definition or removed if obsolete."
+      ],
+      "tags": [
+        "src/lib/server/db/schema-old.ts"
+      ],
+      "bowTerms": [
+        "evidence",
+        "components",
+        "types",
+        "sym:extract"
+      ],
+      "representativePaths": [
+        "src/lib/shims",
+        "src/lib/data"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T10:11:34.974Z",
+      "updatedAt": "2026-04-25T10:11:34.974Z"
+    },
+    {
+      "clusterId": 48,
+      "summary": "This cluster provides utility functions for managing background job states, sending multi-channel notifications, retrieving vector database boost scores, and updating ingestion job progress.",
+      "purpose": "Utility and Service Layer",
+      "patterns": [
+        "Service Layer",
+        "Observer/State Management (for job updates)",
+        "Multi-channel Dispatch",
+        "Repository Pattern (implied by Redis interaction)"
+      ],
+      "warnings": [
+        "The `sendNotification` function in `push-service.ts` uses a switch statement and relies on external implementations (`sendWebPush`, etc.), which could lead to complex error handling if any single channel fails.",
+        "The job update functions (`completeAnalysisJob`, `updateAceIngestJob`) modify state directly, suggesting potential race conditions or lack of transactional integrity if multiple processes update the same job concurrently."
+      ],
+      "tags": [
+        "src/lib/server/notifications/push-service.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/retrieval/qlora-boost.ts",
+        "src/lib/server/ace-ingest-progress.ts"
+      ],
+      "bowTerms": [
+        "migrations",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/db/migrations/meta"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:55:56.369Z",
+      "updatedAt": "2026-04-25T01:55:56.369Z"
+    },
+    {
+      "clusterId": 31,
+      "summary": "This module provides a utility function to perform a database health check by verifying the existence of a predefined set of essential application tables against the database schema.",
+      "purpose": "Database schema validation and health check",
+      "patterns": [
+        "Dependency Check",
+        "Connection Pooling",
+        "Read-Only Query Pattern"
+      ],
+      "warnings": [
+        "Performance: Querying `information_schema.tables` on startup can be slow and may add significant overhead to the application's initialization time.",
+        "Resource Management: Ensure that the database client connection (`client`) is reliably released back to the pool (e.g., using a `finally` block) even if errors occur during the query execution.",
+        "Maintainability: The list of essential tables is hardcoded; consider externalizing this list into a configuration file or environment variable to improve maintainability."
+      ],
+      "tags": [
+        "src/lib/server/db/ssr-health-check.ts"
+      ],
+      "bowTerms": [
+        "topic:investigate",
+        "topic:suggest",
+        "routes"
+      ],
+      "representativePaths": [
+        "src/routes/api/investigate/suggest"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:52:40.179Z",
+      "updatedAt": "2026-04-25T01:52:40.179Z"
+    },
+    {
+      "clusterId": 93,
+      "summary": "This cluster manages complex data processing pipelines, including audio transcription, entity extraction, and error event embedding, while providing mechanisms for synchronizing knowledge bases and storing structured data.",
+      "purpose": "Data processing and knowledge graph management pipeline",
+      "patterns": [
+        "Pipeline pattern",
+        "Service layer",
+        "Repository pattern",
+        "Batch processing"
+      ],
+      "warnings": [
+        "The `fullResync` function in `qdrant-sync.ts` is labeled as a 'nuclear option' and involves deleting and recreating a collection, which should be handled with extreme care in production environments.",
+        "The `AudioProcessor` class in `audio-processor.ts` relies on an external `getRedis()` call, which assumes proper initialization and connection handling for Redis.",
+        "The `fullResync` function reads all documents from the `knowledge_documents` table, which could lead to significant performance degradation and memory issues if the table grows very large."
+      ],
+      "tags": [
+        "src/lib/server/workers/audio-processor.ts",
+        "src/lib/server/db/qdrant-sync.ts",
+        "src/lib/server/evidence/batch-entity-storer.ts",
+        "src/lib/server/pipeline/error-embedding-pipeline.ts"
+      ],
+      "bowTerms": [
+        "types"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:56:16.786Z",
+      "updatedAt": "2026-04-25T01:56:16.786Z"
+    },
+    {
+      "clusterId": 74,
+      "summary": "This component provides a reusable, state-managed form structure for handling user input, validation, and submission logic within a Svelte application.",
+      "purpose": "UI Component / Form Management",
+      "patterns": [
+        "Component Composition",
+        "State Management (Local/Reactive)",
+        "Props/Attributes Handling",
+        "Event Handling"
+      ],
+      "warnings": [
+        "The comment 'Mock form store until createFormStore is fixed' indicates temporary, potentially unstable state management logic that should be addressed to ensure robustness and maintainability."
+      ],
+      "tags": [
+        "src/lib/components/ui/Form.svelte"
+      ],
+      "bowTerms": [
+        "types",
+        "topic:vector",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/agent"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:32:47.958Z",
+      "updatedAt": "2026-04-24T00:32:47.958Z"
+    },
+    {
+      "clusterId": 35,
+      "summary": "This cluster contains utility code for caching route metadata using IndexedDB and a component for simulating and displaying Nintendo Entertainment System (NES) memory usage.",
+      "purpose": "Utility and Demonstration Components",
+      "patterns": [
+        "IndexedDB Cache",
+        "Component State Management",
+        "Simulation/Modeling"
+      ],
+      "warnings": [
+        "The IndexedDB implementation lacks proper error handling (e.g., rejection handling for `openCacheDB`).",
+        "The memory palace component relies on external state management (`nesMemory`) which should be thoroughly tested for edge cases and performance under heavy load."
+      ],
+      "tags": [
+        "src/routes/(app)/admin/all-routes/+page.svelte",
+        "src/routes/(app)/demos/memory-palace/+page.svelte"
+      ],
+      "bowTerms": [
+        "legal",
+        "components",
+        "topic:component",
+        "topic:legal",
+        "corpus"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/demos/source-drawer",
+        "src/routes/(app)/library/glossary",
+        "src/lib/components/legal-ai",
+        "src/lib/components/legal-corpus",
+        "src/routes/(app)/cases/[id]"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:33:11.854Z",
+      "updatedAt": "2026-04-24T00:33:11.854Z"
+    },
+    {
+      "clusterId": 21,
+      "summary": "This cluster provides utilities for GPU-accelerated computation using WebGPU and manages the ingestion and sharding of documents for Retrieval-Augmented Generation (RAG) pipelines.",
+      "purpose": "Data Processing and Compute Utility Layer",
+      "patterns": [
+        "SDK/Facade Pattern",
+        "Sharding/Chunking",
+        "WebGPU Compute Pipeline",
+        "Message Queue Integration"
+      ],
+      "warnings": [
+        "The WebGPU code uses type casting (`as any`) which suggests potential type safety issues or incomplete type definitions.",
+        "The `publishToQueue` function in `sdk.ts` is a stub, meaning the actual message queuing mechanism is not implemented or is mocked, requiring full implementation for production use.",
+        "The WebGPU buffer writing uses `inputData as unknown as BufferSource`, which is a potentially unsafe type assertion and should be reviewed for robust data handling."
+      ],
+      "tags": [
+        "src/lib/webgpu/legal-compute-shaders.ts",
+        "src/lib/server/rag/sdk.ts",
+        "src/lib/server/rag/types.js"
+      ],
+      "bowTerms": [
+        "legal",
+        "topic:legal",
+        "components",
+        "topic:component",
+        "routes",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/components/dashboard",
+        "src/routes/(app)/simulation",
+        "src/lib/server/pdf",
+        "src/routes/api/rag/todo-suggestions",
+        "src/lib/components/legal"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 6,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:34:28.599Z",
+      "updatedAt": "2026-04-24T00:34:28.599Z"
+    },
+    {
+      "clusterId": 87,
+      "summary": "This file defines interfaces and structures related to the retrieval and assembly of code chunks, including performance metrics and configuration.",
+      "purpose": "Data structure definition for code retrieval and context assembly",
+      "patterns": [
+        "Data Transfer Object (DTO)",
+        "Interface Definition"
+      ],
+      "warnings": [],
+      "tags": [
+        "src/lib/machines/retrieval-machine.ts"
+      ],
+      "bowTerms": [
+        "sym:get"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:47:14.766Z",
+      "updatedAt": "2026-04-24T00:47:14.766Z"
+    }
+  ]
+}

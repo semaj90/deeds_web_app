@@ -154,3 +154,92 @@ The **whole point** of this skill is to use the GPU codebase index as the author
 - Before opening a PR (clean audit = green CI)
 - After running `agents:write` (per-directory AGENTS.md may have updated warnings)
 - Daily as part of `graphify:daily`
+
+## D9 Orphan Verification (added 2026-05-05)
+
+D9's `fanIn === 0` heuristic from Graphify is great for **visualization** (find isolated nodes), but unsafe for **deletion decisions**. fanIn under-counts:
+
+- type-only imports (`import type { X } from '...'`)
+- dynamic imports (`await import('...')`)
+- barrel re-exports (`export * from '...'`)
+- SvelteKit auto-loaded route files
+- framework/config/hooks/migrations/service-workers
+
+**Always run the verifier before recommending any deletion**:
+
+```bash
+npm run audit:d9              # writes reports/deep-audit/d9-orphan-verification.json
+npm run audit:d9:strict       # exits 1 if any true orphans (CI gate)
+```
+
+The verifier (`scripts/lib/reference-verifier.mjs`) classifies every fanIn=0
+candidate into one of:
+
+| Classification | Action |
+|----------------|--------|
+| `runtime-referenced` | KEEP (real `from '...'` consumer) |
+| `dynamic-referenced` | KEEP (`await import()` consumer) |
+| `barrel-reexported` | KEEP (consumed via `index.ts`) |
+| `type-only-referenced` | KEEP (used in types — flag if also unused at runtime) |
+| `route-entrypoint` | EXEMPT (SvelteKit auto-loads) |
+| `config-or-framework-entrypoint` | EXEMPT (hooks/sw/configs/migrations) |
+| `path-mentioned` | MANUAL REVIEW (string mention only) |
+| `true-orphan-candidate` | DELETION CANDIDATE — but still do a manual peek |
+
+### Triage chain (run in order)
+
+```bash
+npm run audit:d9            # 3357 → 148 verified true-orphans       (~12s cold, ~3s warm)
+npm run audit:d9:triage     # 148 → 19 true / 32 unwired / 50 dyn / 46 in-agents / 1 sibling
+npm run audit:d9:vs-plan    # cross-ref vs next_steps/ — PLANNED / DRIFT / INVERTED
+npm run audit:d9:full-chain # all three in one shot
+```
+
+The chain lands three artifacts under `reports/deep-audit/`:
+
+1. `d9-orphan-verification.json` — 8-bucket classification (verifier output)
+2. `d9-shallow-dynamic-triage.json` — 5-bucket triage (post-classification)
+3. `d9-vs-next-steps.json` — PLANNED vs DRIFT vs INVERTED (vs `next_steps/` plan corpus)
+4. `d9-vs-next-steps.md` — human-readable digest
+
+Plus a **durable encoded snapshot** at `reports/deep-audit/encoded/d9-vs-next-steps_<date>_<gitSha>.json` so future audits can diff against the baseline. **Don't gitignore this directory** — it's the audit trail.
+
+### Decision matrix
+
+| Bucket | Action | Notes |
+|--------|--------|-------|
+| `runtime-referenced` | KEEP | Real `from '...'` consumer found |
+| `dynamic-import-target` | KEEP | `await import('...filename')` consumer |
+| `barrel-reexported` | KEEP | Surfaced via `index.ts` re-export |
+| `mentioned-in-agents` | KEEP | Documented in directory wiki / AGENTS.md |
+| `has-fanOut-no-fanIn` ∩ PLANNED | **WIRE** | Planner expects this — find the wire point |
+| `has-fanOut-no-fanIn` ∩ DRIFT | INVESTIGATE | Substantial code (200-600 LOC), no plan ref |
+| `true-orphan` ∩ PLANNED | INVESTIGATE | Tiny file, planner mention — verify intent |
+| `true-orphan` ∩ DRIFT | **ARCHIVE** | Move to `deeds_labs/` |
+| INVERTED | IMPLEMENT or DEPLAN | Plan expects file that doesn't exist |
+
+### Sample baseline (2026-05-05, post Tier-A wiring)
+
+| Metric | Count |
+|--------|-------|
+| fanIn=0 candidates | 3357 |
+| Verified true-orphans | 148 (95.6% false-positive cut) |
+| Unwired features (`has-fanOut-no-fanIn`) | 28 |
+| Wire-now (PLANNED ∩ unwired) | 13 |
+| Archive-now (DRIFT ∩ true-orphan) | 19 |
+| Live INVERTED (planner expects missing) | 29 |
+
+**Output artifact** (`reports/deep-audit/d9-orphan-verification.json`):
+
+```json
+{
+  "gate": "D9",
+  "reportedByFanIn": 840,
+  "verifiedTrueOrphans": 12,
+  "falsePositives": 828,
+  "classifications": { "runtime-referenced": 300, ..., "true-orphan-candidate": 12 },
+  "trueOrphans": [ "src/lib/.../foo.ts", ... ]
+}
+```
+
+This artifact is the input to `/audit-components` and `/prune-codebase`. Never recommend deleting a file based only on Graphify's `fanIn`.

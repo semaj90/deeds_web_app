@@ -12,14 +12,13 @@ export async function validateResearchGain(params: {
 	sourceType: string;
 }) {
 	try {
-		const response = await bifrostChat({
-			messages: [
-				{ 
-					role: 'system', 
-					content: 'You are a Research Quality Auditor. Compare an external technical finding with a codebase implementation and decide if the finding provides significant "Information Gain" that justifies saving it as a durable Research Note.' 
+		const response = await bifrostChat([
+				{
+					role: 'system',
+					content: 'You are a Research Quality Auditor. Compare an external technical finding with a codebase implementation and decide if the finding provides significant "Information Gain" that justifies saving it as a durable Research Note.'
 				},
-				{ 
-					role: 'user', 
+				{
+					role: 'user',
 					content: `
 Query: ${params.query}
 Source: ${params.sourceType}
@@ -41,12 +40,11 @@ OUTPUT JSON:
   "reasoning": "string",
   "recommendedAction": "string"
 }
-`.trim() 
+`.trim()
 				}
-			]
-		});
+			], 'gemma4-legal-vlm');
 
-		const content = response.message.content.trim();
+		const content = response.trim();
 		const jsonMatch = content.match(/\{[\s\S]*\}/);
 		if (jsonMatch) {
 			const result = JSON.parse(jsonMatch[0]);

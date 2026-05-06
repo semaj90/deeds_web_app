@@ -139,7 +139,7 @@ export class GenerationClient {
   private baseUrl: string;
   private timeout: number;
 
-  constructor(baseUrl: string = 'http://localhost:50052', timeout: number = 120_000) {
+  constructor(baseUrl: string = process.env.GENERATION_GRPC_URL ?? 'http://localhost:50052', timeout: number = 120_000) {
     this.baseUrl = baseUrl;
     this.timeout = timeout;
   }

@@ -68,6 +68,9 @@ export const VECTOR_CONFIG = {
     legal_glossary: 'legal_glossary',
     /** Lane 3 deep research — GitHub / Reddit / web crawl chunks */
     research_chunks: 'chunks_web_search',
+    /** KAG/ACE summary lenses and synthesis memory */
+    summary_lenses: 'summary_lenses_768',
+    synthesis_memory: 'synthesis_memory_768',
   },
 
   /** Per-collection vector schema (vector name → used by health checks + init) */
@@ -94,6 +97,9 @@ export const VECTOR_CONFIG = {
     legal_glossary: { vectors: ['content'], on_disk_payload: true },
     /** Lane 3 deep research collection — GitHub/Reddit/web research chunks */
     chunks_web_search: { vectors: ['content'], on_disk_payload: true },
+    /** KAG/ACE summary lenses and synthesis memory */
+    summary_lenses_768: { vectors: ['summary'], on_disk_payload: true },
+    synthesis_memory_768: { vectors: ['synthesis'], on_disk_payload: true },
   },
 
   /** Qdrant HNSW config applied to all collections */

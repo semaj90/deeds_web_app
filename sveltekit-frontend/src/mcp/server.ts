@@ -102,6 +102,20 @@ export function setupToolHandlers() {
         inputSchema: { type: 'object', properties: { url: { type: 'string' } }, required: ['url'] },
       },
       {
+        name: 'memory:prior_answer_lookup',
+        description: 'Look up a prior LLM answer from the 3-tier cache (Redis L1 → Postgres L2 → Qdrant L3 semantic). Returns compressed CodeLlmOutputMeta envelope (summary, citations, confidence, grounding) suitable for ACE prompt preambles. Use BEFORE generating a new RAG answer to reuse compressed reasoning.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path:              { type: 'string', description: 'Code path or directory to look up first (cheapest L1 lookup).' },
+            query:             { type: 'string', description: 'Free-text query for L3 Qdrant semantic fallback when path misses.' },
+            clusterId:         { type: 'number', description: 'Optional glyph cluster filter for L3 search.' },
+            includeFullOutput: { type: 'boolean', description: 'When true, include the full llmOutput; default false (only meta).' },
+            minScore:          { type: 'number', description: 'Minimum cosine similarity for L3 hits (default 0.78).' },
+          },
+        },
+      },
+      {
         name: 'playwright:browser_action',
         description: 'Execute a browser action using Playwright',
         inputSchema: {
@@ -1726,6 +1740,30 @@ export function setupToolHandlers() {
         const { query, topK } = args as { query: string; topK?: number };
         const result = await mcpTools.rag.webSearch(query, { topK });
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+      }
+
+      case 'memory:prior_answer_lookup': {
+        const { lookupPriorAnswerMemory, renderPriorAnswerSection } = await import('$lib/server/cache/code-llm-index.js');
+        const hit = await lookupPriorAnswerMemory(args as Parameters<typeof lookupPriorAnswerMemory>[0]);
+        if (!hit) {
+          return { content: [{ type: 'text', text: JSON.stringify({ found: false }) }] };
+        }
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              found:      true,
+              layer:      hit.layer,
+              latencyMs:  hit.latencyMs,
+              path:       hit.path,
+              source:     hit.source,
+              clusterId:  hit.glyphClusterId,
+              meta:       hit.meta,
+              llmOutput:  hit.llmOutput,
+              promptSection: renderPriorAnswerSection(hit),
+            }),
+          }],
+        };
       }
 
       case 'rag:index_page': {

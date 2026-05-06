@@ -42,42 +42,35 @@ export interface LangExtractOutput {
 }
 
 /**
- * Prefer LANGEXTRACT_URL (new), but support LANGEXTRACT_API_URL (legacy).
- * If neither set, try python:8095 then go:8090.
+ * Phase 1: empty LANGEXTRACT_URL = disabled, use TypeScript heuristic directly.
+ * Only probe the network when an explicit URL is configured.
+ *
+ * Legacy localhost fallbacks removed — they caused silent coupling to the
+ * phase66-langextract container and blocked normal RAG/evidence/ACP flows
+ * when that container was not running.
  */
-const CANDIDATE_BASE_URLS = [
-	ENV.LANGEXTRACT_URL,
-	'http://localhost:8095', // python (phase66)
-	'http://localhost:8090' // go (langextract-go)
-].filter((v, i, arr) => Boolean(v) && arr.indexOf(v) === i) as string[];
-
 let cachedBaseUrl: string | null = null;
 
 async function resolveLangExtractBaseUrl(): Promise<string> {
 	if (cachedBaseUrl) return cachedBaseUrl;
 
-	for (const base of CANDIDATE_BASE_URLS) {
-		try {
-			const res = await fetch(`${base}/health`, { method: 'GET' });
-			if (res.ok) {
-				cachedBaseUrl = base;
-				return base;
-			}
-		} catch {
-			// keep trying
-		}
-	}
-
-	// If no /health exists, still allow explicit env override to work.
 	const explicit = ENV.LANGEXTRACT_URL?.trim();
-	if (explicit) {
-		cachedBaseUrl = explicit;
-		return explicit;
-	}
+  if (!explicit) {
+    throw new Error('LANGEXTRACT_URL is not set (disabled)');
+  }
 
-	throw new Error(
-		`LangExtract unavailable. Tried: ${CANDIDATE_BASE_URLS.join(', ')} (no /health responded)`
-	);
+  // Probe /health once; cache on success
+  try {
+    const res = await fetch(`${explicit}/health`, { method: 'GET' });
+    if (res.ok) {
+      cachedBaseUrl = explicit;
+      return explicit;
+    }
+  } catch {
+    // service down — fall through to throw
+  }
+
+	throw new Error(`LangExtract service unhealthy at ${explicit}`);
 }
 
 function normalizeOutput(raw: unknown, documentId: string): LangExtractOutput {
@@ -107,45 +100,73 @@ function normalizeOutput(raw: unknown, documentId: string): LangExtractOutput {
 }
 
 /**
- * Call LangExtract API to extract sections from document text
+ * Call LangExtract API to extract sections from document text.
+ *
+ * Phase 1 behaviour:
+ *   - LANGEXTRACT_URL empty/unset → heuristic directly, no network call
+ *   - LANGEXTRACT_URL set + service healthy → Python/Go service
+ *   - LANGEXTRACT_URL set + service down/error → heuristic fallback
+ *   - Service returns 0 sections → heuristic fallback
  */
 export async function extractSectionsFromText(
 	documentText: string,
 	documentId: string,
 	documentType: 'statute' | 'case' = 'case'
 ): Promise<LangExtractOutput> {
-	const baseUrl = await resolveLangExtractBaseUrl();
-	const prompt =
-		documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
+  // Phase 0: native-TS path — opt in via LANGEXTRACT_NATIVE=true. No Python,
+  // no network, no GIL. Uses the regex extractor in langextract/native.ts.
+  if (ENV.LANGEXTRACT_NATIVE === 'true') {
+    const { extractDocumentNative } = await import('$lib/server/langextract/native.js');
+    const out = extractDocumentNative(documentText, documentId, documentType);
+    const { entities: _e, ...legacy } = out;
+    return legacy;
+  }
+  // Phase 1: disabled path — no network call when URL is empty
+  const langextractUrl = ENV.LANGEXTRACT_URL?.trim();
+  if (!langextractUrl) {
+    return {
+      ...detectSectionsHeuristic(documentText, documentId),
+      metadata: { langextractDisabled: true } as CrimeMetadata & { langextractDisabled: boolean },
+    };
+  }
 
-	const response = await fetch(`${baseUrl}/extract`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			text: documentText,
-			doc_id: documentId,
-			prompt,
-			extract_metadata: true,
-			extract_crimes: documentType === 'case'
-		})
-	});
+  try {
+    const baseUrl = await resolveLangExtractBaseUrl();
+    const prompt =
+      documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
 
-	if (!response.ok) {
-		const body = await safeReadText(response);
-		throw new Error(
-			`LangExtract API error: ${response.status} ${response.statusText}${body ? ` — ${body}` : ''}`
-		);
-	}
+    const response = await fetch(`${baseUrl}/extract`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: documentText,
+        doc_id: documentId,
+        prompt,
+        extract_metadata: true,
+        extract_crimes: documentType === 'case',
+      }),
+    });
 
-	const raw = (await response.json()) as unknown;
-	const result = normalizeOutput(raw, documentId);
+    if (!response.ok) {
+      const body = await safeReadText(response);
+      throw new Error(
+        `LangExtract API error: ${response.status} ${response.statusText}${body ? ` — ${body}` : ''}`
+      );
+    }
 
-	// If the model returned 0 valid sections, fall back rather than returning empty
-	if (!result.sections.length) {
-		return detectSectionsHeuristic(documentText, documentId);
-	}
+    const raw = (await response.json()) as unknown;
+    const result = normalizeOutput(raw, documentId);
 
-	return result;
+    // If the model returned 0 valid sections, fall back to heuristic
+    if (!result.sections.length) {
+      return detectSectionsHeuristic(documentText, documentId);
+    }
+
+    return result;
+  } catch {
+    // Service down or request failed — degrade to TypeScript heuristic
+    return detectSectionsHeuristic(documentText, documentId);
+  }
 }
 
 async function safeReadText(res: Response): Promise<string> {

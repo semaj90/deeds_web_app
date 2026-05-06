@@ -104,6 +104,8 @@ export default defineConfig({
       'tests/routes/codebase-index-summarize-dirs.test.ts',
       'tests/unit/agents-md-quick-hit.test.ts',
       'tests/unit/ensure-dev-runtime.test.ts',
+      'tests/karpathy-hook.spec.ts',
+      'tests/wiki-vault-watcher.spec.ts',
       // G16 auto-generated route test stubs (npm run audit:generate-route-stubs)
       'tests/routes/auto/**/*.test.ts',
     ],

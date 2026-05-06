@@ -86,18 +86,49 @@ export function getServiceDiscovery(): ServiceDiscovery {
 
 // Common Service Configs
 export const COMMON_SERVICES: Record<string, ServiceConfig> = {
-    minio: {
-	envVar: 'MINIO_ENDPOINT', fallback: 'http://localhost:9000', containerName: 'legal-ai-minio', port: 9000, verify: true },
-	ollama: {
-	envVar: 'OLLAMA_URL', fallback: 'http://localhost:11434', containerName: 'ollama', port: 11434, verify: true },
-	qdrant: {
-	envVar: 'QDRANT_URL', fallback: 'http://localhost:6333', containerName: 'qdrant', port: 6333, verify: true },
-	redis: {
-	envVar: 'REDIS_HOST', fallback: 'redis://localhost:6379', containerName: 'redis', port: 6379, verify: false },
-	postgres: {
-	envVar: 'DATABASE_URL', fallback: 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db', containerName: 'postgres', port: 5432, verify: false },
-	langextract: {
-	envVar: 'LANGEXTRACT_URL', fallback: 'http://localhost:8095', containerName: 'phase66-langextract', port: 8095, verify: true, verifyTimeout: 3000 }
+  minio: {
+    envVar: 'MINIO_ENDPOINT',
+    fallback: 'http://localhost:9000',
+    containerName: 'legal-ai-minio',
+    port: 9000,
+    verify: true,
+  },
+  ollama: {
+    envVar: 'OLLAMA_URL',
+    fallback: 'http://localhost:11434',
+    containerName: 'ollama',
+    port: 11434,
+    verify: true,
+  },
+  qdrant: {
+    envVar: 'QDRANT_URL',
+    fallback: 'http://localhost:6333',
+    containerName: 'qdrant',
+    port: 6333,
+    verify: true,
+  },
+  redis: {
+    envVar: 'REDIS_HOST',
+    fallback: 'redis://localhost:6379',
+    containerName: 'redis',
+    port: 6379,
+    verify: false,
+  },
+  postgres: {
+    envVar: 'DATABASE_URL',
+    fallback: 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
+    containerName: 'postgres',
+    port: 5432,
+    verify: false,
+  },
+  langextract: {
+    envVar: 'LANGEXTRACT_URL',
+    fallback: '',
+    containerName: 'phase66-langextract',
+    port: 8095,
+    verify: false,
+    verifyTimeout: 3000,
+  },
 };
 
 export async function initializeCommonServices(): Promise<Record<string, ServiceDiscoveryResult>> {

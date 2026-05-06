@@ -50,6 +50,7 @@ declare interface SimpleRedis {
   info(...args: any[]): Promise<unknown>;
   status?: unknown;
   isOpen?: boolean;
+  isReady?: boolean;
   dbsize(...args: any[]): Promise<number>;
   get(...args: any[]): Promise<unknown>;
   set(...args: any[]): Promise<unknown>;

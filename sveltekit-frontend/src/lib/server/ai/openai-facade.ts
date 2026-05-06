@@ -22,7 +22,7 @@ import type {
   OpenAIMessage,
 } from './openai-types.js';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
-import { bifrostChat } from '$lib/server/ollama.js';
+import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
 
 interface RunOpts {
   /** Authenticated user id (from locals.user) — used for ACE personalization */
@@ -39,6 +39,9 @@ function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
+    return 'gemma4-legal-vlm:latest';
+  }
+  if (m === 'gemma4-agent' || m === 'gemma4-raw' || m.startsWith('gemma4')) {
     return 'gemma4-legal-vlm:latest';
   }
   if (m.startsWith('gemma3')) return 'gemma3-legal:latest';
@@ -107,15 +110,25 @@ export async function runChatCompletion(
   // ── Raw passthrough mode: skip ACE, use messages verbatim ──
   // For benchmarking / debugging the model layer in isolation.
   if (req.raw) {
-    const content = await bifrostChat(
-      req.messages.map((m) => ({
-        role:    m.role === 'tool' ? 'user' : m.role,
-        content: m.content ?? '',
-      })),
-      internalModel,
-      { temperature: req.temperature, maxTokens: req.max_tokens },
-    );
-    const text = typeof content === 'string' ? content : (content as { content: string }).content;
+    const mappedMsgs = req.messages.map((m) => ({
+      role:    m.role === 'tool' ? 'user' as const : m.role,
+      content: m.content ?? '',
+    }));
+    // Try TurboQuant first (78 tok/s GPU), fall back to bifrostChat
+    let text: string;
+    try {
+      const content = await turboQuantChat(mappedMsgs, internalModel, {
+        temperature: req.temperature,
+        maxTokens: req.max_tokens,
+      });
+      text = typeof content === 'string' ? content : (content as { content: string }).content;
+    } catch {
+      const content = await bifrostChat(mappedMsgs, internalModel, {
+        temperature: req.temperature,
+        maxTokens: req.max_tokens,
+      });
+      text = typeof content === 'string' ? content : (content as { content: string }).content;
+    }
     return wrapResponse({
       content:  text,
       model:    internalModel,
@@ -152,11 +165,21 @@ export async function runChatCompletion(
     { role: 'user',   content: query },
   ];
 
-  const result = await bifrostChat(messages, internalModel, {
-    temperature: req.temperature,
-    maxTokens:   req.max_tokens,
-  });
-  const text = typeof result === 'string' ? result : (result as { content: string }).content;
+  // Try TurboQuant first (78 tok/s GPU), fall back to bifrostChat
+  let text: string;
+  try {
+    const result = await turboQuantChat(messages, internalModel, {
+      temperature: req.temperature,
+      maxTokens:   req.max_tokens,
+    });
+    text = typeof result === 'string' ? result : (result as { content: string }).content;
+  } catch {
+    const result = await bifrostChat(messages, internalModel, {
+      temperature: req.temperature,
+      maxTokens:   req.max_tokens,
+    });
+    text = typeof result === 'string' ? result : (result as { content: string }).content;
+  }
 
   return wrapResponse({
     content:    text,
@@ -222,9 +245,11 @@ function wrapResponse(args: {
 // ── Models list ────────────────────────────────────────────────────────────
 
 export const ADVERTISED_MODELS = [
-  { id: 'yorha-legal',    owned_by: 'yorha' }, // → gemma4-legal-vlm
-  { id: 'yorha-fast',     owned_by: 'yorha' }, // → gemma3:270m
-  { id: 'gemma4-legal',   owned_by: 'yorha' }, // → gemma4-legal-vlm explicit
-  { id: 'gemma3-legal',   owned_by: 'yorha' }, // → gemma3-legal
+  { id: 'gemma4-agent',   owned_by: 'local' },  // → gemma4-legal-vlm (ACE/KAG/RAG brain)
+  { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-legal-vlm (direct, no ACE)
+  { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-legal-vlm (alias)
+  { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
+  { id: 'gemma4-legal',   owned_by: 'yorha' },   // → gemma4-legal-vlm explicit
+  { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },
 ] as const;
