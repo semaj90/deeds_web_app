@@ -709,6 +709,10 @@ async function syncHypergraphToNeo4j(
                  f.som_y      = $y,
                  f.semantic_z = $z,
                  f.reward_w   = $w,
+                 f.manifold4X = $x,
+                 f.manifold4Y = $y,
+                 f.manifold4Z = $z,
+                 f.manifold4W = $w,
                  f.nodeType   = $type
            WITH  f
            MERGE (sc:SomCell { col: $x, row: $y })

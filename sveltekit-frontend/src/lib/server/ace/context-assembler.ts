@@ -2548,13 +2548,25 @@ async function applyKarpathyBoost(
   const topSomRow  = candidates[0]?.somBmuRow ?? null;
   const topSomCol  = candidates[0]?.somBmuCol ?? null;
 
-  // Step 4 pre-fetch: load cluster BoW tile + SOM tile (non-blocking, best-effort)
-  const [clusterTile, somTile] = await Promise.all([
+  // Step 4 pre-fetch: load cluster BoW tile + SOM tile + Neo4j authority scores (non-blocking, best-effort)
+  const [clusterTile, somTile, authorityNodes] = await Promise.all([
     topCluster != null ? getClusterBowTexture(topCluster).catch(() => null) : Promise.resolve(null),
     topSomRow != null && topSomCol != null
       ? getSomBowTexture(topSomRow, topSomCol).catch(() => null)
       : Promise.resolve(null),
+    import('$lib/server/graph/neo4j-gds.js')
+      .then(m => m.getTopAuthorityNodes(50))
+      .catch(() => [] as import('$lib/server/graph/neo4j-gds.js').AuthorityNode[]),
   ]);
+
+  // Build stableKey/path → normalised PageRank score (0–1) for fast lookup
+  const maxPR = authorityNodes.reduce((m, n) => Math.max(m, n.graphPageRank), 1e-9);
+  const authorityMap = new Map(
+    authorityNodes.map(n => [
+      (n.path ?? n.stableKey).replace(/\\/g, '/').replace(/^sveltekit-frontend\//, ''),
+      n.graphPageRank / maxPR,
+    ])
+  );
 
   // Build query BoW from query terms for overlap scoring
   const queryTerms = new Set(
@@ -2568,7 +2580,11 @@ async function applyKarpathyBoost(
     let clusterBoost = 0;
     let somBoost = 0;
     let bowBoost = 0;
-    const pagerankBoost = 0; // populated downstream by PageRank top-list check
+    // Neo4j GDS graphPageRank boost (+0–0.08, capped; zero when Neo4j offline)
+    const fileLookup = c.filePath
+      ? c.filePath.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '')
+      : '';
+    const pagerankBoost = fileLookup ? Math.min((authorityMap.get(fileLookup) ?? 0) * 0.08, 0.08) : 0;
     const pairedTestBoost = 0; // populated downstream by paired test check
 
     // Tag overlap boost: +0.08 per matching Karpathy tag (max +0.24)
