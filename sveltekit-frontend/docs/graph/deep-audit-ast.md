@@ -1,27 +1,13 @@
 # Deep AST Audit
 
-Generated: 2026-05-06T01:23:19.222Z
+Generated: 2026-05-06T01:28:41.628Z
 Graph files: 3417
 
 ## Summary
 
 | Gate | Description | Count |
 | :--- | :--- | ---: |
-| D18 | simdjson opportunity (.mget + JSON.parse, no fast-parse) | 7 |
-
----
-
-## D18 — simdjson opportunity (.mget + JSON.parse, no fast-parse)
-
-**7** findings
-
-- `src\lib\server\research\lane4-feedback.ts:126` — const [scoreRaw, countRaw] = await redis.mget(  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\lib\server\rag\sdk.ts:48` — const [statusRaw, shardCountRaw] = await redis.mget([  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\lib\server\graph\codebase-cluster-detection.ts:350` — const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\topology-hits\+server.ts:52` — const blobs = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\ingest-log\+server.ts:44` — const raws = await redis.mget(hashes.map((h) => `rag:hit:${h}`));  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\agents-write\+server.ts:209` — kagVals = await redis.mget(...kagKeys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
-- `src\routes\api\codebase-index\export\bundle\+server.ts:231` — const values = await redis.mget(...keys);  → consider parseEntriesBulk for ≥10/≥5KB aggregate
+| D18 | simdjson opportunity (.mget + JSON.parse, no fast-parse) | 0 |
 
 ---
 

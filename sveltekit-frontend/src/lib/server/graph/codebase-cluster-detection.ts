@@ -348,9 +348,21 @@ export async function getAllClusterNarratives(_k?: number): Promise<ClusterNarra
     } while (cursor !== '0');
     if (keys.length === 0) return [];
     const values = await redis.mget(...keys);
+
+    // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. ClusterNarrative
+    // records carry purpose + patterns + warnings + key files lists.
+    const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
+    let parseFn: (s: string) => ClusterNarrative = (s) => JSON.parse(s) as ClusterNarrative;
+    if (values.length >= 10 && totalChars >= 5_000) {
+      try {
+        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+        if (isSimdJsonAvailable()) parseFn = fastJsonParse<ClusterNarrative>;
+      } catch { /* addon unavailable — keep V8 */ }
+    }
+
     return values
       .filter((v): v is string => v !== null)
-      .map((v) => JSON.parse(v) as ClusterNarrative);
+      .map(parseFn);
   } catch {
     return [];
   }

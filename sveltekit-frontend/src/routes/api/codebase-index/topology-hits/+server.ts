@@ -51,12 +51,24 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     const keys = pairs.map((p) => `rag:hit:${p.sha8}`);
     const blobs = await redis.mget(...keys);
 
+    // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. RAG hit blobs carry
+    // chunk content + cluster metadata + retrieval breakdown ~2-10KB each.
+    const totalChars = blobs.reduce((sum, b) => sum + (b?.length ?? 0), 0);
+    let parseFn: (s: string) => Record<string, unknown> =
+      (s) => JSON.parse(s) as Record<string, unknown>;
+    if (blobs.length >= 10 && totalChars >= 5_000) {
+      try {
+        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+        if (isSimdJsonAvailable()) parseFn = fastJsonParse<Record<string, unknown>>;
+      } catch { /* addon unavailable — keep V8 */ }
+    }
+
     const hits: Array<Record<string, unknown>> = [];
     for (let i = 0; i < pairs.length; i++) {
       const raw = blobs[i];
       if (!raw) continue;
       try {
-        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        const parsed = parseFn(raw);
         if (clusterParam !== null) {
           const c = parsed.top_cluster;
           if (c === undefined || String(c) !== clusterParam) continue;

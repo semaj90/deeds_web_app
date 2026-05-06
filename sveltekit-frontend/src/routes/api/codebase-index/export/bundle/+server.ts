@@ -229,12 +229,25 @@ async function buildWikiNotesPart(
 		const keys = await scanKeys(redis, 'wiki:note:*', limit);
 		if (keys.length === 0) return [];
 		const values = await redis.mget(...keys);
+
+		// simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Wiki notes 1-5KB
+		// each — bulk export easily clears the threshold.
+		const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
+		let parseFn: (s: string) => Record<string, unknown> =
+			(s) => JSON.parse(s) as Record<string, unknown>;
+		if (values.length >= 10 && totalChars >= 5_000) {
+			try {
+				const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+				if (isSimdJsonAvailable()) parseFn = fastJsonParse<Record<string, unknown>>;
+			} catch { /* addon unavailable — keep V8 */ }
+		}
+
 		const notes: WikiNote[] = [];
 		for (let i = 0; i < keys.length; i++) {
 			const raw = values[i];
 			if (!raw) continue;
 			try {
-				const parsed = JSON.parse(raw) as Record<string, unknown>;
+				const parsed = parseFn(raw);
 				notes.push({
 					id: keys[i],
 					type: String(parsed.type ?? keys[i].split(':')[2] ?? 'unknown'),
