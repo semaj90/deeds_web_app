@@ -13,7 +13,7 @@
  * All configurations are loaded from environment variables.
  */
 import { dev } from '$app/environment';
-import { env as privateEnv } from '$env/dynamic/private';
+const privateEnv: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
 import type {
 	MinIOClient,
@@ -47,11 +47,11 @@ export function loadServiceEnvironment(): ServiceEnvironment {
 		// Database
 		databaseUrl,
 		postgresConfig: {
-			host: dbUrl.hostname || 'localhost',
+			host: dbUrl.hostname,
 			port: parseInt(dbUrl.port || '5432', 10),
-			database: dbUrl.pathname.slice(1) || 'legal_ai_db',
-			user: dbUrl.username || 'legal_admin',
-			password: dbUrl.password || '123456',
+			database: dbUrl.pathname.slice(1),
+			user: dbUrl.username,
+			password: dbUrl.password,
 			ssl: process.env.NODE_ENV === 'production',
 			max: 20,
 			idleTimeoutMillis: 30000
@@ -566,10 +566,13 @@ export class Neo4jAdapter implements Neo4jClient {
 
 // ===== Service Factory & Health Checks =====
 
-export function getServiceAdapters() {
+// Singleton — pg/ioredis/neo4j drivers maintain internal connection pools.
+// Constructing fresh adapters per request leaks connections and exhausts pools.
+let _adapters: ReturnType<typeof buildAdapters> | null = null;
+
+function buildAdapters() {
 	const env = loadServiceEnvironment();
 	const urls = getServiceUrls(env);
-
 	return {
 		env: urls,
 		ollama: new OllamaAdapter(env.ollamaConfig),
@@ -580,6 +583,11 @@ export function getServiceAdapters() {
 		neo4j: new Neo4jAdapter(env.neo4jConfig),
 		rabbitmq: { url: env.rabbitmqConfig.url, enabled: env.rabbitmqConfig.enabled }
 	};
+}
+
+export function getServiceAdapters() {
+	if (!_adapters) _adapters = buildAdapters();
+	return _adapters;
 }
 
 export async function healthCheckServices() {
@@ -602,11 +610,14 @@ export async function healthCheckServices() {
 		services.ollama = false;
 	}
 
-	// Check Qdrant
+	// Check Qdrant — probe collection list endpoint instead of forcing a search
+	// against a fixed collection/dim that may not exist. The /collections endpoint
+	// is the canonical Qdrant liveness check.
 	try {
-		await adapters.qdrant.search('test', [0], 1);
-		services.qdrant = true;
-	} catch (e) {
+		const url = 'http://' + adapters.env.qdrant.split('://')[1];
+		const res = await fetch(url + '/collections', { signal: AbortSignal.timeout(3_000) });
+		services.qdrant = res.ok;
+	} catch {
 		services.qdrant = false;
 	}
 

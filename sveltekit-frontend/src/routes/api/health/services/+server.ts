@@ -75,43 +75,54 @@ export const GET: RequestHandler = async () => {
 };
 
 /**
- * Check Qdrant connectivity
+ * Check Qdrant connectivity — adapter signature is search(collection, vector, limit?).
+ * Use the existing legal_documents collection (768-dim) which is always present.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function checkQdrant(qdrant: any): Promise<boolean> {
   try {
-    await qdrant.search('legal_documents', { vector: Array(768).fill(0), limit: 1 });
+    await qdrant.search('legal_documents', new Array(768).fill(0), 1);
     return true;
   } catch (error) {
     console.warn('Qdrant health check failed: ', error);
     return false;
   }
-}/**
+}
+
+/**
  * Check MinIO connectivity
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function checkMinIO(minio: any): Promise<boolean> {
- try {
- await minio.bucketExists?.('legal-evidence');
- return true;
- } catch (error) {
- console.warn('MinIO health check failed: ', error);
- return false;
- }
+  try {
+    await minio.bucketExists?.('legal-evidence');
+    return true;
+  } catch (error) {
+    console.warn('MinIO health check failed: ', error);
+    return false;
+  }
 }
 
 /**
- * Check RabbitMQ connectivity
+ * Check RabbitMQ connectivity — probe the management API.
+ * The adapter is a config-only object (no live connection); previously this
+ * returned `true` unconditionally inside a no-op try/catch. Now it does an
+ * actual HTTP probe against the management UI port.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-async function checkRabbitMQ(_rabbitmq: any): Promise<boolean> {
- try {
- // RabbitMQ health check is passive (connection established on init)
- return true;
- } catch (error) {
- console.warn('RabbitMQ health check failed: ', error);
- return false;
- }
+async function checkRabbitMQ(rabbitmq: { url: string; enabled: boolean }): Promise<boolean> {
+  if (!rabbitmq.enabled) return false;
+  try {
+    const mgmtUrl = rabbitmq.url
+      .replace('amqp://', 'http://')
+      .replace(':5672', ':15672');
+    // Anonymous probe — management API responds 401 without creds, which still
+    // proves the broker is up. Treat 200 OR 401 as "alive".
+    const res = await fetch(mgmtUrl, { signal: AbortSignal.timeout(2_000) });
+    return res.status === 200 || res.status === 401;
+  } catch (error) {
+    console.warn('RabbitMQ health check failed: ', error);
+    return false;
+  }
 }
 
 
