@@ -117,6 +117,8 @@ export default defineConfig({
       'tests/ace-code-cache.spec.ts',
       'tests/tensor-analysis-enqueue.spec.ts',
       'tests/ace-hit-tagger.spec.ts',
+      // Gemma4 agentic 24hr ACE hits cache (trace.kag_search Redis layer)
+      'tests/ace-hits-cache.spec.ts',
       // code-intel dashboard, Karpathy persistence, TRACE memory gain, HMM flow (added 2026-05-06)
       'tests/karpathy-persistence.spec.ts',
       'tests/trace-memory-gain.spec.ts',
