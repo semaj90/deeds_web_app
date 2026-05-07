@@ -5,6 +5,7 @@ import { lookupErrorFingerprint, extractSymbols } from './error-fingerprint.js';
 import { multiTextRecall, type NgramHit } from './ngram-retrieval.js';
 import { extractFilePaths } from './error-fingerprint.js';
 import { aceTopkKey } from './cache-keys.js';
+import { readLatestQdrantClusterTags, scoreClusterRelevance } from './cluster-tags-cache.js';
 
 export interface MultiLaneQuery {
 	text: string;
@@ -14,7 +15,7 @@ export interface MultiLaneQuery {
 }
 
 export interface LaneResult {
-	lane: 'hash' | 'ngram' | 'graph' | 'ace_cache' | 'symbol' | 'vector';
+	lane: 'hash' | 'ngram' | 'graph' | 'ace_cache' | 'symbol' | 'vector' | 'glyph_cluster';
 	hits: MultiLaneHit[];
 	latencyMs: number;
 	cacheHit: boolean;
