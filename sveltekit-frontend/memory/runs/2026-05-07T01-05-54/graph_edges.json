@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-05-07T01:05:54.150Z",
+  "totalEdges": 11669,
+  "edgeCounts": {
+    "EXPORTS_SYMBOL": 8232,
+    "READS_REDIS_KEY": 85,
+    "WRITES_REDIS_KEY": 57,
+    "QUERIES_TABLE": 309,
+    "QUERIES_QDRANT_COLLECTION": 164,
+    "QUERIES_NEO4J_LABEL": 52,
+    "HAS_AGENTS_SCOPE": 2770
+  },
+  "sample": []
+}

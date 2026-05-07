@@ -504,6 +504,7 @@
 			"label": "🩺 Quality Gate: Smoke + Audit (parallel)",
 			"dependsOn": [
 				"⚙️ [leaf] Verify: TRACE Startup",
+				"⚙️ [leaf] TRACE: Full-Loop Smoke",
 				"⚙️ [leaf] Test: Code-Intel Suite",
 				"⚙️ [leaf] Typecheck: Native tsgo"
 			],
@@ -536,19 +537,32 @@
 			"detail": "Run 5 TRACE prompts + cache validation — logs to logs/trace-full-loop/latest.json"
 		},
 
+		// ── Leaf: TRACE cache-reuse smoke (repeated-query cache proof) ───────────
+		{
+			"label": "⚙️ [leaf] TRACE: Cache Reuse Smoke",
+			"type": "shell",
+			"command": "node scripts/smoke-trace-cache-reuse.mjs",
+			"options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+			"group": "test",
+			"presentation": { "reveal": "always", "panel": "dedicated" },
+			"problemMatcher": [],
+			"detail": "Run same query twice — proves prior-answer cache reuse — logs to logs/trace-full-loop/cache-reuse-latest.json"
+		},
+
 		// ── Compound: Quality + Full Loop ────────────────────────────────────────
 		{
 			"label": "🏁 TRACE: Quality + Full Loop (parallel)",
 			"dependsOn": [
 				"⚙️ [leaf] Verify: TRACE Startup",
 				"⚙️ [leaf] TRACE: Full-Loop Smoke",
+				"⚙️ [leaf] TRACE: Cache Reuse Smoke",
 				"⚙️ [leaf] Test: Code-Intel Suite",
 				"⚙️ [leaf] Typecheck: Native tsgo",
 				"⚙️ [leaf] Agent: Diagnose Last Failure"
 			],
 			"dependsOrder": "parallel",
 			"group": { "kind": "test", "isDefault": false },
-			"detail": "Full quality gate: TRACE stack + 5-prompt loop + code-intel tests + tsgo — run before release"
+			"detail": "Full quality gate: TRACE stack + 5-prompt loop + cache-reuse smoke + code-intel tests + tsgo — run before release"
 		}
 	],
 	"inputs": [

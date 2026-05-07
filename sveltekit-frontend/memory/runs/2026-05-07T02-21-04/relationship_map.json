@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-05-07T02:21:05.035Z",
+  "source": "2026-05-07T02:20:55.783Z",
+  "totalFiles": 2770,
+  "totalEdges": 11670,
+  "edgeCounts": {
+    "EXPORTS_SYMBOL": 8232,
+    "READS_REDIS_KEY": 85,
+    "WRITES_REDIS_KEY": 57,
+    "QUERIES_TABLE": 310,
+    "QUERIES_QDRANT_COLLECTION": 164,
+    "QUERIES_NEO4J_LABEL": 52,
+    "HAS_AGENTS_SCOPE": 2770
+  },
+  "topFilesByType": {},
+  "topTargetsByType": {}
+}

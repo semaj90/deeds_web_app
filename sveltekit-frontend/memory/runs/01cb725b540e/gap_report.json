@@ -1,0 +1,199 @@
+{
+  "runId": "01cb725b540e",
+  "pipelineVersion": "1.0.0",
+  "generatedAt": "2026-05-07T00:31:35.301Z",
+  "gaps": [
+    {
+      "id": "gap_ace_001",
+      "title": "multiLaneSearch not called by context-assembler",
+      "severity": "HIGH",
+      "type": "dead_retrieval_lane",
+      "summary": "[FIXED] context-assembler.ts has no import or call to multiLaneSearch() from multi-lane-retrieval.ts. | Evidence: multiLaneSearch import found in context-assembler.ts",
+      "why": "The multi-lane retrieval system (hash + ngram + graph + ace_cache lanes) exists but is bypassed. ACE context assembly only uses Qdrant/ACP/Redis/SOM paths. Error fingerprint cache hits, ngram recall, and graph node expansion are never surfaced to Gemma4.",
+      "patch": "In context-assembler.ts: import { multiLaneSearch } from ./multi-lane-retrieval.js; call multiLaneSearch({ text: query, isError: looksLikeError(query), topK: 10 }) in parallel with the Qdrant lane; merge synthesis.synthesisBlock into the assembled context string.",
+      "affectedFiles": [
+        "src/lib/server/ace/context-assembler.ts",
+        "src/lib/server/ace/multi-lane-retrieval.ts"
+      ],
+      "affectedSymbols": [
+        "multiLaneSearch",
+        "assembleACEContext",
+        "MultiLaneSynthesis"
+      ],
+      "affectedRedisKeys": [
+        "ace:topk:*:embeddinggemma:768"
+      ],
+      "affectedMcpTools": [
+        "trace.explain_retrieval"
+      ],
+      "score": 0.69,
+      "status": "fixed",
+      "discoveredByRun": "01cb725b540e",
+      "createdAt": "2026-05-07T00:31:35.301Z",
+      "updatedAt": "2026-05-07T00:31:35.301Z"
+    },
+    {
+      "id": "gap_ace_002",
+      "title": "skipVectorLane declared but never enforced in multiLaneSearch",
+      "severity": "HIGH",
+      "type": "vector_lane_mismatch",
+      "summary": "[FIXED] MultiLaneQuery.skipVectorLane is typed but the multiLaneSearch() body always runs all lanes regardless. | Evidence: skipVectorLane is checked in multiLaneSearch body",
+      "why": "Callers cannot opt out of expensive vector lanes. When context-assembler already has Qdrant results, running the vector lane again wastes latency. The flag exists for cost control but has no effect — a silent contract break.",
+      "patch": "In multi-lane-retrieval.ts multiLaneSearch(): check query.skipVectorLane before pushing lanes; the ace_cache lane and ngram lane should still run when skipVectorLane=true. Add a comment \"// vector lane gated by skipVectorLane\" so the invariant is visible.",
+      "affectedFiles": [
+        "src/lib/server/ace/multi-lane-retrieval.ts"
+      ],
+      "affectedSymbols": [
+        "multiLaneSearch",
+        "MultiLaneQuery",
+        "skipVectorLane"
+      ],
+      "affectedRedisKeys": [],
+      "affectedMcpTools": [],
+      "score": 0.5,
+      "status": "fixed",
+      "discoveredByRun": "01cb725b540e",
+      "createdAt": "2026-05-07T00:31:35.301Z",
+      "updatedAt": "2026-05-07T00:31:35.301Z"
+    },
+    {
+      "id": "gap_ace_003",
+      "title": "ace:topk writer/reader key namespace is shared but ownership unclear",
+      "severity": "HIGH",
+      "type": "cache_read_without_write",
+      "summary": "[FIXED] context-assembler.ts writes ace:topk:{queryHash}:embeddinggemma:768 at line 2184. multi-lane-retrieval.ts reads the same key pattern in runAceCacheLane(). There is no canonical constant or import binding the two — if either changes the key format, the cache silently stops working. | Evidence: aceTopkKey constant found in cache-keys.ts",
+      "why": "A format drift (e.g. model name change, hash length change) would cause 100% cache miss with no error, only silent latency regression. The key pattern is copy-pasted in two places with no shared constant.",
+      "patch": "Create src/lib/server/ace/cache-keys.ts with: export const aceTopkKey = (queryHash: string, model = \"embeddinggemma\", dim = 768) => `ace:topk:${queryHash}:${model}:${dim}`; Import and use this in both context-assembler.ts and multi-lane-retrieval.ts.",
+      "affectedFiles": [
+        "src/lib/server/ace/context-assembler.ts",
+        "src/lib/server/ace/multi-lane-retrieval.ts"
+      ],
+      "affectedSymbols": [
+        "aceTopkKey"
+      ],
+      "affectedRedisKeys": [
+        "ace:topk:*:embeddinggemma:768"
+      ],
+      "affectedMcpTools": [],
+      "score": 0.59,
+      "status": "fixed",
+      "discoveredByRun": "01cb725b540e",
+      "createdAt": "2026-05-07T00:31:35.301Z",
+      "updatedAt": "2026-05-07T00:31:35.301Z"
+    },
+    {
+      "id": "gap_ace_004",
+      "title": "error_fingerprints table exists but has no dedicated ACE retrieval lane",
+      "severity": "MED",
+      "type": "schema_drift",
+      "summary": "[FIXED] schema-postgres.ts defines errorFingerprints table and error-fingerprint.ts has fingerprintError(). multiLaneSearch runs the hash lane which calls lookupErrorFingerprint(). But lookupErrorFingerprint reads from Redis first (ace:error:fp:*) with Postgres fallback — the Postgres table may be empty if no batch ingest has run. | Evidence: backfill-error-fingerprints.mjs exists",
+      "why": "Error context is only surfaced when (a) multiLaneSearch is called (gap_ace_001 blocks this) AND (b) the Redis fingerprint cache is warm. Cold starts miss all error context. The Postgres table could serve as a durable fallback but no backfill pipeline populates it from tsgo diagnostics.",
+      "patch": "Wire tsgo-diagnostics-to-jsonb.mjs output into an error_fingerprints INSERT batch. Add a backfill script: scripts/wiki/backfill-error-fingerprints.mjs that reads scratch/audits/tsgo-diagnostics.json → upserts into error_fingerprints → warms Redis. Then fix gap_ace_001 so ACE actually reads this data.",
+      "affectedFiles": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/ace/error-fingerprint.ts",
+        "src/lib/server/ace/multi-lane-retrieval.ts",
+        "scripts/tsgo-diagnostics-to-jsonb.mjs"
+      ],
+      "affectedSymbols": [
+        "errorFingerprints",
+        "lookupErrorFingerprint",
+        "fingerprintError"
+      ],
+      "affectedRedisKeys": [
+        "ace:error:fp:*"
+      ],
+      "affectedMcpTools": [
+        "trace.explain_retrieval"
+      ],
+      "score": 0.48,
+      "status": "fixed",
+      "discoveredByRun": "01cb725b540e",
+      "createdAt": "2026-05-07T00:31:35.301Z",
+      "updatedAt": "2026-05-07T00:31:35.301Z"
+    },
+    {
+      "id": "gap_wiki_001",
+      "title": "retrieval-lanes.ts redis_ace lane reads ace:query:* but context-assembler writes ace:topk:*",
+      "severity": "HIGH",
+      "type": "cache_read_without_write",
+      "summary": "[FIXED] retrieval-lanes.ts runRedisAceLane() reads ace:query:{qHash}:embeddinggemma:768 but context-assembler.ts writes ace:topk:{queryHash}:embeddinggemma:768 — different namespace prefixes mean the redis_ace lane always misses. | Evidence: context-assembler.ts writes ace:query:* key — lanes can hit",
+      "why": "runRetrievalLanes() was wired into context-assembler.ts to provide multi-lane context. The redis_ace lane is the fastest path (sub-millisecond on cache hit) but currently has 0% hit rate because the key it reads was never written. The full multi-lane round-trip pays GPU+Postgres cost for every query.",
+      "patch": "In context-assembler.ts, after writing ace:topk:* also write ace:query:{queryHash}:embeddinggemma:768 with the same value (or alias). Alternatively: canonicalize both to use the same key via src/lib/server/ace/cache-keys.ts.",
+      "affectedFiles": [
+        "src/lib/server/ace/retrieval-lanes.ts",
+        "src/lib/server/ace/context-assembler.ts"
+      ],
+      "affectedSymbols": [
+        "runRedisAceLane",
+        "runRetrievalLanes"
+      ],
+      "affectedRedisKeys": [
+        "ace:query:*:embeddinggemma:768",
+        "ace:topk:*:embeddinggemma:768"
+      ],
+      "affectedMcpTools": [],
+      "score": 0.41,
+      "status": "fixed",
+      "discoveredByRun": "01cb725b540e",
+      "createdAt": "2026-05-07T00:31:35.301Z",
+      "updatedAt": "2026-05-07T00:31:35.301Z"
+    },
+    {
+      "id": "gap_wiki_002",
+      "title": "error_fingerprints not exported from schema-postgres.ts Drizzle schema",
+      "severity": "MED",
+      "type": "schema_drift",
+      "summary": "[FIXED] error-fingerprint.ts and multi-lane-retrieval.ts reference the error_fingerprints table but the table was added via raw SQL migration (drizzle/manual/20260506_error_fingerprints.sql), not as a Drizzle schema definition in schema-postgres.ts. | Evidence: errorFingerprints table definition found in schema-postgres.ts",
+      "why": "Without a Drizzle table definition, type-safe queries against error_fingerprints are not possible. db.insert(errorFingerprints) will fail at runtime with \"table undefined\". The migration creates the table but Drizzle ORM has no knowledge of it.",
+      "patch": "Add errorFingerprints table definition to src/lib/server/db/schema-postgres.ts using pgTable(). Export it alongside all other tables. error-fingerprint.ts can then use Drizzle-typed inserts instead of raw pool.query().",
+      "affectedFiles": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/ace/error-fingerprint.ts"
+      ],
+      "affectedSymbols": [
+        "errorFingerprints",
+        "storeErrorFingerprint"
+      ],
+      "affectedRedisKeys": [
+        "ace:error:*"
+      ],
+      "affectedMcpTools": [],
+      "score": 0.28,
+      "status": "fixed",
+      "discoveredByRun": "01cb725b540e",
+      "createdAt": "2026-05-07T00:31:35.301Z",
+      "updatedAt": "2026-05-07T00:31:35.301Z"
+    },
+    {
+      "id": "gap_wiki_003",
+      "title": "multi-lane-retrieval.ts has no paired test file",
+      "severity": "LOW",
+      "type": "test_gap",
+      "summary": "src/lib/server/ace/multi-lane-retrieval.ts (multiLaneSearch, runAceCacheLane, etc.) has no paired test in tests/multi-lane-retrieval.spec.ts. retrieval-lanes.ts gained tests/retrieval-lanes.spec.ts this session but the older module remains untested.",
+      "why": "multi-lane-retrieval.ts has 4 lanes and a merge strategy. Lane-failure isolation, deduplication logic, and score computation have no automated safety net. Changes to the hash or ngram lane can silently break retrieval quality.",
+      "patch": "Create tests/multi-lane-retrieval.spec.ts following the G26 pattern. Cover: all-lanes success, hash-lane Redis miss, trigram lane pg failure, duplicate hit dedup, synthesisBlock shape stability.",
+      "affectedFiles": [
+        "src/lib/server/ace/multi-lane-retrieval.ts"
+      ],
+      "affectedSymbols": [
+        "multiLaneSearch",
+        "runAceCacheLane"
+      ],
+      "affectedRedisKeys": [],
+      "affectedMcpTools": [],
+      "score": 0.42,
+      "status": "open",
+      "discoveredByRun": "01cb725b540e",
+      "createdAt": "2026-05-07T00:31:35.301Z",
+      "updatedAt": "2026-05-07T00:31:35.301Z"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "high": 0,
+    "med": 0,
+    "low": 1,
+    "open": 1
+  }
+}

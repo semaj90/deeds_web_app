@@ -27,6 +27,7 @@ import { turboQuantChat, bifrostChat } from '$lib/server/ollama.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 import { compressToHCACard } from '$lib/server/ai/hca-compressor.js';
 import { buildDevContextPlan, isCodingPrompt } from '$lib/server/ai/dev-context-planner.js';
+import { classifyQuerySection } from '$lib/server/analysis/hmm-ace-analyzer.js';
 
 interface RunOpts {
   /** Authenticated user id (from locals.user) — used for ACE personalization */
@@ -171,6 +172,7 @@ export async function runChatCompletion(
         devContextSummary: devPlan?.contextSummary,
       },
     });
+    const agentHmmResult = (() => { try { return classifyQuerySection(query); } catch { return null; } })();
     return wrapResponse({
       content:    agentResult.answer,
       model:      internalModel,
@@ -182,6 +184,13 @@ export async function runChatCompletion(
         codeLlmHit: agentResult.cacheTier !== undefined,
         cacheHit:   agentResult.cacheTier ? 'prior-answer' : 'none',
       },
+      hmm: agentHmmResult ? {
+        hmmAnalyzerUsed: true,
+        intent:          agentHmmResult.section,
+        confidence:      agentHmmResult.confidence,
+        state:           'agent_loop',
+        signals:         ['gemma4_agent', ...(agentResult.toolsUsed ?? [])],
+      } : undefined,
       toolLoop: {
         toolsUsed:           agentResult.toolsUsed ?? [],
         toolRounds:          agentResult.rounds ?? 0,
@@ -317,6 +326,8 @@ export async function runChatCompletion(
     priorAnswerKey = hcaKey;
   }
 
+  const hmmResult = (() => { try { return classifyQuerySection(query); } catch { return null; } })();
+
   return wrapResponse({
     content:    text,
     model:      internalModel,
@@ -328,6 +339,13 @@ export async function runChatCompletion(
       codeLlmHit: !!aceCtx.codeLlmHit?.llmOutput,
       cacheHit:   aceCtx.codeLlmHit ? 'prior-answer' : (aceCtx.agentsMd ? 'agents-md' : 'none'),
     },
+    hmm: hmmResult ? {
+      hmmAnalyzerUsed: true,
+      intent:          hmmResult.section,
+      confidence:      hmmResult.confidence,
+      state:           'context_sufficient',
+      signals:         ['ace_retrieval', 'qdrant', ...(aceCtx.agentsMd ? ['agents_md'] : [])],
+    } : undefined,
     toolLoop: {
       toolsUsed:       [],
       toolRounds:      0,
@@ -353,6 +371,8 @@ function wrapResponse(args: {
     codeLlmHit: boolean;
     cacheHit:   NonNullable<OpenAIChatCompletionResponse['yorha']>['cacheHit'];
   };
+  hmm?: NonNullable<NonNullable<OpenAIChatCompletionResponse['yorha']>['hmm']>;
+  topoPrefilter?: { used: boolean; hitCount?: number } | null;
   toolLoop?: {
     toolsUsed?:          string[];
     toolRounds?:         number;
@@ -377,6 +397,10 @@ function wrapResponse(args: {
     object:  'chat.completion',
     created: Math.floor(Date.now() / 1000),
     model:   args.model,
+    retrievalTrace: args.hmm ? {
+      hmm:           args.hmm,
+      topoPrefilter: args.topoPrefilter ?? null,
+    } : undefined,
     choices: [
       {
         index:         0,
@@ -406,6 +430,7 @@ function wrapResponse(args: {
       selectedStableKeys:  args.toolLoop?.selectedStableKeys,
       selectedFiles:       args.toolLoop?.selectedFiles,
       contextHitCount:     args.toolLoop?.contextHitCount,
+      hmm:                 args.hmm,
     },
   };
 }

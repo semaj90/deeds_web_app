@@ -1,0 +1,82 @@
+[
+  {
+    "file": "context-assembler.ts",
+    "outboundCount": 15,
+    "inboundCount": 0,
+    "outbound": [
+      "READS_REDIS_KEY → code:index:manifest",
+      "READS_REDIS_KEY → code:index:tag:${word}",
+      "READS_REDIS_KEY → agents:root",
+      "READS_REDIS_KEY → agents:dir:${dir}",
+      "QUERIES_TABLE → context_timeline",
+      "QUERIES_TABLE → cases",
+      "QUERIES_TABLE → legal_glossary",
+      "QUERIES_TABLE → research_summaries",
+      "QUERIES_TABLE → evidence",
+      "QUERIES_QDRANT_COLLECTION → codebase_chunks_768",
+      "QUERIES_QDRANT_COLLECTION → legal_glossary",
+      "QUERIES_QDRANT_COLLECTION → legal_documents",
+      "QUERIES_QDRANT_COLLECTION → legal_canon_chunks",
+      "QUERIES_QDRANT_COLLECTION → evidence_items",
+      "QUERIES_NEO4J_LABEL → Case"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "multi-lane-retrieval.ts",
+    "outboundCount": 4,
+    "inboundCount": 0,
+    "outbound": [
+      "READS_REDIS_KEY → code:graph:node:${nodeHash}",
+      "READS_REDIS_KEY → code:graph:node:${h}",
+      "QUERIES_TABLE → context_timeline",
+      "QUERIES_QDRANT_COLLECTION → codebase_chunks_768"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "retrieval-lanes.ts",
+    "outboundCount": 5,
+    "inboundCount": 0,
+    "outbound": [
+      "READS_REDIS_KEY → ace:error:${errHash}",
+      "READS_REDIS_KEY → code:graph:node:${hash}",
+      "READS_REDIS_KEY → ace:topo:${topoClass}:${qHash}",
+      "QUERIES_TABLE → document_chunks",
+      "QUERIES_TABLE → research_summaries"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "ngram-retrieval.ts",
+    "outboundCount": 3,
+    "inboundCount": 0,
+    "outbound": [
+      "QUERIES_TABLE → document_chunks",
+      "QUERIES_TABLE → error_fingerprints",
+      "QUERIES_TABLE → research_summaries"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "error-fingerprint.ts",
+    "outboundCount": 1,
+    "inboundCount": 0,
+    "outbound": [
+      "QUERIES_TABLE → error_fingerprints"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "gemma4-agent.ts",
+    "outboundCount": 4,
+    "inboundCount": 0,
+    "outbound": [
+      "QUERIES_TABLE → cases",
+      "QUERIES_QDRANT_COLLECTION → legal_documents",
+      "QUERIES_QDRANT_COLLECTION → evidence_items",
+      "QUERIES_QDRANT_COLLECTION → codebase_chunks_768"
+    ],
+    "inbound": []
+  }
+]

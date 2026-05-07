@@ -1,17 +1,19 @@
 // @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import type { AceHmmMeta, RetrievalTrace } from '$lib/server/ai/openai-types.js';
 
 // Mock the heavy deps so this is a unit test on the facade orchestration,
 // not a full integration test (the route handler test covers wiring).
 const mocks = vi.hoisted(() => ({
-  assembleACEContext:   vi.fn(),
-  buildACEPromptCached: vi.fn(),
-  bifrostChat:          vi.fn(),
-  turboQuantChat:       vi.fn(),
-  runGemma4Agent:       vi.fn(),
-  recordRagAnswer:      vi.fn(),
-  buildDevContextPlan:  vi.fn(),
-  isCodingPrompt:       vi.fn(),
+  assembleACEContext:    vi.fn(),
+  buildACEPromptCached:  vi.fn(),
+  bifrostChat:           vi.fn(),
+  turboQuantChat:        vi.fn(),
+  runGemma4Agent:        vi.fn(),
+  recordRagAnswer:       vi.fn(),
+  buildDevContextPlan:   vi.fn(),
+  isCodingPrompt:        vi.fn(),
+  classifyQuerySection:  vi.fn(),
 }));
 
 vi.mock('$lib/server/ace/context-assembler.js', () => ({
@@ -38,6 +40,10 @@ vi.mock('$lib/server/cache/code-llm-index.js', () => ({
   recordRagAnswer: mocks.recordRagAnswer,
 }));
 
+vi.mock('$lib/server/analysis/hmm-ace-analyzer.js', () => ({
+  classifyQuerySection: mocks.classifyQuerySection,
+}));
+
 describe('openai-facade — runChatCompletion', () => {
   beforeEach(() => {
     mocks.assembleACEContext.mockReset();
@@ -51,6 +57,8 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.isCodingPrompt.mockReturnValue(false);
     // Default: TurboQuant throws so bifrostChat is used (existing test expectations)
     mocks.turboQuantChat.mockRejectedValue(new Error('TurboQuant unavailable'));
+    // Default: HMM returns a real classification so the data path is exercised
+    mocks.classifyQuerySection.mockReturnValue({ section: 'FACTS', confidence: 0.82 });
   });
 
   it('extracts last user message as query, earlier messages as history', async () => {
@@ -192,6 +200,71 @@ describe('openai-facade — runChatCompletion', () => {
         temperature: 0.3,
       }),
     ).rejects.toThrow(/No user query/);
+  });
+
+  it('ACE path: populates yorha.hmm and retrievalTrace.hmm from classifyQuerySection', async () => {
+    mocks.classifyQuerySection.mockReturnValue({ section: 'LEGAL_AUTHORITY', confidence: 0.91 });
+    mocks.assembleACEContext.mockResolvedValue({
+      ragChunks: [{}], kbChunks: [], caseChunks: [], chatHistory: [],
+      agentsMd: null, codeLlmHit: null,
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({ systemPrompt: 'sys', contextWindow: '' });
+    mocks.bifrostChat.mockResolvedValue('ACE answer');
+
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    const res = await runChatCompletion({
+      model:    'yorha-legal',
+      messages: [{ role: 'user', content: 'Cite the controlling case on hearsay.' }],
+      raw: false, stream: false, temperature: 0.3,
+    });
+
+    // yorha.hmm populated — AceHmmMeta shape
+    const hmm = res.yorha?.hmm as AceHmmMeta | undefined;
+    expect(hmm?.hmmAnalyzerUsed).toBe(true);
+    expect(hmm?.intent).toBe('LEGAL_AUTHORITY');
+    expect(typeof hmm?.confidence).toBe('number');
+    expect(Array.isArray(hmm?.signals)).toBe(true);
+
+    // retrievalTrace.hmm mirrors yorha.hmm — RetrievalTrace shape
+    const trace = res.retrievalTrace as RetrievalTrace | undefined;
+    expect(trace?.hmm?.hmmAnalyzerUsed).toBe(true);
+    expect(trace?.hmm?.intent).toBe('LEGAL_AUTHORITY');
+  });
+
+  it('agent path: populates yorha.hmm and retrievalTrace.hmm for agentic tool calling', async () => {
+    mocks.classifyQuerySection.mockReturnValue({ section: 'CLAIMS', confidence: 0.78 });
+    mocks.isCodingPrompt.mockReturnValue(false);
+    mocks.runGemma4Agent.mockResolvedValue({
+      answer:    'Agent answer with tool results',
+      toolsUsed: ['rag_search', 'case_search'],
+      rounds:    2,
+      cacheTier: undefined,
+    });
+
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    const res = await runChatCompletion({
+      model:    'gemma4-agent',
+      messages: [{ role: 'user', content: 'What claims are supported by the evidence?' }],
+      raw: false, stream: false, temperature: 0.3,
+    });
+
+    expect(res.choices[0].message.content).toBe('Agent answer with tool results');
+
+    // HMM on agent path
+    const hmm = res.yorha?.hmm as AceHmmMeta | undefined;
+    expect(hmm?.hmmAnalyzerUsed).toBe(true);
+    expect(hmm?.intent).toBe('CLAIMS');
+    expect(hmm?.state).toBe('agent_loop');
+    expect(hmm?.signals).toContain('gemma4_agent');
+    expect(hmm?.signals).toContain('rag_search');
+
+    // retrievalTrace.hmm also present
+    const trace = res.retrievalTrace as RetrievalTrace | undefined;
+    expect(trace?.hmm?.intent).toBe('CLAIMS');
+
+    // toolsUsed exposed in yorha
+    expect(res.yorha?.toolsUsed).toContain('rag_search');
+    expect(res.yorha?.toolRounds).toBe(2);
   });
 });
 

@@ -342,7 +342,7 @@ export interface Manifold4Ranges {
 }
 
 export const DEFAULT_MANIFOLD4_RANGES: Manifold4Ranges = {
-  somMax:      40,
+  somMax:      512,  // must accommodate real SOM grids up to 512×512
   semanticMax: 1,
   rewardMax:   1,
 };

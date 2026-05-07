@@ -311,14 +311,51 @@ async function runVectorLane(query: MultiLaneQuery): Promise<LaneResult> {
 	}
 }
 
+/**
+ * Lane 7 — glyph_cluster: score every cluster in the latest qdrant_cluster_tags artifact
+ * against the query terms.  Top-3 clusters with score ≥ 0.05 become hits.
+ * Non-fatal: returns empty lane if the artifact is absent or stale.
+ */
+function runGlyphClusterLane(query: MultiLaneQuery): LaneResult {
+	const t0 = Date.now();
+	const entries = readLatestQdrantClusterTags();
+	if (!entries.length) {
+		return { lane: 'glyph_cluster', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+
+	const queryLower = query.text.toLowerCase();
+	const queryTerms = new Set(queryLower.split(/\W+/).filter((t) => t.length > 2));
+
+	const scored = entries
+		.map((e) => ({ entry: e, score: scoreClusterRelevance(e, queryLower, queryTerms) }))
+		.filter(({ score }) => score >= 0.05)
+		.sort((a, b) => b.score - a.score)
+		.slice(0, 3);
+
+	const hits: MultiLaneHit[] = scored.map(({ entry, score }) => {
+		const repFile = (entry.topFiles as (string | null)[]).find((f): f is string => f != null) ?? undefined;
+		return {
+			id:       entry.clusterKey,
+			text:     `${entry.topoClasses.slice(0, 3).join(', ')}: ${entry.topTags.slice(0, 4).map((t) => t.tag).join(', ')}`,
+			filePath: repFile,
+			tags:     entry.topTags.slice(0, 6).map((t) => t.tag),
+			score,
+			lane:     'glyph_cluster' as const,
+		};
+	});
+
+	return { lane: 'glyph_cluster', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
+}
+
 const LANE_WEIGHT: Record<string, number> = {
-	hash:      1.00,
-	ace_cache: 0.90,
-	symbol:    0.80,
-	vector:    0.75,
-	ngram:     0.60,
-	graph:     0.55,
-	wiki_note: 0.65,
+	hash:          1.00,
+	ace_cache:     0.90,
+	symbol:        0.80,
+	vector:        0.75,
+	glyph_cluster: 0.70,
+	ngram:         0.60,
+	graph:         0.55,
+	wiki_note:     0.65,
 };
 
 function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
@@ -351,13 +388,14 @@ export async function multiLaneSearch(
 	const t0 = Date.now();
 	const queryHash = qHash(query.text);
 
-	const [hashResult, ngramResult, graphResult, aceCacheResult, symbolResult, vectorResult] = await Promise.allSettled([
+	const [hashResult, ngramResult, graphResult, aceCacheResult, symbolResult, vectorResult, glyphClusterResult] = await Promise.allSettled([
 		runHashLane(redis, pool, query),
 		runNgramLane(pool, query),
 		runGraphLane(redis, query),
 		runAceCacheLane(redis, queryHash),
 		runSymbolLane(redis, query),
 		runVectorLane(query),
+		Promise.resolve(runGlyphClusterLane(query)),
 	]);
 
 	const lanes: LaneResult[] = [];
@@ -386,8 +424,12 @@ export async function multiLaneSearch(
 		vectorResult.status === 'fulfilled'
 			? vectorResult.value
 			: { lane: 'vector' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedGlyphCluster =
+		glyphClusterResult.status === 'fulfilled'
+			? glyphClusterResult.value
+			: { lane: 'glyph_cluster' as const, hits: [], latencyMs: 0, cacheHit: false };
 
-	lanes.push(resolvedHash, resolvedNgram, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedVector);
+	lanes.push(resolvedHash, resolvedNgram, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedVector, resolvedGlyphCluster);
 
 	const merged = mergeAndRank(lanes);
 

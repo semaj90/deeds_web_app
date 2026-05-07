@@ -11,7 +11,7 @@
  * Direct:          npx tsx src/mcp/trace-mcp-server.ts
  * Health check:    curl http://127.0.0.1:8788/health
  *
- * Tool namespaces (12 tools):
+ * Tool namespaces (17 tools):
  *   graph.expand_neighborhood  — ego-graph expansion in Neo4j
  *   graph.shortest_path        — multi-hop path between two stableKeys
  *   graph.community_for_node   — community/cluster membership
@@ -27,9 +27,18 @@
  *   graph.expand_neighborhood    — ego-graph expansion (direct + N-hop neighbours)
  *   clusters.get_summary_lenses  — AGENTS.md/wiki notes for a GPU cluster
  *   trace.validate_ace_hit       — validate cache key contract + graph node presence
+ *   ops.propose_patch            — [OPERATOR-GATED] propose a code fix (read-only preview, no write)
+ *   ops.run_targeted_test        — [OPERATOR-GATED] run a specific vitest file, return output
+ *   ops.record_fix_attempt       — [OPERATOR-GATED] persist fix metadata to fix_attempts table
+ *   ops.run_quality_gate         — [OPERATOR-GATED] run tsc --noEmit and report pass/fail
+ *   hypergraph.search            — FTS + member activation search over hyperedges
+ *   hypergraph.get_edge          — fetch single hyperedge by edge_hash
+ *   hypergraph.explain_activation — why a hyperedge was activated for query terms
+ *   hypergraph.expand_members    — edges sharing members with a given edge
+ *   knowledge.get_minified_map   — compact map: top edges + AGENTS.md for a directory
  *
- * Architecture note — tools are READ-ONLY (Gemma4 never writes to Qdrant/Neo4j/Redis directly).
- * Batch writes flow through graphify:* npm scripts run outside the ACE hot path.
+ * Architecture note — tools are READ-ONLY except the four ops.* tools which require an
+ * operator_token to execute. Batch writes flow through graphify:* npm scripts outside the ACE hot path.
  *
  * TODO (optional future sidecar):
  *   LangGraph can orchestrate long-running graphify → verify → human-approval → patch workflows
@@ -1637,6 +1646,464 @@ server.tool(
   }
 );
 
+// ── Operator-gated tools (ops.*) ─────────────────────────────────────────────
+//
+// Rules:
+//   1. operator_token must be a non-empty string — acts as an explicit approval signal.
+//   2. propose_patch never writes files; it only reads and returns a diff description.
+//   3. run_targeted_test runs npx vitest run <file> in a child process, returns stdout/stderr.
+//   4. record_fix_attempt writes audit metadata to fix_attempts (not source code).
+//   5. run_quality_gate runs tsc --noEmit --skipLibCheck and reports pass/fail + error count.
+//
+// Gemma4 may CALL these tools and receive back previews / results.
+// Gemma4 may NOT apply patches or trigger mutations without the operator_token being set.
+
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { readFileSync as _readFileSync } from 'node:fs';
+
+const execFileAsync = promisify(execFile);
+
+function requireToken(token: unknown): string | null {
+  if (!token || typeof token !== 'string' || token.trim() === '') return 'operator_token required';
+  return null;
+}
+
+// ── ops.propose_patch ──────────────────────────────────────────────────────────
+server.tool(
+  'ops.propose_patch',
+  {
+    description: 'Read a source file and propose a targeted fix. Returns the current content and a recommended diff. Does NOT write anything. Requires operator_token.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        operator_token: { type: 'string', description: 'Non-empty approval token' },
+        file_path:      { type: 'string', description: 'Repo-relative file path to inspect' },
+        issue:          { type: 'string', description: 'Description of the issue to fix' },
+        context_lines:  { type: 'number', description: 'Lines of context to return (default 40)', minimum: 5, maximum: 200 },
+      },
+      required: ['operator_token', 'file_path', 'issue'],
+    },
+  },
+  async ({ operator_token, file_path, issue, context_lines }: {
+    operator_token: unknown; file_path: unknown; issue: unknown; context_lines?: unknown;
+  }) => {
+    const tokenErr = requireToken(operator_token);
+    if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
+
+    const safeFile = String(file_path ?? '').replace(/\.\./g, '').slice(0, 500);
+    const safeIssue = String(issue ?? '').slice(0, 1000);
+    const maxLines  = clampNumber(context_lines, 5, 200, 40);
+
+    try {
+      const absPath = resolve(process.cwd(), safeFile);
+      const raw = _readFileSync(absPath, 'utf8');
+      const lines = raw.split('\n');
+      const preview = lines.slice(0, maxLines).join('\n');
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: true,
+            file_path: safeFile,
+            total_lines: lines.length,
+            preview_lines: maxLines,
+            issue: safeIssue,
+            preview,
+            instruction: 'Review the preview. To apply a fix, call ops.record_fix_attempt with fixDiff describing the change, then apply it using your editor or git.',
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }] };
+    }
+  }
+);
+
+// ── ops.run_targeted_test ─────────────────────────────────────────────────────
+server.tool(
+  'ops.run_targeted_test',
+  {
+    description: 'Run a specific vitest test file and return the output. Requires operator_token.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        operator_token: { type: 'string', description: 'Non-empty approval token' },
+        test_file:      { type: 'string', description: 'Path to the test file relative to project root, e.g. tests/foo.spec.ts' },
+        timeout_ms:     { type: 'number', description: 'Max wait in ms (default 30000, max 120000)' },
+      },
+      required: ['operator_token', 'test_file'],
+    },
+  },
+  async ({ operator_token, test_file, timeout_ms }: {
+    operator_token: unknown; test_file: unknown; timeout_ms?: unknown;
+  }) => {
+    const tokenErr = requireToken(operator_token);
+    if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
+
+    const safeFile = String(test_file ?? '').replace(/\.\./g, '').slice(0, 500);
+    if (!safeFile.match(/\.(spec|test)\.[cm]?[jt]s$/)) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'test_file must end with .spec.ts / .test.ts (no path traversal)' }) }] };
+    }
+
+    const timeoutMs = clampNumber(timeout_ms, 5000, 120000, 30000);
+    const t0 = Date.now();
+
+    try {
+      const { stdout, stderr } = await execFileAsync(
+        'npx', ['vitest', 'run', safeFile, '--reporter=verbose'],
+        { cwd: process.cwd(), timeout: timeoutMs }
+      );
+      const elapsed = Date.now() - t0;
+      const passed  = /\d+ passed/.test(stdout);
+      const failed  = /\d+ failed/.test(stdout);
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: !failed,
+            test_file: safeFile,
+            passed,
+            failed,
+            durationMs: elapsed,
+            stdout: stdout.slice(-4000),
+            stderr: stderr.slice(-1000),
+          }, null, 2),
+        }],
+      };
+    } catch (err: unknown) {
+      const ex = err as { stdout?: string; stderr?: string; message?: string };
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: false,
+            test_file: safeFile,
+            durationMs: Date.now() - t0,
+            error:  (ex?.message ?? String(err)).slice(0, 300),
+            stdout: (ex?.stdout ?? '').slice(-3000),
+            stderr: (ex?.stderr ?? '').slice(-1000),
+          }, null, 2),
+        }],
+      };
+    }
+  }
+);
+
+// ── ops.record_fix_attempt ────────────────────────────────────────────────────
+server.tool(
+  'ops.record_fix_attempt',
+  {
+    description: 'Persist fix attempt metadata to fix_attempts table (audit only — does not modify source files). Requires operator_token.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        operator_token:   { type: 'string', description: 'Non-empty approval token' },
+        fix_type:         { type: 'string', description: 'Category of fix, e.g. "type-error", "logic-bug", "missing-null-check"' },
+        fix_description:  { type: 'string', description: 'Human-readable description of the proposed fix' },
+        fix_diff:         { type: 'string', description: 'Unified diff or summary of the change' },
+        files_affected:   { type: 'number', description: 'Number of files the fix touches (default 1)' },
+        errors_resolved:  { type: 'number', description: 'Estimated errors this fix resolves (default 1)' },
+        success:          { type: 'boolean', description: 'Whether the fix was verified to work (omit if unknown)' },
+        metadata:         { type: 'object', description: 'Extra context (e.g. test result, issue ID)' },
+      },
+      required: ['operator_token', 'fix_type', 'fix_description'],
+    },
+  },
+  async ({ operator_token, fix_type, fix_description, fix_diff, files_affected, errors_resolved, success, metadata }: {
+    operator_token: unknown; fix_type: unknown; fix_description: unknown; fix_diff?: unknown;
+    files_affected?: unknown; errors_resolved?: unknown; success?: unknown; metadata?: unknown;
+  }) => {
+    const tokenErr = requireToken(operator_token);
+    if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
+
+    const safeType = String(fix_type ?? '').slice(0, 100);
+    const safeDesc = String(fix_description ?? '').slice(0, 2000);
+    const safeDiff = fix_diff != null ? String(fix_diff).slice(0, 8000) : null;
+    const nFiles   = clampNumber(files_affected, 0, 9999, 1);
+    const nErrors  = clampNumber(errors_resolved, 0, 9999, 1);
+    const safeOk   = typeof success === 'boolean' ? success : null;
+    const safeMeta = normalizeJsonFilter(metadata) ?? {};
+
+    try {
+      const result = await pool.query<{ id: number }>(
+        `INSERT INTO fix_attempts
+           (fix_type, fix_description, fix_diff, files_affected, errors_resolved, success, metadata)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING id`,
+        [safeType, safeDesc, safeDiff, nFiles, nErrors, safeOk, JSON.stringify(safeMeta)]
+      );
+      const id = result.rows[0]?.id ?? null;
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({ ok: true, fix_attempt_id: id, fix_type: safeType, files_affected: nFiles }),
+        }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }] };
+    }
+  }
+);
+
+// ── ops.run_quality_gate ──────────────────────────────────────────────────────
+server.tool(
+  'ops.run_quality_gate',
+  {
+    description: 'Run tsc --noEmit --skipLibCheck and return pass/fail + error count. Requires operator_token.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        operator_token: { type: 'string', description: 'Non-empty approval token' },
+        gate:           { type: 'string', description: '"tsc" (default) or "vitest-all" to run full test suite', enum: ['tsc', 'vitest-all'] },
+        timeout_ms:     { type: 'number', description: 'Max wait in ms (default 60000, max 300000)' },
+      },
+      required: ['operator_token'],
+    },
+  },
+  async ({ operator_token, gate, timeout_ms }: {
+    operator_token: unknown; gate?: unknown; timeout_ms?: unknown;
+  }) => {
+    const tokenErr = requireToken(operator_token);
+    if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
+
+    const safeGate = String(gate ?? 'tsc') === 'vitest-all' ? 'vitest-all' : 'tsc';
+    const timeoutMs = clampNumber(timeout_ms, 5000, 300000, 60000);
+    const t0 = Date.now();
+
+    const [cmd, args] = safeGate === 'vitest-all'
+      ? ['npx', ['vitest', 'run', '--reporter=verbose']]
+      : ['npx', ['tsc', '--noEmit', '--skipLibCheck']];
+
+    try {
+      const { stdout, stderr } = await execFileAsync(cmd, args, { cwd: process.cwd(), timeout: timeoutMs });
+      const elapsed    = Date.now() - t0;
+      const errorMatch = /Found (\d+) errors?/.exec(stdout + stderr);
+      const errorCount = errorMatch ? parseInt(errorMatch[1], 10) : 0;
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: true, gate: safeGate, passed: true, errorCount, durationMs: elapsed,
+            output: (stdout + stderr).slice(-3000),
+          }, null, 2),
+        }],
+      };
+    } catch (err: unknown) {
+      const ex = err as { stdout?: string; stderr?: string; message?: string };
+      const combined = (ex?.stdout ?? '') + (ex?.stderr ?? '');
+      const elapsed  = Date.now() - t0;
+      const errorMatch = /Found (\d+) errors?/.exec(combined) ?? /(\d+) error/.exec(combined);
+      const errorCount = errorMatch ? parseInt(errorMatch[1], 10) : -1;
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: false, gate: safeGate, passed: false, errorCount, durationMs: elapsed,
+            output: combined.slice(-3000),
+          }, null, 2),
+        }],
+      };
+    }
+  }
+);
+
+// ── hypergraph.search ─────────────────────────────────────────────────────────
+server.tool(
+  'hypergraph.search',
+  {
+    description: 'Search hyperedges by query terms using Postgres FTS + member activation scoring. Returns edges ranked by coverage × grade × confidence.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        query:          { type: 'string',  description: 'Natural language query (1-500 chars)' },
+        edge_types:     { type: 'array', items: { type: 'string' }, description: 'Filter by edge_type (agents_md, cluster_summary, codebase_chunk, generic)' },
+        limit:          { type: 'number', description: 'Max results 1-50 (default 10)' },
+        min_confidence: { type: 'number', description: 'Minimum confidence threshold 0-1' },
+      },
+      required: ['query'],
+    },
+  },
+  async ({ query, edge_types, limit, min_confidence }: {
+    query: unknown; edge_types?: unknown; limit?: unknown; min_confidence?: unknown;
+  }) => {
+    const safeQuery = String(query ?? '').slice(0, 500).trim();
+    if (!safeQuery) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'query required' }) }] };
+    try {
+      const res = await fetch(`${SVELTEKIT}/api/hypergraph/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-mcp-internal': '1' },
+        body: JSON.stringify({
+          query: safeQuery,
+          edgeTypes: Array.isArray(edge_types) ? edge_types : undefined,
+          limit: typeof limit === 'number' ? Math.min(Math.max(1, limit), 50) : 10,
+          minConfidence: typeof min_confidence === 'number' ? min_confidence : undefined,
+          includeMembers: true,
+        }),
+      });
+      const data = await res.json();
+      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }] };
+    }
+  }
+);
+
+// ── hypergraph.get_edge ───────────────────────────────────────────────────────
+server.tool(
+  'hypergraph.get_edge',
+  {
+    description: 'Fetch a single hyperedge by edge_hash, with all member stable_keys and metadata.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        edge_hash: { type: 'string', description: 'The edge_hash to look up' },
+        expand:    { type: 'boolean', description: 'If true, also return related edges sharing at least one member' },
+      },
+      required: ['edge_hash'],
+    },
+  },
+  async ({ edge_hash, expand }: { edge_hash: unknown; expand?: unknown }) => {
+    const hash = String(edge_hash ?? '').slice(0, 128).trim();
+    if (!hash) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge_hash required' }) }] };
+    try {
+      const url = `${SVELTEKIT}/api/hypergraph/edge/${encodeURIComponent(hash)}${expand ? '?expand=true' : ''}`;
+      const res = await fetch(url, { headers: { 'x-mcp-internal': '1' } });
+      if (res.status === 404) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge not found', edge_hash: hash }) }] };
+      const data = await res.json();
+      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }] };
+    }
+  }
+);
+
+// ── hypergraph.explain_activation ────────────────────────────────────────────
+server.tool(
+  'hypergraph.explain_activation',
+  {
+    description: 'Explain why a hyperedge was activated for a set of query terms — shows which terms matched which members, coverage ratio.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        edge_hash:   { type: 'string', description: 'The edge_hash to explain' },
+        query_terms: { type: 'array', items: { type: 'string' }, description: 'List of query terms that triggered activation' },
+      },
+      required: ['edge_hash', 'query_terms'],
+    },
+  },
+  async ({ edge_hash, query_terms }: { edge_hash: unknown; query_terms: unknown }) => {
+    const hash  = String(edge_hash ?? '').slice(0, 128).trim();
+    const terms = Array.isArray(query_terms) ? (query_terms as unknown[]).map(t => String(t).slice(0, 100)) : [];
+    if (!hash) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge_hash required' }) }] };
+    try {
+      const { explainEdgeActivation } = await import('../lib/server/hypergraph/hypergraph-search.js');
+      const result = await explainEdgeActivation(hash, terms);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }] };
+    }
+  }
+);
+
+// ── hypergraph.expand_members ─────────────────────────────────────────────────
+server.tool(
+  'hypergraph.expand_members',
+  {
+    description: 'Given an edge_hash, return all edges that share at least one member — useful for exploring the hypergraph neighbourhood.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        edge_hash: { type: 'string', description: 'The edge_hash to expand from' },
+      },
+      required: ['edge_hash'],
+    },
+  },
+  async ({ edge_hash }: { edge_hash: unknown }) => {
+    const hash = String(edge_hash ?? '').slice(0, 128).trim();
+    if (!hash) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge_hash required' }) }] };
+    try {
+      const url = `${SVELTEKIT}/api/hypergraph/edge/${encodeURIComponent(hash)}?expand=true`;
+      const res = await fetch(url, { headers: { 'x-mcp-internal': '1' } });
+      if (res.status === 404) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge not found' }) }] };
+      const data = await res.json();
+      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }] };
+    }
+  }
+);
+
+// ── knowledge.get_minified_map ────────────────────────────────────────────────
+server.tool(
+  'knowledge.get_minified_map',
+  {
+    description: 'Return a compact knowledge map: top hyperedges by grade, cluster summaries, and AGENTS.md directives for a directory. Designed for tight context budgets.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        directory:  { type: 'string', description: 'Relative directory path (e.g. "src/lib/server/ai")' },
+        max_edges:  { type: 'number', description: 'Max hyperedges to include (default 5)' },
+        max_agents: { type: 'number', description: 'Max AGENTS.md directives to include (default 3)' },
+      },
+    },
+  },
+  async ({ directory, max_edges, max_agents }: {
+    directory?: unknown; max_edges?: unknown; max_agents?: unknown;
+  }) => {
+    const dir       = String(directory ?? '').slice(0, 200).trim();
+    const edgeLimit = clampNumber(max_edges, 1, 20, 5);
+    const agentLimit = clampNumber(max_agents, 1, 10, 3);
+
+    try {
+      // 1. Top hyperedges (grade B+ or by confidence)
+      const edgeRes = await fetch(`${SVELTEKIT}/api/hypergraph/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-mcp-internal': '1' },
+        body: JSON.stringify({ query: dir || 'architecture', limit: edgeLimit, includeMembers: false }),
+      });
+      const edgeData = edgeRes.ok ? await edgeRes.json() : { results: [] };
+
+      // 2. AGENTS.md context for the directory (Redis key agents:dir:<dir>)
+      let agentsMd: string[] = [];
+      try {
+        const agentRes = await pool.query<{ title: string; summary: string; rules: unknown[] }>(
+          `SELECT title, summary, rules
+           FROM agent_context_files
+           WHERE file_path ILIKE $1
+           ORDER BY confidence DESC
+           LIMIT $2`,
+          [`%${dir}%`, agentLimit]
+        );
+        agentsMd = agentRes.rows.map(r => {
+          const lines = [`## ${r.title ?? 'Context'}`];
+          if (r.summary) lines.push(r.summary.slice(0, 300));
+          if (Array.isArray(r.rules) && r.rules.length) {
+            lines.push('Rules: ' + (r.rules as { rule?: string }[]).slice(0, 3).map(x => x.rule).join('; '));
+          }
+          return lines.join('\n');
+        });
+      } catch { /* ignore */ }
+
+      const map = {
+        directory:   dir || '(root)',
+        topEdges:    (edgeData.results ?? []).slice(0, edgeLimit).map((r: { edge: { id: string; edge_type: string; label: string | null; weight: number; query_hash: string | null } }) => ({
+          id:          r.edge.id,
+          edge_type:   r.edge.edge_type,
+          label:       r.edge.label,
+          weight:      r.edge.weight,
+          query_hash:  r.edge.query_hash,
+        })),
+        agentsMd,
+        generatedAt: new Date().toISOString(),
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(map, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }] };
+    }
+  }
+);
+
 // ── HTTP server with /health + MCP handler ────────────────────────────────────
 
 const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
@@ -1667,5 +2134,6 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       context.build_kv_packet, context.get_compressed_card,');
   console.log('       context.explain_compression, context.refresh_task_toc,');
   console.log('       kag.ingest_error, kag.multi_lane_search,');
-  console.log('       graph.expand_neighborhood, clusters.get_summary_lenses, trace.validate_ace_hit');
+  console.log('       graph.expand_neighborhood, clusters.get_summary_lenses, trace.validate_ace_hit,');
+  console.log('       ops.propose_patch, ops.run_targeted_test, ops.record_fix_attempt, ops.run_quality_gate [OPERATOR-GATED]');
 });
