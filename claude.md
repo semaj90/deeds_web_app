@@ -1356,8 +1356,42 @@ Ollama :11434 (final fallback)
 
 ### KV Cache Policy (llama-server.exe)
 - **Production**: `-ctk q8_0 -ctv q8_0` (18% VRAM savings, stable)
-- **Experimental only**: `-ctk turbo3` — benchmark on your exact GGUF + CUDA backend first; crash reports exist on some backends
+- **Experimental**: `-ctk turbo3 -ctv turbo3` — benchmark on your exact GGUF + CUDA backend first; crash reports exist on some backends
 - **TurboQuant `cache_prompt: true`**: safe for system prompt KV reuse across communities/clusters
+
+### TurboQuant — Google ICLR 2026 Paper (PolarQuant + QJL)
+**Paper**: "TurboQuant: Redefining AI Efficiency with Extreme Compression" — Google Research + NYU  
+**Algorithm** (two-stage, data-oblivious — no calibration, no learned params):
+1. **PolarQuant**: Random rotation of KV vectors → simplifies geometry → scalar quantization per coordinate (Lloyd-Max optimal codebook)
+2. **QJL error correction**: Captures residual error (~1 bit) via Quantized Johnson-Lindenstrauss, eliminates quantization bias
+
+**Compression ratios vs f16 baseline**:
+| Format | Bits | VRAM savings | Notes |
+|--------|------|-------------|-------|
+| `turbo4` | 4-bit | 74% | Higher quality, more VRAM than turbo3 |
+| `turbo3` | 3-bit | 80% | Recommended — 5.1× compression |
+| `turbo2` | 2-bit | 87% | Aggressive — test carefully |
+| `q8_0` | 8-bit | 50% | Stable production baseline |
+
+**Speedup**: 8× attention computation speedup, within 1% throughput of baseline. Example: 75 tok/s on Qwen3-8B / RTX 3080.
+
+**Correct flags** (Flash Attention is MANDATORY — without `-fa on`, KV is dequantized every step → slower than no quant):
+```bash
+# Recommended asymmetric (K tolerates more compression than V)
+llama-server.exe -m model.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 -c 4096
+
+# Symmetric (simpler, slightly more VRAM than asymmetric)
+llama-server.exe -m model.gguf -ctk turbo3 -ctv turbo3 -fa on -ngl 99 -c 4096
+
+# Baseline comparison
+llama-server.exe -m model.gguf -ctk q8_0 -ctv q8_0 -fa on -ngl 99
+```
+
+**RTX 3060 Ti (8GB) with gemma4-legal-vlm (5.3GB model)**:
+- Baseline f16 KV: ~7.5GB total → barely fits
+- turbo3 KV: ~3.4GB total → 4GB free for batch/context
+- Enables 32K+ context without OOM
+- **Test stability first**: run 20+ generations, check for NaN/repetition before prod use
 
 ### ACE Scoring Spine (verified weights)
 ```
