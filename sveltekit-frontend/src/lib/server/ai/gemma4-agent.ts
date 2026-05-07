@@ -674,35 +674,77 @@ function fnv1a32(s: string): string {
 // Supported shapes:
 //   { "tool": "trace.search", "args": { "query": "...", "limit": 10 } }
 //   { "tool": "rag_search",   "arguments": { ... } }
+//   { "name": "graph_expand", "arguments": { "file": "..." } }   ← OpenAI-style in prose
+//   ```json\n{...}\n```
+//   prose before/after JSON: "I will call {...} to search."
 // Tool names may use dot notation (trace.search) or underscores (trace_search).
+
+/** Extract all top-level JSON objects from text using balanced-brace scanning. */
+function extractJsonObjects(text: string): string[] {
+  const objects: string[] = [];
+  let depth = 0, start = -1, inString = false, escaped = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escaped)          { escaped = false; continue; }
+    if (ch === '\\')      { escaped = true;  continue; }
+    if (ch === '"')       { inString = !inString; continue; }
+    if (inString)          continue;
+    if (ch === '{')       { if (depth++ === 0) start = i; }
+    else if (ch === '}')  { if (--depth === 0 && start >= 0) { objects.push(text.slice(start, i + 1)); start = -1; } }
+  }
+  return objects;
+}
+
+function tryParseToolObject(obj: Record<string, unknown>): OllamaToolCall | null {
+  // Shape 1: { "tool": "name", "args"|"arguments": {...} }
+  if (typeof obj['tool'] === 'string') {
+    const name = (obj['tool'] as string).replace(/\./g, '_');
+    const args = (
+      typeof obj['args'] === 'object' && obj['args'] !== null ? obj['args']
+      : typeof obj['arguments'] === 'object' && obj['arguments'] !== null ? obj['arguments']
+      : {}
+    ) as Record<string, unknown>;
+    return { function: { name, arguments: args } };
+  }
+  // Shape 2: { "name": "name", "arguments": {...} }  (OpenAI-style in prose)
+  if (typeof obj['name'] === 'string') {
+    const name = (obj['name'] as string).replace(/\./g, '_');
+    const rawArgs = obj['arguments'] ?? obj['args'] ?? obj['parameters'] ?? {};
+    const args = (typeof rawArgs === 'string'
+      ? (() => { try { return JSON.parse(rawArgs); } catch { return {}; } })()
+      : rawArgs) as Record<string, unknown>;
+    return { function: { name, arguments: args } };
+  }
+  return null;
+}
+
 export function parseToolRequest(content: string): OllamaToolCall[] {
-  const s = content.trim();
-  // Only try to parse content that looks like a JSON object starting with {
-  if (!s.startsWith('{') && !s.startsWith('```')) return [];
+  if (!content?.trim()) return [];
 
-  // Strip optional ```json fences
-  const json = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+  // Fast path: strip ```json fences and try direct parse
+  const stripped = content.trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '')
+    .trim();
 
-  let parsed: unknown;
-  try { parsed = JSON.parse(json); } catch { return []; }
+  if (stripped.startsWith('{')) {
+    try {
+      const obj = JSON.parse(stripped) as Record<string, unknown>;
+      const tc = tryParseToolObject(obj);
+      if (tc) return [tc];
+    } catch { /* fall through to balanced scan */ }
+  }
 
-  if (typeof parsed !== 'object' || parsed === null) return [];
-  const obj = parsed as Record<string, unknown>;
+  // General path: extract all JSON objects from prose (handles nested braces)
+  for (const candidate of extractJsonObjects(content)) {
+    try {
+      const obj = JSON.parse(candidate) as Record<string, unknown>;
+      const tc = tryParseToolObject(obj);
+      if (tc) return [tc];
+    } catch { /* keep scanning */ }
+  }
 
-  // Must have a "tool" string field
-  if (typeof obj['tool'] !== 'string') return [];
-
-  // Normalize dot.notation → underscore for matching against AGENT_TOOLS
-  const name = (obj['tool'] as string).replace(/\./g, '_');
-  const args = (
-    typeof obj['args'] === 'object' && obj['args'] !== null
-      ? obj['args']
-      : typeof obj['arguments'] === 'object' && obj['arguments'] !== null
-        ? obj['arguments']
-        : {}
-  ) as Record<string, unknown>;
-
-  return [{ function: { name, arguments: args } }];
+  return [];
 }
 
 // ── TRACE MCP proxy helper ────────────────────────────────────────────────────

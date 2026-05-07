@@ -36,18 +36,19 @@ const { values: flags } = parseArgs({
 });
 
 const STRICT     = flags.strict;
-const MAX_ROUNDS = parseInt(flags['max-rounds']) || 3;
 const LLAMA_URL  = process.env.LLAMA_URL  ?? 'http://127.0.0.1:8090';
 const MCP_URL    = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
 const TIMEOUT    = 60_000;
 
 const GATED_TOOLS = ['ops.propose_patch', 'ops.run_targeted_test', 'ops.record_fix_attempt', 'ops.run_quality_gate'];
 
+// Use __ as namespace separator (dots are invalid in JSON schema names).
+// Matches production llama-tool-definitions.ts LLAMA_TOOL_DEFINITIONS.
 const TRACE_TOOLS = [
   {
     type: 'function',
     function: {
-      name: 'trace_kag_search',
+      name: 'trace__kag_search',
       description: 'Search the codebase knowledge graph and return relevant code chunks',
       parameters: {
         type: 'object',
@@ -62,7 +63,7 @@ const TRACE_TOOLS = [
   {
     type: 'function',
     function: {
-      name: 'graph_pagerank_top',
+      name: 'graph__pagerank_top',
       description: 'Return the highest-authority files in the codebase graph',
       parameters: {
         type: 'object',
@@ -72,6 +73,21 @@ const TRACE_TOOLS = [
     },
   },
 ];
+
+// Mirrors production llama-tool-definitions.ts LLAMA_TO_MCP_NAME.
+// __ → dot, matching trace-mcp-server.ts tool names.
+const LLAMA_TO_MCP_NAME = {
+  'trace__kag_search':          'trace.kag_search',
+  'graph__expand_neighborhood': 'graph.expand_neighborhood',
+  'graph__pagerank_top':        'graph.pagerank_top',
+  'context__build_kv_packet':   'context.build_kv_packet',
+  'search__dev_context':        'search.dev_context',
+  'search__go_hybrid':          'search.go_hybrid',
+};
+
+function toMcpToolName(name) {
+  return LLAMA_TO_MCP_NAME[name] ?? name.replace('__', '.');
+}
 
 const c = {
   green:  s => `\x1b[32m${s}\x1b[0m`,
@@ -115,14 +131,7 @@ async function llamaPost(body) {
 }
 
 async function mcpToolCall(name, args) {
-  // Map underscore name to dot name (trace_kag_search → trace.kag_search)
-  const mcpName = name.replace(/_/g, '.').replace(/\./g, (m, i, s) => {
-    const parts = s.split('_');
-    // Only first segment separator becomes a dot
-    return i === s.indexOf('_') ? '.' : '_';
-  });
-  // Simpler: just try both dot and underscore forms
-  const dotName = name.replace('_', '.');
+  const dotName = toMcpToolName(name);
   const res = await fetch(`${MCP_URL}/mcp`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
@@ -247,22 +256,10 @@ if (toolResult && firstToolCall) {
   });
 }
 
-// G6. Operator-gated tools not auto-executed
+// G6. Operator-gated tools not auto-executed (static check — no MCP call needed)
 await gate('G6', 'Operator-gated tools (ops.*) not present in tool list', async () => {
-  const res = await fetch(`${MCP_URL}/mcp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
-    body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method: 'tools/list', params: {} }),
-    signal: AbortSignal.timeout(5_000),
-  });
-  const text = await res.text();
-  const line = text.split('\n').find(l => l.startsWith('data:') || l.startsWith('{'));
-  const raw = line?.startsWith('data:') ? line.slice(5).trim() : line ?? text;
-  const data = JSON.parse(raw);
-  const toolNames = (data?.result?.tools ?? data?.tools ?? []).map(t => t.name);
-  // Gated tools may exist in the list but should never be called by the model without approval
-  // The real guard is in gemma4-tool-controller.ts — we just verify the model can't self-escalate
-  // by checking the tools we expose in THIS smoke don't include gated tools
+  // The real guard is in gemma4-tool-controller.ts — we verify the tools we expose
+  // in THIS smoke don't include gated tools (model can't self-escalate via this surface)
   const exposed = TRACE_TOOLS.map(t => t.function.name);
   const gatedExposed = GATED_TOOLS.filter(g => exposed.includes(g));
   if (gatedExposed.length) throw new Error(`gated tools exposed to model: ${gatedExposed.join(', ')}`);
