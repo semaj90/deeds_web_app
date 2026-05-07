@@ -80,7 +80,7 @@ What would you like to explore today?`,
 			connectionStatus = 'checking';
 
 			// First, try the SvelteKit API health endpoint
-			const response = await fetch('/api/health/status');
+			const response = await fetch('/api/health/status', { signal: AbortSignal.timeout(15_000) });
 
 			if (response.ok) {
 				const data = await response.json();
@@ -88,7 +88,7 @@ What would you like to explore today?`,
 				connectionStatus = isConnected ? 'connected' : 'error';
 			} else {
 				// Fallback: try to reach Ollama directly
-				const ollamaResponse = await fetch(getOllamaEndpoint());
+				const ollamaResponse = await fetch(getOllamaEndpoint(), { signal: AbortSignal.timeout(15_000) });
 				if (ollamaResponse.ok) {
 					isConnected = true;
 					connectionStatus = 'connected';
@@ -102,7 +102,7 @@ What would you like to explore today?`,
 
 			// Try direct Ollama connection as fallback
 			try {
-				const ollamaResponse = await fetch(getOllamaEndpoint());
+				const ollamaResponse = await fetch(getOllamaEndpoint(), { signal: AbortSignal.timeout(15_000) });
 				if (ollamaResponse.ok) {
 					isConnected = true;
 					connectionStatus = 'connected';
@@ -169,7 +169,8 @@ What would you like to explore today?`,
 							content: messageContent
 						}
 					]
-				})
+				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 
 			if (!response.ok) {

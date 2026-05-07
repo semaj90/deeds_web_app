@@ -134,7 +134,8 @@
 			const response = await fetch('/api/rag/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: query.trim() })
+				body: JSON.stringify({ query: query.trim() }),
+				signal: AbortSignal.timeout(30_000)
 			});
 
 			if (!response.ok) {

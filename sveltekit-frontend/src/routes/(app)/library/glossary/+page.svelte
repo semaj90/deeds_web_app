@@ -203,6 +203,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ query: searchQ, category: activeCategory === 'all' ? undefined : activeCategory, limit: 30 }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) throw new Error('Search failed');
 			const json = await res.json();

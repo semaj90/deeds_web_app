@@ -142,7 +142,7 @@
 	async function loadIdxStatus() {
 		idxStatusLoading = true;
 		try {
-			const res = await fetch('/api/codebase-index/orchestrate');
+			const res = await fetch('/api/codebase-index/orchestrate', { signal: AbortSignal.timeout(15_000) });
 			if (res.ok) idxStatus = await res.json();
 		} catch { /* ignore */ }
 		idxStatusLoading = false;
@@ -162,6 +162,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (!res.ok) {
 				idxError = `HTTP ${res.status}: ${await res.text().catch(() => '')}`;
@@ -236,7 +237,7 @@
 	async function loadTodos() {
 		todosLoading = true;
 		try {
-			const r = await fetch('/api/analytics/generate-todos');
+			const r = await fetch('/api/analytics/generate-todos', { signal: AbortSignal.timeout(30_000) });
 			if (r.ok) { const d = await r.json() as { todos: PredictiveTodo[] }; todosResult = d.todos ?? []; }
 		} catch { /* ignore */ }
 		finally { todosLoading = false; }
@@ -250,6 +251,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ days: todosDays, dryRun }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const d = await r.json() as { jobId?: string; error?: string };
 			if (!r.ok) { todosError = d.error ?? 'Failed'; return; }
@@ -259,7 +261,7 @@
 				let attempts = 0;
 				const poll = setInterval(async () => {
 					attempts++;
-					const pr = await fetch(`/api/analytics/generate-todos?jobId=${todosJobId}`);
+					const pr = await fetch(`/api/analytics/generate-todos?jobId=${todosJobId}`, { signal: AbortSignal.timeout(15_000) });
 					const pd = await pr.json() as { status: string; inserted?: number; error?: string };
 					if (pd.status === 'done' || pd.status === 'error' || attempts > 30) {
 						clearInterval(poll);
@@ -282,6 +284,7 @@
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ id, status: 'dismissed' }),
+			signal: AbortSignal.timeout(15_000)
 		}).catch(() => {});
 		todosResult = todosResult.filter(t => t.id !== id);
 	}
@@ -306,7 +309,7 @@
 	async function loadTagStatus() {
 		tagStatusLoading = true;
 		try {
-			const res = await fetch('/api/codebase-index/karpathy-tag');
+			const res = await fetch('/api/codebase-index/karpathy-tag', { signal: AbortSignal.timeout(15_000) });
 			if (res.ok) tagStatus = await res.json();
 		} catch { /* ignore */ }
 		finally { tagStatusLoading = false; }
@@ -416,6 +419,7 @@
 					preferCachedResearch: true,
 					debug: true,
 				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (res.ok) {
 				assistDebugResult = await res.json();
@@ -447,6 +451,7 @@
 					cacheSlot: r.cache?.key ?? '',
 					useful,
 				}),
+				signal: AbortSignal.timeout(15_000)
 			});
 			feedbackSent = true;
 		} catch { /* non-fatal */ }
@@ -455,7 +460,7 @@
 
 	async function loadFeedbackStats() {
 		try {
-			const res = await fetch('/api/codebase-index/claude-assist/feedback?limit=20');
+			const res = await fetch('/api/codebase-index/claude-assist/feedback?limit=20', { signal: AbortSignal.timeout(15_000) });
 			if (res.ok) feedbackStats = await res.json();
 		} catch { /* non-fatal */ }
 	}
@@ -470,7 +475,7 @@
 		try {
 			const params = new URLSearchParams({ limit: '200' });
 			if (analysisWindow !== 'all') params.set('window', analysisWindow);
-			const res = await fetch(`/api/codebase-index/claude-assist/feedback/analysis?${params}`);
+			const res = await fetch(`/api/codebase-index/claude-assist/feedback/analysis?${params}`, { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				analysisData = await res.json();
 				loadAppliedDefaults();
@@ -488,7 +493,7 @@
 	async function loadAppliedDefaults() {
 		defaultsLoading = true;
 		try {
-			const res = await fetch('/api/codebase-index/claude-assist/defaults');
+			const res = await fetch('/api/codebase-index/claude-assist/defaults', { signal: AbortSignal.timeout(15_000) });
 			if (res.ok) appliedDefaults = await res.json();
 		} catch { /* non-fatal */ }
 		defaultsLoading = false;
@@ -502,6 +507,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(defaults),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (res.ok) {
 				applyMessage = 'Defaults applied successfully';
@@ -529,6 +535,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(analysisData.defaultsImpact.previous),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (res.ok) {
 				revertMessage = 'Reverted to previous defaults';
@@ -653,7 +660,7 @@
 			if (cursor)       params.set('cursor',    cursor);
 			if (tlEventType)  params.set('eventType', tlEventType);
 			if (tlPipeline)   params.set('pipeline',  tlPipeline);
-			const res = await fetch(`/api/analytics/context-timeline?${params}`);
+			const res = await fetch(`/api/analytics/context-timeline?${params}`, { signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json() as { events: TimelineEvent[]; nextCursor: string | null };
 			if (cursor) {
@@ -678,7 +685,7 @@
 		graphLoading = true;
 		graphError   = null;
 		try {
-			const res = await fetch('/api/analytics/research-graph');
+			const res = await fetch('/api/analytics/research-graph', { signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json();
 			graphStats = d.graph  ?? null;
@@ -698,6 +705,7 @@
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body:    JSON.stringify({ action }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json();
@@ -729,7 +737,7 @@
 		hyperedgeLoading = true;
 		hyperedgeError   = null;
 		try {
-			const res = await fetch(`/api/graph/hypergraph?grade=${hyperedgeGrade}&limit=10`);
+			const res = await fetch(`/api/graph/hypergraph?grade=${hyperedgeGrade}&limit=10`, { signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json() as { edges: HyperEdge[] };
 			hyperedges = d.edges ?? [];
@@ -761,6 +769,7 @@
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body:    JSON.stringify({ query: agentQuery, pipeline: 'ace' }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
 			agentResult = await res.json();
@@ -793,7 +802,7 @@
 
 	async function poll_corpus_job(jobId: string) {
 		for (let attempt = 0; attempt < 30; attempt += 1) {
-			const res = await fetch(`/api/analytics/web-research?jobId=${encodeURIComponent(jobId)}`);
+			const res = await fetch(`/api/analytics/web-research?jobId=${encodeURIComponent(jobId)}`, { signal: AbortSignal.timeout(15_000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json() as { job: CorpusJob };
 			if (!d.job) throw new Error('Research job not found');
@@ -820,6 +829,7 @@
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ action: 'corpus-search', selfPrompts: [corpusQuery.trim()], pipeline: researchPipeline, maxResults: 6, defer: true }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json() as { jobId?: string; status?: string; batches?: Array<{ summaries: CorpusResult[] }> };
@@ -846,6 +856,7 @@
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ action: 'constitution', stateCode }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			ingestResult = await res.json();
 		} catch (e) {
@@ -857,7 +868,7 @@
 
 	async function load_corpus_stats() {
 		try {
-			const res = await fetch('/api/ingest/legal?type=corpus');
+			const res = await fetch('/api/ingest/legal?type=corpus', { signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) return;
 			const d = await res.json();
 			corpusStats = { byType: d.byCorpusType ? buildByTypeMap(d.byCorpusType) : {}, constitutionCoverage: d.constitutionCoverage?.pct ?? 0, totalDocuments: Object.values<{ total: number }>(d.byCorpusType ? buildByTypeMap(d.byCorpusType) : {}).reduce((s, v) => s + v.total, 0), totalComplete: d.constitutionCoverage?.complete ?? 0 };
@@ -885,7 +896,7 @@
 				depth:    '3',
 			});
 			if (rebuild) params.set('rebuild', '1');
-			const res = await fetch(`/api/analytics/research-topics?${params}`);
+			const res = await fetch(`/api/analytics/research-topics?${params}`, { signal: AbortSignal.timeout(120_000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			researchData = await res.json();
 		} catch (e) {
@@ -927,6 +938,7 @@
 			method:  'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body:    JSON.stringify({ queryHash: sourceHash, rating: null, pipeline: 'did-you-mean' }),
+			signal: AbortSignal.timeout(15_000)
 		}).catch(() => {});
 	}
 
@@ -943,7 +955,7 @@
 			if (qFilter)    params.set('q',       qFilter);
 			if (suggestFor) params.set('suggest',  suggestFor);
 
-			const res = await fetch(`/api/analytics/search-patterns?${params}`);
+			const res = await fetch(`/api/analytics/search-patterns?${params}`, { signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			data = await res.json();
 		} catch (e) {
@@ -963,7 +975,7 @@
 		try {
 			const params = new URLSearchParams({ limit: '100' });
 			if (leaderSection) params.set('section', leaderSection);
-			const res = await fetch(`/api/analytics/prompt-leaderboard?${params}`);
+			const res = await fetch(`/api/analytics/prompt-leaderboard?${params}`, { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) promptLeader = await res.json();
 		} catch { /* non-fatal */ } finally {
 			leaderLoading = false;
@@ -979,8 +991,8 @@
 				? '/api/codebase-index/cluster-summary'
 				: `/api/codebase-index/cluster-summary?clusterId=${clusterId}`;
 			const opts = force
-				? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clusterId, force: true }) }
-				: {};
+				? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clusterId, force: true }), signal: AbortSignal.timeout(120_000) }
+				: { signal: AbortSignal.timeout(30_000) };
 			const res = await fetch(url, opts);
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const json = await res.json();
@@ -1052,6 +1064,7 @@
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body:    JSON.stringify({ minRerankScore, limit: distillLimit, dryRun }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const d = await r.json() as typeof distillResult;
 			distillResult = d;
@@ -1073,6 +1086,7 @@
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body:    JSON.stringify({ model: ckptModel.trim(), baseline: ckptBaseline.trim() }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const d = await r.json() as ValidateReport & { error?: string };
 			if (d.error) throw new Error(d.error);

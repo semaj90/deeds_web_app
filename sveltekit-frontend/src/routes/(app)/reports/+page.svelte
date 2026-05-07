@@ -31,7 +31,7 @@
 		loading = true;
 		error = null;
 		try {
-			const res = await fetch('/api/reports', { credentials: 'include' });
+			const res = await fetch('/api/reports', { credentials: 'include', signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const data = await res.json();
 				reportStore.reports = data.data || [];

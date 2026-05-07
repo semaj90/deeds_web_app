@@ -25,7 +25,8 @@
 
 				const response = await fetch('/api/evidence/upload', {
 					method: 'POST',
-					body: formData
+					body: formData,
+					signal: AbortSignal.timeout(120_000)
 				});
 
 				if (response.ok) {

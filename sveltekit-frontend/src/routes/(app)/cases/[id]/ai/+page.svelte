@@ -25,7 +25,7 @@
 			const params = new URLSearchParams({ q: messageText, mode: 'ollama' });
 			if (id) params.set('caseId', id);
 
-			const res = await fetch(`/api/chat/stream?${params}`);
+			const res = await fetch(`/api/chat/stream?${params}`, { signal: AbortSignal.timeout(120_000) });
 			if (!res.ok || !res.body) throw new Error('Stream failed');
 
 			messages = [...messages, { role: 'assistant', content: '' }];

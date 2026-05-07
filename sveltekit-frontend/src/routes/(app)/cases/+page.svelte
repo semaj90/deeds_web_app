@@ -190,7 +190,8 @@
 4. Recommended next steps
 5. Potential legal precedents`
 					}
-				})
+				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const result = await response.json();
 			if (result.success) {

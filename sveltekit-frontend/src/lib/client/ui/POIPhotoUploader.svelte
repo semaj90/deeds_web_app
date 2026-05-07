@@ -44,7 +44,8 @@
 
  const response = await fetch(`/api/persons-of-interest/${poiId}/photos`, {
  method: 'POST',
- body: formData
+ body: formData,
+ signal: AbortSignal.timeout(120_000),
  });
 
  if (!response.ok) {

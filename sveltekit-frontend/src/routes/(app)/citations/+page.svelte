@@ -52,7 +52,7 @@
 
   async function exportCitations(format: 'json' | 'pdf') {
     try {
-      const res = await fetch(`/api/citations/export/${format}`);
+      const res = await fetch(`/api/citations/export/${format}`, { signal: AbortSignal.timeout(30_000) });
       if (!res.ok) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -81,7 +81,7 @@
 
   async function loadTagsForCitation(citationId: string) {
     try {
-      const res = await fetch(`/api/citations/${citationId}/tags`);
+      const res = await fetch(`/api/citations/${citationId}/tags`, { signal: AbortSignal.timeout(15_000) });
       if (res.ok) {
         const data = await res.json();
         citationTagsMap[citationId] = data.tags ?? [];
@@ -95,6 +95,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tag, color }),
+        signal: AbortSignal.timeout(30_000)
       });
       await loadTagsForCitation(citationId);
     } catch { /* ignore */ }
@@ -108,6 +109,7 @@
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tag }),
+        signal: AbortSignal.timeout(30_000)
       });
       citationTagsMap[citationId] = (citationTagsMap[citationId] ?? []).filter(t => t.tag !== tag);
     } catch { /* ignore */ }
@@ -128,9 +130,9 @@
     const start = performance.now();
 
     Promise.all([
-      fetch('/api/glossary/search', { method: 'POST', headers, body }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
-      fetch('/api/statutes/search', { method: 'POST', headers, body }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
-      fetch('/api/precedents/search', { method: 'POST', headers, body }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
+      fetch('/api/glossary/search', { method: 'POST', headers, body, signal: AbortSignal.timeout(30_000) }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
+      fetch('/api/statutes/search', { method: 'POST', headers, body, signal: AbortSignal.timeout(30_000) }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
+      fetch('/api/precedents/search', { method: 'POST', headers, body, signal: AbortSignal.timeout(30_000) }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
     ]).then(([g, s, p]) => {
       kbResults = {
         glossary: g.results ?? [],
@@ -151,7 +153,7 @@
   async function loadUserCollections() {
     if (collectionsLoaded) return;
     try {
-      const res = await fetch('/api/citations/collections');
+      const res = await fetch('/api/citations/collections', { signal: AbortSignal.timeout(15_000) });
       if (res.ok) {
         userCollections = await res.json();
         collectionsLoaded = true;
@@ -164,7 +166,8 @@
       await fetch(`/api/citations/collections/${collectionId}/citations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ citationId })
+        body: JSON.stringify({ citationId }),
+        signal: AbortSignal.timeout(30_000)
       });
     } catch { /* ignore */ }
     addingToCollectionFor = null;
@@ -290,7 +293,7 @@
       const params = new URLSearchParams();
       if (searchQuery) params.set('search', searchQuery);
       if (citationType !== 'all') params.set('citationType', citationType);
-      const response = await fetch(`/api/citations?${params}`);
+      const response = await fetch(`/api/citations?${params}`, { signal: AbortSignal.timeout(30_000) });
       if (response.ok) {
         const data = await response.json();
         citations = Array.isArray(data.citations) ? data.citations : [];
@@ -872,7 +875,7 @@
           onattachtocase={() => { attachStatuteCode = selectedCitation?.statute_code ?? null; attachCitationId = selectedCitation?.id ?? null; showAttachModal = true; }}
           onsavecitation={async (statute) => {
             if (!statute) return;
-            await fetch('/api/citations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ statute_code: statute.code ?? statute.id, statute_title: statute.title, jurisdiction: statute.jurisdiction ?? '', highlighted_text: statute.full_text ?? '' }) }).catch(() => {});
+            await fetch('/api/citations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ statute_code: statute.code ?? statute.id, statute_title: statute.title, jurisdiction: statute.jurisdiction ?? '', highlighted_text: statute.full_text ?? '' }), signal: AbortSignal.timeout(30_000) }).catch(() => {});
           }}
         />
         <RelatedCasesPanel

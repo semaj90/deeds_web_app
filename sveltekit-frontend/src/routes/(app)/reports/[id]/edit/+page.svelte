@@ -44,7 +44,7 @@
 		loading = true;
 		error = null;
 		try {
-			const res = await fetch(`/api/reports?ids=${reportId}`, { credentials: 'include' });
+			const res = await fetch(`/api/reports?ids=${reportId}`, { credentials: 'include', signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) throw new Error('Failed to load report');
 			const data = await res.json();
 			const reports = data.data || [];
@@ -68,7 +68,8 @@
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({ ids: [reportId], contentHtml: editorContent, title: report.title })
+				body: JSON.stringify({ ids: [reportId], contentHtml: editorContent, title: report.title }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) throw new Error('Failed to save report');
 			lastSaved = new Date();
@@ -86,7 +87,7 @@
 		error = null;
 		try {
 			await saveReport();
-			const res = await fetch(`/api/reports/${reportId}/publish`, { method: 'POST', credentials: 'include' });
+			const res = await fetch(`/api/reports/${reportId}/publish`, { method: 'POST', credentials: 'include', signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) throw new Error('Failed to publish report');
 			report.status = 'published';
 		} catch (err) {

@@ -38,7 +38,7 @@
 		error = null;
 
 		try {
-			const res = await fetch(`/api/reports?ids=${reportId}`, { credentials: 'include' });
+			const res = await fetch(`/api/reports?ids=${reportId}`, { credentials: 'include', signal: AbortSignal.timeout(30_000) });
 
 			if (!res.ok) {
 				throw new Error('Failed to load report');
@@ -64,7 +64,7 @@
 
 	async function exportReport(format: 'pdf' | 'html' | 'markdown' | 'json') {
 		try {
-			const res = await fetch(`/api/reports/${reportId}/export?format=${format}`);
+			const res = await fetch(`/api/reports/${reportId}/export?format=${format}`, { signal: AbortSignal.timeout(30_000) });
 
 			if (format === 'pdf' && res.status === 501) {
 				// PDF not yet implemented - show HTML fallback

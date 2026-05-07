@@ -60,7 +60,7 @@
 	async function loadAnalysis() {
 		try {
 			loading = true;
-			const response = await fetch(`/api/video/analysis/${data.evidenceId}`);
+			const response = await fetch(`/api/video/analysis/${data.evidenceId}`, { signal: AbortSignal.timeout(30_000) });
 			if (!response.ok) throw new Error('Failed to load analysis');
 			analysis = await response.json();
 		} catch (err) {

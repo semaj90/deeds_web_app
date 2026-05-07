@@ -1,18 +1,58 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let runs = $state<any[]>([]);
+	interface RunRow {
+		id: string;
+		query: string;
+		queryHash: string;
+		intent: string | null;
+		status: string;
+		model: string | null;
+		totalDurationMs: number | null;
+		finalAnswer: string | null;
+		finalJson: Record<string, unknown> | null;
+		createdAt: string;
+		finishedAt: string | null;
+		metadata: {
+			intent?: string;
+			tags?: string[];
+			clustersUsed?: number;
+			lensesUsed?: number;
+			researchProvenance?: string;
+			summary?: string;
+		} & Record<string, unknown> | null;
+	}
+
+	interface AuditRow {
+		decision: string;
+		gainScore: number | null;
+		reasoning: string;
+	}
+
+	interface RunDetail {
+		run: RunRow;
+		audits: AuditRow[];
+	}
+
+	let runs = $state<RunRow[]>([]);
 	let selectedRunId = $state<string | null>(null);
-	let runDetail = $state<any>(null);
+	let runDetail = $state<RunDetail | null>(null);
 	let loading = $state(true);
 	let detailLoading = $state(false);
+	let listError = $state<string | null>(null);
+	let detailError = $state<string | null>(null);
 
 	async function loadRuns() {
+		listError = null;
 		try {
-			const res = await fetch('/api/code-intel/retrieval-runs');
-			runs = await res.json();
+			const res = await fetch('/api/code-intel/retrieval-runs', { signal: AbortSignal.timeout(30_000) });
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const data = await res.json();
+			runs = Array.isArray(data) ? data : [];
 		} catch (e) {
 			console.error('Failed to load runs', e);
+			listError = e instanceof Error ? e.message : 'Failed to load runs';
+			runs = [];
 		} finally {
 			loading = false;
 		}
@@ -21,11 +61,19 @@
 	async function selectRun(id: string) {
 		selectedRunId = id;
 		detailLoading = true;
+		detailError = null;
 		try {
-			const res = await fetch(`/api/code-intel/retrieval-runs/${id}`);
-			runDetail = await res.json();
+			const res = await fetch(`/api/code-intel/retrieval-runs/${id}`, { signal: AbortSignal.timeout(30_000) });
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const data = await res.json();
+			runDetail = {
+				run: data.run,
+				audits: Array.isArray(data.audits) ? data.audits : []
+			};
 		} catch (e) {
 			console.error('Failed to load run detail', e);
+			detailError = e instanceof Error ? e.message : 'Failed to load trace';
+			runDetail = null;
 		} finally {
 			detailLoading = false;
 		}
@@ -35,9 +83,16 @@
 		loadRuns();
 	});
 
-	function getStepStatus(step: string) {
-		// Mock logic based on run metadata
-		return 'completed';
+	function statusLabel(status: string | undefined): string {
+		if (!status) return 'Pending';
+		return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+	}
+
+	function statusClass(status: string | undefined): string {
+		const s = (status ?? '').toLowerCase();
+		if (s === 'completed' || s === 'success' || s === 'done') return 'ok';
+		if (s === 'failed' || s === 'error') return 'err';
+		return 'pending';
 	}
 </script>
 
@@ -58,23 +113,31 @@
 		<div class="layout">
 			<aside class="run-list card">
 				<h2>Recent TRACE Runs</h2>
-				<div class="runs">
-					{#each runs as run}
-						<button 
-							class="run-item" 
-							class:active={selectedRunId === run.id}
-							onclick={() => selectRun(run.id)}
-						>
-							<div class="query">{run.query.slice(0, 40)}...</div>
-							<div class="meta">{new Date(run.createdAt).toLocaleTimeString()}</div>
-						</button>
-					{/each}
-				</div>
+				{#if listError}
+					<div class="error-state">{listError}</div>
+				{:else if runs.length === 0}
+					<div class="empty-state-small">No TRACE runs recorded yet.</div>
+				{:else}
+					<div class="runs">
+						{#each runs as run}
+							<button
+								class="run-item"
+								class:active={selectedRunId === run.id}
+								onclick={() => selectRun(run.id)}
+							>
+								<div class="query">{run.query.slice(0, 40)}{run.query.length > 40 ? '…' : ''}</div>
+								<div class="meta">{new Date(run.createdAt).toLocaleTimeString()}</div>
+							</button>
+						{/each}
+					</div>
+				{/if}
 			</aside>
 
 			<main class="trace-view">
 				{#if detailLoading}
 					<div class="loading">Reconstructing retrieval steps...</div>
+				{:else if detailError}
+					<div class="error-state">{detailError}</div>
 				{:else if runDetail}
 					<div class="timeline">
 						<!-- Step 1: Triage -->
@@ -82,7 +145,7 @@
 							<div class="step-header">
 								<span class="step-num">1</span>
 								<h3>Triage</h3>
-								<span class="status">Success</span>
+								<span class="status {statusClass(runDetail.run.status)}">{statusLabel(runDetail.run.status)}</span>
 							</div>
 							<div class="step-body">
 								<p><strong>Intent:</strong> {runDetail.run.metadata?.intent || 'General Query'}</p>
@@ -146,13 +209,19 @@
 								<h3>Encode</h3>
 							</div>
 							<div class="step-body">
-								{#each runDetail.audits as audit}
-									<div class="audit-summary" class:accepted={audit.decision === 'accepted'}>
-										<strong>{audit.decision.toUpperCase()}</strong>
-										<span class="gain">Gain: {audit.gainScore?.toFixed(2)}</span>
-										<p>{audit.reasoning}</p>
-									</div>
-								{/each}
+								{#if runDetail.audits.length === 0}
+									<div class="empty-inline">No memory-gain audits recorded for this run.</div>
+								{:else}
+									{#each runDetail.audits as audit}
+										<div class="audit-summary" class:accepted={audit.decision === 'accepted'}>
+											<strong>{audit.decision.toUpperCase()}</strong>
+											{#if audit.gainScore != null}
+												<span class="gain">Gain: {audit.gainScore.toFixed(2)}</span>
+											{/if}
+											<p>{audit.reasoning}</p>
+										</div>
+									{/each}
+								{/if}
 							</div>
 						</div>
 					</div>

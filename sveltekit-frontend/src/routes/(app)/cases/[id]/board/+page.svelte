@@ -92,7 +92,8 @@
 			const res = await fetch('/api/cases', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ title, description, status: 'open', priority: 'medium' })
+				body: JSON.stringify({ title, description, status: 'open', priority: 'medium' }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (res.ok) {
 				const body = await res.json();
@@ -120,7 +121,7 @@
 
 	async function loadCaseList() {
 		try {
-			const res = await fetch('/api/cases?limit=50');
+			const res = await fetch('/api/cases?limit=50', { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const data = await res.json();
 				caseList = (data.cases || []).map((c: any) => ({
@@ -311,7 +312,8 @@
 			const res = await fetch(`/api/evidence/${evidenceId}/key-points`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ caseId })
+				body: JSON.stringify({ caseId }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (res.ok) {
 				const result = await res.json();
@@ -665,7 +667,8 @@
 			const res = await fetch(`/api/cases/${caseId}/connections`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ fromEvidenceId, toEvidenceId, connectionType, label })
+				body: JSON.stringify({ fromEvidenceId, toEvidenceId, connectionType, label }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (res.ok) {
 				const { connection } = await res.json();
@@ -684,7 +687,8 @@
 			await fetch(`/api/cases/${caseId}/connections`, {
 				method: 'DELETE',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ connectionId })
+				body: JSON.stringify({ connectionId }),
+				signal: AbortSignal.timeout(30_000)
 			});
 		} catch (e) {
 			console.error('Failed to delete connection:', e);
@@ -696,7 +700,7 @@
 		if (!isValidCaseId) { timelineLoading = false; return; }
 		timelineLoading = true;
 		try {
-			const res = await fetch(`/api/cases/${caseId}/timeline?limit=30`);
+			const res = await fetch(`/api/cases/${caseId}/timeline?limit=30`, { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const data = await res.json();
 				timelineEvents = data.events ?? [];
@@ -829,7 +833,8 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						evidenceCount: evidenceItems.length,
 						timestamp: new Date().toISOString()
 					}
-				})
+				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 
 			if (!response.ok) {
@@ -886,7 +891,8 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				try {
 					const response = await fetch('/api/whisper/transcribe', {
 						method: 'POST',
-						body: formData
+						body: formData,
+						signal: AbortSignal.timeout(30_000)
 					});
 
 					if (response.ok) {
@@ -931,6 +937,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(snapshot),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) {
 				console.error('Failed to save', await res.json());

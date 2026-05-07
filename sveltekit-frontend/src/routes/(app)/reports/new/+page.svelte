@@ -41,7 +41,8 @@
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					credentials: 'include',
-					body: JSON.stringify({ templateType: selectedType, caseId, customTitle: title.trim(), useAI })
+					body: JSON.stringify({ templateType: selectedType, caseId, customTitle: title.trim(), useAI }),
+					signal: AbortSignal.timeout(120_000)
 				});
 				if (!res.ok) { const data = await res.json(); throw new Error(data.message || 'Failed to generate report'); }
 				const data = await res.json();
@@ -51,7 +52,8 @@
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					credentials: 'include',
-					body: JSON.stringify({ caseId, title: title.trim(), type: selectedType, contentHtml: '<p>Start writing your report...</p>', status: 'draft', metadata: { reportType: selectedType } })
+					body: JSON.stringify({ caseId, title: title.trim(), type: selectedType, contentHtml: '<p>Start writing your report...</p>', status: 'draft', metadata: { reportType: selectedType } }),
+					signal: AbortSignal.timeout(30_000)
 				});
 				if (!res.ok) { const data = await res.json(); throw new Error(data.message || 'Failed to create report'); }
 				const data = await res.json();

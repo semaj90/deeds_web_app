@@ -112,7 +112,7 @@
 	// --- API Functions ---
 	async function loadActiveSessions() {
 		try {
-			const res = await fetch('/api/simulation');
+			const res = await fetch('/api/simulation', { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const data = await res.json();
 				activeSessions = data.sessions ?? [];
@@ -130,6 +130,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ fictionalCaseId }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const result = await res.json();
 			if (!res.ok) {
@@ -162,7 +163,7 @@
 	}
 
 	async function loadSessionState(sid: string) {
-		const res = await fetch(`/api/simulation/${sid}`);
+		const res = await fetch(`/api/simulation/${sid}`, { signal: AbortSignal.timeout(30_000) });
 		if (!res.ok) throw new Error('Failed to load session');
 		const result = await res.json();
 		// GET /api/simulation/[sessionId] returns session fields at top level
@@ -179,6 +180,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ action, ...extra }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const result = await res.json();
 			if (!res.ok) {
@@ -199,7 +201,7 @@
 	async function abandonSession() {
 		if (!sessionId) return;
 		try {
-			await fetch(`/api/simulation/${sessionId}`, { method: 'DELETE' });
+			await fetch(`/api/simulation/${sessionId}`, { method: 'DELETE', signal: AbortSignal.timeout(30_000) });
 			sessionId = null;
 			sessionData = null;
 			dialogue = [];
@@ -273,6 +275,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ filePath: codeReviewFile }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const analysisResult = await res.json().catch(() => ({}));
 			const analysis = analysisResult.analysis;

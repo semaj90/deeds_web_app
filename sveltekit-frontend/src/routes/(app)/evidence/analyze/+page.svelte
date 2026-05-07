@@ -26,7 +26,8 @@
 					case_id: caseId || undefined,
 					source_type: 'auto_extracted',
 					notes: citation.summary || undefined
-				})
+				}),
+				signal: AbortSignal.timeout(30_000)
 			});
 		} catch (err) {
 			console.error('Failed to save citation:', err);
@@ -129,7 +130,8 @@
 					content: evidenceContent,
 					type: evidenceType,
 					evidenceType: evidenceType === 'police_report' ? 'document' : evidenceType
-				})
+				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (!response.ok) throw new Error(`Analysis failed: ${response.statusText}`);
 			const data = await response.json();

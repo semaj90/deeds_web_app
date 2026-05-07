@@ -77,7 +77,7 @@
 	}
 
 	async function fetchIngestJobStatus(jobId: string) {
-		const res = await fetch(`/api/ace/status?jobId=${encodeURIComponent(jobId)}`);
+		const res = await fetch(`/api/ace/status?jobId=${encodeURIComponent(jobId)}`, { signal: AbortSignal.timeout(15_000) });
 		const data = await res.json().catch(() => ({}));
 		if (!res.ok) {
 			throw new Error(data.error || 'Unable to load ingest status');
@@ -163,7 +163,8 @@
 			const res = await fetch('/api/ace/ingest', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ url: ingestUrl.trim(), caseId: ingestCaseId || undefined })
+				body: JSON.stringify({ url: ingestUrl.trim(), caseId: ingestCaseId || undefined }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Ingestion failed');
@@ -195,7 +196,8 @@
 
 			const res = await fetch('/api/ace/ingest', {
 				method: 'POST',
-				body: formData
+				body: formData,
+				signal: AbortSignal.timeout(120_000)
 			});
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Ingestion failed');

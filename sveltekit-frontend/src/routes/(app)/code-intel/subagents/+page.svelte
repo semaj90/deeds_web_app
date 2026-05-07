@@ -13,7 +13,8 @@
 				body: JSON.stringify({
 					query: 'Test full TRACE DAG execution',
 					filePaths: ['src/lib/server/ai/gemma4-agent.ts', 'src/lib/server/indexer/karpathy-hook.ts']
-				})
+				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 			lastRun = await res.json();
 		} catch (e) {
