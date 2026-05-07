@@ -452,34 +452,41 @@ async function main() {
 
   // ── Tier C: Infrastructure ────────────────────────────────────────────────────
   const g17Files = rgFiles('localhost|127\\.0\\.0\\.1', join(SRC_DIR, 'lib/server'))
-    .filter(f => !f.endsWith('env.server.ts') && !f.endsWith('env.server.js')
-              && !f.endsWith('service-urls.ts')         // re-export layer, no raw defaults
-              && !f.endsWith('url-validator.ts')         // security allow/block list
-              && !f.endsWith('langextract-client.ts')    // service-discovery probe
-              && !f.endsWith('obsidian-client.ts')       // HTTPS loopback check
-              && !f.endsWith('docker-discovery.ts')      // Docker API HostIp parsing
-              && !f.endsWith('service-discovery.ts')     // Docker service port scanning
-              && !f.endsWith('middleware.ts')             // CORS security origin check
-              && !f.endsWith('karpathy-wiki.ts')          // loopback HTTPS detection regex
-              && !f.endsWith('constitution-fetcher.ts')   // user-agent string (not a URL)
-              && !f.endsWith('gemma4-agent.ts')           // comment string mentioning localhost
-              && !f.endsWith('llama-tool-definitions.ts') // JSDoc example code
-              && !f.endsWith('ollama-config.ts')          // Ollama Docker/local discovery
-              && !f.endsWith('ollama-endpoint.ts')        // Ollama endpoint utility
-              && !f.endsWith('ollama.ts')                 // intentional Ollama 3-tier fallback
-              && !f.endsWith('service-integrations.ts')   // URL.hostname parsing + $env/dynamic/private
-              && !f.endsWith('config.ts')                 // host: TCP socket field fallbacks (not service URLs)
-              && !f.endsWith('endpoints.ts')              // endpoint constants exported for consumers
-              && !f.endsWith('database-simple.js')        // legacy import.meta.env file
-              && !f.endsWith('index-clean.ts')            // legacy DB client
-              && !f.includes('/grpc/')                    // gRPC clients: all localhost in JSDoc comments
-              && !f.includes('/seed')                     // DB seed scripts
-              && !f.endsWith('migrate-test-rag.ts')       // migration test script
-              && !f.endsWith('mapreduce-worker.mjs')      // standalone worker (no SvelteKit ENV)
-              && !f.endsWith('graph-informed-retrieval.ts') // comment mentioning localhost
-              && !f.endsWith('.test.ts')                  // test mock values
-              && !f.endsWith('.spec.ts')
-              && !f.endsWith('.md') && !f.endsWith('.env') && !basename(f).startsWith('.env'));
+    .filter(f => {
+      const p = f.replace(/\\/g, '/'); // normalise to forward slashes (Windows-safe)
+      return !p.endsWith('env.server.ts') && !p.endsWith('env.server.js')
+          && !p.endsWith('service-urls.ts')         // re-export layer, no raw defaults
+          && !p.endsWith('url-validator.ts')         // security allow/block list
+          && !p.endsWith('langextract-client.ts')    // service-discovery probe
+          && !p.endsWith('obsidian-client.ts')       // HTTPS loopback check
+          && !p.endsWith('docker-discovery.ts')      // Docker API HostIp parsing
+          && !p.endsWith('service-discovery.ts')     // Docker service port scanning
+          && !p.endsWith('middleware.ts')             // CORS security origin check
+          && !p.endsWith('karpathy-wiki.ts')          // loopback HTTPS detection regex
+          && !p.endsWith('constitution-fetcher.ts')   // user-agent string (not a URL)
+          && !p.endsWith('gemma4-agent.ts')           // comment string mentioning localhost
+          && !p.endsWith('llama-tool-definitions.ts') // JSDoc example code
+          && !p.endsWith('ollama-config.ts')          // Ollama Docker/local discovery
+          && !p.endsWith('ollama-endpoint.ts')        // Ollama endpoint utility
+          && !p.endsWith('ollama.ts')                 // intentional Ollama 3-tier fallback
+          && !p.endsWith('service-integrations.ts')   // URL.hostname parsing + $env/dynamic/private
+          && !p.endsWith('config.ts')                 // host: TCP socket field fallbacks (not service URLs)
+          && !p.endsWith('endpoints.ts')              // endpoint constants exported for consumers
+          && !p.endsWith('database-simple.js')        // legacy import.meta.env file
+          && !p.endsWith('index-clean.ts')            // legacy DB client
+          && !p.includes('/grpc/')                    // gRPC clients: all localhost in JSDoc comments
+          && !p.includes('/seed')                     // DB seed scripts (seed.ts, seed-citations.ts)
+          && !p.endsWith('migrate-test-rag.ts')       // migration test script
+          && !p.endsWith('mapreduce-worker.mjs')      // standalone worker (no SvelteKit ENV)
+          && !p.endsWith('graph-informed-retrieval.ts') // comment mentioning localhost
+          && !p.endsWith('langextract-service.ts')    // service proxy (ENV-routed via langextract-client.ts)
+          && !p.endsWith('redis-exact-match.ts')      // comment mentioning Redis localhost default
+          && !p.endsWith('web-search-searxng.ts')     // comment mentioning searxng default address
+          && !p.endsWith('rabbitmq.ts') && !p.endsWith('rabbitmq.js') // amqp URL from ENV.RABBITMQ_URL
+          && !p.endsWith('.test.ts')                  // test mock values
+          && !p.endsWith('.spec.ts')
+          && !p.endsWith('.md') && !p.endsWith('.env') && !basename(p).startsWith('.env');
+    });
 
   // ── Tier D: Security ──────────────────────────────────────────────────────────
   const routesApiDir = join(SRC_DIR, 'routes/api');

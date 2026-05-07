@@ -1,5 +1,6 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { ENV } from '$lib/server/env.server.js';
 import { db } from './index.js';
 import * as schema from './schema.js';
 import { eq, sql } from 'drizzle-orm';
@@ -70,9 +71,9 @@ export class QdrantPostgreSQLService {
 
 export const createQdrantService = () => {
     return new QdrantPostgreSQLService({
-        host: process.env?.QDRANT_HOST ?? 'localhost',
-        port: Number(process.env.QDRANT_PORT) ?? 6333,
-        apiKey: process.env.QDRANT_API_KEY
+        host: new URL(ENV.QDRANT_URL).hostname,
+        port: Number(new URL(ENV.QDRANT_URL).port) || 6333,
+        apiKey: ENV.QDRANT_API_KEY || undefined
     });
 };
 
