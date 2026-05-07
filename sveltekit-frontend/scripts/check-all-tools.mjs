@@ -17,6 +17,11 @@
  */
 
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
+// Load .env so COUCHDB_URL, DATABASE_URL, etc. are available when run directly
+try {
+  const { config } = await import('dotenv');
+  config();
+} catch { /* dotenv optional */ }
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync, spawnSync } from 'node:child_process';
@@ -36,9 +41,14 @@ const NEO4J_USER  = process.env.NEO4J_USER      ?? 'neo4j';
 const NEO4J_PASS  = process.env.NEO4J_PASSWORD  ?? process.env.NEO4J_PASS ?? 'neo4j123';
 const QDRANT_URL  = process.env.QDRANT_URL      ?? 'http://127.0.0.1:6333';
 const REDIS_URL   = process.env.REDIS_URL       ?? 'redis://127.0.0.1:6379';
-const COUCH_URL   = process.env.COUCHDB_URL     ?? 'http://127.0.0.1:5984';
-const COUCH_USER  = process.env.COUCHDB_USER    ?? process.env.COUCH_USER ?? 'admin';
-const COUCH_PASS  = process.env.COUCHDB_PASSWORD ?? process.env.COUCH_PASS ?? 'admin';
+// Parse credentials from COUCHDB_URL (http://user:pass@host) if set, otherwise use separate vars
+const _rawCouchUrl = process.env.COUCHDB_URL ?? '';
+const _couchCredsMatch = _rawCouchUrl.match(/^(https?:\/\/)([^:]+):([^@]+)@(.+)$/);
+const COUCH_URL   = _couchCredsMatch
+  ? `${_couchCredsMatch[1]}${_couchCredsMatch[4]}`
+  : (_rawCouchUrl || 'http://127.0.0.1:5984');
+const COUCH_USER  = process.env.COUCHDB_USER     ?? process.env.COUCH_USER     ?? _couchCredsMatch?.[2] ?? 'admin';
+const COUCH_PASS  = process.env.COUCHDB_PASSWORD ?? process.env.COUCH_PASS     ?? _couchCredsMatch?.[3] ?? 'admin';
 const OLLAMA_URL  = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 const MCP_URL     = `http://${process.env.TRACE_MCP_HOST ?? '127.0.0.1'}:${process.env.TRACE_MCP_PORT ?? '8788'}`;
 const DB_URL      = process.env.DATABASE_URL;
@@ -320,15 +330,17 @@ await Promise.all([
     return `${r.doc_count ?? 0} docs`;
   }),
 
-  probe('couchdb', 'pagerank DB', async () => {
-    const r = await couchGet('/pagerank').catch(() => null);
-    if (!r) throw new Error('WARN: pagerank DB missing — run run:pagerank');
+  probe('couchdb', 'codebase_graph DB (pagerank store)', async () => {
+    const r = await couchGet('/codebase_graph').catch(() => null);
+    if (!r) throw new Error('WARN: codebase_graph DB missing — run run:pagerank');
+    if ((r.doc_count ?? 0) < 100) throw new Error(`WARN: only ${r.doc_count} docs — run run:pagerank to rebuild`);
     return `${r.doc_count ?? 0} docs`;
   }),
 
-  probe('couchdb', 'ace_context DB (docstore cards)', async () => {
-    const r = await couchGet('/ace_context').catch(() => null);
-    if (!r) throw new Error('WARN: ace_context DB missing — run graphify:docstore');
+  probe('couchdb', 'wiki_cards DB (docstore cards)', async () => {
+    const r = await couchGet('/wiki_cards').catch(() => null);
+    if (!r) throw new Error('WARN: wiki_cards DB missing — run graphify:docstore');
+    if ((r.doc_count ?? 0) < 5) throw new Error(`WARN: only ${r.doc_count} cards — run graphify:docstore to rebuild`);
     return `${r.doc_count ?? 0} docs`;
   }),
 
