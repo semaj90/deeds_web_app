@@ -1649,7 +1649,7 @@ export async function runGemma4Agent(
       toolsUsed.push(name);
       if (SIDE_EFFECT_TOOLS.has(name)) hasSideEffect = true;
 
-      const result = await dispatchTool(name, tArgs ?? {});
+      const result = await dispatchTool(name, tArgs ?? {}, goRetrievalHits);
       if (Array.isArray(result.result)) sources.push(...result.result);
 
       // Ollama expects role:"tool" messages with the result as content
