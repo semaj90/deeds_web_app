@@ -104,7 +104,7 @@
 			currentPage++;
 			const params = new URLSearchParams({ page: String(currentPage), limit: '50' });
 			if (data.caseId) params.set('caseId', data.caseId);
-			const res = await fetch(`/api/evidence?${params}`);
+			const res = await fetch(`/api/evidence?${params}`, { signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) { currentPage--; return; }
 			const result = await res.json();
 			const newItems = result.evidence ?? [];
@@ -244,7 +244,8 @@
 			const res = await fetch('/api/evidence/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query, limit: 30, includeContext: true })
+				body: JSON.stringify({ query, limit: 30, includeContext: true }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) { searchMode = 'local'; return; }
 			const result = await res.json();
@@ -451,6 +452,7 @@
 			onSelect={({ action }) => {
 				if (action === 'analyze') showAiAssistant = true;
 				else if (action === 'attach') showCaseSelector = true;
+				else if (action === 'save') showUploadPipeline = true;
 				actionPopupFile = null;
 			}}
 			onClose={() => { actionPopupFile = null; }}
