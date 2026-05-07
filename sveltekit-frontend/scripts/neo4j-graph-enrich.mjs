@@ -269,9 +269,45 @@ function normQdrantKey(fp) {
     .replace(/^\//, '');
 }
 
-/** Scroll Qdrant, building relativePath → [point-id, …] mapping (all chunks per file) */
+/** All identity aliases a Qdrant payload may carry */
+function buildPayloadAliases(payload = {}) {
+  return [
+    payload.filePath,
+    payload.file_path,
+    payload.relativePath,
+    payload.relative_path,
+    payload.stableKey,
+    payload.stable_key,
+    payload.path,
+  ].filter(Boolean);
+}
+
+/** Add a single alias → pointId mapping, deduplicating via Set */
+function addQdrantAlias(index, rawKey, pointId) {
+  const key = normQdrantKey(rawKey);
+  if (!key) return;
+  let s = index.get(key);
+  if (!s) { s = new Set(); index.set(key, s); }
+  s.add(pointId);
+}
+
+/** Resolve all Qdrant point-ids for an enriched node, trying every alias */
+function findQdrantPointIds(index, entry) {
+  const aliases = [
+    entry.filePath,
+    entry.stableKey,
+  ].filter(Boolean);
+  const ids = new Set();
+  for (const alias of aliases) {
+    const s = index.get(normQdrantKey(alias));
+    if (s) for (const id of s) ids.add(id);
+  }
+  return ids;
+}
+
+/** Scroll Qdrant, building normalised-path → Set<point-id> mapping (all chunks per file) */
 async function buildQdrantIndex(limit = 50_000) {
-  // Map<normalised-path, point-id[]>
+  // Map<normalised-path, Set<point-id>>
   const index = new Map();
   let offset = null;
   let collected = 0;
@@ -281,7 +317,7 @@ async function buildQdrantIndex(limit = 50_000) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         limit: 500,
-        with_payload: ['stable_key', 'relativePath', 'file_path'],
+        with_payload: ['stable_key', 'stableKey', 'relativePath', 'relative_path', 'file_path', 'filePath', 'path'],
         with_vector: false,
         ...(offset ? { offset } : {}),
       }),
@@ -290,11 +326,9 @@ async function buildQdrantIndex(limit = 50_000) {
     const d = await r.json();
     const pts = d.result?.points ?? [];
     for (const pt of pts) {
-      const raw = pt.payload?.relativePath ?? pt.payload?.file_path ?? pt.payload?.stable_key;
-      if (!raw) continue;
-      const key = normQdrantKey(raw);
-      if (!index.has(key)) index.set(key, []);
-      index.get(key).push(pt.id);
+      for (const alias of buildPayloadAliases(pt.payload)) {
+        addQdrantAlias(index, alias, pt.id);
+      }
     }
     collected += pts.length;
     offset = d.result?.next_page_offset ?? null;
@@ -531,11 +565,17 @@ async function main() {
       console.log(`   Qdrant index built: ${qdrantIndex.size} unique paths → point-id[] mappings`);
 
       const patches = [];
+      let matchedFiles = 0;
+      let missedFiles  = 0;
+      const topMisses  = [];
       for (const e of enriched) {
-        // normalise both sides to repo-relative path (strips 'sveltekit-frontend/' prefix)
-        const key = normQdrantKey(e.filePath ?? e.stableKey ?? '');
-        const ids = qdrantIndex.get(key);
-        if (!ids?.length) continue;
+        const ids = findQdrantPointIds(qdrantIndex, e);
+        if (!ids.size) {
+          missedFiles++;
+          if (topMisses.length < 10) topMisses.push(normQdrantKey(e.filePath ?? e.stableKey ?? '?'));
+          continue;
+        }
+        matchedFiles++;
         const payload = {
           graphAuthorityScore: e.graphAuthorityScore,
           communityId:         e.communityId,
@@ -547,9 +587,21 @@ async function main() {
         for (const id of ids) patches.push({ id, payload });
       }
 
+      const total     = matchedFiles + missedFiles;
+      const matchRate = total > 0 ? `${Math.round((matchedFiles / total) * 100)}%` : 'n/a';
+      summary.qdrant  = {
+        indexSize:     qdrantIndex.size,
+        enrichedCount: enriched.length,
+        matched:       matchedFiles,
+        missed:        missedFiles,
+        matchRate,
+        topMisses,
+      };
+
       const dryNote = DRY_RUN ? ' (dry — no writes)' : '';
-      summary.gates.GDS7 = patches.length > 0 ? `PASS: ${patches.length} patches${dryNote}` : 'WARN: 0 patches';
-      console.log(`   Qdrant patches: ${patches.length}${dryNote}`);
+      summary.gates.GDS7 = patches.length > 0 ? `PASS: ${patches.length} patches (${matchedFiles}/${total} files matched, ${matchRate})${dryNote}` : 'WARN: 0 patches';
+      console.log(`   Qdrant patches: ${patches.length}  matched ${matchedFiles}/${total} files (${matchRate})${dryNote}`);
+      if (topMisses.length) console.log(`   Top misses: ${topMisses.slice(0, 5).join(', ')}`);
 
       if (!DRY_RUN) {
         await qdrantPatchBatch(patches);
