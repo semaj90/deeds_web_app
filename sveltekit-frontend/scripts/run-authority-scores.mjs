@@ -21,7 +21,7 @@
  */
 
 import { resolve, dirname, join } from 'node:path';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readdirSync, existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -168,16 +168,39 @@ while (true) {
 const dur = Date.now() - t0;
 console.log(`[authority] ✓ Mirrored ${mirrored} authority scores in ${dur}ms`);
 
-// ── 4. Write authority_scores.json artifact ───────────────────────────────────
+// ── 4. Write authority_scores.json into latest run dir that has graph_nodes.json ─
 
+const MEMORY_RUNS = resolve(__dirname, '..', 'memory', 'runs');
 const nowStr = new Date().toISOString();
-const runId  = nowStr.slice(0, 19).replace(/[:T]/g, '-');
-const runDir = join(resolve(__dirname, '..', 'memory', 'runs'), runId);
+
+// Prefer a run dir that already contains graph_nodes.json (synthesis-ready)
+let selectedRunId = null;
+let selectedRunDir = null;
+try {
+  const allDirs = readdirSync(MEMORY_RUNS).sort().reverse();
+  for (const d of allDirs) {
+    const dir = join(MEMORY_RUNS, d);
+    if (existsSync(join(dir, 'graph_nodes.json'))) {
+      selectedRunId  = d;
+      selectedRunDir = dir;
+      break;
+    }
+  }
+} catch { /* MEMORY_RUNS doesn't exist yet */ }
+
+// Fallback: create a new run dir
+if (!selectedRunDir) {
+  selectedRunId  = nowStr.slice(0, 19).replace(/[:T]/g, '-');
+  selectedRunDir = join(MEMORY_RUNS, selectedRunId);
+  console.log(`[authority] No existing run dir with graph_nodes.json — creating ${selectedRunId}`);
+} else {
+  console.log(`[authority] Writing into existing run dir: ${selectedRunId}`);
+}
 
 try {
-  mkdirSync(runDir, { recursive: true });
+  mkdirSync(selectedRunDir, { recursive: true });
   const artifact = {
-    runId,
+    runId:         selectedRunId,
     writtenAt:     nowStr,
     nodesScored:   nodes.length,
     nodesMirrored: mirrored,
@@ -185,11 +208,43 @@ try {
     collection:    COLLECTION,
     neo4jUri:      NEO4J_URI,
     qdrantUrl:     QDRANT_URL,
-    topScores:     [...scoreMap.entries()]
+    selectedRunDir,
+    topScores: [...scoreMap.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 20)
       .map(([stableKey, score]) => ({ stableKey, score })),
   };
-  writeFileSync(join(runDir, 'authority_scores.json'), JSON.stringify(artifact, null, 2));
-  console.log(`[authority] Artifact → memory/runs/${runId}/authority_scores.json`);
+  writeFileSync(join(selectedRunDir, 'authority_scores.json'), JSON.stringify(artifact, null, 2));
+  console.log(`[authority] Artifact → memory/runs/${selectedRunId}/authority_scores.json`);
+
+  // P2: authority_pipeline_trace.json — cross-stage audit trail
+  try {
+    const gdsLatestPath = resolve(__dirname, '..', 'memory', 'graphify', 'gds', 'latest.json');
+    const gdsLatest = existsSync(gdsLatestPath) ? JSON.parse(readFileSync(gdsLatestPath, 'utf8')) : null;
+
+    const tsgoPath = resolve(__dirname, '..', 'scratch', 'audits', 'tsgo-diagnostics.json');
+    let tsgoErrorCount = 0;
+    if (existsSync(tsgoPath)) {
+      try {
+        const tsgoRaw = JSON.parse(readFileSync(tsgoPath, 'utf8'));
+        const tsgoList = tsgoRaw.diagnostics ?? tsgoRaw;
+        tsgoErrorCount = Array.isArray(tsgoList) ? tsgoList.length : 0;
+      } catch { /* non-fatal */ }
+    }
+
+    const trace = {
+      traceWrittenAt:      nowStr,
+      selectedAuthorityRunDir: selectedRunDir,
+      gdsVersion:          gdsLatest?.gdsAvailable ? 'available' : 'unavailable',
+      pagerankNodes:       gdsLatest?.pagerankRows ?? 0,
+      authorityNodes:      scoreMap.size,
+      allAuthoritiesCount: gdsLatest?.allAuthorities?.length ?? gdsLatest?.topAuthorities?.length ?? 0,
+      tsgoErrorCount,
+      clustersWithAuthority: 0,  // TODO: populated by synthesize-next-actions after synthesis
+      qdrantDryRunMatches:   mirrored,
+      errors:              [],
+    };
+    writeFileSync(join(selectedRunDir, 'authority_pipeline_trace.json'), JSON.stringify(trace, null, 2));
+    console.log(`[authority] Trace  → memory/runs/${selectedRunId}/authority_pipeline_trace.json`);
+  } catch { /* non-fatal */ }
 } catch { /* non-fatal */ }

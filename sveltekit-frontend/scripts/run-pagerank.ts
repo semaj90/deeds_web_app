@@ -14,6 +14,7 @@
  *   npx tsx scripts/run-pagerank.ts [--skip-couch-write]
  */
 
+import 'dotenv/config';
 import Redis from 'ioredis';
 
 const COUCHDB_URL   = process.env.COUCHDB_URL  ?? 'http://admin:legal_ai_pass@127.0.0.1:5984';

@@ -20,7 +20,7 @@
  * npm: "wire:synthesis:grpo": "node scripts/graph/wire-synthesis-grpo.mjs"
  */
 
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -305,6 +305,19 @@ async function main() {
   const low      = results.filter(r => r.riskLevel === 'low').length;
   console.log(`\n  critical:${critical}  high:${high}  medium:${medium}  low:${low}`);
   console.log(`\n${DRY_RUN ? '✓ Dry run complete (no writes)' : '✓ Wire complete'}`);
+
+  // 5. Write synthesis_grpo_wiring.json artifact to the run directory
+  const artifact = {
+    runId,
+    wiredAt: new Date().toISOString(),
+    dryRun: DRY_RUN,
+    clusterCount: results.length,
+    summary: { critical, high, medium, low },
+    clusters: results,
+  };
+  const artifactPath = join(await resolveRunDir(), 'synthesis_grpo_wiring.json');
+  await writeFile(artifactPath, JSON.stringify(artifact, null, 2), 'utf8');
+  console.log(`  ✓ Artifact: ${artifactPath}`);
 
   const redis = await getRedis().catch(() => null);
   if (redis) redis.quit().catch(() => {});

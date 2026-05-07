@@ -41,17 +41,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // ── CLI flags ─────────────────────────────────────────────────────────────────
 
-const DRY_RUN    = process.argv.includes('--dry-run');
-const NO_QDRANT  = process.argv.includes('--no-qdrant');
-const NO_REDIS   = process.argv.includes('--no-redis');
-const LIMIT_ARG  = process.argv.find(a => a.startsWith('--limit'));
-const LIMIT      = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1] ?? LIMIT_ARG.split(' ')[1] ?? '5000') : 5_000;
+const DRY_RUN        = process.argv.includes('--dry-run');
+const NO_QDRANT      = process.argv.includes('--no-qdrant');
+const NO_REDIS       = process.argv.includes('--no-redis');
+const FORCE_RECREATE = process.argv.includes('--force-recreate');
+const LIMIT_ARG      = process.argv.find(a => a.startsWith('--limit'));
+const LIMIT          = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1] ?? LIMIT_ARG.split(' ')[1] ?? '5000') : 5_000;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const NEO4J_URL   = process.env.NEO4J_HTTP_URL  ?? 'http://localhost:7474';
 const NEO4J_USER  = process.env.NEO4J_USER       ?? 'neo4j';
 const NEO4J_PASS  = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
+if (!process.env.NEO4J_PASSWORD && !process.env.NEO4J_PASS) {
+  console.warn('   ⚠ NEO4J_PASSWORD not set in environment — using hardcoded default. Add to .env: NEO4J_PASSWORD=<password>');
+}
 const QDRANT_URL  = process.env.QDRANT_URL       ?? 'http://127.0.0.1:6333';
 const QDRANT_COLL = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
 const DB_URL      = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
@@ -72,13 +76,22 @@ async function neo4j(cypher, params = {}) {
   if (!res.ok) throw new Error(`Neo4j HTTP ${res.status}: ${await res.text().catch(() => '')}`);
   const data = await res.json();
   if (data.errors?.length) throw new Error(data.errors.map(e => e.message).join('; '));
-  return data.results?.[0]?.data ?? [];
+  // Attach columns to each row for neo4jRows() to use names not meta ids
+  const result = data.results?.[0] ?? { columns: [], data: [] };
+  result.data.forEach(d => { d._columns = result.columns; });
+  return result.data;
 }
 
 function neo4jRows(data) {
   return data.map(d => {
     const obj = {};
-    d.meta?.forEach((m, i) => { obj[m?.id ?? `col${i}`] = d.row[i]; });
+    const cols = d._columns;
+    if (cols?.length) {
+      cols.forEach((col, i) => { obj[col] = d.row[i]; });
+    } else {
+      // Fallback to meta-based naming for older callers
+      d.meta?.forEach((m, i) => { obj[m?.id ?? `col${i}`] = d.row[i]; });
+    }
     return obj;
   });
 }
@@ -86,58 +99,82 @@ function neo4jRows(data) {
 // ── Phase 1: GDS project ──────────────────────────────────────────────────────
 
 async function ensureProjection() {
-  // Check if projection exists
+  // Check if projection exists and whether it has nodes
   const existing = await neo4j(`
     CALL gds.graph.list()
-    YIELD graphName
-    RETURN graphName
+    YIELD graphName, nodeCount, relationshipCount
+    RETURN graphName, nodeCount, relationshipCount
   `).catch(() => []);
-  if (neo4jRows(existing).some(r => r.graphName === GRAPH_NAME)) {
-    console.log(`   ✓ GDS projection '${GRAPH_NAME}' already exists`);
-    return true;
+
+  const existingRow = neo4jRows(existing).find(r => r.graphName === GRAPH_NAME);
+  if (existingRow) {
+    const nodeCount = existingRow.nodeCount ?? 0;
+    if (nodeCount > 0 && !FORCE_RECREATE) {
+      console.log(`   ✓ GDS projection '${GRAPH_NAME}' exists (${nodeCount} nodes, ${existingRow.relationshipCount ?? 0} rels)`);
+      return true;
+    }
+    // Projection has 0 nodes (stale) or --force-recreate requested — drop and recreate
+    const reason = FORCE_RECREATE ? '--force-recreate requested' : `0 nodes (stale projection)`;
+    console.warn(`   ⚠ GDS projection '${GRAPH_NAME}' — ${reason}, dropping and recreating`);
+    await neo4j(`CALL gds.graph.drop('${GRAPH_NAME}', false) YIELD graphName RETURN graphName`).catch(() => {});
   }
+
   // Create projection
-  await neo4j(`
+  const projRows = await neo4j(`
     CALL gds.graph.project(
       '${GRAPH_NAME}',
       ['CodebaseFile'],
       {
         IMPORTS:           { orientation: 'NATURAL' },
-        DEPENDS_ON:        { orientation: 'NATURAL' },
+        DYNAMIC_IMPORTS:   { orientation: 'NATURAL' },
         SIMILAR_TOPOLOGY:  { orientation: 'UNDIRECTED' }
       }
     )
     YIELD graphName, nodeCount, relationshipCount
     RETURN graphName, nodeCount, relationshipCount
   `);
-  console.log(`   ✓ GDS projection '${GRAPH_NAME}' created`);
-  return true;
+
+  const created = neo4jRows(projRows)[0];
+  const nodeCount = created?.nodeCount ?? 0;
+  if (nodeCount === 0) {
+    console.warn(`   ⚠ GDS projection '${GRAPH_NAME}' created but has 0 CodebaseFile nodes`);
+    console.warn(`      Run: npm run graphify:full  to populate Neo4j before running GDS enrichment`);
+  } else {
+    console.log(`   ✓ GDS projection '${GRAPH_NAME}' created (${nodeCount} nodes, ${created?.relationshipCount ?? 0} rels)`);
+  }
+  return nodeCount > 0;
 }
 
 // ── Phase 2: PageRank ─────────────────────────────────────────────────────────
 
 async function runPageRank() {
-  // Stream PageRank scores and write back to nodes
-  const data = await neo4j(`
-    CALL gds.pageRank.stream('${GRAPH_NAME}', { maxIterations: 30, dampingFactor: 0.85 })
-    YIELD nodeId, score
-    WITH gds.util.asNode(nodeId) AS n, score
-    WHERE n.stable_key IS NOT NULL OR n.file_path IS NOT NULL
-    WITH n, score
-    LIMIT ${LIMIT}
-    CALL { WITH n, score
-      SET n.pagerank = toFloat(score)
-    } IN TRANSACTIONS OF 500 ROWS
-    RETURN n.stable_key AS stableKey, n.file_path AS filePath, score
-    ORDER BY score DESC
-    LIMIT 50
+  // Write PageRank scores to node property using write mode (avoids CALL {} IN TRANSACTIONS)
+  const writeData = await neo4j(`
+    CALL gds.pageRank.write('${GRAPH_NAME}', {
+      maxIterations: 30,
+      dampingFactor: 0.85,
+      writeProperty: 'graphPageRank'
+    })
+    YIELD nodePropertiesWritten, ranIterations
+    RETURN nodePropertiesWritten, ranIterations
   `).catch(async (e) => {
-    console.warn(`   ⚠ GDS PageRank failed (${e.message.slice(0,80)})`);
+    console.warn(`   ⚠ GDS PageRank failed (${e.message.slice(0, 80)})`);
     return [];
   });
-  const rows = neo4jRows(data);
-  console.log(`   ✓ PageRank: ${rows.length} top nodes returned`);
-  return rows;
+  const writeRows = neo4jRows(writeData);
+  const written = writeRows[0]?.nodePropertiesWritten ?? 0;
+  console.log(`   ✓ PageRank: ${written} nodes scored`);
+  if (!written) return [];
+
+  // Return top 50 by score for downstream use
+  const data = await neo4j(`
+    MATCH (n:CodebaseFile)
+    WHERE n.graphPageRank IS NOT NULL
+    RETURN coalesce(n.filePath, n.id) AS stableKey, n.filePath AS filePath, n.graphPageRank AS score
+    ORDER BY n.graphPageRank DESC
+    LIMIT 50
+  `).catch(() => []);
+  return neo4jRows(data);
 }
 
 /** Fallback: approximate authority from Postgres code_relations fan-in counts */
@@ -156,16 +193,24 @@ async function fallbackAuthorityFromPostgres(pool) {
 // ── Phase 3: Louvain community detection ──────────────────────────────────────
 
 async function runLouvain() {
+  // Write Louvain community IDs to node property then query back
+  await neo4j(`
+    CALL gds.louvain.write('${GRAPH_NAME}', {
+      maxLevels: 10,
+      maxIterations: 10,
+      writeProperty: 'communityId'
+    })
+    YIELD communityCount, modularity
+    RETURN communityCount, modularity
+  `).catch(async (e) => {
+    console.warn(`   ⚠ GDS Louvain write failed (${e.message.slice(0, 80)}) — skipping community detection`);
+  });
+
   const data = await neo4j(`
-    CALL gds.louvain.stream('${GRAPH_NAME}', { maxLevels: 10, maxIterations: 10 })
-    YIELD nodeId, communityId
-    WITH gds.util.asNode(nodeId) AS n, communityId
-    WHERE n.stable_key IS NOT NULL OR n.file_path IS NOT NULL
+    MATCH (n:CodebaseFile)
+    WHERE n.communityId IS NOT NULL
+    RETURN coalesce(n.filePath, n.id) AS stableKey, n.filePath AS filePath, n.communityId AS communityId
     LIMIT ${LIMIT}
-    CALL { WITH n, communityId
-      SET n.communityId = toInteger(communityId)
-    } IN TRANSACTIONS OF 500 ROWS
-    RETURN n.stable_key AS stableKey, n.file_path AS filePath, communityId
   `).catch(async (e) => {
     console.warn(`   ⚠ GDS Louvain failed (${e.message.slice(0, 80)}) — skipping community detection`);
     return [];
@@ -298,7 +343,7 @@ async function main() {
   let gdsOk = false;
   if (neo4jOk) {
     try {
-      await neo4j('CALL gds.version() YIELD version RETURN version');
+      await neo4j('RETURN gds.version() AS version');  // GDS 2.x: function not YIELD-able procedure
       gdsOk = true;
       summary.gdsAvailable = true;
       summary.gates.GDS2 = 'PASS';
@@ -314,15 +359,21 @@ async function main() {
   // ── PHASE 1: Graph projection ─────────────────────────────────────────────
   if (gdsOk) {
     try {
-      await ensureProjection();
-      summary.gates.GDS3 = 'PASS';
+      const projOk = await ensureProjection();
+      if (projOk) {
+        summary.gates.GDS3 = 'PASS';
+      } else {
+        gdsOk = false;
+        summary.gates.GDS3 = 'FAIL: projection created but has 0 nodes — run graphify:full first';
+        console.warn('   ✗ GDS3 skipping PageRank/Louvain — projection has 0 nodes');
+      }
     } catch (e) {
       gdsOk = false;
       summary.gates.GDS3 = `FAIL: ${e.message.slice(0, 80)}`;
       console.warn(`   ✗ GDS3 projection failed: ${e.message.slice(0, 80)}`);
     }
   } else {
-    summary.gates.GDS3 = gdsOk ? 'PASS' : 'SKIP';
+    summary.gates.GDS3 = 'SKIP (GDS unavailable)';
   }
 
   // ── PHASE 2: PageRank ─────────────────────────────────────────────────────
@@ -376,13 +427,13 @@ async function main() {
   if (neo4jOk) {
     const data = await neo4j(`
       MATCH (f:CodebaseFile)
-      WHERE f.stable_key IS NOT NULL OR f.file_path IS NOT NULL
-      RETURN f.stable_key AS stableKey, f.file_path AS filePath,
-             coalesce(f.pagerank, 0.0) AS pagerank,
+      WHERE f.filePath IS NOT NULL OR f.id IS NOT NULL
+      RETURN coalesce(f.filePath, f.id) AS stableKey, f.filePath AS filePath,
+             coalesce(f.graphPageRank, f.pagerank, 0.0) AS pagerank,
              coalesce(f.communityId, -1) AS communityId,
-             coalesce(f.topo_byte, 0) AS topoByte,
-             coalesce(f.topo_class, 'unclassified') AS topoClass,
-             coalesce(f.directFanIn, 0) AS fanIn
+             coalesce(f.topoByte, 0) AS topoByte,
+             coalesce(f.topoClass, 'unclassified') AS topoClass,
+             coalesce(f.importCount, 0) AS fanIn
       LIMIT ${LIMIT}
     `).catch(() => []);
     allNodes = neo4jRows(data);
@@ -540,13 +591,27 @@ async function main() {
 
   // ── PHASE 7: Summary artifact ─────────────────────────────────────────────
   summary.finishedAt = new Date().toISOString();
-  summary.topAuthorities = enriched.slice(0, 25).map(e => ({
+
+  const toAuthEntry = e => ({
     filePath:            e.filePath,
     graphAuthorityScore: e.graphAuthorityScore,
     communityId:         e.communityId,
     pagerank:            e.pagerank,
     topoClass:           e.topoClass,
-  }));
+  });
+
+  // Normalize to repo-relative forward-slash path for lookup
+  const normPath = fp => (fp ?? '')
+    .replace(/\\/g, '/')
+    .replace(/^.*?\/src\//, 'src/')
+    .replace(/^.*?\/sveltekit-frontend\//, '')
+    .replace(/^\//, '');
+
+  summary.topAuthorities  = enriched.slice(0, 500).map(toAuthEntry);
+  summary.allAuthorities  = enriched.map(toAuthEntry);
+  summary.byPath          = Object.fromEntries(
+    enriched.map(e => [normPath(e.filePath), toAuthEntry(e)])
+  );
 
   try {
     mkdirSync(OUTPUT_DIR, { recursive: true });
