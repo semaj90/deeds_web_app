@@ -35,6 +35,7 @@ export const ENV = {
   DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
   REDIS_URL: privateEnv.REDIS_URL ?? DEV.REDIS_URL,
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
+  QDRANT_API_KEY: privateEnv.QDRANT_API_KEY ?? '',
   RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? DEV.RABBITMQ_URL,
   OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
   /** Legal reasoning / chat / tool-calling model (unified GRPO legal + VLM, 5.3GB) */

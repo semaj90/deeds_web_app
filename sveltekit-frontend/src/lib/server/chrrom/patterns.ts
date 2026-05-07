@@ -2,6 +2,7 @@
  * CHR-ROM UI Pattern schema and generators
  * Tiny, ready-to-render UI blocks: text, svg, or component state
  */
+import { ENV } from '$lib/server/env.server.js';
 
 export type CHRPatternType = 'text' | 'svg' | 'state';
 

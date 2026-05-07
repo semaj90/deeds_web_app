@@ -4,6 +4,7 @@ import * as schema from '$lib/server/db/schema-postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import pgClient from '$lib/server/db-shim';
+import { ENV } from '$lib/server/env.server.js';
 
 let _db: PostgresJsDatabase<typeof schema> | null = null;
 
@@ -15,7 +16,7 @@ export function getPostgreSQLDatabase(): PostgresJsDatabase<typeof schema> | nul
 	}
 	if (_db) return _db;
 
-	const databaseUrl = process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+	const databaseUrl = ENV.DATABASE_URL;
 	const nodeEnv = process.env?.NODE_ENV ?? 'development';
 	console.log('[PostgreSQL] Connecting via postgres-js client:', databaseUrl);
 

@@ -1,4 +1,5 @@
 import type { WikiCard, WikiGap } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // wiki-neo4j-sync.ts

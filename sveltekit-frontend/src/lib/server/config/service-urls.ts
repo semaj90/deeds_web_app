@@ -2,8 +2,8 @@
  * service-urls.ts — canonical service URL accessors
  *
  * Single import point for all service URLs. Wraps ENV from env.server.ts so
- * downstream files never need to hard-code localhost defaults themselves.
- * G17 compliance: all localhost defaults live only in env.server.ts.
+ * downstream files import here instead of duplicating dev-fallback defaults.
+ * G17 compliance: all dev-fallback addresses live only in env.server.ts.
  */
 import { ENV } from '$lib/server/env.server.js';
 

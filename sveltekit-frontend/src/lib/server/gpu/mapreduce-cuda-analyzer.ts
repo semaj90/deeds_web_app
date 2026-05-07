@@ -1,4 +1,5 @@
 import { pgRows } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 /**
  * MapReduce CUDA Analyzer
  * GPU-accelerated semantic indexing for codebase wiki

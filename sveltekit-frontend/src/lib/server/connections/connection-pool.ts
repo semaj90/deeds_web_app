@@ -17,6 +17,7 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
 import { VECTOR_CONFIG } from '../config/vector-config.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // Local amqplib types (named imports fail with moduleResolution: "bundler")
 type AmqpConnection = { createChannel(): Promise<AmqpChannel>; close(): Promise<void> };
@@ -153,9 +154,9 @@ export function ensureNeo4jDriver(): Driver {
 		return neo4jDriverInstance;
 	}
 
-	const uri = process.env?.NEO4J_URI ?? 'bolt://localhost:7687';
-	const user = process.env?.NEO4J_USER ?? 'neo4j';
-	const password = process.env?.NEO4J_PASSWORD ?? 'password';
+	const uri = ENV.NEO4J_URI;
+	const user = ENV.NEO4J_USER;
+	const password = ENV.NEO4J_PASSWORD;
 
 	neo4jDriverInstance = neo4j.driver(
 		uri,
@@ -221,7 +222,7 @@ export async function ensureRabbitConnection(): Promise<AmqpConnection> {
 
 	try {
 		rabbitConnectionAttempts++;
-		const url = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:secret123@localhost:5672';
+		const url = ENV.RABBITMQ_URL;
 		const amqplib = await import('amqplib');
 		rabbitConnectionInstance = await (amqplib as any).default.connect(url, {
 			heartbeat: 60,

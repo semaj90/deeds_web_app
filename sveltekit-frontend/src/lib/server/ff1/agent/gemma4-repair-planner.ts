@@ -16,6 +16,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { createHash }               from 'crypto';
 import path                         from 'path';
+import { ENV } from '$lib/server/env.server.js';
 import type { DiagnosticEntry, RepairPlan } from '../graph/graph-schema.js';
 
 const ROOT         = path.resolve(process.cwd());

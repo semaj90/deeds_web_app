@@ -9,6 +9,7 @@
  *
  * Call ensureMangoIndexes() once at startup (idempotent).
  */
+import { ENV } from '$lib/server/env.server.js';
 
 const COUCHDB_URL  = ENV.COUCHDB_URL;
 const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
