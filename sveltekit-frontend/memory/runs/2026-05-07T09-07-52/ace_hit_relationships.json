@@ -1,0 +1,207 @@
+[
+  {
+    "file": "context-assembler.ts",
+    "outboundCount": 25,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → assembleACEContext",
+      "EXPORTS_SYMBOL → persistACEChunks",
+      "EXPORTS_SYMBOL → fetchCachedACEChunks",
+      "EXPORTS_SYMBOL → buildACEPromptCached",
+      "EXPORTS_SYMBOL → buildACEPrompt",
+      "EXPORTS_SYMBOL → fetchGlossaryMatches",
+      "EXPORTS_SYMBOL → CodebaseFetchStats",
+      "EXPORTS_SYMBOL → fetchCodebaseContext",
+      "READS_REDIS_KEY → ace:authority:top",
+      "READS_REDIS_KEY → code:index:manifest",
+      "READS_REDIS_KEY → code:index:tag:${word}",
+      "READS_REDIS_KEY → agents:root",
+      "READS_REDIS_KEY → agents:dir:${dir}",
+      "QUERIES_TABLE → context_timeline",
+      "QUERIES_TABLE → cases"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "multi-lane-retrieval.ts",
+    "outboundCount": 10,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → MultiLaneQuery",
+      "EXPORTS_SYMBOL → LaneResult",
+      "EXPORTS_SYMBOL → MultiLaneHit",
+      "EXPORTS_SYMBOL → MultiLaneSynthesis",
+      "EXPORTS_SYMBOL → multiLaneSearch",
+      "READS_REDIS_KEY → code:graph:node:${nodeHash}",
+      "READS_REDIS_KEY → code:graph:node:${h}",
+      "QUERIES_TABLE → context_timeline",
+      "QUERIES_QDRANT_COLLECTION → codebase_chunks_768",
+      "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "retrieval-lanes.ts",
+    "outboundCount": 15,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → RetrievalLaneName",
+      "EXPORTS_SYMBOL → ContextHit",
+      "EXPORTS_SYMBOL → RetrievalLaneResult",
+      "EXPORTS_SYMBOL → MultiLaneOutput",
+      "EXPORTS_SYMBOL → mergeContextHits",
+      "EXPORTS_SYMBOL → extractTopFiles",
+      "EXPORTS_SYMBOL → extractTopSymbols",
+      "EXPORTS_SYMBOL → runRetrievalLanes",
+      "EXPORTS_SYMBOL → writeRetrievalTrace",
+      "READS_REDIS_KEY → ace:error:${errHash}",
+      "READS_REDIS_KEY → code:graph:node:${hash}",
+      "READS_REDIS_KEY → ace:topo:${topoClass}:${qHash}",
+      "QUERIES_TABLE → document_chunks",
+      "QUERIES_TABLE → research_summaries",
+      "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "cache-keys.ts",
+    "outboundCount": 29,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → aceTopkKey",
+      "EXPORTS_SYMBOL → aceErrorFpKey",
+      "EXPORTS_SYMBOL → wikiPageKey",
+      "EXPORTS_SYMBOL → wikiGapKey",
+      "EXPORTS_SYMBOL → wikiFileKey",
+      "EXPORTS_SYMBOL → wikiSymbolKey",
+      "EXPORTS_SYMBOL → wikiGapReportLatestKey",
+      "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md",
+      "EXPORTS_SYMBOL → TTL",
+      "EXPORTS_SYMBOL → caseVersionKey",
+      "EXPORTS_SYMBOL → retrievalKey",
+      "EXPORTS_SYMBOL → synthesisKey",
+      "EXPORTS_SYMBOL → clientKey",
+      "EXPORTS_SYMBOL → evidenceKey",
+      "EXPORTS_SYMBOL → graphKey"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "ngram-retrieval.ts",
+    "outboundCount": 8,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → NgramHit",
+      "EXPORTS_SYMBOL → ngramRecall",
+      "EXPORTS_SYMBOL → fullTextRecall",
+      "EXPORTS_SYMBOL → multiTextRecall",
+      "QUERIES_TABLE → document_chunks",
+      "QUERIES_TABLE → error_fingerprints",
+      "QUERIES_TABLE → research_summaries",
+      "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "error-fingerprint.ts",
+    "outboundCount": 10,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → ErrorFingerprint",
+      "EXPORTS_SYMBOL → normalizeError",
+      "EXPORTS_SYMBOL → fingerprintError",
+      "EXPORTS_SYMBOL → extractSymbols",
+      "EXPORTS_SYMBOL → extractFilePaths",
+      "EXPORTS_SYMBOL → storeErrorFingerprint",
+      "EXPORTS_SYMBOL → lookupErrorFingerprint",
+      "EXPORTS_SYMBOL → findSimilarErrors",
+      "QUERIES_TABLE → error_fingerprints",
+      "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "graph-expander.ts",
+    "outboundCount": 2,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → fetchDeepImportGraphExpansion",
+      "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "qdrant-manager.ts",
+    "outboundCount": 11,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → generateSparseVector",
+      "EXPORTS_SYMBOL → QdrantSearchResult",
+      "EXPORTS_SYMBOL → deterministicPointId",
+      "EXPORTS_SYMBOL → QdrantManager",
+      "EXPORTS_SYMBOL → QuantizationLevel",
+      "EXPORTS_SYMBOL → ScalingMode",
+      "EXPORTS_SYMBOL → GPUHealthMetrics",
+      "EXPORTS_SYMBOL → ScalingDecision",
+      "EXPORTS_SYMBOL → adaptiveScalingDecision",
+      "EXPORTS_SYMBOL → qdrant",
+      "HAS_AGENTS_SCOPE → lib/server/vector/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "gemma4-agent.ts",
+    "outboundCount": 10,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → GEMMA4_ALLOWED_TOOLS",
+      "EXPORTS_SYMBOL → truncateToolResult",
+      "EXPORTS_SYMBOL → parseToolRequest",
+      "EXPORTS_SYMBOL → AgentRunResult",
+      "EXPORTS_SYMBOL → runGemma4Agent",
+      "QUERIES_TABLE → cases",
+      "QUERIES_QDRANT_COLLECTION → legal_documents",
+      "QUERIES_QDRANT_COLLECTION → evidence_items",
+      "QUERIES_QDRANT_COLLECTION → codebase_chunks_768",
+      "HAS_AGENTS_SCOPE → lib/server/ai/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "trace-subagent-orchestrator.ts",
+    "outboundCount": 2,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → runTraceSubagentDag",
+      "HAS_AGENTS_SCOPE → lib/server/agents/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "synthesis-memory-archiver.ts",
+    "outboundCount": 2,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → archiveSynthesisMemory",
+      "HAS_AGENTS_SCOPE → lib/server/indexer/AGENTS.md"
+    ],
+    "inbound": []
+  },
+  {
+    "file": "dual-embedder.ts",
+    "outboundCount": 9,
+    "inboundCount": 0,
+    "outbound": [
+      "EXPORTS_SYMBOL → IndexChunksProgress",
+      "EXPORTS_SYMBOL → patchErrorVectorSchema",
+      "EXPORTS_SYMBOL → upsertErrorVector",
+      "EXPORTS_SYMBOL → searchByError",
+      "EXPORTS_SYMBOL → searchCodebase",
+      "EXPORTS_SYMBOL → indexChunks",
+      "EXPORTS_SYMBOL → indexChunksIncremental",
+      "QUERIES_QDRANT_COLLECTION → codebase_chunks_768",
+      "HAS_AGENTS_SCOPE → lib/server/indexer/AGENTS.md"
+    ],
+    "inbound": []
+  }
+]

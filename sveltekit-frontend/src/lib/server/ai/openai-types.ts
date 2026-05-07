@@ -45,6 +45,16 @@ export const openAIChatCompletionRequestSchema = z.object({
 export type OpenAIMessage = z.infer<typeof openAIMessageSchema>;
 export type OpenAIChatCompletionRequest = z.infer<typeof openAIChatCompletionRequestSchema>;
 
+// ── HMM ACE analyzer metadata ──────────────────────────────────────────────
+
+export interface AceHmmMeta {
+  hmmAnalyzerUsed: boolean;
+  intent:          string;
+  confidence:      number;
+  state:           string;
+  signals:         string[];
+}
+
 // ── Response ───────────────────────────────────────────────────────────────
 
 export interface OpenAIChatCompletionChoice {
@@ -59,6 +69,13 @@ export interface OpenAIChatCompletionUsage {
   total_tokens:      number;
 }
 
+/** Retrieval trace — top-level transparency block alongside choices */
+export interface RetrievalTrace {
+  hmm?:            AceHmmMeta;
+  topoPrefilter?:  { used: boolean; hitCount?: number } | null;
+  graphAuthority?: boolean | null;
+}
+
 export interface OpenAIChatCompletionResponse {
   id:      string;
   object:  'chat.completion';
@@ -66,6 +83,8 @@ export interface OpenAIChatCompletionResponse {
   model:   string;
   choices: OpenAIChatCompletionChoice[];
   usage:   OpenAIChatCompletionUsage;
+  /** Retrieval + HMM trace — machine-inspectable by smoke tests */
+  retrievalTrace?: RetrievalTrace;
   /** Custom field — context sources used for this completion (transparency) */
   yorha?: {
     aceUsed:        boolean;
@@ -87,6 +106,8 @@ export interface OpenAIChatCompletionResponse {
     selectedStableKeys?: string[];
     selectedFiles?:      string[];
     contextHitCount?:    number;
+    // HMM ACE analyzer result (surfaced for full-loop smoke / TRACE proof)
+    hmm?: AceHmmMeta;
   };
 }
 

@@ -1,0 +1,685 @@
+{
+  "generatedAt": "2026-05-07T04:00:48.786Z",
+  "purpose": "Per-cluster context packets for llm_synthesis prompt block injection",
+  "gaps": [
+    "gap_synth_001: llm_synthesis TRACE subagent is a hardcoded stub",
+    "gap_synth_002: synthesis-memory-archiver.ts not wired into orchestrator",
+    "gap_synth_003: cluster_key field absent from codebase_chunks_768 payload",
+    "gap_synth_004: writeAuthorityScoresToQdrant has no scheduler",
+    "gap_synth_005: RerankBreakdown not written back to Qdrant payload"
+  ],
+  "gpuClusterPackets": [
+    {
+      "cluster_key": "cluster:gpu:6",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 269,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "server",
+        "ts",
+        "db-schema",
+        "zod",
+        "auth",
+        "test",
+        "js",
+        "json",
+        "api-handler"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:6 cluster (269 files). Key domains: mixed. Top tags: src, lib, server, ts, db-schema."
+    },
+    {
+      "cluster_key": "cluster:gpu:92",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 188,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "zod",
+        "ts",
+        "routes",
+        "(app)",
+        "auth",
+        "has-todo",
+        "route"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:92 cluster (188 files). Key domains: mixed. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:34",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 165,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "ts",
+        "js",
+        "has-todo",
+        "routes",
+        "(app)",
+        "route",
+        "auth"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:34 cluster (165 files). Key domains: mixed. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:57",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 80,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "ts",
+        "svelte",
+        "component",
+        "icons",
+        "zod",
+        "shims",
+        "js",
+        "services",
+        "client",
+        "workers"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:57 cluster (80 files). Key domains: mixed. Top tags: src, lib, ts, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:50",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 79,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "ts",
+        "zod",
+        "has-todo"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:50 cluster (79 files). Key domains: mixed. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:58",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 57,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "ts",
+        "server",
+        "machines",
+        "zod",
+        "db-schema",
+        "svelte",
+        "component",
+        "api-handler",
+        "test",
+        "types"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:58 cluster (57 files). Key domains: mixed. Top tags: src, lib, ts, server, machines."
+    },
+    {
+      "cluster_key": "cluster:gpu:5",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 55,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "svelte",
+        "component",
+        "lib",
+        "components",
+        "zod",
+        "routes",
+        "(app)",
+        "route",
+        "auth",
+        "ts",
+        "features"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:5 cluster (55 files). Key domains: mixed. Top tags: src, svelte, component, lib, components."
+    },
+    {
+      "cluster_key": "cluster:gpu:1",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 46,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "utils",
+        "ts",
+        "zod",
+        "svelte",
+        "components",
+        "component",
+        "js",
+        "auth"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:1 cluster (46 files). Key domains: mixed. Top tags: src, lib, utils, ts, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:21",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 41,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "svelte",
+        "component",
+        "components",
+        "zod",
+        "ts",
+        "routes",
+        "route",
+        "auth",
+        "(app)",
+        "db-schema"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:21 cluster (41 files). Key domains: mixed. Top tags: src, lib, svelte, component, components."
+    },
+    {
+      "cluster_key": "cluster:gpu:59",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 41,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "zod",
+        "ts",
+        "server"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:59 cluster (41 files). Key domains: mixed. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:35",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 35,
+      "topo_classes": [],
+      "top_tags": [
+        "svelte",
+        "src",
+        "component",
+        "lib",
+        "components",
+        "routes",
+        "(app)",
+        "route",
+        "auth"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:35 cluster (35 files). Key domains: mixed. Top tags: svelte, src, component, lib, components."
+    },
+    {
+      "cluster_key": "cluster:gpu:4",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 35,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "ts",
+        "js",
+        "icons",
+        "types"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:4 cluster (35 files). Key domains: mixed. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:19",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 34,
+      "topo_classes": [],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "db-schema",
+        "auth",
+        "services",
+        "utils"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:19 cluster (34 files). Key domains: mixed. Top tags: ts, src, lib, server, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:53",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 34,
+      "topo_classes": [],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "db-schema"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:53 cluster (34 files). Key domains: mixed. Top tags: ts, src, lib, server, db-schema."
+    },
+    {
+      "cluster_key": "cluster:gpu:17",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 30,
+      "topo_classes": [],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "gpu",
+        "services",
+        "zod",
+        "server",
+        "db-schema"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:17 cluster (30 files). Key domains: mixed. Top tags: ts, src, lib, gpu, services."
+    },
+    {
+      "cluster_key": "cluster:gpu:0",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 30,
+      "topo_classes": [],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "types",
+        "zod",
+        "db-schema"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:0 cluster (30 files). Key domains: mixed. Top tags: ts, src, lib, types, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:29",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 28,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "ts",
+        "lib",
+        "routes",
+        "(app)",
+        "auth",
+        "schemas",
+        "route",
+        "zod",
+        "json",
+        "svelte",
+        "component"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:29 cluster (28 files). Key domains: mixed. Top tags: src, ts, lib, routes, (app)."
+    },
+    {
+      "cluster_key": "cluster:gpu:20",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 28,
+      "topo_classes": [],
+      "top_tags": [
+        "src",
+        "lib",
+        "ts",
+        "webgpu",
+        "server",
+        "zod",
+        "mjs",
+        "js",
+        "gpu",
+        "db-schema",
+        "routes",
+        "api"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:20 cluster (28 files). Key domains: mixed. Top tags: src, lib, ts, webgpu, server."
+    },
+    {
+      "cluster_key": "cluster:gpu:73",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 27,
+      "topo_classes": [],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "db-schema",
+        "auth"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:73 cluster (27 files). Key domains: mixed. Top tags: ts, src, lib, server, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:43",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 26,
+      "topo_classes": [],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "services",
+        "db-schema"
+      ],
+      "top_files": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:43 cluster (26 files). Key domains: mixed. Top tags: ts, src, lib, server, zod."
+    }
+  ],
+  "fallbackClusterCount": 10,
+  "aceCriticalRelations": [
+    {
+      "file": "context-assembler.ts",
+      "relations": [
+        "READS_REDIS_KEY → code:index:manifest",
+        "READS_REDIS_KEY → code:index:tag:${word}",
+        "READS_REDIS_KEY → agents:root",
+        "READS_REDIS_KEY → agents:dir:${dir}",
+        "QUERIES_TABLE → context_timeline",
+        "QUERIES_TABLE → cases",
+        "QUERIES_TABLE → legal_glossary",
+        "QUERIES_TABLE → research_summaries"
+      ]
+    },
+    {
+      "file": "multi-lane-retrieval.ts",
+      "relations": [
+        "READS_REDIS_KEY → code:graph:node:${nodeHash}",
+        "READS_REDIS_KEY → code:graph:node:${h}",
+        "QUERIES_TABLE → context_timeline",
+        "QUERIES_QDRANT_COLLECTION → codebase_chunks_768"
+      ]
+    },
+    {
+      "file": "retrieval-lanes.ts",
+      "relations": [
+        "READS_REDIS_KEY → ace:error:${errHash}",
+        "READS_REDIS_KEY → code:graph:node:${hash}",
+        "READS_REDIS_KEY → ace:topo:${topoClass}:${qHash}",
+        "QUERIES_TABLE → document_chunks",
+        "QUERIES_TABLE → research_summaries"
+      ]
+    },
+    {
+      "file": "ngram-retrieval.ts",
+      "relations": [
+        "QUERIES_TABLE → document_chunks",
+        "QUERIES_TABLE → error_fingerprints",
+        "QUERIES_TABLE → research_summaries"
+      ]
+    },
+    {
+      "file": "error-fingerprint.ts",
+      "relations": [
+        "QUERIES_TABLE → error_fingerprints"
+      ]
+    },
+    {
+      "file": "gemma4-agent.ts",
+      "relations": [
+        "QUERIES_TABLE → cases",
+        "QUERIES_QDRANT_COLLECTION → legal_documents",
+        "QUERIES_QDRANT_COLLECTION → evidence_items",
+        "QUERIES_QDRANT_COLLECTION → codebase_chunks_768"
+      ]
+    }
+  ],
+  "synthesisBlock": "### Relationship-Aware Codebase Context\n\nCluster: ace:retrieval-spine\nFiles:\n- context-assembler.ts\n  - READS_REDIS_KEY → code:index:manifest\n  - READS_REDIS_KEY → code:index:tag:${word}\n  - READS_REDIS_KEY → agents:root\n  - READS_REDIS_KEY → agents:dir:${dir}\n  - QUERIES_TABLE → context_timeline\n- multi-lane-retrieval.ts\n  - READS_REDIS_KEY → code:graph:node:${nodeHash}\n  - READS_REDIS_KEY → code:graph:node:${h}\n  - QUERIES_TABLE → context_timeline\n  - QUERIES_QDRANT_COLLECTION → codebase_chunks_768\n- retrieval-lanes.ts\n  - READS_REDIS_KEY → ace:error:${errHash}\n  - READS_REDIS_KEY → code:graph:node:${hash}\n  - READS_REDIS_KEY → ace:topo:${topoClass}:${qHash}\n  - QUERIES_TABLE → document_chunks\n  - QUERIES_TABLE → research_summaries\n- ngram-retrieval.ts\n  - QUERIES_TABLE → document_chunks\n  - QUERIES_TABLE → error_fingerprints\n  - QUERIES_TABLE → research_summaries\n\nCluster: ace:general\nFiles:\n- error-fingerprint.ts\n  - QUERIES_TABLE → error_fingerprints\n\nCluster: ace:agent-layer\nFiles:\n- gemma4-agent.ts\n  - QUERIES_TABLE → cases\n  - QUERIES_QDRANT_COLLECTION → legal_documents\n  - QUERIES_QDRANT_COLLECTION → evidence_items\n  - QUERIES_QDRANT_COLLECTION → codebase_chunks_768\n"
+}

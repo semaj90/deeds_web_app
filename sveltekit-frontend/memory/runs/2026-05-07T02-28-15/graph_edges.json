@@ -1,0 +1,1665 @@
+{
+  "generatedAt": "2026-05-07T02:28:15.619Z",
+  "totalEdges": 11670,
+  "edgeCounts": {
+    "EXPORTS_SYMBOL": 8232,
+    "READS_REDIS_KEY": 85,
+    "WRITES_REDIS_KEY": 57,
+    "QUERIES_TABLE": 310,
+    "QUERIES_QDRANT_COLLECTION": 164,
+    "QUERIES_NEO4J_LABEL": 52,
+    "HAS_AGENTS_SCOPE": 2770
+  },
+  "sample": [
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "code:index:manifest",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 708,
+        "snippet": "const manifestRaw = await redis.get('code:index:manifest');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "code:index:tag:${word}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 725,
+        "snippet": "const raw = await redis.get(`code:index:tag:${word}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "agents:root",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 867,
+        "snippet": "if (resolvedKey === 'agents:root') ttl = await redis.ttl('agents:root').catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "agents:dir:${dir}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 2690,
+        "snippet": "if (await redis.exists(`agents:dir:${dir}`)) {",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/multi-lane-retrieval.ts",
+      "targetKey": "code:graph:node:${nodeHash}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 147,
+        "snippet": "const raw = await redis.get(`code:graph:node:${nodeHash}`).catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/multi-lane-retrieval.ts",
+      "targetKey": "code:graph:node:${h}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 231,
+        "snippet": "const raw = await redis.get(`code:graph:node:${h}`).catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/retrieval-lanes.ts",
+      "targetKey": "ace:error:${errHash}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 103,
+        "snippet": "const errRaw = await redis.get(`ace:error:${errHash}`).catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/retrieval-lanes.ts",
+      "targetKey": "code:graph:node:${hash}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 217,
+        "snippet": "const raw = await redis.get(`code:graph:node:${hash}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/retrieval-lanes.ts",
+      "targetKey": "ace:topo:${topoClass}:${qHash}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 272,
+        "snippet": "const raw = await redis.get(`ace:topo:${topoClass}:${qHash}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/adapters/service-integrations.ts",
+      "targetKey": "health_check",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 591,
+        "snippet": "await adapters.redis.get('health_check');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/context-compression.ts",
+      "targetKey": "wiki:note:dir:${dirPath}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 102,
+        "snippet": "const wikiRaw = await redis.get(`wiki:note:dir:${dirPath}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/context-compression.ts",
+      "targetKey": "ace:trace:${traceId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 159,
+        "snippet": "const traceRaw = await redis.get(`ace:trace:${traceId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/kv-context-controller.ts",
+      "targetKey": "kv:toc:task:${taskId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 237,
+        "snippet": "const raw = await redis.get(`kv:toc:task:${taskId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/mcp-tool-dispatch.ts",
+      "targetKey": "couchdb:pagerank_scores",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 144,
+        "snippet": "const raw   = await redis.get('couchdb:pagerank_scores');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/token-tracker.ts",
+      "targetKey": "${KV_BUDGET_KEY}${sessionId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 129,
+        "snippet": "const raw   = await redis.hgetall(`${KV_BUDGET_KEY}${sessionId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/mapreduce-matrix-analysis.ts",
+      "targetKey": "${MATRIX_CACHE_KEY}${userId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 701,
+        "snippet": "const cached = await redis.get(`${MATRIX_CACHE_KEY}${userId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/research-cache.ts",
+      "targetKey": "research:topics:chain:${queryHash}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 235,
+        "snippet": "const raw = await redis.get(`research:topics:chain:${queryHash}`).catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/cartridge-tensor-bridge.ts",
+      "targetKey": "${REDIS_CARTRIDGE_PREFIX}${caseId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 116,
+        "snippet": "const data = await redis.get(`${REDIS_CARTRIDGE_PREFIX}${caseId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/cartridge-tensor-bridge.ts",
+      "targetKey": "${GPU_RESULT_PREFIX}${caseId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 401,
+        "snippet": "const data = await redis.get(`${GPU_RESULT_PREFIX}${caseId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/cluster-summary-forest.ts",
+      "targetKey": "cluster:summary:${clusterId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 67,
+        "snippet": "const raw = await redis.get(`cluster:summary:${clusterId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/code-llm-index.ts",
+      "targetKey": "${CODE_LLM_CLUSTER_PFX}${clusterId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 430,
+        "snippet": "const hashes = await redis.smembers(`${CODE_LLM_CLUSTER_PFX}${clusterId}`).catch(() => [] as string[]);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cartridge/glyph-tile-engine.ts",
+      "targetKey": "${TILE_REDIS_PREFIX}${caseId}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 105,
+        "snippet": "const raw = await redis.get(`${TILE_REDIS_PREFIX}${caseId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/gpu/libtorch-bridge.ts",
+      "targetKey": "som:weights",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 854,
+        "snippet": "const weightsJson = await redis.get('som:weights');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/community-graph.ts",
+      "targetKey": "hg:community:encoding_log",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 100,
+        "snippet": "const raw = await redis.zrange('hg:community:encoding_log', 0, limit - 1, 'REV');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/community-graph.ts",
+      "targetKey": "hg:community:idx",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 483,
+        "snippet": "const ids = await redis.zrange('hg:community:idx', 0, 19, 'REV');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/community-graph.ts",
+      "targetKey": "code:index:manifest",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 614,
+        "snippet": "const manifestRaw = await redis.get('code:index:manifest').catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/community-graph.ts",
+      "targetKey": "agents:root",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 855,
+        "snippet": "const rootMarkdown = await redis.get('agents:root').catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/glyph-atlas-builder.ts",
+      "targetKey": "${ATLAS_REDIS_KEY}:buf",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 301,
+        "snippet": "const atlasBase64 = await redis.get(`${ATLAS_REDIS_KEY}:buf`) ?? '';",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/glyph-atlas-builder.ts",
+      "targetKey": "couchdb:pagerank_scores",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 314,
+        "snippet": "const prJson = await redis.get('couchdb:pagerank_scores');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/graph-intel.ts",
+      "targetKey": "code:index:tag:${word}",
+      "relationType": "READS_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 224,
+        "snippet": "const raw = await redis.get(`code:index:tag:${word}`).catch(() => null);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/error-kag-writer.ts",
+      "targetKey": "web:research:idx:all",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 261,
+        "snippet": "await redis.zadd('web:research:idx:all', 0.7, hashKey);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/error-kag-writer.ts",
+      "targetKey": "web:research:sum:${hashKey}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 262,
+        "snippet": "await redis.setex(`web:research:sum:${hashKey}`, 7200, JSON.stringify({",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/hmm-wiki-logger.ts",
+      "targetKey": "hmm:flow:known_ids",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 175,
+        "snippet": "await redis.sadd('hmm:flow:known_ids', hash).catch(() => {});",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/kv-context-controller.ts",
+      "targetKey": "kv:toc:task:${taskId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 270,
+        "snippet": "try { await redis.del(`kv:toc:task:${taskId}`); } catch { /* ok */ }",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analysis/evidence-analysis-pipeline.ts",
+      "targetKey": "${YOLO_CACHE_PREFIX}${hash}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 185,
+        "snippet": "await redis.set(`${YOLO_CACHE_PREFIX}${hash}`, JSON.stringify(result), 'EX', YOLO_CACHE_TTL_S);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/codebase-research.ts",
+      "targetKey": "${CACHE_PREFIX}${userId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 412,
+        "snippet": "await redis.del(`${CACHE_PREFIX}${userId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/deep-research.ts",
+      "targetKey": "deep-research:${userId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 607,
+        "snippet": "const deleted = await redis.del(`deep-research:${userId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/mapreduce-matrix-analysis.ts",
+      "targetKey": "${MATRIX_CACHE_KEY}${userId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 770,
+        "snippet": "await redis.del(`${MATRIX_CACHE_KEY}${userId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/cartridge-tensor-bridge.ts",
+      "targetKey": "${REDIS_CARTRIDGE_PREFIX}${caseId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 362,
+        "snippet": "const deleted = await redis.del(`${REDIS_CARTRIDGE_PREFIX}${caseId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/cartridge-tensor-bridge.ts",
+      "targetKey": "${GPU_RESULT_PREFIX}${caseId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 423,
+        "snippet": "await redis.setex(`${GPU_RESULT_PREFIX}${caseId}`, ttl, JSON.stringify(analysis));",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/cartridge-tensor-bridge.ts",
+      "targetKey": "${GPU_RESULT_PREFIX}${caseId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 434,
+        "snippet": "await redis.del(`${GPU_RESULT_PREFIX}${caseId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache-config.ts",
+      "targetKey": "${keyPrefix}:${id}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 131,
+        "snippet": "* await redis.set(`${keyPrefix}:${id}`, data, 'EX', ttlSeconds);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cartridge/glyph-tile-engine.ts",
+      "targetKey": "${TILE_REDIS_PREFIX}${caseId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 96,
+        "snippet": "await redis.set(`${TILE_REDIS_PREFIX}${caseId}`, JSON.stringify(slim), 'EX', TILE_REDIS_TTL);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cartridge/glyph-tile-engine.ts",
+      "targetKey": "${TILE_REDIS_PREFIX}${caseId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 398,
+        "snippet": "await redis.del(`${TILE_REDIS_PREFIX}${caseId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/community-graph.ts",
+      "targetKey": "hg:community:encoding_log",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 91,
+        "snippet": "await redis.zadd('hg:community:encoding_log', score, member);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/community-graph.ts",
+      "targetKey": "hg:community:idx",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 421,
+        "snippet": "void redis.zadd('hg:community:idx', cohesionScore, String(group.id)).catch(() => {});",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/glyph-atlas-builder.ts",
+      "targetKey": "${ATLAS_REDIS_KEY}:buf",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 420,
+        "snippet": "redis.setex(`${ATLAS_REDIS_KEY}:buf`, ATLAS_TTL, atlasBase64),",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/hypergraph-4d.ts",
+      "targetKey": "rlpolicy:pipeline_weights",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 1451,
+        "snippet": "await redis.set('rlpolicy:pipeline_weights', JSON.stringify(policy), 'EX', 24 * 60 * 60).catch(() => {});",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/hypergraph-4d.ts",
+      "targetKey": "hg:adapt:pending",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 1461,
+        "snippet": "const pending = Number(await redis.incr('hg:adapt:pending').catch(() => 0));",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/hypergraph-4d.ts",
+      "targetKey": "hg:adapt:pending",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 1464,
+        "snippet": "await redis.del('hg:adapt:pending').catch(() => {});",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/relationship-extractor.ts",
+      "targetKey": "key",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 177,
+        "snippet": "// Match redis.get('key'), redis.setex('key', ...), await redis.hget('key', ...)",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/indexer/directory-summarizer.ts",
+      "targetKey": "wiki:note:dir:${id}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 155,
+        "snippet": "await redis.setex(`wiki:note:dir:${id}`, REDIS_TTL, JSON.stringify(doc));",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/indexer/directory-summarizer.ts",
+      "targetKey": "hg:community:${communityId}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 359,
+        "snippet": "await redis.del(`hg:community:${communityId}`);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/knowledge-cache.ts",
+      "targetKey": "stats:knowledge_base",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.9,
+      "evidence": {
+        "line": 182,
+        "snippet": "await redis.del('stats:knowledge_base');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ml/recommendation-metrics.ts",
+      "targetKey": "${REDIS_PREFIX}:served:${dayKey}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 138,
+        "snippet": "await redis.sadd(`${REDIS_PREFIX}:served:${dayKey}`, docId);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ml/recommendation-metrics.ts",
+      "targetKey": "${REDIS_PREFIX}:daily:${dayKey}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 142,
+        "snippet": "await redis.expire(`${REDIS_PREFIX}:daily:${dayKey}`, DEFAULT_TTL);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ml/recommendation-metrics.ts",
+      "targetKey": "${REDIS_PREFIX}:hourly:${hourKey}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 143,
+        "snippet": "await redis.expire(`${REDIS_PREFIX}:hourly:${hourKey}`, DEFAULT_TTL);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ml/recommendation-metrics.ts",
+      "targetKey": "${REDIS_PREFIX}:topic:${dayKey}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 144,
+        "snippet": "await redis.expire(`${REDIS_PREFIX}:topic:${dayKey}`, DEFAULT_TTL);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ml/recommendation-metrics.ts",
+      "targetKey": "${REDIS_PREFIX}:impressions:ts",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 145,
+        "snippet": "await redis.expire(`${REDIS_PREFIX}:impressions:ts`, DEFAULT_TTL);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ml/recommendation-metrics.ts",
+      "targetKey": "${REDIS_PREFIX}:served:${dayKey}",
+      "relationType": "WRITES_REDIS_KEY",
+      "confidence": 0.65,
+      "evidence": {
+        "line": 146,
+        "snippet": "await redis.expire(`${REDIS_PREFIX}:served:${dayKey}`, DEFAULT_TTL);",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "hooks.server.ts",
+      "targetKey": "reports",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 421,
+        "snippet": "'SELECT id, title, content, updated_at FROM reports ORDER BY created_at DESC LIMIT 5'",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/components/modals/EvidenceCRUDModal.svelte",
+      "targetKey": "evidence",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 257,
+        "snippet": "if (!response.ok) throw new Error('Failed to update evidence');",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/ace-error-kag.ts",
+      "targetKey": "research_summaries",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 177,
+        "snippet": "`INSERT INTO research_summaries",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "context_timeline",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 635,
+        "snippet": "`INSERT INTO context_timeline (event_type, pipeline, payload)",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "cases",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 1662,
+        "snippet": "FROM cases WHERE id = ${caseId} LIMIT 1`",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "legal_glossary",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 1726,
+        "snippet": "FROM legal_glossary lg",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "research_summaries",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 2065,
+        "snippet": "* Research Summaries Tier — SOM-prefiltered retrieval from research_summaries.",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "evidence",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 2445,
+        "snippet": "FROM evidence WHERE case_id = ${caseId}",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/error-fingerprint.ts",
+      "targetKey": "error_fingerprints",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 116,
+        "snippet": "`INSERT INTO error_fingerprints",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/error-kag-writer.ts",
+      "targetKey": "research_summaries",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 179,
+        "snippet": "`SELECT COUNT(*) AS cnt FROM research_summaries",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/multi-lane-retrieval.ts",
+      "targetKey": "context_timeline",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 449,
+        "snippet": "`INSERT INTO context_timeline (event_type, pipeline, payload)",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/ngram-retrieval.ts",
+      "targetKey": "document_chunks",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 22,
+        "snippet": "FROM document_chunks",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/ngram-retrieval.ts",
+      "targetKey": "error_fingerprints",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 51,
+        "snippet": "FROM error_fingerprints",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/ngram-retrieval.ts",
+      "targetKey": "research_summaries",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 75,
+        "snippet": "FROM research_summaries",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/retrieval-lanes.ts",
+      "targetKey": "document_chunks",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 139,
+        "snippet": "FROM document_chunks",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/retrieval-lanes.ts",
+      "targetKey": "research_summaries",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 147,
+        "snippet": "FROM research_summaries",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/agent/supervisor.ts",
+      "targetKey": "documents",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 58,
+        "snippet": "- document: Document analysis, images, PDFs, OCR, VLM, evidence upload, forensic patterns, entity extraction from docume",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/gemma4-agent.ts",
+      "targetKey": "cases",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 702,
+        "snippet": "FROM cases",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/lang-extract.ts",
+      "targetKey": "documents",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 16,
+        "snippet": "*   - Extract legal entities (statutes, citations, dates) from documents",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analysis/analysis-jobs.ts",
+      "targetKey": "analysis_jobs",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 147,
+        "snippet": "UPDATE analysis_jobs",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analysis/evidence-analysis-pipeline.ts",
+      "targetKey": "evidence",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 8,
+        "snippet": "* Called from evidence upload route (step 6b) and RabbitMQ evidence.process handler.",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analysis/summarizer.ts",
+      "targetKey": "evidence",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 4,
+        "snippet": "* Ported from evidence-service/src/services/summarizer.ts",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/architectural-guard.ts",
+      "targetKey": "chunk_hit_log",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 44,
+        "snippet": "FROM   chunk_hit_log",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/codebase-research.ts",
+      "targetKey": "chunk_hit_log",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 156,
+        "snippet": "* Fetch pipeline hit distribution from chunk_hit_log.",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/deep-research.ts",
+      "targetKey": "chunk_hit_log",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 184,
+        "snippet": "FROM chunk_hit_log",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/mapreduce-matrix-analysis.ts",
+      "targetKey": "chunk_hit_log",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 135,
+        "snippet": "* Map: Extract pipeline hit vectors from chunk_hit_log.",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/research-graph-rl.ts",
+      "targetKey": "research_summaries",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 145,
+        "snippet": "FROM   research_summaries",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/research-summaries-db.ts",
+      "targetKey": "research_summaries",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 189,
+        "snippet": "FROM  research_summaries",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/search-analytics.ts",
+      "targetKey": "chunk_hit_log",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 125,
+        "snippet": "`INSERT INTO chunk_hit_log",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/unified-research-query.ts",
+      "targetKey": "chunk_hit_log",
+      "relationType": "QUERIES_TABLE",
+      "confidence": 0.88,
+      "evidence": {
+        "line": 235,
+        "snippet": "FROM chunk_hit_log",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/ai/model-ids.ts",
+      "targetKey": "legal_documents",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 327,
+        "snippet": "documents: 'legal_documents',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/ai/model-ids.ts",
+      "targetKey": "legal_cases",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 328,
+        "snippet": "cases: 'legal_cases',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/ai/model-ids.ts",
+      "targetKey": "evidence_items",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 329,
+        "snippet": "evidence: 'evidence_items',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/ai/model-ids.ts",
+      "targetKey": "chat_messages",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 330,
+        "snippet": "chat_history: 'chat_messages',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/ai/model-ids.ts",
+      "targetKey": "embedding_cache",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 331,
+        "snippet": "embeddings_cache: 'embedding_cache',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/components/legal-ai/CaseChatPanel.svelte",
+      "targetKey": "legal_documents",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 250,
+        "snippet": "case 'legal_documents':",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/db/schema.ts",
+      "targetKey": "embedding_cache",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 305,
+        "snippet": "export const embeddingCache = pgTable('embedding_cache', {",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/models/ChatSession.svelte.ts",
+      "targetKey": "legal_glossary",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 22,
+        "snippet": "source: 'legal_glossary' | 'legal_definitions';",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/ace-hit-tagger.ts",
+      "targetKey": "codebase_chunks_768",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 18,
+        "snippet": "const COLLECTION = 'codebase_chunks_768';",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/chat-memory.ts",
+      "targetKey": "chat_messages",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 2,
+        "snippet": "* chat-memory.ts — past chat recall via Qdrant `chat_messages` collection.",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "codebase_chunks_768",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 151,
+        "snippet": "collection = 'codebase_chunks_768'",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "legal_glossary",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 1745,
+        "snippet": "source: 'legal_glossary',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "legal_documents",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 1959,
+        "snippet": "qdrantMgr.client.search('legal_documents', searchOpts(4, 0.45)).catch(() => []),",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "legal_canon_chunks",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 1960,
+        "snippet": "qdrantMgr.client.search('legal_canon_chunks', searchOpts(6, 0.4)).catch(() => []),",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "evidence_items",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 2037,
+        "snippet": ".search('evidence_items', {",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/multi-lane-retrieval.ts",
+      "targetKey": "codebase_chunks_768",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 287,
+        "snippet": "'codebase_chunks_768',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/types.ts",
+      "targetKey": "legal_glossary",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 115,
+        "snippet": "source: 'legal_glossary' | 'legal_definitions';",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/code-intel-service.ts",
+      "targetKey": "codebase_chunks",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 276,
+        "snippet": "collection: 'codebase_chunks',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/gemma4-agent.ts",
+      "targetKey": "legal_documents",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 102,
+        "snippet": "enum: ['research_summaries', 'legal_documents', 'evidence_items'],",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/gemma4-agent.ts",
+      "targetKey": "evidence_items",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 102,
+        "snippet": "enum: ['research_summaries', 'legal_documents', 'evidence_items'],",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/gemma4-agent.ts",
+      "targetKey": "codebase_chunks_768",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 669,
+        "snippet": "const VALID = ['research_summaries', 'codebase_chunks_768', 'legal_documents', 'evidence_items'] as const;",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/langgraph-research.ts",
+      "targetKey": "codebase_chunks_768",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 200,
+        "snippet": "const COLLECTION  = 'codebase_chunks_768';",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/trace-reranker.ts",
+      "targetKey": "codebase_chunks",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 30,
+        "snippet": "collection: 'codebase_chunks',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/web-research-crawler.test.ts",
+      "targetKey": "legal_canon_chunks",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 83,
+        "snippet": "if (collection === 'legal_canon_chunks') {",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/web-research-crawler.ts",
+      "targetKey": "legal_canon_chunks",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 463,
+        "snippet": "{ alias: 'legal_canon_chunks', label: 'Legal Canon' },",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/web-research-crawler.ts",
+      "targetKey": "legal_glossary",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 466,
+        "snippet": "{ alias: 'legal_glossary', label: 'Legal Glossary' },",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/cache/cartridge-tensor-bridge.ts",
+      "targetKey": "evidence_items",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 187,
+        "snippet": "collections: ['evidence_items'],",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/config/vector-config.ts",
+      "targetKey": "legal_documents",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 49,
+        "snippet": "documents: 'legal_documents',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/config/vector-config.ts",
+      "targetKey": "legal_cases",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 50,
+        "snippet": "cases: 'legal_cases',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/config/vector-config.ts",
+      "targetKey": "evidence_items",
+      "relationType": "QUERIES_QDRANT_COLLECTION",
+      "confidence": 0.93,
+      "evidence": {
+        "line": 51,
+        "snippet": "evidence: 'evidence_items',",
+        "matchKind": "literal"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ace/context-assembler.ts",
+      "targetKey": "Case",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 2319,
+        "snippet": "`MATCH (c:Case {id: $caseId})-[r]-(n)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/code-intel-service.ts",
+      "targetKey": "File",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 88,
+        "snippet": "OPTIONAL MATCH (rn)-[:REFERENCES]->(f:File)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/code-intel-service.ts",
+      "targetKey": "Cluster",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 89,
+        "snippet": "OPTIONAL MATCH (rn)-[:EVIDENCE_FOR]->(c:Cluster)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/hypergraph-store.ts",
+      "targetKey": "File",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 92,
+        "snippet": "MERGE (f:File {path: $filePath})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/ai/mcp-tool-dispatch.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 174,
+        "snippet": "(a:CodebaseFile {filePath: $src})-[*]-(b:CodebaseFile {filePath: $tgt})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/architectural-guard.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 29,
+        "snippet": "`MATCH (f:CodebaseFile {filePath: $filePath})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/analytics/research-graph-rl.ts",
+      "targetKey": "ResearchSummary",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 258,
+        "snippet": "MERGE (n:ResearchSummary { id: row.id })",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/couchdb/memory-mirror.ts",
+      "targetKey": "Cluster",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 98,
+        "snippet": "MERGE (c:Cluster {stableKey: ck})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/embedding/embed-schema.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 200,
+        "snippet": "*   `MATCH (a:CodebaseFile)-[:${NEO4J_REL.IMPORTS}]->(b:CodebaseFile)`",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/codebase-cluster-detection.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 187,
+        "snippet": "MATCH (f:CodebaseFile {id: row.id})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/codebase-neo4j-sync.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 78,
+        "snippet": "MERGE (f:CodebaseFile {id: node.id})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/codebase-neo4j-sync.ts",
+      "targetKey": "Component",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 199,
+        "snippet": "MATCH (b:Component {id: edge.target})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/codebase-neo4j-sync.ts",
+      "targetKey": "Store",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 213,
+        "snippet": "MATCH (b:Store {id: edge.target})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/community-graph.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 198,
+        "snippet": "MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/evidence-graph-service.ts",
+      "targetKey": "Evidence",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 28,
+        "snippet": "await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (e:Evidence) REQUIRE e.id IS UNIQUE');",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/evidence-graph-service.ts",
+      "targetKey": "Case",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 29,
+        "snippet": "await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (c:Case) REQUIRE c.id IS UNIQUE');",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/gpu-graph-analysis.ts",
+      "targetKey": "Case",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 154,
+        "snippet": "? `MATCH (c:Case {id: $caseId})-[r*1..2]-(n)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/graph-centrality.ts",
+      "targetKey": "Case",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 66,
+        "snippet": "`MATCH (source:Case {id: $caseId})-[r1]-(neighbor)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/hypergraph-4d.ts",
+      "targetKey": "File",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 708,
+        "snippet": "`MERGE (f:File { id: $id })",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/hypergraph-4d.ts",
+      "targetKey": "Cluster",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 728,
+        "snippet": "`MERGE (cl:Cluster { hash: $hash })",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/missing-import-recommendations.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 169,
+        "snippet": "`MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/neo4j-gds.ts",
+      "targetKey": "File",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 841,
+        "snippet": "* D27 gate: MATCH (f:File) WHERE NOT (f)-[:CLASSIFIED_AS]->() RETURN count(f)",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/neo4j-schema.ts",
+      "targetKey": "Case",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 26,
+        "snippet": "await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (c:Case) REQUIRE c.id IS UNIQUE');",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/neo4j-schema.ts",
+      "targetKey": "Evidence",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 27,
+        "snippet": "await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (e:Evidence) REQUIRE e.id IS UNIQUE');",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/neo4j-schema.ts",
+      "targetKey": "Statute",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 28,
+        "snippet": "await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (s:Statute) REQUIRE s.code IS UNIQUE');",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/neo4j-schema.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 36,
+        "snippet": "'CREATE CONSTRAINT IF NOT EXISTS FOR (f:CodebaseFile) REQUIRE f.id IS UNIQUE'",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/pg-neo4j-sync.ts",
+      "targetKey": "Case",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 48,
+        "snippet": "`MERGE (c:Case {id: $id})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/pg-neo4j-sync.ts",
+      "targetKey": "Evidence",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 99,
+        "snippet": "`MERGE (e:Evidence {id: $id})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/pg-neo4j-sync.ts",
+      "targetKey": "Statute",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 126,
+        "snippet": "`MERGE (s:Statute {code: $code})",
+        "matchKind": "regex"
+      }
+    },
+    {
+      "sourceFile": "lib/server/graph/som-topology-pipeline.ts",
+      "targetKey": "CodebaseFile",
+      "relationType": "QUERIES_NEO4J_LABEL",
+      "confidence": 0.91,
+      "evidence": {
+        "line": 267,
+        "snippet": "MATCH (a:CodebaseFile) WHERE a.filePath = pair.a OR a.file_path = pair.a",
+        "matchKind": "regex"
+      }
+    }
+  ]
+}

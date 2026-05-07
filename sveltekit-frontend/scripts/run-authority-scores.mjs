@@ -20,7 +20,8 @@
  *   NEO4J_PASSWORD   — default deeds123
  */
 
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -159,3 +160,29 @@ while (true) {
 
 const dur = Date.now() - t0;
 console.log(`[authority] ✓ Mirrored ${mirrored} authority scores in ${dur}ms`);
+
+// ── 4. Write authority_scores.json artifact ───────────────────────────────────
+
+const nowStr = new Date().toISOString();
+const runId  = nowStr.slice(0, 19).replace(/[:T]/g, '-');
+const runDir = join(resolve(__dirname, '..', 'memory', 'runs'), runId);
+
+try {
+  mkdirSync(runDir, { recursive: true });
+  const artifact = {
+    runId,
+    writtenAt:     nowStr,
+    nodesScored:   nodes.length,
+    nodesMirrored: mirrored,
+    durationMs:    dur,
+    collection:    COLLECTION,
+    neo4jUri:      NEO4J_URI,
+    qdrantUrl:     QDRANT_URL,
+    topScores:     [...scoreMap.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([stableKey, score]) => ({ stableKey, score })),
+  };
+  writeFileSync(join(runDir, 'authority_scores.json'), JSON.stringify(artifact, null, 2));
+  console.log(`[authority] Artifact → memory/runs/${runId}/authority_scores.json`);
+} catch { /* non-fatal */ }

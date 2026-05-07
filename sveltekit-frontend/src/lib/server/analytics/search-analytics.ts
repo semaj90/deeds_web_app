@@ -393,7 +393,7 @@ export async function getDidYouMeanSuggestions(
 	suggestion:   string;
 	similarity:   number;
 	hitCount:     number;
-	source:       'redis' | 'pg' | 'qlora';
+	source:       'redis' | 'pg' | 'qlora' | 'engram';
 	qualityTier?: string;
 }>> {
 	const temp   = Math.max(0, Math.min(1, temperature));
@@ -403,7 +403,7 @@ export async function getDidYouMeanSuggestions(
 		suggestion:   string;
 		similarity:   number;
 		hitCount:     number;
-		source:       'redis' | 'pg' | 'qlora';
+		source:       'redis' | 'pg' | 'qlora' | 'engram';
 		qualityTier?: string;
 	}> = [];
 
@@ -461,7 +461,34 @@ export async function getDidYouMeanSuggestions(
 		}
 	} catch { /* pg_trgm may not be installed */ }
 
-	// ── 3. QLoRA oracle — cosine similarity on gold/silver training examples ──
+	// ── 3. Engram — bigram co-occurrence + SOM spatial neighbors ────────────────
+	try {
+		const { getEngramSuggestions } = await import('$lib/server/search/engram-bigram.js');
+		const bigramHits = await getEngramSuggestions(query, limit);
+		for (const e of bigramHits) {
+			results.push({
+				suggestion: e.suggestion,
+				similarity: e.score,
+				hitCount:   e.hitCount,
+				source:     'engram',
+			});
+		}
+	} catch { /* non-fatal */ }
+	try {
+		const { getDidYouMeanFromEngram } = await import('$lib/server/ai/engram-memory.js');
+		const redis = getRedis();
+		const engramHits = await getDidYouMeanFromEngram(redis, query, limit);
+		for (const e of engramHits) {
+			results.push({
+				suggestion: e.suggestion,
+				similarity: 0.85,
+				hitCount:   e.hitCount,
+				source:     'engram',
+			});
+		}
+	} catch { /* non-fatal */ }
+
+	// ── 4. QLoRA oracle — cosine similarity on gold/silver training examples ──
 	// Run in parallel with above when we still need more candidates
 	try {
 		const qloraSuggestions = await getQloraSmartSuggestions(query, temperature, limit);

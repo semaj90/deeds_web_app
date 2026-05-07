@@ -256,6 +256,7 @@
 		{ href: '/admin/kag-notebook', label: 'KAG Notebook', icon: 'notebook-pen', desc: 'Knowledge notebook' },
 		{ href: '/admin/all-routes', label: 'All Routes', icon: 'route', desc: 'Route health ops' },
 		{ href: '/admin/face-gallery', label: 'Face Gallery', icon: 'scan-face', desc: 'POI face matching + GRPO reranker + QLoRA synths' },
+		{ href: '/admin/observability', label: 'Observability', icon: 'activity', desc: 'Graph/search/ACE spine health' },
 	];
 </script>
 

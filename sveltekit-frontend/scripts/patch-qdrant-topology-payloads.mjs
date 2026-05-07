@@ -4,6 +4,7 @@
  * Reads tensor_analysis_cache from Postgres and patches every matching
  * Qdrant point in codebase_chunks_768 with:
  *   topo_byte, topo_hex, topo_class, manifold4, graphAuthorityScore
+ *   som_cluster, gpu_cluster   ← added: from codebase_chunk_index
  *
  * Usage:
  *   node scripts/patch-qdrant-topology-payloads.mjs
@@ -24,11 +25,12 @@ const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768'
 const DB_URL            = process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
 
 async function main() {
-  console.log(`📦 Patch Qdrant topology payloads${DRY_RUN ? ' [DRY RUN]' : ''} (limit ${LIMIT})`);
+  console.log(`📦 Patch Qdrant topology + cluster payloads${DRY_RUN ? ' [DRY RUN]' : ''} (limit ${LIMIT})`);
 
   const pool = new pg.Pool({ connectionString: DB_URL });
 
-  // 1. Load from tensor_analysis_cache
+  // ── 1. Topology fields from tensor_analysis_cache ────────────────────────────
+
   const { rows: cacheRows } = await pool.query(
     `SELECT stable_key, topo_byte, topo_hex, topo_class,
             manifold4_x, manifold4_y, manifold4_z, manifold4_w,
@@ -45,12 +47,9 @@ async function main() {
     return;
   }
 
-  // Build two lookup maps:
-  // 1. stable_key (payload field) → topology payload
-  // 2. qdrant point ID (from "qdrant:<id>" sentinel keys) → topology payload
   /** @type {Map<string, Record<string,unknown>>} */
   const payloadByStableKey = new Map();
-  /** @type {Map<string|number, Record<string,unknown>>} */
+  /** @type {Map<string, Record<string,unknown>>} */
   const payloadByQdrantId  = new Map();
 
   for (const r of cacheRows) {
@@ -62,17 +61,50 @@ async function main() {
       graphAuthorityScore: r.graph_authority_score,
     };
     if (r.stable_key.startsWith('qdrant:')) {
-      payloadByQdrantId.set(r.stable_key.slice(7), p);  // e.g. "8303"
+      payloadByQdrantId.set(r.stable_key.slice(7), p);
     } else {
       payloadByStableKey.set(r.stable_key, p);
     }
   }
 
-  console.log(`  Loaded ${cacheRows.length} cache entries (${payloadByStableKey.size} by stableKey, ${payloadByQdrantId.size} by qdrantId)`);
+  console.log(`  Topology: ${cacheRows.length} cache entries (${payloadByStableKey.size} by stableKey, ${payloadByQdrantId.size} by qdrantId)`);
 
-  // 2. Scroll Qdrant and patch matching points
+  // ── 2. Cluster fields from codebase_chunk_index ───────────────────────────────
+  // Maps Qdrant numeric point ID → { som_cluster, gpu_cluster }
+
+  const { rows: clusterRows } = await pool.query(
+    `SELECT cci.qdrant_id, cci.gpu_cluster, cci.som_cluster, cci.som_bmu_row, cci.som_bmu_col,
+            tac.topo_class
+     FROM codebase_chunk_index cci
+     LEFT JOIN tensor_analysis_cache tac ON tac.stable_key = cci.relative_path
+     WHERE cci.qdrant_id IS NOT NULL
+       AND (cci.gpu_cluster IS NOT NULL OR cci.som_cluster IS NOT NULL)
+     LIMIT $1`,
+    [LIMIT]
+  ).catch(() => ({ rows: [] }));
+
+  /** @type {Map<string, {som_cluster:number|null, gpu_cluster:number|null, som_bmu_row:number|null, som_bmu_col:number|null, glyph_cluster:string}>} */
+  const clusterByQdrantId = new Map();
+  for (const r of clusterRows) {
+    // glyph_cluster: deterministic label used by the glyph_cluster retrieval lane.
+    // Format: "<topo_class>:<som_cluster>" — both sourced from codebase_chunk_index.
+    // Populated here so the lane has payload backing without needing a live GPU run.
+    const glyphCluster = `${r.topo_class ?? 'unknown'}:${r.som_cluster ?? 'na'}`;
+    clusterByQdrantId.set(String(r.qdrant_id), {
+      som_cluster:   r.som_cluster,
+      gpu_cluster:   r.gpu_cluster,
+      som_bmu_row:   r.som_bmu_row,
+      som_bmu_col:   r.som_bmu_col,
+      glyph_cluster: glyphCluster,
+    });
+  }
+
+  console.log(`  Clusters: ${clusterRows.length} rows with gpu_cluster / som_cluster / glyph_cluster`);
+
+  // ── 3. Scroll Qdrant and patch matching points ────────────────────────────────
+
   let offset = null;
-  let patched = 0, missed = 0;
+  let patched = 0, missed = 0, clusterPatched = 0;
 
   while (patched + missed < LIMIT) {
     const r = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
@@ -87,11 +119,31 @@ async function main() {
 
     const patches = pts
       .map(pt => {
+        const ptId = String(pt.id);
         const byKey = payloadByStableKey.get(pt.payload?.stable_key);
-        if (byKey) return { id: pt.id, payload: byKey };
-        const byId = payloadByQdrantId.get(String(pt.id));
-        if (byId) return { id: pt.id, payload: byId };
-        return null;
+        const byId  = payloadByQdrantId.get(ptId);
+        const topoPayload = byKey ?? byId ?? null;
+
+        const clusterPayload = clusterByQdrantId.get(ptId) ?? null;
+
+        if (!topoPayload && !clusterPayload) return null;
+
+        const merged = { ...(topoPayload ?? {}), ...(clusterPayload ?? {}) };
+
+        // Derive glyph_cluster from topo_class + som_cluster (deterministic label)
+        const topoClass   = merged.topo_class   ?? null;
+        const somCluster  = merged.som_cluster   ?? null;
+        if (topoClass !== null || somCluster !== null) {
+          merged.glyph_cluster = `${topoClass ?? 'unknown'}:${somCluster ?? 'na'}`;
+        }
+
+        // Strip nulls — don't overwrite existing payload with null
+        for (const k of Object.keys(merged)) {
+          if (merged[k] === null || merged[k] === undefined) delete merged[k];
+        }
+
+        if (clusterPayload) clusterPatched++;
+        return { id: pt.id, payload: merged };
       })
       .filter(Boolean);
 
@@ -108,13 +160,14 @@ async function main() {
     }
 
     patched += patches.length;
-    process.stdout.write(`\r  Patched: ${patched}  Missed: ${missed}    `);
+    process.stdout.write(`\r  Patched: ${patched}  Missed: ${missed}  (${clusterPatched} with cluster)    `);
 
     offset = d.result?.next_page_offset ?? null;
     if (!offset || pts.length < BATCH) break;
   }
 
   console.log(`\n\n✅ Done — patched ${patched} points${DRY_RUN ? ' (dry — no writes)' : ''}, ${missed} had no cache entry`);
+  console.log(`   ${clusterPatched} points received som_cluster/gpu_cluster/glyph_cluster fields`);
   await pool.end();
 }
 
