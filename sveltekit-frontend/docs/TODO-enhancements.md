@@ -1,7 +1,12 @@
 # TODO — Codebase Enhancement Synthesis
 
-> Generated: 2026-05-06T23:56:13Z from 1159 directories, 30 hotspot files
+> Generated: 2026-05-07T22:55:34Z from 12 directories, 0 hotspot files
 > Source: Redis ACE hits (code:graph:node:* + code:graph:hotspot:*) + 55-gate audit system
+
+> ⚠️ **Data stale** — Redis has only 30 node entries (expect ≥3000 after `graphify:full`). Sections 1 and 2 below may be sparse or empty.
+> Run: `npm run graphify:full && npm run agents:enrich` to repopulate (5-10 min GPU).
+
+- [ ] **data:refresh** `npm run graphify:full && npm run agents:enrich` — last enriched 2026-05-07T22:55:34Z with 30 nodes / 0 hotspots (full graph has ≥3000 files)
 
 ## 1. Critical Hotspots (High Fan-In → High Risk)
 
@@ -10,68 +15,12 @@ Files with the most dependents — changes here cascade widely. Each needs:
 
 | File | Fan-In | Zone | Action |
 |------|--------|------|--------|
-| `src/lib/server/db/client.ts` | 484 | server | ⚠️ CRITICAL — consider dependency inversion + interface extraction |
-| `src/lib/server/env.server.ts` | 336 | server | ⚠️ CRITICAL — consider dependency inversion + interface extraction |
-| `src/lib/components/ui/Icon.svelte` | 252 | client | ⚠️ CRITICAL — consider dependency inversion + interface extraction |
-| `src/lib/server/redis.ts` | 237 | server | ⚠️ CRITICAL — consider dependency inversion + interface extraction |
-| `src/lib/server/db/schema-postgres.ts` | 192 | server | 🟠 HIGH — add paired test + change guard |
-| `src/lib/server/ollama.ts` | 170 | server | 🟠 HIGH — add paired test + change guard |
-| `src/lib/server/middleware/cache-headers.ts` | 112 | server | 🟠 HIGH — add paired test + change guard |
-| `src/lib/server/db/schema.ts` | 97 | server | 🟠 HIGH — add paired test + change guard |
-| `src/lib/server/validation.ts` | 93 | server | 🟠 HIGH — add paired test + change guard |
-| `src/lib/components/ui/Button.svelte` | 89 | client | 🟠 HIGH — add paired test + change guard |
-| `src/lib/server/grpc/embedding-client.ts` | 88 | server | 🟠 HIGH — add paired test + change guard |
-| `src/lib/server/vector/qdrant-manager.ts` | 71 | server | 🟠 HIGH — add paired test + change guard |
-| `src/lib/server/observability/langfuse.ts` | 45 | server | 🟡 MODERATE — add paired test |
-| `src/lib/server/gpu/libtorch-bridge.ts` | 45 | server | 🟡 MODERATE — add paired test |
-| `src/lib/server/analytics/search-analytics.ts` | 39 | server | 🟡 MODERATE — add paired test |
-| `src/lib/server/gpu/simdjson-bridge.ts` | 37 | server | 🟡 MODERATE — add paired test |
-| `src/lib/server/neo4j-driver.ts` | 32 | server | 🟡 MODERATE — add paired test |
-| `src/lib/ai/model-ids.ts` | 30 | client | 🟡 MODERATE — add paired test |
-| `src/lib/server/ai/code-intel-service.ts` | 29 | server | 🟡 MODERATE — add paired test |
-| `src/lib/server/ace/context-assembler.ts` | 29 | server | 🟡 MODERATE — add paired test |
-| `src/lib/server/queue/rabbitmq-manager-fixed.ts` | 28 | server | 🟡 MODERATE — add paired test |
-| `src/lib/types/enhanced-svelte5-types.ts` | 27 | types | 🟡 MODERATE — add paired test |
-| `src/lib/services/couchdb-client.ts` | 26 | client | 🟡 MODERATE — add paired test |
-| `src/routes/api/sse/chat/+server.ts` | 21 | route | 🟡 MODERATE — add paired test |
-| `src/lib/server/cache.ts` | 20 | server | 🟡 MODERATE — add paired test |
-| `tests/helpers/env-ports.ts` | 19 | test | 🟡 MODERATE — add paired test |
-| `src/lib/server/queue/dispatch-inline.ts` | 18 | server | 🟡 MODERATE — add paired test |
-| `src/lib/server/ai/compact-budgets.ts` | 18 | server | 🟡 MODERATE — add paired test |
-| `src/lib/components/ui/card/Card.svelte` | 18 | client | 🟡 MODERATE — add paired test |
-| `src/lib/server/cache/code-llm-index.ts` | 17 | server | 🟡 MODERATE — add paired test |
 
 ## 2. Test Coverage Gaps (fanIn ≥ 15, no paired test)
 
 > G26 compliance: every high-fanIn server file needs a test in `tests/routes/auto/`
 > Pattern: `@vitest-environment node` + `vi.hoisted` + lazy `beforeEach` import + 401/400/200/degraded cases
 
-- [ ] `src/lib/server/db/client.ts` (fanIn=484)
-- [ ] `src/lib/server/env.server.ts` (fanIn=336)
-- [ ] `src/lib/server/redis.ts` (fanIn=237)
-- [ ] `src/lib/server/db/schema-postgres.ts` (fanIn=192)
-- [ ] `src/lib/server/ollama.ts` (fanIn=170)
-- [ ] `src/lib/server/middleware/cache-headers.ts` (fanIn=112)
-- [ ] `src/lib/server/db/schema.ts` (fanIn=97)
-- [ ] `src/lib/server/validation.ts` (fanIn=93)
-- [ ] `src/lib/server/grpc/embedding-client.ts` (fanIn=88)
-- [ ] `src/lib/server/vector/qdrant-manager.ts` (fanIn=71)
-- [ ] `src/lib/server/observability/langfuse.ts` (fanIn=45)
-- [ ] `src/lib/server/gpu/libtorch-bridge.ts` (fanIn=45)
-- [ ] `src/lib/server/analytics/search-analytics.ts` (fanIn=39)
-- [ ] `src/lib/server/gpu/simdjson-bridge.ts` (fanIn=37)
-- [ ] `src/lib/server/neo4j-driver.ts` (fanIn=32)
-- [ ] `src/lib/server/ai/code-intel-service.ts` (fanIn=29)
-- [ ] `src/lib/server/ace/context-assembler.ts` (fanIn=29)
-- [ ] `src/lib/server/queue/rabbitmq-manager-fixed.ts` (fanIn=28)
-- [ ] `src/routes/api/sse/chat/+server.ts` (fanIn=21)
-- [ ] `src/lib/server/cache.ts` (fanIn=20)
-- [ ] `src/lib/server/ai/compact-budgets.ts` (fanIn=18)
-- [ ] `src/lib/server/queue/dispatch-inline.ts` (fanIn=18)
-- [ ] `src/lib/server/cache/code-llm-index.ts` (fanIn=17)
-- [ ] `src/lib/server/minio-client.ts` (fanIn=16)
-- [ ] `src/lib/server/retrieval/graph-context.ts` (fanIn=16)
-- [ ] `src/lib/server/ace/chat-memory.ts` (fanIn=15)
 
 ## 3. Audit Gate Violations to Address
 

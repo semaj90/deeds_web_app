@@ -308,13 +308,24 @@ function buildTodoSection(relDir, dirStats) {
 }
 
 // ── Master TODO synthesis ─────────────────────────────────────────────────────
-function buildMasterTodo(dirStats, hotspots) {
+function buildMasterTodo(dirStats, hotspots, totalNodes) {
   const lines = [];
+  const ts = new Date().toISOString().slice(0, 19) + 'Z';
   lines.push('# TODO — Codebase Enhancement Synthesis');
   lines.push('');
-  lines.push(`> Generated: ${new Date().toISOString().slice(0,19)}Z from ${dirStats.size} directories, ${hotspots.length} hotspot files`);
+  lines.push(`> Generated: ${ts} from ${dirStats.size} directories, ${hotspots.length} hotspot files`);
   lines.push('> Source: Redis ACE hits (code:graph:node:* + code:graph:hotspot:*) + 55-gate audit system');
   lines.push('');
+
+  // ── Data freshness warning ────────────────────────────────────────────────
+  const FULL_GRAPH_TARGET = 3000;  // expected node count after graphify:full
+  if (totalNodes < FULL_GRAPH_TARGET) {
+    lines.push('> ⚠️ **Data stale** — Redis has only ' + totalNodes + ' node entries (expect ≥' + FULL_GRAPH_TARGET + ' after `graphify:full`). Sections 1 and 2 below may be sparse or empty.');
+    lines.push('> Run: `npm run graphify:full && npm run agents:enrich` to repopulate (5-10 min GPU).');
+    lines.push('');
+    lines.push('- [ ] **data:refresh** `npm run graphify:full && npm run agents:enrich` — last enriched ' + ts + ' with ' + totalNodes + ' nodes / ' + hotspots.length + ' hotspots (full graph has ≥' + FULL_GRAPH_TARGET + ' files)');
+    lines.push('');
+  }
 
   // ── Section 1: Critical Hotspots ──────────────────────────────────────────
   lines.push('## 1. Critical Hotspots (High Fan-In → High Risk)');
@@ -584,7 +595,7 @@ console.log(`  updated: ${updated} / ${agentsMdFiles.length}`);
 // ── Write master TODO ─────────────────────────────────────────────────────────
 const todoPath = join(ROOT, 'docs', 'TODO-enhancements.md');
 mkdirSync(dirname(todoPath), { recursive: true });
-const masterTodo = buildMasterTodo(dirStats, hotspots);
+const masterTodo = buildMasterTodo(dirStats, hotspots, nodes.length);
 if (!DRY_RUN) {
   writeFileSync(todoPath, masterTodo, 'utf8');
   console.log(`\n  ✓ Wrote docs/TODO-enhancements.md (${masterTodo.length.toLocaleString()} chars)`);
