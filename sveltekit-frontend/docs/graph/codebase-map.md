@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-07T19:20:15.752Z
+> Generated: 2026-05-07T20:42:50.209Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,7 +8,7 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 3652 |
+| Files scanned | 3653 |
 | Directories analysed | 388 |
 | Route files | 944 |
 | Svelte components | 864 |
@@ -17,10 +17,10 @@
 | API routes without Zod | 1 |
 | SSR-unsafe files | 1 |
 | Svelte 4 legacy patterns | 0 |
-| Hardcoded localhost refs | 54 |
+| Hardcoded localhost refs | 43 |
 | Routes without test pairing | 17 |
 | Cyclic import pairs | 0 |
-| Drizzle table refs | 426 |
+| Drizzle table refs | 427 |
 | TODO/FIXME markers | 16 |
 
 ---
@@ -31,13 +31,13 @@
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 691 | 32 |
 | G5  | Zod validation on API routes | 495 | 1 |
-| G11 | No hardcoded localhost (excl env.server) | 3598 | 54 |
-| G14a | No `export let` (Svelte 4 props) | 3652 | 0 |
-| G14b | No `$:` reactive declarations | 3652 | 0 |
-| G14c | No `on:event=` directives | 3652 | 0 |
-| G14d | No `createEventDispatcher()` | 3652 | 0 |
-| G14e | No runes in plain `.ts` files | 3652 | 0 |
-| G15 | No SSR-unsafe globals (unguarded) | 3651 | 1 |
+| G11 | No hardcoded localhost (excl env.server) | 3610 | 43 |
+| G14a | No `export let` (Svelte 4 props) | 3653 | 0 |
+| G14b | No `$:` reactive declarations | 3653 | 0 |
+| G14c | No `on:event=` directives | 3653 | 0 |
+| G14d | No `createEventDispatcher()` | 3653 | 0 |
+| G14e | No runes in plain `.ts` files | 3653 | 0 |
+| G15 | No SSR-unsafe globals (unguarded) | 3652 | 1 |
 | G16 | Server routes have test pairing | 642 | 17 |
 | G17 | Server routes have error handling | 633 | 90 |
 | G20 | Cyclic import pairs | — | 0 |
@@ -88,10 +88,8 @@
 | ✅ | `src/lib/config` | 85 | 8 | 1504 | 0 | 1/1 | 0 | 🟠lh |
 | ✅ | `src/lib/gpu` | 85 | 17 | 4763 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `src/lib/machines` | 85 | 11 | 4068 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `src/lib/server/chrrom` | 85 | 3 | 412 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `src/lib/server/clients` | 85 | 1 | 17 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `src/lib/server/env` | 85 | 1 | 14 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `src/lib/server/grpc` | 85 | 10 | 4250 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `src/lib/server/helpers` | 85 | 2 | 330 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `src/lib/services/error-analysis` | 85 | 17 | 4788 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `src/lib/utils` | 85 | 42 | 7082 | 0 | 2/7 | 0 | 🟠lh |
@@ -181,28 +179,30 @@
 | ✅ | `src/lib/server/api` | 90 | 1 | 195 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/ast` | 90 | 1 | 313 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/auth` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/cache` | 90 | 13 | 4369 | 0 | 0/9 | 0 | — |
+| ✅ | `src/lib/server/cache` | 90 | 13 | 4370 | 0 | 0/9 | 0 | — |
 | ✅ | `src/lib/server/cartridge` | 90 | 5 | 1614 | 0 | 0/2 | 0 | — |
-| ✅ | `src/lib/server/config` | 90 | 4 | 701 | 0 | 0/1 | 0 | — |
-| ✅ | `src/lib/server/connections` | 90 | 1 | 346 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/couchdb` | 90 | 3 | 521 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/chrrom` | 90 | 3 | 408 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/config` | 90 | 5 | 743 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/connections` | 90 | 1 | 347 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/couchdb` | 90 | 3 | 524 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/data` | 90 | 2 | 459 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/ff1` | 90 | 9 | 1817 | 0 | 0/5 | 0 | — |
+| ✅ | `src/lib/server/ff1` | 90 | 9 | 1821 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/glyph` | 90 | 2 | 170 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/hypergraph` | 90 | 5 | 957 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/grpc` | 90 | 10 | 4251 | 0 | 0/4 | 0 | — |
+| ✅ | `src/lib/server/hypergraph` | 90 | 5 | 959 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/image` | 90 | 1 | 88 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/inference` | 90 | 4 | 2102 | 0 | 0/4 | 0 | — |
 | ✅ | `src/lib/server/init` | 90 | 1 | 105 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/integrations` | 90 | 1 | 279 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/kb` | 90 | 2 | 143 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/langextract` | 90 | 3 | 565 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/langextract` | 90 | 3 | 566 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/legal` | 90 | 7 | 2644 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/mcp` | 90 | 4 | 749 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/memory` | 90 | 1 | 154 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/minio` | 90 | 2 | 321 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/minio` | 90 | 2 | 320 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/nlp` | 90 | 1 | 140 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/notifications` | 90 | 1 | 210 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/observability` | 90 | 3 | 1041 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/observability` | 90 | 3 | 1042 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/obsidian` | 90 | 2 | 384 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/ocr` | 90 | 3 | 392 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/optimize` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
@@ -215,7 +215,7 @@
 | ✅ | `src/lib/server/rag` | 90 | 7 | 535 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/rate-limit` | 90 | 2 | 318 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/redis` | 90 | 1 | 26 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/search` | 90 | 12 | 2096 | 0 | 0/2 | 0 | — |
+| ✅ | `src/lib/server/search` | 90 | 12 | 2100 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/security` | 90 | 1 | 131 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/services` | 90 | 2 | 724 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/simulation` | 90 | 2 | 477 | 0 | 0/1 | 0 | — |
@@ -225,7 +225,7 @@
 | ✅ | `src/lib/server/tools` | 90 | 9 | 1508 | 0 | 0/3 | 0 | — |
 | ✅ | `src/lib/server/topology` | 90 | 1 | 329 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/training` | 90 | 1 | 111 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/utils` | 90 | 13 | 930 | 0 | 0/2 | 0 | — |
+| ✅ | `src/lib/server/utils` | 90 | 13 | 926 | 0 | 0/2 | 0 | — |
 | ✅ | `src/lib/server/validation` | 90 | 2 | 402 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/shared` | 90 | 3 | 284 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/shared/schemas` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
@@ -338,13 +338,8 @@
 | ✅ | `src/routes/api/stream` | 93 | 2 | 102 | 2 | 2/1 | 0 | — |
 | ✅ | `src/routes/api/ai` | 94 | 30 | 3087 | 30 | 30/28 | 0 | 🟠lh |
 | ✅ | `src/routes/api/library` | 94 | 21 | 2860 | 21 | 21/12 | 0 | — |
-| ✅ | `src/lib/server/agent` | 95 | 11 | 4178 | 0 | 0/8 | 0 | 🟠lh |
-| ✅ | `src/lib/server/ai` | 95 | 41 | 11688 | 0 | 2/15 | 0 | 🟠lh |
-| ✅ | `src/lib/server/db` | 95 | 111 | 18077 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `src/lib/server/gpu` | 95 | 11 | 4321 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `src/lib/server/graph` | 95 | 21 | 9682 | 0 | 1/7 | 0 | 🟠lh |
-| ✅ | `src/lib/server/ml` | 95 | 8 | 2973 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `src/lib/server/vector` | 95 | 10 | 2839 | 0 | 0/1 | 0 | 🟠lh |
+| ✅ | `src/lib/server/ai` | 95 | 41 | 11690 | 0 | 2/15 | 0 | 🟠lh |
+| ✅ | `src/lib/server/gpu` | 95 | 11 | 4322 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `src/lib/services` | 95 | 8 | 9875 | 0 | 0/3 | 0 | 🟠lh |
 | ✅ | `src/lib/services/knowledge-search` | 95 | 11 | 3966 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `src/mcp` | 95 | 4 | 7383 | 0 | 1/7 | 0 | 🟠lh |
@@ -364,36 +359,41 @@
 | ✅ | `src/routes/api/reports` | 98 | 9 | 2311 | 9 | 9/8 | 0 | — |
 | ✅ | `src/routes/api/routes` | 98 | 9 | 1005 | 9 | 9/8 | 0 | — |
 | ✅ | `src/routes/api/v1` | 99 | 19 | 1584 | 19 | 19/18 | 0 | — |
-| ✅ | `src/lib` | 100 | 11 | 398066 | 3 | 12/251 | 9 | 🔴ssr 🟠lh |
+| ✅ | `src/lib` | 100 | 11 | 398136 | 3 | 12/251 | 9 | 🔴ssr 🟠lh |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server` | 100 | 62 | 160922 | 3 | 9/162 | 0 | 🟠lh |
-| ✅ | `src/lib/server/ace` | 100 | 30 | 11438 | 0 | 0/15 | 0 | — |
+| ✅ | `src/lib/server` | 100 | 62 | 160992 | 3 | 9/162 | 0 | 🟠lh |
+| ✅ | `src/lib/server/ace` | 100 | 30 | 11425 | 0 | 0/15 | 0 | — |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 638 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/agent` | 100 | 11 | 4178 | 0 | 0/8 | 0 | — |
 | ✅ | `src/lib/server/agents` | 100 | 4 | 316 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/analysis` | 100 | 12 | 2988 | 0 | 0/4 | 0 | — |
-| ✅ | `src/lib/server/analytics` | 100 | 15 | 6780 | 0 | 0/10 | 0 | — |
+| ✅ | `src/lib/server/analytics` | 100 | 15 | 6781 | 0 | 0/10 | 0 | — |
 | ✅ | `src/lib/server/audit` | 100 | 4 | 1415 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/cases` | 100 | 1 | 189 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/codeintel` | 100 | 1 | 498 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/concurrency` | 100 | 3 | 741 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/db` | 100 | 111 | 18075 | 0 | 0/4 | 0 | — |
 | ✅ | `src/lib/server/embedding` | 100 | 9 | 1122 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/engagement` | 100 | 1 | 367 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/error-brain` | 100 | 11 | 1156 | 0 | 1/2 | 0 | — |
-| ✅ | `src/lib/server/evidence` | 100 | 15 | 1229 | 0 | 0/2 | 0 | — |
+| ✅ | `src/lib/server/error-brain` | 100 | 11 | 1157 | 0 | 1/2 | 0 | — |
+| ✅ | `src/lib/server/evidence` | 100 | 15 | 1230 | 0 | 0/2 | 0 | — |
+| ✅ | `src/lib/server/graph` | 100 | 21 | 9683 | 0 | 1/7 | 0 | — |
 | ✅ | `src/lib/server/indexer` | 100 | 23 | 6805 | 1 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/llm` | 100 | 6 | 1643 | 0 | 0/2 | 0 | — |
-| ✅ | `src/lib/server/queue` | 100 | 8 | 3812 | 0 | 0/3 | 0 | — |
+| ✅ | `src/lib/server/ml` | 100 | 8 | 2974 | 0 | 0/0 | 0 | — |
+| ✅ | `src/lib/server/queue` | 100 | 8 | 3813 | 0 | 0/3 | 0 | — |
 | ✅ | `src/lib/server/reports` | 100 | 1 | 112 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/research` | 100 | 16 | 1604 | 0 | 0/3 | 0 | — |
-| ✅ | `src/lib/server/retrieval` | 100 | 28 | 7359 | 0 | 0/5 | 0 | — |
+| ✅ | `src/lib/server/retrieval` | 100 | 28 | 7360 | 0 | 0/5 | 0 | — |
 | ✅ | `src/lib/server/tensor` | 100 | 2 | 461 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/trace` | 100 | 1 | 344 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/types` | 100 | 10 | 1109 | 0 | 0/0 | 0 | — |
 | ✅ | `src/lib/server/unified` | 100 | 1 | 284 | 0 | 0/0 | 0 | — |
-| ✅ | `src/lib/server/wiki` | 100 | 7 | 1940 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/vector` | 100 | 10 | 2840 | 0 | 0/1 | 0 | — |
+| ✅ | `src/lib/server/wiki` | 100 | 7 | 1942 | 0 | 0/1 | 0 | — |
 | ✅ | `src/lib/server/workers` | 100 | 5 | 1771 | 0 | 0/4 | 0 | — |
 | ✅ | `src/lib/types` | 100 | 52 | 7126 | 0 | 0/3 | 0 | — |
 | ✅ | `src/routes/(app)` | 100 | 2 | 103867 | 4 | 408/40 | 6 | 🟠lh ⬜notest |
@@ -583,7 +583,7 @@ _No Svelte 4 patterns found. ✅_
 
 ---
 
-## G11 — Hardcoded Localhost References (54 files)
+## G11 — Hardcoded Localhost References (43 files)
 - `src/lib/ai/model-ids.ts` · http://127.0.0.1:8070, http://127.0.0.1:8085
 - `src/lib/ai/ollama-config.ts` · http://localhost:11434
 - `src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte` · http://localhost:11434, http://localhost:11434
@@ -595,15 +595,15 @@ _No Svelte 4 patterns found. ✅_
 - `src/lib/config/pgvector-gpu-config.js` · http://localhost:11436, http://localhost:8097
 - `src/lib/gpu/runtime-optimizations.ts` · http://localhost:8098, http://localhost:8097
 - `src/lib/machines/userTypingStateMachine.ts` · http://localhost:3001
-- `src/lib/server/agent/tools/web-search-searxng.ts` · http://localhost:8888
-- `src/lib/server/ai/gemma4-tool-controller.ts` · http://localhost:8788
 - `src/lib/server/ai/llama-tool-definitions.ts` · http://127.0.0.1:8090
-- `src/lib/server/chrrom/patterns.ts` · http://localhost:8094, http://localhost:5174
 - `src/lib/server/clients/ollama.ts` · http://localhost:11434
-- `src/lib/server/config.ts` · http://localhost:4000, http://localhost:8000
-- `src/lib/server/db/mirror-query.ts` · http://localhost:9000
-- `src/lib/server/docling.ts` · http://localhost:8085
 - `src/lib/server/endpoints.ts` · http://localhost:8094
+- `src/lib/server/env/endpoints.ts` · http://localhost:11434
+- `src/lib/server/gpu/mapreduce-worker.mjs` · http://127.0.0.1:11434
+- `src/lib/server/helpers/service-discovery.ts` · http://localhost:9000, http://localhost:11434
+- `src/lib/server/langextract-client.ts` · http://localhost:8095
+- `src/lib/services/error-analysis/MetricsCollector.ts` · http://localhost:6333, http://localhost:7474
+- `src/lib/services/knowledge-search/ACPToolRegistry.ts` · http://localhost:11434, http://localhost:6333
 
 ---
 
@@ -647,8 +647,8 @@ _No Svelte 4 patterns found. ✅_
 ## G19 — Top Module Fan-In (most imported `$lib` paths)
 | Module | Import Count |
 |--------|-------------|
-| `$lib/server/db/client` | 529 |
-| `$lib/server/env.server.js` | 331 |
+| `$lib/server/db/client` | 528 |
+| `$lib/server/env.server.js` | 371 |
 | `$lib/components/ui/Icon.svelte` | 253 |
 | `$lib/server/redis.js` | 234 |
 | `$lib/server/ollama.js` | 168 |
@@ -748,8 +748,8 @@ _No cyclic imports detected. ✅_
 | `@sveltejs/kit` | 706 |
 | `zod` | 496 |
 | `$lib/server/db/client` | 401 |
-| `drizzle-orm` | 323 |
-| `$lib/server/env.server.js` | 300 |
+| `$lib/server/env.server.js` | 340 |
+| `drizzle-orm` | 324 |
 | `$lib/components/ui/Icon.svelte` | 253 |
 | `svelte` | 227 |
 | `$lib/server/redis.js` | 157 |

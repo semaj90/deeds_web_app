@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-05-07T17:03:34.397Z",
+  "generatedAt": "2026-05-07T20:11:25.423Z",
   "sourceGraph": "docs/graph/codebase-graph.json",
   "stats": {
-    "generatedAt": "2026-05-07T17:03:34.397Z",
-    "nodeCount": 3652,
-    "edgeCount": 11890,
-    "resolvedEdges": 7012,
+    "generatedAt": "2026-05-07T20:11:25.423Z",
+    "nodeCount": 3653,
+    "edgeCount": 11926,
+    "resolvedEdges": 7053,
     "unresolvedEdges": 766,
     "externalEdges": 3919,
     "edgeTypeBreakdown": {
-      "imports_static": 5495,
+      "imports_static": 5493,
       "imports_dynamic": 491,
-      "env_dependency": 543,
+      "env_dependency": 581,
       "exports_from": 276,
       "db_dependency": 890,
       "redis_dependency": 383,
@@ -24,7 +24,7 @@
     "zoneBreakdown": {
       "types": 121,
       "client": 956,
-      "server": 643,
+      "server": 644,
       "test": 862,
       "route": 1070
     },
@@ -9170,7 +9170,7 @@
       "lineCount": 15,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 1,
       "directFanOut": 0,
       "hash": "849bb6dd"
     },
@@ -10935,11 +10935,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 364,
+      "lineCount": 365,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 8,
-      "directFanOut": 3,
+      "directFanOut": 4,
       "hash": "0140f528"
     },
     {
@@ -11117,11 +11117,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 350,
+      "lineCount": 351,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 2,
-      "directFanOut": 9,
+      "directFanOut": 10,
       "hash": "6bc108f8"
     },
     {
@@ -11611,11 +11611,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 651,
+      "lineCount": 652,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 41,
-      "directFanOut": 6,
+      "directFanOut": 7,
       "hash": "a78e8b4f"
     },
     {
@@ -11871,11 +11871,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 203,
+      "lineCount": 204,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "5f763508"
     },
     {
@@ -11884,11 +11884,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 931,
+      "lineCount": 932,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 16,
-      "directFanOut": 5,
+      "directFanOut": 6,
       "hash": "b2d91ca4"
     },
     {
@@ -12170,11 +12170,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 208,
+      "lineCount": 209,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 6,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "183541bc"
     },
     {
@@ -12183,7 +12183,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 170,
+      "lineCount": 165,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
@@ -12308,6 +12308,19 @@
       "hash": "997814c6"
     },
     {
+      "rel": "src/lib/server/config/service-urls.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 42,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "62bd1ee8"
+    },
+    {
       "rel": "src/lib/server/config/vector-config.ts",
       "zone": "server",
       "isRoute": false,
@@ -12339,11 +12352,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 346,
+      "lineCount": 347,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 4,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "b1755d54"
     },
     {
@@ -12352,11 +12365,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 167,
+      "lineCount": 168,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 5,
+      "directFanOut": 6,
       "hash": "8e53b418"
     },
     {
@@ -12365,11 +12378,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 206,
+      "lineCount": 207,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "bee17c80"
     },
     {
@@ -12378,11 +12391,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 148,
+      "lineCount": 149,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 3,
+      "directFanOut": 4,
       "hash": "04bd12c6"
     },
     {
@@ -12716,11 +12729,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 85,
+      "lineCount": 86,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "a93bbf60"
     },
     {
@@ -12729,11 +12742,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 39,
+      "lineCount": 40,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "6ea3c0fa"
     },
     {
@@ -13756,11 +13769,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 481,
+      "lineCount": 476,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 4,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "f0a7f0be"
     },
     {
@@ -13886,11 +13899,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 332,
+      "lineCount": 331,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 8,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "b942067a"
     },
     {
@@ -14094,10 +14107,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 218,
+      "lineCount": 244,
       "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 336,
+      "directFanIn": 379,
       "directFanOut": 0,
       "hash": "2cfc0822"
     },
@@ -14224,11 +14237,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 44,
+      "lineCount": 45,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 3,
+      "directFanOut": 4,
       "hash": "88fdca8f"
     },
     {
@@ -14341,11 +14354,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 41,
+      "lineCount": 42,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 2,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "12ebb092"
     },
     {
@@ -14471,11 +14484,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 259,
+      "lineCount": 260,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "1d620bb0"
     },
     {
@@ -14484,11 +14497,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 250,
+      "lineCount": 251,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "ca052fc8"
     },
     {
@@ -14549,11 +14562,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 163,
+      "lineCount": 164,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 1,
-      "directFanOut": 4,
+      "directFanOut": 5,
       "hash": "21a099d7"
     },
     {
@@ -14575,11 +14588,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 249,
+      "lineCount": 250,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 2,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "45fd2eb1"
     },
     {
@@ -14705,11 +14718,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 263,
+      "lineCount": 264,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "81b4fe7b"
     },
     {
@@ -14978,11 +14991,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 917,
+      "lineCount": 918,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "237339bf"
     },
     {
@@ -15108,11 +15121,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 390,
+      "lineCount": 391,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "03ed59f7"
     },
     {
@@ -15212,11 +15225,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 220,
+      "lineCount": 221,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "a8be0ae6"
     },
     {
@@ -15225,11 +15238,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 300,
+      "lineCount": 301,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 13,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "ee9650ba"
     },
     {
@@ -15732,11 +15745,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 132,
+      "lineCount": 133,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "713cd095"
     },
     {
@@ -16109,11 +16122,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 91,
+      "lineCount": 90,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "8f1f6cea"
     },
     {
@@ -16239,11 +16252,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 459,
+      "lineCount": 460,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
-      "directFanOut": 4,
+      "directFanOut": 5,
       "hash": "6d406ca5"
     },
     {
@@ -16269,7 +16282,7 @@
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 32,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "fec84b93"
     },
     {
@@ -16317,11 +16330,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 272,
+      "lineCount": 273,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 11,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "b140e7db"
     },
     {
@@ -16642,11 +16655,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 127,
+      "lineCount": 128,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "a9fe68b7"
     },
     {
@@ -16720,11 +16733,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 89,
+      "lineCount": 90,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "3e496566"
     },
     {
@@ -17331,11 +17344,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 683,
+      "lineCount": 684,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
-      "directFanOut": 8,
+      "directFanOut": 9,
       "hash": "aa66a62e"
     },
     {
@@ -17630,11 +17643,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 266,
+      "lineCount": 267,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 2,
-      "directFanOut": 6,
+      "directFanOut": 7,
       "hash": "4b712941"
     },
     {
@@ -17682,11 +17695,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 197,
+      "lineCount": 198,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 3,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "2fa87bfe"
     },
     {
@@ -17708,7 +17721,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 601,
+      "lineCount": 603,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 4,
@@ -18280,11 +18293,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 29,
+      "lineCount": 18,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 1,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "fd41ef18"
     },
     {
@@ -18345,11 +18358,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 10,
+      "lineCount": 6,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 0,
+      "directFanOut": 1,
       "hash": "f5d532b4"
     },
     {
@@ -18553,11 +18566,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 228,
+      "lineCount": 229,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "ff007a6f"
     },
     {
@@ -18657,11 +18670,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 116,
+      "lineCount": 117,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "e1130894"
     },
     {
@@ -18683,11 +18696,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 173,
+      "lineCount": 174,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 1,
+      "directFanOut": 2,
       "hash": "df97d771"
     },
     {
@@ -47611,7 +47624,7 @@
     },
     "src/lib/server/neo4j-driver.ts": {
       "upstreamNodeCount": 500,
-      "downstreamNodeCount": 1,
+      "downstreamNodeCount": 2,
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
@@ -47809,7 +47822,7 @@
     },
     "src/lib/server/hypergraph/hypergraph-search.ts": {
       "upstreamNodeCount": 7,
-      "downstreamNodeCount": 2,
+      "downstreamNodeCount": 3,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },

@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-05-07T17:03:34.397Z",
-  "nodeCount": 3652,
-  "edgeCount": 11890,
-  "resolvedEdges": 7012,
+  "generatedAt": "2026-05-07T20:11:25.423Z",
+  "nodeCount": 3653,
+  "edgeCount": 11926,
+  "resolvedEdges": 7053,
   "unresolvedEdges": 766,
   "externalEdges": 3919,
   "edgeTypeBreakdown": {
-    "imports_static": 5495,
+    "imports_static": 5493,
     "imports_dynamic": 491,
-    "env_dependency": 543,
+    "env_dependency": 581,
     "exports_from": 276,
     "db_dependency": 890,
     "redis_dependency": 383,
@@ -21,7 +21,7 @@
   "zoneBreakdown": {
     "types": 121,
     "client": 956,
-    "server": 643,
+    "server": 644,
     "test": 862,
     "route": 1070
   },

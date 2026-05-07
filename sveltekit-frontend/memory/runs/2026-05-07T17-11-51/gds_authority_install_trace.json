@@ -1,0 +1,27 @@
+{
+  "runDate": "2026-05-07T17:13:27.849Z",
+  "activeNeo4jMode": "docker",
+  "gdsInstalled": true,
+  "gdsVersion": "2.13.7",
+  "apocInstalled": true,
+  "apocVersion": "5.x",
+  "passwordSource": "NEO4J_PASSWORD env (neo4j123)",
+  "nodesTotal": 2772,
+  "withPageRankAfter": 2772,
+  "withAuthorityAfter": 263,
+  "communities": 735,
+  "qdrantPatched": 1837,
+  "redisCached": 200,
+  "grpoChunksWired": 3438,
+  "grpoClusters": 7,
+  "gdsFixesApplied": [
+    "CALL gds.version() YIELD version → RETURN gds.version() AS version (GDS 2.x function syntax)",
+    "DEPENDS_ON relationship removed from projection (does not exist in Neo4j)",
+    "DYNAMIC_IMPORTS added to projection instead",
+    "neo4jRows() fixed to use column names from result, not null meta ids",
+    "PageRank query changed to write mode gds.pageRank.write() + separate read query",
+    "Louvain query changed to write mode gds.louvain.write() + separate read query",
+    "Property names fixed: stable_key→filePath, file_path→filePath, directFanIn→importCount, topo_byte→topoByte, topo_class→topoClass"
+  ],
+  "errors": []
+}

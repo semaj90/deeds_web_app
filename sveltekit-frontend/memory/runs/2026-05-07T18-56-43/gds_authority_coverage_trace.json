@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-05-07T19:09:53.304Z",
+  "fix": "Added byPath (O(1) map, 2772 entries) and allAuthorities (full 2772-node list) to GDS latest.json",
+  "before": {
+    "nodesWithAuthority": 6,
+    "clustersWithAuthority": 0,
+    "note": "Only top-500 in topAuthorities; cluster files outside window showed authority=0"
+  },
+  "after": {
+    "gds": {
+      "byPathKeys": 2772,
+      "allAuthoritiesCount": 2772,
+      "topAuthoritiesCount": 500
+    },
+    "graph_nodes": {
+      "total": 2000,
+      "withAuthority": 1770,
+      "coveragePct": "88.5%"
+    },
+    "synthesis": {
+      "p0Clusters": [
+        {
+          "cluster": "cluster:gpu:6",
+          "auth": 0.5549
+        },
+        {
+          "cluster": "cluster:gpu:58",
+          "auth": 0.2383
+        },
+        {
+          "cluster": "cluster:gpu:73",
+          "auth": 0.2803
+        }
+      ],
+      "p1Clusters": [
+        {
+          "cluster": "cluster:gpu:92",
+          "auth": 0.1709
+        },
+        {
+          "cluster": "cluster:gpu:20",
+          "auth": 0.2101
+        },
+        {
+          "cluster": "cluster:gpu:59",
+          "auth": 0.2277
+        }
+      ]
+    }
+  },
+  "status": "COMPLETE"
+}

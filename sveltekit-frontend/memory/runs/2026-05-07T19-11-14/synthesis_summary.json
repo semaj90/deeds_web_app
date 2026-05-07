@@ -1,0 +1,51 @@
+{
+  "runId": "2026-05-07T19-11-14",
+  "synthesizedAt": "2026-05-07T20:44:09.620Z",
+  "tsgoDiagnostics": 0,
+  "shallowWiredFiles": 357,
+  "auditGates": {
+    "g11_wrong_db_client": 0,
+    "g17_localhost_hardcoded": 0,
+    "g18_missing_auth": 0,
+    "g19_missing_zod": 0,
+    "g21_svelte4_props": 0,
+    "g22_svelte4_reactive": 0,
+    "g23_svelte4_events": 0,
+    "g25_runes_in_plain_ts": 0,
+    "g27_pass": true,
+    "g27_kmeans_consumers": 7,
+    "g27_som_consumers": 7,
+    "g40_glyph_cache_pass": true
+  },
+  "totalFiles": 2772,
+  "totalEdges": 11685,
+  "p0": [],
+  "p1": [
+    {
+      "cluster": "cluster:gpu:92",
+      "risk": 0.3,
+      "riskBreakdown": {
+        "diagDensity": 0,
+        "shallowDensity": 1,
+        "gateDensity": 0,
+        "authorityBoost": 0,
+        "tsgoBoost": 0
+      },
+      "graph_authority_score": 0.1709,
+      "diagCount": 0,
+      "shallowCount": 86,
+      "protocols": [
+        "sql-drizzle",
+        "w3c-fetch",
+        "svelte5-runes"
+      ],
+      "topFiles": [
+        "src/lib/client/ui/POIPhotoUploader.svelte",
+        "src/lib/components/ActionPopup.svelte",
+        "src/lib/components/agent/AutonomousInvestigator.svelte",
+        "src/lib/components/agentic/AgentChat.svelte",
+        "src/lib/components/agentic/AgenticController.svelte"
+      ]
+    }
+  ]
+}

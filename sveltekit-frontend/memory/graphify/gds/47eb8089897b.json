@@ -1,0 +1,3524 @@
+{
+  "runId": "47eb8089897b",
+  "startedAt": "2026-05-07T17:11:22.527Z",
+  "gdsAvailable": true,
+  "pagerankRows": 50,
+  "communities": 735,
+  "authorityScoresComputed": 2772,
+  "qdrantPatched": 1837,
+  "redisCached": 200,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "PASS",
+    "GDS3": "PASS",
+    "GDS4": "PASS",
+    "GDS5": "PASS",
+    "GDS6": "PASS",
+    "GDS7": "PASS: 1837 patches",
+    "GDS8": "PASS: 200 entries",
+    "GDS9": "PASS"
+  },
+  "finishedAt": "2026-05-07T17:11:41.227Z",
+  "topAuthorities": [
+    {
+      "filePath": "src/lib/server/db/client.ts",
+      "graphAuthorityScore": 0.5549,
+      "communityId": "community:549",
+      "pagerank": 7.061964689752575,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-postgres.ts",
+      "graphAuthorityScore": 0.3751,
+      "communityId": "community:550",
+      "pagerank": 4.050278318145835,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/env.server.ts",
+      "graphAuthorityScore": 0.3738,
+      "communityId": "community:550",
+      "pagerank": 5.278375547026334,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/sse/chat/+server.ts",
+      "graphAuthorityScore": 0.3683,
+      "communityId": "community:1862",
+      "pagerank": 0.73770159525397,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/index.ts",
+      "graphAuthorityScore": 0.3622,
+      "communityId": "community:550",
+      "pagerank": 0.22133384052934624,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/redis-direct/+server.ts",
+      "graphAuthorityScore": 0.3565,
+      "communityId": "community:549",
+      "pagerank": 1.7791772286003864,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/components/ui/index.ts",
+      "graphAuthorityScore": 0.3517,
+      "communityId": "community:521",
+      "pagerank": 1.0433121757598087,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema.ts",
+      "graphAuthorityScore": 0.3435,
+      "communityId": "community:550",
+      "pagerank": 1.1966779353194168,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/redis-write/+server.ts",
+      "graphAuthorityScore": 0.336,
+      "communityId": "community:549",
+      "pagerank": 1.3654146759777555,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/upload/+server.ts",
+      "graphAuthorityScore": 0.3286,
+      "communityId": "community:1862",
+      "pagerank": 0.6759670828928381,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ollama.ts",
+      "graphAuthorityScore": 0.3241,
+      "communityId": "community:11",
+      "pagerank": 3.4134740002619264,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/cache-single-conn/+server.ts",
+      "graphAuthorityScore": 0.3184,
+      "communityId": "community:1862",
+      "pagerank": 0.88803112520285,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/tiered-cache/+server.ts",
+      "graphAuthorityScore": 0.3183,
+      "communityId": "community:1862",
+      "pagerank": 1.0092984839456856,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/cache-demo/+server.ts",
+      "graphAuthorityScore": 0.3179,
+      "communityId": "community:1862",
+      "pagerank": 0.8779217018449074,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/ollama-cached/+server.ts",
+      "graphAuthorityScore": 0.3161,
+      "communityId": "community:1862",
+      "pagerank": 0.9639216018750932,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/cache-simple/+server.ts",
+      "graphAuthorityScore": 0.3128,
+      "communityId": "community:1862",
+      "pagerank": 0.6513430615215229,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons-of-interest/__tests__/poi-schemas.test.ts",
+      "graphAuthorityScore": 0.3097,
+      "communityId": "community:11",
+      "pagerank": 0.9588753330695337,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ace/context-assembler.ts",
+      "graphAuthorityScore": 0.3076,
+      "communityId": "community:11",
+      "pagerank": 0.9894688814607403,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/redis.ts",
+      "graphAuthorityScore": 0.3057,
+      "communityId": "community:549",
+      "pagerank": 3.903507773970027,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/rag/search/__tests__/rag-search-schema.test.ts",
+      "graphAuthorityScore": 0.2996,
+      "communityId": "community:11",
+      "pagerank": 0.7540323346597456,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/__tests__/cases-schemas.test.ts",
+      "graphAuthorityScore": 0.2983,
+      "communityId": "community:11",
+      "pagerank": 0.728360896091716,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/reports/generate/__tests__/generate-schema.test.ts",
+      "graphAuthorityScore": 0.2983,
+      "communityId": "community:11",
+      "pagerank": 0.728360896091716,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/legal-relations.ts",
+      "graphAuthorityScore": 0.295,
+      "communityId": "community:550",
+      "pagerank": 1.5728262441344398,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/qdrant-manager.ts",
+      "graphAuthorityScore": 0.2884,
+      "communityId": "community:550",
+      "pagerank": 1.8085118935905105,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/search/__tests__/search-schema.test.ts",
+      "graphAuthorityScore": 0.2868,
+      "communityId": "community:11",
+      "pagerank": 0.49651822564907067,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/components/ui/gaming/n64/index.ts",
+      "graphAuthorityScore": 0.2865,
+      "communityId": "community:521",
+      "pagerank": 1.0808318484173836,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/test/webgpu-modules/+server.ts",
+      "graphAuthorityScore": 0.2863,
+      "communityId": "community:1462",
+      "pagerank": 0.4856412780108497,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/hypergraph-4d.ts",
+      "graphAuthorityScore": 0.2803,
+      "communityId": "community:6",
+      "pagerank": 1.3977591089399835,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/test-utils/setup.ts",
+      "graphAuthorityScore": 0.2765,
+      "communityId": "community:549",
+      "pagerank": 1.5428384376426187,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/__tests__/cache-smoke.test.ts",
+      "graphAuthorityScore": 0.2757,
+      "communityId": "community:11",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/utils.ts",
+      "graphAuthorityScore": 0.2703,
+      "communityId": "community:549",
+      "pagerank": 1.6900694912032515,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/__tests__/hypergraph-store.test.ts",
+      "graphAuthorityScore": 0.2696,
+      "communityId": "community:549",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/unified-client.ts",
+      "graphAuthorityScore": 0.2665,
+      "communityId": "community:6",
+      "pagerank": 1.2433124278434764,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/case-library-links.ts",
+      "graphAuthorityScore": 0.2659,
+      "communityId": "community:550",
+      "pagerank": 1.5997995811462629,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/index-new.ts",
+      "graphAuthorityScore": 0.2584,
+      "communityId": "community:549",
+      "pagerank": 1.5710799064254701,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/legal-nodes.ts",
+      "graphAuthorityScore": 0.2575,
+      "communityId": "community:550",
+      "pagerank": 1.6762826099662207,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/library-documents.ts",
+      "graphAuthorityScore": 0.2573,
+      "communityId": "community:550",
+      "pagerank": 1.7961845624463082,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/middleware/cache-headers.ts",
+      "graphAuthorityScore": 0.2572,
+      "communityId": "community:549",
+      "pagerank": 3.172702467143441,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/legal-citations.ts",
+      "graphAuthorityScore": 0.2566,
+      "communityId": "community:550",
+      "pagerank": 1.7821034441546983,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-evidence-crud.ts",
+      "graphAuthorityScore": 0.2555,
+      "communityId": "community:550",
+      "pagerank": 1.7597118175744615,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/synthesis/generate/+server.ts",
+      "graphAuthorityScore": 0.2553,
+      "communityId": "community:1862",
+      "pagerank": 0.7950262608740406,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/relations.ts",
+      "graphAuthorityScore": 0.2531,
+      "communityId": "community:550",
+      "pagerank": 1.8346582262300364,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/recommendations/+server.ts",
+      "graphAuthorityScore": 0.2506,
+      "communityId": "community:500",
+      "pagerank": 1.0702537863405897,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/pg.ts",
+      "graphAuthorityScore": 0.2479,
+      "communityId": "community:549",
+      "pagerank": 1.3602612651545702,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/gpu-graph-analysis.ts",
+      "graphAuthorityScore": 0.2473,
+      "communityId": "community:6",
+      "pagerank": 1.2256291756648816,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/codebase-neo4j-sync.ts",
+      "graphAuthorityScore": 0.2464,
+      "communityId": "community:549",
+      "pagerank": 0.9608299699383474,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/multi-store.ts",
+      "graphAuthorityScore": 0.2458,
+      "communityId": "community:550",
+      "pagerank": 1.4410001370939232,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/verify-canvas-table.ts",
+      "graphAuthorityScore": 0.2456,
+      "communityId": "community:549",
+      "pagerank": 1.5590056842790894,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-ingestion.ts",
+      "graphAuthorityScore": 0.2439,
+      "communityId": "community:550",
+      "pagerank": 1.5248774090734651,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/index.ts",
+      "graphAuthorityScore": 0.2426,
+      "communityId": "community:550",
+      "pagerank": 1.1301793106041949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-canvas.ts",
+      "graphAuthorityScore": 0.2426,
+      "communityId": "community:550",
+      "pagerank": 1.4993931782185281,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/embedding-gemma.ts",
+      "graphAuthorityScore": 0.2423,
+      "communityId": "community:549",
+      "pagerank": 1.4923834117231152,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-test-rag.ts",
+      "graphAuthorityScore": 0.2417,
+      "communityId": "community:550",
+      "pagerank": 1.3574933624736711,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-canvas-autosaves.ts",
+      "graphAuthorityScore": 0.2416,
+      "communityId": "community:550",
+      "pagerank": 1.479462803466491,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-actual.ts",
+      "graphAuthorityScore": 0.2415,
+      "communityId": "community:550",
+      "pagerank": 1.4770471440527497,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/index-clean.ts",
+      "graphAuthorityScore": 0.2403,
+      "communityId": "community:549",
+      "pagerank": 1.207430410711816,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-phase89-preserved.ts",
+      "graphAuthorityScore": 0.2397,
+      "communityId": "community:550",
+      "pagerank": 1.5636766166671263,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/vector-schema.ts",
+      "graphAuthorityScore": 0.2389,
+      "communityId": "community:550",
+      "pagerank": 1.547931724977365,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/codebase-cluster-detection.ts",
+      "graphAuthorityScore": 0.2386,
+      "communityId": "community:6",
+      "pagerank": 1.2958873180037733,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/persons.ts",
+      "graphAuthorityScore": 0.2384,
+      "communityId": "community:550",
+      "pagerank": 1.5366325632954139,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/warden-schema.ts",
+      "graphAuthorityScore": 0.2383,
+      "communityId": "community:550",
+      "pagerank": 1.536550480430642,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/orchestrator.ts",
+      "graphAuthorityScore": 0.2383,
+      "communityId": "community:6",
+      "pagerank": 1.1912851509522906,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-timeline.ts",
+      "graphAuthorityScore": 0.2372,
+      "communityId": "community:550",
+      "pagerank": 1.512767521098985,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons-of-interest/[id]/photos/+server.ts",
+      "graphAuthorityScore": 0.2372,
+      "communityId": "community:500",
+      "pagerank": 1.0465546416967169,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/additional-tables.ts",
+      "graphAuthorityScore": 0.2365,
+      "communityId": "community:550",
+      "pagerank": 1.3758378413766847,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/evidence.ts",
+      "graphAuthorityScore": 0.2357,
+      "communityId": "community:550",
+      "pagerank": 1.4829639706226905,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/reports.ts",
+      "graphAuthorityScore": 0.2357,
+      "communityId": "community:550",
+      "pagerank": 1.4829639706226905,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/agent/autonomous-agent.ts",
+      "graphAuthorityScore": 0.2343,
+      "communityId": "community:549",
+      "pagerank": 1.2343605560285968,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/similar/+server.ts",
+      "graphAuthorityScore": 0.2342,
+      "communityId": "community:1862",
+      "pagerank": 0.7398032142871235,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/page-artifacts.ts",
+      "graphAuthorityScore": 0.234,
+      "communityId": "community:550",
+      "pagerank": 1.3259564977897025,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/qdrant-integration.ts",
+      "graphAuthorityScore": 0.2339,
+      "communityId": "community:6",
+      "pagerank": 1.2000817146025464,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/missing-import-recommendations.ts",
+      "graphAuthorityScore": 0.2338,
+      "communityId": "community:6",
+      "pagerank": 1.1978626600196347,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/ingestion-jobs.ts",
+      "graphAuthorityScore": 0.2336,
+      "communityId": "community:550",
+      "pagerank": 1.318048665030025,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/search-analytics.ts",
+      "graphAuthorityScore": 0.2334,
+      "communityId": "community:550",
+      "pagerank": 1.1903872776758693,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/ace/ingest/+server.ts",
+      "graphAuthorityScore": 0.2334,
+      "communityId": "community:1862",
+      "pagerank": 0.9700134417250329,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/seed.ts",
+      "graphAuthorityScore": 0.2331,
+      "communityId": "community:11",
+      "pagerank": 0.9393642604885895,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-chat.ts",
+      "graphAuthorityScore": 0.2328,
+      "communityId": "community:550",
+      "pagerank": 1.4242855627819144,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/error_feedback.ts",
+      "graphAuthorityScore": 0.2323,
+      "communityId": "community:550",
+      "pagerank": 1.5377689456435797,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cache/metrics/+server.ts",
+      "graphAuthorityScore": 0.2321,
+      "communityId": "community:500",
+      "pagerank": 1.6815871693927558,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/citations.ts",
+      "graphAuthorityScore": 0.2318,
+      "communityId": "community:550",
+      "pagerank": 1.5282826753128893,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/seed-citations.ts",
+      "graphAuthorityScore": 0.2318,
+      "communityId": "community:11",
+      "pagerank": 1.1591846061790785,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-phase78.ts",
+      "graphAuthorityScore": 0.2314,
+      "communityId": "community:550",
+      "pagerank": 1.5191331159656973,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/state-constitution-sources.ts",
+      "graphAuthorityScore": 0.2313,
+      "communityId": "community:550",
+      "pagerank": 1.271080589957851,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/pg-neo4j-sync.ts",
+      "graphAuthorityScore": 0.2312,
+      "communityId": "community:549",
+      "pagerank": 1.1456619996406059,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/migrate-test-rag.ts",
+      "graphAuthorityScore": 0.2302,
+      "communityId": "community:11",
+      "pagerank": 1.2487810963706856,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/queries.ts",
+      "graphAuthorityScore": 0.2298,
+      "communityId": "community:549",
+      "pagerank": 1.1176836100576772,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-prosecutor.ts",
+      "graphAuthorityScore": 0.2296,
+      "communityId": "community:550",
+      "pagerank": 1.4826743502073774,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/qdrant-health.ts",
+      "graphAuthorityScore": 0.2291,
+      "communityId": "community:6",
+      "pagerank": 1.2273594241485581,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/connections.ts",
+      "graphAuthorityScore": 0.229,
+      "communityId": "community:549",
+      "pagerank": 1.3477281968926191,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/drizzle.ts",
+      "graphAuthorityScore": 0.2287,
+      "communityId": "community:550",
+      "pagerank": 0.849627835626275,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/jsonb-legal-schema.ts",
+      "graphAuthorityScore": 0.2286,
+      "communityId": "community:550",
+      "pagerank": 1.0946041033386227,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-gpu-cache.ts",
+      "graphAuthorityScore": 0.2279,
+      "communityId": "community:550",
+      "pagerank": 1.2031646650447305,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/observability/langfuse.ts",
+      "graphAuthorityScore": 0.2277,
+      "communityId": "community:549",
+      "pagerank": 2.4534215789924874,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/qdrant-sync.ts",
+      "graphAuthorityScore": 0.2271,
+      "communityId": "community:549",
+      "pagerank": 0.8175446616545485,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/components/agentic/__tests__/AgentChat.test.ts",
+      "graphAuthorityScore": 0.2268,
+      "communityId": "community:1462",
+      "pagerank": 0.29507880668635306,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/lucia-schema.ts",
+      "graphAuthorityScore": 0.2268,
+      "communityId": "community:550",
+      "pagerank": 1.42560592709797,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/drizzle-cache.ts",
+      "graphAuthorityScore": 0.2267,
+      "communityId": "community:549",
+      "pagerank": 1.0561834484804318,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/query-utils.ts",
+      "graphAuthorityScore": 0.2265,
+      "communityId": "community:11",
+      "pagerank": 1.420391450884419,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/unified/legal-ai-service.ts",
+      "graphAuthorityScore": 0.2265,
+      "communityId": "community:6",
+      "pagerank": 1.1987387455224214,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/lucia.ts",
+      "graphAuthorityScore": 0.2247,
+      "communityId": "community:549",
+      "pagerank": 1.778316692424537,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cache.ts",
+      "graphAuthorityScore": 0.2246,
+      "communityId": "community:549",
+      "pagerank": 1.898940114450494,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/seed-simple.ts",
+      "graphAuthorityScore": 0.2245,
+      "communityId": "community:11",
+      "pagerank": 1.0105764221587816,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/quantize.ts",
+      "graphAuthorityScore": 0.2239,
+      "communityId": "community:549",
+      "pagerank": 1.491891800392557,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/components/ui/dialog/index.ts",
+      "graphAuthorityScore": 0.2235,
+      "communityId": "community:521",
+      "pagerank": 0.7942227217082246,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/rag/search/+server.ts",
+      "graphAuthorityScore": 0.2233,
+      "communityId": "community:550",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/legal-cases.ts",
+      "graphAuthorityScore": 0.2232,
+      "communityId": "community:550",
+      "pagerank": 1.2318391961410131,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/legal-chunks.ts",
+      "graphAuthorityScore": 0.2222,
+      "communityId": "community:550",
+      "pagerank": 1.088660463718099,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analyze-file/+server.ts",
+      "graphAuthorityScore": 0.2222,
+      "communityId": "community:1862",
+      "pagerank": 1.1114700606046817,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-pgvector-512.ts",
+      "graphAuthorityScore": 0.2221,
+      "communityId": "community:550",
+      "pagerank": 1.4546420694948172,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/couchdb-pagerank.ts",
+      "graphAuthorityScore": 0.2221,
+      "communityId": "community:6",
+      "pagerank": 1.2088836195934283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/setup-database.ts",
+      "graphAuthorityScore": 0.2218,
+      "communityId": "community:549",
+      "pagerank": 1.2033986541500952,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/codebase-scanner.ts",
+      "graphAuthorityScore": 0.2218,
+      "communityId": "community:6",
+      "pagerank": 1.2030435791703666,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/PgVectorService.ts",
+      "graphAuthorityScore": 0.2218,
+      "communityId": "community:6",
+      "pagerank": 1.2027713523657273,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/error-brain/diagnose/+server.ts",
+      "graphAuthorityScore": 0.2217,
+      "communityId": "community:1862",
+      "pagerank": 0.8559936671203441,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/evidence-graph-service.ts",
+      "graphAuthorityScore": 0.2212,
+      "communityId": "community:6",
+      "pagerank": 1.1909562152360482,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/library-document-versions.ts",
+      "graphAuthorityScore": 0.2209,
+      "communityId": "community:550",
+      "pagerank": 1.0618607907784745,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/gemma4-agent.ts",
+      "graphAuthorityScore": 0.2207,
+      "communityId": "community:6",
+      "pagerank": 1.2043653843292348,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/engagement/idle-reengagement.ts",
+      "graphAuthorityScore": 0.2207,
+      "communityId": "community:549",
+      "pagerank": 1.57315770203786,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/knowledge/+server.ts",
+      "graphAuthorityScore": 0.2206,
+      "communityId": "community:1862",
+      "pagerank": 1.0799122003068584,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/onboarding/+server.ts",
+      "graphAuthorityScore": 0.22,
+      "communityId": "community:500",
+      "pagerank": 1.5598861629669314,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/legal-db-init.ts",
+      "graphAuthorityScore": 0.2198,
+      "communityId": "community:11",
+      "pagerank": 0.9158064446580994,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/legal-definitions.ts",
+      "graphAuthorityScore": 0.2198,
+      "communityId": "community:550",
+      "pagerank": 1.0396759922111747,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/cache/__tests__/cache.test.ts",
+      "graphAuthorityScore": 0.2196,
+      "communityId": "community:549",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/reports/preview/[id]/+server.ts",
+      "graphAuthorityScore": 0.2193,
+      "communityId": "community:500",
+      "pagerank": 1.1763218753795577,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-web.ts",
+      "graphAuthorityScore": 0.2192,
+      "communityId": "community:550",
+      "pagerank": 1.2725647931514015,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/workspace-operations.ts",
+      "graphAuthorityScore": 0.2191,
+      "communityId": "community:11",
+      "pagerank": 1.024979870294049,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/(app)/cases/[id]/+page.svelte",
+      "graphAuthorityScore": 0.2188,
+      "communityId": "community:1462",
+      "pagerank": 0.7235510577717386,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/infrastructure/status/+server.ts",
+      "graphAuthorityScore": 0.2172,
+      "communityId": "community:11",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/cases.ts",
+      "graphAuthorityScore": 0.2168,
+      "communityId": "community:1862",
+      "pagerank": 0.9780131808311153,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/grpc/embedding-client.ts",
+      "graphAuthorityScore": 0.2161,
+      "communityId": "community:6",
+      "pagerank": 1.8506006678781861,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/enhanced-vector-operations.ts",
+      "graphAuthorityScore": 0.2156,
+      "communityId": "community:550",
+      "pagerank": 1.322985961666778,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/pgvector.ts",
+      "graphAuthorityScore": 0.2156,
+      "communityId": "community:6",
+      "pagerank": 1.2004709650321328,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-week3-kb.ts",
+      "graphAuthorityScore": 0.2152,
+      "communityId": "community:550",
+      "pagerank": 1.0685533301361332,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/mirror-query.ts",
+      "graphAuthorityScore": 0.2151,
+      "communityId": "community:6",
+      "pagerank": 1.1909242943196539,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/jurisdictions.ts",
+      "graphAuthorityScore": 0.2147,
+      "communityId": "community:550",
+      "pagerank": 1.0589714229719152,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/graph-centrality.ts",
+      "graphAuthorityScore": 0.2142,
+      "communityId": "community:11",
+      "pagerank": 1.172901057031706,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/indexer/web-search-indexer.ts",
+      "graphAuthorityScore": 0.2139,
+      "communityId": "community:6",
+      "pagerank": 1.1911106110246628,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/route_metadata.ts",
+      "graphAuthorityScore": 0.2138,
+      "communityId": "community:550",
+      "pagerank": 1.1639685211379824,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/generate-cluster-summaries/+server.ts",
+      "graphAuthorityScore": 0.2136,
+      "communityId": "community:1862",
+      "pagerank": 1.1850134301655526,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/claude-assist/+server.ts",
+      "graphAuthorityScore": 0.2135,
+      "communityId": "community:1862",
+      "pagerank": 1.0590351834404708,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons-of-interest/[id]/summary/+server.ts",
+      "graphAuthorityScore": 0.2128,
+      "communityId": "community:500",
+      "pagerank": 1.0463809763962473,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/__tests__/token-tracker.test.ts",
+      "graphAuthorityScore": 0.2124,
+      "communityId": "community:11",
+      "pagerank": 1.0136744747203283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/migrate.ts",
+      "graphAuthorityScore": 0.2123,
+      "communityId": "community:6",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/canvas/+server.ts",
+      "graphAuthorityScore": 0.2121,
+      "communityId": "community:1862",
+      "pagerank": 1.0313760136845895,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/codebase-intelligence.ts",
+      "graphAuthorityScore": 0.2118,
+      "communityId": "community:550",
+      "pagerank": 1.0015184280371598,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/observability/inference-log.ts",
+      "graphAuthorityScore": 0.2116,
+      "communityId": "community:549",
+      "pagerank": 2.1297194485430104,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/bm42-sparse.ts",
+      "graphAuthorityScore": 0.2111,
+      "communityId": "community:11",
+      "pagerank": 1.2327388498290526,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/persons/+server.ts",
+      "graphAuthorityScore": 0.2108,
+      "communityId": "community:500",
+      "pagerank": 1.1280142433364113,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-charges.ts",
+      "graphAuthorityScore": 0.2107,
+      "communityId": "community:550",
+      "pagerank": 0.9793838773141806,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cartridge/export/+server.ts",
+      "graphAuthorityScore": 0.2102,
+      "communityId": "community:500",
+      "pagerank": 0.9928511699264619,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/gpu/simdjson-bridge.ts",
+      "graphAuthorityScore": 0.2101,
+      "communityId": "community:549",
+      "pagerank": 1.8518001649833435,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/knowledge/stream/+server.ts",
+      "graphAuthorityScore": 0.21,
+      "communityId": "community:1862",
+      "pagerank": 0.7432888700034788,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/reports/generate/+server.ts",
+      "graphAuthorityScore": 0.2095,
+      "communityId": "community:1862",
+      "pagerank": 0.85701394417122,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/ace-web-crawl.ts",
+      "graphAuthorityScore": 0.2093,
+      "communityId": "community:550",
+      "pagerank": 1.0741569188652742,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/+server.ts",
+      "graphAuthorityScore": 0.2093,
+      "communityId": "community:500",
+      "pagerank": 0.9747684596947969,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "graphAuthorityScore": 0.209,
+      "communityId": "community:6",
+      "pagerank": 1.2154240096526743,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector/metadata-encoder.ts",
+      "graphAuthorityScore": 0.209,
+      "communityId": "community:6",
+      "pagerank": 1.1909242943196539,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/research-graph/+server.ts",
+      "graphAuthorityScore": 0.2089,
+      "communityId": "community:500",
+      "pagerank": 1.5830150968131986,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/audit/gpu-audit-orchestrator.ts",
+      "graphAuthorityScore": 0.2088,
+      "communityId": "community:6",
+      "pagerank": 1.2115275167288464,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/ready/+server.ts",
+      "graphAuthorityScore": 0.2084,
+      "communityId": "community:549",
+      "pagerank": 1.2036228232495247,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/codebase-context.ts",
+      "graphAuthorityScore": 0.2082,
+      "communityId": "community:11",
+      "pagerank": 1.074884088425346,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cartridge/index.ts",
+      "graphAuthorityScore": 0.208,
+      "communityId": "community:550",
+      "pagerank": 1.1955368350070132,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/reports/generate-from-template/+server.ts",
+      "graphAuthorityScore": 0.2074,
+      "communityId": "community:1862",
+      "pagerank": 0.812706483052212,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/error_events.ts",
+      "graphAuthorityScore": 0.207,
+      "communityId": "community:550",
+      "pagerank": 1.0262621502127498,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/route_health.ts",
+      "graphAuthorityScore": 0.207,
+      "communityId": "community:550",
+      "pagerank": 1.0262621502127498,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/error-brain/transport/factory.ts",
+      "graphAuthorityScore": 0.207,
+      "communityId": "community:549",
+      "pagerank": 1.4201466877360371,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/gpu/libtorch-bridge.ts",
+      "graphAuthorityScore": 0.2069,
+      "communityId": "community:549",
+      "pagerank": 1.7872801029204413,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/analytics.ts",
+      "graphAuthorityScore": 0.2068,
+      "communityId": "community:550",
+      "pagerank": 1.0226830985318793,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/[id]/key-points/+server.ts",
+      "graphAuthorityScore": 0.2067,
+      "communityId": "community:500",
+      "pagerank": 1.0463449146753363,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/reports/[id]/export/+server.ts",
+      "graphAuthorityScore": 0.2067,
+      "communityId": "community:500",
+      "pagerank": 1.046344914675336,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analysis/worker.ts",
+      "graphAuthorityScore": 0.2065,
+      "communityId": "community:549",
+      "pagerank": 1.9034012795456332,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/neo4j-schema.ts",
+      "graphAuthorityScore": 0.2065,
+      "communityId": "community:11",
+      "pagerank": 1.0162788817528794,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/citations/+server.ts",
+      "graphAuthorityScore": 0.2065,
+      "communityId": "community:500",
+      "pagerank": 1.287766422738209,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
+      "graphAuthorityScore": 0.2062,
+      "communityId": "community:549",
+      "pagerank": 1.1587496572323959,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/pgvector-utils.ts",
+      "graphAuthorityScore": 0.206,
+      "communityId": "community:11",
+      "pagerank": 1.007443981299719,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/vector-operations.ts",
+      "graphAuthorityScore": 0.2059,
+      "communityId": "community:11",
+      "pagerank": 0.7583299346712441,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/user-interaction-sync.ts",
+      "graphAuthorityScore": 0.2056,
+      "communityId": "community:11",
+      "pagerank": 0.9980692469210073,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/search/+server.ts",
+      "graphAuthorityScore": 0.2055,
+      "communityId": "community:500",
+      "pagerank": 0.5283478027213168,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "graphAuthorityScore": 0.2054,
+      "communityId": "community:549",
+      "pagerank": 1.2647120017352915,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/legal-schema.ts",
+      "graphAuthorityScore": 0.2053,
+      "communityId": "community:550",
+      "pagerank": 1.115394748999385,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/error-brain/diagnosis-history/similar/+server.ts",
+      "graphAuthorityScore": 0.2053,
+      "communityId": "community:1862",
+      "pagerank": 0.8943751899235767,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/recommendations/+server.ts",
+      "graphAuthorityScore": 0.2052,
+      "communityId": "community:1862",
+      "pagerank": 1.384797972564844,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cache/recent-queries/+server.ts",
+      "graphAuthorityScore": 0.205,
+      "communityId": "community:500",
+      "pagerank": 1.5030527337351247,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cache/som/+server.ts",
+      "graphAuthorityScore": 0.205,
+      "communityId": "community:500",
+      "pagerank": 1.5030866519673767,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/legal/constitution-pipeline.ts",
+      "graphAuthorityScore": 0.2049,
+      "communityId": "community:1862",
+      "pagerank": 0.8868782820376446,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/chrrom/push/+server.ts",
+      "graphAuthorityScore": 0.2049,
+      "communityId": "community:549",
+      "pagerank": 1.3779884784913652,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/indexing/+server.ts",
+      "graphAuthorityScore": 0.2049,
+      "communityId": "community:500",
+      "pagerank": 1.009804773983558,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/embedding/embed.ts",
+      "graphAuthorityScore": 0.2048,
+      "communityId": "community:11",
+      "pagerank": 1.0064330441708487,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/collections/[collectionId]/+server.ts",
+      "graphAuthorityScore": 0.2047,
+      "communityId": "community:500",
+      "pagerank": 1.1279798852676592,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/error_brain_analysis.ts",
+      "graphAuthorityScore": 0.2045,
+      "communityId": "community:550",
+      "pagerank": 0.9773164628029889,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/error_clusters.ts",
+      "graphAuthorityScore": 0.2045,
+      "communityId": "community:550",
+      "pagerank": 0.9773164628029889,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/error_suggestions.ts",
+      "graphAuthorityScore": 0.2045,
+      "communityId": "community:550",
+      "pagerank": 0.9773164628029889,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/error_timeline.ts",
+      "graphAuthorityScore": 0.2045,
+      "communityId": "community:550",
+      "pagerank": 0.9773164628029889,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema/route_error_patches.ts",
+      "graphAuthorityScore": 0.2045,
+      "communityId": "community:550",
+      "pagerank": 0.9773164628029889,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/notes/search/+server.ts",
+      "graphAuthorityScore": 0.2042,
+      "communityId": "community:500",
+      "pagerank": 1.1173169074934177,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons-of-interest/[id]/similar/+server.ts",
+      "graphAuthorityScore": 0.2042,
+      "communityId": "community:500",
+      "pagerank": 1.2417248689405307,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/timeline/+server.ts",
+      "graphAuthorityScore": 0.2036,
+      "communityId": "community:500",
+      "pagerank": 1.1054583752845957,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/pgvector-utils.temp.ts",
+      "graphAuthorityScore": 0.2035,
+      "communityId": "community:11",
+      "pagerank": 0.9567748838895807,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/postgres-knowledge.ts",
+      "graphAuthorityScore": 0.2034,
+      "communityId": "community:549",
+      "pagerank": 0.7073859130510003,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons-of-interest/[id]/+server.ts",
+      "graphAuthorityScore": 0.2034,
+      "communityId": "community:500",
+      "pagerank": 1.2258592848309837,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/unified-schema-clean.ts",
+      "graphAuthorityScore": 0.2033,
+      "communityId": "community:549",
+      "pagerank": 1.075837709027675,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/recommendations/track/+server.ts",
+      "graphAuthorityScore": 0.2033,
+      "communityId": "community:1862",
+      "pagerank": 0.9761173255807412,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/neo4j-driver.ts",
+      "graphAuthorityScore": 0.2032,
+      "communityId": "community:549",
+      "pagerank": 1.836856764810551,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/minio-client.ts",
+      "graphAuthorityScore": 0.2031,
+      "communityId": "community:549",
+      "pagerank": 1.833716838824515,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ml/topic-clustering-worker.ts",
+      "graphAuthorityScore": 0.2026,
+      "communityId": "community:6",
+      "pagerank": 1.3317674522607201,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-old.ts",
+      "graphAuthorityScore": 0.2025,
+      "communityId": "community:550",
+      "pagerank": 0.8137279103828136,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/ingest-errors/+server.ts",
+      "graphAuthorityScore": 0.2025,
+      "communityId": "community:500",
+      "pagerank": 1.207403434233483,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/deep-research.ts",
+      "graphAuthorityScore": 0.2024,
+      "communityId": "community:6",
+      "pagerank": 1.2049519633838595,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/research-graph-rl.ts",
+      "graphAuthorityScore": 0.202,
+      "communityId": "community:6",
+      "pagerank": 1.197509389517709,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/queue/rabbitmq-manager-fixed.ts",
+      "graphAuthorityScore": 0.2018,
+      "communityId": "community:549",
+      "pagerank": 1.5622366750055598,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/search/+server.ts",
+      "graphAuthorityScore": 0.2018,
+      "communityId": "community:500",
+      "pagerank": 1.0700081739343357,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/rag/answer/+server.ts",
+      "graphAuthorityScore": 0.2017,
+      "communityId": "community:1862",
+      "pagerank": 0.8210267422577056,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/indexer/workspace-metadata-extractor.ts",
+      "graphAuthorityScore": 0.2015,
+      "communityId": "community:6",
+      "pagerank": 1.3090974516381895,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase/narratives/+server.ts",
+      "graphAuthorityScore": 0.2014,
+      "communityId": "community:1862",
+      "pagerank": 1.1849155942020257,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/embeddings/ollama.ts",
+      "graphAuthorityScore": 0.2013,
+      "communityId": "community:549",
+      "pagerank": 1.6751651851381946,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/graph-context.ts",
+      "graphAuthorityScore": 0.2012,
+      "communityId": "community:11",
+      "pagerank": 1.3028562706332953,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analysis/entity-extraction.ts",
+      "graphAuthorityScore": 0.201,
+      "communityId": "community:6",
+      "pagerank": 1.3000643321527225,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cache/stats/+server.ts",
+      "graphAuthorityScore": 0.201,
+      "communityId": "community:500",
+      "pagerank": 1.1762562469988003,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/[citationId]/tags/+server.ts",
+      "graphAuthorityScore": 0.201,
+      "communityId": "community:1862",
+      "pagerank": 0.930001768306197,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons-of-interest/[id]/risk/+server.ts",
+      "graphAuthorityScore": 0.2009,
+      "communityId": "community:1862",
+      "pagerank": 0.805326180628232,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/analysis/cache/+server.ts",
+      "graphAuthorityScore": 0.2006,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/search/filters/+server.ts",
+      "graphAuthorityScore": 0.2006,
+      "communityId": "community:500",
+      "pagerank": 1.0463083901750254,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/ingestion-buffer-builder.ts",
+      "graphAuthorityScore": 0.2003,
+      "communityId": "community:6",
+      "pagerank": 0.2775,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/embed/+server.ts",
+      "graphAuthorityScore": 0.2003,
+      "communityId": "community:1862",
+      "pagerank": 0.7935488956538842,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/database/+server.ts",
+      "graphAuthorityScore": 0.2002,
+      "communityId": "community:549",
+      "pagerank": 1.40598522679148,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/+server.ts",
+      "graphAuthorityScore": 0.2001,
+      "communityId": "community:1862",
+      "pagerank": 0.7892467433620551,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/connections/connection-pool.ts",
+      "graphAuthorityScore": 0.1999,
+      "communityId": "community:549",
+      "pagerank": 1.5228633074541054,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/glyph/index.ts",
+      "graphAuthorityScore": 0.1992,
+      "communityId": "community:550",
+      "pagerank": 1.386264637637449,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/inference/inference-router.ts",
+      "graphAuthorityScore": 0.199,
+      "communityId": "community:11",
+      "pagerank": 0.6445871482088017,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cache/exact-match/stats/+server.ts",
+      "graphAuthorityScore": 0.1989,
+      "communityId": "community:500",
+      "pagerank": 1.5030866519673767,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/search/+server.ts",
+      "graphAuthorityScore": 0.1989,
+      "communityId": "community:11",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/laws/+server.ts",
+      "graphAuthorityScore": 0.1986,
+      "communityId": "community:500",
+      "pagerank": 1.1279451128680449,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/search/cases/+server.ts",
+      "graphAuthorityScore": 0.1986,
+      "communityId": "community:500",
+      "pagerank": 1.1290006085538755,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/codebase-scanner-v2.ts",
+      "graphAuthorityScore": 0.1984,
+      "communityId": "community:6",
+      "pagerank": 0.6079943219463916,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/vision/analyze/+server.ts",
+      "graphAuthorityScore": 0.1982,
+      "communityId": "community:1862",
+      "pagerank": 0.7501874422435316,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ml/multi-modal-ranker.ts",
+      "graphAuthorityScore": 0.198,
+      "communityId": "community:6",
+      "pagerank": 1.238458811378925,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase72/similar/+server.ts",
+      "graphAuthorityScore": 0.198,
+      "communityId": "community:500",
+      "pagerank": 1.1156027047460608,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/qlora/generate/+server.ts",
+      "graphAuthorityScore": 0.198,
+      "communityId": "community:500",
+      "pagerank": 1.2401214027291123,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ace/gemma4-codeintel.ts",
+      "graphAuthorityScore": 0.1978,
+      "communityId": "community:6",
+      "pagerank": 1.2343259612171131,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/ai/personas/+server.ts",
+      "graphAuthorityScore": 0.1977,
+      "communityId": "community:500",
+      "pagerank": 1.479214940804319,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/relationships/+server.ts",
+      "graphAuthorityScore": 0.1977,
+      "communityId": "community:1862",
+      "pagerank": 0.9867115754811256,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/gpu/lease/+server.ts",
+      "graphAuthorityScore": 0.1977,
+      "communityId": "community:500",
+      "pagerank": 1.4792149408043191,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/circuit-breakers/+server.ts",
+      "graphAuthorityScore": 0.1977,
+      "communityId": "community:500",
+      "pagerank": 1.4792149408043191,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/tools/execute/+server.ts",
+      "graphAuthorityScore": 0.1977,
+      "communityId": "community:500",
+      "pagerank": 1.4791808624081488,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/generate-todos/+server.ts",
+      "graphAuthorityScore": 0.1975,
+      "communityId": "community:500",
+      "pagerank": 1.1054230323480756,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/context-buffer.ts",
+      "graphAuthorityScore": 0.1974,
+      "communityId": "community:549",
+      "pagerank": 1.7199154807794785,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/key-points/+server.ts",
+      "graphAuthorityScore": 0.1973,
+      "communityId": "community:1862",
+      "pagerank": 0.8568696069135961,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/cluster-detect/+server.ts",
+      "graphAuthorityScore": 0.1971,
+      "communityId": "community:1862",
+      "pagerank": 1.220705017836228,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/middleware/validate-and-rate.ts",
+      "graphAuthorityScore": 0.197,
+      "communityId": "community:549",
+      "pagerank": 1.5886473632865747,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/config/env.server.ts",
+      "graphAuthorityScore": 0.1967,
+      "communityId": "community:549",
+      "pagerank": 2.714539353796075,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analysis/vlm-evidence-analyzer.ts",
+      "graphAuthorityScore": 0.1966,
+      "communityId": "community:6",
+      "pagerank": 1.2099406827921781,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase89/node/[id]/similar/+server.ts",
+      "graphAuthorityScore": 0.1966,
+      "communityId": "community:500",
+      "pagerank": 1.2104266648667574,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/system/phase78/apply-patch/+server.ts",
+      "graphAuthorityScore": 0.1966,
+      "communityId": "community:1862",
+      "pagerank": 0.9645680678707476,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/tiered-llm-cache.ts",
+      "graphAuthorityScore": 0.1964,
+      "communityId": "community:549",
+      "pagerank": 1.2074292795249055,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/legal/ingestion-worker.ts",
+      "graphAuthorityScore": 0.1964,
+      "communityId": "community:6",
+      "pagerank": 1.207208432085835,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analysis/analysis-jobs.ts",
+      "graphAuthorityScore": 0.1961,
+      "communityId": "community:549",
+      "pagerank": 1.323820701567649,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/adapters/service-integrations.ts",
+      "graphAuthorityScore": 0.196,
+      "communityId": "community:549",
+      "pagerank": 1.445718901111035,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/codebase-research.ts",
+      "graphAuthorityScore": 0.196,
+      "communityId": "community:6",
+      "pagerank": 1.198306189315825,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/yorha/cases/+server.ts",
+      "graphAuthorityScore": 0.1957,
+      "communityId": "community:1862",
+      "pagerank": 1.0698569380281702,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/indexer/dual-embedder.ts",
+      "graphAuthorityScore": 0.1956,
+      "communityId": "community:549",
+      "pagerank": 0.9440781982832329,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/statutes/[id]/summary/+server.ts",
+      "graphAuthorityScore": 0.1956,
+      "communityId": "community:1862",
+      "pagerank": 0.8208669637351665,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/workers/video-vlm-processor.ts",
+      "graphAuthorityScore": 0.1954,
+      "communityId": "community:11",
+      "pagerank": 0.9399236297621373,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/search/+server.ts",
+      "graphAuthorityScore": 0.1954,
+      "communityId": "community:500",
+      "pagerank": 1.1865728306318255,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase82/status/+server.ts",
+      "graphAuthorityScore": 0.1954,
+      "communityId": "community:549",
+      "pagerank": 1.1872117248824179,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/chrrom/events/+server.ts",
+      "graphAuthorityScore": 0.1953,
+      "communityId": "community:1862",
+      "pagerank": 1.184915594202026,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase89/agentic-fix/+server.ts",
+      "graphAuthorityScore": 0.1953,
+      "communityId": "community:1862",
+      "pagerank": 1.1847635933850815,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/reasoning-chain/+server.ts",
+      "graphAuthorityScore": 0.1951,
+      "communityId": "community:1862",
+      "pagerank": 0.8125483242241321,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/error-brain/history/[filePath]/+server.ts",
+      "graphAuthorityScore": 0.1949,
+      "communityId": "community:500",
+      "pagerank": 1.1761890910306256,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/ml/cluster-status/+server.ts",
+      "graphAuthorityScore": 0.1949,
+      "communityId": "community:500",
+      "pagerank": 1.1762228632772878,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/connection.ts",
+      "graphAuthorityScore": 0.1948,
+      "communityId": "community:550",
+      "pagerank": 0.7814431795742189,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/notes/[noteId]/versions/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0463083901750254,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/overview/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0463083901750254,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/collections/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/[docId]/status/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0463083901750254,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/fictional-cases/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/precedents/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/rag/documents/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/routes/[routeId]/error-brain-analyses/+server.ts",
+      "graphAuthorityScore": 0.1945,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/chat/+server.ts",
+      "graphAuthorityScore": 0.1944,
+      "communityId": "community:1862",
+      "pagerank": 0.673899617479597,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/evidence-analyze/+server.ts",
+      "graphAuthorityScore": 0.1942,
+      "communityId": "community:1862",
+      "pagerank": 1.1631632520932955,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/reports/+server.ts",
+      "graphAuthorityScore": 0.194,
+      "communityId": "community:1862",
+      "pagerank": 0.7891691292046875,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analysis/hmm-ace-analyzer.ts",
+      "graphAuthorityScore": 0.1939,
+      "communityId": "community:11",
+      "pagerank": 1.156243626199325,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase/auto-research/+server.ts",
+      "graphAuthorityScore": 0.1939,
+      "communityId": "community:1862",
+      "pagerank": 0.9101287236182011,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/simulation/+server.ts",
+      "graphAuthorityScore": 0.1939,
+      "communityId": "community:1862",
+      "pagerank": 0.7877544095172507,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/workers/compute-pool.ts",
+      "graphAuthorityScore": 0.1938,
+      "communityId": "community:549",
+      "pagerank": 1.4009780902483622,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/notes/[noteId]/evidence/+server.ts",
+      "graphAuthorityScore": 0.1938,
+      "communityId": "community:1862",
+      "pagerank": 0.9082872819443263,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/statutes/+server.ts",
+      "graphAuthorityScore": 0.1938,
+      "communityId": "community:1862",
+      "pagerank": 1.0311497007356507,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/system/health/+server.ts",
+      "graphAuthorityScore": 0.1938,
+      "communityId": "community:549",
+      "pagerank": 0.9073577126232187,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/minio.ts",
+      "graphAuthorityScore": 0.1935,
+      "communityId": "community:549",
+      "pagerank": 1.639592315074842,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/workers/audio-processor.ts",
+      "graphAuthorityScore": 0.1935,
+      "communityId": "community:549",
+      "pagerank": 0.7802138935101764,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/inference/gpu-arbiter.ts",
+      "graphAuthorityScore": 0.1933,
+      "communityId": "community:549",
+      "pagerank": 1.5125907000253704,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/metrics/+server.ts",
+      "graphAuthorityScore": 0.1933,
+      "communityId": "community:549",
+      "pagerank": 1.514157516121922,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/pipeline/status/[jobId]/+server.ts",
+      "graphAuthorityScore": 0.1928,
+      "communityId": "community:500",
+      "pagerank": 1.5030866519673767,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/conversations/[id]/+server.ts",
+      "graphAuthorityScore": 0.1927,
+      "communityId": "community:1862",
+      "pagerank": 1.008272363003154,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/reports/save/+server.ts",
+      "graphAuthorityScore": 0.1927,
+      "communityId": "community:1862",
+      "pagerank": 1.0098277797359403,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/export/pdf/+server.ts",
+      "graphAuthorityScore": 0.1925,
+      "communityId": "community:500",
+      "pagerank": 1.1279451128680449,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/export/json/+server.ts",
+      "graphAuthorityScore": 0.1925,
+      "communityId": "community:500",
+      "pagerank": 1.1279099185973545,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/export/pdf/+server.ts",
+      "graphAuthorityScore": 0.1925,
+      "communityId": "community:500",
+      "pagerank": 1.1279099185973545,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/routes/[routeId]/errors/+server.ts",
+      "graphAuthorityScore": 0.1925,
+      "communityId": "community:1862",
+      "pagerank": 1.0045702884306238,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/audit/planner/+server.ts",
+      "graphAuthorityScore": 0.1923,
+      "communityId": "community:1862",
+      "pagerank": 1.246334356510584,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/ocr/+server.ts",
+      "graphAuthorityScore": 0.1923,
+      "communityId": "community:549",
+      "pagerank": 1.3693851952843876,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ace/codeintel-datastore.ts",
+      "graphAuthorityScore": 0.1922,
+      "communityId": "community:549",
+      "pagerank": 1.12187401320595,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ocr/tesseract.ts",
+      "graphAuthorityScore": 0.1921,
+      "communityId": "community:549",
+      "pagerank": 1.367128263640909,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cache/pdf-export-cache.ts",
+      "graphAuthorityScore": 0.192,
+      "communityId": "community:549",
+      "pagerank": 1.6097200311485356,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/search/citations/+server.ts",
+      "graphAuthorityScore": 0.192,
+      "communityId": "community:500",
+      "pagerank": 1.1172432081840435,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/similar-queries/+server.ts",
+      "graphAuthorityScore": 0.1919,
+      "communityId": "community:500",
+      "pagerank": 1.1156762942974348,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ace/self-prompt.ts",
+      "graphAuthorityScore": 0.1918,
+      "communityId": "community:11",
+      "pagerank": 0.9906957092082709,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cache/report-template-cache.ts",
+      "graphAuthorityScore": 0.1918,
+      "communityId": "community:549",
+      "pagerank": 1.4828144194210442,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/indexer/ast-chunker.ts",
+      "graphAuthorityScore": 0.1918,
+      "communityId": "community:6",
+      "pagerank": 1.2362463853919625,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/web-search.ts",
+      "graphAuthorityScore": 0.1918,
+      "communityId": "community:6",
+      "pagerank": 1.3594744489576196,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/system/+server.ts",
+      "graphAuthorityScore": 0.1917,
+      "communityId": "community:549",
+      "pagerank": 1.604564650688303,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cartridge/stats/+server.ts",
+      "graphAuthorityScore": 0.1916,
+      "communityId": "community:500",
+      "pagerank": 1.4791808624081488,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/gpu/queue/+server.ts",
+      "graphAuthorityScore": 0.1916,
+      "communityId": "community:500",
+      "pagerank": 1.4791808624081488,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/components/ui/gaming/index.ts",
+      "graphAuthorityScore": 0.1915,
+      "communityId": "community:521",
+      "pagerank": 0.7626447273313903,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cache/invalidation.ts",
+      "graphAuthorityScore": 0.1915,
+      "communityId": "community:549",
+      "pagerank": 1.3535952252856709,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/statutes/[id]/+server.ts",
+      "graphAuthorityScore": 0.1915,
+      "communityId": "community:1862",
+      "pagerank": 0.8625357440580615,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/gpu-wasm-integration/+server.ts",
+      "graphAuthorityScore": 0.1914,
+      "communityId": "community:1862",
+      "pagerank": 0.7370558897885949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ace/auto-tagger.ts",
+      "graphAuthorityScore": 0.1913,
+      "communityId": "community:6",
+      "pagerank": 1.2262558739937661,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/knowledge/document/[id]/+server.ts",
+      "graphAuthorityScore": 0.1912,
+      "communityId": "community:500",
+      "pagerank": 1.2258267871308253,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/events/+server.ts",
+      "graphAuthorityScore": 0.1911,
+      "communityId": "community:1862",
+      "pagerank": 0.9776638595945455,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/canon/+server.ts",
+      "graphAuthorityScore": 0.1911,
+      "communityId": "community:1862",
+      "pagerank": 0.9759970979399757,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/push/send/+server.ts",
+      "graphAuthorityScore": 0.1911,
+      "communityId": "community:1862",
+      "pagerank": 0.9774752776650986,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/ssr-health-check.ts",
+      "graphAuthorityScore": 0.191,
+      "communityId": "community:549",
+      "pagerank": 0.7039799474797531,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/cluster/+server.ts",
+      "graphAuthorityScore": 0.1908,
+      "communityId": "community:1862",
+      "pagerank": 0.7255564110990252,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/route-operations/log/+server.ts",
+      "graphAuthorityScore": 0.1907,
+      "communityId": "community:500",
+      "pagerank": 1.583696812697696,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/indexer/cluster-summary.ts",
+      "graphAuthorityScore": 0.1906,
+      "communityId": "community:6",
+      "pagerank": 1.2128707544676882,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/documents/[id]/auto-save/+server.ts",
+      "graphAuthorityScore": 0.1905,
+      "communityId": "community:1862",
+      "pagerank": 0.9646371066576099,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ocr/hybrid.ts",
+      "graphAuthorityScore": 0.1904,
+      "communityId": "community:6",
+      "pagerank": 1.2085015367773222,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/notes/[noteId]/+server.ts",
+      "graphAuthorityScore": 0.1904,
+      "communityId": "community:1862",
+      "pagerank": 0.8392957690518742,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/+server.ts",
+      "graphAuthorityScore": 0.1904,
+      "communityId": "community:1862",
+      "pagerank": 0.8392957690518742,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/gpu/background-analyzer.ts",
+      "graphAuthorityScore": 0.1903,
+      "communityId": "community:549",
+      "pagerank": 1.0831047841626011,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/workers/audio-queue-consumer.ts",
+      "graphAuthorityScore": 0.1903,
+      "communityId": "community:549",
+      "pagerank": 1.5761443298969515,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/components/ui/table/index.ts",
+      "graphAuthorityScore": 0.1902,
+      "communityId": "community:521",
+      "pagerank": 1.10571165919749,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/graph-informed-retrieval.ts",
+      "graphAuthorityScore": 0.19,
+      "communityId": "community:6",
+      "pagerank": 1.2017332860759904,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/queue/dispatch-stats/+server.ts",
+      "graphAuthorityScore": 0.1899,
+      "communityId": "community:549",
+      "pagerank": 1.4456427345848528,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/llm/contextual-chat.ts",
+      "graphAuthorityScore": 0.1896,
+      "communityId": "community:1862",
+      "pagerank": 0.8233501241813226,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/web-research/+server.ts",
+      "graphAuthorityScore": 0.1896,
+      "communityId": "community:500",
+      "pagerank": 1.0699339464682962,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/[id]/+server.ts",
+      "graphAuthorityScore": 0.1896,
+      "communityId": "community:1862",
+      "pagerank": 0.8244468395452594,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/capabilities/+server.ts",
+      "graphAuthorityScore": 0.1896,
+      "communityId": "community:549",
+      "pagerank": 1.0690945663950857,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase89/node/[id]/docs/+server.ts",
+      "graphAuthorityScore": 0.1896,
+      "communityId": "community:500",
+      "pagerank": 1.0699712968229145,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/research-refiner.ts",
+      "graphAuthorityScore": 0.1895,
+      "communityId": "community:6",
+      "pagerank": 1.1910804073814034,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/codeintel/fix-recommender.ts",
+      "graphAuthorityScore": 0.1895,
+      "communityId": "community:6",
+      "pagerank": 1.189786105791321,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/contextual/chat/+server.ts",
+      "graphAuthorityScore": 0.1895,
+      "communityId": "community:1862",
+      "pagerank": 0.8208669637351665,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/canon/ingest/+server.ts",
+      "graphAuthorityScore": 0.1893,
+      "communityId": "community:1862",
+      "pagerank": 0.8170883468165867,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/chat/stream/+server.ts",
+      "graphAuthorityScore": 0.1893,
+      "communityId": "community:1862",
+      "pagerank": 0.9402487812727486,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/gpu-pipeline/+server.ts",
+      "graphAuthorityScore": 0.1891,
+      "communityId": "community:1862",
+      "pagerank": 1.0589294543930097,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/unified-client-backup.ts",
+      "graphAuthorityScore": 0.189,
+      "communityId": "community:550",
+      "pagerank": 0.6640804156274145,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/acp/tools/+server.ts",
+      "graphAuthorityScore": 0.1888,
+      "communityId": "community:500",
+      "pagerank": 1.1761549234365376,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/collections/[collectionId]/citations/+server.ts",
+      "graphAuthorityScore": 0.1888,
+      "communityId": "community:1862",
+      "pagerank": 0.9298768130101781,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/claude-assist/defaults/+server.ts",
+      "graphAuthorityScore": 0.1888,
+      "communityId": "community:1862",
+      "pagerank": 1.0542415871551778,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/[id]/approve/+server.ts",
+      "graphAuthorityScore": 0.1888,
+      "communityId": "community:1862",
+      "pagerank": 0.9298768130101781,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/fictional-cases/[id]/+server.ts",
+      "graphAuthorityScore": 0.1888,
+      "communityId": "community:1862",
+      "pagerank": 0.9298768130101781,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons-of-interest/[id]/face-match/+server.ts",
+      "graphAuthorityScore": 0.1888,
+      "communityId": "community:1862",
+      "pagerank": 0.8070371509093104,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cache-keys.ts",
+      "graphAuthorityScore": 0.1886,
+      "communityId": "community:550",
+      "pagerank": 1.5415109294841245,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/types/index.ts",
+      "graphAuthorityScore": 0.1886,
+      "communityId": "community:550",
+      "pagerank": 1.173351870250548,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/graph/recommendations/+server.ts",
+      "graphAuthorityScore": 0.1885,
+      "communityId": "community:1862",
+      "pagerank": 1.0470191288919914,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/investigate/suggest/+server.ts",
+      "graphAuthorityScore": 0.1885,
+      "communityId": "community:1862",
+      "pagerank": 1.0471340015941422,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/enhanced-legal-schema.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:550",
+      "pagerank": 0.775250423366006,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/context-timeline/+server.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/canon/chunks/[chunkId]/+server.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/[id]/gpu-analysis/+server.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:500",
+      "pagerank": 1.0463083901750254,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/kb/validate/+server.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/documents/[documentId]/pdf/+server.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:500",
+      "pagerank": 1.0463083901750254,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase89/graph/+server.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:500",
+      "pagerank": 1.0461959491666608,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/worker/autotag/trigger/+server.ts",
+      "graphAuthorityScore": 0.1884,
+      "communityId": "community:1862",
+      "pagerank": 1.0449923678011162,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/push/+server.ts",
+      "graphAuthorityScore": 0.1882,
+      "communityId": "community:549",
+      "pagerank": 1.0417886358804875,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/database-simple.js",
+      "graphAuthorityScore": 0.1881,
+      "communityId": "community:549",
+      "pagerank": 1.5323082317674466,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/qdrant/+server.ts",
+      "graphAuthorityScore": 0.1881,
+      "communityId": "community:549",
+      "pagerank": 1.1633978474723488,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/neo4j/+server.ts",
+      "graphAuthorityScore": 0.188,
+      "communityId": "community:549",
+      "pagerank": 1.40598522679148,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ace/error-kag-writer.ts",
+      "graphAuthorityScore": 0.1879,
+      "communityId": "community:6",
+      "pagerank": 1.2823437615433244,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/nlp/analyzer.ts",
+      "graphAuthorityScore": 0.1879,
+      "communityId": "community:549",
+      "pagerank": 1.2818596469479022,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/(dev)/test-source-validation/+page.svelte",
+      "graphAuthorityScore": 0.1879,
+      "communityId": "community:1462",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/[id]/versions/+server.ts",
+      "graphAuthorityScore": 0.1879,
+      "communityId": "community:1862",
+      "pagerank": 0.7890087749675921,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/chrrom/precompute/+server.ts",
+      "graphAuthorityScore": 0.1878,
+      "communityId": "community:1862",
+      "pagerank": 1.1567975400438857,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/acp/phase90-tools.ts",
+      "graphAuthorityScore": 0.1877,
+      "communityId": "community:549",
+      "pagerank": 1.2764691897556173,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cartridge/glyph-tile-engine.ts",
+      "graphAuthorityScore": 0.1877,
+      "communityId": "community:6",
+      "pagerank": 1.2767434844736962,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/icons/yorha/index.ts",
+      "graphAuthorityScore": 0.1876,
+      "communityId": "community:6",
+      "pagerank": 1.3009969458156203,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/agentic-web-indexer.ts",
+      "graphAuthorityScore": 0.1873,
+      "communityId": "community:11",
+      "pagerank": 1.022913403907343,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/admin/seed-knowledge/+server.ts",
+      "graphAuthorityScore": 0.1871,
+      "communityId": "community:1862",
+      "pagerank": 1.0761529493885869,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-gpu-metrics.ts",
+      "graphAuthorityScore": 0.187,
+      "communityId": "community:550",
+      "pagerank": 0.7468045756081627,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase/wiki/+server.ts",
+      "graphAuthorityScore": 0.187,
+      "communityId": "community:1862",
+      "pagerank": 0.8941866310189837,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase72/errors/+server.ts",
+      "graphAuthorityScore": 0.1868,
+      "communityId": "community:500",
+      "pagerank": 1.1353867969142766,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/route-components/+server.ts",
+      "graphAuthorityScore": 0.1866,
+      "communityId": "community:500",
+      "pagerank": 1.0097628193517714,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/error-brain/apply-fix/+server.ts",
+      "graphAuthorityScore": 0.1866,
+      "communityId": "community:1862",
+      "pagerank": 0.8864429831070172,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/error-brain/diagnosis-history/+server.ts",
+      "graphAuthorityScore": 0.1866,
+      "communityId": "community:1862",
+      "pagerank": 0.8854934657788028,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/error-brain/verify-fix/+server.ts",
+      "graphAuthorityScore": 0.1866,
+      "communityId": "community:1862",
+      "pagerank": 0.8864429831070172,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/document/[id]/+server.ts",
+      "graphAuthorityScore": 0.1866,
+      "communityId": "community:500",
+      "pagerank": 1.2558229504031495,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/document/[id]/node/[nodeId]/+server.ts",
+      "graphAuthorityScore": 0.1866,
+      "communityId": "community:500",
+      "pagerank": 1.2558548038651869,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/documents/[documentId]/toc/+server.ts",
+      "graphAuthorityScore": 0.1866,
+      "communityId": "community:500",
+      "pagerank": 1.2558229504031495,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/langextract-client.ts",
+      "graphAuthorityScore": 0.1865,
+      "communityId": "community:6",
+      "pagerank": 1.375557362574354,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/tags/+server.ts",
+      "graphAuthorityScore": 0.1864,
+      "communityId": "community:500",
+      "pagerank": 1.1279099185973545,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-enhanced.ts",
+      "graphAuthorityScore": 0.1863,
+      "communityId": "community:550",
+      "pagerank": 0.7330016892762958,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-sqlite.ts",
+      "graphAuthorityScore": 0.1863,
+      "communityId": "community:550",
+      "pagerank": 0.7330016892762958,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/saved/+server.ts",
+      "graphAuthorityScore": 0.1863,
+      "communityId": "community:1862",
+      "pagerank": 0.8791647049966245,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/agent/tools/analyze-file.ts",
+      "graphAuthorityScore": 0.1862,
+      "communityId": "community:550",
+      "pagerank": 1.3701780303160498,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ml/user-history.ts",
+      "graphAuthorityScore": 0.1862,
+      "communityId": "community:6",
+      "pagerank": 1.2474843610989241,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/research-summaries/+server.ts",
+      "graphAuthorityScore": 0.1861,
+      "communityId": "community:1862",
+      "pagerank": 0.8754675779102071,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/reports/audit.ts",
+      "graphAuthorityScore": 0.1858,
+      "communityId": "community:500",
+      "pagerank": 1.3617569682247597,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/research-summaries/[id]/+server.ts",
+      "graphAuthorityScore": 0.1858,
+      "communityId": "community:500",
+      "pagerank": 1.1155652150673427,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/startup/qdrant-init.ts",
+      "graphAuthorityScore": 0.1856,
+      "communityId": "community:549",
+      "pagerank": 1.3572104627343409,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/langgraph-client.ts",
+      "graphAuthorityScore": 0.1852,
+      "communityId": "community:549",
+      "pagerank": 1.59680878791987,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/search-analytics.ts",
+      "graphAuthorityScore": 0.1852,
+      "communityId": "community:11",
+      "pagerank": 1.2262503369118092,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/research/fastcrawl.ts",
+      "graphAuthorityScore": 0.1851,
+      "communityId": "community:549",
+      "pagerank": 1.2252203264842068,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/onnx-server.ts",
+      "graphAuthorityScore": 0.185,
+      "communityId": "community:549",
+      "pagerank": 1.4686443879435995,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/redis-streams.ts",
+      "graphAuthorityScore": 0.1849,
+      "communityId": "community:6",
+      "pagerank": 1.4671815311869367,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/citations/collections/[collectionId]/export/+server.ts",
+      "graphAuthorityScore": 0.1849,
+      "communityId": "community:1862",
+      "pagerank": 0.729684336765064,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/hypergraph-store.ts",
+      "graphAuthorityScore": 0.1846,
+      "communityId": "community:549",
+      "pagerank": 1.0925778142923988,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/v1/chat/messages/+server.ts",
+      "graphAuthorityScore": 0.1846,
+      "communityId": "community:1862",
+      "pagerank": 0.9679292999191016,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/web-research-crawler.ts",
+      "graphAuthorityScore": 0.1845,
+      "communityId": "community:6",
+      "pagerank": 1.3366547625516219,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/v1/reports/chat-associations/+server.ts",
+      "graphAuthorityScore": 0.1844,
+      "communityId": "community:1862",
+      "pagerank": 0.9645680678707476,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analysis/evidence-analysis-pipeline.ts",
+      "graphAuthorityScore": 0.1843,
+      "communityId": "community:6",
+      "pagerank": 1.2097403046212571,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/connections/+server.ts",
+      "graphAuthorityScore": 0.1843,
+      "communityId": "community:1862",
+      "pagerank": 0.8392229454140269,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/graph-sync/+server.ts",
+      "graphAuthorityScore": 0.1843,
+      "communityId": "community:1862",
+      "pagerank": 1.0852236427014499,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/web/crawl/+server.ts",
+      "graphAuthorityScore": 0.1843,
+      "communityId": "community:1862",
+      "pagerank": 0.9629622994277639,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/api-metadata-extractor.ts",
+      "graphAuthorityScore": 0.1842,
+      "communityId": "community:549",
+      "pagerank": 1.4535554095250942,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/redis/+server.ts",
+      "graphAuthorityScore": 0.184,
+      "communityId": "community:549",
+      "pagerank": 1.203474656156946,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/pgai/summarize/+server.ts",
+      "graphAuthorityScore": 0.184,
+      "communityId": "community:549",
+      "pagerank": 1.2033986541500952,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/user/preferences/+server.ts",
+      "graphAuthorityScore": 0.184,
+      "communityId": "community:549",
+      "pagerank": 1.2033986541500952,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/notes/+server.ts",
+      "graphAuthorityScore": 0.1838,
+      "communityId": "community:1862",
+      "pagerank": 0.8303732656101643,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/linter-service.ts",
+      "graphAuthorityScore": 0.1837,
+      "communityId": "community:6",
+      "pagerank": 1.1964217368280385,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/health/gpu/+server.ts",
+      "graphAuthorityScore": 0.1836,
+      "communityId": "community:549",
+      "pagerank": 1.0708908861218893,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/synthesis/evaluation/[id]/+server.ts",
+      "graphAuthorityScore": 0.1836,
+      "communityId": "community:500",
+      "pagerank": 1.1952180289831749,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/search/semantic-cache.ts",
+      "graphAuthorityScore": 0.1835,
+      "communityId": "community:549",
+      "pagerank": 1.3163436805225954,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/llm/gemma4-tool-loop.ts",
+      "graphAuthorityScore": 0.1834,
+      "communityId": "community:6",
+      "pagerank": 1.1910498715529856,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/prompt-leaderboard/+server.ts",
+      "graphAuthorityScore": 0.1834,
+      "communityId": "community:6",
+      "pagerank": 1.1909562152360482,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cases/[id]/analyze/stream/+server.ts",
+      "graphAuthorityScore": 0.1834,
+      "communityId": "community:1862",
+      "pagerank": 0.8207844651098105,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/chat/+server.ts",
+      "graphAuthorityScore": 0.1834,
+      "communityId": "community:1862",
+      "pagerank": 0.8207844651098105,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/[id]/suggest-summary/+server.ts",
+      "graphAuthorityScore": 0.1834,
+      "communityId": "community:1862",
+      "pagerank": 0.8207844651098105,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/schema-unified.ts",
+      "graphAuthorityScore": 0.1833,
+      "communityId": "community:6",
+      "pagerank": 0.5493464925489814,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/minio/health-check.ts",
+      "graphAuthorityScore": 0.1833,
+      "communityId": "community:549",
+      "pagerank": 1.435647356705588,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/feedback/+server.ts",
+      "graphAuthorityScore": 0.1833,
+      "communityId": "community:1862",
+      "pagerank": 1.0648909237341078,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/event-logger.ts",
+      "graphAuthorityScore": 0.1832,
+      "communityId": "community:6",
+      "pagerank": 1.3101623457732636,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/tools/handlers/kbSearch.ts",
+      "graphAuthorityScore": 0.1832,
+      "communityId": "community:1862",
+      "pagerank": 1.1861038430724624,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/playwright/run-health-check/+server.ts",
+      "graphAuthorityScore": 0.1831,
+      "communityId": "community:549",
+      "pagerank": 1.3084600653505642,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cache/cache-events.ts",
+      "graphAuthorityScore": 0.183,
+      "communityId": "community:549",
+      "pagerank": 1.5519796055724533,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/config/ollama.ts",
+      "graphAuthorityScore": 0.183,
+      "communityId": "community:549",
+      "pagerank": 1.5511491983608974,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/topology/stream/+server.ts",
+      "graphAuthorityScore": 0.1827,
+      "communityId": "community:549",
+      "pagerank": 1.053665866178037,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/ace/status/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/patterns/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/audit/gpu/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/chat/migrate/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:1862",
+      "pagerank": 1.0458879132621555,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/couchdb-pagerank/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/file-intel/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.0461959491666608,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/errors/summary/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/graph/timeline/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.0461959491666608,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/citations/[citation]/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/corpus/constitutions/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/documents/[documentId]/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/library/documents/[documentId]/chunks/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.046233916739949,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase89/clusters/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.0462339167399488,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/routes/[routeId]/interactions/+server.ts",
+      "graphAuthorityScore": 0.1823,
+      "communityId": "community:500",
+      "pagerank": 1.0462713939295283,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/graph/som-topology-pipeline.ts",
+      "graphAuthorityScore": 0.1822,
+      "communityId": "community:549",
+      "pagerank": 0.15697013173145496,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/yolo.ts",
+      "graphAuthorityScore": 0.1822,
+      "communityId": "community:11",
+      "pagerank": 1.1656452134550122,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/langgraph-research.ts",
+      "graphAuthorityScore": 0.182,
+      "communityId": "community:11",
+      "pagerank": 1.161422388160011,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/research-index/+server.ts",
+      "graphAuthorityScore": 0.182,
+      "communityId": "community:549",
+      "pagerank": 1.1633436114277171,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/chrrom/bus.ts",
+      "graphAuthorityScore": 0.1819,
+      "communityId": "community:549",
+      "pagerank": 1.529284685772223,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/db/seed-dev-user.ts",
+      "graphAuthorityScore": 0.1818,
+      "communityId": "community:550",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/evidence/summary/[id]/approve/+server.ts",
+      "graphAuthorityScore": 0.1818,
+      "communityId": "community:1862",
+      "pagerank": 0.7893445095408743,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/persons/+server.ts",
+      "graphAuthorityScore": 0.1818,
+      "communityId": "community:1862",
+      "pagerank": 0.788925920787051,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase89/vector-search/+server.ts",
+      "graphAuthorityScore": 0.1817,
+      "communityId": "community:1862",
+      "pagerank": 0.9101287236182011,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ace/tag-sync.ts",
+      "graphAuthorityScore": 0.1816,
+      "communityId": "community:11",
+      "pagerank": 1.1539466057638899,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/ai/context/+server.ts",
+      "graphAuthorityScore": 0.1816,
+      "communityId": "community:1862",
+      "pagerank": 1.0311560173405865,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/cluster-assign/+server.ts",
+      "graphAuthorityScore": 0.1816,
+      "communityId": "community:1862",
+      "pagerank": 1.0322714634962251,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/embedding/ollama-embed.ts",
+      "graphAuthorityScore": 0.1815,
+      "communityId": "community:549",
+      "pagerank": 1.2743811827057017,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/admin/routes/+server.ts",
+      "graphAuthorityScore": 0.1814,
+      "communityId": "community:500",
+      "pagerank": 1.2075039132875631,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/cartridge/search/+server.ts",
+      "graphAuthorityScore": 0.1814,
+      "communityId": "community:1862",
+      "pagerank": 0.5346158648000303,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/gpu/compute/+server.ts",
+      "graphAuthorityScore": 0.1814,
+      "communityId": "community:1862",
+      "pagerank": 1.0269331154675936,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/agent/tools/index.ts",
+      "graphAuthorityScore": 0.181,
+      "communityId": "community:549",
+      "pagerank": 0.8967911123114057,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/cartridge/glyph-record.ts",
+      "graphAuthorityScore": 0.181,
+      "communityId": "community:6",
+      "pagerank": 1.3886326962148523,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/validation.ts",
+      "graphAuthorityScore": 0.1809,
+      "communityId": "community:549",
+      "pagerank": 1.6313919831067536,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/helpers/service-discovery.ts",
+      "graphAuthorityScore": 0.1806,
+      "communityId": "community:549",
+      "pagerank": 1.3807718872972747,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/whisper/transcribe/+server.ts",
+      "graphAuthorityScore": 0.1806,
+      "communityId": "community:11",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/error-brain/transport/redis.ts",
+      "graphAuthorityScore": 0.1803,
+      "communityId": "community:549",
+      "pagerank": 1.3746156523990238,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/glyph-prompt-cache.ts",
+      "graphAuthorityScore": 0.1803,
+      "communityId": "community:549",
+      "pagerank": 1.4965218965826423,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/ai/lang-extract.ts",
+      "graphAuthorityScore": 0.1802,
+      "communityId": "community:11",
+      "pagerank": 1.249378814479556,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/agent/investigate/+server.ts",
+      "graphAuthorityScore": 0.1801,
+      "communityId": "community:1862",
+      "pagerank": 0.877997893342312,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/qlora-dataset/+server.ts",
+      "graphAuthorityScore": 0.1801,
+      "communityId": "community:1862",
+      "pagerank": 0.877997893342312,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/nlp/sentiment/+server.ts",
+      "graphAuthorityScore": 0.1801,
+      "communityId": "community:1862",
+      "pagerank": 1.2462866382213023,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/init/legal-search-init.ts",
+      "graphAuthorityScore": 0.1799,
+      "communityId": "community:549",
+      "pagerank": 1.3654901482595918,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/minio/client.ts",
+      "graphAuthorityScore": 0.1797,
+      "communityId": "community:549",
+      "pagerank": 1.3614136836737267,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/vector-cache.ts",
+      "graphAuthorityScore": 0.1794,
+      "communityId": "community:6",
+      "pagerank": 1.2321223781911266,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/glyph-diffusion-service.ts",
+      "graphAuthorityScore": 0.1793,
+      "communityId": "community:549",
+      "pagerank": 1.4764160048695845,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/queue/rabbitmq-xstate-integration.ts",
+      "graphAuthorityScore": 0.1792,
+      "communityId": "community:550",
+      "pagerank": 1.4758804086185433,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/analytics/unified-research/+server.ts",
+      "graphAuthorityScore": 0.1792,
+      "communityId": "community:500",
+      "pagerank": 1.1053510281057028,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/agent/tools/find-files.ts",
+      "graphAuthorityScore": 0.1791,
+      "communityId": "community:6",
+      "pagerank": 1.226908870009532,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/research/lane4-feedback.ts",
+      "graphAuthorityScore": 0.1789,
+      "communityId": "community:550",
+      "pagerank": 1.346155215105252,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/error-brain/transport/none.ts",
+      "graphAuthorityScore": 0.1786,
+      "communityId": "community:549",
+      "pagerank": 1.3388570948791438,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/ai/agent/+server.ts",
+      "graphAuthorityScore": 0.1785,
+      "communityId": "community:1862",
+      "pagerank": 0.8464636281695275,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/codebase-index/claude-assist/feedback/+server.ts",
+      "graphAuthorityScore": 0.1785,
+      "communityId": "community:1862",
+      "pagerank": 0.9679292999191016,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/phase89/analyze/+server.ts",
+      "graphAuthorityScore": 0.1785,
+      "communityId": "community:1862",
+      "pagerank": 0.8464636281695275,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/analytics/research-summaries-db.ts",
+      "graphAuthorityScore": 0.1784,
+      "communityId": "community:11",
+      "pagerank": 1.0902482164357,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/legal/law-citations.ts",
+      "graphAuthorityScore": 0.1783,
+      "communityId": "community:6",
+      "pagerank": 1.456355136072662,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/feedback/+server.ts",
+      "graphAuthorityScore": 0.1783,
+      "communityId": "community:1862",
+      "pagerank": 0.9645680678707476,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/internal/error-brain/runs/+server.ts",
+      "graphAuthorityScore": 0.1783,
+      "communityId": "community:1862",
+      "pagerank": 0.9644977487976193,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/routes/api/routes/[routeId]/error-brain-patch/+server.ts",
+      "graphAuthorityScore": 0.1783,
+      "communityId": "community:1862",
+      "pagerank": 0.9645680678707476,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/retrieval/wikipedia-search.ts",
+      "graphAuthorityScore": 0.1782,
+      "communityId": "community:549",
+      "pagerank": 1.455154880259596,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/research/github-harvester.ts",
+      "graphAuthorityScore": 0.1781,
+      "communityId": "community:6",
+      "pagerank": 1.2059694568480173,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "src/lib/server/research/reddit-harvester.ts",
+      "graphAuthorityScore": 0.1781,
+      "communityId": "community:6",
+      "pagerank": 1.2060775367737773,
+      "topoClass": "unclassified"
+    }
+  ]
+}

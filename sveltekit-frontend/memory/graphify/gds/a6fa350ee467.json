@@ -1,0 +1,23 @@
+{
+  "runId": "a6fa350ee467",
+  "startedAt": "2026-05-07T17:07:28.483Z",
+  "gdsAvailable": true,
+  "pagerankRows": 0,
+  "communities": 0,
+  "authorityScoresComputed": 0,
+  "qdrantPatched": 0,
+  "redisCached": 0,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "PASS",
+    "GDS3": "PASS",
+    "GDS4": "FAIL: 0 rows",
+    "GDS5": "FAIL: 0 rows",
+    "GDS6": "WARN: only 0 files with non-zero score",
+    "GDS7": "WARN: 0 patches",
+    "GDS8": "PASS: 0 entries",
+    "GDS9": "PASS"
+  },
+  "finishedAt": "2026-05-07T17:07:37.569Z",
+  "topAuthorities": []
+}

@@ -1,0 +1,93 @@
+{
+  "runId": "2026-05-07T19-11-14",
+  "writtenAt": "2026-05-07T20:11:37.083Z",
+  "nodesScored": 2772,
+  "nodesMirrored": 7119,
+  "durationMs": 8407,
+  "collection": "codebase_chunks_768",
+  "neo4jUri": "bolt://localhost:7687",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "selectedRunDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\runs\\2026-05-07T19-11-14",
+  "topScores": [
+    {
+      "stableKey": "src/lib/server/db/client.ts",
+      "score": 0.73
+    },
+    {
+      "stableKey": "src/lib/server/env.server.ts",
+      "score": 0.5532060829021065
+    },
+    {
+      "stableKey": "src/lib/server/db/schema-postgres.ts",
+      "score": 0.4314739448947057
+    },
+    {
+      "stableKey": "src/lib/server/redis.ts",
+      "score": 0.4169256732115938
+    },
+    {
+      "stableKey": "src/lib/server/ollama.ts",
+      "score": 0.3683522723712551
+    },
+    {
+      "stableKey": "src/lib/server/middleware/cache-headers.ts",
+      "score": 0.344486382270232
+    },
+    {
+      "stableKey": "src/lib/config/env.server.ts",
+      "score": 0.2990720827894465
+    },
+    {
+      "stableKey": "src/lib/server/observability/langfuse.ts",
+      "score": 0.27318942118003037
+    },
+    {
+      "stableKey": "src/lib/server/observability/inference-log.ts",
+      "score": 0.24110323818856982
+    },
+    {
+      "stableKey": "src/lib/server/analysis/worker.ts",
+      "score": 0.2186700025016161
+    },
+    {
+      "stableKey": "src/lib/server/cache.ts",
+      "score": 0.21822780040860246
+    },
+    {
+      "stableKey": "src/lib/server/gpu/simdjson-bridge.ts",
+      "score": 0.21355516806382624
+    },
+    {
+      "stableKey": "src/lib/server/grpc/embedding-client.ts",
+      "score": 0.21343627084322295
+    },
+    {
+      "stableKey": "src/lib/server/neo4j-driver.ts",
+      "score": 0.21207394002311772
+    },
+    {
+      "stableKey": "src/lib/server/db/relations.ts",
+      "score": 0.21185601525657322
+    },
+    {
+      "stableKey": "src/lib/server/minio-client.ts",
+      "score": 0.21176270252947604
+    },
+    {
+      "stableKey": "src/lib/server/vector/qdrant-manager.ts",
+      "score": 0.20926432389988517
+    },
+    {
+      "stableKey": "src/lib/server/db/schema/library-documents.ts",
+      "score": 0.20804240731150803
+    },
+    {
+      "stableKey": "src/lib/server/gpu/libtorch-bridge.ts",
+      "score": 0.2071597745114388
+    },
+    {
+      "stableKey": "src/lib/server/db/schema/legal-citations.ts",
+      "score": 0.20664665085602343
+    }
+  ]
+}
