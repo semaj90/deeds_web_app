@@ -1660,6 +1660,21 @@ export async function runGemma4Agent(
     }
   }
 
+  // Build cluster context from accumulated Go/topology tool hits.
+  // Injected into messages so the model has structured cluster metadata
+  // before it synthesises its final answer (HCA compression step).
+  const goClusterPackets = buildGoClusterPackets(goRetrievalHits);
+  if (goClusterPackets?.length && !finalAnswer) {
+    const clusterBlock = goClusterPackets
+      .map(p => `[${p.clusterKey ?? p.clusterId}] ${p.topoClass}: ${p.chunkCount} hits` +
+                `${p.topFiles?.length ? ', top: ' + p.topFiles.slice(0, 3).join(', ') : ''}`)
+      .join('\n');
+    messages.push({
+      role: 'user' as const,
+      content: `[CLUSTER CONTEXT from retrieval tools]\n${clusterBlock}`,
+    });
+  }
+
   // If we ran out of rounds without a final answer, synthesise one.
   // Use tieredLLMQuery so the synthesis is cached (L1→L2→L3).
   // Bypass cache when any side-effect tool ran — stale "patch applied"
@@ -1853,4 +1868,57 @@ export async function runGemma4Agent(
 
         // 2. Validate Information Gain via Gemma4
         const validation = await validateInformationGain({
-         
+          context: query,
+          existing: existingText,
+          candidate: finalAnswer
+        });
+
+        // 3. Populate YorHA UI metadata
+        yorhaMetadata.informationGain = {
+          score: validation.gainScore,
+          decision: validation.shouldUpdate ? 'accepted' : 'rejected',
+          reason: validation.reasoning
+        };
+
+        // 4. Archive only if it provides significant improvement (respecting threshold)
+        const threshold = MEMORY_THRESHOLDS.synthesis_memory;
+        if (validation.success && validation.shouldUpdate && (validation.gainScore ?? 0) >= threshold) {
+          const { archiveSynthesisMemory } = await import('$lib/server/indexer/synthesis-memory-archiver.js');
+          await archiveSynthesisMemory({
+            title: query.slice(0, 60),
+            content: finalAnswer,
+            source: `chat:${options?.sessionId ?? 'anon'}`,
+            tags: toolsUsed,
+            metadata: { 
+              gainScore: validation.gainScore, 
+              reasoning: validation.reasoning,
+              validated_at: new Date().toISOString()
+            }
+          });
+          yorhaMetadata.memoryEncoded = true;
+          console.log(`[agent] High-gain memory encoded: ${query.slice(0, 30)}... (Gain: ${validation.gainScore})`);
+        }
+      }
+    } catch (e) {
+      console.error('[agent] Memory encoding failed:', e);
+      /* non-fatal */
+    }
+  }
+
+  return {
+    answer:      finalAnswer,
+    toolsUsed,
+    rounds:      round,
+    sources,
+    durationMs:  Date.now() - t0,
+    cacheTier:   resultCacheTier,
+    cacheLatencyMs: resultCacheMs,
+    errorFixMemoryHit,
+    verificationStatus,
+    inferenceBackend,
+    requestedBackend,
+    backendFallbackReason,
+    yorha: yorhaMetadata,
+    goToolClusterContext: goClusterPackets?.length ? goClusterPackets : undefined,
+  };
+}
