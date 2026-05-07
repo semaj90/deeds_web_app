@@ -52,7 +52,7 @@ const GO_RETRIEVAL_URL  = process.env.GO_RETRIEVAL_URL      ?? 'http://127.0.0.1
 const pool = new Pool({ connectionString: PG_URL, max: 4, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
 pool.on('error', () => {});
 
-// ── Coordinate clamping helpers ───────────────────────────────────────────────
+// ── Coordinate clamping + filter sanitization helpers ────────────────────────
 
 function clampFinite(n: unknown, fallback: number): number {
   const v = Number(n);
@@ -61,6 +61,28 @@ function clampFinite(n: unknown, fallback: number): number {
 
 function clamp01(n: unknown, fallback = 0.5): number {
   return Math.max(0, Math.min(1, clampFinite(n, fallback)));
+}
+
+function clampInt(n: unknown, min: number, max: number, fallback: number): number {
+  const v = Math.round(Number(n));
+  if (!Number.isFinite(v)) return fallback;
+  return Math.max(min, Math.min(max, v));
+}
+
+/**
+ * Strip non-scalar values and oversized keys from a filter object so Gemma4
+ * cannot pass nested objects, arrays, or injection payloads to Go services.
+ * Returns {} for any non-object input.
+ */
+function normalizeJsonFilter(input: unknown): Record<string, string | number | boolean> {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+  return Object.fromEntries(
+    Object.entries(input as Record<string, unknown>)
+      .filter(([k, v]) =>
+        typeof k === 'string' && k.length > 0 && k.length < 64 &&
+        (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')
+      )
+  );
 }
 
 // ── Shared retrieval hit shape ────────────────────────────────────────────────
@@ -417,19 +439,14 @@ server.tool(
     const cGrpoW     = clamp01(grpo_w     ?? 0.5);
     const cRadius    = Math.max(0.01, Math.min(5.0, clampFinite(radius, 0.5)));
     // Allow only scalar primitive filter values to prevent injection payloads
-    const safeFilters = filters
-      ? Object.fromEntries(
-          Object.entries(filters)
-            .filter(([k, v]) => k.length < 64 && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'))
-        )
-      : undefined;
+    const safeFilters = normalizeJsonFilter(filters);
     try {
       const body: Record<string, unknown> = {
         center: { som_x: cSomX, som_y: cSomY, semantic_z: cSemanticZ, grpo_w: cGrpoW },
         radius:  cRadius,
         limit:   Math.min(limit, 50),
       };
-      if (safeFilters && Object.keys(safeFilters).length > 0) body.filters = safeFilters;
+      if (Object.keys(safeFilters).length > 0) body.filters = safeFilters;
       const res = await fetch(`${TOPO_URL}/search/4d`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -749,8 +766,11 @@ server.tool(
   async ({ query, limit = 20, type = 'codebase', filters }) => {
     const t0 = Date.now();
     try {
-      const body: Record<string, unknown> = { query, limit: Math.min(limit, 50), type };
-      if (filters && Object.keys(filters).length > 0) body.filters = filters;
+      const safeQuery   = String(query ?? '').slice(0, 4000);
+      const safeLimit   = clampInt(limit, 1, 50, 10);
+      const safeFilters = normalizeJsonFilter(filters);
+      const body: Record<string, unknown> = { query: safeQuery, limit: safeLimit, type };
+      if (Object.keys(safeFilters).length > 0) body.filters = safeFilters;
       const res = await fetch(`${GO_SEARCH_URL}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
