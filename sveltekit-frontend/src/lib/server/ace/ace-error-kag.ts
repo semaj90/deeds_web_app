@@ -18,6 +18,8 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { db, qdrant } from '$lib/server/db/unified-client.js';
+import { sql } from 'drizzle-orm';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -172,21 +174,14 @@ export async function summarizeErrorToKag(input: ErrorKagInput): Promise<ErrorKa
   // ── 3. Persist to Postgres research_summaries ───────────────────────────
   let summaryId: string | undefined;
   try {
-    const { pool } = await import('$lib/server/db/client');
-    const res = await pool.query<{ id: string }>(
-      `INSERT INTO research_summaries
-         (title, summary, embedding, tags, source, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())
-       RETURNING id`,
-      [
-        `[${source}] ${summary.errorType}`,
-        JSON.stringify(summary),
-        embedding ? `[${embedding.join(',')}]` : null,
-        summary.tags,
-        source,
-      ],
-    );
-    summaryId = res.rows[0]?.id;
+    const title = `[${source}] ${summary.errorType}`;
+    const embeddingStr = embedding ? `[${embedding.join(',')}]` : null;
+    const result = await db.execute(sql`
+      INSERT INTO research_summaries (title, summary, embedding, tags, source, created_at)
+      VALUES (${title}, ${JSON.stringify(summary)}, ${embeddingStr}::vector,
+              ${summary.tags}, ${source}, NOW())
+      RETURNING id`);
+    summaryId = (result as unknown as Array<{ id: string }>)[0]?.id;
   } catch (err) {
     // Non-fatal — continue to Qdrant even if Postgres write fails
     console.warn('[ace-error-kag] Postgres write failed:', (err as Error).message);
@@ -194,35 +189,28 @@ export async function summarizeErrorToKag(input: ErrorKagInput): Promise<ErrorKa
 
   // ── 4. Upsert to Qdrant research_summaries collection ──────────────────
   let qdrantPoint: string | undefined;
-  if (embedding) {
+  if (embedding && qdrant) {
     try {
       const pointId = summaryId ?? crypto.randomUUID();
-      const upsertResp = await fetch(
-        `${ENV.QDRANT_URL}/collections/research_summaries/points`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            points: [{
-              id: pointId,
-              vector: embedding,
-              payload: {
-                title:         `[${source}] ${summary.errorType}`,
-                summary:       summaryText,
-                rootCause:     summary.rootCause,
-                fixHint:       summary.fixHint,
-                severity:      summary.severity,
-                affectedFiles: summary.affectedFiles,
-                tags:          summary.tags,
-                source,
-                createdAt:     new Date().toISOString(),
-              },
-            }],
-          }),
-          signal: AbortSignal.timeout(10_000),
-        },
-      );
-      if (upsertResp.ok) qdrantPoint = pointId;
+      await qdrant.upsert('research_summaries', {
+        points: [{
+          id: pointId,
+          vector: embedding,
+          payload: {
+            title:         `[${source}] ${summary.errorType}`,
+            summary:       summaryText,
+            rootCause:     summary.rootCause,
+            fixHint:       summary.fixHint,
+            severity:      summary.severity,
+            affectedFiles: summary.affectedFiles,
+            tags:          summary.tags,
+            source,
+            createdAt:     new Date().toISOString(),
+          },
+        }],
+        wait: false,
+      });
+      qdrantPoint = pointId;
     } catch (err) {
       console.warn('[ace-error-kag] Qdrant upsert failed:', (err as Error).message);
     }

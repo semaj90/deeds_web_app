@@ -10,9 +10,8 @@
  * scanning Redis.
  */
 
-import { QdrantClient } from '@qdrant/js-client-rest';
-import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
+import { qdrant } from '$lib/server/db/unified-client.js';
 import type { ACEContext } from './types.js';
 
 const COLLECTION = 'codebase_chunks_768';
@@ -65,7 +64,7 @@ export async function tagAceHits(
   let tagged = 0;
   let skipped = 0;
   try {
-    const client = new QdrantClient({ url: ENV.QDRANT_URL, checkCompatibility: false });
+    if (!qdrant) throw new Error('Qdrant client unavailable');
     const payload: Record<string, unknown> = {
       llm_synthesis_used: true,
       llm_synthesis_last_used_ms: Date.now(),
@@ -76,7 +75,7 @@ export async function tagAceHits(
     }
 
     // Batch all filePaths into a single setPayload call using an OR filter
-    await client.setPayload(COLLECTION, {
+    await qdrant.setPayload(COLLECTION, {
       payload,
       filter: {
         should: filePaths.map((fp) => ({
@@ -133,8 +132,8 @@ export async function getChunkHitCountBulk(filePaths: string[]): Promise<Map<str
  */
 export async function syncHitCountsToQdrant(filePaths: string[]): Promise<void> {
   if (!filePaths.length) return;
+  if (!qdrant) return;
   const countMap = await getChunkHitCountBulk(filePaths);
-  const client = new QdrantClient({ url: ENV.QDRANT_URL, checkCompatibility: false });
 
   // Group by count to batch into fewer setPayload calls
   const byCount = new Map<number, string[]>();
@@ -146,7 +145,7 @@ export async function syncHitCountsToQdrant(filePaths: string[]): Promise<void> 
 
   for (const [count, fps] of byCount) {
     try {
-      await client.setPayload(COLLECTION, {
+      await qdrant.setPayload(COLLECTION, {
         payload: { ace_cache_hit_count: count },
         filter: {
           should: fps.map((fp) => ({ key: 'path', match: { value: fp } })),
