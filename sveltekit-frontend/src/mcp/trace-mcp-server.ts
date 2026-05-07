@@ -27,9 +27,18 @@
  *   graph.expand_neighborhood    — ego-graph expansion (direct + N-hop neighbours)
  *   clusters.get_summary_lenses  — AGENTS.md/wiki notes for a GPU cluster
  *   trace.validate_ace_hit       — validate cache key contract + graph node presence
+ *
+ * Architecture note — tools are READ-ONLY (Gemma4 never writes to Qdrant/Neo4j/Redis directly).
+ * Batch writes flow through graphify:* npm scripts run outside the ACE hot path.
+ *
+ * TODO (optional future sidecar):
+ *   LangGraph can orchestrate long-running graphify → verify → human-approval → patch workflows
+ *   once the current FastMCP spine (this file) is stable and the observability dashboard is live.
+ *   It would call these same MCP tools + npm scripts, not replace them.
  */
 
 import http from 'node:http';
+import { createHash } from 'node:crypto';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
@@ -52,15 +61,24 @@ const GO_RETRIEVAL_URL  = process.env.GO_RETRIEVAL_URL      ?? 'http://127.0.0.1
 const pool = new Pool({ connectionString: PG_URL, max: 4, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
 pool.on('error', () => {});
 
-// ── Coordinate clamping + filter sanitization helpers ────────────────────────
+// ── ACE hits cache (Gemma4 agentic 24hr result cache) ─────────────────────────
 
-function clampFinite(n: unknown, fallback: number): number {
-  const v = Number(n);
-  return Number.isFinite(v) ? v : fallback;
+const ACE_HITS_TTL = 86_400; // 24 hours
+
+function aceHitsKey(queryHash: string, limit: number): string {
+  return `ace:hits:${queryHash}:${limit}`;
 }
 
-function clamp01(n: unknown, fallback = 0.5): number {
-  return Math.max(0, Math.min(1, clampFinite(n, fallback)));
+function hashQuery(query: string, limit: number): string {
+  return createHash('sha256').update(`${query.trim()}:${limit}`).digest('hex').slice(0, 16);
+}
+
+// ── Input hardening helpers ───────────────────────────────────────────────────
+
+function clampNumber(value: unknown, min: number, max: number, fallback = 0): number {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
 }
 
 function clampInt(n: unknown, min: number, max: number, fallback: number): number {
@@ -69,20 +87,13 @@ function clampInt(n: unknown, min: number, max: number, fallback: number): numbe
   return Math.max(min, Math.min(max, v));
 }
 
-/**
- * Strip non-scalar values and oversized keys from a filter object so Gemma4
- * cannot pass nested objects, arrays, or injection payloads to Go services.
- * Returns {} for any non-object input.
- */
-function normalizeJsonFilter(input: unknown): Record<string, string | number | boolean> {
-  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
-  return Object.fromEntries(
+function normalizeJsonFilter(input: unknown): Record<string, unknown> | undefined {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return undefined;
+  const out = Object.fromEntries(
     Object.entries(input as Record<string, unknown>)
-      .filter(([k, v]) =>
-        typeof k === 'string' && k.length > 0 && k.length < 64 &&
-        (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')
-      )
+      .filter(([k, v]) => k.length < 64 && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'))
   );
+  return Object.keys(out).length > 0 ? out : undefined;
 }
 
 // ── Shared retrieval hit shape ────────────────────────────────────────────────
@@ -432,21 +443,20 @@ server.tool(
   },
   async ({ som_x, som_y, semantic_z, grpo_w, radius, limit, filters }) => {
     const t0 = Date.now();
-    // Clamp all numeric inputs so the model cannot send unbounded payloads
-    const cSomX      = clampFinite(som_x, 0);
-    const cSomY      = clampFinite(som_y, 0);
-    const cSemanticZ = clamp01(semantic_z ?? 0.5);
-    const cGrpoW     = clamp01(grpo_w     ?? 0.5);
-    const cRadius    = Math.max(0.01, Math.min(5.0, clampFinite(radius, 0.5)));
-    // Allow only scalar primitive filter values to prevent injection payloads
+    const cSomX      = clampNumber(som_x,           0,    255);
+    const cSomY      = clampNumber(som_y,           0,    255);
+    const cSemanticZ = clampNumber(semantic_z ?? 0.5, -1,    1, 0.5);
+    const cGrpoW     = clampNumber(grpo_w     ?? 0.5, -1,    1, 0.5);
+    const cRadius    = clampNumber(radius,         0.01,  5.0, 0.5);
+    const cLimit     = clampNumber(limit,             1,   50, 10);
     const safeFilters = normalizeJsonFilter(filters);
     try {
       const body: Record<string, unknown> = {
         center: { som_x: cSomX, som_y: cSomY, semantic_z: cSemanticZ, grpo_w: cGrpoW },
         radius:  cRadius,
-        limit:   Math.min(limit, 50),
+        limit:   cLimit,
       };
-      if (Object.keys(safeFilters).length > 0) body.filters = safeFilters;
+      if (safeFilters) body.filters = safeFilters;
       const res = await fetch(`${TOPO_URL}/search/4d`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -526,24 +536,51 @@ server.tool(
 server.tool(
   'trace.kag_search',
   {
-    query:    z.string().max(2000).describe('Natural language question or search'),
+    query:    z.string().max(4000).describe('Natural language question or search'),
     filePath: z.string().optional().describe('Optional file path for AGENTS.md-scoped context'),
     limit:    z.number().int().min(1).max(50).default(10).describe('Max chunks returned'),
   },
   async ({ query, filePath, limit }) => {
-    // ── Try Go retrieval service first (GPU embedding + JSONB cache, 5s budget) ──
+    const safeQuery = String(query ?? '').slice(0, 4000);
+    const safeLimit = clampInt(limit, 1, 50, 10);
+    const qHash     = hashQuery(safeQuery, safeLimit);
+    const cacheKey  = aceHitsKey(qHash, safeLimit);
+
+    // ── L1: Redis 24hr hit cache ──────────────────────────────────────────────
+    try {
+      const { default: Redis } = await import('ioredis');
+      const redis = new Redis(REDIS_URL);
+      const cached = await redis.get(cacheKey).catch(() => null);
+      await redis.quit();
+      if (cached) {
+        const parsed = JSON.parse(cached) as Record<string, unknown>;
+        return {
+          content: [{
+            type: 'text' as const,
+            text: JSON.stringify({ ...parsed, cached: true }, null, 2),
+          }],
+        };
+      }
+    } catch { /* Redis unavailable — proceed to live retrieval */ }
+
+    // ── L2: Go retrieval service (GPU embedding + JSONB cache, 5s budget) ────
     try {
       const goT0  = Date.now();
       const goRes = await fetch(`${GO_RETRIEVAL_URL}/search/codebase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, limit }),
+        body: JSON.stringify({ query: safeQuery, limit: safeLimit }),
         signal: AbortSignal.timeout(5_000),
       });
       if (goRes.ok) {
         const goData = await goRes.json() as { results?: Array<Record<string, unknown>> };
         if (goData.results?.length) {
-          const normalized = normalizeGoRetrievalHits(goData, query, goT0);
+          const normalized = normalizeGoRetrievalHits(goData, safeQuery, goT0);
+          import('ioredis').then(({ default: Redis }) => {
+            const r = new Redis(REDIS_URL);
+            r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(normalized)).catch(() => {});
+            r.quit().catch(() => {});
+          }).catch(() => {});
           return {
             content: [{
               type: 'text' as const,
@@ -554,9 +591,9 @@ server.tool(
       }
     } catch { /* fall through to SvelteKit */ }
 
-    // ── Try SvelteKit KAG-DAG pipeline (3s budget — fast-path only) ─────────────
+    // ── L3: SvelteKit KAG-DAG pipeline (3s budget — fast-path only) ──────────
     try {
-      const body: Record<string, unknown> = { query, limit };
+      const body: Record<string, unknown> = { query: safeQuery, limit: safeLimit };
       if (filePath) body.filePath = filePath;
       const svelteFetch = sveltePost('/api/code-intel/search', body);
       svelteFetch.catch(() => {}); // prevent UnhandledPromiseRejection if race abandons it
@@ -573,15 +610,21 @@ server.tool(
         content:    typeof h.content === 'string' ? h.content.slice(0, 600) : '',
         topo_class: h.topoClass ?? h.topo_class ?? '',
       }));
+      const svelteResult = { success: true, data: hits, count: hits.length };
+      import('ioredis').then(({ default: Redis }) => {
+        const r = new Redis(REDIS_URL);
+        r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(svelteResult)).catch(() => {});
+        r.quit().catch(() => {});
+      }).catch(() => {});
       return {
         content: [{
           type: 'text' as const,
-          text: JSON.stringify({ success: true, data: hits, count: hits.length }, null, 2),
+          text: JSON.stringify(svelteResult, null, 2),
         }],
       };
     } catch { /* fall through to Postgres FTS */ }
 
-    // ── Postgres FTS fallback ─────────────────────────────────────────────────
+    // ── L4: Postgres FTS fallback ─────────────────────────────────────────────
     try {
       const client = await pool.connect();
       try {
@@ -590,7 +633,7 @@ server.tool(
           lexical_score: number; topo_class: string | null;
         }>(
           'SELECT * FROM search_code_lexical($1, $2, $3)',
-          [query, limit, null]
+          [safeQuery, safeLimit, null]
         );
         const hits = rows.map(r => ({
           stable_key: r.stable_key,
@@ -599,10 +642,16 @@ server.tool(
           content:    (r.chunk_text ?? '').slice(0, 600),
           topo_class: r.topo_class ?? '',
         }));
+        const ftsResult = { success: true, data: hits, count: hits.length, source: 'postgres_fts' };
+        import('ioredis').then(({ default: Redis }) => {
+          const r = new Redis(REDIS_URL);
+          r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(ftsResult)).catch(() => {});
+          r.quit().catch(() => {});
+        }).catch(() => {});
         return {
           content: [{
             type: 'text' as const,
-            text: JSON.stringify({ success: true, data: hits, count: hits.length, source: 'postgres_fts' }, null, 2),
+            text: JSON.stringify(ftsResult, null, 2),
           }],
         };
       } finally {
@@ -767,10 +816,10 @@ server.tool(
     const t0 = Date.now();
     try {
       const safeQuery   = String(query ?? '').slice(0, 4000);
-      const safeLimit   = clampInt(limit, 1, 50, 10);
+      const safeLimit   = clampNumber(limit, 1, 50, 10);
       const safeFilters = normalizeJsonFilter(filters);
       const body: Record<string, unknown> = { query: safeQuery, limit: safeLimit, type };
-      if (Object.keys(safeFilters).length > 0) body.filters = safeFilters;
+      if (safeFilters) body.filters = safeFilters;
       const res = await fetch(`${GO_SEARCH_URL}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

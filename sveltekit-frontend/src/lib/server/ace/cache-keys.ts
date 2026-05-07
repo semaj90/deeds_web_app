@@ -7,6 +7,12 @@ export const aceTopkKey = (
 	dim = 768
 ): string => `ace:topk:${queryHash}:${model}:${dim}`;
 
+// Gemma4 agentic hit cache — 24hr TTL, keyed by query+limit hash.
+// Written by trace-mcp-server.ts `trace.kag_search` handler; read on
+// subsequent Gemma4 tool calls to avoid re-running the retrieval pipeline.
+export const aceHitsKey = (queryHash: string, limit: number): string =>
+	`ace:hits:${queryHash}:${limit}`;
+
 export const aceErrorFpKey = (errorHash: string): string => `ace:error:fp:${errorHash}`;
 
 export const wikiPageKey = (slug: string): string => `wiki:page:${slug}`;
