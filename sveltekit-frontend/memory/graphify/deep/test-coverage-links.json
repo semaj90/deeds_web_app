@@ -713,13 +713,28 @@
     "tests/library-upload-ingest.spec.ts",
     "tests/routes/auto/api/library/documents.test.ts"
   ],
+  "src/lib/server/ai/llama-tool-definitions.ts": [
+    "tests/llama-tool-definitions.spec.ts"
+  ],
   "src/lib/server/retrieval/manifold4-search.ts": [
     "tests/manifold4-retrieval.spec.ts",
     "tests/manifold4-retrieval.spec.ts",
     "tests/manifold4-retrieval.spec.ts",
     "tests/manifold4-retrieval.spec.ts"
   ],
+  "src/lib/server/ace/multi-lane-retrieval.ts": [
+    "tests/multi-lane-retrieval.spec.ts",
+    "tests/multi-lane-retrieval.spec.ts",
+    "tests/multi-lane-spine.spec.ts"
+  ],
+  "src/lib/server/ace/retrieval-lanes.ts": [
+    "tests/multi-lane-spine.spec.ts",
+    "tests/retrieval-lanes.spec.ts",
+    "tests/retrieval-lanes.spec.ts",
+    "tests/retrieval-lanes.spec.ts"
+  ],
   "src/lib/server/ai/openai-facade.ts": [
+    "tests/openai-facade.spec.ts",
     "tests/openai-facade.spec.ts",
     "tests/openai-facade.spec.ts",
     "tests/openai-facade.spec.ts",
@@ -760,6 +775,12 @@
     "tests/routes/auto/api/persons-of-interest/__id.test.ts",
     "tests/routes/auto/api/persons-of-interest/__id.test.ts",
     "tests/routes/auto/api/persons-of-interest/__id.test.ts"
+  ],
+  "src/lib/server/graph/relationship-extractor.ts": [
+    "tests/relation-extractor.spec.ts",
+    "tests/relation-extractor.spec.ts",
+    "tests/relation-extractor.spec.ts",
+    "tests/relationship-extractor.spec.ts"
   ],
   "src/routes/api/reports/+server.ts": [
     "tests/reports-embed-chat-routes.spec.ts",

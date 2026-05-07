@@ -1,33 +1,33 @@
 {
-  "generatedAt": "2026-05-06T23:11:45.918Z",
-  "nodeCount": 3590,
-  "edgeCount": 11623,
-  "resolvedEdges": 6874,
-  "unresolvedEdges": 752,
-  "externalEdges": 3804,
+  "generatedAt": "2026-05-07T04:00:08.174Z",
+  "nodeCount": 3616,
+  "edgeCount": 11735,
+  "resolvedEdges": 6916,
+  "unresolvedEdges": 756,
+  "externalEdges": 3870,
   "edgeTypeBreakdown": {
-    "imports_static": 5412,
-    "imports_dynamic": 476,
+    "imports_static": 5455,
+    "imports_dynamic": 487,
     "env_dependency": 543,
-    "exports_from": 275,
-    "db_dependency": 884,
-    "redis_dependency": 363,
-    "qdrant_dependency": 157,
-    "test_covers_file": 2389,
-    "neo4j_dependency": 72,
-    "mcp_tool_calls": 49,
-    "server_route_depends_on": 1003
+    "exports_from": 276,
+    "db_dependency": 885,
+    "redis_dependency": 373,
+    "qdrant_dependency": 159,
+    "test_covers_file": 2426,
+    "neo4j_dependency": 75,
+    "mcp_tool_calls": 50,
+    "server_route_depends_on": 1006
   },
   "zoneBreakdown": {
-    "types": 119,
+    "types": 120,
     "client": 956,
-    "server": 617,
-    "test": 837,
-    "route": 1061
+    "server": 632,
+    "test": 845,
+    "route": 1063
   },
   "hotspotCount": 50,
   "routeCount": 50,
   "testCount": 30,
   "neighborhoodsComputed": 100,
-  "coveredFiles": 666
+  "coveredFiles": 670
 }

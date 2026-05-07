@@ -571,6 +571,48 @@ export function truncateToolResult(result: unknown, maxChars = 12_000): unknown 
   return s.slice(0, maxChars) + '\n[truncated]';
 }
 
+/**
+ * Convert accumulated Go/topology retrieval hits into ClusterContextPackets
+ * for injection into the pre-synthesis context block.
+ * Groups by clusterKey (or topoClass fallback), max 3 packets.
+ */
+function buildGoClusterPackets(
+  hits: Array<{ clusterKey?: string; topoClass?: string; path?: string; score?: number }>,
+): AgentRunResult['goToolClusterContext'] {
+  if (!hits.length) return undefined;
+  const byKey = new Map<string, { count: number; topoClass: string; files: Set<string>; scores: number[] }>();
+  for (const h of hits) {
+    const key = h.clusterKey ?? `topo:${h.topoClass ?? 'unknown'}`;
+    let entry = byKey.get(key);
+    if (!entry) {
+      entry = { count: 0, topoClass: h.topoClass ?? 'general', files: new Set(), scores: [] };
+      byKey.set(key, entry);
+    }
+    entry.count++;
+    if (h.path) entry.files.add(h.path);
+    if (h.score != null) entry.scores.push(h.score);
+  }
+  return [...byKey.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 3)
+    .map(([clusterKey, { count, topoClass, files, scores }]) => {
+      const clusterId = parseInt(clusterKey.replace(/\D/g, ''), 10) || 0;
+      const topFiles  = [...files].slice(0, 5).map(f => f.split('/').pop() ?? f);
+      const avgScore  = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
+      const scoreHint = avgScore != null ? `, avg score ${avgScore.toFixed(3)}` : '';
+      return {
+        clusterId,
+        clusterKey,
+        topoClass,
+        chunkCount: count,
+        topFiles,
+        synthesisSuggestion: `Go/topology: ${count} hits in ${clusterKey} (${topoClass})${scoreHint}. Top files: ${topFiles.slice(0, 3).join(', ')}.`,
+        communityId: null,
+        graphAuthorityScore: null,
+      };
+    });
+}
+
 // ── ALLOWED_TOOLS allowlist ────────────────────────────────────────────────────
 // read  — pure retrieval, no filesystem or DB writes; always allowed
 // write — filesystem or DB side-effect; requires explicit opt-in (ALLOW_WRITE_TOOLS)
@@ -1133,6 +1175,18 @@ async function dispatchTool(
         ...(grpo_w     != null ? { grpo_w }     : {}),
         ...(filters               ? { filters }   : {}),
       });
+      // Accumulate hits for cluster context injection before final synthesis
+      const topoNorm = data as { ok?: boolean; hits?: Array<Record<string, unknown>> };
+      if (topoNorm?.ok && Array.isArray(topoNorm.hits)) {
+        for (const h of topoNorm.hits.slice(0, 20)) {
+          goRetrievalHits.push({
+            clusterKey: h.clusterKey != null ? String(h.clusterKey) : undefined,
+            topoClass:  h.topoClass  != null ? String(h.topoClass)  : undefined,
+            path:       h.path       != null ? String(h.path)       : undefined,
+            score:      h.score      != null ? Number(h.score)      : undefined,
+          });
+        }
+      }
       return { tool: name, result: data };
     }
 
@@ -1148,6 +1202,18 @@ async function dispatchTool(
         query, type, limit,
         ...(filters ? { filters } : {}),
       });
+      // Accumulate hits for cluster context injection before final synthesis
+      const goNorm = data as { ok?: boolean; hits?: Array<Record<string, unknown>> };
+      if (goNorm?.ok && Array.isArray(goNorm.hits)) {
+        for (const h of goNorm.hits.slice(0, 20)) {
+          goRetrievalHits.push({
+            clusterKey: h.clusterKey != null ? String(h.clusterKey) : undefined,
+            topoClass:  h.topoClass  != null ? String(h.topoClass)  : undefined,
+            path:       h.path       != null ? String(h.path)       : undefined,
+            score:      h.score      != null ? Number(h.score)      : undefined,
+          });
+        }
+      }
       return { tool: name, result: data };
     }
 
@@ -1290,6 +1356,17 @@ export interface AgentRunResult {
   inferenceBackend?: 'bifrost' | 'turboquant' | 'ollama' | 'cache';
   backendFallbackReason?: string;
   yorha?: Record<string, unknown>;
+  /** Cluster context derived from Go/topology tool results during this agent run. */
+  goToolClusterContext?: Array<{
+    clusterId: number;
+    clusterKey?: string;
+    topoClass: string;
+    chunkCount: number;
+    topFiles?: string[];
+    synthesisSuggestion: string;
+    communityId: string | null;
+    graphAuthorityScore: number | null;
+  }>;
 }
 
 // ── Agent loop ────────────────────────────────────────────────────────────────
@@ -1318,6 +1395,9 @@ export async function runGemma4Agent(
   const pipeline    = options?.pipeline ?? 'ace';
   const toolsUsed:  string[]  = [];
   const sources:    unknown[] = [];
+  // Accumulates cluster/topology hits from Go retrieval tools across all rounds.
+  // Converted to ClusterContextPacket[] and injected before final synthesis.
+  const goRetrievalHits: Array<{ clusterKey?: string; topoClass?: string; path?: string; score?: number }> = [];
   // Bypass cache when caller requests it, or when side-effect tools were used
   let hasSideEffect = false;
   let bypassCache   = options?.bypassCache ?? false;
@@ -1773,56 +1853,4 @@ export async function runGemma4Agent(
 
         // 2. Validate Information Gain via Gemma4
         const validation = await validateInformationGain({
-          context: query,
-          existing: existingText,
-          candidate: finalAnswer
-        });
-
-        // 3. Populate YorHA UI metadata
-        yorhaMetadata.informationGain = {
-          score: validation.gainScore,
-          decision: validation.shouldUpdate ? 'accepted' : 'rejected',
-          reason: validation.reasoning
-        };
-
-        // 4. Archive only if it provides significant improvement (respecting threshold)
-        const threshold = MEMORY_THRESHOLDS.synthesis_memory;
-        if (validation.success && validation.shouldUpdate && (validation.gainScore ?? 0) >= threshold) {
-          const { archiveSynthesisMemory } = await import('$lib/server/indexer/synthesis-memory-archiver.js');
-          await archiveSynthesisMemory({
-            title: query.slice(0, 60),
-            content: finalAnswer,
-            source: `chat:${options?.sessionId ?? 'anon'}`,
-            tags: toolsUsed,
-            metadata: { 
-              gainScore: validation.gainScore, 
-              reasoning: validation.reasoning,
-              validated_at: new Date().toISOString()
-            }
-          });
-          yorhaMetadata.memoryEncoded = true;
-          console.log(`[agent] High-gain memory encoded: ${query.slice(0, 30)}... (Gain: ${validation.gainScore})`);
-        }
-      }
-    } catch (e) {
-      console.error('[agent] Memory encoding failed:', e);
-      /* non-fatal */
-    }
-  }
-
-  return {
-    answer:      finalAnswer,
-    toolsUsed,
-    rounds:      round,
-    sources,
-    durationMs:  Date.now() - t0,
-    cacheTier:   resultCacheTier,
-    cacheLatencyMs: resultCacheMs,
-    errorFixMemoryHit,
-    verificationStatus,
-    inferenceBackend,
-    requestedBackend,
-    backendFallbackReason,
-    yorha: yorhaMetadata
-  };
-}
+         
