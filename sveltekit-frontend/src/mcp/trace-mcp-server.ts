@@ -514,32 +514,6 @@ server.tool(
 
 // ── clusters.get_summary_lenses ───────────────────────────────────────────────
 
-server.tool(
-  'clusters.get_summary_lenses',
-  {
-    clusterKey: z.string().describe('Cluster key to get wiki notes / AGENTS.md for'),
-  },
-  async ({ clusterKey }) => {
-    try {
-      const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
-      const [wikiNote, agentNote] = await Promise.all([
-        redis.get(`wiki:note:cluster:${clusterKey}`),
-        redis.get(`agents:dir:${clusterKey}`),
-      ]);
-      await redis.quit();
-      return {
-        content: [{
-          type: 'text' as const,
-          text: JSON.stringify({ clusterKey, wikiNote, agentsMd: agentNote }, null, 2),
-        }],
-      };
-    } catch (err) {
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
-    }
-  }
-);
-
 // ── trace.kag_search ──────────────────────────────────────────────────────────
 
 server.tool(
@@ -1500,36 +1474,6 @@ server.tool(
       const result = await multiLaneSearch(r, pool, { text: query, isError, topK });
       await r.quit().catch(() => {});
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
-    } catch (err) {
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
-    }
-  }
-);
-
-// ── graph.expand_neighborhood ────────────────────────────────────────────────
-// Ego-graph expansion: returns direct + 2-hop neighbours for a given file path.
-
-server.tool(
-  'graph.expand_neighborhood',
-  {
-    filePath: z.string().max(512).describe('Source file path (e.g. src/lib/server/ace/context-assembler.ts)'),
-    hops:     z.number().int().min(1).max(3).default(2).describe('Expansion depth'),
-    limit:    z.number().int().min(1).max(50).default(20).describe('Max neighbours to return'),
-  },
-  async ({ filePath, hops, limit }) => {
-    try {
-      const cypher = `
-        MATCH (start:CodebaseFile {file_path: $fp})
-        CALL apoc.path.subgraphNodes(start, {maxLevel: $hops, limit: $limit}) YIELD node
-        WHERE node <> start
-        RETURN node.file_path AS neighbour, node.neo4j_gpuCluster AS cluster,
-               node.neo4j_pageRankScore AS pageRank
-        ORDER BY pageRank DESC NULLS LAST
-        LIMIT $limit
-      `;
-      const rows = await neo4jQuery(cypher, { fp: filePath, hops, limit }).catch(() => ({ results: [] }));
-      const data = (rows as Record<string, unknown>).results?.[0]?.data ?? [];
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ filePath, hops, neighbours: data }) }] };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
     }
