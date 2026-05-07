@@ -1,3 +1,5 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { pgRows, db } from '$lib/server/db/client';
 /**
  * ACE Context Assembler — Central Orchestration Module
@@ -16,7 +18,7 @@ import { pgRows, db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { aceRetrievalRuns } from '$lib/server/db/schema/metadata-spine.js';
-import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown } from './types.js';
+import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown, ClusterContextPacket } from './types.js';
 import { TOKEN_BUDGET } from './types.js';
 import { selectPracticeTemplate } from './practice-templates.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
@@ -69,6 +71,7 @@ import {
   recordLlmOutputHit,
 } from '$lib/server/cache/code-llm-index.js';
 import { getRedis } from '$lib/server/redis.js';
+import { aceTopkKey } from './cache-keys.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
 import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/ACPToolRegistry.js';
@@ -92,6 +95,121 @@ import {
 } from '$lib/server/cache/topo-candidate-cache.js';
 import type { TopoPrefilterStats } from '$lib/server/cache/topo-candidate-cache.js';
 import { aceCodeKey, TTL } from '$lib/server/cache-keys.js';
+import { fetchDeepImportGraphExpansion } from './graph-expander.js';
+import { runRetrievalLanes, type MultiLaneOutput } from './retrieval-lanes.js';
+
+// ── Cluster tags artifact reader (shared with multi-lane-retrieval) ──────────
+import {
+  readLatestQdrantClusterTags,
+  readLatestRelationSynthesis,
+  type ClusterTagsEntry,
+} from './cluster-tags-cache.js';
+
+/**
+ * Derives per-cluster Qdrant tag context from already-retrieved codebase chunks.
+ * Only clusters that appeared in this retrieval pass are included (gap_rel_004).
+ */
+function buildClusterContext(
+  codebaseCtx: ACEContext['codebaseContext']
+): ClusterContextPacket[] | null {
+  if (!codebaseCtx?.length) return null;
+
+  const byCluster = new Map<number, { tags: Map<string, number>; count: number; files: Set<string> }>();
+  for (const c of codebaseCtx) {
+    const cid = c.gpuCluster;
+    if (cid == null) continue;
+    let entry = byCluster.get(cid);
+    if (!entry) { entry = { tags: new Map(), count: 0, files: new Set() }; byCluster.set(cid, entry); }
+    entry.count++;
+    if (c.filePath) entry.files.add(c.filePath);
+    for (const tag of c.tags ?? []) {
+      entry.tags.set(tag, (entry.tags.get(tag) ?? 0) + 1);
+    }
+  }
+
+  if (byCluster.size === 0) return null;
+
+  const TOPO_HINT: Record<string, string> = {
+    cache: 'Redis/cache layer', vector: 'vector store / embeddings', graph: 'Neo4j graph layer',
+    db: 'database / Drizzle ORM', inference: 'LLM inference', frontend: 'SvelteKit frontend',
+    ace: 'ACE retrieval spine', server: 'server-side logic', routes: 'API routes',
+  };
+
+  // Build index from cluster tags artifact for enrichment
+  const artifactEntries = readLatestQdrantClusterTags();
+  const artifactByKey = new Map<string, ClusterTagsEntry>();
+  for (const e of artifactEntries) artifactByKey.set(e.clusterKey, e);
+
+  return [...byCluster.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 3)  // max 3 clusters per user spec
+    .map(([clusterId, { tags, count, files }]) => {
+      const topTags = [...tags.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([t]) => t);
+      const topoClass = topTags.find((t) => t in TOPO_HINT) ?? 'general';
+      const hint = TOPO_HINT[topoClass] ?? topoClass;
+      const clusterKey = `cluster:gpu:${clusterId}`;
+      const artifact = artifactByKey.get(clusterKey);
+      // Enrich from artifact: prefer artifact's richer tag list and topo classes
+      const enrichedTags = artifact
+        ? artifact.topTags.map((t) => t.tag).slice(0, 8)
+        : topTags;
+      const topFiles = [...files]
+        .slice(0, 5)
+        .map((f) => f.split('/').pop() ?? f);
+      const artifactTopFiles = (artifact?.topFiles ?? [])
+        .filter((f): f is string => typeof f === 'string')
+        .map((f) => f.split('/').pop() ?? f)
+        .slice(0, 5);
+      const topoClasses = artifact?.topoClasses ?? [topoClass];
+      const suggestion = artifact
+        ? `Cluster ${clusterKey} (${artifact.fileCount} files). Domains: ${topoClasses.slice(0, 3).join(', ')}. Tags: ${enrichedTags.slice(0, 4).join(', ')}.`
+        : `Cluster ${clusterId} (${hint}): focus on ${topTags.slice(0, 3).join(', ')} patterns.`;
+      return {
+        clusterId,
+        clusterKey,
+        topoClass,
+        topoClasses,
+        topTags: enrichedTags,
+        chunkCount: count,
+        topFiles: topFiles.length ? topFiles : artifactTopFiles,
+        synthesisSuggestion: suggestion,
+        communityId: null,
+        graphAuthorityScore: null,
+      };
+    });
+}
+
+/**
+ * Enrich ClusterContextPackets with GDS data from Redis ace:authority:top.
+ * Fire-and-forget safe — on any error returns packets unchanged.
+ */
+async function enrichClusterContextWithGds(
+  packets: ClusterContextPacket[] | null
+): Promise<ClusterContextPacket[] | null> {
+  if (!packets?.length) return packets;
+  try {
+    const redis = getRedis();
+    // Read representative file for each cluster from the cluster top-files list
+    const enriched = await Promise.all(
+      packets.map(async (pkt) => {
+        const repFile = pkt.topFiles?.[0];
+        if (!repFile) return pkt;
+        // ace:authority:top is a HASH: field = stable_key or file_path, value = JSON
+        const raw = await redis.hget('ace:authority:top', repFile).catch(() => null);
+        if (!raw) return pkt;
+        const entry = JSON.parse(raw) as { graphAuthorityScore?: number; communityId?: string | number };
+        return {
+          ...pkt,
+          communityId: entry.communityId != null ? String(entry.communityId) : pkt.communityId,
+          graphAuthorityScore: entry.graphAuthorityScore ?? pkt.graphAuthorityScore,
+        };
+      })
+    );
+    return enriched;
+  } catch {
+    return packets;
+  }
+}
 
 /** Vector-search web_search_index for semantically relevant pre-indexed pages. */
 async function fetchWebResearchRows(
@@ -367,6 +485,7 @@ export async function assembleACEContext(opts: {
         directoryKagContext,
         acpKnowledgeResults,
         graphIntelContext,
+        multiLaneResult,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -403,18 +522,40 @@ export async function assembleACEContext(opts: {
         fetchACPKnowledgeResults(query, ACP_MAX_RESULTS, 'codebase_chunks_768').catch(() => null),
         // Fast-AST graph intel: top relevant files + audit hotspots from codebase-graph.json
         getGraphIntelContext(query).catch(() => null),
+        // P1-A: Error-aware multi-lane search (hash exact + n-gram + graph + ace-cache).
+        // skipVectorLane=true because Qdrant already runs in fetchRAGChunks above.
+        opts.enableCodebaseContext
+          ? import('./multi-lane-retrieval.js').then(({ multiLaneSearch }) =>
+              import('$lib/server/db/client').then(({ pool: pgPool }) =>
+                multiLaneSearch(getRedis(), pgPool, {
+                  text: query,
+                  isError: /error|exception|failed|cannot|undefined is not|typeerror/i.test(query),
+                  topK: 8,
+                  skipVectorLane: true,
+                })
+              )
+            ).catch(() => null)
+          : Promise.resolve(null),
       ]);
 
       const { ragChunks, kbChunks, caseChunks } = ragResult;
 
-      // Fetch evidence metadata, connections, and semantic chat recall in parallel.
+      // Fetch evidence metadata, connections, semantic chat recall, and Phase A
+      // deep-import-graph expansion in parallel.
       // Chat recall searches Qdrant chat_messages for past turns similar to the
       // current query (across ALL prior sessions, not just the active conversation).
-      const [evidenceMetadata, evidenceConnections, chatMemory] = await Promise.all([
-        caseId ? fetchEvidenceMetadataForCase(caseId) : Promise.resolve(null),
-        caseId ? fetchEvidenceConnections(caseId) : Promise.resolve(null),
-        fetchChatMemory(query, conversationId).catch(() => []),
-      ]);
+      // Graph expansion enriches codebase context hits with typed import-graph data.
+      const importGraphFilePaths = [
+        ...(codebaseContext ?? []).map((c) => c.filePath),
+        ...(opts.filePath ? [opts.filePath] : []),
+      ];
+      const [evidenceMetadata, evidenceConnections, chatMemory, importGraphContext] =
+        await Promise.all([
+          caseId ? fetchEvidenceMetadataForCase(caseId) : Promise.resolve(null),
+          caseId ? fetchEvidenceConnections(caseId) : Promise.resolve(null),
+          fetchChatMemory(query, conversationId).catch(() => []),
+          fetchDeepImportGraphExpansion(importGraphFilePaths).catch(() => ''),
+        ]);
 
       // Determine practice area from case or user profile
       const practiceArea = extractPracticeArea(caseContext, userProfile);
@@ -449,6 +590,16 @@ export async function assembleACEContext(opts: {
       // P5-B: Apply QLoRA quality boost to RAG chunks (proven high-quality chunks get +0.05)
       const allRag = ragChunks.map(toUnified);
       await applyQloraBoost(allRag).catch(() => {});
+
+      // ── Multi-lane parallel retrieval (allSettled — degradation-safe) ──────
+      const { pool: pgPool } = await import('$lib/server/db/client');
+      const multiLaneOutput: MultiLaneOutput | null = await runRetrievalLanes({
+        query,
+        pool: pgPool,
+        redis: getRedis(),
+        caseId,
+        filePath: opts.filePath,
+      }).catch(() => null);
 
       const baseContext: ACEContext = {
         userProfile,
@@ -509,6 +660,28 @@ export async function assembleACEContext(opts: {
                   .map((r, i) => `[${i + 1}] [${r.source}] ${r.url}\n${r.body.slice(0, 600)}`)
                   .join('\n\n')
               : '',
+            // P1-A: Multi-lane synthesis block (hash exact-match + n-gram + graph recall)
+            multiLaneResult?.synthesisBlock ?? '',
+            // gap_rel_004: Compact cluster-aware context for llm_synthesis (max 3 clusters × 5 files × 8 tags)
+            (() => {
+              const pkts = buildClusterContext(codebaseContext ?? null);
+              if (!pkts?.length) return '';
+              const sections = pkts.slice(0, 3).map((p) => {
+                const key = p.clusterKey ?? `cluster:gpu:${p.clusterId}`;
+                const domains = p.topoClasses?.slice(0, 3).join(', ') || p.topoClass;
+                const tags = p.topTags.slice(0, 8).join(', ');
+                const files = (p.topFiles ?? []).slice(0, 5).join(', ');
+                return `Cluster: ${key} [${domains}] (${p.chunkCount} chunks)\nTags: ${tags}${files ? `\nFiles: ${files}` : ''}\nHint: ${p.synthesisSuggestion}`;
+              });
+              return `\n## Qdrant Cluster Tag Context\n${sections.join('\n\n')}`;
+            })(),
+            // gap_rel_004b: Relationship-aware ACE synthesis block (pre-computed by graphify:map)
+            (() => {
+              const block = readLatestRelationSynthesis();
+              return block ? `\n${block}` : '';
+            })(),
+            // Phase A: typed import-graph expansion for codebase context hits
+            importGraphContext ?? '',
             acpKnowledgeResults?.results?.length
               ? `\n## ACP Knowledge Cross-Feed (${acpKnowledgeResults.metadata.collection})\n` +
                 acpKnowledgeResults.results
@@ -532,6 +705,44 @@ export async function assembleACEContext(opts: {
         retrievalTrace: acpKnowledgeResults?.metadata?.topoPrefilter
           ? { topoPrefilter: acpKnowledgeResults.metadata.topoPrefilter }
           : undefined,
+        clusterContext: await enrichClusterContextWithGds(buildClusterContext(codebaseContext ?? null)),
+        multiLaneOutput: multiLaneOutput ?? null,
+        multiLane: (() => {
+          if (!multiLaneResult) return null;
+          // Build community-grouping addendum when GDS data is available on codebase hits.
+          // Uses codebaseContext (already Qdrant-enriched) — avoids an extra Redis call.
+          const communityAddendum = (() => {
+            if (!codebaseContext?.length) return '';
+            const byComm = new Map<string, { files: string[]; maxAuth: number }>();
+            for (const c of codebaseContext) {
+              const cid = c.communityId;
+              if (!cid) continue;
+              let entry = byComm.get(cid);
+              if (!entry) { entry = { files: [], maxAuth: 0 }; byComm.set(cid, entry); }
+              if (c.filePath && entry.files.length < 4) entry.files.push(c.filePath.split('/').pop() ?? c.filePath);
+              if ((c.graphAuthorityScore ?? 0) > entry.maxAuth) entry.maxAuth = c.graphAuthorityScore ?? 0;
+            }
+            if (byComm.size === 0) return '';
+            const lines = [...byComm.entries()]
+              .sort((a, b) => b[1].maxAuth - a[1].maxAuth)
+              .slice(0, 4)
+              .map(([cid, { files, maxAuth }]) =>
+                `- Community ${cid} (authority=${maxAuth.toFixed(3)}): ${files.join(', ')}`
+              );
+            return `\n### GDS Community Groups\n${lines.join('\n')}`;
+          })();
+          return {
+            knownError: multiLaneResult.knownError,
+            priorFix: multiLaneResult.priorFix,
+            topFiles: multiLaneResult.topFiles,
+            topSymbols: multiLaneResult.topSymbols,
+            lanesHit: multiLaneResult.lanes
+              .filter((l) => l.hits.length > 0)
+              .map((l) => l.lane),
+            synthesisBlock: multiLaneResult.synthesisBlock + communityAddendum,
+            durationMs: multiLaneResult.durationMs,
+          };
+        })(),
       };
 
       // ── HMM Wiki Logger — 4D topology note (fire-and-forget) ──────────
@@ -567,6 +778,37 @@ export async function assembleACEContext(opts: {
           await logHMMAnalysis(hmmAnalysis, proxiedGlyphs, { userId, caseId });
         } catch { /* non-fatal */ }
       })().catch(() => {});
+
+      // ── P4-A: Log multiLane context event to context_timeline ─────────
+      if (multiLaneResult && pgPool) {
+        const mlLanesHit = multiLaneResult.lanes
+          .filter((l) => l.hits.length > 0 && !l.skipped)
+          .map((l) => l.lane);
+        const mlLanesSkipped = multiLaneResult.lanes
+          .filter((l) => l.skipped)
+          .map((l) => l.lane);
+        pgPool
+          .query(
+            `INSERT INTO context_timeline (event_type, pipeline, payload)
+             VALUES ('ace_multilane_context_built', 'ace', $1::jsonb)`,
+            [
+              JSON.stringify({
+                queryHash:        multiLaneResult.queryHash,
+                knownError:       multiLaneResult.knownError,
+                priorFixPresent:  Boolean(multiLaneResult.priorFix),
+                lanesHit:         mlLanesHit,
+                lanesSkipped:     mlLanesSkipped,
+                totalHits:        multiLaneResult.totalHits,
+                topFiles:         multiLaneResult.topFiles.slice(0, 5),
+                topSymbols:       multiLaneResult.topSymbols.slice(0, 5),
+                durationMs:       multiLaneResult.durationMs,
+                userId:           userId ?? null,
+                caseId:           caseId ?? null,
+              }),
+            ]
+          )
+          .catch(() => {});
+      }
 
       // ── Autonomous Research Ingestion (Phase 6) ─────────────────────
       // Persist all external research (Web + Wikipedia) to knowledge_base
@@ -672,6 +914,19 @@ export async function assembleACEContext(opts: {
         } catch {
           /* non-fatal — fast-ast cache is best-effort */
         }
+      }
+
+      // P3-B: boost ragChunks whose filePath appears in multiLane.topFiles
+      // Files confirmed by ngram+symbol or ace_cache+symbol get +0.05 on top of existing score.
+      if (multiLaneResult && multiLaneResult.topFiles.length > 0 && baseContext.ragChunks?.length) {
+        const boostedFiles = new Set(multiLaneResult.topFiles);
+        const MULTILANE_BOOST = 0.05;
+        baseContext.ragChunks = baseContext.ragChunks.map((chunk) =>
+          chunk.filePath && boostedFiles.has(chunk.filePath)
+            ? { ...chunk, score: Math.min((chunk.score ?? 0) + MULTILANE_BOOST, 1.0) }
+            : chunk
+        );
+        baseContext.ragChunks = assignRanks(sortByBestScore(baseContext.ragChunks));
       }
 
       // Step 6: fetch VLM cluster narrative for the top matched cluster
@@ -1202,6 +1457,29 @@ async function setCachedACEBundle(
  * Falls through to sync buildACEPrompt() on cache miss.
  */
 export async function buildACEPromptCached(context: ACEContext, query: string): Promise<ACEPrompt> {
+  // P1-C: Fast pre-check using ace:query:{hash} written by multiLaneSearch.
+  // Prepends file/symbol hints derived from prior queries with the same hash
+  // so the model receives context faster — does NOT short-circuit full assembly.
+  try {
+    const { createHash } = await import('crypto');
+    const qHash = createHash('sha256').update(query.slice(0, 512)).digest('hex').slice(0, 12);
+    const fastHit = await getRedis().get(`ace:query:${qHash}`).catch(() => null);
+    if (fastHit) {
+      const { topFiles, knownError } = JSON.parse(fastHit) as { topFiles?: string[]; knownError?: boolean };
+      if (topFiles?.length || knownError) {
+        const hint = knownError
+          ? `\n> ⚡ **Known error pattern** — top files: ${(topFiles ?? []).slice(0, 3).join(', ')}\n`
+          : `\n> ⚡ **File hints (cache)**: ${(topFiles ?? []).slice(0, 3).join(', ')}\n`;
+        // Inject into context so buildACEPrompt can see it via multiLane block
+        if (!context.multiLane && topFiles?.length) {
+          (context as unknown as Record<string, unknown>).__fastHint = hint;
+        }
+      }
+    }
+  } catch {
+    // non-fatal
+  }
+
   const fingerprint = computeContextFingerprint(context, query);
   const cacheKey = bundleCacheKey('ace', fingerprint);
 
@@ -2166,6 +2444,21 @@ async function fetchRAGChunks(
     }
   }
 
+  // P0-B: Write top-K chunk metadata to Redis so the ACE cache lane in multi-lane-retrieval.ts
+  // can serve repeated queries at <2ms instead of re-running Qdrant (~200ms).
+  try {
+    const redis = getRedis();
+    const topkKey = aceTopkKey(queryHash);
+    const topkPayload = kbChunks.slice(0, 20).map((c) => ({
+      id: c.source,
+      text: c.content.slice(0, 200),
+      score: c.score,
+    }));
+    redis.setex(topkKey, 600, JSON.stringify(topkPayload)).catch(() => {});
+  } catch {
+    /* non-fatal — ACE cache lane will miss on this query, Qdrant is the fallback */
+  }
+
   return { ragChunks, kbChunks, caseChunks };
 }
 
@@ -2707,6 +3000,7 @@ export async function fetchCodebaseContext(
       somBmuCol: r.chunk.som_bmu_col != null ? Number(r.chunk.som_bmu_col) : null,
       // Pre-computed by nightly GDS job; avoids Neo4j RTT per ACE call
       graphAuthorityScore: r.chunk.graph_authority_score != null ? Number(r.chunk.graph_authority_score) : null,
+      communityId: r.chunk.communityId != null ? String(r.chunk.communityId) : null,
     });
 
     // Seed topo cache on miss (fire-and-forget) — stableKey + score from Qdrant results

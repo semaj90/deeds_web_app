@@ -192,7 +192,13 @@ export interface ACEContext {
     somBmuCol?: number | null;
     /** Normalised composite authority score mirrored from GDS nightly job via Qdrant payload */
     graphAuthorityScore?: number | null;
+    /** Louvain communityId written by graphify:gds, mirrored via Qdrant payload patch */
+    communityId?: string | null;
     rerankBreakdown?: RerankBreakdown | null;
+    /** Stable content-addressed key for this chunk (used by code-intel/search) */
+    stableKey?: string | null;
+    /** Topology class label (api-route, ui-component, etc.) */
+    topoClass?: string | null;
     /** Precomputed LLM output for this path from code-llm-index Redis cache */
     cachedLlmOutput?: string | null;
     /** Source pipeline of the cached LLM output */
@@ -289,6 +295,27 @@ export interface ACEContext {
       analysisMs:      number;
     };
   };
+  /**
+   * Per-cluster Qdrant tag context for the current retrieval pass.
+   * Only populated when codebase context is enabled and at least one
+   * codebase chunk carried a gpuCluster payload field.  Closes gap_rel_004:
+   * llm_synthesis can now read cluster tag metadata for domain summarisation.
+   */
+  clusterContext?: ClusterContextPacket[] | null;
+  /** Multi-lane parallel retrieval output (allSettled — degradation-safe) */
+  multiLaneOutput?: import('./retrieval-lanes.js').MultiLaneOutput | null;
+  /** Error-aware multi-lane results: hash exact-match + n-gram recall + graph expansion.
+   *  Populated when query matches error pattern or codebase context is enabled.
+   *  knownError=true means the hash lane found a prior fingerprint → priorFix may be set. */
+  multiLane?: {
+    knownError: boolean;
+    priorFix?: string;
+    topFiles: string[];
+    topSymbols: string[];
+    lanesHit: string[];
+    synthesisBlock: string;
+    durationMs: number;
+  } | null;
 }
 
 export interface ACEPrompt {
@@ -330,6 +357,42 @@ export interface GeneratedTag {
   category: 'statute' | 'case_law' | 'entity' | 'practice_area' | 'topic' | 'jurisdiction';
   confidence: number;
   source: 'regex' | 'ner' | 'llm' | 'manual';
+}
+
+/**
+ * Per-cluster Qdrant tag summary scoped to the current ACE query.
+ * Built from the codebase context hits that were retrieved — only clusters
+ * present in this retrieval pass are included.  Injected into the
+ * llm_synthesis step so cluster-aware domain summaries can be generated.
+ */
+export interface ClusterContextPacket {
+  clusterId: number;
+  /** Composite cluster key matching Qdrant payload, e.g. "cluster:gpu:6" */
+  clusterKey?: string;
+  /** Human-readable topo class label derived from the dominant tag */
+  topoClass: string;
+  /** Domain labels from the topology (e.g. ["server", "ace"]) */
+  topoClasses?: string[];
+  /** Top Qdrant tags by frequency across chunks in this cluster */
+  topTags: string[];
+  /** Number of chunks from this cluster in the current retrieval pass */
+  chunkCount: number;
+  /** Top files from the qdrant_cluster_tags artifact (global cluster view) */
+  topFiles?: string[];
+  /** Synthesis prompt hint built from topoClass + topTags */
+  synthesisSuggestion: string;
+  /**
+   * Louvain community id written by graphify:gds.
+   * Groups this cluster with others sharing a structural community in the
+   * IMPORTS/SIMILAR_TOPOLOGY graph — useful for cross-cluster synthesis.
+   */
+  communityId?: string | null;
+  /**
+   * Composite GDS authority score (0-1) for the cluster's representative file.
+   * 0.35×normPageRank + 0.25×normFanIn + 0.15×topoTrust + 0.15×testCoverage – 0.10×riskPenalty.
+   * Populated from Redis ace:authority:top after graphify:gds runs.
+   */
+  graphAuthorityScore?: number | null;
 }
 
 /** Token budget allocation per context source (expanded for 128K+ context models) */

@@ -494,6 +494,49 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'topology_search_4d',
+      description:
+        'Search using explicit 4D manifold coordinates (SOM grid + semantic projection + GRPO quality). ' +
+        'Use when you already know a SOM cluster position and want structurally-adjacent files ' +
+        'without re-embedding a query. Supports JSONB payload filters (topo_class, has_auth, etc.).',
+      parameters: {
+        type: 'object',
+        properties: {
+          som_x:      { type: 'number', description: 'SOM X coordinate (BMU column, 0-based)' },
+          som_y:      { type: 'number', description: 'SOM Y coordinate (BMU row, 0-based)' },
+          semantic_z: { type: 'number', description: 'Semantic centroid projection 0–1 (default 0.5)' },
+          grpo_w:     { type: 'number', description: 'GRPO quality weight 0–1 (default 0.5)' },
+          radius:     { type: 'number', description: 'Euclidean radius in 4D manifold space (default 0.5)' },
+          limit:      { type: 'number', description: 'Max results (default 20, max 50)' },
+          filters:    { type: 'object', description: 'Optional JSONB payload filters (e.g. { "topo_class": "server" })' },
+        },
+        required: ['som_x', 'som_y'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'search_go_hybrid',
+      description:
+        'Go search service RRF fusion: parallel fan-out of citation + FTS + pgvector + Qdrant ' +
+        'with reciprocal rank fusion. Faster than in-process hybrid for large-scale recall. ' +
+        'Supports JSONB metadata filters. Falls back gracefully when service is unavailable.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query:   { type: 'string', description: 'Search query' },
+          type:    { type: 'string', description: '"codebase", "legal", or "hybrid" (default: codebase)' },
+          limit:   { type: 'number', description: 'Max results (default 20, max 50)' },
+          filters: { type: 'object', description: 'Optional JSONB metadata filters' },
+        },
+        required: ['query'],
+      },
+    },
+  },
 ] as const;
 
 // ── GEMMA4_ALLOWED_TOOLS — exported allowlist for MCP graph/search tools ──────
@@ -512,6 +555,7 @@ export const GEMMA4_ALLOWED_TOOLS = {
   'graph.pagerank_top':          { write: false },
   'clusters.get_members':        { write: false },
   'clusters.get_summary_lenses': { write: false },
+  'trace.validate_ace_hit':      { write: false },
   'web.search':                  { write: false },
   'search.dev_context':          { write: false },
   'kag.record_agent_run':        { write: true,  requiresGainValidation: false },
@@ -549,12 +593,14 @@ const ALLOWED_TOOLS = {
     'context.explain_compression', 'context.refresh_task_toc',
     // MCP dev-context tool (Step 5B)
     'search.dev_context',
+    // B1 new tools: graph expansion, cluster lenses, ACE hit validator
+    'trace.validate_ace_hit',
     // LLAMA __ names (TurboQuant native function-call format)
     'search__dev_context', 'graph__expand_neighborhood', 'graph__shortest_path',
     'graph__community_for_node', 'graph__pagerank_top', 'topology__search_near',
     'topology__same_som_cluster', 'clusters__get_members', 'clusters__get_summary_lenses',
     'trace__kag_search', 'trace__explain_retrieval', 'context__get_compressed_card',
-    'context__build_kv_packet',
+    'context__build_kv_packet', 'trace__validate_ace_hit',
   ]),
   write: new Set([
     'apply_shadow_patch', 'revert_fix', 'verify_fix',
