@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-05-07T14:58:30.006Z",
+  "generatedAt": "2026-05-07T15:52:06.226Z",
   "nodeCount": 3652,
-  "edgeCount": 11882,
+  "edgeCount": 11886,
   "resolvedEdges": 7009,
   "unresolvedEdges": 766,
-  "externalEdges": 3914,
+  "externalEdges": 3918,
   "edgeTypeBreakdown": {
-    "imports_static": 5491,
+    "imports_static": 5495,
     "imports_dynamic": 491,
     "env_dependency": 543,
     "exports_from": 276,

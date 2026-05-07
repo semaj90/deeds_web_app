@@ -1,0 +1,431 @@
+{
+  "generatedAt": "2026-05-07T16:09:00.444Z",
+  "source": "2026-05-07T04:39:02.951Z",
+  "totalFiles": 2772,
+  "totalEdges": 11685,
+  "edgeCounts": {
+    "EXPORTS_SYMBOL": 8241,
+    "READS_REDIS_KEY": 86,
+    "WRITES_REDIS_KEY": 57,
+    "QUERIES_TABLE": 312,
+    "QUERIES_QDRANT_COLLECTION": 164,
+    "QUERIES_NEO4J_LABEL": 53,
+    "HAS_AGENTS_SCOPE": 2772
+  },
+  "topFilesByType": {
+    "READS_REDIS_KEY": [
+      {
+        "file": "lib/server/ace/context-assembler.ts",
+        "count": 5
+      },
+      {
+        "file": "lib/server/graph/community-graph.ts",
+        "count": 4
+      },
+      {
+        "file": "lib/server/ace/retrieval-lanes.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/ace/multi-lane-retrieval.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/ai/context-compression.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/cache/cartridge-tensor-bridge.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/graph/glyph-atlas-builder.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/adapters/service-integrations.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ai/kv-context-controller.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ai/mcp-tool-dispatch.ts",
+        "count": 1
+      }
+    ],
+    "WRITES_REDIS_KEY": [
+      {
+        "file": "lib/server/ml/recommendation-metrics.ts",
+        "count": 6
+      },
+      {
+        "file": "lib/server/cache/cartridge-tensor-bridge.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/graph/hypergraph-4d.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/ace/error-kag-writer.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/cartridge/glyph-tile-engine.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/graph/community-graph.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/indexer/directory-summarizer.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/ace/hmm-wiki-logger.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ai/kv-context-controller.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/analysis/evidence-analysis-pipeline.ts",
+        "count": 1
+      }
+    ],
+    "QUERIES_TABLE": [
+      {
+        "file": "lib/server/ace/context-assembler.ts",
+        "count": 5
+      },
+      {
+        "file": "lib/server/ace/ngram-retrieval.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/ace/retrieval-lanes.ts",
+        "count": 2
+      },
+      {
+        "file": "hooks.server.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/components/modals/EvidenceCRUDModal.svelte",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ace/ace-error-kag.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ace/error-fingerprint.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ace/error-kag-writer.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ace/multi-lane-retrieval.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/agent/supervisor.ts",
+        "count": 1
+      }
+    ],
+    "QUERIES_QDRANT_COLLECTION": [
+      {
+        "file": "lib/ai/model-ids.ts",
+        "count": 5
+      },
+      {
+        "file": "lib/server/ace/context-assembler.ts",
+        "count": 5
+      },
+      {
+        "file": "lib/server/ai/gemma4-agent.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/config/vector-config.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/analytics/web-research-crawler.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/components/legal-ai/CaseChatPanel.svelte",
+        "count": 1
+      },
+      {
+        "file": "lib/db/schema.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/models/ChatSession.svelte.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ace/ace-hit-tagger.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ace/chat-memory.ts",
+        "count": 1
+      }
+    ],
+    "QUERIES_NEO4J_LABEL": [
+      {
+        "file": "lib/server/graph/neo4j-schema.ts",
+        "count": 4
+      },
+      {
+        "file": "lib/server/graph/codebase-neo4j-sync.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/graph/pg-neo4j-sync.ts",
+        "count": 3
+      },
+      {
+        "file": "lib/server/ai/code-intel-service.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/graph/evidence-graph-service.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/graph/hypergraph-4d.ts",
+        "count": 2
+      },
+      {
+        "file": "lib/server/ace/context-assembler.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ai/hypergraph-store.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/ai/mcp-tool-dispatch.ts",
+        "count": 1
+      },
+      {
+        "file": "lib/server/analytics/architectural-guard.ts",
+        "count": 1
+      }
+    ]
+  },
+  "topTargetsByType": {
+    "READS_REDIS_KEY": [
+      {
+        "target": "code:index:manifest",
+        "count": 2
+      },
+      {
+        "target": "agents:root",
+        "count": 2
+      },
+      {
+        "target": "couchdb:pagerank_scores",
+        "count": 2
+      },
+      {
+        "target": "ace:authority:top",
+        "count": 1
+      },
+      {
+        "target": "code:index:tag:${word}",
+        "count": 1
+      },
+      {
+        "target": "agents:dir:${dir}",
+        "count": 1
+      },
+      {
+        "target": "code:graph:node:${nodeHash}",
+        "count": 1
+      },
+      {
+        "target": "code:graph:node:${h}",
+        "count": 1
+      },
+      {
+        "target": "ace:error:${errHash}",
+        "count": 1
+      },
+      {
+        "target": "code:graph:node:${hash}",
+        "count": 1
+      }
+    ],
+    "WRITES_REDIS_KEY": [
+      {
+        "target": "${GPU_RESULT_PREFIX}${caseId}",
+        "count": 2
+      },
+      {
+        "target": "${TILE_REDIS_PREFIX}${caseId}",
+        "count": 2
+      },
+      {
+        "target": "hg:adapt:pending",
+        "count": 2
+      },
+      {
+        "target": "${REDIS_PREFIX}:served:${dayKey}",
+        "count": 2
+      },
+      {
+        "target": "web:research:idx:all",
+        "count": 1
+      },
+      {
+        "target": "web:research:sum:${hashKey}",
+        "count": 1
+      },
+      {
+        "target": "hmm:flow:known_ids",
+        "count": 1
+      },
+      {
+        "target": "kv:toc:task:${taskId}",
+        "count": 1
+      },
+      {
+        "target": "${YOLO_CACHE_PREFIX}${hash}",
+        "count": 1
+      },
+      {
+        "target": "${CACHE_PREFIX}${userId}",
+        "count": 1
+      }
+    ],
+    "QUERIES_TABLE": [
+      {
+        "target": "research_summaries",
+        "count": 7
+      },
+      {
+        "target": "chunk_hit_log",
+        "count": 6
+      },
+      {
+        "target": "evidence",
+        "count": 4
+      },
+      {
+        "target": "context_timeline",
+        "count": 2
+      },
+      {
+        "target": "cases",
+        "count": 2
+      },
+      {
+        "target": "error_fingerprints",
+        "count": 2
+      },
+      {
+        "target": "document_chunks",
+        "count": 2
+      },
+      {
+        "target": "documents",
+        "count": 2
+      },
+      {
+        "target": "reports",
+        "count": 1
+      },
+      {
+        "target": "legal_glossary",
+        "count": 1
+      }
+    ],
+    "QUERIES_QDRANT_COLLECTION": [
+      {
+        "target": "legal_documents",
+        "count": 5
+      },
+      {
+        "target": "evidence_items",
+        "count": 5
+      },
+      {
+        "target": "codebase_chunks_768",
+        "count": 5
+      },
+      {
+        "target": "legal_glossary",
+        "count": 4
+      },
+      {
+        "target": "legal_canon_chunks",
+        "count": 3
+      },
+      {
+        "target": "legal_cases",
+        "count": 2
+      },
+      {
+        "target": "chat_messages",
+        "count": 2
+      },
+      {
+        "target": "embedding_cache",
+        "count": 2
+      },
+      {
+        "target": "codebase_chunks",
+        "count": 2
+      }
+    ],
+    "QUERIES_NEO4J_LABEL": [
+      {
+        "target": "CodebaseFile",
+        "count": 9
+      },
+      {
+        "target": "Case",
+        "count": 6
+      },
+      {
+        "target": "File",
+        "count": 4
+      },
+      {
+        "target": "Cluster",
+        "count": 3
+      },
+      {
+        "target": "Evidence",
+        "count": 3
+      },
+      {
+        "target": "Statute",
+        "count": 2
+      },
+      {
+        "target": "ResearchSummary",
+        "count": 1
+      },
+      {
+        "target": "Component",
+        "count": 1
+      },
+      {
+        "target": "Store",
+        "count": 1
+      }
+    ]
+  }
+}

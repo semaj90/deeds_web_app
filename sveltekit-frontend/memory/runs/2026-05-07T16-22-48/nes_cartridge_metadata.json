@@ -1,0 +1,26 @@
+{
+  "event": "turboquant_kv_profile_promoted",
+  "from": "q8_0/q8_0",
+  "to": "turbo3/turbo4",
+  "activeKvProfile": "turbo3/4",
+  "profile": {
+    "keyCache": "turbo3",
+    "valueCache": "turbo4",
+    "flashAttention": true,
+    "contextWindow": 4096
+  },
+  "stabilityGate": {
+    "generations": 20,
+    "ok": 20,
+    "crash": 0,
+    "nan": 0,
+    "repetitive": 0,
+    "invalidJson": 0,
+    "medianMs": 4880,
+    "p95Ms": 5420,
+    "vramDeltaMb": 5
+  },
+  "promotedAt": "2026-05-07T16:22:48.000Z",
+  "grpoReward": 1.0,
+  "stabilityGatePassed": true
+}

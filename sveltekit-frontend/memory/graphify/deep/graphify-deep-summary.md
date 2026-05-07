@@ -1,14 +1,14 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-07T14:58:30.006Z
+Generated: 2026-05-07T15:52:06.226Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
 | Nodes | 3652 |
-| Total edges | 11882 |
+| Total edges | 11886 |
 | Resolved edges | 7009 |
 | Unresolved (local) | 766 |
-| External refs | 3914 |
+| External refs | 3918 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 681 |
 
@@ -24,7 +24,7 @@ Generated: 2026-05-07T14:58:30.006Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 5491 |
+| imports_static | 5495 |
 | test_covers_file | 2500 |
 | server_route_depends_on | 1015 |
 | db_dependency | 888 |

@@ -29,7 +29,7 @@
 import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { existsSync, readFileSync }      from 'node:fs';
 import { execSync }                     from 'node:child_process';
-import { resolve, dirname, join }       from 'node:path';
+import { resolve, dirname, join, basename } from 'node:path';
 import { fileURLToPath }                from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -362,14 +362,22 @@ async function main() {
   }
 
   // 4. Build file→cluster index
-  const fileToCluster = new Map();   // relative path → clusterKey
-  const clusterFiles  = new Map();   // clusterKey   → string[]
+  const fileToCluster    = new Map();   // relative path → clusterKey
+  const clusterFiles     = new Map();   // clusterKey   → {rel,pageRank,fanIn}[]
+  const clusterAuthority = new Map();   // clusterKey   → max graphAuthorityScore
   for (const node of nodes) {
     const rel = toRelative(node.filePath ?? '');
     if (!rel) continue;
-    fileToCluster.set(rel, node.clusterKey);
-    if (!clusterFiles.has(node.clusterKey)) clusterFiles.set(node.clusterKey, []);
-    clusterFiles.get(node.clusterKey).push({ rel, pageRank: node.pageRank ?? 0, fanIn: node.fanIn ?? 0 });
+    // Support both camelCase (graph_nodes.json) and snake_case field names
+    const clusterKey = node.clusterKey ?? node.cluster_key;
+    if (!clusterKey) continue;
+    fileToCluster.set(rel, clusterKey);
+    if (!clusterFiles.has(clusterKey)) clusterFiles.set(clusterKey, []);
+    clusterFiles.get(clusterKey).push({ rel, pageRank: node.pageRank ?? 0, fanIn: node.fanIn ?? 0 });
+    const nodeAuthority = node.graphAuthorityScore ?? node.graph_authority_score ?? 0;
+    if (nodeAuthority > (clusterAuthority.get(clusterKey) ?? 0)) {
+      clusterAuthority.set(clusterKey, nodeAuthority);
+    }
   }
 
   // 5. Map diagnostics → cluster
@@ -392,14 +400,17 @@ async function main() {
   const g25Files = rgFiles('\\$(?:state|derived|effect|props)\\s*[(<]', join(SRC_DIR, 'lib'))
     .filter(f => f.endsWith('.ts') && !f.endsWith('.svelte.ts') && !f.endsWith('.d.ts'))
     .filter(f => {
-      // Skip false positives: matches that only appear in comments or string literals
+      // Skip false positives: matches only in comments or string literals
       try {
         const src = readFileSync(f, 'utf8');
-        const codeLines = src.split('\n').filter(l => {
-          const t = l.trim();
-          return t && !t.startsWith('//') && !t.startsWith('*') && !t.startsWith('/*');
-        }).join('\n');
-        return /\$(?:state|derived|effect|props)\s*[(<]/.test(codeLines);
+        const cleaned = src.split('\n')
+          .filter(l => { const t = l.trim(); return t && !t.startsWith('//') && !t.startsWith('*') && !t.startsWith('/*'); })
+          .map(l => l.replace(/\/\/.*$/, ''))             // strip inline comments
+          .join('\n')
+          .replace(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")    // strip single-quoted strings
+          .replace(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')    // strip double-quoted strings
+          .replace(/`[^`\\]*(?:\\.[^`\\]*)*`/g, '``');   // strip template literals
+        return /\$(?:state|derived|effect|props)\s*[(<]/.test(cleaned);
       } catch { return false; }
     });
 
@@ -409,7 +420,8 @@ async function main() {
 
   // ── Tier C: Infrastructure ────────────────────────────────────────────────────
   const g17Files = rgFiles('localhost|127\\.0\\.0\\.1', join(SRC_DIR, 'lib/server'))
-    .filter(f => !f.endsWith('env.server.ts') && !f.endsWith('env.server.js'));
+    .filter(f => !f.endsWith('env.server.ts') && !f.endsWith('env.server.js')
+              && !f.endsWith('.md') && !f.endsWith('.env') && !basename(f).startsWith('.env'));
 
   // ── Tier D: Security ──────────────────────────────────────────────────────────
   const routesApiDir = join(SRC_DIR, 'routes/api');
@@ -524,7 +536,9 @@ async function main() {
     const diagList    = clusterDiag.get(cluster.cluster_key)    ?? [];
     const shallowList = clusterShallow.get(cluster.cluster_key) ?? [];
     const protocols   = [...(clusterProtocols.get(cluster.cluster_key) ?? [])];
-    const authority   = cluster.graph_authority_score ?? 0;
+    // Authority: prefer aggregated max from nodes (graphAuthorityScore), fall back to synthMap field
+    const authority   = clusterAuthority.get(cluster.cluster_key ?? cluster.clusterKey)
+                        ?? cluster.graph_authority_score ?? cluster.graphAuthorityScore ?? 0;
 
     // Gate violations in this cluster
     const gateViolations = [...files].filter(({ rel }) => auditGateFiles.has(rel)).length;

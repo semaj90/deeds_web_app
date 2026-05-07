@@ -1,0 +1,223 @@
+{
+  "profile": "turbo3",
+  "profileArgs": {
+    "ctk": "turbo3",
+    "ctv": "turbo4",
+    "label": "turbo3/4 (experimental)"
+  },
+  "port": "8090",
+  "generationsRequested": 20,
+  "results": [
+    {
+      "gen": 1,
+      "prompt": "Summarize the hearsay rule exception for excited utterances ",
+      "ok": true,
+      "latencyMs": 5082,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 2,
+      "prompt": "What is the statute of limitations for civil fraud claims in",
+      "ok": true,
+      "latencyMs": 5326,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 3,
+      "prompt": "Define chain of custody and its importance in evidence admis",
+      "ok": true,
+      "latencyMs": 5043,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 4,
+      "prompt": "Explain the Miranda rights and when they must be read to a s",
+      "ok": true,
+      "latencyMs": 4895,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 5,
+      "prompt": "What constitutes an effective waiver of attorney-client priv",
+      "ok": true,
+      "latencyMs": 5220,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 6,
+      "prompt": "Respond with a JSON object: { \"rule\": \"...\", \"exception\": \".",
+      "ok": true,
+      "latencyMs": 4583,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 7,
+      "prompt": "Return JSON: { \"elements\": [\"element1\",\"element2\",\"element3\"",
+      "ok": true,
+      "latencyMs": 4563,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 8,
+      "prompt": "Output JSON: { \"party\": \"plaintiff\", \"burden\": \"preponderanc",
+      "ok": true,
+      "latencyMs": 5420,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 9,
+      "prompt": "What is voir dire?",
+      "ok": true,
+      "latencyMs": 4838,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 10,
+      "prompt": "Define subpoena duces tecum.",
+      "ok": true,
+      "latencyMs": 4959,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 11,
+      "prompt": "What is a writ of habeas corpus?",
+      "ok": true,
+      "latencyMs": 4988,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 12,
+      "prompt": "Define res judicata.",
+      "ok": true,
+      "latencyMs": 5097,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 13,
+      "prompt": "What is collateral estoppel?",
+      "ok": true,
+      "latencyMs": 4586,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 14,
+      "prompt": "Summarize the hearsay rule exception for excited utterances ",
+      "ok": true,
+      "latencyMs": 4853,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 15,
+      "prompt": "What is voir dire?",
+      "ok": true,
+      "latencyMs": 4685,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 16,
+      "prompt": "Analyze how the Frye standard for expert testimony differs f",
+      "ok": true,
+      "latencyMs": 4880,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 17,
+      "prompt": "What are the grounds for a directed verdict motion in federa",
+      "ok": true,
+      "latencyMs": 4611,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 18,
+      "prompt": "Explain the exclusionary rule and its exceptions under Unite",
+      "ok": true,
+      "latencyMs": 4751,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 19,
+      "prompt": "Describe the doctrine of res ipsa loquitur with a medical ma",
+      "ok": true,
+      "latencyMs": 4794,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 20,
+      "prompt": "What constitutional protections apply to digital searches un",
+      "ok": true,
+      "latencyMs": 4852,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    }
+  ],
+  "okCount": 20,
+  "crashCount": 0,
+  "nanCount": 0,
+  "repCount": 0,
+  "jsonFail": 0,
+  "median": 4880,
+  "p95": 5420,
+  "vramBefore": 5569,
+  "vramAfter": 5584,
+  "pass": true,
+  "testedAt": "2026-05-07T16:12:05.578Z"
+}

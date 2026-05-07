@@ -1,17 +1,17 @@
 {
   "runId": "2026-05-07T14-55-56",
-  "synthesizedAt": "2026-05-07T15:41:24.534Z",
+  "synthesizedAt": "2026-05-07T15:55:12.808Z",
   "tsgoDiagnostics": 0,
   "shallowWiredFiles": 357,
   "auditGates": {
-    "g11_wrong_db_client": 4,
+    "g11_wrong_db_client": 0,
     "g17_localhost_hardcoded": 166,
     "g18_missing_auth": 0,
-    "g19_missing_zod": 4,
+    "g19_missing_zod": 0,
     "g21_svelte4_props": 0,
     "g22_svelte4_reactive": 0,
     "g23_svelte4_events": 0,
-    "g25_runes_in_plain_ts": 8,
+    "g25_runes_in_plain_ts": 4,
     "g27_pass": true,
     "g27_kmeans_consumers": 7,
     "g27_som_consumers": 7,
@@ -40,7 +40,7 @@
     },
     {
       "cluster": "cluster:gpu:58",
-      "risk": 0.5991525423728814,
+      "risk": 0.6275147928994083,
       "diagCount": 0,
       "shallowCount": 0,
       "protocols": [
@@ -66,7 +66,7 @@
   "p1": [
     {
       "cluster": "cluster:gpu:73",
-      "risk": 0.4279661016949153,
+      "risk": 0.4482248520710059,
       "diagCount": 0,
       "shallowCount": 0,
       "protocols": [

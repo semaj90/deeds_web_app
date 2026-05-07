@@ -64,11 +64,12 @@ let nodes = [];
 try {
   const result = await session.run(
     `MATCH (n)
-     WHERE n.graphPageRank IS NOT NULL AND n.stableKey IS NOT NULL
-     RETURN n.stableKey       AS stableKey,
-            n.graphPageRank   AS graphPageRank,
-            n.louvainCommunity AS louvainCommunity
-     ORDER BY n.graphPageRank DESC
+     WHERE (n.graphPageRank IS NOT NULL OR n.graphAuthorityScore IS NOT NULL)
+       AND (n.stableKey IS NOT NULL OR n.filePath IS NOT NULL)
+     RETURN coalesce(n.stableKey, n.filePath) AS stableKey,
+            coalesce(n.graphPageRank, n.graphAuthorityScore) AS graphPageRank,
+            coalesce(n.louvainCommunity, n.communityId) AS louvainCommunity
+     ORDER BY coalesce(n.graphPageRank, n.graphAuthorityScore) DESC
      LIMIT $limit`,
     { limit: neo4j.int(limit) }
   );
@@ -120,7 +121,7 @@ const t0     = Date.now();
 while (true) {
   const scrollBody = JSON.stringify({
     limit: BATCH,
-    with_payload: ['stable_key'],
+    with_payload: ['stable_key', 'relativePath', 'file_path'],
     with_vector:  false,
     ...(offset != null ? { offset } : {}),
   });
@@ -140,8 +141,14 @@ while (true) {
   if (pts.length === 0) break;
 
   for (const pt of pts) {
-    const sk = pt.payload?.stable_key;
-    if (!sk || !scoreMap.has(sk)) continue;
+    // Try stable_key first, then relativePath stripped of leading src/, then file_path
+    const rawKey = pt.payload?.stable_key
+      ?? pt.payload?.relativePath
+      ?? pt.payload?.file_path;
+    if (!rawKey) continue;
+    // Normalize: strip leading 'src/' so 'src/lib/...' matches 'lib/...'
+    const sk = rawKey.replace(/^src\//, '');
+    if (!scoreMap.has(sk)) continue;
 
     await fetch(
       `${QDRANT_URL}/collections/${COLLECTION}/points/payload`,

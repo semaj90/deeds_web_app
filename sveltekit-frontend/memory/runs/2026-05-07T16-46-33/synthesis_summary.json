@@ -1,0 +1,166 @@
+{
+  "runId": "2026-05-07T16-46-33",
+  "synthesizedAt": "2026-05-07T16:47:20.123Z",
+  "tsgoDiagnostics": 62,
+  "shallowWiredFiles": 357,
+  "auditGates": {
+    "g11_wrong_db_client": 0,
+    "g17_localhost_hardcoded": 102,
+    "g18_missing_auth": 0,
+    "g19_missing_zod": 0,
+    "g21_svelte4_props": 0,
+    "g22_svelte4_reactive": 0,
+    "g23_svelte4_events": 0,
+    "g25_runes_in_plain_ts": 0,
+    "g27_pass": true,
+    "g27_kmeans_consumers": 7,
+    "g27_som_consumers": 7,
+    "g40_glyph_cache_pass": true
+  },
+  "totalFiles": 2772,
+  "totalEdges": 11685,
+  "p0": [
+    {
+      "cluster": "cluster:gpu:6",
+      "risk": 1,
+      "diagCount": 0,
+      "shallowCount": 2,
+      "protocols": [
+        "qdrant-vector",
+        "redis-ioredis",
+        "sql-drizzle"
+      ],
+      "topFiles": [
+        "src/lib/server/ace/ace-agent.ts",
+        "src/lib/server/ace/ace-error-kag.ts",
+        "src/lib/server/ace/ace-hit-tagger.ts",
+        "src/lib/server/ace/auto-tagger.ts",
+        "src/lib/server/ace/chat-memory.ts"
+      ]
+    },
+    {
+      "cluster": "cluster:gpu:58",
+      "risk": 1,
+      "diagCount": 0,
+      "shallowCount": 0,
+      "protocols": [
+        "w3c-fetch",
+        "xstate-v5",
+        "svelte5-runes",
+        "sse-streams",
+        "grpc",
+        "sql-drizzle",
+        "webgpu",
+        "redis-ioredis",
+        "neo4j-cypher"
+      ],
+      "topFiles": [
+        "src/lib/machines/AIAssistantMachineComponent.svelte",
+        "src/lib/machines/audio-upload-machine.ts",
+        "src/lib/machines/auth-machine.ts",
+        "src/lib/machines/document-upload-machine.ts",
+        "src/lib/machines/evidence-processing-machine.ts"
+      ]
+    },
+    {
+      "cluster": "cluster:gpu:73",
+      "risk": 0.5941176470588235,
+      "diagCount": 0,
+      "shallowCount": 0,
+      "protocols": [
+        "neo4j-cypher",
+        "redis-ioredis",
+        "sql-drizzle",
+        "sse-streams",
+        "svelte5-runes",
+        "qdrant-vector"
+      ],
+      "topFiles": [
+        "src/lib/server/graph/codebase-cluster-detection.ts",
+        "src/lib/server/graph/codebase-neo4j-sync.ts",
+        "src/lib/server/graph/codebase-scanner-v2.ts",
+        "src/lib/server/graph/codebase-scanner.ts",
+        "src/lib/server/graph/community-graph.ts"
+      ]
+    }
+  ],
+  "p1": [
+    {
+      "cluster": "cluster:gpu:92",
+      "risk": 0.3,
+      "diagCount": 0,
+      "shallowCount": 86,
+      "protocols": [
+        "sql-drizzle",
+        "w3c-fetch",
+        "svelte5-runes"
+      ],
+      "topFiles": [
+        "src/lib/client/ui/POIPhotoUploader.svelte",
+        "src/lib/components/ActionPopup.svelte",
+        "src/lib/components/agent/AutonomousInvestigator.svelte",
+        "src/lib/components/agentic/AgentChat.svelte",
+        "src/lib/components/agentic/AgenticController.svelte"
+      ]
+    },
+    {
+      "cluster": "cluster:gpu:19",
+      "risk": 0.29705882352941176,
+      "diagCount": 0,
+      "shallowCount": 0,
+      "protocols": [
+        "redis-ioredis",
+        "sql-drizzle",
+        "neo4j-cypher",
+        "qdrant-vector"
+      ],
+      "topFiles": [
+        "src/lib/server/ai/ab-test.ts",
+        "src/lib/server/ai/cached-stream.ts",
+        "src/lib/server/ai/caching-layer.ts",
+        "src/lib/server/ai/code-intel-service.ts",
+        "src/lib/server/ai/compact-budgets.ts"
+      ]
+    },
+    {
+      "cluster": "cluster:gpu:20",
+      "risk": 0.29705882352941176,
+      "diagCount": 0,
+      "shallowCount": 0,
+      "protocols": [
+        "webgpu",
+        "otel-langfuse",
+        "grpc",
+        "redis-ioredis",
+        "sql-drizzle",
+        "sse-streams",
+        "xstate-v5"
+      ],
+      "topFiles": [
+        "src/lib/gpu/shader-registry.ts",
+        "src/lib/server/gpu/autoencoder-bridge.ts",
+        "src/lib/server/gpu/cuda-bridge.ts",
+        "src/lib/server/gpu/gpu-monitor.ts",
+        "src/lib/server/gpu/mapreduce-runner.mjs"
+      ]
+    },
+    {
+      "cluster": "cluster:gpu:59",
+      "risk": 0.2392270861833105,
+      "diagCount": 0,
+      "shallowCount": 26,
+      "protocols": [
+        "sql-drizzle",
+        "w3c-fetch",
+        "svelte5-runes"
+      ],
+      "topFiles": [
+        "src/lib/components/evidence/board-persistence.svelte.ts",
+        "src/lib/components/evidence/BoardMinimap.svelte",
+        "src/lib/components/evidence/CaseEvidenceOrganizer.svelte",
+        "src/lib/components/evidence/DoclingExtractionViewer.svelte",
+        "src/lib/components/evidence/DraggableEvidenceNode.svelte"
+      ]
+    }
+  ]
+}

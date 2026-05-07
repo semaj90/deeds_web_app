@@ -19,7 +19,7 @@ _(--no-llm: synthesis skipped)_
 
 **Top files**: `src/lib/server/ace/ace-agent.ts`  `src/lib/server/ace/ace-error-kag.ts`  `src/lib/server/ace/ace-hit-tagger.ts`
 
-### 🔴 cluster:gpu:58 — risk `0.599`
+### 🔴 cluster:gpu:58 — risk `0.628`
 
 **Files**: 54  ·  **Diagnostics**: 0  ·  **Shallow wiring**: 0  ·  **Authority**: 0.000
 **Protocols**: `w3c-fetch`  `xstate-v5`  `svelte5-runes`  `sse-streams`  `grpc`  `sql-drizzle`  `webgpu`  `redis-ioredis`  `neo4j-cypher`
@@ -32,7 +32,7 @@ _(--no-llm: synthesis skipped)_
 
 ## P1 — Important (improves ACE quality)
 
-### 🟡 cluster:gpu:73 — risk `0.428`
+### 🟡 cluster:gpu:73 — risk `0.448`
 
 **Files**: 25  ·  **Diagnostics**: 0  ·  **Shallow wiring**: 0  ·  **Authority**: 0.000
 **Protocols**: `neo4j-cypher`  `redis-ioredis`  `sql-drizzle`  `sse-streams`  `svelte5-runes`  `qdrant-vector`
@@ -257,7 +257,7 @@ _Run ID: 2026-05-07T14-55-56 · Audit: 28 checks · 23 closed · 3 open · 2 par
 | Field | Value |
 |-------|-------|
 | Run ID | `2026-05-07T14-55-56` |
-| Synthesized at | 2026-05-07T15:41:24.531Z |
+| Synthesized at | 2026-05-07T15:55:12.803Z |
 | tsgo diagnostics loaded | 0 |
 | Shallow-wired files | 357 |
 | P0 clusters | 2 |
