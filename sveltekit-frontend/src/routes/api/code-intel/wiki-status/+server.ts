@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		let latestSyncAt: string | null = null;
 		try {
 			const { couchdb } = await import('$lib/services/couchdb-client.js');
-			const rows = await couchdb.allDocs('karpathy_wiki', { limit: 1, descending: true });
+			const rows = await couchdb.allDocs('karpathy_wiki', { limit: 1, descending: true } as { limit: number });
 			couchNoteCount = (rows as { total_rows?: number }).total_rows ?? 0;
 			couchDbStatus = 'ok';
 			// Most-recent doc id encodes the timestamp in karpathy wiki format

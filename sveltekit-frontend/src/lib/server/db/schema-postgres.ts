@@ -3880,6 +3880,47 @@ export const contextTimeline = pgTable('context_timeline', {
 export type ContextTimelineRow    = typeof contextTimeline.$inferSelect;
 export type NewContextTimelineRow = typeof contextTimeline.$inferInsert;
 
+// === ERROR FINGERPRINT STORE ===
+// Queried by error-fingerprint.ts (lookupErrorFingerprint, findSimilarErrors)
+// and ngram-retrieval.ts (ngramRecall error lane).
+// GIN trigram + FTS + array indexes are in drizzle/manual/20260506_error_fingerprints.sql
+// (Drizzle cannot express USING GIN(...gin_trgm_ops) natively).
+export const errorFingerprints = pgTable('error_fingerprints', {
+	errorHash:      text('error_hash').primaryKey(),
+	normalizedText: text('normalized_text').notNull(),
+	rawText:        text('raw_text').notNull(),
+	topSymbols:     text('top_symbols').array().notNull().default(sql`'{}'`),
+	topFiles:       text('top_files').array().notNull().default(sql`'{}'`),
+	priorFix:       text('prior_fix'),
+	confidence:     real('confidence').notNull().default(0.5),
+	seenCount:      integer('seen_count').notNull().default(1),
+	firstSeen:      timestamp('first_seen', { withTimezone: true }).notNull().default(sql`now()`),
+	lastSeen:       timestamp('last_seen', { withTimezone: true }).notNull().default(sql`now()`),
+});
+
+export type ErrorFingerprintRow    = typeof errorFingerprints.$inferSelect;
+export type NewErrorFingerprintRow = typeof errorFingerprints.$inferInsert;
+
+// === CODEBASE RELATIONSHIP SPINE ===
+// Semantic edges extracted by relationship-extractor.ts from every TS/Svelte source file.
+// Edge types: EXPORTS_SYMBOL, READS/WRITES_REDIS_KEY, QUERIES_TABLE,
+//   QUERIES_QDRANT_COLLECTION, QUERIES_NEO4J_LABEL, HAS_AGENTS_SCOPE
+
+export const codeRelations = pgTable('code_relations', {
+	id:           integer('id').generatedAlwaysAsIdentity().primaryKey(),
+	sourceFile:   text('source_file').notNull(),     // relative path, e.g. src/lib/server/ace/context-assembler.ts
+	targetKey:    text('target_key').notNull(),      // symbol name, table name, redis key, etc.
+	relationType: text('relation_type').notNull(),   // SemanticRelationType union value
+	confidence:   real('confidence').notNull().default(0.8),
+	evidence:     jsonb('evidence').default({}),     // { line, snippet, matchKind }
+	runId:        text('run_id'),                    // extraction run that created this row
+	createdAt:    timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt:    timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+});
+
+export type CodeRelationRow    = typeof codeRelations.$inferSelect;
+export type NewCodeRelationRow = typeof codeRelations.$inferInsert;
+
 // === COURTROOM 3D ANIMATION SYSTEM ===
 // Timeline-driven 3D reconstruction: Mixamo-rigged models with keyframe animation
 
