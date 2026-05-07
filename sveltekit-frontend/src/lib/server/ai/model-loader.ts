@@ -43,7 +43,7 @@ interface BackendConfig {
 const BACKENDS: BackendConfig[] = [
   {
     name: 'tensorrt',
-    healthUrl: `${ENV.TENSORRT_URL ?? 'http://localhost:8099'}/health`,
+    healthUrl: `${ENV.TENSORRT_URL}/health`,
     requiresVision: false,
     minVramMb: 4000,
     probeTimeoutMs: 2000,
@@ -51,7 +51,7 @@ const BACKENDS: BackendConfig[] = [
   },
   {
     name: 'triton',
-    healthUrl: `${ENV.TRITON_URL ?? 'http://localhost:8000'}/v2/health/ready`,
+    healthUrl: `${ENV.TRITON_URL}/v2/health/ready`,
     requiresVision: false,
     minVramMb: 4000,
     probeTimeoutMs: 2000,
@@ -59,7 +59,7 @@ const BACKENDS: BackendConfig[] = [
   },
   {
     name: 'turboquant',
-    healthUrl: `${(ENV as Record<string, unknown>)['TURBOQUANT_BASE_URL'] as string ?? 'http://localhost:8090'}/health`,
+    healthUrl: `${ENV.TURBOQUANT_BASE_URL}/health`,
     requiresVision: false,
     minVramMb: 3400,
     probeTimeoutMs: 2000,
@@ -67,15 +67,15 @@ const BACKENDS: BackendConfig[] = [
   },
   {
     name: 'bifrost',
-    healthUrl: `${ENV.BIFROST_URL ?? 'http://localhost:3040'}/health`,
+    healthUrl: `${ENV.BIFROST_URL}/health`,
     requiresVision: false,
     minVramMb: 0,
-    probeTimeoutMs: 500,  // Bifrost must respond fast or be skipped
+    probeTimeoutMs: 500,
     priority: 4,
   },
   {
     name: 'vlm',
-    healthUrl: `${(ENV as Record<string, unknown>)['VLM_BASE_URL'] as string ?? 'http://localhost:8085'}/health`,
+    healthUrl: `${ENV.VLM_BASE_URL}/health`,
     requiresVision: true,
     minVramMb: 5800,
     probeTimeoutMs: 2000,
@@ -83,7 +83,7 @@ const BACKENDS: BackendConfig[] = [
   },
   {
     name: 'litert',
-    healthUrl: `${(ENV as Record<string, unknown>)['LITERT_BASE_URL'] as string ?? 'http://localhost:8070'}/health`,
+    healthUrl: `${ENV.LITERT_BASE_URL}/health`,
     requiresVision: false,
     minVramMb: 0,
     probeTimeoutMs: 2000,
@@ -91,7 +91,7 @@ const BACKENDS: BackendConfig[] = [
   },
   {
     name: 'ollama',
-    healthUrl: `${ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434'}/api/tags`,
+    healthUrl: `${ENV.OLLAMA_BASE_URL}/api/tags`,
     requiresVision: false,
     minVramMb: 0,
     probeTimeoutMs: 3000,

@@ -273,7 +273,7 @@ export async function generateClaudePlan(params: { goal: string; scope: string }
 	const qdrant = new QdrantManager();
 	const queryEmbedding = await generateSingleEmbedding(params.goal);
 	const hits = await qdrant.hybridSearch({
-		collection: 'codebase_chunks',
+		collection: 'codebase_chunks_768',
 		query: params.goal,
 		queryEmbedding,
 		limit: 3

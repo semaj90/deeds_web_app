@@ -235,15 +235,15 @@ if (-not $turboUp) {
       "-c", "65536",
       "-ngl", "99",
       "-fa", "on",
-      "-ctk", "q8_0",
-      "-ctv", "q8_0",
+      "-ctk", "turbo3",
+      "-ctv", "turbo4",
       "--log-disable"
     )
     if ($MmprojPath -and (Test-Path $MmprojPath)) {
       $llamaArgs += @("--mmproj", $MmprojPath)
-      Write-Host "  -> TurboQuant :$TurboPort  VLM + mmproj, KV q8_0, FA on" -ForegroundColor Cyan
+      Write-Host "  -> TurboQuant :$TurboPort  VLM + mmproj, KV turbo3/4, FA on" -ForegroundColor Cyan
     } else {
-      Write-Host "  -> TurboQuant :$TurboPort  text-only, KV q8_0, FA on" -ForegroundColor Cyan
+      Write-Host "  -> TurboQuant :$TurboPort  text-only, KV turbo3/4, FA on" -ForegroundColor Cyan
     }
     $turboPid = (Start-Process -FilePath $LlamaExe -ArgumentList $llamaArgs `
       -WorkingDirectory $Frontend -WindowStyle Minimized -PassThru)?.Id
@@ -279,7 +279,7 @@ if (-not $topoUp) {
   } catch {}
 }
 
-$health["turbo_quant"] = @{ url = "http://127.0.0.1:$TurboPort/health"; healthy = $turboUp;  tier = 1; kvProfile = "q8_0"; faOn = $true }
+$health["turbo_quant"] = @{ url = "http://127.0.0.1:$TurboPort/health"; healthy = $turboUp;  tier = 1; kvProfile = "turbo3/4"; faOn = $true }
 $health["topo_search"]  = @{ url = "http://127.0.0.1:8101/health";        healthy = $topoUp;  tier = 1 }
 if ($turboPid) { $pids["turbo_quant"] = $turboPid }
 if ($topoPid)  { $pids["topo_search"] = $topoPid }
@@ -376,7 +376,7 @@ Write-Host " TRACE stack launched  ($RunId)" -ForegroundColor Green
 Write-Host "=====================================================" -ForegroundColor Green
 Write-Host "  Langfuse traces  $LangfuseUrl"
 Write-Host "  Bifrost KV cache $BifrostUrl"
-Write-Host "  TurboQuant GGUF  http://127.0.0.1:$TurboPort   (q8_0 KV, FA on)"
+Write-Host "  TurboQuant GGUF  http://127.0.0.1:$TurboPort   (turbo3/4 KV, FA on)"
 Write-Host "  Topo search      http://127.0.0.1:8101/health"
 Write-Host "  TRACE MCP        http://127.0.0.1:$McpPort/health  ($McpWorkers workers)"
 Write-Host "  SvelteKit dev    http://127.0.0.1:5173"

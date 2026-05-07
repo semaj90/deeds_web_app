@@ -51,7 +51,7 @@ export async function ollamaCachedChat(
   const prompt = normalizedMessages.map((m) => `${m.role}: ${m.content}`).join('\n\n');
   const startTime = performance.now();
 
-  const ollamaUrl = ENV.OLLAMA_BASE_URL || 'http://localhost:11434';
+  const ollamaUrl = ENV.OLLAMA_BASE_URL;
   const response = await fetch(`${ollamaUrl}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

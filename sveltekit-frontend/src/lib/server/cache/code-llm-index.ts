@@ -21,6 +21,7 @@
 
 import { createHash }   from 'node:crypto';
 import { getRedis }     from '$lib/server/redis.js';
+import { ENV }          from '$lib/server/env.server.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -33,9 +34,9 @@ export const CODE_LLM_CLUSTER_PFX   = 'code:llm_output:by-cluster:';
 
 // Qdrant semantic layer (path-keyed, 768-dim embeddinggemma)
 export const CODE_LLM_QDRANT_COLLECTION = 'code_llm_outputs';
-const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://127.0.0.1:6333';
-const OLLAMA_URL  = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const EMBED_MODEL = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
+const QDRANT_URL  = ENV.QDRANT_URL;
+const OLLAMA_URL  = ENV.OLLAMA_BASE_URL;
+const EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const EMBED_BATCH_SIZE     = 16;
 const EMBED_FLUSH_MS       = 500;
 

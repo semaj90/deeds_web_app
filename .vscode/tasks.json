@@ -9457,12 +9457,32 @@
       "problemMatcher": []
     },
     {
+      "label": "🧠 GRPO: Wire Synthesis Risk → NES Cartridge",
+      "type": "shell",
+      "command": "cd sveltekit-frontend && npm run wire:synthesis:grpo",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "detail": "Reads latest synthesis_summary.json cluster risk scores → updates Qdrant codebase_chunks_768 payload (grpo_reward, nes_risk_level, nes_priority) + writes Redis nes:cluster_risk:{cluster} keys (6h TTL). Run after graph:synthesize. ~5s.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 GRPO: Wire Synthesis Risk → NES Cartridge (dry run)",
+      "type": "shell",
+      "command": "cd sveltekit-frontend && npm run wire:synthesis:grpo:dry",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test",
+      "detail": "Dry-run: prints what would be written to Qdrant + Redis without making any changes.",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+      "problemMatcher": []
+    },
+    {
       "label": "🔍 Claude: Graph Relations (extract + synthesize)",
       "type": "shell",
-      "command": "mkdir -p logs/task-output && npm run graph:full 2>&1 | Tee-Object -FilePath logs/task-output/graph-full-latest.log; Write-Host '✅ graph:full done — relations extracted + next_actions synthesized' -ForegroundColor Green",
+      "command": "mkdir -p logs/task-output && npm run graph:full 2>&1 | Tee-Object -FilePath logs/task-output/graph-full-latest.log; Write-Host '✅ graph:full done — relations extracted + next_actions synthesized + GRPO wired' -ForegroundColor Green",
       "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
       "group": "build",
-      "detail": "Full relation pipeline: extract-code-relations → build-codebase-relationships (11k+ edges) → synthesize-next-actions. Use after merging large PRs or before a major agent run. ~2-3 min.",
+      "detail": "Full relation pipeline: extract-code-relations → build-codebase-relationships (11k+ edges) → synthesize-next-actions → wire-synthesis-grpo. Use after merging large PRs or before a major agent run. ~2-3 min.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     }

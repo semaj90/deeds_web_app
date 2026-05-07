@@ -3,7 +3,8 @@
  * Direct HTTP fetch-based Qdrant operations (no SDK dependencies)
  */
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+import { ENV } from '$lib/server/env.server.js';
+const QDRANT_URL = ENV.QDRANT_URL;
 const QDRANT_TIMEOUT = 10_000;
 
 export type QdrantPoint = {

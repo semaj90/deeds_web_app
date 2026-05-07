@@ -1617,6 +1617,7 @@ function requireToken(token: unknown): string | null {
 // ── ops.propose_patch ──────────────────────────────────────────────────────────
 server.tool(
   'ops.propose_patch',
+  {
     operator_token: z.string().describe('Non-empty approval token'),
     file_path:      z.string().describe('Repo-relative file path to inspect'),
     issue:          z.string().describe('Description of the issue to fix'),
@@ -1658,6 +1659,7 @@ server.tool(
 // ── ops.run_targeted_test ─────────────────────────────────────────────────────
 server.tool(
   'ops.run_targeted_test',
+  {
     operator_token: z.string().describe('Non-empty approval token'),
     test_file:      z.string().describe('Path to the test file relative to project root, e.g. tests/foo.spec.ts'),
     timeout_ms:     z.number().int().min(5000).max(120000).optional().describe('Max wait in ms (default 30000)'),
@@ -1717,14 +1719,16 @@ server.tool(
 
 // ── ops.record_fix_attempt ────────────────────────────────────────────────────
 server.tool(
-  'ops.record_fix_attempt',    operator_token:  z.string().describe('Non-empty approval token'),
+  'ops.record_fix_attempt',
+  {
+    operator_token:  z.string().describe('Non-empty approval token'),
     fix_type:        z.string().max(100).describe('Category of fix, e.g. "type-error", "logic-bug"'),
     fix_description: z.string().max(2000).describe('Human-readable description of the proposed fix'),
     fix_diff:        z.string().max(8000).optional().describe('Unified diff or summary of the change'),
     files_affected:  z.number().int().min(0).optional().describe('Number of files the fix touches (default 1)'),
     errors_resolved: z.number().int().min(0).optional().describe('Estimated errors this fix resolves (default 1)'),
     success:         z.boolean().optional().describe('Whether the fix was verified to work (omit if unknown)'),
-    metadata:        z.record(z.unknown()).optional().describe('Extra context (e.g. test result, issue ID)'),
+    metadata:        z.record(z.string(), z.unknown()).optional().describe('Extra context (e.g. test result, issue ID)'),
   },
   async ({ operator_token, fix_type, fix_description, fix_diff, files_affected, errors_resolved, success, metadata }) => {
     const tokenErr = requireToken(operator_token);
@@ -1762,6 +1766,7 @@ server.tool(
 // ── ops.run_quality_gate ──────────────────────────────────────────────────────
 server.tool(
   'ops.run_quality_gate',
+  {
     operator_token: z.string().describe('Non-empty approval token'),
     gate:           z.enum(['tsc', 'vitest-all']).optional().describe('tsc (default) or vitest-all to run full test suite'),
     timeout_ms:     z.number().int().min(5000).max(300000).optional().describe('Max wait in ms (default 60000)'),
@@ -1813,7 +1818,9 @@ server.tool(
 
 // ── hypergraph.search ─────────────────────────────────────────────────────────
 server.tool(
-  'hypergraph.search',    query:          z.string().max(500).describe('Natural language query (1-500 chars)'),
+  'hypergraph.search',
+  {
+    query:          z.string().max(500).describe('Natural language query (1-500 chars)'),
     edge_types:     z.array(z.string()).optional().describe('Filter by edge_type (agents_md, cluster_summary, codebase_chunk, generic)'),
     limit:          z.number().int().min(1).max(50).optional().describe('Max results 1-50 (default 10)'),
     min_confidence: z.number().min(0).max(1).optional().describe('Minimum confidence threshold 0-1'),
@@ -1844,6 +1851,7 @@ server.tool(
 // ── hypergraph.get_edge ───────────────────────────────────────────────────────
 server.tool(
   'hypergraph.get_edge',
+  {
     edge_hash: z.string().max(128).describe('The edge_hash to look up'),
     expand:    z.boolean().optional().describe('If true, also return related edges sharing at least one member'),
   },
@@ -1865,6 +1873,7 @@ server.tool(
 // ── hypergraph.explain_activation ────────────────────────────────────────────
 server.tool(
   'hypergraph.explain_activation',
+  {
     edge_hash:   z.string().max(128).describe('The edge_hash to explain'),
     query_terms: z.array(z.string().max(100)).describe('List of query terms that triggered activation'),
   },
@@ -1885,6 +1894,7 @@ server.tool(
 // ── hypergraph.expand_members ─────────────────────────────────────────────────
 server.tool(
   'hypergraph.expand_members',
+  {
     edge_hash: z.string().max(128).describe('The edge_hash to expand from'),
   },
   async ({ edge_hash }) => {
@@ -1904,7 +1914,9 @@ server.tool(
 
 // ── knowledge.get_minified_map ────────────────────────────────────────────────
 server.tool(
-  'knowledge.get_minified_map',    directory:  z.string().max(200).optional().describe('Relative directory path (e.g. "src/lib/server/ai")'),
+  'knowledge.get_minified_map',
+  {
+    directory:  z.string().max(200).optional().describe('Relative directory path (e.g. "src/lib/server/ai")'),
     max_edges:  z.number().int().min(1).max(20).optional().describe('Max hyperedges to include (default 5)'),
     max_agents: z.number().int().min(1).max(10).optional().describe('Max AGENTS.md directives to include (default 3)'),
   },

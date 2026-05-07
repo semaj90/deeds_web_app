@@ -1,28 +1,17 @@
-/**
- * Centralized utility functions for retrieving service endpoints.
- * This ensures consistency and allows for easy switching between Docker service names
- * and localhost fallbacks for development.
- */
+import { ENV } from '$lib/server/env.server.js';
 
-/**
- * Returns the URL for the Legal Gateway microservice.
- * Prefers the `LEGAL_GATEWAY_URL` environment variable,
- * falling back to `http://localhost:8080` for local development.
- */
 export function getLegalGatewayUrl(): string {
-  return process.env?.LEGAL_GATEWAY_URL ?? 'http://localhost:8080';
+  return ENV.LEGAL_GATEWAY_URL;
 }
 
-/** * Retrieves the Qdrant service URL, preferring the environment variable * and falling back to a localhost default for development. * @returns { string } The Qdrant service URL. */ export function getQdrantUrl(): string {
-  return process.env?.QDRANT_URL ?? 'http://localhost:6333';
+export function getQdrantUrl(): string {
+  return ENV.QDRANT_URL;
 }
 
-/** * Retrieves the Ollama service URL, preferring the environment variable * and falling back to a localhost default for development. * This service is used for both embeddings and generation. * @returns { string } The Ollama service URL. */ export function getOllamaUrl(): string {
-  return process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+export function getOllamaUrl(): string {
+  return ENV.OLLAMA_BASE_URL;
 }
 
-/** * Centralized utility to get the PostgreSQL database URL. */ export function getDatabaseUrl(): string {
-  return (
-    process.env?.DATABASE_URL ?? 'postgresql://legal_admin: 123456@localhost: 5434/legal_ai_db'
-  );
+export function getDatabaseUrl(): string {
+  return ENV.DATABASE_URL;
 }

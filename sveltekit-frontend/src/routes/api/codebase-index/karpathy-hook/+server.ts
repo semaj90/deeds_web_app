@@ -1,6 +1,12 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { processKarpathyHook, type KarpathyHookInput } from '$lib/server/indexer/karpathy-hook.js';
 import { persistKarpathyHook } from '$lib/server/indexer/karpathy-persistence.js';
+
+const KarpathyHookSchema = z.object({
+	files: z.array(z.string()).min(1),
+	runId: z.string().optional()
+}).passthrough();
 
 /**
  * Karpathy Hook API
@@ -13,11 +19,9 @@ export async function POST({ request, locals }) {
 	}
 
 	try {
-		const input = await request.json() as KarpathyHookInput;
-
-		if (!input.files || !Array.isArray(input.files)) {
-			return json({ error: 'Invalid input: files array is required' }, { status: 400 });
-		}
+		const parsed = KarpathyHookSchema.safeParse(await request.json());
+		if (!parsed.success) return json({ error: parsed.error.flatten(), success: false }, { status: 400 });
+		const input = parsed.data as unknown as KarpathyHookInput;
 
 		if (!input.runId) {
 			input.runId = `karpathy-${new Date().toISOString().split('T')[0]}-${Math.random().toString(36).slice(2, 8)}`;

@@ -337,8 +337,8 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 
 	await setStage(jobId, 'chunking', 60, { nodeCount: nodeRows.length });
 
-	// ── Stage E: Insert chunks ───────────────────────────────────────────────
-	const chunkRows: Array<{ id: string; nodeId: string; text: string; index: number }> = [];
+	// ── Stage E: Bulk-insert chunks (single round-trip per 500-row batch) ──
+	const chunkRows: Array<{ id: string; nodeId: string; text: string; index: number; tokenCount: number; startOffset: number; endOffset: number }> = [];
 
 	for (const chunk of chunks) {
 		const pathKey = chunk.sectionPath?.length
@@ -346,23 +346,40 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 			: 'root';
 		const nodeId = nodeMap.get(pathKey) ?? nodeRows[0]?.id;
 		if (!nodeId) continue;
+		chunkRows.push({
+			id: randomUUID(), nodeId, text: chunk.text, index: chunk.chunkIndex,
+			tokenCount: chunk.tokenCount ?? 0,
+			startOffset: chunk.startOffset ?? 0,
+			endOffset: chunk.endOffset ?? 0,
+		});
+	}
 
-		const chunkId = randomUUID();
-		chunkRows.push({ id: chunkId, nodeId, text: chunk.text, index: chunk.chunkIndex });
-
+	// Bulk INSERT in 500-row batches — avoids N sequential round-trips
+	const CHUNK_INSERT_BATCH = 500;
+	for (let i = 0; i < chunkRows.length; i += CHUNK_INSERT_BATCH) {
+		const batch = chunkRows.slice(i, i + CHUNK_INSERT_BATCH);
+		const values = batch.map((_, k) => {
+			const base = k * 7;
+			return `($${base+1},$${base+2},$${base+3},$${base+4},$${base+5},$${base+6},$${base+7})`;
+		}).join(',');
+		const params: unknown[] = [];
+		for (const row of batch) {
+			params.push(row.id, row.nodeId, row.index, row.text,
+				row.tokenCount, row.startOffset, row.endOffset);
+		}
 		await pool.query(
 			`INSERT INTO legal_chunks
 			   (id, legal_node_id, chunk_index, chunk_text, token_count, char_start, char_end)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7)
+			 VALUES ${values}
 			 ON CONFLICT (legal_node_id, chunk_index) DO NOTHING`,
-			[chunkId, nodeId, chunk.chunkIndex, chunk.text, chunk.tokenCount ?? 0, chunk.startOffset, chunk.endOffset]
+			params
 		);
 	}
 
 	await setStage(jobId, 'embedding', 70, { chunkCount: chunkRows.length });
 
 	// ── Stage F: Embeddings ─────────────────────────────────────────────────
-	const EMBED_BATCH = 32;
+	const EMBED_BATCH = 128; // GPU handles 128 at once; 32 was leaving throughput on the table
 	const embedTexts = chunkRows.map((c) => c.text.slice(0, 1024));
 	const qdrantPoints: Array<{ id: string; vector: number[]; chunkIdx: number }> = [];
 
@@ -379,14 +396,23 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 		}
 
 		if (embeddings) {
+			// Bulk UPDATE via unnest — one round-trip per embed batch
+			const ids: string[] = [];
+			const vecs: string[] = [];
 			for (let j = 0; j < batch.length; j++) {
 				const embedding = embeddings[j];
 				if (!embedding) continue;
-				await pool.query(
-					`UPDATE legal_chunks SET embedding = $1 WHERE id = $2`,
-					[`[${embedding.join(',')}]`, batch[j].id]
-				);
+				ids.push(batch[j].id);
+				vecs.push(`[${embedding.join(',')}]`);
 				qdrantPoints.push({ id: batch[j].id, vector: embedding, chunkIdx: i + j });
+			}
+			if (ids.length) {
+				await pool.query(
+					`UPDATE legal_chunks SET embedding = v.vec::vector
+					 FROM unnest($1::uuid[], $2::text[]) AS v(id, vec)
+					 WHERE legal_chunks.id = v.id`,
+					[ids, vecs]
+				);
 			}
 		}
 

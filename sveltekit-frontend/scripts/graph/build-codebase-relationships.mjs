@@ -91,12 +91,24 @@ const multihop         = safeJson(join(DOCS_GRAPH, 'multihop-codebase-map.json')
 const clusterAgentsIdx = safeJson(join(DOCS_GRAPH, 'cluster-agents-index.json')) ?? null;
 // GDS enrichment artifact — populated by graphify:gds; optional (null-safe throughout)
 const gdsArtifact = safeJson(resolve(ROOT, 'memory/graphify/gds/latest.json')) ?? null;
-// Build index: stableKey/filePath → { communityId, graphAuthorityScore } for O(1) lookup
+// Build index: normalized-path → { communityId, graphAuthorityScore } for O(1) lookup.
+// Priority: byPath (O(1) map) → allAuthorities → topAuthorities fallback.
 const gdsAuthorityIndex = new Map();
-if (gdsArtifact?.topAuthorities ?? gdsArtifact?.topAuthority) {
-  for (const entry of (gdsArtifact.topAuthorities ?? gdsArtifact.topAuthority)) {
-    const key = entry.stableKey ?? entry.filePath ?? entry.file_path;
-    if (key) gdsAuthorityIndex.set(key, { communityId: entry.communityId ?? null, graphAuthorityScore: entry.graphAuthorityScore ?? null });
+const gdsNormPath = fp => (fp ?? '').replace(/\\/g, '/').replace(/^.*?\/src\//, 'src/').replace(/^.*?\/sveltekit-frontend\//, '').replace(/^\//, '');
+if (gdsArtifact) {
+  if (gdsArtifact.byPath && typeof gdsArtifact.byPath === 'object') {
+    // Preferred: O(1) map keyed by normalized path
+    for (const [key, entry] of Object.entries(gdsArtifact.byPath)) {
+      if (key) gdsAuthorityIndex.set(key, { communityId: entry.communityId ?? null, graphAuthorityScore: entry.graphAuthorityScore ?? null });
+    }
+  } else {
+    // Fallback: iterate allAuthorities → topAuthorities
+    const list = gdsArtifact.allAuthorities ?? gdsArtifact.topAuthorities ?? gdsArtifact.topAuthority ?? [];
+    for (const entry of list) {
+      const raw = entry.stableKey ?? entry.filePath ?? entry.file_path;
+      const key = raw ? gdsNormPath(raw) : null;
+      if (key) gdsAuthorityIndex.set(key, { communityId: entry.communityId ?? null, graphAuthorityScore: entry.graphAuthorityScore ?? null });
+    }
   }
 }
 

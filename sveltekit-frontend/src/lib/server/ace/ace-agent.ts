@@ -57,7 +57,7 @@ const searchCodebase: Gemma4Tool = {
         : undefined;
 
       const qdrantResp = await fetch(
-        `${ENV.QDRANT_URL ?? 'http://localhost:6333'}/collections/codebase_chunks_768/points/search`,
+        `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -99,7 +99,7 @@ const getClusterSummary: Gemma4Tool = {
 
     try {
       const qdrantResp = await fetch(
-        `${ENV.QDRANT_URL ?? 'http://localhost:6333'}/collections/codebase_chunks_768/points/scroll`,
+        `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -151,7 +151,7 @@ const lookupResearchSummary: Gemma4Tool = {
 
     try {
       const resp = await fetch(
-        `${ENV.PUBLIC_API_URL ?? 'http://localhost:5173'}/api/analytics/research-graph`,
+        `${ENV.PUBLIC_API_URL}/api/analytics/research-graph`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -184,7 +184,7 @@ const getSystemHealth: Gemma4Tool = {
   },
   execute: async (_args) => {
     try {
-      const resp = await fetch(`${ENV.PUBLIC_API_URL ?? 'http://localhost:5173'}/api/infrastructure/status`, {
+      const resp = await fetch(`${ENV.PUBLIC_API_URL}/api/infrastructure/status`, {
         signal: AbortSignal.timeout(8_000),
       });
       if (!resp.ok) throw new Error(`Health HTTP ${resp.status}`);
@@ -227,7 +227,7 @@ const webSearch: Gemma4Tool = {
 
     // Try live web search via the internal proxy
     try {
-      const resp = await fetch(`${ENV.PUBLIC_API_URL ?? 'http://localhost:5173'}/api/research/web-search`, {
+      const resp = await fetch(`${ENV.PUBLIC_API_URL}/api/research/web-search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-dev-bypass-auth': 'true' },
         body: JSON.stringify({ query, limit: topK }),
@@ -257,7 +257,7 @@ const webSearch: Gemma4Tool = {
         const vec = eData.embeddings?.[0];
         if (vec?.length) {
           const sResp = await fetch(
-            `${ENV.QDRANT_URL ?? 'http://localhost:6333'}/collections/research_summaries/points/search`,
+            `${ENV.QDRANT_URL}/collections/research_summaries/points/search`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
