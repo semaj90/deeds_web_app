@@ -19,6 +19,7 @@ import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import path from 'path';
 import postgres from 'postgres';
 import * as schema from './schema-unified.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // Define DocumentMetadata locally since it may not be exported from schema-unified
 interface DocumentMetadata {
@@ -85,22 +86,16 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const config: DatabaseConfig = {
   runtime: {
-    url: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
+    url: ENV.DATABASE_URL,
     poolSize: isDev ? 5 : 20,
   },
   admin: {
-    url:
-      process.env.DATABASE_URL_ADMIN ??
-      process.env.ADMIN_DATABASE_URL ??
-      'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
+    url: ENV.DATABASE_URL,
     poolSize: 2,
   },
-  qdrant: process.env.QDRANT_URL
-    ? {
-        url: process.env.QDRANT_URL,
-        apiKey: process.env.QDRANT_API_KEY,
-      }
-    : undefined,
+  qdrant: {
+    url: ENV.QDRANT_URL,
+  },
   environment: (process.env.NODE_ENV ?? 'development') as 'development' | 'production' | 'test',
 };
 
