@@ -137,6 +137,8 @@ export default defineConfig({
       'tests/relation-extractor.spec.ts',
       // normalizeRepoPath + ACE relation matching regression
       'tests/build-codebase-relationships.spec.ts',
+      // reduce-neo4j.mjs: deduplication, caps, counters, symbol/import split
+      'tests/mapreduce/reduce-neo4j.spec.ts',
     ],
     exclude: [
       'node_modules/**',
