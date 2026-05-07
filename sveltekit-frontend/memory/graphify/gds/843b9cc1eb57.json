@@ -1,0 +1,199 @@
+{
+  "runId": "843b9cc1eb57",
+  "startedAt": "2026-05-07T03:02:39.033Z",
+  "gdsAvailable": false,
+  "pagerankRows": 0,
+  "communities": 0,
+  "authorityScoresComputed": 200,
+  "qdrantPatched": 0,
+  "redisCached": 0,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "DEGRADED: GDS unavailable — using Postgres fan-in fallback",
+    "GDS3": "SKIP",
+    "GDS4": "DEGRADED: 200 files from Postgres fan-in",
+    "GDS5": "SKIP (GDS unavailable)",
+    "GDS6": "PASS",
+    "GDS7": "WARN: 0 patches",
+    "GDS8": "PASS: 200 entries (dry — no writes)",
+    "GDS9": "PASS"
+  },
+  "finishedAt": "2026-05-07T03:02:39.305Z",
+  "topAuthorities": [
+    {
+      "filePath": "lib/server/ace/context-assembler.ts",
+      "graphAuthorityScore": 0.25,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/relationship-extractor.ts",
+      "graphAuthorityScore": 0.2167,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/config/vector-config.ts",
+      "graphAuthorityScore": 0.1667,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ml/recommendation-metrics.ts",
+      "graphAuthorityScore": 0.15,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/pg-neo4j-sync.ts",
+      "graphAuthorityScore": 0.1333,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/phase89/analysis/+server.ts",
+      "graphAuthorityScore": 0.1333,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/hypergraph-4d.ts",
+      "graphAuthorityScore": 0.1333,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "mcp/trace-mcp-server.ts",
+      "graphAuthorityScore": 0.1333,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/community-graph.ts",
+      "graphAuthorityScore": 0.1167,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/search/+server.ts",
+      "graphAuthorityScore": 0.1,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/wiki/wiki-redis-cache.ts",
+      "graphAuthorityScore": 0.1,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/timeline/+server.ts",
+      "graphAuthorityScore": 0.1,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/retrieval-lanes.ts",
+      "graphAuthorityScore": 0.1,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/dashboard/stats/+server.ts",
+      "graphAuthorityScore": 0.1,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/ai/model-ids.ts",
+      "graphAuthorityScore": 0.1,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/claude-assist/+server.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/similar/+server.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/sse/chat/+server.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/neo4j-schema.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/search/suggestions/+server.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/simulation/grpo-strategy.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/wiki/wiki-neo4j-sync.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "mcp/tools/trace-kag.tool.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/directory-summarizer.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/timeline/+server.ts",
+      "graphAuthorityScore": 0.0833,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    }
+  ]
+}

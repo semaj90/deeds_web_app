@@ -1,0 +1,243 @@
+syntax = "proto3";
+
+package yorha.gpu;
+
+option go_package = "github.com/deeds-web-app/proto/gpu";
+
+import "shared_ids.proto";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// gpu.proto — GPU analytics service: embedding analysis, k-means clustering,
+// SOM training, PageRank, and attention scoring.
+//
+// Large tensor payloads (embedding matrices) travel via ArtifactRef pointing
+// to Arrow IPC files under memory/runs/<run_id>/embeddings.arrow — NOT inline
+// in protobuf messages. Only metadata and small result arrays are inlined.
+//
+// N-API scope (tensorrt_bridge.node) is limited to:
+//   - kmeansWithCentroids()
+//   - trainSOM()
+//   - pageRankGPU()
+//   - attentionScoreGPU()
+//   - rewardScoreGPU()
+//   - fastJsonParse() / simdJsonParse()
+//
+// Larger GPU workloads (TensorRT inference, autoencoder latent topology)
+// belong in a dedicated C++ gRPC service that this proto describes.
+//
+// RPCs:
+//   AnalyzeEmbeddings  — run k-means + SOM + PageRank on a run's embeddings
+//   ClusterChunks      — assign pre-computed embeddings to existing centroids
+// ─────────────────────────────────────────────────────────────────────────────
+
+service GpuService {
+  // Full GPU analysis: k-means → SOM → PageRank → attention scoring.
+  // Reads embeddings from the ArtifactRef Arrow file.
+  // Writes results to memory/runs/<run_id>/ and calls MemoryService.IngestRunArtifacts.
+  rpc AnalyzeEmbeddings(AnalyzeEmbeddingsRequest) returns (AnalyzeEmbeddingsResponse);
+
+  // Assign a batch of chunks to the nearest existing cluster centroid.
+  // Used for incremental indexing without re-running full k-means.
+  rpc ClusterChunks(ClusterChunksRequest) returns (ClusterChunksResponse);
+
+  // Stream GPU analysis progress (maps to SSE progress pattern in SvelteKit)
+  rpc StreamAnalysis(AnalyzeEmbeddingsRequest) returns (stream GpuAnalysisEvent);
+}
+
+// ── AnalyzeEmbeddings ────────────────────────────────────────────────────────
+
+message AnalyzeEmbeddingsRequest {
+  yorha.shared.RunIds ids = 1;
+
+  // Arrow IPC file containing the embedding matrix (n × dim Float32)
+  yorha.shared.ArtifactRef embeddings_artifact = 2;
+
+  // k-means parameters
+  KMeansConfig kmeans = 3;
+
+  // SOM parameters
+  SomConfig som = 4;
+
+  // PageRank parameters
+  PageRankConfig pagerank = 5;
+
+  // Whether to write results back to Qdrant glyph_atlas / codebase_chunks_768
+  bool write_qdrant = 6;
+
+  // Whether to write cluster summaries to Redis (24h TTL)
+  bool write_redis = 7;
+
+  // Force re-run even if gradient checkpoint exists in Redis
+  bool force = 8;
+}
+
+message AnalyzeEmbeddingsResponse {
+  yorha.shared.RunIds ids = 1;
+  bool ok = 2;
+
+  // k-means result
+  KMeansResult kmeans_result = 3;
+
+  // SOM result
+  SomResult som_result = 4;
+
+  // PageRank scores per cluster
+  repeated ClusterPageRank pagerank_scores = 5;
+
+  // Attention scores per chunk (top-K only)
+  repeated ChunkAttentionScore attention_scores = 6;
+
+  // Files written under memory/runs/<run_id>/
+  repeated yorha.shared.ArtifactRef artifacts = 7;
+
+  // Redis keys written (if write_redis = true)
+  repeated string redis_keys_written = 8;
+
+  int64 duration_ms = 9;
+  string error_message = 10;
+}
+
+// ── ClusterChunks ─────────────────────────────────────────────────────────
+
+message ClusterChunksRequest {
+  yorha.shared.RunIds ids = 1;
+
+  // Reference run whose centroids to use
+  string centroid_run_id = 2;
+
+  // Inline small embeddings for incremental assignment (max 500 chunks)
+  // For larger batches, use an Arrow ArtifactRef via embeddings_artifact
+  repeated ChunkEmbedding chunks = 3;
+  yorha.shared.ArtifactRef embeddings_artifact = 4;
+
+  // Write assignments back to Qdrant
+  bool write_qdrant = 5;
+}
+
+message ChunkEmbedding {
+  string chunk_id = 1;
+  string file_path = 2;
+  // 768-dim embedding (only for small batches)
+  repeated float embedding = 3 [packed = true];
+}
+
+message ClusterChunksResponse {
+  yorha.shared.RunIds ids = 1;
+  repeated ChunkAssignment assignments = 2;
+  int64 duration_ms = 3;
+  string error_message = 4;
+}
+
+message ChunkAssignment {
+  string chunk_id = 1;
+  string file_path = 2;
+  int32 cluster_id = 3;
+  // Distance to nearest centroid (cosine)
+  float distance = 4;
+  int32 som_bmu_row = 5;
+  int32 som_bmu_col = 6;
+}
+
+// ── GPU Analysis Event (streaming) ──────────────────────────────────────────
+
+message GpuAnalysisEvent {
+  oneof event {
+    GpuProgressEvent progress = 1;
+    KMeansResult kmeans_done = 2;
+    SomResult som_done = 3;
+    AnalyzeEmbeddingsResponse completed = 4;
+    GpuErrorEvent error = 5;
+  }
+}
+
+message GpuProgressEvent {
+  // "kmeans", "som", "pagerank", "attention", "qdrant_write", "redis_write"
+  string stage = 1;
+  int32 iteration = 2;
+  int32 max_iterations = 3;
+  float loss = 4;
+  string message = 5;
+}
+
+message GpuErrorEvent {
+  string code = 1;
+  string message = 2;
+  bool cuda_available = 3;
+  bool fell_back_to_cpu = 4;
+}
+
+// ── k-means config and result ────────────────────────────────────────────────
+
+message KMeansConfig {
+  int32 k = 1;               // Number of clusters (default 20)
+  int32 max_iterations = 2;  // Default 100
+  // Seed for reproducibility (0 = random)
+  int32 seed = 3;
+  // Use k-means++ initialisation (always true for JS fallback; GPU uses random)
+  bool use_kmeanspp = 4;
+  // Gradient checkpoint interval — save state to Redis every N iterations
+  int32 checkpoint_interval = 5;
+}
+
+message KMeansResult {
+  // Cluster ID per input point (length = n)
+  repeated int32 assignments = 1 [packed = true];
+  // Centroids: k × dim Float32 flattened row-major
+  repeated float centroids = 2 [packed = true];
+  int32 k = 3;
+  int32 dim = 4;
+  int32 n = 5;
+  int32 iterations_run = 6;
+  float final_inertia = 7;
+  bool cuda_used = 8;
+  // Redis key for gradient checkpoint (empty if no checkpoint)
+  string checkpoint_key = 9;
+}
+
+// ── SOM config and result ─────────────────────────────────────────────────────
+
+message SomConfig {
+  int32 grid_width = 1;    // Default 5
+  int32 grid_height = 2;   // Default 4 (20-node grid for k=20)
+  int32 iterations = 3;    // Default 500
+  float lr_init = 4;       // Default 0.1
+  float lr_final = 5;      // Default 0.01
+  float radius_init = 6;   // Default max(W,H)/2
+  float radius_final = 7;  // Default 0.5
+}
+
+message SomResult {
+  // BMU (row, col) for each k-means cluster (length = k)
+  // Indexed by cluster_id, value = bmu_row * grid_width + bmu_col
+  repeated int32 bmu_assignments = 1 [packed = true];
+  int32 grid_width = 2;
+  int32 grid_height = 3;
+  bool cuda_used = 4;
+  // SOM weight matrix: (grid_w * grid_h) × dim Float32, Arrow ArtifactRef
+  yorha.shared.ArtifactRef weights_artifact = 5;
+}
+
+// ── PageRank ─────────────────────────────────────────────────────────────────
+
+message PageRankConfig {
+  float damping = 1;       // Default 0.85
+  int32 max_iterations = 2; // Default 100
+  float tolerance = 3;     // Convergence threshold (default 1e-6)
+  // Source of edges: "neo4j", "couchdb_link_matrix", "hyperedge"
+  string edge_source = 4;
+}
+
+message ClusterPageRank {
+  int32 cluster_id = 1;
+  float score = 2;
+  int32 node_count = 3;
+}
+
+// ── Attention scoring ─────────────────────────────────────────────────────────
+
+message ChunkAttentionScore {
+  string chunk_id = 1;
+  string file_path = 2;
+  float attention_score = 3;
+  int32 cluster_id = 4;
+}

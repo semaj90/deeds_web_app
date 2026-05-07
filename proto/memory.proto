@@ -1,0 +1,201 @@
+syntax = "proto3";
+
+package yorha.memory;
+
+option go_package = "github.com/deeds-web-app/proto/memory";
+
+import "shared_ids.proto";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// memory.proto — Run artifact ingestion and canonical schema for the
+// memory/runs/<run_id>/ directory tree.
+//
+// Every pipeline execution (k-means, SOM, ACE assembly, hypergraph, GRPO batch)
+// writes its outputs under memory/runs/<run_id>/ and then calls IngestRunArtifacts
+// so the results are queryable via the retrieval spine.
+//
+// Canonical artifact layout:
+//   memory/runs/<run_id>/
+//     embeddings.arrow      — Float32 embedding matrix (n × dim), Arrow IPC
+//     assignments.json      — { chunk_id → cluster_id } k-means result
+//     som_grid.json         — SOM weight matrix + BMU assignments
+//     manifold4.json        — 4D manifold coords per cluster
+//     errors.json           — fingerprinted error list for this run
+//     symbols.json          — symbol table (functions, exports, classes)
+//     trace.json            — full retrieval trace for replay
+//     artifacts.json        — index of all files in this run dir
+//
+// RPCs:
+//   IngestRunArtifacts  — register a completed run's artifacts into Postgres
+// ─────────────────────────────────────────────────────────────────────────────
+
+service MemoryService {
+  // Register a completed pipeline run's artifacts.
+  // Writes rows to: runs, chunks, symbols, errors, artifacts tables.
+  // Idempotent — rerunning with same run_id updates existing rows.
+  rpc IngestRunArtifacts(IngestRunArtifactsRequest) returns (IngestRunArtifactsResponse);
+
+  // Query which runs produced artifacts for a given file path or chunk.
+  rpc QueryRunHistory(RunHistoryRequest) returns (RunHistoryResponse);
+}
+
+// ── IngestRunArtifacts ───────────────────────────────────────────────────────
+
+message IngestRunArtifactsRequest {
+  yorha.shared.RunIds ids = 1;
+
+  // Pipeline that produced this run
+  // "kmeans", "som", "ace", "hypergraph", "grpo", "tsgo", "deep-imports"
+  string pipeline = 2;
+
+  // Run metadata
+  RunMeta meta = 3;
+
+  // Chunks to upsert (maps to `chunks` Postgres table)
+  repeated ChunkRecord chunks = 4;
+
+  // Symbol table entries (maps to `symbols` table)
+  repeated SymbolRecord symbols = 5;
+
+  // Fingerprinted errors from this run (maps to `errors` table)
+  repeated ErrorRecord errors = 6;
+
+  // File artifacts written under memory/runs/<run_id>/ (maps to `artifacts` table)
+  repeated yorha.shared.ArtifactRef artifacts = 7;
+}
+
+message IngestRunArtifactsResponse {
+  yorha.shared.RunIds ids = 1;
+  bool ok = 2;
+  int32 chunks_upserted = 3;
+  int32 symbols_upserted = 4;
+  int32 errors_upserted = 5;
+  int32 artifacts_registered = 6;
+  string error_message = 7;
+  int64 ingested_at_unix = 8;
+}
+
+// ── RunMeta ──────────────────────────────────────────────────────────────────
+
+message RunMeta {
+  // ISO timestamp when the run started
+  string started_at = 1;
+  string finished_at = 2;
+  // Git commit SHA of the codebase snapshot
+  string git_sha = 3;
+  // Duration of the full pipeline
+  int64 duration_ms = 4;
+  // Number of files/chunks processed
+  int32 files_processed = 5;
+  int32 chunks_processed = 6;
+  // GPU cluster count if applicable
+  int32 cluster_count = 7;
+  // SOM grid dimensions
+  int32 som_width = 8;
+  int32 som_height = 9;
+  // Whether CUDA was used
+  bool cuda_used = 10;
+  // Exit status — "success", "partial", "failed"
+  string status = 11;
+  // Human-readable summary of what the run produced
+  string summary = 12;
+}
+
+// ── ChunkRecord ──────────────────────────────────────────────────────────────
+// Maps to `chunks` Postgres table.
+
+message ChunkRecord {
+  string chunk_id = 1;          // sha256 of normalised chunk text
+  string run_id = 2;
+  string file_path = 3;
+  string content = 4;
+  string content_hash = 5;      // sha256 of raw source bytes
+  int32 start_line = 6;
+  int32 end_line = 7;
+  int32 token_count = 8;
+  string kind = 9;              // "route", "component", "server", "lib", "test"
+  string topo_class = 10;       // 8-class topo label
+  int32 gpu_cluster = 11;
+  int32 som_bmu_row = 12;
+  int32 som_bmu_col = 13;
+  // 768-dim embedding — stored as Arrow file, not inline here
+  // Use ArtifactRef pointing to embeddings.arrow instead
+  string embedding_model = 14;
+  int32 embedding_dim = 15;
+  repeated string tags = 16;
+  // 4D manifold position: [topoClass/7, somRow/(H-1), somCol/(W-1), clusterSize/n]
+  repeated float manifold4 = 17 [packed = true];
+  int64 indexed_at_unix = 18;
+}
+
+// ── SymbolRecord ─────────────────────────────────────────────────────────────
+// Maps to `symbols` Postgres table.
+
+message SymbolRecord {
+  string symbol_id = 1;         // sha256 of file_path:name:kind
+  string run_id = 2;
+  string file_path = 3;
+  string name = 4;
+  // "function", "class", "export", "type", "const", "interface"
+  string kind = 5;
+  int32 line = 6;
+  int32 col = 7;
+  // Direct import fan-in (how many files import this symbol)
+  int32 fan_in = 8;
+  // Direct import fan-out (how many modules this symbol imports)
+  int32 fan_out = 9;
+  // Upstream transitive node count (reachable via imports)
+  int32 upstream_count = 10;
+  // Downstream transitive node count (who imports this transitively)
+  int32 downstream_count = 11;
+  int64 indexed_at_unix = 12;
+}
+
+// ── ErrorRecord ──────────────────────────────────────────────────────────────
+// Maps to `errors` Postgres table.
+
+message ErrorRecord {
+  string error_hash = 1;        // sha256 of file:line:col:ts_code:message
+  string run_id = 2;
+  string file_path = 3;
+  int32 line = 4;
+  int32 col = 5;
+  int32 ts_code = 6;
+  string raw_message = 7;
+  string normalized_message = 8;
+  string topo_class = 9;
+  int32 gpu_cluster = 10;
+  // "inline", "schema", "import", "refactor"
+  string fix_tier = 11;
+  float grpo_reward = 12;
+  // "typescript", "runtime", "eslint", "svelte-check", "tsgo"
+  string error_source = 13;
+  int64 first_seen_unix = 14;
+  int64 last_seen_unix = 15;
+  int32 occurrence_count = 16;
+}
+
+// ── QueryRunHistory ──────────────────────────────────────────────────────────
+
+message RunHistoryRequest {
+  // Filter by file path (returns runs that touched this file)
+  string file_path = 1;
+  // Filter by pipeline
+  string pipeline = 2;
+  // Return runs after this unix timestamp
+  int64 since_unix = 3;
+  // Max runs to return
+  int32 limit = 4;
+}
+
+message RunHistoryResponse {
+  repeated RunSummary runs = 1;
+  int32 total_count = 2;
+}
+
+message RunSummary {
+  string run_id = 1;
+  string pipeline = 2;
+  RunMeta meta = 3;
+  repeated yorha.shared.ArtifactRef artifacts = 4;
+}
