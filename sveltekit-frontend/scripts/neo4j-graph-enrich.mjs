@@ -260,8 +260,18 @@ function riskLevel(fp) {
 
 // ── Phase 5: Qdrant batch patch ───────────────────────────────────────────────
 
-/** Scroll Qdrant for stable_key → point-id mapping */
-async function buildQdrantIndex(limit = 10_000) {
+/** Normalise a file path to a repo-relative forward-slash key (src/... or scripts/...) */
+function normQdrantKey(fp) {
+  return (fp ?? '')
+    .replace(/\\/g, '/')
+    .replace(/^.*?\/sveltekit-frontend\//, '')
+    .replace(/^.*?\/src\//, 'src/')
+    .replace(/^\//, '');
+}
+
+/** Scroll Qdrant, building relativePath → [point-id, …] mapping (all chunks per file) */
+async function buildQdrantIndex(limit = 50_000) {
+  // Map<normalised-path, point-id[]>
   const index = new Map();
   let offset = null;
   let collected = 0;
@@ -269,19 +279,22 @@ async function buildQdrantIndex(limit = 10_000) {
     const r = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLL}/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: 500, with_payload: ['stable_key', 'relativePath', 'file_path'], with_vector: false, ...(offset ? { offset } : {}) }),
+      body: JSON.stringify({
+        limit: 500,
+        with_payload: ['stable_key', 'relativePath', 'file_path'],
+        with_vector: false,
+        ...(offset ? { offset } : {}),
+      }),
     });
     if (!r.ok) break;
     const d = await r.json();
     const pts = d.result?.points ?? [];
     for (const pt of pts) {
-      const key = pt.payload?.stable_key ?? pt.payload?.relativePath ?? pt.payload?.file_path;
-      if (key) {
-        index.set(key, pt.id);
-        // Also index by basename so Postgres fan-in short paths can match
-        const base = key.split('/').pop();
-        if (base && base !== key && !index.has(base)) index.set(base, pt.id);
-      }
+      const raw = pt.payload?.relativePath ?? pt.payload?.file_path ?? pt.payload?.stable_key;
+      if (!raw) continue;
+      const key = normQdrantKey(raw);
+      if (!index.has(key)) index.set(key, []);
+      index.get(key).push(pt.id);
     }
     collected += pts.length;
     offset = d.result?.next_page_offset ?? null;
@@ -514,24 +527,24 @@ async function main() {
   if (!NO_QDRANT) {
     console.log('\n── Phase 5: Qdrant payload patch ────────────────────────────────');
     try {
-      const qdrantIndex = await buildQdrantIndex(LIMIT);
-      console.log(`   Qdrant index built: ${qdrantIndex.size} stable_key → point-id mappings`);
+      const qdrantIndex = await buildQdrantIndex(50_000);
+      console.log(`   Qdrant index built: ${qdrantIndex.size} unique paths → point-id[] mappings`);
 
       const patches = [];
       for (const e of enriched) {
-        const key = e.stableKey ?? e.filePath;
-        const id  = qdrantIndex.get(key);
-        if (!id) continue;
-        patches.push({
-          id,
-          payload: {
-            graphAuthorityScore: e.graphAuthorityScore,
-            communityId:         e.communityId,
-            communitySize:       e.communitySize,
-            pagerank:            e.pagerank,
-            cluster_key:         e.clusterKey,
-          },
-        });
+        // normalise both sides to repo-relative path (strips 'sveltekit-frontend/' prefix)
+        const key = normQdrantKey(e.filePath ?? e.stableKey ?? '');
+        const ids = qdrantIndex.get(key);
+        if (!ids?.length) continue;
+        const payload = {
+          graphAuthorityScore: e.graphAuthorityScore,
+          communityId:         e.communityId,
+          communitySize:       e.communitySize,
+          pagerank:            e.pagerank,
+          cluster_key:         e.clusterKey,
+        };
+        // Patch ALL chunks for this file (one point per chunk)
+        for (const id of ids) patches.push({ id, payload });
       }
 
       const dryNote = DRY_RUN ? ' (dry — no writes)' : '';
