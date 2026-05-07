@@ -83,10 +83,12 @@ export function normalizeRepoPath(p) {
 
 // ── load sources ─────────────────────────────────────────────────────────────
 
-const relArtifact = safeJson(join(LOGS_DIR, 'code-relations-latest.json')) ?? {};
-const nesGraph    = safeJson(join(DOCS_GRAPH, 'nes-glyph-architecture.json')) ?? {};
-const cgraph      = safeJson(join(DOCS_GRAPH, 'codebase-graph.json')) ?? {};
-const multihop    = safeJson(join(DOCS_GRAPH, 'multihop-codebase-map.json')) ?? {};
+const relArtifact      = safeJson(join(LOGS_DIR, 'code-relations-latest.json')) ?? {};
+const nesGraph         = safeJson(join(DOCS_GRAPH, 'nes-glyph-architecture.json')) ?? {};
+const cgraph           = safeJson(join(DOCS_GRAPH, 'codebase-graph.json')) ?? {};
+const multihop         = safeJson(join(DOCS_GRAPH, 'multihop-codebase-map.json')) ?? {};
+// Cluster→AGENTS.md index — built by scripts/graph/build-cluster-agents-index.mjs
+const clusterAgentsIdx = safeJson(join(DOCS_GRAPH, 'cluster-agents-index.json')) ?? null;
 // GDS enrichment artifact — populated by graphify:gds; optional (null-safe throughout)
 const gdsArtifact = safeJson(resolve(ROOT, 'memory/graphify/gds/latest.json')) ?? null;
 // Build index: stableKey/filePath → { communityId, graphAuthorityScore } for O(1) lookup
@@ -357,6 +359,39 @@ const llmSynthesisMapping = {
 
 // ── 7. next_actions.md ────────────────────────────────────────────────────────
 
+// Dynamic cluster-coverage gaps derived from cluster-agents-index.json
+const clusterCoverageGaps = (() => {
+  if (!clusterAgentsIdx?.clusters) {
+    return [{
+      id: 'gap_agents_index',
+      open: true,
+      priority: 'P0',
+      title: 'Run `npm run graph:cluster-agents` to build cluster→AGENTS.md index (needed for P0/P1 gap detection)',
+    }];
+  }
+  const gaps = [];
+  for (const c of clusterAgentsIdx.clusters) {
+    if (c.memberCount > 100 && c.coverage === 0) {
+      const tags = (c.bowTerms ?? []).slice(0, 3).join('/') || 'mixed';
+      gaps.push({
+        id:       `gap_agents_cluster_${c.clusterId}`,
+        open:     true,
+        priority: 'P0',
+        title:    `cluster:${c.clusterId} (${c.memberCount} files, ${tags}) has NO AGENTS.md coverage — add AGENTS.md to \`${c.topDir || 'src'}\``,
+      });
+    } else if (c.memberCount > 30 && c.coverage < 0.3 && c.agentsMdCount < 2) {
+      const tags = (c.bowTerms ?? []).slice(0, 2).join('/') || 'mixed';
+      gaps.push({
+        id:       `gap_agents_cluster_${c.clusterId}`,
+        open:     true,
+        priority: 'P1',
+        title:    `cluster:${c.clusterId} (${c.memberCount} files, ${tags}) has ${Math.round(c.coverage * 100)}% AGENTS.md coverage — enrich \`${c.topDir || 'src'}/AGENTS.md\``,
+      });
+    }
+  }
+  return gaps;
+})();
+
 const openGapChecks = [
   { id: 'gap_synth_001', open: false, title: 'CLOSED — bifrostChat in trace-subagent-orchestrator.ts' },
   { id: 'gap_synth_002', open: false, title: 'CLOSED — archiveSynthesisMemory wired in orchestrator' },
@@ -380,6 +415,7 @@ const openGapChecks = [
     title: 'Make graph analysis artifacts readable by ACE (ingest.jsonl → KAG notes)' },
   { id: 'gap_analytics_001', open: !existsSync(join(ROOT, 'src/routes/api/admin/pipeline/events/+server.ts')),
     title: 'Add /api/admin/pipeline/events SSE route for dev analytics' },
+  ...clusterCoverageGaps,
 ];
 
 const nextActionsLines = [
@@ -391,13 +427,13 @@ const nextActionsLines = [
   '## P0 — Critical (blocks synthesis)',
   '',
   ...openGapChecks
-    .filter(g => g.open && (g.id.startsWith('gap_synth_00') && ['1','2','3'].includes(g.id.slice(-1))))
+    .filter(g => g.open && (g.priority === 'P0' || g.id === 'gap_gds_001' || g.id === 'gap_rel_001'))
     .map(g => `- [ ] **${g.id}** — ${g.title}`),
   '',
   '## P1 — Important (improves ACE quality)',
   '',
   ...openGapChecks
-    .filter(g => g.open && !(['gap_synth_001','gap_synth_002','gap_synth_003'].includes(g.id)))
+    .filter(g => g.open && g.priority !== 'P0' && !(['gap_synth_001','gap_synth_002','gap_synth_003'].includes(g.id)))
     .map(g => `- [ ] **${g.id}** — ${g.title}`),
   '',
   '## Relationship Extraction Status',
@@ -423,6 +459,30 @@ const nextActionsLines = [
   ),
   '',
   synthesisBlock,
+  ...(clusterAgentsIdx ? [
+    '## Cluster → AGENTS.md Coverage',
+    '',
+    `> Built by \`scripts/graph/build-cluster-agents-index.mjs\` · ${clusterAgentsIdx.generatedAt?.slice(0,19) ?? ''}`,
+    `> ${clusterAgentsIdx.totalWithCoverage}/${clusterAgentsIdx.clusterCount} clusters covered · ${clusterAgentsIdx.agentsMdUnique} unique AGENTS.md files`,
+    '',
+    '### Uncovered clusters (P0)',
+    '',
+    ...(clusterAgentsIdx.clusters ?? [])
+      .filter(c => c.coverage === 0 && c.memberCount > 50)
+      .slice(0, 8)
+      .map(c => {
+        const tags = (c.bowTerms ?? []).slice(0,3).join(', ') || 'mixed';
+        return `- **cluster:${c.clusterId}** (${c.memberCount} files) ${tags} → \`${c.topDir}\``;
+      }),
+    '',
+    '### Well-covered clusters (sample)',
+    '',
+    ...(clusterAgentsIdx.clusters ?? [])
+      .filter(c => c.coverage >= 0.8 && c.memberCount > 30)
+      .slice(0, 6)
+      .map(c => `- cluster:${c.clusterId} (${c.memberCount} files, ${c.agentsMdCount} AGENTS.md) ${(c.bowTerms ?? []).slice(0,2).join('/')}`),
+    '',
+  ] : ['## Cluster → AGENTS.md Coverage', '', '> Not built yet — run `npm run graph:cluster-agents`', '']),
   `---`,
   `_Run ID: ${RUN_ID}_`,
 ];

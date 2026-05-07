@@ -1,0 +1,3508 @@
+{
+  "generatedAt": "2026-05-07T14:57:35.408Z",
+  "clusterCount": 79,
+  "totalWithCoverage": 79,
+  "totalWithoutCoverage": 0,
+  "agentsMdUnique": 140,
+  "clusters": [
+    {
+      "clusterId": 50,
+      "memberCount": 3814,
+      "bowTerms": [
+        "components",
+        "gaming",
+        "yorha",
+        "topic:gaming",
+        "topic:component"
+      ],
+      "topDir": "src/lib/components/ui/select",
+      "agentsMdFiles": [
+        "src/lib/components/AGENTS.md",
+        "src/lib/components/legal/AGENTS.md",
+        "src/lib/components/ui/AGENTS.md",
+        "src/lib/components/ui/gaming/n64/AGENTS.md",
+        "src/lib/components/ui/input/AGENTS.md",
+        "src/lib/components/ui/select/AGENTS.md",
+        "src/routes/(app)/evidence/realtime/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "5 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/5 files have paired tests",
+        "4 file(s), 0 handler(s)",
+        "**Paired tests**: 1/4 files have paired tests",
+        "35 file(s), 0 handler(s)",
+        "**Paired tests**: 1/35 files have paired tests",
+        "shared library directory with 245 files, 0 API handlers, 3 TODOs",
+        "**Paired tests**: 1/89 files have paired tests",
+        "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs",
+        "🟠 hardcoded localhost: 2 · TODOs: 2",
+        "**Paired tests**: 0/56 files have paired tests",
+        "shared library directory with 33 files, 0 API handlers",
+        "**Paired tests**: 0/33 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "localhost"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G20** SSR safety — browser globals behind onMount guard Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from th"
+    },
+    {
+      "clusterId": 70,
+      "memberCount": 1546,
+      "bowTerms": [
+        "analytics",
+        "routes"
+      ],
+      "topDir": "src/routes/api/library/crawl",
+      "agentsMdFiles": [
+        "src/lib/server/tools/handlers/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "8 file(s), 0 handler(s)",
+        "**Paired tests**: 1/8 files have paired tests",
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "**Paired tests**: 0/2 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "route"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 5,
+      "memberCount": 1526,
+      "bowTerms": [
+        "components",
+        "sym:chat",
+        "routes",
+        "topic:component",
+        "auth"
+      ],
+      "topDir": "src/lib/components",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/client/AGENTS.md",
+        "src/lib/components/AGENTS.md",
+        "src/lib/components/ai/AGENTS.md",
+        "src/lib/components/legal-corpus/AGENTS.md",
+        "src/lib/components/ui/AGENTS.md",
+        "src/lib/features/evidence-command-center/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/(app)/terminal/AGENTS.md"
+      ],
+      "agentsMdCount": 9,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs",
+        "🟠 hardcoded localhost: 2 · TODOs: 2",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/56 files have paired tests",
+        "shared library directory with 5 files, 0 API handlers",
+        "**Paired tests**: 0/5 files have paired tests",
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "**Paired tests**: 0/2 files have paired tests",
+        "route handler directory with 2 files, 0 API handlers, 1 Drizzle refs",
+        "shared library directory with 46 files, 0 API handlers",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/45 files have paired tests",
+        "shared library directory with 8 files, 0 API handlers",
+        "**Paired tests**: 0/8 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "features",
+        "localhost",
+        "routes",
+        "auth",
+        "route",
+        "client"
+      ],
+      "aceHint": "This cluster provides a comprehensive service layer for advanced AI capabilities, handling inference, context analysis (emotion), knowledge retrieval, and complex multi-step workflow orchestration."
+    },
+    {
+      "clusterId": 7,
+      "memberCount": 1427,
+      "bowTerms": [
+        "topic:component",
+        "components"
+      ],
+      "topDir": "src/lib/components/admin",
+      "agentsMdFiles": [
+        "src/lib/components/AGENTS.md",
+        "src/lib/components/admin/AGENTS.md",
+        "src/lib/components/legal/AGENTS.md",
+        "src/lib/components/ui/AGENTS.md",
+        "src/lib/components/yorha/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/(app)/admin/ast-topology/AGENTS.md",
+        "src/routes/(app)/admin/dev-tools/AGENTS.md",
+        "src/routes/(app)/admin/qlora-training/AGENTS.md",
+        "src/routes/(app)/command-center/codebase/clusters/[id]/AGENTS.md"
+      ],
+      "agentsMdCount": 10,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 5 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/5 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "**Paired tests**: 0/2 files have paired tests",
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs",
+        "🟠 hardcoded localhost: 2 · TODOs: 2",
+        "**Paired tests**: 0/56 files have paired tests",
+        "3 file(s), 0 handler(s)",
+        "**Paired tests**: 1/3 files have paired tests",
+        "shared library directory with 33 files, 0 API handlers",
+        "**Paired tests**: 0/33 files have paired tests",
+        "shared library directory with 72 files, 0 API handlers, 1 TODOs"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "localhost",
+        "routes",
+        "auth",
+        "route"
+      ],
+      "aceHint": "This cluster provides a suite of components and pages for a legal research and analysis platform, handling tasks like evidence management, legal citation tracking, document comparison, and real-time data streaming."
+    },
+    {
+      "clusterId": 14,
+      "memberCount": 1360,
+      "bowTerms": [
+        "auth"
+      ],
+      "topDir": "src/lib/ai",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/components/AGENTS.md",
+        "src/lib/components/canvas/AGENTS.md",
+        "src/lib/components/ui/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/grpc/AGENTS.md",
+        "src/lib/types/AGENTS.md",
+        "src/lib/utils/AGENTS.md",
+        "src/lib/webgpu/AGENTS.md"
+      ],
+      "agentsMdCount": 9,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 2",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/14 files have paired tests",
+        "shared library directory with 42 files, 0 API handlers",
+        "🟠 hardcoded localhost: 4",
+        "**Paired tests**: 3/42 files have paired tests",
+        "shared library directory with 245 files, 0 API handlers, 3 TODOs",
+        "**Paired tests**: 1/89 files have paired tests",
+        "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs",
+        "🟠 hardcoded localhost: 2 · TODOs: 2",
+        "**Paired tests**: 0/56 files have paired tests",
+        "shared library directory with 6 files, 0 API handlers",
+        "**Paired tests**: 0/5 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "zod",
+        "utils",
+        "auth",
+        "components",
+        "component",
+        "webgpu",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "server",
+        "test",
+        "types"
+      ],
+      "aceHint": "This cluster provides utility functions and client-side logic for advanced AI tasks, including stable softmax calculation, WebGPU context management, image preprocessing for VLM, and specialized data parsing for genomic/cartridge data."
+    },
+    {
+      "clusterId": 8,
+      "memberCount": 1215,
+      "bowTerms": [
+        "routes",
+        "sym:load"
+      ],
+      "topDir": "src/routes/(app)/library/[documentid]/node/[nodeid]",
+      "agentsMdFiles": [
+        "src/AGENTS.md",
+        "src/lib/server/gpu/AGENTS.md",
+        "src/lib/server/indexer/AGENTS.md",
+        "src/lib/services/error-analysis/AGENTS.md",
+        "src/routes/(app)/admin/codebase-viewer/AGENTS.md",
+        "src/routes/(app)/library/[documentid]/node/[nodeid]/AGENTS.md",
+        "src/routes/(app)/library/[documentid]/reader/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 8,
+      "coverage": 1,
+      "mergedRules": [
+        "2 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "4 file(s), 0 handler(s)",
+        "**Paired tests**: 1/4 files have paired tests",
+        "server module directory with 23 files, 1 API handlers, 5 Drizzle refs",
+        "**Paired tests**: 4/19 files have paired tests",
+        "17 file(s), 0 handler(s)",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/17 files have paired tests",
+        "shared library directory with 17 files, 0 API handlers",
+        "server module directory with 11 files, 0 API handlers, 2 Drizzle refs"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "lib",
+        "server",
+        "zod",
+        "services"
+      ],
+      "aceHint": "This cluster provides a comprehensive set of API route handlers responsible for managing core application features, including document access, user profiles, knowledge base indexing, and complex data retrieval like conversation history and RAG suggestions."
+    },
+    {
+      "clusterId": 72,
+      "memberCount": 1186,
+      "bowTerms": [
+        "topic:vector",
+        "auth"
+      ],
+      "topDir": "src/routes/api/graph/recommendations",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/ace/AGENTS.md",
+        "src/lib/server/agent/AGENTS.md",
+        "src/lib/server/types/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 22 files, 0 API handlers, 4 Drizzle refs",
+        "**Paired tests**: 3/22 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 11 files, 0 API handlers, 3 Drizzle refs",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 10 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 4/10 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "ace.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "server",
+        "zod",
+        "test",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Directory audit: src/lib/server/ace - server module directory with 22 files, 0 API handlers, 4 Drizzle refs"
+    },
+    {
+      "clusterId": 11,
+      "memberCount": 1126,
+      "bowTerms": [
+        "utils",
+        "topic:utils",
+        "sym:progressive",
+        "types"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/AGENTS.md",
+        "src/lib/components/canvas/AGENTS.md",
+        "src/lib/components/codebase/AGENTS.md",
+        "src/lib/components/evidence/AGENTS.md",
+        "src/lib/server/cache/AGENTS.md",
+        "src/lib/stores/unified/AGENTS.md",
+        "src/lib/types/AGENTS.md",
+        "src/lib/utils/AGENTS.md",
+        "src/lib/webgpu/AGENTS.md"
+      ],
+      "agentsMdCount": 9,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 41 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/41 files have paired tests",
+        "shared library directory with 12 files, 0 API handlers",
+        "**Paired tests**: 1/12 files have paired tests",
+        "shared library directory with 6 files, 0 API handlers",
+        "**Paired tests**: 0/5 files have paired tests",
+        "**Paired tests**: 0/6 files have paired tests",
+        "shared library directory with 19 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/19 files have paired tests",
+        "shared library directory with 42 files, 0 API handlers",
+        "🟠 hardcoded localhost: 4",
+        "**Paired tests**: 3/42 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "stores",
+        "webgpu",
+        "localhost",
+        "utils",
+        "auth",
+        "generateCacheKey",
+        "types"
+      ],
+      "aceHint": "This cluster defines a comprehensive set of type definitions and data contracts for advanced, specialized system components, including GPU tensor management, AI embedding services, and complex user interface states."
+    },
+    {
+      "clusterId": 57,
+      "memberCount": 1099,
+      "bowTerms": [
+        "sym:store",
+        "auth"
+      ],
+      "topDir": "src/lib/server/gpu",
+      "agentsMdFiles": [
+        "src/lib/components/dashboard/AGENTS.md",
+        "src/lib/server/gpu/AGENTS.md",
+        "src/lib/server/utils/AGENTS.md",
+        "src/lib/shims/AGENTS.md",
+        "src/lib/utils/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 11 files, 0 API handlers, 2 Drizzle refs",
+        "🟠 hardcoded localhost: 2",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/11 files have paired tests",
+        "shared library directory with 42 files, 0 API handlers",
+        "🟠 hardcoded localhost: 4",
+        "**Paired tests**: 3/42 files have paired tests",
+        "server module directory with 13 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/13 files have paired tests",
+        "shared library directory with 15 files, 0 API handlers",
+        "**Paired tests**: 1/15 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers, 1 Drizzle refs, 1 SSR-unsafe",
+        "🔴 SSR-unsafe: 1"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "utils",
+        "zod",
+        "auth",
+        "server",
+        "components",
+        "component",
+        "shims"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G8b** GPU/Analysis layer — NO @sveltejs/kit imports (pure fns Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check f"
+    },
+    {
+      "clusterId": 19,
+      "memberCount": 1052,
+      "bowTerms": [
+        "types",
+        "utils",
+        "sym:ollama",
+        "sym:qdrant"
+      ],
+      "topDir": "src/lib/server/ai",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/ai/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/observability/AGENTS.md",
+        "src/lib/server/retrieval/AGENTS.md",
+        "src/lib/server/types/AGENTS.md",
+        "src/lib/server/utils/AGENTS.md",
+        "src/lib/types/AGENTS.md"
+      ],
+      "agentsMdCount": 8,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 38 files, 0 API handlers, 6 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 4/38 files have paired tests",
+        "server module directory with 13 files, 0 API handlers",
+        "**Paired tests**: 0/13 files have paired tests",
+        "server module directory with 3 files, 0 API handlers",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "**Paired tests**: 4/70 files have paired tests",
+        "shared library directory with 52 files, 0 API handlers, 1 Drizzle refs"
+      ],
+      "toolsAllowed": [
+        "graph.ts",
+        "ace.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "types"
+      ],
+      "aceHint": "This cluster defines the comprehensive data models and response types used across various backend services. It standardizes the structure for results coming from knowledge bases, web searches, document processing, and AI synthesis."
+    },
+    {
+      "clusterId": 92,
+      "memberCount": 940,
+      "bowTerms": [
+        "components",
+        "evidence",
+        "sym:upload",
+        "topic:component",
+        "yorha"
+      ],
+      "topDir": "src/lib/components/evidence",
+      "agentsMdFiles": [
+        "src/lib/components/ai/AGENTS.md",
+        "src/lib/components/evidence/AGENTS.md",
+        "src/lib/components/yorha/evidence/AGENTS.md",
+        "src/lib/stores/unified/AGENTS.md",
+        "src/routes/(app)/cases/[id]/evidence/upload/AGENTS.md",
+        "src/routes/(app)/demos/yorha/components/evidence/AGENTS.md",
+        "src/routes/(app)/evidence/upload/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 41 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/41 files have paired tests",
+        "3 file(s), 0 handler(s)",
+        "**Paired tests**: 0/3 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "**Paired tests**: 1/2 files have paired tests",
+        "5 file(s), 0 handler(s)",
+        "**Paired tests**: 0/5 files have paired tests",
+        "shared library directory with 46 files, 0 API handlers",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/45 files have paired tests",
+        "shared library directory with 6 files, 0 API handlers",
+        "**Paired tests**: 0/6 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "stores"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G20** SSR safety — browser globals behind onMount guard Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from th"
+    },
+    {
+      "clusterId": 4,
+      "memberCount": 934,
+      "bowTerms": [
+        "components",
+        "sym:props",
+        "topic:vector"
+      ],
+      "topDir": "src/lib/components/ui/modular",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/components/ai/AGENTS.md",
+        "src/lib/components/courtroom/AGENTS.md",
+        "src/lib/components/legal-corpus/AGENTS.md",
+        "src/lib/components/rag/AGENTS.md",
+        "src/lib/components/ui/alert-dialog/AGENTS.md",
+        "src/lib/components/ui/dialog/AGENTS.md",
+        "src/lib/components/ui/modular/AGENTS.md",
+        "src/lib/components/ui/tabs/AGENTS.md",
+        "src/lib/icons/yorha/AGENTS.md"
+      ],
+      "agentsMdCount": 10,
+      "coverage": 1,
+      "mergedRules": [
+        "2 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "9 file(s), 0 handler(s)",
+        "**Paired tests**: 1/9 files have paired tests",
+        "shared library directory with 15 files, 0 API handlers",
+        "**Paired tests**: 1/15 files have paired tests",
+        "14 file(s), 0 handler(s)",
+        "**Paired tests**: 1/14 files have paired tests",
+        "13 file(s), 0 handler(s)",
+        "**Paired tests**: 1/13 files have paired tests",
+        "shared library directory with 2 files, 0 API handlers",
+        "shared library directory with 46 files, 0 API handlers",
+        "🟠 hardcoded localhost: 2"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "icons",
+        "component",
+        "components",
+        "zod"
+      ],
+      "aceHint": "This file centralizes various constants and configuration limits necessary for the deployment and operation of AI models, defining resource minimums, model dimensions, and performance multipliers."
+    },
+    {
+      "clusterId": 9,
+      "memberCount": 928,
+      "bowTerms": [
+        "types",
+        "sym:response",
+        "utils",
+        "sym:props",
+        "auth"
+      ],
+      "topDir": "src/lib/utils",
+      "agentsMdFiles": [
+        "src/lib/AGENTS.md",
+        "src/lib/schemas/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/agent/AGENTS.md",
+        "src/lib/server/pdf/AGENTS.md",
+        "src/lib/server/queue/AGENTS.md",
+        "src/lib/server/types/AGENTS.md",
+        "src/lib/server/utils/AGENTS.md",
+        "src/lib/utils/AGENTS.md"
+      ],
+      "agentsMdCount": 9,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 42 files, 0 API handlers",
+        "🟠 hardcoded localhost: 4",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 3/42 files have paired tests",
+        "shared library directory with 5 files, 0 API handlers",
+        "**Paired tests**: 1/5 files have paired tests",
+        "server module directory with 13 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/13 files have paired tests",
+        "server module directory with 2 files, 0 API handlers",
+        "**Paired tests**: 0/2 files have paired tests",
+        "server module directory with 11 files, 0 API handlers, 3 Drizzle refs",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 8 files, 0 API handlers, 1 Drizzle refs"
+      ],
+      "toolsAllowed": [
+        "ace.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "utils",
+        "zod",
+        "auth",
+        "schemas",
+        "json",
+        "server",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "This cluster provides the foundational infrastructure for a complex application, managing core backend services like authentication, API routing, state persistence, and external service communication (AI/gRPC). It also includes essential frontend utilities for state management and network handling."
+    },
+    {
+      "clusterId": 94,
+      "memberCount": 921,
+      "bowTerms": [
+        "sym:get"
+      ],
+      "topDir": "src/routes/api/v1/redis/cache",
+      "agentsMdFiles": [
+        "src/lib/cache/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/cache/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 5 files, 0 API handlers",
+        "**Paired tests**: 0/5 files have paired tests",
+        "server module directory with 13 files, 0 API handlers",
+        "**Paired tests**: 2/13 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "cache",
+        "zod",
+        "generateCacheKey",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 6,
+      "memberCount": 918,
+      "bowTerms": [
+        "auth"
+      ],
+      "topDir": "src/lib/server/graph",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/ace/AGENTS.md",
+        "src/lib/server/agent/AGENTS.md",
+        "src/lib/server/analytics/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/graph/AGENTS.md",
+        "src/lib/server/services/AGENTS.md",
+        "src/lib/server/workers/AGENTS.md",
+        "src/lib/types/AGENTS.md"
+      ],
+      "agentsMdCount": 9,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 20 files, 0 API handlers, 2 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/20 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "**Paired tests**: 4/70 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "shared library directory with 52 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 11/52 files have paired tests",
+        "server module directory with 11 files, 0 API handlers, 3 Drizzle refs",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 22 files, 0 API handlers, 4 Drizzle refs"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "src",
+        "lib",
+        "types",
+        "zod",
+        "server",
+        "test"
+      ],
+      "aceHint": "This cluster provides comprehensive services for advanced information retrieval, including vector search, document extraction, and hybrid ranking, while also managing audio processing and auditing tools."
+    },
+    {
+      "clusterId": 82,
+      "memberCount": 903,
+      "bowTerms": [
+        "sym:response",
+        "analytics",
+        "auth"
+      ],
+      "topDir": "src/lib/server/mcp",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/gpu/AGENTS.md",
+        "src/lib/server/grpc/AGENTS.md",
+        "src/lib/server/mcp/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 3 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 10 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/10 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 11 files, 0 API handlers, 2 Drizzle refs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 0/11 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "src",
+        "lib",
+        "server",
+        "localhost",
+        "zod",
+        "test",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "routes",
+        "component",
+        "auth"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 20,
+      "memberCount": 883,
+      "bowTerms": [
+        "topic:webgpu",
+        "sym:web",
+        "auth"
+      ],
+      "topDir": "src/routes/api/codebase-index/karpathy-tag/gpu",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/gpu/AGENTS.md",
+        "src/lib/server/gpu/AGENTS.md",
+        "src/lib/server/indexer/AGENTS.md",
+        "src/lib/webgpu/AGENTS.md",
+        "src/lib/workers/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 19 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/19 files have paired tests",
+        "server module directory with 23 files, 1 API handlers, 5 Drizzle refs",
+        "**Paired tests**: 4/19 files have paired tests",
+        "shared library directory with 17 files, 0 API handlers",
+        "**Paired tests**: 1/17 files have paired tests",
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/14 files have paired tests",
+        "shared library directory with 6 files, 0 API handlers, 2 TODOs"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "webgpu",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "server",
+        "zod",
+        "gpu",
+        "mjs",
+        "workers"
+      ],
+      "aceHint": "This GPU cluster is specialized for high-performance Artificial Intelligence and Machine Learning workloads. It manages complex data pipelines involving vector embedding generation, similarity calculations (like SOM and graph attention), and low-level tensor operations using CUDA/WebGPU. The archite"
+    },
+    {
+      "clusterId": 17,
+      "memberCount": 849,
+      "bowTerms": [
+        "services",
+        "error",
+        "analysis",
+        "knowledge",
+        "search",
+        "sym:get",
+        "topic:error",
+        "sym:store"
+      ],
+      "topDir": "src/lib/services/error-analysis",
+      "agentsMdFiles": [
+        "src/lib/components/case/AGENTS.md",
+        "src/lib/components/legal/AGENTS.md",
+        "src/lib/components/yorha/AGENTS.md",
+        "src/lib/config/AGENTS.md",
+        "src/lib/server/concurrency/AGENTS.md",
+        "src/lib/server/gpu/AGENTS.md",
+        "src/lib/server/workers/AGENTS.md",
+        "src/lib/services/error-analysis/AGENTS.md",
+        "src/lib/services/knowledge-search/AGENTS.md",
+        "src/lib/stores/unified/AGENTS.md",
+        "src/routes/(app)/active-cases/AGENTS.md",
+        "src/routes/(app)/demos/yorha/components/cases/AGENTS.md"
+      ],
+      "agentsMdCount": 12,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 17 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/17 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers, 1 Drizzle refs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/11 files have paired tests",
+        "shared library directory with 33 files, 0 API handlers",
+        "**Paired tests**: 0/33 files have paired tests",
+        "shared library directory with 3 files, 0 API handlers",
+        "**Paired tests**: 0/3 files have paired tests",
+        "shared library directory with 72 files, 0 API handlers, 1 TODOs",
+        "**Paired tests**: 0/38 files have paired tests",
+        "3 file(s), 0 handler(s)"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "src",
+        "lib",
+        "services",
+        "zod",
+        "components",
+        "component",
+        "routes",
+        "route",
+        "auth",
+        "stores",
+        "server",
+        "config",
+        "json"
+      ],
+      "aceHint": "This cluster provides foundational, shared infrastructure services for the application, managing state, handling resource pooling (compute and GPU), and providing utilities for configuration, concurrency, and AI processing."
+    },
+    {
+      "clusterId": 16,
+      "memberCount": 791,
+      "bowTerms": [
+        "topic:error",
+        "topic:vector",
+        "error",
+        "analysis",
+        "services"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/db/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/agent/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/db/schema/AGENTS.md",
+        "src/lib/server/queue/AGENTS.md",
+        "src/lib/stores/unified/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 4/70 files have paired tests",
+        "shared library directory with 4 files, 0 API handlers, 11 Drizzle refs",
+        "**Paired tests**: 0/4 files have paired tests",
+        "38 file(s), 0 handler(s)",
+        "**Paired tests**: 7/38 files have paired tests",
+        "server module directory with 8 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 0/8 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "shared library directory with 6 files, 0 API handlers"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "zod",
+        "server",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "stores"
+      ],
+      "aceHint": "This cluster provides the foundational types, schemas, and infrastructure constants necessary for a complex, multi-stage evidence processing pipeline. It manages state, communication queues, and data persistence across various specialized AI agents."
+    },
+    {
+      "clusterId": 2,
+      "memberCount": 774,
+      "bowTerms": [
+        "topic:cases",
+        "topic:component",
+        "cases",
+        "components",
+        "sym:chat"
+      ],
+      "topDir": "src/lib/components/cases",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/ai/e2b/AGENTS.md",
+        "src/lib/components/cases/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/ml/AGENTS.md",
+        "src/lib/webgpu/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 11 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/11 files have paired tests",
+        "server module directory with 8 files, 0 API handlers, 3 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/8 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "**Paired tests**: 4/70 files have paired tests",
+        "shared library directory with 19 files, 0 API handlers",
+        "**Paired tests**: 0/19 files have paired tests",
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs"
+      ],
+      "toolsAllowed": [
+        "cluster.ts"
+      ],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "localhost",
+        "server",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "webgpu"
+      ],
+      "aceHint": "This cluster provides a sophisticated, multi-tiered API for AI text generation and embedding. It orchestrates a complex cascade of local and remote inference engines, prioritizing performance via caching and hardware acceleration."
+    },
+    {
+      "clusterId": 15,
+      "memberCount": 766,
+      "bowTerms": [
+        "auth"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/db/queries/AGENTS.md",
+        "src/lib/server/analysis/AGENTS.md",
+        "src/lib/server/cache/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/observability/AGENTS.md",
+        "src/routes/(app)/admin/phase89/AGENTS.md",
+        "src/routes/(app)/cases/[id]/evidence/AGENTS.md",
+        "src/routes/(app)/command-center/AGENTS.md",
+        "src/routes/(app)/evidence/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 10,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 2 files, 0 API handlers, 2 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "route handler directory with 14 files, 1 API handlers, 3 Drizzle refs",
+        "Auth: 1/1 · Zod: 1/1 · tests paired: 1/1",
+        "**Paired tests**: 1/1 route files paired",
+        "2 file(s), 0 handler(s)",
+        "route handler directory with 11 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 0/3 files have paired tests",
+        "**Paired tests**: 1/2 files have paired tests",
+        "server module directory with 12 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 0/12 files have paired tests",
+        "server module directory with 13 files, 0 API handlers",
+        "**Paired tests**: 2/13 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "routes",
+        "route",
+        "component",
+        "auth",
+        "server",
+        "zod",
+        "generateCacheKey"
+      ],
+      "aceHint": "This cluster provides backend services for managing complex data workflows, including job queuing, caching (Redis/memory), database extensions, and user authentication."
+    },
+    {
+      "clusterId": 3,
+      "memberCount": 653,
+      "bowTerms": [
+        "routes"
+      ],
+      "topDir": "src/routes/(app)/command-center",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/components/ai/AGENTS.md",
+        "src/lib/components/yorha/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/(app)/command-center/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "route handler directory with 11 files, 0 API handlers, 1 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/3 files have paired tests",
+        "shared library directory with 46 files, 0 API handlers",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/45 files have paired tests",
+        "shared library directory with 72 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/38 files have paired tests",
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "**Paired tests**: 0/2 files have paired tests",
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "**Paired tests**: 1/14 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "route",
+        "auth",
+        "lib",
+        "components",
+        "component",
+        "zod"
+      ],
+      "aceHint": "This module provides utility functions for managing WebAssembly (WASM) workers, but currently serves only as an archive placeholder, directing users to an alternative ONNX Runtime WebGPU path for client-side inference."
+    },
+    {
+      "clusterId": 18,
+      "memberCount": 643,
+      "bowTerms": [
+        "types",
+        "sym:case",
+        "cases",
+        "components",
+        "auth",
+        "analytics"
+      ],
+      "topDir": "src/lib/server/vector",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/components/ui/gaming/constants/AGENTS.md",
+        "src/lib/server/vector/AGENTS.md",
+        "src/lib/types/AGENTS.md",
+        "src/lib/webgpu/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 10 files, 0 API handlers, 1 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/10 files have paired tests",
+        "shared library directory with 52 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 11/52 files have paired tests",
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/14 files have paired tests",
+        "shared library directory with 19 files, 0 API handlers",
+        "**Paired tests**: 0/19 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "**Paired tests**: 0/2 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "types",
+        "zod",
+        "webgpu"
+      ],
+      "aceHint": "This cluster defines a set of TypeScript interfaces and types used throughout the application to structure data related to legal cases, evidence, error analysis, and external service interactions."
+    },
+    {
+      "clusterId": 10,
+      "memberCount": 603,
+      "bowTerms": [
+        "auth"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/analysis/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/db/schema/AGENTS.md",
+        "src/lib/server/langextract/AGENTS.md",
+        "src/lib/server/llm/AGENTS.md",
+        "src/routes/(app)/admin/dev-tools/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 3 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/3 files have paired tests",
+        "4 file(s), 0 handler(s)",
+        "**Paired tests**: 0/4 files have paired tests",
+        "server module directory with 12 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 0/12 files have paired tests",
+        "server module directory with 6 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "This cluster provides a collection of TypeScript type definitions that mirror the structure of various database tables, ensuring strong type safety across the application's data access layer."
+    },
+    {
+      "clusterId": 85,
+      "memberCount": 587,
+      "bowTerms": [
+        "routes",
+        "cases",
+        "evidence"
+      ],
+      "topDir": "src/routes/api/citations/collections/[collectionid]/citations",
+      "agentsMdFiles": [
+        "src/lib/machines/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/11 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "machines",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 64,
+      "memberCount": 525,
+      "bowTerms": [
+        "brain",
+        "error",
+        "topic:error",
+        "routes"
+      ],
+      "topDir": "src/routes/api/error-brain/history/[filepath]",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/phase72/AGENTS.md",
+        "src/lib/utils/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 3 files, 0 API handlers",
+        "**Paired tests**: 0/3 files have paired tests",
+        "shared library directory with 42 files, 0 API handlers",
+        "🟠 hardcoded localhost: 4",
+        "**Paired tests**: 3/42 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "lib",
+        "server",
+        "utils",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 12,
+      "memberCount": 509,
+      "bowTerms": [],
+      "topDir": "src/lib/server/cartridge",
+      "agentsMdFiles": [
+        "src/lib/cache/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/ai/AGENTS.md",
+        "src/lib/server/cache/AGENTS.md",
+        "src/lib/server/cartridge/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/legal/AGENTS.md",
+        "src/lib/services/knowledge-search/AGENTS.md",
+        "src/lib/shared/AGENTS.md",
+        "src/lib/utils/AGENTS.md"
+      ],
+      "agentsMdCount": 10,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 5 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/5 files have paired tests",
+        "shared library directory with 3 files, 0 API handlers",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests",
+        "shared library directory with 5 files, 0 API handlers",
+        "**Paired tests**: 0/5 files have paired tests",
+        "server module directory with 13 files, 0 API handlers",
+        "**Paired tests**: 2/13 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers, 1 Drizzle refs",
+        "🟠 hardcoded localhost: 2"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "shared",
+        "zod",
+        "cache",
+        "generateCacheKey",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "services",
+        "server",
+        "utils",
+        "auth"
+      ],
+      "aceHint": "This cluster provides utility functions and components for handling diverse data formats, including proprietary cartridge headers, legal document processing, UI state management, and general security/file handling utilities."
+    },
+    {
+      "clusterId": 1,
+      "memberCount": 442,
+      "bowTerms": [
+        "sym:form",
+        "utils",
+        "sym:progressive",
+        "topic:utils",
+        "types",
+        "topic:component",
+        "components",
+        "sym:props",
+        "auth"
+      ],
+      "topDir": "src/lib/components/forms",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/cache/AGENTS.md",
+        "src/lib/components/citations/AGENTS.md",
+        "src/lib/components/forms/AGENTS.md",
+        "src/lib/components/legal/AGENTS.md",
+        "src/lib/components/rag/AGENTS.md",
+        "src/routes/(app)/citations/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 7 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/7 files have paired tests",
+        "shared library directory with 33 files, 0 API handlers",
+        "**Paired tests**: 0/33 files have paired tests",
+        "shared library directory with 4 files, 0 API handlers",
+        "**Paired tests**: 0/4 files have paired tests",
+        "shared library directory with 5 files, 0 API handlers",
+        "**Paired tests**: 0/5 files have paired tests",
+        "route handler directory with 10 files, 0 API handlers",
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/14 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "localhost",
+        "routes",
+        "route",
+        "auth",
+        "cache"
+      ],
+      "aceHint": "This cluster provides various singleton services and utilities for data handling, including base64 encoding/decoding for floating-point numbers, and multiple caching mechanisms (Loki, unified, and IndexedDB)."
+    },
+    {
+      "clusterId": 75,
+      "memberCount": 416,
+      "bowTerms": [
+        "sym:get",
+        "sym:ollama"
+      ],
+      "topDir": "src/lib/config",
+      "agentsMdFiles": [
+        "src/lib/config/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/config/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 8 files, 0 API handlers",
+        "🟠 hardcoded localhost: 2",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 2/8 files have paired tests",
+        "server module directory with 4 files, 0 API handlers",
+        "**Paired tests**: 1/4 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "config",
+        "auth",
+        "zod",
+        "json",
+        "server",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "routes",
+        "component"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 28,
+      "memberCount": 387,
+      "bowTerms": [
+        "routes",
+        "topic:component"
+      ],
+      "topDir": "src/routes/(app)/demos/icons",
+      "agentsMdFiles": [
+        "src/lib/components/monitoring/AGENTS.md",
+        "src/lib/components/yorha/dashboard/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/(app)/admin/cache/AGENTS.md",
+        "src/routes/(app)/admin/dev-tools/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 6,
+      "coverage": 1,
+      "mergedRules": [
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "14 file(s), 0 handler(s)",
+        "**Paired tests**: 0/14 files have paired tests",
+        "shared library directory with 3 files, 0 API handlers",
+        "**Paired tests**: 0/3 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "4 file(s), 0 handler(s)",
+        "**Paired tests**: 0/4 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "auth",
+        "route",
+        "component",
+        "lib",
+        "components"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 47,
+      "memberCount": 339,
+      "bowTerms": [
+        "legal",
+        "corpus",
+        "sym:load",
+        "routes",
+        "topic:legal"
+      ],
+      "topDir": "src/routes/(app)/library/corpus",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/components/legal/AGENTS.md",
+        "src/lib/server/legal/AGENTS.md",
+        "src/routes/(app)/citations/law/[citation]/AGENTS.md",
+        "src/routes/(app)/legal-corpus/AGENTS.md",
+        "src/routes/(app)/legal-corpus/[id]/AGENTS.md",
+        "src/routes/(app)/library/corpus/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 8,
+      "coverage": 1,
+      "mergedRules": [
+        "2 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "server module directory with 7 files, 0 API handlers",
+        "**Paired tests**: 0/7 files have paired tests",
+        "route handler directory with 5 files, 0 API handlers, 2 Drizzle refs",
+        "3 file(s), 0 handler(s)",
+        "**Paired tests**: 0/3 files have paired tests",
+        "shared library directory with 33 files, 0 API handlers",
+        "**Paired tests**: 0/33 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 2"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "routes",
+        "route",
+        "auth",
+        "components",
+        "component",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 24,
+      "memberCount": 297,
+      "bowTerms": [
+        "workers",
+        "topic:workers",
+        "topic:class"
+      ],
+      "topDir": "src/lib/server/workers",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/queue/AGENTS.md",
+        "src/lib/server/workers/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 5 files, 0 API handlers, 3 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/5 files have paired tests",
+        "server module directory with 8 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 0/8 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 80,
+      "memberCount": 285,
+      "bowTerms": [
+        "topic:vector",
+        "routes"
+      ],
+      "topDir": "src/routes/api/persons-of-interest/[id]/gpu-analyze",
+      "agentsMdFiles": [
+        "src/AGENTS.md",
+        "src/lib/components/poi/AGENTS.md",
+        "src/routes/(app)/persons-of-interest/[id]/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "17 file(s), 0 handler(s)",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/17 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "**Paired tests**: 0/2 files have paired tests",
+        "shared library directory with 10 files, 0 API handlers",
+        "**Paired tests**: 0/10 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "components",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 69,
+      "memberCount": 256,
+      "bowTerms": [
+        "routes",
+        "sym:job"
+      ],
+      "topDir": "src/routes/api/codebase-index/recommendations",
+      "agentsMdFiles": [
+        "src/lib/server/indexer/AGENTS.md",
+        "src/lib/server/ml/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 8 files, 0 API handlers, 3 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/8 files have paired tests",
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "**Paired tests**: 0/2 files have paired tests",
+        "server module directory with 23 files, 1 API handlers, 5 Drizzle refs",
+        "**Paired tests**: 4/19 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "cluster.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "server",
+        "route",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 96,
+      "memberCount": 177,
+      "bowTerms": [
+        "types",
+        "sym:evidence",
+        "sym:type",
+        "sym:web"
+      ],
+      "topDir": "src/lib/server/queue",
+      "agentsMdFiles": [
+        "src/lib/components/ui/modular/AGENTS.md",
+        "src/lib/machines/AGENTS.md",
+        "src/lib/server/evidence/AGENTS.md",
+        "src/lib/server/queue/AGENTS.md",
+        "src/lib/services/error-analysis/AGENTS.md",
+        "src/lib/types/AGENTS.md",
+        "src/lib/utils/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 8 files, 0 API handlers, 1 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/8 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/11 files have paired tests",
+        "shared library directory with 42 files, 0 API handlers",
+        "🟠 hardcoded localhost: 4",
+        "**Paired tests**: 3/42 files have paired tests",
+        "server module directory with 15 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 2/10 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "**Paired tests**: 0/2 files have paired tests",
+        "shared library directory with 17 files, 0 API handlers"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "machines",
+        "component",
+        "utils",
+        "auth",
+        "test",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "services",
+        "types"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G13** Docker service ports (5432/6379/6333/9000/5672) Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the "
+    },
+    {
+      "clusterId": 81,
+      "memberCount": 176,
+      "bowTerms": [
+        "topic:class",
+        "topic:vector",
+        "knowledge",
+        "search",
+        "services"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/vector/AGENTS.md",
+        "src/lib/services/knowledge-search/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 4/70 files have paired tests",
+        "server module directory with 10 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 0/10 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers, 1 Drizzle refs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/11 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "services",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G10** Drizzle schema refs Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root"
+    },
+    {
+      "clusterId": 91,
+      "memberCount": 162,
+      "bowTerms": [
+        "auth",
+        "sym:evidence"
+      ],
+      "topDir": "src/lib/db",
+      "agentsMdFiles": [
+        "src/lib/db/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/db/schema/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 4 files, 0 API handlers, 11 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/4 files have paired tests",
+        "38 file(s), 0 handler(s)",
+        "**Paired tests**: 7/38 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 90,
+      "memberCount": 158,
+      "bowTerms": [
+        "auth",
+        "routes",
+        "types",
+        "sym:invalidate",
+        "sym:get"
+      ],
+      "topDir": "src/routes/api/auth/logout",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/routes/AGENTS.md",
+        "src/routes/login/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "route handler directory with 3 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 1/3 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "login",
+        "route"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 77,
+      "memberCount": 134,
+      "bowTerms": [
+        "types",
+        "sym:qdrant",
+        "auth"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/AGENTS.md",
+        "src/lib/server/retrieval/AGENTS.md",
+        "src/lib/server/types/AGENTS.md",
+        "src/lib/server/vector/AGENTS.md",
+        "src/lib/services/knowledge-search/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "17 file(s), 0 handler(s)",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/17 files have paired tests",
+        "server module directory with 10 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 0/10 files have paired tests",
+        "**Paired tests**: 4/10 files have paired tests",
+        "server module directory with 28 files, 0 API handlers, 3 Drizzle refs",
+        "**Paired tests**: 1/28 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers, 1 Drizzle refs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/11 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "ace.ts",
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "src",
+        "localhost",
+        "lib",
+        "server",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "services",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 88,
+      "memberCount": 123,
+      "bowTerms": [
+        "auth",
+        "sym:chat"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/db/schema/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/db/schema/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 6 files, 0 API handlers, 6 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests",
+        "38 file(s), 0 handler(s)",
+        "**Paired tests**: 7/38 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 51,
+      "memberCount": 100,
+      "bowTerms": [],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/components/detective/AGENTS.md",
+        "src/lib/components/evidence/AGENTS.md",
+        "src/lib/server/graph/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 20 files, 0 API handlers, 2 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/20 files have paired tests",
+        "shared library directory with 6 files, 0 API handlers",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 41 files, 0 API handlers",
+        "**Paired tests**: 0/41 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod",
+        "localhost",
+        "routes",
+        "auth"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G8b** GPU/Analysis layer — NO @sveltejs/kit imports (pure fns Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check f"
+    },
+    {
+      "clusterId": 53,
+      "memberCount": 84,
+      "bowTerms": [
+        "types",
+        "sym:type",
+        "sym:chat"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/shims/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 11 files, 0 API handlers, 1 Drizzle refs, 1 SSR-unsafe",
+        "🔴 SSR-unsafe: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/11 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "shims",
+        "zod",
+        "localhost"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 84,
+      "memberCount": 69,
+      "bowTerms": [
+        "topic:vector",
+        "routes",
+        "sym:get"
+      ],
+      "topDir": "src/routes/api/audit/gpu",
+      "agentsMdFiles": [
+        "src/lib/server/audit/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 4 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 0/4 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 13,
+      "memberCount": 61,
+      "bowTerms": [
+        "routes",
+        "auth"
+      ],
+      "topDir": "src/routes/api/analytics/context-timeline",
+      "agentsMdFiles": [
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 0.29,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth"
+      ],
+      "aceHint": "This cluster consists of multiple files that uniformly define a constant to explicitly disable Server-Side Rendering (SSR) for the module."
+    },
+    {
+      "clusterId": 97,
+      "memberCount": 61,
+      "bowTerms": [
+        "yorha",
+        "components",
+        "topic:component",
+        "routes"
+      ],
+      "topDir": "src/lib/components/yorha",
+      "agentsMdFiles": [
+        "src/lib/components/yorha/AGENTS.md",
+        "src/lib/components/yorha/_simulations/AGENTS.md",
+        "src/routes/(app)/demos/yorha/components/cases/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 72 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/38 files have paired tests",
+        "3 file(s), 0 handler(s)",
+        "**Paired tests**: 0/3 files have paired tests",
+        "12 file(s), 0 handler(s)",
+        "**Paired tests**: 0/12 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G20** SSR safety — browser globals behind onMount guard Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from th"
+    },
+    {
+      "clusterId": 0,
+      "memberCount": 49,
+      "bowTerms": [
+        "topic:vector",
+        "types",
+        "sym:upload",
+        "sym:response"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/utils/AGENTS.md",
+        "src/lib/server/validation/AGENTS.md",
+        "src/lib/types/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/(app)/admin/component-analysis/AGENTS.md",
+        "src/routes/(app)/cases/[id]/AGENTS.md",
+        "src/routes/(app)/cases/[id]/canvas/AGENTS.md",
+        "src/routes/(app)/cases/[id]/overview/AGENTS.md"
+      ],
+      "agentsMdCount": 9,
+      "coverage": 1,
+      "mergedRules": [
+        "6 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/6 files have paired tests",
+        "3 file(s), 0 handler(s)",
+        "**Paired tests**: 1/3 files have paired tests",
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "**Paired tests**: 0/2 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "shared library directory with 52 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 11/52 files have paired tests",
+        "server module directory with 2 files, 0 API handlers",
+        "server module directory with 13 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/13 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "auth",
+        "route",
+        "component",
+        "lib",
+        "types",
+        "zod",
+        "server",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "This cluster provides various TypeScript definitions and Zod validation schemas used for defining data structures, handling API query parameters, and structuring communication payloads within a server environment."
+    },
+    {
+      "clusterId": 89,
+      "memberCount": 41,
+      "bowTerms": [
+        "legal",
+        "topic:legal",
+        "sym:get"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/legal/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 7 files, 0 API handlers",
+        "**Paired tests**: 0/7 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "src",
+        "lib",
+        "server"
+      ],
+      "aceHint": "This cluster manages the ingestion, storage, and analysis of state constitutional law data across the US. It maintains a comprehensive registry of state sources and provides utilities for fetching, mapping, and tagging constitutional texts based on defined legal patterns. The system is designed to h"
+    },
+    {
+      "clusterId": 38,
+      "memberCount": 41,
+      "bowTerms": [
+        "stores",
+        "unified",
+        "topic:unified",
+        "topic:stores",
+        "sym:type",
+        "sym:evidence",
+        "types"
+      ],
+      "topDir": "src/lib/stores/unified",
+      "agentsMdFiles": [
+        "src/AGENTS.md",
+        "src/lib/AGENTS.md",
+        "src/lib/stores/AGENTS.md",
+        "src/lib/stores/unified/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 6 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/6 files have paired tests",
+        "17 file(s), 0 handler(s)",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/17 files have paired tests",
+        "shared library directory with 14 files, 0 API handlers",
+        "**Paired tests**: 1/14 files have paired tests",
+        "module directory with 11 files, 3 API handlers, 175 Drizzle refs, 9 TODOs, 1 SSR-unsafe",
+        "**Paired tests**: 1/11 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "stores",
+        "zod",
+        "localhost"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G21** No Svelte 4 props (export let → $props()) Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **svel"
+    },
+    {
+      "clusterId": 41,
+      "memberCount": 40,
+      "bowTerms": [
+        "topic:component",
+        "components"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/components/AGENTS.md",
+        "src/lib/components/canvas/AGENTS.md",
+        "src/lib/components/cases/AGENTS.md",
+        "src/lib/components/ui/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 245 files, 0 API handlers, 3 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/89 files have paired tests",
+        "shared library directory with 6 files, 0 API handlers",
+        "**Paired tests**: 0/5 files have paired tests",
+        "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs",
+        "🟠 hardcoded localhost: 2 · TODOs: 2",
+        "**Paired tests**: 0/56 files have paired tests",
+        "shared library directory with 11 files, 0 API handlers",
+        "**Paired tests**: 1/11 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G20** SSR safety — browser globals behind onMount guard Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from th"
+    },
+    {
+      "clusterId": 39,
+      "memberCount": 23,
+      "bowTerms": [
+        "analysis",
+        "sym:job",
+        "sym:update"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/embedding/AGENTS.md",
+        "src/lib/server/research/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 16 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 1/16 files have paired tests",
+        "server module directory with 9 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 1/9 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 40,
+      "memberCount": 22,
+      "bowTerms": [
+        "topic:component",
+        "routes"
+      ],
+      "topDir": "src/routes/(app)/demos/streaming",
+      "agentsMdFiles": [
+        "src/lib/components/analytics/AGENTS.md",
+        "src/lib/components/cases/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 2 files, 0 API handlers",
+        "shared library directory with 11 files, 0 API handlers",
+        "**Paired tests**: 1/11 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "auth",
+        "route",
+        "component",
+        "lib",
+        "components",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 66,
+      "memberCount": 12,
+      "bowTerms": [
+        "services",
+        "sym:extract",
+        "evidence",
+        "types"
+      ],
+      "topDir": "src/lib/server/evidence/services",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/evidence/AGENTS.md",
+        "src/lib/server/evidence/services/AGENTS.md",
+        "src/lib/server/services/AGENTS.md",
+        "src/lib/types/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "5 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/5 files have paired tests",
+        "server module directory with 15 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 2/10 files have paired tests",
+        "server module directory with 2 files, 0 API handlers",
+        "**Paired tests**: 1/2 files have paired tests",
+        "shared library directory with 52 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 11/52 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "test",
+        "zod",
+        "types",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 56,
+      "memberCount": 10,
+      "bowTerms": [
+        "types",
+        "sym:ollama",
+        "sym:evidence"
+      ],
+      "topDir": "src/lib/shared/types",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/analysis/AGENTS.md",
+        "src/lib/shared/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 3 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 12 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 0/12 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "shared",
+        "zod",
+        "server",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "This cluster is architected for advanced document intelligence and legal data processing. It implements a multi-stage pipeline that handles document parsing, visual language model (VLM) extraction, and subsequent embedding generation for vector storage. The system is designed to extract structured d"
+    },
+    {
+      "clusterId": 58,
+      "memberCount": 10,
+      "bowTerms": [
+        "topic:vector",
+        "auth"
+      ],
+      "topDir": "src/lib/server/phase78",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/grpc/AGENTS.md",
+        "src/lib/server/indexer/AGENTS.md",
+        "src/lib/server/inference/AGENTS.md",
+        "src/lib/server/research/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 4 files, 0 API handlers",
+        "**Paired tests**: 0/4 files have paired tests",
+        "server module directory with 23 files, 1 API handlers, 5 Drizzle refs",
+        "**Paired tests**: 4/19 files have paired tests",
+        "server module directory with 16 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 1/16 files have paired tests",
+        "server module directory with 10 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/10 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "test"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. "
+    },
+    {
+      "clusterId": 45,
+      "memberCount": 3,
+      "bowTerms": [],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/ai/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 38 files, 0 API handlers, 6 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 4/38 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G8a** Service layer — use HttpServiceError subclasses, not ki"
+    },
+    {
+      "clusterId": 67,
+      "memberCount": 3,
+      "bowTerms": [
+        "components"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/components/ui/tabs/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "9 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/9 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G20** SSR safety — browser globals behind onMount guard"
+    },
+    {
+      "clusterId": 49,
+      "memberCount": 2,
+      "bowTerms": [
+        "topic:vector"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/cache/AGENTS.md",
+        "src/lib/server/gpu/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 11 files, 0 API handlers, 2 Drizzle refs",
+        "🟠 hardcoded localhost: 2",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/11 files have paired tests",
+        "server module directory with 13 files, 0 API handlers",
+        "**Paired tests**: 2/13 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "generateCacheKey"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G8b** GPU/Analysis layer — NO @sveltejs/kit imports (pure fns Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check f"
+    },
+    {
+      "clusterId": 68,
+      "memberCount": 2,
+      "bowTerms": [
+        "stores",
+        "topic:stores",
+        "sym:get"
+      ],
+      "topDir": "src/lib/stores/dashboard",
+      "agentsMdFiles": [
+        "src/lib/stores/dashboard/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 3 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/3 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "stores",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G21** No Svelte 4 props (export let → $props())"
+    },
+    {
+      "clusterId": 76,
+      "memberCount": 1,
+      "bowTerms": [],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/db/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 4/70 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G10** Drizzle schema refs"
+    },
+    {
+      "clusterId": 33,
+      "memberCount": 1,
+      "bowTerms": [
+        "types",
+        "sym:options",
+        "auth"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/types/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 52 files, 0 API handlers, 1 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 11/52 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "types",
+        "zod"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G1** Static ESM imports"
+    },
+    {
+      "clusterId": 71,
+      "memberCount": 1,
+      "bowTerms": [
+        "topic:vector"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/vector/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 10 files, 0 API handlers, 1 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/10 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost"
+      ],
+      "aceHint": "Auto-mapped from CLAUDE.md §\"Unified Audit Gate System\". Last enriched: 2026-05-06 Run each check from the **sveltekit-frontend/** root. **G8b** GPU/Analysis layer — NO @sveltejs/kit imports (pure fns"
+    },
+    {
+      "clusterId": 31,
+      "memberCount": 0,
+      "bowTerms": [
+        "topic:investigate",
+        "topic:suggest",
+        "routes"
+      ],
+      "topDir": "src/routes/api/investigate/suggest",
+      "agentsMdFiles": [
+        "src/lib/server/db/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth"
+      ],
+      "aceHint": "This module provides a utility function to perform a database health check by verifying the existence of a predefined set of essential application tables against the database schema."
+    },
+    {
+      "clusterId": 55,
+      "memberCount": 0,
+      "bowTerms": [],
+      "topDir": "src/lib/db/schema",
+      "agentsMdFiles": [
+        "src/lib/db/AGENTS.md",
+        "src/lib/db/schema/AGENTS.md",
+        "src/lib/server/db/schema/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 6 files, 0 API handlers, 6 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 4 files, 0 API handlers, 11 Drizzle refs",
+        "**Paired tests**: 0/4 files have paired tests",
+        "38 file(s), 0 handler(s)",
+        "**Paired tests**: 7/38 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "zod"
+      ],
+      "aceHint": "This cluster defines a comprehensive set of TypeScript types that mirror the structure of various underlying database tables. These types are used throughout the application to ensure type safety when interacting with the database, covering domains from web crawling to legal document management."
+    },
+    {
+      "clusterId": 86,
+      "memberCount": 0,
+      "bowTerms": [
+        "evidence",
+        "components",
+        "types",
+        "sym:extract"
+      ],
+      "topDir": "src/lib/shims",
+      "agentsMdFiles": [
+        "src/lib/data/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/shims/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 11 files, 0 API handlers, 1 Drizzle refs, 1 SSR-unsafe",
+        "🔴 SSR-unsafe: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/11 files have paired tests",
+        "shared library directory with 5 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 0/5 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "shims",
+        "zod",
+        "localhost",
+        "json",
+        "data"
+      ],
+      "aceHint": "This file appears to be a placeholder for defining a database schema or data structure related to court decisions, but it currently only exports a reference to an undefined variable."
+    },
+    {
+      "clusterId": 63,
+      "memberCount": 0,
+      "bowTerms": [
+        "auth"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/analytics/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/ml/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 8 files, 0 API handlers, 3 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/8 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "**Paired tests**: 4/70 files have paired tests",
+        "server module directory with 15 files, 0 API handlers, 5 Drizzle refs",
+        "**Paired tests**: 4/15 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "cluster.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server"
+      ],
+      "aceHint": "This cluster provides utility functions for generating visual representations (glyphs) of recommendations, building database query filters, and selecting the top K results based on associated scores."
+    },
+    {
+      "clusterId": 65,
+      "memberCount": 0,
+      "bowTerms": [],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/components/ai/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/grpc/AGENTS.md",
+        "src/lib/services/error-analysis/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 2",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/14 files have paired tests",
+        "shared library directory with 17 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/17 files have paired tests",
+        "server module directory with 10 files, 0 API handlers",
+        "**Paired tests**: 1/10 files have paired tests",
+        "shared library directory with 46 files, 0 API handlers",
+        "**Paired tests**: 1/45 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "**Paired tests**: 4/70 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "zod",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "services",
+        "server",
+        "test",
+        "components",
+        "component"
+      ],
+      "aceHint": "This cluster contains utility functions and components for advanced AI processing, database interaction, and frontend UI component management, alongside core policy and state management logic."
+    },
+    {
+      "clusterId": 42,
+      "memberCount": 0,
+      "bowTerms": [
+        "topic:error",
+        "topic:vector",
+        "error",
+        "analysis",
+        "services"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/ai/AGENTS.md",
+        "src/lib/server/ml/AGENTS.md",
+        "src/lib/server/ocr/AGENTS.md",
+        "src/lib/server/services/AGENTS.md",
+        "src/lib/server/workers/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 2 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/2 files have paired tests",
+        "server module directory with 38 files, 0 API handlers, 6 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/38 files have paired tests",
+        "server module directory with 3 files, 0 API handlers",
+        "**Paired tests**: 0/3 files have paired tests",
+        "server module directory with 8 files, 0 API handlers, 3 Drizzle refs",
+        "**Paired tests**: 0/8 files have paired tests",
+        "server module directory with 5 files, 0 API handlers, 3 Drizzle refs",
+        "**Paired tests**: 0/5 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "cluster.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "aceHint": "This cluster provides a comprehensive backend service for processing documents, including OCR, vector embedding generation, advanced analysis (like SOM clustering and glyph diffusion), and orchestrating these steps into a cohesive pipeline."
+    },
+    {
+      "clusterId": 133,
+      "memberCount": 0,
+      "bowTerms": [],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/components/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 56 files, 0 API handlers, 1 Drizzle refs, 6 TODOs",
+        "🟠 hardcoded localhost: 2 · TODOs: 2",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/56 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "zod"
+      ],
+      "aceHint": "This component acts as a real-time dashboard for monitoring application errors, consuming an event stream to aggregate statistics and display detailed error information."
+    },
+    {
+      "clusterId": 30,
+      "memberCount": 0,
+      "bowTerms": [
+        "gaming",
+        "topic:gaming",
+        "components",
+        "types"
+      ],
+      "topDir": "src/lib/components/ui/gaming/types",
+      "agentsMdFiles": [
+        "src/lib/components/ui/gaming/types/AGENTS.md",
+        "src/lib/types/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "2 file(s), 0 handler(s)",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "shared library directory with 52 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 11/52 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "types",
+        "zod"
+      ],
+      "aceHint": "Defines a TypeScript type representing the expected response structure after a file upload operation."
+    },
+    {
+      "clusterId": 73,
+      "memberCount": 0,
+      "bowTerms": [
+        "types",
+        "topic:vector"
+      ],
+      "topDir": "src/lib/server/retrieval",
+      "agentsMdFiles": [
+        "src/lib/server/analytics/AGENTS.md",
+        "src/lib/server/observability/AGENTS.md",
+        "src/lib/server/retrieval/AGENTS.md",
+        "src/lib/server/streaming/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 28 files, 0 API handlers, 3 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/28 files have paired tests",
+        "server module directory with 15 files, 0 API handlers, 5 Drizzle refs",
+        "**Paired tests**: 4/15 files have paired tests",
+        "server module directory with 2 files, 0 API handlers",
+        "**Paired tests**: 0/2 files have paired tests",
+        "server module directory with 3 files, 0 API handlers",
+        "**Paired tests**: 0/3 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "src",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "aceHint": "This cluster provides utilities for logging and analyzing various stages of a retrieval-augmented generation (RAG) pipeline, including recording chunk hits, chunking text by sentences, and generating aggregated inference statistics."
+    },
+    {
+      "clusterId": 48,
+      "memberCount": 0,
+      "bowTerms": [
+        "migrations",
+        "auth"
+      ],
+      "topDir": "src/lib/server/db/migrations/meta",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/analysis/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/retrieval/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 4/70 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "server module directory with 12 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 0/12 files have paired tests",
+        "server module directory with 28 files, 0 API handlers, 3 Drizzle refs",
+        "**Paired tests**: 1/28 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError",
+        "src",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "aceHint": "This cluster provides utility functions for managing background job states, sending multi-channel notifications, retrieving vector database boost scores, and updating ingestion job progress."
+    },
+    {
+      "clusterId": 79,
+      "memberCount": 0,
+      "bowTerms": [
+        "types"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/ai/AGENTS.md",
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/analytics/AGENTS.md",
+        "src/lib/server/embedding/AGENTS.md",
+        "src/lib/server/graph/AGENTS.md"
+      ],
+      "agentsMdCount": 5,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 15 files, 0 API handlers, 5 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 4/15 files have paired tests",
+        "server module directory with 9 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 1/9 files have paired tests",
+        "server module directory with 20 files, 0 API handlers, 2 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 1/20 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests",
+        "shared library directory with 14 files, 0 API handlers, 1 TODOs",
+        "🟠 hardcoded localhost: 2",
+        "**Paired tests**: 1/14 files have paired tests"
+      ],
+      "toolsAllowed": [
+        "graph.ts"
+      ],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "This cluster provides core backend services for a complex AI application, handling data persistence (embeddings, graph databases), content processing (image resizing, chunk hit logging), and advanced AI features like knowledge synthesis and graph initialization."
+    },
+    {
+      "clusterId": 93,
+      "memberCount": 0,
+      "bowTerms": [
+        "types"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/server/AGENTS.md",
+        "src/lib/server/db/AGENTS.md",
+        "src/lib/server/evidence/AGENTS.md",
+        "src/lib/server/workers/AGENTS.md"
+      ],
+      "agentsMdCount": 4,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 5 files, 0 API handlers, 3 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/5 files have paired tests",
+        "server module directory with 111 files, 0 API handlers, 92 Drizzle refs",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 4/70 files have paired tests",
+        "server module directory with 15 files, 0 API handlers, 2 Drizzle refs",
+        "**Paired tests**: 2/10 files have paired tests",
+        "server module directory with 62 files, 3 API handlers, 157 Drizzle refs",
+        "🟠 hardcoded localhost: 5",
+        "**Paired tests**: 9/62 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "test",
+        "HttpServiceError",
+        "UnauthorizedError",
+        "NotFoundError"
+      ],
+      "aceHint": "This cluster manages complex data processing pipelines, including audio transcription, entity extraction, and error event embedding, while providing mechanisms for synchronizing knowledge bases and storing structured data."
+    },
+    {
+      "clusterId": 35,
+      "memberCount": 0,
+      "bowTerms": [
+        "legal",
+        "components",
+        "topic:component",
+        "topic:legal",
+        "corpus"
+      ],
+      "topDir": "src/routes/(app)/demos/source-drawer",
+      "agentsMdFiles": [
+        "src/lib/components/legal-ai/AGENTS.md",
+        "src/lib/components/legal-corpus/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/(app)/admin/all-routes/AGENTS.md",
+        "src/routes/(app)/cases/[id]/AGENTS.md",
+        "src/routes/(app)/demos/memory-palace/AGENTS.md",
+        "src/routes/(app)/library/glossary/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "**Paired tests**: 1/2 files have paired tests",
+        "shared library directory with 18 files, 0 API handlers",
+        "**Paired tests**: 0/18 files have paired tests",
+        "shared library directory with 8 files, 0 API handlers",
+        "**Paired tests**: 0/8 files have paired tests",
+        "6 file(s), 0 handler(s)",
+        "**Paired tests**: 0/6 files have paired tests",
+        "4 file(s), 0 handler(s)",
+        "**Paired tests**: 0/4 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "auth",
+        "route",
+        "component",
+        "lib",
+        "components"
+      ],
+      "aceHint": "This cluster contains utility code for caching route metadata using IndexedDB and a component for simulating and displaying Nintendo Entertainment System (NES) memory usage."
+    },
+    {
+      "clusterId": 74,
+      "memberCount": 0,
+      "bowTerms": [
+        "types",
+        "topic:vector",
+        "auth"
+      ],
+      "topDir": "src/lib/server/agent",
+      "agentsMdFiles": [
+        "src/lib/components/ui/AGENTS.md",
+        "src/lib/server/agent/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "server module directory with 11 files, 0 API handlers, 3 Drizzle refs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/3 files have paired tests",
+        "shared library directory with 245 files, 0 API handlers, 3 TODOs",
+        "**Paired tests**: 1/89 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "server",
+        "zod"
+      ],
+      "aceHint": "This component provides a reusable, state-managed form structure for handling user input, validation, and submission logic within a Svelte application."
+    },
+    {
+      "clusterId": 21,
+      "memberCount": 0,
+      "bowTerms": [
+        "legal",
+        "topic:legal",
+        "components",
+        "topic:component",
+        "routes",
+        "auth"
+      ],
+      "topDir": "src/lib/components/dashboard",
+      "agentsMdFiles": [
+        "src/lib/components/dashboard/AGENTS.md",
+        "src/lib/components/legal/AGENTS.md",
+        "src/lib/server/pdf/AGENTS.md",
+        "src/lib/server/rag/AGENTS.md",
+        "src/lib/webgpu/AGENTS.md",
+        "src/routes/(app)/simulation/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 7,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 15 files, 0 API handlers",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/15 files have paired tests",
+        "route handler directory with 2 files, 0 API handlers, 1 Drizzle refs",
+        "**Paired tests**: 1/2 files have paired tests",
+        "server module directory with 2 files, 0 API handlers",
+        "**Paired tests**: 0/2 files have paired tests",
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "**Paired tests**: 1/6 files have paired tests",
+        "shared library directory with 33 files, 0 API handlers",
+        "**Paired tests**: 0/33 files have paired tests",
+        "shared library directory with 19 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "**Paired tests**: 0/19 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "src",
+        "lib",
+        "components",
+        "component",
+        "localhost",
+        "routes",
+        "route",
+        "auth",
+        "server",
+        "zod",
+        "webgpu"
+      ],
+      "aceHint": "This cluster provides utilities for GPU-accelerated computation using WebGPU and manages the ingestion and sharding of documents for Retrieval-Augmented Generation (RAG) pipelines."
+    },
+    {
+      "clusterId": 87,
+      "memberCount": 0,
+      "bowTerms": [
+        "sym:get"
+      ],
+      "topDir": "",
+      "agentsMdFiles": [
+        "src/lib/machines/AGENTS.md"
+      ],
+      "agentsMdCount": 1,
+      "coverage": 1,
+      "mergedRules": [
+        "shared library directory with 11 files, 0 API handlers",
+        "🟠 hardcoded localhost: 1",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/11 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "lib",
+        "machines",
+        "component",
+        "zod"
+      ],
+      "aceHint": "This file defines interfaces and structures related to the retrieval and assembly of code chunks, including performance metrics and configuration."
+    },
+    {
+      "clusterId": 34,
+      "memberCount": 0,
+      "bowTerms": [
+        "icons",
+        "topic:celestial",
+        "topic:icons",
+        "routes",
+        "topic:component",
+        "yorha",
+        "components"
+      ],
+      "topDir": "src/routes/(app)/demos/yorha-icons",
+      "agentsMdFiles": [
+        "src/lib/components/ui/AGENTS.md",
+        "src/routes/(app)/AGENTS.md",
+        "src/routes/(app)/admin/gpu-evidence-graph/AGENTS.md"
+      ],
+      "agentsMdCount": 3,
+      "coverage": 1,
+      "mergedRules": [
+        "route handler directory with 2 files, 4 API handlers, 29 Drizzle refs, 6 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 0/2 files have paired tests",
+        "shared library directory with 245 files, 0 API handlers, 3 TODOs",
+        "**Paired tests**: 1/89 files have paired tests",
+        "3 file(s), 0 handler(s)",
+        "**Paired tests**: 0/3 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "auth",
+        "route",
+        "component"
+      ],
+      "aceHint": "This component renders an interactive, physics-simulated graph visualization, likely for displaying evidence relationships in an administrative context."
+    },
+    {
+      "clusterId": 25,
+      "memberCount": 0,
+      "bowTerms": [
+        "routes",
+        "sym:get"
+      ],
+      "topDir": "src/routes/api/cache/stats",
+      "agentsMdFiles": [
+        "src/routes/(app)/demos/memory-palace/AGENTS.md",
+        "src/routes/AGENTS.md"
+      ],
+      "agentsMdCount": 2,
+      "coverage": 1,
+      "mergedRules": [
+        "module directory with 6 files, 621 API handlers, 243 Drizzle refs, 7 TODOs",
+        "Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.",
+        "**Cluster**: _(not yet indexed — run `graphify:batch` to assign)_",
+        "**Paired tests**: 1/6 files have paired tests",
+        "2 file(s), 0 handler(s)",
+        "**Paired tests**: 0/2 files have paired tests"
+      ],
+      "toolsAllowed": [],
+      "keyTerms": [
+        "localhost",
+        "src",
+        "routes",
+        "component",
+        "auth"
+      ],
+      "aceHint": "This file appears to be a Svelte page component responsible for displaying and managing simulated Nintendo Entertainment System (NES) memory and cartridge data."
+    }
+  ]
+}

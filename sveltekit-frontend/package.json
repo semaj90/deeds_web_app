@@ -656,7 +656,11 @@
     "trace:quality": "npm run smoke:trace && npm run smoke:trace:full && npm run smoke:trace:cache && npm run proto:check && npm run typecheck:native && npm run svelte-check",
     "graph:build-relations": "node scripts/graph/build-codebase-relationships.mjs",
     "graph:build-relations:print": "node scripts/graph/build-codebase-relationships.mjs --print",
-    "dev:plan": "node scripts/startup-plan.mjs --print && vite dev"
+    "dev:plan": "node scripts/startup-plan.mjs --print && vite dev",
+    "graph:cluster-agents": "node scripts/graph/build-cluster-agents-index.mjs",
+    "graph:cluster-agents:print": "node scripts/graph/build-cluster-agents-index.mjs --print",
+    "graph:cluster-agents:redis": "node scripts/graph/build-cluster-agents-index.mjs --redis",
+    "graph:build-all": "npm run graph:cluster-agents && npm run graph:build-relations"
   },
   "devDependencies": {
     "@babel/core": "7.28.5",
