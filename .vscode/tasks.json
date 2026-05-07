@@ -2691,6 +2691,52 @@
       "problemMatcher": []
     },
     {
+      // ── STARTUP: Full AI Stack — parallel compound task ───────────────────
+      // Starts TurboQuant (:8090) + TRACE MCP (:8788) + Bifrost (:3040) +
+      // graphify:daily all simultaneously with one keystroke.
+      // Individual task definitions below; this just wires them together.
+      "label": "🚀 STARTUP: Full AI Stack (parallel)",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "⚡ TurboQuant: Start (vision + text, :8090)",
+        "🤖 Startup: TRACE MCP Server (:8788)",
+        "🌉 Startup: Bifrost Semantic Cache (:3040)",
+        "🗺️ Startup: Auto-Map Codebase (graphify:daily)"
+      ],
+      "group": { "kind": "build", "isDefault": false },
+      "problemMatcher": []
+    },
+    {
+      // ── Bifrost semantic cache (Go microservice, :3040) ───────────────────
+      // Health-checks first so it's idempotent; starts go-microservice/cmd/bifrost
+      "label": "🌉 Startup: Bifrost Semantic Cache (:3040)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"try { Invoke-WebRequest 'http://127.0.0.1:3040/health' -TimeoutSec 1 | Out-Null; Write-Host '🌉 Bifrost already running :3040' -ForegroundColor Yellow; exit 0 } catch {}; Set-Location '${workspaceFolder}/go-microservice'; go run ./cmd/bifrost/ --port 3040 --redis redis://127.0.0.1:6379\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": [{
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "(?:listening|already running)"
+        }
+      }],
+      "group": "build",
+      "presentation": { "reveal": "silent", "panel": "shared" }
+    },
+    {
+      // ── Hypergraph centroid rebuild — run after embedding new files ───────
+      // Full graphify:topology pipeline: Qdrant export → k-means → Redis + tag
+      "label": "🕸️ Rebuild: Hypergraph Centroids (graphify:topology)",
+      "type": "shell",
+      "command": "npm run graphify:topology 2>&1 | Tee-Object logs/task-output/graphify-topology-latest.log; Write-Host '🕸️ Hypergraph centroids rebuilt' -ForegroundColor Green",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "problemMatcher": []
+    },
+    {
       "label": "🚀 Full Stack: All Services",
       "type": "shell",
       "command": "docker start phase66-postgres phase66-redis phase66-minio phase66-qdrant go-search-service 2>/dev/null; echo '✓ Docker services started' && sleep 3 && curl -s http://127.0.0.1:6333/collections | jq '.result.collections | length' && echo ' Qdrant collections' && curl -s http://127.0.0.1:8096/health | jq '.status' && redis-cli PING && curl -s http://127.0.0.1:11434/api/tags | jq '.models | length' && echo ' Ollama models'",
