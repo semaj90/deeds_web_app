@@ -405,18 +405,24 @@ server.tool(
     limit:     z.number().int().min(1).max(100).default(30).describe('Max results'),
   },
   async ({ stableKey, limit }) => {
-    // Look up the node's som_cluster then return siblings
+    // codebase_chunk_index uses qdrant_id and relative_path; treat input as either.
     const rows = await pool.query<{ som_cluster: number }>(
-      `SELECT som_cluster FROM codebase_chunk_index WHERE stable_key = $1 LIMIT 1`,
+      `SELECT som_cluster FROM codebase_chunk_index
+       WHERE qdrant_id = $1 OR relative_path = $1
+       LIMIT 1`,
       [stableKey]
     );
     const cluster = rows.rows[0]?.som_cluster;
     if (cluster == null) return { content: [{ type: 'text' as const, text: JSON.stringify({ error: 'Node not found in Postgres index' }) }] };
 
     const siblings = await pool.query<{ stable_key: string; rel_path: string; som_cluster: number }>(
-      `SELECT stable_key, rel_path, som_cluster
+      `SELECT qdrant_id   AS stable_key,
+              relative_path AS rel_path,
+              som_cluster
        FROM codebase_chunk_index
-       WHERE som_cluster = $1 AND stable_key != $2
+       WHERE som_cluster = $1
+         AND qdrant_id != $2
+         AND relative_path != $2
        ORDER BY page_rank_score DESC NULLS LAST
        LIMIT $3`,
       [cluster, stableKey, limit]
@@ -495,11 +501,16 @@ server.tool(
     limit:      z.number().int().min(1).max(200).default(50).describe('Max files returned'),
   },
   async ({ clusterKey, limit }) => {
+    // qdrant_cluster_members is the canonical cluster→file map (cluster_key="gpu:N"|"dir:..."|"som:N").
+    // Falls back to codebase_chunk_index when membership table is empty by parsing the prefix.
     const rows = await pool.query<{ stable_key: string; rel_path: string; page_rank_score: number | null }>(
-      `SELECT stable_key, rel_path, page_rank_score
-       FROM codebase_chunk_index
-       WHERE cluster_key = $1
-       ORDER BY page_rank_score DESC NULLS LAST
+      `SELECT m.stable_key,
+              COALESCE(m.file_path, c.relative_path) AS rel_path,
+              c.page_rank_score
+       FROM qdrant_cluster_members m
+       LEFT JOIN codebase_chunk_index c ON c.qdrant_id = m.qdrant_point_id
+       WHERE m.cluster_key = $1
+       ORDER BY c.page_rank_score DESC NULLS LAST, m.membership_score DESC
        LIMIT $2`,
       [clusterKey, limit]
     );
@@ -728,25 +739,28 @@ server.tool(
   },
   async ({ query, limit = 20, topo_class, mode = 'auto' }) => {
     try {
-      // Embed the query via SvelteKit embed endpoint
-      let embedding: number[] = [];
-      try {
-        const embedRes = await sveltePost('/api/embed', { text: query });
-        embedding = (embedRes as { embedding?: number[] }).embedding ?? [];
-      } catch { /* continue without embedding — will degrade to FTS-only */ }
+      // Fan-out: FTS runs immediately; embedding runs in parallel and chains into Qdrant.
+      // Total latency = max(FTS, embed + qdrant) instead of embed + max(FTS, qdrant).
+      const ftsPromise = pool.query(
+        'SELECT * FROM search_code_lexical($1, $2, $3)',
+        [query, limit * 2, topo_class ?? null],
+      );
 
-      // Postgres FTS + Qdrant in parallel
-      const [pgRes, qdrantRes] = await Promise.all([
-        pool.query('SELECT * FROM search_code_lexical($1, $2, $3)', [query, limit * 2, topo_class ?? null]),
-        embedding.length
-          ? fetch(`${SVELTEKIT}/api/code-intel/search`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ query, embedding, limit: limit * 2, topoClass: topo_class }),
-              signal: AbortSignal.timeout(10_000),
-            }).then((r) => r.json()).catch(() => ({ results: [] }))
-          : Promise.resolve({ results: [] }),
-      ]);
+      const embedPromise = sveltePost('/api/embed', { text: query })
+        .then((res) => (res as { embedding?: number[] }).embedding ?? [])
+        .catch(() => [] as number[]);
+
+      const qdrantPromise = embedPromise.then((embedding) => {
+        if (!embedding.length) return { results: [] };
+        return fetch(`${SVELTEKIT}/api/code-intel/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, embedding, limit: limit * 2, topoClass: topo_class }),
+          signal: AbortSignal.timeout(10_000),
+        }).then((r) => r.json()).catch(() => ({ results: [] }));
+      });
+
+      const [pgRes, qdrantRes, embedding] = await Promise.all([ftsPromise, qdrantPromise, embedPromise]);
 
       // Merge by file_path as a best-effort stable_key
       const merged = new Map<string, Record<string, unknown>>();
@@ -1576,8 +1590,11 @@ server.tool(
       }
 
       // Check 4: chunk in Postgres code_relations
+      // Schema: code_relations(source_file, target_key, ...). target_key is "file:<path>:<symbol>" form,
+      // so a path match needs a prefix LIKE on target_key.
       const relCount = await pool.query<{ cnt: string }>(
-        `SELECT COUNT(*)::text AS cnt FROM code_relations WHERE from_file = $1 OR to_file = $1`,
+        `SELECT COUNT(*)::text AS cnt FROM code_relations
+         WHERE source_file = $1 OR target_key LIKE 'file:' || $1 || '%'`,
         [filePath]
       ).catch(() => ({ rows: [{ cnt: '0' }] }));
       checks.codeRelationsEdges = parseInt(relCount.rows[0]?.cnt ?? '0', 10);
