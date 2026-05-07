@@ -12,6 +12,7 @@
  */
 
 import { S3Client } from '@aws-sdk/client-s3';
+import { ENV } from '$lib/server/env.server.js';
 // Stub local imports as they might depend on corrupted files, but these are safer stubs
 // import { getNeighbors, traverseGraph, type KnowledgeNode } from './couchdb';
 // import { searchQdrant } from './qdrant-sync';

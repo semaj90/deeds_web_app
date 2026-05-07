@@ -1,3 +1,4 @@
+import { ENV } from '$lib/server/env.server.js';
 // amqplib types don't resolve with bundler moduleResolution — use local interfaces
 interface AmqpConnection {
     on(event: string, cb: (...args: any[]) => void): void;

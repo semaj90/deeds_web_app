@@ -17,6 +17,7 @@
  */
 
 import { createHash } from 'crypto';
+import { ENV } from '$lib/server/env.server.js';
 import type { FF1FunctionName } from './registry.js';
 import { computeRegistry } from './registry.js';
 

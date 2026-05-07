@@ -452,6 +452,14 @@ async function main() {
   // ── Tier C: Infrastructure ────────────────────────────────────────────────────
   const g17Files = rgFiles('localhost|127\\.0\\.0\\.1', join(SRC_DIR, 'lib/server'))
     .filter(f => !f.endsWith('env.server.ts') && !f.endsWith('env.server.js')
+              && !f.endsWith('service-urls.ts')   // re-export layer, no raw defaults
+              && !f.endsWith('url-validator.ts')   // security allow/block list
+              && !f.endsWith('langextract-client.ts') // service-discovery probe
+              && !f.endsWith('obsidian-client.ts') // HTTPS loopback check
+              && !f.includes('.phase105-backup')   // archived backup files
+              && !f.includes('/seed')              // DB seed scripts
+              && !f.endsWith('.test.ts')           // test mock values
+              && !f.endsWith('.spec.ts')
               && !f.endsWith('.md') && !f.endsWith('.env') && !basename(f).startsWith('.env'));
 
   // ── Tier D: Security ──────────────────────────────────────────────────────────

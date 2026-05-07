@@ -67,9 +67,9 @@ export type SIMDHealthStatus = LangExtractHealthStatus;
 
 const LANGEXTRACT_SERVICE_CONFIG: ServiceConfig = {
   envVar: 'LANGEXTRACT_URL',
-  fallback: 'http://127.0.0.1:8095',
   containerName: 'phase66-langextract',
   port: 8095,
+  fallback: 'http://localhost:8095',
   verify: true,
   verifyTimeout: 3000,
 };
@@ -92,7 +92,7 @@ async function getBaseUrl(): Promise<string> {
 
   // Priority 1: Explicit env var
   const explicit = ENV.LANGEXTRACT_URL?.trim();
-  if (explicit && explicit !== 'http://127.0.0.1:8095') {
+  if (explicit) {
     resolvedUrl = explicit;
     resolvedSource = 'env';
     lastResolution = now;

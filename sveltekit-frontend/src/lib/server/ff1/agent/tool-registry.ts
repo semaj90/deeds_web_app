@@ -16,6 +16,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { spawnSync }                from 'child_process';
 import path                         from 'path';
+import { ENV } from '$lib/server/env.server.js';
 
 const ROOT         = path.resolve(process.cwd());
 const MAX_READ     = 50_000;   // bytes

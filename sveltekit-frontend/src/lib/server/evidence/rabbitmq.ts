@@ -1,4 +1,5 @@
 import amqp from 'amqplib';
+import { ENV } from '$lib/server/env.server.js';
 
 const RABBITMQ_URL = ENV.RABBITMQ_URL;
 

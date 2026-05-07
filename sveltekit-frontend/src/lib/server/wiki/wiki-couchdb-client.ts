@@ -1,4 +1,5 @@
 import type { WikiCard, WikiGap, GapReport } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // wiki-couchdb-client.ts

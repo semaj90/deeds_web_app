@@ -114,7 +114,7 @@ async function _getClient(): Promise<unknown> {
     const v1 = agent['v1'] as Record<string, unknown>;
     const ServiceCtor = v1['ToolRouter'] as new (addr: string, creds: unknown) => unknown;
 
-    const url = process.env.TOOL_ROUTER_GRPC_URL ?? '127.0.0.1:50058';
+    const url = ENV.TOOL_ROUTER_GRPC_URL;
     _client = new ServiceCtor(url, grpc.credentials.createInsecure());
     return _client;
   } catch (err) {

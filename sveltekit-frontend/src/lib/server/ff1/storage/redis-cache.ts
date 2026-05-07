@@ -15,6 +15,7 @@
  */
 
 import { createHash } from 'crypto';
+import { ENV } from '$lib/server/env.server.js';
 import type { DiagnosticEntry, RepairPlan } from '../graph/graph-schema.js';
 
 const REDIS_URL = ENV.REDIS_URL;
