@@ -419,13 +419,20 @@ export async function indexChunks(
         points.push({
           id: batch[i].id,
           vectors: { content: contentEmb, signature: signatureEmb },
-          payload: {
-            content: batch[i].content.slice(0, 4_000),
-            signature: batch[i].signature,
-            ...batch[i].metadata,
-            topo_byte:  topoByteFromPath(batch[i].metadata?.relativePath ?? ''),
-            topo_class: classifyPath(batch[i].metadata?.relativePath ?? ''),
-          },
+          payload: (() => {
+            const meta = batch[i].metadata ?? {};
+            const topoClass = classifyPath((meta as Record<string, unknown>).relativePath as string ?? '');
+            const somCluster = (meta as Record<string, unknown>).som_cluster ?? (meta as Record<string, unknown>).somCluster;
+            const clusterKey = somCluster != null ? `${topoClass}:${somCluster}` : topoClass;
+            return {
+              content: batch[i].content.slice(0, 4_000),
+              signature: batch[i].signature,
+              ...meta,
+              topo_byte:   topoByteFromPath((meta as Record<string, unknown>).relativePath as string ?? ''),
+              topo_class:  topoClass,
+              cluster_key: clusterKey,
+            };
+          })(),
         });
       }
 

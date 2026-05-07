@@ -23,7 +23,7 @@ import { traceWorker } from '$lib/server/observability/langfuse.js';
 
 export type TaskType =
   | 'kmeans' | 'som' | 'forensics' | 'silhouette' | 'similarity'
-  | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload';
+  | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).

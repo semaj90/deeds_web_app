@@ -4,6 +4,8 @@ import { sql } from 'drizzle-orm';
 import { kagDagRuns, kagDagNodes } from '$lib/server/db/schema.js';
 import { ontologySortationAgent } from './ontology-sortation-agent.js';
 import { memoryEncodingAgent } from './memory-encoding-agent.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { archiveSynthesisMemory } from '$lib/server/indexer/synthesis-memory-archiver.js';
 import type {
 	TraceSubagentContext,
 	TraceSubagentResult,
@@ -48,10 +50,10 @@ export async function runTraceSubagentDag(ctx: TraceSubagentContext) {
 		const ranking = await runAndPersistStub('ranking', ctx, runUuid);
 		results.push(ranking);
 
-		// 5. LLM Synthesis (Stub for now)
-		const synthesis = await runAndPersistStub('llm_synthesis', ctx, runUuid);
+		// 5. LLM Synthesis — reads cluster tags from rankedEvidence, calls inference chain
+		const synthesis = await runLlmSynthesis(ctx, runUuid);
 		results.push(synthesis);
-		ctx.synthesis = 'Synthesis from TRACE subagents';
+		ctx.synthesis = synthesis.output?.text ?? '';
 
 		// 6. Memory Encoding
 		const memory = await runAndPersist(memoryEncodingAgent, ctx, runUuid);
@@ -96,6 +98,64 @@ async function runAndPersist(agent: any, ctx: TraceSubagentContext, runUuid: str
 	});
 
 	return result;
+}
+
+async function runLlmSynthesis(ctx: TraceSubagentContext, runUuid: string): Promise<TraceSubagentResult> {
+	const t0 = Date.now();
+	try {
+		// Group rankedEvidence by cluster_key / topo_class for cluster-aware prompt
+		const evidence: Array<Record<string, unknown>> = ctx.rankedEvidence ?? ctx.ontology ?? [];
+		const clusterMap = new Map<string, string[]>();
+		for (const e of evidence.slice(0, 20)) {
+			const key = String((e as Record<string, unknown>)['cluster_key'] ?? (e as Record<string, unknown>)['topo_class'] ?? 'general');
+			const text = String((e as Record<string, unknown>)['content'] ?? (e as Record<string, unknown>)['text'] ?? '').slice(0, 300);
+			if (!text) continue;
+			const bucket = clusterMap.get(key) ?? [];
+			bucket.push(text);
+			clusterMap.set(key, bucket);
+		}
+
+		const clusterLines = [...clusterMap.entries()].slice(0, 5).map(([cluster, texts]) =>
+			`**${cluster}**: ${texts.slice(0, 2).join(' | ')}`
+		).join('\n');
+
+		const prompt = [
+			`Query: ${ctx.query ?? 'codebase analysis'}`,
+			'',
+			'Relevant context by cluster:',
+			clusterLines || '(no cluster evidence available)',
+			'',
+			'Provide a concise technical synthesis of the above context. Focus on cross-cluster patterns and actionable insights.',
+		].join('\n');
+
+		const messages = [{ role: 'user' as const, content: prompt }];
+		const response = await bifrostChat(messages, 'gemma4-legal', { temperature: 0.2, maxTokens: 600 });
+		const text = String(response ?? '');
+
+		// Fire-and-forget archive to synthesis_memory_768
+		archiveSynthesisMemory({
+			title: `TRACE synthesis: ${(ctx.query ?? '').slice(0, 80)}`,
+			content: text,
+			source: `trace:${ctx.runId}`,
+			tags: [...clusterMap.keys()].slice(0, 8),
+			metadata: { runId: ctx.runId, clusterCount: clusterMap.size },
+		}).catch(() => {});
+
+		const durationMs = Date.now() - t0;
+		await db.insert(kagDagNodes).values({
+			runId: runUuid, nodeKey: 'llm_synthesis', nodeType: 'agent',
+			status: 'ok', durationMs, output: { text: text.slice(0, 500), clusterCount: clusterMap.size },
+		});
+
+		return { agent: 'llm_synthesis', status: 'ok', durationMs, output: { text } };
+	} catch (error) {
+		const durationMs = Date.now() - t0;
+		await db.insert(kagDagNodes).values({
+			runId: runUuid, nodeKey: 'llm_synthesis', nodeType: 'agent',
+			status: 'failed', durationMs, output: {},
+		}).catch(() => {});
+		return { agent: 'llm_synthesis', status: 'failed', durationMs, error: String(error), output: { text: '' } };
+	}
 }
 
 async function runAndPersistStub(name: TraceSubagentName, ctx: TraceSubagentContext, runUuid: string): Promise<TraceSubagentResult> {
