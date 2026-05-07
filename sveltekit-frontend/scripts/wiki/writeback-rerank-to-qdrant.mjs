@@ -53,8 +53,8 @@ try {
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
-  console.error('[rerank-wb] ✗ DATABASE_URL is not set. Add it to sveltekit-frontend/.env');
-  process.exit(1);
+  console.warn('[rerank-wb] DATABASE_URL not set — skipping (non-fatal)');
+  process.exit(0);
 }
 
 console.log(`[rerank-wb] lookback=${LOOKBACK_H}h  min-hits=${MIN_HITS}${DRY_RUN ? '  DRY RUN' : ''}`);
