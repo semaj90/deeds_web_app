@@ -16,6 +16,7 @@
  */
 
 import { traceCouchDB } from './langfuse.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const INFERENCE_LOG_DB = 'inference_log';
 const FLUSH_INTERVAL_MS = 5_000;
@@ -115,7 +116,7 @@ async function flushBuffer(): Promise<void> {
 			}));
 
 			const res = await fetch(
-				`${process.env.COUCHDB_URL ?? 'http://localhost:5984'}/${INFERENCE_LOG_DB}/_bulk_docs`,
+				`${ENV.COUCHDB_URL}/${INFERENCE_LOG_DB}/_bulk_docs`,
 				{
 					method: 'POST',
 					headers: {
@@ -205,7 +206,7 @@ export function logVectorSearch(params: {
 export async function cleanupOldInferenceLogs(): Promise<{ deleted: number; error?: string }> {
 	try {
 		const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString().replace(/[:.]/g, '-');
-		const baseUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+		const baseUrl = ENV.COUCHDB_URL;
 		const auth = 'Basic ' + Buffer.from(
 			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
 		).toString('base64');

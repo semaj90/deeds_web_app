@@ -84,7 +84,7 @@ const BASE = `http://${ENV.CODEINTEL_GRPC_URL.replace(/^grpc:\/\//, '')}`;
 // This avoids a Node.js gRPC dependency (which requires native bindings).
 
 async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
-  const base = process.env.PUBLIC_API_URL ?? process.env.SVELTE_DEV_URL ?? 'http://localhost:5173';
+  const base = ENV.PUBLIC_API_URL;
   const res = await fetch(`${base}/api/codeintel${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },

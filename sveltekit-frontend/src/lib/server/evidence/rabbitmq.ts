@@ -1,6 +1,6 @@
 import amqp from 'amqplib';
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL ?? 'amqp://localhost';
+const RABBITMQ_URL = ENV.RABBITMQ_URL;
 
 export async function connectRabbit(): Promise<{
 	conn: any, channel: any }> {

@@ -14,7 +14,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getRedis } from '$lib/server/redis.js';
 
-const NEO4J_URL  = ENV.NEO4J_URI ?? 'bolt://127.0.0.1:7687';
+const NEO4J_URL  = ENV.NEO4J_URI;
 const NEO4J_USER = ENV.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = ENV.NEO4J_PASSWORD ?? 'legal_ai_pass';
 

@@ -45,8 +45,8 @@ export interface PrecomputeContext {
 }
 
 // Configuration
-const ENHANCED_RAG_BASE = process.env.ENHANCED_RAG_URL || 'http://localhost:8094';
-const FRONTEND_BASE = process.env.FRONTEND_BASE_URL || 'http://localhost:5174';
+const ENHANCED_RAG_BASE = ENV.ENHANCED_RAG_URL;
+const FRONTEND_BASE = ENV.FRONTEND_BASE_URL;
 const PATTERN_CACHE_TTL_SECONDS = 120;
 
 // Helpers

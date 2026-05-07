@@ -12,6 +12,7 @@
 import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
 import type { MemoryDatabase, MemoryDoc } from './mango-indexes.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Redis mirror ──────────────────────────────────────────────────────────────
 
@@ -72,7 +73,7 @@ async function mirrorToPostgres(dbName: MemoryDatabase, doc: MemoryDoc): Promise
 // ── Neo4j mirror ──────────────────────────────────────────────────────────────
 
 async function mirrorToNeo4j(dbName: MemoryDatabase, doc: MemoryDoc): Promise<void> {
-  const neo4jUrl  = process.env.NEO4J_HTTP_URL ?? 'http://localhost:7474';
+  const neo4jUrl  = ENV.NEO4J_HTTP_URL;
   const neo4jAuth = 'Basic ' + Buffer.from(
     (process.env.NEO4J_USER ?? 'neo4j') + ':' + (process.env.NEO4J_PASSWORD ?? 'password')
   ).toString('base64');

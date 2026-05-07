@@ -14,6 +14,7 @@
  */
 
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -152,7 +153,7 @@ export interface GdsExtendedStats extends GdsStatus {
  * Results are suitable for Redis caching at the call site (TTL ~60s).
  */
 export async function getGdsExtendedStats(
-  qdrantUrl = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333',
+  qdrantUrl = ENV.QDRANT_URL,
 ): Promise<GdsExtendedStats> {
   const base = await getGdsStatus().catch((): GdsStatus => ({
     apocAvailable: false, gdsAvailable: false, projectionExists: false,
@@ -629,7 +630,7 @@ export interface AuthorityMirrorResult {
  * context-assembler use graphAuthorityScore without a Neo4j round-trip per query.
  */
 export async function writeAuthorityScoresToQdrant(
-  qdrantUrl = 'http://127.0.0.1:6333',
+  qdrantUrl = ENV.QDRANT_URL,
   collection = 'codebase_chunks_768',
   limit = 5000,
 ): Promise<AuthorityMirrorResult> {

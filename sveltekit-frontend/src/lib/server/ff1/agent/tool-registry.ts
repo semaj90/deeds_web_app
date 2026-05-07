@@ -22,7 +22,7 @@ const MAX_READ     = 50_000;   // bytes
 const MAX_CMD_OUT  = 8_000;    // chars
 const QDRANT_URL   = ENV.QDRANT_URL;
 const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
-const REDIS_URL    = process.env.REDIS_URL  ?? 'redis://127.0.0.1:6379';
+const REDIS_URL    = ENV.REDIS_URL;
 
 // ── Allowlist for runValidation ───────────────────────────────────────────
 

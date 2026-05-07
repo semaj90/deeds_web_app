@@ -1694,7 +1694,7 @@ export class RabbitMQManager extends EventEmitter {
         .catch(() => []);
 
       let inserted = 0;
-      const couchUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+      const couchUrl = ENV.COUCHDB_URL;
 
       for (const row of candidates) {
         try {

@@ -10,7 +10,7 @@
  * Call ensureMangoIndexes() once at startup (idempotent).
  */
 
-const COUCHDB_URL  = process.env.COUCHDB_URL  ?? 'http://localhost:5984';
+const COUCHDB_URL  = ENV.COUCHDB_URL;
 const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
 const COUCHDB_PASS = (process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass');
 

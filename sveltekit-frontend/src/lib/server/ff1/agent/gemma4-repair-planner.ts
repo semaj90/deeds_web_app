@@ -22,10 +22,10 @@ const ROOT         = path.resolve(process.cwd());
 const MAX_BYTES    = 50_000;
 const CTX_LINES    = 10;   // lines before + after error
 const MAX_DISPLAY  = 80;   // total lines shown if no line hint
-const TURBO_BASE   = process.env.GEMMA_BASE   ?? 'http://localhost:8090';
+const TURBO_BASE   = ENV.TURBOQUANT_BASE_URL;
 const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL   = ENV.QDRANT_URL;
-const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
+const REDIS_URL    = ENV.REDIS_URL;
 
 // ── File context ──────────────────────────────────────────────────────────
 

@@ -10,6 +10,7 @@
  */
 
 import type { Readable } from 'stream';
+import { ENV } from '$lib/server/env.server.js';
 
 // ============================================================================
 // TypeScript Types (Mirror Protobuf)
@@ -139,7 +140,7 @@ export class GenerationClient {
   private baseUrl: string;
   private timeout: number;
 
-  constructor(baseUrl: string = process.env.GENERATION_GRPC_URL ?? 'http://localhost:50052', timeout: number = 120_000) {
+  constructor(baseUrl: string = ENV.GENERATION_GRPC_URL, timeout: number = 120_000) {
     this.baseUrl = baseUrl;
     this.timeout = timeout;
   }
@@ -318,7 +319,7 @@ export class GenerationClient {
 // ============================================================================
 
 export const generationClient = new GenerationClient(
-  process.env.GENERATION_SERVICE_URL || 'http://localhost:50052'
+  ENV.GENERATION_SERVICE_URL
 );
 
 // ============================================================================
