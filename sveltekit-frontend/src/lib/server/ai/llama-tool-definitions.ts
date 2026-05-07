@@ -156,6 +156,44 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
     },
   },
 
+  {
+    type: 'function',
+    function: {
+      name:        'topology__search_4d',
+      description: 'Search using explicit 4D manifold coordinates (SOM grid + semantic + GRPO quality). Use when you know a cluster\'s SOM position and want structurally adjacent files with optional JSONB filters.',
+      parameters: {
+        type: 'object',
+        properties: {
+          som_x:      { type: 'number',  description: 'SOM X (BMU column)' },
+          som_y:      { type: 'number',  description: 'SOM Y (BMU row)' },
+          semantic_z: { type: 'number',  description: 'Semantic projection 0–1 (default 0.5)' },
+          grpo_w:     { type: 'number',  description: 'GRPO quality weight 0–1 (default 0.5)' },
+          radius:     { type: 'number',  description: '4D radius (default 0.5)' },
+          limit:      { type: 'integer', description: 'Max results (default 20)' },
+          filters:    { type: 'object',  description: 'JSONB payload filters' },
+        },
+        required: ['som_x', 'som_y'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name:        'search__go_hybrid',
+      description: 'Go search service RRF fusion: parallel FTS + pgvector + Qdrant with reciprocal rank fusion. Faster than in-process hybrid for large-scale recall.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query:   { type: 'string',  description: 'Search query' },
+          type:    { type: 'string',  description: '"codebase", "legal", or "hybrid" (default: codebase)' },
+          limit:   { type: 'integer', description: 'Max results (default 20)' },
+          filters: { type: 'object',  description: 'JSONB metadata filters' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+
   // ── Cluster tools ───────────────────────────────────────────────────────────
   {
     type: 'function',
@@ -269,6 +307,8 @@ export const LLAMA_TO_MCP_NAME: Record<string, string> = {
   'trace__explain_retrieval':      'trace.explain_retrieval',
   'context__get_compressed_card':  'context.get_compressed_card',
   'context__build_kv_packet':      'context.build_kv_packet',
+  'topology__search_4d':           'topology.search_4d',
+  'search__go_hybrid':             'search.go_hybrid',
 };
 
 /**
