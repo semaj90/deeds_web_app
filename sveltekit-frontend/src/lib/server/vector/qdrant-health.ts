@@ -282,7 +282,7 @@ export async function getQdrantServerInfo(client: QdrantClient): Promise<{
 
 	try {
 		// Qdrant root endpoint returns version info
-		const response = await fetch(ENV.QDRANT_URL ?? 'http://localhost:6333', {
+		const response = await fetch(ENV.QDRANT_URL, {
 			signal: AbortSignal.timeout(2000)
 		});
 

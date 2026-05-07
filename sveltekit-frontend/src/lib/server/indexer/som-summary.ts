@@ -140,7 +140,7 @@ Focus on structural patterns and data-flow, not individual files.`;
       } catch { /* TurboQuant unavailable */ }
 
       if (!llmText) {
-        const ollamaUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+        const ollamaUrl = ENV.OLLAMA_BASE_URL;
         const r = await fetch(`${ollamaUrl}/api/generate`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },

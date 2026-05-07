@@ -198,7 +198,7 @@ export async function summarizeErrorToKag(input: ErrorKagInput): Promise<ErrorKa
     try {
       const pointId = summaryId ?? crypto.randomUUID();
       const upsertResp = await fetch(
-        `${ENV.QDRANT_URL ?? 'http://localhost:6333'}/collections/research_summaries/points`,
+        `${ENV.QDRANT_URL}/collections/research_summaries/points`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

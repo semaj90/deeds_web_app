@@ -5,6 +5,7 @@
  */
 
 import { pool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface FTSResult {
   stable_key: string;
@@ -70,7 +71,7 @@ export async function syncCodeRetrievalChunks(opts: {
   qdrantUrl?: string;
 } = {}): Promise<SyncCodeRetrievalResult> {
   const { limit = 5000, batchSize = 100, qdrantUrl } = opts;
-  const QDRANT = qdrantUrl ?? (process.env.QDRANT_URL ?? 'http://localhost:6333');
+  const QDRANT = qdrantUrl ?? (ENV.QDRANT_URL);
   const COLLECTION = 'codebase_chunks_768';
   const t0 = Date.now();
   let upserted = 0, skipped = 0, errors = 0;

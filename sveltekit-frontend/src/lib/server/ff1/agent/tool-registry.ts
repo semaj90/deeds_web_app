@@ -20,8 +20,8 @@ import path                         from 'path';
 const ROOT         = path.resolve(process.cwd());
 const MAX_READ     = 50_000;   // bytes
 const MAX_CMD_OUT  = 8_000;    // chars
-const QDRANT_URL   = process.env.QDRANT_URL ?? 'http://localhost:6333';
-const OLLAMA_URL   = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const QDRANT_URL   = ENV.QDRANT_URL;
+const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
 const REDIS_URL    = process.env.REDIS_URL  ?? 'redis://127.0.0.1:6379';
 
 // ── Allowlist for runValidation ───────────────────────────────────────────

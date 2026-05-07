@@ -16,7 +16,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 
-const OBSIDIAN_URL = ENV.OBSIDIAN_URL ?? 'https://127.0.0.1:27124';
+const OBSIDIAN_URL = ENV.OBSIDIAN_URL;
 const OBSIDIAN_API_KEY = ENV.OBSIDIAN_API_KEY ?? '';
 
 // Plugin's HTTPS listener uses a self-signed cert. Build a permissive undici

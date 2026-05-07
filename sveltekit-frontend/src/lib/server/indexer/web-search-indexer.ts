@@ -25,7 +25,7 @@ import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import { JSDOM } from 'jsdom';
 
-const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = ENV.QDRANT_URL;
 const KNOWLEDGE_COLLECTION = 'knowledge_base';
 const PAGE_FETCH_TIMEOUT = 12_000; // ms
 const MAX_CONTENT_CHARS = 4_000; // truncate long pages before embedding

@@ -11,8 +11,8 @@
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
-const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const QDRANT_URL = ENV.QDRANT_URL;
 
 export interface ChunkingStrategy {
 	maxTokens?: number;

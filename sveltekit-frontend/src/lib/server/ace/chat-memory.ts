@@ -16,8 +16,8 @@
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 
-const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const QDRANT_URL = ENV.QDRANT_URL;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const COLLECTION = 'chat_messages';
 const VECTOR_NAME = 'message';
 const EMBED_MODEL = 'embeddinggemma:latest';

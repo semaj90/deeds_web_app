@@ -9,7 +9,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { createHash } from 'crypto';
 
-const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = ENV.QDRANT_URL;
 const KNOWLEDGE_COLLECTION = 'knowledge_base';
 
 export interface WebIngestMessage {
