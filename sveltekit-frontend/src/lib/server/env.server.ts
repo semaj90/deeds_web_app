@@ -1,5 +1,9 @@
-import { env as privateEnv } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
+// Runtime-agnostic env access: works under SvelteKit/Vite (where $env wraps process.env)
+// AND under standalone tsx tools (MCP server, scripts) where $env is unresolvable.
+// SvelteKit forwards all $env/dynamic/private values onto process.env at runtime,
+// so process.env is always the canonical source server-side.
+const privateEnv: Record<string, string | undefined> = process.env;
+const publicEnv: Record<string, string | undefined> = process.env;
 
 // Development fallback defaults (localhost)
 const DEV = {
