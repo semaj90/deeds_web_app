@@ -19,6 +19,7 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -88,7 +89,7 @@ async function embedText(text: string): Promise<Float32Array | null> {
 
   // Direct Ollama HTTP fallback (works when gRPC service is down)
   try {
-    const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+    const ollamaUrl = ENV.OLLAMA_BASE_URL;
     const model     = process.env.EMBEDDING_MODEL  ?? 'embeddinggemma:latest';
     const res = await fetch(`${ollamaUrl}/api/embeddings`, {
       method: 'POST',

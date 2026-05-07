@@ -28,7 +28,7 @@ async function getRedis() {
   if (redisClient !== null) return redisClient;
   try {
     const { createClient } = await import('redis');
-    const c = createClient({ url: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379' });
+    const c = createClient({ url: ENV.REDIS_URL });
     await c.connect();
     redisClient = {
       get: (k) => c.get(k) as Promise<string | null>,

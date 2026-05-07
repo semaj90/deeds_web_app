@@ -216,7 +216,7 @@ async function invalidateCache(jobId: string): Promise<{ invalidated: boolean }>
 
 		// Publish cache invalidation message to RabbitMQ
 		// This triggers all recommendation API responses to be refreshed
-		const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+		const rabbitmqUrl = ENV.RABBITMQ_URL;
 
 		// Dynamic import to avoid server-side dependency issues
 		const amqpMod = (await import('amqplib')) as unknown as {

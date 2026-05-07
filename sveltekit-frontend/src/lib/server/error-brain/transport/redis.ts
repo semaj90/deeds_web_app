@@ -6,6 +6,7 @@
 import type { ErrorBrainEvent } from '../events.js';
 import type { ErrorBrainTransport } from './interface.js';
 import { getRedis } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const CHANNEL = 'error-brain:events';
 
@@ -24,7 +25,7 @@ export class RedisTransport implements ErrorBrainTransport {
 	async subscribe(handler: (evt: ErrorBrainEvent) => void): Promise<() => void> {
 		// Subscriber needs a dedicated connection (ioredis cannot share pub/sub + commands)
 		const { default: Redis } = await import('ioredis');
-		const sub = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379');
+		const sub = new Redis(ENV.REDIS_URL);
 
 		await sub.subscribe(CHANNEL);
 		sub.on('message', (_ch: string, msg: string) => {

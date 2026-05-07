@@ -13,7 +13,7 @@ export const MCP_CONFIG = {
 	context7: {
 	enabled: true,
 		officialCommand: 'npx -y @upstash/context7-mcp',
-		mockUrl: process.env.CONTEXT7_MCP_URL || 'http://localhost:4000',
+		mockUrl: ENV.CONTEXT7_MCP_URL,
 		useOfficial: process.env.USE_OFFICIAL_CONTEXT7 === 'true',
 		timeout: 30000,
 		retries: 3
@@ -52,7 +52,7 @@ export const AI_CONFIG = {
 	// Secondary: TensorRT-LLM with Triton Inference Server
 	tensorrt: {
 	enabled: process.env.TENSORRT_ENABLED === 'true',
-		tritonUrl: process.env.TRITON_URL || 'http://localhost:8000',
+		tritonUrl: ENV.TRITON_URL,
 		modelName: process.env.TENSORRT_MODEL_NAME || 'gemma_legal_tensorrt',
 		modelVersion: process.env.TENSORRT_MODEL_VERSION || '1',
 		timeout: 30000,
@@ -68,7 +68,7 @@ export const AI_CONFIG = {
 	// Tertiary: vLLM
 	vllm: {
 		enabled: process.env.VLLM_ENABLED === 'true',
-		baseUrl: process.env.VLLM_URL || 'http://localhost:8001',
+		baseUrl: ENV.VLLM_URL,
 		model: process.env.VLLM_MODEL || 'gemma-2b-it',
 		timeout: 30000,
 		maxTokens: 2048
@@ -144,7 +144,7 @@ export const VECTOR_SEARCH_CONFIG = {
 // DATABASE CONFIGURATION
 // ============================================================================
 export const DATABASE_CONFIG = {
-  url: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+  url: ENV.DATABASE_URL,
   postgres: {
     host: process.env.DATABASE_HOST || 'localhost',
     port: parseInt(process.env.DATABASE_PORT || '5434', 10),

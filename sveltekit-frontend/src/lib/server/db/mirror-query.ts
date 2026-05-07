@@ -18,7 +18,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 
 // Stub environment config access
 const CONFIG = {
-    MINIO_URL: process.env.MINIO_URL || 'http://localhost:9000',
+    MINIO_URL: ENV.MINIO_URL,
     MINIO_REGION: process.env.MINIO_REGION || 'us-east-1',
     MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY || 'minioadmin',
     MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY || 'minioadmin'

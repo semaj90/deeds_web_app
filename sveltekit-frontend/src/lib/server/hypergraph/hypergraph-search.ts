@@ -1,4 +1,5 @@
 import pg from 'pg';
+import { ENV } from '$lib/server/env.server.js';
 import type {
   Hyperedge,
   HyperedgeMember,
@@ -12,7 +13,7 @@ import type {
   HyperedgeExpansion,
 } from './hypergraph-types.js';
 
-const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_URL = ENV.DATABASE_URL;
 
 let _pool: pg.Pool | null = null;
 function getPool(): pg.Pool {

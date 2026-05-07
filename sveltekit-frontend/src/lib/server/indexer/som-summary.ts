@@ -117,7 +117,7 @@ Focus on structural patterns and data-flow, not individual files.`;
 
     try {
       // TurboQuant first, Ollama fallback
-      const turbo = process.env.TURBO_URL ?? 'http://127.0.0.1:8090';
+      const turbo = ENV.TURBOQUANT_BASE_URL;
       let   llmText = '';
 
       try {

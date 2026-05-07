@@ -72,6 +72,10 @@ export const ENV = {
   RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
   /** Topology search engine — detached Node.js server (port 8101) */
   TOPOLOGY_SEARCH_URL: privateEnv.TOPOLOGY_SEARCH_URL ?? 'http://127.0.0.1:8101',
+  /** Trace MCP server (trace-mcp-server.ts, Streamable HTTP, port 8788) */
+  TRACE_MCP_URL: privateEnv.TRACE_MCP_URL ?? 'http://localhost:8788',
+  /** Docling VLM service (Docker, layout-aware OCR, port 8085 by default) */
+  DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL ?? 'http://localhost:8085',
   /** Go retrieval service HTTP REST API (port 8100) — lighter weight alternative to gRPC */
   RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? 'http://localhost:8100',
   RETRIEVAL_HTTP_ENABLED: (privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
@@ -79,12 +83,16 @@ export const ENV = {
   CHR97_GRPC_ENABLED: (privateEnv.CHR97_GRPC_ENABLED ?? 'false') === 'true',
   TOOL_GRPC_URL: privateEnv.TOOL_GRPC_URL ?? '127.0.0.1:50057',
   TOOL_GRPC_ENABLED: (privateEnv.TOOL_GRPC_ENABLED ?? 'false') === 'true',
+  TOOL_ROUTER_GRPC_URL: privateEnv.TOOL_ROUTER_GRPC_URL ?? '127.0.0.1:50058',
   /** GraphML gRPC service (GPU graph analytics — PyTorch/CUDA, port 50056) */
   GRAPH_ML_GRPC_URL: privateEnv.GRAPH_ML_GRPC_URL ?? '127.0.0.1:50056',
   GRAPH_ML_GRPC_ENABLED: (privateEnv.GRAPH_ML_GRPC_ENABLED ?? 'false') === 'true',
   /** CodeIntel gRPC service (cluster summaries, chunk lookup, job status, port 50058) */
   CODEINTEL_GRPC_URL: privateEnv.CODEINTEL_GRPC_URL ?? '127.0.0.1:50058',
   CODEINTEL_GRPC_ENABLED: (privateEnv.CODEINTEL_GRPC_ENABLED ?? 'false') === 'true',
+  /** GenerationService gRPC (orphaned — zero consumers; port 50052 reserved) */
+  GENERATION_GRPC_URL: privateEnv.GENERATION_GRPC_URL ?? 'http://localhost:50052',
+  GENERATION_SERVICE_URL: privateEnv.GENERATION_SERVICE_URL ?? 'http://localhost:50052',
   // LangExtract — pure-TS native extractor (langextract/native.ts) is now the default.
   // The Python FastAPI service (phase66-langextract :8095) is DECOMMISSIONED:
   //   - 11/11 native tests pass (citations, statutes, case names, money, dates, persons, etc.)
@@ -121,6 +129,8 @@ export const ENV = {
   NEO4J_URI: privateEnv.NEO4J_URI ?? privateEnv.NEO4J_URL ?? 'bolt://localhost:7687',
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',
   NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'password',
+  // Neo4j browser HTTP API (used by memory-mirror, couchdb sync — separate from bolt)
+  NEO4J_HTTP_URL: privateEnv.NEO4J_HTTP_URL ?? 'http://localhost:7474',
   // CouchDB document store — default password matches docker-compose.yml
   // (`COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-legal_ai_pass}`). Override via
   // COUCHDB_URL or COUCHDB_PASSWORD in .env.production.
@@ -146,6 +156,15 @@ export const ENV = {
   REDDIT_USERNAME: privateEnv.REDDIT_USERNAME ?? '',
   // Legal Gateway microservice (case + document fetch proxy)
   LEGAL_GATEWAY_URL: privateEnv.LEGAL_GATEWAY_URL ?? 'http://localhost:8080',
+  // Enhanced RAG microservice + dev frontend base (used by CHR97 module)
+  ENHANCED_RAG_URL: privateEnv.ENHANCED_RAG_URL ?? 'http://localhost:8094',
+  FRONTEND_BASE_URL: privateEnv.FRONTEND_BASE_URL ?? 'http://localhost:5174',
+  // vLLM OpenAI-compatible inference (alternative to Triton/TurboQuant)
+  VLLM_URL: privateEnv.VLLM_URL ?? 'http://localhost:8001',
+  // Context7 MCP server (library docs lookup tool)
+  CONTEXT7_MCP_URL: privateEnv.CONTEXT7_MCP_URL ?? 'http://localhost:4000',
+  // MinIO full URL (for direct HTTP calls — use MINIO_ENDPOINT/PORT for the SDK)
+  MINIO_URL: privateEnv.MINIO_URL ?? 'http://localhost:9000',
   // Go Legal Library Search Service (parallel fan-out: citation + FTS + pgvector + Qdrant)
   GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? '',
   GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055',

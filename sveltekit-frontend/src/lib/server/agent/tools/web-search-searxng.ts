@@ -113,7 +113,7 @@ export async function webSearch(input: WebSearchInput): Promise<WebSearchResult>
  * Search via SearXNG API
  */
 async function searchViaSearXNG(query: string, maxResults: number): Promise<SearchResult[]> {
-	const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8888';
+	const searxngUrl = ENV.SEARXNG_URL;
 
 	const response = await fetch(`${searxngUrl}/search`, {
 		method: 'POST',

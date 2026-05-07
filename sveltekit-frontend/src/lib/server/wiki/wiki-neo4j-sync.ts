@@ -23,7 +23,7 @@ import type { WikiCard, WikiGap } from './types.js';
 // Lazy import — neo4j-driver is an optional dependency in scripts context
 async function getDriver() {
 	const neo4j = await import('neo4j-driver');
-	const url = process.env.NEO4J_URL ?? 'bolt://localhost:7687';
+	const url = ENV.NEO4J_URI;
 	const user = process.env.NEO4J_USER ?? 'neo4j';
 	const pass = process.env.NEO4J_PASSWORD ?? 'neo4j_password';
 	return neo4j.default.driver(url, neo4j.default.auth.basic(user, pass));

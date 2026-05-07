@@ -7,7 +7,7 @@ import type { WikiCard, WikiGap, GapReport } from './types.js';
 // CouchDB = human-readable wiki documents layer.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+const COUCHDB_URL = ENV.COUCHDB_URL;
 const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
 const COUCHDB_PASS = process.env.COUCHDB_PASS ?? 'password';
 const WIKI_DB = process.env.COUCHDB_WIKI_DB ?? 'wiki';

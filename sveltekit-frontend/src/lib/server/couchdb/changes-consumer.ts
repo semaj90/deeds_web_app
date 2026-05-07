@@ -18,10 +18,11 @@ import { getRedis } from '$lib/server/redis.js';
 import { MEMORY_DATABASES } from './mango-indexes.js';
 import type { MemoryDatabase, MemoryDoc } from './mango-indexes.js';
 import { mirrorMemoryDoc } from './memory-mirror.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Config ─────────────────────────────────────────────────────────────────────
 
-const COUCHDB_URL  = process.env.COUCHDB_URL  ?? 'http://localhost:5984';
+const COUCHDB_URL  = ENV.COUCHDB_URL;
 const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
 const COUCHDB_PASS = (process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass');
 

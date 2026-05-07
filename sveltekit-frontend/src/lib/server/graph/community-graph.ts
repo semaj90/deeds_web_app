@@ -37,10 +37,10 @@ import path from 'node:path';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const TURBOQUANT_URL   = process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
+const TURBOQUANT_URL   = ENV.TURBOQUANT_BASE_URL;
 const OLLAMA_URL       = ENV.OLLAMA_BASE_URL;
 const CHAT_MODEL       = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-vlm:latest';
-const NEO4J_URL        = ENV.NEO4J_URI ?? 'bolt://127.0.0.1:7687';
+const NEO4J_URL        = ENV.NEO4J_URI;
 const NEO4J_USER       = ENV.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS       = ENV.NEO4J_PASSWORD ?? 'legal_ai_pass';
 const COMMUNITY_TTL    = 3600;       // 1h Redis cache

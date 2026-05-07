@@ -303,7 +303,7 @@ async function _scoreOne(query: string, doc: RerankCandidate): Promise<number> {
  * Returns null on failure so caller can fall through to next backend.
  */
 async function _scoreTensorRT(query: string, doc: RerankCandidate): Promise<number | null> {
-  const trtUrl = process.env.TENSORRT_URL ?? 'http://localhost:8099';
+  const trtUrl = ENV.TENSORRT_URL;
   const docText = doc.content.slice(0, SCORE_MAX_CHARS);
   const prompt = SCORE_PROMPT_PREFIX(query) + docText + SCORE_PROMPT_SUFFIX;
   try {
@@ -335,7 +335,7 @@ async function _scoreTensorRT(query: string, doc: RerankCandidate): Promise<numb
  * Returns null on failure.
  */
 async function _scoreTriton(query: string, doc: RerankCandidate): Promise<number | null> {
-  const tritonUrl = process.env.TRITON_URL ?? 'http://localhost:8000';
+  const tritonUrl = ENV.TRITON_URL;
   const docText = doc.content.slice(0, SCORE_MAX_CHARS);
   const prompt = SCORE_PROMPT_PREFIX(query) + docText + SCORE_PROMPT_SUFFIX;
   try {

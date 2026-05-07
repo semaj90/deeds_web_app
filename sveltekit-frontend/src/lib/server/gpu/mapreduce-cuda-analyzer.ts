@@ -149,7 +149,7 @@ export async function processEmbeddingJob(
         env: {
           ...process.env,
           DATABASE_URL: process.env.DATABASE_URL,
-          OLLAMA_URL: process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434',
+          OLLAMA_URL: ENV.OLLAMA_BASE_URL,
         },
       });
 

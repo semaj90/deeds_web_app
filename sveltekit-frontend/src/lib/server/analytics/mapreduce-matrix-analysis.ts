@@ -46,7 +46,7 @@ import type { HitPipeline } from './search-analytics.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+const COUCHDB_URL = ENV.COUCHDB_URL;
 const GLYPH_DB = 'glyph_topology';
 const MATRIX_CACHE_KEY = 'mapreduce:matrix:';
 const MATRIX_CACHE_TTL = 900; // 15 min

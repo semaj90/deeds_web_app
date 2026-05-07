@@ -17,7 +17,7 @@
 import { createHash } from 'crypto';
 import type { DiagnosticEntry, RepairPlan } from '../graph/graph-schema.js';
 
-const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+const REDIS_URL = ENV.REDIS_URL;
 
 // TTLs (seconds)
 const TTL = {
