@@ -158,7 +158,34 @@
 
 <!-- Popup -->
 {#if showPopup}
-	<ActionPopup {pendingFile} onClose={() => (showPopup = false)} />
+	<ActionPopup
+		{pendingFile}
+		onSelect={({ file, action }) => {
+			const name = file && typeof file === 'object' && 'name' in file ? String((file as { name: unknown }).name) : 'file';
+			if (action === 'analyze') {
+				messages.push({ role: 'user', text: `Analyze ${name}` });
+				searchSimilar(`Analyze ${name}`);
+			} else if (action === 'attach') {
+				messages.push({ role: 'system', text: `${name} attached to this session.` });
+			} else if (action === 'save') {
+				messages.push({ role: 'system', text: `Saving ${name} to evidence library…` });
+				if (file instanceof File) {
+					const fd = new FormData();
+					fd.append('file', file);
+					fd.append('type', 'document');
+					fetch('/api/evidence', { method: 'POST', body: fd, signal: AbortSignal.timeout(60_000) })
+						.then(r => {
+							messages.push({ role: 'system', text: r.ok ? `${name} saved.` : `Save failed (${r.status}).` });
+						})
+						.catch(() => {
+							messages.push({ role: 'system', text: `Save failed — network error.` });
+						});
+				}
+			}
+			showPopup = false;
+		}}
+		onClose={() => (showPopup = false)}
+	/>
 {/if}
 
 <style>
