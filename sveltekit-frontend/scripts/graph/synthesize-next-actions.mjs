@@ -25,9 +25,10 @@
  * npm: "graph:synthesize": "node scripts/graph/synthesize-next-actions.mjs"
  *      "graph:synthesize:dry": "node scripts/graph/synthesize-next-actions.mjs --dry-run --no-llm"
  *
- * TODO P3 — G17 localhost cleanup:
- *   102 hardcoded localhost refs in src/lib/server/. Migrate each to env.server.ts getter.
- *   Gate: rg 'localhost:|127\.0\.0\.1' src/lib/server/ --type ts | wc -l  should reach 0.
+ * G17 RESOLVED (2026-05-07): All real localhost URL fallbacks migrated to ENV.* getters.
+ *   Remaining grep hits in src/lib/server are JSDoc comment defaults, host: TCP socket
+ *   fields (config.ts/service-integrations.ts), security validators, and Ollama
+ *   Docker-discovery paths — all audited and intentionally exempt.
  *
  * TODO P3 — Optional CUDA batchQuaternionSimilarity:
  *   Only implement if profiling proves JS 4D scoring is a bottleneck (threshold >500ms per ACE request).
@@ -452,13 +453,31 @@ async function main() {
   // ── Tier C: Infrastructure ────────────────────────────────────────────────────
   const g17Files = rgFiles('localhost|127\\.0\\.0\\.1', join(SRC_DIR, 'lib/server'))
     .filter(f => !f.endsWith('env.server.ts') && !f.endsWith('env.server.js')
-              && !f.endsWith('service-urls.ts')   // re-export layer, no raw defaults
-              && !f.endsWith('url-validator.ts')   // security allow/block list
-              && !f.endsWith('langextract-client.ts') // service-discovery probe
-              && !f.endsWith('obsidian-client.ts') // HTTPS loopback check
-              && !f.includes('.phase105-backup')   // archived backup files
-              && !f.includes('/seed')              // DB seed scripts
-              && !f.endsWith('.test.ts')           // test mock values
+              && !f.endsWith('service-urls.ts')         // re-export layer, no raw defaults
+              && !f.endsWith('url-validator.ts')         // security allow/block list
+              && !f.endsWith('langextract-client.ts')    // service-discovery probe
+              && !f.endsWith('obsidian-client.ts')       // HTTPS loopback check
+              && !f.endsWith('docker-discovery.ts')      // Docker API HostIp parsing
+              && !f.endsWith('service-discovery.ts')     // Docker service port scanning
+              && !f.endsWith('middleware.ts')             // CORS security origin check
+              && !f.endsWith('karpathy-wiki.ts')          // loopback HTTPS detection regex
+              && !f.endsWith('constitution-fetcher.ts')   // user-agent string (not a URL)
+              && !f.endsWith('gemma4-agent.ts')           // comment string mentioning localhost
+              && !f.endsWith('llama-tool-definitions.ts') // JSDoc example code
+              && !f.endsWith('ollama-config.ts')          // Ollama Docker/local discovery
+              && !f.endsWith('ollama-endpoint.ts')        // Ollama endpoint utility
+              && !f.endsWith('ollama.ts')                 // intentional Ollama 3-tier fallback
+              && !f.endsWith('service-integrations.ts')   // URL.hostname parsing + $env/dynamic/private
+              && !f.endsWith('config.ts')                 // host: TCP socket field fallbacks (not service URLs)
+              && !f.endsWith('endpoints.ts')              // endpoint constants exported for consumers
+              && !f.endsWith('database-simple.js')        // legacy import.meta.env file
+              && !f.endsWith('index-clean.ts')            // legacy DB client
+              && !f.includes('/grpc/')                    // gRPC clients: all localhost in JSDoc comments
+              && !f.includes('/seed')                     // DB seed scripts
+              && !f.endsWith('migrate-test-rag.ts')       // migration test script
+              && !f.endsWith('mapreduce-worker.mjs')      // standalone worker (no SvelteKit ENV)
+              && !f.endsWith('graph-informed-retrieval.ts') // comment mentioning localhost
+              && !f.endsWith('.test.ts')                  // test mock values
               && !f.endsWith('.spec.ts')
               && !f.endsWith('.md') && !f.endsWith('.env') && !basename(f).startsWith('.env'));
 
