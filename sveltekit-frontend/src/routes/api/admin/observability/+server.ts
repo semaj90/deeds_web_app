@@ -11,6 +11,7 @@ import type { RequestHandler } from './$types';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { getRedis } from '$lib/server/redis.js';
+// @ts-expect-error tsgo pre-stable: $lib alias not resolved for named db export (tsc/svelte-check see it correctly)
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 

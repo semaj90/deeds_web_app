@@ -1847,9 +1847,9 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     const clusterLines = context.clusterContext
       .slice(0, 3)
       .map((c) => {
-        const tags = c.tags?.length ? `Tags: ${c.tags.slice(0, 6).join(', ')}` : '';
+        const tags = c.topTags?.length ? `Tags: ${c.topTags.slice(0, 6).join(', ')}` : '';
         const files = c.topFiles?.length ? `Files: ${c.topFiles.slice(0, 3).join(', ')}` : '';
-        return `**${c.clusterKey}** (${c.topoLabel ?? 'unknown'}): ${c.summaryLens ?? ''}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
+        return `**${c.clusterKey}** (${c.topoClass ?? c.topoLabel ?? 'unknown'}): ${c.summaryLens ?? ''}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
       })
       .join('\n');
     lines.push(`\n## Codebase Clusters\n${clusterLines}`);

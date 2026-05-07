@@ -518,6 +518,10 @@ export interface ClusterContextPacket {
    * Populated from Redis ace:authority:top after graphify:gds runs.
    */
   graphAuthorityScore?: number | null;
+  /** One-sentence synthesis lens from synthesize-next-actions.mjs (set by graph:synthesize) */
+  summaryLens?: string;
+  /** Alias for topoClass used by NES cluster rendering in context-assembler */
+  topoLabel?: string;
 }
 
 /** Token budget allocation per context source (expanded for 128K+ context models) */

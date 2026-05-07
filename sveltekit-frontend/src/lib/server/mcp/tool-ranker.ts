@@ -303,6 +303,7 @@ export async function persistToolStatsToDb(
   gainScore: number,
   succeeded: boolean,
 ): Promise<void> {
+  // @ts-expect-error tsgo pre-stable: $lib alias not resolved for named pool export
   const { pool } = await import('$lib/server/db/client.js');
   await pool.query(
     `INSERT INTO tool_call_stats
@@ -324,6 +325,7 @@ export async function persistToolStatsToDb(
  */
 export async function loadToolStatsFromDb(): Promise<void> {
   try {
+    // @ts-expect-error tsgo pre-stable: $lib alias not resolved for named pool export
     const { pool } = await import('$lib/server/db/client.js');
     const { rows } = await pool.query<{
       tool_name: string;
