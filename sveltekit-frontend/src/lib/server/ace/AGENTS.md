@@ -1,7 +1,7 @@
 # AGENTS.md — `src/lib/server/ace`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-07T00:04:22.038Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/ace
 

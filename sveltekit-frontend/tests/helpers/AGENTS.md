@@ -1,7 +1,7 @@
 # AGENTS.md — `tests/helpers`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-06T23:45:43.498Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/helpers
 
@@ -21,6 +21,19 @@
 ## Warnings
 
 - ⚠️ Hardcoded localhost refs
+## Audit Gates
+
+| Gate | Status | Detail |
+|------|--------|--------|
+| G17 | ❌ FAIL | 1/3 files — use env.server.ts getters |
+
+_Gates checked: G17. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
+## Todos + Enhancements
+
+- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/3 files — use env.server.ts getters
+- **[MED]** Hardcoded localhost refs
+
+_Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 
 ## Retrieval / Rerank Hints
 

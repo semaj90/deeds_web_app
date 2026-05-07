@@ -677,7 +677,7 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/code-intel/+page.svelte": {
+  "src/routes/(app)/code-intel/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -719,13 +719,13 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/code-intel/memory/+page.svelte": {
+  "src/routes/(app)/code-intel/memory/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/code-intel/research/+page.svelte": {
+  "src/routes/(app)/code-intel/research/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -737,13 +737,13 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/code-intel/retrieval/+page.svelte": {
+  "src/routes/(app)/code-intel/retrieval/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/code-intel/subagents/+page.svelte": {
+  "src/routes/(app)/code-intel/subagents/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -755,7 +755,7 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/code-intel/topology/+page.svelte": {
+  "src/routes/(app)/code-intel/topology/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -1937,6 +1937,12 @@
     "serverDeps": 2,
     "dbDeps": 0
   },
+  "src/routes/api/admin/pipeline/events/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
   "src/routes/api/admin/qlora/+server.ts": {
     "zone": "route",
     "directDeps": 4,
@@ -2945,6 +2951,12 @@
     "serverDeps": 1,
     "dbDeps": 0
   },
+  "src/routes/api/code-intel/search/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "src/routes/api/code-intel/smoke/health/+server.ts": {
     "zone": "route",
     "directDeps": 1,
@@ -3241,8 +3253,8 @@
   },
   "src/routes/api/codebase-index/karpathy-tag/+server.ts": {
     "zone": "route",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "src/routes/api/codebase-index/karpathy-tag/backfill/+server.ts": {

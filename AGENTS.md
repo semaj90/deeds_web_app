@@ -1,7 +1,7 @@
 # AGENTS.md — Deeds Web App
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T23:09:49.059Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-07T00:04:22.038Z · agents.md spec · regen: npm run agents:write -->
 
 > Legal-AI platform: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > See [`CLAUDE.md`](./CLAUDE.md) for the canonical 600-line dev guide. This file is the agents.md-spec entry point — agents.md / Claude Code / Cursor / Codex all read it.

@@ -1,10 +1,88 @@
 {
-  "generatedAt": "2026-05-05T13:59:31.191Z",
+  "generatedAt": "2026-05-07T00:10:45.581Z",
   "repoId": "default",
-  "clusterCount": 38,
-  "totalMembers": 16626,
+  "clusterCount": 79,
+  "totalMembers": 32466,
   "totalLlmHits": 0,
   "clusters": [
+    {
+      "clusterId": 50,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "components",
+        "gaming",
+        "yorha",
+        "topic:gaming",
+        "topic:component"
+      ],
+      "representativePaths": [
+        "src/lib/components/ui/select",
+        "src/lib/components/ui/input",
+        "src/lib/components/ui/gaming/n64",
+        "src/lib/components/ui/user"
+      ],
+      "memberCount": 3814,
+      "llmPathCount": 4,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/ClientGemmaInference.svelte",
+          "src/lib/components/legal/ChainOfCustodyTracker.svelte",
+          "src/lib/components/ui/radio/Svelte5RadioGroup.svelte",
+          "src/lib/components/NESGraphRenderer.svelte",
+          "src/routes/(app)/evidence/realtime/+page.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:30:44.941Z"
+      },
+      "createdAt": "2026-05-06T23:30:44.942Z",
+      "updatedAt": "2026-05-06T23:30:44.942Z"
+    },
+    {
+      "clusterId": 70,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "analytics",
+        "routes"
+      ],
+      "representativePaths": [
+        "src/routes/api/library/crawl",
+        "src/routes/api/codebase-index/gpu-pipeline",
+        "src/routes/api/admin/seed-knowledge",
+        "src/routes/api/analytics/research-summaries",
+        "src/lib/server/tools/handlers"
+      ],
+      "memberCount": 1546,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/routes/api/codebase-index/orchestrate/+server.ts",
+          "src/routes/api/analytics/focus/+server.ts",
+          "src/routes/(app)/indexing/+page.svelte",
+          "src/routes/api/courtroom/models/+server.ts",
+          "src/routes/api/codebase-index/recommendations/+server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:48:27.564Z"
+      },
+      "createdAt": "2026-05-06T23:48:27.565Z",
+      "updatedAt": "2026-05-06T23:48:27.565Z"
+    },
     {
       "clusterId": 5,
       "summary": "This cluster provides a comprehensive service layer for advanced AI capabilities, handling inference, context analysis (emotion), knowledge retrieval, and complex multi-step workflow orchestration.",
@@ -216,6 +294,41 @@
       "updatedAt": "2026-04-25T02:13:00.257Z"
     },
     {
+      "clusterId": 72,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:vector",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/routes/api/graph/recommendations",
+        "src/lib/server/ace"
+      ],
+      "memberCount": 1186,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/api-registry.ts",
+          "src/lib/server/agent/subagents.ts",
+          "src/lib/server/ace/context-assembler.ts",
+          "src/lib/server/types/kag.ts",
+          "src/lib/server/agent/autonomous-agent.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:49:31.497Z"
+      },
+      "createdAt": "2026-05-06T23:49:31.497Z",
+      "updatedAt": "2026-05-06T23:49:31.497Z"
+    },
+    {
       "clusterId": 11,
       "summary": "This cluster defines a comprehensive set of type definitions and data contracts for advanced, specialized system components, including GPU tensor management, AI embedding services, and complex user interface states.",
       "purpose": "Type definitions and data contracts layer",
@@ -262,6 +375,40 @@
       },
       "createdAt": "2026-04-20T19:29:52.136Z",
       "updatedAt": "2026-04-25T02:16:27.521Z"
+    },
+    {
+      "clusterId": 57,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "sym:store",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/gpu"
+      ],
+      "memberCount": 1099,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/utils/media-query.svelte.ts",
+          "src/lib/server/utils/retry.ts",
+          "src/lib/utils/cuid.ts",
+          "src/lib/components/dashboard/gamification-types.ts",
+          "src/lib/shims/dns-browser-shim.js"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:35:25.467Z"
+      },
+      "createdAt": "2026-05-06T23:35:25.469Z",
+      "updatedAt": "2026-05-06T23:35:25.469Z"
     },
     {
       "clusterId": 19,
@@ -313,6 +460,47 @@
       },
       "createdAt": "2026-04-20T19:30:59.624Z",
       "updatedAt": "2026-04-25T02:21:53.755Z"
+    },
+    {
+      "clusterId": 92,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "components",
+        "evidence",
+        "sym:upload",
+        "topic:component",
+        "yorha"
+      ],
+      "representativePaths": [
+        "src/lib/components/evidence",
+        "src/routes/(app)/demos/yorha/components/evidence",
+        "src/routes/(app)/cases/[id]/evidence/upload",
+        "src/lib/components/yorha/evidence",
+        "src/routes/(app)/evidence/upload"
+      ],
+      "memberCount": 940,
+      "llmPathCount": 6,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/evidence/EvidenceAssistant.svelte",
+          "src/lib/components/ai/EnhancedDocumentUploader.svelte",
+          "src/lib/stores/unified/evidence-store.svelte.ts",
+          "src/lib/components/evidence/EvidenceRecall.svelte",
+          "src/lib/components/evidence/EvidenceRecall.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:04:51.791Z"
+      },
+      "createdAt": "2026-05-07T00:04:51.792Z",
+      "updatedAt": "2026-05-07T00:04:51.792Z"
     },
     {
       "clusterId": 4,
@@ -414,6 +602,41 @@
       "updatedAt": "2026-04-25T02:14:22.791Z"
     },
     {
+      "clusterId": 94,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "sym:get"
+      ],
+      "representativePaths": [
+        "src/routes/api/v1/redis/cache",
+        "src/lib/cache",
+        "src/lib/server/cache"
+      ],
+      "memberCount": 921,
+      "llmPathCount": 3,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/db/drizzle-cache.ts",
+          "src/lib/server/vector-cache.ts",
+          "src/lib/cache/loki-cache.svelte.ts",
+          "src/lib/server/cache/invalidation.ts",
+          "src/lib/server/vector-cache.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:06:37.379Z"
+      },
+      "createdAt": "2026-05-07T00:06:37.380Z",
+      "updatedAt": "2026-05-07T00:06:37.380Z"
+    },
+    {
       "clusterId": 6,
       "summary": "This cluster provides comprehensive services for advanced information retrieval, including vector search, document extraction, and hybrid ranking, while also managing audio processing and auditing tools.",
       "purpose": "Knowledge Retrieval and AI Processing Pipeline",
@@ -462,6 +685,95 @@
       },
       "createdAt": "2026-04-20T19:29:18.434Z",
       "updatedAt": "2026-04-25T02:10:59.989Z"
+    },
+    {
+      "clusterId": 82,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "sym:response",
+        "analytics",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/mcp",
+        "src/lib/server/grpc",
+        "src/lib/server/training"
+      ],
+      "memberCount": 903,
+      "llmPathCount": 3,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/redis-streams.ts",
+          "src/routes/api/whisper/transcribe/+server.ts",
+          "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
+          "src/routes/api/synthesis/generate/+server.ts",
+          "src/routes/api/codebase-index/orchestrate/+server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:57:32.049Z"
+      },
+      "createdAt": "2026-05-06T23:57:32.050Z",
+      "updatedAt": "2026-05-06T23:57:32.050Z"
+    },
+    {
+      "clusterId": 20,
+      "summary": "This GPU cluster is specialized for high-performance Artificial Intelligence and Machine Learning workloads. It manages complex data pipelines involving vector embedding generation, similarity calculations (like SOM and graph attention), and low-level tensor operations using CUDA/WebGPU. The architecture supports advanced tasks such as quantization and map-reduce analysis.",
+      "purpose": "High-performance AI/ML computation and vector processing",
+      "patterns": [
+        "Quantization",
+        "Self-Organizing Maps (SOM)",
+        "Graph Embeddings",
+        "MapReduce Pipeline",
+        "Linear Algebra Kernels"
+      ],
+      "warnings": [
+        "Low-level CUDA/WebGPU code requires specialized expertise for maintenance and debugging.",
+        "High computational load necessitates careful resource throttling to prevent performance degradation."
+      ],
+      "tags": [
+        "ai",
+        "embedding",
+        "vector-search",
+        "ml-inference"
+      ],
+      "bowTerms": [
+        "topic:webgpu",
+        "sym:web",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/routes/api/codebase-index/karpathy-tag/gpu",
+        "src/lib/webgpu",
+        "src/lib/server/indexer",
+        "src/lib/gpu"
+      ],
+      "memberCount": 883,
+      "llmPathCount": 4,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/ai/base64-fp32-quantizer.ts",
+          "src/lib/webgpu/som-webgpu-cache.ts",
+          "src/lib/workers/compute-worker.mjs",
+          "src/lib/server/gpu/mapreduce-cuda-analyzer.ts",
+          "src/routes/api/graph/colab-export/+server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:10:54.209Z"
+      },
+      "createdAt": "2026-05-06T23:10:54.251Z",
+      "updatedAt": "2026-05-06T23:10:54.251Z"
     },
     {
       "clusterId": 17,
@@ -713,25 +1025,23 @@
     },
     {
       "clusterId": 18,
-      "summary": "This cluster provides comprehensive data modeling and services for a sophisticated legal or investigative platform, managing case metadata, digital evidence, knowledge graph construction, and advanced vector retrieval.",
-      "purpose": "Core Data Modeling and Knowledge Retrieval Layer",
+      "summary": "This cluster defines a set of TypeScript interfaces and types used throughout the application to structure data related to legal cases, evidence, error analysis, and external service interactions.",
+      "purpose": "Data modeling and type definition layer",
       "patterns": [
-        "Repository Pattern",
-        "Retrieval Augmented Generation (RAG)",
-        "State Machine Pattern",
-        "Domain-Driven Design (DDD)",
-        "Graph Modeling"
+        "Interface Definition",
+        "Type Aliasing/Union Types",
+        "Data Transfer Objects (DTOs)",
+        "Domain Modeling"
       ],
       "warnings": [
-        "The use of `[key: string]: any;` in `CaseMetadata` weakens type safety and should be replaced with explicit property definitions.",
-        "The `EvidenceFile` interface is located in a `.svelte.ts` file, suggesting a potential mixing of concerns between data modeling and UI component logic.",
-        "Handling of `Date` objects (e.g., in `EscalationTicket`) requires careful serialization/deserialization logic (e.g., using ISO strings) to prevent runtime errors."
+        "The definition of 'global.ts' appears twice with different content/focus (Permission vs. Evidence). Ensure these are consolidated or separated logically.",
+        "The use of 'any' in multiple interfaces (e.g., CaseMetadata, Evidence) reduces type safety and should be replaced with explicit property definitions where possible.",
+        "The structure relies heavily on interfaces, which is good for contracts, but complex relationships (like those in CaseTheoryPlan) might benefit from dedicated classes or records for better encapsulation."
       ],
       "tags": [
-        "src/lib/types/database.ts",
-        "src/lib/stores/unified/evidence-store.svelte.ts",
-        "src/lib/machines/retrieval-machine.ts",
-        "src/lib/services/error-analysis/types.ts",
+        "src/lib/types/global.ts",
+        "src/lib/types/evidence.ts",
+        "src/lib/types/case-theory.ts",
         "src/lib/types/external-services.ts"
       ],
       "bowTerms": [
@@ -764,7 +1074,7 @@
         "generatedAt": "2026-04-20T19:30:57.390Z"
       },
       "createdAt": "2026-04-20T19:30:57.434Z",
-      "updatedAt": "2026-04-25T02:20:52.510Z"
+      "updatedAt": "2026-05-05T18:58:49.140Z"
     },
     {
       "clusterId": 10,
@@ -809,6 +1119,82 @@
       },
       "createdAt": "2026-04-20T19:29:53.250Z",
       "updatedAt": "2026-04-25T02:15:16.556Z"
+    },
+    {
+      "clusterId": 85,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "routes",
+        "cases",
+        "evidence"
+      ],
+      "representativePaths": [
+        "src/routes/api/citations/collections/[collectionid]/citations",
+        "src/routes/api/error-brain/diagnosis-history",
+        "src/routes/api/cases/[id]/notes/[noteid]/evidence",
+        "src/routes/api/citations/[citationid]/tags",
+        "src/routes/api/citations/collections/[collectionid]"
+      ],
+      "memberCount": 587,
+      "llmPathCount": 8,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/routes/api/yorha/cases/+server.ts",
+          "src/lib/machines/evidence-analysis-machine.ts",
+          "src/routes/api/reports/[id]/export/+server.ts",
+          "src/routes/api/chat/stream/+server.ts",
+          "src/routes/api/fictional-cases/+server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:59:35.634Z"
+      },
+      "createdAt": "2026-05-06T23:59:35.635Z",
+      "updatedAt": "2026-05-06T23:59:35.635Z"
+    },
+    {
+      "clusterId": 64,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "brain",
+        "error",
+        "topic:error",
+        "routes"
+      ],
+      "representativePaths": [
+        "src/routes/api/error-brain/history/[filepath]",
+        "src/routes/api/internal/error-brain/runs"
+      ],
+      "memberCount": 525,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/api-registry.ts",
+          "src/routes/api/detective/connections/+server.ts",
+          "src/routes/api/phase89/components/+server.ts",
+          "src/lib/server/phase72/astVectorizer.ts",
+          "src/lib/utils/route-operation-logger.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:43:48.597Z"
+      },
+      "createdAt": "2026-05-06T23:43:48.598Z",
+      "updatedAt": "2026-05-06T23:43:48.598Z"
     },
     {
       "clusterId": 12,
@@ -909,6 +1295,536 @@
       "updatedAt": "2026-04-24T21:46:07.946Z"
     },
     {
+      "clusterId": 75,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "sym:get",
+        "sym:ollama"
+      ],
+      "representativePaths": [
+        "src/lib/config",
+        "src/lib/server/config"
+      ],
+      "memberCount": 416,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/env.server.ts",
+          "src/routes/api/phase89/config/+server.ts",
+          "src/lib/server/env.server.ts",
+          "src/lib/config/env.server.ts",
+          "src/lib/server/config/dynamic-ports.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:51:16.042Z"
+      },
+      "createdAt": "2026-05-06T23:51:16.042Z",
+      "updatedAt": "2026-05-06T23:51:16.042Z"
+    },
+    {
+      "clusterId": 28,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "routes",
+        "topic:component"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/demos/icons",
+        "src/routes/(app)/demos/gpu-cache",
+        "src/routes/(app)/demos/cache",
+        "src/routes/(app)/demos/bits-ui",
+        "src/routes/(app)/webgpu-similarity"
+      ],
+      "memberCount": 387,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/routes/(dev)/cache-demo/+page.svelte",
+          "src/lib/components/yorha/dashboard/GPUMetrics.svelte",
+          "src/lib/components/monitoring/CacheWarmUpControl.svelte",
+          "src/routes/(app)/admin/cache/+page.svelte",
+          "src/routes/(app)/admin/dev-tools/+page.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:15:04.363Z"
+      },
+      "createdAt": "2026-05-06T23:15:04.364Z",
+      "updatedAt": "2026-05-06T23:15:04.364Z"
+    },
+    {
+      "clusterId": 47,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "legal",
+        "corpus",
+        "sym:load",
+        "routes",
+        "topic:legal"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/library/corpus",
+        "src/lib/server/legal",
+        "src/routes/(app)/legal-corpus",
+        "src/routes/(app)/legal-corpus/[id]",
+        "src/routes/(app)/citations/law/[citation]"
+      ],
+      "memberCount": 339,
+      "llmPathCount": 6,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/legal/CitationManager.svelte",
+          "src/routes/api/evidence/search/+server.ts",
+          "src/routes/api/precedents/+server.ts",
+          "src/routes/api/search/laws/+server.ts",
+          "src/lib/ai/citation-cache.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:28:26.887Z"
+      },
+      "createdAt": "2026-05-06T23:28:26.889Z",
+      "updatedAt": "2026-05-06T23:28:26.889Z"
+    },
+    {
+      "clusterId": 24,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "workers",
+        "topic:workers",
+        "topic:class"
+      ],
+      "representativePaths": [
+        "src/lib/server/workers"
+      ],
+      "memberCount": 297,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/queue/rabbitmq-manager-fixed.ts",
+          "src/lib/server/queue/rabbitmq-manager-fixed.ts",
+          "src/lib/server/rabbitmq.ts",
+          "src/lib/server/queue/rabbitmq-manager-fixed.ts",
+          "src/lib/server/queue/rabbitmq-manager-fixed.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:12:08.877Z"
+      },
+      "createdAt": "2026-05-06T23:12:08.878Z",
+      "updatedAt": "2026-05-06T23:12:08.878Z"
+    },
+    {
+      "clusterId": 80,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:vector",
+        "routes"
+      ],
+      "representativePaths": [
+        "src/routes/api/persons-of-interest/[id]/gpu-analyze"
+      ],
+      "memberCount": 285,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/poi-store.ts",
+          "src/routes/api/persons-of-interest/[id]/face-match/+server.ts",
+          "src/routes/(app)/persons-of-interest/[id]/+page.svelte",
+          "src/lib/components/poi/PersonOfInterestDetailView.svelte",
+          "src/lib/components/poi/PersonOfInterestDetailView.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:56:00.184Z"
+      },
+      "createdAt": "2026-05-06T23:56:00.185Z",
+      "updatedAt": "2026-05-06T23:56:00.185Z"
+    },
+    {
+      "clusterId": 69,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "routes",
+        "sym:job"
+      ],
+      "representativePaths": [
+        "src/routes/api/codebase-index/recommendations",
+        "src/lib/server/ml",
+        "src/routes/api/ml/cluster-status",
+        "src/routes/api/codebase-index/cluster-detect",
+        "src/routes/(app)/admin/api-testing/agentic-loop"
+      ],
+      "memberCount": 256,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/routes/api/generate-cluster-summaries/+server.ts",
+          "src/routes/api/codebase-index/cluster-assign/+server.ts",
+          "src/routes/api/codebase-index/reindex/+server.ts",
+          "src/lib/server/indexer/cluster-summary.ts",
+          "src/routes/api/codebase-index/orchestrate/+server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:46:30.628Z"
+      },
+      "createdAt": "2026-05-06T23:46:30.629Z",
+      "updatedAt": "2026-05-06T23:46:30.629Z"
+    },
+    {
+      "clusterId": 96,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "types",
+        "sym:evidence",
+        "sym:type",
+        "sym:web"
+      ],
+      "representativePaths": [
+        "src/lib/server/queue",
+        "src/lib/machines"
+      ],
+      "memberCount": 177,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/utils/type-guards.ts",
+          "src/lib/server/evidence/type-detector.ts",
+          "src/lib/components/ui/modular/types.ts",
+          "src/lib/services/error-analysis/types.ts",
+          "src/lib/types/sharedTypes.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:07:32.050Z"
+      },
+      "createdAt": "2026-05-07T00:07:32.051Z",
+      "updatedAt": "2026-05-07T00:07:32.051Z"
+    },
+    {
+      "clusterId": 81,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:class",
+        "topic:vector",
+        "knowledge",
+        "search",
+        "services"
+      ],
+      "representativePaths": [],
+      "memberCount": 176,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/db/qdrant-sync.ts",
+          "src/lib/server/vector/qdrant-manager.ts",
+          "src/lib/server/qdrant-integration.ts",
+          "src/routes/api/knowledge/youtube/+server.ts",
+          "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:56:49.517Z"
+      },
+      "createdAt": "2026-05-06T23:56:49.518Z",
+      "updatedAt": "2026-05-06T23:56:49.518Z"
+    },
+    {
+      "clusterId": 91,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "auth",
+        "sym:evidence"
+      ],
+      "representativePaths": [
+        "src/lib/db"
+      ],
+      "memberCount": 162,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/db/schema/error_clusters.ts",
+          "src/lib/server/db/schema-phase78.ts",
+          "src/lib/server/db/schema-postgres.ts",
+          "src/lib/server/db/schema-postgres.ts",
+          "src/lib/server/db/schema/search-analytics.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:03:36.222Z"
+      },
+      "createdAt": "2026-05-07T00:03:36.223Z",
+      "updatedAt": "2026-05-07T00:03:36.223Z"
+    },
+    {
+      "clusterId": 90,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "auth",
+        "routes",
+        "types",
+        "sym:invalidate",
+        "sym:get"
+      ],
+      "representativePaths": [
+        "src/routes/api/auth/logout",
+        "src/routes/api/auth/session",
+        "src/routes/api/dev/login-demo",
+        "src/lib/server"
+      ],
+      "memberCount": 158,
+      "llmPathCount": 4,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/lucia.ts",
+          "src/lib/server/auth.ts",
+          "src/routes/login/+page.server.ts",
+          "src/lib/server/api-registry.ts",
+          "src/lib/server/auth.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:04:15.144Z"
+      },
+      "createdAt": "2026-05-07T00:04:15.144Z",
+      "updatedAt": "2026-05-07T00:04:15.144Z"
+    },
+    {
+      "clusterId": 77,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "types",
+        "sym:qdrant",
+        "auth"
+      ],
+      "representativePaths": [],
+      "memberCount": 134,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/qdrant-client.ts",
+          "src/lib/server/vector/qdrant-manager.ts",
+          "src/lib/server/types/retrieval.ts",
+          "src/lib/server/retrieval/codebase-context.ts",
+          "src/lib/services/knowledge-search/ACPToolRegistry.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:51:53.237Z"
+      },
+      "createdAt": "2026-05-06T23:51:53.238Z",
+      "updatedAt": "2026-05-06T23:51:53.238Z"
+    },
+    {
+      "clusterId": 88,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "auth",
+        "sym:chat"
+      ],
+      "representativePaths": [],
+      "memberCount": 123,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/db/schema/evidence.ts",
+          "src/lib/server/db/schema.ts",
+          "src/lib/server/db/warden-schema.ts",
+          "src/lib/server/db/schema/legal-relations.ts",
+          "src/lib/db/schema/route-health-tables.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:00:53.402Z"
+      },
+      "createdAt": "2026-05-07T00:00:53.403Z",
+      "updatedAt": "2026-05-07T00:00:53.403Z"
+    },
+    {
+      "clusterId": 51,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [],
+      "representativePaths": [],
+      "memberCount": 100,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/graph/graph-centrality.ts",
+          "src/lib/server/graph/graph-centrality.ts",
+          "src/lib/components/detective/EvidenceTheoryBoard.svelte",
+          "src/lib/components/evidence/EvidenceCanvas.svelte",
+          "src/routes/api/ace/ingest/+server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:30:43.372Z"
+      },
+      "createdAt": "2026-05-06T23:30:43.373Z",
+      "updatedAt": "2026-05-06T23:30:43.373Z"
+    },
+    {
+      "clusterId": 53,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "types",
+        "sym:type",
+        "sym:chat"
+      ],
+      "representativePaths": [],
+      "memberCount": 84,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/shims/dns-browser-shim.js",
+          "src/lib/shims/dns-browser-shim.js",
+          "src/lib/server/db/schema-postgres.ts",
+          "src/lib/server/db/schema-phase78.ts",
+          "src/lib/server/db/schema-postgres.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:32:44.722Z"
+      },
+      "createdAt": "2026-05-06T23:32:44.723Z",
+      "updatedAt": "2026-05-06T23:32:44.723Z"
+    },
+    {
+      "clusterId": 84,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:vector",
+        "routes",
+        "sym:get"
+      ],
+      "representativePaths": [
+        "src/routes/api/audit/gpu",
+        "src/lib/server/audit"
+      ],
+      "memberCount": 69,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/audit/gpu-audit-orchestrator.ts",
+          "src/lib/server/audit/gpu-audit-orchestrator.ts",
+          "src/lib/server/audit/gpu-audit-orchestrator.ts",
+          "src/lib/server/audit/gemma-tool-router.ts",
+          "src/lib/server/audit/gpu-audit-orchestrator.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:00:10.014Z"
+      },
+      "createdAt": "2026-05-07T00:00:10.014Z",
+      "updatedAt": "2026-05-07T00:00:10.014Z"
+    },
+    {
       "clusterId": 13,
       "summary": "This cluster consists of multiple files that uniformly define a constant to explicitly disable Server-Side Rendering (SSR) for the module.",
       "purpose": "Build configuration setting",
@@ -949,6 +1865,42 @@
       },
       "createdAt": "2026-04-20T19:30:02.148Z",
       "updatedAt": "2026-04-24T00:19:00.348Z"
+    },
+    {
+      "clusterId": 97,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "yorha",
+        "components",
+        "topic:component",
+        "routes"
+      ],
+      "representativePaths": [
+        "src/lib/components/yorha"
+      ],
+      "memberCount": 61,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/yorha/CrossExaminationAssistant.svelte",
+          "src/routes/(app)/demos/yorha/components/cases/CaseStats.svelte",
+          "src/lib/components/yorha/YoRHaDetectiveNotification.svelte",
+          "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+          "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:08:42.316Z"
+      },
+      "createdAt": "2026-05-07T00:08:42.317Z",
+      "updatedAt": "2026-05-07T00:08:42.317Z"
     },
     {
       "clusterId": 0,
@@ -994,6 +1946,1073 @@
       },
       "createdAt": "2026-04-20T19:28:22.326Z",
       "updatedAt": "2026-04-25T10:43:05.245Z"
+    },
+    {
+      "clusterId": 89,
+      "summary": "This cluster manages the ingestion, storage, and analysis of state constitutional law data across the US. It maintains a comprehensive registry of state sources and provides utilities for fetching, mapping, and tagging constitutional texts based on defined legal patterns. The system is designed to handle diverse data formats and varying levels of source reliability.",
+      "purpose": "Legal Data Ingestion and Analysis Pipeline",
+      "patterns": [
+        "Registry Pattern",
+        "Strategy Pattern",
+        "Data Mapping",
+        "Repository Pattern"
+      ],
+      "warnings": [
+        "Rate limiting and error handling are critical during external data fetching (fetchConstitution).",
+        "Data source confidence levels (sourceConfidence) must be managed to warn users about potentially outdated or unverified data.",
+        "The system must account for schema drift as state legislative websites change their structure."
+      ],
+      "tags": [
+        "LegalTech",
+        "ConstitutionalLaw",
+        "DataIngestion",
+        "StateLaw"
+      ],
+      "bowTerms": [
+        "legal",
+        "topic:legal",
+        "sym:get"
+      ],
+      "representativePaths": [],
+      "memberCount": 41,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/law-mapping.ts",
+          "src/lib/server/legal/constitution-registry.ts",
+          "src/lib/server/legal/constitution-registry.ts",
+          "src/lib/server/legal/constitution-fetcher.ts",
+          "src/lib/server/legal/constitution-registry.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-07T00:02:32.825Z"
+      },
+      "createdAt": "2026-05-07T00:02:32.939Z",
+      "updatedAt": "2026-05-07T00:02:32.939Z"
+    },
+    {
+      "clusterId": 38,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "stores",
+        "unified",
+        "topic:unified",
+        "topic:stores",
+        "sym:type",
+        "sym:evidence",
+        "types"
+      ],
+      "representativePaths": [
+        "src/lib/stores/unified"
+      ],
+      "memberCount": 41,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/auth-store.svelte.ts",
+          "src/lib/stores/app-store.svelte.ts",
+          "src/localDocs.svelte.ts",
+          "src/lib/stores/unified/index.svelte.ts",
+          "src/lib/stores.svelte.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:21:16.733Z"
+      },
+      "createdAt": "2026-05-06T23:21:16.733Z",
+      "updatedAt": "2026-05-06T23:21:16.733Z"
+    },
+    {
+      "clusterId": 41,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:component",
+        "components"
+      ],
+      "representativePaths": [],
+      "memberCount": 40,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/ui/RichTextEditor.svelte",
+          "src/lib/components/canvas/HybridBoard.svelte",
+          "src/lib/components/TipTapEditor.svelte",
+          "src/lib/components/cases/CaseNotesEditor.svelte",
+          "src/lib/components/ui/DiffViewer.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:22:12.587Z"
+      },
+      "createdAt": "2026-05-06T23:22:12.588Z",
+      "updatedAt": "2026-05-06T23:22:12.588Z"
+    },
+    {
+      "clusterId": 39,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "analysis",
+        "sym:job",
+        "sym:update"
+      ],
+      "representativePaths": [],
+      "memberCount": 23,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/routes/api/ace/ingest/+server.ts",
+          "src/lib/server/research/task-runner.ts",
+          "src/lib/server/embedding/ingestion-queue.ts",
+          "src/lib/server/embedding/ingestion-queue.ts",
+          "src/routes/api/evidence/upload/+server.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:21:16.140Z"
+      },
+      "createdAt": "2026-05-06T23:21:16.144Z",
+      "updatedAt": "2026-05-06T23:21:16.144Z"
+    },
+    {
+      "clusterId": 40,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:component",
+        "routes"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/demos/streaming"
+      ],
+      "memberCount": 22,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/routes/api/topology/stream/+server.ts",
+          "src/routes/api/phase89/stream/+server.ts",
+          "src/routes/api/tools/stream/+server.ts",
+          "src/lib/components/analytics/LiveResearchPanel.svelte",
+          "src/lib/components/cases/StreamingAnalysisPanel.svelte"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:22:20.836Z"
+      },
+      "createdAt": "2026-05-06T23:22:20.836Z",
+      "updatedAt": "2026-05-06T23:22:20.836Z"
+    },
+    {
+      "clusterId": 66,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "services",
+        "sym:extract",
+        "evidence",
+        "types"
+      ],
+      "representativePaths": [
+        "src/lib/server/evidence/services",
+        "src/lib/server/evidence",
+        "src/lib/server/services"
+      ],
+      "memberCount": 12,
+      "llmPathCount": 3,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/types/ai.ts",
+          "src/lib/server/services/langextract-service.ts",
+          "src/lib/server/langextract-client.ts",
+          "src/lib/server/langextract-client.ts",
+          "src/lib/server/services/langextract-service.ts"
+        ],
+        "chunkCount": 12,
+        "generatedAt": "2026-05-06T23:45:40.746Z"
+      },
+      "createdAt": "2026-05-06T23:45:40.747Z",
+      "updatedAt": "2026-05-06T23:45:40.747Z"
+    },
+    {
+      "clusterId": 56,
+      "summary": "This cluster is architected for advanced document intelligence and legal data processing. It implements a multi-stage pipeline that handles document parsing, visual language model (VLM) extraction, and subsequent embedding generation for vector storage. The system is designed to extract structured data, analyze evidence, and provide detailed processing metrics.",
+      "purpose": "Document Intelligence and Legal Data Processing Pipeline",
+      "patterns": [
+        "Pipeline",
+        "Strategy",
+        "Repository",
+        "Type Modeling"
+      ],
+      "warnings": [
+        "Cluster stats indicate 0 members and no associated semantic tags, suggesting the cluster may be inactive or lacks current operational context.",
+        "The system relies heavily on external services (e.g., Ollama, WASM parsers) which must be monitored for latency and reliability."
+      ],
+      "tags": [
+        "document-processing",
+        "legal-tech",
+        "embeddings",
+        "vlm"
+      ],
+      "bowTerms": [
+        "types",
+        "sym:ollama",
+        "sym:evidence"
+      ],
+      "representativePaths": [
+        "src/lib/shared/types"
+      ],
+      "memberCount": 10,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/analysis/granite-docling.ts",
+          "src/lib/shared/types/parser.ts",
+          "src/lib/server/docling.ts",
+          "src/lib/server/db-shim.ts",
+          "src/lib/shared/types/parser.ts"
+        ],
+        "chunkCount": 10,
+        "generatedAt": "2026-05-06T23:37:10.016Z"
+      },
+      "createdAt": "2026-05-06T23:37:10.486Z",
+      "updatedAt": "2026-05-06T23:37:10.486Z"
+    },
+    {
+      "clusterId": 58,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:vector",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/phase78",
+        "src/lib/server/inference"
+      ],
+      "memberCount": 10,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/indexer/legal-chunker.ts",
+          "src/lib/server/research/web-research-ingester.ts",
+          "src/lib/server/inference/inference-router.ts",
+          "src/lib/server/phase78/contextBuilder.ts",
+          "src/lib/server/grpc/retrieval-client.ts"
+        ],
+        "chunkCount": 10,
+        "generatedAt": "2026-05-06T23:39:14.677Z"
+      },
+      "createdAt": "2026-05-06T23:39:14.677Z",
+      "updatedAt": "2026-05-06T23:39:14.677Z"
+    },
+    {
+      "clusterId": 45,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [],
+      "representativePaths": [],
+      "memberCount": 3,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/ai/ollama-config.ts",
+          "src/lib/server/ai/ollama-config.ts",
+          "src/lib/server/ai/ollama-config.ts"
+        ],
+        "chunkCount": 3,
+        "generatedAt": "2026-05-06T23:25:17.591Z"
+      },
+      "createdAt": "2026-05-06T23:25:17.592Z",
+      "updatedAt": "2026-05-06T23:25:17.592Z"
+    },
+    {
+      "clusterId": 67,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "components"
+      ],
+      "representativePaths": [],
+      "memberCount": 3,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/components/ui/tabs/index.ts",
+          "src/lib/components/ui/tabs/index.ts",
+          "src/lib/components/ui/tabs/index.ts"
+        ],
+        "chunkCount": 3,
+        "generatedAt": "2026-05-06T23:45:47.682Z"
+      },
+      "createdAt": "2026-05-06T23:45:47.683Z",
+      "updatedAt": "2026-05-06T23:45:47.683Z"
+    },
+    {
+      "clusterId": 49,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:vector"
+      ],
+      "representativePaths": [],
+      "memberCount": 2,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/gpu/background-analyzer.ts",
+          "src/lib/server/cache/cartridge-tensor-bridge.ts"
+        ],
+        "chunkCount": 2,
+        "generatedAt": "2026-05-06T23:29:54.449Z"
+      },
+      "createdAt": "2026-05-06T23:29:54.450Z",
+      "updatedAt": "2026-05-06T23:29:54.450Z"
+    },
+    {
+      "clusterId": 68,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "stores",
+        "topic:stores",
+        "sym:get"
+      ],
+      "representativePaths": [
+        "src/lib/stores/dashboard"
+      ],
+      "memberCount": 2,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/stores/dashboard/GrpcStatusAdapter.ts",
+          "src/lib/stores/dashboard/GrpcStatusAdapter.ts"
+        ],
+        "chunkCount": 2,
+        "generatedAt": "2026-05-06T23:47:33.294Z"
+      },
+      "createdAt": "2026-05-06T23:47:33.295Z",
+      "updatedAt": "2026-05-06T23:47:33.295Z"
+    },
+    {
+      "clusterId": 76,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [],
+      "representativePaths": [],
+      "memberCount": 1,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/db/schema-postgres.ts"
+        ],
+        "chunkCount": 1,
+        "generatedAt": "2026-05-06T23:52:39.983Z"
+      },
+      "createdAt": "2026-05-06T23:52:39.984Z",
+      "updatedAt": "2026-05-06T23:52:39.984Z"
+    },
+    {
+      "clusterId": 33,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "types",
+        "sym:options",
+        "auth"
+      ],
+      "representativePaths": [],
+      "memberCount": 1,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/types/svelte5-api-types.d.ts"
+        ],
+        "chunkCount": 1,
+        "generatedAt": "2026-05-06T23:18:03.052Z"
+      },
+      "createdAt": "2026-05-06T23:18:03.054Z",
+      "updatedAt": "2026-05-06T23:18:03.054Z"
+    },
+    {
+      "clusterId": 71,
+      "summary": "",
+      "purpose": null,
+      "patterns": [],
+      "warnings": [],
+      "tags": [],
+      "bowTerms": [
+        "topic:vector"
+      ],
+      "representativePaths": [],
+      "memberCount": 1,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": "gemma4-legal-vlm:latest",
+      "hasEmbedding": false,
+      "metadata": {
+        "topFiles": [
+          "src/lib/server/vector/multi-store.ts"
+        ],
+        "chunkCount": 1,
+        "generatedAt": "2026-05-06T23:49:02.852Z"
+      },
+      "createdAt": "2026-05-06T23:49:02.853Z",
+      "updatedAt": "2026-05-06T23:49:02.853Z"
+    },
+    {
+      "clusterId": 31,
+      "summary": "This module provides a utility function to perform a database health check by verifying the existence of a predefined set of essential application tables against the database schema.",
+      "purpose": "Database schema validation and health check",
+      "patterns": [
+        "Dependency Check",
+        "Connection Pooling",
+        "Read-Only Query Pattern"
+      ],
+      "warnings": [
+        "Performance: Querying `information_schema.tables` on startup can be slow and may add significant overhead to the application's initialization time.",
+        "Resource Management: Ensure that the database client connection (`client`) is reliably released back to the pool (e.g., using a `finally` block) even if errors occur during the query execution.",
+        "Maintainability: The list of essential tables is hardcoded; consider externalizing this list into a configuration file or environment variable to improve maintainability."
+      ],
+      "tags": [
+        "src/lib/server/db/ssr-health-check.ts"
+      ],
+      "bowTerms": [
+        "topic:investigate",
+        "topic:suggest",
+        "routes"
+      ],
+      "representativePaths": [
+        "src/routes/api/investigate/suggest"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:52:40.179Z",
+      "updatedAt": "2026-04-25T01:52:40.179Z"
+    },
+    {
+      "clusterId": 55,
+      "summary": "This cluster defines a comprehensive set of TypeScript types that mirror the structure of various underlying database tables. These types are used throughout the application to ensure type safety when interacting with the database, covering domains from web crawling to legal document management.",
+      "purpose": "Database Schema Type Definition Layer",
+      "patterns": [
+        "Type Inference",
+        "Schema Definition",
+        "Data Transfer Objects (DTOs)",
+        "Repository Pattern (Implied)"
+      ],
+      "warnings": [
+        "The strong coupling between TypeScript types and the underlying database schema means that any database migration must be immediately followed by an update to these type definitions to prevent runtime type errors."
+      ],
+      "tags": [
+        "src/lib/db/schema.ts",
+        "src/lib/server/db/schema/board.ts",
+        "src/lib/server/db/schema/error_events.ts",
+        "src/lib/server/db/schema/legal-chunks.ts"
+      ],
+      "bowTerms": [],
+      "representativePaths": [
+        "src/lib/db/schema"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:52:44.482Z",
+      "updatedAt": "2026-04-25T01:52:44.482Z"
+    },
+    {
+      "clusterId": 86,
+      "summary": "This file appears to be a placeholder for defining a database schema or data structure related to court decisions, but it currently only exports a reference to an undefined variable.",
+      "purpose": "Database Schema Definition (Placeholder)",
+      "patterns": [
+        "Placeholder",
+        "Data Structure Definition"
+      ],
+      "warnings": [
+        "The file exports an undefined variable (`cases`), which will cause runtime errors and indicates incomplete implementation. This file should be updated with the actual schema definition or removed if obsolete."
+      ],
+      "tags": [
+        "src/lib/server/db/schema-old.ts"
+      ],
+      "bowTerms": [
+        "evidence",
+        "components",
+        "types",
+        "sym:extract"
+      ],
+      "representativePaths": [
+        "src/lib/shims",
+        "src/lib/data"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 2,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T10:11:34.974Z",
+      "updatedAt": "2026-04-25T10:11:34.974Z"
+    },
+    {
+      "clusterId": 63,
+      "summary": "This cluster provides utility functions for generating visual representations (glyphs) of recommendations, building database query filters, and selecting the top K results based on associated scores.",
+      "purpose": "Utility and Data Transformation Layer",
+      "patterns": [
+        "Utility Functions",
+        "Builder Pattern (QueryBuilder)",
+        "Data Transformation",
+        "Top-K Selection"
+      ],
+      "warnings": [
+        "The `QueryBuilder` in `query-utils.ts` uses type assertions (`as AnyColumn`, `as AnyCol`) which can mask potential type safety issues and should be reviewed for stricter typing.",
+        "The `topKGlyphs` function assumes a direct index correspondence between `glyphs` and `scores` array, which is brittle if the input arrays are not guaranteed to be parallel and correctly ordered."
+      ],
+      "tags": [
+        "src/lib/server/ml/recommendation-glyph.ts",
+        "src/lib/server/db/query-utils.ts",
+        "src/lib/server/analytics/minified-research-cache.ts"
+      ],
+      "bowTerms": [
+        "auth"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:54:46.592Z",
+      "updatedAt": "2026-04-25T01:54:46.592Z"
+    },
+    {
+      "clusterId": 65,
+      "summary": "This cluster contains utility functions and components for advanced AI processing, database interaction, and frontend UI component management, alongside core policy and state management logic.",
+      "purpose": "Utility and Component Library",
+      "patterns": [
+        "Utility Functions",
+        "Component Props/Types",
+        "State Management/Policy",
+        "Dependency Injection/Overriding"
+      ],
+      "warnings": [
+        "The `GRPOPolicy` class appears to be missing the definition for `rollbackThreshold` in its constructor, leading to potential incompleteness or runtime errors.",
+        "The `stableSoftmax` function is incomplete (missing the return statement).",
+        "The `readBodyFast` function relies on an undefined `parseFast` function, which needs to be defined or imported.",
+        "The `RowList` type definition uses `any` extensively, which sacrifices type safety and should be reviewed for stricter typing."
+      ],
+      "tags": [
+        "src/lib/ai/client-embed.ts",
+        "src/lib/services/error-analysis/GRPOPolicy.ts",
+        "src/lib/server/grpc/retrieval-client.ts",
+        "src/lib/components/ai/index.ts",
+        "src/lib/server/db/connection.ts"
+      ],
+      "bowTerms": [],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:48:36.931Z",
+      "updatedAt": "2026-04-25T01:54:49.367Z"
+    },
+    {
+      "clusterId": 42,
+      "summary": "This cluster provides a comprehensive backend service for processing documents, including OCR, vector embedding generation, advanced analysis (like SOM clustering and glyph diffusion), and orchestrating these steps into a cohesive pipeline.",
+      "purpose": "Document Processing and AI Pipeline Backend",
+      "patterns": [
+        "Pipeline Orchestration",
+        "Worker Pool/Worker Threads",
+        "Caching (LRU/Memoization)",
+        "Service Layer Abstraction",
+        "Fallback/Degradation Handling"
+      ],
+      "warnings": [
+        "The use of `console.warn` and `try...catch` blocks to handle failures (e.g., Qdrant indexing, OpenAI embedding) suggests potential non-critical failures, but robust error handling and logging are crucial to ensure data integrity and proper failure reporting to the user.",
+        "The `som-cluster.ts` file shows fallback logic to run on the main thread when workers are unavailable, which could lead to performance bottlenecks or blocking the event loop if the dataset is large.",
+        "The `audio-processor.ts` and `evidence-record` update logic suggests complex state management involving multiple external services (Qdrant, DB) which requires careful transaction management to ensure atomicity.",
+        "The `ClientGemmaInference.svelte` component handles model loading and provider detection, which is good, but client-side model loading can be highly dependent on the user's local hardware and browser capabilities, requiring clear fallback mechanisms."
+      ],
+      "tags": [
+        "src/lib/server/services/pipeline-orchestrator.ts",
+        "src/lib/server/ai/embeddings-simple.ts",
+        "src/lib/server/ocr/tesseract.ts",
+        "src/lib/server/ml/som-cluster.ts",
+        "src/lib/server/workers/audio-processor.ts"
+      ],
+      "bowTerms": [
+        "topic:error",
+        "topic:vector",
+        "error",
+        "analysis",
+        "services"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:49:44.548Z",
+      "updatedAt": "2026-04-24T00:49:44.548Z"
+    },
+    {
+      "clusterId": 133,
+      "summary": "This component acts as a real-time dashboard for monitoring application errors, consuming an event stream to aggregate statistics and display detailed error information.",
+      "purpose": "Error Monitoring Dashboard Component",
+      "patterns": [
+        "Reactive State Management",
+        "Observer Pattern",
+        "Component-based Architecture",
+        "Data Aggregation"
+      ],
+      "warnings": [
+        "The type definition for `eventSource` is incomplete (`eventSource: Even`), which will cause compilation errors.",
+        "If the error samples or messages are rendered directly, the component is vulnerable to Cross-Site Scripting (XSS) attacks; proper sanitization must be implemented.",
+        "Handling high-frequency error streams requires careful performance consideration (e.g., throttling or debouncing) to prevent UI slowdowns."
+      ],
+      "tags": [
+        "src/lib/components/ErrorStreamMonitor.svelte"
+      ],
+      "bowTerms": [],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:50:12.205Z",
+      "updatedAt": "2026-04-24T00:50:12.205Z"
+    },
+    {
+      "clusterId": 30,
+      "summary": "Defines a TypeScript type representing the expected response structure after a file upload operation.",
+      "purpose": "Data structure definition",
+      "patterns": [
+        "Type Definition",
+        "Data Transfer Object (DTO)"
+      ],
+      "warnings": [],
+      "tags": [
+        "src/lib/types/evidence.ts"
+      ],
+      "bowTerms": [
+        "gaming",
+        "topic:gaming",
+        "components",
+        "types"
+      ],
+      "representativePaths": [
+        "src/lib/components/ui/gaming/types"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:54:53.246Z",
+      "updatedAt": "2026-04-25T01:54:53.246Z"
+    },
+    {
+      "clusterId": 73,
+      "summary": "This cluster provides utilities for logging and analyzing various stages of a retrieval-augmented generation (RAG) pipeline, including recording chunk hits, chunking text by sentences, and generating aggregated inference statistics.",
+      "purpose": "Observability and Analytics Layer",
+      "patterns": [
+        "Service Layer",
+        "Logging/Metrics Collection",
+        "Data Aggregation",
+        "Utility Functions"
+      ],
+      "warnings": [
+        "The `recordChunkHits` function performs database writes and should ensure proper transaction management or batching if high throughput is expected.",
+        "The `getStatsByType` function relies on an external CouchDB view, which might introduce latency or failure points if the database is unavailable or the view is improperly configured."
+      ],
+      "tags": [
+        "src/lib/server/analytics/search-analytics.ts",
+        "src/lib/server/streaming/chunked-response.ts",
+        "src/lib/server/observability/inference-log-views.ts"
+      ],
+      "bowTerms": [
+        "types",
+        "topic:vector"
+      ],
+      "representativePaths": [
+        "src/lib/server/retrieval"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:54:54.584Z",
+      "updatedAt": "2026-04-25T01:54:54.584Z"
+    },
+    {
+      "clusterId": 48,
+      "summary": "This cluster provides utility functions for managing background job states, sending multi-channel notifications, retrieving vector database boost scores, and updating ingestion job progress.",
+      "purpose": "Utility and Service Layer",
+      "patterns": [
+        "Service Layer",
+        "Observer/State Management (for job updates)",
+        "Multi-channel Dispatch",
+        "Repository Pattern (implied by Redis interaction)"
+      ],
+      "warnings": [
+        "The `sendNotification` function in `push-service.ts` uses a switch statement and relies on external implementations (`sendWebPush`, etc.), which could lead to complex error handling if any single channel fails.",
+        "The job update functions (`completeAnalysisJob`, `updateAceIngestJob`) modify state directly, suggesting potential race conditions or lack of transactional integrity if multiple processes update the same job concurrently."
+      ],
+      "tags": [
+        "src/lib/server/notifications/push-service.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/retrieval/qlora-boost.ts",
+        "src/lib/server/ace-ingest-progress.ts"
+      ],
+      "bowTerms": [
+        "migrations",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/db/migrations/meta"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:55:56.369Z",
+      "updatedAt": "2026-04-25T01:55:56.369Z"
+    },
+    {
+      "clusterId": 79,
+      "summary": "This cluster provides core backend services for a complex AI application, handling data persistence (embeddings, graph databases), content processing (image resizing, chunk hit logging), and advanced AI features like knowledge synthesis and graph initialization.",
+      "purpose": "Backend Service Layer and Data Persistence",
+      "patterns": [
+        "Repository pattern",
+        "Service Layer",
+        "Cache-aside pattern",
+        "Singleton pattern"
+      ],
+      "warnings": [
+        "The `recordChunkHits` function uses a raw SQL query and relies on external `pool` management; ensure proper transaction handling and parameterized queries are used to prevent SQL injection.",
+        "The `getPersistedEmbedding` function relies on hashing the input text; if the hashing function is not cryptographically secure or if collisions are possible, it could lead to retrieving incorrect embeddings.",
+        "The `initializeNeo4jSchema` function is marked as safe to call multiple times, but complex schema initialization logic should be wrapped in robust transaction management to ensure atomicity.",
+        "The `resizeForVLM` function handles image transcoding (PNG/WebP/TIFF -> JPEG); ensure that the quality setting (92) is appropriate for the intended use case to balance file size and visual fidelity."
+      ],
+      "tags": [
+        "src/lib/server/analytics/search-analytics.ts",
+        "src/lib/server/embedding/embedding-persist.ts",
+        "src/lib/server/graph/neo4j-schema.ts",
+        "src/lib/server/image/resize-for-vlm.ts",
+        "src/lib/ai/client-llm-synthesis.ts"
+      ],
+      "bowTerms": [
+        "types"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:56:02.286Z",
+      "updatedAt": "2026-04-25T01:56:02.286Z"
+    },
+    {
+      "clusterId": 93,
+      "summary": "This cluster manages complex data processing pipelines, including audio transcription, entity extraction, and error event embedding, while providing mechanisms for synchronizing knowledge bases and storing structured data.",
+      "purpose": "Data processing and knowledge graph management pipeline",
+      "patterns": [
+        "Pipeline pattern",
+        "Service layer",
+        "Repository pattern",
+        "Batch processing"
+      ],
+      "warnings": [
+        "The `fullResync` function in `qdrant-sync.ts` is labeled as a 'nuclear option' and involves deleting and recreating a collection, which should be handled with extreme care in production environments.",
+        "The `AudioProcessor` class in `audio-processor.ts` relies on an external `getRedis()` call, which assumes proper initialization and connection handling for Redis.",
+        "The `fullResync` function reads all documents from the `knowledge_documents` table, which could lead to significant performance degradation and memory issues if the table grows very large."
+      ],
+      "tags": [
+        "src/lib/server/workers/audio-processor.ts",
+        "src/lib/server/db/qdrant-sync.ts",
+        "src/lib/server/evidence/batch-entity-storer.ts",
+        "src/lib/server/pipeline/error-embedding-pipeline.ts"
+      ],
+      "bowTerms": [
+        "types"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-25T01:56:16.786Z",
+      "updatedAt": "2026-04-25T01:56:16.786Z"
+    },
+    {
+      "clusterId": 35,
+      "summary": "This cluster contains utility code for caching route metadata using IndexedDB and a component for simulating and displaying Nintendo Entertainment System (NES) memory usage.",
+      "purpose": "Utility and Demonstration Components",
+      "patterns": [
+        "IndexedDB Cache",
+        "Component State Management",
+        "Simulation/Modeling"
+      ],
+      "warnings": [
+        "The IndexedDB implementation lacks proper error handling (e.g., rejection handling for `openCacheDB`).",
+        "The memory palace component relies on external state management (`nesMemory`) which should be thoroughly tested for edge cases and performance under heavy load."
+      ],
+      "tags": [
+        "src/routes/(app)/admin/all-routes/+page.svelte",
+        "src/routes/(app)/demos/memory-palace/+page.svelte"
+      ],
+      "bowTerms": [
+        "legal",
+        "components",
+        "topic:component",
+        "topic:legal",
+        "corpus"
+      ],
+      "representativePaths": [
+        "src/routes/(app)/demos/source-drawer",
+        "src/routes/(app)/library/glossary",
+        "src/lib/components/legal-ai",
+        "src/lib/components/legal-corpus",
+        "src/routes/(app)/cases/[id]"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 5,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:33:11.854Z",
+      "updatedAt": "2026-04-24T00:33:11.854Z"
+    },
+    {
+      "clusterId": 74,
+      "summary": "This component provides a reusable, state-managed form structure for handling user input, validation, and submission logic within a Svelte application.",
+      "purpose": "UI Component / Form Management",
+      "patterns": [
+        "Component Composition",
+        "State Management (Local/Reactive)",
+        "Props/Attributes Handling",
+        "Event Handling"
+      ],
+      "warnings": [
+        "The comment 'Mock form store until createFormStore is fixed' indicates temporary, potentially unstable state management logic that should be addressed to ensure robustness and maintainability."
+      ],
+      "tags": [
+        "src/lib/components/ui/Form.svelte"
+      ],
+      "bowTerms": [
+        "types",
+        "topic:vector",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/server/agent"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 1,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:32:47.958Z",
+      "updatedAt": "2026-04-24T00:32:47.958Z"
+    },
+    {
+      "clusterId": 21,
+      "summary": "This cluster provides utilities for GPU-accelerated computation using WebGPU and manages the ingestion and sharding of documents for Retrieval-Augmented Generation (RAG) pipelines.",
+      "purpose": "Data Processing and Compute Utility Layer",
+      "patterns": [
+        "SDK/Facade Pattern",
+        "Sharding/Chunking",
+        "WebGPU Compute Pipeline",
+        "Message Queue Integration"
+      ],
+      "warnings": [
+        "The WebGPU code uses type casting (`as any`) which suggests potential type safety issues or incomplete type definitions.",
+        "The `publishToQueue` function in `sdk.ts` is a stub, meaning the actual message queuing mechanism is not implemented or is mocked, requiring full implementation for production use.",
+        "The WebGPU buffer writing uses `inputData as unknown as BufferSource`, which is a potentially unsafe type assertion and should be reviewed for robust data handling."
+      ],
+      "tags": [
+        "src/lib/webgpu/legal-compute-shaders.ts",
+        "src/lib/server/rag/sdk.ts",
+        "src/lib/server/rag/types.js"
+      ],
+      "bowTerms": [
+        "legal",
+        "topic:legal",
+        "components",
+        "topic:component",
+        "routes",
+        "auth"
+      ],
+      "representativePaths": [
+        "src/lib/components/dashboard",
+        "src/routes/(app)/simulation",
+        "src/lib/server/pdf",
+        "src/routes/api/rag/todo-suggestions",
+        "src/lib/components/legal"
+      ],
+      "memberCount": 0,
+      "llmPathCount": 6,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:34:28.599Z",
+      "updatedAt": "2026-04-24T00:34:28.599Z"
+    },
+    {
+      "clusterId": 87,
+      "summary": "This file defines interfaces and structures related to the retrieval and assembly of code chunks, including performance metrics and configuration.",
+      "purpose": "Data structure definition for code retrieval and context assembly",
+      "patterns": [
+        "Data Transfer Object (DTO)",
+        "Interface Definition"
+      ],
+      "warnings": [],
+      "tags": [
+        "src/lib/machines/retrieval-machine.ts"
+      ],
+      "bowTerms": [
+        "sym:get"
+      ],
+      "representativePaths": [],
+      "memberCount": 0,
+      "llmPathCount": 0,
+      "llmTotalHits": 0,
+      "centroidDistanceMean": null,
+      "summaryModel": null,
+      "hasEmbedding": false,
+      "metadata": {},
+      "createdAt": "2026-04-24T00:47:14.766Z",
+      "updatedAt": "2026-04-24T00:47:14.766Z"
     },
     {
       "clusterId": 34,
@@ -1070,570 +3089,6 @@
       "metadata": {},
       "createdAt": "2026-04-24T00:47:31.161Z",
       "updatedAt": "2026-04-24T00:47:31.161Z"
-    },
-    {
-      "clusterId": 42,
-      "summary": "This cluster provides a comprehensive backend service for processing documents, including OCR, vector embedding generation, advanced analysis (like SOM clustering and glyph diffusion), and orchestrating these steps into a cohesive pipeline.",
-      "purpose": "Document Processing and AI Pipeline Backend",
-      "patterns": [
-        "Pipeline Orchestration",
-        "Worker Pool/Worker Threads",
-        "Caching (LRU/Memoization)",
-        "Service Layer Abstraction",
-        "Fallback/Degradation Handling"
-      ],
-      "warnings": [
-        "The use of `console.warn` and `try...catch` blocks to handle failures (e.g., Qdrant indexing, OpenAI embedding) suggests potential non-critical failures, but robust error handling and logging are crucial to ensure data integrity and proper failure reporting to the user.",
-        "The `som-cluster.ts` file shows fallback logic to run on the main thread when workers are unavailable, which could lead to performance bottlenecks or blocking the event loop if the dataset is large.",
-        "The `audio-processor.ts` and `evidence-record` update logic suggests complex state management involving multiple external services (Qdrant, DB) which requires careful transaction management to ensure atomicity.",
-        "The `ClientGemmaInference.svelte` component handles model loading and provider detection, which is good, but client-side model loading can be highly dependent on the user's local hardware and browser capabilities, requiring clear fallback mechanisms."
-      ],
-      "tags": [
-        "src/lib/server/services/pipeline-orchestrator.ts",
-        "src/lib/server/ai/embeddings-simple.ts",
-        "src/lib/server/ocr/tesseract.ts",
-        "src/lib/server/ml/som-cluster.ts",
-        "src/lib/server/workers/audio-processor.ts"
-      ],
-      "bowTerms": [
-        "topic:error",
-        "topic:vector",
-        "error",
-        "analysis",
-        "services"
-      ],
-      "representativePaths": [],
-      "memberCount": 0,
-      "llmPathCount": 0,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-24T00:49:44.548Z",
-      "updatedAt": "2026-04-24T00:49:44.548Z"
-    },
-    {
-      "clusterId": 133,
-      "summary": "This component acts as a real-time dashboard for monitoring application errors, consuming an event stream to aggregate statistics and display detailed error information.",
-      "purpose": "Error Monitoring Dashboard Component",
-      "patterns": [
-        "Reactive State Management",
-        "Observer Pattern",
-        "Component-based Architecture",
-        "Data Aggregation"
-      ],
-      "warnings": [
-        "The type definition for `eventSource` is incomplete (`eventSource: Even`), which will cause compilation errors.",
-        "If the error samples or messages are rendered directly, the component is vulnerable to Cross-Site Scripting (XSS) attacks; proper sanitization must be implemented.",
-        "Handling high-frequency error streams requires careful performance consideration (e.g., throttling or debouncing) to prevent UI slowdowns."
-      ],
-      "tags": [
-        "src/lib/components/ErrorStreamMonitor.svelte"
-      ],
-      "bowTerms": [],
-      "representativePaths": [],
-      "memberCount": 0,
-      "llmPathCount": 0,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-24T00:50:12.205Z",
-      "updatedAt": "2026-04-24T00:50:12.205Z"
-    },
-    {
-      "clusterId": 79,
-      "summary": "This cluster provides core backend services for a complex AI application, handling data persistence (embeddings, graph databases), content processing (image resizing, chunk hit logging), and advanced AI features like knowledge synthesis and graph initialization.",
-      "purpose": "Backend Service Layer and Data Persistence",
-      "patterns": [
-        "Repository pattern",
-        "Service Layer",
-        "Cache-aside pattern",
-        "Singleton pattern"
-      ],
-      "warnings": [
-        "The `recordChunkHits` function uses a raw SQL query and relies on external `pool` management; ensure proper transaction handling and parameterized queries are used to prevent SQL injection.",
-        "The `getPersistedEmbedding` function relies on hashing the input text; if the hashing function is not cryptographically secure or if collisions are possible, it could lead to retrieving incorrect embeddings.",
-        "The `initializeNeo4jSchema` function is marked as safe to call multiple times, but complex schema initialization logic should be wrapped in robust transaction management to ensure atomicity.",
-        "The `resizeForVLM` function handles image transcoding (PNG/WebP/TIFF -> JPEG); ensure that the quality setting (92) is appropriate for the intended use case to balance file size and visual fidelity."
-      ],
-      "tags": [
-        "src/lib/server/analytics/search-analytics.ts",
-        "src/lib/server/embedding/embedding-persist.ts",
-        "src/lib/server/graph/neo4j-schema.ts",
-        "src/lib/server/image/resize-for-vlm.ts",
-        "src/lib/ai/client-llm-synthesis.ts"
-      ],
-      "bowTerms": [
-        "types"
-      ],
-      "representativePaths": [],
-      "memberCount": 0,
-      "llmPathCount": 0,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:56:02.286Z",
-      "updatedAt": "2026-04-25T01:56:02.286Z"
-    },
-    {
-      "clusterId": 55,
-      "summary": "This cluster defines a comprehensive set of TypeScript types that mirror the structure of various underlying database tables. These types are used throughout the application to ensure type safety when interacting with the database, covering domains from web crawling to legal document management.",
-      "purpose": "Database Schema Type Definition Layer",
-      "patterns": [
-        "Type Inference",
-        "Schema Definition",
-        "Data Transfer Objects (DTOs)",
-        "Repository Pattern (Implied)"
-      ],
-      "warnings": [
-        "The strong coupling between TypeScript types and the underlying database schema means that any database migration must be immediately followed by an update to these type definitions to prevent runtime type errors."
-      ],
-      "tags": [
-        "src/lib/db/schema.ts",
-        "src/lib/server/db/schema/board.ts",
-        "src/lib/server/db/schema/error_events.ts",
-        "src/lib/server/db/schema/legal-chunks.ts"
-      ],
-      "bowTerms": [],
-      "representativePaths": [
-        "src/lib/db/schema"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 1,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:52:44.482Z",
-      "updatedAt": "2026-04-25T01:52:44.482Z"
-    },
-    {
-      "clusterId": 63,
-      "summary": "This cluster provides utility functions for generating visual representations (glyphs) of recommendations, building database query filters, and selecting the top K results based on associated scores.",
-      "purpose": "Utility and Data Transformation Layer",
-      "patterns": [
-        "Utility Functions",
-        "Builder Pattern (QueryBuilder)",
-        "Data Transformation",
-        "Top-K Selection"
-      ],
-      "warnings": [
-        "The `QueryBuilder` in `query-utils.ts` uses type assertions (`as AnyColumn`, `as AnyCol`) which can mask potential type safety issues and should be reviewed for stricter typing.",
-        "The `topKGlyphs` function assumes a direct index correspondence between `glyphs` and `scores` array, which is brittle if the input arrays are not guaranteed to be parallel and correctly ordered."
-      ],
-      "tags": [
-        "src/lib/server/ml/recommendation-glyph.ts",
-        "src/lib/server/db/query-utils.ts",
-        "src/lib/server/analytics/minified-research-cache.ts"
-      ],
-      "bowTerms": [
-        "auth"
-      ],
-      "representativePaths": [],
-      "memberCount": 0,
-      "llmPathCount": 0,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:54:46.592Z",
-      "updatedAt": "2026-04-25T01:54:46.592Z"
-    },
-    {
-      "clusterId": 65,
-      "summary": "This cluster contains utility functions and components for advanced AI processing, database interaction, and frontend UI component management, alongside core policy and state management logic.",
-      "purpose": "Utility and Component Library",
-      "patterns": [
-        "Utility Functions",
-        "Component Props/Types",
-        "State Management/Policy",
-        "Dependency Injection/Overriding"
-      ],
-      "warnings": [
-        "The `GRPOPolicy` class appears to be missing the definition for `rollbackThreshold` in its constructor, leading to potential incompleteness or runtime errors.",
-        "The `stableSoftmax` function is incomplete (missing the return statement).",
-        "The `readBodyFast` function relies on an undefined `parseFast` function, which needs to be defined or imported.",
-        "The `RowList` type definition uses `any` extensively, which sacrifices type safety and should be reviewed for stricter typing."
-      ],
-      "tags": [
-        "src/lib/ai/client-embed.ts",
-        "src/lib/services/error-analysis/GRPOPolicy.ts",
-        "src/lib/server/grpc/retrieval-client.ts",
-        "src/lib/components/ai/index.ts",
-        "src/lib/server/db/connection.ts"
-      ],
-      "bowTerms": [],
-      "representativePaths": [],
-      "memberCount": 0,
-      "llmPathCount": 0,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-24T00:48:36.931Z",
-      "updatedAt": "2026-04-25T01:54:49.367Z"
-    },
-    {
-      "clusterId": 30,
-      "summary": "Defines a TypeScript type representing the expected response structure after a file upload operation.",
-      "purpose": "Data structure definition",
-      "patterns": [
-        "Type Definition",
-        "Data Transfer Object (DTO)"
-      ],
-      "warnings": [],
-      "tags": [
-        "src/lib/types/evidence.ts"
-      ],
-      "bowTerms": [
-        "gaming",
-        "topic:gaming",
-        "components",
-        "types"
-      ],
-      "representativePaths": [
-        "src/lib/components/ui/gaming/types"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 1,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:54:53.246Z",
-      "updatedAt": "2026-04-25T01:54:53.246Z"
-    },
-    {
-      "clusterId": 73,
-      "summary": "This cluster provides utilities for logging and analyzing various stages of a retrieval-augmented generation (RAG) pipeline, including recording chunk hits, chunking text by sentences, and generating aggregated inference statistics.",
-      "purpose": "Observability and Analytics Layer",
-      "patterns": [
-        "Service Layer",
-        "Logging/Metrics Collection",
-        "Data Aggregation",
-        "Utility Functions"
-      ],
-      "warnings": [
-        "The `recordChunkHits` function performs database writes and should ensure proper transaction management or batching if high throughput is expected.",
-        "The `getStatsByType` function relies on an external CouchDB view, which might introduce latency or failure points if the database is unavailable or the view is improperly configured."
-      ],
-      "tags": [
-        "src/lib/server/analytics/search-analytics.ts",
-        "src/lib/server/streaming/chunked-response.ts",
-        "src/lib/server/observability/inference-log-views.ts"
-      ],
-      "bowTerms": [
-        "types",
-        "topic:vector"
-      ],
-      "representativePaths": [
-        "src/lib/server/retrieval"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 1,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:54:54.584Z",
-      "updatedAt": "2026-04-25T01:54:54.584Z"
-    },
-    {
-      "clusterId": 86,
-      "summary": "This file appears to be a placeholder for defining a database schema or data structure related to court decisions, but it currently only exports a reference to an undefined variable.",
-      "purpose": "Database Schema Definition (Placeholder)",
-      "patterns": [
-        "Placeholder",
-        "Data Structure Definition"
-      ],
-      "warnings": [
-        "The file exports an undefined variable (`cases`), which will cause runtime errors and indicates incomplete implementation. This file should be updated with the actual schema definition or removed if obsolete."
-      ],
-      "tags": [
-        "src/lib/server/db/schema-old.ts"
-      ],
-      "bowTerms": [
-        "evidence",
-        "components",
-        "types",
-        "sym:extract"
-      ],
-      "representativePaths": [
-        "src/lib/shims",
-        "src/lib/data"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 2,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T10:11:34.974Z",
-      "updatedAt": "2026-04-25T10:11:34.974Z"
-    },
-    {
-      "clusterId": 48,
-      "summary": "This cluster provides utility functions for managing background job states, sending multi-channel notifications, retrieving vector database boost scores, and updating ingestion job progress.",
-      "purpose": "Utility and Service Layer",
-      "patterns": [
-        "Service Layer",
-        "Observer/State Management (for job updates)",
-        "Multi-channel Dispatch",
-        "Repository Pattern (implied by Redis interaction)"
-      ],
-      "warnings": [
-        "The `sendNotification` function in `push-service.ts` uses a switch statement and relies on external implementations (`sendWebPush`, etc.), which could lead to complex error handling if any single channel fails.",
-        "The job update functions (`completeAnalysisJob`, `updateAceIngestJob`) modify state directly, suggesting potential race conditions or lack of transactional integrity if multiple processes update the same job concurrently."
-      ],
-      "tags": [
-        "src/lib/server/notifications/push-service.ts",
-        "src/lib/server/analysis/analysis-jobs.ts",
-        "src/lib/server/retrieval/qlora-boost.ts",
-        "src/lib/server/ace-ingest-progress.ts"
-      ],
-      "bowTerms": [
-        "migrations",
-        "auth"
-      ],
-      "representativePaths": [
-        "src/lib/server/db/migrations/meta"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 1,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:55:56.369Z",
-      "updatedAt": "2026-04-25T01:55:56.369Z"
-    },
-    {
-      "clusterId": 31,
-      "summary": "This module provides a utility function to perform a database health check by verifying the existence of a predefined set of essential application tables against the database schema.",
-      "purpose": "Database schema validation and health check",
-      "patterns": [
-        "Dependency Check",
-        "Connection Pooling",
-        "Read-Only Query Pattern"
-      ],
-      "warnings": [
-        "Performance: Querying `information_schema.tables` on startup can be slow and may add significant overhead to the application's initialization time.",
-        "Resource Management: Ensure that the database client connection (`client`) is reliably released back to the pool (e.g., using a `finally` block) even if errors occur during the query execution.",
-        "Maintainability: The list of essential tables is hardcoded; consider externalizing this list into a configuration file or environment variable to improve maintainability."
-      ],
-      "tags": [
-        "src/lib/server/db/ssr-health-check.ts"
-      ],
-      "bowTerms": [
-        "topic:investigate",
-        "topic:suggest",
-        "routes"
-      ],
-      "representativePaths": [
-        "src/routes/api/investigate/suggest"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 1,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:52:40.179Z",
-      "updatedAt": "2026-04-25T01:52:40.179Z"
-    },
-    {
-      "clusterId": 93,
-      "summary": "This cluster manages complex data processing pipelines, including audio transcription, entity extraction, and error event embedding, while providing mechanisms for synchronizing knowledge bases and storing structured data.",
-      "purpose": "Data processing and knowledge graph management pipeline",
-      "patterns": [
-        "Pipeline pattern",
-        "Service layer",
-        "Repository pattern",
-        "Batch processing"
-      ],
-      "warnings": [
-        "The `fullResync` function in `qdrant-sync.ts` is labeled as a 'nuclear option' and involves deleting and recreating a collection, which should be handled with extreme care in production environments.",
-        "The `AudioProcessor` class in `audio-processor.ts` relies on an external `getRedis()` call, which assumes proper initialization and connection handling for Redis.",
-        "The `fullResync` function reads all documents from the `knowledge_documents` table, which could lead to significant performance degradation and memory issues if the table grows very large."
-      ],
-      "tags": [
-        "src/lib/server/workers/audio-processor.ts",
-        "src/lib/server/db/qdrant-sync.ts",
-        "src/lib/server/evidence/batch-entity-storer.ts",
-        "src/lib/server/pipeline/error-embedding-pipeline.ts"
-      ],
-      "bowTerms": [
-        "types"
-      ],
-      "representativePaths": [],
-      "memberCount": 0,
-      "llmPathCount": 0,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-25T01:56:16.786Z",
-      "updatedAt": "2026-04-25T01:56:16.786Z"
-    },
-    {
-      "clusterId": 74,
-      "summary": "This component provides a reusable, state-managed form structure for handling user input, validation, and submission logic within a Svelte application.",
-      "purpose": "UI Component / Form Management",
-      "patterns": [
-        "Component Composition",
-        "State Management (Local/Reactive)",
-        "Props/Attributes Handling",
-        "Event Handling"
-      ],
-      "warnings": [
-        "The comment 'Mock form store until createFormStore is fixed' indicates temporary, potentially unstable state management logic that should be addressed to ensure robustness and maintainability."
-      ],
-      "tags": [
-        "src/lib/components/ui/Form.svelte"
-      ],
-      "bowTerms": [
-        "types",
-        "topic:vector",
-        "auth"
-      ],
-      "representativePaths": [
-        "src/lib/server/agent"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 1,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-24T00:32:47.958Z",
-      "updatedAt": "2026-04-24T00:32:47.958Z"
-    },
-    {
-      "clusterId": 35,
-      "summary": "This cluster contains utility code for caching route metadata using IndexedDB and a component for simulating and displaying Nintendo Entertainment System (NES) memory usage.",
-      "purpose": "Utility and Demonstration Components",
-      "patterns": [
-        "IndexedDB Cache",
-        "Component State Management",
-        "Simulation/Modeling"
-      ],
-      "warnings": [
-        "The IndexedDB implementation lacks proper error handling (e.g., rejection handling for `openCacheDB`).",
-        "The memory palace component relies on external state management (`nesMemory`) which should be thoroughly tested for edge cases and performance under heavy load."
-      ],
-      "tags": [
-        "src/routes/(app)/admin/all-routes/+page.svelte",
-        "src/routes/(app)/demos/memory-palace/+page.svelte"
-      ],
-      "bowTerms": [
-        "legal",
-        "components",
-        "topic:component",
-        "topic:legal",
-        "corpus"
-      ],
-      "representativePaths": [
-        "src/routes/(app)/demos/source-drawer",
-        "src/routes/(app)/library/glossary",
-        "src/lib/components/legal-ai",
-        "src/lib/components/legal-corpus",
-        "src/routes/(app)/cases/[id]"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 5,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-24T00:33:11.854Z",
-      "updatedAt": "2026-04-24T00:33:11.854Z"
-    },
-    {
-      "clusterId": 21,
-      "summary": "This cluster provides utilities for GPU-accelerated computation using WebGPU and manages the ingestion and sharding of documents for Retrieval-Augmented Generation (RAG) pipelines.",
-      "purpose": "Data Processing and Compute Utility Layer",
-      "patterns": [
-        "SDK/Facade Pattern",
-        "Sharding/Chunking",
-        "WebGPU Compute Pipeline",
-        "Message Queue Integration"
-      ],
-      "warnings": [
-        "The WebGPU code uses type casting (`as any`) which suggests potential type safety issues or incomplete type definitions.",
-        "The `publishToQueue` function in `sdk.ts` is a stub, meaning the actual message queuing mechanism is not implemented or is mocked, requiring full implementation for production use.",
-        "The WebGPU buffer writing uses `inputData as unknown as BufferSource`, which is a potentially unsafe type assertion and should be reviewed for robust data handling."
-      ],
-      "tags": [
-        "src/lib/webgpu/legal-compute-shaders.ts",
-        "src/lib/server/rag/sdk.ts",
-        "src/lib/server/rag/types.js"
-      ],
-      "bowTerms": [
-        "legal",
-        "topic:legal",
-        "components",
-        "topic:component",
-        "routes",
-        "auth"
-      ],
-      "representativePaths": [
-        "src/lib/components/dashboard",
-        "src/routes/(app)/simulation",
-        "src/lib/server/pdf",
-        "src/routes/api/rag/todo-suggestions",
-        "src/lib/components/legal"
-      ],
-      "memberCount": 0,
-      "llmPathCount": 6,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-24T00:34:28.599Z",
-      "updatedAt": "2026-04-24T00:34:28.599Z"
-    },
-    {
-      "clusterId": 87,
-      "summary": "This file defines interfaces and structures related to the retrieval and assembly of code chunks, including performance metrics and configuration.",
-      "purpose": "Data structure definition for code retrieval and context assembly",
-      "patterns": [
-        "Data Transfer Object (DTO)",
-        "Interface Definition"
-      ],
-      "warnings": [],
-      "tags": [
-        "src/lib/machines/retrieval-machine.ts"
-      ],
-      "bowTerms": [
-        "sym:get"
-      ],
-      "representativePaths": [],
-      "memberCount": 0,
-      "llmPathCount": 0,
-      "llmTotalHits": 0,
-      "centroidDistanceMean": null,
-      "summaryModel": null,
-      "hasEmbedding": false,
-      "metadata": {},
-      "createdAt": "2026-04-24T00:47:14.766Z",
-      "updatedAt": "2026-04-24T00:47:14.766Z"
     }
   ]
 }
