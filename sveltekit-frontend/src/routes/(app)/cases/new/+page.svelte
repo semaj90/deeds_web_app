@@ -74,7 +74,8 @@
 
 			const res = await fetch('?/analyze', {
 				method: 'POST',
-				body: formData
+				body: formData,
+				signal: AbortSignal.timeout(120_000)
 			});
 
 			const result = await res.json();
@@ -160,7 +161,8 @@
 								description: formData.summary ?? '',
 								status: 'open',
 								priority: 'medium',
-							})
+							}),
+							signal: AbortSignal.timeout(30_000)
 						});
 						const data = await res.json();
 						if (res.ok && data.case?.id) goto('/cases/' + data.case.id);

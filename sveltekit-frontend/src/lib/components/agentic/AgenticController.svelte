@@ -40,11 +40,28 @@
   let selectedFile = $state<File | null>(null);
   let dragActive = $state<boolean>(false);
 
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault();
+    dragActive = true;
+  }
+
+  function handleDragLeave() {
+    dragActive = false;
+  }
+
+  function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    dragActive = false;
+    if (e.dataTransfer?.files.length) {
+      selectedFile = e.dataTransfer.files[0];
+    }
+  }
+
   async function fetchStatus(): Promise<void> {
     loading = true;
     error = '';
     try {
-      const response = await fetch('/api/v1/agentic?action=status');
+      const response = await fetch('/api/v1/agentic?action=status', { signal: AbortSignal.timeout(15_000) });
       if (!response.ok) {
         throw new Error(`Status check failed: ${response.status}`);
       }
@@ -59,7 +76,7 @@
 
   async function fetchRecentErrors(): Promise<void> {
     try {
-      const response = await fetch('/api/v1/agentic?action=recent-errors');
+      const response = await fetch('/api/v1/agentic?action=recent-errors', { signal: AbortSignal.timeout(15_000) });
       if (!response.ok) {
         throw new Error(`Failed to fetch errors: ${response.status}`);
       }
@@ -76,7 +93,7 @@
     loading = true;
     fixSuggestions = [];
     try {
-      const response = await fetch(`/api/v1/agentic?action=fix-suggestions&query=${encodeURIComponent(errorQuery)}`);
+      const response = await fetch(`/api/v1/agentic?action=fix-suggestions&query=${encodeURIComponent(errorQuery)}`, { signal: AbortSignal.timeout(30_000) });
       if (!response.ok) {
         throw new Error(`Fix query failed: ${response.status}`);
       }
@@ -87,23 +104,6 @@
       console.error('Fix query error:', err);
     } finally {
       loading = false;
-    }
-  }
-
-  function handleDragOver(e: DragEvent) {
-    e.preventDefault();
-    dragActive = true;
-  }
-
-  function handleDragLeave() {
-    dragActive = false;
-  }
-
-  function handleDrop(e: DragEvent) {
-    e.preventDefault();
-    dragActive = false;
-    if (e.dataTransfer?.files.length) {
-      selectedFile = e.dataTransfer.files[0];
     }
   }
 
@@ -155,6 +155,22 @@
       </div>
     </div>
   {/if}
+
+  <div
+    class="mb-6 border-2 border-dashed rounded-lg p-4 text-center transition-colors {dragActive ? 'border-info bg-info/10' : 'border-sand/20'}"
+    role="button"
+    tabindex="0"
+    aria-label="Drop screenshot or log file here"
+    ondragover={handleDragOver}
+    ondragleave={handleDragLeave}
+    ondrop={handleDrop}
+  >
+    {#if selectedFile}
+      <p class="text-accent text-sm">📎 {selectedFile.name}</p>
+    {:else}
+      <p class="text-sand/40 text-sm">Drop a screenshot or log file here</p>
+    {/if}
+  </div>
 
   <div class="mb-6">
     <h3 class="text-lg font-semibold text-white mb-2">Query Fix Suggestions</h3>

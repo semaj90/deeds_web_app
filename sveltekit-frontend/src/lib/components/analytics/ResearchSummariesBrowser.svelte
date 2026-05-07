@@ -108,7 +108,7 @@ async function fetchPage(newCursor: string | null = null) {
 			...(activeTags.length && { tags: activeTags.join(',') }),
 			...(newCursor     && { cursor: newCursor }),
 		});
-		const res = await fetch(`/api/analytics/research-summaries?${params}`);
+		const res = await fetch(`/api/analytics/research-summaries?${params}`, { signal: AbortSignal.timeout(30_000) });
 		if (!res.ok) throw new Error(await res.text());
 		data   = await res.json() as BrowsePage;
 		// Rebuild Fuse.js index from current page
@@ -171,6 +171,7 @@ async function saveAsCitation(row: Summary) {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ action: 'save_citation', summaryId: row.id }),
+			signal: AbortSignal.timeout(30_000)
 		});
 		if (!res.ok) throw new Error(await res.text());
 		const json = await res.json() as { citationId: string };
@@ -217,7 +218,7 @@ async function toggleRelated(id: string) {
 	}
 
 	try {
-		const res = await fetch(`/api/analytics/research-summaries/${id}?mode=similar&limit=5`);
+		const res = await fetch(`/api/analytics/research-summaries/${id}?mode=similar&limit=5`, { signal: AbortSignal.timeout(30_000) });
 		if (!res.ok) throw new Error(await res.text());
 		const json = await res.json() as { similar: Summary[] };
 		relatedItems = json.similar ?? [];

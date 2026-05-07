@@ -40,6 +40,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ suggestionId: id }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (response.ok) window.location.reload();
 		} catch (err) {
@@ -49,7 +50,7 @@
 
 	async function dismissSuggestion(id: string) {
 		try {
-			const response = await fetch(`/api/error-brain/suggestions?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+			const response = await fetch(`/api/error-brain/suggestions?id=${encodeURIComponent(id)}`, { method: 'DELETE', signal: AbortSignal.timeout(30_000) });
 			if (response.ok) window.location.reload();
 		} catch (err) {
 			console.error('Failed to dismiss suggestion:', err);

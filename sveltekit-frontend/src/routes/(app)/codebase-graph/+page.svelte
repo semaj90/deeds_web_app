@@ -48,7 +48,7 @@ async function loadGraph() {
 	loading = true;
 	error = null;
 	try {
-		const res = await fetch(`/api/codebase-index/graph?limit=${limit}`);
+		const res = await fetch(`/api/codebase-index/graph?limit=${limit}`, { signal: AbortSignal.timeout(30_000) });
 		if (!res.ok) throw new Error('Failed to load graph data');
 		graphData = await res.json();
 	} catch (err) {

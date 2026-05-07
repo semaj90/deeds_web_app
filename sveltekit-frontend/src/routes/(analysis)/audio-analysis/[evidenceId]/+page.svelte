@@ -43,7 +43,7 @@
 	async function loadAnalysis() {
 		try {
 			loading = true;
-			const response = await fetch(`/api/audio/analysis/${data.evidenceId}`);
+			const response = await fetch(`/api/audio/analysis/${data.evidenceId}`, { signal: AbortSignal.timeout(30_000) });
 			if (!response.ok) throw new Error('Failed to load analysis');
 			const result = await response.json();
 			analysis = {

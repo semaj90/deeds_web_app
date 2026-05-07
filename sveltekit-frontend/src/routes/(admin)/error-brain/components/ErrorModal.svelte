@@ -43,7 +43,8 @@
 
  try {
  const res = await fetch(
- `/api/phase78/error-events?routePath=${encodeURIComponent(routePath)}`
+ `/api/phase78/error-events?routePath=${encodeURIComponent(routePath)}`,
+ { signal: AbortSignal.timeout(30_000) }
  );
 
  if (!res.ok) {
@@ -76,6 +77,7 @@
  const res = await fetch('/api/phase78/route-health', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
+ signal: AbortSignal.timeout(30_000),
 	body: JSON.stringify({
  routePath,
  filePath: '',
@@ -119,6 +121,7 @@
  const res = await fetch('/api/phase78/suggestion-state', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
+ signal: AbortSignal.timeout(30_000),
 	body: JSON.stringify({
 routePath: suggestionId,
  state

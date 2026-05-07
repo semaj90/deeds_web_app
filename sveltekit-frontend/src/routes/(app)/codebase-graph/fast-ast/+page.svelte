@@ -66,7 +66,7 @@
   async function loadAtlas() {
     if (atlasLoaded) return;
     try {
-      const res  = await fetch('/api/graph/glyph-atlas');
+      const res  = await fetch('/api/graph/glyph-atlas', { signal: AbortSignal.timeout(30_000) });
       const body = await res.json();
       atlasManifest = body.manifest ?? null;
       atlasBase64   = body.atlasBase64 ?? null;
@@ -88,7 +88,7 @@
       const params = new URLSearchParams({ limit: String(limit) });
       if (dirsOnly)         params.set('dirsOnly', '1');
       if (lowScore != null) params.set('lowScore', String(lowScore));
-      const res  = await fetch(`/api/codebase-graph/json?${params}`);
+      const res  = await fetch(`/api/codebase-graph/json?${params}`, { signal: AbortSignal.timeout(30_000) });
       const body = await res.json();
       if (!res.ok) { canvasErr = body.error ?? `HTTP ${res.status}`; nodes = []; edges = []; }
       else { nodes = body.nodes ?? []; edges = body.edges ?? []; stats = body.stats ?? null; }
@@ -101,7 +101,7 @@
     if (graphifyLoaded) return;
     graphifyLoading = true;
     try {
-      const res  = await fetch('/api/codebase-graph/json?limit=5000&raw=1');
+      const res  = await fetch('/api/codebase-graph/json?limit=5000&raw=1', { signal: AbortSignal.timeout(30_000) });
       const body = await res.json();
       // raw=1 returns the files[] array directly
       graphFiles = body.files ?? body.nodes?.map((n: ViewerNode) => ({ rel: n.path, clusterId: parseInt(n.cluster) || undefined })) ?? [];
@@ -124,6 +124,7 @@
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ stages, k: 20, maxChunks: 2000, writeBack: true }),
+        signal: AbortSignal.timeout(120_000)
       });
       if (!res.ok || !res.body) { batchError = `HTTP ${res.status}`; return; }
 

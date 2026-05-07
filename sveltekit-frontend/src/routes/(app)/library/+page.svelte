@@ -80,7 +80,7 @@
 		uploadProgress = null;
 
 		try {
-			const res = await fetch('/api/library/upload', { method: 'POST', body: fd });
+			const res = await fetch('/api/library/upload', { method: 'POST', body: fd, signal: AbortSignal.timeout(120_000) });
 			const data = await res.json();
 			if (!res.ok || !data.success) throw new Error(data.error ?? 'Upload failed');
 			if (data.documentId && data.alreadyExists && !data.jobId) {

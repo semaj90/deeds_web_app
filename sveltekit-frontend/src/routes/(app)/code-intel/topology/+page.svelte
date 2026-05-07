@@ -55,7 +55,7 @@
 
 	async function loadTopology() {
 		try {
-			const res = await fetch('/api/code-intel/topology');
+			const res = await fetch('/api/code-intel/topology', { signal: AbortSignal.timeout(30_000) });
 			const data = await res.json();
 			snapshot = data.snapshot;
 			nodes = data.nodes ?? [];
@@ -175,7 +175,7 @@
 		neighborResults = [];
 		try {
 			const nodeId = encodeURIComponent(selectedNode.stable_key);
-			const res = await fetch(`/api/graph/traverse?nodeId=${nodeId}&mode=ego`);
+			const res = await fetch(`/api/graph/traverse?nodeId=${nodeId}&mode=ego`, { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const data = await res.json();
 				neighborResults = (data.nodes ?? data.edges ?? []).slice(0, 20);

@@ -28,7 +28,7 @@
 		graphLoading = true;
 		graphError   = null;
 		try {
-			const res = await fetch('/api/analytics/research-graph');
+			const res = await fetch('/api/analytics/research-graph', { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const json = await res.json();
 				graphData   = (json.graph?.totalSummaries != null ? json.graph : null) as GraphData | null;
@@ -46,6 +46,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ action }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (res.ok) {
 				const json = await res.json();
@@ -105,7 +106,7 @@
 		if (personalizedCases.length > 0) return; // already loaded
 		forYouLoading = true;
 		try {
-			const res = await fetch('/api/recommendations');
+			const res = await fetch('/api/recommendations', { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const json = await res.json();
 				personalizedCases = json.data?.personalizedCases ?? [];
@@ -132,7 +133,7 @@
 		if (searchIntel) return;
 		searchIntelLoading = true;
 		try {
-			const res = await fetch('/api/analytics/search-patterns');
+			const res = await fetch('/api/analytics/search-patterns', { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) searchIntel = await res.json();
 		} catch { /* non-fatal */ }
 		searchIntelLoading = false;
@@ -232,7 +233,7 @@
 		deepResearchError = null;
 		try {
 			const url = refresh ? '/api/analytics/deep-research?refresh=true' : '/api/analytics/deep-research';
-			const res = await fetch(url);
+			const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
 			if (res.ok) {
 				deepResearch = await res.json();
 			} else {
@@ -258,6 +259,7 @@
 					selfPrompt: topic.selfPrompt,
 					pipelineHint: topic.pipelineHint,
 				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (res.ok) {
 				const result = await res.json();
@@ -303,7 +305,7 @@
 		matrixError = null;
 		try {
 			const url = refresh ? '/api/analytics/mapreduce-matrix?refresh=true' : '/api/analytics/mapreduce-matrix';
-			const res = await fetch(url);
+			const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
 			if (res.ok) {
 				matrixData = await res.json();
 			} else {
@@ -349,7 +351,7 @@
 	async function loadPlayground() {
 		if (playgroundAggOnly) return;
 		try {
-			const res = await fetch('/api/analytics/unified-research?days=7');
+			const res = await fetch('/api/analytics/unified-research?days=7', { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const json = await res.json();
 				playgroundAggOnly = json.aggregations;
@@ -373,6 +375,7 @@
 					includeMatrix:   playgroundIncludeMx,
 					includeCodebase: playgroundIncludeCb,
 				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (res.ok) {
 				const json = await res.json();

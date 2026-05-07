@@ -11,7 +11,7 @@
 	async function loadPersons() {
 		loading = true;
 		try {
-			const res = await fetch(`/api/persons?caseId=${id}`);
+			const res = await fetch(`/api/persons?caseId=${id}`, { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const result = await res.json();
 				persons = result.data ?? [];
@@ -37,7 +37,8 @@
 					caseIds: [id],
 					status: 'active',
 					threatLevel: 'low'
-				})
+				}),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (res.ok) {
 				newPerson = { name: '', relationship: 'person_of_interest', description: '' };

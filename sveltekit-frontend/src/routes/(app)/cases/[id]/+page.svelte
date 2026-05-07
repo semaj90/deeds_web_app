@@ -96,7 +96,8 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
      const res = await fetch('/api/rag/search', {
        method: 'POST',
        headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ query, caseId, top_k: 5 })
+       body: JSON.stringify({ query, caseId, top_k: 5 }),
+       signal: AbortSignal.timeout(30_000)
      });
      if (res.ok) {
        const data = await res.json();
@@ -111,7 +112,8 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
      const res = await fetch('/api/evidence/search', {
        method: 'POST',
        headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ query: caseData?.title ?? '', caseId, limit: 5 })
+       body: JSON.stringify({ query: caseData?.title ?? '', caseId, limit: 5 }),
+       signal: AbortSignal.timeout(30_000)
      });
      if (res.ok) {
        const data = await res.json();
@@ -125,7 +127,8 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
      const res = await fetch('/api/knowledge/search', {
        method: 'POST',
        headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ query, topK: 5 })
+       body: JSON.stringify({ query, topK: 5 }),
+       signal: AbortSignal.timeout(30_000)
      });
      if (res.ok) {
        const data = await res.json();
@@ -296,7 +299,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  }
 
  // Cache miss - fetch from API
- const response = await fetch(`/api/cases/${caseId}`);
+ const response = await fetch(`/api/cases/${caseId}`, { signal: AbortSignal.timeout(30_000) });
  if (!response.ok) {
  if (response.status === 401) {
  await goto('/login');
@@ -324,7 +327,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  const loadSimilarCases = async () => {
    isLoadingSimilar = true;
    try {
-     const response = await fetch(`/api/cases/${caseId}/similar`);
+     const response = await fetch(`/api/cases/${caseId}/similar`, { signal: AbortSignal.timeout(30_000) });
      if (!response.ok) return;
      const data = await response.json();
      similarCases = (data.cases ?? data ?? []).map((c: any) => ({
@@ -354,7 +357,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  }
 
  // Cache miss - fetch from API
- const response = await fetch(`/api/cases/${caseId}/evidence`);
+ const response = await fetch(`/api/cases/${caseId}/evidence`, { signal: AbortSignal.timeout(30_000) });
  if (!response.ok) throw new Error('Failed to load evidence');
 
  const payload = await response.json();
@@ -379,7 +382,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
     canvasError = '';
 
     try {
-      const response = await fetch(`/api/cases/${caseId}/canvas`);
+      const response = await fetch(`/api/cases/${caseId}/canvas`, { signal: AbortSignal.timeout(30_000) });
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
@@ -404,7 +407,8 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
     const response = await fetch(`/api/cases/${caseId}/canvas`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
+      body: JSON.stringify(state),
+      signal: AbortSignal.timeout(30_000)
     });
 
     const data = await response.json().catch(() => null);
@@ -420,7 +424,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  const loadCitations = async () => {
    isLoadingCitations = true;
    try {
-     const response = await fetch(`/api/cases/${caseId}/citations`);
+     const response = await fetch(`/api/cases/${caseId}/citations`, { signal: AbortSignal.timeout(30_000) });
      if (!response.ok) throw new Error('Failed to load citations');
      const data = await response.json();
      citations = data.data ?? [];
@@ -434,7 +438,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  const loadStatutes = async () => {
    isLoadingStatutes = true;
    try {
-     const response = await fetch(`/api/cases/${caseId}/laws`);
+     const response = await fetch(`/api/cases/${caseId}/laws`, { signal: AbortSignal.timeout(30_000) });
      if (!response.ok) throw new Error('Failed to load statutes');
      const data = await response.json();
      statutes = data.data ?? [];
@@ -465,6 +469,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  const response = await fetch('/api/evidence/upload', {
  method: 'POST',
  body: formData,
+ signal: AbortSignal.timeout(120_000)
  });
 
  if (!response.ok) {
@@ -495,6 +500,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  try {
  const response = await fetch(`/api/evidence/${selectedEvidence.id}/suggest-summary`, {
  method: 'POST',
+ signal: AbortSignal.timeout(120_000)
  });
 
  if (!response.ok) throw new Error('Failed to generate summary');
@@ -515,6 +521,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(data),
+ signal: AbortSignal.timeout(30_000)
  });
 
  if (!response.ok) throw new Error('Failed to approve summary');
@@ -536,6 +543,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({action: 'reject', rejectionReason: 'Rejected by prosecutor' }),
+ signal: AbortSignal.timeout(30_000)
  });
 
  if (!response.ok) throw new Error('Failed to reject evidence');
@@ -558,6 +566,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  try {
  const response = await fetch(`/api/cases/${caseId}/export/pdf`, {
  method: 'POST',
+ signal: AbortSignal.timeout(120_000)
  });
 
  if (!response.ok) {
@@ -1037,7 +1046,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  <!-- Contract Analysis Tab -->
  <ContractAnalyzer
    onAnalyze={async (id) => {
-    await fetch('/api/agent/investigate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: `Analyze contract ${id} for case ${caseId}: clauses, risks, obligations.`, caseId }) });
+    await fetch('/api/agent/investigate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: `Analyze contract ${id} for case ${caseId}: clauses, risks, obligations.`, caseId }), signal: AbortSignal.timeout(120_000) });
    }}
    onExport={(format) => {
     const link = document.createElement('a');
@@ -1086,7 +1095,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
      userId={caseData?.id ?? 'anonymous'}
      evidenceId={selectedEvidence?.id ?? ''}
      onAddAnnotation={async (content, position) => {
-    await fetch('/api/cases/' + caseId + '/annotations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, position, evidenceId: selectedEvidence?.id }) }).catch(() => {});
+    await fetch('/api/cases/' + caseId + '/annotations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, position, evidenceId: selectedEvidence?.id }), signal: AbortSignal.timeout(30_000) }).catch(() => {});
    }}
    />
  </div>

@@ -22,7 +22,7 @@
 	async function fetchSuggestions(q: string) {
 		if (q.trim().length < 2) { suggestions = []; return; }
 		try {
-			const res = await fetch(`/api/library/suggestions?q=${encodeURIComponent(q.trim())}`);
+			const res = await fetch(`/api/library/suggestions?q=${encodeURIComponent(q.trim())}`, { signal: AbortSignal.timeout(15_000) });
 			if (res.ok) {
 				const d = await res.json() as { suggestions: Array<{ suggestion: string }> };
 				suggestions = (d.suggestions ?? []).map((s) => s.suggestion).slice(0, 8);
@@ -91,6 +91,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ query: searchQ, limit: 10 }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (res.ok) {
 				const d = await res.json();

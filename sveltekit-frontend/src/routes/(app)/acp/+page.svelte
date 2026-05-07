@@ -30,7 +30,7 @@
 
 	async function loadTools() {
 		try {
-			const res = await fetch('/api/acp/tools');
+			const res = await fetch('/api/acp/tools', { signal: AbortSignal.timeout(15_000) });
 			const data = await res.json();
 			tools = data.tools || [];
 			categories = [...new Set(tools.map((t: any) => t.category))];
@@ -44,7 +44,8 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ tool: 'system:health', args: {} })
+	body: JSON.stringify({ tool: 'system:health', args: {} }),
+				signal: AbortSignal.timeout(15_000)
 			});
 			const data = await res.json();
 			systemHealth = data.result?.services ?? {};
@@ -65,7 +66,8 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ tool: selectedTool, args })
+	body: JSON.stringify({ tool: selectedTool, args }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const data = await res.json();
 			result = data;

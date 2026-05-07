@@ -44,7 +44,8 @@
 				body: JSON.stringify({
 					message: `Analyze this codebase node and suggest fixes: "${node.name}" (type: ${node.type}, errors: ${node.errors}, complexity: ${node.complexity}, recommended action: ${node.recommended_action}). List 3 specific, actionable fixes.`,
 					model: 'gemma4-legal'
-				})
+				}),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const data = await res.json();
 			fixAIResult = data.response ?? data.message ?? 'No suggestion generated.';
@@ -89,7 +90,7 @@
 
 	async function loadTopology() {
 		try {
-			const response = await fetch('/api/topology');
+			const response = await fetch('/api/topology', { signal: AbortSignal.timeout(30_000) });
 			const data = await response.json();
 
 			const nodes = data.components.map((comp: any, i: number) => ({

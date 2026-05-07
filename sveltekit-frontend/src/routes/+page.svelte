@@ -33,7 +33,8 @@
 			const res = await fetch(endpoint, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(body)
+				body: JSON.stringify(body),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) throw new Error(`${res.status}`);
 			const json = await res.json();
@@ -88,7 +89,8 @@
 			const res = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: loginEmail, password: loginPassword })
+				body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			const json = await res.json();
 			if (!res.ok) {
@@ -116,7 +118,8 @@
 					firstName: regFirstName,
 					lastName: regLastName,
 					password: regPassword
-				})
+				}),
+				signal: AbortSignal.timeout(30_000)
 			});
 			const json = await res.json();
 			if (!res.ok) {
@@ -139,7 +142,8 @@
 			const res = await fetch('/api/auth/demo-login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: 'demo@legal-ai.local', role: 'admin' })
+				body: JSON.stringify({ email: 'demo@legal-ai.local', role: 'admin' }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) {
 				authError = 'Demo login failed';

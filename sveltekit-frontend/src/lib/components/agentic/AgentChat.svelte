@@ -29,8 +29,8 @@
       const response = await fetch('/api/agents/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-prompt: input })
+        signal: AbortSignal.timeout(60_000),
+	body: JSON.stringify({ prompt: input })
       });
 
       if (!response.ok) {

@@ -53,7 +53,7 @@
 			fd.append('corpusType', 'constitution');
 			fd.append('jurisdiction', uploadModal.stateCode);
 			fd.append('jurisdictionType', 'state');
-			const res = await fetch('/api/library/upload', { method: 'POST', body: fd });
+			const res = await fetch('/api/library/upload', { method: 'POST', body: fd, signal: AbortSignal.timeout(120_000) });
 			const d = await res.json();
 			if (!res.ok) {
 				uploadError = d.error ?? 'Upload failed';
@@ -111,6 +111,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ stateCode: src.stateCode }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			if (!res.ok) {
 				const d = await res.json();
@@ -130,6 +131,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ all: true }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const d = await res.json();
 			bulkMessage = res.ok

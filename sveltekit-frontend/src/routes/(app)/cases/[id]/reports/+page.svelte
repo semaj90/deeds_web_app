@@ -46,7 +46,8 @@
 			const res = await fetch('/api/reports/generate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ caseId: caseData.id, type: 'charging_memo' })
+				body: JSON.stringify({ caseId: caseData.id, type: 'charging_memo' }),
+				signal: AbortSignal.timeout(120_000)
 			});
 			const responseData = await res.json();
 
@@ -74,7 +75,8 @@
 						reportId: selectedReport.id,
 						title: editorTitle,
 						contentHtml: editorContent
-					})
+					}),
+					signal: AbortSignal.timeout(30_000)
 				});
 				const responseData = await res.json();
 				if (responseData.success) {
@@ -89,7 +91,8 @@
 						title: editorTitle,
 						contentHtml: editorContent,
 						status: 'draft'
-					})
+					}),
+					signal: AbortSignal.timeout(30_000)
 				});
 				const responseData = await res.json();
 				if (responseData.success && responseData.data) {
@@ -108,7 +111,7 @@
 		if (!selectedReport?.id) return;
 		isExporting = true;
 		try {
-			const res = await fetch(`/api/reports/${selectedReport.id}/export?format=${format}`);
+			const res = await fetch(`/api/reports/${selectedReport.id}/export?format=${format}`, { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const blob = await res.blob();
 				const url = URL.createObjectURL(blob);
@@ -130,7 +133,8 @@
 		isPublishing = true;
 		try {
 			const res = await fetch(`/api/reports/${selectedReport.id}/publish`, {
-				method: 'POST'
+				method: 'POST',
+				signal: AbortSignal.timeout(30_000)
 			});
 			const responseData = await res.json();
 			if (responseData.success) {
@@ -150,7 +154,8 @@
 			const res = await fetch('/api/reports', {
 				method: 'DELETE',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ids: [reportId] })
+				body: JSON.stringify({ ids: [reportId] }),
+				signal: AbortSignal.timeout(30_000)
 			});
 			if (res.ok) {
 				showResumeModal = false;

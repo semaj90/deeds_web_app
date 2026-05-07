@@ -13,7 +13,7 @@
 
 	interface ToolCall {
 		tool: string;
-		input: any;
+		input: Record<string, unknown>;
 		output: string;
 		duration: number;
 	}
@@ -22,7 +22,7 @@
 		answer: string;
 		toolCalls: ToolCall[];
 		reasoning: string[];
-		aceContext?: any;
+		aceContext?: Record<string, unknown>;
 		duration: number;
 		metadata?: {
 			userId?: string;
@@ -79,7 +79,7 @@
 
 		loadingCapabilities = true;
 		try {
-			const res = await fetch('/api/agent/investigate');
+			const res = await fetch('/api/agent/investigate', { signal: AbortSignal.timeout(15_000) });
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			capabilities = await res.json();
 		} catch (err) {
@@ -108,6 +108,7 @@
 			const res = await fetch('/api/agent/investigate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
+				signal: AbortSignal.timeout(120_000),
 				body: JSON.stringify({
 					query,
 					useACE,
