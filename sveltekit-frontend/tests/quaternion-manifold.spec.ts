@@ -20,6 +20,11 @@ import {
   manifold4Similarity,
   DEFAULT_MANIFOLD4_RANGES,
   type Manifold4Ranges,
+  standardizeManifold4,
+  applyQuaternionAxisMultiplier,
+  toStandardizedBiasedQuaternion,
+  hmmAxisMultiplierTuple,
+  DEFAULT_MANIFOLD4_STANDARDIZATION,
 } from '../src/lib/server/search/quaternion-manifold.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -505,5 +510,121 @@ describe('biasedUnitQuaternion', () => {
     const plainQ  = biasedUnitQuaternion(m4 as unknown as import('../src/lib/server/retrieval/manifold4-search.js').Manifold4Point, neutral);
     // semantic_z maps to quaternion z-component — biased should have larger |z|
     expect(Math.abs(biasedQ[3])).toBeGreaterThan(Math.abs(plainQ[3]));
+  });
+});
+
+// ── standardizeManifold4 (American spelling — separate x/y maxima) ────────────
+
+describe('standardizeManifold4', () => {
+  it('standardizes large SOM coordinates before quaternion normalization', () => {
+    // raw [400, 20, 0.5, 1] with somXMax=400, somYMax=40 → [1, 0.5, 0.5, 1]
+    const result = standardizeManifold4(
+      m4(400, 20, 0.5, 1),
+      { somXMax: 400, somYMax: 40, semanticZMax: 1, grpoWMax: 1 },
+    );
+    expect(result[0]).toBeCloseTo(1,   10);  // som_x   / 400 = 1
+    expect(result[1]).toBeCloseTo(0.5, 10);  // som_y   / 40  = 0.5
+    expect(result[2]).toBeCloseTo(0.5, 10);  // sem_z   / 1   = 0.5
+    expect(result[3]).toBeCloseTo(1,   10);  // grpo_w  / 1   = 1
+  });
+
+  it('preserves reward contribution after standardization', () => {
+    // Without standardization a raw SOM coord of 421 crushes grpo_w in the quaternion.
+    // q = toUnitQuaternion([421, 88, 0.5, 0.83]):  q[0] ≈ norm ≈ grpo_w / ‖v‖ << 0.01
+    // After standardization (default 40×40 grid) grpo_w stays O(1) → q[0] >> 0.5
+    const raw = m4(421, 88, 0.5, 0.83);
+    const qRaw = toUnitQuaternion(raw);
+
+    const std = standardizeManifold4(raw);
+    const qStd = toUnitQuaternion(std);
+
+    // Raw quaternion: reward component (w=q[0]) is nearly zero
+    expect(Math.abs(qRaw[0])).toBeLessThan(0.01);
+    // Standardized quaternion: reward component is substantial (SOM axes clamp to 1,
+    // so grpo_w = 0.83 contributes ~0.48 of the unit quaternion — vs ~0.002 raw)
+    expect(Math.abs(qStd[0])).toBeGreaterThan(0.4);
+  });
+
+  it('clamps values exceeding maxima to 1', () => {
+    const result = standardizeManifold4(m4(100, 100, 2, 3), { somXMax: 40, somYMax: 40, semanticZMax: 1, grpoWMax: 1 });
+    for (const v of result) expect(Math.abs(v)).toBeLessThanOrEqual(1);
+  });
+
+  it('treats non-finite maxima as 1 (safe fallback)', () => {
+    const result = standardizeManifold4(m4(5, 5, 0.5, 0.5), { somXMax: 0, somYMax: NaN });
+    // both fallback to denominator=1; value itself gets clamped
+    expect(Number.isFinite(result[0])).toBe(true);
+    expect(Number.isFinite(result[1])).toBe(true);
+  });
+
+  it('uses DEFAULT_MANIFOLD4_STANDARDIZATION when config is omitted', () => {
+    // DEFAULT has somXMax=40, somYMax=40 — divides by 40
+    const result = standardizeManifold4(m4(40, 20, 0.5, 0.8));
+    expect(result[0]).toBeCloseTo(1,   10);  // 40/40
+    expect(result[1]).toBeCloseTo(0.5, 10);  // 20/40
+    expect(result[2]).toBeCloseTo(0.5, 10);  // 0.5/1
+    expect(result[3]).toBeCloseTo(0.8, 10);  // 0.8/1
+  });
+});
+
+// ── applyQuaternionAxisMultiplier ─────────────────────────────────────────────
+
+describe('applyQuaternionAxisMultiplier', () => {
+  it('applies multiplier tuple [wS,xS,yS,zS] component-wise to manifold4', () => {
+    // manifold4 = [som_x, som_y, semantic_z, grpo_w]
+    // multiplier = [wScale, xScale, yScale, zScale]
+    // → [som_x*xS, som_y*yS, semantic_z*zS, grpo_w*wS]
+    const result = applyQuaternionAxisMultiplier(
+      m4(1, 2, 3, 4),
+      [2, 3, 4, 5],  // [wS=2, xS=3, yS=4, zS=5]
+    );
+    expect(result[0]).toBeCloseTo(1 * 3, 10); // som_x   * xScale
+    expect(result[1]).toBeCloseTo(2 * 4, 10); // som_y   * yScale
+    expect(result[2]).toBeCloseTo(3 * 5, 10); // sem_z   * zScale
+    expect(result[3]).toBeCloseTo(4 * 2, 10); // grpo_w  * wScale
+  });
+
+  it('neutral multiplier [1,1,1,1] leaves manifold4 unchanged', () => {
+    const pt = m4(7, 3, 0.6, 0.9);
+    const result = applyQuaternionAxisMultiplier(pt, [1, 1, 1, 1]);
+    for (let i = 0; i < 4; i++) expect(result[i]).toBeCloseTo(pt[i], 10);
+  });
+});
+
+// ── toStandardizedBiasedQuaternion ────────────────────────────────────────────
+
+describe('toStandardizedBiasedQuaternion', () => {
+  it('output is a unit quaternion for arbitrary raw inputs', () => {
+    const multiplier = hmmAxisMultiplierTuple('LEGAL_AUTHORITY', 0.9);
+    const q = toStandardizedBiasedQuaternion(m4(421, 88, 0.5, 0.83), multiplier, { somXMax: 40, somYMax: 40 });
+    expect(l2Norm(q)).toBeCloseTo(1, 8);
+  });
+
+  it('reward-boosted multiplier shifts quaternion w-component higher than neutral', () => {
+    // CLAIMS section boosts reward (w-scale > 1), so q[0] (=grpo_w) should be larger
+    const raw = m4(20, 20, 0.5, 0.8);
+    const neutral  = toStandardizedBiasedQuaternion(raw, [1, 1, 1, 1]);
+    const rewarded = toStandardizedBiasedQuaternion(raw, [2, 1, 1, 1]);  // wScale=2
+    expect(Math.abs(rewarded[0])).toBeGreaterThan(Math.abs(neutral[0]));
+  });
+
+  it('applies HMM axis multiplier after standardization end-to-end', () => {
+    // CLAIMS at confidence=1 boosts reward axis — result must differ from neutral
+    const raw   = m4(400, 80, 0.5, 0.8);
+    const multi = hmmAxisMultiplierTuple('CLAIMS', 1);
+    const biasedQ  = toStandardizedBiasedQuaternion(raw, multi,   { somXMax: 40, somYMax: 40 });
+    const neutralQ = toStandardizedBiasedQuaternion(raw, [1,1,1,1], { somXMax: 40, somYMax: 40 });
+    // Should differ (HMM multiplier is non-trivial at confidence=1)
+    const identical = biasedQ.every((v, i) => Math.abs(v - neutralQ[i]) < 1e-9);
+    expect(identical).toBe(false);
+    // And CLAIMS boosts reward (q[0] = grpo_w channel)
+    expect(Math.abs(biasedQ[0])).toBeGreaterThan(Math.abs(neutralQ[0]));
+  });
+
+  it('omitting multiplier and config gives same result as standardize→toUnitQuaternion', () => {
+    const raw = m4(20, 10, 0.4, 0.7);
+    const pipeline = toStandardizedBiasedQuaternion(raw);
+    const manual   = toUnitQuaternion(standardizeManifold4(raw));
+    for (let i = 0; i < 4; i++) expect(pipeline[i]).toBeCloseTo(manual[i], 8);
   });
 });

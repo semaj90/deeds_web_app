@@ -485,3 +485,116 @@ export function biasedUnitQuaternionTuple(
   const scaledM4: Manifold4Point = [sx * xScale, sy * yScale, sz * zScale, gw * wScale];
   return toUnitQuaternion(scaledM4);
 }
+
+// ── Standardised pipeline (primary ACE-facing API) ───────────────────────────
+//
+// Rule: NEVER apply HMM multipliers to raw manifold4 coordinates.
+// Always:  standardize → weight → normalize → compare
+//
+// The functions below form the canonical ACE-facing stack.  Internal helpers
+// (toUnitQuaternion, biasedUnitQuaternion, standardiseManifold4) remain for
+// callers that already normalise upstream.
+
+/**
+ * Per-axis scale configuration for raw manifold4 standardisation.
+ *
+ * SOM coordinates can be large grid indices (0–400+); grpo_w and semantic_z
+ * are already probability/similarity values in [0, 1].  Dividing by these
+ * maxima brings every axis to O(1) before HMM multipliers are applied.
+ */
+export interface Manifold4StandardizationConfig {
+  /** Maximum absolute value for som_x. Example: SOM grid width (default 40). */
+  somXMax: number;
+  /** Maximum absolute value for som_y. Example: SOM grid height (default 40). */
+  somYMax: number;
+  /** Maximum absolute value for semantic_z. Default 1 (cosine range). */
+  semanticZMax: number;
+  /** Maximum absolute value for grpo_w (reward). Default 1. */
+  grpoWMax: number;
+}
+
+export const DEFAULT_MANIFOLD4_STANDARDIZATION: Manifold4StandardizationConfig = {
+  somXMax:      40,
+  somYMax:      40,
+  semanticZMax: 1,
+  grpoWMax:     1,
+};
+
+/** Axis scale tuple `[wScale, xScale, yScale, zScale]` from `hmmAxisMultiplierTuple`. */
+export type QuaternionAxisMultiplier = [number, number, number, number];
+
+function _clampUnit(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(-1, Math.min(1, value));
+}
+
+function _safeScale(value: number, maxAbs: number): number {
+  const denom = Number.isFinite(maxAbs) && Math.abs(maxAbs) > 0 ? Math.abs(maxAbs) : 1;
+  return _clampUnit(value / denom);
+}
+
+/**
+ * Standardise raw manifold4 axes so each component is in [-1, 1].
+ *
+ * Uses separate X/Y maxima so non-square SOM grids are handled correctly.
+ * American-spelling alias for callers who prefer `standardize`.
+ */
+export function standardizeManifold4(
+  m4:     Manifold4Point,
+  config: Partial<Manifold4StandardizationConfig> = {},
+): Manifold4Point {
+  const cfg = { ...DEFAULT_MANIFOLD4_STANDARDIZATION, ...config };
+  const [somX, somY, semanticZ, grpoW] = m4;
+  return [
+    _safeScale(somX,     cfg.somXMax),
+    _safeScale(somY,     cfg.somYMax),
+    _safeScale(semanticZ, cfg.semanticZMax),
+    _safeScale(grpoW,    cfg.grpoWMax),
+  ] as Manifold4Point;
+}
+
+/**
+ * Apply a `QuaternionAxisMultiplier` tuple `[wScale, xScale, yScale, zScale]`
+ * to a manifold4 point.  The tuple maps:
+ *   multiplier[0] = wScale → grpo_w
+ *   multiplier[1] = xScale → som_x
+ *   multiplier[2] = yScale → som_y
+ *   multiplier[3] = zScale → semantic_z
+ *
+ * Call this AFTER `standardizeManifold4` and BEFORE `toUnitQuaternion`.
+ */
+export function applyQuaternionAxisMultiplier(
+  m4:         Manifold4Point,
+  multiplier: QuaternionAxisMultiplier,
+): Manifold4Point {
+  const [somX, somY, semanticZ, grpoW] = m4;
+  const [wScale, xScale, yScale, zScale] = multiplier;
+  return [somX * xScale, somY * yScale, semanticZ * zScale, grpoW * wScale] as Manifold4Point;
+}
+
+/**
+ * Full safe pipeline: raw manifold4 → unit quaternion on S³.
+ *
+ *   1. standardizeManifold4(m4, config)   → axes in [-1, 1]
+ *   2. applyQuaternionAxisMultiplier(std, multiplier) → HMM-biased manifold4
+ *   3. toUnitQuaternion(biased)            → UnitQuaternion on S³
+ *
+ * This is the canonical ACE-facing function.  Use `hmmAxisMultiplierTuple()`
+ * to compute `multiplier` from an HMM section prediction.
+ *
+ * Example:
+ *   const multiplier = hmmAxisMultiplierTuple('CLAIMS', 0.9);
+ *   const q = toStandardizedBiasedQuaternion(rawManifold4, multiplier, {
+ *     somXMax: somGridWidth,
+ *     somYMax: somGridHeight,
+ *   });
+ */
+export function toStandardizedBiasedQuaternion(
+  m4:         Manifold4Point,
+  multiplier: QuaternionAxisMultiplier = [1, 1, 1, 1],
+  config:     Partial<Manifold4StandardizationConfig> = {},
+): UnitQuaternion {
+  const standardized = standardizeManifold4(m4, config);
+  const biased       = applyQuaternionAxisMultiplier(standardized, multiplier);
+  return toUnitQuaternion(biased);
+}
