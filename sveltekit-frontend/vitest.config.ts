@@ -139,6 +139,9 @@ export default defineConfig({
       'tests/build-codebase-relationships.spec.ts',
       // reduce-neo4j.mjs: deduplication, caps, counters, symbol/import split
       'tests/mapreduce/reduce-neo4j.spec.ts',
+      // MCP tool input hardening + rerank feedback aggregation
+      'tests/mcp-trace-tools.spec.ts',
+      'tests/qdrant-rerank-feedback.spec.ts',
     ],
     exclude: [
       'node_modules/**',
