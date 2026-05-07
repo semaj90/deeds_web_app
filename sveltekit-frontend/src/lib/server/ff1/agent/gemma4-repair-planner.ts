@@ -23,8 +23,8 @@ const MAX_BYTES    = 50_000;
 const CTX_LINES    = 10;   // lines before + after error
 const MAX_DISPLAY  = 80;   // total lines shown if no line hint
 const TURBO_BASE   = process.env.GEMMA_BASE   ?? 'http://localhost:8090';
-const OLLAMA_URL   = process.env.OLLAMA_URL   ?? 'http://localhost:11434';
-const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://localhost:6333';
+const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
+const QDRANT_URL   = ENV.QDRANT_URL;
 const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
 
 // ── File context ──────────────────────────────────────────────────────────

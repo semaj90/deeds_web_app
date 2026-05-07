@@ -708,7 +708,7 @@ export function parseToolRequest(content: string): OllamaToolCall[] {
 // ── TRACE MCP proxy helper ────────────────────────────────────────────────────
 // Calls a tool on the standalone TRACE MCP HTTP server at :8788.
 // Non-fatal: returns null if the server is not running.
-const TRACE_MCP_URL = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
+const TRACE_MCP_URL = ENV.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
 
 async function callTraceMcp(toolName: string, toolArgs: Record<string, unknown>): Promise<unknown> {
   try {

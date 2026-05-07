@@ -117,7 +117,7 @@ export const VECTOR_SEARCH_CONFIG = {
 	},
 	qdrant: {
 	enabled: process.env.QDRANT_ENABLED === 'true',
-		url: process.env.QDRANT_URL || 'http://localhost:6333',
+		url: ENV.QDRANT_URL,
 		apiKey: process.env.QDRANT_API_KEY,
 		collectionName: process.env.QDRANT_COLLECTION || 'legal_documents',
 		dimensions: parseInt(process.env.QDRANT_DIMENSIONS || '768', 10),
@@ -162,7 +162,7 @@ export const DATABASE_CONFIG = {
 // REDIS CONFIGURATION
 // ============================================================================
 export const REDIS_CONFIG = {
-	url: process.env.REDIS_URL || 'redis://localhost:6379',
+	url: ENV.REDIS_URL,
 	host: process.env.REDIS_HOST || 'localhost',
 	port: parseInt(process.env.REDIS_PORT || '6379', 10),
 	password: process.env.REDIS_PASSWORD || undefined,

@@ -14,7 +14,7 @@ import { clusterEmbeddings } from '$lib/server/gpu/libtorch-bridge.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { couchdb } from '$lib/services/couchdb-client.js';
 
-const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = ENV.QDRANT_URL;
 const COLLECTION = 'codebase_chunks_768';
 const COUCH_DB = 'graph_clusters';
 

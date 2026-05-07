@@ -33,6 +33,7 @@ import { db } from '$lib/server/db/client';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { documentTopics } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface ClusteringContext {
 	jobId: string;
@@ -70,7 +71,7 @@ async function fetchDocumentEmbeddings(): Promise<{
 		const startMs = Date.now();
 
 		// Use Qdrant scroll API to fetch all points with their embeddings
-		const response = await fetch(`${process.env.QDRANT_URL || 'http://localhost:6333'}/collections/legal_documents/points?limit=10000&with_vectors=true`, {
+		const response = await fetch(`${ENV.QDRANT_URL}/collections/legal_documents/points?limit=10000&with_vectors=true`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		});

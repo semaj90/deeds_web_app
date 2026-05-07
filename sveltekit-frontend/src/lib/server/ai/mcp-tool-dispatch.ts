@@ -16,6 +16,7 @@ import { fetchCodebaseContext }    from '$lib/server/ace/context-assembler.js';
 import { getRedis }                from '$lib/server/redis.js';
 import { db }                      from '$lib/server/db/client';
 import { sql }                     from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Shared result shape ───────────────────────────────────────────────────────
 
@@ -161,7 +162,7 @@ export async function tool_graph_shortest_path(args: {
   try {
     const { default: neo4j } = await import('neo4j-driver');
     const driver = neo4j.driver(
-      process.env.NEO4J_URI ?? 'bolt://localhost:7687',
+      ENV.NEO4J_URI,
       neo4j.auth.basic(
         process.env.NEO4J_USER     ?? 'neo4j',
         process.env.NEO4J_PASSWORD ?? 'password',

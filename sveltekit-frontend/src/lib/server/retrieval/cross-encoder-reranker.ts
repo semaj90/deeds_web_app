@@ -40,6 +40,7 @@ import { traceCache, traceGraph } from '$lib/server/observability/langfuse.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { fromRerankResult, type UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import { scoreBatchTriton, isRerankerReady } from './triton-reranker.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -258,7 +259,7 @@ async function _scoreOne(query: string, doc: RerankCandidate): Promise<number> {
 
   try {
     const res = await ollamaFetch(
-      `${process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434'}/api/generate`,
+      `${ENV.OLLAMA_BASE_URL}/api/generate`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

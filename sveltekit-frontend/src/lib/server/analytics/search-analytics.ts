@@ -18,6 +18,7 @@ import { createHash } from 'crypto';
 import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
 import { batchCosineSimilarity } from '$lib/server/gpu/libtorch-bridge.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -534,7 +535,7 @@ async function getQuerySketch(query: string): Promise<number[] | null> {
 
 	// Generate via Ollama
 	try {
-		const ollamaUrl = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+		const ollamaUrl = ENV.OLLAMA_BASE_URL;
 		const res = await fetch(`${ollamaUrl}/api/embeddings`, {
 			method:  'POST',
 			headers: { 'Content-Type': 'application/json' },

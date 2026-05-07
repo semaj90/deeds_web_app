@@ -18,6 +18,7 @@ import { rerankCandidates }                       from './gpu-rerank.js';
 import { buildRetrievalTrace, SCORE_WEIGHTS }     from './retrieval-explainer.js';
 import { recordEvent }                            from '$lib/server/trace/trace-collector.js';
 import { createHash }                             from 'crypto';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ function queryHash(query: string, opts: HybridSearchOptions): string {
 async function tryRedisGet(key: string): Promise<string | null> {
   try {
     const { default: Redis } = await import('ioredis');
-    const r = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
+    const r = new Redis(ENV.REDIS_URL);
     const val = await r.get(key);
     await r.quit();
     return val;
@@ -94,7 +95,7 @@ async function tryRedisGet(key: string): Promise<string | null> {
 async function tryRedisSet(key: string, value: string, ttl = 300): Promise<void> {
   try {
     const { default: Redis } = await import('ioredis');
-    const r = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
+    const r = new Redis(ENV.REDIS_URL);
     await r.setex(key, ttl, value);
     await r.quit();
   } catch { /* non-fatal */ }

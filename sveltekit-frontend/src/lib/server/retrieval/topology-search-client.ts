@@ -11,7 +11,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 
-const BASE_URL = ENV.TOPOLOGY_SEARCH_URL ?? 'http://127.0.0.1:8101';
+const BASE_URL = ENV.TOPOLOGY_SEARCH_URL;
 
 export interface TopologySearchHit {
   stableKey:          string | null;

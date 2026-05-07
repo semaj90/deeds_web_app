@@ -115,7 +115,7 @@ async function upsertToQdrant(
 	try {
 		const { QdrantClient } = await import('@qdrant/js-client-rest');
 		const { ENV } = await import('$lib/server/env.server');
-		const client = new QdrantClient({ url: ENV.QDRANT_URL ?? 'http://localhost:6333' });
+		const client = new QdrantClient({ url: ENV.QDRANT_URL });
 
 		const COLLECTION = 'legal_documents';
 		try {
