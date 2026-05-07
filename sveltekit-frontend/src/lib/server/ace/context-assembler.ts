@@ -18,7 +18,7 @@ import { pgRows, db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { aceRetrievalRuns } from '$lib/server/db/schema/metadata-spine.js';
-import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown, ClusterContextPacket } from './types.js';
+import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown, ClusterContextPacket, TileEngineTrace } from './types.js';
 import { TOKEN_BUDGET } from './types.js';
 import { selectPracticeTemplate } from './practice-templates.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
@@ -79,6 +79,7 @@ import { applyClusterCoherenceBoost, extractDominantCluster } from '$lib/server/
 import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
 import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/bag-cache.js';
 import { classifyQuerySection, analyzeACEFlow } from '$lib/server/analysis/hmm-ace-analyzer.js';
+import { buildAdaptivePrefetch } from '$lib/server/ace/adaptive-prefetch.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 import {
   computeManifold4Centroid,
@@ -87,6 +88,11 @@ import {
 } from '$lib/server/retrieval/manifold4-search.js';
 import type { Manifold4Point } from '$lib/server/retrieval/manifold4-search.js';
 import { classifyQuery, TOPO_CLASS, TOPO_CLASS_LABEL } from '$lib/server/tensor/topology-byte-mapper.js';
+import {
+  quaternionSimilarity,
+  toUnitQuaternion,
+  manifold4ToQuaternion,
+} from '$lib/server/search/quaternion-manifold.js';
 import {
   getTopoCandidates,
   setTopoCandidates,
@@ -97,6 +103,9 @@ import type { TopoPrefilterStats } from '$lib/server/cache/topo-candidate-cache.
 import { aceCodeKey, TTL } from '$lib/server/cache-keys.js';
 import { fetchDeepImportGraphExpansion } from './graph-expander.js';
 import { runRetrievalLanes, type MultiLaneOutput } from './retrieval-lanes.js';
+import { buildRetrievalEdge, insertHyperedge } from '$lib/server/hypergraph/hypergraph-builder.js';
+import { recordLastQuery, recordEngramTransition } from '$lib/server/search/engram-bigram.js';
+import { tokenizeBowQuery, weightedBowOverlapScore, boundedBowBoost } from '$lib/server/search/bow-utils.js';
 
 // ── Cluster tags artifact reader (shared with multi-lane-retrieval) ──────────
 import {
@@ -702,9 +711,61 @@ export async function assembleACEContext(opts: {
         userAnalyticsContext: userAnalyticsContext ?? null,
         codebaseContext: codebaseContext ?? null,
         policyDecision: null,
-        retrievalTrace: acpKnowledgeResults?.metadata?.topoPrefilter
-          ? { topoPrefilter: acpKnowledgeResults.metadata.topoPrefilter }
-          : undefined,
+        retrievalTrace: (() => {
+          const { section: hmmSection, confidence: hmmConf } = classifyQuerySection(query);
+          const topChunk = codebaseContext?.[0];
+          const neighborIds = (kagNeighbors ?? []).map((n) => n.nodeId);
+          const adaptiveRecs = buildAdaptivePrefetch({
+            query,
+            hmmSection,
+            hmmConf,
+            topChunkIds: (codebaseContext ?? []).map((c) => c.stableKey ?? c.filePath).filter(Boolean) as string[],
+            topSomRow:   topChunk?.somBmuRow  ?? null,
+            topSomCol:   topChunk?.somBmuCol  ?? null,
+            graphNeighborIds: neighborIds,
+          });
+
+          const tileEngine: TileEngineTrace = {
+            hmmState:      hmmSection,
+            hmmConfidence: hmmConf,
+            queryHash:     adaptiveRecs.prefetchKeys.find(k => k.startsWith('ace:engram:dym:'))
+                             ?.replace('ace:engram:dym:', '') ?? query.slice(0, 32),
+            tileMap: {
+              somRow: topChunk?.somBmuRow ?? null,
+              somCol: topChunk?.somBmuCol ?? null,
+              // SOM neighbour cells enumerated by adaptive-prefetch
+              neighboringTilesLoaded: adaptiveRecs.prefetchKeys.filter(k => k.startsWith('som:bow:')).length,
+            },
+            texture: {
+              // BoW cluster bias is applied upstream in applyKarpathyBoost — if top chunk has a
+              // gpuCluster we know the texture was loaded
+              bowClusterBiasUsed: topChunk?.gpuCluster != null,
+              matchedTerms:       [],   // populated by bow-utils if available
+            },
+            quaternion: {
+              // Quaternion rerank fires when manifold4 is present on the top chunk
+              used:        topChunk != null && (topChunk as { manifold4?: unknown }).manifold4 != null,
+              score:       0,           // per-chunk score; 0 here is the global sentinel
+              axisWeights: adaptiveRecs.axisWeights,
+            },
+            graphSort: {
+              used:          neighborIds.length > 0,
+              pagerankUsed:  codebaseContext?.some(c => c.pageRankScore != null) ?? false,
+              hyperedgeUsed: false,    // populated by fetch-rerank when it runs
+            },
+            prefetch: {
+              used:      adaptiveRecs.recommendedChunks.length > 0 || adaptiveRecs.recommendedTools.length > 0,
+              chunks:    adaptiveRecs.recommendedChunks.length,
+              summaries: 0,
+              tools:     adaptiveRecs.recommendedTools.length,
+            },
+          };
+
+          const base = acpKnowledgeResults?.metadata?.topoPrefilter
+            ? { topoPrefilter: acpKnowledgeResults.metadata.topoPrefilter }
+            : ({} as NonNullable<ACEContext['retrievalTrace']>);
+          return { ...base, adaptiveRecommendations: adaptiveRecs, tileEngine };
+        })(),
         clusterContext: await enrichClusterContextWithGds(buildClusterContext(codebaseContext ?? null)),
         multiLaneOutput: multiLaneOutput ?? null,
         multiLane: (() => {
@@ -1152,6 +1213,29 @@ export async function assembleACEContext(opts: {
           ...(codebaseFetchStats.aceCodeCache   && { aceCodeCache:   codebaseFetchStats.aceCodeCache }),
         }
       }).catch((err) => console.warn('[ACE Run Log] failed:', (err as Error)?.message ?? err));
+
+      // Fire-and-forget: record retrieval event as a HyperGraphRAG hyperedge
+      {
+        const chunkIds  = finalContext.ragChunks.slice(0, 20).map(c => c.id).filter(Boolean) as string[];
+        const agentsMdKeys = agentsMd?.resolvedKey ? [agentsMd.resolvedKey] : [];
+        const clusterIds: string[] = [];
+        if (codebaseContext?.length) {
+          const seen = new Set<string>();
+          for (const c of codebaseContext) {
+            const k = c.gpuCluster != null ? `gpu:${c.gpuCluster}` : c.somCluster != null ? `som:${c.somCluster}` : null;
+            if (k && !seen.has(k)) { seen.add(k); clusterIds.push(k); }
+          }
+        }
+        insertHyperedge(buildRetrievalEdge(query, chunkIds, agentsMdKeys, clusterIds))
+          .catch(() => {});
+      }
+
+      // Fire-and-forget: record query bigram for engram DYM suggestions
+      if (userId) {
+        recordLastQuery(userId, query)
+          .then(prev => { if (prev) recordEngramTransition(prev, query).catch(() => {}); })
+          .catch(() => {});
+      }
 
       return finalContext;
     }
@@ -2823,6 +2907,41 @@ export interface CodebaseFetchStats {
     key?: string;
     chunks?: number;
   };
+  karpathy?: {
+    bowClusterBiasUsed: boolean;
+    bowClusterScores: Array<{ clusterId: number; score: number }>;
+  };
+}
+
+// ── BoW cluster pre-scorer ────────────────────────────────────────────────────
+// Fetches all cluster BoW tiles in one Promise.all, scores each by weighted
+// dot-product against query terms, returns clusters sorted by score descending.
+// O(K × T): K = clusters scanned (≤24), T = terms per tile (≤128).
+export type BowClusterScore = { clusterId: number; score: number };
+
+
+
+const MAX_CLUSTERS_TO_SCAN = 24;
+
+async function scoreClustersForQuery(
+  queryTerms: Set<string>,
+  maxClusters = MAX_CLUSTERS_TO_SCAN,
+): Promise<BowClusterScore[]> {
+  const tiles = await Promise.all(
+    Array.from({ length: maxClusters }, (_, i) =>
+      getClusterBowTexture(i).catch(() => null),
+    ),
+  );
+  const scores: Array<{ clusterId: number; score: number }> = [];
+  for (let i = 0; i < tiles.length; i++) {
+    const tile = tiles[i];
+    if (!tile || tile.terms.length === 0) continue;
+    const tileRecord: Record<string, number> = {};
+        for (let j = 0; j < tile.terms.length; j++) tileRecord[tile.terms[j]] = tile.weights[j];
+        const { score } = weightedBowOverlapScore(queryTerms, tileRecord);
+        if (score > 0) scores.push({ clusterId: i, score });
+  }
+  return scores.sort((a, b) => b.score - a.score);
 }
 
 export async function fetchCodebaseContext(
@@ -2920,7 +3039,7 @@ export async function fetchCodebaseContext(
       }
     } catch { /* non-fatal — proceed without topo prefilter */ }
 
-    // ── Stage 2: centroid-based GPU-cluster pre-filter ─────────────────────
+    // ── Stage 2: centroid-based GPU-cluster pre-filter (embedding-space) ──────
     // Resolves query embedding once → Redis MGET nearest centroid (O(k)).
     // Falls back gracefully when centroids aren't seeded.
     let clusterFilter: Record<string, unknown> | undefined;
@@ -2934,11 +3053,43 @@ export async function fetchCodebaseContext(
       }
     } catch { /* non-fatal — continue without cluster pre-filter */ }
 
-    // Merge topo + cluster filters (both must-clauses stack cleanly)
+    // ── Stage 2B: BoW cluster pre-scoring (term-space, no embedding needed) ────
+    // Scores all cluster BoW tiles against query terms in a single Promise.all.
+    // Top-2 clusters are added as Qdrant `should` conditions: when `must` clauses
+    // are also present (topo or centroid), `should` acts as a scoring boost only
+    // (Qdrant semantics) — does not restrict the ANN sweep.
+    // Threshold 0.05 filters noise (tile has no term overlap with query).
+    let bowClusterShould: Array<{ key: string; match: { value: number } }> = [];
+    try {
+      const bowQueryTerms = tokenizeBowQuery(query);
+      if (bowQueryTerms.size > 0) {
+        const ranked = await scoreClustersForQuery(bowQueryTerms);
+        if (statsOut) {
+          statsOut.karpathy = {
+            bowClusterBiasUsed: ranked.length > 0,
+            bowClusterScores: ranked.slice(0, 5),
+          };
+        }
+        bowClusterShould = ranked
+          .slice(0, 2)
+          .filter(c => c.score >= 0.05)
+          .map(c => ({ key: 'neo4j_gpuCluster', match: { value: c.clusterId } }));
+      }
+    } catch { /* non-fatal */ }
+
+    // Merge: topo (must) + centroid cluster (must) + BoW clusters (should).
+    // Qdrant: `should` boosts scores of matching docs without restricting the set.
+    const mustClauses: unknown[] = [
+      ...(topoFilter   ? (topoFilter.must   as unknown[]) : []),
+      ...(clusterFilter ? (clusterFilter.must as unknown[]) : []),
+    ];
     const combinedFilter: Record<string, unknown> | undefined =
-      topoFilter && clusterFilter
-        ? { must: [...(topoFilter.must as unknown[]), ...(clusterFilter.must as unknown[])] }
-        : (topoFilter ?? clusterFilter);
+      mustClauses.length > 0 || bowClusterShould.length > 0
+        ? {
+            ...(mustClauses.length > 0       ? { must:   mustClauses       } : {}),
+            ...(bowClusterShould.length > 0   ? { should: bowClusterShould  } : {}),
+          }
+        : undefined;
 
     // Fetch broader initial set so the reranker has candidates to work with
     const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
@@ -3264,9 +3415,19 @@ async function applyKarpathyBoost(
   }
 
   // Step 2: identify top result's GPU cluster + SOM cell for coherence boosts
-  const topCluster = candidates[0]?.gpuCluster ?? null;
-  const topSomRow  = candidates[0]?.somBmuRow ?? null;
-  const topSomCol  = candidates[0]?.somBmuCol ?? null;
+  const topCluster  = candidates[0]?.gpuCluster ?? null;
+  const topSomRow   = candidates[0]?.somBmuRow ?? null;
+  const topSomCol   = candidates[0]?.somBmuCol ?? null;
+  const topManifold4 = (candidates[0] as Record<string, unknown>)?.manifold4 as number[] | null | undefined;
+
+  // HMM prediction: classify the query into a legal document section,
+  // then derive per-axis scale multipliers for the quaternion bias.
+  // At confidence=0 (unknown), the multiplier is neutral [1,1,1,1].
+  const { section: hmmSection, confidence: hmmConf } = classifyQuerySection(query);
+
+  const topQuat = topManifold4?.length === 4
+    ? manifold4ToQuaternion(topManifold4 as [number, number, number, number], hmmSection, hmmConf)
+    : null;
 
   // Step 4 pre-fetch: load cluster BoW tile + SOM tile (non-blocking, best-effort).
   // graphAuthorityScore is pre-computed nightly by writeAuthorityScoresToQdrant() and
@@ -3296,11 +3457,9 @@ async function applyKarpathyBoost(
   );
 
   // Build query BoW from query terms for overlap scoring
-  const queryTerms = new Set(
-    queryLower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length >= 3)
-  );
+  const queryTerms = tokenizeBowQuery(query);
 
-  // Step 3–6: apply boosts and build breakdown
+    // Step 3–6: apply boosts and build breakdown
   const boosted = candidates.map((c) => {
     const semantic = c.score;
     let qdrantTagBoost = 0;
@@ -3341,26 +3500,31 @@ async function applyKarpathyBoost(
       somBoost = 0.03;
     }
 
-    // BoW term overlap: check chunk content against cluster texture tile terms
+    // BoW term overlap: weighted dot-product against cluster texture tile.
+    // tile.weights are IDF-normalized (sum ≈ 1.0), so high-frequency terms for the
+    // cluster contribute more. Scale factor 0.24 means a weighted overlap of 0.5
+    // (half the cluster vocabulary matching) yields the full +0.12 cap.
     if (clusterTile && clusterTile.terms.length > 0) {
       const chunkTerms = new Set(
         c.content.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length >= 3)
       );
-      let bowMatches = 0;
-      for (const term of clusterTile.terms) {
-        if (queryTerms.has(term) && chunkTerms.has(term)) bowMatches++;
-      }
-      bowBoost = Math.min(bowMatches * 0.03, 0.12);
+      const clusterRecord: Record<string, number> = {};
+            for (let j = 0; j < clusterTile.terms.length; j++) {
+              if (chunkTerms.has(clusterTile.terms[j])) clusterRecord[clusterTile.terms[j]] = clusterTile.weights[j];
+            }
+            const { score: bowScore } = weightedBowOverlapScore(queryTerms, clusterRecord);
+            bowBoost = boundedBowBoost(bowScore);
     } else if (somTile && somTile.terms.length > 0) {
       // Fall back to SOM tile if cluster tile absent
       const chunkTerms = new Set(
         c.content.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length >= 3)
       );
-      let bowMatches = 0;
-      for (const term of somTile.terms) {
-        if (queryTerms.has(term) && chunkTerms.has(term)) bowMatches++;
-      }
-      bowBoost = Math.min(bowMatches * 0.03, 0.12);
+      const somRecord: Record<string, number> = {};
+            for (let j = 0; j < somTile.terms.length; j++) {
+              if (chunkTerms.has(somTile.terms[j])) somRecord[somTile.terms[j]] = somTile.weights[j];
+            }
+            const { score: bowScore } = weightedBowOverlapScore(queryTerms, somRecord);
+            bowBoost = boundedBowBoost(bowScore);
     }
 
     // Same-AGENTS.md-dir boost (architecture review item 3).
@@ -3376,7 +3540,22 @@ async function applyKarpathyBoost(
       }
     }
 
-    const final = semantic + qdrantTagBoost + clusterBoost + somBoost + bowBoost + pagerankBoost + pairedTestBoost + sameAgentsDirBoost;
+    // Quaternion manifold boost: HMM-biased angular similarity on S³.
+    // Both query (topQuat) and chunk quaternions are normalised in the same
+    // axis-scaled space so the dot product is more sensitive to the axes that
+    // matter for the current HMM section.
+    // Neutral at score ≤ 0.5; max +0.06 at perfect match (score = 1.0).
+    let quaternionBoost = 0;
+    if (topQuat && c !== candidates[0]) {
+      const chunkM4 = (c as Record<string, unknown>).manifold4 as number[] | null | undefined;
+      if (chunkM4?.length === 4) {
+        const chunkQuat = manifold4ToQuaternion(chunkM4 as [number, number, number, number], hmmSection, hmmConf);
+        const qScore = quaternionSimilarity(topQuat, chunkQuat);
+        quaternionBoost = Math.max(0, qScore - 0.5) * 0.12;
+      }
+    }
+
+    const final = semantic + qdrantTagBoost + clusterBoost + somBoost + bowBoost + pagerankBoost + pairedTestBoost + sameAgentsDirBoost + quaternionBoost;
     const breakdown: RerankBreakdown = {
       semantic,
       qdrantTag: qdrantTagBoost,
@@ -3386,6 +3565,7 @@ async function applyKarpathyBoost(
       bow: bowBoost,
       pairedTest: pairedTestBoost,
       sameAgentsDir: sameAgentsDirBoost,
+      quaternion: quaternionBoost,
       final,
     };
 

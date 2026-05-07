@@ -98,6 +98,8 @@ export interface RerankBreakdown {
   pairedTest: number;
   /** Boost from chunk being under the resolved AGENTS.md directory (≤0.05 cap) */
   sameAgentsDir?: number;
+  /** Boost from manifold4 quaternion similarity to top candidate (≤0.06 cap) */
+  quaternion?: number;
   /** Final composite score (semantic + all boosts) */
   final: number;
 }
@@ -294,6 +296,10 @@ export interface ACEContext {
       fromCache:       boolean;
       analysisMs:      number;
     };
+    /** MapReduce adaptive prefetch recommendations — chunk/tool warm-up for Gemma4's next call */
+    adaptiveRecommendations?: import('./adaptive-prefetch.js').AdaptiveRecommendations | null;
+    /** Full tile-engine audit trace — HMM state, SOM tile map, BoW, quaternion, graph, prefetch */
+    tileEngine?: TileEngineTrace | null;
   };
   /**
    * Per-cluster Qdrant tag context for the current retrieval pass.
@@ -357,6 +363,125 @@ export interface GeneratedTag {
   category: 'statute' | 'case_law' | 'entity' | 'practice_area' | 'topic' | 'jurisdiction';
   confidence: number;
   source: 'regex' | 'ner' | 'llm' | 'manual';
+}
+
+/**
+ * Unified memory unit type — all rerankers operate on SemanticTile[].
+ *
+ * Tiles are the shared vocabulary for: codebase chunks, legal chunks,
+ * accepted LLM summaries, graph nodes, tool call traces, and cluster
+ * summaries.  Every pipeline stage adds fields and a component score;
+ * the final `score` and `why` are the product of all stages.
+ *
+ * Pipeline:
+ *   Qdrant retrieval → SOM tile map → BoW texture → quaternion orientation
+ *     → graph rerank → memory-gain boost → SemanticTile.score
+ */
+export interface SemanticTile {
+  /** Canonical chunk / summary / node ID */
+  id:   string;
+  kind: 'chunk' | 'summary' | 'trace' | 'tool' | 'graph_node';
+
+  text?: string;
+  tags?: string[];
+
+  /** SOM grid position and cluster assignment */
+  som?: {
+    row:      number;
+    col:      number;
+    cluster?: number;
+  };
+
+  /** BoW texture signal for this tile */
+  bow?: {
+    matchedTerms?:  string[];
+    weightedScore?: number;
+  };
+
+  /**
+   * Raw manifold4 = [som_x, som_y, semantic_z, grpo_w].
+   * Must be standardised before quaternion comparison — see standardiseManifold4().
+   */
+  manifold4?:   [number, number, number, number];
+  /** Unit quaternion on S³ — angular retrieval geometry */
+  manifold4_q?: [number, number, number, number];
+
+  /** Graph signals (from Qdrant payload + Neo4j) */
+  graph?: {
+    pagerank?:       number;
+    hyperedgeWeight?: number;
+    fastAstScore?:   number;
+  };
+
+  /** Memory / RL gain signals (from llm_summaries + context_timeline) */
+  memory?: {
+    gainScore?: number;
+    accepted?:  boolean;
+    cacheHit?:  boolean;
+  };
+
+  /** Final composite score and explanation labels */
+  score?: number;
+  why?:  string[];
+}
+
+/**
+ * Scoring weights used to compute SemanticTile.score.
+ *
+ * All weights sum to 1.0.  HMM section bias adjusts the effective weights
+ * at runtime (e.g. LEGAL_AUTHORITY raises quaternion+graph; FACTS raises
+ * som_adjacency+bow; CLAIMS raises memory_gain).
+ */
+export const TILE_SCORE_WEIGHTS = {
+  qdrant:       0.35,
+  graph:        0.18,
+  hyperedge:    0.12,
+  som_adjacency: 0.10,
+  bow_texture:  0.10,
+  quaternion:   0.10,
+  memory_gain:  0.05,
+} as const;
+
+/**
+ * Retrieval trace for the semantic tile engine.
+ * Logged under `ACEContext.retrievalTrace.tileEngine` so every query has
+ * an auditable record of which pipeline stages fired and what they produced.
+ */
+export interface TileEngineTrace {
+  hmmState:      string;
+  hmmConfidence: number;
+  queryHash:     string;
+
+  tileMap: {
+    somRow:                 number | null;
+    somCol:                 number | null;
+    neighboringTilesLoaded: number;
+  };
+
+  texture: {
+    bowClusterBiasUsed: boolean;
+    matchedTerms:       string[];
+  };
+
+  quaternion: {
+    used:        boolean;
+    score:       number;
+    /** [w=reward, x=som_x, y=som_y, z=semantic_z] scale factors from hmmAxisMultiplier */
+    axisWeights: [number, number, number, number];
+  };
+
+  graphSort: {
+    used:          boolean;
+    pagerankUsed:  boolean;
+    hyperedgeUsed: boolean;
+  };
+
+  prefetch: {
+    used:      boolean;
+    chunks:    number;
+    summaries: number;
+    tools:     number;
+  };
 }
 
 /**
