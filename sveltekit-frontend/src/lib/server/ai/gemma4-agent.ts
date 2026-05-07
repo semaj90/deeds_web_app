@@ -561,6 +561,8 @@ export const GEMMA4_ALLOWED_TOOLS = {
   'kag.record_agent_run':        { write: true,  requiresGainValidation: false },
   'kag.ingest_memory_directory': { write: true,  requiresGainValidation: false },
   'research.encode':             { write: true, requiresGainValidation: true },
+  'topology.search_4d':         { write: false },
+  'search.go_hybrid':           { write: false },
 } as const;
 
 export function truncateToolResult(result: unknown, maxChars = 12_000): unknown {
@@ -595,12 +597,16 @@ const ALLOWED_TOOLS = {
     'search.dev_context',
     // B1 new tools: graph expansion, cluster lenses, ACE hit validator
     'trace.validate_ace_hit',
+    // topology.search_4d + search.go_hybrid (4D manifold + RRF Go service)
+    'topology_search_4d', 'topology.search_4d',
+    'search_go_hybrid', 'search.go_hybrid',
     // LLAMA __ names (TurboQuant native function-call format)
     'search__dev_context', 'graph__expand_neighborhood', 'graph__shortest_path',
     'graph__community_for_node', 'graph__pagerank_top', 'topology__search_near',
     'topology__same_som_cluster', 'clusters__get_members', 'clusters__get_summary_lenses',
     'trace__kag_search', 'trace__explain_retrieval', 'context__get_compressed_card',
     'context__build_kv_packet', 'trace__validate_ace_hit',
+    'topology__search_4d', 'search__go_hybrid',
   ]),
   write: new Set([
     'apply_shadow_patch', 'revert_fix', 'verify_fix',
@@ -1108,6 +1114,40 @@ async function dispatchTool(
       const topoClass = args.topoClass ? String(args.topoClass) : undefined;
       const limit     = Math.min(Number(args.limit ?? 10), 30);
       const data = await callTraceMcp('search.hybrid', { query, limit, ...(topoClass ? { topo_class: topoClass } : {}) });
+      return { tool: name, result: data };
+    }
+
+    if (name === 'topology_search_4d' || name === 'topology.search_4d') {
+      const som_x      = Number(args.som_x ?? 0);
+      const som_y      = Number(args.som_y ?? 0);
+      const semantic_z = args.semantic_z != null ? Number(args.semantic_z) : undefined;
+      const grpo_w     = args.grpo_w     != null ? Number(args.grpo_w)     : undefined;
+      const radius     = Math.min(Math.max(Number(args.radius ?? 0.5), 0.01), 5.0);
+      const limit      = Math.min(Number(args.limit ?? 20), 50);
+      const filters    = args.filters && typeof args.filters === 'object'
+        ? (args.filters as Record<string, unknown>)
+        : undefined;
+      const data = await callTraceMcp('topology.search_4d', {
+        som_x, som_y, radius, limit,
+        ...(semantic_z != null ? { semantic_z } : {}),
+        ...(grpo_w     != null ? { grpo_w }     : {}),
+        ...(filters               ? { filters }   : {}),
+      });
+      return { tool: name, result: data };
+    }
+
+    if (name === 'search_go_hybrid' || name === 'search.go_hybrid') {
+      const query   = String(args.query ?? '');
+      const type    = ['codebase', 'legal', 'hybrid'].includes(String(args.type ?? ''))
+        ? String(args.type) : 'codebase';
+      const limit   = Math.min(Number(args.limit ?? 20), 50);
+      const filters = args.filters && typeof args.filters === 'object'
+        ? (args.filters as Record<string, unknown>)
+        : undefined;
+      const data = await callTraceMcp('search.go_hybrid', {
+        query, type, limit,
+        ...(filters ? { filters } : {}),
+      });
       return { tool: name, result: data };
     }
 
