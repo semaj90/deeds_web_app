@@ -1,46 +1,21 @@
 {
-  "generatedAt": "2026-05-07T15:41:24.533Z",
+  "generatedAt": "2026-05-07T15:55:12.807Z",
   "runId": "2026-05-07T14-55-56",
-  "failureCount": 178,
+  "failureCount": 170,
   "failures": [
     {
-      "gate": "G11",
+      "gate": "G17",
       "file": "src/lib/server/AGENTS.md",
-      "msg": "imports from db/index (should use db/client)"
+      "msg": "hardcoded localhost outside env.server.ts"
     },
     {
-      "gate": "G11",
-      "file": "src/lib/server/db/AGENTS.md",
-      "msg": "imports from db/index (should use db/client)"
-    },
-    {
-      "gate": "G11",
-      "file": "src/lib/server/db/meta/AGENTS.md",
-      "msg": "imports from db/index (should use db/client)"
-    },
-    {
-      "gate": "G11",
-      "file": "src/lib/server/db/schema/AGENTS.md",
-      "msg": "imports from db/index (should use db/client)"
+      "gate": "G17",
+      "file": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
       "file": "src/lib/server/adapters/service-integrations.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/audit/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/analytics/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/agent/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -50,12 +25,22 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/ace/ace-agent.ts",
+      "file": "src/lib/server/agent/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/ace/ace-error-kag.ts",
+      "file": "src/lib/server/agent/tools/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ai/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/analysis/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -65,22 +50,12 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/cache/AGENTS.md",
+      "file": "src/lib/server/ace/ace-error-kag.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/cache/code-llm-index.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/cache/cluster-summary-forest.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/cache/dag-cache.ts",
+      "file": "src/lib/server/ace/ace-agent.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -90,7 +65,52 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/analytics/search-analytics.ts",
+      "file": "src/lib/server/concurrency/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ai/gemma4-agent.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ai/gemma4-tool-controller.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/cache/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/chrrom/predictor.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/cache/cluster-summary-forest.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/chrrom/patterns.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/cache/dag-cache.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/analytics/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/cache/code-llm-index.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -100,7 +120,22 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/database-simple.js",
+      "file": "src/lib/server/chrrom/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/clients/ollama.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/analytics/search-analytics.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -115,62 +150,7 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/clients/ollama.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/langextract-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/data/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/chrrom/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/langextract/google-langextract.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/chrrom/patterns.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/chrrom/predictor.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/langextract/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/analysis/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/hypergraph/hypergraph-search.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/couchdb/memory-mirror.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "file": "src/lib/server/database-simple.js",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -180,97 +160,7 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/couchdb/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/couchdb/mango-indexes.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/hypergraph/hypergraph-builder.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/couchdb/changes-consumer.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/agent/tools/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/connections/connection-pool.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/concurrency/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
       "file": "src/lib/server/docling.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/config/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/evidence/services/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/kb/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/helpers/service-discovery.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/evidence/rabbitmq.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/evidence/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/helpers/docker-discovery.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/evidence/.env.example",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/helpers/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/embedding/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/integrations/obsidian-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -280,117 +170,42 @@
     },
     {
       "gate": "G17",
+      "file": "src/lib/server/audit/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/couchdb/memory-mirror.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/connections/connection-pool.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/couchdb/mango-indexes.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/config/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/couchdb/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/couchdb/changes-consumer.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
       "file": "src/lib/server/endpoints.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/db/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/db/client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/error-brain/middleware.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/grpc/chr97-agent-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/error-brain/transport/redis.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/grpc/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/error-brain/transport/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ff1/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ff1/planner.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/inference/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ff1/storage/redis-cache.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/grpc/tool-router-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/graph/codebase-cluster-detection.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ai/ollama-config.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/grpc/tool-calling-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/graph/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ff1/cli/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/grpc/retrieval-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/graph/community-graph.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/grpc/retrieval-client.test.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ai/model-loader.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ff1/agent/tool-registry.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -400,47 +215,27 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/error-brain/AGENTS.md",
+      "file": "src/lib/server/ai/model-loader.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/grpc/graph-ml-client.ts",
+      "file": "src/lib/server/data/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/ff1/agent/gemma4-repair-planner.ts",
+      "file": "src/lib/server/ai/ollama-config.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/grpc/codeintel-client.ts",
+      "file": "src/lib/server/db/client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/grpc/generation-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ff1/agent/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ai/llama-tool-definitions.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/indexer/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/db/pg.ts",
+      "file": "src/lib/server/db/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -450,42 +245,77 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/indexer/karpathy-wiki.ts",
+      "file": "src/lib/server/embedding/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/workers/AGENTS.md",
+      "file": "src/lib/server/grpc/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/db/mirror-query.ts",
+      "file": "src/lib/server/evidence/.env.example",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/indexer/directory-summarizer.ts",
+      "file": "src/lib/server/evidence/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/db/meta/AGENTS.md",
+      "file": "src/lib/server/grpc/chr97-agent-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/graph/missing-import-recommendations.ts",
+      "file": "src/lib/server/grpc/tool-router-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/graph/neo4j-gds.ts",
+      "file": "src/lib/server/grpc/graph-ml-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/gpu/mapreduce-worker.mjs",
+      "file": "src/lib/server/grpc/tool-calling-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/grpc/retrieval-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/hypergraph/hypergraph-search.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/grpc/retrieval-client.test.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/hypergraph/hypergraph-builder.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/error-brain/transport/redis.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/grpc/generation-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/db/pg.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -495,17 +325,72 @@
     },
     {
       "gate": "G17",
+      "file": "src/lib/server/error-brain/transport/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/db/mirror-query.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/grpc/codeintel-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/helpers/service-discovery.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/evidence/services/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/helpers/docker-discovery.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/evidence/rabbitmq.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
       "file": "src/lib/server/db/migrate-test-rag.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/indexer/web-search-indexer.ts",
+      "file": "src/lib/server/kb/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/indexer/som-summary.ts",
+      "file": "src/lib/server/graph/neo4j-gds.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/helpers/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/graph/missing-import-recommendations.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/gpu/mapreduce-worker.mjs",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/integrations/obsidian-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -515,17 +400,37 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/wiki/wiki-neo4j-sync.ts",
+      "file": "src/lib/server/ff1/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/ollama-cached.ts",
+      "file": "src/lib/server/error-brain/middleware.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/wiki/wiki-couchdb-client.ts",
+      "file": "src/lib/server/inference/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/db/meta/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ff1/agent/tool-registry.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/error-brain/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ff1/agent/gemma4-repair-planner.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -535,12 +440,32 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/neo4j-driver.ts",
+      "file": "src/lib/server/ff1/agent/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/indexer/pipeline/AGENTS.md",
+      "file": "src/lib/server/ff1/planner.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/graph/codebase-cluster-detection.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/graph/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/graph/community-graph.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ff1/cli/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -550,37 +475,7 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/ai/gemma4-tool-controller.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
       "file": "src/lib/server/db/qdrant-integration.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ocr/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/mcp/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ai/gemma4-agent.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/phase72/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/middleware/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -590,62 +485,7 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/vector/qdrant-health.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/obsidian/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/vector/qdrant-api-wrapper.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/db/unified-client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ml/topic-clustering-worker.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ml/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/ai/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/pgai/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/minio.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/vector/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/pdf/AGENTS.md",
+      "file": "src/lib/server/indexer/web-search-indexer.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -655,12 +495,32 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/llm/AGENTS.md",
+      "file": "src/lib/server/db/unified-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/services/langextract-service.ts",
+      "file": "src/lib/server/workers/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/indexer/directory-summarizer.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/indexer/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/indexer/som-summary.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ff1/storage/redis-cache.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -670,7 +530,17 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/minio/health-check.ts",
+      "file": "src/lib/server/indexer/karpathy-wiki.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/indexer/pipeline/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/services/langextract-service.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -680,27 +550,12 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/minio/AGENTS.md",
+      "file": "src/lib/server/rate-limit/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/minio/client.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/validation/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/legal/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/legal/constitution-pipeline.ts",
+      "file": "src/lib/server/ml/topic-clustering-worker.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -710,42 +565,32 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/legal/constitution-fetcher.ts",
+      "file": "src/lib/server/ml/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/research/AGENTS.md",
+      "file": "src/lib/server/wiki/wiki-couchdb-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/search/AGENTS.md",
+      "file": "src/lib/server/minio.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/rate-limit/AGENTS.md",
+      "file": "src/lib/server/middleware/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/rabbitmq.js",
+      "file": "src/lib/server/wiki/wiki-neo4j-sync.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/qdrant-http.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/rabbitmq.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/retrieval/AGENTS.md",
+      "file": "src/lib/server/minio/health-check.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -755,22 +600,17 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/utils/ollama-endpoint.ts",
+      "file": "src/lib/server/minio/client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/tensor/AGENTS.md",
+      "file": "src/lib/server/minio/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/queue/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/utils/ollama-client.ts",
+      "file": "src/lib/server/ollama-cached.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -780,37 +620,12 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/queue/rabbitmq-connection.ts",
+      "file": "src/lib/server/rabbitmq.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/queue/rabbitmq-manager-fixed.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/utils/endpoints.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/simulation/AGENTS.md",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/streaming/chunked-response.ts",
-      "msg": "hardcoded localhost outside env.server.ts"
-    },
-    {
-      "gate": "G17",
-      "file": "src/lib/server/retrieval/graph-informed-retrieval.ts",
+      "file": "src/lib/server/rabbitmq.js",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -820,27 +635,37 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/streaming/AGENTS.md",
+      "file": "src/lib/server/llm/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/utils/AGENTS.md",
+      "file": "src/lib/server/mcp/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/tools/handlers/AGENTS.md",
+      "file": "src/lib/server/observability/inference-log.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/retrieval/topology-search-client.ts",
+      "file": "src/lib/server/phase72/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/retrieval/web-ingest.ts",
+      "file": "src/lib/server/search/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/pdf/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ocr/AGENTS.md",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -850,27 +675,167 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/observability/inference-log.ts",
+      "file": "src/lib/server/tools/handlers/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/pgai/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/neo4j-driver.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/queue/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/obsidian/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/qdrant-http.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/queue/rabbitmq-connection.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/retrieval/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/queue/rabbitmq-manager-fixed.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/legal/constitution-pipeline.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/vector/qdrant-health.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/legal/constitution-fetcher.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/vector/qdrant-api-wrapper.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/legal/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/tensor/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/retrieval/graph-informed-retrieval.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/langextract-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/retrieval/topology-search-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/validation/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/vector/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/langextract/google-langextract.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/streaming/chunked-response.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/streaming/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/retrieval/web-ingest.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/langextract/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/utils/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/utils/endpoints.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/research/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/simulation/AGENTS.md",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/utils/ollama-endpoint.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/utils/ollama-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
       "gate": "G25",
-      "file": "src/lib/machines/evidence-analysis-machine.ts",
-      "msg": "$state/$derived in plain .ts"
-    },
-    {
-      "gate": "G25",
-      "file": "src/lib/webgpu/init.ts",
-      "msg": "$state/$derived in plain .ts"
-    },
-    {
-      "gate": "G25",
-      "file": "src/lib/types/yorha-interface.ts",
-      "msg": "$state/$derived in plain .ts"
-    },
-    {
-      "gate": "G25",
-      "file": "src/lib/components/ui/svelte5-index.ts",
+      "file": "src/lib/server/codeintel/fix-recommender.ts",
       "msg": "$state/$derived in plain .ts"
     },
     {
@@ -881,11 +846,6 @@
     {
       "gate": "G25",
       "file": "src/lib/server/agent/tools/web-search-searxng.ts",
-      "msg": "$state/$derived in plain .ts"
-    },
-    {
-      "gate": "G25",
-      "file": "src/lib/server/codeintel/fix-recommender.ts",
       "msg": "$state/$derived in plain .ts"
     },
     {

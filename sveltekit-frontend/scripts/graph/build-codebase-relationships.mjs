@@ -93,8 +93,8 @@ const clusterAgentsIdx = safeJson(join(DOCS_GRAPH, 'cluster-agents-index.json'))
 const gdsArtifact = safeJson(resolve(ROOT, 'memory/graphify/gds/latest.json')) ?? null;
 // Build index: stableKey/filePath → { communityId, graphAuthorityScore } for O(1) lookup
 const gdsAuthorityIndex = new Map();
-if (gdsArtifact?.topAuthority) {
-  for (const entry of gdsArtifact.topAuthority) {
+if (gdsArtifact?.topAuthorities ?? gdsArtifact?.topAuthority) {
+  for (const entry of (gdsArtifact.topAuthorities ?? gdsArtifact.topAuthority)) {
     const key = entry.stableKey ?? entry.filePath ?? entry.file_path;
     if (key) gdsAuthorityIndex.set(key, { communityId: entry.communityId ?? null, graphAuthorityScore: entry.graphAuthorityScore ?? null });
   }
@@ -163,18 +163,27 @@ function nesFilePath(n) {
   return n.id ?? n.label ?? null;
 }
 
-const graphNodes = nesNodes.slice(0, 2000).map(n => ({
-  id:          n.stableKey ?? n.id ?? n.file_path,
-  filePath:    nesFilePath(n),
-  clusterKey:  n.clusterKey,
-  clusterSrc:  n.clusterSource,
-  tags:        (n.tags ?? []).slice(0, 10),
-  topoClass:   n.topo_class ?? n.topoLabel,
-  somCluster:  n.som_cluster,
-  kind:        n.kind,
-  fanIn:       n.directFanIn,
-  pageRank:    n.pageRankScore,
-}));
+const graphNodes = nesNodes.slice(0, 2000).map(n => {
+  const fp     = nesFilePath(n);
+  const fpNorm = fp ? fp.replace(/^src\//, '') : '';
+  const stem   = fpNorm.split('/').pop() ?? fpNorm;
+  const gds    = fp
+    ? (gdsAuthorityIndex.get(fp) ?? gdsAuthorityIndex.get(fpNorm) ?? gdsAuthorityIndex.get(stem) ?? null)
+    : null;
+  return {
+    id:                   n.stableKey ?? n.id ?? n.file_path,
+    filePath:             fp,
+    clusterKey:           n.clusterKey,
+    clusterSrc:           n.clusterSource,
+    tags:                 (n.tags ?? []).slice(0, 10),
+    topoClass:            n.topo_class ?? n.topoLabel,
+    somCluster:           n.som_cluster,
+    kind:                 n.kind,
+    fanIn:                n.directFanIn,
+    pageRank:             n.pageRankScore,
+    graphAuthorityScore:  gds?.graphAuthorityScore ?? null,
+  };
+});
 
 // ── 3. graph_edges.json ───────────────────────────────────────────────────────
 
@@ -329,9 +338,14 @@ const llmSynthesisMapping = {
   ],
   gpuClusterPackets: gpuClusters.map(c => {
     // Resolve GDS community + authority for this cluster's representative file
-    const repFile = c.topFiles?.[0] ?? '';
+    // GDS keys strip leading 'src/', so normalise for lookup
+    const repFile     = c.topFiles?.[0] ?? '';
+    const repFileNorm = repFile.replace(/^src\//, '');
     const repFileStem = repFile.split('/').pop() ?? repFile;
-    const gdsEntry = gdsAuthorityIndex.get(repFile) ?? gdsAuthorityIndex.get(repFileStem) ?? null;
+    const gdsEntry    = gdsAuthorityIndex.get(repFile)
+                     ?? gdsAuthorityIndex.get(repFileNorm)
+                     ?? gdsAuthorityIndex.get(repFileStem)
+                     ?? null;
     return {
       cluster_key:           c.clusterKey,
       cluster_src:           c.clusterSrc,

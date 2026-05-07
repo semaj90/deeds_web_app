@@ -1,0 +1,199 @@
+{
+  "runId": "417c2d2fd32d",
+  "startedAt": "2026-05-07T16:38:57.139Z",
+  "gdsAvailable": false,
+  "pagerankRows": 0,
+  "communities": 0,
+  "authorityScoresComputed": 2772,
+  "qdrantPatched": 4,
+  "redisCached": 200,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "DEGRADED: GDS unavailable — using Postgres fan-in fallback",
+    "GDS3": "SKIP",
+    "GDS4": "DEGRADED: 2772 files from Postgres fan-in",
+    "GDS5": "SKIP (GDS unavailable)",
+    "GDS6": "PASS",
+    "GDS7": "PASS: 4 patches",
+    "GDS8": "PASS: 200 entries",
+    "GDS9": "PASS"
+  },
+  "finishedAt": "2026-05-07T16:39:00.163Z",
+  "topAuthorities": [
+    {
+      "filePath": "lib/server/ace/context-assembler.ts",
+      "graphAuthorityScore": 0.25,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/relationship-extractor.ts",
+      "graphAuthorityScore": 0.2031,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "mcp/trace-mcp-server.ts",
+      "graphAuthorityScore": 0.1719,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/__tests__/cache-smoke.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/__tests__/hypergraph-store.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/test-utils/setup.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(dev)/test-source-validation/+page.svelte",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/__tests__/cases-schemas.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/search/__tests__/search-schema.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons-of-interest/__tests__/poi-schemas.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/search/__tests__/rag-search-schema.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/generate/__tests__/generate-schema.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/cache-demo/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/cache-simple/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/cache-single-conn/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/ollama-cached/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/redis-direct/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/redis-write/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/tiered-cache/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/webgpu-modules/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/cache/__tests__/cache.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/agentic/__tests__/AgentChat.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/config/vector-config.ts",
+      "graphAuthorityScore": 0.1563,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ml/recommendation-metrics.ts",
+      "graphAuthorityScore": 0.1406,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/admin/all-routes/__tests__/page.test.ts",
+      "graphAuthorityScore": 0.1323,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    }
+  ]
+}

@@ -449,7 +449,8 @@ async function main() {
         UNWIND $rows AS row
         OPTIONAL MATCH (f:CodebaseFile {stable_key: row.sk})
         OPTIONAL MATCH (g:CodebaseFile {file_path: row.fp})
-        WITH coalesce(f, g) AS node, row
+        OPTIONAL MATCH (h:CodebaseFile {filePath: row.fp})
+        WITH coalesce(f, g, h) AS node, row
         WHERE node IS NOT NULL
         SET node.graphAuthorityScore = row.auth,
             node.communityId         = row.comId

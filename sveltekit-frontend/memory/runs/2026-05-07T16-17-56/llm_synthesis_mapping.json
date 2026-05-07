@@ -1,0 +1,841 @@
+{
+  "generatedAt": "2026-05-07T16:17:56.853Z",
+  "purpose": "Per-cluster context packets for llm_synthesis prompt block injection",
+  "gaps": [],
+  "gpuClusterPackets": [
+    {
+      "cluster_key": "cluster:gpu:6",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 269,
+      "topo_classes": [
+        "trace-retrieval",
+        "unclassified",
+        "test-audit-devtool",
+        "legal-evidence",
+        "database-schema"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "server",
+        "ts",
+        "db-schema",
+        "zod",
+        "auth",
+        "test",
+        "js",
+        "json",
+        "api-handler"
+      ],
+      "top_files": [
+        "src/lib/server/ace/ace-agent.ts",
+        "src/lib/server/ace/ace-error-kag.ts",
+        "src/lib/server/ace/ace-hit-tagger.ts",
+        "src/lib/server/ace/auto-tagger.ts",
+        "src/lib/server/ace/chat-memory.ts",
+        "src/lib/server/ace/codeintel-datastore.ts",
+        "src/lib/server/ace/error-kag-writer.ts",
+        "src/lib/server/ace/hmm-wiki-logger.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:6 cluster (269 files). Key domains: trace-retrieval, unclassified, test-audit-devtool, legal-evidence, database-schema. Top tags: src, lib, server, ts, db-schema."
+    },
+    {
+      "cluster_key": "cluster:gpu:92",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 188,
+      "topo_classes": [
+        "unclassified",
+        "ui-component",
+        "legal-evidence",
+        "graph-gpu-topology",
+        "trace-retrieval"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "zod",
+        "ts",
+        "routes",
+        "(app)",
+        "auth",
+        "has-todo",
+        "route"
+      ],
+      "top_files": [
+        "src/lib/client/ui/POIPhotoUploader.svelte",
+        "src/lib/components/ActionPopup.svelte",
+        "src/lib/components/agent/AutonomousInvestigator.svelte",
+        "src/lib/components/agentic/AgentChat.svelte",
+        "src/lib/components/agentic/AgenticController.svelte",
+        "src/lib/components/analysis/AnalysisPanel.svelte",
+        "src/lib/components/analysis/AnalysisToast.svelte",
+        "src/lib/components/analysis/KeyboardShortcutsHelp.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:92 cluster (188 files). Key domains: unclassified, ui-component, legal-evidence, graph-gpu-topology, trace-retrieval. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:34",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 165,
+      "topo_classes": [
+        "ui-component",
+        "unclassified",
+        "graph-gpu-topology"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "ts",
+        "js",
+        "has-todo",
+        "routes",
+        "(app)",
+        "route",
+        "auth"
+      ],
+      "top_files": [
+        "src/lib/components/ui/AccessibilityPanel.svelte",
+        "src/lib/components/ui/AccessibilitySettings.svelte",
+        "src/lib/components/ui/AdaptiveRenderingEngine.svelte",
+        "src/lib/components/ui/AIDialog.svelte",
+        "src/lib/components/ui/AIDropdown.svelte",
+        "src/lib/components/ui/AILoadingIndicator.svelte",
+        "src/lib/components/ui/AuthModal.svelte",
+        "src/lib/components/ui/AutoPopulatedCaseForm.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:34 cluster (165 files). Key domains: ui-component, unclassified, graph-gpu-topology. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:57",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 80,
+      "topo_classes": [
+        "unclassified",
+        "database-schema",
+        "graph-gpu-topology",
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "ts",
+        "svelte",
+        "component",
+        "icons",
+        "zod",
+        "shims",
+        "js",
+        "services",
+        "client",
+        "workers"
+      ],
+      "top_files": [
+        "src/lib/ambient-events.d.ts",
+        "src/lib/client/db/loki-client.ts",
+        "src/lib/client/search-client.ts",
+        "src/lib/client/streaming-handler.ts",
+        "src/lib/client/subscribeEmbedding.svelte.ts",
+        "src/lib/client/ui/POIPhotoModal.svelte",
+        "src/lib/client/workflow-event-stream.ts",
+        "src/lib/client-logging.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:57 cluster (80 files). Key domains: unclassified, database-schema, graph-gpu-topology, trace-retrieval, test-audit-devtool. Top tags: src, lib, ts, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:50",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 79,
+      "topo_classes": [
+        "unclassified",
+        "ui-component",
+        "legal-evidence",
+        "graph-gpu-topology"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "ts",
+        "zod",
+        "has-todo"
+      ],
+      "top_files": [
+        "src/lib/components/components-shims.d.ts",
+        "src/lib/components/ui/alert-dialog/AlertDialogTrigger.svelte",
+        "src/lib/components/ui/ExpandGrid.svelte",
+        "src/lib/components/ui/gaming/n64/Card.svelte",
+        "src/lib/components/ui/gaming/n64/Dialog.svelte",
+        "src/lib/components/ui/gaming/n64/HTML5Canvas.svelte",
+        "src/lib/components/ui/gaming/n64/index.ts",
+        "src/lib/components/ui/gaming/n64/Input.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:50 cluster (79 files). Key domains: unclassified, ui-component, legal-evidence, graph-gpu-topology. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:58",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 57,
+      "topo_classes": [
+        "unclassified",
+        "graph-gpu-topology",
+        "trace-retrieval"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "ts",
+        "server",
+        "machines",
+        "zod",
+        "db-schema",
+        "svelte",
+        "component",
+        "api-handler",
+        "test",
+        "types"
+      ],
+      "top_files": [
+        "src/lib/machines/AIAssistantMachineComponent.svelte",
+        "src/lib/machines/audio-upload-machine.ts",
+        "src/lib/machines/auth-machine.ts",
+        "src/lib/machines/document-upload-machine.ts",
+        "src/lib/machines/evidence-processing-machine.ts",
+        "src/lib/machines/evidenceCustodyMachine.ts",
+        "src/lib/machines/gpu-process-machine.ts",
+        "src/lib/machines/uploadMachine.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:58 cluster (57 files). Key domains: unclassified, graph-gpu-topology, trace-retrieval. Top tags: src, lib, ts, server, machines."
+    },
+    {
+      "cluster_key": "cluster:gpu:5",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 55,
+      "topo_classes": [
+        "ui-component",
+        "graph-gpu-topology",
+        "unclassified"
+      ],
+      "top_tags": [
+        "src",
+        "svelte",
+        "component",
+        "lib",
+        "components",
+        "zod",
+        "routes",
+        "(app)",
+        "route",
+        "auth",
+        "ts",
+        "features"
+      ],
+      "top_files": [
+        "src/lib/components/ai/ACEContextBubble.svelte",
+        "src/lib/components/ai/AIAssistantButton.svelte",
+        "src/lib/components/ai/AIAssistantPanel.svelte",
+        "src/lib/components/ai/AIButton.svelte",
+        "src/lib/components/ai/AIChatWidget.svelte",
+        "src/lib/components/ai/AIRecommendation.svelte",
+        "src/lib/components/ai/AIStatusIndicator.svelte",
+        "src/lib/components/ai/AskAI.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:5 cluster (55 files). Key domains: ui-component, graph-gpu-topology, unclassified. Top tags: src, svelte, component, lib, components."
+    },
+    {
+      "cluster_key": "cluster:gpu:1",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 46,
+      "topo_classes": [
+        "ui-component",
+        "unclassified",
+        "graph-gpu-topology"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "utils",
+        "ts",
+        "zod",
+        "svelte",
+        "components",
+        "component",
+        "js",
+        "auth"
+      ],
+      "top_files": [
+        "src/lib/components/forms/CaseForm.svelte",
+        "src/lib/components/forms/EnhancedCaseForm.svelte",
+        "src/lib/components/forms/EnhancedFileUpload.svelte",
+        "src/lib/components/forms/EvidenceForm.svelte",
+        "src/lib/components/forms/LegalCaseForm.svelte",
+        "src/lib/components/forms/ProgressiveForm.svelte",
+        "src/lib/components/forms/SmartDocumentForm.svelte",
+        "src/lib/utils/accessibility-validator.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:1 cluster (46 files). Key domains: ui-component, unclassified, graph-gpu-topology. Top tags: src, lib, utils, ts, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:21",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 41,
+      "topo_classes": [
+        "unclassified",
+        "ui-component",
+        "legal-evidence",
+        "trace-retrieval"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "svelte",
+        "component",
+        "components",
+        "zod",
+        "ts",
+        "routes",
+        "route",
+        "auth",
+        "(app)",
+        "db-schema"
+      ],
+      "top_files": [
+        "src/lib/ai/e2b/session.ts",
+        "src/lib/components/dashboard/GamificationWidget.svelte",
+        "src/lib/components/evidence/BoardSearchOverlay.svelte",
+        "src/lib/components/legal/AISummaryMiniModal.svelte",
+        "src/lib/components/legal/AISummaryReader.svelte",
+        "src/lib/components/legal/CaseTimeline.svelte",
+        "src/lib/components/legal/ChainOfCustodyTracker.svelte",
+        "src/lib/components/legal/CitationDrawer.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:21 cluster (41 files). Key domains: unclassified, ui-component, legal-evidence, trace-retrieval. Top tags: src, lib, svelte, component, components."
+    },
+    {
+      "cluster_key": "cluster:gpu:59",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 41,
+      "topo_classes": [
+        "legal-evidence",
+        "graph-gpu-topology",
+        "unclassified"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "zod",
+        "ts",
+        "server"
+      ],
+      "top_files": [
+        "src/lib/components/evidence/board-persistence.svelte.ts",
+        "src/lib/components/evidence/BoardMinimap.svelte",
+        "src/lib/components/evidence/CaseEvidenceOrganizer.svelte",
+        "src/lib/components/evidence/DoclingExtractionViewer.svelte",
+        "src/lib/components/evidence/DraggableEvidenceNode.svelte",
+        "src/lib/components/evidence/EvidenceAdvancedToolsMenu.svelte",
+        "src/lib/components/evidence/EvidenceAiAssistantDrawer.svelte",
+        "src/lib/components/evidence/EvidenceAssistant.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:59 cluster (41 files). Key domains: legal-evidence, graph-gpu-topology, unclassified. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:35",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 35,
+      "topo_classes": [
+        "legal-evidence",
+        "ui-component"
+      ],
+      "top_tags": [
+        "svelte",
+        "src",
+        "component",
+        "lib",
+        "components",
+        "routes",
+        "(app)",
+        "route",
+        "auth"
+      ],
+      "top_files": [
+        "src/lib/components/legal/GlossaryTermCard.svelte",
+        "src/lib/components/legal/LegalResearchSpellbook.svelte",
+        "src/lib/components/legal-ai/AttachToCaseModal.svelte",
+        "src/lib/components/legal-ai/CaseChatPanel.svelte",
+        "src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+        "src/lib/components/legal-ai/CaseStatuteLinks.svelte",
+        "src/lib/components/legal-ai/CitationCollections.svelte",
+        "src/lib/components/legal-ai/CitationDetail.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:35 cluster (35 files). Key domains: legal-evidence, ui-component. Top tags: svelte, src, component, lib, components."
+    },
+    {
+      "cluster_key": "cluster:gpu:4",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 35,
+      "topo_classes": [
+        "ui-component",
+        "unclassified"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "components",
+        "svelte",
+        "component",
+        "ts",
+        "js",
+        "icons",
+        "types"
+      ],
+      "top_files": [
+        "src/lib/components/ui/alert-dialog/AlertDialog.svelte",
+        "src/lib/components/ui/alert-dialog/AlertDialogAction.svelte",
+        "src/lib/components/ui/alert-dialog/AlertDialogCancel.svelte",
+        "src/lib/components/ui/alert-dialog/AlertDialogContent.svelte",
+        "src/lib/components/ui/alert-dialog/AlertDialogDescription.svelte",
+        "src/lib/components/ui/alert-dialog/AlertDialogFooter.svelte",
+        "src/lib/components/ui/alert-dialog/AlertDialogHeader.svelte",
+        "src/lib/components/ui/alert-dialog/AlertDialogOverlay.svelte"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:4 cluster (35 files). Key domains: ui-component, unclassified. Top tags: src, lib, components, svelte, component."
+    },
+    {
+      "cluster_key": "cluster:gpu:19",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 34,
+      "topo_classes": [
+        "unclassified",
+        "graph-gpu-topology"
+      ],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "db-schema",
+        "auth",
+        "services",
+        "utils"
+      ],
+      "top_files": [
+        "src/lib/server/ai/ab-test.ts",
+        "src/lib/server/ai/cached-stream.ts",
+        "src/lib/server/ai/caching-layer.ts",
+        "src/lib/server/ai/code-intel-service.ts",
+        "src/lib/server/ai/compact-budgets.ts",
+        "src/lib/server/ai/contextual-tools.ts",
+        "src/lib/server/ai/endpoints.ts",
+        "src/lib/server/ai/error-fix-memory.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:19 cluster (34 files). Key domains: unclassified, graph-gpu-topology. Top tags: ts, src, lib, server, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:53",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 34,
+      "topo_classes": [
+        "database-schema"
+      ],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "db-schema"
+      ],
+      "top_files": [
+        "src/lib/server/db/schema/ai_chat.ts",
+        "src/lib/server/db/schema/analytics.ts",
+        "src/lib/server/db/schema/case-library-links.ts",
+        "src/lib/server/db/schema/citations.ts",
+        "src/lib/server/db/schema/codebase-intelligence.ts",
+        "src/lib/server/db/schema/directory-clusters.ts",
+        "src/lib/server/db/schema/embedded-summaries.ts",
+        "src/lib/server/db/schema/errorBrainDiffs.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:53 cluster (34 files). Key domains: database-schema. Top tags: ts, src, lib, server, db-schema."
+    },
+    {
+      "cluster_key": "cluster:gpu:17",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 30,
+      "topo_classes": [
+        "graph-gpu-topology",
+        "unclassified"
+      ],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "gpu",
+        "services",
+        "zod",
+        "server",
+        "db-schema"
+      ],
+      "top_files": [
+        "src/lib/gpu/global-gpu-manager.ts",
+        "src/lib/gpu/gpu-embedding-bridge.ts",
+        "src/lib/gpu/gpu-search-reranker.ts",
+        "src/lib/gpu/hybrid-gpu-context.ts",
+        "src/lib/gpu/index.ts",
+        "src/lib/gpu/markdown-processor.ts",
+        "src/lib/gpu/nes-glyph-webgpu.ts",
+        "src/lib/gpu/nes-gpu-memory-bridge.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:17 cluster (30 files). Key domains: graph-gpu-topology, unclassified. Top tags: ts, src, lib, gpu, services."
+    },
+    {
+      "cluster_key": "cluster:gpu:0",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 30,
+      "topo_classes": [
+        "unclassified"
+      ],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "types",
+        "zod",
+        "db-schema"
+      ],
+      "top_files": [
+        "src/lib/types/advanced-patches.d.ts",
+        "src/lib/types/agent.ts",
+        "src/lib/types/app.d.ts",
+        "src/lib/types/chat.ts",
+        "src/lib/types/citations.ts",
+        "src/lib/types/enhanced-svelte5-types.ts",
+        "src/lib/types/env-enhanced.d.ts",
+        "src/lib/types/fast-locals-shim.d.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:0 cluster (30 files). Key domains: unclassified. Top tags: ts, src, lib, types, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:29",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 28,
+      "topo_classes": [
+        "legal-evidence",
+        "unclassified",
+        "test-audit-devtool",
+        "api-route"
+      ],
+      "top_tags": [
+        "src",
+        "ts",
+        "lib",
+        "routes",
+        "(app)",
+        "auth",
+        "schemas",
+        "route",
+        "zod",
+        "json",
+        "svelte",
+        "component"
+      ],
+      "top_files": [
+        "src/lib/components/evidence/evidence-utils.ts",
+        "src/lib/data/types.ts",
+        "src/lib/schemas/auth.ts",
+        "src/lib/schemas/evidence-upload.ts",
+        "src/lib/schemas/evidence.ts",
+        "src/lib/schemas/forms.ts",
+        "src/lib/schemas/tools/chunk-embed.schema.json",
+        "src/lib/schemas/tools/cluster-tag.schema.json"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:29 cluster (28 files). Key domains: legal-evidence, unclassified, test-audit-devtool, api-route. Top tags: src, ts, lib, routes, (app)."
+    },
+    {
+      "cluster_key": "cluster:gpu:20",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 28,
+      "topo_classes": [
+        "graph-gpu-topology",
+        "unclassified"
+      ],
+      "top_tags": [
+        "src",
+        "lib",
+        "ts",
+        "webgpu",
+        "server",
+        "zod",
+        "mjs",
+        "js",
+        "gpu",
+        "db-schema",
+        "routes",
+        "api"
+      ],
+      "top_files": [
+        "src/lib/gpu/shader-registry.ts",
+        "src/lib/server/gpu/autoencoder-bridge.ts",
+        "src/lib/server/gpu/cuda-bridge.ts",
+        "src/lib/server/gpu/gpu-monitor.ts",
+        "src/lib/server/gpu/mapreduce-runner.mjs",
+        "src/lib/server/gpu/mapreduce-worker.mjs",
+        "src/lib/server/gpu/pytorch-graph.ts",
+        "src/lib/server/gpu/simdjson-bridge.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:20 cluster (28 files). Key domains: graph-gpu-topology, unclassified. Top tags: src, lib, ts, webgpu, server."
+    },
+    {
+      "cluster_key": "cluster:gpu:73",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 27,
+      "topo_classes": [
+        "graph-gpu-topology",
+        "trace-retrieval",
+        "unclassified"
+      ],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "db-schema",
+        "auth"
+      ],
+      "top_files": [
+        "src/lib/server/graph/codebase-cluster-detection.ts",
+        "src/lib/server/graph/codebase-neo4j-sync.ts",
+        "src/lib/server/graph/codebase-scanner-v2.ts",
+        "src/lib/server/graph/codebase-scanner.ts",
+        "src/lib/server/graph/community-graph.ts",
+        "src/lib/server/graph/couchdb-pagerank.ts",
+        "src/lib/server/graph/evidence-graph-service.ts",
+        "src/lib/server/graph/glyph-atlas-builder.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:73 cluster (27 files). Key domains: graph-gpu-topology, trace-retrieval, unclassified. Top tags: ts, src, lib, server, zod."
+    },
+    {
+      "cluster_key": "cluster:gpu:43",
+      "cluster_src": "gpu-kmeans",
+      "file_count": 26,
+      "topo_classes": [
+        "trace-retrieval",
+        "unclassified"
+      ],
+      "top_tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "zod",
+        "services",
+        "db-schema"
+      ],
+      "top_files": [
+        "src/lib/server/rag/evidenceRag.ts",
+        "src/lib/server/rag/rag-types.ts",
+        "src/lib/server/rag/sdk.ts",
+        "src/lib/server/rag/tag-extractor.ts",
+        "src/lib/server/rag/types.ts",
+        "src/lib/server/rag/uiComplianceRag.ts",
+        "src/lib/server/research/chunk-web-doc.ts",
+        "src/lib/server/research/fastcrawl.ts"
+      ],
+      "community_id": null,
+      "graph_authority_score": null,
+      "synthesis_prompt_hint": "Summarise the cluster:gpu:43 cluster (26 files). Key domains: trace-retrieval, unclassified. Top tags: ts, src, lib, server, zod."
+    }
+  ],
+  "fallbackClusterCount": 10,
+  "aceCriticalRelations": [
+    {
+      "file": "context-assembler.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → assembleACEContext",
+        "EXPORTS_SYMBOL → persistACEChunks",
+        "EXPORTS_SYMBOL → fetchCachedACEChunks",
+        "EXPORTS_SYMBOL → buildACEPromptCached",
+        "EXPORTS_SYMBOL → buildACEPrompt",
+        "EXPORTS_SYMBOL → fetchGlossaryMatches",
+        "EXPORTS_SYMBOL → CodebaseFetchStats",
+        "EXPORTS_SYMBOL → fetchCodebaseContext"
+      ]
+    },
+    {
+      "file": "multi-lane-retrieval.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → MultiLaneQuery",
+        "EXPORTS_SYMBOL → LaneResult",
+        "EXPORTS_SYMBOL → MultiLaneHit",
+        "EXPORTS_SYMBOL → MultiLaneSynthesis",
+        "EXPORTS_SYMBOL → multiLaneSearch",
+        "READS_REDIS_KEY → code:graph:node:${nodeHash}",
+        "READS_REDIS_KEY → code:graph:node:${h}",
+        "QUERIES_TABLE → context_timeline"
+      ]
+    },
+    {
+      "file": "retrieval-lanes.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → RetrievalLaneName",
+        "EXPORTS_SYMBOL → ContextHit",
+        "EXPORTS_SYMBOL → RetrievalLaneResult",
+        "EXPORTS_SYMBOL → MultiLaneOutput",
+        "EXPORTS_SYMBOL → mergeContextHits",
+        "EXPORTS_SYMBOL → extractTopFiles",
+        "EXPORTS_SYMBOL → extractTopSymbols",
+        "EXPORTS_SYMBOL → runRetrievalLanes"
+      ]
+    },
+    {
+      "file": "cache-keys.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → aceTopkKey",
+        "EXPORTS_SYMBOL → aceErrorFpKey",
+        "EXPORTS_SYMBOL → wikiPageKey",
+        "EXPORTS_SYMBOL → wikiGapKey",
+        "EXPORTS_SYMBOL → wikiFileKey",
+        "EXPORTS_SYMBOL → wikiSymbolKey",
+        "EXPORTS_SYMBOL → wikiGapReportLatestKey",
+        "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+      ]
+    },
+    {
+      "file": "ngram-retrieval.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → NgramHit",
+        "EXPORTS_SYMBOL → ngramRecall",
+        "EXPORTS_SYMBOL → fullTextRecall",
+        "EXPORTS_SYMBOL → multiTextRecall",
+        "QUERIES_TABLE → document_chunks",
+        "QUERIES_TABLE → error_fingerprints",
+        "QUERIES_TABLE → research_summaries",
+        "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+      ]
+    },
+    {
+      "file": "error-fingerprint.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → ErrorFingerprint",
+        "EXPORTS_SYMBOL → normalizeError",
+        "EXPORTS_SYMBOL → fingerprintError",
+        "EXPORTS_SYMBOL → extractSymbols",
+        "EXPORTS_SYMBOL → extractFilePaths",
+        "EXPORTS_SYMBOL → storeErrorFingerprint",
+        "EXPORTS_SYMBOL → lookupErrorFingerprint",
+        "EXPORTS_SYMBOL → findSimilarErrors"
+      ]
+    },
+    {
+      "file": "graph-expander.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → fetchDeepImportGraphExpansion",
+        "HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md"
+      ]
+    },
+    {
+      "file": "qdrant-manager.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → generateSparseVector",
+        "EXPORTS_SYMBOL → QdrantSearchResult",
+        "EXPORTS_SYMBOL → deterministicPointId",
+        "EXPORTS_SYMBOL → QdrantManager",
+        "EXPORTS_SYMBOL → QuantizationLevel",
+        "EXPORTS_SYMBOL → ScalingMode",
+        "EXPORTS_SYMBOL → GPUHealthMetrics",
+        "EXPORTS_SYMBOL → ScalingDecision"
+      ]
+    },
+    {
+      "file": "gemma4-agent.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → GEMMA4_ALLOWED_TOOLS",
+        "EXPORTS_SYMBOL → truncateToolResult",
+        "EXPORTS_SYMBOL → parseToolRequest",
+        "EXPORTS_SYMBOL → AgentRunResult",
+        "EXPORTS_SYMBOL → runGemma4Agent",
+        "QUERIES_TABLE → cases",
+        "QUERIES_QDRANT_COLLECTION → legal_documents",
+        "QUERIES_QDRANT_COLLECTION → evidence_items"
+      ]
+    },
+    {
+      "file": "trace-subagent-orchestrator.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → runTraceSubagentDag",
+        "HAS_AGENTS_SCOPE → lib/server/agents/AGENTS.md"
+      ]
+    },
+    {
+      "file": "synthesis-memory-archiver.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → archiveSynthesisMemory",
+        "HAS_AGENTS_SCOPE → lib/server/indexer/AGENTS.md"
+      ]
+    },
+    {
+      "file": "dual-embedder.ts",
+      "relations": [
+        "EXPORTS_SYMBOL → IndexChunksProgress",
+        "EXPORTS_SYMBOL → patchErrorVectorSchema",
+        "EXPORTS_SYMBOL → upsertErrorVector",
+        "EXPORTS_SYMBOL → searchByError",
+        "EXPORTS_SYMBOL → searchCodebase",
+        "EXPORTS_SYMBOL → indexChunks",
+        "EXPORTS_SYMBOL → indexChunksIncremental",
+        "QUERIES_QDRANT_COLLECTION → codebase_chunks_768"
+      ]
+    }
+  ],
+  "synthesisBlock": "### Relationship-Aware Codebase Context\n\nCluster: ace:retrieval-spine\nFiles:\n- context-assembler.ts\n  - EXPORTS_SYMBOL → assembleACEContext\n  - EXPORTS_SYMBOL → persistACEChunks\n  - EXPORTS_SYMBOL → fetchCachedACEChunks\n  - EXPORTS_SYMBOL → buildACEPromptCached\n  - EXPORTS_SYMBOL → buildACEPrompt\n- multi-lane-retrieval.ts\n  - EXPORTS_SYMBOL → MultiLaneQuery\n  - EXPORTS_SYMBOL → LaneResult\n  - EXPORTS_SYMBOL → MultiLaneHit\n  - EXPORTS_SYMBOL → MultiLaneSynthesis\n  - EXPORTS_SYMBOL → multiLaneSearch\n- retrieval-lanes.ts\n  - EXPORTS_SYMBOL → RetrievalLaneName\n  - EXPORTS_SYMBOL → ContextHit\n  - EXPORTS_SYMBOL → RetrievalLaneResult\n  - EXPORTS_SYMBOL → MultiLaneOutput\n  - EXPORTS_SYMBOL → mergeContextHits\n- ngram-retrieval.ts\n  - EXPORTS_SYMBOL → NgramHit\n  - EXPORTS_SYMBOL → ngramRecall\n  - EXPORTS_SYMBOL → fullTextRecall\n  - EXPORTS_SYMBOL → multiTextRecall\n  - QUERIES_TABLE → document_chunks\n\nCluster: ace:cache-layer\nFiles:\n- cache-keys.ts\n  - EXPORTS_SYMBOL → aceTopkKey\n  - EXPORTS_SYMBOL → aceErrorFpKey\n  - EXPORTS_SYMBOL → wikiPageKey\n  - EXPORTS_SYMBOL → wikiGapKey\n  - EXPORTS_SYMBOL → wikiFileKey\n\nCluster: ace:general\nFiles:\n- error-fingerprint.ts\n  - EXPORTS_SYMBOL → ErrorFingerprint\n  - EXPORTS_SYMBOL → normalizeError\n  - EXPORTS_SYMBOL → fingerprintError\n  - EXPORTS_SYMBOL → extractSymbols\n  - EXPORTS_SYMBOL → extractFilePaths\n\nCluster: ace:vector-layer\nFiles:\n- graph-expander.ts\n  - EXPORTS_SYMBOL → fetchDeepImportGraphExpansion\n  - HAS_AGENTS_SCOPE → lib/server/ace/AGENTS.md\n- qdrant-manager.ts\n  - EXPORTS_SYMBOL → generateSparseVector\n  - EXPORTS_SYMBOL → QdrantSearchResult\n  - EXPORTS_SYMBOL → deterministicPointId\n  - EXPORTS_SYMBOL → QdrantManager\n  - EXPORTS_SYMBOL → QuantizationLevel\n- dual-embedder.ts\n  - EXPORTS_SYMBOL → IndexChunksProgress\n  - EXPORTS_SYMBOL → patchErrorVectorSchema\n  - EXPORTS_SYMBOL → upsertErrorVector\n  - EXPORTS_SYMBOL → searchByError\n  - EXPORTS_SYMBOL → searchCodebase\n\nCluster: ace:agent-layer\nFiles:\n- gemma4-agent.ts\n  - EXPORTS_SYMBOL → GEMMA4_ALLOWED_TOOLS\n  - EXPORTS_SYMBOL → truncateToolResult\n  - EXPORTS_SYMBOL → parseToolRequest\n  - EXPORTS_SYMBOL → AgentRunResult\n  - EXPORTS_SYMBOL → runGemma4Agent\n- trace-subagent-orchestrator.ts\n  - EXPORTS_SYMBOL → runTraceSubagentDag\n  - HAS_AGENTS_SCOPE → lib/server/agents/AGENTS.md\n\nCluster: ace:synthesis-layer\nFiles:\n- synthesis-memory-archiver.ts\n  - EXPORTS_SYMBOL → archiveSynthesisMemory\n  - HAS_AGENTS_SCOPE → lib/server/indexer/AGENTS.md\n"
+}
