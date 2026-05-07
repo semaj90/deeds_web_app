@@ -3,7 +3,6 @@
  * Learns P(next|prev) from short user interaction sequences
  * Enhanced with Redis caching for persistence and performance
  */
-import { env } from '$env/dynamic/private';
 import { ensureRedis as ensureRedisReady, redis } from '$lib/server/redis.js';
 
 type ActionType = string; // e.g., 'open:123', 'hover:123', 'search:term|indemnification'
@@ -24,10 +23,6 @@ class MarkovPredictorWithRedis {
     private cacheEnabled: boolean;
 
     constructor() {
-        // Initialize Redis connection with password support
-        const redisPassword = env?.REDIS_PASSWORD;
-        const redisUrl = env?.REDIS_URL ?? 'redis://localhost:6379';
-
         this.redisClient = redis;
         this.cacheEnabled = true;
 

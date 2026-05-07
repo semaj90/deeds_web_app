@@ -1,9 +1,5 @@
-import { env } from '$env/dynamic/private';
+import { ENV } from '$lib/server/env.server.js';
 
-/**
- * Retrieves the Ollama API endpoint from environment variables or provides a default.
- * @returns The Ollama API URL.
- */
 export function getOllamaEndpoint(): string {
-	return env?.OLLAMA_URL ?? 'http://localhost:11434';
+	return ENV.OLLAMA_BASE_URL;
 }

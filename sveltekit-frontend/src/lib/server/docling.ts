@@ -3,10 +3,9 @@
  * Connects to docling-vlm Docker service for OCR + layout-aware text extraction
  */
 
-import { env } from '$env/dynamic/private';
+import { ENV } from '$lib/server/env.server.js';
 
-// Docker service URL (falls back to localhost for dev)
-const DOCLING_SERVICE_URL = env.DOCLING_SERVICE_URL || 'http://localhost:8085';
+const DOCLING_SERVICE_URL = ENV.DOCLING_SERVICE_URL;
 
 export type DoclingBlock = {
     type: 'paragraph' | 'heading' | 'table' | 'list' | 'equation' | 'image' | 'transcription' | 'other';
