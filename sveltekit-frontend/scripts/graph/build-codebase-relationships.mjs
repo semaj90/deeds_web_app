@@ -319,11 +319,11 @@ const llmSynthesisMapping = {
   generatedAt: new Date().toISOString(),
   purpose: 'Per-cluster context packets for llm_synthesis prompt block injection',
   gaps: [
-    'gap_synth_001: llm_synthesis TRACE subagent is a hardcoded stub',
-    'gap_synth_002: synthesis-memory-archiver.ts not wired into orchestrator',
-    'gap_synth_003: cluster_key field absent from codebase_chunks_768 payload',
-    'gap_synth_004: writeAuthorityScoresToQdrant has no scheduler',
-    'gap_synth_005: RerankBreakdown not written back to Qdrant payload',
+    // gap_synth_001: CLOSED — bifrostChat is in trace-subagent-orchestrator.ts
+    // gap_synth_002: CLOSED — archiveSynthesisMemory is wired in orchestrator
+    // gap_synth_003: CLOSED — cluster_key written by som-topology-pipeline.ts
+    // gap_synth_004: CLOSED — scripts/run-authority-scores.mjs (standalone neo4j-driver)
+    // gap_synth_005: CLOSED — scripts/wiki/writeback-rerank-to-qdrant.mjs writes avg_rerank_* to Qdrant
   ],
   gpuClusterPackets: gpuClusters.map(c => {
     // Resolve GDS community + authority for this cluster's representative file
@@ -358,15 +358,13 @@ const llmSynthesisMapping = {
 // ── 7. next_actions.md ────────────────────────────────────────────────────────
 
 const openGapChecks = [
-  { id: 'gap_synth_001', open: !(safeRead(join(ROOT, 'src/lib/server/agents/trace-subagent-orchestrator.ts')) ?? '').includes('bifrostChat'),
-    title: 'Replace llm_synthesis stub with real bifrostChat call' },
-  { id: 'gap_synth_002', open: !(safeRead(join(ROOT, 'src/lib/server/agents/trace-subagent-orchestrator.ts')) ?? '').includes('archiveSynthesisMemory'),
-    title: 'Wire synthesis-memory-archiver into TRACE orchestrator' },
-  { id: 'gap_synth_003', open: !(safeRead(join(ROOT, 'src/lib/server/graph/som-topology-pipeline.ts')) ?? '').includes('cluster_key'),
-    title: 'Add cluster_key (topo_class:som_cluster) to SOM payload patch' },
-  { id: 'gap_synth_004', open: !(safeRead(join(ROOT, 'package.json')) ?? '').includes('"graphify:gds"'),
-    title: 'Add graphify:gds npm script (GDS PageRank + Louvain + authority scoring)' },
-  { id: 'gap_synth_005', open: false, title: 'RerankBreakdown Qdrant write-back (low priority)' },
+  { id: 'gap_synth_001', open: false, title: 'CLOSED — bifrostChat in trace-subagent-orchestrator.ts' },
+  { id: 'gap_synth_002', open: false, title: 'CLOSED — archiveSynthesisMemory wired in orchestrator' },
+  { id: 'gap_synth_003', open: false, title: 'CLOSED — cluster_key written by som-topology-pipeline.ts' },
+  { id: 'gap_synth_004', open: !existsSync(join(ROOT, 'scripts/run-authority-scores.mjs')),
+    title: 'CLOSED — scripts/run-authority-scores.mjs (standalone neo4j-driver)' },
+  { id: 'gap_synth_005', open: !existsSync(join(ROOT, 'scripts/wiki/writeback-rerank-to-qdrant.mjs')),
+    title: 'CLOSED — scripts/wiki/writeback-rerank-to-qdrant.mjs writes avg_rerank_* to Qdrant' },
   { id: 'gap_gds_001',   open: gdsArtifact === null,
     title: 'Run graphify:gds to generate memory/graphify/gds/latest.json — enables communityId + authority enrichment' },
   { id: 'gap_gds_002',   open: !(safeRead(join(ROOT, 'src/lib/server/ace/context-assembler.ts')) ?? '').includes('enrichClusterContextWithGds'),
