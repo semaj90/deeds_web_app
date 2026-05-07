@@ -192,7 +192,8 @@
 					<li><span class="{data.graphify.authorityScoresExists ? 'ok' : 'fail'}">{check(data.graphify.authorityScoresExists)}</span> authority scores in Redis</li>
 					<li><span class="{data.graphify.rerankPayloadsExists ? 'ok' : 'fail'}">{check(data.graphify.rerankPayloadsExists)}</span> Qdrant codebase_chunks_768 reachable</li>
 				</ul>
-				{#if data.graphify.healthSnapshot as snap}
+				{#if data.graphify.healthSnapshot}
+					{@const snap = data.graphify.healthSnapshot}
 					<div class="snap-grid">
 						<div class="snap-item">
 							<span class="snap-val">{snap.wikiNoteCount.toLocaleString()}</span>
