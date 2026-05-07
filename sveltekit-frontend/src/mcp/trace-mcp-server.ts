@@ -52,6 +52,106 @@ const GO_RETRIEVAL_URL  = process.env.GO_RETRIEVAL_URL      ?? 'http://127.0.0.1
 const pool = new Pool({ connectionString: PG_URL, max: 4, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
 pool.on('error', () => {});
 
+// ── Coordinate clamping helpers ───────────────────────────────────────────────
+
+function clampFinite(n: unknown, fallback: number): number {
+  const v = Number(n);
+  return Number.isFinite(v) ? v : fallback;
+}
+
+function clamp01(n: unknown, fallback = 0.5): number {
+  return Math.max(0, Math.min(1, clampFinite(n, fallback)));
+}
+
+// ── Shared retrieval hit shape ────────────────────────────────────────────────
+
+interface RetrievalHit {
+  id?:                  string;
+  path?:                string;
+  title?:               string;
+  snippet?:             string;
+  score?:               number;
+  source?:              string;
+  clusterKey?:          string;
+  topoClass?:           string;
+  graphAuthorityScore?: number;
+  metadata?:            Record<string, unknown>;
+}
+
+interface NormalizedRetrievalResult {
+  ok:        boolean;
+  source:    'go-retrieval' | 'go-search' | 'topology' | 'sveltekit-fallback' | 'postgres-fts';
+  degraded?: boolean;
+  reason?:   string;
+  query?:    string;
+  hits:      RetrievalHit[];
+  elapsedMs: number;
+}
+
+function normalizeGoRetrievalHits(
+  data: { results?: Array<Record<string, unknown>> },
+  query: string,
+  t0: number,
+): NormalizedRetrievalResult {
+  const hits: RetrievalHit[] = (data.results ?? []).map(h => ({
+    id:                  h.stable_key != null ? String(h.stable_key) : h.id != null ? String(h.id) : undefined,
+    path:                h.file_path  != null ? String(h.file_path)  : undefined,
+    snippet:             h.content    != null ? String(h.content).slice(0, 600) : undefined,
+    score:               typeof h.score === 'number' ? h.score : undefined,
+    topoClass:           h.topo_class   != null ? String(h.topo_class)   : undefined,
+    clusterKey:          h.cluster_key  != null ? String(h.cluster_key)  : undefined,
+    graphAuthorityScore: typeof h.graph_authority_score === 'number' ? h.graph_authority_score : undefined,
+  }));
+  return { ok: true, source: 'go-retrieval', query, hits, elapsedMs: Date.now() - t0 };
+}
+
+function normalizeGoSearchHits(
+  data: { results?: Array<Record<string, unknown>>; hits?: Array<Record<string, unknown>> },
+  query: string,
+  t0: number,
+): NormalizedRetrievalResult {
+  const raw = data.results ?? data.hits ?? [];
+  const hits: RetrievalHit[] = raw.map(h => ({
+    id:                  h.id          != null ? String(h.id)          : undefined,
+    path:                h.file_path   != null ? String(h.file_path)   : undefined,
+    title:               h.title       != null ? String(h.title)       : undefined,
+    snippet:             h.content     != null ? String(h.content).slice(0, 600)
+                       : h.text        != null ? String(h.text).slice(0, 600) : undefined,
+    score:               typeof h.score === 'number' ? h.score : undefined,
+    source:              h.source      != null ? String(h.source)      : 'go-search-service',
+    topoClass:           h.topo_class  != null ? String(h.topo_class)  : undefined,
+    clusterKey:          h.cluster_key != null ? String(h.cluster_key) : undefined,
+    graphAuthorityScore: typeof h.authority_score === 'number' ? h.authority_score : undefined,
+  }));
+  return { ok: true, source: 'go-search', query, hits, elapsedMs: Date.now() - t0 };
+}
+
+function normalizeTopologyHits(
+  data: { hits?: Array<Record<string, unknown>>; results?: Array<Record<string, unknown>> },
+  elapsedMs: number,
+): NormalizedRetrievalResult {
+  const raw = data.hits ?? data.results ?? [];
+  const hits: RetrievalHit[] = raw.map(h => ({
+    id:                  h.stable_key   != null ? String(h.stable_key)  : undefined,
+    path:                h.path         != null ? String(h.path)
+                       : h.file_path    != null ? String(h.file_path)   : undefined,
+    snippet:             h.summary      != null ? String(h.summary).slice(0, 600)
+                       : h.content      != null ? String(h.content).slice(0, 600) : undefined,
+    score:               typeof h.hybrid_score   === 'number' ? h.hybrid_score
+                       : typeof h.manifold_score === 'number' ? h.manifold_score
+                       : typeof h.score          === 'number' ? h.score : undefined,
+    topoClass:           h.topo_class   != null ? String(h.topo_class)  : undefined,
+    clusterKey:          h.cluster_key  != null ? String(h.cluster_key) : undefined,
+    graphAuthorityScore: typeof h.graph_authority_score === 'number' ? h.graph_authority_score : undefined,
+    metadata:            {
+      som_x:    h.som_bmu_col,
+      som_y:    h.som_bmu_row,
+      topoHex:  h.topo_hex,
+    },
+  }));
+  return { ok: true, source: 'topology', hits, elapsedMs };
+}
+
 // ── Neo4j HTTP helper ─────────────────────────────────────────────────────────
 
 async function neo4jQuery(cypher: string, params: Record<string, unknown> = {}) {
@@ -309,13 +409,27 @@ server.tool(
     filters:    z.record(z.unknown()).optional().describe('JSONB payload filters (e.g. { "topo_class": "server" })'),
   },
   async ({ som_x, som_y, semantic_z, grpo_w, radius, limit, filters }) => {
+    const t0 = Date.now();
+    // Clamp all numeric inputs so the model cannot send unbounded payloads
+    const cSomX      = clampFinite(som_x, 0);
+    const cSomY      = clampFinite(som_y, 0);
+    const cSemanticZ = clamp01(semantic_z ?? 0.5);
+    const cGrpoW     = clamp01(grpo_w     ?? 0.5);
+    const cRadius    = Math.max(0.01, Math.min(5.0, clampFinite(radius, 0.5)));
+    // Allow only scalar primitive filter values to prevent injection payloads
+    const safeFilters = filters
+      ? Object.fromEntries(
+          Object.entries(filters)
+            .filter(([k, v]) => k.length < 64 && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'))
+        )
+      : undefined;
     try {
       const body: Record<string, unknown> = {
-        center: { som_x, som_y, semantic_z: semantic_z ?? 0.5, grpo_w: grpo_w ?? 0.5 },
-        radius,
-        limit,
+        center: { som_x: cSomX, som_y: cSomY, semantic_z: cSemanticZ, grpo_w: cGrpoW },
+        radius:  cRadius,
+        limit:   Math.min(limit, 50),
       };
-      if (filters && Object.keys(filters).length > 0) body.filters = filters;
+      if (safeFilters && Object.keys(safeFilters).length > 0) body.filters = safeFilters;
       const res = await fetch(`${TOPO_URL}/search/4d`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -323,10 +437,15 @@ server.tool(
         signal: AbortSignal.timeout(20_000),
       });
       if (!res.ok) throw new Error(`topology /search/4d HTTP ${res.status}`);
-      const data = await res.json();
-      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      const raw = await res.json() as { hits?: Array<Record<string, unknown>>; results?: Array<Record<string, unknown>> };
+      const normalized = normalizeTopologyHits(raw, Date.now() - t0);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(normalized, null, 2) }] };
     } catch (err) {
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err), hint: 'topology-search-server may not be running (port 8101)' }) }] };
+      const result: NormalizedRetrievalResult = {
+        ok: false, source: 'topology', degraded: true,
+        reason: String(err), hits: [], elapsedMs: Date.now() - t0,
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     }
   }
 );
@@ -397,6 +516,7 @@ server.tool(
   async ({ query, filePath, limit }) => {
     // ── Try Go retrieval service first (GPU embedding + JSONB cache, 5s budget) ──
     try {
+      const goT0  = Date.now();
       const goRes = await fetch(`${GO_RETRIEVAL_URL}/search/codebase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -404,22 +524,13 @@ server.tool(
         signal: AbortSignal.timeout(5_000),
       });
       if (goRes.ok) {
-        const goData = await goRes.json() as { results?: Array<{
-          id?: string; file_path?: string; stable_key?: string;
-          score?: number; content?: string; topo_class?: string;
-        }> };
+        const goData = await goRes.json() as { results?: Array<Record<string, unknown>> };
         if (goData.results?.length) {
-          const hits = goData.results.map(h => ({
-            stable_key: h.stable_key ?? h.id ?? '',
-            file_path:  h.file_path ?? '',
-            score:      h.score ?? 0,
-            content:    (h.content ?? '').slice(0, 600),
-            topo_class: h.topo_class ?? '',
-          }));
+          const normalized = normalizeGoRetrievalHits(goData, query, goT0);
           return {
             content: [{
               type: 'text' as const,
-              text: JSON.stringify({ success: true, data: hits, count: hits.length, source: 'go_retrieval' }, null, 2),
+              text: JSON.stringify(normalized, null, 2),
             }],
           };
         }
@@ -636,8 +747,9 @@ server.tool(
     filters: z.record(z.unknown()).optional().describe('JSONB metadata filters applied at the Go service level'),
   },
   async ({ query, limit = 20, type = 'codebase', filters }) => {
+    const t0 = Date.now();
     try {
-      const body: Record<string, unknown> = { query, limit, type };
+      const body: Record<string, unknown> = { query, limit: Math.min(limit, 50), type };
       if (filters && Object.keys(filters).length > 0) body.filters = filters;
       const res = await fetch(`${GO_SEARCH_URL}/search`, {
         method: 'POST',
@@ -646,10 +758,15 @@ server.tool(
         signal: AbortSignal.timeout(15_000),
       });
       if (!res.ok) throw new Error(`go-search HTTP ${res.status}`);
-      const data = await res.json();
-      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      const raw = await res.json() as { results?: Array<Record<string, unknown>>; hits?: Array<Record<string, unknown>> };
+      const normalized = normalizeGoSearchHits(raw, query, t0);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(normalized, null, 2) }] };
     } catch (err) {
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err), hint: 'go-search-service unavailable (port 8096)' }) }] };
+      const result: NormalizedRetrievalResult = {
+        ok: false, source: 'go-search', degraded: true,
+        reason: String(err), query, hits: [], elapsedMs: Date.now() - t0,
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     }
   }
 );
