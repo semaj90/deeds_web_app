@@ -14,6 +14,7 @@ import { initializeNeo4jSchema } from './neo4j-schema.js';
 import { buildCodebaseGraphV2 } from './codebase-scanner-v2.js';
 import { buildCodebaseGraph } from './codebase-scanner.js';
 import { syncNodesToCouchDb, ensureCouchDbDesignDoc } from './couchdb-pagerank.js';
+import { extractAllSemanticRelations, type SemanticEdge } from './relationship-extractor.js';
 import type { ScanNodeV2 as WorkerNodeV2 } from './codebase-scanner-v2.js';
 import type { ScanNode as WorkerNode, ScanEdge as WorkerEdge } from './codebase-scanner.js';
 
@@ -336,10 +337,88 @@ export async function syncCodebaseToNeo4j(options: SyncOptions = {}): Promise<Co
 		} catch (couchErr) {
 			console.warn('[Neo4j Sync] CouchDB mirror failed (non-fatal):', (couchErr as Error)?.message);
 		}
+
+		// 5. Semantic relation extraction — P5 edge types (fire-and-forget, non-fatal)
+		emit('semantic-relations');
+		try {
+			await syncSemanticRelations({ srcRoot, session: getNeo4jDriver().session({ database: 'neo4j' }) });
+		} catch (semErr) {
+			console.warn('[Neo4j Sync] Semantic relation sync failed (non-fatal):', (semErr as Error)?.message);
+		}
 	} catch (err) {
 		result.errors.push(err instanceof Error ? err.message : String(err));
 	}
 
 	result.durationMs = Date.now() - start;
 	return result;
+}
+
+// ── Standalone semantic relation syncer ──────────────────────────────────────
+
+export interface SemanticSyncResult {
+	totalFiles: number;
+	totalEdges: number;
+	neo4jSynced: number;
+	durationMs: number;
+	errors: string[];
+}
+
+const SEMANTIC_NEO4J_TYPES = new Set([
+	'READS_REDIS_KEY', 'WRITES_REDIS_KEY',
+	'QUERIES_TABLE', 'QUERIES_QDRANT_COLLECTION', 'QUERIES_NEO4J_LABEL',
+]);
+
+/**
+ * Extract semantic edges and mirror the high-value subset to Neo4j.
+ * Designed to be called standalone or from syncCodebaseToNeo4j.
+ */
+export async function syncSemanticRelations(opts: {
+	srcRoot?: string;
+	maxFiles?: number;
+	session?: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>;
+}): Promise<SemanticSyncResult> {
+	const t0 = Date.now();
+	const srcRoot = opts.srcRoot ?? path.join(process.cwd(), 'src');
+	const result = extractAllSemanticRelations(srcRoot, opts.maxFiles ?? 3000);
+
+	const neo4jEdges = result.edges.filter(e => SEMANTIC_NEO4J_TYPES.has(e.relationType));
+
+	let neo4jSynced = 0;
+	const ownSession = !opts.session;
+	const session = opts.session ?? getNeo4jDriver().session({ database: 'neo4j' });
+
+	try {
+		const BATCH = 200;
+		for (let i = 0; i < neo4jEdges.length; i += BATCH) {
+			const batch = neo4jEdges.slice(i, i + BATCH);
+			await session.run(
+				`UNWIND $batch AS e
+				 MERGE (src:CodebaseFile {filePath: e.source})
+				 MERGE (tgt:SemanticTarget {key: e.target, kind: e.kind})
+				 MERGE (src)-[r:SEMANTIC_REL {type: e.type}]->(tgt)
+				 SET r.confidence = e.conf, r.updatedAt = datetime()`,
+				{
+					batch: batch.map((e) => ({
+						source: e.sourceFile,
+						target: e.targetKey,
+						kind:   e.relationType.replace('QUERIES_', '').replace('READS_', '').replace('WRITES_', '').toLowerCase(),
+						type:   e.relationType,
+						conf:   e.confidence,
+					})),
+				}
+			);
+			neo4jSynced += batch.length;
+		}
+		console.log(`[Neo4j Sync] Semantic relations: ${result.totalEdges} extracted, ${neo4jSynced} synced to Neo4j in ${Date.now() - t0}ms`);
+	} finally {
+		if (ownSession) await session.close();
+	}
+
+	return {
+		totalFiles: result.totalFiles,
+		totalEdges: result.totalEdges,
+		neo4jSynced,
+		durationMs: Date.now() - t0,
+		errors: result.errors,
+	};
 }

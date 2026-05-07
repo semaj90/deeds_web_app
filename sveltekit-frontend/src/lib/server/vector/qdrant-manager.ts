@@ -190,6 +190,8 @@ export class QdrantManager {
       { collection: this.collections.codebase_chunks, field: 'repo', schema: 'keyword' },
       { collection: this.collections.codebase_chunks, field: 'error_id', schema: 'keyword' },
       { collection: this.collections.codebase_chunks, field: 'updated_at', schema: 'integer' },
+      { collection: this.collections.codebase_chunks, field: 'cluster_key', schema: 'keyword' },
+      { collection: this.collections.codebase_chunks, field: 'topo_class', schema: 'keyword' },
       // evidence_items: add cluster + tag indexes for cross-case similarity
       { collection: this.collections.evidence, field: 'cluster_id', schema: 'keyword' },
       { collection: this.collections.evidence, field: 'tags', schema: 'keyword' },

@@ -15,9 +15,19 @@ export interface CodebaseChunkPayload {
   graph_neighbors?: string[];
   schema_version?: number;
   som_cluster?: number | null;
+  som_bmu_row?: number | null;
+  som_bmu_col?: number | null;
+  gpu_cluster?: number | null;
+  topo_class?: string | null;
+  topo_byte?: number | null;
+  cluster_key?: string | null;   // composite: "${topo_class}:${som_cluster}"
   centroid_id?: number | null;
   quality_score?: number | null;
   authority_score?: number | null;
+  agents_scope?: string | null;  // nearest AGENTS.md path
+  relation_types?: string[];     // from code_relations (READS_REDIS_KEY, QUERIES_TABLE, …)
+  semantic_tags?: string[];      // NES glyph-derived tags
+  symbol_names?: string[];       // exported symbols from AST chunker
 }
 
 export interface EvidenceChunkPayload {

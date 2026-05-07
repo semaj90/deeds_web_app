@@ -62,6 +62,7 @@ import { analyzeDocumentWithDocling } from '$lib/server/docling.js';
 import { YOLOService }               from '$lib/server/yolo.js';
 import { analyzeEvidenceImage }      from '$lib/server/analysis/vlm-evidence-analyzer.js';
 import { langGraphSynthesize }       from '$lib/server/ai/langgraph-client.js';
+import { classifyPath }              from '$lib/server/tensor/topology-byte-mapper.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -822,13 +823,16 @@ async function updateQdrantClusterPayloads(
       const slice = summaries.slice(start, start + BATCH);
       const points = slice.map((s, idx) => {
         const i = start + idx;
+        const somCluster = (somCoords[i].y * 44) + somCoords[i].x;
+        const topoClass = s.table === 'codebase_chunks_768' ? classifyPath(s.summary) : '';
         return {
           id:      s.id,
           payload: {
             gpu_cluster: gpuLabels[i],
-            som_cluster: (somCoords[i].y * 44) + somCoords[i].x, // flatten (col,row) → neuron index
+            som_cluster: somCluster,
             som_bmu_col: somCoords[i].x,
             som_bmu_row: somCoords[i].y,
+            ...(topoClass ? { cluster_key: `${topoClass}:${somCluster}` } : {}),
           },
         };
       });

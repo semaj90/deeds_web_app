@@ -18,7 +18,7 @@
 import { createHash } from 'crypto';
 import { getRedis } from '$lib/server/redis.js';
 import type { GlyphRecord, GlyphSection } from '$lib/server/types/glyph.js';
-import type { ACEFlowAnalysis } from './hmm-ace-analyzer.js';
+import type { ACEFlowAnalysis } from '$lib/server/analysis/hmm-ace-analyzer.js';
 
 // ── 4D coordinate constants ──────────────────────────────────────────────────
 

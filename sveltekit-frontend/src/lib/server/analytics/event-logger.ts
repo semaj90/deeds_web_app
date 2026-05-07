@@ -55,6 +55,44 @@ export interface AnalyticsPayload {
 	metadata?: Record<string, unknown>;
 }
 
+// ── Pipeline & Dev Analytics Types ───────────────────────────────────────
+
+export type PipelineEventKind =
+  | 'npm_script'
+  | 'test_run'
+  | 'docker_cmd'
+  | 'dev_server'
+  | 'graphify'
+  | 'gpu_batch'
+  | 'build';
+
+export interface PipelineEvent {
+  /** ISO timestamp */
+  ts: string;
+  kind: PipelineEventKind;
+  /** Full command or script name */
+  cmd: string;
+  /** Exit code — null while still running */
+  exitCode: number | null;
+  durationMs?: number;
+  /** Tail of stdout (last 2KB) */
+  stdoutTail?: string;
+  /** Tail of stderr (last 2KB) */
+  stderrTail?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface UserAnalyticsEvent {
+  ts: string;
+  userId?: string;
+  sessionId?: string;
+  kind: PipelineEventKind | AnalyticsEventType;
+  label: string;
+  durationMs?: number;
+  success: boolean;
+  metadata?: Record<string, unknown>;
+}
+
 // ── Core Logger ──────────────────────────────────────────────────────────
 
 /**

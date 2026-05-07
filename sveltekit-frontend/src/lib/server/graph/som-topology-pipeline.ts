@@ -15,6 +15,7 @@ import { trainSOM } from '$lib/server/gpu/pytorch-graph.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { ENV } from '$lib/server/env.server.js';
 import { pool } from '$lib/server/db/client';
+import { classifyPath } from '$lib/server/tensor/topology-byte-mapper.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -128,17 +129,19 @@ async function updateQdrantSomClusters(
 		const batch = files.slice(i, i + BATCH);
 		const payloadGroups = new Map<
 			string,
-			{ ids: Array<number | string>; payload: Record<string, number> }
+			{ ids: Array<number | string>; payload: Record<string, number | string> }
 		>();
 
 		for (let j = 0; j < batch.length; j++) {
 			const f = batch[j];
 			const bmuIdx = bmuAssignments[i + j];
 			const gridW = opts.gridW;
+			const topoClass = classifyPath(f.filePath);
 			const payload = {
 				som_cluster: bmuIdx,
 				som_bmu_row: Math.floor(bmuIdx / gridW),
 				som_bmu_col: bmuIdx % gridW,
+				cluster_key: `${topoClass}:${bmuIdx}`,
 			};
 			const key = `${payload.som_cluster}:${payload.som_bmu_row}:${payload.som_bmu_col}`;
 			const existing = payloadGroups.get(key);
