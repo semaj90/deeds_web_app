@@ -206,7 +206,7 @@ await gate('GDS9', 'Degraded mode: Postgres fan-in fallback query works', async 
   try {
     await client.connect();
     const res = await client.query(
-      `SELECT COUNT(*) AS cnt FROM code_relations WHERE from_file IS NOT NULL LIMIT 1`
+      `SELECT COUNT(*) AS cnt FROM code_relations WHERE source_file IS NOT NULL LIMIT 1`
     );
     const cnt = parseInt(res.rows[0]?.cnt ?? 0);
     if (cnt === 0) throw new Error('WARN: code_relations is empty — authority fallback will yield 0 scores');
