@@ -1,0 +1,92 @@
+{
+  "runId": "2026-05-07-17-00-51",
+  "writtenAt": "2026-05-07T17:00:51.216Z",
+  "nodesScored": 374,
+  "nodesMirrored": 7119,
+  "durationMs": 11031,
+  "collection": "codebase_chunks_768",
+  "neo4jUri": "bolt://localhost:7687",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "topScores": [
+    {
+      "stableKey": "lib/server/ace/context-assembler.ts",
+      "score": 0.7
+    },
+    {
+      "stableKey": "lib/server/graph/relationship-extractor.ts",
+      "score": 0.56868
+    },
+    {
+      "stableKey": "mcp/trace-mcp-server.ts",
+      "score": 0.48131999999999997
+    },
+    {
+      "stableKey": "lib/server/config/vector-config.ts",
+      "score": 0.43764
+    },
+    {
+      "stableKey": "lib/server/ml/recommendation-metrics.ts",
+      "score": 0.39368
+    },
+    {
+      "stableKey": "lib/server/graph/hypergraph-4d.ts",
+      "score": 0.35
+    },
+    {
+      "stableKey": "lib/server/graph/pg-neo4j-sync.ts",
+      "score": 0.35
+    },
+    {
+      "stableKey": "routes/api/phase89/analysis/+server.ts",
+      "score": 0.35
+    },
+    {
+      "stableKey": "lib/server/graph/community-graph.ts",
+      "score": 0.30632
+    },
+    {
+      "stableKey": "lib/ai/model-ids.ts",
+      "score": 0.26264
+    },
+    {
+      "stableKey": "lib/server/ace/retrieval-lanes.ts",
+      "score": 0.26264
+    },
+    {
+      "stableKey": "lib/server/wiki/wiki-redis-cache.ts",
+      "score": 0.26264
+    },
+    {
+      "stableKey": "routes/api/dashboard/stats/+server.ts",
+      "score": 0.26264
+    },
+    {
+      "stableKey": "routes/api/graph/timeline/+server.ts",
+      "score": 0.26264
+    },
+    {
+      "stableKey": "routes/api/search/+server.ts",
+      "score": 0.26264
+    },
+    {
+      "stableKey": "lib/server/ace/multi-lane-retrieval.ts",
+      "score": 0.21867999999999999
+    },
+    {
+      "stableKey": "lib/server/ai/gemma4-agent.ts",
+      "score": 0.21867999999999999
+    },
+    {
+      "stableKey": "lib/server/db/seed.ts",
+      "score": 0.21867999999999999
+    },
+    {
+      "stableKey": "lib/server/graph/neo4j-schema.ts",
+      "score": 0.21867999999999999
+    },
+    {
+      "stableKey": "lib/server/indexer/directory-summarizer.ts",
+      "score": 0.21867999999999999
+    }
+  ]
+}

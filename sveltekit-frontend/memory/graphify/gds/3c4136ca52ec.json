@@ -1,0 +1,3524 @@
+{
+  "runId": "3c4136ca52ec",
+  "startedAt": "2026-05-07T17:06:09.894Z",
+  "gdsAvailable": true,
+  "pagerankRows": 0,
+  "communities": 0,
+  "authorityScoresComputed": 2772,
+  "qdrantPatched": 4,
+  "redisCached": 200,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "PASS",
+    "GDS3": "FAIL: Failed to invoke procedure `gds.graph.project`: Caused by: java.lang.IllegalArgu",
+    "GDS4": "DEGRADED: 2772 files from Postgres fan-in",
+    "GDS5": "SKIP (GDS unavailable)",
+    "GDS6": "PASS",
+    "GDS7": "PASS: 4 patches",
+    "GDS8": "PASS: 200 entries",
+    "GDS9": "PASS"
+  },
+  "finishedAt": "2026-05-07T17:06:11.761Z",
+  "topAuthorities": [
+    {
+      "filePath": "lib/server/ace/context-assembler.ts",
+      "graphAuthorityScore": 0.25,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/relationship-extractor.ts",
+      "graphAuthorityScore": 0.2031,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "mcp/trace-mcp-server.ts",
+      "graphAuthorityScore": 0.1719,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/__tests__/cache-smoke.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/__tests__/hypergraph-store.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/test-utils/setup.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(dev)/test-source-validation/+page.svelte",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/__tests__/cases-schemas.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/search/__tests__/search-schema.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons-of-interest/__tests__/poi-schemas.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/search/__tests__/rag-search-schema.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/generate/__tests__/generate-schema.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/cache-demo/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/cache-simple/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/cache-single-conn/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/ollama-cached/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/redis-direct/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/redis-write/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/tiered-cache/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/test/webgpu-modules/+server.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/cache/__tests__/cache.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/agentic/__tests__/AgentChat.test.ts",
+      "graphAuthorityScore": 0.1656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/config/vector-config.ts",
+      "graphAuthorityScore": 0.1563,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ml/recommendation-metrics.ts",
+      "graphAuthorityScore": 0.1406,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/admin/all-routes/__tests__/page.test.ts",
+      "graphAuthorityScore": 0.1323,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/pg-neo4j-sync.ts",
+      "graphAuthorityScore": 0.125,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/hypergraph-4d.ts",
+      "graphAuthorityScore": 0.125,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/phase89/analysis/+server.ts",
+      "graphAuthorityScore": 0.125,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/community-graph.ts",
+      "graphAuthorityScore": 0.1094,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/retrieval-lanes.ts",
+      "graphAuthorityScore": 0.0938,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/wiki/wiki-redis-cache.ts",
+      "graphAuthorityScore": 0.0938,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/search/+server.ts",
+      "graphAuthorityScore": 0.0938,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/dashboard/stats/+server.ts",
+      "graphAuthorityScore": 0.0938,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/ai/model-ids.ts",
+      "graphAuthorityScore": 0.0938,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/timeline/+server.ts",
+      "graphAuthorityScore": 0.0938,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/neo4j-schema.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/seed.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/timeline/+server.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/similar/+server.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/directory-summarizer.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/search/suggestions/+server.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/multi-lane-retrieval.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/wiki/wiki-neo4j-sync.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/sse/chat/+server.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "mcp/tools/trace-kag.tool.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/simulation/grpo-strategy.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/gemma4-agent.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/claude-assist/+server.ts",
+      "graphAuthorityScore": 0.0781,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/__tests__/token-tracker.test.ts",
+      "graphAuthorityScore": 0.0656,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/generate-from-template/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/wiki/wiki-gap-analyzer.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/seed-citations.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/export/pdf/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/synthesis/evaluation/[id]/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/schema-postgres.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/upload/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/gpu-pipeline/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/web-research-crawler.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/engagement/idle-reengagement.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/codebase-neo4j-sync.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/error-kag-writer.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/yorha/analytics/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/retrieval/orchestrator.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/yorha/search/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/code-intel-service.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/generate/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/contextual/chat/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/jsonb-legal-schema.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/grpc/embedding-client.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/cache/cartridge-tensor-bridge.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/queue/queue-worker.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/+page.server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/queue/rabbitmq-manager-fixed.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/ngram-retrieval.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ace/health/+server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/legal-corpus/+page.server.ts",
+      "graphAuthorityScore": 0.0625,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/neo4j-gds.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/legal/ingestion-worker.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/laws/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/orchestrate/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/key-points/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/som-topology-pipeline.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analysis/evidence-analysis-pipeline.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/pipeline/status/[jobId]/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/llm/contextual-chat.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/chat/stream/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/precedents/search/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/agents-write/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/rag/sdk.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/mcp-tool-dispatch.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/vector-operations.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/command-center/+page.server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/codebase-cluster-detection.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/[id]/reports/+page.server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ai/case-prediction/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/codebase-research.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/citations/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/evidence/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/vector-search/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/mapreduce-matrix-analysis.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/search/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/services/knowledge-search/ACPToolRegistry.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/search/server.route.test.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/qlora-dataset/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/deep-research.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/evidence/upload/+page.server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/research-graph-rl.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/citations/export/json/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/retrieval/topological-search.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/recommendations/jobs/[jobId]/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/search/filters/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/citations/export/pdf/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/gpu/background-analyzer.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/graph-remote-functions.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/evidence-graph-service.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons-of-interest/[id]/face-match/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/glyph-atlas-builder.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase/wiki/index/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/inference/turbo-prefix-cache.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/citations/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/architectural-guard.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/retrieval/graph-context.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/analyze/stream/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ai/case-scoring/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/retrieval/codebase-context.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "mcp/server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/context-compression.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons-of-interest/[id]/risk/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ai/context/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/legal-corpus/[id]/+page.server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/contextual/state/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/overview/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/couchdb-pagerank/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/gpu-karpathy-tagger.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ai/stats/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/library/health/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/.well-known/llms.txt/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/enrich-qdrant/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/redis.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/feedback/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/notes/search/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/export/obsidian/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/seed-simple.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/[id]/overview/+page.server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/generate-todos/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/retrieval/graph-informed-retrieval.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/versions/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/colab-export/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/notes/[noteId]/evidence/+server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/analysis-center/+page.server.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/missing-import-recommendations.ts",
+      "graphAuthorityScore": 0.0469,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/documents/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/process/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/suggestions/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/citations/collections/[collectionId]/citations/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/recommendations/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/citations/saved/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/[id]/export/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/[id]/publish/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/batch-export/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/qdrant-integration.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/police/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/preview/[id]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/reports/save/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/vector/embedding-gemma.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/warden-schema.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/workspace-operations.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/grpc/retrieval-client.test.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/grpc/retrieval-client.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/schema-ingestion.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/research-cache.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/legal-ai/CaseChatPanel.svelte",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/search/cases/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/embedding/embed-schema.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/search/laws/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/ast-chunker.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/workers/audio-processor.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/statutes/[id]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/statutes/[id]/summary/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/statutes/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-graph/agents-freshness/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/research-summaries-db.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/workers/document-embed-consumer.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/batch-gpu/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/sync/documents/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/workers/video-vlm-processor.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/embedding/embedding-persist.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/library/glossary/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/search-analytics.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/cluster-assign/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/cluster-summary.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/dual-embedder.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/unified-research-query.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/tags/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/karpathy-wiki.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/config.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/reports/audit.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/file-intel/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analytics/web-research-crawler.test.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/graph/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/index-stream/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/reports/[id]/+layout.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/kag-notebook/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/karpathy-tag/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/karpathy-tag/backfill/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/karpathy-tag/gpu/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/ace-error-kag.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/indexer/run-cluster-assign.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/ai/cache-result/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/related/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/ai/summarize-async/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/ai/summary-cache/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/research/lane4-feedback.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/stats/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/evidence/advanced-analysis/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/evidence/analyze/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase-index/tags/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/legal/compare-pdf/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/[id]/+layout.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/redis/cache/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/adapters/service-integrations.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/v1/vector/store/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/video/analysis/[evidenceId]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase/analyze/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase/auto-research/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/hmm-wiki-logger.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/whisper/transcribe/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/demos/memory-palace/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/couchdb/memory-mirror.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/ace-hit-tagger.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/agent/supervisor.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/yorha/cases/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/audit/evidence-audit.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/login/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/codebase/tags/rename/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/models/ChatSession.svelte.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/additional-tables.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/retrieval/cluster-aware-reranker.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/[id]/evidence/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/.well-known/llms-full.txt/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/contextual/predictions/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/contextual/stats/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/[id]/evidence/upload/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/keyword-extractor.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/[id]/notes/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/knowledge-cache.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/dev/login-demo/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/document/[docId]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/document/analysis/[evidenceId]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/documents/[id]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/documents/[id]/auto-save/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/documents/upload/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/retrieval/document-dag.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ace/context/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "workers/embedding-worker.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/error-brain/diagnose/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ace/ingest/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/error-brain/search/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/evidence/batch-entity-embedder.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/cases/new/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[docId]/status/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/approve/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/audit/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/chain-of-custody/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/download/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/gpu-analysis/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/key-points/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/report/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/suggest-summary/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/[id]/vlm-analyze/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/evidence/batch-entity-storer.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/cache-config.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/legal/constitution-pipeline.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/analysis/cache/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/trace-reranker.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/entities/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "hooks.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/search/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/evidence/summary/[id]/approve/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/evidence/services/drizzle-stub.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analysis/analysis-jobs.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/glossary/search/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/glossary/terms/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/search/mla-kv-compress.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "mcp/tools/graph-analysis.tool.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/search/neo4j-rerank.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/bow-texture/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/cluster-summaries/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/connections/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/glyph-atlas/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/search/postgres-fts.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/search/qdrant-search.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/cache/cluster-summary-forest.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/cache/code-llm-index.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/chat-memory.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/db/schema.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/topology-neighbors/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/graph/traverse/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/hypergraph-store.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/pgvector-utils.temp.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/pgvector-utils.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ai/yorha/context-chat/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/modals/EvidenceCRUDModal.svelte",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/kv-context-controller.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/lang-extract.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/health/services/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/queries.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/health/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/mirror-health/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/ingest/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/glyph-diffusion-service.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/research-graph/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/research-summaries/[id]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/research-summaries/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/research-topics/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/analysis/summarizer.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/analytics/search-patterns/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ai/langgraph-research.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/error-fingerprint.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ml/multi-modal-ranker.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/active-cases/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/audio/analysis/[evidenceId]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/audio/progress/[evidenceId]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/audio/search/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/audio/upload/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/gpu/libtorch-bridge.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/seed-dev-user.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/trace/trace-collector.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/cartridge/glyph-tile-engine.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/ssr-health-check.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/schema-chat.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/db/unified-client.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/onboarding/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cache/set/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/types/qdrant.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/gpu-graph-analysis.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons-of-interest/[id]/photos/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/unified/legal-ai-service.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons-of-interest/[id]/summary/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/canon/ingest/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/canon/search/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons-of-interest/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cartridge/export/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/graph-centrality.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/persons/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cartridge/search/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/graph-intel.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cartridge/tile-atlas/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/phase109/tag-chunks/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/canvas/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/chat/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/connections/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/notes/[noteId]/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/notes/[noteId]/versions/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/notes/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/persons/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/[id]/reasoning-chain/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/evidence/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/ace/types.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/phase89/reindex/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/phase89/search/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/analytics/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/cases/cluster/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/(app)/evidence/manage/+page.server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/graph/user-interaction-sync.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/qlora/generate/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/server/png-embed-extractor.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/citations/[citationId]/tags/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "routes/api/rag/answer/+server.ts",
+      "graphAuthorityScore": 0.0313,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/source-validation/CitationInspector.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/source-validation/ProvenanceGraph.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/source-validation/SourceValidator.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/StatsPanel.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/StreamingResponse.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/subcomponents/LoadingSpinner.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/terminal/TerminalWindow.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/TipTapEditor.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/types.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AccessibilityPanel.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AccessibilitySettings.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AdaptiveRenderingEngine.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AIDialog.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AIDropdown.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AIFileUpload.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AILoadingIndicator.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialog.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogAction.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogCancel.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogContent.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogDescription.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogFooter.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogHeader.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogOverlay.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogPortal.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogRoot.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogTitle.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/AlertDialogTrigger.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/index.js",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/alert-dialog/types.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AuthModal.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/AutoPopulatedCaseForm.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/avatar/Avatar.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/avatar/AvatarFallback.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/avatar/AvatarImage.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/avatar/index.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/avatar/Svelte5Avatar.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Badge.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/badge/Badge.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/badge/index.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/badge/Svelte5Badge.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/bits/Button.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/bits/compound.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/bits/index.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/bits/Svelte5Button.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/bits/Svelte5Dialog.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/BitsUIDemo.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Breadcrumbs.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/button-variants.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Button.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/button/Button.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/button/index.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CacheMonitoringWidget.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Card.js",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Card.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/Card.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/CardContent.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/CardDescription.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/CardFooter.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/CardHeader.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/CardTitle.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/index.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/card/Svelte5Card.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CardContent.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CardDescription.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CardFooter.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CardHeader.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CardTitle.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CaseForm.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/ChatMessage.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Checkbox.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/CommandPalette.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/context-menu.js",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/ContextMenuContent.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/ContextMenuItem.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/ContextMenuSeparator.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/ContextMenuTrigger.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/core/Label.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/core/Textarea.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Dialog.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/Dialog.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogClose.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogContent.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogDescription.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogFooter.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogHeader.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogOverlay.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogPortal.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogRoot.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogTitle.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/DialogTrigger.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/index.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/dialog/types.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/DialogWrapper.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/DiamondModal.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/DiffViewer.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Dropdown.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/DropdownMenu.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/EmptyState.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/enhanced-bits.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/enhanced-bits/Button.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/enhanced/button-variants.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/ErrorBoundary.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/ExpandGrid.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/FeedbackButtons.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Field.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/Form.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/16bit/SNES16BitButton.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/8bit/NES8BitButton.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/8bit/NES8BitContainer.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/constants/gaming-constants-minimal.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/constants/gaming-constants.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/core/GamingEvolutionManager.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/core/ProgressiveGamingProvider.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/core/useGamingEvolution.js",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/demo/GPUCacheIntegrationDemo.svelte",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/effects/audio-effects.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "lib/components/ui/gaming/effects/gradient-utils.ts",
+      "graphAuthorityScore": 0.0156,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    }
+  ]
+}

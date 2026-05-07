@@ -1,0 +1,3524 @@
+{
+  "runId": "36f3b4aef271",
+  "startedAt": "2026-05-07T17:10:02.523Z",
+  "gdsAvailable": true,
+  "pagerankRows": 0,
+  "communities": 1,
+  "authorityScoresComputed": 2772,
+  "qdrantPatched": 0,
+  "redisCached": 200,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "PASS",
+    "GDS3": "PASS",
+    "GDS4": "FAIL: 0 rows",
+    "GDS5": "FAIL: 0 rows",
+    "GDS6": "WARN: only 0 files with non-zero score",
+    "GDS7": "WARN: 0 patches",
+    "GDS8": "PASS: 200 entries",
+    "GDS9": "PASS"
+  },
+  "finishedAt": "2026-05-07T17:10:15.331Z",
+  "topAuthorities": [
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "",
+      "graphAuthorityScore": 0,
+      "communityId": null,
+      "pagerank": 0,
+      "topoClass": "unclassified"
+    }
+  ]
+}
