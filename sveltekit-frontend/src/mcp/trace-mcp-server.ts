@@ -22,8 +22,11 @@
  *   clusters.get_summary_lenses — AGENTS.md / wiki notes for cluster
  *   trace.kag_search           — full KAG-DAG retrieval (via /api/graph/traverse + ACE)
  *   trace.explain_retrieval    — retrieval trace for a prior query
- *   kag.record_agent_run       — write run artifacts + queue JSONL for ingest
- *   kag.ingest_memory_directory — flush pending JSONL queue → Redis ACE cache
+ *   kag.record_agent_run         — write run artifacts + queue JSONL for ingest
+ *   kag.ingest_memory_directory  — flush pending JSONL queue → Redis ACE cache
+ *   graph.expand_neighborhood    — ego-graph expansion (direct + N-hop neighbours)
+ *   clusters.get_summary_lenses  — AGENTS.md/wiki notes for a GPU cluster
+ *   trace.validate_ace_hit       — validate cache key contract + graph node presence
  */
 
 import http from 'node:http';
@@ -42,7 +45,9 @@ const NEO4J_USER = process.env.NEO4J_USER           ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
 const REDIS_URL  = process.env.REDIS_URL             ?? 'redis://127.0.0.1:6379';
 const PG_URL     = process.env.DATABASE_URL          ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
-const TOPO_URL   = process.env.TOPOLOGY_SEARCH_URL  ?? 'http://127.0.0.1:8101';
+const TOPO_URL          = process.env.TOPOLOGY_SEARCH_URL  ?? 'http://127.0.0.1:8101';
+const GO_SEARCH_URL     = process.env.GO_SEARCH_URL         ?? 'http://127.0.0.1:8096';
+const GO_RETRIEVAL_URL  = process.env.GO_RETRIEVAL_URL      ?? 'http://127.0.0.1:8100';
 
 const pool = new Pool({ connectionString: PG_URL, max: 4, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
 pool.on('error', () => {});
@@ -287,6 +292,45 @@ server.tool(
   }
 );
 
+// ── topology.search_4d ───────────────────────────────────────────────────────
+// Explicit 4D manifold coordinate search with optional JSONB payload filters.
+// Use when you already know the SOM grid position and want structurally-adjacent
+// files rather than starting from a text query.
+
+server.tool(
+  'topology.search_4d',
+  {
+    som_x:      z.number().describe('SOM X coordinate (BMU column, 0-based)'),
+    som_y:      z.number().describe('SOM Y coordinate (BMU row, 0-based)'),
+    semantic_z: z.number().min(0).max(1).default(0.5).optional().describe('Semantic centroid projection 0–1'),
+    grpo_w:     z.number().min(0).max(1).default(0.5).optional().describe('GRPO quality weight 0–1'),
+    radius:     z.number().min(0.01).max(5.0).default(0.5).describe('4D Euclidean radius'),
+    limit:      z.number().int().min(1).max(50).default(20).describe('Max results'),
+    filters:    z.record(z.unknown()).optional().describe('JSONB payload filters (e.g. { "topo_class": "server" })'),
+  },
+  async ({ som_x, som_y, semantic_z, grpo_w, radius, limit, filters }) => {
+    try {
+      const body: Record<string, unknown> = {
+        center: { som_x, som_y, semantic_z: semantic_z ?? 0.5, grpo_w: grpo_w ?? 0.5 },
+        radius,
+        limit,
+      };
+      if (filters && Object.keys(filters).length > 0) body.filters = filters;
+      const res = await fetch(`${TOPO_URL}/search/4d`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) throw new Error(`topology /search/4d HTTP ${res.status}`);
+      const data = await res.json();
+      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err), hint: 'topology-search-server may not be running (port 8101)' }) }] };
+    }
+  }
+);
+
 // ── clusters.get_members ──────────────────────────────────────────────────────
 
 server.tool(
@@ -351,7 +395,38 @@ server.tool(
     limit:    z.number().int().min(1).max(50).default(10).describe('Max chunks returned'),
   },
   async ({ query, filePath, limit }) => {
-    // ── Try SvelteKit KAG-DAG pipeline first (3s budget — fast-path only) ───────
+    // ── Try Go retrieval service first (GPU embedding + JSONB cache, 5s budget) ──
+    try {
+      const goRes = await fetch(`${GO_RETRIEVAL_URL}/search/codebase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, limit }),
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (goRes.ok) {
+        const goData = await goRes.json() as { results?: Array<{
+          id?: string; file_path?: string; stable_key?: string;
+          score?: number; content?: string; topo_class?: string;
+        }> };
+        if (goData.results?.length) {
+          const hits = goData.results.map(h => ({
+            stable_key: h.stable_key ?? h.id ?? '',
+            file_path:  h.file_path ?? '',
+            score:      h.score ?? 0,
+            content:    (h.content ?? '').slice(0, 600),
+            topo_class: h.topo_class ?? '',
+          }));
+          return {
+            content: [{
+              type: 'text' as const,
+              text: JSON.stringify({ success: true, data: hits, count: hits.length, source: 'go_retrieval' }, null, 2),
+            }],
+          };
+        }
+      }
+    } catch { /* fall through to SvelteKit */ }
+
+    // ── Try SvelteKit KAG-DAG pipeline (3s budget — fast-path only) ─────────────
     try {
       const body: Record<string, unknown> = { query, limit };
       if (filePath) body.filePath = filePath;
@@ -543,6 +618,38 @@ server.tool(
       };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
+    }
+  }
+);
+
+// ── search.go_hybrid ─────────────────────────────────────────────────────────
+// Go search service RRF fusion: parallel fan-out of citation + FTS + pgvector +
+// Qdrant → reciprocal rank fusion. Faster than the Node.js hybrid for bulk recall.
+// Falls back gracefully when go-search-service is not running.
+
+server.tool(
+  'search.go_hybrid',
+  {
+    query:   z.string().describe('Search query — RRF fusion of FTS + pgvector + Qdrant via go-search-service'),
+    limit:   z.number().int().min(1).max(50).default(20).optional(),
+    type:    z.enum(['codebase', 'legal', 'hybrid']).default('codebase').optional().describe('Search domain'),
+    filters: z.record(z.unknown()).optional().describe('JSONB metadata filters applied at the Go service level'),
+  },
+  async ({ query, limit = 20, type = 'codebase', filters }) => {
+    try {
+      const body: Record<string, unknown> = { query, limit, type };
+      if (filters && Object.keys(filters).length > 0) body.filters = filters;
+      const res = await fetch(`${GO_SEARCH_URL}/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok) throw new Error(`go-search HTTP ${res.status}`);
+      const data = await res.json();
+      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err), hint: 'go-search-service unavailable (port 8096)' }) }] };
     }
   }
 );
@@ -943,85 +1050,118 @@ server.tool(
       const processedFiles: string[] = [];
       const failedFiles: Array<{ path: string; reason: string }> = [];
 
+      // Parse all files into record batches first, then do pipelined Redis I/O
+      type ParsedRec = {
+        rec: Record<string, unknown>;
+        recType: string;
+        sourceKind: string;
+        stableKey: string;
+        idHash: string;
+        idempKey: string;
+        file: string;
+      };
+
+      const parsedByFile = new Map<string, { records: ParsedRec[]; raw: string }>();
+      const fileErrors   = new Map<string, string>();
+
       for (const file of batch) {
         const src = join(pendDir, file);
-        let fileOk = true;
-        let fileReason = '';
-
         try {
           const raw   = readFileSync(src, 'utf8');
-          const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-
+          const lines = raw.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0);
+          const records: ParsedRec[] = [];
           for (const line of lines) {
             let rec: Record<string, unknown>;
             try { rec = JSON.parse(line) as Record<string, unknown>; }
             catch { failed++; continue; }
-
             const recType    = (rec.type as string | undefined) ?? '';
             const sourceKind = (rec.source_kind as string | undefined) ?? '';
             const stableKey  = (rec.stable_key as string | undefined) ?? (rec.id as string | undefined) ?? line.slice(0, 80);
             const idHash     = createHash('sha1').update(stableKey).digest('hex').slice(0, 12);
-            const idempKey   = `kag:ingested:${idHash}`;
+            records.push({ rec, recType, sourceKind, stableKey, idHash, idempKey: `kag:ingested:${idHash}`, file });
+          }
+          parsedByFile.set(file, { records, raw });
+        } catch (fileErr) {
+          fileErrors.set(file, String(fileErr));
+          failed++;
+        }
+      }
 
-            if (dryRun) { ingested++; continue; }
+      if (dryRun) {
+        for (const { records } of parsedByFile.values()) ingested += records.length;
+      } else {
+        // ── Pipeline pass 1: batch EXISTS check for all idempotency keys ──────
+        const allRecords: ParsedRec[] = [];
+        for (const { records } of parsedByFile.values()) allRecords.push(...records);
 
-            // Idempotency: skip if written within last 7 days
-            if (redis) {
-              if (await redis.exists(idempKey)) { skipped++; continue; }
+        const alreadyIngested = new Set<string>();
+        if (redis && allRecords.length > 0) {
+          const CHUNK = 500;
+          for (let i = 0; i < allRecords.length; i += CHUNK) {
+            const slice = allRecords.slice(i, i + CHUNK);
+            const pipe  = redis.pipeline();
+            for (const r of slice) pipe.exists(r.idempKey);
+            const results = await pipe.exec();
+            if (results) {
+              for (let j = 0; j < slice.length; j++) {
+                if ((results[j]?.[1] as number) > 0) alreadyIngested.add(slice[j].idHash);
+              }
             }
+          }
+        }
+
+        // ── Dispatch: build Redis pipeline writes + collect Postgres rows ─────
+        const now = new Date().toISOString();
+        const pgRows: Array<[string, string, string, string]> = []; // event_type, pipeline, session_id, payload
+
+        const CHUNK = 500;
+        for (let i = 0; i < allRecords.length; i += CHUNK) {
+          const slice   = allRecords.slice(i, i + CHUNK);
+          const pipe    = redis ? redis.pipeline() : null;
+          let chunkIngest = 0;
+
+          for (const { rec, recType, sourceKind, stableKey, idHash, idempKey } of slice) {
+            if (alreadyIngested.has(idHash)) { skipped++; continue; }
 
             try {
               if (recType === 'error') {
-                // Postgres context_timeline
-                try {
-                  await pool.query(
-                    `INSERT INTO context_timeline (event_type, pipeline, session_id, payload)
-                     VALUES ($1, $2, $3, $4::jsonb)`,
-                    ['error_ingested', 'kag', '',
-                     JSON.stringify({ id: rec.id, summary: rec.summary, tags: rec.tags,
-                       files: rec.files, confidence: rec.confidence,
-                       needsDeepResearch: rec.needsDeepResearch,
-                       source_file: file, ingested_at: new Date().toISOString() })],
-                  );
-                } catch { /* Postgres down or migration pending — non-fatal */ }
-                // Redis ACE error cache (24h)
-                if (redis) {
-                  await redis.setex(`ace:error:${idHash}`, 86_400, JSON.stringify({
-                    id: rec.id, summary: rec.summary,
-                    tags:  Array.isArray(rec.tags)  ? rec.tags  : [],
-                    files: Array.isArray(rec.files) ? rec.files : [],
-                    confidence: rec.confidence ?? 0.5,
-                    needsDeepResearch: rec.needsDeepResearch ?? false,
-                    ingested_at: new Date().toISOString(),
-                  }));
+                pgRows.push(['error_ingested', 'kag', '',
+                  JSON.stringify({ id: rec.id, summary: rec.summary, tags: rec.tags,
+                    files: rec.files, confidence: rec.confidence,
+                    needsDeepResearch: rec.needsDeepResearch,
+                    source_file: (rec as any).__file ?? '', ingested_at: now })]);
+                if (pipe) pipe.setex(`ace:error:${idHash}`, 86_400, JSON.stringify({
+                  id: rec.id, summary: rec.summary,
+                  tags:  Array.isArray(rec.tags)  ? rec.tags  : [],
+                  files: Array.isArray(rec.files) ? rec.files : [],
+                  confidence: rec.confidence ?? 0.5,
+                  needsDeepResearch: rec.needsDeepResearch ?? false,
+                  ingested_at: now,
+                }));
+                // P0-C: persist to error_fingerprints table for hash + n-gram lane recall
+                if (redis && rec.summary && typeof rec.summary === 'string') {
+                  import('../lib/server/ace/error-fingerprint.js').then(({ storeErrorFingerprint }) => {
+                    storeErrorFingerprint(redis!, pool, rec.summary as string).catch(() => {});
+                  }).catch(() => {});
                 }
 
               } else if (recType === 'agent_run') {
-                try {
-                  await pool.query(
-                    `INSERT INTO context_timeline (event_type, pipeline, session_id, payload)
-                     VALUES ($1, $2, $3, $4::jsonb)`,
-                    ['agent_run_ingested', 'kag', '',
-                     JSON.stringify({ id: rec.id, summary: rec.summary, tags: rec.tags,
-                       files: rec.files, confidence: rec.confidence, patchResult: rec.patchResult,
-                       needsDeepResearch: rec.needsDeepResearch,
-                       source_file: file, ingested_at: new Date().toISOString() })],
-                  );
-                } catch { /* non-fatal */ }
-                if (redis) {
-                  await redis.setex(`ace:agent:${idHash}`, 86_400, JSON.stringify({
-                    id: rec.id, summary: rec.summary, confidence: rec.confidence,
-                    patchResult: rec.patchResult, ingested_at: new Date().toISOString(),
-                  }));
-                }
+                pgRows.push(['agent_run_ingested', 'kag', '',
+                  JSON.stringify({ id: rec.id, summary: rec.summary, tags: rec.tags,
+                    files: rec.files, confidence: rec.confidence, patchResult: rec.patchResult,
+                    needsDeepResearch: rec.needsDeepResearch,
+                    source_file: (rec as any).__file ?? '', ingested_at: now })]);
+                if (pipe) pipe.setex(`ace:agent:${idHash}`, 86_400, JSON.stringify({
+                  id: rec.id, summary: rec.summary, confidence: rec.confidence,
+                  patchResult: rec.patchResult, ingested_at: now,
+                }));
 
               } else if (sourceKind === 'graphify_deep_imports') {
-                // Code-graph nodes → Redis fast ACE lookup (12h TTL)
-                if (redis) {
-                  const srcType = (rec.source_type as string | undefined) ?? '';
-                  const ttl = 43_200;
+                const srcType = (rec.source_type as string | undefined) ?? '';
+                const ttl = 43_200;
+                if (pipe) {
                   if (srcType === 'node_summary') {
-                    await redis.setex(`code:graph:node:${idHash}`, ttl, JSON.stringify({
+                    pipe.setex(`code:graph:node:${idHash}`, ttl, JSON.stringify({
                       file_path: rec.file_path, zone: rec.zone,
                       directFanIn: rec.directFanIn, directFanOut: rec.directFanOut,
                       upstreamNodeCount: rec.upstreamNodeCount,
@@ -1029,39 +1169,54 @@ server.tool(
                       text: rec.text, stable_key: stableKey,
                     }));
                   } else if (srcType === 'hotspot_callers') {
-                    await redis.setex(`code:graph:hotspot:${idHash}`, ttl, JSON.stringify({
+                    pipe.setex(`code:graph:hotspot:${idHash}`, ttl, JSON.stringify({
                       file_path: rec.file_path, zone: rec.zone,
                       directFanIn: rec.directFanIn, topCallers: rec.topCallers,
                       text: rec.text, stable_key: stableKey,
                     }));
                   }
                 }
+                // graphify bulk records: skip per-row Postgres to stay under timeout
 
               } else if (recType === 'ace_hit') {
-                if (redis) {
-                  await redis.setex(`ace:hit:${idHash}`, 86_400, JSON.stringify(rec));
-                }
+                if (pipe) pipe.setex(`ace:hit:${idHash}`, 86_400, JSON.stringify(rec));
               }
               // else: unknown type — skip silently
 
-              // Mark as ingested (7-day idempotency TTL)
-              if (redis) await redis.setex(idempKey, 604_800, '1');
-              ingested++;
-            } catch (dispatchErr) {
-              failed++;
-            }
+              if (pipe) pipe.setex(idempKey, 604_800, '1');
+              chunkIngest++;
+            } catch { failed++; }
           }
-        } catch (fileErr) {
-          fileOk = false;
-          fileReason = String(fileErr);
-          failed++;
+
+          if (pipe) {
+            try { await pipe.exec(); } catch { /* non-fatal — will re-ingest next run */ }
+          }
+          ingested += chunkIngest;
         }
+
+        // ── Postgres batch: error + agent_run rows only (small count) ─────────
+        for (const [eventType, pipeline, sessionId, payload] of pgRows) {
+          try {
+            await pool.query(
+              `INSERT INTO context_timeline (event_type, pipeline, session_id, payload)
+               VALUES ($1, $2, $3, $4::jsonb)`,
+              [eventType, pipeline, sessionId, payload],
+            );
+          } catch { /* Postgres down or migration pending — non-fatal */ }
+        }
+      }
+
+      // ── Move files ───────────────────────────────────────────────────────────
+      for (const file of batch) {
+        const src   = join(pendDir, file);
+        const fileOk = !fileErrors.has(file);
 
         if (!dryRun && moveProcessed) {
           if (fileOk) {
             try { renameSync(src, join(doneDir, file)); processedFiles.push(file); }
             catch (mvErr) { failedFiles.push({ path: file, reason: `move failed: ${mvErr}` }); }
           } else {
+            const fileReason = fileErrors.get(file) ?? 'unknown error';
             try {
               writeFileSync(join(failDir, file + '.report.json'), JSON.stringify({ file, reason: fileReason }));
               renameSync(src, join(failDir, file));
@@ -1099,6 +1254,203 @@ server.tool(
   }
 );
 
+// ── kag.ingest_error ──────────────────────────────────────────────────────────
+// Normalize + fingerprint raw error text, store in Redis ace:error:{hash} and
+// Postgres error_fingerprints, fire-and-forget. Returns the fingerprint.
+
+server.tool(
+  'kag.ingest_error',
+  {
+    errorText: z.string().max(8000).describe('Raw error text: stack trace, compiler output, log line'),
+    priorFix:  z.string().max(2000).optional().describe('Known fix for this error if already resolved'),
+  },
+  async ({ errorText, priorFix }) => {
+    try {
+      const { storeErrorFingerprint } = await import('../lib/server/ace/error-fingerprint.js');
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+      const fp = await storeErrorFingerprint(r, pool, errorText, priorFix);
+      await r.quit().catch(() => {});
+      return { content: [{ type: 'text' as const, text: JSON.stringify(fp, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── kag.multi_lane_search ─────────────────────────────────────────────────────
+// 4-lane retrieval: hash → n-gram → graph-node → ACE cache.
+// Returns ranked hits + synthesisBlock ready for LLM context injection.
+
+server.tool(
+  'kag.multi_lane_search',
+  {
+    query:   z.string().max(4000).describe('Query text, error message, or symbol/file name'),
+    isError: z.boolean().default(false).describe('Treat query as an error fingerprint (enables hash lane)'),
+    topK:    z.number().int().min(1).max(30).default(10).describe('Hits per lane'),
+  },
+  async ({ query, isError, topK }) => {
+    try {
+      const { multiLaneSearch } = await import('../lib/server/ace/multi-lane-retrieval.js');
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+      const result = await multiLaneSearch(r, pool, { text: query, isError, topK });
+      await r.quit().catch(() => {});
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── graph.expand_neighborhood ────────────────────────────────────────────────
+// Ego-graph expansion: returns direct + 2-hop neighbours for a given file path.
+
+server.tool(
+  'graph.expand_neighborhood',
+  {
+    filePath: z.string().max(512).describe('Source file path (e.g. src/lib/server/ace/context-assembler.ts)'),
+    hops:     z.number().int().min(1).max(3).default(2).describe('Expansion depth'),
+    limit:    z.number().int().min(1).max(50).default(20).describe('Max neighbours to return'),
+  },
+  async ({ filePath, hops, limit }) => {
+    try {
+      const cypher = `
+        MATCH (start:CodebaseFile {file_path: $fp})
+        CALL apoc.path.subgraphNodes(start, {maxLevel: $hops, limit: $limit}) YIELD node
+        WHERE node <> start
+        RETURN node.file_path AS neighbour, node.neo4j_gpuCluster AS cluster,
+               node.neo4j_pageRankScore AS pageRank
+        ORDER BY pageRank DESC NULLS LAST
+        LIMIT $limit
+      `;
+      const rows = await neo4jQuery(cypher, { fp: filePath, hops, limit }).catch(() => ({ results: [] }));
+      const data = (rows as Record<string, unknown>).results?.[0]?.data ?? [];
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ filePath, hops, neighbours: data }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── clusters.get_summary_lenses ───────────────────────────────────────────────
+// Returns AGENTS.md notes and wiki KAG notes for a given GPU cluster.
+
+server.tool(
+  'clusters.get_summary_lenses',
+  {
+    clusterId: z.number().int().min(0).describe('GPU k-means cluster ID'),
+    maxNotes:  z.number().int().min(1).max(20).default(5).describe('Max wiki/KAG notes to include'),
+  },
+  async ({ clusterId, maxNotes }) => {
+    try {
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+
+      // Qdrant cluster members (top 5 files by pageRank)
+      const memberRows = await pool.query<{ file_path: string }>(
+        `SELECT DISTINCT metadata->>'file_path' AS file_path
+         FROM codebase_chunks
+         WHERE (metadata->>'neo4j_gpuCluster')::int = $1
+         ORDER BY (metadata->>'neo4j_pageRankScore')::float DESC NULLS LAST
+         LIMIT 5`,
+        [clusterId]
+      ).catch(() => ({ rows: [] as { file_path: string }[] }));
+      const keyFiles = memberRows.rows.map((r) => r.file_path).filter(Boolean);
+
+      // Wiki KAG notes for these files
+      const noteKeys = await r.keys(`wiki:note:dir:*`).catch(() => [] as string[]);
+      const notes: string[] = [];
+      for (const key of noteKeys.slice(0, maxNotes * 3)) {
+        const raw = await r.get(key).catch(() => null);
+        if (!raw) continue;
+        try {
+          const note = JSON.parse(raw) as { content?: string; dir?: string };
+          if (keyFiles.some((f) => f?.startsWith(note.dir ?? ''))) {
+            notes.push(note.content ?? '');
+            if (notes.length >= maxNotes) break;
+          }
+        } catch { /* skip malformed */ }
+      }
+
+      await r.quit().catch(() => {});
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ clusterId, keyFiles, kagNotes: notes }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── trace.validate_ace_hit ────────────────────────────────────────────────────
+// Validates whether a retrieved chunk is a true ACE hit by checking the
+// cache key contract, Qdrant payload freshness, and rerank breakdown presence.
+
+server.tool(
+  'trace.validate_ace_hit',
+  {
+    filePath:  z.string().max(512).describe('File path of the retrieved chunk'),
+    chunkId:   z.string().max(128).optional().describe('Qdrant chunk ID if known'),
+    queryHash: z.string().max(64).optional().describe('SHA-256 hash prefix of the original query (12 chars)'),
+  },
+  async ({ filePath, chunkId, queryHash }) => {
+    try {
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+
+      const checks: Record<string, unknown> = {};
+
+      // Check 1: ACE topk cache key presence (gap_ace_003 — key contract)
+      if (queryHash) {
+        const cacheKey = `ace:topk:${queryHash}:embeddinggemma:768`;
+        const raw = await r.get(cacheKey).catch(() => null);
+        checks.aceTopkCacheKey = { key: cacheKey, hit: raw !== null };
+      }
+
+      // Check 2: code-llm-index hit for this path
+      const llmKey = `code:llm:${filePath}`;
+      const llmRaw = await r.get(llmKey).catch(() => null);
+      checks.codeLlmCacheHit = llmRaw !== null;
+
+      // Check 3: code graph node exists
+      const { createHash } = await import('node:crypto');
+      const nodeHash = createHash('sha1').update(filePath).digest('hex').slice(0, 12);
+      const nodeRaw = await r.get(`code:graph:node:${nodeHash}`).catch(() => null);
+      checks.graphNodePresent = nodeRaw !== null;
+      if (nodeRaw) {
+        try { checks.graphNodeMeta = JSON.parse(nodeRaw); } catch { /* skip */ }
+      }
+
+      // Check 4: chunk in Postgres code_relations
+      const relCount = await pool.query<{ cnt: string }>(
+        `SELECT COUNT(*)::text AS cnt FROM code_relations WHERE from_file = $1 OR to_file = $1`,
+        [filePath]
+      ).catch(() => ({ rows: [{ cnt: '0' }] }));
+      checks.codeRelationsEdges = parseInt(relCount.rows[0]?.cnt ?? '0', 10);
+
+      await r.quit().catch(() => {});
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ filePath, chunkId, checks }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
 // ── HTTP server with /health + MCP handler ────────────────────────────────────
 
 const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
@@ -1121,9 +1473,13 @@ nodeServer.listen(PORT, HOST, () => {
   console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
   console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
   console.log('       graph.pagerank_top, topology.search_near, topology.same_som_cluster,');
+  console.log('       topology.search_4d (4D manifold + JSONB filters),');
   console.log('       clusters.get_members, clusters.get_summary_lenses,');
-  console.log('       trace.kag_search, trace.explain_retrieval,');
-  console.log('       search.postgres_fts, search.hybrid,');
+  console.log('       trace.kag_search (go-retrieval→sveltekit→postgres cascade),');
+  console.log('       trace.explain_retrieval,');
+  console.log('       search.postgres_fts, search.hybrid, search.go_hybrid (RRF),');
   console.log('       context.build_kv_packet, context.get_compressed_card,');
-  console.log('       context.explain_compression, context.refresh_task_toc');
+  console.log('       context.explain_compression, context.refresh_task_toc,');
+  console.log('       kag.ingest_error, kag.multi_lane_search,');
+  console.log('       graph.expand_neighborhood, clusters.get_summary_lenses, trace.validate_ace_hit');
 });

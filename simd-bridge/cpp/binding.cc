@@ -295,6 +295,11 @@ static napi_value GraphSimilarityWrapper(napi_env env, napi_callback_info info) 
   if (n <= 0 || dim <= 0 || (size_t)(n * dim) > arr_len)
     return throw_type_error(env, "Invalid dimensions for embeddings array");
 
+  // Binding-level hard cap — defence-in-depth before the C function enforces MAX_N_SIMILARITY.
+  // Keeps the n*n allocation from happening even if the C call is somehow bypassed.
+  if (n > 4096)
+    return throw_error(env, "graphSimilarity: n exceeds hard cap (4096); use batchCosineSimilarity for pairwise scores");
+
   // Allocate output: n*n float32 values — pooled
   int output_len = n * n;
   void* out_data;
@@ -350,8 +355,23 @@ static napi_value ClusterEmbeddingsWrapper(napi_env env, napi_callback_info info
 
   int reseeded_cluster = 0;
   int rc = clusterEmbeddings((const float*)arr_data, n, dim, k, max_iters, (int*)out_data, n, &reseeded_cluster);
-  if (rc != 0) return throw_error(env, "clusterEmbeddings failed (GPU/CPU error)");
+  if (rc != 0) {
+    const char* msg;
+    switch (rc) {
+      case GPU_ERR_INPUT_TOO_LARGE:    msg = "clusterEmbeddings: n exceeds max clustering cap";  break;
+      case GPU_ERR_CUDA_OOM:           msg = "clusterEmbeddings: CUDA out of memory";             break;
+      case GPU_ERR_DEVICE_UNAVAILABLE: msg = "clusterEmbeddings: CUDA device unavailable";        break;
+      case GPU_ERR_INVALID_ARGS:       msg = "clusterEmbeddings: invalid arguments (n/dim/k<=0)"; break;
+      case GPU_ERR_BUFFER_TOO_SMALL:   msg = "clusterEmbeddings: output buffer too small";        break;
+      case GPU_ERR_TORCH_EXCEPTION:    msg = "clusterEmbeddings: LibTorch exception (see logs)";  break;
+      default:                         msg = "clusterEmbeddings: GPU/CPU error";                   break;
+    }
+    return throw_error(env, msg);
+  }
 
+  // Return typed array; reseeded_cluster count reflects empty-cluster re-seedings (P0 guard).
+  // Callers needing the reseeded count should use kmeansWithCentroids() which returns
+  // { assignments, centroids, reseeded } as a richer object.
   napi_value result;
   napi_create_typedarray(env, napi_int32_array, n, arraybuffer, 0, &result);
   return result;
