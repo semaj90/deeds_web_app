@@ -24,6 +24,22 @@
  *
  * npm: "graph:synthesize": "node scripts/graph/synthesize-next-actions.mjs"
  *      "graph:synthesize:dry": "node scripts/graph/synthesize-next-actions.mjs --dry-run --no-llm"
+ *
+ * TODO P3 — G17 localhost cleanup:
+ *   102 hardcoded localhost refs in src/lib/server/. Migrate each to env.server.ts getter.
+ *   Gate: rg 'localhost:|127\.0\.0\.1' src/lib/server/ --type ts | wc -l  should reach 0.
+ *
+ * TODO P3 — Optional CUDA batchQuaternionSimilarity:
+ *   Only implement if profiling proves JS 4D scoring is a bottleneck (threshold >500ms per ACE request).
+ *   Current JS path handles <2000 nodes in <50ms on RTX 3060 Ti host.
+ *
+ * TODO P3 — Legal ingestion concurrency:
+ *   legal-chunker.ts processes docs sequentially; add worker-thread pool for parallel chunk+embed.
+ *   Prerequisite: evidence pipeline Stage 9 (GPU background analysis) must be stable first.
+ *
+ * TODO P3 — cluster:gpu:58 boundary tests:
+ *   AIAssistantMachineComponent.svelte + auth/audio-upload machines — add XState v5 snapshot tests
+ *   to confirm machine stays in valid states across SSE reconnect and audio upload abort paths.
  */
 
 import { readFile, writeFile, readdir } from 'node:fs/promises';
@@ -44,7 +60,12 @@ const argv      = process.argv.slice(2);
 const DRY_RUN   = argv.includes('--dry-run');
 const NO_LLM    = argv.includes('--no-llm');
 const NO_FETCH  = argv.includes('--no-spec-fetch');
-const runIdArg  = (() => { const i = argv.findIndex(a => a === '--run-id'); return i >= 0 ? argv[i + 1] : null; })();
+const runIdArg  = (() => {
+  const eq = argv.find(a => a.startsWith('--run-id='));
+  if (eq) return eq.slice('--run-id='.length);
+  const i = argv.findIndex(a => a === '--run-id');
+  return i >= 0 ? argv[i + 1] : null;
+})();
 
 // ── Protocol registry ─────────────────────────────────────────────────────────
 // Each entry maps a detected language/protocol to its canonical spec URL.
@@ -332,9 +353,19 @@ async function callLLM(prompt) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  // 1. Locate run directory
-  const runDirs = (await readdir(MEMORY_RUNS)).sort().reverse();
-  const runId   = runIdArg ?? runDirs[0];
+  // 1. Locate run directory — prefer dirs with graph_nodes.json + llm_synthesis_mapping.json
+  let runId = runIdArg;
+  if (!runId) {
+    const allDirs = (await readdir(MEMORY_RUNS)).sort().reverse();
+    for (const d of allDirs) {
+      const dir = join(MEMORY_RUNS, d);
+      if (existsSync(join(dir, 'graph_nodes.json')) && existsSync(join(dir, 'llm_synthesis_mapping.json'))) {
+        runId = d;
+        break;
+      }
+    }
+    runId ??= allDirs[0];
+  }
   if (!runId) throw new Error(`No runs found in ${MEMORY_RUNS}`);
   const runDir = join(MEMORY_RUNS, runId);
   console.log(`[synth] run: ${runId}`);
@@ -551,11 +582,16 @@ async function main() {
     // High authority clusters have higher blast radius → small positive bonus
     const authorityBoost = authority > 0.6 ? 0.12 : authority > 0.3 ? 0.06 : 0;
 
+    // Bounded absolute tsgo signal: prevents normalization from washing out small clusters
+    // with real errors. 1 error → +0.025, 4 errors → +0.10 (max), independent of cluster size.
+    const tsgoBoost = Math.min(0.10, diagList.length * 0.025);
+
     const risk = Math.min(1,
       diagDensity    * 0.40 +
       shallowDensity * 0.30 +
       gateDensity    * 0.15 +
-      authorityBoost
+      authorityBoost +
+      tsgoBoost
     );
 
     return {
@@ -565,6 +601,10 @@ async function main() {
       shallowList,
       protocols,
       risk,
+      riskBreakdown: { diagDensity, shallowDensity, gateDensity, authorityBoost, tsgoBoost },
+      diagCount:     diagList.length,
+      shallowCount:  shallowList.length,
+      graph_authority_score: authority,
       // Top files by pageRank for context
       topFiles: [...files].sort((a, b) => b.pageRank - a.pageRank).slice(0, 5).map(f => f.rel),
     };
@@ -733,20 +773,24 @@ In 3–4 sentences: what is the most likely root-cause pattern driving the risk 
       totalFiles: relMap.totalFiles ?? nodes.length,
       totalEdges: relMap.totalEdges ?? 0,
       p0: p0Results.map(r => ({
-        cluster:  r.cluster.cluster_key,
-        risk:     r.cluster.risk,
-        diagCount: r.cluster.diagList.length,
-        shallowCount: r.cluster.shallowList.length,
-        protocols: r.cluster.protocols,
-        topFiles: r.cluster.topFiles,
+        cluster:              r.cluster.cluster_key,
+        risk:                 r.cluster.risk,
+        riskBreakdown:        r.cluster.riskBreakdown,
+        graph_authority_score: r.cluster.graph_authority_score ?? 0,
+        diagCount:            r.cluster.diagList.length,
+        shallowCount:         r.cluster.shallowList.length,
+        protocols:            r.cluster.protocols,
+        topFiles:             r.cluster.topFiles,
       })),
       p1: p1Results.map(r => ({
-        cluster:  r.cluster.cluster_key,
-        risk:     r.cluster.risk,
-        diagCount: r.cluster.diagList.length,
-        shallowCount: r.cluster.shallowList.length,
-        protocols: r.cluster.protocols,
-        topFiles: r.cluster.topFiles,
+        cluster:              r.cluster.cluster_key,
+        risk:                 r.cluster.risk,
+        riskBreakdown:        r.cluster.riskBreakdown,
+        graph_authority_score: r.cluster.graph_authority_score ?? 0,
+        diagCount:            r.cluster.diagList.length,
+        shallowCount:         r.cluster.shallowList.length,
+        protocols:            r.cluster.protocols,
+        topFiles:             r.cluster.topFiles,
       })),
     }, null, 2), 'utf8');
     console.log(`[synth] wrote: ${summaryPath}`);

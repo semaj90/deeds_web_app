@@ -108,6 +108,11 @@ export const ENV = {
   TENSORRT_URL:
     privateEnv.TENSORRT_URL ?? privateEnv.TENSORRT_SERVICE_URL ?? 'http://localhost:8099',
   TRITON_URL: privateEnv.TRITON_URL ?? DEV.TRITON_URL,
+  // Inference cascade: Bifrost L2 cache (:3040) → TurboQuant (:8090) → VLM (:8085) → LiteRT (:8070)
+  BIFROST_URL: privateEnv.BIFROST_URL ?? 'http://localhost:3040',
+  TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? 'http://localhost:8090',
+  VLM_BASE_URL: privateEnv.VLM_BASE_URL ?? 'http://localhost:8085',
+  LITERT_BASE_URL: privateEnv.LITERT_BASE_URL ?? 'http://localhost:8070',
   TRITON_LLM_MODEL: privateEnv.TRITON_LLM_MODEL ?? 'legal-llm',
   TRITON_VLM_MODEL: privateEnv.TRITON_VLM_MODEL ?? DEV.TRITON_VLM_MODEL,
   TRITON_VISION_MODEL: privateEnv.TRITON_VISION_MODEL ?? DEV.TRITON_VISION_MODEL,
@@ -139,6 +144,8 @@ export const ENV = {
   REDDIT_CLIENT_ID: privateEnv.REDDIT_CLIENT_ID ?? '',
   REDDIT_CLIENT_SECRET: privateEnv.REDDIT_CLIENT_SECRET ?? '',
   REDDIT_USERNAME: privateEnv.REDDIT_USERNAME ?? '',
+  // Legal Gateway microservice (case + document fetch proxy)
+  LEGAL_GATEWAY_URL: privateEnv.LEGAL_GATEWAY_URL ?? 'http://localhost:8080',
   // Go Legal Library Search Service (parallel fan-out: citation + FTS + pgvector + Qdrant)
   GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? '',
   GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055',
@@ -164,8 +171,7 @@ export const ENV = {
   LANGFUSE_SECRET_KEY: privateEnv.LANGFUSE_SECRET_KEY ?? '',
   LANGFUSE_HOST: privateEnv.LANGFUSE_HOST ?? 'http://localhost:3030',
   LANGFUSE_ENABLED: (privateEnv.LANGFUSE_ENABLED ?? 'false') === 'true',
-  // Bifrost AI gateway (Go, OpenAI-compatible, built-in semantic cache -- replaces LiteLLM)
-  BIFROST_URL: privateEnv.BIFROST_URL ?? 'http://localhost:3040',
+  // Bifrost semantic cache gateway settings (URL already defined above in inference cascade)
   BIFROST_ENABLED: (privateEnv.BIFROST_ENABLED ?? 'false') === 'true',
   // OpenAI-compatible base URL (via Bifrost → Ollama) for pgai, LangChain, external tools
   OPENAI_BASE_URL: privateEnv.OPENAI_BASE_URL ?? 'http://localhost:3040/v1',
