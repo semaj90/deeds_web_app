@@ -31,6 +31,7 @@ import { TOOL_DISPATCH, type MCPToolResult } from './mcp-tool-dispatch.js';
 import { compressToHCACard, hcaCardToContextSnippet, type HCACard } from './hca-compressor.js';
 import { recordAgentAction } from '$lib/server/trace/trace-collector.js';
 import { createHash } from 'crypto';
+import { ENV } from '$lib/server/env.server.js';
 
 // ── Allowlist ─────────────────────────────────────────────────────────────────
 
@@ -68,7 +69,7 @@ const BLOCKED_PATTERNS = [
 
 const MAX_TOOL_ROUNDS     = 3;
 const MAX_TOOL_RESULT_CHARS = 12_000;
-const MCP_SERVER_URL      = 'http://localhost:8788';
+const MCP_SERVER_URL      = ENV.TRACE_MCP_URL;
 const MCP_TIMEOUT_MS      = 8_000;
 
 // ── Types ─────────────────────────────────────────────────────────────────────

@@ -1,11 +1,11 @@
-import { env } from '$env/dynamic/private';
 import { Client as MinioClient } from 'minio';
+import { ENV } from '$lib/server/env.server.js';
 
 // Parse MINIO_ENDPOINT which may be: 'host', 'host:port', or 'http(s)://host:port'
-const _raw = env?.MINIO_ENDPOINT ?? 'localhost';
+const _raw = ENV.MINIO_ENDPOINT;
 let _host = _raw;
-let _port = Number(env?.MINIO_PORT ?? 9000);
-let _useSSL = (env?.MINIO_USE_SSL ?? 'false') === 'true';
+let _port = Number(ENV.MINIO_PORT ?? 9000);
+let _useSSL = (ENV.MINIO_USE_SSL ?? 'false') === 'true';
 try {
 	if (_raw.includes('://')) {
 		const u = new URL(_raw);
@@ -28,9 +28,8 @@ const MINIO_ENDPOINT = _host;
 const MINIO_PORT = _port;
 const MINIO_USE_SSL = _useSSL;
 
-// Fallback to MINIO_ROOT_USER/MINIO_ROOT_PASSWORD when access/secret not provided
-const MINIO_ACCESS_KEY = 'admin'; // Forced for current dev session
-const MINIO_SECRET_KEY = 'password';
+const MINIO_ACCESS_KEY = ENV.MINIO_ACCESS_KEY;
+const MINIO_SECRET_KEY = ENV.MINIO_SECRET_KEY;
 
 export const minio = new MinioClient({
 	endPoint: MINIO_ENDPOINT,

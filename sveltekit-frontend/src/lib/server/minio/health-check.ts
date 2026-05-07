@@ -4,8 +4,8 @@
  *
  * Requirements: 5.1, 5.3, 5.5
  */
-import { env } from '$lib/env';
 import { Client } from 'minio';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface MinioHealthResult {
 	healthy: boolean;
@@ -23,18 +23,18 @@ export interface MinioHealthResult {
 }
 
 // Bucket names from environment
-const EVIDENCE_BUCKET = process.env.MINIO_EVIDENCE_BUCKET ?? 'legal-evidence';
-const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-chat-images';
+const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
+const AI_CHAT_IMAGES_BUCKET = ENV.MINIO_LIBRARY_BUCKET;
 
 /**
  * Create MinIO client for health checks
  */
 function createMinioClient(): Client {
-	const endPoint = env?.MINIO_ENDPOINT ?? 'localhost';
-	const port = parseInt(env?.MINIO_PORT ?? '9000', 10);
-	const accessKey = env?.MINIO_ACCESS_KEY ?? 'minio';
-	const secretKey = env?.MINIO_SECRET_KEY ?? 'minio123';
-	const useSSL = env?.MINIO_USE_SSL === 'true';
+	const endPoint = ENV.MINIO_ENDPOINT;
+	const port = parseInt(ENV.MINIO_PORT ?? '9000', 10);
+	const accessKey = ENV.MINIO_ACCESS_KEY;
+	const secretKey = ENV.MINIO_SECRET_KEY;
+	const useSSL = ENV.MINIO_USE_SSL === 'true';
 
 	return new Client({
 		endPoint: endPoint.split(':')[0],
@@ -64,7 +64,7 @@ export async function checkMinioHealth(): Promise<MinioHealthResult> {
 
 	try {
 		const client = createMinioClient();
-		const endpoint = env?.MINIO_ENDPOINT ?? 'localhost:9000';
+		const endpoint = ENV.MINIO_ENDPOINT;
 		result.connection.endpoint = endpoint;
 
 		// Test connection by listing buckets (with timeout)

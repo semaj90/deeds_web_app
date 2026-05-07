@@ -1,5 +1,5 @@
-import { env } from '$lib/env';
 import { Client } from 'minio';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface MinioS3ClientConfig {
   endPoint: string;
@@ -12,12 +12,12 @@ export interface MinioS3ClientConfig {
 
 export function getMinioConfig(): MinioS3ClientConfig {
   return {
-    endPoint: env.MINIO_HOST ?? 'localhost',
-    port: parseInt(env.MINIO_PORT ?? '9000', 10),
-    useSSL: env.MINIO_USE_SSL === 'true',
-    accessKey: env.MINIO_ACCESS_KEY ?? 'minio',
-    secretKey: env.MINIO_SECRET_KEY ?? 'minio123',
-    bucket: env.MINIO_BUCKET ?? 'legal-evidence',
+    endPoint: ENV.MINIO_ENDPOINT,
+    port: parseInt(ENV.MINIO_PORT ?? '9000', 10),
+    useSSL: ENV.MINIO_USE_SSL === 'true',
+    accessKey: ENV.MINIO_ACCESS_KEY,
+    secretKey: ENV.MINIO_SECRET_KEY,
+    bucket: ENV.MINIO_EVIDENCE_BUCKET,
   };
 }
 

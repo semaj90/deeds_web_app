@@ -24,7 +24,7 @@ import {
 import { sql } from 'drizzle-orm';
 
 // Qdrant Configuration
-const QDRANT_URL = CONFIG?.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = CONFIG?.QDRANT_URL;
 const COLLECTION_NAME = 'knowledge_graph';
 const VECTOR_SIZE = 384;
 
