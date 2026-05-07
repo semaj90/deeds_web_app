@@ -344,4 +344,30 @@
 		color: #64748b;
 		font-style: italic;
 	}
+
+	.empty-state-small {
+		padding: 1rem;
+		color: #64748b;
+		font-style: italic;
+		font-size: 0.875rem;
+	}
+
+	.empty-inline {
+		color: #64748b;
+		font-style: italic;
+		font-size: 0.875rem;
+	}
+
+	.error-state {
+		padding: 1rem;
+		background: #2a1414;
+		border: 1px solid #dc2626;
+		border-radius: 8px;
+		color: #fca5a5;
+		font-size: 0.875rem;
+	}
+
+	.status.ok { color: #10b981; }
+	.status.err { color: #ef4444; }
+	.status.pending { color: #f59e0b; }
 </style>
