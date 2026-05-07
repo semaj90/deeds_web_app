@@ -2526,6 +2526,7 @@
     "src/lib/server/obsidian/wiki-vault-watcher.ts",
     "src/lib/server/phase72/astVectorizer.ts",
     "src/lib/server/wiki/wiki-artifact-writer.ts",
+    "src/mcp/trace-mcp-server.ts",
     "src/routes/(app)/admin/all-routes/+page.server.ts",
     "src/routes/.well-known/llms-full.txt/+server.ts",
     "src/routes/.well-known/llms.txt/+server.ts",

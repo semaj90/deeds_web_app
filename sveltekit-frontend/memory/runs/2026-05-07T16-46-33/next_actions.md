@@ -12,7 +12,7 @@
 **Specs**: [Qdrant search & filter API](https://qdrant.tech/documentation/concepts/search/) · [ioredis reconnect and error handling](https://github.com/redis/ioredis#error-handling) · [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview)
 
 **Analysis**:
-_(--no-llm: synthesis skipped)_
+The most likely root-cause pattern driving the risk score is **shallow-wiring**, indicating tight, low-level coupling between core server components and data access layers. While diagnostics contribute to the score, the presence of shallow-wiring hits in `src/lib/server/database-simple.js` and `src/lib/server/ocr/extractText.ts` suggests that critical services are bypassing proper abstraction boundaries, leading to brittle dependencies. To resolve
 
 **Top files**: `src/lib/server/ace/ace-agent.ts`  `src/lib/server/ace/ace-error-kag.ts`  `src/lib/server/ace/ace-hit-tagger.ts`
 
@@ -23,7 +23,7 @@ _(--no-llm: synthesis skipped)_
 **Specs**: [W3C Fetch — network error vs abort](https://fetch.spec.whatwg.org/#concept-request) · [XState v5 migration and actor types](https://stately.ai/docs/migration) · [Svelte 5 runes API](https://svelte.dev/docs/svelte/what-are-runes) · [W3C SSE — reconnection and error events](https://html.spec.whatwg.org/multipage/server-sent-events.html) · [gRPC error handling and status codes](https://grpc.io/docs/guides/error/) · [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [WebGPU error scopes and device lost handling](https://gpuweb.github.io/gpuweb/#error-scopes) · [ioredis reconnect and error handling](https://github.com/redis/ioredis#error-handling) · [Neo4j JS driver error handling](https://neo4j.com/docs/api/javascript-driver/current/)
 
 **Analysis**:
-_(--no-llm: synthesis skipped)_
+The high risk score is primarily driven by the complexity and deep coupling within the core business logic, particularly how state and data flow across the specialized machine components. The pattern of managing complex, asynchronous state transitions (evidenced by `xstate-v5` and `svelte5-runes`) across different domains (e.g., `auth-machine.ts`, `evidence-processing-machine.ts`) creates a high surface area for subtle integration bugs, even if local diagnostics pass. The most focused change would be to enforce a standardized, decoupled communication contract for
 
 **Top files**: `src/lib/machines/AIAssistantMachineComponent.svelte`  `src/lib/machines/audio-upload-machine.ts`  `src/lib/machines/auth-machine.ts`
 
@@ -34,7 +34,7 @@ _(--no-llm: synthesis skipped)_
 **Specs**: [Neo4j JS driver error handling](https://neo4j.com/docs/api/javascript-driver/current/) · [ioredis reconnect and error handling](https://github.com/redis/ioredis#error-handling) · [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [W3C SSE — reconnection and error events](https://html.spec.whatwg.org/multipage/server-sent-events.html) · [Svelte 5 runes API](https://svelte.dev/docs/svelte/what-are-runes) · [Qdrant search & filter API](https://qdrant.tech/documentation/concepts/search/)
 
 **Analysis**:
-_(--no-llm: synthesis skipped)_
+The most likely root-cause pattern driving the elevated risk score is the inadequate management of asynchronous resource lifecycles and error propagation across multiple, complex data persistence layers. The combination of `diagnostic` (suggesting incomplete state checks) and `shallow-wiring` (indicating potential dependency gaps or unhandled call chains) is highly probable in the graph processing logic found in `src/lib/server/graph/codebase-neo4j-sync.ts` and `src
 
 **Top files**: `src/lib/server/graph/codebase-cluster-detection.ts`  `src/lib/server/graph/codebase-neo4j-sync.ts`  `src/lib/server/graph/codebase-scanner-v2.ts`
 
@@ -47,7 +47,7 @@ _(--no-llm: synthesis skipped)_
 **Specs**: [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [W3C Fetch — network error vs abort](https://fetch.spec.whatwg.org/#concept-request) · [Svelte 5 runes API](https://svelte.dev/docs/svelte/what-are-runes)
 
 **Analysis**:
-_(--no-llm: synthesis skipped)_
+The most likely root-cause pattern driving the risk score is **shallow-wiring** within complex, stateful UI and agentic components, indicated by 86 hits. This pattern suggests that critical data or state is being passed or managed directly across component boundaries (e.g., in `POIPhotoUploader.svelte` and `SummaryEditor.svelte`) rather than through a centralized, predictable store or context. To resolve the most issues, the single focused change should be to refactor the state management of shared data (like evidence status or user context) out of the components and into a dedicated, observable store (e.g., using a Pinia/Zustand pattern or Svelte
 
 **Top files**: `src/lib/client/ui/POIPhotoUploader.svelte`  `src/lib/components/ActionPopup.svelte`  `src/lib/components/agent/AutonomousInvestigator.svelte`
 
@@ -58,7 +58,7 @@ _(--no-llm: synthesis skipped)_
 **Specs**: [ioredis reconnect and error handling](https://github.com/redis/ioredis#error-handling) · [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [Neo4j JS driver error handling](https://neo4j.com/docs/api/javascript-driver/current/) · [Qdrant search & filter API](https://qdrant.tech/documentation/concepts/search/)
 
 **Analysis**:
-_(--no-llm: synthesis skipped)_
+_(no answer)_
 
 **Top files**: `src/lib/server/ai/ab-test.ts`  `src/lib/server/ai/cached-stream.ts`  `src/lib/server/ai/caching-layer.ts`
 
@@ -69,7 +69,7 @@ _(--no-llm: synthesis skipped)_
 **Specs**: [WebGPU error scopes and device lost handling](https://gpuweb.github.io/gpuweb/#error-scopes) · [OTel exception recording in spans](https://opentelemetry.io/docs/specs/otel/trace/exceptions/) · [gRPC error handling and status codes](https://grpc.io/docs/guides/error/) · [ioredis reconnect and error handling](https://github.com/redis/ioredis#error-handling) · [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [W3C SSE — reconnection and error events](https://html.spec.whatwg.org/multipage/server-sent-events.html) · [XState v5 migration and actor types](https://stately.ai/docs/migration)
 
 **Analysis**:
-_(--no-llm: synthesis skipped)_
+_(no answer)_
 
 **Top files**: `src/lib/gpu/shader-registry.ts`  `src/lib/server/gpu/autoencoder-bridge.ts`  `src/lib/server/gpu/cuda-bridge.ts`
 
@@ -80,7 +80,7 @@ _(--no-llm: synthesis skipped)_
 **Specs**: [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [W3C Fetch — network error vs abort](https://fetch.spec.whatwg.org/#concept-request) · [Svelte 5 runes API](https://svelte.dev/docs/svelte/what-are-runes)
 
 **Analysis**:
-_(--no-llm: synthesis skipped)_
+The primary risk driver in this cluster is the pervasive **shallow-wiring** pattern, which is evident across several core component files responsible for visualizing complex evidence data. This pattern suggests that components are directly coupling to low-level APIs or internal state management without proper encapsulation, particularly visible in `src/lib/server/observability/langfuse.ts` and the WebGPU/Vision components. The most impactful single change would be to enforce a dedicated state management layer (e.g., using a centralized store or context provider) to decouple the component logic from direct API calls, thereby resolving the shallow-wiring in files like `src/lib/components/evidence/WebGPUTextureStreamingDemo.svelte` and `src/lib/components/evidence/VisionImageAnalyzer.svelte`.
 
 **Top files**: `src/lib/components/evidence/board-persistence.svelte.ts`  `src/lib/components/evidence/BoardMinimap.svelte`  `src/lib/components/evidence/CaseEvidenceOrganizer.svelte`
 
@@ -243,10 +243,10 @@ _Run ID: 2026-05-07T16-46-33_
 | Field | Value |
 |-------|-------|
 | Run ID | `2026-05-07T16-46-33` |
-| Synthesized at | 2026-05-07T16:47:20.120Z |
+| Synthesized at | 2026-05-07T16:58:20.690Z |
 | tsgo diagnostics loaded | 62 |
 | Shallow-wired files | 357 |
 | P0 clusters | 3 |
 | P1 clusters | 4 |
-| LLM backend | none (--no-llm) |
+| LLM backend | turboquant |
 | Spec fetch | enabled |
