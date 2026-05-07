@@ -291,16 +291,45 @@ function addQdrantAlias(index, rawKey, pointId) {
   s.add(pointId);
 }
 
+/**
+ * Expand a single path into all equivalent aliases that might appear
+ * in Qdrant payloads (after normQdrantKey normalisation).
+ *
+ * Handles:
+ *   $lib/...      → src/lib/...   (SvelteKit import alias)
+ *   ~lib/...      → src/lib/...
+ *   @lib/...      → src/lib/...
+ *   src/lib/...   (already canonical)
+ *   absolute paths with sveltekit-frontend/ or /src/ segments (handled by normQdrantKey)
+ */
+function expandPathAliases(fp) {
+  if (!fp) return [];
+  const norm = normQdrantKey(fp);
+  const variants = new Set([fp, norm]);
+
+  // SvelteKit $lib → src/lib resolution
+  if (norm.startsWith('$lib/'))  variants.add('src/lib/' + norm.slice('$lib/'.length));
+  if (norm.startsWith('~lib/'))  variants.add('src/lib/' + norm.slice('~lib/'.length));
+  if (norm.startsWith('@lib/'))  variants.add('src/lib/' + norm.slice('@lib/'.length));
+
+  // Inverse: src/lib → $lib (in case Qdrant was indexed with the alias)
+  if (norm.startsWith('src/lib/')) variants.add('$lib/' + norm.slice('src/lib/'.length));
+
+  // Strip leading src/ to get bare lib/... form
+  if (norm.startsWith('src/')) variants.add(norm.slice('src/'.length));
+
+  return [...variants];
+}
+
 /** Resolve all Qdrant point-ids for an enriched node, trying every alias */
 function findQdrantPointIds(index, entry) {
-  const aliases = [
-    entry.filePath,
-    entry.stableKey,
-  ].filter(Boolean);
+  const raw = [entry.filePath, entry.stableKey].filter(Boolean);
   const ids = new Set();
-  for (const alias of aliases) {
-    const s = index.get(normQdrantKey(alias));
-    if (s) for (const id of s) ids.add(id);
+  for (const fp of raw) {
+    for (const alias of expandPathAliases(fp)) {
+      const s = index.get(normQdrantKey(alias));
+      if (s) for (const id of s) ids.add(id);
+    }
   }
   return ids;
 }
@@ -328,6 +357,10 @@ async function buildQdrantIndex(limit = 50_000) {
     for (const pt of pts) {
       for (const alias of buildPayloadAliases(pt.payload)) {
         addQdrantAlias(index, alias, pt.id);
+        // Also index all expanded aliases so lookups with $lib/ etc. find src/lib/ entries
+        for (const expanded of expandPathAliases(alias)) {
+          addQdrantAlias(index, expanded, pt.id);
+        }
       }
     }
     collected += pts.length;
