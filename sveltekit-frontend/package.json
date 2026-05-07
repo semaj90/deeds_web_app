@@ -647,6 +647,8 @@
     "knowledge:search": "npx tsx scripts/knowledge-base-builder.ts --search",
     "knowledge:research": "npx tsx scripts/knowledge-base-builder.ts --auto-research",
     "mcp:trace": "tsx src/mcp/trace-mcp-server.ts",
+    "mcp:legacy:python": "python scripts/mcp/fastmcp_server.py",
+    "mcp:trace:full-stack": "concurrently -n \"TRACE-MCP,Agent\" -c \"green,cyan\" \"npm run mcp:trace\" \"sleep 5 && npm run mcp:agent\"",
     "mcp:ensure": "node scripts/ensure-mcp-server.mjs --spawn",
     "smoke:trace": "node scripts/smoke-trace-stack.mjs",
     "trace:start": "powershell -ExecutionPolicy Bypass -File scripts/start-trace-stack.ps1",
