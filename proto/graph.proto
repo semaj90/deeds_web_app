@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package yorha.graph;
+
+option go_package = "github.com/deeds-web-app/proto/graph";
+
+import "shared_ids.proto";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// graph.proto — Graph expansion service: typed import-graph neighborhoods,
+// SOM topology traversal, Neo4j community context, and hyperedge scoring.
+//
+// ExpandGraph is the unified entry point for ACE Phase A + B graph context.
+// It replaces the inline Redis mget in graph-expander.ts for cross-service use.
+//
+// RPCs:
+//   ExpandGraph  — given seed file paths, return typed import-graph + SOM
+//                  topology neighbors + Neo4j community context
+// ─────────────────────────────────────────────────────────────────────────────
+
+service GraphService {
+  // Expand seed file paths into a rich import-graph + SOM + Neo4j context bundle.
+  // Used by ACE context assembly (Phase A import-graph + Phase B SOM topology).
+  rpc ExpandGraph(ExpandGraphRequest) returns (ExpandGraphResponse);
+
+  // Query hyperedge statistics for a set of cluster IDs.
+  // Used by the Gemma4 agent hyperedge_stats tool.
+  rpc QueryHyperedges(HyperedgeQueryRequest) returns (HyperedgeQueryResponse);
+
+  // Resolve SOM neighborhood: given a BMU (row, col), return files in radius.
+  rpc GetSomNeighborhood(SomNeighborhoodRequest) returns (SomNeighborhoodResponse);
+}
+
+// ── ExpandGraph ──────────────────────────────────────────────────────────────
+
+message ExpandGraphRequest {
+  yorha.shared.RunIds ids = 1;
+
+  // Seed file paths — typically from ACE codebaseContext + opts.filePath
+  repeated string file_paths = 2;
+
+  // Maximum seed paths to expand (default 12)
+  int32 max_seeds = 3;
+
+  // Which expansion sources to activate
+  bool include_import_graph = 4;   // Phase A: Redis code:graph:file:* keys
+  bool include_som_topology = 5;   // Phase B: SOM BMU neighborhood
+  bool include_neo4j_community = 6; // Neo4j BELONGS_TO_CLUSTER + HAS_DIRECTORY_SUMMARY
+  bool include_hyperedges = 7;     // Hyperedge scoring from run artifacts
+
+  // SOM neighborhood radius when include_som_topology = true (default 1)
+  int32 som_radius = 8;
+}
+
+message ExpandGraphResponse {
+  yorha.shared.RunIds ids = 1;
+
+  // Import-graph expansion for each seed file (Phase A)
+  repeated ImportGraphNode import_graph = 2;
+
+  // SOM topology neighbors for seed files (Phase B)
+  repeated SomTopologyNeighbor som_neighbors = 3;
+
+  // Neo4j community context for seed files
+  repeated Neo4jCommunityContext neo4j_context = 4;
+
+  // Top hyperedges touching the seed cluster(s)
+  repeated HyperedgeSummary hyperedges = 5;
+
+  // Pre-formatted context string for direct ACE injection
+  // (equivalent to fetchDeepImportGraphExpansion output)
+  string formatted_context = 6;
+
+  int64 expanded_at_unix = 7;
+}
+
+// ── Import Graph (Phase A — Redis code:graph:file:* ) ────────────────────────
+
+message ImportGraphNode {
+  string rel = 1;           // Relative file path from repo root
+  string zone = 2;          // "route", "server", "lib", "test", "config"
+  int32 direct_fan_in = 3;  // Files that import this file
+  int32 direct_fan_out = 4; // Modules this file imports
+  bool is_route = 5;
+  bool is_test = 6;
+  int32 upstream_node_count = 7;   // Transitive upstream
+  int32 downstream_node_count = 8; // Transitive downstream (who imports this)
+  // Top callers (up to 3 short names)
+  repeated string top_callers = 9;
+}
+
+// ── SOM Topology (Phase B — cluster:kmeans:k{K}:som:{i} ) ───────────────────
+
+message SomTopologyNeighbor {
+  string file_path = 1;
+  int32 bmu_row = 2;
+  int32 bmu_col = 3;
+  int32 gpu_cluster = 4;
+  string topo_class = 5;
+  // Manhattan distance from the seed file's BMU
+  int32 grid_distance = 6;
+  // 4D manifold coords: [topoClass/7, somRow/(H-1), somCol/(W-1), clusterSize/n]
+  repeated float manifold4 = 7 [packed = true];
+}
+
+// ── Neo4j Community Context ──────────────────────────────────────────────────
+
+message Neo4jCommunityContext {
+  string file_path = 1;
+  string cluster_id = 2;
+  string cluster_label = 3;
+  // Gemma4 directory summary from HAS_DIRECTORY_SUMMARY edge
+  string directory_summary = 4;
+  // PageRank score from Neo4j (authority score for this file)
+  float page_rank_score = 5;
+  // SOM coords stored on the Neo4j node
+  int32 som_bmu_row = 6;
+  int32 som_bmu_col = 7;
+  // SIMILAR_TOPOLOGY neighbors (files at adjacent BMU grid positions)
+  repeated string topology_neighbors = 8;
+}
+
+// ── Hyperedges ───────────────────────────────────────────────────────────────
+
+message HyperedgeSummary {
+  string edge_id = 1;
+  // Edge type: "A" (same cluster), "B" (cross-cluster, same topo-class),
+  //            "C" (cross-cluster, cross-topo), "D" (research bridge)
+  string edge_type = 2;
+  repeated int32 cluster_ids = 3;
+  repeated string topo_classes = 4;
+  float pagerank_grade = 5;
+  int32 member_count = 6;
+  string summary = 7;
+}
+
+message HyperedgeQueryRequest {
+  yorha.shared.RunIds ids = 1;
+  repeated int32 cluster_ids = 2;
+  int32 limit = 3;
+  // Filter by edge type: "A", "B", "C", "D"
+  repeated string edge_types = 4;
+}
+
+message HyperedgeQueryResponse {
+  yorha.shared.RunIds ids = 1;
+  repeated HyperedgeSummary edges = 2;
+  int32 total_edges = 3;
+}
+
+// ── SOM Neighborhood ─────────────────────────────────────────────────────────
+
+message SomNeighborhoodRequest {
+  yorha.shared.RunIds ids = 1;
+  int32 bmu_row = 2;
+  int32 bmu_col = 3;
+  // Chebyshev radius (default 1 = 8 neighbors, 2 = 24 neighbors)
+  int32 radius = 4;
+  // Max files to return
+  int32 limit = 5;
+}
+
+message SomNeighborhoodResponse {
+  yorha.shared.RunIds ids = 1;
+  repeated SomTopologyNeighbor neighbors = 2;
+  // SOM grid dimensions
+  int32 grid_width = 3;
+  int32 grid_height = 4;
+}

@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package yorha.trace;
+
+option go_package = "github.com/deeds-web-app/proto/trace";
+
+import "shared_ids.proto";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// trace.proto — TRACE service: retrieval explainability, error fingerprinting,
+// and ACE context-packet assembly.
+//
+// This is the observability spine. Every retrieval pass, error event, and
+// context assembly step emits a trace that can be replayed or diffed.
+//
+// RPCs:
+//   ExplainRetrieval    — why did ACE pick these chunks? score breakdown per chunk
+//   FingerprintError    — stable hash + topo-class for a TS/runtime error
+//   BuildContextPacket  — assemble a full ACE context bundle for an LLM prompt
+// ─────────────────────────────────────────────────────────────────────────────
+
+service TraceService {
+  // Explain why specific chunks were selected in a retrieval pass.
+  // Useful for ACE transparency (yorha block in OpenAI facade response).
+  rpc ExplainRetrieval(ExplainRetrievalRequest) returns (ExplainRetrievalResponse);
+
+  // Fingerprint a TypeScript or runtime error into a stable hash + cluster label.
+  // Used by the error-brain pipeline and GRPO reward scoring.
+  rpc FingerprintError(FingerprintErrorRequest) returns (FingerprintErrorResponse);
+
+  // Assemble a full ACE context packet ready for LLM injection.
+  // Returns scored chunks, import-graph expansion, and retrieval trace metadata.
+  rpc BuildContextPacket(BuildContextPacketRequest) returns (BuildContextPacketResponse);
+}
+
+// ── ExplainRetrieval ─────────────────────────────────────────────────────────
+
+message ExplainRetrievalRequest {
+  yorha.shared.RunIds ids = 1;
+  string query = 2;
+  // Chunk IDs that were selected in the retrieval pass
+  repeated string selected_chunk_ids = 3;
+  // Optional: pipeline that ran this retrieval (rag, kag, dag, ace, bow, som)
+  string pipeline = 4;
+}
+
+message ExplainRetrievalResponse {
+  yorha.shared.RunIds ids = 1;
+  repeated ChunkExplanation explanations = 2;
+  RetrievalSummary summary = 3;
+  int64 explained_at_unix = 4;
+}
+
+message ChunkExplanation {
+  string chunk_id = 1;
+  string file_path = 2;
+  float final_score = 3;
+  ScoreBreakdown breakdown = 4;
+  // Source that surfaced this chunk: "qdrant", "redis_bow", "neo4j", "fast_ast", etc.
+  string source = 5;
+  string cluster_label = 6;
+  repeated string matched_tags = 7;
+}
+
+message ScoreBreakdown {
+  float semantic_vector = 1;   // weight 0.60
+  float tag_score = 2;         // weight 0.12
+  float ast_graph = 3;         // weight 0.10
+  float som_boost = 4;         // weight 0.08
+  float hyperedge = 5;         // weight 0.10
+  float community_context = 6; // GraphRAG preamble (not scored inline)
+  float topo_prefilter = 7;    // bonus from topo-byte cache hit
+}
+
+message RetrievalSummary {
+  int32 total_candidates = 1;
+  int32 selected_count = 2;
+  float ace_pipeline_version = 3;
+  // Which sources contributed: "qdrant", "redis_kag", "fast_ast", "som", "hyperedge"
+  repeated string sources_used = 4;
+  bool topo_cache_hit = 5;
+  int64 total_ms = 6;
+}
+
+// ── FingerprintError ─────────────────────────────────────────────────────────
+
+message FingerprintErrorRequest {
+  yorha.shared.RunIds ids = 1;
+  string raw_message = 2;
+  string file_path = 3;
+  int32 line = 4;
+  int32 col = 5;
+  // TypeScript error code, e.g. 2345
+  int32 ts_code = 6;
+  // "typescript", "runtime", "eslint", "svelte-check"
+  string error_source = 7;
+}
+
+message FingerprintErrorResponse {
+  yorha.shared.RunIds ids = 1;
+  // Stable sha256 of file:line:col:ts_code:message
+  string error_hash = 2;
+  // Topo class of the file that owns this error
+  string topo_class = 3;
+  // GPU k-means cluster the file belongs to
+  int32 gpu_cluster = 4;
+  // Normalized error message with variable tokens stripped
+  string normalized_message = 5;
+  // Suggested fix tier: "inline", "schema", "import", "refactor"
+  string fix_tier = 6;
+  // GRPO reward score if this error pattern is in the training corpus
+  float grpo_reward = 7;
+  int64 fingerprinted_at_unix = 8;
+}
+
+// ── BuildContextPacket ───────────────────────────────────────────────────────
+
+message BuildContextPacketRequest {
+  yorha.shared.RunIds ids = 1;
+  string query = 2;
+  // Active file in the IDE (seeds import-graph expansion)
+  string file_path = 3;
+  string case_id = 4;
+  string conversation_id = 5;
+  // Which lanes to activate: "rag", "kag", "bow", "som", "hyperedge", "graph"
+  repeated string lanes = 6;
+  int32 max_chunks = 7;
+  // Pass pre-computed embedding to skip embed step
+  repeated float query_embedding = 8 [packed = true];
+}
+
+message BuildContextPacketResponse {
+  yorha.shared.RunIds ids = 1;
+  // Assembled context string ready for LLM injection
+  string context_text = 2;
+  repeated ContextChunk chunks = 3;
+  // Import-graph expansion section (Phase A)
+  string import_graph_section = 4;
+  // ACE pipeline version that assembled this packet
+  string ace_pipeline_version = 5;
+  // Retrieval trace — populates yorha block in OpenAI facade response
+  RetrievalTrace trace = 6;
+  int64 built_at_unix = 7;
+}
+
+message ContextChunk {
+  string chunk_id = 1;
+  string file_path = 2;
+  string content = 3;
+  float score = 4;
+  string source = 5;
+  ScoreBreakdown score_breakdown = 6;
+}
+
+message RetrievalTrace {
+  bool ace_used = 1;
+  int32 context_chunks = 2;
+  bool agents_md_used = 3;
+  bool code_llm_hit = 4;
+  // "prior-answer", "agents-md", "none"
+  string cache_hit = 5;
+  bool topo_prefilter_hit = 6;
+  int64 duration_ms = 7;
+  repeated string lanes_fired = 8;
+}

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package yorha.shared;
+
+option go_package = "github.com/deeds-web-app/proto/shared";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// shared_ids.proto — Canonical cross-service identity primitives.
+//
+// Import this in every service proto that needs to reference run artifacts,
+// chunks, symbols, or errors. All IDs are stable UUIDs or content hashes.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// RunIds carries the canonical set of IDs that travel with every pipeline run.
+// Attach to any request/response that participates in a run artifact.
+message RunIds {
+  // Stable run UUID — identifies a single pipeline execution (k-means, SOM, ACE, etc.)
+  string run_id = 1;
+
+  // Content-addressed chunk identity (sha256 of normalised chunk text)
+  string chunk_id = 2;
+
+  // Cluster/community group identity — GPU k-means cluster or SOM BMU group
+  string group_id = 3;
+
+  // Symbol identity — function/class/export in the codebase AST
+  string symbol_id = 4;
+
+  // Stable error fingerprint (sha256 of file:line:col:code:message)
+  string error_hash = 5;
+
+  // Content hash — sha256 of raw source bytes for change detection
+  string content_hash = 6;
+
+  // Embedding model tag that produced vectors in this run
+  // e.g. "embeddinggemma:latest", "nomic-embed-text"
+  string embedding_model = 7;
+
+  // Dimensionality of vectors produced in this run (e.g. 768)
+  int32 embedding_dim = 8;
+}
+
+// ArtifactRef is a pointer to a file written under memory/runs/<run_id>/
+message ArtifactRef {
+  string run_id = 1;
+  // Relative path under memory/runs/<run_id>/ — e.g. "embeddings.arrow"
+  string relative_path = 2;
+  // MIME type or format hint — "application/vnd.apache.arrow.file", "application/json", etc.
+  string format = 3;
+  int64 size_bytes = 4;
+  string content_hash = 5;
+  int64 created_at_unix = 6;
+}

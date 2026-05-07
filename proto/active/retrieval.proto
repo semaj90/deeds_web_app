@@ -4,6 +4,8 @@ package yorha.retrieval;
 
 option go_package = "github.com/deeds-web-app/proto/retrieval";
 
+import "shared_ids.proto";
+
 // ─────────────────────────────────────────────────────────────────────────
 // RetrievalService — the single RAG + KAG + DAG retrieval boundary.
 //
@@ -50,6 +52,8 @@ service RetrievalService {
 // ── Evidence Search (RAG + KAG + DAG) ──────────────────────────────────
 
 message EvidenceSearchRequest {
+  // Canonical run IDs — attach to correlate retrieval events with pipeline runs
+  yorha.shared.RunIds ids = 10;
   string query = 1;
   string case_id = 2;
   int32 limit = 3;

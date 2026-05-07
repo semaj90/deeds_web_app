@@ -1,0 +1,40 @@
+{
+  "runId": "2026-05-07T04-08-31",
+  "indexedAt": "2026-05-07T04:09:43.348Z",
+  "clusterCount": 95,
+  "relTypeCount": 5,
+  "totalCards": 102,
+  "sinks": {
+    "couchdb": {
+      "ok": true,
+      "written": 102,
+      "db": "wiki_cards"
+    },
+    "redis": {
+      "ok": true,
+      "written": 198,
+      "ttlSeconds": 21600
+    }
+  },
+  "sampleClusterKeys": [
+    "cluster:gpu:6",
+    "cluster:gpu:92",
+    "cluster:gpu:34",
+    "cluster:gpu:57",
+    "cluster:gpu:50"
+  ],
+  "sampleRelTypes": [
+    "READS_REDIS_KEY",
+    "WRITES_REDIS_KEY",
+    "QUERIES_TABLE",
+    "QUERIES_QDRANT_COLLECTION",
+    "QUERIES_NEO4J_LABEL"
+  ],
+  "gaps": [
+    "gap_synth_001: llm_synthesis TRACE subagent is a hardcoded stub",
+    "gap_synth_002: synthesis-memory-archiver.ts not wired into orchestrator",
+    "gap_synth_003: cluster_key field absent from codebase_chunks_768 payload",
+    "gap_synth_004: writeAuthorityScoresToQdrant has no scheduler",
+    "gap_synth_005: RerankBreakdown not written back to Qdrant payload"
+  ]
+}

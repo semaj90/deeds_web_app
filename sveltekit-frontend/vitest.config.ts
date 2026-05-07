@@ -106,6 +106,7 @@ export default defineConfig({
       'tests/routes/codebase-index-summarize-dirs.test.ts',
       'tests/unit/agents-md-quick-hit.test.ts',
       'tests/unit/ensure-dev-runtime.test.ts',
+      'tests/unit/normalize-repo-path.test.ts',
       'tests/karpathy-hook.spec.ts',
       'tests/wiki-vault-watcher.spec.ts',
       'tests/manifold4-retrieval.spec.ts',
@@ -127,6 +128,15 @@ export default defineConfig({
       'tests/gemma4-dev-context-loop.spec.ts',
       // G16 auto-generated route test stubs (npm run audit:generate-route-stubs)
       'tests/routes/auto/**/*.test.ts',
+      // parallel ACE retrieval lane tests (added 2026-05-06)
+      'tests/retrieval-lanes.spec.ts',
+      // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
+      'tests/multi-lane-spine.spec.ts',
+      // P5 codebase relationship extractor: 7 semantic edge types
+      'tests/relationship-extractor.spec.ts',
+      'tests/relation-extractor.spec.ts',
+      // normalizeRepoPath + ACE relation matching regression
+      'tests/build-codebase-relationships.spec.ts',
     ],
     exclude: [
       'node_modules/**',

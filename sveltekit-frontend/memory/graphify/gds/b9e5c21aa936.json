@@ -1,0 +1,23 @@
+{
+  "runId": "b9e5c21aa936",
+  "startedAt": "2026-05-07T03:00:28.593Z",
+  "gdsAvailable": false,
+  "pagerankRows": 0,
+  "communities": 0,
+  "authorityScoresComputed": 0,
+  "qdrantPatched": 0,
+  "redisCached": 0,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "DEGRADED: GDS unavailable — using Postgres fan-in fallback",
+    "GDS3": "SKIP",
+    "GDS4": "DEGRADED: 0 files from Postgres fan-in",
+    "GDS5": "SKIP (GDS unavailable)",
+    "GDS6": "WARN: only 0 files with non-zero score",
+    "GDS7": "WARN: 0 patches",
+    "GDS8": "PASS: 0 entries (dry — no writes)",
+    "GDS9": "PASS"
+  },
+  "finishedAt": "2026-05-07T03:00:32.172Z",
+  "topAuthorities": []
+}
