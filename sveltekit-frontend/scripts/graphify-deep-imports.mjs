@@ -401,3 +401,45 @@ console.log(`Nodes: ${stats.nodeCount}  Edges: ${stats.edgeCount}  Resolved: ${s
 console.log('Top edge types:', Object.entries(typeCount).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([t, c]) => `${t}:${c}`).join(', '));
 console.log(`Top hotspot: ${top20[0]?.rel} (fanIn=${top20[0]?.directFanIn})`);
 console.log(`Output: ${OUT_DIR}`);
+
+// ── 13. Optional Redis file-index (--redis flag) ──────────────────────────
+// Writes code:graph:file:{sha1(rel).slice(0,12)} keys for ACE lookup by file path
+
+if (process.argv.includes('--redis')) {
+  const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+  const REDIS_TTL = 24 * 3600; // 24 h
+  let Redis;
+  try { ({ default: Redis } = await import('ioredis')); }
+  catch { console.warn('ioredis not available — skipping Redis file-index write'); process.exit(0); }
+
+  const redis = new Redis(REDIS_URL, { lazyConnect: true, connectTimeout: 4_000, commandTimeout: 8_000 });
+  try {
+    await redis.connect();
+    let pipe = redis.pipeline();
+    let written = 0;
+    for (const n of nodes) {
+      const fileHash = createHash('sha1').update(n.rel).digest('hex').slice(0, 12);
+      const nb = neighborhoods[n.rel];
+      const entry = {
+        rel: n.rel,
+        zone: n.zone,
+        directFanIn: n.directFanIn,
+        directFanOut: n.directFanOut,
+        isRoute: n.isRoute,
+        isTest: n.isTest,
+        upstreamNodeCount: nb?.upstreamNodeCount ?? null,
+        downstreamNodeCount: nb?.downstreamNodeCount ?? null,
+        topCallers: (inAdj.get(n.rel) ?? []).slice(0, 10),
+      };
+      pipe.setex(`code:graph:file:${fileHash}`, REDIS_TTL, JSON.stringify(entry));
+      written++;
+      if (written % 1000 === 0) { await pipe.exec(); pipe = redis.pipeline(); }
+    }
+    await pipe.exec();
+    await redis.quit().catch(() => {});
+    console.log(`Redis: wrote ${written} code:graph:file:* keys (TTL ${REDIS_TTL}s)`);
+  } catch (err) {
+    await redis.quit().catch(() => {});
+    console.warn('Redis write failed:', err.message);
+  }
+}

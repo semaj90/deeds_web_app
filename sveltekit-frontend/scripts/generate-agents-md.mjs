@@ -180,6 +180,113 @@ function kagKey(dirRel) {
   return `wiki:note:dir:dir:${slug}`;
 }
 
+// ── Per-directory audit gate pass/fail ───────────────────────────────────────
+function computeGates(dirRel, dirFiles) {
+  const routeFiles = dirFiles.filter(f => f.isRoute &&
+    (f.rel.endsWith('+server.ts') || f.rel.endsWith('+page.server.ts')));
+  const svelteFiles = dirFiles.filter(f => f.isSvelteComp);
+  const gates = [];
+
+  if (routeFiles.length > 0) {
+    const noAuth = routeFiles.filter(f => !f.hasAuth);
+    gates.push({
+      id: 'G18', label: 'Auth guard on API routes',
+      pass: noAuth.length === 0,
+      detail: noAuth.length > 0
+        ? `${noAuth.length}/${routeFiles.length} missing (${noAuth.slice(0, 3).map(f => path.basename(f.rel)).join(', ')})`
+        : `${routeFiles.length}/${routeFiles.length} guarded ✅`,
+    });
+
+    const noZod = routeFiles.filter(f => !f.hasZod);
+    gates.push({
+      id: 'G19', label: 'Zod input validation',
+      pass: noZod.length === 0,
+      detail: noZod.length > 0
+        ? `${noZod.length}/${routeFiles.length} unvalidated`
+        : `${routeFiles.length}/${routeFiles.length} validated ✅`,
+    });
+
+    const noTest = routeFiles.filter(f => !f.hasPairedTest);
+    gates.push({
+      id: 'G26', label: 'Route test pairing',
+      pass: noTest.length === 0,
+      detail: noTest.length > 0
+        ? `${noTest.length}/${routeFiles.length} unpaired`
+        : `all paired ✅`,
+    });
+  }
+
+  if (svelteFiles.length > 0) {
+    const sv4 = svelteFiles.filter(f => f.sv4Legacy);
+    gates.push({
+      id: 'G21-24', label: 'Svelte 5 rune compliance',
+      pass: sv4.length === 0,
+      detail: sv4.length > 0
+        ? `${sv4.length}/${svelteFiles.length} files with Svelte 4 patterns`
+        : `${svelteFiles.length}/${svelteFiles.length} clean ✅`,
+    });
+
+    const ssrUnsafe = svelteFiles.filter(f => f.ssrUnsafe);
+    gates.push({
+      id: 'G20', label: 'SSR safety',
+      pass: ssrUnsafe.length === 0,
+      detail: ssrUnsafe.length > 0
+        ? `${ssrUnsafe.length} SSR-unsafe file(s)`
+        : 'clean ✅',
+    });
+  }
+
+  const localhostFiles = dirFiles.filter(f => f.localhostRefs && f.localhostRefs.length > 0);
+  if (localhostFiles.length > 0) {
+    gates.push({
+      id: 'G17', label: 'No hardcoded localhost URLs',
+      pass: false,
+      detail: `${localhostFiles.length}/${dirFiles.length} files — use env.server.ts getters`,
+    });
+  }
+
+  const runeTs = dirFiles.filter(f => f.runeInTs);
+  if (runeTs.length > 0) {
+    gates.push({
+      id: 'G25', label: 'No rune calls in plain .ts',
+      pass: false,
+      detail: `${runeTs.length} plain .ts file(s) use rune syntax`,
+    });
+  }
+
+  return { gates, routeCount: routeFiles.length, svelteCount: svelteFiles.length };
+}
+
+// ── Todo synthesis per directory ─────────────────────────────────────────────
+function synthTodos(dirRel, dirFiles, gatesData, kagDoc) {
+  const todos = [];
+
+  for (const g of gatesData.gates) {
+    if (!g.pass) todos.push({ pri: 'HIGH', gate: g.id, text: `Fix **${g.id}** ${g.label}: ${g.detail}` });
+  }
+
+  for (const w of (kagDoc?.warnings ?? []).slice(0, 4)) {
+    todos.push({ pri: 'MED', gate: null, text: w });
+  }
+
+  const fileTodos = dirFiles.flatMap(f =>
+    (f.todos ?? []).map(t => ({ file: path.basename(f.rel), text: String(t).slice(0, 120) }))
+  );
+  for (const ft of fileTodos.slice(0, 6)) {
+    todos.push({ pri: 'LOW', gate: 'TODO', text: `\`${ft.file}\`: ${ft.text}` });
+  }
+
+  const highFanIn = dirFiles
+    .filter(f => (f.fanIn ?? 0) >= 8)
+    .sort((a, b) => (b.fanIn ?? 0) - (a.fanIn ?? 0))
+    .slice(0, 3);
+  for (const f of highFanIn) {
+    todos.push({ pri: 'LOW', gate: 'G1', text: `High fan-in (${f.fanIn} importers): \`${path.basename(f.rel)}\` — interface changes are high-blast-radius` });
+  }
+
+  return todos;
+}
+
 // ── Render per-directory AGENTS.md ───────────────────────────────────────────
 function renderDirAgents(dirRel, dirFiles, kagDoc, cluster) {
   const m = aggregate(dirFiles);
@@ -190,6 +297,8 @@ function renderDirAgents(dirRel, dirFiles, kagDoc, cluster) {
   const topo = kagDoc?.topologicalNeighbors ?? [];
   const patterns = kagDoc?.patterns ?? [];
   const warnings = kagDoc?.warnings ?? [];
+  const gatesData = computeGates(dirRel, dirFiles);
+  const todos = synthTodos(dirRel, dirFiles, gatesData, kagDoc);
   const pageRank = kagDoc?.pageRankTop5 ?? [];
 
   // Hypergraph cluster section (optional — present when topDirs/topPaths credit this dir)
@@ -264,6 +373,18 @@ ${warningsList}
 ` : ''}${pageRankList ? `## PageRank top-5 (in this directory)
 
 ${pageRankList}
+` : ''}${gatesData.gates.length > 0 ? `## Audit Gates
+
+| Gate | Status | Detail |
+|------|--------|--------|
+${gatesData.gates.map(g => `| ${g.id} | ${g.pass ? '✅ PASS' : '❌ FAIL'} | ${g.detail} |`).join('\n')}
+
+_Gates checked: ${gatesData.gates.map(g => g.id).join(', ')}. Run \`npm run index:codebase:fast && npm run agents:write\` to refresh._
+` : ''}${todos.length > 0 ? `## Todos + Enhancements
+
+${todos.map(t => `- **[${t.pri}]**${t.gate ? ` [${t.gate}]` : ''} ${t.text}`).join('\n')}
+
+_Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: \`npm run agents:write\`._
 ` : ''}
 ## Retrieval / Rerank Hints
 
