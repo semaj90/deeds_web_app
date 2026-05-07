@@ -110,6 +110,8 @@
     "graphify:cluster-summaries": "node scripts/graphify-cluster-summaries.mjs",
     "graphify:cluster-summaries:test": "node scripts/graphify-cluster-summaries.mjs --limit 3",
     "graphify:cluster-summaries:fast": "node scripts/graphify-cluster-summaries.mjs --skip-llm",
+    "graphify:cluster": "node scripts/graphify-cluster-summaries.mjs",
+    "graphify:cluster:fast": "node scripts/graphify-cluster-summaries.mjs --skip-llm",
     "graphify:semantic-cluster": "node scripts/graphify-semantic-cluster.mjs",
     "graphify:semantic-cluster:dry": "node scripts/graphify-semantic-cluster.mjs --dry-run",
     "graphify:semantic-cluster:force": "node scripts/graphify-semantic-cluster.mjs --force",
