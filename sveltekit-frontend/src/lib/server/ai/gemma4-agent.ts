@@ -741,9 +741,12 @@ interface ToolResult {
   errorMsg?: string;
 }
 
+type GoHit = { clusterKey?: string; topoClass?: string; path?: string; score?: number };
+
 async function dispatchTool(
   name: string,
   args: Record<string, unknown>,
+  goRetrievalHits?: GoHit[],
 ): Promise<ToolResult> {
   try {
     if (name === 'rag_search') {
@@ -1177,7 +1180,7 @@ async function dispatchTool(
       });
       // Accumulate hits for cluster context injection before final synthesis
       const topoNorm = data as { ok?: boolean; hits?: Array<Record<string, unknown>> };
-      if (topoNorm?.ok && Array.isArray(topoNorm.hits)) {
+      if (goRetrievalHits && topoNorm?.ok && Array.isArray(topoNorm.hits)) {
         for (const h of topoNorm.hits.slice(0, 20)) {
           goRetrievalHits.push({
             clusterKey: h.clusterKey != null ? String(h.clusterKey) : undefined,
@@ -1204,7 +1207,7 @@ async function dispatchTool(
       });
       // Accumulate hits for cluster context injection before final synthesis
       const goNorm = data as { ok?: boolean; hits?: Array<Record<string, unknown>> };
-      if (goNorm?.ok && Array.isArray(goNorm.hits)) {
+      if (goRetrievalHits && goNorm?.ok && Array.isArray(goNorm.hits)) {
         for (const h of goNorm.hits.slice(0, 20)) {
           goRetrievalHits.push({
             clusterKey: h.clusterKey != null ? String(h.clusterKey) : undefined,
