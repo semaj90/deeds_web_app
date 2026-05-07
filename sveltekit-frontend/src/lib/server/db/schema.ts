@@ -123,7 +123,14 @@ export {
 } from './schema/legal-cases';
 
 // Metadata Spine (Phase 78/79)
-export * from './schema/metadata-spine';
+// codeRelations / CodeRelation / NewCodeRelation are already exported from schema-postgres above
+export {
+	metadataEnvelopes, codebaseAuditEvents, aceRetrievalRuns, aceRetrievalHits,
+	type MetadataEnvelope, type NewMetadataEnvelope,
+	type CodebaseAuditEvent, type NewCodebaseAuditEvent,
+	type AceRetrievalRun, type NewAceRetrievalRun,
+	type AceRetrievalHit, type NewAceRetrievalHit,
+} from './schema/metadata-spine';
 
 // KAG-DAG Architecture (Phase 79)
 export * from './schema/kag-dag';

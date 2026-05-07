@@ -33,6 +33,10 @@ const postSchema = z.object({
 	chunkIds:      z.array(z.string()).max(20).optional(),
 	/** 8-char FNV-1a hash of the active hyperedge at signal time (from selectAdaptiveMemory) */
 	hyperedgeHash: z.string().max(8).optional(),
+	/** P4-B: error fingerprint hash — when set and rating='up', writes prior_fix to DB */
+	errorHash:     z.string().max(32).optional(),
+	/** P4-B: LLM response text to persist as prior_fix (truncated to 2KB) */
+	responseText:  z.string().max(4000).optional(),
 });
 
 // ── Redis keys ─────────────────────────────────────────────────────────────
@@ -74,7 +78,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const parsed = postSchema.safeParse(body);
 	if (!parsed.success) return json({ error: 'Invalid request' }, { status: 400 });
 
-	const { queryHash, rating, pipeline, chunkIds = [], hyperedgeHash } = parsed.data;
+	const { queryHash, rating, pipeline, chunkIds = [], hyperedgeHash, errorHash, responseText } = parsed.data;
 	const userId = locals.user.id as string;
 	const redis  = getRedis();
 
@@ -175,6 +179,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			import('$lib/server/retrieval/qlora-boost.js').then(({ invalidateQloraBoostSet }) => invalidateQloraBoostSet()).catch(() => {});
 			import('$lib/server/analytics/research-cache.js').then(({ invalidateResearchIndex }) => invalidateResearchIndex()).catch(() => {});
 		}).catch(() => {});
+	}
+
+	// ── P4-B: Write prior_fix to error_fingerprints on thumbs-up ─────────
+	// Closes the RL loop: resolved errors permanently improve hash lane quality
+	// for future identical queries.
+	if (rating === 'up' && errorHash && responseText) {
+		pool.query(
+			`UPDATE error_fingerprints
+			 SET prior_fix  = $1,
+			     seen_count = seen_count + 1,
+			     last_seen  = now()
+			 WHERE error_hash = $2`,
+			[responseText.slice(0, 2000), errorHash]
+		).catch(() => {});
 	}
 
 	// ── 5. RL self-modification signal ───────────────────────────────────
