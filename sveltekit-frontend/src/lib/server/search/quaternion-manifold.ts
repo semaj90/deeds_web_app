@@ -149,6 +149,8 @@ export function quaternionDot(a: UnitQuaternion, b: UnitQuaternion): number {
  * Uses |dot| because unit quaternions double-cover S³:
  * q and −q represent the same rotation, so |dot| collapses both hemispheres.
  */
+// TODO(cuda): batch version — batchQuaternionSimilarity(queries: Float32Array, candidates: Float32Array, n: number): Float32Array
+// Use tensorrt_bridge.node cuBLAS GEMM on the 4-column quaternion matrix; fall back to the loop below for n < 256.
 export function quaternionSimilarity(a: UnitQuaternion, b: UnitQuaternion): number {
   return Math.abs(quaternionDot(a, b));
 }
