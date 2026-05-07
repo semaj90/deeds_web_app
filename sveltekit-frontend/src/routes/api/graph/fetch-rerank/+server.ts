@@ -24,8 +24,7 @@ import {
 } from '$lib/server/ai/graph-reranker.js';
 import { mlaFusionRerank }  from '$lib/server/search/mla-kv-compress.js';
 import {
-  toUnitQuaternion,
-  standardiseManifold4,
+  toStandardizedBiasedQuaternion,
   hmmAxisMultiplierTuple,
   biasedUnitQuaternionTuple,
 } from '$lib/server/search/quaternion-manifold.js';
@@ -99,15 +98,20 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   try {
     const { getRedis } = await import('$lib/server/redis.js');
     const redis = getRedis();
-    enrichedHits = await Promise.all(
-      qdrantHits.map(async (hit) => {
-        if (hit.payload?.hyperedgeWeight != null) return hit as QdrantHit;
-        const edgeKey = `hg:edge:chunk:${hit.chunkId}`;
-        const raw = await redis.get(edgeKey).catch(() => null);
-        const weight = raw ? (JSON.parse(raw)?.weight ?? null) : null;
-        return { ...hit, payload: { ...hit.payload, hyperedgeWeight: weight } } as QdrantHit;
-      })
-    );
+
+    const needsEnrich = qdrantHits.filter((h) => h.payload?.hyperedgeWeight == null);
+    if (needsEnrich.length) {
+      const keys = needsEnrich.map((h) => `hg:edge:chunk:${h.chunkId}`);
+      const raws = await redis.mget(...keys).catch(() => keys.map(() => null));
+      const weightMap = new Map(
+        needsEnrich.map((h, i) => [h.chunkId, raws[i] ? (JSON.parse(raws[i]!)?.weight ?? null) : null])
+      );
+      enrichedHits = qdrantHits.map((h) =>
+        h.payload?.hyperedgeWeight != null
+          ? (h as QdrantHit)
+          : ({ ...h, payload: { ...h.payload, hyperedgeWeight: weightMap.get(h.chunkId) ?? null } } as QdrantHit)
+      );
+    }
   } catch { /* non-fatal */ }
 
   // ── 2. Ensure manifold4_q unit quaternions are populated ─────────────────
@@ -118,8 +122,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     const p = hit.payload;
     if (!p || p.manifold4_q?.length === 4) return hit;
     if (!p.manifold4?.length) return hit;
-    const std = standardiseManifold4(p.manifold4 as [number, number, number, number]);
-    const q   = toUnitQuaternion(std);
+    const q = toStandardizedBiasedQuaternion(p.manifold4 as [number, number, number, number]);
     return { ...hit, payload: { ...p, manifold4_q: q } };
   });
 
@@ -137,13 +140,13 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
   if (hmm?.state && (hmm.confidence ?? 0) > 0 && querySom?.manifold4_q?.length === 4) {
     const section    = hmmStateToGlyphSection(hmm.state);
-    const confidence = hmm.confidence ?? 0;
+    const confidence = hmm.confidence!;
     const multiplier = hmmAxisMultiplierTuple(section, confidence);
 
     // Convert [w,x,y,z] quaternion back to Manifold4Point [som_x,som_y,semantic_z,grpo_w]
     const q = querySom.manifold4_q as [number, number, number, number];
-    const m4 = [q[1], q[2], q[3], q[0]] as [number, number, number, number];
-    const biasedQ = biasedUnitQuaternionTuple(m4, multiplier);
+    const rawM4 = [q[1], q[2], q[3], q[0]] as [number, number, number, number];
+    const biasedQ = biasedUnitQuaternionTuple(rawM4, multiplier);
 
     effectiveQuerySom = { ...querySom, manifold4_q: biasedQ };
     hmmBiasApplied    = true;

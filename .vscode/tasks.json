@@ -2707,11 +2707,37 @@
       "problemMatcher": []
     },
     {
-      // ── Bifrost semantic cache (Go microservice, :3040) ───────────────────
-      // Health-checks first so it's idempotent; starts go-microservice/cmd/bifrost
+      // ── Node.js canonical orchestrator — tier-ordered, health-checked ─────
+      // Replaces the parallel compound task with ordered startup + startup.jsonl journal.
+      // Use this for reliable first-boot; use the parallel task for quick restarts.
+      "label": "🚀 Dev Stack: Node Orchestrator (tier-ordered)",
+      "type": "shell",
+      "command": "node scripts/start-dev-stack.mjs --full",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "isBackground": true,
+      "problemMatcher": [{
+        "pattern": { "regexp": "^$" },
+        "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "SvelteKit" }
+      }],
+      "group": { "kind": "build", "isDefault": false },
+      "presentation": { "reveal": "always", "panel": "new", "clear": true }
+    },
+    {
+      // ── TurboQuant stability test — run before promoting turbo3/4 ─────────
+      "label": "🧪 TurboQuant: Stability Test (q8_0 baseline, 20 gen)",
+      "type": "shell",
+      "command": "npm run turbo:test:stability 2>&1 | Tee-Object logs/task-output/turbo-stability-latest.log",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      // ── Bifrost semantic cache (maximhq/bifrost Docker image, :3040) ────────
+      // Health-checks first; starts via docker compose --profile full (no Go source needed)
       "label": "🌉 Startup: Bifrost Semantic Cache (:3040)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"try { Invoke-WebRequest 'http://127.0.0.1:3040/health' -TimeoutSec 1 | Out-Null; Write-Host '🌉 Bifrost already running :3040' -ForegroundColor Yellow; exit 0 } catch {}; Set-Location '${workspaceFolder}/go-microservice'; go run ./cmd/bifrost/ --port 3040 --redis redis://127.0.0.1:6379\"",
+      "command": "pwsh -NoProfile -Command \"try { Invoke-WebRequest 'http://127.0.0.1:3040/health' -TimeoutSec 1 | Out-Null; Write-Host '🌉 Bifrost already :3040' -ForegroundColor Yellow; exit 0 } catch {}; Write-Host '🌉 Starting Bifrost via docker compose...' -ForegroundColor Cyan; Set-Location '${workspaceFolder}/..'; docker compose --profile full up -d bifrost; Start-Sleep 3; Write-Host '🌉 Bifrost :3040 started' -ForegroundColor Green\"",
       "options": { "cwd": "${workspaceFolder}" },
       "isBackground": true,
       "problemMatcher": [{
@@ -9402,6 +9428,42 @@
       "group": "test",
       "detail": "Test the topology.search_near MCP tool — finds nodes near a query in 4D manifold space.",
       "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": []
+    },
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // Claude Code token-saving tools — keep codebase graph fresh so Claude
+    // doesn't need to grep/read files manually each session.
+    // ══════════════════════════════════════════════════════════════════════════
+
+    {
+      "label": "🤖 Graphify: Synthesize Next Actions (tsgo + gates + Gemma4)",
+      "type": "shell",
+      "command": "mkdir -p logs/task-output && npm run graph:synthesize 2>&1 | Tee-Object -FilePath logs/task-output/synthesize-next-actions-latest.log; $latest = Get-ChildItem memory/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name; if ($latest) { Write-Host \"✅ next_actions.md → memory/runs/$latest/next_actions.md\" -ForegroundColor Green; Get-Content \"memory/runs/$latest/next_actions.md\" | Select-Object -First 40 } else { Write-Host '⚠️ No run found' -ForegroundColor Yellow }",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Run synthesize-next-actions.mjs: tsgo diagnostics + G17-G25 audit gates + risk scoring + TurboQuant synthesis → memory/runs/<ts>/next_actions.md. Prints P0/P1 summary on completion. ~30-60s.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 Claude: Context Brief (next_actions P0/P1)",
+      "type": "shell",
+      "command": "$latest = Get-ChildItem memory/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name; if ($latest) { Write-Host \"Run: $latest\" -ForegroundColor Cyan; Get-Content \"memory/runs/$latest/next_actions.md\" | Select-Object -First 80 } else { Write-Host '⚠️ No run found — run 🤖 Graphify: Synthesize Next Actions first' -ForegroundColor Yellow }",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "test",
+      "detail": "Print the P0/P1 priorities + audit table from the latest next_actions.md run. Use this to give Claude a quick context brief without manual file reading.",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 Claude: Graph Relations (extract + synthesize)",
+      "type": "shell",
+      "command": "mkdir -p logs/task-output && npm run graph:full 2>&1 | Tee-Object -FilePath logs/task-output/graph-full-latest.log; Write-Host '✅ graph:full done — relations extracted + next_actions synthesized' -ForegroundColor Green",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Full relation pipeline: extract-code-relations → build-codebase-relationships (11k+ edges) → synthesize-next-actions. Use after merging large PRs or before a major agent run. ~2-3 min.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
     }
   ],

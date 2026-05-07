@@ -1,38 +1,38 @@
 {
-  "generatedAt": "2026-05-07T04:00:08.174Z",
+  "generatedAt": "2026-05-07T14:58:30.006Z",
   "sourceGraph": "docs/graph/codebase-graph.json",
   "stats": {
-    "generatedAt": "2026-05-07T04:00:08.174Z",
-    "nodeCount": 3616,
-    "edgeCount": 11735,
-    "resolvedEdges": 6916,
-    "unresolvedEdges": 756,
-    "externalEdges": 3870,
+    "generatedAt": "2026-05-07T14:58:30.006Z",
+    "nodeCount": 3652,
+    "edgeCount": 11882,
+    "resolvedEdges": 7009,
+    "unresolvedEdges": 766,
+    "externalEdges": 3914,
     "edgeTypeBreakdown": {
-      "imports_static": 5455,
-      "imports_dynamic": 487,
+      "imports_static": 5491,
+      "imports_dynamic": 491,
       "env_dependency": 543,
       "exports_from": 276,
-      "db_dependency": 885,
-      "redis_dependency": 373,
-      "qdrant_dependency": 159,
-      "test_covers_file": 2426,
-      "neo4j_dependency": 75,
-      "mcp_tool_calls": 50,
-      "server_route_depends_on": 1006
+      "db_dependency": 888,
+      "redis_dependency": 383,
+      "qdrant_dependency": 161,
+      "test_covers_file": 2500,
+      "neo4j_dependency": 80,
+      "mcp_tool_calls": 54,
+      "server_route_depends_on": 1015
     },
     "zoneBreakdown": {
-      "types": 120,
+      "types": 121,
       "client": 956,
-      "server": 632,
-      "test": 845,
-      "route": 1063
+      "server": 643,
+      "test": 862,
+      "route": 1070
     },
     "hotspotCount": 50,
     "routeCount": 50,
     "testCount": 30,
     "neighborhoodsComputed": 100,
-    "coveredFiles": 670
+    "coveredFiles": 681
   },
   "nodes": [
     {
@@ -7064,7 +7064,7 @@
       "lineCount": 69,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 252,
+      "directFanIn": 253,
       "directFanOut": 14,
       "hash": "d5744454"
     },
@@ -10150,6 +10150,19 @@
       "hash": "1d41b3ea"
     },
     {
+      "rel": "src/lib/server/ace/adaptive-prefetch.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 246,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 2,
+      "hash": "ce9478c4"
+    },
+    {
       "rel": "src/lib/server/ace/auto-tagger.ts",
       "zone": "server",
       "isRoute": false,
@@ -10168,7 +10181,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 17,
+      "lineCount": 23,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 2,
@@ -10197,7 +10210,7 @@
       "lineCount": 95,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 0,
+      "directFanIn": 1,
       "directFanOut": 0,
       "hash": "81ca99d9"
     },
@@ -10220,10 +10233,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 3434,
+      "lineCount": 3628,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 30,
+      "directFanIn": 31,
       "directFanOut": 37,
       "hash": "6342c9b9"
     },
@@ -10324,11 +10337,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 474,
+      "lineCount": 517,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 4,
-      "directFanOut": 6,
+      "directFanOut": 7,
       "hash": "b21c25f2"
     },
     {
@@ -10454,11 +10467,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 414,
+      "lineCount": 539,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 13,
-      "directFanOut": 2,
+      "directFanOut": 3,
       "hash": "2f813086"
     },
     {
@@ -10878,6 +10891,19 @@
       "hash": "58a4e166"
     },
     {
+      "rel": "src/lib/server/ai/engram-memory.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 123,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 11,
+      "directFanOut": 0,
+      "hash": "22bb71d2"
+    },
+    {
       "rel": "src/lib/server/ai/error-fix-memory.ts",
       "zone": "server",
       "isRoute": false,
@@ -10896,7 +10922,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1746,
+      "lineCount": 1928,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 4,
@@ -10915,6 +10941,19 @@
       "directFanIn": 8,
       "directFanOut": 3,
       "hash": "0140f528"
+    },
+    {
+      "rel": "src/lib/server/ai/graph-reranker.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 193,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 7,
+      "directFanOut": 0,
+      "hash": "fb70ae0a"
     },
     {
       "rel": "src/lib/server/ai/hca-compressor.ts",
@@ -11039,7 +11078,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 299,
+      "lineCount": 339,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 3,
@@ -11169,11 +11208,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 424,
+      "lineCount": 449,
       "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 7,
-      "directFanOut": 8,
+      "directFanIn": 9,
+      "directFanOut": 9,
       "hash": "63b24533"
     },
     {
@@ -11182,10 +11221,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 106,
+      "lineCount": 127,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 3,
+      "directFanIn": 4,
       "directFanOut": 0,
       "hash": "283461c8"
     },
@@ -11367,7 +11406,7 @@
       "lineCount": 394,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 13,
+      "directFanIn": 14,
       "directFanOut": 6,
       "hash": "f372098e"
     },
@@ -11572,11 +11611,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 624,
+      "lineCount": 651,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 39,
-      "directFanOut": 4,
+      "directFanIn": 41,
+      "directFanOut": 6,
       "hash": "a78e8b4f"
     },
     {
@@ -12303,7 +12342,7 @@
       "lineCount": 346,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 4,
       "directFanOut": 1,
       "hash": "b1755d54"
     },
@@ -12420,7 +12459,7 @@
       "lineCount": 112,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 485,
+      "directFanIn": 488,
       "directFanOut": 7,
       "hash": "0d33d955"
     },
@@ -15168,6 +15207,71 @@
       "hash": "aef81905"
     },
     {
+      "rel": "src/lib/server/hypergraph/hypergraph-builder.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 220,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "a8be0ae6"
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-search.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 300,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 13,
+      "directFanOut": 1,
+      "hash": "ee9650ba"
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-sync.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 78,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "dfe945b3"
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-traversal.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 169,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 11,
+      "directFanOut": 2,
+      "hash": "f18b4ee6"
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-types.ts",
+      "zone": "types",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 190,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 9,
+      "directFanOut": 0,
+      "hash": "71fbdc02"
+    },
+    {
       "rel": "src/lib/server/image/resize-for-vlm.ts",
       "zone": "server",
       "isRoute": false,
@@ -15907,6 +16011,19 @@
       "directFanIn": 0,
       "directFanOut": 2,
       "hash": "50beebd1"
+    },
+    {
+      "rel": "src/lib/server/mcp/tool-ranker.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 353,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 3,
+      "hash": "cfbd026d"
     },
     {
       "rel": "src/lib/server/mcp-bridge.ts",
@@ -16866,7 +16983,7 @@
       "lineCount": 230,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 240,
+      "directFanIn": 246,
       "directFanOut": 1,
       "hash": "46ee6e0b"
     },
@@ -17308,7 +17425,7 @@
       "lineCount": 201,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 5,
+      "directFanIn": 12,
       "directFanOut": 1,
       "hash": "a5a36d1b"
     },
@@ -17469,6 +17586,32 @@
       "hash": "6da137e8"
     },
     {
+      "rel": "src/lib/server/search/bow-utils.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 47,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "02403d0c"
+    },
+    {
+      "rel": "src/lib/server/search/engram-bigram.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 150,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 2,
+      "directFanOut": 1,
+      "hash": "3638ffd7"
+    },
+    {
       "rel": "src/lib/server/search/gpu-rerank.ts",
       "zone": "server",
       "isRoute": false,
@@ -17516,7 +17659,7 @@
       "lineCount": 272,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 3,
+      "directFanIn": 4,
       "directFanOut": 1,
       "hash": "043e5ca9"
     },
@@ -17558,6 +17701,19 @@
       "directFanIn": 3,
       "directFanOut": 2,
       "hash": "a936bea1"
+    },
+    {
+      "rel": "src/lib/server/search/quaternion-manifold.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 601,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 4,
+      "directFanOut": 2,
+      "hash": "11394bd9"
     },
     {
       "rel": "src/lib/server/search/retrieval-explainer.ts",
@@ -17997,7 +18153,7 @@
       "lineCount": 186,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 11,
+      "directFanIn": 15,
       "directFanOut": 0,
       "hash": "e2e66256"
     },
@@ -21348,7 +21504,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1379,
+      "lineCount": 2139,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
@@ -21738,7 +21894,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 732,
+      "lineCount": 733,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
@@ -22485,6 +22641,19 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "65bcc391"
+    },
+    {
+      "rel": "src/routes/(app)/admin/observability/+page.svelte",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 428,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "cb1ad585"
     },
     {
       "rel": "src/routes/(app)/admin/phase78/+page.server.ts",
@@ -27804,6 +27973,19 @@
       "hash": "59b5c55f"
     },
     {
+      "rel": "src/routes/api/admin/observability/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 305,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 2,
+      "directFanOut": 2,
+      "hash": "de8421b9"
+    },
+    {
       "rel": "src/routes/api/admin/pipeline/events/+server.ts",
       "zone": "route",
       "isRoute": true,
@@ -27900,7 +28082,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 352,
+      "lineCount": 353,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
@@ -32042,6 +32224,32 @@
       "hash": "d421d7b9"
     },
     {
+      "rel": "src/routes/api/graph/docstore/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 95,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "4a6584f1"
+    },
+    {
+      "rel": "src/routes/api/graph/fetch-rerank/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 210,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 5,
+      "hash": "7eae7d09"
+    },
+    {
       "rel": "src/routes/api/graph/glyph-atlas/+server.ts",
       "zone": "route",
       "isRoute": true,
@@ -32393,6 +32601,19 @@
       "hash": "611431dc"
     },
     {
+      "rel": "src/routes/api/hypergraph/edge/[id]/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 24,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "4d8512d0"
+    },
+    {
       "rel": "src/routes/api/hypergraph/lookup/+server.ts",
       "zone": "route",
       "isRoute": true,
@@ -32404,6 +32625,32 @@
       "directFanIn": 2,
       "directFanOut": 1,
       "hash": "ddc0f2c4"
+    },
+    {
+      "rel": "src/routes/api/hypergraph/search/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 48,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "5fee06aa"
+    },
+    {
+      "rel": "src/routes/api/hypergraph/traverse/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 35,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "8c346a1b"
     },
     {
       "rel": "src/routes/api/indexing/+server.ts",
@@ -36176,6 +36423,19 @@
       "hash": "36123a1a"
     },
     {
+      "rel": "tests/ace-hits-cache.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 118,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "c8e59b0e"
+    },
+    {
       "rel": "tests/ace-ingest-route.spec.ts",
       "zone": "test",
       "isRoute": false,
@@ -36215,6 +36475,19 @@
       "hash": "77ceb37a"
     },
     {
+      "rel": "tests/ace-rerank-spine.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 445,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 11,
+      "hash": "6f711618"
+    },
+    {
       "rel": "tests/ace-status-route.spec.ts",
       "zone": "test",
       "isRoute": false,
@@ -36239,6 +36512,32 @@
       "directFanIn": 0,
       "directFanOut": 4,
       "hash": "9b9e41a9"
+    },
+    {
+      "rel": "tests/admin-observability.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 103,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "5cb4ac40"
+    },
+    {
+      "rel": "tests/agents-md-ingest.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 217,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "b5f2467f"
     },
     {
       "rel": "tests/agents-md-relations.spec.ts",
@@ -36532,7 +36831,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": true,
-      "lineCount": 107,
+      "lineCount": 131,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
@@ -37164,6 +37463,32 @@
       "hash": "d91b246e"
     },
     {
+      "rel": "tests/engram-dym.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 252,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "1fd41b57"
+    },
+    {
+      "rel": "tests/engram-graph-rerank.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 362,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 10,
+      "hash": "19d7d56c"
+    },
+    {
       "rel": "tests/error-brain-complete.spec.ts",
       "zone": "test",
       "isRoute": false,
@@ -37528,6 +37853,19 @@
       "hash": "7763453d"
     },
     {
+      "rel": "tests/hypergraph-mcp-tools.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 202,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "160a23d9"
+    },
+    {
       "rel": "tests/hypergraph-merge-semantics.spec.ts",
       "zone": "test",
       "isRoute": false,
@@ -37552,6 +37890,45 @@
       "directFanIn": 0,
       "directFanOut": 1,
       "hash": "f793cb4c"
+    },
+    {
+      "rel": "tests/hypergraph-search.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 222,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 10,
+      "hash": "7abac0b3"
+    },
+    {
+      "rel": "tests/hypergraph-traversal.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 327,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 11,
+      "hash": "fdf43cd8"
+    },
+    {
+      "rel": "tests/hypergraph-types.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 422,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "2e507466"
     },
     {
       "rel": "tests/index.js",
@@ -37827,6 +38204,32 @@
       "hash": "e3566db7"
     },
     {
+      "rel": "tests/mapreduce/reduce-neo4j.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 217,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "770ba7ee"
+    },
+    {
+      "rel": "tests/mcp-operator-tools.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 207,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "38f4c344"
+    },
+    {
       "rel": "tests/mcp-routes.spec.ts",
       "zone": "test",
       "isRoute": false,
@@ -37838,6 +38241,19 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "d7beb924"
+    },
+    {
+      "rel": "tests/mcp-trace-tools.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 117,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "84e67a9c"
     },
     {
       "rel": "tests/minio-upload.spec.ts",
@@ -37923,11 +38339,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": true,
-      "lineCount": 247,
+      "lineCount": 320,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 8,
+      "directFanOut": 11,
       "hash": "73938f1d"
     },
     {
@@ -38111,6 +38527,45 @@
       "directFanIn": 0,
       "directFanOut": 6,
       "hash": "e555ea24"
+    },
+    {
+      "rel": "tests/qdrant-rerank-feedback.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 135,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "dde18fbe"
+    },
+    {
+      "rel": "tests/qdrant-topology-payloads.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 185,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "aa02eda3"
+    },
+    {
+      "rel": "tests/quaternion-manifold.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 631,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 8,
+      "hash": "4249a82c"
     },
     {
       "rel": "tests/quick-routes-test.spec.ts",
@@ -46732,6 +47187,19 @@
       "hash": "80f491bf"
     },
     {
+      "rel": "tests/tool-ranker.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 335,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "c6755d60"
+    },
+    {
       "rel": "tests/topology-projection-pipeline.spec.ts",
       "zone": "test",
       "isRoute": false,
@@ -47058,7 +47526,7 @@
       "downstreamTruncated": false
     },
     "src/lib/components/ui/Icon.svelte": {
-      "upstreamNodeCount": 304,
+      "upstreamNodeCount": 305,
       "downstreamNodeCount": 15,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47106,19 +47574,19 @@
       "downstreamTruncated": false
     },
     "src/lib/server/grpc/embedding-client.ts": {
-      "upstreamNodeCount": 425,
+      "upstreamNodeCount": 426,
       "downstreamNodeCount": 31,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/vector/qdrant-manager.ts": {
-      "upstreamNodeCount": 422,
+      "upstreamNodeCount": 423,
       "downstreamNodeCount": 19,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/gpu/libtorch-bridge.ts": {
-      "upstreamNodeCount": 399,
+      "upstreamNodeCount": 400,
       "downstreamNodeCount": 3,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47130,8 +47598,8 @@
       "downstreamTruncated": false
     },
     "src/lib/server/analytics/search-analytics.ts": {
-      "upstreamNodeCount": 119,
-      "downstreamNodeCount": 23,
+      "upstreamNodeCount": 120,
+      "downstreamNodeCount": 29,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -47147,16 +47615,16 @@
       "upstreamTruncated": true,
       "downstreamTruncated": false
     },
+    "src/lib/server/ace/context-assembler.ts": {
+      "upstreamNodeCount": 44,
+      "downstreamNodeCount": 107,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
     "src/lib/ai/model-ids.ts": {
       "upstreamNodeCount": 500,
       "downstreamNodeCount": 1,
       "upstreamTruncated": true,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/ace/context-assembler.ts": {
-      "upstreamNodeCount": 43,
-      "downstreamNodeCount": 101,
-      "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/ai/code-intel-service.ts": {
@@ -47166,7 +47634,7 @@
       "downstreamTruncated": false
     },
     "src/lib/server/queue/rabbitmq-manager-fixed.ts": {
-      "upstreamNodeCount": 221,
+      "upstreamNodeCount": 222,
       "downstreamNodeCount": 46,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47185,12 +47653,12 @@
     },
     "src/routes/api/sse/chat/+server.ts": {
       "upstreamNodeCount": 4,
-      "downstreamNodeCount": 127,
+      "downstreamNodeCount": 132,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/cache.ts": {
-      "upstreamNodeCount": 250,
+      "upstreamNodeCount": 251,
       "downstreamNodeCount": 5,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47215,7 +47683,7 @@
     },
     "src/lib/server/queue/dispatch-inline.ts": {
       "upstreamNodeCount": 67,
-      "downstreamNodeCount": 56,
+      "downstreamNodeCount": 60,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -47226,7 +47694,7 @@
       "downstreamTruncated": false
     },
     "src/lib/server/cache/code-llm-index.ts": {
-      "upstreamNodeCount": 103,
+      "upstreamNodeCount": 104,
       "downstreamNodeCount": 20,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47238,19 +47706,25 @@
       "downstreamTruncated": false
     },
     "src/lib/server/retrieval/graph-context.ts": {
-      "upstreamNodeCount": 56,
+      "upstreamNodeCount": 57,
       "downstreamNodeCount": 22,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/types/retrieval.ts": {
-      "upstreamNodeCount": 241,
+      "upstreamNodeCount": 242,
       "downstreamNodeCount": 2,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/components/ui/card/CardContent.svelte": {
       "upstreamNodeCount": 37,
+      "downstreamNodeCount": 1,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
+    "src/lib/server/types/glyph.ts": {
+      "upstreamNodeCount": 217,
       "downstreamNodeCount": 1,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47273,6 +47747,12 @@
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
+    "src/lib/server/analysis/hmm-ace-analyzer.ts": {
+      "upstreamNodeCount": 14,
+      "downstreamNodeCount": 7,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
     "src/lib/server/auth-helpers.ts": {
       "upstreamNodeCount": 32,
       "downstreamNodeCount": 1,
@@ -47292,7 +47772,7 @@
       "downstreamTruncated": false
     },
     "src/lib/server/research/web-research-ingester.ts": {
-      "upstreamNodeCount": 82,
+      "upstreamNodeCount": 83,
       "downstreamNodeCount": 37,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47316,32 +47796,20 @@
       "downstreamTruncated": false
     },
     "src/lib/server/ace/types.ts": {
-      "upstreamNodeCount": 198,
-      "downstreamNodeCount": 5,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/analysis/hmm-ace-analyzer.ts": {
-      "upstreamNodeCount": 9,
-      "downstreamNodeCount": 7,
+      "upstreamNodeCount": 199,
+      "downstreamNodeCount": 25,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/gpu/pytorch-graph.ts": {
-      "upstreamNodeCount": 173,
+      "upstreamNodeCount": 174,
       "downstreamNodeCount": 1,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
-    "src/routes/api/cache/+server.ts": {
-      "upstreamNodeCount": 3,
-      "downstreamNodeCount": 4,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/routes/api/chat/memory/settings/+server.ts": {
-      "upstreamNodeCount": 3,
-      "downstreamNodeCount": 4,
+    "src/lib/server/hypergraph/hypergraph-search.ts": {
+      "upstreamNodeCount": 7,
+      "downstreamNodeCount": 2,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },

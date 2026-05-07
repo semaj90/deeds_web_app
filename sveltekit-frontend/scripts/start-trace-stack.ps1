@@ -1,86 +1,320 @@
 # start-trace-stack.ps1
 #
-# Launches the full TRACE inference stack as detached background processes:
-#   1. llama-server.exe  :8090  (TurboQuant / Gemma4 GGUF)
-#   2. topology-search   :8101  (4D manifold search engine)
-#   3. trace-mcp-server  :8788  (TypeScript MCP — graph/KAG tools)
-#   4. SvelteKit dev     :5173  (main app)
+# Full TRACE inference + indexing stack — detached background processes:
+#
+#   Tier 0 (pre-flight):   Langfuse :3030 health, Bifrost :3040 health
+#   Tier 1 (parallel):     llama-server.exe :8090  (TurboQuant + Gemma4 GGUF)
+#                          topology-search  :8101  (4D manifold search engine)
+#   Tier 2 (after Tier 1): TRACE MCP cluster :8788  (TypeScript agentic tools)
+#   Tier 3:                SvelteKit dev :5173
+#   Background (non-block):graphify:som — SOM centroid clustering refresh
+#
+# Env overrides:
+#   LLAMA_SERVER_PATH   path to llama-server.exe
+#   TURBO_MODEL_PATH    path to GGUF model blob
+#   TURBO_MMPROJ_PATH   path to mmproj-BF16.gguf
+#   TURBO_PORT          default 8090
+#   TRACE_MCP_PORT      default 8788
+#   TRACE_MCP_WORKERS   default min(cpuCount, 4)
+#   LANGFUSE_URL        default http://127.0.0.1:3030
+#   BIFROST_URL         default http://127.0.0.1:3040
 #
 # Usage:
 #   npm run trace:start
 #   powershell -ExecutionPolicy Bypass -File scripts/start-trace-stack.ps1
 
-$Root      = Split-Path -Parent $PSScriptRoot   # deeds-web-app
-$Frontend  = Join-Path $Root "sveltekit-frontend"
-$BinDir    = Join-Path $Frontend "bin"
-$ModelDir  = Join-Path $Frontend "models"
+$ErrorActionPreference = 'Continue'
 
-# ── 1. llama-server.exe (TurboQuant) ─────────────────────────────────────────
+$Root     = Split-Path -Parent $PSScriptRoot
+$Frontend = Join-Path $Root "sveltekit-frontend"
 
-$LlamaExe = Join-Path $BinDir "llama-server.exe"
-$Model    = Join-Path $ModelDir "gemma4-legal-q4_k_m.gguf"
-$Mmproj   = Join-Path $ModelDir "mmproj-BF16.gguf"
+# ── Helpers ─────────────────────────────────────────────────────────────────
 
-if (Test-Path $LlamaExe) {
-  $llamaArgs = @(
-    "-m", $Model,
-    "--host", "127.0.0.1",
-    "--port", "8090",
-    "-c",  "65536",
-    "-ngl", "99",
-    "--cache-prompt",
-    "-ctk", "q8_0",
-    "-ctv", "q8_0"
-  )
-  if (Test-Path $Mmproj) { $llamaArgs += @("--mmproj", $Mmproj) }
-
-  Write-Host "Starting llama-server.exe on :8090 ..." -ForegroundColor Cyan
-  Start-Process -FilePath $LlamaExe -ArgumentList $llamaArgs `
-    -WorkingDirectory $Frontend -WindowStyle Minimized
-  Start-Sleep -Milliseconds 1500
-} else {
-  Write-Host "llama-server.exe not found at $LlamaExe — skipping" -ForegroundColor Yellow
+function Test-Service {
+  param([string]$Url, [string]$Label)
+  try {
+    Invoke-RestMethod $Url -TimeoutSec 2 -ErrorAction Stop | Out-Null
+    Write-Host "  v $Label ($Url)" -ForegroundColor Green
+    return $true
+  } catch {
+    Write-Host "  x $Label unreachable ($Url) -- continuing" -ForegroundColor Yellow
+    return $false
+  }
 }
 
-# ── 2. Topology search server :8101 ──────────────────────────────────────────
-
-$TopoScript = Join-Path $Frontend "scripts\topology-search-server.mjs"
-if (Test-Path $TopoScript) {
-  Write-Host "Starting topology-search-server on :8101 ..." -ForegroundColor Cyan
-  Start-Process -FilePath "node.exe" -ArgumentList @($TopoScript) `
-    -WorkingDirectory $Frontend -WindowStyle Minimized
-  Start-Sleep -Milliseconds 800
-} else {
-  Write-Host "topology-search-server.mjs not found — skipping" -ForegroundColor Yellow
+function Wait-Service {
+  param([string]$Url, [string]$Label, [int]$RetryCount = 40, [int]$DelayMs = 500)
+  Write-Host "  Waiting for $Label ..." -ForegroundColor Cyan
+  for ($i = 0; $i -lt $RetryCount; $i++) {
+    try {
+      Invoke-RestMethod $Url -TimeoutSec 1 -ErrorAction Stop | Out-Null
+      Write-Host "  v $Label ready" -ForegroundColor Green
+      return $true
+    } catch {
+      [System.Threading.Thread]::Sleep($DelayMs)
+    }
+  }
+  Write-Host "  x $Label timed out -- continuing" -ForegroundColor Yellow
+  return $false
 }
 
-# ── 3. TRACE MCP cluster :8788 (multicore round-robin) ───────────────────────
+# ── Path resolution (env-overridable, fallback to known locations) ──────────
 
+$LlamaExe = if ($env:LLAMA_SERVER_PATH) { $env:LLAMA_SERVER_PATH }
+            elseif (Test-Path (Join-Path $Frontend "bin\llama-server.exe")) {
+              Join-Path $Frontend "bin\llama-server.exe"
+            } else { "C:\Users\james\Desktop\llama-server-cuda\llama-server.exe" }
+
+$ModelPath = if ($env:TURBO_MODEL_PATH) { $env:TURBO_MODEL_PATH } else {
+  $blob = Join-Path $env:USERPROFILE ".ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43"
+  if (Test-Path $blob) { $blob } else { Join-Path $Frontend "models\gemma4-legal-q4_k_m.gguf" }
+}
+
+$MmprojPath = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else {
+  $dl = Join-Path $env:USERPROFILE "Downloads\gemma4-mmproj\mmproj-BF16.gguf"
+  if (Test-Path $dl) { $dl } else { $null }
+}
+
+$TurboPort   = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { "8090" }
+$McpPort     = if ($env:TRACE_MCP_PORT)    { $env:TRACE_MCP_PORT }    else { "8788" }
+$McpWorkers  = if ($env:TRACE_MCP_WORKERS) { $env:TRACE_MCP_WORKERS } else {
+  [Math]::Min([System.Environment]::ProcessorCount, 4)
+}
+$LangfuseUrl = if ($env:LANGFUSE_URL) { $env:LANGFUSE_URL } else { "http://127.0.0.1:3030" }
+$BifrostUrl  = if ($env:BIFROST_URL)  { $env:BIFROST_URL }  else { "http://127.0.0.1:3040/health" }
+
+$TopoScript    = Join-Path $Frontend "scripts\topology-search-server.mjs"
 $ClusterScript = Join-Path $Frontend "scripts\start-trace-mcp-cluster.mjs"
-$McpServer     = Join-Path $Frontend "src\mcp\trace-mcp-server.ts"
-if ((Test-Path $ClusterScript) -and (Test-Path $McpServer)) {
-  $workers = [Math]::Min([System.Environment]::ProcessorCount, 4)
-  Write-Host "Starting TRACE MCP cluster on :8788 ($workers workers) ..." -ForegroundColor Cyan
-  Start-Process -FilePath "node.exe" `
-    -ArgumentList @($ClusterScript, $workers) `
-    -WorkingDirectory $Frontend -WindowStyle Minimized
-  Start-Sleep -Milliseconds 2500
-} else {
-  Write-Host "start-trace-mcp-cluster.mjs or trace-mcp-server.ts not found — skipping" -ForegroundColor Yellow
+$McpServerTs   = Join-Path $Frontend "src\mcp\trace-mcp-server.ts"
+$TsxCmd        = Join-Path $Frontend "node_modules\.bin\tsx.cmd"
+
+Write-Host ""
+Write-Host "=====================================================" -ForegroundColor Magenta
+Write-Host " TRACE inference stack startup" -ForegroundColor Magenta
+Write-Host "=====================================================" -ForegroundColor Magenta
+Write-Host ""
+
+# ── TIER 0: pre-flight (Langfuse + Bifrost must be running via Docker) ──────
+
+Write-Host "[Tier 0] Pre-flight: Langfuse + Bifrost" -ForegroundColor Blue
+
+# Langfuse :3030 — inference trace autoencoding (read-only health check)
+Test-Service -Url $LangfuseUrl  -Label "Langfuse  :3030 (inference traces)" | Out-Null
+
+# Bifrost :3040 — L2 semantic cache; start via Docker if not already up
+$bifrostHealthy = $false
+try {
+  Invoke-RestMethod $BifrostUrl -TimeoutSec 2 -ErrorAction Stop | Out-Null
+  Write-Host "  v Bifrost   :3040 (semantic KV cache)" -ForegroundColor Green
+  $bifrostHealthy = $true
+} catch {}
+
+if (-not $bifrostHealthy) {
+  Write-Host "  -> Bifrost :3040 not running — attempting docker compose start ..." -ForegroundColor Cyan
+  $dcResult = & docker compose --profile full up -d bifrost 2>&1
+  if ($LASTEXITCODE -eq 0) {
+    Start-Sleep -Seconds 3
+    try {
+      Invoke-RestMethod $BifrostUrl -TimeoutSec 2 -ErrorAction Stop | Out-Null
+      Write-Host "  v Bifrost :3040 started (L2 semantic cache active)" -ForegroundColor Green
+      $bifrostHealthy = $true
+    } catch {
+      Write-Host "  x Bifrost started but not yet responding — L2 cache may warm up shortly" -ForegroundColor Yellow
+    }
+  } else {
+    Write-Host "  x docker compose could not start Bifrost — L2 cache inactive, falling back to L3 direct" -ForegroundColor Yellow
+    Write-Host "    Run: docker compose --profile full up -d bifrost" -ForegroundColor DarkGray
+  }
+}
+Write-Host ""
+
+# ── TIER 0.5: Go retrieval service :8100 / gRPC :50053 ──────────────────────
+
+Write-Host "[Tier 0.5] Go retrieval service (gRPC :50053 / HTTP :8100)" -ForegroundColor Blue
+
+$retrievalUp = $false
+try {
+  Invoke-RestMethod "http://127.0.0.1:8100/health" -TimeoutSec 1 -ErrorAction Stop | Out-Null
+  Write-Host "  v go-retrieval-service already :8100" -ForegroundColor Yellow
+  $retrievalUp = $true
+} catch {}
+
+if (-not $retrievalUp) {
+  $GoServiceDir = Join-Path $Root "services\go-retrieval-service"
+  $GoExe        = Join-Path $GoServiceDir "go-retrieval-service.exe"
+  $GoCmd        = "C:\Program Files\Go\bin\go.exe"
+  if (Test-Path $GoExe) {
+    Write-Host "  -> Starting go-retrieval-service.exe :8100 ..." -ForegroundColor Cyan
+    $env:HTTP_PORT              = "8100"
+    $env:GRPC_PORT              = "50053"
+    $env:QDRANT_URL             = "http://localhost:6333"
+    $env:REDIS_URL              = "redis://localhost:6379"
+    $env:OLLAMA_URL             = "http://localhost:11434"
+    $env:EMBED_SERVICE_URL      = "localhost:50051"
+    $env:GPU_EMBED_ENABLED      = "true"
+    $env:EMBED_MODEL            = "embeddinggemma:latest"
+    $env:RETRIEVAL_HTTP_ENABLED = "true"
+    Start-Process -FilePath $GoExe -WorkingDirectory $GoServiceDir -WindowStyle Minimized | Out-Null
+    Start-Sleep -Seconds 2
+  } elseif (Test-Path $GoCmd) {
+    Write-Host "  -> go run go-retrieval-service :8100 (slow first start) ..." -ForegroundColor Cyan
+    Start-Process -FilePath "powershell.exe" `
+      -ArgumentList @("-NonInteractive", "-Command",
+        "cd `"$GoServiceDir`"; `$env:HTTP_PORT='8100'; `$env:GRPC_PORT='50053'; & `"$GoCmd`" run .") `
+      -WindowStyle Minimized | Out-Null
+    Start-Sleep -Seconds 5
+  } else {
+    Write-Host "  x go-retrieval-service not found — retrieval falls back to inline TS pipeline" -ForegroundColor Yellow
+    Write-Host "    Build: npm run go:retrieval:build" -ForegroundColor DarkGray
+  }
+  if (-not $retrievalUp) {
+    try {
+      Invoke-RestMethod "http://127.0.0.1:8100/health" -TimeoutSec 1 -ErrorAction Stop | Out-Null
+      Write-Host "  v go-retrieval-service :8100 ready" -ForegroundColor Green
+    } catch {}
+  }
+}
+Write-Host ""
+
+# ── TIER 1: TurboQuant + Topology search (parallel, detached) ───────────────
+
+Write-Host "[Tier 1] TurboQuant + Topology search" -ForegroundColor Blue
+
+# 1a. TurboQuant llama-server.exe :8090
+$turboUp = $false
+try {
+  Invoke-RestMethod "http://127.0.0.1:$TurboPort/health" -TimeoutSec 1 -ErrorAction Stop | Out-Null
+  Write-Host "  v TurboQuant already healthy on :$TurboPort" -ForegroundColor Yellow
+  $turboUp = $true
+} catch {}
+
+if (-not $turboUp) {
+  if (-not (Test-Path $LlamaExe)) {
+    Write-Host "  x llama-server.exe not found at $LlamaExe" -ForegroundColor Yellow
+    Write-Host "    Set LLAMA_SERVER_PATH env var to override" -ForegroundColor DarkYellow
+  } elseif (-not (Test-Path $ModelPath)) {
+    Write-Host "  x Model not found at $ModelPath" -ForegroundColor Yellow
+  } else {
+    $llamaArgs = @(
+      "-m",  $ModelPath,
+      "--host", "127.0.0.1",
+      "--port", $TurboPort,
+      "-c", "65536",
+      "-ngl", "99",
+      "-fa", "on",
+      "-ctk", "q8_0",
+      "-ctv", "q8_0",
+      "--log-disable"
+    )
+    if ($MmprojPath -and (Test-Path $MmprojPath)) {
+      $llamaArgs += @("--mmproj", $MmprojPath)
+      Write-Host "  -> TurboQuant :$TurboPort  VLM + mmproj, KV q8_0, FA on" -ForegroundColor Cyan
+    } else {
+      Write-Host "  -> TurboQuant :$TurboPort  text-only, KV q8_0, FA on" -ForegroundColor Cyan
+    }
+    Start-Process -FilePath $LlamaExe -ArgumentList $llamaArgs `
+      -WorkingDirectory $Frontend -WindowStyle Minimized -PassThru | Out-Null
+  }
 }
 
-# ── 4. SvelteKit dev server :5173 ─────────────────────────────────────────────
+# 1b. Topology search server :8101
+$topoUp = $false
+try {
+  Invoke-RestMethod "http://127.0.0.1:8101/health" -TimeoutSec 1 -ErrorAction Stop | Out-Null
+  Write-Host "  v Topology search already healthy on :8101" -ForegroundColor Yellow
+  $topoUp = $true
+} catch {}
 
-Write-Host "Starting SvelteKit dev server on :5173 ..." -ForegroundColor Cyan
+if (-not $topoUp -and (Test-Path $TopoScript)) {
+  Write-Host "  -> Topology search :8101" -ForegroundColor Cyan
+  Start-Process -FilePath "node.exe" -ArgumentList @($TopoScript) `
+    -WorkingDirectory $Frontend -WindowStyle Minimized | Out-Null
+}
+
+# Wait for TurboQuant before opening MCP (Gemma4 tool calls need it)
+if (-not $turboUp) {
+  Wait-Service -Url "http://127.0.0.1:$TurboPort/health" `
+    -Label "TurboQuant :$TurboPort" -RetryCount 120 -DelayMs 500 | Out-Null
+}
+Write-Host ""
+
+# ── TIER 2: TRACE MCP cluster :8788 ─────────────────────────────────────────
+
+Write-Host "[Tier 2] TRACE MCP server (Gemma4 agentic tools)" -ForegroundColor Blue
+
+$mcpUp = $false
+try {
+  Invoke-RestMethod "http://127.0.0.1:$McpPort/health" -TimeoutSec 1 -ErrorAction Stop | Out-Null
+  Write-Host "  v TRACE MCP already healthy on :$McpPort" -ForegroundColor Yellow
+  $mcpUp = $true
+} catch {}
+
+if (-not $mcpUp) {
+  if ((Test-Path $ClusterScript) -and (Test-Path $McpServerTs)) {
+    Write-Host "  -> MCP cluster :$McpPort  ($McpWorkers workers, SSE-transparent)" -ForegroundColor Cyan
+    Start-Process -FilePath "node.exe" `
+      -ArgumentList @($ClusterScript, $McpWorkers) `
+      -WorkingDirectory $Frontend -WindowStyle Minimized | Out-Null
+  } elseif (Test-Path $McpServerTs) {
+    Write-Host "  -> MCP single-worker :$McpPort" -ForegroundColor Cyan
+    $tsxExe  = if (Test-Path $TsxCmd) { $TsxCmd } else { "npx" }
+    $tsxArgs = if (Test-Path $TsxCmd) { @($McpServerTs) } else { @("tsx", $McpServerTs) }
+    $env:TRACE_MCP_PORT = $McpPort
+    Start-Process -FilePath $tsxExe -ArgumentList $tsxArgs `
+      -WorkingDirectory $Frontend -WindowStyle Minimized | Out-Null
+  } else {
+    Write-Host "  x trace-mcp-server.ts not found -- skipping" -ForegroundColor Yellow
+  }
+  Wait-Service -Url "http://127.0.0.1:$McpPort/health" `
+    -Label "TRACE MCP :$McpPort" -RetryCount 40 -DelayMs 500 | Out-Null
+}
+Write-Host ""
+
+# ── TIER 3: SvelteKit dev :5173 ─────────────────────────────────────────────
+
+Write-Host "[Tier 3] SvelteKit dev :5173" -ForegroundColor Blue
 Start-Process -FilePath "powershell.exe" `
   -ArgumentList @("-NoExit", "-Command", "cd `"$Frontend`"; npm run dev") `
   -WorkingDirectory $Frontend -WindowStyle Normal
+Write-Host ""
 
+# ── BACKGROUND: SOM centroid clustering ─────────────────────────────────────
+
+Write-Host "[Background] Launching SOM + graphify:som (non-blocking)" -ForegroundColor DarkGray
+$logsDir = Join-Path $Frontend "logs"
+if (-not (Test-Path $logsDir)) { New-Item -ItemType Directory -Path $logsDir | Out-Null }
+Start-Process -FilePath "powershell.exe" `
+  -ArgumentList @(
+    "-NonInteractive", "-Command",
+    "cd `"$Frontend`"; npm run graphify:som 2>&1 | Tee-Object -FilePath `"$logsDir\graphify-som.log`""
+  ) `
+  -WorkingDirectory $Frontend -WindowStyle Minimized | Out-Null
+Write-Host "  logs -> sveltekit-frontend/logs/graphify-som.log" -ForegroundColor DarkGray
 Write-Host ""
-Write-Host "TRACE stack launched:" -ForegroundColor Green
-Write-Host "  llama-server   http://127.0.0.1:8090"
-Write-Host "  topo-search    http://127.0.0.1:8101/health"
-Write-Host "  trace-mcp      http://127.0.0.1:8788/health"
-Write-Host "  SvelteKit      http://127.0.0.1:5173"
+
+# ── BACKGROUND: graph synthesis → next_actions.md P0/P1 ─────────────────────
+
+$SynthScript = Join-Path $Frontend "scripts\graph\synthesize-next-actions.mjs"
+if (Test-Path $SynthScript) {
+  Write-Host "[Background] Launching audit synthesis (next_actions.md P0/P1)" -ForegroundColor DarkGray
+  Start-Process -FilePath "node.exe" `
+    -ArgumentList @($SynthScript, "--no-spec-fetch") `
+    -WorkingDirectory $Frontend -WindowStyle Minimized | Out-Null
+  Write-Host "  reading: memory/runs/<latest>/ artifacts" -ForegroundColor DarkGray
+}
 Write-Host ""
-Write-Host "Connect MCP clients to: http://127.0.0.1:8788"
+
+# ── Summary ──────────────────────────────────────────────────────────────────
+
+Write-Host "=====================================================" -ForegroundColor Green
+Write-Host " TRACE stack launched" -ForegroundColor Green
+Write-Host "=====================================================" -ForegroundColor Green
+Write-Host "  Langfuse traces  $LangfuseUrl"
+Write-Host "  Bifrost KV cache $BifrostUrl"
+Write-Host "  TurboQuant GGUF  http://127.0.0.1:$TurboPort   (q8_0 KV, FA on)"
+Write-Host "  Topo search      http://127.0.0.1:8101/health"
+Write-Host "  TRACE MCP        http://127.0.0.1:$McpPort/health  ($McpWorkers workers)"
+Write-Host "  SvelteKit dev    http://127.0.0.1:5173"
+Write-Host ""
+Write-Host "  MCP endpoint:    http://127.0.0.1:$McpPort" -ForegroundColor Cyan
+Write-Host "=====================================================" -ForegroundColor Green

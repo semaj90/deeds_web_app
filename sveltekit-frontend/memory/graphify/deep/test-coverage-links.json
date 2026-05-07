@@ -48,6 +48,7 @@
     "tests/ace-pipeline-wiring.spec.ts",
     "tests/ace-pipeline-wiring.spec.ts",
     "tests/ace-pipeline-wiring.spec.ts",
+    "tests/ace-rerank-spine.spec.ts",
     "tests/postgres-fts-fallback.spec.ts",
     "tests/postgres-fts-fallback.spec.ts",
     "tests/postgres-fts-fallback.spec.ts",
@@ -87,6 +88,21 @@
   "src/lib/server/ace/policy.ts": [
     "tests/ace-policy.spec.ts"
   ],
+  "src/lib/server/search/bow-utils.ts": [
+    "tests/ace-rerank-spine.spec.ts"
+  ],
+  "src/lib/server/ai/graph-reranker.ts": [
+    "tests/ace-rerank-spine.spec.ts",
+    "tests/ace-rerank-spine.spec.ts",
+    "tests/ace-rerank-spine.spec.ts",
+    "tests/ace-rerank-spine.spec.ts",
+    "tests/ace-rerank-spine.spec.ts",
+    "tests/ace-rerank-spine.spec.ts"
+  ],
+  "src/lib/server/analytics/search-analytics.ts": [
+    "tests/ace-rerank-spine.spec.ts",
+    "tests/ace-rerank-spine.spec.ts"
+  ],
   "src/routes/api/ace/status/+server.ts": [
     "tests/ace-status-route.spec.ts",
     "tests/ace-status-route.spec.ts",
@@ -101,6 +117,10 @@
     "tests/ace-summarize-route.spec.ts",
     "tests/ace-summarize-route.spec.ts",
     "tests/routes/auto/api/ace/summarize.test.ts"
+  ],
+  "src/routes/api/admin/observability/+server.ts": [
+    "tests/admin-observability.spec.ts",
+    "tests/admin-observability.spec.ts"
   ],
   "src/lib/server/agents-md/parse-agents-md.ts": [
     "tests/agents-md-relations.spec.ts"
@@ -488,6 +508,21 @@
     "tests/e2e/demo-seed.spec.ts",
     "tests/fixtures/demo-auth.ts"
   ],
+  "src/lib/server/search/engram-bigram.ts": [
+    "tests/engram-dym.spec.ts"
+  ],
+  "src/lib/server/ai/engram-memory.ts": [
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts",
+    "tests/engram-graph-rerank.spec.ts"
+  ],
   "src/routes/api/error-brain/generate-fix/+server.ts": [
     "tests/error-brain-routes.spec.ts",
     "tests/routes/auto/api/error-brain/generate-fix.test.ts"
@@ -636,6 +671,35 @@
   "src/lib/server/ace/codeintel-datastore.ts": [
     "tests/hypergraph-research-grounding.spec.ts"
   ],
+  "src/lib/server/hypergraph/hypergraph-search.ts": [
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts",
+    "tests/hypergraph-search.spec.ts"
+  ],
+  "src/lib/server/hypergraph/hypergraph-types.ts": [
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-types.spec.ts",
+    "tests/hypergraph-types.spec.ts"
+  ],
+  "src/lib/server/hypergraph/hypergraph-traversal.ts": [
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts",
+    "tests/hypergraph-traversal.spec.ts"
+  ],
   "src/lib/server/workers/compute-pool.ts": [
     "tests/indexer-worker-tasks.spec.ts",
     "tests/indexer-worker-tasks.spec.ts"
@@ -720,7 +784,13 @@
     "tests/manifold4-retrieval.spec.ts",
     "tests/manifold4-retrieval.spec.ts",
     "tests/manifold4-retrieval.spec.ts",
-    "tests/manifold4-retrieval.spec.ts"
+    "tests/manifold4-retrieval.spec.ts",
+    "tests/quaternion-manifold.spec.ts",
+    "tests/quaternion-manifold.spec.ts",
+    "tests/quaternion-manifold.spec.ts",
+    "tests/quaternion-manifold.spec.ts",
+    "tests/quaternion-manifold.spec.ts",
+    "tests/quaternion-manifold.spec.ts"
   ],
   "src/lib/server/ace/multi-lane-retrieval.ts": [
     "tests/multi-lane-retrieval.spec.ts",
@@ -733,7 +803,12 @@
     "tests/retrieval-lanes.spec.ts",
     "tests/retrieval-lanes.spec.ts"
   ],
+  "src/lib/server/ai/openai-types.ts": [
+    "tests/openai-facade.spec.ts"
+  ],
   "src/lib/server/ai/openai-facade.ts": [
+    "tests/openai-facade.spec.ts",
+    "tests/openai-facade.spec.ts",
     "tests/openai-facade.spec.ts",
     "tests/openai-facade.spec.ts",
     "tests/openai-facade.spec.ts",
@@ -775,6 +850,10 @@
     "tests/routes/auto/api/persons-of-interest/__id.test.ts",
     "tests/routes/auto/api/persons-of-interest/__id.test.ts",
     "tests/routes/auto/api/persons-of-interest/__id.test.ts"
+  ],
+  "src/lib/server/search/quaternion-manifold.ts": [
+    "tests/quaternion-manifold.spec.ts",
+    "tests/quaternion-manifold.spec.ts"
   ],
   "src/lib/server/graph/relationship-extractor.ts": [
     "tests/relation-extractor.spec.ts",

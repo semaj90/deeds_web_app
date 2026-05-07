@@ -1,21 +1,21 @@
 {
   "mode": "fast-ast",
-  "createdAt": "2026-05-07T04:00:07.590Z",
+  "createdAt": "2026-05-07T15:40:44.893Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
-  "fileCount": 3616,
-  "routeCount": 937,
-  "componentCount": 863,
-  "apiCount": 630,
-  "dbTableMentions": 425,
+  "fileCount": 3652,
+  "routeCount": 944,
+  "componentCount": 864,
+  "apiCount": 636,
+  "dbTableMentions": 426,
   "todoCount": 16,
-  "dirCount": 386,
+  "dirCount": 388,
   "qdrantUpserted": false,
   "graphJsonPath": "docs/graph/codebase-graph.json",
   "codebaseMapPath": "docs/graph/codebase-map.md",
   "gateStats": {
-    "routesWithAuth": 685,
+    "routesWithAuth": 691,
     "routesWithoutAuth": 32,
-    "routesWithZod": 486,
+    "routesWithZod": 491,
     "routesWithoutZod": 4,
     "filesWithLocalhost": 56,
     "filesWithLocalhostBreaks": 25,
@@ -25,9 +25,9 @@
     "sv4DispatchCount": 0,
     "runeInTsCount": 0,
     "ssrUnsafeCount": 1,
-    "routesWithTest": 640,
-    "routesWithoutTest": 13,
-    "routesWithErrorHandling": 628,
+    "routesWithTest": 642,
+    "routesWithoutTest": 17,
+    "routesWithErrorHandling": 633,
     "cyclicPairCount": 0
   },
   "files": [
@@ -31364,6 +31364,47 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/lib/server/ace/adaptive-prefetch.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "Adaptive Prefetch — MapReduce-style recommendation engine for inference.",
+      "imports": [
+        "$lib/server/types/glyph.js",
+        "$lib/server/search/quaternion-manifold.js"
+      ],
+      "exports": [
+        "PrefetchInput",
+        "AdaptiveRecommendations",
+        "buildAdaptivePrefetch"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 246,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/lib/server/ace/auto-tagger.ts",
       "ext": ".ts",
       "tags": [
@@ -31419,6 +31460,7 @@
       "imports": [],
       "exports": [
         "aceTopkKey",
+        "aceHitsKey",
         "aceErrorFpKey",
         "wikiPageKey",
         "wikiGapKey",
@@ -31435,7 +31477,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 17,
+      "lineCount": 23,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -31648,6 +31690,7 @@
         "buildACEPrompt",
         "fetchGlossaryMatches",
         "CodebaseFetchStats",
+        "BowClusterScore",
         "fetchCodebaseContext"
       ],
       "dynImports": [
@@ -31672,7 +31715,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 3434,
+      "lineCount": 3628,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -32017,7 +32060,7 @@
         "server",
         "zod"
       ],
-      "summary": "",
+      "summary": "Lane 7 — glyph_cluster: score every cluster in the latest qdrant_cluster_tags artifact",
       "imports": [
         "node:crypto",
         "ioredis",
@@ -32025,7 +32068,8 @@
         "./error-fingerprint.js",
         "./ngram-retrieval.js",
         "./error-fingerprint.js",
-        "./cache-keys.js"
+        "./cache-keys.js",
+        "./cluster-tags-cache.js"
       ],
       "exports": [
         "MultiLaneQuery",
@@ -32046,7 +32090,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 474,
+      "lineCount": 517,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -32490,10 +32534,14 @@
         "ACEPrompt",
         "SelfEvaluation",
         "GeneratedTag",
+        "SemanticTile",
+        "TILE_SCORE_WEIGHTS",
+        "TileEngineTrace",
         "ClusterContextPacket",
         "TOKEN_BUDGET"
       ],
       "dynImports": [
+        "./adaptive-prefetch.js",
         "./retrieval-lanes.js"
       ],
       "reExports": [],
@@ -32504,7 +32552,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 414,
+      "lineCount": 539,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -34005,6 +34053,47 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/lib/server/ai/engram-memory.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "Engram Memory — Redis-backed bigram transition store for ACE retrieval.",
+      "imports": [
+        "node:crypto",
+        "ioredis"
+      ],
+      "exports": [
+        "hashQuery",
+        "recordEngramTransition",
+        "getDidYouMeanFromEngram"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 123,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/lib/server/ai/error-fix-memory.ts",
       "ext": ".ts",
       "tags": [
@@ -34108,7 +34197,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1746,
+      "lineCount": 1928,
       "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -34173,6 +34262,52 @@
         "http://localhost:8788"
       ],
       "localhostBreaks": true
+    },
+    {
+      "rel": "src/lib/server/ai/graph-reranker.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "Graph Fetch-Rerank — multi-signal scoring for Qdrant candidates.",
+      "imports": [],
+      "exports": [
+        "QdrantHit",
+        "HmmContext",
+        "QuerySom",
+        "RerankScores",
+        "RerankResult",
+        "somAdjacencyBonus",
+        "quaternionSimilarity",
+        "toUnitQuaternion",
+        "scoreCandidate",
+        "buildWhyLabels",
+        "rerankHits"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 193,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
     },
     {
       "rel": "src/lib/server/ai/hca-compressor.ts",
@@ -34636,7 +34771,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 299,
+      "lineCount": 339,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -35092,7 +35227,8 @@
         "$lib/server/ollama.js",
         "$lib/server/ai/gemma4-agent.js",
         "$lib/server/ai/hca-compressor.js",
-        "$lib/server/ai/dev-context-planner.js"
+        "$lib/server/ai/dev-context-planner.js",
+        "$lib/server/analysis/hmm-ace-analyzer.js"
       ],
       "exports": [
         "runChatCompletion",
@@ -35110,7 +35246,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 424,
+      "lineCount": 449,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -35142,8 +35278,10 @@
         "openAIChatCompletionRequestSchema",
         "OpenAIMessage",
         "OpenAIChatCompletionRequest",
+        "AceHmmMeta",
         "OpenAIChatCompletionChoice",
         "OpenAIChatCompletionUsage",
+        "RetrievalTrace",
         "OpenAIChatCompletionResponse",
         "OpenAIModelEntry",
         "OpenAIModelListResponse"
@@ -35157,7 +35295,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 106,
+      "lineCount": 127,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -36612,7 +36750,9 @@
         "getAllQuerySketches"
       ],
       "dynImports": [
-        "$lib/server/ace/types.js"
+        "$lib/server/ace/types.js",
+        "$lib/server/search/engram-bigram.js",
+        "$lib/server/ai/engram-memory.js"
       ],
       "reExports": [],
       "routeHandlers": [],
@@ -36622,7 +36762,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 624,
+      "lineCount": 651,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -49505,6 +49645,239 @@
       "localhostBreaks": true
     },
     {
+      "rel": "src/lib/server/hypergraph/hypergraph-builder.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "",
+      "imports": [
+        "node:crypto",
+        "pg",
+        "./hypergraph-types.js"
+      ],
+      "exports": [
+        "hashQuery",
+        "retrievalEdgeId",
+        "agentsContextEdgeId",
+        "clusterContextEdgeId",
+        "testCoverageEdgeId",
+        "fixAttemptEdgeId",
+        "insertHyperedge",
+        "buildRetrievalEdge",
+        "buildAgentsContextEdge",
+        "buildClusterContextEdge",
+        "buildTestCoverageEdge",
+        "buildFixAttemptEdge"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 220,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-search.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "",
+      "imports": [
+        "pg",
+        "./hypergraph-types.js"
+      ],
+      "exports": [
+        "computeScoreBreakdown",
+        "searchHyperedges",
+        "getHyperedgeById",
+        "explainEdgeActivation",
+        "expandEdgeMembers"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 300,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-sync.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "hypergraph-sync.ts",
+      "imports": [
+        "./hypergraph-types.js"
+      ],
+      "exports": [
+        "syncEdgeToRedis",
+        "syncEdgeToNeo4j"
+      ],
+      "dynImports": [
+        "../redis.js",
+        "../connections/connection-pool.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 78,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-traversal.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "hypergraph-traversal.ts",
+      "imports": [
+        "./hypergraph-types.js",
+        "./hypergraph-search.js"
+      ],
+      "exports": [
+        "traverseHop1",
+        "traverseMultihop",
+        "traverseFlat",
+        "traverseHypergraph"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 169,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/hypergraph/hypergraph-types.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "HyperGraphRAG types.",
+      "imports": [],
+      "exports": [
+        "EDGE_TYPES",
+        "EdgeType",
+        "MEMBER_KINDS",
+        "MemberKind",
+        "MEMBER_ROLES",
+        "MemberRole",
+        "SEARCH_MODES",
+        "SearchMode",
+        "HyperedgeTopology",
+        "HyperedgeScoreBreakdown",
+        "HyperedgeCard",
+        "HyperedgeMember",
+        "HyperedgeInput",
+        "Hyperedge",
+        "HyperedgeSearchParams",
+        "HyperedgeSearchResult",
+        "HyperedgeSearchResponse",
+        "HyperedgeActivation",
+        "HyperedgeExpansion",
+        "TraversalStep"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 190,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/lib/server/image/resize-for-vlm.ts",
       "ext": ".ts",
       "tags": [
@@ -52123,6 +52496,59 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/lib/server/mcp/tool-ranker.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "FastMCP tool-call ranking — recommends the top tools for a given HMM state.",
+      "imports": [
+        "$lib/server/types/glyph.js"
+      ],
+      "exports": [
+        "ToolKind",
+        "ToolRisk",
+        "TraceToolProfile",
+        "RankedTool",
+        "ToolRankingRequest",
+        "registerTool",
+        "getToolRegistry",
+        "scoreToolForContext",
+        "rankTools",
+        "defaultToolsForSection",
+        "updateToolStats",
+        "persistToolStatsToDb",
+        "loadToolStatsFromDb"
+      ],
+      "dynImports": [
+        "$lib/server/db/client.js",
+        "$lib/server/db/client.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 353,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/lib/server/mcp-bridge.ts",
       "ext": ".ts",
       "tags": [
@@ -53195,6 +53621,8 @@
         "traceGraph",
         "tracePolicy",
         "traceCartridge",
+        "traceMCPTool",
+        "traceBifrost",
         "flushLangfuse",
         "shutdownLangfuse"
       ],
@@ -53209,7 +53637,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 502,
+      "lineCount": 573,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -57465,6 +57893,87 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/lib/server/search/bow-utils.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "Pure, dependency-free BoW (Bag-of-Words) helpers used by the retrieval spine.",
+      "imports": [],
+      "exports": [
+        "tokenizeBowQuery",
+        "weightedBowOverlapScore",
+        "boundedBowBoost"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 47,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/search/engram-bigram.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "Engram bigram index — query co-occurrence memory in Redis.",
+      "imports": [
+        "$lib/server/redis.js",
+        "crypto"
+      ],
+      "exports": [
+        "recordEngramTransition",
+        "recordLastQuery",
+        "EngramSuggestion",
+        "getEngramSuggestions",
+        "getEngramStats"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 150,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/lib/server/search/gpu-rerank.ts",
       "ext": ".ts",
       "tags": [
@@ -57770,6 +58279,64 @@
       "sv4Legacy": false,
       "runeInTs": false,
       "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/lib/server/search/quaternion-manifold.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server"
+      ],
+      "summary": "Quaternion operations on manifold4 = [som_x, som_y, semantic_z, grpo_w].",
+      "imports": [
+        "$lib/server/retrieval/manifold4-search.js",
+        "$lib/server/types/glyph.js"
+      ],
+      "exports": [
+        "UnitQuaternion",
+        "HmmAxisMultiplier",
+        "QuaternionErrorAxes",
+        "QuaternionRerankResult",
+        "toUnitQuaternion",
+        "quaternionMultiply",
+        "quaternionConjugate",
+        "quaternionDot",
+        "quaternionSimilarity",
+        "quaternionError",
+        "decomposeError",
+        "quaternionRerank",
+        "quaternionNeighbourhood",
+        "EulerAngles",
+        "toEulerAngles",
+        "HMM_AXIS_TABLE",
+        "hmmAxisMultiplier",
+        "biasedUnitQuaternion",
+        "Manifold4Ranges",
+        "DEFAULT_MANIFOLD4_RANGES"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 601,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
@@ -70295,10 +70862,14 @@
       "summary": "trace-mcp-server.ts",
       "imports": [
         "node:http",
+        "node:crypto",
         "@modelcontextprotocol/sdk/server/mcp.js",
         "@modelcontextprotocol/sdk/server/streamableHttp.js",
         "zod",
-        "pg"
+        "pg",
+        "node:child_process",
+        "node:util",
+        "node:fs"
       ],
       "exports": [],
       "dynImports": [
@@ -70306,12 +70877,12 @@
         "ioredis",
         "ioredis",
         "ioredis",
+        "ioredis",
+        "ioredis",
+        "ioredis",
+        "ioredis",
         "../lib/server/ai/context-compression.js",
-        "ioredis",
-        "node:crypto",
-        "ioredis",
-        "ioredis",
-        "node:fs"
+        "ioredis"
       ],
       "reExports": [],
       "routeHandlers": [],
@@ -70321,7 +70892,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1379,
+      "lineCount": 2139,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -71675,7 +72246,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 732,
+      "lineCount": 733,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -74227,6 +74798,49 @@
       "fanIn": 0,
       "routeParams": [],
       "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/routes/(app)/admin/observability/+page.svelte",
+      "ext": ".svelte",
+      "tags": [
+        "svelte",
+        "src",
+        "routes",
+        "(app)",
+        "route",
+        "component",
+        "auth"
+      ],
+      "summary": "",
+      "imports": [
+        "svelte",
+        "$lib/components/ui/Icon.svelte"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [
+        "ObsData",
+        "Icon"
+      ],
+      "isRoute": true,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 428,
+      "hasAuth": true,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 5,
       "localhostRefs": [],
       "localhostBreaks": false
     },
@@ -91927,6 +92541,59 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/routes/api/admin/observability/+server.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema",
+        "auth",
+        "zod"
+      ],
+      "summary": "GET /api/admin/observability",
+      "imports": [
+        "@sveltejs/kit",
+        "./$types",
+        "node:fs",
+        "node:path",
+        "$lib/server/redis.js",
+        "$lib/server/db/client.js",
+        "drizzle-orm"
+      ],
+      "exports": [
+        "GET"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [
+        "GET"
+      ],
+      "drizzleRefs": [
+        "drizzle"
+      ],
+      "todos": [],
+      "components": [],
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 305,
+      "hasAuth": true,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 5,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/routes/api/admin/pipeline/events/+server.ts",
       "ext": ".ts",
       "tags": [
@@ -92341,7 +93008,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 352,
+      "lineCount": 353,
       "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -108791,6 +109458,104 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/routes/api/graph/docstore/+server.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod"
+      ],
+      "summary": "GET /api/graph/docstore",
+      "imports": [
+        "@sveltejs/kit",
+        "./$types",
+        "$lib/server/redis.js"
+      ],
+      "exports": [
+        "GET"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [
+        "GET"
+      ],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 95,
+      "hasAuth": true,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 5,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/routes/api/graph/fetch-rerank/+server.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod"
+      ],
+      "summary": "POST /api/graph/fetch-rerank",
+      "imports": [
+        "@sveltejs/kit",
+        "./$types",
+        "zod",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/search/mla-kv-compress.js",
+        "$lib/server/search/quaternion-manifold.js",
+        "$lib/server/types/glyph.js"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "dynImports": [
+        "$lib/server/redis.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [
+        "POST"
+      ],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 210,
+      "hasAuth": true,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 5,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/routes/api/graph/glyph-atlas/+server.ts",
       "ext": ".ts",
       "tags": [
@@ -110121,6 +110886,53 @@
       "localhostBreaks": false
     },
     {
+      "rel": "src/routes/api/hypergraph/edge/[id]/+server.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "summary": "",
+      "imports": [
+        "@sveltejs/kit",
+        "./$types.js",
+        "$lib/server/hypergraph/hypergraph-search.js"
+      ],
+      "exports": [
+        "GET"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [
+        "GET"
+      ],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 24,
+      "hasAuth": true,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [
+        "id"
+      ],
+      "routeDepth": 6,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "src/routes/api/hypergraph/lookup/+server.ts",
       "ext": ".ts",
       "tags": [
@@ -110158,6 +110970,102 @@
       "isSvelteComp": false,
       "isTest": false,
       "lineCount": 149,
+      "hasAuth": true,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 5,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/routes/api/hypergraph/search/+server.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod"
+      ],
+      "summary": "",
+      "imports": [
+        "@sveltejs/kit",
+        "zod",
+        "./$types.js",
+        "$lib/server/hypergraph/hypergraph-search.js",
+        "$lib/server/hypergraph/hypergraph-types.js"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [
+        "POST"
+      ],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 48,
+      "hasAuth": true,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": true,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 5,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "src/routes/api/hypergraph/traverse/+server.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod"
+      ],
+      "summary": "",
+      "imports": [
+        "@sveltejs/kit",
+        "zod",
+        "./$types.js",
+        "$lib/server/hypergraph/hypergraph-traversal.js",
+        "$lib/server/hypergraph/hypergraph-types.js"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [
+        "POST"
+      ],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 35,
       "hasAuth": true,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -124613,6 +125521,44 @@
       "localhostBreaks": false
     },
     {
+      "rel": "tests/ace-hits-cache.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "ace-hits-cache.spec.ts",
+        "zod",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "node:crypto",
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 118,
+      "hasAuth": false,
+      "hasZod": true,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "tests/ace-ingest-route.spec.ts",
       "ext": ".ts",
       "tags": [
@@ -124748,6 +125694,54 @@
       "localhostBreaks": false
     },
     {
+      "rel": "tests/ace-rerank-spine.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "ace-rerank-spine.spec.ts",
+        "test"
+      ],
+      "summary": "ACE Retrieval Spine — integration guardrail",
+      "imports": [
+        "vitest",
+        "$lib/server/search/bow-utils.js"
+      ],
+      "exports": [],
+      "dynImports": [
+        "$lib/server/ace/context-assembler.js",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/analytics/search-analytics.js",
+        "$lib/server/analytics/search-analytics.js",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/ai/graph-reranker.js",
+        "$lib/server/redis.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 445,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "tests/ace-status-route.spec.ts",
       "ext": ".ts",
       "tags": [
@@ -124818,6 +125812,86 @@
       "isSvelteComp": false,
       "isTest": true,
       "lineCount": 211,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/admin-observability.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "admin-observability.spec.ts",
+        "db-schema",
+        "test"
+      ],
+      "summary": "Observability endpoint contract tests.",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [
+        "../src/routes/api/admin/observability/+server.js",
+        "../src/routes/api/admin/observability/+server.js",
+        "node:fs"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [
+        "drizzle"
+      ],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 103,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/agents-md-ingest.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "agents-md-ingest.spec.ts",
+        "test"
+      ],
+      "summary": "tests/agents-md-ingest.spec.ts",
+      "imports": [
+        "vitest",
+        "node:crypto"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 217,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -125743,7 +126817,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": true,
-      "lineCount": 107,
+      "lineCount": 131,
       "hasAuth": false,
       "hasZod": true,
       "ssrUnsafe": false,
@@ -127759,6 +128833,91 @@
       "localhostBreaks": false
     },
     {
+      "rel": "tests/engram-dym.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "engram-dym.spec.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest",
+        "../src/lib/server/search/engram-bigram.js"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 252,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/engram-graph-rerank.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "engram-graph-rerank.spec.ts",
+        "test"
+      ],
+      "summary": "Tests for:",
+      "imports": [
+        "vitest",
+        "ioredis"
+      ],
+      "exports": [],
+      "dynImports": [
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js",
+        "$lib/server/ai/engram-memory.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 362,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "tests/error-brain-complete.spec.ts",
       "ext": ".ts",
       "tags": [
@@ -128945,6 +130104,42 @@
       "localhostBreaks": false
     },
     {
+      "rel": "tests/hypergraph-mcp-tools.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "hypergraph-mcp-tools.spec.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 202,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "tests/hypergraph-merge-semantics.spec.ts",
       "ext": ".ts",
       "tags": [
@@ -129012,6 +130207,139 @@
       "isSvelteComp": false,
       "isTest": true,
       "lineCount": 155,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/hypergraph-search.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "hypergraph-search.spec.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js",
+        "../src/lib/server/hypergraph/hypergraph-search.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 222,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/hypergraph-traversal.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "hypergraph-traversal.spec.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest",
+        "../src/lib/server/hypergraph/hypergraph-types.js"
+      ],
+      "exports": [],
+      "dynImports": [
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js",
+        "../src/lib/server/hypergraph/hypergraph-traversal.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 327,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/hypergraph-types.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "hypergraph-types.spec.ts",
+        "test"
+      ],
+      "summary": "hypergraph-types.spec.ts",
+      "imports": [
+        "vitest",
+        "$lib/server/hypergraph/hypergraph-types.js",
+        "$lib/server/hypergraph/hypergraph-types.js"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 422,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -129865,6 +131193,84 @@
       "localhostBreaks": false
     },
     {
+      "rel": "tests/mapreduce/reduce-neo4j.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "mapreduce",
+        "reduce-neo4j.spec.ts",
+        "test"
+      ],
+      "summary": "Unit tests for scripts/mapreduce/reduce-neo4j.mjs",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [
+        "../../scripts/mapreduce/reduce-neo4j.mjs",
+        "../../scripts/mapreduce/reduce-neo4j.mjs",
+        "../../scripts/mapreduce/reduce-neo4j.mjs",
+        "../../scripts/mapreduce/reduce-neo4j.mjs"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 217,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/mcp-operator-tools.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "mcp-operator-tools.spec.ts",
+        "test"
+      ],
+      "summary": "tests/mcp-operator-tools.spec.ts",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 207,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "tests/mcp-routes.spec.ts",
       "ext": ".ts",
       "tags": [
@@ -129891,6 +131297,42 @@
       "isSvelteComp": false,
       "isTest": true,
       "lineCount": 34,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/mcp-trace-tools.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "mcp-trace-tools.spec.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 117,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -130144,10 +131586,13 @@
       ],
       "summary": "",
       "imports": [
-        "vitest"
+        "vitest",
+        "$lib/server/ai/openai-types.js"
       ],
       "exports": [],
       "dynImports": [
+        "$lib/server/ai/openai-facade.js",
+        "$lib/server/ai/openai-facade.js",
         "$lib/server/ai/openai-facade.js",
         "$lib/server/ai/openai-facade.js",
         "$lib/server/ai/openai-facade.js",
@@ -130165,7 +131610,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": true,
-      "lineCount": 247,
+      "lineCount": 320,
       "hasAuth": true,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -130727,6 +132172,123 @@
       "isSvelteComp": false,
       "isTest": true,
       "lineCount": 146,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/qdrant-rerank-feedback.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "qdrant-rerank-feedback.spec.ts",
+        "test"
+      ],
+      "summary": "",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 135,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/qdrant-topology-payloads.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "qdrant-topology-payloads.spec.ts",
+        "test"
+      ],
+      "summary": "qdrant-topology-payloads.spec.ts",
+      "imports": [
+        "vitest"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 185,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
+      "rel": "tests/quaternion-manifold.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "quaternion-manifold.spec.ts",
+        "test"
+      ],
+      "summary": "Unit tests for src/lib/server/search/quaternion-manifold.ts",
+      "imports": [
+        "vitest",
+        "../src/lib/server/retrieval/manifold4-search.js",
+        "../src/lib/server/search/quaternion-manifold.js",
+        "../src/lib/server/search/quaternion-manifold.js"
+      ],
+      "exports": [],
+      "dynImports": [
+        "../src/lib/server/retrieval/manifold4-search.js",
+        "../src/lib/server/retrieval/manifold4-search.js",
+        "../src/lib/server/retrieval/manifold4-search.js",
+        "../src/lib/server/retrieval/manifold4-search.js",
+        "../src/lib/server/retrieval/manifold4-search.js"
+      ],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 631,
       "hasAuth": false,
       "hasZod": false,
       "ssrUnsafe": false,
@@ -157680,6 +159242,43 @@
       "localhostBreaks": false
     },
     {
+      "rel": "tests/tool-ranker.spec.ts",
+      "ext": ".ts",
+      "tags": [
+        "ts",
+        "tests",
+        "tool-ranker.spec.ts",
+        "test"
+      ],
+      "summary": "FastMCP tool-ranker unit tests",
+      "imports": [
+        "vitest",
+        "$lib/server/mcp/tool-ranker.js"
+      ],
+      "exports": [],
+      "dynImports": [],
+      "reExports": [],
+      "routeHandlers": [],
+      "drizzleRefs": [],
+      "todos": [],
+      "components": [],
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 335,
+      "hasAuth": false,
+      "hasZod": false,
+      "ssrUnsafe": false,
+      "sv4Legacy": false,
+      "runeInTs": false,
+      "hasPairedTest": false,
+      "fanIn": 0,
+      "routeParams": [],
+      "routeDepth": 0,
+      "localhostRefs": [],
+      "localhostBreaks": false
+    },
+    {
       "rel": "tests/topology-projection-pipeline.spec.ts",
       "ext": ".ts",
       "tags": [
@@ -160226,6 +161825,35 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/routes/api/hypergraph",
+      "score": 86,
+      "summary": "route handler directory with 4 files, 4 API handlers",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 4,
+      "todos": 0,
+      "routes": 4,
+      "components": 0,
+      "db": 0,
+      "apis": 4,
+      "auth": 4,
+      "zod": 3,
+      "lines": 256,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 1,
+      "localhostRefs": 0,
+      "tryCatch": 3,
+      "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/routes/api/knowledge",
       "score": 86,
       "summary": "route handler directory with 8 files, 8 API handlers",
@@ -162422,6 +164050,32 @@
       "fanInTotal": 0
     },
     {
+      "dir": "src/lib/server/hypergraph",
+      "score": 90,
+      "summary": "server module directory with 5 files, 0 API handlers",
+      "tagList": [
+        "src",
+        "lib",
+        "server"
+      ],
+      "fileCount": 5,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 957,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 2,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "src/lib/server/image",
       "score": 90,
       "summary": "server module directory with 1 files, 0 API handlers",
@@ -162608,13 +164262,13 @@
     {
       "dir": "src/lib/server/mcp",
       "score": 90,
-      "summary": "server module directory with 3 files, 0 API handlers",
+      "summary": "server module directory with 4 files, 0 API handlers",
       "tagList": [
         "src",
         "lib",
         "server"
       ],
-      "fileCount": 3,
+      "fileCount": 4,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -162622,13 +164276,13 @@
       "apis": 0,
       "auth": 0,
       "zod": 0,
-      "lines": 394,
+      "lines": 747,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
-      "tryCatch": 3,
-      "dynImports": 0,
+      "tryCatch": 4,
+      "dynImports": 1,
       "fanInTotal": 0
     },
     {
@@ -162753,7 +164407,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 0,
-      "lines": 970,
+      "lines": 1041,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -163079,14 +164733,14 @@
     {
       "dir": "src/lib/server/search",
       "score": 90,
-      "summary": "server module directory with 9 files, 0 API handlers",
+      "summary": "server module directory with 12 files, 0 API handlers",
       "tagList": [
         "src",
         "lib",
         "server",
         "zod"
       ],
-      "fileCount": 9,
+      "fileCount": 12,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -163094,12 +164748,12 @@
       "apis": 0,
       "auth": 0,
       "zod": 2,
-      "lines": 1298,
+      "lines": 2096,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 0,
-      "tryCatch": 7,
+      "tryCatch": 8,
       "dynImports": 1,
       "fanInTotal": 0
     },
@@ -164904,35 +166558,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/hypergraph",
-      "score": 90,
-      "summary": "route handler directory with 1 files, 1 API handlers",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 1,
-      "todos": 0,
-      "routes": 1,
-      "components": 0,
-      "db": 0,
-      "apis": 1,
-      "auth": 1,
-      "zod": 1,
-      "lines": 149,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 0,
-      "tryCatch": 1,
-      "dynImports": 0,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/indexing",
       "score": 90,
       "summary": "route handler directory with 1 files, 1 API handlers",
@@ -165936,6 +167561,33 @@
       "fanInTotal": 0
     },
     {
+      "dir": "tests/mapreduce",
+      "score": 90,
+      "summary": "module directory with 1 files, 0 API handlers",
+      "tagList": [
+        "tests",
+        "mapreduce",
+        "reduce-neo4j.spec.ts",
+        "test"
+      ],
+      "fileCount": 1,
+      "todos": 0,
+      "routes": 0,
+      "components": 0,
+      "db": 0,
+      "apis": 0,
+      "auth": 0,
+      "zod": 0,
+      "lines": 217,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 0,
+      "localhostRefs": 0,
+      "tryCatch": 0,
+      "dynImports": 1,
+      "fanInTotal": 0
+    },
+    {
       "dir": "tests/reports",
       "score": 90,
       "summary": "module directory with 2 files, 0 API handlers",
@@ -166302,38 +167954,9 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/graph",
-      "score": 92,
-      "summary": "route handler directory with 17 files, 17 API handlers, 2 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 17,
-      "todos": 0,
-      "routes": 17,
-      "components": 0,
-      "db": 2,
-      "apis": 17,
-      "auth": 17,
-      "zod": 14,
-      "lines": 2610,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 1,
-      "localhostRefs": 1,
-      "tryCatch": 16,
-      "dynImports": 5,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes",
       "score": 93,
-      "summary": "module directory with 6 files, 623 API handlers, 243 Drizzle refs, 7 TODOs",
+      "summary": "module directory with 6 files, 629 API handlers, 244 Drizzle refs, 7 TODOs",
       "tagList": [
         "src",
         "routes",
@@ -166344,19 +167967,19 @@
       ],
       "fileCount": 6,
       "todos": 7,
-      "routes": 937,
-      "components": 240,
-      "db": 243,
-      "apis": 623,
-      "auth": 1007,
-      "zod": 513,
-      "lines": 212048,
+      "routes": 944,
+      "components": 241,
+      "db": 244,
+      "apis": 629,
+      "auth": 1014,
+      "zod": 518,
+      "lines": 213195,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
-      "noTest": 77,
+      "noTest": 81,
       "localhostRefs": 10,
-      "tryCatch": 748,
-      "dynImports": 180,
+      "tryCatch": 754,
+      "dynImports": 181,
       "fanInTotal": 0
     },
     {
@@ -166386,6 +168009,35 @@
       "localhostRefs": 0,
       "tryCatch": 2,
       "dynImports": 0,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/graph",
+      "score": 93,
+      "summary": "route handler directory with 19 files, 19 API handlers, 2 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 19,
+      "todos": 0,
+      "routes": 19,
+      "components": 0,
+      "db": 2,
+      "apis": 19,
+      "auth": 19,
+      "zod": 16,
+      "lines": 2915,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 3,
+      "localhostRefs": 1,
+      "tryCatch": 18,
+      "dynImports": 6,
       "fanInTotal": 0
     },
     {
@@ -166466,7 +168118,7 @@
       "apis": 30,
       "auth": 30,
       "zod": 28,
-      "lines": 3086,
+      "lines": 3087,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -166535,7 +168187,7 @@
     {
       "dir": "src/lib/server/ai",
       "score": 95,
-      "summary": "server module directory with 39 files, 0 API handlers, 6 Drizzle refs",
+      "summary": "server module directory with 41 files, 0 API handlers, 6 Drizzle refs",
       "tagList": [
         "src",
         "lib",
@@ -166544,7 +168196,7 @@
         "db-schema",
         "auth"
       ],
-      "fileCount": 39,
+      "fileCount": 41,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -166552,7 +168204,7 @@
       "apis": 0,
       "auth": 2,
       "zod": 15,
-      "lines": 11104,
+      "lines": 11688,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -166779,7 +168431,7 @@
       "apis": 0,
       "auth": 1,
       "zod": 7,
-      "lines": 6753,
+      "lines": 7513,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -166934,35 +168586,6 @@
       "fanInTotal": 0
     },
     {
-      "dir": "src/routes/api/admin",
-      "score": 97,
-      "summary": "route handler directory with 11 files, 11 API handlers, 2 Drizzle refs",
-      "tagList": [
-        "src",
-        "routes",
-        "api",
-        "route",
-        "api-handler",
-        "auth"
-      ],
-      "fileCount": 11,
-      "todos": 0,
-      "routes": 11,
-      "components": 0,
-      "db": 2,
-      "apis": 11,
-      "auth": 11,
-      "zod": 9,
-      "lines": 1922,
-      "ssrUnsafe": 0,
-      "sv4Legacy": 0,
-      "noTest": 0,
-      "localhostRefs": 0,
-      "tryCatch": 11,
-      "dynImports": 2,
-      "fanInTotal": 0
-    },
-    {
       "dir": "src/routes/api/analytics",
       "score": 97,
       "summary": "route handler directory with 26 files, 26 API handlers, 4 Drizzle refs",
@@ -167076,6 +168699,35 @@
       "localhostRefs": 0,
       "tryCatch": 5,
       "dynImports": 3,
+      "fanInTotal": 0
+    },
+    {
+      "dir": "src/routes/api/admin",
+      "score": 98,
+      "summary": "route handler directory with 12 files, 12 API handlers, 3 Drizzle refs",
+      "tagList": [
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth"
+      ],
+      "fileCount": 12,
+      "todos": 0,
+      "routes": 12,
+      "components": 0,
+      "db": 3,
+      "apis": 12,
+      "auth": 12,
+      "zod": 10,
+      "lines": 2227,
+      "ssrUnsafe": 0,
+      "sv4Legacy": 0,
+      "noTest": 1,
+      "localhostRefs": 0,
+      "tryCatch": 12,
+      "dynImports": 2,
       "fanInTotal": 0
     },
     {
@@ -167272,13 +168924,13 @@
       "apis": 3,
       "auth": 12,
       "zod": 251,
-      "lines": 394598,
+      "lines": 398002,
       "ssrUnsafe": 1,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 39,
-      "tryCatch": 751,
-      "dynImports": 169,
+      "tryCatch": 755,
+      "dynImports": 171,
       "fanInTotal": 0
     },
     {
@@ -167411,19 +169063,19 @@
       "apis": 3,
       "auth": 9,
       "zod": 162,
-      "lines": 157454,
+      "lines": 160858,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
       "localhostRefs": 20,
-      "tryCatch": 394,
-      "dynImports": 136,
+      "tryCatch": 398,
+      "dynImports": 138,
       "fanInTotal": 0
     },
     {
       "dir": "src/lib/server/ace",
       "score": 100,
-      "summary": "server module directory with 29 files, 0 API handlers, 5 Drizzle refs",
+      "summary": "server module directory with 30 files, 0 API handlers, 5 Drizzle refs",
       "tagList": [
         "src",
         "lib",
@@ -167432,7 +169084,7 @@
         "db-schema",
         "test"
       ],
-      "fileCount": 29,
+      "fileCount": 30,
       "todos": 0,
       "routes": 0,
       "components": 0,
@@ -167440,7 +169092,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 15,
-      "lines": 10820,
+      "lines": 11434,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -167552,7 +169204,7 @@
       "apis": 0,
       "auth": 0,
       "zod": 10,
-      "lines": 6753,
+      "lines": 6780,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 0,
@@ -168162,18 +169814,18 @@
       ],
       "fileCount": 2,
       "todos": 6,
-      "routes": 290,
-      "components": 219,
+      "routes": 291,
+      "components": 220,
       "db": 29,
       "apis": 4,
-      "auth": 407,
+      "auth": 408,
       "zod": 40,
-      "lines": 103438,
+      "lines": 103867,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 57,
       "localhostRefs": 5,
-      "tryCatch": 165,
+      "tryCatch": 166,
       "dynImports": 21,
       "fanInTotal": 0
     },
@@ -168238,7 +169890,7 @@
     {
       "dir": "src/routes/(app)/admin",
       "score": 100,
-      "summary": "route handler directory with 130 files, 3 API handlers, 3 Drizzle refs, 4 TODOs",
+      "summary": "route handler directory with 131 files, 3 API handlers, 3 Drizzle refs, 4 TODOs",
       "tagList": [
         "src",
         "routes",
@@ -168247,20 +169899,20 @@
         "component",
         "auth"
       ],
-      "fileCount": 130,
+      "fileCount": 131,
       "todos": 4,
-      "routes": 56,
-      "components": 33,
+      "routes": 57,
+      "components": 34,
       "db": 3,
       "apis": 3,
-      "auth": 130,
+      "auth": 131,
       "zod": 12,
-      "lines": 25946,
+      "lines": 26375,
       "ssrUnsafe": 0,
       "sv4Legacy": 0,
       "noTest": 14,
       "localhostRefs": 1,
-      "tryCatch": 40,
+      "tryCatch": 41,
       "dynImports": 7,
       "fanInTotal": 0
     },
@@ -170200,6 +171852,7 @@
       "src/lib/server/ace/ace-error-kag.ts",
       "src/lib/server/ace/ace-hit-tagger.ts",
       "src/lib/server/ace/ace-wiki.ts",
+      "src/lib/server/ace/adaptive-prefetch.ts",
       "src/lib/server/ace/auto-tagger.ts",
       "src/lib/server/ace/cache-keys.ts",
       "src/lib/server/ace/chat-memory.ts",
@@ -170244,8 +171897,7 @@
       "src/lib/server/agents/ontology-sortation-agent.ts",
       "src/lib/server/agents/trace-subagent-orchestrator.ts",
       "src/lib/server/agents/trace-subagent-registry.ts",
-      "src/lib/server/agents-md/parse-agents-md.ts",
-      "src/lib/server/agents-md/resolve-directory-context.ts"
+      "src/lib/server/agents-md/parse-agents-md.ts"
     ],
     "test": [
       "src/lib/server/ace/kag-dag-runner.test.ts",
@@ -170271,11 +171923,15 @@
       "tests/ace-code-cache.spec.ts",
       "tests/ace-context-glossary.spec.ts",
       "tests/ace-hit-tagger.spec.ts",
+      "tests/ace-hits-cache.spec.ts",
       "tests/ace-ingest-route.spec.ts",
       "tests/ace-pipeline-wiring.spec.ts",
       "tests/ace-policy.spec.ts",
+      "tests/ace-rerank-spine.spec.ts",
       "tests/ace-status-route.spec.ts",
       "tests/ace-summarize-route.spec.ts",
+      "tests/admin-observability.spec.ts",
+      "tests/agents-md-ingest.spec.ts",
       "tests/agents-md-relations.spec.ts",
       "tests/ai-analysis-pipeline.spec.ts",
       "tests/ai-canon-routes.spec.ts",
@@ -170293,11 +171949,7 @@
       "tests/assist-defaults.spec.ts",
       "tests/assist-feedback-analysis.spec.ts",
       "tests/assist-feedback.spec.ts",
-      "tests/auth-api.spec.ts",
-      "tests/auth-ui-flow.spec.ts",
-      "tests/autoencoder-projection-smoke.spec.ts",
-      "tests/barrel-store-integration.spec.ts",
-      "tests/barrel-store.spec.ts"
+      "tests/auth-api.spec.ts"
     ],
     "mjs": [
       "src/lib/server/gpu/mapreduce-runner.mjs",
@@ -170337,6 +171989,7 @@
       "src/routes/api/admin/inference-stats/+server.ts",
       "src/routes/api/admin/knowledge/+server.ts",
       "src/routes/api/admin/model/validate-checkpoint/+server.ts",
+      "src/routes/api/admin/observability/+server.ts",
       "src/routes/api/admin/pipeline/events/+server.ts",
       "src/routes/api/admin/qlora/+server.ts",
       "src/routes/api/admin/routes/+server.ts",
@@ -170358,8 +172011,7 @@
       "src/routes/api/ai/contextual-chat/+server.ts",
       "src/routes/api/ai/cross-exam/+server.ts",
       "src/routes/api/ai/feedback/+server.ts",
-      "src/routes/api/ai/generate-image/+server.ts",
-      "src/routes/api/ai/generate-report/[scope]/+server.ts"
+      "src/routes/api/ai/generate-image/+server.ts"
     ],
     "services": [
       "src/lib/services/api-client.ts",
@@ -170874,6 +172526,7 @@
       "src/routes/api/admin/inference-stats/+server.ts",
       "src/routes/api/admin/knowledge/+server.ts",
       "src/routes/api/admin/model/validate-checkpoint/+server.ts",
+      "src/routes/api/admin/observability/+server.ts",
       "src/routes/api/admin/pipeline/events/+server.ts",
       "src/routes/api/admin/qlora/+server.ts",
       "src/routes/api/admin/routes/+server.ts",
@@ -170906,8 +172559,7 @@
       "src/routes/api/ai/stats/+server.ts",
       "src/routes/api/ai/suggestions/+server.ts",
       "src/routes/api/ai/summarize/+server.ts",
-      "src/routes/api/ai/tensorrt/+server.ts",
-      "src/routes/api/ai/tensorrt/stream/+server.ts"
+      "src/routes/api/ai/tensorrt/+server.ts"
     ],
     "login": [
       "src/routes/login/+page.server.ts",
@@ -170939,11 +172591,15 @@
       "tests/ace-code-cache.spec.ts",
       "tests/ace-context-glossary.spec.ts",
       "tests/ace-hit-tagger.spec.ts",
+      "tests/ace-hits-cache.spec.ts",
       "tests/ace-ingest-route.spec.ts",
       "tests/ace-pipeline-wiring.spec.ts",
       "tests/ace-policy.spec.ts",
+      "tests/ace-rerank-spine.spec.ts",
       "tests/ace-status-route.spec.ts",
       "tests/ace-summarize-route.spec.ts",
+      "tests/admin-observability.spec.ts",
+      "tests/agents-md-ingest.spec.ts",
       "tests/agents-md-relations.spec.ts",
       "tests/ai-analysis-pipeline.spec.ts",
       "tests/ai-canon-routes.spec.ts",
@@ -170978,11 +172634,7 @@
       "tests/chat-session-attachment-handoff.spec.ts",
       "tests/code-intel-dashboard.spec.ts",
       "tests/code-llm-index.spec.ts",
-      "tests/codebase-index-cache-reuse.spec.ts",
-      "tests/codebase-index-postgres-fallback.spec.ts",
-      "tests/codebase-index-rabbitmq-channel.spec.ts",
-      "tests/codebase-indexer.spec.ts",
-      "tests/codebase-observation-tools.spec.ts"
+      "tests/codebase-index-cache-reuse.spec.ts"
     ],
     "setup.ts": [
       "src/tests/setup.ts",
@@ -171092,6 +172744,9 @@
     "ace-hit-tagger.spec.ts": [
       "tests/ace-hit-tagger.spec.ts"
     ],
+    "ace-hits-cache.spec.ts": [
+      "tests/ace-hits-cache.spec.ts"
+    ],
     "ace-ingest-route.spec.ts": [
       "tests/ace-ingest-route.spec.ts"
     ],
@@ -171101,11 +172756,20 @@
     "ace-policy.spec.ts": [
       "tests/ace-policy.spec.ts"
     ],
+    "ace-rerank-spine.spec.ts": [
+      "tests/ace-rerank-spine.spec.ts"
+    ],
     "ace-status-route.spec.ts": [
       "tests/ace-status-route.spec.ts"
     ],
     "ace-summarize-route.spec.ts": [
       "tests/ace-summarize-route.spec.ts"
+    ],
+    "admin-observability.spec.ts": [
+      "tests/admin-observability.spec.ts"
+    ],
+    "agents-md-ingest.spec.ts": [
+      "tests/agents-md-ingest.spec.ts"
     ],
     "agents-md-relations.spec.ts": [
       "tests/agents-md-relations.spec.ts"
@@ -171337,6 +173001,12 @@
     "e2e-workflow.spec.ts": [
       "tests/e2e-workflow.spec.ts"
     ],
+    "engram-dym.spec.ts": [
+      "tests/engram-dym.spec.ts"
+    ],
+    "engram-graph-rerank.spec.ts": [
+      "tests/engram-graph-rerank.spec.ts"
+    ],
     "error-brain-complete.spec.ts": [
       "tests/error-brain-complete.spec.ts"
     ],
@@ -171430,11 +173100,23 @@
     "hmm-ace-flow.spec.ts": [
       "tests/hmm-ace-flow.spec.ts"
     ],
+    "hypergraph-mcp-tools.spec.ts": [
+      "tests/hypergraph-mcp-tools.spec.ts"
+    ],
     "hypergraph-merge-semantics.spec.ts": [
       "tests/hypergraph-merge-semantics.spec.ts"
     ],
     "hypergraph-research-grounding.spec.ts": [
       "tests/hypergraph-research-grounding.spec.ts"
+    ],
+    "hypergraph-search.spec.ts": [
+      "tests/hypergraph-search.spec.ts"
+    ],
+    "hypergraph-traversal.spec.ts": [
+      "tests/hypergraph-traversal.spec.ts"
+    ],
+    "hypergraph-types.spec.ts": [
+      "tests/hypergraph-types.spec.ts"
     ],
     "index.js": [
       "tests/index.js"
@@ -171496,8 +173178,20 @@
     "manifold4-retrieval.spec.ts": [
       "tests/manifold4-retrieval.spec.ts"
     ],
+    "mapreduce": [
+      "tests/mapreduce/reduce-neo4j.spec.ts"
+    ],
+    "reduce-neo4j.spec.ts": [
+      "tests/mapreduce/reduce-neo4j.spec.ts"
+    ],
+    "mcp-operator-tools.spec.ts": [
+      "tests/mcp-operator-tools.spec.ts"
+    ],
     "mcp-routes.spec.ts": [
       "tests/mcp-routes.spec.ts"
+    ],
+    "mcp-trace-tools.spec.ts": [
+      "tests/mcp-trace-tools.spec.ts"
     ],
     "minio-upload.spec.ts": [
       "tests/minio-upload.spec.ts"
@@ -171561,6 +173255,15 @@
     ],
     "postgres-fts-fallback.spec.ts": [
       "tests/postgres-fts-fallback.spec.ts"
+    ],
+    "qdrant-rerank-feedback.spec.ts": [
+      "tests/qdrant-rerank-feedback.spec.ts"
+    ],
+    "qdrant-topology-payloads.spec.ts": [
+      "tests/qdrant-topology-payloads.spec.ts"
+    ],
+    "quaternion-manifold.spec.ts": [
+      "tests/quaternion-manifold.spec.ts"
     ],
     "quick-routes-test.spec.ts": [
       "tests/quick-routes-test.spec.ts"
@@ -171824,6 +173527,9 @@
     "theme-screenshots.spec.ts": [
       "tests/theme-screenshots.spec.ts"
     ],
+    "tool-ranker.spec.ts": [
+      "tests/tool-ranker.spec.ts"
+    ],
     "topology-projection-pipeline.spec.ts": [
       "tests/topology-projection-pipeline.spec.ts"
     ],
@@ -171901,9 +173607,9 @@
   },
   "audit": {
     "gateStats": {
-      "routesWithAuth": 685,
+      "routesWithAuth": 691,
       "routesWithoutAuth": 32,
-      "routesWithZod": 486,
+      "routesWithZod": 491,
       "routesWithoutZod": 4,
       "filesWithLocalhost": 56,
       "filesWithLocalhostBreaks": 25,
@@ -171913,9 +173619,9 @@
       "sv4DispatchCount": 0,
       "runeInTsCount": 0,
       "ssrUnsafeCount": 1,
-      "routesWithTest": 640,
-      "routesWithoutTest": 13,
-      "routesWithErrorHandling": 628,
+      "routesWithTest": 642,
+      "routesWithoutTest": 17,
+      "routesWithErrorHandling": 633,
       "cyclicPairCount": 0
     },
     "cyclicPairs": [],
@@ -171930,11 +173636,11 @@
       },
       {
         "mod": "$lib/components/ui/Icon.svelte",
-        "n": 252
+        "n": 253
       },
       {
         "mod": "$lib/server/redis.js",
-        "n": 228
+        "n": 233
       },
       {
         "mod": "$lib/server/ollama.js",
@@ -171978,7 +173684,7 @@
       },
       {
         "mod": "$lib/server/analytics/search-analytics.js",
-        "n": 36
+        "n": 38
       },
       {
         "mod": "$lib/server/db/schema-postgres",
@@ -171993,12 +173699,12 @@
         "n": 32
       },
       {
-        "mod": "$lib/server/ai/code-intel-service.js",
+        "mod": "$lib/server/ace/context-assembler.js",
         "n": 31
       },
       {
-        "mod": "$lib/server/ace/context-assembler.js",
-        "n": 30
+        "mod": "$lib/server/ai/code-intel-service.js",
+        "n": 31
       },
       {
         "mod": "$lib/types/enhanced-svelte5-types",
@@ -172029,16 +173735,16 @@
         "n": 21
       },
       {
+        "mod": "$lib/server/ai/graph-reranker.js",
+        "n": 21
+      },
+      {
         "mod": "$lib/server/ace/hmm-wiki-logger.js",
         "n": 21
       },
       {
-        "mod": "$lib",
-        "n": 18
-      },
-      {
-        "mod": "$lib/server/types/retrieval.js",
-        "n": 18
+        "mod": "$lib/server/analysis/hmm-ace-analyzer.js",
+        "n": 19
       }
     ]
   }

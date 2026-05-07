@@ -284,7 +284,6 @@ describe('standardiseManifold4 — axis-scale correction', () => {
     // All axes within [-1,1] after dividing by their max
     const raw = m4(0.5, 0.3, 0.8, 0.9);
     const std = standardiseManifold4(raw);
-    // som axes: 0.5/40=0.0125, 0.3/40=0.0075; semantic 0.8/1=0.8; reward 0.9/1=0.9
     expect(std[0]).toBeCloseTo(0.5 / DEFAULT_MANIFOLD4_RANGES.somMax, 10);
     expect(std[1]).toBeCloseTo(0.3 / DEFAULT_MANIFOLD4_RANGES.somMax, 10);
     expect(std[2]).toBeCloseTo(0.8, 10);
@@ -292,11 +291,12 @@ describe('standardiseManifold4 — axis-scale correction', () => {
   });
 
   it('large SOM coordinates are clamped to [-1, 1]', () => {
-    // som_x=421 >> somMax=40 → should clamp to 1
+    // Pass explicit somMax=40 to test the clamping mechanism independently of the default
+    const ranges: Manifold4Ranges = { somMax: 40, semanticMax: 1, rewardMax: 1 };
     const raw = m4(421, 88, 0.5, 0.8);
-    const std = standardiseManifold4(raw);
-    expect(std[0]).toBe(1);   // clamped
-    expect(std[1]).toBe(1);   // 88/40=2.2 → clamped to 1
+    const std = standardiseManifold4(raw, ranges);
+    expect(std[0]).toBe(1);   // 421/40=10.5 → clamped to 1
+    expect(std[1]).toBe(1);   // 88/40=2.2  → clamped to 1
     expect(std[2]).toBeCloseTo(0.5, 10);
     expect(std[3]).toBeCloseTo(0.8, 10);
   });

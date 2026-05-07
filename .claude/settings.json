@@ -1,0 +1,69 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "latest=$(ls -t /c/Users/james/Videos/deeds-web-app/sveltekit-frontend/memory/runs/ 2>/dev/null | head -1 | tr -d '\\r\\n'); f=\"/c/Users/james/Videos/deeds-web-app/sveltekit-frontend/memory/runs/$latest/next_actions.md\"; [ -f \"$f\" ] && head -70 \"$f\" | jq -Rs --arg run \"$latest\" '{hookSpecificOutput:{hookEventName:\"SessionStart\",additionalContext:(\"=== GPU/Karpathy Next Actions [\" + $run + \"] ===\\n\" + .)},systemMessage:(\"GPU graph loaded: \" + $run + \" · P0/P1 priorities injected into context\")}' 2>/dev/null || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"\nconst fs=require('fs'),path=require('path');\nconst root='c:/Users/james/Videos/deeds-web-app/sveltekit-frontend';\nconst lines=[];\n// 1. Inject latest audit_gates.json if fresh (<24h)\ntry{\n  const runs=fs.readdirSync(path.join(root,'memory/runs')).sort().slice(-1);\n  if(runs[0]){\n    const gf=path.join(root,'memory/runs',runs[0],'audit_gates.json');\n    if(fs.existsSync(gf)&&(Date.now()-fs.statSync(gf).mtimeMs)<86400000){\n      const g=JSON.parse(fs.readFileSync(gf,'utf8'));\n      const fails=Object.entries(g.gates||{}).filter(([k,v])=>k.startsWith('g')&&typeof v==='number'&&v>0&&!k.includes('consumer')&&!k.includes('pass')&&!k.includes('kmeans')&&!k.includes('som'));\n      if(fails.length)lines.push('OPEN AUDIT GATES: '+fails.map(([k,v])=>k+'='+v).join(', '));\n      else lines.push('Audit gates: ALL PASS (run '+runs[0]+')');\n    }\n  }\n}catch(e){}\n// 2. Inject smoke:graphify status from graph JSON mtime\ntry{\n  const gj=path.join(root,'docs/graph/codebase-graph.json');\n  if(fs.existsSync(gj)){\n    const age=Math.round((Date.now()-fs.statSync(gj).mtimeMs)/60000);\n    lines.push('codebase-graph.json age: '+age+'min'+(age>120?' ⚠️ stale':''));\n  }\n}catch(e){}\n// 3. Inject latest next_actions P0 count\ntry{\n  const runs=fs.readdirSync(path.join(root,'memory/runs')).sort().slice(-1);\n  if(runs[0]){\n    const na=path.join(root,'memory/runs',runs[0],'next_actions.md');\n    if(fs.existsSync(na)){\n      const txt=fs.readFileSync(na,'utf8');\n      const p0=((txt.match(/^- \\[/mg))||[]).length;\n      if(p0>0)lines.push('next_actions P0/P1 open items: '+p0+' (see memory/runs/'+runs[0]+'/next_actions.md)');\n    }\n  }\n}catch(e){}\nif(lines.length)console.log(JSON.stringify({systemMessage:'[Graph context] '+lines.join(' | ')}));\n\" 2>/dev/null",
+            "timeout": 4
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"' 2>/dev/null); if echo \"$cmd\" | grep -qE '^git commit'; then (cd /c/Users/james/Videos/deeds-web-app/sveltekit-frontend && npm run graphify:daily >> /tmp/graphify-daily.log 2>&1 &); fi",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "path=$(jq -r '.tool_input.file_path // \"\"' 2>/dev/null); if echo \"$path\" | grep -qE '\\.(ts|svelte|mjs|js)$'; then (cd /c/Users/james/Videos/deeds-web-app/sveltekit-frontend && npm run graphify:resume >> /tmp/graphify-resume.log 2>&1 &); fi",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "path=$(jq -r '.tool_input.file_path // \"\"' 2>/dev/null); if echo \"$path\" | grep -qE '\\.(ts|svelte)$'; then (cd /c/Users/james/Videos/deeds-web-app/sveltekit-frontend && npm run graphify:resume >> /tmp/graphify-resume.log 2>&1 &); fi",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"\nconst fs=require('fs'),path=require('path');\nconst root='c:/Users/james/Videos/deeds-web-app/sveltekit-frontend';\nconst gj=path.join(root,'docs/graph/codebase-graph.json');\nconst age=fs.existsSync(gj)?Math.round((Date.now()-fs.statSync(gj).mtimeMs)/60000):null;\nconst stale=age===null||age>180;\nif(stale)console.log(JSON.stringify({systemMessage:'[Graph stale] codebase-graph.json is '+(age?age+'min old':'missing')+'. Run: npm run graphify:daily (in sveltekit-frontend) to refresh Karpathy map + KAG notes.'}));\n\" 2>/dev/null",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}

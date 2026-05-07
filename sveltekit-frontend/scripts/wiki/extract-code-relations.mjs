@@ -443,8 +443,9 @@ function aceEdges(edges) {
 async function writeArtifact(result, edges) {
   const outDir = resolve(ROOT, 'logs/task-output');
   try { mkdirSync(outDir, { recursive: true }); } catch {}
+  const runId = new Date().toISOString().replace(/:/g, '-').replace(/\.\d+Z$/, '');
   const artifact = {
-    runId: new Date().toISOString(),
+    runId,
     totalFiles: result.totalFiles,
     totalEdges: result.totalEdges,
     filtered: edges.length,
@@ -457,6 +458,63 @@ async function writeArtifact(result, edges) {
   const out = resolve(outDir, 'code-relations-latest.json');
   writeFileSync(out, JSON.stringify(artifact, null, 2), 'utf-8');
   log(`  Artifact : ${out}`);
+
+  // ── Per-run memory artifacts ──────────────────────────────────────────────
+  // Write structured maps to memory/runs/<runId>/ so ACE + Gemma4 can query
+  // relationship context without re-scanning the codebase on each request.
+  const runsDir = resolve(ROOT, 'memory/runs', runId);
+  try {
+    mkdirSync(runsDir, { recursive: true });
+
+    // relationship_map.json — edge counts + top files by out-degree
+    const sourceFreq = {};
+    for (const e of edges) sourceFreq[e.sourceFile] = (sourceFreq[e.sourceFile] ?? 0) + 1;
+    const topFilesByEdgeCount = Object.entries(sourceFreq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([file, count]) => ({ file, count }));
+    writeFileSync(resolve(runsDir, 'relationship_map.json'), JSON.stringify({
+      runId,
+      totalEdges: result.totalEdges,
+      edgeCounts: result.edgeCounts,
+      topFilesByEdgeCount,
+    }, null, 2), 'utf-8');
+
+    // agents_scope_map.json — { filePath → agentsMdPath }
+    const agentsScopeMap = Object.fromEntries(
+      edges
+        .filter(e => e.relationType === 'HAS_AGENTS_SCOPE')
+        .map(e => [e.sourceFile, e.targetKey])
+    );
+    writeFileSync(resolve(runsDir, 'agents_scope_map.json'), JSON.stringify(agentsScopeMap, null, 2), 'utf-8');
+
+    // schema_access_map.json — { table → [files] }
+    const schemaAccessMap = {};
+    for (const e of edges.filter(e => e.relationType === 'QUERIES_TABLE')) {
+      (schemaAccessMap[e.targetKey] ??= []).push(e.sourceFile);
+    }
+    writeFileSync(resolve(runsDir, 'schema_access_map.json'), JSON.stringify(schemaAccessMap, null, 2), 'utf-8');
+
+    // redis_key_map.json — { key_pattern → { reads: [files], writes: [files] } }
+    const redisKeyMap = {};
+    for (const e of edges.filter(e => e.relationType === 'READS_REDIS_KEY' || e.relationType === 'WRITES_REDIS_KEY')) {
+      const bucket = (redisKeyMap[e.targetKey] ??= { reads: [], writes: [] });
+      if (e.relationType === 'READS_REDIS_KEY') bucket.reads.push(e.sourceFile);
+      else bucket.writes.push(e.sourceFile);
+    }
+    writeFileSync(resolve(runsDir, 'redis_key_map.json'), JSON.stringify(redisKeyMap, null, 2), 'utf-8');
+
+    // qdrant_access_map.json — { collection → [files] }
+    const qdrantAccessMap = {};
+    for (const e of edges.filter(e => e.relationType === 'QUERIES_QDRANT_COLLECTION')) {
+      (qdrantAccessMap[e.targetKey] ??= []).push(e.sourceFile);
+    }
+    writeFileSync(resolve(runsDir, 'qdrant_access_map.json'), JSON.stringify(qdrantAccessMap, null, 2), 'utf-8');
+
+    log(`  Run dir  : ${runsDir} (5 maps written)`);
+  } catch (err) {
+    log(`  [warn] run artifacts skipped: ${err.message}`);
+  }
 }
 
 main().catch(err => {

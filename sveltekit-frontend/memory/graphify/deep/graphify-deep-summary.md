@@ -1,48 +1,48 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-07T04:00:08.174Z
+Generated: 2026-05-07T14:58:30.006Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 3616 |
-| Total edges | 11735 |
-| Resolved edges | 6916 |
-| Unresolved (local) | 756 |
-| External refs | 3870 |
+| Nodes | 3652 |
+| Total edges | 11882 |
+| Resolved edges | 7009 |
+| Unresolved (local) | 766 |
+| External refs | 3914 |
 | Neighborhoods computed | 100 |
-| Test-covered files | 670 |
+| Test-covered files | 681 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| route | 1063 |
+| route | 1070 |
 | client | 956 |
-| test | 845 |
-| server | 632 |
-| types | 120 |
+| test | 862 |
+| server | 643 |
+| types | 121 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 5455 |
-| test_covers_file | 2426 |
-| server_route_depends_on | 1006 |
-| db_dependency | 885 |
+| imports_static | 5491 |
+| test_covers_file | 2500 |
+| server_route_depends_on | 1015 |
+| db_dependency | 888 |
 | env_dependency | 543 |
-| imports_dynamic | 487 |
-| redis_dependency | 373 |
+| imports_dynamic | 491 |
+| redis_dependency | 383 |
 | exports_from | 276 |
-| qdrant_dependency | 159 |
-| neo4j_dependency | 75 |
-| mcp_tool_calls | 50 |
+| qdrant_dependency | 161 |
+| neo4j_dependency | 80 |
+| mcp_tool_calls | 54 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
-| 1 | `src/lib/server/db/client.ts` | server | 485 | 7 |
+| 1 | `src/lib/server/db/client.ts` | server | 488 | 7 |
 | 2 | `src/lib/server/env.server.ts` | server | 336 | 0 |
-| 3 | `src/lib/components/ui/Icon.svelte` | client | 252 | 14 |
-| 4 | `src/lib/server/redis.ts` | server | 240 | 1 |
+| 3 | `src/lib/components/ui/Icon.svelte` | client | 253 | 14 |
+| 4 | `src/lib/server/redis.ts` | server | 246 | 1 |
 | 5 | `src/lib/server/db/schema-postgres.ts` | server | 192 | 2 |
 | 6 | `src/lib/server/ollama.ts` | server | 171 | 11 |
 | 7 | `src/lib/server/middleware/cache-headers.ts` | server | 112 | 1 |
@@ -53,9 +53,9 @@ Generated: 2026-05-07T04:00:08.174Z
 | 12 | `src/lib/server/vector/qdrant-manager.ts` | server | 73 | 9 |
 | 13 | `src/lib/server/gpu/libtorch-bridge.ts` | server | 45 | 1 |
 | 14 | `src/lib/server/observability/langfuse.ts` | server | 45 | 2 |
-| 15 | `src/lib/server/analytics/search-analytics.ts` | server | 39 | 4 |
+| 15 | `src/lib/server/analytics/search-analytics.ts` | server | 41 | 6 |
 | 16 | `src/lib/server/gpu/simdjson-bridge.ts` | server | 37 | 0 |
 | 17 | `src/lib/server/neo4j-driver.ts` | server | 32 | 0 |
-| 18 | `src/lib/ai/model-ids.ts` | client | 30 | 0 |
-| 19 | `src/lib/server/ace/context-assembler.ts` | server | 30 | 37 |
+| 18 | `src/lib/server/ace/context-assembler.ts` | server | 31 | 37 |
+| 19 | `src/lib/ai/model-ids.ts` | client | 30 | 0 |
 | 20 | `src/lib/server/ai/code-intel-service.ts` | server | 29 | 12 |

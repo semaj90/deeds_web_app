@@ -474,6 +474,77 @@ export async function traceCartridge<T>(
 }
 
 /**
+ * Trace an MCP tool call (trace-mcp-server :8788).
+ * Records tool name, input, round number, and output.
+ */
+export async function traceMCPTool<T>(
+	toolName: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = await getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `mcp:${toolName}`,
+		metadata: { toolName, ...metadata },
+		tags: ['mcp', 'trace-mcp-server', toolName],
+	});
+
+	const span = trace.span({
+		name: `tool-${toolName}`,
+		input: JSON.stringify(metadata).slice(0, 400),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		const ms = Date.now() - start;
+		const count = Array.isArray(result) ? result.length : null;
+		span.end({ output: count !== null ? `${count} results (${ms}ms)` : `ok (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a Bifrost L2 semantic cache interaction.
+ * operation: 'hit' | 'miss' | 'store' — indicates cache outcome.
+ */
+export async function traceBifrost<T>(
+	operation: 'hit' | 'miss' | 'store',
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = await getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `bifrost:${operation}`,
+		metadata: { operation, ...metadata },
+		tags: ['bifrost', 'l2-cache', operation],
+	});
+
+	const span = trace.span({
+		name: `bifrost-${operation}`,
+		input: JSON.stringify(metadata).slice(0, 300),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		const ms = Date.now() - start;
+		span.end({ output: `${operation} (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
  * Flush pending events (call during graceful shutdown).
  */
 export async function flushLangfuse(): Promise<void> {
