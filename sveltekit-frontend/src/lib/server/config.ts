@@ -143,14 +143,15 @@ export const VECTOR_SEARCH_CONFIG = {
 // ============================================================================
 // DATABASE CONFIGURATION
 // ============================================================================
+const _dbUrl = (() => { try { return new URL(ENV.DATABASE_URL.replace(/^postgres:\/\//, 'postgresql://')); } catch { return null; } })();
 export const DATABASE_CONFIG = {
   url: ENV.DATABASE_URL,
   postgres: {
-    host: process.env.DATABASE_HOST || 'localhost',
-    port: parseInt(process.env.DATABASE_PORT || '5434', 10),
-    database: process.env.DATABASE_NAME || 'legal_ai_db',
-    username: process.env.DATABASE_USER || 'legal_admin',
-    password: process.env.DATABASE_PASSWORD || '123456',
+    host: _dbUrl?.hostname || env.DATABASE_HOST || 'localhost',
+    port: parseInt(_dbUrl?.port || env.DATABASE_PORT || '5434', 10),
+    database: (_dbUrl?.pathname.slice(1)) || env.DATABASE_NAME || 'legal_ai_db',
+    username: _dbUrl?.username || env.DATABASE_USER || 'legal_admin',
+    password: _dbUrl?.password || env.DATABASE_PASSWORD || '',
     max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20', 10),
     idleTimeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20', 10),
     connectionTimeout: parseInt(process.env.DATABASE_CONNECT_TIMEOUT || '10', 10),
@@ -161,10 +162,11 @@ export const DATABASE_CONFIG = {
 // ============================================================================
 // REDIS CONFIGURATION
 // ============================================================================
+const _redisUrl = (() => { try { return new URL(ENV.REDIS_URL); } catch { return null; } })();
 export const REDIS_CONFIG = {
 	url: ENV.REDIS_URL,
-	host: process.env.REDIS_HOST || 'localhost',
-	port: parseInt(process.env.REDIS_PORT || '6379', 10),
+	host: _redisUrl?.hostname || env.REDIS_HOST || 'localhost',
+	port: parseInt(_redisUrl?.port || env.REDIS_PORT || '6379', 10),
 	password: process.env.REDIS_PASSWORD || undefined,
 	db: parseInt(process.env.REDIS_DB || '0', 10),
 	keyPrefix: process.env.REDIS_KEY_PREFIX || 'legal-ai:',
