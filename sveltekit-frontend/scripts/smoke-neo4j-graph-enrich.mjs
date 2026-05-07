@@ -103,7 +103,10 @@ await gate('GDS1', 'Neo4j reachable', async () => {
 
 /* GDS2 — GDS plugin available (WARN if missing — pipeline has Postgres fallback) */
 await gate('GDS2', 'GDS plugin available', async () => {
-  const rows = await neo4jQuery("CALL gds.version() YIELD version RETURN version");
+  // gds.version() YIELD syntax removed in GDS 2.x; use gds.debug.sysInfo() instead
+  const rows = await neo4jQuery(
+    "CALL gds.debug.sysInfo() YIELD key, value WHERE key = 'gdsVersion' RETURN value AS version"
+  );
   const ver = rows[0]?.row?.[0] ?? rows[0]?.data?.[0]?.row?.[0];
   if (!ver) throw new Error('WARN: GDS not installed — Postgres fan-in fallback active');
   return `version ${ver}`;
@@ -116,22 +119,25 @@ await gate('GDS3', 'codeGraph named projection exists', async () => {
   );
   const exists = rows[0]?.row?.[0] ?? rows[0]?.data?.[0]?.row?.[0];
   if (!exists) throw new Error('WARN: codeGraph projection not found — run graphify:gds first');
+  // GDS 2.x: gds.graph.list() with WHERE clause (no positional arg filter)
   const cnt = await neo4jQuery(
-    "CALL gds.graph.nodeCount('codeGraph') YIELD nodeCount RETURN nodeCount"
+    "CALL gds.graph.list() YIELD graphName, nodeCount WHERE graphName = 'codeGraph' RETURN nodeCount"
   );
   const n = cnt[0]?.row?.[0] ?? cnt[0]?.data?.[0]?.row?.[0] ?? 0;
   if (n < 10) throw new Error(`WARN: codeGraph has only ${n} nodes`);
   return `${n} nodes`;
 });
 
-/* GDS4 — PageRank written to at least 25 CodebaseFile nodes */
-await gate('GDS4', 'PageRank scores present on CodebaseFile nodes', async () => {
+/* GDS4 — graphPageRank written to at least 25 CodebaseFile nodes */
+await gate('GDS4', 'graphPageRank scores present on CodebaseFile nodes', async () => {
+  // Pipeline writes property as graphPageRank (not pagerank)
   const rows = await neo4jQuery(
-    'MATCH (n:CodebaseFile) WHERE n.pagerank IS NOT NULL RETURN count(n) AS cnt'
+    'MATCH (n:CodebaseFile) WHERE n.graphPageRank IS NOT NULL RETURN count(n) AS cnt, max(n.graphPageRank) AS mx'
   );
   const cnt = rows[0]?.row?.[0] ?? rows[0]?.data?.[0]?.row?.[0] ?? 0;
-  if (cnt < 25) throw new Error(`only ${cnt} nodes with pagerank (need ≥25) — run graphify:gds`);
-  return `${cnt} nodes`;
+  if (cnt < 25) throw new Error(`only ${cnt} nodes with graphPageRank (need ≥25) — run graphify:gds`);
+  const mx = (rows[0]?.row?.[1] ?? rows[0]?.data?.[0]?.row?.[1] ?? 0).toFixed(4);
+  return `${cnt} nodes, max=${mx}`;
 });
 
 /* GDS5 — Louvain communityId written to at least 10 CodebaseFile nodes */
@@ -224,8 +230,10 @@ await gate('GDS10', 'GDS summary artifact exists', async () => {
   }
   const raw = readFileSync(latestPath, 'utf8');
   const data = JSON.parse(raw);
-  const age = data.runAt ? Math.round((Date.now() - new Date(data.runAt).getTime()) / 1000 / 60) : '?';
-  const nodesUpdated = data.nodesUpdated ?? data.nodes_updated ?? '?';
+  const tsField = data.finishedAt ?? data.startedAt ?? data.runAt;
+  const age = tsField ? Math.round((Date.now() - new Date(tsField).getTime()) / 1000 / 60) : '?';
+  // latest.json uses authorityScoresComputed, not nodesUpdated
+  const nodesUpdated = data.authorityScoresComputed ?? data.nodesUpdated ?? data.nodes_updated ?? '?';
   const qdrantPatched = data.qdrantPatched ?? data.qdrant_patched ?? '?';
   return `${nodesUpdated} nodes, ${qdrantPatched} Qdrant pts, age=${age}min`;
 });
