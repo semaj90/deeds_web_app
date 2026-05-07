@@ -226,6 +226,7 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
                 cacheTrace: result.cacheTrace,
                 errorFixMemoryHit: result.errorFixMemoryHit,
                 verificationStatus: result.verificationStatus,
+                goToolClusterContext: result.goToolClusterContext,
               },
             },
           ],
