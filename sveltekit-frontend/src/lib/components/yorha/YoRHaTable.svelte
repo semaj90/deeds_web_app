@@ -98,6 +98,19 @@
     selectedRows = new Set(selectedRows);
   }
 
+  const allPageSelected = $derived(
+    paginatedData.length > 0 && paginatedData.every(row => selectedRows.has(row.id))
+  );
+
+  function toggleAllRows() {
+    if (allPageSelected) {
+      paginatedData.forEach(row => selectedRows.delete(row.id));
+    } else {
+      paginatedData.forEach(row => selectedRows.add(row.id));
+    }
+    selectedRows = new Set(selectedRows);
+  }
+
   function formatCellValue(value: any, column: TableColumn) {
     if (value === null || value === undefined) return '-';
     switch (column.type) {
@@ -132,7 +145,7 @@
         <tr class="border-b border-sand/20 bg-panel/50">
           {#if selectable}
             <th class="p-3 w-10">
-              <input type="checkbox" onchange={() => {}} class="rounded bg-panelSoft border-sand/20" />
+              <input type="checkbox" checked={allPageSelected} onchange={toggleAllRows} class="rounded bg-panelSoft border-sand/20" />
             </th>
           {/if}
           {#each columns as col}
