@@ -1605,6 +1605,7 @@ server.tool(
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { readFileSync as _readFileSync } from 'node:fs';
+import { resolve as _resolvePath } from 'node:path';
 
 const execFileAsync = promisify(execFile);
 
@@ -1616,22 +1617,12 @@ function requireToken(token: unknown): string | null {
 // ── ops.propose_patch ──────────────────────────────────────────────────────────
 server.tool(
   'ops.propose_patch',
-  {
-    description: 'Read a source file and propose a targeted fix. Returns the current content and a recommended diff. Does NOT write anything. Requires operator_token.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        operator_token: { type: 'string', description: 'Non-empty approval token' },
-        file_path:      { type: 'string', description: 'Repo-relative file path to inspect' },
-        issue:          { type: 'string', description: 'Description of the issue to fix' },
-        context_lines:  { type: 'number', description: 'Lines of context to return (default 40)', minimum: 5, maximum: 200 },
-      },
-      required: ['operator_token', 'file_path', 'issue'],
-    },
+    operator_token: z.string().describe('Non-empty approval token'),
+    file_path:      z.string().describe('Repo-relative file path to inspect'),
+    issue:          z.string().describe('Description of the issue to fix'),
+    context_lines:  z.number().int().min(5).max(200).optional().describe('Lines of context to return (default 40)'),
   },
-  async ({ operator_token, file_path, issue, context_lines }: {
-    operator_token: unknown; file_path: unknown; issue: unknown; context_lines?: unknown;
-  }) => {
+  async ({ operator_token, file_path, issue, context_lines }) => {
     const tokenErr = requireToken(operator_token);
     if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
 
@@ -1640,7 +1631,7 @@ server.tool(
     const maxLines  = clampNumber(context_lines, 5, 200, 40);
 
     try {
-      const absPath = resolve(process.cwd(), safeFile);
+      const absPath = _resolvePath(process.cwd(), safeFile);
       const raw = _readFileSync(absPath, 'utf8');
       const lines = raw.split('\n');
       const preview = lines.slice(0, maxLines).join('\n');
@@ -1667,21 +1658,11 @@ server.tool(
 // ── ops.run_targeted_test ─────────────────────────────────────────────────────
 server.tool(
   'ops.run_targeted_test',
-  {
-    description: 'Run a specific vitest test file and return the output. Requires operator_token.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        operator_token: { type: 'string', description: 'Non-empty approval token' },
-        test_file:      { type: 'string', description: 'Path to the test file relative to project root, e.g. tests/foo.spec.ts' },
-        timeout_ms:     { type: 'number', description: 'Max wait in ms (default 30000, max 120000)' },
-      },
-      required: ['operator_token', 'test_file'],
-    },
+    operator_token: z.string().describe('Non-empty approval token'),
+    test_file:      z.string().describe('Path to the test file relative to project root, e.g. tests/foo.spec.ts'),
+    timeout_ms:     z.number().int().min(5000).max(120000).optional().describe('Max wait in ms (default 30000)'),
   },
-  async ({ operator_token, test_file, timeout_ms }: {
-    operator_token: unknown; test_file: unknown; timeout_ms?: unknown;
-  }) => {
+  async ({ operator_token, test_file, timeout_ms }) => {
     const tokenErr = requireToken(operator_token);
     if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
 
@@ -1736,28 +1717,16 @@ server.tool(
 
 // ── ops.record_fix_attempt ────────────────────────────────────────────────────
 server.tool(
-  'ops.record_fix_attempt',
-  {
-    description: 'Persist fix attempt metadata to fix_attempts table (audit only — does not modify source files). Requires operator_token.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        operator_token:   { type: 'string', description: 'Non-empty approval token' },
-        fix_type:         { type: 'string', description: 'Category of fix, e.g. "type-error", "logic-bug", "missing-null-check"' },
-        fix_description:  { type: 'string', description: 'Human-readable description of the proposed fix' },
-        fix_diff:         { type: 'string', description: 'Unified diff or summary of the change' },
-        files_affected:   { type: 'number', description: 'Number of files the fix touches (default 1)' },
-        errors_resolved:  { type: 'number', description: 'Estimated errors this fix resolves (default 1)' },
-        success:          { type: 'boolean', description: 'Whether the fix was verified to work (omit if unknown)' },
-        metadata:         { type: 'object', description: 'Extra context (e.g. test result, issue ID)' },
-      },
-      required: ['operator_token', 'fix_type', 'fix_description'],
-    },
+  'ops.record_fix_attempt',    operator_token:  z.string().describe('Non-empty approval token'),
+    fix_type:        z.string().max(100).describe('Category of fix, e.g. "type-error", "logic-bug"'),
+    fix_description: z.string().max(2000).describe('Human-readable description of the proposed fix'),
+    fix_diff:        z.string().max(8000).optional().describe('Unified diff or summary of the change'),
+    files_affected:  z.number().int().min(0).optional().describe('Number of files the fix touches (default 1)'),
+    errors_resolved: z.number().int().min(0).optional().describe('Estimated errors this fix resolves (default 1)'),
+    success:         z.boolean().optional().describe('Whether the fix was verified to work (omit if unknown)'),
+    metadata:        z.record(z.unknown()).optional().describe('Extra context (e.g. test result, issue ID)'),
   },
-  async ({ operator_token, fix_type, fix_description, fix_diff, files_affected, errors_resolved, success, metadata }: {
-    operator_token: unknown; fix_type: unknown; fix_description: unknown; fix_diff?: unknown;
-    files_affected?: unknown; errors_resolved?: unknown; success?: unknown; metadata?: unknown;
-  }) => {
+  async ({ operator_token, fix_type, fix_description, fix_diff, files_affected, errors_resolved, success, metadata }) => {
     const tokenErr = requireToken(operator_token);
     if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
 
@@ -1793,21 +1762,11 @@ server.tool(
 // ── ops.run_quality_gate ──────────────────────────────────────────────────────
 server.tool(
   'ops.run_quality_gate',
-  {
-    description: 'Run tsc --noEmit --skipLibCheck and return pass/fail + error count. Requires operator_token.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        operator_token: { type: 'string', description: 'Non-empty approval token' },
-        gate:           { type: 'string', description: '"tsc" (default) or "vitest-all" to run full test suite', enum: ['tsc', 'vitest-all'] },
-        timeout_ms:     { type: 'number', description: 'Max wait in ms (default 60000, max 300000)' },
-      },
-      required: ['operator_token'],
-    },
+    operator_token: z.string().describe('Non-empty approval token'),
+    gate:           z.enum(['tsc', 'vitest-all']).optional().describe('tsc (default) or vitest-all to run full test suite'),
+    timeout_ms:     z.number().int().min(5000).max(300000).optional().describe('Max wait in ms (default 60000)'),
   },
-  async ({ operator_token, gate, timeout_ms }: {
-    operator_token: unknown; gate?: unknown; timeout_ms?: unknown;
-  }) => {
+  async ({ operator_token, gate, timeout_ms }) => {
     const tokenErr = requireToken(operator_token);
     if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
 
@@ -1854,23 +1813,12 @@ server.tool(
 
 // ── hypergraph.search ─────────────────────────────────────────────────────────
 server.tool(
-  'hypergraph.search',
-  {
-    description: 'Search hyperedges by query terms using Postgres FTS + member activation scoring. Returns edges ranked by coverage × grade × confidence.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        query:          { type: 'string',  description: 'Natural language query (1-500 chars)' },
-        edge_types:     { type: 'array', items: { type: 'string' }, description: 'Filter by edge_type (agents_md, cluster_summary, codebase_chunk, generic)' },
-        limit:          { type: 'number', description: 'Max results 1-50 (default 10)' },
-        min_confidence: { type: 'number', description: 'Minimum confidence threshold 0-1' },
-      },
-      required: ['query'],
-    },
+  'hypergraph.search',    query:          z.string().max(500).describe('Natural language query (1-500 chars)'),
+    edge_types:     z.array(z.string()).optional().describe('Filter by edge_type (agents_md, cluster_summary, codebase_chunk, generic)'),
+    limit:          z.number().int().min(1).max(50).optional().describe('Max results 1-50 (default 10)'),
+    min_confidence: z.number().min(0).max(1).optional().describe('Minimum confidence threshold 0-1'),
   },
-  async ({ query, edge_types, limit, min_confidence }: {
-    query: unknown; edge_types?: unknown; limit?: unknown; min_confidence?: unknown;
-  }) => {
+  async ({ query, edge_types, limit, min_confidence }) => {
     const safeQuery = String(query ?? '').slice(0, 500).trim();
     if (!safeQuery) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'query required' }) }] };
     try {
@@ -1896,18 +1844,10 @@ server.tool(
 // ── hypergraph.get_edge ───────────────────────────────────────────────────────
 server.tool(
   'hypergraph.get_edge',
-  {
-    description: 'Fetch a single hyperedge by edge_hash, with all member stable_keys and metadata.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        edge_hash: { type: 'string', description: 'The edge_hash to look up' },
-        expand:    { type: 'boolean', description: 'If true, also return related edges sharing at least one member' },
-      },
-      required: ['edge_hash'],
-    },
+    edge_hash: z.string().max(128).describe('The edge_hash to look up'),
+    expand:    z.boolean().optional().describe('If true, also return related edges sharing at least one member'),
   },
-  async ({ edge_hash, expand }: { edge_hash: unknown; expand?: unknown }) => {
+  async ({ edge_hash, expand }) => {
     const hash = String(edge_hash ?? '').slice(0, 128).trim();
     if (!hash) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge_hash required' }) }] };
     try {
@@ -1925,18 +1865,10 @@ server.tool(
 // ── hypergraph.explain_activation ────────────────────────────────────────────
 server.tool(
   'hypergraph.explain_activation',
-  {
-    description: 'Explain why a hyperedge was activated for a set of query terms — shows which terms matched which members, coverage ratio.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        edge_hash:   { type: 'string', description: 'The edge_hash to explain' },
-        query_terms: { type: 'array', items: { type: 'string' }, description: 'List of query terms that triggered activation' },
-      },
-      required: ['edge_hash', 'query_terms'],
-    },
+    edge_hash:   z.string().max(128).describe('The edge_hash to explain'),
+    query_terms: z.array(z.string().max(100)).describe('List of query terms that triggered activation'),
   },
-  async ({ edge_hash, query_terms }: { edge_hash: unknown; query_terms: unknown }) => {
+  async ({ edge_hash, query_terms }) => {
     const hash  = String(edge_hash ?? '').slice(0, 128).trim();
     const terms = Array.isArray(query_terms) ? (query_terms as unknown[]).map(t => String(t).slice(0, 100)) : [];
     if (!hash) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge_hash required' }) }] };
@@ -1953,17 +1885,9 @@ server.tool(
 // ── hypergraph.expand_members ─────────────────────────────────────────────────
 server.tool(
   'hypergraph.expand_members',
-  {
-    description: 'Given an edge_hash, return all edges that share at least one member — useful for exploring the hypergraph neighbourhood.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        edge_hash: { type: 'string', description: 'The edge_hash to expand from' },
-      },
-      required: ['edge_hash'],
-    },
+    edge_hash: z.string().max(128).describe('The edge_hash to expand from'),
   },
-  async ({ edge_hash }: { edge_hash: unknown }) => {
+  async ({ edge_hash }) => {
     const hash = String(edge_hash ?? '').slice(0, 128).trim();
     if (!hash) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge_hash required' }) }] };
     try {
@@ -1980,21 +1904,11 @@ server.tool(
 
 // ── knowledge.get_minified_map ────────────────────────────────────────────────
 server.tool(
-  'knowledge.get_minified_map',
-  {
-    description: 'Return a compact knowledge map: top hyperedges by grade, cluster summaries, and AGENTS.md directives for a directory. Designed for tight context budgets.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        directory:  { type: 'string', description: 'Relative directory path (e.g. "src/lib/server/ai")' },
-        max_edges:  { type: 'number', description: 'Max hyperedges to include (default 5)' },
-        max_agents: { type: 'number', description: 'Max AGENTS.md directives to include (default 3)' },
-      },
-    },
+  'knowledge.get_minified_map',    directory:  z.string().max(200).optional().describe('Relative directory path (e.g. "src/lib/server/ai")'),
+    max_edges:  z.number().int().min(1).max(20).optional().describe('Max hyperedges to include (default 5)'),
+    max_agents: z.number().int().min(1).max(10).optional().describe('Max AGENTS.md directives to include (default 3)'),
   },
-  async ({ directory, max_edges, max_agents }: {
-    directory?: unknown; max_edges?: unknown; max_agents?: unknown;
-  }) => {
+  async ({ directory, max_edges, max_agents }) => {
     const dir       = String(directory ?? '').slice(0, 200).trim();
     const edgeLimit = clampNumber(max_edges, 1, 20, 5);
     const agentLimit = clampNumber(max_agents, 1, 10, 3);
