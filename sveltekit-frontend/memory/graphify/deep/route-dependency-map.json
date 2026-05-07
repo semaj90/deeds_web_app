@@ -329,6 +329,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/admin/observability/+page.svelte": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/(app)/admin/phase78/+page.server.ts": {
     "zone": "route",
     "directDeps": 0,
@@ -1936,6 +1942,12 @@
     "directDeps": 2,
     "serverDeps": 2,
     "dbDeps": 0
+  },
+  "src/routes/api/admin/observability/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 1
   },
   "src/routes/api/admin/pipeline/events/+server.ts": {
     "zone": "route",
@@ -3887,6 +3899,18 @@
     "serverDeps": 2,
     "dbDeps": 0
   },
+  "src/routes/api/graph/docstore/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/graph/fetch-rerank/+server.ts": {
+    "zone": "route",
+    "directDeps": 5,
+    "serverDeps": 5,
+    "dbDeps": 0
+  },
   "src/routes/api/graph/glyph-atlas/+server.ts": {
     "zone": "route",
     "directDeps": 2,
@@ -4049,10 +4073,28 @@
     "serverDeps": 2,
     "dbDeps": 1
   },
+  "src/routes/api/hypergraph/edge/[id]/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "src/routes/api/hypergraph/lookup/+server.ts": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/hypergraph/search/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/hypergraph/traverse/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/indexing/+server.ts": {

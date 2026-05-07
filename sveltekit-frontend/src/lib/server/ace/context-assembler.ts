@@ -1842,6 +1842,20 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.codebaseContext = Math.max(...context.codebaseContext.map((c) => c.score));
   }
 
+  // 14b. NES cluster context — GPU cluster summary lenses for top retrieved files
+  if (context.clusterContext && context.clusterContext.length > 0) {
+    const clusterLines = context.clusterContext
+      .slice(0, 3)
+      .map((c) => {
+        const tags = c.tags?.length ? `Tags: ${c.tags.slice(0, 6).join(', ')}` : '';
+        const files = c.topFiles?.length ? `Files: ${c.topFiles.slice(0, 3).join(', ')}` : '';
+        return `**${c.clusterKey}** (${c.topoLabel ?? 'unknown'}): ${c.summaryLens ?? ''}${tags ? '\n  ' + tags : ''}${files ? '\n  ' + files : ''}`;
+      })
+      .join('\n');
+    lines.push(`\n## Codebase Clusters\n${clusterLines}`);
+    confidenceFactors.clusterContext = 0.7;
+  }
+
   confidenceFactors.policy = policyDecision.confidence;
 
   // 15. Self-prompting instructions

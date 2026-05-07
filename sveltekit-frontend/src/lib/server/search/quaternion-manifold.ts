@@ -491,7 +491,7 @@ export function biasedUnitQuaternionTuple(
 // Rule: NEVER apply HMM multipliers to raw manifold4 coordinates.
 // Always:  standardize → weight → normalize → compare
 //
-// The functions below form the canonical ACE-facing stack.  Internal helpers
+// The functions below form the canonical ACE-facing stack.  Lower-level exports
 // (toUnitQuaternion, biasedUnitQuaternion, standardiseManifold4) remain for
 // callers that already normalise upstream.
 
@@ -536,8 +536,8 @@ function _safeScale(value: number, maxAbs: number): number {
 /**
  * Standardise raw manifold4 axes so each component is in [-1, 1].
  *
- * Uses separate X/Y maxima so non-square SOM grids are handled correctly.
- * American-spelling alias for callers who prefer `standardize`.
+ * Unlike `standardiseManifold4`, accepts separate `somXMax`/`somYMax` via
+ * `Manifold4StandardizationConfig` so non-square SOM grids are handled correctly.
  */
 export function standardizeManifold4(
   m4:     Manifold4Point,
