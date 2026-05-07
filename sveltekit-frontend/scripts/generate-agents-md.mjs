@@ -668,6 +668,20 @@ if (DRY_RUN) {
           console.log(`  ⏸  ${path.relative(REPO_ROOT, t.path)}  (human-edited, preserved)`);
           continue;
         }
+        // Preserve any AGENTS-ENRICH block (or other enrichment) that lives
+        // ABOVE the AGENTS-GEN marker so enrich-agents-md.mjs output is not lost.
+        const genIdx = existing.indexOf(HEADER_MARKER);
+        // Find where the H1 heading ends (first blank line after it)
+        const h1End = existing.indexOf('\n\n');
+        const prefixBlock = (h1End !== -1 && h1End < genIdx)
+          ? existing.slice(h1End + 2, genIdx)   // content between H1 and GEN marker
+          : '';
+        if (prefixBlock.trim()) {
+          // Splice preserved enrichment between the H1 line and the GEN block
+          const h1Line = t.content.split('\n')[0]; // "# AGENTS.md — `dir`"
+          const afterH1 = t.content.slice(h1Line.length);
+          t.content = h1Line + '\n\n' + prefixBlock + afterH1;
+        }
       } catch { /* unreadable — overwrite */ }
     }
     mkdirSync(path.dirname(t.path), { recursive: true });

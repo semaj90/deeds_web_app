@@ -34,7 +34,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     return EMPTY(parsed.error.issues[0]?.message ?? 'Invalid parameters', 400);
   }
 
-  const { nodeId, hops, mode, limit, direction } = parsed.data;
+  const { nodeId, hops, mode, direction } = parsed.data;
+  // Neo4j LIMIT requires a strict integer; coerce here to avoid "50.0 is not valid" error
+  const limit = Math.trunc(parsed.data.limit);
   const startMs = Date.now();
 
   // Normalise to a stable Neo4j id (same convention as graph_neighbors in MCP)
@@ -63,21 +65,20 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
     try {
       if (mode === 'ego') {
-        // 1-hop both directions regardless of `direction` param
-        const [rOut, rIn] = await Promise.all([
-          session.run(
-            `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS]->(b:CodebaseFile)
-             RETURN b.id AS id, b.filePath AS fp, b.type AS type, b.cluster AS cluster
-             LIMIT $limit`,
-            { id: fileId, limit }
-          ),
-          session.run(
-            `MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile {id: $id})
-             RETURN a.id AS id, a.filePath AS fp, a.type AS type, a.cluster AS cluster
-             LIMIT $limit`,
-            { id: fileId, limit }
-          ),
-        ]);
+        // 1-hop both directions — run sequentially to avoid Neo4j session conflicts
+        // (concurrent session.run() on the same session causes "open transaction" errors)
+        const rOut = await session.run(
+          `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS]->(b:CodebaseFile)
+           RETURN b.id AS id, b.filePath AS fp, b.type AS type, b.cluster AS cluster
+           LIMIT toInteger($limit)`,
+          { id: fileId, limit }
+        );
+        const rIn = await session.run(
+          `MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile {id: $id})
+           RETURN a.id AS id, a.filePath AS fp, a.type AS type, a.cluster AS cluster
+           LIMIT toInteger($limit)`,
+          { id: fileId, limit }
+        );
 
         for (const rec of rOut.records) {
           const id = rec.get('id') as string;
@@ -100,7 +101,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
           `MATCH (a:CodebaseFile {id: $id})
            MATCH (b:CodebaseFile) WHERE b.cluster = a.cluster AND b.id <> $id
            RETURN b.id AS id, b.filePath AS fp, b.type AS type, b.cluster AS cluster
-           LIMIT $limit`,
+           LIMIT toInteger($limit)`,
           { id: fileId, limit }
         );
         for (const rec of r.records) {
@@ -112,44 +113,39 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
       } else {
         // bfs — variable-length path up to `hops`
+        // Run sequentially to avoid Neo4j session conflicts from concurrent session.run()
         const hopStr = `1..${hops}`;
-        const queries: Promise<unknown>[] = [];
+        const results: unknown[] = [];
 
         if (direction === 'imports' || direction === 'both') {
-          queries.push(
-            session.run(
-              `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS*${hopStr}]->(b:CodebaseFile)
-               WITH a, b
-               MATCH path=(a)-[:IMPORTS*${hopStr}]->(b)
-               UNWIND relationships(path) AS rel
-               WITH startNode(rel) AS src, endNode(rel) AS tgt, b
-               RETURN DISTINCT
-                 src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
-                 tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
-               LIMIT $limit`,
-              { id: fileId, limit }
-            )
-          );
+          results.push(await session.run(
+            `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS*${hopStr}]->(b:CodebaseFile)
+             WITH a, b
+             MATCH path=(a)-[:IMPORTS*${hopStr}]->(b)
+             UNWIND relationships(path) AS rel
+             WITH startNode(rel) AS src, endNode(rel) AS tgt, b
+             RETURN DISTINCT
+               src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
+               tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
+             LIMIT toInteger($limit)`,
+            { id: fileId, limit }
+          ));
         }
 
         if (direction === 'importedBy' || direction === 'both') {
-          queries.push(
-            session.run(
-              `MATCH (b:CodebaseFile)-[:IMPORTS*${hopStr}]->(a:CodebaseFile {id: $id})
-               WITH a, b
-               MATCH path=(b)-[:IMPORTS*${hopStr}]->(a)
-               UNWIND relationships(path) AS rel
-               WITH startNode(rel) AS src, endNode(rel) AS tgt, b
-               RETURN DISTINCT
-                 src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
-                 tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
-               LIMIT $limit`,
-              { id: fileId, limit }
-            )
-          );
+          results.push(await session.run(
+            `MATCH (b:CodebaseFile)-[:IMPORTS*${hopStr}]->(a:CodebaseFile {id: $id})
+             WITH a, b
+             MATCH path=(b)-[:IMPORTS*${hopStr}]->(a)
+             UNWIND relationships(path) AS rel
+             WITH startNode(rel) AS src, endNode(rel) AS tgt, b
+             RETURN DISTINCT
+               src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
+               tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
+             LIMIT toInteger($limit)`,
+            { id: fileId, limit }
+          ));
         }
-
-        const results = await Promise.all(queries);
         for (const r of results) {
           for (const rec of (r as { records: unknown[] }).records) {
             const srcId = (rec as { get: (k: string) => unknown }).get('srcId') as string;
