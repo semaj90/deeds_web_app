@@ -14,7 +14,7 @@
  */
 
 import { execSync }     from 'node:child_process';
-import { existsSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,6 +27,11 @@ const GENS    = parseInt(genArg ?? '20', 10);
 const profArg = argv.find(a => a.startsWith('--profile='))?.split('=')[1]
              ?? (argv.includes('--profile') ? argv[argv.indexOf('--profile') + 1] : 'q8');
 const PORT    = process.env.TURBO_PORT ?? '8090';
+
+// Optional --run-dir: also write turboquant_stability.json into that run directory.
+// Falls back to auto-detecting the latest memory/runs/<run_id>/ folder inside main().
+const RUN_DIR_ARG = argv.find(a => a.startsWith('--run-dir='))?.split('=').slice(1).join('=')
+                 ?? (argv.includes('--run-dir') ? argv[argv.indexOf('--run-dir') + 1] : null);
 
 const PROFILE_ARGS = {
   q8:     { ctk: 'q8_0',  ctv: 'q8_0',  label: 'q8_0 (stable baseline)' },
@@ -219,6 +224,26 @@ async function main() {
     testedAt: new Date().toISOString(),
   }, null, 2), 'utf8');
   console.log(`  Report: ${reportPath}\n`);
+
+  // Also write into the startup run-dir if one was supplied or can be auto-detected
+  const runDir = (() => {
+    if (RUN_DIR_ARG) return RUN_DIR_ARG;
+    const runsBase = join(ROOT, 'memory', 'runs');
+    if (!existsSync(runsBase)) return null;
+    const entries = readdirSync(runsBase).sort();
+    return entries.length ? join(runsBase, entries[entries.length - 1]) : null;
+  })();
+  if (runDir && existsSync(runDir)) {
+    const runReportPath = join(runDir, 'turboquant_stability.json');
+    writeFileSync(runReportPath, JSON.stringify({
+      profile: profArg, profileArgs: profile, port: PORT,
+      generationsRequested: GENS,
+      results, okCount, crashCount, nanCount, repCount, jsonFail,
+      median, p95, vramBefore, vramAfter, pass,
+      testedAt: new Date().toISOString(),
+    }, null, 2), 'utf8');
+    console.log(`  Run artifact: ${runReportPath}\n`);
+  }
 
   process.exit(pass ? 0 : 1);
 }

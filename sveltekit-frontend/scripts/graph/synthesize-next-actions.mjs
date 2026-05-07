@@ -27,7 +27,7 @@
  */
 
 import { readFile, writeFile, readdir } from 'node:fs/promises';
-import { existsSync }                   from 'node:fs';
+import { existsSync, readFileSync }      from 'node:fs';
 import { execSync }                     from 'node:child_process';
 import { resolve, dirname, join }       from 'node:path';
 import { fileURLToPath }                from 'node:url';
@@ -390,10 +390,22 @@ async function main() {
   const g22Files = rgFiles('^\\s*\\$:[^:]', SRC_DIR).filter(f => f.endsWith('.svelte'));
   const g23Files = rgFiles('\\bon:[a-z][a-z]+=', SRC_DIR).filter(f => f.endsWith('.svelte'));
   const g25Files = rgFiles('\\$(?:state|derived|effect|props)\\s*[(<]', join(SRC_DIR, 'lib'))
-    .filter(f => f.endsWith('.ts') && !f.endsWith('.svelte.ts') && !f.endsWith('.d.ts'));
+    .filter(f => f.endsWith('.ts') && !f.endsWith('.svelte.ts') && !f.endsWith('.d.ts'))
+    .filter(f => {
+      // Skip false positives: matches that only appear in comments or string literals
+      try {
+        const src = readFileSync(f, 'utf8');
+        const codeLines = src.split('\n').filter(l => {
+          const t = l.trim();
+          return t && !t.startsWith('//') && !t.startsWith('*') && !t.startsWith('/*');
+        }).join('\n');
+        return /\$(?:state|derived|effect|props)\s*[(<]/.test(codeLines);
+      } catch { return false; }
+    });
 
   // ── Tier B: DB layer ──────────────────────────────────────────────────────────
-  const g11Files = rgFiles('from.*db/index', join(SRC_DIR, 'lib/server'));  // must be 0
+  const g11Files = rgFiles('from.*db/index', join(SRC_DIR, 'lib/server'))
+    .filter(f => !f.endsWith('.md'));  // exclude AGENTS.md and other markdown
 
   // ── Tier C: Infrastructure ────────────────────────────────────────────────────
   const g17Files = rgFiles('localhost|127\\.0\\.0\\.1', join(SRC_DIR, 'lib/server'))
