@@ -406,7 +406,7 @@ server.tool(
     grpo_w:     z.number().min(0).max(1).default(0.5).optional().describe('GRPO quality weight 0–1'),
     radius:     z.number().min(0.01).max(5.0).default(0.5).describe('4D Euclidean radius'),
     limit:      z.number().int().min(1).max(50).default(20).describe('Max results'),
-    filters:    z.record(z.unknown()).optional().describe('JSONB payload filters (e.g. { "topo_class": "server" })'),
+    filters:    z.record(z.string(), z.unknown()).optional().describe('JSONB payload filters (e.g. { "topo_class": "server" })'),
   },
   async ({ som_x, som_y, semantic_z, grpo_w, radius, limit, filters }) => {
     const t0 = Date.now();
@@ -744,7 +744,7 @@ server.tool(
     query:   z.string().describe('Search query — RRF fusion of FTS + pgvector + Qdrant via go-search-service'),
     limit:   z.number().int().min(1).max(50).default(20).optional(),
     type:    z.enum(['codebase', 'legal', 'hybrid']).default('codebase').optional().describe('Search domain'),
-    filters: z.record(z.unknown()).optional().describe('JSONB metadata filters applied at the Go service level'),
+    filters: z.record(z.string(), z.unknown()).optional().describe('JSONB metadata filters applied at the Go service level'),
   },
   async ({ query, limit = 20, type = 'codebase', filters }) => {
     const t0 = Date.now();
