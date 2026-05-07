@@ -140,7 +140,7 @@ export async function purgeAllDAGCache(): Promise<{ deleted: number; error?: str
 
 		if (toDelete.length === 0) return { deleted: 0 };
 
-		const baseUrl = ENV.COUCHDB_URL ?? process.env.COUCHDB_URL ?? 'http://localhost:5984';
+		const baseUrl = ENV.COUCHDB_URL;
 		const auth = 'Basic ' + Buffer.from(
 			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
 		).toString('base64');
@@ -192,7 +192,7 @@ export async function cleanupExpiredDAGCache(): Promise<{ deleted: number; error
 
 		if (expired.length === 0) return { deleted: 0 };
 
-		const baseUrl = ENV.COUCHDB_URL ?? process.env.COUCHDB_URL ?? 'http://localhost:5984';
+		const baseUrl = ENV.COUCHDB_URL;
 		const auth = 'Basic ' + Buffer.from(
 			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
 		).toString('base64');

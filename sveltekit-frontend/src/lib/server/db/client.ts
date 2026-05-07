@@ -7,7 +7,7 @@ import { createDrizzleCache } from './drizzle-cache.js';
 import { traceDB } from '$lib/server/observability/langfuse.js';
 
 function getDatabaseUrl(): string {
- return ENV.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+ return ENV.DATABASE_URL;
 }
 
 function getAdminDatabaseUrl(): string {

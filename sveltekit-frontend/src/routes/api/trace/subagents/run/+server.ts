@@ -1,5 +1,11 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { runTraceSubagentDag } from '$lib/server/agents/trace-subagent-orchestrator.js';
+
+const TraceSubagentsRunSchema = z.object({
+	query: z.string().max(4000).optional(),
+	filePaths: z.array(z.string()).optional()
+});
 
 /**
  * POST /api/trace/subagents/run
@@ -10,8 +16,9 @@ export async function POST({ request, locals }) {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		const body = await request.json();
-		const { query, filePaths } = body;
+		const parsed = TraceSubagentsRunSchema.safeParse(await request.json());
+		if (!parsed.success) return json({ error: parsed.error.flatten() }, { status: 400 });
+		const { query, filePaths } = parsed.data;
 
 		const result = await runTraceSubagentDag({
 			runId: `trace-subagents-${new Date().toISOString().split('T')[0]}-${crypto.randomUUID().slice(0, 8)}`,
