@@ -69,7 +69,13 @@ async function resolveRunDir() {
     .sort()
     .reverse();
   if (!entries.length) throw new Error(`No run directories found in ${MEMORY_RUNS}`);
-  return join(MEMORY_RUNS, entries[0]);
+  // Find the most recent run dir that has synthesis_summary.json
+  const { existsSync: exists } = await import('node:fs');
+  for (const name of entries) {
+    const candidate = join(MEMORY_RUNS, name, 'synthesis_summary.json');
+    if (exists(candidate)) return join(MEMORY_RUNS, name);
+  }
+  throw new Error(`No run dir with synthesis_summary.json found in ${MEMORY_RUNS}`);
 }
 
 // ── Cluster key parsing ───────────────────────────────────────────────────────
