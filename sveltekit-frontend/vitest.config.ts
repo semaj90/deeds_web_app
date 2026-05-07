@@ -119,6 +119,8 @@ export default defineConfig({
       'tests/ace-hit-tagger.spec.ts',
       // Gemma4 agentic 24hr ACE hits cache (trace.kag_search Redis layer)
       'tests/ace-hits-cache.spec.ts',
+      // Admin observability dashboard endpoint contract
+      'tests/admin-observability.spec.ts',
       // code-intel dashboard, Karpathy persistence, TRACE memory gain, HMM flow (added 2026-05-06)
       'tests/karpathy-persistence.spec.ts',
       'tests/trace-memory-gain.spec.ts',
@@ -144,6 +146,21 @@ export default defineConfig({
       // MCP tool input hardening + rerank feedback aggregation
       'tests/mcp-trace-tools.spec.ts',
       'tests/qdrant-rerank-feedback.spec.ts',
+      // operator-gated ops.* tools (propose_patch, run_targeted_test, record_fix_attempt, run_quality_gate)
+      'tests/mcp-operator-tools.spec.ts',
+      // AGENTS.md ingest + Qdrant topology payload backfill
+      'tests/agents-md-ingest.spec.ts',
+      'tests/qdrant-topology-payloads.spec.ts',
+      // Step 5D HyperGraphRAG projection layer
+      'tests/hypergraph-types.spec.ts',
+      'tests/hypergraph-search.spec.ts',
+      'tests/hypergraph-mcp-tools.spec.ts',
+      'tests/hypergraph-traversal.spec.ts',
+      'tests/engram-dym.spec.ts',
+      'tests/engram-graph-rerank.spec.ts',
+      'tests/quaternion-manifold.spec.ts',
+      'tests/ace-rerank-spine.spec.ts',
+      'tests/tool-ranker.spec.ts',
     ],
     exclude: [
       'node_modules/**',
