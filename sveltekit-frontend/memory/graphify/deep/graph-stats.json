@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-05-07T15:52:06.226Z",
+  "generatedAt": "2026-05-07T17:03:34.397Z",
   "nodeCount": 3652,
-  "edgeCount": 11886,
-  "resolvedEdges": 7009,
+  "edgeCount": 11890,
+  "resolvedEdges": 7012,
   "unresolvedEdges": 766,
-  "externalEdges": 3918,
+  "externalEdges": 3919,
   "edgeTypeBreakdown": {
     "imports_static": 5495,
     "imports_dynamic": 491,
     "env_dependency": 543,
     "exports_from": 276,
-    "db_dependency": 888,
+    "db_dependency": 890,
     "redis_dependency": 383,
     "qdrant_dependency": 161,
     "test_covers_file": 2500,
     "neo4j_dependency": 80,
-    "mcp_tool_calls": 54,
+    "mcp_tool_calls": 56,
     "server_route_depends_on": 1015
   },
   "zoneBreakdown": {

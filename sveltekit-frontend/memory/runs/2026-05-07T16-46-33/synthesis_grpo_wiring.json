@@ -1,0 +1,63 @@
+{
+  "runId": "2026-05-07T16-46-33",
+  "wiredAt": "2026-05-07T17:02:58.358Z",
+  "dryRun": true,
+  "clusterCount": 7,
+  "summary": {
+    "critical": 2,
+    "high": 1,
+    "medium": 1,
+    "low": 3
+  },
+  "clusters": [
+    {
+      "clusterKey": "cluster:gpu:6",
+      "riskLevel": "critical",
+      "priority": 255,
+      "tsgo7Diags": 0,
+      "qdrantCount": "(dry-run)"
+    },
+    {
+      "clusterKey": "cluster:gpu:58",
+      "riskLevel": "critical",
+      "priority": 255,
+      "tsgo7Diags": 0,
+      "qdrantCount": "(dry-run)"
+    },
+    {
+      "clusterKey": "cluster:gpu:73",
+      "riskLevel": "high",
+      "priority": 192,
+      "tsgo7Diags": 0,
+      "qdrantCount": "(dry-run)"
+    },
+    {
+      "clusterKey": "cluster:gpu:92",
+      "riskLevel": "medium",
+      "priority": 128,
+      "tsgo7Diags": 0,
+      "qdrantCount": "(dry-run)"
+    },
+    {
+      "clusterKey": "cluster:gpu:19",
+      "riskLevel": "low",
+      "priority": 64,
+      "tsgo7Diags": 0,
+      "qdrantCount": "(dry-run)"
+    },
+    {
+      "clusterKey": "cluster:gpu:20",
+      "riskLevel": "low",
+      "priority": 64,
+      "tsgo7Diags": 0,
+      "qdrantCount": "(dry-run)"
+    },
+    {
+      "clusterKey": "cluster:gpu:59",
+      "riskLevel": "low",
+      "priority": 64,
+      "tsgo7Diags": 0,
+      "qdrantCount": "(dry-run)"
+    }
+  ]
+}

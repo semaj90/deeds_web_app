@@ -1,5 +1,5 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-05-07T15:40:44.893Z
+> Generated: 2026-05-07T19:20:15.752Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
@@ -16,8 +16,8 @@
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 32 |
-| G5 No Zod  | 4 |
-| G11 Localhost | 56 |
+| G5 No Zod  | 1 |
+| G11 Localhost | 54 |
 | G14 Svelte4 | 0 |
 | G15 SSR unsafe | 1 |
 | G16 No test | 17 |

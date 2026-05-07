@@ -1,14 +1,14 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-07T15:52:06.226Z
+Generated: 2026-05-07T17:03:34.397Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
 | Nodes | 3652 |
-| Total edges | 11886 |
-| Resolved edges | 7009 |
+| Total edges | 11890 |
+| Resolved edges | 7012 |
 | Unresolved (local) | 766 |
-| External refs | 3918 |
+| External refs | 3919 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 681 |
 
@@ -27,23 +27,23 @@ Generated: 2026-05-07T15:52:06.226Z
 | imports_static | 5495 |
 | test_covers_file | 2500 |
 | server_route_depends_on | 1015 |
-| db_dependency | 888 |
+| db_dependency | 890 |
 | env_dependency | 543 |
 | imports_dynamic | 491 |
 | redis_dependency | 383 |
 | exports_from | 276 |
 | qdrant_dependency | 161 |
 | neo4j_dependency | 80 |
-| mcp_tool_calls | 54 |
+| mcp_tool_calls | 56 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
-| 1 | `src/lib/server/db/client.ts` | server | 488 | 7 |
+| 1 | `src/lib/server/db/client.ts` | server | 489 | 7 |
 | 2 | `src/lib/server/env.server.ts` | server | 336 | 0 |
 | 3 | `src/lib/components/ui/Icon.svelte` | client | 253 | 14 |
-| 4 | `src/lib/server/redis.ts` | server | 246 | 1 |
-| 5 | `src/lib/server/db/schema-postgres.ts` | server | 192 | 2 |
+| 4 | `src/lib/server/redis.ts` | server | 247 | 1 |
+| 5 | `src/lib/server/db/schema-postgres.ts` | server | 193 | 2 |
 | 6 | `src/lib/server/ollama.ts` | server | 171 | 11 |
 | 7 | `src/lib/server/middleware/cache-headers.ts` | server | 112 | 1 |
 | 8 | `src/lib/server/db/schema.ts` | server | 97 | 10 |
