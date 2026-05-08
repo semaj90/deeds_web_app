@@ -94,6 +94,100 @@
       "detail": "Spawn TurboQuant llama-server.exe as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache and adds mmproj automatically if present."
     },
     {
+      "label": "MCP TRACE Server (detached)",
+      "type": "shell",
+      "command": "npm run mcp:ensure",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Spawn trace-mcp-server.ts detached (same pattern as TurboQuant), idempotent — health-checks :8788 first and returns immediately if already alive. Required by Gemma4 agent + clusters.get_members + 35-tool MCP surface."
+    },
+    {
+      "label": "Agents Pipeline (Safe)",
+      "type": "shell",
+      "command": "npm run agents:pipeline:safe",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run agents:write → agents:enrich → agents:index → smoke:agents with a dry-run preflight. Uses size-shrink + read-error fail-closed safeguards. Backups to .bak when |new − old| > 2KB."
+    },
+    {
+      "label": "Agents Pipeline (Dry-Run Only)",
+      "type": "shell",
+      "command": "npm run agents:pipeline:dry",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Preview AGENTS.md changes without writing. Useful before committing — shows TODO-enhancements.md diff + per-directory enrich plan."
+    },
+    {
+      "label": "Qdrant: Backfill Cluster Keys (gpu: namespace)",
+      "type": "shell",
+      "command": "npm run qdrant:backfill-cluster-keys",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Patch cluster_key payload in codebase_chunks_768 to use the gpu:N namespace MCP queries with. Uses Qdrant SetPayload (only touches cluster_key + agents_scope + relation_types — vector and content stay intact). Idempotent: skips already-correct rows."
+    },
+    {
+      "label": "Backend Stack (MCP + TurboQuant detached)",
+      "dependsOn": [
+        "MCP TRACE Server (detached)",
+        "TurboQuant llama-server (VLM)"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Start MCP TRACE (:8788) and TurboQuant llama-server (:8090) in parallel. Both detached — VS Code returns immediately. Frontend dev server is started separately."
+    },
+    {
       "label": "Svelte Check",
       "type": "shell",
       "command": "npx svelte-kit sync && npx svelte-check --threshold error --tsconfig ./tsconfig.json",
@@ -746,6 +840,79 @@
         "showReuseMessage": false,
         "clear": false
       }
+    },
+    {
+      "label": "📝 AGENTS.md: Pipeline (manual, force re-run)",
+      "type": "shell",
+      "command": "Remove-Item logs/task-output/.agents-pipeline-last-run -ErrorAction SilentlyContinue; npm run agents:pipeline:safe",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Manually re-run agents:pipeline:safe — clears the cooldown stamp first so the startup hook will fire again on next folder open."
+    },
+    {
+      "label": "📝 AGENTS.md: Pipeline (dry-run only)",
+      "type": "shell",
+      "command": "npm run agents:pipeline:dry",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Preview agents:pipeline output — write:dry → enrich:dry → ingest:dry. No file IO, no Redis writes, no Postgres writes."
+    },
+    {
+      "label": "📝 Startup: AGENTS.md Pipeline (write→enrich→index→smoke)",
+      "type": "shell",
+      "command": "$stamp = 'logs/task-output/.agents-pipeline-last-run'; $cooldownSec = 21600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('📝 agents:pipeline skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/3600) + ' h)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run agents:pipeline:safe 2>&1 | Tee-Object -FilePath logs/task-output/agents-pipeline-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '📝 agents:pipeline complete' } else { Write-Host '📝 agents:pipeline failed — stamp NOT updated, will retry next folder open' } }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": true,
+      "dependsOn": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
+      "problemMatcher": {
+        "owner": "agents-pipeline",
+        "pattern": {
+          "regexp": "^(ERROR|WARN|✗):\\s+(.*)$",
+          "severity": 1,
+          "message": 2
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "agents:write",
+          "endsPattern": "agents:pipeline complete"
+        }
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Run agents:pipeline:safe (dry-run preflight → real write → enrich → index → smoke) detached on folder open. 6h cooldown via stamp file. Depends on graphify:daily so the codebase graph is fresh before AGENTS.md regen."
     },
     {
       "label": "CMake: Auto-Build on Startup",
