@@ -19,7 +19,6 @@
  *   node scripts/generate-timeline-synthesis.mjs --limit 30
  */
 
-import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -124,7 +123,6 @@ async function pgvectorSearch(queryM4, limit) {
   try {
     // Encode manifold4 as pgvector literal
     const vecLiteral = `'[${queryM4.join(',')}]'`;
-    const { createClient } = await import('redis').catch(() => ({ createClient: null }));
     // Use postgres via pg package
     const { default: pg } = await import('pg').catch(() => ({ default: null }));
     if (!pg) return [];
@@ -220,9 +218,10 @@ async function synthesize(prompt, onChunk) {
     const reader = res.body.getReader();
     const dec    = new TextDecoder();
     let full     = '';
-    while (true) {
+    let streaming = true;
+    while (streaming) {
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) { streaming = false; break; }
       const lines = dec.decode(value, { stream: true }).split('\n').filter(Boolean);
       for (const line of lines) {
         try {
