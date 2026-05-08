@@ -190,6 +190,38 @@ async function fallbackAuthorityFromPostgres(pool) {
   return rows.map(r => ({ filePath: r.file_path, fanIn: parseInt(r.fan_in, 10) }));
 }
 
+/**
+ * Synthesize PageRank from Postgres fan-in and write back to Neo4j.
+ * Used when GDS plugin is absent or the GDS PageRank call returns 0 rows.
+ * Score = log1p(fanIn) / log1p(maxFanIn) so high-fan-in files dominate
+ * but the long tail still gets a non-zero score.
+ *
+ * Sets:
+ *   n.graphPageRank   — float in [0, 1]
+ *   n.pagerankSource  — "postgres-fan-in" (marker so downstream knows it's synthetic)
+ */
+async function writeFanInPagerankToNeo4j(pgRows) {
+  if (!pgRows.length) return 0;
+  const maxLog = Math.log1p(pgRows[0].fanIn || 1);
+  const scored = pgRows.map(r => ({
+    filePath: r.filePath,
+    score:    maxLog > 0 ? Math.log1p(r.fanIn) / maxLog : 0,
+  }));
+  const result = await neo4j(`
+    UNWIND $rows AS row
+    MATCH (n:CodebaseFile { filePath: row.filePath })
+    SET n.graphPageRank  = row.score,
+        n.pagerankSource = 'postgres-fan-in',
+        n.pagerankWrittenAt = datetime()
+    RETURN count(n) AS written
+  `, { rows: scored }).catch(e => {
+    console.warn(`   ⚠ writeFanInPagerankToNeo4j failed (${String(e.message ?? e).slice(0, 80)})`);
+    return [];
+  });
+  const written = neo4jRows(result)[0]?.written ?? 0;
+  return Number(written) || 0;
+}
+
 // ── Phase 3: Louvain community detection ──────────────────────────────────────
 
 async function runLouvain() {
@@ -472,12 +504,31 @@ async function main() {
     } catch (e) {
       summary.gates.GDS4 = `FAIL: ${e.message.slice(0, 60)}`;
     }
-  } else {
-    // Degraded: Postgres fan-in
+  }
+
+  // Fall through to Postgres fan-in when GDS PageRank produced nothing.
+  // This covers both "no GDS plugin" (gdsOk=false) and "GDS call succeeded but
+  // wrote 0 rows" (e.g. empty graph projection). Writes synthetic pagerank back
+  // to Neo4j so Phase 4 can read it via coalesce(f.graphPageRank, ...).
+  if (pagerankByKey.size === 0) {
     const pgRows = await fallbackAuthorityFromPostgres(pool);
     for (const r of pgRows) fallbackFanIn.set(r.filePath, r.fanIn);
-    summary.gates.GDS4 = `DEGRADED: ${pgRows.length} files from Postgres fan-in`;
-    console.log(`   ⚠ GDS4 using Postgres fan-in: ${pgRows.length} files`);
+    if (pgRows.length && neo4jOk) {
+      const written = await writeFanInPagerankToNeo4j(pgRows);
+      // Materialize the synthetic scores into pagerankByKey too so the rest of
+      // the pipeline (authority compute, Qdrant patch) can read them.
+      const maxLog = Math.log1p(pgRows[0].fanIn || 1);
+      for (const r of pgRows) {
+        const score = maxLog > 0 ? Math.log1p(r.fanIn) / maxLog : 0;
+        pagerankByKey.set(r.filePath, score);
+      }
+      summary.pagerankRows = pagerankByKey.size;
+      summary.gates.GDS4 = `DEGRADED: ${pgRows.length} synthetic, ${written} written to Neo4j`;
+      console.log(`   ⚠ GDS4 fan-in fallback: ${pgRows.length} files, ${written} Neo4j writes`);
+    } else if (pgRows.length) {
+      summary.gates.GDS4 = `DEGRADED: ${pgRows.length} files (Neo4j write skipped)`;
+      console.log(`   ⚠ GDS4 fan-in fallback: ${pgRows.length} files (no Neo4j write)`);
+    }
   }
 
   // ── PHASE 3: Community detection ─────────────────────────────────────────
