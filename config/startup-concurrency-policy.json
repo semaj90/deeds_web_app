@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "Startup concurrency policy. Two parallel lanes: long-running services (detached, non-blocking) and incremental data refresh (locked, idempotent). Schema migrations and full rebuilds are explicitly NEVER auto-run.",
+  "serviceLane": {
+    "detached": true,
+    "label": "Long-running AI services — spawned once, idempotent health-checks",
+    "commands": [
+      "mcp:ensure",
+      "turbo:start:detached",
+      "go:retrieval:run"
+    ],
+    "allowedPorts": [8788, 8090, 8100, 50053],
+    "healthChecks": {
+      "mcp:ensure": "http://127.0.0.1:8788/health",
+      "turbo:start:detached": "http://127.0.0.1:8090/health",
+      "go:retrieval:run": "http://127.0.0.1:8100/health"
+    }
+  },
+  "dataLane": {
+    "detached": true,
+    "label": "Incremental cache + ranking refresh — Redis-locked, git-diff scoped",
+    "lockKey": "lock:startup:ace-refresh",
+    "lockTtlSeconds": 900,
+    "maxRuntimeMs": 300000,
+    "commands": [
+      "agents:pipeline:dry",
+      "agents:pipeline:safe",
+      "topology:validate",
+      "graph:synthesize",
+      "check-all-tools:quick"
+    ],
+    "cooldownKey": "ace:startup:last_run",
+    "cooldownSeconds": 21600
+  },
+  "neverRunOnStartup": [
+    "agents:write:force",
+    "qdrant:recreate",
+    "qdrant:backfill-cluster-keys",
+    "db:reset",
+    "db:apply-migration",
+    "neo4j:clear",
+    "redis:flush",
+    "couchdb:delete",
+    "graphify:full",
+    "graphify:full:force",
+    "graphify:gpu",
+    "graphify:gpu:turbo",
+    "embedding:full-reindex",
+    "taxonomy:rebuild-from-scratch",
+    "screenshots:caption"
+  ],
+  "manualOnly": {
+    "label": "Operator-triggered tasks — VS Code task palette only, never folderOpen",
+    "rationale": "Schema changes, destructive rebuilds, force overrides, and full-corpus re-embedding must be deliberate operator decisions. Surfaced as VS Code tasks with reveal=always + focus=true so the operator sees the output.",
+    "commands": [
+      "agents:db:verify",
+      "db:apply-migration",
+      "qdrant:backfill-cluster-keys",
+      "agents:write:force",
+      "graphify:full"
+    ]
+  },
+  "concurrencyRules": {
+    "lanesParallel": true,
+    "withinLaneSerial": false,
+    "maxConcurrentTasks": 6,
+    "abortOnFirstFailure": false
+  }
+}
