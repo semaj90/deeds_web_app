@@ -162,6 +162,20 @@ async function runIncrementalLane(redis) {
       return;
     }
 
+    // ── Indexing loop (upstream of every other step) ─────────────────────────
+    // index:codebase:fast:resume — incremental AST scan with gradient
+    // checkpoint that skips unchanged files. Writes to code_relations +
+    // qdrant_cluster_members, which are the exact upstream tables the
+    // hypergraph seeder + atlas builder consume. Without this step, the
+    // downstream seeders work against stale data after every refactor.
+    //
+    // Cost: ~1-3s when nothing changed (gradient checkpoint short-circuit),
+    // up to ~30s when many files changed. The agents:pipeline below depends
+    // on fresh code_relations data, so this MUST run first.
+    runStep('codebase index resume', 'index:codebase:fast:resume', {
+      required: false, timeout: 60_000,
+    });
+
     runStep('agents pipeline dry-run', 'agents:pipeline:dry', { timeout: 180_000 });
 
     if (!DRY) {
@@ -170,6 +184,14 @@ async function runIncrementalLane(redis) {
 
     runStep('topology validate', 'topology:validate', { required: false, timeout: 120_000 });
     runStep('graph synthesize', 'graph:synthesize', { required: false, timeout: 240_000 });
+
+    // atlas:index — rebuild atlas dir cards (ace:atlas:dir:*) and
+    // ace:atlas:dirs index from the fresh code_relations + agent_context_files
+    // data the steps above just refreshed. Adaptive (skips dirs without
+    // changed files), so re-runs are cheap. Must come AFTER agents:pipeline
+    // and graph:synthesize so the dir cards reflect the latest envelope +
+    // synthesis state.
+    runStep('atlas index rebuild', 'atlas:index', { required: false, timeout: 60_000 });
 
     // ace:hit-demand — refresh chunk_hit_log → Redis demand hash on every
     // folder open. Cheap (~3s), idempotent (HSET atomic replace), 1h TTL so
@@ -195,6 +217,18 @@ async function runIncrementalLane(redis) {
     //           latest synthesis run files, all screenshot captions (24h).
     // Idempotent — same-day re-runs atomically replace.
     runStep('archive llm summaries', 'archive:llm', { required: false, timeout: 60_000 });
+
+    // smoke:atlas — final regression gate. Runs the 16-check atlas-context
+    // smoke: contextForFile shape + provenance, hypergraph.search returns
+    // hits, /api/ace/recommendations responds, prompt cards present, etc.
+    // If any earlier step in the loop silently corrupted state (e.g.,
+    // empty dir cards, broken edge_hash idempotency, missing 4D fields),
+    // this catches it and surfaces in the startup-latest.json log.
+    //
+    // Required: false so a smoke failure doesn't tank the lane — the
+    // operator gets the failure recorded and can investigate via
+    // logs/task-output/pipeline-test/smoke-atlas-latest.json.
+    runStep('atlas smoke gate', 'smoke:atlas', { required: false, timeout: 60_000 });
 
     await redis.hset('ace:startup:latest', {
       head,
