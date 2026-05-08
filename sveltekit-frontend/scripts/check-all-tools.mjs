@@ -513,25 +513,35 @@ if (!JSON_MODE) console.log('\n\x1b[1m── 10. Postgres Tables\x1b[0m');
 if (DB_URL) {
   const { default: pg } = await import('pg');
   const client = new pg.Client({ connectionString: DB_URL, connectionTimeoutMillis: 5000 });
-  await client.connect().catch(e => {});
+  let connectErr = null;
+  await client.connect().catch(e => { connectErr = e; });
 
-  const tables = [
-    { name: 'research_summaries', minRows: 0 },
-    { name: 'chunk_hit_log',      minRows: 0 },
-    { name: 'code_relations',     minRows: 100 },
-    { name: 'context_timeline',   minRows: 0 },
-    { name: 'evidence',           minRows: 0 },
-    { name: 'cases',              minRows: 0 },
-  ];
+  if (connectErr) {
+    // Previously this swallowed the error and let every table probe fail with
+    // cryptic "Client has not been connected" messages. Now we surface the
+    // root cause once and skip the per-table probes entirely.
+    record('postgres', 'connect', 'FAIL',
+           String(connectErr.message ?? connectErr).slice(0, 120), 0,
+           'check Postgres is running and DATABASE_URL is correct');
+  } else {
+    const tables = [
+      { name: 'research_summaries', minRows: 0 },
+      { name: 'chunk_hit_log',      minRows: 0 },
+      { name: 'code_relations',     minRows: 100 },
+      { name: 'context_timeline',   minRows: 0 },
+      { name: 'evidence',           minRows: 0 },
+      { name: 'cases',              minRows: 0 },
+    ];
 
-  await Promise.all(tables.map(({ name, minRows }) =>
-    probe('postgres', `table: ${name}`, async () => {
-      const r = await client.query(`SELECT COUNT(*) AS n FROM ${name}`);
-      const n = parseInt(r.rows[0]?.n ?? 0);
-      if (n < minRows) throw new Error(`only ${n} rows (need ≥${minRows})`);
-      return `${n.toLocaleString()} rows`;
-    })
-  ));
+    await Promise.all(tables.map(({ name, minRows }) =>
+      probe('postgres', `table: ${name}`, async () => {
+        const r = await client.query(`SELECT COUNT(*) AS n FROM ${name}`);
+        const n = parseInt(r.rows[0]?.n ?? 0);
+        if (n < minRows) throw new Error(`only ${n} rows (need ≥${minRows})`);
+        return `${n.toLocaleString()} rows`;
+      })
+    ));
+  }
 
   await client.end().catch(() => {});
 } else {
