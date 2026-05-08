@@ -191,7 +191,7 @@ function buildTimeline(commits, filesMap, kagMap) {
   return lines.join('\n');
 }
 
-function buildRecommendations(commits, filesMap, kagMap) {
+function buildRecommendations(commits, filesMap, _kagMap) {
   const dirActivity = {};
   for (const c of commits) {
     for (const f of (filesMap[c.hash] ?? [])) {

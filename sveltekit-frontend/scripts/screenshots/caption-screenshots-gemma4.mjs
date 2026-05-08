@@ -31,15 +31,10 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
 import sharp from 'sharp';
 import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT      = resolve(__dirname, '../..');
 
 const args      = process.argv.slice(2);
 const APPLY     = args.includes('--apply');
