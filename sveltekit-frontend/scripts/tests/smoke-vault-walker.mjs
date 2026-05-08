@@ -109,6 +109,10 @@ await run('hypergraph.searchByLane:B', () =>
 await run('hypergraph.searchByLane:C', () =>
   m.hypergraphSearchByLaneTool.execute({ query: 'ai', lane: 'agents_context', limit: 5 }));
 
+// 15. hypergraph.searchByLane — Lane D (vault_link)
+await run('hypergraph.searchByLane:D', () =>
+  m.hypergraphSearchByLaneTool.execute({ query: 'cluster', lane: 'vault_link', limit: 5 }));
+
 const totalMs = Date.now() - startedAt;
 const passed = Object.values(results).filter(r => r.ok).length;
 const failed = Object.values(results).filter(r => !r.ok).length;
