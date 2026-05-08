@@ -7,7 +7,7 @@ import { PDFDocument, StandardFonts } from 'pdf-lib';
 import pg from 'pg';
 
 const { Pool } = pg;
-const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db' });
+const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
 
 async function createTestPDF() {
   const doc = await PDFDocument.create();

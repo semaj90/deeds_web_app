@@ -1,7 +1,7 @@
 # AGENTS.md — `tests/routes/auto/api/detective`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T23:45:43.498Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-08T02:03:14.841Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests/routes/auto/api/detective
 

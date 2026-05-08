@@ -21,14 +21,32 @@
   import GlyphAtlasViewer from '$lib/components/graph/GlyphAtlasViewer.svelte';
 
   // ── SSR props from page.server.ts ─────────────────────────────────────────
-  // $derived so re-runs of load() (e.g. invalidate, navigation) reflow into
-  // overview/serverPR. Plain `const` would freeze them at first render.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let { data } = $props();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const d = $derived(data as any);
-  const overview  = $derived(d.overview  ?? null);
-  const serverPR  = $derived(d.pageRankTop ?? []);
+  // $derived.by closures so re-runs of load() (invalidate, navigation)
+  // reflow into overview/serverPR. Structural types match the actual shape
+  // returned by page.server.ts so the template can index properties safely.
+  interface OverviewStats {
+    sourceFiles?: number;
+    sourceDirs?: number;
+    ssrUnsafe?: number;
+    sv4Legacy?: number;
+    avgScore?: number | string;
+  }
+  interface Overview {
+    totalFiles: number;
+    totalDirs: number;
+    totalClusters: number;
+    stats: OverviewStats;
+  }
+  interface PageRankRow {
+    rel: string;
+    score: number | string;
+    source?: string;
+  }
+  type LoadedData = { overview?: Overview | null; pageRankTop?: PageRankRow[] };
+
+  let props = $props();
+  const overview = $derived.by<Overview | null>(() => ((props.data as LoadedData | undefined)?.overview ?? null));
+  const serverPR = $derived.by<PageRankRow[]>(() => ((props.data as LoadedData | undefined)?.pageRankTop ?? []));
 
   // ── Tab state ─────────────────────────────────────────────────────────────
   type Tab = 'canvas' | 'graphify' | 'pagerank' | 'batch' | 'atlas';
@@ -88,6 +106,8 @@
   async function loadCanvas() {
     canvasLoading = true; canvasErr = null;
     try {
+      // One-shot URLSearchParams builder, never bound to component state.
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity
       const params = new URLSearchParams({ limit: String(limit) });
       if (dirsOnly)         params.set('dirsOnly', '1');
       if (lowScore != null) params.set('lowScore', String(lowScore));
@@ -135,6 +155,8 @@
       const dec = new TextDecoder();
       let buf = '';
 
+      // SSE pump — exits when reader.read() returns { done: true }.
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -189,7 +211,7 @@
 
   <!-- ── Tab bar ──────────────────────────────────────────────────────────── -->
   <nav class="tabs">
-    {#each (['graphify','atlas','pagerank','batch','canvas'] as Tab[]) as t}
+    {#each (['graphify','atlas','pagerank','batch','canvas'] as Tab[]) as t (t)}
       <button class="tab" class:active={activeTab === t} onclick={() => switchTab(t)}>
         {{ graphify:'🗂️ Cluster View', atlas:'🧩 Glyph Atlas', pagerank:'⚡ PageRank', batch:'🔧 GPU Batch', canvas:'🔵 Canvas' }[t]}
       </button>
@@ -217,7 +239,7 @@
         <table class="pr-table">
           <thead><tr><th>#</th><th>Score</th><th>File</th></tr></thead>
           <tbody>
-            {#each serverPR as r, i}
+            {#each serverPR as r, i (r.rel)}
               <tr>
                 <td class="rank">{i + 1}</td>
                 <td class="score">{typeof r.score === 'number' ? r.score.toExponential(3) : r.score}</td>
@@ -238,7 +260,7 @@
       <p class="dim">Runs PyTorch GPU ops over all 32,753 Qdrant vectors. Writes back to Qdrant payloads + Neo4j. VRAM: RTX 3060 Ti (8GB).</p>
 
       <div class="stage-grid">
-        {#each GPU_STAGES as stage}
+        {#each GPU_STAGES as stage (stage)}
           {@const s = batchStages.find(x => x.name === stage)}
           <div class="stage-card" class:done={s?.status==='done'} class:running={s?.status==='running'} class:error={s?.status==='error'}>
             <span class="sname">{stage}</span>

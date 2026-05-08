@@ -27,7 +27,7 @@ if (existsSync(ENV_FILE)) {
 
 const APP_URL  = process.env.APP_URL ?? 'http://localhost:5173';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
 let exitCode = 0;
 const ok   = (msg) => console.log(`✓ ${msg}`);

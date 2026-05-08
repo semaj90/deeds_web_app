@@ -193,8 +193,15 @@ export async function searchHyperedges(params: HyperedgeSearchParams): Promise<H
     // anchor_key treated as a member_key to find edges containing the anchor
     const keyFilter = params.anchor_key ?? params.member_key;
     if (keyFilter) {
-      bindings.push(keyFilter);
-      conditions.push(`hem.member_key = $${bindings.length}`);
+      // Path-shaped values (containing '/' or '.') get an exact match — used
+      // by code that already knows the full member_key (e.g. file path).
+      // Free-text tokens (no path separator) get ILIKE '%token%' so the API's
+      // documented "Free-text search maps to member_key ILIKE" contract holds
+      // — without this fork, `?query=redis` would never match
+      // `src/lib/server/redis.ts` because exact equality fails.
+      const isPath = /[/.]/.test(keyFilter);
+      bindings.push(isPath ? keyFilter : `%${keyFilter}%`);
+      conditions.push(`hem.member_key ${isPath ? '=' : 'ILIKE'} $${bindings.length}`);
     }
     if (params.member_kind) {
       bindings.push(params.member_kind);

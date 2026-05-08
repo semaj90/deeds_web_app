@@ -22,7 +22,7 @@ const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit'));
 const LIMIT     = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1] ?? '10000') : 10_000;
 const BATCH     = 500;
 
-const DB_URL       = process.env.DATABASE_URL  ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_URL       = process.env.DATABASE_URL  ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const NEO4J_URL    = process.env.NEO4J_URI     ?? 'bolt://127.0.0.1:7687';
 const NEO4J_USER   = process.env.NEO4J_USER    ?? 'neo4j';
 const NEO4J_PASS   = process.env.NEO4J_PASSWORD ?? 'neo4j_password';

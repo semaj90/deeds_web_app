@@ -27,7 +27,7 @@ async function main() {
 
   // Also check evidence table counts
   const { Pool } = await import('pg');
-  const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db' });
+  const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
   try {
     const tables = ['evidence', 'evidence_vectors', 'case_notes', 'legal_documents', 'citations', 'statutes'];
     console.log('\n=== PostgreSQL Table Counts ===\n');

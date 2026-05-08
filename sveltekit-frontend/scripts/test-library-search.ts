@@ -5,7 +5,7 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
-const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'legal_documents';

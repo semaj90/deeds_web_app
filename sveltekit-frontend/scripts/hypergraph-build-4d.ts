@@ -19,7 +19,7 @@ import path from 'path';
 dotenv.config();
 
 // Ensure critical env vars are set for standalone execution
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 process.env.REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 process.env.OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
 

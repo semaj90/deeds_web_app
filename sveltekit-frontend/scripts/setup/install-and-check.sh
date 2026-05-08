@@ -378,7 +378,7 @@ VITE_LEGAL_AI_API=http://localhost:8084
 VITE_OLLAMA_URL=http://localhost:11434
 VITE_REDIS_URL=redis://localhost:6379
 VITE_ENABLE_GPU=true
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/legal_ai_db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5434/legal_ai_db
 ENVEOF
     echo "✅ Created .env.development template" >> "$REPORT_FILE"
 fi

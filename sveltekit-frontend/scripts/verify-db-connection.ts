@@ -6,7 +6,7 @@ import pg from 'pg';
 
 dotenv.config();
 
-const DATABASE_URL = process.env.DATABASE_URL?.replace('5434', '5432') || "postgresql://legal_admin:123456@localhost:5432/legal_ai_db";
+const DATABASE_URL = process.env.DATABASE_URL?.replace('5434', '5432') || "postgresql://legal_admin:123456@localhost:5434/legal_ai_db";
 
 console.log(`Testing connection to: ${DATABASE_URL}`);
 

@@ -67,7 +67,7 @@ search.dev_context({ query: "expandNeighbours neo4j rerank" })
 
 ## Audit Gates — General
 
-> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-06
+> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-08
 > Run each check from the **sveltekit-frontend/** root.
 
 ### Tier A — Code Connectivity
@@ -95,6 +95,19 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 > Generated from Redis ACE hits (code:graph:node:* + hotspot data). Regenerate: `node scripts/enrich-agents-md.mjs`.
 
 - [ ] **G17** Audit for remaining hardcoded `localhost` / `127.0.0.1` — replace with `ENV.*` getters
+
+## Fix Timeline
+
+> Recent commits touching this directory — newest first. Used by agents to correlate errors with fixes.
+
+| Commit | Timestamp | Subject |
+|--------|-----------|---------|
+| `e1f78a54a8` | 2026-05-07T17:14 | feat(mla): 1-bit sign-pack latent + Hamming pre-filter (TurboQuant fast-path) |
+| `7f1195e756` | 2026-05-07T13:05 | chore(quaternion): add deferred CUDA batch similarity TODO |
+| `e3f3210872` | 2026-05-07T12:21 | fix(g17): batch-remove remaining localhost fallbacks via fix-g17-localhost.mjs |
+| `a20c7e3d79` | 2026-05-07T08:43 | feat(startup+synthesis): TurboQuant stability gate, Node orchestrator, audit pipeline, fetch-rerank mget batch |
+| `0a450c5017` | 2026-05-07T03:27 | memory_logs_56_26 |
+| `d25a3dd4a2` | 2026-05-07T03:24 | feat(tile-engine): SemanticTile, TileEngineTrace, standardized quaternion pipeline |
 
 <!-- /AGENTS-ENRICH -->
 

@@ -899,39 +899,171 @@
       "detail": "Preview agents:pipeline output — write:dry → enrich:dry → ingest:dry. No file IO, no Redis writes, no Postgres writes."
     },
     {
-      "label": "📝 Startup: AGENTS.md Pipeline (write→enrich→index→smoke)",
+      "label": "🚀 Startup: ACE Incremental Refresh (detached, safe)",
       "type": "shell",
-      "command": "$stamp = 'logs/task-output/.agents-pipeline-last-run'; $cooldownSec = 21600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('📝 agents:pipeline skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/3600) + ' h)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run agents:pipeline:safe 2>&1 | Tee-Object -FilePath logs/task-output/agents-pipeline-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '📝 agents:pipeline complete' } else { Write-Host '📝 agents:pipeline failed — stamp NOT updated, will retry next folder open' } }",
+      "command": "npm run startup:ace:detached",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "runOptions": {
-        "runOn": "folderOpen"
+        "runOn": "folderOpen",
+        "instanceLimit": 1
       },
       "isBackground": true,
       "dependsOn": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
-      "problemMatcher": {
-        "owner": "agents-pipeline",
-        "pattern": {
-          "regexp": "^(ERROR|WARN|✗):\\s+(.*)$",
-          "severity": 1,
-          "message": 2
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "agents:write",
-          "endsPattern": "agents:pipeline complete"
-        }
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
       },
+      "detail": "Detached fork of scripts/startup/ace-incremental-startup.mjs. Two lanes: (1) INCREMENTAL — git diff vs ace:startup:last_sha → agents:pipeline:dry → agents:pipeline:safe → topology:validate → graph:synthesize, lock-protected via Redis lock:startup:ace-refresh. (2) HEAVY — only fires when TurboQuant :8090 OR Ollama :11434 is healthy AND last heavy run was >24h ago, runs graphify:authority/gds/cluster-summaries/bow-tiles. Policy denylist in config/startup-ace-policy.json refuses destructive commands. Logs to logs/task-output/pipeline-test/startup-latest.json."
+    },
+    {
+      "label": "🚀 ACE Startup: Manual Refresh (force, foreground)",
+      "type": "shell",
+      "command": "npm run startup:ace:force",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run the incremental + heavy lanes in the foreground, bypassing locks and last-sha skip. Still respects policy denylist."
+    },
+    {
+      "label": "🧠 Karpathy GPU: Top-50 Authority Blend",
+      "type": "shell",
+      "command": "npm run karpathy:gpu",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "GPU autoencoder + attention score blend over top-50 nodes by graphPageRank. Writes Redis gpu:karpathy:scores (24h TTL) + next_steps/active/karpathy-gpu-recommendations.md. Falls back to CPU if tensorrt_bridge.node unavailable."
+    },
+    {
+      "label": "🧠 Karpathy GPU: Dirty Files Only (incremental)",
+      "type": "shell",
+      "command": "npm run karpathy:gpu:dirty",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Only refresh GPU authority blend for files in Redis ace:rank:dirty_files (set by ace-incremental-startup). Skip silently if no dirty files."
+    },
+    {
+      "label": "🚀 ACE Startup: Heavy Lane Only (GPU-gated)",
+      "type": "shell",
+      "command": "npm run startup:ace:heavy",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Skip incremental lane; only run graphify:authority/gds/cluster-summaries/bow-tiles. Probes TurboQuant :8090 + Ollama :11434 first — exits silently if GPU not warm."
+    },
+    {
+      "label": "🩺 Startup: Atlas Smoke Gate (16 probes, detached)",
+      "type": "shell",
+      "command": "$stamp = 'logs/task-output/.atlas-smoke-last-run'; $cooldownSec = 1800; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🩺 atlas smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run smoke:atlas 2>&1 | Tee-Object -FilePath logs/task-output/smoke-atlas-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🩺 atlas smoke green' } else { Write-Host '🩺 atlas smoke FAILED — atlas/MCP/HTTP regression detected' } }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": true,
+      "dependsOn": "🚀 Startup: ACE Incremental Refresh (detached, safe)",
+      "problemMatcher": [],
       "presentation": {
         "echo": false,
         "reveal": "silent",
         "focus": false,
-        "panel": "shared",
+        "panel": "dedicated",
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Run agents:pipeline:safe (dry-run preflight → real write → enrich → index → smoke) detached on folder open. 6h cooldown via stamp file. Depends on graphify:daily so the codebase graph is fresh before AGENTS.md regen."
+      "detail": "16-probe regression gate over the atlas → context_for_file → hypergraph search → /api/ace/recommendations chain. Runs after ACE incremental refresh has primed the caches. 30-min cooldown via logs/task-output/.atlas-smoke-last-run stamp. Catches schema drift, dual-DB confusion, empty hypergraph_edges, and stale Redis caches in one shot — green = the agent's grounding signals all read from canonical Postgres (:5434) and are queryable end-to-end."
+    },
+    {
+      "label": "🔥 Startup: Seed Hit-Demand (chunk_hit_log → Redis, detached)",
+      "type": "shell",
+      "command": "$stamp = 'logs/task-output/.hit-demand-last-run'; $cooldownSec = 300; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🔥 hit-demand skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds + ' s ago (cooldown ' + $cooldownSec + ' s)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run ace:hit-demand 2>&1 | Tee-Object -FilePath logs/task-output/hit-demand-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🔥 hit-demand seeded' } else { Write-Host '🔥 hit-demand failed — stamp NOT updated' } }",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": true,
+      "dependsOn": "🩺 Startup: Atlas Smoke Gate (16 probes, detached)",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Aggregates chunk_hit_log (last 24h) into Redis ace:rank:demand hash so contextForFile() rank includes a real-time agent-query feedback signal. Read-only Postgres → atomic Redis HSET replace, 1h TTL self-evicts stale data. Fires after the atlas smoke gate so any data inconsistency is caught before re-seeding. 5-min cooldown debounces rapid VS Code restarts."
+    },
+    {
+      "label": "🩺 Atlas Smoke: Manual Run (force, foreground)",
+      "type": "shell",
+      "command": "Remove-Item logs/task-output/.atlas-smoke-last-run -ErrorAction SilentlyContinue; npm run smoke:atlas",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Manually re-run the 16-probe atlas smoke. Clears the cooldown stamp first so the startup auto-task fires fresh on next folder open."
     },
     {
       "label": "CMake: Auto-Build on Startup",

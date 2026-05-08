@@ -507,7 +507,7 @@ import type { Client as MinioClient } from 'minio';
 import type { RedisClientType } from 'redis';
 
 // Environment configuration
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT ?? 'localhost';

@@ -1,7 +1,7 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
-const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const p = new Pool({ connectionString: DB_URL });
 
 const check = await p.query(`

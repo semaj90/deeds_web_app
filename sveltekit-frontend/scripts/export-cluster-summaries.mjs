@@ -38,7 +38,7 @@ const args = process.argv.slice(2);
 const REPO   = args.includes('--repo') ? args[args.indexOf('--repo') + 1] : 'default';
 const TOP    = args.includes('--top')  ? Number(args[args.indexOf('--top') + 1]) || 0 : 0;
 
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
 
 const pool  = new pg.Pool({ connectionString: DATABASE_URL, max: 4 });

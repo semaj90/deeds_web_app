@@ -33,7 +33,7 @@ const CONFIG = {
   turboUrl:      process.env.TURBOQUANT_URL    ?? 'http://127.0.0.1:8090',
   model:         process.env.OLLAMA_MODEL      ?? 'gemma4-legal-vlm:latest',
   embedModel:    process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
-  pgUrl:         process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db',
+  pgUrl:         process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
   redisUrl:      process.env.REDIS_URL         ?? 'redis://localhost:6379',
   redisPass:     process.env.REDIS_PASSWORD    ?? 'redis',
   force:         process.argv.includes('--force'),

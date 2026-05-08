@@ -2,7 +2,7 @@
 export const PGVECTOR_CONFIG = {
  // PostgreSQL 17 with pgvector
  database: { host: process.env.PGVECTOR_HOST || 'localhost', port: parseInt(process.env.PGVECTOR_PORT || '5432'), database: process.env.PGVECTOR_DB || 'legal_ai_db', user: process.env.PGVECTOR_USER || 'legal_admin', password: process.env.PGVECTOR_PASSWORD || '123456', // Connection URL for services
- url: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db', // pgvector specific settings
+ url: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db', // pgvector specific settings
  vector: { dimensions: 384, // Gemma embedding dimensions (embeddinggemma: latest), indexMethod: 'hnsw', // GPU-optimized index
  metric: 'cosine', // Similarity metric
  // HNSW parameters for GPU optimization

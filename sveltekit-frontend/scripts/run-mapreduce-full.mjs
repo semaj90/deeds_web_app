@@ -62,7 +62,7 @@ const DIM          = 768;
 
 const QDRANT_URL   = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
 const QDRANT_COLL  = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
-const DB_URL       = process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_URL       = process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL    = process.env.REDIS_URL         ?? 'redis://127.0.0.1:6379';
 const REDIS_TTL    = 3600;
 const NEO4J_URL    = process.env.NEO4J_HTTP_URL    ?? 'http://localhost:7474';

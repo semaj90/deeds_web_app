@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+const env: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
 
 /**

@@ -28,7 +28,7 @@ import neo4j, { type Driver } from 'neo4j-driver';
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const QDRANT_URL   = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
-const PG_URL       = process.env.DATABASE_URL       ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const PG_URL       = process.env.DATABASE_URL       ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL    = process.env.REDIS_URL          ?? 'redis://127.0.0.1:6379';
 const REDIS_PASS   = process.env.REDIS_PASSWORD     ?? 'redis';
 const OLLAMA_URL   = process.env.OLLAMA_BASE_URL    ?? 'http://127.0.0.1:11434';

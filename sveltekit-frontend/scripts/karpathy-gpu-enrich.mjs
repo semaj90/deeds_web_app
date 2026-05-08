@@ -431,6 +431,34 @@ async function main() {
   log.candidateSource = candidateSource;
   console.log(`[karpathy] ${candidates.length} candidates (${candidateSource})`);
 
+  // ── Adaptive guard: input-hash short-circuit ──────────────────────────────
+  // Compute SHA1 of (mode, candidate_set_signature) where the signature is the
+  // sorted (stableKey, pr) pairs from the upstream signal. If this matches the
+  // last run's summary.input_hash, the autoencoder + attention pass would
+  // produce byte-identical output — skip the GPU work entirely. Bypass with
+  // --force when you want to re-run regardless (e.g., after weight changes).
+  const force = process.argv.includes('--force');
+  if (!DRY && !force && candidates.length > 0) {
+    const { createHash } = await import('node:crypto');
+    const sig = candidates
+      .map(c => `${c.stableKey}:${(c.pr ?? 0).toFixed(4)}`)
+      .sort()
+      .join('|');
+    const inputHash = createHash('sha1')
+      .update(`${candidateSource}:${LIMIT}:${HIDDEN_DIM}:${sig}`)
+      .digest('hex')
+      .slice(0, 16);
+    log.inputHash = inputHash;
+    const lastHash = await redis.hget('gpu:karpathy:summary', 'input_hash').catch(() => null);
+    if (lastHash === inputHash) {
+      console.log(`[karpathy] inputs unchanged (hash=${inputHash}) — skipping GPU pass + Redis writes`);
+      console.log(`           Pass --force to rebuild anyway. Existing scores/encoded preserved.`);
+      log.status = 'unchanged';
+      await redis.quit();
+      return;
+    }
+  }
+
   // Fetch embeddings (sequential — Qdrant scroll-by-filter is fast, ~50ms each)
   const enriched = [];
   for (const c of candidates) {
@@ -543,6 +571,9 @@ async function main() {
       gpuEncoded: String(log.gpu.encoded),
       gpuAttention: String(log.gpu.attention),
       mode: log.mode,
+      // Persist the input signature so next run can short-circuit when nothing
+      // upstream has changed (see "Adaptive guard" block above).
+      input_hash: log.inputHash ?? '',
     });
     await redis.expire('gpu:karpathy:summary', 86_400);
   }

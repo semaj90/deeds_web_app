@@ -1,0 +1,81 @@
+{
+  "mode": "incremental",
+  "neverRunOnStartup": [
+    "qdrant:recreate",
+    "graphify:full",
+    "graphify:full:force",
+    "db:reset",
+    "neo4j:clear",
+    "redis:flush",
+    "couchdb:delete",
+    "agents:write:force",
+    "drizzle:push",
+    "drizzle:reset",
+    "db:apply-migration"
+  ],
+  "allowedOnStartup": [
+    "agents:pipeline:dry",
+    "agents:pipeline:safe",
+    "topology:validate",
+    "graph:synthesize",
+    "smoke:agents",
+    "smoke:trace",
+    "kag:ingest",
+    "karpathy:gpu:dirty",
+    "karpathy:gpu:dry",
+    "ace:hit-demand",
+    "ace:hit-demand:dry",
+    "smoke:atlas",
+    "atlas:prompt:smoke"
+  ],
+  "thresholds": {
+    "smallChangeMaxFiles": 20,
+    "mediumChangeMaxFiles": 200,
+    "schemaChangeTriggers": [
+      "package.json",
+      "pnpm-lock.yaml",
+      "package-lock.json",
+      "drizzle.config.ts",
+      "drizzle.config.js",
+      "src/lib/server/db/schema",
+      "docker-compose.yml",
+      "docker-compose.test.yml",
+      "scripts/graph/",
+      "scripts/neo4j/"
+    ]
+  },
+  "maxRuntimeMs": 300000,
+  "lockKey": "lock:startup:ace-refresh",
+  "lockTtlSec": 900,
+  "logDir": "logs/task-output/pipeline-test",
+  "redisStateKeys": {
+    "lastSha": "ace:startup:last_sha",
+    "latest": "ace:startup:latest",
+    "dirtyFiles": "ace:rank:dirty_files",
+    "dirtyClusters": "ace:rank:dirty_clusters",
+    "heavyLastRun": "ace:startup:heavy_last_run",
+    "heavyLock": "lock:startup:heavy-worker"
+  },
+  "heavyServiceWorker": {
+    "enabled": true,
+    "cooldownHours": 24,
+    "gpuWarmGate": {
+      "turboquantUrl": "http://127.0.0.1:8090/health",
+      "ollamaUrl": "http://127.0.0.1:11434/api/tags",
+      "probeTimeoutMs": 3000,
+      "requireBoth": false
+    },
+    "tasks": [
+      "graphify:authority",
+      "graphify:gds",
+      "graphify:cluster-summaries",
+      "graphify:bow-tiles",
+      "topology:validate",
+      "karpathy:gpu",
+      "hypergraph:seed",
+      "ace:hit-demand",
+      "audit:full-pipeline"
+    ],
+    "logKey": "ace:startup:heavy_log"
+  }
+}

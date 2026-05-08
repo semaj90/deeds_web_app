@@ -15,7 +15,7 @@ import ollama
 
 OLLAMA_HOST = "http://localhost:11434"
 EMBED_MODEL = "embeddinggemma:latest"
-PG_DSN      = "postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db"
+PG_DSN      = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
 PATCH_ALL   = "--all" in sys.argv
 
 client = ollama.Client(host=OLLAMA_HOST)
