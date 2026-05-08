@@ -90,12 +90,24 @@ await run('retrieval.qdrantLookup', () =>
 await run('agent.explainCluster:7', () =>
   m.agentExplainClusterTool.execute({ cluster_id: 7, topMembers: 5 }));
 
-// 11. agent.proposeFix — generate markdown plan
+// 11. agent.proposeFix — generate markdown plan with 3-lane composition
 await run('agent.proposeFix:db-client', () =>
   m.agentProposeFixTool.execute({
     file_path: 'src/lib/server/db/client.ts',
     issue: 'investigate cache miss path during pool warmup',
   }));
+
+// 12. hypergraph.searchByLane — Lane A (cluster_context)
+await run('hypergraph.searchByLane:A', () =>
+  m.hypergraphSearchByLaneTool.execute({ query: 'retrieval', lane: 'cluster_context', limit: 5 }));
+
+// 13. hypergraph.searchByLane — Lane B (shared_resource)
+await run('hypergraph.searchByLane:B', () =>
+  m.hypergraphSearchByLaneTool.execute({ query: 'evidence', lane: 'shared_resource', limit: 5 }));
+
+// 14. hypergraph.searchByLane — Lane C (agents_context)
+await run('hypergraph.searchByLane:C', () =>
+  m.hypergraphSearchByLaneTool.execute({ query: 'ai', lane: 'agents_context', limit: 5 }));
 
 const totalMs = Date.now() - startedAt;
 const passed = Object.values(results).filter(r => r.ok).length;
