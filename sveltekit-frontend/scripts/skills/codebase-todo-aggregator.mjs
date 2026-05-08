@@ -57,7 +57,13 @@ const QUERY     = (() => {
 
 const REDIS_URL  = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const LLM_MODEL  = process.env.LLM_MODEL ?? 'gemma4-legal-vlm:latest';
+const LLM_MODEL = process.env.LLM_MODEL ?? 'gemma4-legal-vlm:latest';
+// Inference cascade per CLAUDE.md "Inference Cascade" section:
+//   TurboQuant llama-server :8090  (KV cache, cache_prompt:true, primary)
+//   Bifrost :3040                  (L2 semantic cache wrapper)
+//   Ollama :11434                  (last-resort fallback, reloads weights)
+const TURBOQUANT_URL = process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
+const BIFROST_URL    = process.env.BIFROST_URL    ?? 'http://127.0.0.1:3040';
 const MCP_URL    = process.env.MCP_URL ?? 'http://127.0.0.1:8788';
 const DB_URL     = process.env.DATABASE_URL;
 
@@ -114,22 +120,40 @@ async function pullPostgresSignals() {
   const c = new pg.Client({ connectionString: DB_URL, connectionTimeoutMillis: 3000 });
   try {
     await c.connect();
-    // Loosened filter: rules may be NULL, '[]', or non-array shape on partial
-    // ingests — only require the column actually contains a JSONB array with
-    // ≥1 entry. jsonb_typeof guards against scalar/object shapes that would
-    // throw on jsonb_array_length.
+    // The AGENTS.md generator currently emits Audit Gates / TODO / Fix Timeline
+    // sections instead of structured Rules JSONB (parser/generator mismatch
+    // documented in next_steps/active/2026-05-08_schema-consolidation-production-ready.md
+    // P0.2). Until Machine Envelope JSON lands, treat any indexed AGENTS.md
+    // with a non-empty summary or constraints/tools array as a "rule-bearing"
+    // directive — gives the rerank prompt useful context immediately.
+    // Column is `file_path` (not `path`) — verified via information_schema.
+    // Earlier query selecting `path` failed silently in the catch and returned
+    // [], which is why the aggregator showed `agent_context_files = 0+`
+    // despite 373 indexed rows. Use file_path; loosened predicate accepts
+    // any envelope that has at least one structured field populated.
     const r = await c.query(`
-      SELECT path, jsonb_array_length(rules) AS rule_count, indexed_at
+      SELECT file_path AS path,
+             COALESCE(jsonb_array_length(rules), 0)
+               + COALESCE(jsonb_array_length(constraints), 0)
+               + COALESCE(jsonb_array_length(tools), 0)
+               + (CASE WHEN length(coalesce(summary, '')) > 50 THEN 1 ELSE 0 END) AS rule_count,
+             indexed_at
       FROM agent_context_files
-      WHERE rules IS NOT NULL
-        AND jsonb_typeof(rules) = 'array'
-        AND jsonb_array_length(rules) > 0
-      ORDER BY jsonb_array_length(rules) DESC, indexed_at DESC
+      WHERE (jsonb_typeof(rules)       = 'array' AND jsonb_array_length(rules) > 0)
+         OR (jsonb_typeof(constraints) = 'array' AND jsonb_array_length(constraints) > 0)
+         OR (jsonb_typeof(tools)       = 'array' AND jsonb_array_length(tools) > 0)
+         OR length(coalesce(summary, '')) > 50
+      ORDER BY rule_count DESC, indexed_at DESC
       LIMIT 30
     `);
     return { agentsRules: r.rows };
-  } catch { return { agentsRules: [] }; }
-  finally { await c.end().catch(() => {}); }
+  } catch (err) {
+    // Don't silent-swallow — surface the error so column drift / migration
+    // mismatches don't masquerade as "0 rows" forever (this is exactly the
+    // bug that hid `path` vs `file_path` for the whole session).
+    if (!STDOUT) console.warn(`   ⚠ Postgres agentsRules query failed: ${err.message}`);
+    return { agentsRules: [] };
+  } finally { await c.end().catch(() => {}); }
 }
 
 function readDoc(rel) {
@@ -181,11 +205,17 @@ function fuseScores(redis, dirtySet) {
   // Karpathy GPU pass — keys here are usually 'src/lib/server/...'
   // karpathy stores authority per-file from its own blend; only adopt if the
   // authority pass didn't already set it (rare overlap → prefer authority).
+  // Field names: karpathy uses 'pr' / 'attn' (abbreviated for compact JSON).
+  // Accept either form so the aggregator works no matter which writer
+  // populated the row. Verified payload shape via redis-cli HGET:
+  //   {"pr":7.061965,"attn":0.998511,"authority":0.5549,"blend":3.290809}
   for (const [file, v] of Object.entries(redis.karpathy)) {
     const e = entry(normalizeAtlasPath(file), file);
-    e.attention = v.attention ?? e.attention ?? 0;
+    const attn = v.attn ?? v.attention ?? 0;
+    const pr   = v.pr   ?? v.pagerank  ?? 0;
+    if (attn) e.attention = attn;
     e.karpBlend = v.blend ?? 0;
-    if (!e.pagerank && v.pagerank) e.pagerank = v.pagerank;
+    if (!e.pagerank && pr)           e.pagerank  = pr;
     if (!e.authority && v.authority) e.authority = v.authority;
   }
 
@@ -241,22 +271,69 @@ async function gemma4Rerank(top, agentsRules, timelineMd) {
     'Format as Markdown bullets. No preamble.',
   ].join('\n');
 
-  try {
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model:   LLM_MODEL,
-        prompt,
-        stream:  false,
-        options: { temperature: 0.3, num_predict: 600 },
-      }),
-      signal: AbortSignal.timeout(60_000),
-    });
-    if (!res.ok) return null;
-    const j = await res.json();
-    return (j.response ?? '').trim();
-  } catch { return null; }
+  // Wrap the prompt in explicit Gemma turn markers. The fine-tuned
+  // gemma4-legal-vlm breaks Ollama's auto-applied chat template AND
+  // TurboQuant's /v1/chat/completions endpoint (both return empty when GPU
+  // is under VRAM pressure). Raw /v1/completions with explicit
+  // <start_of_turn>...<end_of_turn> tokens works reliably (~3s, 800+ chars
+  // on the same hardware where /chat/completions returns 0 chars).
+  const gemmaPrompt =
+    `<start_of_turn>user\n${prompt}<end_of_turn>\n<start_of_turn>model\n`;
+
+  // Tier 1: TurboQuant /v1/completions with cache_prompt for KV reuse.
+  //   - Persistent KV cache (q8_0) means subsequent calls with the same
+  //     system-prompt prefix hit the cache instead of re-tokenizing.
+  //   - cache_prompt:true is the llama-server flag that enables this.
+  async function callTurboQuant() {
+    try {
+      const res = await fetch(`${TURBOQUANT_URL}/v1/completions`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model:        LLM_MODEL,
+          prompt:       gemmaPrompt,
+          max_tokens:   600,
+          temperature:  0.3,
+          cache_prompt: true,
+          stop:         ['<end_of_turn>', '<start_of_turn>'],
+        }),
+        signal: AbortSignal.timeout(45_000),
+      });
+      if (!res.ok) return null;
+      const j = await res.json();
+      const out = (j.choices?.[0]?.text ?? '').trim();
+      return out || null;
+    } catch { return null; }
+  }
+
+  // Tier 2: Ollama /api/chat (fallback — competes with TurboQuant for VRAM
+  // but doesn't always need the same KV state).
+  async function callOllama() {
+    try {
+      const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model:    LLM_MODEL,
+          messages: [{ role: 'user', content: prompt }],
+          stream:   false,
+          options:  { temperature: 0.3, num_predict: 600 },
+        }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!res.ok) return null;
+      const j = await res.json();
+      const out = (j.message?.content ?? j.response ?? '').trim();
+      return out || null;
+    } catch { return null; }
+  }
+
+  const tq = await callTurboQuant();
+  if (tq) return tq;
+  if (!STDOUT) console.warn('   ⚠ TurboQuant rerank empty — falling back to Ollama');
+  const ol = await callOllama();
+  if (ol) return ol;
+  return null;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -304,6 +381,9 @@ async function main() {
   const lines = [
     '# Codebase TODO Recommendations',
     '',
+    '> **This file is auto-generated** by `npm run skill:codebase-todo`.',
+    '> For human-edited planning + commentary, see [`2026-05-08_pipeline-driven-next-actions.md`](./2026-05-08_pipeline-driven-next-actions.md).',
+    '>',
     `> Generated: ${now} | Top-${LIMIT} by fused authority + Karpathy GPU + dirty-file signal`,
     `> Sources: Redis ace:authority:top + gpu:karpathy:scores + ace:rank:dirty_files,`,
     `>          Postgres agent_context_files, MCP clusters.get_summary_lenses,`,
