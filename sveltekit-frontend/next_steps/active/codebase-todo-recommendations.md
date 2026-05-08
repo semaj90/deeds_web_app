@@ -1,5 +1,5 @@
 # Codebase TODO Recommendations
-> Generated: 2026-05-08T04:13:36Z | Top-25 by fused authority + Karpathy GPU + dirty-file signal
+> Generated: 2026-05-08T04:34:36Z | Top-25 by fused authority + Karpathy GPU + dirty-file signal
 > Sources: Redis ace:authority:top + gpu:karpathy:scores + ace:rank:dirty_files,
 >          Postgres agent_context_files, MCP clusters.get_summary_lenses,
 >          docs/agent_timeline_synthesis.md
@@ -8,31 +8,31 @@
 ## Ranked Targets
 | # | File | Blend | PR | Authority | Attention | Dirty | Reasons |
 |---|------|-------|----|-----------|-----------|-------|---------|
-| 1 | `src/lib/server/db/client.ts` | 0.288 | 0.00 | 0.00 | 0.00 | · | — |
-| 2 | `src/lib/server/env.server.ts` | 0.221 | 0.00 | 0.00 | 0.00 | · | — |
-| 3 | `src/lib/server/redis.ts` | 0.171 | 0.00 | 0.00 | 0.00 | · | — |
-| 4 | `src/lib/server/ollama.ts` | 0.154 | 0.00 | 0.00 | 0.00 | · | — |
-| 5 | `src/lib/server/middleware/cache-headers.ts` | 0.144 | 0.00 | 0.00 | 0.00 | · | — |
-| 6 | `lib/server/analytics/research-summaries-db.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 7 | `lib/server/graph/gpu-graph-analysis.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 8 | `lib/server/ai/kv-context-controller.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 9 | `lib/server/queue/rabbitmq-manager-fixed.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 10 | `lib/server/analytics/research-graph-rl.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 11 | `lib/server/db/unified-client.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 12 | `lib/server/graph/graph-intel.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 13 | `lib/server/ace/hmm-wiki-logger.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 14 | `lib/server/llm/contextual-chat.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 15 | `lib/server/ace/ngram-retrieval.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 16 | `lib/server/graph/user-interaction-sync.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 17 | `lib/server/embedding/embed-schema.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 18 | `lib/server/analytics/mapreduce-matrix-analysis.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 19 | `lib/server/legal/constitution-pipeline.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 20 | `lib/server/couchdb/memory-mirror.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 21 | `routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 22 | `lib/db/schema.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 23 | `lib/server/graph/codebase-cluster-detection.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 24 | `lib/server/engagement/idle-reengagement.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
-| 25 | `lib/server/graph/neo4j-schema.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | — |
+| 1 | `src/lib/server/db/client.ts` | 0.510 | 0.00 | 0.55 | 0.00 | · | authority=0.55 |
+| 2 | `src/lib/server/env.server.ts` | 0.370 | 0.00 | 0.37 | 0.00 | · | — |
+| 3 | `src/lib/server/redis.ts` | 0.311 | 0.15 | 0.35 | 0.00 | · | unclassified:community-2516 |
+| 4 | `src/lib/server/ollama.ts` | 0.284 | 0.00 | 0.32 | 0.00 | · | — |
+| 5 | `src/lib/server/middleware/cache-headers.ts` | 0.247 | 0.00 | 0.26 | 0.00 | · | — |
+| 6 | `src/routes/api/test/redis-direct/+server.ts` | 0.240 | 0.00 | 0.36 | 0.00 | · | — |
+| 7 | `src/lib/server/grpc/embedding-client.ts` | 0.237 | 0.15 | 0.35 | 0.00 | · | unclassified:community-2493 |
+| 8 | `src/lib/server/gpu/libtorch-bridge.ts` | 0.234 | 0.15 | 0.35 | 0.00 | · | unclassified:community-2475 |
+| 9 | `src/lib/server/vector/qdrant-manager.ts` | 0.212 | 0.00 | 0.29 | 0.00 | · | — |
+| 10 | `src/lib/server/observability/langfuse.ts` | 0.209 | 0.00 | 0.23 | 0.00 | · | — |
+| 11 | `src/lib/config/env.server.ts` | 0.205 | 0.00 | 0.20 | 0.00 | · | — |
+| 12 | `src/lib/server/db/utils.ts` | 0.201 | 0.00 | 0.27 | 0.00 | · | — |
+| 13 | `src/lib/server/db/schema/library-documents.ts` | 0.199 | 0.00 | 0.26 | 0.00 | · | — |
+| 14 | `src/lib/server/db/relations.ts` | 0.198 | 0.00 | 0.25 | 0.00 | · | — |
+| 15 | `src/lib/server/db/schema/legal-citations.ts` | 0.198 | 0.00 | 0.26 | 0.00 | · | — |
+| 16 | `src/lib/server/db/schema-evidence-crud.ts` | 0.197 | 0.00 | 0.26 | 0.00 | · | — |
+| 17 | `src/lib/server/observability/inference-log.ts` | 0.191 | 0.00 | 0.21 | 0.00 | · | — |
+| 18 | `src/lib/server/cache.ts` | 0.188 | 0.00 | 0.22 | 0.00 | · | — |
+| 19 | `src/lib/server/lucia.ts` | 0.184 | 0.00 | 0.22 | 0.00 | · | — |
+| 20 | `src/lib/server/analysis/worker.ts` | 0.181 | 0.00 | 0.21 | 0.00 | · | — |
+| 21 | `src/lib/server/gpu/simdjson-bridge.ts` | 0.181 | 0.00 | 0.21 | 0.00 | · | — |
+| 22 | `src/lib/server/neo4j-driver.ts` | 0.177 | 0.00 | 0.20 | 0.00 | · | — |
+| 23 | `src/lib/server/minio-client.ts` | 0.177 | 0.00 | 0.20 | 0.00 | · | — |
+| 24 | `src/lib/server/retrieval/context-buffer.ts` | 0.171 | 0.00 | 0.20 | 0.00 | · | — |
+| 25 | `lib/server/analytics/research-summaries-db.ts` | 0.140 | 0.15 | 0.35 | 0.00 | · | unclassified:community-2436 |
 ## Provenance
 - Redis authority: `HLEN ace:authority:top` = 200
 - Karpathy GPU:    `HLEN gpu:karpathy:scores` = 24
