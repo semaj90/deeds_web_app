@@ -187,6 +187,12 @@ node -e "const a=require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node')
 - ✅ Keep `DATABASE_URL_FALLBACK` removed
 - ✅ Add/keep startup smoke for atlas and hypergraph
 - ✅ Ensure `seed:hit-demand` remains in the safe startup lane (`allowedOnStartup`)
+- ✅ Adaptive guards on every refresh command — second-run is no-op when nothing changed:
+  - `ace:hit-demand`     — `chunk_hit_log.max(id)` watermark in `ace:rank:demand:meta:water`
+  - `hypergraph:seed`    — per-edge `edge_hash` skip when membership unchanged
+  - `karpathy:gpu`       — input-hash short-circuit (verified: 2174ms → 366ms when unchanged)
+  - `skill:codebase-todo`— input-hash cache hit returning cached `ace:todo:latest`
+  - All four respect `--force` to override
 
 ### P1 — Improve signal quality
 
