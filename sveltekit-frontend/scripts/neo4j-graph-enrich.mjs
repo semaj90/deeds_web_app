@@ -59,6 +59,9 @@ if (!process.env.NEO4J_PASSWORD && !process.env.NEO4J_PASS) {
 const QDRANT_URL  = process.env.QDRANT_URL       ?? 'http://127.0.0.1:6333';
 const QDRANT_COLL = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
 const DB_URL      = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+if (!process.env.DATABASE_URL) {
+  console.warn('   ⚠ DATABASE_URL not set in environment — using hardcoded dev default. Add to .env: DATABASE_URL=postgresql://...');
+}
 const REDIS_URL   = process.env.REDIS_URL        ?? 'redis://127.0.0.1:6379';
 const REDIS_TTL   = 6 * 3600; // 6 h
 const GRAPH_NAME  = 'codeGraph';
@@ -439,6 +442,7 @@ async function main() {
     gates: {},
   };
 
+  try {
   // ── GATE GDS1: Neo4j reachable ────────────────────────────────────────────
   let neo4jOk = false;
   try {
@@ -785,8 +789,13 @@ async function main() {
   console.log(`   Authority scores: ${enriched.length}  Communities: ${summary.communities}`);
   console.log(`   Qdrant patched: ${summary.qdrantPatched}  Redis cached: ${summary.redisCached}`);
 
-  if (redis) redis.disconnect();
-  await pool.end();
+  } finally {
+    // Always release connection pools so the script exits cleanly even after
+    // an exception above. ioredis would otherwise hold the event loop open
+    // retrying, and pg.Pool would emit "client connections still active".
+    if (redis) redis.disconnect();
+    await pool.end().catch(() => {});
+  }
 }
 
 main().catch(err => { console.error('\n❌ GDS enrichment failed:', err); process.exit(1); });
