@@ -127,10 +127,23 @@ outer: while (true) {
     const topoClass = String(pt.payload?.topo_class ?? '');
     const somCluster = pt.payload?.som_cluster ?? pt.payload?.somCluster;
 
-    // Determine cluster_key
+    // Determine cluster_key. Convention is `<namespace>:<id>` where namespace ∈
+    // {gpu, som, dir, topo}. SOM cluster IDs come from the GPU k-means pass and
+    // MUST be serialized with the `gpu:` prefix because that's what MCP tool
+    // clusters.get_members queries for. Previous logic preferred topo_class
+    // over `gpu` whenever both were set, producing keys like `unclassified:0`,
+    // `legal-evidence:2`, `server:92` — which the MCP tool can't find since it
+    // only knows the `gpu:` namespace. topo_class is a separate dimension
+    // already stored in its own payload field — don't conflate it with cluster_key.
     let clusterKey = fileClusterMap.get(filePath) ?? fileClusterMap.get(filePath.replace(/^src\//, ''));
     if (!clusterKey) {
-      clusterKey = somCluster != null ? `${topoClass}:${somCluster}` : (topoClass || 'general');
+      if (somCluster != null) {
+        clusterKey = `gpu:${somCluster}`;
+      } else if (topoClass) {
+        clusterKey = `topo:${topoClass}`;
+      } else {
+        clusterKey = 'general';
+      }
     }
 
     // code_relations stores paths relative to src/ (no "src/" prefix)

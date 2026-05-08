@@ -252,21 +252,28 @@ function buildGateSection(relDir, dirStats) {
 
 // ── Generate TODO section ─────────────────────────────────────────────────────
 function buildTodoSection(relDir, dirStats) {
+  // dirStats may be sparse (Redis ACE data is stale or graphify:full hasn't
+  // been run recently). Stats-derived TODOs (untested + hotspot) get skipped
+  // when stats are missing, but gate-derived TODOs still emit since they
+  // depend only on the static gate→directory mapping. Previously the entire
+  // TODO section was skipped via `if (!stats) return ''` which silently
+  // dropped G17/G27/G54-G55/G8a-b TODOs from every AGENTS.md whenever Redis
+  // was sparse — making the directory wikis look healthier than they were.
   const stats = dirStats.get(relDir);
-  if (!stats) return '';
-
   const todos = [];
   const { gates } = gatesForDir(relDir);
 
-  // High fan-in files lacking tests
-  const untested = stats.files.filter(f => f.fanIn >= 10 && !f.file.includes('.test.') && !f.file.includes('.spec.'));
-  for (const u of untested.sort((a,b) => b.fanIn - a.fanIn).slice(0, 5)) {
-    todos.push(`- [ ] **test-coverage** \`${u.file}\` fanIn=${u.fanIn} — add G26-pattern test (${u.fanIn} consumers depend on this)`);
-  }
+  if (stats) {
+    // High fan-in files lacking tests
+    const untested = stats.files.filter(f => f.fanIn >= 10 && !f.file.includes('.test.') && !f.file.includes('.spec.'));
+    for (const u of untested.sort((a,b) => b.fanIn - a.fanIn).slice(0, 5)) {
+      todos.push(`- [ ] **test-coverage** \`${u.file}\` fanIn=${u.fanIn} — add G26-pattern test (${u.fanIn} consumers depend on this)`);
+    }
 
-  // Hotspot warnings
-  for (const h of stats.hotspotFiles.slice(0, 3)) {
-    todos.push(`- [ ] **hotspot** \`${h.file}\` (fanIn=${h.fanIn}) — consider splitting or adding circuit breaker; top callers: ${h.topCallers.slice(0,3).map(c => '`' + c.split('/').pop() + '`').join(', ')}`);
+    // Hotspot warnings
+    for (const h of stats.hotspotFiles.slice(0, 3)) {
+      todos.push(`- [ ] **hotspot** \`${h.file}\` (fanIn=${h.fanIn}) — consider splitting or adding circuit breaker; top callers: ${h.topCallers.slice(0,3).map(c => '`' + c.split('/').pop() + '`').join(', ')}`);
+    }
   }
 
   // Gate-specific TODOs based on which gates are mapped
