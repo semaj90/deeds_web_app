@@ -360,26 +360,45 @@ server.tool(
     stableKey: z.string().describe('Node stableKey to find community for'),
   },
   async ({ stableKey }) => {
+    // Neo4j CodebaseFile nodes key on filePath (without "src/" prefix), not stableKey.
+    // Accept multiple input shapes: "src/foo.ts", "foo.ts", "file:src/foo.ts:Symbol".
+    const stripped = stableKey.replace(/^file:/, '').replace(/:[^/]*$/, '');
+    const candidates = Array.from(new Set([
+      stableKey,
+      stripped,
+      stripped.replace(/^src\//, ''),
+      `src/${stripped}`,
+    ]));
     const rows = await neo4jQuery(
-      `MATCH (n {stableKey: $key})
+      `MATCH (n:CodebaseFile)
+       WHERE n.filePath IN $keys OR n.id IN $keys
        OPTIONAL MATCH (n)-[:MEMBER_OF]->(c:GPUCluster)
        OPTIONAL MATCH (n)-[:BELONGS_TO_COMMUNITY]->(cm:Community)
-       RETURN n.gpuCluster AS gpuCluster, n.somCluster AS somCluster,
-              c.clusterId AS clusterNodeId, cm.communityId AS communityId,
-              n.clusterKey AS clusterKey`,
-      { key: stableKey }
+       RETURN n.filePath        AS filePath,
+              n.gpuCluster      AS gpuCluster,
+              n.communityId     AS communityId,
+              c.clusterId       AS clusterNodeId,
+              cm.communityId    AS communityNodeId,
+              n.clusterKey      AS clusterKey
+       LIMIT 1`,
+      { keys: candidates }
     );
     const row = rows[0]?.row ?? [];
+    if (row.length === 0) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        stableKey, error: 'no community found — node not in Neo4j',
+      }, null, 2) }] };
+    }
     return {
       content: [{
         type: 'text' as const,
         text: JSON.stringify({
           stableKey,
-          gpuCluster:    row[0],
-          somCluster:    row[1],
-          clusterNodeId: row[2],
-          communityId:   row[3],
-          clusterKey:    row[4],
+          filePath:        row[0],
+          gpuCluster:      row[1],
+          communityId:     row[2] ?? row[4],  // prefer node prop, fall back to relationship
+          clusterNodeId:   row[3],
+          clusterKey:      row[5],
         }, null, 2),
       }],
     };
@@ -395,25 +414,36 @@ server.tool(
     nodeType:  z.string().optional().describe('Filter by Neo4j label, e.g. "CodebaseFile"'),
   },
   async ({ limit, nodeType }) => {
-    // Try Redis cache of PageRank scores first
-    try {
-      const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
-      const raw = await redis.get('couchdb:pagerank_scores') as string | null;
-      await redis.quit();
-      if (raw) {
-        const scores: Record<string, number> = JSON.parse(raw);
-        let entries = Object.entries(scores).map(([k, v]) => ({ stableKey: k, pageRank: v }));
-        if (nodeType) entries = entries.filter(e => e.stableKey.startsWith(nodeType.toLowerCase() + ':'));
-        entries.sort((a, b) => b.pageRank - a.pageRank);
-        return { content: [{ type: 'text' as const, text: JSON.stringify(entries.slice(0, limit), null, 2) }] };
-      }
-    } catch { /* fall through to Neo4j */ }
+    // Redis cache stores raw file paths (no `codebasefile:` prefix); skip cache when
+    // a label filter is supplied since Neo4j is the only source that carries labels.
+    if (!nodeType) {
+      try {
+        const { default: Redis } = await import('ioredis');
+        const redis = new Redis(REDIS_URL);
+        const raw = (await redis.get('couchdb:pagerank_scores')) as string | null;
+        await redis.quit();
+        if (raw) {
+          const scores: Record<string, number> = JSON.parse(raw);
+          const entries = Object.entries(scores)
+            .map(([k, v]) => ({ stableKey: k, pageRank: v }))
+            .sort((a, b) => b.pageRank - a.pageRank)
+            .slice(0, limit);
+          return { content: [{ type: 'text' as const, text: JSON.stringify(entries, null, 2) }] };
+        }
+      } catch { /* fall through to Neo4j */ }
+    }
 
+    // Property is `graphPageRank` (written by GDS pipeline), not `pageRankScore`.
+    // Use labels(n)[0] for the actual Neo4j label, not a `n.label` property.
+    // CodebaseFile nodes use `filePath` (camelCase), not `stableKey`. Coalesce to
+    // whichever identity property exists on the node so this works for non-CodebaseFile
+    // labels too.
     const label = nodeType ? `:${nodeType}` : '';
     const rows = await neo4jQuery(
-      `MATCH (n${label}) WHERE n.pageRankScore IS NOT NULL
-       RETURN n.stableKey AS stableKey, n.pageRankScore AS score, n.label AS label
+      `MATCH (n${label}) WHERE n.graphPageRank IS NOT NULL
+       RETURN coalesce(n.stableKey, n.filePath, n.relativePath, n.path) AS stableKey,
+              n.graphPageRank AS score,
+              labels(n)[0] AS label
        ORDER BY score DESC LIMIT $limit`,
       { limit }
     );
