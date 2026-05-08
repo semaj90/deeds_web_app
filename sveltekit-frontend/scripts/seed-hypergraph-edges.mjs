@@ -72,17 +72,39 @@ function edgeHash(edgeType, memberKeys) {
 }
 
 async function main() {
-  // 1. Pull all gpu:N clusters that meet the size band.
+  // 1. Pull all gpu:N clusters that meet the size band, joined to
+  //    code_retrieval_chunks so we can aggregate the cluster's SOM cell
+  //    centroid + dominant topo_class + manifold4 centroid in one pass.
+  //
+  //    Why join here: the hypergraph_edges schema has slots for som_cluster,
+  //    som_cell, manifold4, topo_class — but Lane A only wrote gpu_cluster.
+  //    Filling these turns each cluster_context edge into a full 4D node so
+  //    topology.search_4d / topology.same_som_cluster / atlas dir cards can
+  //    all use the same edge as the join key.
   const { rows: clusters } = await pool.query(
-    `SELECT cluster_key,
-            count(*) AS n_members,
-            array_agg(coalesce(file_path, stable_key) ORDER BY stable_key) AS members
-       FROM qdrant_cluster_members
-      WHERE cluster_key LIKE 'gpu:%'
-      GROUP BY cluster_key
-     HAVING count(*) BETWEEN $1 AND $2
-      ORDER BY count(*) DESC
-      LIMIT $3`,
+    `WITH per_cluster AS (
+       SELECT m.cluster_key,
+              count(*)                                            AS n_members,
+              array_agg(coalesce(m.file_path, m.stable_key)
+                        ORDER BY m.stable_key)                    AS members,
+              -- SOM centroid (cell = "row,col" stringified)
+              avg(c.manifold4_x)::real                            AS m4x,
+              avg(c.manifold4_y)::real                            AS m4y,
+              avg(c.manifold4_z)::real                            AS m4z,
+              avg(c.manifold4_w)::real                            AS m4w,
+              -- Dominant topo_class (most-common across members)
+              mode() WITHIN GROUP (ORDER BY c.topo_class)         AS topo_class,
+              -- Topo_byte mode for the SOM-cell stub (when manifold4 missing)
+              mode() WITHIN GROUP (ORDER BY c.topo_byte)          AS topo_byte
+         FROM qdrant_cluster_members m
+         LEFT JOIN code_retrieval_chunks c ON c.file_path = m.file_path
+        WHERE m.cluster_key LIKE 'gpu:%'
+        GROUP BY m.cluster_key
+       HAVING count(*) BETWEEN $1 AND $2
+        ORDER BY count(*) DESC
+        LIMIT $3
+     )
+     SELECT * FROM per_cluster`,
     [MIN_MEMBERS, MAX_MEMBERS, LIMIT],
   );
   console.log(`   ${clusters.length} cluster(s) eligible (size ${MIN_MEMBERS}-${MAX_MEMBERS})`);
@@ -113,20 +135,39 @@ async function main() {
       continue;
     }
 
+    // Topology centroid (k-means cluster IS the SOM cluster — gpu:N labels
+    // come from the unified k-means+SOM pipeline). When manifold4 is null
+    // (file not yet topo-tagged), we leave the slot null so callers can tell
+    // the difference between "centroid is origin" and "no data".
+    const manifold4 = (c.m4x != null && c.m4y != null && c.m4z != null && c.m4w != null)
+      ? [Number(c.m4x), Number(c.m4y), Number(c.m4z), Number(c.m4w)]
+      : null;
+    const somCluster = gpuId;                                   // shared label space
+    const somCell    = manifold4
+      ? `${manifold4[0].toFixed(2)},${manifold4[1].toFixed(2)}` // x,y centroid as the cell key
+      : null;
+    const topoClass  = c.topo_class || null;
+
     // Upsert edge row
     const { rows: edgeRows, rowCount } = await pool.query(
       `INSERT INTO hypergraph_edges (
          edge_hash, edge_type, member_ids, title, summary,
          grade_label, grade_score, confidence, source,
-         gpu_cluster, weight, run_id, label, metadata
+         gpu_cluster, som_cluster, som_cell, manifold4, topo_class,
+         weight, run_id, label, metadata
        ) VALUES ($1, 'cluster_context', $2, $3, $4, $5, $6, 0.85, 'qdrant_cluster_members',
-                 $7, $8, $9, $10, $11::jsonb)
+                 $7, $8, $9, $10::real[], $11,
+                 $12, $13, $14, $15::jsonb)
        ON CONFLICT (edge_hash) DO UPDATE SET
          member_ids  = EXCLUDED.member_ids,
          title       = EXCLUDED.title,
          summary     = EXCLUDED.summary,
          grade_label = EXCLUDED.grade_label,
          grade_score = EXCLUDED.grade_score,
+         som_cluster = EXCLUDED.som_cluster,
+         som_cell    = EXCLUDED.som_cell,
+         manifold4   = EXCLUDED.manifold4,
+         topo_class  = EXCLUDED.topo_class,
          weight      = EXCLUDED.weight,
          run_id      = EXCLUDED.run_id,
          updated_at  = now()
@@ -134,8 +175,15 @@ async function main() {
       [
         hash, memberKeys, title, summary,
         grade.label, grade.score,
-        gpuId, weight, RUN_ID, c.cluster_key,
-        JSON.stringify({ source: 'cluster_context', n_members: memberKeys.length, run_id: RUN_ID }),
+        gpuId, somCluster, somCell, manifold4, topoClass,
+        weight, RUN_ID, c.cluster_key,
+        JSON.stringify({
+          source: 'cluster_context',
+          n_members: memberKeys.length,
+          run_id: RUN_ID,
+          topo_class: topoClass,
+          som_centroid: manifold4,
+        }),
       ],
     );
     if (rowCount === 0) { skipped++; continue; }
