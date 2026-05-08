@@ -4116,22 +4116,52 @@ export const communityReports = pgTable('community_reports', {
 	builtAtIdx: index('community_reports_built_at_idx').on(table.builtAt),
 }));
 
-/** Hypergraph edges — durable Postgres mirror of Redis hg:edge:* keys */
+/**
+ * Hypergraph edges — durable Postgres mirror of Redis hg:edge:* keys.
+ *
+ * NOTE: schema declared here mirrors the LIVE table (verified via
+ * `\d hypergraph_edges` on 2026-05-08). Earlier Drizzle declaration was
+ * 10 of 25 columns — Drizzle-based readers saw `unknown column "title"`
+ * even though psql resolved fine. Full 25-column declaration below.
+ *
+ * Index list also synced (8 live indexes), including the FTS-friendly
+ * topo_class / som_cluster / glyph_cluster covering indexes added
+ * during the Lane A seeder pass.
+ */
 export const hypergraphEdges = pgTable('hypergraph_edges', {
-	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	edgeHash: varchar('edge_hash', { length: 64 }).notNull(),
-	memberIds: text('member_ids').array().notNull().default(sql`'{}'::text[]`),
-	gradeLabel: varchar('grade_label', { length: 4 }).notNull().default('D'),
-	gradeScore: real('grade_score').notNull().default(0),
-	gpuCluster: integer('gpu_cluster'),
-	communityId: integer('community_id'),
-	metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
-	createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
-	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+	id:           uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	edgeHash:     varchar('edge_hash', { length: 64 }).notNull(),
+	edgeId:       text('edge_id'),
+	edgeType:     text('edge_type').notNull().default('generic'),
+	memberIds:    text('member_ids').array().notNull().default(sql`'{}'::text[]`),
+	title:        text('title'),
+	summary:      text('summary'),
+	gradeLabel:   varchar('grade_label', { length: 4 }).notNull().default('D'),
+	gradeScore:   real('grade_score').notNull().default(0),
+	confidence:   real('confidence').notNull().default(0.5),
+	source:       text('source'),
+	gpuCluster:   integer('gpu_cluster'),
+	communityId:  integer('community_id'),
+	topoClass:    text('topo_class'),
+	somCluster:   integer('som_cluster'),
+	glyphCluster: text('glyph_cluster'),
+	somCell:      text('som_cell'),
+	manifold4:    real('manifold4').array(),
+	metadata:     jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+	createdAt:    timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+	updatedAt:    timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+	label:        text('label'),
+	queryHash:    text('query_hash'),
+	runId:        uuid('run_id'),
+	weight:       real('weight').notNull().default(0),
 }, (table) => ({
-	edgeHashUq: unique('hypergraph_edges_edge_hash_uq').on(table.edgeHash),
-	gradeIdx: index('hypergraph_edges_grade_idx').on(table.gradeLabel),
-	clusterIdx: index('hypergraph_edges_cluster_idx').on(table.gpuCluster),
+	edgeHashUq:        unique('hypergraph_edges_edge_hash_uq').on(table.edgeHash),
+	gradeIdx:          index('hypergraph_edges_grade_idx').on(table.gradeLabel),
+	clusterIdx:        index('hypergraph_edges_cluster_idx').on(table.gpuCluster),
+	edgeTypeIdx:       index('hypergraph_edges_edge_type_idx').on(table.edgeType),
+	topoClassIdx:      index('hypergraph_edges_topo_class_idx').on(table.topoClass),
+	somClusterIdx:     index('hypergraph_edges_som_cluster_idx').on(table.somCluster),
+	glyphClusterIdx:   index('hypergraph_edges_glyph_cluster_idx').on(table.glyphCluster),
 }));
 
 /** Enrichment job tracking — one row per background enrichment run */
