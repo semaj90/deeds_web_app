@@ -463,8 +463,13 @@ await Promise.all([
       ? readdirSync(runsDir).filter(d => /^\d{4}/.test(d)).sort().reverse()
       : [];
     if (!runs.length) throw new Error('WARN: no synthesis runs');
-    const wf = resolve(runsDir, runs[0], 'synthesis_grpo_wiring.json');
-    if (!existsSync(wf)) throw new Error('WARN: no grpo wiring artifact — run wire:synthesis:grpo');
+    // Walk newest-first to find the most recent run that has the artifact.
+    // wire-synthesis-grpo only writes into runs that have synthesis_summary.json,
+    // so the latest dir may legitimately lack the wiring file.
+    const wf = runs
+      .map(name => resolve(runsDir, name, 'synthesis_grpo_wiring.json'))
+      .find(p => existsSync(p));
+    if (!wf) throw new Error('WARN: no grpo wiring artifact — run wire:synthesis:grpo');
     const w = JSON.parse(readFileSync(wf, 'utf8'));
     const sum = w.summary ?? {};
     return `critical=${sum.critical ?? 0} high=${sum.high ?? 0} medium=${sum.medium ?? 0} low=${sum.low ?? 0}`;
