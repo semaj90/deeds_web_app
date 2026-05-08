@@ -119,6 +119,24 @@ function addEdge(source_key, target_key, relation, weight = 1.0, evidence = {}) 
   edges.push({ source_key, target_key, relation, weight, evidence });
 }
 
+/**
+ * qdrant_cluster_members.cluster_key has inconsistent shapes:
+ *   "gpu:42"      — already namespaced (correct)
+ *   ":21"         — bare bigint, missing namespace → assume gpu:N
+ *   "general"     — scalar without colon → keep
+ *   "dir:src/lib" — directory-fallback (correct)
+ * Normalise to "cluster:<ns>:<id>" or "cluster:<scalar>".
+ */
+function normalizeClusterKey(raw) {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  if (/^:\d+$/.test(s))   return `cluster:gpu${s}`;   // ":21" → "cluster:gpu:21"
+  if (s === 'general')    return `cluster:general`;
+  if (s.includes(':'))    return `cluster:${s}`;      // "gpu:42" → "cluster:gpu:42"
+  return `cluster:${s}`;                              // "foo"  → "cluster:foo"
+}
+
 // 1. PARENT_OF — directory tree
 const { rows: files } = await pool.query(`
   SELECT stable_key, directory_path FROM agent_context_files ORDER BY directory_path
@@ -169,7 +187,9 @@ const { rows: covCluster } = await pool.query(`
   GROUP BY a.stable_key, m.cluster_key
 `).catch(() => ({ rows: [] }));
 for (const r of covCluster) {
-  addEdge(r.stable_key, `cluster:${r.cluster_key}`, 'COVERS_CLUSTER',
+  const normalized = normalizeClusterKey(r.cluster_key);
+  if (!normalized) continue;
+  addEdge(r.stable_key, normalized, 'COVERS_CLUSTER',
           Math.min(1.0, parseInt(r.n_members, 10) / 20),
           { n_members: parseInt(r.n_members, 10) });
 }
@@ -250,7 +270,25 @@ console.log(`    REFERENCES_FILE:   ${refFile}`);
 // 8. OVERRIDES — heuristic skipped (needs rule conflict detection; rare without P0 envelope work)
 console.log(`    OVERRIDES:         0  (skipped — needs rule-text NLP)`);
 
-console.log(`\n  TOTAL edges: ${edges.length}`);
+// Dedup within the build — multiple sources can collapse to the same edge
+// after key normalisation. Postgres ON CONFLICT can't see same-batch duplicates,
+// so collapse here: keep max(weight) and concatenate evidence arrays.
+const dedupMap = new Map();
+for (const e of edges) {
+  const k = `${e.source_key}\0${e.target_key}\0${e.relation}`;
+  const ex = dedupMap.get(k);
+  if (ex) {
+    ex.weight = Math.max(ex.weight, e.weight);
+    ex.evidence = { ...ex.evidence, ...e.evidence, _merged_count: (ex.evidence._merged_count ?? 1) + 1 };
+  } else {
+    dedupMap.set(k, { ...e });
+  }
+}
+const dedupedEdges = [...dedupMap.values()];
+const collapsed = edges.length - dedupedEdges.length;
+edges.length = 0;
+edges.push(...dedupedEdges);
+console.log(`\n  TOTAL edges: ${edges.length}${collapsed > 0 ? `  (${collapsed} merged after dedup)` : ''}`);
 
 // ── Persist ─────────────────────────────────────────────────────────────────
 if (DRY_RUN) {

@@ -364,13 +364,40 @@ ${fileList}
 ${clusterSection}${topoLines.includes('none recorded') ? '' : `## Topological neighbors
 
 ${topoLines}
-`}${patternsList ? `## Patterns
-
-${patternsList}
-` : ''}${warningsList ? `## Warnings
-
-${warningsList}
-` : ''}${pageRankList ? `## PageRank top-5 (in this directory)
+`}${(() => {
+  // Canonical envelope sections (Rules/Tools/Constraints/Tags) — these are what
+  // src/lib/server/agents-md/parse-agents-md.ts looks for. Derive from existing
+  // data so re-running agents:write fills the envelope JSONB columns automatically.
+  const out = [];
+  if (patternsList) {
+    out.push(`## Rules\n`);
+    out.push(`> Conventions to follow inside this directory. Derived from cluster patterns + nearby AGENTS.md.\n`);
+    out.push(patternsList);
+    out.push('');
+  }
+  if (warningsList) {
+    out.push(`## Constraints\n`);
+    out.push(`> Forbidden / risky patterns. Derived from audit warnings + gate FAILs.\n`);
+    out.push(warningsList);
+    out.push('');
+  }
+  // Tools section: mirror the agentic tool-calling list as bullets the parser can read.
+  const toolNames = ['kag.multi_lane_search', 'graph.expand_neighborhood', 'topology.same_som_cluster',
+                     'clusters.get_members', 'context.build_kv_packet', 'taxonomy.children'];
+  out.push(`## Tools\n`);
+  out.push(`> MCP tools the Gemma4 agent should reach for inside this directory.`);
+  for (const t of toolNames) out.push(`- ${t}`);
+  out.push('');
+  // Tags section: cluster.tags already has them — emit as bullets so parser picks them up.
+  if (cluster?.tags?.length) {
+    out.push(`## Qdrant Tags\n`);
+    for (const t of cluster.tags.slice(0, 8)) {
+      out.push(`- ${typeof t === 'string' ? t : (t.tag ?? '')}`);
+    }
+    out.push('');
+  }
+  return out.join('\n');
+})()}${pageRankList ? `## PageRank top-5 (in this directory)
 
 ${pageRankList}
 ` : ''}${gatesData.gates.length > 0 ? `## Audit Gates
@@ -658,31 +685,67 @@ if (DRY_RUN) {
   if (tasks.length > 12) console.log(`  ... and ${tasks.length - 12} more`);
 } else {
   let humanEdited = 0;
+  let skippedReadError = 0;
+  let skippedShrink = 0;
+  let backedUp = 0;
+  // Safeguards toggle — `--force` bypasses size-shrink + read-error protection.
+  // Always honoured: human-edited preservation (no marker = skip).
+  const FORCE = argv.includes('--force');
+  const SHRINK_RATIO = 0.5;          // refuse to write if new < 50% of existing size
+  const BACKUP_DELTA_BYTES = 2048;   // back up files where the diff is > 2 KB
   for (const t of tasks) {
     // Idempotency: never clobber a file the user hand-wrote (no AGENTS-GEN marker)
     if (existsSync(t.path)) {
+      let existing;
       try {
-        const existing = readFileSync(t.path, 'utf-8');
-        if (!existing.includes(HEADER_MARKER)) {
-          humanEdited++;
-          console.log(`  ⏸  ${path.relative(REPO_ROOT, t.path)}  (human-edited, preserved)`);
+        existing = readFileSync(t.path, 'utf-8');
+      } catch (err) {
+        // Fail-closed: never blindly overwrite a file we can't read.
+        if (FORCE) {
+          console.log(`  ⚠  ${path.relative(REPO_ROOT, t.path)}  (unreadable — overwriting under --force: ${err.message})`);
+          existing = '';
+        } else {
+          skippedReadError++;
+          console.log(`  ✗  ${path.relative(REPO_ROOT, t.path)}  (unreadable, skipped — re-run with --force to overwrite: ${err.message})`);
           continue;
         }
-        // Preserve any AGENTS-ENRICH block (or other enrichment) that lives
-        // ABOVE the AGENTS-GEN marker so enrich-agents-md.mjs output is not lost.
-        const genIdx = existing.indexOf(HEADER_MARKER);
-        // Find where the H1 heading ends (first blank line after it)
-        const h1End = existing.indexOf('\n\n');
-        const prefixBlock = (h1End !== -1 && h1End < genIdx)
-          ? existing.slice(h1End + 2, genIdx)   // content between H1 and GEN marker
-          : '';
-        if (prefixBlock.trim()) {
-          // Splice preserved enrichment between the H1 line and the GEN block
-          const h1Line = t.content.split('\n')[0]; // "# AGENTS.md — `dir`"
-          const afterH1 = t.content.slice(h1Line.length);
-          t.content = h1Line + '\n\n' + prefixBlock + afterH1;
-        }
-      } catch { /* unreadable — overwrite */ }
+      }
+      if (!existing.includes(HEADER_MARKER)) {
+        humanEdited++;
+        console.log(`  ⏸  ${path.relative(REPO_ROOT, t.path)}  (human-edited, preserved)`);
+        continue;
+      }
+      // Preserve any AGENTS-ENRICH block (or other enrichment) that lives
+      // ABOVE the AGENTS-GEN marker so enrich-agents-md.mjs output is not lost.
+      const genIdx = existing.indexOf(HEADER_MARKER);
+      const h1End = existing.indexOf('\n\n');
+      const prefixBlock = (h1End !== -1 && h1End < genIdx)
+        ? existing.slice(h1End + 2, genIdx)
+        : '';
+      if (prefixBlock.trim()) {
+        const h1Line = t.content.split('\n')[0];
+        const afterH1 = t.content.slice(h1Line.length);
+        t.content = h1Line + '\n\n' + prefixBlock + afterH1;
+      }
+
+      // Size-shrink guard: if the new content is dramatically smaller than the
+      // existing file, refuse to write — usually means a data source went empty
+      // (Redis cleared, graph JSON missing) and we'd nuke real content.
+      const existingSize = Buffer.byteLength(existing, 'utf8');
+      const newSize = Buffer.byteLength(t.content, 'utf8');
+      if (!FORCE && existingSize > 1024 && newSize < existingSize * SHRINK_RATIO) {
+        skippedShrink++;
+        console.log(`  ✗  ${path.relative(REPO_ROOT, t.path)}  (would shrink ${existingSize}→${newSize} bytes; skipped — use --force to override)`);
+        continue;
+      }
+
+      // Backup on substantial change so a bad regen can be reverted via .bak file.
+      if (Math.abs(newSize - existingSize) > BACKUP_DELTA_BYTES) {
+        try {
+          writeFileSync(`${t.path}.bak`, existing, 'utf8');
+          backedUp++;
+        } catch { /* non-fatal */ }
+      }
     }
     mkdirSync(path.dirname(t.path), { recursive: true });
     writeFileSync(t.path, t.content, 'utf8');
@@ -702,7 +765,13 @@ if (DRY_RUN) {
     }
   }
   const mirrored = redis ? `, mirrored to Redis agents:dir:* (${wrote} keys, 24h TTL)` : '';
-  console.log(`✓ wrote ${wrote} AGENTS.md file(s)${humanEdited ? `, preserved ${humanEdited} human-edited` : ''}${mirrored}`);
+  const guarded = [
+    humanEdited && `${humanEdited} human-edited preserved`,
+    skippedShrink && `${skippedShrink} shrink-guarded`,
+    skippedReadError && `${skippedReadError} unreadable-skipped`,
+    backedUp && `${backedUp} backed up to .bak`,
+  ].filter(Boolean).join(', ');
+  console.log(`✓ wrote ${wrote} AGENTS.md file(s)${guarded ? ` (${guarded})` : ''}${mirrored}`);
 }
 
 if (redis) await redis.quit();
