@@ -13,6 +13,15 @@ import { topologySearchTool }                              from './tools/topolog
 import { graphExpandNeighborhoodTool, graphShortestPathTool } from './tools/graph-analysis.tool.js';
 import { clusterSummaryLensesTool }                        from './tools/cluster-lenses.tool.js';
 import { traceKagSearchTool }                              from './tools/trace-kag.tool.js';
+import {
+  vaultSearchTool,
+  vaultReadTool,
+  vaultFollowLinksTool,
+  vaultResolveEmbeddingTool,
+  retrievalQdrantLookupTool,
+  agentExplainClusterTool,
+  agentProposeFixTool,
+} from './tools/vault-walker.tool.js';
 
 const server = new FastMCP({
   name:    'deeds-codebase-intel',
@@ -31,5 +40,21 @@ const server = new FastMCP({
 (server.addTool as (t: any) => void)(clusterSummaryLensesTool);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server.addTool as (t: any) => void)(traceKagSearchTool);
+
+// Vault walker — 7 read-only tools over the Obsidian codebase vault
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(vaultSearchTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(vaultReadTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(vaultFollowLinksTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(vaultResolveEmbeddingTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(retrievalQdrantLookupTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(agentExplainClusterTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(agentProposeFixTool);
 
 server.start({ transportType: 'stdio' });
