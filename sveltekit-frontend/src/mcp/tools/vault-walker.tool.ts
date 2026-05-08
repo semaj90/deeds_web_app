@@ -44,10 +44,43 @@ async function getPgPool(): Promise<PgPool | null> {
   if (!url) return null;
   try {
     const pg = (await import('pg')).default;
-    _pgPool = new pg.Pool({ connectionString: url, max: 2 }) as unknown as PgPool;
+    const pool = new pg.Pool({
+      connectionString:       url,
+      max:                    5,
+      idleTimeoutMillis:      30_000,
+      connectionTimeoutMillis: 5_000,
+      keepAlive:              true,
+      allowExitOnIdle:        true,
+    });
+    // Suppress idle-client errors (e.g. server hangup on long-lived connection)
+    // — pool.query() will silently re-acquire on next call.
+    (pool as unknown as { on: (e: string, fn: (e: Error) => void) => void }).on('error', () => {});
+    _pgPool = pool as unknown as PgPool;
     return _pgPool;
   } catch {
     return null;
+  }
+}
+
+// Resilient query wrapper: on "Connection terminated" or transient socket
+// errors, drop the cached pool and retry once. Required because the
+// dual-DB Postgres setup (5434 → 5432 proxy) drops idle TCP connections
+// aggressively.
+async function pgQueryWithRetry(
+  pool: PgPool,
+  sql: string,
+  args?: unknown[],
+): Promise<{ rows: Array<Record<string, unknown>> }> {
+  try {
+    return await pool.query(sql, args);
+  } catch (e) {
+    const msg = (e as Error).message ?? '';
+    if (!/terminated|ECONNRESET|EPIPE|connection.*closed/i.test(msg)) throw e;
+    // Drop cached pool so getPgPool() spins up a fresh one on the retry.
+    _pgPool = null;
+    const fresh = await getPgPool();
+    if (!fresh) throw e;
+    return await fresh.query(sql, args);
   }
 }
 
@@ -426,14 +459,16 @@ type HyperedgeRow = {
   members: string[];
   metadata: Record<string, unknown>;
 };
+type EdgeLane = 'cluster_context' | 'shared_resource' | 'agents_context' | 'vault_link';
+
 async function searchHyperedges(
   query: string,
-  edgeType: 'cluster_context' | 'shared_resource' | 'agents_context',
+  edgeType: EdgeLane,
   limit: number,
 ): Promise<HyperedgeRow[]> {
   const pool = await getPgPool();
   if (!pool) return [];
-  const { rows } = await pool.query(
+  const { rows } = await pgQueryWithRetry(pool,
     `SELECT id::text AS id, edge_type, label, weight::real AS weight,
             title, summary, grade_label,
             COALESCE(member_ids, ARRAY[]::text[]) AS members,
@@ -453,18 +488,19 @@ async function searchHyperedges(
 export const hypergraphSearchByLaneTool = {
   name: 'hypergraph.searchByLane',
   description:
-    'Search the 3-lane hyperedge graph by edge_type. ' +
+    'Search the 4-lane hyperedge graph by edge_type. ' +
     'Lane A (cluster_context) = GPU k-means cohesion. ' +
     'Lane B (shared_resource) = files coupled by same DB table / Qdrant collection / Redis key / Neo4j label. ' +
     'Lane C (agents_context) = AGENTS.md scopes sharing tag vocabulary (jaccard ≥ 0.4). ' +
+    'Lane D (vault_link)     = vault MD files all linking to the same target (shared-reference). ' +
     'Read-only Postgres query against hypergraph_edges. Returns ranked edges with members + metadata.',
   parameters: z.object({
     query: z.string().min(1).describe('Keyword or phrase (matched against title, summary, label)'),
-    lane: z.enum(['cluster_context', 'shared_resource', 'agents_context'])
+    lane: z.enum(['cluster_context', 'shared_resource', 'agents_context', 'vault_link'])
       .describe('Which lane to query'),
     limit: z.number().int().min(1).max(50).default(10).optional(),
   }),
-  execute: async (args: { query: string; lane: 'cluster_context' | 'shared_resource' | 'agents_context'; limit?: number }) => {
+  execute: async (args: { query: string; lane: EdgeLane; limit?: number }) => {
     const limit = args.limit ?? 10;
     const rows = await searchHyperedges(args.query, args.lane, limit);
     return JSON.stringify({
@@ -536,7 +572,7 @@ export const agentProposeFixTool = {
       .slice(0, 2);
     const probes = [...new Set([fileStem, dirStem, ...topicWords].filter(Boolean))];
 
-    async function unionLane(lane: 'cluster_context' | 'shared_resource' | 'agents_context', perProbe: number) {
+    async function unionLane(lane: EdgeLane, perProbe: number) {
       const seen = new Map<string, HyperedgeRow>();
       for (const p of probes) {
         const rows = await searchHyperedges(p, lane, perProbe).catch(() => []);
@@ -546,10 +582,11 @@ export const agentProposeFixTool = {
       return [...seen.values()].slice(0, perProbe * 2);
     }
 
-    const [laneA, laneB, laneC] = await Promise.all([
+    const [laneA, laneB, laneC, laneD] = await Promise.all([
       unionLane('cluster_context', 3),
       unionLane('shared_resource', 5),
       unionLane('agents_context', 3),
+      unionLane('vault_link',      3),
     ]);
 
     const fmtHit = (r: HyperedgeRow) =>
@@ -591,6 +628,11 @@ export const agentProposeFixTool = {
       ``,
       laneC.length ? laneC.map(fmtHit).join('\n') : '_no matching agents_context edges_',
       ``,
+      `## Lane D — shared vault references (${laneD.length} hyperedges)`,
+      `_Vault notes that all wikilink to the same target (shared-reference clusters)._`,
+      ``,
+      laneD.length ? laneD.map(fmtHit).join('\n') : '_no matching vault_link edges_',
+      ``,
       `## Recommended next steps`,
       `1. \`vault.read("${vaultPath}")\` — full file note`,
       `2. \`retrieval.qdrantLookup("${note.fm.embedding_id ?? `qdrant://codebase_chunks_768/${args.file_path}`}")\` — semantic chunks`,
@@ -610,7 +652,8 @@ export const agentProposeFixTool = {
       lanes: {
         cluster_context: laneA.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
         shared_resource: laneB.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
-        agents_context: laneC.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
+        agents_context:  laneC.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
+        vault_link:      laneD.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
       },
       proposal_markdown: proposalMd,
     });
