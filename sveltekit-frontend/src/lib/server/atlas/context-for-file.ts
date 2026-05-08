@@ -175,13 +175,26 @@ async function loadDirectoryCard(
   dir: string,
 ): Promise<RawDirCard | null> {
   if (!redis) return null;
-  const key = `ace:atlas:dir:${dirSlug(dir)}`;
-  try {
-    const raw = await redis.get(key);
-    return safeParse<RawDirCard>(raw);
-  } catch {
-    return null;
+  // build-atlas-index.mjs writes slugs from the src/-prefixed shape
+  // ('src_lib_server_db'), but callers may pass either the normalized
+  // shape ('lib/server/db') or the original ('src/lib/server/db'). Try
+  // both forms — first match wins.
+  const candidates = [
+    dirSlug(dir),
+    dirSlug(`src/${dir}`),
+    dirSlug(dir.replace(/^src\//, '')),
+  ];
+  const seen = new Set<string>();
+  for (const slug of candidates) {
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    try {
+      const raw = await redis.get(`ace:atlas:dir:${slug}`);
+      const parsed = safeParse<RawDirCard>(raw);
+      if (parsed) return parsed;
+    } catch { /* try next */ }
   }
+  return null;
 }
 
 async function loadDirtySet(redis: Redis | null): Promise<Set<string>> {
