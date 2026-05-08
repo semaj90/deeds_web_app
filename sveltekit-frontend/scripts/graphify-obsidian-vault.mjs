@@ -47,6 +47,8 @@ const TOP_CLUSTERS = parseInt(arg('top-clusters', '20'), 10);
 const FILES_LIMIT  = parseInt(arg('files-limit', '0'), 10) || Infinity;
 const SKIP_CANVAS  = args.includes('--no-canvas');
 const CLEAN        = args.includes('--clean');
+const FORCE        = args.includes('--force');
+const INCREMENTAL  = args.includes('--incremental');
 
 const log = (...m) => console.log('[obsidian]', ...m);
 
@@ -70,6 +72,26 @@ const fm = (obj) => '---\n' + Object.entries(obj)
   .filter(([, v]) => v !== undefined)
   .map(([k, v]) => `${k}: ${yamlValue(v)}`)
   .join('\n') + '\n---\n';
+
+// ── Adaptive guard: skip rebuild if source graph hasn't changed ────────────
+// Compares mtime(codebase-graph.json) against vault's agent-manifest.json.
+async function shouldSkip() {
+  if (FORCE || CLEAN) return false;
+  if (!INCREMENTAL)    return false;
+  const { stat } = await import('node:fs/promises');
+  try {
+    const srcMtime  = (await stat(resolve(ROOT, 'docs/graph/codebase-graph.json'))).mtimeMs;
+    const vaultStat = await stat(join(VAULT_DIR, 'agent-manifest.json')).catch(() => null);
+    if (!vaultStat) return false;
+    if (srcMtime <= vaultStat.mtimeMs) {
+      log(`incremental: source graph unchanged since vault was built — skipping rebuild`);
+      log(`  (pass --force to rebuild anyway)`);
+      return true;
+    }
+  } catch { /* missing inputs handled below */ }
+  return false;
+}
+if (await shouldSkip()) process.exit(0);
 
 // ── Load inputs ────────────────────────────────────────────────────────────
 async function loadJson(rel) {
@@ -104,7 +126,7 @@ try {
     const p = join(runsDir, r, 'authority_scores.json');
     if (existsSync(p)) {
       const j = JSON.parse(await readFile(p, 'utf8'));
-      const arr = Array.isArray(j) ? j : (j.scores ?? j.authority ?? []);
+      const arr = Array.isArray(j) ? j : (j.topScores ?? j.scores ?? j.authority ?? []);
       for (const row of arr) {
         const k = row.stableKey ?? row.path ?? row.rel;
         if (k) authorityMap.set(k, row);
@@ -144,6 +166,60 @@ function resolveClusterId(rel) {
   return -1;
 }
 
+// ── Pre-pass: per-file pagerank, per-cluster aggregates, cluster↔cluster sim ─
+const filePagerank = new Map();
+for (const f of files) {
+  if (!f.rel) continue;
+  const a = authorityMap.get(f.rel) ?? authorityMap.get(`src/${f.rel}`) ?? {};
+  filePagerank.set(f.rel, Number(a.score ?? a.pageRank ?? a.pagerank ?? a.graphPageRank ?? 0) || 0);
+}
+
+// Cluster aggregates — pagerank_sum, top_tags, risk
+const clusterAgg = new Map();
+for (const c of clusters) {
+  const memberPaths = [
+    ...(c.memberFiles ?? []).map((m) => m.path),
+    ...(c.topPaths    ?? []).map((m) => m.path),
+  ].filter(Boolean);
+  const uniq = [...new Set(memberPaths)];
+  const prSum = uniq.reduce((s, p) => s + (filePagerank.get(p) ?? 0), 0);
+  const prMax = uniq.reduce((m, p) => Math.max(m, filePagerank.get(p) ?? 0), 0);
+  const summary = summaries.get(c.id) ?? {};
+  // risk: high if low-confidence summary AND low pagerank exposure ; high pr ⇒ high blast radius
+  const risk = (!summary.summary && prMax > 0.05) ? 'high'
+             : (!summary.summary)                  ? 'medium'
+             : (prMax > 0.1)                       ? 'medium'
+             :                                       'low';
+  clusterAgg.set(c.id, {
+    members: uniq,
+    pagerank_sum: +prSum.toFixed(6),
+    pagerank_max: +prMax.toFixed(6),
+    top_tags: (c.topTags ?? []).slice(0, 5).map((t) => t.tag),
+    risk,
+  });
+}
+
+// Cluster ↔ cluster jaccard on top-tags (for `same::` Breadcrumbs edges)
+const clusterTags = new Map();
+for (const c of clusters) {
+  clusterTags.set(c.id, new Set((c.topTags ?? []).slice(0, 8).map((t) => t.tag)));
+}
+function clusterNeighbors(cid, threshold = 0.3, limit = 5) {
+  const a = clusterTags.get(cid) ?? new Set();
+  if (a.size === 0) return [];
+  const scores = [];
+  for (const c of clusters) {
+    if (c.id === cid) continue;
+    const b = clusterTags.get(c.id) ?? new Set();
+    if (b.size === 0) continue;
+    let inter = 0;
+    for (const t of a) if (b.has(t)) inter++;
+    const j = inter / (a.size + b.size - inter);
+    if (j >= threshold) scores.push({ id: c.id, j });
+  }
+  return scores.sort((x, y) => y.j - x.j).slice(0, limit);
+}
+
 // ── Vault dirs ─────────────────────────────────────────────────────────────
 if (CLEAN && existsSync(VAULT_DIR)) {
   log(`Cleaning ${VAULT_DIR}…`);
@@ -151,6 +227,7 @@ if (CLEAN && existsSync(VAULT_DIR)) {
 }
 await mkdir(join(VAULT_DIR, 'Clusters'), { recursive: true });
 await mkdir(join(VAULT_DIR, 'Files'),    { recursive: true });
+await mkdir(join(VAULT_DIR, 'Indexes'),  { recursive: true });
 
 // ── Cluster notes ──────────────────────────────────────────────────────────
 log(`Writing ${clusters.length} cluster notes…`);
@@ -171,21 +248,28 @@ for (const c of clusters) {
     ...(summary.bowTerms ?? []).slice(0, 5).map((t) => `topic/${String(t).replace(/[^\w-]+/g, '_')}`),
   ];
 
-  // Breadcrumbs typed edges: cluster.contains → file ; cluster.same → other clusters
-  // (We populate `same` per cluster after we know all cluster ids — done below.)
+  const agg = clusterAgg.get(c.id) ?? { pagerank_sum: 0, pagerank_max: 0, top_tags: [], risk: 'low' };
+  const neighbors = clusterNeighbors(c.id);
+
   const front = fm({
     type: 'cluster',
+    cluster_id: `cluster-${c.id}`,
     clusterId: c.id,
     topic,
     aliases: [`cluster-${c.id}`, topic].filter(Boolean),
     memberCount: c.size ?? uniqMembers.length,
+    pagerank_sum: agg.pagerank_sum,
+    pagerank_max: agg.pagerank_max,
+    risk: agg.risk,
+    top_tags: agg.top_tags,
     llmHits: summary.llmTotalHits ?? 0,
     summaryMode: summary.summaryMode ?? null,
     confidence: summary.summary ? 'high' : (summary.bowTerms?.length ? 'medium' : 'low'),
     last_updated_by_llm: NOW_ISO,
     'ai-first': true,
-    // Breadcrumbs typed-edge fields (Juggl picks up as colored edges):
+    // Breadcrumbs typed-edge fields (Juggl renders as colored edges):
     contains: uniqMembers.slice(0, 50).map((p) => `[[Files/${slug(p)}]]`),
+    same:     neighbors.map((n) => `[[Clusters/cluster-${n.id}]]`),
     tags,
   });
 
@@ -196,12 +280,25 @@ for (const c of clusters) {
     '## For future Claude',
     summary.summary
       ? `> ${summary.summary}`
-      : `> Cluster of ${uniqMembers.length} files. Top dirs: ${(c.topDirs ?? []).slice(0, 3).map((d) => d.dir).join(', ')}. Top tags: ${(c.topTags ?? []).slice(0, 3).map((t) => t.tag).join(', ')}.`,
+      : `> Cluster of ${uniqMembers.length} files. Top dirs: ${(c.topDirs ?? []).slice(0, 3).map((d) => d.dir).join(', ')}. Top tags: ${agg.top_tags.slice(0, 3).join(', ')}. Risk: ${agg.risk}.`,
     summary.purpose ? `\n**Purpose:** ${summary.purpose}` : '',
     '',
-    // Dataview inline fields — queryable via Dataview, picked up by Extended Graph for filtering
+    // Dataview inline fields — queryable + Extended Graph filterable
+    `cluster:: cluster-${c.id}`,
     `cluster_id:: ${c.id}`,
     `member_count:: ${uniqMembers.length}`,
+    `pagerank_sum:: ${agg.pagerank_sum}`,
+    `risk:: ${agg.risk}`,
+    `top_tags:: ${agg.top_tags.join(', ')}`,
+    '',
+    '## Agent hints',
+    `Use this cluster when investigating ${agg.top_tags.slice(0, 3).join(', ') || 'these files'}.`,
+    `Risk: **${agg.risk}** (pagerank_max=${agg.pagerank_max}, confidence=${summary.summary ? 'high' : 'medium/low'}).`,
+    '',
+    '## Main dependencies',
+    neighbors.length
+      ? neighbors.map((n) => `- same:: [[Clusters/cluster-${n.id}]] (jaccard ${n.j.toFixed(2)})`).join('\n')
+      : '_no strongly-related clusters_',
     '',
     '## Top Directories',
     ...(c.topDirs ?? []).slice(0, 10).map((d) => `- \`${d.dir}\` (${d.count})`),
@@ -215,7 +312,7 @@ for (const c of clusters) {
     '',
     '## Backlinks (Dataview)',
     '```dataview',
-    `LIST FROM [[]] WHERE cluster_id = ${c.id}`,
+    `LIST FROM "Files" WHERE clusterId = ${c.id} SORT pagerank DESC LIMIT 30`,
     '```',
   ].filter(Boolean).join('\n');
 
@@ -250,7 +347,7 @@ for (const f of sortedFiles) {
   ].filter(Boolean);
 
   const auth = authorityMap.get(rel) ?? authorityMap.get(`src/${rel}`) ?? {};
-  const pagerank = Number(auth.pageRank ?? auth.pagerank ?? auth.graphPageRank ?? 0) || 0;
+  const pagerank = Number(auth.score ?? auth.pageRank ?? auth.pagerank ?? auth.graphPageRank ?? 0) || 0;
   const blend    = Number(auth.blend ?? auth.graphAuthorityScore ?? 0) || 0;
 
   const importLinks = (f.imports ?? [])
@@ -498,6 +595,148 @@ const indexBody = [
 ].join('\n');
 
 await writeFile(join(VAULT_DIR, 'index.md'), indexBody);
+
+// ── Generated dataview indexes ─────────────────────────────────────────────
+const indexNotes = {
+  'High-Risk-Files.md': {
+    title: 'High-Risk Files',
+    purpose: 'Files with high blast radius (pagerank > 0.05) OR low LLM confidence.',
+    query: [
+      '```dataview',
+      'TABLE clusterId AS cluster, pagerank, blend, confidence, lineCount AS lines',
+      'FROM "Files"',
+      'WHERE confidence = "low" OR pagerank > 0.05',
+      'SORT pagerank DESC',
+      'LIMIT 50',
+      '```',
+    ].join('\n'),
+  },
+  'Low-Confidence-Summaries.md': {
+    title: 'Low-Confidence Summaries',
+    purpose: 'Notes the LLM was uncertain about — candidates for manual review or re-summarization.',
+    query: [
+      '```dataview',
+      'TABLE confidence, clusterId AS cluster, lineCount AS lines, pagerank',
+      'FROM "Files"',
+      'WHERE confidence != "high"',
+      'SORT pagerank DESC',
+      'LIMIT 50',
+      '```',
+    ].join('\n'),
+  },
+  'Top-PageRank-Files.md': {
+    title: 'Top PageRank Files',
+    purpose: 'Highest authority files in the import graph — start investigations here.',
+    query: [
+      '```dataview',
+      'TABLE pagerank, clusterId AS cluster, blend, isRoute, hasAuth, lineCount AS lines',
+      'FROM "Files"',
+      'WHERE pagerank > 0',
+      'SORT pagerank DESC',
+      'LIMIT 30',
+      '```',
+    ].join('\n'),
+  },
+  'Cluster-Entry-Points.md': {
+    title: 'Cluster Entry Points',
+    purpose: 'Top file in each cluster (by pagerank) — minimal navigation set.',
+    query: [
+      '```dataview',
+      'TABLE WITHOUT ID',
+      '  cluster_id AS Cluster,',
+      '  topic AS Topic,',
+      '  risk AS Risk,',
+      '  pagerank_sum AS PageRankSum,',
+      '  member_count AS Members',
+      'FROM "Clusters"',
+      'SORT pagerank_sum DESC',
+      'LIMIT 50',
+      '```',
+    ].join('\n'),
+  },
+};
+
+for (const [fname, spec] of Object.entries(indexNotes)) {
+  const front = fm({
+    type: 'index',
+    title: spec.title,
+    generated: NOW_ISO,
+    'ai-first': true,
+    tags: ['index', 'agent-readable'],
+  });
+  const body = [
+    front,
+    `# ${spec.title}`,
+    '',
+    `> ${spec.purpose}`,
+    '',
+    spec.query,
+  ].join('\n');
+  await writeFile(join(VAULT_DIR, 'Indexes', fname), body);
+}
+log(`  Indexes: ${Object.keys(indexNotes).length} dataview notes`);
+
+// ── Agent manifest (read-only contract for Gemma4 / MCP) ───────────────────
+const agentManifest = {
+  vault_version: NOW_ISO,
+  generated_by: 'graphify-obsidian-vault.mjs',
+  collections: {
+    files:    'Files/',
+    clusters: 'Clusters/',
+    indexes:  'Indexes/',
+  },
+  canvases: {
+    full_map:   'codebase.canvas',
+    cluster_kg: 'kg.canvas',
+  },
+  retrieval: {
+    qdrant_collection:   'codebase_chunks_768',
+    embedding_id_scheme: 'qdrant://codebase_chunks_768/<path>',
+    neo4j_node_label:    'CodebaseFile',
+    neo4j_pagerank_property: 'pageRank',
+  },
+  schema: {
+    file_frontmatter: ['type', 'path', 'aliases', 'clusterId', 'pagerank', 'blend', 'confidence', 'embedding_id', 'last_updated_by_llm', 'ai-first', 'up', 'imports', 'tags'],
+    cluster_frontmatter: ['type', 'cluster_id', 'clusterId', 'topic', 'aliases', 'memberCount', 'pagerank_sum', 'pagerank_max', 'risk', 'top_tags', 'confidence', 'contains', 'same', 'tags'],
+    typed_edges: {
+      up:       'BELONGS_TO_CLUSTER (file → cluster)',
+      contains: 'CONTAINS (cluster → file)',
+      same:     'SIMILAR_TOPOLOGY (cluster ↔ cluster, jaccard ≥ 0.3 on top-tags)',
+      imports:  'IMPORTS (file → file, local imports only)',
+    },
+  },
+  agent_policy: {
+    read_only: true,
+    allowed_actions: [
+      'search_notes',
+      'read_note',
+      'follow_links',
+      'resolve_embedding_id',
+      'qdrant_lookup',
+      'generate_plan',
+      'propose_fix_markdown',
+    ],
+    forbidden_actions: [
+      'patch_code',
+      'mutate_qdrant',
+      'mutate_postgres',
+      'mutate_redis',
+      'mutate_neo4j',
+      'rewrite_vault',
+      'execute_shell',
+    ],
+  },
+  stats: {
+    file_notes:    fileNotes,
+    cluster_notes: clusterFiles,
+    index_notes:   Object.keys(indexNotes).length,
+  },
+};
+await writeFile(
+  join(VAULT_DIR, 'agent-manifest.json'),
+  JSON.stringify(agentManifest, null, 2),
+);
+log('  agent-manifest.json written (read-only policy)');
 
 // ── Plugin config + README ─────────────────────────────────────────────────
 // Breadcrumbs hierarchy config — Juggl picks these up as typed colored edges.
