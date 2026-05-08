@@ -187,6 +187,15 @@ async function runIncrementalLane(redis) {
     // re-running the 20+ min AST/GPU upstream chain.
     runStep('hypergraph seed', 'hypergraph:seed', { required: false, timeout: 120_000 });
 
+    // archive:llm — daily snapshot of every LLM-generated summary into Redis
+    // hash llm:summaries:archive:{YYYY-MM-DD} (30d TTL). Same defensive
+    // pattern as the hypergraph snapshot: lets the operator recover a bad
+    // synthesis pass without re-running the 20+ min upstream chain.
+    // Captures: codebase-todo, karpathy-gpu, agent-timeline, atlas-latest,
+    //           latest synthesis run files, all screenshot captions (24h).
+    // Idempotent — same-day re-runs atomically replace.
+    runStep('archive llm summaries', 'archive:llm', { required: false, timeout: 60_000 });
+
     await redis.hset('ace:startup:latest', {
       head,
       changedCount: String(relevant.length),
