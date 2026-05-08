@@ -31,7 +31,9 @@
     "archive:llm:dry",
     "smoke:atlas",
     "smoke:hypergraph",
-    "atlas:prompt:smoke"
+    "atlas:prompt:smoke",
+    "index:codebase:fast:resume",
+    "atlas:index"
   ],
   "thresholds": {
     "smallChangeMaxFiles": 20,
