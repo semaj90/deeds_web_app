@@ -1694,7 +1694,9 @@ server.tool(
          LIMIT $2`,
         [stable, limit],
       );
-      const peers = rows.map(r => ({ peer: r.target_key, weight: r.weight, source: 'shares_tags' as const }));
+      // Union type so both branches push compatible records
+      type Peer = { peer: string; weight: number; source: 'shares_tags' | 'sibling-fallback' };
+      const peers: Peer[] = rows.map(r => ({ peer: r.target_key, weight: r.weight, source: 'shares_tags' as const }));
       // SHARES_TAGS empty → sibling fallback (envelope still sparse)
       if (peers.length === 0) {
         const parent = dirPath.split('/').slice(0, -1).join('/');
@@ -1706,7 +1708,7 @@ server.tool(
            LIMIT $3`,
           [parent, dirPath, limit],
         );
-        for (const s of sib) peers.push({ peer: s.stable_key, weight: 0.5, source: 'sibling-fallback' as const });
+        for (const s of sib) peers.push({ peer: s.stable_key, weight: 0.5, source: 'sibling-fallback' });
       }
       return { content: [{ type: 'text' as const, text: JSON.stringify({ dirPath, peers }, null, 2) }] };
     } catch (err) {
