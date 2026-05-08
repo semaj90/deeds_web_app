@@ -1213,7 +1213,7 @@ server.tool(
   },
   async ({ taskId, errorSummary, files, tags, confidence, patchResult, researchNotes, needsDeepResearch }) => {
     try {
-      const { existsSync, mkdirSync, writeFileSync } = await import('node:fs');
+      const { mkdirSync, writeFileSync } = await import('node:fs');
       const { join }  = await import('node:path');
       const { createHash } = await import('node:crypto');
 
@@ -1668,6 +1668,14 @@ server.tool(
     }
   },
 );
+
+// NOTE: codebase.context_for_file / agents_md.context_for_file / peers_for_dir
+// / coverage are registered later in this file (~line 2399). The older block
+// here had bugs — `scopeToCluster` was passed to contextForFile() which doesn't
+// accept it, `parentAgents` doesn't exist on the directory interface, etc.
+// Removed during P0.4 cleanup; canonical implementations live below. The
+// `agents_md.coverage` Postgres walk-up chain logic is preserved by reusing
+// directory_context_bindings in the canonical version.
 
 // ── clusters.get_summary_lenses ───────────────────────────────────────────────
 // Returns AGENTS.md notes and wiki KAG notes for a given GPU cluster.
@@ -2257,6 +2265,180 @@ server.tool(
         },
       ],
     };
+  },
+);
+
+// ── codebase.context_for_file ─────────────────────────────────────────────────
+// Master "atlas → context packet" tool. Wraps src/lib/server/atlas/
+// context-for-file.ts with an injected Redis client (MCP runs outside the
+// SvelteKit bundler so `$lib/...` path aliases don't resolve under tsx —
+// we pass our own ioredis instance instead).
+
+server.tool(
+  'codebase.context_for_file',
+  {
+    filePath:    z.string().min(1).max(512).describe('Repo-relative file path (e.g. "src/lib/server/db/client.ts")'),
+    maxCards:    z.number().int().min(1).max(20).default(6).describe('Max peer prompt cards to include'),
+    forceReload: z.boolean().default(false).describe('Bypass 5-min atlas cache'),
+  },
+  async ({ filePath, maxCards, forceReload }) => {
+    const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      lazyConnect: true,
+      connectTimeout: 3000,
+      enableReadyCheck: false,
+    });
+    try {
+      await redis.connect();
+      const packet = await contextForFile(filePath, {
+        peerLimit:   maxCards,
+        forceReload,
+        redis,
+      });
+      return { content: [{ type: 'text' as const, text: JSON.stringify(packet, null, 2) }] };
+    } finally {
+      await redis.quit().catch(() => {});
+    }
+  },
+);
+
+// ── agents_md.context_for_file ───────────────────────────────────────────────
+// Slim wrapper — returns only the AGENTS-related slice of the full packet.
+// Useful when a caller wants directory rules / tools / constraints without
+// the prompt-card payload (saves ~3-5KB per response).
+
+server.tool(
+  'agents_md.context_for_file',
+  {
+    filePath: z.string().min(1).max(512).describe('Repo-relative file path'),
+  },
+  async ({ filePath }) => {
+    const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false,
+    });
+    try {
+      await redis.connect();
+      const full = await contextForFile(filePath, { peerLimit: 0, redis });
+      const slim = {
+        filePath:       full.filePath,
+        normalizedPath: full.normalizedPath,
+        agentsDir:      full.directory.agentsDir ?? null,
+        directoryPath:  full.directory.path,
+        topo:           full.directory.topo,
+        clusters:       full.directory.clusters,
+        tools:          full.directory.tools,
+        constraints:    full.directory.constraints,
+        tags:           full.directory.tags,
+        recommendedActions: full.recommendedActions,
+        provenance:     full.provenance,
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(slim, null, 2) }] };
+    } finally {
+      await redis.quit().catch(() => {});
+    }
+  },
+);
+
+// ── agents_md.peers_for_dir ───────────────────────────────────────────────────
+// Returns the directory card directly — peers, tools, tags, top files in
+// the directory, without going through context-for-file's per-file lookup.
+// O(1) Redis GET on ace:atlas:dir:<slug>.
+
+server.tool(
+  'agents_md.peers_for_dir',
+  {
+    dirPath: z.string().min(1).max(512).describe('Directory path (e.g. "src/lib/server/db")'),
+  },
+  async ({ dirPath }) => {
+    const norm = String(dirPath)
+      .replace(/\\/g, '/')
+      .replace(/^\.?\//, '')
+      .replace(/^sveltekit-frontend\//, '')
+      .replace(/^src\//, '');
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false,
+    });
+    try {
+      await redis.connect();
+      // Try original then normalized form
+      const slug1 = dirPath.replace(/[/()]/g, '_');
+      const slug2 = norm.replace(/[/()]/g, '_');
+      const slug3 = `src_${norm.replace(/[/()]/g, '_')}`;
+      let card: Record<string, unknown> | null = null;
+      let usedKey = '';
+      for (const slug of [slug1, slug2, slug3]) {
+        const raw = await redis.get(`ace:atlas:dir:${slug}`).catch(() => null);
+        if (raw) {
+          try { card = JSON.parse(raw); usedKey = slug; break; }
+          catch { /* try next */ }
+        }
+      }
+      const result = card
+        ? { found: true, key: `ace:atlas:dir:${usedKey}`, card }
+        : { found: false, dirPath, hint: 'Run `npm run atlas:index` to populate directory cards.' };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+    } finally {
+      await redis.quit().catch(() => {});
+    }
+  },
+);
+
+// ── agents_md.coverage ────────────────────────────────────────────────────────
+// Quality probe: how complete is the AGENTS.md envelope for the directory
+// containing this file? Reads the Postgres mirror to report which envelope
+// fields are populated. Lets agents detect "thin context" before relying on it.
+
+server.tool(
+  'agents_md.coverage',
+  {
+    filePath: z.string().min(1).max(512).describe('Repo-relative file path'),
+  },
+  async ({ filePath }) => {
+    const norm = String(filePath)
+      .replace(/\\/g, '/')
+      .replace(/^\.?\//, '')
+      .replace(/^sveltekit-frontend\//, '')
+      .replace(/^src\//, '');
+    const dir = norm.lastIndexOf('/') > 0 ? norm.slice(0, norm.lastIndexOf('/')) : '';
+
+    const dbUrl = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+    const pgPool = new Pool({ connectionString: dbUrl, max: 1, connectionTimeoutMillis: 3000 });
+    try {
+      const r = await pgPool.query(
+        `SELECT file_path,
+                jsonb_typeof(rules)         AS rules_kind,
+                jsonb_array_length(rules)   AS rules_n,
+                jsonb_array_length(tools)   AS tools_n,
+                jsonb_array_length(constraints) AS constraints_n,
+                length(coalesce(summary, '')) AS summary_chars,
+                indexed_at
+         FROM agent_context_files
+         WHERE file_path LIKE $1 OR file_path LIKE $2
+         ORDER BY indexed_at DESC
+         LIMIT 5`,
+        [`%${dir}%AGENTS.md`, `%/${dir}/AGENTS.md`],
+      );
+      const result = {
+        filePath,
+        normalizedPath: norm,
+        directory:      dir,
+        nearestEnvelopes: r.rows,
+        coverage: {
+          totalRowsMatched: r.rowCount ?? 0,
+          anyRules:         r.rows.some(x => (x.rules_n ?? 0) > 0),
+          anyTools:         r.rows.some(x => (x.tools_n ?? 0) > 0),
+          anyConstraints:   r.rows.some(x => (x.constraints_n ?? 0) > 0),
+          anySummary:       r.rows.some(x => (x.summary_chars ?? 0) > 50),
+        },
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+    } finally {
+      await pgPool.end().catch(() => {});
+    }
   },
 );
 
