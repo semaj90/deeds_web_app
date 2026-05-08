@@ -213,7 +213,8 @@ await Promise.all([
   probe('neo4j', 'SOM topology edges (SIMILAR_TOPOLOGY)', async () => {
     const rows = await neo4j('MATCH ()-[r:SIMILAR_TOPOLOGY]->() RETURN count(r) AS c LIMIT 1');
     const c = rows[0]?.row?.[0] ?? 0;
-    return c > 0 ? `${c} edges` : 'WARN: no SIMILAR_TOPOLOGY edges — run graphify:topology';
+    if (c === 0) throw new Error('WARN: no SIMILAR_TOPOLOGY edges — run graphify:topology');
+    return `${c} edges`;
   }),
 
   probe('neo4j', 'IMPORTS edges', async () => {
@@ -446,9 +447,12 @@ await Promise.all([
 
   probe('artifacts', 'latest synthesis run', () => {
     const runsDir = resolve(ROOT, 'memory/runs');
-    if (!existsSync(runsDir)) throw new Error('no runs/ dir');
+    // Absence of synthesis runs is an installable/empty-fresh-checkout state,
+    // not a hard failure. Mirrors the GRPO wire artifact probe below which
+    // already uses WARN: for the identical "no runs" condition.
+    if (!existsSync(runsDir)) throw new Error('WARN: no runs/ dir — run graph:synthesize');
     const runs = readdirSync(runsDir).filter(d => /^\d{4}-\d{2}-\d{2}T/.test(d)).sort().reverse();
-    if (!runs.length) throw new Error('no synthesis runs');
+    if (!runs.length) throw new Error('WARN: no synthesis runs — run graph:synthesize');
     const latest = runs[0];
     const af = resolve(runsDir, latest, 'audit_failures.json');
     const failures = existsSync(af)
