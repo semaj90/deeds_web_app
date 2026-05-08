@@ -28,7 +28,28 @@
 import { z } from 'zod';
 import { readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { resolve, join, basename } from 'node:path';
+import { resolve, join } from 'node:path';
+
+// ── Lazy Postgres client (only initialized when hypergraph tools are called) ─
+type PgPool = { query: (sql: string, args?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> };
+let _pgPool: PgPool | null = null;
+async function getPgPool(): Promise<PgPool | null> {
+  if (_pgPool) return _pgPool;
+  // Lazy-load dotenv so the tool is self-contained when imported by smoke
+  // runners or the MCP stdio loop without an explicit env preload step.
+  if (!process.env.DATABASE_URL) {
+    try { (await import('dotenv')).default.config(); } catch { /* optional */ }
+  }
+  const url = process.env.DATABASE_URL;
+  if (!url) return null;
+  try {
+    const pg = (await import('pg')).default;
+    _pgPool = new pg.Pool({ connectionString: url, max: 2 }) as unknown as PgPool;
+    return _pgPool;
+  } catch {
+    return null;
+  }
+}
 
 // ── Vault root ─────────────────────────────────────────────────────────────
 const REPO_ROOT = resolve(process.cwd());
@@ -392,7 +413,80 @@ export const agentExplainClusterTool = {
   },
 } as const;
 
-// ── 7. agent.proposeFix ────────────────────────────────────────────────────
+// ── 7. hypergraph.searchByLane ─────────────────────────────────────────────
+// Direct Postgres query over hypergraph_edges; no SvelteKit dev server required.
+type HyperedgeRow = {
+  id: string;
+  edge_type: string;
+  label: string;
+  weight: number;
+  title: string;
+  summary: string;
+  grade_label: string;
+  members: string[];
+  metadata: Record<string, unknown>;
+};
+async function searchHyperedges(
+  query: string,
+  edgeType: 'cluster_context' | 'shared_resource' | 'agents_context',
+  limit: number,
+): Promise<HyperedgeRow[]> {
+  const pool = await getPgPool();
+  if (!pool) return [];
+  const { rows } = await pool.query(
+    `SELECT id::text AS id, edge_type, label, weight::real AS weight,
+            title, summary, grade_label,
+            COALESCE(member_ids, ARRAY[]::text[]) AS members,
+            COALESCE(metadata, '{}'::jsonb)       AS metadata
+       FROM hypergraph_edges
+      WHERE edge_type = $1
+        AND (title ILIKE '%' || $2 || '%'
+          OR summary ILIKE '%' || $2 || '%'
+          OR label ILIKE '%' || $2 || '%')
+      ORDER BY grade_score DESC, weight DESC
+      LIMIT $3`,
+    [edgeType, query, limit],
+  );
+  return rows as unknown as HyperedgeRow[];
+}
+
+export const hypergraphSearchByLaneTool = {
+  name: 'hypergraph.searchByLane',
+  description:
+    'Search the 3-lane hyperedge graph by edge_type. ' +
+    'Lane A (cluster_context) = GPU k-means cohesion. ' +
+    'Lane B (shared_resource) = files coupled by same DB table / Qdrant collection / Redis key / Neo4j label. ' +
+    'Lane C (agents_context) = AGENTS.md scopes sharing tag vocabulary (jaccard ≥ 0.4). ' +
+    'Read-only Postgres query against hypergraph_edges. Returns ranked edges with members + metadata.',
+  parameters: z.object({
+    query: z.string().min(1).describe('Keyword or phrase (matched against title, summary, label)'),
+    lane: z.enum(['cluster_context', 'shared_resource', 'agents_context'])
+      .describe('Which lane to query'),
+    limit: z.number().int().min(1).max(50).default(10).optional(),
+  }),
+  execute: async (args: { query: string; lane: 'cluster_context' | 'shared_resource' | 'agents_context'; limit?: number }) => {
+    const limit = args.limit ?? 10;
+    const rows = await searchHyperedges(args.query, args.lane, limit);
+    return JSON.stringify({
+      query: args.query,
+      lane: args.lane,
+      totalFound: rows.length,
+      hits: rows.map(r => ({
+        id: r.id,
+        label: r.label,
+        title: r.title,
+        summary: r.summary,
+        grade: r.grade_label,
+        weight: r.weight,
+        memberCount: Array.isArray(r.members) ? r.members.length : 0,
+        topMembers: Array.isArray(r.members) ? r.members.slice(0, 5) : [],
+        metadata: r.metadata,
+      })),
+    });
+  },
+} as const;
+
+// ── 8. agent.proposeFix ────────────────────────────────────────────────────
 export const agentProposeFixTool = {
   name: 'agent.proposeFix',
   description:
@@ -415,7 +509,7 @@ export const agentProposeFixTool = {
       });
     }
 
-    // Pull cluster context
+    // Pull cluster context (file note frontmatter)
     let clusterCtx: Record<string, unknown> | null = null;
     if (typeof note.fm.clusterId === 'number' && note.fm.clusterId >= 0) {
       const cNote = await readNote(`Clusters/cluster-${note.fm.clusterId}.md`);
@@ -429,6 +523,37 @@ export const agentProposeFixTool = {
         };
       }
     }
+
+    // ── 3-lane hyperedge composition ───────────────────────────────────────
+    // ILIKE matches single substrings, not joined phrases — query each lane
+    // with multiple distinct probes and union the results (dedup by id).
+    // Best-effort: if Postgres unavailable, lanes silently return empty.
+    const fileStem = args.file_path.split('/').pop()?.replace(/\.\w+$/, '') ?? '';
+    const dirStem  = args.file_path.split('/').slice(-2, -1)[0] ?? '';
+    const topicWords = String(clusterCtx?.topic ?? '')
+      .split(/[`\s/,]+/)
+      .filter(w => w.length >= 4 && !/^(the|and|for|chunks|cluster)$/i.test(w))
+      .slice(0, 2);
+    const probes = [...new Set([fileStem, dirStem, ...topicWords].filter(Boolean))];
+
+    async function unionLane(lane: 'cluster_context' | 'shared_resource' | 'agents_context', perProbe: number) {
+      const seen = new Map<string, HyperedgeRow>();
+      for (const p of probes) {
+        const rows = await searchHyperedges(p, lane, perProbe).catch(() => []);
+        for (const r of rows) if (!seen.has(r.id)) seen.set(r.id, r);
+        if (seen.size >= perProbe * 2) break;
+      }
+      return [...seen.values()].slice(0, perProbe * 2);
+    }
+
+    const [laneA, laneB, laneC] = await Promise.all([
+      unionLane('cluster_context', 3),
+      unionLane('shared_resource', 5),
+      unionLane('agents_context', 3),
+    ]);
+
+    const fmtHit = (r: HyperedgeRow) =>
+      `- **${r.label}** (${r.grade_label}, n=${Array.isArray(r.members) ? r.members.length : 0}) — ${r.title}`;
 
     // Markdown-only proposal — never modifies any file
     const proposalMd = [
@@ -452,12 +577,27 @@ export const agentProposeFixTool = {
       `## Cluster siblings (related files to inspect)`,
       ((clusterCtx?.siblings as string[]) ?? []).map(s => `- ${s}`).join('\n') || '_no cluster_',
       ``,
+      // ── A/B/C lanes ──
+      `## Lane A — semantic cohesion (${laneA.length} hyperedges)`,
+      laneA.length ? laneA.map(fmtHit).join('\n') : '_no matching cluster_context edges_',
+      ``,
+      `## Lane B — runtime coupling (${laneB.length} hyperedges)`,
+      `_Files that share the same DB table / Qdrant collection / Redis key / Neo4j label as this one._`,
+      ``,
+      laneB.length ? laneB.map(fmtHit).join('\n') : '_no matching shared_resource edges_',
+      ``,
+      `## Lane C — agent conventions (${laneC.length} hyperedges)`,
+      `_AGENTS.md scopes that describe related conventions for this area._`,
+      ``,
+      laneC.length ? laneC.map(fmtHit).join('\n') : '_no matching agents_context edges_',
+      ``,
       `## Recommended next steps`,
       `1. \`vault.read("${vaultPath}")\` — full file note`,
       `2. \`retrieval.qdrantLookup("${note.fm.embedding_id ?? `qdrant://codebase_chunks_768/${args.file_path}`}")\` — semantic chunks`,
       `3. \`vault.followLinks("${vaultPath}", "imports", 2)\` — import graph 2 hops`,
-      `4. Review siblings + neighbors before drafting the change`,
-      `5. Apply the change manually and re-run \`graphify:obsidian:incremental\` to refresh`,
+      `4. \`hypergraph.searchByLane({query: "${probes[0] ?? fileStem}", lane: "shared_resource"})\` — full Lane B coupling`,
+      `5. Review siblings + neighbors + AGENTS.md guidance before drafting the change`,
+      `6. Apply the change manually and re-run \`graphify:obsidian:incremental\` to refresh`,
     ].join('\n');
 
     return JSON.stringify({
@@ -467,6 +607,11 @@ export const agentProposeFixTool = {
       vault_note: vaultPath,
       cluster: clusterCtx,
       embedding_id: note.fm.embedding_id ?? null,
+      lanes: {
+        cluster_context: laneA.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
+        shared_resource: laneB.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
+        agents_context: laneC.map(r => ({ label: r.label, grade: r.grade_label, members: Array.isArray(r.members) ? r.members.length : 0 })),
+      },
       proposal_markdown: proposalMd,
     });
   },

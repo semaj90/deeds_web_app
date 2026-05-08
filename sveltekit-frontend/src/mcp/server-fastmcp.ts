@@ -21,6 +21,7 @@ import {
   retrievalQdrantLookupTool,
   agentExplainClusterTool,
   agentProposeFixTool,
+  hypergraphSearchByLaneTool,
 } from './tools/vault-walker.tool.js';
 
 const server = new FastMCP({
@@ -56,5 +57,7 @@ const server = new FastMCP({
 (server.addTool as (t: any) => void)(agentExplainClusterTool);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server.addTool as (t: any) => void)(agentProposeFixTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(hypergraphSearchByLaneTool);
 
 server.start({ transportType: 'stdio' });

@@ -34,7 +34,13 @@
     "atlas:prompt:smoke",
     "index:codebase:fast:resume",
     "atlas:index",
-    "graphify:obsidian:incremental"
+    "graphify:obsidian:incremental",
+    "index:vault:md",
+    "index:vault:md:dry",
+    "seed:hypergraph:lane-b",
+    "seed:hypergraph:lane-c",
+    "seed:hypergraph:lane-d",
+    "smoke:hypergraph:vault"
   ],
   "thresholds": {
     "smallChangeMaxFiles": 20,
