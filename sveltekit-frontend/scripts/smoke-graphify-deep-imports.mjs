@@ -20,7 +20,8 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DEEP_DIR = join(ROOT, 'memory/graphify/deep');
-const INGEST_DIR = join(ROOT, 'memory/ingest/pending');
+const INGEST_PENDING   = join(ROOT, 'memory/ingest/pending');
+const INGEST_PROCESSED = join(ROOT, 'memory/ingest/processed');
 
 let passed = 0;
 let failed = 0;
@@ -111,14 +112,30 @@ gate('G6 - unresolved-imports.json exists and non-empty', () => {
   return true;
 });
 
-// G7 - ACE ingest JSONL present in memory/ingest/pending/
-gate('G7 - ACE ingest JSONL present in memory/ingest/pending/', () => {
-  if (!existsSync(INGEST_DIR)) return 'ingest dir missing';
-  const files = readdirSync(INGEST_DIR).filter(f => f.startsWith('graphify_deep_imports_'));
-  if (files.length === 0) return 'no graphify_deep_imports_*.jsonl files found';
-  const latest = files.sort().pop();
-  const lines = readFileSync(join(INGEST_DIR, latest), 'utf8').split('\n').filter(l => l.trim());
+// G7 - ACE ingest JSONL present in pending/ OR processed/
+// graphify-deep-ingest writes to pending/ then idempotently moves to processed/
+// once the records are in Redis. Either location proves the ingest fired.
+gate('G7 - ACE ingest JSONL present (pending/ OR processed/)', () => {
+  const candidates = [];
+  for (const dir of [INGEST_PENDING, INGEST_PROCESSED]) {
+    if (!existsSync(dir)) continue;
+    const matches = readdirSync(dir)
+      .filter(f => f.startsWith('graphify_deep_imports_'))
+      .map(f => ({ dir, file: f }));
+    candidates.push(...matches);
+  }
+  if (candidates.length === 0) {
+    return 'no graphify_deep_imports_*.jsonl files in pending/ or processed/';
+  }
+  // Prefer most-recent across both dirs
+  candidates.sort((a, b) => a.file.localeCompare(b.file));
+  const latest = candidates[candidates.length - 1];
+  const lines = readFileSync(join(latest.dir, latest.file), 'utf8')
+    .split('\n').filter(l => l.trim());
   if (lines.length < 100) return `only ${lines.length} ingest records (expected >= 100)`;
+  // gate() treats only `true`/`undefined` as PASS — print detail then return true
+  const where = latest.dir.endsWith('processed') ? 'processed' : 'pending';
+  console.log(`        (${lines.length} records in ${where}/${latest.file})`);
   return true;
 });
 
