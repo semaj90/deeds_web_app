@@ -355,6 +355,44 @@ function normalize(arr) {
   return out;
 }
 
+/**
+ * Spread tightly-clustered attention scores via z-score → sigmoid.
+ *
+ * Raw cosine similarity in 768-dim embedding spaces is famously concentrated:
+ * even for unrelated content, dot products against any query land in a narrow
+ * 0.99–1.00 band. The plain `normalize()` (divide by max) preserves this
+ * narrowness and the resulting "attention" gives no differential signal —
+ * every file scores ~1.0.
+ *
+ * This helper:
+ *   1. Computes mean + std of the raw scores
+ *   2. Z-scores each value: z_i = (raw_i - mean) / std
+ *   3. Maps through sigmoid: 1 / (1 + exp(-z * temp))
+ *   4. Returns Float32Array in [0, 1] with preserved rank order
+ *
+ * `temp` controls sharpness (higher = more spread). Default 1.5 gives a
+ * ~0.10–0.95 spread for typical 768-dim cosine inputs.
+ */
+function spreadByZScore(arr, temp = 1.5) {
+  if (!arr || arr.length < 2) return arr;
+  const n = arr.length;
+  let sum = 0;
+  for (let i = 0; i < n; i++) sum += arr[i];
+  const mean = sum / n;
+  let varSum = 0;
+  for (let i = 0; i < n; i++) {
+    const d = arr[i] - mean;
+    varSum += d * d;
+  }
+  const std = Math.sqrt(varSum / n) || 1e-9;
+  const out = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const z = (arr[i] - mean) / std;
+    out[i] = 1 / (1 + Math.exp(-z * temp));
+  }
+  return out;
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
   const redis = new Redis(REDIS_URL, { lazyConnect: true, connectTimeout: 3000 });
@@ -434,7 +472,10 @@ async function main() {
       log.gpu.attentionError = err.message;
     }
   }
-  const attn = normalize(attnRaw);
+  // Use z-score sigmoid spread instead of max-normalize — raw cosine in
+  // 768-dim space clusters in 0.99–1.00 (no differential signal). Z-score
+  // gives a real [0.10–0.95] spread that distinguishes risk-adjacent files.
+  const attn = spreadByZScore(attnRaw, 1.5);
 
   // GPU pass 2 (separate output): autoencoder 768 → 64 for memory-path mapping.
   // Cached at gpu:karpathy:encoded:* — used by future MLA attention paths and
