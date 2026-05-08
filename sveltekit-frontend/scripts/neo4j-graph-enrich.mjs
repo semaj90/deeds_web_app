@@ -58,7 +58,7 @@ if (!process.env.NEO4J_PASSWORD && !process.env.NEO4J_PASS) {
 }
 const QDRANT_URL  = process.env.QDRANT_URL       ?? 'http://127.0.0.1:6333';
 const QDRANT_COLL = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
-const DB_URL      = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_URL      = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 if (!process.env.DATABASE_URL) {
   console.warn('   ⚠ DATABASE_URL not set in environment — using hardcoded dev default. Add to .env: DATABASE_URL=postgresql://...');
 }
@@ -169,13 +169,20 @@ async function runPageRank() {
   console.log(`   ✓ PageRank: ${written} nodes scored`);
   if (!written) return [];
 
-  // Return top 50 by score for downstream use
+  // Return ALL scored nodes — downstream `enriched.map` writes the top-200 to
+  // ace:authority:top, so the cap must be ≥200. Previous LIMIT 50 meant 150
+  // of the 200 cached authority entries had pagerank=0 in Redis (because
+  // `pagerankByKey.get(key)` missed them, and the enrich step defaulted to
+  // n.pagerank ?? 0). The aggregator's TODO recommendations then displayed
+  // PR=0.00 for any non-top-50 authority entry — masking real graph
+  // importance signal. ${LIMIT} matches the global --limit flag (default
+  // 5000) so the in-memory map covers every CodebaseFile we care about.
   const data = await neo4j(`
     MATCH (n:CodebaseFile)
     WHERE n.graphPageRank IS NOT NULL
     RETURN coalesce(n.filePath, n.id) AS stableKey, n.filePath AS filePath, n.graphPageRank AS score
     ORDER BY n.graphPageRank DESC
-    LIMIT 50
+    LIMIT toInteger(${LIMIT})
   `).catch(() => []);
   return neo4jRows(data);
 }
@@ -712,14 +719,24 @@ async function main() {
       const dryNote = DRY_RUN ? ' (dry — no writes)' : '';
 
       if (!DRY_RUN) {
-        // Store as a Redis HASH: ace:authority:top  key=filePath  value=JSON
+        // Store as a Redis HASH: ace:authority:top  key=filePath  value=JSON.
+        // Field aliases included (pr / pageRank / graphPageRank all set to the
+        // same value, similarly authority / graphAuthorityScore) so any
+        // downstream reader works without per-tool alias logic. Costs ~40
+        // bytes per entry × 200 entries ≈ 8KB extra in Redis — negligible.
         const pipeline = redis.pipeline();
         pipeline.del('ace:authority:top');
         for (const e of top200) {
+          const pr = e.pagerank ?? 0;
+          const ga = e.graphAuthorityScore ?? 0;
           pipeline.hset('ace:authority:top', e.filePath || e.stableKey || '', JSON.stringify({
-            graphAuthorityScore: e.graphAuthorityScore,
+            graphAuthorityScore: ga,
+            authority:           ga,                 // alias
             communityId:         e.communityId,
-            pagerank:            e.pagerank,
+            pagerank:            pr,
+            pr:                  pr,                 // alias (matches karpathy schema)
+            pageRank:            pr,                 // alias (camelCase)
+            graphPageRank:       pr,                 // alias (Neo4j-native name)
             topoClass:           e.topoClass,
             clusterKey:          e.clusterKey,
           }));
