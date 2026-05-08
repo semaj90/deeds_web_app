@@ -88,6 +88,11 @@ async function main() {
   console.log(`   ${clusters.length} cluster(s) eligible (size ${MIN_MEMBERS}-${MAX_MEMBERS})`);
 
   let inserted = 0, updated = 0, skipped = 0, totalMembers = 0;
+  // Adaptive-guard counters: members are only "rewritten" when we actually
+  // hit the DELETE/INSERT branch. When the unchanged-edge short-circuit
+  // fires, we count the same rows under `membersUnchanged` so the operator
+  // can tell at a glance how much work the guard saved.
+  let membersRewritten = 0, membersUnchanged = 0;
 
   for (const c of clusters) {
     const memberKeys = (c.members ?? []).filter(Boolean);
@@ -137,9 +142,31 @@ async function main() {
     const edgeId = edgeRows[0].id;
     if (edgeRows[0].was_inserted) inserted++; else updated++;
 
-    // Replace members atomically so re-runs reflect cluster membership churn.
-    // CASCADE delete on hypergraph_edges → hypergraph_edge_members handles the
-    // delete, then we re-insert.
+    // ── Adaptive guard: skip DELETE/INSERT when membership unchanged ──────
+    // edge_hash = sha256(edge_type + sorted member_keys), so when the upsert
+    // hits an existing row (was_inserted=false) the member set is provably
+    // identical to what's already in hypergraph_edge_members. Skip the
+    // DELETE/INSERT cycle to avoid 16k+ wasted row touches per re-run.
+    //
+    // Edge case: a previous run may have died mid-way, leaving the edge row
+    // but with zero or partial members. We probe the count and only short-
+    // circuit when the existing member count matches what we'd write.
+    if (!edgeRows[0].was_inserted) {
+      const { rows: [{ existing_n }] } = await pool.query(
+        'SELECT count(*)::int AS existing_n FROM hypergraph_edge_members WHERE edge_id = $1',
+        [edgeId],
+      );
+      if (existing_n === memberKeys.length) {
+        // Membership unchanged — skip the DELETE/INSERT entirely.
+        totalMembers      += memberKeys.length;
+        membersUnchanged  += memberKeys.length;
+        continue;
+      }
+      // Otherwise fall through to the rebuild — partial state from a
+      // failed previous run.
+    }
+
+    // Replace members atomically (new edge OR detected partial member set).
     await pool.query('DELETE FROM hypergraph_edge_members WHERE edge_id = $1', [edgeId]);
     const memberScore = 1 / Math.sqrt(memberKeys.length); // smaller cluster → higher per-member score
     const memberValues = memberKeys
@@ -150,13 +177,16 @@ async function main() {
        VALUES ${memberValues}`,
       [edgeId, ...memberKeys, memberScore],
     );
-    totalMembers += memberKeys.length;
+    totalMembers      += memberKeys.length;
+    membersRewritten  += memberKeys.length;
   }
 
-  console.log(`\n   inserted: ${inserted}`);
-  console.log(`   updated:  ${updated}`);
-  console.log(`   skipped:  ${skipped}`);
-  console.log(`   total members written: ${totalMembers}`);
+  console.log(`\n   inserted:           ${inserted}`);
+  console.log(`   updated:            ${updated}`);
+  console.log(`   skipped:            ${skipped}`);
+  console.log(`   members rewritten:  ${membersRewritten}  (DELETE+INSERT executed)`);
+  console.log(`   members unchanged:  ${membersUnchanged}  (skipped via edge_hash + count match)`);
+  console.log(`   total members:      ${totalMembers}      (= rewritten + unchanged)`);
 
   // Quick verify
   if (!DRY) {
