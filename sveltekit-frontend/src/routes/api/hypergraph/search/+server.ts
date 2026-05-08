@@ -6,7 +6,7 @@ import { searchHyperedges } from '$lib/server/hypergraph/hypergraph-search.js';
 import type { HyperedgeSearchParams } from '$lib/server/hypergraph/hypergraph-types.js';
 import { ENV } from '$lib/server/env.server.js';
 
-const EDGE_TYPE_VALUES = ['retrieval', 'fix_attempt', 'test_coverage', 'cluster_context', 'agents_context'] as const;
+const EDGE_TYPE_VALUES = ['retrieval', 'fix_attempt', 'test_coverage', 'cluster_context', 'agents_context', 'shared_resource'] as const;
 const MEMBER_KIND_VALUES = ['query', 'file', 'agents_md', 'cluster', 'prior_answer', 'test', 'chunk', 'neo4j_node'] as const;
 
 const schema = z.object({
