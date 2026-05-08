@@ -180,8 +180,22 @@ async function captionWithTurboQuant(imageB64) {
     if (!res.ok) return null;
     const j   = await res.json();
     const msg = j.choices?.[0]?.message;
-    // Prefer content; fall back to reasoning_content (chain-of-thought) only if empty
-    const raw = (msg?.content || msg?.reasoning_content || '').trim();
+    // gemma4-legal-vlm is a thinking model: it sometimes puts the actual
+    // caption in `content` and the analysis in `reasoning_content`, but other
+    // times the CoT opener lands in `content` and the real answer is buried
+    // in reasoning_content. Concatenate both and let stripReasoning() pick
+    // the final prose paragraph regardless of which field carries the meat.
+    const content   = (msg?.content           ?? '').trim();
+    const reasoning = (msg?.reasoning_content ?? '').trim();
+    let raw = '';
+    if (content && reasoning && content.length < 80) {
+      // content is just the opener; full answer lives in reasoning_content
+      raw = `${reasoning}\n\n${content}`;
+    } else if (content) {
+      raw = content;
+    } else {
+      raw = reasoning;
+    }
     const out = stripReasoning(raw);
     return out || null;
   } catch { return null; }
