@@ -242,6 +242,8 @@
     "atlas:demo": "node scripts/atlas-10q-demo.mjs",
     "atlas:normalize": "node scripts/normalize-cluster-keys.mjs",
     "atlas:normalize:dry": "node scripts/normalize-cluster-keys.mjs --dry-run",
+    "atlas:index": "node scripts/build-atlas-index.mjs",
+    "atlas:index:dry": "node scripts/build-atlas-index.mjs --dry-run",
     "services:ai:detached": "concurrently -n \"TRACE-MCP,TurboQuant,GoRetrieval\" -c \"yellow,magenta,green\" \"npm run mcp:ensure\" \"npm run turbo:start:detached\" \"npm run go:retrieval:run\"",
     "screenshots:index": "node scripts/screenshots/index-screenshots.mjs",
     "screenshots:index:apply": "node scripts/screenshots/index-screenshots.mjs --apply",
