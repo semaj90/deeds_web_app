@@ -70,6 +70,46 @@ const GO_RETRIEVAL_URL  = process.env.GO_RETRIEVAL_URL      ?? 'http://127.0.0.1
 const pool = new Pool({ connectionString: PG_URL, max: 4, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
 pool.on('error', () => {});
 
+// ── Shared embedding cache (Redis L1, 1h TTL) ────────────────────────────────
+// search.hybrid + topology.search_near + search.dev_context all embed the same
+// query independently — single embeddinggemma call costs 3-7s, cache hit is <5ms.
+const EMBED_CACHE_TTL = 3600;
+
+let _embedRedis: import('ioredis').default | null = null;
+async function getEmbedRedis() {
+  if (_embedRedis) return _embedRedis;
+  const { default: Redis } = await import('ioredis');
+  _embedRedis = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
+  _embedRedis.on('error', () => {});
+  await _embedRedis.connect().catch(() => {});
+  return _embedRedis;
+}
+
+async function getOrComputeEmbedding(query: string): Promise<{ embedding: number[]; cached: boolean }> {
+  const safeQuery = query.slice(0, 4000);
+  const key = `embed:mcp:${createHash('md5').update(safeQuery).digest('hex')}`;
+  try {
+    const r = await getEmbedRedis();
+    const hit = await r.get(key).catch(() => null);
+    if (hit) {
+      try {
+        const parsed = JSON.parse(hit) as number[];
+        if (Array.isArray(parsed) && parsed.length === 768) {
+          return { embedding: parsed, cached: true };
+        }
+      } catch { /* fallthrough to recompute */ }
+    }
+    const res = await sveltePost('/api/embed', { text: safeQuery });
+    const embedding = ((res as { embedding?: number[] }).embedding ?? []) as number[];
+    if (embedding.length === 768) {
+      await r.setex(key, EMBED_CACHE_TTL, JSON.stringify(embedding)).catch(() => {});
+    }
+    return { embedding, cached: false };
+  } catch {
+    return { embedding: [], cached: false };
+  }
+}
+
 // ── ACE hits cache (Gemma4 agentic 24hr result cache) ─────────────────────────
 
 const ACE_HITS_TTL = 86_400; // 24 hours
@@ -235,6 +275,20 @@ async function sveltePost(path: string, body: unknown) {
 // ── MCP Server ────────────────────────────────────────────────────────────────
 
 const server = new McpServer({ name: 'trace-kag-tools', version: '1.0.0' });
+
+// ── Tool registry for tools.batch_call ────────────────────────────────────────
+// Capture every tool handler keyed by name so batch_call can dispatch by name
+// without re-routing through MCP transport. Preserves the SDK's tool() API.
+type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
+const toolRegistry = new Map<string, ToolHandler>();
+const _origTool = server.tool.bind(server);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server as any).tool = (name: string, ...rest: any[]) => {
+  const handler = rest[rest.length - 1];
+  if (typeof handler === 'function') toolRegistry.set(name, handler as ToolHandler);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (_origTool as any)(name, ...rest);
+};
 
 // ── graph.expand_neighborhood ─────────────────────────────────────────────────
 
@@ -746,11 +800,9 @@ server.tool(
         [query, limit * 2, topo_class ?? null],
       );
 
-      const embedPromise = sveltePost('/api/embed', { text: query })
-        .then((res) => (res as { embedding?: number[] }).embedding ?? [])
-        .catch(() => [] as number[]);
+      const embedPromise = getOrComputeEmbedding(query);
 
-      const qdrantPromise = embedPromise.then((embedding) => {
+      const qdrantPromise = embedPromise.then(({ embedding }) => {
         if (!embedding.length) return { results: [] };
         return fetch(`${SVELTEKIT}/api/code-intel/search`, {
           method: 'POST',
@@ -760,7 +812,9 @@ server.tool(
         }).then((r) => r.json()).catch(() => ({ results: [] }));
       });
 
-      const [pgRes, qdrantRes, embedding] = await Promise.all([ftsPromise, qdrantPromise, embedPromise]);
+      const [pgRes, qdrantRes, embedResult] = await Promise.all([ftsPromise, qdrantPromise, embedPromise]);
+      const embedding = embedResult.embedding;
+      const embedCached = embedResult.cached;
 
       // Merge by file_path as a best-effort stable_key
       const merged = new Map<string, Record<string, unknown>>();
@@ -787,7 +841,7 @@ server.tool(
       return {
         content: [{
           type: 'text' as const,
-          text: JSON.stringify({ results, count: results.length, mode, embedding_used: embedding.length > 0 }, null, 2),
+          text: JSON.stringify({ results, count: results.length, mode, embedding_used: embedding.length > 0, embed_cache_hit: embedCached }, null, 2),
         }],
       };
     } catch (err) {
@@ -1036,9 +1090,14 @@ server.tool(
   async ({ query, filePath, limit, topo_class }) => {
     // ── Try SvelteKit ACE pipeline first ─────────────────────────────────────
     try {
+      // Precompute embedding once (Redis-cached) so the SvelteKit endpoint
+      // skips its own embed call when this is a repeat query.
+      const { embedding } = await getOrComputeEmbedding(query);
+
       const body: Record<string, unknown> = { query, limit, mode: 'dev_context' };
-      if (filePath)   body.filePath  = filePath;
-      if (topo_class) body.topoClass = topo_class;
+      if (filePath)         body.filePath  = filePath;
+      if (topo_class)       body.topoClass = topo_class;
+      if (embedding.length) body.embedding = embedding;
 
       const svelteFetch = sveltePost('/api/code-intel/search', body);
       svelteFetch.catch(() => {}); // prevent UnhandledPromiseRejection if race abandons it
@@ -1989,6 +2048,100 @@ server.tool(
       return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }] };
     }
   }
+);
+
+// ── tools.batch_call ─────────────────────────────────────────────────────────
+// Dispatch N tool calls under Promise.allSettled so multi-tool agent plans
+// finish in max(latency) instead of sum(latency). Read-only tools only —
+// operator-gated tools (ops.*) refuse batch dispatch and must be called directly.
+
+const BATCH_DENYLIST = new Set([
+  'ops.propose_patch',
+  'ops.run_targeted_test',
+  'ops.record_fix_attempt',
+  'ops.run_quality_gate',
+  'tools.batch_call',
+]);
+const BATCH_MAX_CALLS = 8;
+const BATCH_TIMEOUT_MS = 30_000;
+
+server.tool(
+  'tools.batch_call',
+  {
+    calls: z
+      .array(
+        z.object({
+          name: z.string().describe('Tool name to dispatch (must be registered)'),
+          arguments: z.record(z.string(), z.unknown()).default({}).describe('Arguments object for the tool'),
+        }),
+      )
+      .min(1)
+      .max(BATCH_MAX_CALLS)
+      .describe(`Up to ${BATCH_MAX_CALLS} tool calls dispatched in parallel`),
+    timeoutMs: z
+      .number()
+      .int()
+      .min(1_000)
+      .max(120_000)
+      .default(BATCH_TIMEOUT_MS)
+      .optional()
+      .describe('Per-call timeout (ms)'),
+  },
+  async ({ calls, timeoutMs = BATCH_TIMEOUT_MS }) => {
+    const start = Date.now();
+    const results = await Promise.allSettled(
+      calls.map(async (call) => {
+        const callStart = Date.now();
+        if (BATCH_DENYLIST.has(call.name)) {
+          return {
+            name: call.name,
+            status: 'denied' as const,
+            error: 'tool not allowed in batch (operator-gated or recursive)',
+            ms: 0,
+          };
+        }
+        const handler = toolRegistry.get(call.name);
+        if (!handler) {
+          return { name: call.name, status: 'unknown' as const, error: `tool not found: ${call.name}`, ms: 0 };
+        }
+        try {
+          const result = await Promise.race([
+            handler(call.arguments ?? {}),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error(`batch_call timeout after ${timeoutMs}ms`)), timeoutMs),
+            ),
+          ]);
+          return { name: call.name, status: 'ok' as const, result, ms: Date.now() - callStart };
+        } catch (err) {
+          return {
+            name: call.name,
+            status: 'error' as const,
+            error: err instanceof Error ? err.message : String(err),
+            ms: Date.now() - callStart,
+          };
+        }
+      }),
+    );
+
+    const flat = results.map((r) =>
+      r.status === 'fulfilled' ? r.value : { status: 'error' as const, error: String(r.reason), ms: 0, name: 'unknown' },
+    );
+    const ok = flat.filter((r) => r.status === 'ok').length;
+    const totalMs = Date.now() - start;
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(
+            { ok, total: flat.length, totalMs, calls: flat },
+            null,
+            2,
+          ),
+        },
+      ],
+    };
+  },
 );
 
 // ── HTTP server with /health + MCP handler ────────────────────────────────────
