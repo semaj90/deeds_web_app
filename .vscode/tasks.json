@@ -170,6 +170,25 @@
       "detail": "Patch cluster_key payload in codebase_chunks_768 to use the gpu:N namespace MCP queries with. Uses Qdrant SetPayload (only touches cluster_key + agents_scope + relation_types — vector and content stay intact). Idempotent: skips already-correct rows."
     },
     {
+      "label": "Agents: DB Verify (manual)",
+      "type": "shell",
+      "command": "npm run agents:db:verify",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Read-only check that AGENTS.md Postgres mirror tables exist (agent_context_files, directory_context_bindings, ace_context_sources) and report row counts. Run AFTER applying drizzle/manual/agents_md_relations.sql. Schema migrations are deliberate operator actions — never auto-run on folder open."
+    },
+    {
       "label": "Backend Stack (MCP + TurboQuant detached)",
       "dependsOn": [
         "MCP TRACE Server (detached)",
