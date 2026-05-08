@@ -70,3 +70,7 @@ static/models/courtroom/*.glb
 logs/task-output/
 logs/*.log
 logs/startup/
+
+# Obsidian vault generated plugin binaries (13MB, regenerable via install-plugins.sh)
+docs/obsidian-vault/.obsidian/plugins/*/main.js
+docs/obsidian-vault/.obsidian/plugins/*/styles.css

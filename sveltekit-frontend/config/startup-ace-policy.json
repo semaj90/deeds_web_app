@@ -33,7 +33,8 @@
     "smoke:hypergraph",
     "atlas:prompt:smoke",
     "index:codebase:fast:resume",
-    "atlas:index"
+    "atlas:index",
+    "graphify:obsidian:incremental"
   ],
   "thresholds": {
     "smallChangeMaxFiles": 20,
@@ -81,6 +82,7 @@
       "karpathy:gpu",
       "hypergraph:seed",
       "ace:hit-demand",
+      "graphify:obsidian:incremental",
       "audit:full-pipeline"
     ],
     "logKey": "ace:startup:heavy_log"

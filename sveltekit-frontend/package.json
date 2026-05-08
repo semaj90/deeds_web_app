@@ -161,6 +161,7 @@
     "graphify:obsidian": "node scripts/graphify-obsidian-vault.mjs",
     "graphify:obsidian:full": "node scripts/graphify-obsidian-vault.mjs --clean",
     "graphify:obsidian:fast": "node scripts/graphify-obsidian-vault.mjs --files-limit=500 --no-canvas",
+    "graphify:obsidian:incremental": "node scripts/graphify-obsidian-vault.mjs --incremental --files-limit=500",
     "tensor:topology": "node scripts/run-tensor-topology-mapreduce.mjs",
     "tensor:topology:dry": "node scripts/run-tensor-topology-mapreduce.mjs --dry-run --limit=500",
     "tensor:topology:resume": "node scripts/run-tensor-topology-mapreduce.mjs --resume",
