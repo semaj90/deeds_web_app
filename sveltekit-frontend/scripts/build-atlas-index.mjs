@@ -288,5 +288,231 @@ for (const t of top) {
   console.log(`    ${t.blend.toFixed(3).padStart(6)}  pr=${String(t.row[4]).padStart(6)}  ga=${String(t.row[5]).padStart(6)}  h=${String(t.row[6]).padStart(3)}  ${t.row[0]}`);
 }
 
+// ── 10. Directory-level aggregation ─────────────────────────────────────────
+//
+// Groups files by their immediate parent directory and aggregates atlas
+// signals into one card per directory. Uses path normalisation so cards
+// generated from "src/lib/foo.ts" and "lib/foo.ts" land on the same dir.
+
+function normalizeAtlasPath(path) {
+  return String(path ?? '')
+    .replace(/\\/g, '/')
+    .replace(/^sveltekit-frontend\//, '')
+    .replace(/^\.?\//, '')
+    .replace(/^src\//, '');
+}
+
+function dirOf(path) {
+  const i = path.lastIndexOf('/');
+  return i === -1 ? '' : path.slice(0, i);
+}
+
+// AGENTS.md envelope content per dir (relations + tag/tool/constraint hints)
+const { rows: relRows } = await pool.query(`
+  SELECT source_key, target_key, relation, weight
+  FROM agent_context_relations
+  WHERE source_key LIKE 'agents:%'
+`).catch(() => ({ rows: [] }));
+
+const relationsByAgent = new Map();
+for (const r of relRows) {
+  const list = relationsByAgent.get(r.source_key) ?? { clusters: [], topo: [], tools: [], peers: [], parent: null };
+  if (r.relation === 'COVERS_CLUSTER')      list.clusters.push(r.target_key);
+  else if (r.relation === 'COVERS_TOPO_CLASS') list.topo.push(r.target_key.replace(/^topo:/, ''));
+  else if (r.relation === 'REFERENCES_TOOL')  list.tools.push(r.target_key.replace(/^tool:/, ''));
+  else if (r.relation === 'SHARES_TAGS')      list.peers.push(r.target_key);
+  else if (r.relation === 'PARENT_OF')        list.parent = r.target_key;
+  relationsByAgent.set(r.source_key, list);
+}
+
+// Karpathy GPU blend per file
+let karpathyMap = new Map();
+try {
+  const { default: Redis } = await import('ioredis');
+  const r = new Redis(REDIS_URL, { lazyConnect: true });
+  await r.connect();
+  const kHash = await r.hgetall('gpu:karpathy:scores').catch(() => ({}));
+  for (const [k, v] of Object.entries(kHash)) {
+    try {
+      const obj = typeof v === 'string' ? JSON.parse(v) : v;
+      const blend = obj.blend ?? obj.k ?? 0;
+      // Store under both raw and normalised paths so karpathy hits land
+      // regardless of which prefix the writer used.
+      karpathyMap.set(k, blend);
+      karpathyMap.set(normalizeAtlasPath(k), blend);
+    } catch { /* skip */ }
+  }
+  await r.quit().catch(() => {});
+} catch { /* karpathy unavailable */ }
+
+// Build per-directory card
+const dirMap = new Map();   // dir → card
+for (let i = 0; i < fileRows.length; i++) {
+  const row    = fileRows[i];
+  const path   = row[0];
+  const norm   = normalizeAtlasPath(path);
+  const dir    = dirOf(path);
+  const agentKey = row[8] ? `agents:${row[8]}/AGENTS.md` : '';
+  const c      = row[3];
+  const tc     = row[1];
+  const ga     = row[5];
+  const pr     = row[4];
+  const hits   = row[6];
+  const kBlend = karpathyMap.get(path) ?? karpathyMap.get(norm) ?? 0;
+  const rel    = relationsByAgent.get(agentKey);
+
+  let card = dirMap.get(dir);
+  if (!card) {
+    card = {
+      d:           dir,
+      a:           agentKey,
+      p:           rel?.parent ?? '',
+      n:           0,
+      clusters:    new Set(),
+      topo:        new Set(),
+      tools:       new Set(),
+      tags:        new Set(),
+      pr:          0,
+      auth:        0,
+      authSum:     0,
+      authN:       0,
+      kgpu:        0,
+      hits:        0,
+      dirty:       0,
+      top:         [],
+      _files:      [],
+    };
+    dirMap.set(dir, card);
+  }
+  card.n++;
+  card._files.push({ path, pr, ga, kBlend, hits });
+  if (c)  card.clusters.add(c);
+  if (tc) card.topo.add(tc);
+  if (rel?.tools) for (const t of rel.tools) card.tools.add(t);
+  card.pr     = Math.max(card.pr, pr);
+  card.auth   = Math.max(card.auth, ga);
+  card.authSum += ga;
+  card.authN++;
+  card.kgpu   = Math.max(card.kgpu, kBlend);
+  card.hits  += hits;
+}
+
+// Compose final dir cards (sets → arrays, top-5 files, rank score)
+const dirCards = [];
+for (const card of dirMap.values()) {
+  const sortedFiles = card._files.sort((a, b) =>
+    (0.4 * b.pr + 0.3 * b.ga + 0.2 * b.kBlend + 0.1 * (b.hits / 10)) -
+    (0.4 * a.pr + 0.3 * a.ga + 0.2 * a.kBlend + 0.1 * (a.hits / 10)),
+  );
+  const dirty = sortedFiles.filter(f => f.hits > 0).length;
+  // Directory rank composite (0..1):
+  //   0.25 maxAuth + 0.20 normKarpathy + 0.20 normHits
+  // + 0.15 dirtyShare + 0.10 relDensity + 0.10 tagCoverage
+  const normHits   = Math.min(1, card.hits / 50);
+  const normKarp   = Math.min(1, card.kgpu / 3.5);
+  const dirtyShare = card.n ? dirty / card.n : 0;
+  const relDensity = Math.min(1, (card.clusters.size + card.topo.size) / 8);
+  const tagCov     = Math.min(1, card.tools.size / 6);
+  const rank = 0.25 * card.auth
+             + 0.20 * normKarp
+             + 0.20 * normHits
+             + 0.15 * dirtyShare
+             + 0.10 * relDensity
+             + 0.10 * tagCov;
+
+  dirCards.push({
+    d:        card.d,
+    a:        card.a,
+    p:        card.p,
+    n:        card.n,
+    clusters: [...card.clusters],
+    topo:     [...card.topo],
+    tools:    [...card.tools].slice(0, 8),
+    tags:     [...card.tags].slice(0, 8),
+    pr:       Math.round(card.pr   * 1e3) / 1e3,
+    auth:     Math.round(card.auth * 1e3) / 1e3,
+    avgAuth:  Math.round((card.authSum / Math.max(card.authN, 1)) * 1e3) / 1e3,
+    kgpu:     Math.round(card.kgpu * 1e3) / 1e3,
+    hits:     card.hits,
+    dirty,
+    rank:     Math.round(rank * 1e3) / 1e3,
+    top:      sortedFiles.slice(0, 5).map(f => f.path),
+  });
+}
+dirCards.sort((a, b) => b.rank - a.rank);
+
+console.log(`\n  Directory cards: ${dirCards.length}`);
+console.log(`  Top-10 directories by rank:`);
+for (const d of dirCards.slice(0, 10)) {
+  console.log(`    ${d.rank.toFixed(3).padStart(6)}  files=${String(d.n).padStart(3)}  pr=${String(d.pr).padStart(6)}  hits=${String(d.hits).padStart(3)}  ${d.d}`);
+}
+
+// Write directory + top JSONs to memory/atlas/ (also keep docs/atlas-index/ for back-compat)
+const memoryAtlasDir = resolve(ROOT, 'memory/atlas');
+await mkdir(memoryAtlasDir, { recursive: true });
+
+const dirsJson = JSON.stringify({
+  v: 1,
+  generated_at: atlas.generated_at,
+  count: dirCards.length,
+  cards: dirCards,
+});
+const topJson = JSON.stringify({
+  v: 1,
+  generated_at: atlas.generated_at,
+  count: Math.min(50, dirCards.length),
+  top: dirCards.slice(0, 50),
+});
+
+const mdLines = [
+  `# Directory Atlas Recommendations`,
+  ``,
+  `> Generated: ${atlas.generated_at} · ${dirCards.length} directories · ${fileRows.length} files`,
+  ``,
+];
+for (const d of dirCards.slice(0, 25)) {
+  mdLines.push(`## \`${d.d || '(repo root)'}\``);
+  mdLines.push(``);
+  mdLines.push(`- Rank: **${d.rank.toFixed(3)}** · files=${d.n} · hits=${d.hits} · dirty=${d.dirty}`);
+  mdLines.push(`- AGENTS: \`${d.a || '—'}\`${d.p ? ` (parent: \`${d.p}\`)` : ''}`);
+  mdLines.push(`- Authority max=${d.auth} avg=${d.avgAuth}, PageRank max=${d.pr}, Karpathy blend=${d.kgpu}`);
+  if (d.topo.length)     mdLines.push(`- Topo classes: ${d.topo.map(t => `\`${t}\``).join(', ')}`);
+  if (d.clusters.length) mdLines.push(`- Clusters: ${d.clusters.slice(0, 4).map(c => `\`${c}\``).join(', ')}`);
+  if (d.tools.length)    mdLines.push(`- Tools: ${d.tools.slice(0, 4).map(t => `\`${t}\``).join(', ')}`);
+  if (d.top.length)      mdLines.push(`- Top files: ${d.top.slice(0, 3).map(f => `\`${f}\``).join(', ')}`);
+  mdLines.push(``);
+}
+
+if (!DRY_RUN) {
+  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.dirs.json'), dirsJson, 'utf8');
+  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.top.json'),  topJson,  'utf8');
+  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.latest.md'), mdLines.join('\n'), 'utf8');
+  await writeFile(resolve(memoryAtlasDir, 'codebase-atlas.min.json'),  minJson,  'utf8');
+
+  console.log(`\n  ✓ wrote memory/atlas/codebase-atlas.dirs.json   (${(dirsJson.length / 1024).toFixed(1)} KB)`);
+  console.log(`  ✓ wrote memory/atlas/codebase-atlas.top.json    (${(topJson.length / 1024).toFixed(1)} KB)`);
+  console.log(`  ✓ wrote memory/atlas/codebase-atlas.latest.md   (${(mdLines.join('\n').length / 1024).toFixed(1)} KB)`);
+
+  if (!NO_REDIS) {
+    try {
+      const { default: Redis } = await import('ioredis');
+      const r = new Redis(REDIS_URL, { lazyConnect: true });
+      await r.connect();
+      await r.setex('ace:atlas:dirs', 24 * 3600, dirsJson);
+      // Per-directory cache for O(1) skill lookups
+      const pipe = r.pipeline();
+      for (const d of dirCards) {
+        const slug = (d.d || '_root').replace(/[\/\(\)]/g, '_');
+        pipe.setex(`ace:atlas:dir:${slug}`, 24 * 3600, JSON.stringify(d));
+      }
+      await pipe.exec().catch(() => {});
+      await r.quit().catch(() => {});
+      console.log(`  ✓ Redis ace:atlas:dirs + ace:atlas:dir:* set (${dirCards.length} keys, 24h TTL)`);
+    } catch (e) {
+      console.warn(`  ⚠ Redis dir cache failed: ${e.message}`);
+    }
+  }
+}
+
 await pool.end();
 console.log();

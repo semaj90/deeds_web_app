@@ -144,3 +144,37 @@ The rest is provenance + raw rankings.
   inserts/updates/deletes
 - **MCP optional**: skill works without `:8788` available; live MCP queries
   are enrichment only
+
+## Directory-First Lookups (added 2026-05-08)
+
+Before generating recommendations, prefer directory-scoped reads over the global top-N:
+
+```
+memory/atlas/codebase-atlas.dirs.json    918 directory cards, ranked 0..1
+memory/atlas/codebase-atlas.top.json     top-50 ranked subset
+memory/atlas/codebase-atlas.latest.md    human-readable summary
+
+Redis  ace:atlas:dirs                    same as dirs.json (24h TTL)
+Redis  ace:atlas:dir:{slug}              one card per directory (24h TTL)
+       slug = dir.replace(/[\/()]/g, '_')
+```
+
+Each directory card carries: `d`, `a` (AGENTS), `p` (parent AGENTS), `n` (file count),
+`clusters[]`, `topo[]`, `tools[]`, `tags[]`, `pr`, `auth`, `avgAuth`, `kgpu` (Karpathy blend),
+`hits`, `dirty`, `rank`, `top[]` (top 5 files inside).
+
+When a target file is mentioned:
+1. **Normalize** the path (strip `src/` and `sveltekit-frontend/` prefixes).
+2. **Find its directory card** — `redis GET ace:atlas:dir:{slug}` is O(1).
+3. **Walk up** to parent AGENTS via card `p` field if more rules needed.
+4. **Read related clusters** from card `clusters[]` for cross-cutting context.
+5. **Then** call live MCP/Postgres/Qdrant only for detail the card doesn't cover.
+
+Prefer directory-scoped recommendations over a flat global list — they keep the
+agent grounded in the local conventions instead of drifting to the global top-25.
+
+Refresh:
+```bash
+npm run atlas:index           # rebuild file + dir cards (~7s)
+npm run atlas:index:dry       # preview without writing
+```
