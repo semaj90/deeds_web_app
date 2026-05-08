@@ -36,7 +36,7 @@ const args = process.argv.slice(2);
 const REPO          = args.includes('--repo') ? args[args.indexOf('--repo') + 1] : 'default';
 const QDRANT_URL    = process.env.QDRANT_URL    ?? 'http://127.0.0.1:6333';
 const REDIS_URL     = process.env.REDIS_URL     ?? 'redis://127.0.0.1:6379';
-const DATABASE_URL  = process.env.DATABASE_URL  ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DATABASE_URL  = process.env.DATABASE_URL  ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const COLLECTION    = 'cluster_narratives';
 const REDIS_TTL     = 12 * 60 * 60;
 

@@ -10,7 +10,7 @@
  *   node scripts/karpathy-tag.mjs [--dry-run] [--limit N] [--batch N] [--domain D]
  *
  * ENV:
- *   DATABASE_URL   (default postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db)
+ *   DATABASE_URL   (default postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db)
  *   QDRANT_URL     (default http://localhost:6333)
  *   OLLAMA_URL     (default http://localhost:11434)
  *   OLLAMA_MODEL   (default gemma4-legal-fast:latest)
@@ -20,7 +20,7 @@
 import pg from 'pg';
 const { Pool } = pg;
 
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://localhost:6333';
 const OLLAMA_URL   = process.env.OLLAMA_URL   ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-legal-fast:latest';

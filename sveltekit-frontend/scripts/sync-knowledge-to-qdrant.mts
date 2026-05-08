@@ -6,7 +6,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import postgres from 'postgres';
 
-const sql = postgres('postgresql://legal_admin:legal_admin_pass@localhost:5432/legal_ai_db');
+const sql = postgres('postgresql://legal_admin:legal_admin_pass@localhost:5434/legal_ai_db');
 const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
 
 const COLLECTION = 'phase79_knowledge_base';

@@ -63,7 +63,7 @@ try {
 } catch { /* skip — env may already be set */ }
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const DATABASE_URL     = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const DATABASE_URL     = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const OLLAMA_BASE_URL  = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434').replace(/\/$/, '');
 const QDRANT_URL       = (process.env.QDRANT_URL      ?? 'http://localhost:6333').replace(/\/$/, '');
 const EMBED_MODEL      = process.env.EMBEDDING_MODEL  ?? 'embeddinggemma:latest';

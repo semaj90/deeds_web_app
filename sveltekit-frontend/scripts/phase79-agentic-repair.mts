@@ -24,7 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Configuration
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDUFnEXDcyhys7aKLHpHFZjmJB0Yhsoxt0';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';

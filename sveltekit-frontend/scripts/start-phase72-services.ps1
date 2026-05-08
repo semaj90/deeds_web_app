@@ -37,7 +37,7 @@ $env:SIMD_JSON_ACCEL_URL = "http://127.0.0.1:8103"
 $env:GO_INGEST_URL = "http://127.0.0.1:8089"
 $env:REDIS_URL = "redis://127.0.0.1:4005"
 $env:QDRANT_URL = "http://localhost:6333"
-$env:DATABASE_URL = "postgresql://legal_admin:123456@localhost:5432/legal_ai_db"
+$env:DATABASE_URL = "postgresql://legal_admin:123456@localhost:5434/legal_ai_db"
 
 Write-Host "🔧 Environment variables set:" -ForegroundColor Yellow
 Write-Host "   SIMD_JSON_ACCEL_URL: $env:SIMD_JSON_ACCEL_URL" -ForegroundColor Gray

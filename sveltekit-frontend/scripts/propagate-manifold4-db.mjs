@@ -12,7 +12,7 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 
-const DB_5432 = 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_5432 = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const DB_5434 = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const CLUSTER_TOPOLOGY = './docs/graph/cluster-topology.json';
 

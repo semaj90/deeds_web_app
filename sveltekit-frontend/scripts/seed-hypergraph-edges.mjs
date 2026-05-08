@@ -71,7 +71,70 @@ function edgeHash(edgeType, memberKeys) {
   return createHash('sha256').update(`${edgeType}:${sorted}`).digest('hex').slice(0, 64);
 }
 
+// ── Pre-run Redis snapshot ───────────────────────────────────────────────────
+//
+// AST scan + GPU k-means + qdrant_cluster_members repopulation is a 20+ min
+// pipeline. If the seeder ever deletes orphan edges (or a downstream cleanup
+// query does), a stale state with no recovery path means the operator has to
+// re-run the whole upstream chain to get back to a known-good edge set.
+//
+// Pre-snapshot the entire current hypergraph_edges + member_ids state into
+// Redis BEFORE any mutation. Hash key = hypergraph:edges:archive:{ISO date}
+// — survives 30 days, idempotent (same key per day = atomic replace).
+//
+// Recovery path documented in next_steps for future operators.
+async function snapshotToRedis(pool) {
+  let Redis;
+  try { ({ default: Redis } = await import('ioredis')); } catch { return null; }
+  const redisUrl = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+  const redis    = new Redis(redisUrl, { lazyConnect: true, connectTimeout: 3000 });
+  try {
+    await redis.connect();
+    const day      = new Date().toISOString().slice(0, 10);  // YYYY-MM-DD
+    const key      = `hypergraph:edges:archive:${day}`;
+    const { rows } = await pool.query(
+      `SELECT id, edge_hash, edge_type, member_ids, title, summary,
+              grade_label, grade_score, gpu_cluster, som_cluster, som_cell,
+              manifold4, topo_class, weight, run_id, label, metadata
+       FROM hypergraph_edges`,
+    );
+    if (rows.length === 0) {
+      await redis.quit();
+      return { archived: 0, key };
+    }
+    const pipe = redis.pipeline();
+    pipe.del(key);
+    for (const r of rows) {
+      pipe.hset(key, r.edge_hash, JSON.stringify(r));
+    }
+    pipe.expire(key, 30 * 24 * 3600);  // 30 days
+    pipe.set(`${key}:meta`,
+             JSON.stringify({ archived_at: new Date().toISOString(), edges: rows.length }),
+             'EX', 30 * 24 * 3600);
+    await pipe.exec();
+    return { archived: rows.length, key };
+  } catch {
+    return null;
+  } finally {
+    await redis.quit().catch(() => {});
+  }
+}
+
 async function main() {
+  // 0. Snapshot current hypergraph_edges to Redis with 30-day TTL.
+  //    Defensive guard: AST + GPU + qdrant_cluster_members repopulation
+  //    is a 20+ min pipeline. If a future cleanup deletes orphan edges,
+  //    this archive lets the operator restore without re-running the
+  //    whole chain. Recovery: redis-cli HGETALL hypergraph:edges:archive:YYYY-MM-DD
+  if (!DRY) {
+    const snap = await snapshotToRedis(pool);
+    if (snap) {
+      console.log(`   📦 archived ${snap.archived} edges → ${snap.key} (30d TTL)`);
+    } else {
+      console.log(`   ⚠ snapshot skipped (Redis unavailable) — proceeding`);
+    }
+  }
+
   // 1. Pull all gpu:N clusters that meet the size band, joined to
   //    code_retrieval_chunks so we can aggregate the cluster's SOM cell
   //    centroid + dominant topo_class + manifold4 centroid in one pass.

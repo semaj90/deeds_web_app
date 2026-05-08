@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+const env: Record<string, string | undefined> = process.env;
 import type { PointStruct, SearchRequest, SearchResponse, UpsertPoints, UpsertResponse } from '$lib/types/qdrant';
 
 const QDRANT_COLLECTION_NAME = 'legal_documents';

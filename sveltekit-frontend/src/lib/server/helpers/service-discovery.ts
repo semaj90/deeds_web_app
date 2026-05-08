@@ -116,7 +116,7 @@ export const COMMON_SERVICES: Record<string, ServiceConfig> = {
   },
   postgres: {
     envVar: 'DATABASE_URL',
-    fallback: 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
+    fallback: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
     containerName: 'postgres',
     port: 5432,
     verify: false,

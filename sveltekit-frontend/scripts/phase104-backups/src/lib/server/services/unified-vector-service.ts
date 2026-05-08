@@ -65,7 +65,7 @@ const getConfig = () => ({
  | 'faiss',
 
  // Database
- databaseUrl: process.env?.DATABASE_URL?? 'postgresql://localhost:5432/legal_ai_db',
+ databaseUrl: process.env?.DATABASE_URL?? 'postgresql://localhost:5434/legal_ai_db',
 
  // Redis caching
  redisUrl: process.env?.REDIS_URL?? 'redis://127.0.0.1:6379/0',

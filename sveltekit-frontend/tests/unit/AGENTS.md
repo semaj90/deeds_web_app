@@ -1,24 +1,24 @@
 # AGENTS.md — `tests/unit`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-06T23:45:43.498Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-08T02:03:14.841Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/unit
 
 ## Snapshot
 
-- module directory with 5 files, 0 API handlers
+- module directory with 6 files, 0 API handlers
 - Audit score: **90/100**
 - no audit signals
 - Tags: `tests` `unit` `agents-md-quick-hit.test.ts` `zod` `test` `board-persistence-server.test.ts`
 
-## Files (5)
+## Files (6)
 
 - `tests/unit/agents-md-quick-hit.test.ts`
 - `tests/unit/board-persistence-server.test.ts`
 - `tests/unit/chat-memory.test.ts`
 - `tests/unit/ensure-dev-runtime.test.ts`
-- `tests/unit/templates.test.ts`
+- `tests/unit/normalize-repo-path.test.ts`
 
 
 ## Retrieval / Rerank Hints
@@ -26,7 +26,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/5 files have paired tests
+- **Paired tests**: 0/6 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

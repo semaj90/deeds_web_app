@@ -12,7 +12,7 @@ import pg from 'pg';
 
 const OLLAMA_URL  = process.env.OLLAMA_URL  ?? 'http://localhost:11434';
 const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-const PG_URL      = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const PG_URL      = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const PATCH_ALL   = process.argv.includes('--all');
 
 const pool = new pg.Pool({ connectionString: PG_URL });

@@ -1,12 +1,12 @@
 # Deep Import Graph - Phase A
-Generated: 2026-05-07T20:11:25.423Z
+Generated: 2026-05-07T22:33:08.108Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
 | Nodes | 3653 |
-| Total edges | 11926 |
-| Resolved edges | 7053 |
+| Total edges | 11927 |
+| Resolved edges | 7054 |
 | Unresolved (local) | 766 |
 | External refs | 3919 |
 | Neighborhoods computed | 100 |
@@ -15,8 +15,8 @@ Generated: 2026-05-07T20:11:25.423Z
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| route | 1070 |
-| client | 956 |
+| route | 1071 |
+| client | 955 |
 | test | 862 |
 | server | 644 |
 | types | 121 |
@@ -24,22 +24,22 @@ Generated: 2026-05-07T20:11:25.423Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 5493 |
+| imports_static | 5494 |
 | test_covers_file | 2500 |
 | server_route_depends_on | 1015 |
-| db_dependency | 890 |
+| db_dependency | 891 |
 | env_dependency | 581 |
 | imports_dynamic | 491 |
 | redis_dependency | 383 |
 | exports_from | 276 |
-| qdrant_dependency | 161 |
+| qdrant_dependency | 160 |
 | neo4j_dependency | 80 |
 | mcp_tool_calls | 56 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
-| 1 | `src/lib/server/db/client.ts` | server | 489 | 7 |
+| 1 | `src/lib/server/db/client.ts` | server | 488 | 7 |
 | 2 | `src/lib/server/env.server.ts` | server | 379 | 0 |
 | 3 | `src/lib/components/ui/Icon.svelte` | client | 253 | 14 |
 | 4 | `src/lib/server/redis.ts` | server | 247 | 1 |

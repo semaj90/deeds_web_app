@@ -13,7 +13,7 @@ async function querySvelte5ErrorsAndSolutions() {
 
     // Connect to PostgreSQL
     const client = new Client({
-        connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db'
+        connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db'
     });
 
     try {

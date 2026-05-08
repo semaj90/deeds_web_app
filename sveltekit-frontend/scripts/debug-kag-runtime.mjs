@@ -5,7 +5,7 @@
  */
 import pg from 'pg';
 const { Pool } = pg;
-const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db' });
+const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
 
 const CASE_ID = 'c9b79f5d-5d81-40ee-9c60-4945a6b38287';
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -88,7 +88,7 @@ async function main() {
   console.log('\n--- Drizzle connection check ---');
   // Check DATABASE_URL env
   console.log(`DATABASE_URL env: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
-  console.log(`Connection used: postgresql://legal_admin:***@127.0.0.1:5432/legal_ai_db`);
+  console.log(`Connection used: postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db`);
 
   // 8. Test what happens when the function is called but error is caught
   console.log('\n--- Error swallowing test ---');

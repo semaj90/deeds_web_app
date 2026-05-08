@@ -20,7 +20,7 @@ dotenv.config();
 const STRICT = process.argv.includes('--strict');
 const STRICT_MIN_ROWS = 1000;
 
-const DB_URL            = process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_URL            = process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL         = process.env.REDIS_URL         ?? 'redis://127.0.0.1:6379';
 const QDRANT_URL        = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';

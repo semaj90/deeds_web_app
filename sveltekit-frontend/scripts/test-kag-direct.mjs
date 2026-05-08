@@ -5,7 +5,7 @@
  */
 import pg from 'pg';
 const { Pool } = pg;
-const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db' });
+const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
 
 const CASE_ID = 'c9b79f5d-5d81-40ee-9c60-4945a6b38287';
 

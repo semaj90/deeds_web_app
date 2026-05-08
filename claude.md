@@ -1445,6 +1445,79 @@ VS Code tasks: `🗺️ Graphify: Daily Map`, `🔎 Graphify: Semantic Index`, `
 
 ---
 
+## Karpathy GPU Authority Blend + Redis ACE Cache (May 8, 2026)
+
+Single-pipeline composite score for "where to focus" agent recommendations. Combines Neo4j PageRank, GPU semantic attention, and graph authority into one Redis-cached blend that ACE/MCP/synthesis tools read in O(1).
+
+### Pipeline (`scripts/karpathy-gpu-enrich.mjs`)
+```
+Top-N from Neo4j (graphPageRank)
+  → Qdrant fetch content_embedding (768-dim, codebase_chunks_768)
+  → Embed RISK_QUERY via /api/embed (Redis L1 + Bifrost L2 cached probe)
+  → attentionScoreGPU(probe, 768, embeddings, n)  [direct on raw 768d]
+  → autoencoderEncode 768→64  [separate output for memory paths, NOT on attention path]
+  → Blend: 0.4·PR + 0.3·attn + 0.3·authority
+  → Persist to Redis + write markdown report
+```
+
+**Surface**: `npm run karpathy:gpu` (top-50), `karpathy:gpu:dirty` (incremental), `karpathy:gpu:top200`, `karpathy:gpu:dry`.
+
+### Redis ACE cache layout (canonical)
+
+| Key | Type | TTL | Refresher |
+|-----|------|-----|-----------|
+| `gpu:karpathy:scores` | hash `<file> → JSON{pr,attn,authority,blend}` | 24h | `karpathy:gpu` |
+| `gpu:karpathy:encoded` | hash `<file> → 64-dim CSV` (compressed memory paths) | 24h | `karpathy:gpu` |
+| `gpu:karpathy:summary` | hash run metadata | 24h | `karpathy:gpu` |
+| `ace:authority:top` | hash top-200 stableKey → graphAuthorityScore | varies | `graphify:authority` |
+| `ace:rank:dirty_files` | set | session | `startup:ace` |
+| `ace:startup:last_sha` | string git HEAD | persistent | `startup:ace` |
+| `ace:startup:heavy_last_run` | string ISO timestamp | 24h | `startup:ace` heavy |
+| `ace:topo:{class}:{hash}` | string topo-byte candidate cache | 300s | ACE Stage A0 |
+| `agents:dir:<rel>` | string rendered AGENTS.md | 24h | `agents:write` |
+| `couchdb:pagerank_scores` | string JSON | 6h | `run-pagerank.ts` |
+
+### TurboQuant embedding constraint (important)
+
+**TurboQuant llama-server (:8090) is chat-only** with the canonical flags `-fa on -ctk q8_0 -ctv q8_0`. It refuses `/embedding` and `/v1/embeddings` with `code: 501, "Start it with --embeddings"`. Don't route embedding work through TurboQuant.
+
+**Canonical embed cascade** (used by `karpathy-gpu-enrich.mjs` and elsewhere):
+1. **SvelteKit `/api/embed`** — wraps Ollama embeddinggemma with Redis L1 (5ms) + Bifrost L2 (2-5s) — preferred
+2. **Direct Ollama `/api/embeddings`** — fallback when dev server is down
+3. **TurboQuant** — chat-only, never embeddings unless restarted with `--embeddings` (which OOMs with current `ctk/ctv q8_0` config on 8GB GPU)
+
+**Why TurboQuant chat config wins on RTX 3060 Ti (8GB)**: gemma4-legal-vlm + q8_0 KV uses ~5.8GB VRAM; tensorrt_bridge.node shares the remaining ~2.3GB for autoencoder/attention compute. Adding `--embeddings` would OOM or force a separate server instance.
+
+### Why autoencoder is bypassed for attention scoring
+
+Random Xavier-initialized weights produce flat tanh outputs at 64-dim — every vector saturates near boundaries, attention scores cluster at ~1.0 (Δ < 0.01). Direct 768-dim attention preserves embeddinggemma's semantic structure. The 64-dim autoencoder output is still cached at `gpu:karpathy:encoded` for **future MLA-style consumers** (DeepSeek-MLA path) once trained autoencoder weights become available.
+
+`encodeProbe` and `attentionVsRiskProbe` are kept in the script (marked `@reserved` JSDoc) — don't delete on lint cleanup.
+
+### Auto-fire policy
+
+Wired into the heavy lane of `scripts/startup/ace-incremental-startup.mjs` via `config/startup-ace-policy.json`:
+- Heavy lane fires only when GPU is warm (TurboQuant :8090 OR Ollama :11434 health probe passes)
+- 24h cooldown via `ace:startup:heavy_last_run`
+- Sequence: `graphify:authority → graphify:gds → graphify:cluster-summaries → graphify:bow-tiles → topology:validate → karpathy:gpu → audit:full-pipeline`
+- Allowlist also permits `karpathy:gpu:dirty` and `karpathy:gpu:dry` on every folder open (incremental lane)
+
+### Verification
+
+```bash
+# Sample scores
+docker exec legal-ai-redis redis-cli HGET gpu:karpathy:scores 'src/lib/server/db/client.ts'
+# → {"pr":7.06,"attn":0.999,"authority":0.555,"blend":3.291}
+
+# 64-dim memory path for a file
+docker exec legal-ai-redis redis-cli HGET gpu:karpathy:encoded 'src/lib/server/db/client.ts'
+
+# Run metadata
+docker exec legal-ai-redis redis-cli HGETALL gpu:karpathy:summary
+```
+
+---
+
 ## Route Test Pairing (G16 — May 4, 2026)
 
 Closes the test-coverage visibility gap: every `+server.ts` without a paired test gets a placeholder stub written to `tests/routes/auto/` (already in vitest include glob).

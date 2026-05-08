@@ -2,7 +2,7 @@
 import { Client } from 'pg';
 
 const client = new Client({
-    connectionString: 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db'
+    connectionString: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db'
 });
 
 async function checkColumns() {

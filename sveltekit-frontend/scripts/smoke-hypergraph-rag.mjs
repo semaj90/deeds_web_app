@@ -16,7 +16,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const KEEP = process.argv.includes('--keep');
-const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
 async function main() {
   console.log('🔷 HyperGraphRAG smoke test');

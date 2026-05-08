@@ -1,5 +1,5 @@
 import psycopg2
-conn = psycopg2.connect('postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db')
+conn = psycopg2.connect('postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db')
 conn.autocommit = True
 cur = conn.cursor()
 cur.execute("DELETE FROM cluster_summaries WHERE summary = '' OR summary IS NULL")

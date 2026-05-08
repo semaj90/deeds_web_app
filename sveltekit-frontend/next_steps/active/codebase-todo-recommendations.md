@@ -2,18 +2,18 @@
 > **This file is auto-generated** by `npm run skill:codebase-todo`.
 > For human-edited planning + commentary, see [`2026-05-08_pipeline-driven-next-actions.md`](./2026-05-08_pipeline-driven-next-actions.md).
 >
-> Generated: 2026-05-08T07:08:17Z | Top-25 by fused authority + Karpathy GPU + dirty-file signal
+> Generated: 2026-05-08T07:10:38Z | Top-25 by fused authority + Karpathy GPU + dirty-file signal
 > Sources: Redis ace:authority:top + gpu:karpathy:scores + ace:rank:dirty_files,
 >          Postgres agent_context_files, MCP clusters.get_summary_lenses,
 >          docs/agent_timeline_synthesis.md
 ## Gemma4 Synthesis
 
-* **`lib/server/db/client.ts`**: Review and refactor database connection logic to ensure resilience against connection pooling failures, as this file is central to all data operations and has high authority.
-* **`lib/server/env.server.ts`**: Standardize environment variable loading across all services to enforce strict configuration boundaries, given the recent focus on eliminating hardcoded local settings.
-* **`routes/api/analytics/research-graph/+server.ts`**: Investigate the integration of the latest graph traversal logic here to ensure it correctly handles the path-alias expansion fixes applied to the core graph services.
-* **`lib/server/redis.ts`**: Audit the Redis client implementation for potential race conditions, as caching mechanisms are critical for the high-momentum MCP features.
-* **`lib/server/ollama.ts`**: Enhance the agent interaction layer by adding robust error handling for Ollama calls, as agent reliability is a primary area of recent instability.
-* **`lib/server/db/relations.ts`**: Review the schema definitions for any potential circular dependencies, as this file manages the core relationships and is a foundational piece of the data layer.
+* **`lib/server/db/client.ts`**: Review and refactor the database client initialization to ensure all connection pooling logic is resilient to environment changes. (High authority suggests this is a core dependency needing immediate stability checks.)
+* **`lib/server/env.server.ts`**: Standardize environment variable loading across the entire application to eliminate hardcoded `localhost` fallbacks and improve container portability. (High recent focus on environment hardening suggests this is a critical, high-impact cleanup task.)
+* **`routes/api/analytics/research-graph/+server.ts`**: Audit the graph endpoint logic to confirm it correctly handles path-alias expansion for Qdrant/Neo4j consistency. (The recent activity shows graph/indexing issues are a primary source of bugs.)
+* **`lib/server/redis.ts`**: Implement robust connection health checks and automatic reconnection logic for Redis to prevent cascading failures during transient network issues. (Redis is a key piece of infrastructure highlighted in recent fixes, demanding reliability improvements.)
+* **`lib/server/ollama.ts`**: Review the Ollama interaction layer to ensure proper error handling for model unavailability or unexpected API responses. (Agent/Tooling reliability is a major theme, and this file manages a key external dependency.)
+* **`lib/server/gpu/libtorch-bridge.ts`**: Investigate and document the GPU resource management lifecycle to ensure deterministic cleanup of PyTorch resources. (This file relates to complex, low-level infrastructure that needs hardening to prevent resource leaks.)
 
 ## Ranked Targets
 | # | File | Blend | PR | Authority | Attention | Dirty | Reasons |

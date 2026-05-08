@@ -100,7 +100,7 @@ async function run() {
 
     let dbClient = null;
     if (!isDryRun) {
-        dbClient = new Client({ connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db' });
+        dbClient = new Client({ connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db' });
         try {
             await dbClient.connect();
         } catch(e) {

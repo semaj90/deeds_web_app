@@ -66,6 +66,16 @@ export interface CodebaseContextForFile {
     karpathyBlend?:       number;
     karpathyAttention?:   number;
     hitCount?:            number;
+    /**
+     * Live demand signal from chunk_hit_log (last N hours, Redis-cached).
+     * `hits` × `avgRerank` = `hotScore` — the squashed value feeds fileRank.
+     */
+    hitDemand?: {
+      hits:        number;
+      hotScore:    number;
+      avgRerank:   number;
+      lastHitAt?:  string;
+    };
     dirty?:               boolean;
     rank:                 number;
     reasons:              string[];
@@ -207,6 +217,32 @@ async function loadDirtySet(redis: Redis | null): Promise<Set<string>> {
   }
 }
 
+interface HitDemand {
+  hits:        number;
+  hot_score:   number;
+  avg_rerank:  number;
+  last_hit_at: string | null;
+}
+
+/**
+ * Pull demand signal from `ace:rank:demand` (1h TTL hash, seeded by
+ * `scripts/seed-hit-demand.mjs` from `chunk_hit_log` aggregations).
+ * Returns null if the hash is missing or the file isn't hot — the rank
+ * formula degrades gracefully to 0 contribution from this lane.
+ */
+async function loadHitDemand(
+  redis: Redis | null,
+  normalizedPath: string,
+): Promise<HitDemand | null> {
+  if (!redis) return null;
+  try {
+    const raw = await redis.hget('ace:rank:demand', normalizedPath);
+    return safeParse<HitDemand>(raw);
+  } catch {
+    return null;
+  }
+}
+
 // ── Recommended-actions synthesis ────────────────────────────────────────────
 //
 // Pure-atlas — only emits actions the data actually justifies. Caller layers
@@ -293,11 +329,13 @@ export async function contextForFile(
     redis = await defaultGetRedis();
   }
 
-  const [dirtySet, dirCard] = await Promise.all([
+  const [dirtySet, dirCard, hitDemand] = await Promise.all([
     loadDirtySet(redis),
     loadDirectoryCard(redis, directory),
+    loadHitDemand(redis, normalizedPath),
   ]);
   if (dirCard) sources.push(`dir-card(${directory})`);
+  if (hitDemand && hitDemand.hits > 0) sources.push(`hit-demand(hits=${hitDemand.hits})`);
   const isDirty = dirtySet.has(normalizedPath);
 
   // ── Karpathy + authority neighbours via path aliases ──────────────────────
@@ -340,20 +378,33 @@ export async function contextForFile(
   })();
 
   // ── File rank synthesis (deterministic) ───────────────────────────────────
+  // Hit-demand normalization: `hot_score` is unbounded (hits × avg_rerank).
+  // Observed range in cold dev: 0-5; in production: 0-50+. Use logarithmic
+  // squashing so a few warm hits produce signal without one hot file
+  // dominating the rank when the demand window is short.
+  const demandHotRaw   = hitDemand?.hot_score ?? 0;
+  const demandSquashed = demandHotRaw > 0 ? Math.min(1, Math.log1p(demandHotRaw) / Math.log1p(20)) : 0;
+
   const fileReasons: string[] = [];
   if (graphAuthorityScore != null) fileReasons.push(`authority=${graphAuthorityScore.toFixed(2)}`);
   if (graphPageRank != null && graphPageRank > 0) fileReasons.push(`PR=${graphPageRank.toFixed(2)}`);
   if (karpathyBlend != null) fileReasons.push(`gpu_blend=${karpathyBlend.toFixed(2)}`);
   if (karpathyAttention != null && karpathyAttention >= 0.95) fileReasons.push('high-attention');
   if (isDirty) fileReasons.push('dirty');
+  if (hitDemand && hitDemand.hits > 0) fileReasons.push(`demand=${hitDemand.hits}×${hitDemand.avg_rerank.toFixed(2)}`);
   if (dirCard?.clusters?.length) fileReasons.push(`dir-clusters=${dirCard.clusters.length}`);
 
+  // Weights re-balanced to make room for demand without over-rotating away
+  // from the structural signals (authority/PR/karpathy still dominate at 80%).
+  // Demand at 12% means 5+ recent hot hits beats a one-off dirty flag (10%)
+  // but won't overwhelm a top-authority file with no recent traffic.
   const fileRank =
-    0.40 * (graphAuthorityScore ?? 0) +
-    0.20 * Math.min(1, (graphPageRank ?? 0) / 8) +    // PR observed range 0..8
-    0.15 * (karpathyAttention ?? 0) +
-    0.15 * (karpathyBlend != null ? Math.min(1, karpathyBlend / 3.5) : 0) +
-    (isDirty ? 0.10 : 0);
+    0.36 * (graphAuthorityScore ?? 0) +
+    0.18 * Math.min(1, (graphPageRank ?? 0) / 8) +    // PR observed range 0..8
+    0.13 * (karpathyAttention ?? 0) +
+    0.13 * (karpathyBlend != null ? Math.min(1, karpathyBlend / 3.5) : 0) +
+    0.12 * demandSquashed +                            // NEW — chunk_hit_log demand
+    (isDirty ? 0.08 : 0);
 
   // ── Assemble packet ───────────────────────────────────────────────────────
   return {
@@ -374,7 +425,17 @@ export async function contextForFile(
       graphPageRank,
       karpathyBlend:     karpathyBlend     ?? undefined,
       karpathyAttention: karpathyAttention ?? undefined,
-      hitCount:          row?.h ?? dirCard?.hits,
+      // Live demand from chunk_hit_log (1h Redis cache, seed-hit-demand.mjs);
+      // falls back to atlas-baked counts when Redis miss.
+      hitCount:          hitDemand?.hits ?? row?.h ?? dirCard?.hits,
+      hitDemand:         hitDemand
+        ? {
+            hits:        hitDemand.hits,
+            hotScore:    hitDemand.hot_score,
+            avgRerank:   hitDemand.avg_rerank,
+            lastHitAt:   hitDemand.last_hit_at ?? undefined,
+          }
+        : undefined,
       dirty:             isDirty,
       rank:              Math.round(fileRank * 1000) / 1000,
       reasons:           fileReasons,

@@ -33,7 +33,7 @@ const REDIS_ONLY = process.argv.includes('--redis-only');
 const VERBOSE    = process.argv.includes('--verbose');
 
 const REDIS_URL  = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
-const DB_URL     = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DB_URL     = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_TTL  = 86_400;
 
 const SCHEMA_VERSION = 1;
@@ -69,8 +69,9 @@ function parseAgentsMd(body, filePath) {
   const RULE_H       = ['rules', 'conventions', 'standards', 'guidelines'];
   const TAG_H        = ['tags', 'semantic tags', 'qdrant tags', 'topics'];
   const CONSTRAINT_H = ['constraints', 'forbidden', "don't", 'do not', 'limits'];
+  const TOOL_H       = ['tools', 'tool policy', 'allowed tools', 'tool registry'];
 
-  const rules = [], semantic_tags = [], qdrant_tags = [], constraints = [];
+  const rules = [], semantic_tags = [], qdrant_tags = [], constraints = [], tools = [];
 
   for (const sec of sections) {
     const h = sec.header;
@@ -95,13 +96,29 @@ function parseAgentsMd(body, filePath) {
       for (const b of bullets) (isQdrant ? qdrant_tags : semantic_tags).push(b.slice(0, 100));
     } else if (CONSTRAINT_H.some(k => h.includes(k))) {
       for (const b of bullets) constraints.push({ constraint: b.slice(0, 500), applies_to: [] });
+    } else if (TOOL_H.some(k => h.includes(k))) {
+      // Two forms accepted (mirrors src/lib/server/agents-md/parse-agents-md.ts):
+      //   "- toolname: allowed (scope) — reason"
+      //   "- toolname"  (bare → defaults to allowed/unspecified)
+      for (const b of bullets) {
+        const m = /^([\w.-]+)(?:\s*[:=]\s*(allowed|forbidden|denied|yes|no|true|false))?(?:\s*\(([^)]+)\))?(?:\s*[—-]\s*(.+))?$/i.exec(b);
+        if (!m) continue;
+        const allowed = m[2] ? /^(allowed|yes|true)$/i.test(m[2]) : true;
+        tools.push({
+          tool:    m[1].slice(0, 100),
+          allowed,
+          scope:   (m[3] ?? 'unspecified').toLowerCase().slice(0, 60),
+          reason:  m[4]?.trim().slice(0, 300),
+        });
+      }
     }
   }
 
   let confidence = 0.5;
   if (title)              confidence += 0.10;
   if (summary.length > 50) confidence += 0.10;
-  if (rules.length > 0)   confidence += 0.10;
+  if (rules.length > 0)        confidence += 0.10;
+  if (tools.length > 0)        confidence += 0.05;
   if (semantic_tags.length > 0) confidence += 0.10;
   if (constraints.length > 0)   confidence += 0.05;
   confidence = Math.min(confidence, 0.95);
@@ -117,7 +134,7 @@ function parseAgentsMd(body, filePath) {
     content_hash:   createHash('sha256').update(body).digest('hex'),
     title,
     summary: summary.slice(0, 2000),
-    rules, tools: [], constraints, semantic_tags, qdrant_tags,
+    rules, tools, constraints, semantic_tags, qdrant_tags,
     confidence,
     schema_version: SCHEMA_VERSION,
   };

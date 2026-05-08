@@ -36,7 +36,7 @@ const WITH_PG  = args.includes('--postgres');
 const NO_REDIS = args.includes('--no-redis');
 
 const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const TTL = 6 * 60 * 60;
 
 const r = new Redis(REDIS_URL, { lazyConnect: true, connectTimeout: 3000 });

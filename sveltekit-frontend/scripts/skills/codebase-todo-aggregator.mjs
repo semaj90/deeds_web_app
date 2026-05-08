@@ -372,6 +372,37 @@ async function main() {
   const fused = fuseScores(redisSignals, dirtySet);
   const top = fused.slice(0, LIMIT);
 
+  // ── Adaptive guard: input-hash short-circuit ──────────────────────────────
+  // Fingerprint the inputs that would change the markdown output: counts of
+  // each signal source + the top-LIMIT file paths (sorted, with blend).
+  // If unchanged from last run, skip the Gemma4 rerank AND the file write —
+  // return the cached markdown from Redis ace:todo:latest unchanged. Bypass
+  // with --force when you want to regenerate regardless.
+  const force = args.includes('--force');
+  let inputHash = null;
+  if (!DRY_RUN && !force && redis) {
+    const { createHash } = await import('node:crypto');
+    const sig = top.map(e => `${e.file}:${e.blend.toFixed(3)}`).join('|');
+    inputHash = createHash('sha1')
+      .update(`v1:${Object.keys(redisSignals.authority).length}:${Object.keys(redisSignals.karpathy).length}:${redisSignals.dirty.length}:${agentsRules.length}:${LIMIT}:${sig}`)
+      .digest('hex')
+      .slice(0, 16);
+    const lastHash = await redis.hget('ace:todo:meta', 'input_hash').catch(() => null);
+    if (lastHash === inputHash) {
+      const cached = await redis.get('ace:todo:latest').catch(() => null);
+      if (cached) {
+        if (STDOUT) {
+          process.stdout.write(cached);
+        } else {
+          console.log(`   inputs unchanged (hash=${inputHash}) — returning cached ace:todo:latest`);
+          console.log(`   Pass --force to regenerate. File at next_steps/active/codebase-todo-recommendations.md kept.`);
+        }
+        await redis.quit().catch(() => {});
+        return;
+      }
+    }
+  }
+
   // Gemma4 rerank
   if (!STDOUT) console.log(`\n   Running Gemma4 rerank…`);
   const reranked = await gemma4Rerank(top, agentsRules, timelineMd);
@@ -439,13 +470,24 @@ async function main() {
       console.log(`\n   ✓ next_steps/active/codebase-todo-recommendations.md (${lines.length} chars)`);
       if (redis) {
         try {
-          await redis.setex('ace:todo:latest', 24 * 3600, JSON.stringify({
+          // Cache the rendered markdown directly so the adaptive guard above
+          // can return it byte-for-byte without re-rendering. Plus a JSON
+          // metadata sidecar for callers that want the structured form.
+          const pipe = redis.pipeline();
+          pipe.setex('ace:todo:latest', 24 * 3600, lines);
+          pipe.setex('ace:todo:meta:json', 24 * 3600, JSON.stringify({
             generatedAt: now,
             top:         top.slice(0, LIMIT),
             agentsRules: agentsRules.slice(0, 10),
             rerank:      reranked ?? null,
+            inputHash:   inputHash ?? '',
           }));
-          console.log(`   ✓ Redis ace:todo:latest (24h TTL)`);
+          if (inputHash) {
+            pipe.hset('ace:todo:meta', { input_hash: inputHash, generated_at: now });
+            pipe.expire('ace:todo:meta', 24 * 3600);
+          }
+          await pipe.exec();
+          console.log(`   ✓ Redis ace:todo:{latest,meta,meta:json} (24h TTL)`);
         } catch { /* non-fatal */ }
       }
     } else {

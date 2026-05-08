@@ -36,7 +36,7 @@ const __dirname = path.dirname(__filename);
 
 const CONFIG = {
   // Database
-  DATABASE_URL: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
+  DATABASE_URL: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
 
   // Redis
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',

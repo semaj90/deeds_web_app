@@ -63,7 +63,7 @@ const REPO_ROOT = join(__dirname, '..', '..');
 const LAWPDFS_DIR = join(REPO_ROOT, 'lawpdfs');
 
 const DATABASE_URL =
-	process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+	process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 
 const OLLAMA_BASE_URL = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434').replace(/\/$/, '');
 const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://localhost:6333').replace(/\/$/, '');

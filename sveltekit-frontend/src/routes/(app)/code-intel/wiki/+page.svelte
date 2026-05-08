@@ -15,6 +15,7 @@
 
 <div class="p-6 max-w-6xl mx-auto space-y-6">
   <div class="flex items-center gap-4">
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
     <a href="/code-intel" class="text-[var(--t-fg-muted)] hover:text-[var(--t-fg)] text-sm">← Code Intel</a>
     <h1 class="text-xl font-bold">📖 Karpathy Wiki</h1>
     <span class="ml-auto text-sm {syncColor(ws?.syncStatus ?? 'unknown')}">{ws?.syncStatus ?? 'unknown'}</span>
@@ -52,6 +53,7 @@
   <div class="panel p-4 rounded">
     <h2 class="text-xs uppercase text-[var(--t-fg-muted)] mb-3">Actions</h2>
     <div class="flex gap-2 flex-wrap text-xs">
+      <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
       <a href="/codebase-wiki" class="btn-base px-3 py-1.5">Open Wiki →</a>
     </div>
     <div class="mt-3 font-mono text-xs space-y-1 text-[var(--t-fg-muted)]">
