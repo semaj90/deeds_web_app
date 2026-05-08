@@ -7,6 +7,9 @@ const publicEnv: Record<string, string | undefined> = process.env;
 
 // Development fallback defaults (localhost)
 const DEV = {
+  // Port 5434 = deeds-postgres-prod-proxy (alpine/socat) → legal-ai-postgres container.
+  // Port 5432 on the host is squatted by a native Windows Postgres install on this machine,
+  // so any client connecting to :5432 hits a different DB. Always route through the proxy.
   DATABASE_URL: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
   REDIS_URL: 'redis://localhost:6379',
   QDRANT_URL: 'http://localhost:6333',
@@ -34,6 +37,14 @@ function qdrantUrlFromParts(): string | undefined {
   const port = privateEnv.QDRANT_PORT ?? '6333';
   return `http://${host}:${port}`;
 }
+
+// Canonical DB resolution: only the modern Postgres on :5434 is supported.
+// The legacy :5432 stub used to live behind a DATABASE_URL_FALLBACK chain;
+// removed 2026-05-08 because the two instances had drifted independently
+// (different schemas, different row counts) and the fallback let stale dev
+// processes silently read the wrong DB. See
+//   next_steps/active/2026-05-08_dual-postgres-dbs-todo.md
+// for the full diagnosis.
 
 export const ENV = {
   DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
