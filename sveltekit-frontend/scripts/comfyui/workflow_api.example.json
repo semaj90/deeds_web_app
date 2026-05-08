@@ -1,0 +1,42 @@
+{
+  "_comment": "Placeholder workflow_api.json for the ComfyUI HTTP bridge. Replace this with a real export from ComfyUI Desktop: Workflow → Save (API Format). The shape below is a minimal stable-diffusion graph and will only succeed against a ComfyUI instance that has the referenced models. Production workflows (TRELLIS image→GLB) drop in here unchanged.",
+  "3": {
+    "inputs": {
+      "seed": 1,
+      "steps": 20,
+      "cfg": 8.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1.0,
+      "model":     ["4", 0],
+      "positive":  ["6", 0],
+      "negative":  ["7", 0],
+      "latent_image": ["5", 0]
+    },
+    "class_type": "KSampler"
+  },
+  "4": {
+    "inputs": { "ckpt_name": "model.safetensors" },
+    "class_type": "CheckpointLoaderSimple"
+  },
+  "5": {
+    "inputs": { "width": 512, "height": 512, "batch_size": 1 },
+    "class_type": "EmptyLatentImage"
+  },
+  "6": {
+    "inputs": { "text": "PS1 low-poly alleyway, demonstrative reconstruction", "clip": ["4", 1] },
+    "class_type": "CLIPTextEncode"
+  },
+  "7": {
+    "inputs": { "text": "photorealistic, high detail", "clip": ["4", 1] },
+    "class_type": "CLIPTextEncode"
+  },
+  "8": {
+    "inputs": { "samples": ["3", 0], "vae": ["4", 2] },
+    "class_type": "VAEDecode"
+  },
+  "9": {
+    "inputs": { "filename_prefix": "deeds-smoke", "images": ["8", 0] },
+    "class_type": "SaveImage"
+  }
+}
