@@ -183,6 +183,12 @@ export interface MlaFusionOpts {
   somBmuRow?:   number;     // query's SOM BMU row
   weights?:     Partial<MlaFusionWeights>;
   skipCache?:   boolean;    // bypass Redis latent cache (for benchmarking)
+  /**
+   * 1-bit pre-filter cap. When candidates.length exceeds this, run the cheap
+   * Hamming pre-filter over sign-packed latents and keep the top-K before the
+   * Float32 dot product. 0 / undefined → disabled.
+   */
+  oneBitPrefilter?: number;
 }
 
 export async function mlaFusionRerank(
@@ -197,9 +203,31 @@ export async function mlaFusionRerank(
   const queryArr = new Float32Array(queryEmbedding);
   const queryLatent = projectDown(queryArr, W);
 
+  // ── 1-bit pre-filter (TurboQuant-style sign quantization) ─────────────────
+  // When the candidate set is large, narrow it via Hamming distance over
+  // 16-byte sign packs before the Float32 dot product. This mirrors the
+  // PolarQuant fast-path used in TurboQuant inference KV cache.
+  let filtered = candidates;
+  const cap = opts.oneBitPrefilter ?? 0;
+  if (cap > 0 && candidates.length > cap) {
+    const queryPacked = latentTo1Bit(queryLatent);
+    const oneBitScores = await Promise.all(candidates.map(async (c) => {
+      let packed = opts.skipCache ? null : await getLatent1Bit(c.stable_key);
+      if (!packed && c.embedding?.length) {
+        const lat = projectDown(new Float32Array(c.embedding), W);
+        packed = latentTo1Bit(lat);
+        void setLatent1Bit(c.stable_key, packed);
+      }
+      return packed ? hammingSimilarity1Bit(queryPacked, packed) : 0.5;
+    }));
+    const indexed = candidates.map((c, i) => ({ c, s: oneBitScores[i] }));
+    indexed.sort((a, b) => b.s - a.s);
+    filtered = indexed.slice(0, cap).map((x) => x.c);
+  }
+
   // ── Resolve or compute latent KV per candidate ────────────────────────────
   const keyLatents: Float32Array[] = await Promise.all(
-    candidates.map(async (c) => {
+    filtered.map(async (c) => {
       if (!opts.skipCache) {
         const cached = await getLatentKV(c.stable_key);
         if (cached) return cached;
@@ -209,6 +237,8 @@ export async function mlaFusionRerank(
       }
       const latent = projectDown(new Float32Array(c.embedding), W);
       void setLatentKV(c.stable_key, latent); // fire-and-forget cache write
+      // Mirror to 1-bit cache for next-time pre-filter
+      void setLatent1Bit(c.stable_key, latentTo1Bit(latent));
       return latent;
     })
   );
@@ -220,7 +250,7 @@ export async function mlaFusionRerank(
   const qBmuCol = opts.somBmuCol ?? 4;
   const qBmuRow = opts.somBmuRow ?? 4;
 
-  return candidates.map((c, i) => {
+  return filtered.map((c, i) => {
     const latent_score  = attnScores[i];
     const som_score     = somProximityScore(qBmuCol, qBmuRow, c.som_bmu_col, c.som_bmu_row);
     const authority     = Math.min(c.authority_score ?? 0, 1);
@@ -241,6 +271,79 @@ export function embeddingHash(embedding: number[]): string {
     .update(Buffer.from(new Float32Array(embedding).buffer))
     .digest('hex')
     .slice(0, 16);
+}
+
+// ── 1-bit MLA: sign-pack latent → 16-byte bitmap ─────────────────────────────
+//
+// Mirrors the geometry that TurboQuant's PolarQuant exploits at extreme
+// compression (random rotation → sign quantization → angular similarity via
+// Hamming). At rank 128 each latent collapses from 512 bytes (Float32) to
+// 16 bytes (128 bits) — 32× compression. Hamming distance over the sign
+// bitmaps approximates the cosine-of-angle between the original latents:
+//
+//   cos(θ) ≈ cos(π · hamming(a,b) / 128)
+//
+// Use as a cheap pre-filter before the Float32 dot product when reranking
+// thousands of candidates. SOM BMU adjacency is the topology mirror layer:
+// candidates in the same SOM cell + close 1-bit Hamming distance → likely
+// near each other in the original 768-dim space.
+//
+// Wire chain: 1-bit MLA → SOM mirror → engram/ngram (Redis bigrams) →
+//             TurboQuant KV (inference-side) → rg/awk codebase fallback.
+
+const ONE_BIT_BYTES = MLA_RANK / 8; // 128 / 8 = 16
+
+export function latentTo1Bit(latent: Float32Array): Uint8Array {
+  if (latent.length !== MLA_RANK) {
+    throw new Error(`latentTo1Bit expects length ${MLA_RANK}, got ${latent.length}`);
+  }
+  const out = new Uint8Array(ONE_BIT_BYTES);
+  for (let i = 0; i < MLA_RANK; i++) {
+    if (latent[i] > 0) out[i >>> 3] |= 1 << (i & 7);
+  }
+  return out;
+}
+
+// Cached popcount for 256 byte values — measurably faster than per-call popcnt
+// in hot rerank loops (called O(candidates²) for cross-similarity).
+const POPCNT_TABLE = new Uint8Array(256);
+for (let i = 0; i < 256; i++) {
+  let x = i, c = 0;
+  while (x) { c += x & 1; x >>>= 1; }
+  POPCNT_TABLE[i] = c;
+}
+
+export function hammingDistance1Bit(a: Uint8Array, b: Uint8Array): number {
+  if (a.length !== b.length) throw new Error('hamming length mismatch');
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d += POPCNT_TABLE[a[i] ^ b[i]];
+  return d;
+}
+
+/** Cosine approximation from Hamming distance over sign bitmaps, in [0, 1]. */
+export function hammingSimilarity1Bit(a: Uint8Array, b: Uint8Array): number {
+  const d = hammingDistance1Bit(a, b);
+  // d/MLA_RANK ∈ [0,1] — fraction of disagreeing bits. Map to cos-like score.
+  return Math.cos(Math.PI * d / MLA_RANK);
+}
+
+export async function getLatent1Bit(stableKey: string): Promise<Uint8Array | null> {
+  try {
+    const redis = getRedis();
+    const buf = await redis.getBuffer(`mla:kv1b:${stableKey}`);
+    if (buf && buf.length === ONE_BIT_BYTES) {
+      return new Uint8Array(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
+    }
+  } catch { /* non-fatal */ }
+  return null;
+}
+
+export async function setLatent1Bit(stableKey: string, packed: Uint8Array): Promise<void> {
+  try {
+    const redis = getRedis();
+    // 1-bit cache lives much longer than Float32 — 16 bytes × N keys is cheap.
+    await redis.setex(`mla:kv1b:${stableKey}`, LATENT_TTL * 12, Buffer.from(packed));
+  } catch { /* non-fatal */ }
 }
 
 // ── Stats for observability ───────────────────────────────────────────────────

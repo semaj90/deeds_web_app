@@ -167,6 +167,10 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       const mlaResults = await mlaFusionRerank(queryEmbedding, mlaCandidates, {
         somBmuCol: querySom?.col ?? undefined,
         somBmuRow: querySom?.row ?? undefined,
+        // 1-bit Hamming pre-filter when candidate set is large. Mirrors
+        // TurboQuant PolarQuant: sign-pack latents → 32× compression →
+        // O(n) Hamming pass narrows to top-K before Float32 dot products.
+        oneBitPrefilter: mlaCandidates.length > 80 ? 64 : 0,
       });
       mlaScoreByChunk = new Map(mlaResults.map((r) => [r.stable_key, r.mla_score]));
       // Merge MLA score into payload for use by rerankHits scoreCandidate
