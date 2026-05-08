@@ -1669,13 +1669,94 @@ server.tool(
   },
 );
 
-// NOTE: codebase.context_for_file / agents_md.context_for_file / peers_for_dir
-// / coverage are registered later in this file (~line 2399). The older block
-// here had bugs — `scopeToCluster` was passed to contextForFile() which doesn't
-// accept it, `parentAgents` doesn't exist on the directory interface, etc.
-// Removed during P0.4 cleanup; canonical implementations live below. The
-// `agents_md.coverage` Postgres walk-up chain logic is preserved by reusing
-// directory_context_bindings in the canonical version.
+// ── agents_md.peers_via_relations ────────────────────────────────────────────
+// DB-backed sibling lookup via agent_context_relations.SHARES_TAGS edges.
+// Complements the canonical `agents_md.peers_for_dir` (Redis atlas card) by
+// answering "AGENTS.md dirs that share TAGS with this dir" — falls back to
+// sibling directories when SHARES_TAGS edges are sparse (pre-P0.2 envelope
+// JSON state). Both tools coexist under distinct names per MCP 2026 FQN
+// best-practice (last-registered-wins is silent → rename, don't override).
+
+server.tool(
+  'agents_md.peers_via_relations',
+  {
+    dirPath: z.string().min(1).max(500).describe('Directory (e.g. "src/lib/server/ace")'),
+    limit:   z.number().int().min(1).max(20).default(8).optional(),
+  },
+  async ({ dirPath, limit = 8 }) => {
+    try {
+      const stable = `agents:${dirPath.replace(/^src\//, 'src/')}/AGENTS.md`;
+      const { rows } = await pool.query<{ target_key: string; relation: string; weight: number }>(
+        `SELECT target_key, relation, weight
+         FROM agent_context_relations
+         WHERE source_key = $1 AND relation = 'SHARES_TAGS'
+         ORDER BY weight DESC
+         LIMIT $2`,
+        [stable, limit],
+      );
+      const peers = rows.map(r => ({ peer: r.target_key, weight: r.weight, source: 'shares_tags' as const }));
+      // SHARES_TAGS empty → sibling fallback (envelope still sparse)
+      if (peers.length === 0) {
+        const parent = dirPath.split('/').slice(0, -1).join('/');
+        const { rows: sib } = await pool.query<{ stable_key: string; directory_path: string }>(
+          `SELECT stable_key, directory_path
+           FROM agent_context_files
+           WHERE directory_path LIKE $1 || '/%' AND directory_path != $2
+           ORDER BY directory_path
+           LIMIT $3`,
+          [parent, dirPath, limit],
+        );
+        for (const s of sib) peers.push({ peer: s.stable_key, weight: 0.5, source: 'sibling-fallback' as const });
+      }
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ dirPath, peers }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        error: String(err).slice(0, 300), dirPath,
+      }) }] };
+    }
+  },
+);
+
+// ── agents_md.coverage_chain ─────────────────────────────────────────────────
+// Walk-up inheritance chain from directory_context_bindings — every binding
+// row from leaf → root, ordered by (priority DESC, depth ASC). Complements
+// the canonical `agents_md.coverage` (envelope completeness probe) by
+// answering "WHICH AGENTS.md rules apply to this file, in what priority?".
+
+server.tool(
+  'agents_md.coverage_chain',
+  {
+    filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
+  },
+  async ({ filePath }) => {
+    try {
+      const { rows } = await pool.query<{ agent_context_key: string; directory_path: string; binding_type: string; depth: number; priority: number; confidence: number }>(
+        `SELECT agent_context_key, directory_path, binding_type, depth, priority, confidence
+         FROM directory_context_bindings
+         WHERE $1 LIKE directory_path || '/%' OR directory_path = $1
+         ORDER BY priority DESC, depth ASC, length(directory_path) DESC`,
+        [filePath],
+      );
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        filePath,
+        chain: rows,
+        count: rows.length,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        error: String(err).slice(0, 300), filePath,
+      }) }] };
+    }
+  },
+);
+
+// NOTE: The older `codebase.context_for_file` / `agents_md.context_for_file`
+// implementations (deleted) had genuine bugs: `scopeToCluster` was passed to
+// contextForFile() which doesn't accept it (silently ignored), and
+// `parentAgents` doesn't exist on the CodebaseContextForFile.directory
+// interface (always undefined). Their semantic intent is fully covered by
+// the canonical block at ~line 2399 — not re-adding under aliased names
+// since they'd just produce inferior copies of the same output.
 
 // ── clusters.get_summary_lenses ───────────────────────────────────────────────
 // Returns AGENTS.md notes and wiki KAG notes for a given GPU cluster.
@@ -2438,6 +2519,111 @@ server.tool(
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     } finally {
       await pgPool.end().catch(() => {});
+    }
+  },
+);
+
+// ── agents_md.shares_tags ────────────────────────────────────────────────────
+// SHARES_TAGS lens — pure DB query against agent_context_relations.
+// Distinct from agents_md.peers_for_dir which reads the Redis atlas card.
+// This one returns only directories whose qdrant_tags Jaccard-overlap (≥0.3)
+// with the source AGENTS.md, with a sibling-dir fallback when the SHARES_TAGS
+// edge set is sparse for the requested source.
+
+server.tool(
+  'agents_md.shares_tags',
+  {
+    dirPath: z.string().min(1).max(500).describe('Directory path (e.g. "src/lib/server/ace")'),
+    limit:   z.number().int().min(1).max(50).default(10).optional(),
+  },
+  async ({ dirPath, limit = 10 }) => {
+    const stable = `agents:${dirPath.replace(/^src\//, 'src/')}/AGENTS.md`;
+    try {
+      const { rows } = await pool.query<{ target_key: string; weight: number; evidence: Record<string, unknown> }>(
+        `SELECT target_key, weight, evidence
+         FROM agent_context_relations
+         WHERE source_key = $1 AND relation = 'SHARES_TAGS'
+         ORDER BY weight DESC
+         LIMIT $2`,
+        [stable, limit],
+      );
+      let peers: Array<{ peer: string; weight: number; jaccard: number | null; source: 'shares_tags' | 'sibling-fallback' }> =
+        rows.map(r => ({
+          peer:    r.target_key,
+          weight:  Number(r.weight) || 0,
+          jaccard: typeof r.evidence?.jaccard === 'number' ? (r.evidence.jaccard as number) : null,
+          source:  'shares_tags',
+        }));
+
+      // Sibling fallback: if SHARES_TAGS empty for this source, return dirs
+      // under the same parent so the caller still gets *something* useful.
+      if (peers.length === 0) {
+        const parent = dirPath.split('/').slice(0, -1).join('/');
+        if (parent) {
+          const { rows: sib } = await pool.query<{ stable_key: string; directory_path: string }>(
+            `SELECT stable_key, directory_path
+             FROM agent_context_files
+             WHERE directory_path LIKE $1 || '/%' AND directory_path != $2
+             ORDER BY directory_path
+             LIMIT $3`,
+            [parent, dirPath, limit],
+          );
+          peers = sib.map(s => ({
+            peer: s.stable_key, weight: 0.5, jaccard: null, source: 'sibling-fallback',
+          }));
+        }
+      }
+
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        dirPath,
+        sourceKey: stable,
+        peerCount: peers.length,
+        peers,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        error: String(err).slice(0, 300), dirPath,
+      }) }] };
+    }
+  },
+);
+
+// ── agents_md.binding_chain ──────────────────────────────────────────────────
+// directory_context_bindings priority-ordered walk-up chain.
+// Distinct from agents_md.coverage which returns nearestEnvelopes (one row per
+// matching dir LIKE). This walks the formal binding hierarchy with
+// (binding_type, depth, priority, confidence) per row — answers
+// "in what order do AGENTS.md envelopes apply to this file?".
+
+server.tool(
+  'agents_md.binding_chain',
+  {
+    filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
+  },
+  async ({ filePath }) => {
+    try {
+      const { rows } = await pool.query<{
+        agent_context_key: string; directory_path: string;
+        binding_type: string; depth: number;
+        applies_to_children: boolean; priority: number; confidence: number;
+      }>(
+        `SELECT agent_context_key, directory_path, binding_type, depth,
+                applies_to_children, priority, confidence
+         FROM directory_context_bindings
+         WHERE $1 LIKE directory_path || '/%' OR directory_path = $1
+         ORDER BY priority DESC, depth ASC, length(directory_path) DESC`,
+        [filePath],
+      );
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        filePath,
+        chain: rows,
+        count: rows.length,
+        types: Array.from(new Set(rows.map(r => r.binding_type))),
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        error: String(err).slice(0, 300), filePath,
+      }) }] };
     }
   },
 );
