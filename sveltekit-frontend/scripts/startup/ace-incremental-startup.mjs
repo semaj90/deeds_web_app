@@ -178,6 +178,15 @@ async function runIncrementalLane(redis) {
     // hits" and exits clean) so this is safe even on a cold dev machine.
     runStep('ace hit-demand refresh', 'ace:hit-demand', { required: false, timeout: 60_000 });
 
+    // hypergraph:seed — promote qdrant_cluster_members → hypergraph_edges with
+    // SOM cell + manifold4 + topo_class enrichment. Adaptive-guarded
+    // (per-edge edge_hash skip when membership unchanged), so re-runs are
+    // sub-second when nothing changed. Snapshots the existing edge set to
+    // hypergraph:edges:archive:{day} (30d TTL) before any mutation —
+    // operator can recover via scripts/restore-hypergraph-archive.mjs without
+    // re-running the 20+ min AST/GPU upstream chain.
+    runStep('hypergraph seed', 'hypergraph:seed', { required: false, timeout: 120_000 });
+
     await redis.hset('ace:startup:latest', {
       head,
       changedCount: String(relevant.length),
