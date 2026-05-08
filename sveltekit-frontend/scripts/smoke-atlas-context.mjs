@@ -49,11 +49,29 @@ async function callMcp(name, args, timeoutMs = 15_000) {
   if (!res.ok) throw new Error(`MCP HTTP ${res.status}`);
   const text = await res.text();
   const dataLine = text.split('\n').find((l) => l.startsWith('data:'));
-  if (!dataLine) throw new Error('no SSE data');
-  const payload = JSON.parse(dataLine.slice(5).trim());
+  if (!dataLine) {
+    // Non-SSE response — surface a slice for diagnostics instead of "no SSE data"
+    throw new Error(`MCP returned non-SSE body: ${text.slice(0, 120).replace(/\s+/g, ' ')}`);
+  }
+  // Outer envelope must be JSON-RPC
+  let payload;
+  try {
+    payload = JSON.parse(dataLine.slice(5).trim());
+  } catch (e) {
+    throw new Error(`MCP SSE envelope is not JSON: ${dataLine.slice(5, 120).trim()} (${e.message})`);
+  }
   if (payload.error) throw new Error(payload.error.message ?? JSON.stringify(payload.error));
   const inner = payload.result?.content?.[0]?.text;
-  return inner ? JSON.parse(inner) : payload.result;
+  if (!inner) return payload.result;
+  // Tool result `text` may be a JSON string OR a degraded plain-text error
+  // (e.g. "Connection is closed." when an upstream service drops). Parse
+  // best-effort and fall back to wrapping the raw text so the caller gets
+  // a structured object either way.
+  try {
+    return JSON.parse(inner);
+  } catch {
+    return { _degraded: true, _rawText: inner };
+  }
 }
 
 async function check(name, fn) {
@@ -185,6 +203,20 @@ await check('edge_type filter cluster_context', () => {
   const matched = ctxOnly.totalMatched ?? ctxOnly.results?.length ?? 0;
   if (matched === 0) throw new Error('WARN: 0 cluster_context edges matched — seeder may need re-run');
   return `${matched} hits`;
+});
+
+// Lane B regression — shared_resource edges from code_relations. Probe with
+// a query that should hit at least one of the producer/consumer cohorts
+// (Redis/Postgres/Qdrant/Neo4j adjacency). 0 hits = Lane B was never run
+// or the seeder regressed.
+const sharedRes = await callMcp('hypergraph.search', { query: 'redis', limit: 3, edge_types: ['shared_resource'] }, 10_000)
+  .catch((err) => ({ error: err.message }));
+await check('edge_type filter shared_resource (Lane B)', () => {
+  if (sharedRes.error) throw new Error(sharedRes.error);
+  const matched = sharedRes.totalMatched ?? sharedRes.results?.length ?? 0;
+  if (matched === 0) throw new Error('WARN: 0 shared_resource edges matched — run npm run hypergraph:seed:lane-b');
+  const top = sharedRes.results?.[0]?.edge;
+  return `${matched} hits, top: ${top?.label ?? top?.title ?? '?'}`;
 });
 
 // ── /api/ace/recommendations HTTP wrapper ────────────────────────────────────
