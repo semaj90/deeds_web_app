@@ -45,9 +45,20 @@ class RedisConnectionPool {
 				lazyConnect: false // Auto-connect on creation
 			});
 
-			// Handle connection errors
+			// Attach error handler IMMEDIATELY so the first connection failure
+			// (which fires synchronously after construction when Redis is offline)
+			// has a listener and doesn't surface as "Unhandled error event".
+			//
+			// Throttle logs: print first error per pool slot, then go silent —
+			// the retryStrategy already caps reconnect attempts. Without this
+			// throttle the console fills with hundreds of identical lines on
+			// every Redis-down test run.
+			let _logged = false;
 			client.on('error', (err) => {
-				console.error('[Redis Pool] Connection error:', err.message);
+				if (_logged) return;
+				_logged = true;
+				const msg = err?.message ?? String(err);
+				console.error(`[Redis Pool] Connection error (further errors suppressed): ${msg}`);
 			});
 
 			this.pool.push(client);
