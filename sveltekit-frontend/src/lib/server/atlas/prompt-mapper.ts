@@ -90,6 +90,12 @@ export async function buildPromptCards(opts: ContextPacketOptions = {}): Promise
   const { topN = 12, ext = {}, filter = {} } = opts;
 
   // ── Pick candidate row indices (axis-filtered or all) ─────────────────────
+  // Cap the unfiltered scan: at 6,707+ files the unbounded path scores every
+  // row to find the top-12, which wastes work. The first DEFAULT_SCAN_LIMIT
+  // rows of atlas.files are already in canonical-path order from the build,
+  // and the prompt only needs the top N anyway. Callers that genuinely need
+  // a global ranking should pass an explicit filter or pre-sorted index.
+  const DEFAULT_SCAN_LIMIT = 2000;
   let candidateIdx: number[];
   if (filter.cluster) {
     candidateIdx = atlas.indices.by_cluster[filter.cluster] ?? [];
@@ -98,7 +104,7 @@ export async function buildPromptCards(opts: ContextPacketOptions = {}): Promise
   } else if (filter.agentsDir) {
     candidateIdx = atlas.indices.by_agents_dir[filter.agentsDir] ?? [];
   } else {
-    candidateIdx = atlas.files.map((_, i) => i);
+    candidateIdx = atlas.files.map((_, i) => i).slice(0, DEFAULT_SCAN_LIMIT);
   }
 
   // ── Decode + score ────────────────────────────────────────────────────────
