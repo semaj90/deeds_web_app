@@ -563,9 +563,130 @@
 			"dependsOrder": "parallel",
 			"group": { "kind": "test", "isDefault": false },
 			"detail": "Full quality gate: TRACE stack + 5-prompt loop + cache-reuse smoke + code-intel tests + tsgo — run before release"
+		},
+		{
+			"label": "✅ Validate: Fast (Tier 0 only)",
+			"type": "shell",
+			"command": "npm run validate:fast",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+			"problemMatcher": [],
+			"detail": "10 gates · ~2s · hash determinism + smokes (no server, no audit) — pre-commit safety net"
+		},
+		{
+			"label": "✅ Validate: Offline (no live HTTP)",
+			"type": "shell",
+			"command": "npm run validate:offline",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+			"problemMatcher": [],
+			"detail": "Tier 0 + Tier 1 · ~3s · adds zombie detection on :5173 (no live HTTP, no Playwright)"
+		},
+		{
+			"label": "✅ Validate: Full (25 gates)",
+			"type": "shell",
+			"command": "npm run validate:full",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": { "kind": "test", "isDefault": false },
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+			"problemMatcher": [],
+			"detail": "All 25 gates · ~10-30s · hashes + env + live HTTP + Playwright deep-render + Gemma4 agent + tsgo audit"
+		},
+		{
+			"label": "✅ Validate: Single Gate",
+			"type": "shell",
+			"command": "node scripts/validate/full-system.mjs --gate=${input:gateId}",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+			"problemMatcher": [],
+			"detail": "Run a single gate by ID (G01-G25). Useful for debugging specific failures without re-running the full ladder."
+		},
+		{
+			"label": "🚀 Dev: Probe Port 5173 (fast)",
+			"type": "shell",
+			"command": "npm run dev:monitor:probe",
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "build",
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+			"problemMatcher": [],
+			"detail": "Sub-second probe: reports READY (SvelteKit alive) / ZOMBIE (port held by 404'er) / down. No spawn, no kill."
+		},
+		{
+			"label": "🚀 Dev: Monitor (with stdio capture)",
+			"type": "shell",
+			"command": "npm run dev:monitor",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": true,
+			"group": "build",
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": false, "showReuseMessage": false },
+			"problemMatcher": {
+				"owner": "dev-monitor",
+				"pattern": { "regexp": "^\\[monitor:(FAILED|STALLED)\\]\\s+(.*)$", "severity": 1, "message": 2 },
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "monitor:INFO.*spawning",
+					"endsPattern": "monitor:READY"
+				}
+			},
+			"detail": "Spawn npm run dev with full stdio capture. Logs to logs/dev-server/dev-<TS>.log. Probes /api/health every 2s."
+		},
+		{
+			"label": "🚀 Dev: Safe Start (auto-kill zombie)",
+			"type": "shell",
+			"command": "npm run dev:monitor:safe",
+			"options": { "cwd": "${workspaceFolder}" },
+			"isBackground": true,
+			"group": "build",
+			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "showReuseMessage": false },
+			"problemMatcher": {
+				"owner": "dev-monitor",
+				"pattern": { "regexp": "^\\[monitor:(FAILED|STALLED|ZOMBIE)\\]\\s+(.*)$", "severity": 1, "message": 2 },
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "monitor:INFO.*log",
+					"endsPattern": "monitor:READY"
+				}
+			},
+			"detail": "Kill zombie if found, then spawn npm run dev with stdio capture. Use this when port 5173 has a stuck node.exe."
+		},
+		{
+			"label": "🩺 Validate: Recommended Sequence",
+			"dependsOn": [
+				"✅ Validate: Fast (Tier 0 only)",
+				"🚀 Dev: Safe Start (auto-kill zombie)",
+				"✅ Validate: Full (25 gates)"
+			],
+			"dependsOrder": "sequence",
+			"group": { "kind": "test", "isDefault": false },
+			"detail": "1) Fast pre-flight (~2s) → 2) Safe-start dev server (kills zombie, captures stdio) → 3) Full 25-gate audit. Stops at first failure."
+		},
+		{
+			"label": "🩺 Validate: TypeScript First (no dev server)",
+			"dependsOn": [
+				"✅ Validate: Fast (Tier 0 only)",
+				"⚙️ [leaf] Typecheck: Native tsgo"
+			],
+			"dependsOrder": "sequence",
+			"group": "test",
+			"detail": "TypeScript-only validation: hash gates + tsgo. Server-independent. Use before any TS change is committed."
 		}
 	],
 	"inputs": [
+		{
+			"id": "gateId",
+			"type": "pickString",
+			"description": "Pick a validator gate to run",
+			"default": "G15",
+			"options": [
+				"G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09", "G10",
+				"G11", "G12", "G13", "G14", "G15",
+				"G16", "G17", "G18", "G19", "G20",
+				"G21", "G22", "G23", "G24", "G25"
+			]
+		},
 		{
 			"id": "svelteQuery",
 			"type": "promptString",
