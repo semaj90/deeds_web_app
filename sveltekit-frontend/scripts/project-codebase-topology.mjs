@@ -68,9 +68,20 @@ const clusters = JSON.parse(readFileSync(clustersPath, 'utf8'));
 
 // ── Build file → cluster map (exact + directory walk-up fallback) ────────────
 
+// Defensive guard: clusters file may be mid-write or have a different shape.
+// Accept either { clusters: [...] } (canonical) or a bare array.
+const clusterList = Array.isArray(clusters?.clusters)
+  ? clusters.clusters
+  : Array.isArray(clusters)
+    ? clusters
+    : [];
+if (clusterList.length === 0) {
+  console.warn('[topology] WARNING: hypergraph-clusters.json has no clusters array — falling back to directory-only assignment');
+}
+
 /** @type {Map<string, { clusterId: number; kind: string }>} */
 const fileClusterMap = new Map();
-for (const cluster of clusters.clusters) {
+for (const cluster of clusterList) {
   for (const member of (cluster.memberFiles ?? [])) {
     fileClusterMap.set(member.path, { clusterId: cluster.id, kind: member.kind });
   }
@@ -84,7 +95,7 @@ for (const cluster of clusters.clusters) {
 // dir → clusterId fallback: first cluster that lists this dir in topDirs
 /** @type {Map<string, number>} */
 const dirClusterMap = new Map();
-for (const cluster of clusters.clusters) {
+for (const cluster of clusterList) {
   for (const d of (cluster.topDirs ?? [])) {
     if (!dirClusterMap.has(d.dir)) dirClusterMap.set(d.dir, cluster.id);
   }
