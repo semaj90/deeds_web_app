@@ -63,6 +63,20 @@ const DB_URL     = process.env.DATABASE_URL;
 
 if (!STDOUT) console.log(`\n📋 Codebase TODO aggregator${DRY_RUN ? ' [DRY RUN]' : ''}`);
 
+// ── Atlas path normalization ─────────────────────────────────────────────────
+// karpathy:gpu writes keys like 'src/lib/server/db/client.ts' (with src/ prefix
+// because it joins through Neo4j CodebaseFile.filePath which is workspace-relative).
+// ace:authority:top writes keys like 'lib/server/db/client.ts' (no src/ prefix
+// because graphify:gds normalizes through code_relations.source_file). Without
+// normalization the two key spaces never match → authority always 0 on the
+// karpathy-ranked entries, blend collapses to attention*0.15.
+function normalizeAtlasPath(path) {
+  return String(path)
+    .replace(/\\/g, '/')
+    .replace(/^sveltekit-frontend\//, '')
+    .replace(/^src\//, '');
+}
+
 // ── Signal pulls ──────────────────────────────────────────────────────────────
 async function pullRedisSignals(redis) {
   const out = { authority: {}, karpathy: {}, dirty: [], bigramHits: [] };
@@ -100,10 +114,16 @@ async function pullPostgresSignals() {
   const c = new pg.Client({ connectionString: DB_URL, connectionTimeoutMillis: 3000 });
   try {
     await c.connect();
+    // Loosened filter: rules may be NULL, '[]', or non-array shape on partial
+    // ingests — only require the column actually contains a JSONB array with
+    // ≥1 entry. jsonb_typeof guards against scalar/object shapes that would
+    // throw on jsonb_array_length.
     const r = await c.query(`
       SELECT path, jsonb_array_length(rules) AS rule_count, indexed_at
       FROM agent_context_files
-      WHERE jsonb_array_length(rules) > 0
+      WHERE rules IS NOT NULL
+        AND jsonb_typeof(rules) = 'array'
+        AND jsonb_array_length(rules) > 0
       ORDER BY jsonb_array_length(rules) DESC, indexed_at DESC
       LIMIT 30
     `);
@@ -118,52 +138,78 @@ function readDoc(rel) {
 }
 
 // ── Score fusion ─────────────────────────────────────────────────────────────
+// Both Redis HSETs are merged on the normalized atlas path (no src/ prefix).
+// `displayPath` keeps the most explicit form for the rendered table — prefer
+// the src/-prefixed shape since that's what Claude Code / IDE links resolve.
 function fuseScores(redis, dirtySet) {
-  const merged = new Map(); // filePath → entry
-  // Authority pass (weight: 0.40)
-  for (const [file, v] of Object.entries(redis.authority)) {
-    merged.set(file, {
-      file,
-      authority: v.graphAuthorityScore ?? 0,
-      pagerank:  v.pagerank ?? 0,
-      community: v.communityId ?? null,
-      cluster:   v.clusterKey ?? null,
-      topo:      v.topoClass ?? null,
-      attention: 0,
-      blend:     0,
-      isDirty:   dirtySet.has(file),
-      reasons:   [],
-    });
-  }
-  // Karpathy GPU pass (weight: 0.35) — autoencoder + attention blend
-  for (const [file, v] of Object.entries(redis.karpathy)) {
-    const cur = merged.get(file) ?? {
-      file, authority: 0, pagerank: 0, community: null, cluster: null,
-      topo: null, attention: 0, blend: 0, isDirty: dirtySet.has(file), reasons: [],
-    };
-    cur.attention = v.attention ?? 0;
-    cur.pagerank  = v.pagerank ?? cur.pagerank;
-    cur.karpBlend = v.blend ?? 0;
-    merged.set(file, cur);
-  }
-  // Dirty-file boost (weight: 0.25) — recent changes get explicit attention
-  for (const f of dirtySet) {
-    const cur = merged.get(f);
-    if (cur) {
-      cur.isDirty = true;
-      cur.reasons.push('dirty');
+  const merged = new Map(); // normalizedPath → entry
+  const dirtyNorm = new Set([...dirtySet].map(normalizeAtlasPath));
+
+  function entry(norm, displayPath) {
+    let e = merged.get(norm);
+    if (!e) {
+      e = {
+        file:        norm,
+        displayPath: displayPath,
+        authority:   0,
+        pagerank:    0,
+        community:   null,
+        cluster:     null,
+        topo:        null,
+        attention:   0,
+        karpBlend:   0,
+        isDirty:     dirtyNorm.has(norm),
+        reasons:     [],
+      };
+      merged.set(norm, e);
+    } else if (displayPath?.startsWith('src/') && !e.displayPath?.startsWith('src/')) {
+      e.displayPath = displayPath; // upgrade to src/-prefixed display when seen
     }
+    return e;
   }
-  // Final blend
+
+  // Authority pass — keys here are usually 'lib/server/...'
+  for (const [file, v] of Object.entries(redis.authority)) {
+    const e = entry(normalizeAtlasPath(file), file);
+    e.authority = v.graphAuthorityScore ?? 0;
+    e.pagerank  = v.pagerank ?? 0;
+    e.community = v.communityId ?? null;
+    e.cluster   = v.clusterKey ?? null;
+    e.topo      = v.topoClass ?? null;
+  }
+
+  // Karpathy GPU pass — keys here are usually 'src/lib/server/...'
+  // karpathy stores authority per-file from its own blend; only adopt if the
+  // authority pass didn't already set it (rare overlap → prefer authority).
+  for (const [file, v] of Object.entries(redis.karpathy)) {
+    const e = entry(normalizeAtlasPath(file), file);
+    e.attention = v.attention ?? e.attention ?? 0;
+    e.karpBlend = v.blend ?? 0;
+    if (!e.pagerank && v.pagerank) e.pagerank = v.pagerank;
+    if (!e.authority && v.authority) e.authority = v.authority;
+  }
+
+  // Dirty-file boost (recent changes get explicit attention)
+  for (const f of dirtyNorm) {
+    const cur = merged.get(f);
+    if (cur && !cur.reasons.includes('dirty')) cur.reasons.push('dirty');
+  }
+
+  // Final blend — weights:
+  //   0.40 graphAuthorityScore  (graphify:gds composite)
+  //   0.35 karpBlend / 4        (karpathy:gpu, normalize 0-4 → 0-1)
+  //   0.15 attention            (Karpathy attention vs centroid)
+  //   0.10 dirty boost
   for (const e of merged.values()) {
     e.blend =
       0.40 * (e.authority ?? 0) +
-      0.35 * (e.karpBlend ?? 0) / 4 +  // karpBlend ranges 0-4, normalize
+      0.35 * ((e.karpBlend ?? 0) / 4) +
       0.15 * (e.attention ?? 0) +
       (e.isDirty ? 0.10 : 0);
-    if (e.authority > 0.4) e.reasons.push(`authority=${e.authority.toFixed(2)}`);
-    if (e.attention > 0.95) e.reasons.push('high-attention');
-    if (e.pagerank > 3) e.reasons.push(`PR=${e.pagerank.toFixed(1)}`);
+    if (e.authority > 0.4)   e.reasons.push(`authority=${e.authority.toFixed(2)}`);
+    if (e.attention > 0.95)  e.reasons.push('high-attention');
+    if (e.pagerank > 3)      e.reasons.push(`PR=${e.pagerank.toFixed(1)}`);
+    if (e.cluster)           e.reasons.push(e.cluster);
   }
   return [...merged.values()].sort((a, b) => b.blend - a.blend);
 }
@@ -272,7 +318,8 @@ async function main() {
     '|---|------|-------|----|-----------|-----------|-------|---------|',
     ...top.map((e, i) => {
       const reasons = e.reasons.slice(0, 3).join(', ') || '—';
-      return `| ${i + 1} | \`${e.file}\` | ${e.blend.toFixed(3)} | ${(e.pagerank ?? 0).toFixed(2)} | ${(e.authority ?? 0).toFixed(2)} | ${(e.attention ?? 0).toFixed(2)} | ${e.isDirty ? 'Y' : '·'} | ${reasons} |`;
+      const path = e.displayPath || e.file;
+      return `| ${i + 1} | \`${path}\` | ${e.blend.toFixed(3)} | ${(e.pagerank ?? 0).toFixed(2)} | ${(e.authority ?? 0).toFixed(2)} | ${(e.attention ?? 0).toFixed(2)} | ${e.isDirty ? 'Y' : '·'} | ${reasons} |`;
     }),
     '',
     agentsRules.length ? '## Directories with the Strictest AGENTS.md Rules\n' : '',
