@@ -25,7 +25,10 @@
     "karpathy:gpu:dry",
     "ace:hit-demand",
     "ace:hit-demand:dry",
+    "hypergraph:seed",
+    "hypergraph:seed:dry",
     "smoke:atlas",
+    "smoke:hypergraph",
     "atlas:prompt:smoke"
   ],
   "thresholds": {
