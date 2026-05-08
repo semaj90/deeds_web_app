@@ -1583,6 +1583,92 @@ server.tool(
   }
 );
 
+// ── taxonomy.children ─────────────────────────────────────────────────────────
+// Walk the topological ontology one level down from a parent node.
+// Hierarchy: root → topo_class (L1) → topo_byte (L2) → cluster (L3) → file (L4).
+// Backed by the taxonomy_nodes / taxonomy_edges tables built by
+// `npm run taxonomy:build`. Read-through Redis cache for hot levels.
+
+server.tool(
+  'taxonomy.children',
+  {
+    parent_key: z.string().min(1).max(200).describe(
+      'Parent node_key. "root" lists all topo_classes. "topo:api-route" lists topo_bytes within api-route. "byte:api-route:18" lists files. Empty string = root.',
+    ),
+    limit: z.number().int().min(1).max(500).default(50).optional(),
+  },
+  async ({ parent_key, limit = 50 }) => {
+    const key = parent_key === '' ? 'root' : parent_key;
+    try {
+      // Try Redis first
+      const r = await getEmbedRedis();
+      const cached = await r.get(`taxonomy:children:${key}`).catch(() => null);
+      if (cached) {
+        const arr = JSON.parse(cached) as Array<{ node_key: string; level: number; display_name: string; member_count: number }>;
+        return { content: [{ type: 'text' as const, text: JSON.stringify({
+          parent: key, source: 'redis', count: Math.min(arr.length, limit),
+          children: arr.slice(0, limit),
+        }, null, 2) }] };
+      }
+      // Fall through to Postgres
+      const { rows } = await pool.query<{ node_key: string; level: number; display_name: string; member_count: number; metadata: Record<string, unknown> }>(
+        `SELECT node_key, level, display_name, member_count, metadata
+         FROM taxonomy_nodes
+         WHERE parent_key = $1
+         ORDER BY member_count DESC NULLS LAST, display_name ASC
+         LIMIT $2`,
+        [key, limit],
+      );
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        parent: key, source: 'postgres', count: rows.length, children: rows,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        error: String(err).slice(0, 200), parent: key,
+      }) }] };
+    }
+  },
+);
+
+// ── taxonomy.path ─────────────────────────────────────────────────────────────
+// Walk UP from a leaf node to root, returning the full ontological path.
+// Useful for "what category does this file belong to?" queries.
+
+server.tool(
+  'taxonomy.path',
+  {
+    node_key: z.string().min(1).max(500).describe('Leaf node_key (e.g. "file:src/foo.ts")'),
+  },
+  async ({ node_key }) => {
+    try {
+      const { rows } = await pool.query<{ node_key: string; level: number; parent_key: string | null; display_name: string }>(
+        `WITH RECURSIVE up AS (
+           SELECT node_key, level, parent_key, display_name, 0 AS depth
+           FROM taxonomy_nodes WHERE node_key = $1
+           UNION ALL
+           SELECT n.node_key, n.level, n.parent_key, n.display_name, up.depth + 1
+           FROM taxonomy_nodes n
+           JOIN up ON n.node_key = up.parent_key
+         )
+         SELECT node_key, level, parent_key, display_name FROM up ORDER BY depth DESC`,
+        [node_key],
+      );
+      if (rows.length === 0) {
+        return { content: [{ type: 'text' as const, text: JSON.stringify({
+          error: 'node not found in taxonomy', node_key,
+        }) }] };
+      }
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        node: node_key, depth: rows.length, path: rows,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        error: String(err).slice(0, 200), node_key,
+      }) }] };
+    }
+  },
+);
+
 // ── clusters.get_summary_lenses ───────────────────────────────────────────────
 // Returns AGENTS.md notes and wiki KAG notes for a given GPU cluster.
 
