@@ -21,11 +21,14 @@
   import GlyphAtlasViewer from '$lib/components/graph/GlyphAtlasViewer.svelte';
 
   // ── SSR props from page.server.ts ─────────────────────────────────────────
+  // $derived so re-runs of load() (e.g. invalidate, navigation) reflow into
+  // overview/serverPR. Plain `const` would freeze them at first render.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let { data } = $props();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const d = data as any;
-  const overview  = d.overview  ?? null;
-  const serverPR  = d.pageRankTop ?? [];
+  const d = $derived(data as any);
+  const overview  = $derived(d.overview  ?? null);
+  const serverPR  = $derived(d.pageRankTop ?? []);
 
   // ── Tab state ─────────────────────────────────────────────────────────────
   type Tab = 'canvas' | 'graphify' | 'pagerank' | 'batch' | 'atlas';

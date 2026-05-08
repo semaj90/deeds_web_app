@@ -1,7 +1,11 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  let { data }: { data: PageData } = $props();
-  const ws = data.wikiStatus;
+  // $derived.by closure so navigation between wiki sub-routes re-runs
+  // load(), mutates props.data, and re-renders the status block. Direct
+  // destructure + $derived(expr) trips a "captures initial value" warning
+  // because the destructured `data` ref is evaluated outside the closure.
+  let props: { data: PageData } = $props();
+  const ws = $derived.by(() => props.data.wikiStatus);
 
   const syncColor = (s: string) =>
     s === 'synced' ? 'text-green-400' : s === 'degraded' ? 'text-yellow-400' : 'text-red-400';
