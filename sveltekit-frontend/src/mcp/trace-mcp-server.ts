@@ -85,6 +85,28 @@ async function getEmbedRedis() {
   return _embedRedis;
 }
 
+/**
+ * Construct a short-lived ioredis client for one tool-call's worth of work.
+ * Attaches a no-op error listener before the connection attempt so that
+ * Redis being offline does not flood stderr with "Unhandled error event".
+ * Caller is responsible for `redis.quit()` when done.
+ */
+function makeRedis() {
+  // Sync Redis() works fine without a dynamic import here — `Redis` is
+  // already imported at the top of this file via the static import chain.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const Redis = require('ioredis');
+  const r = new Redis(REDIS_URL, {
+    lazyConnect:        true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    connectTimeout:     2_000,
+    retryStrategy:      () => null,
+  });
+  r.on('error', () => { /* swallow — caller's awaits will reject cleanly */ });
+  return r;
+}
+
 async function getOrComputeEmbedding(query: string): Promise<{ embedding: number[]; cached: boolean }> {
   const safeQuery = query.slice(0, 4000);
   const key = `embed:mcp:${createHash('md5').update(safeQuery).digest('hex')}`;
@@ -419,7 +441,7 @@ server.tool(
     if (!nodeType) {
       try {
         const { default: Redis } = await import('ioredis');
-        const redis = new Redis(REDIS_URL);
+        const redis = makeRedis();
         const raw = (await redis.get('couchdb:pagerank_scores')) as string | null;
         await redis.quit();
         if (raw) {
@@ -627,7 +649,7 @@ server.tool(
     // ── L1: Redis 24hr hit cache ──────────────────────────────────────────────
     try {
       const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
+      const redis = makeRedis();
       const cached = await redis.get(cacheKey).catch(() => null);
       await redis.quit();
       if (cached) {
@@ -655,7 +677,7 @@ server.tool(
         if (goData.results?.length) {
           const normalized = normalizeGoRetrievalHits(goData, safeQuery, goT0);
           import('ioredis').then(({ default: Redis }) => {
-            const r = new Redis(REDIS_URL);
+            const r = makeRedis();
             r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(normalized)).catch(() => {});
             r.quit().catch(() => {});
           }).catch(() => {});
@@ -690,7 +712,7 @@ server.tool(
       }));
       const svelteResult = { success: true, data: hits, count: hits.length };
       import('ioredis').then(({ default: Redis }) => {
-        const r = new Redis(REDIS_URL);
+        const r = makeRedis();
         r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(svelteResult)).catch(() => {});
         r.quit().catch(() => {});
       }).catch(() => {});
@@ -722,7 +744,7 @@ server.tool(
         }));
         const ftsResult = { success: true, data: hits, count: hits.length, source: 'postgres_fts' };
         import('ioredis').then(({ default: Redis }) => {
-          const r = new Redis(REDIS_URL);
+          const r = makeRedis();
           r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(ftsResult)).catch(() => {});
           r.quit().catch(() => {});
         }).catch(() => {});
@@ -756,7 +778,7 @@ server.tool(
   async ({ query }) => {
     try {
       const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
+      const redis = makeRedis();
       // Look for the most recent ACE trace for this query prefix
       const keys = await redis.keys(`ace:trace:*`);
       let found: string | null = null;
@@ -936,7 +958,7 @@ server.tool(
   async ({ taskId, query, hotFiles, hotSymbols, blockedAreas, maxInputTokens = 12000 }) => {
     try {
       const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
+      const redis = makeRedis();
 
       // Build file cards in parallel (bounded to 8)
       const { compressFileToCard, buildAttentionToc } = await import('../lib/server/ai/context-compression.js').catch(() =>
@@ -979,7 +1001,7 @@ server.tool(
   async ({ stableKey }) => {
     try {
       const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
+      const redis = makeRedis();
       const crypto = await import('node:crypto');
       const sha = (s: string) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 32);
 
@@ -1037,7 +1059,7 @@ server.tool(
   async ({ taskId }) => {
     try {
       const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
+      const redis = makeRedis();
 
       const raw = await redis.get(`kv:toc:task:${taskId}`);
       await redis.quit();
@@ -1080,7 +1102,7 @@ server.tool(
   async ({ taskId, hotFiles, hotSymbols, blockedAreas }) => {
     try {
       const { default: Redis } = await import('ioredis');
-      const redis = new Redis(REDIS_URL);
+      const redis = makeRedis();
 
       // Invalidate existing TOC
       await redis.del(`kv:toc:task:${taskId}`).catch(() => {});
