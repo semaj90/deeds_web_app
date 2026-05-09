@@ -602,7 +602,7 @@
 			"group": "test",
 			"presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
 			"problemMatcher": [],
-			"detail": "Run a single gate by ID (G01-G25). Useful for debugging specific failures without re-running the full ladder."
+			"detail": "Run a single gate by ID (G01-G31). Useful for debugging specific failures without re-running the full ladder."
 		},
 		{
 			"label": "🚀 Dev: Probe Port 5173 (fast)",
@@ -684,7 +684,8 @@
 				"G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09", "G10",
 				"G11", "G12", "G13", "G14", "G15",
 				"G16", "G17", "G18", "G19", "G20",
-				"G21", "G22", "G23", "G24", "G25"
+				"G21", "G22", "G23", "G24", "G25",
+				"G26", "G27", "G29", "G30", "G31"
 			]
 		},
 		{
