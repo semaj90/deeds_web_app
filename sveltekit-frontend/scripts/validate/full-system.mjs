@@ -702,6 +702,132 @@ async function G27() {
   return pass(`${dur}ms gen=${usage.completion_tokens ?? '?'}t prompt=${usage.prompt_tokens ?? '?'}t reply="${content.slice(0, 40)}"`);
 }
 
+/**
+ * G29 — destructive-SQL detector for pending Drizzle migrations.
+ *
+ * `drizzle-kit migrate` will happily run a DROP TABLE that wipes prod data
+ * if it lands in a numbered SQL file. This gate scans every migration in
+ * `drizzle/*.sql` whose tag is NOT in `drizzle/meta/_journal.json` (i.e.
+ * still pending) and fails on any destructive op.
+ *
+ * Excludes `drizzle/manual/` and `drizzle/archived/` — those are operator-
+ * curated and don't run automatically.
+ *
+ * Tier 0, fatal: false (warns loudly so CI surfaces it; flip to fatal once
+ * the existing 0001 DROP COLUMN is reconciled).
+ */
+async function G29() {
+  const journalPath = 'drizzle/meta/_journal.json';
+  if (!(await exists(journalPath))) return skip('drizzle/meta/_journal.json missing');
+  const journal = await readJson(journalPath);
+  const appliedTags = new Set((journal.entries ?? []).map(e => e.tag));
+
+  let entries;
+  try { entries = await readdir(resolve(ROOT, 'drizzle')); }
+  catch { return skip('drizzle/ dir missing'); }
+
+  const sqlFiles = entries.filter(f => /^\d{4}_.+\.sql$/.test(f));
+  const pending = sqlFiles.filter(f => !appliedTags.has(f.replace(/\.sql$/, '')));
+  if (pending.length === 0) return pass(`0 pending migrations (${sqlFiles.length} applied)`);
+
+  const DESTRUCTIVE = /\b(DROP\s+(TABLE|COLUMN|SCHEMA|DATABASE|INDEX)|TRUNCATE|DELETE\s+FROM(?!\s+\w+\s+WHERE))\b/i;
+  const findings = [];
+  for (const file of pending) {
+    const sql = await readFile(resolve(ROOT, 'drizzle', file), 'utf8');
+    const lines = sql.split('\n');
+    lines.forEach((line, i) => {
+      const stripped = line.replace(/--.*$/, '').trim();
+      if (DESTRUCTIVE.test(stripped)) {
+        findings.push(`${file}:${i + 1} ${stripped.slice(0, 80)}`);
+      }
+    });
+  }
+  if (findings.length === 0) return pass(`${pending.length} pending, no destructive ops`);
+  return warn(`${findings.length} destructive op(s) in pending: ${findings.slice(0, 3).join(' | ')}${findings.length > 3 ? ` (+${findings.length - 3} more)` : ''}`);
+}
+
+/**
+ * G30 — gemma4-offload MCP stdio server: spawn + initialize handshake.
+ *
+ * Boots `scripts/mcp/gemma4-offload-mcp.mjs` as a stdio child, sends
+ * the JSON-RPC `initialize` then `tools/list`, expects ≥4 tools back.
+ * Catches: missing file, JSON-RPC handler crash, stdin/stdout deadlock.
+ *
+ * Independent of TurboQuant/Ollama — just exercises the protocol layer.
+ */
+async function G30() {
+  const path = 'scripts/mcp/gemma4-offload-mcp.mjs';
+  if (!(await exists(path))) return fail(`${path} missing`);
+
+  return new Promise(resolveP => {
+    const child = spawn(process.execPath, [resolve(ROOT, path)], {
+      cwd: ROOT, env: process.env, windowsHide: true,
+    });
+    let stdout = '', stderr = '';
+    let done = false;
+    const finish = (res) => { if (!done) { done = true; try { child.kill(); } catch {} resolveP(res); } };
+    const t = setTimeout(() => finish(fail('handshake timeout (5s)')), 5_000);
+    child.stdout.on('data', d => {
+      stdout += d.toString();
+      const lines = stdout.split('\n').filter(l => l.trim());
+      for (const line of lines) {
+        let msg; try { msg = JSON.parse(line); } catch { continue; }
+        if (msg.id === 2 && msg.result?.tools) {
+          clearTimeout(t);
+          const n = msg.result.tools.length;
+          finish(n >= 4 ? pass(`${n} tools registered`) : fail(`only ${n} tools (need ≥4)`));
+        }
+      }
+    });
+    child.stderr.on('data', d => { stderr += d.toString(); });
+    child.on('error', err => { clearTimeout(t); finish(fail(`spawn failed: ${err.message}`)); });
+    child.on('exit', code => {
+      if (!done) { clearTimeout(t); finish(fail(`exited ${code} stderr=${stderr.slice(0, 120)}`)); }
+    });
+    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'g30', version: '0' } } }) + '\n');
+    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }) + '\n');
+  });
+}
+
+/**
+ * G31 — gemma4-offload MCP tool round-trip via gemma4_health.
+ *
+ * Calls the cheap health probe tool — proves stdin → tool dispatch → backend
+ * fetch → stdout response works end-to-end. Skip if G30 didn't pass.
+ */
+async function G31() {
+  const path = 'scripts/mcp/gemma4-offload-mcp.mjs';
+  if (!(await exists(path))) return skip('mcp server missing (G30 should fail)');
+
+  return new Promise(resolveP => {
+    const child = spawn(process.execPath, [resolve(ROOT, path)], {
+      cwd: ROOT, env: process.env, windowsHide: true,
+    });
+    let stdout = '';
+    let done = false;
+    const finish = (res) => { if (!done) { done = true; try { child.kill(); } catch {} resolveP(res); } };
+    const t = setTimeout(() => finish(fail('tool call timeout (10s)')), 10_000);
+    child.stdout.on('data', d => {
+      stdout += d.toString();
+      for (const line of stdout.split('\n').filter(l => l.trim())) {
+        let msg; try { msg = JSON.parse(line); } catch { continue; }
+        if (msg.id === 2 && msg.result?.content) {
+          clearTimeout(t);
+          const text = msg.result.content[0]?.text ?? '';
+          let body; try { body = JSON.parse(text); } catch { return finish(fail(`non-JSON content: ${text.slice(0, 80)}`)); }
+          const turbo = body.turboquant ?? '?', ollama = body.ollama ?? '?';
+          const liveCount = [turbo, ollama].filter(s => s === 'ok').length;
+          if (liveCount === 0) return finish(warn(`both backends down (turbo=${turbo}, ollama=${ollama})`));
+          finish(pass(`turbo=${turbo} ollama=${ollama}`));
+        }
+      }
+    });
+    child.on('error', err => { clearTimeout(t); finish(fail(`spawn failed: ${err.message}`)); });
+    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'g31', version: '0' } } }) + '\n');
+    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'gemma4_health', arguments: {} } }) + '\n');
+  });
+}
+
 // ── registry ─────────────────────────────────────────────────
 
 const GATES = [
@@ -742,6 +868,13 @@ const GATES = [
   // T1 because TurboQuant is independent of SvelteKit dev server — runs detached.
   { id: 'G26', tier: 1, name: 'turboquant:health',          fn: G26, fatal: false },
   { id: 'G27', tier: 2, name: 'turboquant:chat-roundtrip',  fn: G27, fatal: false },
+
+  // T0 — Drizzle migration safety: scan pending SQL for destructive ops.
+  { id: 'G29', tier: 0, name: 'drizzle:destructive-pending', fn: G29, fatal: false },
+
+  // T1 — gemma4-offload MCP server (Claude Code → local Gemma4 routing).
+  { id: 'G30', tier: 1, name: 'mcp:gemma4-offload-handshake', fn: G30, fatal: false },
+  { id: 'G31', tier: 1, name: 'mcp:gemma4-offload-roundtrip', fn: G31, fatal: false },
 ];
 
 // ── runner ───────────────────────────────────────────────────
