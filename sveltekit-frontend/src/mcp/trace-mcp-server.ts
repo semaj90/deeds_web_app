@@ -66,6 +66,7 @@ import { registerResearchTools } from './research_tools.js';
 import { searchNotecards } from '../lib/server/kb/search-logic.js';
 import { registerBifrostTools } from './bifrost_tools.js';
 import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
+import { registerDbInspectionTools } from './db-inspection-tools.js';
 
 const SVELTEKIT = process.env.SVELTEKIT_URL         ?? 'http://127.0.0.1:5173';
 const NEO4J_HTTP = process.env.NEO4J_HTTP_URL       ?? 'http://localhost:7474';
@@ -93,7 +94,9 @@ registerSkillTools(server);
 registerCodebaseTools(server);
 registerResearchTools(server);
 registerBifrostTools(server);
-registerTopologyMgmtTools(server, pool);
+// NOTE: registerTopologyMgmtTools(server, pool) moved below `pool` declaration
+// at line 111 — it was hitting TDZ here and crashing MCP at startup with
+// "Cannot access 'pool' before initialization".
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const path = await import('node:path');
@@ -110,6 +113,15 @@ try {
 
 const pool = new Pool({ connectionString: PG_URL, max: 4, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
 pool.on('error', () => {});
+
+// Register topology management tools — needs `pool`, so must be after declaration.
+registerTopologyMgmtTools(server, pool);
+
+// Register read-only Drizzle/Postgres inspection tools (db.schema_overview,
+// db.table_inspect). Per docs/architecture/drizzle-inspection-mcp.md: no
+// write verbs, no raw SQL, statement_timeout=2s, forbidden columns scrubbed.
+// G33 validator gate enforces the no-write-verb rule statically.
+registerDbInspectionTools(server, pool);
 
 // ── Shared embedding cache (Redis L1, 1h TTL) ────────────────────────────────
 // search.hybrid + topology.search_near + search.dev_context all embed the same
@@ -863,133 +875,6 @@ server.tool(
   }
 );
 
-// == topology.hydration_status ================================================
-
-server.tool(
-  'topology.hydration_status',
-  {},
-  async () => {
-    try {
-      const res = await pool.query(`
-        SELECT
-          COUNT(*)::int AS total_rows,
-          COUNT(*) FILTER (WHERE som_bmu_row IS NOT NULL AND som_bmu_col IS NOT NULL)::int AS bmu_rows,
-          COUNT(*) FILTER (WHERE manifold4 IS NOT NULL AND array_length(manifold4, 1) = 4)::int AS manifold4_rows
-        FROM embedded_summaries
-      `);
-
-      const row = res.rows[0] ?? { total_rows: 0, bmu_rows: 0, manifold4_rows: 0 };
-      const total = Number(row.total_rows ?? 0);
-      const bmuRows = Number(row.bmu_rows ?? 0);
-      const manifold4Rows = Number(row.manifold4_rows ?? 0);
-
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            ok: true,
-            totalRows: total,
-            bmuRows,
-            manifold4Rows,
-            bmuCoveragePct: total > 0 ? Math.round((bmuRows / total) * 1000) / 10 : 0,
-            manifold4CoveragePct: total > 0 ? Math.round((manifold4Rows / total) * 1000) / 10 : 0,
-            hydrated: total > 0 && bmuRows === total && manifold4Rows === total,
-            degraded: total === 0 || bmuRows < total || manifold4Rows < total,
-            note: total === 0
-              ? 'No embedded summaries found.'
-              : bmuRows < total || manifold4Rows < total
-                ? 'Topology hydration incomplete; semantic anchoring can still work, but SOM/topology expansion is partial.'
-                : 'Topology hydration complete for embedded summaries.',
-          }, null, 2),
-        }],
-      };
-    } catch (err) {
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ ok: false, degraded: true, error: String(err) }) }],
-        isError: true,
-      };
-    }
-  }
-);
-
-// == topology.recompute_manifold_plan =========================================
-
-server.tool(
-  'topology.recompute_manifold_plan',
-  {
-    scope: z.enum(['embedded_summaries', 'codebase_index', 'all']).default('all'),
-  },
-  async ({ scope }) => {
-    try {
-      const summaryRes = await pool.query(`
-        SELECT
-          COUNT(*)::int AS total_rows,
-          COUNT(*) FILTER (WHERE som_bmu_row IS NOT NULL AND som_bmu_col IS NOT NULL)::int AS bmu_rows,
-          COUNT(*) FILTER (WHERE manifold4 IS NOT NULL AND array_length(manifold4, 1) = 4)::int AS manifold4_rows
-        FROM embedded_summaries
-      `);
-      const codebaseRes = await pool.query(`
-        SELECT
-          COUNT(*)::int AS total_rows,
-          COUNT(*) FILTER (WHERE som_bmu_row IS NOT NULL AND som_bmu_col IS NOT NULL)::int AS bmu_rows,
-          COUNT(*) FILTER (WHERE manifold4 IS NOT NULL AND array_length(manifold4, 1) = 4)::int AS manifold4_rows
-        FROM codebase_chunk_index
-      `).catch(() => ({ rows: [{ total_rows: 0, bmu_rows: 0, manifold4_rows: 0 }] }));
-
-      const summary = summaryRes.rows[0];
-      const codebase = codebaseRes.rows[0];
-      const selected = scope === 'embedded_summaries'
-        ? summary
-        : scope === 'codebase_index'
-          ? codebase
-          : {
-              total_rows: Number(summary.total_rows ?? 0) + Number(codebase.total_rows ?? 0),
-              bmu_rows: Number(summary.bmu_rows ?? 0) + Number(codebase.bmu_rows ?? 0),
-              manifold4_rows: Number(summary.manifold4_rows ?? 0) + Number(codebase.manifold4_rows ?? 0),
-            };
-
-      const totalRows = Number(selected.total_rows ?? 0);
-      const bmuRows = Number(selected.bmu_rows ?? 0);
-      const manifold4Rows = Number(selected.manifold4_rows ?? 0);
-      const missingBmu = Math.max(0, totalRows - bmuRows);
-      const missingManifold4 = Math.max(0, totalRows - manifold4Rows);
-
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            ok: true,
-            readOnly: true,
-            scope,
-            current: {
-              totalRows,
-              bmuRows,
-              manifold4Rows,
-              missingBmu,
-              missingManifold4,
-            },
-            recommendedSequence: [
-              'npm run graphify:topology:gpu',
-              'npm run qdrant:patch-topology',
-              'npm run graphify:seed-llm-index',
-            ],
-            expectedEffects: [
-              'Populate som_bmu_row and som_bmu_col for topological grid expansion.',
-              'Populate manifold4 for 4D topology metadata and proximity search.',
-              'Improve topology.search_som_neighborhood and hydration status coverage.',
-            ],
-            note: 'This tool is plan-only. It does not execute graphify or backfill jobs.',
-          }, null, 2),
-        }],
-      };
-    } catch (err) {
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ ok: false, degraded: true, error: String(err) }) }],
-        isError: true,
-      };
-    }
-  }
-);
 
 // == kb.hybrid_search =========================================================
 
@@ -1473,142 +1358,6 @@ server.tool(
 
 // ── clusters.get_summary_lenses ───────────────────────────────────────────────
 
-// ── trace.kag_search ──────────────────────────────────────────────────────────
-
-server.tool(
-  'trace.kag_search',
-  {
-    query:    z.string().max(4000).describe('Natural language question or search'),
-    filePath: z.string().optional().describe('Optional file path for AGENTS.md-scoped context'),
-    limit:    z.number().int().min(1).max(50).default(10).describe('Max chunks returned'),
-  },
-  async ({ query, filePath, limit }) => {
-    const safeQuery = String(query ?? '').slice(0, 4000);
-    const safeLimit = clampInt(limit, 1, 50, 10);
-    const qHash     = hashQuery(safeQuery, safeLimit);
-    const cacheKey  = aceHitsKey(qHash, safeLimit);
-
-    // ── L1: Redis 24hr hit cache ──────────────────────────────────────────────
-    try {
-      const { default: Redis } = await import('ioredis');
-      const redis = makeRedis();
-      const cached = await redis.get(cacheKey).catch(() => null);
-      await redis.quit();
-      if (cached) {
-        const parsed = JSON.parse(cached) as Record<string, unknown>;
-        return {
-          content: [{
-            type: 'text' as const,
-            text: JSON.stringify({ ...parsed, cached: true }, null, 2),
-          }],
-        };
-      }
-    } catch { /* Redis unavailable — proceed to live retrieval */ }
-
-    // ── L2: Go retrieval service (GPU embedding + JSONB cache, 5s budget) ────
-    try {
-      const goT0  = Date.now();
-      const goRes = await fetch(`${GO_RETRIEVAL_URL}/search/codebase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: safeQuery, limit: safeLimit }),
-        signal: AbortSignal.timeout(5_000),
-      });
-      if (goRes.ok) {
-        const goData = await goRes.json() as { results?: Array<Record<string, unknown>> };
-        if (goData.results?.length) {
-          const normalized = normalizeGoRetrievalHits(goData, safeQuery, goT0);
-          import('ioredis').then(({ default: Redis }) => {
-            const r = makeRedis();
-            r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(normalized)).catch(() => {});
-            r.quit().catch(() => {});
-          }).catch(() => {});
-          return {
-            content: [{
-              type: 'text' as const,
-              text: JSON.stringify(normalized, null, 2),
-            }],
-          };
-        }
-      }
-    } catch { /* fall through to SvelteKit */ }
-
-    // ── L3: SvelteKit KAG-DAG pipeline (3s budget — fast-path only) ──────────
-    try {
-      const body: Record<string, unknown> = { query: safeQuery, limit: safeLimit };
-      if (filePath) body.filePath = filePath;
-      const svelteFetch = sveltePost('/api/code-intel/search', body);
-      svelteFetch.catch(() => {}); // prevent UnhandledPromiseRejection if race abandons it
-      const raw = await Promise.race([
-        svelteFetch,
-        new Promise<never>((_, r) => setTimeout(() => r(new Error('svelte-timeout')), 3_000)),
-      ]) as unknown;
-      const data = (raw as { data?: unknown[] }).data
-        ?? (Array.isArray(raw) ? raw : []);
-      const hits = (data as Record<string, unknown>[]).map(h => ({
-        stable_key: h.stableKey ?? h.stable_key ?? '',
-        file_path:  h.filePath  ?? h.file_path  ?? '',
-        score:      typeof h.score === 'number' ? h.score : 0,
-        content:    typeof h.content === 'string' ? h.content.slice(0, 600) : '',
-        topo_class: h.topoClass ?? h.topo_class ?? '',
-      }));
-      const svelteResult = { success: true, data: hits, count: hits.length };
-      import('ioredis').then(({ default: Redis }) => {
-        const r = makeRedis();
-        r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(svelteResult)).catch(() => {});
-        r.quit().catch(() => {});
-      }).catch(() => {});
-      return {
-        content: [{
-          type: 'text' as const,
-          text: JSON.stringify(svelteResult, null, 2),
-        }],
-      };
-    } catch { /* fall through to Postgres FTS */ }
-
-    // ── L4: Postgres FTS fallback ─────────────────────────────────────────────
-    try {
-      const client = await pool.connect();
-      try {
-        const { rows } = await client.query<{
-          stable_key: string; rel_path: string; chunk_text: string;
-          lexical_score: number; topo_class: string | null;
-        }>(
-          'SELECT * FROM search_code_lexical($1, $2, $3)',
-          [safeQuery, safeLimit, null]
-        );
-        const hits = rows.map(r => ({
-          stable_key: r.stable_key,
-          file_path:  r.rel_path,
-          score:      r.lexical_score,
-          content:    (r.chunk_text ?? '').slice(0, 600),
-          topo_class: r.topo_class ?? '',
-        }));
-        const ftsResult = { success: true, data: hits, count: hits.length, source: 'postgres_fts' };
-        import('ioredis').then(({ default: Redis }) => {
-          const r = makeRedis();
-          r.setex(cacheKey, ACE_HITS_TTL, JSON.stringify(ftsResult)).catch(() => {});
-          r.quit().catch(() => {});
-        }).catch(() => {});
-        return {
-          content: [{
-            type: 'text' as const,
-            text: JSON.stringify(ftsResult, null, 2),
-          }],
-        };
-      } finally {
-        client.release();
-      }
-    } catch (err) {
-      return {
-        content: [{
-          type: 'text' as const,
-          text: JSON.stringify({ success: false, data: [], error: String(err) }, null, 2),
-        }],
-      };
-    }
-  }
-);
 
 // ── trace.explain_retrieval ───────────────────────────────────────────────────
 
