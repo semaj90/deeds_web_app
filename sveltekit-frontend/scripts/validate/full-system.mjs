@@ -703,6 +703,47 @@ async function G27() {
 }
 
 /**
+ * G33 — static audit of src/mcp/db-inspection-tools.ts for write verbs.
+ *
+ * The whole point of the db.* MCP tools is that they're read-only. This gate
+ * grep-checks the source file for any write SQL keyword in code positions
+ * (not in comment/docstring positions) and fails if found. Cheap regression
+ * lock against accidentally adding `db.execute_write` or sprinkling INSERT
+ * into a "harmless" handler.
+ *
+ * Tier 0, fatal: true (read-only is load-bearing for the safety story).
+ *
+ * False-positives we tolerate:
+ *   - `INSERT` / `UPDATE` etc. inside string-literal comments or
+ *     description fields (we strip /* ... *\/ and // lines before checking).
+ *   - The word "scrubbed" / "[scrubbed]" sentinel.
+ */
+async function G33() {
+  const path = 'src/mcp/db-inspection-tools.ts';
+  if (!(await exists(path))) return skip(`${path} missing — Phase B incomplete`);
+  const src = await readFile(resolve(ROOT, path), 'utf8');
+
+  // Strip block comments and line comments so docstrings can mention "INSERT".
+  const stripped = src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '');
+
+  const WRITE_VERBS = /\b(INSERT\s+INTO|UPDATE\s+\w+\s+SET|DELETE\s+FROM|TRUNCATE|DROP\s+(TABLE|COLUMN|SCHEMA|INDEX)|CREATE\s+(TABLE|INDEX|SCHEMA)|ALTER\s+TABLE|GRANT|REVOKE|COPY\s+\w+\s+FROM)\b/i;
+  const m = stripped.match(WRITE_VERBS);
+  if (m) {
+    const idx = stripped.indexOf(m[0]);
+    const lineNum = stripped.slice(0, idx).split('\n').length;
+    return fail(`write verb "${m[0]}" found at line ~${lineNum} — db.* tools must be read-only`);
+  }
+
+  // Sanity: must register at least 2 tools.
+  const toolCount = (src.match(/server\.tool\(/g) ?? []).length;
+  if (toolCount < 2) return fail(`only ${toolCount} server.tool() calls — expected ≥2 (db.schema_overview, db.table_inspect)`);
+
+  return pass(`${toolCount} tools, 0 write verbs`);
+}
+
+/**
  * G29 — destructive-SQL detector for pending Drizzle migrations.
  *
  * `drizzle-kit migrate` will happily run a DROP TABLE that wipes prod data
@@ -875,6 +916,9 @@ const GATES = [
   // T1 — gemma4-offload MCP server (Claude Code → local Gemma4 routing).
   { id: 'G30', tier: 1, name: 'mcp:gemma4-offload-handshake', fn: G30, fatal: false },
   { id: 'G31', tier: 1, name: 'mcp:gemma4-offload-roundtrip', fn: G31, fatal: false },
+
+  // T0 — db-inspection-tools.ts must contain zero write verbs (Phase B).
+  { id: 'G33', tier: 0, name: 'mcp:db-inspection-readonly',  fn: G33, fatal: true  },
 ];
 
 // ── runner ───────────────────────────────────────────────────
