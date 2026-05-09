@@ -9,6 +9,7 @@
 import { pgRows } from '$lib/server/db/client';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 import { redis } from '$lib/server/redis.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
@@ -36,8 +37,8 @@ export interface ACPKnowledgeSearchResult {
 
 const CONFIG = {
   endpoints: {
-    ollama: process.env.OLLAMA_URL || 'http://localhost:11434',
-    qdrant: process.env.QDRANT_URL || 'http://localhost:6333',
+    ollama: ENV.OLLAMA_BASE_URL,
+    qdrant: ENV.QDRANT_URL,
   },
   models: {
     embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',

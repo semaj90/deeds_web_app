@@ -12,6 +12,7 @@
 
 import type { SearchResult, SearchOptions,
   SearchFilters, FullDocument, IndexResult } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 
 export interface PostgresConfig {
@@ -38,7 +39,7 @@ export interface PostgresDocument {
 }
 
 const DEFAULT_CONFIG: PostgresConfig = {
-  connectionString: process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+  connectionString: ENV.DATABASE_URL,
   maxConnections: 10,
   idleTimeout: 30000
 };

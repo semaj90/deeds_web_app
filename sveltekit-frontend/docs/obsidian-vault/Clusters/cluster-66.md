@@ -12,7 +12,7 @@ top_tags: ["types","redis","embedding","server-module","ui-component"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__evidence__proto-serializer]]","[[Files/src__lib__server__analysis__entity-extraction]]","[[Files/src__lib__server__langextract-client]]","[[Files/src__lib__server__evidence__services__entity-extractor]]","[[Files/src__lib__server__services__langextract-service]]","[[Files/src__lib__types__ai]]"]
 same: ["[[Clusters/cluster-78]]","[[Clusters/cluster-56]]","[[Clusters/cluster-1]]","[[Clusters/cluster-4]]","[[Clusters/cluster-17]]"]

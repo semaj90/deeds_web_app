@@ -1,11 +1,11 @@
 {
   "runId": "2026-05-07T20-53-22",
-  "synthesizedAt": "2026-05-08T07:00:42.902Z",
+  "synthesizedAt": "2026-05-08T21:59:33.315Z",
   "tsgoDiagnostics": 0,
   "shallowWiredFiles": 357,
   "auditGates": {
     "g11_wrong_db_client": 0,
-    "g17_localhost_hardcoded": 0,
+    "g17_localhost_hardcoded": 1,
     "g18_missing_auth": 0,
     "g19_missing_zod": 0,
     "g21_svelte4_props": 0,

@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { spawn } from 'child_process';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import { ENV } from '$lib/server/env.server.js';
 
 /**
  * Tool 11: Extract frames from video evidence
@@ -91,7 +92,7 @@ export const stableDiffusionGenerateTool = {
 	}),
 	execute: async ({ prompt, negativePrompt, width, height, steps, cfgScale, seed, numImages }) => {
 		// Call Triton SDXL endpoint (port 8100)
-		const SDXL_URL = process.env.SDXL_SERVICE_URL || 'http://localhost:8100';
+		const SDXL_URL = ENV.SDXL_SERVICE_URL;
 
 		const payload = {
 			prompt,

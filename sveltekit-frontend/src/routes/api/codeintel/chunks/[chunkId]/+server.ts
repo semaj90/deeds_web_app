@@ -33,7 +33,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 			       COALESCE(summary, '') AS summary,
 			       COALESCE(metadata::text, '{}') AS metadata_json
 			FROM codebase_chunk_index
-			WHERE qdrant_id = ${chunkId}
+			WHERE (qdrant_id = ${chunkId} OR chunk_id = ${chunkId})
 			  AND (${repoId} = '' OR repo_id = ${repoId})
 			LIMIT 1
 		`);

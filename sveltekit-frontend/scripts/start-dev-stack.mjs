@@ -162,16 +162,13 @@ async function startTier1() {
   }
 }
 
-// ── Tier 2: TurboQuant llama-server ──────────────────────────────────────────
+// ── Tier 2: Inference Cascade (Reranker & TurboQuant) ─────────────────────────
 
 async function startTier2() {
-  console.log('\n[ Tier 2 ] TurboQuant llama-server');
+  console.log('\n[ Tier 2 ] Inference Cascade');
 
-  const port = process.env.TURBO_PORT ?? '8090';
-  if (await isPortOpen(Number(port))) {
-    logEvent('T2', `TurboQuant :${port}`, 'already-up');
-    return;
-  }
+  const rerankPort = 8090;
+  const turboPort  = 8080;
 
   const candidates = [
     process.env.TURBOQUANT_EXE_PATH,
@@ -185,31 +182,39 @@ async function startTier2() {
     'sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43');
   const modelPath = process.env.TURBO_MODEL_PATH ??
     (existsSync(blobPath) ? blobPath : join(ROOT, 'models', 'gemma4-legal-q4_k_m.gguf'));
-  const mmprojDl  = join(process.env.USERPROFILE ?? 'C:\\Users\\james', 'Downloads', 'gemma4-mmproj', 'mmproj-BF16.gguf');
-  const mmproj    = process.env.TURBO_MMPROJ_PATH ?? (existsSync(mmprojDl) ? mmprojDl : null);
 
   if (!llamaExe) {
-    logEvent('T2', `TurboQuant :${port}`, 'skip', { note: 'llama-server.exe not found; set TURBOQUANT_EXE_PATH' });
-    return;
-  }
-  if (!existsSync(modelPath)) {
-    logEvent('T2', `TurboQuant :${port}`, 'skip', { note: `model not found at ${modelPath}` });
+    logEvent('T2', 'Inference', 'skip', { note: 'llama-server.exe not found' });
     return;
   }
 
-  const args = ['-m', modelPath, '--host', '127.0.0.1', '--port', port,
-    '-c', '65536', '-ngl', '99', '-fa', 'on',
-    '-ctk', 'q8_0', '-ctv', 'q8_0', '--log-disable'];
-  if (mmproj && existsSync(mmproj)) args.push('--mmproj', mmproj);
+  // 1. Start Reranker on :8090
+  if (await isPortOpen(rerankPort)) {
+    logEvent('T2', `Reranker :${rerankPort}`, 'already-up');
+  } else {
+    logEvent('T2', `Reranker :${rerankPort}`, 'starting', { kv: 'fp16' });
+    spawnDetached(llamaExe, [
+      '-m', modelPath, '--host', '127.0.0.1', '--port', String(rerankPort),
+      '--rerank', '-ngl', '99', '--log-disable'
+    ], { cwd: ROOT });
+  }
 
-  logEvent('T2', `TurboQuant :${port}`, 'starting', {
-    exe: llamaExe, kv: 'q8_0', fa: true, mmproj: mmproj ?? null });
-  spawnDetached(llamaExe, args, { cwd: ROOT });
+  // 2. Start TurboQuant on :8080
+  if (await isPortOpen(turboPort)) {
+    logEvent('T2', `TurboQuant :${turboPort}`, 'already-up');
+  } else {
+    logEvent('T2', `TurboQuant :${turboPort}`, 'starting', { kv: 'q8_0', fa: true });
+    spawnDetached(llamaExe, [
+      '-m', modelPath, '--host', '127.0.0.1', '--port', String(turboPort),
+      '-c', '65536', '-ngl', '99', '-fa', 'on',
+      '-ctk', 'q8_0', '-ctv', 'q8_0', '--log-disable'
+    ], { cwd: ROOT });
+  }
 
-  // Wait up to 90s — large GGUF models are slow to load
-  const ready = await waitForPort(Number(port), `TurboQuant :${port}`, 90_000);
-  logEvent('T2', `TurboQuant :${port}`, ready ? 'up' : 'warn-loading',
-    { note: ready ? undefined : 'model still loading — MCP will retry' });
+  const rerankReady = await waitForPort(rerankPort, `Reranker :${rerankPort}`, 45_000);
+  const turboReady  = await waitForPort(turboPort, `TurboQuant :${turboPort}`, 60_000);
+  
+  logEvent('T2', 'Inference', rerankReady && turboReady ? 'up' : 'warn-partial');
 }
 
 // ── Tier 3: SvelteKit dev server ──────────────────────────────────────────────
@@ -235,8 +240,10 @@ async function startTier4() {
   console.log('\n[ Tier 4 ] TRACE MCP + topology search');
 
   const mcpPort      = process.env.TRACE_MCP_PORT ?? '8788';
+  const kbPort       = process.env.KB_MCP_PORT ?? '8789';
   const clusterScript = join(ROOT, 'scripts', 'start-trace-mcp-cluster.mjs');
   const mcpServerTs   = join(ROOT, 'src', 'mcp', 'trace-mcp-server.ts');
+  const kbServerTs    = join(ROOT, 'src', 'mcp', 'kb-retrieval-server.ts');
   const topoScript    = join(ROOT, 'scripts', 'topology-search-server.mjs');
 
   // Topology search :8101
@@ -259,6 +266,18 @@ async function startTier4() {
     logEvent('T4', `TRACE MCP :${mcpPort}`, ready ? 'up' : 'warn-not-ready');
   } else {
     logEvent('T4', `TRACE MCP :${mcpPort}`, 'skip', { note: 'cluster script or trace-mcp-server.ts not found' });
+  }
+
+  // KB retrieval MCP :8789
+  if (await isPortOpen(Number(kbPort))) {
+    logEvent('T4', `KB MCP :${kbPort}`, 'already-up');
+  } else if (existsSync(kbServerTs)) {
+    logEvent('T4', `KB MCP :${kbPort}`, 'starting');
+    spawnDetached('node', [join(ROOT, 'scripts', 'ensure-kb-retrieval-server.mjs'), '--spawn'], { cwd: ROOT });
+    const ready = await waitForPort(Number(kbPort), `KB MCP :${kbPort}`, 20_000);
+    logEvent('T4', `KB MCP :${kbPort}`, ready ? 'up' : 'warn-not-ready');
+  } else {
+    logEvent('T4', `KB MCP :${kbPort}`, 'skip', { note: 'kb-retrieval-server.ts not found' });
   }
 }
 
@@ -297,15 +316,18 @@ function printSummary() {
   console.log('  Langfuse traces  http://127.0.0.1:3030/traces');
   console.log('  Bifrost L2 cache http://127.0.0.1:3040/health');
   console.log('  go-retrieval     http://127.0.0.1:8100/health');
-  console.log('  TurboQuant KV    http://127.0.0.1:8090/health');
+  console.log('  Reranker         http://127.0.0.1:8090/health');
+  console.log('  TurboQuant KV    http://127.0.0.1:8080/health');
   console.log('  topo-search      http://127.0.0.1:8101/health');
   console.log('  TRACE MCP        http://127.0.0.1:8788/health');
+  console.log('  KB MCP           http://127.0.0.1:8789/health');
   console.log('  SvelteKit        http://127.0.0.1:5173');
   console.log('─────────────────────────────────────────────────');
   console.log('  Inference cascade (bifrostChat):');
   console.log('    L1 Redis exact-match   (~5ms)');
   console.log('    L2 Bifrost semantic    (2-5s)');
-  console.log('    L3 TurboQuant KV cold  (~25s)');
+  console.log('    L3 Reranker scoring    (5-8s)');
+  console.log('    L4 TurboQuant KV cold  (~25s)');
   console.log('─────────────────────────────────────────────────');
   console.log(`  Startup log: memory/runs/${runId}/startup.jsonl`);
   console.log('═════════════════════════════════════════════════\n');

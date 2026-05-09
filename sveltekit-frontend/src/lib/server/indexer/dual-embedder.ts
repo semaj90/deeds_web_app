@@ -66,10 +66,10 @@ async function embed(text: string): Promise<number[]> {
     return cached;
   }
 
-  const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+  const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt, keep_alive: '24h' }),
+    body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: [prompt], keep_alive: '24h' }),
     signal: AbortSignal.timeout(30_000),
   });
 
@@ -77,12 +77,13 @@ async function embed(text: string): Promise<number[]> {
     throw new Error(`Embedding failed (${res.status}): ${await res.text()}`);
   }
 
-  const data = (await res.json()) as EmbeddingResult;
-  if (!isValidEmbedding(data.embedding)) {
+  const data = (await res.json()) as { embeddings: number[][] };
+  const embedding = data.embeddings?.[0];
+  if (!isValidEmbedding(embedding)) {
     throw new Error('Embedding response returned an invalid vector');
   }
-  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, data.embedding).catch(() => {});
-  return data.embedding;
+  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, embedding).catch(() => {});
+  return embedding;
 }
 
 /**
@@ -427,6 +428,7 @@ export async function indexChunks(
             return {
               content: batch[i].content.slice(0, 4_000),
               signature: batch[i].signature,
+              chunk_id: batch[i].id,
               ...meta,
               topo_byte:   topoByteFromPath((meta as Record<string, unknown>).relativePath as string ?? ''),
               topo_class:  topoClass,

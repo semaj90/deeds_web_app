@@ -1,0 +1,42 @@
+---
+type: "file"
+path: "src/routes/api/cartridge/search/+server.ts"
+aliases: ["+server.ts","src/routes/api/cartridge/search/+server.ts"]
+clusterId: -1
+ext: ".ts"
+lineCount: 116
+pagerank: 0
+blend: 0
+isRoute: true
+isSvelteComp: false
+isTest: false
+hasAuth: true
+hasZod: true
+importCount: 9
+embedding_id: "qdrant://codebase_chunks_768/src/routes/api/cartridge/search/+server.ts"
+last_updated_by_llm: "2026-05-08T16:50:32.855Z"
+ai-first: true
+confidence: "high"
+up: []
+imports: ["[[Files/_types]]"]
+tags: ["file","ext/ts","route","auth","zod","t/ts","t/src","t/routes"]
+---
+
+# `src/routes/api/cartridge/search/+server.ts`
+## For future Claude
+> CHR-ROM97 Cartridge Tensor Search API
+pagerank:: 0.000000
+blend:: 0.000000
+lines:: 116
+## Summary
+
+CHR-ROM97 Cartridge Tensor Search API
+
+## Imports
+
+- imports:: [[Files/_types]] `./$types`
+## Backlinks (Dataview)
+```dataviewjs
+const cur = dv.current().file.path;
+dv.list(dv.pages().where(p => Array.isArray(p.imports) && p.imports.some(l => l && l.path === cur)).file.link);
+```

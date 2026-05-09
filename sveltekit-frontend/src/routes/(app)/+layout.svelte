@@ -27,11 +27,11 @@
 	let showShortcuts = $state(false);
 	let showAnalysisPanel = $state(false);
 	let showAuthModal = $state(false);
-	let currentPathname = $derived(page.url.pathname);
-
+	let showAssistant = $state(false);
 	// Dynamic imports to avoid SSR TDZ crashes (browser-only components)
 	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
 	let AIChatWidget = $state<typeof import('$lib/components/ai/AIChatWidget.svelte').default | null>(null);
+	let ContextualAssistantModal = $state<typeof import('$lib/components/admin/ContextualAssistantModal.svelte').default | null>(null);
 	let SetupWizard = $state<typeof import('$lib/components/onboarding/SetupWizard.svelte').default | null>(null);
 	let KeyboardShortcutsPanel = $state<typeof import('$lib/components/KeyboardShortcutsPanel.svelte').default | null>(null);
 	let AnalysisPanelComp = $state<typeof import('$lib/components/analysis/AnalysisPanel.svelte').default | null>(null);
@@ -42,14 +42,16 @@
 		Promise.all([
 			import('$lib/components/ui/AccessibilityPanel.svelte').catch(() => null),
 			import('$lib/components/ai/AIChatWidget.svelte').catch(() => null),
+			import('$lib/components/admin/ContextualAssistantModal.svelte').catch(() => null),
 			import('$lib/components/onboarding/SetupWizard.svelte').catch(() => null),
 			import('$lib/components/KeyboardShortcutsPanel.svelte').catch(() => null),
 			import('$lib/components/analysis/AnalysisPanel.svelte').catch(() => null),
 			import('$lib/components/research/ResearchTaskPanel.svelte').catch(() => null),
 			import('$lib/components/ui/AuthModal.svelte').catch(() => null),
-		]).then(([accMod, chatMod, wizardMod, shortcutsMod, analysisMod, tasksMod, authMod]) => {
+		]).then(([accMod, chatMod, contextMod, wizardMod, shortcutsMod, analysisMod, tasksMod, authMod]) => {
 			if (accMod) AccessibilityPanel = accMod.default;
 			if (chatMod) AIChatWidget = chatMod.default;
+			if (contextMod) ContextualAssistantModal = contextMod.default;
 			if (wizardMod) SetupWizard = wizardMod.default;
 			if (shortcutsMod) KeyboardShortcutsPanel = shortcutsMod.default;
 			if (analysisMod) AnalysisPanelComp = analysisMod.default;
@@ -126,6 +128,11 @@
 			e.preventDefault();
 			researchTasks.panelOpen = !researchTasks.panelOpen;
 		}
+		// Alt+C — toggle contextual assistant
+		if (e.altKey && e.key.toLowerCase() === 'c' && !e.ctrlKey) {
+			e.preventDefault();
+			showAssistant = !showAssistant;
+		}
 		// ? key toggles keyboard shortcuts panel (only when not typing in an input)
 		if (e.key === '?' && !e.ctrlKey && !e.altKey) {
 			const tag = (e.target as HTMLElement)?.tagName;
@@ -167,6 +174,9 @@
 <OfflineIndicator />
 {#if AccessibilityPanel}
 	<AccessibilityPanel />
+{/if}
+{#if ContextualAssistantModal && data.user?.role === 'admin'}
+	<ContextualAssistantModal bind:open={showAssistant} />
 {/if}
 {#if AIChatWidget}
 	<AIChatWidget currentRoute={currentPathname} />

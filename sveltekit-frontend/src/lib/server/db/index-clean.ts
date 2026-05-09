@@ -4,6 +4,8 @@ import * as schema from '$lib/server/db/schema-postgres';
 import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
+import { ENV } from '$lib/server/env.server.js';
+
 let _db: PostgresJsDatabase<typeof schema> | null = null;
 let _client: ReturnType<typeof postgres> | null = null;
 
@@ -14,8 +16,7 @@ function initializeDatabase(): PostgresJsDatabase<typeof schema> | null {
 	}
 	if (_db) return _db;
 
-	const databaseUrl =
-		process.env?.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/prosecutor_db';
+	const databaseUrl = ENV.DATABASE_URL;
 	console.log('🏗️ Connecting to PostgreSQL database');
 
     _client = postgres(databaseUrl);

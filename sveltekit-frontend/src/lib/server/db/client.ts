@@ -38,26 +38,56 @@ export function resetPoolHealth(): void {
 	adminPoolHealthy = true;
 }
 
-export const pool = new Pool({ connectionString: getDatabaseUrl() });
+// ── Connection Pooling ───────────────────────────────────────────────────────
+
+const POOL_CONFIG = {
+	max: 10, // Default for node-postgres
+	idleTimeoutMillis: 30000,
+	connectionTimeoutMillis: 5000,
+};
+
+// Log canonical DB on boot (Sprint 3.6 G17)
+if (typeof process !== 'undefined') {
+	try {
+		const url = new URL(getDatabaseUrl());
+		console.log(`📡 [DB] Canonical target: ${url.hostname}:${url.port}${url.pathname}`);
+	} catch {
+		console.log('📡 [DB] Canonical target: [invalid URL]');
+	}
+}
+
+export const pool = new Pool({
+	connectionString: getDatabaseUrl(),
+	...POOL_CONFIG,
+	statement_timeout: 60000, // 60s max per query
+});
+
 pool.on('error', (err) => {
 	poolHealthy = false;
-  lastPoolError = err.message;
-  lastPoolErrorAt = new Date();
-  console.error('Database pool error:', err.message);
+	lastPoolError = err.message;
+	lastPoolErrorAt = new Date();
+	console.error('Database pool error:', err.message);
 });
+
 // Enable pgvector iterative scanning for filtered HNSW queries (9x faster)
 pool.on('connect', (client) => {
-  client.query('SET hnsw.iterative_scan = relaxed_order').catch(() => {});
+	client.query('SET hnsw.iterative_scan = relaxed_order').catch(() => {});
 });
+
 export const db = drizzle(pool, { schema: mergedSchema, cache });
 
-const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });
+const adminPool = new Pool({
+	connectionString: getAdminDatabaseUrl(),
+	...POOL_CONFIG
+});
+
 adminPool.on('error', (err) => {
 	adminPoolHealthy = false;
-  lastPoolError = err.message;
-  lastPoolErrorAt = new Date();
-  console.error('Admin database pool error:', err.message);
+	lastPoolError = err.message;
+	lastPoolErrorAt = new Date();
+	console.error('Admin database pool error:', err.message);
 });
+
 // NOTE: Do NOT use casing: 'snake_case' — our schema uses explicit column names
 // (e.g. passwordHash: varchar('hashed_password')) and casing would override them
 // to password_hash, which doesn't exist in the DB.

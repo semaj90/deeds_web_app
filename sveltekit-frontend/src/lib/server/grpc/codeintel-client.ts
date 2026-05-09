@@ -5,9 +5,7 @@
  * All exported functions return plain objects (not proto instances)
  * so callers have no proto dependency.
  *
- * ENV:
- *   CODEINTEL_GRPC_URL      — grpc host:port (default 127.0.0.1:50058)
- *   CODEINTEL_GRPC_ENABLED  — "true" to enable gRPC path (default false → HTTP fallback)
+ * All addresses resolved via ENV.* getters in env.server.ts.
  */
 import { ENV } from '$lib/server/env.server.js';
 

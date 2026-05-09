@@ -12,7 +12,7 @@ top_tags: ["embedding","vector","redis","rabbitmq","ai"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__config__ollama]]","[[Files/src__lib__config__env.server]]","[[Files/src__lib__server__ai__ollama-config]]","[[Files/src__lib__server__config]]","[[Files/src__lib__config__database]]","[[Files/src__lib__config__redis-config]]","[[Files/src__lib__server__minio]]","[[Files/src__lib__services__knowledge-search__qdrantknowledgestore]]"]
 same: ["[[Clusters/cluster-19]]","[[Clusters/cluster-46]]","[[Clusters/cluster-22]]","[[Clusters/cluster-24]]","[[Clusters/cluster-72]]"]

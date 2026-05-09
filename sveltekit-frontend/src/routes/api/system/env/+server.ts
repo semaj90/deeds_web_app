@@ -6,7 +6,11 @@ import type { RequestHandler } from './$types';
  * Sanitized environment check (presence flags only, no secrets)
  * No side effects
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const env = {
 		timestamp: new Date().toISOString(),
 		has: { REDIS_URL: !!process.env.REDIS_URL,

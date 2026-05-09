@@ -3,6 +3,7 @@
 
 import type { OllamaConfig, ModelConfig } from './types.js';
 import { SYSTEM_GEMMA4_LEGAL, SYSTEM_EMBEDDING } from '$lib/ai/prompts.js';
+import { ENV } from '$lib/server/env.server.js';
 
 /**
  * Ollama Configuration for High-Performance AI Assistant
@@ -61,8 +62,8 @@ export const FALLBACK_CHAIN = {
 };
 
 export const OLLAMA_CONFIG: OllamaConfig = {
-	baseUrl: process.env?.OLLAMA_BASE_URL ?? process.env?.OLLAMA_URL ?? 'http://localhost:11434',
-	defaultModel: 'gemma4-legal:latest',
+  baseUrl: ENV.OLLAMA_BASE_URL,
+  defaultModel: 'gemma4-legal:latest',
 	embeddingModel: 'embeddinggemma',
 	fallbackModel: 'gemma4-legal:latest',
 	fallbackModels: {
@@ -164,4 +165,3 @@ export function isLegalTask(prompt: string): boolean {
 }
 
 export default OLLAMA_CONFIG;
-

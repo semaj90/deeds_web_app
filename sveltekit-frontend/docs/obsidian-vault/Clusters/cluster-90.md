@@ -12,7 +12,7 @@ top_tags: ["auth","api","server"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__lucia]]","[[Files/src__routes__api__auth__logout___server]]","[[Files/src__lib__server__auth]]","[[Files/src__lib__server__auth-guard]]","[[Files/src__lib__types__auth.d]]","[[Files/src__routes__api__auth__session___server]]","[[Files/src__routes__api__dev__login-demo___server]]"]
 same: ["[[Clusters/cluster-64]]","[[Clusters/cluster-44]]","[[Clusters/cluster-26]]","[[Clusters/cluster-31]]","[[Clusters/cluster-80]]"]

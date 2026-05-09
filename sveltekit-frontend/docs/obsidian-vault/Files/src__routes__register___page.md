@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 5
 embedding_id: "qdrant://codebase_chunks_768/src/routes/register/+page.svelte"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 confidence: "medium"
 up: []

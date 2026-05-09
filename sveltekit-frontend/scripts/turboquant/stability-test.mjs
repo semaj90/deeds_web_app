@@ -2,13 +2,25 @@
 /**
  * stability-test.mjs — TurboQuant KV profile stability gate
  *
- * Tests q8_0 (baseline) vs turbo3/turbo4 profiles before promoting to production.
- * All 20 generations must pass tool-call JSON validity, no NaN centroids, and
- * latency p95 < 2× baseline before turbo3/turbo4 is considered safe.
+ * Tests q8_0/q8_0 (baseline) vs q8_0/turbo3 (asymmetric) and q8_0/turbo4
+ * (aggressive asymmetric) before promoting to production. All 20 generations
+ * must pass tool-call JSON validity, no NaN centroids, and latency p95 < 2×
+ * baseline before turbo3/turbo4 V-cache is considered safe.
+ *
+ * NOTE: This harness validates a server that is ALREADY RUNNING. It does NOT
+ * start llama-server.exe. The `ctk`/`ctv` fields in PROFILE_ARGS are
+ * documentation/report labels only — they describe the profile the operator
+ * launched the server with. To change the running profile, restart the server
+ * with the corresponding TURBO_KV_K / TURBO_KV_V env vars.
+ *
+ * Asymmetric rationale: K-cache tolerates less compression than V-cache, so
+ * keep K at q8_0 and only push V toward turbo3/turbo4. turbo3/turbo4 require
+ * a TurboQuant-enabled llama-server build (the standard llama.cpp build
+ * rejects them and the launcher falls back to q8_0/q8_0).
  *
  * Usage:
- *   npm run turbo:test:stability              (20 gen, q8_0 profile)
- *   npm run turbo:test:stability:turbo        (20 gen, turbo3 profile)
+ *   npm run turbo:test:stability              (20 gen, q8 profile)
+ *   npm run turbo:test:stability:turbo        (20 gen, q8/turbo3 profile)
  *   node scripts/turboquant/stability-test.mjs --generations 5 --profile q8
  *   node scripts/turboquant/stability-test.mjs --generations 20 --profile turbo3
  */
@@ -34,9 +46,9 @@ const RUN_DIR_ARG = argv.find(a => a.startsWith('--run-dir='))?.split('=').slice
                  ?? (argv.includes('--run-dir') ? argv[argv.indexOf('--run-dir') + 1] : null);
 
 const PROFILE_ARGS = {
-  q8:     { ctk: 'q8_0',  ctv: 'q8_0',  label: 'q8_0 (stable baseline)' },
-  turbo3: { ctk: 'turbo3', ctv: 'turbo4', label: 'turbo3/4 (experimental)' },
-  turbo4: { ctk: 'turbo4', ctv: 'turbo4', label: 'turbo4 (aggressive)' },
+  q8:     { ctk: 'q8_0', ctv: 'q8_0',   label: 'q8_0/q8_0 stable baseline' },
+  turbo3: { ctk: 'q8_0', ctv: 'turbo3', label: 'q8_0/turbo3 asymmetric TurboQuant' },
+  turbo4: { ctk: 'q8_0', ctv: 'turbo4', label: 'q8_0/turbo4 aggressive asymmetric TurboQuant' },
 };
 const profile = PROFILE_ARGS[profArg] ?? PROFILE_ARGS.q8;
 
@@ -203,10 +215,10 @@ async function main() {
   console.log('──────────────────────────────────────────────────\n');
 
   if (pass && profArg !== 'q8') {
-    console.log('  Next step: set -ctk turbo3 -ctv turbo4 in turbo:start:detached');
-    console.log('  and update start-trace-stack.ps1 KV flags.\n');
+    console.log('  Next step: set TURBO_KV_K=q8_0 TURBO_KV_V=turbo3 TURBO_CTX=16384 before turbo:start:detached');
+    console.log('  (requires TurboQuant-enabled llama-server binary at LLAMA_SERVER_PATH).\n');
   } else if (!pass) {
-    console.log('  Keep: -ctk q8_0 -ctv q8_0 (stable baseline)\n');
+    console.log('  Keep: -ctk q8_0 -ctv q8_0 (stable baseline). If q8/turbo3 fails, fall back to q8/q8 with TURBO_CTX=16384.\n');
   }
 
   // Write report

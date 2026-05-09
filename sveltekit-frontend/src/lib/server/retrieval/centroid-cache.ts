@@ -2,8 +2,8 @@
  * Centroid cache — precomputed cluster centroid vectors in Redis.
  *
  * Key layout (matches cache-keys.ts centroidKey):
- *   centroid:cluster:<clusterId>     Float32Array packed as base64 JSON
- *   centroid:som:<x>:<y>             SOM cell centroid
+ *   taxonomy:clusters:gpu:<clusterId>     Float32Array packed as JSON
+ *   taxonomy:clusters:som:<x>:<y>         SOM cell centroid
  *
  * Centroids are computed by averaging all chunk embeddings in a cluster
  * (done by graphify:semantic / som-topology pipeline) and stored here for
@@ -15,7 +15,7 @@
  *   const id  = await nearestCluster(queryVec, 10); // top-1 cluster
  */
 
-import { getRedis } from '$lib/server/redis.js';
+import { getRedis, setJsonWithTtl, getJson } from '$lib/server/redis.js';
 import { centroidKey, TTL } from '$lib/server/cache-keys.js';
 import { db } from '$lib/server/db/client';
 import { gpuClusterCentroids } from '$lib/server/db/schema/codebase-intelligence.js';
@@ -24,15 +24,8 @@ import { eq, sql } from 'drizzle-orm';
 // ── get / set ─────────────────────────────────────────────────────────────────
 
 export async function getClusterCentroid(clusterId: number): Promise<Float32Array | null> {
-  try {
-    const redis = getRedis();
-    const raw   = await redis.get(centroidKey.cluster(clusterId));
-    if (!raw) return null;
-    const arr   = JSON.parse(raw) as number[];
-    return new Float32Array(arr);
-  } catch {
-    return null;
-  }
+  const arr = await getJson<number[]>(centroidKey.cluster(clusterId));
+  return arr ? new Float32Array(arr) : null;
 }
 
 export async function setClusterCentroid(
@@ -40,19 +33,12 @@ export async function setClusterCentroid(
   vec: Float32Array,
   ttlSeconds = TTL.CENTROID
 ): Promise<void> {
-  const redis = getRedis();
-  await redis.setex(centroidKey.cluster(clusterId), ttlSeconds, JSON.stringify(Array.from(vec)));
+  await setJsonWithTtl(centroidKey.cluster(clusterId), Array.from(vec), ttlSeconds);
 }
 
 export async function getSomCentroid(x: number, y: number): Promise<Float32Array | null> {
-  try {
-    const redis = getRedis();
-    const raw   = await redis.get(centroidKey.som(x, y));
-    if (!raw) return null;
-    return new Float32Array(JSON.parse(raw) as number[]);
-  } catch {
-    return null;
-  }
+  const arr = await getJson<number[]>(centroidKey.som(x, y));
+  return arr ? new Float32Array(arr) : null;
 }
 
 export async function setSomCentroid(
@@ -61,8 +47,7 @@ export async function setSomCentroid(
   vec: Float32Array,
   ttlSeconds = TTL.CENTROID
 ): Promise<void> {
-  const redis = getRedis();
-  await redis.setex(centroidKey.som(x, y), ttlSeconds, JSON.stringify(Array.from(vec)));
+  await setJsonWithTtl(centroidKey.som(x, y), Array.from(vec), ttlSeconds);
 }
 
 // ── nearest-cluster lookup ────────────────────────────────────────────────────
@@ -91,7 +76,7 @@ export async function nearestCluster(
   const t0 = Date.now();
   try {
     const redis = getRedis();
-    const keys  = (await redis.keys('centroid:cluster:*')).slice(0, maxClusters);
+    const keys  = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
     if (!keys.length) return null;
 
     const values = await redis.mget(...keys);
@@ -112,7 +97,7 @@ export async function nearestCluster(
     for (let i = 0; i < keys.length; i++) {
       const raw = values[i];
       if (!raw) continue;
-      const id = parseInt(keys[i].split(':')[2], 10);
+      const id = parseInt(keys[i].split(':')[3], 10);
       if (isNaN(id)) continue;
       ids.push(id);
       vecs.push(parseFn(raw));

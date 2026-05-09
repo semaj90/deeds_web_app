@@ -27,9 +27,9 @@ import { ENV } from '$lib/server/env.server.js';
 import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import { indexChatMessage, hashToQdrantId } from '$lib/server/ace/chat-memory.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBED_MODEL = 'embeddinggemma:latest';
-const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = ENV.QDRANT_URL;
 
 interface ChatRow {
 	id: string;
@@ -213,4 +213,3 @@ async function embedAndUpsert(
 		return false;
 	}
 }
-

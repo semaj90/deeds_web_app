@@ -1,0 +1,40 @@
+---
+type: "file"
+path: "src/lib/server/redis-streams.ts"
+aliases: ["redis-streams.ts","src/lib/server/redis-streams.ts"]
+clusterId: 6
+ext: ".ts"
+lineCount: 197
+pagerank: 0
+blend: 0
+isRoute: false
+isSvelteComp: false
+isTest: false
+hasAuth: false
+hasZod: true
+importCount: 3
+embedding_id: "qdrant://codebase_chunks_768/src/lib/server/redis-streams.ts"
+last_updated_by_llm: "2026-05-08T16:50:32.855Z"
+ai-first: true
+confidence: "high"
+up: ["[[Clusters/cluster-6]]"]
+imports: []
+tags: ["file","ext/ts","cluster/6","zod","t/ts","t/src","t/lib"]
+---
+
+# `src/lib/server/redis-streams.ts`
+## For future Claude
+> redis-streams.ts — typed Redis Streams helpers for token-chunk streaming.
+cluster:: [[Clusters/cluster-6]]
+pagerank:: 0.000000
+blend:: 0.000000
+lines:: 197
+## Summary
+
+redis-streams.ts — typed Redis Streams helpers for token-chunk streaming.
+
+## Backlinks (Dataview)
+```dataviewjs
+const cur = dv.current().file.path;
+dv.list(dv.pages().where(p => Array.isArray(p.imports) && p.imports.some(l => l && l.path === cur)).file.link);
+```

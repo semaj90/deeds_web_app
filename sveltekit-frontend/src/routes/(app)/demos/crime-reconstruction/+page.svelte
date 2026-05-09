@@ -553,6 +553,13 @@
       {stage === 'running' ? 'Reconstructing…' : 'Reconstruct Scene'}
     </button>
 
+    <p class="mt-2 text-[10px] text-[#777]">
+      Prefer the deterministic view?
+      <a href="/demos/scene-intent-2d" class="text-[#c4a35a] underline underline-offset-2">
+        View as 2D timeline
+      </a>
+    </p>
+
     <!-- Progress stages -->
     {#if stage !== 'idle'}
       <div class="mt-2 space-y-1">

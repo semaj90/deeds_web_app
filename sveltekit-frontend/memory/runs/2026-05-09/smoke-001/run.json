@@ -1,0 +1,19 @@
+{
+  "type": "agent_run",
+  "id": "smoke-001",
+  "hash": "f272120f",
+  "errorSummary": "smoke test agent run",
+  "files": [],
+  "tags": [
+    "smoke"
+  ],
+  "confidence": 0.5,
+  "patchResult": "unknown",
+  "researchNotes": "",
+  "needsDeepResearch": false,
+  "generated_at": "2026-05-09T03:42:31.675Z",
+  "recommended_actions": [
+    "Verify fix with smoke tests",
+    "Ingest artifacts: kag.ingest_memory_directory"
+  ]
+}

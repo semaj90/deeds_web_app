@@ -1726,8 +1726,9 @@ export class RabbitMQManager extends EventEmitter {
           const topCluster = hits.find((h) => h.gpu_cluster != null)?.gpu_cluster;
           let graphSummary: string | null = null;
           if (topCluster != null && this.redisService) {
+            const { clusterSummaryKey } = await import('$lib/server/cache-keys.js');
             const cached = await this.redisService
-              .get(`cluster-summary:${topCluster}`)
+              .get(clusterSummaryKey.cached(topCluster))
               .catch(() => null);
             if (cached) {
               try {

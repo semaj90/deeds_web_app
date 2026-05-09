@@ -27,7 +27,10 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Server Cache**: Redis (SSR pages + sessions)
 - **Database**: PostgreSQL 16 + Drizzle ORM 0.44 + pgvector
 - **Vector DB**: Qdrant (GPU-accelerated)
-- **AI Models**: Ollama (`embeddinggemma:latest` + `gemma4-legal-vlm:latest` — unified text+vision, GRPO legal LoRA merged)
+- **AI Models**: 
+    - **Embeddings Lane**: Ollama (`embeddinggemma:latest` via `/api/embed`)
+    - **Generation Lane**: `Gemma4` / `Qwen` via `llama-server` (TurboQuant + Bitfrost)
+    - **Vision**: `gemma4-legal-vlm` (unified text+vision, GRPO legal LoRA merged)
 - **Client AI**: ONNX Runtime (WebGPU → WASM SIMD → CPU) + gemma 270M quantized
 - **Real-Time**: Server-Sent Events (SSE)
 - **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
@@ -49,10 +52,12 @@ Client Router (src/lib/ai/client-router.ts)
   │   ├─ Embeddings: static/embeddinggemma_300m_onnx/ (768-dim)
   │   └─ Auto-escalate on failure → SERVER
   │
-  └─ Legal/complex query → SERVER Ollama
-      ├─ LLM: gemma4-legal-vlm:latest
-      ├─ Embeddings: embeddinggemma:latest (768-dim)
-      └─ SSE stream via /api/sse/chat
+  └─ Legal/complex query → DUAL LANE
+      ├─ **Embeddings/Indexing**: Ollama `/api/embed` (embeddinggemma:latest)
+      │   └─ Storage: Redis (exact) → Qdrant (dense) → Postgres (mirror)
+      ├─ **Generation/Chat**: llama-server (Gemma4/Qwen)
+      │   └─ Optimization: TurboQuant KV Cache + Bitfrost semantic cache
+      └─ Reference: [`docs/KARPATHY_PIPELINE_ARCHITECTURE.md`](./docs/KARPATHY_PIPELINE_ARCHITECTURE.md)
 ```
 
 ### Cache Hierarchy (Client → Server)
@@ -1355,9 +1360,117 @@ Ollama :11434 (final fallback)
 - **ioredis** = `setex` (lowercase), no `.connect()`, use `.quit()` not `.disconnect()`.
 
 ### KV Cache Policy (llama-server.exe)
-- **Production**: `-ctk q8_0 -ctv q8_0` (18% VRAM savings, stable)
-- **Experimental**: `-ctk turbo3 -ctv turbo3` — benchmark on your exact GGUF + CUDA backend first; crash reports exist on some backends
+- **Production-stable**: `-ctk q8_0 -ctv q8_0` (works on every llama.cpp build)
+- **Recommended TurboQuant**: `-ctk q8_0 -ctv turbo3` — asymmetric. K stays at q8_0 because K-cache TurboQuant support is less mature than V-cache compression on current forks; V at turbo3 captures most of the context-length win.
+- **Avoid** `-ctk turbo3 -ctv turbo4` — symmetric K-turbo is the riskier config and stock binaries reject it at flag parse, which silently no-ops if a launcher falls back. Don't hardcode it.
+- **Aggressive ceiling**: `-ctk q8_0 -ctv turbo4` — only after q8_0/turbo3 passes the 20-generation stability harness
+- **Fallback**: if q8_0/turbo3 fails parity on Gemma4's `head_dim=256` (CUDA mixed-quant parity is documented as "not yet verified" by upstream), drop to `-ctk q8_0 -ctv q8_0` and keep `TURBO_CTX=16384` — you still win 4× context vs the 4096 default.
+- **Binary requirement (Gemma4-critical)**: `turbo2/turbo3/turbo4/tbq3_0/tbq4_0` are rejected by stock `ggml-org/llama.cpp` builds, and **picking the right fork matters more than picking the right cache type** for Gemma 4. Gemma 4 attention has `head_dim=256` on SWA layers and `head_dim=512` on global layers, but most TurboQuant forks ship `D=128`-only attention kernels:
+  - **[TheTom/llama-cpp-turboquant](https://github.com/TheTom/llama-cpp-turboquant/releases) tqp-v0.1.1 (Win+CUDA12.4 prebuilt)** — D=128 only. The `-h` probe advertises turbo support so the launcher passes flags through, but the model **crashes or produces garbage at the first attention pass on `gemma4-legal-vlm`**. Suitable for D=128 models (Llama-3 8B, Qwen2.5 7B). **Do not pair with Gemma 4.**
+  - **[test1111…/llama-cpp-turboquant-gemma4](https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4)** — source build, MSVC + CUDA 13.0. Adds D=256/512 kernels with lazy K (Q pre-transform), lazy V (deferred WHT post-loop), batch centroid decode, warp-cooperative writes. Reaches 100% of f16 throughput. **The only working path to turbo4 on Gemma 4 today.**
+
+  Build:
+  ```bash
+  git clone https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4
+  cd llama-cpp-turboquant-gemma4
+  cmake -B build -S . -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86  # 86 = RTX 3060 Ti / Ampere
+  cmake --build build --config Release   # ~30 min
+  ```
+  Drop `build/bin/llama-server.exe` in a separate folder (e.g. `C:\Users\james\Desktop\llama-server-turboquant\`), point `LLAMA_SERVER_PATH` at it. The launcher's `-h` turbo-support probe **cannot detect head-dim incompatibility** — operator owns matching binary capability to model architecture.
+
+  Expected on RTX 3060 Ti / 8GB vs the test1111 RTX 3090 numbers: tokens/sec roughly halves (448 GB/s vs 936 GB/s memory bandwidth), but VRAM footprint is identical. `gemma4-legal-vlm` (5.3 GB) + turbo4 KV @ 256K ≈ 6.3 GB total — fits 8GB.
+- **Validation harness**: `npm run turbo:test:stability:turbo` (requires server already running with the matching profile — the harness does NOT start llama-server)
 - **TurboQuant `cache_prompt: true`**: safe for system prompt KV reuse across communities/clusters
+
+#### `TURBO_PROFILE` shortcut (launcher env var)
+
+[scripts/launch-turboquant.ps1](sveltekit-frontend/scripts/launch-turboquant.ps1) accepts a single env var that picks the K/V pair:
+
+| `TURBO_PROFILE` | K | V | When |
+|------|---|---|------|
+| `stock` *(default)* | q8_0 | q8_0 | Stock llama.cpp binary; safe baseline. |
+| `turboquant` | q8_0 | turbo3 | TurboQuant-enabled binary at `LLAMA_SERVER_PATH`; recommended once stability harness passes. |
+| `turboquant-safe` | q8_0 | q8_0 | TurboQuant binary present but you suspect parity issues — keep the larger `TURBO_CTX` without trusting the V-cache compression yet. |
+
+`TURBO_KV_K` / `TURBO_KV_V` env vars override the profile. The launcher's failure semantics (added 2026-05-08):
+- Invalid `TURBO_PROFILE` → throw before launch.
+- Explicit `TURBO_KV_K` / `TURBO_KV_V` outside the allowlist (`f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1, turbo2, turbo3, turbo4, tbq3_0, tbq4_0`) → throw.
+- Profile resolves to `turbo*` but binary's `-h` doesn't advertise turbo support → throw with the test1111 fork build URL (for Gemma 4 / D=256/512) and TheTom releases URL (for D=128 models). Silent downgrade is exactly the failure mode that hid `-ctk turbo3 -ctv turbo4` for months.
+- Profile defaults that resolve to a stock-only name and the binary doesn't accept it → soft-fallback (the user did not assert intent).
+
+Recommended sequence on RTX 3060 Ti / 8GB:
+
+```powershell
+# 1. Baseline on stock binary
+$env:TURBO_PROFILE = 'stock'
+$env:TURBO_CTX     = '16384'
+npm run turbo:start:detached
+npm run turbo:test:stability       # captures the q8_0 baseline numbers
+
+# 2. Drop in TurboQuant binary, retest with V-cache compression only
+$env:LLAMA_SERVER_PATH = 'C:\Users\james\Desktop\llama-server-turboquant\llama-server.exe'
+$env:TURBO_PROFILE     = 'turboquant'
+$env:TURBO_CTX         = '16384'
+npm run turbo:start:detached
+npm run turbo:test:stability:turbo # compares vs the baseline
+
+# 3. Only if step 2 fails parity / stability:
+$env:TURBO_PROFILE = 'turboquant-safe'
+npm run turbo:start:detached
+```
+
+### Gemma4 TurboQuant caveat
+
+For Gemma 4, do not treat generic TurboQuant support as sufficient.
+
+Gemma 4 uses larger attention head dimensions than many llama.cpp TurboQuant examples:
+
+- SWA layers: `head_dim = 256`
+- global layers: `head_dim = 512`
+
+Some TurboQuant binaries advertise `turbo3`, `turbo4`, `tbq3_0`, or `tbq4_0` in `--help` but only implement fast attention kernels for `D=128`. Those builds launch successfully and our launcher's `-h` probe will pass them through, but they fail, crash, or produce invalid output on Gemma 4 attention. The launcher cannot detect this — operator owns binary↔model matching.
+
+**Stable default**:
+
+```bash
+TURBO_PROFILE=stock
+# equivalent KV: -ctk q8_0 -ctv q8_0
+```
+
+**Desired experimental Gemma 4 profile** — only with D=256/D=512-capable kernels:
+
+```bash
+TURBO_PROFILE=turboquant
+# equivalent KV: -ctk q8_0 -ctv turbo3
+```
+
+**Parity-safe fallback**:
+
+```bash
+TURBO_PROFILE=turboquant-safe
+# equivalent KV: -ctk q8_0 -ctv q8_0
+```
+
+Do **not** use `-ctk turbo3 -ctv turbo4` as a default. Keep K-cache at `q8_0`; compress V-cache first.
+
+**Fork pairing**:
+
+| Fork | Head dims | Gemma 4? | Path |
+|------|-----------|----------|------|
+| stock `ggml-org/llama.cpp` | all | n/a (no turbo*) | baseline |
+| [TheTom/llama-cpp-turboquant](https://github.com/TheTom/llama-cpp-turboquant/releases) tqp-v0.1.1 prebuilt | D=128 | **No** — treat as not recommended for Gemma 4 unless D=256/512 support is confirmed in a future tag | suits Llama-3 8B / Qwen2.5 7B |
+| [test1111…/llama-cpp-turboquant-gemma4](https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4) | D=128/256/512 | **Yes** | only working experimental Gemma 4 path |
+
+**Source build for RTX 3060 Ti / Ampere sm_86**:
+
+```bash
+git clone https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4
+cd llama-cpp-turboquant-gemma4
+cmake -B build -S . -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86
+cmake --build build --config Release   # ~30 min
+```
+
+**TurboQuant is a manual runtime milestone.** Do not block ACE / KAG / hypergraph retrieval work on it. Retrieval lanes (Lane A cluster_context shipped, Lane B shared_resource shipped, Lane C SHARES_TAGS pending) improve agent quality even when the server stays on `q8_0/q8_0`. Lane B retrieval > TurboQuant runtime as a priority call.
 
 ### TurboQuant — Google ICLR 2026 Paper (PolarQuant + QJL)
 **Paper**: "TurboQuant: Redefining AI Efficiency with Extreme Compression" — Google Research + NYU  
@@ -1377,14 +1490,15 @@ Ollama :11434 (final fallback)
 
 **Correct flags** (Flash Attention is MANDATORY — without `-fa on`, KV is dequantized every step → slower than no quant):
 ```bash
-# Recommended asymmetric (K tolerates more compression than V)
-llama-server.exe -m model.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 -c 4096
+# Recommended asymmetric — K stays at q8_0, only V is pushed to turbo3
+# (requires a TurboQuant-enabled llama-server binary; stock llama.cpp rejects turbo3/turbo4)
+llama-server.exe -m model.gguf -ctk q8_0 -ctv turbo3 -fa on -ngl 99 -c 16384
 
-# Symmetric (simpler, slightly more VRAM than asymmetric)
-llama-server.exe -m model.gguf -ctk turbo3 -ctv turbo3 -fa on -ngl 99 -c 4096
+# Aggressive (only after q8/turbo3 passes the 20-gen stability harness)
+llama-server.exe -m model.gguf -ctk q8_0 -ctv turbo4 -fa on -ngl 99 -c 16384
 
-# Baseline comparison
-llama-server.exe -m model.gguf -ctk q8_0 -ctv q8_0 -fa on -ngl 99
+# Production-stable baseline (works on every llama.cpp build)
+llama-server.exe -m model.gguf -ctk q8_0 -ctv q8_0 -fa on -ngl 99 -c 16384
 ```
 
 **RTX 3060 Ti (8GB) with gemma4-legal-vlm (5.3GB model)**:
@@ -1566,6 +1680,7 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 
 ## Key Lessons (Proven Patterns)
 
+- **ioredis cold-start in startup scripts**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fire. Default ioredis behavior reconnects forever and spams unhandled `error` events. Required client options for ANY standalone Node script under `scripts/startup/`, `scripts/index-*`, `scripts/seed-*`: `lazyConnect:true`, `maxRetriesPerRequest:1`, `enableOfflineQueue:false`, `retryStrategy:()=>null`, attach `redis.on('error',()=>{})`, then `await redis.connect()` BEFORE `await redis.ping()` (offlineQueue:false makes ping fail with "Stream isn't writeable" otherwise), and `redis.disconnect()` on failure. Verified in `scripts/index-codebase-fast.mjs` and `scripts/startup/ace-incremental-startup.mjs` (2026-05-08). Do NOT use this pattern in long-running server code — there `getRedis()` from `src/lib/server/redis.ts` is canonical.
 - **$derived vs $derived.by**: `$derived(() => {...})` returns a function. Use `$derived.by(() => {...})` for complex computations
 - **TS imports in SvelteKit**: Use `.js` extensions not `.ts` (bundler resolves `.js` → `.ts`)
 - **bits-ui Tabs SSR**: `Record<string, any>` cast passes svelte-check but causes SSR 500. Use native `$state`-based tabs
@@ -1691,8 +1806,49 @@ Available models: `yorha-legal`, `yorha-fast`, `gemma4-legal`, `gemma3-legal`, `
 
 ---
 
+## Reconstruction 3-Track Architecture (May 8, 2026)
+
+Three connected tracks for evidence → timeline → visual reconstruction:
+
+**Track 1 — model layer per binary** (multiple llama-server.exe paths, switch via `LLAMA_SERVER_PATH`):
+- `gemma4-legal-vlm:latest` → stock `-ctk q8_0 -ctv q8_0` (head dim 256+, D=128 TurboQuant kernels crash). VLM + legal reasoning.
+- `qwen2.5-7b-instruct` / `qwen3-7b` → candidate for `-ctk q8_0 -ctv turbo3` (head_dim=128, 28 Q-heads / 4 KV-heads — matches stock D=128 TurboQuant prebuilts). Long-context planning, JSON timeline extraction, ComfyUI workflow generation.
+
+**Track 2 — ComfyUI image/keyframe generation**: HTTP API only (`POST /prompt` → `GET /history/{prompt_id}` → fetch outputs). Operator builds workflow in ComfyUI Desktop, exports `workflow_api.json`, app submits as POST payload. RabbitMQ queue `comfyui.render` + SSE stream `/api/comfyui/render/stream`. **Do NOT shell out to Python** — the Desktop "Export to Python" is a dev-only debugging convenience.
+
+**Track 3 — 3D reconstruction lanes** (build in order, do NOT skip):
+- Lane A — 2D legal timeline viewer (safest first)
+- Lane B — ComfyUI still frame per `TimelineEvent`
+- Lane C — Blender + Mixamo MP4 (uses existing `courtroom_models` table + `courtroom_anim_type` enum: idle/speaking/objection/walk/gesture/point/sit/stand/present_evidence/react_*/nod/shake_head). Queue: `blender.render`.
+- Lane D — WebGPU low-poly viewer (Threlte). Actors follow paths, Mixamo clips, evidence labels, timeline scrubber, "Demonstrative reconstruction" overlay.
+- Lane E — Gaussian splatting **environments only** (pre-scanned courtroom/street/house). Defer until stable scene library exists. NOT for actors, NOT for text-to-3D, NOT for claimed-real spaces.
+
+**Canonical TimelineEvent schema:** `{ id, time, location, who[], what, whyHypothesis?, how, evidenceIds[], confidence: 'high'|'medium'|'low', disputed: boolean, reconstructionNotes[] }`.
+
+**Legal product rule:** every visual output must carry `"Demonstrative reconstruction — not original footage"` overlay + per-event confidence badge + evidence ID citations + disputed-fact highlights + gaps for unknowns. Hyper-realistic uncertainty-free reconstructions are indefensible. Mixamo+Blender frames trace to logged action IDs; SVD/AnimateDiff/CogVideoX/Wan invent pixels — do NOT use for evidence.
+
+**Load-bearing principle:** LLM is planner, compiler is renderer. Gemma4/Qwen emit Zod-validated `SceneIntent` JSON only. A deterministic TypeScript scene compiler turns intent → Blender script / Three.js scene. Do NOT let the LLM write Three.js/Blender Python directly — silent failures (empty scene, wrong scale, hallucinated objects, non-repeatable). Same input → same render is load-bearing for legal audit.
+
+**Repo audit (2026-05-08): ~70% of the renderer already exists.** `src/lib/courtroom/` is 1556 LoC including a CRT/N64 post-process shader (PS1 aesthetic foundation), 1070-line scene state machine, 276-line timeline engine. `/demos/crime-reconstruction/+page.svelte` is 690 LoC with who/what/why/how form + WebGPU scene wired. `courtroom_models` + `courtroom_animations` Drizzle tables exist. 8 detective-mode UI components exist. Missing: SceneIntent Zod schema, deterministic compiler, TRELLIS evidence-to-3D pipeline, Mixamo asset registry, RabbitMQ `scene.render`/`evidence.render` queues, mini-modal viewer, ZIP export bundle.
+
+**Hard gates** (do not skip):
+1. **Stylization IS the admissibility hedge** — PS1/N64 aesthetic on environments is non-negotiable. Going photoreal on non-evidence renders pushes the product into Daubert-hearing territory. Keep backgrounds pixelated.
+2. **Evidence is near-exact** — TRELLIS-derived GLBs preserve original photo silhouette/texture; do NOT apply PS1 vertex jitter to evidence meshes. Visual contrast (sharp evidence + blocky environment) signals "reconstructed scene, real evidence."
+3. **Chain of custody on every 3D asset** — extend `evidenceAuditLog` to `evidence_3d_assets`, SHA-256 every GLB at write, log `metadata.trellis_model = 'TRELLIS-image-large@<digest>'`.
+4. **No GPU/3D work on Node main thread** — TRELLIS + Blender = Python sidecars on RabbitMQ. SvelteKit produces messages, never blocks on render. Queues: `scene.render` (1hr), `evidence.render` (1hr), `scene.export` (5min).
+5. **Export bundles are SHA-256-verifiable** — `manifest.txt` in the ZIP lets a reviewer prove the offline bundle matches what the case file exported. Self-contained Chrome-offline `index.html` + Three.js single-file ESM (~200KB) means air-gapped review laptops work.
+
+**Existing scaffolding** (don't rebuild): `src/lib/courtroom/{courtroom-scene,timeline-engine,crt-postprocess,courtroom-types}.svelte.ts/.ts`, `courtroom_models` + `courtroom_animations` Drizzle tables, `/api/courtroom/models`, `/api/cases/[id]/timeline`, `/api/persons-of-interest/[id]/timeline`, 8 `src/lib/components/detective/*` + `*Detective*` components, `LocalImageGenerator.svelte` with `comfyui` provider.
+
+**Companion lane** (different tooling): `next_steps/active/2026-05-08_3dgs-forensic-roadmap.md` — photogrammetric 3DGS from real crime-scene photos (evidence-AS-environment). The 3-track lane above is the reverse: prompt-as-environment + evidence-as-objects.
+
+See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ queue table, license-safe Mixamo action allowlist, TRELLIS Replicate fallback policy, and the 9-phase build order.
+
+---
+
 ## Reference Docs
 
+- `memory/reconstruction-3-tracks.md` — model/image/3D pipeline architecture, build order, Qwen TurboQuant fit, ComfyUI HTTP wiring, Gaussian-splat scope
 - `memory/drizzle-schema-reference.md` — 70+ tables, 14 enums, type patterns, route map
 - `memory/architecture-reference.md` — DB tiers, JSONB, caching strategy, vector search
 - `memory/docker-cuda-setup.md` — Docker, CUDA, GPU acceleration, FlashAttention

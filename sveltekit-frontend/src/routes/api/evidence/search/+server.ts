@@ -35,7 +35,7 @@ import type { VectorSearchResult, VectorSearchOptions } from '$lib/server/db/pgv
 import { productionLogger } from '$lib/server/production-logger.js';
 import { legalPageRank } from '$lib/server/retrieval/legal-pagerank.js';
 import { CitationGraph } from '$lib/server/retrieval/citation-graph.js';
-import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { recordSearchQuery, recordChunkHits } from '$lib/server/analytics/search-analytics.js';
 import { z } from 'zod';
 
 const evidenceSearchSchema = z.object({
@@ -320,6 +320,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     };
 
     const response = { results: hits, bundles, timing };
+
+    recordChunkHits(
+      hits.map((h) => ({
+        id:           `${h.evidenceId}:${h.chunkIndex}`,
+        score:        h.score,
+        rerankScore:  h.rerank?.finalScore,
+        relativePath: typeof h.metadata?.file_path === 'string' ? h.metadata.file_path as string : undefined,
+      })),
+      query,
+      'rag',
+      { userId: userId ?? undefined, caseId: caseId ?? undefined },
+    );
 
     // Cache the full response — fire-and-forget
     setVectorCache(

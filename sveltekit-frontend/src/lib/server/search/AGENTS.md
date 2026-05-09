@@ -102,12 +102,12 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 | Commit | Timestamp | Subject |
 |--------|-----------|---------|
+| `19e6b700f1` | 2026-05-08T00:18 | feat(kag): adaptive guards on 4 pipelines + KAG feature implementation doc |
 | `e1f78a54a8` | 2026-05-07T17:14 | feat(mla): 1-bit sign-pack latent + Hamming pre-filter (TurboQuant fast-path) |
 | `7f1195e756` | 2026-05-07T13:05 | chore(quaternion): add deferred CUDA batch similarity TODO |
 | `e3f3210872` | 2026-05-07T12:21 | fix(g17): batch-remove remaining localhost fallbacks via fix-g17-localhost.mjs |
 | `a20c7e3d79` | 2026-05-07T08:43 | feat(startup+synthesis): TurboQuant stability gate, Node orchestrator, audit pipeline, fetch-rerank mget batch |
 | `0a450c5017` | 2026-05-07T03:27 | memory_logs_56_26 |
-| `d25a3dd4a2` | 2026-05-07T03:24 | feat(tile-engine): SemanticTile, TileEngineTrace, standardized quaternion pipeline |
 
 <!-- /AGENTS-ENRICH -->
 

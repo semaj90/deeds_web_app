@@ -43,7 +43,8 @@ const evidenceUploadSchema = z.object({
   description: z.string().max(10000).optional(),
   caseId: z
     .string()
-    .uuid('Invalid caseId format. Expected UUID, use crypto.randomUUID() or a valid case ID.')
+    .min(36, 'Invalid caseId length. Expected UUID.')
+    .max(36, 'Invalid caseId length. Expected UUID.')
     .optional(),
   evidenceType: z.string().max(100).optional(),
 });
@@ -137,7 +138,7 @@ async function persistProcessingDiagnostics(
 	`);
 }
 
-async function resolveEvidenceCaseId(requestedCaseId: string | null): Promise<string> {
+async function resolveEvidenceCaseId(requestedCaseId: string | null, ownerUserId: string): Promise<string> {
   if (requestedCaseId) {
     const existingCase = getResultRows(
       await db.execute(sql`
@@ -171,8 +172,14 @@ async function resolveEvidenceCaseId(requestedCaseId: string | null): Promise<st
 
   const createdFallbackCase = getResultRows(
     await db.execute(sql`
-      INSERT INTO cases (title, description)
-      VALUES (${FALLBACK_UPLOAD_CASE_TITLE}, ${FALLBACK_UPLOAD_CASE_DESCRIPTION})
+      INSERT INTO cases (title, description, user_id, status, priority)
+      VALUES (
+        ${FALLBACK_UPLOAD_CASE_TITLE},
+        ${FALLBACK_UPLOAD_CASE_DESCRIPTION},
+        ${ownerUserId},
+        'open',
+        'medium'
+      )
       RETURNING id
     `)
   )[0];
@@ -227,8 +234,11 @@ async function setCachedExtraction(
  * Pipeline: MinIO → PostgreSQL → text extraction (pdf-parse + OCR fallback) → chunk → embed → pgvector + Qdrant
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
-  // Auth guard: reject unauthenticated uploads
-  if (!locals.user?.id) {
+  const devBypass = ENV.DEV_BYPASS_AUTH;
+  const uploaderUserId = locals.user?.id ?? (devBypass ? '00000000-0000-0000-0000-000000000001' : null);
+
+  // Auth guard: reject unauthenticated uploads unless dev bypass is enabled
+  if (!uploaderUserId) {
     return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -271,10 +281,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Validate form fields with Zod
     const formFields = {
-      title: formData.get('title')?.toString() || undefined,
-      description: formData.get('description')?.toString() || undefined,
-      caseId: formData.get('caseId')?.toString() || undefined,
-      evidenceType: formData.get('evidenceType')?.toString() || undefined,
+      title: formData.get('title')?.toString()?.trim() || undefined,
+      description: formData.get('description')?.toString()?.trim() || undefined,
+      caseId: formData.get('caseId')?.toString()?.trim() || undefined,
+      evidenceType: formData.get('evidenceType')?.toString()?.trim() || undefined,
     };
     const parsed = evidenceUploadSchema.safeParse(formFields);
     if (!parsed.success) {
@@ -289,7 +299,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const userType = parsed.data.evidenceType;
     const autoType = detectEvidenceType(file.type, file.name);
     const evidenceType = userType && userType !== 'UNKNOWN' ? userType : autoType;
-    const caseId = await resolveEvidenceCaseId(requestedCaseId);
+    const caseId = await resolveEvidenceCaseId(requestedCaseId, uploaderUserId);
 
     if (file.size > MAX_FILE_SIZE) {
       return json(
@@ -345,6 +355,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       'hearsay',
       'expert',
       'scientific',
+      'real',
     ] as const;
     type EvidenceTypeVal = (typeof VALID_EVIDENCE_TYPES)[number];
     const safeEvidenceType: EvidenceTypeVal | null = VALID_EVIDENCE_TYPES.includes(
@@ -357,7 +368,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       .insert(evidence)
       .values({
         caseId,
-        userId: locals.user.id,
         evidenceNumber,
         title: title || file.name,
         type: 'document',
@@ -377,7 +387,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           extractionStatus: 'pending',
           uploadedVia: 'api',
         },
-        uploadedBy: locals.user.id,
+        uploadedBy: uploaderUserId,
       })
       .returning({ id: evidence.id });
 

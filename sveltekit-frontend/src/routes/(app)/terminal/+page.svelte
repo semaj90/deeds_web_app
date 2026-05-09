@@ -28,6 +28,7 @@
 	let recognition: any = $state(null);
 	let sttSupported = $state(false);
 	let conversationState = $state<'idle' | 'listening' | 'processing' | 'ai-thinking' | 'ai-speaking'>('idle');
+	let error = $state<string | null>(null);
 
 	let ttsVolume = $state(1.0);
 	let ttsRate = $state(1.0);
@@ -162,7 +163,55 @@
 		{ label: 'Draft Summary', text: 'Draft a case summary highlighting the strongest arguments for the plaintiff.' }
 	];
 
-	function useSamplePrompt(text: string) { currentMessage = text; }
+	import { WebGPUSOMCache } from '$lib/webgpu/som-webgpu-cache';
+	const somCache = new WebGPUSOMCache();
+	let triageLoading = $state(false);
+
+	async function triageErrors() {
+		if (!session || triageLoading) return;
+		
+		const lastMsg = [...session.messages].reverse().find(m => m.role === 'user');
+		if (!lastMsg) {
+			error = 'Please provide NPM check output first.';
+			return;
+		}
+
+		triageLoading = true;
+		error = null;
+		try {
+			await somCache.initialize();
+			const todos = await somCache.processNPMCheckErrors(lastMsg.content);
+			
+			if (todos.length === 0) {
+				session.addMessage('assistant', 'I analyzed the input but found no recognizable NPM errors to triage.');
+			} else {
+				const triageReport = [
+					'### 🛠️ GPU-Accelerated Error Triage',
+					`I have prioritized ${todos.length} task clusters using WebGPU PageRank analysis.`,
+					'',
+					...todos.map(t => {
+						const priorityIcon = t.priority > 0.8 ? '🔴' : t.priority > 0.5 ? '🟡' : '🟢';
+						return `${priorityIcon} **[${t.category.toUpperCase()}]** ${t.title}\n  - *Fix:* ${t.suggested_fixes[0]}\n  - *Confidence:* ${Math.round(t.confidence * 100)}%`;
+					}),
+					'',
+					'Would you like me to start fixing the highest priority issue?'
+				].join('\n');
+				
+				session.addMessage('assistant', triageReport);
+			}
+		} catch (err: any) {
+			error = `Triage failed: ${err.message}`;
+		} finally {
+			triageLoading = false;
+		}
+	}
+
+	function useSamplePrompt(text: string) { 
+		currentMessage = text; 
+		if (text.includes('npm run check')) {
+			// Special handling for triage example
+		}
+	}
 
 	// ===== Voice Functions =====
 	async function speakMessage(text: string, idx: number) {
@@ -275,6 +324,19 @@
 			<button class="term-pill">TERMINAL</button>
 			<button class="term-pill term-pill-active">AI CHAT</button>
 			<button class="term-pill term-pill-danger" onclick={clearChat}>CLEAR</button>
+			<button 
+				class="term-pill term-pill-amber" 
+				onclick={triageErrors}
+				disabled={triageLoading}
+			>
+				{#if triageLoading}
+					<span class="loading loading-spinner loading-xs"></span>
+					TRIAGING...
+				{:else}
+					<Icon name="activity" size={14} />
+					TRIAGE
+				{/if}
+			</button>
 			{#if prefs.persona !== 'neutral'}
 				<div class="term-badge term-badge-amber">
 					<Icon name="user-cog" size={12} />
@@ -368,6 +430,15 @@
 				<Icon name="trash-2" size={14} />
 				Clear chat
 			</Button>
+		</div>
+	{/if}
+
+	<!-- Error Alert -->
+	{#if error}
+		<div class="alert alert-error mb-4 mx-4 mt-4">
+			<Icon name="alert-circle" size={18} />
+			<span>{error}</span>
+			<button class="btn btn-ghost btn-xs" onclick={() => error = null}>Dismiss</button>
 		</div>
 	{/if}
 
@@ -645,6 +716,13 @@
 		border-color: #ef4444;
 		background: #450a0a;
 		color: #f87171;
+	}
+	.term-pill-amber {
+		border-color: #d97706;
+		color: #fbbf24;
+	}
+	.term-pill-amber:hover {
+		background: #451a03;
 	}
 	.term-state-tag {
 		font-size: 0.6rem;

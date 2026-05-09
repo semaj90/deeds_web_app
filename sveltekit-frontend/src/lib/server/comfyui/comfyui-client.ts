@@ -17,7 +17,7 @@
  *   - Drag-drop canvas UI (NOT here)
  *
  * Env contract:
- *   COMFYUI_BASE_URL — default http://127.0.0.1:8188
+ *   COMFYUI_BASE_URL — default http://comfyui:8188
  *
  * Failure mode: every method either resolves with a structured object
  * containing `ok:false` + `error` (for caller-handled degradation) or
@@ -26,7 +26,7 @@
  * so API routes can return 200 with `ok:false` instead of 500.
  */
 
-const DEFAULT_BASE_URL = 'http://127.0.0.1:8188';
+const DEFAULT_BASE_URL = 'http://comfyui:8188';
 
 export class ComfyUIError extends Error {
   constructor(message: string) {

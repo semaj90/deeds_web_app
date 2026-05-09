@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 
-import { recordSearchQuery, recordQueryLog, queryHash as computeQueryHash } from '$lib/server/analytics/search-analytics.js';
+import { recordSearchQuery, recordQueryLog, recordChunkHits, queryHash as computeQueryHash } from '$lib/server/analytics/search-analytics.js';
 import type { RequestHandler } from './$types';
 import type {
 	RetrieveCandidatesRequest,
@@ -979,6 +979,16 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       hybridSearch: hybridSearchUsed,
       dagEnabled:   enableDAG,
     });
+    recordChunkHits(
+      topChunks.map((c) => ({
+        id:    c.chunk_id,
+        score: c.score,
+        relativePath: c.source_title && c.source_title !== 'Unknown' ? c.source_title : undefined,
+      })),
+      query,
+      'rag',
+      { userId: userId || undefined, caseId: effectiveCaseId || undefined },
+    );
 
     // Fire-and-forget: persist search query to DB for analytics/audit
     import('$lib/server/db/client')

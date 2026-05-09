@@ -12,7 +12,7 @@ import { ENV } from '$lib/server/env.server.js';
  * SearXNG Setup:
  * - Docker: docker run -d -p 8080:8080 searxng/searxng
  * - Or use public instance: https://searx.space/
- * - Set SEARXNG_URL in .env (e.g., http://localhost:8888)
+ * - Set SEARXNG_URL in .env (resolved via ENV.SEARXNG_URL)
  */
 
 export const webSearchSchema = z.object({

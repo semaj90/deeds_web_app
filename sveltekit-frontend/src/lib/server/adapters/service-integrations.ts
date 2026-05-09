@@ -60,16 +60,16 @@ export function loadServiceEnvironment(): ServiceEnvironment {
 		redisConfig: {
 			url: ENV.REDIS_URL,
 			password: privateEnv.REDIS_PASSWORD || undefined,
-			host: privateEnv.REDIS_HOST || 'localhost',
-			port: parseInt(privateEnv.REDIS_PORT || '6379', 10),
+			host: new URL(ENV.REDIS_URL).hostname,
+			port: new URL(ENV.REDIS_URL).port ? parseInt(new URL(ENV.REDIS_URL).port, 10) : 6379,
 			db: 0,
 			maxRetriesPerRequest: 3,
 			enableReadyCheck: true
 		},
 		// Qdrant
 		qdrantConfig: {
-			host: privateEnv.QDRANT_HOST || 'localhost',
-			port: parseInt(privateEnv.QDRANT_PORT || '6333', 10),
+			host: new URL(ENV.QDRANT_URL).hostname,
+			port: new URL(ENV.QDRANT_URL).port ? parseInt(new URL(ENV.QDRANT_URL).port, 10) : 6333,
 			apiKey: privateEnv.QDRANT_API_KEY,
 			timeout: 30000
 		},
@@ -83,7 +83,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
 		},
 		// MinIO
 		minioConfig: {
-			endPoint: ENV.MINIO_ENDPOINT.split(':')[0],
+			endPoint: ENV.MINIO_ENDPOINT,
 			port: parseInt(ENV.MINIO_PORT, 10),
 			accessKey: ENV.MINIO_ACCESS_KEY,
 			secretKey: ENV.MINIO_SECRET_KEY,

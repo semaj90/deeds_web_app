@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 interface KAGHit {
   path: string | null;
@@ -11,7 +12,7 @@ interface KAGHit {
 }
 
 async function embedQuery(text: string): Promise<number[]> {
-  const base = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+  const base = ENV.OLLAMA_BASE_URL;
   const res = await fetch(`${base}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -24,7 +25,7 @@ async function embedQuery(text: string): Promise<number[]> {
 }
 
 async function qdrantSearch(vector: number[], collection: string, limit: number): Promise<KAGHit[]> {
-  const base = process.env.QDRANT_URL ?? 'http://localhost:6333';
+  const base = ENV.QDRANT_URL;
   const res = await fetch(`${base}/collections/${collection}/points/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -95,8 +96,8 @@ export const traceKagSearchTool = {
       try {
         const neo4j = await import('neo4j-driver');
         const driver = neo4j.default.driver(
-          process.env.NEO4J_URI ?? 'bolt://localhost:7687',
-          neo4j.default.auth.basic(process.env.NEO4J_USER ?? 'neo4j', process.env.NEO4J_PASSWORD ?? 'neo4j123')
+          ENV.NEO4J_URI,
+          neo4j.default.auth.basic(ENV.NEO4J_USER, ENV.NEO4J_PASSWORD)
         );
         const session = driver.session();
         const topPaths = qdrantHits.slice(0, 5).map(h => h.path).filter(Boolean);

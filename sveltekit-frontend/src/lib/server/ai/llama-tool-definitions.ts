@@ -7,7 +7,7 @@
  * Usage in the Karpathy tool loop:
  *   import { LLAMA_TOOL_DEFINITIONS, llamaToolCall } from './llama-tool-definitions.js';
  *
- *   const response = await fetch('http://127.0.0.1:8090/v1/chat/completions', {
+ *   const response = await fetch('http://turboquant:8090/v1/chat/completions', {
  *     method: 'POST',
  *     body: JSON.stringify({ model: 'gemma4-legal', messages, tools: LLAMA_TOOL_DEFINITIONS }),
  *   });
@@ -289,6 +289,66 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
       },
     },
   },
+  // ── KB Identity Spine tools ────────────────────────────────────────────────
+  {
+    type: 'function',
+    function: {
+      name:        'kb__search_cards',
+      description: 'Search the knowledge base for codebase "cards" (identity-spine chunks). Returns ranked cards with stable IDs (card:path:hash), content snippets, and topological metadata.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string',  description: 'Natural language query or symbol name' },
+          limit: { type: 'integer', description: 'Max results (default 10, max 25)' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name:        'kb__get_card',
+      description: 'Retrieve the full content and high-fidelity metadata for a specific knowledge card by ID. Use this when you have a card ID from search_cards.',
+      parameters: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', description: 'Stable card ID (e.g. "card:src/lib/server/ai/gemma4-agent.ts:7a2b3")' },
+        },
+        required: ['id'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name:        'kb__expand_neighbors',
+      description: 'Expand the topological neighborhood of a card or file using graph relationships. Returns structurally-related cards based on imports, dependencies, and cluster proximity.',
+      parameters: {
+        type: 'object',
+        properties: {
+          id:    { type: 'string',  description: 'Card or file ID to expand from' },
+          limit: { type: 'integer', description: 'Max neighbors (default 20)' },
+        },
+        required: ['id'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name:        'kb__explain_retrieval',
+      description: 'Provide an audit trace for why a specific card or search result was retrieved. Includes cluster dominance, community purpose, and grounding signals.',
+      parameters: {
+        type: 'object',
+        properties: {
+          id:    { type: 'string', description: 'Card ID or query string to explain' },
+          limit: { type: 'integer', description: 'Max grounding signals (default 5)' },
+        },
+        required: ['id'],
+      },
+    },
+  },
 ];
 
 // Tool name mapping: llama-server uses __ as namespace separator (dots invalid in JSON schema names)
@@ -309,6 +369,10 @@ export const LLAMA_TO_MCP_NAME: Record<string, string> = {
   'context__build_kv_packet':      'context.build_kv_packet',
   'topology__search_4d':           'topology.search_4d',
   'search__go_hybrid':             'search.go_hybrid',
+  'kb__search_cards':              'kb.search_cards',
+  'kb__get_card':                  'kb.get_card',
+  'kb__expand_neighbors':          'kb.expand_neighbors',
+  'kb__explain_retrieval':         'kb.explain_retrieval',
 };
 
 /**

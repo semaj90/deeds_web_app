@@ -22,11 +22,11 @@ import pg from 'pg';
 import * as schema from './schema-postgres';
 import crypto from 'crypto';
 
+import { ENV } from './env.server.js';
+
 const { Pool } = pg;
 
-const DATABASE_URL =
-	process.env.DATABASE_URL ||
-	'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = ENV.DATABASE_URL;
 
 const pool = new Pool({ connectionString: DATABASE_URL });
 const db = drizzle(pool, { schema });

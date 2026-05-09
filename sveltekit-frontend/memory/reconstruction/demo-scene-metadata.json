@@ -1,0 +1,175 @@
+{
+  "scene_id": "demo-2026-05-08-alleyway",
+  "case_id": "demo-case-001",
+  "title": "Alleyway altercation — demo reconstruction",
+  "city": "downtown",
+  "aesthetic": "ps1",
+  "duration_s": 12,
+  "disclaimer": "Demonstrative reconstruction — not original footage",
+  "actors": [
+    {
+      "actor_id": "suspect-1",
+      "role": "suspect",
+      "label": "Suspect (male, dark jacket)"
+    },
+    {
+      "actor_id": "victim-1",
+      "role": "victim",
+      "label": "Victim (female, light coat)"
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-001",
+      "time_s": 0,
+      "duration_s": 3,
+      "action": "walk",
+      "mixamo_id": "mixamo_walk_forward_01",
+      "actor_ids": [
+        "suspect-1"
+      ],
+      "path": [
+        {
+          "t": 0,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "t": 3,
+          "x": 4,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "confidence": "high",
+      "disputed": false,
+      "evidence_ids": [
+        "ev-cctv-12",
+        "ev-witness-statement-A"
+      ]
+    },
+    {
+      "id": "evt-002",
+      "time_s": 3,
+      "duration_s": 4,
+      "action": "idle",
+      "mixamo_id": "mixamo_idle_01",
+      "actor_ids": [
+        "suspect-1",
+        "victim-1"
+      ],
+      "path": [],
+      "confidence": "medium",
+      "disputed": true,
+      "evidence_ids": [
+        "ev-witness-statement-B"
+      ]
+    },
+    {
+      "id": "evt-003",
+      "time_s": 7,
+      "duration_s": 1.5,
+      "action": "fall",
+      "mixamo_id": "mixamo_fall_backward_01",
+      "actor_ids": [
+        "victim-1"
+      ],
+      "path": [
+        {
+          "t": 0,
+          "x": 4,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "t": 1.5,
+          "x": 4.2,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "confidence": "medium",
+      "disputed": false,
+      "evidence_ids": [
+        "ev-photo-spatter-04",
+        "ev-coroner-report"
+      ]
+    },
+    {
+      "id": "evt-004",
+      "time_s": 8.5,
+      "duration_s": 3.5,
+      "action": "run",
+      "mixamo_id": "mixamo_run_01",
+      "actor_ids": [
+        "suspect-1"
+      ],
+      "path": [
+        {
+          "t": 0,
+          "x": 4,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "t": 3.5,
+          "x": -2,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "confidence": "high",
+      "disputed": false,
+      "evidence_ids": [
+        "ev-cctv-12"
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "t": 0,
+      "kind": "evidence_pin",
+      "text": "CCTV camera #12 enters here",
+      "evidence_id": "ev-cctv-12",
+      "position": [
+        0,
+        0,
+        2
+      ]
+    },
+    {
+      "t": 3.5,
+      "kind": "uncertainty",
+      "text": "Disputed — two conflicting witness accounts",
+      "position": [
+        4,
+        0,
+        2
+      ]
+    },
+    {
+      "t": 7,
+      "kind": "evidence_pin",
+      "text": "Blood spatter — photo 04",
+      "evidence_id": "ev-photo-spatter-04",
+      "position": [
+        4.2,
+        0,
+        0
+      ]
+    }
+  ],
+  "evidence_ids": [
+    "ev-cctv-12",
+    "ev-witness-statement-A",
+    "ev-witness-statement-B",
+    "ev-photo-spatter-04",
+    "ev-coroner-report"
+  ],
+  "generator": {
+    "version": "scene-compiler-0.1.0-phase-0b",
+    "compiled_at": "2026-05-08T21:33:24.223Z",
+    "plan_hash": "4a5d9c80a8bccd82c50ac87e0a881f68"
+  }
+}

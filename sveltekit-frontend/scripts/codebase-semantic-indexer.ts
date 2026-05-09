@@ -42,6 +42,7 @@ const VECTOR_DIM = 768;
 // ─── CLI Args ────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
+const force = args.includes('--force');
 const tagsOnly = args.includes('--tags-only');
 const dirIdx = args.indexOf('--dir');
 const targetDir = dirIdx >= 0 ? args[dirIdx + 1] : 'src';
@@ -95,6 +96,16 @@ interface IndexStats {
   chunksTagged: number;
   errors: number;
   startTime: number;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function hashToUint(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash + char) | 0;
+  }
+  return Math.abs(hash);
 }
 
 // ─── Redis Cache ─────────────────────────────────────────────────────────────
@@ -295,7 +306,7 @@ function chunkFile(filePath: string, content: string): CodeChunk[] {
     if (currentLen + line.length > CHUNK_SIZE && currentChunk.length > 0) {
       const text = currentChunk.join('\n');
       const hash = createHash('sha256').update(text).digest('hex').slice(0, 16);
-      const id = createHash('sha256').update(`${relPath}:${chunkIdx}`).digest('hex').slice(0, 32);
+      const id = `card:${relPath}:${hash}`;
 
       chunks.push({
         id,
@@ -323,8 +334,17 @@ function chunkFile(filePath: string, content: string): CodeChunk[] {
     const text = currentChunk.join('\n');
     if (text.trim().length > 20) {
       const hash = createHash('sha256').update(text).digest('hex').slice(0, 16);
-      const id = createHash('sha256').update(`${relPath}:${chunkIdx}`).digest('hex').slice(0, 32);
-      chunks.push({ id, filePath: relPath, fileName, extension: ext, chunkIndex: chunkIdx, totalChunks: 0, content: text, contentHash: hash });
+      const id = `card:${relPath}:${hash}`;
+      chunks.push({
+        id,
+        filePath: relPath,
+        fileName,
+        extension: ext,
+        chunkIndex: chunkIdx,
+        totalChunks: 0, // filled later
+        content: text,
+        contentHash: hash,
+      });
     }
   }
 
@@ -346,7 +366,7 @@ async function processChunkBatch(
     const results = await Promise.allSettled(
       batch.map(async (chunk) => {
         // Check Redis cache
-        if (!dryRun && await isHashCached(chunk.contentHash)) {
+        if (!dryRun && !force && await isHashCached(chunk.contentHash)) {
           stats.chunksSkipped++;
           return null;
         }
@@ -369,9 +389,10 @@ async function processChunkBatch(
 
         // Build point — collection uses named vectors: content + signature
         const point = {
-          id: chunk.id,
+          id: hashToUint(chunk.id),
           vector: { content: vector, signature: vector },
           payload: {
+            chunk_id: chunk.id,
             file_path: chunk.filePath,
             file_name: chunk.fileName,
             extension: chunk.extension,

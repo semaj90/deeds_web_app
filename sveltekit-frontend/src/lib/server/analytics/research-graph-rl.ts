@@ -23,7 +23,7 @@
 import { StateGraph, Annotation, END, START } from '@langchain/langgraph';
 import { sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
-import { getRedis } from '$lib/server/redis.js';
+import { getRedis, setJsonWithTtl, getJson } from '$lib/server/redis.js';
 import {
 	runKMeans,
 	runPageRank,
@@ -40,8 +40,8 @@ const GRAPH_CLUSTERS    = 20;           // k for k-means clustering
 const ADJACENCY_SIM     = 0.70;         // cosine threshold for edge creation
 const PAGERANK_DAMPING  = 0.85;
 const PAGERANK_ITERS    = 100;
-const REDIS_GRAPH_KEY   = 'rsgraph:clusters';
-const REDIS_POLICY_KEY  = 'rlpolicy:pipeline_weights';
+const REDIS_GRAPH_KEY   = 'ace:research:graph';
+const REDIS_POLICY_KEY  = 'ace:research:policy';
 const REDIS_GRAPH_TTL   = 6 * 60 * 60; // 6 h
 const REDIS_POLICY_TTL  = 2 * 60 * 60; // 2 h
 const MAX_GRAPH_ROWS    = 5_000;        // cap DB fetch for large tables
@@ -212,13 +212,11 @@ export async function buildResearchGraph(): Promise<GraphBuildResult> {
 		pageRank:  c.pageRank,
 		size:      c.memberIds.length,
 	}));
-	try {
-		await getRedis().set(
-			REDIS_GRAPH_KEY,
-			JSON.stringify({ clusters: slimClusters, totalSummaries: n, builtAt: new Date().toISOString() }),
-			'EX', REDIS_GRAPH_TTL,
-		);
-	} catch { /* non-fatal */ }
+	await setJsonWithTtl(
+		REDIS_GRAPH_KEY,
+		{ clusters: slimClusters, totalSummaries: n, builtAt: new Date().toISOString() },
+		REDIS_GRAPH_TTL
+	);
 
 	// 8. Write per-summary cluster assignment to Neo4j (fire-and-forget)
 	syncToNeo4j(summaries, km.assignments, pr.scores).catch(() => { /* ignore */ });
@@ -376,19 +374,14 @@ export async function computeRlPolicy(): Promise<RlPolicyWeights> {
 		updatedAt: new Date().toISOString(),
 	};
 
-	try {
-		await getRedis().set(REDIS_POLICY_KEY, JSON.stringify(policy), 'EX', REDIS_POLICY_TTL);
-	} catch { /* non-fatal */ }
+	await setJsonWithTtl(REDIS_POLICY_KEY, policy, REDIS_POLICY_TTL);
 
 	return policy;
 }
 
 /** Read cached RL policy weights (fast path for route handlers). */
 export async function getCachedPolicy(): Promise<RlPolicyWeights | null> {
-	try {
-		const raw = await getRedis().get(REDIS_POLICY_KEY);
-		return raw ? JSON.parse(raw) as RlPolicyWeights : null;
-	} catch { return null; }
+	return await getJson<RlPolicyWeights>(REDIS_POLICY_KEY);
 }
 
 // ── Tag-Aware Embedding Search ───────────────────────────────────────────────
@@ -445,19 +438,17 @@ export async function searchWithTagEmbedding(
 
 	// 4. Load graph metadata from Redis (optional enrichment)
 	const clusterById: Map<string, { cluster: number; pageRank: number }> = new Map();
-	try {
-		const raw = await getRedis().get(REDIS_GRAPH_KEY);
-		if (raw) {
-			const { clusters } = JSON.parse(raw) as {
-				clusters: Array<{ id: number; memberIds: string[]; pageRank: number }>;
-			};
-			for (const c of clusters) {
-				for (const mid of c.memberIds) {
-					clusterById.set(mid, { cluster: c.id, pageRank: c.pageRank });
-				}
+	const graphData = await getJson<{
+		clusters: Array<{ id: number; memberIds: string[]; pageRank: number }>;
+	}>(REDIS_GRAPH_KEY);
+
+	if (graphData?.clusters) {
+		for (const c of graphData.clusters) {
+			for (const mid of c.memberIds) {
+				clusterById.set(mid, { cluster: c.id, pageRank: c.pageRank });
 			}
 		}
-	} catch { /* non-fatal */ }
+	}
 
 	// 5. Build scored results and take top-K
 	const scored = candidates.map((row, i): TagSearchResult => {

@@ -12,7 +12,7 @@ top_tags: ["embedding","redis","vector","auth","schema"]
 llmHits: 0
 summaryMode: null
 confidence: "high"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 contains: ["[[Files/src__lib__webgpu__webgpu-similarity-service]]","[[Files/src__lib__webgpu__som-webgpu-cache]]","[[Files/src__lib__gpu__shader-registry]]","[[Files/src__lib__webgpu__compute-shader-engine]]","[[Files/src__lib__server__gpu__libtorch-bridge]]","[[Files/src__lib__server__grpc__graph-ml-client]]","[[Files/src__lib__server__indexer__gpu-karpathy-tagger]]","[[Files/src__routes__api__codebase-index__karpathy-tag__gpu___server]]"]
 same: ["[[Clusters/cluster-29]]","[[Clusters/cluster-58]]","[[Clusters/cluster-60]]","[[Clusters/cluster-72]]","[[Clusters/cluster-74]]"]

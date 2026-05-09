@@ -1,27 +1,49 @@
 import { ENV } from '$lib/server/env.server.js';
 import { Client } from 'minio';
+import crypto from 'crypto';
 
 // Centralized MinIO client initialization — singleton
 let minioClient: Client | null = null;
 
+function parseMinioEndpoint(rawValue: string, fallbackPort: number): { endPoint: string; port: number } {
+  const raw = rawValue.trim();
+  let endPoint = raw;
+  let port = fallbackPort;
+
+  try {
+    if (raw.includes('://')) {
+      const url = new URL(raw);
+      endPoint = url.hostname;
+      if (url.port) {
+        const parsedPort = Number(url.port);
+        if (!Number.isNaN(parsedPort)) port = parsedPort;
+      }
+    } else if (raw.includes(':')) {
+      const [host, maybePort] = raw.split(':', 2);
+      if (host) endPoint = host;
+      const parsedPort = Number(maybePort);
+      if (!Number.isNaN(parsedPort)) port = parsedPort;
+    }
+  } catch {
+    // Keep the raw host + fallback port if parsing fails.
+  }
+
+  return { endPoint, port };
+}
+
 /** Raw MinIO Client singleton — use for advanced ops (statObject, getPartialObject, streaming) */
 export function getMinioClient(): Client {
- if (!minioClient) {
- const endPoint = ENV.MINIO_ENDPOINT;
- const port = parseInt(ENV.MINIO_PORT, 10);
- const accessKey = ENV.MINIO_ACCESS_KEY;
- const secretKey = ENV.MINIO_SECRET_KEY;
- const useSSL = ENV.MINIO_USE_SSL === 'true';
-
- minioClient = new Client({
-   endPoint: endPoint.split(':')[0],
-   port: endPoint.includes(':') ? parseInt(endPoint.split(':')[1], 10) : port,
-   useSSL,
-   accessKey,
-   secretKey,
- });
- }
- return minioClient;
+  if (!minioClient) {
+    const { endPoint, port } = parseMinioEndpoint(ENV.MINIO_ENDPOINT, Number.parseInt(ENV.MINIO_PORT, 10));
+    minioClient = new Client({
+      endPoint,
+      port,
+      useSSL: ENV.MINIO_USE_SSL === 'true',
+      accessKey: ENV.MINIO_ACCESS_KEY,
+      secretKey: ENV.MINIO_SECRET_KEY,
+    });
+  }
+  return minioClient;
 }
 
 /**
@@ -32,37 +54,37 @@ export function getMinioClient(): Client {
  * @param metaData Optional metadata for the object.
  */
 export async function uploadFile(
- bucketName: string,
- objectName: string,
- buffer: Buffer,
- metaData: Record<string, string> = {}
+  bucketName: string,
+  objectName: string,
+  buffer: Buffer,
+  metaData: Record<string, string> = {}
 ): Promise<string> {
- const client = getMinioClient();
+  const client = getMinioClient();
 
- // Ensure the bucket exists
- const bucketExists = await client.bucketExists(bucketName);
- if (!bucketExists) {
- await client.makeBucket(bucketName);
- console.log(`MinIO bucket '${bucketName}' created.`);
- }
+  // Ensure the bucket exists
+  const bucketExists = await client.bucketExists(bucketName);
+  if (!bucketExists) {
+    await client.makeBucket(bucketName);
+    console.log(`MinIO bucket '${bucketName}' created.`);
+  }
 
- await client.putObject(bucketName, objectName, buffer, metaData);
- console.log(`File '${objectName}' uploaded to bucket '${bucketName}'.`);
- return objectName;
+  await client.putObject(bucketName, objectName, buffer, metaData);
+  console.log(`File '${objectName}' uploaded to bucket '${bucketName}'.`);
+  return objectName;
 }
 
 /**
  * Deletes a file from MinIO. Non-fatal — logs and returns false on failure.
  */
 export async function deleteFile(bucketName: string, objectName: string): Promise<boolean> {
- try {
-  const client = getMinioClient();
-  await client.removeObject(bucketName, objectName);
-  return true;
- } catch (err) {
-  console.warn(`[minio] deleteFile failed: ${bucketName}/${objectName}`, err);
-  return false;
- }
+  try {
+    const client = getMinioClient();
+    await client.removeObject(bucketName, objectName);
+    return true;
+  } catch (err) {
+    console.warn(`[minio] deleteFile failed: ${bucketName}/${objectName}`, err);
+    return false;
+  }
 }
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -72,193 +94,209 @@ const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-cha
  * Upload evidence file from FormData for AI chat
  */
 export async function uploadEvidenceFile(opts: {
- caseId?: string, chatTurnId: string,
- file: File;
+  caseId?: string;
+  chatTurnId: string;
+  file: File;
 }) {
- const { caseId, chatTurnId, file } = opts;
- const client = getMinioClient();
+  const { caseId, chatTurnId, file } = opts;
+  const client = getMinioClient();
 
- const ext = file.name.split('.').pop() ?? 'bin';
- const keyParts = ['evidence'];
- if (caseId) keyParts.push(caseId);
- keyParts.push(chatTurnId);
- const objectName = `${keyParts.join('/')}/${crypto.randomUUID()}.${ext}`;
+  const ext = file.name.split('.').pop() ?? 'bin';
+  const keyParts = ['evidence'];
+  if (caseId) keyParts.push(caseId);
+  keyParts.push(chatTurnId);
+  const objectName = `${keyParts.join('/')}/${crypto.randomUUID()}.${ext}`;
 
- // Ensure bucket exists
- const bucketExists = await client.bucketExists(BUCKET);
- if (!bucketExists) {
- await client.makeBucket(BUCKET);
- console.log(`MinIO bucket '${BUCKET}' created.`);
- }
+  // Ensure bucket exists
+  const bucketExists = await client.bucketExists(BUCKET);
+  if (!bucketExists) {
+    await client.makeBucket(BUCKET);
+    console.log(`MinIO bucket '${BUCKET}' created.`);
+  }
 
- // Convert File to Buffer for MinIO
- const arrayBuffer = await file.arrayBuffer();
- const buffer = Buffer.from(arrayBuffer);
+  // Convert File to Buffer for MinIO
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
- await client.putObject(BUCKET, objectName, buffer, {
- 'Content-Type': file?.type ?? 'application/octet-stream',
- });
+  await client.putObject(BUCKET, objectName, buffer, {
+    'Content-Type': file?.type ?? 'application/octet-stream',
+  });
 
- return {
- bucket: BUCKET,
- objectName,
- };
+  return {
+    bucket: BUCKET,
+    objectName,
+  };
 }
 
 /**
  * Upload image file to ai_chat_images bucket for contextual chat
  */
-export async function uploadChatImage(opts: { caseId?: string, chatTurnId: string, file: File }) {
- const { caseId, chatTurnId, file } = opts;
- const client = getMinioClient();
+export async function uploadChatImage(opts: { caseId?: string; chatTurnId: string; file: File }) {
+  const { caseId, chatTurnId, file } = opts;
+  const client = getMinioClient();
 
- const ext = file.name.split('.').pop() ?? 'bin';
- const keyParts = ['chat-images'];
- if (caseId) keyParts.push(caseId);
- keyParts.push(chatTurnId);
- const objectName = `${keyParts.join('/')}/${crypto.randomUUID()}.${ext}`;
+  const ext = file.name.split('.').pop() ?? 'bin';
+  const keyParts = ['chat-images'];
+  if (caseId) keyParts.push(caseId);
+  keyParts.push(chatTurnId);
+  const objectName = `${keyParts.join('/')}/${crypto.randomUUID()}.${ext}`;
 
- // Ensure bucket exists
- const bucketExists = await client.bucketExists(AI_CHAT_IMAGES_BUCKET);
- if (!bucketExists) {
- await client.makeBucket(AI_CHAT_IMAGES_BUCKET);
- console.log(`MinIO bucket '${AI_CHAT_IMAGES_BUCKET}' created.`);
- }
+  // Ensure bucket exists
+  const bucketExists = await client.bucketExists(AI_CHAT_IMAGES_BUCKET);
+  if (!bucketExists) {
+    await client.makeBucket(AI_CHAT_IMAGES_BUCKET);
+    console.log(`MinIO bucket '${AI_CHAT_IMAGES_BUCKET}' created.`);
+  }
 
- // Convert File to Buffer for MinIO
- const arrayBuffer = await file.arrayBuffer();
- const buffer = Buffer.from(arrayBuffer);
+  // Convert File to Buffer for MinIO
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
- await client.putObject(AI_CHAT_IMAGES_BUCKET, objectName, buffer, {
- 'Content-Type': file?.type ?? 'application/octet-stream',
- });
+  await client.putObject(AI_CHAT_IMAGES_BUCKET, objectName, buffer, {
+    'Content-Type': file?.type ?? 'application/octet-stream',
+  });
 
- return {
- bucket: AI_CHAT_IMAGES_BUCKET,
- objectName,
- url: `minio://${AI_CHAT_IMAGES_BUCKET}/${objectName}`,
- };
+  return {
+    bucket: AI_CHAT_IMAGES_BUCKET,
+    objectName,
+    url: `minio://${AI_CHAT_IMAGES_BUCKET}/${objectName}`,
+  };
 }
 
 /**
  * Fetches a file from MinIO as a Buffer.
  */
 export async function getFile(bucketName: string, objectName: string): Promise<Buffer> {
- const client = getMinioClient();
- const stream = await client.getObject(bucketName, objectName);
- const chunks: Buffer[] = [];
- for await (const chunk of stream) {
-  chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
- }
- return Buffer.concat(chunks);
+  const client = getMinioClient();
+  const stream = await client.getObject(bucketName, objectName);
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
 }
 
 /**
  * Ensure a bucket exists, creating it if necessary.
  */
 export async function ensureBucket(bucketName: string): Promise<boolean> {
- const client = getMinioClient();
- const exists = await client.bucketExists(bucketName);
- if (!exists) {
-  await client.makeBucket(bucketName);
-  console.log(`MinIO bucket '${bucketName}' created.`);
- }
- return true;
+  const client = getMinioClient();
+  const exists = await client.bucketExists(bucketName);
+  if (!exists) {
+    await client.makeBucket(bucketName);
+    console.log(`MinIO bucket '${bucketName}' created.`);
+  }
+  return true;
 }
 
 /**
  * Get object stats (size, etag, content-type).
  */
 export async function statObject(bucketName: string, objectName: string) {
- return getMinioClient().statObject(bucketName, objectName);
+  return getMinioClient().statObject(bucketName, objectName);
 }
 
 /**
  * Get a readable stream for an object (for streaming responses).
  */
 export async function getStream(bucketName: string, objectName: string) {
- return getMinioClient().getObject(bucketName, objectName);
+  return getMinioClient().getObject(bucketName, objectName);
 }
 
 /**
  * Get a partial readable stream (for Range requests).
  */
-export async function getPartialStream(bucketName: string, objectName: string, offset: number, length: number) {
- return getMinioClient().getPartialObject(bucketName, objectName, offset, length);
+export async function getPartialStream(
+  bucketName: string,
+  objectName: string,
+  offset: number,
+  length: number
+) {
+  return getMinioClient().getPartialObject(bucketName, objectName, offset, length);
 }
 
 /**
  * List all buckets.
  */
 export async function listBuckets() {
- return getMinioClient().listBuckets();
+  return getMinioClient().listBuckets();
 }
 
 /**
  * Put an object with optional size + metadata (for streams/buffers with explicit size).
  */
 export async function putObject(
- bucketName: string,
- objectName: string,
- body: Buffer | import('stream').Readable,
- sizeOrMeta?: number | Record<string, string>,
- meta?: Record<string, string>
+  bucketName: string,
+  objectName: string,
+  body: Buffer | import('stream').Readable,
+  sizeOrMeta?: number | Record<string, string>,
+  meta?: Record<string, string>
 ) {
- const client = getMinioClient();
- await ensureBucket(bucketName);
- if (typeof sizeOrMeta === 'number') {
-  await client.putObject(bucketName, objectName, body, sizeOrMeta, meta);
- } else {
-  await client.putObject(bucketName, objectName, body, sizeOrMeta);
- }
+  const client = getMinioClient();
+  await ensureBucket(bucketName);
+  if (typeof sizeOrMeta === 'number') {
+    await client.putObject(bucketName, objectName, body, sizeOrMeta, meta);
+  } else {
+    await client.putObject(bucketName, objectName, body, sizeOrMeta);
+  }
 }
 
 /**
  * Remove an object.
  */
 export async function removeObject(bucketName: string, objectName: string) {
- return getMinioClient().removeObject(bucketName, objectName);
+  return getMinioClient().removeObject(bucketName, objectName);
 }
 
 /**
  * Check MinIO connectivity + bucket health.
  */
 export async function checkHealth(): Promise<{
- healthy: boolean;
- connected: boolean;
- endpoint: string;
- buckets: { name: string }[];
- latencyMs: number;
- error?: string;
+  healthy: boolean;
+  connected: boolean;
+  endpoint: string;
+  buckets: { name: string }[];
+  latencyMs: number;
+  error?: string;
 }> {
- const start = Date.now();
- const endpoint = ENV.MINIO_ENDPOINT + ':' + ENV.MINIO_PORT;
- try {
-  const client = getMinioClient();
-  const bucketList = await Promise.race([
-   client.listBuckets(),
-   new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
-  ]);
-  return { healthy: true, connected: true, endpoint, buckets: bucketList, latencyMs: Date.now() - start };
- } catch (err: any) {
-  return { healthy: false, connected: false, endpoint, buckets: [], latencyMs: Date.now() - start, error: err?.message };
- }
+  const start = Date.now();
+  const { endPoint, port } = parseMinioEndpoint(ENV.MINIO_ENDPOINT, Number.parseInt(ENV.MINIO_PORT, 10));
+  const endpoint = `${endPoint}:${port}`;
+  try {
+    const client = getMinioClient();
+    const bucketList = await Promise.race([
+      client.listBuckets(),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+    ]);
+    return {
+      healthy: true,
+      connected: true,
+      endpoint,
+      buckets: bucketList,
+      latencyMs: Date.now() - start,
+    };
+  } catch (err: any) {
+    return {
+      healthy: false,
+      connected: false,
+      endpoint,
+      buckets: [],
+      latencyMs: Date.now() - start,
+      error: err?.message,
+    };
+  }
 }
 
 /**
  * Get presigned URL for chat image
  */
 export async function getChatImageUrl(objectName: string): Promise<string> {
- const client = getMinioClient();
- try {
- const url = await client.presignedGetObject(AI_CHAT_IMAGES_BUCKET, objectName, 24 * 60 * 60);
- return url;
- } catch (err) {
- console.error('Failed to get presigned URL:', err);
- return `minio://${AI_CHAT_IMAGES_BUCKET}/${objectName}`;
- }
+  const client = getMinioClient();
+  try {
+    const url = await client.presignedGetObject(AI_CHAT_IMAGES_BUCKET, objectName, 24 * 60 * 60);
+    return url;
+  } catch (err) {
+    console.error('Failed to get presigned URL:', err);
+    return `minio://${AI_CHAT_IMAGES_BUCKET}/${objectName}`;
+  }
 }
-
-
-
-

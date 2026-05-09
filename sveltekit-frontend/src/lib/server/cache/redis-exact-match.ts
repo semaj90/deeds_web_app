@@ -228,7 +228,7 @@ export async function setExactMatchCacheBatch(
 // ── Stats (pipelined) ─────────────────────────────────────────────────────────
 //
 // Original stats used N individual MEMORY USAGE calls + N TTL calls via
-// Promise.all — that's 2N round-trips (each ~2ms on localhost → ~200ms for 50 keys).
+// Promise.all — that's 2N round-trips (each ~2ms → ~200ms for 50 keys).
 // Redis pipeline sends all commands in one TCP write and reads responses in one
 // TCP read: O(1) round-trips regardless of key count.
 

@@ -1,0 +1,422 @@
+{
+  "generated_at": "2026-05-08T21:10:23.249Z",
+  "input_path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\ingest\\processed\\graphify_deep_imports_2026-05-08T07-18-58-883Z.jsonl",
+  "source_format": "jsonl",
+  "parsed": 2220,
+  "emitted": 2173,
+  "invalid": 47,
+  "duplicate_count": 47,
+  "duplicates": 47,
+  "output_files": {
+    "cards": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\kb\\cards\\codebase_graph_cards.jsonl",
+    "report": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\kb\\cards\\codebase_graph_cards.report.json",
+    "invalid": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\kb\\cards\\codebase_graph_cards.invalid.jsonl"
+  },
+  "top_20_ranked_cards": [
+    {
+      "card_id": "card:codebase:src/lib/server/db/client.ts:0d33d955",
+      "source_id": "src/lib/server/db/client.ts",
+      "source_path": "src/lib/server/db/client.ts",
+      "score": 0.3565,
+      "risk_score": 0.34,
+      "line_count": 0,
+      "fan_in": 488,
+      "fan_out": 7,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "db",
+      "zone": "server",
+      "tags": [
+        "db",
+        "server"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/redis.ts:46ee6e0b",
+      "source_id": "src/lib/server/redis.ts",
+      "source_path": "src/lib/server/redis.ts",
+      "score": 0.2501,
+      "risk_score": 0.32,
+      "line_count": 0,
+      "fan_in": 248,
+      "fan_out": 1,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server",
+        "redis"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/env.server.ts:2cfc0822",
+      "source_id": "src/lib/server/env.server.ts",
+      "source_path": "src/lib/server/env.server.ts",
+      "score": 0.2445,
+      "risk_score": 0.26,
+      "line_count": 0,
+      "fan_in": 380,
+      "fan_out": 0,
+      "tag_boost": 0,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/db/schema-postgres.ts:ee3bb49f",
+      "source_id": "src/lib/server/db/schema-postgres.ts",
+      "source_path": "src/lib/server/db/schema-postgres.ts",
+      "score": 0.2353,
+      "risk_score": 0.34,
+      "line_count": 0,
+      "fan_in": 193,
+      "fan_out": 2,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "db",
+      "zone": "server",
+      "tags": [
+        "db",
+        "server"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/db/schema.ts:dc051353",
+      "source_id": "src/lib/server/db/schema.ts",
+      "source_path": "src/lib/server/db/schema.ts",
+      "score": 0.1997,
+      "risk_score": 0.34,
+      "line_count": 0,
+      "fan_in": 97,
+      "fan_out": 10,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "db",
+      "zone": "server",
+      "tags": [
+        "db",
+        "server"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/middleware/cache-headers.ts:cd0139a4",
+      "source_id": "src/lib/server/middleware/cache-headers.ts",
+      "source_path": "src/lib/server/middleware/cache-headers.ts",
+      "score": 0.1917,
+      "risk_score": 0.31,
+      "line_count": 0,
+      "fan_in": 112,
+      "fan_out": 1,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server",
+        "cache"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/ace/context-assembler.ts:6342c9b9",
+      "source_id": "src/lib/server/ace/context-assembler.ts",
+      "source_path": "src/lib/server/ace/context-assembler.ts",
+      "score": 0.184,
+      "risk_score": 0.34,
+      "line_count": 0,
+      "fan_in": 31,
+      "fan_out": 37,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server",
+        "ace"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:tests/e2e/auth-login-db.spec.ts:f12c8205",
+      "source_id": "tests/e2e/auth-login-db.spec.ts",
+      "source_path": "tests/e2e/auth-login-db.spec.ts",
+      "score": 0.1833,
+      "risk_score": 0.307,
+      "line_count": 0,
+      "fan_in": 0,
+      "fan_out": 2,
+      "tag_boost": 0.5,
+      "summary_presence": 0,
+      "kind": "module",
+      "zone": "test",
+      "tags": [
+        "module",
+        "test",
+        "auth",
+        "db"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/vector/qdrant-manager.ts:d5ba4aa4",
+      "source_id": "src/lib/server/vector/qdrant-manager.ts",
+      "source_path": "src/lib/server/vector/qdrant-manager.ts",
+      "score": 0.1826,
+      "risk_score": 0.32,
+      "line_count": 0,
+      "fan_in": 73,
+      "fan_out": 9,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server",
+        "qdrant"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/components/ui/Icon.svelte:d5744454",
+      "source_id": "src/lib/components/ui/Icon.svelte",
+      "source_path": "src/lib/components/ui/Icon.svelte",
+      "score": 0.1779,
+      "risk_score": 0.2,
+      "line_count": 0,
+      "fan_in": 253,
+      "fan_out": 14,
+      "tag_boost": 0,
+      "summary_presence": 0,
+      "kind": "component",
+      "zone": "client",
+      "tags": [
+        "component",
+        "client"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:tests/cases-auth-evidence-routes.spec.ts:8622adfe",
+      "source_id": "tests/cases-auth-evidence-routes.spec.ts",
+      "source_path": "tests/cases-auth-evidence-routes.spec.ts",
+      "score": 0.1776,
+      "risk_score": 0.285,
+      "line_count": 0,
+      "fan_in": 0,
+      "fan_out": 7,
+      "tag_boost": 0.5,
+      "summary_presence": 0,
+      "kind": "module",
+      "zone": "test",
+      "tags": [
+        "module",
+        "test",
+        "auth",
+        "evidence"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/cache/code-llm-index.ts:b2d91ca4",
+      "source_id": "src/lib/server/cache/code-llm-index.ts",
+      "source_path": "src/lib/server/cache/code-llm-index.ts",
+      "score": 0.1668,
+      "risk_score": 0.237,
+      "line_count": 0,
+      "fan_in": 16,
+      "fan_out": 6,
+      "tag_boost": 0.5,
+      "summary_presence": 0,
+      "kind": "cache",
+      "zone": "server",
+      "tags": [
+        "cache",
+        "server",
+        "llm"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/ollama.ts:b3738cdc",
+      "source_id": "src/lib/server/ollama.ts",
+      "source_path": "src/lib/server/ollama.ts",
+      "score": 0.1645,
+      "risk_score": 0.26,
+      "line_count": 0,
+      "fan_in": 171,
+      "fan_out": 11,
+      "tag_boost": 0,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/cache/redis-exact-match.ts:3dad18b2",
+      "source_id": "src/lib/server/cache/redis-exact-match.ts",
+      "source_path": "src/lib/server/cache/redis-exact-match.ts",
+      "score": 0.1588,
+      "risk_score": 0.222,
+      "line_count": 0,
+      "fan_in": 12,
+      "fan_out": 3,
+      "tag_boost": 0.5,
+      "summary_presence": 0,
+      "kind": "cache",
+      "zone": "server",
+      "tags": [
+        "cache",
+        "server",
+        "redis"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/auth-helpers.ts:42ce8b12",
+      "source_id": "src/lib/server/auth-helpers.ts",
+      "source_path": "src/lib/server/auth-helpers.ts",
+      "score": 0.1583,
+      "risk_score": 0.329,
+      "line_count": 0,
+      "fan_in": 14,
+      "fan_out": 0,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server",
+        "auth"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/evidence/upload/+server.ts:4379d202",
+      "source_id": "src/routes/api/evidence/upload/+server.ts",
+      "source_path": "src/routes/api/evidence/upload/+server.ts",
+      "score": 0.1578,
+      "risk_score": 0.308,
+      "line_count": 0,
+      "fan_in": 1,
+      "fan_out": 30,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "route",
+      "zone": "route",
+      "tags": [
+        "route",
+        "evidence"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/retrieval/authority-chain.ts:396f333d",
+      "source_id": "src/lib/server/retrieval/authority-chain.ts",
+      "source_path": "src/lib/server/retrieval/authority-chain.ts",
+      "score": 0.1536,
+      "risk_score": 0.319,
+      "line_count": 0,
+      "fan_in": 4,
+      "fan_out": 7,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "server",
+        "auth"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/ai/gemma4-agent.ts:cff1a8c0",
+      "source_id": "src/lib/server/ai/gemma4-agent.ts",
+      "source_path": "src/lib/server/ai/gemma4-agent.ts",
+      "score": 0.1529,
+      "risk_score": 0.295,
+      "line_count": 0,
+      "fan_in": 4,
+      "fan_out": 26,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "ai",
+      "zone": "server",
+      "tags": [
+        "ai",
+        "server",
+        "llm"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/auth/login/+server.ts:4de81a9f",
+      "source_id": "src/routes/api/auth/login/+server.ts",
+      "source_path": "src/routes/api/auth/login/+server.ts",
+      "score": 0.1523,
+      "risk_score": 0.321,
+      "line_count": 0,
+      "fan_in": 2,
+      "fan_out": 4,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "route",
+      "zone": "route",
+      "tags": [
+        "route",
+        "auth"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/auth/register/+server.ts:fe6f205b",
+      "source_id": "src/routes/api/auth/register/+server.ts",
+      "source_path": "src/routes/api/auth/register/+server.ts",
+      "score": 0.1523,
+      "risk_score": 0.321,
+      "line_count": 0,
+      "fan_in": 2,
+      "fan_out": 4,
+      "tag_boost": 0.25,
+      "summary_presence": 0,
+      "kind": "route",
+      "zone": "route",
+      "tags": [
+        "route",
+        "auth"
+      ],
+      "exports": [],
+      "graph_neighbors": []
+    }
+  ]
+}

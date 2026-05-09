@@ -36,6 +36,11 @@ const querySchema = z.object({
 const EMPTY: CodebaseContextForFile = {
   filePath: '',
   normalizedPath: '',
+  retrieval: {
+    exactPath: '',
+    directoryPath: '',
+    peerScope: 'none',
+  },
   directory: {
     path: '', rank: 0, topo: [], clusters: [], tools: [], tags: [],
     constraints: [],

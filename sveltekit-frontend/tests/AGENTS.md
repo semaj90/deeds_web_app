@@ -1,18 +1,18 @@
 # AGENTS.md — `tests`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-08T02:03:14.841Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-08T21:57:37.606Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests
 
 ## Snapshot
 
-- 183 file(s), 0 handler(s)
+- 184 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
 - 🟠 hardcoded localhost: 1
 
 
-## Files (183)
+## Files (184)
 
 - `ace-code-cache.spec.ts`
 - `ace-context-glossary.spec.ts`
@@ -23,16 +23,25 @@
 - `ace-policy.spec.ts`
 - `ace-rerank-spine.spec.ts`
 
+## Tools
+
+> MCP tools the Gemma4 agent should reach for inside this directory.
+- kag.multi_lane_search
+- graph.expand_neighborhood
+- topology.same_som_cluster
+- clusters.get_members
+- context.build_kv_packet
+- taxonomy.children
 ## Audit Gates
 
 | Gate | Status | Detail |
 |------|--------|--------|
-| G17 | ❌ FAIL | 1/183 files — use env.server.ts getters |
+| G17 | ❌ FAIL | 1/184 files — use env.server.ts getters |
 
 _Gates checked: G17. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
 ## Todos + Enhancements
 
-- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/183 files — use env.server.ts getters
+- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/184 files — use env.server.ts getters
 
 _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 
@@ -41,7 +50,7 @@ _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 2/183 files have paired tests
+- **Paired tests**: 2/184 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

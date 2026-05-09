@@ -1,7 +1,7 @@
 # AGENTS.md — `tests/routes/auto/api/codebase`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-08T02:03:14.841Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-08T21:57:37.606Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests/routes/auto/api/codebase
 
@@ -23,6 +23,15 @@
 - `recall.test.ts`
 - `rerank.test.ts`
 
+## Tools
+
+> MCP tools the Gemma4 agent should reach for inside this directory.
+- kag.multi_lane_search
+- graph.expand_neighborhood
+- topology.same_som_cluster
+- clusters.get_members
+- context.build_kv_packet
+- taxonomy.children
 
 ## Retrieval / Rerank Hints
 

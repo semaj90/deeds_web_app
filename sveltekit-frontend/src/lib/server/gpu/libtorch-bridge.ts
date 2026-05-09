@@ -234,6 +234,18 @@ export function getAddonInternal(): NativeAddon | null {
 	return null;
 }
 
+/**
+ * Proactive GPU readiness probe.
+ * Returns true if the native CUDA addon is loaded AND the driver reports
+ * compute capability (CUDA/cuDNN) is initialized.
+ */
+export function isCudaAvailable(): boolean {
+	const native = getAddonInternal();
+	if (!native) return false;
+	const code = native.checkCudaAvailable?.() ?? 0;
+	return code > 0; // 1 = CUDA, 2 = CUDA+cuDNN
+}
+
 // ── Float32Array pool ──────────────────────────────────────────────────────────
 // Reuses typed arrays across calls to eliminate GC churn from large allocations.
 // Each bucket stores arrays of a fixed power-of-2 capacity.
@@ -1131,12 +1143,6 @@ export async function runWithAdaptiveBatch<T>(
  */
 export function estimateGpuBytes(rows: number, cols: number): number {
   return rows * cols * 4 * 1.5; // float32 = 4 bytes, 1.5× for PyTorch overhead
-}
-
-export function isCudaAvailable(): boolean {
-  const native = getAddonInternal();
-  if (!native?.checkCudaAvailable) return false;
-  return native.checkCudaAvailable() >= 1;
 }
 
 export function isCudnnAvailable(): boolean {

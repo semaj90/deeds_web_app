@@ -292,12 +292,17 @@ async function main() {
     lazyConnect: true,
     connectTimeout: 3000,
     enableReadyCheck: false,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
   });
+  redis.on('error', () => {});
   try {
     await redis.connect();
   } catch (err) {
     log.status = 'skipped';
     log.reason = `redis unavailable: ${err.message}`;
+    try { redis.disconnect(); } catch {}
     return;
   }
 

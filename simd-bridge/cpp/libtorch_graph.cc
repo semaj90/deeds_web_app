@@ -58,7 +58,7 @@ static torch::Device getDevice() {
 
 #include "gpu_error_codes.h"
 
-static constexpr int MAX_N_SIMILARITY = 4096;
+static constexpr int MAX_N_SIMILARITY = 3000;
 static constexpr int MAX_N_SIMILARITY_HALF = 8192;
 static constexpr int MAX_N_CLUSTERING = 16384;
 
@@ -100,7 +100,7 @@ extern "C" int graphSimilarity(
 }
 
 /**
- * K-means clustering on GPU with empty cluster guard.
+ * K-means clustering on GPU with empty cluster guard and k-means++ init.
  */
 extern "C" int clusterEmbeddings(
     const float* embeddings, int n, int dim,
@@ -125,8 +125,22 @@ extern "C" int clusterEmbeddings(
             const_cast<float*>(embeddings), {n, dim}, opts
         ).to(device);
 
-        auto centroids = data.slice(0, 0, k).clone();
-        auto assign_tensor = torch::zeros({n}, torch::TensorOptions().dtype(torch::kLong).device(device));
+        // K-means++ initialization
+        auto centroids = torch::zeros({k, dim}, data.options());
+        // Randomly pick first centroid
+        auto first_idx = torch::randint(0, n, {1}).item<int64_t>();
+        centroids[0] = data[first_idx];
+
+        for (int i = 1; i < k; i++) {
+            auto dists = torch::cdist(data, centroids.slice(0, 0, i), 2.0);
+            auto min_dists = std::get<0>(dists.min(1));
+            auto probs = min_dists.pow(2);
+            // multinomial expects probabilities/weights
+            auto next_idx = probs.multinomial(1).item<int64_t>();
+            centroids[i] = data[next_idx];
+        }
+
+        auto assign_tensor = torch::full({n}, -1, torch::TensorOptions().dtype(torch::kLong).device(device));
 
         for (int iter = 0; iter < max_iters; iter++) {
             auto dists = torch::cdist(data, centroids, 2.0);
@@ -138,11 +152,15 @@ extern "C" int clusterEmbeddings(
             }
             assign_tensor = new_assign;
 
+            auto new_centroids = torch::zeros_like(centroids);
+            auto counts = torch::zeros({k, 1}, data.options());
+            new_centroids.scatter_add_(0, assign_tensor.unsqueeze(1).expand({n, dim}), data);
+            counts.scatter_add_(0, assign_tensor.unsqueeze(1), torch::ones({n, 1}, data.options()));
+
             for (int c = 0; c < k; c++) {
-                auto mask = (assign_tensor == c);
-                auto count = mask.sum().item<int64_t>();
-                if (count > 0) {
-                    centroids[c] = data.index({mask}).mean(0);
+                float c_count = counts[c].item<float>();
+                if (c_count > 0) {
+                    centroids[c] = new_centroids[c] / c_count;
                 } else {
                     // P0: Empty cluster guard — re-seed from farthest point
                     auto current_centroids = centroids.index({assign_tensor});

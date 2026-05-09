@@ -33,9 +33,8 @@ export interface ClusterSummary {
 
 async function getCache(clusterId: number): Promise<ClusterSummary | null> {
 	try {
-		const { getRedis } = await import('$lib/server/redis.js');
-		const val = await getRedis().get(clusterSummaryKey.cached(clusterId));
-		return val ? (JSON.parse(val) as ClusterSummary) : null;
+		const { getJson } = await import('$lib/server/redis.js');
+		return await getJson<ClusterSummary>(clusterSummaryKey.cached(clusterId));
 	} catch {
 		return null;
 	}
@@ -43,11 +42,10 @@ async function getCache(clusterId: number): Promise<ClusterSummary | null> {
 
 async function setCache(summary: ClusterSummary): Promise<void> {
 	try {
-		const { getRedis } = await import('$lib/server/redis.js');
-		await getRedis().set(
+		const { setJsonWithTtl } = await import('$lib/server/redis.js');
+		await setJsonWithTtl(
 			clusterSummaryKey.cached(summary.clusterId),
-			JSON.stringify(summary),
-			'EX',
+			summary,
 			TTL.CLUSTER_SUMMARY,
 		);
 	} catch { /* non-fatal */ }

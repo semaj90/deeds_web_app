@@ -1,13 +1,9 @@
-export function getOllamaEndpoint(): string {
- // Prefer Docker service hostname for production, fall back to localhost for local dev.
- // Use process.env.OLLAMA_URL when provided.
- const envUrl = process.env.OLLAMA_URL?.trim();
- const dockerDefault = 'http://ollama:11434';
- const localFallback = 'http://localhost:11434';
+import { ENV } from '$lib/server/env.server.js';
 
- const raw = envUrl || dockerDefault || localFallback;
- return raw.replace(/\/$/, '');
+export function getOllamaEndpoint(): string {
+	return ENV.OLLAMA_BASE_URL;
 }
+
 
 
 

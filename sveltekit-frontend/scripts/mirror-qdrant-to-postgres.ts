@@ -193,6 +193,10 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
        content_hash,
        gpu_cluster,
        som_cluster,
+       som_bmu_row,
+       som_bmu_col,
+       manifold4,
+       chunk_id,
        neo4j_gpu_cluster,
        semantic_tags,
        token_count,
@@ -208,7 +212,7 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
      VALUES (
        $1,  $2,  $3,  $4,  $5,  $6,  $7,  $8,  $9,
        $10, $11, $12, $13, $14, $15, $16, $17, $18,
-       $19, $20, $21, now(), now()
+       $19, $20, $21, $22, $23, $24, $25, now(), now()
      )
      ON CONFLICT (qdrant_id) DO UPDATE SET
        repo_id           = EXCLUDED.repo_id,
@@ -222,6 +226,10 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
        content_hash      = EXCLUDED.content_hash,
        gpu_cluster       = EXCLUDED.gpu_cluster,
        som_cluster       = EXCLUDED.som_cluster,
+       som_bmu_row       = EXCLUDED.som_bmu_row,
+       som_bmu_col       = EXCLUDED.som_bmu_col,
+       manifold4         = EXCLUDED.manifold4,
+       chunk_id          = EXCLUDED.chunk_id,
        neo4j_gpu_cluster = EXCLUDED.neo4j_gpu_cluster,
        semantic_tags     = EXCLUDED.semantic_tags,
        token_count       = EXCLUDED.token_count,
@@ -245,7 +253,11 @@ async function upsertChunk(pg: PgClient, point: QdrantPoint): Promise<boolean> {
       textOrNull(payload.content_hash),
       intOrNull(payload.gpu_cluster),
       intOrNull(payload.som_cluster),
-      intOrNull(payload.neo4j_gpuCluster),       // note: camelCase in Qdrant payload
+      intOrNull(payload.som_bmu_row ?? payload.som_y),
+      intOrNull(payload.som_bmu_col ?? payload.som_x),
+      Array.isArray(payload.manifold4) ? payload.manifold4 : null,
+      textOrNull(payload.chunk_id) ?? textOrNull(payload.stable_key),
+      intOrNull(payload.neo4j_gpuCluster),
       semanticTags,
       intOrNull(payload.token_count),
       intOrNull(payload.line_start),

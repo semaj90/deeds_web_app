@@ -3,6 +3,8 @@
  *
  * getOllamaEndpoint → ollama.ts (canonical, Docker-aware)
  */
+import { ENV } from '$lib/server/env.server.js';
+
 export { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 /**
@@ -13,6 +15,6 @@ export function getEnvUrl(envName: string, dockerHost: string, localFallback?: s
 }
 
 export function getEnhancedRagEndpoint(): string {
-	// audit:ignore-localhost — third-tier dev fallback after ENV → Docker hostname
-	return getEnvUrl('ENHANCED_RAG_URL', 'http://enhanced-rag:8094', 'http://localhost:8094');
+	// third-tier dev fallback after ENV → Docker hostname
+	return ENV.ENHANCED_RAG_URL || getEnvUrl('ENHANCED_RAG_URL', 'http://enhanced-rag:8094');
 }

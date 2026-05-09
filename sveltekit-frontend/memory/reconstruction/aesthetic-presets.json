@@ -1,0 +1,97 @@
+{
+  "emitted_by": "emit-aesthetic-preset.mjs",
+  "presets": {
+    "modern-low-poly": {
+      "affine_texture_warp": false,
+      "blender": {
+        "color_management": "Filmic",
+        "fps": 30,
+        "output_resolution": [
+          1920,
+          1080
+        ],
+        "pixelate_node": false,
+        "samples": 64,
+        "use_eevee": false
+      },
+      "crt": {
+        "chromatic_aberration": 0,
+        "curvature": 0,
+        "noise_amount": 0,
+        "scanline_intensity": 0,
+        "vignette_strength": 0.15
+      },
+      "crt_postprocess": false,
+      "internal_resolution": [
+        1280,
+        720
+      ],
+      "palette_bits_per_channel": 8,
+      "preset": "modern-low-poly",
+      "texture_filter": "mipmap-linear",
+      "vertex_jitter": 0
+    },
+    "n64": {
+      "affine_texture_warp": false,
+      "blender": {
+        "color_management": "Standard",
+        "fps": 30,
+        "output_resolution": [
+          960,
+          720
+        ],
+        "pixelate_node": true,
+        "samples": 48,
+        "use_eevee": true
+      },
+      "crt": {
+        "chromatic_aberration": 0.0015,
+        "curvature": 0.12,
+        "noise_amount": 0.04,
+        "scanline_intensity": 0.3,
+        "vignette_strength": 0.35
+      },
+      "crt_postprocess": true,
+      "internal_resolution": [
+        640,
+        480
+      ],
+      "palette_bits_per_channel": 6,
+      "preset": "n64",
+      "texture_filter": "linear",
+      "vertex_jitter": 0.1
+    },
+    "ps1": {
+      "affine_texture_warp": true,
+      "blender": {
+        "color_management": "Standard",
+        "fps": 24,
+        "output_resolution": [
+          640,
+          480
+        ],
+        "pixelate_node": true,
+        "samples": 32,
+        "use_eevee": true
+      },
+      "crt": {
+        "chromatic_aberration": 0.0025,
+        "curvature": 0.1,
+        "noise_amount": 0.06,
+        "scanline_intensity": 0.45,
+        "vignette_strength": 0.45
+      },
+      "crt_postprocess": true,
+      "internal_resolution": [
+        320,
+        240
+      ],
+      "palette_bits_per_channel": 5,
+      "preset": "ps1",
+      "texture_filter": "nearest",
+      "vertex_jitter": 0.4
+    }
+  },
+  "schema_version": "v1",
+  "source_file": "src/lib/server/reconstruction/aesthetic-presets.ts"
+}

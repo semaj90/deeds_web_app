@@ -13,6 +13,7 @@
 
 import type { SearchResult, SearchOptions,
   SearchFilters, CollectionStats, FullDocument } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface QdrantConfig {
   url: string;
@@ -33,7 +34,7 @@ export interface QdrantSearchResult {
 }
 
 const DEFAULT_CONFIG: QdrantConfig = {
-  url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+  url: ENV.QDRANT_URL,
   collection: 'phase76_knowledge_base'
 };
 

@@ -1,0 +1,84 @@
+{
+  "vault_version": "2026-05-08T22:10:35.424Z",
+  "generated_by": "graphify-obsidian-vault.mjs",
+  "collections": {
+    "files": "Files/",
+    "clusters": "Clusters/",
+    "indexes": "Indexes/"
+  },
+  "canvases": {
+    "full_map": "codebase.canvas",
+    "cluster_kg": "kg.canvas"
+  },
+  "retrieval": {
+    "qdrant_collection": "codebase_chunks_768",
+    "embedding_id_scheme": "qdrant://codebase_chunks_768/<path>",
+    "neo4j_node_label": "CodebaseFile",
+    "neo4j_pagerank_property": "pageRank"
+  },
+  "schema": {
+    "file_frontmatter": [
+      "type",
+      "path",
+      "aliases",
+      "clusterId",
+      "pagerank",
+      "blend",
+      "confidence",
+      "embedding_id",
+      "last_updated_by_llm",
+      "ai-first",
+      "up",
+      "imports",
+      "tags"
+    ],
+    "cluster_frontmatter": [
+      "type",
+      "cluster_id",
+      "clusterId",
+      "topic",
+      "aliases",
+      "memberCount",
+      "pagerank_sum",
+      "pagerank_max",
+      "risk",
+      "top_tags",
+      "confidence",
+      "contains",
+      "same",
+      "tags"
+    ],
+    "typed_edges": {
+      "up": "BELONGS_TO_CLUSTER (file → cluster)",
+      "contains": "CONTAINS (cluster → file)",
+      "same": "SIMILAR_TOPOLOGY (cluster ↔ cluster, jaccard ≥ 0.3 on top-tags)",
+      "imports": "IMPORTS (file → file, local imports only)"
+    }
+  },
+  "agent_policy": {
+    "read_only": true,
+    "allowed_actions": [
+      "search_notes",
+      "read_note",
+      "follow_links",
+      "resolve_embedding_id",
+      "qdrant_lookup",
+      "generate_plan",
+      "propose_fix_markdown"
+    ],
+    "forbidden_actions": [
+      "patch_code",
+      "mutate_qdrant",
+      "mutate_postgres",
+      "mutate_redis",
+      "mutate_neo4j",
+      "rewrite_vault",
+      "execute_shell"
+    ]
+  },
+  "stats": {
+    "file_notes": 500,
+    "cluster_notes": 100,
+    "index_notes": 4
+  }
+}

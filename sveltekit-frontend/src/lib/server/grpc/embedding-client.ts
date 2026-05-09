@@ -2,16 +2,12 @@
  * Multi-Protocol Embedding Client — server-only.
  *
  * 4-tier fallback chain for batch 768d embeddings:
- *   1. gRPC (port 50051, 5s timeout) — binary protocol, lowest latency
- *   2. QUIC/NATS (port 4222, 5s timeout) — HTTP/3, 0-RTT, multiplexed
- *   3. HTTP/Ollama Batch (/api/embed, 60s timeout) — standard REST
- *   4. HTTP/Ollama Sequential (/api/embeddings, 15s/text) — legacy fallback
+ *   1. gRPC (50051) — binary protocol, lowest latency
+ *   2. QUIC/NATS (4222) — HTTP/3, 0-RTT, multiplexed
+ *   3. HTTP/Ollama Batch (/api/embed) — standard REST
+ *   4. HTTP/Ollama Sequential (/api/embeddings) — legacy fallback
  *
- * ENV:
- *   EMBEDDING_GRPC_URL      — gRPC server address (default: 127.0.0.1:50051)
- *   EMBEDDING_GRPC_ENABLED  — "true" to enable gRPC path (default: "false")
- *   EMBEDDING_QUIC_ENABLED  — "true" to enable QUIC/NATS path (default: "false")
- *   NATS_URL                — NATS server URL (default: nats://127.0.0.1:4222)
+ * All addresses resolved via ENV.* getters in env.server.ts.
  */
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
@@ -119,8 +115,8 @@ interface EmbeddingCallResult {
   detail?: string;
 }
 
-const HTTP_BATCH_TIMEOUT_MS = Number(process.env.EMBED_BATCH_TIMEOUT_MS ?? 180_000);
-const HTTP_SINGLE_TIMEOUT_MS = Number(process.env.EMBED_SINGLE_TIMEOUT_MS ?? 45_000);
+const HTTP_BATCH_TIMEOUT_MS = ENV.ACE_EMBED_BATCH_TIMEOUT_MS;
+const HTTP_SINGLE_TIMEOUT_MS = 45_000; // Standard single-embedding fallback
 
 // ── gRPC client (lazy-loaded, singleton) ───────────────────────────────────
 

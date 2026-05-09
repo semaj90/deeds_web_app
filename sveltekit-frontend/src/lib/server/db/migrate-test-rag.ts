@@ -6,8 +6,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 
-const connectionString = process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+const connectionString = ENV.DATABASE_URL;
 const migrationClient = postgres(connectionString, { max: 1 });
 const db = drizzle(migrationClient);
 
@@ -124,4 +125,3 @@ migrate().catch((err) => {
 	console.error('Fatal error: ', err);
 	process.exit(1);
 });
-

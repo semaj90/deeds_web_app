@@ -1,0 +1,24 @@
+{
+  "userHiers": [
+    {
+      "up": [
+        "up"
+      ],
+      "same": [
+        "same"
+      ],
+      "down": [
+        "contains"
+      ]
+    },
+    {
+      "up": [],
+      "same": [
+        "imports"
+      ],
+      "down": []
+    }
+  ],
+  "showNameOrType": true,
+  "showRelationType": true
+}

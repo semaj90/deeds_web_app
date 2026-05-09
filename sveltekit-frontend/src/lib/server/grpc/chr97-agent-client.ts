@@ -6,9 +6,7 @@
  * export/search/timeline API routes, with automatic fallback to the direct
  * Qdrant scroll + CHR97 builder path when gRPC is unavailable.
  *
- * ENV:
- *   CHR97_GRPC_URL     — gRPC server address (default: 127.0.0.1:50056)
- *   CHR97_GRPC_ENABLED — "true" to enable (default: "false")
+ * All addresses resolved via ENV.* getters in env.server.ts.
  */
 import { ENV } from '$lib/server/env.server.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';

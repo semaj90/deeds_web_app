@@ -207,6 +207,158 @@
       "detail": "Start MCP TRACE (:8788) and TurboQuant llama-server (:8090) in parallel. Both detached — VS Code returns immediately. Frontend dev server is started separately."
     },
     {
+      "label": "Agentic Stack: Ensure MCP + TurboQuant + Topology",
+      "dependsOn": [
+        "MCP TRACE Server (detached)",
+        "TurboQuant llama-server (VLM)",
+        "Topology Search: Ensure"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Bring up the orchestration plane (MCP), inference plane (TurboQuant llama-server), and retrieval topology plane. Use before Gemma4 agentic tool-calling tests."
+    },
+    {
+      "label": "Topology Search: Ensure",
+      "type": "shell",
+      "command": "npm run topology:search:ensure",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Start or health-check the topology retrieval service used for 4D/SOM neighborhood search. This is the vector/topology retrieval plane, not inference."
+    },
+    {
+      "label": "Gemma4 Agentic Tool Calling: Smoke Full Loop",
+      "type": "shell",
+      "command": "npm run smoke:trace:full",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "End-to-end Gemma4/MCP loop smoke. Verifies that the model-facing orchestration plane can call tools and synthesize from returned context."
+    },
+    {
+      "label": "Gemma4 Agentic Tool Calling: Tool Surface Audit",
+      "type": "shell",
+      "command": "node scripts/smoke-trace-mcp-tools.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Read-only audit of the MCP tool registry on :8788. Use when changing graph, KB, topology, web, or fix-attempt tools."
+    },
+    {
+      "label": "Retrieval Plane: Fast Graph + Topology Refresh",
+      "type": "shell",
+      "command": "npm run graphify:intel:fast",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Refresh sparse graph, topology payloads, wiki enrichment, and graphify smoke. This feeds retrieval; it does not run the LLM as the search engine."
+    },
+    {
+      "label": "Retrieval Plane: Karpathy GPU Rank Refresh",
+      "type": "shell",
+      "command": "npm run karpathy:gpu",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Recompute GPU-assisted authority blend for ranked codebase recommendations. GPU is used after candidate pruning for ranking semantics."
+    },
+    {
+      "label": "Agentic Error Fixing: Plan Only",
+      "type": "shell",
+      "command": "npm run agent:fix:plan",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Plan-only agentic error fixing. Use for ranked evidence, likely files, and verification commands before patching."
+    },
+    {
+      "label": "Feature Tracking: Codebase TODO Recommendations",
+      "type": "shell",
+      "command": "npm run skill:codebase-todo",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Regenerate feature/TODO recommendations from graph authority, AGENTS context, and Karpathy scores for LLM-ready production planning."
+    },
+    {
       "label": "Svelte Check",
       "type": "shell",
       "command": "npx svelte-kit sync && npx svelte-check --threshold error --tsconfig ./tsconfig.json",

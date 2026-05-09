@@ -12,6 +12,7 @@
  */
 
 import type { SearchResult } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 import { redis } from '$lib/server/redis.js';
 
 export interface RedisCacheConfig {
@@ -28,7 +29,7 @@ export interface CachedSearchResult {
 }
 
 const DEFAULT_CONFIG: RedisCacheConfig = {
-  url: process.env?.REDIS_URL ?? 'redis://localhost:6379',
+  url: ENV.REDIS_URL,
   defaultTTL: 3600, // 1 hour (Requirement 6.1)
   keyPrefix: 'kb:search:', // Requirement 6.2
 };

@@ -10,7 +10,7 @@
  *   3. Append role:"tool" result messages → re-send
  *   4. Repeat until final text response or MAX_ROUNDS exceeded
  *
- * All tool dispatch is in-process — no HTTP round-trip to localhost:
+ * All tool dispatch is in-process — no HTTP round-trip to external services:
  *   rag_search      → Qdrant hybrid search (research_summaries + legal_documents)
  *   case_search     → Postgres full-text case search
  *   memory_recall   → selectAdaptiveMemory() — hyperedge X_prime similarity
@@ -222,7 +222,7 @@ const AGENT_TOOLS = [
       description:
         'Quick-hit fetch of the per-directory AGENTS.md (agents.md spec) for a path. ' +
         'Returns pre-rendered Markdown with: directory purpose, audit score, ' +
-        'top warnings (auth/Zod/SSR/Svelte4/localhost), dominant tags, ' +
+        'top warnings (auth/Zod/SSR/Svelte4/network), dominant tags, ' +
         'topological neighbors, and representative files. Walks UP the tree to ' +
         'the nearest AGENTS.md (Cursor/Codex/Aider use the same convention). ' +
         'Use this BEFORE editing files in an unfamiliar directory — it gives you ' +
@@ -537,6 +537,74 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'kb_search_cards',
+      description:
+        'Search the knowledge base for codebase "cards" (identity-spine chunks). ' +
+        'Returns ranked cards with stable IDs (card:path:hash), content snippets, ' +
+        'and topological metadata (SOM cluster, gpu cluster). Use this for high-fidelity retrieval.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'Natural language query or symbol name' },
+          limit: { type: 'number', description: 'Max results (default 10, max 25)' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'kb_get_card',
+      description:
+        'Retrieve the full content and high-fidelity metadata for a specific knowledge card by ID. ' +
+        'Use this when you have a card ID from search_cards and need the full context.',
+      parameters: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', description: 'Stable card ID (e.g., card:src/lib/server/ai/gemma4-agent.ts:7a2b3)' },
+        },
+        required: ['id'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'kb_expand_neighbors',
+      description:
+        'Expand the topological neighborhood of a card or file using graph relationships. ' +
+        'Returns structurally-related cards based on imports, dependencies, and cluster proximity.',
+      parameters: {
+        type: 'object',
+        properties: {
+          id:    { type: 'string', description: 'Card or file ID to expand from' },
+          limit: { type: 'number', description: 'Max neighbors (default 20)' },
+        },
+        required: ['id'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'kb_explain_retrieval',
+      description:
+        'Provide an audit trace for why a specific card or search result was retrieved. ' +
+        'Includes cluster dominance, community purpose, and grounding signals.',
+      parameters: {
+        type: 'object',
+        properties: {
+          id:    { type: 'string', description: 'Card ID or query string to explain' },
+          limit: { type: 'number', description: 'Max grounding signals (default 5)' },
+        },
+        required: ['id'],
+      },
+    },
+  },
 ] as const;
 
 // ── GEMMA4_ALLOWED_TOOLS — exported allowlist for MCP graph/search tools ──────
@@ -563,6 +631,10 @@ export const GEMMA4_ALLOWED_TOOLS = {
   'research.encode':             { write: true, requiresGainValidation: true },
   'topology.search_4d':         { write: false },
   'search.go_hybrid':           { write: false },
+  'kb.search_cards':                 { write: false },
+  'kb.get_card':                     { write: false },
+  'kb.expand_neighbors':             { write: false },
+  'kb.explain_retrieval':            { write: false },
 } as const;
 
 export function truncateToolResult(result: unknown, maxChars = 12_000): unknown {
@@ -649,6 +721,9 @@ const ALLOWED_TOOLS = {
     'trace__kag_search', 'trace__explain_retrieval', 'context__get_compressed_card',
     'context__build_kv_packet', 'trace__validate_ace_hit',
     'topology__search_4d', 'search__go_hybrid',
+    // KB Identity Spine tools
+    'kb.search_cards', 'kb.get_card', 'kb.expand_neighbors', 'kb.explain_retrieval',
+    'kb__search_cards', 'kb__get_card', 'kb__expand_neighbors', 'kb__explain_retrieval',
   ]),
   write: new Set([
     'apply_shadow_patch', 'revert_fix', 'verify_fix',
@@ -791,6 +866,11 @@ async function dispatchTool(
   goRetrievalHits?: GoHit[],
 ): Promise<ToolResult> {
   try {
+    if (name.startsWith('kb_') || name.startsWith('kb.')) {
+      const toolName = name.replace(/_/g, '.'); // kb_search_cards -> kb.search_cards
+      return { tool: name, result: await callTraceMcp(toolName, args) };
+    }
+
     if (name === 'rag_search') {
       const query      = String(args.query ?? '');
       const collection = String(args.collection ?? 'research_summaries');

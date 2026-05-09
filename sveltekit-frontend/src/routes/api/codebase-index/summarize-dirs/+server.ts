@@ -14,7 +14,7 @@ async function fetchSomCoordsFromQdrant(
 
   try {
     const { ENV } = await import('$lib/server/env.server.js');
-    const base = (ENV.QDRANT_URL ?? 'http://localhost:6333').replace(/\/$/, '');
+		const base = ENV.QDRANT_URL.replace(/\/$/, '');
 
     // Accumulate cluster/bmu votes per directory
     const votes = new Map<string, { cluster: number[]; row: number[]; col: number[] }>();

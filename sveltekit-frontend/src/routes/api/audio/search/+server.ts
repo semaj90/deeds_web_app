@@ -12,6 +12,7 @@ import { db } from '$lib/server/db/client';
 import { whisperSegments, audioTranscripts, evidence } from '$lib/server/db/schema-postgres';
 import { eq, and, sql, desc } from 'drizzle-orm';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -72,7 +73,7 @@ async function searchQdrant(
 }>> {
 	try {
 		// Get embedding for query
-		const embedResp = await fetch('http://localhost:11434/api/embeddings', {
+		const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
@@ -93,7 +94,7 @@ async function searchQdrant(
 		};
 		if (must.length > 0) searchBody.filter = { must };
 
-		const resp = await fetch('http://localhost:6333/collections/audio_segments/points/search', {
+		const resp = await fetch(`${ENV.QDRANT_URL}/collections/audio_segments/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(searchBody),
@@ -170,7 +171,7 @@ async function searchTranscripts(
 	score: number;
 }>> {
 	try {
-		const embedResp = await fetch('http://localhost:11434/api/embeddings', {
+		const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
@@ -184,7 +185,7 @@ async function searchTranscripts(
 		if (evidenceId) must.push({ key: 'evidenceId', match: { value: evidenceId } });
 		if (caseId) must.push({ key: 'caseId', match: { value: caseId } });
 
-		const resp = await fetch('http://localhost:6333/collections/evidence_items/points/search', {
+		const resp = await fetch(`${ENV.QDRANT_URL}/collections/evidence_items/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

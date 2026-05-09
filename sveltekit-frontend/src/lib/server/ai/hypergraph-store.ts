@@ -22,6 +22,7 @@ export type TaskType =
   | 'wiki-generation'
   | 'streaming-chat'
   | 'tool-calling-loop'
+  | 'scene-intent-extraction'
   | 'vlm-escalation';
 
 export interface HyperedgeSession {

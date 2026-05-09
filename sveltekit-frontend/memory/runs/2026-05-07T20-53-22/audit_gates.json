@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-05-08T07:00:42.900Z",
+  "generatedAt": "2026-05-08T21:59:33.314Z",
   "runId": "2026-05-07T20-53-22",
   "gates": {
     "g11_wrong_db_client": 0,
-    "g17_localhost_hardcoded": 0,
+    "g17_localhost_hardcoded": 1,
     "g18_missing_auth": 0,
     "g19_missing_zod": 0,
     "g21_svelte4_props": 0,
@@ -15,5 +15,5 @@
     "g27_som_consumers": 7,
     "g40_glyph_cache_pass": true
   },
-  "allPass": true
+  "allPass": false
 }

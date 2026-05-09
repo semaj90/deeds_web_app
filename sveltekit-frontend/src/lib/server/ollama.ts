@@ -471,6 +471,15 @@ async function tryTurboQuantIntercept(
 }
 
 /**
+ * Check if the GPU is currently under heavy load from TurboQuant.
+ * Used to avoid parallel VLM/Ollama contention on 8GB cards.
+ */
+async function isGpuCongested(): Promise<boolean> {
+  // If TurboQuant is healthy, we assume it's holding VRAM/KVCache
+  return await isTurboQuantHealthy();
+}
+
+/**
  * Shared fetch wrapper for Ollama requests with connection pooling.
  * All Ollama HTTP calls should use this instead of raw fetch().
  *
@@ -482,9 +491,21 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
   const meta = extractOllamaRequestMeta(url, init);
   const startedAt = Date.now();
 
+  // VRAM Contention Guard: If this is a large model call (VLM/Gemma4) to Ollama,
+  // but TurboQuant is already active, we risk an OOM or massive swapping.
+  const isLargeModel = meta.model === VLM_MODELS.vision || meta.model === VLM_MODELS.gemma4;
+  if (isLargeModel && await isGpuCongested()) {
+    const msg = `[ollama] VRAM congestion: skipping Ollama ${meta.model} while TurboQuant is active`;
+    console.warn(msg);
+    return new Response(JSON.stringify({ error: 'GPU_CONGESTION', message: msg }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   // TurboQuant intercept: route /api/chat and /api/generate through GPU llama-server
   const turboResponse = await tryTurboQuantIntercept(url, init);
-  if (turboResponse) {
+  if (turboResponse && turboResponse.ok) {
     logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200);
     return turboResponse;
   }
@@ -497,8 +518,18 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
     logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status);
     return response;
   } catch (error) {
-    logOllamaDiagnostics('error', meta, Date.now() - startedAt, undefined, error);
-    throw error;
+    const duration = Date.now() - startedAt;
+    logOllamaDiagnostics('error', meta, duration, undefined, error);
+    
+    // Normalize error response so agents get a consistent JSON envelope
+    return new Response(JSON.stringify({ 
+      error: 'FETCH_ERROR', 
+      message: (error as Error)?.message ?? String(error),
+      duration 
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 

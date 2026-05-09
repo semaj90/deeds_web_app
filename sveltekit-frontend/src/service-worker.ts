@@ -128,24 +128,54 @@ self.addEventListener('sync', (event: any) => {
 });
 
 /**
- * Handle API requests with multi-tier caching
+ * Handle API requests with multi-tier caching and WebGPU acceleration
  */
 async function handleAPIRequest(request: Request): Promise<Response> {
 	const url = new URL(request.url);
 	const cacheKey = generateCacheKey(request);
+
+	// ── SPECIAL HANDLING: Instant Local Search (WebGPU) ───────────────────────
+	if (url.pathname === '/api/rag/search' && request.method === 'POST') {
+		const useWebGPU = request.headers.get('x-use-webgpu') === 'true';
+		
+		if (useWebGPU) {
+			try {
+				const body = await request.clone().json();
+				const caseId = body.caseId || body.case_id;
+				
+				// If we have a local embedding corpus for this case, run instant search
+				if (caseId && somCacheReady) {
+					const localResults = await attemptLocalWebGPUSearch(body);
+					if (localResults) {
+						console.log(`[SW] WebGPU Instant Search hit for case ${caseId}`);
+						return new Response(JSON.stringify(localResults), {
+							headers: { 
+								'Content-Type': 'application/json',
+								'X-Search-Backend': 'webgpu-local',
+								'X-Cache-Source': 'som-webgpu'
+							}
+						});
+					}
+				}
+			} catch (err) {
+				console.warn('[SW] Local search bypass:', err);
+			}
+		}
+	}
+
 	try {
 		// Check cache hierarchy: Memory -> SOM -> Redis -> Network
 		const cachedResponse = await checkCacheHierarchy(cacheKey, request);
 		if (cachedResponse) {
-			console.log(`Cache hit for ${url.pathname}`);
 			return cachedResponse;
 		}
 
-		// Network request with SIMD JSON optimization
-		const networkResponse = await fetchWithSIMD(request);
+		// Network request with optional SIMD JSON optimization
+		const networkResponse = await fetch(request);
 
-		// Cache the response across all tiers
-		if (networkResponse.ok) {
+		// Cache the response across all tiers if it's a successful JSON response
+		const contentType = networkResponse.headers.get('content-type') ?? '';
+		if (networkResponse.ok && contentType.includes('application/json')) {
 			await cacheResponse(cacheKey, networkResponse.clone(), request);
 		}
 		return networkResponse;
@@ -156,69 +186,48 @@ async function handleAPIRequest(request: Request): Promise<Response> {
 }
 
 /**
- * Check cache hierarchy for cached responses
+ * Attempt a local similarity search using WebGPU in the Service Worker.
+ * Falls back to network search if local corpus is missing or GPU fails.
  */
-async function checkCacheHierarchy(cacheKey: string, request: Request): Promise<Response | null> {
-	// 1. Check SOM WebGPU cache first (fastest)
-	if (somCacheReady) {
-		try {
-			const somResult = await safeSomGet(cacheKey);
-			if (somResult) {
-				return new Response(JSON.stringify(somResult), {
-					headers: { 'Content-Type': 'application/json', 'X-Cache-Source': 'som-webgpu' },
-				});
-			}
-		} catch (error) {
-			console.warn('SOM cache miss:', error);
-		}
-	}
-
-	// 2. Check Redis distributed cache
-	if (isRedisConnected) {
-		try {
-			const redisResult = await redisWebGPUIntegration.getCachedResult(cacheKey);
-			if (redisResult) {
-				return new Response(JSON.stringify(redisResult), {
-					headers: { 'Content-Type': 'application/json', 'X-Cache-Source': 'redis-distributed' },
-				});
-			}
-		} catch (error) {
-			console.warn('Redis cache miss:', error);
-		}
-	}
-
-	// 3. Check browser cache
-	const cache = await caches.open('legal-ai-v1');
-	const cachedResponse = await cache.match(request);
-	if (cachedResponse) {
-		return cachedResponse;
-	}
-	return null;
-}
-
-/**
- * Fetch with SIMD JSON optimization
- */
-async function fetchWithSIMD(request: Request): Promise<Response> {
-	const response = await fetch(request);
-
-	const contentType = response.headers.get('content-type') ?? '';
-	if (!contentType.includes('application/json')) {
-		return response;
-	}
+async function attemptLocalWebGPUSearch(body: any): Promise<any | null> {
+	if (!webgpuInitialized || !somWebGPUCache) return null;
+	
+	const { query, precomputedEmbedding, top_k = 10 } = body;
+	if (!query && !precomputedEmbedding) return null;
 
 	try {
-		const responseText = await response.text();
-		const parsedData = await simdJSONClient.parseJSON(responseText);
+		// Retrieve local corpus from IndexedDB/LokiJS
+		const corpus = await somWebGPUCache.getEmbeddingsForCase(body.caseId || body.case_id);
+		if (!corpus || corpus.length === 0) return null;
 
-		return new Response(JSON.stringify(parsedData), {
-			status: response.status,
-			statusText: response.statusText,
-			headers: { ...Object.fromEntries(response.headers.entries()), 'X-SIMD-Optimized': 'true' },
-		});
-	} catch (error) {
-		console.warn('SIMD JSON optimization failed, using original response:', error);
-		return response;
+		// Perform WebGPU similarity search
+		// This uses the WebGPUSimilarityEngine integrated into somWebGPUCache
+		const results = await somWebGPUCache.search(
+			precomputedEmbedding || query, 
+			corpus, 
+			{ topK: top_k }
+		);
+
+		return {
+			query_id: `sw-webgpu-${Date.now()}`,
+			query,
+			chunks: results.map((r: any) => ({
+				...r.chunk,
+				score: r.score,
+				confidence: r.score >= 0.85 ? 'high' : 'medium'
+			})),
+			total_found: results.length,
+			search_time_ms: results.searchTimeMs,
+			embedding_model: 'client-local-webgpu',
+			timestamp: new Date().toISOString(),
+			diagnostics: {
+				backend: 'webgpu-service-worker',
+				corpus_size: corpus.length
+			}
+		};
+	} catch (err) {
+		console.error('[SW] WebGPU search failed:', err);
+		return null;
 	}
 }
 

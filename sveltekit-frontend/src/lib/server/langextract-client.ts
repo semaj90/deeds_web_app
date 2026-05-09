@@ -12,7 +12,7 @@
  * URL resolution (priority order):
  *   1. ENV.LANGEXTRACT_URL (explicit env var)
  *   2. Docker service discovery (container: phase66-langextract, port range 8090-8099)
- *   3. Fallback: http://127.0.0.1:8095
+ *   3. Fallback: ENV default / container service URL
  *
  * NOTE: The legacy MinIO SIMD Go service (bytedance/sonic AVX2) that used to occupy
  * this port is archived in deeds_labs/. The /api/evidence, /api/chunks, /api/manifest
@@ -69,13 +69,10 @@ const LANGEXTRACT_SERVICE_CONFIG: ServiceConfig = {
   envVar: 'LANGEXTRACT_URL',
   containerName: 'phase66-langextract',
   port: 8095,
-  fallback: 'http://localhost:8095',
+  fallback: ENV.LANGEXTRACT_URL || 'http://phase66-langextract:8095',
   verify: true,
   verifyTimeout: 3000,
 };
-
-/** Port range for dynamic discovery (Docker compose overrides or QUIC/Caddy proxy) */
-const PORT_RANGE = { min: 8090, max: 8099 };
 
 // ── URL Resolution ────────────────────────────────────────────────────────
 
@@ -108,28 +105,6 @@ async function getBaseUrl(): Promise<string> {
       resolvedSource = result.source;
       lastResolution = now;
       return resolvedUrl;
-    }
-
-    // Scan port range (Docker compose may assign dynamic ports via Caddy/QUIC proxy)
-    for (let port = PORT_RANGE.min; port <= PORT_RANGE.max; port++) {
-      if (port === 8095) continue; // Already tried via default
-      try {
-        const probe = await fetch(`http://127.0.0.1:${port}/health`, {
-          signal: AbortSignal.timeout(1000),
-        });
-        if (probe.ok) {
-          const data = await probe.json().catch(() => null);
-          // Verify it's the LangExtract service (has spaCy/NER services)
-          if (data?.services?.spacy !== undefined || data?.version) {
-            resolvedUrl = `http://127.0.0.1:${port}`;
-            resolvedSource = 'discovery';
-            lastResolution = now;
-            return resolvedUrl;
-          }
-        }
-      } catch {
-        // Port not listening
-      }
     }
   } catch {
     // Discovery unavailable

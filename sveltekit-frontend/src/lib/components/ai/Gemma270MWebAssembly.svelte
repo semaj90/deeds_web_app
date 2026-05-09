@@ -200,7 +200,11 @@
 					throw new Error(err.error || `Upload failed (${uploadRes.status})`);
 				}
 				const uploadData = await uploadRes.json();
-				uploadedEvidenceId = uploadData.id || uploadData.evidenceId || '';
+				const createdEvidence = uploadData.data ?? uploadData;
+				uploadedEvidenceId = createdEvidence?.id || createdEvidence?.evidenceId || '';
+				if (!uploadedEvidenceId) {
+					throw new Error('Upload succeeded but no evidence ID was returned');
+				}
 			}
 
 			// Stage 3: YOLO object detection (server-side Python ONNX subprocess)

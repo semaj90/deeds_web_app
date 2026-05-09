@@ -357,7 +357,7 @@ export async function getAllClusterNarratives(_k?: number): Promise<ClusterNarra
     const keys: string[] = [];
     let cursor = '0';
     do {
-      const [next, batch] = await redis.scan(cursor, 'MATCH', 'cluster-summary:*', 'COUNT', 100);
+      const [next, batch] = await redis.scan(cursor, 'MATCH', 'ace:research:cluster-summary:*', 'COUNT', 100);
       cursor = next;
       keys.push(...batch);
     } while (cursor !== '0');

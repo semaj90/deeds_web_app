@@ -81,7 +81,7 @@ type Part = (typeof PARTS)[number];
 // ── Redis helper with retry on stale pool ──────────────────────────────────
 
 function getRedisFresh(): IORedis {
-	return new IORedis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+	return new IORedis(ENV.REDIS_URL, {
 		maxRetriesPerRequest: 1,
 		connectTimeout: 3000,
 		lazyConnect: false
@@ -301,7 +301,7 @@ async function buildTileAtlasPart(
 	errors: Record<string, string>
 ): Promise<{ tileCount: number; payloadVersion: string | null; source: string } | null> {
 	try {
-		const url = `${ENV.QDRANT_URL ?? 'http://localhost:6333'}/collections/codebase_chunks_768`;
+		const url = `${ENV.QDRANT_URL}/collections/codebase_chunks_768`;
 		const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
 		if (!res.ok) throw new Error(`Qdrant ${res.status}`);
 		const data = (await res.json()) as Record<string, unknown>;
