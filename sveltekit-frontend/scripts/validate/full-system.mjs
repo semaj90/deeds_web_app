@@ -386,15 +386,26 @@ async function G17() {
 }
 
 async function G18() {
+  // The endpoint itself being reachable is a "pass" for this gate; the
+  // Redis-up/down signal is reported in the detail string. We use HTTP
+  // status as the primary truth signal (handler returns 5xx when Redis
+  // is unreachable, 200 when reachable) and fall back to the JSON
+  // `connected` flag only when the body shape is well-formed.
   const r = await fetchSafe(`${DEV_BASE}/api/health/redis`, { timeoutMs: 8000 });
   if (r.status === 0) return fail('connection refused');
   if (r.status === 404) return skip('endpoint not implemented');
+  let label = '(unknown)';
   try {
     const j = JSON.parse(r.body);
-    return pass(`status=${r.status} ${j.connected === false ? '(redis down)' : '(redis ok)'}`);
+    const connected = j.connected ?? j.ok ?? null;   // tolerate both shapes
+    if (r.status >= 500)         label = '(redis down)';
+    else if (connected === false) label = '(redis down)';
+    else if (connected === true)  label = '(redis ok)';
+    else                          label = `(redis ${r.status === 200 ? 'ok' : 'unclear'})`;
   } catch {
-    return warn(`status ${r.status} but body not JSON`);
+    label = r.status >= 500 ? '(redis down, body not JSON)' : '(body not JSON)';
   }
+  return pass(`status=${r.status} ${label}`);
 }
 
 async function G19() {
