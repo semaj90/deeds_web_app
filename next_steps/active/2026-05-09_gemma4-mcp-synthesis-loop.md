@@ -1,0 +1,195 @@
+# Plan — Gemma4 ⇄ MCP ⇄ Claude Code synthesis loop
+
+**Date**: 2026-05-09
+**Status**: design (no code yet — scaffolding only after this plan is approved)
+**Owner**: solo
+**Related**: [claude-code-agent-os.md](../../sveltekit-frontend/docs/architecture/claude-code-agent-os.md), [drizzle-inspection-mcp.md](../../sveltekit-frontend/docs/architecture/drizzle-inspection-mcp.md), [obsidian-neo4j-couchdb-alignment.md](../../sveltekit-frontend/docs/architecture/obsidian-neo4j-couchdb-alignment.md)
+
+## Goal
+
+Build a token-cheap retrieval+synthesis loop that runs **locally on
+Gemma4 + TRACE MCP**, produces a structured implementation brief as
+markdown, and hands it to **Claude Code** for the actual file edits.
+Claude Code only sees the distilled brief, not the raw retrieval —
+that's where the token savings come from.
+
+```
+┌───────────────────────────────────────────────────────────────────┐
+│ User question / TODO                                             │
+└────────────────────────────┬──────────────────────────────────────┘
+                             │
+                             ▼
+┌───────────────────────────────────────────────────────────────────┐
+│ Lane 1 — Local retrieval pass (Gemma4 + MCP, no Claude tokens)   │
+│                                                                   │
+│   Gemma4 ──► gemma4-offload MCP ──► trace.kag_search             │
+│              (stdio)                trace.wiki_note_lookup        │
+│                                     graph.expand_neighborhood     │
+│                                     graph.pagerank_top            │
+│                                     db.schema_overview / inspect  │
+│                                     ts.symbol_lookup / route_map  │
+│                                                                   │
+│   ↳ writes raw retrieval JSON to                                 │
+│     scratch/synthesis-runs/<ts>/raw-retrieval.json               │
+└────────────────────────────┬──────────────────────────────────────┘
+                             │
+                             ▼
+┌───────────────────────────────────────────────────────────────────┐
+│ Lane 2 — Graph analysis pass (Neo4j + CouchDB MapReduce)         │
+│                                                                   │
+│   raw-retrieval.json ──► neo4j read-only Cypher                  │
+│                          (paths, communities, authority blend)    │
+│                       ──► couchdb view: graph_recommendations    │
+│                          + couchdb:pagerank_scores               │
+│                                                                   │
+│   ↳ writes graph-analysis.json (paths, clusters, authority)      │
+└────────────────────────────┬──────────────────────────────────────┘
+                             │
+                             ▼
+┌───────────────────────────────────────────────────────────────────┐
+│ Lane 3 — Rerank + KAG / web_search fallback                      │
+│                                                                   │
+│   Gemma4 reranks raw + graph by relevance.                       │
+│   If confidence low (< 0.6 ACE blend score):                     │
+│     ─► call kag.expand or web_search MCP tool                    │
+│     ─► merge new evidence, rerank again                          │
+│                                                                   │
+│   ↳ writes ranked-context.json (top 10-15 chunks + citations)    │
+└────────────────────────────┬──────────────────────────────────────┘
+                             │
+                             ▼
+┌───────────────────────────────────────────────────────────────────┐
+│ Lane 4 — Synthesis (Gemma4 single shot)                          │
+│                                                                   │
+│   Input:  ranked-context.json + AGENTS.md hierarchy              │
+│   Output: memory/implementation-briefs/<ts>_<slug>.md            │
+│                                                                   │
+│   Brief format: Goal / Files / Constraints / Steps / Smoke /     │
+│                 Do-not-touch / MCP context used                  │
+└────────────────────────────┬──────────────────────────────────────┘
+                             │
+                             ▼
+┌───────────────────────────────────────────────────────────────────┐
+│ Lane 5 — Claude Code implementation                              │
+│                                                                   │
+│   /implement memory/implementation-briefs/<ts>_<slug>.md         │
+│     ─► Claude Code reads ONE markdown file (small token spend)   │
+│     ─► uses .claude/skills/* (bits-ui, uno, drizzle, trace)      │
+│     ─► uses .claude/agents/* (drizzle-inspector etc.) for sub-   │
+│         tasks if needed                                           │
+│     ─► hooks/PreToolUse blocks destructive actions                │
+│     ─► writes diff, runs smoke, archives result                   │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+## Web research findings (verified 2026-05-09)
+
+These shape the plan; cited so future-me can re-verify.
+
+| Topic | Verified fact | Source |
+|-------|---------------|--------|
+| **Skills** | `.claude/skills/<name>/SKILL.md` with YAML frontmatter (`description`, `disable-model-invocation`, `allowed-tools`); auto-discovered from project / personal / plugin scope; invoked by name match against description or `/skill-name`. | [code.claude.com/docs/en/skills](https://code.claude.com/docs/en/skills.md) |
+| **Subagents** | `.claude/agents/<name>.md`. `tools:` field accepts space-separated names INCLUDING `mcp__server__tool` patterns. **Important**: `tools:` declares *preferences* — it does not hard-restrict access. Use hooks for hard restriction. | [code.claude.com/docs/en/subagents](https://code.claude.com/docs/en/subagents.md) |
+| **Hooks** | 30+ events (`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `SubagentStop`, `FileChanged`, `PreCompact`, …). Config in `.claude/settings.json`. Matchers are regex-capable. **Only `PreToolUse` can block/modify** via `permissionDecision: allow|deny|ask` + optional `updatedInput`. `PostToolUse` exit-code-2 also blocks. | [code.claude.com/docs/en/hooks](https://code.claude.com/docs/en/hooks.md) |
+| **Plugins** | Manifest at `<plugin>/.claude-plugin/plugin.json`. Bundles skills/agents/hooks/MCP. MCP servers declared in `.mcp.json`. Install via `/plugin install` or `--plugin-dir`. | [code.claude.com/docs/en/plugins](https://code.claude.com/docs/en/plugins.md) |
+| **MCP TS SDK** | Stable v1.29.0 (`@modelcontextprotocol/sdk`), v2 pre-alpha. Tool registration requires Zod schemas; compatible with `zod@^3.22`. **The trace-mcp-server `tools/list` Zod crash is a version-mismatch bug** — pin zod to ^3.22 to fix. | [github.com/modelcontextprotocol/typescript-sdk](https://github.com/modelcontextprotocol/typescript-sdk) |
+| **mcporter** | Real, maintained CLI. `npx mcporter list` auto-discovers Claude Code/Cursor/etc. configs and prints registered tools. `npx mcporter call <tool> <args>` executes from shell — useful for smoke-testing TRACE MCP without Claude. | [mcporter.sh](https://mcporter.sh/) |
+| **Hermes Agent (Nous)** | Real, but **not** what we need. It's a Python TUI agent with codebase introspection (LOC counting via pygount). Not a design tool, not a SvelteKit-aware planner, no GUI. | [hermes-agent.nousresearch.com](https://hermes-agent.nousresearch.com/) |
+| **Closer matches for "ingest codebase, emit plans" UI** | **Open WebUI** (agent orchestration + tool use), **AnythingLLM** (RAG over codebase), **LM Studio** / **Jan** (model hosting + chat). None of them replace Claude Code as the *implementation* layer; treat them as alternative front-ends for the *retrieval+synthesis* lane. | (verified by claude-code-guide agent) |
+| **Figma Claude plugin** | Official, uses Code Connect, works with Claude Code CLI (not just desktop). Code-to-Canvas (Feb 2026) goes the other way too. | [claude.com/plugins/figma](https://claude.com/plugins/figma) |
+
+## Verdict on Hermes Agent / desktop-WebUI route
+
+**Don't pin the loop to Hermes Agent.** It's a TUI codebase-introspection
+toy, not a planner. The user-facing question — "can a desktop webui
+ingest the codebase and hand plans to Claude Code?" — is yes, but the
+right front-end is **Open WebUI** (already common in this stack) or
+**AnythingLLM** (RAG-first), pointed at the same TRACE MCP server +
+gemma4-offload MCP. Either of them just becomes Lane 1's UI; Lanes 2-5
+are unchanged.
+
+For now: skip the desktop-WebUI dependency. Drive the loop from Claude
+Code's CLI itself (it can call MCP tools), keeping the toolchain inside
+one process. Revisit Open WebUI integration only if the multi-tab
+chat/branching workflow becomes a bottleneck.
+
+## Build order
+
+### Phase A — scaffolding (this commit, no behavior change)
+
+1. ✅ Already shipped: `gemma4-offload` stdio MCP (chat/summarize/classify/health), G29/G30/G31 validator gates.
+2. ✅ Already shipped: `claude-code-agent-os.md`, `drizzle-inspection-mcp.md`, `obsidian-neo4j-couchdb-alignment.md`.
+3. **This commit**: scaffold `.claude/skills/{trace-mcp-tooling,bits-ui-svelte5,uno-css-design-system,drizzle-schema-review}/SKILL.md` + `.claude/agents/{drizzle-inspector,sveltekit-route-auditor,topology-medic,obsidian-cartographer}.md` + `gemma4-to-claude-code-handoff.md`.
+
+### Phase B — read-only MCP tools (small)
+
+4. Implement `db.schema_overview` + `db.table_inspect` in `src/mcp/db-inspection-tools.ts` (per [drizzle-inspection-mcp.md](../../sveltekit-frontend/docs/architecture/drizzle-inspection-mcp.md)).
+5. Pin `zod` to `^3.22` in `package.json` to unblock `trace-mcp-server.ts` `tools/list`.
+6. Add `G32 mcp:trace-server-tools-list` (asserts ≥30 tools list cleanly).
+7. Add `G33 mcp:db-inspection-readonly` (asserts no `db.*` tool exposes a write verb).
+
+### Phase C — synthesis loop CLI
+
+8. New script `scripts/synth/run-loop.mjs`:
+   - takes a query/TODO string,
+   - drives Lanes 1-4 via the gemma4-offload MCP (calling sub-tools through TRACE MCP),
+   - emits `memory/implementation-briefs/<ts>_<slug>.md`.
+9. New script `scripts/synth/handoff-to-claude.mjs`:
+   - opens the brief in Claude Code via `claude code --prompt-file <path>` (or copies to clipboard if CLI hook unavailable),
+   - records the handoff in `context_timeline` as `event_type='synthesis_handoff'`.
+
+### Phase D — hardening
+
+10. PreToolUse hook in `.claude/settings.json` blocking the destructive Bash list from [claude-code-agent-os.md](../../sveltekit-frontend/docs/architecture/claude-code-agent-os.md).
+11. PostToolUse hook appending JSONL audit to `memory/runs/claude-code/<YYYY-MM-DD>.jsonl`.
+12. UserPromptSubmit hook injecting the port map + active next_steps headers.
+13. `trace.alignment_check` MCP tool that bundles G29+G30+G31+`tools/list` probe into one JSON answer for any agent.
+
+### Phase E — packaging (defer)
+
+14. Wrap the whole `.claude/{skills,agents,hooks}` + `gemma4-offload-mcp.mjs` into a `trace-claude-plugin/` with `.claude-plugin/plugin.json`. Only after Phase D is stable.
+
+## Cost model
+
+| Step | Tokens spent on Claude API | Tokens spent on local Gemma4 |
+|------|---------------------------|------------------------------|
+| Lane 1 retrieval | 0 | ~2-4 K (multi-tool calls) |
+| Lane 2 graph analysis | 0 | ~1 K (rerank prompt) |
+| Lane 3 rerank + KAG | 0 | ~2 K |
+| Lane 4 synthesis | 0 | ~3-5 K (writes brief) |
+| Lane 5 Claude Code reads brief + implements | **~3-8 K** (one .md + targeted edits) | 0 |
+
+Without the loop, Lane 5 alone would spend 30-80 K because Claude Code
+would re-discover everything Lanes 1-3 already found. **Net savings:
+≈75-90 % per implementation cycle.**
+
+## Risks + mitigations
+
+| Risk | Mitigation |
+|------|-----------|
+| Brief is too compressed → Claude Code asks follow-up questions, eating savings | Lane 4 prompt mandates "files: with line ranges" + "constraints: explicit list"; G34 (planned) lints briefs for required sections |
+| Gemma4 hallucinates a file path that doesn't exist | Every retrieved chunk in Lane 3 carries a `pg_id` / `file_path`; Lane 4 prompt says "cite only paths that appeared in `files[]` of the input"; pre-flight script verifies paths exist before writing brief |
+| Subagent `tools:` field doesn't actually restrict (per docs) — agent could call write tools anyway | Use hooks (PreToolUse) for hard restriction. The `tools:` declaration is a hint to the agent's planner, not a sandbox. |
+| TRACE MCP `tools/list` Zod crash blocks the loop | Phase B step 5 — pin `zod@^3.22`; G32 catches regressions |
+| `synth/run-loop.mjs` hangs because TurboQuant is down | gemma4-offload MCP already cascades to Ollama; loop should also write a partial brief on backend failure rather than hang |
+
+## Open questions (decide before Phase C)
+
+1. **Brief storage**: `memory/implementation-briefs/` (vault) vs `next_steps/auto/` (next-steps lane)? Leaning vault — briefs are derivative, not authoritative TODOs.
+2. **Handoff trigger**: explicit (`/synth-handoff <slug>`) vs auto-open (Claude Code launches when brief is written)? Leaning explicit so the human reviews the brief first.
+3. **Confidence threshold for KAG fallback**: 0.6 is a guess. Wire it to ACE telemetry once Phase C runs a few cycles, then tune.
+4. **Open WebUI front-end**: defer or build now? Defer — ship the CLI loop first, evaluate UX, then decide.
+
+## Smoke commands (will exist after Phase C)
+
+```bash
+# end-to-end loop test, dry-run (no Claude Code handoff)
+node scripts/synth/run-loop.mjs --query "wire browser context lane" --dry-run
+
+# inspect last brief
+ls -t memory/implementation-briefs/ | head -1 | xargs -I{} cat memory/implementation-briefs/{}
+
+# round-trip via mcporter (no Claude in the loop at all)
+npx mcporter call gemma4-offload.gemma4_summarize text:"..." target_words:80
+npx mcporter call trace.kag_search query:"reranker topology"
+```
