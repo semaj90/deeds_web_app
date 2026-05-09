@@ -30,18 +30,12 @@ const AI_CHAT_IMAGES_BUCKET = ENV.MINIO_LIBRARY_BUCKET;
  * Create MinIO client for health checks
  */
 function createMinioClient(): Client {
-	const endPoint = ENV.MINIO_ENDPOINT;
-	const port = parseInt(ENV.MINIO_PORT ?? '9000', 10);
-	const accessKey = ENV.MINIO_ACCESS_KEY;
-	const secretKey = ENV.MINIO_SECRET_KEY;
-	const useSSL = ENV.MINIO_USE_SSL === 'true';
-
 	return new Client({
-		endPoint: endPoint.split(':')[0],
-		port: endPoint.includes(':') ? parseInt(endPoint.split(':')[1], 10) : port,
-		useSSL,
-		accessKey,
-		secretKey
+		endPoint: ENV.MINIO_ENDPOINT,
+		port: parseInt(ENV.MINIO_PORT, 10),
+		useSSL: ENV.MINIO_USE_SSL === 'true',
+		accessKey: ENV.MINIO_ACCESS_KEY,
+		secretKey: ENV.MINIO_SECRET_KEY
 	});
 }
 

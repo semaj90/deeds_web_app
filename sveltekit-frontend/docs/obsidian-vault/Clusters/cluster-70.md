@@ -12,7 +12,7 @@ top_tags: ["embedding","api","server","vector","redis"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 contains: ["[[Files/src__routes__api__library__crawl___server]]","[[Files/src__routes__api__admin__seed-knowledge___server]]","[[Files/src__lib__server__analytics__agentic-web-indexer]]","[[Files/src__lib__server__graph__pg-neo4j-sync]]","[[Files/src__lib__server__tools__handlers__crawldocs]]","[[Files/src__routes__api__analytics__research-summaries___server]]","[[Files/src__routes__api__codebase-index__gpu-pipeline___server]]","[[Files/src__lib__server__tools__handlers__kbsearch]]"]
 same: ["[[Clusters/cluster-25]]","[[Clusters/cluster-85]]","[[Clusters/cluster-26]]","[[Clusters/cluster-31]]","[[Clusters/cluster-80]]"]

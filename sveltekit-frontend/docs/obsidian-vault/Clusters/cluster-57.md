@@ -12,7 +12,7 @@ top_tags: ["embedding","vector","auth","server-module","config"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__vector__multi-store]]","[[Files/src__lib__stores.svelte]]","[[Files/src__lib__utils__route-operation-logger]]","[[Files/src__lib__shims__worker-threads-browser-shim]]","[[Files/src__lib__server__gpu__libtorch-bridge]]","[[Files/src__lib__stores__unified__index.svelte]]","[[Files/src__lib__db__pool]]","[[Files/src__lib__server__retrieval__context-buffer]]"]
 same: ["[[Clusters/cluster-52]]","[[Clusters/cluster-59]]","[[Clusters/cluster-48]]","[[Clusters/cluster-6]]","[[Clusters/cluster-17]]"]

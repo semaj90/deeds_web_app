@@ -4,6 +4,7 @@
  * Integrates with: redis-service.ts, loki-redis-integration.ts, redis-helper.ts
  */
 import type { RedisOptions } from 'ioredis';
+import { getRedisHost, getRedisPassword, getRedisPort } from './env.server';
 
 // Environment-based configuration
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -12,9 +13,9 @@ const isTest = process.env.NODE_ENV === 'test';
 
 // Base Redis configuration
 export const REDIS_BASE_CONFIG: RedisOptions = {
-    host: process.env?.REDIS_HOST ?? 'localhost',
-    port: parseInt(process.env?.REDIS_PORT ?? '6379'),
-    password: process.env?.REDIS_PASSWORD ?? undefined,
+    host: getRedisHost(),
+    port: getRedisPort(),
+    password: getRedisPassword() || undefined,
     db: parseInt(process.env?.REDIS_DB ?? '0'),
     // Connection settings optimized for legal AI workloads
     connectTimeout: 10000,
@@ -167,9 +168,9 @@ export function getRedisConfig(service?: keyof typeof SERVICE_CONFIGS): RedisOpt
 
 // Connection URL builder for external tools
 export function getRedisUrl(database?: number): string {
-    const host = process.env?.REDIS_HOST ?? 'localhost';
-    const port = process.env?.REDIS_PORT ?? '6379';
-    const password = process.env.REDIS_PASSWORD;
+    const host = getRedisHost();
+    const port = String(getRedisPort());
+    const password = getRedisPassword();
     const db = database ?? 0;
     const auth = password ? `:${password}@` : '';
     return `redis://${auth}${host}:${port}/${db}`;

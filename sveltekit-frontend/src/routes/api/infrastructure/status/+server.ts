@@ -23,7 +23,11 @@ import { getAdapterStatus } from '$lib/server/inference/adapter-manifest.js';
 import { getDispatchStats } from '$lib/server/queue/dispatch-inline.js';
 import { getInferenceLogStats } from '$lib/server/observability/inference-log.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+    return json({ error: 'Unauthorized', degraded: true, ts: new Date().toISOString() }, { status: 401 });
+  }
+
 	const start = Date.now();
 	const TIMEOUT = 3000;
 

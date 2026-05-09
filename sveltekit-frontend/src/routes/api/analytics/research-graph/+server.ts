@@ -12,7 +12,7 @@
 
 import { json }           from '@sveltejs/kit';
 import { z }              from 'zod';
-import { getRedis }       from '$lib/server/redis.js';
+import { getRedis, getJson } from '$lib/server/redis.js';
 import {
 	buildResearchGraph,
 	computeRlPolicy,
@@ -22,35 +22,41 @@ import {
 } from '$lib/server/analytics/research-graph-rl.js';
 import type { RequestHandler } from './$types';
 
-const REDIS_GRAPH_KEY   = 'rsgraph:clusters';
-const REDIS_POLICY_KEY  = 'rlpolicy:pipeline_weights';
+const REDIS_GRAPH_KEY   = 'ace:research:graph';
+const REDIS_POLICY_KEY  = 'ace:research:policy';
 // Rate-limit: max 10 rl-step calls per user per minute (GPU-bound operation)
 const RL_RATE_LIMIT     = 10;
 const RL_RATE_WINDOW_S  = 60;
+
+const DEGRADED_GET_RESPONSE = {
+	graph: { clusters: [], totalSummaries: 0, builtAt: null },
+	policy: null,
+};
 
 // ── GET ───────────────────────────────────────────────────────────────────────
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) {
-		return json({ clusters: [], policy: null, error: 'Unauthorized' }, { status: 401 });
+		return json({ ...DEGRADED_GET_RESPONSE, error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
-		const redis = getRedis();
-		const [rawGraph, rawPolicy] = await Promise.all([
-			redis.get(REDIS_GRAPH_KEY),
-			redis.get(REDIS_POLICY_KEY),
+		// Use a 30s timeout via getJson logic internally if possible, or just await
+		const [graph, policy] = await Promise.all([
+			getJson(REDIS_GRAPH_KEY).catch(() => null),
+			getJson(REDIS_POLICY_KEY).catch(() => null),
 		]);
 
-		const graph  = rawGraph  ? JSON.parse(rawGraph)  : null;
-		const policy = rawPolicy ? JSON.parse(rawPolicy) : null;
-
 		return json({
-			graph:  graph  ?? { clusters: [], totalSummaries: 0, builtAt: null },
+			graph:  graph  ?? DEGRADED_GET_RESPONSE.graph,
 			policy: policy ?? null,
 		});
-	} catch {
-		return json({ graph: { clusters: [], totalSummaries: 0, builtAt: null }, policy: null });
+	} catch (err) {
+		console.warn('[ResearchGraph] GET failed:', err);
+		return json({
+			...DEGRADED_GET_RESPONSE,
+			error: (err as Error)?.message ?? 'Retrieval failed',
+		});
 	}
 };
 
@@ -104,47 +110,55 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const data = parsed.data;
 
-	if (data.action === 'build') {
-		const result = await buildResearchGraph();
-		return json(result);
-	}
+	try {
+		if (data.action === 'build') {
+			const result = await buildResearchGraph();
+			return json(result);
+		}
 
-	if (data.action === 'policy') {
-		const weights = await computeRlPolicy();
-		return json({ weights });
-	}
+		if (data.action === 'policy') {
+			const weights = await computeRlPolicy();
+			return json({ weights });
+		}
 
-	if (data.action === 'search') {
-		const results = await searchWithTagEmbedding(
-			data.query,
-			data.embedding,
-			data.tags,
-			data.topK,
-		);
-		// Also return cached policy for client-side display
-		const policy = await getCachedPolicy();
-		return json({ results, policy });
-	}
+		if (data.action === 'search') {
+			const results = await searchWithTagEmbedding(
+				data.query,
+				data.embedding,
+				data.tags,
+				data.topK,
+			);
+			// Also return cached policy for client-side display
+			const policy = await getCachedPolicy();
+			return json({ results, policy });
+		}
 
-	if (data.action === 'rl-step') {
-		// Token-bucket rate-limit: 10 requests/user/minute (GPU-bound)
-		const bucketKey = `ratelimit:rl-step:${locals.user.id}`;
-		try {
-			const redis = getRedis();
-			const count = await redis.incr(bucketKey);
-			if (count === 1) await redis.expire(bucketKey, RL_RATE_WINDOW_S);
-			if (count > RL_RATE_LIMIT) {
-				return json({ error: 'Rate limit exceeded — max 10 rl-step requests per minute' }, { status: 429 });
-			}
-		} catch { /* Redis down — allow through rather than block */ }
+		if (data.action === 'rl-step') {
+			// Token-bucket rate-limit: 10 requests/user/minute (GPU-bound)
+			const bucketKey = `ratelimit:rl-step:${locals.user.id}`;
+			try {
+				const redis = getRedis();
+				const count = await redis.incr(bucketKey);
+				if (count === 1) await redis.expire(bucketKey, RL_RATE_WINDOW_S);
+				if (count > RL_RATE_LIMIT) {
+					return json({ error: 'Rate limit exceeded — max 10 rl-step requests per minute' }, { status: 429 });
+				}
+			} catch { /* Redis down — allow through rather than block */ }
 
-		const result = await runResearchRlLoop({
-			query:          data.query,
-			queryEmbedding: data.embedding,
-			tags:           data.tags,
-			pipeline:       data.pipeline,
-		});
-		return json(result);
+			const result = await runResearchRlLoop({
+				query:          data.query,
+				queryEmbedding: data.embedding,
+				tags:           data.tags,
+				pipeline:       data.pipeline,
+			});
+			return json(result);
+		}
+	} catch (err) {
+		console.error(`[ResearchGraph] POST ${data.action} failed:`, err);
+		return json({
+			error: (err as Error)?.message ?? `Action ${data.action} failed`,
+			action: data.action,
+		}, { status: 500 });
 	}
 
 	return json({ error: 'Unknown action' }, { status: 400 });

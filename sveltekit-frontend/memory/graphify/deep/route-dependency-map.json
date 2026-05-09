@@ -329,6 +329,18 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/admin/memory-inspector/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/admin/memory-inspector/+page.svelte": {
+    "zone": "route",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/(app)/admin/observability/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
@@ -1277,6 +1289,18 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/demos/scene-intent-2d/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 1
+  },
+  "src/routes/(app)/demos/scene-intent-2d/+page.svelte": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
+  },
   "src/routes/(app)/demos/search-tools/+page.svelte": {
     "zone": "route",
     "directDeps": 3,
@@ -1747,7 +1771,7 @@
   },
   "src/routes/(app)/terminal/+page.svelte": {
     "zone": "route",
-    "directDeps": 10,
+    "directDeps": 11,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -1883,6 +1907,12 @@
     "serverDeps": 3,
     "dbDeps": 0
   },
+  "src/routes/api/ace/recommendations/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 0
+  },
   "src/routes/api/ace/status/+server.ts": {
     "zone": "route",
     "directDeps": 2,
@@ -1945,8 +1975,8 @@
   },
   "src/routes/api/admin/observability/+server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
+    "directDeps": 3,
+    "serverDeps": 3,
     "dbDeps": 1
   },
   "src/routes/api/admin/pipeline/events/+server.ts": {
@@ -2047,8 +2077,8 @@
   },
   "src/routes/api/ai/chat-direct/+server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
+    "directDeps": 2,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/ai/context/+server.ts": {
@@ -2359,8 +2389,8 @@
   },
   "src/routes/api/audio/search/+server.ts": {
     "zone": "route",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 2
   },
   "src/routes/api/audio/upload/+server.ts": {
@@ -2515,8 +2545,8 @@
   },
   "src/routes/api/cache/stats/+server.ts": {
     "zone": "route",
-    "directDeps": 5,
-    "serverDeps": 5,
+    "directDeps": 6,
+    "serverDeps": 6,
     "dbDeps": 0
   },
   "src/routes/api/cache/warm-up/+server.ts": {
@@ -3407,6 +3437,18 @@
     "serverDeps": 1,
     "dbDeps": 0
   },
+  "src/routes/api/comfyui/health/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/comfyui/render/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "src/routes/api/consolidation/status/+server.ts": {
     "zone": "route",
     "directDeps": 2,
@@ -4087,8 +4129,8 @@
   },
   "src/routes/api/hypergraph/search/+server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
+    "directDeps": 3,
+    "serverDeps": 3,
     "dbDeps": 0
   },
   "src/routes/api/hypergraph/traverse/+server.ts": {
@@ -4870,6 +4912,18 @@
     "directDeps": 7,
     "serverDeps": 7,
     "dbDeps": 2
+  },
+  "src/routes/api/reconstruction/compile/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 1
+  },
+  "src/routes/api/reconstruction/scene-intent/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
   },
   "src/routes/api/reports/+server.ts": {
     "zone": "route",

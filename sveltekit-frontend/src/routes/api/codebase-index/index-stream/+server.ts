@@ -124,11 +124,13 @@ async function mirrorToPostgres(
 	try {
 		await pool.query(
       `INSERT INTO codebase_chunk_index
-			   (qdrant_id, relative_path, symbol, kind, line_start, line_end, content,
+			   (qdrant_id, chunk_id, relative_path, symbol, kind, line_start, line_end, content,
 			    content_embedding, signature_embedding, summary_embedding,
-			    gpu_cluster, som_cluster, page_rank_score, tags, cluster_summary, updated_at)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15::jsonb, NOW())
+			    gpu_cluster, som_cluster, som_bmu_row, som_bmu_col, manifold4,
+			    page_rank_score, tags, cluster_summary, updated_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18::jsonb, $19::jsonb, NOW())
 			 ON CONFLICT (qdrant_id) DO UPDATE SET
+			    chunk_id           = COALESCE(EXCLUDED.chunk_id, codebase_chunk_index.chunk_id),
 			    relative_path      = COALESCE(NULLIF(EXCLUDED.relative_path, ''), codebase_chunk_index.relative_path),
 			    content            = EXCLUDED.content,
 			    content_embedding  = COALESCE(EXCLUDED.content_embedding, codebase_chunk_index.content_embedding),
@@ -136,12 +138,16 @@ async function mirrorToPostgres(
 			    summary_embedding  = COALESCE(EXCLUDED.summary_embedding, codebase_chunk_index.summary_embedding),
 			    gpu_cluster        = EXCLUDED.gpu_cluster,
 			    som_cluster        = EXCLUDED.som_cluster,
+			    som_bmu_row        = EXCLUDED.som_bmu_row,
+			    som_bmu_col        = EXCLUDED.som_bmu_col,
+			    manifold4          = EXCLUDED.manifold4,
 			    page_rank_score    = EXCLUDED.page_rank_score,
 			    tags               = EXCLUDED.tags,
 			    cluster_summary    = EXCLUDED.cluster_summary,
 			    updated_at         = NOW()`,
       [
         String(chunk.id),
+        (p['chunk_id'] as string) ?? null,
         relativePath,
         (p['symbol'] as string) ?? null,
         (p['kind'] as string) ?? null,
@@ -153,6 +159,9 @@ async function mirrorToPostgres(
         summaryVec ? JSON.stringify(summaryVec) : null,
         (p['neo4j_gpuCluster'] as number) ?? (p['gpu_cluster'] as number) ?? null,
         (p['som_cluster'] as number) ?? null,
+        (p['som_bmu_row'] as number) ?? null,
+        (p['som_bmu_col'] as number) ?? null,
+        Array.isArray(p['manifold4']) ? p['manifold4'] : null,
         (p['pagerank_score'] as number) ?? (p['pagerank_score_couchdb'] as number) ?? null,
         JSON.stringify(p['tags'] ?? []),
         JSON.stringify(clusterSummary ?? {}),

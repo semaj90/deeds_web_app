@@ -1,13 +1,13 @@
 /**
  * Centralized utility to get the Ollama API endpoint.
  * Prioritizes the process.env.OLLAMA_URL environment variable for Docker/production,
- * and falls back to a localhost URL for development.
+ * and falls back to the canonical server ENV default.
  */
 
+import { ENV } from '$lib/server/env.server.js';
+
 export function getOllamaEndpoint(): string {
-    // Use process.env.OLLAMA_URL for Docker service name or production environment.
-    // Fallback to localhost for local development without Docker Compose.
-    const ollamaUrl = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+    const ollamaUrl = ENV.OLLAMA_BASE_URL;
     console.log(`Using Ollama endpoint: ${ollamaUrl}`);
     return ollamaUrl;
 }

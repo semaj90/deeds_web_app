@@ -1,0 +1,773 @@
+{
+  "generated_at": "2026-05-09T00:49:38.573Z",
+  "input_path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph\\codebase-graph.json",
+  "source_format": "json",
+  "parsed": 3676,
+  "emitted": 3566,
+  "invalid": 110,
+  "duplicate_count": 110,
+  "duplicates": 110,
+  "output_files": {
+    "cards": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\kb\\notecards\\graph_file_cards.jsonl",
+    "report": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\kb\\notecards\\graph_file_cards.report.json",
+    "invalid": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\kb\\notecards\\graph_file_cards.invalid.jsonl"
+  },
+  "top_20_ranked_cards": [
+    {
+      "card_id": "card:codebase:src/mcp/server.ts:29833c246993",
+      "source_id": "src/mcp/server.ts",
+      "source_path": "src/mcp/server.ts",
+      "score": 0.5895,
+      "risk_score": 0.51,
+      "line_count": 4312,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "module",
+      "zone": "shared",
+      "tags": [
+        "ts",
+        "src",
+        "mcp",
+        "server.ts",
+        "db-schema",
+        "auth",
+        "zod",
+        "module",
+        "shared"
+      ],
+      "exports": [
+        "server",
+        "setupToolHandlers"
+      ],
+      "graph_neighbors": [
+        "@modelcontextprotocol/sdk/server/index.js",
+        "@modelcontextprotocol/sdk/server/stdio.js",
+        "@modelcontextprotocol/sdk/types.js",
+        "src/mcp/index.js",
+        "src/lib/server/cache/code-llm-index.js",
+        "src/lib/server/ollama.js",
+        "src/lib/server/docling.js",
+        "src/lib/server/analysis/entity-extraction.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/evidence/upload/+server.ts:9441219d2516",
+      "source_id": "src/routes/api/evidence/upload/+server.ts",
+      "source_path": "src/routes/api/evidence/upload/+server.ts",
+      "score": 0.5455,
+      "risk_score": 0.65,
+      "line_count": 2293,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema",
+        "auth",
+        "zod",
+        "server",
+        "evidence"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/evidence/upload/$types",
+        "src/lib/server/minio-client",
+        "src/lib/server/db/client",
+        "src/lib/server/db/schema-postgres.js",
+        "src/lib/server/evidence-progress",
+        "src/lib/server/vector/qdrant-manager.js",
+        "src/lib/server/ocr/hybrid.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/ai/gemma4-agent.ts:ba8c00444e48",
+      "source_id": "src/lib/server/ai/gemma4-agent.ts",
+      "source_path": "src/lib/server/ai/gemma4-agent.ts",
+      "score": 0.5202,
+      "risk_score": 0.62,
+      "line_count": 1970,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "ai",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "auth",
+        "zod",
+        "ai",
+        "llm"
+      ],
+      "exports": [
+        "GEMMA4_ALLOWED_TOOLS",
+        "truncateToolResult",
+        "parseToolRequest",
+        "AgentRunResult",
+        "runGemma4Agent"
+      ],
+      "graph_neighbors": [
+        "src/lib/server/ollama.js",
+        "src/lib/server/grpc/embedding-client.js",
+        "src/lib/server/vector/qdrant-manager.js",
+        "src/lib/server/graph/hypergraph-4d.js",
+        "src/lib/server/retrieval/topology-search-client.js",
+        "src/lib/server/db/client",
+        "src/lib/server/db/schema-postgres.js",
+        "src/lib/server/ai/token-tracker.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/sse/chat/+server.ts:4a9793febe34",
+      "source_id": "src/routes/api/sse/chat/+server.ts",
+      "source_path": "src/routes/api/sse/chat/+server.ts",
+      "score": 0.5084,
+      "risk_score": 0.61,
+      "line_count": 2604,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.5,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema",
+        "auth",
+        "zod",
+        "server"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/sse/chat/$types",
+        "src/lib/server/db/client",
+        "src/lib/server/db/schema",
+        "src/lib/server/env.server.js",
+        "src/lib/server/ollama.js",
+        "src/lib/server/retrieval/codebase-context.js",
+        "src/lib/server/retrieval/graph-context.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/(app)/admin/search-intelligence/+page.svelte:42e76e520e78",
+      "source_id": "src/routes/(app)/admin/search-intelligence/+page.svelte",
+      "source_path": "src/routes/(app)/admin/search-intelligence/+page.svelte",
+      "score": 0.4728,
+      "risk_score": 0.58,
+      "line_count": 4232,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.5,
+      "summary_presence": 0,
+      "kind": "route",
+      "zone": "client",
+      "tags": [
+        "svelte",
+        "src",
+        "routes",
+        "(app)",
+        "route",
+        "component",
+        "auth",
+        "zod",
+        "client"
+      ],
+      "exports": [],
+      "graph_neighbors": [
+        "src/lib/components/ui/Icon.svelte",
+        "src/lib/components/ui/FeedbackButtons.svelte",
+        "src/lib/components/analytics/ResearchSummariesBrowser.svelte",
+        "src/lib/components/analytics/LiveResearchPanel.svelte"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/(app)/cases/[id]/board/+page.svelte:818aee550311",
+      "source_id": "src/routes/(app)/cases/[id]/board/+page.svelte",
+      "source_path": "src/routes/(app)/cases/[id]/board/+page.svelte",
+      "score": 0.4663,
+      "risk_score": 0.47,
+      "line_count": 3570,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.25,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "client",
+      "tags": [
+        "svelte",
+        "src",
+        "routes",
+        "(app)",
+        "route",
+        "component",
+        "auth",
+        "client"
+      ],
+      "exports": [],
+      "graph_neighbors": [
+        "src/lib/components/canvas/HybridBoard.svelte",
+        "src/lib/components/ui/Icon.svelte",
+        "src/lib/models/ChatSession.svelte.js",
+        "src/lib/components/ai/TypewriterResponse.svelte",
+        "src/lib/components/legal/AISummaryMiniModal.svelte",
+        "src/lib/components/evidence/board-history.svelte.js",
+        "src/lib/components/evidence/board-persistence.svelte.js",
+        "src/lib/components/evidence/WebGPUParticleOverlay.svelte"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/ace/context-assembler.ts:76b4e598d059",
+      "source_id": "src/lib/server/ace/context-assembler.ts",
+      "source_path": "src/lib/server/ace/context-assembler.ts",
+      "score": 0.4645,
+      "risk_score": 0.35,
+      "line_count": 3628,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.5,
+      "summary_presence": 1,
+      "kind": "server",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "db-schema",
+        "zod",
+        "ace"
+      ],
+      "exports": [
+        "assembleACEContext",
+        "persistACEChunks",
+        "fetchCachedACEChunks",
+        "buildACEPromptCached",
+        "buildACEPrompt",
+        "fetchGlossaryMatches",
+        "CodebaseFetchStats",
+        "BowClusterScore",
+        "fetchCodebaseContext"
+      ],
+      "graph_neighbors": [
+        "src/lib/server/db/client",
+        "src/lib/server/env.server.js",
+        "src/lib/server/db/schema/metadata-spine.js",
+        "src/lib/server/ace/types.js",
+        "src/lib/server/ace/practice-templates.js",
+        "src/lib/server/rag/tag-extractor.js",
+        "src/lib/server/analytics/event-logger.js",
+        "src/lib/server/ace/style-adapter.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/ace/ingest/+server.ts:ce43341a800d",
+      "source_id": "src/routes/api/ace/ingest/+server.ts",
+      "source_path": "src/routes/api/ace/ingest/+server.ts",
+      "score": 0.4597,
+      "risk_score": 0.579,
+      "line_count": 967,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema",
+        "auth",
+        "zod",
+        "server",
+        "ace"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/ace/ingest/$types",
+        "src/lib/server/indexer/legal-chunker.js",
+        "src/lib/server/grpc/embedding-client.js",
+        "src/lib/server/vector/qdrant-manager.js",
+        "src/lib/server/db/client",
+        "src/lib/server/db/schema-postgres.js",
+        "src/lib/server/ocr/hybrid.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/evidence/search/+server.ts:9301fd86827b",
+      "source_id": "src/routes/api/evidence/search/+server.ts",
+      "source_path": "src/routes/api/evidence/search/+server.ts",
+      "score": 0.4584,
+      "risk_score": 0.597,
+      "line_count": 803,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema",
+        "auth",
+        "zod",
+        "server",
+        "evidence"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/evidence/search/$types",
+        "src/lib/server/db/client",
+        "src/lib/server/vector/qdrant-manager.js",
+        "src/lib/server/embedding/embed.js",
+        "src/lib/server/observability/langfuse.js",
+        "src/lib/server/vector-cache.js",
+        "src/lib/server/env.server.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/evidence/analysis/cache/+server.ts:2e07723e6333",
+      "source_id": "src/routes/api/evidence/analysis/cache/+server.ts",
+      "source_path": "src/routes/api/evidence/analysis/cache/+server.ts",
+      "score": 0.4514,
+      "risk_score": 0.558,
+      "line_count": 132,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 1,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "db-schema",
+        "auth",
+        "zod",
+        "server",
+        "cache",
+        "evidence"
+      ],
+      "exports": [
+        "GET"
+      ],
+      "graph_neighbors": [
+        "src/lib/server/db/client",
+        "@sveltejs/kit",
+        "src/lib/server/cache.js",
+        "src/lib/server/redis.js",
+        "src/lib/server/middleware/cache-headers.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/v1/redis/cache/+server.ts:4ad3746dd83f",
+      "source_id": "src/routes/api/v1/redis/cache/+server.ts",
+      "source_path": "src/routes/api/v1/redis/cache/+server.ts",
+      "score": 0.4489,
+      "risk_score": 0.564,
+      "line_count": 33,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 1,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod",
+        "server",
+        "redis",
+        "cache"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "graph_neighbors": [
+        "src/routes/api/v1/redis/cache/$types",
+        "@sveltejs/kit",
+        "src/lib/server/redis.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/codebase-index/gpu-pipeline/+server.ts:4bd5ea5dda81",
+      "source_id": "src/routes/api/codebase-index/gpu-pipeline/+server.ts",
+      "source_path": "src/routes/api/codebase-index/gpu-pipeline/+server.ts",
+      "score": 0.4483,
+      "risk_score": 0.61,
+      "line_count": 1299,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.5,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod",
+        "server"
+      ],
+      "exports": [
+        "POST",
+        "GET"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/codebase-index/gpu-pipeline/$types",
+        "src/lib/server/env.server.js",
+        "src/lib/server/ollama.js",
+        "src/lib/server/redis.js",
+        "src/lib/server/db/client",
+        "src/lib/server/indexer/dual-embedder.js",
+        "src/lib/server/retrieval/graph-context.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/db/schema-postgres.ts:f17dc61d31f0",
+      "source_id": "src/lib/server/db/schema-postgres.ts",
+      "source_path": "src/lib/server/db/schema-postgres.ts",
+      "score": 0.446,
+      "risk_score": 0.31,
+      "line_count": 4345,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.25,
+      "summary_presence": 1,
+      "kind": "db",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "db-schema",
+        "db"
+      ],
+      "exports": [
+        "userRoleEnum",
+        "caseStatusEnum",
+        "casePriorityEnum",
+        "evidenceTypeEnum",
+        "relationTypeEnum",
+        "threatLevelEnum",
+        "patchStatusEnum",
+        "documentStatusEnum",
+        "documentTypeEnum",
+        "summaryTypeEnum",
+        "activityStatusEnum",
+        "verificationStatusEnum"
+      ],
+      "graph_neighbors": [
+        "drizzle-orm/pg-core",
+        "drizzle-orm/relations",
+        "src/lib/server/db/schema",
+        "src/lib/server/db/schema-chat"
+      ]
+    },
+    {
+      "card_id": "card:codebase:tests/infra-ollama-cache-routes.spec.ts:00ba57b5bdf9",
+      "source_id": "tests/infra-ollama-cache-routes.spec.ts",
+      "source_path": "tests/infra-ollama-cache-routes.spec.ts",
+      "score": 0.4395,
+      "risk_score": 0.525,
+      "line_count": 939,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "module",
+      "zone": "shared",
+      "tags": [
+        "ts",
+        "tests",
+        "infra-ollama-cache-routes.spec.ts",
+        "db-schema",
+        "auth",
+        "zod",
+        "test",
+        "module",
+        "shared",
+        "cache"
+      ],
+      "exports": [],
+      "graph_neighbors": [
+        "src/routes/api/infrastructure/status/+server",
+        "src/lib/server/db/client",
+        "src/routes/api/dashboard/stats/+server",
+        "src/routes/api/db/health/+server",
+        "src/routes/api/ollama/pull/+server",
+        "src/routes/api/ollama/generate/+server",
+        "src/routes/api/cache/stats/+server",
+        "src/lib/server/redis.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/synthesis/generate/+server.ts:785ecd5755cd",
+      "source_id": "src/routes/api/synthesis/generate/+server.ts",
+      "source_path": "src/routes/api/synthesis/generate/+server.ts",
+      "score": 0.439,
+      "risk_score": 0.603,
+      "line_count": 1150,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.5,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "has-todo",
+        "auth",
+        "zod",
+        "server"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/synthesis/generate/$types",
+        "src/lib/server/auth-helpers.js",
+        "src/lib/server/env.server.js",
+        "src/lib/server/middleware/rate-limit.js",
+        "src/lib/server/observability/langfuse.js",
+        "src/lib/server/vector-cache.js",
+        "src/lib/server/ace/context-assembler.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/codebase-index/enrich-qdrant/+server.ts:4901ce81a5dd",
+      "source_id": "src/routes/api/codebase-index/enrich-qdrant/+server.ts",
+      "source_path": "src/routes/api/codebase-index/enrich-qdrant/+server.ts",
+      "score": 0.439,
+      "risk_score": 0.579,
+      "line_count": 518,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod",
+        "server",
+        "qdrant"
+      ],
+      "exports": [
+        "POST",
+        "GET"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/codebase-index/enrich-qdrant/$types",
+        "src/lib/server/neo4j-driver.js",
+        "src/lib/server/env.server.js",
+        "src/lib/server/db/client"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/mcp/trace-mcp-server.ts:512ad75c6d11",
+      "source_id": "src/mcp/trace-mcp-server.ts",
+      "source_path": "src/mcp/trace-mcp-server.ts",
+      "score": 0.4378,
+      "risk_score": 0.29,
+      "line_count": 2689,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "module",
+      "zone": "shared",
+      "tags": [
+        "ts",
+        "src",
+        "mcp",
+        "trace-mcp-server.ts",
+        "zod",
+        "module",
+        "shared",
+        "ace"
+      ],
+      "exports": [],
+      "graph_neighbors": [
+        "@modelcontextprotocol/sdk/server/mcp.js",
+        "@modelcontextprotocol/sdk/server/streamableHttp.js",
+        "src/lib/server/ai/context-compression.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/(app)/cases/[id]/evidence/upload/+page.svelte:aa337c9e89bb",
+      "source_id": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+      "source_path": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+      "score": 0.4326,
+      "risk_score": 0.55,
+      "line_count": 599,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "client",
+      "tags": [
+        "svelte",
+        "src",
+        "routes",
+        "(app)",
+        "route",
+        "component",
+        "auth",
+        "zod",
+        "client",
+        "evidence"
+      ],
+      "exports": [],
+      "graph_neighbors": [
+        "$app/state",
+        "src/lib/cache/cache-invalidation",
+        "src/lib/utils/sensitive-info-detector.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/rag/search/+server.ts:841773e77e07",
+      "source_id": "src/routes/api/rag/search/+server.ts",
+      "source_path": "src/routes/api/rag/search/+server.ts",
+      "score": 0.4283,
+      "risk_score": 0.588,
+      "line_count": 1033,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.5,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod",
+        "server"
+      ],
+      "exports": [
+        "POST"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/lib/server/analytics/search-analytics.js",
+        "src/routes/api/rag/search/$types",
+        "src/lib/types/rag-source-validation",
+        "src/lib/server/production-logger.js",
+        "src/lib/server/api/response-helper.js",
+        "src/lib/server/middleware/rate-limiter.js",
+        "src/lib/server/retrieval/tfidf-scorer.js"
+      ]
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/analytics/feedback/+server.ts:fa6687b67c34",
+      "source_id": "src/routes/api/analytics/feedback/+server.ts",
+      "source_path": "src/routes/api/analytics/feedback/+server.ts",
+      "score": 0.4257,
+      "risk_score": 0.57,
+      "line_count": 297,
+      "fan_in": 0,
+      "fan_out": 0,
+      "tag_boost": 0.75,
+      "summary_presence": 1,
+      "kind": "route",
+      "zone": "server",
+      "tags": [
+        "ts",
+        "src",
+        "routes",
+        "api",
+        "route",
+        "api-handler",
+        "auth",
+        "zod",
+        "server",
+        "db"
+      ],
+      "exports": [
+        "POST",
+        "GET"
+      ],
+      "graph_neighbors": [
+        "@sveltejs/kit",
+        "src/routes/api/analytics/feedback/$types",
+        "src/lib/server/db/client",
+        "src/lib/server/redis.js",
+        "src/lib/server/retrieval/qlora-boost.js",
+        "src/lib/server/analytics/research-cache.js",
+        "src/lib/server/graph/hypergraph-4d.js"
+      ]
+    }
+  ]
+}

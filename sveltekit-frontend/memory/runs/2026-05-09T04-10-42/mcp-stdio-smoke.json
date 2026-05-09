@@ -1,0 +1,45 @@
+{
+  "runAt": "2026-05-09T04:10:42.121Z",
+  "summary": {
+    "pass": 6,
+    "skip": 0,
+    "fail": 0,
+    "total": 6
+  },
+  "results": [
+    {
+      "name": "connect",
+      "status": "PASS",
+      "preview": "stdio handshake complete"
+    },
+    {
+      "name": "tools/list",
+      "status": "PASS",
+      "preview": "tools=68"
+    },
+    {
+      "name": "agents_md",
+      "status": "PASS",
+      "ms": 1572,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"path\\\":\\\"src/mcp/server.ts\\\",\\\"markdown\\\":\\\"# AGENTS.md — `src/mcp`\\\\n\\\\n\\\\n\\\\n\\\\n…"
+    },
+    {
+      "name": "codebase:file_intel",
+      "status": "PASS",
+      "ms": 40,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"Error: The client is unauthorized due to authentication failure.\"}],\"isError\":true}"
+    },
+    {
+      "name": "codebase:graph_neighbors",
+      "status": "PASS",
+      "ms": 20,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"Error: The client is unauthorized due to authentication failure.\"}],\"isError\":true}"
+    },
+    {
+      "name": "topology_search",
+      "status": "PASS",
+      "ms": 180,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"query\\\":\\\"redis cache topology\\\",\\\"center\\\":null,\\\"radius\\\":0.3,\\\"totalFound\\\":6,\\…"
+    }
+  ]
+}

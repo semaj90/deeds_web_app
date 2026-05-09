@@ -1,0 +1,43 @@
+{
+  "profile": "turbo3",
+  "profileArgs": {
+    "ctk": "q8_0",
+    "ctv": "turbo3",
+    "label": "q8_0/turbo3 asymmetric TurboQuant"
+  },
+  "port": "8090",
+  "generationsRequested": 2,
+  "results": [
+    {
+      "gen": 1,
+      "prompt": "Summarize the hearsay rule exception for excited utterances ",
+      "ok": true,
+      "latencyMs": 4241,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    },
+    {
+      "gen": 2,
+      "prompt": "What is the statute of limitations for civil fraud claims in",
+      "ok": true,
+      "latencyMs": 3845,
+      "jsonValid": true,
+      "hasNaN": false,
+      "isRepetitive": false,
+      "tokenCount": 300
+    }
+  ],
+  "okCount": 2,
+  "crashCount": 0,
+  "nanCount": 0,
+  "repCount": 0,
+  "jsonFail": 0,
+  "median": 4241,
+  "p95": 4241,
+  "vramBefore": 5652,
+  "vramAfter": 5623,
+  "pass": true,
+  "testedAt": "2026-05-08T16:24:06.815Z"
+}

@@ -1,4 +1,6 @@
 // Type definitions for amqplib when types aren't available
+import { ENV } from '$lib/server/env.server.js';
+
 type AmqpChannel = {
   prefetch: (count: number) => Promise<void>;
   assertQueue: (queue: string, options?: Record<string, unknown>) => Promise<unknown>;
@@ -40,7 +42,7 @@ export const QUEUES = {
 
 export async function getConnection(): Promise<AmqpConnection> {
   if (connection) return connection;
-  const rabbitmqUrl = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:secret123@localhost:5672';
+  const rabbitmqUrl = ENV.RABBITMQ_URL;
   console.log('🐰 Connecting to RabbitMQ:', rabbitmqUrl);
   try {
     const amqp = await import('amqplib');

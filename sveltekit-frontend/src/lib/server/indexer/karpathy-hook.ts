@@ -166,7 +166,7 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 			// Trigger Tier 2: Gemma4 summary lenses
 			const lenses = ['purpose', 'retrieval_role', 'api_surface', 'risk', 'dependencies'];
 			const summaries = await generateSummaryLenses({
-				stableKey: fileId,
+				chunkId: fileId,
 				targetType: 'file',
 				content: file.content,
 				lenses
@@ -175,7 +175,7 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 			for (const s of summaries) {
 				if (s.success) {
 					output.summaries.push({ 
-						stableKey: fileId, 
+						chunkId: fileId, 
 						lensType: s.lensType,
 						content: s.summaryText
 					});

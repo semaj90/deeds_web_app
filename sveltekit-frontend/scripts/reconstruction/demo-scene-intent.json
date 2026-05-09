@@ -1,0 +1,131 @@
+{
+  "scene_id": "demo-2026-05-08-alleyway-intent",
+  "case_id": "demo-case-001",
+  "title": "Alleyway altercation — demo SceneIntent (hand-written)",
+  "duration_s": 12,
+  "aesthetic": "ps1",
+  "environment": {
+    "city": "downtown",
+    "location": "alleyway between 3rd and 4th",
+    "time_of_day": "night",
+    "weather": "clear",
+    "notes": "Narrow alleyway, mixed-use buildings. Single sodium streetlight at south entrance."
+  },
+  "actors": [
+    { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect (male, dark jacket, witness statement A)" },
+    { "actor_id": "victim-1", "role": "victim", "label": "Victim (per case-001 incident report)" },
+    { "actor_id": "witness-A", "role": "witness", "label": "Witness A (across-street observer, partial view)" }
+  ],
+  "events": [
+    {
+      "id": "evt-001",
+      "time_s": 0,
+      "duration_s": 3,
+      "location": "south entrance",
+      "who": [
+        { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect (male, dark jacket)" }
+      ],
+      "what": "Suspect walks east into the alleyway from the street.",
+      "how": "Pedestrian gait, hands in jacket pockets per witness statement A.",
+      "action": "walk",
+      "path": [
+        { "t": 0, "x": 0, "y": 0, "z": 0 },
+        { "t": 3, "x": 4, "y": 0, "z": 0 }
+      ],
+      "evidence_ids": ["ev-cctv-12", "ev-witness-statement-A"],
+      "confidence": "high",
+      "disputed": false,
+      "annotations": [
+        {
+          "t": 0.5,
+          "kind": "evidence_pin",
+          "text": "CCTV frame 12:03:14 — suspect entering alleyway",
+          "evidence_id": "ev-cctv-12",
+          "position": [0.5, 1.7, 0]
+        }
+      ]
+    },
+    {
+      "id": "evt-002",
+      "time_s": 3,
+      "duration_s": 4,
+      "location": "alleyway midpoint",
+      "who": [
+        { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect" },
+        { "actor_id": "victim-1", "role": "victim", "label": "Victim" }
+      ],
+      "what": "Verbal altercation between suspect and victim near the midpoint.",
+      "why_hypothesis": "Possible prior dispute per case file, not corroborated by physical evidence.",
+      "how": "Witness A reports raised voices for ~4 seconds; no audio recording recovered.",
+      "action": "speaking",
+      "path": [],
+      "evidence_ids": ["ev-witness-statement-A"],
+      "confidence": "medium",
+      "disputed": true,
+      "annotations": [
+        {
+          "t": 3,
+          "kind": "uncertainty",
+          "text": "Witness A had partial view from across street — content of altercation is disputed."
+        }
+      ]
+    },
+    {
+      "id": "evt-003",
+      "time_s": 7,
+      "duration_s": 2,
+      "location": "alleyway midpoint",
+      "who": [
+        { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect" },
+        { "actor_id": "victim-1", "role": "victim", "label": "Victim" }
+      ],
+      "what": "Physical contact occurred — exact mechanism unknown.",
+      "how": "Witness A: 'looked like a shove or strike' — physical evidence ambiguous.",
+      "action": "strike",
+      "path": [],
+      "evidence_ids": ["ev-witness-statement-A", "ev-medical-report-9"],
+      "confidence": "low",
+      "disputed": true,
+      "annotations": [
+        {
+          "t": 7,
+          "kind": "uncertainty",
+          "text": "Action choice 'strike' is the closest allowlist verb; actual mechanism per medical report is consistent with either strike or fall."
+        }
+      ]
+    },
+    {
+      "id": "evt-004",
+      "time_s": 9,
+      "duration_s": 3,
+      "location": "alleyway midpoint to north exit",
+      "who": [
+        { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect" }
+      ],
+      "what": "Suspect departs alleyway northward.",
+      "how": "Witness A reports departure at increased pace.",
+      "action": "flee",
+      "path": [
+        { "t": 9, "x": 6, "y": 0, "z": 0 },
+        { "t": 12, "x": 12, "y": 0, "z": -3 }
+      ],
+      "evidence_ids": ["ev-witness-statement-A"],
+      "confidence": "medium",
+      "disputed": false,
+      "annotations": []
+    }
+  ],
+  "evidence_links": [
+    { "evidence_id": "ev-cctv-12",            "label": "CCTV south entrance",       "status": "cited" },
+    { "evidence_id": "ev-witness-statement-A", "label": "Witness A (across-street)", "status": "cited" },
+    { "evidence_id": "ev-medical-report-9",   "label": "Medical examiner report",   "status": "cited" }
+  ],
+  "annotations": [
+    {
+      "t": 0,
+      "kind": "note",
+      "text": "Hand-written demo fixture. All three evidence IDs are placeholders — not real case artifacts."
+    }
+  ],
+  "disclaimer": "Demonstrative reconstruction — not original footage"
+}

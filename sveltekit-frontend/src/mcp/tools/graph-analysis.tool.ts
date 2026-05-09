@@ -1,12 +1,13 @@
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 async function getNeo4j() {
   const neo4j = await import('neo4j-driver');
   const driver = neo4j.default.driver(
-    process.env.NEO4J_URI ?? 'bolt://localhost:7687',
+    ENV.NEO4J_URI,
     neo4j.default.auth.basic(
-      process.env.NEO4J_USER ?? 'neo4j',
-      process.env.NEO4J_PASSWORD ?? 'neo4j123'
+      ENV.NEO4J_USER,
+      ENV.NEO4J_PASSWORD
     )
   );
   return driver;

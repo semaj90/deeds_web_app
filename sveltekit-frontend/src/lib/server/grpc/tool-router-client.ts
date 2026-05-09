@@ -7,11 +7,9 @@
  *   Internal: each tool dispatched by name — face_identify, llm_synths, etc.
  *   Fallback: when TOOL_ROUTER_GRPC_ENABLED=false, routes inline to contextual-tools.ts
  *
- * Proto: proto/active/tool_router.proto  (package legal.agent.v1)
+ * All addresses resolved via ENV.* getters in env.server.ts.
  *
- * ENV:
- *   TOOL_ROUTER_GRPC_URL     — gRPC server address (default: 127.0.0.1:50058)
- *   TOOL_ROUTER_GRPC_ENABLED — "true" to enable gRPC path (default: "false")
+ * Proto: proto/active/tool_router.proto  (package legal.agent.v1)
  */
 
 import { resolve } from 'path';
@@ -90,7 +88,7 @@ let _loadFailed = false;
 let _retryAt = 0;
 
 async function _getClient(): Promise<unknown> {
-  const enabled = process.env.TOOL_ROUTER_GRPC_ENABLED === 'true';
+  const enabled = ENV.TOOL_ROUTER_GRPC_ENABLED;
   if (!enabled) return null;
   if (_loadFailed && Date.now() < _retryAt) return null;
   if (_loadFailed) { _loadFailed = false; _client = null; }

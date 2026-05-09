@@ -11,13 +11,15 @@
  * Property 6: Hybrid Score Calculation
  */
 
+import { ENV } from '$lib/server/env.server.js';
+
 export interface TfIdfConfig {
   redisUrl?: string;
   cacheTTL?: number; // seconds
 }
 
 const DEFAULT_CONFIG: TfIdfConfig = {
-  redisUrl: process.env?.REDIS_URL ?? 'redis://localhost:6379',
+  redisUrl: ENV.REDIS_URL,
   cacheTTL: 3600 // 1 hour
 };
 

@@ -1,0 +1,121 @@
+{
+  "scene_id": "demo-2026-05-08-alleyway",
+  "case_id": "demo-case-001",
+  "title": "Alleyway altercation — demo reconstruction",
+  "city": "downtown",
+  "aesthetic": "ps1",
+  "duration_s": 12,
+  "disclaimer": "Demonstrative reconstruction — not original footage",
+  "events": [
+    {
+      "id": "evt-001",
+      "time_s": 0,
+      "duration_s": 3,
+      "location": "alleyway entrance",
+      "who": [
+        { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect (male, dark jacket)" }
+      ],
+      "what": "Suspect walks east into the alleyway from the street.",
+      "how": "Pedestrian gait, hands in jacket pockets per witness statement.",
+      "action": "walk",
+      "path": [
+        { "t": 0,   "x": 0, "y": 0, "z": 0 },
+        { "t": 3,   "x": 4, "y": 0, "z": 0 }
+      ],
+      "evidence_ids": ["ev-cctv-12", "ev-witness-statement-A"],
+      "confidence": "high",
+      "disputed": false,
+      "reconstruction_notes": ["Path inferred from CCTV frames 12:03:14–12:03:17."],
+      "annotations": [
+        {
+          "t": 0,
+          "kind": "evidence_pin",
+          "text": "CCTV camera #12 enters here",
+          "evidence_id": "ev-cctv-12",
+          "position": [0, 0, 2]
+        }
+      ]
+    },
+    {
+      "id": "evt-002",
+      "time_s": 3,
+      "duration_s": 4,
+      "location": "alleyway midpoint",
+      "who": [
+        { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect (male, dark jacket)" },
+        { "actor_id": "victim-1",  "role": "victim",  "label": "Victim (female, light coat)" }
+      ],
+      "what": "Suspect and victim stop, brief verbal exchange.",
+      "why_hypothesis": "Witness B reports raised voices; content unknown.",
+      "how": "Both stationary, facing each other.",
+      "action": "idle",
+      "path": [],
+      "evidence_ids": ["ev-witness-statement-B"],
+      "confidence": "medium",
+      "disputed": true,
+      "reconstruction_notes": [
+        "Disputed: witness A says no exchange occurred. Witness B says ~5 seconds of raised voices."
+      ],
+      "annotations": [
+        {
+          "t": 3.5,
+          "kind": "uncertainty",
+          "text": "Disputed — two conflicting witness accounts",
+          "position": [4, 0, 2]
+        }
+      ]
+    },
+    {
+      "id": "evt-003",
+      "time_s": 7,
+      "duration_s": 1.5,
+      "location": "alleyway midpoint",
+      "who": [
+        { "actor_id": "victim-1", "role": "victim", "label": "Victim (female, light coat)" }
+      ],
+      "what": "Victim falls backward.",
+      "how": "Fall consistent with backward push; head impact location matches blood-spatter at evidence pin ev-photo-spatter-04.",
+      "action": "fall",
+      "path": [
+        { "t": 0,   "x": 4,   "y": 0, "z": 0 },
+        { "t": 1.5, "x": 4.2, "y": 0, "z": 0 }
+      ],
+      "evidence_ids": ["ev-photo-spatter-04", "ev-coroner-report"],
+      "confidence": "medium",
+      "disputed": false,
+      "reconstruction_notes": [
+        "Cause of fall (push vs slip vs strike) is undetermined. Compiler renders fall verb only."
+      ],
+      "annotations": [
+        {
+          "t": 7,
+          "kind": "evidence_pin",
+          "text": "Blood spatter — photo 04",
+          "evidence_id": "ev-photo-spatter-04",
+          "position": [4.2, 0, 0]
+        }
+      ]
+    },
+    {
+      "id": "evt-004",
+      "time_s": 8.5,
+      "duration_s": 3.5,
+      "location": "alleyway → street",
+      "who": [
+        { "actor_id": "suspect-1", "role": "suspect", "label": "Suspect (male, dark jacket)" }
+      ],
+      "what": "Suspect runs west out of the alleyway.",
+      "how": "Running gait, no items dropped per evidence inventory.",
+      "action": "run",
+      "path": [
+        { "t": 0,   "x": 4,  "y": 0, "z": 0 },
+        { "t": 3.5, "x": -2, "y": 0, "z": 0 }
+      ],
+      "evidence_ids": ["ev-cctv-12"],
+      "confidence": "high",
+      "disputed": false,
+      "reconstruction_notes": ["CCTV frames 12:03:23–12:03:26 confirm direction and gait."],
+      "annotations": []
+    }
+  ]
+}

@@ -1,0 +1,727 @@
+{
+  "generated": "2026-05-08T17:41:59.978Z",
+  "totalMs": 993,
+  "totalTools": 15,
+  "passed": 11,
+  "failed": 4,
+  "vaultDir": "docs/obsidian-vault",
+  "results": {
+    "vault.search:qdrant": {
+      "ok": true,
+      "ms": 857,
+      "query": "qdrant",
+      "totalFound": 3504,
+      "hits": [
+        {
+          "path": "Files/src__lib__server__db__qdrant-integration.md",
+          "score": 6,
+          "snippet": "# `src/lib/server/db/qdrant-integration.ts` ## For future Claude > .ts at src/lib/server/db/qdrant-integrat",
+          "frontmatter": {
+            "type": "file",
+            "path": "src/lib/server/db/qdrant-integration.ts",
+            "aliases": [
+              "qdrant-integration.ts",
+              "src/lib/server/db/qdrant-integration.ts"
+            ],
+            "clusterId": 6,
+            "ext": ".ts",
+            "lineCount": 84,
+            "pagerank": 0,
+            "blend": 0,
+            "isRoute": false,
+            "isSvelteComp": false,
+            "isTest": false,
+            "hasAuth": false,
+            "hasZod": false,
+            "importCount": 5,
+            "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/db/qdrant-integration.ts",
+            "last_updated_by_llm": "2026-05-08T16:50:32.855Z",
+            "ai-first": true,
+            "confidence": "medium",
+            "up": [
+              "[[Clusters/cluster-6]]"
+            ],
+            "imports": [
+              "[[Files/index]]",
+              "[[Files/schema]]"
+            ],
+            "tags": [
+              "file",
+              "ext/ts",
+              "cluster/6",
+              "t/ts",
+              "t/src",
+              "t/lib"
+            ]
+          }
+        },
+        {
+          "path": "Files/src__lib__server__db__qdrant-sync.md",
+          "score": 6,
+          "snippet": "# `src/lib/server/db/qdrant-sync.ts` ## For future Claude > Qdrant Mirror Sync Pipeline cluster:: [[Cluster",
+          "frontmatter": {
+            "type": "file",
+            "path": "src/lib/server/db/qdrant-sync.ts",
+            "aliases": [
+              "qdrant-sync.ts",
+              "src/lib/server/db/qdrant-sync.ts"
+            ],
+            "clusterId": 6,
+            "ext": ".ts",
+            "lineCount": 408,
+            "pagerank": 0,
+            "blend": 0,
+            "isRoute": false,
+            "isSvelteComp": false,
+            "isTest": false,
+            "hasAuth": false,
+            "hasZod": true,
+            "importCount": 6,
+            "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/db/qdrant-sync.ts",
+            "last_updated_by_llm": "2026-05-08T16:52:56.571Z",
+            "ai-first": true,
+            "confidence": "high",
+            "up": [
+              "[[Clusters/cluster-6]]"
+            ],
+            "imports": [
+              "[[Files/client]]",
+              "[[Files/postgres-knowledge]]"
+            ],
+            "tags": [
+              "file",
+              "ext/ts",
+              "cluster/6",
+              "zod",
+              "t/ts",
+              "t/src",
+              "t/lib"
+            ]
+          }
+        },
+        {
+          "path": "Files/src__lib__server__qdrant-http.md",
+          "score": 6,
+          "snippet": "# `src/lib/server/qdrant-http.ts` ## For future Claude > Phase 89: Qdrant HTTP Helper cluster:: [[Cluste",
+          "frontmatter": {
+            "type": "file",
+            "path": "src/lib/server/qdrant-http.ts",
+            "aliases": [
+              "qdrant-http.ts",
+              "src/lib/server/qdrant-http.ts"
+            ],
+            "clusterId": 77,
+            "ext": ".ts",
+            "lineCount": 128,
+            "pagerank": 0,
+            "blend": 0,
+            "isRoute": false,
+            "isSvelteComp": false,
+            "isTest": false,
+            "hasAuth": false,
+            "hasZod": false,
+            "importCount": 1,
+            "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/qdrant-http.ts",
+            "last_updated_by_llm": "2026-05-08T16:50:32.855Z",
+            "ai-first": true,
+            "confidence": "high",
+            "up": [
+              "[[Clusters/cluster-77]]"
+            ],
+            "imports": [],
+            "tags": [
+              "file",
+              "ext/ts",
+              "cluster/77",
+              "t/ts",
+              "t/src",
+              "t/lib"
+            ]
+          }
+        },
+        {
+          "path": "Files/src__lib__server__qdrant-integration.md",
+          "score": 6,
+          "snippet": "# `src/lib/server/qdrant-integration.ts` ## For future Claude > Upserts points (vectors and payloads) in",
+          "frontmatter": {
+            "type": "file",
+            "path": "src/lib/server/qdrant-integration.ts",
+            "aliases": [
+              "qdrant-integration.ts",
+              "src/lib/server/qdrant-integration.ts"
+            ],
+            "clusterId": 6,
+            "ext": ".ts",
+            "lineCount": 64,
+            "pagerank": 0,
+            "blend": 0,
+            "isRoute": false,
+            "isSvelteComp": false,
+            "isTest": false,
+            "hasAuth": false,
+            "hasZod": false,
+            "importCount": 1,
+            "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/qdrant-integration.ts",
+            "last_updated_by_llm": "2026-05-08T16:50:32.855Z",
+            "ai-first": true,
+            "confidence": "high",
+            "up": [
+              "[[Clusters/cluster-6]]"
+            ],
+            "imports": [],
+            "tags": [
+              "file",
+              "ext/ts",
+              "cluster/6",
+              "t/ts",
+              "t/src",
+              "t/lib"
+            ]
+          }
+        },
+        {
+          "path": "Files/src__lib__server__search__qdrant-search.md",
+          "score": 6,
+          "snippet": "# `src/lib/server/search/qdrant-search.ts` ## For future Claude > Qdrant semantic search over codebase_chunks_7",
+          "frontmatter": {
+            "type": "file",
+            "path": "src/lib/server/search/qdrant-search.ts",
+            "aliases": [
+              "qdrant-search.ts",
+              "src/lib/server/search/qdrant-search.ts"
+            ],
+            "clusterId": 6,
+            "ext": ".ts",
+            "lineCount": 68,
+            "pagerank": 0,
+            "blend": 0,
+            "isRoute": false,
+            "isSvelteComp": false,
+            "isTest": false,
+            "hasAuth": false,
+            "hasZod": false,
+            "importCount": 2,
+            "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/search/qdrant-search.ts",
+            "last_updated_by_llm": "2026-05-08T16:50:32.855Z",
+            "ai-first": true,
+            "confidence": "high",
+            "up": [
+              "[[Clusters/cluster-6]]"
+            ],
+            "imports": [],
+            "tags": [
+              "file",
+              "ext/ts",
+              "cluster/6",
+              "t/ts",
+              "t/src",
+              "t/lib"
+            ]
+          }
+        }
+      ]
+    },
+    "vault.search:risk-high": {
+      "ok": true,
+      "ms": 21,
+      "query": "cluster",
+      "totalFound": 12,
+      "hits": [
+        {
+          "path": "Clusters/cluster-51.md",
+          "score": 3,
+          "snippet": "`src/lib/db/schema` (tag: database) ## For future Claude > Cluster of 2 files. Top dirs: src/lib/db/schema, src/lib/server/db. Top tags: database,",
+          "frontmatter": {
+            "type": "cluster",
+            "cluster_id": "cluster-51",
+            "clusterId": 51,
+            "topic": "table-def chunks in `src/lib/db/schema` (tag: database)",
+            "aliases": [
+              "cluster-51",
+              "table-def chunks in `src/lib/db/schema` (tag: database)"
+            ],
+            "memberCount": 100,
+            "pagerank_sum": 0.431474,
+            "pagerank_max": 0.431474,
+            "risk": "high",
+            "top_tags": [
+              "database",
+              "schema",
+              "drizzle",
+              "vector",
+              "redis"
+            ],
+            "llmHits": 0,
+            "summaryMode": null,
+            "confidence": "low",
+            "last_updated_by_llm": "2026-05-08T16:52:56.571Z",
+            "ai-first": true,
+            "contains": [
+              "[[Files/src__lib__db__schema__evidence]]",
+              "[[Files/src__lib__server__db__schema-postgres]]"
+            ],
+            "same": [
+              "[[Clusters/cluster-65]]",
+              "[[Clusters/cluster-76]]",
+              "[[Clusters/cluster-53]]",
+              "[[Clusters/cluster-55]]",
+              "[[Clusters/cluster-60]]"
+            ],
+            "tags": [
+              "cluster",
+              "cluster/51"
+            ]
+          }
+        },
+        {
+          "path": "Clusters/cluster-53.md",
+          "score": 3,
+          "snippet": "`src/lib/server/db` (tag: database) ## For future Claude > Cluster of 8 files. Top dirs: src/lib/server/db, src/lib/types, src/lib/server/db/schem",
+          "frontmatter": {
+            "type": "cluster",
+            "cluster_id": "cluster-53",
+            "clusterId": 53,
+            "topic": "const chunks in `src/lib/server/db` (tag: database)",
+            "aliases": [
+              "cluster-53",
+              "const chunks in `src/lib/server/db` (tag: database)"
+            ],
+            "memberCount": 84,
+            "pagerank_sum": 0.638121,
+            "pagerank_max": 0.431474,
+            "risk": "high",
+            "top_tags": [
+              "database",
+              "schema",
+              "drizzle",
+              "embedding",
+              "vector"
+            ],
+            "llmHits": 0,
+            "summaryMode": null,
+            "confidence": "medium",
+            "last_updated_by_llm": "2026-05-08T16:52:56.571Z",
+            "ai-first": true,
+            "contains": [
+              "[[Files/src__lib__server__db__schema__legal-citations]]",
+              "[[Files/src__lib__server__db__schema-evidence-crud]]",
+              "[[Files/src__lib__server__db__schema-postgres]]",
+              "[[Files/src__lib__server__db__schema-ingestion]]",
+              "[[Files/src__lib__server__db__schema-chat]]",
+              "[[Files/src__lib__server__evidence__type-detector]]",
+              "[[Files/src__lib__types__protocol]]",
+              "[[Files/src__lib__types__poi]]"
+            ],
+            "same": [
+              "[[Clusters/cluster-55]]",
+              "[[Clusters/cluster-84]]",
+              "[[Clusters/cluster-10]]",
+              "[[Clusters/cluster-13]]",
+              "[[Clusters/cluster-51]]"
+            ],
+            "tags": [
+              "cluster",
+              "cluster/53",
+              "topic/types",
+              "topic/sym_type",
+              "topic/sym_chat"
+            ]
+          }
+        },
+        {
+          "path": "Clusters/cluster-57.md",
+          "score": 3,
+          "snippet": "in `src/lib/shims` (tag: embedding) ## For future Claude > Cluster of 8 files. Top dirs: src/lib/shims, src/lib/server/vector, src/lib. Top tags:",
+          "frontmatter": {
+            "type": "cluster",
+            "cluster_id": "cluster-57",
+            "clusterId": 57,
+            "topic": "const chunks in `src/lib/shims` (tag: embedding)",
+            "aliases": [
+              "cluster-57",
+              "const chunks in `src/lib/shims` (tag: embedding)"
+            ],
+            "memberCount": 1099,
+            "pagerank_sum": 0.20716,
+            "pagerank_max": 0.20716,
+            "risk": "high",
+            "top_tags": [
+              "embedding",
+              "vector",
+              "auth",
+              "server-module",
+              "config"
+            ],
+            "llmHits": 0,
+            "summaryMode": null,
+            "confidence": "medium",
+            "last_updated_by_llm": "2026-05-08T16:52:56.571Z",
+            "ai-first": true,
+            "contains": [
+              "[[Files/src__lib__server__vector__multi-store]]",
+              "[[Files/src__lib__stores.svelte]]",
+              "[[Files/src__lib__utils__route-operation-logger]]",
+              "[[Files/src__lib__shims__worker-threads-browser-shim]]",
+              "[[Files/src__lib__server__gpu__libtorch-bridge]]",
+              "[[Files/src__lib__stores__unified__index.svelte]]",
+              "[[Files/src__lib__db__pool]]",
+              "[[Files/src__lib__server__retrieval__context-buffer]]"
+            ],
+            "same": [
+              "[[Clusters/cluster-52]]",
+              "[[Clusters/cluster-59]]",
+              "[[Clusters/cluster-48]]",
+              "[[Clusters/cluster-6]]",
+              "[[Clusters/cluster-17]]"
+            ],
+            "tags": [
+              "cluster",
+              "cluster/57",
+              "topic/sym_store",
+              "topic/auth"
+            ]
+          }
+        },
+        {
+          "path": "Clusters/cluster-59.md",
+          "score": 3,
+          "snippet": "/server/observability` (tag: vector) ## For future Claude > Cluster of 2 files. Top dirs: src/lib/server/observability, src/lib/components/evidence",
+          "frontmatter": {
+            "type": "cluster",
+            "cluster_id": "cluster-59",
+            "clusterId": 59,
+            "topic": "function chunks in `src/lib/server/observability` (tag: vector)",
+            "aliases": [
+              "cluster-59",
+              "function chunks in `src/lib/server/observability` (tag: vector)"
+            ],
+            "memberCount": 36,
+            "pagerank_sum": 0.241103,
+            "pagerank_max": 0.241103,
+            "risk": "high",
+            "top_tags": [
+              "vector",
+              "embedding",
+              "auth"
+            ],
+            "llmHits": 0,
+            "summaryMode": null,
+            "confidence": "low",
+            "last_updated_by_llm": "2026-05-08T16:52:56.571Z",
+            "ai-first": true,
+            "contains": [
+              "[[Files/src__lib__server__observability__inference-log]]",
+              "[[Files/src__lib__components__evidence__board-persistence.svelte]]"
+            ],
+            "same": [
+              "[[Clusters/cluster-48]]",
+              "[[Clusters/cluster-12]]",
+              "[[Clusters/cluster-71]]",
+              "[[Clusters/cluster-6]]",
+              "[[Clusters/cluster-20]]"
+            ],
+            "tags": [
+              "cluster",
+              "cluster/59"
+            ]
+          }
+        },
+        {
+          "path": "Clusters/cluster-75.md",
+          "score": 3,
+          "snippet": "in `src/lib/config` (tag: embedding) ## For future Claude > Cluster of 8 files. Top dirs: src/lib/config, src/lib/server, src/lib/server/config. To",
+          "frontmatter": {
+            "type": "cluster",
+            "cluster_id": "cluster-75",
+            "clusterId": 75,
+            "topic": "function chunks in `src/lib/config` (tag: embedding)",
+            "aliases": [
+              "cluster-75",
+              "function chunks in `src/lib/config` (tag: embedding)"
+            ],
+            "memberCount": 416,
+            "pagerank_sum": 0.299072,
+            "pagerank_max": 0.299072,
+            "risk": "high",
+            "top_tags": [
+              "embedding",
+              "vector",
+              "redis",
+              "rabbitmq",
+              "ai"
+            ],
+            "llmHits": 0,
+            "summaryMode": null,
+            "confidence": "medium",
+            "last_updated_by_llm": "2026-05-08T16:52:56.571Z",
+            "ai-first": true,
+            "contains": [
+              "[[Files/src__lib__server__config__ollama]]",
+              "[[Files/src__lib__config__env.server]]",
+              "[[Files/src__lib__server__ai__ollama-config]]",
+              "[[Files/src__lib__server__config]]",
+              "[[Files/src__lib__config__database]]",
+              "[[Files/src__lib__config__redis-config]]",
+              "[[Files/src__lib__server__minio]]",
+              "[[Files/src__lib__services__knowledge-search__qdrantknowledgestore]]"
+            ],
+            "same": [
+              "[[Clusters/cluster-19]]",
+              "[[Clusters/cluster-46]]",
+              "[[Clusters/cluster-22]]",
+              "[[Clusters/cluster-24]]",
+              "[[Clusters/cluster-72]]"
+            ],
+            "tags": [
+              "cluster",
+              "cluster/75",
+              "topic/sym_get",
+              "topic/sym_ollama"
+            ]
+          }
+        }
+      ]
+    },
+    "vault.read:db-client": {
+      "ok": true,
+      "ms": 0,
+      "path": "Files/src__lib__server__db__client.md",
+      "type": "file",
+      "frontmatter": {
+        "type": "file",
+        "path": "src/lib/server/db/client.ts",
+        "aliases": [
+          "client.ts",
+          "src/lib/server/db/client.ts"
+        ],
+        "clusterId": 6,
+        "ext": ".ts",
+        "lineCount": 112,
+        "pagerank": 0.73,
+        "blend": 0,
+        "isRoute": false,
+        "isSvelteComp": false,
+        "isTest": false,
+        "hasAuth": false,
+        "hasZod": false,
+        "importCount": 7,
+        "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/db/client.ts",
+        "last_updated_by_llm": "2026-05-08T16:50:32.855Z",
+        "ai-first": true,
+        "confidence": "high",
+        "up": [
+          "[[Clusters/cluster-6]]"
+        ],
+        "imports": [
+          "[[Files/schema-canvas-autosaves]]",
+          "[[Files/schema]]",
+          "[[Files/drizzle-cache]]"
+        ],
+        "tags": [
+          "file",
+          "ext/ts",
+          "cluster/6",
+          "t/ts",
+          "t/src",
+          "t/lib"
+        ]
+      },
+      "body": "\n# `src/lib/server/db/client.ts`\n## For future Claude\n> Reset pool health flag after successful connectivity check\ncluster:: [[Clusters/cluster-6]]\npagerank:: 0.730000\nblend:: 0.000000\nlines:: 112\n## Summary\n\nReset pool health flag after successful connectivity check\n\n## Imports\n\n- imports:: [[Files/schema-canvas-autosaves]] `./schema-canvas-autosaves.js`\n- imports:: [[Files/schema]] `./schema.js`\n- imports:: [[Files/drizzle-cache]] `./drizzle-cache.js`\n## Backlinks (Dataview)\n```dataviewjs\nconst cur = dv.current().file.path;\ndv.list(dv.pages().where(p => Array.isArray(p.imports) && p.imports.some(l => l && l.path === cur)).file.link);\n```",
+      "edges": {
+        "up": [
+          "Clusters/cluster-6.md"
+        ],
+        "same": [],
+        "imports": [
+          "Files/schema-canvas-autosaves.md",
+          "Files/schema.md",
+          "Files/drizzle-cache.md"
+        ],
+        "contains": []
+      },
+      "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/db/client.ts"
+    },
+    "vault.read:cluster-7": {
+      "ok": true,
+      "ms": 0,
+      "path": "Clusters/cluster-7.md",
+      "type": "cluster",
+      "frontmatter": {
+        "type": "cluster",
+        "cluster_id": "cluster-7",
+        "clusterId": 7,
+        "topic": "component chunks in `src/lib/components/admin`",
+        "aliases": [
+          "cluster-7",
+          "component chunks in `src/lib/components/admin`"
+        ],
+        "memberCount": 6,
+        "pagerank_sum": 0,
+        "pagerank_max": 0,
+        "risk": "low",
+        "top_tags": [],
+        "llmHits": 0,
+        "summaryMode": null,
+        "confidence": "high",
+        "last_updated_by_llm": "2026-05-08T16:52:56.571Z",
+        "ai-first": true,
+        "contains": [
+          "[[Files/src__lib__components__admin__tagselector]]"
+        ],
+        "same": [],
+        "tags": [
+          "cluster",
+          "cluster/7",
+          "topic/topic_component",
+          "topic/components"
+        ]
+      },
+      "body": "\n# component chunks in `src/lib/components/admin`\n## For future Claude\n> This cluster provides a suite of components and pages for a legal research and analysis platform, handling tasks like evidence management, legal citation tracking, document comparison, and real-time data streaming.\n\n**Purpose:** Legal Research and Evidence Analysis Platform\ncluster:: cluster-7\ncluster_id:: 7\nmember_count:: 1\npagerank_sum:: 0\nrisk:: low\ntop_tags:: \n## Agent hints\nUse this cluster when investigating these files.\nRisk: **low** (pagerank_max=0, confidence=high).\n## Main dependencies\n_no strongly-related clusters_\n## Top Directories\n- `src/lib/components/admin` (1)\n## Top Tags\n## Members (1)\n- contains:: [[Files/src__lib__components__admin__tagselector|src/lib/components/admin/TagSelector.svelte]]\n## Backlinks (Dataview)\n```dataview\nLIST FROM \"Files\" WHERE clusterId = 7 SORT pagerank DESC LIMIT 30\n```",
+      "edges": {
+        "up": [],
+        "same": [],
+        "imports": [],
+        "contains": [
+          "Files/src__lib__components__admin__tagselector.md"
+        ]
+      },
+      "embedding_id": null
+    },
+    "vault.followLinks:cluster-contains": {
+      "ok": true,
+      "ms": 1,
+      "start": "Clusters/cluster-7.md",
+      "edgeType": "contains",
+      "hops": 1,
+      "totalVisited": 1,
+      "nodes": [
+        {
+          "path": "Files/src__lib__components__admin__tagselector.md",
+          "type": "file",
+          "pagerank": 0,
+          "depth": 1
+        }
+      ]
+    },
+    "vault.followLinks:file-up": {
+      "ok": true,
+      "ms": 1,
+      "start": "Files/src__lib__server__db__client.md",
+      "edgeType": "up",
+      "hops": 1,
+      "totalVisited": 1,
+      "nodes": [
+        {
+          "path": "Clusters/cluster-6.md",
+          "type": "cluster",
+          "topic": "function chunks in `src/lib/server/db` (tag: embedding)",
+          "risk": "low",
+          "depth": 1
+        }
+      ]
+    },
+    "vault.resolveEmbedding:vault-path": {
+      "ok": true,
+      "ms": 0,
+      "path": "Files/src__lib__server__db__client.md",
+      "repo_path": "src/lib/server/db/client.ts",
+      "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/db/client.ts",
+      "clusterId": 6
+    },
+    "vault.resolveEmbedding:repo-path": {
+      "ok": true,
+      "ms": 1,
+      "repo_path": "src/lib/server/db/client.ts",
+      "vault_note": "Files/src__lib__server__db__client.md",
+      "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/db/client.ts"
+    },
+    "retrieval.qdrantLookup": {
+      "ok": true,
+      "ms": 53,
+      "error": "qdrant_unavailable",
+      "message": "fetch failed"
+    },
+    "agent.explainCluster:7": {
+      "ok": true,
+      "ms": 1,
+      "cluster_id": "cluster-7",
+      "topic": "component chunks in `src/lib/components/admin`",
+      "risk": "low",
+      "pagerank_sum": 0,
+      "pagerank_max": 0,
+      "member_count": 6,
+      "top_tags": [],
+      "neighbors": [],
+      "top_members": [
+        {
+          "path": "src/lib/components/admin/TagSelector.svelte",
+          "clusterId": 7,
+          "pagerank": 0,
+          "confidence": "medium",
+          "lineCount": 434,
+          "isRoute": false,
+          "hasAuth": false
+        }
+      ],
+      "summary_excerpt": "\n# component chunks in `src/lib/components/admin`\n## For future Claude\n> This cluster provides a suite of components and pages for a legal research and analysis platform, handling tasks like evidence management, legal citation tracking, document comparison, and real-time data streaming.\n\n**Purpose:** Legal Research and Evidence Analysis Platform\ncluster:: cluster-7\ncluster_id:: 7\nmember_count:: 1\npagerank_sum:: 0\nrisk:: low\ntop_tags:: \n## Agent hints\nUse this cluster when investigating these files.\nRisk: **low** (pagerank_max=0, confidence=high).\n## Main dependencies\n_no strongly-related clusters_\n## Top Directories\n- `src/lib/components/admin` (1)\n## Top Tags\n## Members (1)\n- contains:: [[Files/src__lib__components__admin__tagselector|src/lib/components/admin/TagSelector.svelte]]\n## Backl"
+    },
+    "agent.proposeFix:db-client": {
+      "ok": true,
+      "ms": 52,
+      "proposal_kind": "read-only-markdown",
+      "file_path": "src/lib/server/db/client.ts",
+      "issue": "investigate cache miss path during pool warmup",
+      "vault_note": "Files/src__lib__server__db__client.md",
+      "cluster": {
+        "cluster_id": "cluster-6",
+        "topic": "function chunks in `src/lib/server/db` (tag: embedding)",
+        "risk": "low",
+        "top_tags": [
+          "embedding",
+          "database",
+          "vector",
+          "auth",
+          "vector-search"
+        ],
+        "siblings": [
+          "Files/src__lib__server__db__pgvector-utils.temp.md",
+          "Files/src__lib__server__db__vector-operations.md",
+          "Files/src__lib__server__ace__tag-sync.md",
+          "Files/src__lib__server__db__postgres-knowledge.md",
+          "Files/src__lib__server__db__qdrant-sync.md",
+          "Files/src__lib__server__qdrant-integration.md",
+          "Files/src__lib__server__db__pgvector-utils.md",
+          "Files/src__lib__server__graph__user-interaction-sync.md"
+        ]
+      },
+      "embedding_id": "qdrant://codebase_chunks_768/src/lib/server/db/client.ts",
+      "lanes": {
+        "cluster_context": [],
+        "shared_resource": [],
+        "agents_context": [],
+        "vault_link": []
+      },
+      "proposal_markdown": "# Fix Proposal: `src/lib/server/db/client.ts`\n\n**Issue:** investigate cache miss path during pool warmup\n\n**Generated:** 2026-05-08T17:41:59.973Z (read-only — no patches applied)\n\n## File context\n- **PageRank:** 0.73\n- **Confidence:** high\n- **Cluster:** 6 (function chunks in `src/lib/server/db` (tag: embedding))\n- **Cluster risk:** low\n- **Lines:** 112\n- **Tags:** file, ext/ts, cluster/6, t/ts, t/src, t/lib\n\n## Direct imports (potential change blast radius)\n- [[Files/schema-canvas-autosaves]]\n- [[Files/schema]]\n- [[Files/drizzle-cache]]\n\n## Cluster siblings (related files to inspect)\n- Files/src__lib__server__db__pgvector-utils.temp.md\n- Files/src__lib__server__db__vector-operations.md\n- Files/src__lib__server__ace__tag-sync.md\n- Files/src__lib__server__db__postgres-knowledge.md\n- Files/src__lib__server__db__qdrant-sync.md\n- Files/src__lib__server__qdrant-integration.md\n- Files/src__lib__server__db__pgvector-utils.md\n- Files/src__lib__server__graph__user-interaction-sync.md\n\n## Lane A — semantic cohesion (0 hyperedges)\n_no matching cluster_context edges_\n\n## Lane B — runtime coupling (0 hyperedges)\n_Files that share the same DB table / Qdrant collection / Redis key / Neo4j label as this one._\n\n_no matching shared_resource edges_\n\n## Lane C — agent conventions (0 hyperedges)\n_AGENTS.md scopes that describe related conventions for this area._\n\n_no matching agents_context edges_\n\n## Lane D — shared vault references (0 hyperedges)\n_Vault notes that all wikilink to the same target (shared-reference clusters)._\n\n_no matching vault_link edges_\n\n## Recommended next steps\n1. `vault.read(\"Files/src__lib__server__db__client.md\")` — full file note\n2. `retrieval.qdrantLookup(\"qdrant://codebase_chunks_768/src/lib/server/db/client.ts\")` — semantic chunks\n3. `vault.followLinks(\"Files/src__lib__server__db__client.md\", \"imports\", 2)` — import graph 2 hops\n4. `hypergraph.searchByLane({query: \"client\", lane: \"shared_resource\"})` — full Lane B coupling\n5. Review siblings + neighbors + AGENTS.md guidance before drafting the change\n6. Apply the change manually and re-run `graphify:obsidian:incremental` to refresh"
+    },
+    "hypergraph.searchByLane:A": {
+      "ok": false,
+      "ms": 1,
+      "error": "Connection terminated unexpectedly"
+    },
+    "hypergraph.searchByLane:B": {
+      "ok": false,
+      "ms": 1,
+      "error": "Connection terminated unexpectedly"
+    },
+    "hypergraph.searchByLane:C": {
+      "ok": false,
+      "ms": 1,
+      "error": "Connection terminated unexpectedly"
+    },
+    "hypergraph.searchByLane:D": {
+      "ok": false,
+      "ms": 1,
+      "error": "Connection terminated unexpectedly"
+    }
+  }
+}

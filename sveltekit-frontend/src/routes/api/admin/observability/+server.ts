@@ -10,6 +10,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 // @ts-expect-error tsgo pre-stable: $lib alias not resolved for named db export (tsc/svelte-check see it correctly)
 import { db } from '$lib/server/db/client.js';
@@ -23,15 +24,15 @@ const LOGS_OUTPUT = resolve(CWD, 'logs/task-output');
 
 // ── Service URLs ──────────────────────────────────────────────────────────────
 
-const QDRANT_URL    = process.env.QDRANT_URL         ?? 'http://127.0.0.1:6333';
-const NEO4J_HTTP    = process.env.NEO4J_HTTP_URL      ?? 'http://localhost:7474';
+const QDRANT_URL    = ENV.QDRANT_URL;
+const NEO4J_HTTP    = ENV.NEO4J_HTTP_URL;
 const NEO4J_USER    = process.env.NEO4J_USER          ?? 'neo4j';
 const NEO4J_PASS    = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
-const MCP_URL       = process.env.TRACE_MCP_URL       ?? 'http://127.0.0.1:8788';
-const GO_RETRIEVAL  = process.env.GO_RETRIEVAL_URL    ?? 'http://127.0.0.1:8100';
-const GO_SEARCH     = process.env.GO_SEARCH_URL       ?? 'http://127.0.0.1:8096';
-const TOPO_URL      = process.env.TOPOLOGY_SEARCH_URL ?? 'http://127.0.0.1:8101';
-const TURBO_URL     = process.env.TURBO_QUANT_URL     ?? 'http://127.0.0.1:8090';
+const MCP_URL       = ENV.TRACE_MCP_URL;
+const GO_RETRIEVAL  = ENV.RETRIEVAL_HTTP_URL;
+const GO_SEARCH     = ENV.GO_SEARCH_URL;
+const TOPO_URL      = ENV.TOPOLOGY_SEARCH_URL;
+const TURBO_URL     = ENV.TURBOQUANT_BASE_URL;
 
 // ── Service probe helpers ─────────────────────────────────────────────────────
 

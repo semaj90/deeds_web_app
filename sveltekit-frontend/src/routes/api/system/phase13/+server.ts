@@ -11,7 +11,11 @@ import { ENV } from '$lib/server/env.server.js';
  * Health check - verifies core services are reachable
  * No side effects
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+		return json({ timestamp: new Date().toISOString(), services: {}, error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const health: { timestamp: string; services: Record<string, Record<string, unknown>> } = {
 		timestamp: new Date().toISOString(),
 		services: {},

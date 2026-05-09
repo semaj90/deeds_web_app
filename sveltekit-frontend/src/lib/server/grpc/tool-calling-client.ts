@@ -5,9 +5,7 @@
  * proto/active/tool_calling.proto.  Follows the same lazy-singleton +
  * 30s retry-backoff pattern as embedding-client.ts / chr97-agent-client.ts.
  *
- * ENV:
- *   TOOL_GRPC_URL     — gRPC server address (default: 127.0.0.1:50057)
- *   TOOL_GRPC_ENABLED — "true" to enable (default: "false")
+ * All addresses resolved via ENV.* getters in env.server.ts.
  *
  * When disabled or unavailable every method returns an empty / error result
  * so callers can fall through to the inline HTTP pipeline unchanged.

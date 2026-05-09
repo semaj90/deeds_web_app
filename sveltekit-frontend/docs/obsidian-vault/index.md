@@ -1,16 +1,16 @@
 ---
 title: "Codebase Map"
-generated: "2026-05-08T16:20:53.620Z"
-fileCount: 300
+generated: "2026-05-08T22:10:36.429Z"
+fileCount: 500
 clusterCount: 100
 tags: ["index","codebase"]
 ---
 
 # Codebase Map
 
-Generated: 2026-05-08T16:20:53.620Z
+Generated: 2026-05-08T22:10:36.429Z
 
-- **300** file notes
+- **500** file notes
 - **100** clusters
 - **n/a** route methods
 
@@ -20,7 +20,7 @@ Generated: 2026-05-08T16:20:53.620Z
 - **Canvas**: open `codebase.canvas` for spatial cluster map
 - **Extended Graph plugin** (recommended for 3k+ nodes): `ElsaTam/obsidian-extended-graph`
 
-## Top 15 Clusters (Mermaid)
+## Top 20 Clusters (Mermaid)
 
 ```mermaid
 graph LR
@@ -39,6 +39,11 @@ graph LR
   C82["function chunks in `src/lib/server/grpc` (tag: emb"]
   C20["function chunks in `src/lib/webgpu` (tag: embeddin"]
   C6["function chunks in `src/lib/server/db` (tag: embed"]
+  C86["function chunks in `src/lib/components/evidence` ("]
+  C23["class chunks in `src/lib/webgpu` (tag: embedding)"]
+  C85["route-handler chunks in `src/routes/api/citations/"]
+  C55["table-def chunks in `src/lib/server/db` (tag: data"]
+  C32["function chunks in `src/lib/server/services` (tag:"]
 ```
 
 ## Cluster Index
@@ -58,3 +63,8 @@ graph LR
 - [[Clusters/cluster-82|function chunks in `src/lib/server/grpc` (tag: embedding)]] (903 members)
 - [[Clusters/cluster-20|function chunks in `src/lib/webgpu` (tag: embedding)]] (883 members)
 - [[Clusters/cluster-6|function chunks in `src/lib/server/db` (tag: embedding)]] (700 members)
+- [[Clusters/cluster-86|function chunks in `src/lib/components/evidence` (tag: embedding)]] (680 members)
+- [[Clusters/cluster-23|class chunks in `src/lib/webgpu` (tag: embedding)]] (622 members)
+- [[Clusters/cluster-85|route-handler chunks in `src/routes/api/citations/collections/[collectionId]/citations` (tag: api)]] (587 members)
+- [[Clusters/cluster-55|table-def chunks in `src/lib/server/db` (tag: database)]] (577 members)
+- [[Clusters/cluster-32|function chunks in `src/lib/server/services` (tag: api-route)]] (540 members)

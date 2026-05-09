@@ -18,7 +18,7 @@ import { normalizeConstitutionHtml, normalizePlainText, type NormalizeResult } f
 import type { StateConstitutionSource } from './constitution-registry';
 
 const BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
-const USER_AGENT = 'LegalAI-Researcher/1.0 (educational; contact: admin@localhost)';
+const USER_AGENT = 'LegalAI-Researcher/1.0 (educational; contact: admin@deeds.internal)';
 
 // Inter-request delay: 1000–1500ms to be polite
 const REQUEST_DELAY_MS = 1000;

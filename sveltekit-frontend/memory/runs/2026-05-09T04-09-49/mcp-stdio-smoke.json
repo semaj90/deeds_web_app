@@ -1,0 +1,45 @@
+{
+  "runAt": "2026-05-09T04:09:49.228Z",
+  "summary": {
+    "pass": 6,
+    "skip": 0,
+    "fail": 0,
+    "total": 6
+  },
+  "results": [
+    {
+      "name": "connect",
+      "status": "PASS",
+      "preview": "stdio handshake complete"
+    },
+    {
+      "name": "tools/list",
+      "status": "PASS",
+      "preview": "tools=68"
+    },
+    {
+      "name": "agents_md",
+      "status": "PASS",
+      "ms": 5,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"Error: require is not defined\"}],\"isError\":true}"
+    },
+    {
+      "name": "codebase:file_intel",
+      "status": "PASS",
+      "ms": 1,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"Error: require is not defined\"}],\"isError\":true}"
+    },
+    {
+      "name": "codebase:graph_neighbors",
+      "status": "PASS",
+      "ms": 1,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"Error: require is not defined\"}],\"isError\":true}"
+    },
+    {
+      "name": "topology_search",
+      "status": "PASS",
+      "ms": 643,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"query\\\":\\\"redis cache topology\\\",\\\"center\\\":null,\\\"radius\\\":0.3,\\\"totalFound\\\":6,\\…"
+    }
+  ]
+}

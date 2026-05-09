@@ -11,7 +11,7 @@
   "patchResult": "unknown",
   "researchNotes": "",
   "needsDeepResearch": false,
-  "generated_at": "2026-05-08T06:53:42.735Z",
+  "generated_at": "2026-05-08T22:50:33.315Z",
   "recommended_actions": [
     "Verify fix with smoke tests",
     "Ingest artifacts: kag.ingest_memory_directory"

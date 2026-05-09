@@ -271,7 +271,7 @@ export class WebGPUSimilarityEngine {
       ) {
         let docIdx  = wgId.x;
         let tid     = localId.x;                    // 0 .. 255
-        let dim     = arrayLength(&queryBytes);      // e.g. 768
+        let numU32  = arrayLength(&queryBytes);      // e.g. 192 for 768-dim
 
         if (docIdx >= arrayLength(&output)) { return; }
 
@@ -287,14 +287,23 @@ export class WebGPUSimilarityEngine {
 
         var i : u32 = tid;
         loop {
-          if (i >= dim) { break; }
+          if (i >= numU32) { break; }
 
-          let q = (f32(queryBytes[i])                  / 255.0) * qScale + qOff;
-          let d = (f32(docBytes[docIdx * dim + i]) / 255.0) * dScale + dOff;
+          let qPacked = queryBytes[i];
+          let dPacked = docBytes[docIdx * numU32 + i];
 
-          local_dot   += q * d;
-          local_qnorm += q * q;
-          local_dnorm += d * d;
+          // Unpack 4 bytes from each u32
+          for (var b = 0u; b < 4u; b = b + 1u) {
+            let qByte = (qPacked >> (b * 8u)) & 0xFFu;
+            let dByte = (dPacked >> (b * 8u)) & 0xFFu;
+
+            let q = (f32(qByte) / 255.0) * qScale + qOff;
+            let d = (f32(dByte) / 255.0) * dScale + dOff;
+
+            local_dot   += q * d;
+            local_qnorm += q * q;
+            local_dnorm += d * d;
+          }
 
           i += 256u;
         }

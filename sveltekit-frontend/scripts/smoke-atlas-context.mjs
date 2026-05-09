@@ -24,7 +24,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = resolve(__dirname, '..');
 
 const MCP_URL    = process.env.MCP_URL    ?? 'http://127.0.0.1:8788/mcp';
-const SVELTEKIT  = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+const SVELTEKIT_BASES = [...new Set([
+  process.env.SVELTEKIT_URL,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+].filter(Boolean))];
 const JSON_OUT   = process.argv.includes('--json');
 const STRICT     = process.argv.includes('--strict');
 
@@ -223,13 +227,30 @@ await check('edge_type filter shared_resource (Lane B)', () => {
 
 if (!JSON_OUT) console.log('\n=== /api/ace/recommendations HTTP ===');
 
-const httpRes = await fetch(`${SVELTEKIT}/api/ace/recommendations?filePath=${encodeURIComponent(PROBE_FILE)}&maxCards=2`, {
-  signal: AbortSignal.timeout(10_000),
-}).catch((err) => ({ ok: false, _err: err.message }));
+let httpRes = null;
+let httpBase = '';
+let httpErr = '';
+for (const base of SVELTEKIT_BASES) {
+  const res = await fetch(`${base}/api/ace/recommendations?filePath=${encodeURIComponent(PROBE_FILE)}&maxCards=2`, {
+    signal: AbortSignal.timeout(10_000),
+  }).catch((err) => ({ ok: false, _err: err.message }));
+  if (!res._err && res.ok) {
+    httpRes = res;
+    httpBase = base;
+    break;
+  }
+  if (!res._err && res.status !== 404) {
+    httpRes = res;
+    httpBase = base;
+    break;
+  }
+  httpErr = res._err ?? `HTTP ${res.status}`;
+  httpRes = res;
+}
 
 await check('GET /api/ace/recommendations responds', async () => {
-  if (httpRes._err) throw new Error('WARN: dev server unreachable: ' + httpRes._err);
-  if (!httpRes.ok) throw new Error('WARN: HTTP ' + httpRes.status);
+  if (httpRes._err) throw new Error('WARN: dev server unreachable: ' + httpErr);
+  if (!httpRes.ok) throw new Error(`WARN: ${httpBase} HTTP ${httpRes.status}`);
   const body = await httpRes.json();
   if (body.filePath !== PROBE_FILE) throw new Error(`echo mismatch: ${body.filePath}`);
   return `rank=${body.file?.rank ?? '?'}`;

@@ -7,9 +7,7 @@
  * Fallback: If gRPC is disabled or unavailable, returns null so the caller
  * can fall through to the inline TypeScript pipeline.
  *
- * ENV:
- *   RETRIEVAL_GRPC_URL     — gRPC server address (default: 127.0.0.1:50053)
- *   RETRIEVAL_GRPC_ENABLED — "true" to enable gRPC path (default: "false")
+ * All addresses resolved via ENV.* getters in env.server.ts.
  */
 import { ENV } from '$lib/server/env.server.js';
 import type { ResearchSource } from '$lib/server/research/web-research-ingester.js';

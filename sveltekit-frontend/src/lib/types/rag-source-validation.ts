@@ -55,6 +55,7 @@ export interface RetrieveCandidatesRequest {
   caseId?: string;
   conversationId?: string;
   enableACE?: boolean;
+  use_webgpu?: boolean;
 }
 
 export interface RetrievedChunk {
@@ -306,9 +307,15 @@ const RAG_API_BASE = '/api/rag';
 export async function searchKnowledgeBase(
   request: RetrieveCandidatesRequest
 ): Promise<RetrieveCandidatesResponse> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  
+  if (request.use_webgpu) {
+    headers['x-use-webgpu'] = 'true';
+  }
+
   const response = await fetch(`${RAG_API_BASE}/search`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
 	body: JSON.stringify(request),
   });
 

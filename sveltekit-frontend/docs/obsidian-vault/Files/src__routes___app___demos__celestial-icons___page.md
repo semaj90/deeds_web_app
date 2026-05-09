@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: false
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/routes/(app)/demos/celestial-icons/+page.svelte"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 confidence: "medium"
 up: ["[[Clusters/cluster-34]]"]

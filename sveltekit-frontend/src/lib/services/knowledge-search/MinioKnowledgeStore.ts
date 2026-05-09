@@ -12,6 +12,7 @@
  */
 
 import type { FullDocument } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface MinioConfig {
   endpoint: string;
@@ -32,11 +33,11 @@ export interface StoredDocument {
 }
 
 const DEFAULT_CONFIG: MinioConfig = {
-  endpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
-  port: parseInt(process.env?.MINIO_PORT ?? '9000', 10),
-  useSSL: process.env?.MINIO_USE_SSL === 'true',
-  accessKey: process.env?.MINIO_ACCESS_KEY ?? 'minioadmin',
-  secretKey: process.env?.MINIO_SECRET_KEY ?? 'minioadmin',
+  endpoint: ENV.MINIO_ENDPOINT,
+  port: Number(ENV.MINIO_PORT),
+  useSSL: ENV.MINIO_USE_SSL === 'true',
+  accessKey: ENV.MINIO_ACCESS_KEY,
+  secretKey: ENV.MINIO_SECRET_KEY,
   bucket: process.env?.MINIO_BUCKET ?? 'knowledge-docs',
   region: process.env?.MINIO_REGION ?? 'us-east-1'
 };

@@ -14,6 +14,7 @@
 import { readFile } from 'fs/promises';
 import { Project, SyntaxKind, type SourceFile, type Node } from 'ts-morph';
 import { basename, relative, extname } from 'path';
+import crypto from 'node:crypto';
 import { logAstParse } from './ast-ingest-logger.js';
 import { extractMetadata, persistFileFeature } from './workspace-metadata-extractor.js';
 
@@ -176,8 +177,9 @@ function chunkSourceFile(sourceFile: SourceFile, rootDir: string): CodeChunk[] {
 			lineEnd
 		};
 
+		const hash = crypto.createHash('sha256').update(content).digest('hex').slice(0, 12);
 		const partialChunk = {
-			id: `${relPath}::${symbol}::${chunkIndex}`,
+			id: `card:${relPath}:${hash}`,
 			content,
 			metadata
 		};
@@ -254,9 +256,10 @@ function chunkSourceFile(sourceFile: SourceFile, rootDir: string): CodeChunk[] {
 	}
 
 	// 7. If no chunks extracted (e.g., .svelte compiled or complex file), chunk the whole file
-	if (chunks.length === 0 && fileContent.length > 50) {
+	if (chunks.length === 0) {
+		const hash = crypto.createHash('sha256').update(fileContent.slice(0, 4000)).digest('hex').slice(0, 12);
 		const partialChunk = {
-			id: `${relPath}::file::0`,
+			id: `card:${relPath}:${hash}`,
 			content: fileContent.slice(0, 4000), // cap at ~4K chars
 			metadata: {
 				path: filePath,
@@ -286,9 +289,10 @@ function chunkRawFile(content: string, filePath: string, rootDir: string): CodeC
   const relPath = relative(rootDir, filePath).replace(/\\/g, '/');
   const tags = deriveTags(relPath, content);
   const routeId = deriveRouteId(relPath);
-  const lineCount = content.split(/\r?\n/).length;
+  const lineCount = normalizedContent.split(/\r?\n/).length;
+  const hash = crypto.createHash('sha256').update(normalizedContent.slice(0, 4000)).digest('hex').slice(0, 12);
   const partialChunk: Omit<CodeChunk, 'signature'> = {
-    id: `${relPath}::file::0`,
+    id: `card:${relPath}:${hash}`,
     content: normalizedContent.slice(0, 4000),
     metadata: {
       path: filePath,

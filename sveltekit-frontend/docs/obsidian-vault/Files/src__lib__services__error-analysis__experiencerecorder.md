@@ -1,0 +1,44 @@
+---
+type: "file"
+path: "src/lib/services/error-analysis/ExperienceRecorder.ts"
+aliases: ["ExperienceRecorder.ts","src/lib/services/error-analysis/ExperienceRecorder.ts"]
+clusterId: 19
+ext: ".ts"
+lineCount: 463
+pagerank: 0
+blend: 0
+isRoute: false
+isSvelteComp: false
+isTest: false
+hasAuth: false
+hasZod: false
+importCount: 3
+embedding_id: "qdrant://codebase_chunks_768/src/lib/services/error-analysis/ExperienceRecorder.ts"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+ai-first: true
+confidence: "high"
+up: ["[[Clusters/cluster-19]]"]
+imports: ["[[Files/types]]","[[Files/jsonlstorage]]"]
+tags: ["file","ext/ts","cluster/19","t/ts","t/src","t/lib"]
+---
+
+# `src/lib/services/error-analysis/ExperienceRecorder.ts`
+## For future Claude
+> Experience Recorder Service for LLM Self-Improvement System
+cluster:: [[Clusters/cluster-19]]
+pagerank:: 0.000000
+blend:: 0.000000
+lines:: 463
+## Summary
+
+Experience Recorder Service for LLM Self-Improvement System
+
+## Imports
+
+- imports:: [[Files/types]] `./types.js`
+- imports:: [[Files/jsonlstorage]] `./JSONLStorage.js`
+## Backlinks (Dataview)
+```dataviewjs
+const cur = dv.current().file.path;
+dv.list(dv.pages().where(p => Array.isArray(p.imports) && p.imports.some(l => l && l.path === cur)).file.link);
+```

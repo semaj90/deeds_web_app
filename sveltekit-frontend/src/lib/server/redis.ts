@@ -167,6 +167,89 @@ export async function ensureRedis() {
 }
 
 // =============================================================================
+// Typed Hash Helpers (Sprint 3.6 G17 Hardening)
+// Standardizes key naming and TTL enforcement for high-traffic metadata.
+// =============================================================================
+
+/**
+ * Standard Redis Key Namespaces:
+ *   ace:rank:demand   — 1h TTL, hit-demand hash (from chunk_hit_log)
+ *   ace:authority:top — 6h TTL, top entries from graphify:gds
+ *   ace:atlas:*       — 24h TTL, atlas directory cards
+ *   gpu:karpathy:scores — 24h TTL, GPU rank blend
+ *   agents:dir:*      — 24h TTL, AGENTS.md envelope mirror
+ *   taxonomy:clusters — 12h TTL, SOM/K-means cluster centroids
+ */
+
+/**
+ * Typed Hash Helper with TTL
+ * Standardizes the pattern of setting multiple fields in a hash and applying a TTL.
+ */
+export async function setHashWithTtl<T extends Record<string, string | number | boolean>>(
+	key: string,
+	fields: T,
+	ttlSeconds: number
+): Promise<void> {
+	try {
+		const redis = getRedis();
+		// Use pipeline to ensure atomic-ish set + expire
+		const pipeline = redis.pipeline();
+		pipeline.hset(key, fields);
+		pipeline.expire(key, ttlSeconds);
+		await pipeline.exec();
+	} catch (err) {
+		console.warn(`[Redis] Failed to set hash with TTL for key ${key}:`, err);
+	}
+}
+
+/**
+ * Typed Hash Retrieval
+ * Returns null if key doesn't exist or hash is empty.
+ */
+export async function getHash<T extends Record<string, string>>(
+	key: string
+): Promise<T | null> {
+	try {
+		const redis = getRedis();
+		const data = await redis.hgetall(key);
+		return Object.keys(data).length > 0 ? (data as T) : null;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Generic JSON Set with TTL
+ * Standardizes the pattern of stringifying objects and applying a TTL.
+ */
+export async function setJsonWithTtl<T>(
+	key: string,
+	value: T,
+	ttlSeconds: number
+): Promise<void> {
+	try {
+		const redis = getRedis();
+		await redis.set(key, JSON.stringify(value), 'EX', ttlSeconds);
+	} catch (err) {
+		console.warn(`[Redis] Failed to set JSON with TTL for key ${key}:`, err);
+	}
+}
+
+/**
+ * Generic JSON Retrieval
+ * Automatically parses JSON string back to typed object. Returns null on miss.
+ */
+export async function getJson<T>(key: string): Promise<T | null> {
+	try {
+		const redis = getRedis();
+		const raw = await redis.get(key);
+		return raw ? (JSON.parse(raw) as T) : null;
+	} catch {
+		return null;
+	}
+}
+
+// =============================================================================
 // Chat Message Cache
 // Keys: chat:msg:{conversationId}:{index}  → JSON {role,content,timestamp}
 //       chat:session:{sessionId}            → Redis Set of conversationIds

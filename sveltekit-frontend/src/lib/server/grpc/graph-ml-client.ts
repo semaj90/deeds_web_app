@@ -4,12 +4,10 @@
  * Thin TypeScript bridge for the 4 GPU graph-ML operations defined in graph_ml.proto.
  * Execution priority per call:
  *   1. Local N-API (pytorch-graph.ts)  — fastest, synchronous, RTX 3060 Ti CUDA
- *   2. Remote gRPC                     — when GRAPH_ML_GRPC_URL + GRAPH_ML_GRPC_ENABLED=true
+ *   2. Remote gRPC                     — when GRAPH_ML_GRPC_ENABLED=true
  *   3. CPU JS fallback                 — always available (pytorch-graph.ts internals)
  *
- * ENV:
- *   GRAPH_ML_GRPC_URL      — gRPC server address (default: 127.0.0.1:50056)
- *   GRAPH_ML_GRPC_ENABLED  — "true" to enable remote gRPC path (default: "false")
+ * All addresses resolved via ENV.* getters in env.server.ts.
  */
 
 import {
@@ -57,7 +55,7 @@ export interface GraphMLPageRankResult {
 //   2. Replace the stub body below with the real client call, mirroring the
 //      pattern in embedding-client.ts (lazy import, deadline, callback → Promise).
 //   3. Set GRAPH_ML_GRPC_ENABLED=true in .env and point GRAPH_ML_GRPC_URL at the
-//      Go microservice address (e.g. 127.0.0.1:50056).
+//      Go microservice address (e.g. via ENV.GRAPH_ML_GRPC_URL).
 
 let _grpcClient: any = null;
 let _grpcLoadFailed = false;

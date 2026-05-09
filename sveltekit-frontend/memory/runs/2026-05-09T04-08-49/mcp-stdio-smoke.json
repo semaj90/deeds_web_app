@@ -1,0 +1,46 @@
+{
+  "runAt": "2026-05-09T04:08:49.312Z",
+  "summary": {
+    "pass": 2,
+    "skip": 5,
+    "fail": 0,
+    "total": 7
+  },
+  "results": [
+    {
+      "name": "connect",
+      "status": "PASS",
+      "preview": "stdio handshake complete"
+    },
+    {
+      "name": "tools/list",
+      "status": "PASS",
+      "preview": "tools=68"
+    },
+    {
+      "name": "context.build_kv_packet",
+      "status": "SKIP",
+      "preview": "tool not exposed"
+    },
+    {
+      "name": "search.postgres_fts",
+      "status": "SKIP",
+      "preview": "tool not exposed"
+    },
+    {
+      "name": "agents_md.context_for_file",
+      "status": "SKIP",
+      "preview": "tool not exposed"
+    },
+    {
+      "name": "graph.expand_neighborhood",
+      "status": "SKIP",
+      "preview": "tool not exposed"
+    },
+    {
+      "name": "kag.multi_lane_search",
+      "status": "SKIP",
+      "preview": "tool not exposed"
+    }
+  ]
+}

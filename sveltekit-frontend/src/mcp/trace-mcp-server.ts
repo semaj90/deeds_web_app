@@ -57,6 +57,16 @@ import { Pool } from 'pg';
 
 const PORT     = Number(process.env.TRACE_MCP_PORT  ?? 8788);
 const HOST     = process.env.TRACE_MCP_HOST         ?? '127.0.0.1';
+
+import { registerNewTools } from './new_tools.js';
+import { registerAdminTools } from './admin_tools.js';
+import { registerSkillTools } from './skill_tools.js';
+import { registerCodebaseTools } from './codebase_tools.js';
+import { registerResearchTools } from './research_tools.js';
+import { searchNotecards } from '../lib/server/kb/search-logic.js';
+import { registerBifrostTools } from './bifrost_tools.js';
+import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
+
 const SVELTEKIT = process.env.SVELTEKIT_URL         ?? 'http://127.0.0.1:5173';
 const NEO4J_HTTP = process.env.NEO4J_HTTP_URL       ?? 'http://localhost:7474';
 const NEO4J_USER = process.env.NEO4J_USER           ?? 'neo4j';
@@ -66,6 +76,37 @@ const PG_URL     = process.env.DATABASE_URL          ?? 'postgresql://legal_admi
 const TOPO_URL          = process.env.TOPOLOGY_SEARCH_URL  ?? 'http://127.0.0.1:8101';
 const GO_SEARCH_URL     = process.env.GO_SEARCH_URL         ?? 'http://127.0.0.1:8096';
 const GO_RETRIEVAL_URL  = process.env.GO_RETRIEVAL_URL      ?? 'http://127.0.0.1:8100';
+const RERANK_URL        = process.env.RERANK_BASE_URL       ?? process.env.RERANK_URL ?? 'http://127.0.0.1:8090';
+const TURBOQUANT_URL    = process.env.TURBOQUANT_BASE_URL   ?? 'http://127.0.0.1:8080';
+const OLLAMA_BASE       = process.env.OLLAMA_BASE_URL      ?? 'http://127.0.0.1:11434';
+const OLLAMA_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL   ?? 'embeddinggemma:latest';
+const QDRANT_URL        = process.env.QDRANT_URL            ?? 'http://127.0.0.1:6333';
+
+const server = new McpServer({
+  name: "trace-mcp-server",
+  version: "1.0.0",
+});
+
+registerNewTools(server, { rerankUrl: RERANK_URL });
+registerAdminTools(server);
+registerSkillTools(server);
+registerCodebaseTools(server);
+registerResearchTools(server);
+registerBifrostTools(server);
+registerTopologyMgmtTools(server, pool);
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const path = await import('node:path');
+
+const NATIVE_PATH = path.resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+let native: any = null;
+try {
+  native = require(NATIVE_PATH);
+} catch (e) {
+  console.warn('Native addon failed to load:', e);
+}
+
+
 
 const pool = new Pool({ connectionString: PG_URL, max: 4, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
 pool.on('error', () => {});
@@ -121,13 +162,32 @@ async function getOrComputeEmbedding(query: string): Promise<{ embedding: number
         }
       } catch { /* fallthrough to recompute */ }
     }
-    const res = await sveltePost('/api/embed', { text: safeQuery });
-    const embedding = ((res as { embedding?: number[] }).embedding ?? []) as number[];
+    let embedding: number[] = [];
+    try {
+      const res = await sveltePost('/api/embed', { text: safeQuery });
+      embedding = ((res as { embedding?: number[] }).embedding ?? []) as number[];
+    } catch {
+      // Fallback to direct Ollama
+      try {
+        const res = await fetch(`${OLLAMA_BASE}/api/embeddings`, {
+          method: 'POST',
+          body: JSON.stringify({ model: OLLAMA_EMBED_MODEL, prompt: safeQuery }),
+          signal: AbortSignal.timeout(10_000),
+        });
+        const data = await res.json() as { embedding?: number[] };
+        embedding = data.embedding ?? [];
+      } catch (err) {
+        console.error('Embedding fallback failed:', err);
+      }
+    }
+
     if (embedding.length === 768) {
+      const r = await getEmbedRedis();
       await r.setex(key, EMBED_CACHE_TTL, JSON.stringify(embedding)).catch(() => {});
     }
     return { embedding, cached: false };
-  } catch {
+  } catch (err) {
+    console.error('getOrComputeEmbedding error:', err);
     return { embedding: [], cached: false };
   }
 }
@@ -156,6 +216,99 @@ function clampInt(n: unknown, min: number, max: number, fallback: number): numbe
   const v = Math.round(Number(n));
   if (!Number.isFinite(v)) return fallback;
   return Math.max(min, Math.min(max, v));
+}
+
+async function searchEmbeddedSummariesLexically(opts: {
+  query: string;
+  limit: number;
+  jsonFilter?: Record<string, unknown>;
+  sourceType?: string;
+}) {
+  const params: Array<string | number> = [opts.query];
+  let sql = `
+    SELECT chunk_id,
+           summary_text,
+           output_meta,
+           manifold4,
+           som_bmu_row,
+           som_bmu_col,
+           ts_rank_cd(
+             to_tsvector('english', COALESCE(summary_text, '')),
+             plainto_tsquery('english', $1)
+           ) AS lexical_score
+    FROM embedded_summaries
+    WHERE COALESCE(summary_text, '') <> ''
+  `;
+
+  if (opts.sourceType) {
+    params.push(opts.sourceType);
+    sql += ` AND source_type = $${params.length}`;
+  }
+
+  if (opts.jsonFilter) {
+    params.push(JSON.stringify(opts.jsonFilter));
+    sql += ` AND output_meta @> $${params.length}`;
+  }
+
+  params.push(opts.limit);
+  sql += ` ORDER BY lexical_score DESC, updated_at DESC LIMIT $${params.length}`;
+  return pool.query(sql, params);
+}
+
+async function probeUrl(name: string, url: string, init?: RequestInit) {
+  const startedAt = Date.now();
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(4_000), ...init });
+    return {
+      name,
+      url,
+      ok: res.ok,
+      status: res.status,
+      latencyMs: Date.now() - startedAt,
+    };
+  } catch (error) {
+    return {
+      name,
+      url,
+      ok: false,
+      status: null,
+      latencyMs: Date.now() - startedAt,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+async function probePostgres() {
+  const startedAt = Date.now();
+  try {
+    await pool.query('SELECT 1');
+    return { name: 'postgres', ok: true, status: 'ok', latencyMs: Date.now() - startedAt };
+  } catch (error) {
+    return {
+      name: 'postgres',
+      ok: false,
+      status: 'error',
+      latencyMs: Date.now() - startedAt,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+async function probeRedis() {
+  const startedAt = Date.now();
+  try {
+    const redis = await getEmbedRedis();
+    await redis.ping();
+    return { name: 'redis', ok: true, status: 'ok', latencyMs: Date.now() - startedAt };
+  } catch (error) {
+    return {
+      name: 'redis',
+      ok: false,
+      status: 'error',
+      latencyMs: Date.now() - startedAt,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
 
 function normalizeJsonFilter(input: unknown): Record<string, unknown> | undefined {
@@ -294,10 +447,6 @@ async function sveltePost(path: string, body: unknown) {
   return res.json();
 }
 
-// ── MCP Server ────────────────────────────────────────────────────────────────
-
-const server = new McpServer({ name: 'trace-kag-tools', version: '1.0.0' });
-
 // ── Tool registry for tools.batch_call ────────────────────────────────────────
 // Capture every tool handler keyed by name so batch_call can dispatch by name
 // without re-routing through MCP transport. Preserves the SDK's tool() API.
@@ -371,6 +520,82 @@ server.tool(
       ? { path: rows[0].row?.[0], hops: rows[0].row?.[1], relations: rows[0].row?.[2] }
       : { path: null, hops: null, message: 'No path found within hop limit' };
     return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+// == graph.semantic_path_synthesis ============================================
+
+server.tool(
+  'graph.semantic_path_synthesis',
+  {
+    startKey: z.string().describe('Source node stableKey'),
+    endKey:   z.string().describe('Target node stableKey'),
+    maxHops:  z.number().int().min(1).max(10).default(6),
+  },
+  async ({ startKey, endKey, maxHops }) => {
+    try {
+      // 1. Structural Traverse (Neo4j)
+      const rows = await neo4jQuery(
+        `MATCH p = shortestPath((a {stableKey: $from})-[*..${maxHops}]-(b {stableKey: $to}))
+         RETURN [n IN nodes(p) | n.stableKey] AS path,
+                [r IN relationships(p) | type(r)] AS relations`,
+        { from: startKey, to: endKey }
+      );
+      
+      if (!rows.length || !rows[0].row?.[0]) {
+        return { content: [{ type: 'text', text: 'No structural path found' }] };
+      }
+      
+      const pathKeys = rows[0].row[0] as string[];
+      const relations = rows[0].row[1] as string[];
+      
+      // 2. Semantic Hydration (Postgres)
+      const hydratedNodes = await pool.query(
+        `SELECT chunk_id, summary_text, output_meta, som_bmu_row, som_bmu_col, pagerank_score, risk_score
+         FROM embedded_summaries
+         WHERE chunk_id = ANY($1)`,
+        [pathKeys]
+      );
+      
+      const nodeMap = new Map(hydratedNodes.rows.map(n => [n.chunk_id, n]));
+      
+      // 3. Synthesis
+      const steps = pathKeys.map((key, i) => {
+        const node = nodeMap.get(key);
+        return {
+          step: i + 1,
+          stableKey: key,
+          relation: i > 0 ? relations[i - 1] : 'START',
+          summary: node?.summary_text ?? 'No summary available',
+          outputMeta: node?.output_meta ?? {},
+          somAnchor: node ? `${node.som_bmu_row},${node.som_bmu_col}` : null,
+          authority: node?.pagerank_score ?? 0,
+        };
+      });
+      
+      // 4. Derive Outcomes
+      const allTags = steps.flatMap(s => s.outputMeta?.tags || []);
+      const sharedTags = Array.from(new Set(allTags.filter((t, i) => allTags.indexOf(t) !== i)));
+      
+      const leaps = [];
+      for (let i = 1; i < steps.length; i++) {
+        if (steps[i-1].somAnchor && steps[i].somAnchor && steps[i-1].somAnchor !== steps[i].somAnchor) {
+          leaps.push({ from: steps[i-1].stableKey, to: steps[i].stableKey, boundary: `${steps[i-1].somAnchor} -> ${steps[i].somAnchor}` });
+        }
+      }
+      
+      const synthesis = {
+        path: steps,
+        sharedTags,
+        crossClusterLeaps: leaps,
+        totalAuthority: steps.reduce((acc, s) => acc + s.authority, 0),
+        narrative: `Synthesized structural path of ${steps.length} steps. Identified ${sharedTags.length} shared tags and ${leaps.length} cluster leaps.`
+      };
+      
+      return { content: [{ type: 'text', text: JSON.stringify(synthesis, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
   }
 );
 
@@ -543,6 +768,623 @@ server.tool(
         }, null, 2),
       }],
     };
+  }
+);
+
+// == topology.search_som_neighborhood =========================================
+
+server.tool(
+  'topology.search_som_neighborhood',
+  {
+    query: z.string().describe('Search query'),
+    radius: z.number().int().min(0).max(2).default(1).describe('SOM neighbor radius'),
+    limit: z.number().int().default(10),
+    jsonFilter: z.record(z.string(), z.any()).optional().describe('Optional JSONB metadata filter'),
+  },
+  async ({ query, radius, limit, jsonFilter }) => {
+    try {
+      // Anchor on the dedicated topology sidecar. embedded_summaries does not
+      // store 768d embeddings, so comparing a query embedding to manifold4 is invalid.
+      const topoRes = await fetch(`${TOPO_URL}/search/hybrid`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, radius: 0.25, limit: 1 }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!topoRes.ok) {
+        throw new Error(`topology /search/hybrid HTTP ${topoRes.status}`);
+      }
+
+      const topoData = await topoRes.json() as {
+        hits?: Array<Record<string, unknown>>;
+        results?: Array<Record<string, unknown>>;
+      };
+      const anchor = (topoData.hits ?? topoData.results ?? [])[0] ?? null;
+      const som_bmu_row = typeof anchor?.som_bmu_row === 'number' ? anchor.som_bmu_row : null;
+      const som_bmu_col = typeof anchor?.som_bmu_col === 'number' ? anchor.som_bmu_col : null;
+
+      if (som_bmu_row == null || som_bmu_col == null) {
+        return { content: [{ type: 'text', text: JSON.stringify({
+          query,
+          degraded: true,
+          error: 'No SOM anchor found for query',
+          note: 'Hydrate som_bmu_row/som_bmu_col and manifold4 before relying on neighborhood expansion.',
+        }, null, 2) }] };
+      }
+
+      // 2. Retrieve neighborhood by BMU proximity.
+      let sql = `
+        SELECT chunk_id,
+               summary_text,
+               output_meta,
+               manifold4,
+               som_bmu_row,
+               som_bmu_col,
+               ABS(som_bmu_row - $1) + ABS(som_bmu_col - $3) AS som_distance
+        FROM embedded_summaries
+        WHERE som_bmu_row BETWEEN $1 AND $2
+          AND som_bmu_col BETWEEN $3 AND $4
+      `;
+      const params: Array<number | string> = [
+        som_bmu_row - radius,
+        som_bmu_row + radius,
+        som_bmu_col - radius,
+        som_bmu_col + radius,
+      ];
+      
+      if (jsonFilter) {
+        params.push(JSON.stringify(jsonFilter));
+        sql += ` AND output_meta @> $${params.length}`;
+      }
+      
+      sql += ` ORDER BY som_distance ASC, updated_at DESC LIMIT 1000`;
+      
+      const candidates = await pool.query(sql, params);
+      if (candidates.rows.length === 0) return { content: [{ type: 'text', text: '[]' }] };
+
+      return { content: [{ type: 'text', text: JSON.stringify({
+        query,
+        anchor: {
+          stable_key: anchor?.stable_key ?? null,
+          path: anchor?.path ?? anchor?.file_path ?? null,
+          som_bmu_row,
+          som_bmu_col,
+          manifold4: Array.isArray(anchor?.coords) ? anchor.coords : null,
+        },
+        rerank: {
+          applied: false,
+          reason: 'embedded_summaries does not expose a 768d embedding column for neighborhood reranking',
+        },
+        results: candidates.rows.slice(0, limit),
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: JSON.stringify({ error: String(err) }) }], isError: true };
+    }
+  }
+);
+
+// == topology.hydration_status ================================================
+
+server.tool(
+  'topology.hydration_status',
+  {},
+  async () => {
+    try {
+      const res = await pool.query(`
+        SELECT
+          COUNT(*)::int AS total_rows,
+          COUNT(*) FILTER (WHERE som_bmu_row IS NOT NULL AND som_bmu_col IS NOT NULL)::int AS bmu_rows,
+          COUNT(*) FILTER (WHERE manifold4 IS NOT NULL AND array_length(manifold4, 1) = 4)::int AS manifold4_rows
+        FROM embedded_summaries
+      `);
+
+      const row = res.rows[0] ?? { total_rows: 0, bmu_rows: 0, manifold4_rows: 0 };
+      const total = Number(row.total_rows ?? 0);
+      const bmuRows = Number(row.bmu_rows ?? 0);
+      const manifold4Rows = Number(row.manifold4_rows ?? 0);
+
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            ok: true,
+            totalRows: total,
+            bmuRows,
+            manifold4Rows,
+            bmuCoveragePct: total > 0 ? Math.round((bmuRows / total) * 1000) / 10 : 0,
+            manifold4CoveragePct: total > 0 ? Math.round((manifold4Rows / total) * 1000) / 10 : 0,
+            hydrated: total > 0 && bmuRows === total && manifold4Rows === total,
+            degraded: total === 0 || bmuRows < total || manifold4Rows < total,
+            note: total === 0
+              ? 'No embedded summaries found.'
+              : bmuRows < total || manifold4Rows < total
+                ? 'Topology hydration incomplete; semantic anchoring can still work, but SOM/topology expansion is partial.'
+                : 'Topology hydration complete for embedded summaries.',
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: false, degraded: true, error: String(err) }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// == topology.recompute_manifold_plan =========================================
+
+server.tool(
+  'topology.recompute_manifold_plan',
+  {
+    scope: z.enum(['embedded_summaries', 'codebase_index', 'all']).default('all'),
+  },
+  async ({ scope }) => {
+    try {
+      const summaryRes = await pool.query(`
+        SELECT
+          COUNT(*)::int AS total_rows,
+          COUNT(*) FILTER (WHERE som_bmu_row IS NOT NULL AND som_bmu_col IS NOT NULL)::int AS bmu_rows,
+          COUNT(*) FILTER (WHERE manifold4 IS NOT NULL AND array_length(manifold4, 1) = 4)::int AS manifold4_rows
+        FROM embedded_summaries
+      `);
+      const codebaseRes = await pool.query(`
+        SELECT
+          COUNT(*)::int AS total_rows,
+          COUNT(*) FILTER (WHERE som_bmu_row IS NOT NULL AND som_bmu_col IS NOT NULL)::int AS bmu_rows,
+          COUNT(*) FILTER (WHERE manifold4 IS NOT NULL AND array_length(manifold4, 1) = 4)::int AS manifold4_rows
+        FROM codebase_chunk_index
+      `).catch(() => ({ rows: [{ total_rows: 0, bmu_rows: 0, manifold4_rows: 0 }] }));
+
+      const summary = summaryRes.rows[0];
+      const codebase = codebaseRes.rows[0];
+      const selected = scope === 'embedded_summaries'
+        ? summary
+        : scope === 'codebase_index'
+          ? codebase
+          : {
+              total_rows: Number(summary.total_rows ?? 0) + Number(codebase.total_rows ?? 0),
+              bmu_rows: Number(summary.bmu_rows ?? 0) + Number(codebase.bmu_rows ?? 0),
+              manifold4_rows: Number(summary.manifold4_rows ?? 0) + Number(codebase.manifold4_rows ?? 0),
+            };
+
+      const totalRows = Number(selected.total_rows ?? 0);
+      const bmuRows = Number(selected.bmu_rows ?? 0);
+      const manifold4Rows = Number(selected.manifold4_rows ?? 0);
+      const missingBmu = Math.max(0, totalRows - bmuRows);
+      const missingManifold4 = Math.max(0, totalRows - manifold4Rows);
+
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            ok: true,
+            readOnly: true,
+            scope,
+            current: {
+              totalRows,
+              bmuRows,
+              manifold4Rows,
+              missingBmu,
+              missingManifold4,
+            },
+            recommendedSequence: [
+              'npm run graphify:topology:gpu',
+              'npm run qdrant:patch-topology',
+              'npm run graphify:seed-llm-index',
+            ],
+            expectedEffects: [
+              'Populate som_bmu_row and som_bmu_col for topological grid expansion.',
+              'Populate manifold4 for 4D topology metadata and proximity search.',
+              'Improve topology.search_som_neighborhood and hydration status coverage.',
+            ],
+            note: 'This tool is plan-only. It does not execute graphify or backfill jobs.',
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: false, degraded: true, error: String(err) }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// == kb.hybrid_search =========================================================
+
+server.tool(
+  'kb.hybrid_search',
+  {
+    query: z.string().describe('Semantic query'),
+    jsonFilter: z.record(z.string(), z.any()).optional().describe('JSONB metadata filter'),
+    limit: z.number().int().default(10),
+  },
+  async ({ query, jsonFilter, limit }) => {
+    try {
+      const lexicalPromise = searchEmbeddedSummariesLexically({ query, limit: limit * 2, jsonFilter });
+      const embedPromise = getOrComputeEmbedding(query);
+      const semanticPromise = embedPromise.then(({ embedding, cached }) => {
+        if (embedding.length !== 768) return { ok: false, cached, data: [] as Array<Record<string, unknown>> };
+        return sveltePost('/api/code-intel/search', { query, limit: limit * 2 })
+          .then((data) => ({
+            ok: true,
+            cached,
+            data: Array.isArray((data as { data?: Array<Record<string, unknown>> }).data)
+              ? (data as { data?: Array<Record<string, unknown>> }).data ?? []
+              : [],
+          }))
+          .catch(() => ({ ok: false, cached, data: [] as Array<Record<string, unknown>> }));
+      });
+
+      const [lexicalRes, semanticRes] = await Promise.all([lexicalPromise, semanticPromise]);
+      const merged = new Map<string, Record<string, unknown>>();
+
+      for (const row of lexicalRes.rows as Array<Record<string, unknown>>) {
+        const key = String(row.chunk_id ?? row.summary_text ?? crypto.randomUUID());
+        merged.set(key, {
+          ...row,
+          sources: ['embedded_summaries_fts'],
+          final_score: Number(row.lexical_score ?? 0) * 0.55,
+        });
+      }
+
+      for (const row of semanticRes.data) {
+        const key = String(row.filePath ?? row.stableKey ?? crypto.randomUUID());
+        const existing = merged.get(key);
+        if (existing) {
+          (existing.sources as string[]).push('code_intel_semantic');
+          existing.semantic_score = row.score;
+          existing.final_score = Number(existing.final_score ?? 0) + Number(row.score ?? 0) * 0.45;
+          if (!existing.file_path && row.filePath) existing.file_path = row.filePath;
+          if (!existing.content && row.content) existing.content = row.content;
+        } else {
+          merged.set(key, {
+            stable_key: row.stableKey ?? null,
+            file_path: row.filePath ?? null,
+            content: row.content ?? null,
+            semantic_score: row.score ?? 0,
+            sources: ['code_intel_semantic'],
+            final_score: Number(row.score ?? 0) * 0.45,
+          });
+        }
+      }
+
+      const results = Array.from(merged.values())
+        .sort((a, b) => Number(b.final_score ?? 0) - Number(a.final_score ?? 0))
+        .slice(0, limit);
+
+      return { content: [{ type: 'text', text: JSON.stringify({
+        query,
+        count: results.length,
+        embedding_used: semanticRes.ok,
+        embed_cache_hit: semanticRes.cached,
+        degraded: !semanticRes.ok,
+        note: semanticRes.ok
+          ? 'Sparse lexical summaries merged with 768d semantic code-intel anchors.'
+          : '768d semantic lane unavailable; returning sparse lexical results only.',
+        results,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: JSON.stringify({ error: String(err) }) }], isError: true };
+    }
+  }
+);
+
+// == graph.materialize_pathway ================================================
+
+server.tool(
+  'graph.materialize_pathway',
+  {
+    startKey: z.string().describe('Starting node stableKey'),
+    endKey:   z.string().describe('Target node stableKey'),
+    summary:  z.string().describe('Synthesized narrative summary'),
+    pathSteps: z.array(z.record(z.string(), z.any())).describe('The ordered steps of the path'),
+    citationSpans: z.array(z.any()).optional().describe('Provenance mapping'),
+    pagerankScore: z.number().optional(),
+  },
+  async ({ startKey, endKey, summary, pathSteps, citationSpans, pagerankScore }) => {
+    try {
+      const { embedding } = await getOrComputeEmbedding(summary);
+      if (embedding.length === 0) return { content: [{ type: 'text', text: 'Embedding failed' }], isError: true };
+      
+      const pathKey = createHash('sha256').update(`${startKey}:${endKey}:${summary.slice(0,100)}`).digest('hex').slice(0, 16);
+      
+      // Attempt primary table
+      try {
+        const res = await pool.query(
+          `INSERT INTO graph_pathway_cards (
+            path_key, start_node, end_node, summary, path_sequence, citation_spans, pagerank_score, embedding
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, ($8::real[]::vector))
+          ON CONFLICT (path_key) DO UPDATE SET 
+            summary = EXCLUDED.summary,
+            path_sequence = EXCLUDED.path_sequence,
+            updated_at = NOW()
+          RETURNING id`,
+          [
+            pathKey, startKey, endKey, summary, 
+            JSON.stringify(pathSteps), JSON.stringify(citationSpans || []), 
+            pagerankScore || 0.0, embedding
+          ]
+        );
+        return { content: [{ type: 'text', text: `Pathway materialized with ID: ${res.rows[0].id}` }] };
+      } catch (e) {
+        // Fallback to embedded_summaries
+        const res = await pool.query(
+          `INSERT INTO embedded_summaries (
+            chunk_id, summary_text, source_type, source_hash, summary_type, 
+            model, embedding_model, qdrant_collection, manifold4
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, ($9::real[]::vector))
+          RETURNING id`,
+          [
+            `${startKey}->${endKey}`, summary, 'pathway', pathKey, 'detailed',
+            'mcp-algorithmic', OLLAMA_EMBED_MODEL, 'pathway_cards', embedding
+          ]
+        );
+        return { content: [{ type: 'text', text: `Pathway materialized (fallback) with ID: ${res.rows[0].id}` }] };
+      }
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+);
+
+// == kb.search_pathways =======================================================
+
+server.tool(
+  'kb.search_pathways',
+  {
+    query: z.string().describe('Search for synthesized pathways'),
+    limit: z.number().int().default(5),
+  },
+  async ({ query, limit }) => {
+    try {
+      const { embedding } = await getOrComputeEmbedding(query);
+      if (embedding.length === 0) return { content: [{ type: 'text', text: 'Embedding failed' }], isError: true };
+      
+      // Search both potential tables
+      const pathways = await pool.query(
+        `SELECT id, path_key, summary, path_sequence FROM graph_pathway_cards 
+         ORDER BY (embedding::vector) <=> ($1::real[]::vector) LIMIT $2`,
+        [embedding, limit]
+      ).catch(() => ({ rows: [] }));
+      
+      const fallback = await searchEmbeddedSummariesLexically({
+        query,
+        limit,
+        sourceType: 'pathway',
+      }).catch(() => ({ rows: [] }));
+      
+      return { 
+        content: [{ 
+          type: 'text', 
+          text: JSON.stringify({ 
+            primary: pathways.rows, 
+            fallback: fallback.rows 
+          }, null, 2) 
+        }] 
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+);
+
+// == kb.search_notecards ======================================================
+
+server.tool(
+  'kb.search_notecards',
+  {
+    query: z.string().describe('Search for identity-spine notecards'),
+    limit: z.number().int().min(1).max(20).default(5),
+  },
+  async ({ query, limit }) => {
+    try {
+      const cards = await searchNotecards({ query, limit });
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            query,
+            count: cards.length,
+            cards: cards.map((card) => ({
+              chunk_id: card.card_id,
+              source_path: card.source_path,
+              score: card.score,
+              why: card.why,
+              kind: card.kind,
+              tags: card.tags,
+              content: card.context_text.slice(0, 600),
+            })),
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+);
+
+// == kb.explain_context_pack ==================================================
+
+server.tool(
+  'kb.explain_context_pack',
+  {
+    query: z.string().describe('User question that produced the context pack'),
+    hybridSearch: z.array(z.record(z.string(), z.any())).optional(),
+    pathwaySearch: z.record(z.string(), z.any()).optional(),
+    notecardSearch: z.record(z.string(), z.any()).optional(),
+    rerankResults: z.record(z.string(), z.any()).optional(),
+    topologyNeighborhood: z.record(z.string(), z.any()).optional(),
+  },
+  async ({ query, hybridSearch, pathwaySearch, notecardSearch, rerankResults, topologyNeighborhood }) => {
+    const hybridCount = hybridSearch?.length ?? 0;
+    const pathwayPrimary = Array.isArray(pathwaySearch?.primary) ? pathwaySearch.primary.length : 0;
+    const pathwayFallback = Array.isArray(pathwaySearch?.fallback) ? pathwaySearch.fallback.length : 0;
+    const notecardCount = Array.isArray(notecardSearch?.cards) ? notecardSearch.cards.length : 0;
+    const rerankCount = Array.isArray(rerankResults?.results) ? rerankResults.results.length : 0;
+    const topologyCount = Array.isArray(topologyNeighborhood?.results) ? topologyNeighborhood.results.length : 0;
+
+    const reasons: string[] = [];
+    if (hybridCount > 0) reasons.push(`hybrid retrieval surfaced ${hybridCount} summary candidates`);
+    if (pathwayPrimary + pathwayFallback > 0) reasons.push(`pathway retrieval found ${pathwayPrimary + pathwayFallback} reusable narratives`);
+    if (notecardCount > 0) reasons.push(`identity-spine notecards contributed ${notecardCount} codebase anchors`);
+    if (rerankCount > 0) reasons.push(`reranking compressed the candidate set to ${rerankCount}`);
+    if (topologyCount > 0) reasons.push(`SOM neighborhood expansion added ${topologyCount} topological neighbors`);
+    if (reasons.length === 0) reasons.push('all retrieval lanes degraded or returned empty results');
+
+    const recommendedNextSteps: string[] = [];
+    if (hybridCount === 0) recommendedNextSteps.push('Run kb.hybrid_search diagnostics or check embedded_summaries freshness');
+    if (pathwayPrimary === 0) recommendedNextSteps.push('Materialized pathway coverage is low for this query family');
+    if (topologyCount === 0 && /som|topology|cluster|neighbor/i.test(query)) {
+      recommendedNextSteps.push('Hydrate SOM anchors before relying on topology neighborhood answers');
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          query,
+          summary: `Context pack assembled from ${[
+            hybridCount > 0 ? 'hybrid summaries' : null,
+            pathwayPrimary + pathwayFallback > 0 ? 'pathway cards' : null,
+            notecardCount > 0 ? 'notecards' : null,
+            topologyCount > 0 ? 'SOM neighbors' : null,
+          ].filter(Boolean).join(', ') || 'degraded fallbacks'}.`,
+          reasons,
+          counts: {
+            hybrid: hybridCount,
+            pathwayPrimary,
+            pathwayFallback,
+            notecards: notecardCount,
+            reranked: rerankCount,
+            topologyNeighbors: topologyCount,
+          },
+          recommendedNextSteps,
+        }, null, 2),
+      }],
+    };
+  }
+);
+
+// == trace.system_health =======================================================
+
+server.tool(
+  'trace.system_health',
+  {},
+  async () => {
+    const checks = await Promise.all([
+      probeUrl('mcp', `http://${HOST}:${PORT}/health`),
+      probeUrl('ollama_embed', `${OLLAMA_BASE}/api/tags`),
+      probeUrl('bifrost', `${process.env.BIFROST_URL ?? 'http://127.0.0.1:3040'}/health`),
+      probeUrl('turboquant', `${TURBOQUANT_URL}/health`),
+      probeUrl('topology_search', `${TOPO_URL}/health`),
+      probeUrl('go_retrieval', `${GO_RETRIEVAL_URL}/health`),
+      probeUrl('rerank', `${RERANK_URL}/health`),
+      probeUrl('qdrant', `${QDRANT_URL}/collections`),
+      probeUrl('neo4j', `${NEO4J_HTTP}/db/neo4j/tx/commit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(`${NEO4J_USER}:${NEO4J_PASS}`).toString('base64')}`,
+        },
+        body: JSON.stringify({ statements: [{ statement: 'RETURN 1' }] }),
+      }),
+      probePostgres(),
+      probeRedis(),
+    ]);
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          ok: checks.every((check) => check.ok),
+          degraded: checks.some((check) => !check.ok),
+          checkedAt: new Date().toISOString(),
+          services: checks,
+          notes: [
+            'Port 8788: TRACE MCP tool gateway',
+            'Port 11434: Ollama (embeddings + fast gen)',
+            'Port 8090: Reranker (Optimized llama-server)',
+            'Port 8080: TurboQuant (Long-context llama-server)',
+            'Port 3040: Bifrost dispatcher'
+          ],
+        }, null, 2),
+      }],
+    };
+  }
+);
+
+// == search.rerank ============================================================
+
+server.tool(
+  'search.rerank',
+  {
+    query: z.string().describe('The user query'),
+    documents: z.array(z.string()).describe('List of document snippets to rerank'),
+    topN: z.number().int().default(5),
+  },
+  async ({ query, documents, topN }) => {
+    try {
+      const res = await fetch(`${RERANK_URL}/rerank`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, documents, top_n: topN }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok) {
+        throw new Error(`rerank HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: JSON.stringify({
+        degraded: true,
+        reason: String(err),
+        results: documents.slice(0, topN).map((document, index) => ({
+          index,
+          relevance_score: Math.max(0, 1 - index * 0.05),
+          document,
+        })),
+      }, null, 2) }] };
+    }
+  }
+);
+
+// == hypergraph.semantic_path_synthesis =======================================
+
+server.tool(
+  'hypergraph.semantic_path_synthesis',
+  {
+    startKey: z.string().describe('Source node stableKey'),
+    endKey:   z.string().describe('Target node stableKey'),
+  },
+  async ({ startKey, endKey }) => {
+    try {
+      const res = await pool.query(
+        `SELECT h.edge_hash, h.title, h.summary, h.member_ids, h.confidence
+         FROM hypergraph_edges h
+         WHERE $1 = ANY(h.member_ids) OR $2 = ANY(h.member_ids)
+         LIMIT 10`,
+        [startKey, endKey]
+      );
+      
+      const direct = res.rows.filter(r => r.member_ids.includes(startKey) && r.member_ids.includes(endKey));
+      const bridges = res.rows.filter(r => !direct.includes(r));
+      
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            directLinkingEdges: direct,
+            potentialBridges: bridges,
+            note: 'Hypergraph paths represent higher-order relations beyond simple direct imports/calls.'
+          }, null, 2)
+        }]
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
   }
 );
 
@@ -2673,9 +3515,11 @@ pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first r
 nodeServer.listen(PORT, HOST, () => {
   console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
   console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
-  console.log('       graph.pagerank_top, topology.search_near, topology.same_som_cluster,');
-  console.log('       topology.search_4d (4D manifold + JSONB filters),');
-  console.log('       clusters.get_members, clusters.get_summary_lenses,');
+  console.log('       graph.pagerank_top, graph.materialize_pathway, graph.semantic_path_synthesis,');
+  console.log('       topology.search_near, topology.same_som_cluster, topology.search_som_neighborhood,');
+  console.log('       kb.hybrid_search, kb.search_pathways, kb.search_notecards, kb.explain_context_pack,');
+  console.log('       search.rerank, clusters.get_members,');
+  console.log('       hypergraph.semantic_path_synthesis, clusters.get_summary_lenses,');
   console.log('       trace.kag_search (go-retrieval→sveltekit→postgres cascade),');
   console.log('       trace.explain_retrieval,');
   console.log('       search.postgres_fts, search.hybrid, search.go_hybrid (RRF),');

@@ -16,7 +16,7 @@ _No P0 clusters detected — cluster-level error density is low._
 **Specs**: [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [W3C Fetch — network error vs abort](https://fetch.spec.whatwg.org/#concept-request) · [Svelte 5 runes API](https://svelte.dev/docs/svelte/what-are-runes)
 
 **Analysis**:
-The primary risk driving the cluster's score is **shallow-wiring**, indicating that several UI components are handling too much state or logic internally, leading to tight coupling between presentation and behavior. This pattern is evident in files like `src/lib/components/case/SummaryEditor.svelte`, `src/lib/client/ui/POIPhotoUploader.svelte`, and `src/lib/components/analysis/AnalysisPanel.svelte`. To resolve this, the single most impactful change would be to refactor the state management and complex business logic out of these components and into dedicated, injectable services or Svelte stores. This separation would decouple the UI from the data flow, reducing the shallow-wiring hits and improving testability across the cluster.
+_(synthesis unavailable — start dev server or Ollama)_
 
 **Top files**: `src/lib/client/ui/POIPhotoUploader.svelte`  `src/lib/components/ActionPopup.svelte`  `src/lib/components/agent/AutonomousInvestigator.svelte`
 
@@ -179,7 +179,7 @@ _Run ID: 2026-05-07T20-53-22_
 | Field | Value |
 |-------|-------|
 | Run ID | `2026-05-07T20-53-22` |
-| Synthesized at | 2026-05-08T07:00:42.896Z |
+| Synthesized at | 2026-05-08T21:59:33.312Z |
 | tsgo diagnostics loaded | 0 |
 | Shallow-wired files | 357 |
 | P0 clusters | 0 |

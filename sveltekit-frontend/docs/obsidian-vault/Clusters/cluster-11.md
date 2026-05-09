@@ -12,7 +12,7 @@ top_tags: ["config","sse","types","ui-component"]
 llmHits: 0
 summaryMode: null
 confidence: "high"
-last_updated_by_llm: "2026-05-08T16:20:53.376Z"
+last_updated_by_llm: "2026-05-08T22:10:35.424Z"
 ai-first: true
 contains: ["[[Files/src__lib__utils__progressive-enhancement-audit]]"]
 same: ["[[Clusters/cluster-38]]"]

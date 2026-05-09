@@ -111,17 +111,21 @@ export async function generateEmbedding(
   );
   const body = {
     model,
-    prompt: params.text,
+    input: [params.text],
     keep_alive: getEmbeddingModelKeepAlive(),
   };
 
   return traceEmbedding(params.text, model, async () => {
-    return fetchFromOllama<OllamaEmbeddingResponse>('/api/embeddings', {
+    const result = await fetchFromOllama<{ model: string; embeddings: number[][] }>('/api/embed', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       timeoutMs: params.timeoutMs,
     });
+    return {
+      model: result.model,
+      embedding: result.embeddings[0],
+    };
   });
 }
 

@@ -2,6 +2,7 @@
  * Service Discovery & Configuration
  */
 import { discoverServiceEndpoint } from './docker-discovery.js';
+import { ENV } from '$lib/server/env.server.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ServiceConfig {
@@ -88,42 +89,42 @@ export function getServiceDiscovery(): ServiceDiscovery {
 export const COMMON_SERVICES: Record<string, ServiceConfig> = {
   minio: {
     envVar: 'MINIO_ENDPOINT',
-    fallback: 'http://localhost:9000',
+    fallback: ENV.MINIO_URL,
     containerName: 'legal-ai-minio',
     port: 9000,
     verify: true,
   },
   ollama: {
     envVar: 'OLLAMA_URL',
-    fallback: 'http://localhost:11434',
+    fallback: ENV.OLLAMA_BASE_URL,
     containerName: 'ollama',
     port: 11434,
     verify: true,
   },
   qdrant: {
     envVar: 'QDRANT_URL',
-    fallback: 'http://localhost:6333',
+    fallback: ENV.QDRANT_URL,
     containerName: 'qdrant',
     port: 6333,
     verify: true,
   },
   redis: {
     envVar: 'REDIS_HOST',
-    fallback: 'redis://localhost:6379',
+    fallback: ENV.REDIS_URL,
     containerName: 'redis',
     port: 6379,
     verify: false,
   },
   postgres: {
     envVar: 'DATABASE_URL',
-    fallback: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+    fallback: ENV.DATABASE_URL,
     containerName: 'postgres',
     port: 5432,
     verify: false,
   },
   langextract: {
     envVar: 'LANGEXTRACT_URL',
-    fallback: '',
+    fallback: ENV.LANGEXTRACT_URL || 'http://phase66-langextract:8095',
     containerName: 'phase66-langextract',
     port: 8095,
     verify: false,

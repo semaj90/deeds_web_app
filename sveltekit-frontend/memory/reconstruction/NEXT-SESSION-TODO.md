@@ -784,7 +784,8 @@ final_score =
 | N6 | ✅ **Byte-stable modulo timestamps**: `cards.jsonl` = `1f242edd…`, `rank.json` = `2e367426…` (preserve `updated_at`/`generated_at` for date-search; strip via sed at hash-time) | XS |
 | N7 | **Pause before N9.** Do not wire MCP/Qdrant/Bitfrost integration until N8 sparse search is proven in real use. | — |
 | N8 | ✅ `scripts/kb/search-graph-cards.mjs` — Fuse.js sparse search over `search_text + tags + exports + source_path`, weighted (path 0.30 / exports 0.20 / tags 0.20 / search_text 0.10), threshold 0.4. CLI + `KB_QUERY` env var + `--json` mode. **Local-only, no GPU, no LLM, no network.** | S |
-| N9 | When ready: Qdrant embedding job for `context_text` (batched 32–128) + pgvector mirror for SQL filters | M |
+| N9a | ✅ `scripts/kb/build-embedding-jobs.mjs` — emits `embedding_jobs.jsonl` work queue (rank-sorted, deterministic, byte-stable). Schema: `{job_id, card_id, source_path, source_hash, rank, rank_score, model, dim, text, text_hash}`. Flags: `--top N`, `--tag-filter a,b`, `--model X`. Env vars: `KB_TOP`, `KB_TAG_FILTER`, `KB_EMBED_MODEL`. **No Qdrant call. No network. No mutation.** | S |
+| N9b | ✅ `scripts/kb/run-embedding-jobs.mjs` — consumes the work queue, calls Ollama `embeddinggemma:latest` (`/api/embeddings`), upserts to Qdrant `codebase_chunks_768` (named vector `content`), mirrors to pgvector `codebase_chunk_index.summaryEmbedding` via Drizzle. **Default DRY-RUN** (Ollama+vectors run, NO writes). `--execute` opts in to writes. Resume sidecar: `embedding_run_results.jsonl` (skip jobs with matching `card_id::text_hash`). Health probes: Ollama (always), Qdrant (execute-only). Pgvector mirror is best-effort — Qdrant write succeeds even if Postgres is down. Batch=32, sequential Ollama, 50ms gentle-pause every 10 jobs. Verified: dry-run produces 768d vectors via Ollama in ~150ms each. | M |
 | N10 | When ready: MCP tools `kb.search_cards`, `kb.get_card`, `kb.expand_neighbors`, `kb.explain_retrieval` (return cards, never raw JSONL) | M |
 | N11 | When ready: Go/gRPC sidecar spike (`KBNotecardIndex` service: SearchCards, GetCards, ExpandNeighbors, RerankCards) — research only, benchmark vs Node | L |
 
@@ -805,6 +806,10 @@ sed -E 's/"updated_at":\s*"[^"]*"//g; s/"generated_at":\s*"[^"]*"//g' memory/kb/
 ```
 
 Both hashes are pinned to source `graphify_deep_imports_2026-05-08T07-18-58-883Z.jsonl` (2220 parsed → 2173 emitted → 47 invalid/duplicate). Different source JSONL → different hash, but the same JSONL must produce the same hash on every run.
+
+### TurboQuant + embeddinggemma — confirmed via web search 2026-05-08
+
+Web search confirmed: TurboQuant compresses *attention KV state during autoregressive decoding*. embeddinggemma is a **non-autoregressive embedding model** — one forward pass yields a 768d vector, no decoding loop, no KV cache to compress. Ollama PR [#15505](https://github.com/ollama/ollama/pull/15505) added TurboQuant-compressed KV cache to chat models only. The HuggingFace `gemma-4-E4B-turboquant` is a *generation* model, not embedding. **Conclusion**: don't try to route N9b through TurboQuant — keep `embeddinggemma:latest` on stock Ollama, route generation through TurboQuant llama-server (chat-only) per CLAUDE.md "TurboQuant embedding constraint".
 
 ### Hard rules
 

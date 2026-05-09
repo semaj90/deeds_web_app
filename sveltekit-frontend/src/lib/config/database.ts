@@ -1,4 +1,4 @@
-import ENV_CONFIG from './env';
+import { getDatabaseUrl } from './env.server';
 
 export interface PoolConfig {
     connectionString: string;
@@ -16,7 +16,7 @@ function getDatabaseConfig() {
 }
 
 function getConnectionString(): string {
-    return ENV_CONFIG.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+    return getDatabaseUrl();
 }
 
 /**

@@ -13,6 +13,12 @@
 import { building, dev } from '$app/environment';
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import { productionLogger } from '$lib/server/production-logger.js';
+import { SkillsService } from '$lib/server/admin/skills-service.js';
+
+// Initialize Gemma 4 Skills
+if (process.env.NODE_ENV !== 'test') {
+  SkillsService.initializeSystemSkills().catch(e => console.warn('Failed to init skills:', e));
+}
 import { pool } from '$lib/server/db/client';
 import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
@@ -473,7 +479,7 @@ async function warmupExportCache(): Promise<WarmupStatus> {
  * Option #6: Warm up LLM cache with common legal queries
  */
 async function warmupLLMCache(): Promise<WarmupStatus> {
-  const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+  const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
   const EMBEDDING_MODEL = 'embeddinggemma:latest';
 
   // Quick connectivity check — skip entirely if Ollama is unreachable
@@ -562,7 +568,7 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
  * do not pay the full cold-load cost.
  */
 async function warmupChatModel(): Promise<WarmupStatus> {
-  const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+  const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
   try {
     const ping = await ollamaFetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });

@@ -9,10 +9,13 @@ import { embeddedSummaries } from '$lib/server/db/schema.js';
  * for high-value codebase chunks, directories, or clusters.
  */
 export async function generateSummaryLenses(params: {
-	stableKey: string;
+	chunkId: string;
 	targetType: string; // 'file' | 'dir' | 'cluster' | 'chunk'
 	content: string;
 	lenses: string[]; // ['purpose', 'risk', 'api_surface', 'retrieval_role']
+	somBmuRow?: number;
+	somBmuCol?: number;
+	manifold4?: number[];
 }) {
 	const qdrant = new QdrantManager();
 	const results = [];
@@ -27,7 +30,7 @@ export async function generateSummaryLenses(params: {
 
 			// 3. Store in Postgres (Audit record + Durable text)
 			await db.insert(embeddedSummaries).values({
-				stableKey: params.stableKey,
+				chunkId: params.chunkId,
 				sourceType: params.targetType,
 				sourceHash: 'T2_SUMMARY', // Tier 2 summary marker
 				summaryType: lensType,
@@ -35,9 +38,12 @@ export async function generateSummaryLenses(params: {
 				model: 'gemma4-legal-vlm',
 				embeddingModel: 'embeddinggemma',
 				qdrantCollection: 'summary_lenses_768',
+				somBmuRow: params.somBmuRow,
+				somBmuCol: params.somBmuCol,
+				manifold4: params.manifold4,
 				updatedAt: new Date()
 			}).onConflictDoUpdate({
-				target: [embeddedSummaries.stableKey, embeddedSummaries.sourceHash, embeddedSummaries.summaryType],
+				target: [embeddedSummaries.chunkId, embeddedSummaries.sourceHash, embeddedSummaries.summaryType],
 				set: { summaryText: lensText, updatedAt: new Date() }
 			});
 
@@ -45,13 +51,16 @@ export async function generateSummaryLenses(params: {
 			await qdrant.client.upsert(qdrant.collections.summary_lenses, {
 				wait: false,
 				points: [{
-					id: deterministicPointId(`${params.stableKey}:${lensType}`),
+					id: deterministicPointId(`${params.chunkId}:${lensType}`),
 					vector: { summary: embedding },
 					payload: {
-						stable_key: params.stableKey,
+						chunk_id: params.chunkId,
 						lens_type: lensType,
 						text: lensText,
 						target_type: params.targetType,
+						som_bmu_row: params.somBmuRow,
+						som_bmu_col: params.somBmuCol,
+						manifold4: params.manifold4,
 						generated_at: new Date().toISOString()
 					}
 				}]

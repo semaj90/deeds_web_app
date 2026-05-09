@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 import { generateCacheKey, getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
 
 const chatMessageSchema = z.object({
@@ -61,7 +62,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const start = performance.now();
 
     // Direct Ollama call (bypasses router)
-    const response = await fetch('http://localhost:11434/api/generate', {
+    const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

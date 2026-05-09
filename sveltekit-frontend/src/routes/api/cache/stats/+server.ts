@@ -15,6 +15,7 @@ import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import IORedis, { type Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
 // redis-metrics module removed — inline fallback below
@@ -69,7 +70,7 @@ export const GET: RequestHandler = async ({ locals, request, url }) => {
 				if (/closed|ECONNRESET|ENOTFOUND/i.test(msg)) {
 					// D16: `await using` auto-disconnects on scope exit (even on throw)
 					const { attachDispose } = await import('$lib/server/redis-disposable.js');
-					await using fresh = attachDispose(new IORedis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+					await using fresh = attachDispose(new IORedis(ENV.REDIS_URL, {
 						maxRetriesPerRequest: 1,
 						connectTimeout: 3000,
 						lazyConnect: false

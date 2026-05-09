@@ -1,6 +1,12 @@
 {
-  "generatedAt": "2026-05-08T07:00:42.901Z",
+  "generatedAt": "2026-05-08T21:59:33.314Z",
   "runId": "2026-05-07T20-53-22",
-  "failureCount": 0,
-  "failures": []
+  "failureCount": 1,
+  "failures": [
+    {
+      "gate": "G17",
+      "file": "src/lib/server/comfyui/comfyui-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    }
+  ]
 }

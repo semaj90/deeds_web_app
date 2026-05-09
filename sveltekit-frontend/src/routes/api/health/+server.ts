@@ -110,7 +110,7 @@ export const GET: RequestHandler = async ({ url }) => {
       latencyMs: 0,
       error: 'quic probe failed',
     })),
-    probe(`${ENV.GO_SEARCH_URL || 'http://localhost:8096'}/health`, 3000).catch(() => ({
+    probe(`${ENV.GO_SEARCH_URL || 'http://go-search:8096'}/health`, 3000).catch(() => ({
       ok: false,
       latencyMs: 0,
       error: 'go-search probe failed',
@@ -137,7 +137,7 @@ export const GET: RequestHandler = async ({ url }) => {
       latencyMs: 0,
       error: 'neo4j probe failed',
     })),
-    probeTcp('127.0.0.1', 4222, 'nats'),
+    probeTcp(new URL(ENV.NATS_URL).hostname, parseInt(new URL(ENV.NATS_URL).port || '4222', 10), 'nats'),
   ]);
 
   const checks = {
@@ -293,7 +293,7 @@ async function handleServiceHealth(service: string) {
       return json({ service: 'quic', ...result, enabled: ENV.EMBEDDING_QUIC_ENABLED });
     }
     case 'go-search': {
-      const goUrl = ENV.GO_SEARCH_URL || 'http://localhost:8096';
+      const goUrl = ENV.GO_SEARCH_URL || 'http://go-search:8096';
       const result = await probe(`${goUrl}/health`, 3000);
       return json({ service: 'go-search', ...result, grpcUrl: ENV.GO_SEARCH_GRPC_URL });
     }
@@ -323,7 +323,7 @@ async function handleServiceHealth(service: string) {
       return json({ service: 'neo4j', ...result });
     }
     case 'nats': {
-      const result = await probeTcp('127.0.0.1', 4222, 'nats');
+      const result = await probeTcp(new URL(ENV.NATS_URL).hostname, parseInt(new URL(ENV.NATS_URL).port || '4222', 10), 'nats');
       return json({ service: 'nats', ...result });
     }
     default:

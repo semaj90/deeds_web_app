@@ -41,6 +41,7 @@ const urlParams = $derived(typeof window !== 'undefined' ? new URLSearchParams(w
 let query = $state('');
 let caseId = $state('');
 let isSearching = $state(false);
+let useWebGPU = $state(true); // Default to on for premium feel
 let isValidating = $state(false);
 let isGenerating = $state(false);
 let error = $state<string | null>(null);
@@ -82,6 +83,7 @@ async function handleSearch() {
       top_k: 10,
       use_hybrid: true,
       use_rerank: true,
+      use_webgpu: useWebGPU,
     });
 
     chunks = result.chunks;
@@ -235,30 +237,34 @@ function startNewSearch() {
         </div>
 
         <!-- Query Input -->
-        <div class="form-control">
-          <label class="label">
+        <div class="form-control mb-4">
+          <div class="flex items-center justify-between">
             <span class="label-text">Your Question</span>
-            <div class="join w-full">
-              <input
-                type="text"
-                bind:value={query}
-                placeholder="e.g., What are the requirements for deed registration in Texas? "
-                class="input input-bordered join-item flex-1"
-                onkeydown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <button
-                class="btn btn-primary join-item"
-                onclick={handleSearch}
-                disabled={isSearching || !query.trim()}
-              >
-                {#if isSearching}
-                  <span class="loading loading-spinner loading-sm"></span>
-                {:else}
-                  🔍 Search
-                {/if}
-              </button>
-            </div>
-          </label>
+            <label class="label cursor-pointer gap-2">
+              <span class="label-text text-xs">WebGPU Hardware Acceleration</span>
+              <input type="checkbox" bind:checked={useWebGPU} class="toggle toggle-primary toggle-sm" />
+            </label>
+          </div>
+          <div class="join w-full">
+            <input
+              type="text"
+              bind:value={query}
+              placeholder="e.g., What are the requirements for deed registration in Texas? "
+              class="input input-bordered join-item flex-1"
+              onkeydown={(e) => e.key === 'Enter' && handleSearch()}
+            />
+            <button
+              class="btn btn-primary join-item"
+              onclick={handleSearch}
+              disabled={isSearching || !query.trim()}
+            >
+              {#if isSearching}
+                <span class="loading loading-spinner loading-sm"></span>
+              {:else}
+                🔍 Search
+              {/if}
+            </button>
+          </div>
         </div>
 
         <!-- Recent Queries -->

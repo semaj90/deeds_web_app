@@ -147,7 +147,7 @@ const _dbUrl = (() => { try { return new URL(ENV.DATABASE_URL.replace(/^postgres
 export const DATABASE_CONFIG = {
   url: ENV.DATABASE_URL,
   postgres: {
-    host: _dbUrl?.hostname || env.DATABASE_HOST || 'localhost',
+	  host: _dbUrl?.hostname || env.DATABASE_HOST || new URL(ENV.DATABASE_URL).hostname,
     port: parseInt(_dbUrl?.port || env.DATABASE_PORT || '5434', 10),
     database: (_dbUrl?.pathname.slice(1)) || env.DATABASE_NAME || 'legal_ai_db',
     username: _dbUrl?.username || env.DATABASE_USER || 'legal_admin',
@@ -165,7 +165,7 @@ export const DATABASE_CONFIG = {
 const _redisUrl = (() => { try { return new URL(ENV.REDIS_URL); } catch { return null; } })();
 export const REDIS_CONFIG = {
 	url: ENV.REDIS_URL,
-	host: _redisUrl?.hostname || env.REDIS_HOST || 'localhost',
+	host: _redisUrl?.hostname || env.REDIS_HOST || new URL(ENV.REDIS_URL).hostname,
 	port: parseInt(_redisUrl?.port || env.REDIS_PORT || '6379', 10),
 	password: process.env.REDIS_PASSWORD || undefined,
 	db: parseInt(process.env.REDIS_DB || '0', 10),

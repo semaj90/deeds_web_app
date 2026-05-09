@@ -1013,7 +1013,7 @@
       "id": "src__mcp__server",
       "type": "file",
       "file": "Files/src__mcp__server.md",
-      "x": 4364,
+      "x": 4356,
       "y": 0,
       "width": 260,
       "height": 60
@@ -1022,8 +1022,8 @@
       "id": "src__routes___app___admin__search-intelligence___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__search-intelligence___page.md",
-      "x": 4381,
-      "y": 20,
+      "x": 4371,
+      "y": 13,
       "width": 260,
       "height": 60
     },
@@ -1031,8 +1031,8 @@
       "id": "src__routes___app___cases___id___board___page",
       "type": "file",
       "file": "Files/src__routes___app___cases___id___board___page.md",
-      "x": 4394,
-      "y": 41,
+      "x": 4382,
+      "y": 27,
       "width": 260,
       "height": 60
     },
@@ -1040,8 +1040,8 @@
       "id": "src__mcp__trace-mcp-server",
       "type": "file",
       "file": "Files/src__mcp__trace-mcp-server.md",
-      "x": 4403,
-      "y": 64,
+      "x": 4390,
+      "y": 42,
       "width": 260,
       "height": 60
     },
@@ -1049,8 +1049,8 @@
       "id": "tests__sse-chat-attachment-metadata.spec",
       "type": "file",
       "file": "Files/tests__sse-chat-attachment-metadata.spec.md",
-      "x": 4409,
-      "y": 87,
+      "x": 4397,
+      "y": 57,
       "width": 260,
       "height": 60
     },
@@ -1058,8 +1058,8 @@
       "id": "src__routes__api__sse__chat___server",
       "type": "file",
       "file": "Files/src__routes__api__sse__chat___server.md",
-      "x": 4413,
-      "y": 111,
+      "x": 4402,
+      "y": 72,
       "width": 260,
       "height": 60
     },
@@ -1067,8 +1067,8 @@
       "id": "src__routes___app___global-search___page",
       "type": "file",
       "file": "Files/src__routes___app___global-search___page.md",
-      "x": 4415,
-      "y": 135,
+      "x": 4406,
+      "y": 88,
       "width": 260,
       "height": 60
     },
@@ -1076,8 +1076,8 @@
       "id": "src__routes___app___analytics___page",
       "type": "file",
       "file": "Files/src__routes___app___analytics___page.md",
-      "x": 4414,
-      "y": 159,
+      "x": 4409,
+      "y": 104,
       "width": 260,
       "height": 60
     },
@@ -1085,8 +1085,8 @@
       "id": "src__routes__api__evidence__upload___server",
       "type": "file",
       "file": "Files/src__routes__api__evidence__upload___server.md",
-      "x": 4412,
-      "y": 184,
+      "x": 4411,
+      "y": 120,
       "width": 260,
       "height": 60
     },
@@ -1094,8 +1094,8 @@
       "id": "src__routes___app___admin__all-routes___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__all-routes___page.md",
-      "x": 4409,
-      "y": 208,
+      "x": 4412,
+      "y": 136,
       "width": 260,
       "height": 60
     },
@@ -1103,8 +1103,8 @@
       "id": "tests__sse-chat-glossary-metadata.spec",
       "type": "file",
       "file": "Files/tests__sse-chat-glossary-metadata.spec.md",
-      "x": 4403,
-      "y": 233,
+      "x": 4412,
+      "y": 153,
       "width": 260,
       "height": 60
     },
@@ -1112,8 +1112,8 @@
       "id": "src__routes___app___dashboard___page",
       "type": "file",
       "file": "Files/src__routes___app___dashboard___page.md",
-      "x": 4396,
-      "y": 257,
+      "x": 4411,
+      "y": 169,
       "width": 260,
       "height": 60
     },
@@ -1121,8 +1121,8 @@
       "id": "src__routes___app___legal-corpus___id____page",
       "type": "file",
       "file": "Files/src__routes___app___legal-corpus___id____page.md",
-      "x": 4387,
-      "y": 281,
+      "x": 4410,
+      "y": 186,
       "width": 260,
       "height": 60
     },
@@ -1130,8 +1130,8 @@
       "id": "src__routes___app___persons-of-interest___page",
       "type": "file",
       "file": "Files/src__routes___app___persons-of-interest___page.md",
-      "x": 4376,
-      "y": 305,
+      "x": 4407,
+      "y": 203,
       "width": 260,
       "height": 60
     },
@@ -1139,8 +1139,8 @@
       "id": "src__routes___app___cases___page",
       "type": "file",
       "file": "Files/src__routes___app___cases___page.md",
-      "x": 4364,
-      "y": 328,
+      "x": 4404,
+      "y": 219,
       "width": 260,
       "height": 60
     },
@@ -1148,8 +1148,8 @@
       "id": "src__routes___app___citations___page",
       "type": "file",
       "file": "Files/src__routes___app___citations___page.md",
-      "x": 4350,
-      "y": 350,
+      "x": 4400,
+      "y": 236,
       "width": 260,
       "height": 60
     },
@@ -1157,8 +1157,8 @@
       "id": "src__routes__api__codebase-index__orchestrate___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__orchestrate___server.md",
-      "x": 4335,
-      "y": 372,
+      "x": 4395,
+      "y": 252,
       "width": 260,
       "height": 60
     },
@@ -1166,8 +1166,8 @@
       "id": "src__routes___page",
       "type": "file",
       "file": "Files/src__routes___page.md",
-      "x": 4318,
-      "y": 393,
+      "x": 4390,
+      "y": 268,
       "width": 260,
       "height": 60
     },
@@ -1175,8 +1175,8 @@
       "id": "src__routes___app___admin__phase89___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__phase89___page.md",
-      "x": 4300,
-      "y": 413,
+      "x": 4383,
+      "y": 285,
       "width": 260,
       "height": 60
     },
@@ -1184,8 +1184,8 @@
       "id": "src__routes___app___analysis-center___page",
       "type": "file",
       "file": "Files/src__routes___app___analysis-center___page.md",
-      "x": 4281,
-      "y": 433,
+      "x": 4376,
+      "y": 301,
       "width": 260,
       "height": 60
     },
@@ -1193,8 +1193,8 @@
       "id": "src__routes___app___cases___id____page",
       "type": "file",
       "file": "Files/src__routes___app___cases___id____page.md",
-      "x": 4260,
-      "y": 451,
+      "x": 4368,
+      "y": 316,
       "width": 260,
       "height": 60
     },
@@ -1202,8 +1202,8 @@
       "id": "tests__codebase-indexer.spec",
       "type": "file",
       "file": "Files/tests__codebase-indexer.spec.md",
-      "x": 4239,
-      "y": 468,
+      "x": 4359,
+      "y": 332,
       "width": 260,
       "height": 60
     },
@@ -1211,8 +1211,8 @@
       "id": "src__routes___app___demos__unified-dashboard___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__unified-dashboard___page.md",
-      "x": 4216,
-      "y": 484,
+      "x": 4350,
+      "y": 347,
       "width": 260,
       "height": 60
     },
@@ -1220,8 +1220,8 @@
       "id": "src__routes___app___command-center___page",
       "type": "file",
       "file": "Files/src__routes___app___command-center___page.md",
-      "x": 4192,
-      "y": 499,
+      "x": 4340,
+      "y": 362,
       "width": 260,
       "height": 60
     },
@@ -1229,8 +1229,8 @@
       "id": "src__routes___app___demos___page",
       "type": "file",
       "file": "Files/src__routes___app___demos___page.md",
-      "x": 4167,
-      "y": 513,
+      "x": 4330,
+      "y": 377,
       "width": 260,
       "height": 60
     },
@@ -1238,8 +1238,8 @@
       "id": "src__routes___app___legal-corpus-premium___page",
       "type": "file",
       "file": "Files/src__routes___app___legal-corpus-premium___page.md",
-      "x": 4141,
-      "y": 525,
+      "x": 4318,
+      "y": 391,
       "width": 260,
       "height": 60
     },
@@ -1247,8 +1247,8 @@
       "id": "src__routes__api__synthesis__generate___server",
       "type": "file",
       "file": "Files/src__routes__api__synthesis__generate___server.md",
-      "x": 4114,
-      "y": 536,
+      "x": 4306,
+      "y": 405,
       "width": 260,
       "height": 60
     },
@@ -1256,8 +1256,8 @@
       "id": "src__routes___app___legal-corpus___page",
       "type": "file",
       "file": "Files/src__routes___app___legal-corpus___page.md",
-      "x": 4086,
-      "y": 545,
+      "x": 4294,
+      "y": 418,
       "width": 260,
       "height": 60
     },
@@ -1265,8 +1265,8 @@
       "id": "src__routes___app___active-cases___page",
       "type": "file",
       "file": "Files/src__routes___app___active-cases___page.md",
-      "x": 4058,
-      "y": 553,
+      "x": 4280,
+      "y": 431,
       "width": 260,
       "height": 60
     },
@@ -1274,8 +1274,8 @@
       "id": "src__routes___app___admin__cache___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__cache___page.md",
-      "x": 4029,
-      "y": 559,
+      "x": 4267,
+      "y": 444,
       "width": 260,
       "height": 60
     },
@@ -1283,8 +1283,8 @@
       "id": "tests__reports-embed-chat-routes.spec",
       "type": "file",
       "file": "Files/tests__reports-embed-chat-routes.spec.md",
-      "x": 4000,
-      "y": 564,
+      "x": 4252,
+      "y": 456,
       "width": 260,
       "height": 60
     },
@@ -1292,8 +1292,8 @@
       "id": "tests__poi-citations-conversations-routes.spec",
       "type": "file",
       "file": "Files/tests__poi-citations-conversations-routes.spec.md",
-      "x": 3970,
-      "y": 567,
+      "x": 4238,
+      "y": 467,
       "width": 260,
       "height": 60
     },
@@ -1301,8 +1301,8 @@
       "id": "src__routes__api__rag__search___server",
       "type": "file",
       "file": "Files/src__routes__api__rag__search___server.md",
-      "x": 3940,
-      "y": 569,
+      "x": 4222,
+      "y": 478,
       "width": 260,
       "height": 60
     },
@@ -1310,8 +1310,8 @@
       "id": "src__hooks.server",
       "type": "file",
       "file": "Files/src__hooks.server.md",
-      "x": 3910,
-      "y": 568,
+      "x": 4206,
+      "y": 489,
       "width": 260,
       "height": 60
     },
@@ -1319,8 +1319,8 @@
       "id": "tests__analytics-tags-nlp-prefs-routes.spec",
       "type": "file",
       "file": "Files/tests__analytics-tags-nlp-prefs-routes.spec.md",
-      "x": 3880,
-      "y": 567,
+      "x": 4190,
+      "y": 499,
       "width": 260,
       "height": 60
     },
@@ -1328,8 +1328,8 @@
       "id": "src__routes___analysis___video-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___video-analysis___evidenceid____page.md",
-      "x": 3849,
-      "y": 563,
+      "x": 4173,
+      "y": 508,
       "width": 260,
       "height": 60
     },
@@ -1337,8 +1337,8 @@
       "id": "src__routes___app___demos__courtroom-sim___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__courtroom-sim___page.md",
-      "x": 3819,
-      "y": 558,
+      "x": 4156,
+      "y": 516,
       "width": 260,
       "height": 60
     },
@@ -1346,8 +1346,8 @@
       "id": "tests__vision-gpu-tools-topology-routes.spec",
       "type": "file",
       "file": "Files/tests__vision-gpu-tools-topology-routes.spec.md",
-      "x": 3789,
-      "y": 551,
+      "x": 4138,
+      "y": 525,
       "width": 260,
       "height": 60
     },
@@ -1355,8 +1355,8 @@
       "id": "src__routes___app___admin__face-gallery___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__face-gallery___page.md",
-      "x": 3759,
-      "y": 542,
+      "x": 4120,
+      "y": 532,
       "width": 260,
       "height": 60
     },
@@ -1364,8 +1364,8 @@
       "id": "src__routes__api__ace__ingest___server",
       "type": "file",
       "file": "Files/src__routes__api__ace__ingest___server.md",
-      "x": 3729,
-      "y": 532,
+      "x": 4102,
+      "y": 539,
       "width": 260,
       "height": 60
     },
@@ -1373,8 +1373,8 @@
       "id": "src__routes___app___indexing___page",
       "type": "file",
       "file": "Files/src__routes___app___indexing___page.md",
-      "x": 3700,
-      "y": 520,
+      "x": 4083,
+      "y": 545,
       "width": 260,
       "height": 60
     },
@@ -1382,8 +1382,8 @@
       "id": "tests__cache-recommendations-ml-sys-routes.spec",
       "type": "file",
       "file": "Files/tests__cache-recommendations-ml-sys-routes.spec.md",
-      "x": 3671,
-      "y": 507,
+      "x": 4064,
+      "y": 550,
       "width": 260,
       "height": 60
     },
@@ -1391,8 +1391,8 @@
       "id": "src__routes__api__error-brain__diagnose___server",
       "type": "file",
       "file": "Files/src__routes__api__error-brain__diagnose___server.md",
-      "x": 3643,
-      "y": 491,
+      "x": 4044,
+      "y": 555,
       "width": 260,
       "height": 60
     },
@@ -1400,8 +1400,8 @@
       "id": "src__routes___analysis___video-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___video-analysis___evidenceid____page.md",
-      "x": 3616,
-      "y": 475,
+      "x": 4025,
+      "y": 559,
       "width": 260,
       "height": 60
     },
@@ -1409,8 +1409,8 @@
       "id": "tests__infra-ollama-cache-routes.spec",
       "type": "file",
       "file": "Files/tests__infra-ollama-cache-routes.spec.md",
-      "x": 3589,
-      "y": 456,
+      "x": 4005,
+      "y": 562,
       "width": 260,
       "height": 60
     },
@@ -1418,8 +1418,8 @@
       "id": "src__routes___app___reports__new___page",
       "type": "file",
       "file": "Files/src__routes___app___reports__new___page.md",
-      "x": 3564,
-      "y": 436,
+      "x": 3985,
+      "y": 564,
       "width": 260,
       "height": 60
     },
@@ -1427,8 +1427,8 @@
       "id": "src__routes___app___persons-of-interest___id____page",
       "type": "file",
       "file": "Files/src__routes___app___persons-of-interest___id____page.md",
-      "x": 3539,
-      "y": 415,
+      "x": 3965,
+      "y": 566,
       "width": 260,
       "height": 60
     },
@@ -1436,8 +1436,8 @@
       "id": "src__routes___app___admin__library___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__library___page.md",
-      "x": 3515,
-      "y": 392,
+      "x": 3944,
+      "y": 567,
       "width": 260,
       "height": 60
     },
@@ -1445,8 +1445,8 @@
       "id": "tests__ai-routes-comprehensive.spec",
       "type": "file",
       "file": "Files/tests__ai-routes-comprehensive.spec.md",
-      "x": 3493,
-      "y": 368,
+      "x": 3924,
+      "y": 567,
       "width": 260,
       "height": 60
     },
@@ -1454,8 +1454,8 @@
       "id": "src__routes___analysis___document-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___document-analysis___evidenceid____page.md",
-      "x": 3472,
-      "y": 343,
+      "x": 3903,
+      "y": 567,
       "width": 260,
       "height": 60
     },
@@ -1463,8 +1463,8 @@
       "id": "src__routes___app___demos__webgpu-showcase___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__webgpu-showcase___page.md",
-      "x": 3452,
-      "y": 316,
+      "x": 3883,
+      "y": 566,
       "width": 260,
       "height": 60
     },
@@ -1472,8 +1472,8 @@
       "id": "src__routes___app___admin__component-analysis___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__component-analysis___page.md",
-      "x": 3433,
-      "y": 289,
+      "x": 3862,
+      "y": 564,
       "width": 260,
       "height": 60
     },
@@ -1481,8 +1481,8 @@
       "id": "src__routes___analysis___audio-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___audio-analysis___evidenceid____page.md",
-      "x": 3416,
-      "y": 260,
+      "x": 3842,
+      "y": 561,
       "width": 260,
       "height": 60
     },
@@ -1490,8 +1490,8 @@
       "id": "tests__docs-sync-cartridge-system-routes.spec",
       "type": "file",
       "file": "Files/tests__docs-sync-cartridge-system-routes.spec.md",
-      "x": 3401,
-      "y": 230,
+      "x": 3821,
+      "y": 557,
       "width": 260,
       "height": 60
     },
@@ -1499,8 +1499,8 @@
       "id": "src__routes___app___admin__codebase-graph___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__codebase-graph___page.md",
-      "x": 3387,
-      "y": 199,
+      "x": 3801,
+      "y": 553,
       "width": 260,
       "height": 60
     },
@@ -1508,8 +1508,8 @@
       "id": "src__routes___app___code-intel__topology___page",
       "type": "file",
       "file": "Files/src__routes___app___code-intel__topology___page.md",
-      "x": 3374,
-      "y": 168,
+      "x": 3780,
+      "y": 548,
       "width": 260,
       "height": 60
     },
@@ -1517,8 +1517,8 @@
       "id": "src__routes___app___system-configuration___page",
       "type": "file",
       "file": "Files/src__routes___app___system-configuration___page.md",
-      "x": 3363,
-      "y": 135,
+      "x": 3760,
+      "y": 542,
       "width": 260,
       "height": 60
     },
@@ -1526,8 +1526,8 @@
       "id": "tests__assist-feedback-analysis.spec",
       "type": "file",
       "file": "Files/tests__assist-feedback-analysis.spec.md",
-      "x": 3354,
-      "y": 102,
+      "x": 3740,
+      "y": 535,
       "width": 260,
       "height": 60
     },
@@ -1535,8 +1535,8 @@
       "id": "tests__cases-sub-routes.spec",
       "type": "file",
       "file": "Files/tests__cases-sub-routes.spec.md",
-      "x": 3347,
-      "y": 69,
+      "x": 3720,
+      "y": 527,
       "width": 260,
       "height": 60
     },
@@ -1544,8 +1544,8 @@
       "id": "src__routes___app___admin__chat-memory___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__chat-memory___page.md",
-      "x": 3341,
-      "y": 35,
+      "x": 3700,
+      "y": 519,
       "width": 260,
       "height": 60
     },
@@ -1553,8 +1553,8 @@
       "id": "src__routes___app___cases__new___page",
       "type": "file",
       "file": "Files/src__routes___app___cases__new___page.md",
-      "x": 3338,
-      "y": 0,
+      "x": 3681,
+      "y": 510,
       "width": 260,
       "height": 60
     },
@@ -1562,8 +1562,8 @@
       "id": "src__routes__api__evidence__search___server",
       "type": "file",
       "file": "Files/src__routes__api__evidence__search___server.md",
-      "x": 3336,
-      "y": -35,
+      "x": 3662,
+      "y": 500,
       "width": 260,
       "height": 60
     },
@@ -1571,8 +1571,8 @@
       "id": "src__routes___app___demos__evidence-canvas___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__evidence-canvas___page.md",
-      "x": 3336,
-      "y": -70,
+      "x": 3643,
+      "y": 490,
       "width": 260,
       "height": 60
     },
@@ -1580,8 +1580,8 @@
       "id": "src__routes___app___admin__ast-topology___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__ast-topology___page.md",
-      "x": 3338,
-      "y": -105,
+      "x": 3624,
+      "y": 479,
       "width": 260,
       "height": 60
     },
@@ -1589,8 +1589,8 @@
       "id": "src__routes___analysis___audio-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___audio-analysis___evidenceid____page.md",
-      "x": 3341,
-      "y": -140,
+      "x": 3606,
+      "y": 467,
       "width": 260,
       "height": 60
     },
@@ -1598,8 +1598,8 @@
       "id": "src__routes___layout",
       "type": "file",
       "file": "Files/src__routes___layout.md",
-      "x": 3347,
-      "y": -175,
+      "x": 3588,
+      "y": 454,
       "width": 260,
       "height": 60
     },
@@ -1607,8 +1607,8 @@
       "id": "tests__errors-feedback-fictional-routes.spec",
       "type": "file",
       "file": "Files/tests__errors-feedback-fictional-routes.spec.md",
-      "x": 3355,
-      "y": -210,
+      "x": 3571,
+      "y": 441,
       "width": 260,
       "height": 60
     },
@@ -1616,8 +1616,8 @@
       "id": "src__routes___app___demos__page-layouts___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__page-layouts___page.md",
-      "x": 3364,
-      "y": -244,
+      "x": 3554,
+      "y": 427,
       "width": 260,
       "height": 60
     },
@@ -1625,8 +1625,8 @@
       "id": "tests__graph-detective-search-routes.spec",
       "type": "file",
       "file": "Files/tests__graph-detective-search-routes.spec.md",
-      "x": 3375,
-      "y": -278,
+      "x": 3537,
+      "y": 412,
       "width": 260,
       "height": 60
     },
@@ -1634,8 +1634,8 @@
       "id": "tests__yorha-v1-routes.spec",
       "type": "file",
       "file": "Files/tests__yorha-v1-routes.spec.md",
-      "x": 3388,
-      "y": -312,
+      "x": 3521,
+      "y": 397,
       "width": 260,
       "height": 60
     },
@@ -1643,8 +1643,8 @@
       "id": "tests__ai-canon-routes.spec",
       "type": "file",
       "file": "Files/tests__ai-canon-routes.spec.md",
-      "x": 3403,
-      "y": -345,
+      "x": 3506,
+      "y": 381,
       "width": 260,
       "height": 60
     },
@@ -1652,8 +1652,8 @@
       "id": "src__routes___analysis___document-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___document-analysis___evidenceid____page.md",
-      "x": 3420,
-      "y": -377,
+      "x": 3491,
+      "y": 364,
       "width": 260,
       "height": 60
     },
@@ -1661,8 +1661,8 @@
       "id": "tests__contextual-knowledge-web-routes.spec",
       "type": "file",
       "file": "Files/tests__contextual-knowledge-web-routes.spec.md",
-      "x": 3438,
-      "y": -408,
+      "x": 3476,
+      "y": 347,
       "width": 260,
       "height": 60
     },
@@ -1670,8 +1670,8 @@
       "id": "src__routes___app___admin__explorer___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__explorer___page.md",
-      "x": 3458,
-      "y": -439,
+      "x": 3463,
+      "y": 330,
       "width": 260,
       "height": 60
     },
@@ -1679,8 +1679,8 @@
       "id": "src__routes___app___demos__ui-components___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__ui-components___page.md",
-      "x": 3480,
-      "y": -468,
+      "x": 3449,
+      "y": 311,
       "width": 260,
       "height": 60
     },
@@ -1688,8 +1688,8 @@
       "id": "src__routes___app___admin___page",
       "type": "file",
       "file": "Files/src__routes___app___admin___page.md",
-      "x": 3504,
-      "y": -496,
+      "x": 3437,
+      "y": 293,
       "width": 260,
       "height": 60
     },
@@ -1697,8 +1697,8 @@
       "id": "tests__e2e__vlm-inference-vision.spec",
       "type": "file",
       "file": "Files/tests__e2e__vlm-inference-vision.spec.md",
-      "x": 3529,
-      "y": -524,
+      "x": 3425,
+      "y": 273,
       "width": 260,
       "height": 60
     },
@@ -1706,8 +1706,8 @@
       "id": "src__routes___app___recommendations___page",
       "type": "file",
       "file": "Files/src__routes___app___recommendations___page.md",
-      "x": 3555,
-      "y": -549,
+      "x": 3414,
+      "y": 254,
       "width": 260,
       "height": 60
     },
@@ -1715,8 +1715,8 @@
       "id": "tests__unit__chat-memory.test",
       "type": "file",
       "file": "Files/tests__unit__chat-memory.test.md",
-      "x": 3583,
-      "y": -574,
+      "x": 3403,
+      "y": 233,
       "width": 260,
       "height": 60
     },
@@ -1724,8 +1724,8 @@
       "id": "src__routes___app___demos__crime-reconstruction___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__crime-reconstruction___page.md",
-      "x": 3612,
-      "y": -597,
+      "x": 3394,
+      "y": 213,
       "width": 260,
       "height": 60
     },
@@ -1733,8 +1733,8 @@
       "id": "tests__cases-auth-evidence-routes.spec",
       "type": "file",
       "file": "Files/tests__cases-auth-evidence-routes.spec.md",
-      "x": 3643,
-      "y": -619,
+      "x": 3384,
+      "y": 192,
       "width": 260,
       "height": 60
     },
@@ -1742,8 +1742,8 @@
       "id": "tests__library-upload-ingest.spec",
       "type": "file",
       "file": "Files/tests__library-upload-ingest.spec.md",
-      "x": 3675,
-      "y": -639,
+      "x": 3376,
+      "y": 170,
       "width": 260,
       "height": 60
     },
@@ -1751,8 +1751,8 @@
       "id": "src__routes__api__search___server",
       "type": "file",
       "file": "Files/src__routes__api__search___server.md",
-      "x": 3707,
-      "y": -657,
+      "x": 3368,
+      "y": 148,
       "width": 260,
       "height": 60
     },
@@ -1760,8 +1760,8 @@
       "id": "src__routes___app___admin__error-brain___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__error-brain___page.md",
-      "x": 3741,
-      "y": -674,
+      "x": 3362,
+      "y": 126,
       "width": 260,
       "height": 60
     },
@@ -1769,8 +1769,8 @@
       "id": "tests__routes__ace-wiki-graph-index.test",
       "type": "file",
       "file": "Files/tests__routes__ace-wiki-graph-index.test.md",
-      "x": 3776,
-      "y": -689,
+      "x": 3356,
+      "y": 104,
       "width": 260,
       "height": 60
     },
@@ -1778,8 +1778,17 @@
       "id": "src__routes___app___admin__topology___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__topology___page.md",
-      "x": 3812,
-      "y": -702,
+      "x": 3350,
+      "y": 81,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__mcp__tools__vault-walker.tool",
+      "type": "file",
+      "file": "Files/src__mcp__tools__vault-walker.tool.md",
+      "x": 3346,
+      "y": 58,
       "width": 260,
       "height": 60
     },
@@ -1787,8 +1796,8 @@
       "id": "src__routes___app___admin__case-graph___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__case-graph___page.md",
-      "x": 3848,
-      "y": -713,
+      "x": 3342,
+      "y": 35,
       "width": 260,
       "height": 60
     },
@@ -1796,8 +1805,8 @@
       "id": "src__routes___app___command-center__codebase___page",
       "type": "file",
       "file": "Files/src__routes___app___command-center__codebase___page.md",
-      "x": 3886,
-      "y": -722,
+      "x": 3340,
+      "y": 12,
       "width": 260,
       "height": 60
     },
@@ -1805,8 +1814,8 @@
       "id": "tests__e2e__chat.spec",
       "type": "file",
       "file": "Files/tests__e2e__chat.spec.md",
-      "x": 3923,
-      "y": -729,
+      "x": 3338,
+      "y": -12,
       "width": 260,
       "height": 60
     },
@@ -1814,8 +1823,8 @@
       "id": "src__routes__api__graph__colab-export___server",
       "type": "file",
       "file": "Files/src__routes__api__graph__colab-export___server.md",
-      "x": 3961,
-      "y": -735,
+      "x": 3337,
+      "y": -35,
       "width": 260,
       "height": 60
     },
@@ -1823,8 +1832,8 @@
       "id": "src__routes___app___library___documentid___reader___page",
       "type": "file",
       "file": "Files/src__routes___app___library___documentid___reader___page.md",
-      "x": 4000,
-      "y": -738,
+      "x": 3337,
+      "y": -59,
       "width": 260,
       "height": 60
     },
@@ -1832,8 +1841,8 @@
       "id": "tests__routes__codebase-index-orchestrate.test",
       "type": "file",
       "file": "Files/tests__routes__codebase-index-orchestrate.test.md",
-      "x": 4039,
-      "y": -739,
+      "x": 3337,
+      "y": -83,
       "width": 260,
       "height": 60
     },
@@ -1841,8 +1850,8 @@
       "id": "tests__error-brain-routes.spec",
       "type": "file",
       "file": "Files/tests__error-brain-routes.spec.md",
-      "x": 4078,
-      "y": -738,
+      "x": 3339,
+      "y": -107,
       "width": 260,
       "height": 60
     },
@@ -1850,8 +1859,8 @@
       "id": "src__routes___app___cases___id___reports___page",
       "type": "file",
       "file": "Files/src__routes___app___cases___id___reports___page.md",
-      "x": 4117,
-      "y": -736,
+      "x": 3341,
+      "y": -130,
       "width": 260,
       "height": 60
     },
@@ -1859,8 +1868,8 @@
       "id": "tests__analysis-uis.spec",
       "type": "file",
       "file": "Files/tests__analysis-uis.spec.md",
-      "x": 4155,
-      "y": -731,
+      "x": 3344,
+      "y": -154,
       "width": 260,
       "height": 60
     },
@@ -1868,8 +1877,8 @@
       "id": "tests__quaternion-manifold.spec",
       "type": "file",
       "file": "Files/tests__quaternion-manifold.spec.md",
-      "x": 4194,
-      "y": -724,
+      "x": 3348,
+      "y": -178,
       "width": 260,
       "height": 60
     },
@@ -1877,8 +1886,8 @@
       "id": "src__routes___app___acp___page",
       "type": "file",
       "file": "Files/src__routes___app___acp___page.md",
-      "x": 4232,
-      "y": -715,
+      "x": 3353,
+      "y": -201,
       "width": 260,
       "height": 60
     },
@@ -1886,8 +1895,8 @@
       "id": "tests__retrieval-path-wiring.spec",
       "type": "file",
       "file": "Files/tests__retrieval-path-wiring.spec.md",
-      "x": 4270,
-      "y": -704,
+      "x": 3359,
+      "y": -225,
       "width": 260,
       "height": 60
     },
@@ -1895,8 +1904,17 @@
       "id": "src__routes__api__reports___id___export___server",
       "type": "file",
       "file": "Files/src__routes__api__reports___id___export___server.md",
-      "x": 4307,
-      "y": -691,
+      "x": 3366,
+      "y": -248,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__scene-intent-2d___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__scene-intent-2d___page.md",
+      "x": 3374,
+      "y": -271,
       "width": 260,
       "height": 60
     },
@@ -1904,8 +1922,8 @@
       "id": "src__routes___app___command-center__codebase__graph___page",
       "type": "file",
       "file": "Files/src__routes___app___command-center__codebase__graph___page.md",
-      "x": 4344,
-      "y": -676,
+      "x": 3382,
+      "y": -294,
       "width": 260,
       "height": 60
     },
@@ -1913,8 +1931,8 @@
       "id": "src__routes__api__cases___id___similar___server",
       "type": "file",
       "file": "Files/src__routes__api__cases___id___similar___server.md",
-      "x": 4380,
-      "y": -658,
+      "x": 3391,
+      "y": -316,
       "width": 260,
       "height": 60
     },
@@ -1922,8 +1940,8 @@
       "id": "src__service-worker",
       "type": "file",
       "file": "Files/src__service-worker.md",
-      "x": 4415,
-      "y": -640,
+      "x": 3401,
+      "y": -339,
       "width": 260,
       "height": 60
     },
@@ -1931,8 +1949,8 @@
       "id": "src__routes___app___admin__gpu-evidence-graph___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__gpu-evidence-graph___page.md",
-      "x": 4449,
-      "y": -619,
+      "x": 3412,
+      "y": -361,
       "width": 260,
       "height": 60
     },
@@ -1940,8 +1958,8 @@
       "id": "src__mcp-gpu-orchestrator",
       "type": "file",
       "file": "Files/src__mcp-gpu-orchestrator.md",
-      "x": 4483,
-      "y": -596,
+      "x": 3424,
+      "y": -382,
       "width": 260,
       "height": 60
     },
@@ -1949,8 +1967,8 @@
       "id": "src__routes__api__codebase-index__export__obsidian___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__export__obsidian___server.md",
-      "x": 4515,
-      "y": -571,
+      "x": 3436,
+      "y": -403,
       "width": 260,
       "height": 60
     },
@@ -1958,8 +1976,8 @@
       "id": "src__routes___app___library___page",
       "type": "file",
       "file": "Files/src__routes___app___library___page.md",
-      "x": 4545,
-      "y": -545,
+      "x": 3450,
+      "y": -424,
       "width": 260,
       "height": 60
     },
@@ -1967,8 +1985,8 @@
       "id": "src__routes___app___admin__codebase-viewer___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__codebase-viewer___page.md",
-      "x": 4575,
-      "y": -517,
+      "x": 3464,
+      "y": -445,
       "width": 260,
       "height": 60
     },
@@ -1976,8 +1994,8 @@
       "id": "src__routes___app___fictional-cases___page",
       "type": "file",
       "file": "Files/src__routes___app___fictional-cases___page.md",
-      "x": 4603,
-      "y": -488,
+      "x": 3479,
+      "y": -465,
       "width": 260,
       "height": 60
     },
@@ -1985,8 +2003,8 @@
       "id": "tests__routes__all-routes-page-server.test",
       "type": "file",
       "file": "Files/tests__routes__all-routes-page-server.test.md",
-      "x": 4629,
-      "y": -457,
+      "x": 3494,
+      "y": -484,
       "width": 260,
       "height": 60
     },
@@ -1994,8 +2012,8 @@
       "id": "src__routes__api__analytics__qlora-dataset___server",
       "type": "file",
       "file": "Files/src__routes__api__analytics__qlora-dataset___server.md",
-      "x": 4654,
-      "y": -425,
+      "x": 3510,
+      "y": -503,
       "width": 260,
       "height": 60
     },
@@ -2003,8 +2021,8 @@
       "id": "tests__routes__get-degraded-shape-pass-a.test",
       "type": "file",
       "file": "Files/tests__routes__get-degraded-shape-pass-a.test.md",
-      "x": 4677,
-      "y": -391,
+      "x": 3527,
+      "y": -521,
       "width": 260,
       "height": 60
     },
@@ -2012,8 +2030,8 @@
       "id": "src__routes__api__indexing___server",
       "type": "file",
       "file": "Files/src__routes__api__indexing___server.md",
-      "x": 4698,
-      "y": -356,
+      "x": 3545,
+      "y": -539,
       "width": 260,
       "height": 60
     },
@@ -2021,8 +2039,8 @@
       "id": "src__routes__register___page",
       "type": "file",
       "file": "Files/src__routes__register___page.md",
-      "x": 4718,
-      "y": -320,
+      "x": 3563,
+      "y": -556,
       "width": 260,
       "height": 60
     },
@@ -2030,8 +2048,8 @@
       "id": "tests__full-user-workflow-screenshots.spec",
       "type": "file",
       "file": "Files/tests__full-user-workflow-screenshots.spec.md",
-      "x": 4736,
-      "y": -282,
+      "x": 3582,
+      "y": -573,
       "width": 260,
       "height": 60
     },
@@ -2039,8 +2057,8 @@
       "id": "tests__e2e__e2b-client-inference.spec",
       "type": "file",
       "file": "Files/tests__e2e__e2b-client-inference.spec.md",
-      "x": 4751,
-      "y": -244,
+      "x": 3602,
+      "y": -588,
       "width": 260,
       "height": 60
     },
@@ -2048,8 +2066,8 @@
       "id": "src__routes__api__knowledge___server",
       "type": "file",
       "file": "Files/src__routes__api__knowledge___server.md",
-      "x": 4765,
-      "y": -205,
+      "x": 3622,
+      "y": -604,
       "width": 260,
       "height": 60
     },
@@ -2057,8 +2075,8 @@
       "id": "tests__hmm-ace-flow.spec",
       "type": "file",
       "file": "Files/tests__hmm-ace-flow.spec.md",
-      "x": 4777,
-      "y": -165,
+      "x": 3643,
+      "y": -618,
       "width": 260,
       "height": 60
     },
@@ -2066,8 +2084,8 @@
       "id": "src__routes___app___couchdb-analytics__clusterinspector",
       "type": "file",
       "file": "Files/src__routes___app___couchdb-analytics__clusterinspector.md",
-      "x": 4786,
-      "y": -125,
+      "x": 3665,
+      "y": -632,
       "width": 260,
       "height": 60
     },
@@ -2075,8 +2093,8 @@
       "id": "src__routes__api__codebase-index__enrich-qdrant___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__enrich-qdrant___server.md",
-      "x": 4794,
-      "y": -83,
+      "x": 3687,
+      "y": -645,
       "width": 260,
       "height": 60
     },
@@ -2084,8 +2102,503 @@
       "id": "tests__gamification-poi-timeline.spec",
       "type": "file",
       "file": "Files/tests__gamification-poi-timeline.spec.md",
+      "x": 3709,
+      "y": -657,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___knowledge___page",
+      "type": "file",
+      "file": "Files/src__routes___app___knowledge___page.md",
+      "x": 3732,
+      "y": -668,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__wasm__vector-operations",
+      "type": "file",
+      "file": "Files/src__wasm__vector-operations.md",
+      "x": 3755,
+      "y": -679,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__ace-ingest-route.spec",
+      "type": "file",
+      "file": "Files/tests__ace-ingest-route.spec.md",
+      "x": 3779,
+      "y": -689,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__chat__stream___server",
+      "type": "file",
+      "file": "Files/src__routes__api__chat__stream___server.md",
+      "x": 3803,
+      "y": -698,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__legal-workflow.spec",
+      "type": "file",
+      "file": "Files/tests__legal-workflow.spec.md",
+      "x": 3828,
+      "y": -706,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__simulation___sessionid____server",
+      "type": "file",
+      "file": "Files/src__routes__api__simulation___sessionid____server.md",
+      "x": 3852,
+      "y": -713,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__claude-assist__feedback__analysis___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__claude-assist__feedback__analysis___server.md",
+      "x": 3878,
+      "y": -719,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__research-graph-rl.spec",
+      "type": "file",
+      "file": "Files/tests__research-graph-rl.spec.md",
+      "x": 3903,
+      "y": -725,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__investigate___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__investigate___page.md",
+      "x": 3929,
+      "y": -729,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__persons-of-interest___id___photos___server",
+      "type": "file",
+      "file": "Files/src__routes__api__persons-of-interest___id___photos___server.md",
+      "x": 3954,
+      "y": -733,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__recommendations___server",
+      "type": "file",
+      "file": "Files/src__routes__api__recommendations___server.md",
+      "x": 3980,
+      "y": -736,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___reports___page",
+      "type": "file",
+      "file": "Files/src__routes___app___reports___page.md",
+      "x": 4007,
+      "y": -738,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__routes__codeintel-fix-recommender.test",
+      "type": "file",
+      "file": "Files/tests__routes__codeintel-fix-recommender.test.md",
+      "x": 4033,
+      "y": -738,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__memory-palace___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__memory-palace___page.md",
+      "x": 4059,
+      "y": -738,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__nes-routes___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__nes-routes___page.md",
+      "x": 4085,
+      "y": -737,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__mcp__index",
+      "type": "file",
+      "file": "Files/src__mcp__index.md",
+      "x": 4112,
+      "y": -735,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__nier-showcase___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__nier-showcase___page.md",
+      "x": 4138,
+      "y": -732,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___couchdb-analytics__errorpropagationgraph",
+      "type": "file",
+      "file": "Files/src__routes___app___couchdb-analytics__errorpropagationgraph.md",
+      "x": 4164,
+      "y": -729,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__agent__investigate___server",
+      "type": "file",
+      "file": "Files/src__routes__api__agent__investigate___server.md",
+      "x": 4190,
+      "y": -724,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__e2e__chat-inference-routing.spec",
+      "type": "file",
+      "file": "Files/tests__e2e__chat-inference-routing.spec.md",
+      "x": 4216,
+      "y": -718,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__accessibility__accessibility-tester",
+      "type": "file",
+      "file": "Files/tests__accessibility__accessibility-tester.md",
+      "x": 4242,
+      "y": -711,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__ace-rerank-spine.spec",
+      "type": "file",
+      "file": "Files/tests__ace-rerank-spine.spec.md",
+      "x": 4268,
+      "y": -704,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__kag-notebook___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__kag-notebook___server.md",
+      "x": 4293,
+      "y": -695,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___admin__ai-dashboard__operator___page",
+      "type": "file",
+      "file": "Files/src__routes___app___admin__ai-dashboard__operator___page.md",
+      "x": 4318,
+      "y": -686,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__claude-assist___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__claude-assist___server.md",
+      "x": 4343,
+      "y": -675,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__contextual__chat___server",
+      "type": "file",
+      "file": "Files/src__routes__api__contextual__chat___server.md",
+      "x": 4368,
+      "y": -664,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__codebase-index-rabbitmq-channel.spec",
+      "type": "file",
+      "file": "Files/tests__codebase-index-rabbitmq-channel.spec.md",
+      "x": 4392,
+      "y": -652,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__e2e__client-inference.spec",
+      "type": "file",
+      "file": "Files/tests__e2e__client-inference.spec.md",
+      "x": 4416,
+      "y": -639,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__routes__sveltekit-form-actions.test",
+      "type": "file",
+      "file": "Files/tests__routes__sveltekit-form-actions.test.md",
+      "x": 4439,
+      "y": -625,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__phase97-authenticated-streaming.spec",
+      "type": "file",
+      "file": "Files/tests__phase97-authenticated-streaming.spec.md",
+      "x": 4462,
+      "y": -610,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__karpathy-tag___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__karpathy-tag___server.md",
+      "x": 4484,
+      "y": -594,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__research-evidence-e2e.spec",
+      "type": "file",
+      "file": "Files/tests__research-evidence-e2e.spec.md",
+      "x": 4506,
+      "y": -578,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__export__bundle___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__export__bundle___server.md",
+      "x": 4527,
+      "y": -561,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___admin__observability___page",
+      "type": "file",
+      "file": "Files/src__routes___app___admin__observability___page.md",
+      "x": 4547,
+      "y": -542,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__ingest-errors___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__ingest-errors___server.md",
+      "x": 4567,
+      "y": -524,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__hypergraph-types.spec",
+      "type": "file",
+      "file": "Files/tests__hypergraph-types.spec.md",
+      "x": 4587,
+      "y": -504,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__index-stream___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__index-stream___server.md",
+      "x": 4605,
+      "y": -484,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__retrieval-quality-regression.spec",
+      "type": "file",
+      "file": "Files/tests__retrieval-quality-regression.spec.md",
+      "x": 4623,
+      "y": -463,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__whisper__transcribe___server",
+      "type": "file",
+      "file": "Files/src__routes__api__whisper__transcribe___server.md",
+      "x": 4640,
+      "y": -441,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__health___server",
+      "type": "file",
+      "file": "Files/src__routes__api__health___server.md",
+      "x": 4657,
+      "y": -419,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__routes__chat-memory-backfill.test",
+      "type": "file",
+      "file": "Files/tests__routes__chat-memory-backfill.test.md",
+      "x": 4673,
+      "y": -396,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__rag-search-ace-route.spec",
+      "type": "file",
+      "file": "Files/tests__rag-search-ace-route.spec.md",
+      "x": 4687,
+      "y": -373,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___reports___id___edit___page",
+      "type": "file",
+      "file": "Files/src__routes___app___reports___id___edit___page.md",
+      "x": 4701,
+      "y": -349,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__phase99-production.spec",
+      "type": "file",
+      "file": "Files/tests__phase99-production.spec.md",
+      "x": 4715,
+      "y": -324,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__agentic-errors___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__agentic-errors___page.md",
+      "x": 4727,
+      "y": -299,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__v1__agentic__tool-loop___server",
+      "type": "file",
+      "file": "Files/src__routes__api__v1__agentic__tool-loop___server.md",
+      "x": 4739,
+      "y": -274,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___citations__law___page",
+      "type": "file",
+      "file": "Files/src__routes___app___citations__law___page.md",
+      "x": 4749,
+      "y": -248,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__localdocs.svelte",
+      "type": "file",
+      "file": "Files/src__localdocs.svelte.md",
+      "x": 4759,
+      "y": -221,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___codebase-graph__fast-ast___page",
+      "type": "file",
+      "file": "Files/src__routes___app___codebase-graph__fast-ast___page.md",
+      "x": 4767,
+      "y": -195,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__library__ingest-dev-docs___server",
+      "type": "file",
+      "file": "Files/src__routes__api__library__ingest-dev-docs___server.md",
+      "x": 4775,
+      "y": -168,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__login___page",
+      "type": "file",
+      "file": "Files/src__routes__login___page.md",
+      "x": 4782,
+      "y": -140,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__routes__chat-memory-search.test",
+      "type": "file",
+      "file": "Files/tests__routes__chat-memory-search.test.md",
+      "x": 4788,
+      "y": -113,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___fictional-cases___id____page",
+      "type": "file",
+      "file": "Files/src__routes___app___fictional-cases___id____page.md",
+      "x": 4793,
+      "y": -85,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__persons-of-interest___id___face-match___server",
+      "type": "file",
+      "file": "Files/src__routes__api__persons-of-interest___id___face-match___server.md",
+      "x": 4797,
+      "y": -57,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__reports__generate___server",
+      "type": "file",
+      "file": "Files/src__routes__api__reports__generate___server.md",
       "x": 4799,
-      "y": -42,
+      "y": -28,
       "width": 260,
       "height": 60
     },
@@ -2093,7 +2606,7 @@
       "id": "src__lib__server__ace__context-assembler",
       "type": "file",
       "file": "Files/src__lib__server__ace__context-assembler.md",
-      "x": -152,
+      "x": -190,
       "y": -3929,
       "width": 260,
       "height": 60
@@ -2102,8 +2615,8 @@
       "id": "src__lib__server__ace__ace-wiki",
       "type": "file",
       "file": "Files/src__lib__server__ace__ace-wiki.md",
-      "x": -1105,
-      "y": -3313,
+      "x": -750,
+      "y": -3270,
       "width": 260,
       "height": 60
     },
@@ -2111,8 +2624,17 @@
       "id": "src__lib__server__ai__langgraph-research",
       "type": "file",
       "file": "Files/src__lib__server__ai__langgraph-research.md",
-      "x": -1150,
-      "y": -4622,
+      "x": -1485,
+      "y": -3929,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__types__rag-source-validation",
+      "type": "file",
+      "file": "Files/src__lib__types__rag-source-validation.md",
+      "x": -750,
+      "y": -4729,
       "width": 260,
       "height": 60
     },
@@ -2120,7 +2642,7 @@
       "id": "src__lib__server__db__meta__0000_snapshot",
       "type": "file",
       "file": "Files/src__lib__server__db__meta__0000_snapshot.md",
-      "x": 4163,
+      "x": 4123,
       "y": 1472,
       "width": 260,
       "height": 60
@@ -2129,8 +2651,8 @@
       "id": "src__lib__server__queue__rabbitmq-manager-fixed",
       "type": "file",
       "file": "Files/src__lib__server__queue__rabbitmq-manager-fixed.md",
-      "x": 4172,
-      "y": 1674,
+      "x": 4149,
+      "y": 1555,
       "width": 260,
       "height": 60
     },
@@ -2138,8 +2660,8 @@
       "id": "src__lib__server__agent__autonomous-agent",
       "type": "file",
       "file": "Files/src__lib__server__agent__autonomous-agent.md",
-      "x": 4077,
-      "y": 1870,
+      "x": 4151,
+      "y": 1645,
       "width": 260,
       "height": 60
     },
@@ -2147,8 +2669,8 @@
       "id": "src__lib__server__ollama",
       "type": "file",
       "file": "Files/src__lib__server__ollama.md",
-      "x": 3895,
-      "y": 2013,
+      "x": 4129,
+      "y": 1736,
       "width": 260,
       "height": 60
     },
@@ -2156,8 +2678,8 @@
       "id": "src__lib__server__wiki__wiki-gap-analyzer",
       "type": "file",
       "file": "Files/src__lib__server__wiki__wiki-gap-analyzer.md",
-      "x": 3657,
-      "y": 2066,
+      "x": 4086,
+      "y": 1822,
       "width": 260,
       "height": 60
     },
@@ -2165,8 +2687,8 @@
       "id": "src__lib__server__api-metadata-extractor",
       "type": "file",
       "file": "Files/src__lib__server__api-metadata-extractor.md",
-      "x": 3407,
-      "y": 2013,
+      "x": 4023,
+      "y": 1900,
       "width": 260,
       "height": 60
     },
@@ -2174,8 +2696,8 @@
       "id": "src__lib__server__adapters__service-integrations",
       "type": "file",
       "file": "Files/src__lib__server__adapters__service-integrations.md",
-      "x": 3195,
-      "y": 1853,
+      "x": 3944,
+      "y": 1965,
       "width": 260,
       "height": 60
     },
@@ -2183,8 +2705,8 @@
       "id": "src__lib__server__queue__queue-worker",
       "type": "file",
       "file": "Files/src__lib__server__queue__queue-worker.md",
-      "x": 3063,
-      "y": 1612,
+      "x": 3850,
+      "y": 2013,
       "width": 260,
       "height": 60
     },
@@ -2192,8 +2714,8 @@
       "id": "src__lib__server__production-logger",
       "type": "file",
       "file": "Files/src__lib__server__production-logger.md",
-      "x": 3042,
-      "y": 1329,
+      "x": 3746,
+      "y": 2043,
       "width": 260,
       "height": 60
     },
@@ -2201,8 +2723,8 @@
       "id": "src__lib__server__search__quaternion-manifold",
       "type": "file",
       "file": "Files/src__lib__server__search__quaternion-manifold.md",
-      "x": 3143,
-      "y": 1054,
+      "x": 3636,
+      "y": 2051,
       "width": 260,
       "height": 60
     },
@@ -2210,8 +2732,8 @@
       "id": "src__lib__server__storage__.phase105-backup__1768605014945-minio-service",
       "type": "file",
       "file": "Files/src__lib__server__storage__.phase105-backup__1768605014945-minio-service.md",
-      "x": 3354,
-      "y": 839,
+      "x": 3524,
+      "y": 2037,
       "width": 260,
       "height": 60
     },
@@ -2219,8 +2741,8 @@
       "id": "src__lib__server__db__seed",
       "type": "file",
       "file": "Files/src__lib__server__db__seed.md",
-      "x": 3641,
-      "y": 727,
+      "x": 3414,
+      "y": 2000,
       "width": 260,
       "height": 60
     },
@@ -2228,8 +2750,8 @@
       "id": "src__lib__server__ace__types",
       "type": "file",
       "file": "Files/src__lib__server__ace__types.md",
-      "x": 3956,
-      "y": 743,
+      "x": 3312,
+      "y": 1942,
       "width": 260,
       "height": 60
     },
@@ -2237,8 +2759,8 @@
       "id": "src__lib__server__ml__recommendation-metrics",
       "type": "file",
       "file": "Files/src__lib__server__ml__recommendation-metrics.md",
-      "x": 4244,
-      "y": 890,
+      "x": 3222,
+      "y": 1864,
       "width": 260,
       "height": 60
     },
@@ -2246,8 +2768,170 @@
       "id": "src__lib__server__ace__multi-lane-retrieval",
       "type": "file",
       "file": "Files/src__lib__server__ace__multi-lane-retrieval.md",
-      "x": 4450,
-      "y": 1147,
+      "x": 3147,
+      "y": 1767,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__glyph-diffusion-service",
+      "type": "file",
+      "file": "Files/src__lib__server__glyph-diffusion-service.md",
+      "x": 3091,
+      "y": 1657,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__codeintel__fix-recommender",
+      "type": "file",
+      "file": "Files/src__lib__server__codeintel__fix-recommender.md",
+      "x": 3058,
+      "y": 1536,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__inference__turbo-prefix-cache",
+      "type": "file",
+      "file": "Files/src__lib__server__inference__turbo-prefix-cache.md",
+      "x": 3048,
+      "y": 1408,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__acp__phase90-tools",
+      "type": "file",
+      "file": "Files/src__lib__server__acp__phase90-tools.md",
+      "x": 3063,
+      "y": 1280,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__db__unified-client",
+      "type": "file",
+      "file": "Files/src__lib__server__db__unified-client.md",
+      "x": 3103,
+      "y": 1155,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__atlas__context-for-file",
+      "type": "file",
+      "file": "Files/src__lib__server__atlas__context-for-file.md",
+      "x": 3167,
+      "y": 1038,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__agent__tools__web-search-searxng",
+      "type": "file",
+      "file": "Files/src__lib__server__agent__tools__web-search-searxng.md",
+      "x": 3253,
+      "y": 934,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__data__legal-seed-data",
+      "type": "file",
+      "file": "Files/src__lib__server__data__legal-seed-data.md",
+      "x": 3359,
+      "y": 848,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ace__retrieval-lanes",
+      "type": "file",
+      "file": "Files/src__lib__server__ace__retrieval-lanes.md",
+      "x": 3481,
+      "y": 783,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ml__multi-modal-ranker",
+      "type": "file",
+      "file": "Files/src__lib__server__ml__multi-modal-ranker.md",
+      "x": 3614,
+      "y": 742,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__simulation__grpo-strategy",
+      "type": "file",
+      "file": "Files/src__lib__server__simulation__grpo-strategy.md",
+      "x": 3755,
+      "y": 727,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ace__codeintel-datastore",
+      "type": "file",
+      "file": "Files/src__lib__server__ace__codeintel-datastore.md",
+      "x": 3897,
+      "y": 740,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ml__topic-cluster",
+      "type": "file",
+      "file": "Files/src__lib__server__ml__topic-cluster.md",
+      "x": 4036,
+      "y": 779,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__db__qdrant-sync",
+      "type": "file",
+      "file": "Files/src__lib__server__db__qdrant-sync.md",
+      "x": 4166,
+      "y": 845,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__db__pgvector-utils.temp",
+      "type": "file",
+      "file": "Files/src__lib__server__db__pgvector-utils.temp.md",
+      "x": 4282,
+      "y": 936,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__db__pgvector-utils",
+      "type": "file",
+      "file": "Files/src__lib__server__db__pgvector-utils.md",
+      "x": 4380,
+      "y": 1048,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ml__som-cluster",
+      "type": "file",
+      "file": "Files/src__lib__server__ml__som-cluster.md",
+      "x": 4455,
+      "y": 1178,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__agent__supervisor",
+      "type": "file",
+      "file": "Files/src__lib__server__agent__supervisor.md",
+      "x": 4505,
+      "y": 1321,
       "width": 260,
       "height": 60
     },
@@ -2255,7 +2939,7 @@
       "id": "src__lib__components__analysis__analysispanel",
       "type": "file",
       "file": "Files/src__lib__components__analysis__analysispanel.md",
-      "x": 3910,
+      "x": 3887,
       "y": -1927,
       "width": 260,
       "height": 60
@@ -2264,8 +2948,8 @@
       "id": "src__lib__components__graph__graphifyviewer",
       "type": "file",
       "file": "Files/src__lib__components__graph__graphifyviewer.md",
-      "x": 3937,
-      "y": -1841,
+      "x": 3911,
+      "y": -1884,
       "width": 260,
       "height": 60
     },
@@ -2273,8 +2957,8 @@
       "id": "src__lib__components__canvas__hybridboard",
       "type": "file",
       "file": "Files/src__lib__components__canvas__hybridboard.md",
-      "x": 3937,
-      "y": -1748,
+      "x": 3923,
+      "y": -1838,
       "width": 260,
       "height": 60
     },
@@ -2282,8 +2966,8 @@
       "id": "src__lib__components__devreviewpanel",
       "type": "file",
       "file": "Files/src__lib__components__devreviewpanel.md",
-      "x": 3912,
-      "y": -1655,
+      "x": 3927,
+      "y": -1790,
       "width": 260,
       "height": 60
     },
@@ -2291,8 +2975,8 @@
       "id": "src__lib__components__caseoutcomeprediction",
       "type": "file",
       "file": "Files/src__lib__components__caseoutcomeprediction.md",
-      "x": 3866,
-      "y": -1567,
+      "x": 3924,
+      "y": -1740,
       "width": 260,
       "height": 60
     },
@@ -2300,8 +2984,8 @@
       "id": "src__lib__components__onboarding__setupwizard",
       "type": "file",
       "file": "Files/src__lib__components__onboarding__setupwizard.md",
-      "x": 3798,
-      "y": -1488,
+      "x": 3914,
+      "y": -1691,
       "width": 260,
       "height": 60
     },
@@ -2309,8 +2993,8 @@
       "id": "src__lib__components__codebase__nodedetailpanel",
       "type": "file",
       "file": "Files/src__lib__components__codebase__nodedetailpanel.md",
-      "x": 3714,
-      "y": -1424,
+      "x": 3897,
+      "y": -1643,
       "width": 260,
       "height": 60
     },
@@ -2318,8 +3002,8 @@
       "id": "src__lib__components__courtroom__courtroomhud",
       "type": "file",
       "file": "Files/src__lib__components__courtroom__courtroomhud.md",
-      "x": 3614,
-      "y": -1378,
+      "x": 3873,
+      "y": -1596,
       "width": 260,
       "height": 60
     },
@@ -2327,8 +3011,8 @@
       "id": "src__lib__components__video__videoanalysisview",
       "type": "file",
       "file": "Files/src__lib__components__video__videoanalysisview.md",
-      "x": 3505,
-      "y": -1352,
+      "x": 3844,
+      "y": -1551,
       "width": 260,
       "height": 60
     },
@@ -2336,8 +3020,8 @@
       "id": "src__lib__components__codebase__codebasewikidashboard",
       "type": "file",
       "file": "Files/src__lib__components__codebase__codebasewikidashboard.md",
-      "x": 3390,
-      "y": -1350,
+      "x": 3808,
+      "y": -1510,
       "width": 260,
       "height": 60
     },
@@ -2345,8 +3029,8 @@
       "id": "src__lib__components__modals__evidencecrudmodal",
       "type": "file",
       "file": "Files/src__lib__components__modals__evidencecrudmodal.md",
-      "x": 3275,
-      "y": -1371,
+      "x": 3768,
+      "y": -1472,
       "width": 260,
       "height": 60
     },
@@ -2354,8 +3038,8 @@
       "id": "src__lib__components__detective__contextualdetectiveboard",
       "type": "file",
       "file": "Files/src__lib__components__detective__contextualdetectiveboard.md",
-      "x": 3164,
-      "y": -1417,
+      "x": 3723,
+      "y": -1439,
       "width": 260,
       "height": 60
     },
@@ -2363,8 +3047,8 @@
       "id": "src__lib__components__glyph__glyphatlaspanel",
       "type": "file",
       "file": "Files/src__lib__components__glyph__glyphatlaspanel.md",
-      "x": 3063,
-      "y": -1484,
+      "x": 3673,
+      "y": -1410,
       "width": 260,
       "height": 60
     },
@@ -2372,8 +3056,8 @@
       "id": "src__lib__components__dashboard__evidenceanalysisdashboard",
       "type": "file",
       "file": "Files/src__lib__components__dashboard__evidenceanalysisdashboard.md",
-      "x": 2975,
-      "y": -1573,
+      "x": 3620,
+      "y": -1387,
       "width": 260,
       "height": 60
     },
@@ -2381,8 +3065,8 @@
       "id": "src__lib__components__routeapiexplorer",
       "type": "file",
       "file": "Files/src__lib__components__routeapiexplorer.md",
-      "x": 2906,
-      "y": -1679,
+      "x": 3564,
+      "y": -1370,
       "width": 260,
       "height": 60
     },
@@ -2390,8 +3074,8 @@
       "id": "src__lib__components__recommendations__recommendationwidget",
       "type": "file",
       "file": "Files/src__lib__components__recommendations__recommendationwidget.md",
-      "x": 2858,
-      "y": -1798,
+      "x": 3505,
+      "y": -1359,
       "width": 260,
       "height": 60
     },
@@ -2399,8 +3083,8 @@
       "id": "src__lib__components__canvas__collaborativeevidencecanvas",
       "type": "file",
       "file": "Files/src__lib__components__canvas__collaborativeevidencecanvas.md",
-      "x": 2835,
-      "y": -1927,
+      "x": 3445,
+      "y": -1355,
       "width": 260,
       "height": 60
     },
@@ -2408,8 +3092,8 @@
       "id": "src__lib__components__ui__aifileupload",
       "type": "file",
       "file": "Files/src__lib__components__ui__aifileupload.md",
-      "x": 2838,
-      "y": -2060,
+      "x": 3384,
+      "y": -1357,
       "width": 260,
       "height": 60
     },
@@ -2417,8 +3101,8 @@
       "id": "src__lib__components__citations__citationcollections",
       "type": "file",
       "file": "Files/src__lib__components__citations__citationcollections.md",
-      "x": 2868,
-      "y": -2191,
+      "x": 3323,
+      "y": -1366,
       "width": 260,
       "height": 60
     },
@@ -2426,8 +3110,8 @@
       "id": "src__lib__components__audio__audioanalysisview",
       "type": "file",
       "file": "Files/src__lib__components__audio__audioanalysisview.md",
-      "x": 2924,
-      "y": -2316,
+      "x": 3262,
+      "y": -1382,
       "width": 260,
       "height": 60
     },
@@ -2435,8 +3119,8 @@
       "id": "src__lib__components__cache__cachedemo",
       "type": "file",
       "file": "Files/src__lib__components__cache__cachedemo.md",
-      "x": 3004,
-      "y": -2428,
+      "x": 3203,
+      "y": -1404,
       "width": 260,
       "height": 60
     },
@@ -2444,8 +3128,8 @@
       "id": "src__lib__components__editor__wysiwygeditor",
       "type": "file",
       "file": "Files/src__lib__components__editor__wysiwygeditor.md",
-      "x": 3106,
-      "y": -2524,
+      "x": 3146,
+      "y": -1433,
       "width": 260,
       "height": 60
     },
@@ -2453,8 +3137,8 @@
       "id": "src__routes___app___cases___id___evidence__upload___page",
       "type": "file",
       "file": "Files/src__routes___app___cases___id___evidence__upload___page.md",
-      "x": 3227,
-      "y": -2599,
+      "x": 3092,
+      "y": -1468,
       "width": 260,
       "height": 60
     },
@@ -2462,8 +3146,8 @@
       "id": "src__lib__components__analytics__liveresearchpanel",
       "type": "file",
       "file": "Files/src__lib__components__analytics__liveresearchpanel.md",
-      "x": 3362,
-      "y": -2649,
+      "x": 3042,
+      "y": -1510,
       "width": 260,
       "height": 60
     },
@@ -2471,8 +3155,8 @@
       "id": "src__lib__components__routeinspectorworking",
       "type": "file",
       "file": "Files/src__lib__components__routeinspectorworking.md",
-      "x": 3505,
-      "y": -2671,
+      "x": 2996,
+      "y": -1557,
       "width": 260,
       "height": 60
     },
@@ -2480,8 +3164,8 @@
       "id": "src__lib__components__research__researchtaskpanel",
       "type": "file",
       "file": "Files/src__lib__components__research__researchtaskpanel.md",
-      "x": 3652,
-      "y": -2665,
+      "x": 2954,
+      "y": -1609,
       "width": 260,
       "height": 60
     },
@@ -2489,8 +3173,8 @@
       "id": "src__lib__components__detective__evidencetheoryboard",
       "type": "file",
       "file": "Files/src__lib__components__detective__evidencetheoryboard.md",
-      "x": 3796,
-      "y": -2630,
+      "x": 2919,
+      "y": -1666,
       "width": 260,
       "height": 60
     },
@@ -2498,8 +3182,8 @@
       "id": "src__lib__components__analytics__researchsummariesbrowser",
       "type": "file",
       "file": "Files/src__lib__components__analytics__researchsummariesbrowser.md",
-      "x": 3932,
-      "y": -2566,
+      "x": 2889,
+      "y": -1727,
       "width": 260,
       "height": 60
     },
@@ -2507,8 +3191,8 @@
       "id": "src__lib__components__courtroom__strategywizard",
       "type": "file",
       "file": "Files/src__lib__components__courtroom__strategywizard.md",
-      "x": 4055,
-      "y": -2476,
+      "x": 2866,
+      "y": -1791,
       "width": 260,
       "height": 60
     },
@@ -2516,8 +3200,8 @@
       "id": "src__lib__components__phase72errorbrain",
       "type": "file",
       "file": "Files/src__lib__components__phase72errorbrain.md",
-      "x": 4158,
-      "y": -2363,
+      "x": 2849,
+      "y": -1858,
       "width": 260,
       "height": 60
     },
@@ -2525,8 +3209,8 @@
       "id": "src__lib__components__editor__legaldocumenteditor",
       "type": "file",
       "file": "Files/src__lib__components__editor__legaldocumenteditor.md",
-      "x": 4237,
-      "y": -2230,
+      "x": 2840,
+      "y": -1927,
       "width": 260,
       "height": 60
     },
@@ -2534,8 +3218,260 @@
       "id": "src__lib__components__poi__addpoimodal",
       "type": "file",
       "file": "Files/src__lib__components__poi__addpoimodal.md",
-      "x": 4290,
-      "y": -2083,
+      "x": 2838,
+      "y": -1997,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__routeinspectormodal",
+      "type": "file",
+      "file": "Files/src__lib__components__routeinspectormodal.md",
+      "x": 2844,
+      "y": -2068,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__codebase__tagdetailview",
+      "type": "file",
+      "file": "Files/src__lib__components__codebase__tagdetailview.md",
+      "x": 2857,
+      "y": -2138,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__codebase__codeevidenceboard",
+      "type": "file",
+      "file": "Files/src__lib__components__codebase__codeevidenceboard.md",
+      "x": 2878,
+      "y": -2206,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__citations__citationlist",
+      "type": "file",
+      "file": "Files/src__lib__components__citations__citationlist.md",
+      "x": 2906,
+      "y": -2273,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__apitestermodal",
+      "type": "file",
+      "file": "Files/src__lib__components__apitestermodal.md",
+      "x": 2941,
+      "y": -2337,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__citations__citationsaveform",
+      "type": "file",
+      "file": "Files/src__lib__components__citations__citationsaveform.md",
+      "x": 2984,
+      "y": -2397,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__codebase__tagrenamedialog",
+      "type": "file",
+      "file": "Files/src__lib__components__codebase__tagrenamedialog.md",
+      "x": 3032,
+      "y": -2452,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legalcorpussearch",
+      "type": "file",
+      "file": "Files/src__lib__components__legalcorpussearch.md",
+      "x": 3087,
+      "y": -2503,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__routeoperationsdashboard",
+      "type": "file",
+      "file": "Files/src__lib__components__routeoperationsdashboard.md",
+      "x": 3147,
+      "y": -2548,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__codebase__routegraph",
+      "type": "file",
+      "file": "Files/src__lib__components__codebase__routegraph.md",
+      "x": 3212,
+      "y": -2586,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__archivedroutespanel",
+      "type": "file",
+      "file": "Files/src__lib__components__archivedroutespanel.md",
+      "x": 3281,
+      "y": -2618,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ragsearchcomponent",
+      "type": "file",
+      "file": "Files/src__lib__components__ragsearchcomponent.md",
+      "x": 3353,
+      "y": -2642,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__poi__personofinterestdetailview",
+      "type": "file",
+      "file": "Files/src__lib__components__poi__personofinterestdetailview.md",
+      "x": 3428,
+      "y": -2659,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__graph__glyphatlasviewer",
+      "type": "file",
+      "file": "Files/src__lib__components__graph__glyphatlasviewer.md",
+      "x": 3505,
+      "y": -2667,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__routeinspectordetectiveboard",
+      "type": "file",
+      "file": "Files/src__lib__components__routeinspectordetectiveboard.md",
+      "x": 3583,
+      "y": -2668,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__editor__tiptapeditor",
+      "type": "file",
+      "file": "Files/src__lib__components__editor__tiptapeditor.md",
+      "x": 3661,
+      "y": -2660,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___evidence__upload___page",
+      "type": "file",
+      "file": "Files/src__routes___app___evidence__upload___page.md",
+      "x": 3738,
+      "y": -2644,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__monitoring__cachemonitoringwidget",
+      "type": "file",
+      "file": "Files/src__lib__components__monitoring__cachemonitoringwidget.md",
+      "x": 3814,
+      "y": -2620,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__graph__bagofwordstexturepanel",
+      "type": "file",
+      "file": "Files/src__lib__components__graph__bagofwordstexturepanel.md",
+      "x": 3886,
+      "y": -2587,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__rag__ragdocumentgrid",
+      "type": "file",
+      "file": "Files/src__lib__components__rag__ragdocumentgrid.md",
+      "x": 3956,
+      "y": -2547,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__routetreeview",
+      "type": "file",
+      "file": "Files/src__lib__components__routetreeview.md",
+      "x": 4021,
+      "y": -2500,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__poi__poiform",
+      "type": "file",
+      "file": "Files/src__lib__components__poi__poiform.md",
+      "x": 4081,
+      "y": -2446,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__statspanel",
+      "type": "file",
+      "file": "Files/src__lib__components__statspanel.md",
+      "x": 4136,
+      "y": -2385,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__poiphotomodal",
+      "type": "file",
+      "file": "Files/src__lib__components__poiphotomodal.md",
+      "x": 4184,
+      "y": -2319,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__document__documentanalysisview",
+      "type": "file",
+      "file": "Files/src__lib__components__document__documentanalysisview.md",
+      "x": 4225,
+      "y": -2247,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__layout__yorhasidebar",
+      "type": "file",
+      "file": "Files/src__lib__components__layout__yorhasidebar.md",
+      "x": 4258,
+      "y": -2172,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__codebase__categoryfilter",
+      "type": "file",
+      "file": "Files/src__lib__components__codebase__categoryfilter.md",
+      "x": 4284,
+      "y": -2093,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__agent__autonomousinvestigator",
+      "type": "file",
+      "file": "Files/src__lib__components__agent__autonomousinvestigator.md",
+      "x": 4301,
+      "y": -2011,
       "width": 260,
       "height": 60
     },
@@ -2543,7 +3479,7 @@
       "id": "src__lib__server__ai__gemma4-agent",
       "type": "file",
       "file": "Files/src__lib__server__ai__gemma4-agent.md",
-      "x": 2070,
+      "x": 1988,
       "y": 3719,
       "width": 260,
       "height": 60
@@ -2552,8 +3488,8 @@
       "id": "src__lib__server__ai__contextual-tools",
       "type": "file",
       "file": "Files/src__lib__server__ai__contextual-tools.md",
-      "x": 1117,
-      "y": 4336,
+      "x": 1771,
+      "y": 4236,
       "width": 260,
       "height": 60
     },
@@ -2561,7 +3497,34 @@
       "id": "src__lib__types__yorha-interface",
       "type": "file",
       "file": "Files/src__lib__types__yorha-interface.md",
-      "x": 1072,
+      "x": 1143,
+      "y": 4290,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__error-analysis__experiencerecorder",
+      "type": "file",
+      "file": "Files/src__lib__services__error-analysis__experiencerecorder.md",
+      "x": 761,
+      "y": 3719,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ai__openai-facade",
+      "type": "file",
+      "file": "Files/src__lib__server__ai__openai-facade.md",
+      "x": 1093,
+      "y": 3063,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ai__caching-layer",
+      "type": "file",
+      "file": "Files/src__lib__server__ai__caching-layer.md",
+      "x": 1872,
       "y": 3026,
       "width": 260,
       "height": 60
@@ -2570,7 +3533,7 @@
       "id": "src__lib__components__legal-corpus__legalcorpusclassicview",
       "type": "file",
       "file": "Files/src__lib__components__legal-corpus__legalcorpusclassicview.md",
-      "x": -1861,
+      "x": -1907,
       "y": 3236,
       "width": 260,
       "height": 60
@@ -2579,8 +3542,8 @@
       "id": "src__lib__components__legal-ai__casechatpanel",
       "type": "file",
       "file": "Files/src__lib__components__legal-ai__casechatpanel.md",
-      "x": -1955,
-      "y": 3632,
+      "x": -1899,
+      "y": 3438,
       "width": 260,
       "height": 60
     },
@@ -2588,8 +3551,8 @@
       "id": "src__routes___app___library___documentid___node___nodeid____page",
       "type": "file",
       "file": "Files/src__routes___app___library___documentid___node___nodeid____page.md",
-      "x": -2351,
-      "y": 3850,
+      "x": -1993,
+      "y": 3633,
       "width": 260,
       "height": 60
     },
@@ -2597,8 +3560,8 @@
       "id": "src__routes___app___library__glossary___page",
       "type": "file",
       "file": "Files/src__routes___app___library__glossary___page.md",
-      "x": -2817,
-      "y": 3702,
+      "x": -2176,
+      "y": 3776,
       "width": 260,
       "height": 60
     },
@@ -2606,8 +3569,8 @@
       "id": "src__lib__components__legal__legalresearchspellbook",
       "type": "file",
       "file": "Files/src__lib__components__legal__legalresearchspellbook.md",
-      "x": -3051,
-      "y": 3236,
+      "x": -2414,
+      "y": 3830,
       "width": 260,
       "height": 60
     },
@@ -2615,8 +3578,8 @@
       "id": "src__lib__components__legal-ai__legalailayout",
       "type": "file",
       "file": "Files/src__lib__components__legal-ai__legalailayout.md",
-      "x": -2871,
-      "y": 2716,
+      "x": -2663,
+      "y": 3776,
       "width": 260,
       "height": 60
     },
@@ -2624,8 +3587,8 @@
       "id": "src__lib__components__legal-ai__attachtocasemodal",
       "type": "file",
       "file": "Files/src__lib__components__legal-ai__attachtocasemodal.md",
-      "x": -2351,
-      "y": 2467,
+      "x": -2875,
+      "y": 3617,
       "width": 260,
       "height": 60
     },
@@ -2633,8 +3596,71 @@
       "id": "src__lib__components__legal-ai__citationdetail",
       "type": "file",
       "file": "Files/src__lib__components__legal-ai__citationdetail.md",
-      "x": -1785,
-      "y": 2670,
+      "x": -3007,
+      "y": 3375,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal-ai__collectiondetail",
+      "type": "file",
+      "file": "Files/src__lib__components__legal-ai__collectiondetail.md",
+      "x": -3028,
+      "y": 3092,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal-ai__citationlist",
+      "type": "file",
+      "file": "Files/src__lib__components__legal-ai__citationlist.md",
+      "x": -2927,
+      "y": 2818,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal-ai__citationhighlighter",
+      "type": "file",
+      "file": "Files/src__lib__components__legal-ai__citationhighlighter.md",
+      "x": -2717,
+      "y": 2603,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal-corpus__corpussidebar",
+      "type": "file",
+      "file": "Files/src__lib__components__legal-corpus__corpussidebar.md",
+      "x": -2429,
+      "y": 2491,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal-ai__statutedetail",
+      "type": "file",
+      "file": "Files/src__lib__components__legal-ai__statutedetail.md",
+      "x": -2114,
+      "y": 2507,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal-ai__casestatutelinks",
+      "type": "file",
+      "file": "Files/src__lib__components__legal-ai__casestatutelinks.md",
+      "x": -1827,
+      "y": 2654,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal-ai__citationsavemodal",
+      "type": "file",
+      "file": "Files/src__lib__components__legal-ai__citationsavemodal.md",
+      "x": -1620,
+      "y": 2911,
       "width": 260,
       "height": 60
     },
@@ -2642,7 +3668,7 @@
       "id": "src__lib__components__ai__enhancedlegalaichatwithsynthesis",
       "type": "file",
       "file": "Files/src__lib__components__ai__enhancedlegalaichatwithsynthesis.md",
-      "x": 4248,
+      "x": 4237,
       "y": 1236,
       "width": 260,
       "height": 60
@@ -2651,8 +3677,8 @@
       "id": "src__lib__components__ai__intelligentmodelorchestrator",
       "type": "file",
       "file": "Files/src__lib__components__ai__intelligentmodelorchestrator.md",
-      "x": 4257,
-      "y": 1438,
+      "x": 4255,
+      "y": 1400,
       "width": 260,
       "height": 60
     },
@@ -2660,8 +3686,8 @@
       "id": "src__lib__components__ai__contextualevidencechatmodal",
       "type": "file",
       "file": "Files/src__lib__components__ai__contextualevidencechatmodal.md",
-      "x": 4162,
-      "y": 1633,
+      "x": 4199,
+      "y": 1568,
       "width": 260,
       "height": 60
     },
@@ -2669,8 +3695,8 @@
       "id": "src__routes___app___terminal___page",
       "type": "file",
       "file": "Files/src__routes___app___terminal___page.md",
-      "x": 3980,
-      "y": 1776,
+      "x": 4077,
+      "y": 1709,
       "width": 260,
       "height": 60
     },
@@ -2678,8 +3704,8 @@
       "id": "src__lib__components__ai__enhanceddocumentuploader",
       "type": "file",
       "file": "Files/src__lib__components__ai__enhanceddocumentuploader.md",
-      "x": 3742,
-      "y": 1830,
+      "x": 3904,
+      "y": 1800,
       "width": 260,
       "height": 60
     },
@@ -2687,8 +3713,8 @@
       "id": "src__lib__components__ai__recommendationengine",
       "type": "file",
       "file": "Files/src__lib__components__ai__recommendationengine.md",
-      "x": 3492,
-      "y": 1776,
+      "x": 3701,
+      "y": 1824,
       "width": 260,
       "height": 60
     },
@@ -2696,8 +3722,8 @@
       "id": "src__lib__components__ai__gemma270mwebassembly",
       "type": "file",
       "file": "Files/src__lib__components__ai__gemma270mwebassembly.md",
-      "x": 3280,
-      "y": 1617,
+      "x": 3495,
+      "y": 1772,
       "width": 260,
       "height": 60
     },
@@ -2705,8 +3731,8 @@
       "id": "src__lib__components__ai__cacheperformancedashboard",
       "type": "file",
       "file": "Files/src__lib__components__ai__cacheperformancedashboard.md",
-      "x": 3148,
-      "y": 1375,
+      "x": 3314,
+      "y": 1647,
       "width": 260,
       "height": 60
     },
@@ -2714,8 +3740,8 @@
       "id": "src__lib__components__ai__simpleworkingchat",
       "type": "file",
       "file": "Files/src__lib__components__ai__simpleworkingchat.md",
-      "x": 3128,
-      "y": 1092,
+      "x": 3185,
+      "y": 1462,
       "width": 260,
       "height": 60
     },
@@ -2723,8 +3749,8 @@
       "id": "src__lib__components__ai__legaldocumentsummarizer",
       "type": "file",
       "file": "Files/src__lib__components__ai__legaldocumentsummarizer.md",
-      "x": 3228,
-      "y": 818,
+      "x": 3126,
+      "y": 1236,
       "width": 260,
       "height": 60
     },
@@ -2732,8 +3758,8 @@
       "id": "src__lib__components__ai__yorhaaiassistant",
       "type": "file",
       "file": "Files/src__lib__components__ai__yorhaaiassistant.md",
-      "x": 3439,
-      "y": 603,
+      "x": 3151,
+      "y": 998,
       "width": 260,
       "height": 60
     },
@@ -2741,8 +3767,8 @@
       "id": "src__lib__components__ai__contextualchatdemo",
       "type": "file",
       "file": "Files/src__lib__components__ai__contextualchatdemo.md",
-      "x": 3726,
-      "y": 491,
+      "x": 3259,
+      "y": 778,
       "width": 260,
       "height": 60
     },
@@ -2750,8 +3776,8 @@
       "id": "src__lib__components__ai__automatedlegalresearch",
       "type": "file",
       "file": "Files/src__lib__components__ai__automatedlegalresearch.md",
-      "x": 4041,
-      "y": 507,
+      "x": 3440,
+      "y": 606,
       "width": 260,
       "height": 60
     },
@@ -2759,8 +3785,8 @@
       "id": "src__lib__components__ai__casescoringdashboard",
       "type": "file",
       "file": "Files/src__lib__components__ai__casescoringdashboard.md",
-      "x": 4329,
-      "y": 654,
+      "x": 3675,
+      "y": 504,
       "width": 260,
       "height": 60
     },
@@ -2768,8 +3794,35 @@
       "id": "src__lib__components__ai__askai",
       "type": "file",
       "file": "Files/src__lib__components__ai__askai.md",
-      "x": 4535,
-      "y": 911,
+      "x": 3936,
+      "y": 489,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ai__enhancedfileupload",
+      "type": "file",
+      "file": "Files/src__lib__components__ai__enhancedfileupload.md",
+      "x": 4191,
+      "y": 567,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ai__enhancedaichattest",
+      "type": "file",
+      "file": "Files/src__lib__components__ai__enhancedaichattest.md",
+      "x": 4407,
+      "y": 731,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ai__vectorintelligencedemo",
+      "type": "file",
+      "file": "Files/src__lib__components__ai__vectorintelligencedemo.md",
+      "x": 4556,
+      "y": 962,
       "width": 260,
       "height": 60
     },
@@ -2777,7 +3830,7 @@
       "id": "src__lib__server__graph__hypergraph-4d",
       "type": "file",
       "file": "Files/src__lib__server__graph__hypergraph-4d.md",
-      "x": 59,
+      "x": -53,
       "y": -3968,
       "width": 260,
       "height": 60
@@ -2786,8 +3839,8 @@
       "id": "src__lib__server__graph__neo4j-gds",
       "type": "file",
       "file": "Files/src__lib__server__graph__neo4j-gds.md",
-      "x": -501,
-      "y": -3309,
+      "x": -50,
+      "y": -3751,
       "width": 260,
       "height": 60
     },
@@ -2795,8 +3848,8 @@
       "id": "src__lib__server__graph__community-graph",
       "type": "file",
       "file": "Files/src__lib__server__graph__community-graph.md",
-      "x": -1237,
-      "y": -3968,
+      "x": -163,
+      "y": -3545,
       "width": 260,
       "height": 60
     },
@@ -2804,8 +3857,98 @@
       "id": "src__lib__server__graph__gpu-graph-analysis",
       "type": "file",
       "file": "Files/src__lib__server__graph__gpu-graph-analysis.md",
-      "x": -501,
-      "y": -4768,
+      "x": -373,
+      "y": -3406,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__graph__codebase-scanner-v2",
+      "type": "file",
+      "file": "Files/src__lib__server__graph__codebase-scanner-v2.md",
+      "x": -636,
+      "y": -3377,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__graph__glyph-atlas-builder",
+      "type": "file",
+      "file": "Files/src__lib__server__graph__glyph-atlas-builder.md",
+      "x": -897,
+      "y": -3473,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__graph__relationship-extractor",
+      "type": "file",
+      "file": "Files/src__lib__server__graph__relationship-extractor.md",
+      "x": -1095,
+      "y": -3682,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__graph__graph-remote-functions",
+      "type": "file",
+      "file": "Files/src__lib__server__graph__graph-remote-functions.md",
+      "x": -1184,
+      "y": -3968,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__retrieval__graph-context",
+      "type": "file",
+      "file": "Files/src__lib__server__retrieval__graph-context.md",
+      "x": -1136,
+      "y": -4274,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__graph__codebase-neo4j-sync",
+      "type": "file",
+      "file": "Files/src__lib__server__graph__codebase-neo4j-sync.md",
+      "x": -954,
+      "y": -4536,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__graph__couchdb-pagerank",
+      "type": "file",
+      "file": "Files/src__lib__server__graph__couchdb-pagerank.md",
+      "x": -667,
+      "y": -4695,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__graph__som-topology-pipeline",
+      "type": "file",
+      "file": "Files/src__lib__server__graph__som-topology-pipeline.md",
+      "x": -331,
+      "y": -4714,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__types__retrieval",
+      "type": "file",
+      "file": "Files/src__lib__server__types__retrieval.md",
+      "x": -13,
+      "y": -4580,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__retrieval__citation-graph",
+      "type": "file",
+      "file": "Files/src__lib__server__retrieval__citation-graph.md",
+      "x": 219,
+      "y": -4316,
       "width": 260,
       "height": 60
     },
@@ -2813,7 +3956,7 @@
       "id": "src__lib__server__gpu__libtorch-bridge",
       "type": "file",
       "file": "Files/src__lib__server__gpu__libtorch-bridge.md",
-      "x": 1833,
+      "x": 1752,
       "y": 3804,
       "width": 260,
       "height": 60
@@ -2822,8 +3965,8 @@
       "id": "src__lib__webgpu__som-webgpu-cache",
       "type": "file",
       "file": "Files/src__lib__webgpu__som-webgpu-cache.md",
-      "x": 880,
-      "y": 4421,
+      "x": 1535,
+      "y": 4321,
       "width": 260,
       "height": 60
     },
@@ -2831,7 +3974,34 @@
       "id": "src__lib__server__gpu__pytorch-graph",
       "type": "file",
       "file": "Files/src__lib__server__gpu__pytorch-graph.md",
-      "x": 836,
+      "x": 906,
+      "y": 4375,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__webgpu__texture-streaming",
+      "type": "file",
+      "file": "Files/src__lib__webgpu__texture-streaming.md",
+      "x": 524,
+      "y": 3804,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__grpc__graph-ml-client",
+      "type": "file",
+      "file": "Files/src__lib__server__grpc__graph-ml-client.md",
+      "x": 857,
+      "y": 3148,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__gpu__simdjson-bridge",
+      "type": "file",
+      "file": "Files/src__lib__server__gpu__simdjson-bridge.md",
+      "x": 1636,
       "y": 3111,
       "width": 260,
       "height": 60
@@ -2840,7 +4010,7 @@
       "id": "src__lib__models__chatsession.svelte",
       "type": "file",
       "file": "Files/src__lib__models__chatsession.svelte.md",
-      "x": -3059,
+      "x": -3085,
       "y": -1703,
       "width": 260,
       "height": 60
@@ -2849,8 +4019,8 @@
       "id": "src__lib__courtroom__courtroom-scene.svelte",
       "type": "file",
       "file": "Files/src__lib__courtroom__courtroom-scene.svelte.md",
-      "x": -3619,
-      "y": -1044,
+      "x": -3427,
+      "y": -1110,
       "width": 260,
       "height": 60
     },
@@ -2858,8 +4028,8 @@
       "id": "src__lib__data__report-templates",
       "type": "file",
       "file": "Files/src__lib__data__report-templates.md",
-      "x": -4355,
-      "y": -1703,
+      "x": -4179,
+      "y": -1296,
       "width": 260,
       "height": 60
     },
@@ -2867,8 +4037,17 @@
       "id": "src__lib__workers__compute-worker",
       "type": "file",
       "file": "Files/src__lib__workers__compute-worker.md",
-      "x": -3619,
-      "y": -2503,
+      "x": -4226,
+      "y": -2144,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__shims__ioredis-browser-shim",
+      "type": "file",
+      "file": "Files/src__lib__shims__ioredis-browser-shim.md",
+      "x": -3372,
+      "y": -2464,
       "width": 260,
       "height": 60
     },
@@ -2876,7 +4055,7 @@
       "id": "src__lib__components__evidence__evidenceviewmodal",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceviewmodal.md",
-      "x": -2919,
+      "x": -2937,
       "y": -2143,
       "width": 260,
       "height": 60
@@ -2885,8 +4064,8 @@
       "id": "src__lib__components__evidence__evidenceboard",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceboard.md",
-      "x": -2930,
-      "y": -1885,
+      "x": -2925,
+      "y": -1956,
       "width": 260,
       "height": 60
     },
@@ -2894,8 +4073,8 @@
       "id": "src__lib__components__evidence__webgpuparticleoverlay",
       "type": "file",
       "file": "Files/src__lib__components__evidence__webgpuparticleoverlay.md",
-      "x": -3097,
-      "y": -1658,
+      "x": -3004,
+      "y": -1770,
       "width": 260,
       "height": 60
     },
@@ -2903,8 +4082,8 @@
       "id": "src__lib__components__evidence__evidenceuploadmodal",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceuploadmodal.md",
-      "x": -3377,
-      "y": -1546,
+      "x": -3163,
+      "y": -1626,
       "width": 260,
       "height": 60
     },
@@ -2912,8 +4091,8 @@
       "id": "src__lib__components__evidence__caseevidenceorganizer",
       "type": "file",
       "file": "Files/src__lib__components__evidence__caseevidenceorganizer.md",
-      "x": -3692,
-      "y": -1598,
+      "x": -3377,
+      "y": -1555,
       "width": 260,
       "height": 60
     },
@@ -2921,8 +4100,8 @@
       "id": "src__lib__components__evidence__evidencecanvas",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidencecanvas.md",
-      "x": -3948,
-      "y": -1814,
+      "x": -3612,
+      "y": -1576,
       "width": 260,
       "height": 60
     },
@@ -2930,8 +4109,8 @@
       "id": "src__lib__components__evidence__doclingextractionviewer",
       "type": "file",
       "file": "Files/src__lib__components__evidence__doclingextractionviewer.md",
-      "x": -4064,
-      "y": -2143,
+      "x": -3828,
+      "y": -1693,
       "width": 260,
       "height": 60
     },
@@ -2939,8 +4118,8 @@
       "id": "src__lib__components__evidence__evidenceuploadresults",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceuploadresults.md",
-      "x": -3994,
-      "y": -2499,
+      "x": -3987,
+      "y": -1891,
       "width": 260,
       "height": 60
     },
@@ -2948,8 +4127,8 @@
       "id": "src__lib__components__evidence__visionimageanalyzer",
       "type": "file",
       "file": "Files/src__lib__components__evidence__visionimageanalyzer.md",
-      "x": -3745,
-      "y": -2780,
+      "x": -4057,
+      "y": -2143,
       "width": 260,
       "height": 60
     },
@@ -2957,8 +4136,8 @@
       "id": "src__lib__server__observability__langfuse",
       "type": "file",
       "file": "Files/src__lib__server__observability__langfuse.md",
-      "x": -3377,
-      "y": -2901,
+      "x": -4024,
+      "y": -2411,
       "width": 260,
       "height": 60
     },
@@ -2966,8 +4145,8 @@
       "id": "src__lib__components__evidence__evidenceuploadprogress",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceuploadprogress.md",
-      "x": -2988,
-      "y": -2818,
+      "x": -3885,
+      "y": -2651,
       "width": 260,
       "height": 60
     },
@@ -2975,8 +4154,44 @@
       "id": "src__lib__components__evidence__webgputexturestreamingdemo",
       "type": "file",
       "file": "Files/src__lib__components__evidence__webgputexturestreamingdemo.md",
-      "x": -2684,
-      "y": -2543,
+      "x": -3659,
+      "y": -2823,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__evidence__evidencelist",
+      "type": "file",
+      "file": "Files/src__lib__components__evidence__evidencelist.md",
+      "x": -3377,
+      "y": -2896,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__evidence__evidenceprimaryupload",
+      "type": "file",
+      "file": "Files/src__lib__components__evidence__evidenceprimaryupload.md",
+      "x": -3083,
+      "y": -2854,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__evidence__evidenceupload",
+      "type": "file",
+      "file": "Files/src__lib__components__evidence__evidenceupload.md",
+      "x": -2822,
+      "y": -2698,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__evidence__draggableevidencenode",
+      "type": "file",
+      "file": "Files/src__lib__components__evidence__draggableevidencenode.md",
+      "x": -2638,
+      "y": -2449,
       "width": 260,
       "height": 60
     },
@@ -2993,7 +4208,7 @@
       "id": "src__lib__server__inference__inference-router",
       "type": "file",
       "file": "Files/src__lib__server__inference__inference-router.md",
-      "x": -3033,
+      "x": -3080,
       "y": -1927,
       "width": 260,
       "height": 60
@@ -3002,8 +4217,8 @@
       "id": "src__lib__server__grpc__retrieval-client",
       "type": "file",
       "file": "Files/src__lib__server__grpc__retrieval-client.md",
-      "x": -3073,
-      "y": -1613,
+      "x": -3058,
+      "y": -1789,
       "width": 260,
       "height": 60
     },
@@ -3011,8 +4226,8 @@
       "id": "src__lib__server__retrieval__codebase-context",
       "type": "file",
       "file": "Files/src__lib__server__retrieval__codebase-context.md",
-      "x": -3325,
-      "y": -1373,
+      "x": -3091,
+      "y": -1645,
       "width": 260,
       "height": 60
     },
@@ -3020,8 +4235,8 @@
       "id": "src__lib__server__retrieval__cross-encoder-reranker",
       "type": "file",
       "file": "Files/src__lib__server__retrieval__cross-encoder-reranker.md",
-      "x": -3698,
-      "y": -1334,
+      "x": -3175,
+      "y": -1513,
       "width": 260,
       "height": 60
     },
@@ -3029,8 +4244,8 @@
       "id": "src__lib__server__indexer__workspace-metadata-extractor",
       "type": "file",
       "file": "Files/src__lib__server__indexer__workspace-metadata-extractor.md",
-      "x": -4039,
-      "y": -1539,
+      "x": -3303,
+      "y": -1411,
       "width": 260,
       "height": 60
     },
@@ -3038,8 +4253,8 @@
       "id": "src__lib__machines__evidence-processing-machine",
       "type": "file",
       "file": "Files/src__lib__machines__evidence-processing-machine.md",
-      "x": -4197,
-      "y": -1927,
+      "x": -3462,
+      "y": -1352,
       "width": 260,
       "height": 60
     },
@@ -3047,8 +4262,8 @@
       "id": "src__lib__server__indexer__dual-embedder",
       "type": "file",
       "file": "Files/src__lib__server__indexer__dual-embedder.md",
-      "x": -4089,
-      "y": -2351,
+      "x": -3638,
+      "y": -1345,
       "width": 260,
       "height": 60
     },
@@ -3056,8 +4271,8 @@
       "id": "src__lib__server__indexer__legal-chunker",
       "type": "file",
       "file": "Files/src__lib__server__indexer__legal-chunker.md",
-      "x": -3737,
-      "y": -2640,
+      "x": -3813,
+      "y": -1393,
       "width": 260,
       "height": 60
     },
@@ -3065,8 +4280,8 @@
       "id": "src__lib__server__retrieval__centroid-cache",
       "type": "file",
       "file": "Files/src__lib__server__retrieval__centroid-cache.md",
-      "x": -3266,
-      "y": -2664,
+      "x": -3970,
+      "y": -1496,
       "width": 260,
       "height": 60
     },
@@ -3074,8 +4289,107 @@
       "id": "src__lib__server__indexer__directory-summarizer",
       "type": "file",
       "file": "Files/src__lib__server__indexer__directory-summarizer.md",
-      "x": -2858,
-      "y": -2397,
+      "x": -4092,
+      "y": -1644,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__indexer__ast-chunker",
+      "type": "file",
+      "file": "Files/src__lib__server__indexer__ast-chunker.md",
+      "x": -4165,
+      "y": -1828,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__machines__aiassistantmachinecomponent",
+      "type": "file",
+      "file": "Files/src__lib__machines__aiassistantmachinecomponent.md",
+      "x": -4180,
+      "y": -2029,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__indexer__cluster-summary",
+      "type": "file",
+      "file": "Files/src__lib__server__indexer__cluster-summary.md",
+      "x": -4134,
+      "y": -2230,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__indexer__web-search-indexer",
+      "type": "file",
+      "file": "Files/src__lib__server__indexer__web-search-indexer.md",
+      "x": -4027,
+      "y": -2411,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__retrieval__orchestrator",
+      "type": "file",
+      "file": "Files/src__lib__server__retrieval__orchestrator.md",
+      "x": -3868,
+      "y": -2555,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__machines__evidencecustodymachine",
+      "type": "file",
+      "file": "Files/src__lib__machines__evidencecustodymachine.md",
+      "x": -3670,
+      "y": -2647,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__machines__usertypingstatemachine",
+      "type": "file",
+      "file": "Files/src__lib__machines__usertypingstatemachine.md",
+      "x": -3449,
+      "y": -2677,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__indexer__ast-ingest-logger",
+      "type": "file",
+      "file": "Files/src__lib__server__indexer__ast-ingest-logger.md",
+      "x": -3226,
+      "y": -2639,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__retrieval__auto-backfill",
+      "type": "file",
+      "file": "Files/src__lib__server__retrieval__auto-backfill.md",
+      "x": -3021,
+      "y": -2534,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__phase78__contextbuilder",
+      "type": "file",
+      "file": "Files/src__lib__server__phase78__contextbuilder.md",
+      "x": -2854,
+      "y": -2371,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__machines__auth-machine",
+      "type": "file",
+      "file": "Files/src__lib__machines__auth-machine.md",
+      "x": -2741,
+      "y": -2163,
       "width": 260,
       "height": 60
     },
@@ -3083,7 +4397,7 @@
       "id": "src__routes___app___simulation___page",
       "type": "file",
       "file": "Files/src__routes___app___simulation___page.md",
-      "x": 1529,
+      "x": 1475,
       "y": 3874,
       "width": 260,
       "height": 60
@@ -3092,8 +4406,8 @@
       "id": "src__lib__components__legal__citationmanager",
       "type": "file",
       "file": "Files/src__lib__components__legal__citationmanager.md",
-      "x": 1187,
-      "y": 4467,
+      "x": 1413,
+      "y": 4225,
       "width": 260,
       "height": 60
     },
@@ -3101,8 +4415,8 @@
       "id": "src__lib__components__legal__evidencereportsummary",
       "type": "file",
       "file": "Files/src__lib__components__legal__evidencereportsummary.md",
-      "x": 435,
-      "y": 4281,
+      "x": 1098,
+      "y": 4462,
       "width": 260,
       "height": 60
     },
@@ -3110,8 +4424,8 @@
       "id": "src__lib__components__legal__aisummaryreader",
       "type": "file",
       "file": "Files/src__lib__components__legal__aisummaryreader.md",
-      "x": 389,
-      "y": 3434,
+      "x": 675,
+      "y": 4429,
       "width": 260,
       "height": 60
     },
@@ -3119,8 +4433,44 @@
       "id": "src__lib__components__legal__contractanalyzer",
       "type": "file",
       "file": "Files/src__lib__components__legal__contractanalyzer.md",
-      "x": 1242,
-      "y": 3113,
+      "x": 358,
+      "y": 4106,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal__workspacepanel",
+      "type": "file",
+      "file": "Files/src__lib__components__legal__workspacepanel.md",
+      "x": 326,
+      "y": 3631,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal__evidencecustodyflow",
+      "type": "file",
+      "file": "Files/src__lib__components__legal__evidencecustodyflow.md",
+      "x": 623,
+      "y": 3231,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal__documentdetails",
+      "type": "file",
+      "file": "Files/src__lib__components__legal__documentdetails.md",
+      "x": 1129,
+      "y": 3114,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__legal__criminalprofile",
+      "type": "file",
+      "file": "Files/src__lib__components__legal__criminalprofile.md",
+      "x": 1608,
+      "y": 3360,
       "width": 260,
       "height": 60
     },
@@ -3137,7 +4487,7 @@
       "id": "src__lib__services__knowledge-search__acptoolregistry",
       "type": "file",
       "file": "Files/src__lib__services__knowledge-search__acptoolregistry.md",
-      "x": 2487,
+      "x": 2417,
       "y": 3505,
       "width": 260,
       "height": 60
@@ -3146,8 +4496,8 @@
       "id": "src__lib__gpu__markdown-processor",
       "type": "file",
       "file": "Files/src__lib__gpu__markdown-processor.md",
-      "x": 1927,
-      "y": 4165,
+      "x": 2323,
+      "y": 3901,
       "width": 260,
       "height": 60
     },
@@ -3155,8 +4505,8 @@
       "id": "src__lib__gpu__gpu-compute-pipeline",
       "type": "file",
       "file": "Files/src__lib__gpu__gpu-compute-pipeline.md",
-      "x": 1191,
-      "y": 3505,
+      "x": 1927,
+      "y": 4119,
       "width": 260,
       "height": 60
     },
@@ -3164,8 +4514,44 @@
       "id": "src__lib__gpu__nes-glyph-webgpu",
       "type": "file",
       "file": "Files/src__lib__gpu__nes-glyph-webgpu.md",
+      "x": 1461,
+      "y": 3972,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__knowledge-search__knowledgeindexer",
+      "type": "file",
+      "file": "Files/src__lib__services__knowledge-search__knowledgeindexer.md",
+      "x": 1228,
+      "y": 3505,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__knowledge-search__minioknowledgestore",
+      "type": "file",
+      "file": "Files/src__lib__services__knowledge-search__minioknowledgestore.md",
+      "x": 1407,
+      "y": 2985,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__gpu__webgpu-pagerank",
+      "type": "file",
+      "file": "Files/src__lib__gpu__webgpu-pagerank.md",
       "x": 1927,
-      "y": 2705,
+      "y": 2736,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__error-analysis__learningpipeline",
+      "type": "file",
+      "file": "Files/src__lib__services__error-analysis__learningpipeline.md",
+      "x": 2493,
+      "y": 2940,
       "width": 260,
       "height": 60
     },
@@ -3173,7 +4559,7 @@
       "id": "src__lib__components__forms__smartdocumentform",
       "type": "file",
       "file": "Files/src__lib__components__forms__smartdocumentform.md",
-      "x": 4508,
+      "x": 4472,
       "y": 251,
       "width": 260,
       "height": 60
@@ -3182,8 +4568,8 @@
       "id": "src__lib__components__forms__progressiveform",
       "type": "file",
       "file": "Files/src__lib__components__forms__progressiveform.md",
-      "x": 4291,
-      "y": 768,
+      "x": 4411,
+      "y": 602,
       "width": 260,
       "height": 60
     },
@@ -3191,8 +4577,8 @@
       "id": "src__lib__components__forms__legalcaseform",
       "type": "file",
       "file": "Files/src__lib__components__forms__legalcaseform.md",
-      "x": 3662,
-      "y": 822,
+      "x": 4096,
+      "y": 839,
       "width": 260,
       "height": 60
     },
@@ -3200,8 +4586,8 @@
       "id": "src__lib__utils__parallaxdynamic",
       "type": "file",
       "file": "Files/src__lib__utils__parallaxdynamic.md",
-      "x": 3280,
-      "y": 251,
+      "x": 3672,
+      "y": 805,
       "width": 260,
       "height": 60
     },
@@ -3209,8 +4595,8 @@
       "id": "src__lib__components__forms__enhancedcaseform",
       "type": "file",
       "file": "Files/src__lib__components__forms__enhancedcaseform.md",
-      "x": 3613,
-      "y": -405,
+      "x": 3355,
+      "y": 483,
       "width": 260,
       "height": 60
     },
@@ -3218,8 +4604,35 @@
       "id": "src__lib__components__forms__caseform",
       "type": "file",
       "file": "Files/src__lib__components__forms__caseform.md",
-      "x": 4392,
-      "y": -442,
+      "x": 3323,
+      "y": 8,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__utils__accessibility",
+      "type": "file",
+      "file": "Files/src__lib__utils__accessibility.md",
+      "x": 3620,
+      "y": -393,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__forms__enhancedfileupload",
+      "type": "file",
+      "file": "Files/src__lib__components__forms__enhancedfileupload.md",
+      "x": 4126,
+      "y": -510,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__utils__progressive-enhancement-audit",
+      "type": "file",
+      "file": "Files/src__lib__utils__progressive-enhancement-audit.md",
+      "x": 4605,
+      "y": -263,
       "width": 260,
       "height": 60
     },
@@ -3227,7 +4640,7 @@
       "id": "src__lib__server__cache__code-llm-index",
       "type": "file",
       "file": "Files/src__lib__server__cache__code-llm-index.md",
-      "x": 1409,
+      "x": 1265,
       "y": 3929,
       "width": 260,
       "height": 60
@@ -3236,8 +4649,44 @@
       "id": "src__lib__server__cache__cartridge-tensor-bridge",
       "type": "file",
       "file": "Files/src__lib__server__cache__cartridge-tensor-bridge.md",
-      "x": -50,
+      "x": 1048,
+      "y": 4446,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__cache__invalidation",
+      "type": "file",
+      "file": "Files/src__lib__server__cache__invalidation.md",
+      "x": 420,
+      "y": 4500,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__cache__report-template-cache",
+      "type": "file",
+      "file": "Files/src__lib__server__cache__report-template-cache.md",
+      "x": 38,
       "y": 3929,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__cartridge__glyph-tile-engine",
+      "type": "file",
+      "file": "Files/src__lib__server__cartridge__glyph-tile-engine.md",
+      "x": 370,
+      "y": 3273,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__cache__warm-up",
+      "type": "file",
+      "file": "Files/src__lib__server__cache__warm-up.md",
+      "x": 1150,
+      "y": 3236,
       "width": 260,
       "height": 60
     },
@@ -3245,8 +4694,35 @@
       "id": "src__lib__components__cases__casenoteseditor",
       "type": "file",
       "file": "Files/src__lib__components__cases__casenoteseditor.md",
-      "x": 4768,
+      "x": 4528,
       "y": 501,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__cases__caseoverview",
+      "type": "file",
+      "file": "Files/src__lib__components__cases__caseoverview.md",
+      "x": 3968,
+      "y": 1161,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__cases__caseviewmodal",
+      "type": "file",
+      "file": "Files/src__lib__components__cases__caseviewmodal.md",
+      "x": 3233,
+      "y": 501,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__cases__contextualchatmodal",
+      "type": "file",
+      "file": "Files/src__lib__components__cases__contextualchatmodal.md",
+      "x": 3968,
+      "y": -299,
       "width": 260,
       "height": 60
     },
@@ -3254,7 +4730,16 @@
       "id": "src__lib__server__grpc__embedding-client",
       "type": "file",
       "file": "Files/src__lib__server__grpc__embedding-client.md",
-      "x": 2503,
+      "x": 2363,
+      "y": -3619,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__grpc__generation-client",
+      "type": "file",
+      "file": "Files/src__lib__server__grpc__generation-client.md",
+      "x": 903,
       "y": -3619,
       "width": 260,
       "height": 60
@@ -3272,7 +4757,7 @@
       "id": "src__lib__components__yorha__yorhadetectivecommandcenter",
       "type": "file",
       "file": "Files/src__lib__components__yorha__yorhadetectivecommandcenter.md",
-      "x": -3547,
+      "x": -3567,
       "y": 0,
       "width": 260,
       "height": 60
@@ -3281,8 +4766,8 @@
       "id": "src__lib__components__yorha__yorhadetectivecommandcenter",
       "type": "file",
       "file": "Files/src__lib__components__yorha__yorhadetectivecommandcenter.md",
-      "x": -3550,
-      "y": 236,
+      "x": -3549,
+      "y": 164,
       "width": 260,
       "height": 60
     },
@@ -3290,8 +4775,8 @@
       "id": "src__lib__components__yorha__casetheoryconstructor",
       "type": "file",
       "file": "Files/src__lib__components__yorha__casetheoryconstructor.md",
-      "x": -3687,
-      "y": 453,
+      "x": -3605,
+      "y": 332,
       "width": 260,
       "height": 60
     },
@@ -3299,8 +4784,8 @@
       "id": "src__lib__components__yorha__casetheoryconstructor",
       "type": "file",
       "file": "Files/src__lib__components__yorha__casetheoryconstructor.md",
-      "x": -3929,
-      "y": 582,
+      "x": -3727,
+      "y": 473,
       "width": 260,
       "height": 60
     },
@@ -3308,8 +4793,8 @@
       "id": "src__lib__components__yorha__enhancedyorhaaiassistant",
       "type": "file",
       "file": "Files/src__lib__components__yorha__enhancedyorhaaiassistant.md",
-      "x": -4219,
-      "y": 578,
+      "x": -3901,
+      "y": 564,
       "width": 260,
       "height": 60
     },
@@ -3317,8 +4802,8 @@
       "id": "src__lib__components__yorha___simulations__yorhadataviz",
       "type": "file",
       "file": "Files/src__lib__components__yorha___simulations__yorhadataviz.md",
-      "x": -4484,
-      "y": 428,
+      "x": -4104,
+      "y": 588,
       "width": 260,
       "height": 60
     },
@@ -3326,44 +4811,44 @@
       "id": "src__lib__components__yorha___simulations__yorhadataviz",
       "type": "file",
       "file": "Files/src__lib__components__yorha___simulations__yorhadataviz.md",
+      "x": -4310,
+      "y": 536,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha__phoenixprosecutordashboard",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha__phoenixprosecutordashboard.md",
+      "x": -4490,
+      "y": 411,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha__phoenixprosecutordashboard",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha__phoenixprosecutordashboard.md",
+      "x": -4620,
+      "y": 226,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha___simulations__yorhacommandinterface",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha___simulations__yorhacommandinterface.md",
+      "x": -4678,
+      "y": 0,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha___simulations__yorhacommandinterface",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha___simulations__yorhacommandinterface.md",
       "x": -4653,
-      "y": 161,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__components__yorha__phoenixprosecutordashboard",
-      "type": "file",
-      "file": "Files/src__lib__components__yorha__phoenixprosecutordashboard.md",
-      "x": -4676,
-      "y": -167,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__components__yorha__phoenixprosecutordashboard",
-      "type": "file",
-      "file": "Files/src__lib__components__yorha__phoenixprosecutordashboard.md",
-      "x": -4538,
-      "y": -477,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__components__yorha___simulations__yorhacommandinterface",
-      "type": "file",
-      "file": "Files/src__lib__components__yorha___simulations__yorhacommandinterface.md",
-      "x": -4263,
-      "y": -693,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__components__yorha___simulations__yorhacommandinterface",
-      "type": "file",
-      "file": "Files/src__lib__components__yorha___simulations__yorhacommandinterface.md",
-      "x": -3908,
-      "y": -756,
+      "y": -238,
       "width": 260,
       "height": 60
     },
@@ -3371,8 +4856,8 @@
       "id": "src__lib__components__yorha__detectiveevidencemap",
       "type": "file",
       "file": "Files/src__lib__components__yorha__detectiveevidencemap.md",
-      "x": -3556,
-      "y": -643,
+      "x": -4545,
+      "y": -458,
       "width": 260,
       "height": 60
     },
@@ -3380,8 +4865,53 @@
       "id": "src__lib__components__yorha__detectiveevidencemap",
       "type": "file",
       "file": "Files/src__lib__components__yorha__detectiveevidencemap.md",
-      "x": -3292,
-      "y": -372,
+      "x": -4364,
+      "y": -630,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha___simulations__canvasboard",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha___simulations__canvasboard.md",
+      "x": -4129,
+      "y": -732,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha___simulations__canvasboard",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha___simulations__canvasboard.md",
+      "x": -3868,
+      "y": -747,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha__judicialanalysisagent",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha__judicialanalysisagent.md",
+      "x": -3614,
+      "y": -669,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha__yorhamodal",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha__yorhamodal.md",
+      "x": -3398,
+      "y": -506,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__yorha__yorhamodal",
+      "type": "file",
+      "file": "Files/src__lib__components__yorha__yorhamodal.md",
+      "x": -3248,
+      "y": -274,
       "width": 260,
       "height": 60
     },
@@ -3389,7 +4919,7 @@
       "id": "src__lib__components__ui__globalcommandpalette",
       "type": "file",
       "file": "Files/src__lib__components__ui__globalcommandpalette.md",
-      "x": -1609,
+      "x": -1672,
       "y": 3377,
       "width": 260,
       "height": 60
@@ -3398,8 +4928,8 @@
       "id": "src__lib__components__ui__richtexteditor",
       "type": "file",
       "file": "Files/src__lib__components__ui__richtexteditor.md",
-      "x": -1951,
-      "y": 3970,
+      "x": -1711,
+      "y": 3692,
       "width": 260,
       "height": 60
     },
@@ -3407,8 +4937,8 @@
       "id": "src__lib__components__ui__themegallery",
       "type": "file",
       "file": "Files/src__lib__components__ui__themegallery.md",
-      "x": -2703,
-      "y": 3784,
+      "x": -1963,
+      "y": 3932,
       "width": 260,
       "height": 60
     },
@@ -3416,8 +4946,8 @@
       "id": "src__lib__components__ui__autopopulatedcaseform",
       "type": "file",
       "file": "Files/src__lib__components__ui__autopopulatedcaseform.md",
-      "x": -2750,
-      "y": 2937,
+      "x": -2336,
+      "y": 3970,
       "width": 260,
       "height": 60
     },
@@ -3425,8 +4955,53 @@
       "id": "src__routes___app___demos__celestial-icons___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__celestial-icons___page.md",
-      "x": -1896,
-      "y": 2616,
+      "x": -2677,
+      "y": 3765,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ui__gaming__modals__retrorecommendationmodal",
+      "type": "file",
+      "file": "Files/src__lib__components__ui__gaming__modals__retrorecommendationmodal.md",
+      "x": -2835,
+      "y": 3377,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__yorha-icons___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__yorha-icons___page.md",
+      "x": -2727,
+      "y": 2953,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ui__cachemonitoringwidget",
+      "type": "file",
+      "file": "Files/src__lib__components__ui__cachemonitoringwidget.md",
+      "x": -2375,
+      "y": 2665,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ui__authmodal",
+      "type": "file",
+      "file": "Files/src__lib__components__ui__authmodal.md",
+      "x": -1904,
+      "y": 2640,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__ui__diamondmodal",
+      "type": "file",
+      "file": "Files/src__lib__components__ui__diamondmodal.md",
+      "x": -1496,
+      "y": 2907,
       "width": 260,
       "height": 60
     },
@@ -3434,7 +5009,7 @@
       "id": "src__lib__server__indexer__karpathy-wiki",
       "type": "file",
       "file": "Files/src__lib__server__indexer__karpathy-wiki.md",
-      "x": -2746,
+      "x": -2764,
       "y": -2351,
       "width": 260,
       "height": 60
@@ -3443,8 +5018,8 @@
       "id": "src__lib__server__analytics__mapreduce-matrix-analysis",
       "type": "file",
       "file": "Files/src__lib__server__analytics__mapreduce-matrix-analysis.md",
-      "x": -2840,
-      "y": -1955,
+      "x": -2804,
+      "y": -2037,
       "width": 260,
       "height": 60
     },
@@ -3452,8 +5027,8 @@
       "id": "src__lib__server__analytics__web-research-crawler",
       "type": "file",
       "file": "Files/src__lib__server__analytics__web-research-crawler.md",
-      "x": -3236,
-      "y": -1737,
+      "x": -3056,
+      "y": -1797,
       "width": 260,
       "height": 60
     },
@@ -3461,8 +5036,8 @@
       "id": "src__lib__server__analytics__research-graph-rl",
       "type": "file",
       "file": "Files/src__lib__server__analytics__research-graph-rl.md",
-      "x": -3702,
-      "y": -1885,
+      "x": -3429,
+      "y": -1758,
       "width": 260,
       "height": 60
     },
@@ -3470,8 +5045,8 @@
       "id": "src__lib__server__analytics__unified-research-query",
       "type": "file",
       "file": "Files/src__lib__server__analytics__unified-research-query.md",
-      "x": -3936,
-      "y": -2351,
+      "x": -3770,
+      "y": -1964,
       "width": 260,
       "height": 60
     },
@@ -3479,8 +5054,8 @@
       "id": "src__lib__server__analytics__minified-research-cache",
       "type": "file",
       "file": "Files/src__lib__server__analytics__minified-research-cache.md",
-      "x": -3756,
-      "y": -2871,
+      "x": -3928,
+      "y": -2351,
       "width": 260,
       "height": 60
     },
@@ -3488,8 +5063,8 @@
       "id": "src__lib__server__analytics__search-analytics",
       "type": "file",
       "file": "Files/src__lib__server__analytics__search-analytics.md",
-      "x": -3236,
-      "y": -3120,
+      "x": -3820,
+      "y": -2775,
       "width": 260,
       "height": 60
     },
@@ -3497,8 +5072,26 @@
       "id": "src__lib__server__analytics__deep-research",
       "type": "file",
       "file": "Files/src__lib__server__analytics__deep-research.md",
-      "x": -2670,
-      "y": -2917,
+      "x": -3468,
+      "y": -3064,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__analytics__research-summaries-db",
+      "type": "file",
+      "file": "Files/src__lib__server__analytics__research-summaries-db.md",
+      "x": -2996,
+      "y": -3089,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__analytics__codebase-research",
+      "type": "file",
+      "file": "Files/src__lib__server__analytics__codebase-research.md",
+      "x": -2589,
+      "y": -2821,
       "width": 260,
       "height": 60
     },
@@ -3524,8 +5117,26 @@
       "id": "src__lib__services__error-analysis__kagtraverser",
       "type": "file",
       "file": "Files/src__lib__services__error-analysis__kagtraverser.md",
-      "x": 2943,
+      "x": 2740,
       "y": 3377,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__error-analysis__grpopolicy",
+      "type": "file",
+      "file": "Files/src__lib__services__error-analysis__grpopolicy.md",
+      "x": 1787,
+      "y": 3994,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__error-analysis__escalationservice",
+      "type": "file",
+      "file": "Files/src__lib__services__error-analysis__escalationservice.md",
+      "x": 1743,
+      "y": 2684,
       "width": 260,
       "height": 60
     },
@@ -3569,7 +5180,7 @@
       "id": "src__lib__components__admin__evidencedrawer",
       "type": "file",
       "file": "Files/src__lib__components__admin__evidencedrawer.md",
-      "x": 4216,
+      "x": 4179,
       "y": 1703,
       "width": 260,
       "height": 60
@@ -3578,8 +5189,8 @@
       "id": "src__lib__components__admin__pipelineprogress",
       "type": "file",
       "file": "Files/src__lib__components__admin__pipelineprogress.md",
-      "x": 3263,
-      "y": 2320,
+      "x": 3619,
+      "y": 2363,
       "width": 260,
       "height": 60
     },
@@ -3587,8 +5198,17 @@
       "id": "src__lib__components__admin__evidencedatagrid",
       "type": "file",
       "file": "Files/src__lib__components__admin__evidencedatagrid.md",
-      "x": 3219,
-      "y": 1010,
+      "x": 2884,
+      "y": 1703,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__admin__tagselector",
+      "type": "file",
+      "file": "Files/src__lib__components__admin__tagselector.md",
+      "x": 3619,
+      "y": 903,
       "width": 260,
       "height": 60
     },
@@ -3596,7 +5216,7 @@
       "id": "src__routes___app___evidence__analyze___page",
       "type": "file",
       "file": "Files/src__routes___app___evidence__analyze___page.md",
-      "x": -398,
+      "x": -460,
       "y": 3874,
       "width": 260,
       "height": 60
@@ -3605,8 +5225,8 @@
       "id": "src__routes___app___evidence__hash___page",
       "type": "file",
       "file": "Files/src__routes___app___evidence__hash___page.md",
-      "x": -1351,
-      "y": 4491,
+      "x": -802,
+      "y": 4467,
       "width": 260,
       "height": 60
     },
@@ -3614,8 +5234,26 @@
       "id": "src__routes___app___evidence__realtime___page",
       "type": "file",
       "file": "Files/src__routes___app___evidence__realtime___page.md",
-      "x": -1395,
-      "y": 3182,
+      "x": -1554,
+      "y": 4281,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___evidence___page",
+      "type": "file",
+      "file": "Files/src__routes___app___evidence___page.md",
+      "x": -1601,
+      "y": 3434,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__schemas__evidence-upload",
+      "type": "file",
+      "file": "Files/src__lib__schemas__evidence-upload.md",
+      "x": -748,
+      "y": 3113,
       "width": 260,
       "height": 60
     },
@@ -3650,7 +5288,16 @@
       "id": "src__lib__server__workers__audio-processor",
       "type": "file",
       "file": "Files/src__lib__server__workers__audio-processor.md",
-      "x": 1051,
+      "x": 911,
+      "y": 3992,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__workers__video-vlm-processor",
+      "type": "file",
+      "file": "Files/src__lib__server__workers__video-vlm-processor.md",
+      "x": -549,
       "y": 3992,
       "width": 260,
       "height": 60
@@ -3659,8 +5306,26 @@
       "id": "src__lib__server__services__langextract-service",
       "type": "file",
       "file": "Files/src__lib__server__services__langextract-service.md",
-      "x": -903,
+      "x": -1106,
       "y": 3619,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__analysis__evidence-analysis-pipeline",
+      "type": "file",
+      "file": "Files/src__lib__server__analysis__evidence-analysis-pipeline.md",
+      "x": -2059,
+      "y": 4236,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__analysis__hmm-ace-analyzer",
+      "type": "file",
+      "file": "Files/src__lib__server__analysis__hmm-ace-analyzer.md",
+      "x": -2103,
+      "y": 2926,
       "width": 260,
       "height": 60
     },
@@ -3697,6 +5362,141 @@
       "file": "Files/src__lib__server__gpu__background-analyzer.md",
       "x": -3192,
       "y": 251,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__config__retro-console-palettes",
+      "type": "file",
+      "file": "Files/src__lib__config__retro-console-palettes.md",
+      "x": 659,
+      "y": -4000,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__knowledge-search__qdrantknowledgestore",
+      "type": "file",
+      "file": "Files/src__lib__services__knowledge-search__qdrantknowledgestore.md",
+      "x": -800,
+      "y": -4000,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__ai__client-router",
+      "type": "file",
+      "file": "Files/src__lib__ai__client-router.md",
+      "x": 3110,
+      "y": 3082,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__ai__client-cache",
+      "type": "file",
+      "file": "Files/src__lib__ai__client-cache.md",
+      "x": 2550,
+      "y": 3741,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__ai__unified-generation",
+      "type": "file",
+      "file": "Files/src__lib__ai__unified-generation.md",
+      "x": 1814,
+      "y": 3082,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__ai__citation-cache",
+      "type": "file",
+      "file": "Files/src__lib__ai__citation-cache.md",
+      "x": 2550,
+      "y": 2282,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__db__queries__route-health-queries",
+      "type": "file",
+      "file": "Files/src__lib__db__queries__route-health-queries.md",
+      "x": 4037,
+      "y": -2143,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__db__client-db",
+      "type": "file",
+      "file": "Files/src__lib__db__client-db.md",
+      "x": 2577,
+      "y": -2143,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__vector-cache",
+      "type": "file",
+      "file": "Files/src__lib__server__vector-cache.md",
+      "x": 4519,
+      "y": -1472,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__types__webgpu-navigator.d",
+      "type": "file",
+      "file": "Files/src__lib__types__webgpu-navigator.d.md",
+      "x": 1301,
+      "y": 3968,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__cartridge__glyph-mappers",
+      "type": "file",
+      "file": "Files/src__lib__server__cartridge__glyph-mappers.md",
+      "x": 3350,
+      "y": -3082,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__yorha__components__judicialanalysisagent",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__yorha__components__judicialanalysisagent.md",
+      "x": 4729,
+      "y": -750,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ml__topic-clustering-worker",
+      "type": "file",
+      "file": "Files/src__lib__server__ml__topic-clustering-worker.md",
+      "x": -672,
+      "y": -3719,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__concurrency__queue-manager",
+      "type": "file",
+      "file": "Files/src__lib__server__concurrency__queue-manager.md",
+      "x": -2282,
+      "y": -2550,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__machines__evidence-analysis-machine",
+      "type": "file",
+      "file": "Files/src__lib__machines__evidence-analysis-machine.md",
+      "x": 4674,
+      "y": -995,
       "width": 260,
       "height": 60
     }
@@ -3985,15 +5785,39 @@
       "toEnd": "arrow"
     },
     {
+      "id": "e-22-2",
+      "fromNode": "group-22",
+      "toNode": "src__lib__server__cache__invalidation",
+      "toEnd": "arrow"
+    },
+    {
       "id": "e-2-0",
       "fromNode": "group-2",
       "toNode": "src__lib__components__cases__casenoteseditor",
       "toEnd": "arrow"
     },
     {
+      "id": "e-2-1",
+      "fromNode": "group-2",
+      "toNode": "src__lib__components__cases__caseoverview",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-2-2",
+      "fromNode": "group-2",
+      "toNode": "src__lib__components__cases__caseviewmodal",
+      "toEnd": "arrow"
+    },
+    {
       "id": "e-82-0",
       "fromNode": "group-82",
       "toNode": "src__lib__server__grpc__embedding-client",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-82-1",
+      "fromNode": "group-82",
+      "toNode": "src__lib__server__grpc__generation-client",
       "toEnd": "arrow"
     },
     {
@@ -4072,6 +5896,18 @@
       "id": "e-16-0",
       "fromNode": "group-16",
       "toNode": "src__lib__services__error-analysis__kagtraverser",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-16-1",
+      "fromNode": "group-16",
+      "toNode": "src__lib__services__error-analysis__grpopolicy",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-16-2",
+      "fromNode": "group-16",
+      "toNode": "src__lib__services__error-analysis__escalationservice",
       "toEnd": "arrow"
     },
     {
@@ -4159,9 +5995,27 @@
       "toEnd": "arrow"
     },
     {
+      "id": "e-24-1",
+      "fromNode": "group-24",
+      "toNode": "src__lib__server__workers__video-vlm-processor",
+      "toEnd": "arrow"
+    },
+    {
       "id": "e-32-0",
       "fromNode": "group-32",
       "toNode": "src__lib__server__services__langextract-service",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-32-1",
+      "fromNode": "group-32",
+      "toNode": "src__lib__server__analysis__evidence-analysis-pipeline",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-32-2",
+      "fromNode": "group-32",
+      "toNode": "src__lib__server__analysis__hmm-ace-analyzer",
       "toEnd": "arrow"
     },
     {
@@ -4186,6 +6040,90 @@
       "id": "e-49-0",
       "fromNode": "group-49",
       "toNode": "src__lib__server__gpu__background-analyzer",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-75-0",
+      "fromNode": "group-75",
+      "toNode": "src__lib__config__retro-console-palettes",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-75-1",
+      "fromNode": "group-75",
+      "toNode": "src__lib__services__knowledge-search__qdrantknowledgestore",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-14-0",
+      "fromNode": "group-14",
+      "toNode": "src__lib__ai__client-router",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-14-1",
+      "fromNode": "group-14",
+      "toNode": "src__lib__ai__client-cache",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-14-2",
+      "fromNode": "group-14",
+      "toNode": "src__lib__ai__unified-generation",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-91-0",
+      "fromNode": "group-91",
+      "toNode": "src__lib__db__queries__route-health-queries",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-91-1",
+      "fromNode": "group-91",
+      "toNode": "src__lib__db__client-db",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-94-0",
+      "fromNode": "group-94",
+      "toNode": "src__lib__server__vector-cache",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-23-0",
+      "fromNode": "group-23",
+      "toNode": "src__lib__types__webgpu-navigator.d",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-86-0",
+      "fromNode": "group-86",
+      "toNode": "src__lib__server__cartridge__glyph-mappers",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-97-0",
+      "fromNode": "group-97",
+      "toNode": "src__routes___app___demos__yorha__components__judicialanalysisagent",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-69-0",
+      "fromNode": "group-69",
+      "toNode": "src__lib__server__ml__topic-clustering-worker",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-61-0",
+      "fromNode": "group-61",
+      "toNode": "src__lib__server__concurrency__queue-manager",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-96-0",
+      "fromNode": "group-96",
+      "toNode": "src__lib__machines__evidence-analysis-machine",
       "toEnd": "arrow"
     }
   ]

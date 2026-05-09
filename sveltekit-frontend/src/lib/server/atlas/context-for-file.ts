@@ -49,6 +49,14 @@ export interface CodebaseContextForFile {
   /** Atlas-normalized path (no src/ or sveltekit-frontend/ prefix). */
   normalizedPath: string;
 
+  /** Small ownership / routing summary for the retrieval ladder. */
+  retrieval: {
+    exactPath: string;
+    directoryPath: string;
+    agentsDir?: string;
+    peerScope: 'agentsDir' | 'cluster' | 'none';
+  };
+
   directory: {
     path:        string;
     rank:        number;
@@ -352,6 +360,7 @@ export async function contextForFile(
   const karpathyAttention   = karp?.attn  ?? null;
 
   // ── Peer prompt cards: prefer agentsDir filter, fall back to cluster ──────
+  let peerScope: 'agentsDir' | 'cluster' | 'none' = 'none';
   const promptCards = await (async (): Promise<PromptCard[]> => {
     if (atlas.files.length === 0) return [];
     if (row?.a) {
@@ -360,6 +369,7 @@ export async function contextForFile(
         filter: { agentsDir: row.a },
       });
       if (cards.length) {
+        peerScope = 'agentsDir';
         sources.push(`peers(agentsDir=${row.a})`);
         return cards;
       }
@@ -370,6 +380,7 @@ export async function contextForFile(
         filter: { cluster: row.c },
       });
       if (cards.length) {
+        peerScope = 'cluster';
         sources.push(`peers(cluster=${row.c})`);
         return cards;
       }
@@ -410,6 +421,12 @@ export async function contextForFile(
   return {
     filePath,
     normalizedPath,
+    retrieval: {
+      exactPath: filePath,
+      directoryPath: dirCard?.d ?? directory,
+      agentsDir: row?.a ?? dirCard?.a,
+      peerScope,
+    },
     directory: {
       path:        dirCard?.d ?? directory,
       rank:        dirCard?.rank ?? 0,

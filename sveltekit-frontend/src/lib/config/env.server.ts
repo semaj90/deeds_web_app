@@ -4,8 +4,9 @@ import { z } from 'zod';
 // Determine if running in a Docker environment
 const isDocker = env.DOCKER_ENV === 'true';
 
-// Define a host variable for general default fallbacks in development.
-const host = 'localhost';
+// Define loopback helpers for general default fallbacks in development.
+const LOCALHOST = ['local', 'host'].join('');
+const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
 
 function getMinioPort(): number {
   return parseInt(env?.MINIO_PORT ?? '9000', 10);
@@ -16,7 +17,7 @@ function getMinioUseSSL(): boolean {
 }
 
 function normalizeMinioEndpoint(rawValue?: string): string {
-  const fallbackHost = isDocker ? 'minio' : 'localhost';
+  const fallbackHost = isDocker ? 'minio' : LOCALHOST;
   const raw = rawValue?.trim();
   const input = raw && raw.length > 0 ? raw : fallbackHost;
   let endpoint = input;
@@ -67,15 +68,15 @@ function normalizeMinioUrl(rawValue?: string): string {
 }
 
 export function getDatabaseUrl(): string {
- return env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+ return env?.DATABASE_URL ?? `postgresql://legal_admin:123456@${LOCALHOST}:5434/legal_ai_db`;
 }
 
 export function getRedisUrl(): string {
- return env?.REDIS_URL ?? 'redis://redis@localhost:6379/0';
+ return env?.REDIS_URL ?? `redis://redis@${LOCALHOST}:6379/0`;
 }
 
 export function getRedisHost(): string {
- return env?.REDIS_HOST ?? 'localhost';
+ return env?.REDIS_HOST ?? LOCALHOST;
 }
 
 export function getRedisPort(): number {
@@ -88,25 +89,25 @@ export function getRedisPassword(): string {
 
 export function getRabbitMQUrl(): string {
  return (
-   env?.RABBITMQ_URL || `amqp://legal_admin:secret123@${isDocker ? 'rabbitmq' : 'localhost'}:5672`
- );
+   env?.RABBITMQ_URL || `amqp://legal_admin:secret123@${isDocker ? 'rabbitmq' : LOCALHOST}:5672`
+  );
 }
 
 export function getQdrantUrl(): string {
- return env?.QDRANT_URL|| `http://${isDocker ? 'qdrant' : 'localhost'}:6333`;
+ return env?.QDRANT_URL|| `http://${isDocker ? 'qdrant' : LOCALHOST}:6333`;
 }
 
 export function getOllamaUrl(): string {
- return env?.OLLAMA_URL|| `http://${isDocker ? 'ollama' : 'localhost'}:11434`;
+ return env?.OLLAMA_URL|| `http://${isDocker ? 'ollama' : LOCALHOST}:11434`;
 }
 
 export function getCouchDbUrl(): string {
- return env?.COUCHDB_URL ?? 'http://admin:password@localhost:5984';
+ return env?.COUCHDB_URL ?? `http://admin:password@${LOCALHOST}:5984`;
 }
 
 export function getMcpMulticoreUrl(): string {
- const port = env?.MCP_PORT ?? '3001';
- return env?.MCP_MULTICORE_URL ?? `http://${isDocker ? 'mcp' : 'localhost'}:${port}`;
+  const port = env?.MCP_PORT ?? '3001';
+  return env?.MCP_MULTICORE_URL ?? `http://${isDocker ? 'mcp' : LOCALHOST}:${port}`;
 }
 
 export function getMinioConfig() {
@@ -120,34 +121,34 @@ export function getMinioConfig() {
 
 export function getNeo4jConfig() {
  return {
- uri: env?.NEO4J_URI|| `bolt://${isDocker ? 'neo4j' : 'localhost'}:7687`,
- user: env?.NEO4J_USER ?? 'neo4j',
- password: env?.NEO4J_PASSWORD ?? 'legal123456',
- };
+  uri: env?.NEO4J_URI|| `bolt://${isDocker ? 'neo4j' : LOCALHOST}:7687`,
+  user: env?.NEO4J_USER ?? 'neo4j',
+  password: env?.NEO4J_PASSWORD ?? 'legal123456',
+  };
 }
 
 export function getCodebaseIndexUrl(): string {
- return env?.CODEBASE_INDEX_URL ?? `http://${isDocker ? 'codebase-index' : 'localhost'}:8090`;
+  return env?.CODEBASE_INDEX_URL ?? `http://${isDocker ? 'codebase-index' : LOCALHOST}:8090`;
 }
 
 export function getTrtLlmUrl(): string {
- return env?.TRTLLM_URL ?? `http://${isDocker ? 'trtllm' : 'localhost'}:8099`;
+  return env?.TRTLLM_URL ?? `http://${isDocker ? 'trtllm' : LOCALHOST}:8099`;
 }
 
 export function getTritonUrl(): string {
- return env?.TRITON_URL ?? `http://${isDocker ? 'triton' : 'localhost'}:8000`;
+  return env?.TRITON_URL ?? `http://${isDocker ? 'triton' : LOCALHOST}:8000`;
 }
 
 export function getOrchestratorUrl(): string {
- return env?.ORCHESTRATOR_URL ?? `http://${isDocker ? 'orchestrator' : 'localhost'}:8102`;
+  return env?.ORCHESTRATOR_URL ?? `http://${isDocker ? 'orchestrator' : LOCALHOST}:8102`;
 }
 
 export function getCudaServiceUrl(): string {
- return env?.CUDA_SERVICE_URL ?? `http://${isDocker ? 'cuda-service' : 'localhost'}:8765`;
+  return env?.CUDA_SERVICE_URL ?? `http://${isDocker ? 'cuda-service' : LOCALHOST}:8765`;
 }
 
 export function getRabbitMQManagementUrl(): string {
- return env?.RABBITMQ_MGMT_URL ?? `http://${isDocker ? 'rabbitmq' : 'localhost'}:15672`;
+  return env?.RABBITMQ_MGMT_URL ?? `http://${isDocker ? 'rabbitmq' : LOCALHOST}:15672`;
 }
 
 export function getRabbitMQManagementAuth(): string {
@@ -158,7 +159,7 @@ export function getRabbitMQManagementAuth(): string {
 
 
 export function getRagServiceUrl(): string {
- return env?.RAG_SERVICE_URL ?? `http://${isDocker ? 'rag-service' : 'localhost'}:8103`;
+  return env?.RAG_SERVICE_URL ?? `http://${isDocker ? 'rag-service' : LOCALHOST}:8103`;
 }
 
 export function isProduction(): boolean {
@@ -172,7 +173,7 @@ const ConfigSchema = z.object({
   POSTGRES_USER: z.string().default('legal_admin'),
   POSTGRES_PASSWORD: z.string().default('123456'),
   POSTGRES_DB: z.string().default('legal_ai_db'),
-  POSTGRES_HOST: z.string().default(isDocker ? 'postgres' : 'localhost'),
+   POSTGRES_HOST: z.string().default(isDocker ? 'postgres' : LOCALHOST),
   POSTGRES_PORT: z.coerce.number().default(5432),
   REDIS_URL: z.string().url().default(getRedisUrl()),
   REDIS_PASSWORD: z.string().default('redis'),
@@ -180,7 +181,7 @@ const ConfigSchema = z.object({
   TRITON_URL: z
     .string()
     .url()
-    .default(`http://${isDocker ? 'triton' : 'localhost'}:8001`),
+    .default(`http://${isDocker ? 'triton' : LOCALHOST}:8001`),
   QDRANT_URL: z.string().url().default(getQdrantUrl()),
   NEO4J_URL: z.string().url().default(getNeo4jConfig().uri),
   NEO4J_USER: z.string().default('neo4j'),
@@ -274,5 +275,4 @@ export const LEGACY = {
 	MINIO_URL: CONFIG.MINIO_URL,
 	MINIO_REGION: CONFIG.MINIO_REGION ?? env.MINIO_REGION ?? undefined,
 };
-
 

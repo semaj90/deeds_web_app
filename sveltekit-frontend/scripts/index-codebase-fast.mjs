@@ -64,10 +64,15 @@ if (!SKIP_REDIS) {
       lazyConnect:          true,
       connectTimeout:       3000,
       maxRetriesPerRequest: 1,
+      enableOfflineQueue:   false,
+      retryStrategy:        () => null,
     });
+    redis.on('error', () => {});
+    await redis.connect();
     await redis.ping();
   } catch {
     console.warn('⚠️  Redis unavailable — skipping cache writes');
+    try { redis?.disconnect(); } catch {}
     redis = null;
   }
 }

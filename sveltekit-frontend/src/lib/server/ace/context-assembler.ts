@@ -100,7 +100,7 @@ import {
   queryHash as topoQueryHash,
 } from '$lib/server/cache/topo-candidate-cache.js';
 import type { TopoPrefilterStats } from '$lib/server/cache/topo-candidate-cache.js';
-import { aceCodeKey, TTL } from '$lib/server/cache-keys.js';
+import { aceCodeKey, aceTopologicalKagKey, TTL } from '$lib/server/cache-keys.js';
 import { fetchDeepImportGraphExpansion } from './graph-expander.js';
 import { runRetrievalLanes, type MultiLaneOutput } from './retrieval-lanes.js';
 import { buildRetrievalEdge, insertHyperedge } from '$lib/server/hypergraph/hypergraph-builder.js';
@@ -186,6 +186,68 @@ function buildClusterContext(
         graphAuthorityScore: null,
       };
     });
+}
+
+async function buildTopologicalKagPromptBlock(query: string, context: ACEContext): Promise<string> {
+  const topFiles = (context.codebaseContext ?? []).slice(0, 6);
+  const clusters = (context.clusterContext ?? []).slice(0, 3);
+  const lanes = context.multiLane?.lanesHit ?? [];
+  const agentsScope = context.agentsMd?.resolvedDir || context.agentsMd?.resolvedKey || 'root';
+
+  if (!topFiles.length && !clusters.length && !lanes.length && !context.multiLane?.topFiles?.length) {
+    return '';
+  }
+
+  const scope = JSON.stringify({
+    files: topFiles.map((f) => f.stableKey ?? f.filePath).slice(0, 6),
+    clusters: clusters.map((c) => c.clusterKey ?? c.clusterId).slice(0, 3),
+    lanes,
+    agentsScope,
+  });
+  const cacheKey = aceTopologicalKagKey.forPrompt(query, scope);
+
+  try {
+    const redis = getRedis();
+    const cached = await redis.get(cacheKey).catch(() => null);
+    if (cached) {
+      return `${cached}\n_Source: Redis KV cache \`${cacheKey}\`_`;
+    }
+
+    const fileLines = topFiles.map((f, i) => {
+      const topo = [
+        f.topoClass ? `topo=${f.topoClass}` : '',
+        f.gpuCluster != null ? `cluster=${f.gpuCluster}` : '',
+        f.somBmuRow != null && f.somBmuCol != null ? `SOM(${f.somBmuRow},${f.somBmuCol})` : '',
+        f.pageRankScore != null ? `PR=${f.pageRankScore.toFixed(2)}` : '',
+        f.graphAuthorityScore != null ? `auth=${f.graphAuthorityScore.toFixed(2)}` : '',
+      ].filter(Boolean).join(', ');
+      return `${i + 1}. ${f.filePath}${topo ? ` [${topo}]` : ''}`;
+    });
+
+    const clusterLines = clusters.map((c) => {
+      const domains = c.topoClasses?.slice(0, 3).join(', ') || c.topoClass || 'unknown';
+      const tags = c.topTags?.slice(0, 6).join(', ') || 'none';
+      return `- ${c.clusterKey ?? `cluster:gpu:${c.clusterId}`} [${domains}] tags=${tags}`;
+    });
+
+    const laneLine = context.multiLane
+      ? `Lanes hit: ${lanes.length ? lanes.join(', ') : 'none'}; top files: ${context.multiLane.topFiles.slice(0, 5).join(', ') || 'none'}`
+      : '';
+
+    const block = [
+      '## Topological KAG Prompt Injection',
+      `Scope: ${agentsScope}`,
+      fileLines.length ? `Ranked topology files:\n${fileLines.join('\n')}` : '',
+      clusterLines.length ? `SOM / cluster compression:\n${clusterLines.join('\n')}` : '',
+      laneLine,
+      'Use this block as routing evidence: prefer exact files first, expand graph neighbors only when needed, and treat GPU/SOM signals as rerank hints after sparse filtering.',
+    ].filter(Boolean).join('\n');
+
+    await redis.set(cacheKey, block, 'EX', TTL.ACE_TOPO_KAG_PROMPT).catch(() => {});
+    return `${block}\n_Source: assembled and cached as \`${cacheKey}\`_`;
+  } catch {
+    return '';
+  }
 }
 
 /**
@@ -1137,6 +1199,19 @@ export async function assembleACEContext(opts: {
         } catch (err) {
           console.warn('[ACE code-llm preflight] skipped:', (err as Error)?.message ?? err);
         }
+      }
+
+      const topoKagPromptBlock = await buildTopologicalKagPromptBlock(query, {
+        ...baseContext,
+        agentsMd,
+        codeLlmHit,
+      }).catch(() => '');
+
+      if (topoKagPromptBlock) {
+        baseContext.webSearchContext = [
+          baseContext.webSearchContext ?? '',
+          topoKagPromptBlock,
+        ].filter(Boolean).join('\n');
       }
 
       const finalContext = {

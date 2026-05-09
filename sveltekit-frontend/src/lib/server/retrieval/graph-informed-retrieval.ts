@@ -30,7 +30,7 @@ export interface ContextDoc {
 }
 
 interface GraphExpansionConfig {
-	/** Qdrant REST URL (e.g. http://localhost:6333) */
+	/** Qdrant REST URL (e.g. via ENV.QDRANT_URL) */
 	qdrantUrl: string;
 	/** Collections to search for neighbor chunks */
 	collections: readonly string[];

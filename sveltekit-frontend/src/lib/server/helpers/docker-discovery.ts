@@ -74,8 +74,10 @@ function inspectContainer(
 			for (const [key, bindings] of Object.entries(parsed)) {
 				if (Array.isArray(bindings) && bindings.length > 0) {
 					const b = bindings[0] as { HostIp: string; HostPort: string };
+					const host = b.HostIp?.trim();
+					if (!host) continue;
 					ports.set(key, {
-						host: b.HostIp || 'localhost',
+						host,
 						port: parseInt(b.HostPort, 10)
 					});
 				}

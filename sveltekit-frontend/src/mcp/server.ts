@@ -3,7 +3,10 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
     CallToolRequestSchema, ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { createHash } from 'node:crypto';
 import { mcpTools } from '../mcp/index.js';
+import { ENV } from '$lib/server/env.server.js';
+import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
 
 export const server = new Server(
   {
@@ -36,11 +39,11 @@ async function getMcpMinioClient() {
   if (!_mcpMinioClient) {
     const { Client } = await import('minio');
     _mcpMinioClient = new Client({
-      endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
-      port: parseInt(process.env.MINIO_PORT || '9000', 10),
-      useSSL: process.env.MINIO_USE_SSL === 'true',
-      accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-      secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+      endPoint: ENV.MINIO_ENDPOINT?.split(':')[0] || 'minio',
+      port: parseInt(ENV.MINIO_PORT || '9000', 10),
+      useSSL: ENV.MINIO_USE_SSL === 'true',
+      accessKey: ENV.MINIO_ACCESS_KEY || 'minioadmin',
+      secretKey: ENV.MINIO_SECRET_KEY || 'minioadmin',
     });
   }
   return _mcpMinioClient;
@@ -1627,6 +1630,54 @@ export function setupToolHandlers() {
         },
       },
       {
+        name: 'kb.search_cards',
+        description: 'Semantic search across the codebase index returning structured "cards" (identity spine format). Use for finding relevant code with stable IDs for grounding.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query:  { type: 'string', description: 'Semantic query (e.g. "auth middleware logic")' },
+            limit:  { type: 'number', description: 'Max cards to return (1-20)', default: 10 },
+            filters: { type: 'object', description: 'Optional metadata filters (kind, domain, extension)' }
+          },
+          required: ['query']
+        }
+      },
+      {
+        name: 'kb.get_card',
+        description: 'Retrieve a single codebase card by its stable chunk_id (card:path:hash). Returns full content, metadata, and cluster context.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            chunk_id: { type: 'string', description: 'The stable ID of the chunk' }
+          },
+          required: ['chunk_id']
+        }
+      },
+      {
+        name: 'kb.expand_neighbors',
+        description: 'Get immediate graph neighbors for a card from the hypergraph. Returns related cards linked by imports, shared symbols, or topological proximity.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            chunk_id: { type: 'string', description: 'The starting card ID' },
+            hops:     { type: 'number', description: 'Traversal depth (1-2, default 1)', default: 1 }
+          },
+          required: ['chunk_id']
+        }
+      },
+      {
+        name: 'kb.explain_retrieval',
+        description: 'Explain why a specific card was retrieved for a query. Returns rank, similarity score, cluster dominance analysis, and topological authority context.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query:    { type: 'string', description: 'The original search query' },
+            chunk_id: { type: 'string', description: 'The ID of the retrieved card (optional)' }
+          },
+          required: ['query']
+        }
+      },
+      {
         name: 'ast:cross_language',
         description:
           'Synthesize cross-language equivalents for a TypeScript/JS function. ' +
@@ -1703,6 +1754,10 @@ export function setupToolHandlers() {
     'reports:list',
     'analytics:deep_research',
     'analytics:research_topics',
+    'kb.search_cards',
+    'kb.get_card',
+    'kb.expand_neighbors',
+    'kb.explain_retrieval',
   ]);
 
   const MCP_CACHE_TTL = parseInt(process.env.MCP_CACHE_TTL_SECONDS ?? '3600', 10);
@@ -1712,7 +1767,7 @@ export function setupToolHandlers() {
     if (_mcpRedis) return _mcpRedis;
     try {
       const { default: Redis } = await import('ioredis');
-      const url = process.env.REDIS_URL ?? 'redis://localhost:6379';
+      const url = ENV.REDIS_URL;
       _mcpRedis = new Redis(url, { lazyConnect: false, maxRetriesPerRequest: 1, enableOfflineQueue: false, connectTimeout: 1000 });
       _mcpRedis.on('error', () => { _mcpRedis = null; });
     } catch { _mcpRedis = null; }
@@ -1720,7 +1775,6 @@ export function setupToolHandlers() {
   }
 
   function mcpArgsHash(args: Record<string, any>): string {
-    const { createHash } = require('crypto') as typeof import('crypto');
     return createHash('sha256').update(JSON.stringify(args)).digest('hex').slice(0, 16);
   }
 
@@ -1859,7 +1913,7 @@ export function setupToolHandlers() {
 
         // 4. Generate embeddings via Ollama
         const { ollamaFetch } = await import('../lib/server/ollama.js');
-        const OLLAMA_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+        const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
         const embeddings: number[][] = [];
 
         for (const chunk of chunks) {
@@ -1878,7 +1932,7 @@ export function setupToolHandlers() {
         }
 
         // 5. Store in Qdrant knowledge_base collection
-        const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+        const QDRANT_URL = ENV.QDRANT_URL;
         const collection = 'knowledge_base';
         const points = chunks
           .map((chunk, i) => ({
@@ -1926,7 +1980,7 @@ export function setupToolHandlers() {
         const { action, url: targetUrl, selector, value } = args;
 
         // Call the Playwright test infrastructure via the app's test API
-        const testUrl = process.env.PLAYWRIGHT_SERVICE_URL || 'http://localhost:5173';
+        const testUrl = ENV.PUBLIC_API_URL;
         if (action === 'goto' && targetUrl) {
           // Navigate + screenshot via the test runner
           const { chromium } = await import('playwright');
@@ -2077,7 +2131,7 @@ export function setupToolHandlers() {
           analyzeAudio,
           extractEmbeddings,
         } = args;
-        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+        const FASTAPI_URL = ENV.FASTAPI_URL;
 
         // Fetch file from MinIO
         const fileBuffer = await mcpGetFile(fileUrl);
@@ -2112,7 +2166,7 @@ export function setupToolHandlers() {
 
       case 'evidence:detect_objects': {
         const { evidenceId, imageUrl, confidenceThreshold } = args;
-        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+        const FASTAPI_URL = ENV.FASTAPI_URL;
 
         // Fetch image from MinIO
         const imageBuffer = await mcpGetFile(imageUrl);
@@ -2142,7 +2196,7 @@ export function setupToolHandlers() {
 
       case 'evidence:transcribe_gpu': {
         const { evidenceId, audioUrl, language, wordTimestamps } = args;
-        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+        const FASTAPI_URL = ENV.FASTAPI_URL;
 
         // Fetch audio from MinIO
         const audioBuffer = await mcpGetFile(audioUrl);
@@ -2173,7 +2227,7 @@ export function setupToolHandlers() {
 
       case 'evidence:search_similar': {
         const { query, modalities, topK } = args;
-        const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+        const FASTAPI_URL = ENV.FASTAPI_URL;
 
         const url = new URL(`${FASTAPI_URL}/multimodal/search`);
         url.searchParams.set('query', query);
@@ -2338,6 +2392,133 @@ export function setupToolHandlers() {
         }
       }
 
+      case 'kb.search_cards': {
+        const { query, limit = 10, filters = {} } = args as { query: string; limit?: number; filters?: Record<string, any> };
+        const results = await searchNotecards({
+          query,
+          limit,
+          filters: filters as Parameters<typeof searchNotecards>[0]['filters'],
+        });
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              query,
+              count: results.length,
+              cards: results.map((hit) => ({
+                chunk_id: hit.card_id,
+                source_path: hit.source_path,
+                score: hit.score,
+                why: hit.why,
+                kind: hit.kind,
+                tags: hit.tags,
+                rank_score: hit.rank_score,
+                content: hit.context_text,
+              })),
+            }),
+          }],
+        };
+      }
+
+      case 'kb.get_card': {
+        const { chunk_id } = args as { chunk_id: string };
+        const card = (await getNotecardById(chunk_id)) ?? (await getNotecardBySourcePath(chunk_id));
+
+        if (!card) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ error: 'Card not found', chunk_id }) }],
+            isError: true
+          };
+        }
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              card: {
+                chunk_id: card.card_id,
+                source_path: card.source_path,
+                title: card.title,
+                kind: card.kind,
+                zone: card.zone,
+                tags: card.tags,
+                exports: card.exports,
+                confidence: card.confidence,
+                updated_at: card.updated_at,
+                summary: card.search_text,
+                content: card.context_text,
+              },
+            }),
+          }],
+        };
+      }
+
+      case 'kb.expand_neighbors': {
+        const { chunk_id, hops = 1 } = args as { chunk_id: string; hops?: number };
+        try {
+          const expanded = await expandNotecardNeighbors({ cardId: chunk_id, hops, limit: 20 });
+
+          if (!expanded) {
+            return {
+              content: [{ type: 'text', text: JSON.stringify({ error: 'Card not found', chunk_id }) }],
+              isError: true,
+            };
+          }
+
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                root_id: chunk_id,
+                center: {
+                  chunk_id: expanded.center.card_id,
+                  source_path: expanded.center.source_path,
+                  title: expanded.center.title,
+                  kind: expanded.center.kind,
+                  tags: expanded.center.tags,
+                },
+                neighbors: expanded.neighbors.map((neighbor) => ({
+                  chunk_id: neighbor.card_id,
+                  source_path: neighbor.source_path,
+                  title: neighbor.title,
+                  kind: neighbor.kind,
+                  tags: neighbor.tags,
+                  hop: neighbor.hop,
+                  via: neighbor.via,
+                })),
+              }),
+            }],
+          };
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ error: String(err) }) }], isError: true };
+        }
+      }
+
+      case 'kb.explain_retrieval': {
+        const { query, chunk_id } = args as { query: string; chunk_id?: string };
+        const matches = await searchNotecards({ query, limit: 20 });
+        const card = chunk_id ? (await getNotecardById(chunk_id)) ?? (await getNotecardBySourcePath(chunk_id)) : null;
+        const effectiveChunkId = chunk_id ?? matches[0]?.card_id ?? null;
+        const match = matches.find((item) => item.card_id === effectiveChunkId || item.source_path === card?.source_path) ?? matches[0];
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              chunk_id: effectiveChunkId,
+              explanation: {
+                retrieval_mode: 'sparse-lexical-rank',
+                score: match?.score ?? null,
+                rank_score: match?.rank_score ?? null,
+                why: match?.why ?? [],
+              },
+              context: { card: card ?? null, topMatch: match ?? null },
+            }),
+          }],
+        };
+      }
+
       case 'inference:route': {
         const { prompt, model, maxTokens, temperature, stream } = args as {
           prompt: string;
@@ -2359,7 +2540,7 @@ export function setupToolHandlers() {
         } catch {
           // Direct Ollama fallback
           const { ollamaFetch } = await import('../lib/server/ollama.js');
-          const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
+          const ollamaUrl = ENV.OLLAMA_BASE_URL;
           const res = await ollamaFetch(`${ollamaUrl}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -2501,7 +2682,7 @@ export function setupToolHandlers() {
         });
         const acePrompt = await buildACEPromptCached(context, aceQuery);
 
-        const ollamaUrl = process.env.OLLAMA_HOST || 'http://127.0.0.1:11434';
+        const ollamaUrl = ENV.OLLAMA_BASE_URL;
         const llmRes = await ollamaFetch(`${ollamaUrl}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2716,7 +2897,7 @@ export function setupToolHandlers() {
           extraction_passes?: number;
           temperature?: number;
         };
-        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+        const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
           method: 'POST',
@@ -2743,7 +2924,7 @@ export function setupToolHandlers() {
           extraction_passes?: number;
           temperature?: number;
         };
-        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+        const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
           method: 'POST',
@@ -2770,7 +2951,7 @@ export function setupToolHandlers() {
           extraction_type?: string;
           extraction_passes?: number;
         };
-        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+        const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract/file`, {
           method: 'POST',
@@ -2797,7 +2978,7 @@ export function setupToolHandlers() {
           examples?: any[];
           extraction_passes?: number;
         };
-        const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+        const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
           method: 'POST',
@@ -3668,7 +3849,7 @@ export function setupToolHandlers() {
           limit?: number;
           repoId?: string;
         };
-        const baseUrl = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
+        const baseUrl = ENV.PUBLIC_API_URL;
         const params = new URLSearchParams();
         if (include) params.set('include', include);
         if (typeof limit === 'number' && limit > 0) params.set('limit', String(limit));

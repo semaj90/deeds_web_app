@@ -26,6 +26,7 @@
  */
 
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 import { readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
@@ -364,7 +365,7 @@ export const retrievalQdrantLookupTool = {
     if (!m) return JSON.stringify({ error: 'invalid_embedding_id', expected: 'qdrant://<collection>/<path>' });
     const [, collection, path] = m;
     const limit = args.limit ?? 5;
-    const base = process.env.QDRANT_URL ?? 'http://localhost:6333';
+     const base = ENV.QDRANT_URL;
     try {
       const res = await fetch(`${base}/collections/${collection}/points/scroll`, {
         method: 'POST',

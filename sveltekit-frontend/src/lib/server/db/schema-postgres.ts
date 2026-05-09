@@ -4011,6 +4011,7 @@ export type NewCourtroomKeyframe = typeof courtroomKeyframes.$inferInsert;
 export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	qdrantId: varchar('qdrant_id', { length: 64 }),
+	chunkId: text('chunk_id'),
 
 	repoId: uuid('repo_id'),
 	relativePath: text('relative_path').notNull(),

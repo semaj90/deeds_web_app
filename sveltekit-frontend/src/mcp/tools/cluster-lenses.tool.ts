@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 export const clusterSummaryLensesTool = {
   name: 'clusters.get_summary_lenses',
@@ -9,7 +10,7 @@ export const clusterSummaryLensesTool = {
   }),
   execute: async (args: { clusterIds: number[]; includeMembers?: boolean }) => {
     const { createClient } = await import('redis');
-    const redis = createClient({ url: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', password: process.env.REDIS_PASSWORD });
+    const redis = createClient({ url: ENV.REDIS_URL, password: process.env.REDIS_PASSWORD });
     await redis.connect();
     try {
       const results = await Promise.all(args.clusterIds.map(async (clusterId) => {
@@ -22,7 +23,7 @@ export const clusterSummaryLensesTool = {
         // Fall back to Postgres tensor_analysis_cache aggregate
         const { Pool } = await import('pg');
         const pool = new Pool({
-          connectionString: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+          connectionString: ENV.DATABASE_URL,
           max: 2,
         });
         try {

@@ -1,0 +1,317 @@
+{
+  "runAt": "2026-05-09T03:17:37.237Z",
+  "summary": {
+    "pass": 51,
+    "skip": 0,
+    "fail": 0,
+    "total": 51
+  },
+  "results": [
+    {
+      "name": "graph.expand_neighborhood",
+      "status": "PASS",
+      "ms": 31,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"center\\\": \\\"file:src/lib/server/ace/context-assembler.ts\\\",\\n  \\\"neighbors\\\": "
+    },
+    {
+      "name": "graph.shortest_path",
+      "status": "PASS",
+      "ms": 16,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"path\\\": null,\\n  \\\"hops\\\": null,\\n  \\\"message\\\": \\\"No path found within hop li"
+    },
+    {
+      "name": "graph.community_for_node",
+      "status": "PASS",
+      "ms": 14,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"stableKey\\\": \\\"file:src/lib/server/ace/context-assembler.ts\\\",\\n  \\\"filePath\\\""
+    },
+    {
+      "name": "graph.pagerank_top",
+      "status": "PASS",
+      "ms": 19,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"[\\n  {\\n    \\\"stableKey\\\": \\\"src/lib/server/db/client.ts\\\",\\n    \\\"pageRank\\\": 7.0619"
+    },
+    {
+      "name": "graph.topological_sort",
+      "status": "PASS",
+      "ms": 5,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool graph.topologica"
+    },
+    {
+      "name": "graph.materialize_pathway",
+      "status": "PASS",
+      "ms": 5,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool graph.materializ"
+    },
+    {
+      "name": "topology.search_near",
+      "status": "PASS",
+      "ms": 157,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": true,\\n  \\\"query\\\": \\\"redis cache topology\\\",\\n  \\\"center\\\": null,\\n  \\\""
+    },
+    {
+      "name": "topology.same_som_cluster",
+      "status": "PASS",
+      "ms": 8,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"error\\\":\\\"Node not found in Postgres index\\\"}\"}]}"
+    },
+    {
+      "name": "topology.search_4d",
+      "status": "PASS",
+      "ms": 4,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": false,\\n  \\\"source\\\": \\\"topology\\\",\\n  \\\"degraded\\\": true,\\n  \\\"reason\\\""
+    },
+    {
+      "name": "clusters.get_members",
+      "status": "PASS",
+      "ms": 12,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"clusterKey\\\": \\\"gpu:92\\\",\\n  \\\"count\\\": 5,\\n  \\\"members\\\": [\\n    {\\n      \\\"s"
+    },
+    {
+      "name": "trace.kag_search",
+      "status": "PASS",
+      "ms": 12,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"success\\\": true,\\n  \\\"data\\\": [],\\n  \\\"count\\\": 0,\\n  \\\"source\\\": \\\"postgres_f"
+    },
+    {
+      "name": "trace.explain_retrieval",
+      "status": "PASS",
+      "ms": 4,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"error\\\":\\\"Error: Stream isn't writeable and enableOfflineQueue options is false\\\"}"
+    },
+    {
+      "name": "search.postgres_fts",
+      "status": "PASS",
+      "ms": 3,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"results\\\": [],\\n  \\\"count\\\": 0,\\n  \\\"mode\\\": \\\"lexical\\\"\\n}\"}]}"
+    },
+    {
+      "name": "search.hybrid",
+      "status": "PASS",
+      "ms": 6,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"results\\\": [],\\n  \\\"count\\\": 0,\\n  \\\"mode\\\": \\\"auto\\\",\\n  \\\"embedding_used\\\": "
+    },
+    {
+      "name": "search.go_hybrid",
+      "status": "PASS",
+      "ms": 29,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": true,\\n  \\\"source\\\": \\\"go-search\\\",\\n  \\\"query\\\": \\\"redis cache topology"
+    },
+    {
+      "name": "context.build_kv_packet",
+      "status": "PASS",
+      "ms": 19,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"error\\\":\\\"Error: Stream isn't writeable and enableOfflineQueue options is false\\\"}"
+    },
+    {
+      "name": "context.get_compressed_card",
+      "status": "PASS",
+      "ms": 3,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"error\\\":\\\"Error: Stream isn't writeable and enableOfflineQueue options is false\\\"}"
+    },
+    {
+      "name": "context.explain_compression",
+      "status": "PASS",
+      "ms": 3,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"error\\\":\\\"Error: Stream isn't writeable and enableOfflineQueue options is false\\\"}"
+    },
+    {
+      "name": "context.refresh_task_toc",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"error\\\":\\\"Error: Stream isn't writeable and enableOfflineQueue options is false\\\"}"
+    },
+    {
+      "name": "search.dev_context",
+      "status": "PASS",
+      "ms": 6,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"success\\\": true,\\n  \\\"data\\\": [],\\n  \\\"count\\\": 0,\\n  \\\"source\\\": \\\"postgres_f"
+    },
+    {
+      "name": "kag.record_agent_run",
+      "status": "PASS",
+      "ms": 4,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"success\\\": true,\\n  \\\"taskId\\\": \\\"smoke-001\\\",\\n  \\\"hash\\\": \\\"f272120f\\\",\\n  \\"
+    },
+    {
+      "name": "kag.ingest_memory_directory",
+      "status": "PASS",
+      "ms": 7,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": true,\\n  \\\"dryRun\\\": true,\\n  \\\"scanned\\\": 1,\\n  \\\"totalPending\\\": 1,\\n "
+    },
+    {
+      "name": "kag.ingest_error",
+      "status": "PASS",
+      "ms": 9,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"errorHash\\\": \\\"4e5ba67a5efe86f2\\\",\\n  \\\"normalizedText\\\": \\\"typeerror: smoke t"
+    },
+    {
+      "name": "kag.multi_lane_search",
+      "status": "PASS",
+      "ms": 1001,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"queryHash\\\": \\\"1619ea78ab79\\\",\\n  \\\"lanes\\\": [\\n    {\\n      \\\"lane\\\": \\\"hash\\"
+    },
+    {
+      "name": "taxonomy.children",
+      "status": "PASS",
+      "ms": 1,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool taxonomy.childre"
+    },
+    {
+      "name": "taxonomy.path",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool taxonomy.path: ["
+    },
+    {
+      "name": "agents_md.peers_via_relations",
+      "status": "PASS",
+      "ms": 1,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool agents_md.peers_"
+    },
+    {
+      "name": "agents_md.coverage_chain",
+      "status": "PASS",
+      "ms": 1,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool agents_md.covera"
+    },
+    {
+      "name": "clusters.get_summary_lenses",
+      "status": "PASS",
+      "ms": 21,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"clusterId\\\":92,\\\"keyFiles\\\":[],\\\"kagNotes\\\":[]}\"}]}"
+    },
+    {
+      "name": "trace.validate_ace_hit",
+      "status": "PASS",
+      "ms": 9,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"filePath\\\": \\\"src/lib/server/ace/context-assembler.ts\\\",\\n  \\\"checks\\\": {\\n   "
+    },
+    {
+      "name": "ops.propose_patch",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": true,\\n  \\\"file_path\\\": \\\"src/lib/server/ace/context-assembler.ts\\\",\\n  "
+    },
+    {
+      "name": "ops.run_targeted_test",
+      "status": "PASS",
+      "ms": 6,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": false,\\n  \\\"test_file\\\": \\\"tests/smoke.spec.ts\\\",\\n  \\\"durationMs\\\": 6,\\"
+    },
+    {
+      "name": "ops.record_fix_attempt",
+      "status": "PASS",
+      "ms": 3,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"ok\\\":true,\\\"fix_attempt_id\\\":\\\"19\\\",\\\"fix_type\\\":\\\"smoke\\\",\\\"files_affected\\\":1}\"}"
+    },
+    {
+      "name": "ops.run_quality_gate",
+      "status": "PASS",
+      "ms": 5,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": false,\\n  \\\"gate\\\": \\\"tsc\\\",\\n  \\\"passed\\\": false,\\n  \\\"errorCount\\\": -1"
+    },
+    {
+      "name": "hypergraph.search",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"ok\\\":false,\\\"error\\\":\\\"TypeError: fetch failed\\\"}\"}]}"
+    },
+    {
+      "name": "hypergraph.get_edge",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"ok\\\":false,\\\"error\\\":\\\"TypeError: fetch failed\\\"}\"}]}"
+    },
+    {
+      "name": "hypergraph.explain_activation",
+      "status": "PASS",
+      "ms": 15,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"edge\\\": null,\\n  \\\"activatedByTerms\\\": [],\\n  \\\"membersCovered\\\": 0,\\n  \\\"cove"
+    },
+    {
+      "name": "hypergraph.expand_members",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"ok\\\":false,\\\"error\\\":\\\"TypeError: fetch failed\\\"}\"}]}"
+    },
+    {
+      "name": "knowledge.get_minified_map",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"ok\\\":false,\\\"error\\\":\\\"TypeError: fetch failed\\\"}\"}]}"
+    },
+    {
+      "name": "tools.batch_call",
+      "status": "PASS",
+      "ms": 5,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"ok\\\": 2,\\n  \\\"total\\\": 2,\\n  \\\"totalMs\\\": 5,\\n  \\\"calls\\\": [\\n    {\\n      \\\"n"
+    },
+    {
+      "name": "codebase.context_for_file",
+      "status": "PASS",
+      "ms": 69,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"filePath\\\": \\\"src/lib/server/ace/context-assembler.ts\\\",\\n  \\\"normalizedPath\\\""
+    },
+    {
+      "name": "agents_md.context_for_file",
+      "status": "PASS",
+      "ms": 8,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"filePath\\\": \\\"src/lib/server/ace/context-assembler.ts\\\",\\n  \\\"normalizedPath\\\""
+    },
+    {
+      "name": "agents_md.peers_for_dir",
+      "status": "PASS",
+      "ms": 4,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"found\\\": true,\\n  \\\"key\\\": \\\"ace:atlas:dir:src_lib_server_db\\\",\\n  \\\"card\\\": {"
+    },
+    {
+      "name": "agents_md.coverage",
+      "status": "PASS",
+      "ms": 13,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"filePath\\\": \\\"src/lib/server/ace/context-assembler.ts\\\",\\n  \\\"normalizedPath\\\""
+    },
+    {
+      "name": "agents_md.shares_tags",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool agents_md.shares"
+    },
+    {
+      "name": "agents_md.binding_chain",
+      "status": "PASS",
+      "ms": 1,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool agents_md.bindin"
+    },
+    {
+      "name": "hypergraph.semantic_path_synthesis",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool hypergraph.seman"
+    },
+    {
+      "name": "hypergraph.materialize_pathway",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool hypergraph.mater"
+    },
+    {
+      "name": "graph.search_pathway_cards",
+      "status": "PASS",
+      "ms": 3,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"[]\"}]}"
+    },
+    {
+      "name": "kb.search_notecards",
+      "status": "PASS",
+      "ms": 2,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool kb.search_noteca"
+    },
+    {
+      "name": "kb.explain_context_pack",
+      "status": "PASS",
+      "ms": 1,
+      "preview": "{\"content\":[{\"type\":\"text\",\"text\":\"MCP error -32602: Input validation error: Invalid arguments for tool kb.explain_conte"
+    }
+  ]
+}

@@ -13,6 +13,7 @@ import { searchCodeLexical }       from '$lib/server/search/postgres-fts.js';
 import { searchQdrantCode }        from '$lib/server/search/qdrant-search.js';
 import { expandNeighbours }        from '$lib/server/search/neo4j-rerank.js';
 import { fetchCodebaseContext }    from '$lib/server/ace/context-assembler.js';
+import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
 import { getRedis }                from '$lib/server/redis.js';
 import { db }                      from '$lib/server/db/client';
 import { sql }                     from 'drizzle-orm';
@@ -221,6 +222,127 @@ export async function tool_trace_explain_retrieval(args: {
   } catch (e) { return err('trace.explain_retrieval', String(e), Date.now() - t0); }
 }
 
+/** kb.search_cards — notecard retrieval over the identity spine */
+export async function tool_kb_search_cards(args: {
+  query: string;
+  limit?: number;
+  filters?: Record<string, unknown>;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const cards = await searchNotecards({
+      query: args.query,
+      limit: Math.min(args.limit ?? 10, 20),
+      filters: args.filters as Parameters<typeof searchNotecards>[0]['filters'],
+    });
+    return ok('kb.search_cards', {
+      query: args.query,
+      count: cards.length,
+      cards: cards.map((hit) => ({
+        chunk_id: hit.card_id,
+        source_path: hit.source_path,
+        score: hit.score,
+        why: hit.why,
+        kind: hit.kind,
+        tags: hit.tags,
+        rank_score: hit.rank_score,
+        content: hit.context_text,
+      })),
+    }, Date.now() - t0);
+  } catch (e) {
+    return err('kb.search_cards', String(e), Date.now() - t0);
+  }
+}
+
+/** kb.get_card — fetch a single card by stable id or source path */
+export async function tool_kb_get_card(args: {
+  chunk_id: string;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const card = (await getNotecardById(args.chunk_id)) ?? (await getNotecardBySourcePath(args.chunk_id));
+    if (!card) return err('kb.get_card', `Card not found: ${args.chunk_id}`, Date.now() - t0);
+    return ok('kb.get_card', {
+      card: {
+        chunk_id: card.card_id,
+        source_path: card.source_path,
+        title: card.title,
+        kind: card.kind,
+        zone: card.zone,
+        tags: card.tags,
+        exports: card.exports,
+        confidence: card.confidence,
+        updated_at: card.updated_at,
+        summary: card.search_text,
+        content: card.context_text,
+      },
+    }, Date.now() - t0, true);
+  } catch (e) {
+    return err('kb.get_card', String(e), Date.now() - t0);
+  }
+}
+
+/** kb.expand_neighbors — hop through graph_neighbors on notecards */
+export async function tool_kb_expand_neighbors(args: {
+  chunk_id: string;
+  hops?: number;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const expanded = await expandNotecardNeighbors({
+      cardId: args.chunk_id,
+      hops: args.hops ?? 1,
+    });
+    if (!expanded) return err('kb.expand_neighbors', `Card not found: ${args.chunk_id}`, Date.now() - t0);
+    return ok('kb.expand_neighbors', {
+      center: {
+        chunk_id: expanded.center.card_id,
+        source_path: expanded.center.source_path,
+        title: expanded.center.title,
+        kind: expanded.center.kind,
+        tags: expanded.center.tags,
+      },
+      neighbors: expanded.neighbors.map((neighbor) => ({
+        chunk_id: neighbor.card_id,
+        source_path: neighbor.source_path,
+        title: neighbor.title,
+        kind: neighbor.kind,
+        tags: neighbor.tags,
+        hop: neighbor.hop,
+        via: neighbor.via,
+      })),
+    }, Date.now() - t0, true);
+  } catch (e) {
+    return err('kb.expand_neighbors', String(e), Date.now() - t0);
+  }
+}
+
+/** kb.explain_retrieval — explain notecard ranking for a query/card pair */
+export async function tool_kb_explain_retrieval(args: {
+  query: string;
+  chunk_id: string;
+}): Promise<MCPToolResult> {
+  const t0 = Date.now();
+  try {
+    const [matches, card] = await Promise.all([
+      searchNotecards({ query: args.query, limit: 20 }),
+      getNotecardById(args.chunk_id) ?? getNotecardBySourcePath(args.chunk_id),
+    ]);
+    const match = matches.find((item) => item.card_id === args.chunk_id || item.source_path === card?.source_path);
+    return ok('kb.explain_retrieval', {
+      query: args.query,
+      chunk_id: args.chunk_id,
+      retrieved: Boolean(match),
+      score: match?.score ?? null,
+      rank_score: match?.rank_score ?? null,
+      why: match?.why ?? [],
+      card: card ?? null,
+    }, Date.now() - t0, true);
+  } catch (e) {
+    return err('kb.explain_retrieval', String(e), Date.now() - t0);
+  }
+}
+
 /** context.build_kv_packet — return compressed ACE context bundle */
 export async function tool_context_build_kv_packet(args: {
   query:      string;
@@ -347,4 +469,8 @@ export const TOOL_DISPATCH: Record<
   'context.get_compressed_card':   (a) => tool_context_get_compressed_card(a as Parameters<typeof tool_context_get_compressed_card>[0]),
   'context.explain_compression':   (a) => tool_context_explain_compression(a as Parameters<typeof tool_context_explain_compression>[0]),
   'workspace.timeline':            (a) => tool_workspace_timeline(a as Parameters<typeof tool_workspace_timeline>[0]),
+  'kb.search_cards':               (a) => tool_kb_search_cards(a as Parameters<typeof tool_kb_search_cards>[0]),
+  'kb.get_card':                   (a) => tool_kb_get_card(a as Parameters<typeof tool_kb_get_card>[0]),
+  'kb.expand_neighbors':           (a) => tool_kb_expand_neighbors(a as Parameters<typeof tool_kb_expand_neighbors>[0]),
+  'kb.explain_retrieval':          (a) => tool_kb_explain_retrieval(a as Parameters<typeof tool_kb_explain_retrieval>[0]),
 };

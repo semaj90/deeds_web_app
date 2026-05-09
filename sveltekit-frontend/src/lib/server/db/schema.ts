@@ -1,3 +1,4 @@
+// KAG-DAG Architecture (Phase 79)
 // src/lib/server/db/schema.ts
 // Main schema file - re-exports from schema-postgres.ts
 // This is the canonical schema for the legal AI application
@@ -137,3 +138,6 @@ export * from './schema/kag-dag';
 export * from './schema/directory-clusters';
 export * from './schema/embedded-summaries';
 export * from './schema/topology';
+export * from './schema/graph-pathway-cards';
+export * from './schema/admin-chat';
+export * from './schema/admin-ai-skills';

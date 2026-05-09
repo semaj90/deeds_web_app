@@ -11,6 +11,7 @@
 
 import type { CrawledDocument, IndexResult,
   ReindexStats } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface KnowledgeIndexerConfig {
   qdrantUrl: string;
@@ -25,13 +26,13 @@ export interface KnowledgeIndexerConfig {
 }
 
 const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
-  qdrantUrl: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+  qdrantUrl: ENV.QDRANT_URL,
   qdrantCollection: 'phase76_knowledge_base',
-  postgresUrl: process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
-  minioEndpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
+  postgresUrl: ENV.DATABASE_URL,
+  minioEndpoint: ENV.MINIO_ENDPOINT,
   minioBucket: process.env?.MINIO_BUCKET ?? 'knowledge-docs',
-  redisUrl: process.env?.REDIS_URL ?? 'redis://localhost:6379',
-  ollamaUrl: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
+  redisUrl: ENV.REDIS_URL,
+  ollamaUrl: ENV.OLLAMA_BASE_URL,
   embeddingModel: process.env?.EMBEDDING_MODEL ?? 'nomic-embed-text:latest',
   summaryModel: process.env?.OLLAMA_MODEL ?? 'gemma4-legal:latest'
 };
@@ -472,7 +473,6 @@ export function getKnowledgeIndexer(config?: Partial<KnowledgeIndexerConfig>): K
   }
   return knowledgeIndexerInstance;
 }
-
 
 
 

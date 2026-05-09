@@ -1,0 +1,83 @@
+{
+  "query": "auth redis",
+  "limit": 5,
+  "generated_at": "2026-05-09T00:49:42.857Z",
+  "results": [
+    {
+      "card_id": "card:codebase:src/lib/server/redis.ts:63deb4bc891c",
+      "source_path": "src/lib/server/redis.ts",
+      "score": 199.51559999999998,
+      "why": [
+        "context_text frequency (1): auth",
+        "path contains: redis",
+        "tag match: redis",
+        "export match: redis",
+        "search_text frequency (9): redis",
+        "context_text frequency (10): redis",
+        "rank boost: 0.2708"
+      ],
+      "context_text": "NODE src/lib/server/redis.ts\ndomain=codebase kind=server zone=server risk=0.242 lines=241\nsource_id=src/lib/server/redis.ts\nsource_hash=63deb4bc891c\ntags=ts,src,lib,server,zod,redis\nexports=redisPool,getRedis,redis,createRedisInstance,createRedisConnection,ensureRedis,CachedChatMessage,cacheMessage,getCachedMessages,invalidateChatCache\nguards auth=false zod=true\nfan=in:0 out:0\nneighbors=src/lib/server/env.server.js\nsummary=Redis Connection Pool"
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/auth.ts:d0259f15760d",
+      "source_path": "src/lib/server/auth.ts",
+      "score": 196.24720000000002,
+      "why": [
+        "path contains: auth",
+        "tag match: auth",
+        "export match: auth",
+        "search_text frequency (8): auth",
+        "context_text frequency (11): auth",
+        "rank boost: 0.2911"
+      ],
+      "context_text": "NODE src/lib/server/auth.ts\ndomain=codebase kind=server zone=server risk=0.365 lines=561\nsource_id=src/lib/server/auth.ts\nsource_hash=d0259f15760d\ntags=ts,src,lib,server,db-schema,auth\nexports=auth,Auth,AuthService,authService,getUser,requireAuth\nguards auth=true zod=false\nfan=in:0 out:0\nneighbors=@lucia-auth/adapter-drizzle, @sveltejs/kit, src/lib/server/db/client, src/lib/server/db/schema.js, src/lib/server/env.server.js, src/lib/server/errors.js, src/lib/server/utils/endpoints.js\nsummary=src/"
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/v1/redis/cache/+server.ts:4ad3746dd83f",
+      "source_path": "src/routes/api/v1/redis/cache/+server.ts",
+      "score": 178.21470000000002,
+      "why": [
+        "tag match: auth",
+        "search_text frequency (1): auth",
+        "context_text frequency (2): auth",
+        "path contains: redis",
+        "tag match: redis",
+        "search_text frequency (4): redis",
+        "context_text frequency (7): redis",
+        "rank boost: 0.4489"
+      ],
+      "context_text": "NODE src/routes/api/v1/redis/cache/+server.ts\ndomain=codebase kind=route zone=server risk=0.564 lines=33\nsource_id=src/routes/api/v1/redis/cache/+server.ts\nsource_hash=4ad3746dd83f\ntags=ts,src,routes,api,route,api-handler,auth,zod,server,redis,cache\nexports=POST\nguards auth=true zod=true\nfan=in:0 out:0\nneighbors=src/routes/api/v1/redis/cache/$types, @sveltejs/kit, src/lib/server/redis.js\nsummary=POST /api/v1/redis/cache — Set a key-value pair in Redis"
+    },
+    {
+      "card_id": "card:codebase:src/lib/shims/ioredis-browser-shim.js:56459217d242",
+      "source_path": "src/lib/shims/ioredis-browser-shim.js",
+      "score": 165.1071,
+      "why": [
+        "context_text frequency (1): auth",
+        "path contains: redis",
+        "tag match: redis",
+        "export match: redis",
+        "search_text frequency (5): redis",
+        "context_text frequency (6): redis",
+        "rank boost: 0.2799"
+      ],
+      "context_text": "NODE src/lib/shims/ioredis-browser-shim.js\ndomain=codebase kind=module zone=shared risk=0.245 lines=416\nsource_id=src/lib/shims/ioredis-browser-shim.js\nsource_hash=56459217d242\ntags=js,src,lib,shims,zod,module,shared,redis\nexports=RedisShim,Redis,Cluster\nguards auth=false zod=true\nfan=in:0 out:0\nneighbors=none\nsummary=IORedis Browser Shim for Legal AI Platform"
+    },
+    {
+      "card_id": "card:codebase:src/routes/api/test/redis-write/+server.ts:30966346a516",
+      "source_path": "src/routes/api/test/redis-write/+server.ts",
+      "score": 161.8432,
+      "why": [
+        "tag match: auth",
+        "search_text frequency (1): auth",
+        "context_text frequency (2): auth",
+        "path contains: redis",
+        "tag match: redis",
+        "search_text frequency (3): redis",
+        "context_text frequency (6): redis",
+        "rank boost: 0.3952"
+      ],
+      "context_text": "NODE src/routes/api/test/redis-write/+server.ts\ndomain=codebase kind=route zone=server risk=0.516 lines=45\nsource_id=src/routes/api/test/redis-write/+server.ts\nsource_hash=30966346a516\ntags=ts,src,routes,api,route,api-handler,auth,zod,test,server,redis\nexports=POST\nguards auth=true zod=true\nfan=in:0 out:0\nneighbors=@sveltejs/kit, $app/environment, src/routes/api/test/redis-write/$types, src/lib/server/redis.js\nsummary=POST /api/test/redis-write"
+    }
+  ]
+}

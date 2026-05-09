@@ -11,6 +11,15 @@
  *   Evidence:  evidence:{evidenceId}:{stage}
  *   Graph:     graph:{caseId}:neighbors:{nodeHash}
  *   Embedding: embed:{model}:{textHash}
+ *
+ * Standardized Namespaces (G17 Hardening):
+ *   ace:llm:exact:    — L1 LLM exact-match cache
+ *   ace:research:*    — Research graph, policy, cluster summaries
+ *   ace:rank:demand   — 1h TTL, hit-demand hash (from chunk_hit_log)
+ *   ace:authority:top — 6h TTL, top entries from graphify:gds
+ *   ace:code:*        — Codebase context cache
+ *   taxonomy:clusters — SOM/K-means cluster centroids
+ *   gpu:karpathy:*    — GPU rank/scoring metadata
  */
 
 import { createHash } from 'crypto';
@@ -50,6 +59,8 @@ export const TTL = {
   CENTROID: 6 * 60 * 60, // 6 hours
   /** ACE codebase hit cache: boosted chunks from last Qdrant+topology pass */
   ACE_CODE: 15 * 60, // 15 min — short enough to reflect new indexing
+  /** ACE topological KAG prompt block: compact Redis KV prompt injection */
+  ACE_TOPO_KAG_PROMPT: 10 * 60, // 10 min — tied to hot retrieval context
   /** ACE token budget stats per (topoClass, clusterId): rolling window */
   ACE_TOKEN_BUDGET: 2 * 60 * 60, // 2 hours
   /** User activity heartbeat: long-lived engagement tracking */
@@ -153,17 +164,27 @@ export const jobKey = {
 // ── Cluster Summary Keys ──────────────────────────────────────────────────
 
 export const clusterSummaryKey = {
-  /** cluster-summary:{clusterId} — LLM-generated cluster narrative */
-  cached: (clusterId: number) => `cluster-summary:${clusterId}`,
+  /** ace:research:cluster-summary:{clusterId} — LLM-generated cluster narrative */
+  cached: (clusterId: number) => `ace:research:cluster-summary:${clusterId}`,
 };
-
-// ── Centroid Cache Keys ───────────────────────────────────────────────────
 
 export const centroidKey = {
   /** centroid:cluster:{clusterId} — Float32Array packed as JSON number[] */
-  cluster: (clusterId: number) => `centroid:cluster:${clusterId}`,
+  cluster: (clusterId: number) => `taxonomy:clusters:gpu:${clusterId}`,
   /** centroid:som:{x}:{y} — SOM cell centroid vector */
-  som: (x: number, y: number) => `centroid:som:${x}:${y}`,
+  som: (x: number, y: number) => `taxonomy:clusters:som:${x}:${y}`,
+};
+
+// ── Analytics & Ranking Keys (G17) ───────────────────────────────────────────
+
+export const hitDemandKey = {
+  /** ace:rank:demand — hit-demand hash from chunk_hit_log */
+  hash: () => 'ace:rank:demand',
+};
+
+export const authorityTopKey = {
+  /** ace:authority:top — top entries from graphify:gds */
+  hash: () => 'ace:authority:top',
 };
 
 // ── User Engagement Keys ──────────────────────────────────────────────────
@@ -208,6 +229,16 @@ export const aceCodeKey = {
     `ace:code:${hashStr(query)}:${topoClass}:${hashStr(resolvedDir ?? 'root')}`,
 };
 
+export const aceTopologicalKagKey = {
+  /**
+   * ace:topo:kag:{queryHash}:{scopeHash}
+   * Stores a compact, prompt-ready topological KAG block assembled from
+   * codebase hits, SOM/BMU, graph authority, AGENTS scope, and multi-lane hints.
+   */
+  forPrompt: (query: string, scope: string): string =>
+    `ace:topo:kag:${hashStr(query)}:${hashStr(scope)}`,
+};
+
 // ── ACE Token Budget Keys ─────────────────────────────────────────────────────
 
 export const aceTokenBudgetKey = {
@@ -227,7 +258,7 @@ export const aceTokenBudgetKey = {
 // ── LLM Cache Key Utilities ───────────────────────────────────────────────
 
 /** Prefix used by the Redis L1 exact-match cache — single source of truth. */
-export const LLM_EXACT_CACHE_PREFIX = 'llm:exact:';
+export const LLM_EXACT_CACHE_PREFIX = 'ace:llm:exact:';
 
 /**
  * Generate a deterministic L1 Redis cache key from LLM request parameters.

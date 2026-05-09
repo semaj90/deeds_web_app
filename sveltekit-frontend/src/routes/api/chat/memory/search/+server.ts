@@ -18,8 +18,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { db } from '$lib/server/db/client';
 import { recallPastChats } from '$lib/server/ace/chat-memory.js';
 
-const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const QDRANT_URL = ENV.QDRANT_URL;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 const searchSchema = z.object({
   q: z.string().min(1).max(500),

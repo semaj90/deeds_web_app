@@ -23,6 +23,7 @@ if (missing.length === 0) {
   const bgScripts = [
     path.join(scriptDir, 'ensure-search-engine.mjs'),
     path.join(scriptDir, 'ensure-mcp-server.mjs'),
+    path.join(scriptDir, 'ensure-kb-retrieval-server.mjs'),
   ];
   for (const script of bgScripts) {
     if (existsSync(script)) {
