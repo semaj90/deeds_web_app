@@ -196,6 +196,137 @@ would re-discover everything Lanes 1-3 already found. **Net savings:
 3. **Confidence threshold for KAG fallback**: 0.6 is a guess. Wire it to ACE telemetry once Phase C runs a few cycles, then tune.
 4. **Open WebUI front-end**: defer or build now? Defer — ship the CLI loop first, evaluate UX, then decide.
 
+## Token-cost FAQ (added 2026-05-09 turn 4)
+
+> "Do these MCP servers take Claude tokens?"
+
+**Adopting an MCP server is free.** The server is a local stdio child
+process spawned by Claude Code. It consumes local CPU/RAM, not Claude
+API tokens.
+
+**Calling a tool exposed by that server is not free.** Each tool call's
+input arguments and output payload flow into Claude's context window,
+which costs tokens proportional to the payload size. A `tools/list`
+that returns 30 tool descriptions is ~1-2 K tokens. A
+`db.table_inspect` returning a 5 KB JSON shape is ~1.5 K tokens.
+
+**Three ways to keep that cost bounded:**
+
+1. **Route discovery through Gemma4-offload first.** Lane 3 of the
+   synthesis loop reranks locally before any Claude tokens are spent.
+2. **Use Claude Code's `tools:` field in subagents** to scope which
+   tools each agent even *sees* — fewer descriptions in context.
+3. **Trim outputs at the tool layer.** TRACE MCP tools should default
+   to compact JSON (no whitespace, no redundant field labels) and cap
+   array results — that's why we wrote `db.find_jsonb_keys` to return
+   keys + types + frequencies, not values.
+
+> "If I run Hermes / Open WebUI / AnythingLLM as the front-end and
+> point it at TRACE MCP, do *those* calls cost Claude tokens?"
+
+**No.** Those front-ends call Gemma4 (or whatever local model they're
+configured for) via Ollama / TurboQuant. The local model produces the
+tool calls. The Claude API never enters that loop. Tokens are only
+spent when the resulting markdown brief is handed off to Claude Code
+for implementation.
+
+## Empirical adopted-MCP smoke (2026-05-09 first run)
+
+`scripts/smoke/smoke-adopted-mcp.mjs` probes each `enabled: false`
+server in `.vscode/mcp.json`. First run on this machine:
+
+| Server | Result | Notes |
+|--------|--------|-------|
+| `postgres-readonly` | ✅ 1 tool, 6.2 s | `@modelcontextprotocol/server-postgres` installed and listed cleanly |
+| `neo4j-readonly` | ❌ timeout | `uvx mcp-neo4j-cypher@latest` — package name needs verification |
+| `qdrant-readonly` | ❌ timeout | `uvx mcp-server-qdrant` — same; uv not in PATH or wrong package name |
+| `redis-readonly` | ❌ exit 1 | `uvx mcp-redis` — "requirements unsatisfiable"; correct invocation TBD |
+| `obsidian-vault` | ❌ npm install failed | `mcpvault` — possibly wrong npm name |
+| `ts-lsp` | ❌ npm install failed | `@isaacphi/mcp-language-server` — possibly wrong scope |
+
+**Don't enable any of the failed five blindly.** Phase B step 4 needs
+a follow-up pass to find each server's actual current invocation
+(check the GitHub README of each one before flipping `enabled: true`).
+The probe is the regression test — re-run after each correction:
+
+```bash
+node sveltekit-frontend/scripts/smoke/smoke-adopted-mcp.mjs
+```
+
+## Phase F (proposed) — centroid-gap external-doc analysis
+
+Brought in this turn from the operator question:
+"can we take GPU Karpathy codebase indexing and attempt to take cluster
+centroids into features and look for gaps from analysis using all
+language documentations to GitHub repos / Reddit posts?"
+
+**Sketch (defer until Phase B-D stable):**
+
+```
+1. Read GPU k-means centroids from Qdrant `codebase_chunks_768`
+   (k=20, already built by `graphify:full`)
+
+2. For each centroid:
+   a. Pull top-20 nearest chunks (members of cluster i)
+   b. Local Gemma4 names the cluster's "feature concept"
+      ("auth middleware", "vector indexing", "scene compiler", …)
+   c. Output: {cluster_id, feature_label, member_files[], confidence}
+
+3. For each feature_label:
+   a. Fetch external evidence (in priority order):
+      - TS LSP / npm registry (via official MCP) — what does the canonical
+        package for this concept look like?
+      - GitHub code search (via official GitHub MCP) — top-N repos with
+        same concept; extract their public API surface
+      - Reddit / HN via existing web-research-crawler (rate-limited) —
+        what gotchas / patterns are people discussing?
+      - llms.txt of the canonical docs site if it exists
+   b. Local Gemma4 distills external evidence into a "what's expected"
+      schema (~10 concept-keys per feature)
+
+4. Compare expected vs actual:
+   a. For each expected concept-key, grep our cluster's member files
+   b. Output gap report:
+      {feature: 'auth middleware',
+       missing: ['rate_limit', 'csrf_token_rotation'],
+       unexpected: ['custom_session_format'],
+       confidence: 0.82}
+
+5. Rank gaps by:
+   - severity (security > perf > ergonomic)
+   - cluster authority (PageRank * member count)
+   - external consensus (how many sources agreed it's expected)
+
+6. Synthesis pass writes:
+   memory/implementation-briefs/<ts>_centroid-gap-<cluster_id>.md
+   with: gap, citations, suggested fix sketch, do-not-touch list
+
+7. Hand off to Claude Code via the existing synthesis-loop Lane 5.
+```
+
+**Cost model:** Lane 1-6 all run on local Gemma4 + adopted MCP servers
+(~zero Claude tokens). Lane 7 is the only Claude-paid step, and it's
+~3-8 K per gap fix. With 20 clusters and an average of 1-2 gaps each,
+that's ~40 briefs = ~200-300 K tokens to fully audit the codebase
+against external best practice. Cheap.
+
+**Hard rules:**
+- Reddit / HN scraping must respect rate limits + robots.txt
+  (existing `web-research-crawler.ts` already does this).
+- External evidence is *never* canonical; it's input to Gemma4's
+  reranker, not a source of truth.
+- Gap reports never auto-edit code. They produce briefs; human +
+  Claude Code decide what to do.
+
+**Effort:** ~2 days end-to-end. Build order:
+1. New script `scripts/centroid-gap-analysis.mjs` — Lanes 1-2
+2. Reuse `web-research-crawler.ts` + `kag.fetch_doc` MCP tool — Lane 3
+3. Local Gemma4 reranker prompt — Lane 4-5
+4. Synthesis brief writer — Lane 6 (already exists per Phase C)
+5. Plug into existing handoff — Lane 7 (already exists)
+
+This is genuinely additive — no existing pipeline changes.
+
 ## Smoke commands (will exist after Phase C)
 
 ```bash
