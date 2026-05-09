@@ -327,6 +327,111 @@ against external best practice. Cheap.
 
 This is genuinely additive — no existing pipeline changes.
 
+## Phase G (proposed) — local-deep-research / LangGraph evaluation
+
+Brought in 2026-05-09: evaluate replacing or augmenting Lane 1 + Lane 3
+of the synthesis loop with one of the open-source "deep research" agent
+frameworks. **Not yet built — evaluation only.**
+
+**Why consider it**: Lane 1's "Gemma4 picks tools, calls them, summarises"
+loop is similar to what local-deep-research and LangGraph already do. If
+their orchestration is better than what we'd hand-roll in Phase C, adopt;
+otherwise document the decision.
+
+**Candidates to evaluate** (each ≤2 hours of evaluation, not adoption):
+
+| Tool | What it does | Fit for our loop |
+|------|--------------|------------------|
+| [local-deep-research](https://github.com/LearningCircuit/local-deep-research) | Ollama-backed "iterate query → search → summarise → re-query" loop with checkpointing | Very close to Lane 3's rerank+KAG/web_search fallback; could replace `scripts/synth/run-loop.mjs` |
+| [LangGraph](https://github.com/langchain-ai/langgraph) | Stateful multi-agent graphs over LangChain primitives | More general; we already have `@langchain/langgraph@1.2.7` in deps so import cost is zero — but adds opinionated abstractions |
+| [smolagents](https://github.com/huggingface/smolagents) (HuggingFace) | Minimal Python agent harness with tool calling | Python-only — would need a stdio bridge; probably more than it's worth |
+| [autogen](https://github.com/microsoft/autogen) | Microsoft multi-agent orchestration | Heavier than we need for a single-agent retrieve+synth loop |
+
+**Evaluation criteria** (write a one-pager per candidate):
+
+1. Does it speak MCP natively (call our existing TRACE MCP tools)?
+2. Does it support local Ollama / TurboQuant out of the box?
+3. Does it produce a structured artifact (JSON/markdown) we can hand to Claude Code?
+4. Does it persist state to a place we already have (Postgres / Redis / CouchDB)?
+5. Bus factor / commit frequency / license.
+6. Operational footprint (Docker? extra service? extra port?).
+
+**Output of Phase G**: a 2-page decision doc at
+`docs/architecture/synth-loop-orchestration-choice.md` with the verdict
+"adopt X" or "build it ourselves in Phase C" and the reasoning. **No code
+changes**.
+
+**Effort**: ~4-6 hours of reading + small repro scripts. Defer until
+Phase B is fully landed.
+
+## Phase H (proposed) — External Corpus Phase 1: llms.txt + topic schema + embedding job
+
+Brought in 2026-05-09. The "centroid → external doc → gap analysis"
+sketch in Phase F needs an actual external-doc corpus to compare against.
+This phase builds that corpus *cheaply*, biased toward the
+machine-readable `llms.txt` standard that's spreading across modern docs
+sites in 2026.
+
+### Scope
+
+1. **`llms.txt` registry** (`src/lib/server/external-corpus/llms-txt-registry.ts`, ~250 LOC):
+   - Curated list of canonical `llms.txt` URLs for libraries we depend on (TS, Svelte, Bits UI, Drizzle, Qdrant, Neo4j, Redis, langchain, zod, sveltekit, …).
+   - Each entry: `{ slug, url, version, last_fetched, sha256, doc_count }`.
+   - Stored in Postgres `external_corpus_sources` (new table, simple).
+   - Fetcher uses the existing `web-research-crawler.ts` fetch path (which already does readability + turndown + rate-limiting + robots.txt).
+
+2. **Topic schema** (`src/lib/server/external-corpus/topic-schema.ts`, ~150 LOC):
+   - `Topic` shape: `{ topic_id (sha256 of canonical name), canonical_name, aliases[], parent_topic_id?, source_slugs[], confidence }`.
+   - Seeded from cluster centroids (Phase F) once those exist; until then, hand-seed ~20 topics covering the domain (auth middleware, vector indexing, scene compiler, evidence pipeline, ACE retrieval, Karpathy authority, …).
+   - Stored in Postgres `external_corpus_topics`.
+   - Each topic gets one row in Qdrant `external_corpus_topics_768` for ANN lookup later.
+
+3. **Embedding job extension** (extends existing `web-research-crawler.ts` pipeline, ~200 LOC delta):
+   - New mode: `--source=llms-txt --slug=<slug>` triggers fetch → chunk → embed → upsert into Qdrant `external_corpus_chunks_768`.
+   - Reuses the existing `embeddinggemma:latest` lane via `/api/embed`.
+   - Each chunk's payload carries: `{ source_slug, source_version, chunk_index, sha256, topic_ids[], chunk_text }`.
+   - Idempotent: skips if `(source_slug, source_version, sha256)` already present.
+
+### Cost / effort
+
+- **Time**: ~16 hours total (registry 4h, topic schema 4h, embedding job extension 6h, tests 2h).
+- **Tokens**: zero Claude tokens; everything runs on local Ollama embeddinggemma + Postgres + Qdrant.
+- **Disk**: each `llms.txt` source averages 50-200 KB raw → 500-2000 chunks → ~1.5-6 MB Qdrant per source. Budget: 50 sources × 4 MB avg = 200 MB. Trivial.
+
+### Hard rules
+
+- **No Claude API calls** in this lane. Everything is local.
+- **`llms.txt` only — no JS-rendered scraping** in Phase H. (Crawl4AI / Firecrawl deferred to Phase H.2.)
+- **External corpus is never canonical truth.** It feeds Phase F's
+  centroid-gap reranker as evidence; it does not auto-edit our code.
+- **Robots.txt + rate limit respected** (existing crawler infra already does this).
+- **SHA-256 hash gates writes**: refetching the same `llms.txt` and
+  finding identical content is a no-op, not a re-embed.
+
+### Build order
+
+1. Create `external_corpus_sources` + `external_corpus_topics` Drizzle tables → manual SQL migration → G29 verify safe.
+2. Hand-seed 5 sources to validate the pipeline end-to-end.
+3. Write the registry + fetcher.
+4. Write the topic schema + hand-seed 20 topics.
+5. Extend the embedding job.
+6. Add `external_corpus_chunks_768` Qdrant collection.
+7. Smoke: pick a topic, query Qdrant, confirm relevant chunks come back.
+8. Commit each step independently.
+
+### What this unblocks
+
+Phase F (centroid-gap external-doc analysis) becomes implementable: the
+"fetch external evidence" step in Lane 3 of that pipeline now hits a
+local Qdrant collection (~5ms) instead of doing live web fetches per
+query (~5s per source).
+
+### Out of scope for Phase H
+
+- GitHub repo code search MCP (separate, easier — just adopt the official GitHub MCP server).
+- Reddit/HN scraping (already partially covered by `web-research-crawler.ts`; expand if needed).
+- LLM-driven topic generation from cluster centroids — that's Phase F's job, not Phase H's.
+
 ## Smoke commands (will exist after Phase C)
 
 ```bash

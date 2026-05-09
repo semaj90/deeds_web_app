@@ -29,7 +29,7 @@ export function registerSkillTools(server: McpServer) {
     {
       skillName: z.string().describe('The name of the skill to execute'),
       mission: z.string().describe('The specific mission description'),
-      input: z.record(z.any()).optional().describe('Input parameters for the skill')
+      input: z.record(z.string(), z.any()).optional().describe('Input parameters for the skill')
     },
     async ({ skillName, mission, input }) => {
       // Note: In a real MCP server, we might want to run this async or stream it.

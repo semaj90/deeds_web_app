@@ -703,6 +703,54 @@ async function G27() {
 }
 
 /**
+ * G34 — static check: no `z.record(<single-arg>)` in MCP tool schemas.
+ *
+ * Zod 4 requires `z.record(keySchema, valueSchema)` (two args). The zod 3
+ * single-arg form `z.record(z.any())` survives TypeScript compilation but
+ * crashes the SDK's tools/list JSON-Schema generator with
+ * "Cannot read properties of undefined (reading '_zod')" — because the
+ * record's keyType is undefined.
+ *
+ * Tier 0, fatal: true. Cheap regression lock against re-introducing the
+ * tools/list crash.
+ *
+ * Heuristic: `z.record(` followed by a single argument (no top-level comma
+ * before the closing paren). Counts at depth 0 of nested parens/brackets.
+ */
+async function G34() {
+  const dir = resolve(ROOT, 'src/mcp');
+  let entries;
+  try { entries = await readdir(dir); }
+  catch { return skip('src/mcp/ missing'); }
+
+  const findings = [];
+  for (const f of entries.filter(e => e.endsWith('.ts'))) {
+    const src = await readFile(resolve(dir, f), 'utf8');
+    const lines = src.split('\n');
+    lines.forEach((line, i) => {
+      const m = line.match(/z\.record\s*\(/);
+      if (!m) return;
+      const start = m.index + m[0].length;
+      let depth = 1, commas = 0;
+      for (let k = start; k < line.length && depth > 0; k++) {
+        const c = line[k];
+        if (c === '(' || c === '[' || c === '{') depth++;
+        else if (c === ')' || c === ']' || c === '}') depth--;
+        else if (c === ',' && depth === 1) commas++;
+      }
+      // depth still > 0 means call spans multiple lines — accept (uncommon and would
+      // require deeper parsing). Single-line calls with 0 commas at depth 1 are bad.
+      if (depth === 0 && commas === 0) {
+        findings.push(`${f}:${i + 1} — ${line.trim().slice(0, 80)}`);
+      }
+    });
+  }
+
+  if (findings.length === 0) return pass(`${entries.filter(e => e.endsWith('.ts')).length} files scanned, all z.record(...) calls have ≥2 args`);
+  return fail(`${findings.length} single-arg z.record(...) — crashes tools/list: ${findings.slice(0, 2).join(' | ')}${findings.length > 2 ? ` (+${findings.length - 2} more)` : ''}`);
+}
+
+/**
  * G33 — static audit of src/mcp/db-inspection-tools.ts for write verbs.
  *
  * The whole point of the db.* MCP tools is that they're read-only. This gate
@@ -919,6 +967,9 @@ const GATES = [
 
   // T0 — db-inspection-tools.ts must contain zero write verbs (Phase B).
   { id: 'G33', tier: 0, name: 'mcp:db-inspection-readonly',  fn: G33, fatal: true  },
+
+  // T0 — no z.record(<single-arg>) in MCP tool schemas (zod 4 requires 2 args).
+  { id: 'G34', tier: 0, name: 'mcp:zod-record-two-arg',      fn: G34, fatal: true  },
 ];
 
 // ── runner ───────────────────────────────────────────────────

@@ -14,7 +14,7 @@ export function registerAdminTools(server: McpServer) {
   server.tool(
     'ui.analyze_view',
     {
-      snapshot: z.record(z.any()).describe('A structured snapshot of the current UI elements'),
+      snapshot: z.record(z.string(), z.any()).describe('A structured snapshot of the current UI elements'),
       focus: z.string().optional().describe('Specific element ID to focus on')
     },
     async ({ snapshot, focus }) => {
@@ -41,7 +41,7 @@ export function registerAdminTools(server: McpServer) {
     {
       event: z.string().describe('The event description'),
       severity: z.enum(['info', 'warning', 'error']).default('info'),
-      context: z.record(z.any()).optional()
+      context: z.record(z.string(), z.any()).optional()
     },
     async ({ event, severity, context }) => {
       console.log(`[ADMIN LOG] [${severity.toUpperCase()}] ${event}`, context);
