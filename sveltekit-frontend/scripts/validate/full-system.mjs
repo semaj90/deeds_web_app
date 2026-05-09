@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * full-system.mjs — single-command system validator (25-gate audit)
+ * full-system.mjs — single-command system validator (27-gate audit)
  *
  * Replaces the ad-hoc "what should I run after npm run dev?" guesswork
  * with a deterministic tiered ladder. Every check is a numbered gate
@@ -55,6 +55,8 @@
  *   Tier 2 (extended) — Browser + LLM probes
  *     G24  playwright:deep-render        real Chromium, hydration check, console errors
  *     G25  gemma4:agent-roundtrip        POST /api/ai/agent — tool-call wiring proof
+ *     G26  turboquant:health             :8090/health — generation backend up
+ *     G27  turboquant:chat-roundtrip     :8090/v1/chat/completions — model actually generates
  *
  * Design rules (load-bearing, do not break):
  *   - No service writes. This script is read-only.
@@ -101,6 +103,11 @@ const TSGO_BASELINE = 3;
 
 const DEV_PORT = 5173;
 const DEV_BASE = `http://localhost:${DEV_PORT}`;
+
+// TurboQuant llama-server — canonical generation backend per CLAUDE.md
+// dual-lane architecture (Embeddings via Ollama, Generation via TurboQuant).
+const TURBO_PORT = 8090;
+const TURBO_BASE = `http://127.0.0.1:${TURBO_PORT}`;
 
 // ── small utils ──────────────────────────────────────────────
 
@@ -514,18 +521,25 @@ async function G25() {
   try { parsed = JSON.parse(body); } catch {
     return fail(`200 but body not JSON (${body.slice(0, 80)})`);
   }
-  // Documented shape: { query, answer, toolsUsed?, rounds?, durationMs?, ... }
-  // We accept either toolsUsed or tools_used; some routes have a `result` wrapper.
+  // Documented shape per gemma4-agent.ts AgentRunResult:
+  //   { query, answer, toolsUsed?, rounds?, durationMs?, cacheTier?, inferenceBackend?, ... }
+  // Some routes nest under `result`; handle both.
   const result = parsed.result ?? parsed;
   const toolsUsed = result.toolsUsed ?? result.tools_used ?? null;
   const hasAnswer = typeof result.answer === 'string' || typeof result.text === 'string' || typeof result.content === 'string';
   if (!hasAnswer && !toolsUsed) {
     return warn(`200 but unexpected shape: ${Object.keys(parsed).join(',') || '(empty)'}`);
   }
-  const toolsLabel = Array.isArray(toolsUsed) ? `tools=[${toolsUsed.slice(0, 3).join(',')}${toolsUsed.length > 3 ? '…' : ''}]` : 'tools=?';
-  const durLabel = result.durationMs != null ? ` ${result.durationMs}ms` : '';
-  const roundsLabel = result.rounds != null ? ` rounds=${result.rounds}` : '';
-  return pass(`agent reached${durLabel}${roundsLabel} ${toolsLabel}`);
+  const toolsLabel  = Array.isArray(toolsUsed) ? `tools=[${toolsUsed.slice(0, 3).join(',')}${toolsUsed.length > 3 ? '…' : ''}]` : 'tools=?';
+  const durLabel    = result.durationMs != null ? ` ${result.durationMs}ms` : '';
+  const roundsLabel = result.rounds     != null ? ` rounds=${result.rounds}` : '';
+  // path= surfaces which backend served the response so a future regression
+  // (e.g. silent fallback to ollama because bifrost cache misconfigured)
+  // is visible in the gate output without needing to read langfuse traces.
+  const backend     = result.inferenceBackend ?? result.backend ?? 'unknown';
+  const cacheTier   = result.cacheTier        ?? null;
+  const pathLabel   = ` path=${backend}${cacheTier ? `(${cacheTier})` : ''}`;
+  return pass(`agent reached${durLabel}${roundsLabel}${pathLabel} ${toolsLabel}`);
 }
 
 /**
@@ -612,6 +626,82 @@ async function G24() {
   }
 }
 
+/**
+ * G26 — TurboQuant llama-server health probe.
+ *
+ * Per CLAUDE.md §"Inference Cascade", TurboQuant on :8090 is the canonical
+ * generation backend (not Ollama). This gate is independent of the SvelteKit
+ * dev server — TurboQuant runs as a detached process via
+ * `npm run turbo:start:detached` and serves chat regardless of dev state.
+ *
+ * Skip cleanly if not running (TurboQuant is optional in dev workflows that
+ * only embed). Fail only if the port is bound but the health endpoint
+ * returns non-2xx — that's a half-broken server, worse than absent.
+ */
+async function G26() {
+  const r = await fetchSafe(`${TURBO_BASE}/health`, { timeoutMs: 5000 });
+  if (r.status === 0) return skip(`port ${TURBO_PORT} not bound — start with \`npm run turbo:start:detached\``);
+  if (r.status !== 200) return fail(`HTTP ${r.status} — bound but unhealthy`);
+  let body; try { body = JSON.parse(r.body); } catch {
+    return warn(`200 but body not JSON: ${r.body.slice(0, 80)}`);
+  }
+  const status = body.status ?? body.state ?? 'unknown';
+  return pass(`status=${status}`);
+}
+
+/**
+ * G27 — TurboQuant chat-completions round-trip.
+ *
+ * Proves the model actually generates (not just that the health endpoint
+ * responds). Sends a tiny deterministic prompt to the OpenAI-compat
+ * endpoint, expects a non-empty completion. Catches:
+ *   - model loaded but mmproj/tokenizer broken (200 health, error on chat)
+ *   - VRAM exhausted (slow start → 503)
+ *   - wrong server binary (D=128 turbo on Gemma4 → garbage output)
+ *
+ * Skip if G26 didn't pass (no point probing chat if /health fails).
+ */
+async function G27() {
+  const health = await fetchSafe(`${TURBO_BASE}/health`, { timeoutMs: 3000 });
+  if (health.status !== 200) return skip('TurboQuant /health not 200 (G26 should fail/skip)');
+
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 30_000);
+  let res, body;
+  const tStart = Date.now();
+  try {
+    res = await fetch(`${TURBO_BASE}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma4',
+        messages: [{ role: 'user', content: 'reply with the single word OK' }],
+        max_tokens: 8,
+        stream: false,
+        temperature: 0,
+      }),
+      signal: ctrl.signal,
+    });
+    body = await res.text();
+  } catch (err) {
+    return fail(`chat request failed: ${err.message.slice(0, 150)}`);
+  } finally { clearTimeout(t); }
+
+  const dur = Date.now() - tStart;
+  if (!res.ok) return fail(`HTTP ${res.status}: ${body.slice(0, 150)}`);
+
+  let parsed;
+  try { parsed = JSON.parse(body); } catch {
+    return fail(`200 but body not JSON (${body.slice(0, 80)})`);
+  }
+  const content = parsed?.choices?.[0]?.message?.content ?? '';
+  if (!content || typeof content !== 'string') {
+    return fail(`200 JSON but no content (keys: ${Object.keys(parsed).join(',')})`);
+  }
+  const usage = parsed.usage ?? {};
+  return pass(`${dur}ms gen=${usage.completion_tokens ?? '?'}t prompt=${usage.prompt_tokens ?? '?'}t reply="${content.slice(0, 40)}"`);
+}
+
 // ── registry ─────────────────────────────────────────────────
 
 const GATES = [
@@ -647,6 +737,11 @@ const GATES = [
 
   // T2 — VLM Gemma4 agentic tool-call round-trip
   { id: 'G25', tier: 2, name: 'gemma4:agent-roundtrip',     fn: G25, fatal: false },
+
+  // T1 — TurboQuant llama-server (canonical generation backend per CLAUDE.md)
+  // T1 because TurboQuant is independent of SvelteKit dev server — runs detached.
+  { id: 'G26', tier: 1, name: 'turboquant:health',          fn: G26, fatal: false },
+  { id: 'G27', tier: 2, name: 'turboquant:chat-roundtrip',  fn: G27, fatal: false },
 ];
 
 // ── runner ───────────────────────────────────────────────────
