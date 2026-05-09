@@ -703,6 +703,36 @@ async function G27() {
 }
 
 /**
+ * G35 — static check: scripts/synth/run-loop.mjs is intact (Phase C).
+ *
+ * The synthesis loop is the load-bearing entry point for Lane 1-4 of the
+ * Gemma4 ⇄ MCP token-saving pipeline. This gate proves:
+ *   - file exists at the canonical path
+ *   - parses cleanly (no syntax errors on `node --check`)
+ *   - declares all 5 lanes (lane1Retrieval, lane2Graph, lane3Rerank,
+ *     lane4Synthesis, lane5Handoff) by name
+ *   - has the preflight() probe (operator-facing failure mode for down infra)
+ *
+ * Tier 0, fatal: true. Cheap regression lock — catches accidental rewrites
+ * that drop a lane or break the orchestrator's invariant shape.
+ */
+async function G35() {
+  const path = 'scripts/synth/run-loop.mjs';
+  if (!(await exists(path))) return fail(`${path} missing — Phase C not landed`);
+
+  // Syntax check via spawn'd node --check.
+  const r = await runCmd('node', ['--check', resolve(ROOT, path)], { timeoutMs: 5000 });
+  if (r.code !== 0) return fail(`syntax error: ${r.stderr.split('\n').filter(l => l.trim()).slice(-2).join(' ').slice(0, 200)}`);
+
+  const src = await readFile(resolve(ROOT, path), 'utf8');
+  const required = ['lane1Retrieval', 'lane2Graph', 'lane3Rerank', 'lane4Synthesis', 'lane5Handoff', 'preflight'];
+  const missing = required.filter(name => !src.includes(name));
+  if (missing.length > 0) return fail(`missing required functions: ${missing.join(', ')}`);
+
+  return pass(`syntax ok, all 5 lanes + preflight present (${(src.length / 1024).toFixed(1)} KB)`);
+}
+
+/**
  * G34 — static check: no `z.record(<single-arg>)` in MCP tool schemas.
  *
  * Zod 4 requires `z.record(keySchema, valueSchema)` (two args). The zod 3
@@ -970,6 +1000,9 @@ const GATES = [
 
   // T0 — no z.record(<single-arg>) in MCP tool schemas (zod 4 requires 2 args).
   { id: 'G34', tier: 0, name: 'mcp:zod-record-two-arg',      fn: G34, fatal: true  },
+
+  // T0 — synthesis loop CLI exists, parses, has all 5 lanes (Phase C).
+  { id: 'G35', tier: 0, name: 'synth:run-loop-static',       fn: G35, fatal: true  },
 ];
 
 // ── runner ───────────────────────────────────────────────────
