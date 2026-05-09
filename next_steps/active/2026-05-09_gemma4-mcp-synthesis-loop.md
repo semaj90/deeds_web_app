@@ -121,12 +121,28 @@ chat/branching workflow becomes a bottleneck.
 2. ✅ Already shipped: `claude-code-agent-os.md`, `drizzle-inspection-mcp.md`, `obsidian-neo4j-couchdb-alignment.md`.
 3. **This commit**: scaffold `.claude/skills/{trace-mcp-tooling,bits-ui-svelte5,uno-css-design-system,drizzle-schema-review}/SKILL.md` + `.claude/agents/{drizzle-inspector,sveltekit-route-auditor,topology-medic,obsidian-cartographer}.md` + `gemma4-to-claude-code-handoff.md`.
 
-### Phase B — read-only MCP tools (small)
+### Phase B — adopt official MCP + minimal custom (revised 2026-05-09)
 
-4. Implement `db.schema_overview` + `db.table_inspect` in `src/mcp/db-inspection-tools.ts` (per [drizzle-inspection-mcp.md](../../sveltekit-frontend/docs/architecture/drizzle-inspection-mcp.md)).
-5. Pin `zod` to `^3.22` in `package.json` to unblock `trace-mcp-server.ts` `tools/list`.
-6. Add `G32 mcp:trace-server-tools-list` (asserts ≥30 tools list cleanly).
-7. Add `G33 mcp:db-inspection-readonly` (asserts no `db.*` tool exposes a write verb).
+**Replaces the original "build all `db.*` tools ourselves" plan** —
+see [mcp-ecosystem-survey-2026.md](../../sveltekit-frontend/docs/architecture/mcp-ecosystem-survey-2026.md)
+for the full adopt-vs-build matrix. Net: build 6 custom tools
+instead of 12; mount 6 official servers for the rest.
+
+4. **Mount official MCP servers** (read-only) in `.vscode/mcp.json` + `~/.claude/mcp.json`:
+   - `neo4j` (`neo4j-contrib/mcp-neo4j` with `NEO4J_READ_ONLY=true`)
+   - `qdrant` (`qdrant/mcp-server-qdrant`)
+   - `postgres-readonly` (`@modelcontextprotocol/server-postgres` with read-only DB role)
+   - `redis-readonly` (`redis/mcp-redis` with `READ_ONLY=true`)
+   - `obsidian-vault` (`mcpvault` — filesystem-native, no Obsidian.app required)
+   - `ts-lsp` (`@isaacphi/mcp-language-server`)
+   Smoke each via `npx mcporter call <server>.<tool> ...`.
+5. **Add `PreToolUse` hook** (`.claude/settings.json`) that denies any tool whose name contains a write verb (`drop`, `delete`, `truncate`, `update`, `insert`, `create`, `flushdb`, `set`) regardless of which server it came from. This is the actual sandbox; subagent `tools:` is just a hint.
+6. **Implement the 6 truly-custom `db.*` tools** in `src/mcp/db-inspection-tools.ts` (Drizzle-aware shape that the official Postgres MCP doesn't know): `db.schema_overview`, `db.table_inspect`, `db.indexes`, `db.relation_map`, `db.find_jsonb_keys`, `db.drift_check`, `db.migration_status`. (`db.table_sample` — adopt official Postgres MCP read access instead, gated by DB role.)
+7. **Pin `zod` to `^3.22`** in `package.json` — fixes the `trace-mcp-server.ts` `tools/list` Zod crash blocking Lane 1.
+8. **Validator gates**:
+   - `G32 mcp:trace-server-tools-list` — asserts our TRACE MCP `tools/list` returns ≥30 tools cleanly.
+   - `G33 mcp:db-inspection-readonly` — asserts no `db.*` tool we ship exposes a write verb in its inputSchema.
+   - `G37 mcp:adopted-servers-mounted` — asserts each official server in `.vscode/mcp.json` resolves on `tools/list` without error.
 
 ### Phase C — synthesis loop CLI
 
