@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node c:/Users/james/Videos/deeds-web-app/.claude/hooks/pretooluse-deny.mjs",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [
@@ -23,6 +34,15 @@
       }
     ],
     "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node c:/Users/james/Videos/deeds-web-app/.claude/hooks/posttooluse-audit.mjs",
+            "timeout": 2
+          }
+        ]
+      },
       {
         "matcher": "Bash",
         "hooks": [
