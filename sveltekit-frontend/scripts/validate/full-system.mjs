@@ -703,6 +703,56 @@ async function G27() {
 }
 
 /**
+ * G36 — static check: Claude Code Phase D hooks are wired + intact.
+ *
+ * Hooks are the actual security boundary (subagent `tools:` is a hint per
+ * Anthropic docs). This gate proves:
+ *   1. .claude/hooks/pretooluse-deny.mjs exists, parses, has the deny RULES
+ *   2. .claude/hooks/posttooluse-audit.mjs exists, parses, writes to
+ *      memory/runs/claude-code/<date>.jsonl
+ *   3. .claude/settings.json wires both hooks under the right event names
+ *
+ * Tier 0, fatal: true. Cheap regression lock — catches the case where
+ * settings.json is edited and the hooks block is dropped.
+ */
+async function G36() {
+  const REPO = resolve(ROOT, '..');   // hooks live at repo root, not under sveltekit-frontend
+  const settingsPath = resolve(REPO, '.claude', 'settings.json');
+  const denyPath     = resolve(REPO, '.claude', 'hooks', 'pretooluse-deny.mjs');
+  const auditPath    = resolve(REPO, '.claude', 'hooks', 'posttooluse-audit.mjs');
+
+  for (const [label, p] of [['settings.json', settingsPath], ['pretooluse-deny.mjs', denyPath], ['posttooluse-audit.mjs', auditPath]]) {
+    try { await stat(p); }
+    catch { return fail(`${label} missing at ${p}`); }
+  }
+
+  // Syntax-check the two .mjs hook scripts
+  for (const [label, p] of [['pretooluse-deny', denyPath], ['posttooluse-audit', auditPath]]) {
+    const r = await runCmd('node', ['--check', p], { timeoutMs: 5000 });
+    if (r.code !== 0) return fail(`${label} syntax error: ${r.stderr.split('\n').filter(l => l.trim()).slice(-1)[0]?.slice(0, 200)}`);
+  }
+
+  // Settings wiring check — both hooks referenced under the right event names
+  let settings;
+  try { settings = JSON.parse(await readFile(settingsPath, 'utf8')); }
+  catch (e) { return fail(`settings.json parse error: ${e.message.slice(0, 100)}`); }
+
+  const pre  = (settings?.hooks?.PreToolUse  ?? []).flatMap(b => (b.hooks ?? []).map(h => h.command ?? '')).join(' ');
+  const post = (settings?.hooks?.PostToolUse ?? []).flatMap(b => (b.hooks ?? []).map(h => h.command ?? '')).join(' ');
+
+  if (!pre.includes('pretooluse-deny.mjs')) return fail('PreToolUse hook for pretooluse-deny.mjs not wired in settings.json');
+  if (!post.includes('posttooluse-audit.mjs')) return fail('PostToolUse hook for posttooluse-audit.mjs not wired in settings.json');
+
+  // Deny-list integrity — assert the script contains the expected high-stakes patterns
+  const denySrc = await readFile(denyPath, 'utf8');
+  const required = ['drizzle-kit\\s+push', 'rm\\s+', 'taskkill', 'git\\s+push', 'reconstruction', 'schema-postgres'];
+  const missing = required.filter(needle => !new RegExp(needle).test(denySrc));
+  if (missing.length > 0) return fail(`pretooluse-deny.mjs missing rules for: ${missing.join(', ')}`);
+
+  return pass(`hooks wired + scripts parse + ${required.length} deny patterns present`);
+}
+
+/**
  * G35 — static check: scripts/synth/run-loop.mjs is intact (Phase C).
  *
  * The synthesis loop is the load-bearing entry point for Lane 1-4 of the
@@ -1003,6 +1053,9 @@ const GATES = [
 
   // T0 — synthesis loop CLI exists, parses, has all 5 lanes (Phase C).
   { id: 'G35', tier: 0, name: 'synth:run-loop-static',       fn: G35, fatal: true  },
+
+  // T0 — Phase D Claude Code hooks (PreToolUse deny + PostToolUse audit).
+  { id: 'G36', tier: 0, name: 'claude-code:hook-integrity',  fn: G36, fatal: true  },
 ];
 
 // ── runner ───────────────────────────────────────────────────
