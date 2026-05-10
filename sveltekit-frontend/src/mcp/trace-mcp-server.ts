@@ -4654,6 +4654,135 @@ server.registerTool(
   }
 );
 
+// ── image.enrich_tags ─────────────────────────────────────────────────────────
+// Run VLM on the stored image for one or more Qdrant points, then PATCH the
+// suggestedTags back onto the payload.  Accepts a point_id + optional
+// image_path override; when no path is given, resolves via payload fields
+// (file_path → absolute read, minioKey/storageKey → MinIO fetch).
+server.registerTool(
+  'image.enrich_tags',
+  {
+    description:
+      'VLM-enrich one Qdrant evidence point with auto-generated tags. ' +
+      'Fetches the image (from payload file_path or MinIO), runs Gemma4-VLM, ' +
+      'and PATCHes suggestedTags + vlm_summary back onto the Qdrant payload. ' +
+      'Tags are merged with any existing tags (deduped). ' +
+      'Use before indexing or to backfill stale points.',
+    inputSchema: z.object({
+      point_id:   z.union([z.string(), z.number()]).describe('Qdrant point ID to enrich'),
+      collection: z.string().default('evidence_items'),
+      image_path: z.string().optional().describe('Override file path (absolute). If omitted, resolved from payload.'),
+      merge:      z.boolean().default(true).describe('Merge new tags with existing ones (true) or replace (false)'),
+      dry_run:    z.boolean().default(false).describe('Report what would be written without patching Qdrant'),
+    }),
+  },
+  async ({ point_id, collection, image_path, merge, dry_run }) => {
+    const { readFile } = await import('node:fs/promises');
+    const { resolve, basename, extname } = await import('node:path');
+    const { analyzeEvidenceImage } = await import('../lib/server/analysis/vlm-evidence-analyzer.js');
+    const { QdrantManager } = await import('../lib/server/vector/qdrant-manager.js');
+
+    const qdrant = new QdrantManager();
+    const pid = String(point_id);
+
+    // ── 1. Fetch the existing Qdrant payload ──────────────────────────────────
+    let existingPayload: Record<string, unknown> = {};
+    try {
+      const pts = await qdrant.client.retrieve(collection, { ids: [pid], with_payload: true });
+      if (!pts.length) throw new Error(`Point ${pid} not found in ${collection}`);
+      existingPayload = (pts[0].payload as Record<string, unknown>) ?? {};
+    } catch (e) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: `Qdrant retrieve: ${String(e).slice(0, 200)}` }) }] };
+    }
+
+    // ── 2. Resolve image bytes ────────────────────────────────────────────────
+    let buffer: Buffer;
+    let resolvedPath = image_path;
+
+    if (!resolvedPath) {
+      // Try payload fields in priority order
+      const candidates = [
+        existingPayload.file_path,
+        existingPayload.filePath,
+        existingPayload.localPath,
+      ].filter(Boolean).map(String);
+
+      for (const c of candidates) {
+        try {
+          buffer = await readFile(c);
+          resolvedPath = c;
+          break;
+        } catch { /* try next */ }
+      }
+
+      // MinIO fallback: fetch via SvelteKit presigned URL
+      if (!buffer!) {
+        const minioKey = String(existingPayload.minioKey ?? existingPayload.storageKey ?? '');
+        if (minioKey) {
+          const SK_URL = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+          try {
+            const r = await fetch(`${SK_URL}/api/evidence/file/${encodeURIComponent(minioKey)}`, { signal: AbortSignal.timeout(15_000) });
+            if (r.ok) { buffer = Buffer.from(await r.arrayBuffer()); resolvedPath = minioKey; }
+          } catch { /* non-fatal */ }
+        }
+      }
+    } else {
+      buffer = await readFile(resolve(process.cwd(), resolvedPath));
+    }
+
+    if (!buffer!) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: 'Could not resolve image bytes — provide image_path or ensure payload has file_path/minioKey' }) }] };
+    }
+
+    // ── 3. VLM caption ────────────────────────────────────────────────────────
+    const fileName = resolvedPath ? basename(resolvedPath) : `point-${pid}.jpg`;
+    let vlmResult: { summary: string; suggestedTags: string[]; model: string; cached: boolean };
+    try {
+      vlmResult = await analyzeEvidenceImage({ buffer, fileName });
+    } catch (e) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: `VLM: ${String(e).slice(0, 200)}` }) }] };
+    }
+
+    // ── 4. Merge tags ─────────────────────────────────────────────────────────
+    const existingTags = (existingPayload.tags as string[] ?? []).map(t => String(t).toLowerCase());
+    const newTags = vlmResult.suggestedTags.map(t => t.toLowerCase());
+    const mergedTags = merge
+      ? [...new Set([...existingTags, ...newTags])]
+      : newTags;
+
+    const patch: Record<string, unknown> = {
+      tags:        mergedTags,
+      vlm_summary: vlmResult.summary.slice(0, 500),
+      vlm_model:   vlmResult.model,
+      vlm_enriched_at: new Date().toISOString(),
+    };
+
+    // ── 5. Patch Qdrant (or dry-run) ──────────────────────────────────────────
+    if (!dry_run) {
+      try {
+        await qdrant.client.setPayload(collection, { payload: patch, points: [pid] });
+      } catch (e) {
+        return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: `Qdrant setPayload: ${String(e).slice(0, 200)}` }) }] };
+      }
+    }
+
+    return { content: [{ type: 'text' as const, text: JSON.stringify({
+      ok:            true,
+      dry_run,
+      point_id:      pid,
+      collection,
+      resolvedPath,
+      existingTags,
+      newTags,
+      mergedTags,
+      addedCount:    mergedTags.length - existingTags.length,
+      vlm_summary:   vlmResult.summary.slice(0, 200),
+      model:         vlmResult.model,
+      cached:        vlmResult.cached,
+    }, null, 2) }] };
+  }
+);
+
 // ── HTTP server with /health + MCP handler ────────────────────────────────────
 
 process.on('uncaughtException', (e) => console.error('[MCP uncaughtException]', e?.message, e?.stack));
@@ -4738,5 +4867,6 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
   console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');
   console.log('       image.search_by_text (text→embed→Qdrant, no file upload),');
-  console.log('       image.caption (VLM describe only, no search)');
+  console.log('       image.caption (VLM describe only, no search),');
+  console.log('       image.enrich_tags (VLM→tags→setPayload PATCH, merge dedup)');
 });
