@@ -1848,6 +1848,10 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 
 ## Reference Docs
 
+- `sveltekit-frontend/docs/architecture/trace-runtime-split.md` — TRACE/Karpathy runtime boundary rule (Gemma4 → MCP only, never raw infra)
+- `sveltekit-frontend/docs/architecture/trace-kag-web-development-guide.md` — 23-section practical guide (route contract, retrieval lane decision tree, Admin Copilot safety, browser context lane, RabbitMQ/sidecar rules, production safety gates)
+- `sveltekit-frontend/docs/architecture/hermes-agent-windows-gemma4-guide.md` — Hermes Agent + WSL2 + local Gemma4 integration (allowlist/blocklist of TRACE tools, port reconciliation, TurboQuant Gemma4 binary caveat)
+- `sveltekit-frontend/memory/architecture/mcp-mount-smoke-2026-05-09.md` — post-restart MCP mount + smoke verification log (live `tools/list`: 42 tools after the per-request transport fix; 5 registries silent-failing — adminTools/skillTools/codebaseTools/bifrostTools/topologyMgmtTools; G33/G34/G37 green; G38 referenced in trace-runtime-split rule #8; Phase D hooks deferred)
 - `memory/reconstruction-3-tracks.md` — model/image/3D pipeline architecture, build order, Qwen TurboQuant fit, ComfyUI HTTP wiring, Gaussian-splat scope
 - `memory/drizzle-schema-reference.md` — 70+ tables, 14 enums, type patterns, route map
 - `memory/architecture-reference.md` — DB tiers, JSONB, caching strategy, vector search
