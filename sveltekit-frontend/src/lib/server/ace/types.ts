@@ -524,6 +524,103 @@ export interface ClusterContextPacket {
   topoLabel?: string;
 }
 
+// ── Trust-Tier types (HyperRAG §4) ───────────────────────────────────────────
+
+/**
+ * Trust tier for every retrieved chunk.
+ *
+ * T1 System        — AGENTS.md rules, hard-wired schema definitions. instructionAuthority=true.
+ * T2 Agent-gen     — Synthesis memory, summary lenses, prior answers. Authority=false.
+ * T3 Verified code — Qdrant codebase_chunks_768 (indexed committed files). Authority=false.
+ * T4 External/web  — Web-fetched content, ACP cross-feed. Authority=false. MUST be sanitized.
+ * T5 User input    — Chat messages, uploaded evidence text. Authority=false. MUST be sanitized.
+ */
+export type TrustTier = 'T1' | 'T2' | 'T3' | 'T4' | 'T5';
+
+export interface TrustMeta {
+  /** Trust tier — determines synthesis fence placement */
+  tier: TrustTier;
+  /** True only for T1 (AGENTS.md / hard-wired rules). */
+  instructionAuthority: boolean;
+  /** File path, Qdrant point ID, or URL */
+  sourceUri: string;
+  /** sha256 hex of raw chunk text — for audit trail (context_timeline) */
+  contentHash: string;
+  /** True if T4/T5 chunk passed the injection-pattern sanitizer */
+  sanitized: boolean;
+  /** Detected injection-pattern labels, if any (from sanitizer) */
+  injectionSignals?: string[];
+}
+
+/** Returns default T3 TrustMeta for indexed codebase chunks. */
+export function codeChunkTrustMeta(sourceUri: string, contentHash: string): TrustMeta {
+  return { tier: 'T3', instructionAuthority: false, sourceUri, contentHash, sanitized: false };
+}
+
+/** Returns default T1 TrustMeta for AGENTS.md / operator-authored rules. */
+export function systemTrustMeta(sourceUri: string, contentHash: string): TrustMeta {
+  return { tier: 'T1', instructionAuthority: true, sourceUri, contentHash, sanitized: false };
+}
+
+// ── Lane IDs (HyperRAG §3) ────────────────────────────────────────────────────
+
+export type LaneId =
+  | 'L0'   // topo-byte prefilter (Redis ace:topo:*)
+  | 'L1'   // Qdrant dense ANN (content vector)
+  | 'L2'   // Qdrant signature ANN
+  | 'L3'   // summary lenses (summary_lenses_768)
+  | 'L4'   // wiki / AGENTS.md notes (Redis wiki:note:* + agents:dir:*)
+  | 'L5'   // synthesis memory (synthesis_memory_768)
+  | 'L6'   // prior answers (Redis code:llm:* + ace:chunks:*)
+  | 'L7'   // graph neighbors (Neo4j)
+  | 'L8'   // PageRank authority (couchdb:pagerank_scores)
+  | 'L9'   // feature atlas (Postgres feature_implementations)
+  | 'L10'  // web / external corpus (ACP cross-feed)
+  | 'L11'  // activity prefetch (panel_activity_log)
+  // Legacy lane names kept for backward compat with multi-lane-retrieval.ts
+  | 'hash' | 'sparse' | 'graph' | 'ace_cache' | 'symbol' | 'dense'
+  | 'topology' | 'wiki' | 'error' | 'task' | 'research';
+
+/** Default trust tier for each lane */
+export const LANE_DEFAULT_TRUST_TIER: Record<LaneId, TrustTier> = {
+  L0:       'T1',
+  L1:       'T3',
+  L2:       'T3',
+  L3:       'T2',
+  L4:       'T1',
+  L5:       'T2',
+  L6:       'T2',
+  L7:       'T3',
+  L8:       'T1',
+  L9:       'T1',
+  L10:      'T4',
+  L11:      'T1',
+  hash:     'T2',
+  sparse:   'T3',
+  graph:    'T3',
+  ace_cache:'T2',
+  symbol:   'T3',
+  dense:    'T3',
+  topology: 'T2',
+  wiki:     'T1',
+  error:    'T2',
+  task:     'T1',
+  research: 'T4',
+};
+
+/**
+ * Karpathy trust multiplier applied after blend score.
+ * T1 floats above code hits; T4/T5 demoted so web content
+ * doesn't crowd out indexed code.
+ */
+export const TRUST_SCORE_MULTIPLIER: Record<TrustTier, number> = {
+  T1: 1.20,
+  T2: 1.00,
+  T3: 0.95,
+  T4: 0.70,
+  T5: 0.60,
+};
+
 /** Token budget allocation per context source (expanded for 128K+ context models) */
 export const TOKEN_BUDGET = {
   system: 300,
