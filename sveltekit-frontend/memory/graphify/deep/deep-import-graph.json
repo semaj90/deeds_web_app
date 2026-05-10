@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-05-10T02:44:04.216Z",
+  "generatedAt": "2026-05-10T02:51:27.539Z",
   "sourceGraph": "docs/graph/codebase-graph.json",
   "stats": {
-    "generatedAt": "2026-05-10T02:44:04.216Z",
+    "generatedAt": "2026-05-10T02:51:27.539Z",
     "nodeCount": 3729,
     "edgeCount": 12208,
     "resolvedEdges": 7197,

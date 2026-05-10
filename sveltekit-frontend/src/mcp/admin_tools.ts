@@ -11,11 +11,14 @@ export function registerAdminTools(server: McpServer) {
    * Analyzes the current UI state based on a provided snapshot.
    * This allows the agent to 'see' what the user is looking at.
    */
-  server.tool(
+  server.registerTool(
     'ui.analyze_view',
     {
-      snapshot: z.record(z.string(), z.any()).describe('A structured snapshot of the current UI elements'),
-      focus: z.string().optional().describe('Specific element ID to focus on')
+      description: 'Analyzes the current UI state based on a provided snapshot.',
+      inputSchema: {
+        snapshot: z.record(z.string(), z.any()).describe('A structured snapshot of the current UI elements'),
+        focus: z.string().optional().describe('Specific element ID to focus on')
+      }
     },
     async ({ snapshot, focus }) => {
       // In a real implementation, this might use a vision model or a complex heuristic.
@@ -36,35 +39,43 @@ export function registerAdminTools(server: McpServer) {
   /**
    * Logs a manual administrative event with context.
    */
-  server.tool(
-    'admin.log_event',
-    {
-      event: z.string().describe('The event description'),
-      severity: z.enum(['info', 'warning', 'error']).default('info'),
-      context: z.record(z.string(), z.any()).optional()
-    },
-    async ({ event, severity, context }) => {
-      console.log(`[ADMIN LOG] [${severity.toUpperCase()}] ${event}`, context);
-      return {
-        content: [{ type: 'text', text: `Event logged successfully with ${severity} severity.` }]
-      };
-    }
-  );
+  if (process.env.MCP_LEGACY_ALIASES === 'true') {
+    server.registerTool(
+      'admin.log_event',
+      {
+        description: 'Logs a manual administrative event with context.',
+        inputSchema: {
+          event: z.string().describe('The event description'),
+          severity: z.enum(['info', 'warning', 'error']).default('info'),
+          context: z.record(z.string(), z.any()).optional()
+        }
+      },
+      async ({ event, severity, context }) => {
+        console.log(`[ADMIN LOG] [${severity.toUpperCase()}] ${event}`, context);
+        return {
+          content: [{ type: 'text', text: `Event logged successfully with ${severity} severity.` }]
+        };
+      }
+    );
+  }
 
   // == ops.execute_graphify ==================================================
   /**
    * Executes an authorized graphify pipeline command.
    * Gated executor for topological maintenance.
    */
-  server.tool(
+  server.registerTool(
     'ops.execute_graphify',
     {
-      command: z.enum([
-        'npm run graphify:topology:gpu',
-        'npm run qdrant:patch-topology',
-        'npm run graphify:seed-llm-index'
-      ]).describe('The canonical graphify command to execute'),
-      confirm: z.boolean().describe('Must be true to execute')
+      description: 'Executes an authorized graphify pipeline command.',
+      inputSchema: {
+        command: z.enum([
+          'npm run graphify:topology:gpu',
+          'npm run qdrant:patch-topology',
+          'npm run graphify:seed-llm-index'
+        ]).describe('The canonical graphify command to execute'),
+        confirm: z.boolean().describe('Must be true to execute')
+      }
     },
     async ({ command, confirm }) => {
       if (!confirm) {

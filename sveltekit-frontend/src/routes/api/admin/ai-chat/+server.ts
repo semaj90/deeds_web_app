@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { AdminAiChatService } from '$lib/server/admin/ai-chat-service.js';
+import { AdminAiChatService, formatBrowserContextForPrompt } from '$lib/server/admin/ai-chat-service.js';
 import { gatherAdminContext } from '$lib/server/admin/ai-chat-context.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -35,7 +35,10 @@ export async function POST({ request, locals }) {
     : await AdminAiChatService.getOrCreateSession(userId, contextTag);
 
   // 2. Gather System Context (Parallel to LLM prep)
-  const systemContext = await gatherAdminContext(query, contextTag);
+  //    Pass userId so the Browser Context Lane can attach a sanitized
+  //    snapshot from /api/browser-context/snapshot if one is stored.
+  const systemContext = await gatherAdminContext(query, contextTag, userId);
+  const browserSection = formatBrowserContextForPrompt(systemContext.browserContext ?? null);
 
   // 3. Log User Message
   await AdminAiChatService.logMessage(session.id, 'user', query);
@@ -43,11 +46,15 @@ export async function POST({ request, locals }) {
   // 4. Construct Inference Payload (Tiered Cascade)
   // We use Bifrost Dispatch via internal fetch to keep it canonical
   const prompt = `
-SYSTEM CONTEXT:
-${JSON.stringify(systemContext, null, 2)}
+SYSTEM CONTEXT (authoritative — TRACE backend probes):
+${JSON.stringify({ ...systemContext, browserContext: undefined }, null, 2)}
 
-UI SNAPSHOT (What the user sees):
+UI SNAPSHOT (What the user sees in the admin panel):
 ${JSON.stringify(uiSnapshot || {}, null, 2)}
+${browserSection ? `
+
+BROWSER CONTEXT:
+${browserSection}` : ''}
 
 USER QUESTION:
 ${query}

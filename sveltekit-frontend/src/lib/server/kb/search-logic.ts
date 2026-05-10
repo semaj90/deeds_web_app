@@ -1,7 +1,7 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, createReadStream } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
+import Fuse from 'fuse.js';
 
 // This library implements the N8 weighted lexical search over graph notecards.
 // It is used by both the standalone CLI script and the MCP retrieval server.
@@ -147,9 +147,6 @@ export async function searchNotecards(opts: SearchOptions): Promise<SearchResult
     throw new Error(`Cards file not found: ${cardsPath}`);
   }
 
-  const terms = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
-  if (terms.length === 0) return [];
-
   // 1. Load Ranks
   let ranks: Record<string, number> = {};
   if (existsSync(rankPath)) {
@@ -161,82 +158,69 @@ export async function searchNotecards(opts: SearchOptions): Promise<SearchResult
     }
   }
 
-  const results: SearchResult[] = [];
-  const fileStream = createReadStream(cardsPath);
-  const rl = createInterface({ input: fileStream, crlfDelay: Infinity });
+  // 2. Load all cards (required for Fuse)
+  const allCards = await readAllNotecards(cardsPath);
+  
+  // 3. Filter if necessary
+  const filteredCards = allCards.filter(c => matchesFilters(c, opts.filters));
 
-  for await (const line of rl) {
-    if (!line.trim()) continue;
-    const card = JSON.parse(line) as Card;
-    if (!matchesFilters(card, opts.filters)) continue;
-    
-    let score = 0;
-    const why: string[] = [];
-
-    const pathLower = (card.source_path || '').toLowerCase();
-    const tagsLower = (card.tags || []).map(t => t.toLowerCase());
-    const exportsLower = (card.exports || []).map(e => e.toLowerCase());
-    const searchLower = (card.search_text || '').toLowerCase();
-    const contextLower = (card.context_text || '').toLowerCase();
-
-    for (const term of terms) {
-      let termScore = 0;
-
-      // Exact path match
-      if (pathLower.includes(term)) {
-        termScore += 50;
-        why.push(`path contains: ${term}`);
-      }
-
-      // Tag match
-      if (tagsLower.includes(term)) {
-        termScore += 30;
-        why.push(`tag match: ${term}`);
-      }
-
-      // Export match
-      if (exportsLower.includes(term)) {
-        termScore += 25;
-        why.push(`export match: ${term}`);
-      }
-
-      // Frequency in search_text
-      const stFreq = (searchLower.split(term).length - 1);
-      if (stFreq > 0) {
-        termScore += stFreq * 5;
-        why.push(`search_text frequency (${stFreq}): ${term}`);
-      }
-
-      // Frequency in context_text
-      const ctFreq = (contextLower.split(term).length - 1);
-      if (ctFreq > 0) {
-        termScore += ctFreq * 2;
-        why.push(`context_text frequency (${ctFreq}): ${term}`);
-      }
-
-      score += termScore;
-    }
-
-    if (score > 0) {
-      // Rank boost (multiplicative)
-      const r = ranks[card.source_path] || 0.01;
-      const finalScore = score * (1 + r);
-      if (r > 0.01) why.push(`rank boost: ${r.toFixed(4)}`);
-
-      results.push({
+  if (!query.trim()) {
+    // Return top-ranked cards if no query
+    return filteredCards
+      .sort((a, b) => (ranks[b.source_path] || 0) - (ranks[a.source_path] || 0))
+      .slice(0, limit)
+      .map(card => ({
         card_id: card.card_id,
         source_path: card.source_path,
-        score: Number(finalScore.toFixed(2)),
-        why: Array.from(new Set(why)),
+        score: ranks[card.source_path] || 0,
+        why: ['rank-only (empty query)'],
         context_text: card.context_text,
         kind: card.kind,
         tags: card.tags,
-        rank_score: r
-      });
-    }
+        rank_score: ranks[card.source_path] || 0
+      }));
   }
 
-  // Sort and limit
+  // 4. Fuse.js search
+  const fuse = new Fuse(filteredCards, {
+    keys: [
+      { name: 'source_path', weight: 1.0 },
+      { name: 'title', weight: 0.8 },
+      { name: 'tags', weight: 0.6 },
+      { name: 'exports', weight: 0.5 },
+      { name: 'search_text', weight: 0.3 },
+      { name: 'context_text', weight: 0.1 }
+    ],
+    includeScore: true,
+    threshold: 0.4,
+    ignoreLocation: true,
+    useExtendedSearch: true
+  });
+
+  const fuseResults = fuse.search(query);
+
+  const results: SearchResult[] = fuseResults.map(({ item: card, score: fuseScore = 1 }) => {
+    // Fuse score is 0 to 1, where 0 is perfect match.
+    // We want higher = better for our API.
+    const lexicalScore = (1 - fuseScore) * 100;
+    const r = ranks[card.source_path] || 0.01;
+    const finalScore = lexicalScore * (1 + r);
+    
+    const why = [`fuse-lexical: ${(1 - fuseScore).toFixed(2)}`];
+    if (r > 0.01) why.push(`rank-boost: ${r.toFixed(4)}`);
+
+    return {
+      card_id: card.card_id,
+      source_path: card.source_path,
+      score: Number(finalScore.toFixed(2)),
+      why,
+      context_text: card.context_text,
+      kind: card.kind,
+      tags: card.tags,
+      rank_score: r
+    };
+  });
+
   return results
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);

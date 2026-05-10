@@ -97,20 +97,13 @@ export const caseRiskLevelEnum = pgEnum('case_risk_level', ['low', 'medium', 'hi
 // === TABLES FOR LEGAL AI APPLICATION ===
 
 export const users = pgTable('users', {
-  id: uuid('id')
-    .default(sql`gen_random_uuid()`)
-    .primaryKey()
-    .notNull(),
+  id: serial('id').primaryKey().notNull(),
   email: varchar('email', { length: 255 }).unique().notNull(),
   passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
   name: varchar('name', { length: 255 }), // Legacy field - use firstName/lastName instead
   firstName: varchar('first_name', { length: 255 }),
   lastName: varchar('last_name', { length: 255 }),
   role: userRoleEnum('role').notNull().default('prosecutor'),
-  isActive: boolean('is_active').default(true).notNull(),
-  avatarUrl: text('avatar_url'),
-  hasCompletedOnboarding: boolean('has_completed_onboarding').default(false).notNull(),
-  onboardingStep: integer('onboarding_step').default(0),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
@@ -573,7 +566,7 @@ export const userAiQueries = pgTable(
       .default(sql`gen_random_uuid()`)
       .primaryKey()
       .notNull(),
-    userId: uuid('user_id').notNull(),
+    userId: integer('user_id').notNull(),
     caseId: uuid('case_id'),
     query: text('query').notNull(),
     response: text('response').notNull(),
@@ -615,7 +608,7 @@ export const autoTags = pgTable(
     source: varchar('source', { length: 100 }).notNull(), // e.g., 'ai_analysis', 'user'
     model: varchar('model', { length: 100 }),
     isConfirmed: boolean('is_confirmed').default(false).notNull(),
-    confirmedBy: uuid('confirmed_by'), // FK to users.id
+    confirmedBy: integer('confirmed_by'), // FK to users.id
     confirmedAt: timestamp('confirmed_at', { mode: 'string' }),
     createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
   },
@@ -667,8 +660,8 @@ export const caseActivities = pgTable('case_activities', {
     .primaryKey()
     .notNull(),
   caseId: uuid('case_id'),
-  assignedTo: uuid('assigned_to'),
-  createdBy: uuid('created_by'),
+  assignedTo: integer('assigned_to'),
+  createdBy: integer('created_by'),
   activityType: varchar('activity_type', { length: 100 }),
   description: text('description'),
   status: activityStatusEnum('status'),
@@ -697,7 +690,7 @@ export const canvasStates = pgTable('canvas_states', {
     .primaryKey()
     .notNull(),
   caseId: uuid('case_id'), // FK to cases.id
-  userId: uuid('user_id'), // FK to users.id
+  userId: integer('user_id'), // FK to users.id
   stateData: jsonb('state_data').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
@@ -730,7 +723,7 @@ export const aiReports = pgTable('ai_reports', {
     .primaryKey()
     .notNull(),
   caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }), // FK to cases.id
-  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }), // FK to users.id
+  createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }), // FK to users.id
   reportType: varchar('report_type', { length: 100 }).notNull(),
   summary: text('summary'),
   fullReport: text('full_report'),
@@ -3550,7 +3543,7 @@ export type NewWhisperSegment = typeof whisperSegments.$inferInsert;
 export const aceContextCache = pgTable('ace_context_cache', {
   id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
   queryHash: text('query_hash').notNull(),
-  userId: uuid('user_id'),
+  userId: integer('user_id'),
   policyTier: varchar('policy_tier', { length: 30 }).notNull(),
   contextJson: jsonb('context_json').notNull(),
   chunkCount: integer('chunk_count').default(0).notNull(),
@@ -3587,7 +3580,7 @@ export type NewKnowledgeArtifact = typeof knowledgeArtifacts.$inferInsert;
 // === SYNTHESIS RUNS ===
 export const synthesisRuns = pgTable('synthesis_runs', {
   id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-  userId: uuid('user_id'),
+  userId: integer('user_id'),
   query: text('query').notNull(),
   model: varchar('model', { length: 100 }).notNull(),
   cacheHit: varchar('cache_hit', { length: 10 }),
@@ -3722,7 +3715,7 @@ export const researchSummaries = pgTable('research_summaries', {
   /** 768-dim embeddinggemma vector — NULL if embedding unavailable at ingest time */
   embedding:      vector('embedding', { dimensions: 768 }),
   /** NULL = anonymous / system-generated summary */
-  userId:         uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  userId:         integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   /** Set when the user promotes this summary to a saved citation */
   savedCitationId: uuid('saved_citation_id').references(() => citations.id, { onDelete: 'set null' }),
   /**
@@ -3738,12 +3731,6 @@ export const researchSummaries = pgTable('research_summaries', {
    * pagination by manifold region).
    */
   manifold4:      real('manifold4').array(),
-  /**
-   * Structured 1-3 sentence summary + citations + confidence.
-   * Stored as JSONB so simdjson AVX2 fast-parse can decode at 2-5× V8 speed.
-   * Schema matches CodeLlmOutputMeta from code_llm_index.
-   */
-  outputMeta:     jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
   createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => [
   index('rs_pipeline_score_id').on(t.pipeline, t.relevanceScore, t.id),
@@ -3848,7 +3835,7 @@ export type NewWebSearchIndexRow = typeof webSearchIndex.$inferInsert;
 export const contextTimeline = pgTable('context_timeline', {
   id:                  uuid('id').defaultRandom().primaryKey(),
   /** null = anonymous / system-generated event */
-  userId:              uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  userId:              integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   sessionId:           text('session_id').notNull().default(''),
   /** Broad event class — drives downstream QLoRA distillation selector */
   eventType:           text('event_type').notNull(),

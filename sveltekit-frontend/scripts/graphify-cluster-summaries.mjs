@@ -137,7 +137,7 @@ async function upsertGlyph(id, vector, payload) {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      points: [{ id, vector, payload }],
+      points: [{ id, vector: { content: vector }, payload }],
     }),
     signal: AbortSignal.timeout(15_000),
   });

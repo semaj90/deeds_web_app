@@ -15,6 +15,35 @@
   let chatEnd = $state<HTMLDivElement | null>(null);
   let systemStatus = $state<any>(null);
 
+  // Browser-context lane (untrusted user-visible). Polled on mount + after
+  // every send so the indicator reflects what the server has stored. Empty
+  // is a normal/expected state — no extension installed yet.
+  let browserCtx = $state<{
+    source: 'redis' | 'memory' | 'empty' | 'unknown';
+    tabs: number;
+    snippets: number;
+    redactions: number;
+    deviceLabel: string;
+  }>({ source: 'unknown', tabs: 0, snippets: 0, redactions: 0, deviceLabel: '—' });
+
+  async function refreshBrowserContext() {
+    try {
+      const r = await fetch('/api/browser-context/snapshot', { credentials: 'include' });
+      if (!r.ok) { browserCtx = { source: 'unknown', tabs: 0, snippets: 0, redactions: 0, deviceLabel: '—' }; return; }
+      const { snapshot, source } = await r.json();
+      browserCtx = {
+        source,
+        tabs:        snapshot.tabs?.length ?? 0,
+        snippets:    snapshot.snippets?.length ?? 0,
+        redactions:  (snapshot.sanitized?.urls_redacted ?? 0)
+                   + (snapshot.sanitized?.snippet_redactions ?? 0),
+        deviceLabel: snapshot.embed_device ?? '—',
+      };
+    } catch {
+      browserCtx = { source: 'unknown', tabs: 0, snippets: 0, redactions: 0, deviceLabel: '—' };
+    }
+  }
+
   // Lifecycle
   onMount(async () => {
     // Initial history fetch
@@ -26,6 +55,7 @@
       const { history } = await histRes.json();
       messages = history || [];
     }
+    refreshBrowserContext();
     scrollToBottom();
   });
 
@@ -179,9 +209,21 @@
       </div>
       <div class="mt-2 flex justify-between items-center">
         <span class="text-[10px] text-zinc-600 font-mono">GEMMA4-LEGAL-VLM :3040</span>
-        <div class="flex gap-2">
-           <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
-           <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
+        <div class="flex items-center gap-3">
+          <span
+            class="text-[10px] font-mono"
+            class:text-zinc-600={browserCtx.source === 'empty' || browserCtx.source === 'unknown'}
+            class:text-emerald-500={browserCtx.source === 'redis' || browserCtx.source === 'memory'}
+            title={`Browser context: ${browserCtx.source} · ${browserCtx.deviceLabel} · tabs=${browserCtx.tabs} snippets=${browserCtx.snippets} redactions=${browserCtx.redactions}\n(untrusted user-visible — TRACE backend is authoritative)`}
+          >
+            BROWSER {browserCtx.source === 'empty' || browserCtx.source === 'unknown'
+              ? '—'
+              : `t=${browserCtx.tabs}/s=${browserCtx.snippets}`}
+          </span>
+          <div class="flex gap-2">
+             <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
+             <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
+          </div>
         </div>
       </div>
     </div>

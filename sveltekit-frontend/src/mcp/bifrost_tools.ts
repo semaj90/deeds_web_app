@@ -11,11 +11,14 @@ const TURBOQUANT_URL = ENV.TURBOQUANT_BASE_URL;
  */
 export function registerBifrostTools(server: McpServer) {
 
-  server.tool(
+  server.registerTool(
     'trace.bifrost_dispatch',
     {
-      tier: z.enum(['EMBED', 'RERANK', 'GENERATE_FAST', 'GENERATE_LONG']).describe('Inference tier'),
-      payload: z.record(z.string(), z.any()).describe('OpenAI-compatible payload or tool-specific JSON')
+      description: 'Unified inference routing (Bifrost Gateway).',
+      inputSchema: {
+        tier: z.enum(['EMBED', 'RERANK', 'GENERATE_FAST', 'GENERATE_LONG']).describe('Inference tier'),
+        payload: z.record(z.string(), z.any()).describe('OpenAI-compatible payload or tool-specific JSON')
+      }
     },
     async ({ tier, payload }) => {
       let targetUrl = '';

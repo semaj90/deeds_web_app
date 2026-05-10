@@ -13,7 +13,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path          from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const scriptDir  = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDir, '..');
@@ -22,7 +22,9 @@ const HOST    = process.env.TRACE_MCP_HOST ?? '127.0.0.1';
 const PORT    = process.env.TRACE_MCP_PORT ?? '8788';
 const BASE    = `http://${HOST}:${PORT}`;
 const TIMEOUT = 500;
-const RETRIES = 20;
+// Cold-start budget: tsx must compile + load full MCP tool registration on
+// Windows, which routinely takes 15-25s. 60 × 500ms = 30s is the new ceiling.
+const RETRIES = 60;
 const REQUIRED_TOOLS = ['kag.record_agent_run', 'kag.ingest_memory_directory'];
 
 export async function isTraceMcpHealthy() {
@@ -99,30 +101,61 @@ export async function ensureTraceMcp() {
     return false;
   }
 
-  const tsxBin = process.platform === 'win32'
-    ? path.join(projectRoot, 'node_modules', '.bin', 'tsx.cmd')
-    : path.join(projectRoot, 'node_modules', '.bin', 'tsx');
-  const runner = existsSync(tsxBin) ? tsxBin : 'tsx';
+  // Capture stderr/stdout to a log file. Without this, startup crashes
+  // (TDZ errors, missing imports, port-bind failures) are invisible — the
+  // operator only sees "did not become healthy in time" with no clue why.
+  const { mkdirSync, openSync, readFileSync } = await import('node:fs');
+  const logDir  = path.join(projectRoot, 'logs', 'trace-mcp');
+  mkdirSync(logDir, { recursive: true });
+  const stamp   = new Date().toISOString().replace(/[:.]/g, '-');
+  const errPath = path.join(logDir, `launch-${stamp}.err`);
+  const outPath = path.join(logDir, `launch-${stamp}.out`);
+  const errFd   = openSync(errPath, 'a');
+  const outFd   = openSync(outPath, 'a');
 
-  const launchArgs = process.platform === 'win32'
-    ? ['/d', '/c', runner, serverEntry]
-    : [serverEntry];
+  // Spawn `node` directly with the tsx loader args, bypassing tsx.cmd /
+  // cmd.exe entirely. Earlier versions of this script wrapped via
+  // `cmd.exe /d /c tsx.cmd ...` (3-process indirection) or `{shell:true}`
+  // (Node internally maps to `cmd.exe /d /s /c "..."` on Windows) — both
+  // break fd inheritance for the grandchild Node process when combined with
+  // detached:true, leaving .err/.out files at 0 bytes. By spawning node
+  // directly with the tsx preflight + loader, the child IS the Node process —
+  // fds inherit cleanly, all stdout/stderr lands in the captured files.
+  const tsxPreflight = path.join(projectRoot, 'node_modules', 'tsx', 'dist', 'preflight.cjs');
+  const tsxLoader    = path.join(projectRoot, 'node_modules', 'tsx', 'dist', 'loader.mjs');
+  const tsxLoaderUrl = pathToFileURL(tsxLoader).href;
+  if (!existsSync(tsxPreflight) || !existsSync(tsxLoader)) {
+    console.error('[ensure-mcp-server] tsx loader files missing — run `npm ci`');
+    return false;
+  }
+  const nodeArgs = ['--require', tsxPreflight, '--import', tsxLoaderUrl, serverEntry];
 
-  const child = spawn(process.platform === 'win32' ? 'cmd.exe' : runner, launchArgs, {
+  const child = spawn(process.execPath, nodeArgs, {
     detached:    true,
-    stdio:       'ignore',
+    stdio:       ['ignore', outFd, errFd],
     windowsHide: true,
     env: { ...process.env },
     cwd: projectRoot,
   });
   child.unref();
 
-  // Poll until healthy or timeout
+  // Poll until healthy or timeout. Bail early if the child has already
+  // exited (almost always a startup crash).
   for (let i = 0; i < RETRIES; i++) {
     await new Promise((r) => setTimeout(r, 500));
     if (await isTraceMcpHealthy()) return true;
+    if (child.exitCode !== null) {
+      console.error(`[ensure-mcp-server] TRACE MCP exited code=${child.exitCode} after ${(i + 1) * 500}ms`);
+      try {
+        const tail = readFileSync(errPath, 'utf8').split('\n').slice(-15).join('\n');
+        if (tail.trim()) console.error('  stderr (tail):\n  ' + tail.replace(/\n/g, '\n  '));
+        console.error(`  full log: ${errPath}`);
+      } catch {}
+      return false;
+    }
   }
-  console.error('[ensure-mcp-server] TRACE MCP server did not become healthy in time');
+  console.error(`[ensure-mcp-server] TRACE MCP server did not become healthy in ${RETRIES * 500}ms`);
+  console.error(`  stderr log: ${errPath}`);
   return false;
 }
 

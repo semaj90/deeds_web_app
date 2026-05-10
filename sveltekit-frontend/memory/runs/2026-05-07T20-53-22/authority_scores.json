@@ -1,9 +1,9 @@
 {
   "runId": "2026-05-07T20-53-22",
-  "writtenAt": "2026-05-10T02:44:19.403Z",
+  "writtenAt": "2026-05-10T02:51:41.541Z",
   "nodesScored": 2772,
   "nodesMirrored": 7416,
-  "durationMs": 10966,
+  "durationMs": 10334,
   "collection": "codebase_chunks_768",
   "neo4jUri": "bolt://localhost:7687",
   "qdrantUrl": "http://127.0.0.1:6333",

@@ -9,12 +9,15 @@ const SEARXNG_URL = process.env.SEARXNG_URL || 'http://localhost:8888';
 export function registerResearchTools(server: McpServer) {
 
   // == research.web_search ====================================================
-  server.tool(
+  server.registerTool(
     'research.web_search',
     {
-      query: z.string().describe('The search query'),
-      engines: z.string().optional().describe('Comma-separated list of engines (e.g. "google,bing")'),
-      limit: z.number().default(5).describe('Number of results to return')
+      description: 'Search the web using SearXNG.',
+      inputSchema: z.object({
+        query: z.string().describe('The search query'),
+        engines: z.string().optional().describe('Comma-separated list of engines (e.g. "google,bing")'),
+        limit: z.number().default(5).describe('Number of results to return')
+      })
     },
     async ({ query, engines, limit }) => {
       try {
@@ -48,11 +51,14 @@ export function registerResearchTools(server: McpServer) {
   /**
    * Performs a multi-query expansion and synthesis of search results.
    */
-  server.tool(
+  server.registerTool(
     'research.deep_analyze',
     {
-      topic: z.string().describe('The research topic to analyze in depth'),
-      depth: z.enum(['standard', 'exhaustive']).default('standard')
+      description: 'Performs a multi-query expansion and synthesis of search results.',
+      inputSchema: z.object({
+        topic: z.string().describe('The research topic to analyze in depth'),
+        depth: z.enum(['standard', 'exhaustive']).default('standard')
+      })
     },
     async ({ topic, depth }) => {
       // This tool orchestrates multiple web searches and synthesizes them.

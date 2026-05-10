@@ -1,83 +1,203 @@
 {
-  "query": "auth redis",
-  "limit": 5,
-  "generated_at": "2026-05-09T00:49:42.857Z",
+  "query": "auth",
+  "limit": 10,
+  "generated_at": "2026-05-09T16:24:54.392Z",
   "results": [
-    {
-      "card_id": "card:codebase:src/lib/server/redis.ts:63deb4bc891c",
-      "source_path": "src/lib/server/redis.ts",
-      "score": 199.51559999999998,
-      "why": [
-        "context_text frequency (1): auth",
-        "path contains: redis",
-        "tag match: redis",
-        "export match: redis",
-        "search_text frequency (9): redis",
-        "context_text frequency (10): redis",
-        "rank boost: 0.2708"
-      ],
-      "context_text": "NODE src/lib/server/redis.ts\ndomain=codebase kind=server zone=server risk=0.242 lines=241\nsource_id=src/lib/server/redis.ts\nsource_hash=63deb4bc891c\ntags=ts,src,lib,server,zod,redis\nexports=redisPool,getRedis,redis,createRedisInstance,createRedisConnection,ensureRedis,CachedChatMessage,cacheMessage,getCachedMessages,invalidateChatCache\nguards auth=false zod=true\nfan=in:0 out:0\nneighbors=src/lib/server/env.server.js\nsummary=Redis Connection Pool"
-    },
     {
       "card_id": "card:codebase:src/lib/server/auth.ts:d0259f15760d",
       "source_path": "src/lib/server/auth.ts",
-      "score": 196.24720000000002,
+      "score": 101,
       "why": [
-        "path contains: auth",
-        "tag match: auth",
-        "export match: auth",
-        "search_text frequency (8): auth",
-        "context_text frequency (11): auth",
-        "rank boost: 0.2911"
+        "fuse-lexical: 1.00"
       ],
-      "context_text": "NODE src/lib/server/auth.ts\ndomain=codebase kind=server zone=server risk=0.365 lines=561\nsource_id=src/lib/server/auth.ts\nsource_hash=d0259f15760d\ntags=ts,src,lib,server,db-schema,auth\nexports=auth,Auth,AuthService,authService,getUser,requireAuth\nguards auth=true zod=false\nfan=in:0 out:0\nneighbors=@lucia-auth/adapter-drizzle, @sveltejs/kit, src/lib/server/db/client, src/lib/server/db/schema.js, src/lib/server/env.server.js, src/lib/server/errors.js, src/lib/server/utils/endpoints.js\nsummary=src/"
+      "context_text": "NODE src/lib/server/auth.ts\ndomain=codebase kind=server zone=server risk=0.365 lines=561\nsource_id=src/lib/server/auth.ts\nsource_hash=d0259f15760d\ntags=ts,src,lib,server,db-schema,auth\nexports=auth,Auth,AuthService,authService,getUser,requireAuth\nguards auth=true zod=false\nfan=in:0 out:0\nneighbors=@lucia-auth/adapter-drizzle, @sveltejs/kit, src/lib/server/db/client, src/lib/server/db/schema.js, src/lib/server/env.server.js, src/lib/server/errors.js, src/lib/server/utils/endpoints.js\nsummary=src/lib/server/auth.ts",
+      "kind": "server",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "db-schema",
+        "auth"
+      ],
+      "rank_score": 0.01
     },
     {
-      "card_id": "card:codebase:src/routes/api/v1/redis/cache/+server.ts:4ad3746dd83f",
-      "source_path": "src/routes/api/v1/redis/cache/+server.ts",
-      "score": 178.21470000000002,
+      "card_id": "card:codebase:src/lib/machines/auth-machine.ts:dd9938068f2a",
+      "source_path": "src/lib/machines/auth-machine.ts",
+      "score": 101,
       "why": [
-        "tag match: auth",
-        "search_text frequency (1): auth",
-        "context_text frequency (2): auth",
-        "path contains: redis",
-        "tag match: redis",
-        "search_text frequency (4): redis",
-        "context_text frequency (7): redis",
-        "rank boost: 0.4489"
+        "fuse-lexical: 1.00"
       ],
-      "context_text": "NODE src/routes/api/v1/redis/cache/+server.ts\ndomain=codebase kind=route zone=server risk=0.564 lines=33\nsource_id=src/routes/api/v1/redis/cache/+server.ts\nsource_hash=4ad3746dd83f\ntags=ts,src,routes,api,route,api-handler,auth,zod,server,redis,cache\nexports=POST\nguards auth=true zod=true\nfan=in:0 out:0\nneighbors=src/routes/api/v1/redis/cache/$types, @sveltejs/kit, src/lib/server/redis.js\nsummary=POST /api/v1/redis/cache — Set a key-value pair in Redis"
+      "context_text": "NODE src/lib/machines/auth-machine.ts\ndomain=codebase kind=module zone=shared risk=0.283 lines=398\nsource_id=src/lib/machines/auth-machine.ts\nsource_hash=dd9938068f2a\ntags=ts,src,lib,machines,module,shared,auth\nexports=User,Session,AuthContext,AuthEvent,authMachine,AuthMachine,authActor\nguards auth=false zod=false\nfan=in:0 out:0\nneighbors=none\nsummary=Auth State Machine — XState v5",
+      "kind": "module",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "machines",
+        "module",
+        "shared",
+        "auth"
+      ],
+      "rank_score": 0.01
     },
     {
-      "card_id": "card:codebase:src/lib/shims/ioredis-browser-shim.js:56459217d242",
-      "source_path": "src/lib/shims/ioredis-browser-shim.js",
-      "score": 165.1071,
+      "card_id": "card:codebase:src/auth-store.svelte.ts:19b690a211a6",
+      "source_path": "src/auth-store.svelte.ts",
+      "score": 101,
       "why": [
-        "context_text frequency (1): auth",
-        "path contains: redis",
-        "tag match: redis",
-        "export match: redis",
-        "search_text frequency (5): redis",
-        "context_text frequency (6): redis",
-        "rank boost: 0.2799"
+        "fuse-lexical: 1.00"
       ],
-      "context_text": "NODE src/lib/shims/ioredis-browser-shim.js\ndomain=codebase kind=module zone=shared risk=0.245 lines=416\nsource_id=src/lib/shims/ioredis-browser-shim.js\nsource_hash=56459217d242\ntags=js,src,lib,shims,zod,module,shared,redis\nexports=RedisShim,Redis,Cluster\nguards auth=false zod=true\nfan=in:0 out:0\nneighbors=none\nsummary=IORedis Browser Shim for Legal AI Platform"
+      "context_text": "NODE src/auth-store.svelte.ts\ndomain=codebase kind=store zone=shared risk=0.263 lines=244\nsource_id=src/auth-store.svelte.ts\nsource_hash=19b690a211a6\ntags=ts,src,auth-store.svelte.ts,store,shared,auth\nexports=AuthUser,Session,UserSession,authStore\nguards auth=false zod=false\nfan=in:0 out:0\nneighbors=$app/environment\nsummary=Svelte 5 Auth Store",
+      "kind": "store",
+      "tags": [
+        "ts",
+        "src",
+        "auth-store.svelte.ts",
+        "store",
+        "shared",
+        "auth"
+      ],
+      "rank_score": 0.01
     },
     {
-      "card_id": "card:codebase:src/routes/api/test/redis-write/+server.ts:30966346a516",
-      "source_path": "src/routes/api/test/redis-write/+server.ts",
-      "score": 161.8432,
+      "card_id": "card:codebase:src/lib/server/retrieval/authority-chain.ts:db431df9f717",
+      "source_path": "src/lib/server/retrieval/authority-chain.ts",
+      "score": 101,
       "why": [
-        "tag match: auth",
-        "search_text frequency (1): auth",
-        "context_text frequency (2): auth",
-        "path contains: redis",
-        "tag match: redis",
-        "search_text frequency (3): redis",
-        "context_text frequency (6): redis",
-        "rank boost: 0.3952"
+        "fuse-lexical: 1.00"
       ],
-      "context_text": "NODE src/routes/api/test/redis-write/+server.ts\ndomain=codebase kind=route zone=server risk=0.516 lines=45\nsource_id=src/routes/api/test/redis-write/+server.ts\nsource_hash=30966346a516\ntags=ts,src,routes,api,route,api-handler,auth,zod,test,server,redis\nexports=POST\nguards auth=true zod=true\nfan=in:0 out:0\nneighbors=@sveltejs/kit, $app/environment, src/routes/api/test/redis-write/$types, src/lib/server/redis.js\nsummary=POST /api/test/redis-write"
+      "context_text": "NODE src/lib/server/retrieval/authority-chain.ts\ndomain=codebase kind=server zone=server risk=0.340 lines=373\nsource_id=src/lib/server/retrieval/authority-chain.ts\nsource_hash=db431df9f717\ntags=ts,src,lib,server,auth\nexports=ContextDoc,AuthorityChainConfig,AuthorityChainResult,EmbedFn,authorityChainExpansion\nguards auth=false zod=false\nfan=in:0 out:0\nneighbors=src/lib/server/config/vector-config.js, src/lib/server/rag/tag-extractor.js, src/lib/server/cache.js, src/lib/server/observability/inference-log.js, src/lib/server/observability/langfuse.js, src/lib/server/gpu/pytorch-graph.js, src/lib/server/types/retrieval.js\nsummary=Authority Chain Drill-Down (P4: Recursive Multi-Hop Retrieval)",
+      "kind": "server",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "auth"
+      ],
+      "rank_score": 0.01
+    },
+    {
+      "card_id": "card:codebase:src/lib/stores/auth-store.svelte.ts:e2917fa6b6e6",
+      "source_path": "src/lib/stores/auth-store.svelte.ts",
+      "score": 101,
+      "why": [
+        "fuse-lexical: 1.00"
+      ],
+      "context_text": "NODE src/lib/stores/auth-store.svelte.ts\ndomain=codebase kind=store zone=shared risk=0.265 lines=260\nsource_id=src/lib/stores/auth-store.svelte.ts\nsource_hash=e2917fa6b6e6\ntags=ts,src,lib,stores,store,shared,auth\nexports=AuthUser,Session,UserSession,authStore\nguards auth=false zod=false\nfan=in:0 out:0\nneighbors=$app/environment\nsummary=Svelte 5 Auth Store",
+      "kind": "store",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "stores",
+        "store",
+        "shared",
+        "auth"
+      ],
+      "rank_score": 0.01
+    },
+    {
+      "card_id": "card:codebase:src/lib/server/auth-helpers.ts:fce9250a7a20",
+      "source_path": "src/lib/server/auth-helpers.ts",
+      "score": 101,
+      "why": [
+        "fuse-lexical: 1.00"
+      ],
+      "context_text": "NODE src/lib/server/auth-helpers.ts\ndomain=codebase kind=server zone=server risk=0.302 lines=93\nsource_id=src/lib/server/auth-helpers.ts\nsource_hash=fce9250a7a20\ntags=ts,src,lib,server,auth\nexports=AuthResult,getUserWithFallback,requireAuth,hasRole,requireRole,getOptionalUser\nguards auth=true zod=false\nfan=in:0 out:0\nneighbors=@sveltejs/kit\nsummary=Authentication helpers that trust the user/session already resolved by hooks.server.ts.",
+      "kind": "server",
+      "tags": [
+        "ts",
+        "src",
+        "lib",
+        "server",
+        "auth"
+      ],
+      "rank_score": 0.01
+    },
+    {
+      "card_id": "card:codebase:tests/auth-api.spec.ts:7136c817b942",
+      "source_path": "tests/auth-api.spec.ts",
+      "score": 101,
+      "why": [
+        "fuse-lexical: 1.00"
+      ],
+      "context_text": "NODE tests/auth-api.spec.ts\ndomain=codebase kind=module zone=shared risk=0.249 lines=215\nsource_id=tests/auth-api.spec.ts\nsource_hash=7136c817b942\ntags=ts,tests,auth-api.spec.ts,auth,test,module,shared\nexports=none\nguards auth=true zod=false\nfan=in:0 out:0\nneighbors=@playwright/test, tests/fixtures/test-cases.js, tests/helpers/env-ports.js",
+      "kind": "module",
+      "tags": [
+        "ts",
+        "tests",
+        "auth-api.spec.ts",
+        "auth",
+        "test",
+        "module",
+        "shared"
+      ],
+      "rank_score": 0.01
+    },
+    {
+      "card_id": "card:codebase:tests/fixtures/demo-auth.ts:a6018bc4fd83",
+      "source_path": "tests/fixtures/demo-auth.ts",
+      "score": 101,
+      "why": [
+        "fuse-lexical: 1.00"
+      ],
+      "context_text": "NODE tests/fixtures/demo-auth.ts\ndomain=codebase kind=module zone=shared risk=0.236 lines=45\nsource_id=tests/fixtures/demo-auth.ts\nsource_hash=a6018bc4fd83\ntags=ts,tests,fixtures,demo-auth.ts,auth,test,module,shared\nexports=test\nguards auth=true zod=false\nfan=in:0 out:0\nneighbors=tests/fixtures/demo-auth, @playwright/test\nsummary=Playwright Auth Fixture",
+      "kind": "module",
+      "tags": [
+        "ts",
+        "tests",
+        "fixtures",
+        "demo-auth.ts",
+        "auth",
+        "test",
+        "module",
+        "shared"
+      ],
+      "rank_score": 0.01
+    },
+    {
+      "card_id": "card:codebase:tests/auth-ui-flow.spec.ts:7201b9764ac3",
+      "source_path": "tests/auth-ui-flow.spec.ts",
+      "score": 101,
+      "why": [
+        "fuse-lexical: 1.00"
+      ],
+      "context_text": "NODE tests/auth-ui-flow.spec.ts\ndomain=codebase kind=module zone=shared risk=0.267 lines=275\nsource_id=tests/auth-ui-flow.spec.ts\nsource_hash=7201b9764ac3\ntags=ts,tests,auth-ui-flow.spec.ts,auth,test,module,shared\nexports=none\nguards auth=true zod=false\nfan=in:0 out:0\nneighbors=@playwright/test, tests/helpers/env-ports.js\nsummary=Auth UI Browser Flow Tests",
+      "kind": "module",
+      "tags": [
+        "ts",
+        "tests",
+        "auth-ui-flow.spec.ts",
+        "auth",
+        "test",
+        "module",
+        "shared"
+      ],
+      "rank_score": 0.01
+    },
+    {
+      "card_id": "card:codebase:tests/phase97-authenticated-streaming.spec.ts:2bb4057aed81",
+      "source_path": "tests/phase97-authenticated-streaming.spec.ts",
+      "score": 101,
+      "why": [
+        "fuse-lexical: 1.00"
+      ],
+      "context_text": "NODE tests/phase97-authenticated-streaming.spec.ts\ndomain=codebase kind=module zone=shared risk=0.408 lines=435\nsource_id=tests/phase97-authenticated-streaming.spec.ts\nsource_hash=2bb4057aed81\ntags=ts,tests,phase97-authenticated-streaming.spec.ts,auth,zod,test,module,shared\nexports=none\nguards auth=true zod=true\nfan=in:0 out:0\nneighbors=@playwright/test, fs/promises\nsummary=Phase 97: Authenticated Streaming API Tests",
+      "kind": "module",
+      "tags": [
+        "ts",
+        "tests",
+        "phase97-authenticated-streaming.spec.ts",
+        "auth",
+        "zod",
+        "test",
+        "module",
+        "shared"
+      ],
+      "rank_score": 0.01
     }
   ]
 }

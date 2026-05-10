@@ -82,7 +82,11 @@ const PRESET_DOC_URLS: Record<string, string[]> = {
 // ── Schema ────────────────────────────────────────────────────────────────────
 
 const schema = z.object({
-	urls:   z.array(z.url()).max(30).optional().default([]),
+	// `z.string().url()` works in both Zod v3 and v4. The shorter v4-only
+	// `z.url()` form was the lone Zod-v4-only call site in src/ — kept as a
+	// reminder if/when the project pins Zod ^3.25.76 to fix the MCP SDK
+	// `tools/list` crash (zod-to-json-schema 3.x is v3-only). Same semantics.
+	urls:   z.array(z.string().url()).max(30).optional().default([]),
 	preset: z.array(z.enum(['drizzle', 'sveltekit', 'qdrant', 'langchain', 'karpathy'])).optional().default([]),
 	rescan: z.boolean().optional().default(false),
 });

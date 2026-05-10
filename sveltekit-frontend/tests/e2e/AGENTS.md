@@ -1,18 +1,18 @@
 # AGENTS.md — `tests/e2e`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-08T21:57:37.606Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-09T22:22:23.446Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/e2e
 
 ## Snapshot
 
-- module directory with 21 files, 0 API handlers
+- module directory with 22 files, 0 API handlers
 - Audit score: **90/100**
 - no audit signals
 - Tags: `tests` `e2e` `all-routes-sse.spec.ts` `test` `auth-login-db.spec.ts` `auth`
 
-## Files (21)
+## Files (22)
 
 - `tests/e2e/all-routes-sse.spec.ts`
 - `tests/e2e/auth-login-db.spec.ts`
@@ -35,7 +35,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/21 files have paired tests
+- **Paired tests**: 0/22 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 
