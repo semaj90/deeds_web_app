@@ -103,6 +103,12 @@ import type { TopoPrefilterStats } from '$lib/server/cache/topo-candidate-cache.
 import { aceCodeKey, aceTopologicalKagKey, TTL } from '$lib/server/cache-keys.js';
 import { fetchDeepImportGraphExpansion } from './graph-expander.js';
 import { runRetrievalLanes, type MultiLaneOutput } from './retrieval-lanes.js';
+import {
+  QueryRouter4x4,
+  extractSignal,
+  rrfFuse,
+  type ScoredResult,
+} from '$lib/server/routing/query-router-4x4.js';
 import { buildRetrievalEdge, insertHyperedge } from '$lib/server/hypergraph/hypergraph-builder.js';
 import { recordLastQuery, recordEngramTransition } from '$lib/server/search/engram-bigram.js';
 import { tokenizeBowQuery, weightedBowOverlapScore, boundedBowBoost } from '$lib/server/search/bow-utils.js';
@@ -113,6 +119,27 @@ import {
   readLatestRelationSynthesis,
   type ClusterTagsEntry,
 } from './cluster-tags-cache.js';
+
+// ── QueryRouter4x4 singleton — persisted to Redis ace:router4x4:matrix (24h) ─
+// Reads saved matrix on first call; adapts after each retrieval cycle.
+let _router4x4: QueryRouter4x4 | null = null;
+async function getRouter4x4(): Promise<QueryRouter4x4> {
+  if (_router4x4) return _router4x4;
+  try {
+    const r = getRedis();
+    const saved = await r.get('ace:router4x4:matrix');
+    _router4x4 = saved ? QueryRouter4x4.deserialize(saved) : new QueryRouter4x4();
+  } catch {
+    _router4x4 = new QueryRouter4x4();
+  }
+  return _router4x4;
+}
+async function persistRouter4x4(router: QueryRouter4x4): Promise<void> {
+  try {
+    const r = getRedis();
+    await r.set('ace:router4x4:matrix', router.serialize(), 'EX', 86400);
+  } catch { /* non-fatal */ }
+}
 
 /**
  * Derives per-cluster Qdrant tag context from already-retrieved codebase chunks.
@@ -398,55 +425,137 @@ async function fetchACPKnowledgeResults(
       }
     }
 
-    // Stage B: File/Chunk Search Scoped by Directory Filters
-    const hits = await qdrant.hybridSearch({
-      collection,
-      query,
-      queryEmbedding: Array.from(emb),
-      limit: Math.min(limit, ACP_MAX_RESULTS),
-      filters,
-    });
+    // Stage B: QueryRouter4x4 — dispatch to Qdrant and/or Postgres FTS in parallel
+    const router = await getRouter4x4();
+    const signal = extractSignal(query, { hasFilePath: collection === 'codebase_chunks_768' });
+    const routing = router.route(signal);
+    const useQdrant   = routing.dispatch.includes('qdrant')   || routing.dispatch.length === 0;
+    const usePostgres = routing.dispatch.includes('postgres') && collection === 'codebase_chunks_768';
 
-    // Persist candidates into Redis for next call (fire-and-forget)
+    const batchLimit = Math.min(limit * 2, ACP_MAX_RESULTS);
+    const qdrantScored:   ScoredResult[] = [];
+    const postgresScored: ScoredResult[] = [];
+    const payloadMap = new Map<string, Record<string, unknown>>();
+
+    await Promise.all([
+      // Qdrant ANN lane (always for non-codebase collections; routed for codebase)
+      useQdrant
+        ? qdrant.hybridSearch({
+            collection,
+            query,
+            queryEmbedding: Array.from(emb),
+            limit: batchLimit,
+            filters,
+          }).then((hits) => {
+            hits.results.forEach((h) => {
+              const id = String(h.id);
+              payloadMap.set(id, h.payload as Record<string, unknown> ?? {});
+              qdrantScored.push({ id, score: h.score, source: 'qdrant' });
+            });
+          }).catch(() => {})
+        : Promise.resolve(),
+
+      // Postgres FTS lane (codebase_chunk_index, lexical/graph queries)
+      usePostgres
+        ? (async () => {
+            const { sql: drizzleSql } = await import('drizzle-orm');
+            const { codebaseChunkIndex } = await import('$lib/server/db/schema-postgres.js');
+            const rows = await db.select({
+              id: codebaseChunkIndex.id,
+              relativePath: codebaseChunkIndex.relativePath,
+              content: codebaseChunkIndex.content,
+              symbol: codebaseChunkIndex.symbol,
+              kind: codebaseChunkIndex.kind,
+              gpuCluster: codebaseChunkIndex.gpuCluster,
+            })
+            .from(codebaseChunkIndex)
+            .where(drizzleSql`
+              to_tsvector('english', COALESCE(${codebaseChunkIndex.content}, '') || ' ' || COALESCE(${codebaseChunkIndex.symbol}, ''))
+              @@ plainto_tsquery('english', ${query})
+            `)
+            .limit(batchLimit)
+            .catch(() => []);
+
+            rows.forEach((row) => {
+              const id = String(row.id);
+              payloadMap.set(id, {
+                path: row.relativePath,
+                relative_path: row.relativePath,
+                content: row.content ?? '',
+                symbol: row.symbol,
+                kind: row.kind,
+                gpuCluster: row.gpuCluster,
+                source: 'postgres-fts',
+              });
+              postgresScored.push({ id, score: 0.5, source: 'postgres' });
+            });
+          })().catch(() => {})
+        : Promise.resolve(),
+    ]);
+
+    // RRF fusion when both lanes fired; otherwise use whichever results we got
+    const allScored = [...qdrantScored, ...postgresScored];
+    const fusionWeights = routing.dispatch.length > 0
+      ? routing.weights
+      : { qdrant: 0.8, postgres: 0.2, neo4j: 0, mcp: 0 };
+
+    const fused = allScored.length > 0
+      ? rrfFuse(allScored, fusionWeights).slice(0, limit)
+      : [];
+
+    // Persist topo candidates + adapt router (fire-and-forget)
     const queryClass = classifyQuery(query);
     const qHash = topoQueryHash(query);
-    if (collection === 'codebase_chunks_768' && queryClass !== TOPO_CLASS.UNCLASSIFIED) {
-      const entries = hits.results.map((h) => ({
-        stableKey: String(h.id),
-        score: h.score,
-        path: (h.payload?.['path'] ?? h.payload?.['relative_path'] ?? undefined) as string | undefined,
+    if (collection === 'codebase_chunks_768' && queryClass !== TOPO_CLASS.UNCLASSIFIED && qdrantScored.length > 0) {
+      const entries = qdrantScored.map((r) => ({
+        stableKey: r.id,
+        score: r.score,
+        path: payloadMap.get(r.id)?.['path'] as string | undefined,
       }));
       setTopoCandidates(queryClass, query, entries).catch(() => {});
       topoPrefilter = buildTopoPrefilterStats({
         used: true, topoClass: queryClass, cacheHit: false,
-        candidateCountAfter: hits.results.length,
-        qdrantCollectionEstimate: null, // unknown without collection scan
+        candidateCountAfter: qdrantScored.length,
+        qdrantCollectionEstimate: null,
         queryHash: qHash,
       });
+    }
+
+    // Adapt router matrix toward backends that produced hits (gradient-free Hebbian)
+    if (fused.length > 0) {
+      const total = fused.length || 1;
+      const qdrantShare = qdrantScored.filter(r => fused.some(f => f.id === r.id)).length / total;
+      const pgShare     = postgresScored.filter(r => fused.some(f => f.id === r.id)).length / total;
+      router.adapt(signal, { qdrant: qdrantShare, postgres: pgShare, neo4j: 0, mcp: 0 });
+      persistRouter4x4(router).catch(() => {});
     }
 
     return {
       ok: true,
       query,
-      results: hits.results.map((h) => ({
-        id: String(h.id),
-        source: 'qdrant' as const,
-        title: (h.payload?.['title'] ?? h.payload?.['path'] ?? undefined) as string | undefined,
-        content: (h.payload?.['content'] ??
-          h.payload?.['summary'] ??
-          h.payload?.['text'] ??
-          '') as string,
-        score: h.score,
-        path: (h.payload?.['path'] ?? h.payload?.['relative_path'] ?? undefined) as
-          | string
-          | undefined,
-        metadata: h.payload as Record<string, unknown> | undefined,
-      })),
+      results: fused.map((r) => {
+        const p = payloadMap.get(r.id) ?? {};
+        return {
+          id: r.id,
+          source: r.source === 'postgres' ? 'postgres' as const : 'qdrant' as const,
+          title: (p['title'] ?? p['path'] ?? p['relative_path'] ?? undefined) as string | undefined,
+          content: (p['content'] ?? p['summary'] ?? p['text'] ?? '') as string,
+          score: r.score,
+          path: (p['path'] ?? p['relative_path'] ?? undefined) as string | undefined,
+          metadata: p,
+        };
+      }),
       metadata: {
         embeddingModel: 'embeddinggemma:latest',
         collection,
         latencyMs: Date.now() - startedAt,
         topoPrefilter,
+        routing: {
+          dispatch: routing.dispatch,
+          weights: routing.weights,
+          qdrantHits: qdrantScored.length,
+          postgresHits: postgresScored.length,
+        },
       },
     };
   } catch {

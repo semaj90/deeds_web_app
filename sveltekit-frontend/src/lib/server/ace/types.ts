@@ -579,7 +579,7 @@ export type LaneId =
   | 'L11'  // activity prefetch (panel_activity_log)
   // Legacy lane names kept for backward compat with multi-lane-retrieval.ts
   | 'hash' | 'sparse' | 'graph' | 'ace_cache' | 'symbol' | 'dense'
-  | 'topology' | 'wiki' | 'error' | 'task' | 'research';
+  | 'topology' | 'wiki' | 'error' | 'task' | 'research' | 'web_search';
 
 /** Default trust tier for each lane */
 export const LANE_DEFAULT_TRUST_TIER: Record<LaneId, TrustTier> = {
@@ -604,8 +604,9 @@ export const LANE_DEFAULT_TRUST_TIER: Record<LaneId, TrustTier> = {
   topology: 'T2',
   wiki:     'T1',
   error:    'T2',
-  task:     'T1',
-  research: 'T4',
+  task:       'T1',
+  research:   'T3',
+  web_search: 'T4',
 };
 
 /**
