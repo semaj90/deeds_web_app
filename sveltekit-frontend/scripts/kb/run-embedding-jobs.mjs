@@ -2,14 +2,14 @@
 /**
  * N9b — Consumer for embedding_jobs.jsonl.
  *
- * Reads memory/kb/cards/embedding_jobs.jsonl, calls Ollama embeddinggemma per job,
+ * Reads memory/kb/notecards/embedding_jobs.jsonl, calls Ollama embeddinggemma per job,
  * upserts to Qdrant codebase_chunks_768, mirrors to pgvector codebase_chunk_index.
  *
  * Default mode is DRY-RUN: calls Ollama, prints what would be upserted, NO writes.
  * Pass --execute to actually write to Qdrant + Postgres.
  *
  * Resume / idempotency:
- *   memory/kb/cards/embedding_run_results.jsonl is a sidecar log. Each line is one
+ *   memory/kb/notecards/embedding_run_results.jsonl is a sidecar log. Each line is one
  *   job's outcome: {card_id, text_hash, status, dim, qdrant_id, error?, ts}.
  *   On re-run, jobs whose (card_id, text_hash) appear in the sidecar with
  *   status=success are skipped. text_hash change → re-embed. Source content

@@ -68,13 +68,16 @@ export function registerDbInspectionTools(server: McpServer, pool: any) {
   // Lists every table in the public schema with row estimate + structural flags.
   // Pulls from pg_class.reltuples (cheap, approximate — accurate enough to
   // distinguish "5K rows" from "50M rows").
-  server.tool(
+  server.registerTool(
     'db.schema_overview',
     {
-      include_row_estimates: z.boolean().default(true)
-        .describe('Include pg_class.reltuples row estimates (default true).'),
-      schema: z.string().default('public')
-        .describe('Postgres schema to enumerate (default "public").'),
+      description: 'Lists every table in the public schema with row estimate + structural flags.',
+      inputSchema: z.object({
+        include_row_estimates: z.boolean().default(true)
+          .describe('Include pg_class.reltuples row estimates (default true).'),
+        schema: z.string().default('public')
+          .describe('Postgres schema to enumerate (default "public").'),
+      })
     },
     async ({ include_row_estimates, schema }) => {
       const client = await pool.connect();
@@ -145,19 +148,22 @@ export function registerDbInspectionTools(server: McpServer, pool: any) {
   // Returns columns + indexes + foreign keys for one table. No row data.
   // Forbidden columns are still listed (the operator needs to know they exist)
   // but their default values are scrubbed.
-  server.tool(
+  server.registerTool(
     'db.table_inspect',
     {
-      table: z.string().min(1).max(64)
-        .describe('Table name to inspect (validated against pg_class — invalid names return error, never SQL injection).'),
-      schema: z.string().default('public')
-        .describe('Postgres schema (default "public").'),
-      include_columns: z.boolean().default(true)
-        .describe('Include column list (default true).'),
-      include_indexes: z.boolean().default(true)
-        .describe('Include index list (default true).'),
-      include_foreign_keys: z.boolean().default(true)
-        .describe('Include foreign-key references (default true).'),
+      description: 'Returns columns + indexes + foreign keys for one table. No row data.',
+      inputSchema: z.object({
+        table: z.string().min(1).max(64)
+          .describe('Table name to inspect (validated against pg_class — invalid names return error, never SQL injection).'),
+        schema: z.string().default('public')
+          .describe('Postgres schema (default "public").'),
+        include_columns: z.boolean().default(true)
+          .describe('Include column list (default true).'),
+        include_indexes: z.boolean().default(true)
+          .describe('Include index list (default true).'),
+        include_foreign_keys: z.boolean().default(true)
+          .describe('Include foreign-key references (default true).'),
+      })
     },
     async ({ table, schema, include_columns, include_indexes, include_foreign_keys }) => {
       const client = await pool.connect();

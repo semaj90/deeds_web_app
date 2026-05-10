@@ -491,6 +491,13 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
   const meta = extractOllamaRequestMeta(url, init);
   const startedAt = Date.now();
 
+  // TurboQuant intercept: route /api/chat and /api/generate through GPU llama-server
+  const turboResponse = await tryTurboQuantIntercept(url, init);
+  if (turboResponse && turboResponse.ok) {
+    logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200);
+    return turboResponse;
+  }
+
   // VRAM Contention Guard: If this is a large model call (VLM/Gemma4) to Ollama,
   // but TurboQuant is already active, we risk an OOM or massive swapping.
   const isLargeModel = meta.model === VLM_MODELS.vision || meta.model === VLM_MODELS.gemma4;
@@ -501,13 +508,6 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
       status: 503,
       headers: { 'Content-Type': 'application/json' },
     });
-  }
-
-  // TurboQuant intercept: route /api/chat and /api/generate through GPU llama-server
-  const turboResponse = await tryTurboQuantIntercept(url, init);
-  if (turboResponse && turboResponse.ok) {
-    logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200);
-    return turboResponse;
   }
 
   try {

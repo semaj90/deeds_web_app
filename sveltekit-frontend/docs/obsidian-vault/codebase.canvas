@@ -1001,15 +1001,6 @@
       "color": "4"
     },
     {
-      "id": "src__lib__server__db__schema-postgres",
-      "type": "file",
-      "file": "Files/src__lib__server__db__schema-postgres.md",
-      "x": 3538,
-      "y": 2916,
-      "width": 260,
-      "height": 60
-    },
-    {
       "id": "src__mcp__server",
       "type": "file",
       "file": "Files/src__mcp__server.md",
@@ -1712,18 +1703,18 @@
       "height": 60
     },
     {
-      "id": "tests__unit__chat-memory.test",
+      "id": "src__routes___app___demos__crime-reconstruction___page",
       "type": "file",
-      "file": "Files/tests__unit__chat-memory.test.md",
+      "file": "Files/src__routes___app___demos__crime-reconstruction___page.md",
       "x": 3403,
       "y": 233,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__routes___app___demos__crime-reconstruction___page",
+      "id": "tests__unit__chat-memory.test",
       "type": "file",
-      "file": "Files/src__routes___app___demos__crime-reconstruction___page.md",
+      "file": "Files/tests__unit__chat-memory.test.md",
       "x": 3394,
       "y": 213,
       "width": 260,
@@ -2207,10 +2198,19 @@
       "height": 60
     },
     {
+      "id": "src__routes___app___admin__unified-indexing-studio___page",
+      "type": "file",
+      "file": "Files/src__routes___app___admin__unified-indexing-studio___page.md",
+      "x": 4007,
+      "y": -738,
+      "width": 260,
+      "height": 60
+    },
+    {
       "id": "src__routes___app___reports___page",
       "type": "file",
       "file": "Files/src__routes___app___reports___page.md",
-      "x": 4007,
+      "x": 4033,
       "y": -738,
       "width": 260,
       "height": 60
@@ -2219,7 +2219,7 @@
       "id": "tests__routes__codeintel-fix-recommender.test",
       "type": "file",
       "file": "Files/tests__routes__codeintel-fix-recommender.test.md",
-      "x": 4033,
+      "x": 4059,
       "y": -738,
       "width": 260,
       "height": 60
@@ -2228,8 +2228,8 @@
       "id": "src__routes___app___demos__memory-palace___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__memory-palace___page.md",
-      "x": 4059,
-      "y": -738,
+      "x": 4085,
+      "y": -737,
       "width": 260,
       "height": 60
     },
@@ -2237,8 +2237,8 @@
       "id": "src__routes___app___demos__nes-routes___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__nes-routes___page.md",
-      "x": 4085,
-      "y": -737,
+      "x": 4112,
+      "y": -735,
       "width": 260,
       "height": 60
     },
@@ -2246,8 +2246,8 @@
       "id": "src__mcp__index",
       "type": "file",
       "file": "Files/src__mcp__index.md",
-      "x": 4112,
-      "y": -735,
+      "x": 4138,
+      "y": -732,
       "width": 260,
       "height": 60
     },
@@ -2255,8 +2255,8 @@
       "id": "src__routes___app___demos__nier-showcase___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__nier-showcase___page.md",
-      "x": 4138,
-      "y": -732,
+      "x": 4164,
+      "y": -729,
       "width": 260,
       "height": 60
     },
@@ -2264,8 +2264,8 @@
       "id": "src__routes___app___couchdb-analytics__errorpropagationgraph",
       "type": "file",
       "file": "Files/src__routes___app___couchdb-analytics__errorpropagationgraph.md",
-      "x": 4164,
-      "y": -729,
+      "x": 4190,
+      "y": -724,
       "width": 260,
       "height": 60
     },
@@ -2273,8 +2273,8 @@
       "id": "src__routes__api__agent__investigate___server",
       "type": "file",
       "file": "Files/src__routes__api__agent__investigate___server.md",
-      "x": 4190,
-      "y": -724,
+      "x": 4216,
+      "y": -718,
       "width": 260,
       "height": 60
     },
@@ -2282,8 +2282,8 @@
       "id": "tests__e2e__chat-inference-routing.spec",
       "type": "file",
       "file": "Files/tests__e2e__chat-inference-routing.spec.md",
-      "x": 4216,
-      "y": -718,
+      "x": 4242,
+      "y": -711,
       "width": 260,
       "height": 60
     },
@@ -2291,8 +2291,8 @@
       "id": "tests__accessibility__accessibility-tester",
       "type": "file",
       "file": "Files/tests__accessibility__accessibility-tester.md",
-      "x": 4242,
-      "y": -711,
+      "x": 4268,
+      "y": -704,
       "width": 260,
       "height": 60
     },
@@ -2300,8 +2300,8 @@
       "id": "tests__ace-rerank-spine.spec",
       "type": "file",
       "file": "Files/tests__ace-rerank-spine.spec.md",
-      "x": 4268,
-      "y": -704,
+      "x": 4293,
+      "y": -695,
       "width": 260,
       "height": 60
     },
@@ -2309,8 +2309,8 @@
       "id": "src__routes__api__codebase-index__kag-notebook___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__kag-notebook___server.md",
-      "x": 4293,
-      "y": -695,
+      "x": 4318,
+      "y": -686,
       "width": 260,
       "height": 60
     },
@@ -2318,8 +2318,8 @@
       "id": "src__routes___app___admin__ai-dashboard__operator___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__ai-dashboard__operator___page.md",
-      "x": 4318,
-      "y": -686,
+      "x": 4343,
+      "y": -675,
       "width": 260,
       "height": 60
     },
@@ -2327,8 +2327,8 @@
       "id": "src__routes__api__codebase-index__claude-assist___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__claude-assist___server.md",
-      "x": 4343,
-      "y": -675,
+      "x": 4368,
+      "y": -664,
       "width": 260,
       "height": 60
     },
@@ -2336,8 +2336,8 @@
       "id": "src__routes__api__contextual__chat___server",
       "type": "file",
       "file": "Files/src__routes__api__contextual__chat___server.md",
-      "x": 4368,
-      "y": -664,
+      "x": 4392,
+      "y": -652,
       "width": 260,
       "height": 60
     },
@@ -2345,8 +2345,8 @@
       "id": "tests__codebase-index-rabbitmq-channel.spec",
       "type": "file",
       "file": "Files/tests__codebase-index-rabbitmq-channel.spec.md",
-      "x": 4392,
-      "y": -652,
+      "x": 4416,
+      "y": -639,
       "width": 260,
       "height": 60
     },
@@ -2354,8 +2354,8 @@
       "id": "tests__e2e__client-inference.spec",
       "type": "file",
       "file": "Files/tests__e2e__client-inference.spec.md",
-      "x": 4416,
-      "y": -639,
+      "x": 4439,
+      "y": -625,
       "width": 260,
       "height": 60
     },
@@ -2363,8 +2363,8 @@
       "id": "tests__routes__sveltekit-form-actions.test",
       "type": "file",
       "file": "Files/tests__routes__sveltekit-form-actions.test.md",
-      "x": 4439,
-      "y": -625,
+      "x": 4462,
+      "y": -610,
       "width": 260,
       "height": 60
     },
@@ -2372,8 +2372,8 @@
       "id": "tests__phase97-authenticated-streaming.spec",
       "type": "file",
       "file": "Files/tests__phase97-authenticated-streaming.spec.md",
-      "x": 4462,
-      "y": -610,
+      "x": 4484,
+      "y": -594,
       "width": 260,
       "height": 60
     },
@@ -2381,8 +2381,8 @@
       "id": "src__routes__api__codebase-index__karpathy-tag___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__karpathy-tag___server.md",
-      "x": 4484,
-      "y": -594,
+      "x": 4506,
+      "y": -578,
       "width": 260,
       "height": 60
     },
@@ -2390,8 +2390,8 @@
       "id": "tests__research-evidence-e2e.spec",
       "type": "file",
       "file": "Files/tests__research-evidence-e2e.spec.md",
-      "x": 4506,
-      "y": -578,
+      "x": 4527,
+      "y": -561,
       "width": 260,
       "height": 60
     },
@@ -2399,8 +2399,8 @@
       "id": "src__routes__api__codebase-index__export__bundle___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__export__bundle___server.md",
-      "x": 4527,
-      "y": -561,
+      "x": 4547,
+      "y": -542,
       "width": 260,
       "height": 60
     },
@@ -2408,26 +2408,8 @@
       "id": "src__routes___app___admin__observability___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__observability___page.md",
-      "x": 4547,
-      "y": -542,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes__api__codebase-index__ingest-errors___server",
-      "type": "file",
-      "file": "Files/src__routes__api__codebase-index__ingest-errors___server.md",
       "x": 4567,
       "y": -524,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__hypergraph-types.spec",
-      "type": "file",
-      "file": "Files/tests__hypergraph-types.spec.md",
-      "x": 4587,
-      "y": -504,
       "width": 260,
       "height": 60
     },
@@ -2435,8 +2417,26 @@
       "id": "src__routes__api__codebase-index__index-stream___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__index-stream___server.md",
+      "x": 4587,
+      "y": -504,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__codebase-index__ingest-errors___server",
+      "type": "file",
+      "file": "Files/src__routes__api__codebase-index__ingest-errors___server.md",
       "x": 4605,
       "y": -484,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__hypergraph-types.spec",
+      "type": "file",
+      "file": "Files/tests__hypergraph-types.spec.md",
+      "x": 4623,
+      "y": -463,
       "width": 260,
       "height": 60
     },
@@ -2444,8 +2444,8 @@
       "id": "tests__retrieval-quality-regression.spec",
       "type": "file",
       "file": "Files/tests__retrieval-quality-regression.spec.md",
-      "x": 4623,
-      "y": -463,
+      "x": 4640,
+      "y": -441,
       "width": 260,
       "height": 60
     },
@@ -2453,8 +2453,8 @@
       "id": "src__routes__api__whisper__transcribe___server",
       "type": "file",
       "file": "Files/src__routes__api__whisper__transcribe___server.md",
-      "x": 4640,
-      "y": -441,
+      "x": 4657,
+      "y": -419,
       "width": 260,
       "height": 60
     },
@@ -2462,8 +2462,8 @@
       "id": "src__routes__api__health___server",
       "type": "file",
       "file": "Files/src__routes__api__health___server.md",
-      "x": 4657,
-      "y": -419,
+      "x": 4673,
+      "y": -396,
       "width": 260,
       "height": 60
     },
@@ -2471,8 +2471,8 @@
       "id": "tests__routes__chat-memory-backfill.test",
       "type": "file",
       "file": "Files/tests__routes__chat-memory-backfill.test.md",
-      "x": 4673,
-      "y": -396,
+      "x": 4687,
+      "y": -373,
       "width": 260,
       "height": 60
     },
@@ -2480,8 +2480,8 @@
       "id": "tests__rag-search-ace-route.spec",
       "type": "file",
       "file": "Files/tests__rag-search-ace-route.spec.md",
-      "x": 4687,
-      "y": -373,
+      "x": 4701,
+      "y": -349,
       "width": 260,
       "height": 60
     },
@@ -2489,8 +2489,8 @@
       "id": "src__routes___app___reports___id___edit___page",
       "type": "file",
       "file": "Files/src__routes___app___reports___id___edit___page.md",
-      "x": 4701,
-      "y": -349,
+      "x": 4715,
+      "y": -324,
       "width": 260,
       "height": 60
     },
@@ -2498,8 +2498,8 @@
       "id": "tests__phase99-production.spec",
       "type": "file",
       "file": "Files/tests__phase99-production.spec.md",
-      "x": 4715,
-      "y": -324,
+      "x": 4727,
+      "y": -299,
       "width": 260,
       "height": 60
     },
@@ -2507,44 +2507,8 @@
       "id": "src__routes___app___demos__agentic-errors___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__agentic-errors___page.md",
-      "x": 4727,
-      "y": -299,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes__api__v1__agentic__tool-loop___server",
-      "type": "file",
-      "file": "Files/src__routes__api__v1__agentic__tool-loop___server.md",
       "x": 4739,
       "y": -274,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___citations__law___page",
-      "type": "file",
-      "file": "Files/src__routes___app___citations__law___page.md",
-      "x": 4749,
-      "y": -248,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__localdocs.svelte",
-      "type": "file",
-      "file": "Files/src__localdocs.svelte.md",
-      "x": 4759,
-      "y": -221,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___codebase-graph__fast-ast___page",
-      "type": "file",
-      "file": "Files/src__routes___app___codebase-graph__fast-ast___page.md",
-      "x": 4767,
-      "y": -195,
       "width": 260,
       "height": 60
     },
@@ -2552,8 +2516,44 @@
       "id": "src__routes__api__library__ingest-dev-docs___server",
       "type": "file",
       "file": "Files/src__routes__api__library__ingest-dev-docs___server.md",
+      "x": 4749,
+      "y": -248,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__v1__agentic__tool-loop___server",
+      "type": "file",
+      "file": "Files/src__routes__api__v1__agentic__tool-loop___server.md",
+      "x": 4759,
+      "y": -221,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___citations__law___page",
+      "type": "file",
+      "file": "Files/src__routes___app___citations__law___page.md",
+      "x": 4767,
+      "y": -195,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__localdocs.svelte",
+      "type": "file",
+      "file": "Files/src__localdocs.svelte.md",
       "x": 4775,
       "y": -168,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___codebase-graph__fast-ast___page",
+      "type": "file",
+      "file": "Files/src__routes___app___codebase-graph__fast-ast___page.md",
+      "x": 4782,
+      "y": -140,
       "width": 260,
       "height": 60
     },
@@ -2561,8 +2561,8 @@
       "id": "src__routes__login___page",
       "type": "file",
       "file": "Files/src__routes__login___page.md",
-      "x": 4782,
-      "y": -140,
+      "x": 4788,
+      "y": -113,
       "width": 260,
       "height": 60
     },
@@ -2570,8 +2570,8 @@
       "id": "tests__routes__chat-memory-search.test",
       "type": "file",
       "file": "Files/tests__routes__chat-memory-search.test.md",
-      "x": 4788,
-      "y": -113,
+      "x": 4793,
+      "y": -85,
       "width": 260,
       "height": 60
     },
@@ -2579,8 +2579,8 @@
       "id": "src__routes___app___fictional-cases___id____page",
       "type": "file",
       "file": "Files/src__routes___app___fictional-cases___id____page.md",
-      "x": 4793,
-      "y": -85,
+      "x": 4797,
+      "y": -57,
       "width": 260,
       "height": 60
     },
@@ -2588,17 +2588,17 @@
       "id": "src__routes__api__persons-of-interest___id___face-match___server",
       "type": "file",
       "file": "Files/src__routes__api__persons-of-interest___id___face-match___server.md",
-      "x": 4797,
-      "y": -57,
+      "x": 4799,
+      "y": -28,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__routes__api__reports__generate___server",
+      "id": "src__lib__server__db__schema-postgres",
       "type": "file",
-      "file": "Files/src__routes__api__reports__generate___server.md",
-      "x": 4799,
-      "y": -28,
+      "file": "Files/src__lib__server__db__schema-postgres.md",
+      "x": 3538,
+      "y": 2916,
       "width": 260,
       "height": 60
     },
@@ -3479,7 +3479,7 @@
       "id": "src__lib__server__ai__gemma4-agent",
       "type": "file",
       "file": "Files/src__lib__server__ai__gemma4-agent.md",
-      "x": 1988,
+      "x": 1962,
       "y": 3719,
       "width": 260,
       "height": 60
@@ -3488,8 +3488,8 @@
       "id": "src__lib__server__ai__contextual-tools",
       "type": "file",
       "file": "Files/src__lib__server__ai__contextual-tools.md",
-      "x": 1771,
-      "y": 4236,
+      "x": 1868,
+      "y": 4115,
       "width": 260,
       "height": 60
     },
@@ -3497,8 +3497,17 @@
       "id": "src__lib__types__yorha-interface",
       "type": "file",
       "file": "Files/src__lib__types__yorha-interface.md",
-      "x": 1143,
-      "y": 4290,
+      "x": 1472,
+      "y": 4333,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ai__mcp-tool-dispatch",
+      "type": "file",
+      "file": "Files/src__lib__server__ai__mcp-tool-dispatch.md",
+      "x": 1006,
+      "y": 4185,
       "width": 260,
       "height": 60
     },
@@ -3506,7 +3515,7 @@
       "id": "src__lib__services__error-analysis__experiencerecorder",
       "type": "file",
       "file": "Files/src__lib__services__error-analysis__experiencerecorder.md",
-      "x": 761,
+      "x": 773,
       "y": 3719,
       "width": 260,
       "height": 60
@@ -3515,8 +3524,17 @@
       "id": "src__lib__server__ai__openai-facade",
       "type": "file",
       "file": "Files/src__lib__server__ai__openai-facade.md",
-      "x": 1093,
-      "y": 3063,
+      "x": 952,
+      "y": 3199,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ai__llama-tool-definitions",
+      "type": "file",
+      "file": "Files/src__lib__server__ai__llama-tool-definitions.md",
+      "x": 1472,
+      "y": 2950,
       "width": 260,
       "height": 60
     },
@@ -3524,8 +3542,8 @@
       "id": "src__lib__server__ai__caching-layer",
       "type": "file",
       "file": "Files/src__lib__server__ai__caching-layer.md",
-      "x": 1872,
-      "y": 3026,
+      "x": 2038,
+      "y": 3153,
       "width": 260,
       "height": 60
     },
@@ -3683,18 +3701,18 @@
       "height": 60
     },
     {
-      "id": "src__lib__components__ai__contextualevidencechatmodal",
+      "id": "src__routes___app___terminal___page",
       "type": "file",
-      "file": "Files/src__lib__components__ai__contextualevidencechatmodal.md",
+      "file": "Files/src__routes___app___terminal___page.md",
       "x": 4199,
       "y": 1568,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__routes___app___terminal___page",
+      "id": "src__lib__components__ai__contextualevidencechatmodal",
       "type": "file",
-      "file": "Files/src__routes___app___terminal___page.md",
+      "file": "Files/src__lib__components__ai__contextualevidencechatmodal.md",
       "x": 4077,
       "y": 1709,
       "width": 260,
@@ -4055,7 +4073,7 @@
       "id": "src__lib__components__evidence__evidenceviewmodal",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceviewmodal.md",
-      "x": -2937,
+      "x": -2933,
       "y": -2143,
       "width": 260,
       "height": 60
@@ -4065,7 +4083,7 @@
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceboard.md",
       "x": -2925,
-      "y": -1956,
+      "y": -1942,
       "width": 260,
       "height": 60
     },
@@ -4073,8 +4091,8 @@
       "id": "src__lib__components__evidence__webgpuparticleoverlay",
       "type": "file",
       "file": "Files/src__lib__components__evidence__webgpuparticleoverlay.md",
-      "x": -3004,
-      "y": -1770,
+      "x": -3020,
+      "y": -1746,
       "width": 260,
       "height": 60
     },
@@ -4082,8 +4100,8 @@
       "id": "src__lib__components__evidence__evidenceuploadmodal",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceuploadmodal.md",
-      "x": -3163,
-      "y": -1626,
+      "x": -3202,
+      "y": -1603,
       "width": 260,
       "height": 60
     },
@@ -4091,8 +4109,8 @@
       "id": "src__lib__components__evidence__caseevidenceorganizer",
       "type": "file",
       "file": "Files/src__lib__components__evidence__caseevidenceorganizer.md",
-      "x": -3377,
-      "y": -1555,
+      "x": -3440,
+      "y": -1549,
       "width": 260,
       "height": 60
     },
@@ -4100,8 +4118,8 @@
       "id": "src__lib__components__evidence__evidencecanvas",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidencecanvas.md",
-      "x": -3612,
-      "y": -1576,
+      "x": -3689,
+      "y": -1603,
       "width": 260,
       "height": 60
     },
@@ -4109,8 +4127,8 @@
       "id": "src__lib__components__evidence__doclingextractionviewer",
       "type": "file",
       "file": "Files/src__lib__components__evidence__doclingextractionviewer.md",
-      "x": -3828,
-      "y": -1693,
+      "x": -3901,
+      "y": -1762,
       "width": 260,
       "height": 60
     },
@@ -4118,8 +4136,8 @@
       "id": "src__lib__components__evidence__evidenceuploadresults",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceuploadresults.md",
-      "x": -3987,
-      "y": -1891,
+      "x": -4033,
+      "y": -2004,
       "width": 260,
       "height": 60
     },
@@ -4127,8 +4145,8 @@
       "id": "src__lib__components__evidence__visionimageanalyzer",
       "type": "file",
       "file": "Files/src__lib__components__evidence__visionimageanalyzer.md",
-      "x": -4057,
-      "y": -2143,
+      "x": -4054,
+      "y": -2287,
       "width": 260,
       "height": 60
     },
@@ -4136,8 +4154,8 @@
       "id": "src__lib__server__observability__langfuse",
       "type": "file",
       "file": "Files/src__lib__server__observability__langfuse.md",
-      "x": -4024,
-      "y": -2411,
+      "x": -3953,
+      "y": -2562,
       "width": 260,
       "height": 60
     },
@@ -4145,8 +4163,8 @@
       "id": "src__lib__components__evidence__evidenceuploadprogress",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceuploadprogress.md",
-      "x": -3885,
-      "y": -2651,
+      "x": -3743,
+      "y": -2776,
       "width": 260,
       "height": 60
     },
@@ -4154,8 +4172,8 @@
       "id": "src__lib__components__evidence__webgputexturestreamingdemo",
       "type": "file",
       "file": "Files/src__lib__components__evidence__webgputexturestreamingdemo.md",
-      "x": -3659,
-      "y": -2823,
+      "x": -3456,
+      "y": -2889,
       "width": 260,
       "height": 60
     },
@@ -4163,8 +4181,8 @@
       "id": "src__lib__components__evidence__evidencelist",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidencelist.md",
-      "x": -3377,
-      "y": -2896,
+      "x": -3140,
+      "y": -2873,
       "width": 260,
       "height": 60
     },
@@ -4172,8 +4190,8 @@
       "id": "src__lib__components__evidence__evidenceprimaryupload",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceprimaryupload.md",
-      "x": -3083,
-      "y": -2854,
+      "x": -2853,
+      "y": -2726,
       "width": 260,
       "height": 60
     },
@@ -4181,17 +4199,8 @@
       "id": "src__lib__components__evidence__evidenceupload",
       "type": "file",
       "file": "Files/src__lib__components__evidence__evidenceupload.md",
-      "x": -2822,
-      "y": -2698,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__components__evidence__draggableevidencenode",
-      "type": "file",
-      "file": "Files/src__lib__components__evidence__draggableevidencenode.md",
-      "x": -2638,
-      "y": -2449,
+      "x": -2646,
+      "y": -2469,
       "width": 260,
       "height": 60
     },
@@ -4250,18 +4259,18 @@
       "height": 60
     },
     {
-      "id": "src__lib__machines__evidence-processing-machine",
+      "id": "src__lib__server__indexer__dual-embedder",
       "type": "file",
-      "file": "Files/src__lib__machines__evidence-processing-machine.md",
+      "file": "Files/src__lib__server__indexer__dual-embedder.md",
       "x": -3462,
       "y": -1352,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__lib__server__indexer__dual-embedder",
+      "id": "src__lib__machines__evidence-processing-machine",
       "type": "file",
-      "file": "Files/src__lib__server__indexer__dual-embedder.md",
+      "file": "Files/src__lib__machines__evidence-processing-machine.md",
       "x": -3638,
       "y": -1345,
       "width": 260,
@@ -5033,18 +5042,18 @@
       "height": 60
     },
     {
-      "id": "src__lib__server__analytics__research-graph-rl",
+      "id": "src__lib__server__analytics__unified-research-query",
       "type": "file",
-      "file": "Files/src__lib__server__analytics__research-graph-rl.md",
+      "file": "Files/src__lib__server__analytics__unified-research-query.md",
       "x": -3429,
       "y": -1758,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__lib__server__analytics__unified-research-query",
+      "id": "src__lib__server__analytics__research-graph-rl",
       "type": "file",
-      "file": "Files/src__lib__server__analytics__unified-research-query.md",
+      "file": "Files/src__lib__server__analytics__research-graph-rl.md",
       "x": -3770,
       "y": -1964,
       "width": 260,
@@ -5490,15 +5499,6 @@
       "y": -2550,
       "width": 260,
       "height": 60
-    },
-    {
-      "id": "src__lib__machines__evidence-analysis-machine",
-      "type": "file",
-      "file": "Files/src__lib__machines__evidence-analysis-machine.md",
-      "x": 4674,
-      "y": -995,
-      "width": 260,
-      "height": 60
     }
   ],
   "edges": [
@@ -5613,7 +5613,7 @@
     {
       "id": "e-5-2",
       "fromNode": "group-5",
-      "toNode": "src__lib__components__ai__contextualevidencechatmodal",
+      "toNode": "src__routes___app___terminal___page",
       "toEnd": "arrow"
     },
     {
@@ -6118,12 +6118,6 @@
       "id": "e-61-0",
       "fromNode": "group-61",
       "toNode": "src__lib__server__concurrency__queue-manager",
-      "toEnd": "arrow"
-    },
-    {
-      "id": "e-96-0",
-      "fromNode": "group-96",
-      "toNode": "src__lib__machines__evidence-analysis-machine",
       "toEnd": "arrow"
     }
   ]

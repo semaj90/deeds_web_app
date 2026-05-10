@@ -380,10 +380,11 @@ async function fetchACPKnowledgeResults(
 
       try {
         const dirHits = await qdrant.hybridSearch({
-          collection: 'directory_summaries_768',
+          collection: 'codebase_chunks_768',
           query,
           queryEmbedding: Array.from(emb),
           limit: 5,
+          filters: { kind: 'directory-cluster' }
         });
         const dirs = dirHits.results
           .map((h) => h.payload?.['directory_path'])

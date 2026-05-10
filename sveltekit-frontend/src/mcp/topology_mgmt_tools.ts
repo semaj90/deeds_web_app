@@ -12,9 +12,12 @@ export function registerTopologyMgmtTools(server: McpServer, pool: any) {
   /**
    * Returns a diagnostic overview of topological hydration coverage.
    */
-  server.tool(
+  server.registerTool(
     'topology.hydration_status',
-    {},
+    {
+      description: 'Returns a diagnostic overview of topological hydration coverage.',
+      inputSchema: {}
+    },
     async () => {
       try {
         const stats = await pool.query(`
@@ -55,9 +58,12 @@ export function registerTopologyMgmtTools(server: McpServer, pool: any) {
   /**
    * Provides a recommended plan for restoring topological hydration.
    */
-  server.tool(
+  server.registerTool(
     'topology.recompute_manifold_plan',
-    {},
+    {
+      description: 'Provides a recommended plan for restoring topological hydration.',
+      inputSchema: {}
+    },
     async () => {
       try {
         const stats = await pool.query(`

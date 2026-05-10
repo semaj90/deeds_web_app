@@ -530,9 +530,25 @@ Rules:
 - "Do not touch" lists byte-frozen files (scene-compiler.ts, aesthetic-presets.json, demo-scene.py) if relevant.${priorFixRule}
 - Do not include "Goal Description" or "Background" — be terse.`;
 
-  const candidatesBlock = (lane3.kept ?? []).map((c, i) =>
+  // Split candidates by type so Gemma4 doesn't list cluster:N or dir:X
+  // under "## Files (all paths verified to exist)" — those are conceptual
+  // context, not edit targets. File-level candidates go into the file pool;
+  // cluster-narrative + directory-card candidates go into a separate
+  // "Conceptual context" channel that informs the brief but isn't quoted as
+  // a path.
+  const fileCands = (lane3.kept ?? []).filter(c => !c._from_summary_tree);
+  const conceptCands = (lane3.kept ?? []).filter(c => c._from_summary_tree);
+
+  const candidatesBlock = fileCands.map((c, i) =>
     `${i + 1}. ${c.stableKey ?? c.file_path ?? '?'} (score=${c._score ?? '?'})\n   why: ${c._why ?? '-'}\n   excerpt: ${(c.text ?? c.label ?? c.summary ?? '').slice(0, 240).replace(/\n/g, ' ')}`
   ).join('\n\n');
+
+  const conceptBlock = conceptCands.length > 0
+    ? '\n\nConceptual context (RAPTOR cluster/directory summaries — DO NOT list under "## Files", DO NOT cite as paths; use to understand the domain only):\n' +
+      conceptCands.map((c, i) =>
+        `${i + 1}. [${c._from_summary_tree}] ${c.label ?? c.file_path ?? c.stableKey} (score=${c._score ?? '?'})\n   ${(c.text ?? '').slice(0, 280).replace(/\n/g, ' ')}`
+      ).join('\n\n')
+    : '';
 
   const priorFixBlock = hasFailures
     ? '\n\nSimilar prior fixes (context only — verify before applying):\n' +
@@ -542,8 +558,8 @@ Rules:
   const usr =
 `Query: ${QUERY}
 
-Top reranked candidates (use ONLY these — do not invent paths):
-${candidatesBlock || '(no candidates retrieved — write a brief asking the operator to widen the query)'}${priorFixBlock}
+Top reranked file candidates (use ONLY these for "## Files" + implementation steps; do not invent paths):
+${candidatesBlock || '(no file-level candidates — fall back to conceptual context below; brief should request operator widen the query)'}${conceptBlock}${priorFixBlock}
 
 Write the brief now.`;
 
