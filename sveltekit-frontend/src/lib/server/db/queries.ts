@@ -5,7 +5,7 @@ import { db } from './unified-client.js';
 
 export async function getUserById(id: string): Promise<User | null> {
     try {
-        const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+        const result = await db.select().from(users).where(eq(users.id, Number(id))).limit(1);
         return (result[0] as unknown as User) ?? null;
     } catch (error: unknown) {
         console.error('Error fetching user by ID: ', error);
@@ -58,7 +58,7 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<Us
                 ...updates,
                 updatedAt: new Date().toISOString()
             } as any)
-            .where(eq(users.id, id))
+            .where(eq(users.id, Number(id)))
             .returning();
         return (result[0] as unknown as User) ?? null;
     } catch (error: unknown) {

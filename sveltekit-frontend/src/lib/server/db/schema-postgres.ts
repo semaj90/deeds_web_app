@@ -104,6 +104,10 @@ export const users = pgTable('users', {
   firstName: varchar('first_name', { length: 255 }),
   lastName: varchar('last_name', { length: 255 }),
   role: userRoleEnum('role').notNull().default('prosecutor'),
+  isActive: boolean('is_active').notNull().default(true),
+  avatarUrl: varchar('avatar_url', { length: 2048 }),
+  hasCompletedOnboarding: boolean('has_completed_onboarding').notNull().default(false),
+  onboardingStep: integer('onboarding_step').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
@@ -143,7 +147,7 @@ export const emailVerificationCodes = pgTable('email_verification_codes',
 export const passwordResetTokens = pgTable('password_reset_tokens',
  {
  tokenHash: varchar('token_hash', { length: 63 }).primaryKey().notNull(), // Assuming tokenHash is primary key
- userId: uuid('user_id').notNull(),
+ userId: integer('user_id').notNull(), // FK to users.id (integer, DB migrated 2026-05-10)
  expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }).notNull(),
  },
 	(table) => ({
@@ -1171,6 +1175,17 @@ export const timelineEvents = pgTable(
     index('idx_timeline_events_event_date').on(table.eventDate),
   ]
 );
+
+// === VLM IMAGE TAGS ===
+export const vlmImageTags = pgTable('vlm_image_tags', {
+  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  name: varchar('name', { length: 200 }).unique().notNull(),
+  description: text('description'),
+  source: varchar('source', { length: 50 }).notNull().default('manual'),
+  hitCount: integer('hit_count').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
 
 // === AI/VECTOR TABLES (Missing Definitions) ===
 

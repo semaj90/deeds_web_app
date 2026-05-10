@@ -1469,11 +1469,11 @@ export async function adaptFromAnalytics(signal: AnalyticsSignal): Promise<void>
 
     // 4. Durable timeline record — closes the RL audit trail + QLoRA distillation seed
     db.insert(contextTimeline).values({
-      userId:              signal.userId        ?? undefined,
+      userId:              signal.userId ? Number(signal.userId) : null,
       sessionId:           signal.sessionId     ?? '',
       eventType:           'feedback',
       pipeline:            signal.pipeline,
-      hyperedgeHash:       signal.hyperedgeHash ?? undefined,
+      hyperedgeHash:       signal.hyperedgeHash ?? null,
       signal:              signal.signal,
       grpoReward:          delta,
       pipelineWeightAfter: newWeight,

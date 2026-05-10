@@ -1,8 +1,7 @@
 import { relations } from 'drizzle-orm/relations';
 import { cases, citations, sessions, users } from './schema-postgres.js';
-import { 
-	aceRetrievalHits, aceRetrievalRuns, enrichmentJobs, codeRepos 
-} from './schema.js';
+import { aceRetrievalHits, aceRetrievalRuns, enrichmentJobs } from './schema.js';
+import { codeRepos } from './schema/codebase-intelligence.js';
 
 export const citationsRelations = relations(citations, ({ one }) => ({
 	case: one(cases, { fields: [citations.caseId], references: [cases.id] }),

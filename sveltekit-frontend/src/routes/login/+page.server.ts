@@ -47,7 +47,7 @@ export const actions: Actions = {
 				return fail(400, { form, error: 'Invalid credentials' });
 			}
 
-			const session = await createUserSession(user.id);
+			const session = await createUserSession(String(user.id));
 			setSessionCookie(cookies, session.sessionId);
 		} catch (e) {
 			console.error('[Login] Error:', e);

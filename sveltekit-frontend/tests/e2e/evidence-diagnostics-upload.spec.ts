@@ -1,9 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
 import pg from 'pg';
 
+// Port 5434 = deeds-postgres-prod-proxy → legal-ai-postgres container.
+// Port 5432 on the host is squatted by a native Windows Postgres with a different schema.
+// Always route through 5434 unless DATABASE_URL explicitly overrides.
 const DB_URL =
-	process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+	process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const DEV_USER_ID = '00000000-0000-0000-0000-000000000001';
+// evidence.uploaded_by is integer (FK to users.id), distinct from evidence.user_id (uuid).
+// The seeded dev/bypass user has integer id=1; UUID DEV_USER_ID is for the user_id column only.
+const DEV_USER_INT_ID = 1;
 const pool = new pg.Pool({ connectionString: DB_URL });
 const cleanupEvidenceIds = new Set<string>();
 
@@ -87,21 +93,21 @@ async function insertEvidenceWithDiagnostics(
 			$1,
 			$2,
 			$3,
-			$3,
 			$4,
 			$5,
-			$5,
+			$6,
 			$6,
 			$7,
 			$8,
 			$9,
 			$10,
 			$11,
-			NOW(),
 			$12,
+			NOW(),
 			$13,
 			$14,
-			$15::jsonb,
+			$15,
+			$16::jsonb,
 			NOW(),
 			NOW(),
 			NOW()
@@ -110,6 +116,7 @@ async function insertEvidenceWithDiagnostics(
 			caseId,
 			evidenceNumber,
 			DEV_USER_ID,
+			DEV_USER_INT_ID,
 			title,
 			'Playwright diagnostics upload verification row',
 			'documentary',

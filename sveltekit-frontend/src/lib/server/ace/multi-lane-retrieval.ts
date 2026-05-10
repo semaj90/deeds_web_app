@@ -13,6 +13,8 @@ export interface MultiLaneQuery {
 	isError?: boolean;
 	topK?: number;
 	skipVectorLane?: boolean;
+	filePath?: string;
+	symbols?: string[];
 }
 
 export interface LaneResult {

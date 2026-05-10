@@ -13,8 +13,8 @@ async function main() {
 		const out = await db
 			.insert(evidence)
 			.values({
-				caseId,
-				uploadedBy: 1,
+				...(caseId ? { caseId } : {}),
+				uploadedBy: '00000000-0000-0000-0000-000000000001',
 				evidenceNumber: 'EV-TEST',
 				title: 'TSX Insert Test',
 				type: 'document',
@@ -27,7 +27,7 @@ async function main() {
 				fileName: 'test.png',
 				fileSize: 1,
 				hash: 'sha256:test',
-				uploadedAt: new Date(),
+				uploadedAt: new Date().toISOString(),
 				aiAnalysis: { extractionStatus: 'pending' } as unknown as Record<string, unknown>,
 			})
 			.returning({ id: evidence.id });

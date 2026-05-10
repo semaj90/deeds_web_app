@@ -469,7 +469,7 @@ export async function generateDeepResearch(
 	const dominantPipeline = [...pipelineSummary]
 		.sort((a, b) => b.totalHits - a.totalHits)[0]?.pipeline ?? 'ace';
 	db.insert(contextTimeline).values({
-		userId,
+		userId:      Number(userId),
 		sessionId:  '',
 		eventType:  'research',
 		pipeline:   dominantPipeline,

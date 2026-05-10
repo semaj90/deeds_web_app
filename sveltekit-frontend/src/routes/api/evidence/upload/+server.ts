@@ -242,6 +242,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  // evidence.uploaded_by is INTEGER (FK to users.id INTEGER), but locals.user.id may be a
+  // UUID string under DEV_BYPASS_AUTH or Lucia v3 sessions. Coerce to integer if possible,
+  // otherwise null (column is nullable). Schema drift between Drizzle declaration (uuid)
+  // and actual DB (integer) — see drift cleanup TODO.
+  const uploaderIntId = (() => {
+    const n = Number(uploaderUserId);
+    return Number.isFinite(n) && Number.isInteger(n) && n > 0 ? n : null;
+  })();
+
   // Rate limit: 10 uploads/min per client (heavy operation)
   const rateCheck = heavyRateLimiter.check(request);
   if (!rateCheck.allowed) {
@@ -387,7 +396,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           extractionStatus: 'pending',
           uploadedVia: 'api',
         },
-        uploadedBy: uploaderUserId,
+        uploadedBy: uploaderIntId as any, // schema declares uuid but DB column is integer
       })
       .returning({ id: evidence.id });
 

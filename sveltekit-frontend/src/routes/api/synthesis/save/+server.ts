@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const inserted = await db
 			.insert(synthesisRuns)
 			.values({
-				userId: locals.user.id,
+				userId: Number(locals.user.id),
 				query,
 				answer,
 				model,

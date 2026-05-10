@@ -33,11 +33,12 @@ CREATE INDEX IF NOT EXISTS idx_codebase_chunk_tags_gin
 CREATE INDEX IF NOT EXISTS idx_codebase_chunk_metadata_gin
   ON codebase_chunk_index USING gin(metadata jsonb_path_ops);
 
--- IVFFlat on summary_embedding (vector) for cluster-level semantic search
+-- IVFFlat on summary_embedding (halfvec(768)) for cluster-level semantic search
 -- lists = ceil(sqrt(16626)) ≈ 130; round to 100 for stability
+-- Use halfvec_cosine_ops because column type is halfvec, not vector
 CREATE INDEX IF NOT EXISTS idx_codebase_chunk_summary_embedding_ivfflat
   ON codebase_chunk_index
-  USING ivfflat (summary_embedding vector_cosine_ops)
+  USING ivfflat (summary_embedding halfvec_cosine_ops)
   WITH (lists = 100);
 
 -- ── cluster_summaries: GIN + IVFFlat ────────────────────────────────────────

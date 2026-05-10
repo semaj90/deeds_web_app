@@ -289,6 +289,8 @@
             </div>
           </div>
         </section>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- AI Skills Registry -->
         <section class="space-y-6" data-trace-id="skills-registry" data-trace-type="ai-config">

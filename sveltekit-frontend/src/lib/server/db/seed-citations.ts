@@ -11,7 +11,7 @@ import { eq } from 'drizzle-orm';
 import pg from 'pg';
 import * as schema from './schema-postgres';
 
-import { ENV } from './env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const { Pool } = pg;
 

@@ -70,8 +70,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       .then(({ db }) =>
         import('$lib/server/db/schema-postgres.js').then(({ contextTimeline }) =>
           db.insert(contextTimeline).values({
-            userId:    locals.user.id,
-            sessionId: locals.user.id,
+            userId:    Number(locals.user!.id),
+            sessionId: locals.user!.id,
             eventType: 'feedback',
             pipeline,
             summaryId,

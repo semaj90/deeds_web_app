@@ -22,7 +22,7 @@ import pg from 'pg';
 import * as schema from './schema-postgres';
 import crypto from 'crypto';
 
-import { ENV } from './env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const { Pool } = pg;
 

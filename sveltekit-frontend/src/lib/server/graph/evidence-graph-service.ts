@@ -154,6 +154,48 @@ export async function createSimilarityLinks(
     }
 }
 
+export interface ImageFileLink {
+    filePath: string;
+    score: number;
+    tagBoost?: number;
+    matchedTags?: string[];
+}
+
+// Create IMAGE_FOR edges from an evidence image node to CodebaseFile nodes.
+export async function linkImageToCodeFiles(
+    evidenceId: string,
+    caption: string,
+    links: ImageFileLink[]
+): Promise<number> {
+    if (!links || links.length === 0) return 0;
+    const driver = getDriver();
+    const session = driver.session();
+    let edgesCreated = 0;
+    try {
+        await (session as any).writeTransaction(async (tx: any) => {
+            const res = await tx.run(
+                `MERGE (e:Evidence {id: $evidenceId})
+                 SET e.caption = $caption, e.updatedAt = datetime()
+                 WITH e
+                 UNWIND $links AS lnk
+                 MERGE (f:CodebaseFile {path: lnk.filePath})
+                 MERGE (e)-[r:IMAGE_FOR]->(f)
+                 SET r.score = lnk.score,
+                     r.tagBoost = coalesce(lnk.tagBoost, 0.0),
+                     r.matchedTags = coalesce(lnk.matchedTags, []),
+                     r.updatedAt = datetime()`,
+                { evidenceId, caption, links }
+            );
+            edgesCreated = res.summary.counters.updates().relationshipsCreated ?? 0;
+        });
+    } catch (err) {
+        console.warn('[Neo4j] linkImageToCodeFiles failed:', err);
+    } finally {
+        await session.close();
+    }
+    return edgesCreated;
+}
+
 // Initialize schema on import if requested
 ensureSchema().catch((e) => console.debug('neo4j schema init failed', e));
 
@@ -161,6 +203,7 @@ const EvidenceGraphService = {
     upsertEvidenceGraph,
     createSimilarityLinks,
     ensureSchema,
+    linkImageToCodeFiles,
 };
 
 export default EvidenceGraphService;

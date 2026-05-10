@@ -1,6 +1,6 @@
-import { pool } from '$lib/server/db/client.js';
+import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
-import { makeRedis } from '$lib/server/redis/client.js';
+import { createRedisConnection } from '$lib/server/redis';
 import { sanitizeBrowserContext, emptyContext } from './browser-context-sanitizer.js';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
 
@@ -13,7 +13,7 @@ const BROWSER_REDIS_KEY = (userId: string) => `browser-context:snapshot:${userId
 async function loadBrowserContext(userId: string): Promise<SanitizedBrowserContext | null> {
   if (!userId) return null;
   try {
-    const r = makeRedis();
+    const r = createRedisConnection();
     const raw = await r.get(BROWSER_REDIS_KEY(userId));
     if (!raw) return null;
     const parsed = JSON.parse(raw);
@@ -37,7 +37,7 @@ async function loadBrowserContext(userId: string): Promise<SanitizedBrowserConte
  */
 export async function gatherAdminContext(query: string, currentPath?: string, userId?: string) {
   const t0 = Date.now();
-  const redis = makeRedis();
+  const redis = createRedisConnection();
   
   const [
     dbHealth,

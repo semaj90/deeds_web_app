@@ -63,7 +63,7 @@ export const GET: RequestHandler = async ({ locals, request }) => {
         onboardingStep: users.onboardingStep,
       })
       .from(users)
-      .where(eq(users.id, locals.user.id))
+      .where(eq(users.id, Number(locals.user.id)))
       .limit(1);
 
     const responseData = row ?? DEFAULT_ONBOARDING_STATE;
@@ -105,7 +105,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
   }
 
   try {
-    await db.update(users).set(updates).where(eq(users.id, locals.user.id));
+    await db.update(users).set(updates).where(eq(users.id, Number(locals.user.id)));
     return json({ ok: true, persisted: true });
   } catch (error) {
     if (isMissingColumnError(error)) {

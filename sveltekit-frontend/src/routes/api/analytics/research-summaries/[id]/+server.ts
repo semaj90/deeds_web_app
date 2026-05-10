@@ -112,7 +112,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 			.where(
 				and(
 					eq(researchSummaries.id, id),
-					eq(researchSummaries.userId, locals.user.id),
+					eq(researchSummaries.userId, Number(locals.user.id)),
 				)
 			)
 			.returning({ id: researchSummaries.id });

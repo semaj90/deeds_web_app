@@ -5,7 +5,6 @@ import { traceRerank } from '../lib/server/ai/trace-reranker.js';
 import { lookupWikiNotes } from '../lib/server/graph/graph-intel.js';
 import { archiveSynthesisMemory } from '../lib/server/indexer/synthesis-memory-archiver.js';
 import { generateEmbedding } from '../lib/server/grpc/embedding-client.js';
-import { pool } from '../lib/server/db/client.js';
 
 /**
  * Register new agentic tools for organizing messy text and advanced retrieval.
@@ -67,10 +66,10 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
         }
 
         return {
-          content: [{ type: 'text', text: JSON.stringify(organized, null, 2) }]
+          content: [{ type: 'text' as const, text: JSON.stringify(organized, null, 2) }]
         };
       } catch (err) {
-        return { content: [{ type: 'text', text: `Organization failed: ${err}` }], isError: true };
+        return { content: [{ type: 'text' as const, text: `Organization failed: ${err}` }], isError: true };
       }
     }
   );
@@ -89,7 +88,7 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
       const doc = extractDocumentNative(text, 'mcp-citation-task');
       const citations = doc.entities.filter(e => e.type === 'citation' || e.type === 'statute');
       return {
-        content: [{ type: 'text', text: JSON.stringify(citations, null, 2) }]
+        content: [{ type: 'text' as const, text: JSON.stringify(citations, null, 2) }]
       };
     }
   );
@@ -100,7 +99,7 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
     try {
       const emb = await generateEmbedding(query);
       if (!emb) {
-        return { content: [{ type: 'text', text: 'Embedding service unavailable' }], isError: true };
+        return { content: [{ type: 'text' as const, text: 'Embedding service unavailable' }], isError: true };
       }
 
       const hits = await traceRerank({
@@ -120,10 +119,10 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
       }));
 
       return {
-        content: [{ type: 'text', text: JSON.stringify(results, null, 2) }]
+        content: [{ type: 'text' as const, text: JSON.stringify(results, null, 2) }]
       };
     } catch (err) {
-      return { content: [{ type: 'text', text: `Trace search failed: ${err}` }], isError: true };
+      return { content: [{ type: 'text' as const, text: `Trace search failed: ${err}` }], isError: true };
     }
   }
 
@@ -180,10 +179,10 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
     try {
       const notes = await lookupWikiNotes(query, limit);
       return {
-        content: [{ type: 'text', text: JSON.stringify(notes, null, 2) }]
+        content: [{ type: 'text' as const, text: JSON.stringify(notes, null, 2) }]
       };
     } catch (err) {
-      return { content: [{ type: 'text', text: `Wiki lookup failed: ${err}` }], isError: true };
+      return { content: [{ type: 'text' as const, text: `Wiki lookup failed: ${err}` }], isError: true };
     }
   }
 
@@ -230,10 +229,10 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
       try {
         const res = await archiveSynthesisMemory({ title, content, source, tags });
         return {
-          content: [{ type: 'text', text: JSON.stringify(res, null, 2) }]
+          content: [{ type: 'text' as const, text: JSON.stringify(res, null, 2) }]
         };
       } catch (err) {
-        return { content: [{ type: 'text', text: `Archiving failed: ${err}` }], isError: true };
+        return { content: [{ type: 'text' as const, text: `Archiving failed: ${err}` }], isError: true };
       }
     }
   );
