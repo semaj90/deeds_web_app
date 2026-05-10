@@ -93,8 +93,8 @@
 	// Track page views on navigation + update analysis panel context
 	$effect(() => {
 		if (browser) {
-			analytics.trackPageView(currentPathname);
-			analysisPanel.setRoute(currentPathname);
+			analytics.trackPageView(page.url.pathname);
+			analysisPanel.setRoute(page.url.pathname);
 		}
 	});
 
@@ -111,7 +111,7 @@
 		if (e.altKey && e.key.toLowerCase() === 'd' && !e.ctrlKey) {
 			e.preventDefault();
 			window.dispatchEvent(new CustomEvent('yorha:nav-analytics', { detail: { tab: 'deep-research' } }));
-			if (!currentPathname.startsWith('/analytics')) {
+			if (!page.url.pathname.startsWith('/analytics')) {
 				window.location.href = '/analytics';
 			}
 		}
@@ -119,7 +119,7 @@
 		if (e.altKey && e.key.toLowerCase() === 'r' && !e.ctrlKey) {
 			e.preventDefault();
 			window.dispatchEvent(new CustomEvent('yorha:nav-analytics', { detail: { tab: 'playground' } }));
-			if (!currentPathname.startsWith('/analytics')) {
+			if (!page.url.pathname.startsWith('/analytics')) {
 				window.location.href = '/analytics';
 			}
 		}
@@ -179,7 +179,7 @@
 	<ContextualAssistantModal bind:open={showAssistant} />
 {/if}
 {#if AIChatWidget}
-	<AIChatWidget currentRoute={currentPathname} />
+	<AIChatWidget currentRoute={page.url.pathname} />
 {/if}
 {#if SetupWizard && data.user}
 	<SetupWizard
@@ -205,7 +205,7 @@
 	<AuthModal
 		bind:open={showAuthModal}
 		prompt="Sign in to sync your research tasks across devices and sessions."
-		returnUrl={currentPathname}
+		returnUrl={page.url.pathname}
 		onclose={() => { researchTasks.dismissNeedsAuth(); }}
 	/>
 {/if}

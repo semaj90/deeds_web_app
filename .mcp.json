@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@0.0.75",
+        "--browser", "chrome",
+        "--viewport-size", "1280,800",
+        "--output-dir", "logs/playwright-screenshots"
+      ],
+      "env": {
+        "PLAYWRIGHT_BASE_URL": "http://localhost:5173"
+      }
+    },
+    "trace-mcp": {
+      "command": "node",
+      "args": [
+        "--loader", "ts-node/esm",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+      ],
+      "env": {
+        "REDIS_URL": "redis://127.0.0.1:6379",
+        "DATABASE_URL": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+        "QDRANT_URL": "http://localhost:6333",
+        "NEO4J_URI": "bolt://localhost:7687",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "password"
+      }
+    }
+  }
+}

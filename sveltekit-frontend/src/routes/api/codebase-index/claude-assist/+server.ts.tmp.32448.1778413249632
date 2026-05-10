@@ -1,0 +1,442 @@
+/**
+ * POST /api/codebase-index/claude-assist
+ *
+ * Unified orchestration endpoint for Claude Code context injection.
+ * Chains: ML schema lookup → concurrent research → KAG summary → scaffold cache → ACE context pack.
+ *
+ * Body: {
+ *   query:                string        — natural language question
+ *   filters?: {
+ *     framework?:         string        — libtorch, onnx, webgpu, tensorrt
+ *     modelType?:         string        — transformer, cnn, rnn, som, kmeans, embedding
+ *     precision?:         string        — fp16, fp32, int8, int4
+ *   }
+ *   compactContext?:      boolean       — trim to maxContextChunks (default true)
+ *   preferCachedResearch?: boolean      — prefer Redis-cached research graph (default true)
+ *   maxContextChunks?:    number        — cap on returned chunks (default 8, max 30)
+ *   domains?:             string[]      — LangGraph research domains override
+ *   limitPerWorker?:      number        — max chunks per research worker (default 6)
+ * }
+ *
+ * Response: {
+ *   query, filters, retrieval, ace_context, cache, research, timing
+ * }
+ */
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { z } from 'zod';
+import { getRedis } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
+import { db } from '$lib/server/db/client';
+import { contextTimeline } from '$lib/server/db/schema-postgres.js';
+import { ASSIST_BUDGETS } from '$lib/server/ai/compact-budgets.js';
+import { rerankChunks } from '$lib/server/retrieval/codebase-context.js';
+import { publishWorkflowEvent, publishWorkflowComplete, publishWorkflowError } from '$lib/server/queue/workflow-publish.js';
+import { classifyQuery, TOPO_CLASS_LABEL } from '$lib/server/tensor/topology-byte-mapper.js';
+import { getTopoCandidates, queryHash as topoQueryHash } from '$lib/server/cache/topo-candidate-cache.js';
+
+const QDRANT_URL = ENV.QDRANT_URL;
+
+const DEFAULT_BUDGETS = ASSIST_BUDGETS;
+
+/** Fire-and-forget context_timeline insert. Never throws. */
+function emitTimeline(
+	userId: string,
+	eventType: string,
+	payload: Record<string, unknown>,
+): void {
+	db.insert(contextTimeline).values({
+		userId: Number(userId) || undefined,
+		sessionId:  '',
+		eventType,
+		pipeline:   'claude-assist',
+		payload,
+	}).catch(() => {});
+}
+
+/** FNV-1a hash for cache keys */
+function _ck(s: string): string {
+	let h = 0x811c9dc5 >>> 0;
+	for (let i = 0; i < s.length; i++) {
+		h ^= s.charCodeAt(i);
+		h = Math.imul(h, 0x01000193) >>> 0;
+	}
+	return h.toString(36);
+}
+
+const assistSchema = z.object({
+	query:                z.string().min(3).max(1000),
+	/** Optional error text to activate the `error` named vector lane in rerankChunks(). */
+	errorQuery:           z.string().max(1000).optional(),
+	/** When set, publishes live stage-progress events to /api/workflow-events/[sessionId]. */
+	sessionId:            z.string().max(200).optional(),
+	filters: z.object({
+		framework: z.string().max(50).optional(),
+		modelType: z.string().max(50).optional(),
+		precision: z.string().max(20).optional(),
+	}).optional(),
+	compactContext:       z.boolean().default(true),
+	preferCachedResearch: z.boolean().default(true),
+	maxContextChunks:     z.number().int().min(1).max(30).default(8),
+	domains:              z.array(z.string().max(50)).max(6).optional(),
+	limitPerWorker:       z.number().int().min(3).max(30).default(6),
+	debug:                z.boolean().default(false),
+	compact:              z.boolean().default(true),
+	budgets: z.object({
+		maxResearchFindings: z.number().int().min(1).max(50).optional(),
+		maxRetrievalHits:    z.number().int().min(1).max(50).optional(),
+		maxGraphNeighbors:   z.number().int().min(1).max(30).optional(),
+		maxAceChunks:        z.number().int().min(1).max(30).optional(),
+		maxSummaryChars:     z.number().int().min(100).max(10_000).optional(),
+		maxErrorCards:       z.number().int().min(0).max(20).optional(),
+		maxActionItems:      z.number().int().min(1).max(20).optional(),
+		maxFiles:            z.number().int().min(1).max(30).optional(),
+	}).optional(),
+});
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	const parsed = assistSchema.safeParse(await request.json().catch(() => ({})));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
+	}
+
+	const {
+		query, errorQuery, sessionId, filters, compactContext, preferCachedResearch,
+		maxContextChunks, domains, limitPerWorker, debug, compact,
+	} = parsed.data;
+
+	// Helper: emit a stage event if sessionId provided — fire-and-forget
+	const emit = (type: Parameters<typeof publishWorkflowEvent>[1]['type'], label: string, data?: Record<string, unknown>) => {
+		if (sessionId) publishWorkflowEvent(sessionId, { type, label, data });
+	};
+
+	// Read applied (tuned) defaults from context_timeline, if any
+	let tunedBudgets: Record<string, unknown> = {};
+	try {
+		const { eq, desc } = await import('drizzle-orm');
+		const rows = await db
+			.select()
+			.from(contextTimeline)
+			.where(eq(contextTimeline.eventType, 'assist.tuned_defaults'))
+			.orderBy(desc(contextTimeline.createdAt))
+			.limit(1);
+		if (rows[0]?.payload && typeof rows[0].payload === 'object') {
+			const p = rows[0].payload as Record<string, unknown>;
+			// Only pick recognized budget keys
+			for (const k of ['maxGraphNeighbors', 'maxAceChunks'] as const) {
+				if (typeof p[k] === 'number') tunedBudgets[k] = p[k];
+			}
+		}
+	} catch { /* non-fatal — fall back to code defaults */ }
+
+	// Merge: code defaults → tuned defaults → per-request overrides
+	const B = { ...DEFAULT_BUDGETS, ...tunedBudgets, ...parsed.data.budgets };
+
+	const t0 = performance.now();
+	const timing: Record<string, number> = {};
+	const queryHash = _ck(query);
+
+	// ── context_timeline: claude_assist.started ─────────────────────────
+	emitTimeline(locals.user.id, 'claude_assist.started', {
+		queryHash,
+		compact,
+		hasErrorQuery: !!errorQuery,
+		hasFilters: !!(filters?.framework || filters?.modelType || filters?.precision),
+		domains: domains ?? [],
+	});
+
+	// ── Step 1: ML schema Redis index lookup (restrict Qdrant to known IDs) ──
+	let schemaIds: string[] = [];
+	if (filters?.framework || filters?.modelType || filters?.precision) {
+		const t1 = performance.now();
+		try {
+			const redis = getRedis();
+			const sets: string[][] = [];
+
+			if (filters.framework) {
+				sets.push(await redis.smembers(`ml-schema:fw:${filters.framework}`));
+			}
+			if (filters.modelType) {
+				sets.push(await redis.smembers(`ml-schema:mt:${filters.modelType}`));
+			}
+			if (filters.precision) {
+				sets.push(await redis.smembers(`ml-schema:prec:${filters.precision}`));
+			}
+
+			// Intersect all sets
+			if (sets.length === 1) {
+				schemaIds = sets[0];
+			} else if (sets.length > 1) {
+				const base = new Set(sets[0]);
+				for (let si = 1; si < sets.length; si++) {
+					const other = new Set(sets[si]);
+					for (const id of base) {
+						if (!other.has(id)) base.delete(id);
+					}
+				}
+				schemaIds = [...base];
+			}
+		} catch { /* Redis unavailable — proceed without schema filter */ }
+		timing.mlSchemaMs = Math.round(performance.now() - t1);
+		emit('SCHEMA_LOOKUP_COMPLETE', 'ML schema lookup', { schemaIds: schemaIds.length, durationMs: timing.mlSchemaMs });
+	}
+
+	// ── Step 2: Concurrent research (LangGraph) ──────────────────────────────
+	const researchCacheKey = `ca:research:${_ck(query + (domains?.join(',') ?? '') + limitPerWorker)}`;
+	let researchGraph: any = null;
+	let researchMarkdown = '';
+	let researchCacheHit = false;
+
+	const t2 = performance.now();
+	try {
+		if (preferCachedResearch) {
+			const redis = getRedis();
+			const cached = await redis.get(researchCacheKey).catch(() => null);
+			if (cached) {
+				researchGraph = JSON.parse(cached);
+				researchCacheHit = true;
+
+				// ── context_timeline: cache hit ──────────────────────────────
+				emitTimeline(locals.user.id, 'claude_assist.cache_hit', {
+					queryHash, layer: 'research', cacheKey: researchCacheKey,
+				});
+			}
+		}
+
+		if (!researchGraph) {
+			const { runConcurrentResearch, formatGraphForClaudeCode } = await import(
+				'$lib/server/ai/langgraph-research.js'
+			);
+			researchGraph = await runConcurrentResearch(query, {
+				domains: domains as any,
+				limitPerWorker,
+			});
+			researchMarkdown = formatGraphForClaudeCode(researchGraph);
+
+			// Cache for 15 min
+			try {
+				const redis = getRedis();
+				await redis.setex(researchCacheKey, 900, JSON.stringify(researchGraph));
+			} catch { /* non-fatal */ }
+		} else {
+			const { formatGraphForClaudeCode } = await import(
+				'$lib/server/ai/langgraph-research.js'
+			);
+			researchMarkdown = formatGraphForClaudeCode(researchGraph);
+		}
+	} catch (err) {
+		researchGraph = { error: (err as Error).message, degraded: true };
+	}
+	timing.researchMs = Math.round(performance.now() - t2);
+	emit('PIPELINE_STAGE_DONE', 'Research graph', { cacheHit: researchCacheHit, durationMs: timing.researchMs });
+
+	// ── context_timeline: research done ─────────────────────────────────────
+	emitTimeline(locals.user.id, 'claude_assist.research_done', {
+		queryHash,
+		cacheHit: researchCacheHit,
+		degraded: !!researchGraph?.degraded,
+		durationMs: timing.researchMs,
+	});
+
+	// ── Step 3: Tri-vector rerank (content + signature + error) via rerankChunks() ──
+	// schemaIds → resolved to candidatePaths by rerankChunks() if populated.
+	// errorQuery activates the `error` named-vector lane (additive weight 0.15).
+	const t3 = performance.now();
+	let contentChunks: Array<{ id?: number | string; score: number; path: string; content: string; domain: string; tags: string[] }> = [];
+	let errorChunks:   Array<{ id?: number | string; score: number; path: string }> = [];
+
+	try {
+		// Resolve schemaIds → file paths so rerankChunks can build a Qdrant filter
+		let candidatePaths: string[] | undefined;
+		if (schemaIds.length > 0 && schemaIds.length <= 500) {
+			const ptRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points`, {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body:    JSON.stringify({ ids: schemaIds.map(Number).filter(isFinite), with_payload: true }),
+				signal:  AbortSignal.timeout(8_000),
+			}).catch(() => null);
+			if (ptRes?.ok) {
+				const ptData = await ptRes.json();
+				candidatePaths = (ptData.result ?? [])
+					.map((p: { payload?: { path?: string; relativePath?: string } }) =>
+						p.payload?.path ?? p.payload?.relativePath ?? '')
+					.filter(Boolean) as string[];
+			}
+		}
+
+		const rerank = await rerankChunks(query, {
+      candidatePaths,
+      limit: maxContextChunks * 2,
+      errorQuery: errorQuery,
+      caller: 'claude-assist',
+    });
+
+		contentChunks = rerank.results.map((r) => ({
+			score:   r.score,
+			path:    r.relativePath,
+			content: r.content.slice(0, 400),
+			domain:  (r.tags ?? []).join(','),
+			tags:    r.tags ?? [],
+		}));
+
+		// Expose error-lane count separately for diagnostics
+		// (error hits are already merged into contentChunks via additive scoring)
+		errorChunks = rerank.meta.errorResults > 0
+			? contentChunks.slice(0, rerank.meta.errorResults).map((c) => ({
+				score: c.score,
+				path:  c.path,
+			}))
+			: [];
+	} catch { /* embedding/search failure — degrade gracefully */ }
+	timing.retrievalMs = Math.round(performance.now() - t3);
+	emit('RERANK_COMPLETE', 'Tri-vector rerank', { contentHits: contentChunks.length, errorHits: errorChunks.length, durationMs: timing.retrievalMs });
+
+	// ── context_timeline: retrieval done ─────────────────────────────────────
+	emitTimeline(locals.user.id, 'claude_assist.retrieval_done', {
+		queryHash,
+		contentHits: contentChunks.length,
+		errorHits:   errorChunks.length,
+		schemaIds:   schemaIds.length,
+		durationMs:  timing.retrievalMs,
+	});
+
+	// ── Step 4: KAG graph neighbors (if research mentions case context) ──────
+	const t4 = performance.now();
+	let kagNeighbors: any[] = [];
+	try {
+		const { getCaseGraphNeighborIds } = await import('$lib/server/retrieval/graph-context.js');
+		// Use first research worker's top hit file path as a proxy for graph lookup
+		const topFilePath = contentChunks[0]?.path;
+		if (topFilePath) {
+			kagNeighbors = await getCaseGraphNeighborIds(topFilePath).catch(() => []);
+		}
+	} catch { /* no graph context available */ }
+	timing.kagMs = Math.round(performance.now() - t4);
+	emit('KAG_COMPLETE', 'KAG graph neighbors', { neighborCount: kagNeighbors.length, durationMs: timing.kagMs });
+
+	// ── Step 5: Assemble compact ACE context (budget-limited) ────────────────
+	const topChunks = compactContext
+		? contentChunks.slice(0, Math.min(maxContextChunks, B.maxAceChunks))
+		: contentChunks.slice(0, B.maxRetrievalHits);
+
+	const aceContext = {
+		error_cards:     errorChunks.slice(0, B.maxErrorCards),
+		top_chunks:      topChunks,
+		graph_neighbors: kagNeighbors.slice(0, B.maxGraphNeighbors),
+	};
+
+	// ── Step 6: Cache slot fingerprint ───────────────────────────────────────
+	const cacheFingerprint = _ck(
+		query + JSON.stringify(filters ?? {}) + maxContextChunks + compact
+	);
+	const cacheSlot = `ca:ctx:${cacheFingerprint}`;
+
+	// Persist assembled context (5 min TTL) for repeat queries
+	try {
+		const redis = getRedis();
+		await redis.setex(cacheSlot, 300, JSON.stringify(aceContext));
+	} catch { /* non-fatal */ }
+
+	const totalMs = performance.now() - t0;
+
+	// ── context_timeline: completed ──────────────────────────────────────────
+	emitTimeline(locals.user.id, 'claude_assist.completed', {
+		queryHash,
+		compact,
+		cacheHit: researchCacheHit,
+		contentHits: contentChunks.length,
+		errorHits:   errorChunks.length,
+		aceChunks:   topChunks.length,
+		totalMs:     Math.round(totalMs),
+		// Quality-tracking fields for retrieval tuning
+		researchDomains: researchGraph?.domains ?? researchGraph?.workerFindings?.map((w: any) => w.domain) ?? [],
+		topPaths: topChunks.slice(0, 5).map((c: any) => c.path),
+		graphNeighborCount: kagNeighbors.length,
+		cacheSlot,
+	});
+
+	// ── Topo prefilter probe (5ms Redis check — no Qdrant RTT) ──────────────
+	let topoTrace: Record<string, unknown> | null = null;
+	try {
+		const topoClass  = classifyQuery(query);
+		const qHash      = topoQueryHash(query);
+		const cached     = await getTopoCandidates(topoClass, query);
+		topoTrace = {
+			queryClass:        TOPO_CLASS_LABEL[topoClass] ?? 'unclassified',
+			topoClass,
+			cacheHit:          cached !== null,
+			candidateCount:    cached?.length ?? null,
+			queryHash:         qHash,
+		};
+	} catch { /* non-fatal */ }
+
+	// ── Build response ───────────────────────────────────────────────────────
+	const researchPayload: Record<string, unknown> = {
+		markdown:    compact
+			? researchMarkdown.slice(0, B.maxSummaryChars)
+			: researchMarkdown.slice(0, 8000),
+		cacheHit:    researchCacheHit,
+		workers:     researchGraph?.workerFindings?.length ?? researchGraph?.workers?.length ?? 0,
+		totalChunks: researchGraph?.workerFindings?.reduce(
+			(s: number, w: any) => s + (w.chunks?.length ?? 0), 0
+		) ?? researchGraph?.workers?.reduce(
+			(s: number, w: any) => s + (w.chunks?.length ?? 0), 0
+		) ?? 0,
+	};
+
+	// Inject key findings + action items when available (budget-capped)
+	if (researchGraph?.keyFindings) {
+		researchPayload.keyFindings = researchGraph.keyFindings.slice(0, B.maxResearchFindings);
+	}
+	if (researchGraph?.actionItems) {
+		researchPayload.actionItems = researchGraph.actionItems.slice(0, B.maxActionItems);
+	}
+
+	const response: Record<string, unknown> = {
+		ok:      true,
+		compact,
+		query,
+		filters: filters ?? {},
+		retrieval: {
+			schema_ids:   schemaIds.length,
+			content_hits: contentChunks.length,
+			error_hits:   errorChunks.length,
+			kb_hits:      0, // future: knowledge_base search
+			fused_hits:   topChunks.length,
+		},
+		ace_context: aceContext,
+		research:    researchPayload,
+		cache: {
+			hit:  researchCacheHit,
+			key:  cacheSlot,
+		},
+		timing: {
+			...timing,
+			totalMs: Math.round(totalMs),
+		},
+		trace: {
+			topo_prefilter: topoTrace,
+		},
+	};
+
+	// Debug diagnostics — only when debug=true (avoid token bloat)
+	if (debug) {
+		response.diagnostics = {
+			budgets: B,
+			rawCounts: {
+				schemaIds:      schemaIds.length,
+				contentChunks:  contentChunks.length,
+				errorChunks:    errorChunks.length,
+				kagNeighbors:   kagNeighbors.length,
+			},
+			researchCacheKey,
+			cacheSlot,
+		};
+	}
+
+	if (sessionId) publishWorkflowComplete(sessionId, { aceChunks: topChunks.length, totalMs: Math.round(totalMs) });
+
+	return json(response);
+};

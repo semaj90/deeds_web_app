@@ -1,0 +1,76 @@
+{
+  "_comment": "Official MCP servers for the deeds-web-app stack. Lives ALONGSIDE .vscode/mcp.json (which holds the custom multicore mcpClients setup). Claude Code reads both. Each entry below spawns an official server lazily via npx/uvx — no global install required. All entries default to read-only roles where supported. Operator overrides via env vars before launching Claude Code.",
+  "mcpServers": {
+    "neo4j": {
+      "_purpose": "Graph queries — IMPORTS / SIMILAR_TOPOLOGY / BELONGS_TO_CLUSTER. Read-only via NEO4J_READ_ONLY=true.",
+      "command": "uvx",
+      "args": ["mcp-neo4j-cypher"],
+      "env": {
+        "NEO4J_URI":      "bolt://127.0.0.1:7687",
+        "NEO4J_USERNAME": "neo4j",
+        "NEO4J_PASSWORD": "${NEO4J_PASSWORD}",
+        "NEO4J_DATABASE": "neo4j",
+        "NEO4J_READ_ONLY": "true"
+      }
+    },
+    "qdrant": {
+      "_purpose": "Vector search across codebase_chunks_768 + evidence_items + summary_lenses_768. Search-only role — no upserts.",
+      "command": "uvx",
+      "args": ["mcp-server-qdrant"],
+      "env": {
+        "QDRANT_URL":    "http://127.0.0.1:6333",
+        "COLLECTION_NAME": "codebase_chunks_768"
+      }
+    },
+    "postgres": {
+      "_purpose": "Read-only Postgres queries. CRITICAL: connect with a role that has SELECT-only on the target schemas (create dedicated `claude_readonly` user — do NOT use legal_admin).",
+      "command": "uvx",
+      "args": ["mcp-server-postgres", "postgresql://claude_readonly:${PG_RO_PASSWORD}@127.0.0.1:5434/legal_ai_db"]
+    },
+    "redis": {
+      "_purpose": "Read-only Redis introspection (KEYS / GET / TYPE only). Use the official Redis MCP with read-only ACL user.",
+      "command": "uvx",
+      "args": ["mcp-redis"],
+      "env": {
+        "REDIS_HOST": "127.0.0.1",
+        "REDIS_PORT": "6379",
+        "REDIS_USERNAME": "claude_readonly",
+        "REDIS_PASSWORD": "${REDIS_RO_PASSWORD}"
+      }
+    },
+    "obsidian": {
+      "_purpose": "Filesystem-native Obsidian vault access — reads docs/obsidian-vault. mcpvault community server.",
+      "command": "npx",
+      "args": ["-y", "mcpvault"],
+      "env": {
+        "VAULT_PATH": "./sveltekit-frontend/docs/obsidian-vault"
+      }
+    },
+    "ts-lsp": {
+      "_purpose": "TypeScript Language Server Protocol bridge — go-to-definition / find-references / hover / type info. Uses the @typescript/native-preview already in deps.",
+      "command": "npx",
+      "args": ["-y", "mcp-language-server"],
+      "env": {
+        "WORKSPACE": "./sveltekit-frontend",
+        "LSP_COMMAND": "npx tsgo --lsp"
+      }
+    },
+    "context7": {
+      "_purpose": "Hosted Upstash Context7 MCP — fetches up-to-date library docs by name (e.g. get-library-docs(name='svelte', topic='runes')). Third lane in the docs-fetching cascade: TS LSP (in-process, free) → readability crawler (existing web-research-crawler.ts, free) → Context7 (hosted, free tier). Use Context7 when LSP doesn't expose a package's docs AND the docs site is JS-rendered so direct fetch returns empty HTML. Free tier: 100 requests/day. Set CONTEXT7_API_KEY env var for higher tiers.",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}"
+      }
+    }
+  },
+  "_notes": [
+    "Verify each server one at a time with `mcporter list` before enabling all six.",
+    "Postgres + Redis MUST use dedicated read-only roles (claude_readonly). Never reuse legal_admin / app credentials.",
+    "Neo4j NEO4J_READ_ONLY=true is the official server's flag — verify with the version you install.",
+    "When all SEVEN are mounted, Claude has 7 official + ~74 custom (54 inline + 20 registry-side from src/mcp/*_tools.ts) = ~81 tool surface area. Token cost on tools/list is significant — keep the connection long-lived to amortize.",
+    "Context7 is hosted (Upstash) — calls leave the operator's machine. The other six servers run locally. Reflect this in any privacy-sensitive workflow.",
+    "Docs-fetching cascade order (per synthesis-loop plan §F): TS LSP (local, in-process) → web-research-crawler.ts readability extractor (local, fetches static HTML) → Context7 (hosted, JS-rendered SPAs). Local lanes win; Context7 is the fallback.",
+    "Existing custom MCP at .vscode/mcp.json (mcp-multicore-server.mjs) stays untouched — it serves the SvelteKit dev server's auto-solve loop, not Claude Code itself."
+  ]
+}

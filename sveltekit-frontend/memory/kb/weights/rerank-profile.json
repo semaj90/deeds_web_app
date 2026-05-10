@@ -1,0 +1,12 @@
+{
+  "_comment": "Rerank weights for ACE/KAG candidate scoring. Edit and re-run kb:module-cartridges to apply.",
+  "_version": "1.0.0",
+  "_updated": "2026-05-10",
+  "pagerank":        0.40,
+  "semantic":        0.30,
+  "tag_match":       0.12,
+  "export_match":    0.08,
+  "route_proximity": 0.05,
+  "som_boost":       0.05,
+  "recency":         0.00
+}

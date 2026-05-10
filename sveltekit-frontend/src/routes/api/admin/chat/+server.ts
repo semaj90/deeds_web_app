@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema.js';
 import { createHash } from 'node:crypto';
 

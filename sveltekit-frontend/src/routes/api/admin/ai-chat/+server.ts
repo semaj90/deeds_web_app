@@ -8,7 +8,7 @@ const AdminAiChatSchema = z.object({
   sessionId: z.string().optional(),
   query: z.string().min(1),
   contextTag: z.string().optional(),
-  uiSnapshot: z.array(z.record(z.any())).optional(),
+  uiSnapshot: z.array(z.record(z.string(), z.any())).optional(),
 });
 
 /**

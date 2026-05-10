@@ -1,0 +1,86 @@
+/**
+ * POST /api/analytics/rl-signal
+ *
+ * Lightweight endpoint for non-rating RL signals (dwell_long, dwell_short,
+ * citation_saved) that must update pipeline weights via adaptFromAnalytics
+ * but do NOT require the thumbs-up/down vote persistence path.
+ *
+ * The rating-based signals (thumbs_up, thumbs_down) go through
+ * /api/analytics/feedback which also handles QLoRA quality tier updates.
+ * This endpoint handles intent signals that don't correspond to a vote.
+ *
+ * Body:
+ *   signal        — required; dwell_long | dwell_short | citation_saved
+ *   pipeline      — pipeline tag (default "ace")
+ *   hyperedgeHash — optional 8-char hash of the active hyperedge
+ *   summaryId     — optional UUID of the related research summary
+ *   payload       — optional metadata (trigger, componentId, etc.)
+ *
+ * Response: { ok: true } or { error: string }
+ */
+
+import { json }              from '@sveltejs/kit';
+import { z }                 from 'zod';
+import { adaptFromAnalytics } from '$lib/server/graph/hypergraph-4d.js';
+import type { RequestHandler } from './$types';
+
+const BodySchema = z.object({
+  signal:        z.enum(['dwell_long', 'dwell_short', 'citation_saved']),
+  pipeline:      z.enum(['ace', 'rag', 'kag', 'dag', 'codebase']).optional().default('ace'),
+  hyperedgeHash: z.string().max(8).optional(),
+  summaryId:     z.string().uuid().optional(),
+  payload:       z.record(z.string(), z.unknown()).optional(),
+});
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  const parsed = BodySchema.safeParse(body);
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Bad request' }, { status: 400 });
+  }
+
+  const { signal, pipeline, hyperedgeHash, summaryId } = parsed.data;
+
+  // Fire-and-forget: adaptFromAnalytics handles Redis update + context_timeline insert +
+  // threshold-triggered hypergraph rebuild. Never block the HTTP response.
+  adaptFromAnalytics({
+    signal,
+    pipeline,
+    hyperedgeHash,
+    userId:    locals.user.id,
+    sessionId: locals.user.id,
+  }).catch((err: Error) => {
+    console.warn('[rl-signal] adaptFromAnalytics error:', err.message);
+  });
+
+  // If summaryId is present, also record in context_timeline for the audit trail
+  // (adaptFromAnalytics already writes a feedback row; this adds the summaryId link)
+  if (summaryId) {
+    import('$lib/server/db/client')
+      .then(({ db }) =>
+        import('$lib/server/db/schema-postgres.js').then(({ contextTimeline }) =>
+          db.insert(contextTimeline).values({
+            userId:    Number(locals.user.id) || undefined,
+            sessionId: locals.user.id,
+            eventType: 'feedback',
+            pipeline,
+            summaryId,
+            signal,
+          }).catch(() => {})
+        )
+      )
+      .catch(() => {});
+  }
+
+  return json({ ok: true });
+};
