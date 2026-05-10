@@ -810,3 +810,57 @@ Go/TS retrieval, embedding, indexer service
 - Does NOT replace `svelte-check` or `tsc` — both remain in CI
 - JSONB diagnostics (`scripts/tsgo-diagnostics-to-jsonb.mjs`) feed ACE/TRACE as error-relevance signals
 - Protobuf contracts generated from Zod schemas via `npm run proto:from-zod`
+
+---
+
+## Retrieval Lanes — Vector vs Hyper-Graph-RAG (May 9, 2026)
+
+**Rule**: vector RAG and hyper-graph-RAG are **complementary, not competing**. Pick the lane by the question shape, not by preference. The Karpathy Authority Blend (`0.4·PageRank + 0.3·attention + 0.3·authority`) is the canonical hybrid.
+
+| Lane | Strength | Backing store | Use when |
+|---|---|---|---|
+| **Vector RAG** | "find chunks semantically similar to this query" | Qdrant `codebase_chunks_768` (768-d, named vector `content`) + pgvector `codebase_chunk_index.contentEmbedding` (mirror) | natural-language query, fuzzy intent match, no known entry-point |
+| **Hyper-graph-RAG** | "trace structural relationships across N hops" | Neo4j (typed edges: `IMPORTS`, `BELONGS_TO_CLUSTER`, `SIMILAR_TOPOLOGY`, `SHARES_TAGS`) + CouchDB (PageRank cache `couchdb:pagerank_scores` 6h TTL) | "what depends on X?", "shortest path from auth → DB", cluster expansion, topology-aware reranking |
+| **Sparse RAG** | "exact filename / export / Redis key" | Fuse.js (browser Web Worker), `rg` CLI, BM25 index (planned N8+ in notecard lane) | lexical match needed, ID lookup, code-symbol search |
+
+### Hyper-graph-RAG specifics
+
+- **Neo4j is the analysis substrate.** Cypher queries express graph reasoning naturally; Qdrant cosine similarity does not. Use Neo4j when the question contains "connected to", "depends on", "via", "expand around", "shortest path", "neighborhood".
+- **CouchDB is the precomputed-view layer.** `couchdb:pagerank_scores` (6h TTL), MapReduce rollups for `link_matrix` recommendations. Reads from CouchDB are cheap; reads from Neo4j with PageRank computed inline are not.
+- **The 4-lane hypergraph is the join layer.** `cluster_context` / `shared_resource` / `agents_context` / `vault_link` edges (282 edges across A/B/C/D lanes per `memory/hypergraph-4-lanes-vault.md`) — these are the typed relations that make hyper-graph-RAG actually navigable.
+- **Karpathy blend is the rerank.** After vector OR graph retrieval pulls candidates, the blend score (`0.4·PR + 0.3·attn + 0.3·authority` in Redis hash `gpu:karpathy:scores`, 24h TTL) is the final ordering. **Use the blend; don't roll your own.**
+
+### Decision tree for new retrieval features
+
+1. Is the query "find similar text" or "find similar concept"? → **Vector RAG**, Qdrant ANN.
+2. Is the query "trace connections" or "expand neighborhood"? → **Hyper-graph-RAG**, Cypher in Neo4j, with CouchDB PageRank for ordering.
+3. Is the query "exact filename / export / Redis key"? → **Sparse RAG**, Fuse.js or `rg`.
+4. Hybrid (most cases): vector ANN → graph expansion of top-K → Karpathy rerank → ACE context pack. This is what `fetchACPKnowledgeResults()` already does at Stage A0.
+
+### Hard rules
+
+- ❌ **Don't replace vector RAG with hyper-graph-RAG.** Different jobs. Replacing one with the other loses semantic intent matching.
+- ❌ **Don't run PageRank inline in Cypher.** Use the cached `couchdb:pagerank_scores` view. Inline PageRank is O(V+E) per query — a Neo4j-killer.
+- ❌ **Don't add a 5th lane.** The three above + the 4-lane hypergraph join already cover every retrieval question seen in this codebase. SurrealDB / hypothetical "knowledge mesh" / graph-DB-of-the-month additions are research spikes only.
+- ❌ **Don't bypass Karpathy blend on rerank.** The blend is the single source of truth for "which top-K wins." Custom ordering inside one feature breaks cross-feature consistency.
+
+### MCP retrieval surface — verified healthy (2026-05-09)
+
+TRACE MCP `:8788` is the canonical retrieval boundary for the agentic loop. As of the May 9 mount + smoke pass, **42 tools register cleanly** via `tools/list` (HTTP 200, repeatable) — including `kb.trace_search`, `context.build_kv_packet`, `db.schema_overview`, `db.table_inspect`, plus the `graph.*`, `topology.*`, `clusters.*`, `kag.*`, `kb.*`, `ops.*`, and `search.*` namespaces. Adopt these via the Cline / Claude Code / OpenCode / Hermes MCP configs.
+
+Verified healthy MCP servers (`npx mcporter list`, varies per run): `gemma4-offload`, `microsoft-docs`, `memory`, `postgres-readonly`, `qdrant-readonly`, `neo4j-readonly`, sometimes `colab`. Offline (need package-name correction): `redis-readonly`, `ts-lsp`, `obsidian-vault`, `context7-*`, `playwright`, `legal-ai-context`. Full status: `memory/architecture/mcp-mount-smoke-2026-05-09.md`.
+
+Two hard rules added to `docs/architecture/trace-runtime-split.md` Hard Rules after the May 9 root-cause hunt: **G34** (no Zod 3 single-arg `z.record(...)` in MCP tool schemas) and **G38** (`StreamableHTTPServerTransport({ sessionIdGenerator: undefined })` must be constructed *per request*, never as a module-scope singleton — silent-500s every call after the first).
+
+### Cross-references
+
+- `memory/hypergraph-4-lanes-vault.md` — 4-lane edge inventory + smoke gate
+- `next_steps/active/2026-05-09_karpathy-chr97-wiring.md` — design doc for the cartridge layer that ties vector + graph retrieval into a single ACE Stage A0 cache slice
+- `next_steps/active/2026-05-09_agents-md-incremental-pipeline.md` — sister design doc; AGENTS.md updates feed the `agents_context` hyperedge lane
+- §"Karpathy GPU Authority Blend + Redis ACE Cache" (project-root CLAUDE.md) — full blend pipeline reference
+- `docs/architecture/trace-kag-web-development-guide.md` — canonical 20-section TRACE/Karpathy web-development guide (route execution contract, retrieval lane decision tree, production safety gates, Browser Context Lane policy at §17)
+- `docs/architecture/agent-surface-decision-matrix.md` — Cline vs OpenCode vs Hermes vs Codex vs Claude Code comparison + operating model. Settles "agent-surface choice is now ergonomics, not capability". Supersedes earlier "Cline wins / Hermes is a TUI toy / OpenCode is CLI-only" framing.
+- `docs/architecture/trace-runtime-split.md` — Gemma4 → MCP runtime boundary rule
+- `memory/architecture/browser-context-lane.md` — sanitizer + storage + worker contract for the optional browser snapshot
+- `memory/architecture/admin-chat-assistant.md` — Copilot rune store + AiAnalysisPopup + SummarizeButton drop-in pattern
+- `memory/architecture/client-inference-policy.md` — Service Worker vs Web Worker rules + Phase-2 ONNX-download toggle policy

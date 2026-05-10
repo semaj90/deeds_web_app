@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "trace": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8788/mcp",
+      "enabled": true,
+      "timeout": 15000
+    },
+    "gemma4-offload": {
+      "type": "local",
+      "command": ["node", "sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
+      "enabled": true,
+      "timeout": 15000
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    "sveltekit-frontend/AGENTS.md",
+    ".claude/skills/trace-mcp-tooling/SKILL.md",
+    "sveltekit-frontend/docs/architecture/gemma4-to-claude-code-handoff.md"
+  ]
+}

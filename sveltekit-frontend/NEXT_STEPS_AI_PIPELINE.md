@@ -146,17 +146,52 @@ The full self-improvement loop: inference → log → distill → train → depl
 
 ---
 
-## P5 — Observability Gaps
+## P6 — Feature Mapping Atlas & Semantic Codebase Continuity
 
-### P5-A `UnifiedRetrievalResult` provenance in Langfuse traces
-- **Problem:** `traceVectorSearch()` and `traceGraph()` calls in `context-assembler.ts` log counts. Now that all chunks are `UnifiedRetrievalResult`, log richer metadata: kind distribution, source distribution, cache layer hits, avg rerank score.
-- **Files:** `src/lib/server/ace/context-assembler.ts`, `src/lib/server/observability/langfuse.ts`
-- **Effort:** 1 hr
+Transform the codebase from a set of files into a time-aware, topologically-ordered knowledge atlas.
 
-### P5-B Prompt leaderboard visibility in admin
-- **Problem:** The Redis `ZINCRBY` leaderboard is written but never displayed anywhere.
-- **Change:** Add a panel to `/admin/codebase-viewer` (or new `/admin/prompt-analytics`) showing top 20 prompts per section with click counts, trending direction (7-day delta), and quality tier.
+### P6-A `record-feature-implementation.ts` — automated annotation
+- **Goal:** Every major build task writes a durable record (`feature:ID`) containing intent, diff, dependencies, and coordinates.
+- **Tasks:**
+  - Create `scripts/features/record-feature-implementation.ts`.
+  - Use `rg` and AST scanning (via `ts-morph` or `clang`) to extract static vs. dynamic imports.
+  - Snapshot `package.json` versions and implementation prompt hashes.
+- **Effort:** 3 hrs
+
+### P6-B `context.prefetch_feature_context` — recommendation engine
+- **Goal:** Prefetch related context (files, prior errors, topology neighbors) *before* the LLM starts editing.
+- **Tasks:**
+  - Implement MCP tool `context.prefetch_feature_context`.
+  - Use GPU SOM/manifold4 coordinates for neighborhood lookup in Qdrant.
+  - Incorporate "Knowledge Delta" (Gemma4 belief vs. actual AST truth).
+- **Effort:** 4 hrs
+
+### P6-C Activity-Aware Prefetch (VS Code + rg)
+- **Goal:** Log developer activity (files opened, symbols selected) to steer prefetch relevance.
+- **Tasks:**
+  - Implement `scripts/activity/log-developer-activity.mjs` using `rg` to scan for recently modified symbols/files.
+  - Process logs using **GNU Awk** for high-performance extraction of "hot" areas.
 - **Effort:** 2 hrs
+
+---
+
+## P7 — Production Hardening (SvelteKit 2 + Drizzle-ORM)
+
+Finalize the transition to a byte-stable, high-concurrency production stack.
+
+### P7-A Drizzle-ORM Migration & PGVector Stabilization
+- **Goal:** Zero-downtime migrations for `feature_implementations` and `error_fingerprints` tables.
+- **Tasks:**
+  - Audit `drizzle/` migrations against production `legal_ai_db`.
+  - Verify HNSW index performance for 768d pgvector embeddings.
+- **Effort:** 2 hrs
+
+### P7-B Native Bridge (Clang) & Multi-Stream Concurrency
+- **Goal:** Harden the LibTorch bridge for production loads using Clang/LLVM.
+- **Tasks:**
+  - Validate native N-API bridge compilation via Clang.
+  - Implement Bounded CUDA stream concurrency (8GB VRAM limit).
+- **Effort:** 3 hrs
 
 ---
 
@@ -178,9 +213,10 @@ The full self-improvement loop: inference → log → distill → train → depl
 ```
 P0 (unify retrieval) → P1-A (prompt leaderboard → ACE) → QW-4 (version bump)
                      → P2-A (cache keys) → P3-A (cross-source rerank)
+                     → P6-A (feature recording) → P6-C (activity logging)
                      → P1-B (QLoRA distillation trigger) → P4-A/C
-                     → P2-B (scorer interface) → P2-C (tool registry)
-                     → P3-B → P4-B (quality gate) → P5-A/B
+                     → P2-B (scorer interface) → P6-B (prefetch tool)
+                     → P7-A/B (prod hardening) → P4-B (quality gate) → P5-A/B
 ```
 
 **ROI ranking:** P0 (architectural completeness) > P1-A (closes feedback loop) > P2-A (code hygiene) > P3-A (search quality) > P4 (self-improvement) > P5 (observability)

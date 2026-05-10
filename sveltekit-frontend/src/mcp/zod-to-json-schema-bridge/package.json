@@ -1,0 +1,10 @@
+{
+  "name": "zod-to-json-schema",
+  "version": "3.99.0-bridge",
+  "description": "Local bridge that delegates Zod v4 schemas to z.toJSONSchema() and Zod v3 schemas to the original zod-to-json-schema (renamed to -original). Wired via package.json overrides.",
+  "main": "index.js",
+  "type": "commonjs",
+  "peerDependencies": {
+    "zod": "^3.25 || ^4.0"
+  }
+}

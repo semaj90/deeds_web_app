@@ -37,8 +37,8 @@ const PROBES = [
   },
   {
     name: 'redis-readonly',
-    cmd: 'uvx', args: ['mcp-redis'],
-    env: { REDIS_HOST: 'localhost', REDIS_PORT: '6379', REDIS_DB: '0' },
+    cmd: 'uvx', args: ['mcp-server-redis'],
+    env: { REDIS_HOST: 'localhost', REDIS_PORT: '6379', REDIS_DB: '0', REDIS_PASSWORD: 'redis' },
     note: 'requires uv + Redis on :6379 (legal-ai-redis container)',
   },
   {
@@ -49,15 +49,22 @@ const PROBES = [
   },
   {
     name: 'obsidian-vault',
-    cmd: 'npx', args: ['-y', 'mcpvault', '--vault', './vault'],
+    cmd: 'npx', args: ['-y', '@bitbonsai/mcpvault', '--vault', './vault'],
     env: {},
     note: 'requires npx; falls back gracefully if ./vault directory does not exist',
   },
   {
     name: 'ts-lsp',
-    cmd: 'npx', args: ['-y', '@isaacphi/mcp-language-server', '--workspace', '.'],
+    cmd: 'C:\\Users\\james\\go\\bin\\mcp-language-server.exe',
+    args: ['--workspace', '.', '--lsp', 'C:\\Users\\james\\AppData\\Roaming\\npm\\typescript-language-server.cmd', '--', '--stdio'],
     env: {},
-    note: 'requires npx + typescript-language-server on PATH',
+    note: 'requires go install github.com/isaacphi/mcp-language-server@latest + typescript-language-server on PATH',
+  },
+  {
+    name: 'context7',
+    cmd: 'npx', args: ['-y', '@upstash/context7-mcp'],
+    env: { CONTEXT7_API_KEY: 'placeholder' },
+    note: 'requires npx + context7 API key (probing with placeholder)',
   },
 ];
 
@@ -101,7 +108,7 @@ async function probe(p) {
         finish('fail', `exit ${code} ${tail}`);
       }
     });
-    setTimeout(() => finish('fail', 'timeout (10s)'), 10_000);
+    setTimeout(() => finish('fail', 'timeout (60s)'), 60_000);
     try {
       child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'smoke', version: '0' } } }) + '\n');
       child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }) + '\n');

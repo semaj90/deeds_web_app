@@ -97,5 +97,8 @@
     "pdf-parse": "2.4.5",
     "pg": "^8.0.0",
     "sveltekit-superforms": "^2.0.0"
+  },
+  "overrides": {
+    "zod-to-json-schema": "file:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"
   }
 }

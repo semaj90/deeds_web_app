@@ -29,7 +29,10 @@
   vscode.postMessage({ type: 'ready' });
 
   // ── State ─────────────────────────────────────────────────────────────────
-  let state = vscode.getState() || { zoom: 1, panX: 0, panY: 0, selectedId: null };
+  let state = vscode.getState();
+  if (!state || !state.zoom) {
+    state = window.__deedsInitialState || { zoom: 1, panX: 0, panY: 0, selectedId: null };
+  }
 
   // ── Data ─────────────────────────────────────────────────────────────────
   let nodes    = [];
