@@ -4330,3 +4330,63 @@ export const codeLlmIndex = pgTable('code_llm_index', {
 export type CodeLlmIndexRow    = typeof codeLlmIndex.$inferSelect;
 export type NewCodeLlmIndexRow = typeof codeLlmIndex.$inferInsert;
 
+// ── HyperRAG Feature Atlas ────────────────────────────────────────────────────
+// §5 of docs/architecture/hyperrag-feature-atlas-runtime.md
+// Migration: drizzle/migrations/20260510_feature_atlas.sql
+
+export const featureImplementations = pgTable('feature_implementations', {
+  id:          uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  featureKey:  text('feature_key').notNull().unique(),
+  featureName: text('feature_name').notNull(),
+  description: text('description'),
+  laneIds:     text('lane_ids').array().default(sql`'{}'`),
+  status:      varchar('status', { length: 32 }).notNull().default('active'),
+  confidence:  real('confidence').notNull().default(1.0),
+  createdAt:   timestamp('created_at', { withTimezone: true }).default(sql`now()`),
+  updatedAt:   timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
+}, (t) => [
+  index('feat_impl_status_idx').on(t.status),
+]);
+
+export type FeatureImplementation    = typeof featureImplementations.$inferSelect;
+export type NewFeatureImplementation = typeof featureImplementations.$inferInsert;
+
+export const featureFileEdges = pgTable('feature_file_edges', {
+  id:          uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  featureKey:  text('feature_key').notNull().references(() => featureImplementations.featureKey, { onDelete: 'cascade' }),
+  filePath:    text('file_path').notNull(),
+  entryExport: text('entry_export'),
+  role:        varchar('role', { length: 32 }).notNull().default('primary'),
+  lineStart:   integer('line_start'),
+  lineEnd:     integer('line_end'),
+  createdAt:   timestamp('created_at', { withTimezone: true }).default(sql`now()`),
+}, (t) => [
+  index('feat_file_path_idx').on(t.filePath),
+  index('feat_key_role_idx').on(t.featureKey, t.role),
+  unique('feat_file_unique').on(t.featureKey, t.filePath, t.entryExport),
+]);
+
+export type FeatureFileEdge    = typeof featureFileEdges.$inferSelect;
+export type NewFeatureFileEdge = typeof featureFileEdges.$inferInsert;
+
+// ── Panel Activity Log (L11 prefetch) ─────────────────────────────────────────
+// §6 of docs/architecture/hyperrag-feature-atlas-runtime.md
+
+export const panelActivityLog = pgTable('panel_activity_log', {
+  id:        uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  userId:    uuid('user_id').notNull(),
+  sessionId: text('session_id').notNull(),
+  route:     text('route').notNull(),
+  panelKey:  text('panel_key').notNull(),
+  filePath:  text('file_path'),
+  toolUsed:  text('tool_used'),
+  dwellMs:   integer('dwell_ms'),
+  ts:        timestamp('ts', { withTimezone: true }).default(sql`now()`),
+}, (t) => [
+  index('pal_user_route_idx').on(t.userId, t.route, t.ts),
+  index('pal_ts_idx').on(t.ts),
+]);
+
+export type PanelActivityLog    = typeof panelActivityLog.$inferSelect;
+export type NewPanelActivityLog = typeof panelActivityLog.$inferInsert;
+

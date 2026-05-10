@@ -2733,14 +2733,17 @@ server.registerTool(
 server.registerTool(
   'kag.multi_lane_search',
   {
-    description: 'Performs multi-lane retrieval across hash, n-gram, and graph nodes.',
+    description: 'Performs 11-lane HyperRAG retrieval across hash, n-gram, graph, feature atlas, and activity prefetch lanes. Returns ranked hits + synthesisBlock with per-chunk trust tier metadata.',
     inputSchema: z.object({
       query:   z.string().max(4000).describe('Query text, error message, or symbol/file name'),
       isError: z.boolean().default(false).describe('Treat query as an error fingerprint (enables hash lane)'),
       topK:    z.number().int().min(1).max(30).default(10).describe('Hits per lane'),
+      lanes:   z.array(z.enum(['L0','L1','L2','L3','L4','L5','L6','L7','L8','L9','L10','L11']))
+                .optional()
+                .describe('Which HyperRAG lanes to activate. Default: all except L10. Use L0,L1,L2,L4,L8 for dry-run.'),
     })
   },
-  async ({ query, isError, topK }) => {
+  async ({ query, isError, topK, lanes }) => {
     try {
       const { multiLaneSearch } = await import('../lib/server/ace/multi-lane-retrieval.js');
       const Redis = (await import('ioredis')).default;
@@ -2751,7 +2754,184 @@ server.registerTool(
       await r.connect().catch(() => {});
       const result = await multiLaneSearch(r, pool, { text: query, isError, topK });
       await r.quit().catch(() => {});
-      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+      // Annotate with trust tier metadata per lane
+      const laneFilter = lanes && lanes.length > 0 ? new Set(lanes) : null;
+      const LANE_TRUST: Record<string, string> = {
+        L0:'T1', L1:'T3', L2:'T3', L3:'T2', L4:'T1', L5:'T2',
+        L6:'T2', L7:'T3', L8:'T1', L9:'T1', L10:'T4', L11:'T1',
+      };
+      const enriched = {
+        ...result,
+        lanes: laneFilter ? Array.from(laneFilter) : 'all',
+        trustTiers: LANE_TRUST,
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(enriched, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── kag.feature_lookup ────────────────────────────────────────────────────────
+// Query feature_implementations by natural-language feature name.
+// Returns file paths + entry exports for the matched feature (L9 lane, T1 trust).
+// §11 of docs/architecture/hyperrag-feature-atlas-runtime.md
+
+server.registerTool(
+  'kag.feature_lookup',
+  {
+    description: 'Look up which files implement a named feature. Queries the durable feature_implementations + feature_file_edges tables (HyperRAG L9). Returns file paths and entry-point exports for the matched feature.',
+    inputSchema: z.object({
+      featureName: z.string().min(1).max(500).describe('Natural-language feature name or description (e.g. "hyperedge search", "ace context pack")'),
+      role:        z.enum(['primary','consumer','test','type','all']).default('all').describe('Filter by file role'),
+      limit:       z.number().int().min(1).max(20).default(8).optional(),
+    })
+  },
+  async ({ featureName, role, limit = 8 }) => {
+    try {
+      const { sql: drizzleSql, eq } = await import('drizzle-orm');
+      const { featureImplementations: featImpl, featureFileEdges: featEdges } =
+        await import('../lib/server/db/schema-postgres.js');
+      const whereClause = role === 'all'
+        ? drizzleSql`to_tsvector('english', ${featImpl.featureName} || ' ' || COALESCE(${featImpl.description}, '')) @@ plainto_tsquery('english', ${featureName}) AND ${featImpl.status} = 'active'`
+        : drizzleSql`to_tsvector('english', ${featImpl.featureName} || ' ' || COALESCE(${featImpl.description}, '')) @@ plainto_tsquery('english', ${featureName}) AND ${featImpl.status} = 'active' AND ${featEdges.role} = ${role}`;
+
+      const hits = await pool.query<{
+        feature_key: string; feature_name: string; description: string | null;
+        lane_ids: string[]; file_path: string; entry_export: string | null; role: string;
+      }>(
+        `SELECT fi.feature_key, fi.feature_name, fi.description, fi.lane_ids,
+                fe.file_path, fe.entry_export, fe.role
+         FROM feature_implementations fi
+         JOIN feature_file_edges fe ON fe.feature_key = fi.feature_key
+         WHERE to_tsvector('english', fi.feature_name || ' ' || COALESCE(fi.description, ''))
+               @@ plainto_tsquery('english', $1)
+           AND fi.status = 'active'
+           ${role !== 'all' ? `AND fe.role = '${role}'` : ''}
+         ORDER BY fe.role, fe.file_path
+         LIMIT $2`,
+        [featureName, limit]
+      );
+
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: true,
+            query: featureName,
+            count: hits.rows.length,
+            trustTier: 'T1',
+            instructionAuthority: false,
+            results: hits.rows.map((h) => ({
+              featureKey: h.feature_key,
+              featureName: h.feature_name,
+              description: h.description,
+              laneIds: h.lane_ids,
+              filePath: h.file_path,
+              entryExport: h.entry_export,
+              role: h.role,
+            })),
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── kag.panel_context ─────────────────────────────────────────────────────────
+// Return recent panel_activity_log rows for the current session.
+// Used by SSE context injection to prefetch files the user is likely to ask about.
+// §11 of docs/architecture/hyperrag-feature-atlas-runtime.md
+
+server.registerTool(
+  'kag.panel_context',
+  {
+    description: 'Return recently viewed files and tools from panel_activity_log for the active user session (HyperRAG L11 prefetch). Provides warm context about what the user is currently working on.',
+    inputSchema: z.object({
+      userId:    z.string().uuid().describe('User UUID to look up activity for'),
+      windowMin: z.number().int().min(1).max(1440).default(30).optional().describe('Look-back window in minutes (default 30)'),
+      limit:     z.number().int().min(1).max(50).default(12).optional(),
+    })
+  },
+  async ({ userId, windowMin = 30, limit = 12 }) => {
+    try {
+      const hits = await pool.query<{
+        file_path: string | null; panel_key: string; tool_used: string | null; ts: Date;
+      }>(
+        `SELECT DISTINCT ON (file_path) file_path, panel_key, tool_used, ts
+         FROM panel_activity_log
+         WHERE user_id = $1::uuid
+           AND ts > NOW() - ($2 || ' minutes')::INTERVAL
+         ORDER BY file_path, ts DESC
+         LIMIT $3`,
+        [userId, windowMin, limit]
+      );
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: true,
+            userId,
+            windowMin,
+            count: hits.rows.length,
+            trustTier: 'T1',
+            recentFiles: hits.rows.map((r) => ({
+              filePath: r.file_path,
+              panelKey: r.panel_key,
+              toolUsed: r.tool_used,
+              ts: r.ts,
+            })),
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── ops.trust_audit ───────────────────────────────────────────────────────────
+// Read-only diagnostic: returns blocked injection count + last-N content hashes.
+// T1-only in allowlist — can be called by Gemma4 for diagnostics only.
+// §11 of docs/architecture/hyperrag-feature-atlas-runtime.md
+
+server.registerTool(
+  'ops.trust_audit',
+  {
+    description: 'Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most recently blocked entries. Use for diagnostics only — cannot clear the block list.',
+    inputSchema: z.object({
+      limit: z.number().int().min(1).max(50).default(10).optional().describe('How many blocked entries to return'),
+    })
+  },
+  async ({ limit = 10 }) => {
+    try {
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+
+      // Count ace:injection:blocked:* keys
+      const keys = await r.keys('ace:injection:blocked:*').catch(() => [] as string[]);
+      const recent = keys.slice(0, limit).map((k) => k.replace('ace:injection:blocked:', ''));
+
+      await r.quit().catch(() => {});
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: true,
+            trustAudit: true,
+            readOnly: true,
+            blockedCount: keys.length,
+            recentBlockedHashes: recent,
+            note: 'Only T1 instructions may clear the block list. This tool is diagnostic only.',
+          }, null, 2),
+        }],
+      };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
     }
