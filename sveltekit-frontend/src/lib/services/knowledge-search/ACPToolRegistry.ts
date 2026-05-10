@@ -32,6 +32,12 @@ export interface ACPKnowledgeSearchResult {
     collection: string;
     latencyMs: number;
     topoPrefilter?: import('$lib/server/cache/topo-candidate-cache.js').TopoPrefilterStats;
+    routing?: {
+      dispatch: string[];
+      weights: { qdrant: number; postgres: number; neo4j: number; mcp: number };
+      qdrantHits: number;
+      postgresHits: number;
+    };
   };
 }
 

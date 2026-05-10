@@ -2772,6 +2772,42 @@ server.registerTool(
   }
 );
 
+// ── kag.web_search ────────────────────────────────────────────────────────────
+// L10 lane (T4 trust) — external web search for information-seeking queries.
+// Skips automatically for code/error queries. Results sanitized, not injected raw.
+
+server.registerTool(
+  'kag.web_search',
+  {
+    description: 'L10 lane web search (T4 trust). Searches the web for information-seeking queries. Skips for code/error queries. Returns sanitized snippets for synthesis.',
+    inputSchema: z.object({
+      query: z.string().max(2000).describe('Search query (information-seeking, not code)'),
+      limit: z.number().int().min(1).max(10).default(5),
+    }),
+  },
+  async ({ query, limit }) => {
+    try {
+      const { webSearch } = await import('../lib/server/retrieval/web-search.js');
+      const response = await webSearch(query, limit);
+      const results = response?.results ?? [];
+      if (!results.length) {
+        return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: true, hits: [], totalHits: 0, lane: 'web_search', trustTier: 'T4' }) }] };
+      }
+      const hits = results.map((r) => ({
+        url: r.url,
+        title: r.title,
+        snippet: r.snippet.slice(0, 400),
+        score: 0.4,
+        lane: 'web_search',
+        trustTier: 'T4',
+      }));
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: true, hits, totalHits: hits.length, lane: 'web_search', trustTier: 'T4' }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err), lane: 'web_search', trustTier: 'T4' }) }] };
+    }
+  }
+);
+
 // ── kag.feature_lookup ────────────────────────────────────────────────────────
 // Query feature_implementations by natural-language feature name.
 // Returns file paths + entry exports for the matched feature (L9 lane, T1 trust).
@@ -4535,6 +4571,48 @@ server.registerTool(
   }
 );
 
+// ── evidence.link_image_graph ─────────────────────────────────────────────────
+// Wire IMAGE_FOR Neo4j edges from an evidence image → CodebaseFile nodes.
+// Normally called automatically by the search-by-image route, but exposed here
+// so agents can repair graph links for existing evidence without re-uploading.
+server.registerTool(
+  'evidence.link_image_graph',
+  {
+    description:
+      'Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. ' +
+      'Normally fires automatically after search-by-image, but can be called manually to repair ' +
+      'or backfill graph links for existing evidence. Returns { ok, edgesCreated }.',
+    inputSchema: z.object({
+      evidence_id: z.string().describe('UUID of the evidence image record'),
+      caption:     z.string().max(4096).describe('VLM-generated caption for the image'),
+      links: z.array(z.object({
+        file_path:    z.string().describe('Relative source file path (e.g. "src/lib/server/vector/image-search.ts")'),
+        score:        z.number().min(0).max(1).describe('Qdrant cosine similarity score'),
+        tag_boost:    z.number().min(0).max(0.15).default(0).describe('Tag overlap boost added to raw score'),
+        matched_tags: z.array(z.string()).default([]).describe('Tags matched between VLM caption and Qdrant payload'),
+      })).min(1).max(50).describe('File links to create IMAGE_FOR edges toward'),
+    }),
+  },
+  async ({ evidence_id, caption, links }) => {
+    try {
+      const { linkImageToCodeFiles } = await import('$lib/server/graph/evidence-graph-service.js');
+      const edgesCreated = await linkImageToCodeFiles(
+        evidence_id,
+        caption,
+        links.map(l => ({
+          filePath:    l.file_path,
+          score:       l.score,
+          tagBoost:    l.tag_boost,
+          matchedTags: l.matched_tags,
+        })),
+      );
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: true, edgesCreated }) }] };
+    } catch (e) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(e).slice(0, 200) }) }] };
+    }
+  }
+);
+
 // ── image.search_by_text ──────────────────────────────────────────────────────
 // Text description → embeddinggemma → Qdrant ANN on evidence_items.
 // No image file needed — "find images of X" without uploading anything.
@@ -4846,6 +4924,112 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
 // Pre-warm the Postgres pool so first FTS query doesn't eat into tool timeout
 pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });
 
+// ── ops.gpu_attention ─────────────────────────────────────────────────────────
+// Scaled dot-product attention — pipeline-queued, Redis shape-cached.
+server.registerTool(
+  'ops.gpu_attention',
+  {
+    description: 'GPU scaled dot-product attention over a flat key matrix. ' +
+      'Returns softmax attention weights per key. ' +
+      'Results are Redis-cached 300 s by shape+input hash (CUDA Graph replay emulation). ' +
+      'Use for ACE chunk reranking, evidence scoring, or any query-vs-corpus weighting.',
+    inputSchema: z.object({
+      query: z.array(z.number()).max(768).describe('Query vector (dim floats)'),
+      keys:  z.array(z.number()).describe('Flat key matrix [n × dim] row-major'),
+      n:     z.number().int().min(1).max(2048),
+      dim:   z.number().int().min(1).max(768),
+    }),
+  },
+  async ({ query, keys, n, dim }) => {
+    try {
+      const { pipelineAttention } = await import('../lib/server/gpu/gpu-pipeline.js');
+      const q = new Float32Array(query);
+      const k = new Float32Array(keys);
+      const { weights, source } = await pipelineAttention(q, k, n, dim);
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        weights:  Array.from(weights),
+        source,
+        n, dim,
+      }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
+    }
+  }
+);
+
+// ── ops.gpu_pagerank ──────────────────────────────────────────────────────────
+server.registerTool(
+  'ops.gpu_pagerank',
+  {
+    description: 'GPU power-iteration PageRank on a flat adjacency matrix. ' +
+      'Returns normalised rank scores (sum to 1.0). ' +
+      'Cached 300 s by shape+input hash.',
+    inputSchema: z.object({
+      adj:     z.array(z.number()).describe('Flat n×n adjacency matrix row-major'),
+      n:       z.number().int().min(2).max(512),
+      damping: z.number().min(0).max(1).default(0.85),
+      iters:   z.number().int().min(1).max(200).default(50),
+    }),
+  },
+  async ({ adj, n, damping, iters }) => {
+    try {
+      const { pipelinePageRank } = await import('../lib/server/gpu/gpu-pipeline.js');
+      const { scores, source } = await pipelinePageRank(new Float32Array(adj), n, damping, iters);
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        scores: Array.from(scores),
+        source, n, damping,
+      }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
+    }
+  }
+);
+
+// ── ops.gpu_topk ──────────────────────────────────────────────────────────────
+server.registerTool(
+  'ops.gpu_topk',
+  {
+    description: 'GPU top-k index selection. Returns k indices of highest-scoring candidates ' +
+      'in descending order. Use after pipelineAttention to get the top chunk indices.',
+    inputSchema: z.object({
+      scores: z.array(z.number()).max(4096).describe('Score array (float per candidate)'),
+      k:      z.number().int().min(1).max(100),
+    }),
+  },
+  async ({ scores, k }) => {
+    try {
+      const { pipelineTopK } = await import('../lib/server/gpu/gpu-pipeline.js');
+      const n = scores.length;
+      const { indices, source } = await pipelineTopK(new Float32Array(scores), n, k);
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        indices: Array.from(indices),
+        topScores: Array.from(indices).map(i => scores[i]),
+        source, n, k,
+      }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
+    }
+  }
+);
+
+// ── ops.gpu_pipeline_stats ────────────────────────────────────────────────────
+server.registerTool(
+  'ops.gpu_pipeline_stats',
+  {
+    description: 'Returns GPU pipeline diagnostics: active stream slots, pending queue depth, ' +
+      'cache hit rate over last 50 ops, and device config.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    try {
+      const { gpuPipelineStats } = await import('../lib/server/gpu/gpu-pipeline.js');
+      return { content: [{ type: 'text' as const, text: JSON.stringify(gpuPipelineStats(), null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 200) }) }], isError: true };
+    }
+  }
+);
+
 nodeServer.listen(PORT, HOST, () => {
   console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
   console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
@@ -4866,7 +5050,12 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       context.prefetch_feature_context (TRACE+KB+Karpathy bridge)');
   console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
   console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');
+  console.log('       evidence.link_image_graph (repair/backfill IMAGE_FOR Neo4j edges),');
   console.log('       image.search_by_text (text→embed→Qdrant, no file upload),');
   console.log('       image.caption (VLM describe only, no search),');
   console.log('       image.enrich_tags (VLM→tags→setPayload PATCH, merge dedup)');
+  console.log('       ops.gpu_attention (stream-queued attn, Redis shape-cache),');
+  console.log('       ops.gpu_pagerank (stream-queued PageRank, Redis shape-cache),');
+  console.log('       ops.gpu_topk (GPU top-k index selection),');
+  console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
 });

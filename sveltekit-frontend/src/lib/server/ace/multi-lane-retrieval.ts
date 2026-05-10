@@ -6,6 +6,7 @@ import { multiTextRecall, type NgramHit } from './ngram-retrieval.js';
 import { extractFilePaths } from './error-fingerprint.js';
 import { aceTopkKey } from './cache-keys.js';
 import { readLatestQdrantClusterTags, scoreClusterRelevance } from './cluster-tags-cache.js';
+import { scoreCandidate } from '../kb/rerank-weight-loader.js';
 
 export interface MultiLaneQuery {
 	text: string;
@@ -15,7 +16,7 @@ export interface MultiLaneQuery {
 }
 
 export interface LaneResult {
-	lane: 'hash' | 'sparse' | 'graph' | 'ace_cache' | 'symbol' | 'dense' | 'topology' | 'wiki' | 'error' | 'task' | 'research';
+	lane: 'hash' | 'sparse' | 'graph' | 'ace_cache' | 'symbol' | 'dense' | 'topology' | 'wiki' | 'error' | 'task' | 'research' | 'web_search' | 'cartridge';
 	hits: MultiLaneHit[];
 	latencyMs: number;
 	cacheHit: boolean;
@@ -32,6 +33,8 @@ export interface MultiLaneHit {
 	score: number;
 	lane: string;
 	priorFix?: string;
+	/** Karpathy blend score from Redis gpu:karpathy:scores (added by cartridge enrichment) */
+	pagerank?: number;
 }
 
 export interface MultiLaneSynthesis {
@@ -348,17 +351,19 @@ function runTopologyLane(query: MultiLaneQuery): LaneResult {
 }
 
 const LANE_WEIGHT: Record<string, number> = {
-	hash:     1.00,
-	ace_cache: 0.90,
-	symbol:   0.80,
-	dense:    0.75,
-	topology: 0.70,
-	sparse:   0.60,
-	graph:    0.55,
-	wiki:     0.65,
-	task:     0.50,
-	research: 0.50,
-	error:    0.95,
+	hash:       1.00,
+	error:      0.95,
+	ace_cache:  0.90,
+	symbol:     0.80,
+	dense:      0.75,
+	topology:   0.70,
+	wiki:       0.65,
+	cartridge:  0.65,
+	sparse:     0.60,
+	graph:      0.55,
+	task:       0.50,
+	research:   0.50,
+	web_search: 0.40,
 };
 
 function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
@@ -522,6 +527,143 @@ async function runResearchLane(pool: Pool, query: MultiLaneQuery): Promise<LaneR
 	}
 }
 
+// Patterns that indicate a query needs external web context vs. pure code lookup
+const WEB_SEARCH_TRIGGERS = /\b(what is|what are|how does|how to|explain|definition of|overview of|documentation for|latest|news|recent|2024|2025|2026|legal precedent|case law|statute|regulation)\b/i;
+const CODE_ONLY_PATTERNS  = /\b(function|class|import|export|const|let|var|interface|type|async|await|return|throw|error:|Error:|TypeError:|undefined|null|undefined is not)\b/;
+
+/**
+ * L10 — Web search lane (T4 trust, external content).
+ * Fires only for information-seeking queries; skips for pure code debugging.
+ * Results are sanitized and scored based on URL authority.
+ */
+async function runWebSearchLane(query: MultiLaneQuery): Promise<LaneResult> {
+	const t0 = Date.now();
+	const topK = Math.min(query.topK ?? 5, 5);
+
+	// Skip for code-only queries (error messages, symbol lookups, import paths)
+	const isCodeQuery = CODE_ONLY_PATTERNS.test(query.text) && !WEB_SEARCH_TRIGGERS.test(query.text);
+	if (isCodeQuery || query.isError) {
+		return {
+			lane: 'web_search',
+			hits: [],
+			latencyMs: 0,
+			cacheHit: false,
+			skipped: true,
+			skipReason: 'code/error query — web search skipped',
+		};
+	}
+
+	try {
+		const { webSearch } = await import('$lib/server/retrieval/web-search.js');
+		const response = await webSearch(query.text, topK);
+		const results = response?.results ?? [];
+		if (!results.length) return { lane: 'web_search', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+
+		const hits: MultiLaneHit[] = results.map((r) => ({
+			id: `web:${encodeURIComponent(r.url).slice(0, 64)}`,
+			text: `${r.title}: ${r.snippet.slice(0, 300)}`,
+			filePath: r.url,
+			score: 0.4,
+			lane: 'web_search',
+			tags: ['external', 'web'],
+		}));
+		return { lane: 'web_search', hits, latencyMs: Date.now() - t0, cacheHit: false };
+	} catch {
+		return { lane: 'web_search', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+}
+
+async function runCartridgeLane(redis: Redis, query: MultiLaneQuery): Promise<LaneResult> {
+	const t0 = Date.now();
+	const topK = query.topK ?? 5;
+
+	// Extract candidate file paths from query context or known symbols
+	const candidatePaths: string[] = [];
+	if (query.filePath) candidatePaths.push(query.filePath);
+	if (query.symbols?.length) {
+		// symbol → stable_key lookup via idx
+		for (const sym of query.symbols.slice(0, 8)) {
+			candidatePaths.push(sym);
+		}
+	}
+
+	if (!candidatePaths.length) {
+		return { lane: 'cartridge', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+
+	try {
+		const pipeline = redis.pipeline();
+		for (const p of candidatePaths) {
+			pipeline.get(`ace:module:cartridge:${p}`);
+		}
+		const results = await pipeline.exec();
+		if (!results) return { lane: 'cartridge', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+
+		const queryWords = new Set(query.text.toLowerCase().split(/\W+/).filter(w => w.length > 2));
+		const hits: MultiLaneHit[] = [];
+
+		for (let i = 0; i < results.length; i++) {
+			const [err, raw] = results[i] as [Error | null, string | null];
+			if (err || !raw) continue;
+			const c = JSON.parse(raw) as { p: string; t: string; e: string[]; tg: string[]; pr?: number; h: string };
+			const tagOverlap = (c.tg ?? []).filter((tag: string) => queryWords.has(tag.toLowerCase())).length;
+			const exportOverlap = (c.e ?? []).filter((ex: string) => queryWords.has(ex.toLowerCase())).length;
+			const score = scoreCandidate({
+				pagerank: c.pr,
+				tag_matches: tagOverlap,
+				export_matches: exportOverlap,
+			});
+			if (score < 0.05) continue;
+			hits.push({
+				id: `cartridge:${c.p}`,
+				text: `[${c.t}] ${c.p} — exports: ${(c.e ?? []).slice(0, 6).join(', ')}`,
+				filePath: c.p,
+				score,
+				lane: 'cartridge',
+				tags: c.tg ?? [],
+				pagerank: c.pr,
+			});
+		}
+
+		hits.sort((a, b) => b.score - a.score);
+		return { lane: 'cartridge', hits: hits.slice(0, topK), latencyMs: Date.now() - t0, cacheHit: false };
+	} catch {
+		return { lane: 'cartridge', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+}
+
+async function enrichWithCartridgeData(redis: Redis, hits: MultiLaneHit[], queryText: string): Promise<MultiLaneHit[]> {
+	const filePaths = [...new Set(hits.map(h => h.filePath).filter(Boolean))] as string[];
+	if (!filePaths.length) return hits;
+
+	const queryWords = new Set(queryText.toLowerCase().split(/\W+/).filter(w => w.length > 2));
+
+	const pipeline = redis.pipeline();
+	for (const fp of filePaths) {
+		pipeline.get(`ace:module:cartridge:${fp}`);
+	}
+	const results = await pipeline.exec().catch(() => null);
+	if (!results) return hits;
+
+	const cartridgeMap = new Map<string, { pr?: number; tg?: string[]; e?: string[] }>();
+	for (let i = 0; i < results.length; i++) {
+		const [err, raw] = results[i] as [Error | null, string | null];
+		if (err || !raw) continue;
+		const c = JSON.parse(raw);
+		cartridgeMap.set(filePaths[i], { pr: c.pr, tg: c.tg, e: c.e });
+	}
+
+	return hits.map(hit => {
+		if (!hit.filePath) return hit;
+		const c = cartridgeMap.get(hit.filePath);
+		if (!c) return hit;
+		const tagOverlap = (c.tg ?? []).filter(tag => queryWords.has(tag.toLowerCase())).length;
+		const prBoost = Math.min((c.pr ?? 0) / 10, 1) * 0.10;
+		const tagBoost = Math.min(tagOverlap / 5, 1) * 0.10;
+		return { ...hit, score: Math.min(hit.score + prBoost + tagBoost, 1.0), pagerank: c.pr ?? hit.pagerank, tags: hit.tags?.length ? hit.tags : (c.tg ?? []) };
+	});
+}
+
 export async function multiLaneSearch(
 	redis: Redis,
 	pool: Pool,
@@ -530,7 +672,7 @@ export async function multiLaneSearch(
 	const t0 = Date.now();
 	const queryHash = qHash(query.text);
 
-	const [hashResult, sparseResult, graphResult, aceCacheResult, symbolResult, denseResult, topologyResult, wikiResult, errorResult, taskResult, researchResult] = await Promise.allSettled([
+	const [hashResult, sparseResult, graphResult, aceCacheResult, symbolResult, denseResult, topologyResult, wikiResult, errorResult, taskResult, researchResult, webSearchResult] = await Promise.allSettled([
 		runHashLane(redis, pool, query),
 		runSparseLane(pool, query),
 		runGraphLane(redis, query),
@@ -542,6 +684,7 @@ export async function multiLaneSearch(
 		runErrorLane(pool, query),
 		runTaskLane(pool, query),
 		runResearchLane(pool, query),
+		runWebSearchLane(query),
 	]);
 
 	const lanes: LaneResult[] = [];
@@ -590,8 +733,12 @@ export async function multiLaneSearch(
 		researchResult.status === 'fulfilled'
 			? researchResult.value
 			: { lane: 'research' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedWebSearch =
+		webSearchResult.status === 'fulfilled'
+			? webSearchResult.value
+			: { lane: 'web_search' as const, hits: [], latencyMs: 0, cacheHit: false };
 
-	lanes.push(resolvedHash, resolvedSparse, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedDense, resolvedTopology, resolvedWiki, resolvedError, resolvedTask, resolvedResearch);
+	lanes.push(resolvedHash, resolvedSparse, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedDense, resolvedTopology, resolvedWiki, resolvedError, resolvedTask, resolvedResearch, resolvedWebSearch);
 
 	const merged = mergeAndRank(lanes);
 
