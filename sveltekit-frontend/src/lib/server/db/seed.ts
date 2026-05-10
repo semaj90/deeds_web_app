@@ -16,7 +16,7 @@
  */
 
 import bcrypt from 'bcryptjs';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 import * as schema from './schema-postgres';
@@ -316,21 +316,26 @@ async function seed(): Promise<void> {
 		];
 
 		for (const caseRecord of createdCases) {
+			let addedInCase = 0;
+			let existingInCase = 0;
 			for (let i = 0; i < 8; i++) {
 				const template = evidenceTemplates[i];
-				// NOTE: evidence.user_id is uuid (orphan, pre-Lucia legacy); evidence.uploaded_by
-				// is integer and matches users.id. Use uploaded_by exclusively until the orphan
-				// column is migrated or dropped. See CLAUDE.md "Schema Mismatch" section.
+				const title = `${template.title} - ${caseRecord.caseNumber}-E${i + 1}`;
+				
+				// Create a deterministic hash for idempotency
+				const hashBase = `${caseRecord.id}:${title}:${i}`;
+				const deterministicHash = `sha256:${crypto.createHash('sha256').update(hashBase).digest('hex')}`;
+
 				const evidenceData = {
 					caseId: caseRecord.id,
-					title: `${template.title} - ${caseRecord.caseNumber}-E${i + 1}`,
+					title,
 					description: `Evidence item ${i + 1} for ${caseRecord.title}`,
 					evidenceType: template.type,
 					fileName: `evidence-${caseRecord.caseNumber}-${i + 1}.${template.ext}`,
 					fileSize: Math.floor(Math.random() * 5000000) + 100000,
-					hash: `sha256:${crypto.randomBytes(32).toString('hex')}`,
+					hash: deterministicHash,
 					fileUrl: `minio://evidence/${caseRecord.id}/evidence-${i + 1}.${template.ext}`,
-					uploadedBy: String(userId),
+					uploadedBy: userId,
 				};
 
 				const existing = await db
@@ -350,11 +355,15 @@ async function seed(): Promise<void> {
 							demoSeed: true,
 						},
 					});
-					evidenceCount++;
+					addedInCase++;
+				} else {
+					existingInCase++;
 				}
 			}
-			console.log(`  + Created 8 evidence items for ${caseRecord.caseNumber}`);
+			console.log(`  + ${caseRecord.caseNumber}: ${addedInCase} added, ${existingInCase} verified`);
+			evidenceCount += addedInCase;
 		}
+
 
 		console.log(`\n[seed] ✅ ${evidenceCount} evidence items created.`);
 
@@ -394,6 +403,8 @@ async function seed(): Promise<void> {
 
 		for (let caseIdx = 0; caseIdx < createdCases.length; caseIdx++) {
 			const caseRecord = createdCases[caseIdx];
+			let addedInCase = 0;
+			let existingInCase = 0;
 
 			for (let poiIdx = 0; poiIdx < 4; poiIdx++) {
 				const template = poiTemplates[poiIdx];
@@ -413,16 +424,25 @@ async function seed(): Promise<void> {
 				const existing = await db
 					.select()
 					.from(personsOfInterest)
-					.where(eq(personsOfInterest.name, poiData.name))
+					.where(
+						and(
+							eq(personsOfInterest.name, poiData.name),
+							eq(personsOfInterest.description, poiData.description)
+						)
+					)
 					.limit(1);
 
 				if (existing.length === 0) {
 					await db.insert(personsOfInterest).values(poiData);
-					poiCount++;
+					addedInCase++;
+				} else {
+					existingInCase++;
 				}
 			}
-			console.log(`  + Created 4 POIs for ${caseRecord.caseNumber}`);
+			console.log(`  + ${caseRecord.caseNumber}: ${addedInCase} added, ${existingInCase} verified`);
+			poiCount += addedInCase;
 		}
+
 
 		console.log(`\n[seed] ✅ ${poiCount} POI records created.`);
 
@@ -431,6 +451,8 @@ async function seed(): Promise<void> {
 		let reportCount = 0;
 
 		for (const caseRecord of createdCases) {
+			let addedInCase = 0;
+			let existingInCase = 0;
 			const reportRecords = [
 				{
 					caseId: caseRecord.id,
@@ -506,25 +528,34 @@ Analysis supports further investigation.
 
 				if (existing.length === 0) {
 					await db.insert(reports).values(report);
-					reportCount++;
+					addedInCase++;
+				} else {
+					existingInCase++;
 				}
 			}
-			console.log(`  + Created 2 reports for ${caseRecord.caseNumber}`);
+			console.log(`  + ${caseRecord.caseNumber}: ${addedInCase} added, ${existingInCase} verified`);
+			reportCount += addedInCase;
 		}
 
-		console.log(`\n[seed] ✅ ${reportCount} reports created.`);
 
-		// === FINAL SUMMARY ===
+		// Get total counts from DB for summary
+		const [allUsers] = await db.select({ count: sql`count(*)` }).from(users);
+		const [allCases] = await db.select({ count: sql`count(*)` }).from(cases);
+		const [allEvidence] = await db.select({ count: sql`count(*)` }).from(evidence);
+		const [allPOIs] = await db.select({ count: sql`count(*)` }).from(personsOfInterest);
+		const [allReports] = await db.select({ count: sql`count(*)` }).from(reports);
+
 		console.log('\n' + '='.repeat(60));
 		console.log('  ENHANCED DATABASE SEED COMPLETE');
 		console.log('='.repeat(60));
 		console.log('');
-		console.log(`📊 Summary:`);
-		console.log(`  • ${userCount} users`);
-		console.log(`  • ${createdCases.length} cases`);
-		console.log(`  • ${evidenceCount} evidence items`);
-		console.log(`  • ${poiCount} persons of interest`);
-		console.log(`  • ${reportCount} reports`);
+		console.log(`📊 Summary (Total in Database):`);
+		console.log(`  • ${allUsers.count} users`);
+		console.log(`  • ${allCases.count} cases`);
+		console.log(`  • ${allEvidence.count} evidence items`);
+		console.log(`  • ${allPOIs.count} persons of interest`);
+		console.log(`  • ${allReports.count} reports`);
+
 		console.log('');
 		console.log('🔐 Login Credentials (all use password123):');
 		console.log('  demo@legal-ai.local  (admin)   ← Use this for Playwright tests');

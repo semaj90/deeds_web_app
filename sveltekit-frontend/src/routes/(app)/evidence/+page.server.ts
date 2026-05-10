@@ -42,7 +42,9 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   let evidenceData;
   let loadError: string | null = null;
 
-  const conditions = [eq(evidence.userId, locals.user.id)];
+  // Filter by uploadedBy (integer FK to users.id), not userId (orphan uuid).
+  // See CLAUDE.md "Schema Mismatch" — evidence.user_id is a pre-Lucia legacy column.
+  const conditions = [eq(evidence.uploadedBy, Number(locals.user.id))];
   if (caseId) conditions.push(eq(evidence.caseId, caseId));
 
   evidenceData = await safe(

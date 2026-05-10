@@ -396,7 +396,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           extractionStatus: 'pending',
           uploadedVia: 'api',
         },
-        uploadedBy: uploaderIntId as any, // schema declares uuid but DB column is integer
+        uploadedBy: uploaderIntId,
       })
       .returning({ id: evidence.id });
 

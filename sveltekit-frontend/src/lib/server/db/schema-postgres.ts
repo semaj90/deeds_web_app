@@ -287,7 +287,7 @@ export const evidence = pgTable('evidence', {
  fileUrl: text('file_url'), // S3/MinIO URL
  fileName: varchar('file_name', { length: 255 }),
  canvasPosition: jsonb('canvas_position').default({}),
- uploadedBy: uuid('uploaded_by'), // Foreign key to users.id
+ uploadedBy: integer('uploaded_by'), // FK to users.id (integer; DB migrated 2026-05-10)
  uploadedAt: timestamp('uploaded_at', { mode: 'string' }),
  // ENHANCED COLUMNS (evidence board, AI analysis, forensics)
  evidenceNumber: varchar('evidence_number', { length: 50 }),
