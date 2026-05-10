@@ -4053,6 +4053,607 @@ server.registerTool(
   },
 );
 
+// ── ops.update_agents_md ─────────────────────────────────────────────────────
+// Lets the LLM write structured knowledge back into the directory memory layer.
+// Immediately updates the Redis agents:dir:<dir> key (24h TTL) so the next
+// ACE call picks it up via Lane L4.  Optionally appends to the on-disk
+// AGENTS.md file under the target section so the fact survives redis flush.
+server.registerTool(
+  'ops.update_agents_md',
+  {
+    description: 'Append a new fact, rule, or tool note to a directory AGENTS.md file and flush to Redis. ' +
+                 'Use this after discovering something useful that should survive future conversations. ' +
+                 'The fact appears in every future ACE context for that directory automatically (Lane L4).',
+    inputSchema: z.object({
+      operator_token: z.string().describe('Non-empty approval token'),
+      dir_path:       z.string().max(200).describe('Relative directory path, e.g. "src/lib/server/ace"'),
+      section:        z.enum(['Rules', 'Context', 'Tools', 'Constraints', 'Notes']).default('Notes')
+                       .describe('Section header to append under'),
+      fact:           z.string().min(10).max(2000).describe('The fact, rule, or tool note to record'),
+      redis_only:     z.boolean().optional().describe('If true, only update Redis (skip disk write). Default false'),
+    }),
+  },
+  async ({ operator_token, dir_path, section, fact, redis_only }) => {
+    const tokenErr = requireToken(operator_token);
+    if (tokenErr) return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: tokenErr }) }] };
+
+    const safeDir  = dir_path.replace(/\.\./g, '').replace(/\\/g, '/').replace(/^\//, '');
+    const safeFact = String(fact).slice(0, 2000).replace(/\r\n/g, '\n');
+
+    const { default: Redis } = await import('ioredis');
+    const redisClient = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false,
+    });
+    try {
+      await redisClient.connect();
+      const { join, resolve } = await import('node:path');
+      const { existsSync, readFileSync, writeFileSync, mkdirSync } = await import('node:fs');
+
+      const redisKey = `agents:dir:${safeDir}`;
+      const existing = await redisClient.get(redisKey) ?? '';
+
+      // Build new entry line with timestamp
+      const ts   = new Date().toISOString().slice(0, 10);
+      const line = `- [${ts}] ${safeFact}`;
+
+      let updated: string;
+      const sectionHeader = `## ${section}`;
+      if (existing.includes(sectionHeader)) {
+        // Append under existing section
+        updated = existing.replace(
+          sectionHeader,
+          `${sectionHeader}\n${line}`
+        );
+      } else {
+        // Append new section at end
+        updated = `${existing.trimEnd()}\n\n${sectionHeader}\n${line}\n`;
+      }
+
+      await redisClient.setex(redisKey, 24 * 3600, updated);
+
+      let diskPath = '';
+      if (!redis_only) {
+        const root    = resolve(process.cwd(), '..', 'sveltekit-frontend', 'src');
+        const dirFull = resolve(root, safeDir);
+        const mdPath  = join(dirFull, 'AGENTS.md');
+
+        if (existsSync(dirFull)) {
+          const onDisk   = existsSync(mdPath) ? readFileSync(mdPath, 'utf8') : `# ${safeDir}\n`;
+          let diskUpdate: string;
+          if (onDisk.includes(sectionHeader)) {
+            diskUpdate = onDisk.replace(sectionHeader, `${sectionHeader}\n${line}`);
+          } else {
+            diskUpdate = `${onDisk.trimEnd()}\n\n${sectionHeader}\n${line}\n`;
+          }
+          mkdirSync(dirFull, { recursive: true });
+          writeFileSync(mdPath, diskUpdate, 'utf8');
+          diskPath = mdPath;
+        }
+      }
+
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok:        true,
+            redis_key: redisKey,
+            section,
+            disk_path: diskPath || '(redis-only)',
+            fact_preview: safeFact.slice(0, 120),
+          }),
+        }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }] };
+    } finally {
+      await redisClient.quit().catch(() => {});
+    }
+  }
+);
+
+// ── ops.fixer_semantic_recall ─────────────────────────────────────────────────
+// 3-layer recall: Redis L1 (exact hash) → Postgres L2 → Qdrant L3 (semantic).
+
+server.registerTool(
+  'ops.fixer_semantic_recall',
+  {
+    description: 'Recalls known fix templates via Redis L1 → Postgres L2 → Qdrant semantic L3. Call before LLM analysis to skip redundant inference on known error patterns.',
+    inputSchema: z.object({
+      errorHash:      z.string().describe('SHA-256 from kag.ingest_error'),
+      queryEmbedding: z.array(z.number()).max(768).optional().describe('768-dim error embedding for Qdrant semantic lane'),
+      limit:          z.number().int().min(1).max(10).default(5),
+    })
+  },
+  async ({ errorHash, queryEmbedding, limit }) => {
+    try {
+      const { recallFixerPattern } = await import('../lib/server/fixer/fixer-memory.js');
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+      const { exact, similar } = await recallFixerPattern(
+        r, pool, errorHash,
+        queryEmbedding?.length === 768 ? queryEmbedding : undefined,
+      );
+      await r.quit().catch(() => {});
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        exactMatch:  exact,
+        similarHits: similar.slice(0, limit),
+        recallCount: (exact ? 1 : 0) + similar.length,
+        hasFix:      Boolean(exact?.fixTemplate) || similar.some(s => s.fixTemplate),
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }], isError: true };
+    }
+  }
+);
+
+// ── ops.fixer_pattern_store ───────────────────────────────────────────────────
+// Writes a confirmed/failed fix to Redis + Postgres pgvector + Qdrant.
+// trust_score = success_count / (success + failure), updated on each call.
+
+server.registerTool(
+  'ops.fixer_pattern_store',
+  {
+    description: '[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.',
+    inputSchema: z.object({
+      errorHash:       z.string(),
+      errorCode:       z.string().optional(),
+      fixTemplate:     z.string().max(4000),
+      fixKind:         z.enum(['instruction', 'diff', 'regex']).default('instruction'),
+      outcome:         z.enum(['success', 'failure']),
+      runId:           z.string(),
+      file:            z.string(),
+      tags:            z.array(z.string()).max(10).optional(),
+      topFiles:        z.array(z.string()).max(20).optional(),
+      queryEmbedding:  z.array(z.number()).max(768).optional(),
+      linesChanged:    z.number().int().optional(),
+      durationMs:      z.number().int().optional(),
+      langfuseTraceId: z.string().optional(),
+    })
+  },
+  async (opts) => {
+    try {
+      const { storeFixerPattern, ensureFixerMemoryCollection } = await import('../lib/server/fixer/fixer-memory.js');
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+      await ensureFixerMemoryCollection().catch(() => {});
+      const patternId = await storeFixerPattern(r, pool, {
+        ...opts,
+        embedding: opts.queryEmbedding?.length === 768 ? opts.queryEmbedding : undefined,
+      });
+      await r.quit().catch(() => {});
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: true, patternId, outcome: opts.outcome, errorHash: opts.errorHash,
+      }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }], isError: true };
+    }
+  }
+);
+
+// ── context.prefetch_feature_context ─────────────────────────────────────────
+// Bridge tool: TRACE :8788 (graph/topology/KAG) + KB :8789 (research summaries)
+// + Redis Karpathy blend → one compact context pack for agentic coding.
+
+server.registerTool(
+  'context.prefetch_feature_context',
+  {
+    description:
+      'One-shot context prefetch for agentic coding. Combines KAG graph search, KB research summaries, ' +
+      'Karpathy blend scores, and AGENTS.md rules into a single compact pack. ' +
+      'Call this before making any code edits or retrievals — it saves 3-5 downstream tool calls.',
+    inputSchema: {
+      query:       z.string().describe('What you are about to work on (code path, feature, question)'),
+      file_path:   z.string().optional().describe('Current file being edited (absolute or relative to src/)'),
+      top_k:       z.number().int().min(1).max(20).optional().default(8).describe('Max items per lane'),
+      include_kb:  z.boolean().optional().default(true).describe('Cross-call KB MCP :8789 for research summaries'),
+      include_karpathy: z.boolean().optional().default(true).describe('Attach Karpathy blend scores'),
+    },
+  },
+  async (opts: {
+    query: string;
+    file_path?: string;
+    top_k?: number;
+    include_kb?: boolean;
+    include_karpathy?: boolean;
+  }) => {
+    const topK        = opts.top_k         ?? 8;
+    const includeKb   = opts.include_kb    ?? true;
+    const includeKarp = opts.include_karpathy ?? true;
+    const KB_URL      = process.env.KB_MCP_URL ?? 'http://127.0.0.1:8789';
+    const SK_URL      = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+    const REDIS_URL   = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+
+    const pack: Record<string, unknown> = {
+      query: opts.query,
+      file_path: opts.file_path ?? null,
+      lanes: {},
+      karpathyTop: [],
+      agentsMdRules: [],
+      retrievalTrace: [],
+    };
+
+    // ── Lane 1: KAG graph search via SvelteKit API ────────────────────────────
+    try {
+      const kagRes = await fetch(`${SK_URL}/api/graph/traverse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-internal-token': process.env.INTERNAL_API_TOKEN ?? '' },
+        body: JSON.stringify({ query: opts.query, limit: topK, filePath: opts.file_path }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (kagRes.ok) {
+        const kag = await kagRes.json() as Record<string, unknown>;
+        pack.lanes = { ...pack.lanes as object, kag: (kag.nodes ?? kag.results ?? []) };
+        (pack.retrievalTrace as string[]).push('kag:ok');
+      }
+    } catch { (pack.retrievalTrace as string[]).push('kag:timeout'); }
+
+    // ── Lane 2: Qdrant semantic search via SvelteKit embed + search ───────────
+    try {
+      const embedRes = await fetch(`${SK_URL}/api/embed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: opts.query }),
+        signal: AbortSignal.timeout(6000),
+      });
+      if (embedRes.ok) {
+        const { embedding } = await embedRes.json() as { embedding: number[] };
+        const qdRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            vector: { name: 'content', vector: embedding },
+            limit: topK,
+            with_payload: ['filePath', 'chunkText', 'tags', 'stableKey', 'featureIds', 'trustTier'],
+            score_threshold: 0.3,
+          }),
+          signal: AbortSignal.timeout(6000),
+        });
+        if (qdRes.ok) {
+          const { result } = await qdRes.json() as { result: unknown[] };
+          (pack.lanes as Record<string, unknown>).semantic = result ?? [];
+          (pack.retrievalTrace as string[]).push('semantic:ok');
+        }
+      }
+    } catch { (pack.retrievalTrace as string[]).push('semantic:timeout'); }
+
+    // ── Lane 3: KB MCP :8789 research summaries ───────────────────────────────
+    if (includeKb) {
+      try {
+        const kbRes = await fetch(`${KB_URL}/mcp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', id: 1, method: 'tools/call',
+            params: { name: 'kb.hybrid_search', arguments: { query: opts.query, top_k: Math.min(topK, 5) } },
+          }),
+          signal: AbortSignal.timeout(5000),
+        });
+        if (kbRes.ok) {
+          const kbJson = await kbRes.json() as { result?: { content?: Array<{ text?: string }> } };
+          const raw = kbJson?.result?.content?.[0]?.text;
+          if (raw) {
+            (pack.lanes as Record<string, unknown>).kb = JSON.parse(raw);
+            (pack.retrievalTrace as string[]).push('kb:ok');
+          }
+        }
+      } catch { (pack.retrievalTrace as string[]).push('kb:unavailable'); }
+    }
+
+    // ── Lane 4: Karpathy Redis blend scores for the file ─────────────────────
+    if (includeKarp && opts.file_path) {
+      try {
+        const { default: Redis } = await import('ioredis');
+        const r = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1, enableOfflineQueue: false, retryStrategy: () => null });
+        r.on('error', () => {});
+        await r.connect().catch(() => {});
+
+        // Top Karpathy files near this one
+        const scoreHash = await r.hgetall('gpu:karpathy:scores').catch(() => ({}));
+        const allScores = Object.entries(scoreHash ?? {}).map(([k, v]) => {
+          try { return { file: k, ...(JSON.parse(String(v)) as Record<string, number>) }; } catch { return null; }
+        }).filter(Boolean) as Array<{ file: string; blend: number }>;
+
+        allScores.sort((a, b) => (b.blend ?? 0) - (a.blend ?? 0));
+        pack.karpathyTop = allScores.slice(0, topK).map(s => ({ file: s.file, blend: +(s.blend ?? 0).toFixed(3) }));
+
+        // Score for this specific file
+        const fileScore = scoreHash[opts.file_path];
+        if (fileScore) {
+          (pack as Record<string, unknown>).thisFileKarpathy = JSON.parse(fileScore);
+        }
+
+        // AGENTS.md from Redis agents:dir:*
+        const dirKey = `agents:dir:${opts.file_path.replace(/\/[^/]+$/, '').replace(/^src\//, '')}`;
+        const agentsMd = await r.get(dirKey).catch(() => null);
+        if (agentsMd) {
+          // Extract just the Rules section for compactness
+          const rulesMatch = agentsMd.match(/#+\s*Rules\n([\s\S]*?)(?:\n#+|$)/i);
+          if (rulesMatch) {
+            pack.agentsMdRules = rulesMatch[1].split('\n').filter(l => l.trim().startsWith('-')).slice(0, 8);
+          }
+        }
+
+        await r.quit().catch(() => {});
+        (pack.retrievalTrace as string[]).push('karpathy:ok');
+      } catch { (pack.retrievalTrace as string[]).push('karpathy:timeout'); }
+    }
+
+    // ── Assemble summary ──────────────────────────────────────────────────────
+    const lanes  = pack.lanes as Record<string, unknown[]>;
+    const counts = Object.fromEntries(Object.entries(lanes).map(([k, v]) => [k, (v as unknown[]).length]));
+
+    const out = {
+      query:           opts.query,
+      file_path:       opts.file_path,
+      laneCounts:      counts,
+      kag:             (lanes.kag   ?? []).slice(0, topK),
+      semantic:        (lanes.semantic ?? []).slice(0, topK),
+      kb:              (lanes.kb    ?? []).slice(0, 5),
+      karpathyTop:     pack.karpathyTop,
+      thisFileKarpathy: (pack as Record<string, unknown>).thisFileKarpathy ?? null,
+      agentsMdRules:   pack.agentsMdRules,
+      retrievalTrace:  pack.retrievalTrace,
+      hint: 'Use kag+semantic for code context; kb for research; karpathyTop for hotspot awareness.',
+    };
+
+    return { content: [{ type: 'text' as const, text: JSON.stringify(out, null, 2) }] };
+  }
+);
+
+// ── evidence.search_by_image ──────────────────────────────────────────────────
+// Agentic image search: VLM caption → embed → Qdrant ANN → tag rerank.
+// Wraps POST /api/evidence/search-by-image via the running SvelteKit dev server.
+server.registerTool(
+  'evidence.search_by_image',
+  {
+    description: 'Search evidence by uploading an image. The VLM describes the image, ' +
+      'embeds it, and returns semantically similar evidence items from Qdrant. ' +
+      'Use for "find evidence similar to this photo/diagram/screenshot".',
+    inputSchema: z.object({
+      image_path:      z.string().describe('Absolute or workspace-relative path to the image file'),
+      collection:      z.string().default('evidence_items'),
+      limit:           z.number().int().min(1).max(20).default(10),
+      score_threshold: z.number().min(0).max(1).default(0.20),
+      case_id:         z.string().optional().describe('Filter to a specific case UUID'),
+    }),
+  },
+  async ({ image_path, collection, limit, score_threshold, case_id }) => {
+    const { readFile } = await import('node:fs/promises');
+    const { resolve, extname, basename } = await import('node:path');
+    const { searchByImage } = await import('../lib/server/vector/image-search.js');
+
+    const absPath = resolve(process.cwd(), image_path);
+    let buffer: Buffer;
+    try {
+      buffer = await readFile(absPath);
+    } catch {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: `Cannot read: ${absPath}` }) }] };
+    }
+
+    const ext2mime: Record<string, string> = {
+      '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+      '.webp': 'image/webp', '.gif': 'image/gif',
+    };
+    const fileName = basename(absPath);
+    const mimeType = ext2mime[extname(absPath).toLowerCase()] ?? 'image/jpeg';
+
+    try {
+      const result = await searchByImage({
+        buffer, fileName, collection, limit,
+        scoreThreshold: score_threshold,
+        caseId: case_id,
+      });
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        caption:       result.caption.slice(0, 400),
+        suggestedTags: result.suggestedTags,
+        model:         result.model,
+        cached:        result.cached,
+        durationMs:    result.durationMs,
+        hits:          result.hits.map(h => ({
+          id:          h.id,
+          score:       Math.round(h.score * 1000) / 1000,
+          tagBoost:    Math.round(h.tagBoost * 1000) / 1000,
+          matchedTags: h.matchedTags,
+          payload:     {
+            file_path:    h.payload.file_path,
+            evidenceType: h.payload.evidenceType,
+            caseId:       h.payload.caseId,
+            tags:         h.payload.tags,
+          },
+        })),
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }] };
+    }
+  }
+);
+
+// ── evidence.image_feedback ───────────────────────────────────────────────────
+// Cast a thumbs-up or thumbs-down vote on a visual search result.
+// Redis HINCRBY accumulates; Qdrant payload promoted after 3 votes.
+server.registerTool(
+  'evidence.image_feedback',
+  {
+    description: 'Record thumbs-up or thumbs-down on a visual search result. ' +
+      'Votes accumulate in Redis; Qdrant payload (trust_score, user_approved/rejected) ' +
+      'is updated after 3 votes. Fires GRPO rl-signal automatically.',
+    inputSchema: z.object({
+      point_id:   z.union([z.string(), z.number()]).describe('Qdrant point ID from a search result'),
+      collection: z.string().default('evidence_items'),
+      approved:   z.boolean().describe('true = thumbs up, false = thumbs down'),
+      query:      z.string().max(500).optional().describe('The query that produced this result (improves RL signal)'),
+    }),
+  },
+  async ({ point_id, collection, approved, query }) => {
+    const { default: Redis } = await import('ioredis');
+    const { createHash } = await import('node:crypto');
+
+    const PROMOTE_THRESHOLD = 3;
+    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false,
+    });
+    try {
+      await redis.connect();
+      const pid    = String(point_id);
+      const vote   = approved ? 1 : -1;
+      const qhash  = createHash('sha256').update((query ?? pid).trim().toLowerCase()).digest('hex').slice(0, 16);
+      const fKey   = `ace:img:feedback:${qhash}`;
+      const vKey   = `ace:img:votes:${qhash}`;
+      const TTL    = 60 * 60 * 24 * 7;
+
+      const [netScore, totalVotes] = await Promise.all([
+        redis.hincrby(fKey, pid, vote),
+        redis.hincrby(vKey, pid, 1),
+      ]);
+      redis.expire(fKey, TTL).catch(() => {});
+      redis.expire(vKey, TTL).catch(() => {});
+
+      let promoted = false;
+      if (totalVotes >= PROMOTE_THRESHOLD) {
+        const trustScore = Math.max(0, Math.min(1, (netScore / totalVotes + 1) / 2));
+        const { QdrantManager } = await import('../lib/server/vector/qdrant-manager.js');
+        const qdrant = new QdrantManager();
+        await qdrant.client.setPayload(collection, {
+          payload: { trust_score: trustScore, user_approved: netScore > 0, user_rejected: netScore < 0, vote_count: totalVotes },
+          points:  [pid],
+        }).catch((e: unknown) => console.warn('[image_feedback] Qdrant:', String(e).slice(0, 120)));
+        promoted = true;
+      }
+
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: true, netScore, totalVotes, promoted }) }] };
+    } finally {
+      await redis.quit().catch(() => {});
+    }
+  }
+);
+
+// ── image.search_by_text ──────────────────────────────────────────────────────
+// Text description → embeddinggemma → Qdrant ANN on evidence_items.
+// No image file needed — "find images of X" without uploading anything.
+server.registerTool(
+  'image.search_by_text',
+  {
+    description:
+      'Search the evidence image index using a text description. Embeds the query via embeddinggemma ' +
+      'and searches Qdrant. No image upload needed — use for natural-language queries like ' +
+      '"find images showing property damage" or "photos of the red sedan".',
+    inputSchema: z.object({
+      query:           z.string().min(1).max(2000).describe('Natural-language description of image content to find'),
+      collection:      z.string().default('evidence_items').describe('Qdrant collection to search'),
+      limit:           z.number().int().min(1).max(20).default(10),
+      score_threshold: z.number().min(0).max(1).default(0.25),
+      case_id:         z.string().optional().describe('Filter to a specific case UUID'),
+      tags:            z.array(z.string()).optional().describe('Additional tag filters (AND with query)'),
+    }),
+  },
+  async ({ query, collection, limit, score_threshold, case_id, tags }) => {
+    const SK_URL     = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+    const QDRANT_URL = process.env.QDRANT_URL    ?? 'http://127.0.0.1:6333';
+
+    // Step 1: embed via /api/embed (Redis L1 + Bifrost L2 cached)
+    let vector: number[];
+    try {
+      const er = await fetch(`${SK_URL}/api/embed`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body:   JSON.stringify({ text: query, model: 'embeddinggemma:latest' }),
+        signal: AbortSignal.timeout(10_000),
+      });
+      const ed = await er.json() as { embedding?: number[]; error?: string };
+      if (!ed.embedding?.length) throw new Error(ed.error ?? 'empty embedding');
+      vector = ed.embedding;
+    } catch (e) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: `embed: ${String(e).slice(0, 120)}`, query }) }] };
+    }
+
+    // Step 2: Qdrant ANN (named vector 'content' first, then unnamed fallback)
+    const mustFilter: Record<string, unknown>[] = [{ key: 'user_rejected', match: { value: false } }];
+    if (case_id) mustFilter.push({ key: 'caseId', match: { value: case_id } });
+    (tags ?? []).forEach(t => mustFilter.push({ key: 'tags', match: { value: t } }));
+    const filter = { must: mustFilter };
+
+    let hits: Array<{ id: string | number; score: number; payload: Record<string, unknown> }> = [];
+    for (const vecParam of [{ name: 'content', vector }, vector as unknown]) {
+      try {
+        const r = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body:   JSON.stringify({ vector: vecParam, limit: limit * 2, score_threshold, with_payload: true, filter }),
+          signal: AbortSignal.timeout(8_000),
+        });
+        const d = await r.json() as { result?: typeof hits };
+        if (d.result?.length) { hits = d.result; break; }
+      } catch { /* try fallback */ }
+    }
+
+    // Step 3: lightweight tag-overlap boost
+    const qWords = query.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+    const boosted = hits.map(h => {
+      const ptags = (h.payload?.tags as string[] ?? []).map(t => String(t).toLowerCase());
+      const matched = ptags.filter(pt => qWords.some(w => pt.includes(w)));
+      const tagBoost = Math.min(0.15, matched.length * 0.05);
+      return { ...h, finalScore: Math.min(1.0, h.score + tagBoost), tagBoost, matchedTags: matched };
+    }).sort((a, b) => b.finalScore - a.finalScore).slice(0, limit);
+
+    return { content: [{ type: 'text' as const, text: JSON.stringify({
+      ok: true, query, collection, count: boosted.length,
+      hits: boosted.map(h => ({
+        id:          h.id,
+        score:       Math.round(h.finalScore * 1000) / 1000,
+        tagBoost:    Math.round(h.tagBoost * 1000) / 1000,
+        matchedTags: h.matchedTags,
+        payload: { title: h.payload.title ?? h.payload.fileName, evidenceType: h.payload.evidenceType, caseId: h.payload.caseId, tags: h.payload.tags },
+      })),
+    }, null, 2) }] };
+  }
+);
+
+// ── image.caption ─────────────────────────────────────────────────────────────
+// VLM description of a local image file — no Qdrant search.
+// Returns summary + suggestedTags. Useful before deciding whether to search.
+server.registerTool(
+  'image.caption',
+  {
+    description:
+      'Get a VLM-generated caption and suggested tags for a local image file. ' +
+      'Calls the Gemma4-VLM pipeline (Triton→TurboQuant→Ollama cascade). ' +
+      'Does NOT search Qdrant — use evidence.search_by_image to also get ranked hits.',
+    inputSchema: z.object({
+      image_path:      z.string().describe('Absolute or workspace-relative path to the image (JPEG/PNG/WebP)'),
+      prompt_override: z.string().max(500).optional().describe('Custom captioning prompt'),
+    }),
+  },
+  async ({ image_path, prompt_override }) => {
+    const { readFile } = await import('node:fs/promises');
+    const { resolve, basename } = await import('node:path');
+    const { analyzeEvidenceImage } = await import('../lib/server/analysis/vlm-evidence-analyzer.js');
+
+    const absPath = resolve(process.cwd(), image_path);
+    let buffer: Buffer;
+    try {
+      buffer = await readFile(absPath);
+    } catch {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: `Cannot read: ${absPath}` }) }] };
+    }
+    try {
+      const t0 = Date.now();
+      const result = await analyzeEvidenceImage({ buffer, fileName: basename(absPath), promptOverride: prompt_override });
+      return { content: [{ type: 'text' as const, text: JSON.stringify({
+        ok: true, summary: result.summary, suggestedTags: result.suggestedTags,
+        model: result.model, cached: result.cached, durationMs: Date.now() - t0,
+      }, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }] };
+    }
+  }
+);
+
 // ── HTTP server with /health + MCP handler ────────────────────────────────────
 
 process.on('uncaughtException', (e) => console.error('[MCP uncaughtException]', e?.message, e?.stack));
@@ -4130,5 +4731,12 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       context.build_kv_packet, context.get_compressed_card,');
   console.log('       context.explain_compression, context.refresh_task_toc,');
   console.log('       kag.ingest_error, kag.multi_lane_search, trace.validate_ace_hit,');
-  console.log('       ops.propose_patch, ops.run_targeted_test, ops.record_fix_attempt, ops.run_quality_gate [OPERATOR-GATED]');
+  console.log('       ops.propose_patch, ops.run_targeted_test, ops.record_fix_attempt, ops.run_quality_gate,');
+  console.log('       ops.update_agents_md [OPERATOR-GATED]');
+  console.log('       ops.recall_fixer_pattern, ops.store_fixer_pattern [OPERATOR-GATED]');
+  console.log('       context.prefetch_feature_context (TRACE+KB+Karpathy bridge)');
+  console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
+  console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');
+  console.log('       image.search_by_text (text→embed→Qdrant, no file upload),');
+  console.log('       image.caption (VLM describe only, no search)');
 });
