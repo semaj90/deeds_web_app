@@ -1366,3 +1366,115 @@ ingest (rg + OCR + SearXNG + Hermes)
 8. ⏳ Adaptive TODO generation from signal fusion
 9. ⏳ tmux QLoRA + GRPO log ingestion scripts
 10. ⏳ CUDA Graph capture (`captureAEGraph()`, batch=64)
+
+---
+
+## Session 2026-05-10 — Operational Layer Verified Green
+
+### Schema drift cleanup (5 manual sidecar migrations applied)
+
+| Migration | Fixes |
+|---|---|
+| `0013_codeintel_indexes.sql` | `vector_cosine_ops` → `halfvec_cosine_ops` (col was `halfvec(768)`) |
+| `0016_codeintel_schema.sql` | `llm_outputs.user_id`: uuid → integer (matches `users.id`) |
+| `20260510_admin_ai_chat_sessions_columns.sql` | adds `context_tag` + `active` + partial unique index |
+| `20260510_statutes_missing_columns.sql` | adds `section`, `category`, `source_url` |
+| `20260510_crimes_table.sql` | creates entire `crimes` table per `schema/legal-cases.ts` |
+| `20260510_admin_raptor_summaries.sql` | creates `admin_raptor_summaries` per `schema/admin-raptor-summaries.ts` |
+| `cases.user_id` (DDL only) | column declared by Drizzle but missing in DB |
+| `evidence.uploaded_by` (route fix) | UUID coerced to integer or null in `/api/evidence/upload/+server.ts` |
+| `raw_error_embeddings.file_path` (route fix) | switched SSE poll to `metadata->>'file_path'` (canonical JSONB envelope pattern) |
+
+### Karpathy → HyperRAG wiring — verified live
+
+`gpu:karpathy:scores` Redis hash (11 entries, last run 2026-05-10T08:24Z) is consumed in two places:
+
+| File | What it does |
+|---|---|
+| `src/lib/server/atlas/atlas-loader.ts:79` | `redis.hgetall('gpu:karpathy:scores')` — pre-loads all blends in one round-trip |
+| `src/lib/server/atlas/context-for-file.ts:416` | Per-file score formula: `... + 0.13 * min(1, karpathyBlend / 3.5)` |
+| `src/lib/server/atlas/context-for-file.ts:281` | UI annotation: `Karpathy GPU blend X.XX — top-tier composite priority` |
+
+So 13% of the per-file ranking score in `/api/ace/recommendations` comes directly from the Karpathy GPU blend. **Wired and live**, no extra integration needed.
+
+### Redis ACE state (live snapshot, 2026-05-10)
+
+| Key prefix | Count | Notes |
+|---|---|---|
+| `gpu:karpathy:scores` | 11 | Top-N composite scores |
+| `gpu:karpathy:encoded` | 11 | 64-dim autoencoder outputs (reserved for MLA path) |
+| `ace:atlas:dir:*` | 1,135 | Per-directory atlas cache |
+| `ace:module:cartridge:*` | 4,507 | Per-file cartridge cache (deep codebase intel) |
+| `ace:topo:*` | 0 | Topo-byte candidate cache (cold — populates on first ANN query) |
+| `ace:rrf:*` | 0 | RRF fusion cache (cold — RRF wiring still pending in Phase 1) |
+| `ace:rerank:*` | 0 | Cross-encoder rerank cache (deferred until quality bottleneck proves it) |
+| `ace:authority:top` | 0 | Authority top hash (refreshed by `karpathy:gpu`) |
+| `ace:startup:*` | 3 | Startup bookkeeping |
+
+**Pattern**: hot caches (`atlas:dir`, `module:cartridge`) are warm and large. Cold caches (`topo`, `rrf`, `rerank`) only populate on first request — by design.
+
+### Operational gates — all green
+
+| Gate suite | Result |
+|---|---|
+| `tsgo --noEmit` | **0 errors** (was 46 at session start) |
+| Atlas smoke (P1.7 + P1.8) | **17/17 pass** |
+| HyperRAG smoke (G-HR1..10) | **10/10 pass** |
+| MCP `tools/list` | **88 tools** registered (target ≥70) |
+| `evidence-diagnostics-upload.spec.ts` | **2/2 pass** (was 1/2) |
+| `hypergraph_edges` | **42 edges, 16,181 members** (was 0/0) |
+
+### MCP tool surface (88 tools)
+
+| Namespace | Count | Highlights |
+|---|---|---|
+| `ops.*` | 13 | trust_audit, panel_activity, cache mgmt |
+| `kb.*` | 10 | trace_search, extract_citations, organize_messy_text, wiki_note_lookup |
+| `kag.*` | 8 | multi_lane_search, feature_lookup, recall_similar_fix |
+| `agents_md.*` | 7 | per-directory AGENTS.md spine |
+| `topology.*` | 6 | 4D probes, SOM lookups |
+| `graph.*` | 6 | PageRank, expand_neighborhood, shortest_path |
+| `trace.*` | 5 | KAG aliases, explain_retrieval |
+| `search.*` | 5 | hybrid + sparse + lexical |
+| `hypergraph.*` | 5 | now operational with seeded edges |
+| `context.*` | 5 | build_kv_packet, get_compressed_card |
+| Other | 18 | image, evidence, taxonomy, skills, db, clusters, ui, codebase, knowledge, tools |
+
+### What HyperRAG already has (the user's spec, mapped to live components)
+
+| Spec item | Where in code | State |
+|---|---|---|
+| Semantic multiquery search | `kag.multi_lane_search` (5 lanes), `search.hybrid` | ✅ live |
+| Contextual AI chat assistant | `adminChat.svelte.ts` rune store + `/api/admin/ai-chat/*` | ✅ live (sessions endpoint fixed this session) |
+| Indexed clustered cosine | Qdrant `codebase_chunks_768` + SOM-tagged payloads | ✅ live |
+| BM25 sparse | Postgres `to_tsvector` GIN — declared but **not wired into RRF yet** | 🟡 Phase 1 pending |
+| GPU-enhanced reranking | `attentionScoreGPU` + `pageRankGPU` via `tensorrt_bridge.node` | ✅ live |
+| Minified glyph (NES-arch) | `glyph-tile-engine.ts` + 16×16 tile atlas + slim Redis form | ✅ live |
+| Manifold4 (4D coords) | `manifold4 real[]` columns on `research_summaries`, `embedded_summaries`, `codebase_chunk_index` | ✅ live |
+| CUDA Graph capture | `captureAEGraph()` planned in `tensorrt_bridge.cc` | ⏳ deferred (cheatsheet says: only after Nsight proves launch overhead) |
+
+### GraphRAG status (Microsoft-style community detection)
+
+- ❌ Not installed as a Python package
+- 🟡 Custom equivalent partially scaffolded: `raptor-summarizer.ts` exists; `admin_raptor_summaries` table created this session (was missing)
+- ⏳ Leiden community detection over `IMPORTS` + `SHARES_TAGS` Neo4j edges → cluster summaries: pending implementation
+- **Note**: per the cheatsheet, full GraphRAG is a Phase 3 (Month 3) item. Lazy-summary variant is the right form for this codebase.
+
+### Next-step priority order (refreshed)
+
+1. **Phase 1 legal retrieval** — GIN tsvector on `legal_documents.content` + RRF fusion in `lib/server/retrieval/rrf-fuse.ts` (parallel agent already started `legal-chunker.ts` legal-section enum)
+2. **Citation resolver** — CourtListener API + `resolved_citations` Postgres cache
+3. **KAG operator router** — `kag-router.ts` with 5 operators (exact / graph / dense / numeric / LLM); regex on user intent
+4. **Phase D MCP hooks** (mentioned in 2026-05-09 handoff) — now unblocked since operational layer is green
+5. **GraphRAG community summaries** (Phase 3) — Leiden over Neo4j → lazy LLM summarization → `legal_communities` table
+6. **CUDA Graph capture** — defer until Nsight Compute shows attention is launch-bound (>30% CPU launch overhead)
+
+### Files in this session's commits (5 commits ahead of origin/main)
+
+1. `230d084fef` — schema drift align (uploaded_by, sessions); EvidenceMediaViewer + viewer route
+2. `ac4bc0fa0e` — gitignore graphify per-run snapshots
+3. `32194c3c91` — admin_ai_chat_sessions.context_tag + active
+4. `4fc5fbd4cb` — statutes.section + category + source_url
+5. `e54bc0850e` — crimes table + raw_error_embeddings JSONB extraction (also bundled parallel-agent work in legal-chunker)
+
+
