@@ -352,7 +352,7 @@ export const actions: Actions = {
           evidenceType: evidenceType as any, // New: structured enum
           fileUrl: fileUrl, // New: explicit URL field
           fileName: fileName, // New: original filename
-          uploadedBy: secureUserId, // New: uploader tracking
+          uploadedBy: secureUserId ? Number(secureUserId) : null, // New: uploader tracking (integer FK)
           uploadedAt: new Date().toISOString(), // New: upload timestamp
           canvasPosition: {},
 	// New: canvas board position

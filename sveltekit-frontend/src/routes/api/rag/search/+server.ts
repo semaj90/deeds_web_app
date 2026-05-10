@@ -373,7 +373,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
           import('$lib/server/grpc/embedding-client.js'),
           import('$lib/server/retrieval/rrf-fuse.js'),
           import('$lib/server/retrieval/sparse-bm25.js'),
-          import('$lib/server/db/client.js'),
+          import('$lib/server/db/client'),
         ]);
         const canaryStart = performance.now();
         const embRes = await genEmb([query]).catch(() => null);

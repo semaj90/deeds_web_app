@@ -14,7 +14,7 @@ async function main() {
 			.insert(evidence)
 			.values({
 				...(caseId ? { caseId } : {}),
-				uploadedBy: '00000000-0000-0000-0000-000000000001',
+				uploadedBy: 1,
 				evidenceNumber: 'EV-TEST',
 				title: 'TSX Insert Test',
 				type: 'document',
