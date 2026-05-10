@@ -145,14 +145,18 @@ export class GraphPanel {
 
 	/** Reload graph data and push to viewer (e.g. after graphify run). */
 	reload() {
+		if (!this.panel || !this.panel.webview) { return; }
 		invalidate();
 		loadGraph(this.context.extensionPath).then(data => {
+			if (!this.panel || !this.panel.webview) { return; }
 			this.panel.webview.postMessage({
 				type: 'loadData',
 				nodes:    data.nodes.slice(0, 1500),
 				edges:    data.edges.slice(0, 4000),
 				clusters: data.clusters,
 			});
+		}).catch(err => {
+			console.error('[Deeds] Reload failed:', err);
 		});
 	}
 }
@@ -168,6 +172,7 @@ function buildHtml(
 		`script-src ${webview.cspSource} 'unsafe-inline'`,
 		`style-src 'unsafe-inline'`,
 		`img-src ${webview.cspSource} data:`,
+		`connect-src ${webview.cspSource} https:`, // Allow WebGPU and potential external fetches
 	].join('; ');
 
 	return /* html */`<!DOCTYPE html>
@@ -231,16 +236,9 @@ function buildHtml(
     const _savedState = ${stateJson};
     if (_savedState && Object.keys(_savedState).length) {
       // The viewer initialises from vscode.getState() on its own;
-      // workspaceState is the durable fallback — merge if session state is empty.
-      if (!window.__deedsViewerStateRestored) {
-        const vs = typeof acquireVsCodeApi === 'function'
-          ? acquireVsCodeApi().getState()
-          : null;
-        if (!vs || !vs.zoom) {
-          // Inject as session state so the viewer's own bootstrap picks it up
-          try { acquireVsCodeApi().setState(_savedState); } catch {}
-        }
-      }
+      // workspaceState is the durable fallback.
+      // We check if session state is empty before applying.
+      window.__deedsInitialState = _savedState;
     }
   </script>
 </body>

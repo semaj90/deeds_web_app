@@ -1,12 +1,41 @@
 import { pool } from '$lib/server/db/client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { makeRedis } from '$lib/server/redis/client.js';
+import { sanitizeBrowserContext, emptyContext } from './browser-context-sanitizer.js';
+import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
+
+const BROWSER_REDIS_KEY = (userId: string) => `browser-context:snapshot:${userId}`;
+
+/** Fetch the latest sanitized browser snapshot for a user (Redis-only here —
+ *  the API route owns the in-process fallback for dev). Returns null if none.
+ *  Re-sanitizes defensively before returning so a stale Redis row from an
+ *  older sanitizer version still passes the current rules. */
+async function loadBrowserContext(userId: string): Promise<SanitizedBrowserContext | null> {
+  if (!userId) return null;
+  try {
+    const r = makeRedis();
+    const raw = await r.get(BROWSER_REDIS_KEY(userId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Re-sanitize on read — cheap, and protects against schema drift.
+    const { context } = sanitizeBrowserContext(parsed);
+    return context;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Gathers system-wide context for the Admin Copilot.
  * Probes databases, queues, and caches to provide the LLM with real-time state.
+ *
+ * The optional `userId` parameter unlocks the Browser Context lane —
+ * sanitized tab/snippet/history snapshot the operator's extension POSTed
+ * to /api/browser-context/snapshot. Always attached as
+ * `browserContext` with `trust: 'untrusted_user_visible'` so the prompt
+ * builder can warn the model that this lane is NOT authoritative.
  */
-export async function gatherAdminContext(query: string, currentPath?: string) {
+export async function gatherAdminContext(query: string, currentPath?: string, userId?: string) {
   const t0 = Date.now();
   const redis = makeRedis();
   
@@ -59,6 +88,9 @@ export async function gatherAdminContext(query: string, currentPath?: string) {
     request: {
       query,
       currentPath
-    }
+    },
+    // Browser-side snapshot. Untrusted user-visible context — TRACE backend
+    // retrieval is authoritative. Always present (empty when no snapshot).
+    browserContext: userId ? (await loadBrowserContext(userId)) ?? null : null,
   };
 }

@@ -92,7 +92,7 @@ These shape the plan; cited so future-me can re-verify.
 | **Subagents** | `.claude/agents/<name>.md`. `tools:` field accepts space-separated names INCLUDING `mcp__server__tool` patterns. **Important**: `tools:` declares *preferences* — it does not hard-restrict access. Use hooks for hard restriction. | [code.claude.com/docs/en/subagents](https://code.claude.com/docs/en/subagents.md) |
 | **Hooks** | 30+ events (`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `SubagentStop`, `FileChanged`, `PreCompact`, …). Config in `.claude/settings.json`. Matchers are regex-capable. **Only `PreToolUse` can block/modify** via `permissionDecision: allow|deny|ask` + optional `updatedInput`. `PostToolUse` exit-code-2 also blocks. | [code.claude.com/docs/en/hooks](https://code.claude.com/docs/en/hooks.md) |
 | **Plugins** | Manifest at `<plugin>/.claude-plugin/plugin.json`. Bundles skills/agents/hooks/MCP. MCP servers declared in `.mcp.json`. Install via `/plugin install` or `--plugin-dir`. | [code.claude.com/docs/en/plugins](https://code.claude.com/docs/en/plugins.md) |
-| **MCP TS SDK** | Stable v1.29.0 (`@modelcontextprotocol/sdk`), v2 pre-alpha. Tool registration requires Zod schemas; compatible with `zod@^3.22`. **The trace-mcp-server `tools/list` Zod crash is a version-mismatch bug** — pin zod to ^3.22 to fix. | [github.com/modelcontextprotocol/typescript-sdk](https://github.com/modelcontextprotocol/typescript-sdk) |
+| **MCP TS SDK** | Stable v1.29.0 (`@modelcontextprotocol/sdk`), v2 pre-alpha. Tool registration requires Zod schemas; compatible with Zod 3 and 4. **The trace-mcp-server `tools/list` Zod crash is a serialization bug** — use the runtime patch in `src/mcp/zod-v4-tools-list-patch.ts` to fix. | [github.com/modelcontextprotocol/typescript-sdk](https://github.com/modelcontextprotocol/typescript-sdk) |
 | **mcporter** | Real, maintained CLI. `npx mcporter list` auto-discovers Claude Code/Cursor/etc. configs and prints registered tools. `npx mcporter call <tool> <args>` executes from shell — useful for smoke-testing TRACE MCP without Claude. | [mcporter.sh](https://mcporter.sh/) |
 | **Hermes Agent (Nous)** | Real, but **not** what we need. It's a Python TUI agent with codebase introspection (LOC counting via pygount). Not a design tool, not a SvelteKit-aware planner, no GUI. | [hermes-agent.nousresearch.com](https://hermes-agent.nousresearch.com/) |
 | **Closer matches for "ingest codebase, emit plans" UI** | **Open WebUI** (agent orchestration + tool use), **AnythingLLM** (RAG over codebase), **LM Studio** / **Jan** (model hosting + chat). None of them replace Claude Code as the *implementation* layer; treat them as alternative front-ends for the *retrieval+synthesis* lane. | (verified by claude-code-guide agent) |
@@ -138,7 +138,15 @@ instead of 12; mount 6 official servers for the rest.
    Smoke each via `npx mcporter call <server>.<tool> ...`.
 5. **Add `PreToolUse` hook** (`.claude/settings.json`) that denies any tool whose name contains a write verb (`drop`, `delete`, `truncate`, `update`, `insert`, `create`, `flushdb`, `set`) regardless of which server it came from. This is the actual sandbox; subagent `tools:` is just a hint.
 6. **Implement the 6 truly-custom `db.*` tools** in `src/mcp/db-inspection-tools.ts` (Drizzle-aware shape that the official Postgres MCP doesn't know): `db.schema_overview`, `db.table_inspect`, `db.indexes`, `db.relation_map`, `db.find_jsonb_keys`, `db.drift_check`, `db.migration_status`. (`db.table_sample` — adopt official Postgres MCP read access instead, gated by DB role.)
-7. **Pin `zod` to `^3.22`** in `package.json` — fixes the `trace-mcp-server.ts` `tools/list` Zod crash blocking Lane 1.
+7. **Keep Zod 4 and patch MCP tools/list serialization**
+   - Do not globally downgrade Zod.
+   - The crash is caused by transitive `zod-to-json-schema@3.25.0` expecting Zod 3 internals while TRACE tools use Zod 4 mini schemas.
+   - Use `src/mcp/zod-v4-tools-list-patch.ts`.
+   - It must be imported before any `McpServer` is constructed:
+   ```ts
+   import './zod-v4-tools-list-patch.js';
+   ```
+   - Verify with `smoke:mcp-tools-list-bisect`.
 8. **Validator gates**:
    - `G32 mcp:trace-server-tools-list` — asserts our TRACE MCP `tools/list` returns ≥30 tools cleanly.
    - `G33 mcp:db-inspection-readonly` — asserts no `db.*` tool we ship exposes a write verb in its inputSchema.
@@ -186,7 +194,7 @@ would re-discover everything Lanes 1-3 already found. **Net savings:
 | Brief is too compressed → Claude Code asks follow-up questions, eating savings | Lane 4 prompt mandates "files: with line ranges" + "constraints: explicit list"; G34 (planned) lints briefs for required sections |
 | Gemma4 hallucinates a file path that doesn't exist | Every retrieved chunk in Lane 3 carries a `pg_id` / `file_path`; Lane 4 prompt says "cite only paths that appeared in `files[]` of the input"; pre-flight script verifies paths exist before writing brief |
 | Subagent `tools:` field doesn't actually restrict (per docs) — agent could call write tools anyway | Use hooks (PreToolUse) for hard restriction. The `tools:` declaration is a hint to the agent's planner, not a sandbox. |
-| TRACE MCP `tools/list` Zod crash blocks the loop | Phase B step 5 — pin `zod@^3.22`; G32 catches regressions |
+| TRACE MCP `tools/list` Zod crash blocks the loop | Phase B — import the Zod 4 tools-list patch before MCP construction and verify with `smoke:mcp-tools-list-bisect` |
 | `synth/run-loop.mjs` hangs because TurboQuant is down | gemma4-offload MCP already cascades to Ollama; loop should also write a partial brief on backend failure rather than hang |
 
 ## Open questions (decide before Phase C)

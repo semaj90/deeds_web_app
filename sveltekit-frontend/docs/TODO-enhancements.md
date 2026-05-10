@@ -1,12 +1,12 @@
 # TODO — Codebase Enhancement Synthesis
 
-> Generated: 2026-05-08T21:59:06Z from 8 directories, 0 hotspot files
+> Generated: 2026-05-09T22:25:47Z from 17 directories, 0 hotspot files
 > Source: Redis ACE hits (code:graph:node:* + code:graph:hotspot:*) + 55-gate audit system
 
-> ⚠️ **Data stale** — Redis has only 10 node entries (expect ≥3000 after `graphify:full`). Sections 1 and 2 below may be sparse or empty.
+> ⚠️ **Data stale** — Redis has only 18 node entries (expect ≥3000 after `graphify:full`). Sections 1 and 2 below may be sparse or empty.
 > Run: `npm run graphify:full && npm run agents:enrich` to repopulate (5-10 min GPU).
 
-- [ ] **data:refresh** `npm run graphify:full && npm run agents:enrich` — last enriched 2026-05-08T21:59:06Z with 10 nodes / 0 hotspots (full graph has ≥3000 files)
+- [ ] **data:refresh** `npm run graphify:full && npm run agents:enrich` — last enriched 2026-05-09T22:25:47Z with 18 nodes / 0 hotspots (full graph has ≥3000 files)
 
 ## 1. Critical Hotspots (High Fan-In → High Risk)
 
