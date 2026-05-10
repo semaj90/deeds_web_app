@@ -873,7 +873,7 @@ export const POST: RequestHandler = async (event) => {
     const published = await rabbitmq.publishSynthesisGenerate({
       synthesisId,
       query,
-      userId: Number(auth.user.id),
+      userId: auth.user.id,
       caseId: body.caseId,
       conversationId: body.conversationId,
       persona: body.persona,
@@ -903,7 +903,7 @@ export const POST: RequestHandler = async (event) => {
     const ctxStart = performance.now();
     const context = await assembleACEContext({
       query,
-      userId: Number(auth.user.id),
+      userId: auth.user.id,
       caseId: body.caseId,
       conversationId: body.conversationId,
       persona: body.persona,
@@ -1065,7 +1065,7 @@ export const POST: RequestHandler = async (event) => {
     }).catch(() => {});
 
     trackTokenUsage({
-      userId: Number(auth.user.id),
+      userId: auth.user.id,
       endpoint: '/api/synthesis/generate',
       model: MODEL,
       promptTokens: 0,
@@ -1075,7 +1075,7 @@ export const POST: RequestHandler = async (event) => {
 
     // ── Write analytics signal (powers future getTopQueryPatterns) ──────
     logQuery({
-      userId: Number(auth.user.id),
+      userId: auth.user.id,
       query,
       source: 'server',
       latencyMs: timer.elapsed(),
@@ -1084,7 +1084,7 @@ export const POST: RequestHandler = async (event) => {
       confidence,
     });
     logEvent({
-      userId: Number(auth.user.id),
+      userId: auth.user.id,
       eventType: 'rag_search',
       payload: {
         queryHash: createHash('sha256').update(query.toLowerCase().trim()).digest('hex').slice(0, 16),

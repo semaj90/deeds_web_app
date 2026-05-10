@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-10T20:27:22.568Z
+> Generated: 2026-05-10T20:51:42.667Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,7 +8,7 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 3770 |
+| Files scanned | 3771 |
 | Directories analysed | 399 |
 | Route files | 979 |
 | Svelte components | 880 |
@@ -31,13 +31,13 @@
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 723 | 29 |
 | G5  | Zod validation on API routes | 515 | 2 |
-| G11 | No hardcoded localhost (excl env.server) | 3738 | 32 |
-| G14a | No `export let` (Svelte 4 props) | 3770 | 0 |
-| G14b | No `$:` reactive declarations | 3770 | 0 |
-| G14c | No `on:event=` directives | 3770 | 0 |
-| G14d | No `createEventDispatcher()` | 3770 | 0 |
-| G14e | No runes in plain `.ts` files | 3770 | 0 |
-| G15 | No SSR-unsafe globals (unguarded) | 3768 | 2 |
+| G11 | No hardcoded localhost (excl env.server) | 3739 | 32 |
+| G14a | No `export let` (Svelte 4 props) | 3771 | 0 |
+| G14b | No `$:` reactive declarations | 3771 | 0 |
+| G14c | No `on:event=` directives | 3771 | 0 |
+| G14d | No `createEventDispatcher()` | 3771 | 0 |
+| G14e | No runes in plain `.ts` files | 3771 | 0 |
+| G15 | No SSR-unsafe globals (unguarded) | 3769 | 2 |
 | G16 | Server routes have test pairing | 651 | 33 |
 | G17 | Server routes have error handling | 657 | 95 |
 | G20 | Cyclic import pairs | — | 0 |
@@ -78,13 +78,13 @@
 | ✅ | `src/lib/components` | 80 | 56 | 172766 | 0 | 0/46 | 6 | 🟠lh | C92: component chunks in `src/lib/components/evidence` (tag: embedding) |
 | ✅ | `src/lib/ai/onnx` | 83 | 2 | 340 | 0 | 0/0 | 1 | — | — |
 | ✅ | `src/lib/workers` | 83 | 8 | 1737 | 0 | 0/1 | 2 | — | — |
-| ✅ | `src/routes` | 83 | 6 | 217765 | 653 | 1053/543 | 7 | 🔴ssr 🟠lh ⬜notest | — |
+| ✅ | `src/routes` | 83 | 6 | 217776 | 653 | 1053/543 | 7 | 🔴ssr 🟠lh ⬜notest | — |
 | ✅ | `src/routes/(app)/chat` | 83 | 4 | 865 | 0 | 4/1 | 1 | ⬜notest | — |
 | ✅ | `src/routes/api/codebase-graph` | 83 | 2 | 317 | 2 | 2/1 | 0 | — | — |
 | ✅ | `src/routes/api/comfyui` | 83 | 2 | 74 | 2 | 2/1 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/phase89` | 83 | 24 | 2425 | 24 | 24/13 | 0 | — | — |
 | ✅ | `src/routes/api/system` | 83 | 6 | 716 | 6 | 5/1 | 0 | — | — |
-| ✅ | `src/routes/api/topology` | 83 | 2 | 215 | 2 | 2/1 | 0 | — | — |
+| ✅ | `src/routes/api/topology` | 83 | 2 | 218 | 2 | 2/1 | 0 | — | — |
 | ✅ | `src/routes/api/cache` | 84 | 14 | 1427 | 14 | 14/8 | 0 | — | — |
 | ✅ | `src/lib/components/ai` | 85 | 46 | 19721 | 0 | 0/11 | 0 | 🟠lh | C5: component chunks in `src/lib/components/ai` (tag: ai) |
 | ✅ | `src/lib/config` | 85 | 8 | 1506 | 0 | 1/1 | 0 | 🟠lh | C75: function chunks in `src/lib/config` (tag: embedding) |
@@ -359,7 +359,7 @@
 | ✅ | `src/routes/api/phase78` | 96 | 4 | 198 | 4 | 4/3 | 0 | — | — |
 | ✅ | `src/routes/api/yorha` | 96 | 4 | 510 | 4 | 4/3 | 0 | — | — |
 | ✅ | `src/routes/api/analytics` | 97 | 27 | 4207 | 27 | 26/23 | 0 | ⬜notest | — |
-| ✅ | `src/routes/api/evidence` | 97 | 31 | 5938 | 31 | 31/24 | 0 | ⬜notest | — |
+| ✅ | `src/routes/api/evidence` | 97 | 31 | 5946 | 31 | 31/24 | 0 | ⬜notest | — |
 | ✅ | `src/routes/api/ace` | 98 | 9 | 1821 | 9 | 9/8 | 0 | — | — |
 | ✅ | `src/routes/api/cases` | 98 | 25 | 4737 | 25 | 25/21 | 0 | — | — |
 | ✅ | `src/routes/api/codebase` | 98 | 12 | 1912 | 12 | 12/10 | 0 | — | — |
@@ -369,12 +369,12 @@
 | ✅ | `src/routes/api/routes` | 98 | 9 | 1005 | 9 | 9/8 | 0 | — | — |
 | ✅ | `src/routes/api/ai` | 99 | 30 | 3089 | 30 | 30/28 | 0 | — | — |
 | ✅ | `src/routes/api/v1` | 99 | 19 | 1584 | 19 | 19/18 | 0 | — | — |
-| ✅ | `src/lib` | 100 | 11 | 409634 | 3 | 12/275 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
+| ✅ | `src/lib` | 100 | 11 | 409957 | 3 | 12/275 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — | C29: const chunks in `src/lib/schemas` (tag: auth) |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — | C91: type chunks in `src/lib/server/db` (tag: database) |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — | C51: table-def chunks in `src/lib/db/schema` (tag: database) |
-| ✅ | `src/lib/server` | 100 | 63 | 169327 | 3 | 9/184 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
+| ✅ | `src/lib/server` | 100 | 63 | 169650 | 3 | 9/184 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
 | ✅ | `src/lib/server/ace` | 100 | 32 | 12369 | 0 | 0/15 | 0 | — | C72: function chunks in `src/lib/server/ace` (tag: vector) |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 650 | 0 | 0/1 | 0 | — | — |
 | ✅ | `src/lib/server/admin` | 100 | 8 | 995 | 0 | 0/5 | 0 | — | — |
@@ -392,7 +392,7 @@
 | ✅ | `src/lib/server/error-brain` | 100 | 11 | 1157 | 0 | 1/2 | 0 | — | — |
 | ✅ | `src/lib/server/evidence` | 100 | 15 | 1230 | 0 | 0/2 | 0 | — | C66: type chunks in `src/lib/server/services` (tag: types) |
 | ✅ | `src/lib/server/graph` | 100 | 21 | 9726 | 0 | 1/7 | 0 | — | C73: function chunks in `src/lib/server/retrieval` (tag: vector) |
-| ✅ | `src/lib/server/indexer` | 100 | 23 | 6818 | 1 | 0/5 | 0 | — | C58: type chunks in `src/lib/server/indexer` (tag: vector) |
+| ✅ | `src/lib/server/indexer` | 100 | 24 | 7141 | 1 | 0/5 | 0 | — | C58: type chunks in `src/lib/server/indexer` (tag: vector) |
 | ✅ | `src/lib/server/llm` | 100 | 6 | 1643 | 0 | 0/2 | 0 | — | C44: route-handler chunks in `src/lib/server/llm` (tag: api) |
 | ✅ | `src/lib/server/ml` | 100 | 8 | 2974 | 0 | 0/0 | 0 | — | C69: route-handler chunks in `src/routes/(app)/admin/api-testing/agentic-loop` (tag: api) |
 | ✅ | `src/lib/server/queue` | 100 | 8 | 3814 | 0 | 0/3 | 0 | — | C96: type chunks in `src/lib/server` (tag: embedding) |
@@ -770,7 +770,7 @@ _No cyclic imports detected. ✅_
 ## Top External Module Imports
 | Module | Consumer Count |
 |--------|----------------|
-| `vitest` | 748 |
+| `vitest` | 749 |
 | `@sveltejs/kit` | 734 |
 | `zod` | 529 |
 | `$lib/server/db/client` | 414 |

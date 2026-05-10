@@ -13,6 +13,41 @@
 
 // ── Types ────────────────────────────────────────────────────────────────
 
+/**
+ * Legal-content section classification — used by RRF section-weighted scoring,
+ * KAG applicable-law routing, and RAPTOR leaf classification.
+ *
+ * Distinct from {@link LegalStructureSection} which represents document hierarchy.
+ */
+export type LegalSection =
+  | 'caption'
+  | 'procedural_posture'
+  | 'facts'
+  | 'issue'
+  | 'analysis'
+  | 'holding'
+  | 'dicta'
+  | 'disposition'
+  | 'citation_block'
+  | 'unknown';
+
+/**
+ * Recommended scoring multipliers for legal sections in retrieval rerank.
+ * Reference values — actual RRF scorer (Phase 1C) imports and may tune these.
+ */
+export const LEGAL_SECTION_BOOST: Record<LegalSection, number> = {
+  holding: 1.5,
+  analysis: 1.2,
+  facts: 1.0,
+  issue: 1.0,
+  disposition: 0.95,
+  procedural_posture: 0.9,
+  caption: 0.8,
+  citation_block: 0.8,
+  dicta: 0.65,
+  unknown: 0.75,
+};
+
 export interface LegalChunk {
   text: string;
   chunkIndex: number;
@@ -37,15 +72,33 @@ export interface LegalChunk {
   doctagTypes?: string[];
   /** Whether this chunk is a preserved whole table */
   isTable?: boolean;
+  // ── Phase 1A: legal retrieval metadata (RRF / KAG / RAPTOR feed) ──
+  /** Legal-content classification (holding|analysis|facts|...) for section-weighted RRF */
+  legal_section?: LegalSection;
+  /** Jurisdiction hint, e.g. "US-9th", "CA", "US-Federal", or "unknown" */
+  jurisdiction?: string;
+  /**
+   * Authority tier (1=primary binding, 2=primary persuasive, 3=secondary, 4=other).
+   * See HyperRAG TrustMeta — keep aligned with `trust_tier` mapping.
+   */
+  authority_tier?: 1 | 2 | 3 | 4;
+  /** Number of citations detected in this chunk (denormalized from `citations.length`) */
+  citation_count?: number;
+  /** Confidence in section classification (0..1). Heuristic = ~0.6, LLM-assisted = ~0.9 */
+  extraction_confidence?: number;
 }
 
-export interface LegalSection {
+/**
+ * Document-structure section parsed from headings (Article/Section/§ hierarchy).
+ * Distinct from {@link LegalSection} which is the content classification.
+ */
+export interface LegalStructureSection {
   level: number;
   heading: string;
   text: string;
   startOffset: number;
   endOffset: number;
-  children: LegalSection[];
+  children: LegalStructureSection[];
   /** Resolved section path from root */
   path: string[];
 }
@@ -153,10 +206,10 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
 
 // ── Section parsing ─────────────────────────────────────────────────────
 
-export function parseSections(text: string): LegalSection[] {
+export function parseSections(text: string): LegalStructureSection[] {
   const lines = text.split('\n');
-  const root: LegalSection[] = [];
-  const stack: LegalSection[] = [];
+  const root: LegalStructureSection[] = [];
+  const stack: LegalStructureSection[] = [];
   let currentText = '';
   let currentOffset = 0;
   let lineOffset = 0;
@@ -184,7 +237,7 @@ export function parseSections(text: string): LegalSection[] {
       }
       currentText = '';
 
-      const newSection: LegalSection = {
+      const newSection: LegalStructureSection = {
         level: heading.level,
         heading: heading.fullHeading,
         text: '',
@@ -247,8 +300,8 @@ function detectHeading(line: string): { level: number; fullHeading: string } | n
   return null;
 }
 
-function flattenSections(sections: LegalSection[]): LegalSection[] {
-  const result: LegalSection[] = [];
+function flattenSections(sections: LegalStructureSection[]): LegalStructureSection[] {
+  const result: LegalStructureSection[] = [];
 
   for (const section of sections) {
     result.push(section);
@@ -277,9 +330,10 @@ function chunkSectionText(
   const citations = extractCitations(text);
 
   if (words.length <= maxTokens) {
+    const trimmed = text.trim();
     return [
       {
-        text: text.trim(),
+        text: trimmed,
         chunkIndex: startIndex,
         sectionPath,
         heading,
@@ -287,6 +341,7 @@ function chunkSectionText(
         endOffset: baseOffset + text.length,
         tokenCount: words.length,
         citations,
+        ...buildLegalMetadata(trimmed, heading, citations),
       },
     ];
   }
@@ -309,6 +364,7 @@ function chunkSectionText(
       endOffset: baseOffset + charOffset + chunkText.length,
       tokenCount: windowWords.length,
       citations: chunkCitations,
+      ...buildLegalMetadata(chunkText, heading, chunkCitations),
     });
 
     charOffset += windowWords.slice(0, maxTokens - overlap).join(' ').length + 1;
@@ -335,6 +391,147 @@ function extractCitations(text: string): string[] {
   }
 
   return [...found];
+}
+
+// ── Phase 1A: Section classification + jurisdiction + authority tier ─────
+
+/**
+ * Cue-phrase weights per legal section. Heuristic — Phase 1B/1C will
+ * back this with an LLM-assisted classifier when extraction_confidence < 0.7.
+ *
+ * Phrases are matched case-insensitively against the chunk text + heading.
+ * Multi-word phrases are stronger signals than single words.
+ */
+const SECTION_CUES: Record<LegalSection, string[]> = {
+  caption: ['plaintiff', 'defendant', 'appellant', 'appellee', 'petitioner', 'respondent', 'case no.', 'docket no.'],
+  procedural_posture: ['appeal from', 'on appeal', 'this matter comes before', 'motion for', 'demurrer', 'reversed and remanded', 'affirmed in part', 'we granted certiorari'],
+  facts: ['on or about', 'on the morning of', 'on the night of', 'plaintiff alleges', 'the record shows', 'the evidence established', 'background facts', 'factual background'],
+  issue: ['the question presented', 'we must decide', 'the issue before us', 'the question is whether', 'the central question', 'we consider whether'],
+  analysis: ['we hold that', 'we agree', 'we disagree', 'the test for', 'under this standard', 'applying this rule', 'as we explained in', 'this court has held', 'the proper inquiry'],
+  holding: ['we hold', 'we conclude that', 'we therefore hold', 'accordingly, we hold', 'this court holds', 'it is therefore held', 'the holding of this case'],
+  dicta: ['we note in passing', 'we observe that', 'although not necessary', 'as a matter of dictum', 'we need not decide', 'in passing'],
+  disposition: ['judgment affirmed', 'judgment reversed', 'so ordered', 'remanded for further', 'the petition is denied', 'the petition is granted', 'reversed and remanded', 'we vacate'],
+  citation_block: [], // detected via citation_count >= threshold
+  unknown: [],
+};
+
+/**
+ * Jurisdiction inference from citation patterns + heading hints.
+ * Returns a stable token like "US-Federal", "US-9th", "CA", or "unknown".
+ */
+function inferJurisdiction(text: string, citations: string[]): string {
+  const sample = `${text.slice(0, 2000)} ${citations.join(' ')}`.toLowerCase();
+  if (/\bu\.?s\.?\s*supreme\s*court\b|\bcert(?:iorari)?\b/.test(sample)) return 'US-Federal';
+  if (/\bu\.?s\.?c\.?\s*§|\b\d+\s+u\.?s\.?\s+\d+\b/.test(sample)) return 'US-Federal';
+  if (/\b9th\s+cir|\bf\.?\d+d?\s+\d+\b.*9th/.test(sample)) return 'US-9th';
+  if (/\b\dth\s+cir(?:cuit)?\b/.test(sample)) {
+    const m = sample.match(/\b(\d+)(?:st|nd|rd|th)\s+cir/);
+    return m ? `US-${m[1]}th` : 'US-Federal';
+  }
+  if (/\bcal\.?\s*(?:const|civ|pen|gov|fam|lab|bus|corp|prob|ins|fin|ed|health|welf|veh|wat)|cal\.?\s*app\.?/.test(sample)) return 'CA';
+  if (/\bn\.?y\.?\s*\d|\bnew\s+york\s+state\b/.test(sample)) return 'NY';
+  if (/\btex\.?\s*\d|\btexas\s+supreme/.test(sample)) return 'TX';
+  return 'unknown';
+}
+
+/**
+ * Authority tier mapping (1=primary binding, 2=primary persuasive, 3=secondary, 4=other).
+ * Aligned with HyperRAG TrustMeta. Heuristic by source pattern.
+ */
+function inferAuthorityTier(text: string, citations: string[], jurisdiction: string): 1 | 2 | 3 | 4 {
+  const sample = `${text.slice(0, 1500)} ${citations.join(' ')}`.toLowerCase();
+  // Tier 1: binding primary authority — Supreme Court, controlling circuit, state high court, statutes/constitution
+  if (jurisdiction === 'US-Federal' && /\bu\.?s\.?\s*supreme|\bsupreme\s*court\s*of\s*the\s*u/.test(sample)) return 1;
+  if (/\bconst(?:itution)?\s*art|cal\.?\s*const|u\.?s\.?\s*const/.test(sample)) return 1;
+  if (/\bu\.?s\.?c\.?\s*§|cal\.?\s*(?:civ|pen|gov)\.?\s*code\s*§/.test(sample)) return 1;
+  // Tier 2: primary persuasive — federal circuit, state appellate, sister-jurisdiction high court
+  if (/\bcir(?:cuit)?\b|\bcal\.?\s*app/.test(sample)) return 2;
+  // Tier 3: secondary authority — restatements, treatises, law reviews
+  if (/\brestatement|\btreatise|\blaw\s*review|\bjournal/.test(sample)) return 3;
+  // Default to tier 4 for unclassified material
+  return 4;
+}
+
+/**
+ * Classify the dominant legal section in a chunk via cue-phrase scoring.
+ * Returns the section with the highest weighted score plus a confidence in [0..1].
+ *
+ * Scoring rules:
+ *  - Multi-word cue match: +2.0
+ *  - Single-word cue match: +1.0
+ *  - Heading text matches a known section keyword: +1.5
+ *  - High citation density (≥4 citations in <800 chars): forces 'citation_block'
+ *  - All zeros → 'unknown' with confidence 0.4
+ */
+export function classifyLegalSection(
+  text: string,
+  heading: string,
+  citationCount: number
+): { section: LegalSection; confidence: number } {
+  // Citation-block override: fires only when the text is *predominantly* citations,
+  // not when prose merely contains a few. Heuristic: short passage AND high citation
+  // density (≥1 citation per 60 chars), e.g. a bare "See X; Y; Z." footnote block.
+  if (citationCount >= 3 && text.length < 400 && text.length / citationCount < 60) {
+    return { section: 'citation_block', confidence: 0.85 };
+  }
+
+  const haystack = `${heading.toLowerCase()} \n ${text.toLowerCase()}`;
+  const scores = new Map<LegalSection, number>();
+
+  for (const [section, cues] of Object.entries(SECTION_CUES) as [LegalSection, string[]][]) {
+    if (cues.length === 0) continue;
+    let score = 0;
+    for (const cue of cues) {
+      if (!haystack.includes(cue)) continue;
+      score += cue.includes(' ') ? 2.0 : 1.0;
+    }
+    // Heading bonus
+    if (heading && cues.some((c) => heading.toLowerCase().includes(c))) {
+      score += 1.5;
+    }
+    if (score > 0) scores.set(section, score);
+  }
+
+  if (scores.size === 0) {
+    return { section: 'unknown', confidence: 0.4 };
+  }
+
+  // Pick the highest-scoring section
+  let best: LegalSection = 'unknown';
+  let bestScore = 0;
+  let totalScore = 0;
+  for (const [section, score] of scores) {
+    totalScore += score;
+    if (score > bestScore) {
+      bestScore = score;
+      best = section;
+    }
+  }
+
+  // Confidence = winner's share of total score, capped at 0.95 (heuristic ceiling)
+  const confidence = Math.min(0.95, 0.4 + 0.6 * (bestScore / Math.max(totalScore, 1)));
+  return { section: best, confidence };
+}
+
+/**
+ * Compute the full Phase-1A metadata bundle for a chunk in one pass.
+ * Extracted as a helper so all three chunk producers stay consistent.
+ */
+function buildLegalMetadata(
+  text: string,
+  heading: string,
+  citations: string[]
+): Pick<LegalChunk, 'legal_section' | 'jurisdiction' | 'authority_tier' | 'citation_count' | 'extraction_confidence'> {
+  const { section, confidence } = classifyLegalSection(text, heading, citations.length);
+  const jurisdiction = inferJurisdiction(text, citations);
+  const authority_tier = inferAuthorityTier(text, citations, jurisdiction);
+  return {
+    legal_section: section,
+    jurisdiction,
+    authority_tier,
+    citation_count: citations.length,
+    extraction_confidence: Number(confidence.toFixed(3)),
+  };
 }
 
 // ── DocTags block-aware chunker ──────────────────────────────────────────
@@ -384,8 +581,10 @@ function chunkFromDoclingBlocks(
     const words = combinedText.split(/\s+/).filter(Boolean);
 
     if (words.length <= maxTokens) {
+      const trimmed = combinedText.trim();
+      const cits = extractCitations(combinedText);
       chunks.push({
-        text: combinedText.trim(),
+        text: trimmed,
         chunkIndex: chunkIndex++,
         sectionPath: [...currentSectionPath],
         heading: pendingHeading,
@@ -394,9 +593,10 @@ function chunkFromDoclingBlocks(
         startOffset: charOffset,
         endOffset: charOffset + combinedText.length,
         tokenCount: words.length,
-        citations: extractCitations(combinedText),
+        citations: cits,
         doctagTypes,
         isTable: doctagTypes.length === 1 && doctagTypes[0] === 'table',
+        ...buildLegalMetadata(trimmed, pendingHeading, cits),
       });
       charOffset += combinedText.length + 2;
     } else {
@@ -404,6 +604,7 @@ function chunkFromDoclingBlocks(
       for (let i = 0; i < words.length; i += maxTokens - overlap) {
         const windowWords = words.slice(i, i + maxTokens);
         const chunkText = windowWords.join(' ');
+        const chunkCits = extractCitations(chunkText);
 
         chunks.push({
           text: chunkText,
@@ -415,8 +616,9 @@ function chunkFromDoclingBlocks(
           startOffset: charOffset,
           endOffset: charOffset + chunkText.length,
           tokenCount: windowWords.length,
-          citations: extractCitations(chunkText),
+          citations: chunkCits,
           doctagTypes,
+          ...buildLegalMetadata(chunkText, pendingHeading, chunkCits),
         });
 
         charOffset += windowWords.slice(0, maxTokens - overlap).join(' ').length + 1;
@@ -443,6 +645,7 @@ function chunkFromDoclingBlocks(
       if (tableText.length < minLen) continue;
 
       const words = tableText.split(/\s+/).filter(Boolean);
+      const tblCits = extractCitations(tableText);
       chunks.push({
         text: tableText,
         chunkIndex: chunkIndex++,
@@ -453,9 +656,10 @@ function chunkFromDoclingBlocks(
         startOffset: charOffset,
         endOffset: charOffset + tableText.length,
         tokenCount: words.length,
-        citations: extractCitations(tableText),
+        citations: tblCits,
         doctagTypes: ['table'],
         isTable: true,
+        ...buildLegalMetadata(tableText, pendingHeading, tblCits),
       });
       charOffset += tableText.length + 2;
       continue;
@@ -499,15 +703,18 @@ function buildSectionPath(headingText: string, currentPath: string[]): string[] 
 function simpleChunk(text: string, maxTokens: number, overlap: number): LegalChunk[] {
 	const words = text.split(/\s+/).filter(Boolean);
 	if (words.length <= maxTokens) {
+		const trimmed = text.trim();
+		const citations = extractCitations(text);
 		return [{
-			text: text.trim(),
+			text: trimmed,
 			chunkIndex: 0,
 			sectionPath: [],
 			heading: '',
 			startOffset: 0,
 			endOffset: text.length,
 			tokenCount: words.length,
-			citations: extractCitations(text),
+			citations,
+			...buildLegalMetadata(trimmed, '', citations),
 		}];
 	}
 
@@ -518,6 +725,7 @@ function simpleChunk(text: string, maxTokens: number, overlap: number): LegalChu
 	for (let i = 0; i < words.length; i += maxTokens - overlap) {
 		const windowWords = words.slice(i, i + maxTokens);
 		const chunkText = windowWords.join(' ');
+		const chunkCitations = extractCitations(chunkText);
 
 		chunks.push({
 			text: chunkText,
@@ -527,7 +735,8 @@ function simpleChunk(text: string, maxTokens: number, overlap: number): LegalChu
 			startOffset: charOffset,
 			endOffset: charOffset + chunkText.length,
 			tokenCount: windowWords.length,
-			citations: extractCitations(chunkText),
+			citations: chunkCitations,
+			...buildLegalMetadata(chunkText, '', chunkCitations),
 		});
 
 		charOffset += windowWords.slice(0, maxTokens - overlap).join(' ').length + 1;

@@ -1321,6 +1321,14 @@ async function processAndEmbed(
           docling_enriched: Boolean(doclingBlocks),
           ...(doclingQualityScore != null ? { docling_quality_score: doclingQualityScore } : {}),
           ...(doclingVlmSections.length > 0 ? { docling_vlm_sections: doclingVlmSections } : {}),
+          // Phase 1A: legal retrieval metadata (RRF / KAG / RAPTOR feed)
+          ...(chunk.legal_section ? { legal_section: chunk.legal_section } : {}),
+          ...(chunk.jurisdiction ? { jurisdiction: chunk.jurisdiction } : {}),
+          ...(chunk.authority_tier != null ? { authority_tier: chunk.authority_tier } : {}),
+          ...(chunk.citation_count != null ? { citation_count: chunk.citation_count } : {}),
+          ...(chunk.extraction_confidence != null
+            ? { extraction_confidence: chunk.extraction_confidence }
+            : {}),
         },
       });
 

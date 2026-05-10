@@ -66,7 +66,7 @@
     device = await adapter.requestDevice();
     context = canvas.getContext('webgpu')!;
 
-    const format = navigator.gpu.getPreferredCanvasFormat();
+    const format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
     context.configure({ device, format, alphaMode: 'premultiplied' });
 
     const vertexModule = device.createShaderModule({ code: vertexShader });
@@ -156,7 +156,7 @@
     });
 
     const bindGroup = device.createBindGroup({
-      layout: pipeline.getBindGroupLayout(0),
+      layout: pipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
       entries: [{ binding: 0, resource: { buffer: uniformBuffer } }],
     });
 
