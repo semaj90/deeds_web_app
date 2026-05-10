@@ -45,7 +45,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				createdAt: evidence.createdAt,
 			})
 			.from(evidence)
-			.where(and(eq(evidence.id, params.id), eq(evidence.uploadedBy, Number(locals.user.id))))
+			.where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
 			.limit(1)
 			.then((r) => r[0]);
 
@@ -92,7 +92,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 			chainOfCustody: evidence.chainOfCustody,
 		})
 		.from(evidence)
-		.where(and(eq(evidence.id, params.id), eq(evidence.uploadedBy, Number(locals.user.id))))
+		.where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
 		.limit(1)
 		.then((r) => r[0]);
 
@@ -120,7 +120,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 			chainOfCustody: chain as unknown as Record<string, unknown>[],
 			updatedAt: new Date(),
 		})
-		.where(and(eq(evidence.id, params.id), eq(evidence.uploadedBy, Number(locals.user.id))));
+		.where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)));
 
 	return json({ success: true, event: newEvent, totalEvents: chain.length }, { status: 201 });
 };

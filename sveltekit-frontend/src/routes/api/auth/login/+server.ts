@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		}
 
 		// Create session using Lucia v3
-		const session = await createUserSession(user.id);
+		const session = await createUserSession(String(user.id));
 
 		// Set session cookie
 		setSessionCookie(cookies, session.sessionId);

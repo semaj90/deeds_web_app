@@ -42,7 +42,7 @@ export const PATCH: RequestHandler = async ({ request, locals }) => {
 				...(updates.avatarUrl !== undefined && { avatarUrl: updates.avatarUrl }),
 				updatedAt: new Date().toISOString()
 			})
-			.where(eq(users.id, locals.user.id))
+			.where(eq(users.id, Number(locals.user.id)))
 			.returning({
 				id: users.id,
 				email: users.email,

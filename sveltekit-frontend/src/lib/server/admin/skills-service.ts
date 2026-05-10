@@ -1,4 +1,4 @@
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { adminAiSkills } from '$lib/server/db/schema.js';
 import { eq, like, or } from 'drizzle-orm';
 

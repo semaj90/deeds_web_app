@@ -51,13 +51,13 @@ function fnv1a8(s: string): string {
 
 /** Fire-and-forget context_timeline insert. Never throws. */
 function emitTimeline(
-	userId: string,
+	userId: string | number,
 	eventType: string,
 	payload: Record<string, unknown>,
 	summaryId?: string | null,
 ): void {
 	db.insert(contextTimeline).values({
-		userId,
+		userId:     Number(userId),
 		sessionId:  '',
 		eventType,
 		pipeline:   'langgraph',
@@ -120,7 +120,7 @@ async function persistGraph(
 			summary,
 			entityTags:     domains,
 			relevanceScore: Math.min(1, totalChunks / 100),
-			userId,
+			userId:         Number(userId),
 		}).returning({ id: researchSummaries.id });
 
 		return row?.id ?? null;

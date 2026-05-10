@@ -85,7 +85,7 @@ CREATE INDEX IF NOT EXISTS cluster_summaries_embedding_hnsw
 CREATE TABLE IF NOT EXISTS llm_outputs (
   output_id   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   case_id     uuid,
-  user_id     uuid REFERENCES users(id) ON DELETE SET NULL,
+  user_id     integer REFERENCES users(id) ON DELETE SET NULL,
   pipeline    varchar(50) NOT NULL DEFAULT 'ace',
   prompt      text NOT NULL,
   response    text NOT NULL,

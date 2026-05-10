@@ -1,4 +1,4 @@
-import { pool } from '$lib/server/db/client.js';
+import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { createHash } from 'node:crypto';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';

@@ -138,6 +138,12 @@ export const ENV = {
   TENSORRT_URL:
     privateEnv.TENSORRT_URL ?? privateEnv.TENSORRT_SERVICE_URL ?? `http://${LOOPBACK_IP}:8099`,
   TRITON_URL: privateEnv.TRITON_URL ?? DEV.TRITON_URL,
+  TRITON_LLM_MODEL: privateEnv.TRITON_LLM_MODEL ?? 'legal-llm',
+  TRITON_VLM_MODEL: privateEnv.TRITON_VLM_MODEL ?? DEV.TRITON_VLM_MODEL,
+  TRITON_VISION_MODEL: privateEnv.TRITON_VISION_MODEL ?? DEV.TRITON_VISION_MODEL,
+  TRITON_RERANKER_MODEL: privateEnv.TRITON_RERANKER_MODEL ?? DEV.TRITON_RERANKER_MODEL,
+  CUDA_MAX_STREAMS: privateEnv.CUDA_MAX_STREAMS !== undefined ? Number(privateEnv.CUDA_MAX_STREAMS) : undefined,
+  CUDA_DEVICE_ID: privateEnv.CUDA_DEVICE_ID !== undefined ? Number(privateEnv.CUDA_DEVICE_ID) : undefined,
   // Inference cascade: Bifrost L2 cache (:3040) → Reranker (:8090) → TurboQuant (:8080) → VLM (:8085) → LiteRT (:8070)
   BIFROST_URL: privateEnv.BIFROST_URL ?? `http://${LOOPBACK_IP}:3040`,
   TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8080`,
@@ -288,6 +294,17 @@ function getNormalizedMinioConfig() {
 	}
 
 	return { endpoint, port, useSSL };
+}
+
+// SeaweedFS S3 gateway override — when running `docker compose --profile seaweedfs up`,
+// SeaweedFS exposes an S3-compatible gateway on port 8333. Setting SEAWEED_S3_PORT
+// transparently retargets the existing MinIO SDK client at SeaweedFS without code
+// changes anywhere else.
+if (privateEnv.SEAWEED_S3_PORT) {
+	ENV.MINIO_PORT = privateEnv.SEAWEED_S3_PORT;
+	if (privateEnv.SEAWEED_ENDPOINT) ENV.MINIO_ENDPOINT = privateEnv.SEAWEED_ENDPOINT;
+	if (privateEnv.SEAWEED_ACCESS_KEY) ENV.MINIO_ACCESS_KEY = privateEnv.SEAWEED_ACCESS_KEY;
+	if (privateEnv.SEAWEED_SECRET_KEY) ENV.MINIO_SECRET_KEY = privateEnv.SEAWEED_SECRET_KEY;
 }
 
 const normalizedMinio = getNormalizedMinioConfig();

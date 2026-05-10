@@ -107,7 +107,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Compact to ~1.5KB of plain prose so the extraction prompt stays small.
       const chunks = [...(ctx.kbChunks ?? []).slice(0, 3), ...(ctx.ragChunks ?? []).slice(0, 3)];
       aceContext = chunks
-        .map((c, i) => `[${i + 1}] ${(c.text ?? '').slice(0, 240)}`)
+        .map((c, i) => `[${i + 1}] ${(c.content ?? '').slice(0, 240)}`)
         .filter((s) => s.length > 4)
         .join('\n');
       if (aceContext.length > 1800) aceContext = aceContext.slice(0, 1800);

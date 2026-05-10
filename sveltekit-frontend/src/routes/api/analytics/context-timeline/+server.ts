@@ -134,7 +134,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const [row] = await db
       .insert(contextTimeline)
       .values({
-        userId:              locals.user.id,
+        userId:              Number(locals.user.id),
         sessionId,
         eventType,
         pipeline,

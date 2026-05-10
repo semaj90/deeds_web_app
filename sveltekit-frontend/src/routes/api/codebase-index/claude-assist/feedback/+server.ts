@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	try {
 		await db.insert(contextTimeline).values({
-			userId:    locals.user.id,
+			userId:    Number(locals.user.id),
 			sessionId: '',
 			eventType: 'claude_assist.feedback',
 			pipeline:  'claude-assist',

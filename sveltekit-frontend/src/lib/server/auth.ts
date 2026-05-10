@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { Lucia, type Session, type User } from 'lucia';
 import { db } from './db/client';
-import * as schema from './db/schema.js';
+import * as schema from './db/schema-postgres.js';
 import { ENV } from './env.server.js';
 import {
     LoginError,
@@ -27,7 +27,7 @@ import { getLegalGatewayUrl } from './utils/endpoints.js';
 /**
  * DrizzlePostgreSQLAdapter for Lucia v3
  */
-const adapter = new DrizzlePostgreSQLAdapter(db, schema.sessions, schema.users);
+const adapter = new DrizzlePostgreSQLAdapter(db as any, schema.sessions as any, schema.users as any);
 
 /**
  * Initialize Lucia with SvelteKit 5 adapter
@@ -292,7 +292,7 @@ export class AuthService {
       const [updatedUser] = await db
         .update(schema.users)
         .set(updateData)
-        .where(eq(schema.users.id, userId))
+        .where(eq(schema.users.id, Number(userId)))
         .returning();
 
       console.log('[AUTH] Profile updated:', { userId });
@@ -314,7 +314,7 @@ export class AuthService {
       const [user] = await db
         .select()
         .from(schema.users)
-        .where(eq(schema.users.id, userId))
+        .where(eq(schema.users.id, Number(userId)))
         .limit(1);
 
       if (!user || !user.passwordHash) {
@@ -342,7 +342,7 @@ export class AuthService {
       await db
         .update(schema.users)
         .set({ passwordHash: newPasswordHash, updatedAt: new Date().toISOString() })
-        .where(eq(schema.users.id, userId));
+        .where(eq(schema.users.id, Number(userId)));
 
       // Invalidate all user sessions for security
       await this.invalidateUserSessions(userId);

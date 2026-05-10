@@ -1,37 +1,39 @@
 <script lang="ts">
-  import { useMachine } from '@xstate/svelte';
+  import { useMachine } from '$lib/utils/xstate-svelte5.svelte.js';
+  import { fromPromise } from 'xstate';
   import { chatMachine } from '$lib/stores/admin-chat-machine.js';
-  import { fade, slide, fly } from 'svelte/transition';
-  import { onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
 
   let { chatId = 'admin-studio-default', systemContext = {} } = $props();
 
-  const [state, send] = useMachine(chatMachine, {
-    input: { chatId },
-    actors: {
-      fetchResponse: async ({ input }) => {
-        const res = await fetch('/api/admin/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...input, systemContext })
-        });
-        if (!res.ok) throw new Error('Inference server unreachable');
-        return res.json();
+  const { snapshot, send } = useMachine(
+    chatMachine.provide({
+      actors: {
+        fetchResponse: fromPromise(async ({ input }: { input: { chatId: string; message: string; attachments?: any[] } }) => {
+          const res = await fetch('/api/admin/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...input, systemContext })
+          });
+          if (!res.ok) throw new Error('Inference server unreachable');
+          return res.json();
+        })
       }
-    }
-  });
+    }),
+    { input: { chatId } }
+  );
 
   let inputVal = $state('');
   let scrollContainer: HTMLElement;
 
   function handleSubmit() {
-    if (!inputVal.trim() || $state.matches('thinking')) return;
+    if (!inputVal.trim() || snapshot.matches('thinking')) return;
     send({ type: 'SEND', message: inputVal });
     inputVal = '';
   }
 
   $effect(() => {
-    if ($state.context.messages.length && scrollContainer) {
+    if (snapshot.context.messages.length && scrollContainer) {
       scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
     }
   });
@@ -44,7 +46,7 @@
       <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
       <span class="text-xs font-bold tracking-widest uppercase opacity-70">Gemma 4 / TRACE Oracle</span>
     </div>
-    <button 
+    <button
       class="text-[10px] uppercase tracking-tighter opacity-40 hover:opacity-100 transition-opacity"
       onclick={() => send({ type: 'CLEAR' })}
     >
@@ -53,19 +55,19 @@
   </header>
 
   <!-- Messages -->
-  <div 
+  <div
     bind:this={scrollContainer}
     class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide"
   >
-    {#if $state.context.messages.length === 0}
+    {#if snapshot.context.messages.length === 0}
       <div class="h-full flex flex-col items-center justify-center opacity-20 text-center px-10">
         <span class="i-carbon-machine-learning text-5xl mb-4"></span>
         <p class="text-xs font-mono">Neural interface ready. System context initialized.</p>
       </div>
     {/if}
 
-    {#each $state.context.messages as msg, i}
-      <div 
+    {#each snapshot.context.messages as msg, i}
+      <div
         class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}"
         in:fly={{ y: 10, duration: 400 }}
       >
@@ -80,8 +82,8 @@
       </div>
     {/each}
 
-    {#if $state.matches('thinking')}
-      <div class="flex justify-start" in:fade>
+    {#if snapshot.matches('thinking')}
+      <div class="flex justify-start">
         <div class="bg-white/5 p-4 rounded-2xl border border-white/10 flex items-center gap-2">
           <div class="dot-loading"></div>
           <div class="dot-loading delay-100"></div>
@@ -90,10 +92,10 @@
       </div>
     {/if}
 
-    {#if $state.matches('error')}
+    {#if snapshot.matches('error')}
       <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex flex-col gap-2">
-        <span>Transmission Interrupted: {$state.context.error}</span>
-        <button 
+        <span>Transmission Interrupted: {snapshot.context.error}</span>
+        <button
           class="underline text-left hover:text-red-300"
           onclick={() => send({ type: 'RETRY' })}
         >
@@ -106,16 +108,16 @@
   <!-- Input -->
   <footer class="p-4 bg-black/20 border-t border-white/5">
     <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="relative">
-      <input 
+      <input
         bind:value={inputVal}
         placeholder="Query the Oracle..."
         class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-4 pr-12 text-sm focus:outline-none focus:border-accent/40 transition-all placeholder:opacity-30"
-        disabled={$state.matches('thinking')}
+        disabled={snapshot.matches('thinking')}
       />
-      <button 
+      <button
         type="submit"
         class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-accent text-black flex items-center justify-center transition-all hover:scale-110 active:scale-90 disabled:opacity-30 disabled:scale-100"
-        disabled={!inputVal.trim() || $state.matches('thinking')}
+        disabled={!inputVal.trim() || snapshot.matches('thinking')}
       >
         <span class="i-carbon-send text-lg"></span>
       </button>
@@ -125,7 +127,7 @@
 
 <style>
   .chat-assistant-container {
-    box-shadow: 
+    box-shadow:
       0 20px 50px rgba(0, 0, 0, 0.4),
       inset 0 1px 1px rgba(255, 255, 255, 0.05);
   }

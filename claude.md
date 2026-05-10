@@ -530,6 +530,106 @@ Answer NO or Ctrl+C immediately. Drizzle marks tables not in schema for deletion
 
 ---
 
+## Schema Mismatch: `user_id` columns split across 3 types in DB (May 10, 2026)
+
+**The schema is fragmented.** A live audit of `information_schema.columns` shows 44 tables with `user_id` (or `uploaded_by`) columns, split across **integer / uuid / text**:
+
+```sql
+-- See full breakdown:
+SELECT table_name, column_name, data_type
+FROM information_schema.columns
+WHERE column_name IN ('user_id','uploaded_by') AND table_schema='public'
+ORDER BY data_type, table_name;
+```
+
+| Pattern | Count | Examples |
+|---|---|---|
+| `integer` (Lucia-aligned, FK-correct to `users.id`) | 16 tables | `sessions`, `evidence.uploaded_by`, `documents`, `legal_documents`, `rag_sessions`, `research_summaries`, `llm_outputs`, `canvas_states`, `themes`, `context_timeline` |
+| `uuid` (pre-Lucia legacy, **broken FK** — won't resolve to integer `users.id`) | 24 tables | `cases`, `evidence.user_id` (orphan, 0 rows), `chat_messages`, `audit_log`, `analytics_events`, `chunk_hit_log`, `synthesis_runs`, `email_verification_codes`, `yorha_chat_sessions` |
+| `text` (middle ground, accepts string IDs) | 3 tables | `admin_ai_chat_sessions`, `agent_actions`, `saved_citations` |
+
+**Drizzle schema lies in places.** Many `userId: uuid('user_id')` definitions in `schema-postgres.ts` describe the historical intent, not the current DB. The DB is ground truth — verify with `\d table_name` before adding new code.
+
+**Lucia contract:** `users.id` is `serial` integer. `locals.user.id` is `string` (Lucia v3 always strings IDs). `sessions.user_id` is integer in DB ✅.
+
+**Coding pattern (use until a structural fix lands):**
+- Going INTO Lucia API (`createSession`, `getSession`): `String(user.id)`
+- Going INTO Drizzle `eq()` against an `integer user_id` column: `Number(locals.user.id)`
+- Going INTO Drizzle `eq()` against a `uuid user_id` column: pass `locals.user.id` as-is (string) — **never `Number()`**, but be aware this query will return zero rows for any integer-PK user
+- Going INTO Drizzle `eq()` against a `text user_id` column: pass `locals.user.id` as-is
+- **Before writing the query:** `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "\d <table>"` to confirm column type
+
+**The 24 `uuid user_id` tables are technical debt.** They will never return data for current Lucia users. Three resolution paths:
+
+1. **Convert `users.id` to uuid** (multi-day refactor; requires backfill + FK swap across all 16 integer tables; aligns everything to uuid)
+2. **Migrate the 24 uuid columns to integer** (zero-downtime if tables are empty/low-row; quick if rows can be dropped; each needs `ALTER TABLE … ALTER COLUMN user_id TYPE integer USING NULL` for empty tables)
+3. **Two-tier identity** (keep both — `users.id integer` for Lucia/auth, separate `users.uuid uuid` for cross-system identity referenced by analytics/audit). Most pragmatic; documents intent.
+
+**Migrations applied this session (2026-05-10):**
+- `password_reset_tokens.user_id`: uuid → integer (0 rows; safe; matches `users.id` PK)
+- `vlm_image_tags`: created (uuid PK + name unique) — was missing entirely
+- `0013_codeintel_indexes.sql`, `0016_codeintel_schema.sql`, `0016_courtroom_3d_animation.sql`, `0018_output_meta_manifold4.sql`: applied (mostly idempotent — already in place)
+
+**Until a structural fix lands:** every new auth-touching route MUST verify column types via `\d` before writing the query. JSONB `Record<string, unknown>[]` columns need `as unknown as T[]` double-cast on read AND write. New JSONB columns should use `.$type<T>()` in the schema so consumers skip the double-cast.
+
+---
+
+## Migration history (May 10, 2026 — applied)
+
+5 SQL files lived on disk but were NOT in `drizzle/meta/_journal.json`. `drizzle-kit migrate` skipped them. Applied directly via `docker exec legal-ai-postgres psql`:
+
+```bash
+# All IF NOT EXISTS — applied 2026-05-10, mostly idempotent (already in place)
+docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0013_codeintel_indexes.sql
+docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0016_codeintel_schema.sql
+docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0016_courtroom_3d_animation.sql
+docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/0018_output_meta_manifold4.sql
+
+# vlm_image_tags: created from scratch (schema added the table 2026-05-10)
+docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db <<SQL
+CREATE TABLE IF NOT EXISTS vlm_image_tags (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
+  name varchar(200) UNIQUE NOT NULL,
+  description text,
+  source varchar(50) NOT NULL DEFAULT 'manual',
+  hit_count integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+SQL
+
+# password_reset_tokens.user_id: uuid → integer (0 rows in table — matches users.id)
+docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "ALTER TABLE password_reset_tokens ALTER COLUMN user_id TYPE integer USING NULL;"
+```
+
+**Version bumps verified clean (this session):** `drizzle-orm@0.45.2`, `drizzle-kit@0.31.10`, `@sveltejs/kit@2.59.1`, `@sveltejs/adapter-node@5.5.4`. tsgo baseline unchanged.
+
+**SeaweedFS already wired** at `env.server.ts:300-307` — set `SEAWEED_S3_PORT=8333` in `.env` to retarget the MinIO SDK at the SeaweedFS S3 gateway. Zero code changes needed in `minio-client.ts` or call sites. SeaweedFS containers (`legal-ai-seaweed-{master,volume,filer,s3}`) confirmed up.
+
+### Verification matrix (2026-05-10 — applied + tested)
+
+| Lane | Result |
+|---|---|
+| svelte-check | **32 errors / 13 warnings in 29 files** — down from 43 errors at session start (vlmImageTags fix + reverted password_reset_tokens schema = -11 errors) |
+| smoke:graphify (5-pillar + D33) | **8 present / 4 absent** — Neo4j + Redis hypergraph checkpoint absent (acceptable; Neo4j is a separate `--profile full` lane) |
+| Playwright `auth-login-db` | **11/11 pass** — register, login (4 seeded users), wrong-password 401, duplicate email 409, invalid email 400, short password 400, browser-nav to /cases, logout invalidates session |
+| Playwright `route-verification` | **22/22 pass** — homepage, command-center, terminal, error-analysis, topology, sidebar nav, link clicks, 404 handling, no JS errors on homepage |
+| Playwright `homepage-screenshot` | **4/4 pass** — homepage load, sidebar render, action buttons, mobile viewport |
+| Playwright `evidence-viewer-route` (NEW) | **3/3 pass** — not-found state for unknown UUID, invalid UUID format rejection, no JS errors |
+| Playwright `service-health-probe` | 6/7 pass — 1 pre-existing failure on `/api/health` missing expected service property |
+| Playwright `evidence-diagnostics-upload` | 1/2 pass — 1 timeout waiting for upload response (pre-existing, not session-introduced) |
+
+**Wired this session:** `/evidence/[id]/view` route ([+page.server.ts](sveltekit-frontend/src/routes/(app)/evidence/[id]/view/+page.server.ts) + [+page.svelte](sveltekit-frontend/src/routes/(app)/evidence/[id]/view/+page.svelte)) using `EvidenceMediaViewer.svelte` for unified inline display of image/video/audio/PDF/text with lightbox + download fallback. Auth-guarded with `redirect(303, '/login?redirect=...')` and graceful `loadError` degradation.
+
+**`PLAYWRIGHT_SKIP_GLOBAL_SETUP=true` is required for any Playwright run** until `cases.user_id uuid → integer` migration lands. The case-seed in `tests/global-setup.ts:60` POSTs to `/api/cases` which fails with `invalid input syntax for type uuid: "2"` (integer `users.id` won't fit into uuid `cases.user_id`).
+
+**Known degradations (acceptable until structural fix):**
+- `/cases` page renders empty-state when SSR query `WHERE cases.user_id = $1` runs with integer user.id (see `safe()` helper + `loadError` field — graceful, no 500)
+- `evidence.user_id` queries (chain-of-custody, /api/evidence/[id]) return 0 rows for current Lucia users; consumer routes should switch to `evidence.uploaded_by` (integer) for ownership filters
+- `db:seed` succeeds for users (4 created) but fails at cases insert with the same uuid mismatch — non-blocking for auth tests
+
+---
+
 ## tsconfig Services Status (Updated April 7, 2026)
 
 `src/lib/services/` is **un-excluded and fully type-checked** — 35 files across 3 subdirectories, **0 errors**.

@@ -1,4 +1,4 @@
-import { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { adminAiSkills, adminAiSubagentRuns } from '$lib/server/db/schema.js';
 import { traceMcpClient } from '$lib/server/mcp-client.js';
 import { ENV } from '$lib/server/env.server.js';

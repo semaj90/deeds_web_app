@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.returning();
 
 		// Create session
-		const session = await createUserSession(newUser.id);
+		const session = await createUserSession(String(newUser.id));
 
 		// Set session cookie
 		setSessionCookie(cookies, session.sessionId);

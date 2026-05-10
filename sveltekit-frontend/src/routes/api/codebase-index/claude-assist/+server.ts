@@ -41,12 +41,12 @@ const DEFAULT_BUDGETS = ASSIST_BUDGETS;
 
 /** Fire-and-forget context_timeline insert. Never throws. */
 function emitTimeline(
-	userId: string,
+	userId: string | number,
 	eventType: string,
 	payload: Record<string, unknown>,
 ): void {
 	db.insert(contextTimeline).values({
-		userId,
+		userId:     Number(userId),
 		sessionId:  '',
 		eventType,
 		pipeline:   'claude-assist',

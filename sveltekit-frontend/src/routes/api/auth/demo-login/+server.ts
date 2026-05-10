@@ -112,7 +112,7 @@ const handleDemoLogin: RequestHandler = async ({ request, cookies, url }) => {
     const { user, created } = await upsertDemoUser(parsed.data);
 
     // Create a real Lucia session for the seeded account.
-    const session = await createUserSession(user.id);
+    const session = await createUserSession(String(user.id));
     setSessionCookie(cookies, session.sessionId);
 
     return json({

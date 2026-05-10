@@ -1,15 +1,15 @@
 {
   "src/routes/(analysis)/+layout.svelte": {
     "zone": "route",
-    "directDeps": 6,
+    "directDeps": 3,
     "serverDeps": 0,
     "dbDeps": 0
   },
   "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
-    "dbDeps": 2
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
   },
   "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -19,9 +19,9 @@
   },
   "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
-    "dbDeps": 2
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
   },
   "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -31,9 +31,9 @@
   },
   "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
-    "dbDeps": 2
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
   },
   "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -41,17 +41,41 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(analysis)@/+layout.svelte": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
+  },
   "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
+  },
   "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
+  },
+  "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
   },
   "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -161,6 +185,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/admin/cache/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/(app)/admin/cache/+page.svelte": {
     "zone": "route",
     "directDeps": 4,
@@ -251,6 +281,18 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/admin/document-search/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/admin/document-search/+page.svelte": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/(app)/admin/error-analysis/+page.server.ts": {
     "zone": "route",
     "directDeps": 1,
@@ -264,6 +306,12 @@
     "dbDeps": 0
   },
   "src/routes/(app)/admin/error-brain/+layout.svelte": {
+    "zone": "route",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/admin/error-brain/+page.server.ts": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -535,9 +583,9 @@
   },
   "src/routes/(app)/cases/[id]/ai/+page.server.ts": {
     "zone": "route",
-    "directDeps": 6,
-    "serverDeps": 6,
-    "dbDeps": 6
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
   },
   "src/routes/(app)/cases/[id]/ai/+page.svelte": {
     "zone": "route",
@@ -557,11 +605,23 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/cases/[id]/canvas/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
+  },
   "src/routes/(app)/cases/[id]/canvas/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
+  },
+  "src/routes/(app)/cases/[id]/chat/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
   },
   "src/routes/(app)/cases/[id]/chat/+page.svelte": {
     "zone": "route",
@@ -617,6 +677,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/cases/[id]/persons/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
+  },
   "src/routes/(app)/cases/[id]/persons/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
@@ -661,7 +727,7 @@
   },
   "src/routes/(app)/citations/+layout.svelte": {
     "zone": "route",
-    "directDeps": 2,
+    "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -1469,11 +1535,23 @@
     "serverDeps": 1,
     "dbDeps": 0
   },
+  "src/routes/(app)/evidence/analyze/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
+  },
   "src/routes/(app)/evidence/analyze/+page.svelte": {
     "zone": "route",
     "directDeps": 2,
     "serverDeps": 0,
     "dbDeps": 0
+  },
+  "src/routes/(app)/evidence/hash/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
   },
   "src/routes/(app)/evidence/hash/+page.svelte": {
     "zone": "route",
@@ -1572,6 +1650,12 @@
     "dbDeps": 0
   },
   "src/routes/(app)/knowledge/+page.svelte": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/legal-corpus/+layout.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
@@ -2027,6 +2111,18 @@
     "serverDeps": 2,
     "dbDeps": 0
   },
+  "src/routes/api/admin/model/promote-weights/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/model/upload-weights/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
   "src/routes/api/admin/model/validate-checkpoint/+server.ts": {
     "zone": "route",
     "directDeps": 2,
@@ -2051,6 +2147,12 @@
     "serverDeps": 4,
     "dbDeps": 1
   },
+  "src/routes/api/admin/raptor-atlas/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 1
+  },
   "src/routes/api/admin/routes/+server.ts": {
     "zone": "route",
     "directDeps": 3,
@@ -2070,6 +2172,12 @@
     "dbDeps": 2
   },
   "src/routes/api/admin/topology/recompute/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/weights/+server.ts": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 1,
@@ -2332,6 +2440,12 @@
     "directDeps": 2,
     "serverDeps": 2,
     "dbDeps": 1
+  },
+  "src/routes/api/analytics/panel-activity/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/api/analytics/patterns/+server.ts": {
     "zone": "route",
@@ -3803,10 +3917,34 @@
     "serverDeps": 12,
     "dbDeps": 2
   },
+  "src/routes/api/evidence/search-by-image/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
+  "src/routes/api/evidence/search-by-image/feedback/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
   "src/routes/api/evidence/summary/[id]/approve/+server.ts": {
     "zone": "route",
     "directDeps": 3,
     "serverDeps": 3,
+    "dbDeps": 2
+  },
+  "src/routes/api/evidence/tags/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
+  },
+  "src/routes/api/evidence/tags/[id]/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
     "dbDeps": 2
   },
   "src/routes/api/evidence/upload/+server.ts": {
@@ -5329,8 +5467,8 @@
   },
   "src/routes/api/system/env/+server.ts": {
     "zone": "route",
-    "directDeps": 0,
-    "serverDeps": 0,
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "src/routes/api/system/health/+server.ts": {

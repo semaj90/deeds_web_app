@@ -1915,7 +1915,7 @@ export async function runGemma4Agent(
   // Fire-and-forget timeline record
   db.insert(contextTimeline)
     .values({
-      userId: options?.userId ?? undefined,
+      userId: options?.userId ? Number(options.userId) : null,
       sessionId: options?.sessionId ?? '',
       eventType: 'tool_call',
       pipeline,

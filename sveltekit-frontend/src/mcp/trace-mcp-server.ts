@@ -1874,15 +1874,13 @@ server.registerTool(
             RETURN DISTINCT n.stableKey AS key, length(r) AS hops, type(r[0]) AS via
             LIMIT 200
           `;
-          const session = neo4jDriver.session();
-          try {
-            const r = await session.run(cypher, { seeds: expandSeed });
-            for (const rec of r.records) {
-              const key = rec.get('key');
-              if (!key || merged.has(key)) continue; // skip if already in dense/sparse
-              graphNeighbors.set(key, { hops: Number(rec.get('hops')), via: rec.get('via') ?? 'IMPORTS' });
-            }
-          } finally { await session.close(); }
+          const rows = await neo4jQuery(cypher, { seeds: expandSeed });
+          for (const rec of rows) {
+            const row = (rec as { row?: unknown[] }).row;
+            const key = row?.[0] as string | undefined;
+            if (!key || merged.has(key)) continue; // skip if already in dense/sparse
+            graphNeighbors.set(key, { hops: Number(row?.[1] ?? 1), via: String(row?.[2] ?? 'IMPORTS') });
+          }
         } catch (e) {
           // Graph expansion is best-effort; keep dense+sparse results.
         }

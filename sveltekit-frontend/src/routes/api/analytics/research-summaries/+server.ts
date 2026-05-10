@@ -218,7 +218,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		summary:       d.summary,
 		entityTags:    d.entityTags,
 		relevanceScore: d.relevanceScore,
-		userId:        locals.user.id,
+		userId:        Number(locals.user.id),
 	};
 
 	// Insert and return the generated ID so callers (e.g. ResearchTaskStore) can

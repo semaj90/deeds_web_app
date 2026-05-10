@@ -536,7 +536,7 @@ export async function warmResearchCache(
     const rows = await db
       .select()
       .from(researchSummaries)
-      .where(eq(researchSummaries.userId, userId))
+      .where(eq(researchSummaries.userId, Number(userId)))
       .orderBy(desc(researchSummaries.relevanceScore))
       .limit(limit);
 
