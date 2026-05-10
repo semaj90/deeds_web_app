@@ -74,3 +74,6 @@ logs/startup/
 # Obsidian vault generated plugin binaries (13MB, regenerable via install-plugins.sh)
 docs/obsidian-vault/.obsidian/plugins/*/main.js
 docs/obsidian-vault/.obsidian/plugins/*/styles.css
+
+# Graphify per-run output snapshots — timestamped, regenerable, never review-worthy
+memory/runs/
