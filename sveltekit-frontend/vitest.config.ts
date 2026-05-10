@@ -136,6 +136,10 @@ export default defineConfig({
       'tests/retrieval-lanes.spec.ts',
       // RRF fusion module (Phase 1C — sparse + dense lane combiner, 2026-05-10)
       'tests/rrf-fuse.spec.ts',
+      // Regex intent classifier (Phase A — service-worker design doc, 2026-05-10)
+      'tests/intent/regex-intent.spec.ts',
+      // Sparse BM25 lane integration test (Phase 1B — Postgres ts_rank_cd, 2026-05-10)
+      'tests/sparse-bm25.spec.ts',
       // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
