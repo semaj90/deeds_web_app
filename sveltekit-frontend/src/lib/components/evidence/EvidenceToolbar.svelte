@@ -9,7 +9,9 @@
 		searchMode = 'local',
 		semanticResultsCount = 0,
 		searchTiming = {},
-		onToggleFilters
+		onToggleFilters,
+		onToggleImageSearch,
+		imageSearchActive = false,
 	}: {
 		searchQuery?: string;
 		typeFilter?: string;
@@ -19,6 +21,8 @@
 		semanticResultsCount?: number;
 		searchTiming?: Record<string, number>;
 		onToggleFilters?: () => void;
+		onToggleImageSearch?: () => void;
+		imageSearchActive?: boolean;
 	} = $props();
 
 	const filterTabs = [
@@ -64,6 +68,17 @@
 	</div>
 
 	<div class="toolbar-right">
+		{#if onToggleImageSearch}
+			<button
+				type="button"
+				class="filter-toggle"
+				class:active={imageSearchActive}
+				onclick={onToggleImageSearch}
+				title="Search by image (Gemma4 VLM)"
+			>
+				<Icon name="image" class="w-4 h-4" />
+			</button>
+		{/if}
 		<button type="button" class="filter-toggle" onclick={onToggleFilters} title="Advanced filters">
 			<Icon name="sliders-horizontal" class="w-4 h-4" />
 		</button>
@@ -196,6 +211,11 @@
 	.filter-toggle:hover {
 		color: rgba(212, 199, 163, 0.8);
 		background: rgba(255, 255, 255, 0.06);
+	}
+	.filter-toggle.active {
+		color: var(--color-accent, #c9b285);
+		background: rgba(201, 178, 133, 0.12);
+		border-color: rgba(201, 178, 133, 0.3);
 	}
 	.view-toggle {
 		display: flex;
