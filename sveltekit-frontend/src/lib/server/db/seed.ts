@@ -162,7 +162,7 @@ async function seed(): Promise<void> {
 			throw new Error('Demo user not found - cannot seed cases');
 		}
 
-		const userId = String(demoUser[0].id);
+		const userId = demoUser[0].id;
 
 		// === SEED CASES (10 cases with realistic mix) ===
 		console.log('\n[seed] Creating 10 demo cases...');
@@ -330,7 +330,7 @@ async function seed(): Promise<void> {
 					fileSize: Math.floor(Math.random() * 5000000) + 100000,
 					hash: `sha256:${crypto.randomBytes(32).toString('hex')}`,
 					fileUrl: `minio://evidence/${caseRecord.id}/evidence-${i + 1}.${template.ext}`,
-					uploadedBy: userId,
+					uploadedBy: String(userId),
 				};
 
 				const existing = await db
@@ -434,7 +434,7 @@ async function seed(): Promise<void> {
 			const reportRecords = [
 				{
 					caseId: caseRecord.id,
-					createdBy: userId,
+					createdBy: String(userId),
 					title: `Initial Investigation Summary - ${caseRecord.caseNumber}`,
 					type: 'investigation_summary',
 					content: `
@@ -466,7 +466,7 @@ Investigation ongoing.
 				},
 				{
 					caseId: caseRecord.id,
-					createdBy: userId,
+					createdBy: String(userId),
 					title: `Forensic Analysis - ${caseRecord.caseNumber}`,
 					type: 'forensic_analysis',
 					content: `

@@ -115,7 +115,7 @@ export const actions: Actions = {
         .values({
           title: title.trim(),
           description: description.trim(),
-          userId: locals.user.id,
+          userId: Number(locals.user.id),
           status: 'open',
           priority,
           caseNumber,

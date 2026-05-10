@@ -64,7 +64,7 @@ export const actions = {
           title: title.trim(),
           description,
           priority: priority,
-          userId: locals.user.id,
+          userId: Number(locals.user.id),
           status: 'open' as const,
           updatedAt: new Date().toISOString(),
         })
