@@ -88,7 +88,7 @@ let _loadFailed = false;
 let _retryAt = 0;
 
 async function _getClient(): Promise<unknown> {
-  const enabled = ENV.TOOL_ROUTER_GRPC_ENABLED;
+  const enabled = ENV.TOOL_GRPC_ENABLED;
   if (!enabled) return null;
   if (_loadFailed && Date.now() < _retryAt) return null;
   if (_loadFailed) { _loadFailed = false; _client = null; }

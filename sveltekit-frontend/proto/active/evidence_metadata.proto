@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package evidence;
+
+// ── Top-level message ─────────────────────────────────────────────────────────
+
+message EvidenceMetadata {
+  string evidence_id      = 1;
+  int32  schema_version   = 2;
+  int64  timestamp        = 3;
+
+  ExtractionInfo  extraction     = 4;
+  repeated Entity entities       = 5;
+  VLMAnalysis     vlm            = 6;
+  ForensicsResult forensics      = 7;
+  repeated LangExtractSection sections = 8;
+  YOLODetections  yolo           = 9;
+  NLPClassification nlp          = 10;
+  repeated string suggested_tags = 11;
+  AnalysisPipeline pipeline_stats = 12;
+}
+
+// ── Extraction ────────────────────────────────────────────────────────────────
+
+message ResizeMetadata {
+  bool   resized          = 1;
+  int32  original_width   = 2;
+  int32  original_height  = 3;
+  int32  vlm_size         = 4;
+}
+
+message ExtractionInfo {
+  string method             = 1;
+  int32  text_length        = 2;
+  string language           = 3;
+  bool   ocr_fallback_used  = 4;
+  ResizeMetadata resize     = 5;
+}
+
+// ── Entities ──────────────────────────────────────────────────────────────────
+
+message Entity {
+  string type         = 1;
+  string value        = 2;
+  float  confidence   = 3;
+  int32  start_offset = 4;
+  int32  end_offset   = 5;
+  string source       = 6;
+}
+
+// ── VLM analysis ──────────────────────────────────────────────────────────────
+
+message VLMAnalysis {
+  string          summary        = 1;
+  repeated string key_findings   = 2;
+  repeated string suggested_tags = 3;
+  string          model          = 4;
+  bool            cached         = 5;
+}
+
+// ── Forensics ─────────────────────────────────────────────────────────────────
+
+message ForensicFlag {
+  string type        = 1;
+  string description = 2;
+  string severity    = 3;
+  map<string, string> metadata = 4;
+}
+
+message ForensicsResult {
+  repeated ForensicFlag flags = 1;
+  float                 risk_score = 2;
+}
+
+// ── LangExtract sections ──────────────────────────────────────────────────────
+
+message LangExtractSection {
+  string section_type  = 1;
+  float  confidence    = 2;
+  int32  start_offset  = 3;
+  int32  end_offset    = 4;
+}
+
+// ── YOLO detections ───────────────────────────────────────────────────────────
+
+message BoundingBox {
+  float x      = 1;
+  float y      = 2;
+  float width  = 3;
+  float height = 4;
+}
+
+message YOLOObject {
+  string      class_name  = 1;
+  float       confidence  = 2;
+  BoundingBox bbox        = 3;
+}
+
+message YOLOLayout {
+  repeated string detected_layout_elements = 1;
+}
+
+message YOLODetections {
+  repeated YOLOObject objects    = 1;
+  YOLOLayout          layout     = 2;
+  string              model_type = 3;
+}
+
+// ── NLP classification ────────────────────────────────────────────────────────
+
+message NLPClassification {
+  string          document_type  = 1;
+  string          practice_area  = 2;
+  float           confidence     = 3;
+  repeated string key_phrases    = 4;
+}
+
+// ── Pipeline stats ────────────────────────────────────────────────────────────
+
+message AnalysisPipeline {
+  bool   llm_escalated              = 1;
+  string llm_synthesis              = 2;
+  int32  graph_connections_created  = 3;
+  bool   yolo_cache_hit             = 4;
+  bool   cached_to_db               = 5;
+  int64  processing_time_ms         = 6;
+}

@@ -68,7 +68,7 @@ export async function generateSummaryLenses(params: {
 
 			results.push({ lensType, success: true, summaryText: lensText });
 		} catch (error) {
-			console.error(`[summary-lens] Failed to generate ${lensType} for ${params.stableKey}:`, error);
+			console.error(`[summary-lens] Failed to generate ${lensType} for ${params.chunkId}:`, error);
 			results.push({ lensType, success: false, error: String(error) });
 		}
 	}
