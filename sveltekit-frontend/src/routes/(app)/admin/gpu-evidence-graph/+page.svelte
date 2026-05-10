@@ -2,6 +2,8 @@
 	import type { PageData } from './$types';
 	import type { WebGPULegalDocumentGraph, PerformanceStats } from '$lib/webgpu/legal-document-graph.js';
 
+	export const ssr = false;
+
 	const { data }: { data: PageData & { connections?: Array<{ source: string; target: string; type: string; strength: number }> } } = $props();
 
 	let canvas: HTMLCanvasElement;
@@ -118,7 +120,7 @@
 			const dx = b.x - a.x;
 			const dy = b.y - a.y;
 			const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-			const strength = 0.0005 * (edge.strength / 100);
+			const strength = 0.0005 * (edge.strength / 100) / dist;
 			a.vx += dx * strength;
 			a.vy += dy * strength;
 			b.vx -= dx * strength;
