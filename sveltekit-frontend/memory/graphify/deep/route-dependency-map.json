@@ -83,6 +83,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(app)/admin/+layout.svelte": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/(app)/admin/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
@@ -422,6 +428,18 @@
   "src/routes/(app)/admin/topology/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/admin/unified-indexing-studio/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/(app)/admin/unified-indexing-studio/+page.svelte": {
+    "zone": "route",
+    "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -1943,6 +1961,42 @@
     "serverDeps": 2,
     "dbDeps": 0
   },
+  "src/routes/api/admin/ai-chat/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/ai-chat/sessions/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/ai-chat/subagent/launch/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/ai-chat/summarize-panel/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/ai-chat/upload/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/ai-chat/[sessionId]/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
   "src/routes/api/admin/audit/+server.ts": {
     "zone": "route",
     "directDeps": 2,
@@ -1954,6 +2008,12 @@
     "directDeps": 3,
     "serverDeps": 3,
     "dbDeps": 0
+  },
+  "src/routes/api/admin/chat/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 2
   },
   "src/routes/api/admin/inference-stats/+server.ts": {
     "zone": "route",
@@ -2008,6 +2068,12 @@
     "directDeps": 5,
     "serverDeps": 5,
     "dbDeps": 2
+  },
+  "src/routes/api/admin/topology/recompute/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
   },
   "src/routes/api/agent/investigate/+server.ts": {
     "zone": "route",
@@ -2469,6 +2535,12 @@
     "zone": "route",
     "directDeps": 2,
     "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/browser-context/snapshot/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "src/routes/api/cache/+server.ts": {
@@ -4995,6 +5067,12 @@
     "zone": "route",
     "directDeps": 3,
     "serverDeps": 3,
+    "dbDeps": 0
+  },
+  "src/routes/api/research/external-deep/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "src/routes/api/research/ingest/+server.ts": {

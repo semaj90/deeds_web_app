@@ -4,7 +4,7 @@ path: "src/hooks.server.ts"
 aliases: ["hooks.server.ts","src/hooks.server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 1023
+lineCount: 1029
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: true
 hasZod: false
-importCount: 13
+importCount: 14
 embedding_id: "qdrant://codebase_chunks_768/src/hooks.server.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","auth","t/ts","t/src","t/hooks_server_ts"]
 > SvelteKit Server Hooks
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 1023
+lines:: 1029
 ## Summary
 
 SvelteKit Server Hooks

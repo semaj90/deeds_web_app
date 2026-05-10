@@ -1,32 +1,32 @@
 {
-  "generatedAt": "2026-05-09T01:31:12.858Z",
+  "generatedAt": "2026-05-10T02:44:04.216Z",
   "sourceGraph": "docs/graph/codebase-graph.json",
   "stats": {
-    "generatedAt": "2026-05-09T01:31:12.858Z",
-    "nodeCount": 3683,
-    "edgeCount": 12050,
-    "resolvedEdges": 7122,
-    "unresolvedEdges": 776,
-    "externalEdges": 3969,
+    "generatedAt": "2026-05-10T02:44:04.216Z",
+    "nodeCount": 3729,
+    "edgeCount": 12208,
+    "resolvedEdges": 7197,
+    "unresolvedEdges": 783,
+    "externalEdges": 4045,
     "edgeTypeBreakdown": {
-      "imports_static": 5544,
+      "imports_static": 5622,
       "imports_dynamic": 492,
-      "env_dependency": 608,
+      "env_dependency": 623,
       "exports_from": 276,
-      "db_dependency": 902,
-      "redis_dependency": 387,
+      "db_dependency": 913,
+      "redis_dependency": 389,
       "qdrant_dependency": 160,
-      "test_covers_file": 2508,
+      "test_covers_file": 2509,
       "neo4j_dependency": 80,
-      "mcp_tool_calls": 69,
-      "server_route_depends_on": 1024
+      "mcp_tool_calls": 111,
+      "server_route_depends_on": 1033
     },
     "zoneBreakdown": {
-      "types": 122,
-      "client": 959,
-      "server": 656,
-      "test": 866,
-      "route": 1080
+      "types": 123,
+      "client": 979,
+      "server": 667,
+      "test": 867,
+      "route": 1093
     },
     "hotspotCount": 50,
     "routeCount": 50,
@@ -132,11 +132,11 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 1023,
+      "lineCount": 1029,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
-      "directFanOut": 20,
+      "directFanOut": 21,
       "hash": "942a1693"
     },
     {
@@ -595,6 +595,32 @@
       "hash": "2adf2a8e"
     },
     {
+      "rel": "src/lib/components/admin/AdminChatAssistant.svelte",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 153,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "5cfff416"
+    },
+    {
+      "rel": "src/lib/components/admin/AiAnalysisPopup.svelte",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 178,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 2,
+      "directFanOut": 3,
+      "hash": "e653b417"
+    },
+    {
       "rel": "src/lib/components/admin/BundlePreview.svelte",
       "zone": "client",
       "isRoute": false,
@@ -606,6 +632,19 @@
       "directFanIn": 1,
       "directFanOut": 0,
       "hash": "c8e8e3a6"
+    },
+    {
+      "rel": "src/lib/components/admin/ContextualAssistantModal.svelte",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 350,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 5,
+      "hash": "f82beea1"
     },
     {
       "rel": "src/lib/components/admin/EvidenceDataGrid.svelte",
@@ -647,6 +686,19 @@
       "hash": "a7f4a174"
     },
     {
+      "rel": "src/lib/components/admin/SummarizeButton.svelte",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 75,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "a94c04f1"
+    },
+    {
       "rel": "src/lib/components/admin/TagSelector.svelte",
       "zone": "client",
       "isRoute": false,
@@ -658,6 +710,19 @@
       "directFanIn": 1,
       "directFanOut": 0,
       "hash": "d5415f6f"
+    },
+    {
+      "rel": "src/lib/components/admin/TraceCopilotPanel.svelte",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 238,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "c3e56c11"
     },
     {
       "rel": "src/lib/components/agent/AutonomousInvestigator.svelte",
@@ -759,7 +824,7 @@
       "lineCount": 69,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 1,
       "directFanOut": 3,
       "hash": "8be49a0a"
     },
@@ -5413,7 +5478,7 @@
       "lineCount": 47,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 6,
+      "directFanIn": 7,
       "directFanOut": 0,
       "hash": "2a9a0caa"
     },
@@ -7064,7 +7129,7 @@
       "lineCount": 69,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 253,
+      "directFanIn": 254,
       "directFanOut": 14,
       "hash": "d5744454"
     },
@@ -10246,7 +10311,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 3628,
+      "lineCount": 3704,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 32,
@@ -10350,7 +10415,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 517,
+      "lineCount": 679,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 4,
@@ -10553,6 +10618,71 @@
       "hash": "b551b499"
     },
     {
+      "rel": "src/lib/server/admin/ai-chat-context.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 97,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 4,
+      "hash": "cd522752"
+    },
+    {
+      "rel": "src/lib/server/admin/ai-chat-service.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 146,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 4,
+      "directFanOut": 3,
+      "hash": "7f113a3f"
+    },
+    {
+      "rel": "src/lib/server/admin/browser-context-sanitizer.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 256,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 2,
+      "directFanOut": 1,
+      "hash": "e2d3243d"
+    },
+    {
+      "rel": "src/lib/server/admin/skills-service.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 70,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 2,
+      "directFanOut": 2,
+      "hash": "c6963fb3"
+    },
+    {
+      "rel": "src/lib/server/admin/subagent-orchestrator.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 116,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 2,
+      "directFanOut": 4,
+      "hash": "c6229f00"
+    },
+    {
       "rel": "src/lib/server/agent/autonomous-agent.ts",
       "zone": "server",
       "isRoute": false,
@@ -10665,7 +10795,7 @@
       "lineCount": 249,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 2,
+      "directFanIn": 3,
       "directFanOut": 0,
       "hash": "c60fa095"
     },
@@ -10930,6 +11060,19 @@
       "hash": "1d001cd4"
     },
     {
+      "rel": "src/lib/server/ai/external-research-agent.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 175,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 5,
+      "hash": "098aff99"
+    },
+    {
       "rel": "src/lib/server/ai/gemma4-agent.ts",
       "zone": "server",
       "isRoute": false,
@@ -10987,7 +11130,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 272,
+      "lineCount": 273,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 8,
@@ -11289,7 +11432,7 @@
       "lineCount": 132,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 2,
       "directFanOut": 1,
       "hash": "0b3b20cb"
     },
@@ -11318,6 +11461,19 @@
       "directFanIn": 1,
       "directFanOut": 3,
       "hash": "c76cd7e2"
+    },
+    {
+      "rel": "src/lib/server/ai/web-search-utils.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 112,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "befa2373"
     },
     {
       "rel": "src/lib/server/analysis/analysis-jobs.ts",
@@ -12105,7 +12261,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 312,
+      "lineCount": 324,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 14,
@@ -12550,7 +12706,7 @@
       "lineCount": 142,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 489,
+      "directFanIn": 496,
       "directFanOut": 7,
       "hash": "0d33d955"
     },
@@ -12945,6 +13101,32 @@
       "hash": "cde942cb"
     },
     {
+      "rel": "src/lib/server/db/schema/admin-ai-skills.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 36,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "4982fa2f"
+    },
+    {
+      "rel": "src/lib/server/db/schema/admin-chat.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 41,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "9bafdaff"
+    },
+    {
       "rel": "src/lib/server/db/schema/ai_chat.ts",
       "zone": "server",
       "isRoute": false,
@@ -13138,6 +13320,19 @@
       "directFanIn": 1,
       "directFanOut": 1,
       "hash": "af2b84f1"
+    },
+    {
+      "rel": "src/lib/server/db/schema/graph-pathway-cards.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 43,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "de7b1291"
     },
     {
       "rel": "src/lib/server/db/schema/index.ts",
@@ -13639,10 +13834,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 4346,
+      "lineCount": 4333,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 194,
+      "directFanIn": 195,
       "directFanOut": 2,
       "hash": "ee3bb49f"
     },
@@ -13743,10 +13938,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 140,
+      "lineCount": 144,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 98,
+      "directFanIn": 101,
       "directFanOut": 10,
       "hash": "dc051353"
     },
@@ -14185,10 +14380,10 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 299,
+      "lineCount": 297,
       "hasAuth": true,
       "hasZod": false,
-      "directFanIn": 409,
+      "directFanIn": 424,
       "directFanOut": 0,
       "hash": "2cfc0822"
     },
@@ -15007,7 +15202,7 @@
       "lineCount": 307,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 5,
+      "directFanIn": 6,
       "directFanOut": 1,
       "hash": "dc9bd164"
     },
@@ -15189,7 +15384,7 @@
       "lineCount": 910,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 89,
+      "directFanIn": 90,
       "directFanOut": 7,
       "hash": "0b5bb29d"
     },
@@ -15381,7 +15576,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 512,
+      "lineCount": 514,
       "hasAuth": false,
       "hasZod": false,
       "directFanIn": 4,
@@ -15618,7 +15813,7 @@
       "lineCount": 45,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 2,
+      "directFanIn": 3,
       "directFanOut": 2,
       "hash": "cd9698bf"
     },
@@ -15810,7 +16005,7 @@
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 337,
+      "lineCount": 321,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 4,
@@ -15878,7 +16073,7 @@
       "lineCount": 258,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 4,
+      "directFanIn": 5,
       "directFanOut": 3,
       "hash": "e50be763"
     },
@@ -16169,6 +16364,19 @@
       "hash": "043b2f66"
     },
     {
+      "rel": "src/lib/server/mcp-client.ts",
+      "zone": "server",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 43,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "74561308"
+    },
+    {
       "rel": "src/lib/server/memory/memory-gain-validator.ts",
       "zone": "server",
       "isRoute": false,
@@ -16281,7 +16489,7 @@
       "lineCount": 177,
       "hasAuth": false,
       "hasZod": false,
-      "directFanIn": 1,
+      "directFanIn": 2,
       "directFanOut": 1,
       "hash": "2f3d54bb"
     },
@@ -16580,7 +16788,7 @@
       "lineCount": 1372,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 172,
+      "directFanIn": 173,
       "directFanOut": 11,
       "hash": "b3738cdc"
     },
@@ -17178,7 +17386,7 @@
       "lineCount": 324,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 248,
+      "directFanIn": 249,
       "directFanOut": 1,
       "hash": "46ee6e0b"
     },
@@ -19666,6 +19874,32 @@
       "hash": "4c0b63a9"
     },
     {
+      "rel": "src/lib/stores/admin-chat-assistant.svelte.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 236,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 4,
+      "directFanOut": 0,
+      "hash": "f889d94a"
+    },
+    {
+      "rel": "src/lib/stores/admin-chat-machine.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 100,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 2,
+      "directFanOut": 0,
+      "hash": "d72920ce"
+    },
+    {
       "rel": "src/lib/stores/analysis-panel.svelte.ts",
       "zone": "client",
       "isRoute": false,
@@ -20067,6 +20301,19 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "4e632f1f"
+    },
+    {
+      "rel": "src/lib/types/browser-context.ts",
+      "zone": "types",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 130,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 5,
+      "directFanOut": 0,
+      "hash": "e4ec00d1"
     },
     {
       "rel": "src/lib/types/case-summary.ts",
@@ -21187,6 +21434,19 @@
       "hash": "68b181b0"
     },
     {
+      "rel": "src/lib/utils/ui-recon.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 46,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "54c9e751"
+    },
+    {
       "rel": "src/lib/utils/ultra-json-parser.ts",
       "zone": "client",
       "isRoute": false,
@@ -21247,7 +21507,7 @@
       "lineCount": 362,
       "hasAuth": false,
       "hasZod": true,
-      "directFanIn": 10,
+      "directFanIn": 11,
       "directFanOut": 1,
       "hash": "b64d1893"
     },
@@ -21512,6 +21772,19 @@
       "hash": "0a6c17fe"
     },
     {
+      "rel": "src/lib/workers/admin-chat.worker.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 30,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "28c26c05"
+    },
+    {
       "rel": "src/lib/workers/ast-graph-worker.mjs",
       "zone": "client",
       "isRoute": false,
@@ -21523,6 +21796,19 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "e8e01eba"
+    },
+    {
+      "rel": "src/lib/workers/browser-context-embed.worker.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 191,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "d00cf13f"
     },
     {
       "rel": "src/lib/workers/compute-worker.mjs",
@@ -21603,6 +21889,58 @@
       "hash": "c904e363"
     },
     {
+      "rel": "src/mcp/admin_tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 109,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "5527594a"
+    },
+    {
+      "rel": "src/mcp/bifrost_tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 65,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 1,
+      "hash": "417f8fdb"
+    },
+    {
+      "rel": "src/mcp/codebase_tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 76,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "81ce7c91"
+    },
+    {
+      "rel": "src/mcp/db-inspection-tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 272,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "1838e670"
+    },
+    {
       "rel": "src/mcp/index.ts",
       "zone": "client",
       "isRoute": false,
@@ -21629,6 +21967,32 @@
       "hash": "2f3a8150"
     },
     {
+      "rel": "src/mcp/new_tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 241,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 6,
+      "hash": "f9c39716"
+    },
+    {
+      "rel": "src/mcp/research_tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 87,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "ad6b156f"
+    },
+    {
       "rel": "src/mcp/server-fastmcp.ts",
       "zone": "client",
       "isRoute": false,
@@ -21653,6 +22017,19 @@
       "directFanIn": 3,
       "directFanOut": 9,
       "hash": "d50345f7"
+    },
+    {
+      "rel": "src/mcp/skill_tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 55,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 2,
+      "hash": "c0bdfebb"
     },
     {
       "rel": "src/mcp/tools/cluster-lenses.tool.ts",
@@ -21733,17 +22110,56 @@
       "hash": "6957e93f"
     },
     {
+      "rel": "src/mcp/topology_mgmt_tools.ts",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 105,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 1,
+      "directFanOut": 0,
+      "hash": "54bff6f8"
+    },
+    {
       "rel": "src/mcp/trace-mcp-server.ts",
       "zone": "client",
       "isRoute": false,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 2874,
+      "lineCount": 3955,
       "hasAuth": false,
       "hasZod": true,
       "directFanIn": 0,
-      "directFanOut": 3,
+      "directFanOut": 11,
       "hash": "b934f83d"
+    },
+    {
+      "rel": "src/mcp/zod-to-json-schema-bridge/index.js",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 83,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "169a916d"
+    },
+    {
+      "rel": "src/mcp/zod-to-json-schema-bridge/package.json",
+      "zone": "client",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 10,
+      "hasAuth": false,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "e53a4d6d"
     },
     {
       "rel": "src/mcp-gpu-orchestrator.ts",
@@ -22076,7 +22492,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 311,
+      "lineCount": 321,
       "hasAuth": true,
       "hasZod": false,
       "directFanIn": 0,
@@ -22121,6 +22537,19 @@
       "directFanIn": 0,
       "directFanOut": 10,
       "hash": "e6c6644e"
+    },
+    {
+      "rel": "src/routes/(app)/admin/+layout.svelte",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 36,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "a1127f97"
     },
     {
       "rel": "src/routes/(app)/admin/+page.svelte",
@@ -23096,6 +23525,32 @@
       "directFanIn": 0,
       "directFanOut": 0,
       "hash": "69e6e363"
+    },
+    {
+      "rel": "src/routes/(app)/admin/unified-indexing-studio/+page.server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 249,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "c189e7e3"
+    },
+    {
+      "rel": "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": true,
+      "isTest": false,
+      "lineCount": 484,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "db9ef66d"
     },
     {
       "rel": "src/routes/(app)/ai-dashboard/+page.server.ts",
@@ -25066,7 +25521,7 @@
       "isRoute": true,
       "isSvelteComp": true,
       "isTest": false,
-      "lineCount": 691,
+      "lineCount": 698,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 0,
@@ -28207,6 +28662,84 @@
       "hash": "260471d9"
     },
     {
+      "rel": "src/routes/api/admin/ai-chat/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 99,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "022800ab"
+    },
+    {
+      "rel": "src/routes/api/admin/ai-chat/sessions/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 12,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "1f681e2a"
+    },
+    {
+      "rel": "src/routes/api/admin/ai-chat/subagent/launch/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 43,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "f7c25f97"
+    },
+    {
+      "rel": "src/routes/api/admin/ai-chat/summarize-panel/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 132,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "d8b8d89b"
+    },
+    {
+      "rel": "src/routes/api/admin/ai-chat/upload/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 51,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "87365dbd"
+    },
+    {
+      "rel": "src/routes/api/admin/ai-chat/[sessionId]/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 11,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 2,
+      "hash": "79b062e5"
+    },
+    {
       "rel": "src/routes/api/admin/audit/+server.ts",
       "zone": "route",
       "isRoute": true,
@@ -28231,6 +28764,19 @@
       "directFanIn": 5,
       "directFanOut": 3,
       "hash": "81c1bc36"
+    },
+    {
+      "rel": "src/routes/api/admin/chat/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 74,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "2686aebb"
     },
     {
       "rel": "src/routes/api/admin/inference-stats/+server.ts",
@@ -28348,6 +28894,19 @@
       "directFanIn": 2,
       "directFanOut": 5,
       "hash": "e96541a6"
+    },
+    {
+      "rel": "src/routes/api/admin/topology/recompute/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 55,
+      "hasAuth": true,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "f060d55b"
     },
     {
       "rel": "src/routes/api/agent/investigate/+server.ts",
@@ -29349,6 +29908,19 @@
       "directFanIn": 1,
       "directFanOut": 2,
       "hash": "a9c311da"
+    },
+    {
+      "rel": "src/routes/api/browser-context/snapshot/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 116,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 3,
+      "hash": "df19e910"
     },
     {
       "rel": "src/routes/api/cache/+server.ts",
@@ -32996,8 +33568,8 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 335,
-      "hasAuth": false,
+      "lineCount": 339,
+      "hasAuth": true,
       "hasZod": false,
       "directFanIn": 3,
       "directFanOut": 17,
@@ -33425,7 +33997,7 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 396,
+      "lineCount": 400,
       "hasAuth": true,
       "hasZod": true,
       "directFanIn": 1,
@@ -34850,6 +35422,19 @@
       "hash": "ef8e2c92"
     },
     {
+      "rel": "src/routes/api/research/external-deep/+server.ts",
+      "zone": "route",
+      "isRoute": true,
+      "isSvelteComp": false,
+      "isTest": false,
+      "lineCount": 57,
+      "hasAuth": true,
+      "hasZod": true,
+      "directFanIn": 0,
+      "directFanOut": 1,
+      "hash": "dd67f0f6"
+    },
+    {
       "rel": "src/routes/api/research/ingest/+server.ts",
       "zone": "route",
       "isRoute": true,
@@ -35401,8 +35986,8 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 31,
-      "hasAuth": false,
+      "lineCount": 35,
+      "hasAuth": true,
       "hasZod": false,
       "directFanIn": 1,
       "directFanOut": 0,
@@ -35427,8 +36012,8 @@
       "isRoute": true,
       "isSvelteComp": false,
       "isTest": false,
-      "lineCount": 80,
-      "hasAuth": false,
+      "lineCount": 84,
+      "hasAuth": true,
       "hasZod": false,
       "directFanIn": 1,
       "directFanOut": 4,
@@ -47668,6 +48253,19 @@
       "hash": "b5b710a3"
     },
     {
+      "rel": "tests/unified-indexing-studio.spec.ts",
+      "zone": "test",
+      "isRoute": false,
+      "isSvelteComp": false,
+      "isTest": true,
+      "lineCount": 34,
+      "hasAuth": false,
+      "hasZod": false,
+      "directFanIn": 0,
+      "directFanOut": 0,
+      "hash": "d217d028"
+    },
+    {
       "rel": "tests/unit/agents-md-quick-hit.test.ts",
       "zone": "test",
       "isRoute": false,
@@ -47929,7 +48527,7 @@
       "downstreamTruncated": false
     },
     "src/lib/components/ui/Icon.svelte": {
-      "upstreamNodeCount": 305,
+      "upstreamNodeCount": 306,
       "downstreamNodeCount": 15,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -47970,26 +48568,26 @@
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
+    "src/lib/server/grpc/embedding-client.ts": {
+      "upstreamNodeCount": 429,
+      "downstreamNodeCount": 31,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
     "src/lib/components/ui/Button.svelte": {
       "upstreamNodeCount": 135,
       "downstreamNodeCount": 1,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
-    "src/lib/server/grpc/embedding-client.ts": {
-      "upstreamNodeCount": 427,
-      "downstreamNodeCount": 31,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
     "src/lib/server/vector/qdrant-manager.ts": {
-      "upstreamNodeCount": 424,
+      "upstreamNodeCount": 426,
       "downstreamNodeCount": 19,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
     "src/lib/server/gpu/libtorch-bridge.ts": {
-      "upstreamNodeCount": 401,
+      "upstreamNodeCount": 403,
       "downstreamNodeCount": 3,
       "upstreamTruncated": false,
       "downstreamTruncated": false
@@ -48278,7 +48876,7 @@
     },
     "src/routes/(app)/+layout.svelte": {
       "upstreamNodeCount": 1,
-      "downstreamNodeCount": 77,
+      "downstreamNodeCount": 82,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -48297,6 +48895,12 @@
     "src/routes/(app)/active-cases/+page.svelte": {
       "upstreamNodeCount": 1,
       "downstreamNodeCount": 27,
+      "upstreamTruncated": false,
+      "downstreamTruncated": false
+    },
+    "src/routes/(app)/admin/+layout.svelte": {
+      "upstreamNodeCount": 1,
+      "downstreamNodeCount": 3,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     },
@@ -48507,12 +49111,6 @@
     "src/lib/server/rate-limit/redis-rate-limit.test.ts": {
       "upstreamNodeCount": 1,
       "downstreamNodeCount": 4,
-      "upstreamTruncated": false,
-      "downstreamTruncated": false
-    },
-    "src/lib/server/retrieval/context-buffer.test.ts": {
-      "upstreamNodeCount": 1,
-      "downstreamNodeCount": 18,
       "upstreamTruncated": false,
       "downstreamTruncated": false
     }

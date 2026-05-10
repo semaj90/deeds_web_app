@@ -4,7 +4,7 @@ path: "src/lib/server/ollama.ts"
 aliases: ["ollama.ts","src/lib/server/ollama.ts"]
 clusterId: 6
 ext: ".ts"
-lineCount: 1341
+lineCount: 1372
 pagerank: 0.368352
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 11
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ollama.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-6]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/6","zod","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-6]]
 pagerank:: 0.368352
 blend:: 0.000000
-lines:: 1341
+lines:: 1372
 ## Summary
 
 Ollama Integration Service — canonical Ollama client.

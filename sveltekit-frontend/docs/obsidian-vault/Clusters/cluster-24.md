@@ -12,7 +12,7 @@ top_tags: ["redis","vector","embedding","rabbitmq","worker"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__workers__audio-processor]]","[[Files/src__lib__server__workers__video-vlm-processor]]","[[Files/src__lib__server__workers__audio-queue-consumer]]"]
 same: ["[[Clusters/cluster-19]]","[[Clusters/cluster-22]]","[[Clusters/cluster-75]]","[[Clusters/cluster-77]]","[[Clusters/cluster-96]]"]

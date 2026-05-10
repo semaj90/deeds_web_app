@@ -4,7 +4,7 @@ path: "src/routes/(app)/terminal/+page.svelte"
 aliases: ["+page.svelte","src/routes/(app)/terminal/+page.svelte"]
 clusterId: 5
 ext: ".svelte"
-lineCount: 1013
+lineCount: 1091
 pagerank: 0
 blend: 0
 isRoute: true
@@ -12,9 +12,9 @@ isSvelteComp: true
 isTest: false
 hasAuth: true
 hasZod: true
-importCount: 13
+importCount: 14
 embedding_id: "qdrant://codebase_chunks_768/src/routes/(app)/terminal/+page.svelte"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "medium"
 up: ["[[Clusters/cluster-5]]"]
@@ -24,11 +24,11 @@ tags: ["file","ext/svelte","cluster/5","route","svelte","auth","zod","t/svelte",
 
 # `src/routes/(app)/terminal/+page.svelte`
 ## For future Claude
-> .svelte at src/routes/(app)/terminal/+page.svelte (1013 lines), SvelteKit route, Svelte component, auth-guarded.
+> .svelte at src/routes/(app)/terminal/+page.svelte (1091 lines), SvelteKit route, Svelte component, auth-guarded.
 cluster:: [[Clusters/cluster-5]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 1013
+lines:: 1091
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

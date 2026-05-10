@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 4
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/llm/gemma4-tool-loop.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-44]]"]

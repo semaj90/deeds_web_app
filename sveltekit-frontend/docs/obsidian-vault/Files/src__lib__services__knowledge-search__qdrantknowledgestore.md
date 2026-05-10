@@ -4,7 +4,7 @@ path: "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts"
 aliases: ["QdrantKnowledgeStore.ts","src/lib/services/knowledge-search/QdrantKnowledgeStore.ts"]
 clusterId: 75
 ext: ".ts"
-lineCount: 443
+lineCount: 445
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: false
-importCount: 1
+importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/services/knowledge-search/QdrantKnowledgeStore.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-75]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/75","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-75]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 443
+lines:: 445
 ## Summary
 
 Qdrant Knowledge Store

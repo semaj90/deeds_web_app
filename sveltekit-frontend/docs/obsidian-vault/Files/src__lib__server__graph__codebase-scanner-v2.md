@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: false
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/graph/codebase-scanner-v2.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-73]]"]

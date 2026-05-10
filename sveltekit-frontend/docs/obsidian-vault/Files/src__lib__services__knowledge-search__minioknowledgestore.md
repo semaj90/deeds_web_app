@@ -4,7 +4,7 @@ path: "src/lib/services/knowledge-search/MinioKnowledgeStore.ts"
 aliases: ["MinioKnowledgeStore.ts","src/lib/services/knowledge-search/MinioKnowledgeStore.ts"]
 clusterId: 17
 ext: ".ts"
-lineCount: 440
+lineCount: 442
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: true
-importCount: 1
+importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/lib/services/knowledge-search/MinioKnowledgeStore.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-17]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/17","zod","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-17]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 440
+lines:: 442
 ## Summary
 
 MinIO Knowledge Store

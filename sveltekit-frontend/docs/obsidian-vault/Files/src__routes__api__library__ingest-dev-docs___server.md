@@ -4,7 +4,7 @@ path: "src/routes/api/library/ingest-dev-docs/+server.ts"
 aliases: ["+server.ts","src/routes/api/library/ingest-dev-docs/+server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 396
+lineCount: 400
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 11
 embedding_id: "qdrant://codebase_chunks_768/src/routes/api/library/ingest-dev-docs/+server.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","route","auth","zod","t/ts","t/src","t/routes"]
 > POST /api/library/ingest-dev-docs
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 396
+lines:: 400
 ## Summary
 
 POST /api/library/ingest-dev-docs

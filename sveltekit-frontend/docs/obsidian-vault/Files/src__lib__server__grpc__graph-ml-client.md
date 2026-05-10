@@ -4,7 +4,7 @@ path: "src/lib/server/grpc/graph-ml-client.ts"
 aliases: ["graph-ml-client.ts","src/lib/server/grpc/graph-ml-client.ts"]
 clusterId: 20
 ext: ".ts"
-lineCount: 430
+lineCount: 428
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/grpc/graph-ml-client.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-20]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/20","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-20]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 430
+lines:: 428
 ## Summary
 
 GraphML Client — server-only.

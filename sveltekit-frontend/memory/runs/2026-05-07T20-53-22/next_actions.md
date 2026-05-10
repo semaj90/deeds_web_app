@@ -16,7 +16,7 @@ _No P0 clusters detected — cluster-level error density is low._
 **Specs**: [Drizzle ORM query patterns](https://orm.drizzle.team/docs/overview) · [W3C Fetch — network error vs abort](https://fetch.spec.whatwg.org/#concept-request) · [Svelte 5 runes API](https://svelte.dev/docs/svelte/what-are-runes)
 
 **Analysis**:
-_(synthesis unavailable — start dev server or Ollama)_
+_(no answer)_
 
 **Top files**: `src/lib/client/ui/POIPhotoUploader.svelte`  `src/lib/components/ActionPopup.svelte`  `src/lib/components/agent/AutonomousInvestigator.svelte`
 
@@ -179,9 +179,9 @@ _Run ID: 2026-05-07T20-53-22_
 | Field | Value |
 |-------|-------|
 | Run ID | `2026-05-07T20-53-22` |
-| Synthesized at | 2026-05-08T21:59:33.312Z |
+| Synthesized at | 2026-05-09T22:27:14.362Z |
 | tsgo diagnostics loaded | 0 |
-| Shallow-wired files | 357 |
+| Shallow-wired files | 362 |
 | P0 clusters | 0 |
 | P1 clusters | 1 |
 | LLM backend | gemma4/bifrost |

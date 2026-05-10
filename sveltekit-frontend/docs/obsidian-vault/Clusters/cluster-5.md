@@ -12,7 +12,7 @@ top_tags: ["ai","auth","page","component","embedding"]
 llmHits: 0
 summaryMode: null
 confidence: "high"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 contains: ["[[Files/src__lib__components__ai__simpleworkingchat]]","[[Files/src__routes___app___terminal___page]]","[[Files/src__routes___app___demos__chat-messages___page]]","[[Files/src__lib__components__aichatassistant]]","[[Files/src__lib__components__ai__enhancedaichattest]]","[[Files/src__lib__components__ai__floatingchatmodal]]","[[Files/src__lib__components__ai__airecommendation]]","[[Files/src__lib__features__evidence-command-center__evidencechatpane]]"]
 same: ["[[Clusters/cluster-14]]","[[Clusters/cluster-92]]","[[Clusters/cluster-21]]","[[Clusters/cluster-72]]","[[Clusters/cluster-28]]"]

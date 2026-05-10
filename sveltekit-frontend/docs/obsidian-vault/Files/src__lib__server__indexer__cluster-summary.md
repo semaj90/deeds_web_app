@@ -4,7 +4,7 @@ path: "src/lib/server/indexer/cluster-summary.ts"
 aliases: ["cluster-summary.ts","src/lib/server/indexer/cluster-summary.ts"]
 clusterId: 58
 ext: ".ts"
-lineCount: 492
+lineCount: 490
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 5
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/indexer/cluster-summary.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-58]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/58","zod","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-58]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 492
+lines:: 490
 ## Summary
 
 VLM Cluster-to-Narrative Synthesis (Step 5)
