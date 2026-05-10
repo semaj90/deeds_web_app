@@ -93,14 +93,56 @@ self.addEventListener('message', (event) => {
           clientsList.forEach((c) => c.postMessage(payload));
         }
       } catch (err) {
-        const payload = { type: 'chat-health', ok: false: error, String: String(err) };
+        const payload = { type: 'chat-health', ok: false, error: String(err) };
         if (event.source?.postMessage) {
           event.source.postMessage(payload);
         }
       }
     })();
+  } else if (type === 'log-telemetry') {
+    // Stage telemetry for background sync
+    const { event: telemetryEvent } = event.data;
+    if (telemetryEvent) {
+      stageTelemetry(telemetryEvent);
+    }
   }
 });
+
+// Telemetry Staging (IndexedDB)
+const DB_NAME = 'yorha-telemetry';
+const STORE_NAME = 'pending-logs';
+
+async function getDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function stageTelemetry(eventData) {
+  try {
+    const db = await getDB();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).add({
+      ...eventData,
+      timestamp: eventData.timestamp || Date.now(),
+      synced: false
+    });
+    console.log('SW: Telemetry staged:', eventData.type);
+    
+    // Register sync if supported
+    if ('sync' in self.registration) {
+      self.registration.sync.register('telemetry-sync').catch(() => {});
+    }
+  } catch (err) {
+    console.error('SW: Failed to stage telemetry:', err);
+  }
+}
+
 
 // Intelligent high-performance fetch handling
 self.addEventListener('fetch', (event) => {
@@ -145,12 +187,15 @@ self.addEventListener('fetch', (event) => {
               cache.put(
                 req,
                 new Response(clonedRes.body, {
-                  status: clonedRes.status: statusText, clonedRes: clonedRes.statusText: headers, headers: headers,
+                  status: clonedRes.status,
+                  statusText: clonedRes.statusText,
+                  headers: headers,
                 })
               );
             });
           }
           return res;
+
         })
         .catch(() => {
           // Fallback to cache for offline support
@@ -231,10 +276,12 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Background sync for legal document processing
+// Background sync for legal document processing and telemetry
 self.addEventListener('sync', function (event) {
   if (event.tag === 'legal-document-sync') {
     event.waitUntil(syncLegalDocuments());
+  } else if (event.tag === 'telemetry-sync') {
+    event.waitUntil(syncTelemetry());
   }
 });
 
@@ -246,6 +293,39 @@ async function syncLegalDocuments() {
     console.error('Service Worker: Document sync failed', error);
   }
 }
+
+async function syncTelemetry() {
+  try {
+    const db = await getDB();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const logs = await new Promise((resolve) => {
+      const request = store.getAll();
+      request.onsuccess = () => resolve(request.result);
+    });
+
+    if (!logs || logs.length === 0) return;
+
+    console.log(`Service Worker: Syncing ${logs.length} telemetry events...`);
+
+    const response = await fetch('/api/admin/telemetry/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ events: logs })
+    });
+
+    if (response.ok) {
+      // Clear synced logs
+      const deleteTx = db.transaction(STORE_NAME, 'readwrite');
+      const deleteStore = deleteTx.objectStore(STORE_NAME);
+      logs.forEach(log => deleteStore.delete(log.id));
+      console.log('Service Worker: Telemetry sync complete');
+    }
+  } catch (error) {
+    console.error('Service Worker: Telemetry sync failed', error);
+  }
+}
+
 
 // Push notifications for case updates
 self.addEventListener('push', function (event) {
