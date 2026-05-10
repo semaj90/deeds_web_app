@@ -1,8 +1,22 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { validateResearchGain } from '$lib/server/research/research-gain-validator.js';
 import { encodeResearchToWiki } from '$lib/server/research/research-to-wiki-encoder.js';
 import { calculateResearchScore } from '$lib/server/research/research-source-ranker.js';
 import type { RequestHandler } from './$types.js';
+
+const VALID_SOURCE_TYPES = [
+  'official_docs', 'github_repo', 'github_issue', 'github_pr',
+  'maintainer_comment', 'blog_post', 'reddit_post', 'unknown',
+] as const;
+
+const EncodeSchema = z.object({
+  query:           z.string().min(1).max(2000),
+  source:          z.enum(VALID_SOURCE_TYPES).default('unknown'),
+  externalFinding: z.string().max(10000).default(''),
+  internalContext: z.string().max(4000).default(''),
+  linkedFiles:     z.array(z.string().max(500)).max(50).default([]),
+});
 
 /**
  * POST /api/research/encode
@@ -15,17 +29,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	try {
-		const body = await request.json();
-		const { query, source, externalFinding, internalContext, linkedFiles } = body as Record<string, unknown>;
-		const queryStr = String(query ?? '');
-		const sourceStr = String(source ?? 'manual');
-		const findingStr = String(externalFinding ?? '');
-		const linkedFilesArr: string[] = Array.isArray(linkedFiles) ? linkedFiles.map(String) : [];
+	let rawBody: unknown;
+	try { rawBody = await request.json(); }
+	catch { return json({ error: 'Invalid JSON' }, { status: 400 }); }
 
-		const VALID_SOURCE_TYPES = ['official_docs','github_repo','github_issue','github_pr','maintainer_comment','blog_post','reddit_post','unknown'] as const;
-		type RST = typeof VALID_SOURCE_TYPES[number];
-		const sourceType: RST = (VALID_SOURCE_TYPES as readonly string[]).includes(sourceStr) ? sourceStr as RST : 'unknown';
+	const parsed = EncodeSchema.safeParse(rawBody);
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Bad request' }, { status: 400 });
+
+	const { query: queryStr, source: sourceType, externalFinding: findingStr, internalContext, linkedFiles: linkedFilesArr } = parsed.data;
+
+	try {
 
 		// 1. Validate Information Gain via Gemma4
 		const validation = await validateResearchGain({
@@ -49,11 +62,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			const result = await encodeResearchToWiki({
 				query: queryStr,
 				outsideSources: findingStr
-					? [{ title: sourceStr, url: '', snippet: findingStr.slice(0, 300) }]
+					? [{ title: sourceType, url: '', snippet: findingStr.slice(0, 300) }]
 					: [],
 				internalAreas: linkedFilesArr,
 				confidence: finalScore,
-				pipeline: sourceStr,
+				pipeline: sourceType,
 			});
 
 			return json({
