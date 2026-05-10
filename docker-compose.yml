@@ -210,6 +210,137 @@ services:
       timeout: 20s
       retries: 3
 
+  # ═══════════════════════════════════════════════════════════════════
+  # SEAWEEDFS PROFILE — MIT/Apache drop-in replacement for MinIO
+  # Usage: docker compose --profile seaweedfs up -d
+  # Then set in .env:
+  #   SEAWEED_ENDPOINT=127.0.0.1
+  #   SEAWEED_S3_PORT=8333
+  #   SEAWEED_ACCESS_KEY=minio
+  #   SEAWEED_SECRET_KEY=minio123
+  # No code changes needed — minio.ts uses S3-compatible API transparently.
+  # ═══════════════════════════════════════════════════════════════════
+
+  # SeaweedFS Master — cluster metadata + volume assignment
+  seaweedfs-master:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-master
+    restart: unless-stopped
+    profiles: ["seaweedfs"]
+    command: master -mdir=/data -ip=seaweedfs-master -port=9333
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "9333:9333"
+    volumes:
+      - seaweed_master_data:/data
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://seaweedfs-master:9333/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # SeaweedFS Volume — actual blob storage
+  seaweedfs-volume:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-volume
+    restart: unless-stopped
+    profiles: ["seaweedfs"]
+    command: volume -mserver=seaweedfs-master:9333 -ip=seaweedfs-volume -port=8080 -dir=/data -dataCenter=dc1
+    depends_on:
+      seaweedfs-master:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8380:8080"
+    volumes:
+      - seaweed_volume_data:/data
+    networks:
+      - legal-ai-network
+
+  # SeaweedFS Filer — metadata index (required by S3 gateway)
+  seaweedfs-filer:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-filer
+    restart: unless-stopped
+    profiles: ["seaweedfs"]
+    command: filer -master=seaweedfs-master:9333 -port=8888
+    depends_on:
+      seaweedfs-master:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8382:8888"
+    networks:
+      - legal-ai-network
+
+  # SeaweedFS S3 — S3-compatible API gateway (port 8333)
+  # minio.ts connects to this transparently when SEAWEED_* env vars are set.
+  seaweedfs-s3:
+    image: chrislusf/seaweedfs:latest
+    container_name: legal-ai-seaweed-s3
+    restart: unless-stopped
+    profiles: ["seaweedfs"]
+    command: s3 -filer=seaweedfs-filer:8888 -port=8333 -config=/etc/seaweedfs/s3.json
+    depends_on:
+      seaweedfs-filer:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8333:8333"
+    volumes:
+      - ./docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -S -O /dev/null http://seaweedfs-s3:8333/ 2>&1 | grep -qE '(HTTP/1.1 200|HTTP/1.1 403)'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
   # Caddy — HTTP/3 reverse proxy (QUIC-enabled)
   # Fronts SvelteKit with H3, SSE streaming, compression, security headers
   caddy:
@@ -971,6 +1102,12 @@ volumes:
   chroma_db:
     driver: local
   training_data:
+    driver: local
+
+  # SeaweedFS volumes (profile: seaweedfs)
+  seaweed_master_data:
+    driver: local
+  seaweed_volume_data:
     driver: local
 
   # torch.compile() / Triton kernel caches — shared between GPU containers.
