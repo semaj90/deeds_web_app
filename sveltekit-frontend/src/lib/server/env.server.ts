@@ -130,6 +130,20 @@ export const ENV = {
   /** Native TS langextract is the default. Override to 'false' to fall back to the Python service. */
   LANGEXTRACT_NATIVE:
     (privateEnv.LANGEXTRACT_NATIVE ?? 'true') === 'true' ? 'true' : 'false',
+  /**
+   * RAG_RRF_ENABLED — Phase 1 canary flag.
+   *
+   * When 'true', /api/rag/search routes legal-flavored queries (jurisdiction
+   * filter present OR collection includes 'legal_documents') through the new
+   * sparse-bm25 + dense-Qdrant RRF fusion path (delegating to the
+   * /api/rag/search-fused implementation). Codebase queries continue using
+   * the legacy 1000+ LoC pipeline regardless.
+   *
+   * When 'false' (default), /api/rag/search behavior is unchanged. Both
+   * endpoints remain available; clients can call /api/rag/search-fused
+   * directly during the canary period.
+   */
+  RAG_RRF_ENABLED: (privateEnv.RAG_RRF_ENABLED ?? 'false') === 'true',
   // QUIC/NATS embedding transport
   EMBEDDING_QUIC_ENABLED:
     (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',
