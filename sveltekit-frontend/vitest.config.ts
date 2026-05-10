@@ -138,6 +138,10 @@ export default defineConfig({
       'tests/rrf-fuse.spec.ts',
       // Regex intent classifier (Phase A — service-worker design doc, 2026-05-10)
       'tests/intent/regex-intent.spec.ts',
+      // Intent-router chain mapping + executeChain partial-results contract (Phase B)
+      'tests/intent/intent-router.spec.ts',
+      // /api/ai/intent-dispatch route — G26 baseline (Phase B)
+      'tests/routes/intent-dispatch.spec.ts',
       // Sparse BM25 lane integration test (Phase 1B — Postgres ts_rank_cd, 2026-05-10)
       'tests/sparse-bm25.spec.ts',
       // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
