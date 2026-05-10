@@ -112,7 +112,7 @@ export class GpuReranker {
     this.device.queue.writeBuffer(inputBuffer, 0, flatData);
 
     const bindGroup = this.device.createBindGroup({
-      layout: this.pipeline.getBindGroupLayout(0),
+      layout: this.pipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
       entries: [
         { binding: 0, resource: { buffer: inputBuffer } },
         { binding: 1, resource: { buffer: outputBuffer } }

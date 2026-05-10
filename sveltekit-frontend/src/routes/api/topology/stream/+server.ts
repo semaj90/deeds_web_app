@@ -47,16 +47,19 @@ export const GET: RequestHandler = async ({ locals }) => {
 			// Poll for changes every 5 seconds
 			pollId = setInterval(async () => {
 				try {
-					// Check for recent error changes
+					// Check for recent error changes — raw_error_embeddings stores
+					// these fields inside the metadata JSONB envelope, not as flat columns.
 					const result = await pgPool.query(`
 						SELECT
-							file_path, error_code,
-							COUNT(*) as error_count,
-							MAX(created_at) as last_updated
+							metadata->>'file_path'  AS file_path,
+							metadata->>'error_code' AS error_code,
+							COUNT(*)                AS error_count,
+							MAX(created_at)         AS last_updated
 						FROM raw_error_embeddings
-						WHERE source = 'svelte-check'
+						WHERE metadata->>'source' = 'svelte-check'
 						  AND created_at > NOW() - INTERVAL '10 seconds'
-						GROUP BY file_path, error_code
+						  AND metadata->>'file_path' IS NOT NULL
+						GROUP BY metadata->>'file_path', metadata->>'error_code'
 					`);
 
 					if (result.rows.length > 0) {
