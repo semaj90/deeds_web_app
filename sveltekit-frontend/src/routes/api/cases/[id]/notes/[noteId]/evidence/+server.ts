@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const [targetCase] = await db
       .select({ id: cases.id })
       .from(cases)
-      .where(and(eq(cases.id, params.id), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, params.id), eq(cases.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!targetCase) {
@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const [targetCase] = await db
       .select({ id: cases.id })
       .from(cases)
-      .where(and(eq(cases.id, params.id), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, params.id), eq(cases.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!targetCase) {
@@ -142,7 +142,7 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
     const [targetCase] = await db
       .select({ id: cases.id })
       .from(cases)
-      .where(and(eq(cases.id, params.id), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, params.id), eq(cases.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!targetCase) {

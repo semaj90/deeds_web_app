@@ -58,7 +58,7 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
       const [ownedCase] = await db
         .select({ id: cases.id })
         .from(cases)
-        .where(and(eq(cases.id, caseId), eq(cases.userId, userId)))
+        .where(and(eq(cases.id, caseId), eq(cases.userId, Number(userId))))
         .limit(1);
 
       if (!ownedCase) {
@@ -124,7 +124,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       const [ownedCase] = await db
         .select({ id: cases.id })
         .from(cases)
-        .where(and(eq(cases.id, caseId), eq(cases.userId, userId)))
+        .where(and(eq(cases.id, caseId), eq(cases.userId, Number(userId))))
         .limit(1);
 
       if (!ownedCase) {

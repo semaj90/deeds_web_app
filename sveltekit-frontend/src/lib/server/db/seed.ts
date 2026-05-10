@@ -162,7 +162,7 @@ async function seed(): Promise<void> {
 			throw new Error('Demo user not found - cannot seed cases');
 		}
 
-		const userId = demoUser[0].id;
+		const userId = String(demoUser[0].id);
 
 		// === SEED CASES (10 cases with realistic mix) ===
 		console.log('\n[seed] Creating 10 demo cases...');
@@ -272,18 +272,22 @@ async function seed(): Promise<void> {
 			let caseId: string;
 
 			if (existing.length === 0) {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { caseType: _ct, ...caseInsertData } = caseData;
 				const [inserted] = await db
 					.insert(cases)
-					.values(caseData)
+					.values(caseInsertData)
 					.returning({ id: cases.id, title: cases.title, caseNumber: cases.caseNumber });
 				caseId = inserted.id;
 				console.log(`  + Created case: ${inserted.title}`);
 			} else {
 				caseId = existing[0].id;
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { caseType: _ct2, ...caseUpdateData } = caseData;
 				await db
 					.update(cases)
 					.set({
-						...caseData,
+						...caseUpdateData,
 						updatedAt: new Date().toISOString(),
 					})
 					.where(eq(cases.id, caseId));
@@ -314,9 +318,11 @@ async function seed(): Promise<void> {
 		for (const caseRecord of createdCases) {
 			for (let i = 0; i < 8; i++) {
 				const template = evidenceTemplates[i];
+				// NOTE: evidence.user_id is uuid (orphan, pre-Lucia legacy); evidence.uploaded_by
+				// is integer and matches users.id. Use uploaded_by exclusively until the orphan
+				// column is migrated or dropped. See CLAUDE.md "Schema Mismatch" section.
 				const evidenceData = {
 					caseId: caseRecord.id,
-					userId,
 					title: `${template.title} - ${caseRecord.caseNumber}-E${i + 1}`,
 					description: `Evidence item ${i + 1} for ${caseRecord.title}`,
 					evidenceType: template.type,

@@ -33,7 +33,7 @@ export const POST: RequestHandler = async (event) => {
 	const [targetCase] = await db
     .select({ id: cases.id })
     .from(cases)
-    .where(and(eq(cases.id, caseId), eq(cases.userId, event.locals.user.id)))
+    .where(and(eq(cases.id, caseId), eq(cases.userId, Number(event.locals.user.id))))
     .limit(1);
   if (!targetCase) {
     return json({ error: 'Case not found' }, { status: 404 });

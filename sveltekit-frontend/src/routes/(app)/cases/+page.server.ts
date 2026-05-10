@@ -39,7 +39,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   } = await verifySSRDatabaseConnection(
     async () => {
       // Build query with filters
-      const filters = [eq(cases.userId, locals.user!.id)];
+      const filters = [eq(cases.userId, Number(locals.user!.id))];
 
       if (status && status !== 'all') {
         // Map 'active' to 'open' for legacy compatibility
@@ -177,7 +177,7 @@ export const actions: Actions = {
         })
         .where(
           and(
-            eq(cases.userId, locals.user.id),
+            eq(cases.userId, Number(locals.user.id)),
             inArray(cases.id, result.data.caseId)
           )
         )
@@ -225,7 +225,7 @@ export const actions: Actions = {
         })
         .where(
           and(
-            eq(cases.userId, locals.user.id),
+            eq(cases.userId, Number(locals.user.id)),
             inArray(cases.id, result.data.caseId)
           )
         )

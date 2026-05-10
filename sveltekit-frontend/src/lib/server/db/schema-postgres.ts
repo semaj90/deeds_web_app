@@ -176,7 +176,7 @@ export const cases = pgTable('cases',
  court: varchar('court', { length: 200 }),
  clientName: varchar('client_name', { length: 200 }),
  opposingParty: varchar('opposing_party', { length: 200 }),
- userId: uuid('user_id'), // owner of the case
+ userId: integer('user_id'), // owner of the case (FK to users.id integer; DB migrated 2026-05-10)
  assignedAttorney: uuid('assigned_attorney'),
  filingDate: timestamp('filing_date', { withTimezone: true }),
  dueDate: timestamp('due_date', { withTimezone: true }),

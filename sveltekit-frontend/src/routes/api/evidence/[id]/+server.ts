@@ -118,7 +118,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
         const [linkedCase] = await db
           .select({ id: cases.id })
           .from(cases)
-          .where(and(eq(cases.id, data.caseId), eq(cases.userId, locals.user.id)))
+          .where(and(eq(cases.id, data.caseId), eq(cases.userId, Number(locals.user.id))))
           .limit(1);
 
         if (!linkedCase) {

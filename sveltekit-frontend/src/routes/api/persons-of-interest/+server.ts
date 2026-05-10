@@ -144,7 +144,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const ownedCases = await db
         .select({ id: cases.id })
         .from(cases)
-        .where(and(eq(cases.userId, locals.user.id), sql`${cases.id} = ANY(${validCaseIds})`));
+        .where(and(eq(cases.userId, Number(locals.user.id)), sql`${cases.id} = ANY(${validCaseIds})`));
 
       if (ownedCases.length !== validCaseIds.length) {
         return json({ error: 'One or more cases were not found' }, { status: 404 });
