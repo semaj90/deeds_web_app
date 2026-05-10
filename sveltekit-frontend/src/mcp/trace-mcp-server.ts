@@ -44,6 +44,10 @@
  *   LangGraph can orchestrate long-running graphify → verify → human-approval → patch workflows
  *   once the current FastMCP spine (this file) is stable and the observability dashboard is live.
  *   It would call these same MCP tools + npm scripts, not replace them.
+ *
+ * NOTE: zod-v4-tools-list-patch.js is REQUIRED on 2026-05-09 to fix the
+ * tools/list serialization crash caused by transitive zod-to-json-schema@3.25.0
+ * expecting Zod 3 internals. It must be imported before McpServer construction.
  */
 
 import http from 'node:http';
@@ -52,6 +56,13 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import { Pool } from 'pg';
+
+process.on('uncaughtException', (err) => {
+  console.error('[mcp] UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[mcp] UNHANDLED REJECTION:', reason);
+});
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -67,6 +78,7 @@ import { searchNotecards } from '../lib/server/kb/search-logic.js';
 import { registerBifrostTools } from './bifrost_tools.js';
 import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
+import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 
 const SVELTEKIT = process.env.SVELTEKIT_URL         ?? 'http://127.0.0.1:5173';
 const NEO4J_HTTP = process.env.NEO4J_HTTP_URL       ?? 'http://localhost:7474';
@@ -88,12 +100,23 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
-registerNewTools(server, { rerankUrl: RERANK_URL });
+// Two separate flags so unrelated things stop riding the same env var:
+//   MCP_LEGACY_ALIASES       — bare-name back-compat aliases in new_tools.ts
+//                              (`trace_search`, `wiki_note_lookup`).
+//   MCP_OPTIONAL_REGISTRIES  — whole optional tool families (codebase, research,
+//                              bifrost). Default off — they expose extra
+//                              surface area we don't want unless explicitly opted in.
+const ENABLE_LEGACY_ALIASES      = process.env.MCP_LEGACY_ALIASES === 'true';
+const ENABLE_OPTIONAL_REGISTRIES = process.env.MCP_OPTIONAL_REGISTRIES === 'true';
+
+registerNewTools(server, { rerankUrl: RERANK_URL }, ENABLE_LEGACY_ALIASES);
 registerAdminTools(server);
 registerSkillTools(server);
-registerCodebaseTools(server);
-registerResearchTools(server);
-registerBifrostTools(server);
+if (ENABLE_OPTIONAL_REGISTRIES) {
+  registerCodebaseTools(server);
+  registerResearchTools(server);
+  registerBifrostTools(server);
+}
 // NOTE: registerTopologyMgmtTools(server, pool) moved below `pool` declaration
 // at line 111 — it was hitting TDZ here and crashing MCP at startup with
 // "Cannot access 'pool' before initialization".
@@ -129,13 +152,24 @@ registerDbInspectionTools(server, pool);
 const EMBED_CACHE_TTL = 3600;
 
 let _embedRedis: import('ioredis').default | null = null;
+let _embedRedisConnecting: Promise<import('ioredis').default> | null = null;
 async function getEmbedRedis() {
   if (_embedRedis) return _embedRedis;
-  const { default: Redis } = await import('ioredis');
-  _embedRedis = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
-  _embedRedis.on('error', () => {});
-  await _embedRedis.connect().catch(() => {});
-  return _embedRedis;
+  // Race-safe: if two concurrent callers pass the null check before
+  // connect() resolves, each would `new Redis()` and `connect()` — the
+  // second connect() throws "Already connecting" (ioredis prohibits
+  // double-connect on a single instance). Stash the in-flight promise so
+  // concurrent callers share the SAME connection attempt.
+  if (_embedRedisConnecting) return _embedRedisConnecting;
+  _embedRedisConnecting = (async () => {
+    const { default: Redis } = await import('ioredis');
+    const r = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
+    r.on('error', () => {});
+    await r.connect().catch(() => {});
+    _embedRedis = r;
+    return r;
+  })().finally(() => { _embedRedisConnecting = null; });
+  return _embedRedisConnecting;
 }
 
 /**
@@ -459,28 +493,56 @@ async function sveltePost(path: string, body: unknown) {
   return res.json();
 }
 
-// ── Tool registry for tools.batch_call ────────────────────────────────────────
-// Capture every tool handler keyed by name so batch_call can dispatch by name
-// without re-routing through MCP transport. Preserves the SDK's tool() API.
 type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 const toolRegistry = new Map<string, ToolHandler>();
+
+// Monkey-patch both registerTool and tool so they populate the batch_call registry
+const _origRegister = server.registerTool.bind(server);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server as any).registerTool = (name: string, options: any, handler: any) => {
+  const wrappedHandler = async (args: any, extra: any) => {
+    try {
+      console.log(`[mcp] DISPATCH tool: ${name}`);
+      return await handler(args, extra);
+    } catch (err) {
+      console.error(`[mcp] ERROR in tool ${name}:`, err);
+      throw err;
+    }
+  };
+  if (typeof handler === 'function') toolRegistry.set(name, wrappedHandler as ToolHandler);
+  return _origRegister(name, options, wrappedHandler);
+};
+
 const _origTool = server.tool.bind(server);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server as any).tool = (name: string, ...rest: any[]) => {
   const handler = rest[rest.length - 1];
-  if (typeof handler === 'function') toolRegistry.set(name, handler as ToolHandler);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (_origTool as any)(name, ...rest);
+  const wrappedHandler = async (args: any, extra: any) => {
+    try {
+      console.log(`[mcp] DISPATCH tool (legacy): ${name}`);
+      return await handler(args, extra);
+    } catch (err) {
+      console.error(`[mcp] ERROR in tool ${name} (legacy):`, err);
+      throw err;
+    }
+  };
+  if (typeof handler === 'function') toolRegistry.set(name, wrappedHandler as ToolHandler);
+  const newRest = [...rest];
+  newRest[newRest.length - 1] = wrappedHandler;
+  return (_origTool as any)(name, ...newRest);
 };
 
 // ── graph.expand_neighborhood ─────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'graph.expand_neighborhood',
   {
-    stableKey: z.string().describe('Stable key of the center node (e.g. "file:src/lib/server/ace/context-assembler.ts")'),
-    depth:     z.number().int().min(1).max(3).default(2).describe('Hop depth (1–3)'),
-    limit:     z.number().int().min(1).max(100).default(40).describe('Max neighbors returned'),
+    description: 'Expands the graph neighborhood for a given node.',
+    inputSchema: z.object({
+      stableKey: z.string().describe('Stable key of the center node (e.g. "file:src/lib/server/ace/context-assembler.ts")'),
+      depth:     z.number().int().min(1).max(3).default(2).describe('Hop depth (1–3)'),
+      limit:     z.number().int().min(1).max(100).default(40).describe('Max neighbors returned'),
+    })
   },
   async ({ stableKey, depth, limit }) => {
     // Try SvelteKit traverse API first (has auth-free path)
@@ -511,12 +573,15 @@ server.tool(
 
 // ── graph.shortest_path ───────────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'graph.shortest_path',
   {
-    fromKey: z.string().describe('Source node stableKey'),
-    toKey:   z.string().describe('Target node stableKey'),
-    maxHops: z.number().int().min(1).max(8).default(5).describe('Maximum path length'),
+    description: 'Finds the shortest path between two graph nodes.',
+    inputSchema: z.object({
+      fromKey: z.string().describe('Source node stableKey'),
+      toKey:   z.string().describe('Target node stableKey'),
+      maxHops: z.number().int().min(1).max(8).default(5).describe('Maximum path length'),
+    })
   },
   async ({ fromKey, toKey, maxHops }) => {
     const rows = await neo4jQuery(
@@ -537,12 +602,15 @@ server.tool(
 
 // == graph.semantic_path_synthesis ============================================
 
-server.tool(
+server.registerTool(
   'graph.semantic_path_synthesis',
   {
-    startKey: z.string().describe('Source node stableKey'),
-    endKey:   z.string().describe('Target node stableKey'),
-    maxHops:  z.number().int().min(1).max(10).default(6),
+    description: 'Synthesizes a semantic narrative along the shortest structural path between nodes.',
+    inputSchema: z.object({
+      startKey: z.string().describe('Source node stableKey'),
+      endKey:   z.string().describe('Target node stableKey'),
+      maxHops:  z.number().int().min(1).max(10).default(6),
+    })
   },
   async ({ startKey, endKey, maxHops }) => {
     try {
@@ -613,10 +681,13 @@ server.tool(
 
 // ── graph.community_for_node ──────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'graph.community_for_node',
   {
-    stableKey: z.string().describe('Node stableKey to find community for'),
+    description: 'Returns the community/cluster membership for a specific node.',
+    inputSchema: z.object({
+      stableKey: z.string().describe('Node stableKey to find community for'),
+    })
   },
   async ({ stableKey }) => {
     // Neo4j CodebaseFile nodes key on filePath (without "src/" prefix), not stableKey.
@@ -666,11 +737,14 @@ server.tool(
 
 // ── graph.pagerank_top ────────────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'graph.pagerank_top',
   {
-    limit:     z.number().int().min(1).max(50).default(20).describe('Number of top nodes'),
-    nodeType:  z.string().optional().describe('Filter by Neo4j label, e.g. "CodebaseFile"'),
+    description: 'Lists the top authoritative nodes in the graph by PageRank score.',
+    inputSchema: z.object({
+      limit:     z.number().int().min(1).max(50).default(20).describe('Number of top nodes'),
+      nodeType:  z.string().optional().describe('Filter by Neo4j label, e.g. "CodebaseFile"'),
+    })
   },
   async ({ limit, nodeType }) => {
     // Redis cache stores raw file paths (no `codebasefile:` prefix); skip cache when
@@ -679,8 +753,9 @@ server.tool(
       try {
         const { default: Redis } = await import('ioredis');
         const redis = makeRedis();
+        await redis.connect().catch(() => {});
         const raw = (await redis.get('couchdb:pagerank_scores')) as string | null;
-        await redis.quit();
+        await redis.quit().catch(() => {});
         if (raw) {
           const scores: Record<string, number> = JSON.parse(raw);
           const entries = Object.entries(scores)
@@ -717,13 +792,16 @@ server.tool(
 
 // ── topology.search_near ──────────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'topology.search_near',
   {
-    query:      z.string().describe('Natural language query to embed and search'),
-    radius:     z.number().min(0.01).max(1.0).default(0.25).describe('4D Euclidean radius'),
-    limit:      z.number().int().min(1).max(50).default(20).describe('Max results'),
-    somCluster: z.number().int().optional().describe('Optional SOM cluster filter'),
+    description: 'Semantic search for nodes within a 4D topology radius.',
+    inputSchema: z.object({
+      query:      z.string().describe('Natural language query to embed and search'),
+      radius:     z.number().min(0.01).max(1.0).default(0.25).describe('4D Euclidean radius'),
+      limit:      z.number().int().min(1).max(50).default(20).describe('Max results'),
+      somCluster: z.number().int().optional().describe('Optional SOM cluster filter'),
+    })
   },
   async ({ query, radius, limit, somCluster }) => {
     const body: Record<string, unknown> = { query, radius, limit };
@@ -741,11 +819,14 @@ server.tool(
 
 // ── topology.same_som_cluster ─────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'topology.same_som_cluster',
   {
-    stableKey: z.string().describe('Reference node stableKey'),
-    limit:     z.number().int().min(1).max(100).default(30).describe('Max results'),
+    description: 'Returns other nodes in the same SOM cluster as the reference node.',
+    inputSchema: z.object({
+      stableKey: z.string().describe('Reference node stableKey'),
+      limit:     z.number().int().min(1).max(100).default(30).describe('Max results'),
+    })
   },
   async ({ stableKey, limit }) => {
     // codebase_chunk_index uses qdrant_id and relative_path; treat input as either.
@@ -785,13 +866,16 @@ server.tool(
 
 // == topology.search_som_neighborhood =========================================
 
-server.tool(
+server.registerTool(
   'topology.search_som_neighborhood',
   {
-    query: z.string().describe('Search query'),
-    radius: z.number().int().min(0).max(2).default(1).describe('SOM neighbor radius'),
-    limit: z.number().int().default(10),
-    jsonFilter: z.record(z.string(), z.any()).optional().describe('Optional JSONB metadata filter'),
+    description: 'Searches for nodes in the SOM grid neighborhood of an anchored query.',
+    inputSchema: z.object({
+      query: z.string().describe('Search query'),
+      radius: z.number().int().min(0).max(2).default(1).describe('SOM neighbor radius'),
+      limit: z.number().int().default(10),
+      jsonFilter: z.record(z.string(), z.any()).optional().describe('Optional JSONB metadata filter'),
+    })
   },
   async ({ query, radius, limit, jsonFilter }) => {
     try {
@@ -878,12 +962,15 @@ server.tool(
 
 // == kb.hybrid_search =========================================================
 
-server.tool(
+server.registerTool(
   'kb.hybrid_search',
   {
-    query: z.string().describe('Semantic query'),
-    jsonFilter: z.record(z.string(), z.any()).optional().describe('JSONB metadata filter'),
-    limit: z.number().int().default(10),
+    description: 'Performs hybrid (lexical + semantic) search across KAG context.',
+    inputSchema: z.object({
+      query: z.string().describe('Semantic query'),
+      jsonFilter: z.record(z.string(), z.any()).optional().describe('JSONB metadata filter'),
+      limit: z.number().int().default(10),
+    })
   },
   async ({ query, jsonFilter, limit }) => {
     try {
@@ -958,15 +1045,18 @@ server.tool(
 
 // == graph.materialize_pathway ================================================
 
-server.tool(
+server.registerTool(
   'graph.materialize_pathway',
   {
-    startKey: z.string().describe('Starting node stableKey'),
-    endKey:   z.string().describe('Target node stableKey'),
-    summary:  z.string().describe('Synthesized narrative summary'),
-    pathSteps: z.array(z.record(z.string(), z.any())).describe('The ordered steps of the path'),
-    citationSpans: z.array(z.any()).optional().describe('Provenance mapping'),
-    pagerankScore: z.number().optional(),
+    description: 'Materializes a synthesized pathway into the persistent hypergraph context.',
+    inputSchema: z.object({
+      startKey: z.string().describe('Starting node stableKey'),
+      endKey:   z.string().describe('Target node stableKey'),
+      summary:  z.string().describe('Synthesized narrative summary'),
+      pathSteps: z.array(z.record(z.string(), z.any())).describe('The ordered steps of the path'),
+      citationSpans: z.array(z.any()).optional().describe('Provenance mapping'),
+      pagerankScore: z.number().optional(),
+    })
   },
   async ({ startKey, endKey, summary, pathSteps, citationSpans, pagerankScore }) => {
     try {
@@ -1016,11 +1106,14 @@ server.tool(
 
 // == kb.search_pathways =======================================================
 
-server.tool(
+server.registerTool(
   'kb.search_pathways',
   {
-    query: z.string().describe('Search for synthesized pathways'),
-    limit: z.number().int().default(5),
+    description: 'Searches for previously synthesized and materialized pathways.',
+    inputSchema: z.object({
+      query: z.string().describe('Search for synthesized pathways'),
+      limit: z.number().int().default(5),
+    })
   },
   async ({ query, limit }) => {
     try {
@@ -1055,13 +1148,139 @@ server.tool(
   }
 );
 
+// == kb.search_summary_tree ===================================================
+// RAPTOR-style hierarchical retrieval. The LLM gets summaries at increasing
+// abstraction levels so it can read 5 cluster narratives instead of 50 chunks:
+//
+//   L1  per-chunk lens summaries  → Qdrant summary_lenses_768   (vector="summary")
+//   L2  cluster narratives        → Qdrant cluster_narratives   (vector default)
+//   L3  directory cards           → Redis wiki:note:dir:dir:*   (substring match)
+//
+// All tiers scanned in parallel; results returned grouped by tier with score
+// + source so synth:loop's Lane 4 can decide which abstraction level to feed
+// Gemma4. Defaults bias toward higher-tier summaries (cluster > directory >
+// per-chunk) per RAPTOR principle: bigger units = denser context per token.
+
+server.registerTool(
+  'kb.search_summary_tree',
+  {
+    description: 'RAPTOR-style hierarchical search across per-chunk lens, cluster narrative, and directory-card summary tiers.',
+    inputSchema: z.object({
+      query:        z.string().describe('Natural-language query — embedded once, fanned out to all tiers'),
+      lensTopK:     z.number().int().min(0).max(20).default(5).describe('Per-chunk lens summary hits'),
+      clusterTopK:  z.number().int().min(0).max(20).default(5).describe('Cluster narrative hits'),
+      dirTopK:      z.number().int().min(0).max(20).default(5).describe('Directory-card hits (Redis substring scan)'),
+      lensType:     z.string().optional().describe('Filter lens hits by type (e.g. "risk", "purpose")'),
+    })
+  },
+  async ({ query, lensTopK, clusterTopK, dirTopK, lensType }) => {
+    const t0 = Date.now();
+    const QDRANT = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
+    try {
+      // Embed query once for both Qdrant tiers.
+      const embedRes = await getOrComputeEmbedding(query);
+      const vec = embedRes.embedding;
+
+      // --- L1: per-chunk lens summaries (Qdrant summary_lenses_768) ---
+      const lensPromise = (lensTopK > 0 && vec.length > 0)
+        ? fetch(`${QDRANT}/collections/summary_lenses_768/points/search`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              vector: { name: 'summary', vector: vec },
+              limit: lensTopK,
+              with_payload: true,
+              filter: lensType ? { must: [{ key: 'lens_type', match: { value: lensType } }] } : undefined,
+            }),
+            signal: AbortSignal.timeout(8_000),
+          }).then(r => r.json()).catch(() => ({ result: [] }))
+        : Promise.resolve({ result: [] });
+
+      // --- L2: cluster narratives (Qdrant cluster_narratives, named vector "narrative") ---
+      const clusterPromise = (clusterTopK > 0 && vec.length > 0)
+        ? fetch(`${QDRANT}/collections/cluster_narratives/points/search`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              vector: { name: 'narrative', vector: vec },
+              limit: clusterTopK,
+              with_payload: true,
+            }),
+            signal: AbortSignal.timeout(8_000),
+          }).then(r => r.json()).catch(() => ({ result: [] }))
+        : Promise.resolve({ result: [] });
+
+      // --- L3: directory cards (Redis wiki:note:dir:dir:* substring) ---
+      const dirPromise = (async () => {
+        if (dirTopK <= 0) return [];
+        const r = await getEmbedRedis().catch(() => null);
+        if (!r) return [];
+        const needle = query.toLowerCase().trim();
+        if (needle.length < 3) return [];
+        const keys: string[] = [];
+        let cursor = '0';
+        for (let i = 0; i < 20 && keys.length < 600; i++) {
+          const sr = await r.scan(cursor, 'MATCH', 'wiki:note:dir:dir:*', 'COUNT', '1000');
+          cursor = sr[0]; keys.push(...sr[1]);
+          if (cursor === '0') break;
+        }
+        if (keys.length === 0) return [];
+        const vals = await r.mget(...keys);
+        const hits: Array<{ dirPath: string; score: number; preview: string }> = [];
+        for (let i = 0; i < keys.length && hits.length < dirTopK * 2; i++) {
+          const v = vals[i]; if (!v) continue;
+          const lower = v.toLowerCase();
+          const pos = lower.indexOf(needle);
+          if (pos === -1) continue;
+          const dirPath = keys[i].replace(/^wiki:note:dir:dir:/, '').replace(/_/g, '/');
+          hits.push({ dirPath, score: pos < 200 ? 1.0 : 0.5, preview: v.slice(0, 300) });
+        }
+        return hits.sort((a, b) => b.score - a.score).slice(0, dirTopK);
+      })();
+
+      const [lensRes, clusterRes, dirHits] = await Promise.all([lensPromise, clusterPromise, dirPromise]);
+
+      const lensHits = ((lensRes as { result?: Array<{ id: unknown; score: number; payload?: Record<string, unknown> }> }).result ?? []).map(p => ({
+        id: String(p.id),
+        score: p.score,
+        chunkId: p.payload?.chunk_id,
+        lensType: p.payload?.lens_type,
+        text: String(p.payload?.text ?? '').slice(0, 600),
+      }));
+      const clusterHits = ((clusterRes as { result?: Array<{ id: unknown; score: number; payload?: Record<string, unknown> }> }).result ?? []).map(p => ({
+        id: String(p.id),
+        score: p.score,
+        clusterId: p.payload?.clusterId,
+        purpose: p.payload?.purpose,
+        summary: String(p.payload?.summary ?? '').slice(0, 600),
+        patterns: p.payload?.patterns,
+      }));
+
+      const out = {
+        query,
+        tier_counts: { lens: lensHits.length, cluster: clusterHits.length, directory: dirHits.length },
+        // RAPTOR ordering: cluster (densest context) → directory (mid-grain) → lens (chunk-level).
+        cluster_narratives: clusterHits,
+        directory_cards: dirHits,
+        chunk_lens_summaries: lensHits,
+        embedding_used: vec.length > 0,
+        durationMs: Date.now() - t0,
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(out, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err), durationMs: Date.now() - t0 }) }], isError: true };
+    }
+  }
+);
+
 // == kb.search_notecards ======================================================
 
-server.tool(
+server.registerTool(
   'kb.search_notecards',
   {
-    query: z.string().describe('Search for identity-spine notecards'),
-    limit: z.number().int().min(1).max(20).default(5),
+    description: 'Searches for identity-spine notecards matching a query.',
+    inputSchema: z.object({
+      query: z.string().describe('Search for identity-spine notecards'),
+      limit: z.number().int().min(1).max(20).default(5),
+    })
   },
   async ({ query, limit }) => {
     try {
@@ -1092,15 +1311,18 @@ server.tool(
 
 // == kb.explain_context_pack ==================================================
 
-server.tool(
+server.registerTool(
   'kb.explain_context_pack',
   {
-    query: z.string().describe('User question that produced the context pack'),
-    hybridSearch: z.array(z.record(z.string(), z.any())).optional(),
-    pathwaySearch: z.record(z.string(), z.any()).optional(),
-    notecardSearch: z.record(z.string(), z.any()).optional(),
-    rerankResults: z.record(z.string(), z.any()).optional(),
-    topologyNeighborhood: z.record(z.string(), z.any()).optional(),
+    description: 'Explains the retrieval provenance and assembly logic for a generated context pack.',
+    inputSchema: z.object({
+      query: z.string().describe('User question that produced the context pack'),
+      hybridSearch: z.array(z.record(z.string(), z.any())).optional(),
+      pathwaySearch: z.record(z.string(), z.any()).optional(),
+      notecardSearch: z.record(z.string(), z.any()).optional(),
+      rerankResults: z.record(z.string(), z.any()).optional(),
+      topologyNeighborhood: z.record(z.string(), z.any()).optional(),
+    })
   },
   async ({ query, hybridSearch, pathwaySearch, notecardSearch, rerankResults, topologyNeighborhood }) => {
     const hybridCount = hybridSearch?.length ?? 0;
@@ -1154,60 +1376,82 @@ server.tool(
 
 // == trace.system_health =======================================================
 
-server.tool(
+server.registerTool(
   'trace.system_health',
-  {},
+  {
+    description: 'Returns the health and latency status of all backend retrieval and inference services.',
+    inputSchema: z.object({})
+  },
   async () => {
-    const checks = await Promise.all([
-      probeUrl('mcp', `http://${HOST}:${PORT}/health`),
-      probeUrl('ollama_embed', `${OLLAMA_BASE}/api/tags`),
-      probeUrl('bifrost', `${process.env.BIFROST_URL ?? 'http://127.0.0.1:3040'}/health`),
-      probeUrl('turboquant', `${TURBOQUANT_URL}/health`),
-      probeUrl('topology_search', `${TOPO_URL}/health`),
-      probeUrl('go_retrieval', `${GO_RETRIEVAL_URL}/health`),
-      probeUrl('rerank', `${RERANK_URL}/health`),
-      probeUrl('qdrant', `${QDRANT_URL}/collections`),
-      probeUrl('neo4j', `${NEO4J_HTTP}/db/neo4j/tx/commit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${Buffer.from(`${NEO4J_USER}:${NEO4J_PASS}`).toString('base64')}`,
-        },
-        body: JSON.stringify({ statements: [{ statement: 'RETURN 1' }] }),
-      }),
-      probePostgres(),
-      probeRedis(),
-    ]);
+    try {
+      console.log('[mcp] trace.system_health called');
+      console.log('[mcp] health: starting probes');
+      const checks = await Promise.all([
+        (async () => { console.log('[mcp] probe: mcp'); const r = await probeUrl('mcp', `http://${HOST}:${PORT}/health`); console.log('[mcp] probe: mcp done'); return r; })(),
+        (async () => { console.log('[mcp] probe: ollama'); const r = await probeUrl('ollama_embed', `${OLLAMA_BASE}/api/tags`); console.log('[mcp] probe: ollama done'); return r; })(),
+        (async () => { console.log('[mcp] probe: bifrost'); const r = await probeUrl('bifrost', `${process.env.BIFROST_URL ?? 'http://127.0.0.1:3040'}/health`); console.log('[mcp] probe: bifrost done'); return r; })(),
+        (async () => { console.log('[mcp] probe: turboquant'); const r = await probeUrl('turboquant', `${TURBOQUANT_URL}/health`); console.log('[mcp] probe: turboquant done'); return r; })(),
+        (async () => { console.log('[mcp] probe: topology'); const r = await probeUrl('topology_search', `${TOPO_URL}/health`); console.log('[mcp] probe: topology done'); return r; })(),
+        (async () => { console.log('[mcp] probe: go_retrieval'); const r = await probeUrl('go_retrieval', `${GO_RETRIEVAL_URL}/health`); console.log('[mcp] probe: go_retrieval done'); return r; })(),
+        (async () => { console.log('[mcp] probe: rerank'); const r = await probeUrl('rerank', `${RERANK_URL}/health`); console.log('[mcp] probe: rerank done'); return r; })(),
+        (async () => { console.log('[mcp] probe: qdrant'); const r = await probeUrl('qdrant', `${QDRANT_URL}/collections`); console.log('[mcp] probe: qdrant done'); return r; })(),
+        (async () => {
+          console.log('[mcp] probe: neo4j');
+          const r = await probeUrl('neo4j', `${NEO4J_HTTP}/db/neo4j/tx/commit`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Basic ${Buffer.from(`${NEO4J_USER}:${NEO4J_PASS}`).toString('base64')}`,
+            },
+            body: JSON.stringify({ statements: [{ statement: 'RETURN 1' }] }),
+            signal: AbortSignal.timeout(5_000),
+          }).catch(err => ({ name: 'neo4j', ok: false, error: String(err) }));
+          console.log('[mcp] probe: neo4j done');
+          return r;
+        })(),
+        (async () => { console.log('[mcp] probe: postgres'); const r = await probePostgres(); console.log('[mcp] probe: postgres done'); return r; })(),
+        (async () => { console.log('[mcp] probe: redis'); const r = await probeRedis(); console.log('[mcp] probe: redis done'); return r; })(),
+      ]);
+      console.log('[mcp] health: all probes finished');
 
-    return {
-      content: [{
-        type: 'text',
-        text: JSON.stringify({
-          ok: checks.every((check) => check.ok),
-          degraded: checks.some((check) => !check.ok),
-          checkedAt: new Date().toISOString(),
-          services: checks,
-          notes: [
-            'Port 8788: TRACE MCP tool gateway',
-            'Port 11434: Ollama (embeddings + fast gen)',
-            'Port 8090: Reranker (Optimized llama-server)',
-            'Port 8080: TurboQuant (Long-context llama-server)',
-            'Port 3040: Bifrost dispatcher'
-          ],
-        }, null, 2),
-      }],
-    };
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            ok: checks.every((check) => check.ok),
+            degraded: checks.some((check) => !check.ok),
+            checkedAt: new Date().toISOString(),
+            services: checks,
+            notes: [
+              'Port 8788: TRACE MCP tool gateway',
+              'Port 11434: Ollama (embeddings + fast gen)',
+              'Port 8090: Reranker (Optimized llama-server)',
+              'Port 8080: TurboQuant (Long-context llama-server)',
+              'Port 3040: Bifrost dispatcher'
+            ],
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      console.error('[mcp] trace.system_health error:', err);
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: false, error: String(err) }) }]
+      };
+    }
   }
 );
 
 // == search.rerank ============================================================
 
-server.tool(
+server.registerTool(
   'search.rerank',
   {
-    query: z.string().describe('The user query'),
-    documents: z.array(z.string()).describe('List of document snippets to rerank'),
-    topN: z.number().int().default(5),
+    description: 'Reranks a list of document snippets for relevance to a query using llama-server.',
+    inputSchema: z.object({
+      query: z.string().describe('The user query'),
+      documents: z.array(z.string()).describe('List of document snippets to rerank'),
+      topN: z.number().int().default(5),
+    })
   },
   async ({ query, documents, topN }) => {
     try {
@@ -1238,11 +1482,14 @@ server.tool(
 
 // == hypergraph.semantic_path_synthesis =======================================
 
-server.tool(
+server.registerTool(
   'hypergraph.semantic_path_synthesis',
   {
-    startKey: z.string().describe('Source node stableKey'),
-    endKey:   z.string().describe('Target node stableKey'),
+    description: 'Synthesizes a semantic narrative along a path in the hypergraph.',
+    inputSchema: z.object({
+      startKey: z.string().describe('Source node stableKey'),
+      endKey:   z.string().describe('Target node stableKey'),
+    })
   },
   async ({ startKey, endKey }) => {
     try {
@@ -1278,16 +1525,19 @@ server.tool(
 // Use when you already know the SOM grid position and want structurally-adjacent
 // files rather than starting from a text query.
 
-server.tool(
+server.registerTool(
   'topology.search_4d',
   {
-    som_x:      z.number().describe('SOM X coordinate (BMU column, 0-based)'),
-    som_y:      z.number().describe('SOM Y coordinate (BMU row, 0-based)'),
-    semantic_z: z.number().min(0).max(1).default(0.5).optional().describe('Semantic centroid projection 0–1'),
-    grpo_w:     z.number().min(0).max(1).default(0.5).optional().describe('GRPO quality weight 0–1'),
-    radius:     z.number().min(0.01).max(5.0).default(0.5).describe('4D Euclidean radius'),
-    limit:      z.number().int().min(1).max(50).default(20).describe('Max results'),
-    filters:    z.record(z.string(), z.unknown()).optional().describe('JSONB payload filters (e.g. { "topo_class": "server" })'),
+    description: 'Explicit 4D manifold coordinate search with optional JSONB payload filters.',
+    inputSchema: z.object({
+      som_x:      z.number().describe('SOM X coordinate (BMU column, 0-based)'),
+      som_y:      z.number().describe('SOM Y coordinate (BMU row, 0-based)'),
+      semantic_z: z.number().min(0).max(1).default(0.5).optional().describe('Semantic centroid projection 0–1'),
+      grpo_w:     z.number().min(0).max(1).default(0.5).optional().describe('GRPO quality weight 0–1'),
+      radius:     z.number().min(0.01).max(5.0).default(0.5).describe('4D Euclidean radius'),
+      limit:      z.number().int().min(1).max(50).default(20).describe('Max results'),
+      filters:    z.record(z.string(), z.any()).optional().describe('JSONB payload filters (e.g. { "topo_class": "server" })'),
+    })
   },
   async ({ som_x, som_y, semantic_z, grpo_w, radius, limit, filters }) => {
     const t0 = Date.now();
@@ -1327,11 +1577,14 @@ server.tool(
 
 // ── clusters.get_members ──────────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'clusters.get_members',
   {
-    clusterKey: z.string().describe('Cluster key (e.g. "gpu:998" or "dir:src/lib/server/ace")'),
-    limit:      z.number().int().min(1).max(200).default(50).describe('Max files returned'),
+    description: 'Returns the member nodes for a specific cluster.',
+    inputSchema: z.object({
+      clusterKey: z.string().describe('Cluster key (e.g. "gpu:998" or "dir:src/lib/server/ace")'),
+      limit:      z.number().int().min(1).max(200).default(50).describe('Max files returned'),
+    })
   },
   async ({ clusterKey, limit }) => {
     // qdrant_cluster_members is the canonical cluster→file map (cluster_key="gpu:N"|"dir:..."|"som:N").
@@ -1361,15 +1614,19 @@ server.tool(
 
 // ── trace.explain_retrieval ───────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'trace.explain_retrieval',
   {
-    query: z.string().describe('Query string to look up cached retrieval trace for'),
+    description: 'Explains the retrieval trace for a specific query.',
+    inputSchema: z.object({
+      query: z.string().describe('Query string to look up cached retrieval trace for'),
+    })
   },
   async ({ query }) => {
     try {
       const { default: Redis } = await import('ioredis');
       const redis = makeRedis();
+      await redis.connect().catch(() => {});
       // Look for the most recent ACE trace for this query prefix
       const keys = await redis.keys(`ace:trace:*`);
       let found: string | null = null;
@@ -1377,7 +1634,7 @@ server.tool(
         const val = await redis.get(k) as string | null;
         if (val?.includes(query.slice(0, 30))) { found = val; break; }
       }
-      await redis.quit();
+      await redis.quit().catch(() => {});
       return {
         content: [{
           type: 'text' as const,
@@ -1394,12 +1651,15 @@ server.tool(
 
 // ── search.postgres_fts ───────────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'search.postgres_fts',
   {
-    query:      z.string().describe('Code search query — preserves camelCase, dots, file paths'),
-    limit:      z.number().int().min(1).max(50).default(20).optional(),
-    topo_class: z.string().optional().describe('Filter by topology class (e.g. "infrastructure", "ui")'),
+    description: 'Code search using PostgreSQL Full Text Search.',
+    inputSchema: z.object({
+      query:      z.string().describe('Code search query — preserves camelCase, dots, file paths'),
+      limit:      z.number().int().min(1).max(50).default(20).optional(),
+      topo_class: z.string().optional().describe('Filter by topology class (e.g. "infrastructure", "ui")'),
+    })
   },
   async ({ query, limit = 20, topo_class }) => {
     try {
@@ -1426,13 +1686,16 @@ server.tool(
 
 // ── search.hybrid ─────────────────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'search.hybrid',
   {
-    query:      z.string().describe('Search query — mode is auto-detected from query shape'),
-    limit:      z.number().int().min(1).max(50).default(20).optional(),
-    topo_class: z.string().optional().describe('Optional topology class prefilter'),
-    mode:       z.enum(['auto', 'lexical-heavy', 'hybrid', 'semantic-heavy']).default('auto').optional(),
+    description: 'Performs hybrid (FTS + semantic) search across the codebase.',
+    inputSchema: z.object({
+      query:      z.string().describe('Search query — mode is auto-detected from query shape'),
+      limit:      z.number().int().min(1).max(50).default(20).optional(),
+      topo_class: z.string().optional().describe('Optional topology class prefilter'),
+      mode:       z.enum(['auto', 'lexical-heavy', 'hybrid', 'semantic-heavy']).default('auto').optional(),
+    })
   },
   async ({ query, limit = 20, topo_class, mode = 'auto' }) => {
     try {
@@ -1493,18 +1756,236 @@ server.tool(
   }
 );
 
+// ── trace.graphrag_search ────────────────────────────────────────────────────
+// GraphRAG retrieval: dense (Qdrant) + sparse (Postgres FTS) prefetch → RRF
+// merge → Neo4j graph expansion of top-K → Karpathy blend (Redis gpu:karpathy:scores)
+// → composite scoring with per-source breakdown.
+//
+// Returns finalHits sorted by composite score with scoreBreakdown {dense, sparse,
+// graph, pagerank, karpathy} and why[] reasons per hit. Designed as the canonical
+// GraphRAG entry point — Lane 1 of synth:loop should call this in preference
+// to firing dense/sparse/graph independently.
+
+server.registerTool(
+  'trace.graphrag_search',
+  {
+    description: 'GraphRAG hybrid retrieval: dense+sparse RRF prefetch → Neo4j graph expansion → Karpathy blend rerank.',
+    inputSchema: z.object({
+      query:       z.string().describe('Natural-language query or code symbol/path'),
+      denseTopK:   z.number().int().min(1).max(100).default(50),
+      sparseTopK:  z.number().int().min(1).max(100).default(50),
+      graphDepth:  z.number().int().min(0).max(3).default(1),
+      finalTopK:   z.number().int().min(1).max(20).default(10),
+      topo_class:  z.string().optional().describe('Optional topology class prefilter'),
+    })
+  },
+  async ({ query, denseTopK, sparseTopK, graphDepth, finalTopK, topo_class }) => {
+    const t0 = Date.now();
+    try {
+      // STAGE 1: parallel dense + sparse prefetch (reuses search.hybrid pattern)
+      const ftsPromise = pool.query(
+        'SELECT * FROM search_code_lexical($1, $2, $3)',
+        [query, sparseTopK, topo_class ?? null],
+      );
+      const embedPromise = getOrComputeEmbedding(query);
+      const qdrantPromise = embedPromise.then(({ embedding }) => {
+        if (!embedding.length) return { results: [] };
+        return fetch(`${SVELTEKIT}/api/code-intel/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, embedding, limit: denseTopK, topoClass: topo_class }),
+          signal: AbortSignal.timeout(10_000),
+        }).then((r) => r.json()).catch(() => ({ results: [] }));
+      });
+      const [pgRes, qdrantRes, rgRes] = await Promise.all([
+        ftsPromise,
+        qdrantPromise,
+        ripgrepSearch({ pattern: query, maxResults: sparseTopK, ignoreCase: true }).catch(() => ({ matches: [] }))
+      ]);
+
+      // STAGE 2: RRF merge by stable_key — reciprocal rank fusion (k=60, standard).
+      const RRF_K = 60;
+      const merged = new Map<string, {
+        stable_key: string;
+        file_path?: string;
+        denseRank?: number; sparseRank?: number;
+        denseScore?: number; sparseScore?: number;
+        sources: string[];
+        why: string[];
+      }>();
+      const sparseRows = (pgRes.rows ?? []) as Record<string, unknown>[];
+      sparseRows.forEach((r, i) => {
+        const key = String(r.stable_key ?? r.file_path ?? '');
+        if (!key) return;
+        merged.set(key, {
+          stable_key: key, file_path: r.file_path as string | undefined,
+          sparseRank: i + 1, sparseScore: Number(r.lexical_score ?? 0),
+          sources: ['postgres_fts'], why: [`sparse rank ${i + 1}`],
+        });
+      });
+      const denseRows = ((qdrantRes as { results?: Record<string, unknown>[] }).results ?? []);
+      denseRows.forEach((r, i) => {
+        const key = String(r.stable_key ?? r.file_path ?? '');
+        if (!key) return;
+        const ex = merged.get(key);
+        if (ex) {
+          ex.denseRank = i + 1; ex.denseScore = Number(r.score ?? 0);
+          ex.sources.push('qdrant'); ex.why.push(`dense rank ${i + 1}`);
+        } else {
+          merged.set(key, {
+            stable_key: key, file_path: r.file_path as string | undefined,
+            denseRank: i + 1, denseScore: Number(r.score ?? 0),
+            sources: ['qdrant'], why: [`dense rank ${i + 1}`],
+          });
+        }
+      });
+      const rgMatches = (rgRes as { matches?: Array<{ filePath: string; lineNumber: number }> }).matches ?? [];
+      rgMatches.forEach((m, i) => {
+        const key = `file:${m.filePath}`;
+        const ex = merged.get(key);
+        if (ex) {
+          ex.sparseRank = Math.min(ex.sparseRank ?? 999, i + 1);
+          ex.sources.push('ripgrep'); ex.why.push(`rg rank ${i + 1}`);
+        } else {
+          merged.set(key, {
+            stable_key: key, file_path: m.filePath,
+            sparseRank: i + 1,
+            sources: ['ripgrep'], why: [`rg rank ${i + 1}`],
+          });
+        }
+      });
+
+      // STAGE 3: graph expansion — for top-K (by RRF), pull Neo4j neighbors at depth.
+      // Bounded to keep latency tractable. Uses IMPORTS + SIMILAR_TOPOLOGY edges.
+      const rrfScored = Array.from(merged.values()).map(c => {
+        const rrf = (c.denseRank ? 1 / (RRF_K + c.denseRank) : 0)
+                  + (c.sparseRank ? 1 / (RRF_K + c.sparseRank) : 0);
+        return { ...c, rrfScore: rrf };
+      }).sort((a, b) => b.rrfScore - a.rrfScore);
+      const expandSeed = rrfScored.slice(0, Math.min(finalTopK, 8)).map(c => c.stable_key);
+
+      const graphNeighbors = new Map<string, { hops: number; via: string }>();
+      if (graphDepth > 0 && expandSeed.length > 0) {
+        try {
+          const cypher = `
+            UNWIND $seeds AS seedKey
+            MATCH (s:CodebaseFile {stableKey: seedKey})
+            MATCH (s)-[r:IMPORTS|SIMILAR_TOPOLOGY*1..${graphDepth}]-(n:CodebaseFile)
+            RETURN DISTINCT n.stableKey AS key, length(r) AS hops, type(r[0]) AS via
+            LIMIT 200
+          `;
+          const session = neo4jDriver.session();
+          try {
+            const r = await session.run(cypher, { seeds: expandSeed });
+            for (const rec of r.records) {
+              const key = rec.get('key');
+              if (!key || merged.has(key)) continue; // skip if already in dense/sparse
+              graphNeighbors.set(key, { hops: Number(rec.get('hops')), via: rec.get('via') ?? 'IMPORTS' });
+            }
+          } finally { await session.close(); }
+        } catch (e) {
+          // Graph expansion is best-effort; keep dense+sparse results.
+        }
+      }
+
+      // STAGE 4: Karpathy blend lookup. The Redis hash gpu:karpathy:scores is
+      // keyed by file path (e.g. "src/lib/server/db/client.ts"), but candidate
+      // stable_keys are often chunk-level ("file:src/.../client.ts:symbolName").
+      // Extract the file portion so the blend lookup hits.
+      function extractFilePath(stableKey: string): string {
+        const m = stableKey.match(/^file:(.+?)(?::[^:]+)?$/);
+        return m ? m[1] : stableKey;
+      }
+      const allKeys = [...merged.keys(), ...graphNeighbors.keys()];
+      const filePathByKey = new Map<string, string>(allKeys.map(k => [k, extractFilePath(k)]));
+      const uniqueFilePaths = Array.from(new Set(filePathByKey.values()));
+
+      const r = await getEmbedRedis().catch(() => null);
+      const karpathyByFile: Record<string, { pr: number; attn: number; authority: number; blend: number }> = {};
+      try {
+        if (r && uniqueFilePaths.length > 0) {
+          const raw = await r.hmget('gpu:karpathy:scores', ...uniqueFilePaths);
+          uniqueFilePaths.forEach((fp, i) => {
+            if (raw[i]) {
+              try { karpathyByFile[fp] = JSON.parse(raw[i] as string); } catch {}
+            }
+          });
+        }
+      } catch {}
+      const karpathyScores: Record<string, { pr: number; attn: number; authority: number; blend: number }> = {};
+      for (const [key, fp] of filePathByKey) {
+        if (karpathyByFile[fp]) karpathyScores[key] = karpathyByFile[fp];
+      }
+
+      // STAGE 5: composite scoring + final ranking.
+      // Weights: dense 0.30, sparse 0.20, graph 0.15, pagerank 0.20, karpathy 0.15
+      const candidates = [
+        ...rrfScored.map(c => ({ ...c, graphHops: 0, graphVia: null as string | null })),
+        ...Array.from(graphNeighbors.entries()).map(([key, g]) => ({
+          stable_key: key, file_path: undefined as string | undefined,
+          denseRank: undefined, sparseRank: undefined, denseScore: 0, sparseScore: 0,
+          sources: [`graph_${g.via}`], why: [`graph neighbor (hops=${g.hops}, via=${g.via})`],
+          rrfScore: 0, graphHops: g.hops, graphVia: g.via,
+        })),
+      ];
+      const scored = candidates.map(c => {
+        const k = karpathyScores[c.stable_key];
+        const dense = c.denseScore ? Math.min(1, c.denseScore) : 0;
+        const sparse = c.sparseScore ? Math.min(1, c.sparseScore / 10) : 0;
+        const graph = c.graphHops > 0 ? 1 / (1 + c.graphHops) : 0;
+        const pagerank = k ? Math.min(1, k.pr / 10) : 0;
+        const karpathy = k ? Math.min(1, k.blend / 5) : 0;
+        const score = dense * 0.30 + sparse * 0.20 + graph * 0.15 + pagerank * 0.20 + karpathy * 0.15;
+        const why = [...c.why];
+        if (k) why.push(`karpathy blend ${k.blend.toFixed(2)}`);
+        return {
+          stableKey: c.stable_key,
+          filePath: c.file_path,
+          score: Number(score.toFixed(4)),
+          scoreBreakdown: {
+            dense: Number(dense.toFixed(3)),
+            sparse: Number(sparse.toFixed(3)),
+            graph: Number(graph.toFixed(3)),
+            pagerank: Number(pagerank.toFixed(3)),
+            karpathy: Number(karpathy.toFixed(3)),
+          },
+          sources: c.sources,
+          why,
+        };
+      }).sort((a, b) => b.score - a.score);
+
+      const finalHits = scored.slice(0, finalTopK);
+      const out = {
+        query,
+        mode: 'graphrag',
+        denseHits: denseRows.length,
+        sparseHits: sparseRows.length,
+        graphExpanded: graphNeighbors.size,
+        finalHits,
+        durationMs: Date.now() - t0,
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(out, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err), durationMs: Date.now() - t0 }) }], isError: true };
+    }
+  }
+);
+
 // ── search.go_hybrid ─────────────────────────────────────────────────────────
 // Go search service RRF fusion: parallel fan-out of citation + FTS + pgvector +
 // Qdrant → reciprocal rank fusion. Faster than the Node.js hybrid for bulk recall.
 // Falls back gracefully when go-search-service is not running.
 
-server.tool(
+server.registerTool(
   'search.go_hybrid',
   {
-    query:   z.string().describe('Search query — RRF fusion of FTS + pgvector + Qdrant via go-search-service'),
-    limit:   z.number().int().min(1).max(50).default(20).optional(),
-    type:    z.enum(['codebase', 'legal', 'hybrid']).default('codebase').optional().describe('Search domain'),
-    filters: z.record(z.string(), z.unknown()).optional().describe('JSONB metadata filters applied at the Go service level'),
+    description: 'Go search service RRF fusion of FTS + pgvector + Qdrant.',
+    inputSchema: z.object({
+      query:   z.string().describe('Search query — RRF fusion of FTS + pgvector + Qdrant via go-search-service'),
+      limit:   z.number().int().min(1).max(50).default(20).optional(),
+      type:    z.enum(['codebase', 'legal', 'hybrid']).default('codebase').optional().describe('Search domain'),
+      filters: z.record(z.string(), z.any()).optional().describe('JSONB metadata filters applied at the Go service level'),
+    })
   },
   async ({ query, limit = 20, type = 'codebase', filters }) => {
     const t0 = Date.now();
@@ -1536,15 +2017,18 @@ server.tool(
 
 // ── context.build_kv_packet ───────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'context.build_kv_packet',
   {
-    taskId:         z.string().describe('Stable task identifier (e.g. "task_gpu_async_001")'),
-    query:          z.string().describe('Natural language goal / task description'),
-    hotFiles:       z.array(z.string()).default([]).describe('List of file paths most relevant to this task'),
-    hotSymbols:     z.array(z.string()).default([]).describe('Key function/type names relevant to this task'),
-    blockedAreas:   z.array(z.string()).default([]).describe('File paths or modules that must NOT be modified'),
-    maxInputTokens: z.number().int().min(1000).max(32000).default(12000).optional().describe('Token budget for dynamic context'),
+    description: 'Assembles a context packet of compressed file cards for a specific task.',
+    inputSchema: z.object({
+      taskId:         z.string().describe('Stable task identifier (e.g. "task_gpu_async_001")'),
+      query:          z.string().describe('Natural language goal / task description'),
+      hotFiles:       z.array(z.string()).default([]).describe('List of file paths most relevant to this task'),
+      hotSymbols:     z.array(z.string()).default([]).describe('Key function/type names relevant to this task'),
+      blockedAreas:   z.array(z.string()).default([]).describe('File paths or modules that must NOT be modified'),
+      maxInputTokens: z.number().int().min(1000).max(32000).default(12000).optional().describe('Token budget for dynamic context'),
+    })
   },
   async ({ taskId, query, hotFiles, hotSymbols, blockedAreas, maxInputTokens = 12000 }) => {
     try {
@@ -1569,11 +2053,14 @@ server.tool(
         maxInputTokens,
       };
 
-      // Cache TOC in Redis (1h)
+      // Cache TOC in Redis (1h) — explicit connect() required because makeRedis
+      // uses lazyConnect:true + enableOfflineQueue:false (canonical ioredis cold-start
+      // pattern from CLAUDE.md → Key Lessons → "ioredis cold-start in startup scripts")
       try {
+        await redis.connect().catch(() => {}); // no-op if already connected
         await redis.setex(`kv:toc:task:${taskId}`, 3600, JSON.stringify(result));
       } catch { /* non-fatal */ }
-      await redis.quit();
+      await redis.quit().catch(() => {});
 
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     } catch (err) {
@@ -1584,15 +2071,19 @@ server.tool(
 
 // ── context.get_compressed_card ───────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'context.get_compressed_card',
   {
-    stableKey: z.string().describe('Card stableKey — e.g. "file:src/lib/server/gpu/libtorch-bridge.ts" or "trace:<traceId>"'),
+    description: 'Returns a compressed context card for a specific file or trace.',
+    inputSchema: z.object({
+      stableKey: z.string().describe('Card stableKey — e.g. "file:src/lib/server/gpu/libtorch-bridge.ts" or "trace:<traceId>"'),
+    })
   },
   async ({ stableKey }) => {
     try {
       const { default: Redis } = await import('ioredis');
       const redis = makeRedis();
+      await redis.connect().catch(() => {});
       const crypto = await import('node:crypto');
       const sha = (s: string) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 32);
 
@@ -1632,7 +2123,7 @@ server.tool(
         card = { stableKey, error: `Unknown card type: ${type}. Supported: file, trace` };
       }
 
-      await redis.quit();
+      await redis.quit().catch(() => {});
       return { content: [{ type: 'text' as const, text: JSON.stringify(card, null, 2) }] };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
@@ -1642,18 +2133,22 @@ server.tool(
 
 // ── context.explain_compression ───────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'context.explain_compression',
   {
-    taskId: z.string().describe('Task ID to inspect (from a prior context.build_kv_packet call)'),
+    description: 'Explains the compression logic and token budget for a specific task packet.',
+    inputSchema: z.object({
+      taskId: z.string().describe('Task ID to inspect (from a prior context.build_kv_packet call)'),
+    })
   },
   async ({ taskId }) => {
     try {
       const { default: Redis } = await import('ioredis');
       const redis = makeRedis();
+      await redis.connect().catch(() => {});
 
       const raw = await redis.get(`kv:toc:task:${taskId}`);
-      await redis.quit();
+      await redis.quit().catch(() => {});
 
       if (!raw) {
         return {
@@ -1682,18 +2177,22 @@ server.tool(
 
 // ── context.refresh_task_toc ──────────────────────────────────────────────────
 
-server.tool(
+server.registerTool(
   'context.refresh_task_toc',
   {
-    taskId:       z.string().describe('Task ID to refresh'),
-    hotFiles:     z.array(z.string()).default([]).describe('Updated hot file list'),
-    hotSymbols:   z.array(z.string()).default([]).describe('Updated hot symbol list'),
-    blockedAreas: z.array(z.string()).default([]).describe('Areas to block from modification'),
+    description: 'Refreshes the Table of Contents for a specific task context.',
+    inputSchema: z.object({
+      taskId:       z.string().describe('Task ID to refresh'),
+      hotFiles:     z.array(z.string()).default([]).describe('Updated hot file list'),
+      hotSymbols:   z.array(z.string()).default([]).describe('Updated hot symbol list'),
+      blockedAreas: z.array(z.string()).default([]).describe('Areas to block from modification'),
+    })
   },
   async ({ taskId, hotFiles, hotSymbols, blockedAreas }) => {
     try {
       const { default: Redis } = await import('ioredis');
       const redis = makeRedis();
+      await redis.connect().catch(() => {});
 
       // Invalidate existing TOC
       await redis.del(`kv:toc:task:${taskId}`).catch(() => {});
@@ -1707,7 +2206,7 @@ server.tool(
       };
 
       await redis.setex(`kv:toc:task:${taskId}`, 3600, JSON.stringify({ taskId, toc: newToc })).catch(() => {});
-      await redis.quit();
+      await redis.quit().catch(() => {});
 
       return { content: [{ type: 'text' as const, text: JSON.stringify({ taskId, refreshed: true, toc: newToc }, null, 2) }] };
     } catch (err) {
@@ -1722,13 +2221,16 @@ server.tool(
 // content (≤600 chars), topo_class }.  Proxies to the SvelteKit ACE pipeline;
 // falls back to Postgres FTS when SvelteKit is unavailable.
 
-server.tool(
+server.registerTool(
   'search.dev_context',
   {
-    query:      z.string().max(2000).describe('Natural language coding/debugging query'),
-    filePath:   z.string().optional().describe('Current file path for AGENTS.md-scoped boost'),
-    limit:      z.number().int().min(1).max(20).default(8).describe('Max chunks returned (default 8)'),
-    topo_class: z.string().optional().describe('Optional topology-class prefilter'),
+    description: 'Returns codebase chunks for coding and debugging prompts.',
+    inputSchema: z.object({
+      query:      z.string().max(2000).describe('Natural language coding/debugging query'),
+      filePath:   z.string().optional().describe('Current file path for AGENTS.md-scoped boost'),
+      limit:      z.number().int().min(1).max(20).default(8).describe('Max chunks returned (default 8)'),
+      topo_class: z.string().optional().describe('Optional topology-class prefilter'),
+    })
   },
   async ({ query, filePath, limit, topo_class }) => {
     // ── Try SvelteKit ACE pipeline first ─────────────────────────────────────
@@ -1812,17 +2314,20 @@ server.tool(
 // record for ingestion. Called by Gemma4 at the end of a coding/debug session
 // or when the stuck detector fires.
 
-server.tool(
+server.registerTool(
   'kag.record_agent_run',
   {
-    taskId:           z.string().max(80).describe('Stable task identifier (e.g. "kag-abc12345" or a short slug)'),
-    errorSummary:     z.string().max(1000).describe('One-paragraph summary of the error or task'),
-    files:            z.array(z.string().max(300)).max(20).optional().describe('File paths involved'),
-    tags:             z.array(z.string().max(60)).max(20).optional().describe('Semantic tags'),
-    confidence:       z.number().min(0).max(1).default(0.5).describe('Resolution confidence 0–1'),
-    patchResult:      z.enum(['passed', 'failed', 'unknown']).default('unknown').describe('Patch outcome'),
-    researchNotes:    z.string().max(2000).optional().describe('Free-text research findings or next steps'),
-    needsDeepResearch: z.boolean().default(false).describe('True when agent is stuck and needs escalation'),
+    description: 'Records an autonomous agent run artifact to memory.',
+    inputSchema: z.object({
+      taskId:           z.string().max(80).describe('Stable task identifier (e.g. "kag-abc12345" or a short slug)'),
+      errorSummary:     z.string().max(1000).describe('One-paragraph summary of the error or task'),
+      files:            z.array(z.string().max(300)).max(20).optional().describe('File paths involved'),
+      tags:             z.array(z.string().max(60)).max(20).optional().describe('Semantic tags'),
+      confidence:       z.number().min(0).max(1).default(0.5).describe('Resolution confidence 0–1'),
+      patchResult:      z.enum(['passed', 'failed', 'unknown']).default('unknown').describe('Patch outcome'),
+      researchNotes:    z.string().max(2000).optional().describe('Free-text research findings or next steps'),
+      needsDeepResearch: z.boolean().default(false).describe('True when agent is stuck and needs escalation'),
+    })
   },
   async ({ taskId, errorSummary, files, tags, confidence, patchResult, researchNotes, needsDeepResearch }) => {
     try {
@@ -1891,13 +2396,16 @@ server.tool(
 // writes to Postgres context_timeline + Redis ACE caches, moves to processed/.
 // Idempotent: skips records already written (kag:ingested:{hash} Redis key).
 
-server.tool(
+server.registerTool(
   'kag.ingest_memory_directory',
   {
-    dir:           z.string().max(300).optional().describe('Override ingest directory (default: memory/ingest/pending/)'),
-    dryRun:        z.boolean().default(false).describe('Preview counts without writing anything'),
-    limit:         z.number().int().min(1).max(200).default(25).describe('Max JSONL files to process per call'),
-    moveProcessed: z.boolean().default(true).describe('Move files to processed/ or failed/ after handling'),
+    description: 'Ingests agent run records from the memory directory into the database.',
+    inputSchema: z.object({
+      dir:           z.string().max(300).optional().describe('Override ingest directory (default: memory/ingest/pending/)'),
+      dryRun:        z.boolean().default(false).describe('Preview counts without writing anything'),
+      limit:         z.number().int().min(1).max(200).default(25).describe('Max JSONL files to process per call'),
+      moveProcessed: z.boolean().default(true).describe('Move files to processed/ or failed/ after handling'),
+    })
   },
   async ({ dir, dryRun, limit, moveProcessed }) => {
     try {
@@ -2143,11 +2651,14 @@ server.tool(
 // Normalize + fingerprint raw error text, store in Redis ace:error:{hash} and
 // Postgres error_fingerprints, fire-and-forget. Returns the fingerprint.
 
-server.tool(
+server.registerTool(
   'kag.ingest_error',
   {
-    errorText: z.string().max(8000).describe('Raw error text: stack trace, compiler output, log line'),
-    priorFix:  z.string().max(2000).optional().describe('Known fix for this error if already resolved'),
+    description: 'Fingerprints and stores a raw error text for future retrieval.',
+    inputSchema: z.object({
+      errorText: z.string().max(8000).describe('Raw error text: stack trace, compiler output, log line'),
+      priorFix:  z.string().max(2000).optional().describe('Known fix for this error if already resolved'),
+    })
   },
   async ({ errorText, priorFix }) => {
     try {
@@ -2167,16 +2678,67 @@ server.tool(
   }
 );
 
+// ── kag.recall_similar_fix ────────────────────────────────────────────────────
+// pg_trgm similarity search over error_fingerprints. First tries exact-hash
+// lookup (Redis L1 → Postgres), then falls back to fuzzy similarity (>0.3) to
+// surface prior fixes for near-matches. Closes the agentic-error-fixing loop:
+// MCP 500 → tail-and-ingest → kag.ingest_error → kag.recall_similar_fix
+// returns the prior_fix on the next synth:loop run.
+
+server.registerTool(
+  'kag.recall_similar_fix',
+  {
+    description: 'Recalls prior fixes for an error via exact-hash + pg_trgm similarity over error_fingerprints.',
+    inputSchema: z.object({
+      errorText: z.string().max(8000).describe('Raw error text to match against fingerprint memory'),
+      limit:     z.number().int().min(1).max(20).default(5).describe('Max similar fingerprints to return'),
+    })
+  },
+  async ({ errorText, limit }) => {
+    try {
+      const { lookupErrorFingerprint, findSimilarErrors } = await import('../lib/server/ace/error-fingerprint.js');
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+        lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
+      });
+      r.on('error', () => {});
+      await r.connect().catch(() => {});
+
+      const exact = await lookupErrorFingerprint(r, pool, errorText);
+      const similar = await findSimilarErrors(pool, errorText, limit);
+      await r.quit().catch(() => {});
+
+      // Dedup: if exact hit appears in similar[], strip it from the similar list.
+      const similarFiltered = exact
+        ? similar.filter(s => s.errorHash !== exact.errorHash)
+        : similar;
+
+      const out = {
+        exactMatch: exact,                                // null if no exact hash hit
+        similarMatches: similarFiltered,                  // ordered by pg_trgm similarity desc
+        recallCount: (exact ? 1 : 0) + similarFiltered.length,
+        hasPriorFix: Boolean(exact?.priorFix) || similarFiltered.some(s => s.priorFix),
+      };
+      return { content: [{ type: 'text' as const, text: JSON.stringify(out, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }], isError: true };
+    }
+  }
+);
+
 // ── kag.multi_lane_search ─────────────────────────────────────────────────────
 // 4-lane retrieval: hash → n-gram → graph-node → ACE cache.
 // Returns ranked hits + synthesisBlock ready for LLM context injection.
 
-server.tool(
+server.registerTool(
   'kag.multi_lane_search',
   {
-    query:   z.string().max(4000).describe('Query text, error message, or symbol/file name'),
-    isError: z.boolean().default(false).describe('Treat query as an error fingerprint (enables hash lane)'),
-    topK:    z.number().int().min(1).max(30).default(10).describe('Hits per lane'),
+    description: 'Performs multi-lane retrieval across hash, n-gram, and graph nodes.',
+    inputSchema: z.object({
+      query:   z.string().max(4000).describe('Query text, error message, or symbol/file name'),
+      isError: z.boolean().default(false).describe('Treat query as an error fingerprint (enables hash lane)'),
+      topK:    z.number().int().min(1).max(30).default(10).describe('Hits per lane'),
+    })
   },
   async ({ query, isError, topK }) => {
     try {
@@ -2202,13 +2764,16 @@ server.tool(
 // Backed by the taxonomy_nodes / taxonomy_edges tables built by
 // `npm run taxonomy:build`. Read-through Redis cache for hot levels.
 
-server.tool(
+server.registerTool(
   'taxonomy.children',
   {
-    parent_key: z.string().min(1).max(200).describe(
-      'Parent node_key. "root" lists all topo_classes. "topo:api-route" lists topo_bytes within api-route. "byte:api-route:18" lists files. Empty string = root.',
-    ),
-    limit: z.number().int().min(1).max(500).default(50).optional(),
+    description: 'Lists children of a specific ontological node in the topology.',
+    inputSchema: z.object({
+      parent_key: z.string().min(1).max(200).describe(
+        'Parent node_key. "root" lists all topo_classes. "topo:api-route" lists topo_bytes within api-route. "byte:api-route:18" lists files. Empty string = root.',
+      ),
+      limit: z.number().int().min(1).max(500).default(50).optional(),
+    })
   },
   async ({ parent_key, limit = 50 }) => {
     const key = parent_key === '' ? 'root' : parent_key;
@@ -2247,10 +2812,13 @@ server.tool(
 // Walk UP from a leaf node to root, returning the full ontological path.
 // Useful for "what category does this file belong to?" queries.
 
-server.tool(
+server.registerTool(
   'taxonomy.path',
   {
-    node_key: z.string().min(1).max(500).describe('Leaf node_key (e.g. "file:src/foo.ts")'),
+    description: 'Returns the full ontological path from a leaf node to root.',
+    inputSchema: z.object({
+      node_key: z.string().min(1).max(500).describe('Leaf node_key (e.g. "file:src/foo.ts")'),
+    })
   },
   async ({ node_key }) => {
     try {
@@ -2290,11 +2858,14 @@ server.tool(
 // JSON state). Both tools coexist under distinct names per MCP 2026 FQN
 // best-practice (last-registered-wins is silent → rename, don't override).
 
-server.tool(
+server.registerTool(
   'agents_md.peers_via_relations',
   {
-    dirPath: z.string().min(1).max(500).describe('Directory (e.g. "src/lib/server/ace")'),
-    limit:   z.number().int().min(1).max(20).default(8).optional(),
+    description: 'Finds neighboring directories using the SHARES_TAGS hypergraph relation.',
+    inputSchema: z.object({
+      dirPath: z.string().min(1).max(500).describe('Directory (e.g. "src/lib/server/ace")'),
+      limit:   z.number().int().min(1).max(20).default(8).optional(),
+    })
   },
   async ({ dirPath, limit = 8 }) => {
     try {
@@ -2338,10 +2909,13 @@ server.tool(
 // the canonical `agents_md.coverage` (envelope completeness probe) by
 // answering "WHICH AGENTS.md rules apply to this file, in what priority?".
 
-server.tool(
+server.registerTool(
   'agents_md.coverage_chain',
   {
-    filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
+    description: 'Returns the full AGENTS.md inheritance chain for a file.',
+    inputSchema: z.object({
+      filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
+    })
   },
   async ({ filePath }) => {
     try {
@@ -2376,11 +2950,14 @@ server.tool(
 // ── clusters.get_summary_lenses ───────────────────────────────────────────────
 // Returns AGENTS.md notes and wiki KAG notes for a given GPU cluster.
 
-server.tool(
+server.registerTool(
   'clusters.get_summary_lenses',
   {
-    clusterId: z.number().int().min(0).describe('GPU k-means cluster ID'),
-    maxNotes:  z.number().int().min(1).max(20).default(5).describe('Max wiki/KAG notes to include'),
+    description: 'Returns wiki and AGENTS.md context lenses for a GPU cluster.',
+    inputSchema: z.object({
+      clusterId: z.number().int().min(0).describe('GPU k-means cluster ID'),
+      maxNotes:  z.number().int().min(1).max(20).default(5).describe('Max wiki/KAG notes to include'),
+    })
   },
   async ({ clusterId, maxNotes }) => {
     try {
@@ -2429,12 +3006,15 @@ server.tool(
 // Validates whether a retrieved chunk is a true ACE hit by checking the
 // cache key contract, Qdrant payload freshness, and rerank breakdown presence.
 
-server.tool(
+server.registerTool(
   'trace.validate_ace_hit',
   {
-    filePath:  z.string().max(512).describe('File path of the retrieved chunk'),
-    chunkId:   z.string().max(128).optional().describe('Qdrant chunk ID if known'),
-    queryHash: z.string().max(64).optional().describe('SHA-256 hash prefix of the original query (12 chars)'),
+    description: 'Validates a retrieved chunk against the ACE cache and graph contracts.',
+    inputSchema: z.object({
+      filePath:  z.string().max(512).describe('File path of the retrieved chunk'),
+      chunkId:   z.string().max(128).optional().describe('Qdrant chunk ID if known'),
+      queryHash: z.string().max(64).optional().describe('SHA-256 hash prefix of the original query (12 chars)'),
+    })
   },
   async ({ filePath, chunkId, queryHash }) => {
     try {
@@ -2511,13 +3091,16 @@ function requireToken(token: unknown): string | null {
 }
 
 // ── ops.propose_patch ──────────────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'ops.propose_patch',
   {
-    operator_token: z.string().describe('Non-empty approval token'),
-    file_path:      z.string().describe('Repo-relative file path to inspect'),
-    issue:          z.string().describe('Description of the issue to fix'),
-    context_lines:  z.number().int().min(5).max(200).optional().describe('Lines of context to return (default 40)'),
+    description: 'PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.',
+    inputSchema: z.object({
+      operator_token: z.string().describe('Non-empty approval token'),
+      file_path:      z.string().describe('Repo-relative file path to inspect'),
+      issue:          z.string().describe('Description of the issue to fix'),
+      context_lines:  z.number().int().min(5).max(200).optional().describe('Lines of context to return (default 40)'),
+    })
   },
   async ({ operator_token, file_path, issue, context_lines }) => {
     const tokenErr = requireToken(operator_token);
@@ -2553,12 +3136,15 @@ server.tool(
 );
 
 // ── ops.run_targeted_test ─────────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'ops.run_targeted_test',
   {
-    operator_token: z.string().describe('Non-empty approval token'),
-    test_file:      z.string().describe('Path to the test file relative to project root, e.g. tests/foo.spec.ts'),
-    timeout_ms:     z.number().int().min(5000).max(120000).optional().describe('Max wait in ms (default 30000)'),
+    description: 'Executes a single Vitest test file and returns the outcome.',
+    inputSchema: z.object({
+      operator_token: z.string().describe('Non-empty approval token'),
+      test_file:      z.string().describe('Path to the test file relative to project root, e.g. tests/foo.spec.ts'),
+      timeout_ms:     z.number().int().min(5000).max(120000).optional().describe('Max wait in ms (default 30000)'),
+    })
   },
   async ({ operator_token, test_file, timeout_ms }) => {
     const tokenErr = requireToken(operator_token);
@@ -2614,17 +3200,20 @@ server.tool(
 );
 
 // ── ops.record_fix_attempt ────────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'ops.record_fix_attempt',
   {
-    operator_token:  z.string().describe('Non-empty approval token'),
-    fix_type:        z.string().max(100).describe('Category of fix, e.g. "type-error", "logic-bug"'),
-    fix_description: z.string().max(2000).describe('Human-readable description of the proposed fix'),
-    fix_diff:        z.string().max(8000).optional().describe('Unified diff or summary of the change'),
-    files_affected:  z.number().int().min(0).optional().describe('Number of files the fix touches (default 1)'),
-    errors_resolved: z.number().int().min(0).optional().describe('Estimated errors this fix resolves (default 1)'),
-    success:         z.boolean().optional().describe('Whether the fix was verified to work (omit if unknown)'),
-    metadata:        z.record(z.string(), z.unknown()).optional().describe('Extra context (e.g. test result, issue ID)'),
+    description: 'Records a fix attempt and its outcome to the persistent audit log.',
+    inputSchema: z.object({
+      operator_token:  z.string().describe('Non-empty approval token'),
+      fix_type:        z.string().max(100).describe('Category of fix, e.g. "type-error", "logic-bug"'),
+      fix_description: z.string().max(2000).describe('Human-readable description of the proposed fix'),
+      fix_diff:        z.string().max(8000).optional().describe('Unified diff or summary of the change'),
+      files_affected:  z.number().int().min(0).optional().describe('Number of files the fix touches (default 1)'),
+      errors_resolved: z.number().int().min(0).optional().describe('Estimated errors this fix resolves (default 1)'),
+      success:         z.boolean().optional().describe('Whether the fix was verified to work (omit if unknown)'),
+      metadata:        z.record(z.string(), z.any()).optional().describe('Extra context (e.g. test result, issue ID)'),
+    })
   },
   async ({ operator_token, fix_type, fix_description, fix_diff, files_affected, errors_resolved, success, metadata }) => {
     const tokenErr = requireToken(operator_token);
@@ -2660,12 +3249,15 @@ server.tool(
 );
 
 // ── ops.run_quality_gate ──────────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'ops.run_quality_gate',
   {
-    operator_token: z.string().describe('Non-empty approval token'),
-    gate:           z.enum(['tsc', 'vitest-all']).optional().describe('tsc (default) or vitest-all to run full test suite'),
-    timeout_ms:     z.number().int().min(5000).max(300000).optional().describe('Max wait in ms (default 60000)'),
+    description: 'Executes a project-wide quality gate (tsc or vitest-all).',
+    inputSchema: z.object({
+      operator_token: z.string().describe('Non-empty approval token'),
+      gate:           z.enum(['tsc', 'vitest-all']).optional().describe('tsc (default) or vitest-all to run full test suite'),
+      timeout_ms:     z.number().int().min(5000).max(300000).optional().describe('Max wait in ms (default 60000)'),
+    })
   },
   async ({ operator_token, gate, timeout_ms }) => {
     const tokenErr = requireToken(operator_token);
@@ -2713,13 +3305,16 @@ server.tool(
 );
 
 // ── hypergraph.search ─────────────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'hypergraph.search',
   {
-    query:          z.string().max(500).describe('Natural language query (1-500 chars)'),
-    edge_types:     z.array(z.string()).optional().describe('Filter by edge_type (agents_md, cluster_summary, codebase_chunk, generic)'),
-    limit:          z.number().int().min(1).max(50).optional().describe('Max results 1-50 (default 10)'),
-    min_confidence: z.number().min(0).max(1).optional().describe('Minimum confidence threshold 0-1'),
+    description: 'Semantic search across the hypergraph edges.',
+    inputSchema: z.object({
+      query:          z.string().max(500).describe('Natural language query (1-500 chars)'),
+      edge_types:     z.array(z.string()).optional().describe('Filter by edge_type (agents_md, cluster_summary, codebase_chunk, generic)'),
+      limit:          z.number().int().min(1).max(50).optional().describe('Max results 1-50 (default 10)'),
+      min_confidence: z.number().min(0).max(1).optional().describe('Minimum confidence threshold 0-1'),
+    })
   },
   async ({ query, edge_types, limit, min_confidence }) => {
     const safeQuery = String(query ?? '').slice(0, 500).trim();
@@ -2744,12 +3339,16 @@ server.tool(
   }
 );
 
+
 // ── hypergraph.get_edge ───────────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'hypergraph.get_edge',
   {
-    edge_hash: z.string().max(128).describe('The edge_hash to look up'),
-    expand:    z.boolean().optional().describe('If true, also return related edges sharing at least one member'),
+    description: 'Returns full details for a specific hypergraph edge.',
+    inputSchema: z.object({
+      edge_hash: z.string().max(128).describe('The edge_hash to look up'),
+      expand:    z.boolean().optional().describe('If true, also return related edges sharing at least one member'),
+    })
   },
   async ({ edge_hash, expand }) => {
     const hash = String(edge_hash ?? '').slice(0, 128).trim();
@@ -2767,11 +3366,14 @@ server.tool(
 );
 
 // ── hypergraph.explain_activation ────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'hypergraph.explain_activation',
   {
-    edge_hash:   z.string().max(128).describe('The edge_hash to explain'),
-    query_terms: z.array(z.string().max(100)).describe('List of query terms that triggered activation'),
+    description: 'Explains why a specific hypergraph edge was activated for a set of query terms.',
+    inputSchema: z.object({
+      edge_hash:   z.string().max(128).describe('The edge_hash to explain'),
+      query_terms: z.array(z.string().max(100)).describe('List of query terms that triggered activation'),
+    })
   },
   async ({ edge_hash, query_terms }) => {
     const hash  = String(edge_hash ?? '').slice(0, 128).trim();
@@ -2788,10 +3390,13 @@ server.tool(
 );
 
 // ── hypergraph.expand_members ─────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'hypergraph.expand_members',
   {
-    edge_hash: z.string().max(128).describe('The edge_hash to expand from'),
+    description: 'Returns all related edges for a given edge hash by member overlap.',
+    inputSchema: z.object({
+      edge_hash: z.string().max(128).describe('The edge_hash to expand from'),
+    })
   },
   async ({ edge_hash }) => {
     const hash = String(edge_hash ?? '').slice(0, 128).trim();
@@ -2809,12 +3414,15 @@ server.tool(
 );
 
 // ── knowledge.get_minified_map ────────────────────────────────────────────────
-server.tool(
+server.registerTool(
   'knowledge.get_minified_map',
   {
-    directory:  z.string().max(200).optional().describe('Relative directory path (e.g. "src/lib/server/ai")'),
-    max_edges:  z.number().int().min(1).max(20).optional().describe('Max hyperedges to include (default 5)'),
-    max_agents: z.number().int().min(1).max(10).optional().describe('Max AGENTS.md directives to include (default 3)'),
+    description: 'Returns a minified architectural map for a specific directory.',
+    inputSchema: z.object({
+      directory:  z.string().max(200).optional().describe('Relative directory path (e.g. "src/lib/server/ai")'),
+      max_edges:  z.number().int().min(1).max(20).optional().describe('Max hyperedges to include (default 5)'),
+      max_agents: z.number().int().min(1).max(10).optional().describe('Max AGENTS.md directives to include (default 3)'),
+    })
   },
   async ({ directory, max_edges, max_agents }) => {
     const dir       = String(directory ?? '').slice(0, 200).trim();
@@ -2885,27 +3493,30 @@ const BATCH_DENYLIST = new Set([
 const BATCH_MAX_CALLS = 8;
 const BATCH_TIMEOUT_MS = 30_000;
 
-server.tool(
+server.registerTool(
   'tools.batch_call',
   {
-    calls: z
-      .array(
-        z.object({
-          name: z.string().describe('Tool name to dispatch (must be registered)'),
-          arguments: z.record(z.string(), z.unknown()).default({}).describe('Arguments object for the tool'),
-        }),
-      )
-      .min(1)
-      .max(BATCH_MAX_CALLS)
-      .describe(`Up to ${BATCH_MAX_CALLS} tool calls dispatched in parallel`),
-    timeoutMs: z
-      .number()
-      .int()
-      .min(1_000)
-      .max(120_000)
-      .default(BATCH_TIMEOUT_MS)
-      .optional()
-      .describe('Per-call timeout (ms)'),
+    description: 'Executes multiple tool calls in parallel to reduce total latency.',
+    inputSchema: z.object({
+      calls: z
+        .array(
+          z.object({
+            name: z.string().describe('Tool name to dispatch (must be registered)'),
+            arguments: z.record(z.string(), z.any()).default({}).describe('Arguments object for the tool'),
+          }),
+        )
+        .min(1)
+        .max(BATCH_MAX_CALLS)
+        .describe(`Up to ${BATCH_MAX_CALLS} tool calls dispatched in parallel`),
+      timeoutMs: z
+        .number()
+        .int()
+        .min(1_000)
+        .max(120_000)
+        .default(BATCH_TIMEOUT_MS)
+        .optional()
+        .describe('Per-call timeout (ms)'),
+    })
   },
   async ({ calls, timeoutMs = BATCH_TIMEOUT_MS }) => {
     const start = Date.now();
@@ -2970,12 +3581,15 @@ server.tool(
 // SvelteKit bundler so `$lib/...` path aliases don't resolve under tsx —
 // we pass our own ioredis instance instead).
 
-server.tool(
+server.registerTool(
   'codebase.context_for_file',
   {
-    filePath:    z.string().min(1).max(512).describe('Repo-relative file path (e.g. "src/lib/server/db/client.ts")'),
-    maxCards:    z.number().int().min(1).max(20).default(6).describe('Max peer prompt cards to include'),
-    forceReload: z.boolean().default(false).describe('Bypass 5-min atlas cache'),
+    description: 'Returns the full atlas context packet for a specific file.',
+    inputSchema: z.object({
+      filePath:    z.string().min(1).max(512).describe('Repo-relative file path (e.g. "src/lib/server/db/client.ts")'),
+      maxCards:    z.number().int().min(1).max(20).default(6).describe('Max peer prompt cards to include'),
+      forceReload: z.boolean().default(false).describe('Bypass 5-min atlas cache'),
+    })
   },
   async ({ filePath, maxCards, forceReload }) => {
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
@@ -2999,15 +3613,19 @@ server.tool(
   },
 );
 
+
 // ── agents_md.context_for_file ───────────────────────────────────────────────
 // Slim wrapper — returns only the AGENTS-related slice of the full packet.
 // Useful when a caller wants directory rules / tools / constraints without
 // the prompt-card payload (saves ~3-5KB per response).
 
-server.tool(
+server.registerTool(
   'agents_md.context_for_file',
   {
-    filePath: z.string().min(1).max(512).describe('Repo-relative file path'),
+    description: 'Returns only the AGENTS-related slice of the atlas context packet for a file.',
+    inputSchema: z.object({
+      filePath: z.string().min(1).max(512).describe('Repo-relative file path'),
+    })
   },
   async ({ filePath }) => {
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
@@ -3043,10 +3661,13 @@ server.tool(
 // the directory, without going through context-for-file's per-file lookup.
 // O(1) Redis GET on ace:atlas:dir:<slug>.
 
-server.tool(
+server.registerTool(
   'agents_md.peers_for_dir',
   {
-    dirPath: z.string().min(1).max(512).describe('Directory path (e.g. "src/lib/server/db")'),
+    description: 'Returns the directory card directly from the atlas cache.',
+    inputSchema: z.object({
+      dirPath: z.string().min(1).max(512).describe('Directory path (e.g. "src/lib/server/db")'),
+    })
   },
   async ({ dirPath }) => {
     const norm = String(dirPath)
@@ -3088,10 +3709,13 @@ server.tool(
 // containing this file? Reads the Postgres mirror to report which envelope
 // fields are populated. Lets agents detect "thin context" before relying on it.
 
-server.tool(
+server.registerTool(
   'agents_md.coverage',
   {
-    filePath: z.string().min(1).max(512).describe('Repo-relative file path'),
+    description: 'Reports the population status of the AGENTS.md envelope for a file.',
+    inputSchema: z.object({
+      filePath: z.string().min(1).max(512).describe('Repo-relative file path'),
+    })
   },
   async ({ filePath }) => {
     const norm = String(filePath)
@@ -3145,11 +3769,14 @@ server.tool(
 // with the source AGENTS.md, with a sibling-dir fallback when the SHARES_TAGS
 // edge set is sparse for the requested source.
 
-server.tool(
+server.registerTool(
   'agents_md.shares_tags',
   {
-    dirPath: z.string().min(1).max(500).describe('Directory path (e.g. "src/lib/server/ace")'),
-    limit:   z.number().int().min(1).max(50).default(10).optional(),
+    description: 'Returns neighboring directories based on shared tags in their AGENTS.md files.',
+    inputSchema: z.object({
+      dirPath: z.string().min(1).max(500).describe('Directory path (e.g. "src/lib/server/ace")'),
+      limit:   z.number().int().min(1).max(50).default(10).optional(),
+    })
   },
   async ({ dirPath, limit = 10 }) => {
     const stable = `agents:${dirPath.replace(/^src\//, 'src/')}/AGENTS.md`;
@@ -3210,10 +3837,13 @@ server.tool(
 // (binding_type, depth, priority, confidence) per row — answers
 // "in what order do AGENTS.md envelopes apply to this file?".
 
-server.tool(
+server.registerTool(
   'agents_md.binding_chain',
   {
-    filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
+    description: 'Walks the AGENTS.md binding hierarchy for a file to determine the order of applying envelopes.',
+    inputSchema: z.object({
+      filePath: z.string().min(1).max(500).describe('Repo-relative file path'),
+    })
   },
   async ({ filePath }) => {
     try {
@@ -3245,18 +3875,63 @@ server.tool(
 
 // ── HTTP server with /health + MCP handler ────────────────────────────────────
 
-const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+process.on('uncaughtException', (e) => console.error('[MCP uncaughtException]', e?.message, e?.stack));
+process.on('unhandledRejection', (e: any) => console.error('[MCP unhandledRejection]', e?.message, e?.stack));
 
+// Stateless MCP transport: SDK forbids reusing one transport across requests
+// (webStandardStreamableHttp.js:139-141 throws "Stateless transport cannot be
+// reused..."). Create a fresh transport + connect to the shared server per
+// request. The McpServer instance holds the tool registry and is safe to share.
+//
+// Concurrency note: McpServer.connect() throws "Already connected to a transport"
+// if a previous request hasn't called server.close() yet (Protocol.js:217). To
+// support concurrent MCP calls (e.g. synth:loop's parallel agentic fallback) we
+// serialize the connect/handle/close cycle with a small mutex. Throughput penalty
+// is negligible for the tool-call workload; correct fix is per-request McpServer
+// (factor the 3,387 lines of registrations into buildServer()) — tracked as
+// follow-up.
+let mcpQueueTail: Promise<void> = Promise.resolve();
 const nodeServer = http.createServer(async (req, res) => {
   if (req.method === 'GET' && req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true, version: '1.0.0', uptime: process.uptime() }));
     return;
   }
-  await transport.handleRequest(req, res);
+  // Serialize: each request waits for the previous one to finish + close.
+  const myTurn = mcpQueueTail.then(() => handleMcp(req, res));
+  mcpQueueTail = myTurn.catch(() => {}); // never let a rejection break the chain
+  await myTurn;
 });
 
-await server.connect(transport);
+async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+  (transport as any).onerror = (e: any) => console.error('[MCP transport.onerror]', e?.message || e);
+  try {
+    await server.connect(transport);
+    await transport.handleRequest(req, res);
+    // Wait for client to close before disconnecting (SSE may still be writing
+    // after handleRequest resolves); detach so the next queued request can call
+    // connect() without "Already connected" rejection.
+    await new Promise<void>((resolve) => {
+      if (res.writableEnded) resolve();
+      else res.on('close', () => resolve());
+    });
+  } catch (err: any) {
+    console.error('[MCP per-request handler threw]', {
+      url: req.url, method: req.method,
+      message: err?.message, stack: err?.stack?.split('\n').slice(0, 5).join('\n'),
+    });
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32603, message: String(err?.message || err) }, id: null }));
+    } else {
+      try { res.end(); } catch {}
+    }
+  } finally {
+    try { await server.close(); } catch {}
+    try { await transport.close?.(); } catch {}
+  }
+}
 
 // Pre-warm the Postgres pool so first FTS query doesn't eat into tool timeout
 pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });
@@ -3274,7 +3949,6 @@ nodeServer.listen(PORT, HOST, () => {
   console.log('       search.postgres_fts, search.hybrid, search.go_hybrid (RRF),');
   console.log('       context.build_kv_packet, context.get_compressed_card,');
   console.log('       context.explain_compression, context.refresh_task_toc,');
-  console.log('       kag.ingest_error, kag.multi_lane_search,');
-  console.log('       graph.expand_neighborhood, clusters.get_summary_lenses, trace.validate_ace_hit,');
+  console.log('       kag.ingest_error, kag.multi_lane_search, trace.validate_ace_hit,');
   console.log('       ops.propose_patch, ops.run_targeted_test, ops.record_fix_attempt, ops.run_quality_gate [OPERATOR-GATED]');
 });

@@ -864,9 +864,10 @@ async function G33() {
     return fail(`write verb "${m[0]}" found at line ~${lineNum} — db.* tools must be read-only`);
   }
 
-  // Sanity: must register at least 2 tools.
-  const toolCount = (src.match(/server\.tool\(/g) ?? []).length;
-  if (toolCount < 2) return fail(`only ${toolCount} server.tool() calls — expected ≥2 (db.schema_overview, db.table_inspect)`);
+  // Sanity: must register at least 2 tools. SDK accepts both `server.tool(...)`
+  // and the newer `server.registerTool(...)` shape; count both.
+  const toolCount = (src.match(/server\.(?:tool|registerTool)\(/g) ?? []).length;
+  if (toolCount < 2) return fail(`only ${toolCount} tool registrations — expected ≥2 (db.schema_overview, db.table_inspect)`);
 
   return pass(`${toolCount} tools, 0 write verbs`);
 }
@@ -997,6 +998,41 @@ async function G31() {
   });
 }
 
+/**
+ * G37 — static check: MCP tool surface has no cross-file name collisions
+ *       and no UNGATED handler aliases.
+ *
+ * Delegates to scripts/audit-mcp-tool-surface.mjs --json. The audit walks
+ * src/mcp/**.ts, groups registerTool() calls by name (collisions) and by
+ * shared-named-handler reference (aliases), and reports `ok: false` when
+ * either invariant is broken or a legacy alias slips out from behind the
+ * `if (enableLegacy)` gate driven by MCP_LEGACY_ALIASES.
+ *
+ * Tier 0, fatal: true. Cheap regression lock — catches accidental
+ * re-introduction of bare-name aliases or duplicate registrations across
+ * files.
+ */
+async function G37() {
+  const path = 'scripts/audit-mcp-tool-surface.mjs';
+  if (!(await exists(path))) return skip(`${path} missing`);
+
+  const r = await runCmd('node', [resolve(ROOT, path), '--json'], { timeoutMs: 8000 });
+  let body;
+  try { body = JSON.parse(r.stdout); }
+  catch { return fail(`audit JSON parse error (exit=${r.code}): ${r.stdout.slice(0, 80)} | ${r.stderr.slice(0, 80)}`); }
+
+  if (body.ok) {
+    const canon = body.totalRegistrations - body.gatedRegistrations;
+    return pass(`${canon} canonical + ${body.gatedRegistrations} gated tools, 0 collisions, ${body.aliasGroups.length} alias group(s) all gated`);
+  }
+  const c = body.collisions.length;
+  const a = body.aliasGroups.filter(g => g.names.filter(n => !n.includes('(gated)')).length > 1).length;
+  const first = c > 0
+    ? `collision: ${body.collisions[0].name} in ${body.collisions[0].locations.join(' + ')}`
+    : `ungated alias: ${body.aliasGroups.find(g => g.names.filter(n => !n.includes('(gated)')).length > 1)?.handler}`;
+  return fail(`${c} collision(s), ${a} ungated alias group(s) — ${first}`);
+}
+
 // ── registry ─────────────────────────────────────────────────
 
 const GATES = [
@@ -1056,6 +1092,9 @@ const GATES = [
 
   // T0 — Phase D Claude Code hooks (PreToolUse deny + PostToolUse audit).
   { id: 'G36', tier: 0, name: 'claude-code:hook-integrity',  fn: G36, fatal: true  },
+
+  // T0 — MCP tool surface: no name collisions + no ungated handler aliases.
+  { id: 'G37', tier: 0, name: 'mcp:tool-surface-clean',      fn: G37, fatal: true  },
 ];
 
 // ── runner ───────────────────────────────────────────────────

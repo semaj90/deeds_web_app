@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Redis } from 'ioredis';
 import type { Pool } from 'pg';
-import { lookupErrorFingerprint, extractSymbols } from './error-fingerprint.js';
+import { lookupErrorFingerprint, extractSymbols, findSimilarErrors } from './error-fingerprint.js';
 import { multiTextRecall, type NgramHit } from './ngram-retrieval.js';
 import { extractFilePaths } from './error-fingerprint.js';
 import { aceTopkKey } from './cache-keys.js';
@@ -15,7 +15,7 @@ export interface MultiLaneQuery {
 }
 
 export interface LaneResult {
-	lane: 'hash' | 'ngram' | 'graph' | 'ace_cache' | 'symbol' | 'vector' | 'glyph_cluster';
+	lane: 'hash' | 'sparse' | 'graph' | 'ace_cache' | 'symbol' | 'dense' | 'topology' | 'wiki' | 'error' | 'task' | 'research';
 	hits: MultiLaneHit[];
 	latencyMs: number;
 	cacheHit: boolean;
@@ -115,7 +115,7 @@ async function runHashLane(
 	return { lane: 'hash', hits: [hit], latencyMs, cacheHit: true };
 }
 
-async function runNgramLane(pool: Pool, query: MultiLaneQuery): Promise<LaneResult> {
+async function runSparseLane(pool: Pool, query: MultiLaneQuery): Promise<LaneResult> {
 	const t0 = Date.now();
 	const rawHits = await multiTextRecall(pool, query.text, query.topK ?? 10).catch(
 		(): NgramHit[] => []
@@ -129,10 +129,10 @@ async function runNgramLane(pool: Pool, query: MultiLaneQuery): Promise<LaneResu
 		symbols: h.symbols,
 		tags: h.tags,
 		score: h.similarity,
-		lane: 'ngram',
+		lane: 'sparse',
 	}));
 
-	return { lane: 'ngram', hits, latencyMs, cacheHit: false };
+	return { lane: 'sparse', hits, latencyMs, cacheHit: false };
 }
 
 async function runGraphLane(redis: Redis, query: MultiLaneQuery): Promise<LaneResult> {
@@ -266,14 +266,14 @@ async function runSymbolLane(redis: Redis, query: MultiLaneQuery): Promise<LaneR
 	return { lane: 'symbol', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
 }
 
-async function runVectorLane(query: MultiLaneQuery): Promise<LaneResult> {
+async function runDenseLane(query: MultiLaneQuery): Promise<LaneResult> {
 	const t0 = Date.now();
 
 	// skipVectorLane=true means the caller (context-assembler) already ran Qdrant.
 	// Return a stable skipped object so the lane still appears in the trace.
 	if (query.skipVectorLane) {
 		return {
-			lane: 'vector',
+			lane: 'dense',
 			hits: [],
 			latencyMs: 0,
 			cacheHit: false,
@@ -286,7 +286,7 @@ async function runVectorLane(query: MultiLaneQuery): Promise<LaneResult> {
 		const { qdrant } = await import('../vector/qdrant-manager.js');
 		const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
 		const embedding = await generateSingleEmbedding(query.text).catch(() => null);
-		if (!embedding) return { lane: 'vector', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+		if (!embedding) return { lane: 'dense', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
 		const searchResult = await qdrant._denseSearch({
 			query: query.text,
 			collection: 'codebase_chunks_768',
@@ -302,12 +302,12 @@ async function runVectorLane(query: MultiLaneQuery): Promise<LaneResult> {
 			symbols: c.payload?.tags as string[] | undefined,
 			tags: c.payload?.tags as string[] | undefined,
 			score: c.score ?? 0.5,
-			lane: 'vector' as const,
+			lane: 'dense' as const,
 		})).filter((h) => h.id);
 
-		return { lane: 'vector', hits, latencyMs: Date.now() - t0, cacheHit: false };
+		return { lane: 'dense', hits, latencyMs: Date.now() - t0, cacheHit: false };
 	} catch {
-		return { lane: 'vector', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+		return { lane: 'dense', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
 	}
 }
 
@@ -316,11 +316,11 @@ async function runVectorLane(query: MultiLaneQuery): Promise<LaneResult> {
  * against the query terms.  Top-3 clusters with score ≥ 0.05 become hits.
  * Non-fatal: returns empty lane if the artifact is absent or stale.
  */
-function runGlyphClusterLane(query: MultiLaneQuery): LaneResult {
+function runTopologyLane(query: MultiLaneQuery): LaneResult {
 	const t0 = Date.now();
 	const entries = readLatestQdrantClusterTags();
 	if (!entries.length) {
-		return { lane: 'glyph_cluster', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+		return { lane: 'topology', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
 	}
 
 	const queryLower = query.text.toLowerCase();
@@ -340,22 +340,25 @@ function runGlyphClusterLane(query: MultiLaneQuery): LaneResult {
 			filePath: repFile,
 			tags:     entry.topTags.slice(0, 6).map((t) => t.tag),
 			score,
-			lane:     'glyph_cluster' as const,
+			lane:     'topology' as const,
 		};
 	});
 
-	return { lane: 'glyph_cluster', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
+	return { lane: 'topology', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
 }
 
 const LANE_WEIGHT: Record<string, number> = {
-	hash:          1.00,
-	ace_cache:     0.90,
-	symbol:        0.80,
-	vector:        0.75,
-	glyph_cluster: 0.70,
-	ngram:         0.60,
-	graph:         0.55,
-	wiki_note:     0.65,
+	hash:     1.00,
+	ace_cache: 0.90,
+	symbol:   0.80,
+	dense:    0.75,
+	topology: 0.70,
+	sparse:   0.60,
+	graph:    0.55,
+	wiki:     0.65,
+	task:     0.50,
+	research: 0.50,
+	error:    0.95,
 };
 
 function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
@@ -380,6 +383,145 @@ function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
 		.sort((a, b) => b.score - a.score);
 }
 
+/**
+ * Wiki lane — scans Redis `wiki:note:dir:*` for notes whose body or title
+ * matches the query (case-insensitive substring). Bounded SCAN to avoid
+ * blocking. Each match becomes a hit with the dir path as filePath.
+ */
+async function runWikiLane(redis: Redis, query: MultiLaneQuery): Promise<LaneResult> {
+	const t0 = Date.now();
+	const topK = query.topK ?? 5;
+	const needle = (query.text ?? '').toLowerCase().trim();
+	if (!needle || needle.length < 3) {
+		return { lane: 'wiki', hits: [], latencyMs: Date.now() - t0, cacheHit: false, skipped: true, skipReason: 'query too short' };
+	}
+	try {
+		const keys: string[] = [];
+		let cursor = '0';
+		// Bounded SCAN — max 20 iterations or 600 keys, COUNT 1000 per pass.
+		// Wiki notes are sparse in the keyspace (~417 keys mixed among ~30k+
+		// total), so a small COUNT misses most of them in 4 iterations.
+		for (let i = 0; i < 20 && keys.length < 600; i++) {
+			const r = await redis.scan(cursor, 'MATCH', 'wiki:note:dir:*', 'COUNT', '1000');
+			cursor = r[0];
+			keys.push(...r[1]);
+			if (cursor === '0') break;
+		}
+		if (keys.length === 0) {
+			return { lane: 'wiki', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+		}
+		const values = await redis.mget(...keys);
+		const hits: MultiLaneHit[] = [];
+		for (let i = 0; i < keys.length && hits.length < topK; i++) {
+			const v = values[i];
+			if (!v) continue;
+			const lower = v.toLowerCase();
+			if (!lower.includes(needle)) continue;
+			const dirPath = keys[i].replace(/^wiki:note:dir:/, '').replace(/_/g, '/');
+			// Score: 1.0 if needle appears in first 200 chars (likely title/intro), else 0.5
+			const score = lower.indexOf(needle) < 200 ? 1.0 : 0.5;
+			hits.push({
+				id: keys[i],
+				text: v.slice(0, 400),
+				filePath: dirPath,
+				tags: ['wiki', 'directory-card'],
+				score,
+				lane: 'wiki',
+			});
+		}
+		hits.sort((a, b) => b.score - a.score);
+		return { lane: 'wiki', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
+	} catch {
+		return { lane: 'wiki', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+}
+
+/**
+ * Error lane — pg_trgm similarity over error_fingerprints. Surfaces prior
+ * fixes for queries that look like error messages or that fuzzy-match a
+ * historical stack trace. Closes the loop with kag.recall_similar_fix:
+ * any synth:loop run that touches a known error gets the prior fix as
+ * a multi-lane hit (priorFix field populated).
+ */
+async function runErrorLane(pool: Pool, query: MultiLaneQuery): Promise<LaneResult> {
+	const t0 = Date.now();
+	const topK = Math.min(query.topK ?? 5, 5);
+	try {
+		const matches = await findSimilarErrors(pool, query.text, topK);
+		const hits: MultiLaneHit[] = matches.map(m => ({
+			id: m.errorHash,
+			text: (m.normalizedText ?? '').slice(0, 400),
+			filePath: m.topFiles?.[0],
+			symbols: m.topSymbols ?? [],
+			tags: ['error-fingerprint', m.priorFix ? 'has-prior-fix' : 'no-prior-fix'],
+			score: typeof m.confidence === 'number' ? m.confidence : 0.5,
+			lane: 'error',
+			priorFix: m.priorFix,
+		}));
+		return { lane: 'error', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
+	} catch {
+		return { lane: 'error', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+}
+
+/**
+ * Task lane — surfaces historical KAG/DAG run outcomes.
+ * Scans kag_dag_nodes for similar intents or node keys.
+ */
+async function runTaskLane(pool: Pool, query: MultiLaneQuery): Promise<LaneResult> {
+	const t0 = Date.now();
+	const topK = Math.min(query.topK ?? 5, 5);
+	try {
+		const { rows } = await pool.query(
+			`SELECT node_key, node_type, status, duration_ms,
+			        similarity(node_key || ' ' || node_type, $1) as score
+			 FROM kag_dag_nodes
+			 WHERE similarity(node_key || ' ' || node_type, $1) > 0.2
+			 ORDER BY score DESC LIMIT $2`,
+			[query.text, topK]
+		);
+		const hits: MultiLaneHit[] = rows.map(r => ({
+			id: `task:${r.node_key}`,
+			text: `Task: ${r.node_key} (${r.node_type}) - Status: ${r.status} (${r.duration_ms}ms)`,
+			score: r.score,
+			lane: 'task',
+			tags: ['kag-dag', r.status],
+		}));
+		return { lane: 'task', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
+	} catch {
+		return { lane: 'task', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+}
+
+/**
+ * Research lane — surfaces findings from prior autonomous research missions.
+ * Scans research_summaries table (vector-backed but supports trigram).
+ */
+async function runResearchLane(pool: Pool, query: MultiLaneQuery): Promise<LaneResult> {
+	const t0 = Date.now();
+	const topK = Math.min(query.topK ?? 5, 5);
+	try {
+		const { rows } = await pool.query(
+			`SELECT id::text, summary, pipeline, relevance_score,
+			        similarity(summary, $1) as trigram_score
+			 FROM research_summaries
+			 WHERE similarity(summary, $1) > 0.2
+			 ORDER BY trigram_score DESC LIMIT $2`,
+			[query.text, topK]
+		);
+		const hits: MultiLaneHit[] = rows.map(r => ({
+			id: `res:${r.id}`,
+			text: r.summary.slice(0, 400),
+			score: r.trigram_score,
+			lane: 'research',
+			tags: ['research', r.pipeline],
+		}));
+		return { lane: 'research', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
+	} catch {
+		return { lane: 'research', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+	}
+}
+
 export async function multiLaneSearch(
 	redis: Redis,
 	pool: Pool,
@@ -388,14 +530,18 @@ export async function multiLaneSearch(
 	const t0 = Date.now();
 	const queryHash = qHash(query.text);
 
-	const [hashResult, ngramResult, graphResult, aceCacheResult, symbolResult, vectorResult, glyphClusterResult] = await Promise.allSettled([
+	const [hashResult, sparseResult, graphResult, aceCacheResult, symbolResult, denseResult, topologyResult, wikiResult, errorResult, taskResult, researchResult] = await Promise.allSettled([
 		runHashLane(redis, pool, query),
-		runNgramLane(pool, query),
+		runSparseLane(pool, query),
 		runGraphLane(redis, query),
 		runAceCacheLane(redis, queryHash),
 		runSymbolLane(redis, query),
-		runVectorLane(query),
-		Promise.resolve(runGlyphClusterLane(query)),
+		runDenseLane(query),
+		Promise.resolve(runTopologyLane(query)),
+		runWikiLane(redis, query),
+		runErrorLane(pool, query),
+		runTaskLane(pool, query),
+		runResearchLane(pool, query),
 	]);
 
 	const lanes: LaneResult[] = [];
@@ -404,10 +550,10 @@ export async function multiLaneSearch(
 		hashResult.status === 'fulfilled'
 			? hashResult.value
 			: { lane: 'hash' as const, hits: [], latencyMs: 0, cacheHit: false };
-	const resolvedNgram =
-		ngramResult.status === 'fulfilled'
-			? ngramResult.value
-			: { lane: 'ngram' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedSparse =
+		sparseResult.status === 'fulfilled'
+			? sparseResult.value
+			: { lane: 'sparse' as const, hits: [], latencyMs: 0, cacheHit: false };
 	const resolvedGraph =
 		graphResult.status === 'fulfilled'
 			? graphResult.value
@@ -420,16 +566,32 @@ export async function multiLaneSearch(
 		symbolResult.status === 'fulfilled'
 			? symbolResult.value
 			: { lane: 'symbol' as const, hits: [], latencyMs: 0, cacheHit: false };
-	const resolvedVector =
-		vectorResult.status === 'fulfilled'
-			? vectorResult.value
-			: { lane: 'vector' as const, hits: [], latencyMs: 0, cacheHit: false };
-	const resolvedGlyphCluster =
-		glyphClusterResult.status === 'fulfilled'
-			? glyphClusterResult.value
-			: { lane: 'glyph_cluster' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedDense =
+		denseResult.status === 'fulfilled'
+			? denseResult.value
+			: { lane: 'dense' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedTopology =
+		topologyResult.status === 'fulfilled'
+			? topologyResult.value
+			: { lane: 'topology' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedWiki =
+		wikiResult.status === 'fulfilled'
+			? wikiResult.value
+			: { lane: 'wiki' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedError =
+		errorResult.status === 'fulfilled'
+			? errorResult.value
+			: { lane: 'error' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedTask =
+		taskResult.status === 'fulfilled'
+			? taskResult.value
+			: { lane: 'task' as const, hits: [], latencyMs: 0, cacheHit: false };
+	const resolvedResearch =
+		researchResult.status === 'fulfilled'
+			? researchResult.value
+			: { lane: 'research' as const, hits: [], latencyMs: 0, cacheHit: false };
 
-	lanes.push(resolvedHash, resolvedNgram, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedVector, resolvedGlyphCluster);
+	lanes.push(resolvedHash, resolvedSparse, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedDense, resolvedTopology, resolvedWiki, resolvedError, resolvedTask, resolvedResearch);
 
 	const merged = mergeAndRank(lanes);
 

@@ -1,20 +1,40 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { extractDocumentNative } from '../lib/server/langextract/native.js';
+import { traceRerank } from '../lib/server/ai/trace-reranker.js';
+import { lookupWikiNotes } from '../lib/server/graph/graph-intel.js';
+import { archiveSynthesisMemory } from '../lib/server/indexer/synthesis-memory-archiver.js';
+import { generateEmbedding } from '../lib/server/grpc/embedding-client.js';
+import { pool } from '../lib/server/db/client.js';
 
 /**
  * Register new agentic tools for organizing messy text and advanced retrieval.
  * These tools leverage the native TS LangExtract + TurboQuant Reranker.
+ *
+ * Canonical surface uses `kb.*` prefix plus the named tool `trace.kag_search`
+ * (per §10 of the dev guide — registered unconditionally as a thin alias of
+ * `kb.trace_search`).
+ *
+ * Bare-name aliases (`trace_search`, `wiki_note_lookup`) are registered only
+ * when `enableLegacy` is true (driven by `MCP_LEGACY_ALIASES=true`).
+ *
+ * Note: the full KAG-DAG implementation of `trace.kag_search` lives in
+ * `tools/trace-kag.tool.ts` and is mounted by `server-fastmcp.ts` (a separate
+ * server). If both servers ever merge, that richer impl registers later and
+ * shadows the thin alias — name resolves either way.
  */
-export function registerNewTools(server: McpServer, config: { rerankUrl: string }) {
+export function registerNewTools(server: McpServer, config: { rerankUrl: string }, enableLegacy = false) {
 
   // == kb.organize_messy_text ==================================================
 
-  server.tool(
+  server.registerTool(
     'kb.organize_messy_text',
     {
-      text: z.string().describe('The messy text blob to organize'),
-      query: z.string().optional().describe('Relevance query (e.g. "key legal facts")'),
+      description: 'Organize messy text into structured entities and sections.',
+      inputSchema: z.object({
+        text: z.string().describe('The messy text blob to organize'),
+        query: z.string().optional().describe('Relevance query (e.g. "key legal facts")'),
+      })
     },
     async ({ text, query }) => {
       try {
@@ -57,10 +77,13 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
 
   // == kb.extract_citations ===================================================
 
-  server.tool(
+  server.registerTool(
     'kb.extract_citations',
     {
-      text: z.string().describe('Text to scan for legal citations'),
+      description: 'Extract legal citations and statutes from text.',
+      inputSchema: z.object({
+        text: z.string().describe('Text to scan for legal citations'),
+      })
     },
     async ({ text }) => {
       const doc = extractDocumentNative(text, 'mcp-citation-task');
@@ -68,6 +91,150 @@ export function registerNewTools(server: McpServer, config: { rerankUrl: string 
       return {
         content: [{ type: 'text', text: JSON.stringify(citations, null, 2) }]
       };
+    }
+  );
+
+  // == kb.trace_search ========================================================
+
+  async function handleTraceSearch({ query, limit, intent }: { query: string, limit: number, intent?: string[] }) {
+    try {
+      const emb = await generateEmbedding(query);
+      if (!emb) {
+        return { content: [{ type: 'text', text: 'Embedding service unavailable' }], isError: true };
+      }
+
+      const hits = await traceRerank({
+        query,
+        queryEmbedding: emb,
+        limit,
+        intentOverride: intent
+      });
+
+      const results = hits.map(h => ({
+        id: h.id,
+        score: h.score,
+        path: h.payload?.path,
+        content: (h.payload?.content ?? '').slice(0, 1000),
+        lenses: h.lenses,
+        tags: h.payload?.tags
+      }));
+
+      return {
+        content: [{ type: 'text', text: JSON.stringify(results, null, 2) }]
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: `Trace search failed: ${err}` }], isError: true };
+    }
+  }
+
+  server.registerTool(
+    'kb.trace_search',
+    {
+      description: 'Search the hypergraph/KAG context for documents, cards, and relations matching a query.',
+      inputSchema: z.object({
+        query: z.string().describe('Technical query or coding problem'),
+        limit: z.number().int().min(1).max(20).default(5).describe('Max results to return'),
+        intent: z.array(z.string()).optional().describe('Lenses: purpose, risk, api_surface, dependencies, retrieval_role'),
+      })
+    },
+    handleTraceSearch
+  );
+
+  // `trace.kag_search` is the CANONICAL named tool per §10 of the dev guide.
+  // The richer KAG-DAG impl lives in `tools/trace-kag.tool.ts` but is mounted
+  // only by `server-fastmcp.ts` (a separate server). On the live :8788 server
+  // this thin alias is what makes the canonical name appear in `tools/list` —
+  // so it must register unconditionally. When the two servers eventually
+  // merge, the trace-kag.tool.ts impl wins (registered later) and this entry
+  // is shadowed; the name still resolves either way.
+  server.registerTool(
+    'trace.kag_search',
+    {
+      description: 'Canonical KAG search alias. The thin impl reuses kb.trace_search; the full KAG-DAG impl in tools/trace-kag.tool.ts is mounted by server-fastmcp.ts.',
+      inputSchema: z.object({
+        query: z.string().describe('Technical query or coding problem'),
+        limit: z.number().int().min(1).max(20).default(5),
+      })
+    },
+    handleTraceSearch
+  );
+
+  if (enableLegacy) {
+    server.registerTool(
+      'trace_search',
+      {
+        description: 'DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES.',
+        inputSchema: z.object({
+          query: z.string().describe('Technical query or coding problem'),
+          limit: z.number().int().min(1).max(20).default(5),
+          intent: z.array(z.string()).optional(),
+        })
+      },
+      handleTraceSearch
+    );
+  }
+
+  // == kb.wiki_note_lookup ====================================================
+
+  async function handleWikiLookup({ query, limit }: { query: string, limit: number }) {
+    try {
+      const notes = await lookupWikiNotes(query, limit);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(notes, null, 2) }]
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: `Wiki lookup failed: ${err}` }], isError: true };
+    }
+  }
+
+  server.registerTool(
+    'kb.wiki_note_lookup',
+    {
+      description: 'Look up notes in the wiki.',
+      inputSchema: z.object({
+        query: z.string().describe('Directory name, tag, or topic to look up'),
+        limit: z.number().int().min(1).max(20).default(5),
+      })
+    },
+    handleWikiLookup
+  );
+
+  if (enableLegacy) {
+    server.registerTool(
+      'wiki_note_lookup',
+      {
+        description: 'DEPRECATED bare-name alias for kb.wiki_note_lookup. Gated by MCP_LEGACY_ALIASES.',
+        inputSchema: z.object({
+          query: z.string().describe('Directory name, tag, or topic to look up'),
+          limit: z.number().int().min(1).max(20).default(5),
+        })
+      },
+      handleWikiLookup
+    );
+  }
+
+  // == kb.archive_synthesis ===================================================
+
+  server.registerTool(
+    'kb.archive_synthesis',
+    {
+      description: 'Archive a synthesis artifact.',
+      inputSchema: z.object({
+        title: z.string().describe('Title for the synthesis artifact'),
+        content: z.string().describe('The synthesized answer or report'),
+        source: z.string().describe('Provenance source (e.g. "chat:e782" or "research:query")'),
+        tags: z.array(z.string()).default([]).describe('Keywords for retrieval'),
+      })
+    },
+    async ({ title, content, source, tags }) => {
+      try {
+        const res = await archiveSynthesisMemory({ title, content, source, tags });
+        return {
+          content: [{ type: 'text', text: JSON.stringify(res, null, 2) }]
+        };
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Archiving failed: ${err}` }], isError: true };
+      }
     }
   );
 }
