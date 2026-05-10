@@ -703,7 +703,12 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.user = user;
     event.locals.session = session;
   } else if (dev && ENV.DEV_BYPASS_AUTH) {
-    const devUserId = '00000000-0000-0000-0000-000000000001';
+    // Lucia user.id is always a string. We use '1' (string repr of users.id integer 1)
+    // so Number(locals.user.id) returns 1 for integer-FK columns (cases.user_id,
+    // evidence.uploaded_by, sessions.user_id, etc.) AND queries against orphan uuid
+    // columns silently return 0 rows (graceful, documented in CLAUDE.md).
+    // ID 1 is the seeded test@deeds-legal.ai user (always present after db:seed).
+    const devUserId = '1';
     event.locals.user = {
       id: devUserId,
       email: 'admin@yorha.dev',
@@ -713,7 +718,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       onboardingStep: 10,
     };
     event.locals.session = {
-      id: '00000000-0000-0000-0000-000000000002',
+      id: 'dev-bypass-session',
       userId: devUserId,
       expiresAt: new Date(Date.now() + 86400000),
       fresh: true,

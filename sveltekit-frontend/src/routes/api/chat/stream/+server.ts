@@ -74,7 +74,7 @@ async function loadCaseContext(caseId: string, userId?: string): Promise<string 
     const caseRows = await db
       .select()
       .from(cases)
-      .where(userId ? and(eq(cases.id, caseId), eq(cases.userId, userId)) : eq(cases.id, caseId))
+      .where(userId ? and(eq(cases.id, caseId), eq(cases.userId, Number(userId))) : eq(cases.id, caseId))
       .limit(1);
 
     if (!caseRows.length) return null;

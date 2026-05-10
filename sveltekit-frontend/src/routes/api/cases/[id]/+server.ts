@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ locals, params, request }) => {
     const caseData = await db
       .select()
       .from(cases)
-      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, id), eq(cases.userId, Number(locals.user.id))))
       .limit(1);
 
     if (caseData.length === 0) {
@@ -95,7 +95,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
     const updated = await db
       .update(cases)
       .set(updates)
-      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, id), eq(cases.userId, Number(locals.user.id))))
       .returning();
 
     if (updated.length === 0) {
@@ -142,7 +142,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
         status: 'archived',
         updatedAt: sql`NOW()`,
       })
-      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, id), eq(cases.userId, Number(locals.user.id))))
       .returning();
 
     if (archived.length === 0) {

@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const [caseData] = await db
       .select()
       .from(cases)
-      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, id), eq(cases.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!caseData) {

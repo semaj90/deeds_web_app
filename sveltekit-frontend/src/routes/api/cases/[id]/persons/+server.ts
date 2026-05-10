@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
     const [targetCase] = await db
       .select({ id: cases.id })
       .from(cases)
-      .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+      .where(and(eq(cases.id, caseId), eq(cases.userId, Number(locals.user.id))))
       .limit(1);
 
     if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
@@ -87,7 +87,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
   const [targetCase] = await db
     .select({ id: cases.id })
     .from(cases)
-    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .where(and(eq(cases.id, caseId), eq(cases.userId, Number(locals.user.id))))
     .limit(1);
 
   if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
@@ -121,7 +121,7 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
   const [targetCase] = await db
     .select({ id: cases.id })
     .from(cases)
-    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .where(and(eq(cases.id, caseId), eq(cases.userId, Number(locals.user.id))))
     .limit(1);
 
   if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });

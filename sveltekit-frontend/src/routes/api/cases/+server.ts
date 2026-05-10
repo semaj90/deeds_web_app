@@ -55,7 +55,7 @@ export const GET: RequestHandler = async (event) => {
 
 	try {
 		const filters = [];
-		filters.push(eq(cases.userId, auth.user.id));
+		filters.push(eq(cases.userId, Number(auth.user.id)));
 
 		if (status) {
 			const statusValue = status === 'active' ? 'open' : status;
@@ -125,7 +125,7 @@ export const POST: RequestHandler = async (event) => {
 			.values({
 				title: body.title,
 				description: body.description,
-				userId: auth.user.id,
+				userId: Number(auth.user.id), // cases.user_id is integer (DB migrated 2026-05-10)
 				status: (body.status ?? 'open') as typeof cases.status.enumValues[number],
 				priority: (body.priority ?? 'medium') as typeof cases.priority.enumValues[number],
 				updatedAt: new Date().toISOString()
@@ -180,7 +180,7 @@ export const PATCH: RequestHandler = async (event) => {
     const updated = await db
       .update(cases)
       .set(updates)
-      .where(and(eq(cases.userId, auth.user.id), inArray(cases.id, body.ids)))
+      .where(and(eq(cases.userId, Number(auth.user.id)), inArray(cases.id, body.ids)))
       .returning();
 
     // Invalidate cache for all updated cases
@@ -225,7 +225,7 @@ export const DELETE: RequestHandler = async (event) => {
         status: 'archived',
         updatedAt: new Date().toISOString(),
       })
-      .where(and(eq(cases.userId, auth.user.id), inArray(cases.id, body.ids)))
+      .where(and(eq(cases.userId, Number(auth.user.id)), inArray(cases.id, body.ids)))
       .returning();
 
     // Invalidate cache for all archived cases

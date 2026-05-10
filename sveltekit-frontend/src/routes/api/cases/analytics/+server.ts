@@ -87,7 +87,7 @@ export const GET: RequestHandler = async (event) => {
 
 		// Build filters
 		const filters: ReturnType<typeof eq>[] = [
-			eq(cases.userId, auth.user.id),
+			eq(cases.userId, Number(auth.user.id)),
 			gte(cases.createdAt, dateStart.toISOString()),
 			lte(cases.createdAt, dateEnd.toISOString())
 		];

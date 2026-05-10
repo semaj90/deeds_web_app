@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-05-10T20:51:42.667Z
+> Generated: 2026-05-10T21:07:25.694Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -369,12 +369,12 @@
 | ✅ | `src/routes/api/routes` | 98 | 9 | 1005 | 9 | 9/8 | 0 | — | — |
 | ✅ | `src/routes/api/ai` | 99 | 30 | 3089 | 30 | 30/28 | 0 | — | — |
 | ✅ | `src/routes/api/v1` | 99 | 19 | 1584 | 19 | 19/18 | 0 | — | — |
-| ✅ | `src/lib` | 100 | 11 | 409957 | 3 | 12/275 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
+| ✅ | `src/lib` | 100 | 11 | 409963 | 3 | 12/275 | 9 | 🔴ssr 🟠lh | C57: const chunks in `src/lib/shims` (tag: embedding) |
 | ✅ | `src/lib/data` | 100 | 5 | 1682 | 0 | 0/0 | 0 | — | C29: const chunks in `src/lib/schemas` (tag: auth) |
 | ✅ | `src/lib/db` | 100 | 4 | 2892 | 0 | 0/1 | 0 | — | C91: type chunks in `src/lib/server/db` (tag: database) |
 | ✅ | `src/lib/db/queries` | 100 | 2 | 881 | 0 | 0/0 | 0 | — | — |
 | ✅ | `src/lib/db/schema` | 100 | 6 | 890 | 0 | 0/0 | 0 | — | C51: table-def chunks in `src/lib/db/schema` (tag: database) |
-| ✅ | `src/lib/server` | 100 | 63 | 169650 | 3 | 9/184 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
+| ✅ | `src/lib/server` | 100 | 63 | 169656 | 3 | 9/184 | 0 | 🟠lh | C90: function chunks in `src/lib/server` (tag: auth) |
 | ✅ | `src/lib/server/ace` | 100 | 32 | 12369 | 0 | 0/15 | 0 | — | C72: function chunks in `src/lib/server/ace` (tag: vector) |
 | ✅ | `src/lib/server/adapters` | 100 | 1 | 650 | 0 | 0/1 | 0 | — | — |
 | ✅ | `src/lib/server/admin` | 100 | 8 | 995 | 0 | 0/5 | 0 | — | — |
@@ -386,7 +386,7 @@
 | ✅ | `src/lib/server/cases` | 100 | 1 | 189 | 0 | 0/0 | 0 | — | — |
 | ✅ | `src/lib/server/codeintel` | 100 | 1 | 498 | 0 | 0/1 | 0 | — | — |
 | ✅ | `src/lib/server/concurrency` | 100 | 3 | 741 | 0 | 0/1 | 0 | — | C61: const chunks in `src/lib/server/concurrency` (tag: auth) |
-| ✅ | `src/lib/server/db` | 100 | 116 | 18398 | 0 | 0/4 | 0 | — | C6: function chunks in `src/lib/server/db` (tag: embedding) |
+| ✅ | `src/lib/server/db` | 100 | 116 | 18404 | 0 | 0/4 | 0 | — | C6: function chunks in `src/lib/server/db` (tag: embedding) |
 | ✅ | `src/lib/server/embedding` | 100 | 9 | 1122 | 0 | 0/1 | 0 | — | C77: type chunks in `src/lib/types` (tag: embedding) |
 | ✅ | `src/lib/server/engagement` | 100 | 1 | 367 | 0 | 0/0 | 0 | — | — |
 | ✅ | `src/lib/server/error-brain` | 100 | 11 | 1157 | 0 | 1/2 | 0 | — | — |
