@@ -41,5 +41,7 @@ export default {
     // Manual sidecar migration: drizzle/0016_courtroom_3d_animation.sql
     // (courtroom_models IS declared in schema; the other two are not)
     '!courtroom_animations', '!courtroom_keyframes',
+    // Admin AI chat — managed via raw SQL (ai-chat-service.ts uses pg.Pool, not Drizzle)
+    '!admin_ai_chat_sessions', '!admin_ai_chat_messages',
   ],
 } satisfies Config;
