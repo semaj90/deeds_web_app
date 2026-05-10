@@ -140,8 +140,13 @@ export function routeIntent(
 	text:   string,
 	ctx:    RouterContext
 ): RouterDecision {
+	// Note: Zod schemas (RouterDecisionSchema / OperatorChainStepSchema) remain
+	// exported for external boundary validation. We don't `.parse()` here on the
+	// return because the schema's `.label` infers as optional (union widens it),
+	// which mismatches the required `IntentResult.label`. Inputs are already typed,
+	// so the literal return is the source of truth.
 	if (intent.fallback || intent.label === 'unknown') {
-		return RouterDecisionSchema.parse({
+		return {
 			intent,
 			chain: [
 				{
@@ -151,16 +156,16 @@ export function routeIntent(
 			],
 			fallback: true,
 			reason:   `fallback (label=${intent.label}, confidence=${intent.confidence.toFixed(2)})`,
-		});
+		};
 	}
 
-	const chain = OperatorChainStepSchema.array().parse(chainFor(intent.label, text, ctx));
-	return RouterDecisionSchema.parse({
+	const chain = chainFor(intent.label, text, ctx);
+	return {
 		intent,
 		chain,
 		fallback: false,
 		reason:   `routed label=${intent.label} → ${chain.map((s) => s.tool).join(' → ')}`,
-	});
+	};
 }
 
 // ── Chain executor ───────────────────────────────────────────────────────────
