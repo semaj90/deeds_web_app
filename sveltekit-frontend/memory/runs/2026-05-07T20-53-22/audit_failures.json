@@ -1,11 +1,21 @@
 {
-  "generatedAt": "2026-05-08T21:59:33.314Z",
+  "generatedAt": "2026-05-09T22:27:14.367Z",
   "runId": "2026-05-07T20-53-22",
-  "failureCount": 1,
+  "failureCount": 3,
   "failures": [
     {
       "gate": "G17",
-      "file": "src/lib/server/comfyui/comfyui-client.ts",
+      "file": "src/lib/server/admin/subagent-orchestrator.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/ai/web-search-utils.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/mcp-client.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     }
   ]

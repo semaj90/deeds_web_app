@@ -4,7 +4,7 @@ path: "src/mcp/server.ts"
 aliases: ["server.ts","src/mcp/server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 4312
+lineCount: 4493
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: true
 hasZod: true
-importCount: 4
+importCount: 7
 embedding_id: "qdrant://codebase_chunks_768/src/mcp/server.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","auth","zod","t/ts","t/src","t/mcp"]
 > Setup tool handlers for MCP server
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 4312
+lines:: 4493
 ## Summary
 
 Setup tool handlers for MCP server

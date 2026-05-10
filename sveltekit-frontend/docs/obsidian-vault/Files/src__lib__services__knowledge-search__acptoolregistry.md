@@ -4,7 +4,7 @@ path: "src/lib/services/knowledge-search/ACPToolRegistry.ts"
 aliases: ["ACPToolRegistry.ts","src/lib/services/knowledge-search/ACPToolRegistry.ts"]
 clusterId: 17
 ext: ".ts"
-lineCount: 1010
+lineCount: 1012
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: false
-importCount: 7
+importCount: 8
 embedding_id: "qdrant://codebase_chunks_768/src/lib/services/knowledge-search/ACPToolRegistry.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-17]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/17","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-17]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 1010
+lines:: 1012
 ## Summary
 
 Phase 76: ACP (Agent Communication Protocol) Tool Registry

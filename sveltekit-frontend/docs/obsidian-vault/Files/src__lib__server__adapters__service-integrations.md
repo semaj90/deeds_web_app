@@ -4,7 +4,7 @@ path: "src/lib/server/adapters/service-integrations.ts"
 aliases: ["service-integrations.ts","src/lib/server/adapters/service-integrations.ts"]
 clusterId: 6
 ext: ".ts"
-lineCount: 649
+lineCount: 650
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 3
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/adapters/service-integrations.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-6]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/6","zod","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-6]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 649
+lines:: 650
 ## Summary
 
 Server-Side Service Integration Adapters

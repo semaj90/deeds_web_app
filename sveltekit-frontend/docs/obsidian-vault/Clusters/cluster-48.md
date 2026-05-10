@@ -12,7 +12,7 @@ top_tags: ["database","embedding","auth","vector"]
 llmHits: 0
 summaryMode: null
 confidence: "high"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 contains: ["[[Files/src__lib__db__migrations__20241211000002_create_enhanced_evidence_table]]","[[Files/src__lib__server__db__migrations__005_pgvector_384_optimization]]","[[Files/src__lib__server__db__migrations__012_gin_jsonb_indexes]]","[[Files/src__lib__db__migrations__enhanced-grpo-migration]]","[[Files/src__lib__server__db__migrations__005_fix_app_requirements]]","[[Files/src__lib__server__db__schema-pgvector-512]]","[[Files/src__lib__server__db__migrations__010_add_uploads_table]]","[[Files/src__lib__server__db__migrations__meta___journal]]"]
 same: ["[[Clusters/cluster-6]]","[[Clusters/cluster-15]]","[[Clusters/cluster-59]]","[[Clusters/cluster-10]]","[[Clusters/cluster-12]]"]

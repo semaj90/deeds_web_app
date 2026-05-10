@@ -12,7 +12,7 @@ top_tags: ["api","server","page-server","ssr","vector"]
 llmHits: 0
 summaryMode: null
 confidence: "high"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 contains: ["[[Files/src__routes__api__library__documents___documentid___toc___server]]","[[Files/src__routes__api__library__document___id____server]]","[[Files/src__routes__api__library__document___id___node___nodeid____server]]","[[Files/src__routes__api__knowledge__document___id____server]]","[[Files/src__routes__api__library__document___id___toc___server]]","[[Files/src__routes___app___library___documentid___reader___page.server]]","[[Files/src__routes__api__library__documents___documentid___pdf___server]]","[[Files/src__routes___app___library___documentid___node___nodeid____page.server]]"]
 same: ["[[Clusters/cluster-47]]","[[Clusters/cluster-26]]","[[Clusters/cluster-31]]","[[Clusters/cluster-80]]","[[Clusters/cluster-25]]"]

@@ -12,7 +12,7 @@ top_tags: ["auth","embedding","types","api-route"]
 llmHits: 0
 summaryMode: null
 confidence: "high"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 contains: ["[[Files/src__lib__types__svelte5-api-types.d]]","[[Files/src__lib__utils__type-guards]]","[[Files/src__lib__types__api]]"]
 same: ["[[Clusters/cluster-18]]","[[Clusters/cluster-23]]","[[Clusters/cluster-29]]","[[Clusters/cluster-43]]","[[Clusters/cluster-74]]"]

@@ -12,13 +12,13 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: false
-importCount: 6
+importCount: 7
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/db/seed.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-6]]"]
-imports: ["[[Files/schema-postgres]]"]
+imports: ["[[Files/schema-postgres]]","[[Files/env]]"]
 tags: ["file","ext/ts","cluster/6","t/ts","t/src","t/lib"]
 ---
 
@@ -36,6 +36,7 @@ Database Seed Script - Drizzle ORM 0.44
 ## Imports
 
 - imports:: [[Files/schema-postgres]] `./schema-postgres`
+- imports:: [[Files/env]] `./env.server.js`
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

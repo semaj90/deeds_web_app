@@ -4,7 +4,7 @@ path: "src/service-worker.ts"
 aliases: ["service-worker.ts","src/service-worker.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 585
+lineCount: 594
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 0
 embedding_id: "qdrant://codebase_chunks_768/src/service-worker.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","zod","t/ts","t/src","t/service-worker_ts"]
 > Handle background sync for cache warming and data sync
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 585
+lines:: 594
 ## Summary
 
 Handle background sync for cache warming and data sync

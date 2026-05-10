@@ -4,7 +4,7 @@ path: "src/lib/server/ai/mcp-tool-dispatch.ts"
 aliases: ["mcp-tool-dispatch.ts","src/lib/server/ai/mcp-tool-dispatch.ts"]
 clusterId: 19
 ext: ".ts"
-lineCount: 351
+lineCount: 477
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,9 +12,9 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: true
-importCount: 8
+importCount: 9
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ai/mcp-tool-dispatch.ts"
-last_updated_by_llm: "2026-05-08T16:50:32.855Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-19]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/19","zod","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-19]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 351
+lines:: 477
 ## Summary
 
 In-process MCP tool implementations for trace-mcp-server.ts.

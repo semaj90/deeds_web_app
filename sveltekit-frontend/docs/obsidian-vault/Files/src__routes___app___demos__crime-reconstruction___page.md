@@ -4,7 +4,7 @@ path: "src/routes/(app)/demos/crime-reconstruction/+page.svelte"
 aliases: ["+page.svelte","src/routes/(app)/demos/crime-reconstruction/+page.svelte"]
 clusterId: -1
 ext: ".svelte"
-lineCount: 691
+lineCount: 698
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 2
 embedding_id: "qdrant://codebase_chunks_768/src/routes/(app)/demos/crime-reconstruction/+page.svelte"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "medium"
 up: []
@@ -24,10 +24,10 @@ tags: ["file","ext/svelte","route","svelte","auth","zod","t/svelte","t/src","t/r
 
 # `src/routes/(app)/demos/crime-reconstruction/+page.svelte`
 ## For future Claude
-> .svelte at src/routes/(app)/demos/crime-reconstruction/+page.svelte (691 lines), SvelteKit route, Svelte component, auth-guarded.
+> .svelte at src/routes/(app)/demos/crime-reconstruction/+page.svelte (698 lines), SvelteKit route, Svelte component, auth-guarded.
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 691
+lines:: 698
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

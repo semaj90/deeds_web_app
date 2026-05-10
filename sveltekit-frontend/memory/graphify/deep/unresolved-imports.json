@@ -6,6 +6,9 @@
   ],
   "EXTERNAL:svelte": [
     "src/app.d.ts",
+    "src/lib/components/admin/AdminChatAssistant.svelte",
+    "src/lib/components/admin/ContextualAssistantModal.svelte",
+    "src/lib/components/admin/TraceCopilotPanel.svelte",
     "src/lib/components/agent/AutonomousInvestigator.svelte",
     "src/lib/components/ai/AIChatWidget.svelte",
     "src/lib/components/ai/EnhancedAIChatTest.svelte",
@@ -162,12 +165,14 @@
     "src/lib/types/svelte5-api-types.d.ts",
     "src/routes/(analysis)/+layout.svelte",
     "src/routes/(app)/+layout.svelte",
+    "src/routes/(app)/admin/+layout.svelte",
     "src/routes/(app)/admin/+page.svelte",
     "src/routes/(app)/admin/all-routes/+page.svelte",
     "src/routes/(app)/admin/case-graph/+page.svelte",
     "src/routes/(app)/admin/error-brain/runs/+page.svelte",
     "src/routes/(app)/admin/library/+page.svelte",
     "src/routes/(app)/admin/observability/+page.svelte",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
     "src/routes/(app)/analytics/+page.svelte",
     "src/routes/(app)/cases/[id]/+page.svelte",
     "src/routes/(app)/cases/[id]/board/+page.svelte",
@@ -249,14 +254,23 @@
     "src/lib/server/utils/vector-schemas.ts",
     "src/lib/server/validation/query-params.ts",
     "src/lib/server/z-schemas.ts",
+    "src/lib/types/browser-context.ts",
     "src/lib/types/protocol.ts",
+    "src/mcp/admin_tools.ts",
+    "src/mcp/bifrost_tools.ts",
+    "src/mcp/codebase_tools.ts",
+    "src/mcp/db-inspection-tools.ts",
     "src/mcp/kb-retrieval-server.ts",
+    "src/mcp/new_tools.ts",
+    "src/mcp/research_tools.ts",
+    "src/mcp/skill_tools.ts",
     "src/mcp/tools/cluster-lenses.tool.ts",
     "src/mcp/tools/graph-analysis.tool.ts",
     "src/mcp/tools/topology-search.tool.ts",
     "src/mcp/tools/trace-kag.tool.ts",
     "src/mcp/tools/vault-walker.tool.ts",
     "src/mcp/tools/video-analysis.ts",
+    "src/mcp/topology_mgmt_tools.ts",
     "src/mcp/trace-mcp-server.ts",
     "src/routes/(app)/admin/api-testing/agentic-loop/+server.ts",
     "src/routes/(app)/analysis-center/schema.ts",
@@ -276,6 +290,9 @@
     "src/routes/api/acp/execute/+server.ts",
     "src/routes/api/acp/tools/+server.ts",
     "src/routes/api/admin/agent/fix/+server.ts",
+    "src/routes/api/admin/ai-chat/+server.ts",
+    "src/routes/api/admin/ai-chat/subagent/launch/+server.ts",
+    "src/routes/api/admin/ai-chat/summarize-panel/+server.ts",
     "src/routes/api/admin/audit/+server.ts",
     "src/routes/api/admin/inference-stats/+server.ts",
     "src/routes/api/admin/knowledge/+server.ts",
@@ -633,6 +650,7 @@
     "src/routes/api/reports/[id]/export/+server.ts",
     "src/routes/api/research/concurrent-deep/+server.ts",
     "src/routes/api/research/concurrent-deep/stream/+server.ts",
+    "src/routes/api/research/external-deep/+server.ts",
     "src/routes/api/research/ingest/+server.ts",
     "src/routes/api/research/search/+server.ts",
     "src/routes/api/routes/metadata/+server.ts",
@@ -739,6 +757,7 @@
     "src/routes/(app)/admin/memory-inspector/+page.server.ts",
     "src/routes/(app)/admin/phase78/+page.server.ts",
     "src/routes/(app)/admin/search-intelligence/+page.server.ts",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.server.ts",
     "src/routes/(app)/ai-dashboard/+page.server.ts",
     "src/routes/(app)/all-routes/+page.server.ts",
     "src/routes/(app)/analysis-center/+page.server.ts",
@@ -793,8 +812,15 @@
     "src/routes/api/acp/execute/+server.ts",
     "src/routes/api/acp/tools/+server.ts",
     "src/routes/api/admin/agent/fix/+server.ts",
+    "src/routes/api/admin/ai-chat/+server.ts",
+    "src/routes/api/admin/ai-chat/sessions/+server.ts",
+    "src/routes/api/admin/ai-chat/subagent/launch/+server.ts",
+    "src/routes/api/admin/ai-chat/summarize-panel/+server.ts",
+    "src/routes/api/admin/ai-chat/upload/+server.ts",
+    "src/routes/api/admin/ai-chat/[sessionId]/+server.ts",
     "src/routes/api/admin/audit/+server.ts",
     "src/routes/api/admin/cache-stats/+server.ts",
+    "src/routes/api/admin/chat/+server.ts",
     "src/routes/api/admin/inference-stats/+server.ts",
     "src/routes/api/admin/knowledge/+server.ts",
     "src/routes/api/admin/model/validate-checkpoint/+server.ts",
@@ -804,6 +830,7 @@
     "src/routes/api/admin/routes/+server.ts",
     "src/routes/api/admin/routes/stream/+server.ts",
     "src/routes/api/admin/seed-knowledge/+server.ts",
+    "src/routes/api/admin/topology/recompute/+server.ts",
     "src/routes/api/agent/investigate/+server.ts",
     "src/routes/api/agents/chat/+server.ts",
     "src/routes/api/ai/agent/+server.ts",
@@ -879,6 +906,7 @@
     "src/routes/api/auth/register/+server.ts",
     "src/routes/api/auth/reset-password/+server.ts",
     "src/routes/api/auth/session/+server.ts",
+    "src/routes/api/browser-context/snapshot/+server.ts",
     "src/routes/api/cache/+server.ts",
     "src/routes/api/cache/bifrost/check/+server.ts",
     "src/routes/api/cache/bifrost/store/+server.ts",
@@ -1292,6 +1320,7 @@
     "src/routes/api/research/concurrent-deep/+server.ts",
     "src/routes/api/research/concurrent-deep/stream/+server.ts",
     "src/routes/api/research/encode/+server.ts",
+    "src/routes/api/research/external-deep/+server.ts",
     "src/routes/api/research/ingest/+server.ts",
     "src/routes/api/research/search/+server.ts",
     "src/routes/api/route-operations/log/+server.ts",
@@ -1412,8 +1441,11 @@
     "src/lib/server/ace/context-assembler.ts",
     "src/lib/server/ace/kag-dag-runner.ts",
     "src/lib/server/ace/tag-sync.ts",
+    "src/lib/server/admin/skills-service.ts",
+    "src/lib/server/admin/subagent-orchestrator.ts",
     "src/lib/server/agents/trace-subagent-orchestrator.ts",
     "src/lib/server/ai/code-intel-service.ts",
+    "src/lib/server/ai/external-research-agent.ts",
     "src/lib/server/ai/hypergraph-store.ts",
     "src/lib/server/ai/mcp-tool-dispatch.ts",
     "src/lib/server/ai/token-tracker.ts",
@@ -1771,6 +1803,7 @@
     "src/lib/components/detective/DetectiveBoard.svelte",
     "src/lib/components/evidence/BoardSearchOverlay.svelte",
     "src/lib/components/ui/CommandPalette.svelte",
+    "src/lib/server/kb/search-logic.ts",
     "src/lib/server/retrieval/codebase-context.ts",
     "src/lib/utils/fuse-index.ts",
     "src/routes/(app)/cases/[id]/board/+page.svelte",
@@ -1799,49 +1832,15 @@
   "EXTERNAL:yjs": [
     "src/lib/collaboration/yjs-provider.ts"
   ],
-  "EXTERNAL:bits-ui": [
-    "src/lib/components/ai/ACEContextBubble.svelte",
-    "src/lib/components/ai/FloatingChatModal.svelte",
-    "src/lib/components/cases/CaseFilters.svelte",
-    "src/lib/components/chat/FileUploadModal.svelte",
-    "src/lib/components/codebase/CodebaseWikiDashboard.svelte",
-    "src/lib/components/editor/LegalDocumentEditor.svelte",
-    "src/lib/components/evidence/DoclingExtractionViewer.svelte",
-    "src/lib/components/legal/SourceDrawer.svelte",
-    "src/lib/components/legal/TocTree.svelte",
-    "src/lib/components/legal-corpus/CitedSourcesDrawer.svelte",
-    "src/lib/components/legal-corpus/LegalTabBar.svelte",
-    "src/lib/components/library/reader/TocTree.svelte",
-    "src/lib/components/NESGraphRenderer.svelte",
-    "src/lib/components/poi/AddPoiModal.svelte",
-    "src/lib/components/ui/AccessibilityPanel.svelte",
-    "src/lib/components/ui/AIDropdown.svelte",
-    "src/lib/components/ui/AuthModal.svelte",
-    "src/lib/components/ui/bits/compound.ts",
-    "src/lib/components/ui/bits/index.ts",
-    "src/lib/components/ui/bits/Svelte5Button.svelte",
-    "src/lib/components/ui/bits/Svelte5Dialog.svelte",
-    "src/lib/components/ui/button/Button.svelte",
-    "src/lib/components/ui/FeedbackButtons.svelte",
-    "src/lib/components/ui/gaming/n64/N643DButton.svelte",
-    "src/lib/components/ui/HoverCard.svelte",
-    "src/lib/components/ui/index.ts",
-    "src/lib/components/ui/label/Label.svelte",
-    "src/lib/components/ui/scrollarea/ScrollArea.svelte",
-    "src/lib/components/ui/select/SelectContent.svelte",
-    "src/lib/components/ui/select/SelectItem.svelte",
-    "src/lib/components/ui/select/SelectRoot.svelte",
-    "src/lib/components/ui/select/SelectTrigger.svelte",
-    "src/lib/components/ui/Tooltip.svelte",
-    "src/lib/utils/bits-ui-adapter.ts",
-    "src/routes/(app)/+layout.svelte",
-    "src/routes/(app)/cases/[id]/reports/+page.svelte",
-    "src/routes/(app)/evidence/realtime/+page.svelte",
-    "src/routes/(app)/legal-corpus/+page.svelte",
-    "src/routes/(app)/persons-of-interest/+page.svelte",
-    "src/routes/(dev)/demo/bits-ui/+page.svelte"
+  "EXTERNAL:@xstate/svelte": [
+    "src/lib/components/admin/AdminChatAssistant.svelte",
+    "src/lib/components/admin/ContextualAssistantModal.svelte"
   ],
   "EXTERNAL:svelte/transition": [
+    "src/lib/components/admin/AdminChatAssistant.svelte",
+    "src/lib/components/admin/AiAnalysisPopup.svelte",
+    "src/lib/components/admin/ContextualAssistantModal.svelte",
+    "src/lib/components/admin/TraceCopilotPanel.svelte",
     "src/lib/components/ai/ACEContextBubble.svelte",
     "src/lib/components/ai/AIButton.svelte",
     "src/lib/components/ai/AIChatWidget.svelte",
@@ -1884,6 +1883,7 @@
     "src/lib/components/yorha/YoRHaDialog.svelte",
     "src/lib/components/yorha/YoRHaModal.svelte",
     "src/lib/machines/AIAssistantMachineComponent.svelte",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
     "src/routes/(app)/cases/[id]/reports/+page.svelte",
     "src/routes/(app)/demos/case-prediction/+page.svelte",
     "src/routes/(app)/demos/keyboard-shortcuts/+page.svelte",
@@ -1894,7 +1894,52 @@
     "src/routes/(dev)/odin/+page.svelte",
     "src/routes/register/+page.svelte"
   ],
+  "EXTERNAL:bits-ui": [
+    "src/lib/components/admin/ContextualAssistantModal.svelte",
+    "src/lib/components/ai/ACEContextBubble.svelte",
+    "src/lib/components/ai/FloatingChatModal.svelte",
+    "src/lib/components/cases/CaseFilters.svelte",
+    "src/lib/components/chat/FileUploadModal.svelte",
+    "src/lib/components/codebase/CodebaseWikiDashboard.svelte",
+    "src/lib/components/editor/LegalDocumentEditor.svelte",
+    "src/lib/components/evidence/DoclingExtractionViewer.svelte",
+    "src/lib/components/legal/SourceDrawer.svelte",
+    "src/lib/components/legal/TocTree.svelte",
+    "src/lib/components/legal-corpus/CitedSourcesDrawer.svelte",
+    "src/lib/components/legal-corpus/LegalTabBar.svelte",
+    "src/lib/components/library/reader/TocTree.svelte",
+    "src/lib/components/NESGraphRenderer.svelte",
+    "src/lib/components/poi/AddPoiModal.svelte",
+    "src/lib/components/ui/AccessibilityPanel.svelte",
+    "src/lib/components/ui/AIDropdown.svelte",
+    "src/lib/components/ui/AuthModal.svelte",
+    "src/lib/components/ui/bits/compound.ts",
+    "src/lib/components/ui/bits/index.ts",
+    "src/lib/components/ui/bits/Svelte5Button.svelte",
+    "src/lib/components/ui/bits/Svelte5Dialog.svelte",
+    "src/lib/components/ui/button/Button.svelte",
+    "src/lib/components/ui/FeedbackButtons.svelte",
+    "src/lib/components/ui/gaming/n64/N643DButton.svelte",
+    "src/lib/components/ui/HoverCard.svelte",
+    "src/lib/components/ui/index.ts",
+    "src/lib/components/ui/label/Label.svelte",
+    "src/lib/components/ui/scrollarea/ScrollArea.svelte",
+    "src/lib/components/ui/select/SelectContent.svelte",
+    "src/lib/components/ui/select/SelectItem.svelte",
+    "src/lib/components/ui/select/SelectRoot.svelte",
+    "src/lib/components/ui/select/SelectTrigger.svelte",
+    "src/lib/components/ui/Tooltip.svelte",
+    "src/lib/utils/bits-ui-adapter.ts",
+    "src/routes/(app)/+layout.svelte",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
+    "src/routes/(app)/cases/[id]/reports/+page.svelte",
+    "src/routes/(app)/evidence/realtime/+page.svelte",
+    "src/routes/(app)/legal-corpus/+page.svelte",
+    "src/routes/(app)/persons-of-interest/+page.svelte",
+    "src/routes/(dev)/demo/bits-ui/+page.svelte"
+  ],
   "EXTERNAL:svelte/easing": [
+    "src/lib/components/admin/TraceCopilotPanel.svelte",
     "src/lib/components/ai/AIButton.svelte",
     "src/lib/components/editor/LegalDocumentEditor.svelte",
     "src/lib/components/onboarding/SetupWizard.svelte",
@@ -1903,13 +1948,12 @@
     "src/lib/components/ui/GlobalCommandPalette.svelte",
     "src/lib/components/ui/Notifications.svelte",
     "src/lib/components/yorha/YoRHaModal.svelte",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
     "src/routes/(app)/demos/smart-positioning/+page.svelte",
     "src/routes/(app)/demos/spotlight/+page.svelte"
   ],
-  "EXTERNAL:$lib/types/upload": [
-    "src/lib/components/ai/EnhancedFileUpload.svelte"
-  ],
   "EXTERNAL:xstate": [
+    "src/lib/components/admin/TraceCopilotPanel.svelte",
     "src/lib/components/ai/EnhancedFileUpload.svelte",
     "src/lib/components/DocumentUploadMachineIntegration.svelte",
     "src/lib/components/legal/EvidenceCustodyFlow.svelte",
@@ -1927,11 +1971,15 @@
     "src/lib/messaging/rabbitmq-xstate-integration.ts",
     "src/lib/server/ml/topic-clustering-worker.ts",
     "src/lib/server/queue/rabbitmq-xstate-integration.ts",
+    "src/lib/stores/admin-chat-machine.ts",
     "src/lib/types/evidence.ts",
     "src/lib/utils/xstate-svelte5.svelte.ts",
     "src/routes/login/+page.svelte",
     "src/routes/register/+page.svelte",
     "tests/evidence-workflow-integration.test.ts"
+  ],
+  "EXTERNAL:$lib/types/upload": [
+    "src/lib/components/ai/EnhancedFileUpload.svelte"
   ],
   "EXTERNAL:d3": [
     "src/lib/components/codebase/RouteGraph.svelte",
@@ -2146,6 +2194,7 @@
     "src/routes/(app)/chat/[id]/+page.server.ts",
     "src/routes/api/admin/pipeline/events/+server.ts",
     "src/routes/api/admin/qlora/+server.ts",
+    "src/routes/api/browser-context/snapshot/+server.ts",
     "src/routes/api/cache/+server.ts",
     "src/routes/api/cache/invalidate/+server.ts",
     "src/routes/api/cache/metrics/+server.ts",
@@ -2216,6 +2265,8 @@
     "src/lib/server/db/legal-schema.ts",
     "src/lib/server/db/lucia-schema.ts",
     "src/lib/server/db/schema/ace-web-crawl.ts",
+    "src/lib/server/db/schema/admin-ai-skills.ts",
+    "src/lib/server/db/schema/admin-chat.ts",
     "src/lib/server/db/schema/ai_chat.ts",
     "src/lib/server/db/schema/analytics.ts",
     "src/lib/server/db/schema/case-library-links.ts",
@@ -2231,6 +2282,7 @@
     "src/lib/server/db/schema/error_suggestions.ts",
     "src/lib/server/db/schema/error_timeline.ts",
     "src/lib/server/db/schema/evidence.ts",
+    "src/lib/server/db/schema/graph-pathway-cards.ts",
     "src/lib/server/db/schema/ingestion-jobs.ts",
     "src/lib/server/db/schema/jurisdictions.ts",
     "src/lib/server/db/schema/kag-dag.ts",
@@ -2559,11 +2611,13 @@
     "src/lib/server/ace/graph-expander.ts",
     "src/lib/server/ace/multi-lane-retrieval.ts",
     "src/lib/server/ace/retrieval-lanes.ts",
+    "src/lib/server/admin/ai-chat-service.ts",
     "src/lib/server/agents-md/parse-agents-md.ts",
     "src/lib/server/ai/context-compression.ts",
     "src/lib/server/ai/dev-context-planner.ts",
     "src/lib/server/ai/engram-memory.ts",
     "src/lib/server/ai/error-fix-memory.ts",
+    "src/lib/server/ai/external-research-agent.ts",
     "src/lib/server/ai/kv-context-controller.ts",
     "src/lib/server/ai/openai-facade.ts",
     "src/lib/server/cache/code-llm-index.ts",
@@ -2584,9 +2638,11 @@
     "src/lib/server/unified/legal-ai-service.ts",
     "src/lib/server/wiki/wiki-gap-analyzer.ts",
     "src/lib/workers/compute-worker.mjs",
+    "src/mcp/server.ts",
     "src/mcp/trace-mcp-server.ts",
     "src/routes/(app)/evidence/+page.server.ts",
     "src/routes/(app)/evidence/+server.ts",
+    "src/routes/api/admin/chat/+server.ts",
     "src/routes/api/auth/reset-password/+server.ts",
     "src/routes/api/canon/ingest/+server.ts",
     "src/routes/api/codebase-index/deep-research/+server.ts",
@@ -2609,11 +2665,14 @@
     "src/lib/server/hypergraph/hypergraph-search.ts",
     "src/mcp/tools/cluster-lenses.tool.ts",
     "src/mcp/tools/vault-walker.tool.ts",
+    "src/mcp/topology_mgmt_tools.ts",
     "src/mcp/trace-mcp-server.ts",
     "src/pgvector-search.ts",
     "src/routes/(app)/admin/api-testing/ast-topology/+server.ts",
     "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
     "src/routes/(app)/admin/error-analysis/+page.server.ts",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.server.ts",
+    "src/routes/api/admin/topology/recompute/+server.ts",
     "src/routes/api/hypergraph/search/+server.ts",
     "tests/analysis-uis.spec.ts",
     "tests/auth-api.spec.ts",
@@ -2691,7 +2750,6 @@
     "src/lib/server/vector/qdrant-manager.ts",
     "src/lib/server/vector-cache.ts",
     "src/lib/server/workers/video-vlm-processor.ts",
-    "src/mcp/server.ts",
     "src/routes/(app)/evidence/upload/+page.server.ts",
     "src/routes/api/ace/ingest/+server.ts",
     "src/routes/api/analysis/page-context/+server.ts",
@@ -3569,6 +3627,9 @@
     "src/mcp/tools/graph-analysis.tool.ts",
     "src/mcp/tools/trace-kag.tool.ts"
   ],
+  "EXTERNAL:$lib/server/redis/client.js": [
+    "src/lib/server/admin/ai-chat-context.ts"
+  ],
   "EXTERNAL:@langchain/ollama": [
     "src/lib/server/agent/autonomous-agent.ts",
     "src/lib/server/agent/subagents.ts",
@@ -3651,19 +3712,20 @@
   "EXTERNAL:onnxruntime-node": [
     "src/lib/server/ai/onnx-server.ts"
   ],
+  "EXTERNAL:jsdom": [
+    "src/lib/server/ai/web-search-utils.ts",
+    "src/lib/server/analytics/agentic-web-indexer.ts",
+    "src/lib/server/indexer/web-search-indexer.ts",
+    "src/lib/server/legal/html-normalizer.ts",
+    "src/lib/server/research/normalize-html.ts",
+    "src/routes/api/knowledge/+server.ts"
+  ],
   "EXTERNAL:p-limit": [
     "src/lib/server/analysis/batch-error-analysis.ts",
     "src/lib/server/analysis/concurrency-gate.ts",
     "src/lib/server/analysis/worker.ts",
     "src/lib/server/cache/cartridge-tensor-bridge.ts",
     "src/lib/server/cartridge/glyph-tile-engine.ts"
-  ],
-  "EXTERNAL:jsdom": [
-    "src/lib/server/analytics/agentic-web-indexer.ts",
-    "src/lib/server/indexer/web-search-indexer.ts",
-    "src/lib/server/legal/html-normalizer.ts",
-    "src/lib/server/research/normalize-html.ts",
-    "src/routes/api/knowledge/+server.ts"
   ],
   "EXTERNAL:@mendable/firecrawl-js": [
     "src/lib/server/analytics/unified-research-query.ts",
@@ -3899,6 +3961,8 @@
   "EXTERNAL:node:child_process": [
     "src/lib/server/indexer/web-search-indexer.ts",
     "src/lib/server/inference/inference-router.ts",
+    "src/mcp/admin_tools.ts",
+    "src/mcp/codebase_tools.ts",
     "src/mcp/trace-mcp-server.ts",
     "src/routes/api/error-brain/verify-fix/+server.ts",
     "tests/phase94-cli.spec.ts",
@@ -3906,6 +3970,13 @@
   ],
   "EXTERNAL:node:readline": [
     "src/lib/server/kb/search-logic.ts"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/client/index.js": [
+    "src/lib/server/mcp-client.ts",
+    "src/lib/server/research/github-mcp.ts"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/client/sse.js": [
+    "src/lib/server/mcp-client.ts"
   ],
   "EXTERNAL:uuid": [
     "src/lib/server/ml/user-history.ts",
@@ -3945,9 +4016,6 @@
   "EXTERNAL:events": [
     "src/lib/server/queue/rabbitmq-manager-fixed.ts"
   ],
-  "EXTERNAL:@modelcontextprotocol/sdk/client/index.js": [
-    "src/lib/server/research/github-mcp.ts"
-  ],
   "EXTERNAL:@modelcontextprotocol/sdk/client/stdio.js": [
     "src/lib/server/research/github-mcp.ts"
   ],
@@ -3966,6 +4034,10 @@
   "EXTERNAL:piper-wasm": [
     "src/lib/services/tts.ts"
   ],
+  "UNRESOLVED:...": [
+    "src/lib/stores/admin-chat-assistant.svelte.ts",
+    "src/routes/api/codebase-index/graph/+server.ts"
+  ],
   "EXTERNAL:@tensorflow/tfjs": [
     "src/lib/types/missing-modules.d.ts"
   ],
@@ -3982,6 +4054,7 @@
   ],
   "EXTERNAL:node:module": [
     "src/lib/utils/simd-markdown-parser.ts",
+    "src/mcp/trace-mcp-server.ts",
     "tests/build-codebase-relationships.spec.ts"
   ],
   "EXTERNAL:$lib/webgpu/webgpu-legal-graph": [
@@ -3993,11 +4066,25 @@
   "EXTERNAL:lokijs/src/loki-indexed-adapter": [
     "src/localDocs.svelte.ts"
   ],
-  "EXTERNAL:node:http": [
+  "EXTERNAL:@modelcontextprotocol/sdk/server/mcp.js": [
+    "src/mcp/admin_tools.ts",
+    "src/mcp/bifrost_tools.ts",
+    "src/mcp/codebase_tools.ts",
+    "src/mcp/db-inspection-tools.ts",
     "src/mcp/kb-retrieval-server.ts",
+    "src/mcp/new_tools.ts",
+    "src/mcp/research_tools.ts",
+    "src/mcp/skill_tools.ts",
+    "src/mcp/topology_mgmt_tools.ts",
     "src/mcp/trace-mcp-server.ts"
   ],
-  "EXTERNAL:@modelcontextprotocol/sdk/server/mcp.js": [
+  "EXTERNAL:node:util": [
+    "src/mcp/admin_tools.ts",
+    "src/mcp/codebase_tools.ts",
+    "src/mcp/trace-mcp-server.ts",
+    "src/routes/api/error-brain/verify-fix/+server.ts"
+  ],
+  "EXTERNAL:node:http": [
     "src/mcp/kb-retrieval-server.ts",
     "src/mcp/trace-mcp-server.ts"
   ],
@@ -4021,9 +4108,11 @@
   "EXTERNAL:playwright": [
     "src/mcp/server.ts"
   ],
-  "EXTERNAL:node:util": [
-    "src/mcp/trace-mcp-server.ts",
-    "src/routes/api/error-brain/verify-fix/+server.ts"
+  "EXTERNAL:form-data": [
+    "src/mcp/server.ts"
+  ],
+  "EXTERNAL:zod-to-json-schema": [
+    "src/mcp/zod-to-json-schema-bridge/index.js"
   ],
   "EXTERNAL:node-fetch": [
     "src/qdrant-client.ts",
@@ -4070,6 +4159,8 @@
     "src/routes/(app)/admin/phase89/+page.svelte",
     "src/routes/(app)/admin/qlora-training/+page.server.ts",
     "src/routes/(app)/admin/search-intelligence/+page.server.ts",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.server.ts",
+    "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
     "src/routes/(app)/analysis-center/+page.svelte",
     "src/routes/(app)/analytics/+page.server.ts",
     "src/routes/(app)/cases/+page.server.ts",
@@ -4169,6 +4260,7 @@
     "src/routes/api/admin/agent/fix/+server.ts",
     "src/routes/api/admin/audit/+server.ts",
     "src/routes/api/admin/cache-stats/+server.ts",
+    "src/routes/api/admin/chat/+server.ts",
     "src/routes/api/admin/inference-stats/+server.ts",
     "src/routes/api/admin/knowledge/+server.ts",
     "src/routes/api/admin/model/validate-checkpoint/+server.ts",
@@ -4601,6 +4693,7 @@
     "src/routes/api/reports/[id]/publish/+server.ts",
     "src/routes/api/research/concurrent-deep/+server.ts",
     "src/routes/api/research/concurrent-deep/stream/+server.ts",
+    "src/routes/api/research/external-deep/+server.ts",
     "src/routes/api/research/ingest/+server.ts",
     "src/routes/api/research/search/+server.ts",
     "src/routes/api/route-operations/log/+server.ts",
@@ -4712,9 +4805,11 @@
     "src/routes/+layout.ts",
     "src/routes/api/acp/execute/+server.ts",
     "src/routes/api/acp/tools/+server.ts",
+    "src/routes/api/admin/ai-chat/summarize-panel/+server.ts",
     "src/routes/api/analytics/focus/+server.ts",
     "src/routes/api/auth/debug/+server.ts",
     "src/routes/api/auth/health/+server.ts",
+    "src/routes/api/browser-context/snapshot/+server.ts",
     "src/routes/api/cases/[id]/connections/+server.ts",
     "src/routes/api/cases/[id]/timeline/+server.ts",
     "src/routes/api/codebase-index/deep-research/+server.ts",
@@ -4776,9 +4871,6 @@
   ],
   "EXTERNAL:@babel/traverse": [
     "src/routes/api/admin/routes/+server.ts"
-  ],
-  "UNRESOLVED:...": [
-    "src/routes/api/codebase-index/graph/+server.ts"
   ],
   "EXTERNAL:$lib/services/latency-logger": [
     "src/types/webgpu-shims.d.ts"
@@ -4880,6 +4972,7 @@
     "tests/theme-screenshots.spec.ts",
     "tests/ui-smoke-placeholder.spec.ts",
     "tests/ui-ux-walkthrough.spec.ts",
+    "tests/unified-indexing-studio.spec.ts",
     "tests/user-case-creation.spec.ts",
     "tests/user-migration.spec.ts",
     "tests/utils/seed-cases.ts",

@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-08T22:10:39.176Z",
-  "graphFiles": 3676,
+  "generatedAt": "2026-05-09T22:36:08.358Z",
+  "graphFiles": 3729,
   "gates": {
     "D9": {
       "name": "Likely orphans (0 fanIn, no dynImport ref)",
-      "count": 161,
+      "count": 163,
       "findings": [
         {
           "file": "src/lib/ai/base64-fp32-quantizer.ts",
@@ -18,6 +18,11 @@
         },
         {
           "file": "src/lib/client-logging.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "src/lib/components/admin/SummarizeButton.svelte",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },
@@ -768,6 +773,11 @@
         },
         {
           "file": "src/localDocs.svelte.ts",
+          "line": 1,
+          "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
+        },
+        {
+          "file": "src/mcp/kb-retrieval-server.ts",
           "line": 1,
           "snippet": "0 refs across static/dynamic/type/barrel/path scans; classification=true-orphan-candidate"
         },

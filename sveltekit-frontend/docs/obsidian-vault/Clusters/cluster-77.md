@@ -12,7 +12,7 @@ top_tags: ["embedding","vector","redis","auth","rabbitmq"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 contains: ["[[Files/src__lib__types__external-services]]","[[Files/src__lib__types__pipeline-v2]]","[[Files/src__lib__server__qdrant-http]]","[[Files/src__lib__server__types__qdrant]]","[[Files/src__lib__types__vector-jobs]]","[[Files/src__lib__types__database]]","[[Files/src__lib__server__vector__qdrant-manager]]","[[Files/src__lib__server__embedding__embed-schema]]"]
 same: ["[[Clusters/cluster-19]]","[[Clusters/cluster-20]]","[[Clusters/cluster-22]]","[[Clusters/cluster-24]]","[[Clusters/cluster-29]]"]

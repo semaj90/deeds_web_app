@@ -4,7 +4,7 @@ path: "src/lib/server/indexer/dual-embedder.ts"
 aliases: ["dual-embedder.ts","src/lib/server/indexer/dual-embedder.ts"]
 clusterId: 58
 ext: ".ts"
-lineCount: 577
+lineCount: 579
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 9
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/indexer/dual-embedder.ts"
-last_updated_by_llm: "2026-05-08T22:10:35.424Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-58]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/58","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-58]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 577
+lines:: 579
 ## Summary
 
 Dual Embedding Indexer

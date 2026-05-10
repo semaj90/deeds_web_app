@@ -1,14 +1,14 @@
 # AGENTS.md — Deeds Web App
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-08T21:57:37.606Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-09T22:22:23.446Z · agents.md spec · regen: npm run agents:write -->
 
 > Legal-AI platform: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > See [`CLAUDE.md`](./CLAUDE.md) for the canonical 600-line dev guide. This file is the agents.md-spec entry point — agents.md / Claude Code / Cursor / Codex all read it.
 
 ## Repo at a glance
 
-- **Frontend**: `sveltekit-frontend/` — SvelteKit + Svelte 5 runes only. 634 server routes across 1313 dirs, 3676 indexed files.
+- **Frontend**: `sveltekit-frontend/` — SvelteKit + Svelte 5 runes only. 644 server routes across 1327 dirs, 3729 indexed files.
 - **GPU bridge**: `simd-bridge/cpp/` — N-API addon for LibTorch CUDA + simdjson AVX2.
 - **Go services**: `go-microservice/`, `services/go-retrieval-service/` — gRPC :50051-50057 (see `CLAUDE.md#grpc-port-map`).
 - **Docs**: `docs/graph/codebase-graph.json` (auto), `docs/graph/codebase-map.md`, `docs/ace-kag-howto.md`, `docs/agents-md-howto.md`.
@@ -17,8 +17,8 @@
 
 | Gate | Status |
 |------|--------|
-| G4  Auth on API routes | 698✅ / 32❌ |
-| G5  Zod on body-parsing routes | 500✅ / 1❌ |
+| G4  Auth on API routes | 712✅ / 29❌ |
+| G5  Zod on body-parsing routes | 506✅ / 3❌ |
 | G15 SSR-unsafe globals (real) | 1❌ |
 | G20 Cyclic import pairs | 0 |
 
@@ -57,7 +57,6 @@ npm run smoke:graphify          # 5-pillar codebase intelligence health check
 - **Frontend directory wiki** (LLM jump table): [`sveltekit-frontend/AGENTS.md`](./sveltekit-frontend/AGENTS.md) — every dir + cluster + KAG slug + tool call
 - **Per-directory context** (~250 files): `AGENTS.md` files throughout `sveltekit-frontend/src/` — agents auto-discover via tree walk
 - **AGENTS.md system how-to**: [`sveltekit-frontend/docs/agents-md-howto.md`](./sveltekit-frontend/docs/agents-md-howto.md) — generation, idempotency, cache integration, reranking pattern
-- **Pipeline Architecture**: [`docs/KARPATHY_PIPELINE_ARCHITECTURE.md`](./docs/KARPATHY_PIPELINE_ARCHITECTURE.md) — Dual-lane split (Ollama vs llama-server) + Chunk Identity Spine
 - **Root long-form docs**: [`CLAUDE.md`](./CLAUDE.md), [`docs/ace-kag-howto.md`](./docs/ace-kag-howto.md)
 - **Audit dashboard**: [`sveltekit-frontend/docs/graph/codebase-map.md`](./sveltekit-frontend/docs/graph/codebase-map.md)
 - **Cluster digest**: [`sveltekit-frontend/docs/graph/hypergraph-clusters.md`](./sveltekit-frontend/docs/graph/hypergraph-clusters.md)

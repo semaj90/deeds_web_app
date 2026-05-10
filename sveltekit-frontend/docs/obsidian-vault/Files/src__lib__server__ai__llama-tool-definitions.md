@@ -4,7 +4,7 @@ path: "src/lib/server/ai/llama-tool-definitions.ts"
 aliases: ["llama-tool-definitions.ts","src/lib/server/ai/llama-tool-definitions.ts"]
 clusterId: 19
 ext: ".ts"
-lineCount: 339
+lineCount: 403
 pagerank: 0
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: true
 importCount: 1
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ai/llama-tool-definitions.ts"
-last_updated_by_llm: "2026-05-08T16:50:32.855Z"
+last_updated_by_llm: "2026-05-09T22:35:57.577Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-19]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/19","zod","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-19]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 339
+lines:: 403
 ## Summary
 
 llama-tool-definitions.ts
