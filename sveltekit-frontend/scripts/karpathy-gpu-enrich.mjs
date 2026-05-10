@@ -36,6 +36,8 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import Redis from 'ioredis';
 import pg from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -614,21 +616,20 @@ async function writeByLaneHash(redis, enriched) {
   if (!DATABASE_URL) return { skipped: true, reason: 'DATABASE_URL not set' };
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2, connectionTimeoutMillis: 5000 });
   try {
-    // Build stableKey → blend map for quick lookup
-    const blendMap = new Map(enriched.map(e => [e.stableKey, e.blend]));
-    const keys = enriched.map(e => e.stableKey);
-    if (!keys.length) return { skipped: true, reason: 'no enriched files' };
+    // Build stableKey → blend map for quick lookup (0 default for files not in top-50)
+    const blendMap = enriched ? new Map(enriched.map(e => [e.stableKey, e.blend])) : new Map();
 
-    // Query feature_file_edges — join to feature_implementations for lane_ids
+    // Query ALL active feature_file_edges (not filtered to Karpathy top-50).
+    // Karpathy top-50 are infra files; feature atlas edges point to ACE/retrieval files.
+    // We use blendMap for any overlap; non-overlapping edges get blend=0.
     const { rows } = await pool.query(`
       SELECT DISTINCT
         ffe.file_path,
         fi.lane_ids
       FROM feature_file_edges ffe
       JOIN feature_implementations fi USING (feature_key)
-      WHERE ffe.file_path = ANY($1::text[])
-        AND fi.status = 'active'
-    `, [keys]);
+      WHERE fi.status = 'active'
+    `);
 
     // Invert: lane → [{ file, blend }] sorted desc
     const byLane = {};
@@ -727,10 +728,16 @@ async function main() {
     }
   }
 
-  // Fetch embeddings (sequential — Qdrant scroll-by-filter is fast, ~50ms each)
+  // Batch-fetch embeddings: ceil(N/100) Qdrant requests instead of N sequential
+  const t0embed = Date.now();
+  const embeddingMap = await fetchEmbeddingsBatch(candidates.map(c => c.stableKey));
+  log.qdrantBatchMs = Date.now() - t0embed;
+  log.qdrantBatches = Math.ceil(candidates.length / QDRANT_BATCH_SIZE);
+  console.log(`[karpathy] Qdrant batch: ${embeddingMap.size} hits in ${log.qdrantBatchMs}ms (${log.qdrantBatches} req)`);
+
   const enriched = [];
   for (const c of candidates) {
-    const emb = await fetchEmbedding(c.stableKey);
+    const emb = embeddingMap.get(c.stableKey);
     if (emb && emb.length === 768) {
       enriched.push({ ...c, embedding: emb });
       log.embedded++;
