@@ -134,6 +134,8 @@ export default defineConfig({
       'tests/routes/auto/**/*.test.ts',
       // parallel ACE retrieval lane tests (added 2026-05-06)
       'tests/retrieval-lanes.spec.ts',
+      // RRF fusion module (Phase 1C — sparse + dense lane combiner, 2026-05-10)
+      'tests/rrf-fuse.spec.ts',
       // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
