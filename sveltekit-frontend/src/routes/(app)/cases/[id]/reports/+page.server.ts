@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db/client';
-import { reports, cases } from '$lib/server/db/schema';
+import { reports } from '$lib/server/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
@@ -11,8 +11,12 @@ const safe = <T>(p: Promise<T>, fallback: T): Promise<T> =>
     () => fallback
   );
 
-export const load: PageServerLoad = async ({ locals, params }) => {
-  // Phase 79: Lucia v3 Authentication Guard
+/**
+ * Reports sub-route load. Previously re-fetched the case independently; now
+ * reads it from `await parent()` (layout already loaded the full row).
+ * Reports query (sorted desc by createdAt, capped at 20) stays here.
+ */
+export const load: PageServerLoad = async ({ locals, params, parent }) => {
   if (!locals.user) {
     throw redirect(302, '/login');
   }
@@ -35,9 +39,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     /* miss */
   }
 
-  // Load case data + reports in parallel
-  const [caseRows, reportRows] = await Promise.all([
-    safe(db.select().from(cases).where(eq(cases.id, caseId)).limit(1), []),
+  // caseData from layout via parent(); reports fetched here
+  const [{ caseData }, reportRows] = await Promise.all([
+    parent(),
     safe(
       db
         .select()
@@ -51,7 +55,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
   const result = {
     user: locals.user,
-    caseData: caseRows[0] || null,
+    caseData: caseData || null,
     reports: reportRows || [],
   };
 

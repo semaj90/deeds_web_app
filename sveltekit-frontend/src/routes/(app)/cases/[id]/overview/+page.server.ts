@@ -1,12 +1,22 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db/client';
-import { cases, evidence, personsOfInterest } from '$lib/server/db/schema-postgres.js';
+import { evidence, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { arrayContains, eq } from 'drizzle-orm';
-import { clientKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
+import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+
+/**
+ * Overview sub-route load. Previously re-fetched the case row; now reads the
+ * raw case from `await parent()` and builds the enriched WHO/WHAT/WHEN/WHERE
+ * view shape from it. Evidence + persons fetches stay here (they are
+ * overview-specific).
+ *
+ * Output shape is unchanged — only the case-fetch source changed.
+ */
+export const load: PageServerLoad = async ({ locals, params, parent }) => {
   if (!locals.user) {
     throw redirect(302, '/login');
   }
@@ -31,11 +41,19 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     /* miss */
   }
 
-  const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
-
-  const caseRows = await safe(db.select().from(cases).where(eq(cases.id, id)).limit(1), []);
-
-  const caseRow = caseRows[0];
+  // caseRow from layout; evidence + persons fetched here in parallel.
+  const [{ caseData: caseRow }, evidenceRows, personRows] = await Promise.all([
+    parent(),
+    safe(db.select().from(evidence).where(eq(evidence.caseId, id)).limit(50), []),
+    safe(
+      db
+        .select()
+        .from(personsOfInterest)
+        .where(arrayContains(personsOfInterest.caseIds, [id]))
+        .limit(20),
+      []
+    ),
+  ]);
 
   if (!caseRow) {
     return {
@@ -53,18 +71,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
       loadError: 'Case not found or database unavailable',
     };
   }
-
-  const [evidenceRows, personRows] = await Promise.all([
-    safe(db.select().from(evidence).where(eq(evidence.caseId, id)).limit(50), []),
-    safe(
-      db
-        .select()
-        .from(personsOfInterest)
-        .where(arrayContains(personsOfInterest.caseIds, [id]))
-        .limit(20),
-      []
-    ),
-  ]);
 
   // Build WHO from client + opposing party + linked persons
   const whoParts: string[] = [];
