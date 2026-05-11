@@ -265,11 +265,26 @@ export async function loginAsDemoUser(
 	const password = opts.password ?? 'password123';
 
 	await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 10000 });
-	await page.fill('input[name="username"]', username).catch(async () => {
-		// Fallback selector if form uses email field name:
-		await page.fill('input[type="email"], input[name="email"]', username);
-	});
-	await page.fill('input[name="password"], input[type="password"]', password);
+
+	// DEV_BYPASS_AUTH=true (set by `npm run dev`) auto-authenticates every request,
+	// so /login redirects to / and the form never mounts. Treat that as "already
+	// logged in" and bail out — every authed route works without a session cookie.
+	// (Real bug fixed 2026-05-11 after cases-list.diagnostic.spec.ts hung waiting
+	// for an input that never appears.)
+	if (!page.url().includes('/login')) return;
+
+	// The YORHA login form is inside a Bits UI Dialog that mounts post-hydration.
+	// Wait for the email/username input to be visible+enabled before fill.
+	const userInput = page
+		.locator('input[name="username"], input[type="email"], input[name="email"]')
+		.first();
+	await userInput.waitFor({ state: 'visible', timeout: 10000 });
+	await userInput.fill(username);
+
+	const passInput = page.locator('input[name="password"], input[type="password"]').first();
+	await passInput.waitFor({ state: 'visible', timeout: 5000 });
+	await passInput.fill(password);
+
 	await page.click('button[type="submit"]');
 	// SvelteKit form actions redirect on success; wait for landing.
 	await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
