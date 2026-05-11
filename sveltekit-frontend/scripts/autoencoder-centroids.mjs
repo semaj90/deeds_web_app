@@ -2,116 +2,277 @@
 /**
  * scripts/autoencoder-centroids.mjs
  *
- * Computes mean centroids in 64d encoded space for each som_cluster.
+ * Computes mean centroids in 64d encoded space for each som_cluster,
+ * then writes them to Redis at gpu:autoencoder:centroids_64.
+ *
+ * Primary path: reads 'encoded_64' named vectors already backfilled by
+ * autoencoder-backfill-qdrant.mjs (run that first).
+ *
+ * Fallback: if a point lacks encoded_64, encodes from 'content' on-the-fly
+ * using weights loaded from Redis.
  *
  * Usage:
- *   node scripts/autoencoder-centroids.mjs --collection codebase_chunks_768
+ *   npm run autoencoder:centroids             (defaults to --dry-run)
+ *   npm run autoencoder:centroids -- --dry-run
+ *   npm run autoencoder:centroids -- --min-cluster 3
  */
-import process from 'node:process';
-import { scrollPoints } from '../src/lib/server/qdrant-http.ts';
-import { getCachedAutoencoderWeights } from '../src/lib/server/gpu/autoencoder-weights.ts';
-import { autoencoderEncode } from '../src/lib/server/gpu/topology-projection.js';
-import Redis from 'ioredis';
+
+import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const QDRANT_URL     = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const REDIS_URL      = process.env.REDIS_URL  ?? 'redis://localhost:6379';
+const COLLECTION     = 'codebase_chunks_768';
+const CENTROIDS_KEY  = 'gpu:autoencoder:centroids_64';
+const META_KEY       = 'gpu:autoencoder:centroids_64_meta';
+const CONTENT_DIM    = 768;
+const HIDDEN_DIM     = 256;
+const ENCODED_DIM    = 64;
+const SCROLL_BATCH   = 200;
+
 const args = process.argv.slice(2);
-const COLLECTION = args.find(a => a.startsWith('--collection='))?.split('=')[1] ?? 'codebase_chunks_768';
-const MIN_CLUSTER_SIZE = 5;
+const FLAGS = {
+    dryRun:     args.includes('--dry-run') || args.length === 0,
+    minCluster: parseArg(args, '--min-cluster', 5),
+    limit:      parseArg(args, '--limit', Infinity),
+    quiet:      args.includes('--quiet'),
+};
 
+function parseArg(argv, flag, fallback) {
+    const eq = argv.find(a => a.startsWith(`${flag}=`));
+    if (eq) return Number(eq.slice(flag.length + 1));
+    const idx = argv.indexOf(flag);
+    if (idx >= 0 && argv[idx + 1]) return Number(argv[idx + 1]);
+    return fallback;
+}
+
+const log = (...a) => { if (!FLAGS.quiet) console.log(...a); };
+
+// ── Redis (cold-start safe) ───────────────────────────────────────────────────
+function makeRedis() {
+    const r = new Redis(REDIS_URL, {
+        lazyConnect:          true,
+        maxRetriesPerRequest: 1,
+        enableOfflineQueue:   false,
+        retryStrategy:        () => null,
+    });
+    r.on('error', () => {});
+    return r;
+}
+
+// ── Load weights from Redis ───────────────────────────────────────────────────
+async function loadWeights(redis) {
+    const [w, meta] = await Promise.all([
+        redis.hgetall('ace:autoencoder:weights'),
+        redis.hgetall('ace:autoencoder:meta'),
+    ]);
+    if (!w?.W1 || !meta?.trainedAt) {
+        throw new Error('Autoencoder weights missing in Redis. Run autoencoder training first.');
+    }
+    const parse = (csv) => new Float32Array(csv.split(',').map(Number));
+    return {
+        W1: parse(w.W1),
+        b1: parse(w.b1),
+        W2: parse(w.W2),
+        b2: parse(w.b2),
+        trainedAt: meta.trainedAt,
+        bestLoss:  Number(meta.bestLoss ?? 0),
+    };
+}
+
+// ── CPU encode: tanh(data @ W^T + b) ─────────────────────────────────────────
+function encodeLayer(data, n, inputDim, W, b, outputDim) {
+    const out = new Float32Array(n * outputDim);
+    for (let i = 0; i < n; i++) {
+        const xOff = i * inputDim;
+        const yOff = i * outputDim;
+        for (let h = 0; h < outputDim; h++) {
+            let act = b[h];
+            const wOff = h * inputDim;
+            for (let d = 0; d < inputDim; d++) {
+                act += data[xOff + d] * W[wOff + d];
+            }
+            out[yOff + h] = Math.tanh(act);
+        }
+    }
+    return out;
+}
+
+function encode768to64(vec768, weights) {
+    const h = encodeLayer(vec768, 1, CONTENT_DIM, weights.W1, weights.b1, HIDDEN_DIM);
+    const z = encodeLayer(h, 1, HIDDEN_DIM, weights.W2, weights.b2, ENCODED_DIM);
+    return z;
+}
+
+// ── Qdrant helpers ────────────────────────────────────────────────────────────
+async function qdrantGet(path) {
+    const res = await fetch(`${QDRANT_URL}${path}`);
+    if (!res.ok) throw new Error(`GET ${path} → ${res.status} ${await res.text()}`);
+    return res.json();
+}
+
+async function qdrantPost(path, body) {
+    const res = await fetch(`${QDRANT_URL}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`POST ${path} → ${res.status} ${await res.text()}`);
+    return res.json();
+}
+
+async function hasVectorSlot(name) {
+    const info = await qdrantGet(`/collections/${COLLECTION}`);
+    const vectors = info.result?.config?.params?.vectors ?? {};
+    return !!vectors[name];
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-	console.log(`[centroids] Computing centroids for ${COLLECTION}`);
-	const weights = await getCachedAutoencoderWeights();
-	const redis = new Redis(REDIS_URL);
+    log('=== Autoencoder Centroids (64d) ===');
+    log(`[cfg] dryRun=${FLAGS.dryRun} minCluster=${FLAGS.minCluster} limit=${FLAGS.limit}`);
 
-	const clusters = new Map(); // clusterId -> { sum: Float32Array, count: number }
+    const redis = makeRedis();
+    let weights;
+    try {
+        await redis.connect();
+        await redis.ping();
+        weights = await loadWeights(redis);
+        log(`[weights] trainedAt=${weights.trainedAt} bestLoss=${weights.bestLoss}`);
+        if (weights.bestLoss === 0) {
+            console.warn('[centroids] WARNING: bestLoss=0 — weights may be untrained Xavier init.');
+        }
+    } finally {
+        if (FLAGS.dryRun) redis.disconnect();
+        // In live mode, keep connection open for writes at the end
+    }
 
-	let offset = undefined;
-	let totalScanned = 0;
+    // Check if encoded_64 slot exists — if so, read it directly (faster)
+    const hasEncoded64 = await hasVectorSlot('encoded_64');
+    const withVectors = hasEncoded64 ? ['encoded_64', 'content'] : ['content'];
+    log(`[qdrant] encoded_64 slot: ${hasEncoded64 ? 'present (primary path)' : 'absent (fallback: encode from content)'}`);
 
-	while (true) {
-		const { points, nextOffset } = await scrollPoints({
-			collection: COLLECTION,
-			limit: 500,
-			offset,
-			withVector: true, // Need encoded_64
-			withPayload: true // Need som_cluster
-		});
+    // Scroll Qdrant — request vectors + som_cluster payload
+    const clusters = new Map(); // clusterId -> { sum: Float32Array(64), count: number }
+    let offset       = null;
+    let totalScanned = 0;
+    let primary      = 0; // used encoded_64 directly
+    let fallback     = 0; // encoded from content on-the-fly
+    let noVector     = 0;
+    let noCluster    = 0;
 
-		if (!points.length) break;
+    log(`[qdrant] Scrolling ${COLLECTION}...`);
 
-		for (const pt of points) {
-			totalScanned++;
-			const clusterId = pt.payload?.som_cluster;
-			if (clusterId === undefined || clusterId === null) continue;
+    while (totalScanned < FLAGS.limit) {
+        const batchLimit = Math.min(SCROLL_BATCH, FLAGS.limit - totalScanned);
+        const scrollData = await qdrantPost(`/collections/${COLLECTION}/points/scroll`, {
+            limit:        batchLimit,
+            offset,
+            with_payload: ['som_cluster'],
+            with_vector:  withVectors,
+        });
+        const points = scrollData.result?.points ?? [];
+        if (points.length === 0) break;
+        offset = scrollData.result?.next_page_offset ?? null;
 
-			// Support both flat and named vector, or project from 768d on the fly
-			let encodedVec = pt.vector?.encoded_64 ?? (Array.isArray(pt.vector) && pt.vector.length === 64 ? pt.vector : null);
-			
-			if (!encodedVec) {
-				const contentVec = pt.vector?.content ?? (Array.isArray(pt.vector) && pt.vector.length === 768 ? pt.vector : null);
-				if (contentVec) {
-					// Project 768 -> 256 -> 64
-					const res1 = await autoencoderEncode(new Float32Array(contentVec), weights.W1, weights.b1, { n: 1, dim: 768, outDim: 256 });
-					if (res1.ok) {
-						const res2 = await autoencoderEncode(res1.projected, weights.W2, weights.b2, { n: 1, dim: 256, outDim: 64 });
-						if (res2.ok) encodedVec = Array.from(res2.projected);
-					}
-				}
-			}
+        for (const pt of points) {
+            totalScanned++;
+            const clusterId = pt.payload?.som_cluster;
+            if (clusterId === undefined || clusterId === null) {
+                noCluster++;
+                continue;
+            }
 
-			if (!encodedVec) continue;
+            // Try encoded_64 first, fall back to encoding content on-the-fly
+            let encoded64 = pt.vector?.encoded_64;
+            if (Array.isArray(encoded64) && encoded64.length === ENCODED_DIM) {
+                primary++;
+            } else {
+                const contentVec = pt.vector?.content;
+                if (!Array.isArray(contentVec) || contentVec.length !== CONTENT_DIM) {
+                    noVector++;
+                    continue;
+                }
+                const z = encode768to64(new Float32Array(contentVec), weights);
+                encoded64 = Array.from(z);
+                fallback++;
+            }
 
-			if (!clusters.has(clusterId)) {
-				clusters.set(clusterId, { sum: new Float32Array(64), count: 0 });
-			}
-			const entry = clusters.get(clusterId);
-			for (let i = 0; i < 64; i++) entry.sum[i] += encodedVec[i];
-			entry.count++;
-		}
+            if (!clusters.has(clusterId)) {
+                clusters.set(clusterId, { sum: new Float32Array(ENCODED_DIM), count: 0 });
+            }
+            const entry = clusters.get(clusterId);
+            for (let i = 0; i < ENCODED_DIM; i++) entry.sum[i] += encoded64[i];
+            entry.count++;
+        }
 
-		console.log(`[centroids] Scanned ${totalScanned} points...`);
-		if (!nextOffset) break;
-		offset = nextOffset;
-	}
+        log(`  scanned=${totalScanned} primary=${primary} fallback=${fallback} clusters=${clusters.size}`);
+        if (!offset) break;
+    }
 
-	const hashFields = {};
-	let clusterCount = 0;
-	let totalPoints = 0;
+    // Compute centroids
+    const hashFields = {};
+    let kept = 0;
+    let dropped = 0;
+    for (const [id, entry] of clusters.entries()) {
+        if (entry.count < FLAGS.minCluster) {
+            dropped++;
+            continue;
+        }
+        const centroid = new Float32Array(ENCODED_DIM);
+        for (let i = 0; i < ENCODED_DIM; i++) centroid[i] = entry.sum[i] / entry.count;
+        hashFields[`cluster_${id}`] = Array.from(centroid).join(',');
+        kept++;
+    }
 
-	for (const [id, entry] of clusters.entries()) {
-		if (entry.count < MIN_CLUSTER_SIZE) {
-			console.log(`[centroids] Skipping cluster ${id} (size ${entry.count} < ${MIN_CLUSTER_SIZE})`);
-			continue;
-		}
+    log(`\n[centroids] ${kept} clusters kept (≥${FLAGS.minCluster} members), ${dropped} dropped.`);
 
-		const centroid = new Float32Array(64);
-		for (let i = 0; i < 64; i++) centroid[i] = entry.sum[i] / entry.count;
-		
-		hashFields[`cluster_${id}`] = Array.from(centroid).join(',');
-		clusterCount++;
-		totalPoints += entry.count;
-	}
+    if (!FLAGS.dryRun) {
+        if (kept > 0) {
+            await redis.hset(CENTROIDS_KEY, hashFields);
+            await redis.hset(META_KEY, {
+                trainedAt:    weights.trainedAt,
+                clusterCount: String(kept),
+                totalPoints:  String(totalScanned),
+                computedAt:   new Date().toISOString(),
+            });
+            log(`[redis] Wrote ${kept} centroids to '${CENTROIDS_KEY}'.`);
+        } else {
+            console.warn('[centroids] No clusters met minimum size — Redis not updated.');
+        }
+        redis.disconnect();
+    }
 
-	if (clusterCount > 0) {
-		await redis.hset('gpu:autoencoder:centroids_64', hashFields);
-		await redis.hset('gpu:autoencoder:centroids_64_meta', {
-			trainedAt: weights.trainedAt,
-			clusterCount: clusterCount.toString(),
-			totalPoints: totalPoints.toString(),
-			computedAt: new Date().toISOString()
-		});
-		console.log(`[centroids] Wrote ${clusterCount} centroids to Redis.`);
-	} else {
-		console.warn(`[centroids] No valid clusters found.`);
-	}
+    log('\nFinal Summary:');
+    log(`- Scanned:    ${totalScanned}`);
+    log(`- Primary:    ${primary} (used encoded_64)`);
+    log(`- Fallback:   ${fallback} (encoded from content)`);
+    log(`- No-vector:  ${noVector}`);
+    log(`- No-cluster: ${noCluster}`);
+    log(`- Centroids:  ${kept} written, ${dropped} dropped`);
 
-	await redis.quit();
-	console.log(`[centroids] Finished.`);
+    const machineSummary = {
+        dryRun:       FLAGS.dryRun,
+        limit:        FLAGS.limit === Infinity ? null : FLAGS.limit,
+        scanned:      totalScanned,
+        centroidsKept: FLAGS.dryRun ? 0 : kept,
+        centroidsDropped: dropped,
+        primary,
+        fallback,
+        noVector,
+        noCluster,
+    };
+    console.log(`[autoencoder:centroids] summary=${JSON.stringify(machineSummary)}`);
+
+    if (FLAGS.dryRun && machineSummary.centroidsKept > 0) {
+        console.error('[FATAL] Dry-run violation in centroids script!');
+        process.exit(2);
+    }
 }
 
 main().catch(err => {
-	console.error(`[centroids] Error:`, err);
-	process.exit(1);
+    console.error('[autoencoder:centroids] Fatal:', err);
+    process.exit(1);
 });
