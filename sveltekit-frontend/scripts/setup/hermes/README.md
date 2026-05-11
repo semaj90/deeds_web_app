@@ -97,6 +97,52 @@ docker compose -f "$env:USERPROFILE\Downloads\Hermes-Ollama\local-deep-research-
 Remove-Item -Recurse -Force "$env:USERPROFILE\.hermes"
 ```
 
+## Day-to-day operation (after first install)
+
+Once `setup-hermes-desktop-ollama.ps1` has been run once, **never run it again
+for normal startup** — it's an installer, not a launcher. Use the focused
+starter instead:
+
+```powershell
+.\start-hermes-stack.ps1            # opens browser
+.\start-hermes-stack.ps1 -NoBrowser # CLI-only
+```
+
+Or double-click **"Start Hermes Stack.lnk"** on the desktop.
+
+The starter:
+- Sets the RTX 3060 Ti GPU-tuned env vars (idempotent — only writes if changed)
+- Starts Ollama if `:11434` is down
+- `docker start`s `local-deep-research` + `searxng` containers if they exist + stopped
+- Launches Hermes Workspace via `node node_modules/vite/bin/vite.js dev`
+  (bypasses pnpm 11's `ERR_PNPM_IGNORED_BUILDS` gotcha)
+- Waits up to 60s for `:3000`, then opens the browser
+
+**Typical runtime: 5-15 seconds** (every step is "already running" after warm boot).
+
+### RTX 3060 Ti tuning details
+
+| Variable | Value | Why |
+|---|---|---|
+| `OLLAMA_FLASH_ATTENTION` | `1` | Flash Attention 2 (faster + lower VRAM) |
+| `OLLAMA_KV_CACHE_TYPE` | `q8_0` | 8-bit KV quant — 50% VRAM savings vs f16 |
+| `OLLAMA_CONTEXT_LENGTH` | `65536` | 64K context; fits with q8_0 KV on 8GB card |
+| `OLLAMA_NUM_PARALLEL` | `1` | Single request — 8GB can't share VRAM safely |
+| `OLLAMA_KEEP_ALIVE` | `30m` | Keep model resident, avoid reload churn |
+| `OLLAMA_MAX_LOADED_MODELS` | `1` | Never hold 2 models in VRAM (8GB is tight) |
+| `OLLAMA_GPU_OVERHEAD` | `0` | Use all available VRAM (no headroom reserve) |
+| `OLLAMA_NUM_GPU` | `999` | Offload all model layers to GPU |
+| `OLLAMA_LLM_LIBRARY` | `cuda_v12` | Explicit CUDA 12 — avoids detection ambiguity |
+
+VRAM budget for `gemma4-hermes-64k:latest` on RTX 3060 Ti:
+
+| Component | VRAM |
+|---|---|
+| Model weights (q4_K_M) | ~4.8 GB |
+| q8_0 KV cache @ 64K context | ~1.5 GB |
+| CUDA workspace + Flash Attention | ~0.3 GB |
+| **Total** | **~6.6 GB** (1.4 GB free) |
+
 ## Cross-references
 
 - Upstream: from `irm https://raw.githubusercontent.com/NousResearch/...`
