@@ -218,3 +218,76 @@ export async function captureRouteLoad(
 export function hardErrorCount(log: CapturedLog): number {
 	return log.pageErrors.filter((e) => !e.message.includes('Failed to fetch')).length;
 }
+
+/**
+ * Log in as the seeded demo user via the real /login form action.
+ *
+ * Why: forensic specs need authenticated content paths, not just login-redirect
+ * pages. AUTH_REDIRECT (predicted ~7 routes in triage doc §2) is silenced when
+ * specs start with this helper in beforeEach.
+ *
+ * Works regardless of DEV_BYPASS_AUTH state — uses the same path a real user
+ * would. Sets the Lucia session cookie that hooks.server.ts reads on every
+ * subsequent request. ~300-500ms per call.
+ *
+ * Pre-req: `npm run db:seed` has created demo@legal-ai.local with password123
+ * (default state — see src/lib/server/db/seed.ts).
+ *
+ * Usage pattern (copy into any spec that needs an authed user):
+ *
+ *   import { loginAsDemoUser } from './_helpers';
+ *
+ *   test.describe.serial('my route', () => {
+ *     test.beforeEach(async ({ page }) => {
+ *       await loginAsDemoUser(page);
+ *     });
+ *     test('renders authenticated content', async ({ page }) => {
+ *       const log = await captureRouteLoad(page, '/my/route');
+ *       expect(log.pageErrors).toHaveLength(0);
+ *     });
+ *   });
+ *
+ * Failure modes:
+ * - Login form selectors moved → throws; update selectors in this helper
+ * - Demo user missing → 400 'Invalid credentials' surfaces in log.responses;
+ *   re-seed with `npm run db:seed`
+ * - DEV_BYPASS_AUTH=true server-side: login still works (cookie path is fine);
+ *   the bypass and the cookie cohabit cleanly per hooks.server.ts:705
+ *
+ * For tests that explicitly want UNauthenticated state (e.g. testing the
+ * redirect path itself), do NOT call this helper.
+ */
+export async function loginAsDemoUser(
+	page: Page,
+	opts: { email?: string; password?: string } = {}
+): Promise<void> {
+	const username = opts.email ?? 'demo@legal-ai.local';
+	const password = opts.password ?? 'password123';
+
+	await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 10000 });
+	await page.fill('input[name="username"]', username).catch(async () => {
+		// Fallback selector if form uses email field name:
+		await page.fill('input[type="email"], input[name="email"]', username);
+	});
+	await page.fill('input[name="password"], input[type="password"]', password);
+	await page.click('button[type="submit"]');
+	// SvelteKit form actions redirect on success; wait for landing.
+	await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
+}
+
+/**
+ * Lightweight auth check — visits a small authenticated probe endpoint and
+ * returns whether the session is active. Use to decide between login flow
+ * and dev-bypass shortcut, or just for diagnostics inside a spec.
+ *
+ * Returns null when the probe endpoint doesn't exist (older builds).
+ */
+export async function isAuthenticated(page: Page): Promise<boolean | null> {
+	try {
+		const res = await page.request.get(`${BASE}/api/auth/me`, { timeout: 3000 });
+		if (res.status() === 404) return null;
+		return res.ok();
+	} catch {
+		return null;
+	}
+}
