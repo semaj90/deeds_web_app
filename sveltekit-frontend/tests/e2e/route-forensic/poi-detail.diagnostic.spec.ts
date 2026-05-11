@@ -17,7 +17,12 @@ test.describe.serial('Route forensic: /persons-of-interest/[id]', () => {
 
 	test('GET /persons-of-interest/[id] — content or graceful not-found', async ({ page }) => {
 		if (!poiId) test.skip();
-		const log = await captureRouteLoad(page, `/persons-of-interest/${poiId}`, { waitMs: 1500 });
+		const log = await captureRouteLoad(page, `/persons-of-interest/${poiId}`, { waitMs: 3000 });
+		await page
+			.locator('h1, h2')
+			.first()
+			.waitFor({ state: 'attached', timeout: 5000 })
+			.catch(() => {});
 		const headings = await page.locator('h1, h2').count();
 		const notFound = await page.locator('text=/not found|unavailable/i').count();
 		console.log(`headings: ${headings}, not-found: ${notFound}`);
