@@ -165,6 +165,8 @@ export default defineConfig({
       'tests/agents-regen-loaders.spec.ts',
       // Phase A1.3 + A1.4 — Redis loader contracts (karpathy + cluster summaries)
       'tests/agents-regen-redis-loaders.spec.ts',
+      // Phase A1.5 + A1.6 — Postgres loader contracts (features + activity rollup)
+      'tests/agents-regen-pg-loaders.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
