@@ -1,85 +1,46 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { authMachine } from '$lib/machines/auth-machine.js';
-	import { createActor } from 'xstate';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 	import { fade, fly } from 'svelte/transition';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { registerSchema } from './schema.js';
+	import type { PageData } from './$types';
 
-	let firstName = $state('');
-	let lastName = $state('');
-	let email = $state('');
-	let password = $state('');
-	let confirmPassword = $state('');
+	let { data }: { data: PageData } = $props();
+
+	// Superforms v2 — server-validated registration with Zod adapter.
+	// svelte-ignore state_referenced_locally
+	const { form, errors, message, enhance, submitting, delayed } = superForm(data.form, {
+		validators: zodClient(registerSchema as any),
+		resetForm:  false,
+		invalidateAll: false,
+		onResult({ result }) {
+			if (result.type === 'redirect') {
+				step = 'success';
+			}
+		},
+	});
+
 	let showPassword = $state(false);
 	let step = $state<'form' | 'success'>('form');
 
-	const actor = createActor(authMachine);
-	let snapshot = $state(actor.getSnapshot());
-
-	$effect(() => {
-		actor.start();
-		const sub = actor.subscribe((s) => {
-			snapshot = s;
-		});
-		return () => {
-			sub.unsubscribe();
-			actor.stop();
-		};
-	});
-
-	let isLoading = $derived(snapshot.matches('registering'));
-	let isAuthenticated = $derived(snapshot.matches('authenticated'));
-	let errorMessage = $derived(snapshot.context.error);
-
-	// Redirect on successful registration
-	$effect(() => {
-		if (isAuthenticated) {
-			step = 'success';
-			// Brief pause to show success state, then redirect to dashboard
-			// Authenticated app routes decide whether onboarding should appear
-			setTimeout(() => goto('/dashboard'), 1500);
-		}
-	});
-
-	// Validation
-	let passwordsMatch = $derived(password === confirmPassword);
+	// Derived password strength (client-only — server enforces 8-char min via Zod).
 	let passwordStrength = $derived.by(() => {
-		if (!password) return { score: 0, label: '', color: '' };
+		const p = $form.password ?? '';
+		if (!p) return { score: 0, label: '', color: '' };
 		let score = 0;
-		if (password.length >= 8) score++;
-		if (password.length >= 12) score++;
-		if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
-		if (/\d/.test(password)) score++;
-		if (/[^A-Za-z0-9]/.test(password)) score++;
-
-		if (score <= 1) return { score, label: 'Weak', color: '#ef4444' };
-		if (score <= 2) return { score, label: 'Fair', color: '#f59e0b' };
-		if (score <= 3) return { score, label: 'Good', color: '#63b3ed' };
-		return { score, label: 'Strong', color: '#48bb78' };
+		if (p.length >= 8) score++;
+		if (p.length >= 12) score++;
+		if (/[A-Z]/.test(p) && /[a-z]/.test(p)) score++;
+		if (/\d/.test(p)) score++;
+		if (/[^A-Za-z0-9]/.test(p)) score++;
+		if (score <= 1) return { score, label: 'Weak',   color: '#ef4444' };
+		if (score <= 2) return { score, label: 'Fair',   color: '#f59e0b' };
+		if (score <= 3) return { score, label: 'Good',   color: '#63b3ed' };
+		return                  { score, label: 'Strong', color: '#48bb78' };
 	});
 
-	let canSubmit = $derived(
-		firstName.trim() &&
-		lastName.trim() &&
-		email.trim() &&
-		password.length >= 8 &&
-		passwordsMatch &&
-		!isLoading
-	);
-
-	function handleSubmit(e: Event) {
-		e.preventDefault();
-		if (!canSubmit) return;
-		actor.send({
-			type: 'START_REGISTRATION',
-			data: {
-				email: email.trim(),
-				password,
-				firstName: firstName.trim(),
-				lastName: lastName.trim()
-			}
-		});
-	}
+	let passwordsMatch = $derived(($form.password ?? '') === ($form.confirmPassword ?? ''));
 </script>
 
 <div class="register-container">
@@ -101,13 +62,13 @@
 				<p>Create your account</p>
 			</div>
 
-			{#if errorMessage}
+			{#if $message}
 				<div class="error-banner" role="alert" in:fly={{ y: -10, duration: 200 }}>
-					{errorMessage}
+					{$message}
 				</div>
 			{/if}
 
-			<form onsubmit={handleSubmit}>
+			<form method="POST" use:enhance>
 				<div class="name-row">
 					<div class="form-group">
 						<label for="firstName">First Name</label>
@@ -116,11 +77,14 @@
 							name="firstName"
 							type="text"
 							required
-							bind:value={firstName}
+							bind:value={$form.firstName}
 							placeholder="First name"
-							disabled={isLoading}
+							disabled={$submitting}
 							autocomplete="given-name"
 						/>
+						{#if $errors.firstName}
+							<span class="field-error" in:fade={{ duration: 150 }}>{$errors.firstName[0]}</span>
+						{/if}
 					</div>
 					<div class="form-group">
 						<label for="lastName">Last Name</label>
@@ -129,11 +93,14 @@
 							name="lastName"
 							type="text"
 							required
-							bind:value={lastName}
+							bind:value={$form.lastName}
 							placeholder="Last name"
-							disabled={isLoading}
+							disabled={$submitting}
 							autocomplete="family-name"
 						/>
+						{#if $errors.lastName}
+							<span class="field-error" in:fade={{ duration: 150 }}>{$errors.lastName[0]}</span>
+						{/if}
 					</div>
 				</div>
 
@@ -144,11 +111,14 @@
 						name="email"
 						type="email"
 						required
-						bind:value={email}
+						bind:value={$form.email}
 						placeholder="you@example.com"
-						disabled={isLoading}
+						disabled={$submitting}
 						autocomplete="email"
 					/>
+					{#if $errors.email}
+						<span class="field-error" in:fade={{ duration: 150 }}>{$errors.email[0]}</span>
+					{/if}
 				</div>
 
 				<div class="form-group">
@@ -160,21 +130,21 @@
 							type={showPassword ? 'text' : 'password'}
 							required
 							minlength={8}
-							bind:value={password}
+							bind:value={$form.password}
 							placeholder="At least 8 characters"
-							disabled={isLoading}
+							disabled={$submitting}
 							autocomplete="new-password"
 						/>
 						<button
 							type="button"
 							class="password-toggle"
-							onclick={() => showPassword = !showPassword}
+							onclick={() => (showPassword = !showPassword)}
 							aria-label={showPassword ? 'Hide password' : 'Show password'}
 						>
 							<Icon name={showPassword ? 'eye-off' : 'eye'} size={16} />
 						</button>
 					</div>
-					{#if password}
+					{#if $form.password}
 						<div class="password-strength" in:fade={{ duration: 150 }}>
 							<div class="strength-bar">
 								<div
@@ -187,6 +157,9 @@
 							</span>
 						</div>
 					{/if}
+					{#if $errors.password}
+						<span class="field-error" in:fade={{ duration: 150 }}>{$errors.password[0]}</span>
+					{/if}
 				</div>
 
 				<div class="form-group">
@@ -196,18 +169,20 @@
 						name="confirmPassword"
 						type={showPassword ? 'text' : 'password'}
 						required
-						bind:value={confirmPassword}
+						bind:value={$form.confirmPassword}
 						placeholder="Confirm your password"
-						disabled={isLoading}
+						disabled={$submitting}
 						autocomplete="new-password"
 					/>
-					{#if confirmPassword && !passwordsMatch}
+					{#if $form.confirmPassword && !passwordsMatch}
 						<span class="field-error" in:fade={{ duration: 150 }}>Passwords don't match</span>
+					{:else if $errors.confirmPassword}
+						<span class="field-error" in:fade={{ duration: 150 }}>{$errors.confirmPassword[0]}</span>
 					{/if}
 				</div>
 
-				<button type="submit" class="submit-btn" disabled={!canSubmit}>
-					{#if isLoading}
+				<button type="submit" class="submit-btn" disabled={$submitting || !passwordsMatch}>
+					{#if $delayed}
 						<span class="spinner"></span>
 						Creating account...
 					{:else}
@@ -490,9 +465,9 @@
 	}
 
 	@keyframes success-pop {
-		0% { transform: scale(0); opacity: 0; }
-		60% { transform: scale(1.2); }
-		100% { transform: scale(1); opacity: 1; }
+		0%   { transform: scale(0);   opacity: 0; }
+		60%  { transform: scale(1.2); }
+		100% { transform: scale(1);   opacity: 1; }
 	}
 
 	.success-card h1 {
@@ -523,7 +498,7 @@
 
 	@keyframes redirect-progress {
 		from { width: 0; }
-		to { width: 100%; }
+		to   { width: 100%; }
 	}
 
 	.spinner {
