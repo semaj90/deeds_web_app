@@ -169,6 +169,8 @@ export default defineConfig({
       'tests/agents-regen-pg-loaders.spec.ts',
       // Phase A1.9 — buildRegenContext composer (Promise.allSettled + diagnostics)
       'tests/agents-regen-composer.spec.ts',
+      // Phase A2 — 8 section builders + composeCard (Zod-valid, hash-stable)
+      'tests/agents-regen-section-builders.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
