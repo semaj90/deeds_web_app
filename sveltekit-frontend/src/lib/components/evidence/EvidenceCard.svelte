@@ -27,13 +27,13 @@
 		oncompared
 	}: Props = $props();
 
-	const getIconName = (type: Evidence['type']): string => {
+	const getIconName = (type: Evidence['evidenceType']): string => {
 		switch (type) {
 			case 'document': return 'file-text';
-			case 'image': return 'image';
+			case 'photo': return 'image';
 			case 'video': return 'video';
 			case 'audio': return 'headphones';
-			case 'link': return 'link';
+			case 'link' as Evidence['evidenceType']: return 'link';
 			default: return 'file-text';
 		}
 	};
@@ -46,12 +46,12 @@
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	};
 
-	const fileSize = $derived(Number(evidence?.metadata?.size ?? evidence?.fileSize ?? 0));
+	const fileSize = $derived(Number(evidence?.metadata?.size ?? evidence?.sizeBytes ?? 0));
 	let isHovered = $state(false);
 	let comparing = $state(false);
 	let compareError: string | null = $state(null);
 
-	const evidenceType = $derived(evidence?.evidenceType ?? evidence?.type ?? 'document');
+	const evidenceType = $derived(evidence?.evidenceType ?? 'document');
 	const iconName = $derived(getIconName(evidenceType));
 
 	function getTypeVariant(type: string): 'primary' | 'success' | 'warning' | 'destructive' | 'default' {
@@ -137,19 +137,19 @@
 		<!-- Content -->
 		<div class="px-3 py-2">
 			<!-- Media Preview -->
-			{#if evidenceType === 'image' && evidence?.url}
+			{#if evidenceType === 'photo' && evidence?.fileUrl}
 				<div class="relative w-full mb-3 rounded-lg overflow-hidden">
 					<img
-						src={evidence.url}
+						src={evidence.fileUrl}
 						alt={evidence.title ?? 'evidence'}
 						loading="lazy"
 						class="w-full h-auto max-h-48 object-cover"
 						onerror={handleImageError}
 					/>
 				</div>
-			{:else if evidenceType === 'video' && evidence?.url}
+			{:else if evidenceType === 'video' && evidence?.fileUrl}
 				<div class="relative w-full mb-3 rounded-lg overflow-hidden">
-					<video src={evidence.url} preload="metadata" controls={false} muted class="w-full h-auto max-h-48">
+					<video src={evidence.fileUrl} preload="metadata" controls={false} muted class="w-full h-auto max-h-48">
 						<track kind="captions" />
 					</video>
 					<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 rounded-full p-3">
@@ -167,9 +167,9 @@
 
 				<!-- Metadata -->
 				<div class="flex flex-wrap gap-2 mt-2">
-					{#if evidence?.metadata?.createdAt || evidence?.createdAt}
+					{#if evidence?.metadata?.createdAt}
 						<Badge variant="default" size="sm">
-							{new Date(String(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '')).toLocaleDateString()}
+							{new Date(String(evidence?.metadata?.createdAt ?? '')).toLocaleDateString()}
 						</Badge>
 					{/if}
 					{#if fileSize > 0}
@@ -202,10 +202,10 @@
 		</div>
 
 		<!-- Footer link -->
-		{#if evidence?.url && evidenceType === 'link'}
+		{#if evidence?.fileUrl && (evidenceType as string) === 'link'}
 			<div class="px-3 py-3 b-t b-sand/10">
 				<a
-					href={evidence.url}
+					href={evidence.fileUrl}
 					target="_blank"
 					rel="noopener noreferrer"
 					class="flex items-center gap-1 text-info text-sm font-medium hover:underline"

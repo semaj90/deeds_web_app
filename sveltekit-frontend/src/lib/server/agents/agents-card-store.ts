@@ -51,7 +51,7 @@ export const agentsDirectoryCardSchema = z.object({
 	contentHash:    z.string().length(64),
 	
 	/** Logic gates (G-AI-01 etc.) */
-	gates:          z.record(z.boolean()).default({}),
+	gates:          z.record(z.string(), z.boolean()).default({}),
 });
 
 export type AgentsDirectoryCard = z.infer<typeof agentsDirectoryCardSchema>;

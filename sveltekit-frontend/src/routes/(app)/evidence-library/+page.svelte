@@ -224,22 +224,23 @@
 				<RichEvidenceCard
 					evidence={{
 						id: item.id,
-						userId: String(item.uploadedBy),
+						caseId: item.caseId,
 						title: item.title,
-						filename: item.fileName,
-						originalName: item.fileName,
-						mimeType: item.fileType || item.mimeType,
 						description: item.aiSummary || item.summary || item.description || '',
-						type: item.type || (item.evidenceType === 'photo' ? 'image' : 'document'),
 						evidenceType: item.evidenceType,
+						fileName: item.fileName,
+						fileUrl: item.fileUrl || `/evidence/${item.id}`,
+						mimeType: item.fileType || item.mimeType,
+						sizeBytes: item.fileSize,
 						tags: Array.isArray(item.tags) ? item.tags : [],
-						createdAt: item.createdAt,
-						uploadedAt: item.uploadedAt || item.createdAt,
-						updatedAt: item.updatedAt || item.createdAt,
-						fileSize: item.fileSize,
-						path: item.fileUrl || `/evidence/${item.id}`,
-						bucket: 'evidence',
-						metadata: item.metadata || {}
+						canvasPosition: { x: 0, y: 0 },
+						metadata: {
+							...(item.metadata || {}),
+							createdAt:  item.createdAt,
+							uploadedAt: item.uploadedAt || item.createdAt,
+							updatedAt:  item.updatedAt  || item.createdAt,
+							uploadedBy: item.uploadedBy
+						}
 					}}
 					showCompare={true}
 					expandOnHover={true}
