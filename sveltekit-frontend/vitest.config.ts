@@ -179,6 +179,8 @@ export default defineConfig({
       'tests/agents-regen-writers.spec.ts',
       // Phase A4.5 — agents.regen telemetry → context_timeline (env-gate + DI)
       'tests/agents-regen-telemetry.spec.ts',
+      // Phase A5 — AGENTS.md @auto:* hand-edit preservation + markdown writer
+      'tests/agents-regen-markdown.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
