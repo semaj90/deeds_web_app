@@ -10,6 +10,10 @@
 	// (audit doc §3.16 + merge plan 2026-05-11_evidence-board-merge-plan.md).
 	// Opt-in via showAIAssistant prop; off by default to keep flag-on UX additive.
 	import AIAssistantPanel from '$lib/components/ai/AIAssistantPanel.svelte';
+	import UploadZone from '$lib/components/detective/UploadZone.svelte';
+	import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
+	import { aiAssistantStore } from '$lib/stores/unified/ai-assistant-store.svelte.js';
+	import { collaborationStore } from '$lib/stores/unified/collaboration-store.svelte.js';
 	import { boardHistory, createMoveCommand, createBulkMoveCommand, createDeleteNodeCommand, createAddConnectionCommand, createDeleteConnectionCommand } from './board-history.svelte.js';
 	import { loadLayout, scheduleSave, flushSave, type BoardLayout } from './board-persistence.svelte.js';
 
@@ -39,7 +43,7 @@
 	createdBy?: number;
 		createdAt: string;
 	updatedAt: string };
-	type BoardMode = 'grid' | 'free' | 'magnetic';
+	type BoardMode = 'grid' | 'free' | 'magnetic' | 'columns';
 
 	let {
 		caseId,
@@ -97,6 +101,15 @@
 	let showMinimap = $state(true);
 	let highlightedNodes = $state<Set<string>>(new Set());
 
+	let isDraggingFiles = $state(false);
+	let showNotebook = $state(false);
+	let userInput = $state('');
+	let contextualPrompts = $state<string[]>([]);
+	let currentTypingState = $state('idle');
+	let isAnalyzingNotebook = $state(false);
+	let isGeneratingMap = $state(false);
+	let notebookAnalysisResults = $state<any>(null);
+
 	// ── Drag tracking for undo ─────────────────────────────────
 	let dragStartPositions = $state<Map<string, { x: number; y: number }>>(new Map());
 
@@ -133,6 +146,28 @@
 			stats.set(type, (stats.get(type) ?? 0) + 1);
 		}
 		return Array.from(stats.entries()).map(([type, count]) => ({ type, count }));
+	});
+
+	// M4 — Derived columns for 'columns' mode (grouped by evidenceType)
+	let nodesByColumn = $derived.by(() => {
+		const columnsMap = new Map<string, EvidenceNodeType[]>();
+		const types = ['document', 'photo', 'video', 'audio', 'physical', 'digital', 'forensic', 'other'];
+		types.forEach(t => columnsMap.set(t, []));
+
+		for (const node of nodes) {
+			const type = node.evidenceType || 'other';
+			if (!columnsMap.has(type)) columnsMap.set(type, []);
+			columnsMap.get(type)!.push(node);
+		}
+		
+		return Array.from(columnsMap.entries())
+			.filter(([_, items]) => items.length > 0)
+			.map(([type, items]) => ({
+				id: type,
+				title: getCategoryLabel(type),
+				color: getCategoryColor(type),
+				items
+			}));
 	});
 
 	function getCategoryColor(type: string): string {
@@ -230,6 +265,25 @@
 		nodes = nodes.map(n => n.id === nodeId ? { ...n, x, y } : n);
 	}
 
+	function handleFileUpload(result: any) {
+		const newNode: EvidenceNodeType = {
+			id: result?.id ?? `ev-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+			caseId: caseId,
+			title: result?.originalName ?? result?.fileName ?? "New Evidence",
+			description: result?.description ?? "",
+			evidenceType: result?.evidenceType ?? result?.type ?? "document",
+			fileName: result?.fileName,
+			fileUrl: result?.url,
+			uploadedAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			x: 100 + Math.random() * 200,
+			y: 100 + Math.random() * 200,
+			canvasPosition: { x: 0, y: 0 } // Legacy field
+		};
+		nodes = [...nodes, newNode];
+		notifyMutation();
+	}
+
 	// Node movement (debounced PATCH)
 	function moveNode(nodeId: string, newX: number, newY: number) {
 	if (boardMode === 'grid') {
@@ -239,6 +293,9 @@
 	}
 
 	applyNodePosition(nodeId, newX, newY);
+
+	// Broadcast mutation
+	collaborationStore.broadcast('mutation', { action: 'move', nodeId, x: newX, y: newY });
 
 	// Debounced PATCH to server (2s)
 	if (patchTimers.has(nodeId)) clearTimeout(patchTimers.get(nodeId)!);
@@ -516,10 +573,21 @@
 	function handleToolbarAction(action: string) {
 	switch (action) {
 	case 'analyze':
-	applyMagneticForces();
+	if (selectedNodes.size > 0) {
+		const selectedIds = Array.from(selectedNodes);
+		aiPanelVisible = true;
+		aiAssistantStore.updateContext({ caseId });
+		const prompt = selectedIds.length === 1
+			? `Analyze the selected evidence item in case ${caseId}.`
+			: `Analyze these ${selectedIds.length} selected evidence items in case ${caseId}.`;
+		aiAssistantStore.sendMessage(prompt, caseId, selectedIds);
+	} else {
+		applyMagneticForces();
+	}
 	break;
 	case 'attach':
-	console.log('attach selected nodes', Array.from(selectedNodes));
+	// Trigger file input via a hidden UploadZone or just show the drop overlay
+	isDraggingFiles = true;
 	break;
 	case 'pin':
 	console.log('pin selected nodes', Array.from(selectedNodes));
@@ -564,6 +632,184 @@
 	break;
 	default: break;
 	}
+	}
+
+	async function triggerNotebookAnalysis() {
+		if (!userInput.trim() || isAnalyzingNotebook) return;
+		isAnalyzingNotebook = true;
+		notebookAnalysisResults = null;
+
+		try {
+			const response = await fetch('/api/detective/analyze', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					caseId,
+					text: userInput,
+					evidence: nodes
+				})
+			});
+
+			if (!response.ok) throw new Error('Analysis failed');
+
+			const reader = response.body?.getReader();
+			if (!reader) return;
+
+			const decoder = new TextDecoder();
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				const chunk = decoder.decode(value, { stream: true });
+				const lines = chunk.split('\n\n');
+				for (const line of lines) {
+					if (!line.trim()) continue;
+					const dataPart = line.split('\n').find(l => l.startsWith('data: '));
+					const eventPart = line.split('\n').find(l => l.startsWith('event: '));
+					if (!dataPart) continue;
+					
+					const event = eventPart ? eventPart.slice(7) : 'message';
+					const data = JSON.parse(dataPart.slice(6));
+
+					if (event === 'complete') {
+						notebookAnalysisResults = data;
+						// Add findings as suggestions
+						if (data.keyEntities) {
+							contextualPrompts = [...contextualPrompts, `Explore ${data.keyEntities.length} entities?` ];
+						}
+					}
+				}
+			}
+		} catch (err) {
+			console.error('[Notebook Analysis] Failed:', err);
+		} finally {
+			isAnalyzingNotebook = false;
+		}
+	}
+
+	async function generateConnectionMap() {
+		if (!caseId || isGeneratingMap) return;
+		isGeneratingMap = true;
+
+		try {
+			const response = await fetch('/api/detective/connections', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					caseId,
+					context: userInput || undefined
+				})
+			});
+
+			if (!response.ok) throw new Error('Map generation failed');
+
+			const reader = response.body?.getReader();
+			if (!reader) return;
+
+			const decoder = new TextDecoder();
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				const chunk = decoder.decode(value, { stream: true });
+				const lines = chunk.split('\n\n');
+				for (const line of lines) {
+					if (!line.trim()) continue;
+					const dataPart = line.split('\n').find(l => l.startsWith('data: '));
+					const eventPart = line.split('\n').find(l => l.startsWith('event: '));
+					if (!dataPart) continue;
+
+					const event = eventPart ? eventPart.slice(7) : 'message';
+					const data = JSON.parse(dataPart.slice(6));
+
+					if (event === 'complete') {
+						spawnNodesFromGraph(data.connectionMap);
+					}
+				}
+			}
+		} catch (err) {
+			console.error('[Connection Map] Failed:', err);
+		} finally {
+			isGeneratingMap = false;
+		}
+	}
+
+	function spawnNodesFromGraph(graph: any) {
+		const newNodes: EvidenceNodeType[] = [];
+		const typeMap: Record<string, string> = {
+			person: 'physical',
+			organization: 'digital',
+			location: 'digital',
+			event: 'digital',
+			document: 'document',
+			money: 'digital',
+			evidence: 'other'
+		};
+
+		// Create nodes
+		graph.nodes.forEach((n: any, i: number) => {
+			// Check if node already exists by label
+			if (nodes.some(existing => existing.title === n.label)) return;
+
+			newNodes.push({
+				id: `ai-${n.id}-${Date.now()}-${i}`,
+				title: n.label,
+				description: `Extracted ${n.type} entity.`,
+				evidenceType: typeMap[n.type] || 'other',
+				x: 400 + Math.random() * 200,
+				y: 300 + Math.random() * 200,
+				metadata: { ai_generated: true, entity_type: n.type }
+			});
+		});
+
+		if (newNodes.length > 0) {
+			nodes = [...nodes, ...newNodes];
+			notifyMutation();
+		}
+
+		// Create connections (best effort)
+		const newConnections: EvidenceConnection[] = [];
+		graph.edges.forEach((e: any) => {
+			// Map graph source/target IDs to board node IDs
+			// This is complex because we just spawned them with new IDs
+			// For now, we just log them or skip until we have a proper ID mapping
+		});
+	}
+
+	// ── Notebook Handlers ─────────────────────────────────────
+	function handleTypingStateChange(event: any) {
+		currentTypingState = event.detail.state;
+		collaborationStore.broadcast('typing', { state: currentTypingState });
+	}
+
+	function handleContextualPrompt(event: any) {
+		contextualPrompts = event.detail.prompts;
+	}
+
+	function handleSelectPrompt(prompt: string) {
+		userInput += `\n> ${prompt}\n`;
+		contextualPrompts = [];
+		// If prompt suggests analysis, trigger it
+		if (prompt.toLowerCase().includes('analyze')) {
+			handleToolbarAction('analyze');
+		}
+	}
+
+	// ── Collaboration Handlers ──────────────────────────────────
+	function handleRemoteMutation(event: any) {
+		const { type, payload } = event;
+		if (type === 'mutation') {
+			const { action, nodeId, x, y } = payload;
+			if (action === 'move') {
+				applyNodePosition(nodeId, x, y);
+			}
+		}
+	}
+
+	function handleCanvasMouseMoveCollaboration(event: MouseEvent) {
+		if (!canvasElement) return;
+		const rect = canvasElement.getBoundingClientRect();
+		const x = (event.clientX - rect.left - panX) / zoom;
+		const y = (event.clientY - rect.top - panY) / zoom;
+		collaborationStore.broadcast('cursor', { x, y });
 	}
 
 	// ── Persistence ────────────────────────────────────────────
@@ -622,11 +868,22 @@
 			});
 		}
 
+		// Connect to collaboration sync
+		collaborationStore.connect(caseId);
+		const cleanupMutation = collaborationStore.onMutation(handleRemoteMutation);
+
 		// Save on beforeunload
-		const handleBeforeUnload = () => flushSave();
+		const handleBeforeUnload = () => {
+			flushSave();
+			collaborationStore.disconnect();
+		};
 		window.addEventListener('beforeunload', handleBeforeUnload);
 
-		return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+			cleanupMutation();
+			collaborationStore.disconnect();
+		};
 	});
 
 	$effect(() => {
@@ -716,6 +973,10 @@
 					<Icon name="book-open" size={14} />
 					LIBRARY
 				</button>
+				<button class="retro-btn filled" onclick={() => showNotebook = !showNotebook}>
+					<Icon name="pencil" size={14} />
+					NOTEBOOK
+				</button>
 				<button class="retro-btn accent" onclick={() => handleToolbarAction('analyze')}>
 					<Icon name="sparkles" size={14} />
 					ANALYZE
@@ -777,6 +1038,14 @@
 				>
 					<Icon name="magnet" size={14} />
 				</button>
+				<button
+					class="mode-btn"
+					class:active={boardMode === 'columns'}
+					onclick={() => changeMode('columns')}
+					title="Columns View"
+				>
+					<Icon name="columns" size={14} />
+				</button>
 			</div>
 
 			{#if linkMode}
@@ -837,33 +1106,79 @@
 			bind:this={canvasElement}
 			onwheel={handleWheel}
 			onmousedown={handleCanvasMouseDown}
-			onmousemove={handleCanvasMouseMove}
+			onmousemove={(e) => {
+				handleCanvasMouseMove(e);
+				handleCanvasMouseMoveCollaboration(e);
+			}}
 			onmouseup={handleCanvasMouseUp}
+			ondragenter={(e) => {
+				if (e.dataTransfer?.types.includes('Files')) {
+					isDraggingFiles = true;
+				}
+			}}
 		>
-			<!-- Zoom/Pan transform wrapper -->
-			<div class="viewport-transform" style="transform: translate({panX}px, {panY}px) scale({zoom}); transform-origin: 0 0;">
-				<!-- Connections Layer -->
-				<EvidenceConnections connections={connections} nodes={nodes} />
-				{#each nodes as evidenceNode (evidenceNode.id)}
-					<EvidenceNode
-						node={evidenceNode}
-						isSelected={selectedNodes.has(evidenceNode.id)}
-						isHighlighted={highlightedNodes.has(evidenceNode.id)}
-						isPendingLinkSource={pendingLinkSource === evidenceNode.id}
-						linkMode={linkMode}
-						onSelect={(data) => selectNode(data.nodeId, data.multiSelect)}
-						onMove={(data) => moveNode(data.nodeId, data.x, data.y)}
-						onLink={(data) => handleLinkClick(data.nodeId)}
-						onDragStart={handleNodeDragStart}
-						onDragEnd={handleNodeDragEnd}
-					/>
-				{/each}
+			{#if boardMode === 'columns'}
+				<div class="columns-view">
+					{#each nodesByColumn as col}
+						<div class="evidence-column">
+							<div class="column-header" style="border-bottom: 3px solid {col.color}">
+								<span class="column-title">{col.title}</span>
+								<span class="column-count">{col.items.length}</span>
+							</div>
+							<div class="column-items custom-scrollbar">
+								{#each col.items as node (node.id)}
+									<EvidenceNode
+										{node}
+										isStatic={true}
+										isSelected={selectedNodes.has(node.id)}
+										isHighlighted={highlightedNodes.has(node.id)}
+										isPendingLinkSource={pendingLinkSource === node.id}
+										linkMode={linkMode}
+										onSelect={(data) => selectNode(data.nodeId, data.multiSelect)}
+										onMove={(data) => moveNode(data.nodeId, data.x, data.y)}
+										onLink={(data) => handleLinkClick(data.nodeId)}
+									/>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<!-- Zoom/Pan transform wrapper (Grid/Free/Magnetic) -->
+				<div class="viewport-transform" style="transform: translate({panX}px, {panY}px) scale({zoom}); transform-origin: 0 0;">
+					<!-- Connections Layer -->
+					<EvidenceConnections connections={connections} nodes={nodes} />
+					{#each nodes as evidenceNode (evidenceNode.id)}
+						<EvidenceNode
+							node={evidenceNode}
+							isSelected={selectedNodes.has(evidenceNode.id)}
+							isHighlighted={highlightedNodes.has(evidenceNode.id)}
+							isPendingLinkSource={pendingLinkSource === evidenceNode.id}
+							linkMode={linkMode}
+							onSelect={(data) => selectNode(data.nodeId, data.multiSelect)}
+							onMove={(data) => moveNode(data.nodeId, data.x, data.y)}
+							onLink={(data) => handleLinkClick(data.nodeId)}
+							onDragStart={handleNodeDragStart}
+							onDragEnd={handleNodeDragEnd}
+						/>
+					{/each}
 
-				<!-- Selection rectangle -->
-				{#if selectionRect && selectionRectStyle}
-					<div class="selection-rect" style={selectionRectStyle}></div>
-				{/if}
-			</div>
+					<!-- Selection rectangle -->
+					{#if selectionRect && selectionRectStyle}
+						<div class="selection-rect" style={selectionRectStyle}></div>
+					{/if}
+
+					<!-- M6: Remote Cursors -->
+					{#each Array.from(collaborationStore.activeUsers.entries()) as [userId, user] (userId)}
+						{#if user.cursor}
+							<div class="remote-cursor" style="left: {user.cursor.x}px; top: {user.cursor.y}px;">
+								<div class="cursor-pointer"></div>
+								<div class="cursor-label">{user.name}</div>
+							</div>
+						{/if}
+					{/each}
+				</div>
+			{/if}
 
 			{#if nodes.length === 0}
 				<div class="empty-state">
@@ -899,6 +1214,106 @@
 				/>
 			</aside>
 		{/if}
+
+		<!-- M2: UploadZone overlay -->
+		{#if isDraggingFiles}
+			<div class="upload-overlay" 
+				ondragleave={(e) => {
+					// Only close if we're leaving the overlay, not entering a child
+					if (e.currentTarget === e.target) isDraggingFiles = false;
+				}}
+				ondrop={() => { isDraggingFiles = false; }}
+			>
+				<div class="upload-container">
+					<UploadZone 
+						{caseId} 
+						onUploadComplete={(res) => {
+							handleFileUpload(res);
+							isDraggingFiles = false;
+						}} 
+					/>
+					<button class="retro-btn-sm danger mt-4" onclick={() => isDraggingFiles = false}>
+						CANCEL
+					</button>
+				</div>
+			</div>
+		{/if}
+
+		<!-- M5: Notebook Panel -->
+		{#if showNotebook}
+			<div class="notebook-panel">
+				<div class="notebook-header">
+					<span class="notebook-title">DETECTIVE NOTEBOOK</span>
+					<div class="notebook-controls">
+						<span class="typing-status" class:active={currentTypingState === 'typing'}>
+							{currentTypingState === 'typing' ? 'TYPING...' : 'IDLE'}
+						</span>
+						<button class="close-btn" onclick={() => showNotebook = false}>×</button>
+					</div>
+				</div>
+				<div class="notebook-content">
+					<textarea 
+						bind:value={userInput} 
+						placeholder="Add observations, theories, or questions..."
+						class="notebook-textarea custom-scrollbar"
+					></textarea>
+					
+					{#if contextualPrompts.length > 0}
+						<div class="predictive-prompts">
+							<span class="prompts-label">SUGGESTIONS:</span>
+							<div class="prompts-list">
+								{#each contextualPrompts as prompt}
+									<button class="prompt-chip" onclick={() => handleSelectPrompt(prompt)}>
+										{prompt}
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					<div class="notebook-footer">
+						<button 
+							class="retro-btn-sm accent" 
+							style="flex: 1"
+							onclick={triggerNotebookAnalysis}
+							disabled={isAnalyzingNotebook || !userInput.trim()}
+						>
+							{isAnalyzingNotebook ? '...' : 'ANALYSIS'}
+						</button>
+						<button 
+							class="retro-btn-sm accent" 
+							style="flex: 1"
+							onclick={generateConnectionMap}
+							disabled={isGeneratingMap || !userInput.trim()}
+						>
+							{isGeneratingMap ? '...' : 'MAP'}
+						</button>
+					</div>
+
+					{#if notebookAnalysisResults}
+						<div class="analysis-findings custom-scrollbar">
+							{#if notebookAnalysisResults.keyEntities?.length}
+								<div class="finding-section">
+									<span class="section-title">ENTITIES:</span>
+									<div class="finding-tags">
+										{#each notebookAnalysisResults.keyEntities as entity}
+											<span class="finding-tag">{entity.name}</span>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
+					{/if}
+				</div>
+			</div>
+		{/if}
+
+		<!-- M5: Headless listener -->
+		<HeadlessTypingListener 
+			bind:text={userInput}
+			onstateChange={handleTypingStateChange}
+			oncontextualPrompt={handleContextualPrompt}
+		/>
 	</div>
 </div>
 
@@ -916,6 +1331,30 @@
 		backdrop-filter: blur(6px);
 		overflow-y: auto;
 		box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+	}
+
+	.upload-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.7);
+		backdrop-filter: blur(4px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 100;
+		padding: 40px;
+	}
+
+	.upload-container {
+		background: #b0ab8a;
+		border: 4px double #4a4630;
+		padding: 30px;
+		max-width: 500px;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 	}
 </style>
 
@@ -1336,5 +1775,235 @@
 
 	@keyframes blink {
 		50% { opacity: 0.3; }
+	}
+
+	/* Columns View Styles */
+	.columns-view {
+		display: flex;
+		gap: 20px;
+		padding: 20px;
+		height: 100%;
+		overflow-x: auto;
+		background: #b0ab8a;
+	}
+
+	.evidence-column {
+		flex: 0 0 300px;
+		display: flex;
+		flex-direction: column;
+		background: #c8c3a0;
+		border: 2px solid #8a855e;
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+	}
+
+	.column-header {
+		padding: 12px;
+		background: #e8e4c8;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-family: "Press Start 2P", cursive;
+		font-size: 0.6rem;
+		color: #4a4630;
+	}
+
+	.column-count {
+		background: #4a4630;
+		color: #f0edd4;
+		padding: 2px 6px;
+		font-family: "Courier New", monospace;
+		font-size: 0.7rem;
+	}
+
+	.column-items {
+		flex: 1;
+		padding: 12px;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	/* Notebook Styles */
+	.notebook-panel {
+		position: absolute;
+		bottom: 20px;
+		left: 20px;
+		width: 320px;
+		height: 380px;
+		background: #f0edd4;
+		border: 3px solid #8a855e;
+		box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+		display: flex;
+		flex-direction: column;
+		z-index: 80;
+	}
+
+	.notebook-header {
+		padding: 8px 12px;
+		background: #c8c3a0;
+		border-bottom: 2px solid #8a855e;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.notebook-title {
+		font-family: "Press Start 2P", cursive;
+		font-size: 0.5rem;
+		color: #2a2618;
+	}
+
+	.notebook-controls {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.typing-status {
+		font-size: 0.55rem;
+		color: #8a855e;
+		font-weight: bold;
+	}
+
+	.typing-status.active {
+		color: #3a6e3a;
+		animation: blink 1s step-end infinite;
+	}
+
+	.close-btn {
+		background: none;
+		border: none;
+		font-size: 1.2rem;
+		line-height: 1;
+		cursor: pointer;
+		color: #6b654a;
+	}
+
+	.notebook-content {
+		flex: 1;
+		padding: 12px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		overflow: hidden;
+	}
+
+	.notebook-textarea {
+		flex: 1;
+		background: transparent;
+		border: 1px solid rgba(138, 133, 94, 0.3);
+		padding: 10px;
+		font-family: "Courier New", monospace;
+		font-size: 0.8rem;
+		color: #4a4630;
+		resize: none;
+		outline: none;
+		line-height: 1.4;
+	}
+
+	.predictive-prompts {
+		border-top: 1px solid #8a855e;
+		padding-top: 8px;
+	}
+
+	.prompts-label {
+		font-size: 0.5rem;
+		font-weight: bold;
+		color: #8a855e;
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.prompts-list {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.prompt-chip {
+		text-align: left;
+		background: #e8e4c8;
+		border: 1px solid #8a855e;
+		padding: 4px 8px;
+		font-size: 0.65rem;
+		color: #4a4630;
+		cursor: pointer;
+		transition: all 0.1s;
+	}
+
+	.prompt-chip:hover {
+		background: #4a4630;
+		color: #f0edd4;
+	}
+
+	.notebook-footer {
+		margin-top: 8px;
+		border-top: 1px solid #8a855e;
+		padding-top: 8px;
+	}
+
+	.analysis-findings {
+		margin-top: 12px;
+		padding-top: 8px;
+		border-top: 2px dashed #8a855e;
+		max-height: 120px;
+		overflow-y: auto;
+	}
+
+	.finding-section {
+		margin-bottom: 8px;
+	}
+
+	.section-title {
+		font-size: 0.5rem;
+		font-weight: bold;
+		color: #8a855e;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.finding-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+	}
+
+	.finding-tag {
+		background: #c8c3a0;
+		color: #4a4630;
+		padding: 2px 5px;
+		font-size: 0.55rem;
+		border: 1px solid #8a855e;
+	}
+
+	/* Remote Cursor Styles */
+	.remote-cursor {
+		position: absolute;
+		pointer-events: none;
+		z-index: 1000;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		transition: all 0.1s ease-out;
+	}
+
+	.cursor-pointer {
+		width: 12px;
+		height: 12px;
+		background: #ffc040;
+		clip-path: polygon(0% 0%, 100% 50%, 0% 100%, 25% 50%);
+		border: 1px solid #000;
+	}
+
+	.cursor-label {
+		background: rgba(0, 0, 0, 0.7);
+		color: #ffc040;
+		padding: 2px 6px;
+		border-radius: 3px;
+		font-size: 0.6rem;
+		font-family: "Courier New", monospace;
+		margin-top: 4px;
+		white-space: nowrap;
 	}
 </style>

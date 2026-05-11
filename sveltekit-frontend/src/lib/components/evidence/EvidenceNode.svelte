@@ -11,16 +11,17 @@
 	};
 
 	let {
-	node,
-	isSelected = false,
-	isHighlighted = false,
-	isPendingLinkSource = false,
-	linkMode = false,
-	onSelect,
-	onMove,
-	onLink,
-	onDragStart,
-	onDragEnd
+		node,
+		isSelected = false,
+		isHighlighted = false,
+		isPendingLinkSource = false,
+		linkMode = false,
+		onSelect,
+		onMove,
+		onLink,
+		onDragStart,
+		onDragEnd,
+		isStatic = false
 	}: {
 		node: EvidenceNodeType;
 	isSelected?: boolean;
@@ -32,6 +33,7 @@
 	onLink?: (data: { nodeId: string }) => void;
 	onDragStart?: (data: { nodeId: string, x: number, y: number }) => void;
 	onDragEnd?: (data: { nodeId: string, x: number, y: number }) => void;
+	isStatic?: boolean;
 	} = $props();
 
 	let isDragging = $state(false);
@@ -39,7 +41,7 @@
 	let element: HTMLElement;
 
 	function handleMouseDown(event: MouseEvent) {
-	if (event.button !== 0) return;
+	if (event.button !== 0 || isStatic) return;
 
 	isDragging = true;
 	dragStart = { x: event.clientX - node.x, y: event.clientY - node.y };
@@ -114,11 +116,12 @@
 	class:highlighted={isHighlighted}
 	class:pending-link={isPendingLinkSource}
 	class:dragging={isDragging}
+	class:is-static={isStatic}
 	role="button"
 	tabindex="0"
 	style="
-	left: {node.x}px;
-	top: {node.y}px;
+	left: {isStatic ? 'auto' : node.x + 'px'};
+	top: {isStatic ? 'auto' : node.y + 'px'};
 	--node-color: {getNodeTypeColor(node.evidenceType)};
 	"
 	onmousedown={handleMouseDown}
@@ -193,6 +196,15 @@
 		font-family: "Courier New", monospace;
 		box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
 		transition: box-shadow 0.15s;
+	}
+
+	.retro-node.is-static {
+		position: relative;
+		left: auto !important;
+		top: auto !important;
+		margin-bottom: 12px;
+		max-width: 100%;
+		cursor: pointer;
 	}
 
 	.retro-node:hover {
