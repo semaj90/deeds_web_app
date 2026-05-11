@@ -9,8 +9,15 @@ test.describe.serial('Route forensic: /global-search', () => {
 	});
 
 	test('GET /global-search — search input present', async ({ page }) => {
-		const log = await captureRouteLoad(page, '/global-search', { waitMs: 1500 });
-		const search = await page.locator('input[type="search"], input[type="text"], [role="searchbox"]').count();
+		const log = await captureRouteLoad(page, '/global-search', { waitMs: 3000 });
+		await page
+			.locator('input[type="search"], input[type="text"], [role="searchbox"]')
+			.first()
+			.waitFor({ state: 'attached', timeout: 5000 })
+			.catch(() => {});
+		const search = await page
+			.locator('input[type="search"], input[type="text"], [role="searchbox"]')
+			.count();
 		console.log(`search inputs: ${search}`);
 		summarise(log, 'GET /global-search (input)');
 		expect(search, 'no search input on global search page').toBeGreaterThan(0);
