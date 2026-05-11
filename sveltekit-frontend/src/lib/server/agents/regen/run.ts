@@ -16,6 +16,8 @@ import { buildRegenContext } from './loaders/build-context.js';
 import { loadExistingCard } from './loaders/existing-card.js';
 import { composeCard } from './section-builders.js';
 import { writeCardToRedis } from '../agents-card-store.js';
+import { writeCardToCouchDB, type CouchWriteResult } from './writers/couchdb-writer.js';
+import { backfillQdrantPayload, type QdrantBackfillResult } from './writers/qdrant-backfill.js';
 import type { BuildRegenContextOptions, RegenContext } from './loaders/types.js';
 import type { AgentsDirectoryCard } from '../agents-card-store.js';
 
@@ -52,6 +54,10 @@ export interface RegenFailure {
 }
 
 export interface RegenCliResult {
+	/** Deterministic per-run id — propagates into telemetry rows. */
+	runId:          string;
+	/** ISO timestamp captured at orchestrator entry. */
+	startedAt:      string;
 	dirCount:       number;
 	changedCount:   number;
 	unchangedCount: number;
@@ -59,6 +65,9 @@ export interface RegenCliResult {
 	failedCount:    number;
 	failures:       RegenFailure[];
 	redisWrites:    number;
+	couchWrites:    number;
+	qdrantWrites:   number;
+	qdrantPointsTouched: number;
 	durationMs:     number;
 	signalSourcesLoaded: RegenSignalSources;
 	dryRun:         boolean;
@@ -95,26 +104,39 @@ export interface RunRegenDeps {
 	loadExistingFn?: (dirPath: string) => Promise<{ card: AgentsDirectoryCard | null }>;
 	/** Override the Redis writer (used by tests). */
 	writeFn?: (card: AgentsDirectoryCard) => Promise<boolean>;
+	/** Override the CouchDB writer (used by tests). Gated by !dryRun && !redisOnly. */
+	couchWriteFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<CouchWriteResult>;
+	/** Override the Qdrant backfill (used by tests). Gated by !dryRun && !redisOnly. */
+	qdrantBackfillFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<QdrantBackfillResult>;
 }
 
 export async function runRegen(
 	opts: RegenCliOptions,
 	deps: RunRegenDeps = {},
 ): Promise<RegenCliResult> {
-	const startMs = Date.now();
-	const dryRun  = opts.dryRun ?? false;
-	const force   = opts.force ?? false;
+	const startMs   = Date.now();
+	const startedAt = new Date(startMs).toISOString();
+	const dryRun    = opts.dryRun ?? false;
+	const force     = opts.force ?? false;
+	const redisOnly = opts.redisOnly ?? false;
+	const couchEnabled  = !dryRun && !redisOnly;
+	const qdrantEnabled = !dryRun && !redisOnly;
 	const runId   = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 	const lock    = deps.lock ?? (dryRun ? NOOP_LOCK : redisLock());
 	const compose = deps.composeFn ?? composeCard;
 	const loadEx  = deps.loadExistingFn ?? loadExistingCard;
 	const write   = deps.writeFn ?? writeCardToRedis;
+	const couchFn = deps.couchWriteFn ?? ((card, enabled) => writeCardToCouchDB(card, { enabled }));
+	const qdrantFn = deps.qdrantBackfillFn ?? ((card, enabled) => backfillQdrantPayload(card, { enabled }));
 
 	const failures: RegenFailure[] = [];
-	let changedCount   = 0;
-	let unchangedCount = 0;
-	let skippedCount   = 0;
-	let redisWrites    = 0;
+	let changedCount    = 0;
+	let unchangedCount  = 0;
+	let skippedCount    = 0;
+	let redisWrites     = 0;
+	let couchWrites     = 0;
+	let qdrantWrites    = 0;
+	let qdrantPointsTouched = 0;
 
 	// 1. Acquire lock (real runs only).
 	if (!dryRun) {
@@ -151,6 +173,21 @@ export async function runRegen(
 				const didWrite = await write(composed.card);
 				if (didWrite) redisWrites++;
 				changedCount++;
+
+				// Phase A4 — durable writers. Each is independently gated so
+				// --redis-only / --dry-run produce zero non-Redis writes by contract.
+				// Writer failures DO NOT abort the per-dir loop; they push into
+				// failures[] like any other per-dir error.
+				const couchResult = await couchFn(composed.card, couchEnabled);
+				if (couchResult.wrote) couchWrites++;
+				if (couchResult.error) failures.push({ dir, error: `couchdb: ${couchResult.error}` });
+
+				const qdrantResult = await qdrantFn(composed.card, qdrantEnabled);
+				if (qdrantResult.wrote) {
+					qdrantWrites++;
+					qdrantPointsTouched += qdrantResult.pointsTouched;
+				}
+				if (qdrantResult.error) failures.push({ dir, error: `qdrant: ${qdrantResult.error}` });
 			} catch (err) {
 				failures.push({ dir, error: String((err as Error)?.message ?? err) });
 			}
@@ -165,6 +202,8 @@ export async function runRegen(
 		};
 
 		return {
+			runId,
+			startedAt,
 			dirCount:       targetDirs.length,
 			changedCount,
 			unchangedCount,
@@ -172,6 +211,9 @@ export async function runRegen(
 			failedCount:    failures.length,
 			failures,
 			redisWrites,
+			couchWrites,
+			qdrantWrites,
+			qdrantPointsTouched,
 			durationMs:     Date.now() - startMs,
 			signalSourcesLoaded,
 			dryRun,

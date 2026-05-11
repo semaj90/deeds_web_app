@@ -74,18 +74,70 @@ describe('runRegen', () => {
 		}));
 		const write = vi.fn(async () => true);
 		const loadEx = vi.fn(async () => ({ card: null }));
+		const couchFn = vi.fn(async () => ({ wrote: true, skipped: null, docId: 'x' }));
+		const qdrantFn = vi.fn(async () => ({ wrote: true, skipped: null, pointsTouched: 7 }));
 
 		const result = await runRegen(
 			{ all: true, dryRun: false },
-			{ ctx, lock: NOOP_LOCK, composeFn: compose, loadExistingFn: loadEx, writeFn: write },
+			{ ctx, lock: NOOP_LOCK, composeFn: compose, loadExistingFn: loadEx, writeFn: write, couchWriteFn: couchFn, qdrantBackfillFn: qdrantFn },
 		);
 
 		expect(result.dirCount).toBe(2);
 		expect(result.changedCount).toBe(2);
 		expect(result.redisWrites).toBe(2);
+		expect(result.couchWrites).toBe(2);
+		expect(result.qdrantWrites).toBe(2);
+		expect(result.qdrantPointsTouched).toBe(14);
 		expect(result.failedCount).toBe(0);
 		expect(result.signalSourcesLoaded.graphNodes).toBe(2);
 		expect(result.signalSourcesLoaded.karpathyScores).toBe(2);
+		// Verify the orchestrator passed `enabled: true` (since dryRun=false && redisOnly=false)
+		expect(couchFn.mock.calls[0][1]).toBe(true);
+		expect(qdrantFn.mock.calls[0][1]).toBe(true);
+	});
+
+	it('--redis-only disables couch + qdrant writers but still writes Redis', async () => {
+		const ctx = makeCtx(['src/a']);
+		const couchFn  = vi.fn(async (_card, enabled: boolean) => ({ wrote: false, skipped: enabled ? null : ('disabled' as const), docId: 'x' }));
+		const qdrantFn = vi.fn(async (_card, enabled: boolean) => ({ wrote: false, skipped: enabled ? null : ('disabled' as const), pointsTouched: 0 }));
+		const result = await runRegen(
+			{ all: true, redisOnly: true },
+			{
+				ctx, lock: NOOP_LOCK,
+				composeFn: () => ({ card: makeCard('src/a', 'h'), contentHash: 'h'.padEnd(64, '0'), changed: true }),
+				loadExistingFn: async () => ({ card: null }),
+				writeFn: async () => true,
+				couchWriteFn: couchFn, qdrantBackfillFn: qdrantFn,
+			},
+		);
+		expect(result.redisWrites).toBe(1);
+		expect(result.couchWrites).toBe(0);
+		expect(result.qdrantWrites).toBe(0);
+		expect(couchFn.mock.calls[0][1]).toBe(false);   // enabled=false passed through
+		expect(qdrantFn.mock.calls[0][1]).toBe(false);
+	});
+
+	it('dryRun=true disables all 3 writers (redis + couch + qdrant)', async () => {
+		const ctx = makeCtx(['src/a']);
+		const couchFn  = vi.fn(async () => ({ wrote: false, skipped: 'disabled' as const, docId: 'x' }));
+		const qdrantFn = vi.fn(async () => ({ wrote: false, skipped: 'disabled' as const, pointsTouched: 0 }));
+		const result = await runRegen(
+			{ all: true, dryRun: true },
+			{
+				ctx, lock: NOOP_LOCK,
+				composeFn: () => ({ card: makeCard('src/a', 'h'), contentHash: 'h'.padEnd(64, '0'), changed: true }),
+				loadExistingFn: async () => ({ card: null }),
+				writeFn: vi.fn(async () => true),
+				couchWriteFn: couchFn, qdrantBackfillFn: qdrantFn,
+			},
+		);
+		expect(result.redisWrites).toBe(0);
+		expect(result.couchWrites).toBe(0);
+		expect(result.qdrantWrites).toBe(0);
+		expect(result.skippedCount).toBe(1);
+		// dry-run path short-circuits before couch/qdrant call sites
+		expect(couchFn).not.toHaveBeenCalled();
+		expect(qdrantFn).not.toHaveBeenCalled();
 	});
 
 	it('honors --limit cap', async () => {

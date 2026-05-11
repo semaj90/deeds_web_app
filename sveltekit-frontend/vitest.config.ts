@@ -175,6 +175,10 @@ export default defineConfig({
       'tests/agents-regen-run.spec.ts',
       // Phase A3 (part 2) — agents-md-regen CLI shell (spawns real script)
       'tests/agents-regen-cli.spec.ts',
+      // Phase A4 — durable writers (CouchDB + Qdrant) with env-gate + DI surface
+      'tests/agents-regen-writers.spec.ts',
+      // Phase A4.5 — agents.regen telemetry → context_timeline (env-gate + DI)
+      'tests/agents-regen-telemetry.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
