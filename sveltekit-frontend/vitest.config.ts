@@ -151,6 +151,8 @@ export default defineConfig({
       'tests/multi-lane-rrf-and-rerank.spec.ts',
       // AGENTS directory-card index store + ACE context source (P1 batch — 2026-05-11)
       'tests/agents-index.spec.ts',
+      // GraphRAG flag contract for build-agents-index.mjs (Neo4j sync + dry-run + skip flags)
+      'tests/agents-build-index-flags.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
