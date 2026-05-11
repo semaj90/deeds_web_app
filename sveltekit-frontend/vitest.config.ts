@@ -163,6 +163,8 @@ export default defineConfig({
       'tests/agents-cache-cli.spec.ts',
       // Phase A1 — regen loader contracts (graph + path-aliases foundation)
       'tests/agents-regen-loaders.spec.ts',
+      // Phase A1.3 + A1.4 — Redis loader contracts (karpathy + cluster summaries)
+      'tests/agents-regen-redis-loaders.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
