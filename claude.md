@@ -530,6 +530,33 @@ Answer NO or Ctrl+C immediately. Drizzle marks tables not in schema for deletion
 
 ---
 
+## Drizzle Safety Rule (May 11, 2026 — operator-only gate)
+
+**Do NOT run `drizzle-kit push` or apply generated DROP migrations until ALL four hold:**
+
+1. **DB-only live tables are protected** by `tablesFilter` in [drizzle.config.ts](sveltekit-frontend/drizzle.config.ts) OR explicitly declared in the canonical Drizzle schema. As of 2026-05-11 the filter protects 50 DB-only tables (`!ace_chunks`, `!embedded_summaries`, `!trace_runs`, `!warden_*`, etc.) plus the legacy `!phase89_*` / `!kg_*` patterns.
+2. **The identity strategy for `users.id` / `user_id` is decided** by the operator. See "Schema Mismatch" section below — until the operator commits to Path A (all integer), B (all uuid), C (two-tier `users.id` + `users.uuid`), or D (defer/coerce forever), broad migration work blindly hardcodes the wrong choice.
+3. **Generated SQL has been manually reviewed** — every CREATE/ALTER/DROP must be eyeballed before journaling. `drizzle-kit generate --name=foo` writes to `drizzle/0NNN_foo.sql` AND `drizzle/meta/_journal.json`. To inspect without journaling: generate, copy the SQL, then `git checkout drizzle/meta/_journal.json && rm drizzle/0NNN_foo.sql`.
+4. **Manual SQL sidecar migrations are accounted for.** `drizzle/manual/*.sql` files are NOT in the journal — they were applied by hand. Any auto-generated migration that re-CREATEs those tables will collide. Cross-check generated CREATEs against `ls drizzle/manual/` before applying.
+
+**`tablesFilter` semantics** (subtle): the `!table_name` patterns suppress `drizzle-kit generate` from emitting **DROP TABLE** for DB-only tables. They do NOT suppress **CREATE TABLE** for tables declared in `schema-postgres.ts` but missing from DB. To skip a CREATE, the table must be removed from the schema file OR the generated CREATE must be manually deleted.
+
+**Current schema state (verified 2026-05-11):**
+- Drizzle declares **148 tables** in canonical `schema-postgres.ts` + ~30 in sidecar schema files
+- Live DB has **247 tables** (148 declared + 50 DB-only protected + ~50 legacy/sidecar)
+- Inspection-only generate run produces **34 CREATE statements** (5 are audit-approved "migrate now" — `ace_retrieval_runs`, `ace_retrieval_hits`, `memory_gain_audits`, `metadata_envelopes`, `code_llm_index`; 7 are duplicates of filter-protected tables; 22 are deferred-feature scaffolding)
+- 0 DROP statements (filter working)
+
+**Audit references:**
+- [docs/audits/db-schema-drift-2026-05-10.md](sveltekit-frontend/docs/audits/db-schema-drift-2026-05-10.md) — Drizzle vs Postgres drift inventory
+- [docs/audits/feature-parity-2026-05-10.md](sveltekit-frontend/docs/audits/feature-parity-2026-05-10.md) — feature-level reality check
+- [docs/audits/summary-2026-05-10.md](sveltekit-frontend/docs/audits/summary-2026-05-10.md) — action list
+- [docs/audit/2026-05-11_feature-spec-implementation-audit.md](sveltekit-frontend/docs/audit/2026-05-11_feature-spec-implementation-audit.md) — directory-density feature audit
+
+**AGENTS.md authority** (clarified): treat directory-level `AGENTS.md` files as **searchable index cards**, not source-of-truth specs. Canonical authority for features lives in `docs/master_agents.md` + this CLAUDE.md + `docs/audit/*.md` + actual code/tests/DB introspection. The 383 dir-level AGENTS.md files are auto-generated retrieval cards for ACE/KAG context hints.
+
+---
+
 ## Schema Mismatch: `user_id` columns split across 3 types in DB (May 10, 2026)
 
 **The schema is fragmented.** A live audit of `information_schema.columns` shows 44 tables with `user_id` (or `uploaded_by`) columns, split across **integer / uuid / text**:
