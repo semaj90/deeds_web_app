@@ -23,15 +23,19 @@
 --      panel_activity_log, rag_query_log, report_audit_log, response_feedback,
 --      synthesis_runs, user_analytics_events, user_interaction_history,
 --      user_research_tasks, yorha_chat_sessions
+--    NOTE: chat_messages.user_id stays in the ALTER list to ensure type-parity
+--    with the new integer users.id, even though the table is no longer dropped.
 --
--- 3. DROPS 3 finalization-candidate tables per triage doc §5:
---      - chat_messages           (insert is commented-out at /chat/+page.server.ts:57)
---      - poi_photos              (only consumed by /persons-of-interest/[id])
---      - criminals               (only consumed by homepage count query)
---    All three are scope-down candidates with zero or near-zero live readers.
+-- 3. [CANCELLED] DROPS 3 finalization-candidate tables per triage doc §5.
+--    REASON: Detailed consumer audit (2026-05-11) revealed high dependency.
+--    Tables preserved:
+--      - chat_messages           (20+ consumers including ACE chat-memory and YoRHa)
+--      - poi_photos              (8+ API routes; core of face-match/gpu-analyze)
+--      - criminals               (Full domain schema; future-proofing POI lists)
+--    These DROP statements are now COMMENTED OUT below.
 --
 -- 4. RE-ADDS the integer FK constraints to users(id) with ON DELETE SET NULL.
---    The 3 dropped tables don't need re-add.
+--    chat_messages is included in this list now.
 --
 -- ── WHAT THIS MIGRATION DOES *NOT* DO ───────────────────────────────────────
 --
@@ -58,12 +62,15 @@
 -- 2. If rollback needed: pg_restore from the dump
 -- Operator: take a dump first. This migration drops data by design.
 --
--- ── IDEMPOTENCY ─────────────────────────────────────────────────────────────
+-- ── CONSUMER AUDIT (2026-05-11) ──────────────────────────────────────────────
 --
--- - All ALTER COLUMN statements check current type via information_schema.
--- - All DROP TABLE statements use IF EXISTS.
--- - All ALTER TABLE … DROP CONSTRAINT use IF EXISTS.
--- - Second-run is a no-op.
+-- Table          | Triage (Incorrect)         | Reality (Keep)
+-- ---------------|----------------------------|--------------------------------
+-- criminals      | "homepage count only"      | Full domain schema. Preserve.
+-- poi_photos     | "/poi/[id] only"           | 8 API routes (face-synth, match).
+-- chat_messages  | "insert commented out"     | 20+ consumers (ACE, YoRHa, RAG).
+--
+-- Decision: Preserve all 3. chat_messages.user_id aligned to integer.
 -- ============================================================================
 
 BEGIN;
@@ -107,7 +114,7 @@ DECLARE
   t text;
   uuid_tables text[] := ARRAY[
     'ace_context_cache','ai_usage_log','analytics_events','api_audit_log',
-    'audit_log','chat_metadata','chunk_hit_log',
+    'audit_log','chat_messages','chat_metadata','chunk_hit_log',
     'citation_collections','diagnosis_events','email_verification_codes',
     'error_suggestion_states','evidence','evidence_audit_log',
     'panel_activity_log','rag_query_log','report_audit_log',
@@ -131,13 +138,10 @@ BEGIN
   END LOOP;
 END $$;
 
--- ── STEP 3: Drop the 3 finalization-candidate tables ────────────────────────
--- Per triage doc §5: chat_messages (commented-out insert), poi_photos (single
--- consumer), criminals (homepage-only). Operator confirmed scope-down acceptable.
-
-DROP TABLE IF EXISTS chat_messages   CASCADE;
-DROP TABLE IF EXISTS poi_photos      CASCADE;
-DROP TABLE IF EXISTS criminals       CASCADE;
+-- Per triage doc §5 correction: preserved after consumer audit.
+-- DROP TABLE IF EXISTS chat_messages   CASCADE;
+-- DROP TABLE IF EXISTS poi_photos      CASCADE;
+-- DROP TABLE IF EXISTS criminals       CASCADE;
 
 -- ── STEP 4: Re-add integer FK constraints to users(id) with ON DELETE SET NULL
 -- (Same pattern used by other integer user_id columns in the canonical schema.)
@@ -147,7 +151,7 @@ DECLARE
   t text;
   int_tables text[] := ARRAY[
     'ace_context_cache','ai_usage_log','analytics_events','api_audit_log',
-    'audit_log','chat_metadata','chunk_hit_log',
+    'audit_log','chat_messages','chat_metadata','chunk_hit_log',
     'citation_collections','diagnosis_events','email_verification_codes',
     'error_suggestion_states','evidence','evidence_audit_log',
     'panel_activity_log','rag_query_log','report_audit_log',
@@ -207,7 +211,7 @@ COMMIT;
 --           AND contype = 'f' AND conname ILIKE '%user_id%'
 --      );
 --
---   -- Should print 0 (dropped tables):
+--   -- Should print 3 (preserved tables):
 --   SELECT count(*) FROM information_schema.tables
 --    WHERE table_schema = 'public'
 --      AND table_name IN ('chat_messages','poi_photos','criminals');
