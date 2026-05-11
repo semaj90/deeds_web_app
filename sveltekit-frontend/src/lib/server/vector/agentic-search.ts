@@ -1,12 +1,16 @@
 import { MultiQueryGenerator } from '$lib/server/ai/multi-query-generator';
 import { QdrantManager } from '$lib/server/vector/qdrant-manager';
-import { generateEmbedding } from '$lib/server/ai/ollama-client';
+// embedding-client has the `(text: string) => number[] | null` shape callers expect
+// (handles gRPC → HTTP → inline cascade internally).
+import { generateEmbedding } from '$lib/server/grpc/embedding-client';
 
 export interface AgenticSearchOptions {
 	collection: string;
 	tags?: string[];
 	limit?: number;
 	expandQuery?: boolean;
+	/** Additional Qdrant filter predicates merged on top of the tag filter */
+	filters?: Record<string, unknown>;
 }
 
 export class AgenticSearchService {

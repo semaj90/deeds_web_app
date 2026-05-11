@@ -1,43 +1,64 @@
 import { json } from '@sveltejs/kit';
-import { ModelManager } from '$lib/server/admin/model-manager.js';
+import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
-import { z } from 'zod';
+import { productionLogger } from '$lib/server/production-logger.js';
 
-const PromoteSchema = z.object({
-  component: z.string().min(1),
-  version: z.string().min(1)
-});
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
-/**
- * POST /api/admin/model/promote-weights
- * Atomically promotes a candidate weight version to 'live' status.
- */
-export async function POST({ request, locals }) {
-  if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
-    return json({ error: 'Unauthorized' }, { status: 401 });
-  }
+	try {
+		const { component, version, checksum } = await request.json();
+		
+		if (!component || !version) {
+			return json({ error: 'Component and version required' }, { status: 400 });
+		}
 
-  try {
-    const raw = await request.json();
-    const parsed = PromoteSchema.safeParse(raw);
-    
-    if (!parsed.success) {
-      return json({ error: 'Invalid payload' }, { status: 400 });
-    }
+		const { db } = await import('$lib/server/db/client');
+		const { sql } = await import('drizzle-orm');
 
-    const { component, version } = parsed.data;
-    const result = await ModelManager.promoteCandidate(component, version);
-    
-    if (!result.success) {
-      return json({ error: result.error }, { status: 400 });
-    }
+		// 1. Verify existence and integrity in model_weights table
+		const weights = await db.execute(sql`
+			SELECT * FROM model_weights 
+			WHERE model_name = ${component} AND version = ${version}
+		`);
 
-    return json({ 
-      success: true, 
-      message: `Component ${component} promoted to version ${version}.` 
-    });
-  } catch (err) {
-    console.error('[ModelPromote] Error:', err);
-    return json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
+		const rows = (weights as any).rows || weights;
+		if (rows.length === 0) {
+			return json({ error: `Model weight ${component}@${version} not found in candidate registry` }, { status: 404 });
+		}
+
+		const weightRecord = rows[0];
+		if (checksum && weightRecord.checksum_sha256 !== checksum) {
+			return json({ error: 'Integrity check failed: Checksum mismatch' }, { status: 400 });
+		}
+
+		console.log(`[Model Promotion] Promoting ${component} to version ${version}`);
+		
+		// 2. Atomic promotion: Deactivate old version, activate new one
+		await db.transaction(async (tx) => {
+			await tx.execute(sql`
+				UPDATE model_weights SET status = 'deprecated' 
+				WHERE model_name = ${component} AND status = 'active'
+			`);
+			await tx.execute(sql`
+				UPDATE model_weights SET status = 'active' 
+				WHERE id = ${weightRecord.id}
+			`);
+		});
+		
+		productionLogger.security(`Model weight promotion: ${component}@${version}`, {
+			userId: locals.user?.id,
+			component,
+			version,
+			checksum: weightRecord.checksum_sha256
+		});
+
+		return json({ ok: true, promoted: { component, version, status: 'active' } });
+
+	} catch (err) {
+		console.error('[Model Promotion] Error:', err);
+		return json({ error: 'Internal server error' }, { status: 500 });
+	}
+};

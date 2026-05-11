@@ -1,6 +1,8 @@
 import type { PageServerLoad } from './$types';
 import { pool } from '$lib/server/db/client';
 import { error, redirect } from '@sveltejs/kit';
+import { LegalCitationService } from '$lib/server/legal/citation-service.js';
+
 
 /** Extract citation-like references from text using common legal patterns */
 function extractCitationRefs(text: string | null): Array<{ label: string; type: string }> {
@@ -85,8 +87,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 		const node = nodeRes.rows[0];
 
-		// 2-6: Run remaining queries in parallel
-		const [childrenRes, definitionsRes, siblingsRes, tocRes, chunksRes] = await Promise.all([
+		// 2-8: Run remaining queries in parallel
+		const [childrenRes, definitionsRes, siblingsRes, tocRes, chunksRes, citedBy, citesRes] = await Promise.all([
 			// 2. Children nodes (Key Provisions)
 			pool.query(
 				`SELECT id, heading, citation_label, node_type, full_text
@@ -138,9 +140,23 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 				 LIMIT 30`,
 				[nodeId]
 			),
+			// 7. Incoming citations (Cited By)
+			LegalCitationService.getCitedNodes(nodeId),
+			
+			// 8. Outgoing citations (Cites)
+			pool.query(
+				`SELECT ln.id, ln.heading, ln.citation_label, lc.citation_text
+				 FROM legal_citations lc
+				 JOIN legal_nodes ln ON ln.id = lc.to_node_id
+				 WHERE lc.from_node_id = $1`,
+				[nodeId]
+			)
 		]);
 
 		const siblingIdx = siblingsRes.rows.findIndex((s: any) => s.id === nodeId);
+		const cites = citesRes.rows || [];
+
+
 		const prev = siblingIdx > 0 ? siblingsRes.rows[siblingIdx - 1] : null;
 		const next = siblingIdx < siblingsRes.rows.length - 1 ? siblingsRes.rows[siblingIdx + 1] : null;
 
@@ -207,7 +223,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			breadcrumbs,
 			citationRefs,
 			implications,
+			citations: {
+				cites,
+				citedBy
+			}
 		};
+
 	} catch (err) {
 		console.error('[node/[nodeId]] load error:', err);
 		if (err && typeof err === 'object' && 'status' in err) throw err;

@@ -1,250 +1,71 @@
-// Evidence Management Types for SvelteKit, 2 AI Platform // Optimized for PostgreSQL + PGVector + Qdrant + MinIO + Redis
-import type { ActorRef } from 'xstate';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import { z } from 'zod';
 
 /**
- * Defines the structure for an evidence item used in the legal AI platform.
- * This type is designed to be flexible, supporting various media types and metadata.
- * It combines properties from the original Evidence interface: EvidenceFile type,
- * and the EvidenceItem interface previously used in the frontend.
+ * Evidence Type Enum (matches evidence_type pgEnum)
  */
-export interface Evidence {
- id: string;
-	userId: string; // From EvidenceFile
- caseId?: string; // From EvidenceFile (matches 'caseId' in error message)
+export const EvidenceType = z.enum([
+	'document',
+	'photo',
+	'video',
+	'audio',
+	'physical',
+	'digital',
+	'witness_statement',
+	'forensic',
+	'documentary',
+	'testimonial',
+	'demonstrative',
+	'real',
+	'circumstantial',
+	'hearsay',
+	'expert',
+	'scientific'
+]);
 
- // Core identification and display properties
- title: string;
-	filename: string; // From EvidenceFile (maps to 'name' in error message, 'fileName' in local EvidenceItem)
- originalName: string; // From EvidenceFile
- mimeType: string; // From EvidenceFile
- type: 'document' | 'image' | 'video' | 'audio' | 'link' | string; // General category
- evidenceType?: 'document' | 'image' | 'video' | 'audio' | 'link' | string; // More specific type
+/**
+ * Evidence Schema for validation
+ */
+export const EvidenceSchema = z.object({
+	id: z.string().uuid().optional(),
+	caseId: z.string().uuid(),
+	title: z.string().min(1).max(255),
+	description: z.string().optional(),
+	evidenceType: EvidenceType.optional(),
+	subType: z.string().max(50).optional(),
+	fileKey: z.string().optional(),
+	fileUrl: z.string().url().optional(),
+	fileName: z.string().max(255).optional(),
+	mimeType: z.string().max(100).optional(),
+	sizeBytes: z.number().int().positive().optional(),
+	hash: z.string().max(128).optional(),
+	hashAlgorithm: z.string().max(32).optional(),
+	tags: z.array(z.string()).default([]),
+	metadata: z.record(z.string(), z.any()).default({}),
+	canvasPosition: z.object({
+		x: z.number().default(0),
+		y: z.number().default(0)
+	}).default({ x: 0, y: 0 })
+});
 
- // Content and descriptive properties
- description?: string;
- url?: string; // Can be used for fileUrl
- path: string; // From EvidenceFile (maps to 'filePath' in error message)
- extractedText?: string; // From EvidenceFile (maps to 'contentText' in error message)
+export type Evidence = z.infer<typeof EvidenceSchema>;
+export type EvidenceType = z.infer<typeof EvidenceType>;
 
- // File system and temporal properties
- fileSize: number; // From EvidenceFile (renamed from 'size' to match original Evidence and local EvidenceItem)
- bucket: string; // From EvidenceFile
- createdAt: Date | string;
- uploadedAt: Date | string;
- updatedAt: Date | string;
+/**
+ * Evidence Section Schema (for structured parts of a document)
+ */
+export const EvidenceSectionSchema = z.object({
+	id: z.string().uuid().optional(),
+	evidenceId: z.string().uuid(),
+	sectionType: z.enum(['header', 'footer', 'body', 'signature', 'stamp', 'annotation', 'metadata', 'citation']),
+	content: z.string(),
+	pageNumber: z.number().int().positive().optional(),
+	boundingBox: z.object({
+		x: z.number(),
+		y: z.number(),
+		w: z.number(),
+		h: z.number()
+	}).optional(),
+	confidence: z.number().min(0).max(1).optional()
+});
 
- // Categorization and AI analysis properties
- tags: string[];
- embedding?: number[]; // From EvidenceFile
- summary?: string; // From EvidenceFile (corresponds to aiSummary)
- legalAnalysis?: string;
- hash?: string; // From EvidenceItem
- thumbnailUrl?: string; // From EvidenceItem
-
- // Processing status and metadata
- processingStatus?: 'pending'
- | 'processing'
- | 'completed'
- | 'failed'
- | 'new'
- | 'reviewing'
- | 'approved'; // From EvidenceFile and EvidenceItem (maps to 'status')
- processingError?: string;
-	metadata: Record<string, unknown>;
-}
-
-export type EvidenceUploadInput = {
- file: File;
-	userId: string;
- caseId?: string;
- tags?: string[];
- metadata?: Record<string, unknown>;
-};
-export type EvidenceAnalysisResult = {
- success: boolean;
-	fileId: string;
- summary: string;
-	autoTags: string[];
- legalNotes?: string;
- embedding?: number[];
- extractedText?: string;
-	processingTimeMs: number;
-};
-
-// ==================== AI Agent Types ====================
-export type AIAgentTool = {
- name: string;
-	description: string;
- parameters: Record<string, { type: string;
-	description: string; required?: boolean }>;
- execute: (params: Record<string, unknown>) => Promise<unknown>;
-};
-
-export type AIToolInvocation = {
- tool: string;
-	params: Record<string, unknown>;
- result: unknown;
-	timestamp: number;
-};
-
-export type AIResponse = {
- text: string;
-	source: 'ollama' | 'tensorrt';
- model: string;
- toolInvocations?: AIToolInvocation[];
- tokensUsed?: number;
-	responseTimeMs: number;
-};
-
-export type ChatMessage = {
- id: string;
-	role: 'user' | 'assistant' | 'system';
- content: string;
-	timestamp: number;
- userId: string;
- caseId?: string;
- evidenceIds?: string[];
- aiMetadata?: {
-	source: 'ollama' | 'tensorrt'; model: string; toolsUsed?: string[] };
-};
-
-// ==================== Vector Search Types ====================
-export type VectorEmbedding = number[]; // 768-dim for nomic-embed-text
-
-export type VectorSearchQuery = {
- embedding: VectorEmbedding;
- limit?: number;
- threshold?: number;
- filter?: { userId?: string; caseId?: string; tags?: string[] };
-};
-
-export type VectorSearchResult = {
- id: string;
-	score: number;
- evidence: Evidence; // Updated to use the unified Evidence interface
- distance: number;
-};
-
-// ==================== Workflow Types ====================
-export type WorkflowContext = {
- currentFile?: Evidence; // Updated to use the unified Evidence interface
- result?: EvidenceAnalysisResult;
- error?: string;
-	progress: number;
- stage: 'upload' | 'ocr' | 'embedding' | 'analysis' | 'storage' | 'complete';
- retryCount: number;
-};
-export type WorkflowEvent =
- | { type: 'PROCESS_EVIDENCE';
-	data: Evidence } // Updated to use the unified Evidence interface
- | { type: 'OCR_COMPLETE';
-	text: string }
- | { type: 'EMBEDDING_COMPLETE';
-	embedding: number[] }
- | { type: 'ANALYSIS_COMPLETE';
-	result: EvidenceAnalysisResult }
- | { type: 'ERROR';
-	error: string }
- | { type: 'RETRY' }
- | { type: 'CANCEL' };
-
-// ==================== Cache Types ====================
-export type CacheEntry<T> = { data: T;
-	timestamp: number; ttl: number; userId?: string };
-
-export type EmbeddingCache = CacheEntry<{
- fileId: string;
-	embedding: VectorEmbedding;
- model: string;
-}>;
-
-export type AnalysisCache = CacheEntry<{
- fileId: string;
-	summary: string;
- tags: string[];
- legalNotes?: string;
-}>;
-
-// ==================== API Response Types ====================
-export type APIResponse<T = unknown> = {
- success: boolean;
- data?: T;
- error?: string;
-	timestamp: number;
-};
-
-export type UploadResponse = APIResponse<{
- fileId: string;
-	path: string;
- processingStarted: boolean;
-}>;
-
-export type SearchResponse = APIResponse<{
- results: VectorSearchResult[];
-	totalFound: number;
- queryTimeMs: number;
-}>;
-
-// ==================== WebSocket Message Types ====================
-export type EvidenceWebSocketMessage =
- | { type: 'PROCESSING_UPDATE';
-	fileId: string; stage: string;
-	progress: number }
- | { type: 'ANALYSIS_COMPLETE';
-	fileId: string; result: EvidenceAnalysisResult }
- | { type: 'ERROR';
-	fileId: string; error: string }
- | { type: 'CHAT_MESSAGE';
-	message: ChatMessage }
- | { type: 'VECTOR_SEARCH_RESULT';
-	results: VectorSearchResult[] };
-
-// ==================== Export Actor Types ====================
-// Correct the generic arguments for: ActorRef<TEvent, TSnapshot>
-
-// Base properties common to all snapshot states
-type BaseSnapshotProperties = {
- context: WorkflowContext;
-	value: unknown; // current state value (string | object) depending on machine shape
- lastEvent?: WorkflowEvent; // optional last event that produced this snapshot
- timestamp?: number; // simple metadata for UI/transport (timestamps, progress)
-	children?: Record<string, any>; // Simplified to fix generic parsing error
-};
-
-// Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>
-export type EvidenceSnapshot =
-	| (BaseSnapshotProperties & {
-			status: 'active';
-			output: undefined;
-			error: undefined;
-	  })
-	| (BaseSnapshotProperties & {
-			status: 'stopped';
-			output: undefined;
-			error: undefined;
-	  })
-	| (BaseSnapshotProperties & {
-			status: 'done';
-			output: unknown;
-			error: undefined;
-	  })
-	| (BaseSnapshotProperties & {
-			status: 'error';
-			error: unknown;
-			output: undefined;
-	  });
-
-export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second
-
-// For WebSocket updates
-export interface AnalysisUpdate {
- summary?: string;
- autoTags?: string[];
- progress?: number;
- stage?: string;
-}
-
-
-
-
+export type EvidenceSection = z.infer<typeof EvidenceSectionSchema>;

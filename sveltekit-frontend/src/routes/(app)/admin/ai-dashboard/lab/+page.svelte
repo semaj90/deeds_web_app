@@ -15,6 +15,8 @@
 	import LocalImageGenerator from '$lib/components/ai/LocalImageGenerator.svelte';
 	import GPUAIAssistant from '$lib/components/ai/GPUAIAssistant.svelte';
 	import DeedAnalysis from '$lib/components/ai/DeedAnalysis.svelte';
+	import AdminMonitoringDashboard from '$lib/components/admin/AdminMonitoringDashboard.svelte';
+
 
 	interface AIStats {
 		activeChats: number;
@@ -51,6 +53,8 @@
 	let showDetective = $state(false);
 	let showImageGen = $state(false);
 	let showDeedAnalysis = $state(false);
+	let showMonitoring = $state(false);
+
 
 	$effect(() => {
 		loadDashboard();
@@ -212,6 +216,19 @@
 			{#if showDeedAnalysis}<div class="panel-body"><DeedAnalysis /></div>{/if}
 		</div>
 
+		<div class="panel-block">
+			<p class="section-kicker">Infrastructure Observability</p>
+			<button class="panel-toggle" onclick={() => (showMonitoring = !showMonitoring)}>
+				{showMonitoring ? 'Hide Monitoring Dashboard' : 'Admin Infrastructure Monitoring (Phase D)'}
+			</button>
+			{#if showMonitoring}
+				<div class="panel-body no-padding overflow-hidden">
+					<AdminMonitoringDashboard />
+				</div>
+			{/if}
+		</div>
+
+
 		{#if error}
 			<Card class="mt-4 bg-panel border-danger/40">
 				<CardContent class="p-4 text-center">
@@ -301,7 +318,9 @@
 		border: 1px solid rgba(212, 199, 163, 0.08);
 	}
 	.panel-body.tall { min-height: 520px; }
+	.panel-body.no-padding { padding: 0; }
 	.ace-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-start; }
+
 	@media (max-width: 720px) {
 		.surface-header, .surface-nav { flex-direction: column; }
 	}

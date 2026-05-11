@@ -270,7 +270,7 @@ async function searchLegalLibrary(q: string, limit: number): Promise<PlatformSea
 async function searchRaptorAtlas(q: string, limit: number): Promise<PlatformSearchHit[]> {
 	try {
 		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-		const { generateEmbedding } = await import('$lib/server/ai/ollama-client.js');
+		const { generateEmbedding } = await import('$lib/server/grpc/embedding-client.js');
 
 		const queryVec = await generateEmbedding(q);
 		if (!queryVec) return [];
@@ -287,7 +287,7 @@ async function searchRaptorAtlas(q: string, limit: number): Promise<PlatformSear
 			id: String(r.id),
 			entityType: 'report' as const,
 			title: (r.payload?.title ?? 'Thematic Summary') as string,
-			snippet: (r.payload?.summary ?? r.payload?.text ?? '').slice(0, 300),
+			snippet: String(r.payload?.summary ?? r.payload?.text ?? '').slice(0, 300),
 			score: r.score,
 			matchType: 'semantic' as const,
 			route: '/admin/atlas',

@@ -9,7 +9,7 @@ import { Badge } from "$lib/components/ui/badge/index.js";
 import { Button } from "$lib/components/ui/button/index.js";
 import * as Card from "$lib/components/ui/card/index.js";
 // App stores & Services
-import { aiService } from "$lib/features/ai/services/ai-service";
+import { aiAssistantStore } from "$lib/stores/unified/ai-assistant-store.svelte.js";
 import AIAssistantPanel from "$lib/components/ai/AIAssistantPanel.svelte";
 import EvidenceCard from "$lib/components/detective/EvidenceCard.svelte";
 import UploadZone from "$lib/components/detective/UploadZone.svelte";
@@ -129,13 +129,13 @@ function handleViewEvidence(item: any) {
 async function analyzeSelectedEvidence() {
   if (selectedEvidenceIds.length === 0) return;
   try {
-    if (selectedEvidenceIds.length === 1) {
-      // Assuming 'document' as default type if not available
-      await aiService.analyzeEvidence(selectedEvidenceIds[0], "document");
-    } else {
-      // await findEvidenceConnections(caseId, selectedEvidenceIds);
-      console.warn("findEvidenceConnections not implemented yet");
-    }
+    showAIAssistant = true;
+    aiAssistantStore.updateContext({ caseId });
+    const prompt =
+      selectedEvidenceIds.length === 1
+        ? `Analyze the selected evidence item in case ${caseId}.`
+        : `Analyze these selected evidence items in case ${caseId}: ${selectedEvidenceIds.join(', ')}.`;
+    await aiAssistantStore.sendMessage(prompt, caseId, selectedEvidenceIds);
   } catch (e) {
     console.error("Analyze failed", e);
   }

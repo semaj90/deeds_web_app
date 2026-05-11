@@ -14,6 +14,9 @@
 	import ExpandGrid from '$lib/components/ui/ExpandGrid.svelte';
 	import { createViewTracker } from '$lib/utils/tracking';
 	import EvidenceRecall from '$lib/components/evidence/EvidenceRecall.svelte';
+	import { fade, fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
+
 
 	let { data }: { data: PageData } = $props();
 	let showRecall = $state(true);
@@ -24,11 +27,13 @@
 	let showRichCards = $state(false);
 	let showRagDocuments = $state(false);
 
-	const sampleEvidenceItems: any[] = [
-		{ id: 'ev-001', file_name: 'Contract_Agreement_2024.pdf', evidence_type: 'document', file_type: 'application/pdf', file_size: 2_400_000, uploaded_at: new Date(Date.now() - 86400000 * 5), ai_summary: 'Employment agreement with non-compete clause. Contains liability provisions in Section 4.', tags: ['contract', 'employment'], ai_tags: ['legal-binding', 'non-compete'] },
-		{ id: 'ev-002', file_name: 'Scene_Photo_001.jpg', evidence_type: 'photograph', file_type: 'image/jpeg', file_size: 3_800_000, uploaded_at: new Date(Date.now() - 86400000 * 2), ai_summary: 'Exterior photograph showing property boundary markers.', tags: ['property', 'boundary'], ai_tags: ['geolocation', 'outdoor'] },
-		{ id: 'ev-003', file_name: 'Witness_Deposition.docx', evidence_type: 'testimony', file_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', file_size: 156_000, uploaded_at: new Date(Date.now() - 86400000), tags: ['witness', 'deposition'] },
-	];
+	let evidenceItems = $state(data.evidenceItems || []);
+	
+	// Synchronize with server data when it changes
+	$effect(() => {
+		evidenceItems = data.evidenceItems || [];
+	});
+
 	let showTimeline = $state(false);
 	let showEvidenceModal = $state(false);
 	let selectedEvidence = $state<any>({ jsonData: { title: '', description: '', tags: [] } });
@@ -69,7 +74,11 @@
 	<div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; margin-bottom: 1rem;">
 		<div style="flex: 1;">
 			<div style="font-size: 0.95rem; font-weight: 600; color: var(--t-text, #d6d3d1);">Evidence Library</div>
-			<div style="font-size: 0.8rem; color: var(--t-text-muted, #78716c); margin-top: 0.25rem;">Upload and manage case evidence. Below are demo components and sample data.</div>
+			<div style="font-size: 0.8rem; color: var(--t-text-muted, #78716c); margin-top: 0.25rem;">
+				Total Items: {evidenceItems.length}
+				{#if data.caseId} | Case: {data.caseId} {/if}
+			</div>
+
 		</div>
 		<a href="/evidence/upload" style="padding: 0.5rem 1rem; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; text-decoration: none; white-space: nowrap; transition: background 0.2s;">
 			Upload Evidence
@@ -94,7 +103,14 @@
 
 <LazyLoader placeholderHeight="400px" loadingText="Loading Evidence Dashboard...">
 	{#snippet children()}
-		<EvidenceAnalysisDashboard caseId={data.caseId} />
+		<EvidenceAnalysisDashboard 
+	caseId={data.caseId} 
+	onUpload={(item) => {
+		// Local update for instant feedback
+		evidenceItems = [item, ...evidenceItems];
+	}}
+/>
+
 	{/snippet}
 </LazyLoader>
 
@@ -164,15 +180,30 @@
 {#if showEvidenceCards}
 	<div class="report-container">
 		<ExpandGrid columns={1} expandedColumns={3} gap="1rem" expandOnHover={true}>
-			{#each sampleEvidenceItems as item (item.id)}
-				<div class="grid-item">
+			{#each evidenceItems as item (item.id)}
+				<div class="grid-item" in:fly={{ y: 20, duration: 400, delay: 100, easing: quintOut }}>
 					<EvidenceCard
-						evidence={item}
+						evidence={{
+							...item,
+							file_name: item.fileName || item.title,
+							evidence_type: item.evidenceType || item.type,
+							file_type: item.fileType || item.mimeType,
+							file_size: item.fileSize,
+							uploaded_at: item.uploadedAt ? new Date(item.uploadedAt) : new Date(item.createdAt),
+							ai_summary: item.aiSummary || item.summary || item.description
+						}}
 						onAskAI={(ev) => { goto('/global-search?q=' + encodeURIComponent(ev.file_name ?? '')); }}
-						onDelete={async (id) => { await fetch('/api/evidence/' + id, { method: 'DELETE' }).catch(() => {}); }}
+						onDelete={async (id) => { 
+							const res = await fetch('/api/evidence/' + id, { method: 'DELETE' });
+							if (res.ok) {
+								evidenceItems = evidenceItems.filter(i => i.id !== id);
+							}
+						}}
 					/>
 				</div>
 			{/each}
+
+
 		</ExpandGrid>
 	</div>
 {/if}
@@ -189,31 +220,32 @@
 {#if showRichCards}
 	<div class="report-container">
 		<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-			{#each sampleEvidenceItems as item (item.id)}
+			{#each evidenceItems as item (item.id)}
 				<RichEvidenceCard
 					evidence={{
 						id: item.id,
-						userId: 'system',
-						title: item.file_name,
-						filename: item.file_name,
-						originalName: item.file_name,
-						mimeType: item.file_type,
-						description: item.ai_summary ?? '',
-						type: item.evidence_type === 'photograph' ? 'image' : 'document',
-						evidenceType: item.evidence_type,
-						tags: item.tags ?? [],
-						createdAt: item.uploaded_at?.toISOString?.() ?? '',
-						uploadedAt: item.uploaded_at?.toISOString?.() ?? '',
-						updatedAt: new Date().toISOString(),
-						fileSize: item.file_size,
-						path: `/evidence/${item.id}`,
+						userId: String(item.uploadedBy),
+						title: item.title,
+						filename: item.fileName,
+						originalName: item.fileName,
+						mimeType: item.fileType || item.mimeType,
+						description: item.aiSummary || item.summary || item.description || '',
+						type: item.type || (item.evidenceType === 'photo' ? 'image' : 'document'),
+						evidenceType: item.evidenceType,
+						tags: Array.isArray(item.tags) ? item.tags : [],
+						createdAt: item.createdAt,
+						uploadedAt: item.uploadedAt || item.createdAt,
+						updatedAt: item.updatedAt || item.createdAt,
+						fileSize: item.fileSize,
+						path: item.fileUrl || `/evidence/${item.id}`,
 						bucket: 'evidence',
-						metadata: { format: item.file_type, size: item.file_size }
+						metadata: item.metadata || {}
 					}}
 					showCompare={true}
 					expandOnHover={true}
 				/>
 			{/each}
+
 		</div>
 	</div>
 {/if}
@@ -267,5 +299,12 @@
 
 	.report-container {
 		padding: 0 2rem 2rem;
+		background: rgba(23, 23, 23, 0.4);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		border-radius: 12px;
+		margin: 0 2rem 2rem;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 	}
+
 </style>

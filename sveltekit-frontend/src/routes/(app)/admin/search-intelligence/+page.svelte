@@ -3,6 +3,7 @@
 	import FeedbackButtons from '$lib/components/ui/FeedbackButtons.svelte';
 	import ResearchSummariesBrowser from '$lib/components/analytics/ResearchSummariesBrowser.svelte';
 	import LiveResearchPanel from '$lib/components/analytics/LiveResearchPanel.svelte';
+	import { contextualChat } from '$lib/stores/contextual-chat.svelte.js';
 
 	// ── Types ─────────────────────────────────────────────────────────────────
 
@@ -33,6 +34,16 @@
 		missingColumns: string[];
 		error: string | null;
 	};
+
+	type IntentExample = { label: string; query: string };
+	const INTENT_EXAMPLES: IntentExample[] = [
+		{ label: 'evidence_upload', query: 'upload the pdf evidence and hash it' },
+		{ label: 'schema_drift', query: 'schema drift in the column types' },
+		{ label: 'graph_search', query: 'expand the neighborhood of this node in the graph' },
+		{ label: 'gpu_rerank', query: 'rerank these by the attention score' },
+		{ label: 'ui_bug', query: 'the button click is broken in the modal' },
+		{ label: 'legal_research', query: 'search case law for hearsay precedent' },
+	];
 
 	// ── State ─────────────────────────────────────────────────────────────────
 
@@ -69,6 +80,8 @@
 		recompute?: boolean;
 	};
 	let idxPreset    = $state<IdxPreset>('sync');
+	let intentDraft  = $state('');
+	let intentBusy   = $derived(contextualChat.isThinking);
 
 	const IDX_PRESETS: Record<IdxPreset, IdxPresetConfig> = {
 		sync: { scope: 'all', clusterCount: 20, gpuTag: true, summarize: true, somTopology: false, neo4jSync: false, pageRank: false, exportWiki: false, hypergraph: false },
@@ -1126,6 +1139,14 @@
 		if (!p) return '—';
 		const parts = p.replace(/\\/g, '/').split('/');
 		return parts.length > 2 ? '…/' + parts.slice(-2).join('/') : p;
+	}
+
+	async function sendIntentDraft(query = intentDraft) {
+		const text = query.trim();
+		if (!text) return;
+		intentDraft = text;
+		await contextualChat.send(text);
+		intentDraft = '';
 	}
 </script>
 
@@ -2865,7 +2886,7 @@
 <div class="si-grid">
 
 	<!-- Controls -->
-	<section class="panel span2">
+ 	<section class="panel span2">
 		<div class="panel-hdr">
 			<span class="panel-title"><Icon name="network" class="w-4 h-4" /> Research Graph RL</span>
 			<span class="panel-sub">
@@ -2900,6 +2921,66 @@
 		{#if graphError}
 			<p class="err-inline"><Icon name="alert-triangle" class="w-3.5 h-3.5" /> {graphError}</p>
 		{/if}
+	</section>
+
+	<section class="panel span2">
+		<div class="panel-hdr">
+			<span class="panel-title"><Icon name="sparkles" class="w-4 h-4" /> Intent Router Demo</span>
+			<span class="panel-sub">Type a query and inspect the label badge, confidence pill, and route trace.</span>
+		</div>
+		<div class="intent-demo-shell">
+			<div class="intent-demo-composer">
+				<input
+					class="text-input intent-input"
+					bind:value={intentDraft}
+					placeholder="Try: upload the pdf evidence and hash it"
+					onkeydown={(e) => { if (e.key === 'Enter') void sendIntentDraft(); }}
+				/>
+				<button class="btn-sm primary" onclick={() => void sendIntentDraft()} disabled={intentBusy || !intentDraft.trim()}>
+					{intentBusy ? 'Routing…' : 'Send'}
+				</button>
+			</div>
+			<div class="intent-example-row">
+				{#each INTENT_EXAMPLES as example}
+					<button class="btn-sm btn-ghost" onclick={() => { intentDraft = example.query; void sendIntentDraft(example.query); }}>
+						{example.label}
+					</button>
+				{/each}
+			</div>
+			<div class="intent-message-list">
+				{#each contextualChat.messages as message, index}
+					<div class="intent-message intent-{message.role}">
+						<div class="intent-message-head">
+							<span class="intent-role">{message.role}</span>
+							{#if message.role === 'user' && message.metadata?.intent}
+								{@const intent = message.metadata.intent as { label: string; confidence: number; fallback: boolean }}
+								<span class="intent-badge intent-{intent.fallback ? 'neutral' : intent.label}">{intent.label}</span>
+								<span class="intent-confidence">{(intent.confidence * 100).toFixed(0)}%</span>
+							{/if}
+							{#if message.role === 'assistant' && contextualChat.hasPartialResults}
+								<span class="intent-confidence neutral">partial-results</span>
+							{/if}
+						</div>
+						<p class="intent-message-body">{message.content}</p>
+					</div>
+				{/each}
+			</div>
+			{#if contextualChat.lastRoute}
+				<div class="intent-route-card">
+					<div class="intent-route-row">
+						<span class="intent-confidence">{contextualChat.lastRoute.reason}</span>
+						{#if contextualChat.lastRoute.fallback}
+							<span class="intent-confidence neutral">fallback</span>
+						{/if}
+					</div>
+					<div class="intent-route-steps">
+						{#each contextualChat.lastRoute.chain as step}
+							<span class="intent-step">{step.tool}</span>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</div>
 	</section>
 
 	<!-- Graph stats summary -->
@@ -4163,6 +4244,35 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 	background: #13120f; border: 1px solid #2d2b24; border-radius: 4px; color: #9ca3af; cursor: pointer;
 }
 .ctrl-select:focus { outline: none; border-color: #7c6ff7; }
+
+/* ── Intent Router Demo ───────────────────────────────────────────────── */
+.intent-demo-shell { display: grid; gap: 0.75rem; }
+.intent-demo-composer { display: flex; gap: 0.5rem; align-items: center; }
+.intent-input { flex: 1 1 auto; }
+.intent-example-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.intent-message-list { display: grid; gap: 0.65rem; }
+.intent-message { border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem 0.85rem; background: rgba(255,255,255,0.02); }
+.intent-user { border-color: rgba(99,102,241,0.35); }
+.intent-assistant { border-color: rgba(74,222,128,0.25); }
+.intent-system { border-color: rgba(248,113,113,0.25); }
+.intent-message-head { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: 0.35rem; }
+.intent-role { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.7; }
+.intent-message-body { margin: 0; color: rgba(236, 240, 244, 0.92); line-height: 1.45; }
+.intent-badge, .intent-confidence, .intent-step { display: inline-flex; align-items: center; border-radius: 999px; padding: 0.15rem 0.55rem; font-size: 0.72rem; border: 1px solid rgba(255,255,255,0.12); }
+.intent-confidence { background: rgba(124, 111, 247, 0.18); color: #ddd6fe; }
+.intent-confidence.neutral { background: rgba(156, 163, 175, 0.16); color: #d1d5db; }
+.intent-badge { background: rgba(74, 222, 128, 0.16); color: #bbf7d0; }
+.intent-badge.intent-neutral { background: rgba(156, 163, 175, 0.16); color: #d1d5db; }
+.intent-badge.intent-evidence_upload { background: rgba(251, 191, 36, 0.16); color: #fde68a; }
+.intent-badge.intent-schema_drift { background: rgba(248, 113, 113, 0.16); color: #fecaca; }
+.intent-badge.intent-graph_search { background: rgba(59, 130, 246, 0.16); color: #bfdbfe; }
+.intent-badge.intent-gpu_rerank { background: rgba(168, 85, 247, 0.16); color: #e9d5ff; }
+.intent-badge.intent-ui_bug { background: rgba(251, 146, 60, 0.16); color: #fed7aa; }
+.intent-badge.intent-legal_research { background: rgba(20, 184, 166, 0.16); color: #99f6e4; }
+.intent-route-card { border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem 0.85rem; background: rgba(255,255,255,0.02); }
+.intent-route-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; }
+.intent-route-steps { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.intent-step { background: rgba(255,255,255,0.06); color: #e5e7eb; }
 
 /* ── Predictive Todos ───────────────────────────────────────────────────── */
 .todo-list { display: flex; flex-direction: column; gap: 0.4rem; }

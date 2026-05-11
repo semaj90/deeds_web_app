@@ -106,6 +106,10 @@ class AdminChatAssistant {
     this.isThinking = true;
     this.lastError  = null;
     this.messages.push({ role: 'user', content: query.trim() });
+
+    const intent = this.inferIntent(query);
+    console.log('AdminChat: Inferred intent:', intent);
+
     try {
       const r = await fetch('/api/admin/ai-chat', {
         method:      'POST',
@@ -116,6 +120,7 @@ class AdminChatAssistant {
           query:      query.trim(),
           contextTag: this.contextTag,
           uiSnapshot,
+          intent, // Pass intent to backend for optimized routing
         }),
       });
       const data = await r.json();
@@ -128,7 +133,10 @@ class AdminChatAssistant {
       this.messages.push({
         role:    'assistant',
         content: data.reply ?? '(empty reply)',
-        metadata: { context_used: !!data.context },
+        metadata: { 
+          context_used: !!data.context,
+          intent_routed: intent !== 'general'
+        },
       });
     } catch (err) {
       this.lastError = err instanceof Error ? err.message : String(err);
@@ -137,6 +145,22 @@ class AdminChatAssistant {
       this.isThinking = false;
     }
   }
+
+  /**
+   * Fast regex-based intent classification for routing queries to 
+   * specialized tool chains or context loaders.
+   */
+  private inferIntent(query: string): string {
+    const q = query.toLowerCase();
+    if (/\b(person|poi|suspect|victim|witness|profile)\b/.test(q)) return 'person_lookup';
+    if (/\b(evidence|file|document|upload|attachment|photo|video)\b/.test(q)) return 'evidence_retrieval';
+    if (/\b(case|investigation|docket|matter)\b/.test(q)) return 'case_management';
+    if (/\b(statute|law|code|regulation|legal)\b/.test(q)) return 'legal_research';
+    if (/\b(summarize|summary|tldr|brief)\b/.test(q)) return 'synthesis';
+    if (/\b(audit|log|telemetry|system|health)\b/.test(q)) return 'system_diagnostics';
+    return 'general';
+  }
+
 
   clearChat(): void {
     this.messages   = [];

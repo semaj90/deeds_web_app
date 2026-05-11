@@ -228,8 +228,9 @@
 					History
 				</button>
 				<button class="tab" class:active={activeTab === 'citations'} onclick={() => activeTab = 'citations'}>
-					Citations ({citationRefs.length})
+					Citations ({data.citations.cites.length + data.citations.citedBy.length})
 				</button>
+
 			</nav>
 
 			<!-- Tab Content -->
@@ -274,26 +275,54 @@
 
 				{:else if activeTab === 'citations'}
 					<section class="content-block">
-						{#if citationRefs.length > 0}
-							<div class="citations-grid">
-								{#each citationRefs as ref}
-									<div class="citation-card">
-										<div class="citation-meta">
-											<span class="citation-type-tag">{ref.type}</span>
-										</div>
-										<span class="citation-label">{ref.label}</span>
+						<div class="citation-graph-view">
+							<div class="graph-column">
+								<h3 class="column-header">Cited Authorities <span class="badge">{data.citations.cites.length}</span></h3>
+								{#if data.citations.cites.length > 0}
+									<div class="graph-list">
+										{#each data.citations.cites as cite}
+											<a href="/library/{data.document.id}/node/{cite.id}" class="graph-node outgoing">
+												<div class="node-icon"><Icon name="arrow-up-right" size={12} /></div>
+												<div class="node-info">
+													<span class="node-label">{cite.citation_label || 'Link'}</span>
+													<span class="node-title">{cite.heading}</span>
+												</div>
+											</a>
+										{/each}
 									</div>
-								{/each}
+								{:else}
+									<p class="empty-column">No outgoing citations.</p>
+								{/if}
 							</div>
-						{:else}
-							<div class="empty-tab">
-								<Icon name="scroll-text" size={32} class="text-sand/15" />
-								<p>No cross-references detected in this section.</p>
+
+							<div class="graph-divider">
+								<div class="center-node">
+									<Icon name="target" size={16} />
+								</div>
 							</div>
-						{/if}
+
+							<div class="graph-column">
+								<h3 class="column-header">Referenced By <span class="badge">{data.citations.citedBy.length}</span></h3>
+								{#if data.citations.citedBy.length > 0}
+									<div class="graph-list">
+										{#each data.citations.citedBy as ref}
+											<a href="/library/{data.document.id}/node/{ref.id}" class="graph-node incoming">
+												<div class="node-icon"><Icon name="arrow-down-left" size={12} /></div>
+												<div class="node-info">
+													<span class="node-label">{ref.citationLabel || 'Link'}</span>
+													<span class="node-title">{ref.heading}</span>
+												</div>
+											</a>
+										{/each}
+									</div>
+								{:else}
+									<p class="empty-column">No incoming references.</p>
+								{/if}
+							</div>
+						</div>
 
 						{#if data.definitions.length > 0}
-							<div class="definitions-section">
+							<div class="definitions-section mt-10">
 								<h3 class="definitions-header">Defined Terms</h3>
 								{#each data.definitions as def}
 									<div class="definition-card">
@@ -304,6 +333,7 @@
 							</div>
 						{/if}
 					</section>
+
 
 				{:else if activeTab === 'cases'}
 					<section class="content-block">
@@ -768,4 +798,106 @@
 	.precedent-items { display: flex; flex-direction: column; gap: 0.75rem; }
 	.precedent-teaser .teaser-title { display: block; font-size: 0.75rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.15rem; }
 	.precedent-teaser p { font-size: 0.6875rem; line-height: 1.4; color: rgba(255, 255, 255, 0.4); margin: 0; }
+
+	.citation-graph-view {
+		display: grid;
+		grid-template-columns: 1fr 40px 1fr;
+		gap: 1rem;
+		min-height: 300px;
+	}
+
+	.column-header {
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.5);
+		margin-bottom: 1rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.column-header .badge {
+		background: rgba(255, 255, 255, 0.1);
+		padding: 0.1rem 0.4rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+	}
+
+	.graph-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+	.graph-node {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 10px;
+		text-decoration: none;
+		transition: all 0.2s;
+	}
+
+	.graph-node:hover {
+		background: rgba(255, 255, 255, 0.06);
+		border-color: #60a5fa40;
+		transform: translateX(4px);
+	}
+
+	.node-icon {
+		width: 24px;
+		height: 24px;
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255, 255, 255, 0.05);
+		color: #60a5fa;
+	}
+
+	.node-info { display: flex; flex-direction: column; gap: 0.15rem; }
+	.node-label { font-size: 0.75rem; font-weight: 700; color: #60a5fa; }
+	.node-title { font-size: 0.6875rem; color: rgba(255, 255, 255, 0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+
+	.graph-divider {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+	}
+
+	.graph-divider::before {
+		content: '';
+		position: absolute;
+		top: 0; bottom: 0;
+		width: 1px;
+		background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1), transparent);
+	}
+
+	.center-node {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		background: #1e1f26;
+		border: 2px solid rgba(255, 255, 255, 0.1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1;
+		color: rgba(255, 255, 255, 0.3);
+	}
+
+	.empty-column {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.2);
+		font-style: italic;
+		text-align: center;
+		padding: 2rem;
+		border: 1px dashed rgba(255, 255, 255, 0.05);
+		border-radius: 10px;
+	}
+
+	.mt-10 { margin-top: 2.5rem; }
 </style>
+

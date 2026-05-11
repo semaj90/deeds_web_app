@@ -3,6 +3,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { createRedisConnection } from '$lib/server/redis';
 import { sanitizeBrowserContext, emptyContext } from './browser-context-sanitizer.js';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
+import { AgenticSearchService } from '$lib/server/vector/agentic-search.js';
+
 
 const BROWSER_REDIS_KEY = (userId: string) => `browser-context:snapshot:${userId}`;
 
@@ -35,7 +37,8 @@ async function loadBrowserContext(userId: string): Promise<SanitizedBrowserConte
  * `browserContext` with `trust: 'untrusted_user_visible'` so the prompt
  * builder can warn the model that this lane is NOT authoritative.
  */
-export async function gatherAdminContext(query: string, currentPath?: string, userId?: string) {
+export async function gatherAdminContext(query: string, currentPath?: string, userId?: string, intent?: string) {
+
   const t0 = Date.now();
   const redis = createRedisConnection();
   
@@ -43,7 +46,10 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
     dbHealth,
     redisMetrics,
     indexingStatus,
-    retrievalHealth
+    retrievalHealth,
+    evidenceContext,
+    caseContext,
+    agenticResults
   ] = await Promise.all([
     // 1. DB Row Counts (Quick probe)
     pool.query(`
@@ -68,7 +74,24 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
     `).then(r => r.rows[0]).catch(() => null),
 
     // 4. Trace MCP Health (Direct tool call simulation)
-    fetch(`${ENV.TRACE_MCP_URL}/health`).then(r => r.json()).catch(() => ({ ok: false }))
+    fetch(`${ENV.TRACE_MCP_URL}/health`).then(r => r.json()).catch(() => ({ ok: false })),
+
+    // 5. Intent-specific specialized context
+    intent === 'evidence_retrieval' 
+      ? pool.query(`SELECT count(*) as total, sum(file_size) as total_bytes FROM evidence`).then(r => r.rows[0]).catch(() => null)
+      : Promise.resolve(null),
+    
+    intent === 'case_management'
+      ? pool.query(`SELECT status, count(*) FROM cases GROUP BY status`).then(r => r.rows).catch(() => null)
+      : Promise.resolve(null),
+
+    // 6. Agentic Multi-Query Retrieval
+    intent === 'agentic_multiquery'
+      ? AgenticSearchService.search(query, { 
+          collection: 'codebase_chunks', 
+          tags: query.match(/#\w+/g)?.map(t => t.slice(1)) ?? [] 
+        }).catch(() => null)
+      : Promise.resolve(null)
   ]);
 
   await redis.quit();
@@ -85,12 +108,12 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
       mcp: retrievalHealth
     },
     indexing: indexingStatus,
+    agentic: agenticResults,
     request: {
       query,
-      currentPath
+      currentPath,
+      intent
     },
-    // Browser-side snapshot. Untrusted user-visible context — TRACE backend
-    // retrieval is authoritative. Always present (empty when no snapshot).
     browserContext: userId ? (await loadBrowserContext(userId)) ?? null : null,
   };
 }

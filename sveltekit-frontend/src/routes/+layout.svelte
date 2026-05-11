@@ -12,6 +12,7 @@
     import { goto } from '$app/navigation';
     import { toast } from 'svelte-sonner';
     import { browser } from '$app/environment';
+    import { registerServiceWorker } from '$lib/client/sw-register';
 
     let { children, data }: { children: Snippet; data: { user?: { id: string } | null } } = $props();
     let showDocumentWriter = $state(false);
@@ -121,6 +122,7 @@
     onMount(() => {
         mounted = true;
         analytics.init(data?.user?.id);
+        registerServiceWorker();
 
         // Listen for WebGPU device lost events for graceful degradation
         const handleDeviceLost = (event: Event) => {
