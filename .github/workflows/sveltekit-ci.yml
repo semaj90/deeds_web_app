@@ -44,6 +44,14 @@ jobs:
           node scripts/generate-schema-manifest.mjs
           node scripts/schema-drift-check.mjs
 
+      - name: Agents Smoke Gate (index + cache + regen, dry-run, writers=disabled)
+        run: npm run agents:smoke:all
+        # No DB/Redis/Qdrant/CouchDB required — all three smokes use --dry-run
+        # and gracefully degrade to empty when backends are absent. The script
+        # asserts every *Writes counter is 0; exits nonzero on any contract
+        # violation so this catches a regression of the test-leak class
+        # of bug fixed in Phase A4.
+
   playwright:
     runs-on: ubuntu-latest
     needs: check-and-build
