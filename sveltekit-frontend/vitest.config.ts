@@ -161,6 +161,8 @@ export default defineConfig({
       'tests/agents-index-cli.spec.ts',
       // Mini-Active-Cache CLI flag-contract regression (parallel guardrail to agents-index-cli)
       'tests/agents-cache-cli.spec.ts',
+      // Phase A1 — regen loader contracts (graph + path-aliases foundation)
+      'tests/agents-regen-loaders.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
