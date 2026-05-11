@@ -6,20 +6,21 @@ test('probe /evidence DOM', async ({ page }) => {
 	page.on('pageerror', (e) => errs.push(`PAGEERR: ${e.message}\n${(e.stack ?? '').slice(0, 500)}`));
 
 	await page.goto('http://127.0.0.1:5173/evidence', {
-		waitUntil: 'networkidle',
+		waitUntil: 'domcontentloaded',
 		timeout: 30000,
 	}).catch(() => {});
-	await page.waitForTimeout(3000);
+	await page.waitForTimeout(1500);
 
 	const counts = await page.evaluate(() => ({
 		h1: document.querySelectorAll('h1').length,
 		h2: document.querySelectorAll('h2').length,
 		buttons: document.querySelectorAll('button').length,
 		links: document.querySelectorAll('a').length,
+		rows: document.querySelectorAll('[data-testid*="evidence"], li, table tr').length,
+		uploadCTA: document.querySelectorAll('a[href*="upload"]').length,
 		bodyLen: document.body.innerHTML.length,
 		hasSidebar: !!document.querySelector('.yorha-sidebar'),
 		hasMain: !!document.querySelector('main'),
-		bodyHTMLEnd: document.body.innerHTML.slice(-1500),
 	}));
 	console.log('URL:', page.url());
 	console.log('COUNTS:', JSON.stringify(counts, null, 2));

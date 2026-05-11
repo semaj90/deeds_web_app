@@ -6,6 +6,11 @@
 
 	const item = $derived(data.item);
 	const downloadUrl = $derived(item ? `/api/evidence/${item.id}/download` : null);
+	// fileUrl may be a backend storage URL (minio://, s3://, seaweed://) the browser cannot fetch.
+	// Only use it directly when it's already HTTP(S); otherwise fall back to the proxying API.
+	const viewerUrl = $derived(
+		item?.fileUrl && /^https?:\/\//i.test(item.fileUrl) ? item.fileUrl : downloadUrl
+	);
 </script>
 
 <svelte:head>
@@ -33,7 +38,7 @@
 		</header>
 
 		<EvidenceMediaViewer
-			url={item.fileUrl ?? downloadUrl}
+			url={viewerUrl}
 			fileName={item.fileName}
 			mimeType={item.mimeType}
 			fileType={item.fileType}
