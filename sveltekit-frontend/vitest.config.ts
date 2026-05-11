@@ -181,6 +181,8 @@ export default defineConfig({
       'tests/agents-regen-telemetry.spec.ts',
       // Phase A5 — AGENTS.md @auto:* hand-edit preservation + markdown writer
       'tests/agents-regen-markdown.spec.ts',
+      // Phase A6 — CI smoke gate orchestrator (spawns all 3 agents smokes)
+      'tests/agents-smoke-all-cli.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
