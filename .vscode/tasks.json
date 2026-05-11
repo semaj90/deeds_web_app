@@ -10022,9 +10022,54 @@
       "group": "build",
       "detail": "Compound task — starts Ollama (GPU layers tuned) then the Hermes dashboard. Both stay alive; use 'Terminate Task' to stop them.",
       "problemMatcher": []
+    },
+    {
+      "label": "🔍 Karpathy Search: rg + blend rerank (lexical → semantic)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "rg -l \"${input:karpathyQuery}\" sveltekit-frontend/src --type ts --type svelte 2>/dev/null | while read f; do rel=\"${f#sveltekit-frontend/}\"; raw=$(docker exec legal-ai-redis redis-cli HGET gpu:karpathy:scores \"$rel\" 2>/dev/null); blend=$(echo \"$raw\" | awk -F'\"blend\":' 'NF>1 {gsub(/[},].*/,\"\",$2); print $2}'); lines=$(wc -l < \"$f\" 2>/dev/null); printf \"%-8s %-6s %s\\n\" \"${blend:-0}\" \"${lines:-?}\" \"$rel\"; done | sort -rn | head -25"
+      ],
+      "group": "test",
+      "detail": "Pattern A — lexical rg filter + Karpathy blend rerank from Redis gpu:karpathy:scores hash. Sparse: only top-N PageRank files have scores; rest show 0. Use to find authoritative central files matching a regex.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "echo": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗺️ Karpathy Search: rg + codebase-graph.json metadata",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "jq -r --arg q \"${input:karpathyQuery}\" '.files | to_entries[] | select(.value.rel | test($q; \"i\")) | \"\\(.value.lineCount // 0)\\t\\(.value.routeHandlers | length)\\t\\(.value.rel)\"' sveltekit-frontend/docs/graph/codebase-graph.json 2>/dev/null | sort -rn | head -25 | awk 'BEGIN { printf \"%-7s %-6s %s\\n\", \"LINES\", \"ROUTES\", \"FILE\" } { printf \"%-7s %-6s %s\\n\", $1, $2, $3 }'"
+      ],
+      "group": "test",
+      "detail": "Pattern B — rg-style search over the daily graphify pipeline output (docs/graph/codebase-graph.json). Returns lineCount + routeHandler count + rel path for every file whose path matches the regex. Works for ANY file, not just top-N. Fresh after `npm run graphify:daily`.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "echo": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 Karpathy Search: TRACE MCP kb.trace_search (full semantic)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "curl -s -X POST http://localhost:8788 -H 'Content-Type: application/json' -d \"$(printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"kb.trace_search\",\"arguments\":{\"query\":\"%s\",\"topK\":15}}}' \"${input:karpathyQuery}\")\" | jq -r '.result.content[0].text // .error.message // \"(empty response — is MCP :8788 up?)\"' | head -80"
+      ],
+      "group": "test",
+      "detail": "Pattern C — full semantic via TRACE MCP at :8788. Embeds the query, hits Qdrant ANN, reranks via Karpathy blend, returns top-15 with paths + scores. Requires dev server / mcp:trace running. Same path the agentic loop uses.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "echo": true },
+      "problemMatcher": []
     }
   ],
   "inputs": [
+    {
+      "id": "karpathyQuery",
+      "type": "promptString",
+      "description": "Search query (regex for lexical patterns A+B; natural language for semantic pattern C)",
+      "default": "UploadZone"
+    },
     {
       "id": "nesPath",
       "type": "promptString",
