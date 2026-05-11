@@ -3,7 +3,9 @@
 // - WebGPU resource optimization
 // - Smart cache strategies for maximum speed
 
-const CACHE_VERSION = 'v1.5.0';
+// v1.6.0 (2026-05-10): Phase D — analytics POST interception + IDB offline queue.
+// See next_steps/active/2026-05-10_service-worker-regex-tool-router.md §1.
+const CACHE_VERSION = 'v1.6.0';
 const SHELL_CACHE = `yorha-shell-${CACHE_VERSION}`;
 const STATIC_CACHE = `legal-ai-static-${CACHE_VERSION}`;
 const WASM_CACHE = `legal-ai-wasm-${CACHE_VERSION}`;
@@ -99,6 +101,20 @@ self.addEventListener('message', (event) => {
         }
       }
     })();
+  } else if (type === 'analytics-queue-depth') {
+    // Phase D: respond with current pending_events count
+    (async () => {
+      const depth = await getAnalyticsDepth();
+      const payload = { type: 'analytics-queue-depth', depth };
+      if (event.source?.postMessage) event.source.postMessage(payload);
+    })();
+  } else if (type === 'analytics-flush-now') {
+    // Phase D: caller wants an immediate drain (e.g. before page-unload)
+    (async () => {
+      const result = await drainAnalyticsQueue();
+      const payload = { type: 'analytics-flush-now', ...result };
+      if (event.source?.postMessage) event.source.postMessage(payload);
+    })();
   } else if (type === 'log-telemetry') {
     // Stage telemetry for background sync
     const { event: telemetryEvent } = event.data;
@@ -133,7 +149,7 @@ async function stageTelemetry(eventData) {
       synced: false
     });
     console.log('SW: Telemetry staged:', eventData.type);
-    
+
     // Register sync if supported
     if ('sync' in self.registration) {
       self.registration.sync.register('telemetry-sync').catch(() => {});
@@ -143,6 +159,226 @@ async function stageTelemetry(eventData) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Phase D — Analytics POST offline queue (added 2026-05-10, CACHE_VERSION v1.6.0)
+// Design: next_steps/active/2026-05-10_service-worker-regex-tool-router.md §1
+//
+// Default-deny: only INTERCEPTS POSTs to the explicit allowlist below; every
+// other request falls through to the normal fetch path with NO interception.
+// SSE / WebSocket / auth / AI / admin paths are ignored by design (see §1.3).
+//
+// On offline → enqueue with synthetic 202 to the client (UX promise).
+// On 'online' event → drainQueue() with mutex; 401/403 are terminal.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ANALYTICS_DB     = 'yorha-sw-queue';
+const ANALYTICS_STORE  = 'pending_events';
+const ANALYTICS_DB_VER = 1;
+
+// URLs we intercept (default-deny everything else)
+const ANALYTICS_ALLOWLIST = [
+  '/api/analytics/context-timeline',
+  '/api/analytics/rl-signal',
+];
+
+// Drain-loop mutex (design §1.7 — guards against double-flush on flaky reconnects)
+let draining = false;
+
+function shouldInterceptAnalytics(req, url) {
+  if (req.method !== 'POST') return false;
+  if (req.headers.get('upgrade')) return false;
+  if ((req.headers.get('accept') ?? '').includes('text/event-stream')) return false;
+  return ANALYTICS_ALLOWLIST.some((p) => url.pathname === p);
+}
+
+async function getAnalyticsDB() {
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open(ANALYTICS_DB, ANALYTICS_DB_VER);
+    open.onupgradeneeded = () => {
+      const db = open.result;
+      if (!db.objectStoreNames.contains(ANALYTICS_STORE)) {
+        const store = db.createObjectStore(ANALYTICS_STORE, { keyPath: 'key' });
+        store.createIndex('enqueuedAt', 'enqueuedAt', { unique: false });
+        store.createIndex('deadAt',     'deadAt',     { unique: false });
+      }
+    };
+    open.onsuccess = () => resolve(open.result);
+    open.onerror   = () => reject(open.error);
+  });
+}
+
+async function enqueueAnalytics(req) {
+  const body    = await req.clone().text();
+  const headers = [];
+  req.headers.forEach((v, k) => headers.push([k, v]));
+  const record = {
+    key:        (self.crypto && self.crypto.randomUUID) ? self.crypto.randomUUID() : `k-${Date.now()}-${Math.random()}`,
+    url:        req.url,
+    body,
+    headers,
+    enqueuedAt: Date.now(),
+    retryCount: 0,
+    lastError:  null,
+    deadAt:     null,
+  };
+  try {
+    const db = await getAnalyticsDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(ANALYTICS_STORE, 'readwrite');
+      tx.objectStore(ANALYTICS_STORE).add(record);
+      tx.oncomplete = resolve;
+      tx.onerror    = () => reject(tx.error);
+    });
+  } catch (err) {
+    if (err && err.name === 'QuotaExceededError') {
+      // §1.4: drop the oldest 100 rows + log overflow on next online drain
+      await purgeOldestAnalytics(100);
+      try {
+        const db = await getAnalyticsDB();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(ANALYTICS_STORE, 'readwrite');
+          tx.objectStore(ANALYTICS_STORE).add(record);
+          tx.oncomplete = resolve;
+          tx.onerror    = () => reject(tx.error);
+        });
+      } catch (retryErr) {
+        console.error('SW: analytics enqueue still failed after purge:', retryErr);
+      }
+    } else {
+      console.error('SW: analytics enqueue error:', err);
+    }
+  }
+}
+
+async function purgeOldestAnalytics(n) {
+  try {
+    const db = await getAnalyticsDB();
+    return await new Promise((resolve) => {
+      const tx     = db.transaction(ANALYTICS_STORE, 'readwrite');
+      const store  = tx.objectStore(ANALYTICS_STORE);
+      const cursor = store.index('enqueuedAt').openCursor();
+      let purged   = 0;
+      cursor.onsuccess = (e) => {
+        const c = e.target.result;
+        if (!c || purged >= n) return resolve(purged);
+        store.delete(c.primaryKey);
+        purged++;
+        c.continue();
+      };
+      tx.onerror = () => resolve(purged);
+    });
+  } catch (err) {
+    console.error('SW: purgeOldestAnalytics error:', err);
+    return 0;
+  }
+}
+
+async function getAnalyticsDepth() {
+  try {
+    const db = await getAnalyticsDB();
+    return await new Promise((resolve, reject) => {
+      const tx    = db.transaction(ANALYTICS_STORE, 'readonly');
+      const count = tx.objectStore(ANALYTICS_STORE).count();
+      count.onsuccess = () => resolve(count.result);
+      count.onerror   = () => reject(count.error);
+    });
+  } catch {
+    return 0;
+  }
+}
+
+async function drainAnalyticsQueue() {
+  if (draining) return { drained: 0, failed: 0, skipped: true };
+  draining = true;
+  let drained = 0;
+  let failed  = 0;
+  try {
+    const db = await getAnalyticsDB();
+    const records = await new Promise((resolve) => {
+      const tx  = db.transaction(ANALYTICS_STORE, 'readonly');
+      const req = tx.objectStore(ANALYTICS_STORE).getAll();
+      req.onsuccess = () => resolve(req.result ?? []);
+      req.onerror   = () => resolve([]);
+    });
+
+    for (const rec of records) {
+      if (rec.deadAt) continue; // skip terminal-failed rows
+      const headers = Object.fromEntries(rec.headers ?? []);
+      let status;
+      try {
+        const res = await fetch(rec.url, { method: 'POST', headers, body: rec.body, credentials: 'include' });
+        status = res.status;
+      } catch (e) {
+        rec.retryCount += 1;
+        rec.lastError   = String(e).slice(0, 200);
+        await analyticsUpsert(rec);
+        failed++;
+        continue;
+      }
+
+      if (status >= 200 && status < 300) {
+        await analyticsDelete(rec.key);
+        drained++;
+      } else if (status === 401 || status === 403) {
+        // §1.7 terminal: do NOT retry (cookie expired)
+        rec.deadAt    = Date.now();
+        rec.lastError = `HTTP ${status} terminal`;
+        await analyticsUpsert(rec);
+        failed++;
+      } else {
+        rec.retryCount += 1;
+        rec.lastError   = `HTTP ${status}`;
+        await analyticsUpsert(rec);
+        failed++;
+      }
+    }
+  } finally {
+    draining = false;
+  }
+  return { drained, failed };
+}
+
+async function analyticsUpsert(rec) {
+  try {
+    const db = await getAnalyticsDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(ANALYTICS_STORE, 'readwrite');
+      tx.objectStore(ANALYTICS_STORE).put(rec);
+      tx.oncomplete = resolve;
+      tx.onerror    = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('SW: analytics upsert error:', err);
+  }
+}
+
+async function analyticsDelete(key) {
+  try {
+    const db = await getAnalyticsDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(ANALYTICS_STORE, 'readwrite');
+      tx.objectStore(ANALYTICS_STORE).delete(key);
+      tx.oncomplete = resolve;
+      tx.onerror    = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('SW: analytics delete error:', err);
+  }
+}
+
+// Online event → drain. Wrapped in waitUntil-equivalent via the registration's
+// extendable lifetime — we just let drainAnalyticsQueue run; it self-limits via mutex.
+self.addEventListener('online', () => {
+  drainAnalyticsQueue().catch((err) => console.error('SW: drain on online failed:', err));
+});
+
+// Background-sync drain (parallel path — useful when 'online' fires while SW is
+// suspended; the sync event wakes us back up).
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'analytics-drain') {
+    event.waitUntil(drainAnalyticsQueue().catch(() => undefined));
+  }
+});
 
 // Intelligent high-performance fetch handling
 self.addEventListener('fetch', (event) => {
@@ -151,6 +387,39 @@ self.addEventListener('fetch', (event) => {
 
   // Skip cross-origin
   if (!req.url.startsWith(self.location.origin)) return;
+
+  // Phase D: analytics POST interception (default-deny, allowlist of 2 URLs).
+  // Online → pass through. Offline OR 5xx → enqueue + synthetic 202.
+  if (shouldInterceptAnalytics(req, url)) {
+    event.respondWith((async () => {
+      if (navigator.onLine === false) {
+        await enqueueAnalytics(req);
+        return new Response(
+          JSON.stringify({ ok: true, queued: true }),
+          { status: 202, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      try {
+        const res = await fetch(req.clone());
+        // Server flaky → queue for retry, but tell the client the request was accepted.
+        if (res.status >= 500) {
+          await enqueueAnalytics(req);
+          return new Response(
+            JSON.stringify({ ok: true, queued: true, upstreamStatus: res.status }),
+            { status: 202, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        return res;
+      } catch (err) {
+        await enqueueAnalytics(req);
+        return new Response(
+          JSON.stringify({ ok: true, queued: true, error: String(err) }),
+          { status: 202, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    })());
+    return;
+  }
 
   // WASM files: cache-first with long TTL
   if (WASM_PATTERNS.some((pattern) => pattern.test(req.url))) {

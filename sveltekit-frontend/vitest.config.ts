@@ -142,6 +142,8 @@ export default defineConfig({
       'tests/intent/intent-router.spec.ts',
       // /api/ai/intent-dispatch route — G26 baseline (Phase B)
       'tests/routes/intent-dispatch.spec.ts',
+      // Service Worker offline timeline-client (Phase D)
+      'tests/sw/timeline-client.spec.ts',
       // Sparse BM25 lane integration test (Phase 1B — Postgres ts_rank_cd, 2026-05-10)
       'tests/sparse-bm25.spec.ts',
       // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
