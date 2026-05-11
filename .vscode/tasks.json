@@ -1,6 +1,7 @@
 {
   "$schema": "vscode://schemas/tasks",
   "version": "2.0.0",
+  // TODO: split VS Code tasks into grouped include files or generate tasks from scripts.
   "tasks": [
     {
       "label": "Dev Server",
@@ -1130,6 +1131,25 @@
         "clear": true
       },
       "detail": "Only refresh GPU authority blend for files in Redis ace:rank:dirty_files (set by ace-incremental-startup). Skip silently if no dirty files."
+    },
+    {
+      "label": "🔍🧠 RG-Atlas: Smoke Check (DB tables + API)",
+      "type": "shell",
+      "command": "npm run smoke:rg-atlas",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Verifies rg_search_runs + rg_search_hits tables exist with GIN indexes, then probes POST /api/rg-atlas/search. Exit 0 = all pass."
     },
     {
       "label": "🚀 ACE Startup: Heavy Lane Only (GPU-gated)",
@@ -10061,6 +10081,25 @@
       "detail": "Pattern C — full semantic via TRACE MCP at :8788. Embeds the query, hits Qdrant ANN, reranks via Karpathy blend, returns top-15 with paths + scores. Requires dev server / mcp:trace running. Same path the agentic loop uses.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "echo": true },
       "problemMatcher": []
+    },
+    {
+      "label": "🔍🧠 RG-Atlas: Full pipeline (rg+karpathy+qdrant+marco+langextract)",
+      "type": "shell",
+      "command": "node scripts/rg-atlas/cli.mjs \"${input:rgAtlasQuery}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Execute the full 10-stage search pipeline: (1) rg lexical sweep, (2) multi-query expansion, (3) Qdrant union, (4) Karpathy rerank, (5) MS-MARCO cross-encoder, (6) LangExtract GRPO validation, (7) Cosine final blend, (8) Postgres persistence."
     }
   ],
   "inputs": [
@@ -10433,6 +10472,12 @@
       "type": "promptString",
       "description": "Number of k-means clusters for the hypergraph build (e.g. 50, 100, 200)",
       "default": "100"
+    },
+    {
+      "id": "rgAtlasQuery",
+      "type": "promptString",
+      "description": "RG-Atlas Search Query (Regex for stage 1, NL for semantic stages)",
+      "default": "UploadZone"
     }
   ]
 }

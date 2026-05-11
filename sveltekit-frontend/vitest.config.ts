@@ -209,6 +209,8 @@ export default defineConfig({
       'tests/quaternion-manifold.spec.ts',
       'tests/ace-rerank-spine.spec.ts',
       'tests/tool-ranker.spec.ts',
+      // RG-Atlas search pipeline unit tests
+      'tests/rg-atlas.spec.ts',
     ],
     exclude: [
       'node_modules/**',
