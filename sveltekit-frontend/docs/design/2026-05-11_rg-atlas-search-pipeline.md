@@ -28,7 +28,7 @@ Every layer already exists in the repo. The work is **glue + a typed contract + 
 | Karpathy refresh | `scripts/karpathy-gpu-enrich.mjs` daily cron | live |
 | GPU primitives | `tensorrt_bridge.node` — `attentionScoreGPU`, `kmeansWithCentroids`, `trainSOM`, `pageRankGPU`, `rewardScoreGPU` | live, RTX 3060 Ti |
 | Qdrant collection | `codebase_chunks_768`, named vectors `content` (768d) + `signature` (768d) | live |
-| Cross-encoder reranker | `src/lib/server/retrieval/cross-encoder-reranker.ts` — Gemma4 pointwise scoring, L0+L1 Redis cache | live |
+| Cross-encoder reranker | `src/lib/server/retrieval/cross-encoder-reranker.ts` — Gemma4 pointwise ranking, L0+L1 Redis cache | live |
 | LangExtract reranker | `src/lib/server/retrieval/langextract-reranker.ts` — 3-pass GRPO entity/section/fusion | live |
 | `manifold4 real[]` columns | `research_summaries`, `embedded_summaries`, `codebase_chunk_index` | live (per CLAUDE.md verification) |
 | Autoencoder weights | Redis `ace:autoencoder:weights` (W1/b1/W2/b2 csv f32, dim 768→256→64) | live, trained 2026-05-10 |
