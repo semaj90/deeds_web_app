@@ -161,6 +161,8 @@ export const ENV = {
   // Inference cascade: Bifrost L2 cache (:3040) → Reranker (:8090) → TurboQuant (:8080) → VLM (:8085) → LiteRT (:8070)
   BIFROST_URL: privateEnv.BIFROST_URL ?? `http://${LOOPBACK_IP}:3040`,
   TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8080`,
+  // Alias — admin/inference-lane route references ENV.TURBOQUANT_URL; mirror BASE_URL.
+  TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8080`,
   RERANK_BASE_URL: privateEnv.RERANK_BASE_URL ?? privateEnv.RERANK_URL ?? `http://${LOOPBACK_IP}:8090`,
   RERANK_URL: privateEnv.RERANK_URL ?? privateEnv.RERANK_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   VLM_BASE_URL: privateEnv.VLM_BASE_URL ?? `http://${LOOPBACK_IP}:8085`,
