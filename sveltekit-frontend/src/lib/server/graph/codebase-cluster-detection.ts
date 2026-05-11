@@ -12,7 +12,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { clusterEmbeddings } from '$lib/server/gpu/libtorch-bridge.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
+import { couchdb } from '$lib/server/services/couchdb-client.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
 const COLLECTION = 'codebase_chunks_768';

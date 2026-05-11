@@ -29,7 +29,7 @@ import {
 	kmeansWithCentroids as kmeansGPU,
 	attentionScoreGPU,
 } from '$lib/server/gpu/pytorch-graph.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
+import { couchdb } from '$lib/server/services/couchdb-client.js';
 import { createHash } from 'crypto';
 
 // ── Types ──────────────────────────────────────────────────────────────

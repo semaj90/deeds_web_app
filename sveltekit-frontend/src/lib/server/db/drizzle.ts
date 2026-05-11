@@ -3,7 +3,7 @@
  * Generates a small integration layer over the existing db client, qdrant and minio helpers
  */
 
-import qdrantClient from '$lib/services/qdrant-client';
+import qdrantClient from '$lib/server/services/qdrant-client';
 import { eq, sql } from 'drizzle-orm';
 import { getFile as getMinioFile } from '$lib/server/minio-client.js';
 import lazyDb from './client.js';

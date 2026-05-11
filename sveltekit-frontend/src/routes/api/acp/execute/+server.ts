@@ -8,7 +8,7 @@
  * instead of executing side effects.
  */
 
-import { executeACPTool, getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
+import { executeACPTool, getACPToolSchema } from '$lib/server/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';

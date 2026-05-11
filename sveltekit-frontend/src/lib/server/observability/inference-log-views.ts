@@ -119,7 +119,7 @@ export async function ensureInferenceLogViews(): Promise<void> {
 	if (viewsEnsured) return;
 
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 
 		await couchdb.createDb(INFERENCE_LOG_DB);
 
@@ -150,7 +150,7 @@ export async function getStatsByType(): Promise<Record<string, { avgLatencyMs: n
 	await ensureInferenceLogViews();
 
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const result = await couchdb.view(INFERENCE_LOG_DB, 'stats', 'by_type', { group: 'true' });
 
 		const stats: Record<string, { avgLatencyMs: number; count: number; cacheHitRate: number; errorRate: number }> = {};
@@ -176,7 +176,7 @@ export async function getStatsByBackend(): Promise<Record<string, { avgLatencyMs
 	await ensureInferenceLogViews();
 
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const result = await couchdb.view(INFERENCE_LOG_DB, 'stats', 'by_backend', { group: 'true' });
 
 		const stats: Record<string, { avgLatencyMs: number; count: number; errorRate: number }> = {};

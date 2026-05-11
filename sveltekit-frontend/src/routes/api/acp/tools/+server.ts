@@ -3,7 +3,7 @@
  * GET /api/acp/tools - List available tools with schemas and capabilities
  */
 
-import { getACPToolRegistry, toolSupportsDryRun } from '$lib/services/knowledge-search/ACPToolRegistry';
+import { getACPToolRegistry, toolSupportsDryRun } from '$lib/server/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types.js';

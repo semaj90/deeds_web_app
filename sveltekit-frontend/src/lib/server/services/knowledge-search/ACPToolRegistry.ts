@@ -398,7 +398,7 @@ const handlers: Record<string, HandlerFn> = {
     }
 
     try {
-      const { getDecisionEngine, getFixSynthesizer } = await import('$lib/services/error-analysis');
+      const { getDecisionEngine, getFixSynthesizer } = await import('$lib/server/services/error-analysis');
       const engine = getDecisionEngine();
       const synthesizer = getFixSynthesizer();
 
@@ -453,7 +453,7 @@ const handlers: Record<string, HandlerFn> = {
     }
 
     try {
-      const { getFixSynthesizer } = await import('$lib/services/error-analysis');
+      const { getFixSynthesizer } = await import('$lib/server/services/error-analysis');
       const synthesizer = getFixSynthesizer();
       const result = await synthesizer.synthesizeFix(errorReport, similarErrors);
 
@@ -490,7 +490,7 @@ const handlers: Record<string, HandlerFn> = {
     }
 
     try {
-      const { getFixSynthesizer } = await import('$lib/services/error-analysis');
+      const { getFixSynthesizer } = await import('$lib/server/services/error-analysis');
       const synthesizer = getFixSynthesizer();
       const result = await synthesizer.applyFix(strategy, errorReport);
 
@@ -518,7 +518,7 @@ const handlers: Record<string, HandlerFn> = {
     }
 
     try {
-      const { getMetricsCollector } = await import('$lib/services/error-analysis');
+      const { getMetricsCollector } = await import('$lib/server/services/error-analysis');
       const metrics = getMetricsCollector();
       const snapshot = await metrics.getSnapshot();
 
@@ -546,7 +546,7 @@ const handlers: Record<string, HandlerFn> = {
     }
 
     try {
-      const { getMetricsCollector } = await import('$lib/services/error-analysis');
+      const { getMetricsCollector } = await import('$lib/server/services/error-analysis');
       const metrics = getMetricsCollector();
       const health = await metrics.checkServiceHealth();
 

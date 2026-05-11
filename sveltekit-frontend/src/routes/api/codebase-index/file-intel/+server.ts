@@ -15,7 +15,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
+import { couchdb } from '$lib/server/services/couchdb-client.js';
 
 const pathSchema = z.string().min(1).max(600);
 

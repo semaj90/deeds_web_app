@@ -24,7 +24,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { warmUpCache, warmUpDomain, type WarmUpReport } from '$lib/server/cache/warm-up.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
+import { couchdb } from '$lib/server/services/couchdb-client.js';
 
 const COUCH_DB = 'evidence_analysis';
 

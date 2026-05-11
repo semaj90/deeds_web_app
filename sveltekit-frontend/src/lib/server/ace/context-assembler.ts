@@ -74,7 +74,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { aceTopkKey } from './cache-keys.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
-import type { ACPKnowledgeSearchResult } from '$lib/services/knowledge-search/ACPToolRegistry.js';
+import type { ACPKnowledgeSearchResult } from '$lib/server/services/knowledge-search/ACPToolRegistry.js';
 import { applyClusterCoherenceBoost, extractDominantCluster } from '$lib/server/retrieval/cluster-aware-reranker.js';
 import { getSomCellSummary } from '$lib/server/indexer/som-summary.js';
 import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/bag-cache.js';

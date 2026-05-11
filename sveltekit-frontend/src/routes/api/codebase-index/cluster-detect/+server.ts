@@ -18,7 +18,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { detectCodebaseClusters, type ClusterDetectionResult } from '$lib/server/graph/codebase-cluster-detection.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
+import { couchdb } from '$lib/server/services/couchdb-client.js';
 
 const COUCH_DB = 'graph_clusters';
 

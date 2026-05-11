@@ -10,7 +10,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
-import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
+import { getKnowledgeSearcher } from '$lib/server/services/knowledge-search/KnowledgeSearcher.js';
 
 export const GET: RequestHandler = async ({ locals, request }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
