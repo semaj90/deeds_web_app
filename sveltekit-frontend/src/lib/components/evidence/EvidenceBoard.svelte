@@ -110,6 +110,15 @@
 	let isGeneratingMap = $state(false);
 	let notebookAnalysisResults = $state<any>(null);
 
+	// M7 — RAG findings panel state
+	let showRagFindings = $state(false);
+	let ragFindings = $state<{ score: number; content: string; type: string; citation?: string }[]>([]);
+	let isFetchingRag = $state(false);
+
+	// M8 — connection map suggestions (populated by generateConnectionMap)
+	let mapSuggestions = $state<{ from: string; to: string; label: string }[]>([]);
+	let showMapSuggestions = $state(false);
+
 	// ── Drag tracking for undo ─────────────────────────────────
 	let dragStartPositions = $state<Map<string, { x: number; y: number }>>(new Map());
 
@@ -722,6 +731,15 @@
 
 					if (event === 'complete') {
 						spawnNodesFromGraph(data.connectionMap);
+						// M8 — surface edge suggestions as reviewable list before spawning
+						if (data.connectionMap?.edges?.length) {
+							mapSuggestions = data.connectionMap.edges.slice(0, 20).map((e: any) => ({
+								from: e.sourceLabel ?? e.source ?? e.from ?? '',
+								to: e.targetLabel ?? e.target ?? e.to ?? '',
+								label: e.relationshipType ?? e.label ?? 'related'
+							}));
+							showMapSuggestions = true;
+						}
 					}
 				}
 			}
@@ -772,6 +790,37 @@
 			// This is complex because we just spawned them with new IDs
 			// For now, we just log them or skip until we have a proper ID mapping
 		});
+	}
+
+	// M7 — RAG-driven detective analysis (retrieves matching knowledge chunks from the KB)
+	async function fetchRagAnalysis() {
+		if (isFetchingRag) return;
+		const targetIds = selectedNodes.size > 0 ? Array.from(selectedNodes) : nodes.slice(0, 10).map(n => n.id);
+		if (targetIds.length === 0) return;
+		isFetchingRag = true;
+		showRagFindings = true;
+		ragFindings = [];
+		try {
+			const selectedEvidence = nodes.filter(n => targetIds.includes(n.id));
+			const query = selectedEvidence.map(n => `${n.title} ${n.description ?? ''}`).join('. ');
+			const response = await fetch('/api/rag/search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query, caseId, limit: 10, includeMetadata: true })
+			});
+			if (!response.ok) throw new Error('RAG search failed');
+			const data = await response.json();
+			ragFindings = (data.results ?? []).map((r: any) => ({
+				score: r.score ?? 0,
+				content: r.content ?? r.text ?? '',
+				type: r.type ?? r.chunkType ?? 'knowledge',
+				citation: r.citation ?? r.sourceTitle ?? undefined
+			}));
+		} catch (err) {
+			console.error('[RAG Analysis] Failed:', err);
+		} finally {
+			isFetchingRag = false;
+		}
 	}
 
 	// ── Notebook Handlers ─────────────────────────────────────
@@ -909,7 +958,7 @@
 
 <svelte:window onkeydown={handleKeyDown} />
 
-<div class="retro-board-container">
+<div class="retro-board-container" data-theme="yorha">
 	<!-- Scanline overlay -->
 	<div class="scanlines"></div>
 
@@ -1084,6 +1133,14 @@
 			{#if selectedNodes.size > 0}
 				<span class="separator">|</span>
 				<span class="selected-count">{selectedNodes.size} Selected</span>
+				<!-- M3: Analyze selected evidence bulk action -->
+				<button class="retro-btn-sm accent" onclick={() => handleToolbarAction('analyze')} title="AI analysis of selected items">
+					ANALYZE
+				</button>
+				<!-- M7: RAG knowledge retrieval for selected items -->
+				<button class="retro-btn-sm" onclick={fetchRagAnalysis} title="Retrieve matching legal knowledge" disabled={isFetchingRag}>
+					{isFetchingRag ? '...' : 'RAG'}
+				</button>
 				<button class="retro-btn-sm" onclick={createConnection} disabled={selectedNodes.size !== 2}>
 					CONNECT
 				</button>
@@ -1091,6 +1148,11 @@
 					DELETE
 				</button>
 			{/if}
+			<span class="separator">|</span>
+			<!-- M8: Standalone AUTO-MAP button accessible without notebook panel -->
+			<button class="retro-btn-sm" onclick={generateConnectionMap} disabled={isGeneratingMap} title="Auto-generate connection map from case context">
+				{isGeneratingMap ? 'MAPPING...' : 'AUTO-MAP'}
+			</button>
 		</div>
 	</div>
 
@@ -1309,11 +1371,61 @@
 		{/if}
 
 		<!-- M5: Headless listener -->
-		<HeadlessTypingListener 
+		<HeadlessTypingListener
 			bind:text={userInput}
 			onstateChange={handleTypingStateChange}
 			oncontextualPrompt={handleContextualPrompt}
 		/>
+
+		<!-- M7: RAG Findings Panel -->
+		{#if showRagFindings}
+			<div class="rag-findings-panel">
+				<div class="rag-findings-header">
+					<span class="rag-findings-title">RAG FINDINGS</span>
+					<button class="close-btn" onclick={() => showRagFindings = false}>×</button>
+				</div>
+				{#if isFetchingRag}
+					<div class="rag-loading">RETRIEVING KNOWLEDGE...</div>
+				{:else if ragFindings.length === 0}
+					<div class="rag-empty">No matches found in knowledge base.</div>
+				{:else}
+					<div class="rag-results custom-scrollbar">
+						{#each ragFindings as finding}
+							<div class="rag-result-item">
+								<div class="rag-result-meta">
+									<span class="rag-type">{finding.type.toUpperCase()}</span>
+									<span class="rag-score">{(finding.score * 100).toFixed(0)}%</span>
+								</div>
+								<p class="rag-content">{finding.content.slice(0, 200)}{finding.content.length > 200 ? '…' : ''}</p>
+								{#if finding.citation}
+									<span class="rag-citation">{finding.citation}</span>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
+
+		<!-- M8: Map Suggestions Panel -->
+		{#if showMapSuggestions && mapSuggestions.length > 0}
+			<div class="map-suggestions-panel">
+				<div class="map-suggestions-header">
+					<span class="map-suggestions-title">SUGGESTED CONNECTIONS ({mapSuggestions.length})</span>
+					<button class="close-btn" onclick={() => showMapSuggestions = false}>×</button>
+				</div>
+				<div class="map-suggestions-list custom-scrollbar">
+					{#each mapSuggestions as suggestion}
+						<div class="map-suggestion-item">
+							<span class="suggestion-from">{suggestion.from}</span>
+							<span class="suggestion-arrow">→</span>
+							<span class="suggestion-label">[{suggestion.label}]</span>
+							<span class="suggestion-to">{suggestion.to}</span>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>
 
@@ -1356,9 +1468,7 @@
 		align-items: center;
 		box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 	}
-</style>
 
-<style>
 	/* === RETRO EVIDENCE BOARD === */
 	.retro-board-container {
 		display: flex;
@@ -2005,5 +2115,110 @@
 		font-family: "Courier New", monospace;
 		margin-top: 4px;
 		white-space: nowrap;
+	}
+
+	/* M7: RAG Findings Panel */
+	.rag-findings-panel {
+		position: absolute;
+		bottom: 60px;
+		left: 16px;
+		width: 320px;
+		max-height: 320px;
+		background: #1a1a2e;
+		border: 2px solid #c4a882;
+		color: #d4c9a8;
+		font-family: "Courier New", monospace;
+		font-size: 0.6rem;
+		z-index: 40;
+		display: flex;
+		flex-direction: column;
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+	}
+	.rag-findings-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 6px 10px;
+		background: #c4a882;
+		color: #1a1a2e;
+		font-weight: bold;
+		letter-spacing: 1px;
+	}
+	.rag-findings-title { font-size: 0.55rem; }
+	.rag-loading, .rag-empty {
+		padding: 12px;
+		color: #8a855e;
+		font-size: 0.55rem;
+		text-align: center;
+	}
+	.rag-results { padding: 6px; overflow-y: auto; flex: 1; }
+	.rag-result-item {
+		border-bottom: 1px solid rgba(196, 168, 130, 0.2);
+		padding: 6px 4px;
+		margin-bottom: 4px;
+	}
+	.rag-result-meta { display: flex; gap: 8px; margin-bottom: 4px; }
+	.rag-type {
+		background: #c4a882;
+		color: #1a1a2e;
+		padding: 1px 4px;
+		font-size: 0.5rem;
+		font-weight: bold;
+	}
+	.rag-score { color: #ffc040; font-size: 0.55rem; }
+	.rag-content { color: #d4c9a8; font-size: 0.55rem; line-height: 1.4; margin: 0 0 2px; }
+	.rag-citation { color: #8a855e; font-size: 0.5rem; font-style: italic; }
+
+	/* M8: Map Suggestions Panel */
+	.map-suggestions-panel {
+		position: absolute;
+		bottom: 60px;
+		right: 16px;
+		width: 340px;
+		max-height: 260px;
+		background: #1a1a2e;
+		border: 2px solid #c4a882;
+		color: #d4c9a8;
+		font-family: "Courier New", monospace;
+		font-size: 0.6rem;
+		z-index: 40;
+		display: flex;
+		flex-direction: column;
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+	}
+	.map-suggestions-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 6px 10px;
+		background: #c4a882;
+		color: #1a1a2e;
+		font-weight: bold;
+		letter-spacing: 1px;
+	}
+	.map-suggestions-title { font-size: 0.5rem; }
+	.map-suggestions-list { padding: 6px; overflow-y: auto; flex: 1; }
+	.map-suggestion-item {
+		display: flex;
+		gap: 6px;
+		align-items: center;
+		padding: 4px 2px;
+		border-bottom: 1px solid rgba(196, 168, 130, 0.15);
+		font-size: 0.55rem;
+		flex-wrap: wrap;
+	}
+	.suggestion-from, .suggestion-to { color: #ffc040; }
+	.suggestion-arrow { color: #8a855e; }
+	.suggestion-label { color: #c4a882; font-style: italic; }
+
+	/* M9: YoRHa theme token overrides */
+	[data-theme="yorha"] {
+		--yorha-bg: #b0ab8a;
+		--yorha-surface: #c8c3a0;
+		--yorha-border: #8a855e;
+		--yorha-text: #2a2618;
+		--yorha-accent: #ffc040;
+		--yorha-dark: #1a1a2e;
+		--yorha-muted: #6b654a;
 	}
 </style>
