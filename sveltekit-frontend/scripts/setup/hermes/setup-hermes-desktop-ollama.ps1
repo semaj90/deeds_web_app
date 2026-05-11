@@ -129,16 +129,19 @@ function Invoke-Preflight {
     }
 
     # Free disk space on system drive.
+    # Use DriveInfo (CWD-independent) — Get-Item $env:SystemDrive misbehaves
+    # when the current location is a PSDrive whose name resembles a path.
     try {
-        $sysDrive = (Get-Item $env:SystemDrive)
-        $free = (Get-PSDrive -Name $sysDrive.Name.TrimEnd(':')).Free
+        $sysDriveLetter = $env:SystemDrive.TrimEnd(':')
+        $driveInfo = [System.IO.DriveInfo]::new($sysDriveLetter)
+        $free   = $driveInfo.AvailableFreeSpace
         $freeGB = [int]($free / 1GB)
         if ($freeGB -lt $MinDiskGB) {
-            $msg = "Only $freeGB GB free on $($sysDrive.Name); need >= $MinDiskGB GB for full install (Hermes Desktop + Ollama + models + Docker volumes)"
+            $msg = "Only $freeGB GB free on $sysDriveLetter`:; need >= $MinDiskGB GB for full install (Hermes Desktop + Ollama + models + Docker volumes)"
             Write-Host "  WARN: $msg" -ForegroundColor Yellow
             $script:SetupHermesSummary.preflightWarnings += $msg
         } else {
-            Write-Host "  OK   $freeGB GB free on $($sysDrive.Name) (>= $MinDiskGB GB)"
+            Write-Host "  OK   $freeGB GB free on $sysDriveLetter`: (>= $MinDiskGB GB)"
         }
     } catch {
         Write-Host "  WARN: could not check free disk space: $($_.Exception.Message)" -ForegroundColor Yellow
@@ -1041,12 +1044,48 @@ function Ensure-PnpmAvailable {
         return
     }
 
-    if (-not (Test-Command "corepack")) {
-        throw "pnpm/corepack was not found. Install Node.js 22+ first for Hermes Workspace."
+    # Try corepack first (Node 22+ preferred path).
+    if (Test-Command "corepack") {
+        $corepackErr = $null
+        try {
+            corepack enable 2>$null | Out-Null
+            corepack prepare pnpm@latest --activate 2>&1 | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                # Refresh PATH so this session sees the new alias.
+                $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [Environment]::GetEnvironmentVariable("Path", "User")
+                if (Test-Command "pnpm") { return }
+            } else {
+                $corepackErr = "corepack exit $LASTEXITCODE"
+            }
+        } catch {
+            $corepackErr = $_.Exception.Message
+        }
+        Write-Host "  WARN: corepack pnpm activation failed ($corepackErr) — falling back to npm install -g pnpm" -ForegroundColor Yellow
     }
 
-    corepack enable
-    corepack prepare pnpm@latest --activate
+    # Fallback: npm install -g pnpm (writes to npm's user-prefix, no admin needed).
+    if (-not (Test-Command "npm")) {
+        throw "Neither pnpm nor npm is available. Install Node.js 22+ first."
+    }
+    npm install -g pnpm 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "npm install -g pnpm failed (exit $LASTEXITCODE). Run elevated or install pnpm manually."
+    }
+
+    # Make sure the npm prefix bin dir is on PATH for this session AND persisted.
+    $npmPrefix = (npm config get prefix 2>$null).Trim()
+    if ($npmPrefix -and (Test-Path $npmPrefix)) {
+        $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+        if ($userPath -notlike "*$npmPrefix*") {
+            [Environment]::SetEnvironmentVariable("Path", "$userPath;$npmPrefix", "User")
+            Write-Host "  added $npmPrefix to User PATH"
+        }
+        $env:Path = $env:Path + ";$npmPrefix"
+    }
+
+    if (-not (Test-Command "pnpm")) {
+        throw "pnpm install succeeded but pnpm is not on PATH. Restart PowerShell and re-run."
+    }
 }
 
 function Start-HermesWorkspace {
@@ -1100,7 +1139,13 @@ REDIS_URL=redis://localhost:6379
         if (-not (Test-Path (Join-Path $workspaceDir "node_modules"))) {
             pnpm install
             if ($LASTEXITCODE -ne 0) {
-                throw "pnpm install failed for Hermes Workspace."
+                # pnpm 11+ may exit 1 on ERR_PNPM_IGNORED_BUILDS even though
+                # packages did install. Detect that case and continue.
+                if (Test-Path (Join-Path $workspaceDir "node_modules")) {
+                    Write-Host "  pnpm install returned $LASTEXITCODE but node_modules exists — proceeding (likely ERR_PNPM_IGNORED_BUILDS)" -ForegroundColor Yellow
+                } else {
+                    throw "pnpm install failed for Hermes Workspace."
+                }
             }
         }
         else {
@@ -1108,8 +1153,18 @@ REDIS_URL=redis://localhost:6379
         }
 
         if (-not (Test-Port -Port 3000)) {
+            # Try the canonical `pnpm dev` path first. In pnpm 11+ the script
+            # wrapper re-invokes pnpm install for a deps-status check which
+            # exits 1 on ERR_PNPM_IGNORED_BUILDS — that kills the dev launch.
+            # Fall back to running vite directly to bypass the wrapper.
+            $vitePath = Join-Path $workspaceDir "node_modules\vite\bin\vite.js"
+            $devCmd = if (Test-Path $vitePath) {
+                "Set-Location '$workspaceDir'; `$env:NODE_OPTIONS='--max-old-space-size=2048'; `$env:PORT='3000'; node '$vitePath' dev --host 0.0.0.0 --port 3000"
+            } else {
+                "Set-Location '$workspaceDir'; pnpm dev"
+            }
             Start-Process -FilePath "powershell.exe" `
-                -ArgumentList "-NoExit", "-Command", "cd '$workspaceDir'; pnpm dev" `
+                -ArgumentList "-NoExit", "-Command", $devCmd `
                 -WindowStyle Minimized
         }
         else {
