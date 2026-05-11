@@ -18,7 +18,7 @@ vi.mock('$lib/server/ollama-cached.js', () => ({
   ollamaCachedChat: vi.fn()
 }));
 
-vi.mock('$lib/server/db/client.js', () => ({
+vi.mock('$lib/server/db/client', () => ({
   db: { transaction: vi.fn() }
 }));
 
@@ -41,7 +41,7 @@ beforeEach(async () => {
   ({ rewriteQuery } = await import('$lib/server/rg-atlas/multi-query.js'));
   ({ persistRgAtlasResult } = await import('$lib/server/rg-atlas/persist.js'));
   ({ ollamaCachedChat } = await import('$lib/server/ollama-cached.js') as { ollamaCachedChat: ReturnType<typeof vi.fn> });
-  ({ db } = await import('$lib/server/db/client.js') as { db: { transaction: ReturnType<typeof vi.fn> } });
+  ({ db } = await import('$lib/server/db/client') as { db: { transaction: ReturnType<typeof vi.fn> } });
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
