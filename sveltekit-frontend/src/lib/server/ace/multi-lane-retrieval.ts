@@ -368,26 +368,87 @@ const LANE_WEIGHT: Record<string, number> = {
 	web_search: 0.40,
 };
 
+/**
+ * RRF (Reciprocal Rank Fusion) — Cormack et al. 2009.
+ *   rrf_score(d) = Σ_lanes (lane_weight / (k + rank_lane(d)))
+ *
+ * Replaces the prior weighted-sum merge (which was labeled "RRF-style" but
+ * actually summed `lane_score × lane_weight`). True RRF only uses the rank
+ * within each lane, sidestepping the score-normalisation problem when lanes
+ * produce non-comparable scores (cosine ∈ [0,1] vs ts_rank ∈ ℝ⁺ vs Redis
+ * substring score ∈ {0.5, 1.0}).
+ *
+ * Drop-in per master_agents.md §6.3. k=60 is the standard from the original
+ * paper and matches Elasticsearch / Solr / Qdrant hybrid search defaults.
+ */
+const RRF_K = 60;
+
 function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
-	// RRF-style: accumulate blended scores across lanes; a chunk in N lanes ranks higher.
 	const scoreAcc = new Map<string, number>();
 	const best = new Map<string, MultiLaneHit>();
 
 	for (const lane of lanes) {
 		const weight = LANE_WEIGHT[lane.lane] ?? 0.5;
-		for (const hit of lane.hits) {
-			const blended = hit.score * weight;
-			scoreAcc.set(hit.id, (scoreAcc.get(hit.id) ?? 0) + blended);
+		// Lane hits are already in best-first order coming from each lane.
+		// rank is 1-based: index 0 → rank 1.
+		lane.hits.forEach((hit, idx) => {
+			const rank = idx + 1;
+			const contribution = weight / (RRF_K + rank);
+			scoreAcc.set(hit.id, (scoreAcc.get(hit.id) ?? 0) + contribution);
 			const existing = best.get(hit.id);
 			if (!existing || hit.score > existing.score) {
 				best.set(hit.id, hit);
 			}
-		}
+		});
 	}
 
 	return Array.from(best.values())
 		.map((hit) => ({ ...hit, score: scoreAcc.get(hit.id) ?? hit.score }))
 		.sort((a, b) => b.score - a.score);
+}
+
+/**
+ * Cross-encoder rerank pass — wraps `rerankWithGemma4` with the
+ * MultiLaneHit ↔ RerankCandidate adapter shape.
+ *
+ * Phase 1 wire-up per docs/audit/2026-05-11-feature-spec-implementation-audit.md
+ * action #2. Gated behind `MULTILANE_CROSS_ENCODER_ENABLED` env flag (canary):
+ * when off, returns input unchanged. When on, top-N candidates are rescored
+ * by Gemma4 cross-encoder (with L0/L1 cache layers per cross-encoder-reranker.ts).
+ *
+ * Returns `null` on rerank failure so caller falls back to RRF order — never
+ * throws, never blocks the synthesis lane.
+ */
+async function maybeCrossEncoderRerank(
+	queryText: string,
+	merged: MultiLaneHit[],
+	opts: { topN?: number; returnTopK?: number; userId?: string } = {}
+): Promise<MultiLaneHit[] | null> {
+	if (process.env.MULTILANE_CROSS_ENCODER_ENABLED !== 'true') return null;
+	if (merged.length === 0 || !queryText.trim()) return null;
+
+	try {
+		const { rerankWithGemma4 } = await import('../retrieval/cross-encoder-reranker.js');
+		const candidates = merged.slice(0, opts.topN ?? 40).map((hit) => ({
+			documentId: hit.id,
+			content: hit.text ?? '',
+			retrievalScore: hit.score,
+			__hit: hit, // round-trip the original MultiLaneHit
+		}));
+		const { results } = await rerankWithGemma4(queryText, candidates, {
+			topN: opts.topN ?? 40,
+			returnTopK: opts.returnTopK ?? merged.length,
+			userId: opts.userId,
+		});
+		// Map back, preserving lane provenance + adopting rerank score
+		return results.map((r) => ({
+			...(r.doc as { __hit: MultiLaneHit }).__hit,
+			score: r.rerankScore,
+		}));
+	} catch (err) {
+		console.warn('[multi-lane] cross-encoder rerank failed, falling back to RRF order:', err);
+		return null;
+	}
 }
 
 /**
@@ -742,7 +803,14 @@ export async function multiLaneSearch(
 
 	lanes.push(resolvedHash, resolvedSparse, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedDense, resolvedTopology, resolvedWiki, resolvedError, resolvedTask, resolvedResearch, resolvedWebSearch);
 
-	const merged = mergeAndRank(lanes);
+	const rrfMerged = mergeAndRank(lanes);
+	// Optional cross-encoder rerank pass (gated behind MULTILANE_CROSS_ENCODER_ENABLED).
+	// Returns null on flag-off OR rerank failure → fall back to RRF order.
+	const reranked = await maybeCrossEncoderRerank(query.text, rrfMerged, {
+		topN: 40,
+		returnTopK: rrfMerged.length,
+	});
+	const merged = reranked ?? rrfMerged;
 
 	const fileFreq = new Map<string, number>();
 	const symbolFreq = new Map<string, number>();

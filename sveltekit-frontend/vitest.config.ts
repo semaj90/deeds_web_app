@@ -147,6 +147,8 @@ export default defineConfig({
       // Sparse BM25 lane integration test (Phase 1B — Postgres ts_rank_cd, 2026-05-10)
       'tests/sparse-bm25.spec.ts',
       // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
+      // Multi-lane RRF replacement + cross-encoder gate (Action #2 + #3 from 2026-05-11 audit)
+      'tests/multi-lane-rrf-and-rerank.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
