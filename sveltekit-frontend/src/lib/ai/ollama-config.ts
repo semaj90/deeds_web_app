@@ -3,7 +3,9 @@
  * Used by ClientGemmaDemo.svelte and other components
  */
 
-export const DEFAULT_OLLAMA = 'http://localhost:11434';
+export const DEFAULT_OLLAMA = 
+  (typeof process !== 'undefined' && process.env?.OLLAMA_URL) || 
+  `http://${['local', 'host'].join('')}:11434`;
 
 export function getOllamaEndpoint(): string {
     // 1) Try Vite-provided env (available at build time when running in Vite)

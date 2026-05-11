@@ -12,7 +12,7 @@ import { ENV } from '$lib/server/env.server.js';
  * No side effects
  */
 export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+	if (!locals.user) {
 		return json({ timestamp: new Date().toISOString(), services: {}, error: 'Unauthorized' }, { status: 401 });
 	}
 

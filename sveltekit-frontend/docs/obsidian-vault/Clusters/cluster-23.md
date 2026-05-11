@@ -12,7 +12,7 @@ top_tags: ["embedding","api-route","sse","types","server-module"]
 llmHits: 0
 summaryMode: null
 confidence: "low"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 contains: ["[[Files/src__lib__types__webgpu-navigator.d]]","[[Files/src__lib__polyfills]]","[[Files/src__lib__webgpu__webgpu-init]]","[[Files/src__lib__webgpu__init]]","[[Files/src__lib__webgpu__wire-telemetry]]","[[Files/src__lib__gpu__gpu-compute-pipeline]]","[[Files/src__lib__types__webgpu.d]]","[[Files/src__lib__webgpu__webgpu-rag-service]]"]
 same: ["[[Clusters/cluster-43]]","[[Clusters/cluster-9]]","[[Clusters/cluster-18]]","[[Clusters/cluster-66]]","[[Clusters/cluster-78]]"]

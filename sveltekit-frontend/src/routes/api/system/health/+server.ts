@@ -26,7 +26,8 @@ async function checkService(
 
 // ── GET /api/system/health ────────────────────────────────────────────────
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'degraded', error: 'Unauthorized' }, { status: 401 });
 	const [
 		database, redis, ollama, qdrant,
 		turboQuant, semanticSearch, redisKvCache, grpcServices,

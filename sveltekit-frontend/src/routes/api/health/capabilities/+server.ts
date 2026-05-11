@@ -29,7 +29,8 @@ import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
  *   ts: string,             // ISO timestamp
  * }
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const start = Date.now();
 	const TIMEOUT = 2000;
 

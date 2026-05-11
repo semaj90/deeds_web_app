@@ -1,7 +1,8 @@
 /**
  * Authentication helpers that trust the user/session already resolved by hooks.server.ts.
  */
-import { error, type RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
+import { UnauthorizedError, ForbiddenError } from './errors.js';
 
 export interface AuthResult {
 	user: {
@@ -26,7 +27,7 @@ export async function getUserWithFallback(event: RequestEvent): Promise<AuthResu
 		};
 	}
 
-	throw error(401, 'Authentication required');
+	throw new UnauthorizedError('Authentication required');
 }
 
 /**
@@ -36,7 +37,7 @@ export async function requireAuth(event: RequestEvent, allowTestMode = true): Pr
   const result = await getUserWithFallback(event);
 
   if (result.isTestMode && !allowTestMode) {
-    throw error(401, 'Authentication required (Test mode not allowed)');
+    throw new UnauthorizedError('Authentication required (Test mode not allowed)');
   }
 
   return result;
@@ -67,7 +68,7 @@ export async function requireRole(
 	const auth = await requireAuth(event, allowTestMode);
 
 	if (!hasRole(auth.user, roles)) {
-		throw error(403, 'Insufficient permissions');
+		throw new ForbiddenError('Insufficient permissions');
 	}
 
 	return auth;

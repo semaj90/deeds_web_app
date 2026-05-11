@@ -49,8 +49,8 @@ const _postSchema = z.object({
 // ── GET ───────────────────────────────────────────────────────────────────
 
 export const GET: RequestHandler = async (event) => {
-  const auth = await requireAuth(event);
-  if (!auth?.user) {
+  const { locals, url } = event;
+  if (!locals.user) {
     return json({ atlas: null, error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -91,8 +91,8 @@ export const GET: RequestHandler = async (event) => {
 // ── POST ──────────────────────────────────────────────────────────────────
 
 export const POST: RequestHandler = async (event) => {
-  const auth = await requireAuth(event);
-  if (!auth?.user) {
+  const { locals } = event;
+  if (!locals.user) {
     return json({ atlas: null, queued: false, error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -151,8 +151,8 @@ export const POST: RequestHandler = async (event) => {
 // ── DELETE ────────────────────────────────────────────────────────────────
 
 export const DELETE: RequestHandler = async (event) => {
-  const auth = await requireAuth(event);
-  if (!auth?.user) {
+  const { locals } = event;
+  if (!locals.user) {
     return json({ invalidated: false, error: 'Unauthorized' }, { status: 401 });
   }
 

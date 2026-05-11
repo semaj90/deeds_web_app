@@ -1,11 +1,31 @@
 {
-  "generatedAt": "2026-05-09T22:27:14.367Z",
+  "generatedAt": "2026-05-11T03:12:18.396Z",
   "runId": "2026-05-07T20-53-22",
-  "failureCount": 3,
+  "failureCount": 11,
   "failures": [
     {
       "gate": "G17",
       "file": "src/lib/server/admin/subagent-orchestrator.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/fixer/fixer-memory.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/mcp-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/services/qdrant-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/vector/image-search.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     },
     {
@@ -15,7 +35,27 @@
     },
     {
       "gate": "G17",
-      "file": "src/lib/server/mcp-client.ts",
+      "file": "src/lib/server/services/error-analysis/RAGRetriever.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/services/couchdb-client.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/services/error-analysis/OllamaService.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/services/error-analysis/KAGTraverser.ts",
+      "msg": "hardcoded localhost outside env.server.ts"
+    },
+    {
+      "gate": "G17",
+      "file": "src/lib/server/services/error-analysis/MetricsCollector.ts",
       "msg": "hardcoded localhost outside env.server.ts"
     }
   ]

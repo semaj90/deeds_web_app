@@ -4,16 +4,24 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { productionLogger } from '$lib/server/production-logger.js';
 
+import { z } from 'zod';
+
+const telemetrySchema = z.object({
+	events: z.array(z.object({
+		type: z.string().optional(),
+		event: z.string().optional(),
+		data: z.any().optional(),
+		timestamp: z.number().optional()
+	}))
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	// Optional auth check - telemetry can be anonymous but we prefer user id
 	const userId = locals.user ? Number(locals.user.id) : null;
 
 	try {
-		const { events } = await request.json();
-
-		if (!events || !Array.isArray(events)) {
-			return json({ error: 'Invalid events payload' }, { status: 400 });
-		}
+		const body = await request.json();
+		const { events } = telemetrySchema.parse(body);
 
 		console.log(`[Telemetry] Batch received: ${events.length} events from user ${userId || 'anon'}`);
 

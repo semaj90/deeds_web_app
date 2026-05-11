@@ -4,7 +4,7 @@ path: "src/routes/api/evidence/search/+server.ts"
 aliases: ["+server.ts","src/routes/api/evidence/search/+server.ts"]
 clusterId: -1
 ext: ".ts"
-lineCount: 803
+lineCount: 865
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: true
 importCount: 17
 embedding_id: "qdrant://codebase_chunks_768/src/routes/api/evidence/search/+server.ts"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 confidence: "high"
 up: []
@@ -27,7 +27,7 @@ tags: ["file","ext/ts","route","auth","zod","t/ts","t/src","t/routes"]
 > POST /api/evidence/search
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 803
+lines:: 865
 ## Summary
 
 POST /api/evidence/search

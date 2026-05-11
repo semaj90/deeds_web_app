@@ -22,8 +22,9 @@ interface RecentSession { id: string, userId: string;
  expiresAt: Date;
 }
 
-export const GET: RequestHandler = async () => {
- const started = Date.now();
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'unhealthy', error: 'Unauthorized' }, { status: 401 });
+	const started = Date.now();
  const warnings: HealthWarning[] = [];
  let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
 

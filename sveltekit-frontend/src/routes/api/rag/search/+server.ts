@@ -363,11 +363,10 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
     // 0a. Versioned retrieval cache check (case-scoped, version-stamped)
     const effectiveCaseId = caseId || body.case_id;
     // ── Phase 1 canary: RAG_RRF_ENABLED ───────────────────────────────────
-    // When the flag is on AND the request looks legal-flavored (sectionTypes set),
-    // route through the dual-lane sparse-bm25 + dense-Qdrant RRF fusion path.
-    // Codebase queries (no sectionTypes) continue using the legacy pipeline below.
-    // Reversible: flip RAG_RRF_ENABLED=false to fully revert without code change.
-    if (ENV.RAG_RRF_ENABLED && body.sectionTypes && body.sectionTypes.length > 0) {
+    // When the flag is on AND the request looks legal-flavored (sectionTypes set
+    // OR legal keywords found), route through the dual-lane RRF fusion path.
+    const hasLegalKeywords = /\b(statute|cit[ae]|court|judgment|holdings?|parties|motions?|jurisdiction)\b/i.test(query);
+    if (ENV.RAG_RRF_ENABLED && (hasLegalKeywords || (body.sectionTypes && body.sectionTypes.length > 0))) {
       try {
         const [{ generateEmbeddings: genEmb }, { rrfFuseDenseSparse }, { sparseLegalSearch }, { db: drizzleDb }] = await Promise.all([
           import('$lib/server/grpc/embedding-client.js'),

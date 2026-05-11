@@ -8,7 +8,8 @@ import { getPoolStatus, resetPoolHealth } from '$lib/server/db/client';
  * GET /api/health/database
  * Health check for PostgreSQL connectivity + pool state.
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'unavailable', error: 'Unauthorized' }, { status: 401 });
 	const timestamp = new Date().toISOString();
 	const poolStatus = getPoolStatus();
 

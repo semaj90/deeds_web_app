@@ -4,7 +4,7 @@ path: "src/lib/server/db/schema-postgres.ts"
 aliases: ["schema-postgres.ts","src/lib/server/db/schema-postgres.ts"]
 clusterId: 13
 ext: ".ts"
-lineCount: 4333
+lineCount: 4408
 pagerank: 0.431474
 blend: 0
 isRoute: false
@@ -14,7 +14,7 @@ hasAuth: false
 hasZod: false
 importCount: 4
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/db/schema-postgres.ts"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-13]]"]
@@ -28,7 +28,7 @@ tags: ["file","ext/ts","cluster/13","t/ts","t/src","t/lib"]
 cluster:: [[Clusters/cluster-13]]
 pagerank:: 0.431474
 blend:: 0.000000
-lines:: 4333
+lines:: 4408
 ## Summary
 
 Stores comprehensive GPU-accelerated audit reports combining Neo4j graph analysis,

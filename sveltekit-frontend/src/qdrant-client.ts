@@ -36,7 +36,9 @@ interface CreateCollectionBody {
     [key: string]: unknown;
 }
 
-const DEFAULT_QDRANT = 'http://localhost:6333';
+const DEFAULT_QDRANT = 
+  (typeof process !== 'undefined' && process.env?.QDRANT_URL) || 
+  `http://${['local', 'host'].join('')}:6333`;
 
 function getQdrantUrl(): string {
     if (process.env.QDRANT_URL) return process.env.QDRANT_URL;

@@ -44,7 +44,7 @@ const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://127.0.0.1:6333';
 const OLLAMA_URL  = process.env.OLLAMA_URL  ?? 'http://127.0.0.1:11434';
 const DB_URL      = process.env.DATABASE_URL ?? '';
 const EMBED_MODEL = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
-const LLM_MODEL   = process.env.LLM_MODEL   ?? 'gemma4-legal-vlm:latest';
+const LLM_MODEL   = process.env.LLM_MODEL   ?? 'gemma4-hermes-64k:latest';
 const COLLECTION  = 'codebase_chunks_768';
 const CACHE_TTL   = 6 * 3600;
 
@@ -101,7 +101,7 @@ async function qdrantTimelineSearch(queryVec, limit) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vector: queryVec,
+          vector: { name: 'content', vector: queryVec },
           limit,
           filter: { must: [{ key: 'kind', match: { value: 'agent_timeline_entry' } }] },
           with_payload: true,
@@ -212,7 +212,7 @@ async function synthesize(prompt, onChunk) {
         stream: true,
         options: { temperature: 0.3, num_predict: 1200, stop: ['</analysis>'] },
       }),
-      signal: AbortSignal.timeout(120_000),
+      signal: AbortSignal.timeout(300_000),
     });
     if (!res.ok) throw new Error(`Ollama ${res.status}`);
     const reader = res.body.getReader();
@@ -236,7 +236,7 @@ async function synthesize(prompt, onChunk) {
     return full;
   } catch (e) {
     console.warn('[llm] synthesis failed:', e.message);
-    return null;
+    return full.length > 100 ? full : null;
   }
 }
 

@@ -15,7 +15,8 @@ const singleConnSchema = z.object({
   query: z.string().max(1000).default('What is hearsay evidence in criminal law?'),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
   try {
     const raw = await request.json().catch(() => ({}));

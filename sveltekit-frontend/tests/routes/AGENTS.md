@@ -1,18 +1,18 @@
 # AGENTS.md — `tests/routes`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-09T22:22:23.446Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-11T05:31:27.766Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: tests/routes
 
 ## Snapshot
 
-- module directory with 30 files, 2 API handlers, 6 Drizzle refs
+- module directory with 31 files, 2 API handlers, 6 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `tests` `routes` `ace-wiki-graph-index.test.ts` `test` `ai-models.test.ts` `all-routes-page-server.test.ts`
 
-## Files (30)
+## Files (31)
 
 - `tests/routes/ace-wiki-graph-index.test.ts`
 - `tests/routes/ai-models.test.ts`
@@ -35,7 +35,7 @@
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/30 files have paired tests
+- **Paired tests**: 0/31 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

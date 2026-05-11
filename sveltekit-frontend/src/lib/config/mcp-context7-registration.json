@@ -1,6 +1,6 @@
 {
  "name": "context7",
- "baseUrl": "http://localhost:8095",
+ "baseUrl": "http://127.0.0.1:8095",
  "capabilities": ["som", "hmm", "graph-query"],
  "functions": ["analyze_cluster", "predict_next_context"],
  "healthPath": "/health",

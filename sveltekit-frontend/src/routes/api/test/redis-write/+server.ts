@@ -9,7 +9,8 @@ import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 
-export const POST: RequestHandler = async () => {
+export const POST: RequestHandler = async ({ locals }) => {
+  if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
   try {
     const redis = getRedis();

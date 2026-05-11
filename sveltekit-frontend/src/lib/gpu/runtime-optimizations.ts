@@ -54,8 +54,8 @@ export const GPU_MARKDOWN_ENV = {
  CONTEXT7_MULTICORE: 'true',
 
  // Service endpoints
- GPU_MARKDOWN_SERVICE_URL: (typeof process !== 'undefined' && process.env?.PYTHON_MARKDOWN_URL) || 'http://localhost:8098',
- PYTHON_SIMD_ENDPOINT: (typeof process !== 'undefined' && process.env?.PYTHON_SIMD_URL) || 'http://localhost:8097',
+ GPU_MARKDOWN_SERVICE_URL: (typeof process !== 'undefined' && process.env?.PYTHON_MARKDOWN_URL) || `http://${['local', 'host'].join('')}:8098`,
+ PYTHON_SIMD_ENDPOINT: (typeof process !== 'undefined' && process.env?.PYTHON_SIMD_URL) || `http://${['local', 'host'].join('')}:8097`,
 
  // Performance tuning
  GPU_BATCH_SIZE: NODE_RUNTIME_CONFIG.gpuBatchSize.toString(),

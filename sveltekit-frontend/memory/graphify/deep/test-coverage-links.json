@@ -6,7 +6,8 @@
     "src/lib/server/analytics/web-research-crawler.test.ts"
   ],
   "src/lib/server/indexer/legal-chunker.ts": [
-    "src/lib/server/evidence/docling-structure.test.ts"
+    "src/lib/server/evidence/docling-structure.test.ts",
+    "src/lib/server/indexer/legal-chunker.test.ts"
   ],
   "src/lib/server/evidence/docling-structure.ts": [
     "src/lib/server/evidence/docling-structure.test.ts"
@@ -122,11 +123,49 @@
     "tests/admin-observability.spec.ts",
     "tests/admin-observability.spec.ts"
   ],
+  "src/lib/server/agents/agents-card-store.ts": [
+    "tests/agents-index.spec.ts"
+  ],
+  "src/lib/server/ace/agents-context-source.ts": [
+    "tests/agents-index.spec.ts"
+  ],
   "src/lib/server/agents-md/parse-agents-md.ts": [
     "tests/agents-md-relations.spec.ts"
   ],
   "src/lib/server/agents-md/resolve-directory-context.ts": [
     "tests/agents-md-relations.spec.ts"
+  ],
+  "src/lib/server/agents/regen/loaders/build-context.ts": [
+    "tests/agents-regen-composer.spec.ts"
+  ],
+  "src/lib/server/agents/regen/loaders/activity.ts": [
+    "tests/agents-regen-composer.spec.ts",
+    "tests/agents-regen-pg-loaders.spec.ts"
+  ],
+  "src/lib/server/agents/regen/loaders/features.ts": [
+    "tests/agents-regen-composer.spec.ts",
+    "tests/agents-regen-pg-loaders.spec.ts"
+  ],
+  "src/lib/server/agents/regen/loaders/karpathy.ts": [
+    "tests/agents-regen-composer.spec.ts"
+  ],
+  "src/lib/server/agents/regen/loaders/graph.ts": [
+    "tests/agents-regen-composer.spec.ts",
+    "tests/agents-regen-loaders.spec.ts"
+  ],
+  "src/lib/server/agents/regen/loaders/path-aliases.ts": [
+    "tests/agents-regen-loaders.spec.ts"
+  ],
+  "src/lib/server/agents/regen/loaders/types.ts": [
+    "tests/agents-regen-pg-loaders.spec.ts",
+    "tests/agents-regen-run.spec.ts",
+    "tests/agents-regen-section-builders.spec.ts"
+  ],
+  "src/lib/server/agents/regen/run.ts": [
+    "tests/agents-regen-run.spec.ts"
+  ],
+  "src/lib/server/agents/regen/section-builders.ts": [
+    "tests/agents-regen-section-builders.spec.ts"
   ],
   "tests/utils/seed-cases.ts": [
     "tests/ai-analysis-pipeline.spec.ts",
@@ -239,10 +278,6 @@
   "src/routes/api/tags/[tagId]/+server.ts": [
     "tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "tests/routes/auto/api/tags/__tagId.test.ts"
-  ],
-  "src/lib/services/couchdb-client.ts": [
-    "tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    "tests/karpathy-persistence.spec.ts"
   ],
   "src/routes/api/codebase-index/claude-assist/defaults/+server.ts": [
     "tests/assist-defaults.spec.ts",
@@ -508,6 +543,33 @@
     "tests/e2e/demo-seed.spec.ts",
     "tests/fixtures/demo-auth.ts"
   ],
+  "tests/e2e/route-forensic/_helpers.ts": [
+    "tests/e2e/route-forensic/active-cases.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/analysis-center.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/analytics.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/case-detail.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/case-evidence-upload.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/case-evidence.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/cases-list.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/cases-new.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/chat.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/citations.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/command-center.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/dashboard.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/evidence-library.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/evidence-list.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/evidence-view.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/global-search.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/homepage.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/legal-corpus.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/library.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/login.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/persons-of-interest.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/poi-detail.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/rag-search.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/register.diagnostic.spec.ts",
+    "tests/e2e/route-forensic/reports.diagnostic.spec.ts"
+  ],
   "src/lib/server/search/engram-bigram.ts": [
     "tests/engram-dym.spec.ts"
   ],
@@ -736,6 +798,17 @@
     "tests/infra-ollama-cache-routes.spec.ts",
     "tests/routes/auto/api/case-theory.test.ts"
   ],
+  "src/lib/server/ai/intent-router.ts": [
+    "tests/intent/intent-router.spec.ts",
+    "tests/routes/api/ai/contextual-chat.spec.ts"
+  ],
+  "src/lib/intent/regex-intent.ts": [
+    "tests/intent/intent-router.spec.ts",
+    "tests/intent/regex-intent.spec.ts"
+  ],
+  "src/lib/server/ace/kag-cluster-source.ts": [
+    "tests/kag-cluster-source.spec.ts"
+  ],
   "src/lib/server/indexer/karpathy-hook.ts": [
     "tests/karpathy-hook-stability.spec.ts",
     "tests/karpathy-hook.spec.ts"
@@ -792,9 +865,13 @@
     "tests/quaternion-manifold.spec.ts",
     "tests/quaternion-manifold.spec.ts"
   ],
+  "src/lib/server/ace/mini-active-cache.ts": [
+    "tests/mini-active-cache.spec.ts"
+  ],
   "src/lib/server/ace/multi-lane-retrieval.ts": [
     "tests/multi-lane-retrieval.spec.ts",
     "tests/multi-lane-retrieval.spec.ts",
+    "tests/multi-lane-rrf-and-rerank.spec.ts",
     "tests/multi-lane-spine.spec.ts"
   ],
   "src/lib/server/ace/retrieval-lanes.ts": [
@@ -836,9 +913,6 @@
     "tests/retrieval-quality-regression.spec.ts",
     "tests/retrieval-quality-regression.spec.ts",
     "tests/retrieval-quality-regression.spec.ts"
-  ],
-  "src/lib/services/knowledge-search/ACPToolRegistry.ts": [
-    "tests/phase76-acp-tools.property.test.ts"
   ],
   "src/routes/api/persons-of-interest/+server.ts": [
     "tests/poi-citations-conversations-routes.spec.ts",
@@ -906,6 +980,9 @@
     "tests/routes/all-routes-page-server.test.ts",
     "tests/routes/all-routes-page-server.test.ts",
     "tests/routes/all-routes-page-server.test.ts"
+  ],
+  "src/routes/api/ai/contextual-chat/+server.ts": [
+    "tests/routes/api/ai/contextual-chat.spec.ts"
   ],
   "src/routes/.well-known/agent.json/+server.ts": [
     "tests/routes/auto/.well-known/agent.json.test.ts"
@@ -1025,9 +1102,6 @@
   "src/routes/api/ai/context/+server.ts": [
     "tests/routes/auto/api/ai/context.test.ts"
   ],
-  "src/routes/api/ai/contextual-chat/+server.ts": [
-    "tests/routes/auto/api/ai/contextual-chat.test.ts"
-  ],
   "src/routes/api/ai/cross-exam/+server.ts": [
     "tests/routes/auto/api/ai/cross-exam.test.ts"
   ],
@@ -1048,9 +1122,6 @@
   ],
   "src/routes/api/ai/memo-skeleton/+server.ts": [
     "tests/routes/auto/api/ai/memo-skeleton.test.ts"
-  ],
-  "src/routes/api/ai/route-intent/+server.ts": [
-    "tests/routes/auto/api/ai/route-intent.test.ts"
   ],
   "src/routes/api/ai/tensorrt/stream/+server.ts": [
     "tests/routes/auto/api/ai/tensorrt/stream.test.ts"
@@ -2813,14 +2884,26 @@
     "tests/routes/directory-summarizer.test.ts",
     "tests/routes/directory-summarizer.test.ts"
   ],
-  "src/lib/services/error-analysis/KAGTraverser.ts": [
-    "tests/routes/kag-ingest-notebook-contract.test.ts"
+  "src/routes/api/ai/intent-dispatch/+server.ts": [
+    "tests/routes/intent-dispatch.spec.ts"
   ],
   "src/routes/(app)/cases/new/+page.server.ts": [
     "tests/routes/sveltekit-form-actions.test.ts",
     "tests/routes/sveltekit-form-actions.test.ts",
     "tests/routes/sveltekit-form-actions.test.ts",
     "tests/routes/sveltekit-load-patterns.test.ts"
+  ],
+  "src/lib/server/retrieval/rrf-fuse.ts": [
+    "tests/rrf-fuse.spec.ts"
+  ],
+  "src/lib/server/retrieval/sparse-bm25.ts": [
+    "tests/sparse-bm25.spec.ts"
+  ],
+  "src/lib/client/timeline-client.ts": [
+    "tests/sw/timeline-client.spec.ts",
+    "tests/sw/timeline-client.spec.ts",
+    "tests/sw/timeline-client.spec.ts",
+    "tests/sw/timeline-client.spec.ts"
   ],
   "src/lib/server/tensor/tensor-analysis-cache.ts": [
     "tests/tensor-analysis-enqueue.spec.ts",

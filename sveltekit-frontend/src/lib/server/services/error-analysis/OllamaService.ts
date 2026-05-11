@@ -3,6 +3,7 @@
  * Phase 72 - Task 2: Ollama Integration Enhancement
  */
 
+import { ENV } from '$lib/server/env.server.js';
 import type { ErrorReport } from './types.js';
 
 export interface OllamaConfig {
@@ -44,9 +45,9 @@ export class OllamaService {
 
 	constructor(config?: Partial<OllamaConfig>) {
 		this.config = {
-			url: config?.url ?? process.env?.OLLAMA_URL ?? 'http://localhost:11434',
-			embeddingModel: config?.embeddingModel ?? process.env?.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
-			generationModel: config?.generationModel ?? process.env?.OLLAMA_MODEL ?? 'gemma4-legal:latest',
+			url: config?.url ?? ENV.OLLAMA_BASE_URL,
+			embeddingModel: config?.embeddingModel ?? ENV.OLLAMA_EMBED_MODEL,
+			generationModel: config?.generationModel ?? ENV.OLLAMA_CHAT_MODEL,
 			timeout: config?.timeout ?? 30000,
 			maxRetries: config?.maxRetries ?? 3,
 			retryDelay: config?.retryDelay ?? 1000
@@ -56,9 +57,9 @@ export class OllamaService {
 
 	static getOllamaEndpoint(): OllamaConfig {
 		return {
-			url: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
-			embeddingModel: process.env?.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
-			generationModel: process.env?.OLLAMA_MODEL ?? 'gemma4-legal:latest',
+			url: ENV.OLLAMA_BASE_URL,
+			embeddingModel: ENV.OLLAMA_EMBED_MODEL,
+			generationModel: ENV.OLLAMA_CHAT_MODEL,
 			timeout: 30000,
 			maxRetries: 3,
 			retryDelay: 1000

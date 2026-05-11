@@ -7,7 +7,8 @@ import { getNeo4jDriver } from '$lib/server/neo4j-driver';
  * Health check for Neo4j graph database connectivity.
  * Opens a session and runs a simple RETURN 1 query.
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'unavailable', error: 'Unauthorized' }, { status: 401 });
 	const timestamp = new Date().toISOString();
 	let session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']> | null = null;
 

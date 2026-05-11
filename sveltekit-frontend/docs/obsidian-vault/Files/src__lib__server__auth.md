@@ -14,11 +14,11 @@ hasAuth: true
 hasZod: false
 importCount: 10
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/auth.ts"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-90]]"]
-imports: ["[[Files/db__client]]","[[Files/db__schema]]","[[Files/env]]","[[Files/errors]]","[[Files/utils__endpoints]]"]
+imports: ["[[Files/db__client]]","[[Files/db__schema-postgres]]","[[Files/env]]","[[Files/errors]]","[[Files/utils__endpoints]]"]
 tags: ["file","ext/ts","cluster/90","auth","t/ts","t/src","t/lib"]
 ---
 
@@ -36,7 +36,7 @@ src/lib/server/auth.ts
 ## Imports
 
 - imports:: [[Files/db__client]] `./db/client`
-- imports:: [[Files/db__schema]] `./db/schema.js`
+- imports:: [[Files/db__schema-postgres]] `./db/schema-postgres.js`
 - imports:: [[Files/env]] `./env.server.js`
 - imports:: [[Files/errors]] `./errors.js`
 - imports:: [[Files/utils__endpoints]] `./utils/endpoints.js`

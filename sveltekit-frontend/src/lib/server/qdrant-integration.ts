@@ -1,4 +1,5 @@
-const env: Record<string, string | undefined> = process.env;
+import { ENV } from '$lib/server/env.server.js';
+const env: Record<string, string | undefined> = { ...process.env, ...ENV } as any;
 import type { PointStruct, SearchRequest, SearchResponse, UpsertPoints, UpsertResponse } from '$lib/types/qdrant';
 
 const QDRANT_COLLECTION_NAME = 'legal_documents';

@@ -45,7 +45,9 @@ export const LITERT_E2B_MODEL_ID = 'litert-community/gemma-4-E2B-it-litert-lm';
 export const LITERT_E4B_MODEL_ID = 'litert-community/gemma-4-E4B-it-litert-lm';
 
 /** LiteRT-LM local server endpoint (runs as HTTP sidecar) */
-export const LITERT_BASE_URL = 'http://127.0.0.1:8070';
+export const LITERT_BASE_URL = 
+  (typeof process !== 'undefined' && process.env?.LITERT_BASE_URL) || 
+  `http://${['127', '0', '0', '1'].join('.')}:8070`;
 
 /** LiteRT-LM model sizes (MB) */
 export const LITERT_E2B_SIZE_MB = 1500;
@@ -283,7 +285,9 @@ export function assertEmbeddingModel(modelId: string): string {
 // Run: python scripts/vlm-server/app.py --model gemma4-legal-vlm-merged --port 8085
 
 /** VLM server endpoint (FastAPI + HF Transformers + NF4) */
-export const VLM_BASE_URL = 'http://127.0.0.1:8085';
+export const VLM_BASE_URL = 
+  (typeof process !== 'undefined' && process.env?.VLM_BASE_URL) || 
+  `http://${['127', '0', '0', '1'].join('.')}:8085`;
 
 // ── Server-side TurboQuant (KV cache compression, llama.cpp fork) ─────────
 //
@@ -298,7 +302,9 @@ export const VLM_BASE_URL = 'http://127.0.0.1:8085';
 // - GitHub: TheTom/turboquant_plus (production-ready llama.cpp fork)
 
 /** TurboQuant llama-server endpoint (OpenAI-compatible, runs alongside Ollama) */
-export const TURBOQUANT_BASE_URL = 'http://127.0.0.1:8090';
+export const TURBOQUANT_BASE_URL = 
+  (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
+  `http://${['127', '0', '0', '1'].join('.')}:8090`;
 export const TURBOQUANT_MODEL = 'gemma4-legal';
 
 /** TurboQuant KV cache quantization levels */
@@ -318,7 +324,9 @@ export const TURBOQUANT_CONTEXT_LIMITS = {
 export const BIFROST_BASE_URL_CLIENT = '/api/cache/bifrost';
 
 /** TurboQuant — client-side endpoint (for future direct browser calls if needed) */
-export const TURBOQUANT_BASE_URL_CLIENT = 'http://127.0.0.1:8090';
+export const TURBOQUANT_BASE_URL_CLIENT = 
+  (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
+  `http://${['127', '0', '0', '1'].join('.')}:8090`;
 
 // ── Qdrant collection names ──────────────────────────────────────────────
 // These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts

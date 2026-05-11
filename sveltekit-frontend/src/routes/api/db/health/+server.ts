@@ -2,7 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
 /** GET /api/db/health — PostgreSQL database health check */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'unhealthy', error: 'Unauthorized' }, { status: 401 });
 	try {
 		const { db } = await import('$lib/server/db/client');
 		const { sql } = await import('drizzle-orm');

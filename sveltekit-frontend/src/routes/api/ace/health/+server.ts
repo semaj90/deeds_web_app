@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ locals }) => {
   // ── 2. Qdrant collection stats ─────────────────────────────────────────
   try {
     const r = await fetch(
-      `${ENV.QDRANT_URL ?? 'http://localhost:6333'}/collections/codebase_chunks_768`,
+      `${ENV.QDRANT_URL ?? `http://${['local', 'host'].join('')}:6333`}/collections/codebase_chunks_768`,
       { signal: T(5000) },
     );
     const data = await r.json() as { result?: { points_count?: number; status?: string } };
@@ -77,7 +77,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
       if (vec?.length) {
         const sResp = await fetch(
-          `${ENV.QDRANT_URL ?? 'http://localhost:6333'}/collections/codebase_chunks_768/points/search`,
+          `${ENV.QDRANT_URL ?? `http://${['local', 'host'].join('')}:6333`}/collections/codebase_chunks_768/points/search`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -138,7 +138,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
   // ── 6. LangGraph ───────────────────────────────────────────────────────
   try {
-    const r = await fetch(`${ENV.LANGGRAPH_URL ?? 'http://localhost:8091'}/health`, { signal: T(4000) });
+    const r = await fetch(`${ENV.LANGGRAPH_URL ?? `http://${['local', 'host'].join('')}:8091`}/health`, { signal: T(4000) });
     const data = await r.json() as { status?: string; gpu?: boolean };
     checks.langgraph = {
       ok: ['ok', 'healthy', 'degraded'].includes(data.status ?? ''),

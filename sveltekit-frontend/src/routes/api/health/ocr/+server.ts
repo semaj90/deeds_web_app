@@ -147,7 +147,8 @@ function determineOverallStatus(ocrHealth: OCRHealthDetails): OCRHealthResponse[
  }
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'unhealthy', error: 'Unauthorized' }, { status: 401 });
  const startTime = Date.now();
 
  try {
@@ -208,7 +209,8 @@ export const GET: RequestHandler = async () => {
 };
 
 // Support POST for triggering specific OCR health actions
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
  try {
  const raw = await request.json();
  const parsed = ocrHealthActionSchema.safeParse(raw);
@@ -314,7 +316,8 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 // Support HEAD for lightweight health pings
-export const HEAD: RequestHandler = async () => {
+export const HEAD: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return new Response(null, { status: 401 });
  try {
  const ocrHealth = await performOCRHealthCheck();
  const overallStatus = determineOverallStatus(ocrHealth);

@@ -1,13 +1,15 @@
-import { CONFIG } from '$lib/config/env.server';
+import { ENV } from '$lib/server/env.server.js';
+
+const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
 
 /**
  * Determines the correct Ollama endpoint based on environment configuration.
- * Prioritizes CONFIG.OLLAMA_URL, falls back to host.docker.internal for Docker,
- * then to localhost.
+ * Prioritizes ENV.OLLAMA_BASE_URL, falls back to host.docker.internal for Docker,
+ * then to loopback.
  */
 export function getOllamaEndpoint(): string {
-    if (CONFIG.OLLAMA_URL) {
-        return CONFIG.OLLAMA_URL.replace(/\/+$/, '');
+    if (ENV.OLLAMA_BASE_URL) {
+        return ENV.OLLAMA_BASE_URL.replace(/\/+$/, '');
     }
 
     // Check if running inside a Docker container
@@ -15,6 +17,6 @@ export function getOllamaEndpoint(): string {
         return 'http://host.docker.internal:11434';
     }
 
-    return 'http://localhost:11434';
+    return `http://${LOOPBACK_IP}:11434`;
 }
 

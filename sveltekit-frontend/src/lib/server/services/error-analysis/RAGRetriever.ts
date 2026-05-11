@@ -14,6 +14,7 @@
  *   const similar = await rag.querySimilarErrors(embedding, 5);
  */
 
+import { ENV } from '$lib/server/env.server.js';
 import type { FixStrategy, SimilarError } from './types.js';
 
 export interface RAGConfig {
@@ -47,10 +48,10 @@ export class RAGRetriever {
 
 	constructor(config?: Partial<RAGConfig>) {
 		this.config = {
-			qdrantUrl: config?.qdrantUrl ?? process.env?.QDRANT_URL ?? 'http://localhost:6333',
+			qdrantUrl: config?.qdrantUrl ?? ENV.QDRANT_URL,
 			qdrantCollection: config?.qdrantCollection ?? process.env?.QDRANT_COLLECTION ?? 'phase72_error_patterns',
-			pgvectorUrl: config?.pgvectorUrl ?? process.env.DATABASE_URL,
-			redisUrl: config?.redisUrl ?? process.env?.REDIS_URL ?? 'redis://localhost:6379',
+			pgvectorUrl: config?.pgvectorUrl ?? ENV.DATABASE_URL,
+			redisUrl: config?.redisUrl ?? ENV.REDIS_URL,
 			topK: config?.topK ?? 5,
 			similarityThreshold: config?.similarityThreshold ?? 0.7
 		};

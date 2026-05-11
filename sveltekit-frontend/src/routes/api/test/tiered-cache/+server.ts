@@ -22,7 +22,8 @@ const tieredCacheSchema = z.object({
   context: z.string().max(200).default('test'),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
   const overallStart = performance.now();
 
@@ -106,7 +107,8 @@ export const POST: RequestHandler = async ({ request }) => {
  *
  * Get current cache statistics
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   try {
     const stats = await getTieredCacheStats();
 

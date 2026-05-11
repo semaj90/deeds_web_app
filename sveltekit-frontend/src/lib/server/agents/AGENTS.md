@@ -52,25 +52,53 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 <!-- /AGENTS-ENRICH -->
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-11T03:09:24.094Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-11T05:31:27.766Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory audit: src/lib/server/agents
 
 ## Snapshot
 
-- server module directory with 5 files, 0 API handlers, 1 Drizzle refs
+- server module directory with 18 files, 0 API handlers, 2 Drizzle refs
 - Audit score: **100/100**
 - no audit signals
 - Tags: `src` `lib` `server` `zod` `db-schema`
 
-## Files (5)
+## Files (6)
 
 - `src/lib/server/agents/agents-card-store.ts`
+- `src/lib/server/agents/agents-context-source.ts`
 - `src/lib/server/agents/memory-encoding-agent.ts`
 - `src/lib/server/agents/ontology-sortation-agent.ts`
-- `src/lib/server/agents/trace-subagent-orchestrator.ts`
-- `src/lib/server/agents/trace-subagent-registry.ts`
+- `src/lib/server/agents/regen/loaders/activity.ts`
 
 ## Tools
 
@@ -87,7 +115,7 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 0/5 files have paired tests
+- **Paired tests**: 0/6 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

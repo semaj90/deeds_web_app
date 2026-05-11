@@ -78,6 +78,7 @@
 	const containerStyle = $derived(`max-height: ${maxHeightVh}vh;`);
 </script>
 
+<div class="evidence-viewer" data-testid="evidence-viewer">
 {#if !url}
 	<div class="rounded-lg border border-panel bg-panelSoft p-6 text-center text-sand">
 		<Icon name="file" size={32} class="mx-auto mb-2 opacity-50" />
@@ -177,3 +178,4 @@
 		</a>
 	</div>
 {/if}
+</div>

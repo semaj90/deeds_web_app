@@ -65,7 +65,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 
 // GET endpoint for stats
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'unhealthy', error: 'Unauthorized' }, { status: 401 });
 	try {
 		const [healthRes, statsRes] = await Promise.all([
       fetch(`${RAG_SERVICE_URL}/health`, { signal: AbortSignal.timeout(5_000) }),

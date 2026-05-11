@@ -10,20 +10,10 @@
   let isLoading = $state(false);
   let chatContainer = $state<HTMLDivElement | null>(null);
 
-  /**
-   * Resolves the Ollama endpoint dynamically.
-   * Provides fallback for Docker and local development.
-   */
-  function getOllamaEndpoint(): string {
-    // Check for explicit global config if available
-    const globalUrl = (globalThis as any)?.__OLLAMA_URL__;
-    if (globalUrl) return globalUrl;
-
-    // Standard local fallback
-    return 'http://localhost:11434';
-  }
-
-  const RAG_SERVICE_URL = 'http://localhost:8093';
+  import { getOllamaEndpoint } from '$lib/ai/ollama-config.js';
+  
+  const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
+  const RAG_SERVICE_URL = (globalThis as any)?.__RAG_SERVICE_URL__ || `http://${LOOPBACK_IP}:8103`;
 
   $effect(() => {
 

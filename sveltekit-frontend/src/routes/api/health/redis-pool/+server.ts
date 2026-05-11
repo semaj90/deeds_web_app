@@ -15,7 +15,8 @@ import type { RequestHandler } from './$types';
 import { redisPool } from '$lib/server/redis.js';
 import { getDispatchStats } from '$lib/server/queue/dispatch-inline.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 	try {
 		const poolStats = redisPool.getStats();
 		const dispatchStats = getDispatchStats();

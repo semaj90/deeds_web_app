@@ -2,7 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
 /** GET /api/health/status — Service connection status check */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const services: Record<string, { status: string }> = {};
 
 	// Check Ollama

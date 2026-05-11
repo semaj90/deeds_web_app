@@ -4,7 +4,7 @@ path: "src/routes/(app)/admin/unified-indexing-studio/+page.svelte"
 aliases: ["+page.svelte","src/routes/(app)/admin/unified-indexing-studio/+page.svelte"]
 clusterId: -1
 ext: ".svelte"
-lineCount: 484
+lineCount: 486
 pagerank: 0
 blend: 0
 isRoute: true
@@ -14,7 +14,7 @@ hasAuth: true
 hasZod: false
 importCount: 6
 embedding_id: "qdrant://codebase_chunks_768/src/routes/(app)/admin/unified-indexing-studio/+page.svelte"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 confidence: "medium"
 up: []
@@ -24,10 +24,10 @@ tags: ["file","ext/svelte","route","svelte","auth","t/svelte","t/src","t/routes"
 
 # `src/routes/(app)/admin/unified-indexing-studio/+page.svelte`
 ## For future Claude
-> .svelte at src/routes/(app)/admin/unified-indexing-studio/+page.svelte (484 lines), SvelteKit route, Svelte component, auth-guarded.
+> .svelte at src/routes/(app)/admin/unified-indexing-studio/+page.svelte (486 lines), SvelteKit route, Svelte component, auth-guarded.
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 484
+lines:: 486
 ## Imports
 
 - imports:: [[Files/_types]] `./$types`

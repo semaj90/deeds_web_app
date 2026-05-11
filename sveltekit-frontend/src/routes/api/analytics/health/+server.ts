@@ -6,7 +6,8 @@ import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { isRerankerReady } from '$lib/server/retrieval/triton-reranker.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+    if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
     const start = performance.now();
     const stats: Record<string, any> = {
         timestamp: new Date().toISOString(),

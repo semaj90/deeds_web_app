@@ -22,7 +22,8 @@ async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
 	]);
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ ready: false, error: 'Unauthorized' }, { status: 401 });
 	const redis: Redis = getRedis();
 	const [dbOk, redisOk, ollamaOk] = await Promise.all([
 		safe(db.execute(sql`SELECT 1`).then(() => true), false),

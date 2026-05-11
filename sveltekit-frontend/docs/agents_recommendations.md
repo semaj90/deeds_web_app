@@ -1,80 +1,82 @@
 # Agent Recommendations
 
-> Generated: 2026-05-07T21:47:25Z
+> Generated: 2026-05-11T02:09:22Z
 > Ranked by error-fix churn — most fixes = most fragile. Use Fix Timeline in AGENTS.md for per-directory detail.
 
 ## High-Churn Directories
 
 | Directory | Fixes | Feats | Last Activity | Action |
 |-----------|-------|-------|---------------|--------|
-| `src/lib/server/ai` | 13 | 1 | 2026-05-07 | ⚠️ Stabilize — add tests + circuit breaker |
-| `src/lib/server` | 12 | 0 | 2026-05-07 | ⚠️ Stabilize — add tests + circuit breaker |
-| `src/lib/server/ace` | 8 | 12 | 2026-05-07 | ⚠️ Stabilize — add tests + circuit breaker |
-| `src/lib/server/db` | 7 | 2 | 2026-05-07 | ⚠️ Stabilize — add tests + circuit breaker |
-| `src/mcp` | 7 | 3 | 2026-05-07 | ⚠️ Stabilize — add tests + circuit breaker |
-| `src/lib/server/ff1/agent` | 6 | 0 | 2026-05-07 | ⚠️ Stabilize — add tests + circuit breaker |
-| `src/lib/server/couchdb` | 4 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/wiki` | 4 | 7 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/graph` | 4 | 4 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/indexer` | 4 | 1 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/retrieval` | 4 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/chrrom` | 3 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/gpu` | 3 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/grpc` | 3 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/queue` | 3 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/cache` | 3 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/search` | 2 | 3 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/config` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/evidence` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/ff1` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/ff1/storage` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/vector` | 2 | 1 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/minio` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/utils` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/analytics` | 2 | 1 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/hypergraph` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/ml` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/server/legal` | 2 | 0 | 2026-05-07 | 🟠 Review — add G26 tests |
-| `src/lib/components/ui` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/lib/components/yorha` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/routes/(app)/demos/yorha/components` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/lib/server/connections` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/lib/server/agent/tools` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/lib/server/error-brain/transport` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/lib/server/observability` | 1 | 1 | 2026-05-07 | ✅ Healthy |
-| `src/lib/server/integrations` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/lib/server/langextract` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/lib/server/streaming` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/routes/api/code-intel/claude-plan` | 1 | 0 | 2026-05-07 | ✅ Healthy |
-| `src/routes/api/code-intel/smoke/health` | 1 | 0 | 2026-05-07 | ✅ Healthy |
+| `src/lib/server/db` | 11 | 1 | 2026-05-10 | ⚠️ Stabilize — add tests + circuit breaker |
+| `src/mcp` | 5 | 9 | 2026-05-10 | ⚠️ Stabilize — add tests + circuit breaker |
+| `src/lib/server/admin` | 4 | 4 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/server/ai` | 3 | 4 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/routes/api/evidence/upload` | 3 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/server/graph` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/server` | 2 | 1 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/routes/(app)/evidence/[id]/view` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/routes/(app)/cases` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/routes/(app)/cases/new` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/server/indexer` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/utils` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/routes/api/synthesis/generate` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/components/admin` | 2 | 2 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/server/analytics` | 2 | 0 | 2026-05-10 | 🟠 Review — add G26 tests |
+| `src/lib/server/ace` | 1 | 8 | 2026-05-10 | ✅ Healthy |
+| `src/routes/(app)/admin/gpu-evidence-graph` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/analytics/context-timeline` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/analytics/rl-signal` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/codebase-index/claude-assist` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/codebase-index/claude-assist/feedback` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/evidence/[id]/chain-of-custody` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/(app)/evidence` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/(app)/evidence/upload` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/rag/search` | 1 | 1 | 2026-05-10 | ✅ Healthy |
+| `src` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/analyze/stream` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/canvas` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/chat` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/citations` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/connections` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/evidence` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/export/pdf` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/key-points` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/laws` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/notes` | 1 | 0 | 2026-05-10 | ✅ Healthy |
+| `src/routes/api/cases/[id]/notes/[noteId]` | 1 | 0 | 2026-05-10 | ✅ Healthy |
 
 ## Feature Implementation TODOs
 
 > Recent feat commits that may need wiring, tests, or documentation.
 
-- [ ] **2026-05-07** feat(smoke): add agent roundtrip smoke scripts — dirs: root
-- [ ] **2026-05-07** feat(health): check-all-tools 42-gate probe, 35 PASS 0 FAIL — dirs: root
-- [ ] **2026-05-07** feat(startup): write startup_health/pids/bg-jobs artifacts; stability-test run-dir output; docs/startup.md — dirs: root
-- [ ] **2026-05-07** feat(startup+synthesis): TurboQuant stability gate, Node orchestrator, audit pipeline, fetch-rerank mget batch — dirs: `src/lib/server/ace`, `src/lib/server/observability`
-- [ ] **2026-05-07** feat(startup): parallel Full AI Stack VS Code task + 28-step audit — dirs: root
-- [ ] **2026-05-07** feat(graph): cluster→AGENTS.md index for fast ACE retrieval hits — dirs: root
-- [ ] **2026-05-07** feat(tile-engine): SemanticTile, TileEngineTrace, standardized quaternion pipeline — dirs: `src/lib/server/ace`, `src/lib/server/search`
-- [ ] **2026-05-07** feat(topology): standardise manifold4 axes before quaternion projection — dirs: `src/lib/server/search`
-- [ ] **2026-05-07** feat(mcp): rank FastMCP tools by HMM state and gain history — dirs: `src/lib/server/mcp`
-- [ ] **2026-05-06** feat(mcp): Redis 24hr ACE hits cache for trace.kag_search — dirs: `src/lib/server/ace`, `src/mcp`
-- [ ] **2026-05-06** feat(mcp+feedback): normalizeJsonFilter, search.go_hybrid hardening + 19 tests — dirs: `src/mcp`
-- [ ] **2026-05-06** feat(mapreduce): harden reduce-neo4j + add 16 unit tests — dirs: root
-- [ ] **2026-05-06** feat(ace): add glyph_cluster lane to multi-lane-retrieval — dirs: `src/lib/server/ace`
-- [ ] **2026-05-06** feat(agent): expose goToolClusterContext in A2A task response — dirs: `src/routes/api/ai/agent`
-- [ ] **2026-05-06** feat(agent): inject Go cluster context + complete synthesis memory archival — dirs: `src/lib/server/ai`
-- [ ] **2026-05-06** feat(ace): chain both rerank writeback scripts in graphify:full — dirs: root
-- [ ] **2026-05-06** feat(ace): detailed rerank breakdown writeback + synthesis TODO docs — dirs: root
-- [ ] **2026-05-06** feat(mcp+authority): inline neo4j-gds logic + normalized retrieval result types — dirs: `src/mcp`
-- [ ] **2026-05-06** feat(proto+config): TRACE proto contracts + memory artifacts + vitest config — dirs: root
-- [ ] **2026-05-06** feat(scripts): wiki/mapreduce/graph pipeline scripts — dirs: root
-- [ ] **2026-05-06** feat(db+routes): code_relations + error_fingerprints schema + API routes — dirs: `src/lib/server/db`, `src/routes/api/admin/pipeline/events`
-- [ ] **2026-05-06** feat(ace): add ACE spine modules + graph/wiki infrastructure — dirs: `src/lib/server/ace`, `src/lib/server/agents`
-- [ ] **2026-05-06** feat(indexer): extend worker pool with chunk/hash/metadata/qdrant_payload tasks — dirs: `src/lib/server/workers`, `src/lib/workers`
+- [ ] **2026-05-10** feat(mcp): research.synthesize → legal-ai-langgraph:8091 (89th tool) — dirs: `src/mcp`
+- [ ] **2026-05-10** feat(sw): Phase D offline analytics queue (CACHE_VERSION v1.6.0) — dirs: `src/lib/client`, `src/lib/server/ai`
+- [ ] **2026-05-10** feat(evidence): SSE /api/evidence/[id]/analyze/stream — Phase 3 Item 6 — dirs: `src/routes/api/evidence/[id]/analyze/stream`
+- [ ] **2026-05-10** feat(intent): Phase C demo page at /intent-chat — dirs: `src/routes/(dev)/intent-chat`
+- [ ] **2026-05-10** feat(sw+intent): Phase C SW telemetry + contextual-chat store + dispatch tests — dirs: `src/lib/stores`, `src/routes/api/admin/telemetry/batch`
+- [ ] **2026-05-10** feat(intent): Phase B intent-router + /api/ai/intent-dispatch route — dirs: `src/lib/server/ai`, `src/lib/server/mcp`
+- [ ] **2026-05-10** feat(rag): RAG_RRF_ENABLED canary in /api/rag/search for legal queries — dirs: `src/lib/server`, `src/routes/api/rag/search`
+- [ ] **2026-05-10** feat(intent): Phase A regex intent classifier — pure module + 31 tests — dirs: `src/lib/intent`
+- [ ] **2026-05-10** feat(retrieval): wire RRF into new /api/rag/search-fused endpoint — dirs: `src/routes/api/rag/search-fused`
+- [ ] **2026-05-10** feat(retrieval): Phase 1 sparse+dense lane — tsvector + RRF + BM25 — dirs: `src/lib/server/retrieval`
+- [ ] **2026-05-10** feat(speculative): wire gemma3:270m as draft model for llama-server speculative decoding — dirs: root
+- [ ] **2026-05-10** feat(agent): wire Langfuse tracing + Redis pattern recall into agentic-error-fix — dirs: root
+- [ ] **2026-05-10** feat(ace): QueryRouter4x4 dispatch + web_search L10 lane + smoke 10/10 — dirs: `src/lib/server/ace`, `src/lib/server/routing`
+- [ ] **2026-05-10** feat(mcp+image): image.enrich_tags MCP tool + batch enrichment script (78 tools) — dirs: `src/mcp`
+- [ ] **2026-05-10** feat(mcp): image search tools — 4 new TRACE MCP tools (77 total) — dirs: `src/mcp`
+- [ ] **2026-05-09** feat(evidence+synth): image search UI + GRPO synthesis loop scripts — dirs: `src/lib/components/evidence`, `src/lib/server/vector`
+- [ ] **2026-05-09** feat(karpathy): GPU batch stream log, AGENTS.md T1 patch, lane atlas, ACE hit-rate — dirs: root
+- [ ] **2026-05-09** feat(hyperrag): HyperRAG Feature Atlas + Trust-Tier system (§1-§13 blueprint) — dirs: `src/lib/server/ace`, `src/lib/server/db`
+- [ ] **2026-05-09** feat(session): browser-context lane, admin AI chat, external research agent, mcp:tail-errors, smoke suite — dirs: `src/lib/components/admin`, `src/lib/server/admin`
+- [ ] **2026-05-09** feat(mcp): un-gate canonical tools, fix ioredis cold-starts, expand multi-lane, wire prior-fix recall — dirs: `src/lib/server/ace`, `src/mcp`
+- [ ] **2026-05-09** feat(claude-code): Phase D — PreToolUse deny + PostToolUse audit hooks — dirs: root
+- [ ] **2026-05-09** feat(synth): Phase C — Gemma4 ⇄ MCP synthesis loop CLI — dirs: root
+- [ ] **2026-05-09** feat(mcp): Phase B — read-only db.* inspection tools + G33 gate — dirs: `src/mcp`
+- [ ] **2026-05-09** feat(mcp): adopted MCP servers (enabled:false) + smoke probe + plan amendments — dirs: root
+- [ ] **2026-05-09** feat(mcp): gemma4-offload stdio MCP + G29/G30/G31 validator gates — dirs: root
 
 ## Gate Violations (from enrich-agents-md)
 

@@ -100,13 +100,17 @@ async function embed(text) {
 async function qdrantUpsert(points) {
   if (!points.length) return;
   try {
-    await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points?wait=false`, {
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points?wait=false`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ points }),
       signal: AbortSignal.timeout(15_000),
     });
-  } catch { /* non-fatal */ }
+    const txt = await res.text();
+    console.log(`    Qdrant upsert status: ${res.status} ${res.statusText} - ${txt}`);
+  } catch (e) {
+    console.warn('[qdrant] upsert failed:', e.message);
+  }
 }
 
 // ── Redis KAG notes ───────────────────────────────────────────────────────────
@@ -297,7 +301,7 @@ if (!SKIP_EMBED) {
     const numId = Number(BigInt(`0x${sha1(c.hash)}`) % BigInt(2_147_483_647));
     points.push({
       id: numId,
-      vector: vec,
+      vector: { content: vec },
       payload: {
         kind:      'agent_timeline_entry',
         hash:      c.hash,

@@ -1,7 +1,7 @@
 # AGENTS.md — `sveltekit-frontend/` (LLM directory wiki)
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-09T22:22:23.446Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-11T05:31:27.766Z · agents.md spec · regen: npm run agents:write -->
 
 > SvelteKit 2 + Svelte 5 (runes) + bits-ui v2 + UnoCSS + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 > Per-directory AGENTS.md files are scattered throughout `src/` — agents walk UP from any file to the nearest one. **This file is the directory index** so agents (and humans) can quickly jump to a dir's KAG slug or fire the right tool call.
@@ -34,10 +34,10 @@ These tools are wired in-process in [`src/lib/server/ai/gemma4-agent.ts`](./src/
 
 | Gate | Status |
 |------|--------|
-| G4  Auth on API routes | 712✅ / 29❌ |
-| G5  Zod on body-parsing routes | 506✅ / 3❌ |
-| G15 SSR-unsafe globals | 1❌ |
-| G16 Routes without tests | 26❌ |
+| G4  Auth on API routes | 755✅ / 9❌ |
+| G5  Zod on body-parsing routes | 525✅ / 0❌ |
+| G15 SSR-unsafe globals | 2❌ |
+| G16 Routes without tests | 40❌ |
 | G20 Cyclic import pairs | 0 |
 
 Refresh with `npm run index:codebase:fast && npm run agents:write`.
@@ -68,7 +68,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/client` | 4 | — | — | `src_lib_client` | `agents_md({ path: "src/lib/client" })` |
+| `src/lib/client` | 6 | — | — | `src_lib_client` | `agents_md({ path: "src/lib/client" })` |
 | `src/lib/client/ui` | 2 | — | C92 | `src_lib_client_ui` | `agents_md({ path: "src/lib/client/ui" })` |
 
 ### `src/lib/collaboration/` (1 dir)
@@ -76,12 +76,12 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 
-### `src/lib/components/` (94 dirs)
+### `src/lib/components/` (95 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/components` | 56 | — | C92 | `src_lib_components` | `agents_md({ path: "src/lib/components" })` |
-| `src/lib/components/admin` | 10 | — | C7 | `src_lib_components_admin` | `agents_md({ path: "src/lib/components/admin" })` |
+| `src/lib/components/admin` | 11 | — | C7 | `src_lib_components_admin` | `agents_md({ path: "src/lib/components/admin" })` |
 | `src/lib/components/agentic` | 2 | — | — | `src_lib_components_agentic` | `agents_md({ path: "src/lib/components/agentic" })` |
 | `src/lib/components/ai` | 45 | — | C5 | `src_lib_components_ai` | `agents_md({ path: "src/lib/components/ai" })` |
 | `src/lib/components/analysis` | 3 | — | — | `src_lib_components_analysis` | `agents_md({ path: "src/lib/components/analysis" })` |
@@ -97,7 +97,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/components/dashboard` | 15 | — | C21 | `src_lib_components_dashboard` | `agents_md({ path: "src/lib/components/dashboard" })` |
 | `src/lib/components/detective` | 6 | — | — | `src_lib_components_detective` | `agents_md({ path: "src/lib/components/detective" })` |
 | `src/lib/components/editor` | 7 | — | — | `src_lib_components_editor` | `agents_md({ path: "src/lib/components/editor" })` |
-| `src/lib/components/evidence` | 41 | — | C86 | `src_lib_components_evidence` | `agents_md({ path: "src/lib/components/evidence" })` |
+| `src/lib/components/evidence` | 44 | — | C86 | `src_lib_components_evidence` | `agents_md({ path: "src/lib/components/evidence" })` |
 | `src/lib/components/forms` | 7 | — | C1 | `src_lib_components_forms` | `agents_md({ path: "src/lib/components/forms" })` |
 | `src/lib/components/graph` | 3 | — | — | `src_lib_components_graph` | `agents_md({ path: "src/lib/components/graph" })` |
 | `src/lib/components/legal` | 33 | — | C35 | `src_lib_components_legal` | `agents_md({ path: "src/lib/components/legal" })` |
@@ -197,6 +197,11 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/icons/yorha` | 15 | — | C4 | `src_lib_icons_yorha` | `agents_md({ path: "src/lib/icons/yorha" })` |
 
+### `src/lib/intent/` (1 dir)
+
+| Dir | Files | Score | Cluster | KAG slug | Quick tool call |
+|-----|-------|-------|---------|----------|-----------------|
+
 ### `src/lib/machines/` (1 dir)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
@@ -225,32 +230,34 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/schemas` | 5 | — | C29 | `src_lib_schemas` | `agents_md({ path: "src/lib/schemas" })` |
 | `src/lib/schemas/tools` | 8 | — | C32 | `src_lib_schemas_tools` | `agents_md({ path: "src/lib/schemas/tools" })` |
 
-### `src/lib/server/` (110 dirs)
+### `src/lib/server/` (117 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 | `src/lib/server` | 63 | — | C90 | `src_lib_server` | `agents_md({ path: "src/lib/server" })` |
-| `src/lib/server/ace` | 30 | — | C72 | `src_lib_server_ace` | `agents_md({ path: "src/lib/server/ace" })` |
-| `src/lib/server/admin` | 5 | — | — | `src_lib_server_admin` | `agents_md({ path: "src/lib/server/admin" })` |
+| `src/lib/server/ace` | 35 | — | C72 | `src_lib_server_ace` | `agents_md({ path: "src/lib/server/ace" })` |
+| `src/lib/server/admin` | 8 | — | — | `src_lib_server_admin` | `agents_md({ path: "src/lib/server/admin" })` |
 | `src/lib/server/agent` | 3 | — | C74 | `src_lib_server_agent` | `agents_md({ path: "src/lib/server/agent" })` |
 | `src/lib/server/agent/tools` | 8 | — | — | `src_lib_server_agent_tools` | `agents_md({ path: "src/lib/server/agent/tools" })` |
-| `src/lib/server/agents` | 4 | — | — | `src_lib_server_agents` | `agents_md({ path: "src/lib/server/agents" })` |
+| `src/lib/server/agents` | 6 | — | — | `src_lib_server_agents` | `agents_md({ path: "src/lib/server/agents" })` |
 | `src/lib/server/agents-md` | 3 | — | — | `src_lib_server_agents_md` | `agents_md({ path: "src/lib/server/agents-md" })` |
-| `src/lib/server/ai` | 43 | — | C19 | `src_lib_server_ai` | `agents_md({ path: "src/lib/server/ai" })` |
+| `src/lib/server/agents/regen` | 2 | — | — | `src_lib_server_agents_regen` | `agents_md({ path: "src/lib/server/agents/regen" })` |
+| `src/lib/server/agents/regen/loaders` | 10 | — | — | `src_lib_server_agents_regen_loaders` | `agents_md({ path: "src/lib/server/agents/regen/loaders" })` |
+| `src/lib/server/ai` | 54 | — | C19 | `src_lib_server_ai` | `agents_md({ path: "src/lib/server/ai" })` |
 | `src/lib/server/analysis` | 12 | — | C54 | `src_lib_server_analysis` | `agents_md({ path: "src/lib/server/analysis" })` |
 | `src/lib/server/analytics` | 15 | — | C60 | `src_lib_server_analytics` | `agents_md({ path: "src/lib/server/analytics" })` |
 | `src/lib/server/atlas` | 4 | — | — | `src_lib_server_atlas` | `agents_md({ path: "src/lib/server/atlas" })` |
 | `src/lib/server/audit` | 4 | — | C84 | `src_lib_server_audit` | `agents_md({ path: "src/lib/server/audit" })` |
-| `src/lib/server/cache` | 13 | — | C22 | `src_lib_server_cache` | `agents_md({ path: "src/lib/server/cache" })` |
+| `src/lib/server/cache` | 14 | — | C22 | `src_lib_server_cache` | `agents_md({ path: "src/lib/server/cache" })` |
 | `src/lib/server/cartridge` | 5 | — | C12 | `src_lib_server_cartridge` | `agents_md({ path: "src/lib/server/cartridge" })` |
 | `src/lib/server/chrrom` | 3 | — | — | `src_lib_server_chrrom` | `agents_md({ path: "src/lib/server/chrrom" })` |
 | `src/lib/server/concurrency` | 3 | — | C61 | `src_lib_server_concurrency` | `agents_md({ path: "src/lib/server/concurrency" })` |
-| `src/lib/server/config` | 5 | — | C75 | `src_lib_server_config` | `agents_md({ path: "src/lib/server/config" })` |
+| `src/lib/server/config` | 6 | — | C75 | `src_lib_server_config` | `agents_md({ path: "src/lib/server/config" })` |
 | `src/lib/server/couchdb` | 3 | — | — | `src_lib_server_couchdb` | `agents_md({ path: "src/lib/server/couchdb" })` |
 | `src/lib/server/data` | 2 | — | — | `src_lib_server_data` | `agents_md({ path: "src/lib/server/data" })` |
-| `src/lib/server/db` | 70 | — | C6 | `src_lib_server_db` | `agents_md({ path: "src/lib/server/db" })` |
+| `src/lib/server/db` | 71 | — | C6 | `src_lib_server_db` | `agents_md({ path: "src/lib/server/db" })` |
 | `src/lib/server/db/meta` | 2 | — | — | `src_lib_server_db_meta` | `agents_md({ path: "src/lib/server/db/meta" })` |
-| `src/lib/server/db/schema` | 41 | — | C95 | `src_lib_server_db_schema` | `agents_md({ path: "src/lib/server/db/schema" })` |
+| `src/lib/server/db/schema` | 44 | — | C95 | `src_lib_server_db_schema` | `agents_md({ path: "src/lib/server/db/schema" })` |
 | `src/lib/server/embedding` | 9 | — | C77 | `src_lib_server_embedding` | `agents_md({ path: "src/lib/server/embedding" })` |
 | `src/lib/server/error-brain` | 5 | — | — | `src_lib_server_error_brain` | `agents_md({ path: "src/lib/server/error-brain" })` |
 | `src/lib/server/error-brain/transport` | 6 | — | — | `src_lib_server_error_brain_transport` | `agents_md({ path: "src/lib/server/error-brain/transport" })` |
@@ -260,19 +267,19 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/ff1/agent` | 2 | — | — | `src_lib_server_ff1_agent` | `agents_md({ path: "src/lib/server/ff1/agent" })` |
 | `src/lib/server/ff1/cli` | 2 | — | — | `src_lib_server_ff1_cli` | `agents_md({ path: "src/lib/server/ff1/cli" })` |
 | `src/lib/server/glyph` | 2 | — | — | `src_lib_server_glyph` | `agents_md({ path: "src/lib/server/glyph" })` |
-| `src/lib/server/gpu` | 11 | — | C20 | `src_lib_server_gpu` | `agents_md({ path: "src/lib/server/gpu" })` |
+| `src/lib/server/gpu` | 13 | — | C20 | `src_lib_server_gpu` | `agents_md({ path: "src/lib/server/gpu" })` |
 | `src/lib/server/graph` | 21 | — | C73 | `src_lib_server_graph` | `agents_md({ path: "src/lib/server/graph" })` |
 | `src/lib/server/grpc` | 10 | — | C82 | `src_lib_server_grpc` | `agents_md({ path: "src/lib/server/grpc" })` |
 | `src/lib/server/helpers` | 2 | — | — | `src_lib_server_helpers` | `agents_md({ path: "src/lib/server/helpers" })` |
 | `src/lib/server/hypergraph` | 5 | — | — | `src_lib_server_hypergraph` | `agents_md({ path: "src/lib/server/hypergraph" })` |
-| `src/lib/server/indexer` | 19 | — | C58 | `src_lib_server_indexer` | `agents_md({ path: "src/lib/server/indexer" })` |
+| `src/lib/server/indexer` | 20 | — | C58 | `src_lib_server_indexer` | `agents_md({ path: "src/lib/server/indexer" })` |
 | `src/lib/server/indexer/pipeline` | 3 | — | — | `src_lib_server_indexer_pipeline` | `agents_md({ path: "src/lib/server/indexer/pipeline" })` |
 | `src/lib/server/inference` | 4 | — | C58 | `src_lib_server_inference` | `agents_md({ path: "src/lib/server/inference" })` |
-| `src/lib/server/kb` | 5 | — | — | `src_lib_server_kb` | `agents_md({ path: "src/lib/server/kb" })` |
+| `src/lib/server/kb` | 7 | — | — | `src_lib_server_kb` | `agents_md({ path: "src/lib/server/kb" })` |
 | `src/lib/server/langextract` | 3 | — | — | `src_lib_server_langextract` | `agents_md({ path: "src/lib/server/langextract" })` |
-| `src/lib/server/legal` | 7 | — | C47 | `src_lib_server_legal` | `agents_md({ path: "src/lib/server/legal" })` |
+| `src/lib/server/legal` | 9 | — | C47 | `src_lib_server_legal` | `agents_md({ path: "src/lib/server/legal" })` |
 | `src/lib/server/llm` | 6 | — | C44 | `src_lib_server_llm` | `agents_md({ path: "src/lib/server/llm" })` |
-| `src/lib/server/mcp` | 4 | — | C82 | `src_lib_server_mcp` | `agents_md({ path: "src/lib/server/mcp" })` |
+| `src/lib/server/mcp` | 5 | — | C82 | `src_lib_server_mcp` | `agents_md({ path: "src/lib/server/mcp" })` |
 | `src/lib/server/middleware` | 4 | — | — | `src_lib_server_middleware` | `agents_md({ path: "src/lib/server/middleware" })` |
 | `src/lib/server/minio` | 2 | — | — | `src_lib_server_minio` | `agents_md({ path: "src/lib/server/minio" })` |
 | `src/lib/server/ml` | 8 | — | C69 | `src_lib_server_ml` | `agents_md({ path: "src/lib/server/ml" })` |
@@ -287,9 +294,10 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/rate-limit` | 2 | — | — | `src_lib_server_rate_limit` | `agents_md({ path: "src/lib/server/rate-limit" })` |
 | `src/lib/server/reconstruction` | 5 | — | — | `src_lib_server_reconstruction` | `agents_md({ path: "src/lib/server/reconstruction" })` |
 | `src/lib/server/research` | 16 | — | C43 | `src_lib_server_research` | `agents_md({ path: "src/lib/server/research" })` |
-| `src/lib/server/retrieval` | 28 | — | C73 | `src_lib_server_retrieval` | `agents_md({ path: "src/lib/server/retrieval" })` |
+| `src/lib/server/retrieval` | 32 | — | C73 | `src_lib_server_retrieval` | `agents_md({ path: "src/lib/server/retrieval" })` |
 | `src/lib/server/search` | 12 | — | — | `src_lib_server_search` | `agents_md({ path: "src/lib/server/search" })` |
-| `src/lib/server/services` | 2 | — | C32 | `src_lib_server_services` | `agents_md({ path: "src/lib/server/services" })` |
+| `src/lib/server/services` | 4 | — | C32 | `src_lib_server_services` | `agents_md({ path: "src/lib/server/services" })` |
+| `src/lib/server/services/error-analysis` | 4 | — | — | `src_lib_server_services_error_analysis` | `agents_md({ path: "src/lib/server/services/error-analysis" })` |
 | `src/lib/server/simulation` | 2 | — | — | `src_lib_server_simulation` | `agents_md({ path: "src/lib/server/simulation" })` |
 | `src/lib/server/streaming` | 2 | — | — | `src_lib_server_streaming` | `agents_md({ path: "src/lib/server/streaming" })` |
 | `src/lib/server/tensor` | 2 | — | — | `src_lib_server_tensor` | `agents_md({ path: "src/lib/server/tensor" })` |
@@ -297,7 +305,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/lib/server/types` | 10 | — | C73 | `src_lib_server_types` | `agents_md({ path: "src/lib/server/types" })` |
 | `src/lib/server/utils` | 13 | — | C19 | `src_lib_server_utils` | `agents_md({ path: "src/lib/server/utils" })` |
 | `src/lib/server/validation` | 2 | — | C43 | `src_lib_server_validation` | `agents_md({ path: "src/lib/server/validation" })` |
-| `src/lib/server/vector` | 10 | — | C18 | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
+| `src/lib/server/vector` | 12 | — | C18 | `src_lib_server_vector` | `agents_md({ path: "src/lib/server/vector" })` |
 | `src/lib/server/wiki` | 7 | — | — | `src_lib_server_wiki` | `agents_md({ path: "src/lib/server/wiki" })` |
 | `src/lib/server/workers` | 5 | — | C24 | `src_lib_server_workers` | `agents_md({ path: "src/lib/server/workers" })` |
 
@@ -305,9 +313,9 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/services` | 8 | — | C43 | `src_lib_services` | `agents_md({ path: "src/lib/services" })` |
-| `src/lib/services/error-analysis` | 17 | — | C17 | `src_lib_services_error_analysis` | `agents_md({ path: "src/lib/services/error-analysis" })` |
-| `src/lib/services/knowledge-search` | 11 | — | C17 | `src_lib_services_knowledge_search` | `agents_md({ path: "src/lib/services/knowledge-search" })` |
+| `src/lib/services` | 6 | — | C43 | `src_lib_services` | `agents_md({ path: "src/lib/services" })` |
+| `src/lib/services/error-analysis` | 13 | — | C17 | `src_lib_services_error_analysis` | `agents_md({ path: "src/lib/services/error-analysis" })` |
+| `src/lib/services/knowledge-search` | 10 | — | C17 | `src_lib_services_knowledge_search` | `agents_md({ path: "src/lib/services/knowledge-search" })` |
 
 ### `src/lib/shared/` (3 dirs)
 
@@ -325,7 +333,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/stores` | 16 | — | C52 | `src_lib_stores` | `agents_md({ path: "src/lib/stores" })` |
+| `src/lib/stores` | 17 | — | C52 | `src_lib_stores` | `agents_md({ path: "src/lib/stores" })` |
 | `src/lib/stores/dashboard` | 3 | — | C68 | `src_lib_stores_dashboard` | `agents_md({ path: "src/lib/stores/dashboard" })` |
 | `src/lib/stores/unified` | 6 | — | C52 | `src_lib_stores_unified` | `agents_md({ path: "src/lib/stores/unified" })` |
 
@@ -344,7 +352,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
-| `src/lib/utils` | 43 | — | C1 | `src_lib_utils` | `agents_md({ path: "src/lib/utils" })` |
+| `src/lib/utils` | 44 | — | C1 | `src_lib_utils` | `agents_md({ path: "src/lib/utils" })` |
 
 ### `src/lib/webgpu/` (1 dir)
 
@@ -402,7 +410,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 
-### `src/routes/(app)/` (210 dirs)
+### `src/routes/(app)/` (212 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
@@ -421,6 +429,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/admin/component-analysis` | 2 | — | — | `src_routes__app__admin_component_analysis` | `agents_md({ path: "src/routes/(app)/admin/component-analysis" })` |
 | `src/routes/(app)/admin/dev-tools` | 4 | — | C83 | `src_routes__app__admin_dev_tools` | `agents_md({ path: "src/routes/(app)/admin/dev-tools" })` |
 | `src/routes/(app)/admin/dev-tools/component-showcase` | 13 | — | — | `src_routes__app__admin_dev_tools_component_showcase` | `agents_md({ path: "src/routes/(app)/admin/dev-tools/component-showcase" })` |
+| `src/routes/(app)/admin/document-search` | 2 | 🔴 1 ssr | — | `src_routes__app__admin_document_search` | `agents_md({ path: "src/routes/(app)/admin/document-search" })` |
 | `src/routes/(app)/admin/error-analysis` | 2 | — | — | `src_routes__app__admin_error_analysis` | `agents_md({ path: "src/routes/(app)/admin/error-analysis" })` |
 | `src/routes/(app)/admin/error-brain` | 3 | — | — | `src_routes__app__admin_error_brain` | `agents_md({ path: "src/routes/(app)/admin/error-brain" })` |
 | `src/routes/(app)/admin/gpu-evidence-graph` | 3 | — | — | `src_routes__app__admin_gpu_evidence_graph` | `agents_md({ path: "src/routes/(app)/admin/gpu-evidence-graph" })` |
@@ -481,6 +490,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/demos/yorha/components/evidence` | 3 | — | C92 | `src_routes__app__demos_yorha_components_evidence` | `agents_md({ path: "src/routes/(app)/demos/yorha/components/evidence" })` |
 | `src/routes/(app)/evidence` | 6 | 1/1 auth | C29 | `src_routes__app__evidence` | `agents_md({ path: "src/routes/(app)/evidence" })` |
 | `src/routes/(app)/evidence-library` | 2 | — | — | `src_routes__app__evidence_library` | `agents_md({ path: "src/routes/(app)/evidence-library" })` |
+| `src/routes/(app)/evidence/[id]/view` | 2 | — | — | `src_routes__app__evidence__id__view` | `agents_md({ path: "src/routes/(app)/evidence/[id]/view" })` |
 | `src/routes/(app)/evidence/manage` | 2 | — | — | `src_routes__app__evidence_manage` | `agents_md({ path: "src/routes/(app)/evidence/manage" })` |
 | `src/routes/(app)/evidence/realtime` | 2 | — | — | `src_routes__app__evidence_realtime` | `agents_md({ path: "src/routes/(app)/evidence/realtime" })` |
 | `src/routes/(app)/evidence/upload` | 2 | — | C92 | `src_routes__app__evidence_upload` | `agents_md({ path: "src/routes/(app)/evidence/upload" })` |
@@ -504,7 +514,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | `src/routes/(app)/simulation` | 2 | — | C21 | `src_routes__app__simulation` | `agents_md({ path: "src/routes/(app)/simulation" })` |
 | `src/routes/(app)/terminal` | 2 | — | C5 | `src_routes__app__terminal` | `agents_md({ path: "src/routes/(app)/terminal" })` |
 
-### `src/routes/(dev)/` (7 dirs)
+### `src/routes/(dev)/` (8 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
@@ -518,7 +528,7 @@ Refresh with `npm run index:codebase:fast && npm run agents:write`.
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|
 
-### `src/routes/api/` (635 dirs)
+### `src/routes/api/` (656 dirs)
 
 | Dir | Files | Score | Cluster | KAG slug | Quick tool call |
 |-----|-------|-------|---------|----------|-----------------|

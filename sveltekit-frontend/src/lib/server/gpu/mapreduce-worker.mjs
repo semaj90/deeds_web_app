@@ -11,8 +11,9 @@ import { parentPort, workerData } from 'worker_threads';
 import pg from 'pg';
 const { Pool } = pg;
 
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
+const OLLAMA_URL = process.env.OLLAMA_URL ?? `http://${LOOPBACK_IP}:11434`;
+const DATABASE_URL = process.env.DATABASE_URL ?? `postgresql://legal_admin:123456@${LOOPBACK_IP}:5434/legal_ai_db`;
 
 const pool = new Pool({ connectionString: DATABASE_URL });
 

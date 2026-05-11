@@ -3,14 +3,20 @@ import type { RequestHandler } from './$types';
 import { AgenticDiagnosticService } from '$lib/server/ai/agentic-diagnostic';
 import { ENV } from '$lib/server/env.server.js';
 
+import { z } from 'zod';
+
+const diagnoseSchema = z.object({
+	errorId: z.string().min(1)
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
-		const { errorId } = await request.json();
-		if (!errorId) return json({ error: 'errorId required' }, { status: 400 });
+		const body = await request.json();
+		const { errorId } = diagnoseSchema.parse(body);
 
 		const diagnosis = await AgenticDiagnosticService.diagnose(errorId);
 

@@ -67,7 +67,7 @@ search.dev_context({ query: "expandNeighbours neo4j rerank" })
 
 ## Audit Gates — General
 
-> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-10
+> Auto-mapped from CLAUDE.md §"Unified Audit Gate System". Last enriched: 2026-05-11
 > Run each check from the **sveltekit-frontend/** root.
 
 ### Tier A — Code Connectivity
@@ -102,12 +102,12 @@ rg "localhost|127\.0\.0\.1" src/lib/server/ --type ts  # expect 0 outside env.se
 
 | Commit | Timestamp | Subject |
 |--------|-----------|---------|
+| `2dccb6c40c` | 2026-05-10T19:57 | fix(audit-p1): clear remaining 15 tsgo errors (15 → 0) |
 | `d98e5f8864` | 2026-05-09T19:52 | chore(graphify): second regeneration pass — obsidian indexes, memory atlas, AGENTS.md hierarchy |
 | `520503c2d5` | 2026-05-09T01:17 | 58_ |
 | `19e6b700f1` | 2026-05-08T00:18 | feat(kag): adaptive guards on 4 pipelines + KAG feature implementation doc |
 | `e1f78a54a8` | 2026-05-07T17:14 | feat(mla): 1-bit sign-pack latent + Hamming pre-filter (TurboQuant fast-path) |
 | `7f1195e756` | 2026-05-07T13:05 | chore(quaternion): add deferred CUDA batch similarity TODO |
-| `e3f3210872` | 2026-05-07T12:21 | fix(g17): batch-remove remaining localhost fallbacks via fix-g17-localhost.mjs |
 
 <!-- /AGENTS-ENRICH -->
 
