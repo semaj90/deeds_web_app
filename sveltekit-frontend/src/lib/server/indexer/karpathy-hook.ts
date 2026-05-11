@@ -76,6 +76,9 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 		const dirId = generateDirectoryId(dirPath);
 
 		// 1. Create file-level metadata envelope
+		const lineCount = file.content.split('\n').length;
+		const integrationDensity = file.graph?.fanIn ?? 0;
+
 		const fileMetadata = {
 			id: fileId,
 			type: 'file',
@@ -87,7 +90,9 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 				symbols: file.symbols,
 				route: file.route,
 				audit: file.audit,
-				graph: file.graph
+				graph: file.graph,
+				lineCount,
+				integrationDensity
 			}
 		};
 

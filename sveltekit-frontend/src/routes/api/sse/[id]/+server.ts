@@ -11,7 +11,7 @@ import IORedis from 'ioredis';
 import { produceTokenChunk, readTokenStream } from '$lib/server/redis-streams.js';
 import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import type { RequestHandler } from './$types';
-import { isUuid } from '$lib/server/validation.js';
+import { isUuid, isValidSafeId } from '$lib/server/validation.js';
 import { ENV } from '$lib/server/env.server.js';
 
 const REDIS_URL = ENV.REDIS_URL;
@@ -66,7 +66,7 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const chatId = params.id;
 
-  if (!isUuid(chatId)) {
+  if (!isUuid(chatId) && !isValidSafeId(chatId)) {
     return new Response('Invalid ID format', { status: 400 });
   }
 

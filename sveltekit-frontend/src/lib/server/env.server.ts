@@ -101,11 +101,13 @@ export const ENV = {
   RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? `http://${LOOPBACK_IP}:8100`,
   SDXL_SERVICE_URL: privateEnv.SDXL_SERVICE_URL ?? `http://${LOCALHOST}:8100`,
   RETRIEVAL_HTTP_ENABLED: (privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
-  CHR97_GRPC_URL: privateEnv.CHR97_GRPC_URL ?? `${LOOPBACK_IP}:50055`,
+  /** CHR97 cartridge gRPC (port 50059 — moved from 50055 which collides with go-search-service) */
+  CHR97_GRPC_URL: privateEnv.CHR97_GRPC_URL ?? `${LOOPBACK_IP}:50059`,
   CHR97_GRPC_ENABLED: (privateEnv.CHR97_GRPC_ENABLED ?? 'false') === 'true',
   TOOL_GRPC_URL: privateEnv.TOOL_GRPC_URL ?? `${LOOPBACK_IP}:50057`,
   TOOL_GRPC_ENABLED: (privateEnv.TOOL_GRPC_ENABLED ?? 'false') === 'true',
-  TOOL_ROUTER_GRPC_URL: privateEnv.TOOL_ROUTER_GRPC_URL ?? `${LOOPBACK_IP}:50058`,
+  /** ToolRouter gRPC (port 50060 — moved from 50058 which collides with CodeIntel) */
+  TOOL_ROUTER_GRPC_URL: privateEnv.TOOL_ROUTER_GRPC_URL ?? `${LOOPBACK_IP}:50060`,
   /** GraphML gRPC service (GPU graph analytics — PyTorch/CUDA, port 50056) */
   GRAPH_ML_GRPC_URL: privateEnv.GRAPH_ML_GRPC_URL ?? `${LOOPBACK_IP}:50056`,
   GRAPH_ML_GRPC_ENABLED: (privateEnv.GRAPH_ML_GRPC_ENABLED ?? 'false') === 'true',
@@ -281,6 +283,8 @@ export const ENV = {
   NODE_ENV: process.env.NODE_ENV ?? 'development',
   /** Development bypass auth (Sprint 6/Phase 76) */
   DEV_BYPASS_AUTH: (privateEnv.DEV_BYPASS_AUTH ?? 'false') === 'true',
+  /** ACE Stage A0 encoded-cluster prefilter (Phase 1-4) */
+  ACE_ENCODED_PREFILTER_ENABLED: privateEnv.ACE_ENCODED_PREFILTER_ENABLED ?? 'false',
 };
 
 
@@ -322,6 +326,11 @@ if (privateEnv.SEAWEED_S3_PORT) {
 	if (privateEnv.SEAWEED_ACCESS_KEY) ENV.MINIO_ACCESS_KEY = privateEnv.SEAWEED_ACCESS_KEY;
 	if (privateEnv.SEAWEED_SECRET_KEY) ENV.MINIO_SECRET_KEY = privateEnv.SEAWEED_SECRET_KEY;
 }
+
+/** SeaweedFS master port (metadata/cluster status) — default 9333 */
+export const SEAWEED_MASTER_PORT = parseInt(privateEnv.SEAWEED_MASTER_PORT ?? '9333', 10);
+/** SeaweedFS filer port (POSIX-style file API) — default 8382 */
+export const SEAWEED_FILER_PORT  = parseInt(privateEnv.SEAWEED_FILER_PORT  ?? '8382', 10);
 
 const normalizedMinio = getNormalizedMinioConfig();
 ENV.MINIO_ENDPOINT = normalizedMinio.endpoint;

@@ -15,7 +15,7 @@ import {
 } from '$lib/server/circuit-breaker.js';
 import { getInFlightCount } from '$lib/server/embedding/embed.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
-import { ENV } from '$lib/server/env.server.js';
+import { ENV, SEAWEED_MASTER_PORT } from '$lib/server/env.server.js';
 
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
@@ -31,7 +31,7 @@ const querySchema = z.object({
       'quic',
       'go-search',
       'rabbitmq',
-      'minio',
+      'seaweedfs',
       'couchdb',
       'neo4j',
       'nats',
@@ -77,7 +77,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   const trtllmUrl = ENV.TENSORRT_URL;
   const tritonUrl = ENV.TRITON_URL;
   const langextractUrl = ENV.LANGEXTRACT_URL;
-  const minioUrl = `http://${ENV.MINIO_ENDPOINT}:${ENV.MINIO_PORT}`;
+  const seaweedMasterUrl = `http://${ENV.MINIO_ENDPOINT}:${SEAWEED_MASTER_PORT}/cluster/status`;
 
   // Run all probes in parallel
   const [
@@ -92,7 +92,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     redis,
     postgres,
     rabbitmq,
-    minio,
+    seaweedfs,
     couchdb,
     neo4j,
     nats,
@@ -112,7 +112,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       latencyMs: 0,
       error: 'quic probe failed',
     })),
-    probe(`${ENV.GO_SEARCH_URL || 'http://go-search:8096'}/health`, 3000).catch(() => ({
+    probe(`${ENV.GO_SEARCH_URL || 'http://127.0.0.1:8096'}/health`, 800).catch(() => ({
       ok: false,
       latencyMs: 0,
       error: 'go-search probe failed',
@@ -125,7 +125,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       parseInt(new URL(ENV.RABBITMQ_URL).port || '5672', 10),
       'rabbitmq'
     ),
-    probe(`${minioUrl}/minio/health/live`, 3000),
+    probe(seaweedMasterUrl, 2000).catch(() => ({
+      ok: false,
+      latencyMs: 0,
+      error: 'seaweedfs master unreachable',
+    })),
     probe(`${ENV.COUCHDB_URL.replace(/\/\/.*@/, '//')}`, 3000).catch(() => ({
       ok: false,
       latencyMs: 0,
@@ -153,7 +157,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     redis,
     postgres,
     rabbitmq,
-    minio,
+    seaweedfs,
     couchdb,
     neo4j,
     nats,
@@ -167,7 +171,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     qdrant,
     redis,
     postgres,
-    minio,
+    seaweedfs,
     rabbitmq,
     langextract,
     trtllm,
@@ -195,8 +199,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
         definition: 'Live, required, request path depends on it',
       },
       data: {
-        services: ['minio', 'rabbitmq', 'langextract'],
-        allOk: minio.ok && rabbitmq.ok && langextract.ok,
+        services: ['seaweedfs', 'rabbitmq', 'langextract'],
+        allOk: seaweedfs.ok && rabbitmq.ok && langextract.ok,
         definition: 'Live, supports storage/extraction/messaging',
       },
       inference: {
@@ -295,8 +299,8 @@ async function handleServiceHealth(service: string) {
       return json({ service: 'quic', ...result, enabled: ENV.EMBEDDING_QUIC_ENABLED });
     }
     case 'go-search': {
-      const goUrl = ENV.GO_SEARCH_URL || 'http://go-search:8096';
-      const result = await probe(`${goUrl}/health`, 3000);
+      const goUrl = ENV.GO_SEARCH_URL || 'http://127.0.0.1:8096';
+      const result = await probe(`${goUrl}/health`, 800);
       return json({ service: 'go-search', ...result, grpcUrl: ENV.GO_SEARCH_GRPC_URL });
     }
     case 'rabbitmq': {
@@ -307,12 +311,12 @@ async function handleServiceHealth(service: string) {
       );
       return json({ service: 'rabbitmq', ...result });
     }
-    case 'minio': {
+    case 'seaweedfs': {
       const result = await probe(
-        `http://${ENV.MINIO_ENDPOINT}:${ENV.MINIO_PORT}/minio/health/live`,
-        3000
+        `http://${ENV.MINIO_ENDPOINT}:${SEAWEED_MASTER_PORT}/cluster/status`,
+        2000
       );
-      return json({ service: 'minio', ...result });
+      return json({ service: 'seaweedfs', ...result, masterPort: SEAWEED_MASTER_PORT });
     }
     case 'couchdb': {
       const safeUrl = ENV.COUCHDB_URL.replace(/\/\/.*@/, '//');
