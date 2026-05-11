@@ -167,6 +167,8 @@ export default defineConfig({
       'tests/agents-regen-redis-loaders.spec.ts',
       // Phase A1.5 + A1.6 — Postgres loader contracts (features + activity rollup)
       'tests/agents-regen-pg-loaders.spec.ts',
+      // Phase A1.9 — buildRegenContext composer (Promise.allSettled + diagnostics)
+      'tests/agents-regen-composer.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
