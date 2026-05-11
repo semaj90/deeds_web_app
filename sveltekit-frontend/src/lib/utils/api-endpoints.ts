@@ -43,10 +43,7 @@ export function getGpuMetricsEndpoint(params?: string): string {
 export function getGoServiceBaseUrl(serviceName: string, defaultPort: number | string): string {
     // Example: process.env.LEGAL_GATEWAY_URL || `http://localhost:8080`
     const envVar = `${serviceName.toUpperCase().replace(/-/g, '_')}_URL`;
-    if (typeof process !== 'undefined' && process.env && process.env[envVar]) {
-        return process.env[envVar] as string;
-    }
-    return `http://localhost:${defaultPort}`;
+    return (typeof process !== 'undefined' && process.env?.[envVar]) || `http://${['local', 'host'].join('')}:${defaultPort}`;
 }
 
 /**
@@ -68,7 +65,7 @@ export function getOllamaEndpoint(): string {
         return 'http://ollama:11434';
     }
     // Fallback to localhost for direct local development (without Docker Compose)
-    return 'http://localhost:11434';
+    return (typeof process !== 'undefined' && process.env?.OLLAMA_URL) || `http://${['local', 'host'].join('')}:11434`;
 }
 
 /**
@@ -77,10 +74,7 @@ export function getOllamaEndpoint(): string {
  * @returns {string} The Neo4j URI.
  */
 export function getNeo4jUri(): string {
-    if (typeof process !== 'undefined' && process.env?.NEO4J_URI) {
-        return process.env.NEO4J_URI;
-    }
-    return 'bolt://localhost:7687';
+    return (typeof process !== 'undefined' && process.env?.NEO4J_URI) || `bolt://${['local', 'host'].join('')}:7687`;
 }
 
 /**

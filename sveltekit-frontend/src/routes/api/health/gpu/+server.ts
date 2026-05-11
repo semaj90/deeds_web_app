@@ -15,7 +15,8 @@ import { isCudaAvailable, graphSimilarity } from '$lib/server/gpu/libtorch-bridg
 import { getCudaDeviceInfo } from '$lib/server/gpu/cuda-bridge.js';
 import { getGpuStats, type GpuStats } from '$lib/server/gpu/gpu-monitor.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'warning', error: 'Unauthorized' }, { status: 401 });
 	const cudaAvailable = isCudaAvailable();
 	const deviceInfo = await getCudaDeviceInfo();
 

@@ -15,7 +15,8 @@ import { redis } from '$lib/server/redis.js';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const GET: RequestHandler = async (event) => {
-	await requireAuth(event);
+	const { locals } = event;
+	if (!locals.user) return json({ synthesis: null, evaluation: null, status: 'unauthorized' }, { status: 401 });
 	const { params } = event;
 	const { id } = params;
 

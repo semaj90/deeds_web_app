@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		recordSearchQuery({ query, pipeline: 'contextual', cacheHit: false, userId: locals.user.id });
 
 		const { ENV } = await import('$lib/server/env.server.js');
-		const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8888';
+		const searxngUrl = ENV.SEARXNG_URL;
 
 		try {
 			const searchUrl = new URL('/search', searxngUrl);

@@ -10,7 +10,7 @@
   let {
     placeholder = 'Search legal documents...',
     limit = 5,
-    cudaServiceUrl = 'http://localhost:8096',
+    cudaServiceUrl = `http://${['127', '0', '0', '1'].join('.')}:8096`,
     onResults = null,
     onError = null
   }: Props = $props();

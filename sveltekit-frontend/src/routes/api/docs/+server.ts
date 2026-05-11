@@ -21,7 +21,8 @@ const querySchema = z.object({
 	status: z.string().max(50).optional()
 });
 
-export const GET: RequestHandler = async ({ url, request }) => {
+export const GET: RequestHandler = async ({ url, request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	const { category, q: query, status } = parsed.success ? parsed.data : { category: undefined, q: undefined, status: undefined };
 

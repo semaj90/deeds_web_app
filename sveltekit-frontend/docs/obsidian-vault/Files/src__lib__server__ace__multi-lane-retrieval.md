@@ -4,7 +4,7 @@ path: "src/lib/server/ace/multi-lane-retrieval.ts"
 aliases: ["multi-lane-retrieval.ts","src/lib/server/ace/multi-lane-retrieval.ts"]
 clusterId: 6
 ext: ".ts"
-lineCount: 517
+lineCount: 896
 pagerank: 0
 blend: 0
 isRoute: false
@@ -12,26 +12,26 @@ isSvelteComp: false
 isTest: false
 hasAuth: false
 hasZod: true
-importCount: 8
+importCount: 9
 embedding_id: "qdrant://codebase_chunks_768/src/lib/server/ace/multi-lane-retrieval.ts"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 confidence: "high"
 up: ["[[Clusters/cluster-6]]"]
-imports: ["[[Files/error-fingerprint]]","[[Files/ngram-retrieval]]","[[Files/error-fingerprint]]","[[Files/cache-keys]]","[[Files/cluster-tags-cache]]"]
+imports: ["[[Files/error-fingerprint]]","[[Files/ngram-retrieval]]","[[Files/error-fingerprint]]","[[Files/cache-keys]]","[[Files/cluster-tags-cache]]","[[Files/kb__rerank-weight-loader]]"]
 tags: ["file","ext/ts","cluster/6","zod","t/ts","t/src","t/lib"]
 ---
 
 # `src/lib/server/ace/multi-lane-retrieval.ts`
 ## For future Claude
-> Lane 7 — glyph_cluster: score every cluster in the latest qdrant_cluster_tags artifact
+> Karpathy blend score from Redis gpu:karpathy:scores (added by cartridge enrichment)
 cluster:: [[Clusters/cluster-6]]
 pagerank:: 0.000000
 blend:: 0.000000
-lines:: 517
+lines:: 896
 ## Summary
 
-Lane 7 — glyph_cluster: score every cluster in the latest qdrant_cluster_tags artifact
+Karpathy blend score from Redis gpu:karpathy:scores (added by cartridge enrichment)
 
 ## Imports
 
@@ -40,6 +40,7 @@ Lane 7 — glyph_cluster: score every cluster in the latest qdrant_cluster_tags 
 - imports:: [[Files/error-fingerprint]] `./error-fingerprint.js`
 - imports:: [[Files/cache-keys]] `./cache-keys.js`
 - imports:: [[Files/cluster-tags-cache]] `./cluster-tags-cache.js`
+- imports:: [[Files/kb__rerank-weight-loader]] `../kb/rerank-weight-loader.js`
 ## Backlinks (Dataview)
 ```dataviewjs
 const cur = dv.current().file.path;

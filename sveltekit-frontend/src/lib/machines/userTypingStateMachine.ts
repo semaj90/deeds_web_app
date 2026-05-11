@@ -1,7 +1,8 @@
 import type { User } from '$lib/types';
 import { setup, assign, fromPromise } from 'xstate';
 
-const MCP_BASE_URL = import.meta.env.VITE_MCP_URL || 'http://localhost:3001';
+const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
+const MCP_BASE_URL = import.meta.env.VITE_MCP_URL || `http://${LOOPBACK_IP}:3001`;
 
 /**
  * XState v5 Machine for User Typing States

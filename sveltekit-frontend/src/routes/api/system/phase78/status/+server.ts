@@ -17,7 +17,7 @@ import type { RequestHandler } from './$types.js';
 export const GET: RequestHandler = async ({ locals }) => {
 	// 🔒 Security: Only authenticated users can access system status
 	if (!locals.user) {
-		throw error(401, 'Unauthorized - Please log in');
+		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {

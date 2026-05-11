@@ -2,7 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
 /** GET /api/health/system — Overall system health status */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'degraded', error: 'Unauthorized' }, { status: 401 });
 	try {
 		let allHealthy = true;
 

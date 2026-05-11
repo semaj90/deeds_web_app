@@ -20,7 +20,8 @@ const cacheDemoSchema = z.object({
   model: z.string().max(100).default('gemma3:270m'),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
   const startTime = performance.now();
 

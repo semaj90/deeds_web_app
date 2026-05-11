@@ -95,7 +95,11 @@ async function main() {
       const r = await fetch(`${QDRANT}/collections/codebase_chunks_768/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vector: embedding, limit: 10, with_payload: true }),
+        body: JSON.stringify({ 
+          vector: { name: 'content', vector: embedding }, 
+          limit: 10, 
+          with_payload: true 
+        }),
       });
       if (!r.ok) return false;
       const d = await r.json();

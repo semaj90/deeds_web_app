@@ -10,8 +10,8 @@ import { requireAuth } from '$lib/server/auth-helpers.js';
 import { getStatsByType, getStatsByBackend } from '$lib/server/observability/inference-log-views.js';
 
 export const GET: RequestHandler = async (event) => {
-	requireAuth(event);
 	const { locals } = event;
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
 		const [byType, byBackend] = await Promise.all([

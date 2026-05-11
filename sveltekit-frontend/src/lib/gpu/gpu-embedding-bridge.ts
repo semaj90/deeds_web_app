@@ -17,6 +17,7 @@ import type {
 } from '$lib/types/qlora-protobuf.js';
 import { QLoRABinaryCodec } from '$lib/types/qlora-protobuf.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 
 /** Embedding dimensions for our models */
 const EMBEDDING_DIM = 768;
@@ -126,7 +127,7 @@ export async function embedAndCompare(
 async function generateEmbeddings(texts: string[]): Promise<Float32Array[]> {
 	// Try Ollama HTTP (always available on server)
 	const results: Float32Array[] = [];
-	const OLLAMA_URL = process.env.OLLAMA_HOST ?? 'http://localhost:11434';
+	const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 	for (const text of texts) {
 		try {

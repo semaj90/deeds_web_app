@@ -12,7 +12,7 @@ top_tags: ["embedding","vector","redis","rabbitmq","ai"]
 llmHits: 0
 summaryMode: null
 confidence: "high"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__ai__ollama-client]]","[[Files/src__lib__types__external-services]]","[[Files/src__lib__utils__webgpu-array-utils]]","[[Files/src__lib__server__utils__avatar-upload]]","[[Files/src__lib__services__error-analysis__learningpipeline]]","[[Files/src__lib__components__ui__gaming__types__gaming-types]]","[[Files/src__lib__services__error-analysis__experiencerecorder]]","[[Files/src__lib__types__yorha-interface]]"]
 same: ["[[Clusters/cluster-75]]","[[Clusters/cluster-46]]","[[Clusters/cluster-22]]","[[Clusters/cluster-24]]","[[Clusters/cluster-72]]"]

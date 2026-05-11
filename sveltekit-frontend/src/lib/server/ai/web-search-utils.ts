@@ -15,7 +15,7 @@ export interface WebSearchResult {
 export async function performWebSearch(query: string, maxResults = 5): Promise<WebSearchResult[]> {
 	// 1. Try SearXNG
 	try {
-		const searxngUrl = ENV.SEARXNG_URL || 'http://localhost:8888';
+		const searxngUrl = ENV.SEARXNG_URL;
 		const searchUrl = new URL('/search', searxngUrl);
 		searchUrl.searchParams.set('q', query);
 		searchUrl.searchParams.set('format', 'json');

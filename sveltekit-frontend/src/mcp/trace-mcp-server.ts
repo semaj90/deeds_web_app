@@ -56,6 +56,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import { Pool } from 'pg';
+import { ENV } from '../lib/server/env.server.js';
 
 process.on('uncaughtException', (err) => {
   console.error('[mcp] UNCAUGHT EXCEPTION:', err);
@@ -66,8 +67,9 @@ process.on('unhandledRejection', (reason) => {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const PORT     = Number(process.env.TRACE_MCP_PORT  ?? 8788);
-const HOST     = process.env.TRACE_MCP_HOST         ?? '127.0.0.1';
+const TRACE_URL = new URL(ENV.TRACE_MCP_URL);
+const PORT      = Number(TRACE_URL.port || '8788');
+const HOST      = TRACE_URL.hostname;
 
 import { registerNewTools } from './new_tools.js';
 import { registerAdminTools } from './admin_tools.js';
@@ -80,20 +82,20 @@ import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 
-const SVELTEKIT = process.env.SVELTEKIT_URL         ?? 'http://127.0.0.1:5173';
-const NEO4J_HTTP = process.env.NEO4J_HTTP_URL       ?? 'http://localhost:7474';
-const NEO4J_USER = process.env.NEO4J_USER           ?? 'neo4j';
-const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
-const REDIS_URL  = process.env.REDIS_URL             ?? 'redis://127.0.0.1:6379';
-const PG_URL     = process.env.DATABASE_URL          ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
-const TOPO_URL          = process.env.TOPOLOGY_SEARCH_URL  ?? 'http://127.0.0.1:8101';
-const GO_SEARCH_URL     = process.env.GO_SEARCH_URL         ?? 'http://127.0.0.1:8096';
-const GO_RETRIEVAL_URL  = process.env.GO_RETRIEVAL_URL      ?? 'http://127.0.0.1:8100';
-const RERANK_URL        = process.env.RERANK_BASE_URL       ?? process.env.RERANK_URL ?? 'http://127.0.0.1:8090';
-const TURBOQUANT_URL    = process.env.TURBOQUANT_BASE_URL   ?? 'http://127.0.0.1:8080';
-const OLLAMA_BASE       = process.env.OLLAMA_BASE_URL      ?? 'http://127.0.0.1:11434';
-const OLLAMA_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL   ?? 'embeddinggemma:latest';
-const QDRANT_URL        = process.env.QDRANT_URL            ?? 'http://127.0.0.1:6333';
+const SVELTEKIT         = ENV.PUBLIC_API_URL;
+const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
+const NEO4J_USER        = ENV.NEO4J_USER;
+const NEO4J_PASS        = ENV.NEO4J_PASSWORD;
+const REDIS_URL         = ENV.REDIS_URL;
+const PG_URL            = ENV.DATABASE_URL;
+const TOPO_URL          = ENV.TOPOLOGY_SEARCH_URL;
+const GO_SEARCH_URL     = ENV.GO_SEARCH_URL;
+const GO_RETRIEVAL_URL  = ENV.RETRIEVAL_HTTP_URL;
+const RERANK_URL        = ENV.RERANK_URL;
+const TURBOQUANT_URL    = ENV.TURBOQUANT_URL;
+const OLLAMA_BASE       = ENV.OLLAMA_BASE_URL;
+const OLLAMA_EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;
+const QDRANT_URL        = ENV.QDRANT_URL;
 
 const server = new McpServer({
   name: "trace-mcp-server",
@@ -1175,7 +1177,7 @@ server.registerTool(
   },
   async ({ query, lensTopK, clusterTopK, dirTopK, lensType }) => {
     const t0 = Date.now();
-    const QDRANT = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
+    const QDRANT = QDRANT_URL;
     try {
       // Embed query once for both Qdrant tiers.
       const embedRes = await getOrComputeEmbedding(query);
@@ -1389,7 +1391,7 @@ server.registerTool(
       const checks = await Promise.all([
         (async () => { console.log('[mcp] probe: mcp'); const r = await probeUrl('mcp', `http://${HOST}:${PORT}/health`); console.log('[mcp] probe: mcp done'); return r; })(),
         (async () => { console.log('[mcp] probe: ollama'); const r = await probeUrl('ollama_embed', `${OLLAMA_BASE}/api/tags`); console.log('[mcp] probe: ollama done'); return r; })(),
-        (async () => { console.log('[mcp] probe: bifrost'); const r = await probeUrl('bifrost', `${process.env.BIFROST_URL ?? 'http://127.0.0.1:3040'}/health`); console.log('[mcp] probe: bifrost done'); return r; })(),
+        (async () => { console.log('[mcp] probe: bifrost'); const r = await probeUrl('bifrost', `${ENV.BIFROST_URL}/health`); console.log('[mcp] probe: bifrost done'); return r; })(),
         (async () => { console.log('[mcp] probe: turboquant'); const r = await probeUrl('turboquant', `${TURBOQUANT_URL}/health`); console.log('[mcp] probe: turboquant done'); return r; })(),
         (async () => { console.log('[mcp] probe: topology'); const r = await probeUrl('topology_search', `${TOPO_URL}/health`); console.log('[mcp] probe: topology done'); return r; })(),
         (async () => { console.log('[mcp] probe: go_retrieval'); const r = await probeUrl('go_retrieval', `${GO_RETRIEVAL_URL}/health`); console.log('[mcp] probe: go_retrieval done'); return r; })(),
@@ -2425,7 +2427,7 @@ server.registerTool(
         mkdirSync(failDir, { recursive: true });
       }
 
-      const REDIS_URL_ENV = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+      const REDIS_URL_ENV = REDIS_URL;
       let redis: InstanceType<typeof Redis> | null = null;
       try {
         redis = new Redis(REDIS_URL_ENV, { lazyConnect: true, connectTimeout: 4_000, commandTimeout: 4_000 });
@@ -2662,7 +2664,7 @@ server.registerTool(
     try {
       const { storeErrorFingerprint } = await import('../lib/server/ace/error-fingerprint.js');
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -2696,7 +2698,7 @@ server.registerTool(
     try {
       const { lookupErrorFingerprint, findSimilarErrors } = await import('../lib/server/ace/error-fingerprint.js');
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -2745,7 +2747,7 @@ server.registerTool(
     try {
       const { multiLaneSearch } = await import('../lib/server/ace/multi-lane-retrieval.js');
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -2942,7 +2944,7 @@ server.registerTool(
   async ({ limit = 10 }) => {
     try {
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -3176,7 +3178,7 @@ server.registerTool(
   async ({ clusterId, maxNotes }) => {
     try {
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -3233,7 +3235,7 @@ server.registerTool(
   async ({ filePath, chunkId, queryHash }) => {
     try {
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -3808,7 +3810,7 @@ server.registerTool(
   async ({ filePath, maxCards, forceReload }) => {
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
     const { default: Redis } = await import('ioredis');
-    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+    const redis = new Redis(REDIS_URL, {
       lazyConnect: true,
       connectTimeout: 3000,
       enableReadyCheck: false,
@@ -3844,7 +3846,7 @@ server.registerTool(
   async ({ filePath }) => {
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
     const { default: Redis } = await import('ioredis');
-    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+    const redis = new Redis(REDIS_URL, {
       lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false,
     });
     try {
@@ -3890,7 +3892,7 @@ server.registerTool(
       .replace(/^sveltekit-frontend\//, '')
       .replace(/^src\//, '');
     const { default: Redis } = await import('ioredis');
-    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+    const redis = new Redis(REDIS_URL, {
       lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false,
     });
     try {
@@ -3939,7 +3941,7 @@ server.registerTool(
       .replace(/^src\//, '');
     const dir = norm.lastIndexOf('/') > 0 ? norm.slice(0, norm.lastIndexOf('/')) : '';
 
-    const dbUrl = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+    const dbUrl = PG_URL;
     const pgPool = new Pool({ connectionString: dbUrl, max: 1, connectionTimeoutMillis: 3000 });
     try {
       const r = await pgPool.query(
@@ -4202,7 +4204,7 @@ server.registerTool(
     try {
       const { recallFixerPattern } = await import('../lib/server/fixer/fixer-memory.js');
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -4252,7 +4254,7 @@ server.registerTool(
     try {
       const { storeFixerPattern, ensureFixerMemoryCollection } = await import('../lib/server/fixer/fixer-memory.js');
       const Redis = (await import('ioredis')).default;
-      const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      const r = new Redis(REDIS_URL, {
         lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 2000, retryStrategy: () => null,
       });
       r.on('error', () => {});
@@ -4301,9 +4303,9 @@ server.registerTool(
     const topK        = opts.top_k         ?? 8;
     const includeKb   = opts.include_kb    ?? true;
     const includeKarp = opts.include_karpathy ?? true;
-    const KB_URL      = process.env.KB_MCP_URL ?? 'http://127.0.0.1:8789';
-    const SK_URL      = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
-    const REDIS_URL   = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+    const KB_URL      = ENV.KB_MCP_URL;
+    const SK_URL      = SVELTEKIT;
+    const REDIS_LCL   = REDIS_URL;
 
     const pack: Record<string, unknown> = {
       query: opts.query,
@@ -4318,7 +4320,7 @@ server.registerTool(
     try {
       const kagRes = await fetch(`${SK_URL}/api/graph/traverse`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-internal-token': process.env.INTERNAL_API_TOKEN ?? '' },
+        headers: { 'Content-Type': 'application/json', 'x-internal-token': ENV.SERVICE_AUTH_TOKEN },
         body: JSON.stringify({ query: opts.query, limit: topK, filePath: opts.file_path }),
         signal: AbortSignal.timeout(8000),
       });
@@ -4339,7 +4341,7 @@ server.registerTool(
       });
       if (embedRes.ok) {
         const { embedding } = await embedRes.json() as { embedding: number[] };
-        const qdRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/search`, {
+        const qdRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -4531,7 +4533,7 @@ server.registerTool(
     const { createHash } = await import('node:crypto');
 
     const PROMOTE_THRESHOLD = 3;
-    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+    const redis = new Redis(REDIS_URL, {
       lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false,
     });
     try {
@@ -4631,8 +4633,8 @@ server.registerTool(
     }),
   },
   async ({ query, collection, limit, score_threshold, case_id, tags }) => {
-    const SK_URL     = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
-    const QDRANT_URL = process.env.QDRANT_URL    ?? 'http://127.0.0.1:6333';
+    const SK_URL     = SVELTEKIT;
+    const QDRANT_LCL = QDRANT_URL;
 
     // Step 1: embed via /api/embed (Redis L1 + Bifrost L2 cached)
     let vector: number[];
@@ -4795,7 +4797,7 @@ server.registerTool(
       if (!buffer!) {
         const minioKey = String(existingPayload.minioKey ?? existingPayload.storageKey ?? '');
         if (minioKey) {
-          const SK_URL = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+          const SK_URL = SVELTEKIT;
           try {
             const r = await fetch(`${SK_URL}/api/evidence/file/${encodeURIComponent(minioKey)}`, { signal: AbortSignal.timeout(15_000) });
             if (r.ok) { buffer = Buffer.from(await r.arrayBuffer()); resolvedPath = minioKey; }

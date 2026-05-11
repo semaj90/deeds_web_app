@@ -9,6 +9,7 @@
   import Button from '$lib/components/ui/Button.svelte';
   import TypewriterResponse from './TypewriterResponse.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
+  import { getOllamaBaseUrl } from '$lib/utils/ollama';
 
   // Props
   interface Props {
@@ -395,7 +396,7 @@ Please provide a comprehensive legal analysis including:
 Response:`;
 
     try {
-      const response = await fetch('http://localhost:11434/api/generate', {
+      const response = await fetch(`${getOllamaBaseUrl()}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -698,7 +699,7 @@ Response:`;
     isProcessing = true;
 
     try {
-      const response = await fetch('http://localhost:11434/api/generate', {
+      const response = await fetch(`${getOllamaBaseUrl()}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -758,7 +759,7 @@ ${analysis.response}
     isProcessing = true;
 
     try {
-      const response = await fetch('http://localhost:11434/api/generate', {
+      const response = await fetch(`${getOllamaBaseUrl()}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,8 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { ENV } from '$lib/server/env.server.js';
 
-const SEARXNG_URL   = process.env.SEARXNG_URL   || 'http://localhost:8888';
-const LANGGRAPH_URL = process.env.LANGGRAPH_URL || process.env.LANGGRAPH_SYNTH_URL || 'http://localhost:8091';
+const SEARXNG_URL   = ENV.SEARXNG_URL;
+const LANGGRAPH_URL = ENV.LANGGRAPH_URL;
 
 /**
  * Advanced research tools leveraging SearXNG and Ollama.

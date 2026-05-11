@@ -2,9 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { ENV } from "../lib/server/env.server.js";
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const RERANK_URL = ENV.RERANK_BASE_URL ?? ENV.RERANK_URL ?? 'http://127.0.0.1:8090';
-const TURBOQUANT_URL = ENV.TURBOQUANT_BASE_URL;
+const OLLAMA_URL      = ENV.OLLAMA_BASE_URL;
+const RERANK_URL      = ENV.RERANK_URL;
+const TURBOQUANT_URL  = ENV.TURBOQUANT_URL;
 
 /**
  * Unified inference routing (Bifrost Gateway).

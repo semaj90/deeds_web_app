@@ -59,7 +59,7 @@
     <div class="mt-3 font-mono text-xs space-y-1 text-[var(--t-fg-muted)]">
       <div>Seed: <code>npm run wiki:seed</code></div>
       <div>Watch: wiki-vault-watcher auto-syncs on file change</div>
-      <div>CouchDB: <a href="http://localhost:5984/_utils" target="_blank" class="text-[var(--t-accent)]">localhost:5984/_utils</a></div>
+      <div>CouchDB: <a href="/api/admin/couchdb-proxy" target="_blank" class="text-[var(--t-accent)]">Management Console</a></div>
     </div>
   </div>
 </div>

@@ -5,7 +5,7 @@ import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 

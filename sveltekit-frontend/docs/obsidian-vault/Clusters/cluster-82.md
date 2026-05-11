@@ -12,7 +12,7 @@ top_tags: ["embedding","vector","api-route","auth","analytics"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__grpc__tool-calling-client]]","[[Files/src__lib__server__grpc__tool-router-client]]","[[Files/src__lib__server__training__query-logger]]","[[Files/src__lib__server__grpc__retrieval-client]]","[[Files/src__lib__server__mcp__mcp-internal]]","[[Files/src__lib__server__gpu__mapreduce-cuda-analyzer]]","[[Files/src__lib__server__grpc__codeintel-client]]","[[Files/src__lib__server__retrieval__codebase-context]]"]
 same: ["[[Clusters/cluster-18]]","[[Clusters/cluster-59]]","[[Clusters/cluster-9]]","[[Clusters/cluster-48]]","[[Clusters/cluster-6]]"]

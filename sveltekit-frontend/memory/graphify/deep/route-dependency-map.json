@@ -1,15 +1,15 @@
 {
   "src/routes/(analysis)/+layout.svelte": {
     "zone": "route",
-    "directDeps": 3,
+    "directDeps": 6,
     "serverDeps": 0,
     "dbDeps": 0
   },
   "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -19,9 +19,9 @@
   },
   "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -31,9 +31,9 @@
   },
   "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -41,41 +41,17 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(analysis)@/+layout.svelte": {
-    "zone": "route",
-    "directDeps": 3,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
-  },
-  "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
   },
   "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte": {
     "zone": "route",
@@ -133,7 +109,7 @@
   },
   "src/routes/(app)/admin/ai-dashboard/lab/+page.svelte": {
     "zone": "route",
-    "directDeps": 16,
+    "directDeps": 17,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -180,12 +156,6 @@
     "dbDeps": 0
   },
   "src/routes/(app)/admin/ast-topology/+page.svelte": {
-    "zone": "route",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "src/routes/(app)/admin/cache/+page.server.ts": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -306,12 +276,6 @@
     "dbDeps": 0
   },
   "src/routes/(app)/admin/error-brain/+layout.svelte": {
-    "zone": "route",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "src/routes/(app)/admin/error-brain/+page.server.ts": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
@@ -469,7 +433,7 @@
   },
   "src/routes/(app)/admin/search-intelligence/+page.svelte": {
     "zone": "route",
-    "directDeps": 4,
+    "directDeps": 5,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -583,9 +547,9 @@
   },
   "src/routes/(app)/cases/[id]/ai/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
+    "directDeps": 6,
+    "serverDeps": 6,
+    "dbDeps": 6
   },
   "src/routes/(app)/cases/[id]/ai/+page.svelte": {
     "zone": "route",
@@ -605,23 +569,11 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(app)/cases/[id]/canvas/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(app)/cases/[id]/canvas/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
-  },
-  "src/routes/(app)/cases/[id]/chat/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
   },
   "src/routes/(app)/cases/[id]/chat/+page.svelte": {
     "zone": "route",
@@ -677,12 +629,6 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(app)/cases/[id]/persons/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(app)/cases/[id]/persons/+page.svelte": {
     "zone": "route",
     "directDeps": 0,
@@ -727,7 +673,7 @@
   },
   "src/routes/(app)/citations/+layout.svelte": {
     "zone": "route",
-    "directDeps": 1,
+    "directDeps": 2,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -1535,23 +1481,11 @@
     "serverDeps": 1,
     "dbDeps": 0
   },
-  "src/routes/(app)/evidence/analyze/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
-  },
   "src/routes/(app)/evidence/analyze/+page.svelte": {
     "zone": "route",
     "directDeps": 2,
     "serverDeps": 0,
     "dbDeps": 0
-  },
-  "src/routes/(app)/evidence/hash/+page.server.ts": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
-    "dbDeps": 1
   },
   "src/routes/(app)/evidence/hash/+page.svelte": {
     "zone": "route",
@@ -1595,11 +1529,23 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "src/routes/(app)/evidence-library/+page.server.ts": {
+  "src/routes/(app)/evidence/[id]/view/+page.server.ts": {
     "zone": "route",
-    "directDeps": 0,
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 2
+  },
+  "src/routes/(app)/evidence/[id]/view/+page.svelte": {
+    "zone": "route",
+    "directDeps": 1,
     "serverDeps": 0,
     "dbDeps": 0
+  },
+  "src/routes/(app)/evidence-library/+page.server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
   },
   "src/routes/(app)/evidence-library/+page.svelte": {
     "zone": "route",
@@ -1650,12 +1596,6 @@
     "dbDeps": 0
   },
   "src/routes/(app)/knowledge/+page.svelte": {
-    "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "src/routes/(app)/legal-corpus/+layout.svelte": {
     "zone": "route",
     "directDeps": 1,
     "serverDeps": 0,
@@ -1747,8 +1687,8 @@
   },
   "src/routes/(app)/library/[documentId]/node/[nodeId]/+page.server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
+    "directDeps": 2,
+    "serverDeps": 2,
     "dbDeps": 1
   },
   "src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte": {
@@ -1901,6 +1841,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "src/routes/(dev)/intent-chat/+page.svelte": {
+    "zone": "route",
+    "directDeps": 4,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/(dev)/odin/+page.server.ts": {
     "zone": "route",
     "directDeps": 0,
@@ -1933,7 +1879,7 @@
   },
   "src/routes/+layout.svelte": {
     "zone": "route",
-    "directDeps": 13,
+    "directDeps": 14,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -2030,13 +1976,13 @@
   "src/routes/api/acp/execute/+server.ts": {
     "zone": "route",
     "directDeps": 1,
-    "serverDeps": 0,
+    "serverDeps": 1,
     "dbDeps": 0
   },
   "src/routes/api/acp/tools/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 1,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/admin/agent/fix/+server.ts": {
@@ -2047,8 +1993,8 @@
   },
   "src/routes/api/admin/ai-chat/+server.ts": {
     "zone": "route",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "src/routes/api/admin/ai-chat/sessions/+server.ts": {
@@ -2099,11 +2045,35 @@
     "serverDeps": 3,
     "dbDeps": 2
   },
+  "src/routes/api/admin/citations/discover/+server.ts": {
+    "zone": "route",
+    "directDeps": 5,
+    "serverDeps": 5,
+    "dbDeps": 2
+  },
+  "src/routes/api/admin/diagnose/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
+  },
+  "src/routes/api/admin/inference-lane/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 1,
+    "dbDeps": 0
+  },
   "src/routes/api/admin/inference-stats/+server.ts": {
     "zone": "route",
-    "directDeps": 4,
-    "serverDeps": 3,
-    "dbDeps": 0
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 1
+  },
+  "src/routes/api/admin/jobs/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 1
   },
   "src/routes/api/admin/knowledge/+server.ts": {
     "zone": "route",
@@ -2111,11 +2081,17 @@
     "serverDeps": 2,
     "dbDeps": 0
   },
-  "src/routes/api/admin/model/promote-weights/+server.ts": {
+  "src/routes/api/admin/legal-strategy/+server.ts": {
     "zone": "route",
     "directDeps": 2,
     "serverDeps": 2,
     "dbDeps": 0
+  },
+  "src/routes/api/admin/model/promote-weights/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 1
   },
   "src/routes/api/admin/model/upload-weights/+server.ts": {
     "zone": "route",
@@ -2149,9 +2125,21 @@
   },
   "src/routes/api/admin/raptor-atlas/+server.ts": {
     "zone": "route",
-    "directDeps": 1,
-    "serverDeps": 1,
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 2
+  },
+  "src/routes/api/admin/recommendations/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 3,
     "dbDeps": 1
+  },
+  "src/routes/api/admin/repair/+server.ts": {
+    "zone": "route",
+    "directDeps": 3,
+    "serverDeps": 3,
+    "dbDeps": 0
   },
   "src/routes/api/admin/routes/+server.ts": {
     "zone": "route",
@@ -2170,6 +2158,12 @@
     "directDeps": 5,
     "serverDeps": 5,
     "dbDeps": 2
+  },
+  "src/routes/api/admin/telemetry/batch/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 1
   },
   "src/routes/api/admin/topology/recompute/+server.ts": {
     "zone": "route",
@@ -2263,9 +2257,9 @@
   },
   "src/routes/api/ai/contextual-chat/+server.ts": {
     "zone": "route",
-    "directDeps": 2,
-    "serverDeps": 2,
-    "dbDeps": 0
+    "directDeps": 6,
+    "serverDeps": 5,
+    "dbDeps": 2
   },
   "src/routes/api/ai/cross-exam/+server.ts": {
     "zone": "route",
@@ -2290,6 +2284,12 @@
     "directDeps": 3,
     "serverDeps": 3,
     "dbDeps": 0
+  },
+  "src/routes/api/ai/intent-dispatch/+server.ts": {
+    "zone": "route",
+    "directDeps": 4,
+    "serverDeps": 3,
+    "dbDeps": 2
   },
   "src/routes/api/ai/judge/+server.ts": {
     "zone": "route",
@@ -2407,9 +2407,15 @@
   },
   "src/routes/api/analytics/feedback/+server.ts": {
     "zone": "route",
-    "directDeps": 7,
-    "serverDeps": 7,
-    "dbDeps": 1
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 2
+  },
+  "src/routes/api/analytics/file-activity/+server.ts": {
+    "zone": "route",
+    "directDeps": 2,
+    "serverDeps": 2,
+    "dbDeps": 0
   },
   "src/routes/api/analytics/focus/+server.ts": {
     "zone": "route",
@@ -3206,7 +3212,7 @@
   "src/routes/api/code-intel/wiki-status/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 1,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/codebase/analyze/+server.ts": {
@@ -3356,7 +3362,7 @@
   "src/routes/api/codebase-index/cluster-detect/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 1,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/codebase-index/cluster-summary/+server.ts": {
@@ -3410,7 +3416,7 @@
   "src/routes/api/codebase-index/evidence-analyze/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 1,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/codebase-index/export/bundle/+server.ts": {
@@ -3428,7 +3434,7 @@
   "src/routes/api/codebase-index/file-intel/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 1,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/codebase-index/gpu-pipeline/+server.ts": {
@@ -3470,7 +3476,7 @@
   "src/routes/api/codebase-index/kag-notebook/+server.ts": {
     "zone": "route",
     "directDeps": 3,
-    "serverDeps": 2,
+    "serverDeps": 3,
     "dbDeps": 0
   },
   "src/routes/api/codebase-index/karpathy-hook/+server.ts": {
@@ -3512,7 +3518,7 @@
   "src/routes/api/codebase-index/recommendations/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 1,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/codebase-index/reindex/+server.ts": {
@@ -3971,6 +3977,12 @@
     "serverDeps": 6,
     "dbDeps": 2
   },
+  "src/routes/api/evidence/[id]/analyze/stream/+server.ts": {
+    "zone": "route",
+    "directDeps": 5,
+    "serverDeps": 5,
+    "dbDeps": 2
+  },
   "src/routes/api/evidence/[id]/approve/+server.ts": {
     "zone": "route",
     "directDeps": 3,
@@ -4052,7 +4064,7 @@
   "src/routes/api/generate-cluster-summaries/+server.ts": {
     "zone": "route",
     "directDeps": 7,
-    "serverDeps": 6,
+    "serverDeps": 7,
     "dbDeps": 1
   },
   "src/routes/api/glossary/+server.ts": {
@@ -4406,7 +4418,7 @@
   "src/routes/api/kb/validate/+server.ts": {
     "zone": "route",
     "directDeps": 3,
-    "serverDeps": 2,
+    "serverDeps": 3,
     "dbDeps": 0
   },
   "src/routes/api/knowledge/+server.ts": {
@@ -4423,7 +4435,7 @@
   },
   "src/routes/api/knowledge/document/[id]/+server.ts": {
     "zone": "route",
-    "directDeps": 4,
+    "directDeps": 3,
     "serverDeps": 2,
     "dbDeps": 0
   },
@@ -4435,19 +4447,19 @@
   },
   "src/routes/api/knowledge/search/+server.ts": {
     "zone": "route",
-    "directDeps": 5,
+    "directDeps": 3,
     "serverDeps": 3,
     "dbDeps": 0
   },
   "src/routes/api/knowledge/stats/+server.ts": {
     "zone": "route",
-    "directDeps": 2,
+    "directDeps": 1,
     "serverDeps": 1,
     "dbDeps": 0
   },
   "src/routes/api/knowledge/stream/+server.ts": {
     "zone": "route",
-    "directDeps": 5,
+    "directDeps": 4,
     "serverDeps": 4,
     "dbDeps": 0
   },
@@ -4766,7 +4778,7 @@
   "src/routes/api/phase109/kag/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 0,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/phase109/tag-chunks/+server.ts": {
@@ -5065,9 +5077,15 @@
   },
   "src/routes/api/rag/search/+server.ts": {
     "zone": "route",
-    "directDeps": 23,
-    "serverDeps": 22,
-    "dbDeps": 2
+    "directDeps": 25,
+    "serverDeps": 24,
+    "dbDeps": 1
+  },
+  "src/routes/api/rag/search-fused/+server.ts": {
+    "zone": "route",
+    "directDeps": 5,
+    "serverDeps": 5,
+    "dbDeps": 1
   },
   "src/routes/api/rag/suggestions/+server.ts": {
     "zone": "route",
@@ -5287,9 +5305,9 @@
   },
   "src/routes/api/search/+server.ts": {
     "zone": "route",
-    "directDeps": 14,
-    "serverDeps": 13,
-    "dbDeps": 3
+    "directDeps": 17,
+    "serverDeps": 16,
+    "dbDeps": 4
   },
   "src/routes/api/search/cases/+server.ts": {
     "zone": "route",
@@ -5516,7 +5534,7 @@
   "src/routes/api/tags/[tagId]/+server.ts": {
     "zone": "route",
     "directDeps": 2,
-    "serverDeps": 1,
+    "serverDeps": 2,
     "dbDeps": 0
   },
   "src/routes/api/tasks/+server.ts": {

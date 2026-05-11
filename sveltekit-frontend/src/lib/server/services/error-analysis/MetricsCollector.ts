@@ -3,6 +3,7 @@
  * Phase 72 - Task 15: Monitoring and Observability
  */
 
+import { ENV } from '$lib/server/env.server.js';
 import type { SystemMetrics } from './types.js';
 import { getCacheService } from './CacheService.js';
 import { getDecisionEngine } from './DecisionEngine.js';
@@ -146,17 +147,17 @@ export class MetricsCollector {
 		} catch { health.redis = false; }
 
 		try {
-			const response = await fetch('http://localhost:6333/health', { signal: AbortSignal.timeout(2000) });
+			const response = await fetch(`${ENV.QDRANT_URL}/health`, { signal: AbortSignal.timeout(2000) });
 			health.qdrant = response.ok;
 		} catch { health.qdrant = false; }
 
 		try {
-			const response = await fetch('http://localhost:7474', { signal: AbortSignal.timeout(2000) });
+			const response = await fetch(ENV.NEO4J_HTTP_URL, { signal: AbortSignal.timeout(2000) });
 			health.neo4j = response.ok;
 		} catch { health.neo4j = false; }
 
 		try {
-			const response = await fetch('http://localhost:11434/api/tags', { signal: AbortSignal.timeout(2000) });
+			const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2000) });
 			health.ollama = response.ok;
 		} catch { health.ollama = false; }
 

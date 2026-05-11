@@ -2,6 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { getOllamaBaseUrl } from '$lib/utils/ollama';
 
 	interface LLMModel {
 		id: string;
@@ -45,7 +46,7 @@
 			status: 'offline',
 			performance: { tokensPerSecond: 25, memoryUsage: '6.8GB', responseTime: 1200 },
 			capabilities: ['legal-analysis', 'case-research', 'document-review'],
-			endpoint: 'http://localhost:11434'
+			endpoint: getOllamaBaseUrl()
 		},
 		{
 			id: 'embeddinggemma',
@@ -57,7 +58,7 @@
 			status: 'offline',
 			performance: { tokensPerSecond: 500, memoryUsage: '700MB', responseTime: 80 },
 			capabilities: ['text-embedding', 'similarity-search', 'vector-generation'],
-			endpoint: 'http://localhost:11434'
+			endpoint: getOllamaBaseUrl()
 		},
 		{
 			id: 'nomic-embed',
@@ -69,7 +70,7 @@
 			status: 'offline',
 			performance: { tokensPerSecond: 400, memoryUsage: '512MB', responseTime: 100 },
 			capabilities: ['text-embedding', 'similarity-search'],
-			endpoint: 'http://localhost:11434'
+			endpoint: getOllamaBaseUrl()
 		}
 	]);
 
@@ -109,7 +110,7 @@
 	async function refreshModelStatuses() {
 		isRefreshing = true;
 		try {
-			const response = await fetch('http://localhost:11434/api/tags', {
+			const response = await fetch(`${getOllamaBaseUrl()}/api/tags`, {
 				method: 'GET',
 				signal: AbortSignal.timeout(3000)
 			});

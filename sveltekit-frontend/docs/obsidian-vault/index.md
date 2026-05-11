@@ -1,6 +1,6 @@
 ---
 title: "Codebase Map"
-generated: "2026-05-09T22:36:00.859Z"
+generated: "2026-05-11T03:30:09.942Z"
 fileCount: 500
 clusterCount: 100
 tags: ["index","codebase"]
@@ -8,7 +8,7 @@ tags: ["index","codebase"]
 
 # Codebase Map
 
-Generated: 2026-05-09T22:36:00.859Z
+Generated: 2026-05-11T03:30:09.942Z
 
 - **500** file notes
 - **100** clusters

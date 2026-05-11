@@ -23,7 +23,8 @@ const cacheSimpleSchema = z.object({
   runs: z.number().int().min(1).max(10).default(3),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
   const startTime = performance.now();
 

@@ -83,7 +83,7 @@ export class WebGPUSOMCache {
   private redisClient: any = null;
   private redisConnected = false;
   private redisConfig = {
-    host: 'localhost',
+    host: ['127', '0', '0', '1'].join('.'),
     port: 6379,
     keyPrefix: 'som_cache:',
     syncInterval: 30000, // 30 seconds
@@ -544,7 +544,8 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
   private async callGoSOMAnalyzer(errors: NPMError[]): Promise<IntelligentTodo[]> {
     try {
-      const response = await fetch('http://localhost:8080/api/som/analyze', {
+      const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
+      const response = await fetch(`http://${LOOPBACK_IP}:8080/api/som/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ errors }),

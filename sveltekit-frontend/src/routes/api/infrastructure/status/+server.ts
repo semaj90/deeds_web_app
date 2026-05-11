@@ -24,7 +24,7 @@ import { getDispatchStats } from '$lib/server/queue/dispatch-inline.js';
 import { getInferenceLogStats } from '$lib/server/observability/inference-log.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
-  if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+  if (!locals.user) {
     return json({ error: 'Unauthorized', degraded: true, ts: new Date().toISOString() }, { status: 401 });
   }
 

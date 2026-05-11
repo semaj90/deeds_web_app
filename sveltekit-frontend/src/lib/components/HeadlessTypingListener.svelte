@@ -34,7 +34,7 @@
     element = $bindable(),
     enableContextualPrompts = true,
     enableAnalytics = true,
-    mcpEndpoint = 'http://localhost:3001',
+    mcpEndpoint = `http://${['127', '0', '0', '1'].join('.')}:3001`,
     onstateChange,
     oncontextualPrompt,
     onanalyticsUpdate

@@ -61,7 +61,9 @@ async function probe(url: string, timeoutMs = 5000): Promise<CheckResult> {
   }
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+
   const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
   if (!parsed.success) {
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid service' }, { status: 400 });

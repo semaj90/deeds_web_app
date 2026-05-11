@@ -3,16 +3,16 @@
  * Used by drizzle.ts for hybrid vector search and embedding storage
  */
 
+import { ENV } from '$lib/server/env.server.js';
 import { QdrantClient } from '@qdrant/js-client-rest';
 
-const QDRANT_HOST = process.env?.QDRANT_HOST ?? 'localhost';
-const QDRANT_PORT = Number(process.env?.QDRANT_PORT ?? '6333');
+const QDRANT_URL = ENV.QDRANT_URL;
 
 let client: QdrantClient | null = null;
 
 function getClient(): QdrantClient {
   if (!client) {
-    client = new QdrantClient({ host: QDRANT_HOST, port: QDRANT_PORT });
+    client = new QdrantClient({ url: QDRANT_URL });
   }
   return client;
 }

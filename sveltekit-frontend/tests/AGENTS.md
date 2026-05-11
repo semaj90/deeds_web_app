@@ -1,18 +1,18 @@
 # AGENTS.md — `tests`
 
 <!-- AGENTS-GEN v1 · do not edit below this line -->
-<!-- generated: 2026-05-09T22:22:23.446Z · agents.md spec · regen: npm run agents:write -->
+<!-- generated: 2026-05-11T05:31:27.766Z · agents.md spec · regen: npm run agents:write -->
 
 > Directory: tests
 
 ## Snapshot
 
-- 187 file(s), 0 handler(s)
+- 204 file(s), 0 handler(s)
 - Audit score: _(no GPU audit)_
 - 🟠 hardcoded localhost: 1
 
 
-## Files (187)
+## Files (204)
 
 - `ace-code-cache.spec.ts`
 - `ace-context-glossary.spec.ts`
@@ -36,12 +36,12 @@
 
 | Gate | Status | Detail |
 |------|--------|--------|
-| G17 | ❌ FAIL | 1/187 files — use env.server.ts getters |
+| G17 | ❌ FAIL | 1/204 files — use env.server.ts getters |
 
 _Gates checked: G17. Run `npm run index:codebase:fast && npm run agents:write` to refresh._
 ## Todos + Enhancements
 
-- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/187 files — use env.server.ts getters
+- **[HIGH]** [G17] Fix **G17** No hardcoded localhost URLs: 1/204 files — use env.server.ts getters
 
 _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run agents:write`._
 
@@ -50,7 +50,7 @@ _Synthesized from gate scan + KAG warnings + TODO comments. Regenerate: `npm run
 > Used by ACE context-assembler and Gemma4 agent for pre-retrieval path mapping and post-retrieval chunk scoring.
 
 - **Cluster**: _(not yet indexed — run `graphify:batch` to assign)_
-- **Paired tests**: 2/187 files have paired tests
+- **Paired tests**: 2/204 files have paired tests
 
 ## Agentic tool-calling — quick ACE hits
 

@@ -70,7 +70,7 @@ const RERANK_CACHE_TTL  = 300; // 5 min Redis cache for GPU rerank results
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function embedText(text: string): Promise<number[]> {
-	const ollama = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+	const ollama = ENV.OLLAMA_BASE_URL;
 	const res = await fetch(`${ollama}/api/embeddings`, {
 		method:  'POST',
 		headers: { 'Content-Type': 'application/json' },

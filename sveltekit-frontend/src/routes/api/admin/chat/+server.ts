@@ -3,12 +3,28 @@ import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema.js';
-import { createHash } from 'node:crypto';
+import { z } from 'zod';
 
 const MODEL_URL = ENV.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090';
 
+const chatSchema = z.object({
+  message: z.string().min(1),
+  history: z.array(z.object({
+    role: z.enum(['user', 'assistant', 'system']),
+    content: z.string()
+  })).default([]),
+  chatId: z.string().min(1),
+  systemContext: z.object({
+    rabbit: z.object({ pending: z.number(), failed: z.number() }).optional(),
+    postgres: z.object({ summary_count: z.number() }).optional(),
+    neo4j: z.object({ nodes: z.number() }).optional(),
+    qdrant: z.object({ collectionCount: z.number() }).optional()
+  }).optional()
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
-  const { message, history, chatId, systemContext } = await request.json();
+  const body = await request.json();
+  const { message, history, chatId, systemContext } = chatSchema.parse(body);
   const userId = locals.user?.id;
 
   // 1. Log User Message

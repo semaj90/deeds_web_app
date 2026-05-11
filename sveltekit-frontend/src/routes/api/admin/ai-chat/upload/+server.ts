@@ -1,8 +1,13 @@
 import { json } from '@sveltejs/kit';
 import { getMinioS3Client, getMinioConfig } from '$lib/server/minio.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET || 'admin-ai-uploads';
+
+const uploadSchema = z.object({
+  file: z.any()
+});
 
 /**
  * Handles temporary file uploads for the Admin AI Assistant.
@@ -15,9 +20,11 @@ export async function POST({ request, locals }) {
 
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const { file } = uploadSchema.parse({
+      file: formData.get('file')
+    });
 
-    if (!file) {
+    if (!(file instanceof File)) {
       return json({ error: 'No file provided' }, { status: 400 });
     }
 

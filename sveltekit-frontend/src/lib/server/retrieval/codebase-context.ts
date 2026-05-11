@@ -84,6 +84,7 @@ export interface RankedChunk {
   somBmuCol?: number | null;
   authorityScore?: number;
   language?: string | null;
+  signals?: any; // Signal components from decision tree
 }
 
 // -- Module-level Fuse.js metadata cache -------------------------------------
@@ -579,8 +580,50 @@ export async function loadCodebaseContext(query: string): Promise<{
 
     const finalChunks = gemmasResult.results.map((r) => r.doc.chunk);
 
-    let context = `## Codebase Context (${finalChunks.length} high-precision chunks)\n`;
-    for (const chunk of finalChunks) {
+    // -- Stage D: Karpathy Wiki Context & Decision Tree ----------------------
+    const { getCardsForPaths, formatCardsContext } = await import('$lib/server/agents/agents-context-source');
+    const { combineRerankSignals } = await import('$lib/server/retrieval/rerank-decision-tree');
+    
+    const cards = await getCardsForPaths(finalChunks.map(c => c.relativePath));
+    const wikiContext = formatCardsContext(cards);
+    
+    const cardMap = new Map(cards.map(c => [c.dirPath, c]));
+
+    // Fetch MARCO scores in batch
+    const { scoreBatchTriton } = await import('$lib/server/retrieval/triton-reranker');
+    const marcoScores = await scoreBatchTriton(query, finalChunks.map(c => c.content));
+
+    const contextChunks = await Promise.all(finalChunks.map(async (chunk, idx) => {
+        const dirPath = chunk.relativePath.split('/').slice(0, -1).join('/');
+        const card = cardMap.get(dirPath);
+        
+        // Calculate Wiki Signal
+        const wikiScore = card ? (
+            (card.auditStatus === 'SHIPPED' ? 0.3 : 0.1) + 
+            (Math.min(card.activityScore || 0, 100) / 200) // max 0.5 boost from activity
+        ) : 0;
+
+        const signals = await combineRerankSignals(query, {
+            gemmaScore: chunk.score,
+            marcoScore: marcoScores[idx],
+            wikiScore: Math.min(1.0, wikiScore),
+            activityScore: card?.activityScore || 0
+        }, chunk.content);
+
+        return {
+            ...chunk,
+            score: Math.round(signals.finalScore * 1000) / 1000,
+            authorityScore: signals.wikiScore,
+            signals
+        };
+    }));
+
+    // Re-sort by final decision-tree score
+    contextChunks.sort((a, b) => b.score - a.score);
+
+    let context = wikiContext ? wikiContext + '\n' : '';
+    context += `## Codebase Context (${contextChunks.length} high-precision chunks)\n`;
+    for (const chunk of contextChunks) {
       const header = chunk.httpMethod
         ? `${chunk.httpMethod} ${chunk.routeId ?? chunk.relativePath}`
         : `${chunk.kind}: ${chunk.symbol}`;
@@ -606,9 +649,22 @@ export async function loadCodebaseContext(query: string): Promise<{
       context = context.slice(0, CODEBASE_CONTEXT_MAX_CHARS) + '\n...(truncated)';
     }
 
+    // -- Stage E: Trace Persistence (ace_retrieval_runs) ---------------------
+    import('$lib/server/retrieval/ace-retrieval-logger').then(({ logAceRun }) => {
+        logAceRun({
+            query,
+            model: 'gemma4-legal',
+            mode: 'multi-vector-rerank',
+            metadata: {
+                recallMs: recall.recallMs,
+                contextChunks: contextChunks.length
+            }
+        }, contextChunks).catch(() => {});
+    }).catch(() => {});
+
     return {
       context,
-      chunks: finalChunks,
+      chunks: contextChunks,
       timing: {
         recallMs: recall.recallMs,
         rerankMs: 0,

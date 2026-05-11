@@ -24,10 +24,9 @@ const lastBuild = new Map<string, number>();
 const BUILD_COOLDOWN_MS = 5 * 60 * 1000;
 
 // ── GET ────────────────────────────────────────────────────────────────────────
-export const GET: RequestHandler = async ({ locals, url }) => {
-  if (!(locals as { user?: unknown }).user) {
-    return json({ stats: null, edges: [], error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET: RequestHandler = async (event) => {
+	const { locals, url } = event;
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   const grade = url.searchParams.get('grade') as HyperEdgeGrade | null;
   const limitParam = url.searchParams.get('limit');
@@ -46,7 +45,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 // ── POST ───────────────────────────────────────────────────────────────────────
 export const POST: RequestHandler = async ({ locals, url }) => {
-  if (!(locals as { user?: unknown }).user) {
+  if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -84,7 +83,7 @@ async function handleAddress(locals: App.Locals): Promise<Response> {
 
 // ── DELETE ─────────────────────────────────────────────────────────────────────
 export const DELETE: RequestHandler = async ({ locals }) => {
-  if (!(locals as { user?: unknown }).user) {
+  if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
   await invalidateHypergraph();

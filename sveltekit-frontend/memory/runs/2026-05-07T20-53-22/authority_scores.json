@@ -1,9 +1,9 @@
 {
   "runId": "2026-05-07T20-53-22",
-  "writtenAt": "2026-05-10T02:53:23.862Z",
+  "writtenAt": "2026-05-11T05:19:36.650Z",
   "nodesScored": 2772,
-  "nodesMirrored": 7416,
-  "durationMs": 11538,
+  "nodesMirrored": 7849,
+  "durationMs": 19131,
   "collection": "codebase_chunks_768",
   "neo4jUri": "bolt://localhost:7687",
   "qdrantUrl": "http://127.0.0.1:6333",
@@ -15,15 +15,15 @@
     },
     {
       "stableKey": "src/lib/server/env.server.ts",
-      "score": 0.5532060829021062
+      "score": 0.553206082902106
     },
     {
       "stableKey": "src/lib/server/db/schema-postgres.ts",
-      "score": 0.4314739448947057
+      "score": 0.4314739448947056
     },
     {
       "stableKey": "src/lib/server/redis.ts",
-      "score": 0.4169256732115937
+      "score": 0.4169256732115936
     },
     {
       "stableKey": "src/lib/server/ollama.ts",
@@ -31,7 +31,7 @@
     },
     {
       "stableKey": "src/lib/server/middleware/cache-headers.ts",
-      "score": 0.344486382270232
+      "score": 0.3444863822702319
     },
     {
       "stableKey": "src/lib/config/env.server.ts",
@@ -39,55 +39,55 @@
     },
     {
       "stableKey": "src/lib/server/observability/langfuse.ts",
-      "score": 0.2731894211800303
+      "score": 0.27318942118003015
     },
     {
       "stableKey": "src/lib/server/observability/inference-log.ts",
-      "score": 0.24110323818856977
+      "score": 0.2411032381885697
     },
     {
       "stableKey": "src/lib/server/analysis/worker.ts",
-      "score": 0.21867000250161608
+      "score": 0.21867000250161603
     },
     {
       "stableKey": "src/lib/server/cache.ts",
-      "score": 0.21822780040860246
+      "score": 0.21822780040860235
     },
     {
       "stableKey": "src/lib/server/gpu/simdjson-bridge.ts",
-      "score": 0.2135551680638262
+      "score": 0.21355516806382613
     },
     {
       "stableKey": "src/lib/server/grpc/embedding-client.ts",
-      "score": 0.21343627084322284
+      "score": 0.21343627084322273
     },
     {
       "stableKey": "src/lib/server/neo4j-driver.ts",
-      "score": 0.21207394002311772
+      "score": 0.2120739400231176
     },
     {
       "stableKey": "src/lib/server/db/relations.ts",
-      "score": 0.21185601525657313
+      "score": 0.21185601525657305
     },
     {
       "stableKey": "src/lib/server/minio-client.ts",
-      "score": 0.21176270252947596
+      "score": 0.21176270252947593
     },
     {
       "stableKey": "src/lib/server/vector/qdrant-manager.ts",
-      "score": 0.20926432389988509
+      "score": 0.20926432389988497
     },
     {
       "stableKey": "src/lib/server/db/schema/library-documents.ts",
-      "score": 0.20804240731150803
+      "score": 0.20804240731150792
     },
     {
       "stableKey": "src/lib/server/gpu/libtorch-bridge.ts",
-      "score": 0.20715977451143872
+      "score": 0.20715977451143866
     },
     {
       "stableKey": "src/lib/server/db/schema/legal-citations.ts",
-      "score": 0.20664665085602335
+      "score": 0.2066466508560233
     }
   ]
 }

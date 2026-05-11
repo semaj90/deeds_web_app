@@ -9,7 +9,8 @@
  * - Prevents cross-context contamination
  */
 
-import { error, type RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
+import { ServiceUnavailableError } from '../errors.js';
 import { isErrorBrainEnabled } from './feature-flags.js';
 
 /**
@@ -19,7 +20,7 @@ import { isErrorBrainEnabled } from './feature-flags.js';
  */
 export function requireErrorBrain(event: RequestEvent): void {
  if (!isErrorBrainEnabled()) {
- throw error(503, 'Error-brain system is disabled');
+ throw new ServiceUnavailableError('Error-brain system is disabled');
  }
 }
 

@@ -3,17 +3,22 @@ import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 
+import { z } from 'zod';
+
+const promoteSchema = z.object({
+	component: z.string().min(1),
+	version: z.string().min(1),
+	checksum: z.string().optional()
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
+	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
-		const { component, version, checksum } = await request.json();
-		
-		if (!component || !version) {
-			return json({ error: 'Component and version required' }, { status: 400 });
-		}
+		const body = await request.json();
+		const { component, version, checksum } = promoteSchema.parse(body);
 
 		const { db } = await import('$lib/server/db/client');
 		const { sql } = await import('drizzle-orm');

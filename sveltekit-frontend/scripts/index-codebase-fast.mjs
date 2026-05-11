@@ -782,6 +782,9 @@ const dirRows = Object.entries(dirMap)
   })
   .sort((a, b) => a.score - b.score);
 
+// Load temporal activity scores (populated by scripts/backfill-activity-scores.ts)
+const activityScores = redis ? await redis.hgetall('gpu:activity:dir_scores') : {};
+
 // Write wiki:note:dir:* Redis keys for ACE KAG context
 for (const d of dirRows) {
   const docId   = `dir:${d.dir.replace(/[^a-z0-9]/gi, '_')}`;
@@ -806,6 +809,7 @@ for (const d of dirRows) {
       ...(tsDiagByDir[d.dir] > 0 ? [`${tsDiagByDir[d.dir]} TypeScript errors`] : []),
     ],
     pageRankTop5: [], directoryPath: d.dir, auditScore: d.score,
+    activityScore: parseFloat(activityScores[d.dir] || '0'),
     auditMetrics: {
       fileCount: d.fileCount, lineCount: d.lines,
       tsErrors: tsDiagByDir[d.dir] ?? 0,

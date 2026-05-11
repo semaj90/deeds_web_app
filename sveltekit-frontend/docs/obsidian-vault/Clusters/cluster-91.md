@@ -12,7 +12,7 @@ top_tags: ["database","schema","drizzle","embedding","auth"]
 llmHits: 0
 summaryMode: null
 confidence: "medium"
-last_updated_by_llm: "2026-05-09T22:35:57.577Z"
+last_updated_by_llm: "2026-05-11T03:30:09.005Z"
 ai-first: true
 contains: ["[[Files/src__lib__server__db__schema__error_events]]","[[Files/src__lib__server__db__schema-postgres]]","[[Files/src__lib__db__schema__route-health-tables]]","[[Files/src__lib__server__db__schema__route_health]]","[[Files/src__lib__db__vite-error-schema]]","[[Files/src__lib__server__db__schema__search-analytics]]","[[Files/src__lib__db__schema]]","[[Files/src__lib__server__db__jsonb-legal-schema]]"]
 same: ["[[Clusters/cluster-10]]","[[Clusters/cluster-13]]","[[Clusters/cluster-88]]","[[Clusters/cluster-95]]","[[Clusters/cluster-98]]"]

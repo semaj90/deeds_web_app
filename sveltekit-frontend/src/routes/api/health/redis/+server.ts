@@ -21,7 +21,8 @@ function extractMessage(e: unknown): string {
  }
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ status: 'unavailable', error: 'Unauthorized' }, { status: 401 });
  const timestamp = new Date().toISOString();
 
  try {

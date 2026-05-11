@@ -1,30 +1,36 @@
+import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+
 /**
  * CouchDB Client - Lightweight wrapper for ACE knowledge base
- *
- * Used by:
- *   - /api/ace/summarize-clusters (cluster summaries)
- *   - /api/kb/validate (source validation)
  */
 
-const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
-const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
+const COUCHDB_URL = ENV.COUCHDB_URL.replace(/\/$/, '');
 
 function authHeader(): string {
-  return 'Basic ' + Buffer.from(COUCHDB_USER + ':' + COUCHDB_PASS).toString('base64');
+  // Extract from URL if present, otherwise fallback to basic defaults
+  try {
+    const url = new URL(COUCHDB_URL);
+    if (url.username && url.password) {
+      return 'Basic ' + Buffer.from(url.username + ':' + url.password).toString('base64');
+    }
+  } catch { /* ignore */ }
+  return ''; // Authorization header might be redundant if credentials are in the URL
 }
 
 async function couchFetch(path: string, init?: RequestInit): Promise<Response> {
-  const url = COUCHDB_URL + '/' + path;
-  return fetch(url, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authHeader(),
-      ...(init?.headers ?? {})
-    }
-  });
+  const url = COUCHDB_URL + '/' + path.replace(/^\//, '');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(init?.headers as Record<string, string> ?? {})
+  };
+
+  const auth = authHeader();
+  if (auth && !headers['Authorization']) {
+    headers['Authorization'] = auth;
+  }
+
+  return fetch(url, { ...init, headers });
 }
 
 export const couchdb = {
@@ -90,7 +96,7 @@ export const couchdb = {
 /**
  * ACE LLM helper - generates summaries via Ollama for CouchDB documents
  */
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 export const aceLLM = {
   async summarize(text: string, model = 'gemma4-legal:latest'): Promise<string> {

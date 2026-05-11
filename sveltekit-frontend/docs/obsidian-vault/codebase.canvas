@@ -1001,11 +1001,20 @@
       "color": "4"
     },
     {
+      "id": "src__mcp__trace-mcp-server",
+      "type": "file",
+      "file": "Files/src__mcp__trace-mcp-server.md",
+      "x": 4356,
+      "y": 0,
+      "width": 260,
+      "height": 60
+    },
+    {
       "id": "src__mcp__server",
       "type": "file",
       "file": "Files/src__mcp__server.md",
-      "x": 4356,
-      "y": 0,
+      "x": 4371,
+      "y": 13,
       "width": 260,
       "height": 60
     },
@@ -1013,8 +1022,8 @@
       "id": "src__routes___app___admin__search-intelligence___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__search-intelligence___page.md",
-      "x": 4371,
-      "y": 13,
+      "x": 4381,
+      "y": 27,
       "width": 260,
       "height": 60
     },
@@ -1022,17 +1031,8 @@
       "id": "src__routes___app___cases___id___board___page",
       "type": "file",
       "file": "Files/src__routes___app___cases___id___board___page.md",
-      "x": 4382,
-      "y": 27,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__mcp__trace-mcp-server",
-      "type": "file",
-      "file": "Files/src__mcp__trace-mcp-server.md",
       "x": 4390,
-      "y": 42,
+      "y": 41,
       "width": 260,
       "height": 60
     },
@@ -1040,8 +1040,8 @@
       "id": "tests__sse-chat-attachment-metadata.spec",
       "type": "file",
       "file": "Files/tests__sse-chat-attachment-metadata.spec.md",
-      "x": 4397,
-      "y": 57,
+      "x": 4396,
+      "y": 56,
       "width": 260,
       "height": 60
     },
@@ -1059,7 +1059,7 @@
       "type": "file",
       "file": "Files/src__routes___app___global-search___page.md",
       "x": 4406,
-      "y": 88,
+      "y": 87,
       "width": 260,
       "height": 60
     },
@@ -1068,7 +1068,7 @@
       "type": "file",
       "file": "Files/src__routes___app___analytics___page.md",
       "x": 4409,
-      "y": 104,
+      "y": 103,
       "width": 260,
       "height": 60
     },
@@ -1077,7 +1077,7 @@
       "type": "file",
       "file": "Files/src__routes__api__evidence__upload___server.md",
       "x": 4411,
-      "y": 120,
+      "y": 119,
       "width": 260,
       "height": 60
     },
@@ -1086,7 +1086,7 @@
       "type": "file",
       "file": "Files/src__routes___app___admin__all-routes___page.md",
       "x": 4412,
-      "y": 136,
+      "y": 135,
       "width": 260,
       "height": 60
     },
@@ -1095,7 +1095,7 @@
       "type": "file",
       "file": "Files/tests__sse-chat-glossary-metadata.spec.md",
       "x": 4412,
-      "y": 153,
+      "y": 152,
       "width": 260,
       "height": 60
     },
@@ -1103,8 +1103,8 @@
       "id": "src__routes___app___dashboard___page",
       "type": "file",
       "file": "Files/src__routes___app___dashboard___page.md",
-      "x": 4411,
-      "y": 169,
+      "x": 4412,
+      "y": 168,
       "width": 260,
       "height": 60
     },
@@ -1113,7 +1113,7 @@
       "type": "file",
       "file": "Files/src__routes___app___legal-corpus___id____page.md",
       "x": 4410,
-      "y": 186,
+      "y": 185,
       "width": 260,
       "height": 60
     },
@@ -1121,8 +1121,8 @@
       "id": "src__routes___app___persons-of-interest___page",
       "type": "file",
       "file": "Files/src__routes___app___persons-of-interest___page.md",
-      "x": 4407,
-      "y": 203,
+      "x": 4408,
+      "y": 201,
       "width": 260,
       "height": 60
     },
@@ -1131,7 +1131,7 @@
       "type": "file",
       "file": "Files/src__routes___app___cases___page.md",
       "x": 4404,
-      "y": 219,
+      "y": 218,
       "width": 260,
       "height": 60
     },
@@ -1140,7 +1140,7 @@
       "type": "file",
       "file": "Files/src__routes___app___citations___page.md",
       "x": 4400,
-      "y": 236,
+      "y": 234,
       "width": 260,
       "height": 60
     },
@@ -1148,8 +1148,8 @@
       "id": "src__routes__api__codebase-index__orchestrate___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__orchestrate___server.md",
-      "x": 4395,
-      "y": 252,
+      "x": 4396,
+      "y": 251,
       "width": 260,
       "height": 60
     },
@@ -1158,7 +1158,7 @@
       "type": "file",
       "file": "Files/src__routes___page.md",
       "x": 4390,
-      "y": 268,
+      "y": 267,
       "width": 260,
       "height": 60
     },
@@ -1166,8 +1166,8 @@
       "id": "src__routes___app___admin__phase89___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__phase89___page.md",
-      "x": 4383,
-      "y": 285,
+      "x": 4384,
+      "y": 283,
       "width": 260,
       "height": 60
     },
@@ -1175,8 +1175,8 @@
       "id": "src__routes___app___analysis-center___page",
       "type": "file",
       "file": "Files/src__routes___app___analysis-center___page.md",
-      "x": 4376,
-      "y": 301,
+      "x": 4377,
+      "y": 299,
       "width": 260,
       "height": 60
     },
@@ -1184,8 +1184,8 @@
       "id": "src__routes___app___cases___id____page",
       "type": "file",
       "file": "Files/src__routes___app___cases___id____page.md",
-      "x": 4368,
-      "y": 316,
+      "x": 4369,
+      "y": 315,
       "width": 260,
       "height": 60
     },
@@ -1193,8 +1193,8 @@
       "id": "tests__codebase-indexer.spec",
       "type": "file",
       "file": "Files/tests__codebase-indexer.spec.md",
-      "x": 4359,
-      "y": 332,
+      "x": 4361,
+      "y": 330,
       "width": 260,
       "height": 60
     },
@@ -1202,8 +1202,8 @@
       "id": "src__routes___app___demos__unified-dashboard___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__unified-dashboard___page.md",
-      "x": 4350,
-      "y": 347,
+      "x": 4351,
+      "y": 345,
       "width": 260,
       "height": 60
     },
@@ -1211,8 +1211,8 @@
       "id": "src__routes___app___command-center___page",
       "type": "file",
       "file": "Files/src__routes___app___command-center___page.md",
-      "x": 4340,
-      "y": 362,
+      "x": 4341,
+      "y": 360,
       "width": 260,
       "height": 60
     },
@@ -1220,8 +1220,8 @@
       "id": "src__routes___app___demos___page",
       "type": "file",
       "file": "Files/src__routes___app___demos___page.md",
-      "x": 4330,
-      "y": 377,
+      "x": 4331,
+      "y": 375,
       "width": 260,
       "height": 60
     },
@@ -1229,8 +1229,8 @@
       "id": "src__routes___app___legal-corpus-premium___page",
       "type": "file",
       "file": "Files/src__routes___app___legal-corpus-premium___page.md",
-      "x": 4318,
-      "y": 391,
+      "x": 4320,
+      "y": 389,
       "width": 260,
       "height": 60
     },
@@ -1238,8 +1238,8 @@
       "id": "src__routes__api__synthesis__generate___server",
       "type": "file",
       "file": "Files/src__routes__api__synthesis__generate___server.md",
-      "x": 4306,
-      "y": 405,
+      "x": 4308,
+      "y": 403,
       "width": 260,
       "height": 60
     },
@@ -1247,44 +1247,8 @@
       "id": "src__routes___app___legal-corpus___page",
       "type": "file",
       "file": "Files/src__routes___app___legal-corpus___page.md",
-      "x": 4294,
-      "y": 418,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___active-cases___page",
-      "type": "file",
-      "file": "Files/src__routes___app___active-cases___page.md",
-      "x": 4280,
-      "y": 431,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___admin__cache___page",
-      "type": "file",
-      "file": "Files/src__routes___app___admin__cache___page.md",
-      "x": 4267,
-      "y": 444,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__reports-embed-chat-routes.spec",
-      "type": "file",
-      "file": "Files/tests__reports-embed-chat-routes.spec.md",
-      "x": 4252,
-      "y": 456,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__poi-citations-conversations-routes.spec",
-      "type": "file",
-      "file": "Files/tests__poi-citations-conversations-routes.spec.md",
-      "x": 4238,
-      "y": 467,
+      "x": 4296,
+      "y": 416,
       "width": 260,
       "height": 60
     },
@@ -1292,8 +1256,44 @@
       "id": "src__routes__api__rag__search___server",
       "type": "file",
       "file": "Files/src__routes__api__rag__search___server.md",
-      "x": 4222,
-      "y": 478,
+      "x": 4283,
+      "y": 429,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___active-cases___page",
+      "type": "file",
+      "file": "Files/src__routes___app___active-cases___page.md",
+      "x": 4269,
+      "y": 442,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___admin__cache___page",
+      "type": "file",
+      "file": "Files/src__routes___app___admin__cache___page.md",
+      "x": 4255,
+      "y": 454,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__reports-embed-chat-routes.spec",
+      "type": "file",
+      "file": "Files/tests__reports-embed-chat-routes.spec.md",
+      "x": 4240,
+      "y": 465,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__poi-citations-conversations-routes.spec",
+      "type": "file",
+      "file": "Files/tests__poi-citations-conversations-routes.spec.md",
+      "x": 4225,
+      "y": 476,
       "width": 260,
       "height": 60
     },
@@ -1301,8 +1301,8 @@
       "id": "src__hooks.server",
       "type": "file",
       "file": "Files/src__hooks.server.md",
-      "x": 4206,
-      "y": 489,
+      "x": 4209,
+      "y": 487,
       "width": 260,
       "height": 60
     },
@@ -1310,8 +1310,8 @@
       "id": "tests__analytics-tags-nlp-prefs-routes.spec",
       "type": "file",
       "file": "Files/tests__analytics-tags-nlp-prefs-routes.spec.md",
-      "x": 4190,
-      "y": 499,
+      "x": 4193,
+      "y": 497,
       "width": 260,
       "height": 60
     },
@@ -1319,8 +1319,8 @@
       "id": "src__routes___analysis___video-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___video-analysis___evidenceid____page.md",
-      "x": 4173,
-      "y": 508,
+      "x": 4176,
+      "y": 506,
       "width": 260,
       "height": 60
     },
@@ -1328,8 +1328,8 @@
       "id": "src__routes___app___demos__courtroom-sim___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__courtroom-sim___page.md",
-      "x": 4156,
-      "y": 516,
+      "x": 4159,
+      "y": 515,
       "width": 260,
       "height": 60
     },
@@ -1337,8 +1337,8 @@
       "id": "tests__vision-gpu-tools-topology-routes.spec",
       "type": "file",
       "file": "Files/tests__vision-gpu-tools-topology-routes.spec.md",
-      "x": 4138,
-      "y": 525,
+      "x": 4142,
+      "y": 523,
       "width": 260,
       "height": 60
     },
@@ -1346,8 +1346,8 @@
       "id": "src__routes___app___admin__face-gallery___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__face-gallery___page.md",
-      "x": 4120,
-      "y": 532,
+      "x": 4124,
+      "y": 530,
       "width": 260,
       "height": 60
     },
@@ -1355,8 +1355,8 @@
       "id": "src__routes__api__ace__ingest___server",
       "type": "file",
       "file": "Files/src__routes__api__ace__ingest___server.md",
-      "x": 4102,
-      "y": 539,
+      "x": 4106,
+      "y": 537,
       "width": 260,
       "height": 60
     },
@@ -1364,8 +1364,8 @@
       "id": "src__routes___app___indexing___page",
       "type": "file",
       "file": "Files/src__routes___app___indexing___page.md",
-      "x": 4083,
-      "y": 545,
+      "x": 4087,
+      "y": 543,
       "width": 260,
       "height": 60
     },
@@ -1373,8 +1373,8 @@
       "id": "tests__cache-recommendations-ml-sys-routes.spec",
       "type": "file",
       "file": "Files/tests__cache-recommendations-ml-sys-routes.spec.md",
-      "x": 4064,
-      "y": 550,
+      "x": 4068,
+      "y": 549,
       "width": 260,
       "height": 60
     },
@@ -1382,8 +1382,8 @@
       "id": "src__routes__api__error-brain__diagnose___server",
       "type": "file",
       "file": "Files/src__routes__api__error-brain__diagnose___server.md",
-      "x": 4044,
-      "y": 555,
+      "x": 4049,
+      "y": 554,
       "width": 260,
       "height": 60
     },
@@ -1391,8 +1391,8 @@
       "id": "src__routes___analysis___video-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___video-analysis___evidenceid____page.md",
-      "x": 4025,
-      "y": 559,
+      "x": 4030,
+      "y": 558,
       "width": 260,
       "height": 60
     },
@@ -1400,8 +1400,8 @@
       "id": "tests__infra-ollama-cache-routes.spec",
       "type": "file",
       "file": "Files/tests__infra-ollama-cache-routes.spec.md",
-      "x": 4005,
-      "y": 562,
+      "x": 4010,
+      "y": 561,
       "width": 260,
       "height": 60
     },
@@ -1409,7 +1409,7 @@
       "id": "src__routes___app___reports__new___page",
       "type": "file",
       "file": "Files/src__routes___app___reports__new___page.md",
-      "x": 3985,
+      "x": 3990,
       "y": 564,
       "width": 260,
       "height": 60
@@ -1418,7 +1418,7 @@
       "id": "src__routes___app___persons-of-interest___id____page",
       "type": "file",
       "file": "Files/src__routes___app___persons-of-interest___id____page.md",
-      "x": 3965,
+      "x": 3970,
       "y": 566,
       "width": 260,
       "height": 60
@@ -1427,7 +1427,7 @@
       "id": "src__routes___app___admin__library___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__library___page.md",
-      "x": 3944,
+      "x": 3950,
       "y": 567,
       "width": 260,
       "height": 60
@@ -1436,7 +1436,7 @@
       "id": "tests__ai-routes-comprehensive.spec",
       "type": "file",
       "file": "Files/tests__ai-routes-comprehensive.spec.md",
-      "x": 3924,
+      "x": 3930,
       "y": 567,
       "width": 260,
       "height": 60
@@ -1445,7 +1445,7 @@
       "id": "src__routes___analysis___document-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___document-analysis___evidenceid____page.md",
-      "x": 3903,
+      "x": 3909,
       "y": 567,
       "width": 260,
       "height": 60
@@ -1454,7 +1454,7 @@
       "id": "src__routes___app___demos__webgpu-showcase___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__webgpu-showcase___page.md",
-      "x": 3883,
+      "x": 3889,
       "y": 566,
       "width": 260,
       "height": 60
@@ -1463,7 +1463,7 @@
       "id": "src__routes___app___admin__component-analysis___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__component-analysis___page.md",
-      "x": 3862,
+      "x": 3868,
       "y": 564,
       "width": 260,
       "height": 60
@@ -1472,80 +1472,8 @@
       "id": "src__routes___analysis___audio-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___audio-analysis___evidenceid____page.md",
-      "x": 3842,
-      "y": 561,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__docs-sync-cartridge-system-routes.spec",
-      "type": "file",
-      "file": "Files/tests__docs-sync-cartridge-system-routes.spec.md",
-      "x": 3821,
-      "y": 557,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___admin__codebase-graph___page",
-      "type": "file",
-      "file": "Files/src__routes___app___admin__codebase-graph___page.md",
-      "x": 3801,
-      "y": 553,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___code-intel__topology___page",
-      "type": "file",
-      "file": "Files/src__routes___app___code-intel__topology___page.md",
-      "x": 3780,
-      "y": 548,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___system-configuration___page",
-      "type": "file",
-      "file": "Files/src__routes___app___system-configuration___page.md",
-      "x": 3760,
-      "y": 542,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__assist-feedback-analysis.spec",
-      "type": "file",
-      "file": "Files/tests__assist-feedback-analysis.spec.md",
-      "x": 3740,
-      "y": 535,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__cases-sub-routes.spec",
-      "type": "file",
-      "file": "Files/tests__cases-sub-routes.spec.md",
-      "x": 3720,
-      "y": 527,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___admin__chat-memory___page",
-      "type": "file",
-      "file": "Files/src__routes___app___admin__chat-memory___page.md",
-      "x": 3700,
-      "y": 519,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___cases__new___page",
-      "type": "file",
-      "file": "Files/src__routes___app___cases__new___page.md",
-      "x": 3681,
-      "y": 510,
+      "x": 3848,
+      "y": 562,
       "width": 260,
       "height": 60
     },
@@ -1553,8 +1481,80 @@
       "id": "src__routes__api__evidence__search___server",
       "type": "file",
       "file": "Files/src__routes__api__evidence__search___server.md",
-      "x": 3662,
-      "y": 500,
+      "x": 3827,
+      "y": 558,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__docs-sync-cartridge-system-routes.spec",
+      "type": "file",
+      "file": "Files/tests__docs-sync-cartridge-system-routes.spec.md",
+      "x": 3807,
+      "y": 554,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___admin__codebase-graph___page",
+      "type": "file",
+      "file": "Files/src__routes___app___admin__codebase-graph___page.md",
+      "x": 3787,
+      "y": 549,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___code-intel__topology___page",
+      "type": "file",
+      "file": "Files/src__routes___app___code-intel__topology___page.md",
+      "x": 3766,
+      "y": 544,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___system-configuration___page",
+      "type": "file",
+      "file": "Files/src__routes___app___system-configuration___page.md",
+      "x": 3746,
+      "y": 537,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__assist-feedback-analysis.spec",
+      "type": "file",
+      "file": "Files/tests__assist-feedback-analysis.spec.md",
+      "x": 3726,
+      "y": 530,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__cases-sub-routes.spec",
+      "type": "file",
+      "file": "Files/tests__cases-sub-routes.spec.md",
+      "x": 3707,
+      "y": 522,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___admin__chat-memory___page",
+      "type": "file",
+      "file": "Files/src__routes___app___admin__chat-memory___page.md",
+      "x": 3687,
+      "y": 513,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___cases__new___page",
+      "type": "file",
+      "file": "Files/src__routes___app___cases__new___page.md",
+      "x": 3668,
+      "y": 504,
       "width": 260,
       "height": 60
     },
@@ -1562,8 +1562,8 @@
       "id": "src__routes___app___demos__evidence-canvas___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__evidence-canvas___page.md",
-      "x": 3643,
-      "y": 490,
+      "x": 3649,
+      "y": 494,
       "width": 260,
       "height": 60
     },
@@ -1571,8 +1571,8 @@
       "id": "src__routes___app___admin__ast-topology___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__ast-topology___page.md",
-      "x": 3624,
-      "y": 479,
+      "x": 3631,
+      "y": 483,
       "width": 260,
       "height": 60
     },
@@ -1580,8 +1580,8 @@
       "id": "src__routes___analysis___audio-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___audio-analysis___evidenceid____page.md",
-      "x": 3606,
-      "y": 467,
+      "x": 3612,
+      "y": 471,
       "width": 260,
       "height": 60
     },
@@ -1589,8 +1589,8 @@
       "id": "src__routes___layout",
       "type": "file",
       "file": "Files/src__routes___layout.md",
-      "x": 3588,
-      "y": 454,
+      "x": 3595,
+      "y": 459,
       "width": 260,
       "height": 60
     },
@@ -1598,8 +1598,8 @@
       "id": "tests__errors-feedback-fictional-routes.spec",
       "type": "file",
       "file": "Files/tests__errors-feedback-fictional-routes.spec.md",
-      "x": 3571,
-      "y": 441,
+      "x": 3577,
+      "y": 446,
       "width": 260,
       "height": 60
     },
@@ -1607,8 +1607,8 @@
       "id": "src__routes___app___demos__page-layouts___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__page-layouts___page.md",
-      "x": 3554,
-      "y": 427,
+      "x": 3560,
+      "y": 432,
       "width": 260,
       "height": 60
     },
@@ -1616,8 +1616,8 @@
       "id": "tests__graph-detective-search-routes.spec",
       "type": "file",
       "file": "Files/tests__graph-detective-search-routes.spec.md",
-      "x": 3537,
-      "y": 412,
+      "x": 3544,
+      "y": 418,
       "width": 260,
       "height": 60
     },
@@ -1625,8 +1625,8 @@
       "id": "tests__yorha-v1-routes.spec",
       "type": "file",
       "file": "Files/tests__yorha-v1-routes.spec.md",
-      "x": 3521,
-      "y": 397,
+      "x": 3527,
+      "y": 403,
       "width": 260,
       "height": 60
     },
@@ -1634,8 +1634,8 @@
       "id": "tests__ai-canon-routes.spec",
       "type": "file",
       "file": "Files/tests__ai-canon-routes.spec.md",
-      "x": 3506,
-      "y": 381,
+      "x": 3512,
+      "y": 387,
       "width": 260,
       "height": 60
     },
@@ -1643,8 +1643,8 @@
       "id": "src__routes___analysis___document-analysis___evidenceid____page",
       "type": "file",
       "file": "Files/src__routes___analysis___document-analysis___evidenceid____page.md",
-      "x": 3491,
-      "y": 364,
+      "x": 3497,
+      "y": 371,
       "width": 260,
       "height": 60
     },
@@ -1652,8 +1652,8 @@
       "id": "tests__contextual-knowledge-web-routes.spec",
       "type": "file",
       "file": "Files/tests__contextual-knowledge-web-routes.spec.md",
-      "x": 3476,
-      "y": 347,
+      "x": 3482,
+      "y": 354,
       "width": 260,
       "height": 60
     },
@@ -1661,8 +1661,8 @@
       "id": "src__routes___app___admin__explorer___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__explorer___page.md",
-      "x": 3463,
-      "y": 330,
+      "x": 3468,
+      "y": 337,
       "width": 260,
       "height": 60
     },
@@ -1670,8 +1670,8 @@
       "id": "src__routes___app___demos__ui-components___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__ui-components___page.md",
-      "x": 3449,
-      "y": 311,
+      "x": 3455,
+      "y": 319,
       "width": 260,
       "height": 60
     },
@@ -1679,8 +1679,8 @@
       "id": "src__routes___app___admin___page",
       "type": "file",
       "file": "Files/src__routes___app___admin___page.md",
-      "x": 3437,
-      "y": 293,
+      "x": 3442,
+      "y": 301,
       "width": 260,
       "height": 60
     },
@@ -1688,8 +1688,8 @@
       "id": "tests__e2e__vlm-inference-vision.spec",
       "type": "file",
       "file": "Files/tests__e2e__vlm-inference-vision.spec.md",
-      "x": 3425,
-      "y": 273,
+      "x": 3430,
+      "y": 282,
       "width": 260,
       "height": 60
     },
@@ -1697,44 +1697,8 @@
       "id": "src__routes___app___recommendations___page",
       "type": "file",
       "file": "Files/src__routes___app___recommendations___page.md",
-      "x": 3414,
-      "y": 254,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes___app___demos__crime-reconstruction___page",
-      "type": "file",
-      "file": "Files/src__routes___app___demos__crime-reconstruction___page.md",
-      "x": 3403,
-      "y": 233,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__unit__chat-memory.test",
-      "type": "file",
-      "file": "Files/tests__unit__chat-memory.test.md",
-      "x": 3394,
-      "y": 213,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__cases-auth-evidence-routes.spec",
-      "type": "file",
-      "file": "Files/tests__cases-auth-evidence-routes.spec.md",
-      "x": 3384,
-      "y": 192,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "tests__library-upload-ingest.spec",
-      "type": "file",
-      "file": "Files/tests__library-upload-ingest.spec.md",
-      "x": 3376,
-      "y": 170,
+      "x": 3419,
+      "y": 262,
       "width": 260,
       "height": 60
     },
@@ -1742,8 +1706,44 @@
       "id": "src__routes__api__search___server",
       "type": "file",
       "file": "Files/src__routes__api__search___server.md",
-      "x": 3368,
-      "y": 148,
+      "x": 3408,
+      "y": 242,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes___app___demos__crime-reconstruction___page",
+      "type": "file",
+      "file": "Files/src__routes___app___demos__crime-reconstruction___page.md",
+      "x": 3398,
+      "y": 222,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__unit__chat-memory.test",
+      "type": "file",
+      "file": "Files/tests__unit__chat-memory.test.md",
+      "x": 3388,
+      "y": 201,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__cases-auth-evidence-routes.spec",
+      "type": "file",
+      "file": "Files/tests__cases-auth-evidence-routes.spec.md",
+      "x": 3380,
+      "y": 180,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__library-upload-ingest.spec",
+      "type": "file",
+      "file": "Files/tests__library-upload-ingest.spec.md",
+      "x": 3372,
+      "y": 158,
       "width": 260,
       "height": 60
     },
@@ -1751,8 +1751,8 @@
       "id": "src__routes___app___admin__error-brain___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__error-brain___page.md",
-      "x": 3362,
-      "y": 126,
+      "x": 3365,
+      "y": 137,
       "width": 260,
       "height": 60
     },
@@ -1760,8 +1760,8 @@
       "id": "tests__routes__ace-wiki-graph-index.test",
       "type": "file",
       "file": "Files/tests__routes__ace-wiki-graph-index.test.md",
-      "x": 3356,
-      "y": 104,
+      "x": 3358,
+      "y": 114,
       "width": 260,
       "height": 60
     },
@@ -1769,8 +1769,8 @@
       "id": "src__routes___app___admin__topology___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__topology___page.md",
-      "x": 3350,
-      "y": 81,
+      "x": 3353,
+      "y": 92,
       "width": 260,
       "height": 60
     },
@@ -1778,8 +1778,8 @@
       "id": "src__mcp__tools__vault-walker.tool",
       "type": "file",
       "file": "Files/src__mcp__tools__vault-walker.tool.md",
-      "x": 3346,
-      "y": 58,
+      "x": 3348,
+      "y": 69,
       "width": 260,
       "height": 60
     },
@@ -1787,8 +1787,8 @@
       "id": "src__routes___app___admin__case-graph___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__case-graph___page.md",
-      "x": 3342,
-      "y": 35,
+      "x": 3344,
+      "y": 46,
       "width": 260,
       "height": 60
     },
@@ -1796,8 +1796,8 @@
       "id": "src__routes___app___command-center__codebase___page",
       "type": "file",
       "file": "Files/src__routes___app___command-center__codebase___page.md",
-      "x": 3340,
-      "y": 12,
+      "x": 3341,
+      "y": 23,
       "width": 260,
       "height": 60
     },
@@ -1805,8 +1805,8 @@
       "id": "tests__e2e__chat.spec",
       "type": "file",
       "file": "Files/tests__e2e__chat.spec.md",
-      "x": 3338,
-      "y": -12,
+      "x": 3339,
+      "y": 0,
       "width": 260,
       "height": 60
     },
@@ -1815,7 +1815,7 @@
       "type": "file",
       "file": "Files/src__routes__api__graph__colab-export___server.md",
       "x": 3337,
-      "y": -35,
+      "y": -23,
       "width": 260,
       "height": 60
     },
@@ -1824,7 +1824,7 @@
       "type": "file",
       "file": "Files/src__routes___app___library___documentid___reader___page.md",
       "x": 3337,
-      "y": -59,
+      "y": -47,
       "width": 260,
       "height": 60
     },
@@ -1833,7 +1833,7 @@
       "type": "file",
       "file": "Files/tests__routes__codebase-index-orchestrate.test.md",
       "x": 3337,
-      "y": -83,
+      "y": -70,
       "width": 260,
       "height": 60
     },
@@ -1841,8 +1841,8 @@
       "id": "tests__error-brain-routes.spec",
       "type": "file",
       "file": "Files/tests__error-brain-routes.spec.md",
-      "x": 3339,
-      "y": -107,
+      "x": 3338,
+      "y": -94,
       "width": 260,
       "height": 60
     },
@@ -1850,8 +1850,8 @@
       "id": "src__routes___app___cases___id___reports___page",
       "type": "file",
       "file": "Files/src__routes___app___cases___id___reports___page.md",
-      "x": 3341,
-      "y": -130,
+      "x": 3340,
+      "y": -118,
       "width": 260,
       "height": 60
     },
@@ -1859,8 +1859,8 @@
       "id": "tests__analysis-uis.spec",
       "type": "file",
       "file": "Files/tests__analysis-uis.spec.md",
-      "x": 3344,
-      "y": -154,
+      "x": 3343,
+      "y": -141,
       "width": 260,
       "height": 60
     },
@@ -1868,8 +1868,8 @@
       "id": "tests__quaternion-manifold.spec",
       "type": "file",
       "file": "Files/tests__quaternion-manifold.spec.md",
-      "x": 3348,
-      "y": -178,
+      "x": 3346,
+      "y": -165,
       "width": 260,
       "height": 60
     },
@@ -1877,8 +1877,8 @@
       "id": "src__routes___app___acp___page",
       "type": "file",
       "file": "Files/src__routes___app___acp___page.md",
-      "x": 3353,
-      "y": -201,
+      "x": 3351,
+      "y": -188,
       "width": 260,
       "height": 60
     },
@@ -1886,8 +1886,8 @@
       "id": "tests__retrieval-path-wiring.spec",
       "type": "file",
       "file": "Files/tests__retrieval-path-wiring.spec.md",
-      "x": 3359,
-      "y": -225,
+      "x": 3356,
+      "y": -212,
       "width": 260,
       "height": 60
     },
@@ -1895,8 +1895,8 @@
       "id": "src__routes__api__reports___id___export___server",
       "type": "file",
       "file": "Files/src__routes__api__reports___id___export___server.md",
-      "x": 3366,
-      "y": -248,
+      "x": 3362,
+      "y": -235,
       "width": 260,
       "height": 60
     },
@@ -1904,8 +1904,8 @@
       "id": "src__routes___app___demos__scene-intent-2d___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__scene-intent-2d___page.md",
-      "x": 3374,
-      "y": -271,
+      "x": 3369,
+      "y": -258,
       "width": 260,
       "height": 60
     },
@@ -1913,8 +1913,8 @@
       "id": "src__routes___app___command-center__codebase__graph___page",
       "type": "file",
       "file": "Files/src__routes___app___command-center__codebase__graph___page.md",
-      "x": 3382,
-      "y": -294,
+      "x": 3377,
+      "y": -281,
       "width": 260,
       "height": 60
     },
@@ -1922,8 +1922,8 @@
       "id": "src__routes__api__cases___id___similar___server",
       "type": "file",
       "file": "Files/src__routes__api__cases___id___similar___server.md",
-      "x": 3391,
-      "y": -316,
+      "x": 3386,
+      "y": -303,
       "width": 260,
       "height": 60
     },
@@ -1931,8 +1931,8 @@
       "id": "src__service-worker",
       "type": "file",
       "file": "Files/src__service-worker.md",
-      "x": 3401,
-      "y": -339,
+      "x": 3395,
+      "y": -326,
       "width": 260,
       "height": 60
     },
@@ -1940,8 +1940,8 @@
       "id": "src__routes___app___admin__gpu-evidence-graph___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__gpu-evidence-graph___page.md",
-      "x": 3412,
-      "y": -361,
+      "x": 3406,
+      "y": -348,
       "width": 260,
       "height": 60
     },
@@ -1949,8 +1949,8 @@
       "id": "src__mcp-gpu-orchestrator",
       "type": "file",
       "file": "Files/src__mcp-gpu-orchestrator.md",
-      "x": 3424,
-      "y": -382,
+      "x": 3417,
+      "y": -370,
       "width": 260,
       "height": 60
     },
@@ -1958,8 +1958,8 @@
       "id": "src__routes__api__codebase-index__export__obsidian___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__export__obsidian___server.md",
-      "x": 3436,
-      "y": -403,
+      "x": 3429,
+      "y": -391,
       "width": 260,
       "height": 60
     },
@@ -1967,8 +1967,8 @@
       "id": "src__routes___app___library___page",
       "type": "file",
       "file": "Files/src__routes___app___library___page.md",
-      "x": 3450,
-      "y": -424,
+      "x": 3442,
+      "y": -412,
       "width": 260,
       "height": 60
     },
@@ -1976,8 +1976,8 @@
       "id": "src__routes___app___admin__codebase-viewer___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__codebase-viewer___page.md",
-      "x": 3464,
-      "y": -445,
+      "x": 3455,
+      "y": -432,
       "width": 260,
       "height": 60
     },
@@ -1985,8 +1985,17 @@
       "id": "src__routes___app___fictional-cases___page",
       "type": "file",
       "file": "Files/src__routes___app___fictional-cases___page.md",
-      "x": 3479,
-      "y": -465,
+      "x": 3469,
+      "y": -452,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "tests__evidence-image-upload-storage.spec",
+      "type": "file",
+      "file": "Files/tests__evidence-image-upload-storage.spec.md",
+      "x": 3484,
+      "y": -472,
       "width": 260,
       "height": 60
     },
@@ -1994,8 +2003,8 @@
       "id": "tests__routes__all-routes-page-server.test",
       "type": "file",
       "file": "Files/tests__routes__all-routes-page-server.test.md",
-      "x": 3494,
-      "y": -484,
+      "x": 3500,
+      "y": -491,
       "width": 260,
       "height": 60
     },
@@ -2003,8 +2012,8 @@
       "id": "src__routes__api__analytics__qlora-dataset___server",
       "type": "file",
       "file": "Files/src__routes__api__analytics__qlora-dataset___server.md",
-      "x": 3510,
-      "y": -503,
+      "x": 3517,
+      "y": -510,
       "width": 260,
       "height": 60
     },
@@ -2012,8 +2021,8 @@
       "id": "tests__routes__get-degraded-shape-pass-a.test",
       "type": "file",
       "file": "Files/tests__routes__get-degraded-shape-pass-a.test.md",
-      "x": 3527,
-      "y": -521,
+      "x": 3534,
+      "y": -528,
       "width": 260,
       "height": 60
     },
@@ -2021,8 +2030,8 @@
       "id": "src__routes__api__indexing___server",
       "type": "file",
       "file": "Files/src__routes__api__indexing___server.md",
-      "x": 3545,
-      "y": -539,
+      "x": 3552,
+      "y": -545,
       "width": 260,
       "height": 60
     },
@@ -2030,8 +2039,8 @@
       "id": "src__routes__register___page",
       "type": "file",
       "file": "Files/src__routes__register___page.md",
-      "x": 3563,
-      "y": -556,
+      "x": 3570,
+      "y": -562,
       "width": 260,
       "height": 60
     },
@@ -2039,8 +2048,8 @@
       "id": "tests__full-user-workflow-screenshots.spec",
       "type": "file",
       "file": "Files/tests__full-user-workflow-screenshots.spec.md",
-      "x": 3582,
-      "y": -573,
+      "x": 3589,
+      "y": -578,
       "width": 260,
       "height": 60
     },
@@ -2048,8 +2057,8 @@
       "id": "tests__e2e__e2b-client-inference.spec",
       "type": "file",
       "file": "Files/tests__e2e__e2b-client-inference.spec.md",
-      "x": 3602,
-      "y": -588,
+      "x": 3609,
+      "y": -594,
       "width": 260,
       "height": 60
     },
@@ -2057,8 +2066,8 @@
       "id": "src__routes__api__knowledge___server",
       "type": "file",
       "file": "Files/src__routes__api__knowledge___server.md",
-      "x": 3622,
-      "y": -604,
+      "x": 3629,
+      "y": -608,
       "width": 260,
       "height": 60
     },
@@ -2066,8 +2075,8 @@
       "id": "tests__hmm-ace-flow.spec",
       "type": "file",
       "file": "Files/tests__hmm-ace-flow.spec.md",
-      "x": 3643,
-      "y": -618,
+      "x": 3650,
+      "y": -623,
       "width": 260,
       "height": 60
     },
@@ -2075,8 +2084,8 @@
       "id": "src__routes___app___couchdb-analytics__clusterinspector",
       "type": "file",
       "file": "Files/src__routes___app___couchdb-analytics__clusterinspector.md",
-      "x": 3665,
-      "y": -632,
+      "x": 3672,
+      "y": -636,
       "width": 260,
       "height": 60
     },
@@ -2084,8 +2093,8 @@
       "id": "src__routes__api__codebase-index__enrich-qdrant___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__enrich-qdrant___server.md",
-      "x": 3687,
-      "y": -645,
+      "x": 3694,
+      "y": -649,
       "width": 260,
       "height": 60
     },
@@ -2093,8 +2102,8 @@
       "id": "tests__gamification-poi-timeline.spec",
       "type": "file",
       "file": "Files/tests__gamification-poi-timeline.spec.md",
-      "x": 3709,
-      "y": -657,
+      "x": 3716,
+      "y": -661,
       "width": 260,
       "height": 60
     },
@@ -2102,8 +2111,8 @@
       "id": "src__routes___app___knowledge___page",
       "type": "file",
       "file": "Files/src__routes___app___knowledge___page.md",
-      "x": 3732,
-      "y": -668,
+      "x": 3739,
+      "y": -672,
       "width": 260,
       "height": 60
     },
@@ -2111,8 +2120,8 @@
       "id": "src__wasm__vector-operations",
       "type": "file",
       "file": "Files/src__wasm__vector-operations.md",
-      "x": 3755,
-      "y": -679,
+      "x": 3762,
+      "y": -682,
       "width": 260,
       "height": 60
     },
@@ -2120,8 +2129,8 @@
       "id": "tests__ace-ingest-route.spec",
       "type": "file",
       "file": "Files/tests__ace-ingest-route.spec.md",
-      "x": 3779,
-      "y": -689,
+      "x": 3786,
+      "y": -692,
       "width": 260,
       "height": 60
     },
@@ -2129,8 +2138,8 @@
       "id": "src__routes__api__chat__stream___server",
       "type": "file",
       "file": "Files/src__routes__api__chat__stream___server.md",
-      "x": 3803,
-      "y": -698,
+      "x": 3810,
+      "y": -700,
       "width": 260,
       "height": 60
     },
@@ -2138,8 +2147,8 @@
       "id": "tests__legal-workflow.spec",
       "type": "file",
       "file": "Files/tests__legal-workflow.spec.md",
-      "x": 3828,
-      "y": -706,
+      "x": 3835,
+      "y": -708,
       "width": 260,
       "height": 60
     },
@@ -2147,8 +2156,8 @@
       "id": "src__routes__api__simulation___sessionid____server",
       "type": "file",
       "file": "Files/src__routes__api__simulation___sessionid____server.md",
-      "x": 3852,
-      "y": -713,
+      "x": 3859,
+      "y": -715,
       "width": 260,
       "height": 60
     },
@@ -2156,8 +2165,8 @@
       "id": "src__routes__api__codebase-index__claude-assist__feedback__analysis___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__claude-assist__feedback__analysis___server.md",
-      "x": 3878,
-      "y": -719,
+      "x": 3884,
+      "y": -721,
       "width": 260,
       "height": 60
     },
@@ -2165,8 +2174,8 @@
       "id": "tests__research-graph-rl.spec",
       "type": "file",
       "file": "Files/tests__research-graph-rl.spec.md",
-      "x": 3903,
-      "y": -725,
+      "x": 3910,
+      "y": -726,
       "width": 260,
       "height": 60
     },
@@ -2174,26 +2183,8 @@
       "id": "src__routes___app___demos__investigate___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__investigate___page.md",
-      "x": 3929,
-      "y": -729,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes__api__persons-of-interest___id___photos___server",
-      "type": "file",
-      "file": "Files/src__routes__api__persons-of-interest___id___photos___server.md",
-      "x": 3954,
-      "y": -733,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__routes__api__recommendations___server",
-      "type": "file",
-      "file": "Files/src__routes__api__recommendations___server.md",
-      "x": 3980,
-      "y": -736,
+      "x": 3935,
+      "y": -730,
       "width": 260,
       "height": 60
     },
@@ -2201,7 +2192,25 @@
       "id": "src__routes___app___admin__unified-indexing-studio___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__unified-indexing-studio___page.md",
-      "x": 4007,
+      "x": 3961,
+      "y": -734,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__persons-of-interest___id___photos___server",
+      "type": "file",
+      "file": "Files/src__routes__api__persons-of-interest___id___photos___server.md",
+      "x": 3987,
+      "y": -736,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__routes__api__recommendations___server",
+      "type": "file",
+      "file": "Files/src__routes__api__recommendations___server.md",
+      "x": 4013,
       "y": -738,
       "width": 260,
       "height": 60
@@ -2210,8 +2219,8 @@
       "id": "src__routes___app___reports___page",
       "type": "file",
       "file": "Files/src__routes___app___reports___page.md",
-      "x": 4033,
-      "y": -738,
+      "x": 4039,
+      "y": -739,
       "width": 260,
       "height": 60
     },
@@ -2219,7 +2228,7 @@
       "id": "tests__routes__codeintel-fix-recommender.test",
       "type": "file",
       "file": "Files/tests__routes__codeintel-fix-recommender.test.md",
-      "x": 4059,
+      "x": 4065,
       "y": -738,
       "width": 260,
       "height": 60
@@ -2228,7 +2237,7 @@
       "id": "src__routes___app___demos__memory-palace___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__memory-palace___page.md",
-      "x": 4085,
+      "x": 4092,
       "y": -737,
       "width": 260,
       "height": 60
@@ -2237,7 +2246,7 @@
       "id": "src__routes___app___demos__nes-routes___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__nes-routes___page.md",
-      "x": 4112,
+      "x": 4118,
       "y": -735,
       "width": 260,
       "height": 60
@@ -2246,7 +2255,7 @@
       "id": "src__mcp__index",
       "type": "file",
       "file": "Files/src__mcp__index.md",
-      "x": 4138,
+      "x": 4144,
       "y": -732,
       "width": 260,
       "height": 60
@@ -2255,8 +2264,8 @@
       "id": "src__routes___app___demos__nier-showcase___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__nier-showcase___page.md",
-      "x": 4164,
-      "y": -729,
+      "x": 4170,
+      "y": -728,
       "width": 260,
       "height": 60
     },
@@ -2264,8 +2273,8 @@
       "id": "src__routes___app___couchdb-analytics__errorpropagationgraph",
       "type": "file",
       "file": "Files/src__routes___app___couchdb-analytics__errorpropagationgraph.md",
-      "x": 4190,
-      "y": -724,
+      "x": 4196,
+      "y": -723,
       "width": 260,
       "height": 60
     },
@@ -2273,8 +2282,8 @@
       "id": "src__routes__api__agent__investigate___server",
       "type": "file",
       "file": "Files/src__routes__api__agent__investigate___server.md",
-      "x": 4216,
-      "y": -718,
+      "x": 4222,
+      "y": -717,
       "width": 260,
       "height": 60
     },
@@ -2282,8 +2291,8 @@
       "id": "tests__e2e__chat-inference-routing.spec",
       "type": "file",
       "file": "Files/tests__e2e__chat-inference-routing.spec.md",
-      "x": 4242,
-      "y": -711,
+      "x": 4247,
+      "y": -710,
       "width": 260,
       "height": 60
     },
@@ -2291,8 +2300,8 @@
       "id": "tests__accessibility__accessibility-tester",
       "type": "file",
       "file": "Files/tests__accessibility__accessibility-tester.md",
-      "x": 4268,
-      "y": -704,
+      "x": 4273,
+      "y": -702,
       "width": 260,
       "height": 60
     },
@@ -2300,8 +2309,8 @@
       "id": "tests__ace-rerank-spine.spec",
       "type": "file",
       "file": "Files/tests__ace-rerank-spine.spec.md",
-      "x": 4293,
-      "y": -695,
+      "x": 4298,
+      "y": -693,
       "width": 260,
       "height": 60
     },
@@ -2309,8 +2318,8 @@
       "id": "src__routes__api__codebase-index__kag-notebook___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__kag-notebook___server.md",
-      "x": 4318,
-      "y": -686,
+      "x": 4323,
+      "y": -684,
       "width": 260,
       "height": 60
     },
@@ -2318,8 +2327,8 @@
       "id": "src__routes___app___admin__ai-dashboard__operator___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__ai-dashboard__operator___page.md",
-      "x": 4343,
-      "y": -675,
+      "x": 4348,
+      "y": -673,
       "width": 260,
       "height": 60
     },
@@ -2327,8 +2336,8 @@
       "id": "src__routes__api__codebase-index__claude-assist___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__claude-assist___server.md",
-      "x": 4368,
-      "y": -664,
+      "x": 4372,
+      "y": -662,
       "width": 260,
       "height": 60
     },
@@ -2336,8 +2345,8 @@
       "id": "src__routes__api__contextual__chat___server",
       "type": "file",
       "file": "Files/src__routes__api__contextual__chat___server.md",
-      "x": 4392,
-      "y": -652,
+      "x": 4396,
+      "y": -650,
       "width": 260,
       "height": 60
     },
@@ -2345,8 +2354,8 @@
       "id": "tests__codebase-index-rabbitmq-channel.spec",
       "type": "file",
       "file": "Files/tests__codebase-index-rabbitmq-channel.spec.md",
-      "x": 4416,
-      "y": -639,
+      "x": 4419,
+      "y": -636,
       "width": 260,
       "height": 60
     },
@@ -2354,8 +2363,8 @@
       "id": "tests__e2e__client-inference.spec",
       "type": "file",
       "file": "Files/tests__e2e__client-inference.spec.md",
-      "x": 4439,
-      "y": -625,
+      "x": 4442,
+      "y": -622,
       "width": 260,
       "height": 60
     },
@@ -2363,8 +2372,8 @@
       "id": "tests__routes__sveltekit-form-actions.test",
       "type": "file",
       "file": "Files/tests__routes__sveltekit-form-actions.test.md",
-      "x": 4462,
-      "y": -610,
+      "x": 4465,
+      "y": -608,
       "width": 260,
       "height": 60
     },
@@ -2372,8 +2381,8 @@
       "id": "tests__phase97-authenticated-streaming.spec",
       "type": "file",
       "file": "Files/tests__phase97-authenticated-streaming.spec.md",
-      "x": 4484,
-      "y": -594,
+      "x": 4487,
+      "y": -592,
       "width": 260,
       "height": 60
     },
@@ -2381,8 +2390,8 @@
       "id": "src__routes__api__codebase-index__karpathy-tag___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__karpathy-tag___server.md",
-      "x": 4506,
-      "y": -578,
+      "x": 4508,
+      "y": -575,
       "width": 260,
       "height": 60
     },
@@ -2390,8 +2399,8 @@
       "id": "tests__research-evidence-e2e.spec",
       "type": "file",
       "file": "Files/tests__research-evidence-e2e.spec.md",
-      "x": 4527,
-      "y": -561,
+      "x": 4529,
+      "y": -558,
       "width": 260,
       "height": 60
     },
@@ -2399,8 +2408,8 @@
       "id": "src__routes__api__codebase-index__export__bundle___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__export__bundle___server.md",
-      "x": 4547,
-      "y": -542,
+      "x": 4550,
+      "y": -540,
       "width": 260,
       "height": 60
     },
@@ -2408,8 +2417,8 @@
       "id": "src__routes___app___admin__observability___page",
       "type": "file",
       "file": "Files/src__routes___app___admin__observability___page.md",
-      "x": 4567,
-      "y": -524,
+      "x": 4570,
+      "y": -521,
       "width": 260,
       "height": 60
     },
@@ -2417,8 +2426,8 @@
       "id": "src__routes__api__codebase-index__index-stream___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__index-stream___server.md",
-      "x": 4587,
-      "y": -504,
+      "x": 4589,
+      "y": -502,
       "width": 260,
       "height": 60
     },
@@ -2426,8 +2435,8 @@
       "id": "src__routes__api__codebase-index__ingest-errors___server",
       "type": "file",
       "file": "Files/src__routes__api__codebase-index__ingest-errors___server.md",
-      "x": 4605,
-      "y": -484,
+      "x": 4607,
+      "y": -482,
       "width": 260,
       "height": 60
     },
@@ -2435,8 +2444,8 @@
       "id": "tests__hypergraph-types.spec",
       "type": "file",
       "file": "Files/tests__hypergraph-types.spec.md",
-      "x": 4623,
-      "y": -463,
+      "x": 4625,
+      "y": -461,
       "width": 260,
       "height": 60
     },
@@ -2444,8 +2453,8 @@
       "id": "tests__retrieval-quality-regression.spec",
       "type": "file",
       "file": "Files/tests__retrieval-quality-regression.spec.md",
-      "x": 4640,
-      "y": -441,
+      "x": 4642,
+      "y": -439,
       "width": 260,
       "height": 60
     },
@@ -2453,8 +2462,8 @@
       "id": "src__routes__api__whisper__transcribe___server",
       "type": "file",
       "file": "Files/src__routes__api__whisper__transcribe___server.md",
-      "x": 4657,
-      "y": -419,
+      "x": 4658,
+      "y": -417,
       "width": 260,
       "height": 60
     },
@@ -2462,8 +2471,8 @@
       "id": "src__routes__api__health___server",
       "type": "file",
       "file": "Files/src__routes__api__health___server.md",
-      "x": 4673,
-      "y": -396,
+      "x": 4674,
+      "y": -394,
       "width": 260,
       "height": 60
     },
@@ -2471,8 +2480,8 @@
       "id": "tests__routes__chat-memory-backfill.test",
       "type": "file",
       "file": "Files/tests__routes__chat-memory-backfill.test.md",
-      "x": 4687,
-      "y": -373,
+      "x": 4689,
+      "y": -371,
       "width": 260,
       "height": 60
     },
@@ -2480,8 +2489,8 @@
       "id": "tests__rag-search-ace-route.spec",
       "type": "file",
       "file": "Files/tests__rag-search-ace-route.spec.md",
-      "x": 4701,
-      "y": -349,
+      "x": 4702,
+      "y": -347,
       "width": 260,
       "height": 60
     },
@@ -2489,8 +2498,8 @@
       "id": "src__routes___app___reports___id___edit___page",
       "type": "file",
       "file": "Files/src__routes___app___reports___id___edit___page.md",
-      "x": 4715,
-      "y": -324,
+      "x": 4716,
+      "y": -323,
       "width": 260,
       "height": 60
     },
@@ -2498,8 +2507,8 @@
       "id": "tests__phase99-production.spec",
       "type": "file",
       "file": "Files/tests__phase99-production.spec.md",
-      "x": 4727,
-      "y": -299,
+      "x": 4728,
+      "y": -298,
       "width": 260,
       "height": 60
     },
@@ -2508,7 +2517,7 @@
       "type": "file",
       "file": "Files/src__routes___app___demos__agentic-errors___page.md",
       "x": 4739,
-      "y": -274,
+      "y": -272,
       "width": 260,
       "height": 60
     },
@@ -2516,8 +2525,8 @@
       "id": "src__routes__api__library__ingest-dev-docs___server",
       "type": "file",
       "file": "Files/src__routes__api__library__ingest-dev-docs___server.md",
-      "x": 4749,
-      "y": -248,
+      "x": 4750,
+      "y": -246,
       "width": 260,
       "height": 60
     },
@@ -2526,7 +2535,7 @@
       "type": "file",
       "file": "Files/src__routes__api__v1__agentic__tool-loop___server.md",
       "x": 4759,
-      "y": -221,
+      "y": -220,
       "width": 260,
       "height": 60
     },
@@ -2534,8 +2543,8 @@
       "id": "src__routes___app___citations__law___page",
       "type": "file",
       "file": "Files/src__routes___app___citations__law___page.md",
-      "x": 4767,
-      "y": -195,
+      "x": 4768,
+      "y": -194,
       "width": 260,
       "height": 60
     },
@@ -2544,7 +2553,7 @@
       "type": "file",
       "file": "Files/src__localdocs.svelte.md",
       "x": 4775,
-      "y": -168,
+      "y": -167,
       "width": 260,
       "height": 60
     },
@@ -2562,7 +2571,7 @@
       "type": "file",
       "file": "Files/src__routes__login___page.md",
       "x": 4788,
-      "y": -113,
+      "y": -112,
       "width": 260,
       "height": 60
     },
@@ -2571,7 +2580,7 @@
       "type": "file",
       "file": "Files/tests__routes__chat-memory-search.test.md",
       "x": 4793,
-      "y": -85,
+      "y": -84,
       "width": 260,
       "height": 60
     },
@@ -2580,7 +2589,7 @@
       "type": "file",
       "file": "Files/src__routes___app___fictional-cases___id____page.md",
       "x": 4797,
-      "y": -57,
+      "y": -56,
       "width": 260,
       "height": 60
     },
@@ -2588,7 +2597,7 @@
       "id": "src__routes__api__persons-of-interest___id___face-match___server",
       "type": "file",
       "file": "Files/src__routes__api__persons-of-interest___id___face-match___server.md",
-      "x": 4799,
+      "x": 4800,
       "y": -28,
       "width": 260,
       "height": 60
@@ -2642,7 +2651,7 @@
       "id": "src__lib__server__db__meta__0000_snapshot",
       "type": "file",
       "file": "Files/src__lib__server__db__meta__0000_snapshot.md",
-      "x": 4123,
+      "x": 4124,
       "y": 1472,
       "width": 260,
       "height": 60
@@ -2651,8 +2660,8 @@
       "id": "src__lib__server__queue__rabbitmq-manager-fixed",
       "type": "file",
       "file": "Files/src__lib__server__queue__rabbitmq-manager-fixed.md",
-      "x": 4149,
-      "y": 1555,
+      "x": 4151,
+      "y": 1558,
       "width": 260,
       "height": 60
     },
@@ -2661,7 +2670,7 @@
       "type": "file",
       "file": "Files/src__lib__server__agent__autonomous-agent.md",
       "x": 4151,
-      "y": 1645,
+      "y": 1651,
       "width": 260,
       "height": 60
     },
@@ -2669,8 +2678,8 @@
       "id": "src__lib__server__ollama",
       "type": "file",
       "file": "Files/src__lib__server__ollama.md",
-      "x": 4129,
-      "y": 1736,
+      "x": 4126,
+      "y": 1745,
       "width": 260,
       "height": 60
     },
@@ -2678,89 +2687,8 @@
       "id": "src__lib__server__wiki__wiki-gap-analyzer",
       "type": "file",
       "file": "Files/src__lib__server__wiki__wiki-gap-analyzer.md",
-      "x": 4086,
-      "y": 1822,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__api-metadata-extractor",
-      "type": "file",
-      "file": "Files/src__lib__server__api-metadata-extractor.md",
-      "x": 4023,
-      "y": 1900,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__adapters__service-integrations",
-      "type": "file",
-      "file": "Files/src__lib__server__adapters__service-integrations.md",
-      "x": 3944,
-      "y": 1965,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__queue__queue-worker",
-      "type": "file",
-      "file": "Files/src__lib__server__queue__queue-worker.md",
-      "x": 3850,
-      "y": 2013,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__production-logger",
-      "type": "file",
-      "file": "Files/src__lib__server__production-logger.md",
-      "x": 3746,
-      "y": 2043,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__search__quaternion-manifold",
-      "type": "file",
-      "file": "Files/src__lib__server__search__quaternion-manifold.md",
-      "x": 3636,
-      "y": 2051,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__storage__.phase105-backup__1768605014945-minio-service",
-      "type": "file",
-      "file": "Files/src__lib__server__storage__.phase105-backup__1768605014945-minio-service.md",
-      "x": 3524,
-      "y": 2037,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__db__seed",
-      "type": "file",
-      "file": "Files/src__lib__server__db__seed.md",
-      "x": 3414,
-      "y": 2000,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__ace__types",
-      "type": "file",
-      "file": "Files/src__lib__server__ace__types.md",
-      "x": 3312,
-      "y": 1942,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__ml__recommendation-metrics",
-      "type": "file",
-      "file": "Files/src__lib__server__ml__recommendation-metrics.md",
-      "x": 3222,
-      "y": 1864,
+      "x": 4080,
+      "y": 1833,
       "width": 260,
       "height": 60
     },
@@ -2768,8 +2696,89 @@
       "id": "src__lib__server__ace__multi-lane-retrieval",
       "type": "file",
       "file": "Files/src__lib__server__ace__multi-lane-retrieval.md",
-      "x": 3147,
-      "y": 1767,
+      "x": 4012,
+      "y": 1911,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__api-metadata-extractor",
+      "type": "file",
+      "file": "Files/src__lib__server__api-metadata-extractor.md",
+      "x": 3927,
+      "y": 1976,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__adapters__service-integrations",
+      "type": "file",
+      "file": "Files/src__lib__server__adapters__service-integrations.md",
+      "x": 3828,
+      "y": 2022,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__queue__queue-worker",
+      "type": "file",
+      "file": "Files/src__lib__server__queue__queue-worker.md",
+      "x": 3719,
+      "y": 2047,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ace__types",
+      "type": "file",
+      "file": "Files/src__lib__server__ace__types.md",
+      "x": 3604,
+      "y": 2050,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__production-logger",
+      "type": "file",
+      "file": "Files/src__lib__server__production-logger.md",
+      "x": 3489,
+      "y": 2028,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__search__quaternion-manifold",
+      "type": "file",
+      "file": "Files/src__lib__server__search__quaternion-manifold.md",
+      "x": 3378,
+      "y": 1983,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__db__seed",
+      "type": "file",
+      "file": "Files/src__lib__server__db__seed.md",
+      "x": 3276,
+      "y": 1915,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__storage__.phase105-backup__1768605014945-minio-service",
+      "type": "file",
+      "file": "Files/src__lib__server__storage__.phase105-backup__1768605014945-minio-service.md",
+      "x": 3189,
+      "y": 1827,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__ml__recommendation-metrics",
+      "type": "file",
+      "file": "Files/src__lib__server__ml__recommendation-metrics.md",
+      "x": 3120,
+      "y": 1721,
       "width": 260,
       "height": 60
     },
@@ -2777,8 +2786,8 @@
       "id": "src__lib__server__glyph-diffusion-service",
       "type": "file",
       "file": "Files/src__lib__server__glyph-diffusion-service.md",
-      "x": 3091,
-      "y": 1657,
+      "x": 3072,
+      "y": 1601,
       "width": 260,
       "height": 60
     },
@@ -2786,8 +2795,8 @@
       "id": "src__lib__server__codeintel__fix-recommender",
       "type": "file",
       "file": "Files/src__lib__server__codeintel__fix-recommender.md",
-      "x": 3058,
-      "y": 1536,
+      "x": 3049,
+      "y": 1472,
       "width": 260,
       "height": 60
     },
@@ -2795,8 +2804,8 @@
       "id": "src__lib__server__inference__turbo-prefix-cache",
       "type": "file",
       "file": "Files/src__lib__server__inference__turbo-prefix-cache.md",
-      "x": 3048,
-      "y": 1408,
+      "x": 3052,
+      "y": 1340,
       "width": 260,
       "height": 60
     },
@@ -2804,8 +2813,8 @@
       "id": "src__lib__server__acp__phase90-tools",
       "type": "file",
       "file": "Files/src__lib__server__acp__phase90-tools.md",
-      "x": 3063,
-      "y": 1280,
+      "x": 3082,
+      "y": 1208,
       "width": 260,
       "height": 60
     },
@@ -2813,8 +2822,8 @@
       "id": "src__lib__server__db__unified-client",
       "type": "file",
       "file": "Files/src__lib__server__db__unified-client.md",
-      "x": 3103,
-      "y": 1155,
+      "x": 3138,
+      "y": 1084,
       "width": 260,
       "height": 60
     },
@@ -2822,8 +2831,8 @@
       "id": "src__lib__server__atlas__context-for-file",
       "type": "file",
       "file": "Files/src__lib__server__atlas__context-for-file.md",
-      "x": 3167,
-      "y": 1038,
+      "x": 3218,
+      "y": 971,
       "width": 260,
       "height": 60
     },
@@ -2831,8 +2840,8 @@
       "id": "src__lib__server__agent__tools__web-search-searxng",
       "type": "file",
       "file": "Files/src__lib__server__agent__tools__web-search-searxng.md",
-      "x": 3253,
-      "y": 934,
+      "x": 3320,
+      "y": 876,
       "width": 260,
       "height": 60
     },
@@ -2840,8 +2849,8 @@
       "id": "src__lib__server__data__legal-seed-data",
       "type": "file",
       "file": "Files/src__lib__server__data__legal-seed-data.md",
-      "x": 3359,
-      "y": 848,
+      "x": 3441,
+      "y": 801,
       "width": 260,
       "height": 60
     },
@@ -2849,8 +2858,8 @@
       "id": "src__lib__server__ace__retrieval-lanes",
       "type": "file",
       "file": "Files/src__lib__server__ace__retrieval-lanes.md",
-      "x": 3481,
-      "y": 783,
+      "x": 3576,
+      "y": 751,
       "width": 260,
       "height": 60
     },
@@ -2858,8 +2867,8 @@
       "id": "src__lib__server__ml__multi-modal-ranker",
       "type": "file",
       "file": "Files/src__lib__server__ml__multi-modal-ranker.md",
-      "x": 3614,
-      "y": 742,
+      "x": 3719,
+      "y": 728,
       "width": 260,
       "height": 60
     },
@@ -2867,8 +2876,8 @@
       "id": "src__lib__server__simulation__grpo-strategy",
       "type": "file",
       "file": "Files/src__lib__server__simulation__grpo-strategy.md",
-      "x": 3755,
-      "y": 727,
+      "x": 3866,
+      "y": 734,
       "width": 260,
       "height": 60
     },
@@ -2876,8 +2885,8 @@
       "id": "src__lib__server__ace__codeintel-datastore",
       "type": "file",
       "file": "Files/src__lib__server__ace__codeintel-datastore.md",
-      "x": 3897,
-      "y": 740,
+      "x": 4010,
+      "y": 770,
       "width": 260,
       "height": 60
     },
@@ -2885,8 +2894,8 @@
       "id": "src__lib__server__ml__topic-cluster",
       "type": "file",
       "file": "Files/src__lib__server__ml__topic-cluster.md",
-      "x": 4036,
-      "y": 779,
+      "x": 4146,
+      "y": 833,
       "width": 260,
       "height": 60
     },
@@ -2894,8 +2903,8 @@
       "id": "src__lib__server__db__qdrant-sync",
       "type": "file",
       "file": "Files/src__lib__server__db__qdrant-sync.md",
-      "x": 4166,
-      "y": 845,
+      "x": 4268,
+      "y": 923,
       "width": 260,
       "height": 60
     },
@@ -2903,8 +2912,8 @@
       "id": "src__lib__server__db__pgvector-utils.temp",
       "type": "file",
       "file": "Files/src__lib__server__db__pgvector-utils.temp.md",
-      "x": 4282,
-      "y": 936,
+      "x": 4372,
+      "y": 1037,
       "width": 260,
       "height": 60
     },
@@ -2912,8 +2921,8 @@
       "id": "src__lib__server__db__pgvector-utils",
       "type": "file",
       "file": "Files/src__lib__server__db__pgvector-utils.md",
-      "x": 4380,
-      "y": 1048,
+      "x": 4451,
+      "y": 1169,
       "width": 260,
       "height": 60
     },
@@ -2921,17 +2930,8 @@
       "id": "src__lib__server__ml__som-cluster",
       "type": "file",
       "file": "Files/src__lib__server__ml__som-cluster.md",
-      "x": 4455,
-      "y": 1178,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__agent__supervisor",
-      "type": "file",
-      "file": "Files/src__lib__server__agent__supervisor.md",
-      "x": 4505,
-      "y": 1321,
+      "x": 4504,
+      "y": 1316,
       "width": 260,
       "height": 60
     },
@@ -3848,7 +3848,7 @@
       "id": "src__lib__server__graph__hypergraph-4d",
       "type": "file",
       "file": "Files/src__lib__server__graph__hypergraph-4d.md",
-      "x": -53,
+      "x": -48,
       "y": -3968,
       "width": 260,
       "height": 60
@@ -3857,8 +3857,8 @@
       "id": "src__lib__server__graph__neo4j-gds",
       "type": "file",
       "file": "Files/src__lib__server__graph__neo4j-gds.md",
-      "x": -50,
-      "y": -3751,
+      "x": -51,
+      "y": -3732,
       "width": 260,
       "height": 60
     },
@@ -3866,8 +3866,8 @@
       "id": "src__lib__server__graph__community-graph",
       "type": "file",
       "file": "Files/src__lib__server__graph__community-graph.md",
-      "x": -163,
-      "y": -3545,
+      "x": -189,
+      "y": -3515,
       "width": 260,
       "height": 60
     },
@@ -3875,8 +3875,8 @@
       "id": "src__lib__server__graph__gpu-graph-analysis",
       "type": "file",
       "file": "Files/src__lib__server__graph__gpu-graph-analysis.md",
-      "x": -373,
-      "y": -3406,
+      "x": -431,
+      "y": -3386,
       "width": 260,
       "height": 60
     },
@@ -3884,8 +3884,8 @@
       "id": "src__lib__server__graph__codebase-scanner-v2",
       "type": "file",
       "file": "Files/src__lib__server__graph__codebase-scanner-v2.md",
-      "x": -636,
-      "y": -3377,
+      "x": -720,
+      "y": -3391,
       "width": 260,
       "height": 60
     },
@@ -3893,8 +3893,8 @@
       "id": "src__lib__server__graph__glyph-atlas-builder",
       "type": "file",
       "file": "Files/src__lib__server__graph__glyph-atlas-builder.md",
-      "x": -897,
-      "y": -3473,
+      "x": -985,
+      "y": -3540,
       "width": 260,
       "height": 60
     },
@@ -3902,8 +3902,8 @@
       "id": "src__lib__server__graph__relationship-extractor",
       "type": "file",
       "file": "Files/src__lib__server__graph__relationship-extractor.md",
-      "x": -1095,
-      "y": -3682,
+      "x": -1154,
+      "y": -3808,
       "width": 260,
       "height": 60
     },
@@ -3911,8 +3911,8 @@
       "id": "src__lib__server__graph__graph-remote-functions",
       "type": "file",
       "file": "Files/src__lib__server__graph__graph-remote-functions.md",
-      "x": -1184,
-      "y": -3968,
+      "x": -1178,
+      "y": -4135,
       "width": 260,
       "height": 60
     },
@@ -3920,8 +3920,8 @@
       "id": "src__lib__server__retrieval__graph-context",
       "type": "file",
       "file": "Files/src__lib__server__retrieval__graph-context.md",
-      "x": -1136,
-      "y": -4274,
+      "x": -1040,
+      "y": -4445,
       "width": 260,
       "height": 60
     },
@@ -3929,8 +3929,8 @@
       "id": "src__lib__server__graph__codebase-neo4j-sync",
       "type": "file",
       "file": "Files/src__lib__server__graph__codebase-neo4j-sync.md",
-      "x": -954,
-      "y": -4536,
+      "x": -764,
+      "y": -4661,
       "width": 260,
       "height": 60
     },
@@ -3938,8 +3938,8 @@
       "id": "src__lib__server__graph__couchdb-pagerank",
       "type": "file",
       "file": "Files/src__lib__server__graph__couchdb-pagerank.md",
-      "x": -667,
-      "y": -4695,
+      "x": -410,
+      "y": -4724,
       "width": 260,
       "height": 60
     },
@@ -3947,8 +3947,8 @@
       "id": "src__lib__server__graph__som-topology-pipeline",
       "type": "file",
       "file": "Files/src__lib__server__graph__som-topology-pipeline.md",
-      "x": -331,
-      "y": -4714,
+      "x": -58,
+      "y": -4611,
       "width": 260,
       "height": 60
     },
@@ -3956,17 +3956,8 @@
       "id": "src__lib__server__types__retrieval",
       "type": "file",
       "file": "Files/src__lib__server__types__retrieval.md",
-      "x": -13,
-      "y": -4580,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__retrieval__citation-graph",
-      "type": "file",
-      "file": "Files/src__lib__server__retrieval__citation-graph.md",
-      "x": 219,
-      "y": -4316,
+      "x": 207,
+      "y": -4340,
       "width": 260,
       "height": 60
     },
@@ -3974,7 +3965,7 @@
       "id": "src__lib__server__gpu__libtorch-bridge",
       "type": "file",
       "file": "Files/src__lib__server__gpu__libtorch-bridge.md",
-      "x": 1752,
+      "x": 1737,
       "y": 3804,
       "width": 260,
       "height": 60
@@ -3983,8 +3974,8 @@
       "id": "src__lib__webgpu__som-webgpu-cache",
       "type": "file",
       "file": "Files/src__lib__webgpu__som-webgpu-cache.md",
-      "x": 1535,
-      "y": 4321,
+      "x": 1596,
+      "y": 4255,
       "width": 260,
       "height": 60
     },
@@ -3992,8 +3983,17 @@
       "id": "src__lib__server__gpu__pytorch-graph",
       "type": "file",
       "file": "Files/src__lib__server__gpu__pytorch-graph.md",
-      "x": 906,
-      "y": 4375,
+      "x": 1095,
+      "y": 4423,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__server__gpu__gpu-pipeline",
+      "type": "file",
+      "file": "Files/src__lib__server__gpu__gpu-pipeline.md",
+      "x": 621,
+      "y": 4101,
       "width": 260,
       "height": 60
     },
@@ -4001,8 +4001,8 @@
       "id": "src__lib__webgpu__texture-streaming",
       "type": "file",
       "file": "Files/src__lib__webgpu__texture-streaming.md",
-      "x": 524,
-      "y": 3804,
+      "x": 582,
+      "y": 3489,
       "width": 260,
       "height": 60
     },
@@ -4010,8 +4010,8 @@
       "id": "src__lib__server__grpc__graph-ml-client",
       "type": "file",
       "file": "Files/src__lib__server__grpc__graph-ml-client.md",
-      "x": 857,
-      "y": 3148,
+      "x": 1066,
+      "y": 3059,
       "width": 260,
       "height": 60
     },
@@ -4019,8 +4019,8 @@
       "id": "src__lib__server__gpu__simdjson-bridge",
       "type": "file",
       "file": "Files/src__lib__server__gpu__simdjson-bridge.md",
-      "x": 1636,
-      "y": 3111,
+      "x": 1735,
+      "y": 3179,
       "width": 260,
       "height": 60
     },
@@ -4241,11 +4241,20 @@
       "height": 60
     },
     {
+      "id": "src__lib__server__indexer__legal-chunker",
+      "type": "file",
+      "file": "Files/src__lib__server__indexer__legal-chunker.md",
+      "x": -3175,
+      "y": -1513,
+      "width": 260,
+      "height": 60
+    },
+    {
       "id": "src__lib__server__retrieval__cross-encoder-reranker",
       "type": "file",
       "file": "Files/src__lib__server__retrieval__cross-encoder-reranker.md",
-      "x": -3175,
-      "y": -1513,
+      "x": -3303,
+      "y": -1411,
       "width": 260,
       "height": 60
     },
@@ -4253,8 +4262,8 @@
       "id": "src__lib__server__indexer__workspace-metadata-extractor",
       "type": "file",
       "file": "Files/src__lib__server__indexer__workspace-metadata-extractor.md",
-      "x": -3303,
-      "y": -1411,
+      "x": -3462,
+      "y": -1352,
       "width": 260,
       "height": 60
     },
@@ -4262,8 +4271,8 @@
       "id": "src__lib__server__indexer__dual-embedder",
       "type": "file",
       "file": "Files/src__lib__server__indexer__dual-embedder.md",
-      "x": -3462,
-      "y": -1352,
+      "x": -3638,
+      "y": -1345,
       "width": 260,
       "height": 60
     },
@@ -4271,15 +4280,6 @@
       "id": "src__lib__machines__evidence-processing-machine",
       "type": "file",
       "file": "Files/src__lib__machines__evidence-processing-machine.md",
-      "x": -3638,
-      "y": -1345,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__indexer__legal-chunker",
-      "type": "file",
-      "file": "Files/src__lib__server__indexer__legal-chunker.md",
       "x": -3813,
       "y": -1393,
       "width": 260,
@@ -4493,74 +4493,38 @@
       "height": 60
     },
     {
-      "id": "src__lib__services__knowledge-search__acptoolregistry",
+      "id": "src__lib__server__services__knowledge-search__acptoolregistry",
       "type": "file",
-      "file": "Files/src__lib__services__knowledge-search__acptoolregistry.md",
-      "x": 2417,
-      "y": 3505,
+      "file": "Files/src__lib__server__services__knowledge-search__acptoolregistry.md",
+      "x": -1143,
+      "y": 3619,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__lib__gpu__markdown-processor",
+      "id": "src__lib__server__services__langextract-service",
       "type": "file",
-      "file": "Files/src__lib__gpu__markdown-processor.md",
-      "x": 2323,
-      "y": 3901,
+      "file": "Files/src__lib__server__services__langextract-service.md",
+      "x": -1703,
+      "y": 4279,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__lib__gpu__gpu-compute-pipeline",
+      "id": "src__lib__server__analysis__evidence-analysis-pipeline",
       "type": "file",
-      "file": "Files/src__lib__gpu__gpu-compute-pipeline.md",
-      "x": 1927,
-      "y": 4119,
+      "file": "Files/src__lib__server__analysis__evidence-analysis-pipeline.md",
+      "x": -2439,
+      "y": 3619,
       "width": 260,
       "height": 60
     },
     {
-      "id": "src__lib__gpu__nes-glyph-webgpu",
+      "id": "src__lib__server__analysis__hmm-ace-analyzer",
       "type": "file",
-      "file": "Files/src__lib__gpu__nes-glyph-webgpu.md",
-      "x": 1461,
-      "y": 3972,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__services__knowledge-search__knowledgeindexer",
-      "type": "file",
-      "file": "Files/src__lib__services__knowledge-search__knowledgeindexer.md",
-      "x": 1228,
-      "y": 3505,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__services__knowledge-search__minioknowledgestore",
-      "type": "file",
-      "file": "Files/src__lib__services__knowledge-search__minioknowledgestore.md",
-      "x": 1407,
-      "y": 2985,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__gpu__webgpu-pagerank",
-      "type": "file",
-      "file": "Files/src__lib__gpu__webgpu-pagerank.md",
-      "x": 1927,
-      "y": 2736,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__services__error-analysis__learningpipeline",
-      "type": "file",
-      "file": "Files/src__lib__services__error-analysis__learningpipeline.md",
-      "x": 2493,
-      "y": 2940,
+      "file": "Files/src__lib__server__analysis__hmm-ace-analyzer.md",
+      "x": -1703,
+      "y": 2819,
       "width": 260,
       "height": 60
     },
@@ -4928,7 +4892,7 @@
       "id": "src__lib__components__ui__globalcommandpalette",
       "type": "file",
       "file": "Files/src__lib__components__ui__globalcommandpalette.md",
-      "x": -1672,
+      "x": -1663,
       "y": 3377,
       "width": 260,
       "height": 60
@@ -4937,8 +4901,8 @@
       "id": "src__lib__components__ui__richtexteditor",
       "type": "file",
       "file": "Files/src__lib__components__ui__richtexteditor.md",
-      "x": -1711,
-      "y": 3692,
+      "x": -1725,
+      "y": 3728,
       "width": 260,
       "height": 60
     },
@@ -4946,8 +4910,8 @@
       "id": "src__lib__components__ui__themegallery",
       "type": "file",
       "file": "Files/src__lib__components__ui__themegallery.md",
-      "x": -1963,
-      "y": 3932,
+      "x": -2040,
+      "y": 3965,
       "width": 260,
       "height": 60
     },
@@ -4955,8 +4919,8 @@
       "id": "src__lib__components__ui__autopopulatedcaseform",
       "type": "file",
       "file": "Files/src__lib__components__ui__autopopulatedcaseform.md",
-      "x": -2336,
-      "y": 3970,
+      "x": -2463,
+      "y": 3932,
       "width": 260,
       "height": 60
     },
@@ -4964,8 +4928,8 @@
       "id": "src__routes___app___demos__celestial-icons___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__celestial-icons___page.md",
-      "x": -2677,
-      "y": 3765,
+      "x": -2780,
+      "y": 3609,
       "width": 260,
       "height": 60
     },
@@ -4973,8 +4937,8 @@
       "id": "src__lib__components__ui__gaming__modals__retrorecommendationmodal",
       "type": "file",
       "file": "Files/src__lib__components__ui__gaming__modals__retrorecommendationmodal.md",
-      "x": -2835,
-      "y": 3377,
+      "x": -2812,
+      "y": 3134,
       "width": 260,
       "height": 60
     },
@@ -4982,8 +4946,8 @@
       "id": "src__routes___app___demos__yorha-icons___page",
       "type": "file",
       "file": "Files/src__routes___app___demos__yorha-icons___page.md",
-      "x": -2727,
-      "y": 2953,
+      "x": -2515,
+      "y": 2734,
       "width": 260,
       "height": 60
     },
@@ -4991,8 +4955,8 @@
       "id": "src__lib__components__ui__cachemonitoringwidget",
       "type": "file",
       "file": "Files/src__lib__components__ui__cachemonitoringwidget.md",
-      "x": -2375,
-      "y": 2665,
+      "x": -2009,
+      "y": 2617,
       "width": 260,
       "height": 60
     },
@@ -5000,17 +4964,8 @@
       "id": "src__lib__components__ui__authmodal",
       "type": "file",
       "file": "Files/src__lib__components__ui__authmodal.md",
-      "x": -1904,
-      "y": 2640,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__components__ui__diamondmodal",
-      "type": "file",
-      "file": "Files/src__lib__components__ui__diamondmodal.md",
-      "x": -1496,
-      "y": 2907,
+      "x": -1530,
+      "y": 2863,
       "width": 260,
       "height": 60
     },
@@ -5123,6 +5078,69 @@
       "height": 60
     },
     {
+      "id": "src__lib__gpu__markdown-processor",
+      "type": "file",
+      "file": "Files/src__lib__gpu__markdown-processor.md",
+      "x": 2428,
+      "y": 3505,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__gpu__gpu-compute-pipeline",
+      "type": "file",
+      "file": "Files/src__lib__gpu__gpu-compute-pipeline.md",
+      "x": 2287,
+      "y": 3956,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__gpu__nes-glyph-webgpu",
+      "type": "file",
+      "file": "Files/src__lib__gpu__nes-glyph-webgpu.md",
+      "x": 1786,
+      "y": 4124,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__knowledge-search__knowledgeindexer",
+      "type": "file",
+      "file": "Files/src__lib__services__knowledge-search__knowledgeindexer.md",
+      "x": 1312,
+      "y": 3802,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__knowledge-search__minioknowledgestore",
+      "type": "file",
+      "file": "Files/src__lib__services__knowledge-search__minioknowledgestore.md",
+      "x": 1273,
+      "y": 3190,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__gpu__webgpu-pagerank",
+      "type": "file",
+      "file": "Files/src__lib__gpu__webgpu-pagerank.md",
+      "x": 1757,
+      "y": 2760,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__services__error-analysis__learningpipeline",
+      "type": "file",
+      "file": "Files/src__lib__services__error-analysis__learningpipeline.md",
+      "x": 2426,
+      "y": 2880,
+      "width": 260,
+      "height": 60
+    },
+    {
       "id": "src__lib__services__error-analysis__kagtraverser",
       "type": "file",
       "file": "Files/src__lib__services__error-analysis__kagtraverser.md",
@@ -5189,7 +5207,7 @@
       "id": "src__lib__components__admin__evidencedrawer",
       "type": "file",
       "file": "Files/src__lib__components__admin__evidencedrawer.md",
-      "x": 4179,
+      "x": 4154,
       "y": 1703,
       "width": 260,
       "height": 60
@@ -5198,8 +5216,8 @@
       "id": "src__lib__components__admin__pipelineprogress",
       "type": "file",
       "file": "Files/src__lib__components__admin__pipelineprogress.md",
-      "x": 3619,
-      "y": 2363,
+      "x": 3812,
+      "y": 2296,
       "width": 260,
       "height": 60
     },
@@ -5207,8 +5225,17 @@
       "id": "src__lib__components__admin__evidencedatagrid",
       "type": "file",
       "file": "Files/src__lib__components__admin__evidencedatagrid.md",
-      "x": 2884,
-      "y": 1703,
+      "x": 3060,
+      "y": 2110,
+      "width": 260,
+      "height": 60
+    },
+    {
+      "id": "src__lib__components__admin__adminmonitoringdashboard",
+      "type": "file",
+      "file": "Files/src__lib__components__admin__adminmonitoringdashboard.md",
+      "x": 3013,
+      "y": 1263,
       "width": 260,
       "height": 60
     },
@@ -5216,8 +5243,8 @@
       "id": "src__lib__components__admin__tagselector",
       "type": "file",
       "file": "Files/src__lib__components__admin__tagselector.md",
-      "x": 3619,
-      "y": 903,
+      "x": 3867,
+      "y": 942,
       "width": 260,
       "height": 60
     },
@@ -5308,33 +5335,6 @@
       "file": "Files/src__lib__server__workers__video-vlm-processor.md",
       "x": -549,
       "y": 3992,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__services__langextract-service",
-      "type": "file",
-      "file": "Files/src__lib__server__services__langextract-service.md",
-      "x": -1106,
-      "y": 3619,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__analysis__evidence-analysis-pipeline",
-      "type": "file",
-      "file": "Files/src__lib__server__analysis__evidence-analysis-pipeline.md",
-      "x": -2059,
-      "y": 4236,
-      "width": 260,
-      "height": 60
-    },
-    {
-      "id": "src__lib__server__analysis__hmm-ace-analyzer",
-      "type": "file",
-      "file": "Files/src__lib__server__analysis__hmm-ace-analyzer.md",
-      "x": -2103,
-      "y": 2926,
       "width": 260,
       "height": 60
     },
@@ -5737,21 +5737,21 @@
       "toEnd": "arrow"
     },
     {
-      "id": "e-17-0",
-      "fromNode": "group-17",
-      "toNode": "src__lib__services__knowledge-search__acptoolregistry",
+      "id": "e-32-0",
+      "fromNode": "group-32",
+      "toNode": "src__lib__server__services__knowledge-search__acptoolregistry",
       "toEnd": "arrow"
     },
     {
-      "id": "e-17-1",
-      "fromNode": "group-17",
-      "toNode": "src__lib__gpu__markdown-processor",
+      "id": "e-32-1",
+      "fromNode": "group-32",
+      "toNode": "src__lib__server__services__langextract-service",
       "toEnd": "arrow"
     },
     {
-      "id": "e-17-2",
-      "fromNode": "group-17",
-      "toNode": "src__lib__gpu__gpu-compute-pipeline",
+      "id": "e-32-2",
+      "fromNode": "group-32",
+      "toNode": "src__lib__server__analysis__evidence-analysis-pipeline",
       "toEnd": "arrow"
     },
     {
@@ -5893,6 +5893,24 @@
       "toEnd": "arrow"
     },
     {
+      "id": "e-17-0",
+      "fromNode": "group-17",
+      "toNode": "src__lib__gpu__markdown-processor",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-17-1",
+      "fromNode": "group-17",
+      "toNode": "src__lib__gpu__gpu-compute-pipeline",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e-17-2",
+      "fromNode": "group-17",
+      "toNode": "src__lib__gpu__nes-glyph-webgpu",
+      "toEnd": "arrow"
+    },
+    {
       "id": "e-16-0",
       "fromNode": "group-16",
       "toNode": "src__lib__services__error-analysis__kagtraverser",
@@ -5998,24 +6016,6 @@
       "id": "e-24-1",
       "fromNode": "group-24",
       "toNode": "src__lib__server__workers__video-vlm-processor",
-      "toEnd": "arrow"
-    },
-    {
-      "id": "e-32-0",
-      "fromNode": "group-32",
-      "toNode": "src__lib__server__services__langextract-service",
-      "toEnd": "arrow"
-    },
-    {
-      "id": "e-32-1",
-      "fromNode": "group-32",
-      "toNode": "src__lib__server__analysis__evidence-analysis-pipeline",
-      "toEnd": "arrow"
-    },
-    {
-      "id": "e-32-2",
-      "fromNode": "group-32",
-      "toNode": "src__lib__server__analysis__hmm-ace-analyzer",
       "toEnd": "arrow"
     },
     {

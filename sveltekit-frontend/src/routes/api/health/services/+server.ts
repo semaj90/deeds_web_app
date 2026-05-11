@@ -19,7 +19,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+ if (!locals.user) return json({ status: 'degraded', error: 'Unauthorized' }, { status: 401 });
  const startTime = Date.now();
  try {
  const services = getServiceAdapters();

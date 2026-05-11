@@ -29,6 +29,7 @@ export * from './errorBrainDiffs.js';
 
 // ACE Pipeline tables
 export * from './ace-web-crawl.js';
+export * from '../schema-ace.js';
 
 // Analytics (user_analytics_events — used via raw SQL in event-logger.ts)
 export * from './analytics.js';

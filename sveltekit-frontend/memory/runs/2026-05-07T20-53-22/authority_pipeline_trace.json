@@ -1,12 +1,12 @@
 {
-  "traceWrittenAt": "2026-05-10T02:53:23.862Z",
+  "traceWrittenAt": "2026-05-11T05:19:36.650Z",
   "selectedAuthorityRunDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\runs\\2026-05-07T20-53-22",
   "gdsVersion": "available",
-  "pagerankNodes": 2772,
+  "pagerankNodes": 1201,
   "authorityNodes": 2772,
   "allAuthoritiesCount": 2772,
   "tsgoErrorCount": 0,
   "clustersWithAuthority": 0,
-  "qdrantDryRunMatches": 7416,
+  "qdrantDryRunMatches": 7849,
   "errors": []
 }
