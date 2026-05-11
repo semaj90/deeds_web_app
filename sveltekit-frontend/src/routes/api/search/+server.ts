@@ -12,6 +12,7 @@ const searchQuerySchema = z.object({
 	jurisdiction: z.string().max(20).optional(),
 	authority: z.enum(['primary', 'persuasive', 'secondary', 'fictional']).optional(),
 });
+
 import {
 	cases,
 	evidence,
@@ -21,6 +22,12 @@ import {
 	ragMessages,
 	ragSessions,
 } from '$lib/server/db/schema-postgres.js';
+import { qdrantCentroidClusters } from '$lib/server/db/schema/kag-dag.js';
+import { LegalCitationService } from '$lib/server/legal/citation-service.js';
+import { OperatorRouter } from '$lib/server/kag/operator-router.js';
+import { AgenticSearchService } from '$lib/server/vector/agentic-search.js';
+
+
 import { ilike, or, desc, sql, eq } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { buildGrpcClientChannelOptions } from '$lib/server/grpc/client-options.js';
@@ -79,8 +86,28 @@ function mapGoHit(h: Record<string, unknown>): PlatformSearchHit {
 		jurisdiction: (h.jurisdictionCode ?? h.jurisdiction ?? '') as string,
 		corpusType: (h.corpusType ?? h.corpus_type ?? '') as string,
 		sourceConfidence: (h.sourceConfidence ?? '') as string,
+		citations: (h.citations ?? []) as any[],
 	};
 }
+
+/** Map Agentic search hit to PlatformSearchHit */
+function mapAgenticHit(h: any): PlatformSearchHit {
+	return {
+		id: String(h.id),
+		entityType: 'document' as const,
+		title: (h.payload?.title ?? h.payload?.citation ?? 'Legal Agent Discovery') as string,
+		snippet: (h.payload?.content ?? h.payload?.summary ?? '').slice(0, 300),
+		score: h.score,
+		matchType: 'agentic' as const,
+		route: '/legal-corpus',
+		metadata: {
+			tags: h.payload?.tags,
+			authority: h.payload?.authority_level
+		}
+	};
+}
+
+
 
 // ── gRPC Client for Go Search Service (lazy-loaded, singleton) ──────────
 
@@ -216,25 +243,66 @@ async function searchLegalLibrary(q: string, limit: number): Promise<PlatformSea
 			[q, limit]
 		);
 
-		return res.rows.map((r: Record<string, unknown>) => ({
-			id: (r.chunk_id ?? '') as string,
-			entityType: 'document' as const,
-			title: (r.document_title ?? 'Legal Document') as string,
-			snippet: ((r.chunk_text as string) ?? '').slice(0, 250),
-			score: (r.fts_score ?? 0) as number,
-			matchType: 'fts' as const,
-			route: r.node_id
-				? `/library/${r.document_id}/node/${r.node_id}`
-				: `/library/${r.document_id ?? ''}`,
-			documentId: (r.document_id ?? '') as string,
-			nodeId: (r.node_id ?? '') as string,
-			jurisdiction: (r.jurisdiction_code ?? '') as string,
-			corpusType: (r.corpus_type ?? '') as string,
+		return await Promise.all(
+			res.rows.map(async (r: Record<string, unknown>) => ({
+				id: (r.chunk_id ?? '') as string,
+				entityType: 'document' as const,
+				title: (r.document_title ?? 'Legal Document') as string,
+				snippet: ((r.chunk_text as string) ?? '').slice(0, 250),
+				score: (r.fts_score ?? 0) as number,
+				matchType: 'fts' as const,
+				route: r.node_id
+					? `/library/${r.document_id}/node/${r.node_id}`
+					: `/library/${r.document_id ?? ''}`,
+				documentId: (r.document_id ?? '') as string,
+				nodeId: (r.node_id ?? '') as string,
+				jurisdiction: (r.jurisdiction_code ?? '') as string,
+				corpusType: (r.corpus_type ?? '') as string,
+				citations: await LegalCitationService.getCitedNodes(r.node_id as string)
+			}))
+		);
+	} catch {
+		return [];
+	}
+}
+
+/** Search RAPTOR thematic summaries (Hierarchical context) */
+async function searchRaptorAtlas(q: string, limit: number): Promise<PlatformSearchHit[]> {
+	try {
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+		const { generateEmbedding } = await import('$lib/server/ai/ollama-client.js');
+
+		const queryVec = await generateEmbedding(q);
+		if (!queryVec) return [];
+
+		const results = await qdrant._denseSearch({
+			collection: 'summary_lenses',
+			query: q,
+			queryEmbedding: queryVec,
+			filters: { lens_type: 'thematic_summary' },
+			limit
+		});
+
+		return results.results.map(r => ({
+			id: String(r.id),
+			entityType: 'report' as const,
+			title: (r.payload?.title ?? 'Thematic Summary') as string,
+			snippet: (r.payload?.summary ?? r.payload?.text ?? '').slice(0, 300),
+			score: r.score,
+			matchType: 'semantic' as const,
+			route: '/admin/atlas',
+			metadata: {
+				lens: 'thematic',
+				tags: r.payload?.tags
+			}
 		}));
 	} catch {
 		return [];
 	}
 }
+
+
+
 
 /** Search glossary / legal definitions */
 async function searchGlossary(q: string, limit: number): Promise<PlatformSearchHit[]> {
@@ -448,66 +516,18 @@ async function searchMessages(q: string, limit: number): Promise<PlatformSearchH
 /** Search canonical legal knowledge via Qdrant hybrid dense+sparse search */
 async function searchCanon(q: string, limit: number, jurisdiction?: string, authority?: string): Promise<PlatformSearchHit[]> {
 	try {
-		const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
-		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-		const { generateSparseVector } = await import('$lib/server/vector/bm42-sparse.js');
+		// Hybrid search with RRF via AgenticSearchService
+		const searchResults = await AgenticSearchService.search(q, {
+			collection: 'legal_canon_chunks',
+			limit,
+			filters: {
+				...(jurisdiction ? { jurisdiction } : {}),
+				...(authority ? { authority_level: authority } : {})
+			},
+			expandQuery: true // Enable agentic expansion for canon searches
+		});
 
-		const embedResult = await generateEmbeddings([q]);
-		const queryVec = embedResult.vectors[0];
-		if (!queryVec || queryVec.length !== 768) return [];
-
-		const sparseVec = generateSparseVector(q);
-
-		// Build payload filter for jurisdiction + authority level
-		const mustConditions: Array<{ key: string; match: { value: string } }> = [];
-		if (jurisdiction) {
-			mustConditions.push({ key: 'jurisdiction', match: { value: jurisdiction } });
-		}
-		if (authority) {
-			mustConditions.push({ key: 'authority_level', match: { value: authority } });
-		}
-		const filter = mustConditions.length > 0 ? { must: mustConditions } : undefined;
-
-		// Hybrid search: dense (content) + sparse (bm25) with RRF fusion
-		let points: QdrantPoint[];
-		try {
-			const response = await qdrant.client.query('legal_canon_chunks', {
-				prefetch: [
-					{ query: queryVec, using: 'content', limit: limit * 3, ...(filter ? { filter } : {}) },
-					...(sparseVec.indices.length > 0
-						? [{ query: sparseVec, using: 'bm25', limit: limit * 3, ...(filter ? { filter } : {}) }]
-						: []),
-				],
-				query: { fusion: 'rrf' },
-				limit,
-				with_payload: true,
-				...(filter ? { filter } : {}),
-			});
-			points = ((response as { points?: QdrantPoint[] }).points ?? []);
-		} catch {
-			// Fallback to dense-only if hybrid fails
-			const fallback = await qdrant.client.search('legal_canon_chunks', {
-				vector: { name: 'content', vector: queryVec },
-				limit,
-				score_threshold: 0.3,
-				...(filter ? { filter } : {}),
-			});
-			points = fallback as QdrantPoint[];
-		}
-
-		// GPU-accelerated post-retrieval reranking via LibTorch (100× faster batch similarity)
-		const { results: rerankPoints } = await gpuRerankQdrantResults(
-      queryVec,
-      points as Array<{
-        id: string | number;
-        score: number;
-        payload?: Record<string, unknown>;
-        vector?: number[];
-      }>
-    );
-    points = rerankPoints as QdrantPoint[];
-
-		return points.map((r) => ({
+		return searchResults.results.map((r) => ({
 			id: (r.payload?.chunk_id ?? r.id) as string,
 			entityType: 'statute' as const,
 			title: (r.payload?.citation ?? r.payload?.doc_title ?? 'Canon Chunk') as string,
@@ -523,6 +543,7 @@ async function searchCanon(q: string, limit: number, jurisdiction?: string, auth
 				domains: r.payload?.domains,
 			},
 		}));
+
 	} catch {
 		return [];
 	}
@@ -611,6 +632,20 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 		if (type === 'all' || type === 'canon') {
 			adapters.push({ name: 'canon', fn: () => searchCanon(q, limit, jurisdiction, authority) });
 		}
+
+		// Phase 1D: Automatic Lane Expansion via Router
+		const routerDecision = await OperatorRouter.route(q);
+		if (routerDecision.lane === 'thematic_raptor') {
+			adapters.push({ name: 'raptor', fn: () => searchRaptorAtlas(q, limit) });
+		} else if (routerDecision.lane === 'agentic_multiquery') {
+			// Inject Agentic Multi-Query expansion for deep research intents
+			adapters.push({ 
+				name: 'agentic_research', 
+				fn: () => AgenticSearchService.search(q, { collection: 'legal_canon_chunks', limit }).then(res => res.results.map(mapAgenticHit))
+			});
+		}
+
+
 
 		// Fan out with Promise.allSettled — individual failures don't break the search
 		const settled = await Promise.allSettled(
