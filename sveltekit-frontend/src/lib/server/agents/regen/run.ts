@@ -18,6 +18,7 @@ import { composeCard } from './section-builders.js';
 import { writeCardToRedis } from '../agents-card-store.js';
 import { writeCardToCouchDB, type CouchWriteResult } from './writers/couchdb-writer.js';
 import { backfillQdrantPayload, type QdrantBackfillResult } from './writers/qdrant-backfill.js';
+import { writeCardMarkdown, type MarkdownWriteResult } from './writers/markdown-writer.js';
 import type { BuildRegenContextOptions, RegenContext } from './loaders/types.js';
 import type { AgentsDirectoryCard } from '../agents-card-store.js';
 
@@ -68,6 +69,7 @@ export interface RegenCliResult {
 	couchWrites:    number;
 	qdrantWrites:   number;
 	qdrantPointsTouched: number;
+	markdownWrites: number;
 	durationMs:     number;
 	signalSourcesLoaded: RegenSignalSources;
 	dryRun:         boolean;
@@ -108,6 +110,8 @@ export interface RunRegenDeps {
 	couchWriteFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<CouchWriteResult>;
 	/** Override the Qdrant backfill (used by tests). Gated by !dryRun && !redisOnly. */
 	qdrantBackfillFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<QdrantBackfillResult>;
+	/** Override the AGENTS.md writer (used by tests). Gated by !dryRun && !redisOnly. */
+	markdownWriteFn?: (card: AgentsDirectoryCard, enabled: boolean) => Promise<MarkdownWriteResult>;
 }
 
 export async function runRegen(
@@ -119,15 +123,17 @@ export async function runRegen(
 	const dryRun    = opts.dryRun ?? false;
 	const force     = opts.force ?? false;
 	const redisOnly = opts.redisOnly ?? false;
-	const couchEnabled  = !dryRun && !redisOnly;
-	const qdrantEnabled = !dryRun && !redisOnly;
+	const couchEnabled    = !dryRun && !redisOnly;
+	const qdrantEnabled   = !dryRun && !redisOnly;
+	const markdownEnabled = !dryRun && !redisOnly;
 	const runId   = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 	const lock    = deps.lock ?? (dryRun ? NOOP_LOCK : redisLock());
 	const compose = deps.composeFn ?? composeCard;
 	const loadEx  = deps.loadExistingFn ?? loadExistingCard;
 	const write   = deps.writeFn ?? writeCardToRedis;
-	const couchFn = deps.couchWriteFn ?? ((card, enabled) => writeCardToCouchDB(card, { enabled }));
-	const qdrantFn = deps.qdrantBackfillFn ?? ((card, enabled) => backfillQdrantPayload(card, { enabled }));
+	const couchFn    = deps.couchWriteFn      ?? ((card, enabled) => writeCardToCouchDB(card, { enabled }));
+	const qdrantFn   = deps.qdrantBackfillFn  ?? ((card, enabled) => backfillQdrantPayload(card, { enabled }));
+	const markdownFn = deps.markdownWriteFn   ?? ((card, enabled) => writeCardMarkdown(card, { enabled }));
 
 	const failures: RegenFailure[] = [];
 	let changedCount    = 0;
@@ -137,6 +143,7 @@ export async function runRegen(
 	let couchWrites     = 0;
 	let qdrantWrites    = 0;
 	let qdrantPointsTouched = 0;
+	let markdownWrites  = 0;
 
 	// 1. Acquire lock (real runs only).
 	if (!dryRun) {
@@ -188,6 +195,10 @@ export async function runRegen(
 					qdrantPointsTouched += qdrantResult.pointsTouched;
 				}
 				if (qdrantResult.error) failures.push({ dir, error: `qdrant: ${qdrantResult.error}` });
+
+				const markdownResult = await markdownFn(composed.card, markdownEnabled);
+				if (markdownResult.wrote) markdownWrites++;
+				if (markdownResult.error) failures.push({ dir, error: `markdown: ${markdownResult.error}` });
 			} catch (err) {
 				failures.push({ dir, error: String((err as Error)?.message ?? err) });
 			}
@@ -214,6 +225,7 @@ export async function runRegen(
 			couchWrites,
 			qdrantWrites,
 			qdrantPointsTouched,
+			markdownWrites,
 			durationMs:     Date.now() - startMs,
 			signalSourcesLoaded,
 			dryRun,
