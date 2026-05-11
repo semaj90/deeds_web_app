@@ -41,7 +41,7 @@
 
 3a. **Of the 18 truly-orphan tables, only 2 have non-schema-file consumers** (`errorPatchLog` + `routeContextCache` are imported by `src/lib/server/phase78/contextBuilder.ts`). The other 16 are unreferenced outside their own schema file — meaning that consumer code path is dead-on-arrival until the migration lands.
 
-4. **`$lib/` unresolved-imports audit is overwhelmingly clean.** 1,053 unique import paths checked; 18 unresolved. **17 of those 18 are in: ambient `.d.ts` shim modules, `.new`/`.todo`/`.bak` files, README docs, or commented-out code.** Only one is a live consumer: `src/lib/components/detective/DetectiveBoard.svelte:12` imports `$lib/features/ai/services/ai-service` which doesn't resolve. svelte-check's ~12 baseline errors are unrelated to import resolution (most are in admin/raptor parallel-agent residue per CLAUDE.md).
+4. **`$lib/` unresolved-imports audit is overwhelmingly clean.** 1,053 unique import paths checked; 18 unresolved (audit-time). All 18 were in ambient `.d.ts` shim modules, `.new`/`.todo`/`.bak` files, README docs, or commented-out code. The one prior "live consumer" claim (`DetectiveBoard.svelte:12` → `$lib/features/ai/services/ai-service`) is **stale** — that import was repointed by a parallel agent before this audit revision; live grep returns zero matches. svelte-check's baseline 0 NEW errors holds; the 2 remaining pre-existing errors in `glyph/tile-atlas/+server.ts` are unrelated `url` redeclarations.
 
 5. **The intent-router pipeline (Phase 2) is shipped end-to-end.** `intent-router.ts` exports `routeIntent` + `executeChain` + 9 schemas, consumed by `/api/ai/intent-dispatch/+server.ts` AND `/api/ai/contextual-chat/+server.ts`. RRF fusion (Phase 1) is similarly wired: `retrieval/rrf-fuse.ts` → `/api/rag/search-fused/+server.ts` + `context-assembler.ts` + `routing/query-router-4x4.ts`.
 
@@ -67,7 +67,7 @@ Sorted: SPEC_ONLY → PARTIAL → UNDOCUMENTED → SHIPPED.
 | 6 | Test RAG harness schema | `schema-test-rag.ts` | **SPEC_ONLY** | 1 (schema only) | 0 | Verify test-only; if yes, move to `tests/fixtures/` |
 | 7 | Reconstruction 3-track (Lanes B–E) | `memory/reconstruction-3-tracks.md` | **PARTIAL** | ~6 (extractor + 1 route + courtroom 4) | 0 | Build ComfyUI HTTP wrapper, RabbitMQ `scene.render`/`evidence.render` queues, Blender Mixamo registry |
 | 8 | Glyph / CHR97 cartridge layer | master_agents.md G36–G47 | **PARTIAL** | 10+ (cartridge + glyph + tensor-bridge + 11 routes) | 0 | G45 — verify `glyph_records` columns in canonical schema; G43 — CouchDB `glyph_topology` persistence; G44 — `glyph.tile.rebuild` RabbitMQ |
-| 9 | DetectiveBoard.svelte | n/a (orphan UI) | **PARTIAL** | 1 component | 1: `$lib/features/ai/services/ai-service` | Repoint import or delete component |
+| 9 | Detective / Evidence board variants | n/a (case-investigation UI) | **PARTIAL** | **7 components** (table in §3.16) | 0 (stale audit — broken import was already fixed) | Consolidate to `evidence/EvidenceBoard.svelte` (1290 LoC, feature-richest) for `/cases/[id]/evidence`. Demo mode at `/demos/evidence-canvas` already exercises it. |
 | 10 | feature_atlas (L9 HyperRAG lane) | master_agents.md §2 + §HyperRAG | **PARTIAL** | 2 (`featureImplementations` + `seed-feature-atlas.mjs`) | 0 | Lane wired but G-HR3/G-HR4 per-chunk fields need `graphify:semantic` data run |
 | 11 | HyperRAG L0–L11 multi-lane retrieval | master_agents.md §2 (12 lanes) | **SHIPPED** | 12 primary files (table in §3.1) | 0 | None — G-HR1–G-HR10 all PASS |
 | 12 | ACE context assembler + trust tiers | master_agents.md §2 (ACE_PIPELINE_VERSION=3.0.0) | **SHIPPED** | 43 files in `server/ace/` | 0 | None |
@@ -182,12 +182,31 @@ The Mixamo license-safe action allowlist exists in the spec but no `courtroom_an
 
 `schema-test-rag.ts` — if test-only (likely from `npm run test:diagnostics` or `tests/routes/`), move to `tests/fixtures/` so it isn't conflated with production schema.
 
-### 3.16 DetectiveBoard.svelte broken import — PARTIAL
+### 3.16 Detective / Evidence board fragmentation — PARTIAL
 
-`src/lib/components/detective/DetectiveBoard.svelte:12` imports `$lib/features/ai/services/ai-service` which does not resolve. Either:
-- Repoint to existing `$lib/server/ai/...` module (caveat: needs to be browser-safe — `$lib/server/*` is SSR-only), OR
-- Delete the import — component may still function via other deps, OR
-- Restore a `src/lib/features/ai/services/ai-service.ts` shim.
+The audit's original claim — `DetectiveBoard.svelte:12` imports `$lib/features/ai/services/ai-service` — is **stale**. That import was repointed by a parallel agent before this revision; live grep returns zero matches.
+
+The real finding: **7 board variants** coexist across two domains (case-investigation + non-case).
+
+| File | LoC | Domain | Consumers | Notes |
+|---|---|---|---|---|
+| `components/evidence/EvidenceBoard.svelte` | **1290** | case-evidence | `/demos/evidence-canvas`, `/admin/codebase-graph` | **Feature-richest** — 3 board modes (grid/free/magnetic), node + connection graph, undo/redo history, layout persistence, search overlay, minimap, relationship inspector |
+| `components/detective/ContextualDetectiveBoard.svelte` | 788 | case-evidence | `/analysis-center` | Contextual loading variant |
+| `components/codebase/CodeEvidenceBoard.svelte` | 496 | code-graph | `/admin/codebase-graph` | Different domain — codebase graph, not case evidence |
+| `components/RouteInspectorDetectiveBoard.svelte` | 444 | route-debug | `/admin/all-routes` | Different domain — route inspector |
+| `components/detective/DetectiveBoard.svelte` | 345 | case-evidence | `/admin/all-routes`, `/analysis-center` | Older drag-drop with `nes.css` styling |
+| `components/yorha/EvidenceBoard.svelte` | 335 | case-evidence | 0 (demo only) | YoRHa-themed re-skin |
+| `features/evidence-command-center/EvidenceBoardPane.svelte` | 121 | case-evidence | `/cases/[id]/evidence` (PRODUCTION) | **Minimal grid** — what real users see today |
+
+**Asymmetry**: the most-feature-rich board (`evidence/EvidenceBoard.svelte`, 1290 LoC) is only used by admin/demo routes. The production user surface (`/cases/[id]/evidence`) uses the minimal 121-LoC `EvidenceBoardPane.svelte`.
+
+**Consolidation recommendation** (post-migration, requires user-test):
+1. Wire `evidence/EvidenceBoard.svelte` behind a feature flag on `/cases/[id]/evidence`
+2. Verify with demo mode (`/demos/evidence-canvas` already proves the heavy board works on seeded data)
+3. Migrate the production route to the heavy board once UX is validated
+4. Archive `yorha/EvidenceBoard.svelte` (0 consumers) + dedupe drag-drop logic from `detective/DetectiveBoard.svelte`
+
+Keep `CodeEvidenceBoard.svelte` and `RouteInspectorDetectiveBoard.svelte` — different domains, not duplicate.
 
 Currently the **only active runtime broken import** in the codebase — the other 17 unresolved paths are in .d.ts shims, .new/.todo/.bak files, README docs, or commented-out code.
 
@@ -235,7 +254,7 @@ Currently the **only active runtime broken import** in the codebase — the othe
 
 | File (consumer) | Missing import | Likely target |
 |---|---|---|
-| `src/lib/components/detective/DetectiveBoard.svelte:12` | `$lib/features/ai/services/ai-service` | Repoint to `$lib/services/ai-service` if browser-safe, or delete component |
+| ~~`src/lib/components/detective/DetectiveBoard.svelte:12`~~ | ~~`$lib/features/ai/services/ai-service`~~ | **RESOLVED 2026-05-11** — repointed by parallel agent; live grep returns zero matches |
 | `src/types/webgpu-shims.d.ts:11,25` | `$lib/services/latency-logger` | Ambient declaration; no runtime impact unless re-enabled |
 | `src/types/webgpu-ambient-modules.d.ts:4` | `$lib/services/latency-logger` | Same ambient declaration |
 | `src/lib/utils/bits-ui-ssr` (line 5) | `$lib/types/api-schemas` | Likely intended `$lib/types/api.ts` or `$lib/schemas/...` |
@@ -244,7 +263,7 @@ Currently the **only active runtime broken import** in the codebase — the othe
 | `src/lib/webgpu/todo_webgpu` (commented) | 6 paths | TODO file — no action needed |
 | `src/lib/ClientEmbeddingGemma.README.md` (docs) | self-references | Documentation only |
 
-**Of these, only `DetectiveBoard.svelte` is a real runtime hazard.** The rest are .d.ts ambient declarations (intentionally type-only) or non-`.ts`/`.svelte` files that don't compile.
+**Updated 2026-05-11**: zero remaining live-runtime hazards. All entries are either resolved, ambient declarations (intentionally type-only), or non-`.ts`/`.svelte` files that don't compile. The board-consolidation finding in §3.16 is now the actionable item.
 
 ### 4.3 Spec Drift (AGENTS.md / master_agents.md says X, code does Y)
 
@@ -270,7 +289,7 @@ Currently the **only active runtime broken import** in the codebase — the othe
 
 Ranked by leverage × effort. Each item is a single concrete commit-sized change.
 
-1. **Fix the one real broken import** — `DetectiveBoard.svelte:12` → repoint or delete. *Effort: 15 min. Files: 1. Risk: very low (component may already be unused — check with `grep -r "DetectiveBoard" src/`)*. **This unblocks the "0 active unresolved imports" claim.**
+1. ~~Fix the one real broken import~~ **SUPERSEDED 2026-05-11**: that import was repointed by a parallel agent. Live grep returns zero matches. Replaced action: **consolidate detective/evidence board variants** — see §3.16. The production `/cases/[id]/evidence` route uses the minimal 121-LoC `EvidenceBoardPane.svelte` while the feature-richest 1290-LoC `evidence/EvidenceBoard.svelte` is only exposed via demo + admin routes. **Demo mode**: `/demos/evidence-canvas` already exercises the heavy board on seeded data, so the migration path is validate-then-swap, not rewrite-from-scratch. *Effort: 1-2 hr feature-flag wiring + 30 min user-test. Risk: medium (real UX change, but reversible via flag).*
 
 2. **Promote `errorPatchLog` + `routeContextCache` to canonical** — they have a real consumer (`phase78/contextBuilder.ts`) but no live table, which means that consumer is dead-on-arrival at runtime. Run `drizzle-kit generate` against `schema-phase78.ts`, journal it, move the 2 truly-orphan table definitions into `schema-postgres.ts`, delete the now-empty `schema-phase78.ts`. *Effort: 1-2 hr. Files: 3. Risk: low.*
 
