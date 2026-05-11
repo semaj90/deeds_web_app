@@ -1,7 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-const SEARXNG_URL = process.env.SEARXNG_URL || 'http://localhost:8888';
+const SEARXNG_URL   = process.env.SEARXNG_URL   || 'http://localhost:8888';
+const LANGGRAPH_URL = process.env.LANGGRAPH_URL || process.env.LANGGRAPH_SYNTH_URL || 'http://localhost:8091';
 
 /**
  * Advanced research tools leveraging SearXNG and Ollama.
@@ -43,6 +44,53 @@ export function registerResearchTools(server: McpServer) {
         };
       } catch (err: any) {
         return { content: [{ type: 'text', text: `Web search failed: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // == research.synthesize ====================================================
+  /**
+   * Full RAG+KAG+LangGraph synthesis via the legal-ai-langgraph:8091 container.
+   * Routes through L1 Redis exact-match → L2 Bifrost semantic → L3 LangGraph DAG.
+   * Returns answer + confidence + cache tier + trace_id.
+   *
+   * The synth container is already running (docker compose --profile gpu) and
+   * auto-discovers Ollama models including gemma4-hermes-64k:latest.
+   */
+  server.registerTool(
+    'research.synthesize',
+    {
+      description: 'Full RAG+KAG+LangGraph legal synthesis via the GPU pipeline at :8091. Returns answer + confidence + citations + cache tier. Routes through L1 Redis (5ms) → L2 Bifrost semantic → L3 LangGraph DAG (Gemma4 + Qdrant ANN + Neo4j KAG + ACE context).',
+      inputSchema: z.object({
+        query:       z.string().min(3).max(4000).describe('Natural-language legal/research question'),
+        case_id:     z.string().uuid().optional().describe('Optional UUID — scopes retrieval to a specific case'),
+        temperature: z.number().min(0).max(2).default(0.3).optional().describe('LLM temperature (default 0.3 for legal precision)'),
+        max_tokens:  z.number().int().min(50).max(4000).default(800).optional().describe('Max output tokens'),
+        skip_cache:  z.boolean().default(false).optional().describe('Bypass L1/L2 caches and force a fresh DAG run'),
+      })
+    },
+    async ({ query, case_id, temperature, max_tokens, skip_cache }) => {
+      try {
+        const res = await fetch(`${LANGGRAPH_URL}/synthesize`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ query, case_id, temperature, max_tokens, skip_cache }),
+          signal:  AbortSignal.timeout(90_000),
+        });
+        if (!res.ok) {
+          const text = await res.text().catch(() => '');
+          return {
+            content: [{ type: 'text', text: `synth failed: HTTP ${res.status} ${text.slice(0, 200)}` }],
+            isError: true,
+          };
+        }
+        const data = await res.json();
+        return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+      } catch (err: any) {
+        return {
+          content: [{ type: 'text', text: `synth unreachable: ${err.message ?? String(err)}` }],
+          isError: true,
+        };
       }
     }
   );
