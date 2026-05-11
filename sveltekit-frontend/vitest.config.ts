@@ -211,6 +211,8 @@ export default defineConfig({
       'tests/tool-ranker.spec.ts',
       // RG-Atlas search pipeline unit tests
       'tests/rg-atlas.spec.ts',
+      // P1: autoencoder weights + 768→64 encode chain (2026-05-11)
+      'tests/autoencoder-encoded64.spec.ts',
     ],
     exclude: [
       'node_modules/**',
