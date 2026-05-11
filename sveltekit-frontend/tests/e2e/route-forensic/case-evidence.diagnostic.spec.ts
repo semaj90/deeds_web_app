@@ -17,7 +17,14 @@ test.describe.serial('Route forensic: /cases/[id]/evidence', () => {
 
 	test('GET /cases/[id]/evidence — list or empty state', async ({ page }) => {
 		if (!caseId) test.skip();
-		const log = await captureRouteLoad(page, `/cases/${caseId}/evidence`, { waitMs: 1500 });
+		const log = await captureRouteLoad(page, `/cases/${caseId}/evidence`, { waitMs: 3000 });
+		// ssr=false + heavy imports → wait for hydration to surface either an
+		// evidence row, upload anchor, or upload button before counting.
+		await page
+			.locator('[data-testid*="evidence"], li, table tr, a[href*="/evidence/upload"]')
+			.first()
+			.waitFor({ state: 'attached', timeout: 5000 })
+			.catch(() => {});
 		const rows = await page.locator('[data-testid*="evidence"], li, table tr').count();
 		const uploadCTA = await page
 			.locator('a[href*="/evidence/upload"]').or(page.locator('button').filter({ hasText: /upload/i }))

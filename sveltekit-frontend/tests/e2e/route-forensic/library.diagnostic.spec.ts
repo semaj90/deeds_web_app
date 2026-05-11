@@ -9,7 +9,14 @@ test.describe.serial('Route forensic: /library', () => {
 	});
 
 	test('GET /library — document list or empty state', async ({ page }) => {
-		const log = await captureRouteLoad(page, '/library', { waitMs: 1500 });
+		const log = await captureRouteLoad(page, '/library', { waitMs: 3000 });
+		// ssr=false + heavy imports → wait for hydration to surface either a list
+		// item, a search input, or an empty-state message before asserting.
+		await page
+			.locator('li, article, [data-testid*="doc"], input[type="search"], input[type="text"], text=/no docs|no documents|empty/i')
+			.first()
+			.waitFor({ state: 'attached', timeout: 5000 })
+			.catch(() => {});
 		const items = await page.locator('li, article, [data-testid*="doc"]').count();
 		const search = await page.locator('input[type="search"], input[type="text"]').count();
 		const emptyMsg = await page.locator('text=/no docs|no documents|empty/i').count();
