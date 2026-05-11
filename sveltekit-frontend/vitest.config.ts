@@ -171,6 +171,8 @@ export default defineConfig({
       'tests/agents-regen-composer.spec.ts',
       // Phase A2 — 8 section builders + composeCard (Zod-valid, hash-stable)
       'tests/agents-regen-section-builders.spec.ts',
+      // Phase A3 (part 1) — runRegen() orchestrator (lock + diff-and-skip + dry-run)
+      'tests/agents-regen-run.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',

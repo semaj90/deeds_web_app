@@ -23,6 +23,9 @@ export { loadExistingCard } from './existing-card.js';
 
 export { buildRegenContext } from './build-context.js';
 
+// Phase A3 orchestrator surfaces under ../run.ts (kept out of this loader
+// barrel so consumers can import loaders independently of the writer).
+
 export type {
 	CodebaseGraph,
 	CodebaseGraphFile,
