@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const { getKAGTraverser } = await import('$lib/services/error-analysis/KAGTraverser.js');
+    const { getKAGTraverser } = await import('$lib/server/services/error-analysis/KAGTraverser.js');
     const kag = getKAGTraverser();
     await kag.waitForInit();
     const stats = kag.getStats();
@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const { errorId, action } = parsed.data;
 
   try {
-    const { getKAGTraverser } = await import('$lib/services/error-analysis/KAGTraverser.js');
+    const { getKAGTraverser } = await import('$lib/server/services/error-analysis/KAGTraverser.js');
     const kag = getKAGTraverser();
     await kag.waitForInit();
 

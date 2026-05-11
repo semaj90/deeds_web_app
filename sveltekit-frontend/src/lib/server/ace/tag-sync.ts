@@ -109,7 +109,7 @@ export async function getDocumentTags(
 	// Catalog: CouchDB
 	try {
 		return await traceCouchDB('get-tags', 'ace_tags', async () => {
-			const { couchdb } = await import('$lib/services/couchdb-client.js');
+			const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 			const doc = (await couchdb.get('ace_tags', `doc:${documentId}`)) as Record<string, unknown>;
 			const tags = (doc.tags as GeneratedTag[]) ?? [];
 			return tags;
@@ -204,7 +204,7 @@ async function mirrorToQdrant(
 
 async function mirrorToCouchDB(tag: GeneratedTag, documentId: string): Promise<void> {
 	return traceCouchDB('upsert-tag', 'ace_tags', async () => {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const docKey = `doc:${documentId}`;
 
 		try {

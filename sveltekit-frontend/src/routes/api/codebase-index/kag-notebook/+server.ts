@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-import { couchdb } from '$lib/services/couchdb-client.js';
+import { couchdb } from '$lib/server/services/couchdb-client.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { bifrostChat } from '$lib/server/ollama.js';

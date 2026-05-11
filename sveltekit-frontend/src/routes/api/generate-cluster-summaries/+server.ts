@@ -357,7 +357,7 @@ async function syncToPostgreSQL(summaries: ClusterSummary[]) {
 async function syncToCouchDB(summaries: ClusterSummary[]) {
 	if (!summaries.length) return;
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const DB = 'phase89_clusters';
 		await couchdb.createDb(DB).catch(() => {});  // no-op if already exists
 		for (const s of summaries) {

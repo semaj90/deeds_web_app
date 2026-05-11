@@ -103,7 +103,7 @@ export async function processWebIngestMessage(msg: WebIngestMessage): Promise<vo
 
 	// Write provenance to CouchDB web_sources
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const docId = `web:${contentHash}`;
 		const prev = await couchdb.get('web_sources', docId).catch(() => null);
 		const doc: Record<string, unknown> = {

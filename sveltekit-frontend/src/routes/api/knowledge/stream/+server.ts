@@ -7,7 +7,7 @@ import { json } from '@sveltejs/kit';
  * Streams tokens as they're generated for responsive UI.
  */
 
-import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
+import { getKnowledgeSearcher } from '$lib/server/services/knowledge-search/KnowledgeSearcher.js';
 
 import { routeStreamingInference } from '$lib/server/inference/inference-router.js';
 import { logInference } from '$lib/server/observability/inference-log.js';

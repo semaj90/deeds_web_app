@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	}
 
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const doc = await couchdb.get('ace_tags', tagId);
 		return json(doc);
 	} catch (err) {

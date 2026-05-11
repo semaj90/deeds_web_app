@@ -101,7 +101,7 @@ async function flushBuffer(): Promise<void> {
 
 	try {
 		await traceCouchDB('inference-log-flush', INFERENCE_LOG_DB, async () => {
-			const { couchdb } = await import('$lib/services/couchdb-client.js');
+			const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 
 			// Ensure DB exists (once)
 			if (!dbEnsured) {

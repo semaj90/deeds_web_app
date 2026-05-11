@@ -3072,7 +3072,7 @@ export function setupToolHandlers() {
         if (!filePath) throw new Error('path is required');
 
         const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
-        const { couchdb: couch } = await import('../lib/services/couchdb-client.js');
+        const { couchdb: couch } = await import('../lib/server/services/couchdb-client.js');
 
         const fileId = (filePath.startsWith('src/') ? filePath : `src/${filePath}`).replace(
           /[^a-zA-Z0-9/_.-]/g,

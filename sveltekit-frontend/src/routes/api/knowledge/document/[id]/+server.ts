@@ -7,7 +7,7 @@
  * Requirements: 8.2
  */
 
-import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
+import { getKnowledgeSearcher } from '$lib/server/services/knowledge-search/KnowledgeSearcher.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

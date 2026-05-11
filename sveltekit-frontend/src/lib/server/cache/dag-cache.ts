@@ -48,7 +48,7 @@ export async function getCachedDAG(
 
 	try {
 		return await traceCouchDB('dag-cache-get', DAG_CACHE_DB, async () => {
-			const { couchdb } = await import('$lib/services/couchdb-client.js');
+			const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 			const doc = (await couchdb.get(DAG_CACHE_DB, key)) as Record<string, unknown>;
 
 			const cached = doc as unknown as CachedDAGOrdering & { _id?: string; _rev?: string };
@@ -98,7 +98,7 @@ export async function setCachedDAG(
 
 	try {
 		await traceCouchDB('dag-cache-set', DAG_CACHE_DB, async () => {
-			const { couchdb } = await import('$lib/services/couchdb-client.js');
+			const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 
 			// Ensure DB exists
 			await couchdb.createDb(DAG_CACHE_DB);
@@ -125,7 +125,7 @@ export async function setCachedDAG(
  */
 export async function purgeAllDAGCache(): Promise<{ deleted: number; error?: string }> {
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const allDocs = await couchdb.allDocs(DAG_CACHE_DB, { include_docs: true }) as {
 			rows: Array<{ id: string; doc?: Record<string, unknown> & { _rev?: string } }>
 		};
@@ -169,7 +169,7 @@ export async function purgeAllDAGCache(): Promise<{ deleted: number; error?: str
  */
 export async function cleanupExpiredDAGCache(): Promise<{ deleted: number; error?: string }> {
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 		const allDocs = await couchdb.allDocs(DAG_CACHE_DB, { include_docs: true }) as {
 			rows: Array<{ id: string; doc?: Record<string, unknown> & { _rev?: string } }>
 		};
