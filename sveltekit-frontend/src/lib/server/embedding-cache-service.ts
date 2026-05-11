@@ -2,10 +2,10 @@
  * Enhanced Embedding Cache Service
  * Redis-based caching for embeddings and frequently accessed data
  */
-import { redisService } from './redis-service.js';
+import { redis } from './redis.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-// Using direct type access or any to bypass strict type checking during recovery
-const typedRedisService = redisService as any;
+
+const typedRedisService = redis as any;
 
 interface EmbeddingCacheEntry {
     text: string;
@@ -58,7 +58,7 @@ class EmbeddingCacheService {
         embedding: number[],
         model: string = 'embeddinggemma:latest'
     ): Promise<void> {
-        if (!typedRedisService.isHealthy() || !text || !Array.isArray(embedding) || embedding.length === 0) return;
+        if (typedRedisService.status !== 'ready' || !text || !Array.isArray(embedding) || embedding.length === 0) return;
         try {
             const key = this.generateEmbeddingKey(text, model);
             const compressed = this.compressEmbedding(embedding);
@@ -143,7 +143,7 @@ class EmbeddingCacheService {
         metadata: Record<string, unknown> = {},
 	customTTL?: number
     ): Promise<void> {
-        if (!typedRedisService.isHealthy()) return;
+        if (typedRedisService.status !== 'ready') return;
         try {
             const key = this.generateQueryKey(query, metadata);
             const ttl = customTTL || this.calculateQueryTTL(results.length, metadata);
@@ -173,7 +173,7 @@ class EmbeddingCacheService {
         query: string,
         metadata: Record<string, unknown> = {}
     ): Promise<unknown[] | null> {
-        if (!typedRedisService.isHealthy()) return null;
+        if (typedRedisService.status !== 'ready') return null;
         try {
             const key = this.generateQueryKey(query, metadata);
             const cached = await typedRedisService.get(`${this.QUERY_PREFIX}${key}`);

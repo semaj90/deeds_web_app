@@ -80,6 +80,7 @@ import { searchNotecards } from '../lib/server/kb/search-logic.js';
 import { registerBifrostTools } from './bifrost_tools.js';
 import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
+import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
@@ -118,6 +119,7 @@ if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server);
   registerResearchTools(server);
   registerBifrostTools(server);
+  registerRgAtlasTools(server);
 }
 // NOTE: registerTopologyMgmtTools(server, pool) moved below `pool` declaration
 // at line 111 — it was hitting TDZ here and crashing MCP at startup with

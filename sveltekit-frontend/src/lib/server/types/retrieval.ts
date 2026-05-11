@@ -134,6 +134,16 @@ export interface UnifiedRetrievalResult {
   /** Final position after all scoring and filtering */
   rank?: number;
 
+  // ── Agents enrichment ─────────────────────────────────────────────────────
+  /** Directory summary from AgentsDirectoryCard */
+  dirSummary?: string;
+  /** Features implemented in this directory */
+  featureKeys?: string[];
+  /** Audit status (SHIPPED, PARTIAL, SPEC_ONLY) */
+  auditStatus?: string;
+  /** Activity score from graph degree */
+  activityScore?: number | null;
+
   // ── Arbitrary upstream payload ────────────────────────────────────────────
   /**
    * Raw Qdrant payload or other upstream key/value metadata.
@@ -175,6 +185,13 @@ export function fromQdrantPoint(
     jurisdiction: typeof p['jurisdiction'] === 'string' ? p['jurisdiction'] : undefined,
     somCluster:   typeof p['som_cluster'] === 'number' ? p['som_cluster'] : typeof p['neo4j_gpuCluster'] === 'number' ? p['neo4j_gpuCluster'] : null,
     originalRank: opts.originalRank,
+    
+    // Agents enrichment
+    dirSummary:   typeof p['dir_summary'] === 'string' ? p['dir_summary'] : undefined,
+    featureKeys:  Array.isArray(p['feature_keys']) ? (p['feature_keys'] as string[]) : undefined,
+    auditStatus:  typeof p['audit_status'] === 'string' ? p['audit_status'] : undefined,
+    activityScore: typeof p['agents_activity_score'] === 'number' ? p['agents_activity_score'] : null,
+
     metadata:     p,
   };
 }
