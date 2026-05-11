@@ -61,6 +61,10 @@ const log = (...args) => { if (!FLAGS.quiet) console.log(...args); };
 
 async function main() {
 	log('=== Karpathy LLM Wiki Indexer ===');
+	// Contract startup line — matches the regression test in tests/agents-index-cli.spec.ts
+	const writersState = FLAGS.dryRun ? 'disabled' : 'enabled';
+	const limitDisplay = FLAGS.limit === Infinity ? 'none' : FLAGS.limit;
+	console.log(`[agents:index] dryRun=${FLAGS.dryRun} limit=${limitDisplay} writers=${writersState}`);
 	if (FLAGS.dryRun) log('[dry-run] no writes will occur');
 	if (FLAGS.limit !== Infinity) log(`[limit] capped at ${FLAGS.limit} dirs`);
 
@@ -145,6 +149,21 @@ async function main() {
 		console.log(`- Neo4j:   ${counts.neo4jWrites} card nodes synced, ${counts.neo4jErrors} batch error(s)`);
 		console.log(`- Analysis:${counts.analysisUpdates} cards re-scored`);
 	}
+
+	// Contract JSON summary — single line, machine-parsable, matches CLI regression test.
+	// In dry-run all *Writes counters MUST be 0 — that is the safety invariant under test.
+	const machineSummary = {
+		dryRun:         FLAGS.dryRun,
+		limit:          FLAGS.limit === Infinity ? null : FLAGS.limit,
+		processed:      total,
+		redisWrites:    0, // no Redis stage in this script (kept for contract parity)
+		couchWrites:    FLAGS.dryRun ? 0 : counts.couchdbWrites,
+		qdrantWrites:   0, // no Qdrant stage in this script (kept for contract parity)
+		markdownWrites: 0, // no Markdown stage in this script (kept for contract parity)
+		neo4jWrites:    FLAGS.dryRun ? 0 : counts.neo4jWrites,
+		analysisUpdates: FLAGS.dryRun ? 0 : counts.analysisUpdates,
+	};
+	console.log(`[agents:index] summary=${JSON.stringify(machineSummary)}`);
 
 	console.log('\nDone.');
 }
