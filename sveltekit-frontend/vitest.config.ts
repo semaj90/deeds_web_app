@@ -155,8 +155,12 @@ export default defineConfig({
       'tests/agents-build-index-flags.spec.ts',
       // KAG SOM-cluster source (consumer side of som-cluster-cards.mjs) — 2026-05-11
       'tests/kag-cluster-source.spec.ts',
+      // Mini-active NVMe cache (compiled JSON snapshot of Neo4j + CouchDB) — 2026-05-11
+      'tests/mini-active-cache.spec.ts',
       // End-to-end CLI flag-contract regression (spawns the real script + parses banner/summary)
       'tests/agents-index-cli.spec.ts',
+      // Mini-Active-Cache CLI flag-contract regression (parallel guardrail to agents-index-cli)
+      'tests/agents-cache-cli.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
