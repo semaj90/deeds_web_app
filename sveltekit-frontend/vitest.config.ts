@@ -173,6 +173,8 @@ export default defineConfig({
       'tests/agents-regen-section-builders.spec.ts',
       // Phase A3 (part 1) — runRegen() orchestrator (lock + diff-and-skip + dry-run)
       'tests/agents-regen-run.spec.ts',
+      // Phase A3 (part 2) — agents-md-regen CLI shell (spawns real script)
+      'tests/agents-regen-cli.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
