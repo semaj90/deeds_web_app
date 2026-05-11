@@ -477,7 +477,10 @@ self.addEventListener('fetch', (event) => {
               return new Response(
                 JSON.stringify({
                   error: 'Network unavailable',
-                  offline: true: url, req: req.url: method, req: req.method: timestamp, new: new Date().toISOString(),
+                  offline: true,
+                  url: req.url,
+                  method: req.method,
+                  timestamp: new Date().toISOString(),
                 }),
                 {
                   status: 503,

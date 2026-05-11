@@ -530,6 +530,48 @@ Answer NO or Ctrl+C immediately. Drizzle marks tables not in schema for deletion
 
 ---
 
+## UI bugs are HOT — never deferred (May 11, 2026)
+
+The "do not touch" lists below (Drizzle Safety Rule § 1-4, identity strategy, hypergraph write fire, CUDA Graphs, cuVS, new LangGraph workers) cover **infrastructure/data-layer changes** that need operator review. They do **NOT** cover broken UI affordances. **UI bugs jump the queue.**
+
+**What counts as a UI bug:**
+- Buttons that visually exist but click does nothing (no console.log, no network request, no state change)
+- Forms that submit but no `fetch()` fires (`onsubmit` handler missing or returns false silently)
+- File inputs / drop zones that don't accept files (drag/drop handler missing or `e.preventDefault()` not called)
+- Modals that won't open OR won't close (state binding broken)
+- Pages that render blank (uncaught exception in load() or top-level component)
+- Service Worker / Web Worker registration failures (cascade into offline + analytics breakage)
+- `console.error` on page load (always a real bug — not "noise")
+- Network requests that never arrive at the server (intercepted by SW, blocked by COEP, CORS, or rate limiter)
+
+**The diagnostic discipline** (use `tests/e2e/upload-button-diagnostic.spec.ts` as the template):
+
+A Playwright test that captures EVERY browser signal — `console`, `pageerror`, `request`, `response`, `requestfailed` — for a single user action. Output is verbose by design (forensic, not CI gate). Run it BEFORE guessing what's broken.
+
+```ts
+page.on('console', (msg) => log.consoleMessages.push({type, text, location}));
+page.on('pageerror', (err) => log.pageErrors.push({message, stack}));
+page.on('request', (req) => log.requests.push({method, url, resourceType}));
+page.on('response', async (res) => { if (status >= 400) capture body });
+page.on('requestfailed', (req) => log.requestFailures.push({url, failure}));
+```
+
+**Real example (this commit, 2026-05-11):** User reports "nothing uploads". Server probe shows `POST /api/evidence/upload` returns HTTP 201 with full evidence record. Diagnostic captures `SW: Registration failed: TypeError ... script evaluation failed @ src/lib/client/sw-register.ts:24`. Root cause: 1-line syntax bug in `static/sw.js:480` (corrupted `key: value` colon-mix from a prior auto-fixer pass — same pattern as the `cache.put()` bug fixed in commit `e54bc0850e`). One-line edit + diagnostic re-run shows `Console errors: 0`. Done.
+
+**Workflow when a UI button "doesn't work":**
+1. Write a forensic Playwright test that captures all 5 signals (template above)
+2. Run it once, eyeball the output
+3. Fix the FIRST root-cause error (don't chase warnings)
+4. Re-run, confirm signal goes 1 → 0
+5. Commit with the diagnostic script committed too — the next person needs it
+
+**Do NOT:**
+- Bury UI bugs under the "operator-only" hard rules (those are for DB/infra/identity, not UX)
+- Assume "the SW bug is unrelated" — SW fail cascades into upload failures, telemetry loss, analytics gaps
+- Defer to "P1 mechanical batch" — broken buttons block actual users; mechanical type fixes don't
+
+---
+
 ## Drizzle Safety Rule (May 11, 2026 — operator-only gate)
 
 **Do NOT run `drizzle-kit push` or apply generated DROP migrations until ALL four hold:**
