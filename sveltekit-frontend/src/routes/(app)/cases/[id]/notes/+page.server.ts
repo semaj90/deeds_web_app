@@ -1,31 +1,24 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db/client';
-import { cases } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
 
-const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
-
-export const load: PageServerLoad = async ({ locals, params }) => {
+/**
+ * Notes sub-route load. Previously re-fetched the case independently; now
+ * reads it from `await parent()` (layout already loaded the full row).
+ *
+ * caseData was truncated to {id, title, status, jurisdiction} in the prior
+ * implementation. The layout now returns the FULL row — strictly additive,
+ * so notes/+page.svelte continues to work unchanged.
+ */
+export const load: PageServerLoad = async ({ locals, parent }) => {
 	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
 
-	const caseId = params.id;
-
-	const caseRows = await safe(
-		db.select({
-			id: cases.id,
-			title: cases.title,
-			status: cases.status,
-			jurisdiction: cases.jurisdiction,
-		}).from(cases).where(eq(cases.id, caseId)).limit(1),
-		[]
-	);
+	const { caseData, loadError } = await parent();
 
 	return {
 		user: locals.user,
-		caseData: caseRows[0] ?? null,
-		loadError: caseRows[0] ? null : 'Case not found or database unavailable',
+		caseData,
+		loadError,
 	};
 };
