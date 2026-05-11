@@ -370,3 +370,47 @@ This audit sampled 20 feature areas chosen by file-count density. Long-tail feat
 ---
 
 *End of audit. Generated 2026-05-11.*
+
+---
+
+## Addendum (2026-05-11) — Migration carve + readiness verification
+
+**Migrate-now bucket carved into focused manual migration** at [drizzle/manual/0018_ace_observability_canonicalize.sql](../../drizzle/manual/0018_ace_observability_canonicalize.sql) (153 LoC, all `IF NOT EXISTS`, zero destructive ops). Includes the 5 audit-approved ACE/memory tables only:
+
+- `ace_retrieval_runs` — ACE retrieval pass header
+- `ace_retrieval_hits` — per-chunk scoring detail for a run
+- `memory_gain_audits` — gain-vs-existing-memory audit log
+- `metadata_envelopes` — canonical envelope spine (AGENTS.md / chunks / diagnostics)
+- `code_llm_index` — code LLM output cache (PRIOR ANSWER lane)
+
+**Deliberately NOT carved** (29 of the 34 tables in the inspection migration):
+
+- 7 duplicates of `tablesFilter`-protected tables (`admin_ai_chat_*`, `embedded_summaries`, `panel_activity_log`, `vlm_image_tags`, `admin_ai_skills`, `admin_ai_subagent_runs`) — Drizzle generates CREATE because they're declared in `schema-postgres.ts`; would collide with sidecar SQL that already created them. Each needs per-table review before migration.
+- 22 deferred-feature scaffolding (legal/RAPTOR/KAG/code-analysis caches: `case_chunks`, `crimes`, `case_persons`, `feature_implementations`, `feature_file_edges`, `community_reports`, `kag_dag_*`, `hypergraph_edges`, `graph_pathway_cards`, `code_relations`, `codebase_audit_events`, `directory_cluster_checkpoints`, `error_fingerprints`, `llm_summary_cache`, `qdrant_centroid_clusters`, `qdrant_cluster_members`, `rag_query_cache`, `tensor_analysis_cache`, `topology_positions`, `topology_snapshots`). These should land as coherent migration sets per feature area.
+
+**Apply manually when ready** (NOT auto-applied):
+```bash
+docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db \
+  < sveltekit-frontend/drizzle/manual/0018_ace_observability_canonicalize.sql
+```
+
+### Readiness verification (read-only, 2026-05-11)
+
+| Check | Result |
+|---|---|
+| `manifold4` column on `research_summaries` | ✅ ARRAY |
+| `manifold4` column on `embedded_summaries` | ✅ ARRAY |
+| `manifold4` column on `codebase_chunk_index` | ✅ ARRAY |
+| `docs/graph/codebase-graph.json` freshness | ✅ same-day (4.2 MB) |
+| `docs/graph/codebase-map.md` freshness | ✅ same-day (62 KB) |
+| `npm run smoke:hyperrag` | ✅ 10/10 gates pass (G-HR1..G-HR10) |
+| `npm run smoke:agents` | ✅ 387 Redis dir keys + agents:root present |
+| `npm run agents:index:smoke` | ⚠️ ran live (not dry) — 406 dirs processed (173 SHIPPED, 233 PARTIAL); script's `--dry-run --limit 10` flags appear non-functional. Follow-up: fix flag handling in `scripts/agents/build-agents-index.mjs`. |
+
+**Hard rules respected** (operator directive 2026-05-11):
+- ❌ NOT touching `cases.user_id` / identity strategy (operator-only Path A/B/C/D decision pending; Path C recommended)
+- ❌ NOT running `drizzle-kit push`
+- ❌ NOT applying the 34-table inspection migration
+- ❌ NOT deleting schema files
+- ❌ NOT firing `buildHypergraph4D()` as a write job (identity must be decided first; topology may be valid but RL/feedback would attach signals to the wrong identity model)
+- ❌ NOT starting CUDA Graphs / cuVS / new LangGraph workers

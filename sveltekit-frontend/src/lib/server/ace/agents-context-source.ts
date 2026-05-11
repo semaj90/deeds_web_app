@@ -177,9 +177,10 @@ async function scanRedisCardsByKeywords(
 	for (const card of cards) {
 		if (!card) continue;
 		const haystack = [
-			...card.tags,
+			...card.qdrantTags,
 			...card.featureKeys,
-			card.purpose,
+			card.summary,
+			card.title,
 			card.dirPath,
 		].join(' ').toLowerCase();
 		let hits = 0;
