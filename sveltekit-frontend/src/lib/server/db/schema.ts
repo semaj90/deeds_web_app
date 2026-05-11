@@ -141,3 +141,4 @@ export * from './schema/topology';
 export * from './schema/graph-pathway-cards';
 export * from './schema/admin-chat';
 export * from './schema/admin-ai-skills';
+export * from './schema-search';
