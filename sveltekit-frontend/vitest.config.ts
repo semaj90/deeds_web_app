@@ -149,6 +149,8 @@ export default defineConfig({
       // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
       // Multi-lane RRF replacement + cross-encoder gate (Action #2 + #3 from 2026-05-11 audit)
       'tests/multi-lane-rrf-and-rerank.spec.ts',
+      // AGENTS directory-card index store + ACE context source (P1 batch — 2026-05-11)
+      'tests/agents-index.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
