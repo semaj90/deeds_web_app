@@ -4405,3 +4405,54 @@ export const panelActivityLog = pgTable('panel_activity_log', {
 export type PanelActivityLog    = typeof panelActivityLog.$inferSelect;
 export type NewPanelActivityLog = typeof panelActivityLog.$inferInsert;
 
+// === RG-ATLAS SEARCH PIPELINE (M2-2026-05-11) ===
+//   rg lexical → Karpathy blend → multi-query Qdrant → MS-MARCO → LangExtract
+//   → cosine-weighted final blend, persisted per-run for replay/audit.
+
+export const rgSearchRuns = pgTable('rg_search_runs', {
+  id:          uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  /** rg_<unix_ms>_<uuid8> — human-readable timestamp + UUID prefix */
+  runKey:      varchar('run_key', { length: 64 }).notNull().unique(),
+  query:       text('query').notNull(),
+  /** Resolved RgSearchAtlasOptions used for the run */
+  args:        jsonb('args').notNull().default(sql`'{}'::jsonb`),
+  /** Stage timing + counts (rgMs, embedMs, marcoMs, etc.) */
+  diagnostics: jsonb('diagnostics').notNull().default(sql`'{}'::jsonb`),
+  /** k-means cluster count produced by stage 5 (null when clustering skipped) */
+  clusterCount: integer('cluster_count'),
+  userId:      integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  createdAt:   timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  userCreatedIdx: index('rg_runs_user_created_idx').on(t.userId, t.createdAt),
+  runKeyIdx:      index('rg_runs_runkey_idx').on(t.runKey),
+}));
+
+export const rgSearchHits = pgTable('rg_search_hits', {
+  id:          uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  runId:       uuid('run_id').notNull().references(() => rgSearchRuns.id, { onDelete: 'cascade' }),
+  filePath:    text('file_path').notNull(),
+  lineNumber:  integer('line_number'),
+  snippet:     text('snippet'),
+  /** Provenance tag: 'rg' | 'qdrant' | 'union' */
+  source:      varchar('source', { length: 16 }).notNull(),
+  /** Per-stage scores (rgMatch, karpathy, qdrantCosine, marco, langExtract, final).
+   *  JSONB so weights/components can evolve without schema changes. */
+  scores:      jsonb('scores').notNull().default(sql`'{}'::jsonb`),
+  /** Final weighted score — the sort key; indexed for top-K queries */
+  finalScore:  real('final_score').notNull().default(0),
+  clusterId:   integer('cluster_id'),
+  /** LangExtract grounded entities: [{ type, text, sourceOffset: [start, end] }] */
+  entities:    jsonb('entities').notNull().default(sql`'[]'::jsonb`),
+  rank:        integer('rank').notNull(),
+  createdAt:   timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  runRankIdx:    index('rg_hits_run_rank_idx').on(t.runId, t.rank),
+  finalScoreIdx: index('rg_hits_final_score_idx').on(t.finalScore),
+  clusterIdx:    index('rg_hits_cluster_idx').on(t.clusterId),
+}));
+
+export type RgSearchRun    = typeof rgSearchRuns.$inferSelect;
+export type NewRgSearchRun = typeof rgSearchRuns.$inferInsert;
+export type RgSearchHit    = typeof rgSearchHits.$inferSelect;
+export type NewRgSearchHit = typeof rgSearchHits.$inferInsert;
+
