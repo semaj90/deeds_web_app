@@ -6,6 +6,10 @@
 	import RelationshipInspector from './RelationshipInspector.svelte';
 	import BoardSearchOverlay from './BoardSearchOverlay.svelte';
 	import BoardMinimap from './BoardMinimap.svelte';
+	// M1 merge — AI Assistant Panel toggle ported from detective/DetectiveBoard.svelte
+	// (audit doc §3.16 + merge plan 2026-05-11_evidence-board-merge-plan.md).
+	// Opt-in via showAIAssistant prop; off by default to keep flag-on UX additive.
+	import AIAssistantPanel from '$lib/components/ai/AIAssistantPanel.svelte';
 	import { boardHistory, createMoveCommand, createBulkMoveCommand, createDeleteNodeCommand, createAddConnectionCommand, createDeleteConnectionCommand } from './board-history.svelte.js';
 	import { loadLayout, scheduleSave, flushSave, type BoardLayout } from './board-persistence.svelte.js';
 
@@ -37,11 +41,29 @@
 	updatedAt: string };
 	type BoardMode = 'grid' | 'free' | 'magnetic';
 
-	let { caseId, initialNodes = [], initialConnections = [] }: {
+	let {
+		caseId,
+		initialNodes = [],
+		initialConnections = [],
+		// M1 props — opt-in AI Assistant Panel (additive; off by default)
+		showAIAssistant = false,
+		aiHighlightedIds = [],
+	}: {
 		caseId: string;
-	initialNodes?: EvidenceNodeType[];
-	initialConnections?: EvidenceConnection[]
+		initialNodes?: EvidenceNodeType[];
+		initialConnections?: EvidenceConnection[];
+		showAIAssistant?: boolean;
+		aiHighlightedIds?: string[];
 	} = $props();
+
+	// Local AI panel visibility (operator can toggle on/off via the panel chip).
+	// Init false then sync from prop in effect — avoids the
+	// state_referenced_locally warning by keeping the reactive read inside a closure.
+	let aiPanelVisible = $state(false);
+	$effect(() => { aiPanelVisible = showAIAssistant; });
+
+	// Selected evidence IDs passed to AIAssistantPanel — derived from board's existing selectedNodes
+	let selectedEvidenceIdsForAI = $derived(Array.from(selectedNodes));
 
 	// Board state — Svelte 5 runes (no writable stores)
 	let nodes = $state<EvidenceNodeType[]>([]);
@@ -866,8 +888,36 @@
 
 		<!-- Relationship Inspector -->
 		<RelationshipInspector {caseId} selectedEvidenceId={selectedEvidenceForInspector} />
+
+		<!-- M1: AI Assistant Panel (opt-in via showAIAssistant prop) -->
+		{#if aiPanelVisible}
+			<aside class="ai-panel-slot" aria-label="AI Assistant">
+				<AIAssistantPanel
+					{caseId}
+					selectedEvidenceIds={selectedEvidenceIdsForAI}
+					isVisible={aiPanelVisible}
+				/>
+			</aside>
+		{/if}
 	</div>
 </div>
+
+<style>
+	.ai-panel-slot {
+		position: fixed;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		width: 380px;
+		max-width: 90vw;
+		z-index: 60;
+		background: rgba(10, 10, 18, 0.95);
+		border-left: 1px solid rgba(196, 168, 130, 0.25);
+		backdrop-filter: blur(6px);
+		overflow-y: auto;
+		box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+	}
+</style>
 
 <style>
 	/* === RETRO EVIDENCE BOARD === */
