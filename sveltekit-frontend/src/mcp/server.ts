@@ -7,6 +7,8 @@ import { createHash } from 'node:crypto';
 import { mcpTools } from '../mcp/index.js';
 import { ENV } from '$lib/server/env.server.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
+import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
+import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 
 export const server = new Server(
   {
@@ -1678,6 +1680,29 @@ export function setupToolHandlers() {
         }
       },
       {
+        name: 'kb.rg_atlas_search',
+        description:
+          'Full RG-Atlas search pipeline: rg lexical sweep → GPU Karpathy blend → ' +
+          'multi-query Qdrant union → MS-MARCO cross-encoder rerank → LangExtract GRPO → ' +
+          'cosine-weighted final blend. Returns ranked hits with per-stage score breakdown. ' +
+          'Use for deep codebase search that combines lexical precision with semantic recall. ' +
+          'Lighter alternatives: kb.search_cards (semantic only) or kb.trace_search (TRACE MCP).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query:             { type: 'string',  description: 'Search query — regex for lexical stage, NL for semantic stages' },
+            paths:             { type: 'array',   items: { type: 'string' }, description: 'Directories to scan. Default: ["src"]' },
+            file_types:        { type: 'array',   items: { type: 'string' }, description: 'File extensions for rg. Default: ["ts","svelte"]' },
+            variant_count:     { type: 'number',  description: 'Multi-query variants (1-5). Default: 3' },
+            top_k_per_lane:    { type: 'number',  description: 'Qdrant hits per variant. Default: 20' },
+            enable_marco:      { type: 'boolean', description: 'Run MS-MARCO cross-encoder rerank. Default: true' },
+            enable_langextract:{ type: 'boolean', description: 'Run LangExtract GRPO validation. Default: false (slow)' },
+            persist:           { type: 'boolean', description: 'Write run + hits to Postgres for replay. Default: false' },
+          },
+          required: ['query']
+        }
+      },
+      {
         name: 'ast:cross_language',
         description:
           'Synthesize cross-language equivalents for a TypeScript/JS function. ' +
@@ -1758,6 +1783,7 @@ export function setupToolHandlers() {
     'kb.get_card',
     'kb.expand_neighbors',
     'kb.explain_retrieval',
+    'kb.rg_atlas_search',
   ]);
 
   const MCP_CACHE_TTL = parseInt(process.env.MCP_CACHE_TTL_SECONDS ?? '3600', 10);
@@ -2517,6 +2543,79 @@ export function setupToolHandlers() {
             }),
           }],
         };
+      }
+
+      case 'kb.rg_atlas_search': {
+        const {
+          query,
+          paths,
+          file_types,
+          variant_count,
+          top_k_per_lane,
+          enable_marco,
+          enable_langextract,
+          persist,
+        } = args as {
+          query: string;
+          paths?: string[];
+          file_types?: string[];
+          variant_count?: number;
+          top_k_per_lane?: number;
+          enable_marco?: boolean;
+          enable_langextract?: boolean;
+          persist?: boolean;
+        };
+
+        try {
+          const opts: RgSearchAtlasOptions = {
+            query,
+            paths:               paths ?? ['src'],
+            fileTypes:           file_types ?? ['ts', 'svelte'],
+            variantCount:        variant_count ?? 3,
+            topKPerLane:         top_k_per_lane ?? 20,
+            enableMarcoRerank:   enable_marco ?? true,
+            enableLangExtract:   enable_langextract ?? false,
+            persist:             persist ?? false,
+          };
+
+          const result = await runRgSearchAtlas(opts);
+
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                runId:      result.runId,
+                query:      result.query,
+                hitCount:   result.hits.length,
+                clusterCount: result.clusters.length,
+                diagnostics: result.diagnostics,
+                hits: result.hits.slice(0, 30).map(h => ({
+                  filePath:    h.filePath,
+                  lineNumber:  h.lineNumber,
+                  snippet:     h.snippet,
+                  source:      h.source,
+                  clusterId:   h.clusterId,
+                  finalScore:  h.scores.final,
+                  scoreBreakdown: {
+                    marco:       h.scores.marco,
+                    karpathy:    h.scores.karpathy,
+                    qdrantCos:   h.scores.qdrantCosine,
+                    langExtract: h.scores.langExtract,
+                  },
+                })),
+                clusters: result.clusters.map(c => ({
+                  id:          c.id,
+                  memberFiles: c.memberFiles.slice(0, 10),
+                })),
+              }),
+            }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ error: String(err), query }) }],
+            isError: true,
+          };
+        }
       }
 
       case 'inference:route': {
