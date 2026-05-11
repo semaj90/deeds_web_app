@@ -572,6 +572,69 @@ page.on('requestfailed', (req) => log.requestFailures.push({url, failure}));
 
 ---
 
+## Object Storage: SeaweedFS is canonical (MinIO deprecated, May 11, 2026)
+
+**MinIO has license issues (AGPL change → commercial/restricted use).** The repo has cut over to **SeaweedFS S3 gateway** as the canonical object store. SeaweedFS is Apache 2.0, S3-compatible, and the existing MinIO SDK speaks to it unchanged.
+
+**Architecture:**
+- `legal-ai-seaweed-master` (port 9333) — metadata
+- `legal-ai-seaweed-volume` (host port 8380 → container 8080) — file blobs
+- `legal-ai-seaweed-filer`  (host port 8382 → container 8888) — POSIX-style file API
+- `legal-ai-seaweed-s3`     (port 8333) — **AWS S3-compatible gateway, this is what the SDK talks to**
+- Credentials: `minio` / `minio123` (mirrored in `etc/seaweedfs/s3.json` so the existing MinIO SDK keys work without rotation)
+- Bucket: `legal-evidence` (same name as MinIO had — drop-in)
+
+**How the cutover works** (zero code changes in `minio-client.ts` or call sites):
+
+`src/lib/server/env.server.ts:300-307` has a SEAWEED override block:
+```ts
+if (privateEnv.SEAWEED_S3_PORT) {
+  ENV.MINIO_PORT = privateEnv.SEAWEED_S3_PORT;
+  if (privateEnv.SEAWEED_ENDPOINT) ENV.MINIO_ENDPOINT = privateEnv.SEAWEED_ENDPOINT;
+  if (privateEnv.SEAWEED_ACCESS_KEY) ENV.MINIO_ACCESS_KEY = privateEnv.SEAWEED_ACCESS_KEY;
+  if (privateEnv.SEAWEED_SECRET_KEY) ENV.MINIO_SECRET_KEY = privateEnv.SEAWEED_SECRET_KEY;
+}
+```
+
+The MinIO SDK reads `ENV.MINIO_*` and connects to whatever those resolve to. Setting `SEAWEED_S3_PORT=8333` transparently retargets every `uploadFile` / `deleteFile` / `getMinioClient` / presign call at SeaweedFS.
+
+**The four required env vars** (set in `package.json` `dev` script via cross-env, AND in `.env` for non-`npm run dev` callers like CI / scripts):
+```
+SEAWEED_S3_PORT=8333
+SEAWEED_ENDPOINT=localhost
+SEAWEED_ACCESS_KEY=minio
+SEAWEED_SECRET_KEY=minio123
+```
+
+**Verification (2026-05-11):**
+- `POST /api/evidence/upload` 1-byte file → HTTP 201
+- `mc ls local/legal-evidence/.../<new-key>` → empty (NOT in MinIO)
+- `HEAD /buckets/legal-evidence/.../<new-key>` on SeaweedFS filer → HTTP 200 ✅
+- All `evidence.fileUrl` records continue to use the `minio://...` URL prefix (semantically just an S3 prefix; no consumer parses it strictly as MinIO)
+
+**`.env` is gitignored** — production deployments must set the 4 SEAWEED_* env vars in their orchestrator (k8s, fly.io, docker-compose `environment:`, etc.) for the override to fire.
+
+**Migration of existing MinIO objects to SeaweedFS** (separate ops task, not auto):
+```bash
+# Mirror legal-evidence bucket from MinIO to SeaweedFS
+docker exec legal-ai-minio mc mirror --overwrite local/legal-evidence/ \
+  http://minio:minio123@seaweed-s3:8333/legal-evidence/
+```
+
+**Deprecation timeline:**
+1. ✅ 2026-05-11 — cutover env vars set; new uploads go to SeaweedFS
+2. ⏳ Pending operator decision — mirror existing MinIO objects to SeaweedFS
+3. ⏳ Pending operator decision — `docker stop legal-ai-minio` once mirror complete
+4. ⏳ Pending operator decision — remove `legal-ai-minio` service from `docker-compose.yml`
+5. ⏳ Pending operator decision — rename `MINIO_*` env vars to `S3_*` (cosmetic; the SDK doesn't care)
+
+**Do NOT:**
+- Use `mc admin policy` / MinIO-specific admin commands going forward — they don't translate to SeaweedFS
+- Rely on MinIO Console UI (port 9001) for ops — use SeaweedFS Filer UI at port 8382 instead
+- Add SeaweedFS-specific multipart features without checking the AWS SDK compatibility matrix (SeaweedFS supports basic multipart but not all advanced S3 features — check before adopting)
+
+---
+
 ## Drizzle Safety Rule (May 11, 2026 — operator-only gate)
 
 **Do NOT run `drizzle-kit push` or apply generated DROP migrations until ALL four hold:**
