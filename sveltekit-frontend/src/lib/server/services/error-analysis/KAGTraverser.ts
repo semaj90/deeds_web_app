@@ -14,6 +14,7 @@
  *   const rootCause = await kag.identifyRootCause(errorId);
  */
 
+import { ENV } from '$lib/server/env.server.js';
 import type { ErrorReport, ErrorRelationship, FixStrategy, SimilarError } from './types.js';
 
 export interface KAGConfig {
@@ -61,7 +62,7 @@ export class KAGTraverser {
 
 	constructor(config?: Partial<KAGConfig>) {
 		this.config = {
-			neo4jUrl: config?.neo4jUrl ?? process.env?.NEO4J_URL ?? 'bolt://localhost:7687',
+			neo4jUrl: config?.neo4jUrl ?? ENV.NEO4J_URI,
 			neo4jUser: config?.neo4jUser ?? process.env?.NEO4J_USER ?? 'neo4j',
 			neo4jPassword: config?.neo4jPassword ?? process.env?.NEO4J_PASSWORD ?? 'password',
 			maxDepth: config?.maxDepth ?? 5,
@@ -133,10 +134,7 @@ export class KAGTraverser {
 	 * Convert bolt URL to HTTP URL for REST API access
 	 */
 	private getHttpUrl(): string {
-		return this.config.neo4jUrl
-			.replace('bolt://', 'http://')
-			.replace('bolt+s://', 'https://')
-			.replace(':7687', ':7474');
+		return ENV.NEO4J_HTTP_URL;
 	}
 
 	/**

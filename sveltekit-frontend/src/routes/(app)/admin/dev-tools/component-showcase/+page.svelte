@@ -22,24 +22,34 @@
 		{ id: 'ev-3', file_name: 'Witness_Statement.docx', evidence_type: 'document' as const, file_type: 'application/docx', file_size: 156_000, uploaded_at: new Date(Date.now() - 86400000 * 7), ai_summary: '', tags: ['witness', 'deposition'], ai_tags: ['testimony'] },
 	];
 
+	// Bridge the legacy {document,video,audio,other,image} enum (used by basic card +
+	// sample array) to the canonical {document,photo,video,...,scientific} enum that
+	// the rich card consumes.
+	const toCanonicalEvidenceType = (
+		t: 'document' | 'image' | 'video' | 'audio' | 'other'
+	): 'document' | 'photo' | 'video' | 'audio' =>
+		t === 'image' ? 'photo' : t === 'other' ? 'document' : t;
+
 	const richEvidenceItems = sampleEvidence.map(item => ({
-		id: item.id,
-		userId: 'system',
-		title: item.file_name,
-		filename: item.file_name,
-		originalName: item.file_name,
-		mimeType: item.file_type,
-		description: item.ai_summary ?? '',
-		type: item.evidence_type === 'image' ? 'image' as const : 'document' as const,
-		evidenceType: item.evidence_type,
-		tags: item.tags ?? [],
-		createdAt: item.uploaded_at?.toISOString() ?? '',
-		uploadedAt: item.uploaded_at?.toISOString() ?? '',
-		updatedAt: new Date().toISOString(),
-		fileSize: item.file_size,
-		path: `/evidence/${item.id}`,
-		bucket: 'evidence',
-		metadata: { format: item.file_type, size: item.file_size }
+		id:            item.id,
+		caseId:        '00000000-0000-0000-0000-000000000000',
+		title:         item.file_name,
+		description:   item.ai_summary ?? '',
+		evidenceType:  toCanonicalEvidenceType(item.evidence_type),
+		fileName:      item.file_name,
+		fileUrl:       `/evidence/${item.id}`,
+		mimeType:      item.file_type,
+		sizeBytes:     item.file_size,
+		tags:          item.tags ?? [],
+		canvasPosition: { x: 0, y: 0 },
+		metadata: {
+			format:     item.file_type,
+			size:       item.file_size,
+			createdAt:  item.uploaded_at?.toISOString() ?? '',
+			uploadedAt: item.uploaded_at?.toISOString() ?? '',
+			updatedAt:  new Date().toISOString(),
+			uploadedBy: 'system'
+		}
 	}));
 
 	const detectiveItems = sampleEvidence.map(item => ({

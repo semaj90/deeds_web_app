@@ -7,6 +7,7 @@
    */
   import { onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   let stats: any = null;
   let raptorSummaries: any[] = [];
@@ -281,11 +282,12 @@
 
       <!-- Atlas Section -->
       <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/50">
+        <h3 class="text-[11px] font-bold text-zinc-400 mb-3 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
             Thematic Knowledge Atlas
           </div>
-          <button 
+          <button
             onclick={rebuildRaptor}
             disabled={rebuildingRaptor}
             class="text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-purple-600/20 text-purple-400 border border-purple-500/30 hover:bg-purple-600/30 transition-all disabled:opacity-50"

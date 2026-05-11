@@ -65,23 +65,28 @@ import { getAgentsContextForQuery } from '../src/lib/server/ace/agents-context-s
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeCard(overrides: Partial<AgentsDirectoryCard> = {}): AgentsDirectoryCard {
-	const base = {
-		id:             cardIdForDir(overrides.dirPath ?? 'src/lib/server/ace'),
-		dirPath:        'src/lib/server/ace',
-		purpose:        'ACE context assembler — fuses RAG/KAG/SOM/PR for legal queries.',
-		featureKeys:    ['ace', 'context-assembler', 'kag'],
-		importantFiles: ['context-assembler.ts', 'agents-context-source.ts'],
-		imports:        ['$lib/server/redis', '$lib/server/vector/qdrant-manager'],
-		exports:        ['assembleContext', 'getAgentsContextForQuery'],
-		routes:         [],
-		tags:           ['ace', 'retrieval', 'kag'],
-		auditStatus:    'SHIPPED' as const,
-		contentHash:    '',
-		lastIndexedAt:  '2026-05-11T00:00:00.000Z',
+	const base: AgentsDirectoryCard = {
+		id:              cardIdForDir(overrides.dirPath ?? 'src/lib/server/ace'),
+		dirPath:         'src/lib/server/ace',
+		title:           'ace',
+		summary:         'ACE context assembler — fuses RAG/KAG/SOM/PR for legal queries.',
+		staticImports:   ['$lib/server/redis', '$lib/server/vector/qdrant-manager'],
+		dynamicImports:  [],
+		pathAliases:     [],
+		featureKeys:     ['ace', 'context-assembler', 'kag'],
+		routeSurfaces:   [],
+		schemaTables:    [],
+		qdrantTags:      ['ace', 'retrieval', 'kag'],
+		auditStatus:     'SHIPPED',
+		recommendations: [],
+		activityScore:   0,
+		lastIndexedAt:   '2026-05-11T00:00:00.000Z',
+		contentHash:     '',
+		gates:           {},
 	};
 	const merged = { ...base, ...overrides };
 	merged.contentHash = computeCardContentHash(merged);
-	return merged as AgentsDirectoryCard;
+	return merged;
 }
 
 beforeEach(() => {
@@ -113,14 +118,14 @@ describe('cardIdForDir', () => {
 
 describe('computeCardContentHash', () => {
 	it('is stable for equivalent input regardless of array order', () => {
-		const a = makeCard({ tags: ['ace', 'kag', 'retrieval'] });
-		const b = makeCard({ tags: ['retrieval', 'kag', 'ace'] });
+		const a = makeCard({ qdrantTags: ['ace', 'kag', 'retrieval'] });
+		const b = makeCard({ qdrantTags: ['retrieval', 'kag', 'ace'] });
 		expect(a.contentHash).toBe(b.contentHash);
 	});
 
 	it('changes when purpose changes', () => {
-		const a = makeCard({ purpose: 'A' });
-		const b = makeCard({ purpose: 'B' });
+		const a = makeCard({ summary: 'A' });
+		const b = makeCard({ summary: 'B' });
 		expect(a.contentHash).not.toBe(b.contentHash);
 	});
 
@@ -156,15 +161,15 @@ describe('writeCardToRedis', () => {
 	});
 
 	it('overwrites when content actually changes', async () => {
-		const a = makeCard({ purpose: 'V1' });
+		const a = makeCard({ summary: 'V1' });
 		await writeCardToRedis(a);
 
-		const b = makeCard({ purpose: 'V2' });
+		const b = makeCard({ summary: 'V2' });
 		const wrote = await writeCardToRedis(b);
 		expect(wrote).toBe(true);
 
 		const stored = await readCardFromRedis(b.dirPath);
-		expect(stored?.purpose).toBe('V2');
+		expect(stored?.summary).toBe('V2');
 	});
 
 	it('rejects malformed input (Zod parse error)', async () => {
@@ -222,14 +227,14 @@ describe('getAgentsContextForQuery', () => {
 	it('falls back to keyword broad-scan when no filePath given', async () => {
 		const ace = makeCard({
 			dirPath: 'src/lib/server/ace',
-			tags: ['ace', 'retrieval', 'kag'],
+			qdrantTags: ['ace', 'retrieval', 'kag'],
 			featureKeys: ['ace', 'context-assembler'],
 		});
 		const ui = makeCard({
 			dirPath: 'src/lib/components/ui',
-			tags: ['ui', 'bits'],
+			qdrantTags: ['ui', 'bits'],
 			featureKeys: ['button', 'dialog'],
-			purpose: 'UI primitives',
+			summary: 'UI primitives',
 		});
 		await writeCardToRedis(ace);
 		await writeCardToRedis(ui);
@@ -244,7 +249,7 @@ describe('getAgentsContextForQuery', () => {
 
 	it('respects the limit option', async () => {
 		for (let i = 0; i < 4; i++) {
-			await writeCardToRedis(makeCard({ dirPath: `src/lib/server/dir${i}`, tags: ['shared'] }));
+			await writeCardToRedis(makeCard({ dirPath: `src/lib/server/dir${i}`, qdrantTags: ['shared'] }));
 		}
 		const hits = await getAgentsContextForQuery('shared', { limit: 2, allowFallback: false });
 		expect(hits.length).toBeLessThanOrEqual(2);

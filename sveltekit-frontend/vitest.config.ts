@@ -153,6 +153,10 @@ export default defineConfig({
       'tests/agents-index.spec.ts',
       // GraphRAG flag contract for build-agents-index.mjs (Neo4j sync + dry-run + skip flags)
       'tests/agents-build-index-flags.spec.ts',
+      // KAG SOM-cluster source (consumer side of som-cluster-cards.mjs) — 2026-05-11
+      'tests/kag-cluster-source.spec.ts',
+      // End-to-end CLI flag-contract regression (spawns the real script + parses banner/summary)
+      'tests/agents-index-cli.spec.ts',
       'tests/multi-lane-spine.spec.ts',
       // P5 codebase relationship extractor: 7 semantic edge types
       'tests/relationship-extractor.spec.ts',
