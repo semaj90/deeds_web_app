@@ -2,6 +2,8 @@
 <!-- Session 64: Rewritten from corrupted AIEvidenceAnalyzer dep → wired to real evidence API -->
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
+	import { invalidateAll } from '$app/navigation';
+
 
 	interface EvidenceItem {
 		id: string;
@@ -22,9 +24,12 @@
 
 	interface Props {
 		caseId?: string;
+		onUpload?: (item: EvidenceItem) => void;
 	}
 
-	let { caseId = '' }: Props = $props();
+
+	let { caseId = '', onUpload }: Props = $props();
+
 
 	let evidenceItems = $state<EvidenceItem[]>([]);
 	let selectedEvidence = $state<EvidenceItem | null>(null);
@@ -130,7 +135,11 @@
 			evidenceItems = [...evidenceItems, newItem];
 			uploadProgress = 100;
 
+			if (onUpload) onUpload(newItem);
+			await invalidateAll();
+
 			await analyzeEvidence(newItem);
+
 		} catch (error) {
 			console.error('Upload failed:', error);
 			analysisError = error instanceof Error ? error.message : 'Upload failed';

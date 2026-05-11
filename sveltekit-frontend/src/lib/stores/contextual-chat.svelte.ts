@@ -68,7 +68,7 @@ class ContextualChatStore {
 
 		this.isThinking = true;
 		this.lastError = null;
-		this.messages = [...this.messages, { role: 'user', content: trimmed }];
+		const userIndex = this.messages.push({ role: 'user', content: trimmed }) - 1;
 
 		try {
 			const res = await fetch('/api/ai/contextual-chat', {
@@ -88,7 +88,11 @@ class ContextualChatStore {
 			this.lastIntent = data.intent ?? null;
 			this.lastRoute = data.route ?? null;
 			this.sessionId = data.turnId ? this.sessionId : this.sessionId;
-			this.messages = [...this.messages, { role: 'assistant', content: data.response }];
+			this.messages[userIndex].metadata = {
+				intent: data.intent ?? null,
+				route: data.route ?? null,
+			};
+			this.messages.push({ role: 'assistant', content: data.response, metadata: { route: data.route ?? null } });
 			return data;
 		} catch (err) {
 			this.lastError = err instanceof Error ? err.message : String(err);

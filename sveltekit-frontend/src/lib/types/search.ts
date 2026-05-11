@@ -15,7 +15,14 @@ export type PlatformEntityType =
 	| 'report'
 	| 'message';
 
-export type PlatformMatchType = 'fts' | 'vector' | 'fused' | 'ilike' | 'qdrant';
+export type PlatformMatchType =
+	| 'fts'
+	| 'vector'
+	| 'fused'
+	| 'ilike'
+	| 'qdrant'
+	| 'semantic'  // RAPTOR summary atlas + thematic dense paths
+	| 'agentic';  // AgenticSearchService — multi-query expansion + RRF
 
 export interface PlatformSearchHit {
 	id: string;
@@ -32,6 +39,8 @@ export interface PlatformSearchHit {
 	jurisdiction?: string;
 	corpusType?: string;
 	sourceConfidence?: string;
+	/** Optional citation references — populated by the legal FTS adapter */
+	citations?: unknown[];
 	metadata?: Record<string, unknown>;
 }
 

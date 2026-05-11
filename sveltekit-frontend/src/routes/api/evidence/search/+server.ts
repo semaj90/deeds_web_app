@@ -223,11 +223,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
     const embedMs = performance.now() - start;
 
-    // 2. Dual search: Qdrant ANN (fast) + pgvector (authoritative), merge + deduplicate
+    // 2. Hybrid search: Qdrant + pgvector + BM25 merged via RRF
     const searchStart = performance.now();
     const fetchLimit = Math.min(limit * 3, 50); // over-fetch for rerank headroom
-    const rawHits = await dualSearch(queryEmbedding, caseId, fetchLimit, sectionTypes);
+    const rawHits = await hybridSearch(queryEmbedding, query, caseId, fetchLimit, sectionTypes);
     const searchMs = performance.now() - searchStart;
+
 
     if (rawHits.length === 0) {
       return json({
@@ -446,27 +447,88 @@ async function embedQuery(text: string): Promise<number[] | null> {
 
 // ── Dual search: Qdrant ANN + pgvector ───────────────────────────────────
 
-async function dualSearch(
+async function hybridSearch(
 	embedding: number[],
+	query: string,
 	caseId: string | undefined,
 	limit: number,
 	sectionTypes?: string[]
 ): Promise<SearchResult[]> {
-	const [pgResults, qdrantResults] = await Promise.all([
+	const [pgResults, qdrantResults, bm25Results] = await Promise.all([
 		searchPgvector(embedding, caseId, limit, sectionTypes),
 		searchQdrant(embedding, caseId, limit, sectionTypes).catch((err) => {
-			console.warn('[Evidence Search] Qdrant unavailable, using pgvector only:', err instanceof Error ? err.message : err);
+			console.warn('[Evidence Search] Qdrant unavailable, using pgvector/bm25 only:', err instanceof Error ? err.message : err);
 			return [] as SearchResult[];
 		}),
+		searchBm25(query, caseId, limit),
 	]);
 
-	if (qdrantResults.length === 0) return pgResults;
+	// Reciprocal Rank Fusion (RRF)
+	const k = 60;
+	const scoreMap = new Map<string, { hit: SearchResult; score: number }>();
 
-	const seen = new Set(pgResults.map(r => `${r.evidenceId}:${r.chunkIndex}`));
-	const extras = qdrantResults.filter(r => !seen.has(`${r.evidenceId}:${r.chunkIndex}`));
+	const applyRRF = (results: SearchResult[], weight = 1.0) => {
+		results.forEach((hit, index) => {
+			const id = `${hit.evidenceId}:${hit.chunkIndex}`;
+			const current = scoreMap.get(id) || { hit, score: 0 };
+			current.score += weight * (1 / (k + index + 1));
+			scoreMap.set(id, current);
+		});
+	};
 
-	return [...pgResults, ...extras].sort((a, b) => b.score - a.score).slice(0, limit);
+	applyRRF(pgResults, 1.0);     // Vector weight
+	applyRRF(qdrantResults, 1.0);   // Qdrant weight
+	applyRRF(bm25Results, 0.8);     // BM25 weight (slightly lower as it's document-level here)
+
+	return Array.from(scoreMap.values())
+		.sort((a, b) => b.score - a.score)
+		.slice(0, limit)
+		.map(item => ({
+			...item.hit,
+			score: item.score, // Use RRF score
+			metadata: {
+				...item.hit.metadata,
+				rrfScore: item.score
+			}
+		}));
 }
+
+async function searchBm25(
+	query: string,
+	caseId: string | undefined,
+	limit: number
+): Promise<SearchResult[]> {
+	// Simple BM25-like search using ts_rank_cd on evidence table
+	const conditions = [];
+	if (caseId) conditions.push(sql`case_id = ${caseId}`);
+	const where = conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
+
+	const sqlQuery = sql`
+		SELECT id, title, description, summary, fileName,
+			ts_rank_cd(search_vector, plainto_tsquery('english', ${query})) AS rank
+		FROM evidence
+		${where}
+		AND search_vector @@ plainto_tsquery('english', ${query})
+		ORDER BY rank DESC
+		LIMIT ${limit}
+	`;
+
+	const result = await db.execute(sqlQuery);
+	const rows = extractRows(result);
+
+	return rows.map((row) => ({
+		evidenceId: row.id,
+		chunkIndex: 0, // BM25 is document-level in this implementation
+		content: row.description || row.summary || row.title,
+		score: parseFloat(row.rank) || 0,
+		metadata: {
+			fileName: row.fileName || row.title,
+			title: row.title,
+			searchType: 'bm25'
+		},
+	}));
+}
+
 
 async function searchQdrant(
 	embedding: number[],
