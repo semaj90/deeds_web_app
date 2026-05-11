@@ -11,7 +11,7 @@ test.describe.serial('Route forensic: /chat', () => {
 	test('GET /chat — input field + send button present', async ({ page }) => {
 		const log = await captureRouteLoad(page, '/chat', { waitMs: 1500 });
 		const textInputs = await page.locator('textarea, input[type="text"], [contenteditable="true"]').count();
-		const sendBtn = await page.locator('button:has-text(/send|submit|ask/i), button[type="submit"]').count();
+		const sendBtn = await page.locator('button').filter({ hasText: /send|submit|ask/i }).or(page.locator('button[type="submit"]')).count();
 		console.log(`text inputs: ${textInputs}, send btns: ${sendBtn}`);
 		summarise(log, 'GET /chat (composer)');
 		expect(textInputs + sendBtn, 'no chat composer found').toBeGreaterThan(0);

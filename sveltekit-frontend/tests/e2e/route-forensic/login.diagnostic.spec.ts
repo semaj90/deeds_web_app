@@ -12,7 +12,7 @@ test.describe.serial('Route forensic: /login', () => {
 		const log = await captureRouteLoad(page, '/login', { waitMs: 1500 });
 		const emailInput = await page.locator('input[type="email"], input[name="email"]').count();
 		const passwordInput = await page.locator('input[type="password"], input[name="password"]').count();
-		const submit = await page.locator('button[type="submit"], button:has-text(/sign in|login|log in/i)').count();
+		const submit = await page.locator('button[type="submit"]').or(page.locator('button').filter({ hasText: /sign in|login|log in/i })).count();
 		console.log(`email: ${emailInput}, password: ${passwordInput}, submit: ${submit}`);
 		summarise(log, 'GET /login (form)');
 		expect(emailInput).toBeGreaterThan(0);
