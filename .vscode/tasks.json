@@ -9955,6 +9955,73 @@
       "detail": "Full relation pipeline: extract-code-relations → build-codebase-relationships (11k+ edges) → synthesize-next-actions → wire-synthesis-grpo. Use after merging large PRs or before a major agent run. ~2-3 min.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
       "problemMatcher": []
+    },
+    {
+      "label": "🦉 Hermes: Dashboard (web UI :9119)",
+      "type": "shell",
+      "command": "hermes dashboard",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "isBackground": true,
+      "group": "build",
+      "detail": "Launch Hermes Agent web UI at http://127.0.0.1:9119 with sveltekit-frontend as workspace context. Talks to Ollama at :11434 — start that first if not running.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🦉 Hermes: Interactive Shell",
+      "type": "shell",
+      "command": "hermes",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Hermes interactive prompt in terminal. Use for quick tool-call testing without the web UI.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🦉 Hermes: Chat Mode",
+      "type": "shell",
+      "command": "hermes chat",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Hermes streaming terminal chat — bypasses the dashboard, fastest path for one-off queries.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🦉 Hermes: Model Picker",
+      "type": "shell",
+      "command": "hermes model",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "detail": "Switch Hermes's active LLM. Use to pick gemma4-hermes-64k (64K-context derivative of gemma4-legal-vlm).",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🦉 Hermes: Build 64K Modelfile (one-time)",
+      "type": "shell",
+      "command": "$dir = \"$env:TEMP\\hermes-modelfile\"; New-Item -ItemType Directory -Path $dir -Force | Out-Null; $mf = Join-Path $dir 'Modelfile.gemma4-hermes-64k'; @\"\nFROM gemma4-legal-vlm:latest\nPARAMETER num_ctx 65536\n\"@ | Out-File -Encoding ascii -FilePath $mf; ollama create gemma4-hermes-64k -f $mf; ollama list | Select-String gemma4-hermes-64k",
+      "group": "build",
+      "detail": "One-time setup: derive a 64K-context Ollama model from gemma4-legal-vlm:latest. Hermes Agent requires ≥64K context. ~30s, ~5.3GB (metadata-only derive, no re-quantize).",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Ollama: Verify Hermes Model Ready",
+      "type": "shell",
+      "command": "Write-Host '=== Ollama /api/tags ==='; (Invoke-RestMethod -Uri http://127.0.0.1:11434/api/tags).models | Where-Object { $_.name -match 'gemma4-hermes-64k|gemma4-legal-vlm' } | Select-Object name, size, modified_at | Format-Table; Write-Host '=== num_ctx check (gemma4-hermes-64k) ==='; $b = @{ name = 'gemma4-hermes-64k' } | ConvertTo-Json; (Invoke-RestMethod -Uri http://127.0.0.1:11434/api/show -Method Post -Body $b -ContentType 'application/json').parameters",
+      "group": "test",
+      "detail": "Read-only health check: confirms gemma4-hermes-64k exists in Ollama AND its num_ctx parameter is 65536. Run this before launching Hermes if you're unsure of the setup state.",
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "🦉🤖 Hermes Stack: Ollama + Hermes Dashboard",
+      "dependsOn": ["🤖 Ollama: Start with GPU Layers", "🦉 Hermes: Dashboard (web UI :9119)"],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "detail": "Compound task — starts Ollama (GPU layers tuned) then the Hermes dashboard. Both stay alive; use 'Terminate Task' to stop them.",
+      "problemMatcher": []
     }
   ],
   "inputs": [
